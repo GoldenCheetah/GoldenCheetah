@@ -1060,7 +1060,7 @@ RideSummaryWindow::htmlSummary()
     }
 
     //
-    // If summarising a date range show metrics for each ride in the date range
+    // If summarising a date range show metrics for each activity in the date range
     //
     if (!ridesummary) {
 
@@ -1072,14 +1072,18 @@ RideSummaryWindow::htmlSummary()
         int activities = 0;
         int runs = 0;
         int rides = 0;
+        int swims = 0;
         int totalruns = 0;
         int totalrides = 0;
+        int totalswims = 0;
 
         foreach (RideItem *item, context->athlete->rideCache->rides()) {
 
             // get totals regardless of filter
             if (item->isRun) {
                 totalruns++;
+            } else if (item->isSwim) {
+                totalswims++;
             } else {
                 totalrides++;
             }
@@ -1089,6 +1093,8 @@ RideSummaryWindow::htmlSummary()
             // how many of each after filter
             if (item->isRun) {
                 runs++;
+            } else if (item->isSwim) {
+                swims++;
             } else {
                 rides++;
             }
@@ -1174,7 +1180,7 @@ RideSummaryWindow::htmlSummary()
             // apply the filter if there is one active
             if (!specification.pass(ride)) continue;
 
-            if (ride->isRun) continue;
+            if (ride->isRun || ride->isSwim) continue;
 
             if (even) summary += "<tr>";
             else {
@@ -1302,6 +1308,106 @@ RideSummaryWindow::htmlSummary()
             summary += "</tr>";
         }
         summary += "</table><br>";
+
+        //Swims Last
+        if (context->ishomefiltered || context->isfiltered || filtered) {
+
+            // "n of x activities" shown in header of list when filtered
+            summary += ("<p><h3>" +
+                        QString(tr("%1 of %2")).arg(swims).arg(totalswims)
+                                           + (totalruns == 1 ? tr(" swim") : tr(" swims")) +
+                        "</h3><p>");
+        } else {
+
+            // just "n activities" shown in header of list when not filtered
+            summary += ("<p><h3>" +
+                        QString("%1").arg(swims) + (swims == 1 ? tr(" swim") : tr(" swims")) +
+                        "</h3><p>");
+        }
+
+        // table of activities
+        summary += "<table align=\"center\" width=\"80%\" border=\"0\">";
+
+        // header row 1 - name
+        summary += "<tr>";
+        summary += tr("<td align=\"center\">Date</td>");
+        for (j = 0; j< totalCols; ++j) {
+            QString symbol = rtotalColumn[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            summary += QString("<td align=\"center\">%1</td>").arg(m->name());
+        }
+        for (j = 0; j< metricCols; ++j) {
+            QString symbol = metricColumn[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            summary += QString("<td align=\"center\">%1</td>").arg(m->name());
+        }
+        summary += "</tr>";
+
+        // header row 2 - units
+        summary += "<tr>";
+        summary += tr("<td align=\"center\"></td>"); // date no units
+        for (j = 0; j< totalCols; ++j) {
+            QString symbol = rtotalColumn[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            QString units = m->units(useMetricUnits);
+            if (units == "seconds" || units == tr("seconds")) units = "";
+            summary += QString("<td align=\"center\">%1</td>").arg(units);
+        }
+        for (j = 0; j< metricCols; ++j) {
+            QString symbol = metricColumn[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            QString units = m->units(useMetricUnits);
+            if (units == "seconds" || units == tr("seconds")) units = "";
+            summary += QString("<td align=\"center\">%1</td>").arg(units);
+        }
+        summary += "</tr>";
+
+        // activities 1 per row
+        even = false;
+
+        // iterate once again
+        ridelist.toBack();
+        while (ridelist.hasPrevious()) {
+
+            RideItem *ride = ridelist.previous();
+
+            // apply the filter if there is one active
+            if (!specification.pass(ride)) continue;
+
+            if (!ride->isSwim) continue;
+
+            if (even) summary += "<tr>";
+            else {
+                    summary += "<tr bgcolor='" + altColor.name() + "'>";
+            }
+            even = !even;
+
+            // date of ride
+            summary += QString("<td align=\"center\">%1</td>")
+                       .arg(ride->dateTime.date().toString(tr("dd MMM yyyy")));
+
+            for (j = 0; j< totalCols; ++j) {
+                QString symbol = rtotalColumn[j];
+
+                // get this value
+                QString value = ride->getStringForSymbol(symbol,useMetricUnits);
+                summary += QString("<td align=\"center\">%1</td>").arg(value);
+            }
+            for (j = 0; j< metricCols; ++j) {
+                QString symbol = metricColumn[j];
+
+                // get this value
+                QString value = ride->getStringForSymbol(symbol,useMetricUnits);
+                summary += QString("<td align=\"center\">%1</td>").arg(value);
+            }
+            summary += "</tr>";
+        }
+        summary += "</table><br>";
+
     }
 
     // summarise errors reading file if it was a ride summary
