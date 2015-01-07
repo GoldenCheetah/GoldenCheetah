@@ -100,8 +100,9 @@
 // 94  02  Dec 2014 Ale Martinez       Added xPace
 // 95  08  Dec 2014 Ale Martinez       Deprecated Measures table
 // 96  06  Jan 2015 Damien Grauser     Garmin Cycling Dynamics
+// 97  07  Jan 2015 Mark Liversedge    Added isSwim first class variable
 
-int DBSchemaVersion = 96;
+int DBSchemaVersion = 97;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

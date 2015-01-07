@@ -102,7 +102,7 @@ class RideItem : public QObject
         QDateTime dateTime;
         QString present;
         QColor color;
-        bool isRun;
+        bool isRun,isSwim;
 
         // context the item was updated to
         unsigned long fingerprint; // zones
