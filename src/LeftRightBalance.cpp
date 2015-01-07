@@ -61,7 +61,6 @@ class LeftRightBalance : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("V"); }
 
-
     RideMetric *clone() const { return new LeftRightBalance(*this); }
 };
 

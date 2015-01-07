@@ -20,6 +20,7 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
+#include "RideItem.h"
 #include "LTMOutliers.h"
 #include "Units.h"
 #include "cmath"
@@ -675,6 +676,9 @@ struct AvgSmO2 : public RideMetric {
         setValue(count > 0 ? total / count : 0);
         setCount(count);
     }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("O"); }
+
     RideMetric *clone() const { return new AvgSmO2(*this); }
 };
 
@@ -1092,6 +1096,9 @@ class MaxSmO2 : public RideMetric {
         }
         setValue(max);
     }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("O"); }
+
     RideMetric *clone() const { return new MaxSmO2(*this); }
 };
 
