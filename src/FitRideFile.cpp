@@ -554,7 +554,7 @@ struct FitFileReaderState
                 case 68: // ? Right Platform Center Offset ?
                         rightPedalCenterOffset = value;
                         break;
-                case 69: // ? Left Power Phase (Top and Bottom Dead Center)  ?
+                case 69: // ? Left Power Phase ?
                         leftTopDeathCenter = round(value * 360.0/256);
                         leftBottomDeathCenter = round(value2 * 360.0/256);
                         break;
@@ -562,7 +562,7 @@ struct FitFileReaderState
                         leftTopPeakPowerPhase = round(value * 360.0/256);
                         leftBottomPeakPowerPhase = round(value2 * 360.0/256);
                         break;
-                case 71: // ? Right Power Phase (Top and Bottom Dead Center)  ?
+                case 71: // ? Right Power Phase ?
                         rightTopDeathCenter = round(value * 360.0/256);
                         rightBottomDeathCenter = round(value2 * 360.0/256);
                         break;

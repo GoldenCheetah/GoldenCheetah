@@ -58,6 +58,9 @@ class LeftRightBalance : public RideMetric {
         setCount(count);
     }
 
+    bool isRelevantForRide(const RideFile *ride) const { return ride->areDataPresent()->lrbalance; }
+
+
     RideMetric *clone() const { return new LeftRightBalance(*this); }
 };
 
