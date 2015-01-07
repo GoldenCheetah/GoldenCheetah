@@ -2726,6 +2726,19 @@ Presione Siguiente para Continuar</translation>
     </message>
 </context>
 <context>
+    <name>AvgLPP</name>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="2289"/>
+        <source>Average Left Power Phase Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="2290"/>
+        <source>°</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AvgLPPB</name>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1884"/>
@@ -2749,6 +2762,19 @@ Presione Siguiente para Continuar</translation>
         <location filename="../BasicRideMetrics.cpp" line="1986"/>
         <source>°</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>AvgLPPP</name>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="2376"/>
+        <source>Average Left Peak Power Phase Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="2377"/>
+        <source>°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2838,6 +2864,19 @@ Presione Siguiente para Continuar</translation>
     </message>
 </context>
 <context>
+    <name>AvgRPP</name>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="2333"/>
+        <source>Average Right Power Phase Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="2334"/>
+        <source>°</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AvgRPPE</name>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2035"/>
@@ -2848,6 +2887,19 @@ Presione Siguiente para Continuar</translation>
         <location filename="../BasicRideMetrics.cpp" line="2036"/>
         <source>°</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>AvgRPPP</name>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="2420"/>
+        <source>Average Right Peak Power Phase Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="2421"/>
+        <source>°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5433,7 +5485,7 @@ Cancelar para salir.</translation>
 <context>
     <name>DataFilter</name>
     <message>
-        <location filename="../DataFilter.cpp" line="308"/>
+        <location filename="../DataFilter.cpp" line="309"/>
         <source>malformed expression.</source>
         <translation>expresión mal conformada.</translation>
     </message>
@@ -17500,28 +17552,28 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <translation>Bicicleta</translation>
     </message>
     <message>
-        <location filename="../DataFilter.cpp" line="205"/>
-        <location filename="../DataFilter.cpp" line="224"/>
+        <location filename="../DataFilter.cpp" line="206"/>
+        <location filename="../DataFilter.cpp" line="225"/>
         <source>%1 is unknown</source>
         <translation>%1 es desconocido</translation>
     </message>
     <message>
-        <location filename="../DataFilter.cpp" line="229"/>
+        <location filename="../DataFilter.cpp" line="230"/>
         <source>invalid data series for best(): %1</source>
         <translation>serie de datos inválida para best(): %1</translation>
     </message>
     <message>
-        <location filename="../DataFilter.cpp" line="232"/>
+        <location filename="../DataFilter.cpp" line="233"/>
         <source>invalid data series for tiz(): %1</source>
         <translation>serie de datos inválida para tiz(): %1</translation>
     </message>
     <message>
-        <location filename="../DataFilter.cpp" line="248"/>
+        <location filename="../DataFilter.cpp" line="249"/>
         <source>comparing strings with numbers</source>
         <translation>comparando cadenas de caracteres con números</translation>
     </message>
     <message>
-        <location filename="../DataFilter.cpp" line="254"/>
+        <location filename="../DataFilter.cpp" line="255"/>
         <source>using a string operations with a number</source>
         <translation>usando una operación de cadena de caracteres con un número</translation>
     </message>
@@ -19136,22 +19188,22 @@ Saltando archivo...</translation>
     </message>
     <message>
         <location filename="../RideFileTableModel.cpp" line="153"/>
-        <source>Left Top Dead Center</source>
+        <source>Left Power Phase Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideFileTableModel.cpp" line="157"/>
-        <source>Right Top Dead Center</source>
+        <source>Left Power Phase End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideFileTableModel.cpp" line="161"/>
-        <source>Left Bottom Dead Center</source>
+        <source>Right Power Phase Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideFileTableModel.cpp" line="165"/>
-        <source>Right Bottom Dead Center</source>
+        <source>Right Power Phase End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -19161,36 +19213,46 @@ Saltando archivo...</translation>
     </message>
     <message>
         <location filename="../RideFileTableModel.cpp" line="173"/>
-        <source>Right Peak Power Phase Start</source>
+        <source>Left Peak Power Phase End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideFileTableModel.cpp" line="177"/>
+        <source>Right Peak Power Phase Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFileTableModel.cpp" line="181"/>
+        <source>Right Peak Power Phase End</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFileTableModel.cpp" line="185"/>
         <source>SmO2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideFileTableModel.cpp" line="181"/>
+        <location filename="../RideFileTableModel.cpp" line="189"/>
         <source>tHb</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideFileTableModel.cpp" line="185"/>
+        <location filename="../RideFileTableModel.cpp" line="193"/>
         <source>Run Cadence</source>
         <translation>Frecuencia de Paso</translation>
     </message>
     <message>
-        <location filename="../RideFileTableModel.cpp" line="189"/>
+        <location filename="../RideFileTableModel.cpp" line="197"/>
         <source>Vertical Oscillation</source>
         <translation>Oscilación Vertical</translation>
     </message>
     <message>
-        <location filename="../RideFileTableModel.cpp" line="193"/>
+        <location filename="../RideFileTableModel.cpp" line="201"/>
         <source>GCT</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideFileTableModel.cpp" line="197"/>
+        <location filename="../RideFileTableModel.cpp" line="205"/>
         <source>Interval</source>
         <translation>Intervalo</translation>
     </message>
@@ -19635,92 +19697,93 @@ Saltando archivo...</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="434"/>
-        <location filename="../RideSummaryWindow.cpp" line="1429"/>
+        <location filename="../RideSummaryWindow.cpp" line="1537"/>
         <source>Totals</source>
         <translation>Totales</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="434"/>
-        <location filename="../RideSummaryWindow.cpp" line="1429"/>
+        <location filename="../RideSummaryWindow.cpp" line="1537"/>
         <source>Averages</source>
         <translation>Promedios</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="193"/>
-        <location filename="../RideSummaryWindow.cpp" line="717"/>
+        <location filename="../RideSummaryWindow.cpp" line="719"/>
         <source>&lt;h3&gt;Model&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Modelo&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="721"/>
+        <location filename="../RideSummaryWindow.cpp" line="723"/>
         <source>W&apos;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="731"/>
+        <location filename="../RideSummaryWindow.cpp" line="733"/>
         <source>CP</source>
         <translation>PC</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="733"/>
-        <location filename="../RideSummaryWindow.cpp" line="755"/>
+        <location filename="../RideSummaryWindow.cpp" line="735"/>
+        <location filename="../RideSummaryWindow.cpp" line="757"/>
         <source>watts</source>
         <translation>vatios</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="736"/>
-        <location filename="../RideSummaryWindow.cpp" line="758"/>
+        <location filename="../RideSummaryWindow.cpp" line="738"/>
+        <location filename="../RideSummaryWindow.cpp" line="760"/>
         <source>w/kg</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="744"/>
+        <location filename="../RideSummaryWindow.cpp" line="746"/>
         <source>FTP (watts)</source>
         <translation>FTP (vatios)</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="747"/>
+        <location filename="../RideSummaryWindow.cpp" line="749"/>
         <source>FTP (w/kg)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="753"/>
+        <location filename="../RideSummaryWindow.cpp" line="755"/>
         <source>P-max</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="970"/>
+        <location filename="../RideSummaryWindow.cpp" line="972"/>
         <source>Interval Name</source>
         <translation>Nombre de Intervalo</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1185"/>
-        <location filename="../RideSummaryWindow.cpp" line="1284"/>
+        <location filename="../RideSummaryWindow.cpp" line="1193"/>
+        <location filename="../RideSummaryWindow.cpp" line="1292"/>
+        <location filename="../RideSummaryWindow.cpp" line="1391"/>
         <source>dd MMM yyyy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1321"/>
-        <location filename="../RideSummaryWindow.cpp" line="2076"/>
+        <location filename="../RideSummaryWindow.cpp" line="1429"/>
+        <location filename="../RideSummaryWindow.cpp" line="2184"/>
         <source>&lt;br&gt;FTP, TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
         <translation>&lt;br&gt;FTP, TSS, NP y IF son marcas registradas de Peaksware LLC&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1385"/>
-        <location filename="../RideSummaryWindow.cpp" line="1389"/>
-        <location filename="../RideSummaryWindow.cpp" line="1394"/>
-        <location filename="../RideSummaryWindow.cpp" line="1399"/>
+        <location filename="../RideSummaryWindow.cpp" line="1493"/>
+        <location filename="../RideSummaryWindow.cpp" line="1497"/>
+        <location filename="../RideSummaryWindow.cpp" line="1502"/>
+        <location filename="../RideSummaryWindow.cpp" line="1507"/>
         <source>N/A</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1429"/>
+        <location filename="../RideSummaryWindow.cpp" line="1537"/>
         <source>Metrics*</source>
         <translation>Métricas*</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="434"/>
-        <location filename="../RideSummaryWindow.cpp" line="1429"/>
+        <location filename="../RideSummaryWindow.cpp" line="1537"/>
         <source>Maximums</source>
         <translation>Máximos</translation>
     </message>
@@ -19814,96 +19877,111 @@ Saltando archivo...</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="643"/>
-        <location filename="../RideSummaryWindow.cpp" line="1579"/>
-        <location filename="../RideSummaryWindow.cpp" line="1852"/>
+        <location filename="../RideSummaryWindow.cpp" line="645"/>
+        <location filename="../RideSummaryWindow.cpp" line="1687"/>
+        <location filename="../RideSummaryWindow.cpp" line="1960"/>
         <source>^(Average|Max) </source>
         <translation>( Media| Máx)</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="767"/>
+        <location filename="../RideSummaryWindow.cpp" line="769"/>
         <source>&lt;h3&gt;Athlete Bests&lt;/h3&gt;
 </source>
         <translation>&lt;h3&gt;Mejores registros del Atleta&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="800"/>
+        <location filename="../RideSummaryWindow.cpp" line="802"/>
         <source>d MMM yyyy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="841"/>
+        <location filename="../RideSummaryWindow.cpp" line="843"/>
         <source>&lt;h3&gt;Pace Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Zonas de Ritmo&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="872"/>
-        <location filename="../RideSummaryWindow.cpp" line="1668"/>
-        <location filename="../RideSummaryWindow.cpp" line="1936"/>
+        <location filename="../RideSummaryWindow.cpp" line="874"/>
+        <location filename="../RideSummaryWindow.cpp" line="1776"/>
+        <location filename="../RideSummaryWindow.cpp" line="2044"/>
         <source>&lt;h3&gt;Power Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Zonas de Potencia&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="909"/>
+        <location filename="../RideSummaryWindow.cpp" line="911"/>
         <source>&lt;h3&gt;Heart Rate Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Zonas de Frecuencia Cardíaca&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="972"/>
+        <location filename="../RideSummaryWindow.cpp" line="974"/>
         <source>Rank </source>
         <translation>Rango </translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1110"/>
-        <location filename="../RideSummaryWindow.cpp" line="1210"/>
+        <location filename="../RideSummaryWindow.cpp" line="1118"/>
+        <location filename="../RideSummaryWindow.cpp" line="1218"/>
+        <location filename="../RideSummaryWindow.cpp" line="1317"/>
         <source>%1 of %2</source>
         <translation>%1 de %2</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1111"/>
-        <location filename="../RideSummaryWindow.cpp" line="1117"/>
+        <location filename="../RideSummaryWindow.cpp" line="1119"/>
+        <location filename="../RideSummaryWindow.cpp" line="1125"/>
         <source> ride</source>
-        <translation> actividad</translation>
+        <translation> entrenamiento de ciclismo</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1111"/>
-        <location filename="../RideSummaryWindow.cpp" line="1117"/>
+        <location filename="../RideSummaryWindow.cpp" line="1119"/>
+        <location filename="../RideSummaryWindow.cpp" line="1125"/>
         <source> rides</source>
-        <translation> actividades</translation>
+        <translation> entrenamientos de ciclismo</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1126"/>
-        <location filename="../RideSummaryWindow.cpp" line="1226"/>
+        <location filename="../RideSummaryWindow.cpp" line="1134"/>
+        <location filename="../RideSummaryWindow.cpp" line="1234"/>
+        <location filename="../RideSummaryWindow.cpp" line="1333"/>
         <source>&lt;td align=&quot;center&quot;&gt;Date&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Fecha&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1143"/>
-        <location filename="../RideSummaryWindow.cpp" line="1243"/>
+        <location filename="../RideSummaryWindow.cpp" line="1151"/>
+        <location filename="../RideSummaryWindow.cpp" line="1251"/>
+        <location filename="../RideSummaryWindow.cpp" line="1350"/>
         <source>&lt;td align=&quot;center&quot;&gt;&lt;/td&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1211"/>
-        <location filename="../RideSummaryWindow.cpp" line="1217"/>
+        <location filename="../RideSummaryWindow.cpp" line="1219"/>
+        <location filename="../RideSummaryWindow.cpp" line="1225"/>
         <source> run</source>
-        <translation> carrera</translation>
+        <translation> entrenamiento de carrera</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1211"/>
-        <location filename="../RideSummaryWindow.cpp" line="1217"/>
+        <location filename="../RideSummaryWindow.cpp" line="1219"/>
+        <location filename="../RideSummaryWindow.cpp" line="1225"/>
         <source> runs</source>
-        <translation> carreras</translation>
+        <translation> entrenamientos de carrera</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="1318"/>
-        <location filename="../RideSummaryWindow.cpp" line="2073"/>
+        <location filename="../RideSummaryWindow.cpp" line="1324"/>
+        <source> swim</source>
+        <translation> entrenamiento de natación</translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="1318"/>
+        <location filename="../RideSummaryWindow.cpp" line="1324"/>
+        <source> swims</source>
+        <translation> entrenamientos de natación</translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="1426"/>
+        <location filename="../RideSummaryWindow.cpp" line="2181"/>
         <source>&lt;br&gt;BikeScore is a trademark of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
         <translation>&lt;br&gt;BikeScore es una marca registrada del Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1740"/>
-        <location filename="../RideSummaryWindow.cpp" line="2009"/>
+        <location filename="../RideSummaryWindow.cpp" line="1848"/>
+        <location filename="../RideSummaryWindow.cpp" line="2117"/>
         <source>&lt;h3&gt;Heartrate Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Zonas de Frecuencia Cardíaca&lt;/h3&gt;</translation>
     </message>
@@ -19912,29 +19990,31 @@ Saltando archivo...</translation>
         <translation type="obsolete">&lt;br&gt;TSS, NP e IF son marcas registradas de Peaksware LLC&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="646"/>
-        <location filename="../RideSummaryWindow.cpp" line="982"/>
-        <location filename="../RideSummaryWindow.cpp" line="1041"/>
-        <location filename="../RideSummaryWindow.cpp" line="1149"/>
+        <location filename="../RideSummaryWindow.cpp" line="648"/>
+        <location filename="../RideSummaryWindow.cpp" line="984"/>
+        <location filename="../RideSummaryWindow.cpp" line="1043"/>
         <location filename="../RideSummaryWindow.cpp" line="1157"/>
-        <location filename="../RideSummaryWindow.cpp" line="1249"/>
+        <location filename="../RideSummaryWindow.cpp" line="1165"/>
         <location filename="../RideSummaryWindow.cpp" line="1257"/>
-        <location filename="../RideSummaryWindow.cpp" line="1574"/>
-        <location filename="../RideSummaryWindow.cpp" line="1617"/>
-        <location filename="../RideSummaryWindow.cpp" line="1637"/>
-        <location filename="../RideSummaryWindow.cpp" line="1847"/>
-        <location filename="../RideSummaryWindow.cpp" line="1885"/>
-        <location filename="../RideSummaryWindow.cpp" line="1905"/>
+        <location filename="../RideSummaryWindow.cpp" line="1265"/>
+        <location filename="../RideSummaryWindow.cpp" line="1356"/>
+        <location filename="../RideSummaryWindow.cpp" line="1364"/>
+        <location filename="../RideSummaryWindow.cpp" line="1682"/>
+        <location filename="../RideSummaryWindow.cpp" line="1725"/>
+        <location filename="../RideSummaryWindow.cpp" line="1745"/>
+        <location filename="../RideSummaryWindow.cpp" line="1955"/>
+        <location filename="../RideSummaryWindow.cpp" line="1993"/>
+        <location filename="../RideSummaryWindow.cpp" line="2013"/>
         <source>seconds</source>
         <translation>segundos</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="936"/>
+        <location filename="../RideSummaryWindow.cpp" line="938"/>
         <source>Intervals</source>
         <translation>Intervalos</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1308"/>
+        <location filename="../RideSummaryWindow.cpp" line="1416"/>
         <source>&lt;p&gt;&lt;h2&gt;Errors reading file:&lt;/h2&gt;&lt;ul&gt;</source>
         <translation>&lt;p&gt;&lt;h2&gt;Errores leyendo archivo:&lt;/h2&gt;&lt;ul&gt;</translation>
     </message>
