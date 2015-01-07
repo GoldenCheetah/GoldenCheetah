@@ -108,6 +108,9 @@ class RideCache : public QObject
         // item telling us it changed
         void itemChanged();
 
+        // clear deleted objects
+        void garbageCollect();
+
     signals:
 
         void modelProgress(int, int); // let others know when we're refreshing the model estimates
@@ -120,7 +123,7 @@ class RideCache : public QObject
         friend class ::RideCacheBackgroundRefresh;
 
         Context *context;
-        QVector<RideItem*> rides_, reverse_;
+        QVector<RideItem*> rides_, reverse_, delete_;
         RideCacheModel *model_;
         bool exiting;
 	    double progress_; // percent
