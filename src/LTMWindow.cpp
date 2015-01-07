@@ -293,6 +293,14 @@ LTMWindow::presetSelected(int index)
         settings.start = start;
         settings.end = end;
 
+        // Set the specification
+        FilterSet fs;
+        fs.addFilter(context->isfiltered, context->filters);
+        fs.addFilter(context->ishomefiltered, context->homeFilters);
+        fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
+        settings.specification.setFilterSet(fs);
+        settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
+
         ltmTool->applySettings();
         refresh();
     }
