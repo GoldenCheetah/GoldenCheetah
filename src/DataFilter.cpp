@@ -143,6 +143,7 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
         {
             QString symbol = *(leaf->lvalue.n);
             if (symbol == "isRun") return true;
+            else if (symbol == "isSwim") return true;
             else if (!symbol.compare("Date", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Today", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Current", Qt::CaseInsensitive)) return true;
@@ -201,7 +202,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                 if (symbol.compare("Date", Qt::CaseInsensitive) && 
                     symbol.compare("Today", Qt::CaseInsensitive) && 
                     symbol.compare("Current", Qt::CaseInsensitive) && 
-                    symbol != "isRun" && !isCoggan(symbol))
+                    symbol != "isSwim" && symbol != "isRun" && !isCoggan(symbol))
                     DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
 
                 if (symbol.compare("Current", Qt::CaseInsensitive))
@@ -514,6 +515,10 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                     lhsdouble = m->isRun ? 1 : 0;
                     lhsisNumber = true;
 
+                } else if (symbol == "isSwim") {
+                    lhsdouble = m->isSwim ? 1 : 0;
+                    lhsisNumber = true;
+
                 } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {
 
                     if (context->currentRideItem())
@@ -603,6 +608,11 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                 if (symbol == "isRun") {
 
                     rhsdouble = m->isRun ? 1 : 0;
+                    rhsisNumber = true;
+
+                } else if (symbol == "isSwim") {
+
+                    rhsdouble = m->isSwim ? 1 : 0;
                     rhsisNumber = true;
 
                 } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {

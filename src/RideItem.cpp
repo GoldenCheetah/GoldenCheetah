@@ -44,14 +44,14 @@
 RideItem::RideItem() 
     : 
     ride_(NULL), fileCache_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
-    color(QColor(1,1,1)), isRun(false), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) {
+    color(QColor(1,1,1)), isRun(false), isSwim(false), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
     ride_(ride), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
-    color(QColor(1,1,1)), isRun(false), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) 
+    color(QColor(1,1,1)), isRun(false), isSwim(false), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -59,7 +59,7 @@ RideItem::RideItem(RideFile *ride, Context *context)
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context) 
     :
     ride_(NULL), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), skipsave(false), path(path), 
-    fileName(fileName), dateTime(dateTime), color(QColor(1,1,1)), isRun(false), fingerprint(0), 
+    fileName(fileName), dateTime(dateTime), color(QColor(1,1,1)), isRun(false), isSwim(false), fingerprint(0), 
     metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
@@ -100,6 +100,7 @@ RideItem::setFrom(RideItem&here) // used when loading cache/rideDB.json
 	color = here.color;
 	present = here.present;
     isRun = here.isRun;
+    isSwim = here.isSwim;
 	weight = here.weight;
 }
 
@@ -408,6 +409,7 @@ RideItem::refresh()
 
         // first class stuff
         isRun = f->isRun();
+        isSwim = f->isSwim();
         color = context->athlete->colorEngine->colorFor(f->getTag(context->athlete->rideMetadata()->getColorField(), ""));
         present = f->getTag("Data", "");
 

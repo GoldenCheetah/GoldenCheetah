@@ -137,6 +137,7 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "dbversion") jc->item.dbversion = $3.toInt();
                                                                      else if ($1 == "color") jc->item.color = QColor($3);
                                                                      else if ($1 == "isRun") jc->item.isRun = $3.toInt();
+                                                                     else if ($1 == "isSwim") jc->item.isSwim = $3.toInt();
                                                                      else if ($1 == "present") jc->item.present = $3;
                                                                      else if ($1 == "weight") jc->item.weight = $3.toDouble();
                                                                      else if ($1 == "date") {
@@ -301,6 +302,7 @@ void RideCache::save()
             stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
             stream << "\t\t\"present\":\"" <<item->present <<"\",\n";
             stream << "\t\t\"isRun\":\"" <<item->isRun <<"\",\n";
+            stream << "\t\t\"isSwim\":\"" <<item->isSwim <<"\",\n";
             stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
 
             // pre-computed metrics
