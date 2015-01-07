@@ -167,6 +167,7 @@ class RideFile : public QObject // QObject to emit signals
         static QColor colorFor(SeriesType series);
         static bool parseRideFileName(const QString &name, QDateTime *dt);
         bool isRun() const;
+        bool isSwim() const;
 
         // Working with DATAPOINTS -- ***use command to modify***
         RideFileCommand *command;
