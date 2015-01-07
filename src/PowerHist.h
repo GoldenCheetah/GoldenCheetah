@@ -28,6 +28,8 @@
 #include "HrZones.h"
 #include "PaceZones.h"
 #include "Specification.h"
+#include "Settings.h"
+#include "Colors.h"
 
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
@@ -67,18 +69,17 @@ class penTooltip: public QwtPlotZoomer
          }
 
         virtual QwtText trackerText(const QPoint &/*pos*/) const {
-            QColor bg = QColor(Qt::lightGray);
-#if QT_VERSION >= 0x040300
-            bg.setAlpha(200);
-#endif
-            QwtText text;
-            QFont def;
-            //def.setPointSize(8); // too small on low res displays (Mac)
-            //double val = ceil(pos.y()*100) / 100; // round to 2 decimal place
-            //text.setText(QString("%1 %2").arg(val).arg(format), QwtText::PlainText);
-            text.setText(tip);
-            text.setFont(def);
-            text.setBackgroundBrush( QBrush( bg ));
+            QwtText text(tip);
+
+            QFont stGiles;
+            stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+            stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+            stGiles.setWeight(QFont::Bold);
+            text.setFont(stGiles);
+
+            text.setBackgroundBrush(QBrush( GColor(CPLOTMARKER)));
+            text.setColor(GColor(CRIDEPLOTBACKGROUND));
+            text.setBorderRadius(6);
             text.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
             return text;
         }
