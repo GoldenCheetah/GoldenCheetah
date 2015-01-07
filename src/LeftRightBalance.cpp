@@ -18,6 +18,7 @@
 
 #include "RideMetric.h"
 #include "Zones.h"
+#include "RideItem.h"
 #include <cmath>
 #include <QApplication>
 
@@ -58,7 +59,7 @@ class LeftRightBalance : public RideMetric {
         setCount(count);
     }
 
-    bool isRelevantForRide(const RideFile *ride) const { return ride->areDataPresent()->lrbalance; }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("V"); }
 
 
     RideMetric *clone() const { return new LeftRightBalance(*this); }
