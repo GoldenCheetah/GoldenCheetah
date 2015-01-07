@@ -54,11 +54,11 @@ class PaceZoneTime : public RideMetric {
     {
         seconds = 0;
 
-        // pace only makes sense for running
-        if (ride->isRun()) {
+        // pace only makes sense for running or swimming
+        if (ride->isRun() || ride->isSwim()) {
 
-            const PaceZones *zone = context->athlete->paceZones();
-            int zoneRange = context->athlete->paceZones()->whichRange(ride->startTime().date());
+            const PaceZones *zone = context->athlete->paceZones(ride->isSwim());
+            int zoneRange = zone ? zone->whichRange(ride->startTime().date()) : -1;
 
             // get zone ranges
             if (zone && zoneRange >= 0) {

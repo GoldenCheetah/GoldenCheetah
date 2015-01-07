@@ -110,12 +110,14 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
             QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File"), hrzones_->warningString());
     }
 
-    // Pace Zones
-    pacezones_ = new PaceZones;
-    QFile pacezonesFile(home->config().canonicalPath() + "/" + pacezones_->fileName());
-    if (pacezonesFile.exists()) {
-        if (!pacezones_->read(pacezonesFile)) {
-            QMessageBox::critical(context->mainWindow, tr("Pace Zones File Error"), pacezones_->errorString());
+    // Pace Zones for Run & Swim
+    for (int i=0; i < 2; i++) {
+        pacezones_[i] = new PaceZones(i>0);
+        QFile pacezonesFile(home->config().canonicalPath() + "/" + pacezones_[i]->fileName());
+        if (pacezonesFile.exists()) {
+            if (!pacezones_[i]->read(pacezonesFile)) {
+                QMessageBox::critical(context->mainWindow, tr("Pace Zones File %1 Error").arg(pacezones_[i]->fileName()), pacezones_[i]->errorString());
+            }
         }
     }
 
@@ -258,6 +260,7 @@ Athlete::~Athlete()
     delete colorEngine;
     delete zones_;
     delete hrzones_;
+    for (int i=0; i<2; i++) delete pacezones_[i];
 }
 
 void Athlete::selectRideFile(QString fileName)

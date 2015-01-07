@@ -4224,8 +4224,8 @@ PaceZonePage::saveClicked()
     zones->write(context->athlete->home->config());
 
     // reread Pace zones
-    QFile pacezonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->pacezones_->fileName());
-    context->athlete->pacezones_->read(pacezonesFile);
+    QFile pacezonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->pacezones_[sportCombo->currentIndex()]->fileName());
+    context->athlete->pacezones_[sportCombo->currentIndex()]->read(pacezonesFile);
 
     // did we change ?
     if (zones->getFingerprint() != b4Fingerprint) return CONFIG_ZONES;

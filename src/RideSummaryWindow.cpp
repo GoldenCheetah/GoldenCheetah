@@ -812,21 +812,20 @@ RideSummaryWindow::htmlSummary()
     }
 
     //
-    // Time In Zones
+    // Time In Zones for Running and Swimming
     //
     int numzones = 0;
     int range = -1;
 
-    if (ridesummary && rideItem && rideItem->ride() && rideItem->ride()->isRun()) {
+    if (ridesummary && rideItem && rideItem->ride() &&
+        (rideItem->ride()->isRun() || rideItem->ride()->isSwim())) {
 
-        if (context->athlete->paceZones()) {
+        if (context->athlete->paceZones(rideItem->ride()->isSwim())) {
 
-            // no power zones on a run, should show pace here ...
-            // ... when we have pace zones implemented
-            range = context->athlete->paceZones()->whichRange(rideItem->dateTime.date());
+            range = context->athlete->paceZones(rideItem->ride()->isSwim())->whichRange(rideItem->dateTime.date());
             if (range > -1) {
 
-                numzones = context->athlete->paceZones()->numZones(range);
+                numzones = context->athlete->paceZones(rideItem->ride()->isSwim())->numZones(range);
 
                 if (numzones > 0) {
 
@@ -842,7 +841,7 @@ RideSummaryWindow::htmlSummary()
                     }
         
                     summary += tr("<h3>Pace Zones</h3>");
-                    summary += context->athlete->paceZones()->summarize(range, time_in_zone, altColor); //aggregating
+                    summary += context->athlete->paceZones(rideItem->ride()->isSwim())->summarize(range, time_in_zone, altColor); //aggregating
                 }
             }
         }
@@ -924,7 +923,7 @@ RideSummaryWindow::htmlSummary()
             Season rideSeason;
             bool wantRank=false;
 #ifdef GC_HAVE_RANKING
-            if (!ride->isRun() && ride->areDataPresent()->watts == true) {
+            if (!ride->isRun() && !ride->isSwim() && ride->areDataPresent()->watts == true) {
                 rideSeason = context->athlete->seasons->seasonFor(ride->startTime().date());
                 wantRank = true;
             }
