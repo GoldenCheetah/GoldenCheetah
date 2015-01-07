@@ -37,6 +37,7 @@ class HrZones;
 class Context;
 class RideMetric;
 class RideFile;
+class RideItem;
 
 typedef QSharedPointer<RideMetric> RideMetricPtr;
 
@@ -107,7 +108,7 @@ public:
     virtual bool aggregateZero() const { return false; }
 
     // is this metric relevant
-    virtual bool isRelevantForRide(const RideFile *) const { return true; }
+    virtual bool isRelevantForRide(const RideItem *) const { return true; }
 
     // Factor to multiple value to convert from metric to imperial
     virtual double conversion() const { return conversion_; }
