@@ -799,6 +799,9 @@ struct AvgHeartRate : public RideMetric {
         setValue(count > 0 ? total / count : 0);
         setCount(count);
     }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("H"); }
+
     RideMetric *clone() const { return new AvgHeartRate(*this); }
 };
 
@@ -977,6 +980,9 @@ struct AvgCadence : public RideMetric {
         setValue(count > 0 ? total / count : count);
         setCount(count);
     }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("C"); }
+
     RideMetric *clone() const { return new AvgCadence(*this); }
 };
 
@@ -1165,6 +1171,9 @@ class MaxHr : public RideMetric {
         }
         setValue(max);
     }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("H"); }
+
     RideMetric *clone() const { return new MaxHr(*this); }
 };
 
@@ -1252,6 +1261,9 @@ class MaxCadence : public RideMetric {
 
         setValue(mc.value(true) > value(true) ? mc.value(true) : value(true));
     }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("C"); }
+
     RideMetric *clone() const { return new MaxCadence(*this); }
 };
 
