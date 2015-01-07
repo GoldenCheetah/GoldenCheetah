@@ -817,7 +817,7 @@ class HrPw : public RideMetric {
         setImperialUnits("");
         setMetricUnits("");
         setPrecision(3);
-        setType(RideMetric::Peak);
+        setType(RideMetric::Average);
     }
     void compute(const RideFile *, const Zones *, int,
                  const HrZones *, int,
@@ -909,7 +909,7 @@ class HrNp : public RideMetric {
         setImperialUnits("");
         setMetricUnits("");
         setPrecision(3);
-        setType(RideMetric::Peak);
+        setType(RideMetric::Average);
     }
     void compute(const RideFile *, const Zones *, int,
                  const HrZones *, int,
