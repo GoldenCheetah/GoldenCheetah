@@ -18,6 +18,7 @@
 
 #include "RideMetric.h"
 #include <QApplication>
+#include "RideItem.h"
 
 // This metric computes aerobic decoupling percentage as described
 // by Joe Friel:
@@ -100,6 +101,8 @@ class AerobicDecoupling : public RideMetric {
         }
         setValue(percent);
     }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("H") && ride->present.contains("P"); }
 
     RideMetric *clone() const { return new AerobicDecoupling(*this); }
 };
