@@ -176,6 +176,8 @@ LTMPlot::configChanged(qint32)
     }
     curveColors->saveState();
     updateLegend();
+
+    if (legend()) legend()->installEventFilter(this);
 }
 
 void
@@ -2816,6 +2818,38 @@ LTMPlot::chooseYAxis(QString units)
 bool
 LTMPlot::eventFilter(QObject *obj, QEvent *event)
 {
+
+    // when clicking on a legend item, toggle if the curve is visible
+    if (obj == legend() && event->type() == 2) {
+
+        bool replotNeeded = false;
+        QwtLegend *l = static_cast<QwtLegend *>(this->legend());
+
+        foreach(QwtPlotCurve *p, curves) {
+            foreach (QWidget *w, l->legendWidgets(itemToInfo(p))) {
+                if (w->underMouse()) {
+                    QPalette palette;
+                    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+
+                    if (w->palette().color(QPalette::Text) == GColor(CPLOTMARKER)) {
+                        palette.setColor(QPalette::WindowText, Qt::darkGray);
+                        palette.setColor(QPalette::Text, Qt::darkGray);
+                        p->setVisible(false);
+                    } else {
+                        palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+                        palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+                        p->setVisible(true);
+                    }
+                    replotNeeded = true;
+                    w->setPalette(palette);
+                }
+            }
+        }
+
+        if (replotNeeded) replot();
+        return false;
+    }
+
     // is it for other objects ?
     if (axesObject.contains(obj)) {
 
