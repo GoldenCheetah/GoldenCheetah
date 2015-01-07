@@ -636,7 +636,7 @@ RideSummaryWindow::htmlSummary()
              const RideMetric *m = factory.rideMetric(symbol);
              if (!m) break;
 
-             if (!m->isRelevantForRide(ride)) continue; // don't display non relevant metric
+             if (ridesummary && !m->isRelevantForRide(ride)) continue; // don't display non relevant metric
  
              // HTML table row
              QString s("<tr><td>%1%2:</td><td align=\"right\">%3</td></tr>");
