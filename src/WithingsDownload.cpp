@@ -62,12 +62,15 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
     QString status = QString(tr("%1 new on %2 measurements received.")).arg(newMeasures).arg(allMeasures);
     QMessageBox::information(context->mainWindow, tr("Withings Data Download"), status);
 
-    // store in athlete
-    context->athlete->setWithings(parser->readings());
-
     // hacky for now, just refresh for all dates where we have withings data
     // will go with SQL shortly.
     if (newMeasures) {
+
+        // if refresh is running cancel it !
+        context->athlete->rideCache->cancel();
+
+        // store in athlete
+        context->athlete->setWithings(parser->readings());
 
         // now save data away if we actually got something !
         // doing it here means we don't overwrite previous responses
@@ -80,7 +83,7 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
             withingsJSON.close();
         }
 
-        // apply across the ride items
+        // do a refresh, it will check if needed
         context->athlete->rideCache->refresh();
     }
     return;
