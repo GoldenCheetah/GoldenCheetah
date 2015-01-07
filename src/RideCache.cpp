@@ -81,6 +81,7 @@ RideCache::RideCache(Context *context) : context(context)
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // future watching
+    connect(&watcher, SIGNAL(finished()), this, SLOT(garbageCollect()));
     connect(&watcher, SIGNAL(finished()), this, SLOT(save()));
     connect(&watcher, SIGNAL(finished()), context, SLOT(notifyRefreshEnd()));
     connect(&watcher, SIGNAL(started()), context, SLOT(notifyRefreshStart()));
@@ -96,6 +97,15 @@ RideCache::~RideCache()
 
     // save to store
     save();
+}
+
+void
+RideCache::garbageCollect()
+{
+    foreach(RideItem *item, delete_) {
+        if (item) item->deleteLater();
+    }
+    delete_.clear();
 }
 
 void
@@ -223,6 +233,7 @@ RideCache::removeCurrentRide()
     // but model needs to know about this!
     model_->startRemove(index);
     rides_.remove(index, 1);
+    delete_<<todelete;
     model_->endRemove(index);
 
     // delete the file by renaming it
@@ -257,12 +268,8 @@ RideCache::removeCurrentRide()
     // select a different ride
     context->ride = select;
 
-    // notify AFTER deleted from DISK..
+    // notify after removed from list
     context->notifyRideDeleted(todelete);
-
-    // ..but before MEMORY cleared
-    // todelete->close(); // <<< pointHover crash in AllPlot
-    todelete->deleteLater();
 
     // now we can update
     context->mainWindow->setUpdatesEnabled(true);
