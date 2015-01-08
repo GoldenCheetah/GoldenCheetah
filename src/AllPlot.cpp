@@ -6429,6 +6429,12 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
             QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
             paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(yvalue, metricPace) : mphToPace(yvalue, metricPace)).arg(paceunit);
         }
+        if (curve->title() == tr("Speed") && rideItem && rideItem->isSwim) {
+            bool metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
+            QString paceunit = metricPace ? tr("min/100m") : tr("min/100yd");
+            double swimSpeed = yvalue * 10.00f * (metricPace ? 1.00f : METERS_PER_YARD);
+            paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(swimSpeed, true) : mphToPace(swimSpeed, true)).arg(paceunit);
+        }
 
         bool isHB= curve->title().text().contains("Hb");
 
