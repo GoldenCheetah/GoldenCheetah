@@ -2845,16 +2845,18 @@ LTMPlot::eventFilter(QObject *obj, QEvent *event)
 {
 
     // when clicking on a legend item, toggle if the curve is visible
-    if (event->type() == QEvent::MouseButtonPress) {
+    if (obj == legend() && event->type() == QEvent::MouseButtonPress) {
 
         bool replotNeeded = false;
         QwtLegend *l = static_cast<QwtLegend *>(this->legend());
+        QPoint pos = QCursor::pos();
 
         foreach(QwtPlotCurve *p, curves) {
             foreach (QWidget *w, l->legendWidgets(itemToInfo(p))) {
-                if (w->underMouse()) {
-                    //XXX this is a bit broken on a Mac (at least)
-                    //XXX qDebug()<<"under mouse="<<static_cast<QwtLegendLabel*>(w)->text().text();
+                if (QRect(l->mapToGlobal(w->geometry().topLeft()),
+                    l->mapToGlobal(w->geometry().bottomRight())).contains(pos)) {
+
+                    //qDebug()<<"under mouse="<<static_cast<QwtLegendLabel*>(w)->text().text();
                     for(int m=0; m< settings->metrics.count(); m++) {
                         if (settings->metrics[m].curve == p) {
                             settings->metrics[m].hidden = !settings->metrics[m].hidden;
