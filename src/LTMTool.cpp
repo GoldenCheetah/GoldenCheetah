@@ -1465,6 +1465,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
 {
     setWindowTitle(tr("Curve Settings"));
 
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Curves_Settings));
+
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     // choose the type

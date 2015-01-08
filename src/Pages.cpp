@@ -35,6 +35,7 @@
 #include "DataProcessor.h"
 #include "OAuthDialog.h"
 #include "RideAutoImportConfig.h"
+#include "HelpWhatsThis.h"
 
 //
 // Main Config Page - tabs for each sub-page
@@ -1631,6 +1632,9 @@ ColorsPage::saveClicked()
 IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     QWidget(parent), changed(false)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Intervals));
+
     availList = new QListWidget;
     availList->setSortingEnabled(true);
     availList->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -1824,6 +1828,9 @@ IntervalMetricsPage::saveClicked()
 BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
     QWidget(parent), changed(false)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Best));
+
     availList = new QListWidget;
     availList->setSortingEnabled(true);
     availList->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -2017,6 +2024,9 @@ BestsMetricsPage::saveClicked()
 SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
     QWidget(parent), changed(false)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Summary));
+
     availList = new QListWidget;
     availList->setSortingEnabled(true);
     availList->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -2287,6 +2297,8 @@ FieldsPage::addFieldTypes(QComboBox *p)
 KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keywordDefinitions) : QWidget(parent), parent(parent)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Notes_Keywords));
 
     QHBoxLayout *field = new QHBoxLayout();
     fieldLabel = new QLabel(tr("Field"),this);
@@ -2513,6 +2525,8 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
 FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) : QWidget(parent)
 {
     QGridLayout *mainLayout = new QGridLayout(this);
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Fields));
 
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
@@ -2738,6 +2752,8 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
     processorTree->setUniformRowHeights(true);
     processorTree->setIndentation(0);
     //processorTree->header()->resizeSection(0,150);
+    HelpWhatsThis *help = new HelpWhatsThis(processorTree);
+    processorTree->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Processing));
 
     // iterate over all the processors and add an entry to the
     QMapIterator<QString, DataProcessor*> i(processors);
@@ -2798,6 +2814,8 @@ ProcessorPage::saveClicked()
 DefaultsPage::DefaultsPage(QWidget *parent, QList<DefaultDefinition>defaultDefinitions) : QWidget(parent)
 {
     QGridLayout *mainLayout = new QGridLayout(this);
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_DataFields_Defaults));
 
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
