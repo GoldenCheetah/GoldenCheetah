@@ -1296,7 +1296,7 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     // get zones that apply, if any
     int zoneRange = context->athlete->zones() ? context->athlete->zones()->whichRange(ride->startTime().date()) : -1;
     int hrZoneRange = context->athlete->hrZones() ? context->athlete->hrZones()->whichRange(ride->startTime().date()) : -1;
-    int paceZoneRange = context->athlete->paceZones() ? context->athlete->paceZones()->whichRange(ride->startTime().date()) : -1;
+    int paceZoneRange = context->athlete->paceZones(ride->isSwim()) ? context->athlete->paceZones(ride->isSwim())->whichRange(ride->startTime().date()) : -1;
 
     if (zoneRange != -1) CP=context->athlete->zones()->getCP(zoneRange);
     else CP=0;
@@ -1304,7 +1304,7 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     if (hrZoneRange != -1) LTHR=context->athlete->hrZones()->getLT(hrZoneRange);
     else LTHR=0;
 
-    if (paceZoneRange != -1) CV=context->athlete->paceZones()->getCV(paceZoneRange);
+    if (paceZoneRange != -1) CV=context->athlete->paceZones(ride->isSwim())->getCV(paceZoneRange);
     else CV=0;
 
     // setup the array based upon the ride
@@ -1333,7 +1333,7 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         if (series == RideFile::watts && zoneRange != -1 && CP) {
             if (dp->value(series) < 1) // I zero watts
                 wattsCPTimeInZone[0] += ride->recIntSecs();
-            if (dp->value(series) < (CP*0.85f)) // I
+            else if (dp->value(series) < (CP*0.85f)) // I
                 wattsCPTimeInZone[1] += ride->recIntSecs();
             else if (dp->value(series) < CP) // II
                 wattsCPTimeInZone[2] += ride->recIntSecs();
@@ -1349,7 +1349,7 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         if (series == RideFile::hr && hrZoneRange != -1 && LTHR) {
             if (dp->value(series) < 1) // I zero
                 hrCPTimeInZone[0] += ride->recIntSecs();
-            if (dp->value(series) < (LTHR*0.9f)) // I
+            else if (dp->value(series) < (LTHR*0.9f)) // I
                 hrCPTimeInZone[1] += ride->recIntSecs();
             else if (dp->value(series) < LTHR) // II
                 hrCPTimeInZone[2] += ride->recIntSecs();
@@ -1357,16 +1357,18 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
                 hrCPTimeInZone[3] += ride->recIntSecs();
         }
 
-        // pace time in zone, only for running activities
-        if (series == RideFile::kph && paceZoneRange != -1 && ride->isRun())
-            paceTimeInZone[context->athlete->paceZones()->whichZone(paceZoneRange, dp->value(series))] += ride->recIntSecs();
+        // pace time in zone, only for running and swimming activities
+        if (series == RideFile::kph && paceZoneRange != -1 && (ride->isRun() || ride->isSwim()))
+            paceTimeInZone[context->athlete->paceZones(ride->isSwim())->whichZone(paceZoneRange, dp->value(series))] += ride->recIntSecs();
 
-        // Polarized zones :- I(<0.9*CV), II (<CV and >0.9*CV), III (>CV)
-        // only for running activities
-        if (series == RideFile::kph && paceZoneRange != -1 && CV && ride->isRun()) {
-            if (dp->value(series) < 1) // I zero
+        // Polarized zones Run:- I(<0.9*CV), II (<CV and >0.9*CV), III (>CV)
+        // Polarized zones Swim:- I(<0.975*CV), II (<CV and >0.975*CV), III (>CV)
+        if (series == RideFile::kph && paceZoneRange != -1 && CV && (ride->isRun() || ride->isSwim())) {
+            if (dp->value(series) < 0.1) // I zero
                 paceCPTimeInZone[0] += ride->recIntSecs();
-            if (dp->value(series) < (CV*0.9f)) // I
+            else if (ride->isRun() && dp->value(series) < (CV*0.9f)) // I for run
+                paceCPTimeInZone[1] += ride->recIntSecs();
+            else if (ride->isSwim() && dp->value(series) < (CV*0.975f)) // I for swim
                 paceCPTimeInZone[1] += ride->recIntSecs();
             else if (dp->value(series) < CV) // II
                 paceCPTimeInZone[2] += ride->recIntSecs();
