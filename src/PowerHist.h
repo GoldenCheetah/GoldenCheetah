@@ -68,6 +68,11 @@ class penTooltip: public QwtPlotZoomer
              setTrackerMode(AlwaysOn);
          }
 
+        virtual QRect trackerRect(const QFont &font) const
+        {
+            return QwtPlotPicker::trackerRect(font).adjusted(-3,-3,3,3);
+        }
+
         virtual QwtText trackerText(const QPoint &/*pos*/) const {
             QwtText text(tip);
 
@@ -80,7 +85,7 @@ class penTooltip: public QwtPlotZoomer
             text.setBackgroundBrush(QBrush( GColor(CPLOTMARKER)));
             text.setColor(GColor(CRIDEPLOTBACKGROUND));
             text.setBorderRadius(6);
-            text.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
+            text.setRenderFlags(Qt::AlignCenter | Qt::AlignVCenter);
             return text;
         }
 

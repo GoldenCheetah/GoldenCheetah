@@ -57,6 +57,12 @@ class LTMToolTip : public QwtPlotPicker
                 RubberBand rb, DisplayMode dm, QWidget *pc, QString fmt) :
                 QwtPlotPicker(xaxis, yaxis, rb, dm, pc),
         format(fmt) { setStateMachine(new QwtPickerDragPointMachine());}
+
+    virtual QRect trackerRect(const QFont &font) const
+    {
+        return QwtPlotPicker::trackerRect(font).adjusted(-3,-3,3,3);
+    }
+
     virtual QwtText trackerText(const QPoint &/*pos*/) const
     {
         QwtText text(tip);
@@ -70,7 +76,7 @@ class LTMToolTip : public QwtPlotPicker
         text.setBackgroundBrush(QBrush( GColor(CPLOTMARKER)));
         text.setColor(GColor(CRIDEPLOTBACKGROUND));
         text.setBorderRadius(6);
-        text.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
+        text.setRenderFlags(Qt::AlignCenter | Qt::AlignVCenter);
 
         return text;
     }
