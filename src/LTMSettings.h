@@ -77,16 +77,17 @@ class RideBest;
 class MetricDetail {
     public:
 
-    MetricDetail() : type(METRIC_DB), stack(false), model(""), name(""), metric(NULL), stressType(0),
+    MetricDetail() : type(METRIC_DB), stack(false), hidden(false), model(""), name(""), metric(NULL), stressType(0),
                      smooth(false), trendtype(0), topN(0), lowestN(0), topOut(0), baseline(0.0), 
                      curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
-                     brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false) {}
+                     brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false), curve(NULL) {}
 
     bool operator< (MetricDetail right) const { return name < right.name; }
 
     int type;
     bool stack; // should this be stacked?
+    bool hidden; // should this be hidden ? (toggled via clicking on legend)
 
     QString model; // short code for model selected
     int estimate; // 0-4 for W', CP, FTP, PMAX
@@ -143,6 +144,9 @@ class MetricDetail {
 
     // text labels against values
     bool labels;
+
+    // curve on the chart to spot this...
+    QwtPlotCurve *curve;
 };
 
 // so we can marshal and unmarshall LTMSettings when we save
