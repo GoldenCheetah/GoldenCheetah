@@ -81,6 +81,7 @@ Q_OBJECT
                  ChartTrends_MetricTrends_Config_Basic,
                  ChartTrends_MetricTrends_Config_Preset,
                  ChartTrends_MetricTrends_Config_Curves,
+                 ChartTrends_MetricTrends_Curves_Settings,
 
                  ChartTrends_CollectionTreeMap,
                  ChartTrends_Critical_MM,
@@ -137,7 +138,16 @@ Q_OBJECT
                  Preferences_Passwords,
                  Preferences_Appearance,
                  Preferences_DataFields,
+                 Preferences_DataFields_Fields,
+                 Preferences_DataFields_Notes_Keywords,
+                 Preferences_DataFields_Defaults,
+                 Preferences_DataFields_Processing,
+
                  Preferences_Metrics,
+                 Preferences_Metrics_Best,
+                 Preferences_Metrics_Summary,
+                 Preferences_Metrics_Intervals,
+
                  Preferences_TrainDevices,
 
                  };

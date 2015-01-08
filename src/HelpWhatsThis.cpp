@@ -160,6 +160,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Trends#presets").arg(tr("Prefined sets of curves which can be applied as chart definition, or as starting point for individual adjustments"));
     case ChartTrends_MetricTrends_Config_Curves:
         return text.arg("ChartTypes_Trends#curves").arg(tr("Curves which are plotted for the specific chart - based on presets or individually added and modified here"));
+    case ChartTrends_MetricTrends_Curves_Settings:
+        return text.arg("ChartTypes_Trends#curves-details").arg(tr("Individual curve configuration"));
 
     case ChartTrends_CollectionTreeMap:
         return text.arg("ChartTypes_Trends#collection-tree-map").arg(tr("Tree map visulation of ride data by two selectable dimensions for a configurable metric"));
@@ -253,11 +255,11 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case Preferences_Athlete_About:
         return text.arg("Preferences_Athlete").arg(tr("Athlete"));
     case Preferences_Athlete_TrainingZones_Power:
-        return text.arg("Preferences_Athlete_Training%20Zones").arg(tr("Training Zones"));
+        return text.arg("Preferences_Athlete_Training-Zones#power-zones").arg(tr("Training Zone definition for power"));
     case Preferences_Athlete_TrainingZones_HR:
-        return text.arg("Preferences_Athlete_Training%20Zones").arg(tr("Training Zones"));
+        return text.arg("Preferences_Athlete_Training-Zones#heartrate-zones").arg(tr("Training Zone definition for heartrate"));
     case Preferences_Athlete_TrainingZones_Pace:
-        return text.arg("Preferences_Athlete_Training%20Zones").arg(tr("Training Zones"));
+        return text.arg("Preferences_Athlete_Training-Zones#pace-zones").arg(tr("Training Zone definition for Swim and Run"));
     case Preferences_Athlete_Autoimport:
         return text.arg("Preferences_Athlete_Autoimport").arg(tr("Autoimport"));
     case Preferences_Passwords:
@@ -266,8 +268,22 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Preferences_Appearance").arg(tr("Appearance"));
     case Preferences_DataFields:
         return text.arg("Preferences_Data%20Fields").arg(tr("Data Fields"));
+    case Preferences_DataFields_Fields:
+        return text.arg("Preferences_Data%20Fields#fields").arg(tr("Data Fields"));
+    case Preferences_DataFields_Notes_Keywords:
+        return text.arg("Preferences_Data%20Fields#notes-keywords").arg(tr("Definition of coloring rules for rides"));
+    case Preferences_DataFields_Defaults:
+        return text.arg("Preferences_Data%20Fields#defaults").arg(tr("Definition of default value(s) for data fields"));
+    case Preferences_DataFields_Processing:
+        return text.arg("Preferences_Data%20Fields#processing").arg(tr("Definition of processing default parameters for the fix, adjust,... tools"));
     case Preferences_Metrics:
         return text.arg("Preferences_Metrics").arg(tr("Metrics"));
+    case Preferences_Metrics_Best:
+        return text.arg("Preferences_Metrics#bests").arg(tr("Metrics shown in 'Bests'"));
+    case Preferences_Metrics_Summary:
+        return text.arg("Preferences_Metrics#summary").arg(tr("Metrics shown in 'Summary'"));
+    case Preferences_Metrics_Intervals:
+        return text.arg("Preferences_Metrics#intervals").arg(tr("Metrics shown in 'Intervals'"));
     case Preferences_TrainDevices:
         return text.arg("Preferences_Train Devices").arg(tr("Train Devices"));
 
