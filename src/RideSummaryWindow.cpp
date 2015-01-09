@@ -665,7 +665,7 @@ RideSummaryWindow::htmlSummary()
 
                     s = s.arg(ride->getTag("Temperature", "-"));
 
-                 } else if (m->internalName() == "Pace" || m->internalName() == "xPace") { // pace is mm:ss
+                 } else if (m->internalName().startsWith("Pace") || m->internalName().startsWith("xPace")) { // pace is mm:ss
 
                     double pace;
                     bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
@@ -977,7 +977,7 @@ RideSummaryWindow::htmlSummary()
                         RideMetricPtr m = metrics.value(symbol);
                         if (!m) continue;
                         summary += "<td align=\"center\" valign=\"bottom\">" + m->name();
-                        if (m->internalName() == "Pace" || m->internalName() == "xPace") { // pace is mm:ss
+                        if (m->internalName().startsWith("Pace") || m->internalName().startsWith("xPace")) { // pace is mm:ss
 
                             summary += " (" + m->units(metricPace) + ")";
                         
@@ -1042,7 +1042,7 @@ RideSummaryWindow::htmlSummary()
                     QString s("<td align=\"center\">%1</td>");
                     if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds"))
                         summary += s.arg(time_to_string(m->value(useMetricUnits)));
-                    else if (m->internalName() == "Pace" || m->internalName() == "xPace") { // pace is mm:ss
+                    else if (m->internalName().startsWith("Pace") || m->internalName().startsWith("xPace")) { // pace is mm:ss
 
                         double pace  = m->value(metricPace);
                         summary += s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
