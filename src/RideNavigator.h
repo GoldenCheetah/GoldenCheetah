@@ -223,6 +223,9 @@ public:
 
     void setWidth(int x) { pwidth=x; }
 
+public slots:
+    bool helpEvent(QHelpEvent*, QAbstractItemView*, const QStyleOptionViewItem&, const QModelIndex&);
+
 private slots:
 
     void commitAndCloseEditor();
