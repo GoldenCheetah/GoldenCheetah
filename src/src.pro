@@ -664,6 +664,7 @@ SOURCES += \
         PMCData.cpp \
         SummaryWindow.cpp \
         SyncRideFile.cpp \
+        SwimScore.cpp \
         Tab.cpp \
         TabView.cpp \
         TacxCafRideFile.cpp \
