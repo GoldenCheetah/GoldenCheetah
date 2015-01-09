@@ -349,11 +349,11 @@ PowerHist::refreshPaceZoneLabels()
     }
     pacezoneLabels.clear();
 
-    if (!rideItem || !rideItem->isRun) return;
+    if (!rideItem || !(rideItem->isRun || rideItem->isSwim)) return;
 
-    if (series == RideFile::kph && context->athlete->paceZones()) {
-        const PaceZones *zones = context->athlete->paceZones();
-        int zone_range = context->athlete->paceZones()->whichRange(rideItem->dateTime.date());
+    if (series == RideFile::kph && context->athlete->paceZones(rideItem->isSwim)) {
+        const PaceZones *zones = context->athlete->paceZones(rideItem->isSwim);
+        int zone_range = zones->whichRange(rideItem->dateTime.date());
 
         // generate labels for existing zones
         if (zone_range >= 0) {
@@ -464,12 +464,12 @@ PowerHist::recalcCompare()
 
             }
 
-        } else if (series == RideFile::kph && !(zoned == true && (!rideItem || rideItem->isRun))) {
+        } else if (series == RideFile::kph && !(zoned == true && (!rideItem || rideItem->isRun || rideItem->isSwim))) {
 
             array = &cid.kphArray;
             arrayLength = cid.kphArray.size();
 
-        } else if (series == RideFile::kph && zoned == true && (!rideItem || rideItem->isRun)) {
+        } else if (series == RideFile::kph && zoned == true && (!rideItem || rideItem->isRun || rideItem->isSwim)) {
 
             if (cpzoned) {
 
@@ -704,7 +704,7 @@ PowerHist::recalcCompare()
             }
 
             //
-            // PACE ZONES
+            // PACE ZONES using Run Zones for scale
             //
             if (!cpzoned) {
 
@@ -915,17 +915,17 @@ PowerHist::recalc(bool force)
         // pace scale draw
         int paceRange;
         if (series == RideFile::kph && zoned && rideItem &&
-            rideItem->isRun && context->athlete->paceZones() &&
-            (paceRange=context->athlete->paceZones()->whichRange(rideItem->dateTime.date())) != -1) {
+            (rideItem->isRun || rideItem->isSwim) && context->athlete->paceZones(rideItem->isSwim) &&
+            (paceRange=context->athlete->paceZones(rideItem->isSwim)->whichRange(rideItem->dateTime.date())) != -1) {
 
             if (cpzoned) {
                 setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
                 setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
             } else {
-                setAxisScaleDraw(QwtPlot::xBottom, new PaceZoneScaleDraw(context->athlete->paceZones(), paceRange));
+                setAxisScaleDraw(QwtPlot::xBottom, new PaceZoneScaleDraw(context->athlete->paceZones(rideItem->isSwim), paceRange));
 
                 if (paceRange >= 0)
-                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->paceZones()->numZones(paceRange), 1);
+                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->paceZones(rideItem->isSwim)->numZones(paceRange), 1);
                 else
                     setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
             }
@@ -955,7 +955,7 @@ PowerHist::recalc(bool force)
             }
         }
 
-        // pace zoned for a time range
+        // pace zoned for a time range using run zones for scale
         if (source == Cache && zoned && series == RideFile::kph && context->athlete->paceZones()) {
             if (cpzoned) {
                 setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
@@ -1046,13 +1046,13 @@ PowerHist::binData(HistData &standard, QVector<double>&x, // x-axis for data
             selectedArray = &standard.hrZoneSelectedArray;
         }
 
-    } else if (series == RideFile::kph && !(zoned == true && (!rideItem || rideItem->isRun))) {
+    } else if (series == RideFile::kph && !(zoned == true && (!rideItem || rideItem->isRun || rideItem->isSwim))) {
 
         array = &standard.kphArray;
         arrayLength = standard.kphArray.size();
         selectedArray = &standard.kphSelectedArray;
 
-    } else if (series == RideFile::kph && zoned == true && (!rideItem || rideItem->isRun)) {
+    } else if (series == RideFile::kph && zoned == true && (!rideItem || rideItem->isRun || rideItem->isSwim)) {
 
         if (cpzoned) {
             array = &standard.paceCPZoneArray;
@@ -1851,8 +1851,8 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     int hrZoneRange = context->athlete->hrZones() ? context->athlete->hrZones()->whichRange(ride->startTime().date()) : -1;
     int LTHR = hrZoneRange != -1 ? context->athlete->hrZones()->getLT(hrZoneRange) : 0;
 
-    int paceZoneRange = context->athlete->paceZones() ? context->athlete->paceZones()->whichRange(ride->startTime().date()) : -1;
-    double CV = (paceZoneRange != -1) ? context->athlete->paceZones()->getCV(paceZoneRange) : 0.0;
+    int paceZoneRange = context->athlete->paceZones(ride->isSwim()) ? context->athlete->paceZones(ride->isSwim())->whichRange(ride->startTime().date()) : -1;
+    double CV = (paceZoneRange != -1) ? context->athlete->paceZones(ride->isSwim())->getCV(paceZoneRange) : 0.0;
 
     foreach(const RideFilePoint *p1, ride->dataPoints()) {
 
@@ -2017,15 +2017,17 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
 
         // pace zoned array
         // Only calculate zones if we have a running activity with a valid range
-        if (ride->isRun() && paceZoneRange > -1 && (withz || (!withz && p1->kph))) {
+        if ((ride->isRun() || ride->isSwim()) && paceZoneRange > -1 && (withz || (!withz && p1->kph))) {
             // cp zoned
             if (standard.paceCPZoneArray.size() < 3) {
                 standard.paceCPZoneArray.resize(3);
             }
 
-            if (p1->kph < 1 && withz) { // I zero kph
+            if (p1->kph < 0.1 && withz) { // I zero kph
                 standard.paceCPZoneArray[0] ++;
-            } else if (p1->kph < (CV * 0.9f)) { // I
+            } else if (ride->isRun() && p1->kph < (CV * 0.9f)) { // I Run
+                standard.paceCPZoneArray[0] ++;
+            } else if (ride->isSwim() && p1->kph < (CV * 0.975f)) { // I Swim
                 standard.paceCPZoneArray[0] ++;
             } else if (p1->kph < CV) { // II
                 standard.paceCPZoneArray[1] ++;
@@ -2033,7 +2035,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
                 standard.paceCPZoneArray[2] ++;
             }
 
-            kphIndex = context->athlete->paceZones()->whichZone(paceZoneRange, p1->kph);
+            kphIndex = context->athlete->paceZones(ride->isSwim())->whichZone(paceZoneRange, p1->kph);
 
             if (kphIndex >= 0 && kphIndex < maxSize) {
                 if (kphIndex >= standard.paceZoneArray.size())
@@ -2180,7 +2182,7 @@ PowerHist::setParameterAxisTitle()
             break;
 
         case RideFile::kph:
-            if (zoned && (!rideItem || rideItem->isRun))
+            if (zoned && (!rideItem || rideItem->isRun || rideItem->isSwim))
                 axislabel = tr("Pace zone");
             else
                 axislabel = QString(tr("Speed (%1)")).arg(context->athlete->useMetricUnits ? tr("kph") : tr("mph"));
@@ -2279,20 +2281,27 @@ PowerHist::pointHover(QwtPlotCurve *curve, int index)
 
             if (source != Metric) {
                 // for speed series add pace with units according to settings
-                // only when there is no ride (home) or the activity is a run.
-                QString paceStr;
+                // only when there is no ride (home) or the activity is a run/swim.
+                QString runPaceStr, swimPaceStr;
                 if (series == RideFile::kph && (!rideItem || rideItem->isRun)) {
                     bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
                     QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
-                    paceStr = tr("\n%1 Pace (%2)").arg(context->athlete->useMetricUnits ? kphToPace(xvalue, metricPace) : mphToPace(xvalue, metricPace)).arg(paceunit);
+                    runPaceStr = tr("\n%1 Pace (%2)").arg(context->athlete->useMetricUnits ? kphToPace(xvalue, metricPace) : mphToPace(xvalue, metricPace)).arg(paceunit);
+                }
+                if (series == RideFile::kph && (!rideItem || rideItem->isSwim)) {
+                    bool metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
+                    QString paceunit = metricPace ? tr("min/100m") : tr("min/100yd");
+                    double swimSpeed = xvalue * 10.00f * (metricPace ? 1.00f : METERS_PER_YARD);
+                    swimPaceStr = tr("\n%1 Pace (%2)").arg(context->athlete->useMetricUnits ? kphToPace(swimSpeed, true) : mphToPace(swimSpeed, true)).arg(paceunit);
                 }
                 // output the tooltip
-                text = QString("%1 %2%5\n%3 %4")
+                text = QString("%1 %2%5%6\n%3 %4")
                             .arg(xvalue, 0, 'f', digits)
                             .arg(this->axisTitle(curve->xAxis()).text())
                             .arg(yvalue, 0, 'f', 1)
                             .arg(absolutetime ? tr("minutes") : tr("%"))
-                            .arg(paceStr);
+                            .arg(runPaceStr)
+                            .arg(swimPaceStr);
             } else {
                 text = QString("%1 %2\n%3 %4")
                             .arg(xvalue, 0, 'f', digits)
@@ -2334,5 +2343,5 @@ PowerHist::isZoningEnabled()
     return (zoned == true &&
             (series == RideFile::watts || series == RideFile::wattsKg ||
             series == RideFile::hr ||
-            (series == RideFile::kph && (!rideItem || rideItem->isRun))));
+            (series == RideFile::kph && (!rideItem || rideItem->isRun || rideItem->isSwim))));
 }

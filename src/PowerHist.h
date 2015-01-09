@@ -601,11 +601,11 @@ public:
     {
 	RideItem *rideItem = parent->rideItem;
 
-    // only for running activities
-	if (! rideItem || ! rideItem->isRun)
+    // only for running and swimming activities
+	if (! rideItem || ! (rideItem->isRun || rideItem->isSwim))
 	    return;
 
-	const PaceZones *zones = parent->context->athlete->paceZones();
+	const PaceZones *zones = parent->context->athlete->paceZones(rideItem->isSwim);
 	int zone_range = zones ? zones->whichRange(rideItem->dateTime.date()) : -1;
 
     // unit conversion factor for imperial units
@@ -654,11 +654,11 @@ public:
 
 	RideItem *rideItem = parent->rideItem;
 
-    // only for running activities
-	if (! rideItem || ! rideItem->isRun)
+    // only for running and swimming activities
+	if (! rideItem || ! (rideItem->isRun || rideItem->isSwim))
 	    return;
 
-	const PaceZones *zones = parent->context->athlete->paceZones();
+	const PaceZones *zones = parent->context->athlete->paceZones(rideItem->isSwim);
 	int zone_range = zones ? zones->whichRange(rideItem->dateTime.date()) : -1;
 
     // unit conversion factor for imperial units
