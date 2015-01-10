@@ -85,7 +85,7 @@ class XPower : public RideMetric {
             total += pow(weighted, 4.0);
             count++;
         }
-        xpower = pow(total / count, 0.25);
+        xpower = count ? pow(total / count, 0.25) : 0.0;
         secs = count * secsDelta;
 
         setValue(xpower);
