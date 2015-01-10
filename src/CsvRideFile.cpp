@@ -147,6 +147,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp gcCSV("secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb");
     QRegExp periCSV("mm-dd,hh:mm:ss,SmO2 Live,SmO2 Averaged,THb,Target Power,Heart Rate,Speed,Power,Cadence");
     QRegExp freemotionCSV("Stages Data", Qt::CaseInsensitive);
+    QRegExp cpexportCSV("seconds, value,[ model,]* date", Qt::CaseInsensitive);
+
 
     int recInterval = 1;
 
@@ -163,6 +165,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     int iBikeVersion  = 0;
 
     int secsIndex, minutesIndex = -1;
+
+    double precWork=0.0;
 
     bool eof = false;
     while (!is.atEnd() && !eof) {
@@ -275,6 +279,14 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     ++lineno;
                     continue;
                }
+               else if(cpexportCSV.indexIn(line) != -1) {
+                    csvType = cpexport;
+                    rideFile->setDeviceType("CP Plot Export");
+                    rideFile->setFileFormat("CP Plot Export (csv)");
+                    unitsHeader = 1;
+                    ++lineno;
+                    continue;
+               }
                else {  // default
                     csvType = generic;
                     rideFile->setDeviceType("Unknow");
@@ -372,6 +384,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 double o2hb = 0.0, hhb = 0.0;
                 int interval=0;
                 int pause=0;
+
+
                 quint64 ms;
 
                 if (csvType == powertap || csvType == joule) {
@@ -632,7 +646,18 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                          kph *= KM_PER_MILE;
                          alt *= METERS_PER_FOOT;
                      }
-                } else {
+                } else if (csvType == cpexport) {
+                    // seconds, value, (model), date
+                    seconds = line.section(',',0,0).toDouble();
+                    minutes = seconds / 60.0f;
+
+                    seconds = lineno -1 ;
+                    double avgwatts = line.section(',', 1, 1).toDouble();
+
+                    watts = avgwatts * seconds - precWork; // 1000 * 1 - 700
+
+                    precWork = avgwatts * seconds;
+               } else {
                     if (secsIndex > -1) {
                         seconds = line.section(',', secsIndex, secsIndex).toDouble();
                         minutes = seconds / 60.0f;
