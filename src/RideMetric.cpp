@@ -98,11 +98,12 @@
 // 92  21  Nov 2014 Mark Liversedge    Added Watts:RPE ratio
 // 93  26  Nov 2014 Mark Liversedge    Added Min, Max, Avg SmO2
 // 94  02  Dec 2014 Ale Martinez       Added xPace
-// 95  08  Dec 2014 Ale Martinez       Deprecated Measures table
+// 95  08  Dec 2014 Mark Liversedge    Deprecated Measures table
 // 96  06  Jan 2015 Damien Grauser     Garmin Cycling Dynamics
 // 97  07  Jan 2015 Mark Liversedge    Added isSwim first class variable
+// 98  10  Jan 2015 Ale Martinez       Added Triscore and SwimScore metrics
 
-int DBSchemaVersion = 97;
+int DBSchemaVersion = 98;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
