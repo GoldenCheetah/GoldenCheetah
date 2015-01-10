@@ -528,8 +528,9 @@ class AvgSpeed : public RideMetric {
         if (ride->areDataPresent()->kph) {
 
             secsMoving = 0;
+            bool withz = ride->isSwim(); // average with zeros for swims
             foreach (const RideFilePoint *point, ride->dataPoints())
-                if (point->kph > 0.0) secsMoving += ride->recIntSecs();
+                if (withz || point->kph > 0.0) secsMoving += ride->recIntSecs();
 
             setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
 
@@ -590,6 +591,9 @@ class Pace : public RideMetric {
         setValue(pace);
         setCount(as->count());
     }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
+
     RideMetric *clone() const { return new Pace(*this); }
 };
 
@@ -601,6 +605,57 @@ static bool addPace()
     return true;
 }
 static bool paceAdded = addPace();
+
+//////////////////////////////////////////////////////////////////////////////
+class PaceSwim : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(PaceSwim)
+    double pace;
+
+    public:
+
+    PaceSwim() : pace(0.0)
+    {
+        setSymbol("pace_swim");
+        setInternalName("Pace Swim");
+    }
+    bool isTime() const { return true; }
+    void initialize() {
+        setName(tr("Pace Swim"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("min/100m"));
+        setImperialUnits(tr("min/100yd"));
+        setPrecision(1);
+        setConversion(METERS_PER_YARD);
+   }
+
+    void compute(const RideFile *, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+        AvgSpeed *as = dynamic_cast<AvgSpeed*>(deps.value("average_speed"));
+
+        // divide by zero or stupidly low pace
+        if (as->value(true) > 0.00f) pace = 6.0f / as->value(true);
+        else pace = 0;
+
+        setValue(pace);
+        setCount(as->count());
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
+
+    RideMetric *clone() const { return new PaceSwim(*this); }
+};
+
+static bool addPaceSwim()
+{
+    QVector<QString> deps;
+    deps.append("average_speed");
+    RideMetricFactory::instance().addMetric(PaceSwim(), &deps);
+    return true;
+}
+static bool paceSwimAdded = addPaceSwim();
 
 //////////////////////////////////////////////////////////////////////////////
 
