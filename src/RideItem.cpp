@@ -430,6 +430,11 @@ RideItem::refresh()
             metrics_[i.value()->index()] = i.value()->value(true);
         }
 
+        // clean any bad values
+        for(int j=0; j<factory.metricCount(); j++)
+            if (std::isinf(metrics_[j]) || std::isnan(metrics_[j]))
+                metrics_[j] = 0.00f;
+
         // update current state
         isstale = false;
 

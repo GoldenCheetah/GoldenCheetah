@@ -28,6 +28,7 @@
 #include "Context.h"
 
 #include <stdio.h>
+#include <cmath>
 
 #include <QSharedPointer>
 #include <QProgressDialog>
@@ -174,8 +175,14 @@ void PMCData::refresh()
 
         // seed with score for this one
         int offset = start_.daysTo(item->dateTime.date());
-        if (offset > 0 && offset < stress_.count())
-        stress_[offset] += item->getForSymbol(metricName_);
+        if (offset > 0 && offset < stress_.count()) {
+
+            // although metrics are cleansed, we check here because development
+            // builds have a rideDB.json that has nan and inf values in it.
+            double value = item->getForSymbol(metricName_);
+            if (!std::isinf(value) && !std::isnan(value))
+                stress_[offset] += value;
+        }
     }
 
     //
