@@ -44,7 +44,7 @@
 /*----------------------------------------------------------------------
  * Master widget for Metadata Entry "on" RideSummaryWindow
  *--------------------------------------------------------------------*/
-RideMetadata::RideMetadata(Context *context, bool singlecolumn) : 
+RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
     QWidget(context->mainWindow), singlecolumn(singlecolumn), context(context)
 {
 
@@ -186,7 +186,7 @@ RideMetadata::setExtraTab()
             // we might get more selective later?
 
             // set Text Field to 'Read Only' to still enable scrolling,...
-            QTextEdit* textEdit = dynamic_cast<QTextEdit*> (field->widget);
+            GTextEdit* textEdit = dynamic_cast<GTextEdit*> (field->widget);
             if (textEdit)  textEdit->setReadOnly(true);
             else {
                 QLineEdit* lineEdit = dynamic_cast<QLineEdit*> (field->widget);
@@ -389,8 +389,8 @@ Form::arrange()
     //                 this is how the "Notes" tab is created
     if (fields.count() == 1 && fields[0]->definition.type == FIELD_TEXTBOX) {
         hlayout->addWidget(fields[0]->widget, 0, 0);
-        ((QTextEdit*)(fields[0]->widget))->setFrameStyle(QFrame::NoFrame);
-        ((QTextEdit*)(fields[0]->widget))->viewport()->setAutoFillBackground(false);
+        ((GTextEdit*)(fields[0]->widget))->setFrameStyle(QFrame::NoFrame);
+        ((GTextEdit*)(fields[0]->widget))->viewport()->setAutoFillBackground(false);
         return;
     } else {
         vlayout1 = new QVBoxLayout;
@@ -507,20 +507,21 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
         break;
 
     case FIELD_TEXTBOX : // textbox
-        widget = new QTextEdit(this);
+        widget = new GTextEdit(this);
 
         // use special style sheet ..
-        dynamic_cast<QTextEdit*>(widget)->setObjectName("metadata"); 
+        dynamic_cast<GTextEdit*>(widget)->setObjectName("metadata");
 
         // rich text hangs 'fontd' for some users
-        dynamic_cast<QTextEdit*>(widget)->setAcceptRichText(false); 
-        dynamic_cast<QTextEdit*>(widget)->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); 
+        dynamic_cast<GTextEdit*>(widget)->setAcceptRichText(false);
+        dynamic_cast<GTextEdit*>(widget)->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
         if (field.name == "Change History") {
-            dynamic_cast<QTextEdit*>(widget)->setReadOnly(true);
+            dynamic_cast<GTextEdit*>(widget)->setReadOnly(true);
         } else {
-            connect (widget, SIGNAL(textChanged()), this, SLOT(editFinished()));
-        }
+            //we use focusout event for this now
+            connect (widget, SIGNAL(focusOut(QFocusEvent*)), this, SLOT(focusOut(QFocusEvent*)));
+       }
         break;
 
     case FIELD_INTEGER : // integer
@@ -605,11 +606,11 @@ FormField::~FormField()
         case FIELD_TEXTBOX : if (definition.name == "Summary")
                                  delete ((RideSummaryWindow *)widget);
                              else
-                                 delete ((QTextEdit*)widget);
+                                 delete ((GTextEdit*)widget);
                              break;
         case FIELD_INTEGER : delete ((QSpinBox*)widget); break;
         case FIELD_DOUBLE : {
-                                if (!isTime) delete ((QDoubleSpinBox*)widget); 
+                                if (!isTime) delete ((QDoubleSpinBox*)widget);
                                 else delete ((QTimeEdit*)widget);
                             }
                             break;
@@ -625,6 +626,21 @@ FormField::dataChanged()
 {
     if (active) return;
     edited = true;
+}
+
+void
+FormField::focusOut(QFocusEvent *)
+{
+    // watch to see if we actually have changed ?
+    if (definition.type == FIELD_TEXTBOX && definition.name != "Change History") {
+
+        // what did we used to be ?
+        QString value = ourRideItem->ride()->getTag(definition.name, "");
+        if (value != dynamic_cast<GTextEdit*>(widget)->document()->toPlainText()) {
+            edited = true;
+            editFinished(); // we made a change so reflect it !
+        }
+    }
 }
 
 void
@@ -653,7 +669,7 @@ FormField::editFinished()
              break;
     case FIELD_TEXTBOX :
         {
-            text = ((QTextEdit*)widget)->document()->toPlainText();
+            text = ((GTextEdit*)widget)->document()->toPlainText();
             break;
         }
 
@@ -674,13 +690,13 @@ FormField::editFinished()
     // Update special field
     if (definition.name == "Device") {
         ourRideItem->ride()->setDeviceType(text);
-        ourRideItem->notifyRideMetadataChanged();
+
     } else if (definition.name == "Identifier") {
         ourRideItem->ride()->setId(text);
-        ourRideItem->notifyRideMetadataChanged();
+
     } else if (definition.name == "Recording Interval") {
         ourRideItem->ride()->setRecIntSecs(text.toDouble());
-        ourRideItem->notifyRideMetadataChanged();
+
     } else if (definition.name == "Start Date") {
         QDateTime current = ourRideItem->ride()->startTime();
         QDate date(/* year*/text.mid(6,4).toInt(),
@@ -688,7 +704,6 @@ FormField::editFinished()
                    /* day */text.mid(0,2).toInt());
         QDateTime update = QDateTime(date, current.time());
         ourRideItem->setStartTime(update);
-        ourRideItem->notifyRideMetadataChanged();
 
         // warn if the ride already exists with that date/time
         meta->warnDateTime(update);
@@ -721,11 +736,9 @@ FormField::editFinished()
             override.insert("value", text);
             ourRideItem->ride()->metricOverrides.insert(meta->sp.metricSymbol(definition.name), override);
 
-            // get widgets updated with new override
-            ourRideItem->notifyRideMetadataChanged();
         } else {
 
-            // we need to convert from display value to 
+            // we need to convert from display value to
             // stored value for the Weight field:
             if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
                 double kg = text.toDouble() / LB_PER_KG;
@@ -734,12 +747,9 @@ FormField::editFinished()
 
             // just update the tags QMap!
             ourRideItem->ride()->setTag(definition.name, text);
-
-            // and update !
-            ourRideItem->notifyRideMetadataChanged();
         }
     }
-    active = false; 
+    active = false;
 
     // default values
     setLinkedDefault(text);
@@ -753,6 +763,9 @@ FormField::editFinished()
         }
     }
     ourRideItem->ride()->setTag("Calendar Text", calendarText);
+
+    // and update !
+    ourRideItem->notifyRideMetadataChanged();
 
     // rideFile is now dirty!
     ourRideItem->setDirty(true);
@@ -791,7 +804,7 @@ FormField::stateChanged(int state)
         ourRideItem->ride()->setTag(definition.name, ((QCheckBox *)widget)->isChecked() ? "1" : "0");
         ourRideItem->setDirty(true);
         return;
-    } 
+    }
 
     widget->setEnabled(state ? true : false);
     widget->setHidden(state ? false : true);
@@ -879,8 +892,8 @@ FormField::metadataChanged()
     switch (definition.type) {
     case FIELD_TEXT : // text
     case FIELD_SHORTTEXT : // shorttext
-        { 
-            if (meta->context->athlete->rideCache && completer && 
+        {
+            if (meta->context->athlete->rideCache && completer &&
                 definition.values.count() == 1 && definition.values.at(0) == "*") {
 
                 // set completer if needed for wildcard matching
@@ -898,7 +911,7 @@ FormField::metadataChanged()
 
     case FIELD_TEXTBOX : // textbox
         if (definition.name != "Summary")
-            ((QTextEdit*)widget)->setText(value);
+            ((GTextEdit*)widget)->setText(value);
         break;
 
     case FIELD_INTEGER : // integer

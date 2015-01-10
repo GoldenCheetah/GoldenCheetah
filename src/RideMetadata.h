@@ -93,6 +93,7 @@ class FormField : public QWidget
         void editFinished();        // from the widget - we finished editing this field
         void metadataChanged();     // from GC - a new ride got picked / changed elsewhere
         void stateChanged(int);     // should we enable/disable the widget?
+        void focusOut(QFocusEvent *event);
 
     private:
         RideMetadata *meta;
@@ -228,4 +229,16 @@ protected:
     int red, green, blue;
 };
 
+// version of qtextedit with signal when lost focus
+class GTextEdit : public QTextEdit
+{
+    Q_OBJECT
+
+    public:
+        GTextEdit(QWidget*parent) : QTextEdit(parent) {}
+        void focusOutEvent (QFocusEvent *event) { emit focusOut(event); }
+
+    signals:
+        void focusOut(QFocusEvent *);
+};
 #endif

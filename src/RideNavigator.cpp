@@ -1066,7 +1066,7 @@ void NavigatorCellDelegate::commitAndCloseEditor() { }
 void NavigatorCellDelegate::setEditorData(QWidget *, const QModelIndex &) const { }
 void NavigatorCellDelegate::updateEditorGeometry(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const {}
 void NavigatorCellDelegate::setModelData(QWidget *, QAbstractItemModel *, const QModelIndex &) const { }
-bool NavigatorCellDelegate::helpEvent(QHelpEvent*, QAbstractItemView*, const QStyleOptionViewItem&, const QModelIndex&) {}
+bool NavigatorCellDelegate::helpEvent(QHelpEvent*, QAbstractItemView*, const QStyleOptionViewItem&, const QModelIndex&) { return true; }
 
 QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, const QModelIndex &index) const 
 {
