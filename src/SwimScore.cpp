@@ -107,7 +107,7 @@ class XPowerSwim : public RideMetric {
             total += pow(weighted, 3.0);
             count++;
         }
-        xpower = pow(total / count, 1/3.0);
+        xpower = count ? pow(total / count, 1/3.0) : 0.0;
         secs = count * secsDelta;
 
         setValue(xpower);
