@@ -22,7 +22,7 @@
 
 #include "RideFile.h"
 
-enum csvtypes { generic, gc, powertap, joule, ergomo, motoactv, ibike, moxy, freemotion, peripedal };
+enum csvtypes { generic, gc, powertap, joule, ergomo, motoactv, ibike, moxy, freemotion, peripedal, cpexport };
 typedef enum csvtypes CsvType;
 
 struct CsvFileReader : public RideFileReader {
