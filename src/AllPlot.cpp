@@ -6438,6 +6438,9 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
 
         bool isHB= curve->title().text().contains("Hb");
 
+        // need to scale for W' bal
+        if (curve->title().text().contains("W'")) yvalue /= 1000.0f;
+
         // output the tooltip
         QString text = QString("%1 %2%5\n%3 %4")
                         .arg(yvalue, 0, 'f', isHB ? 2 : 1)
