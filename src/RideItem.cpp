@@ -446,13 +446,13 @@ RideItem::refresh()
 
         // and Lucene search texts if they have changed since we
         // last updated lucene for this ride item
-#ifdef GC_HAVE_LUCENE
         unsigned long mc = metaCRC();
         if (metacrc != mc) {
+#ifdef GC_HAVE_LUCENE
             context->athlete->lucene->importRide(ride_);
+#endif
             metacrc = mc;
         }
-#endif
 
         // close if we opened it
         if (doclose) {
