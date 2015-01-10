@@ -48,6 +48,7 @@
 // 3059 - V3.1 RC4
 // 3100 - V3.1 RELEASE (August 17 2014)
 // 3101 - V3.11 DEVELOPMENT
+// 3102 - V3.11 DEVELOPMENT INCL RIDECACHE
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -59,7 +60,7 @@
 #define VERSION31_BUILD VERSION31_UPG
 
 // these three will change until we release
-#define VERSION_LATEST 3101
+#define VERSION_LATEST 3102
 #define VERSION_STRING "V3.11 development"
 
 class GcUpgradeLogDialog : public QDialog
