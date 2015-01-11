@@ -228,9 +228,14 @@ void IntervalSummaryWindow::summary(RideFile &f, QString name, QString &html)
     html += "<table align=\"center\" width=\"90%\" ";
     html += "cellspacing=0 border=0>";
 
+    RideItem *rideItem = const_cast<RideItem*>(context->currentRideItem());
+
     foreach (QString symbol, intervalMetrics) {
         RideMetricPtr m = metrics.value(symbol);
         if (!m) continue;
+
+        // skip metrics that are not relevant for this ride
+        if (!rideItem || m->isRelevantForRide(rideItem) == false) continue;
 
         html += "<tr>";
         // left column (names)
@@ -306,9 +311,15 @@ void IntervalSummaryWindow::calcInterval(RideFileInterval interval, QString& htm
     html += "<table align=\"center\" width=\"90%\" ";
     html += "cellspacing=0 border=0>";
 
+    RideItem *rideItem = const_cast<RideItem*>(context->currentRideItem());
+
     foreach (QString symbol, intervalMetrics) {
         RideMetricPtr m = metrics.value(symbol);
         if (!m) continue;
+
+        // skip metrics that are not relevant for this ride
+        if (!rideItem || m->isRelevantForRide(rideItem) == false) continue;
+
 
         html += "<tr>";
         // left column (names)
