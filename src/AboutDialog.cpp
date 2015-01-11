@@ -161,6 +161,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Okano Takayoshi");
     contributors.append("Patrick McNerthney");
     contributors.append("Dr Phil Skiba");
+    contributors.append("Philip Willoughby");
     contributors.append("Rainer Clasen");
     contributors.append("Ralf Spenneberg");
     contributors.append("Robb Romans");
@@ -174,6 +175,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Thomas Weichmann");
     contributors.append("Tilman Schmiedeberg");
     contributors.append("Walter B&#252;rki");
+    contributors.append("Yves Arrouye");
 
     QString contributorsTable = "<center><table><tr>";
     for (int i=0;i<contributors.count();i++){
