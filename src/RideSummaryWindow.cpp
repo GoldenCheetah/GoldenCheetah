@@ -80,9 +80,6 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
 #endif
 
         cl->addRow(new QLabel(tr("Date range")), dateSetting);
-
-        // ecp model
-        ecp = new ExtendedCriticalPower(context);
     }
 
     QVBoxLayout *vlayout = new QVBoxLayout;

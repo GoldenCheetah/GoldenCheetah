@@ -327,6 +327,22 @@ CPPlot::initModel()
         pdModel->setMinutes(true); // we're minutes here ...
         pdModel->setData(bestsCache->meanMaxArray(rideSeries));
    }
+
+    #if GC_HAVE_MODEL_LABS
+    // Test
+    ExtendedCriticalPower *ecp = new ExtendedCriticalPower(context);
+
+    TestModel model = ecp->deriveExtendedCP_6_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+    QwtPlotCurve* plot = ecp->getPlotCurveForExtendedCP_6_3(model);
+    plot->attach(this);
+    bestsCurves.append(plot);
+
+    model = ecp->deriveExtendedCP_5_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+    plot = ecp->getPlotCurveForExtendedCP_5_3(model);
+    plot->attach(this);
+    bestsCurves.append(plot);
+    #endif
+
 }
 
 // Plot the dashed line model curve according to the parameters
