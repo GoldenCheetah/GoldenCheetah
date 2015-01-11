@@ -75,6 +75,12 @@ class PMCData : public QObject {
         double sb(QDate);
         double rr(QDate);
 
+        // colour coding the 4 series for RAG reporting
+        static QColor ltsColor(double, QColor defaultColor);
+        static QColor stsColor(double, QColor defaultColor);
+        static QColor sbColor(double, QColor defaultColor);
+        static QColor rrColor(double, QColor defaultColor);
+
     public slots:
 
         // as underlying ride data changes the
