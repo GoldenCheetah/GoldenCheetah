@@ -77,7 +77,7 @@ class RideCache : public QObject
 	    QVector<RideItem*>&rides() { return rides_; } 
 
         // add/remove a ride to the list
-        void addRide(QString name, bool dosignal);
+        void addRide(QString name, bool dosignal, bool useTempActivities);
         void removeCurrentRide();
 
         // export metrics in CSV format
