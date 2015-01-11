@@ -554,15 +554,26 @@ RideSummaryWindow::htmlSummary()
 
             if (ridesummary) {
 
+                // for rag reporting
+                QColor defaultColor = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+
                 // get the Coggan PMC and add values for date of ride
-                summary += QString(tr("<tr><td>CTL:</td><td align=\"right\">%1</td></tr>")
-                                   .arg((int)pmc->lts(rideItem->dateTime.date())));
-                summary += QString(tr("<tr><td>ATL:</td><td align=\"right\">%1</td></tr>")
-                                   .arg((int)pmc->sts(rideItem->dateTime.date())));
-                summary += QString(tr("<tr><td>TSB:</td><td align=\"right\">%1</td></tr>")
-                                   .arg((int)pmc->sb(rideItem->dateTime.date())));
-                summary += QString(tr("<tr><td>RR:</td><td align=\"right\">%1</td></tr>")
-                                   .arg((int)pmc->rr(rideItem->dateTime.date())));
+                summary += QString(tr("<tr><td>CTL:</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
+                                   .arg((int)pmc->lts(rideItem->dateTime.date()))
+                                   .arg(PMCData::ltsColor((int)pmc->lts(rideItem->dateTime.date()), defaultColor).name())
+                                    );
+                summary += QString(tr("<tr><td>ATL:</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
+                                   .arg((int)pmc->sts(rideItem->dateTime.date()))
+                                   .arg(PMCData::stsColor((int)pmc->sts(rideItem->dateTime.date()), defaultColor).name())
+                                    );
+                summary += QString(tr("<tr><td>TSB:</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
+                                   .arg((int)pmc->sb(rideItem->dateTime.date()))
+                                   .arg(PMCData::sbColor((int)pmc->sb(rideItem->dateTime.date()), defaultColor).name())
+                                    );
+                summary += QString(tr("<tr><td>RR:</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
+                                   .arg((int)pmc->rr(rideItem->dateTime.date()))
+                                   .arg(PMCData::rrColor((int)pmc->rr(rideItem->dateTime.date()), defaultColor).name())
+                                    );
 
             } else {
 
