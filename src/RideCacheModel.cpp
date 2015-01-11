@@ -124,8 +124,7 @@ RideCacheModel::itemAdded(RideItem*)
 void
 RideCacheModel::startRemove(int index)
 {
-    //beginRemoveRows(createIndex(0,0), index, columns_-1);
-    beginRemoveRows(QModelIndex(), index, columns_-1);
+    beginRemoveRows(QModelIndex(), index, index);
 }
 
 void
