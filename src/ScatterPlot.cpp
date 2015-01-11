@@ -98,6 +98,8 @@ pointType(const RideFilePoint *point, int type, int side, bool metric, double cr
         case MODEL_GEAR : return point->gear;
         case MODEL_SMO2 : return point->smo2;
         case MODEL_THB : return point->thb;
+        case MODEL_HHB : return point->hhb;
+        case MODEL_O2HB : return point->o2hb;
     }
     return 0; // ? unknown channel ?
 }
@@ -153,6 +155,8 @@ QString ScatterPlot::describeType(int type, bool longer, bool metric)
             case MODEL_GEAR :  return (tr("Gear Ratio"));
             case MODEL_SMO2 :  return (tr("Muscle Oxygen"));
             case MODEL_THB :  return (tr("Haemoglobin Mass"));
+            case MODEL_HHB :  return (tr("Deoxygenated Haemoglobin"));
+            case MODEL_O2HB :  return (tr("Oxygenated Haemoglobin"));
         }
         return (tr("Unknown"));; // ? unknown channel ?
     } else {
@@ -185,6 +189,8 @@ QString ScatterPlot::describeType(int type, bool longer, bool metric)
             case MODEL_GEAR :  return (tr("Gear"));
             case MODEL_SMO2 :  return (tr("SmO2"));
             case MODEL_THB :  return (tr("tHb"));
+            case MODEL_O2HB :  return (tr("O2Hb"));
+            case MODEL_HHB :  return (tr("HHb"));
         }
         return (tr("None")); // ? unknown channel ?
     }

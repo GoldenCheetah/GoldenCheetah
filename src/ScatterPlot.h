@@ -66,6 +66,8 @@
 #define MODEL_GEAR          25
 #define MODEL_SMO2          26
 #define MODEL_THB           27
+#define MODEL_HHB           28
+#define MODEL_O2HB          29
 
 // the data provider for the plot
 class ScatterSettings;
