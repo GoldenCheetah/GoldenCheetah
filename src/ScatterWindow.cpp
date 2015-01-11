@@ -52,6 +52,8 @@ ScatterWindow::addStandardChannels(QComboBox *box)
     box->addItem(tr("Gear Ratio"), MODEL_GEAR);
     box->addItem(tr("Muscle Oxygen"), MODEL_SMO2);
     box->addItem(tr("Haemoglobin Mass"), MODEL_THB);
+    box->addItem(tr("Deoxygenated Hb"), MODEL_HHB);
+    box->addItem(tr("Oxygenated Hb"), MODEL_O2HB);
     //box->addItem(tr("Interval"), MODEL_INTERVAL); //supported differently for now
     //box->addItem(tr("Latitude"), MODEL_LAT); //weird values make the plot ugly
     //box->addItem(tr("Longitude"), MODEL_LONG); //weird values make the plot ugly
@@ -83,6 +85,8 @@ ScatterWindow::addrStandardChannels(QxtStringSpinBox *box)
     list.append(tr("Gear Ratio"));
     list.append(tr("Muscle Oxygen"));
     list.append(tr("Haemoglobin Mass"));
+    list.append(tr("Deoxygenated Hb"));
+    list.append(tr("Oxygenated Hb"));
     box->setStrings(list);
 }
 
