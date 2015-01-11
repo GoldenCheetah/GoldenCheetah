@@ -561,6 +561,8 @@ RideSummaryWindow::htmlSummary()
                                    .arg((int)pmc->sts(rideItem->dateTime.date())));
                 summary += QString(tr("<tr><td>TSB:</td><td align=\"right\">%1</td></tr>")
                                    .arg((int)pmc->sb(rideItem->dateTime.date())));
+                summary += QString(tr("<tr><td>RR:</td><td align=\"right\">%1</td></tr>")
+                                   .arg((int)pmc->rr(rideItem->dateTime.date())));
 
             } else {
 
@@ -570,8 +572,8 @@ RideSummaryWindow::htmlSummary()
                 if (start == -1) start = 0;
                 if (end==-1) end = pmc->lts().count()-1;
 
-                int lowCTL=0, highCTL=0, lowATL=0, highATL=0, lowTSB=0, highTSB=0;
-                double avgCTL=0, avgATL=0, avgTSB=0;
+                int lowCTL=0, highCTL=0, lowATL=0, highATL=0, lowTSB=0, highTSB=0, lowRR=0,highRR=0;
+                double avgCTL=0, avgATL=0, avgTSB=0, avgRR=0;
                 int count=0;
 
                 bool first=true;
@@ -581,11 +583,13 @@ RideSummaryWindow::htmlSummary()
                     double ctl = pmc->lts()[i];
                     double atl = pmc->sts()[i];
                     double tsb = pmc->sb()[i];
+                    double rr = pmc->rr()[i];
 
                     count++;
                     avgCTL += ctl;
                     avgATL += atl;
                     avgTSB += tsb;
+                    avgRR += rr;
 
                     if (first) {
 
@@ -593,6 +597,7 @@ RideSummaryWindow::htmlSummary()
                         lowCTL = highCTL = ctl;
                         lowATL = highATL = atl;
                         lowTSB = highTSB = tsb;
+                        lowRR = highTSB = rr;
                         first = false;
 
                     } else {
@@ -604,6 +609,8 @@ RideSummaryWindow::htmlSummary()
                         if (atl > highATL) highATL=atl;
                         if (tsb < lowTSB) lowTSB=tsb;
                         if (tsb > highTSB) highTSB=tsb;
+                        if (rr < lowRR) lowRR=rr;
+                        if (rr > highRR) highRR=rr;
                     }
                 }
 
@@ -611,6 +618,7 @@ RideSummaryWindow::htmlSummary()
                     avgCTL /= double(count);
                     avgATL /= double(count);
                     avgTSB /= double(count);
+                    avgRR /= double(count);
                 }
 
                 // show range for date period
@@ -620,6 +628,8 @@ RideSummaryWindow::htmlSummary()
                                    .arg((int)lowATL).arg((int)highATL).arg((int)avgATL));
                 summary += QString(tr("<tr><td>TSB:</td><td align=\"right\">%3 (%1 - %2)</td></tr>")
                                    .arg((int)lowTSB).arg((int)highTSB).arg((int)avgTSB));
+                summary += QString(tr("<tr><td>RR:</td><td align=\"right\">%3 (%1 - %2)</td></tr>")
+                                   .arg((int)lowRR).arg((int)highRR).arg((int)avgRR));
             }
             // spacer
             summary += "<tr style=\"height: 3px;\"></tr>";
