@@ -41,6 +41,8 @@ class GcCrashDialog : public QDialog
 
     private:
         QWebView *report;
+        bool newFilesInQuarantine;
+        QStringList files;
 };
 
 #endif

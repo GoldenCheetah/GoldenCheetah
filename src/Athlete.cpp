@@ -73,6 +73,12 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     }
     appsettings->setCValue(cyclist, GC_SAFEEXIT, false); // will be set to true on exit
 
+    // make sure that the latest folder structure exists in Athlete Directory -
+    // e.g. Cache could be deleted by mistake or empty folders are not copied
+    // later GC expects the folders are available
+
+    if (!this->home->subDirsExist()) this->home->createAllSubdirs();
+
     // Before we initialise we need to run the upgrade wizard for this athlete
     GcUpgrade v3;
     int returnCode = v3.upgrade(home->root());
@@ -310,9 +316,9 @@ Athlete::updateRideFileIntervals()
 }
 
 void
-Athlete::addRide(QString name, bool dosignal)
+Athlete::addRide(QString name, bool dosignal, bool useTempActivities)
 {
-    rideCache->addRide(name, dosignal);
+    rideCache->addRide(name, dosignal, useTempActivities);
 }
 
 void
@@ -423,6 +429,7 @@ AthleteDirectoryStructure::AthleteDirectoryStructure(const QDir home){
     myhome = home;
 
     athlete_activities = "activities";
+    athlete_tmp_activities = "tempActivities";
     athlete_imports = "imports";
     athlete_records = "records";
     athlete_downloads = "downloads";
@@ -433,6 +440,7 @@ AthleteDirectoryStructure::AthleteDirectoryStructure(const QDir home){
     athlete_workouts = "workouts";
     athlete_temp = "temp";
     athlete_logs = "logs";
+    athlete_quarantine = "quarantine";
 
 
 }
@@ -447,6 +455,7 @@ void
 AthleteDirectoryStructure::createAllSubdirs() {
 
     myhome.mkdir(athlete_activities);
+    myhome.mkdir(athlete_tmp_activities);
     myhome.mkdir(athlete_imports);
     myhome.mkdir(athlete_records);
     myhome.mkdir(athlete_downloads);
@@ -457,6 +466,8 @@ AthleteDirectoryStructure::createAllSubdirs() {
     myhome.mkdir(athlete_workouts);
     myhome.mkdir(athlete_logs);
     myhome.mkdir(athlete_temp);
+    myhome.mkdir(athlete_quarantine);
+
 
 
 }
@@ -465,6 +476,7 @@ bool
 AthleteDirectoryStructure::subDirsExist() {
 
     return (activities().exists() &&
+            tmpActivities().exists() &&
             imports().exists() &&
             records().exists() &&
             downloads().exists() &&
@@ -474,7 +486,8 @@ AthleteDirectoryStructure::subDirsExist() {
             calendar().exists() &&
             workouts().exists() &&
             logs().exists() &&
-            temp().exists()
+            temp().exists() &&
+            quarantine().exists()
             );
 }
 

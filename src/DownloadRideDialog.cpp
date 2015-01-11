@@ -423,6 +423,8 @@ DownloadRideDialog::downloadClicked()
         QStringList errors;
         QFile currentFile(filepath);
         QString targetFileName;
+        QString targetFileTmpActivitiesName;
+        QString targetFileActivitiesName;
         RideFile *ride = RideFileFactory::instance().openRideFile(context, currentFile, errors);
 
         // did it parse ok ?
@@ -438,8 +440,11 @@ DownloadRideDialog::downloadClicked()
             ride->setTag("Source Filename", filename);
             ride->setTag("Filename", targetFileName);
             JsonFileReader reader;
-            QFile target(context->athlete->home->activities().canonicalPath() + "/" + targetFileName);
+            // write to tempActivties first (until RideCache is updated without crash)
+            targetFileTmpActivitiesName = context->athlete->home->tmpActivities().canonicalPath() + "/" + targetFileName;
+            targetFileActivitiesName = context->athlete->home->activities().canonicalPath() + "/" + targetFileName;
             // no worry if file already exists - .JSON writer either creates the file or updates the file content
+            QFile target(targetFileTmpActivitiesName);
             reader.writeRideFile(context, ride, target);
 
         } else {
@@ -454,7 +459,16 @@ DownloadRideDialog::downloadClicked()
 
         }
 
-        context->athlete->addRide(targetFileName);
+        context->athlete->addRide(targetFileName, true, true);
+        // Ride Cache was updated without crash - so move the file from /tmpactivities to /activities
+        QFile targetFileActivities(targetFileActivitiesName);
+        // renaming does not overwrite - so remove any existing version (if exists) from /activities first
+        if (targetFileActivities.exists()) {
+            targetFileActivities.remove();
+        }
+        // now rename
+        QFile targetFileTmpActivities(targetFileTmpActivitiesName);
+        targetFileTmpActivities.rename(targetFileActivitiesName);
     }
 
     if( ! failures )
