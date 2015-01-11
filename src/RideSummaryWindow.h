@@ -147,7 +147,7 @@ class RideSummaryWindow : public GcChartWindow
 
         RideFileCache *bestsCache;
         ExtendedCriticalPower *ecp;
-        Model_eCP cpModel;
+        TestModel cpModel;
 
         QString WPrimeString, CPString, FTPString, PMaxString;
         QString WPrimeStringWPK, CPStringWPK, FTPStringWPK, PMaxStringWPK;

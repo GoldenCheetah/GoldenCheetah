@@ -31,11 +31,11 @@
 #include <qwt_plot_marker.h>
 
 // Model
-class Model_eCP
+class TestModel //: public PDModel
 {
     public:
 
-        Model_eCP()  :
+        TestModel()  :
             version(""),
             paa(0), paa_dec(0), ecp(0), etau(0), ecp_del(0), tau_del(0), ecp_dec(0), ecp_dec_del(0),
             pMax(0), mmp60(0) {}
@@ -94,65 +94,65 @@ class ExtendedCriticalPower
         ExtendedCriticalPower(Context *context);
         ~ExtendedCriticalPower();
 
-        //Model_eCP deriveExtendedCPParameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
+        //TestModel deriveExtendedCPParameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
 
         /*Model_wsCP deriveWardSmithCPParameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
         QwtPlotCurve* getPlotCurveForWScp(Model_wsCP athleteModeleWSCP);*/
 
 
-        Model_eCP deriveExtendedCP_2_1_Parameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
-        QwtPlotCurve* getPlotCurveForExtendedCP_2_1(Model_eCP athleteModeleCP2);
-        QwtPlotMarker* getPlotMarkerForExtendedCP_2_1(Model_eCP athleteModeleCP2);
+        TestModel deriveExtendedCP_2_1_Parameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_2_1(TestModel athleteModeleCP2);
+        QwtPlotMarker* getPlotMarkerForExtendedCP_2_1(TestModel athleteModeleCP2);
 
-        Model_eCP deriveExtendedCP_2_3_Parameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
-        //Model_eCP deriveExtendedCP_2_3_ParametersForBest(double best5s, double best1min, double best5min, double best60min);
-        QwtPlotCurve* getPlotCurveForExtendedCP_2_3(Model_eCP model);
+        TestModel deriveExtendedCP_2_3_Parameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
+        //TestModel deriveExtendedCP_2_3_ParametersForBest(double best5s, double best1min, double best5min, double best60min);
+        QwtPlotCurve* getPlotCurveForExtendedCP_2_3(TestModel model);
 
-        Model_eCP deriveExtendedCP_3_1_Parameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
-        QwtPlotCurve* getPlotCurveForExtendedCP_3_1(Model_eCP athleteModeleCP2);
+        TestModel deriveExtendedCP_3_1_Parameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_3_1(TestModel athleteModeleCP2);
 
-        Model_eCP deriveExtendedCP_4_1_Parameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
-        QwtPlotCurve* getPlotCurveForExtendedCP_4_1(Model_eCP athleteModeleCP2);
+        TestModel deriveExtendedCP_4_1_Parameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_4_1(TestModel athleteModeleCP2);
 
-        Model_eCP deriveExtendedCP_4_2_Parameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
-        QwtPlotCurve* getPlotCurveForExtendedCP_4_2(Model_eCP athleteModeleCP2);
+        TestModel deriveExtendedCP_4_2_Parameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_4_2(TestModel athleteModeleCP2);
 
-        Model_eCP deriveExtendedCP_4_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
-        Model_eCP deriveExtendedCP_4_3_ParametersForBest(double best5s, double best1min, double best5min, double best60min);
-        QwtPlotCurve* getPlotCurveForExtendedCP_4_3(Model_eCP athleteModeleCP2);
-        QwtPlotCurve* getPlotLevelForExtendedCP_4_3(Model_eCP athleteModeleCP2);
+        TestModel deriveExtendedCP_4_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
+        TestModel deriveExtendedCP_4_3_ParametersForBest(double best5s, double best1min, double best5min, double best60min);
+        QwtPlotCurve* getPlotCurveForExtendedCP_4_3(TestModel athleteModeleCP2);
+        QwtPlotCurve* getPlotLevelForExtendedCP_4_3(TestModel athleteModeleCP2);
 
-        QwtPlotCurve* getPlotCurveForExtendedCP_4_3_WSecond(Model_eCP athleteModeleCP2);
-        QwtPlotCurve* getPlotCurveForExtendedCP_4_3_WPrime(Model_eCP athleteModeleCP2);
-        QwtPlotCurve* getPlotCurveForExtendedCP_4_3_CP(Model_eCP athleteModeleCP2);
-        QwtPlotCurve* getPlotCurveForExtendedCP_4_3_WPrime_CP(Model_eCP athleteModeleCP2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_4_3_WSecond(TestModel athleteModeleCP2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_4_3_WPrime(TestModel athleteModeleCP2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_4_3_CP(TestModel athleteModeleCP2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_4_3_WPrime_CP(TestModel athleteModeleCP2);
 
         // Extended CP Model version 5
-        Model_eCP deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
-        QwtPlotCurve* getPlotCurveForExtendedCP_5_3(Model_eCP athleteModeleCP2);
+        TestModel deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_5_3(TestModel athleteModeleCP2);
 
-        Model_eCP deriveExtendedCP_5_3_ParametersForBest(double best5s, double best1min, double best5min, double best60min);
-        QwtPlotCurve* getPlotLevelForExtendedCP_5_3(Model_eCP athleteModeleCP2);
+        TestModel deriveExtendedCP_5_3_ParametersForBest(double best5s, double best1min, double best5min, double best60min);
+        QwtPlotCurve* getPlotLevelForExtendedCP_5_3(TestModel athleteModeleCP2);
 
         // Contributions
-        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WSecond(Model_eCP athleteModeleCP2, bool stacked);
-        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WPrime(Model_eCP athleteModeleCP2, bool stacked);
-        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_CP(Model_eCP athleteModeleCP2, bool stacked);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WSecond(TestModel athleteModeleCP2, bool stacked);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WPrime(TestModel athleteModeleCP2, bool stacked);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_CP(TestModel athleteModeleCP2, bool stacked);
 
         // Extended CP Model version 6
-        Model_eCP deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);      
-        QwtPlotCurve* getPlotCurveForExtendedCP_6_3(Model_eCP athleteModeleCP2);
+        TestModel deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_6_3(TestModel athleteModeleCP2);
 
         // Contributions
-        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_6_3_WSecond(Model_eCP athleteModeleCP2, bool stacked);
-        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_6_3_WPrime(Model_eCP athleteModeleCP2, bool stacked);
-        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_6_3_CP(Model_eCP athleteModeleCP2, bool stacked);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_6_3_WSecond(TestModel athleteModeleCP2, bool stacked);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_6_3_WPrime(TestModel athleteModeleCP2, bool stacked);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_6_3_CP(TestModel athleteModeleCP2, bool stacked);
 
         // Marker for Model
-        QwtPlotMarker* getPlotMarkerForExtendedCP(Model_eCP athleteModeleCP2);
+        QwtPlotMarker* getPlotMarkerForExtendedCP(TestModel athleteModeleCP2);
 
         // Dan-Veloclinic Model
-        Model_eCP deriveDanVeloclinicCP_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
+        TestModel deriveDanVeloclinicCP_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
 
 
 

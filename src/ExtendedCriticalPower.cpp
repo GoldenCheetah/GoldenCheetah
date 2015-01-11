@@ -34,10 +34,10 @@ ExtendedCriticalPower::~ExtendedCriticalPower()
 {
 }
 
-Model_eCP
+TestModel
 ExtendedCriticalPower::deriveExtendedCP_2_3_Parameters(RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2)
 {
-    Model_eCP model;
+    TestModel model;
     model.version = "eCP v2.3";
 
     // bounds on anaerobic interval in minutes
@@ -254,7 +254,7 @@ ExtendedCriticalPower::deriveExtendedCP_2_3_Parameters(RideFileCache *bests, Rid
 }
 
 QwtPlotCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_2_3(Model_eCP model)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_2_3(TestModel model)
 {
     const int extendedCurve2_points = 1000;
 
@@ -282,10 +282,10 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_2_3(Model_eCP model)
     return extendedCPCurve2;
 }
 
-Model_eCP
+TestModel
 ExtendedCriticalPower::deriveExtendedCP_4_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2)
 {
-    Model_eCP model;
+    TestModel model;
     model.version = "eCP v4.3";
 
     // bounds on anaerobic interval in minutes
@@ -530,10 +530,10 @@ ExtendedCriticalPower::deriveExtendedCP_4_3_Parameters(bool usebest, RideFileCac
     return model;
 }
 
-Model_eCP
+TestModel
 ExtendedCriticalPower::deriveExtendedCP_4_3_ParametersForBest(double best5s, double best1min, double best5min, double best1hour)
 {
-    Model_eCP model;
+    TestModel model;
 
     // initial estimate of tau
     model.paa = 300;
@@ -609,7 +609,7 @@ ExtendedCriticalPower::deriveExtendedCP_4_3_ParametersForBest(double best5s, dou
 }
 
 QwtPlotCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3(Model_eCP model)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3(TestModel model)
 {
     //qDebug() <<"getPlotCurveForExtendedCP_4_3()";
     //qDebug() <<"Model eCP(4.3) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del  << "ecp_dec" << model.ecp_dec ;
@@ -641,7 +641,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3(Model_eCP model)
 }
 
 QwtPlotCurve*
-ExtendedCriticalPower::getPlotLevelForExtendedCP_4_3(Model_eCP model)
+ExtendedCriticalPower::getPlotLevelForExtendedCP_4_3(TestModel model)
 {
     const int extendedCurve2_points = 20;
 
@@ -705,7 +705,7 @@ ExtendedCriticalPower::getPlotLevelForExtendedCP_4_3(Model_eCP model)
 }
 
 QwtPlotMarker*
-ExtendedCriticalPower::getPlotMarkerForExtendedCP(Model_eCP model)
+ExtendedCriticalPower::getPlotMarkerForExtendedCP(TestModel model)
 {
     QwtPlotMarker* extendedCurveTitle2 = new QwtPlotMarker();
     QString extendedCurve2_title;
@@ -719,7 +719,7 @@ ExtendedCriticalPower::getPlotMarkerForExtendedCP(Model_eCP model)
 }
 
 QwtPlotCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WSecond(Model_eCP model)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WSecond(TestModel model)
 {
     const int extendedCurve2_points = 1000;
 
@@ -748,7 +748,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WSecond(Model_eCP model)
 }
 
 QwtPlotCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WPrime(Model_eCP model)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WPrime(TestModel model)
 {
     const int extendedCurve2_points = 1000;
 
@@ -777,7 +777,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WPrime(Model_eCP model)
 }
 
 QwtPlotCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_CP(Model_eCP model)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_CP(TestModel model)
 {
     const int extendedCurve2_points = 1000;
 
@@ -808,7 +808,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_CP(Model_eCP model)
 
 
 QwtPlotCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WPrime_CP(Model_eCP model)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WPrime_CP(TestModel model)
 {
     const int extendedCurve2_points = 1000;
 
@@ -836,27 +836,27 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WPrime_CP(Model_eCP model)
     return extendedCPCurve2;
 }
 
-Model_eCP
+TestModel
 ExtendedCriticalPower::deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2)
 {
-    Model_eCP model;
+    TestModel model;
     model.version = "eCP v5.3";
 
     // bounds on anaerobic interval in minutes
-    const double t1 = sanI1;
-    const double t2 = sanI2;
+    const double t1 = sanI1 / 60.0;
+    const double t2 = sanI2 / 60.0;
 
     // bounds on anaerobic interval in minutes
-    const double t3 = anI1;
-    const double t4 = anI2;
+    const double t3 = anI1 / 60.0;
+    const double t4 = anI2 / 60.0;
 
     // bounds on aerobic interval in minutes
-    const double t5 = aeI1;
-    const double t6 = aeI2;
+    const double t5 = aeI1 / 60.0;
+    const double t6 = aeI2 / 60.0;
 
     // bounds on long aerobic interval in minutes
-    const double t7 = laeI1;
-    const double t8 = laeI2;
+    const double t7 = laeI1 / 60.0;
+    const double t8 = laeI2 / 60.0;
 
     // bounds of these time values in the data
     int i1, i2, i3, i4, i5, i6, i7, i8;
@@ -951,6 +951,8 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCac
 
     // loop to convergence
     int iteration = 0;
+
+    qDebug() << "start iteration";
     do {
         if (iteration ++ > max_loops) {
             qDebug()<<"Maximum number of loops exceeded in ecp2 model";
@@ -1075,21 +1077,21 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCac
              (fabs(model.ecp_dec - ecp_dec_prev) > ecp_dec_delta_max)
             );
 
-    //qDebug() << iteration << "iterations";
+    qDebug() << iteration << "iterations";
 
     model.pMax = model.paa*(1.20-0.20*exp(-1*(1/60.0)))*exp(model.paa_dec*(1/60.0)) + model.ecp * (1-exp(model.tau_del*(1/60.0))) * (1-exp(model.ecp_del*(1/60.0))) * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 + model.etau/(1/60.0));
     model.mmp60 = model.paa*(1.20-0.20*exp(-1*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1-exp(model.tau_del*(60.0))) * (1-exp(model.ecp_del*60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 + model.etau/(60.0));
 
-    qDebug() <<"eCP(5.3) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec << "ecp_dec_del" << model.ecp_dec_del;
-    qDebug() <<"eCP(5.3) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
+    qDebug() <<"-> eCP(5.3) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec << "ecp_dec_del" << model.ecp_dec_del;
+    qDebug() <<"-> eCP(5.3) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
 
     return model;
 }
 
-Model_eCP
+TestModel
 ExtendedCriticalPower::deriveExtendedCP_5_3_ParametersForBest(double best5s, double best1min, double best5min, double best1hour)
 {
-    Model_eCP model;
+    TestModel model;
     model.version = "eCP v5.3";
 
     // initial estimate of tau
@@ -1158,7 +1160,7 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_ParametersForBest(double best5s, dou
 }
 
 QwtPlotCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3(Model_eCP model)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3(TestModel model)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1177,7 +1179,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3(Model_eCP model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_5_3");
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(CCP)); // Qt::cyan
+    QPen e2pen(Qt::cyan); // Qt::cyan GColor(CCP)
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
@@ -1187,7 +1189,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3(Model_eCP model)
 }
 
 QwtPlotCurve*
-ExtendedCriticalPower::getPlotLevelForExtendedCP_5_3(Model_eCP model)
+ExtendedCriticalPower::getPlotLevelForExtendedCP_5_3(TestModel model)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1216,7 +1218,7 @@ ExtendedCriticalPower::getPlotLevelForExtendedCP_5_3(Model_eCP model)
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(Model_eCP model, bool)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(TestModel model, bool)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1258,7 +1260,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(Model_eCP model, bo
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(Model_eCP model, bool stacked)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(TestModel model, bool stacked)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1302,7 +1304,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(Model_eCP model, boo
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_CP(Model_eCP model, bool stacked)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_CP(TestModel model, bool stacked)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1351,27 +1353,27 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_CP(Model_eCP model, bool st
  * Version 6
  *
  **************************************************/
-Model_eCP
+TestModel
 ExtendedCriticalPower::deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2)
 {
-    Model_eCP model;
+    TestModel model;
     model.version = "eCP v6.3";
 
     // bounds on anaerobic interval in minutes
-    const double t1 = sanI1;
-    const double t2 = sanI2;
+    const double t1 = sanI1 / 60.0;
+    const double t2 = sanI2 / 60.0;
 
     // bounds on anaerobic interval in minutes
-    const double t3 = anI1;
-    const double t4 = anI2;
+    const double t3 = anI1 / 60.0;
+    const double t4 = anI2 / 60.0;
 
     // bounds on aerobic interval in minutes
-    const double t5 = aeI1;
-    const double t6 = aeI2;
+    const double t5 = aeI1 / 60.0;
+    const double t6 = aeI2 / 60.0;
 
     // bounds on long aerobic interval in minutes
-    const double t7 = laeI1;
-    const double t8 = laeI2;
+    const double t7 = laeI1 / 60.0;
+    const double t8 = laeI2 / 60.0;
 
     // bounds of these time values in the data
     int i1, i2, i3, i4, i5, i6, i7, i8;
@@ -1595,14 +1597,14 @@ ExtendedCriticalPower::deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCac
     model.pMax = model.paa*(1.10-(1.10-1)*exp(-8*(1/60.0)))*exp(model.paa_dec*(1/60.0)) + model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 * (1-exp(model.ecp_del*(1/60.0))) + pow((1-exp(model.tau_del*(1/60.0))),2) * model.etau/(1/60.0));
     model.mmp60 = model.paa*(1.10-(1.10-1)*exp(-8*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 * (1-exp(model.ecp_del*60.0)) + pow((1-exp(model.tau_del*(60.0))),2) * model.etau/(60.0));
 
-    qDebug() <<"eCP(6.3) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec << "ecp_dec_del" << model.ecp_dec_del;
-    qDebug() <<"eCP(6.3) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
+    qDebug() <<"-> eCP(6.3) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec << "ecp_dec_del" << model.ecp_dec_del;
+    qDebug() <<"-> eCP(6.3) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
 
     return model;
 }
 
 QwtPlotCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3(Model_eCP model)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3(TestModel model)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1621,7 +1623,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3(Model_eCP model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_6_3");
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(Qt::cyan);
+    QPen e2pen(Qt::blue);
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
@@ -1631,7 +1633,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3(Model_eCP model)
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_WSecond(Model_eCP model, bool)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_WSecond(TestModel model, bool)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1671,7 +1673,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_WSecond(Model_eCP model, bo
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_WPrime(Model_eCP model, bool stacked)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_WPrime(TestModel model, bool stacked)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1713,7 +1715,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_WPrime(Model_eCP model, boo
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_CP(Model_eCP model, bool stacked)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_CP(TestModel model, bool stacked)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1771,10 +1773,10 @@ ExtendedCriticalPower::decimateData(QVector<double> data)
    }
 }*/
 
-Model_eCP
+TestModel
 ExtendedCriticalPower::deriveDanVeloclinicCP_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2)
 {
-    Model_eCP model;
+    TestModel model;
     model.version = "2 components (Dan v1)";
 
     // bounds on anaerobic interval in minutes
