@@ -140,7 +140,7 @@ class Athlete : public QObject
 
         // ride collection
         void selectRideFile(QString);
-        void addRide(QString name, bool bSelect=true);
+        void addRide(QString name, bool bSelect=true, bool useTempActivities=false);
         void removeCurrentRide();
 
         // interval selection
@@ -182,6 +182,7 @@ class AthleteDirectoryStructure : public QObject {
             ~AthleteDirectoryStructure();
 
             QDir activities() { return QDir(myhome.absolutePath()+"/"+athlete_activities); }
+            QDir tmpActivities() { return QDir(myhome.absolutePath()+"/"+athlete_tmp_activities); }
             QDir imports(){ return QDir(myhome.absolutePath()+"/"+athlete_imports);}
             QDir records(){ return QDir(myhome.absolutePath()+"/"+athlete_records);}
             QDir downloads() { return QDir(myhome.absolutePath()+"/"+athlete_downloads);}
@@ -192,17 +193,8 @@ class AthleteDirectoryStructure : public QObject {
             QDir workouts() { return QDir(myhome.absolutePath()+"/"+athlete_workouts);}
             QDir logs() { return QDir(myhome.absolutePath()+"/"+athlete_logs);}
             QDir temp() { return QDir(myhome.absolutePath()+"/"+athlete_temp);}
+            QDir quarantine() { return QDir(myhome.absolutePath()+"/"+athlete_quarantine);}
             QDir root() { return myhome; }
-
-            QString getActivitiesSubDir() {return athlete_activities; }
-            QString getImportsSubDir() {return athlete_imports; }
-            QString getDownloadsSubDir() {return athlete_downloads; }
-            QString getFileBackupSubDir() {return athlete_fileBackup;}
-            QString getConfigSubDir() {return athlete_config; }
-            QString getCacheSubDir() {return athlete_cache; }
-            QString getWorkoutsSubDir() {return athlete_workouts; }
-            QString getLogsSubDir() {return athlete_logs; }
-            QString getTempSubDir() {return athlete_temp; }
 
             // supporting functions to work with the subDirs
             void createAllSubdirs();
@@ -214,6 +206,7 @@ class AthleteDirectoryStructure : public QObject {
             QDir myhome;
 
             QString athlete_activities;
+            QString athlete_tmp_activities;
             QString athlete_imports;
             QString athlete_records;
             QString athlete_downloads;
@@ -224,6 +217,7 @@ class AthleteDirectoryStructure : public QObject {
             QString athlete_workouts;
             QString athlete_logs;
             QString athlete_temp;
+            QString athlete_quarantine;
 
 
 };

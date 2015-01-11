@@ -21,6 +21,7 @@
 #include "GcUpgrade.h"
 #include <QtGui>
 #include <QWebFrame>
+#include <QDateTime>
 
 #include "RideMetric.h"
 #include <QtSql>
@@ -66,6 +67,28 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
 {
     setAttribute(Qt::WA_DeleteOnClose, true); // caller must delete me, once they've extracted the name
     setWindowTitle(QString(tr("%1 Crash Recovery").arg(home.root().dirName())));
+
+    //check if the problem occured when adding to RideCache - by checking if there are files in /tmpActivities
+    newFilesInQuarantine = false;
+    files = home.tmpActivities().entryList(QDir::Files);
+    if (!files.empty()) {
+        // yes there are files which caused problems - so quarantine them
+        newFilesInQuarantine = true;
+        foreach (QString file, files) {
+            // just try to move by renaming
+            QString source = home.tmpActivities().canonicalPath() + "/" + file;
+            // create a unique file name in case of multipe crashes with the same file
+            QString target = home.quarantine().canonicalPath() + "/" + file;
+            QFile s(source);
+            QFile t(target);
+            if (t.exists()) {
+               // remove target first if target already exists in /quarantine - from previous crash - only keep the last crashed version
+               t.remove();
+            }
+            s.rename(target);
+        }
+    }
+
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -315,6 +338,30 @@ GcCrashDialog::setHTML()
     // version info
     text += "<center><h3>Version Info</h3></center>";
     text += versionHTML();
+
+    // quarantine info
+    if (newFilesInQuarantine) {
+        text += "<center><h3>Quarantine Info</h3></center>";
+        text += "The following file(s) created by 'Import from file' or 'Download from device' have been moved to subdirectory '/quarantine' "
+                "since they most likely caused the crash - e.g. because of corrupt data - during the creation of the GoldenCheetah metric cache. "
+                "Please check both the GoldenCheetah .JSON files and the associated source files." ;
+        text += "<center><table border=0 cellspacing=10 width=\"90%\">";
+        foreach (QString file, files) {
+          text += "<tr><td align=\"center\">" + file + "</td></tr>";
+        }
+        text += "</table></center>";
+    }
+
+    // get the complete file list which are already in /quarantine
+    QStringList quarantine = home.quarantine().entryList(QDir::Files);
+    if (!quarantine.empty()) {
+        text += "<br><h3><center>All Quarantined Files</h3></center>";
+        text += "<center><table border=0 cellspacing=10 width=\"90%\">";
+        foreach (QString file, quarantine) {
+          text += "<tr><td align=\"center\">" + file + "</td></tr>";
+        }
+        text += "</table></center>";
+    }
 
     // metric log...
     text += "<center><h3>Metric Log</h3></center>";
