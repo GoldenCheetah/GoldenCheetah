@@ -25,6 +25,7 @@
 #include "Settings.h"
 #include "JsonRideFile.h"
 #include "HelpWhatsThis.h"
+#include "RideItem.h"
 #include <assert.h>
 #include <errno.h>
 #include <QtGui>
@@ -469,6 +470,8 @@ DownloadRideDialog::downloadClicked()
         // now rename
         QFile targetFileTmpActivities(targetFileTmpActivitiesName);
         targetFileTmpActivities.rename(targetFileActivitiesName);
+        // and correct the path locally stored in Ride Item
+        context->ride->setFileName(context->athlete->home->activities().canonicalPath(), targetFileName);
     }
 
     if( ! failures )
