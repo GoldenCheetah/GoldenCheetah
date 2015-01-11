@@ -974,6 +974,8 @@ RideImportWizard::abortClicked()
                 // rideCache is successfully updated, let's move the file to the real /activities
                 if (moveFile(tmpActivitiesFulltarget, finalActivitiesFulltarget)) {
                     tableWidget->item(i,5)->setText(tr("File Saved"));
+                    // and correct the path locally stored in Ride Item
+                    context->ride->setFileName(homeActivities.canonicalPath(), activitiesTarget);
                 }  else {
                     tableWidget->item(i,5)->setText(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
                 }
