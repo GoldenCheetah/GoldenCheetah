@@ -75,15 +75,6 @@
         <file>images/settings.png</file>
         <file>images/addchart.png</file>
         <file>images/library.png</file>
-        <file>translations/gc_fr.qm</file>
-        <file>translations/gc_ja.qm</file>
-        <file>translations/gc_it.qm</file>
-        <file>translations/gc_pt-br.qm</file>
-        <file>translations/gc_de.qm</file>
-        <file>translations/gc_ru.qm</file>
-        <file>translations/gc_cs.qm</file>
-        <file>translations/gc_es.qm</file>
-        <file>translations/gc_pt.qm</file>
         <file>xml/charts.xml</file>
         <file>xml/metadata.xml</file>
         <file>xml/train-layout.xml</file>
