@@ -146,8 +146,6 @@ class RideSummaryWindow : public GcChartWindow
         bool filtered; // are we using a filter?
 
         RideFileCache *bestsCache;
-        ExtendedCriticalPower *ecp;
-        TestModel cpModel;
 
         QString WPrimeString, CPString, FTPString, PMaxString;
         QString WPrimeStringWPK, CPStringWPK, FTPStringWPK, PMaxStringWPK;
