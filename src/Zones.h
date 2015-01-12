@@ -161,6 +161,7 @@ class Zones : public QObject
         int whichRange(const QDate &date) const;
 
         // which zone is the power value in for a given range
+        // will return -1 if not in any zone
         int whichZone(int range, double value) const;
 
         // how many zones are there for a given range

@@ -514,7 +514,7 @@ int Zones::whichZone(int rnum, double value) const
     }
 
     // if we got here either it is negative, nan, inf or way high
-    if (value < 0 || std::isnan(value)) return 0; else return range.zones.size()-1;
+    return -1;
 }
 
 void Zones::zoneInfo(int rnum, int znum, QString &name, QString &description, int &low, int &high) const
@@ -892,7 +892,7 @@ QColor zoneColor(int z, int) {
     case 7: return GColor(CZONE8); break;
     case 8: return GColor(CZONE9); break;
     case 9: return GColor(CZONE10); break;
-    default: return QColor(128,128,128); break;
+    default: return QColor(128,128,128,128); break;
     }
 }
 

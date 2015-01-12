@@ -1326,8 +1326,10 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         float lvalue = value * pow(10, decimals);
 
         // watts time in zone
-        if (series == RideFile::watts && zoneRange != -1)
-            wattsTimeInZone[context->athlete->zones()->whichZone(zoneRange, dp->value(series))] += ride->recIntSecs();
+        if (series == RideFile::watts && zoneRange != -1) {
+            int index = context->athlete->zones()->whichZone(zoneRange, dp->value(series));
+            if (index >=0) wattsTimeInZone[index] += ride->recIntSecs();
+        }
 
         // Polarized zones :- I(<0.85*CP), II (<CP and >0.85*CP), III (>CP)
         if (series == RideFile::watts && zoneRange != -1 && CP) {
@@ -1342,8 +1344,10 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         }
 
         // hr time in zone
-        if (series == RideFile::hr && hrZoneRange != -1)
-            hrTimeInZone[context->athlete->hrZones()->whichZone(hrZoneRange, dp->value(series))] += ride->recIntSecs();
+        if (series == RideFile::hr && hrZoneRange != -1) {
+            int index = context->athlete->hrZones()->whichZone(hrZoneRange, dp->value(series));
+            if (index >= 0) hrTimeInZone[index] += ride->recIntSecs();
+        }
 
         // Polarized zones :- I(<0.9*LTHR), II (<LTHR and >0.9*LTHR), III (>LTHR)
         if (series == RideFile::hr && hrZoneRange != -1 && LTHR) {
@@ -1358,8 +1362,10 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         }
 
         // pace time in zone, only for running and swimming activities
-        if (series == RideFile::kph && paceZoneRange != -1 && (ride->isRun() || ride->isSwim()))
-            paceTimeInZone[context->athlete->paceZones(ride->isSwim())->whichZone(paceZoneRange, dp->value(series))] += ride->recIntSecs();
+        if (series == RideFile::kph && paceZoneRange != -1 && (ride->isRun() || ride->isSwim())) {
+            int index = context->athlete->paceZones(ride->isSwim())->whichZone(paceZoneRange, dp->value(series));
+            if (index >= 0) paceTimeInZone[index] += ride->recIntSecs();
+        }
 
         // Polarized zones Run:- I(<0.9*CV), II (<CV and >0.9*CV), III (>CV)
         // Polarized zones Swim:- I(<0.975*CV), II (<CV and >0.975*CV), III (>CV)
