@@ -41,6 +41,7 @@ Lucene::Lucene(QObject *parent, Context *context) : QObject(parent), context(con
 
     try {
 
+	// set lock timeout to a bit longer
         bool indexExists = IndexReader::indexExists(dir.canonicalPath().toLocal8Bit().data());
 
         // clear any locks
@@ -71,6 +72,8 @@ Lucene::~Lucene()
 
 bool Lucene::importRide(RideFile *ride)
 {
+    QMutexLocker locker(&mutex);
+
     // create a document
     Document doc;
 
@@ -99,46 +102,40 @@ bool Lucene::importRide(RideFile *ride)
     Field *cadd = new Field(_T("contents"), value.c_str(), Field::STORE_YES | Field::INDEX_TOKENIZED);
     doc.add( *cadd );
     
-    // delete if already in the index
-    deleteRide(ride->getTag("Filename", ""));
-
     // now add to index
+    IndexWriter *writer = NULL;
     try { 
 
-        mutex.lock();
-
         // now lets open using a mnodifier since the API is much simpler
-        IndexWriter *writer = new IndexWriter(dir.canonicalPath().toLocal8Bit().data(), &analyzer, false); // for updates
+        writer = new IndexWriter(dir.canonicalPath().toLocal8Bit().data(), &analyzer, false); // for updates
         writer->addDocument(&doc); 
-        writer->close();
-        delete writer;
-
-        mutex.unlock();
+    	doc.clear();
 
     } catch (CLuceneError &e) {
         qDebug()<<"add document clucene error!"<<e.what();
     }
 
-    doc.clear();
+    if (writer) {
+    	writer->close();
+	delete writer;
+    }
 
     return true;
 }
 
 bool Lucene::deleteRide(QString name)
 {
+    QMutexLocker locker(&mutex);
+
     std::wstring cname = name.toStdWString();
 
     try {
-
-        mutex.lock();
 
         IndexReader *reader = IndexReader::open(dir.canonicalPath().toLocal8Bit().data());
         Term del = Term(_T("Filename"), cname.c_str());
         reader->deleteDocuments(&del);
         reader->close();
         delete reader;
-
-        mutex.unlock();
 
     } catch (CLuceneError &e) {
         qDebug()<<"deleteDocuments clucene error!"<<e.what();

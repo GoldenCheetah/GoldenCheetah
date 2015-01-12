@@ -454,6 +454,7 @@ RideItem::refresh()
         unsigned long mc = metaCRC();
         if (metacrc != mc) {
 #ifdef GC_HAVE_LUCENE
+            context->athlete->lucene->deleteRide(fileName);
             context->athlete->lucene->importRide(ride_);
 #endif
             metacrc = mc;
