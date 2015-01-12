@@ -592,7 +592,7 @@ class Pace : public RideMetric {
         setCount(as->count());
     }
 
-    bool isRelevantForRide(const RideItem *ride) const { return (ride->isRun||ride->isSwim); }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim; }
 
     RideMetric *clone() const { return new Pace(*this); }
 };
