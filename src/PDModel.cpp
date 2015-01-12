@@ -517,7 +517,7 @@ ExtendedModel::y(double t) const
 {
     // don't start at zero !
     if (t == 0)
-        t += (!minutes?1.00f:1/60.00f);
+        qDebug() << "ExtendedModel t=0 !!";
 
     if (!minutes) t /= 60.00f;
     return paa*(1.20-0.20*exp(-1*double(t)))*exp(paa_dec*(double(t))) + ecp * (1-exp(tau_del*double(t))) * (1-exp(ecp_del*double(t))) * (1+ecp_dec*exp(ecp_dec_del/double(t))) * ( 1 + etau/(double(t)));
