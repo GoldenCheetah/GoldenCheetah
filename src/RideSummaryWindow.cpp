@@ -996,7 +996,7 @@ RideSummaryWindow::htmlSummary()
                     }
                     foreach (QString symbol, intervalMetrics) {
                         RideMetricPtr m = metrics.value(symbol);
-                        if (!m) continue;
+                        if (!m || !m->isRelevantForRide(rideItem)) continue;
                         summary += "<td align=\"center\" valign=\"bottom\">" + m->name();
                         if (m->internalName().startsWith("Pace") || m->internalName().startsWith("xPace")) { // pace is mm:ss
 
@@ -1059,7 +1059,7 @@ RideSummaryWindow::htmlSummary()
 
                 foreach (QString symbol, intervalMetrics) {
                     RideMetricPtr m = metrics.value(symbol);
-                    if (!m) continue;
+                    if (!m || !m->isRelevantForRide(rideItem)) continue;
                     QString s("<td align=\"center\">%1</td>");
                     if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds"))
                         summary += s.arg(time_to_string(m->value(useMetricUnits)));
