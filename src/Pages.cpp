@@ -2865,13 +2865,13 @@ DefaultsPage::DefaultsPage(QWidget *parent, QList<DefaultDefinition>defaultDefin
         add->setFlags(add->flags() | Qt::ItemIsEditable);
 
         // field name
-        add->setText(1, specials.displayName(adefault.field));
+        add->setText(0, specials.displayName(adefault.field));
         // value
-        add->setText(2, adefault.value);
+        add->setText(1, adefault.value);
         // Linked field
-        add->setText(3, adefault.linkedField);
+        add->setText(2, adefault.linkedField);
         // Default Value
-        add->setText(4, adefault.linkedValue);
+        add->setText(3, adefault.linkedValue);
     }
     defaults->setCurrentItem(defaults->invisibleRootItem()->child(0));
 
