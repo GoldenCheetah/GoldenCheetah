@@ -1661,17 +1661,17 @@ class AvgLTE : public RideMetric {
         if (ride->areDataPresent()->lte) {
 
             double total = 0.0f;
-            double secs = 0.0f;
+            double samples = 0.0f;
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
 
-                if (point->cad) {
-                    secs += ride->recIntSecs();
+                if (point->lte) {
+                    samples ++;
                     total += point->lte;
                 }
             }
 
-            if (total > 0.0f && secs > 0.0f) setValue(total / secs);
+            if (total > 0.0f && samples > 0.0f) setValue(total / samples);
             else setValue(0.0);
 
         } else {
@@ -1712,16 +1712,16 @@ class AvgRTE : public RideMetric {
         if (ride->areDataPresent()->rte) {
 
             double total = 0.0f;
-            double secs = 0.0f;
+            double samples = 0.0f;
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
-                if (point->cad) {
-                    secs += ride->recIntSecs();
+                if (point->rte) {
+                    samples ++;
                     total += point->rte;
                 }
             }
 
-            if (total > 0.0f && secs > 0.0f) setValue(total / secs);
+            if (total > 0.0f && samples > 0.0f) setValue(total / samples);
             else setValue(0.0);
 
         } else {
@@ -1762,17 +1762,17 @@ class AvgLPS : public RideMetric {
         if (ride->areDataPresent()->lps) {
 
             double total = 0.0f;
-            double secs = 0.0f;
+            double samples = 0.0f;
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
 
-                if (point->cad) {
-                    secs += ride->recIntSecs();
+                if (point->lps) {
+                    samples ++;
                     total += point->lps;
                 }
             }
 
-            if (total > 0.0f && secs > 0.0f) setValue(total / secs);
+            if (total > 0.0f && samples > 0.0f) setValue(total / samples);
             else setValue(0.0);
 
         } else {
@@ -1813,17 +1813,17 @@ class AvgRPS : public RideMetric {
         if (ride->areDataPresent()->rps) {
 
             double total = 0.0f;
-            double secs = 0.0f;
+            double samples = 0.0f;
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
 
-                if (point->cad) {
-                    secs += ride->recIntSecs();
+                if (point->rps) {
+                    samples ++;
                     total += point->rps;
                 }
             }
 
-            if (total > 0.0f && secs > 0.0f) setValue(total / secs);
+            if (total > 0.0f && samples > 0.0f) setValue(total / samples);
             else setValue(0.0);
 
         } else {
