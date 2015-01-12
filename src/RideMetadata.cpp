@@ -749,7 +749,6 @@ FormField::editFinished()
             ourRideItem->ride()->setTag(definition.name, text);
         }
     }
-    active = false;
 
     // default values
     setLinkedDefault(text);
@@ -769,6 +768,8 @@ FormField::editFinished()
 
     // rideFile is now dirty!
     ourRideItem->setDirty(true);
+
+    active = false;
 }
 
 void
