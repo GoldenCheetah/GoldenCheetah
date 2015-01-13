@@ -287,25 +287,42 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     addCustomButton = new QPushButton("+");
     connect(addCustomButton, SIGNAL(clicked()), this, SLOT(addMetric()));
 
-    deleteCustomButton = new QPushButton("- ");
+    deleteCustomButton = new QPushButton("-");
     connect(deleteCustomButton, SIGNAL(clicked()), this, SLOT(deleteMetric()));
 
     usePreset = new QCheckBox(tr("Use sidebar chart settings"));
     usePreset->setChecked(false);
 
 #ifndef Q_OS_MAC
+    upCustomButton = new QToolButton(this);
+    downCustomButton = new QToolButton(this);
+    upCustomButton->setArrowType(Qt::UpArrow);
+    downCustomButton->setArrowType(Qt::DownArrow);
+    upCustomButton->setFixedSize(20,20);
+    downCustomButton->setFixedSize(20,20);
     addCustomButton->setFixedSize(20,20);
     deleteCustomButton->setFixedSize(20,20);
+#else
+    upCustomButton = new QPushButton(tr("Up"));
+    downCustomButton = new QPushButton(tr("Down"));
 #endif
+    connect(upCustomButton, SIGNAL(clicked()), this, SLOT(moveMetricUp()));
+    connect(downCustomButton, SIGNAL(clicked()), this, SLOT(moveMetricDown()));
+
+
     QHBoxLayout *customButtons = new QHBoxLayout;
     customButtons->setSpacing(2);
-    customButtons->addWidget(usePreset);
+    customButtons->addWidget(upCustomButton);
+    customButtons->addWidget(downCustomButton);
     customButtons->addStretch();
     customButtons->addWidget(editCustomButton);
     customButtons->addStretch();
     customButtons->addWidget(addCustomButton);
     customButtons->addWidget(deleteCustomButton);
     customLayout->addLayout(customButtons);
+
+    // use seperate line to to distinguish from the operational buttons for the Table View
+    customLayout->addWidget(usePreset);
 
     tabs->addTab(basicsettings, tr("Basic"));
     tabs->addTab(basic, tr("Preset"));
@@ -1182,6 +1199,10 @@ LTMTool::usePresetChanged()
     editCustomButton->setEnabled(!usePreset->isChecked());
     addCustomButton->setEnabled(!usePreset->isChecked());
     deleteCustomButton->setEnabled(!usePreset->isChecked());
+    upCustomButton->setEnabled(!usePreset->isChecked());
+    downCustomButton->setEnabled(!usePreset->isChecked());
+
+
 }
 
 void
@@ -1202,7 +1223,7 @@ LTMTool::presetsChanged()
 }
 
 void
-LTMTool::refreshCustomTable()
+LTMTool::refreshCustomTable(int indexSelectedItem)
 {
     // clear then repopulate custom table settings to reflect
     // the current LTMSettings.
@@ -1213,6 +1234,7 @@ LTMTool::refreshCustomTable()
     header << tr("Type") << tr("Details"); 
     customTable->setHorizontalHeaderLabels(header);
 
+    QTableWidgetItem *selected = new QTableWidgetItem();
     // now lets add a row for each metric
     customTable->setRowCount(settings->metrics.count());
     int i=0;
@@ -1242,8 +1264,18 @@ LTMTool::refreshCustomTable()
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         customTable->setItem(i,1,t);
 
+        // keep the selected item from previous step (relevant for moving up/down)
+        if (indexSelectedItem == i) {
+            selected = t;
+        }
+
         i++;
     }
+
+    if (selected) {
+      customTable->setCurrentItem(selected);
+    }
+
 }
 
 void
@@ -1314,6 +1346,40 @@ LTMTool::addMetric()
         curvesChanged();
     }
 }
+
+void
+LTMTool::moveMetricUp()
+{
+    QList<QTableWidgetItem*> items = customTable->selectedItems();
+    if (items.count() < 1) return;
+
+    int index = customTable->row(items.first());
+
+    if (index > 0) {
+        settings->metrics.swap(index, index-1);
+         // refresh
+        refreshCustomTable(index-1);
+        curvesChanged();
+    }
+}
+
+void
+LTMTool::moveMetricDown()
+{
+    QList<QTableWidgetItem*> items = customTable->selectedItems();
+    if (items.count() < 1) return;
+
+    int index = customTable->row(items.first());
+
+    if (index+1 <  settings->metrics.size()) {
+        settings->metrics.swap(index, index+1);
+         // refresh
+        refreshCustomTable(index+1);
+        curvesChanged();
+    }
+}
+
+
 
 void
 LTMTool::applySettings()
