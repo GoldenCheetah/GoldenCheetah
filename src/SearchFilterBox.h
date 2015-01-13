@@ -22,7 +22,7 @@
 #include "Context.h"
 #include "SearchBox.h" // for searchboxmode
 
-class Lucene;
+class FreeSearch;
 class DataFilter;
 
 class SearchFilterBox : public QWidget
@@ -50,7 +50,7 @@ signals:
 
 private:
     Context *context;
-    Lucene *lucene;
+    FreeSearch *freeSearch;
     DataFilter *datafilter;
     SearchBox *searchbox;
 };

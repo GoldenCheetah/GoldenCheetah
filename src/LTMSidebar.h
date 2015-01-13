@@ -29,9 +29,7 @@
 #include "RideMetric.h"
 #include "LTMSettings.h"
 
-#ifdef GC_HAVE_LUCENE
 #include "SearchFilterBox.h"
-#endif
 
 #include <QDir>
 #include <QtGui>

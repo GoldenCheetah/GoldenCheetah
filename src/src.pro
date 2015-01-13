@@ -153,15 +153,11 @@ CONFIG(debug, debug|release) {
     }
 }
 
-!isEmpty( CLUCENE_LIBS ) {
-    INCLUDEPATH += $${CLUCENE_INCLUDE}
-    LIBS        += $${CLUCENE_LIBS}
-    DEFINES     += GC_HAVE_LUCENE
-    HEADERS     += Lucene.h DataFilter.h SearchBox.h NamedSearch.h SearchFilterBox.h
-    SOURCES     += Lucene.cpp DataFilter.cpp SearchBox.cpp NamedSearch.cpp SearchFilterBox.cpp
-    YACCSOURCES += DataFilter.y
-    LEXSOURCES  += DataFilter.l
-}
+# FreeSearch replaces deprecated lucene
+HEADERS     += DataFilter.h SearchBox.h NamedSearch.h SearchFilterBox.h FreeSearch.h
+SOURCES     += DataFilter.cpp SearchBox.cpp NamedSearch.cpp SearchFilterBox.cpp FreeSearch.cpp
+YACCSOURCES += DataFilter.y
+LEXSOURCES  += DataFilter.l
 
 # Mac specific build for
 # Segmented mac style button

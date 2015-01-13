@@ -68,7 +68,6 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
         cl->setSpacing(0);
         setControls(c);
 
-#ifdef GC_HAVE_LUCENE
         // filter / searchbox
         searchBox = new SearchFilterBox(this, context);
         HelpWhatsThis *searchHelp = new HelpWhatsThis(searchBox);
@@ -77,7 +76,6 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
         connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
         cl->addRow(new QLabel(tr("Filter")), searchBox);
         cl->addWidget(new QLabel("")); //spacing
-#endif
 
         cl->addRow(new QLabel(tr("Date range")), dateSetting);
     }
@@ -160,7 +158,6 @@ RideSummaryWindow::configChanged(qint32)
     force = false;
 }
 
-#ifdef GC_HAVE_LUCENE
 void
 RideSummaryWindow::clearFilter()
 {
@@ -176,7 +173,6 @@ RideSummaryWindow::setFilter(QStringList list)
     filtered = true;
     refresh();
 }
-#endif
 
 void 
 RideSummaryWindow::modelProgress(int year, int month)
@@ -351,11 +347,9 @@ RideSummaryWindow::refresh()
             }
 
             FilterSet fs;
-#ifdef GC_HAVE_LUCENE
             fs.addFilter(filtered, filters);
             fs.addFilter(context->isfiltered, context->filters);
             fs.addFilter(context->ishomefiltered, context->homeFilters);
-#endif
             specification.setFilterSet(fs);
         }
         rideSummary->page()->mainFrame()->setHtml(htmlSummary());

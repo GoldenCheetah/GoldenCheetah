@@ -1563,10 +1563,8 @@ PowerHist::setDataFromCompare(QString totalMetric, QString distMetric)
 
         // set the specification
         FilterSet fs;
-#ifdef GC_HAVE_LUCENE
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
-#endif
         Specification spec;
         spec.setDateRange(DateRange(cd.start,cd.end));
         spec.setFilterSet(fs);

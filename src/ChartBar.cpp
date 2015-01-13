@@ -297,7 +297,6 @@ ChartBar::clicked(int index)
 #if 0
 ChartBar::setHighlighted()
 {
-#ifdef GC_HAVE_LUCENE
     if (context->isfiltered) {
         searchLabel->setHighlighted(true);
         searchLabel->show();
@@ -319,7 +318,6 @@ ChartBar::setHighlighted()
 #endif
 #endif
     }
-#endif
 }
 #endif
 

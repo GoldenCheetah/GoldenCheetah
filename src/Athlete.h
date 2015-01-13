@@ -41,7 +41,6 @@ class ICalendar;
 class CalDAV;
 class Seasons;
 class RideNavigator;
-class Lucene;
 class NamedSearches;
 class RideFileCache;
 class RideItem;
@@ -125,12 +124,9 @@ class Athlete : public QObject
         QList<LTMSettings> presets;
         void translateDefaultCharts(QList<LTMSettings>&charts);
 
-        // indexes / filters
-#ifdef GC_HAVE_LUCENE
-        Lucene *lucene;
+        // named filters / queries
         NamedSearches *namedSearches;
-        bool emptyindex; // when startup and index is missing
-#endif
+
         Context *context;
 
         // work with withings data

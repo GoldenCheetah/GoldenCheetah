@@ -91,11 +91,8 @@
 #endif
 
 // SEARCH / FILTER
-#ifdef GC_HAVE_LUCENE
-#include "Lucene.h"
 #include "NamedSearch.h"
 #include "SearchFilterBox.h"
-#endif
 
 #ifdef GC_HAVE_WFAPI
 #include "WFApi.h"
@@ -350,7 +347,6 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(new Spacer(this));
     head->addWidget(viewsel);
 
-#ifdef GC_HAVE_LUCENE
     searchBox = new SearchFilterBox(this,context,false);
 #if QT_VERSION > 0x50000
     QStyle *toolStyle = QStyleFactory::create("fusion");
@@ -362,7 +358,6 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(searchBox);
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
-#endif
 
 #endif
 
@@ -480,7 +475,6 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(lowbar);
     head->addWidget(styleSelector);
 
-#ifdef GC_HAVE_LUCENE
     // add a search box on far right, but with a little space too
     searchBox = new SearchFilterBox(this,context,false);
     searchBox->setStyle(toolStyle);
@@ -490,7 +484,7 @@ MainWindow::MainWindow(const QDir &home)
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
     HelpWhatsThis *helpSearchBox = new HelpWhatsThis(searchBox);
     searchBox->setWhatsThis(helpSearchBox->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
-#endif
+
     Spacer *spacer = new Spacer(this);
     spacer->setFixedWidth(5);
     head->addWidget(spacer);
@@ -1552,10 +1546,8 @@ MainWindow::removeTab(Tab *tab)
 
     if (tabList.count() == 2) showTabbar(false); // don't need it for one!
 
-#ifdef GC_HAVE_LUCENE
     // save the named searches
     tab->context->athlete->namedSearches->write();
-#endif
 
     // clear the clipboard if neccessary
     QApplication::clipboard()->setText("");
@@ -1690,9 +1682,7 @@ MainWindow::saveGCState(Context *context)
 #ifndef Q_OS_MAC // not on a Mac
     context->showToolbar = showhideToolbar->isChecked();
 #endif
-#ifdef GC_HAVE_LUCENE
     context->searchText = searchBox->text();
-#endif
     context->viewIndex = scopebar->selected();
     context->style = styleAction->isChecked();
     context->viewIndex = scopebar->selected();
@@ -1711,10 +1701,8 @@ MainWindow::restoreGCState(Context *context)
     scopebar->setSelected(context->viewIndex);
     scopebar->setContext(context);
     scopebar->setHighlighted(); // to reflect context
-#ifdef GC_HAVE_LUCENE
     searchBox->setContext(context);
     searchBox->setText(context->searchText);
-#endif
 }
 
 void

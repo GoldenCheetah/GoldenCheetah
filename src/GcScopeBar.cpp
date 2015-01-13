@@ -44,9 +44,7 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     layout->addWidget(searchLabel);
     searchLabel->hide();
 
-#ifdef GC_HAVE_LUCENE
     connect(context, SIGNAL(filterChanged()), this, SLOT(setHighlighted()));
-#endif
     connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(setCompare()));
     connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(setCompare()));
 
@@ -146,7 +144,6 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
 void
 GcScopeBar::setHighlighted()
 {
-#ifdef GC_HAVE_LUCENE
     if (context->isfiltered) {
         searchLabel->setHighlighted(true);
         searchLabel->show();
@@ -168,7 +165,6 @@ GcScopeBar::setHighlighted()
 #endif
 #endif
     }
-#endif
 }
 
 void

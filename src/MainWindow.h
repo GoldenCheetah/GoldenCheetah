@@ -208,9 +208,7 @@ class MainWindow : public QMainWindow
         QTFullScreen *fullScreen;
 #endif
 
-#ifdef GC_HAVE_LUCENE
         SearchFilterBox *searchBox;
-#endif
 
 #ifdef Q_OS_MAC
         // Mac Native Support

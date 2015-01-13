@@ -55,10 +55,6 @@
 #include "kqoauthmanager.h"
 #endif
 
-#ifdef GC_HAVE_LUCENE
-#include "Lucene.h"
-#endif
-
 #ifdef GC_HAVE_WFAPI
 #include "WFApi.h"
 #endif
@@ -244,12 +240,6 @@ QString GcCrashDialog::versionHTML()
     vlc = "yes";
     #endif
 
-    // -- LUCENE ----
-    QString clucene = "none";
-    #ifdef GC_HAVE_LUCENE
-    clucene = _CL_VERSION;
-    #endif
-
     #ifdef GC_HAVE_WFAPI
     QString wfapi = WFApi::getInstance()->apiVersion();
     #else
@@ -292,8 +282,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">LIBUSB</td><td>%11</td></tr>"
             "<tr><td colspan=\"2\">Wahoo API</td><td>%12</td></tr>"
             "<tr><td colspan=\"2\">VLC</td><td>%13</td></tr>"
-            "<tr><td colspan=\"2\">LUCENE</td><td>%14</td></tr>"
-            "<tr><td colspan=\"2\">VIDEO</td><td>%15</td></tr>"
+            "<tr><td colspan=\"2\">VIDEO</td><td>%14</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -309,7 +298,6 @@ QString GcCrashDialog::versionHTML()
             .arg(libusb)
             .arg(wfapi)
             .arg(vlc)
-            .arg(clucene)
 #ifdef GC_VIDEO_NONE
             .arg("none")
 #elif defined GC_VIDEO_QUICKTIME

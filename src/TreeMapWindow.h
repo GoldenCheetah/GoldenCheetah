@@ -66,9 +66,8 @@ class TreeMapWindow : public GcWindow
         TreeMapWindow(Context *); 
         ~TreeMapWindow();
 
-#ifdef GC_HAVE_LUCENE
         bool isFiltered() const { return context->ishomefiltered || context->isfiltered; }
-#endif
+
         QString f1 ()
         {   // consider translation on Screen, but Store only in EN
             if (field1->currentIndex() == 0) {

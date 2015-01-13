@@ -133,7 +133,6 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 
     setControls(settingsTabs);
 
-#ifdef GC_HAVE_LUCENE
     // filter / searchbox
     searchBox = new SearchFilterBox(this, context);
     connect(searchBox, SIGNAL(searchClear()), cpPlot, SLOT(clearFilter()));
@@ -144,7 +143,6 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     cl->addWidget(new QLabel("")); //spacing
     HelpWhatsThis *searchHelp = new HelpWhatsThis(searchBox);
     searchBox->setWhatsThis(searchHelp->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
-#endif
 
     // series
     seriesCombo = new QComboBox(this);

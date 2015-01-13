@@ -99,7 +99,6 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
 
     setChartLayout(vlayout);
 
-#ifdef GC_HAVE_LUCENE
     // search filter box
     isfiltered = false;
     searchBox = new SearchFilterBox(this, context);
@@ -112,7 +111,6 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     }
     HelpWhatsThis *searchHelp = new HelpWhatsThis(searchBox);
     searchBox->setWhatsThis(searchHelp->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
-#endif
 
     // date selection
     dateSetting = new DateSettingsEdit(this);
@@ -977,11 +975,7 @@ HistogramWindow::updateChart()
 
                 // plotting a data series, so refresh the ridefilecache
 
-#ifdef GC_HAVE_LUCENE
                 source = new RideFileCache(context, use.from, use.to, isfiltered, files, rangemode);
-#else
-                source = new RideFileCache(context, use.from, use.to);
-#endif
                 cfrom = use.from;
                 cto = use.to;
                 stale = false;
@@ -1013,11 +1007,9 @@ HistogramWindow::updateChart()
                 }
 
                 FilterSet fs;
-#ifdef GC_HAVE_LUCENE
                 fs.addFilter(isfiltered, files);
                 fs.addFilter(context->isfiltered, context->filters);
                 fs.addFilter(context->ishomefiltered, context->homeFilters);
-#endif
 
                 // setData using the summary metrics -- always reset since filters may
                 // have changed, or perhaps the bin width...
@@ -1060,7 +1052,6 @@ HistogramWindow::updateChart()
     } // if stale
 }
 
-#ifdef GC_HAVE_LUCENE
 void 
 HistogramWindow::clearFilter()
 {
@@ -1080,7 +1071,6 @@ HistogramWindow::setFilter(QStringList list)
     updateChart();
     repaint();
 }
-#endif
 
 double
 HistogramWindow::getDelta()
