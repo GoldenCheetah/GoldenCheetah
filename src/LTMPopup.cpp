@@ -140,7 +140,7 @@ LTMPopup::setData(Specification spec, const RideMetric *metric, QString title)
         selected << item->fileName;
 
         // date/time
-        QTableWidgetItem *t = new QTableWidgetItem(item->dateTime.toString(tr("ddd, dd MMM yy hh:mmA")));
+        QTableWidgetItem *t = new QTableWidgetItem(item->dateTime.toString(tr("ddd, dd MMM yy hh:mm")));
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         t->setTextAlignment(Qt::AlignHCenter);
         rides->setRowCount(count+1);
@@ -285,7 +285,7 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
              selected << item->fileName;
 
              // date/time
-             QTableWidgetItem *t = new QTableWidgetItem(rideDate.toString(tr("ddd, dd MMM yy hh:mmA")));
+             QTableWidgetItem *t = new QTableWidgetItem(item->dateTime.toString(tr("ddd, dd MMM yy hh:mm")));
              t->setFlags(t->flags() & (~Qt::ItemIsEditable));
              t->setTextAlignment(Qt::AlignHCenter);
              rides->setRowCount(count+1);
