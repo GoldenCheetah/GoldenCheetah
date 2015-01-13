@@ -661,6 +661,11 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
             // Tacx Vortex trainer
             case CHANNEL_TYPE_TACX_VORTEX:
             {
+               static int loadRefreshCounter = 1;
+
+               if (((loadRefreshCounter++) % 10) == 0)
+                   parent->refreshVortexLoad();
+
                 if (antMessage.vortexPage == TACX_VORTEX_DATA_CALIBRATION)
                     parent->setVortexData(number, antMessage.vortexId);
                 else if (antMessage.vortexPage == TACX_VORTEX_DATA_SPEED)
