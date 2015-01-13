@@ -415,6 +415,7 @@ public:
     }
 
     void setVortexData(int channel, int id);
+    void refreshVortexLoad();
 
 private:
 
