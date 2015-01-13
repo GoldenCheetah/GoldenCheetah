@@ -42,11 +42,9 @@
 #include <QXmlSimpleReader>
 
 // named searchs
+#include "FreeSearch.h"
 #include "NamedSearch.h"
 #include "DataFilter.h"
-#ifdef GC_HAVE_LUCENE
-#include "Lucene.h"
-#endif
 
 // ride cache
 #include "RideCache.h"
@@ -163,7 +161,6 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     presetsChanged();
 
     // filters
-#ifdef GC_HAVE_LUCENE
     filtersWidget = new GcSplitterItem(tr("Filters"), iconFromPNG(":images/toolbar/filter3.png"), this);
     QAction *moreFilterAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     filtersWidget->addAction(moreFilterAct);
@@ -199,8 +196,6 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     HelpWhatsThis *helpFilterTree = new HelpWhatsThis(filterTree);
     filterTree->setWhatsThis(helpFilterTree->getWhatsThisText(HelpWhatsThis::SideBarTrendsView_Filter));
 
-#endif
-
     seasons = context->athlete->seasons;
     resetSeasons(); // reset the season list
     resetFilters(); // reset the filters list
@@ -211,9 +206,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     splitter = new GcSplitter(Qt::Vertical);
     splitter->addWidget(seasonsWidget); // goes alongside events
     splitter->addWidget(eventsWidget); // goes alongside date ranges
-#ifdef GC_HAVE_LUCENE
     splitter->addWidget(filtersWidget);
-#endif
     splitter->addWidget(chartsWidget); // for charts that 'use sidebar chart' charts ! (confusing or what?!)
 
     GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), iconFromPNG(":images/sidebar/dashboard.png"), this);
@@ -244,9 +237,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(dateRangeTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(dateRangePopup(const QPoint &)));
     connect(dateRangeTree,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(dateRangeChanged(QTreeWidgetItem*, int)));
     connect(dateRangeTree,SIGNAL(itemMoved(QTreeWidgetItem *,int, int)), this, SLOT(dateRangeMoved(QTreeWidgetItem*, int, int)));
-#ifdef GC_HAVE_LUCENE
     connect(filterTree,SIGNAL(itemSelectionChanged()), this, SLOT(filterTreeWidgetSelectionChanged()));
-#endif
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
 
     // GC signal
@@ -295,9 +286,7 @@ LTMSidebar::configChanged(qint32)
     seasonsWidget->setStyleSheet(GCColor::stylesheet());
     eventsWidget->setStyleSheet(GCColor::stylesheet());
     chartsWidget->setStyleSheet(GCColor::stylesheet());
-#ifdef GC_HAVE_LUCENE
     filtersWidget->setStyleSheet(GCColor::stylesheet());
-#endif
     setAutoFilterMenu();
 
     // set or reset the autofilter widgets
@@ -564,17 +553,14 @@ LTMSidebar::eventPopup()
 void
 LTMSidebar::manageFilters()
 {
-#ifdef GC_HAVE_LUCENE
     EditNamedSearches *editor = new EditNamedSearches(this, context);
     editor->move(QCursor::pos()+QPoint(10,-200));
     editor->show();
-#endif
 }
 
 void
 LTMSidebar::setAutoFilterMenu()
 {
-#ifdef GC_HAVE_LUCENE
     active = true;
 
     QStringList on = appsettings->cvalue(context->athlete->cyclist, GC_LTM_AUTOFILTERS, tr("Workout Code|Sport")).toString().split("|");
@@ -606,7 +592,6 @@ LTMSidebar::setAutoFilterMenu()
         }
     }
     active = false;
-#endif
 }
 
 void 
@@ -705,7 +690,6 @@ LTMSidebar::autoFilterChanged()
 void 
 LTMSidebar::filterTreeWidgetSelectionChanged()
 {
-#ifdef GC_HAVE_LUCENE
     int selected = filterTree->selectedItems().count();
 
     if (selected) {
@@ -733,7 +717,7 @@ LTMSidebar::filterTreeWidgetSelectionChanged()
             case NamedSearch::search :
                 {
                     // use clucence
-                    Lucene s(this, context);
+                    FreeSearch s(this, context);
                     results = s.search(ns.text);
                 }
 
@@ -763,7 +747,6 @@ LTMSidebar::filterTreeWidgetSelectionChanged()
 
     // tell the world
     filterNotify();
-#endif
 }
 
 void
@@ -890,7 +873,6 @@ LTMSidebar::autoFilterSelectionChanged()
 void
 LTMSidebar::resetFilters()
 {
-#ifdef GC_HAVE_LUCENE
     if (active == true) return;
 
     active = true;
@@ -909,13 +891,11 @@ LTMSidebar::resetFilters()
     }
 
     active = false;
-#endif
 }
 
 void
 LTMSidebar::filterPopup()
 {
-#ifdef GC_HAVE_LUCENE
     // is one selected for deletion?
     int selected = filterTree->selectedItems().count();
 
@@ -940,13 +920,11 @@ LTMSidebar::filterPopup()
 
     // execute the menu
     menu.exec(splitter->mapToGlobal(QPoint(filtersWidget->pos().x()+filtersWidget->width()-20, filtersWidget->pos().y())));
-#endif
 }
 
 void
 LTMSidebar::deleteFilter()
 {
-#ifdef GC_HAVE_LUCENE
     if (filterTree->selectedItems().count() <= 0) return;
 
     active = true; // no need to reset tree when items deleted from model!
@@ -958,7 +936,6 @@ LTMSidebar::deleteFilter()
         context->athlete->namedSearches->deleteNamedSearch(index);
     }
     active = false;
-#endif
 }
 
 void

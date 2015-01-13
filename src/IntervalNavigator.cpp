@@ -80,14 +80,12 @@ IntervalNavigator::IntervalNavigator(Context *context, QString type, bool mainwi
     sortModel->setSourceModel(groupByModel);
     sortModel->setDynamicSortFilter(true);
 
-#ifdef GC_HAVE_LUCENE
     if (!mainwindow) {
         searchFilterBox = new SearchFilterBox(this, context, false);
         mainLayout->addWidget(searchFilterBox);
         HelpWhatsThis *searchHelp = new HelpWhatsThis(searchFilterBox);
         searchFilterBox->setWhatsThis(searchHelp->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
     }
-#endif
 
     // get setup
     tableView = new IntervalGlobalTreeView;
@@ -145,12 +143,10 @@ IntervalNavigator::IntervalNavigator(Context *context, QString type, bool mainwi
     //connect(tableView,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showTreeContextMenuPopup(const QPoint &)));
     connect(tableView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)), this, SLOT(setSortBy(int,Qt::SortOrder)));
 
-#ifdef GC_HAVE_LUCENE
     if (!mainwindow) {
         connect(searchFilterBox, SIGNAL(searchResults(QStringList)), this, SLOT(searchStrings(QStringList)));
         connect(searchFilterBox, SIGNAL(searchClear()), this, SLOT(clearSearch()));
     }
-#endif
 
     // we accept drag and drop operations
     setAcceptDrops(true);

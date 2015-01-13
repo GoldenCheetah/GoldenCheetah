@@ -104,9 +104,7 @@ class LTMWindow : public GcChartWindow
     Q_PROPERTY(int stackWidth READ stackW WRITE setStackW USER true)
     Q_PROPERTY(bool legend READ legend WRITE setLegend USER true)
     Q_PROPERTY(bool events READ events WRITE setEvents USER true)
-#ifdef GC_HAVE_LUCENE
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
-#endif
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
     Q_PROPERTY(QDate startDate READ startDate WRITE setStartDate USER true)
@@ -123,9 +121,7 @@ class LTMWindow : public GcChartWindow
 
         // reveal / filters
         bool hasReveal() { return true; }
-#ifdef GC_HAVE_LUCENE
         bool isFiltered() const { return (ltmTool->isFiltered() || context->ishomefiltered || context->isfiltered); }
-#endif
 
         // comparing things
         bool isCompare() const { return context->isCompareDateRanges; }
@@ -170,10 +166,8 @@ class LTMWindow : public GcChartWindow
         int prevN() { return ltmTool->dateSetting->prevN(); }
         void setPrevN(int x) { ltmTool->dateSetting->setPrevN(x); }
 
-#ifdef GC_HAVE_LUCENE
         QString filter() const { return ltmTool->searchBox->filter(); }
         void setFilter(QString x) { ltmTool->searchBox->setFilter(x); }
-#endif
 
         LTMSettings getSettings() const { return settings; }
         void applySettings(LTMSettings x) { 

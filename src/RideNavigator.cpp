@@ -68,14 +68,12 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     sortModel->setSourceModel(groupByModel);
     sortModel->setDynamicSortFilter(true);
 
-#ifdef GC_HAVE_LUCENE
     if (!mainwindow) {
         searchFilterBox = new SearchFilterBox(this, context, false);
         mainLayout->addWidget(searchFilterBox);
         HelpWhatsThis *searchHelp = new HelpWhatsThis(searchFilterBox);
         searchFilterBox->setWhatsThis(searchHelp->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
     }
-#endif
 
     // get setup
     tableView = new RideTreeView;
@@ -145,12 +143,10 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     connect(context, SIGNAL(refreshEnd()), this, SLOT(backgroundRefresh()));
     connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(backgroundRefresh())); // we might miss 1st one
 
-#ifdef GC_HAVE_LUCENE
     if (!mainwindow) {
         connect(searchFilterBox, SIGNAL(searchResults(QStringList)), this, SLOT(searchStrings(QStringList)));
         connect(searchFilterBox, SIGNAL(searchClear()), this, SLOT(clearSearch()));
     }
-#endif
 
     // we accept drag and drop operations
     setAcceptDrops(true);

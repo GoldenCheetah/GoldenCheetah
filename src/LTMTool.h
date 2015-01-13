@@ -26,9 +26,7 @@
 #include "LTMSettings.h"
 #include "PDModel.h"
 
-#ifdef GC_HAVE_LUCENE
 #include "SearchFilterBox.h"
-#endif
 
 #include <QDir>
 #include <QFileDialog>
@@ -75,9 +73,7 @@ class LTMTool : public QWidget
 
         LTMSettings *settings;
 
-#ifdef GC_HAVE_LUCENE
         SearchFilterBox *searchBox;
-#endif
 
         // basic tab: accessed by LTMWindow hence public
         QComboBox *groupBy;

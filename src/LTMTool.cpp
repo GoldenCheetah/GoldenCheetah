@@ -62,7 +62,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     QFormLayout *basicsettingsLayout = new QFormLayout(basicsettings);
     basicsettingsLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
-#ifdef GC_HAVE_LUCENE
     searchBox = new SearchFilterBox(this, context);
     HelpWhatsThis *searchHelp = new HelpWhatsThis(searchBox);
     searchBox->setWhatsThis(searchHelp->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
@@ -71,7 +70,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
     basicsettingsLayout->addRow(new QLabel(tr("Filter")), searchBox);
     basicsettingsLayout->addRow(new QLabel(tr(""))); // spacing
-#endif
 
     // Basic Controls
     QWidget *basic = new QWidget(this);

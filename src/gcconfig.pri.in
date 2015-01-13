@@ -177,13 +177,6 @@
 #VLC_INCLUDE = 
 #VLC_LIBS    = 
 
-#If you want search functionality then uncomment the following
-#two lines once you habve installed clucene developer libraries
-#and runtimes. See the INSTALL guide for your platform. 
-#CLUCENE_INCLUDE = /usr/include/CLucene
-#CLUCENE_LIBS    = -lclucene-core
-
-
 # *** Mac users NOTE ***
 # On MAC you don't need libvlc since we use the
 # native QTKit (OSX framework) for video playback

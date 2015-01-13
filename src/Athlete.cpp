@@ -40,10 +40,7 @@
 #include "ICalendar.h"
 #include "CalDAV.h"
 #endif
-#ifdef GC_HAVE_LUCENE
-#include "Lucene.h"
 #include "NamedSearch.h"
-#endif
 #include "IntervalItem.h"
 #include "IntervalTreeView.h"
 #include "LTMSettings.h"
@@ -62,9 +59,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     this->context = context;
     context->athlete = this;
     cyclist = this->home->root().dirName();
-#ifdef GC_HAVE_LUCENE
-    emptyindex = false;
-#endif
 
     // Recovering from a crash?
     if(!appsettings->cvalue(cyclist, GC_SAFEEXIT, true).toBool()) {
@@ -136,10 +130,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     translateDefaultCharts(presets);
 
     // Search / filter
-#ifdef GC_HAVE_LUCENE
     namedSearches = new NamedSearches(this); // must be before navigator
-    lucene = new Lucene(context, context);
-#endif
 
     // Metadata
     rideCache = NULL; // let metadata know we don't have a ridecache yet
@@ -256,10 +247,7 @@ Athlete::~Athlete()
     delete sqlBestIntervalsModel;
 #endif
 
-#ifdef GC_HAVE_LUCENE
     delete namedSearches;
-    delete lucene;
-#endif
     delete seasons;
 
     delete rideMetadata_;

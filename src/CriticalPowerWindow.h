@@ -25,9 +25,7 @@
 #include "MainWindow.h" // for isfiltered and filters
 #include "Season.h"
 #include "RideFile.h"
-#ifdef GC_HAVE_LUCENE
 #include "SearchFilterBox.h"
-#endif
 
 #include <QtGui>
 #include <QFormLayout>
@@ -48,9 +46,7 @@ class CriticalPowerWindow : public GcChartWindow
 
     // properties can be saved/restored/set by the layout manager
 
-#ifdef GC_HAVE_LUCENE
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
-#endif
     Q_PROPERTY(int mode READ mode WRITE setMode USER true)
     Q_PROPERTY(bool showBest READ showBest WRITE setShowBest USER true)
     Q_PROPERTY(bool showPercent READ showPercent WRITE setShowPercent USER true)
@@ -108,12 +104,10 @@ class CriticalPowerWindow : public GcChartWindow
         int variant() const;
         void setVariant(int x);
 
-#ifdef GC_HAVE_LUCENE
         // filter
         bool isFiltered() const { return (searchBox->isFiltered() || context->ishomefiltered || context->isfiltered); }
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }
-#endif
 
         int ridePlotMode() const { return ridePlotStyleCombo->currentIndex(); }
         void setRidePlotMode(int x) { ridePlotStyleCombo->setCurrentIndex(x); }
@@ -295,9 +289,7 @@ class CriticalPowerWindow : public GcChartWindow
         QList<Season> seasonsList;
         RideItem *currentRide;
         QList<CriticalSeriesType> seriesList;
-#ifdef GC_HAVE_LUCENE
         SearchFilterBox *searchBox;
-#endif
         QList<QwtPlotCurve*> intervalCurves;
 
         QLabel *intervalLabel, *secondsLabel;

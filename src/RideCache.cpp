@@ -391,11 +391,6 @@ RideCache::refresh()
             staleCount++;
     }
 
-    // reset emptyindex, we will have spotted that now
-#ifdef GC_HAVE_LUCENE
-    context->athlete->emptyindex= false;
-#endif
-
     // start if there is work to do
     // and future watcher can notify of updates
     if (staleCount)  {
