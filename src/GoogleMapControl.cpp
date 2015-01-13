@@ -760,6 +760,31 @@ WebBridge::clearHover()
 {
 }
 
+QList<RideFilePoint*>
+WebBridge::searchPoint(double lat, double lng)
+{
+    QList<RideFilePoint*> list;
+
+    RideItem *rideItem = gm->property("ride").value<RideItem*>();
+
+    RideFilePoint *candidat = NULL;
+    foreach (RideFilePoint *p1, rideItem->ride()->dataPoints()) {
+        if (p1->lat == 0 && p1->lon == 0)
+            continue;
+
+        if (((p1->lat-lat> 0 && p1->lat-lat< 0.0001) || (p1->lat-lat< 0 && p1->lat-lat> -0.0001)) &&
+            ((p1->lon-lng> 0 && p1->lon-lng< 0.0001) || (p1->lon-lng< 0 && p1->lon-lng> -0.0001))) {
+            // Vérifie distance avec dernier candidat
+            candidat = p1;
+        } else if (candidat)  {
+            list.append(candidat);
+            candidat = NULL;
+        }
+    }
+
+    return list;
+}
+
 void
 WebBridge::hoverPath(double lat, double lng)
 {
@@ -773,6 +798,12 @@ WebBridge::hoverPath(double lat, double lng)
             IntervalItem *bottom = (IntervalItem *) allIntervals->child(count-1);
             if (bottom->text(0).startsWith(name)) { //delete allIntervals->takeChild(count-1);
 
+                /*qDebug() << "searchPoint";
+                QList<RideFilePoint*> list = searchPoint(lat, lng);
+                for (int i=0;i<list.count();i++) {
+                    qDebug() << list.at(i)->secs;
+                }*/
+
                 RideItem *rideItem = gm->property("ride").value<RideItem*>();
 
                 double position = 0.0;
@@ -783,6 +814,10 @@ WebBridge::hoverPath(double lat, double lng)
 
                         position = p1->secs;
                     }
+                }
+
+                if (position == 0)  {
+                    return;
                 }
 
                 if (bottom->start>position) {
