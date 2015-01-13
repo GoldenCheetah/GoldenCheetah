@@ -66,6 +66,8 @@ class WebBridge : public QObject
         bool traceInterval;
         int selection;
 
+        QList<RideFilePoint*> searchPoint(double lat, double lng);
+
     public:
         WebBridge(Context *context, GoogleMapControl *gm) : context(context), gm(gm), selection(0) {}
 
