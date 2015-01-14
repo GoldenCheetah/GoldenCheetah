@@ -102,8 +102,9 @@
 // 96  06  Jan 2015 Damien Grauser     Garmin Cycling Dynamics
 // 97  07  Jan 2015 Mark Liversedge    Added isSwim first class variable
 // 98  10  Jan 2015 Ale Martinez       Added Triscore and SwimScore metrics
+// 99  14  Jan 2015 Damien Grauser     Added TotalCalories
 
-int DBSchemaVersion = 98;
+int DBSchemaVersion = 99;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
