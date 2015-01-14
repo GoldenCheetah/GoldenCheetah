@@ -31,11 +31,56 @@ FreeSearch::~FreeSearch()
 {
 }
 
+static QStringList searchSplit(QString string)
+{
+    const QString whitespace(" \n\r\t");
+    QStringList returning;
+    bool inQuotes = false;
+
+    QString current;
+    for (int i=0; i<string.length(); i++) {
+
+        // got a bit of whitespace after a word so split and add
+        if (current != "" && !inQuotes && whitespace.contains(string[i])) {
+            returning << current;
+            current = "";
+            continue;
+        }
+
+        // quote delimeted
+        if (string[i] == '\"') {
+            if (inQuotes) {
+                returning << current;
+                current = "";
+                inQuotes = false;
+            } else {
+                inQuotes = true;
+            }
+            continue;
+        }
+
+        // escaped
+        if (string[i] == '\\' && i < (string.length()-1)) {
+            i++;
+            current += string[i];
+            continue;
+        }
+
+        // just append current character
+        current += string[i];
+    }
+
+    if (current != "") returning << current;
+
+    return returning;
+}
+
 QList<QString> FreeSearch::search(QString query)
 {
     filenames.clear();
 
-    QStringList tokens = query.split(" ", QString::SkipEmptyParts);
+    // search split will tokenise and handle quoting and escaping
+    QStringList tokens = searchSplit(query);
 
     foreach(RideItem*item, context->athlete->rideCache->rides()) {
 
