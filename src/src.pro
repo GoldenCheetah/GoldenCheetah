@@ -534,6 +534,7 @@ SOURCES += \
         FixElevation.cpp \
         FixGaps.cpp \
         FixGPS.cpp \
+        FixMoxy.cpp \
         FixPower.cpp \
         FixSpikes.cpp \
         FixTorque.cpp \
