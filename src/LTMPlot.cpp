@@ -2725,6 +2725,9 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
                     - groupForDate(settings->start.date(), settings->groupBy);
 
+    // skip for negative or empty time periods.
+    if (maxdays <=0) return;
+
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
 
