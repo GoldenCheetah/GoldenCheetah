@@ -5,8 +5,8 @@
                                      Mark Liversedge
                                      John Ehrlinger
 
-                                        May 2011
-                                      Version 1.1
+                                        Jan 2015
+                                      Version 1.2
 
 A walkthrough of building GoldenCheetah from scratch on Ubuntu linux. This walkthrough
 should be largely the same for any Linux distro.
@@ -30,8 +30,6 @@ CONTENTS
      - bison
    - libical - Diary window and CalDAV support (google/mobileme calendar integration)
    - libvlc  - Video playback in training mode
-   - clucene - Indexing/Searching ride files
-
 
 1. BASIC INSTALLATION WITH MANDATORY DEPENDENCIES
 =================================================
@@ -373,30 +371,3 @@ VLC_INSTALL = /usr/include/vlc/
 $ make clean
 $ qmake
 $ make
-
-CLUCENE - Indexing and Searching ride files (search box)
---------------------------------------------------------
-
-You will need clucene runtime and core libraries, we developed against 0.9.21b-2 but
-any 0.9 branch should work fine, let us know if you experience any issues. You may find
-that the libclucene0ldbl runtime is already installed, this is fine and typical since
-clucene is a very popular search library.
-
-$ sudo apt-get install libclucene-dev
-$ sudo apt-get install libclucene0ldbl
-
-By default, and this is deliberate, the clucene install places the config headers into
-a platform specific location. For my install I just copy the platform (linux) specific
-header config into the normal /usr/include/CLucene directory with the following:
-
-$ sudo cp /usr/lib/CLucene/clucene-config.h /usr/include/CLucene
-
-Next we need to comment out the two CLUCENE lines in gcconfig.pri and they should read:
-
-CLUCENE_INCLUDE = /usr/include/CLucene
-CLUCENE_LIBS    = -lclucene
-
-$ make clean
-$ qmake
-$ make
-

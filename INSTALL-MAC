@@ -4,8 +4,8 @@
 
                                      Mark Liversedge
 
-                                        Nov 2011
-                                      Version 1.1
+                                        Jan 2015
+                                      Version 1.2
 
 A walkthrough of building GoldenCheetah from scratch on Mac OSX. This was performed
 on Mac OSX Lion (10.7) but the instructions are largely the same for all versions of
@@ -25,7 +25,6 @@ CONTENTS
    - libkml
    - libusb
    - libical
-   - libclucene
 
 
 1. BASIC INSTALLATION WITH MANDATORY DEPENDENCIES
@@ -297,15 +296,3 @@ libical (0.46)
 first run autogen.sh
 then
 ./configure CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64" --disable-dependency-tracking
-
-2.7 clucene
------------
-
-DO NOT USE THE MACPORTS VERSION (0.9.23) IT DOES NOT WORK.
-
-git clone git://clucene.git.sourceforge.net/gitroot/clucene/clucene 
-cmake -G "Unix Makefiles"
-make
-sudo make install
-
-will install clucene into /usr/local/include/clucene and /usr/local/lib
