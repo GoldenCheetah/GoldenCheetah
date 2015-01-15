@@ -14,10 +14,12 @@ include( $${QWT_ROOT}/qwtconfig.pri )
 include( $${QWT_ROOT}/qwtbuild.pri )
 include( $${QWT_ROOT}/qwtfunctions.pri )
 
+QWT_OUT_ROOT = $${OUT_PWD}/..
+
 TEMPLATE          = lib
 TARGET            = $$qwtLibraryTarget(qwt)
 
-DESTDIR           = $$replace($${QWT_ROOT}/lib," ","\\ ")
+DESTDIR           = $${QWT_OUT_ROOT}/lib
 
 contains(QWT_CONFIG, QwtDll) {
 
