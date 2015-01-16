@@ -89,7 +89,9 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("2d Plot"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("3d Plot"),GcWindowTypes::Model },
     { VIEW_ANALYSIS, tr("Aerolab Chung Analysis"),GcWindowTypes::Aerolab },
+#ifdef GC_HAVE_INTERVALS
     { VIEW_ANALYSIS, tr("Route Segment"),GcWindowTypes::RouteSegment },
+#endif
     { VIEW_DIARY, tr("Calendar"),GcWindowTypes::Diary },
     { VIEW_DIARY, tr("Navigator"), GcWindowTypes::ActivityNavigator },
     { VIEW_DIARY|VIEW_HOME, tr("Summary"), GcWindowTypes::DateRangeSummary },
