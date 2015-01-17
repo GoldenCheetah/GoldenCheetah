@@ -2120,3 +2120,10 @@ RideFileInterval::isClimb() const
     QString climb = QString("^(%1 ).*").arg(tr("Climb"));
     return QRegExp(climb).exactMatch(name); 
 }
+bool
+RideFileInterval::isBest() const
+{
+    QString best = QString("^(%1 ).*").arg(tr("Best"));
+    return QRegExp(best).exactMatch(name); 
+}
+

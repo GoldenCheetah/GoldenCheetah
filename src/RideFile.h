@@ -103,6 +103,7 @@ class RideFileInterval
         bool isPeak() const;
         bool isMatch() const;
         bool isClimb() const;
+        bool isBest() const;
 };
 
 struct RideFileCalibration
