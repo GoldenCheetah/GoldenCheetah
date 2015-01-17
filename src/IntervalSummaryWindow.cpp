@@ -69,10 +69,25 @@ void IntervalSummaryWindow::intervalSelected()
 	    return;
     }
 
-    // summary of currently selected
-    QList<IntervalItem*> list;
+    // summary is html
 	QString html = GCColor::css();
     html += "<body>";
+
+    // summary of all intervals selected
+    QList<IntervalItem*> list;
+    if (context->athlete->allIntervalItems() != NULL) {
+        for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
+            IntervalItem *current = dynamic_cast<IntervalItem*>(context->athlete->allIntervalItems()->child(i));
+            if (current != NULL) {
+                if (current->isSelected()) {
+                    list << current;
+                }
+            }
+        }
+    }
+    if (list.count()>1) calcInterval(list, html);
+
+    // summary for each of the currently selected intervals
     if (context->athlete->allIntervalItems() != NULL) {
         for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
             IntervalItem *current = dynamic_cast<IntervalItem*>(context->athlete->allIntervalItems()->child(i));
@@ -84,9 +99,6 @@ void IntervalSummaryWindow::intervalSelected()
             }
         }
     }
-
-    // summary of all intervals selected
-    if (list.count()>1) calcInterval(list, html);
 
     if (html == GCColor::css()+"<body>") {
     	html += "<i>" + tr("select an interval for summary info") + "</i>";
