@@ -2312,7 +2312,8 @@ AllPlot::refreshIntervalMarkers()
             if (interval.isClimb()) continue;
 
             // no label, but do add
-            if (interval.isPeak() || interval.isMatch()) nolabel = true;
+            if (interval.isBest() || interval.isPeak() || 
+                interval.isMatch()) nolabel = true;
 
             QwtPlotMarker *mrk = new QwtPlotMarker;
             standard->d_mrk.append(mrk);
@@ -6509,6 +6510,7 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
                 if (chosen.isPeak()) hbrush = QColor(Qt::lightGray);
                 if (chosen.isMatch()) hbrush = QColor(Qt::red);
                 if (chosen.isClimb()) hbrush = QColor(Qt::darkGreen);
+                if (chosen.isBest()) hbrush = QColor(Qt::darkYellow);
                 hbrush.setAlpha(64);
                 standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
 
@@ -6570,6 +6572,7 @@ AllPlot::intervalHover(RideFileInterval chosen)
         if (chosen.isPeak()) hbrush = QColor(Qt::lightGray);
         if (chosen.isMatch()) hbrush = QColor(Qt::red);
         if (chosen.isClimb()) hbrush = QColor(Qt::darkGreen);
+        if (chosen.isBest()) hbrush = QColor(Qt::darkYellow);
         hbrush.setAlpha(64);
         standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
 
