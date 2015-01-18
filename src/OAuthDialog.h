@@ -47,15 +47,17 @@ public:
     typedef enum {
         STRAVA,
         TWITTER,
-        CYCLING_ANALYTICS
+        CYCLING_ANALYTICS,
+        GOOGLE_CALENDAR,
     } OAuthSite;
 
     OAuthDialog(Context *context, OAuthSite site);
 
 private slots:
 
-    // Strava/Cyclinganalytics
+    // Strava/Cyclinganalytics/Google
     void urlChanged(const QUrl& url);
+    void loadFinished(bool ok);
     void networkRequestFinished(QNetworkReply *reply);
 
 #ifdef GC_HAVE_KQOAUTH
