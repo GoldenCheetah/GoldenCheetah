@@ -127,6 +127,8 @@
 #define GC_DVURL          "dv/url"
 #define GC_DVUSER         "dv/user"
 #define GC_DVPASS         "dv/pass"
+#define GC_DVCALDAVTYPE   "dv/type"
+#define GC_DVGOOGLE_CALID "dv/googlecalid"
 #define GC_ZEOURL         "zeo/url"
 #define GC_ZEOUSER        "zeo/user"
 #define GC_ZEOPASS        "zeo/pass"
@@ -179,6 +181,11 @@
 #define GC_TWITTER_CONSUMER_SECRET "IWXu2G6mQC5xvhM8V0ohA0mPTUOqAFutiuKIva3LQg"
 #define GC_TWITTER_TOKEN "twitter_token"
 #define GC_TWITTER_SECRET "twitter_secret"
+
+//Google Calendar-CALDAV oauthkeys
+//Google Calendar-CALDAV oauthkeys
+#define GC_GOOGLE_CALENDAR_CLIENT_ID      "426009671216-c588t1u6hafep30tfs7g0g1nuo72s8ko.apps.googleusercontent.com"
+#define GC_GOOGLE_CALENDAR_REFRESH_TOKEN  "google_cal_refresh_token"
 
 //Strava
 #define GC_STRAVA_CLIENT_ID    "83" // client id

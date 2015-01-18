@@ -91,10 +91,19 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
         urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
         urlstr.append("response_type=code&");
         urlstr.append("approval_prompt=force");
+
+    } else if (site == GOOGLE_CALENDAR) {
+
+        // OAUTH 2.0 - Google flow for installed applications
+        urlstr = QString("https://accounts.google.com/o/oauth2/auth?");
+        urlstr.append("scope=https://www.googleapis.com/auth/calendar&");
+        urlstr.append("redirect_uri=urn:ietf:wg:oauth:2.0:oob&");
+        urlstr.append("response_type=code&");
+        urlstr.append("client_id=").append(GC_GOOGLE_CALENDAR_CLIENT_ID);
     }
 
     // different process to get the token for STRAVA, CYCLINGANALYTICS vs. TWITTER
-    if (site == STRAVA || site == CYCLING_ANALYTICS) {
+    if (site == STRAVA || site == CYCLING_ANALYTICS || site == GOOGLE_CALENDAR ) {
 
 
         url = QUrl(urlstr);
@@ -102,6 +111,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
 
         // connects
         connect(view, SIGNAL(urlChanged(const QUrl&)), this, SLOT(urlChanged(const QUrl&)));
+        connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
     }
 }
 
@@ -166,70 +176,134 @@ void OAuthDialog::onAuthorizationPageRequested(QUrl url) {
 }
 #endif
 
-// ****************** Strava / Cyclinganalytics authorization*********************************************
+// ****************** Strava / Cyclinganalytics / Google authorization ***************************************
 
 void
 OAuthDialog::urlChanged(const QUrl &url)
 {
     // STRAVA & CYCLINGANALYTICS work with Call-back URLs / change of URL indicates next step is required
 
-    if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
-        url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
-        QString code = url.toString().right(url.toString().length()-url.toString().indexOf("code=")-5);
+    if (site == STRAVA || site == CYCLING_ANALYTICS) {
+        if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
+                url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
+            QString code = url.toString().right(url.toString().length()-url.toString().indexOf("code=")-5);
 
-        QByteArray data;
+            QByteArray data;
 #if QT_VERSION > 0x050000
-        QUrlQuery params;
+            QUrlQuery params;
 #else
-        QUrl params;
+            QUrl params;
 #endif
-        QString urlstr = "";
+            QString urlstr = "";
 
-        // now get the final token to store
-        if (site == STRAVA) {
-            urlstr = QString("https://www.strava.com/oauth/token?");
-            params.addQueryItem("client_id", GC_STRAVA_CLIENT_ID);
+            // now get the final token to store
+            if (site == STRAVA) {
+                urlstr = QString("https://www.strava.com/oauth/token?");
+                params.addQueryItem("client_id", GC_STRAVA_CLIENT_ID);
 #ifdef GC_STRAVA_CLIENT_SECRET
-            params.addQueryItem("client_secret", GC_STRAVA_CLIENT_SECRET);
+                params.addQueryItem("client_secret", GC_STRAVA_CLIENT_SECRET);
 #endif
-        }
+            }
 
-        else if (site == CYCLING_ANALYTICS) {
-            urlstr = QString("https://www.cyclinganalytics.com/api/token?");
-            params.addQueryItem("client_id", GC_CYCLINGANALYTICS_CLIENT_ID);
+            else if (site == CYCLING_ANALYTICS) {
+                urlstr = QString("https://www.cyclinganalytics.com/api/token?");
+                params.addQueryItem("client_id", GC_CYCLINGANALYTICS_CLIENT_ID);
 #ifdef GC_CYCLINGANALYTICS_CLIENT_SECRET
-            params.addQueryItem("client_secret", GC_CYCLINGANALYTICS_CLIENT_SECRET);
+                params.addQueryItem("client_secret", GC_CYCLINGANALYTICS_CLIENT_SECRET);
 #endif
-            params.addQueryItem("grant_type", "authorization_code");
-        }
-        params.addQueryItem("code", code);
+                params.addQueryItem("grant_type", "authorization_code");
+
+            }
+
+            params.addQueryItem("code", code);
 
 #if QT_VERSION > 0x050000
-        data.append(params.query(QUrl::FullyEncoded));
+            data.append(params.query(QUrl::FullyEncoded));
 #else
-        data=params.encodedQuery();
+            data=params.encodedQuery();
 #endif
 
-        // trade-in the temporary access code retrieved by the Call-Back URL for the finale token
-        QUrl url = QUrl(urlstr);
-        QNetworkRequest request = QNetworkRequest(url);
-        request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
+            // trade-in the temporary access code retrieved by the Call-Back URL for the finale token
+            QUrl url = QUrl(urlstr);
+            QNetworkRequest request = QNetworkRequest(url);
+            request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
 
-        // not get the final token
-        manager = new QNetworkAccessManager(this);
-        connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
-        manager->post(request, data);
+            // now get the final token
+            manager = new QNetworkAccessManager(this);
+            connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
+            manager->post(request, data);
 
+        }
     }
 }
+
+void
+OAuthDialog::loadFinished(bool ok) {
+
+    // GOOGLE OAUTH 2.0 sends the code as part of the title of the HTML page they re-direct too
+    if (site == GOOGLE_CALENDAR) {
+        if (ok && url.toString().startsWith("https://accounts.google.com/o/oauth2/auth")) {
+
+            // retrieve the code from the HTML page title
+            QString title = view->title();
+            if (title.contains("code")) {
+                QString code = title.right(title.length()-title.indexOf("code=")-5);
+                QByteArray data;
+#if QT_VERSION > 0x050000
+                QUrlQuery params;
+#else
+                QUrl params;
+#endif
+                QString urlstr = "https://www.googleapis.com/oauth2/v3/token?";
+                params.addQueryItem("client_id", GC_GOOGLE_CALENDAR_CLIENT_ID);
+#ifdef GC_GOOGLE_CALENDAR_CLIENT_SECRET
+                params.addQueryItem("client_secret", GC_GOOGLE_CALENDAR_CLIENT_SECRET);
+#endif
+                params.addQueryItem("code", code);
+                params.addQueryItem("redirect_uri", "urn:ietf:wg:oauth:2.0:oob");
+                params.addQueryItem("grant_type", "authorization_code");
+
+#if QT_VERSION > 0x050000
+                data.append(params.query(QUrl::FullyEncoded));
+#else
+                data=params.encodedQuery();
+#endif
+
+                // trade-in the temporary access code retrieved by the Call-Back URL for the finale token
+                QUrl url = QUrl(urlstr);
+                QNetworkRequest request = QNetworkRequest(url);
+                request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
+
+                // not get the final token
+                manager = new QNetworkAccessManager(this);
+                connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
+                manager->post(request, data);
+
+            }
+        }
+    }
+}
+
+
 
 void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
 
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray payload = reply->readAll(); // JSON
-        int at = payload.indexOf("\"access_token\":");
+        QByteArray token_type;
+        int token_length;
+        if (site == GOOGLE_CALENDAR) {
+            token_type = "\"refresh_token\":";
+            token_length = 16;
+        } else {  // all other sites have permanent access token
+            token_type = "\"access_token\":";
+            token_length = 15;
+        }
+
+        // get the token
+        int at = payload.indexOf(token_type);
         if (at >=0 ) {
-            int from = at + 15; // first char after ":"
+            int from = at + token_length; // first char after ":"
             int next = payload.indexOf("\"", from);
             from = next + 1;
             int to = payload.indexOf("\"", from);
@@ -244,11 +318,20 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
                 QString info = QString(tr("Cycling Analytics authorization was successful."));
                 QMessageBox information(QMessageBox::Information, tr("Information"), info);
                 information.exec();
-            };
+            } else if (site == GOOGLE_CALENDAR) {
+                // remove the Google Page first
+                url = QUrl("http://www.goldencheetah.org");
+                view->setUrl(url);
+                appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_CALENDAR_REFRESH_TOKEN, access_token);
+                QString info = QString(tr("Google Calendar authorization was successful."));
+                QMessageBox information(QMessageBox::Information, tr("Information"), info);
+                information.exec();
+            }
         }
+
     } else { // something failed
 
-        QString error = QString(tr("Error authoriation credentials"));
+        QString error = QString(tr("Error retrieving authoriation credentials"));
         QMessageBox oautherr(QMessageBox::Critical, tr("Authorization Error"), error);
         oautherr.setDetailedText(error);
         oautherr.exec();
