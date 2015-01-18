@@ -235,8 +235,12 @@ class deviceModel : public QAbstractTableModel
         bool insertRows(int position, int rows, const QModelIndex &index=QModelIndex());
         bool removeRows(int position, int rows, const QModelIndex &index=QModelIndex());
 
-
         QList<DeviceConfiguration> Configuration;  // the actual data
+
+    public slots:
+        // config changed by wizard so reset
+        void doReset();
+
  };
 
 class DevicePage : public QWidget

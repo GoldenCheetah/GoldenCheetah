@@ -1084,6 +1084,7 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
 
     connect(addButton, SIGNAL(clicked()), this, SLOT(devaddClicked()));
     connect(delButton, SIGNAL(clicked()), this, SLOT(devdelClicked()));
+    connect(context, SIGNAL(configChanged(qint32)), deviceListModel, SLOT(doReset()));
 }
 
 qint32
@@ -1162,6 +1163,15 @@ deviceModel::deviceModel(QObject *parent) : QAbstractTableModel(parent)
     // get current configuration
     DeviceConfigurations all;
     Configuration = all.getList();
+}
+
+void
+deviceModel::doReset()
+{
+    beginResetModel();
+    DeviceConfigurations all;
+    Configuration = all.getList();
+    endResetModel();
 }
 
 int
