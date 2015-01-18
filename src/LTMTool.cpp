@@ -1920,7 +1920,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
 
     // when stuff changes rebuild name
     connect(chooseBest, SIGNAL(toggled(bool)), this, SLOT(bestName()));
+    connect(chooseStress, SIGNAL(toggled(bool)), this, SLOT(stressName()));
     connect(chooseEstimate, SIGNAL(toggled(bool)), this, SLOT(estimateName()));
+    connect(stressTypeSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(stressName()));
     connect(chooseMetric, SIGNAL(toggled(bool)), this, SLOT(metricSelected()));
     connect(duration, SIGNAL(valueChanged(double)), this, SLOT(bestName()));
     connect(durationUnits, SIGNAL(currentIndexChanged(int)), this, SLOT(bestName()));
@@ -1972,6 +1974,30 @@ EditMetricDetailDialog::typeChanged()
         typeStack->setCurrentIndex(0);
     }
     adjustSize();
+}
+
+void
+EditMetricDetailDialog::stressName()
+{
+    // used when adding the generated curve to the curves
+    // map in LTMPlot, we need to be able to differentiate
+    // between adding the metric to a chart and adding
+    // a stress series to a chart
+
+    // only for bests!
+    if (chooseStress->isChecked() == false) return;
+
+    // re-use bestSymbol
+    metricDetail->bestSymbol = metricDetail->symbol;
+
+    // append type
+    switch(stressTypeSelect->currentIndex()) {
+    case 0: metricDetail->bestSymbol += "_lts"; break;
+    case 1: metricDetail->bestSymbol += "_sts"; break;
+    case 2: metricDetail->bestSymbol += "_sb"; break;
+    case 3: metricDetail->bestSymbol += "_rr"; break;
+    }
+
 }
 
 void
@@ -2073,6 +2099,9 @@ EditMetricDetailDialog::metricSelected()
     }
 
     (*metricDetail) = ltmTool->metrics[index]; // overwrite!
+
+    // make the stress name
+    if (chooseStress->isChecked()) stressName();
 }
 
 // uh. i hate enums when you need to modify from ints

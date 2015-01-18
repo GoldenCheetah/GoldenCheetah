@@ -177,6 +177,7 @@ class EditMetricDetailDialog : public QDialog
 
         void typeChanged();
         void bestName();
+        void stressName();
         void estimateName();
 
         void modelChanged();
