@@ -162,6 +162,8 @@ class CredentialsPage : public QScrollArea
 #endif
         void authoriseStrava();
         void authoriseCyclingAnalytics();
+        void authoriseGoogleCalendar();
+        void dvCALDAVTypeChanged(int);
 
     private:
         Context *context;
@@ -177,8 +179,10 @@ class CredentialsPage : public QScrollArea
         QPushButton *twitterAuthorise;
 #endif
 
+        QComboBox *dvCALDAVType;
         QPushButton *stravaAuthorise, *stravaAuthorised, *twitterAuthorised;
         QPushButton *cyclingAnalyticsAuthorise, *cyclingAnalyticsAuthorised;
+        QPushButton *googleCalendarAuthorise, *googleCalendarAuthorised;
 
         QLineEdit *rideWithGPSUser;
         QLineEdit *rideWithGPSPass;
@@ -198,9 +202,10 @@ class CredentialsPage : public QScrollArea
 
         QLineEdit *webcalURL; // url for webcal calendar (read only, TP.com, Google Calendar)
 
-        QLineEdit *dvURL; // url for calDAV calendar (read/write, e.g. Google, Hotmail)
+        QLineEdit *dvURL; // url for calDAV calendar (read/write, e.g. Hotmail)
         QLineEdit *dvUser;
         QLineEdit *dvPass;
+        QLineEdit *dvGoogleCalid;
 };
 
 class deviceModel : public QAbstractTableModel

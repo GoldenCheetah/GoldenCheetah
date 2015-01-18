@@ -27,17 +27,54 @@ CalDAV::CalDAV(Context *context) : context(context), mode(None)
 
     connect(nam, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this,
         SLOT(userpass(QNetworkReply*,QAuthenticator*)));
+
+    getConfig();
+
 //    connect(nam, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this,
 //        SLOT(sslErrors(QNetworkReply*,QList<QSslError>)));
 }
 
+
+void CalDAV::getConfig() {
+
+    int t = appsettings->cvalue(context->athlete->cyclist, GC_DVCALDAVTYPE, "0").toInt();
+    if (t == 0) {
+        calDavType = Standard;
+    } else {
+        calDavType = Google;
+    };
+}
+
+
 //
 // GET event directory listing
 //
+
 bool
 CalDAV::download()
 {
-    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
+    getConfig();
+    mode = Events;
+    if (calDavType == Standard) {
+        return doDownload();
+    } else { // calDavType = GOOGLE
+        // after having the token the function defined in "mode" will be executed
+        requestGoogleAccessTokenToExecute();
+    }
+    return true;
+}
+
+bool
+CalDAV::doDownload()
+{
+
+    QString url;
+    if (calDavType == Standard) {
+        url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
+    } else { // calDavType = GOOGLE
+        url =  QString("https://apidata.googleusercontent.com/caldav/v2/%1/events/")
+                .arg(appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "").toString());
+    }
     if (url == "") return false; // not configured
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
@@ -61,6 +98,10 @@ CalDAV::download()
     request.setRawHeader("Depth", "0");
     request.setRawHeader("Content-Type", "application/xml; charset=\"utf-8\"");
     request.setRawHeader("Content-Length", (QString("%1").arg(queryText->size())).toLatin1());
+    if (calDavType == Google && googleCalendarAccessToken != "") {
+        request.setRawHeader("Authorization", "Bearer "+googleCalendarAccessToken );
+    }
+
 
     QBuffer *query = new QBuffer(queryText);
 
@@ -77,110 +118,110 @@ CalDAV::download()
 //
 // Get OPTIONS available
 //
-bool
-CalDAV::options()
-{
-    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
-    if (url == "") return false; // not configured
+//bool
+//CalDAV::options()
+//{
+//    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
+//    if (url == "") return false; // not configured
 
-    QNetworkRequest request = QNetworkRequest(QUrl(url));
+//    QNetworkRequest request = QNetworkRequest(QUrl(url));
 
 
-    QByteArray *queryText = new QByteArray("<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
-                                           "<D:options xmlns:D=\"DAV:\">"
-                                           "  <C:calendar-home-set xmlns:C=\"urn:ietf:params:xml:ns:caldav\"/>"
-                                           "</D:options>");
+//    QByteArray *queryText = new QByteArray("<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
+//                                           "<D:options xmlns:D=\"DAV:\">"
+//                                           "  <C:calendar-home-set xmlns:C=\"urn:ietf:params:xml:ns:caldav\"/>"
+//                                           "</D:options>");
 
-    request.setRawHeader("Depth", "0");
-    request.setRawHeader("Content-Type", "text/xml; charset=\"utf-8\"");
-    request.setRawHeader("Content-Length", (QString("%1").arg(queryText->size())).toLatin1());
+//    request.setRawHeader("Depth", "0");
+//    request.setRawHeader("Content-Type", "text/xml; charset=\"utf-8\"");
+//    request.setRawHeader("Content-Length", (QString("%1").arg(queryText->size())).toLatin1());
 
-    QBuffer *query = new QBuffer(queryText);
+//    QBuffer *query = new QBuffer(queryText);
 
-    mode = Options;
-    QNetworkReply *reply = nam->sendCustomRequest(request, "OPTIONS", query);
-    if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(context->mainWindow, tr("CalDAV OPTIONS url error"), reply->errorString());
-        mode = None;
-        return false;
-    }
-    return true;
-}
+//    mode = Options;
+//    QNetworkReply *reply = nam->sendCustomRequest(request, "OPTIONS", query);
+//    if (reply->error() != QNetworkReply::NoError) {
+//        QMessageBox::warning(context->mainWindow, tr("CalDAV OPTIONS url error"), reply->errorString());
+//        mode = None;
+//        return false;
+//    }
+//    return true;
+//}
 
 //
 // Get URI Properties via PROPFIND
 //
-bool
-CalDAV::propfind()
-{
-    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
-    if (url == "") return false; // not configured
+//bool
+//CalDAV::propfind()
+//{
+//    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
+//    if (url == "") return false; // not configured
 
-    QNetworkRequest request = QNetworkRequest(QUrl(url));
-
-
-    QByteArray *queryText = new QByteArray( "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
-                                            "<D:propfind xmlns:D=\"DAV:\""
-                                            "                 xmlns:C=\"urn:ietf:params:xml:ns:caldav\">"
-                                            "  <D:prop>"
-                                            "    <D:displayname/>"
-                                            "    <C:calendar-timezone/> "
-                                            "    <C:supported-calendar-component-set/> "
-                                            "  </D:prop>"
-                                            "</D:propfind>\r\n");
-
-    request.setRawHeader("Content-Type", "text/xml; charset=\"utf-8\"");
-    request.setRawHeader("Content-Length", (QString("%1").arg(queryText->size())).toLatin1());
-    request.setRawHeader("Depth", "0");
-
-    QBuffer *query = new QBuffer(queryText);
-
-    mode = PropFind;
-    QNetworkReply *reply = nam->sendCustomRequest(request, "PROPFIND" , query);
-    if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(context->mainWindow, tr("CalDAV OPTIONS url error"), reply->errorString());
-        mode = None;
-        return false;
-    }
-    return true;
-}
+//    QNetworkRequest request = QNetworkRequest(QUrl(url));
 
 
-//
-// REPORT of "all" VEVENTS
-//
-bool
-CalDAV::report()
-{
-    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
-    if (url == "") return false; // not configured
+//    QByteArray *queryText = new QByteArray( "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
+//                                            "<D:propfind xmlns:D=\"DAV:\""
+//                                            "                 xmlns:C=\"urn:ietf:params:xml:ns:caldav\">"
+//                                            "  <D:prop>"
+//                                            "    <D:displayname/>"
+//                                            "    <C:calendar-timezone/> "
+//                                            "    <C:supported-calendar-component-set/> "
+//                                            "  </D:prop>"
+//                                            "</D:propfind>\r\n");
 
-    QNetworkRequest request = QNetworkRequest(QUrl(url));
-    QByteArray *queryText = new QByteArray("<x1:calendar-query xmlns:x1=\"urn:ietf:params:xml:ns:caldav\">"
-                     "<x0:prop xmlns:x0=\"DAV:\">"
-                     "<x0:getetag/>"
-                     "<x1:calendar-data/>"
-                     "</x0:prop>"
-                     "<x1:filter>"
-                     "<x1:comp-filter name=\"VCALENDAR\">"
-                     "<x1:comp-filter name=\"VEVENT\">"
-                     "<x1:time-range end=\"21001231\" start=\"20000101T000000Z\"/>"
-                     "</x1:comp-filter>"
-                     "</x1:comp-filter>"
-                     "</x1:filter>"
-                     "</x1:calendar-query>");
+//    request.setRawHeader("Content-Type", "text/xml; charset=\"utf-8\"");
+//    request.setRawHeader("Content-Length", (QString("%1").arg(queryText->size())).toLatin1());
+//    request.setRawHeader("Depth", "0");
 
-    QBuffer *query = new QBuffer(queryText);
+//    QBuffer *query = new QBuffer(queryText);
 
-    mode = Report;
-    QNetworkReply *reply = nam->sendCustomRequest(request, "REPORT", query);
-    if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(context->mainWindow, tr("CalDAV REPORT url error"), reply->errorString());
-        mode = None;
-        return false;
-    }
-    return true;
-}
+//    mode = PropFind;
+//    QNetworkReply *reply = nam->sendCustomRequest(request, "PROPFIND" , query);
+//    if (reply->error() != QNetworkReply::NoError) {
+//        QMessageBox::warning(context->mainWindow, tr("CalDAV OPTIONS url error"), reply->errorString());
+//        mode = None;
+//        return false;
+//    }
+//    return true;
+//}
+
+
+////
+//// REPORT of "all" VEVENTS
+////
+//bool
+//CalDAV::report()
+//{
+//    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
+//    if (url == "") return false; // not configured
+
+//    QNetworkRequest request = QNetworkRequest(QUrl(url));
+//    QByteArray *queryText = new QByteArray("<x1:calendar-query xmlns:x1=\"urn:ietf:params:xml:ns:caldav\">"
+//                     "<x0:prop xmlns:x0=\"DAV:\">"
+//                     "<x0:getetag/>"
+//                     "<x1:calendar-data/>"
+//                     "</x0:prop>"
+//                     "<x1:filter>"
+//                     "<x1:comp-filter name=\"VCALENDAR\">"
+//                     "<x1:comp-filter name=\"VEVENT\">"
+//                     "<x1:time-range end=\"21001231\" start=\"20000101T000000Z\"/>"
+//                     "</x1:comp-filter>"
+//                     "</x1:comp-filter>"
+//                     "</x1:filter>"
+//                     "</x1:calendar-query>");
+
+//    QBuffer *query = new QBuffer(queryText);
+
+//    mode = Report;
+//    QNetworkReply *reply = nam->sendCustomRequest(request, "REPORT", query);
+//    if (reply->error() != QNetworkReply::NoError) {
+//        QMessageBox::warning(context->mainWindow, tr("CalDAV REPORT url error"), reply->errorString());
+//        mode = None;
+//        return false;
+//    }
+//    return true;
+//}
 
 // utility function to create a VCALENDAR from a single RideItem
 static
@@ -283,11 +324,16 @@ static QString extractComponents(QString document)
     // Google Calendar retains the namespace prefix in the results
     // Apple MobileMe doesn't. This means the element names will
     // possibly need a prefix...
+    // Google CalDav API V2 does not deliver C: but caldav: as a prefix
+    // so try both - just in case - to get the data
+
     QString Dprefix = "";
     QString Cprefix = "";
+    QString Cprefix_Google = "";
     if (multistatus.nodeName().startsWith("D:")) {
         Dprefix = "D:";
         Cprefix = "C:";
+        Cprefix_Google = "caldav:";
     }
 
     // read all the responses within the multistatus
@@ -298,6 +344,9 @@ static QString extractComponents(QString document)
         QDomNode propstat = response.firstChildElement(Dprefix + "propstat");
         QDomNode prop = propstat.firstChildElement(Dprefix + "prop");
         QDomNode calendardata = prop.firstChildElement(Cprefix + "calendar-data");
+        if (calendardata.isNull()) {
+            calendardata = prop.firstChildElement(Cprefix_Google + "calendar-data");
+        };
 
         // extract the calendar entry - top and tail the other crap
         QString text = calendardata.toElement().text();
@@ -314,15 +363,42 @@ static QString extractComponents(QString document)
 //
 // PUT a ride item
 //
+
 bool
 CalDAV::upload(RideItem *rideItem)
+{
+    getConfig();
+    mode = Put;
+    if (calDavType == Standard) {
+        return doUpload(rideItem);
+    } else { // calDavType = GOOGLE
+        // after having the token the function defined in "mode" will be executed
+        itemForUpload = rideItem;
+        requestGoogleAccessTokenToExecute();
+    }
+    return true;
+}
+
+
+bool
+CalDAV::doUpload(RideItem *rideItem)
 {
     // is this a valid ride?
     if (!rideItem || !rideItem->ride()) return false;
 
-    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
+    QString url;
+    if (calDavType == Standard) {
+        url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
+    } else { // calDavType = GOOGLE
+        url =  QString("https://apidata.googleusercontent.com/caldav/v2/%1/events/")
+                .arg(appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "").toString());
+    }
     if (url == "") return false; // not configured
 
+    // if URL does not end with "/" - just  add it (for convenience)
+    if (!url.endsWith("/")) {
+        url += "/";
+    }
     // lets upload to calendar
     url += rideItem->fileName;
     url += ".ics";
@@ -331,6 +407,9 @@ CalDAV::upload(RideItem *rideItem)
     QNetworkRequest request = QNetworkRequest(QUrl(url));
     request.setRawHeader("Content-Type", "text/calendar");
     request.setRawHeader("Content-Length", "xxxx");
+    if (calDavType == Google && googleCalendarAccessToken != "") {
+        request.setRawHeader("Authorization", "Bearer "+googleCalendarAccessToken );
+    }
 
     // create the ICal event
     icalcomponent *vcard = createEvent(rideItem);
@@ -389,3 +468,81 @@ void
 CalDAV::sslErrors(QNetworkReply*,QList<QSslError>&)
 {
 }
+
+//
+// gets Google Calendar Access Token (from Refresh Token)
+//
+void
+CalDAV::requestGoogleAccessTokenToExecute() {
+
+    QString refresh_token = appsettings->cvalue(context->athlete->cyclist, GC_GOOGLE_CALENDAR_REFRESH_TOKEN, "").toString();
+    if (refresh_token == "") return;
+
+    // get a valid access token
+    QByteArray data;
+#if QT_VERSION > 0x050000
+    QUrlQuery params;
+#else
+    QUrl params;
+#endif
+    QString urlstr = "https://www.googleapis.com/oauth2/v3/token?";
+    params.addQueryItem("client_id", GC_GOOGLE_CALENDAR_CLIENT_ID);
+#ifdef GC_GOOGLE_CALENDAR_CLIENT_SECRET
+    params.addQueryItem("client_secret", GC_GOOGLE_CALENDAR_CLIENT_SECRET);
+#endif
+    params.addQueryItem("refresh_token", refresh_token);
+    params.addQueryItem("grant_type", "refresh_token");
+
+#if QT_VERSION > 0x050000
+    data.append(params.query(QUrl::FullyEncoded));
+#else
+    data=params.encodedQuery();
+#endif
+
+    // get a new Access Token (since they are just temporarily valid)
+    QUrl url = QUrl(urlstr);
+    QNetworkRequest request = QNetworkRequest(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
+
+    // now get the final token
+    googleNetworkAccessManager = new QNetworkAccessManager(this);
+    connect(googleNetworkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(googleNetworkRequestFinished(QNetworkReply*)));
+    googleNetworkAccessManager->post(request, data);
+
+}
+
+//
+// extract the token and call the requested CALDAV function
+//
+void
+CalDAV::googleNetworkRequestFinished(QNetworkReply* reply)   {
+
+    googleCalendarAccessToken = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        QByteArray payload = reply->readAll(); // JSON
+        QByteArray token_type = "\"access_token\":";
+        int token_length = 15;
+
+        // get the token
+        int at = payload.indexOf(token_type);
+        if (at >=0 ) {
+            int from = at + token_length; // first char after ":"
+            int next = payload.indexOf("\"", from);
+            from = next + 1;
+            int to = payload.indexOf("\"", from);
+            googleCalendarAccessToken = payload.mid(from, to-from);
+
+        } else { // something failed
+
+            QString error = QString(tr("Error retrieving access token"));
+            QMessageBox oautherr(QMessageBox::Critical, tr("Authorization Error"), error);
+            oautherr.setDetailedText(error);
+            oautherr.exec();
+        }
+    }
+
+    // now we have a token and can do the requested jobs
+    if (mode == Put) doUpload(itemForUpload);
+    if (mode == Events) doDownload();
+}
+
