@@ -788,7 +788,7 @@ WebBridge::searchPoint(double lat, double lng)
 void
 WebBridge::hoverPath(double lat, double lng)
 {
-    if (traceInterval) {
+    if (point) {
         QString name = QString(tr("Selection #%1 ")).arg(selection);
 
         QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
@@ -798,36 +798,23 @@ WebBridge::hoverPath(double lat, double lng)
             IntervalItem *bottom = (IntervalItem *) allIntervals->child(count-1);
             if (bottom->text(0).startsWith(name)) { //delete allIntervals->takeChild(count-1);
 
-                /*qDebug() << "searchPoint";
                 QList<RideFilePoint*> list = searchPoint(lat, lng);
-                for (int i=0;i<list.count();i++) {
-                    qDebug() << list.at(i)->secs;
-                }*/
 
-                RideItem *rideItem = gm->property("ride").value<RideItem*>();
+                if (list.count() > 0)  {
 
-                double position = 0.0;
+                    RideFilePoint* secondPoint = list.at(0);
 
-                foreach (RideFilePoint *p1, rideItem->ride()->dataPoints()) {
-                    if (((p1->lat-lat> 0 && p1->lat-lat< 0.0001) || (p1->lat-lat< 0 && p1->lat-lat> -0.0001)) &&
-                        ((p1->lon-lng> 0 && p1->lon-lng< 0.0001) || (p1->lon-lng< 0 && p1->lon-lng> -0.0001))) {
-
-                        position = p1->secs;
+                    if (secondPoint->secs>point->secs) {
+                        bottom->start = point->secs;
+                        bottom->stop = secondPoint->secs;
+                    } else {
+                        bottom->stop = point->secs;
+                        bottom->start = secondPoint->secs;
                     }
-                }
 
-                if (position == 0)  {
-                    return;
-                }
-
-                if (bottom->start>position) {
-                    bottom->start = position;
-                } else {
-                    bottom->stop = position;
-                }
-
-                // overlay a shaded route
-                gm->drawTempInterval(bottom);
+                    // overlay a shaded route
+                    gm->drawTempInterval(bottom);
+                 }
             }
         }
 
@@ -854,38 +841,29 @@ WebBridge::clickPath(double lat, double lng)
 
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
 
-    double position = 0.0;
+    QList<RideFilePoint*> list = searchPoint(lat, lng);
 
-    foreach (RideFilePoint *p1, rideItem->ride()->dataPoints()) {
-        if (((p1->lat-lat> 0 && p1->lat-lat< 0.0001) || (p1->lat-lat< 0 && p1->lat-lat> -0.0001)) &&
-            ((p1->lon-lng> 0 && p1->lon-lng< 0.0001) || (p1->lon-lng< 0 && p1->lon-lng> -0.0001))) {
+    if (list.count() > 0)  {
+        point = list.at(0);
 
-            position = p1->secs;
-        }
+        QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
+
+        QTreeWidgetItem *last = new IntervalItem(rideItem->ride(), name, point->secs, point->secs, 0, 0,
+                                    allIntervals->childCount()+1);
+        last->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+        allIntervals->addChild(last);
+
+        context->athlete->intervalTreeWidget()->clearSelection();
+        context->athlete->intervalTreeWidget()->setItemSelected(last, true);
     }
-
-    if (position == 0)  {
-        traceInterval = false;
-        return;
-    }
-
-    QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
-
-    QTreeWidgetItem *last = new IntervalItem(rideItem->ride(), name, position, position, 0, 0,
-                                allIntervals->childCount()+1);
-    last->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-    allIntervals->addChild(last);
-
-    context->athlete->intervalTreeWidget()->clearSelection();
-    context->athlete->intervalTreeWidget()->setItemSelected(last, true);
-
-    traceInterval = true;
+    else
+        point = NULL;
 }
 
 void
 WebBridge::mouseup()
 {
-    if (traceInterval) {
+    if (point) {
         gm->clearTempInterval();
         QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
         int count = allIntervals->childCount();
@@ -896,7 +874,7 @@ WebBridge::mouseup()
         }
 
         context->athlete->updateRideFileIntervals();
-        traceInterval = false;
+        point = NULL;
     }  
 }
 
