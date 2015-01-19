@@ -50,6 +50,7 @@
 #define CONFIG_UNITS             0x800      // metric / imperial
 #define CONFIG_PMC               0x1000     // PMC constants
 #define CONFIG_WBAL              0x2000     // which w'bal formula to use ?
+#define CONFIG_WORKOUTS          0x4000     // workout location / files
 
 class RideItem;
 class IntervalItem;
