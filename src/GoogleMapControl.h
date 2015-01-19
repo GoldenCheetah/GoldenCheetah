@@ -63,7 +63,7 @@ class WebBridge : public QObject
         Context *context;
         GoogleMapControl *gm;
 
-        bool traceInterval;
+        RideFilePoint* point;
         int selection;
 
         QList<RideFilePoint*> searchPoint(double lat, double lng);
