@@ -22,6 +22,10 @@
 #include "Athlete.h"
 #include "HelpWhatsThis.h"
 
+#include "Library.h"
+#include "LibraryParser.h"
+#include "TrainDB.h"
+
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"
 #include "qwt_compat.h"
@@ -387,6 +391,12 @@ void AbsWattagePage::SaveWorkout()
         }
     }
     stream << "[END COURSE DATA]" << endl;
+    f.close();
+
+    // import them via the workoutimporter
+    QStringList files;
+    files << filename;
+    Library::importFiles(hackContext, files);
 }
 
 /// RelativeWattagePage
@@ -514,6 +524,12 @@ void RelWattagePage::SaveWorkout()
         }
     }
     stream << "[END COURSE DATA]" << endl;
+    f.close();
+
+    // import them via the workoutimporter
+    QStringList files;
+    files << filename;
+    Library::importFiles(hackContext, files);
 }
 
 /// GradientPage
@@ -602,6 +618,12 @@ void GradientPage::SaveWorkout()
         stream << currentX << " " << p.second << " 0" << endl;
     }
     stream << "[END COURSE DATA]" << endl;
+    f.close();
+
+    // import them via the workoutimporter
+    QStringList files;
+    files << filename;
+    Library::importFiles(hackContext, files);
 }
 
 
@@ -745,6 +767,12 @@ void ImportPage::SaveWorkout()
         prevDistance = p.first;
     }
     stream << "[END COURSE DATA]" << endl;
+    f.close();
+
+    // import them via the workoutimporter
+    QStringList files;
+    files << filename;
+    Library::importFiles(hackContext, files);
 }
 
 WorkoutWizard::WorkoutWizard(Context *context) :QWizard(context->mainWindow)
