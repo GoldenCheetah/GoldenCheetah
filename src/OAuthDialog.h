@@ -53,6 +53,8 @@ public:
 
     OAuthDialog(Context *context, OAuthSite site);
 
+    bool sslLibMissing() { return noSSLlib; }
+
 private slots:
 
     // Strava/Cyclinganalytics/Google
@@ -73,6 +75,7 @@ private slots:
 
 private:
     Context *context;
+    bool noSSLlib;
     OAuthSite site;
 
     QVBoxLayout *layout;
