@@ -993,6 +993,9 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
 {
     if (rangemode) return; // do nothing for ranges!
 
+    // is this interval being created as we plot ?
+    if (index == intervalCurves.count()) intervalCurves << NULL;
+
     // we already made it?
     if (intervalCurves[index] != NULL) {
         intervalCurves[index]->detach(); // in case
