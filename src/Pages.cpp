@@ -758,9 +758,12 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 void CredentialsPage::authoriseTwitter()
 {
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TWITTER);
-    oauthDialog->setWindowModality(Qt::ApplicationModal);
-    oauthDialog->exec();
-
+    if (oauthDialog->sslLibMissing()) {
+        delete oauthDialog;
+    } else {
+        oauthDialog->setWindowModality(Qt::ApplicationModal);
+        oauthDialog->exec();
+    }
 }
 #endif
 
@@ -768,22 +771,34 @@ void CredentialsPage::authoriseTwitter()
 void CredentialsPage::authoriseStrava()
 {
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::STRAVA);
-    oauthDialog->setWindowModality(Qt::ApplicationModal);
-    oauthDialog->exec();
+    if (oauthDialog->sslLibMissing()) {
+        delete oauthDialog;
+    } else {
+        oauthDialog->setWindowModality(Qt::ApplicationModal);
+        oauthDialog->exec();
+    }
 }
 
 void CredentialsPage::authoriseCyclingAnalytics()
 {
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::CYCLING_ANALYTICS);
-    oauthDialog->setWindowModality(Qt::ApplicationModal);
-    oauthDialog->exec();
+    if (oauthDialog->sslLibMissing()) {
+        delete oauthDialog;
+    } else {
+        oauthDialog->setWindowModality(Qt::ApplicationModal);
+        oauthDialog->exec();
+    }
 }
 
 void CredentialsPage::authoriseGoogleCalendar()
 {
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_CALENDAR);
-    oauthDialog->setWindowModality(Qt::ApplicationModal);
-    oauthDialog->exec();
+    if (oauthDialog->sslLibMissing()) {
+        delete oauthDialog;
+    } else {
+        oauthDialog->setWindowModality(Qt::ApplicationModal);
+        oauthDialog->exec();
+    }
 }
 
 void CredentialsPage::dvCALDAVTypeChanged(int type)

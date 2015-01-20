@@ -22,12 +22,24 @@
 #include "Settings.h"
 #include "TimeUtils.h"
 
-
 OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
     context(context), site(site)
 {
+
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("OAuth"));
+
+    // check if SSL is available - if not - message and end
+    if (!QSslSocket::supportsSsl()) {
+        QString text = QString(tr("SSL Security Libraries required for 'Authorise' are missing in this installation."));
+        QMessageBox sslMissing(QMessageBox::Critical, tr("Authorization Error"), text);
+        sslMissing.exec();
+        noSSLlib = true;
+        return;
+    }
+
+    // SSL is available - so authorisation can take place
+    noSSLlib = false;
 
     layout = new QVBoxLayout();
     layout->setSpacing(0);
