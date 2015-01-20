@@ -314,18 +314,22 @@ AnalysisSidebar::intervalPopup()
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), context->athlete->intervalWidget);
         QAction *actEditInt = new QAction(tr("Edit interval"), context->athlete->intervalWidget);
         QAction *actDeleteInt = new QAction(tr("Delete interval"), context->athlete->intervalWidget);
+#ifdef GC_HAVE_INTERVALS
         QAction *actCreateRouteInt = new QAction(tr("Create route for interval"), context->athlete->intervalWidget);
-
+#endif
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomIntervalSelected(void)));
         connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editIntervalSelected(void)));
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
+#ifdef GC_HAVE_INTERVALS
         connect(actCreateRouteInt, SIGNAL(triggered(void)), this, SLOT(createRouteIntervalSelected(void)));
-
+#endif
         menu.addAction(actZoomInt);
         menu.addAction(actEditInt);
         menu.addAction(actDeleteInt);
         menu.addSeparator();
+#ifdef GC_HAVE_INTERVALS
         menu.addAction(actCreateRouteInt);
+#endif
     }
 
     if (context->athlete->intervalWidget->selectedItems().count() > 1) {
@@ -356,7 +360,9 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), context->athlete->intervalWidget);
         QAction *actFrontInt = new QAction(tr("Bring to Front"), context->athlete->intervalWidget);
         QAction *actBackInt = new QAction(tr("Send to back"), context->athlete->intervalWidget);
+#ifdef GC_HAVE_INTERVALS
         QAction *actCreateRouteInt = new QAction(tr("Create route for interval"), context->athlete->intervalWidget);
+#endif
 
         connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editInterval(void)));
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteInterval(void)));
@@ -364,15 +370,18 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomInterval(void)));
         connect(actFrontInt, SIGNAL(triggered(void)), this, SLOT(frontInterval(void)));
         connect(actBackInt, SIGNAL(triggered(void)), this, SLOT(backInterval(void)));
+#ifdef GC_HAVE_INTERVALS
         connect(actCreateRouteInt, SIGNAL(triggered(void)), this, SLOT(createRouteIntervalSelected(void)));
-
+#endif
 
         menu.addAction(actZoomOut);
         menu.addAction(actZoomInt);
         menu.addAction(actEditInt);
         menu.addAction(actDeleteInt);
         menu.addSeparator();
+#ifdef GC_HAVE_INTERVALS
         menu.addAction(actCreateRouteInt);
+#endif
 
         menu.exec(context->athlete->intervalWidget->mapToGlobal(pos));
     }
