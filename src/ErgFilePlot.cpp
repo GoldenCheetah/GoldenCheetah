@@ -236,6 +236,19 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     // Now data bridge
     nowData = new NowData(context);
 
+    // CP marker
+    QwtText CPText(QString(tr("CP")));
+    CPText.setColor(GColor(CPLOTMARKER));
+    CPMarker = new QwtPlotMarker(CPText);
+    CPMarker->setLineStyle(QwtPlotMarker::HLine);
+    CPMarker->setLinePen(GColor(CPLOTMARKER), 1, Qt::DotLine);
+    CPMarker->setLabel(CPText);
+    CPMarker->setLabelAlignment(Qt::AlignLeft | Qt::AlignTop);
+    CPMarker->setYAxis(QwtPlot::yLeft);
+    CPMarker->setYValue(274);
+    CPMarker->attach(this);
+    
+
     // Now pointer
     NowCurve = new QwtPlotCurve("Now");
     QPen Nowpen = QPen(Qt::red, 2.0);
@@ -250,6 +263,8 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     setAutoReplot(false);
 	setData(ergFile);
 
+    configChanged(CONFIG_ZONES);
+
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 }
 
@@ -257,6 +272,19 @@ void
 ErgFilePlot::configChanged(qint32)
 {
     setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
+    CPMarker->setLinePen(GColor(CPLOTMARKER), 1, Qt::DotLine);
+
+    // set CP Marker
+    double CP = 0; // default
+    if (context->athlete->zones()) {
+        int zoneRange = context->athlete->zones()->whichRange(QDate::currentDate());
+        if (zoneRange >= 0) CP = context->athlete->zones()->getCP(zoneRange);
+    }
+    if (CP) {
+        CPMarker->setYValue(CP);
+        CPMarker->show();
+    } else CPMarker->hide();
+
     replot();
 }
 

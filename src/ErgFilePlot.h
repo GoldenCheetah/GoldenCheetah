@@ -150,6 +150,7 @@ class ErgFilePlot : public QwtPlot
     Context *context;
     bool bydist;
     ErgFile *ergFile;
+    QwtPlotMarker *CPMarker;
 
 	QwtPlotGrid *grid;
 	QwtPlotCurve *LodCurve;
