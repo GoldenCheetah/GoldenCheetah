@@ -87,7 +87,7 @@ public slots:
     // Catch NAM signals ...
     void requestReply(QNetworkReply *reply);
     void userpass(QNetworkReply*r,QAuthenticator*a);
-    void sslErrors(QNetworkReply*,QList<QSslError>&);
+    void sslErrors(QNetworkReply*,QList<QSslError>);
 
     // Google Access Token
     void googleNetworkRequestFinished(QNetworkReply*);
