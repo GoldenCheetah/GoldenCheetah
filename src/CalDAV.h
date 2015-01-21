@@ -63,7 +63,6 @@ class CalDAV : public QObject
     enum type { Standard, Google };
     typedef enum type CalDAVType;
 
-
 public:
     CalDAV(Context *context);
 
@@ -76,7 +75,8 @@ public slots:
     //bool propfind(); // not used
 
     // authentication (and refresh all events)
-    bool download();
+    // -- parameter ignoreErrors run the function in a "stealth" mode - ignoring any error message which might occur e.g. missing configuration
+    bool download(bool ignoreErrors=false);
 
     // Query CalDAV server for events ...
     //bool report(); // not used
@@ -105,6 +105,8 @@ private:
     QNetworkAccessManager *nam;
     ActionType mode;
     CalDAVType calDavType;
+    QString googleCalDAVurl;
+    bool ignoreDownloadErrors;
 
     // specific part to get Google Access Token
     QNetworkAccessManager *googleNetworkAccessManager;
