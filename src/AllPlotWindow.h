@@ -61,6 +61,7 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int showGrid READ isShowGrid WRITE setShowGrid USER true)
     Q_PROPERTY(int showFull READ isShowFull WRITE setShowFull USER true)
     Q_PROPERTY(int showInterval READ isShowInterval WRITE setShowInterval USER true)
+    Q_PROPERTY(int hovering READ isHovering WRITE setHovering USER true)
     Q_PROPERTY(int showHelp READ isShowHelp WRITE setShowHelp USER true)
     Q_PROPERTY(int showATISS READ isShowATISS WRITE setShowATISS USER true)
     Q_PROPERTY(int showANTISS READ isShowANTISS WRITE setShowANTISS USER true)
@@ -118,6 +119,7 @@ class AllPlotWindow : public GcChartWindow
 
         // get properties - the setters are below
         bool isStacked() const { return showStack->isChecked(); }
+        bool isHovering() const { return showHover->isChecked(); }
         bool isBySeries() const { return showBySeries->isChecked(); }
         int _stackWidth() const { return stackWidth; }
         int isShowGrid() const { return showGrid->checkState(); }
@@ -180,6 +182,7 @@ class AllPlotWindow : public GcChartWindow
         void setrSmoothingFromLineEdit();
         void setStackWidth(int x);
         void setShowNP(int state);
+        void setHovering(int state);
         void setShowATISS(int state);
         void setShowANTISS(int state);
         void setShowXP(int state);
@@ -293,6 +296,7 @@ class AllPlotWindow : public GcChartWindow
         // Common controls
         QGridLayout *controlsLayout;
         QCheckBox *showStack;
+        QCheckBox *showHover;
         QCheckBox *showBySeries;
         QCheckBox *showGrid;
         QCheckBox *showFull;

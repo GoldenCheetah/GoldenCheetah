@@ -6471,8 +6471,8 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         //replot();
     }
 
-    // we have intervals selected so no need to mouse over
-    if (context->athlete->intervalWidget->selectedItems().count()) return;
+    // we don't want hoveing or we have intervals selected so no need to mouse over
+    if (!window->showHover->isChecked() || context->athlete->intervalWidget->selectedItems().count()) return;
 
     if (!context->isCompareIntervals && rideItem && rideItem->ride()) {
 

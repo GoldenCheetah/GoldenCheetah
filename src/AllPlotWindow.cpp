@@ -179,9 +179,13 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showFull->setCheckState(Qt::Checked);
     guiControls->addRow(new QLabel(""), showFull);
 
-    showInterval = new QCheckBox(tr("Intervals"), this);
+    showInterval = new QCheckBox(tr("Interval Navigator"), this);
     showInterval->setCheckState(Qt::Checked);
     guiControls->addRow(new QLabel(""), showInterval);
+
+    showHover = new QCheckBox(tr("Hover intervals"), this);
+    showHover->setCheckState(Qt::Checked);
+    guiControls->addRow(new QLabel(""), showHover);
 
     showHelp = new QCheckBox(tr("Overlay"), this);
     showHelp->setCheckState(Qt::Unchecked);
@@ -2105,6 +2109,12 @@ AllPlotWindow::hideSelection()
         allPlot->standard->allMarker2->setVisible(false);
         allPlot->replot();
     }
+}
+
+void
+AllPlotWindow::setHovering(int value)
+{
+    showHover->setChecked(value);
 }
 
 void
