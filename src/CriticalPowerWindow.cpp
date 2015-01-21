@@ -33,6 +33,7 @@
 #include "MUWidget.h"
 #include "HelpWhatsThis.h"
 #include "TabView.h" // stylesheet
+#include "RideCache.h"
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_picker.h>
@@ -1207,9 +1208,9 @@ CriticalPowerWindow::rideSelected()
         } else {
             cpPlot->setDateCP(0);
         }
-        if (context->athlete->paceZones()) {
-            int paceZoneRange = context->athlete->paceZones()->whichRange(currentRide->dateTime.date());
-            double CV = paceZoneRange >= 0.0 ? context->athlete->paceZones()->getCV(paceZoneRange) : 0.0;
+        if ((currentRide->isRun || currentRide->isSwim) && context->athlete->paceZones(currentRide->isSwim)) {
+            int paceZoneRange = context->athlete->paceZones(currentRide->isSwim)->whichRange(currentRide->dateTime.date());
+            double CV = paceZoneRange >= 0.0 ? context->athlete->paceZones(currentRide->isSwim)->getCV(paceZoneRange) : 0.0;
             cpPlot->setDateCV(CV);
         } else {
             cpPlot->setDateCV(0.0);
@@ -1615,16 +1616,29 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
         }
 
         // lets work out the average CV configure value
-        if (context->athlete->paceZones()) {
-            int fromZoneRange = context->athlete->paceZones()->whichRange(cfrom);
-            int toZoneRange = context->athlete->paceZones()->whichRange(cto);
+        FilterSet fs;
+        fs.addFilter(searchBox->isFiltered(), QStringList(filter()));
+        fs.addFilter(context->isfiltered, context->filters);
+        fs.addFilter(context->ishomefiltered, context->homeFilters);
+        int nActivities, nRides, nRuns, nSwims;
+        context->athlete->rideCache->getRideTypeCounts(
+                                        Specification(dateRange, fs),
+                                        nActivities, nRides, nRuns, nSwims);
+        if (((nActivities == nRuns) || (nActivities == nSwims)) &&
+             context->athlete->paceZones(nActivities == nSwims)) {
+            int fromZoneRange = context->athlete->paceZones(nActivities == nSwims)->whichRange(cfrom);
+            int toZoneRange = context->athlete->paceZones(nActivities == nSwims)->whichRange(cto);
 
-            double CVfrom = fromZoneRange >= 0 ? context->athlete->paceZones()->getCV(fromZoneRange) : 0.0;
-            double CVto = toZoneRange >= 0 ? context->athlete->paceZones()->getCV(toZoneRange) : CVfrom;
+            double CVfrom = fromZoneRange >= 0 ? context->athlete->paceZones(nActivities == nSwims)->getCV(fromZoneRange) : 0.0;
+            double CVto = toZoneRange >= 0 ? context->athlete->paceZones(nActivities == nSwims)->getCV(toZoneRange) : CVfrom;
             if (CVfrom == 0.0) CVfrom = CVto;
             double dateCV = (CVfrom + CVto) / 2.0;
 
             cpPlot->setDateCV(dateCV);
+            cpPlot->setSport(nActivities == nRuns, nActivities == nSwims);
+        } else {
+            cpPlot->setDateCV(0.0);
+            cpPlot->setSport(false, false);
         }
 
         cpPlot->setDateRange(dateRange.from, dateRange.to);

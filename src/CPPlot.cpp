@@ -57,7 +57,8 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     model(0), modelVariant(0),
 
     // state
-    context(context), bestsCache(NULL), rideSeries(RideFile::watts), 
+    context(context), bestsCache(NULL), dateCV(0.0), isRun(false), isSwim(false),
+    rideSeries(RideFile::watts),
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
     showBest(true), showPercent(false), showHeat(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
@@ -570,10 +571,10 @@ CPPlot::plotModel()
 
             } else if (rideSeries == RideFile::kph) {
 
-                // Rank field is reused for pace
-                bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
-                QString paceunit = metricPace ? tr("min/km") : tr("min/mi");
-                cpw->titleRank->setText(paceunit);
+                const PaceZones *zones = (isRun || isSwim) ? context->athlete->paceZones(isSwim) : NULL;
+                // Rank field is reused for pace according to sport
+                bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), true).toBool() : true;
+                cpw->titleRank->setText(zones ? zones->paceUnits(metricPace) : "n/a");
 
                 //DPrime
                 cpw->wprimeTitle->setText(tr("D'"));
@@ -583,13 +584,13 @@ CPPlot::plotModel()
                 //CV
                 cpw->cpTitle->setText(tr("CV"));
                 cpw->cpValue->setText(QString(tr("%1 kph")).arg(pdModel->CP(), 0, 'f', 1));
-                cpw->cpRank->setText(kphToPace(pdModel->CP(), metricPace));
+                cpw->cpRank->setText(zones ? zones->kphToPaceString(pdModel->CP(), metricPace) : "n/a");
 
                 //FTP
                 cpw->ftpTitle->setText(tr("FTV"));
                 if (pdModel->hasFTP()) {
                     cpw->ftpValue->setText(QString(tr("%1 kph")).arg(pdModel->FTP(), 0, 'f', 1));
-                    cpw->ftpRank->setText(kphToPace(pdModel->FTP(), metricPace));
+                    cpw->ftpRank->setText(zones ? zones->kphToPaceString(pdModel->FTP(), metricPace) : "n/a");
 
                 } else {
 
@@ -601,7 +602,7 @@ CPPlot::plotModel()
                 cpw->pmaxTitle->setText(tr("Vmax"));
                 if (pdModel->hasPMax()) {
                     cpw->pmaxValue->setText(QString(tr("%1 kph")).arg(pdModel->PMax(), 0, 'f', 1));
-                    cpw->pmaxRank->setText(kphToPace(pdModel->PMax(), metricPace));
+                    cpw->pmaxRank->setText(zones ? zones->kphToPaceString(pdModel->PMax(), metricPace) : "n/a");
 
                 } else  {
                     cpw->pmaxValue->setText(tr("n/a"));
@@ -862,7 +863,7 @@ CPPlot::getBestDates()
 
 // plot the bests curve and refresh the data if needed too
 void
-CPPlot::plotBests()
+CPPlot::plotBests(RideItem *rideItem)
 {
     // we already drew the bests, if you want them again
     // you need to wipe away whats there buddy
@@ -870,7 +871,7 @@ CPPlot::plotBests()
 
     // do we need to get the cache ?
     if (bestsCache == NULL) {
-        bestsCache = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode);
+        bestsCache = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode, rideItem);
     }
 
     // how much we got ?
@@ -1123,7 +1124,7 @@ CPPlot::plotBests()
 
             // set zones from shading CV
             QList <double> pace_zone;
-            int n_zones = context->athlete->paceZones()->lowsFromCV(&pace_zone, shadingCV);
+            int n_zones = context->athlete->paceZones(isSwim)->lowsFromCV(&pace_zone, shadingCV);
 
             // now run through each zone and create a curve
             int high = maxNonZero - 1;
@@ -1172,7 +1173,7 @@ CPPlot::plotBests()
                 // now the labels
                 if (shadeMode) {
 
-                    QwtText text(context->athlete->paceZones()->getDefaultZoneName(zone));
+                    QwtText text(context->athlete->paceZones(isSwim)->getDefaultZoneName(zone));
                     text.setFont(QFont("Helvetica", 20, QFont::Bold));
                     color.setAlpha(255);
                     text.setColor(color);
@@ -1531,7 +1532,16 @@ CPPlot::setRide(RideItem *rideItem)
     // MAKE SURE BESTS IS UP TO DATE FIRST AS WE REFERENCE IT
     // first make sure the bests cache is up to date as we may need it
     // if plotting in percentage mode, so get data and plot it now
-    plotBests();
+    // delete if sport changed
+    if (!rangemode && (rideItem->isRun != isRun || rideItem->isSwim != isSwim)) {
+        setSport(rideItem->isRun, rideItem->isSwim);
+        delete bestsCache;
+        bestsCache = NULL;
+        clearCurves();
+        plotBests(rideItem);
+    } else {
+        plotBests(NULL);
+    }
 
     // Plot Sustained Efforts
     plotEfforts();
@@ -1639,12 +1649,10 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         if (curve == heatCurve) units2 = QString(tr("Activities"));
 
         // for speed series add pace with units according to settings
-        if (criticalSeries == CriticalPowerWindow::kph) {
-            bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
-            QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
-            // yAxis doesn't obey units yet
-            // when fixed, change true to: context->athlete->useMetricUnits
-            paceStr = QString("\n%1 %2").arg(true ? kphToPace(yvalue, metricPace) : mphToPace(yvalue, metricPace)).arg(paceunit);
+        if (criticalSeries == CriticalPowerWindow::kph && (isRun || isSwim)) {
+            const PaceZones *zones = context->athlete->paceZones(isSwim);
+            bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), true).toBool() : true;
+            paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace)).arg(zones->paceUnits(metricPace));
         }
 
         // output the tooltip

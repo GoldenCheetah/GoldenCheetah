@@ -154,7 +154,7 @@ class RideFileCache
 
         // Construct a ridefile cache that represents the data
         // across a date range. This is used to provide aggregated data.
-        RideFileCache(Context *context, QDate start, QDate end, bool filter = false, QStringList files = QStringList(), bool onhome = true);
+        RideFileCache(Context *context, QDate start, QDate end, bool filter = false, QStringList files = QStringList(), bool onhome = true, RideItem *rideItem = NULL);
 
         // once a cache is loaded we can refresh from in-memory if needed
         void refresh(RideFile*ride = NULL);

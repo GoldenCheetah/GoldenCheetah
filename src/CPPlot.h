@@ -76,6 +76,7 @@ class CPPlot : public QwtPlot
         void setVeloCP(int x) { veloCP = x; }
         void setDateCP(int x) { dateCP = x; }
         void setDateCV(double x) { dateCV = x; }
+        void setSport(bool run, bool swim) { isRun = run; isSwim = swim; }
         void setSeries(CriticalPowerWindow::CriticalSeriesType);
         void setPlotType(int index);
         void setModel(int sanI1, int sanI2, int anI1, int anI2, 
@@ -123,7 +124,7 @@ class CPPlot : public QwtPlot
 
         // plotters
         void plotRide(RideItem *);
-        void plotBests();
+        void plotBests(RideItem *);
         void plotEfforts();
         void plotModel();
         void plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline); // for compare date range models
@@ -148,6 +149,7 @@ class CPPlot : public QwtPlot
         int veloCP;
         int dateCP;
         double dateCV;
+        bool isRun, isSwim;
         QTime lastupdate;
 
         // settings
