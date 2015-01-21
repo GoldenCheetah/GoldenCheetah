@@ -26,12 +26,13 @@ CalDAV::CalDAV(Context *context) : context(context), mode(None)
     connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestReply(QNetworkReply*)));
 
     connect(nam, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this,
-        SLOT(userpass(QNetworkReply*,QAuthenticator*)));
+            SLOT(userpass(QNetworkReply*,QAuthenticator*)));
+    connect(nam, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this,
+            SLOT(sslErrors(QNetworkReply*,QList<QSslError>)));
+
+    googleCalDAVurl = "https://apidata.googleusercontent.com/caldav/v2/%1/events/";
 
     getConfig();
-
-//    connect(nam, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this,
-//        SLOT(sslErrors(QNetworkReply*,QList<QSslError>)));
 }
 
 
@@ -51,10 +52,12 @@ void CalDAV::getConfig() {
 //
 
 bool
-CalDAV::download()
+CalDAV::download(bool ignoreErrors)
 {
     getConfig();
+    ignoreDownloadErrors = ignoreErrors;
     mode = Events;
+
     if (calDavType == Standard) {
         return doDownload();
     } else { // calDavType = GOOGLE
@@ -68,14 +71,22 @@ bool
 CalDAV::doDownload()
 {
 
-    QString url;
+    QString url; QString calID;
     if (calDavType == Standard) {
         url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
     } else { // calDavType = GOOGLE
-        url =  QString("https://apidata.googleusercontent.com/caldav/v2/%1/events/")
-                .arg(appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "").toString());
+        calID = appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "").toString();
+        url =  googleCalDAVurl.arg(calID);
     }
-    if (url == "") return false; // not configured
+
+    // check if we have an useful URL (not space and not the Google Default without CalID
+    if ((url == "" && calDavType == Standard) || (calID == "" && calDavType == Google)) {
+        if (!ignoreDownloadErrors) {
+             QMessageBox::warning(context->mainWindow, tr("Missing Preferences"), tr("CalID or CalDAV Url is missing in preferences"));
+        }
+        mode = None;
+        return false;
+    }
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
 
@@ -108,7 +119,9 @@ CalDAV::doDownload()
     mode = Events;
     QNetworkReply *reply = nam->sendCustomRequest(request, "REPORT", query);
     if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(context->mainWindow, tr("CalDAV REPORT url error"), reply->errorString());
+        if (!ignoreDownloadErrors) {
+            QMessageBox::warning(context->mainWindow, tr("CalDAV REPORT url error"), reply->errorString());
+        }
         mode = None;
         return false;
     }
@@ -248,7 +261,7 @@ icalcomponent *createEvent(RideItem *rideItem)
         rideItem->setDirty(true); // need to save this!
     }
     icalproperty *uid = icalproperty_new_uid(id.toLatin1());
-    icalcomponent_add_property(event, uid); 
+    icalcomponent_add_property(event, uid);
 
     //
     // START DATE
@@ -386,14 +399,20 @@ CalDAV::doUpload(RideItem *rideItem)
     // is this a valid ride?
     if (!rideItem || !rideItem->ride()) return false;
 
-    QString url;
+    QString url; QString calID;
     if (calDavType == Standard) {
         url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
     } else { // calDavType = GOOGLE
-        url =  QString("https://apidata.googleusercontent.com/caldav/v2/%1/events/")
-                .arg(appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "").toString());
+        calID = appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "").toString();
+        url =  googleCalDAVurl.arg(calID);
     }
-    if (url == "") return false; // not configured
+
+    // check if we have an useful URL (not space and not the Google Default without CalID
+    if ((url == "" && calDavType == Standard) || (calID == "" && calDavType == Google)) {
+        QMessageBox::warning(context->mainWindow, tr("Missing Preferences"), tr("CalID or CalDAV Url is missing in preferences"));
+        mode = None;
+        return false;
+    }
 
     // if URL does not end with "/" - just  add it (for convenience)
     if (!url.endsWith("/")) {
@@ -434,6 +453,14 @@ CalDAV::requestReply(QNetworkReply *reply)
 {
     QString response = reply->readAll();
 
+    if (reply->error() != QNetworkReply::NoError) {
+        if (!(mode == Events && ignoreDownloadErrors)) {
+            QMessageBox::warning(context->mainWindow, tr("CalDAV Calendar API reply error"), reply->errorString());
+        }
+        mode = None;
+        return; // silently
+    }
+
     switch (mode) {
     case Report:
     case Events:
@@ -462,12 +489,25 @@ CalDAV::userpass(QNetworkReply*,QAuthenticator*a)
 }
 
 //
-// Trap SSL errors, does nothing ... for now
+// Trap SSL errors
 //
 void
-CalDAV::sslErrors(QNetworkReply*,QList<QSslError>&)
+CalDAV::sslErrors(QNetworkReply* reply ,QList<QSslError>& errors)
 {
+    QString errorString = "";
+    foreach (const QSslError e, errors ) {
+        if (!errorString.isEmpty())
+            errorString += ", ";
+        errorString += e.errorString();
+    }
+    if (!(mode == Events && ignoreDownloadErrors)) {
+        QMessageBox::warning(context->mainWindow, tr("HTTP"), tr("SSL error(s) has occurred: %1").arg(errorString));
+        mode = None;
+        reply->ignoreSslErrors();
+    }
 }
+
+
 
 //
 // gets Google Calendar Access Token (from Refresh Token)
@@ -476,7 +516,13 @@ void
 CalDAV::requestGoogleAccessTokenToExecute() {
 
     QString refresh_token = appsettings->cvalue(context->athlete->cyclist, GC_GOOGLE_CALENDAR_REFRESH_TOKEN, "").toString();
-    if (refresh_token == "") return;
+    if (refresh_token == "") {
+        if (!(mode == Events && ignoreDownloadErrors)) {
+            QMessageBox::warning(context->mainWindow, tr("Missing Preferences"), tr("Authorization for Google CalDAV is missing in preferences"));
+        }
+        mode = None;
+        return;
+    }
 
     // get a valid access token
     QByteArray data;
@@ -534,10 +580,11 @@ CalDAV::googleNetworkRequestFinished(QNetworkReply* reply)   {
 
         } else { // something failed
 
-            QString error = QString(tr("Error retrieving access token"));
-            QMessageBox oautherr(QMessageBox::Critical, tr("Authorization Error"), error);
-            oautherr.setDetailedText(error);
-            oautherr.exec();
+            if (!(mode == Events && ignoreDownloadErrors)) {
+                QMessageBox::warning(context->mainWindow, tr("Authorization Error"), tr("Error requesting access token"));
+            };
+            mode = None;
+            return;
         }
     }
 
