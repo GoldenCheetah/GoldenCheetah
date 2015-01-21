@@ -492,7 +492,7 @@ CalDAV::userpass(QNetworkReply*,QAuthenticator*a)
 // Trap SSL errors
 //
 void
-CalDAV::sslErrors(QNetworkReply* reply ,QList<QSslError>& errors)
+CalDAV::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
 {
     QString errorString = "";
     foreach (const QSslError e, errors ) {
