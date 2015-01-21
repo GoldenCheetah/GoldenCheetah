@@ -187,7 +187,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 #ifdef GC_HAVE_ICAL
     rideCalendar = new ICalendar(context); // my local/remote calendar entries
     davCalendar = new CalDAV(context); // remote caldav
-    davCalendar->download(); // refresh the diary window
+    davCalendar->download(true); // refresh the diary window but do not show any error messages
 #endif
 
     //.INTERVALS TREE -- transitionary
