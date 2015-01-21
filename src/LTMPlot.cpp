@@ -214,6 +214,7 @@ LTMPlot::setData(LTMSettings *set)
     timer.start();
 
     curveColors->isolated = false;
+    isolation = false;
 
     //qDebug()<<"Starting.."<<timer.elapsed();
 
@@ -1202,7 +1203,7 @@ LTMPlot::setData(LTMSettings *set)
 
     //qDebug()<<"Final tidy.."<<timer.elapsed();
 
-    // update colours etc for plot chrome
+    // update colours etc for plot chrome will also save state
     configChanged(CONFIG_APPEARANCE);
 
     // plot
