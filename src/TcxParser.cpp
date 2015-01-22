@@ -63,6 +63,11 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
         // if caller is looking for rides...
         if (rides) rides->append(rideFile);
 
+        // Sport ("Biking", "Running", "Other")
+        QString sport = qAttributes.value("Sport");
+        if (sport == "Biking") rideFile->setTag("Sport", "Bike");
+        else if (sport == "Running") rideFile->setTag("Sport", "Run");
+
     } else if (qName == "Lap") {
 
     // Use the time of the first lap as the time of the activity.
