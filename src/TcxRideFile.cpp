@@ -68,8 +68,12 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
 
     // activities, we just serialise one ride
     QString sport = ride->getTag("Sport", "Biking");
-    if (sport == QObject::tr("Biking") || sport == QObject::tr("Cycling") || sport == QObject::tr("Cycle") || sport == QObject::tr("Bike")) {
+    if (sport == "Bike" || sport == tr("Bike") || sport == "Biking" || sport == "Cycling" || sport == "Cycle") {
         sport = "Biking";
+    } else if (sport == "Run" || sport == tr("Run") || sport == "Running") {
+        sport = "Running";
+    } else {
+        sport = "Other";
     }
     QDomElement activities = doc.createElement("Activities");
     tcx.appendChild(activities);
