@@ -23,7 +23,10 @@
 
 #include "RideFile.h"
 
-struct TcxFileReader : public RideFileReader {
+class TcxFileReader : public RideFileReader {
+    Q_DECLARE_TR_FUNCTIONS(TcxFileReader)
+    public:
+
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
     QByteArray toByteArray(Context *context, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad) const;
     bool writeRideFile(Context *context, const RideFile *ride, QFile &file) const;
