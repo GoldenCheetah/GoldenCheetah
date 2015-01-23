@@ -111,7 +111,7 @@ class GCColor : public QObject
         // for styling things with current preferences
         static bool isFlat();
         static QLinearGradient linearGradient(int size, bool active, bool alternate=false);
-        static QString css(bool trend=false);
+        static QString css(bool ridesummary=true);
         static QPalette palette();
         static QString stylesheet();
         static void readConfig();
