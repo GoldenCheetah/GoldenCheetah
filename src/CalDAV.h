@@ -26,6 +26,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QSslSocket>
 
 // diag messages
 #include <QMessageBox>
