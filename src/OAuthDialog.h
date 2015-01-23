@@ -31,6 +31,7 @@
 #include <QtWebKit>
 #include <QWebView>
 #include <QWebFrame>
+#include <QSslSocket>
 
 // QUrl split into QUrlQuerty in QT5
 #if QT_VERSION > 0x050000
