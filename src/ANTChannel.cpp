@@ -281,6 +281,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
     bool savemessage = true; // flag to stop lastmessage being
                              // overwritten for standard power
                              // messages
+    bool telemetry=false;
 
     unsigned char *message=ant_message+2;
     double timestamp=get_timestamp();
@@ -314,6 +315,9 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
         checkCinqo();
         checkMoxy();
 
+        // TODO in some case ? eg a cadence sensor we have telemetry too
+        //telemetry = true;
+
     } else if (MESSAGE_IS_MANUFACTURER(message)) {
 
         mi.first_time_manufacturer= false;
@@ -323,7 +327,12 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
         product_id=MANUFACTURER_MODEL_NUMBER_ID(message);
         checkCinqo();
 
-    } else {
+    }
+    else {
+        telemetry = true;
+    }
+
+    if (telemetry) {
         //
         // We got some telemetry on this channel
         //
@@ -359,7 +368,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                                 // will be zero
                                 srm_offset = antMessage.srmOffset;
                                 is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
-                                parent->setCadence(0);
+                                parent->setSecondaryCadence(0);
                                 value2=value=0;
                                 break;
 
@@ -404,7 +413,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         if (power >= 0 && power < 2501 && cadence >=0 && cadence < 256) {
                             value2 = value = power;
                             is_alt ? parent->setAltWatts(power) : parent->setWatts(power);
-                            parent->setCadence(cadence);
+                            parent->setSecondaryCadence(cadence);
                         }
 
                     } else {
@@ -413,7 +422,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         if (nullCount >= 4) { // 4 messages on an SRM
                             value2 = value = 0;
                             is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
-                            parent->setCadence(0);
+                            parent->setSecondaryCadence(0);
                         }
                     }
                 }
@@ -467,12 +476,12 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         stdNullCount = 0;
                         is_alt ? parent->setAltWatts(antMessage.instantPower) : parent->setWatts(antMessage.instantPower);
                         value2 = value = antMessage.instantPower;
-                        parent->setCadence(antMessage.instantCadence); // cadence
+                        parent->setSecondaryCadence(antMessage.instantCadence); // cadence
                         antMessage.pedalPowerContribution ? parent->setLRBalance(antMessage.pedalPower) : parent->setLRBalance(0);
                     } else {
                        stdNullCount++;
                        if (stdNullCount >= 6) { //6 for standard power according to specs
-                           parent->setCadence(0);
+                           parent->setSecondaryCadence(0);
                            is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
                            parent->setLRBalance(0);
                            value2 = value = 0;
@@ -525,14 +534,14 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         float cadence = 2048.0 * 60.0 * events / period;
                         float power = 3.14159 * nm_torque * cadence / 30;
 
-                        parent->setCadence(cadence);
+                        parent->setSecondaryCadence(cadence);
                         is_alt ? parent->setAltWatts(power) : parent->setWatts(power);
                         value2 = value = power;
 
                     } else {
                         nullCount++;
                         if (nullCount >= 4) { // 4 on a quarq according to specs
-                            parent->setCadence(0);
+                            parent->setSecondaryCadence(0);
                             is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
                             value2 = value = 0;
                         }
@@ -668,7 +677,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                     parent->setWatts(antMessage.vortexPower);
                     // cadence is only supplied in some range, only set if valid value
                     if (antMessage.vortexCadence)
-                        parent->setCadence(antMessage.vortexCadence);
+                        parent->setSecondaryCadence(antMessage.vortexCadence);
                 }
             }
             break;
