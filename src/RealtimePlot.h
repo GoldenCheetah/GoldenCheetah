@@ -30,6 +30,7 @@
 #include <qwt_scale_div.h>
 #include <qwt_scale_widget.h>
 #include "Settings.h"
+#include "Context.h"
 
 
 #define MAXSAMPLES 300
@@ -294,7 +295,7 @@ class RealtimePlot : public QwtPlot
     RealtimehhbData *hhbData;
     Realtimesmo2Data *smo2Data;
 
-    RealtimePlot();
+    RealtimePlot(Context *context);
     int smooth;
 
     public slots:
@@ -310,6 +311,9 @@ class RealtimePlot : public QwtPlot
     void showtHb(int state);
     void showSmO2(int state);
     void setSmoothing(int value);
+
+    private:
+    Context *context;
 };
 
 
