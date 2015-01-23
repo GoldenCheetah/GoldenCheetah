@@ -404,6 +404,8 @@ RideSummaryWindow::htmlSummary()
     if (!ride && !ridesummary) return ""; // didn't parse!
 
     bool useMetricUnits = context->athlete->useMetricUnits;
+    bool metricRunPace = appsettings->value(this, GC_PACE, true).toBool();
+    bool metricSwimPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
 
     // ride summary and there were ridefile read errors?
     if (ridesummary && !ride) {
@@ -667,7 +669,9 @@ RideSummaryWindow::htmlSummary()
                  else s = s.arg(context->athlete->rideCache->getAggregate(symbol, specification, useMetricUnits));
 
              } else {
-                 if (m->units(useMetricUnits) != "") s = s.arg(" (" + m->units(useMetricUnits) + ")");
+                 if (m->internalName() == "Pace" || m->internalName() == "xPace") s = s.arg(" (" + m->units(metricRunPace) + ")");
+                 else if (m->internalName() == "Pace Swim" || m->internalName() == "xPace Swim") s = s.arg(" (" + m->units(metricSwimPace) + ")");
+                 else if (m->units(useMetricUnits) != "") s = s.arg(" (" + m->units(useMetricUnits) + ")");
                  else s = s.arg("");
 
                  // temperature is a special case, if it is not present fall back to metadata tag
@@ -682,8 +686,7 @@ RideSummaryWindow::htmlSummary()
                  } else if (m->internalName().startsWith("Pace") || m->internalName().startsWith("xPace")) { // pace is mm:ss
 
                     double pace;
-                    bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
-
+                    bool metricPace = m->internalName().contains("Swim") ? metricSwimPace : metricRunPace;
                     if (ridesummary) pace  = rideItem->getForSymbol(symbol) * (metricPace ? 1 : m->conversion()) + (metricPace ? 0 : m->conversionSum());
                     else  pace = context->athlete->rideCache->getAggregate(symbol, specification, metricPace).toDouble();
                     s = s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
@@ -979,7 +982,6 @@ RideSummaryWindow::htmlSummary()
 
                 QHash<QString,RideMetricPtr> metrics =
                     RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), intervalMetrics);
-                bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
 
                 if (firstRow) {
                     summary += "<tr>";
@@ -993,6 +995,7 @@ RideSummaryWindow::htmlSummary()
                         summary += "<td align=\"center\" valign=\"bottom\">" + m->name();
                         if (m->internalName().startsWith("Pace") || m->internalName().startsWith("xPace")) { // pace is mm:ss
 
+                            bool metricPace = m->internalName().contains("Swim") ? metricSwimPace : metricRunPace;
                             summary += " (" + m->units(metricPace) + ")";
                         
                         } else if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds")) {
@@ -1058,6 +1061,7 @@ RideSummaryWindow::htmlSummary()
                         summary += s.arg(time_to_string(m->value(useMetricUnits)));
                     else if (m->internalName().startsWith("Pace") || m->internalName().startsWith("xPace")) { // pace is mm:ss
 
+                        bool metricPace = m->internalName().contains("Swim") ? metricSwimPace : metricRunPace;
                         double pace  = m->value(metricPace);
                         summary += s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
 
