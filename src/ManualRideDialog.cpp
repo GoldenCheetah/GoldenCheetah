@@ -450,7 +450,9 @@ ManualRideDialog::okClicked()
     }
     if (avgKPH->value()) {
         QMap<QString,QString> override;
-        override.insert("value", QString("%1").arg(avgKPH->value()));
+        // Avg Speed is shown according to units preferences
+        double kph = (context->athlete->useMetricUnits ? 1.0 : KM_PER_MILE) * avgKPH->value();
+        override.insert("value", QString("%1").arg(kph));
         rideFile->metricOverrides.insert("average_speed", override);
     }
     if (avgWatts->value()) {
