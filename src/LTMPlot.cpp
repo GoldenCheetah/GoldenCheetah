@@ -143,13 +143,13 @@ void
 LTMPlot::configChanged(qint32)
 {
     // set basic plot colors
-    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    setCanvasBackground(GColor(CTRENDPLOTBACKGROUND));
     QPen gridPen(GColor(CPLOTGRID));
     //gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
 
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     setPalette(palette);

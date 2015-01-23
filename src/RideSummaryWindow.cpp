@@ -139,7 +139,8 @@ RideSummaryWindow::~RideSummaryWindow()
 void
 RideSummaryWindow::configChanged(qint32)
 {
-    setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
+    if (ridesummary) setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
+    else setProperty("color", GColor(CTRENDPLOTBACKGROUND)); // called on config change
 
     QFont defaultFont;
     defaultFont.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
@@ -328,7 +329,7 @@ RideSummaryWindow::refresh()
         // if we're summarising a ride but have no ride to summarise
         if (ridesummary && !myRideItem) {
             setSubTitle(tr("Summary"));
-	        rideSummary->page()->mainFrame()->setHtml(GCColor::css());
+	        rideSummary->page()->mainFrame()->setHtml(GCColor::css(ridesummary));
             return;
         }
 
@@ -390,7 +391,7 @@ QString
 RideSummaryWindow::htmlSummary()
 {
     QString summary("");
-    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor bgColor = ridesummary ? GColor(CPLOTBACKGROUND) : GColor(CTRENDPLOTBACKGROUND);
     //QColor fgColor = GCColor::invertColor(bgColor);
     QColor altColor = GCColor::alternateColor(bgColor);
 
@@ -415,7 +416,7 @@ RideSummaryWindow::htmlSummary()
     }
 
     // set those colors
-    summary = GCColor::css();
+    summary = GCColor::css(ridesummary);
     summary += "<center>";
 
     // device summary for ride summary, otherwise how many activities?
@@ -546,7 +547,8 @@ RideSummaryWindow::htmlSummary()
             if (ridesummary) {
 
                 // for rag reporting
-                QColor defaultColor = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                QColor defaultColor = ridesummary ? GCColor::invertColor(GColor(CPLOTBACKGROUND)) :
+                                                    GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND));
 
                 // get the Coggan PMC and add values for date of ride
                 summary += QString(tr("<tr><td>CTL:</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
@@ -1539,7 +1541,7 @@ RideSummaryWindow::htmlCompareSummary() const
 {
     QString summary;
 
-    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor bgColor = ridesummary ? GColor(CPLOTBACKGROUND) : GColor(CTRENDPLOTBACKGROUND);
     //QColor fgColor = GCColor::invertColor(bgColor);
     QColor altColor = GCColor::alternateColor(bgColor);
 
@@ -1651,7 +1653,7 @@ RideSummaryWindow::htmlCompareSummary() const
         }
 
         // LETS FORMAT THE HTML
-        summary = GCColor::css();
+        summary = GCColor::css(ridesummary);
         summary += "<center>";
 
         //
@@ -1919,7 +1921,7 @@ RideSummaryWindow::htmlCompareSummary() const
     } else { // DATE RANGE COMPARE
 
         // LETS FORMAT THE HTML
-        summary = GCColor::css();
+        summary = GCColor::css(ridesummary);
         summary += "<center>";
 
         // get metric details here ...

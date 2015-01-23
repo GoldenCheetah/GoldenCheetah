@@ -57,7 +57,7 @@ LTMWindow::LTMWindow(Context *context) :
 
     // the stack of plots
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
 
     plotsWidget = new QWidget(this);
     plotsWidget->setPalette(palette);
@@ -613,7 +613,7 @@ LTMWindow::useThruToday()
 void
 LTMWindow::refresh()
 {
-    setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
+    setProperty("color", GColor(CTRENDPLOTBACKGROUND)); // called on config change
 
     // not if in compare mode
     if (isCompare()) return; 
@@ -816,6 +816,14 @@ LTMWindow::applyClicked()
         settings.start = start;
         settings.end = end;
 
+        // Set the specification
+        FilterSet fs;
+        fs.addFilter(context->isfiltered, context->filters);
+        fs.addFilter(context->ishomefiltered, context->homeFilters);
+        fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
+        settings.specification.setFilterSet(fs);
+        settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
+
         ltmTool->applySettings();
         refresh();
     }
@@ -910,7 +918,7 @@ LTMWindow::dataTable(bool html)
     // now set to new (avoids a weird crash)
     QString summary;
 
-    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor bgColor = GColor(CTRENDPLOTBACKGROUND);
     QColor altColor = GCColor::alternateColor(bgColor);
 
     // html page prettified with a title
