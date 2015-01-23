@@ -508,20 +508,28 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 void
 CriticalPowerWindow::configChanged(qint32)
 {
-    setProperty("color", GColor(CPLOTBACKGROUND));
+    if (rangemode) setProperty("color", GColor(CTRENDPLOTBACKGROUND));
+    else setProperty("color", GColor(CPLOTBACKGROUND));
 
     // tinted palette for headings etc
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    if (rangemode) palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    else palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     setPalette(palette);
 
     // inverted palette for data etc
     QPalette whitepalette;
-    whitepalette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    if (rangemode) {
+        whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
+    } else {
+        whitepalette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    }
 
     QFont font;
     font.setPointSize(12); // reasonably big

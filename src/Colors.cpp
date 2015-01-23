@@ -63,6 +63,7 @@ void GCColor::setupColors()
     Colors init[CNUMOFCFGCOLORS+1] = {
         { tr("Plot Background"), "COLORPLOTBACKGROUND", QColor(52,52,52) },
         { tr("Ride Plot Background"), "COLORRIDEPLOTBACKGROUND", QColor(52,52,52) },
+        { tr("Trend Plot Background"), "COLORTRENDPLOTBACKGROUND", Qt::black },
         { tr("Train Plot Background"), "COLORTRAINPLOTBACKGROUND", Qt::black },
         { tr("Plot Symbols"), "COLORRIDEPLOTSYMBOLS", Qt::cyan },
         { tr("Ride Plot X Axis"), "COLORRIDEPLOTXAXIS", Qt::blue },
@@ -337,9 +338,9 @@ ColorEngine::colorFor(QString text)
 }
 
 QString
-GCColor::css()
+GCColor::css(bool ridesummary)
 {
-    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor bgColor = ridesummary ? GColor(CPLOTBACKGROUND) : GColor(CTRENDPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);
     //QColor altColor = GCColor::alternateColor(bgColor); // not yet ?
 
@@ -598,6 +599,7 @@ GCColor::applyTheme(int index)
 
         case CPLOTBACKGROUND:
         case CRIDEPLOTBACKGROUND:
+        case CTRENDPLOTBACKGROUND:
         case CTRAINPLOTBACKGROUND:
             color = theme.colors[0]; // background color
             break;

@@ -205,7 +205,7 @@ GcWindow::GcWindow()
     menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
     menuButton->hide();
 
-    menuButton->move(0,0);
+    menuButton->move(1,1);
 }
 
 GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(None) 
@@ -241,8 +241,8 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
     menuButton->setMenu(menu);
     menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
 
-    //menuButton->hide();
-    menuButton->move(0,0);
+    menuButton->hide();
+    menuButton->move(1,1);
 }
 
 GcWindow::~GcWindow()
@@ -325,10 +325,15 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
 
         // border
         painter.setBrush(Qt::NoBrush);
-        if (underMouse()) {
+        if (underMouse() && property("style") == 2) {
 
             QPixmap sized = closeImage.scaled(QSize(contentsMargins().top()-6,
                                                     contentsMargins().top()-6));
+            QRect all(0,0,width()-1,height()-1);
+            QPen pen(GColor(CPLOTMARKER));
+            pen.setWidth(1);
+            painter.setPen(pen);
+            painter.drawRect(all);
 
         } else {
             painter.setPen(Qt::darkGray);
@@ -338,7 +343,8 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         // background light gray for now?
         QRect all(0,0,width(),height());
         if (property("isManager").toBool() == true) {
-            painter.fillRect(all, QColor("#B3B4BA"));
+            //painter.fillRect(all, QColor("#B3B4BA"));
+            painter.fillRect(all, GColor(CPLOTBACKGROUND));
         }
     }
 }

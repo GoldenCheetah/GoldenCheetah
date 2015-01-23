@@ -129,7 +129,8 @@ void
 PowerHist::configChanged(qint32)
 {
     // plot background
-    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    if (rangemode) setCanvasBackground(GColor(CTRENDPLOTBACKGROUND));
+    else setCanvasBackground(GColor(CPLOTBACKGROUND));
 
     // curve
     QPen pen;
@@ -185,7 +186,8 @@ PowerHist::configChanged(qint32)
     }
 
     // use a linear gradient
-    brush_color.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
+    if (rangemode) brush_color.setAlpha(GColor(CTRENDPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
+    else brush_color.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
     QColor brush_color1 = brush_color.darker();
     QLinearGradient linearGradient(0, 0, 0, height());
     linearGradient.setColorAt(0.0, brush_color);
@@ -207,7 +209,8 @@ PowerHist::configChanged(qint32)
     ivl.setWidth(width);
     curveSelected->setPen(ivl);
     QColor ivlbrush = GColor(CINTERVALHIGHLIGHTER);
-    ivlbrush.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
+    if (rangemode) ivlbrush.setAlpha(GColor(CTRENDPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
+    else ivlbrush.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
     curveSelected->setBrush(ivlbrush);   // fill below the line
 
     // hover curve
@@ -215,7 +218,8 @@ PowerHist::configChanged(qint32)
     hvl.setWidth(width);
     curveHover->setPen(hvl);
     QColor hvlbrush = QColor(Qt::darkGray);
-    hvlbrush.setAlpha((GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200));
+    if (rangemode) hvlbrush.setAlpha((GColor(CTRENDPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200));
+    else hvlbrush.setAlpha((GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200));
     curveHover->setBrush(hvlbrush);   // fill below the line
 
     // grid
@@ -224,7 +228,8 @@ PowerHist::configChanged(qint32)
     grid->setPen(gridPen);
 
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    if (rangemode) palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    else palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     setPalette(palette);
@@ -1477,7 +1482,8 @@ PowerHist::setDataFromCompare()
         newCurve->setPen(pen);
 
         QColor brush_color = color;
-        brush_color.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 120 : 200);
+        if (rangemode) brush_color.setAlpha(GColor(CTRENDPLOTBACKGROUND) == QColor(Qt::white) ? 120 : 200);
+        else brush_color.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 120 : 200);
         QColor brush_color1 = brush_color.darker();
         //QLinearGradient linearGradient(0, 0, 0, height());
         //linearGradient.setColorAt(0.0, brush_color);
@@ -1589,7 +1595,8 @@ PowerHist::setDataFromCompare(QString totalMetric, QString distMetric)
         newCurve->setPen(pen);
 
         QColor brush_color = cd.color;
-        brush_color.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 120 : 200);
+        if (rangemode) brush_color.setAlpha(GColor(CTRENDPLOTBACKGROUND) == QColor(Qt::white) ? 120 : 200);
+        else brush_color.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 120 : 200);
         QColor brush_color1 = brush_color.darker();
         //QLinearGradient linearGradient(0, 0, 0, height());
         //linearGradient.setColorAt(0.0, brush_color);

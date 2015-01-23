@@ -207,7 +207,7 @@ TreeMapWindow::refresh()
 {
     if (!amVisible()) return;
 
-    setProperty("color", GColor(CPLOTBACKGROUND));
+    setProperty("color", GColor(CTRENDPLOTBACKGROUND));
 
     // refresh for changes to ridefiles / zones
     if (active == false) {

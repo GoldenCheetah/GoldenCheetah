@@ -112,7 +112,8 @@ void
 CPPlot::configChanged(qint32)
 {
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    if (rangemode) palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    else palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     setPalette(palette);
@@ -121,7 +122,8 @@ CPPlot::configChanged(qint32)
     axisWidget(QwtPlot::yLeft)->setPalette(palette);
     axisWidget(QwtPlot::yRight)->setPalette(palette);
 
-    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    if (rangemode) setCanvasBackground(GColor(CTRENDPLOTBACKGROUND));
+    else setCanvasBackground(GColor(CPLOTBACKGROUND));
 }
 
 // get the fonts and colors right for the axis scales
