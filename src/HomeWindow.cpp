@@ -194,6 +194,13 @@ HomeWindow::configChanged(qint32)
 //#ifndef Q_OS_MAC
     tileArea->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
 //#endif
+    QPalette palette;
+    palette.setBrush(backgroundRole(), GColor(CPLOTBACKGROUND));
+    setPalette(palette);
+    tileWidget->setPalette(palette);
+    tileArea->setPalette(palette);
+    winWidget->setPalette(palette);
+    winArea->setPalette(palette);
 }
 
 void
