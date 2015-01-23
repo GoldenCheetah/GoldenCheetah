@@ -603,6 +603,7 @@ void DialWindow::seriesChanged()
                  .arg(background.name())
                  .arg(foreground.name());
     valueLabel->setStyleSheet(sh);
+    repaint();
 }
 
 void

@@ -74,6 +74,7 @@ class RealtimePlotWindow : public GcWindow
 
         // trap signals
         void telemetryUpdate(RealtimeData rtData); // got new data
+        void configChanged(qint32);
         void start();
         void stop();
         void pause();

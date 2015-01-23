@@ -92,7 +92,7 @@ RealtimePlotWindow::RealtimePlotWindow(Context *context) :
     cl->addStretch();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    rtPlot = new RealtimePlot();
+    rtPlot = new RealtimePlot(context);
     layout->addWidget(rtPlot);
 
     // common controls
@@ -111,6 +111,7 @@ RealtimePlotWindow::RealtimePlotWindow(Context *context) :
 
     // get updates..
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // lets initialise all the smoothing variables
     hrtot = hrindex = cadtot = cadindex = spdtot = spdindex = alttot = altindex = powtot = powindex = 0;
@@ -122,6 +123,13 @@ RealtimePlotWindow::RealtimePlotWindow(Context *context) :
 
     // set to zero
     telemetryUpdate(RealtimeData());
+}
+
+void
+RealtimePlotWindow::configChanged(qint32)
+{
+    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    repaint();
 }
 
 void

@@ -212,7 +212,7 @@ QRectF RealtimehhbData::boundingRect() const
 //void RealtimeLodData::addData(double v) { lodData[lodCur++] = v; if (lodCur==50) lodCur=0; }
 
 
-RealtimePlot::RealtimePlot() : 
+RealtimePlot::RealtimePlot(Context *context) : 
     pwrCurve(NULL),
     showPowerState(Qt::Checked),
     showPow30sState(Qt::Checked),
@@ -224,7 +224,8 @@ RealtimePlot::RealtimePlot() :
     showHHbState(Qt::Checked),
     showtHbState(Qt::Checked),
     showSmO2State(Qt::Checked),
-    smooth(0)
+    smooth(0),
+    context(context)
 {
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     pwr30Data = new Realtime30PwrData;
@@ -360,6 +361,10 @@ RealtimePlot::RealtimePlot() :
 //    lodCurve->attach(this);
 //    lodCurve->setYAxis(QwtPlot::yLeft);
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
+
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+    // set to current config
     configChanged(CONFIG_APPEARANCE); // set colors
 }
 
@@ -422,6 +427,8 @@ RealtimePlot::configChanged(qint32)
     QPen thbpen = QPen(GColor(CTHB));
     thbpen.setWidth(width);
     thbCurve->setPen(thbpen);
+
+    replot();
 }
 
 void
