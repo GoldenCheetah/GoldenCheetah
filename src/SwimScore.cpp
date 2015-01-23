@@ -289,6 +289,17 @@ class SwimScore : public RideMetric {
         assert(stp);
         double normWork = xPowerSwim->value(true) * xPowerSwim->count();
         double rawGOVSS = normWork * sri->value(true);
+        // No samples in manual workouts, use power at average speed and duration
+        if (rawGOVSS == 0.0) {
+            // unconst naughty boy, get athlete's data
+            RideFile *uride = const_cast<RideFile*>(ride);
+            double weight = uride->getWeight();
+            assert(deps.contains("average_speed"));
+            assert(deps.contains("time_riding"));
+            double watts = swimming_power(weight, deps.value("average_speed")->value(true) / 3.6);
+            double secs = deps.value("time_riding")->value(true);
+            rawGOVSS = watts * secs;
+        }
         double workInAnHourAtSTP = stp->value(true) * 3600;
         score = workInAnHourAtSTP ? rawGOVSS / workInAnHourAtSTP * 100.0 : 0;
 
@@ -307,6 +318,8 @@ static bool addAllSwimScore() {
     deps.append("swimscore_tp");
     RideMetricFactory::instance().addMetric(SRI(), &deps);
     deps.append("swimscore_ri");
+    deps.append("average_speed");
+    deps.append("time_riding");
     RideMetricFactory::instance().addMetric(SwimScore(), &deps);
     return true;
 }
