@@ -80,7 +80,7 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
 // thread and is part of the GC architecture NOT related to the
 // hardware controller.
 //
-ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent), devConf(devConf)
+ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent), devConf(devConf), lastCadenceMessage(NULL)
 {
     qRegisterMetaType<ANTMessage>("ANTMessage");
     qRegisterMetaType<uint16_t>("uint16_t");
@@ -795,7 +795,7 @@ ANT::processMessage(void) {
 
     ANTMessage m(this, rxMessage); // for debug!
 
-//fprintf(stderr, "<< receive: ");
+//fprintf(stderr, "<< receive %i: ", rxMessage[ANT_OFFSET_CHANNEL_NUMBER]);
 //for(int i=0; i<m.length+3; i++) fprintf(stderr, "%02x ", m.data[i]);
 //fprintf(stderr, "\n");
 
