@@ -1586,6 +1586,7 @@ ColorsPage::applyThemeClicked()
 
             case CPLOTBACKGROUND:
             case CRIDEPLOTBACKGROUND:
+            case CTRENDPLOTBACKGROUND:
             case CTRAINPLOTBACKGROUND:
                 color = theme.colors[0]; // background color
                 break;
