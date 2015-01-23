@@ -437,7 +437,7 @@ DiarySidebar::setSummary()
 //********************************************************************************
 GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context), master(master)
 {
-    setContentsMargins(0,0,0,0);
+    setContentsMargins(1,1,1,1);
     setAutoFillBackground(true);
     setObjectName("miniCalendar");
 
@@ -654,7 +654,13 @@ GcMiniCalendar::event(QEvent *e)
         QPainter painter(this);
         QRect all(0,0,width(),height());
         //painter.fillRect(all, QColor("#B3B4BA"));
-        painter.fillRect(all, QColor(Qt::white));
+        painter.fillRect(all, GColor(CPLOTBACKGROUND));
+
+        if (_ride) {
+            QDate when = _ride->dateTime.date();
+            if (when >= QDate(year,month,01) && when < QDate(year,month,01).addMonths(1))
+            painter.fillRect(all, GColor(CPLOTMARKER));
+        }
     }
 
     int n=0;
