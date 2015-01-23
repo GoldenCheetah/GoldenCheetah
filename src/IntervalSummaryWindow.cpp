@@ -220,6 +220,8 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
 void IntervalSummaryWindow::summary(RideFile &f, QString name, QString &html)
 {
     bool metricUnits = context->athlete->useMetricUnits;
+    bool metricRunPace = appsettings->value(this, GC_PACE, true).toBool();
+    bool metricSwimPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
 
     if (f.dataPoints().size() == 0) {
         // Interval empty, do not compute any metrics
@@ -258,16 +260,21 @@ void IntervalSummaryWindow::summary(RideFile &f, QString name, QString &html)
         if (m->units(metricUnits) == "seconds" ||
             m->units(metricUnits) == tr("seconds"))
             html += s.arg(time_to_string(m->value(metricUnits)));
-        else if (m->internalName() == "Pace" || m->internalName() == "xPace") {
-            bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
-            html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricPace)*60).toString("mm:ss"));
-        } else
+        else if (m->internalName() == "Pace" || m->internalName() == "xPace")
+            html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricRunPace)*60).toString("mm:ss"));
+        else if (m->internalName() == "Pace Swim" || m->internalName() == "xPace Swim")
+            html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricSwimPace)*60).toString("mm:ss"));
+        else
             html += s.arg(m->value(metricUnits), 0, 'f', m->precision(metricUnits));
 
         html += "<td align=\"left\" valign=\"bottom\">";
         if (m->units(metricUnits) == "seconds" ||
             m->units(metricUnits) == tr("seconds"))
             ; // don't do anything
+        else if (m->internalName() == "Pace" || m->internalName() == "xPace")
+            html += m->units(metricRunPace);
+        else if (m->internalName() == "Pace Swim" || m->internalName() == "xPace Swim")
+            html += m->units(metricSwimPace);
         else if (m->units(metricUnits).size() > 0)
             html += m->units(metricUnits);
         html += "</td>";
@@ -283,6 +290,8 @@ void IntervalSummaryWindow::calcInterval(RideFileInterval interval, QString& htm
 	const RideFile* ride = context->ride ? context->ride->ride() : NULL;
 
     bool metricUnits = context->athlete->useMetricUnits;
+    bool metricRunPace = appsettings->value(this, GC_PACE, true).toBool();
+    bool metricSwimPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
 
     RideFile f(const_cast<RideFile*>(ride));
     int start = ride->timeIndex(interval.start);
@@ -342,16 +351,21 @@ void IntervalSummaryWindow::calcInterval(RideFileInterval interval, QString& htm
         if (m->units(metricUnits) == "seconds" ||
             m->units(metricUnits) == tr("seconds"))
             html += s.arg(time_to_string(m->value(metricUnits)));
-        else if (m->internalName() == "Pace" || m->internalName() == "xPace") {
-            bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
-            html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricPace)*60).toString("mm:ss"));
-        } else
+        else if (m->internalName() == "Pace" || m->internalName() == "xPace")
+            html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricRunPace)*60).toString("mm:ss"));
+        else if (m->internalName() == "Pace Swim" || m->internalName() == "xPace Swim")
+            html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricSwimPace)*60).toString("mm:ss"));
+        else
             html += s.arg(m->value(metricUnits), 0, 'f', m->precision(metricUnits));
 
         html += "<td align=\"left\" valign=\"bottom\">";
         if (m->units(metricUnits) == "seconds" ||
             m->units(metricUnits) == tr("seconds"))
             ; // don't do anything
+        else if (m->internalName() == "Pace" || m->internalName() == "xPace")
+            html += m->units(metricRunPace);
+        else if (m->internalName() == "Pace Swim" || m->internalName() == "xPace Swim")
+            html += m->units(metricSwimPace);
         else if (m->units(metricUnits).size() > 0)
             html += m->units(metricUnits);
         html += "</td>";
