@@ -342,6 +342,18 @@ class GOVSS : public RideMetric {
         assert(rtp);
         double normWork = lnp->value(true) * lnp->count();
         double rawGOVSS = normWork * iwf->value(true);
+        // No samples in manual workouts, use power at average speed and duration
+        if (rawGOVSS == 0.0) {
+            // unconst naughty boy, get athlete's data
+            RideFile *uride = const_cast<RideFile*>(ride);
+            double weight = uride->getWeight();
+            double height = uride->getHeight();
+            assert(deps.contains("average_speed"));
+            assert(deps.contains("time_riding"));
+            double watts = running_power(weight, height, deps.value("average_speed")->value(true) / 3.6);
+            double secs = deps.value("time_riding")->value(true);
+            rawGOVSS = watts * secs;
+        }
         double workInAnHourAtRTP = rtp->value(true) * 3600;
         score = workInAnHourAtRTP ? rawGOVSS / workInAnHourAtRTP * 100.0 : 0;
 
@@ -360,6 +372,8 @@ static bool addAllGOVSS() {
     deps.append("govss_rtp");
     RideMetricFactory::instance().addMetric(IWF(), &deps);
     deps.append("govss_iwf");
+    deps.append("average_speed");
+    deps.append("time_riding");
     RideMetricFactory::instance().addMetric(GOVSS(), &deps);
     return true;
 }
