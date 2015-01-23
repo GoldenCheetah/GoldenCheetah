@@ -584,8 +584,10 @@ Themes::Themes()
 
 }
 
+// NOTE: this is duplicated in Pages.cpp:1565:ColorsPage::applyThemeClicked()
+//       you need to change there too. Sorry.
 void
-GCColor::applyTheme(int index)
+GCColor::applyTheme(int index) 
 {
     // now get the theme selected
     ColorTheme theme = GCColor::themes().themes[index];
