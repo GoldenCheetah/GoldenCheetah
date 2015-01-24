@@ -352,7 +352,8 @@ class GOVSS : public RideMetric {
             assert(deps.contains("time_riding"));
             double watts = running_power(weight, height, deps.value("average_speed")->value(true) / 3.6);
             double secs = deps.value("time_riding")->value(true);
-            rawGOVSS = watts * secs;
+            double iwf = rtp->value(true) ? watts / rtp->value(true) : 0.0;
+            rawGOVSS = watts * secs * iwf;
         }
         double workInAnHourAtRTP = rtp->value(true) * 3600;
         score = workInAnHourAtRTP ? rawGOVSS / workInAnHourAtRTP * 100.0 : 0;
