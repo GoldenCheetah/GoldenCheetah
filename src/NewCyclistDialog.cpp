@@ -208,7 +208,7 @@ NewCyclistDialog::saveClicked()
                 athleteHome->createAllSubdirs();
 
                 // new Athlete/new Directories - no Upgrade required
-                appsettings->setCValue(name->text(), GC_UPGRADE_311_FOLDER_SUCCESS, true);
+                appsettings->setCValue(name->text(), GC_UPGRADE_FOLDER_SUCCESS, true);
 
                 // nice sidebars please!
                 appsettings->setCValue(name->text(), "splitter/LTM/hide", true);
