@@ -38,7 +38,7 @@ GcUpgrade::upgradeConfirmedByUser(const QDir &home)
 
     // since the upgrade can fail / multiple times, don't rely on the "lastUpdated" version,
     // but track the "upgrade success" separately in the settings on user level
-    bool folderUpgradeSuccess =  appsettings->cvalue(home.dirName(), GC_UPGRADE_311_FOLDER_SUCCESS, false).toBool();
+    bool folderUpgradeSuccess =  appsettings->cvalue(home.dirName(), GC_UPGRADE_FOLDER_SUCCESS, false).toBool();
 
     if (!folderUpgradeSuccess) {
 
@@ -324,7 +324,7 @@ GcUpgrade::upgrade(const QDir &home)
     }
 
     //----------------------------------------------------------------------
-    // 3.11 upgrade processing
+    // 3.2 (formerly 3.11) upgrade processing
     //----------------------------------------------------------------------
 
     if (last < VERSION311_BUILD) {
@@ -334,13 +334,13 @@ GcUpgrade::upgrade(const QDir &home)
     }
 
     //----------------------------------------------------------------------
-    // 3.11 new subfolder introduction and upgrade processing
+    // 3.2 new subfolder introduction and upgrade processing
     //----------------------------------------------------------------------
 
 
     // now the special "folder structure" upgrade - which is tracked separately on success
 
-    bool folderUpgradeSuccess =  appsettings->cvalue(home.dirName(), GC_UPGRADE_311_FOLDER_SUCCESS, false).toBool();
+    bool folderUpgradeSuccess =  appsettings->cvalue(home.dirName(), GC_UPGRADE_FOLDER_SUCCESS, false).toBool();
     if (!folderUpgradeSuccess) {
 
         errorCount = 0;
@@ -516,7 +516,7 @@ int
 GcUpgrade::upgradeLate(Context *context)
 {
     // check the special "folder structure" upgrade - which is tracked separately on success
-    bool folderUpgradeSuccess =  appsettings->cvalue(context->athlete->home->root().dirName(), GC_UPGRADE_311_FOLDER_SUCCESS, false).toBool();
+    bool folderUpgradeSuccess =  appsettings->cvalue(context->athlete->home->root().dirName(), GC_UPGRADE_FOLDER_SUCCESS, false).toBool();
     if (!folderUpgradeSuccess) {
 
         // 1. convert the rest of activities to .json and move the converted ones to /imports
@@ -596,7 +596,7 @@ GcUpgrade::upgradeLate(Context *context)
         // Total Number of errors
         if (errorCount == 0) {
            upgradeLog->append(QString(tr("Summary: No errors detected - upgrade successful" )),3);
-           appsettings->setCValue(context->athlete->home->root().dirName(), GC_UPGRADE_311_FOLDER_SUCCESS, true);
+           appsettings->setCValue(context->athlete->home->root().dirName(), GC_UPGRADE_FOLDER_SUCCESS, true);
         } else {
             upgradeLog->append(QString(tr("Summary: %1 errors detected - please check log details before proceeding" ))
                   .arg(QString::number(errorCount)),3);
@@ -609,11 +609,11 @@ GcUpgrade::upgradeLate(Context *context)
                                           "successful - and had no more errors.</center>")),2);
 
             upgradeLog->append(QString(tr("<center><br>Latest information about possible upgrade problems and concepts to resolve them are available in the<br>"
-                                         "<a href= \"https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.11_Troubleshooting_Guide\" target=\"_blank\">"
-                                         "Upgrade v3.11 Troubleshooting Guide<a>")),1);
+                                         "<a href= \"https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.2_Troubleshooting_Guide\" target=\"_blank\">"
+                                         "Upgrade v3.2 Troubleshooting Guide<a>")),1);
 
             // document that upgrade failed at least one time
-            appsettings->setCValue(context->athlete->home->root().dirName(), GC_UPGRADE_311_FOLDER_SUCCESS, false);
+            appsettings->setCValue(context->athlete->home->root().dirName(), GC_UPGRADE_FOLDER_SUCCESS, false);
 
         }
 
@@ -721,8 +721,8 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
     text->setTextFormat(Qt::RichText);
     text->setText(tr("<center><b>Backup your 'Athlete' data first!<br>"
                      "<b>Please read carefully before proceeding!</b></center> <br> <br>"
-                     "With Version 3.11 the 'Athlete' directory has been refactored "
-                     "by adding a set of subdirectory which hold the different types "
+                     "With Version 3.2 the 'Athlete' directory has been refactored "
+                     "by adding a set of subdirectories which hold the different types "
                      "of GoldenCheetah files.<br><br>"
                      "The new structure is:<br>"
                      "-> Activity/Ride files: <samp>/activities</samp><br>"
@@ -744,7 +744,7 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
                      "all activity/ride files will be converted to GoldenCheetah's native "
                      "file format .JSON and moved to the <br><samp>/activities</samp> folder. The source files "
                      "are moved to the <samp>/imports</samp> folder.<br><br>"
-                     "Starting with version 3.11 all downloads from devices or imported "
+                     "Starting with version 3.2 all downloads from devices or imported "
                      "activity/ride files will be converted to GoldenCheetah's file "
                      "format during import/download. The original files will be stored - depending on the source - "
                      "in <samp>/downloads</samp> or <br><samp>/imports</samp> folder.<br><br>"
@@ -798,7 +798,7 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
     QLabel *header = new QLabel(this);
     header->setWordWrap(true);
     header->setTextFormat(Qt::RichText);
-    header->setText(tr("<h1>Upgrade log: GoldenCheetah v3.11</h1>"));
+    header->setText(tr("<h1>Upgrade log: GoldenCheetah v3.2</h1>"));
 
     toprow->addWidget(information);
     toprow->addWidget(header);
