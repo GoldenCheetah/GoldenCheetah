@@ -298,7 +298,8 @@ class SwimScore : public RideMetric {
             assert(deps.contains("time_riding"));
             double watts = swimming_power(weight, deps.value("average_speed")->value(true) / 3.6);
             double secs = deps.value("time_riding")->value(true);
-            rawGOVSS = watts * secs;
+            double sri = stp->value(true) ? watts / stp->value(true) : 0.0;
+            rawGOVSS = watts * secs * sri;
         }
         double workInAnHourAtSTP = stp->value(true) * 3600;
         score = workInAnHourAtSTP ? rawGOVSS / workInAnHourAtSTP * 100.0 : 0;
