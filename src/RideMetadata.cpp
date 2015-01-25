@@ -479,25 +479,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     case FIELD_TEXT : // text
     case FIELD_SHORTTEXT : // shorttext
 
-        if (field.values.count()) {
-            if (field.values.count() == 1 && field.values.at(0) == "*") {
-
-                // get the metdata values from the metric db ....
-                QStringList values;
-
-                // set values from whatever we have done in the past
-                completer = new QCompleter(values, this);
-                completer->setCaseSensitivity(Qt::CaseInsensitive);
-                completer->setCompletionMode(QCompleter::InlineCompletion);
-
-            } else {
-
-                // user specified restricted values
-                completer = new QCompleter(field.values, this);
-                completer->setCaseSensitivity(Qt::CaseInsensitive);
-                completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-            }
-        }
+        completer = field.getCompleter(this);
         widget = new QLineEdit(this);
         dynamic_cast<QLineEdit*>(widget)->setCompleter(completer);
 
@@ -975,6 +957,32 @@ FieldDefinition::fingerprint(QList<FieldDefinition> list)
     }
 
     return qChecksum(ba, ba.length());
+}
+
+QCompleter *
+FieldDefinition::getCompleter(QObject *parent)
+{
+    QCompleter *completer = NULL;
+    if (values.count()) {
+        if (values.count() == 1 && values.at(0) == "*") {
+
+            // get the metdata values from the metric db ....
+            QStringList past_values;
+
+            // set values from whatever we have done in the past
+            completer = new QCompleter(past_values, parent);
+            completer->setCaseSensitivity(Qt::CaseInsensitive);
+            completer->setCompletionMode(QCompleter::InlineCompletion);
+
+        } else {
+
+            // user specified restricted values
+            completer = new QCompleter(values, parent);
+            completer->setCaseSensitivity(Qt::CaseInsensitive);
+            completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+        }
+    }
+    return completer;
 }
 
 unsigned long
