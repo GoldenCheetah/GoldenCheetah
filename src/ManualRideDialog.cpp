@@ -23,6 +23,7 @@
 #include "RideCache.h"
 #include "RideItem.h"
 #include "Settings.h"
+#include "RideMetadata.h"
 #include <string.h>
 #include <errno.h>
 #include <QtGui>
@@ -164,6 +165,17 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     wcode = new QLineEdit(this);
     QLabel *notesLabel = new QLabel(tr("Notes:"), this);
     notes = new QTextEdit(this);
+
+    // Set completer for Sport and Workout Code fields
+    RideMetadata *rideMetadata = context->athlete->rideMetadata();
+    if (rideMetadata) {
+        foreach (FieldDefinition field, rideMetadata->getFields()) {
+            if (field.name == "Sport")
+                sport->setCompleter(field.getCompleter(this));
+            else if (field.name == "Workout Code")
+                wcode->setCompleter(field.getCompleter(this));
+        }
+    }
 
     // METRICS
 
