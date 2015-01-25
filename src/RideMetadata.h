@@ -65,6 +65,7 @@ class FieldDefinition
         QStringList values; // autocomplete 'defaults'
 
         static unsigned long fingerprint(QList<FieldDefinition>);
+        QCompleter *getCompleter(QObject *parent);
 
         FieldDefinition() : tab(""), name(""), type(0), diary(false), values() {}
         FieldDefinition(QString tab, QString name, int type, bool diary, QStringList values)
