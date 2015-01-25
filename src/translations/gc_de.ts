@@ -66,14 +66,40 @@
 <context>
     <name>AbsWattagePage</name>
     <message>
+        <location filename="../WorkoutWizard.cpp" line="278"/>
+        <source>Workout Wizard</source>
+        <translation>Workout Assistent</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="279"/>
+        <source>Absolute Wattage Workout Creator</source>
+        <translation>Workout erstellen: Absolute Leistung</translation>
+    </message>
+    <message>
         <location filename="../WorkoutWizard.cpp" line="283"/>
         <source>Minutes</source>
         <translation>Minuten</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="284"/>
+        <location filename="../WorkoutWizard.cpp" line="291"/>
         <source>Wattage</source>
         <translation>Leistung</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="292"/>
+        <source>Time (minutes)</source>
+        <translation>Zeit (Minuten)</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="364"/>
+        <source>Save Workout</source>
+        <translation>Workout speichern</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="365"/>
+        <source>Computrainer Format *.erg</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6536,12 +6562,12 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     </message>
     <message>
         <location filename="../RideMetadata.cpp" line="461"/>
-        <location filename="../RideMetadata.cpp" line="548"/>
+        <location filename="../RideMetadata.cpp" line="530"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
     <message>
-        <location filename="../RideMetadata.cpp" line="667"/>
+        <location filename="../RideMetadata.cpp" line="649"/>
         <source>You entered &apos;%1&apos; which is not an expected value.</source>
         <translatorcomment>?? Bessere Formulierung??</translatorcomment>
         <translation>%1 ist kein erwarteter Wert.</translation>
@@ -7999,9 +8025,51 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>GradientPage</name>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="552"/>
+        <location filename="../WorkoutWizard.cpp" line="545"/>
+        <source>Workout Wizard</source>
+        <translation>Workout Assistent</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="547"/>
+        <source>Manually crate a workout based on gradient (slope) and distance, maximum grade is 5.</source>
+        <translation>Workout manuell basierend auf Steigung und Strecke erstellen - maximale Steigung ist 5.</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="553"/>
+        <location filename="../WorkoutWizard.cpp" line="589"/>
+        <source>KM</source>
+        <translation>km</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="553"/>
+        <location filename="../WorkoutWizard.cpp" line="589"/>
+        <source>Miles</source>
+        <translation>Meilen</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="554"/>
         <source>Grade</source>
         <translation>Neigung</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="591"/>
+        <source>Meters Gained</source>
+        <translation>Höhenmeter</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="591"/>
+        <source>Feet Gained</source>
+        <translation>Höhe in Fuss</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="600"/>
+        <source>Save Workout</source>
+        <translation>Workout speichern</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="601"/>
+        <source>Computrainer Format *.crs</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9983,14 +10051,99 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>ImportPage</name>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="660"/>
+        <location filename="../WorkoutWizard.cpp" line="638"/>
+        <source>Workout Wizard</source>
+        <translation>Workout Assistent</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="639"/>
+        <source>Import current ride as a Gradient Ride (slope based)</source>
+        <translation>Importiere aktuelle Trainingseinheite as Steigungstrainingseinheit</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="644"/>
+        <source>KM</source>
+        <translation>km</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="644"/>
+        <source>Miles</source>
+        <translation>Meilen</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="645"/>
+        <source>Distance (</source>
+        <translation>Distanz (</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="647"/>
+        <source>Meters</source>
+        <translation>Meter</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="647"/>
+        <source>Feet</source>
+        <translation>Fuß</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="648"/>
+        <source>elevation (</source>
+        <translation>Höhe (</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="662"/>
         <source>Ride Smoothing Parameters</source>
         <translation>Glättungs-Parameter</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="666"/>
+        <location filename="../WorkoutWizard.cpp" line="663"/>
+        <source>Maximum Grade</source>
+        <translation>Maximale Steigung</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="668"/>
         <source>Maximum supported grade is 8</source>
         <translation>Höchster Wert ist 8</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="671"/>
+        <source>Segment Length</source>
+        <translation>Abschnittslänge</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="677"/>
+        <source>Segment length is based on</source>
+        <translation>Abschnittslänge basiert auf </translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="677"/>
+        <source>meters</source>
+        <translation>Meter</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="677"/>
+        <source>feet</source>
+        <translation>Fuß</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="738"/>
+        <source>Elevation Climbed</source>
+        <translation>Aufstiegshöhenmeter</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="739"/>
+        <source>Distance</source>
+        <translation>Distanz</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="751"/>
+        <source>Save Workout</source>
+        <translation>Workout speichern</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="752"/>
+        <source>Computrainer Format *.crs</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12460,127 +12613,127 @@ on and that its display says, &quot;PC Link&quot;</source>
 <context>
     <name>ManualRideDialog</name>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="119"/>
+        <location filename="../ManualRideDialog.cpp" line="120"/>
         <source>Manual Ride Entry</source>
         <translation>Trainingseinheit manuell eingeben</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="138"/>
+        <location filename="../ManualRideDialog.cpp" line="139"/>
         <source>Ride date:</source>
         <translation>Datum:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="142"/>
+        <location filename="../ManualRideDialog.cpp" line="143"/>
         <source>Start time:</source>
         <translation>Startzeit:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="148"/>
+        <location filename="../ManualRideDialog.cpp" line="149"/>
         <source>Duration:</source>
         <translation>Dauer:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="153"/>
+        <location filename="../ManualRideDialog.cpp" line="154"/>
         <source>Distance (%1):</source>
         <translation>Zurückgelegte Distanz (%1):</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="161"/>
+        <location filename="../ManualRideDialog.cpp" line="162"/>
         <source>Sport:</source>
         <translation>Sport:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="163"/>
+        <location filename="../ManualRideDialog.cpp" line="164"/>
         <source>Workout Code:</source>
         <translation>Workout Code:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="165"/>
+        <location filename="../ManualRideDialog.cpp" line="166"/>
         <source>Notes:</source>
         <translation>Bemerkungen:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="171"/>
+        <location filename="../ManualRideDialog.cpp" line="183"/>
         <source>Average HR:</source>
         <translation>ø Herzfrequenz:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="179"/>
+        <location filename="../ManualRideDialog.cpp" line="191"/>
         <source>Average Watts:</source>
         <translation>ø Leistung:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="187"/>
+        <location filename="../ManualRideDialog.cpp" line="199"/>
         <source>Average Cadence:</source>
         <translation>ø Trittfrequenz:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="195"/>
+        <location filename="../ManualRideDialog.cpp" line="207"/>
         <source>Average Speed:</source>
         <translation>ø Geschwindigkeit:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="204"/>
+        <location filename="../ManualRideDialog.cpp" line="216"/>
         <source>Duration</source>
         <translation>Dauer</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="205"/>
+        <location filename="../ManualRideDialog.cpp" line="217"/>
         <source>Distance</source>
         <translation>Distanz</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="206"/>
+        <location filename="../ManualRideDialog.cpp" line="218"/>
         <source>Manually</source>
         <translation>Manuell</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="214"/>
+        <location filename="../ManualRideDialog.cpp" line="226"/>
         <source>Estimate Stress days:</source>
         <translation>Stresstage für Schätzung:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="230"/>
+        <location filename="../ManualRideDialog.cpp" line="242"/>
         <source>Daniel Points: </source>
         <translation>Daniel Points: </translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="237"/>
+        <location filename="../ManualRideDialog.cpp" line="249"/>
         <source>TSS: </source>
         <translation>TSS: </translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="244"/>
+        <location filename="../ManualRideDialog.cpp" line="256"/>
         <source>Work (KJ):</source>
         <translation>Arbeit (kJ):</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="287"/>
+        <location filename="../ManualRideDialog.cpp" line="299"/>
         <source>Metrics</source>
         <translation>Metriken</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="513"/>
+        <location filename="../ManualRideDialog.cpp" line="525"/>
         <source>Unable to save</source>
         <translation>Fehler beim Speichern</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="514"/>
+        <location filename="../ManualRideDialog.cpp" line="526"/>
         <source>There is already an ride with the same start time or you do not have permissions to save a file.</source>
         <translation>Es gibt bereits eine Trainingseinheit mit der derselben Startzeit or Sie haben keine Berechtigung die Datei zu speichern.</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="252"/>
+        <location filename="../ManualRideDialog.cpp" line="264"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="203"/>
+        <location filename="../ManualRideDialog.cpp" line="215"/>
         <source>Estimate Stress by:</source>
         <translation>Schätze Streß anhand von:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="253"/>
+        <location filename="../ManualRideDialog.cpp" line="265"/>
         <source>&amp;Cancel</source>
         <translation>Abbre&amp;chen</translation>
     </message>
@@ -16224,25 +16377,45 @@ yyyy</translation>
 <context>
     <name>RelWattagePage</name>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="416"/>
-        <location filename="../WorkoutWizard.cpp" line="425"/>
+        <location filename="../WorkoutWizard.cpp" line="412"/>
+        <source>Workout Wizard</source>
+        <translation>Workout Assistent</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="413"/>
+        <source>Relative Wattage Workout Wizard, current CP60 = </source>
+        <translation>Workout basierend auf relativer Leistung - aktuelle CP60 = </translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="417"/>
+        <location filename="../WorkoutWizard.cpp" line="426"/>
         <source>% of FTP</source>
         <translation>% der FTP</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="417"/>
+        <location filename="../WorkoutWizard.cpp" line="418"/>
         <source>Time (minutes)</source>
         <translation>Zeit (Minuten)</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="424"/>
+        <location filename="../WorkoutWizard.cpp" line="425"/>
         <source>Minutes</source>
         <translation>Minuten</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="426"/>
+        <location filename="../WorkoutWizard.cpp" line="427"/>
         <source>Wattage</source>
         <translation>Leistung</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="498"/>
+        <source>Save Workout</source>
+        <translation>Workout speichern</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="499"/>
+        <source>Computrainer Format *.mrc</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -21603,7 +21776,7 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../WorkoutWizard.cpp" line="233"/>
         <source>Absolute Wattage</source>
-        <translation>absolute Leistung</translation>
+        <translation>Absolute Leistung</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="235"/>
@@ -21614,6 +21787,16 @@ F3 drücken, wenn fertig.</translation>
         <location filename="../WorkoutWizard.cpp" line="236"/>
         <source>Gradient</source>
         <translation>Steigung</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="240"/>
+        <source>Import Selected Ride (</source>
+        <translation>Importiere ausgewählte Trainingseinheit (</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="243"/>
+        <source>No ride selected</source>
+        <translation>Keine Trainingseinheit ausgewählt</translation>
     </message>
 </context>
 <context>
