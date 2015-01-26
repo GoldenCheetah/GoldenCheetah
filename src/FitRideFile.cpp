@@ -271,14 +271,19 @@ struct FitFileReaderState
                 case 65534: rideFile->setDeviceType("Garmin Connect Website"); break;
                 default: rideFile->setDeviceType(QString("Garmin %1").arg(prod));
             }
-        }
-        else  if (manu == 38) {
+
+        } else  if (manu == 38) {
             switch (prod) {
                 case 1: rideFile->setDeviceType("o_synce navi2coach"); break;
                 default: rideFile->setDeviceType(QString("o_synce %1").arg(prod));
             }
-        }
-        else {
+        } else if (manu == 70) {
+
+            // does not set product at this point
+           rideFile->setDeviceType("Sigmasport ROX");
+        
+        } else {
+
             rideFile->setDeviceType(QString("Unknown FIT Device %1:%2").arg(manu).arg(prod));
         }
         rideFile->setFileFormat("FIT (*.fit)");
