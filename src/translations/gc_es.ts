@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es">
+<TS version="2.1" language="es">
 <context>
     <name>AAvgPower</name>
     <message>
@@ -1297,12 +1297,12 @@ Presione Siguiente para Continuar</translation>
     <message>
         <location filename="../AllPlot.cpp" line="6435"/>
         <source>min/100m</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="6435"/>
         <source>min/100yd</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Peak</source>
@@ -1775,12 +1775,12 @@ Presione Siguiente para Continuar</translation>
     <message>
         <location filename="../AllPlotWindow.cpp" line="182"/>
         <source>Interval Navigator</source>
-        <translation type="unfinished"></translation>
+        <translation>Navegador de Intervalos</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="186"/>
         <source>Hover intervals</source>
-        <translation type="unfinished"></translation>
+        <translation>Sobrevolar Intervalos</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="194"/>
@@ -6827,7 +6827,7 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
     <message>
         <location filename="../ErgFilePlot.cpp" line="240"/>
         <source>CP</source>
-        <translation type="unfinished">PC</translation>
+        <translation>PC</translation>
     </message>
     <message>
         <location filename="../ErgFilePlot.cpp" line="421"/>
@@ -7346,7 +7346,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../Colors.cpp" line="66"/>
         <source>Trend Plot Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Fondo gráficos de Tendencias</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="67"/>
@@ -8043,7 +8043,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../GcCrashDialog.cpp" line="270"/>
         <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Wahoo API&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../GcCrashDialog.cpp" line="456"/>
@@ -8268,7 +8268,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../GcUpgrade.cpp" line="611"/>
         <source>&lt;center&gt;&lt;br&gt;Latest information about possible upgrade problems and concepts to resolve them are available in the&lt;br&gt;&lt;a href= &quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.2_Troubleshooting_Guide&quot; target=&quot;_blank&quot;&gt;Upgrade v3.2 Troubleshooting Guide&lt;a&gt;</source>
-        <translation type="unfinished">&lt;center&gt;&lt;br&gt;La información más actualizada sobre posibles errores de actualización y ayuda para resolverlos disponibles en&lt;br&gt;&lt;a href= &quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.11_Troubleshooting_Guide&quot; target=&quot;_blank&quot;&gt;Upgrade v3.11 Troubleshooting Guide&lt;a&gt; {3.2_?} {3.2 ?}</translation>
+        <translation>&lt;center&gt;&lt;br&gt;La información más actualizada sobre posibles errores de actualización y ayuda para resolverlos disponibles en&lt;br&gt;&lt;a href= &quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.11_Troubleshooting_Guide&quot; target=&quot;_blank&quot;&gt;Upgrade v3.11 Troubleshooting Guide&lt;a&gt; {3.2_?} {3.2 ?}</translation>
     </message>
     <message>
         <source>&lt;center&gt;&lt;br&gt;Latest information about possible upgrade problems and concepts to resolve them are available in the&lt;br&gt;&lt;a href= &quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.11_Troubleshooting_Guide&quot; target=&quot;_blank&quot;&gt;Upgrade v3.11 Troubleshooting Guide&lt;a&gt;</source>
@@ -8295,7 +8295,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../GcUpgrade.cpp" line="722"/>
         <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.2 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectories which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity/Ride files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity/Ride files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantined files: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity/ride files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.2 all downloads from devices or imported activity/ride files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;center&gt;&lt;b&gt;Como primera medida resguarde sus datos de &apos;Atleta&apos;!&lt;br&gt;&lt;b&gt;Por favor lea cuidadosamente antes de continuar!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Con la versión 3.2 el directorioa del &apos;Atleta&apos; ha sido reestructurado agregando un conjunto de subdirectorios que almacenan los diferentes tipos de archivos de GoldenCheetah.&lt;br&gt;&lt;br&gt;La nueva estructura es:&lt;br&gt;-&gt; Archivos de Actividades: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Configuración: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Descarga: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Importación: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Entrenamientos: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de cache: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Calendario: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Registro: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Archivos Temporarios: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;El proceso de actualización creará la nueva estructura de directorios y moverá los archivos existentes a los nuevos directorios. Durante la actualización todos los archivos de actividad serán convertidos al formato nativo GoldenCheetah .JSON y movidos al directorio&lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt;. Los archivos originales se moverán al directorio &lt;samp&gt;/imports&lt;/samp&gt;.&lt;br&gt;&lt;br&gt;Comenzando con la version 3.2 todos los archivos descargados desde cualquier dispositivo o importados serán convertidos al formato GoldenCheetah .JSON durante el proceso. Los archivos originales se almacenaran, dependiendo del origen, en el directorio &lt;samp&gt;/downloads&lt;/samp&gt; o &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt;r.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Por favor asegúrese de tener resguardo de sus datos de atleta antes de continuar con la actualización. No podemos hacernos responsables de cualquier pérdida de datos durante el proceso. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
     </message>
     <message>
         <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.11 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectory which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity/Ride files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity/Ride files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity/ride files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.11 all downloads from devices or imported activity/ride files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
@@ -8334,7 +8334,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../GcUpgrade.cpp" line="801"/>
         <source>&lt;h1&gt;Upgrade log: GoldenCheetah v3.2&lt;/h1&gt;</source>
-        <translation type="unfinished">&lt;h1&gt;Registro de actualización: GoldenCheetah v3.11&lt;/h1&gt; {1&gt;?} {3.2&lt;?} {1&gt;?}</translation>
+        <translation>&lt;h1&gt;Registro de actualización: GoldenCheetah v3.2&lt;/h1&gt;</translation>
     </message>
     <message>
         <location filename="../GcUpgrade.cpp" line="825"/>
@@ -9605,12 +9605,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../HelpWindow.cpp" line="24"/>
         <source>Help Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones de Ayuda</translation>
     </message>
     <message>
         <location filename="../HelpWindow.cpp" line="56"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;Help Options&lt;/h2&gt;&lt;b&gt;&lt;tt&gt;&quot;Shift&quot;+&quot;F1&quot;&lt;/tt&gt;&lt;/b&gt;&lt;br&gt;provides a context specific short description of a feature including the link to the Wiki page explaining more details&lt;hr&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org&quot;&gt;Golden Cheetah Website&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org/#section-tutorials&quot;&gt;Golden Cheetah Website - Video Tutorials&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org/#section-science&quot;&gt;Golden Cheetah Website - Science in Golden Cheetah&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki&quot;&gt;Wiki Overview&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/UG_Main-Page_Users-Guide&quot;&gt;Wiki - User&apos;s Guide&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/FAQ&quot;&gt;Wiki - Frequently Asked Questions&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;Opciones de Ayuda&lt;/h2&gt;&lt;b&gt;&lt;tt&gt;&quot;Mayúscula&quot;+&quot;F1&quot;&lt;/tt&gt;&lt;/b&gt;&lt;br&gt;brinda una descripción contextual resumida de una facilidad incluyendo el enlace a la Wiki donde se pueden encontrar más detalles &lt;hr&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org&quot;&gt;Golden Cheetah Website&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org/#section-tutorials&quot;&gt;Golden Cheetah - Video Tutorials&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org/#section-science&quot;&gt;Golden Cheetah Website - Science in Golden Cheetah&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki&quot;&gt;Wiki Overview&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/UG_Main-Page_Users-Guide&quot;&gt;Wiki - User&apos;s Guide&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/FAQ&quot;&gt;Wiki - Frequently Asked Questions&lt;/a&gt;</translation>
     </message>
 </context>
 <context>
@@ -11568,7 +11568,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <location filename="../LTMPopup.cpp" line="143"/>
         <location filename="../LTMPopup.cpp" line="288"/>
         <source>ddd, dd MMM yy hh:mm</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../LTMPopup.cpp" line="178"/>
@@ -11901,12 +11901,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../LTMTool.cpp" line="304"/>
         <source>Up</source>
-        <translation type="unfinished">Arriba</translation>
+        <translation>Arriba</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="305"/>
         <source>Down</source>
-        <translation type="unfinished">Abajo</translation>
+        <translation>Abajo</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="365"/>
@@ -13819,7 +13819,7 @@ PC del Atleta en %3 vatios</translation>
     <message>
         <location filename="../MainWindow.cpp" line="716"/>
         <source>&amp;Help Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones de &amp;Ayuda</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="720"/>
@@ -16193,17 +16193,17 @@ No rides found to import.
     <message>
         <location filename="../BasicRideMetrics.cpp" line="623"/>
         <source>Pace Swim</source>
-        <translation type="unfinished"></translation>
+        <translation>Ritmo Natación</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="625"/>
         <source>min/100m</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="626"/>
         <source>min/100yd</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -17545,12 +17545,12 @@ Do you want to continue?</source>
     <message>
         <location filename="../PowerHist.cpp" line="2298"/>
         <source>min/100m</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="2298"/>
         <source>min/100yd</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="1731"/>
@@ -18108,22 +18108,22 @@ yyyy</source>
     <message>
         <location filename="../RealtimeData.cpp" line="442"/>
         <source>Left Torque Effectiveness</source>
-        <translation type="unfinished">Eficiencia de Par Izq</translation>
+        <translation>Eficiencia de Par Izq</translation>
     </message>
     <message>
         <location filename="../RealtimeData.cpp" line="445"/>
         <source>Right Torque Effectiveness</source>
-        <translation type="unfinished">Efectividad de Par Der</translation>
+        <translation>Efectividad de Par Der</translation>
     </message>
     <message>
         <location filename="../RealtimeData.cpp" line="448"/>
         <source>Left Pedal Smoothness</source>
-        <translation type="unfinished">Fluidez Pedal Izq</translation>
+        <translation>Fluidez Pedal Izq</translation>
     </message>
     <message>
         <location filename="../RealtimeData.cpp" line="451"/>
         <source>Right Pedal Smoothness</source>
-        <translation type="unfinished">Fluidez Pedal Der</translation>
+        <translation>Fluidez Pedal Der</translation>
     </message>
 </context>
 <context>
@@ -19298,7 +19298,7 @@ Saltando archivo...</translation>
     <message>
         <location filename="../RideFile.cpp" line="2126"/>
         <source>Best</source>
-        <translation type="unfinished">Mejor</translation>
+        <translation>Mejor</translation>
     </message>
 </context>
 <context>
@@ -19652,12 +19652,12 @@ Saltando archivo...</translation>
     <message>
         <location filename="../RideImportWizard.cpp" line="980"/>
         <source>Error - Moving %1 to activities folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Error - Moviendo %1 a la carpeta de actividades</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="987"/>
         <source>Error - Import of activitiy file failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Error - Falló la importación del archivo de actividad</translation>
     </message>
     <message>
         <source>Error - File already imported, but no activity found</source>
@@ -19943,22 +19943,22 @@ Saltando archivo...</translation>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="556"/>
         <source>&lt;tr&gt;&lt;td&gt;CTL:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;&lt;font color=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="560"/>
         <source>&lt;tr&gt;&lt;td&gt;ATL:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;&lt;font color=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="564"/>
         <source>&lt;tr&gt;&lt;td&gt;TSB:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;&lt;font color=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="568"/>
         <source>&lt;tr&gt;&lt;td&gt;RR:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;&lt;font color=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="740"/>
@@ -20111,7 +20111,7 @@ Saltando archivo...</translation>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="637"/>
         <source>&lt;tr&gt;&lt;td&gt;RR:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;%3 (%1 - %2)&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="661"/>
@@ -20526,7 +20526,7 @@ Transcurridos: %1
     <message>
         <location filename="../SwimScore.cpp" line="229"/>
         <source>SRI</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -20534,13 +20534,13 @@ Transcurridos: %1
     <message>
         <location filename="../SwimScore.cpp" line="178"/>
         <source>STP</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../SwimScore.cpp" line="180"/>
         <location filename="../SwimScore.cpp" line="181"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -21108,47 +21108,47 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../ScatterWindow.cpp" line="192"/>
         <source>All intervals/rides</source>
-        <translation type="unfinished"></translation>
+        <translation>Todos los intervalos/actividades</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="193"/>
         <source>First intervals/rides on X-axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Primeros intervalos/actividades en eje X</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="194"/>
         <source>First intervals/rides on Y-axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Primeros intervalos/actividades en eje Y</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="195"/>
         <source>Compare mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Modo Comparación</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="199"/>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="200"/>
         <source>Auto</source>
-        <translation type="unfinished">Automático</translation>
+        <translation>Automático</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="201"/>
         <source>Linear</source>
-        <translation type="unfinished"></translation>
+        <translation>Lineal</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="202"/>
         <source>Trend line</source>
-        <translation type="unfinished"></translation>
+        <translation>Línea de Tendencia</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="209"/>
         <source>Trend</source>
-        <translation type="unfinished"></translation>
+        <translation>Tendencia</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="109"/>
@@ -21159,7 +21159,7 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../ScatterWindow.cpp" line="159"/>
         <source>Smooth</source>
-        <translation type="unfinished">Suavizado</translation>
+        <translation>Suavizado</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="183"/>
