@@ -36,10 +36,10 @@
 
 #define mark() \
 { \
-    addInterval(start, previous->secs + recIntSecs_, \
+    addInterval(start, previous->secs - recIntSecs_, \
                 QString("%1").arg(interval)); \
     interval = point->interval; \
-    start = point->secs; \
+    start = point->secs - recIntSecs_; \
 }
 
 const QChar deltaChar(0x0394);
