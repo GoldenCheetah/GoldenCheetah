@@ -137,6 +137,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Ilja Booij");
     contributors.append("Jaime Jofre");
     contributors.append("Jamie Kimberley");
+    contributors.append("Jan de Visser");
     contributors.append("Jim Ley");
     contributors.append("J&#246;rn Rischm&#252;ller");
     contributors.append("John Ehrlinger");
