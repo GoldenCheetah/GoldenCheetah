@@ -99,6 +99,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("First-Steps_Download-or-import#importing-from-a-file").arg(tr("Import any activity file - supported by Golden Cheetah - mass import is supported here"));
     case MenuBar_Activity_Manual:
         return text.arg("Menu%20Bar_Activity").arg(tr("Manual creation of an activity where the most relevant data can be added in this dialog"));
+    case MenuBar_Activity_Manual_LapsEditor:
+        return text.arg("Menu%20Bar_Activity").arg(tr("Laps Editor allows to enter a sequence of work-rest intervals series -defined by number of repetitions (reps), distance (dist, units according to preferences in Pace Zones) and duration (min and sec)- to generate the data points for the activity"));
     case MenuBar_Activity_Share:
         return text.arg("Special%20Topics_Upload_Download%20to_from%20external%20web-sites#execution")
                 .arg(tr("Sharing an activity with other Ride related sites - only sites for which the authorization has been configured can be seleted for sharing here"));
