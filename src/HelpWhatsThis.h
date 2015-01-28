@@ -50,6 +50,7 @@ Q_OBJECT
                  MenuBar_Activity_Download,
                  MenuBar_Activity_Import,
                  MenuBar_Activity_Manual,
+                 MenuBar_Activity_Manual_LapsEditor,
                  MenuBar_Activity_Share,
                  MenuBar_Activity_BatchExport,
                  MenuBar_Activity_SplitRide,
