@@ -297,6 +297,23 @@ struct FitFileReaderState
             if( value == NA_VALUE )
                 continue;
 
+            switch (field.num) {
+                case 5: // sport field
+                    switch (value) {
+                        case 1: // running:
+                            rideFile->setTag("Sport","Run");
+                            break;
+                        case 2: // cycling
+                            rideFile->setTag("Sport","Bike");
+                            break;
+                        case 5: // swimming
+                            rideFile->setTag("Sport","Swim");
+                            break;
+                    }
+                    break;
+                default: ; // do nothing
+            }
+
             if (FIT_DEBUG) {
                 printf("decodeSession  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
             }
@@ -446,7 +463,7 @@ struct FitFileReaderState
 
         double rvert = 0, rcad = 0, rcontact = 0;
         double smO2 = 0, tHb = 0;
-        bool run=false;
+        //bool run=false;
 
         fit_value_t lati = NA_VALUE, lngi = NA_VALUE;
         int i = 0;
@@ -478,7 +495,7 @@ struct FitFileReaderState
                         hr = value;
                         break;
                 case 4: // CADENCE
-                        if (run)
+                        if (rideFile->getTag("Sport", "Bike") == "Run")
                             rcad = value;
                         else
                             cad = value;
@@ -517,10 +534,10 @@ struct FitFileReaderState
                          rvert = value / 100.0f;
                          break;
 
-                case 40: // ACTIVITY_TYPE
-                         // TODO We should know/test value for run
-                         run = true;
-                         break;
+                //case 40: // ACTIVITY_TYPE
+                //         // TODO We should know/test value for run
+                //         run = true;
+                //         break;
 
                 case 41: // GROUND CONTACT TIME
                          rcontact = value / 10.0f;
@@ -865,7 +882,7 @@ struct FitFileReaderState
                 case 21: decodeEvent(def, time_offset, values); break;
 
                 case 23: //decodeDeviceInfo(def, time_offset, values); break; /* device info */
-                case 18: //decodeSession(def, time_offset, values); break; /* session */
+                case 18: decodeSession(def, time_offset, values); break; /* session */
 
                 case 2: /* DEVICE_SETTINGS */
                 case 3: /* USER_PROFILE */
