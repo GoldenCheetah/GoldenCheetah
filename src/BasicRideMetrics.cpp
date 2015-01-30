@@ -104,11 +104,11 @@ class TimeRiding : public RideMetric {
     TimeRiding() : secsMovingOrPedaling(0.0)
     {
         setSymbol("time_riding");
-        setInternalName("Time Riding");
+        setInternalName("Time Moving");
     }
     bool isTime() const { return true; }
     void initialize() {
-        setName(tr("Time Riding"));
+        setName(tr("Time Moving"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
     }
