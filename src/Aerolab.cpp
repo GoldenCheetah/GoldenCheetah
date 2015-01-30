@@ -907,7 +907,7 @@ QString Aerolab::estimateCdACrr(RideItem *rideItem)
             errMsg = tr("Altitude and Power data must be present");
         }
     } else {
-        errMsg = tr("No ride selected");
+        errMsg = tr("No activity selected");
     }
     return errMsg;
 }

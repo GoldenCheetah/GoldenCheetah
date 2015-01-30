@@ -28,7 +28,7 @@ GenerateHeatMapDialog::GenerateHeatMapDialog(Context *context) : QDialog(context
 {
     setAttribute(Qt::WA_DeleteOnClose);
     //setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint); // must stop using this flag!
-    setWindowTitle(tr("Ride Heat Map Generator"));
+    setWindowTitle(tr("Heat Map Generator"));
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_CreateHeatMap));
 
@@ -159,7 +159,7 @@ GenerateHeatMapDialog::okClicked()
         ok->setText(tr("Abort"));
         appsettings->setValue(GC_BE_LASTDIR, dirName->text());
         generateNow();
-        status->setText(QString(tr("%1 rides exported, %2 failed or skipped.")).arg(exports).arg(fails));
+        status->setText(QString(tr("%1 activities exported, %2 failed or skipped.")).arg(exports).arg(fails));
         ok->setText(tr("Finish"));
 
     } else if (ok->text() == "Abort" || ok->text() == tr("Abort")) {

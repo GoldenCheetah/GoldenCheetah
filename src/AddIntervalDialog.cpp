@@ -241,7 +241,7 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
-    addButton = new QPushButton(tr("&Add to Ride"));
+    addButton = new QPushButton(tr("&Add to Activity"));
     buttonLayout->addWidget(addButton);
     buttonLayout->addStretch();
     mainLayout->addLayout(buttonLayout);
@@ -422,7 +422,7 @@ AddIntervalDialog::createClicked()
 {
     const RideFile *ride = context->ride ? context->ride->ride() : NULL;
     if (!ride) {
-        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
         return;
     }
 

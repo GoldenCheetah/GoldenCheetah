@@ -205,7 +205,7 @@ SaveSingleDialogWidget::SaveSingleDialogWidget(MainWindow *mainWindow, Context *
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     // Warning text
-    warnText = new QLabel(tr("WARNING\n\nYou have made changes to ") + rideItem->fileName + tr(" If you want to save\nthem, we need to convert the ride to GoldenCheetah\'s\nnative format. Should we do so?\n"));
+    warnText = new QLabel(tr("WARNING\n\nYou have made changes to ") + rideItem->fileName + tr(" If you want to save\nthem, we need to convert to GoldenCheetah\'s\nnative format. Should we do so?\n"));
     mainLayout->addWidget(warnText);
 
     // Buttons

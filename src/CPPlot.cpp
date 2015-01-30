@@ -612,8 +612,8 @@ CPPlot::plotModel()
         heatCurve->setSamples(time, heat);
         heatCurve->setYAxis(yRight);
         setAxisScale(yRight, 0, 100);  // fine if only heat is shown and percentage Scale will be fixed if shown
-        if (showPercent) setAxisTitle(yRight, tr("Percent of Best / Heat Rides"));
-        else setAxisTitle(yRight, tr("Heat Rides"));
+        if (showPercent) setAxisTitle(yRight, tr("Percent of Best / Heat Activities"));
+        else setAxisTitle(yRight, tr("Heat Activities"));
         heatCurve->attach(this);
     }
 
@@ -1319,7 +1319,7 @@ CPPlot::plotRide(RideItem *rideItem)
             setAxisScale(yRight, 0, max); // always 100
 
             // set the right titles in case both Heat and Percent of best is show
-            if (showHeat) setAxisTitle(yRight, tr("Percent of Best / Heat Rides"));
+            if (showHeat) setAxisTitle(yRight, tr("Percent of Best / Heat Activities"));
             else setAxisTitle(yRight, tr("Percent of Best"));
 
         } else {
@@ -1330,7 +1330,7 @@ CPPlot::plotRide(RideItem *rideItem)
                                   maxNonZero > 0 ? maxNonZero-1 : 0);
 
             // Set the YAxis Title if Heat is active
-            if (showHeat) setAxisTitle(yRight, tr("Heat Rides"));
+            if (showHeat) setAxisTitle(yRight, tr("Heat Activities"));
         }
     }
 
@@ -1483,7 +1483,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 		}
 
         // no units for Heat Curve
-        if (curve == heatCurve) units2 = QString(tr("Rides"));
+        if (curve == heatCurve) units2 = QString(tr("Activities"));
 
         // for speed series add pace with units according to settings
         if (criticalSeries == CriticalPowerWindow::kph) {

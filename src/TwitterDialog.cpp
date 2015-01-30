@@ -31,7 +31,7 @@ TwitterDialog::TwitterDialog(Context *context, RideItem *item) :
 {
     ride = item;
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle(tr("Tweet Your Ride"));
+    setWindowTitle(tr("Tweet Activity"));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     QGroupBox *groupBox = new QGroupBox(tr("Choose which metrics you wish to tweet: "));
@@ -72,7 +72,7 @@ TwitterDialog::TwitterDialog(Context *context, RideItem *item) :
     twitterMetricLayout->addWidget(twitterLengthLabel);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
-    tweetButton = new QPushButton(tr("&Tweet Ride"), this);
+    tweetButton = new QPushButton(tr("&Tweet Activity"), this);
     buttonLayout->addWidget(tweetButton);
     cancelButton = new QPushButton(tr("&Cancel"), this);
     buttonLayout->addWidget(cancelButton);

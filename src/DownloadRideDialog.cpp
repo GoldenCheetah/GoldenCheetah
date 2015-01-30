@@ -35,7 +35,7 @@ DownloadRideDialog::DownloadRideDialog(Context *context, bool embedded) :
     action(actionIdle), embedded(embedded)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle(tr("Download Ride Data"));
+    setWindowTitle(tr("Download Data"));
 
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_Download));
@@ -64,7 +64,7 @@ DownloadRideDialog::DownloadRideDialog(Context *context, bool embedded) :
     progressLabel->setTextFormat(Qt::PlainText);
 
     downloadButton = new QPushButton(tr("&Download"), this);
-    eraseRideButton = new QPushButton(tr("&Erase Ride(s)"), this);
+    eraseRideButton = new QPushButton(tr("&Erase Data"), this);
     rescanButton = new QPushButton(tr("&Rescan"), this);
     cancelButton = new QPushButton(tr("&Cancel"), this);
     closeButton = new QPushButton(tr("&Close"), this);
@@ -301,10 +301,10 @@ DownloadRideDialog::downloadClicked()
     connect( device.data(), SIGNAL(updateProgress(QString)), this, SLOT(updateProgress(QString)));
 
     if (devtype->canPreview()) {
-        updateStatus(tr("Getting ride list ..."));
+        updateStatus(tr("Getting list ..."));
         if( ! device->preview( err ) ){
 
-            QMessageBox::information(this, tr("Get ride list failed"), err);
+            QMessageBox::information(this, tr("Get list failed"), err);
             updateAction( actionIdle );
 
             emit downloadEnds();
@@ -367,8 +367,8 @@ DownloadRideDialog::downloadClicked()
 
         if (QFile::exists(filepath)) {
             if (QMessageBox::warning( this,
-                    tr("Ride Already Downloaded"),
-                    tr("The ride starting at %1 appears to have already "
+                    tr("Activity Already Downloaded"),
+                    tr("The activity starting at %1 appears to have already "
                         "been downloaded.  Do you want to overwrite the "
                         "previous download?")
                         .arg(files.at(i).startTime.toString()),
@@ -451,7 +451,7 @@ DownloadRideDialog::downloadClicked()
         } else {
             QMessageBox::critical( this,
                   tr("Error"),
-                  tr("The ride %1 could not be converted to "
+                  tr("The activity %1 could not be converted to "
                       "GoldenCheetah .JSON file format.")
                         .arg(filename) );
                 updateStatus(tr(".JSON conversion error: file %1")

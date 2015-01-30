@@ -189,9 +189,9 @@ ScatterWindow::ScatterWindow(Context *context) :
     cl->addRow(frame);
 
     compareMode = new QComboBox(this);
-    compareMode->addItem(tr("All intervals/rides"));
-    compareMode->addItem(tr("First intervals/rides on X-axis"));
-    compareMode->addItem(tr("First intervals/rides on Y-axis"));
+    compareMode->addItem(tr("All intervals/activities"));
+    compareMode->addItem(tr("First intervals/activities on X-axis"));
+    compareMode->addItem(tr("First intervals/activities on Y-axis"));
     cl->addRow(new QLabel(tr("Compare mode")), compareMode);
     compareMode->setCurrentIndex(0);
 

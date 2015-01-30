@@ -117,7 +117,7 @@ ManualRideDialog::deriveFactors()
 ManualRideDialog::ManualRideDialog(Context *context) : context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle(tr("Manual Ride Entry"));
+    setWindowTitle(tr("Manual Entry"));
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_Manual));
 #ifdef Q_OS_MAC
@@ -136,7 +136,7 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     // BASIC DATA
 
     // ride start date and start time
-    QLabel *dateLabel = new QLabel(tr("Ride date:"), this);
+    QLabel *dateLabel = new QLabel(tr("Date:"), this);
     dateEdit = new QDateEdit(this);
     dateEdit->setDate(QDate::currentDate());
 
@@ -523,7 +523,7 @@ ManualRideDialog::okClicked()
         // work it out -- they may actually want to keep an existing ride, so we shouldn't
         // rename it silently.
         QMessageBox oops(QMessageBox::Critical, tr("Unable to save"),
-                         tr("There is already an ride with the same start time or you do not have permissions to save a file."));
+                         tr("There is already an activity with the same start time or you do not have permissions to save a file."));
         oops.exec();
     }
 }

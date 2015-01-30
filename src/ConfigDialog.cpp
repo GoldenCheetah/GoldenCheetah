@@ -219,7 +219,7 @@ void ConfigDialog::saveClicked()
         // if so we will restart, if not I'll revert to current directory
         QMessageBox msgBox;
         msgBox.setText(tr("You changed the location of the athlete library"));
-        msgBox.setInformativeText(tr("This is where all new athletes and their ride files "
+        msgBox.setInformativeText(tr("This is where all new athletes and their files "
                                   "will now be stored.\n\nCurrent athlete data will no longer be "
                                   "available and GoldenCheetah will need to restart for the change to take effect."
                                   "\n\nDo you want to apply and restart GoldenCheetah?"));

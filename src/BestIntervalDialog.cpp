@@ -151,7 +151,7 @@ BestIntervalDialog::findClicked()
 {
     const RideFile *ride = context->ride ? context->ride->ride() : NULL;
     if (!ride) {
-        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
         return;
     }
 

@@ -45,7 +45,7 @@ LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(con
     QFont titleFont;
     titleFont.setPointSize(14);
     titleFont.setBold(true);
-    title = new QLabel(tr("No Ride Selected"));
+    title = new QLabel(tr("No activity Selected"));
     title->setFont(titleFont);
     title->setFixedHeight(30);
     mainLayout->addWidget(title);
@@ -175,7 +175,7 @@ LTMPopup::setData(Specification spec, const RideMetric *metric, QString title)
        rides->hide();
        metrics->hide();
        notes->hide();
-       title = tr("No ride selected");
+       title = tr("No activity selected");
     } else {
        // one or more rides
        rides->show();
@@ -340,17 +340,17 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
        rides->hide();
        metrics->hide();
        notes->hide();
-       _title = tr("No ride selected");
+       _title = tr("No activity selected");
     } else {
        // one or more rides
        rides->show();
        metrics->show();
        notes->show();
        // give some extrat info
-       if (count > 1) _title += QString(tr(" (%1 rides)")).arg(count);
+       if (count > 1) _title += QString(tr(" (%1 activities)")).arg(count);
     }
 
-    if (nonRideMetrics) _title += QString(tr(" / non ride-related metrics skipped"));
+    if (nonRideMetrics) _title += QString(tr(" / non activity-related metrics skipped"));
 
     setTitle(_title);
     rideSelected();

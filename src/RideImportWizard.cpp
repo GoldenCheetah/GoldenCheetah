@@ -208,7 +208,7 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     // connect(overFiles, SIGNAL(clicked()), this, SLOT(overClicked()));  // deprecate for this release... XXX
 
     // title & headings
-    setWindowTitle(tr("Import Ride Files"));
+    setWindowTitle(tr("Import Files"));
     QTableWidgetItem *filenameHeading = new QTableWidgetItem;
     filenameHeading->setText(tr("Filename"));
     tableWidget->setHorizontalHeaderItem(0, filenameHeading);
@@ -742,7 +742,7 @@ RideImportWizard::todayClicked(int index)
 
     // More than a days worth of rides so can't squeeze into a single day!
     if (totalduration > (24 * 3600)) {
-        QMessageBox::warning ( this, tr ( "Invalid Selection" ), tr ( "More than 24hrs of rides to fit into a day" ));
+        QMessageBox::warning ( this, tr ( "Invalid Selection" ), tr ( "More than 24hrs of activities to fit into a day" ));
         return;
     }
 

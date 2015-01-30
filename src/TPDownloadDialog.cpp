@@ -112,7 +112,7 @@ TPDownloadDialog::completedAthlete(QString errorStr, QList<QMap<QString, QString
     to->setCalendarPopup(true);
 
     // Buttons
-    refreshButton = new QPushButton(tr("Refresh Ride List"), this);
+    refreshButton = new QPushButton(tr("Refresh List"), this);
     cancelButton = new QPushButton(tr("Close"),this);
     downloadButton = new QPushButton(tr("Download"),this);
 
@@ -179,7 +179,7 @@ TPDownloadDialog::completedAthlete(QString errorStr, QList<QMap<QString, QString
     selectAllSync = new QCheckBox(tr("Select all"), this);
     selectAllSync->setChecked(Qt::Unchecked);
     syncMode = new QComboBox(this);
-    syncMode->addItem(tr("Keep all do not delete any rides"));
+    syncMode->addItem(tr("Keep all do not delete"));
     syncMode->addItem(tr("Keep TP.com but delete Local"));
     syncMode->addItem(tr("Keep Local but delete TP.com"));
     QHBoxLayout *syncList = new QHBoxLayout;
@@ -270,7 +270,7 @@ TPDownloadDialog::cancelClicked()
 void
 TPDownloadDialog::refreshClicked()
 {
-    progressLabel->setText(tr("Downloading ride list..."));
+    progressLabel->setText(tr("Downloading list..."));
     progressBar->setMinimum(0);
     progressBar->setMaximum(1);
     progressBar->setValue(0);

@@ -208,12 +208,12 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     cl->addRow(shadies, shadeIntervalsCheck);
 
     ridePlotStyleCombo = new QComboBox(this);
-    ridePlotStyleCombo->addItem(tr("Ride Mean Max"));
-    ridePlotStyleCombo->addItem(tr("Ride Centile"));
-    ridePlotStyleCombo->addItem(tr("No Ride"));
+    ridePlotStyleCombo->addItem(tr("Activity Mean Max"));
+    ridePlotStyleCombo->addItem(tr("Activity Centile"));
+    ridePlotStyleCombo->addItem(tr("No Activity"));
 
     cl->addWidget(new QLabel("")); //spacing
-    cl->addRow(new QLabel(tr("Current Ride")), ridePlotStyleCombo);
+    cl->addRow(new QLabel(tr("Current Activity")), ridePlotStyleCombo);
 
     // model config
     // 2 or 3 point model ?

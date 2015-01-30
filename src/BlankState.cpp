@@ -141,8 +141,8 @@ BlankStatePage::addToShortCuts(ShortCut shortCut)
 BlankStateAnalysisPage::BlankStateAnalysisPage(Context *context) : BlankStatePage(context)
 {  
     dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_ANALYSIS, false).toBool());
-    welcomeTitle->setText(tr("Rides"));
-    welcomeText->setText(tr("No ride ?\nLet's start with some data."));
+    welcomeTitle->setText(tr("Activities"));
+    welcomeText->setText(tr("No files ?\nLet's start with some data."));
 
     img->setIcon(QPixmap(":images/analysis.png"));
     img->setIconSize(QSize(800,330));

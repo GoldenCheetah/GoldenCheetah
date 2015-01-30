@@ -289,7 +289,7 @@ KmlFileReader::writeRideFile(Context *, const RideFile * ride, QFile &file) cons
 
     // setup trip folder (shown on lhs of google earth
     FolderPtr folder = kmldom::KmlFactory::GetFactory()->CreateFolder();
-    folder->set_name(QObject::tr("Bike Rides").toStdString());
+    folder->set_name(QObject::tr("Activities").toStdString());
     document->add_feature(folder);
 
     // Create a track for the entire ride
