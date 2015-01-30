@@ -62,22 +62,52 @@
         <translation type="obsolete">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cpp" line="62"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Ride files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</source>
+        <translation type="vanished">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
+    </message>
+    <message>
+        <location filename="../AboutDialog.cpp" line="62"/>
+        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</source>
         <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
     </message>
 </context>
 <context>
     <name>AbsWattagePage</name>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="283"/>
+        <location filename="../WorkoutWizard.cpp" line="277"/>
+        <source>Workout Wizard</source>
+        <translation>Asistente de Entrenamientos</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="278"/>
+        <source>Absolute Wattage Workout Creator</source>
+        <translation>Crear Entrenamiento con Vatios Absolutos</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="282"/>
         <source>Minutes</source>
         <translation>Minutos</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="284"/>
+        <location filename="../WorkoutWizard.cpp" line="283"/>
+        <location filename="../WorkoutWizard.cpp" line="290"/>
         <source>Wattage</source>
         <translation>Potencia</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="291"/>
+        <source>Time (minutes)</source>
+        <translation>Tiempo (minutos)</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="363"/>
+        <source>Save Workout</source>
+        <translation>Guardar Entrenamiento</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="364"/>
+        <source>Computrainer Format *.erg</source>
+        <translation>Formato Computrainer *.erg</translation>
     </message>
 </context>
 <context>
@@ -563,8 +593,22 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca G
     </message>
     <message>
         <location filename="../AddIntervalDialog.cpp" line="244"/>
+        <source>&amp;Add to Activity</source>
+        <translation>&amp;Agregar a Actividad</translation>
+    </message>
+    <message>
+        <location filename="../AddIntervalDialog.cpp" line="425"/>
+        <source>Select Activity</source>
+        <translation>Elegir Actividad</translation>
+    </message>
+    <message>
+        <location filename="../AddIntervalDialog.cpp" line="425"/>
+        <source>No activity selected!</source>
+        <translation>No hay actividad seleccionada!</translation>
+    </message>
+    <message>
         <source>&amp;Add to Ride</source>
-        <translation>&amp;Agregar a la actividad</translation>
+        <translation type="vanished">&amp;Agregar a la actividad</translation>
     </message>
     <message>
         <location filename="../AddIntervalDialog.cpp" line="528"/>
@@ -649,14 +693,12 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca G
         <translation type="obsolete">&amp;Agregar Intervalos</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="425"/>
         <source>Select Ride</source>
-        <translation>Seleccionar Actividad</translation>
+        <translation type="vanished">Seleccionar Actividad</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="425"/>
         <source>No ride selected!</source>
-        <translation>¡Ninguna actividad seleccionada!</translation>
+        <translation type="vanished">¡Ninguna actividad seleccionada!</translation>
     </message>
     <message>
         <location filename="../AddIntervalDialog.cpp" line="453"/>
@@ -954,8 +996,12 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="910"/>
+        <source>No activity selected</source>
+        <translation>No hay actividad seleccionada</translation>
+    </message>
+    <message>
         <source>No ride selected</source>
-        <translation>No hay un entrenamiento seleccionado</translation>
+        <translation type="vanished">No hay un entrenamiento seleccionado</translation>
     </message>
 </context>
 <context>
@@ -2089,8 +2135,9 @@ Presione Siguiente para Continuar</translation>
         <translation>Calendario</translation>
     </message>
     <message>
+        <location filename="../AnalysisSidebar.cpp" line="82"/>
         <source>Activities</source>
-        <translation type="obsolete">Actividades</translation>
+        <translation>Actividades</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="83"/>
@@ -2119,16 +2166,19 @@ Presione Siguiente para Continuar</translation>
         <translation>Volver a la versión guardada</translation>
     </message>
     <message>
+        <location filename="../AnalysisSidebar.cpp" line="214"/>
         <source>Delete Activity</source>
-        <translation type="obsolete">Eliminar Actividad</translation>
+        <translation>Eliminar Actividad</translation>
     </message>
     <message>
+        <location filename="../AnalysisSidebar.cpp" line="217"/>
         <source>Split Activity</source>
-        <translation type="obsolete">Dividir Actividad</translation>
+        <translation>Dividir Actividad</translation>
     </message>
     <message>
+        <location filename="../AnalysisSidebar.cpp" line="228"/>
         <source>Upload Activity to Calendar</source>
-        <translation type="obsolete">Cargar Actividad al Calendario</translation>
+        <translation>Cargar Actividad al Calendario</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="238"/>
@@ -2164,28 +2214,24 @@ Presione Siguiente para Continuar</translation>
         <translation type="obsolete">Buscar Mejores Intervalos</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="82"/>
         <source>Rides</source>
-        <translation>Actividades</translation>
+        <translation type="vanished">Actividades</translation>
     </message>
     <message>
         <source>All Rides</source>
         <translation type="obsolete">Todas las Actividades</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="214"/>
         <source>Delete Ride</source>
-        <translation>Borrar Actividad</translation>
+        <translation type="vanished">Borrar Actividad</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="217"/>
         <source>Split Ride</source>
-        <translation>Dividir Actividad</translation>
+        <translation type="vanished">Dividir Actividad</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="228"/>
         <source>Upload Ride to Calendar</source>
-        <translation>Cargar Actividad al Calendario</translation>
+        <translation type="vanished">Cargar Actividad al Calendario</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="232"/>
@@ -2259,24 +2305,24 @@ Presione Siguiente para Continuar</translation>
         <translation>Buscar Intervalos</translation>
     </message>
     <message>
+        <source>No ride selected</source>
+        <translation type="vanished">No hay un entrenamiento seleccionado</translation>
+    </message>
+    <message>
+        <source>Current ride contains no data</source>
+        <translation type="vanished">La actividad seleccionada no tiene datos</translation>
+    </message>
+    <message>
         <location filename="../AnalysisSidebar.cpp" line="406"/>
         <location filename="../AnalysisSidebar.cpp" line="453"/>
-        <source>No ride selected</source>
-        <translation>No hay un entrenamiento seleccionado</translation>
+        <source>No activity selected</source>
+        <translation>No hay actividad seleccionada</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="408"/>
         <location filename="../AnalysisSidebar.cpp" line="455"/>
-        <source>Current ride contains no data</source>
-        <translation>La actividad seleccionada no tiene datos</translation>
-    </message>
-    <message>
-        <source>No activity selected</source>
-        <translation type="obsolete">No hay actividad seleccionada</translation>
-    </message>
-    <message>
         <source>Current activity contains no data</source>
-        <translation type="obsolete">La actividad seleccionada no tiene datos</translation>
+        <translation>La actividad seleccionada no tiene datos</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="420"/>
@@ -2755,7 +2801,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2364"/>
-        <source>Â°</source>
+        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2768,7 +2814,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1959"/>
-        <source>Â°</source>
+        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2781,7 +2827,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2060"/>
-        <source>Â°</source>
+        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2794,7 +2840,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2451"/>
-        <source>Â°</source>
+        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2807,7 +2853,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2161"/>
-        <source>Â°</source>
+        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2820,7 +2866,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2262"/>
-        <source>Â°</source>
+        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2893,7 +2939,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2408"/>
-        <source>Â°</source>
+        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2906,7 +2952,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2110"/>
-        <source>Â°</source>
+        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2919,7 +2965,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2495"/>
-        <source>Â°</source>
+        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2932,7 +2978,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2211"/>
-        <source>Â°</source>
+        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2945,7 +2991,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2312"/>
-        <source>Â°</source>
+        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2986,7 +3032,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2009"/>
-        <source>Â°</source>
+        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3051,13 +3097,13 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>BatchExportDialog</name>
     <message>
+        <location filename="../BatchExportDialog.cpp" line="31"/>
         <source>Activity Batch Export</source>
-        <translation type="obsolete">Exportar Actividades en Bloque</translation>
+        <translation>Exportar Actividades en Bloque</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="31"/>
         <source>Ride Batch Export</source>
-        <translation>Exportar Actividades en Bloque</translation>
+        <translation type="vanished">Exportar Actividades en Bloque</translation>
     </message>
     <message>
         <location filename="../BatchExportDialog.cpp" line="44"/>
@@ -3138,13 +3184,13 @@ Presione Siguiente para Continuar</translation>
         <translation>Abortar</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="174"/>
         <source>%1 rides exported, %2 failed or skipped.</source>
-        <translation>%1 actividades exportadas, %2 fallaron o fueron salteadas.</translation>
+        <translation type="vanished">%1 actividades exportadas, %2 fallaron o fueron salteadas.</translation>
     </message>
     <message>
+        <location filename="../BatchExportDialog.cpp" line="174"/>
         <source>%1 activities exported, %2 failed or skipped.</source>
-        <translation type="obsolete">%1 actividades exportadas, %2 fallaron o fueron salteadas.</translation>
+        <translation>%1 actividades exportadas, %2 fallaron o fueron salteadas.</translation>
     </message>
     <message>
         <location filename="../BatchExportDialog.cpp" line="175"/>
@@ -3222,13 +3268,21 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="154"/>
-        <source>Select Ride</source>
-        <translation>Seleccionar Entrenamiento</translation>
+        <source>Select Activity</source>
+        <translation>Elegir Actividad</translation>
     </message>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="154"/>
+        <source>No activity selected!</source>
+        <translation>No hay actividad seleccionada!</translation>
+    </message>
+    <message>
+        <source>Select Ride</source>
+        <translation type="vanished">Seleccionar Entrenamiento</translation>
+    </message>
+    <message>
         <source>No ride selected!</source>
-        <translation>¡Ningún entrenamiento seleccionado!</translation>
+        <translation type="vanished">¡Ningún entrenamiento seleccionado!</translation>
     </message>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="164"/>
@@ -3299,13 +3353,23 @@ Presione Siguiente para Continuar</translation>
         <translation type="obsolete">Análisis</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="144"/>
         <source>Rides</source>
+        <translation type="vanished">Actividades</translation>
+    </message>
+    <message>
+        <source>No ride ?
+Let&apos;s start with some data.</source>
+        <translation type="vanished">¿Ninguna actividad?
+Comencemos con algunos datos.</translation>
+    </message>
+    <message>
+        <location filename="../BlankState.cpp" line="144"/>
+        <source>Activities</source>
         <translation>Actividades</translation>
     </message>
     <message>
         <location filename="../BlankState.cpp" line="145"/>
-        <source>No ride ?
+        <source>No files ?
 Let&apos;s start with some data.</source>
         <translation>¿Ninguna actividad?
 Comencemos con algunos datos.</translation>
@@ -3902,16 +3966,12 @@ Comencemos la configuración.</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../CPPlot.cpp" line="615"/>
-        <location filename="../CPPlot.cpp" line="1322"/>
         <source>Percent of Best / Heat Rides</source>
-        <translation>Porcentaje del Mejor / Mapa de Calor</translation>
+        <translation type="vanished">Porcentaje del Mejor / Mapa de Calor</translation>
     </message>
     <message>
-        <location filename="../CPPlot.cpp" line="616"/>
-        <location filename="../CPPlot.cpp" line="1333"/>
         <source>Heat Rides</source>
-        <translation>Mapa de Calor</translation>
+        <translation type="vanished">Mapa de Calor</translation>
     </message>
     <message>
         <location filename="../CPPlot.cpp" line="1257"/>
@@ -3978,15 +4038,31 @@ ddd, dd MMM yyyy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../CPPlot.cpp" line="1486"/>
         <source>Rides</source>
-        <translation>Actividades</translation>
+        <translation type="vanished">Actividades</translation>
     </message>
     <message>
         <location filename="../CPPlot.cpp" line="541"/>
         <location filename="../CPPlot.cpp" line="1491"/>
         <source>min/km</source>
         <translation>min/km</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="615"/>
+        <location filename="../CPPlot.cpp" line="1322"/>
+        <source>Percent of Best / Heat Activities</source>
+        <translation>Porcentaje del Mejor / Mapa de Calor</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="616"/>
+        <location filename="../CPPlot.cpp" line="1333"/>
+        <source>Heat Activities</source>
+        <translation>Actividades Mapa de Calor</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="1486"/>
+        <source>Activities</source>
+        <translation>Actividades</translation>
     </message>
     <message>
         <location filename="../CPPlot.cpp" line="1491"/>
@@ -4101,13 +4177,13 @@ ddd, dd MMM yyyy</source>
         <location filename="../CalDAV.cpp" line="412"/>
         <location filename="../CalDAV.cpp" line="521"/>
         <source>Missing Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Faltan Preferencias</translation>
     </message>
     <message>
         <location filename="../CalDAV.cpp" line="85"/>
         <location filename="../CalDAV.cpp" line="412"/>
         <source>CalID or CalDAV Url is missing in preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Falta URL CalID o CalDAV en preferencias</translation>
     </message>
     <message>
         <location filename="../CalDAV.cpp" line="123"/>
@@ -4117,32 +4193,32 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../CalDAV.cpp" line="458"/>
         <source>CalDAV Calendar API reply error</source>
-        <translation type="unfinished"></translation>
+        <translation>Respuesta de error CalDAV Calendar API</translation>
     </message>
     <message>
         <location filename="../CalDAV.cpp" line="504"/>
         <source>HTTP</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../CalDAV.cpp" line="504"/>
         <source>SSL error(s) has occurred: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Error(es) SSL: %1</translation>
     </message>
     <message>
         <location filename="../CalDAV.cpp" line="521"/>
         <source>Authorization for Google CalDAV is missing in preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Falta autorización para Google CalDAV en preferencias</translation>
     </message>
     <message>
         <location filename="../CalDAV.cpp" line="584"/>
         <source>Authorization Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Error de Autorización</translation>
     </message>
     <message>
         <location filename="../CalDAV.cpp" line="584"/>
         <source>Error requesting access token</source>
-        <translation type="unfinished"></translation>
+        <translation>Error requiriendo token de acceso</translation>
     </message>
     <message>
         <source>CalDAV OPTIONS url error</source>
@@ -4291,6 +4367,16 @@ ddd, dd MMM yyyy</source>
         <translation>Selección</translation>
     </message>
     <message>
+        <location filename="../Pages.cpp" line="1389"/>
+        <source>Activity Scrollbar</source>
+        <translation>Barra de desplazamiento de Actividades</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1392"/>
+        <source>Activity Headings</source>
+        <translation>Encabezados de Actividades</translation>
+    </message>
+    <message>
         <location filename="../Pages.cpp" line="1403"/>
         <source>Line Width</source>
         <translation>Ancho de Línea</translation>
@@ -4330,14 +4416,12 @@ ddd, dd MMM yyyy</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1389"/>
         <source>Ride Scrollbar</source>
-        <translation>Barra Desliz. Actividades</translation>
+        <translation type="vanished">Barra Desliz. Actividades</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1392"/>
         <source>Ride Headings</source>
-        <translation>Encabezamiento Actividades</translation>
+        <translation type="vanished">Encabezamiento Actividades</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1400"/>
@@ -4502,12 +4586,24 @@ ddd, dd MMM yyyy</source>
     </message>
     <message>
         <location filename="../ConfigDialog.cpp" line="222"/>
-        <source>This is where all new athletes and their ride files will now be stored.
+        <source>This is where all new athletes and their files will now be stored.
 
 Current athlete data will no longer be available and GoldenCheetah will need to restart for the change to take effect.
 
 Do you want to apply and restart GoldenCheetah?</source>
         <translation>Allí es donde todos los nuevos atletas y actividades serán almacenadas.
+
+Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenCheetah para que el cambio tenga efecto.
+
+¿Quiere aplicar los cambios y reiniciar GoldenCheetah?</translation>
+    </message>
+    <message>
+        <source>This is where all new athletes and their ride files will now be stored.
+
+Current athlete data will no longer be available and GoldenCheetah will need to restart for the change to take effect.
+
+Do you want to apply and restart GoldenCheetah?</source>
+        <translation type="vanished">Allí es donde todos los nuevos atletas y actividades serán almacenadas.
 
 Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenCheetah para que el cambio tenga efecto.
 
@@ -4878,23 +4974,23 @@ Puede demorar.
     <message>
         <location filename="../Pages.cpp" line="600"/>
         <source>Generic CalDAV</source>
-        <translation type="unfinished"></translation>
+        <translation>CalDAV Genérico</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="601"/>
         <location filename="../Pages.cpp" line="628"/>
         <source>Google Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Calendario Google</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="610"/>
         <source>Calendar Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de Calendario</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="611"/>
         <source>Google CalID</source>
-        <translation type="unfinished"></translation>
+        <translation>CalID Google</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="672"/>
@@ -5070,6 +5166,26 @@ Puede demorar.
         <translation>Sombreado de Zonas</translation>
     </message>
     <message>
+        <location filename="../CriticalPowerWindow.cpp" line="211"/>
+        <source>Activity Mean Max</source>
+        <translation>Promedio Máximo de Actividad</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="212"/>
+        <source>Activity Centile</source>
+        <translation>Porcentual de Actividad</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="213"/>
+        <source>No Activity</source>
+        <translation>Sin Actividad</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="216"/>
+        <source>Current Activity</source>
+        <translation>Actividad Actual</translation>
+    </message>
+    <message>
         <location filename="../CriticalPowerWindow.cpp" line="221"/>
         <source>None</source>
         <translation>Ninguno</translation>
@@ -5128,24 +5244,20 @@ Puede demorar.
         <translation>Sombrear Intervalos</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="211"/>
         <source>Ride Mean Max</source>
-        <translation>Promedios Máximos</translation>
+        <translation type="vanished">Promedios Máximos</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="212"/>
         <source>Ride Centile</source>
-        <translation>Porcentajes</translation>
+        <translation type="vanished">Porcentajes</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="213"/>
         <source>No Ride</source>
-        <translation>No mostrar</translation>
+        <translation type="vanished">No mostrar</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="216"/>
         <source>Current Ride</source>
-        <translation>Actividad Actual</translation>
+        <translation type="vanished">Actividad Actual</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="222"/>
@@ -5468,13 +5580,21 @@ Puede demorar.
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="882"/>
-        <source>Upload ride to CyclingAnalytics...</source>
+        <source>Upload to CyclingAnalytics...</source>
         <translation>Cargar Actividad a CyclingAnalytics...</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="930"/>
-        <source>Upload ride... Sending to CyclingAnalytics</source>
+        <source>Upload... Sending to CyclingAnalytics</source>
         <translation>Cargar Actividad... Enviando a CyclingAnalytics</translation>
+    </message>
+    <message>
+        <source>Upload ride to CyclingAnalytics...</source>
+        <translation type="vanished">Cargar Actividad a CyclingAnalytics...</translation>
+    </message>
+    <message>
+        <source>Upload ride... Sending to CyclingAnalytics</source>
+        <translation type="vanished">Cargar Actividad... Enviando a CyclingAnalytics</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="939"/>
@@ -5993,9 +6113,8 @@ Cancelar para salir.</translation>
 <context>
     <name>DownloadRideDialog</name>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="38"/>
         <source>Download Ride Data</source>
-        <translation>Descargar datos del Entrenamiento</translation>
+        <translation type="vanished">Descargar datos del Entrenamiento</translation>
     </message>
     <message>
         <source>Instructions:</source>
@@ -6007,9 +6126,18 @@ Cancelar para salir.</translation>
         <translation>&amp;Descargar</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="67"/>
         <source>&amp;Erase Ride(s)</source>
-        <translation>&amp;Borrar Entrenamiento(s)</translation>
+        <translation type="vanished">&amp;Borrar Entrenamiento(s)</translation>
+    </message>
+    <message>
+        <location filename="../DownloadRideDialog.cpp" line="38"/>
+        <source>Download Data</source>
+        <translation>Descargar datos de Entrenamiento</translation>
+    </message>
+    <message>
+        <location filename="../DownloadRideDialog.cpp" line="67"/>
+        <source>&amp;Erase Data</source>
+        <translation>&amp;Borrar Datos</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="68"/>
@@ -6038,13 +6166,26 @@ Cancelar para salir.</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="304"/>
-        <source>Getting ride list ...</source>
-        <translation>Obteniendo lisa de actividades...</translation>
+        <source>Getting list ...</source>
+        <translation>Obteniendo lista de actividades...</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="307"/>
-        <source>Get ride list failed</source>
+        <source>Get list failed</source>
         <translation>Falló obtener lista de actividades</translation>
+    </message>
+    <message>
+        <location filename="../DownloadRideDialog.cpp" line="454"/>
+        <source>The activity %1 could not be converted to GoldenCheetah .JSON file format.</source>
+        <translation>La actividad %1 no se pudo convertir a format GoldenCheetah .JSON</translation>
+    </message>
+    <message>
+        <source>Getting ride list ...</source>
+        <translation type="vanished">Obteniendo lisa de actividades...</translation>
+    </message>
+    <message>
+        <source>Get ride list failed</source>
+        <translation type="vanished">Falló obtener lista de actividades</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="324"/>
@@ -6062,14 +6203,23 @@ Cancelar para salir.</translation>
         <translation>El archivo %1 no tiene fecha y hora válidas, usando &apos;ahora&apos;</translation>
     </message>
     <message>
+        <location filename="../DownloadRideDialog.cpp" line="370"/>
+        <source>Activity Already Downloaded</source>
+        <translation>Actividad ya descargada</translation>
+    </message>
+    <message>
+        <location filename="../DownloadRideDialog.cpp" line="371"/>
+        <source>The activity starting at %1 appears to have already been downloaded.  Do you want to overwrite the previous download?</source>
+        <translation>La actividad que comienza en %1 parece ya haber sido descargada. La quiere sobreescribir?</translation>
+    </message>
+    <message>
         <location filename="../DownloadRideDialog.cpp" line="412"/>
         <source>Failed to rename %1 to %2</source>
         <translation>Falló renombral %1 a %2</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="454"/>
         <source>The ride %1 could not be converted to GoldenCheetah .JSON file format.</source>
-        <translation>La actividad %1 no se pudo convertir a format GoldenCheetah .JSON</translation>
+        <translation type="vanished">La actividad %1 no se pudo convertir a format GoldenCheetah .JSON</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="457"/>
@@ -6099,9 +6249,8 @@ Cancelar para salir.</translation>
         <translation type="obsolete">obteniendo datos ...</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="371"/>
         <source>The ride starting at %1 appears to have already been downloaded.  Do you want to overwrite the previous download?</source>
-        <translation>La actividad que comienza en %1 parece ya haber sido descargada. La quiere sobreescribir?</translation>
+        <translation type="vanished">La actividad que comienza en %1 parece ya haber sido descargada. La quiere sobreescribir?</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="390"/>
@@ -6199,9 +6348,8 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
         <translation type="obsolete">el archivo %1 no tiene fecha válida, revirtiendo a &apos;ahora&apos;</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="370"/>
         <source>Ride Already Downloaded</source>
-        <translation>Entrenamiento ya descargado</translation>
+        <translation type="vanished">Entrenamiento ya descargado</translation>
     </message>
     <message>
         <source>This ride appears to have already </source>
@@ -7198,7 +7346,7 @@ Máx Absoluto - define un valor máximo para la FC, cualquier valor superior ser
     <name>FixMoxyConfig</name>
     <message>
         <location filename="../FixMoxy.cpp" line="51"/>
-        <source>When recording from the Moxy in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the ride file to move the values from speed and cadence into the Moxy series.</source>
+        <source>When recording from the Moxy in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7339,9 +7487,8 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Fondo de Gráficos</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="65"/>
         <source>Ride Plot Background</source>
-        <translation>Fondo de Curva de Actividad</translation>
+        <translation type="vanished">Fondo de Curva de Actividad</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="66"/>
@@ -7359,14 +7506,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Símbolos del gráfico</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="69"/>
         <source>Ride Plot X Axis</source>
-        <translation>Gráfico de Entrenamiento - Eje X</translation>
+        <translation type="vanished">Gráfico de Entrenamiento - Eje X</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="70"/>
         <source>Ride Plot Y Axis</source>
-        <translation>Gráfico de Entrenamiento - Eje Y</translation>
+        <translation type="vanished">Gráfico de Entrenamiento - Eje Y</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="71"/>
@@ -7704,9 +7849,13 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Fondo Barra de Herramientas</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="141"/>
+        <location filename="../Colors.cpp" line="150"/>
+        <source>CP Curve</source>
+        <translation>Curva PC</translation>
+    </message>
+    <message>
         <source>Ride History Group</source>
-        <translation>Grupo de Actividades Históricas</translation>
+        <translation type="vanished">Grupo de Actividades Históricas</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="149"/>
@@ -7714,9 +7863,8 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Balance W&apos;</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="150"/>
         <source>Ride CP Curve</source>
-        <translation>Curva PC de la Actividad</translation>
+        <translation type="vanished">Curva PC de la Actividad</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="151"/>
@@ -7756,8 +7904,24 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Barras de Herramientas y Lateral</translation>
     </message>
     <message>
+        <location filename="../Colors.cpp" line="141"/>
         <source>Activity History Group</source>
-        <translation type="obsolete">Grupo de Actividades Históricas</translation>
+        <translation>Grupo de Actividades Históricas</translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="65"/>
+        <source>Performance Plot Background</source>
+        <translation>Fondo de gráficos miniatura</translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="69"/>
+        <source>Performance Plot X Axis</source>
+        <translation>Gráfico de Entrenamiento - Eje X</translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="70"/>
+        <source>Performance Plot Y Axis</source>
+        <translation>Gráfico de Entrenamiento - Eje Y</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="142"/>
@@ -7888,13 +8052,21 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="1315"/>
-        <source>Upload ride to Garmin Connect...</source>
+        <source>Upload to Garmin Connect...</source>
         <translation>Cargar Actividad a Garmin Connect...</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="1358"/>
-        <source>Upload ride... Sending to Garmin Connect</source>
+        <source>Upload... Sending to Garmin Connect</source>
         <translation>Cargar Actividad... Enviando a Garmin Connect</translation>
+    </message>
+    <message>
+        <source>Upload ride to Garmin Connect...</source>
+        <translation type="vanished">Cargar Actividad a Garmin Connect...</translation>
+    </message>
+    <message>
+        <source>Upload ride... Sending to Garmin Connect</source>
+        <translation type="vanished">Cargar Actividad... Enviando a Garmin Connect</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="1369"/>
@@ -8080,8 +8252,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../GcScopeBar.cpp" line="93"/>
         <location filename="../GcScopeBar.cpp" line="132"/>
-        <source>Rides</source>
+        <source>Activities</source>
         <translation>Actividades</translation>
+    </message>
+    <message>
+        <source>Rides</source>
+        <translation type="vanished">Actividades</translation>
     </message>
     <message>
         <location filename="../GcScopeBar.cpp" line="104"/>
@@ -8294,8 +8470,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <location filename="../GcUpgrade.cpp" line="722"/>
-        <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.2 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectories which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity/Ride files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity/Ride files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantined files: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity/ride files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.2 all downloads from devices or imported activity/ride files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
+        <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.2 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectories which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantined files: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.2 all downloads from devices or imported activity files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
         <translation>&lt;center&gt;&lt;b&gt;Como primera medida resguarde sus datos de &apos;Atleta&apos;!&lt;br&gt;&lt;b&gt;Por favor lea cuidadosamente antes de continuar!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Con la versión 3.2 el directorioa del &apos;Atleta&apos; ha sido reestructurado agregando un conjunto de subdirectorios que almacenan los diferentes tipos de archivos de GoldenCheetah.&lt;br&gt;&lt;br&gt;La nueva estructura es:&lt;br&gt;-&gt; Archivos de Actividades: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Configuración: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Descarga: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Importación: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Entrenamientos: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de cache: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Calendario: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Registro: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Archivos Temporarios: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;El proceso de actualización creará la nueva estructura de directorios y moverá los archivos existentes a los nuevos directorios. Durante la actualización todos los archivos de actividad serán convertidos al formato nativo GoldenCheetah .JSON y movidos al directorio&lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt;. Los archivos originales se moverán al directorio &lt;samp&gt;/imports&lt;/samp&gt;.&lt;br&gt;&lt;br&gt;Comenzando con la version 3.2 todos los archivos descargados desde cualquier dispositivo o importados serán convertidos al formato GoldenCheetah .JSON durante el proceso. Los archivos originales se almacenaran, dependiendo del origen, en el directorio &lt;samp&gt;/downloads&lt;/samp&gt; o &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt;r.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Por favor asegúrese de tener resguardo de sus datos de atleta antes de continuar con la actualización. No podemos hacernos responsables de cualquier pérdida de datos durante el proceso. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.2 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectories which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity/Ride files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity/Ride files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantined files: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity/ride files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.2 all downloads from devices or imported activity/ride files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
+        <translation type="vanished">&lt;center&gt;&lt;b&gt;Como primera medida resguarde sus datos de &apos;Atleta&apos;!&lt;br&gt;&lt;b&gt;Por favor lea cuidadosamente antes de continuar!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Con la versión 3.2 el directorioa del &apos;Atleta&apos; ha sido reestructurado agregando un conjunto de subdirectorios que almacenan los diferentes tipos de archivos de GoldenCheetah.&lt;br&gt;&lt;br&gt;La nueva estructura es:&lt;br&gt;-&gt; Archivos de Actividades: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Configuración: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Descarga: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Importación: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Entrenamientos: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de cache: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Calendario: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Registro: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Archivos Temporarios: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;El proceso de actualización creará la nueva estructura de directorios y moverá los archivos existentes a los nuevos directorios. Durante la actualización todos los archivos de actividad serán convertidos al formato nativo GoldenCheetah .JSON y movidos al directorio&lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt;. Los archivos originales se moverán al directorio &lt;samp&gt;/imports&lt;/samp&gt;.&lt;br&gt;&lt;br&gt;Comenzando con la version 3.2 todos los archivos descargados desde cualquier dispositivo o importados serán convertidos al formato GoldenCheetah .JSON durante el proceso. Los archivos originales se almacenaran, dependiendo del origen, en el directorio &lt;samp&gt;/downloads&lt;/samp&gt; o &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt;r.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Por favor asegúrese de tener resguardo de sus datos de atleta antes de continuar con la actualización. No podemos hacernos responsables de cualquier pérdida de datos durante el proceso. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
     </message>
     <message>
         <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.11 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectory which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity/Ride files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity/Ride files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity/ride files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.11 all downloads from devices or imported activity/ride files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
@@ -8429,8 +8609,9 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Media Máxima Crítica</translation>
     </message>
     <message>
+        <location filename="../GcWindowRegistry.cpp" line="77"/>
         <source>Activity Summary</source>
-        <translation type="obsolete">Resúmen de Actividad</translation>
+        <translation>Resúmen de Actividad</translation>
     </message>
     <message>
         <location filename="../GcWindowRegistry.cpp" line="72"/>
@@ -8438,9 +8619,8 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Métricas de Tendencia</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="77"/>
         <source>Ride Summary</source>
-        <translation>Resumen Actividad</translation>
+        <translation type="vanished">Resumen Actividad</translation>
     </message>
     <message>
         <location filename="../GcWindowRegistry.cpp" line="78"/>
@@ -8776,9 +8956,13 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>GenerateHeatMapDialog</name>
     <message>
-        <location filename="../GenerateHeatMapDialog.cpp" line="31"/>
         <source>Ride Heat Map Generator</source>
-        <translation>Generador de Mapa de Calor p/actividades</translation>
+        <translation type="vanished">Generador de Mapa de Calor p/actividades</translation>
+    </message>
+    <message>
+        <location filename="../GenerateHeatMapDialog.cpp" line="31"/>
+        <source>Heat Map Generator</source>
+        <translation>Generador de Mapa de Calor</translation>
     </message>
     <message>
         <location filename="../GenerateHeatMapDialog.cpp" line="44"/>
@@ -8854,8 +9038,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <location filename="../GenerateHeatMapDialog.cpp" line="162"/>
-        <source>%1 rides exported, %2 failed or skipped.</source>
+        <source>%1 activities exported, %2 failed or skipped.</source>
         <translation>%1 actividades exportadas, %2 fallaron o fueron salteadas.</translation>
+    </message>
+    <message>
+        <source>%1 rides exported, %2 failed or skipped.</source>
+        <translation type="vanished">%1 actividades exportadas, %2 fallaron o fueron salteadas.</translation>
     </message>
     <message>
         <location filename="../GenerateHeatMapDialog.cpp" line="163"/>
@@ -8928,9 +9116,51 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>GradientPage</name>
     <message>
+        <location filename="../WorkoutWizard.cpp" line="544"/>
+        <source>Workout Wizard</source>
+        <translation>Asistente de Entrenamientos</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="546"/>
+        <source>Manually crate a workout based on gradient (slope) and distance, maximum grade is 5.</source>
+        <translation>Crear un entrenamiento basado en pendiente y distancia, la pendiente máxima es 5.</translation>
+    </message>
+    <message>
         <location filename="../WorkoutWizard.cpp" line="552"/>
+        <location filename="../WorkoutWizard.cpp" line="588"/>
+        <source>KM</source>
+        <translation>KM</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="552"/>
+        <location filename="../WorkoutWizard.cpp" line="588"/>
+        <source>Miles</source>
+        <translation>Millas</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="553"/>
         <source>Grade</source>
         <translation>Pendiente</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="590"/>
+        <source>Meters Gained</source>
+        <translation>Metros Ascendidos</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="590"/>
+        <source>Feet Gained</source>
+        <translation>Pies Ascendidos</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="599"/>
+        <source>Save Workout</source>
+        <translation>Guardar Entrenamiento</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="600"/>
+        <source>Computrainer Format *.crs</source>
+        <translation>Formato Computrainer *.crs</translation>
     </message>
 </context>
 <context>
@@ -9626,6 +9856,16 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Log Y</translation>
     </message>
     <message>
+        <location filename="../HistogramWindow.cpp" line="126"/>
+        <source>Data Samples</source>
+        <translation>Datos de las Muestras</translation>
+    </message>
+    <message>
+        <location filename="../HistogramWindow.cpp" line="127"/>
+        <source>Metrics</source>
+        <translation>Métricas</translation>
+    </message>
+    <message>
         <location filename="../HistogramWindow.cpp" line="228"/>
         <source>Show</source>
         <translation>Mostrar</translation>
@@ -9663,14 +9903,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Rango de Fechas</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="126"/>
         <source>Ride Data Samples</source>
-        <translation>Muetras de Datos</translation>
+        <translation type="vanished">Muetras de Datos</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="127"/>
         <source>Ride Metrics</source>
-        <translation>Métricas</translation>
+        <translation type="vanished">Métricas</translation>
     </message>
     <message>
         <location filename="../HistogramWindow.cpp" line="133"/>
@@ -10893,14 +11131,103 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>ImportPage</name>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="660"/>
         <source>Ride Smoothing Parameters</source>
+        <translation type="vanished">Parámetros de Suavizado</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="637"/>
+        <source>Workout Wizard</source>
+        <translation>Asistente de Entrenamientos</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="638"/>
+        <source>Import current activity as a Gradient ride (slope based)</source>
+        <translation>Importar la actividad actual como un entrenamiento basado en pendiente</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="643"/>
+        <source>KM</source>
+        <translation>KM</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="643"/>
+        <source>Miles</source>
+        <translation>Millas</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="644"/>
+        <source>Distance (</source>
+        <translation>Distancia (</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="646"/>
+        <source>Meters</source>
+        <translation>Metros</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="646"/>
+        <source>Feet</source>
+        <translation>Piés</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="647"/>
+        <source>elevation (</source>
+        <translation>Elevación (</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="661"/>
+        <source>Smoothing Parameters</source>
         <translation>Parámetros de Suavizado</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="666"/>
+        <location filename="../WorkoutWizard.cpp" line="662"/>
+        <source>Maximum Grade</source>
+        <translation>Pendiente Máxima</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="667"/>
         <source>Maximum supported grade is 8</source>
         <translation>La máxima pendiente admitida es 8</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="670"/>
+        <source>Segment Length</source>
+        <translation>Longitud del Segmento</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="676"/>
+        <source>Segment length is based on</source>
+        <translation>La longitud del Segmento se expresa en</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="676"/>
+        <source>meters</source>
+        <translation>metros</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="676"/>
+        <source>feet</source>
+        <translation>piés</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="737"/>
+        <source>Elevation Climbed</source>
+        <translation>Desnivel Acumulado</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="738"/>
+        <source>Distance</source>
+        <translation>Distancia</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="750"/>
+        <source>Save Workout</source>
+        <translation>Guardar Entrenamiento</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="751"/>
+        <source>Computrainer Format *.crs</source>
+        <translation>Formato Computrainer *.crs</translation>
     </message>
 </context>
 <context>
@@ -11172,8 +11499,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Joule %1 identificada</translation>
     </message>
     <message>
-        <location filename="../JouleDevice.cpp" line="145"/>
         <source>Read ride detail for ride %1/%2</source>
+        <translation type="vanished">Leyendo detalle de %1/%2</translation>
+    </message>
+    <message>
+        <location filename="../JouleDevice.cpp" line="145"/>
+        <source>Read detail for activity %1/%2</source>
         <translation>Leyendo detalle de %1/%2</translation>
     </message>
     <message>
@@ -11213,13 +11544,26 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <location filename="../JouleDevice.cpp" line="354"/>
-        <source>Read ride summary...</source>
+        <source>Read summary...</source>
         <translation>Leyendo resúmen...</translation>
     </message>
     <message>
         <location filename="../JouleDevice.cpp" line="386"/>
+        <source>%1 detailed activities</source>
+        <translation>Obteniendo detalles de la actividad %1</translation>
+    </message>
+    <message>
+        <location filename="../JouleDevice.cpp" line="412"/>
+        <source>Delete detail for activity %1/%2</source>
+        <translation>Borrar detalle de la sesión %1/%2</translation>
+    </message>
+    <message>
+        <source>Read ride summary...</source>
+        <translation type="vanished">Leyendo resúmen...</translation>
+    </message>
+    <message>
         <source>%1 detailed rides</source>
-        <translation>%1 actividades detalladas</translation>
+        <translation type="vanished">%1 actividades detalladas</translation>
     </message>
     <message>
         <source>%1 detailled rides</source>
@@ -11231,9 +11575,8 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Borrar todos los datos del Joule</translation>
     </message>
     <message>
-        <location filename="../JouleDevice.cpp" line="412"/>
         <source>Delete ride detail for ride %1/%2</source>
-        <translation>Borrar detalle de la sesión %1/%2</translation>
+        <translation type="vanished">Borrar detalle de la sesión %1/%2</translation>
     </message>
 </context>
 <context>
@@ -11554,9 +11897,8 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>LTMPopup</name>
     <message>
-        <location filename="../LTMPopup.cpp" line="48"/>
         <source>No Ride Selected</source>
-        <translation>Ninguna actividad seleccionada</translation>
+        <translation type="vanished">Ninguna actividad seleccionada</translation>
     </message>
     <message>
         <location filename="../LTMPopup.cpp" line="125"/>
@@ -11571,10 +11913,19 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation></translation>
     </message>
     <message>
+        <source>No ride selected</source>
+        <translation type="vanished">Ninguna actividad seleccionada</translation>
+    </message>
+    <message>
+        <location filename="../LTMPopup.cpp" line="48"/>
+        <source>No activity Selected</source>
+        <translation>No hay actividad Seleccionada</translation>
+    </message>
+    <message>
         <location filename="../LTMPopup.cpp" line="178"/>
         <location filename="../LTMPopup.cpp" line="343"/>
-        <source>No ride selected</source>
-        <translation>Ninguna actividad seleccionada</translation>
+        <source>No activity selected</source>
+        <translation>No hay actividad seleccionada</translation>
     </message>
     <message>
         <location filename="../LTMPopup.cpp" line="198"/>
@@ -11611,13 +11962,21 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <location filename="../LTMPopup.cpp" line="350"/>
-        <source> (%1 rides)</source>
-        <translation> (%1 actividades)</translation>
+        <source> (%1 activities)</source>
+        <translation>(%1 actividades)</translation>
     </message>
     <message>
         <location filename="../LTMPopup.cpp" line="353"/>
-        <source> / non ride-related metrics skipped</source>
+        <source> / non activity-related metrics skipped</source>
         <translation> / métrica no relacionada con actividad salteada</translation>
+    </message>
+    <message>
+        <source> (%1 rides)</source>
+        <translation type="vanished"> (%1 actividades)</translation>
+    </message>
+    <message>
+        <source> / non ride-related metrics skipped</source>
+        <translation type="vanished"> / métrica no relacionada con actividad salteada</translation>
     </message>
     <message>
         <location filename="../LTMPopup.cpp" line="415"/>
@@ -13268,8 +13627,9 @@ Saltando archivo...</translation>
         <translation>Descargar del dispositivo</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="410"/>
         <source>Create Manual Activity</source>
-        <translation type="obsolete">Ingreso Manual de Actividad</translation>
+        <translation>Ingreso Manual de Actividad</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="432"/>
@@ -13294,8 +13654,9 @@ Saltando archivo...</translation>
         <translation type="obsolete">Calendario</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="691"/>
         <source>Activities</source>
-        <translation type="obsolete">Actividades</translation>
+        <translation>Actividades</translation>
     </message>
     <message>
         <source>Menu</source>
@@ -13350,9 +13711,8 @@ Saltando archivo...</translation>
         <translation>Sincronizar TrainingPeaks...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="607"/>
         <source>Combine rides...</source>
-        <translation>Combinar actividades...</translation>
+        <translation type="vanished">Combinar actividades...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="636"/>
@@ -13363,6 +13723,16 @@ Saltando archivo...</translation>
         <location filename="../MainWindow.cpp" line="593"/>
         <source>&amp;Upload to TrainingPeaks</source>
         <translation>&amp;Cargar a TrainingPeaks</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="448"/>
+        <source>Split Activity...</source>
+        <translation>Dividir Actividad...</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="583"/>
+        <source>&amp;Manual entry...</source>
+        <translation>Ingreso &amp;Manual de actividad...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="585"/>
@@ -13395,16 +13765,19 @@ Saltando archivo...</translation>
         <translation type="obsolete">Cargar a Trainingstagebuch...</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="604"/>
         <source>&amp;Save activity</source>
-        <translation type="obsolete">&amp;Guardar actividad</translation>
+        <translation>&amp;Guardar actividad</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="605"/>
         <source>D&amp;elete activity...</source>
-        <translation type="obsolete">&amp;Eliminar actividad...</translation>
+        <translation>&amp;Eliminar Actividad...</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="606"/>
         <source>Split &amp;activity...</source>
-        <translation type="obsolete">&amp;Dividir actividad...</translation>
+        <translation>&amp;Dividir actividad...</translation>
     </message>
     <message>
         <source>Critical Power Estimator...</source>
@@ -13461,8 +13834,9 @@ Saltando archivo...</translation>
         <translation type="obsolete">Administrar Biblioteca de Medios/Entrenamientos</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="630"/>
         <source>Upload Activity to Calendar</source>
-        <translation type="obsolete">Cargar Actividad al Calendario</translation>
+        <translation>Cargar Actividad al Calendario</translation>
     </message>
     <message>
         <source>Import Calendar...</source>
@@ -13515,16 +13889,20 @@ Saltando archivo...</translation>
         <translation type="obsolete">Borrar intervalo seleccionado</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1269"/>
         <source>Select Activity</source>
-        <translation type="obsolete">Elegir Actividad</translation>
+        <translation>Elegir Actividad</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1269"/>
+        <location filename="../MainWindow.cpp" line="1388"/>
         <source>No activity selected!</source>
-        <translation type="obsolete">No hay actividad seleccionada!</translation>
+        <translation>No hay actividad seleccionada!</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1280"/>
         <source>Export Activity</source>
-        <translation type="obsolete">Exportar Actividad</translation>
+        <translation>Exportar Actividad</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1294"/>
@@ -13532,17 +13910,19 @@ Saltando archivo...</translation>
         <translation>Falló la Exportación</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1295"/>
         <source>Failed to export ride, please check permissions</source>
-        <translation>Error al exportar actividad, verifique los permisos</translation>
+        <translation type="vanished">Error al exportar actividad, verifique los permisos</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1364"/>
+        <location filename="../MainWindow.cpp" line="1376"/>
         <source>No activity selected</source>
-        <translation type="obsolete">No hay actividad seleccionada</translation>
+        <translation>No hay actividad seleccionada</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1366"/>
         <source>Current activity contains no data to split</source>
-        <translation type="obsolete">La actividad seleccionada no tiene datos para dividir</translation>
+        <translation>La actividad seleccionada no tiene datos para dividir</translation>
     </message>
     <message>
         <source>Current activity contains no data</source>
@@ -13590,19 +13970,16 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">Ctrl+P</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="606"/>
         <source>Split &amp;ride...</source>
-        <translation>Dividir Actividad...</translation>
+        <translation type="vanished">Dividir Actividad...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="605"/>
         <source>D&amp;elete ride...</source>
-        <translation>Borrar Actividad...</translation>
+        <translation type="vanished">Borrar Actividad...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="583"/>
         <source>&amp;Manual ride entry...</source>
-        <translation>Ingreso &amp;Manual de actividad...</translation>
+        <translation type="vanished">Ingreso &amp;Manual de actividad...</translation>
     </message>
     <message>
         <source>Hr Zones File Error</source>
@@ -13671,9 +14048,8 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">Exportar a TCX...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="604"/>
         <source>&amp;Save ride</source>
-        <translation>&amp;Guardar actividad</translation>
+        <translation type="vanished">&amp;Guardar actividad</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="614"/>
@@ -13719,9 +14095,8 @@ PC del Atleta en %3 vatios</translation>
         <translation>Vista con Pestañas</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="410"/>
         <source>Create Manual Ride</source>
-        <translation>Ingreso &amp;Manual de actividad</translation>
+        <translation type="vanished">Ingreso &amp;Manual de actividad</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="421"/>
@@ -13734,9 +14109,8 @@ PC del Atleta en %3 vatios</translation>
         <translation>Buscar Intervalos...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="448"/>
         <source>Split Ride...</source>
-        <translation>Dividir Actividad...</translation>
+        <translation type="vanished">Dividir Actividad...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="560"/>
@@ -13772,9 +14146,8 @@ PC del Atleta en %3 vatios</translation>
         <translation>Estimador de PC y W&apos;...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="630"/>
         <source>Upload Ride to Calendar</source>
-        <translation>Cargar Actividad al Calendario</translation>
+        <translation type="vanished">Cargar Actividad al Calendario</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="635"/>
@@ -13797,9 +14170,8 @@ PC del Atleta en %3 vatios</translation>
         <translation>Mostrar Pestañas de Atletas</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="691"/>
         <source>Rides</source>
-        <translation>Actividades</translation>
+        <translation type="vanished">Actividades</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="692"/>
@@ -13837,30 +14209,29 @@ PC del Atleta en %3 vatios</translation>
         <translation>¿Desea continuar?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1280"/>
-        <source>Export Ride</source>
-        <translation>Exportar Actividad</translation>
-    </message>
-    <message>
-        <location filename="../MainWindow.cpp" line="1336"/>
-        <source>No Ride To Save</source>
-        <translation>Ninguna actividad para Guardar</translation>
-    </message>
-    <message>
-        <location filename="../MainWindow.cpp" line="1364"/>
-        <location filename="../MainWindow.cpp" line="1376"/>
-        <source>No ride selected</source>
-        <translation>Ninguna actividad seleccionada</translation>
-    </message>
-    <message>
-        <location filename="../MainWindow.cpp" line="1366"/>
-        <source>Current ride contains no data to split</source>
-        <translation>La actividad seleccionada no tiene datos para dividir</translation>
-    </message>
-    <message>
         <location filename="../MainWindow.cpp" line="1378"/>
-        <source>Current ride contains no data to merge</source>
+        <source>Current activity contains no data to merge</source>
         <translation>La actividad seleccionada no tiene datos para combinar</translation>
+    </message>
+    <message>
+        <source>Export Ride</source>
+        <translation type="vanished">Exportar Actividad</translation>
+    </message>
+    <message>
+        <source>No Ride To Save</source>
+        <translation type="vanished">Ninguna actividad para Guardar</translation>
+    </message>
+    <message>
+        <source>No ride selected</source>
+        <translation type="vanished">Ninguna actividad seleccionada</translation>
+    </message>
+    <message>
+        <source>Current ride contains no data to split</source>
+        <translation type="vanished">La actividad seleccionada no tiene datos para dividir</translation>
+    </message>
+    <message>
+        <source>Current ride contains no data to merge</source>
+        <translation type="vanished">La actividad seleccionada no tiene datos para combinar</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1630"/>
@@ -13906,12 +14277,38 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">Volver a la versión guardada</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="449"/>
+        <location filename="../MainWindow.cpp" line="1388"/>
         <source>Delete Activity</source>
-        <translation type="obsolete">Eliminar Actividad</translation>
+        <translation>Eliminar Actividad</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="598"/>
+        <source>Tweet activity</source>
+        <translation>Twitear Actividad</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="607"/>
+        <source>Combine activities...</source>
+        <translation>Combinar actividades...</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1295"/>
+        <source>Failed to export activity, please check permissions</source>
+        <translation>Error al exportar actividad, verifique los permisos</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1337"/>
+        <source>There is no currently selected activity to save.</source>
+        <translation>No hay actividad seleccionada para guardar.</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1364"/>
+        <location filename="../MainWindow.cpp" line="1366"/>
+        <location filename="../MainWindow.cpp" line="1376"/>
+        <location filename="../MainWindow.cpp" line="1378"/>
         <source>Split Activity</source>
-        <translation type="obsolete">Dividir Actividad</translation>
+        <translation>Dividir Actividad</translation>
     </message>
     <message>
         <source>Tweet Activity</source>
@@ -13922,15 +14319,12 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">Imposible renombrar %1 a %2</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1269"/>
         <source>Select Ride</source>
-        <translation>Seleccionar Actividad</translation>
+        <translation type="vanished">Seleccionar Actividad</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1269"/>
-        <location filename="../MainWindow.cpp" line="1388"/>
         <source>No ride selected!</source>
-        <translation>¡Ninguna actividad seleccionada!</translation>
+        <translation type="vanished">¡Ninguna actividad seleccionada!</translation>
     </message>
     <message>
         <source>Export PWX</source>
@@ -13985,12 +14379,8 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">Valores Separados por Coma (*.csv)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1364"/>
-        <location filename="../MainWindow.cpp" line="1366"/>
-        <location filename="../MainWindow.cpp" line="1376"/>
-        <location filename="../MainWindow.cpp" line="1378"/>
         <source>Split Ride</source>
-        <translation>Dividir Actividad</translation>
+        <translation type="vanished">Dividir Actividad</translation>
     </message>
     <message>
         <source>The file %1 can&apos;t be opened for writing</source>
@@ -14003,17 +14393,18 @@ PC del Atleta en %3 vatios</translation>
         <translation>Importar de Archivo</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1336"/>
         <source>No Activity To Save</source>
-        <translation type="obsolete">No hay actividad para Guardar</translation>
+        <translation>No hay actividad para Guardar</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1337"/>
         <source>There is no currently selected ride to save.</source>
-        <translation>No hay actividad seleccionada para guardar.</translation>
+        <translation type="vanished">No hay actividad seleccionada para guardar.</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1394"/>
         <source>Are you sure you want to delete the activity:</source>
-        <translation type="obsolete">Confirma que quiere eliminar la actividad: </translation>
+        <translation>Confirma que quiere eliminar la actividad:</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1755"/>
@@ -14043,10 +14434,8 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">Volver al Entrenamiento Guardado</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="449"/>
-        <location filename="../MainWindow.cpp" line="1388"/>
         <source>Delete Ride</source>
-        <translation>Borrar Actividad</translation>
+        <translation type="vanished">Borrar Actividad</translation>
     </message>
     <message>
         <source>Find Best Intervals</source>
@@ -14057,9 +14446,8 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">Buscar Máximos de Potencia</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="598"/>
         <source>Tweet Ride</source>
-        <translation>Twitear Actividad</translation>
+        <translation type="vanished">Twitear Actividad</translation>
     </message>
     <message>
         <source>Rename interval</source>
@@ -14130,9 +14518,8 @@ PC del ciclista %3 vatios</translation>
         <translation type="obsolete">&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Software de Análisis de Potencia para Ciclismo&lt;br&gt;en Linux, Mac y Windows&lt;p&gt;Fecha de construcción: %1 %2&lt;p&gt;Versión: %3&lt;p&gt;GoldenCheetah está licenciado bajo la &lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;El código fuente se puede obtener de&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de entrenamiento y otros datos se guardan en&lt;br&gt;&lt;a href=&quot;%4&quot;&gt;%5&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1394"/>
         <source>Are you sure you want to delete the ride:</source>
-        <translation>Confirma que quiere eliminar la actividad: </translation>
+        <translation type="vanished">Confirma que quiere eliminar la actividad: </translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1396"/>
@@ -14235,13 +14622,21 @@ PC del ciclista %3 vatios</translation>
         <translation type="obsolete">Ingreso Manual de Actividad</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="120"/>
         <source>Manual Ride Entry</source>
+        <translation type="vanished">Ingreso Manual de actividad</translation>
+    </message>
+    <message>
+        <source>Ride date:</source>
+        <translation type="vanished">Fecha:</translation>
+    </message>
+    <message>
+        <location filename="../ManualRideDialog.cpp" line="120"/>
+        <source>Manual Entry</source>
         <translation>Ingreso Manual de actividad</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="139"/>
-        <source>Ride date:</source>
+        <source>Date:</source>
         <translation>Fecha:</translation>
     </message>
     <message>
@@ -14349,13 +14744,13 @@ PC del ciclista %3 vatios</translation>
         <translation>Imposible guardar</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="526"/>
         <source>There is already an ride with the same start time or you do not have permissions to save a file.</source>
-        <translation>Ya existe una actividad con la misma fecha y hora de inicio o falta parmiso para grabar el archivo.</translation>
+        <translation type="vanished">Ya existe una actividad con la misma fecha y hora de inicio o falta parmiso para grabar el archivo.</translation>
     </message>
     <message>
+        <location filename="../ManualRideDialog.cpp" line="526"/>
         <source>There is already an activity with the same start time or you do not have permissions to save a file.</source>
-        <translation type="obsolete">Ya existe una actividad con la misma fecha y hora o no tiene permisos para guardar un archivo.</translation>
+        <translation>Ya existe una actividad con la misma fecha y hora o no tiene permisos para guardar un archivo.</translation>
     </message>
     <message>
         <source>Daniels Points: </source>
@@ -14703,12 +15098,24 @@ PC del ciclista %3 vatios</translation>
     </message>
     <message>
         <location filename="../MergeActivityWizard.cpp" line="1167"/>
+        <source>Press Finish to update the current activity with  the combined data.
+
+The changes will be saved and cannot be undone.
+
+If you press continue the activity will be saved, if you do not want to continue either go back and change the settings or press cancel to abort.</source>
+        <translation>Presione Terminar para actualizar la actividad actual con los datos combinados.
+
+Los cambios se guardarán y no podran deshacerse.
+
+Si presiona continuar la actividad se guardará, sino quiere continuar vuelva atrás para cambiar la configuración o presione cancelar.</translation>
+    </message>
+    <message>
         <source>Press Finish to update the current ride with  the combined data.
 
 The changes will be saved and cannot be undone.
 
 If you press continue the ride will be saved, if you do not want to continue either go back and change the settings or press cancel to abort.</source>
-        <translation>Presione Terminar para actualizar la actividad acual con los datos combinados.
+        <translation type="vanished">Presione Terminar para actualizar la actividad acual con los datos combinados.
 
 Los cambios se guardarán y no podran deshacerse.
 
@@ -15760,9 +16167,13 @@ Parsing ... </source>
 Analizando ...</translation>
     </message>
     <message>
+        <source>Ride #%1: %2</source>
+        <translation type="vanished">Actividad #%1: %2</translation>
+    </message>
+    <message>
         <location filename="../MoxyDevice.cpp" line="256"/>
         <location filename="../MoxyDevice.cpp" line="310"/>
-        <source>Ride #%1: %2</source>
+        <source>File #%1: %2</source>
         <translation>Actividad #%1: %2</translation>
     </message>
     <message>
@@ -17398,14 +17809,12 @@ Do you want to continue?</source>
         <translation>Tiempo (porcentaje)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1741"/>
         <source>%1 of Ride (%2)</source>
-        <translation>%1 de Actividad (%2)</translation>
+        <translation type="vanished">%1 de Actividad (%2)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1743"/>
         <source>%1 of Ride</source>
-        <translation>%1 de Actividad</translation>
+        <translation type="vanished">%1 de Actividad</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="2168"/>
@@ -17448,12 +17857,14 @@ Do you want to continue?</source>
         <translation></translation>
     </message>
     <message>
+        <location filename="../PowerHist.cpp" line="1741"/>
         <source>%1 of Activity (%2)</source>
-        <translation type="obsolete">%1 de Actividad (%2)</translation>
+        <translation>%1 de Actividad (%2)</translation>
     </message>
     <message>
+        <location filename="../PowerHist.cpp" line="1743"/>
         <source>%1 of Activity</source>
-        <translation type="obsolete">%1 de Actividad</translation>
+        <translation>%1 de Actividad</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="2173"/>
@@ -17665,8 +18076,17 @@ y que muestra la palabra &quot;Host&quot;</translation>
     </message>
     <message>
         <location filename="../PowerTapDevice.cpp" line="201"/>
-        <source>Reading ride data...</source>
+        <source>Reading data...</source>
         <translation>Leyendo datos de entrenamiento...</translation>
+    </message>
+    <message>
+        <location filename="../PowerTapDevice.cpp" line="322"/>
+        <source>Failed to find start time.</source>
+        <translation>Falló obtención de la fecha y hora del entrenamiento.</translation>
+    </message>
+    <message>
+        <source>Reading ride data...</source>
+        <translation type="vanished">Leyendo datos de entrenamiento...</translation>
     </message>
     <message>
         <location filename="../PowerTapDevice.cpp" line="215"/>
@@ -17704,9 +18124,8 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <translation>Falló la creación de archivo temporal </translation>
     </message>
     <message>
-        <location filename="../PowerTapDevice.cpp" line="322"/>
         <source>Failed to find ride time.</source>
-        <translation>Falló obtención de la fecha y hora del entrenamiento.</translation>
+        <translation type="vanished">Falló obtención de la fecha y hora del entrenamiento.</translation>
     </message>
 </context>
 <context>
@@ -17790,7 +18209,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <translation>usando una operación de cadena de caracteres con un número</translation>
     </message>
     <message>
-        <location filename="../FitRideFile.cpp" line="420"/>
+        <location filename="../FitRideFile.cpp" line="446"/>
         <source>Lap %1</source>
         <translation>Vuelta %1</translation>
     </message>
@@ -17818,77 +18237,77 @@ yyyy</source>
     <message>
         <location filename="../KmlRideFile.cpp" line="146"/>
         <source>Start</source>
-        <translation type="unfinished">Iniciar</translation>
+        <translation>Inicio</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="167"/>
         <source>End</source>
-        <translation type="unfinished"></translation>
+        <translation>Fin</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="265"/>
         <source>heartrate</source>
-        <translation type="unfinished"></translation>
+        <translation>frecuencia cardíaca</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="267"/>
         <source>temperature</source>
-        <translation type="unfinished"></translation>
+        <translation>temperatura</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="272"/>
         <source>run cadence</source>
-        <translation type="unfinished"></translation>
+        <translation>frecuencia de paso</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="274"/>
         <source>vertical oscillation</source>
-        <translation type="unfinished"></translation>
+        <translation>oscilación vertical</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="276"/>
         <source>ground contact time</source>
-        <translation type="unfinished"></translation>
+        <translation>tiempo de contacto</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="279"/>
         <source>cadence</source>
-        <translation type="unfinished"></translation>
+        <translation>cadencia</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="281"/>
         <source>power</source>
-        <translation type="unfinished"></translation>
+        <translation>potencia</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="283"/>
         <source>torque</source>
-        <translation type="unfinished"></translation>
+        <translation>torque</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="285"/>
         <source>headwind</source>
-        <translation type="unfinished"></translation>
+        <translation>viento en contra</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="292"/>
-        <source>Bike Rides</source>
-        <translation type="unfinished"></translation>
+        <source>Activities</source>
+        <translation>Actividades</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="296"/>
         <source>Entire Activity</source>
-        <translation type="unfinished">Actividad Completa</translation>
+        <translation>Actividad Completa</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="299"/>
         <source>Run %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Carrera %1</translation>
     </message>
     <message>
         <location filename="../KmlRideFile.cpp" line="301"/>
         <source>Bike %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ciclismo %1</translation>
     </message>
 </context>
 <context>
@@ -18333,6 +18752,16 @@ yyyy</source>
 <context>
     <name>RelWattagePage</name>
     <message>
+        <location filename="../WorkoutWizard.cpp" line="411"/>
+        <source>Workout Wizard</source>
+        <translation>Asistente de Entrenamientos</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="412"/>
+        <source>Relative Wattage Workout Wizard, current CP60 = </source>
+        <translation>Asistente de entrenamiento para potencia relativa, PC actual = </translation>
+    </message>
+    <message>
         <location filename="../WorkoutWizard.cpp" line="416"/>
         <location filename="../WorkoutWizard.cpp" line="425"/>
         <source>% of FTP</source>
@@ -18352,6 +18781,16 @@ yyyy</source>
         <location filename="../WorkoutWizard.cpp" line="426"/>
         <source>Wattage</source>
         <translation>Potencia</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="497"/>
+        <source>Save Workout</source>
+        <translation>Guardar Entrenamiento</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="498"/>
+        <source>Computrainer Format *.mrc</source>
+        <translation>Formato Computrainer *.mrc</translation>
     </message>
 </context>
 <context>
@@ -18428,9 +18867,8 @@ yyyy</source>
 <context>
     <name>RideCount</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="41"/>
         <source>Rides</source>
-        <translation>Actividades</translation>
+        <translation type="vanished">Actividades</translation>
     </message>
     <message>
         <location filename="../ManualRideFile.cpp" line="49"/>
@@ -18446,6 +18884,11 @@ yyyy</source>
         <location filename="../ManualRideFile.cpp" line="119"/>
         <source>Unknown ride metric &quot;%1&quot;.</source>
         <translation>Métrica desconocida &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="41"/>
+        <source>Activities</source>
+        <translation>Actividades</translation>
     </message>
 </context>
 <context>
@@ -19183,25 +19626,15 @@ yyyy</source>
         <translation>%</translation>
     </message>
     <message>
+        <location filename="../RideFile.cpp" line="297"/>
+        <source>°C</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../RideFile.cpp" line="303"/>
         <location filename="../RideFile.cpp" line="304"/>
         <source>mm</source>
         <translation></translation>
-    </message>
-    <message>
-        <location filename="../RideFile.cpp" line="1611"/>
-        <source>Wheelsize</source>
-        <translation>Tamaño de rueda</translation>
-    </message>
-    <message>
-        <location filename="../RideFile.cpp" line="314"/>
-        <source>meters per hour</source>
-        <translation>metros por hora</translation>
-    </message>
-    <message>
-        <location filename="../RideFile.cpp" line="297"/>
-        <source>Â°C</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="305"/>
@@ -19212,8 +19645,23 @@ yyyy</source>
         <location filename="../RideFile.cpp" line="310"/>
         <location filename="../RideFile.cpp" line="311"/>
         <location filename="../RideFile.cpp" line="312"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="1527"/>
+        <source>Invalid File Name</source>
+        <translation>Nombre de archivo inválido</translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="1611"/>
+        <source>Wheelsize</source>
+        <translation>Tamaño de rueda</translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="314"/>
+        <source>meters per hour</source>
+        <translation>metros por hora</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="315"/>
@@ -19255,9 +19703,8 @@ yyyy</source>
         <translation>relación</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="1527"/>
         <source>Invalid Ride File Name</source>
-        <translation>Nombre de archivo inválido</translation>
+        <translation type="vanished">Nombre de archivo inválido</translation>
     </message>
     <message>
         <source>Invalid Activity File Name</source>
@@ -19543,9 +19990,8 @@ Saltando archivo...</translation>
         <translation type="obsolete">Sobrescribir Archivos Existentes</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="211"/>
         <source>Import Ride Files</source>
-        <translation>Importar Archivos de Entrenamiento</translation>
+        <translation type="vanished">Importar Archivos de Entrenamiento</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="213"/>
@@ -19645,6 +20091,11 @@ Saltando archivo...</translation>
         <translation>Sin archivos seleccionados para importación automática.</translation>
     </message>
     <message>
+        <location filename="../RideImportWizard.cpp" line="745"/>
+        <source>More than 24hrs of activities to fit into a day</source>
+        <translation>Más de 24hs de entrenamiento en un dia</translation>
+    </message>
+    <message>
         <location filename="../RideImportWizard.cpp" line="915"/>
         <source>Error - Activity file exists</source>
         <translation>Error - El archivo de actividad ya existe</translation>
@@ -19720,6 +20171,11 @@ Saltando archivo...</translation>
         <translation>Sin archivos de actividad encontrados</translation>
     </message>
     <message>
+        <location filename="../RideImportWizard.cpp" line="211"/>
+        <source>Import Files</source>
+        <translation>Importar Archivos</translation>
+    </message>
+    <message>
         <location filename="../RideImportWizard.cpp" line="597"/>
         <source>Step 3 of 4: Confirm Date and Time</source>
         <translation>Paso 3 de 4: Confirmar Fecha y Hora</translation>
@@ -19739,9 +20195,8 @@ Saltando archivo...</translation>
         <translation>Selección Inválida</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="745"/>
         <source>More than 24hrs of rides to fit into a day</source>
-        <translation>Más de 24hs de entrenamiento en un dia</translation>
+        <translation type="vanished">Más de 24hs de entrenamiento en un dia</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="865"/>
@@ -20331,13 +20786,21 @@ Saltando archivo...</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="690"/>
-        <source>Upload ride...</source>
-        <translation>Cargar actividad...</translation>
+        <source>Upload...</source>
+        <translation>Cargar...</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="778"/>
-        <source>Upload ride... Sending to RideWithGPS</source>
+        <source>Upload... Sending to RideWithGPS</source>
         <translation>Cargar Actividad... Enviando a RideWithGPS</translation>
+    </message>
+    <message>
+        <source>Upload ride...</source>
+        <translation type="vanished">Cargar actividad...</translation>
+    </message>
+    <message>
+        <source>Upload ride... Sending to RideWithGPS</source>
+        <translation type="vanished">Cargar Actividad... Enviando a RideWithGPS</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="788"/>
@@ -20462,8 +20925,12 @@ Saltando archivo...</translation>
 <context>
     <name>RouteSegment</name>
     <message>
-        <location filename="../Route.cpp" line="108"/>
         <source>Invalid Ride File Name</source>
+        <translation type="vanished">Nombre de archivo inválido</translation>
+    </message>
+    <message>
+        <location filename="../Route.cpp" line="108"/>
+        <source>Invalid File Name</source>
         <translation>Nombre de archivo inválido</translation>
     </message>
     <message>
@@ -20496,8 +20963,12 @@ Transcurridos: %1
     </message>
     <message>
         <location filename="../Route.cpp" line="340"/>
-        <source>This route &apos;%1&apos; was found %2 times in %3 rides.</source>
+        <source>This route &apos;%1&apos; was found %2 times in %3 activities.</source>
         <translation>Este recorrido %1 se encontró %2 veces en %3 actividades.</translation>
+    </message>
+    <message>
+        <source>This route &apos;%1&apos; was found %2 times in %3 rides.</source>
+        <translation type="vanished">Este recorrido %1 se encontró %2 veces en %3 actividades.</translation>
     </message>
 </context>
 <context>
@@ -20594,14 +21065,23 @@ Se realizaron cambios en </translation>
         <translation>Guardar y Convertir</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="208"/>
         <source> If you want to save
 them, we need to convert the ride to GoldenCheetah&apos;s
 native format. Should we do so?
 </source>
-        <translation> Si quiere guardarlos
+        <translation type="vanished"> Si quiere guardarlos
 es necesario convertir el archivo al 
 formato GoldenCheetah. ¿Confirmar?</translation>
+    </message>
+    <message>
+        <location filename="../SaveDialogs.cpp" line="208"/>
+        <source> If you want to save
+them, we need to convert to GoldenCheetah&apos;s
+native format. Should we do so?
+</source>
+        <translation> Si quiere guardarlos
+es necesario convertir el archivo al 
+formato GoldenCheetah. ¿Confirma?</translation>
     </message>
     <message>
         <location filename="../SaveDialogs.cpp" line="213"/>
@@ -20779,12 +21259,12 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../ScatterPlot.cpp" line="158"/>
         <source>Deoxygenated Haemoglobin</source>
-        <translation type="unfinished"></translation>
+        <translation>Hemoglobina Reducida</translation>
     </message>
     <message>
         <location filename="../ScatterPlot.cpp" line="159"/>
         <source>Oxygenated Haemoglobin</source>
-        <translation type="unfinished"></translation>
+        <translation>Hemoglobina Oxigenada</translation>
     </message>
     <message>
         <location filename="../ScatterPlot.cpp" line="161"/>
@@ -21080,13 +21560,13 @@ formato GoldenCheetah. ¿Confirmar?</translation>
         <location filename="../ScatterWindow.cpp" line="55"/>
         <location filename="../ScatterWindow.cpp" line="88"/>
         <source>Deoxygenated Hb</source>
-        <translation type="unfinished"></translation>
+        <translation>Hg Reducida</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="56"/>
         <location filename="../ScatterWindow.cpp" line="89"/>
         <source>Oxygenated Hb</source>
-        <translation type="unfinished"></translation>
+        <translation>Hg Oxigenada</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="101"/>
@@ -21107,18 +21587,30 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="192"/>
-        <source>All intervals/rides</source>
+        <source>All intervals/activities</source>
         <translation>Todos los intervalos/actividades</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="193"/>
-        <source>First intervals/rides on X-axis</source>
+        <source>First intervals/activities on X-axis</source>
         <translation>Primeros intervalos/actividades en eje X</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="194"/>
-        <source>First intervals/rides on Y-axis</source>
+        <source>First intervals/activities on Y-axis</source>
         <translation>Primeros intervalos/actividades en eje Y</translation>
+    </message>
+    <message>
+        <source>All intervals/rides</source>
+        <translation type="vanished">Todos los intervalos/actividades</translation>
+    </message>
+    <message>
+        <source>First intervals/rides on X-axis</source>
+        <translation type="vanished">Primeros intervalos/actividades en eje X</translation>
+    </message>
+    <message>
+        <source>First intervals/rides on Y-axis</source>
+        <translation type="vanished">Primeros intervalos/actividades en eje Y</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="195"/>
@@ -21463,13 +21955,21 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="1035"/>
-        <source>Upload ride to Selfloops...</source>
+        <source>Upload to Selfloops...</source>
         <translation>Cargar a Selfloops...</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="1081"/>
-        <source>Upload ride... Sending to Selfloops</source>
+        <source>Upload... Sending to Selfloops</source>
         <translation>Cargar Actividad... Enviando a Selfloops</translation>
+    </message>
+    <message>
+        <source>Upload ride to Selfloops...</source>
+        <translation type="vanished">Cargar a Selfloops...</translation>
+    </message>
+    <message>
+        <source>Upload ride... Sending to Selfloops</source>
+        <translation type="vanished">Cargar Actividad... Enviando a Selfloops</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="1090"/>
@@ -21509,8 +22009,12 @@ formato GoldenCheetah. ¿Confirmar?</translation>
 <context>
     <name>ShareDialog</name>
     <message>
-        <location filename="../ShareDialog.cpp" line="90"/>
         <source>Share your ride</source>
+        <translation type="vanished">Compartir Actividad</translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="90"/>
+        <source>Share your activity</source>
         <translation>Compartir Actividad</translation>
     </message>
     <message>
@@ -21550,8 +22054,22 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="177"/>
-        <source>Choose a name for your ride: </source>
+        <source>Choose a name for your activity: </source>
         <translation>Elija un nombre para su actividad: </translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="255"/>
+        <source>&amp;Upload Activity</source>
+        <translation>&amp;Cargar Actividad</translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="365"/>
+        <source>This activity is marked as already on %1. Are you sure you want to upload it?</source>
+        <translation>Esta Actividad está marcada como ya cargada en %1. ¿Desea cargarla nuevamente?</translation>
+    </message>
+    <message>
+        <source>Choose a name for your ride: </source>
+        <translation type="vanished">Elija un nombre para su actividad: </translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="215"/>
@@ -21559,9 +22077,8 @@ formato GoldenCheetah. ¿Confirmar?</translation>
         <translation>Seleccione las series de datos que desea enviar:</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="365"/>
         <source>This Ride is marked as already on %1. Are you sure you want to upload it?</source>
-        <translation>Esta Actividad está marcada como ya cargada en %1. ¿Desea cargarla nuevamente?</translation>
+        <translation type="vanished">Esta Actividad está marcada como ya cargada en %1. ¿Desea cargarla nuevamente?</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="369"/>
@@ -21598,9 +22115,8 @@ formato GoldenCheetah. ¿Confirmar?</translation>
         <translation>Frec. Cardíaca</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="255"/>
         <source>&amp;Upload Ride</source>
-        <translation>Cargar &amp;Actividad</translation>
+        <translation type="vanished">Cargar &amp;Actividad</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="257"/>
@@ -21840,13 +22356,13 @@ formato GoldenCheetah. ¿Confirmar?</translation>
 <context>
     <name>SplitActivityWizard</name>
     <message>
+        <location filename="../SplitActivityWizard.cpp" line="46"/>
         <source>Split Activity</source>
-        <translation type="obsolete">Dividir Actividad</translation>
+        <translation>Dividir Actividad</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="46"/>
         <source>Split Ride</source>
-        <translation>Dividir Actividad</translation>
+        <translation type="vanished">Dividir Actividad</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="65"/>
@@ -21896,20 +22412,18 @@ formato GoldenCheetah. ¿Confirmar?</translation>
         <translation>Acción</translation>
     </message>
     <message>
+        <source>Ride Segment #%1</source>
+        <translation type="vanished">Segmento de Actividad #%1</translation>
+    </message>
+    <message>
+        <source>Entire Ride</source>
+        <translation type="vanished">Actividad Completa</translation>
+    </message>
+    <message>
         <location filename="../SplitActivityWizard.cpp" line="162"/>
         <location filename="../SplitActivityWizard.cpp" line="181"/>
-        <source>Ride Segment #%1</source>
-        <translation>Segmento de Actividad #%1</translation>
-    </message>
-    <message>
-        <location filename="../SplitActivityWizard.cpp" line="228"/>
-        <location filename="../SplitActivityWizard.cpp" line="249"/>
-        <source>Entire Ride</source>
-        <translation>Actividad Completa</translation>
-    </message>
-    <message>
         <source>Activity Segment #%1</source>
-        <translation type="obsolete">Segmento de Actividad #%1</translation>
+        <translation>Segmento de Actividad #%1</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="202"/>
@@ -21918,8 +22432,10 @@ formato GoldenCheetah. ¿Confirmar?</translation>
         <translation>Vacío en registro #%1</translation>
     </message>
     <message>
+        <location filename="../SplitActivityWizard.cpp" line="228"/>
+        <location filename="../SplitActivityWizard.cpp" line="249"/>
         <source>Entire Activity</source>
-        <translation type="obsolete">Actividad Completa</translation>
+        <translation>Actividad Completa</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="248"/>
@@ -21957,8 +22473,12 @@ formato GoldenCheetah. ¿Confirmar?</translation>
         <translation type="obsolete">La División de Actividad no se puede deshacer</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="666"/>
         <source>Split ride cannot be undone</source>
+        <translation type="vanished">La División de Actividad no se puede deshacer</translation>
+    </message>
+    <message>
+        <location filename="../SplitActivityWizard.cpp" line="666"/>
+        <source>Split activity cannot be undone</source>
         <translation>La División de Actividad no se puede deshacer</translation>
     </message>
     <message>
@@ -21986,32 +22506,33 @@ Are you sure you wish to proceed?</source>
         <translation>Finalizado</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="843"/>
         <source>Split Ride Completed</source>
-        <translation>División de Actividad Finalizada</translation>
+        <translation type="vanished">División de Actividad Finalizada</translation>
     </message>
     <message>
+        <location filename="../SplitActivityWizard.cpp" line="843"/>
         <source>Split Activity Completed</source>
-        <translation type="obsolete">División de Actividad Finalizada</translation>
+        <translation>División de Actividad Finalizada</translation>
     </message>
 </context>
 <context>
     <name>SplitKeep</name>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="478"/>
+        <location filename="../SplitActivityWizard.cpp" line="492"/>
         <source>Keep original</source>
         <translation>Mantener el original</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="479"/>
-        <source>Do you want to keep the original ride?</source>
+        <source>Do you want to keep the original?</source>
         <translation>¿Quiere mantener la actividad original?</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="484"/>
-        <source>If you want to keep the current ride then you should ensure you have clicked on the &quot;Keep original ride&quot; check box below.
+        <source>If you want to keep the current activity then you should ensure you have clicked on the &quot;Keep original &quot; check box below.
 
-If you do not choose to keep the original ride it will be backed up before removing it from the ride history.
+If you do not choose to keep the original it will be backed up before removing it from the history.
 
 </source>
         <translation>Si usted quiere preservar la actividad seleccionada asegúrese de seleccionar la opción &quot;Preservar actividad original&quot; más abajo.
@@ -22019,9 +22540,27 @@ If you do not choose to keep the original ride it will be backed up before remov
 Si usted no selecciona dicha opción, la actividad original será resguardada antes de ser eliminada del registro histórico de actividades.</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="492"/>
+        <location filename="../SplitActivityWizard.cpp" line="578"/>
+        <source>WARNING: The current activity will be backed up and removed, but a backup already exists. The existing backup will therefore be overwritten.</source>
+        <translation>Cuidado: la actividad seleccionada será resguardada y eliminada, pero un resguardo ya existe. El resguardo existente será sobreescrito.</translation>
+    </message>
+    <message>
+        <source>Do you want to keep the original ride?</source>
+        <translation type="vanished">¿Quiere mantener la actividad original?</translation>
+    </message>
+    <message>
+        <source>If you want to keep the current ride then you should ensure you have clicked on the &quot;Keep original ride&quot; check box below.
+
+If you do not choose to keep the original ride it will be backed up before removing it from the ride history.
+
+</source>
+        <translation type="vanished">Si usted quiere preservar la actividad seleccionada asegúrese de seleccionar la opción &quot;Preservar actividad original&quot; más abajo.
+
+Si usted no selecciona dicha opción, la actividad original será resguardada antes de ser eliminada del registro histórico de actividades.</translation>
+    </message>
+    <message>
         <source>Keep original ride</source>
-        <translation>Mantener el original</translation>
+        <translation type="vanished">Mantener el original</translation>
     </message>
     <message>
         <source>Do you want to keep the original activity?</source>
@@ -22042,9 +22581,8 @@ Si usted no selecciona dicha opción, la actividad original será resguardada an
         <translation type="obsolete">Preservar actividad original</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="578"/>
         <source>WARNING: The current ride will be backed up and removed, but a backup already exists. The existing backup will therefore be overwritten.</source>
-        <translation>Cuidado: la actividad seleccionada será resguardada y eliminada, pero un resguardo ya existe. El resguardo existente será sobreescrito.</translation>
+        <translation type="vanished">Cuidado: la actividad seleccionada será resguardada y eliminada, pero un resguardo ya existe. El resguardo existente será sobreescrito.</translation>
     </message>
 </context>
 <context>
@@ -22061,7 +22599,7 @@ Si usted no selecciona dicha opción, la actividad original será resguardada an
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="520"/>
-        <source>This wizard will find segments of ride to save by looking for gaps in recording. 
+        <source>This wizard will find segments of the activity to save by looking for gaps in recording. 
 
 You can define the minimum length, in time, a gap in recording should be in order to mark the end of one segment and the beginning of another.
 
@@ -22069,6 +22607,20 @@ In addition, you can set a minimum segment size. Any segment smaller than this l
 
 </source>
         <translation>Este asistente buscará segmentos de la actividad para separar en base a los faltantes en el registro.
+
+Usted puede definir la longitud mínima en tiempo que un faltante debe durar para marcar el fin de un segmento y el comienzo de otro.
+
+Adicionalmente, usted puede elegir una duración mínima de segmento, cualquier segmento de menor duración será ignorado.</translation>
+    </message>
+    <message>
+        <source>This wizard will find segments of ride to save by looking for gaps in recording. 
+
+You can define the minimum length, in time, a gap in recording should be in order to mark the end of one segment and the beginning of another.
+
+In addition, you can set a minimum segment size. Any segment smaller than this limit will be ignored.
+
+</source>
+        <translation type="vanished">Este asistente buscará segmentos de la actividad para separar en base a los faltantes en el registro.
 
 Usted puede definir la longitud mínima en tiempo que un faltante debe durar para marcar el fin de un segmento y el comienzo de otro.
 
@@ -22130,25 +22682,38 @@ Adicionalmente, usted puede elegir una duración mínima de segmento, cualquier 
         <translation>Seleccionar Marcadores de división</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="591"/>
         <source>Ride will be split between marker points selected</source>
-        <translation>La Actividad será dividida entre los marcadores seleccionados</translation>
+        <translation type="vanished">La Actividad será dividida entre los marcadores seleccionados</translation>
     </message>
     <message>
+        <location filename="../SplitActivityWizard.cpp" line="591"/>
         <source>Activity will be split between marker points selected</source>
-        <translation type="obsolete">La Actividad será dividida entre los marcadores seleccionados</translation>
+        <translation>La Actividad será dividida entre los marcadores seleccionados</translation>
     </message>
 </context>
 <context>
     <name>SplitWelcome</name>
     <message>
+        <location filename="../SplitActivityWizard.cpp" line="453"/>
         <source>Split Activity</source>
-        <translation type="obsolete">Dividir Actividad</translation>
+        <translation>Dividir Actividad</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="453"/>
+        <location filename="../SplitActivityWizard.cpp" line="459"/>
+        <source>This wizard will help you split the current activity into multiple activities
+
+The wizard will identify segments of uninterrupted activity and allow you to select which ones to save as new activities. You will also be able to select any currently defined intervals too.
+
+If the newly created activity clashes with an existing activity (same date and time) then the wizard will adjust the start time by one or more seconds to avoid losing or overwriting any existing data.</source>
+        <translation>Este asistente le ayudará a dividir la actividad seleccionada en múltiples actividades
+
+El asistente identificará segmentos de actividad ininterrumpida y permitirá seleccionar cuales guardar como nuevas actividades. Usted también podrá seleccionar intervalos previamente definidos.
+
+Si la nueva actividad colisiona con una existente (misma fecha y hora) el asistente ajustará el tiempo de inicio en un o más segundos para evitar la pérdida de actividades existentes.</translation>
+    </message>
+    <message>
         <source>Split Ride</source>
-        <translation>Dividir Actividad</translation>
+        <translation type="vanished">Dividir Actividad</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="454"/>
@@ -22156,13 +22721,12 @@ Adicionalmente, usted puede elegir una duración mínima de segmento, cualquier 
         <translation>Comencemos</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="459"/>
         <source>This wizard will help you split the current ride into multiple rides
 
 The wizard will identify segments of uninterrupted ride and allow you to select which ones to save as new rides. You will also be able to select any currently defined intervals too.
 
 If the newly created ride clashes with an existing ride (same date and time) then the wizard will adjust the start time by one or more seconds to avoid losing or overwriting any existing rides.</source>
-        <translation>Este asistente le ayudará a dividir la actividad seleccionada en múltiples actividades
+        <translation type="vanished">Este asistente le ayudará a dividir la actividad seleccionada en múltiples actividades
 
 El asistente identificará segmentos de actividad ininterrumpida y permitirá seleccionar cuales guardar como nuevas actividades. Usted también podrá seleccionar intervalos previamente definidos.
 
@@ -22645,13 +23209,26 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="445"/>
-        <source>Upload ride to Strava...</source>
+        <source>Upload activity to Strava...</source>
         <translation>Cargar a Strava...</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="520"/>
-        <source>Upload ride... Sending to Strava</source>
+        <source>Upload... Sending to Strava</source>
         <translation>Cargar Actividad... Enviando a Strava</translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="588"/>
+        <source>Processing...</source>
+        <translation>Procesando...</translation>
+    </message>
+    <message>
+        <source>Upload ride to Strava...</source>
+        <translation type="vanished">Cargar a Strava...</translation>
+    </message>
+    <message>
+        <source>Upload ride... Sending to Strava</source>
+        <translation type="vanished">Cargar Actividad... Enviando a Strava</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="529"/>
@@ -22669,9 +23246,8 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
         <translation> Error de Strava: </translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="588"/>
         <source>Ride processing...</source>
-        <translation>Procesando actividad...</translation>
+        <translation type="vanished">Procesando actividad...</translation>
     </message>
 </context>
 <context>
@@ -22789,9 +23365,8 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
         <translation>Hasta:</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="115"/>
         <source>Refresh Ride List</source>
-        <translation>Actualizar lista de Actividades</translation>
+        <translation type="vanished">Actualizar lista de Actividades</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="116"/>
@@ -22806,9 +23381,8 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
         <translation>Seleccionar todo</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="182"/>
         <source>Keep all do not delete any rides</source>
-        <translation>Mantener todo no borrar ninguna actividad</translation>
+        <translation type="vanished">Mantener todo no borrar ninguna actividad</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="183"/>
@@ -22826,8 +23400,22 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
         <translation>Sobreescribir archivo existente</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="273"/>
         <source>Downloading ride list...</source>
+        <translation type="vanished">Descargando lista de actividades...</translation>
+    </message>
+    <message>
+        <location filename="../TPDownloadDialog.cpp" line="115"/>
+        <source>Refresh List</source>
+        <translation>Actualizar lista de Actividades</translation>
+    </message>
+    <message>
+        <location filename="../TPDownloadDialog.cpp" line="182"/>
+        <source>Keep all do not delete</source>
+        <translation>Mantener todo, no borrar ninguna actividad</translation>
+    </message>
+    <message>
+        <location filename="../TPDownloadDialog.cpp" line="273"/>
+        <source>Downloading list...</source>
         <translation>Descargando lista de actividades...</translation>
     </message>
     <message>
@@ -22947,8 +23535,12 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     </message>
     <message>
         <location filename="../TPUploadDialog.cpp" line="58"/>
-        <source>Uploading ride (%1 bytes)...</source>
+        <source>Uploading (%1 bytes)...</source>
         <translation>Cargando actividad (%1 bytes)...</translation>
+    </message>
+    <message>
+        <source>Uploading ride (%1 bytes)...</source>
+        <translation type="vanished">Cargando actividad (%1 bytes)...</translation>
     </message>
     <message>
         <location filename="../TPUploadDialog.cpp" line="77"/>
@@ -22995,8 +23587,12 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
 <context>
     <name>TabView</name>
     <message>
-        <location filename="../TabView.cpp" line="63"/>
         <source>Compare Rides and Intervals</source>
+        <translation type="vanished">Comparar Actividades e Intervalos</translation>
+    </message>
+    <message>
+        <location filename="../TabView.cpp" line="63"/>
+        <source>Compare Activities and Intervals</source>
         <translation>Comparar Actividades e Intervalos</translation>
     </message>
     <message>
@@ -23088,9 +23684,13 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
 <context>
     <name>TimeRiding</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="111"/>
         <source>Time Riding</source>
-        <translation>Tiempo Pedaleando</translation>
+        <translation type="vanished">Tiempo Pedaleando</translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="111"/>
+        <source>Time Moving</source>
+        <translation>Tiempo en Movimiento</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="112"/>
@@ -23690,13 +24290,12 @@ Presionar F3 en el controlador al finalizar.</translation>
     </message>
     <message>
         <location filename="../TreeMapWindow.cpp" line="307"/>
-        <source>%1 ride%2</source>
-        <translation>%1 actividad%2</translation>
+        <source>%1 activities</source>
+        <translation>%1 actividades</translation>
     </message>
     <message>
-        <location filename="../TreeMapWindow.cpp" line="307"/>
-        <source>s</source>
-        <translation></translation>
+        <source>%1 ride%2</source>
+        <translation type="vanished">%1 actividad%2</translation>
     </message>
     <message>
         <location filename="../TreeMapWindow.cpp" line="315"/>
@@ -23782,9 +24381,8 @@ Presionar F3 en el controlador al finalizar.</translation>
 <context>
     <name>TwitterDialog</name>
     <message>
-        <location filename="../TwitterDialog.cpp" line="34"/>
         <source>Tweet Your Ride</source>
-        <translation>Twitear Actividad</translation>
+        <translation type="vanished">Twitear Actividad</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="37"/>
@@ -23797,9 +24395,18 @@ Presionar F3 en el controlador al finalizar.</translation>
         <translation>Tiempo de Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="40"/>
         <source>Time Riding</source>
-        <translation>Tiempo Pedaleando</translation>
+        <translation type="vanished">Tiempo Pedaleando</translation>
+    </message>
+    <message>
+        <location filename="../TwitterDialog.cpp" line="34"/>
+        <source>Tweet Activity</source>
+        <translation>Twitear Actividad</translation>
+    </message>
+    <message>
+        <location filename="../TwitterDialog.cpp" line="40"/>
+        <source>Time Moving</source>
+        <translation>Tiempo en Movimiento</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="41"/>
@@ -23858,8 +24465,17 @@ Presionar F3 en el controlador al finalizar.</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="75"/>
+        <source>&amp;Tweet Activity</source>
+        <translation>&amp;Twitear Actividad</translation>
+    </message>
+    <message>
+        <location filename="../TwitterDialog.cpp" line="207"/>
+        <source>Time Moving: %1 </source>
+        <translation>Tiempo en Movimiento: %1 </translation>
+    </message>
+    <message>
         <source>&amp;Tweet Ride</source>
-        <translation>&amp;Twitear Entrenamiento</translation>
+        <translation type="vanished">&amp;Twitear Entrenamiento</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="77"/>
@@ -23936,9 +24552,8 @@ Presionar F3 en el controlador al finalizar.</translation>
         <translation>Duración: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="207"/>
         <source>Time Riding: %1 </source>
-        <translation>Tiempo Pedaleando: %1 </translation>
+        <translation type="vanished">Tiempo Pedaleando: %1 </translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="208"/>
@@ -24478,29 +25093,39 @@ Presionar F3 en el controlador al finalizar.</translation>
 <context>
     <name>WorkoutTypePage</name>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="230"/>
+        <location filename="../WorkoutWizard.cpp" line="229"/>
         <source>Workout Creator</source>
         <translation>Creador de Entrenamientos</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="231"/>
+        <location filename="../WorkoutWizard.cpp" line="230"/>
         <source>Select the workout type to be created</source>
         <translation>Seleccionar el tipo de entrenamiento a ser creado</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="233"/>
+        <location filename="../WorkoutWizard.cpp" line="232"/>
         <source>Absolute Wattage</source>
         <translation>Potencia Absoluta</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="235"/>
+        <location filename="../WorkoutWizard.cpp" line="234"/>
         <source>% FTP Wattage</source>
         <translation>Potencia % FTP</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="236"/>
+        <location filename="../WorkoutWizard.cpp" line="235"/>
         <source>Gradient</source>
         <translation>Pendiente</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="239"/>
+        <source>Import Selected Activity (</source>
+        <translation>Importar Actividad Selecctionada (</translation>
+    </message>
+    <message>
+        <location filename="../WorkoutWizard.cpp" line="242"/>
+        <source>No activity selected</source>
+        <translation>No hay actividad seleccionada</translation>
     </message>
 </context>
 <context>
