@@ -304,7 +304,7 @@ TreeMapWindow::cellClicked(QString f1, QString f2)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *metric = factory.rideMetric(settings.symbol);
 
-    ltmPopup->setData(spec, metric, QString(tr("%1 ride%2")).arg(count).arg(count == 1 ? "" : tr("s")));
+    ltmPopup->setData(spec, metric, QString(tr("%1 activities")));
     popup->show();
 
 }

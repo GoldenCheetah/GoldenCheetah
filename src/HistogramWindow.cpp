@@ -123,8 +123,8 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
         cl->addWidget(new QLabel("")); // spacing
 
         // default to data series!
-        data = new QRadioButton(tr("Ride Data Samples"));
-        metric = new QRadioButton(tr("Ride Metrics"));
+        data = new QRadioButton(tr("Data Samples"));
+        metric = new QRadioButton(tr("Metrics"));
         data->setChecked(true);
         metric->setChecked(false);
         QHBoxLayout *radios = new QHBoxLayout;

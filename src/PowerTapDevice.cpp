@@ -198,7 +198,7 @@ PowerTapDevice::download( const QDir &tmpdir,
     for (size_t i = 0; i < sizeof(header); ++i)
         records.append(header[i]);
 
-    emit updateStatus( tr("Reading ride data...") );
+    emit updateStatus( tr("Reading data...") );
     if(m_Cancelled) {
         err = tr("download cancelled");
         return false;
@@ -319,7 +319,7 @@ PowerTapDevice::download( const QDir &tmpdir,
         }
     }
     if (!time_set) {
-        err = tr("Failed to find ride time.");
+        err = tr("Failed to find start time.");
         tmp.setAutoRemove(true);
         return false;
     }

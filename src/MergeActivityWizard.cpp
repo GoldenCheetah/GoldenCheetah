@@ -1164,10 +1164,10 @@ MergeConfirm::MergeConfirm(MergeActivityWizard *parent) : QWizardPage(parent), w
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    QLabel *label = new QLabel(tr("Press Finish to update the current ride with "
+    QLabel *label = new QLabel(tr("Press Finish to update the current activity with "
                                " the combined data.\n\n"
                                "The changes will be saved and cannot be undone.\n\n"
-                               "If you press continue the ride will be saved, if you "
+                               "If you press continue the activity will be saved, if you "
                                "do not want to continue either go back and change "
                                "the settings or press cancel to abort."));
     label->setWordWrap(true);

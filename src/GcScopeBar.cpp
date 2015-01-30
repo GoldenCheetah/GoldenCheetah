@@ -90,7 +90,7 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
 
 #endif
 
-    anal->setText(tr("Rides"));
+    anal->setText(tr("Activities"));
     anal->setWidth(70);
     anal->setChecked(true);
     layout->addWidget(anal);
@@ -129,7 +129,7 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     int width = fontMetric.width(tr("Trends"));
     home->setWidth(width+20);
 
-    width = fontMetric.width(tr("Rides"));
+    width = fontMetric.width(tr("Activities"));
     anal->setWidth(width+20);
 
     width = fontMetric.width(tr("Train"));

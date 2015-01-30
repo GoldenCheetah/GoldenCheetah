@@ -55,7 +55,7 @@ context(context), cyclist(cyclist), ride(ride)
     uploading = true;
     int size = uploader->upload(context, ride);
 
-    statusLabel->setText(QString(tr("Uploading ride (%1 bytes)...")).arg(size));
+    statusLabel->setText(QString(tr("Uploading (%1 bytes)...")).arg(size));
 
     setMinimumWidth(250);
 }

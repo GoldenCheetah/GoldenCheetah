@@ -30,7 +30,7 @@
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_ANALYSIS)
 {
     analSidebar = new AnalysisSidebar(context);
-    HomeWindow *a = new HomeWindow(context, "analysis", "Rides");
+    HomeWindow *a = new HomeWindow(context, "analysis", "Activities");
     controls->addWidget(a->controls());
     controls->setCurrentIndex(0);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);

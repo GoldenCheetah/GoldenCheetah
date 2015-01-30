@@ -51,7 +51,7 @@ class FixMoxyConfig : public DataProcessorConfig
             return(QString(tr("When recording from the Moxy in Speed and"
                            " cadence mode the SmO2 and tHb data is sent as"
                            " cadence and speed respectively. This tool will"
-                           " update the ride file to move the values from speed"
+                           " update the activity file to move the values from speed"
                            " and cadence into the Moxy series."
                            )));
         }

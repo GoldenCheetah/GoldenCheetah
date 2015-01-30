@@ -1738,9 +1738,9 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
         setAxisTitle(yLeft, QString(tr("Total %1")).arg(tm->name()));
     
     if (m->units(context->athlete->useMetricUnits) != "")
-        setAxisTitle(xBottom, QString(tr("%1 of Ride (%2)")).arg(m->name()).arg(xunits));
+        setAxisTitle(xBottom, QString(tr("%1 of Activity (%2)")).arg(m->name()).arg(xunits));
     else
-        setAxisTitle(xBottom, QString(tr("%1 of Ride")).arg(m->name()));
+        setAxisTitle(xBottom, QString(tr("%1 of Activity")).arg(m->name()));
 
     // dont show legend in metric mode
     //XXX legend()->hide();

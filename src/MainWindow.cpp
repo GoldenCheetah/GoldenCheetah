@@ -407,7 +407,7 @@ MainWindow::MainWindow(const QDir &home)
     compose->setIconSize(isize);
     compose->setFixedHeight(25);
     compose->setStyle(toolStyle);
-    compose->setToolTip(tr("Create Manual Ride"));
+    compose->setToolTip(tr("Create Manual Activity"));
     compose->setPalette(metal);
     connect(compose, SIGNAL(clicked(bool)), this, SLOT(manualRide()));
     HelpWhatsThis *helpCompose = new HelpWhatsThis(compose);
@@ -445,8 +445,8 @@ MainWindow::MainWindow(const QDir &home)
     actbuttons->setSelectionBehavior(QtSegmentControl::SelectNone); //wince. spelling. ugh
     actbuttons->setFixedHeight(25);
     actbuttons->setSegmentToolTip(0, tr("Find Intervals..."));
-    actbuttons->setSegmentToolTip(1, tr("Split Ride..."));
-    actbuttons->setSegmentToolTip(2, tr("Delete Ride"));
+    actbuttons->setSegmentToolTip(1, tr("Split Activity..."));
+    actbuttons->setSegmentToolTip(2, tr("Delete Activity"));
     actbuttons->setPalette(metal);
     connect(actbuttons, SIGNAL(segmentSelected(int)), this, SLOT(actionClicked(int)));
 
@@ -580,7 +580,7 @@ MainWindow::MainWindow(const QDir &home)
     QMenu *rideMenu = menuBar()->addMenu(tr("A&ctivity"));
     rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), tr("Ctrl+D"));
     rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
-    rideMenu->addAction(tr("&Manual ride entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
+    rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
     rideMenu->addSeparator ();
     shareAction = new QAction(tr("Share Online..."), this);
     shareAction->setShortcut(tr("Ctrl+U"));
@@ -595,16 +595,16 @@ MainWindow::MainWindow(const QDir &home)
 #endif
 
 #ifdef GC_HAVE_KQOAUTH
-    tweetAction = new QAction(tr("Tweet Ride"), this);
+    tweetAction = new QAction(tr("Tweet activity"), this);
     connect(tweetAction, SIGNAL(triggered(bool)), this, SLOT(tweetRide()));
     rideMenu->addAction(tweetAction);
 #endif
 
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Save ride"), this, SLOT(saveRide()), tr("Ctrl+S"));
-    rideMenu->addAction(tr("D&elete ride..."), this, SLOT(deleteRide()));
-    rideMenu->addAction(tr("Split &ride..."), this, SLOT(splitRide()));
-    rideMenu->addAction(tr("Combine rides..."), this, SLOT(mergeRide()));
+    rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
+    rideMenu->addAction(tr("D&elete activity..."), this, SLOT(deleteRide()));
+    rideMenu->addAction(tr("Split &activity..."), this, SLOT(splitRide()));
+    rideMenu->addAction(tr("Combine activities..."), this, SLOT(mergeRide()));
     rideMenu->addSeparator ();
 
     HelpWhatsThis *helpRideMenu = new HelpWhatsThis(rideMenu);
@@ -627,7 +627,7 @@ MainWindow::MainWindow(const QDir &home)
 
 #ifdef GC_HAVE_ICAL
     optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("Upload Ride to Calendar"), this, SLOT(uploadCalendar()), tr (""));
+    optionsMenu->addAction(tr("Upload Activity to Calendar"), this, SLOT(uploadCalendar()), tr (""));
     //optionsMenu->addAction(tr("Import Calendar..."), this, SLOT(importCalendar()), tr ("")); // planned for v3.1
     //optionsMenu->addAction(tr("Export Calendar..."), this, SLOT(exportCalendar()), tr ("")); // planned for v3.1
     optionsMenu->addAction(tr("Refresh Calendar"), this, SLOT(refreshCalendar()), tr (""));
@@ -688,7 +688,7 @@ MainWindow::MainWindow(const QDir &home)
 
     //connect(showhideSidebar, SIGNAL(triggered(bool)), this, SLOT(showSidebar(bool)));
     viewMenu->addSeparator();
-    viewMenu->addAction(tr("Rides"), this, SLOT(selectAnalysis()));
+    viewMenu->addAction(tr("Activities"), this, SLOT(selectAnalysis()));
     viewMenu->addAction(tr("Trends"), this, SLOT(selectHome()));
 #ifdef GC_HAVE_INTERVALS
     viewMenu->addAction(tr("Intervals"), this, SLOT(selectInterval()));
@@ -1266,7 +1266,7 @@ void
 MainWindow::exportRide()
 {
     if (currentTab->context->ride == NULL) {
-        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
         return;
     }
 
@@ -1277,7 +1277,7 @@ MainWindow::exportRide()
         allFormats << QString("%1 (*.%2)").arg(rff.description(suffix)).arg(suffix);
 
     QString suffix; // what was selected?
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Ride"), QDir::homePath(), allFormats.join(";;"), &suffix);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Activity"), QDir::homePath(), allFormats.join(";;"), &suffix);
 
     if (fileName.length() == 0) return;
 
@@ -1292,7 +1292,7 @@ MainWindow::exportRide()
 
     if (result == false) {
         QMessageBox oops(QMessageBox::Critical, tr("Export Failed"),
-                         tr("Failed to export ride, please check permissions"));
+                         tr("Failed to export activity, please check permissions"));
         oops.exec();
     }
 }
@@ -1333,8 +1333,8 @@ MainWindow::saveRide()
     if (currentTab->context->ride)
         saveRideSingleDialog(currentTab->context, currentTab->context->ride); // will signal save to everyone
     else {
-        QMessageBox oops(QMessageBox::Critical, tr("No Ride To Save"),
-                         tr("There is no currently selected ride to save."));
+        QMessageBox oops(QMessageBox::Critical, tr("No Activity To Save"),
+                         tr("There is no currently selected activity to save."));
         oops.exec();
         return;
     }
@@ -1361,9 +1361,9 @@ MainWindow::splitRide()
     if (currentTab->context->ride && currentTab->context->ride->ride() && currentTab->context->ride->ride()->dataPoints().count()) (new SplitActivityWizard(currentTab->context))->exec();
     else {
         if (!currentTab->context->ride || !currentTab->context->ride->ride())
-            QMessageBox::critical(this, tr("Split Ride"), tr("No ride selected"));
+            QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected"));
         else
-            QMessageBox::critical(this, tr("Split Ride"), tr("Current ride contains no data to split"));
+            QMessageBox::critical(this, tr("Split Activity"), tr("Current activity contains no data to split"));
     }
 }
 
@@ -1373,9 +1373,9 @@ MainWindow::mergeRide()
     if (currentTab->context->ride && currentTab->context->ride->ride() && currentTab->context->ride->ride()->dataPoints().count()) (new MergeActivityWizard(currentTab->context))->exec();
     else {
         if (!currentTab->context->ride || !currentTab->context->ride->ride())
-            QMessageBox::critical(this, tr("Split Ride"), tr("No ride selected"));
+            QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected"));
         else
-            QMessageBox::critical(this, tr("Split Ride"), tr("Current ride contains no data to merge"));
+            QMessageBox::critical(this, tr("Split Activity"), tr("Current activity contains no data to merge"));
     }
 }
 
@@ -1385,13 +1385,13 @@ MainWindow::deleteRide()
     RideItem *_item = currentTab->context->ride;
 
     if (_item==NULL) { 
-        QMessageBox::critical(this, tr("Delete Ride"), tr("No ride selected!"));
+        QMessageBox::critical(this, tr("Delete Activity"), tr("No activity selected!"));
         return;
     }
 
     RideItem *item = static_cast<RideItem*>(_item);
     QMessageBox msgBox;
-    msgBox.setText(tr("Are you sure you want to delete the ride:"));
+    msgBox.setText(tr("Are you sure you want to delete the activity:"));
     msgBox.setInformativeText(item->fileName);
     QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
     msgBox.setStandardButtons(QMessageBox::Cancel);

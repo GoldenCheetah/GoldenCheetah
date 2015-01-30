@@ -253,7 +253,7 @@ MoxyDevice::download( const QDir &tmpdir,
                 if (rows > 30) {
 
                     // we have one file anyway
-                    emit updateStatus(QString(tr("Ride #%1: %2")).arg(++nfiles).arg(file.startTime.toString("d-MMM-yy hh:mm")));
+                    emit updateStatus(QString(tr("File #%1: %2")).arg(++nfiles).arg(file.startTime.toString("d-MMM-yy hh:mm")));
                     tmpFile->close();
                     files << file;
 
@@ -307,7 +307,7 @@ MoxyDevice::download( const QDir &tmpdir,
         if (rows > 30) {
 
             // we have one file anyway
-            emit updateStatus(QString(tr("Ride #%1: %2")).arg(++nfiles).arg(file.startTime.toString("d-MMM-yy hh:mm")));
+            emit updateStatus(QString(tr("File #%1: %2")).arg(++nfiles).arg(file.startTime.toString("d-MMM-yy hh:mm")));
             tmpFile->close();
             files << file;
 

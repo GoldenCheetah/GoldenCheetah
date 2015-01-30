@@ -236,10 +236,10 @@ void WorkoutTypePage::initializePage()
 
     if (hackContext->rideItem()) {
         QString s = hackContext->rideItem()->ride()->startTime().toLocalTime().toString();
-        QString importStr = tr("Import Selected Ride (") + s + ")";
+        QString importStr = tr("Import Selected Activity (") + s + ")";
         importRadioButton = new QRadioButton((importStr));
     } else {
-        importRadioButton = new QRadioButton(tr("No ride selected"));
+        importRadioButton = new QRadioButton(tr("No activity selected"));
     }
     QVBoxLayout *groupBoxLayout = new QVBoxLayout();
 
@@ -635,7 +635,7 @@ void ImportPage::initializePage()
 {
 
         setTitle(tr("Workout Wizard"));
-        setSubTitle(tr("Import current ride as a Gradient Ride (slope based)"));
+        setSubTitle(tr("Import current activity as a Gradient ride (slope based)"));
         setFinalPage(true);
         QVBoxLayout *layout = new QVBoxLayout();
         plot = new WorkoutPlot();
@@ -658,7 +658,7 @@ void ImportPage::initializePage()
         layout->addWidget(plot,1);
 
         QGroupBox *spinGroupBox = new QGroupBox();
-        spinGroupBox->setTitle(tr("Ride Smoothing Parameters"));
+        spinGroupBox->setTitle(tr("Smoothing Parameters"));
         QLabel *gradeLabel = new QLabel(tr("Maximum Grade"));
         gradeBox = new QSpinBox();
         gradeBox->setValue(5);

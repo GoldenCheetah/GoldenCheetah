@@ -35,10 +35,10 @@ class RideCount : public RideMetric {
     RideCount()
     {
         setSymbol("ride_count");
-        setInternalName("Rides");
+        setInternalName("Activities");
     }
     void initialize() {
-        setName(tr("Rides"));
+        setName(tr("Activities"));
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
     }

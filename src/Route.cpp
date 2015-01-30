@@ -105,7 +105,7 @@ RouteSegment::parseRideFileName(Context *context, const QString &name, QString *
     QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
     if ((! date.isValid()) || (! time.isValid())) {
         QMessageBox::warning(context->mainWindow,
-                             tr("Invalid Ride File Name"),
+                             tr("Invalid File Name"),
                              tr("Invalid date/time in filename:\n%1\nSkipping file...").arg(name));
         return false;
     }
@@ -244,7 +244,7 @@ RouteSegment::searchRouteInRide(RideFile* ride, bool freememory, QTextStream* ou
             if (n == this->getPoints().count()-1){
                 // OK
                 //Add the interval and continue search
-                *out << "    >>> Route identified in ride: " << name << " start: " << start << " stop: " << stop << " (distance " << precision << "km)\r\n";
+                *out << "    >>> Route identified in: " << name << " start: " << start << " stop: " << stop << " (distance " << precision << "km)\r\n";
                 this->addRideForRideFile(ride, start, stop, precision);
                 candidate = true;
                 *out << "    search again..." << "\r\n";
@@ -290,7 +290,7 @@ RouteSegment::searchRouteInAllRides(Context* context)
     while (iterator.hasNext()) {
         QString name = iterator.next();
         QFile file(context->athlete->home->activities().canonicalPath() + "/" + name);
-        out << "Opening ride: " << name;
+        out << "Opening: " << name;
 
         RideFile *ride = NULL;
 
@@ -337,7 +337,7 @@ RouteSegment::searchRouteInAllRides(Context* context)
     // stop logging
     out << "SEARCH NEW ROUTE ENDS: " << QDateTime::currentDateTime().toString() + "\r\n";
 
-    QMessageBox::information(context->mainWindow, tr("Route"), tr("This route '%1' was found %2 times in %3 rides.").arg(this->getName()).arg(this->getRides().count()).arg(processed));
+    QMessageBox::information(context->mainWindow, tr("Route"), tr("This route '%1' was found %2 times in %3 activities.").arg(this->getName()).arg(this->getRides().count()).arg(processed));
 
     log.close();
 }

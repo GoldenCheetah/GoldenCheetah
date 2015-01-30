@@ -79,7 +79,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     activityLayout->setContentsMargins(0,0,0,0);
     activityLayout->addWidget(rideNavigator);
 
-    activityItem = new GcSplitterItem(tr("Rides"), iconFromPNG(":images/sidebar/folder.png"), this);
+    activityItem = new GcSplitterItem(tr("Activities"), iconFromPNG(":images/sidebar/folder.png"), this);
     QAction *activityAction = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     activityItem->addAction(activityAction);
     connect(activityAction, SIGNAL(triggered(void)), this, SLOT(analysisPopup()));
@@ -211,10 +211,10 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         QAction *revertRide = new QAction(tr("Revert to Saved version"), rideNavigator);
         connect(revertRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(revertRide()));
 
-        QAction *actDeleteRide = new QAction(tr("Delete Ride"), rideNavigator);
+        QAction *actDeleteRide = new QAction(tr("Delete Activity"), rideNavigator);
         connect(actDeleteRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(deleteRide()));
 
-        QAction *actSplitRide = new QAction(tr("Split Ride"), rideNavigator);
+        QAction *actSplitRide = new QAction(tr("Split Activity"), rideNavigator);
         connect(actSplitRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(splitRide()));
 
         if (rideItem->isDirty() == true) {
@@ -225,7 +225,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         menu.addAction(actDeleteRide);
         menu.addAction(actSplitRide);
 #ifdef GC_HAVE_ICAL
-        QAction *actUploadCalendar = new QAction(tr("Upload Ride to Calendar"), rideNavigator);
+        QAction *actUploadCalendar = new QAction(tr("Upload Activity to Calendar"), rideNavigator);
         connect(actUploadCalendar, SIGNAL(triggered(void)), context->mainWindow, SLOT(uploadCalendar()));
         menu.addAction(actUploadCalendar);
 #endif
@@ -403,9 +403,9 @@ AnalysisSidebar::addIntervals()
     } else {
 
         if (!context->ride || !context->ride->ride())
-            QMessageBox::critical(this, tr("Find Intervals"), tr("No ride selected"));
+            QMessageBox::critical(this, tr("Find Intervals"), tr("No activity selected"));
         else
-            QMessageBox::critical(this, tr("Find Intervals"), tr("Current ride contains no data"));
+            QMessageBox::critical(this, tr("Find Intervals"), tr("Current activity contains no data"));
     }
 }
 
@@ -450,9 +450,9 @@ AnalysisSidebar::findPowerPeaks()
     } else {
 
         if (!context->ride || !context->ride->ride())
-            QMessageBox::critical(this, tr("Find Power Peaks"), tr("No ride selected"));
+            QMessageBox::critical(this, tr("Find Power Peaks"), tr("No activity selected"));
         else
-            QMessageBox::critical(this, tr("Find Power Peaks"), tr("Current ride contains no data"));
+            QMessageBox::critical(this, tr("Find Power Peaks"), tr("Current activity contains no data"));
     }
 }
 

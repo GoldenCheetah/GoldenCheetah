@@ -142,7 +142,7 @@ JouleDevice::download( const QDir &tmpdir,
         return false;
 
     for (int i=0; i<trainings.count(); i++) {
-        emit updateProgress(QString(tr("Read ride detail for ride %1/%2")).arg(i+1).arg(trainings.count()));
+        emit updateProgress(QString(tr("Read detail for activity %1/%2")).arg(i+1).arg(trainings.count()));
         JoulePacket request(READ_RIDE_DETAIL);
         int id1 = (trainings.at(i).id>255?trainings.at(i).id-255:trainings.at(i).id);
         int id2 = (trainings.at(i).id>255?trainings.at(i).id%255:0);
@@ -351,8 +351,8 @@ JouleDevice::getUnitFreeSpace(QString &memory, QString &err)
 bool
 JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJouleGPS, QString &err)
 {
-    emit updateStatus(tr("Read ride summary..."));
-    if (JOULE_DEBUG) printf("Read ride summary\n");
+    emit updateStatus(tr("Read summary..."));
+    if (JOULE_DEBUG) printf("Read summary\n");
 
     JoulePacket request(READ_RIDE_SUMMARY);
 
@@ -383,7 +383,7 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJou
                 rides.append(ride);
             }
         }
-        emit updateStatus(QString(tr("%1 detailed rides")).arg(rides.count()));
+        emit updateStatus(QString(tr("%1 detailed activities")).arg(rides.count()));
         return true;
     }
     return false;
@@ -409,7 +409,7 @@ JouleDevice::cleanup( QString &err ) {
         return false;
 
     for (int i=0; i<trainings.count(); i++) {
-        emit updateStatus(QString(tr("Delete ride detail for ride %1/%2")).arg(i+1).arg(trainings.count()));
+        emit updateStatus(QString(tr("Delete detail for activity %1/%2")).arg(i+1).arg(trainings.count()));
         JoulePacket request(ERASE_RIDE_DETAIL);
         int id1 = (trainings.at(i).id>255?trainings.at(i).id-255:trainings.at(i).id);
         int id2 = (trainings.at(i).id>255?trainings.at(i).id%255:0);

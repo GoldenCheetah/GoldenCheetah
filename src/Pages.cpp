@@ -1386,10 +1386,10 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     antiAliased = new QCheckBox;
     antiAliased->setChecked(appsettings->value(this, GC_ANTIALIAS, true).toBool());
 #ifndef Q_OS_MAC
-    QLabel *rideScrollLabel = new QLabel(tr("Ride Scrollbar"));
+    QLabel *rideScrollLabel = new QLabel(tr("Activity Scrollbar"));
     rideScroll = new QCheckBox;
     rideScroll->setChecked(appsettings->value(this, GC_RIDESCROLL, true).toBool());
-    QLabel *rideHeadLabel = new QLabel(tr("Ride Headings"));
+    QLabel *rideHeadLabel = new QLabel(tr("Activity Headings"));
     rideHead = new QCheckBox;
     rideHead->setChecked(appsettings->value(this, GC_RIDEHEAD, true).toBool());
 #endif
