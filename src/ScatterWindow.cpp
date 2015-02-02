@@ -45,7 +45,7 @@ ScatterWindow::addStandardChannels(QComboBox *box)
     box->addItem(tr("Temperature"), MODEL_TEMP);
     box->addItem(tr("L/R Balance"), MODEL_LRBALANCE);
     box->addItem(tr("L/R Torque Effectiveness"), MODEL_TE);
-    box->addItem(tr("L/R Pedal Smoothness"), MODEL_TE);
+    box->addItem(tr("L/R Pedal Smoothness"), MODEL_PS);
     box->addItem(tr("Running Vertical Oscillation"), MODEL_RV);
     box->addItem(tr("Running Cadence"), MODEL_RCAD);
     box->addItem(tr("Running GCT"), MODEL_RGCT);
