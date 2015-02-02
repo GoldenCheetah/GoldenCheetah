@@ -2344,6 +2344,7 @@ MetadataPage::MetadataPage(Context *context) : context(context)
 
     // save initial values
     b4.keywordFingerprint = KeywordDefinition::fingerprint(keywordDefinitions);
+    b4.colorfield = colorfield;
     b4.fieldFingerprint = FieldDefinition::fingerprint(fieldDefinitions);
 }
 
@@ -2366,7 +2367,7 @@ MetadataPage::saveClicked()
 
     qint32 state = 0;
 
-    if (b4.keywordFingerprint != KeywordDefinition::fingerprint(keywordDefinitions))
+    if (b4.keywordFingerprint != KeywordDefinition::fingerprint(keywordDefinitions) || b4.colorfield != colorfield)
         state += CONFIG_NOTECOLOR;
 
     if (b4.fieldFingerprint != FieldDefinition::fingerprint(fieldDefinitions))
