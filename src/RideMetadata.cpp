@@ -570,7 +570,11 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
 
     // if save is being called flush all the values out ready to save as they are
-    connect(meta->context, SIGNAL(metadataFlush()), this, SLOT(editFinished()));
+    if (definition.type == FIELD_TEXTBOX && definition.name != "Change History") 
+        connect(meta->context, SIGNAL(metadataFlush()), this, SLOT(focusOut()));
+    else {
+        connect(meta->context, SIGNAL(metadataFlush()), this, SLOT(editFinished()));
+    }
 
     active = false;
 }
@@ -613,14 +617,17 @@ FormField::dataChanged()
 void
 FormField::focusOut(QFocusEvent *)
 {
-    // watch to see if we actually have changed ?
-    if (definition.type == FIELD_TEXTBOX && definition.name != "Change History") {
+    if (ourRideItem && ourRideItem->ride()) {
 
-        // what did we used to be ?
-        QString value = ourRideItem->ride()->getTag(definition.name, "");
-        if (value != dynamic_cast<GTextEdit*>(widget)->document()->toPlainText()) {
-            edited = true;
-            editFinished(); // we made a change so reflect it !
+        // watch to see if we actually have changed ?
+        if (definition.type == FIELD_TEXTBOX && definition.name != "Change History") {
+
+            // what did we used to be ?
+            QString value = ourRideItem->ride()->getTag(definition.name, "");
+            if (value != dynamic_cast<GTextEdit*>(widget)->document()->toPlainText()) {
+                edited = true;
+                editFinished(); // we made a change so reflect it !
+            }
         }
     }
 }
