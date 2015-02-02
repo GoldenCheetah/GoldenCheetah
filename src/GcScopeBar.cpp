@@ -127,17 +127,17 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     // suffer from RSI from typing and writing more than any other nation ;)
     QFontMetrics fontMetric(font);
     int width = fontMetric.width(tr("Trends"));
-    home->setWidth(width+20);
+    home->setWidth(width+30);
 
     width = fontMetric.width(tr("Activities"));
-    anal->setWidth(width+20);
+    anal->setWidth(width+30);
 
     width = fontMetric.width(tr("Train"));
-    train->setWidth(width+20);
+    train->setWidth(width+30);
 
 #ifdef GC_HAVE_ICAL
     width = fontMetric.width(tr("Diary"));
-    diary->setWidth(width+20);
+    diary->setWidth(width+30);
 #endif
 }
 
