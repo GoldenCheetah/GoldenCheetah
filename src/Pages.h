@@ -606,6 +606,7 @@ class MetadataPage : public QWidget
         struct {
             unsigned long fieldFingerprint;
             unsigned long keywordFingerprint;
+            QString colorfield;
         } b4;
 };
 
