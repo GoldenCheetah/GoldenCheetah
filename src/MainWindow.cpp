@@ -1326,18 +1326,23 @@ MainWindow::importFile()
 void
 MainWindow::saveRide()
 {
-    // only save if neccessary
-    if (currentTab->context->ride->isDirty()) currentTab->context->notifyMetadataFlush();
-    else return;
-
-    if (currentTab->context->ride)
-        saveRideSingleDialog(currentTab->context, currentTab->context->ride); // will signal save to everyone
-    else {
+    // no ride
+    if (currentTab->context->ride == NULL) {
         QMessageBox oops(QMessageBox::Critical, tr("No Activity To Save"),
                          tr("There is no currently selected activity to save."));
         oops.exec();
         return;
     }
+
+    // flush in-flight changes
+    currentTab->context->notifyMetadataFlush();
+
+    // nothing to do if not dirty
+    if (currentTab->context->ride->isDirty() == false) return;
+
+    // save
+    if (currentTab->context->ride)
+        saveRideSingleDialog(currentTab->context, currentTab->context->ride); // will signal save to everyone
 }
 
 void

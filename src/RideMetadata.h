@@ -94,7 +94,7 @@ class FormField : public QWidget
         void editFinished();        // from the widget - we finished editing this field
         void metadataChanged();     // from GC - a new ride got picked / changed elsewhere
         void stateChanged(int);     // should we enable/disable the widget?
-        void focusOut(QFocusEvent *event);
+        void focusOut(QFocusEvent *event=NULL);
 
     private:
         RideMetadata *meta;
