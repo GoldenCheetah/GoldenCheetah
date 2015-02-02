@@ -76,22 +76,22 @@ ErgDBDownloadDialog::ErgDBDownloadDialog(Context *context) : QDialog(context->ma
         add->setText(4, item.added.toString(tr("dd MMM yyyy")));
 
         // interval action
-        add->setText(5, "Download");
+        add->setText(5, tr("Download"));
 
         // hide away the id
         add->setText(6, QString("%1").arg(item.id));
     }
 
-    all = new QCheckBox("check/uncheck all", this);
+    all = new QCheckBox(tr("check/uncheck all"), this);
     all->setChecked(true);
 
     // buttons
     QHBoxLayout *buttons = new QHBoxLayout;
     status = new QLabel("", this);
     status->hide();
-    overwrite = new QCheckBox("Overwrite existing workouts", this);
-    cancel = new QPushButton("Cancel", this);
-    ok = new QPushButton("Download", this);
+    overwrite = new QCheckBox(tr("Overwrite existing workouts"), this);
+    cancel = new QPushButton(tr("Cancel"), this);
+    ok = new QPushButton(tr("Download"), this);
     buttons->addWidget(overwrite);
     buttons->addWidget(status);
     buttons->addStretch();
@@ -125,23 +125,23 @@ ErgDBDownloadDialog::allClicked()
 void
 ErgDBDownloadDialog::okClicked()
 {
-    if (ok->text() == "Download") {
+    if (ok->text() == tr("Download")) {
         aborted = false;
 
         overwrite->hide();
-        status->setText("Download...");
+        status->setText(tr("Download..."));
         status->show();
         cancel->hide();
-        ok->setText("Abort");
+        ok->setText(tr("Abort"));
         downloadFiles();
-        status->setText(QString("%1 workouts downloaded, %2 failed or skipped.").arg(downloads).arg(fails));
-        ok->setText("Finish");
+        status->setText(QString(tr("%1 workouts downloaded, %2 failed or skipped.")).arg(downloads).arg(fails));
+        ok->setText(tr("Finish"));
 
         context->notifyWorkoutsChanged();
 
-    } else if (ok->text() == "Abort") {
+    } else if (ok->text() == tr("Abort")) {
         aborted = true;
-    } else if (ok->text() == "Finish") {
+    } else if (ok->text() == tr("Finish")) {
         accept(); // our work is done!
     }
 }
@@ -184,7 +184,7 @@ ErgDBDownloadDialog::downloadFiles()
             files->setCurrentItem(current); QApplication::processEvents();
 
             // this one then
-            current->setText(5, "Downloading..."); QApplication::processEvents();
+            current->setText(5, tr("Downloading...")); QApplication::processEvents();
 
             // get the id
             int id = current->text(6).toInt();
@@ -201,7 +201,7 @@ ErgDBDownloadDialog::downloadFiles()
 
                     if (overwrite->isChecked() == false) {
                         // skip existing files
-                        current->setText(5, "Exists already"); QApplication::processEvents();
+                        current->setText(5,tr("Exists already")); QApplication::processEvents();
                         fails++;
                         delete p; // free memory!
                         continue;
@@ -210,11 +210,10 @@ ErgDBDownloadDialog::downloadFiles()
 
                         // remove existing
                         QFile(filename).remove();
-                        current->setText(5, "Removing..."); QApplication::processEvents();
+                        current->setText(5, tr("Removing...")); QApplication::processEvents();
                     }
 
                 }
-                downloads++;
 
                 QFile out(filename);
                 if (out.open(QIODevice::WriteOnly) == true) {
@@ -224,13 +223,13 @@ ErgDBDownloadDialog::downloadFiles()
                     out.close();
 
                     downloads++;
-                    current->setText(5, "Saved"); QApplication::processEvents();
+                    current->setText(5, tr("Saved")); QApplication::processEvents();
                     trainDB->importWorkout(filename, p); // add to library
 
                 } else {
 
                     fails++;
-                    current->setText(5, "Write failed"); QApplication::processEvents();
+                    current->setText(5, tr("Write failed")); QApplication::processEvents();
                 }
 
                 delete p; // free memory!
@@ -240,7 +239,7 @@ ErgDBDownloadDialog::downloadFiles()
 
                 delete p; // free memory!
                 fails++;
-                current->setText(5, "Invalid File"); QApplication::processEvents();
+                current->setText(5, tr("Invalid File")); QApplication::processEvents();
 
             }
 

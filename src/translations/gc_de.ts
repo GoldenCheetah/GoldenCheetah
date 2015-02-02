@@ -3277,7 +3277,7 @@ Let&apos;s start with some data.</source>
         <source>No files ?
 Let&apos;s start with some data.</source>
         <translation>Keine Dateien?
-Hier eine Beispiel Datei.</translation>
+Lade ein paar Daten.</translation>
     </message>
     <message>
         <location filename="../BlankState.cpp" line="151"/>
@@ -3287,7 +3287,7 @@ Hier eine Beispiel Datei.</translation>
     <message>
         <location filename="../BlankState.cpp" line="152"/>
         <source>Import data</source>
-        <translation>Dateien importieren</translation>
+        <translation>Importieren</translation>
     </message>
     <message>
         <location filename="../BlankState.cpp" line="158"/>
@@ -3297,7 +3297,7 @@ Hier eine Beispiel Datei.</translation>
     <message>
         <location filename="../BlankState.cpp" line="159"/>
         <source>Download from device</source>
-        <translation>Download von Gerät</translation>
+        <translation>Download</translation>
     </message>
 </context>
 <context>
@@ -6258,6 +6258,80 @@ an den Computer anschließen und
         <source>dd MMM yyyy</source>
         <translation>dd.MMM yyyy</translation>
     </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="79"/>
+        <location filename="../ErgDBDownloadDialog.cpp" line="94"/>
+        <location filename="../ErgDBDownloadDialog.cpp" line="128"/>
+        <source>Download</source>
+        <translation>Download</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="85"/>
+        <source>check/uncheck all</source>
+        <translation>Alle auswählen/abwählen</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="92"/>
+        <source>Overwrite existing workouts</source>
+        <translation>Überschreibe bestehende Workouts</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="93"/>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="132"/>
+        <source>Download...</source>
+        <translation>Download...</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="135"/>
+        <location filename="../ErgDBDownloadDialog.cpp" line="142"/>
+        <source>Abort</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="137"/>
+        <source>%1 workouts downloaded, %2 failed or skipped.</source>
+        <translation>%1 Workouts heruntergelanden, %2 gescheitert oder übersprungen.</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="138"/>
+        <location filename="../ErgDBDownloadDialog.cpp" line="144"/>
+        <source>Finish</source>
+        <translation>Fertig</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="187"/>
+        <source>Downloading...</source>
+        <translation>Dowload läuft ...</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="204"/>
+        <source>Exists already</source>
+        <translation>Bereits vorhanden</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="213"/>
+        <source>Removing...</source>
+        <translation>Lösche...</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="226"/>
+        <source>Saved</source>
+        <translation>Gespeichert</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="232"/>
+        <source>Write failed</source>
+        <translation>Schreiben fehlgeschlagen</translation>
+    </message>
+    <message>
+        <location filename="../ErgDBDownloadDialog.cpp" line="242"/>
+        <source>Invalid File</source>
+        <translation>Ungültige Datei</translation>
+    </message>
 </context>
 <context>
     <name>ErgFilePlot</name>
@@ -8503,11 +8577,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="74"/>
-        <source>Analysis of a single activity - specifically ride and run - with diagrams like ride plot, W&apos;bal, ... and Chung&apos;s Aerolab</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../HelpWhatsThis.cpp" line="78"/>
         <source>Ride indoors, following pre-programmed workouts - with multi device and video playback support</source>
         <translation></translation>
@@ -8530,11 +8599,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="88"/>
-        <source>Activate / De-activate the Compare Pane - which allows to compare rides, intervals or date ranges - also across athletes</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../HelpWhatsThis.cpp" line="92"/>
         <source>Athlete Management to open/close an existing or create a new athlete - either in a Tab or in a new Window</source>
         <translation></translation>
@@ -8550,18 +8614,8 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="104"/>
-        <source>Sharing an activity with other Ride related sites - only sites for which the authorization has been configured can be seleted for sharing here</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../HelpWhatsThis.cpp" line="106"/>
         <source>Exports a (selectable) set of activties in one of the supported export formats</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../HelpWhatsThis.cpp" line="108"/>
-        <source>Wizard to split an activity/ride into multiple rides based on configurable criteria</source>
         <translation></translation>
     </message>
     <message>
@@ -8600,8 +8654,28 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation></translation>
     </message>
     <message>
+        <location filename="../HelpWhatsThis.cpp" line="74"/>
+        <source>Analysis of a single activity with diagrams like activity plot, W&apos;bal, ... and Chung&apos;s Aerolab</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="88"/>
+        <source>Activate / De-activate the Compare Pane - which allows to compare activities, intervals or date ranges - also across athletes</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="104"/>
+        <source>Sharing an activity with other trainingsites - only sites for which the authorization has been configured can be seleted for sharing here</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="108"/>
+        <source>Wizard to split an activity into multiple activities based on configurable criteria</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../HelpWhatsThis.cpp" line="126"/>
-        <source>Creates a ride heat map using the selected rides and stored in the choosen folder - &quot;HeatMap.htm&quot;. Opened in a Web-Browser the map shows where most activity took place.</source>
+        <source>Creates an activity heat map using the selected activities and stores it in the choosen folder - &quot;HeatMap.htm&quot;. Opened in a Web-Browser the map shows where most activity took place.</source>
         <translation></translation>
     </message>
     <message>
@@ -8691,7 +8765,83 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="167"/>
-        <source>Tree map visulation of ride data by two selectable dimensions for a configurable metric</source>
+        <source>Tree map visulation of activity data by two selectable dimensions for a configurable metric</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="176"/>
+        <location filename="../HelpWhatsThis.cpp" line="205"/>
+        <source>Distribution of activity data samples or metrics according time spent in a certain segment</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="184"/>
+        <source>Detailed information of a single activity - the metrics shown here are configurable</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="188"/>
+        <source>Editor for activity file data - allowing to change/correct data, find entries and find anomalies</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="191"/>
+        <source>Plot of all activity data series in various ways</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="195"/>
+        <source>Selection of all additional curves to be shown in the diagram - plotted only in case data is available in the activity file</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="209"/>
+        <source>Analysis of heartrate vs. power along the activity data</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="211"/>
+        <source>Map of activity</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="213"/>
+        <source>Configurable 2D scatter plot of the current activity</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="215"/>
+        <source>Configurable 3D plot of the current activity</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="226"/>
+        <source>Predefined and configurable set of data ranges for selection of activities to be analysed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="232"/>
+        <source>Powerful filter and search engine to determine the activities which are considered in diagram</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="238"/>
+        <source>Configurable list of activities</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="248"/>
+        <source>Entry field for sophisticated Searching and Filtering of activities</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="250"/>
+        <source>Adding intervals to an activity using simple query methods</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="274"/>
+        <source>Definition of coloring rules for activities</source>
         <translation></translation>
     </message>
     <message>
@@ -8713,12 +8863,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="176"/>
-        <location filename="../HelpWhatsThis.cpp" line="205"/>
-        <source>Distribution of ride data samples or ride metrics according time spent in a certain segment</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../HelpWhatsThis.cpp" line="178"/>
         <source>Definition which date range is used for this particular chart</source>
         <translation></translation>
@@ -8736,28 +8880,8 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="184"/>
-        <source>Detailed information of a single ride - the metrics shown here are configurable</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../HelpWhatsThis.cpp" line="188"/>
-        <source>Editor for activity/ride file data - allowing to change/correct data, find entries and find anomalies</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../HelpWhatsThis.cpp" line="191"/>
-        <source>Plot of all activity/ride data series in various ways</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../HelpWhatsThis.cpp" line="193"/>
         <source>Selection how the power data series is shown in the plot and general settings on the diagram structure</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../HelpWhatsThis.cpp" line="195"/>
-        <source>Selection of all additional curves to be shown in the diagram - plotted only in case data is available in the activity/ride file</source>
         <translation></translation>
     </message>
     <message>
@@ -8766,24 +8890,8 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="209"/>
-        <source>Analysis of heartrate vs. power along the ride data</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../HelpWhatsThis.cpp" line="211"/>
         <source>Map of ride</source>
-        <translation>Karte</translation>
-    </message>
-    <message>
-        <location filename="../HelpWhatsThis.cpp" line="213"/>
-        <source>Configurable 2D scatter plot of the current ride</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../HelpWhatsThis.cpp" line="215"/>
-        <source>Configurable 3D plot of the current ride</source>
-        <translation></translation>
+        <translation type="vanished">Karte</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="217"/>
@@ -8801,11 +8909,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="226"/>
-        <source>Predefined and configurable set of data ranges for selection of rides to be analysed</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../HelpWhatsThis.cpp" line="228"/>
         <source>Definition of points in time &apos;Events&apos; which are marked explicitely on time related diagrams</source>
         <translation></translation>
@@ -8817,33 +8920,13 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="232"/>
-        <source>Powerful filter and search engine to determine the activities/rides which are considered in diagram</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../HelpWhatsThis.cpp" line="234"/>
         <source>Alternative access to the charts created for the main view</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="238"/>
-        <source>Configurable list of activities/rides</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../HelpWhatsThis.cpp" line="240"/>
         <source>Display the available and add new intervals using simple query methods</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../HelpWhatsThis.cpp" line="248"/>
-        <source>Entry field for sophisticated Searching and Filtering of activities/rides</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../HelpWhatsThis.cpp" line="250"/>
-        <source>Adding intervals to a ride using simple query methods</source>
         <translation></translation>
     </message>
     <message>
@@ -8895,11 +8978,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <location filename="../HelpWhatsThis.cpp" line="272"/>
         <source>Data Fields</source>
         <translation>Datenfelder</translation>
-    </message>
-    <message>
-        <location filename="../HelpWhatsThis.cpp" line="274"/>
-        <source>Definition of coloring rules for rides</source>
-        <translation></translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="276"/>

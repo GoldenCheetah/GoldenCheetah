@@ -71,7 +71,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case ScopeBar_Diary:
          return text.arg("ScopeBar_Views#diary").arg(tr("Extended Calendar view and configurable activity list, plus long term metrics charts and diagram types"));
     case ScopeBar_Rides:
-         return text.arg("ScopeBar_Views#rides").arg(tr("Analysis of a single activity - specifically ride and run - with diagrams like ride plot, W'bal, ... and Chung's Aerolab"));
+         return text.arg("ScopeBar_Views#activities").arg(tr("Analysis of a single activity with diagrams like activity plot, W'bal, ... and Chung's Aerolab"));
     case ScopeBar_Intervals:
         return text.arg("ScopeBar_Views#intervals").arg("Intervals");
     case ScopeBar_Train:
@@ -79,13 +79,13 @@ HelpWhatsThis::getText(GCHelp chapter) {
 
     // Tool Bar
     case ToolBar_Download:
-        return text.arg("First-Steps_Download-or-import#downloading-a-ride-from-device").arg(tr("Direct download from Powertap, SRM, Joule, Joule GPS, Moxy Monitor or Macro-X device"));
+        return text.arg("First-Steps_Download-or-import#downloading-a-activity-from-device").arg(tr("Direct download from Powertap, SRM, Joule, Joule GPS, Moxy Monitor or Macro-X device"));
     case ToolBar_Manual:
         return text.arg("Menu%20Bar_Activity").arg(tr("Import any activity file - supported by Golden Cheetah - mass import is supported here"));
     case ToolBar_ToggleSidebar:
         return text.arg("Menu%20Bar_View").arg(tr("Activate / De-activate the Sidebar - which provides different sub-sections to select data shown in the main view"));
     case ToolBar_ToggleComparePane:
-        return text.arg("Compare-Pane_General").arg(tr("Activate / De-activate the Compare Pane - which allows to compare rides, intervals or date ranges - also across athletes"));
+        return text.arg("Compare-Pane_General").arg(tr("Activate / De-activate the Compare Pane - which allows to compare activities, intervals or date ranges - also across athletes"));
 
     // Menus
     case MenuBar_Athlete:
@@ -94,18 +94,18 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case MenuBar_Activity:
         return text.arg("Menu%20Bar_Activity").arg(tr("Main functions related to activities like Activity Creation, Sharing and Export, and Splitting or Combining Activities"));
     case MenuBar_Activity_Download:
-        return text.arg("First-Steps_Download-or-import#downloading-a-ride-from-device").arg(tr("Direct download from Powertap, SRM, Joule, Joule GPS, Moxy Monitor or Macro-X device"));
+        return text.arg("First-Steps_Download-or-import#downloading-a-activity-from-device").arg(tr("Direct download from Powertap, SRM, Joule, Joule GPS, Moxy Monitor or Macro-X device"));
     case MenuBar_Activity_Import:
         return text.arg("First-Steps_Download-or-import#importing-from-a-file").arg(tr("Import any activity file - supported by Golden Cheetah - mass import is supported here"));
     case MenuBar_Activity_Manual:
         return text.arg("Menu%20Bar_Activity").arg(tr("Manual creation of an activity where the most relevant data can be added in this dialog"));
     case MenuBar_Activity_Share:
         return text.arg("Special%20Topics_Upload_Download%20to_from%20external%20web-sites#execution")
-                .arg(tr("Sharing an activity with other Ride related sites - only sites for which the authorization has been configured can be seleted for sharing here"));
+                .arg(tr("Sharing an activity with other trainingsites - only sites for which the authorization has been configured can be seleted for sharing here"));
     case MenuBar_Activity_BatchExport:
         return text.arg("Menu%20Bar_Activity").arg(tr("Exports a (selectable) set of activties in one of the supported export formats"));
     case MenuBar_Activity_SplitRide:
-        return text.arg("Menu%20Bar_Activity").arg(tr("Wizard to split an activity/ride into multiple rides based on configurable criteria"));
+        return text.arg("Menu%20Bar_Activity").arg(tr("Wizard to split an activity into multiple activities based on configurable criteria"));
     case MenuBar_Activity_CombineRides:
         return text.arg("Menu%20Bar_Activity").arg(tr("Wizard to combine data with the currently selected activity in multiple ways"));
 
@@ -123,7 +123,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Menu%20Bar_Tools").arg(tr("Search for Workout files and Video files in a configurable set of folders and add to the Train - Indoor Riding - Workout/Video library"));
     case MenuBar_Tools_CreateHeatMap:
         return text.arg("Menu%20Bar_Tools")
-                .arg(tr("Creates a ride heat map using the selected rides and stored in the choosen folder - \"HeatMap.htm\". Opened in a Web-Browser the map shows where most activity took place."));
+                .arg(tr("Creates an activity heat map using the selected activities and stores it in the choosen folder - \"HeatMap.htm\". Opened in a Web-Browser the map shows where most activity took place."));
 
     case MenuBar_Edit:
         return text.arg("Menu%20Bar_Edit").arg(tr("Wizards which fix, adjust, add series data of the current activity"));
@@ -164,7 +164,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Trends#curves-details").arg(tr("Individual curve configuration"));
 
     case ChartTrends_CollectionTreeMap:
-        return text.arg("ChartTypes_Trends#collection-tree-map").arg(tr("Tree map visulation of ride data by two selectable dimensions for a configurable metric"));
+        return text.arg("ChartTypes_Trends#collection-tree-map").arg(tr("Tree map visulation of activity data by two selectable dimensions for a configurable metric"));
 
     case ChartTrends_Critical_MM:
         return text.arg("ChartTypes_Trends#critical-mean-maximal").arg(tr("Critical Mean Maximal Power Curve"));
@@ -173,7 +173,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case ChartTrends_Critical_MM_Config_Model:
         return text.arg("ChartTypes_Trends#critical-mean-maximal").arg(tr("Configuration of the CP Model to be used to plot the curve"));
     case ChartTrends_Distribution:
-        return text.arg("ChartTypes_Trends#distribution").arg(tr("Distribution of ride data samples or ride metrics according time spent in a certain segment"));
+        return text.arg("ChartTypes_Trends#distribution").arg(tr("Distribution of activity data samples or metrics according time spent in a certain segment"));
      case ChartTrends_DateRange:
         return text.arg("ChartTypes_Trends#date-range-selection").arg(tr("Definition which date range is used for this particular chart"));
     case ChartDiary_Calendar:
@@ -181,40 +181,40 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case ChartDiary_Navigator:
         return text.arg("ChartTypes_Diary#navigator").arg(tr("Configurable activity log - with build in search capabilities"));
     case ChartRides_Summary:
-        return text.arg("ChartTypes_Rides#ride-summary").arg(tr("Detailed information of a single ride - the metrics shown here are configurable"));
+        return text.arg("ChartTypes_Activities#activity-summary").arg(tr("Detailed information of a single activity - the metrics shown here are configurable"));
     case ChartRides_Details:
-        return text.arg("ChartTypes_Rides#details").arg("Configurable tabbed view of ride detail data, plus technical details and change log");
+        return text.arg("ChartTypes_Activities#details").arg("Configurable tabbed view of activity detail data, plus technical details and change log");
     case ChartRides_Editor:
-        return text.arg("ChartTypes_Rides#editor").arg(tr("Editor for activity/ride file data - allowing to change/correct data, find entries and find anomalies"));
+        return text.arg("ChartTypes_Activities#editor").arg(tr("Editor for activity file data - allowing to change/correct data, find entries and find anomalies"));
 
     case ChartRides_Performance:
-        return text.arg("ChartTypes_Rides#performance").arg(tr("Plot of all activity/ride data series in various ways"));
+        return text.arg("ChartTypes_Activities#performance").arg(tr("Plot of all activity data series in various ways"));
     case ChartRides_Performance_Config_Basic:
-        return text.arg("ChartTypes_Rides#performance-basic").arg(tr("Selection how the power data series is shown in the plot and general settings on the diagram structure"));
+        return text.arg("ChartTypes_Activities#performance-basic").arg(tr("Selection how the power data series is shown in the plot and general settings on the diagram structure"));
     case ChartRides_Performance_Config_Series:
-        return text.arg("ChartTypes_Rides#performance-series").arg(tr("Selection of all additional curves to be shown in the diagram - plotted only in case data is available in the activity/ride file"));
+        return text.arg("ChartTypes_Activities#performance-series").arg(tr("Selection of all additional curves to be shown in the diagram - plotted only in case data is available in the activity file"));
 
     case ChartRides_Critical_MM:
-        return text.arg("ChartTypes_Rides#critical-mean-maximals").arg(tr("Critical Mean Maximal Power Curve"));
+        return text.arg("ChartTypes_Activities#critical-mean-maximals").arg(tr("Critical Mean Maximal Power Curve"));
     case ChartRides_Critical_MM_Config_Settings:
-        return text.arg("ChartTypes_Rides#critical-mean-maximal").arg(tr("Basic configuration like date range, what series to use and how to plot"));
+        return text.arg("ChartTypes_Activities#critical-mean-maximal").arg(tr("Basic configuration like date range, what series to use and how to plot"));
     case ChartRides_Critical_MM_Config_Model:
-        return text.arg("ChartTypes_Rides#critical-mean-maximal").arg(tr("Configuration of the CP Model to be used to plot the curve"));
+        return text.arg("ChartTypes_Activities#critical-mean-maximal").arg(tr("Configuration of the CP Model to be used to plot the curve"));
 
     case ChartRides_Histogram:
-        return text.arg("ChartTypes_Rides#histogram").arg(tr("Distribution of ride data samples or ride metrics according time spent in a certain segment"));
+        return text.arg("ChartTypes_Activities#histogram").arg(tr("Distribution of activity data samples or metrics according time spent in a certain segment"));
     case ChartRides_PFvV:
-        return text.arg("ChartTypes_Rides#pedal-force-vs-velocity").arg(tr("Quadrant analysis of pedal velocity vs. effective pedal force"));
+        return text.arg("ChartTypes_Activities#pedal-force-vs-velocity").arg(tr("Quadrant analysis of pedal velocity vs. effective pedal force"));
     case ChartRides_HRvsPw:
-        return text.arg("ChartTypes_Rides#heartrate-vs-power").arg(tr("Analysis of heartrate vs. power along the ride data"));
+        return text.arg("ChartTypes_Activities#heartrate-vs-power").arg(tr("Analysis of heartrate vs. power along the activity data"));
     case ChartRides_Map:
-        return text.arg("ChartTypes_Rides#google-map--bing-map").arg(tr("Map of ride"));
+        return text.arg("ChartTypes_Activities#google-map--bing-map").arg(tr("Map of activity"));
     case ChartRides_2D:
-        return text.arg("ChartTypes_Rides#2d-plot").arg(tr("Configurable 2D scatter plot of the current ride"));
+        return text.arg("ChartTypes_Activities#2d-plot").arg(tr("Configurable 2D scatter plot of the current activity"));
     case ChartRides_3D:
-        return text.arg("ChartTypes_Rides#3d-plot").arg(tr("Configurable 3D plot of the current ride"));
+        return text.arg("ChartTypes_Activities#3d-plot").arg(tr("Configurable 3D plot of the current activity"));
     case ChartRides_Aerolab:
-        return text.arg("ChartTypes_Rides#aerolab-chung-analysis").arg(tr("Chung's Aerolab analysis"));
+        return text.arg("ChartTypes_Activities#aerolab-chung-analysis").arg(tr("Chung's Aerolab analysis"));
 
     case Chart_Summary:
         return text.arg("ChartTypes_Trends#summary").arg(tr("Overview/summary of the selected data range - data shown in 'Athlete's Best' are configurable"));
@@ -223,21 +223,21 @@ HelpWhatsThis::getText(GCHelp chapter) {
 
     // Sidebars
     case SideBarTrendsView_DateRanges:
-        return text.arg("Side-Bar_Trends-view#date-ranges").arg(tr("Predefined and configurable set of data ranges for selection of rides to be analysed"));
+        return text.arg("Side-Bar_Trends-view#date-ranges").arg(tr("Predefined and configurable set of data ranges for selection of activities to be analysed"));
     case SideBarTrendsView_Events:
         return text.arg("Side-Bar_Trends-view#events").arg(tr("Definition of points in time 'Events' which are marked explicitely on time related diagrams"));
     case SideBarTrendsView_Summary:
         return text.arg("Side-Bar_Trends-view#summary").arg(tr("Simple summary view"));
     case SideBarTrendsView_Filter:
-        return text.arg("Side-Bar_Trends-view#filters").arg(tr("Powerful filter and search engine to determine the activities/rides which are considered in diagram"));
+        return text.arg("Side-Bar_Trends-view#filters").arg(tr("Powerful filter and search engine to determine the activities which are considered in diagram"));
     case SideBarTrendsView_Charts:
         return text.arg("Side-Bar_Trends-view#charts").arg(tr("Alternative access to the charts created for the main view"));
     case SideBarRidesView_Calendar:
-        return text.arg("Side-Bar_Rides-view#calendar").arg(tr("Calendar"));
+        return text.arg("Side-Bar_Activities-view#calendar").arg(tr("Calendar"));
     case SideBarRidesView_Rides:
-        return text.arg("Side-Bar_Rides-view#rides").arg(tr("Configurable list of activities/rides"));
+        return text.arg("Side-Bar_Activities-view#activities").arg(tr("Configurable list of activities"));
     case SideBarRidesView_Intervals:
-        return text.arg("Side-Bar_Rides-view#intervals").arg(tr("Display the available and add new intervals using simple query methods"));
+        return text.arg("Side-Bar_Activities-view#intervals").arg(tr("Display the available and add new intervals using simple query methods"));
     case SideBarDiaryView_Calendar:
         return text.arg("Side%20Bar_Diary%20view#calendar").arg(tr("Calendar"));
     case SideBarDiaryView_Summary:
@@ -245,9 +245,9 @@ HelpWhatsThis::getText(GCHelp chapter) {
 
     // Cross Functions
     case SearchFilterBox:
-        return text.arg("Special-Topics_SearchFilter").arg(tr("Entry field for sophisticated Searching and Filtering of activities/rides"));
+        return text.arg("Special-Topics_SearchFilter").arg(tr("Entry field for sophisticated Searching and Filtering of activities"));
     case FindIntervals:
-        return text.arg("Side-Bar_Rides-view#intervals").arg(tr("Adding intervals to a ride using simple query methods"));
+        return text.arg("Side-Bar_Activities-view#intervals").arg(tr("Adding intervals to an activity using simple query methods"));
 
     // Preferences
     case Preferences_General:
@@ -271,7 +271,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case Preferences_DataFields_Fields:
         return text.arg("Preferences_Data%20Fields#fields").arg(tr("Data Fields"));
     case Preferences_DataFields_Notes_Keywords:
-        return text.arg("Preferences_Data%20Fields#notes-keywords").arg(tr("Definition of coloring rules for rides"));
+        return text.arg("Preferences_Data%20Fields#notes-keywords").arg(tr("Definition of coloring rules for activities"));
     case Preferences_DataFields_Defaults:
         return text.arg("Preferences_Data%20Fields#defaults").arg(tr("Definition of default value(s) for data fields"));
     case Preferences_DataFields_Processing:
