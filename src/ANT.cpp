@@ -266,6 +266,15 @@ ANT::setLoad(double load)
         sendMessage(ANTMessage::tacxVortexSetPower(vortexChannel, vortexID, (int)load));
     }
 }
+
+void ANT::refreshVortexLoad()
+{
+    if (vortexChannel == -1)
+        return;
+
+    sendMessage(ANTMessage::tacxVortexSetPower(vortexChannel, vortexID, (int)load));
+}
+
 void
 ANT::setGradient(double gradient)
 {
