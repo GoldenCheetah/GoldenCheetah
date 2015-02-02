@@ -41,7 +41,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 21;
+static const unsigned int RideFileCacheVersion = 22;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -64,6 +64,7 @@ static const unsigned int RideFileCacheVersion = 21;
 // 19       11-Nov-14    Added Pace Zones distribution
 // 20       17-Nov-14    Added Polarized Zones for HR and Pace
 // 21       27-Nov-14    Added SmO2 distribution 
+// 22       02-Feb-15    Added weight to header
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
@@ -110,6 +111,7 @@ struct RideFileCacheHeader {
     int LTHR, // used to calculate Time in Zone (TIZ)
         CP;   // used to calculate Time in Zone (TIZ)
     double CV;   // used to calculate Time in Zone (TIZ)
+    double WEIGHT; // weight in kg x 10 used for w/kg
                 
 };
 
@@ -148,7 +150,7 @@ class RideFileCache
         // the calling class.
         // to save time you can pass the ride file if you already have it open
         // and if you don't want the data and just want to check pass check=true
-        RideFileCache(Context *context, QString filename, RideFile *ride =0, bool check = false, bool refresh = true);
+        RideFileCache(Context *context, QString filename, double weight, RideFile *ride =0, bool check = false, bool refresh = true);
 
         // Construct a ridefile cache that represents the data
         // across a date range. This is used to provide aggregated data.
@@ -232,6 +234,7 @@ class RideFileCache
         int CP;
         int LTHR;
         double CV;
+        double WEIGHT;
 
         //
         // MEAN MAXIMAL VALUES

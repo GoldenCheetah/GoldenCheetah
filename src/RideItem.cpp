@@ -163,7 +163,7 @@ RideFileCache *
 RideItem::fileCache()
 {
     if (!fileCache_) {
-        fileCache_ = new RideFileCache(context, fileName, ride());
+        fileCache_ = new RideFileCache(context, fileName, getWeight(), ride());
         if (isDirty()) fileCache_->refresh(ride()); // refresh from what we have now !
     }
     return fileCache_;
@@ -319,7 +319,7 @@ RideItem::checkStale()
 
         if (prior != now) {
 
-            weight = getWeight();
+            getWeight();
             isstale = true;
 
         } else {
@@ -430,7 +430,7 @@ RideItem::refresh()
         timestamp = QDateTime::currentDateTime().toTime_t();
 
         // RideFile cache needs refreshing possibly
-        RideFileCache updater(context, context->athlete->home->activities().canonicalPath() + "/" + fileName, ride_, true);
+        RideFileCache updater(context, context->athlete->home->activities().canonicalPath() + "/" + fileName, getWeight(), ride_, true);
 
         // we now match
         metacrc = metaCRC();
@@ -462,7 +462,7 @@ RideItem::getWeight()
 
     // global options
     if (!weight) weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
-
+    
     // No weight default is weird, we'll set to 80kg
     if (weight <= 0.00) weight = 80.00;
 
