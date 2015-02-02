@@ -35,7 +35,7 @@
 static const int maxcache = 25; // lets max out at 25 caches
 
 // cache from ride
-RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passedride, bool check, bool refresh) :
+RideFileCache::RideFileCache(Context *context, QString fileName, double weight, RideFile *passedride, bool check, bool refresh) :
                incomplete(false), context(context), rideFileName(fileName), ride(passedride)
 {
     // resize all the arrays to zero
@@ -99,7 +99,7 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
                 head.crc == RideFile::computeFileCRC(rideFileName)) {
  
                 // it is the same ?
-                if (head.version == RideFileCacheVersion) {
+                if (head.version == RideFileCacheVersion && head.WEIGHT == weight) {
 
                     // WE'RE GOOD
                     if (check == false) readCache(); // if check is false we aren't just checking
@@ -116,6 +116,7 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
         if (ride) {
 
             // we got passed the ride - so update from that
+            WEIGHT = ride->getWeight(); // before threads are created
             refreshCache();
 
         } else {
@@ -127,7 +128,7 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
             ride = RideFileFactory::instance().openRideFile(context, file, errors);
 
             if (ride) {
-                ride->getWeight(); // before threads are created
+                WEIGHT = ride->getWeight(); // before threads are created
                 refreshCache();
                 delete ride;
             }
@@ -165,9 +166,9 @@ RideFileCache::checkStale(Context *context, RideItem*item)
             // its more recent -or- the crc is the same
             if (rideFileInfo.lastModified() <= cacheFileInfo.lastModified() ||
                 head.crc == RideFile::computeFileCRC(rideFileName)) {
- 
+
                 // it is the same ?
-                if (head.version == RideFileCacheVersion) {
+                if (head.version == RideFileCacheVersion && head.WEIGHT == item->getWeight()) {
 
                     // WE'RE GOOD
                     return false;
@@ -422,7 +423,7 @@ RideFileCache::RideFileCache(RideFile *ride) :
     paceTimeInZone.resize(10);
     paceCPTimeInZone.resize(4);
 
-    ride->getWeight();
+    WEIGHT = ride->getWeight();
     ride->recalculateDerivedSeries(); // accel and others
 
     // calculate all the arrays
@@ -1494,7 +1495,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
 
             // get its cached values (will NOT! refresh if needed...)
             // the true means it will check only
-            RideFileCache rideCache(context, context->athlete->home->activities().canonicalPath() + "/" + item->fileName, NULL, false, false);
+            RideFileCache rideCache(context, context->athlete->home->activities().canonicalPath() + "/" + item->fileName, item->getWeight(), NULL, false, false);
             if (rideCache.incomplete == true) {
                 // ack, data not available !
                 incomplete = true;
@@ -1583,7 +1584,7 @@ QVector<float> &RideFileCache::heatMeanMaxArray()
             if (onhome && context->ishomefiltered && !context->homeFilters.contains(item->fileName)) continue;
 
             // get its cached values (will refresh if needed...)
-            RideFileCache rideCache(context, context->athlete->home->activities().canonicalPath() + "/" + item->fileName);
+            RideFileCache rideCache(context, context->athlete->home->activities().canonicalPath() + "/" + item->fileName, item->getWeight());
 
             for(int i=0; i<rideCache.wattsMeanMaxDouble.count() && i<wattsMeanMaxDouble.count(); i++) {
 
@@ -1611,6 +1612,7 @@ RideFileCache::serialize(QDataStream *out)
     head.CP = CP;
     head.LTHR = LTHR;
     head.CV = CV;
+    head.WEIGHT = WEIGHT;
 
     head.wattsMeanMaxCount = wattsMeanMax.size();
     head.hrMeanMaxCount = hrMeanMax.size();
