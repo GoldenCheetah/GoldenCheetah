@@ -1,5 +1,4 @@
 /*
-/*
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
  *               2014 Alejandro Martinez (amtriathlon@gmail.com)
  *
@@ -21,6 +20,7 @@
 #include "RideMetric.h"
 #include "PaceZones.h"
 #include "Units.h"
+#include "Settings.h"
 #include "RideItem.h"
 #include <cmath>
 #include <algorithm>
@@ -167,7 +167,20 @@ class XPace : public RideMetric {
         setSymbol("xPace");
         setInternalName("xPace");
     }
+    // xPace ordering is reversed
     bool isLowerBetter() const { return true; }
+    // Overrides to use Pace units setting
+    QString units(bool) const {
+        bool metricRunPace = appsettings->value(NULL, GC_PACE, true).toBool();
+        return RideMetric::units(metricRunPace);
+    }
+    double value(bool) const {
+        bool metricRunPace = appsettings->value(NULL, GC_PACE, true).toBool();
+        return RideMetric::value(metricRunPace);
+    }
+    QString toString(bool metric) const {
+        return time_to_string(value(metric)*60);
+    }
     void initialize() {
         setName(tr("xPace"));
         setType(RideMetric::Average);

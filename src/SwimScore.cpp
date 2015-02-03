@@ -21,6 +21,7 @@
 #include "RideMetric.h"
 #include "PaceZones.h"
 #include "Units.h"
+#include "Settings.h"
 #include "RideItem.h"
 #include <cmath>
 #include <algorithm>
@@ -129,7 +130,20 @@ class XPaceSwim : public RideMetric {
         setSymbol("swimscore_xpace");
         setInternalName("xPace Swim");
     }
+    // Swim Pace ordering is reversed
     bool isLowerBetter() const { return true; }
+    // Overrides to use Swim Pace units setting
+    QString units(bool) const {
+        bool metricRunPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        return RideMetric::units(metricRunPace);
+    }
+    double value(bool) const {
+        bool metricRunPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        return RideMetric::value(metricRunPace);
+    }
+    QString toString(bool metric) const {
+        return time_to_string(value(metric)*60);
+    }
     void initialize() {
         setName(tr("xPace Swim"));
         setType(RideMetric::Average);
