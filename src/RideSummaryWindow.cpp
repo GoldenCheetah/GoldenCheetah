@@ -669,9 +669,7 @@ RideSummaryWindow::htmlSummary()
                  else s = s.arg(context->athlete->rideCache->getAggregate(symbol, specification, useMetricUnits));
 
              } else {
-                 if (m->internalName() == "Pace" || m->internalName() == "xPace") s = s.arg(" (" + m->units(metricRunPace) + ")");
-                 else if (m->internalName() == "Pace Swim" || m->internalName() == "xPace Swim") s = s.arg(" (" + m->units(metricSwimPace) + ")");
-                 else if (m->units(useMetricUnits) != "") s = s.arg(" (" + m->units(useMetricUnits) + ")");
+                 if (m->units(useMetricUnits) != "") s = s.arg(" (" + m->units(useMetricUnits) + ")");
                  else s = s.arg("");
 
                  // temperature is a special case, if it is not present fall back to metadata tag
@@ -993,12 +991,7 @@ RideSummaryWindow::htmlSummary()
                         RideMetricPtr m = metrics.value(symbol);
                         if (!m || !m->isRelevantForRide(rideItem)) continue;
                         summary += "<td align=\"center\" valign=\"bottom\">" + m->name();
-                        if (m->internalName().startsWith("Pace") || m->internalName().startsWith("xPace")) { // pace is mm:ss
-
-                            bool metricPace = m->internalName().contains("Swim") ? metricSwimPace : metricRunPace;
-                            summary += " (" + m->units(metricPace) + ")";
-                        
-                        } else if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds")) {
+                        if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds")) {
                             ; // don't do anything
 
                         } else if (m->units(useMetricUnits).size() > 0) {
@@ -1057,17 +1050,7 @@ RideSummaryWindow::htmlSummary()
                     RideMetricPtr m = metrics.value(symbol);
                     if (!m || !m->isRelevantForRide(rideItem)) continue;
                     QString s("<td align=\"center\">%1</td>");
-                    if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds"))
-                        summary += s.arg(time_to_string(m->value(useMetricUnits)));
-                    else if (m->internalName().startsWith("Pace") || m->internalName().startsWith("xPace")) { // pace is mm:ss
-
-                        bool metricPace = m->internalName().contains("Swim") ? metricSwimPace : metricRunPace;
-                        double pace  = m->value(metricPace);
-                        summary += s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
-
-                    } else {
-                        summary += s.arg(m->value(useMetricUnits), 0, 'f', m->precision(useMetricUnits));
-                    }
+                    summary += s.arg(m->toString(useMetricUnits));
                 }
 
 
