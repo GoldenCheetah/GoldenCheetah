@@ -20,6 +20,7 @@
 #ifndef _GC_ManualRideDialog_h
 #define _GC_ManualRideDialog_h 1
 #include "GoldenCheetah.h"
+#include "LapsEditor.h"
 
 #include <QtGui>
 #include <QLineEdit>
@@ -38,6 +39,7 @@ class ManualRideDialog : public QDialog
 
     public:
         ManualRideDialog(Context *context);
+        ~ManualRideDialog();
 
     private slots:
         void okClicked();
@@ -45,6 +47,9 @@ class ManualRideDialog : public QDialog
 
         void estimate();          // estimate TSS et al when method/duration/distance changes
         void deriveFactors();        // calculate factors to use for estimate
+
+        void sportChanged(const QString& text); // enable/disable lapsButton
+        void lapsClicked(); // starts laps editor
 
     private:
 
@@ -59,7 +64,9 @@ class ManualRideDialog : public QDialog
                timeTSS, distanceTSS,  // Coggan TSS
                timeKJ, distanceKJ;  // Work
 
-        QPushButton *okButton, *cancelButton;
+        LapsEditor *lapsEditor; // Laps Editor Dialog
+
+        QPushButton *okButton, *cancelButton, *lapsButton;
 
         QDateEdit *dateEdit;  // start date
         QTimeEdit *timeEdit;  // start time
@@ -83,6 +90,7 @@ class ManualRideDialog : public QDialog
                        *DP,       // rhea
                        *TSS,      // coggan
                        *KJ;       // work
+
 };
 
 #endif // _GC_ManualRideDialog_h

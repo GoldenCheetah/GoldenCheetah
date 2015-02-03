@@ -343,6 +343,7 @@ HEADERS += \
         IntervalTreeView.h \
         JouleDevice.h \
         JsonRideFile.h \
+        LapsEditor.h \
         Library.h \
         LibraryParser.h \
         LogTimeScaleDraw.h \
@@ -569,6 +570,7 @@ SOURCES += \
         IntervalSummaryWindow.cpp \
         IntervalTreeView.cpp \
         JouleDevice.cpp \
+        LapsEditor.cpp \
         LeftRightBalance.cpp \
         Library.cpp \
         LibraryParser.cpp \

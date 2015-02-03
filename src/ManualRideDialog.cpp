@@ -129,6 +129,9 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     // we haven't derived factors yet
     daysago = -1;
 
+    // we haven't lapsEditor yet
+    lapsEditor = NULL;
+
     //
     // Create the GUI widgets
     //
@@ -144,6 +147,11 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     timeEdit = new QTimeEdit(this);
     timeEdit->setDisplayFormat("hh:mm:ss");
     timeEdit->setTime(QTime::currentTime().addSecs(-4 * 3600)); // 4 hours ago by default
+
+    // Lap information
+    QLabel *lapsLabel = new QLabel(tr("Pace intervals:"), this);
+    lapsButton = new QPushButton(tr("&Laps Editor"), this);
+    lapsButton->setEnabled(false); // it is enables when sport is selected
 
     // ride duration
     QLabel *durationLabel = new QLabel(tr("Duration:"), this);
@@ -268,6 +276,7 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     // the user will expect enter to save file
     okButton->setDefault(true);
     cancelButton->setDefault(false);
+    lapsButton->setDefault(false);
 
     //
     // LAY OUT THE GUI
@@ -291,10 +300,12 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     basicLayout->addWidget(dateEdit, 0,1,Qt::AlignLeft);
     basicLayout->addWidget(timeLabel, 1,0,Qt::AlignLeft);
     basicLayout->addWidget(timeEdit, 1,1,Qt::AlignLeft);
-    basicLayout->addWidget(durationLabel, 2,0,Qt::AlignLeft);
-    basicLayout->addWidget(duration, 2,1, Qt::AlignLeft);
-    basicLayout->addWidget(distanceLabel, 3,0, Qt::AlignLeft);
-    basicLayout->addWidget(distance, 3,1, Qt::AlignLeft);
+    basicLayout->addWidget(lapsLabel, 2,0,Qt::AlignLeft);
+    basicLayout->addWidget(lapsButton, 2,1, Qt::AlignLeft);
+    basicLayout->addWidget(durationLabel, 3,0,Qt::AlignLeft);
+    basicLayout->addWidget(duration, 3,1, Qt::AlignLeft);
+    basicLayout->addWidget(distanceLabel, 4,0, Qt::AlignLeft);
+    basicLayout->addWidget(distance, 4,1, Qt::AlignLeft);
 
     QGroupBox *metricBox = new QGroupBox(tr("Metrics"),this);
     QGridLayout *metricLayout = new QGridLayout;
@@ -338,6 +349,9 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     buttons->addWidget(okButton);
     buttons->addWidget(cancelButton);
 
+    // sport is used to enable/disable and to configure LapsEditor
+    connect(sport, SIGNAL(textChanged(QString)), this, SLOT(sportChanged(QString)));
+
     // if any of the fields used to determine estimation are changed then
     // lets re-calculate and apply
     connect(distance, SIGNAL(valueChanged(double)), this, SLOT(estimate()));
@@ -350,9 +364,14 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     // dialog buttons
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(lapsButton, SIGNAL(clicked()), this, SLOT(lapsClicked()));
 
     // initialise estimates / widgets enabled
     estimate();
+}
+
+ManualRideDialog::~ManualRideDialog() {
+    delete lapsEditor;
 }
 
 void
@@ -423,6 +442,14 @@ ManualRideDialog::okClicked()
     rideFile->setRecIntSecs(0.00);
     rideFile->setDeviceType("Manual");
     rideFile->setFileFormat("GoldenCheetah Json");
+
+    // get samples from Laps Editor, if available
+    if (lapsEditor && lapsEditor->dataPoints().count() > 0) {
+        rideFile->setRecIntSecs(1.00);
+        foreach(RideFilePoint *point, lapsEditor->dataPoints())
+            rideFile->appendPoint(*point);
+        rideFile->fillInIntervals();
+    }
 
     // basic data
     if (distance->value()) {
@@ -525,5 +552,33 @@ ManualRideDialog::okClicked()
         QMessageBox oops(QMessageBox::Critical, tr("Unable to save"),
                          tr("There is already an activity with the same start time or you do not have permissions to save a file."));
         oops.exec();
+    }
+}
+
+void
+ManualRideDialog::sportChanged(const QString& text)
+{
+    // remove previous Laps Editor and create a new one according to sport
+    // only for swimming and running.
+    delete lapsEditor;
+    if (text == "Swim" || text == tr("Swim")) {
+        lapsEditor = new LapsEditor(true);
+        lapsButton->setEnabled(true);
+    } else if (text == "Run" || text == tr("Run")) {
+        lapsEditor = new LapsEditor(false);
+        lapsButton->setEnabled(true);
+    } else {
+        lapsEditor = NULL;
+        lapsButton->setEnabled(false);
+    }
+}
+
+void
+ManualRideDialog::lapsClicked()
+{
+    if (lapsEditor && lapsEditor->exec() && lapsEditor->dataPoints().count() > 0) {
+        // update duration and distance
+        duration->setTime(QTime(0, 0, 0).addSecs(lapsEditor->dataPoints().count()));
+        distance->setValue(lapsEditor->dataPoints()[lapsEditor->dataPoints().count()-1]->km);
     }
 }
