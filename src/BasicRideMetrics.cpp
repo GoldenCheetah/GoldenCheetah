@@ -567,7 +567,7 @@ class Pace : public RideMetric {
         setSymbol("pace");
         setInternalName("Pace");
     }
-    bool isTime() const { return true; }
+    bool isLowerBetter() const { return true; }
     void initialize() {
         setName(tr("Pace"));
         setType(RideMetric::Average);
@@ -618,7 +618,7 @@ class PaceSwim : public RideMetric {
         setSymbol("pace_swim");
         setInternalName("Pace Swim");
     }
-    bool isTime() const { return true; }
+    bool isLowerBetter() const { return true; }
     void initialize() {
         setName(tr("Pace Swim"));
         setType(RideMetric::Average);

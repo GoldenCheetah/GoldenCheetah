@@ -129,6 +129,7 @@ class XPaceSwim : public RideMetric {
         setSymbol("swimscore_xpace");
         setInternalName("xPace Swim");
     }
+    bool isLowerBetter() const { return true; }
     void initialize() {
         setName(tr("xPace Swim"));
         setType(RideMetric::Average);

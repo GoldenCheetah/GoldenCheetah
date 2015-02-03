@@ -128,6 +128,9 @@ public:
     // Convert value to string, taking into account metric pref
     virtual QString toString(bool useMetricUnits) const;
 
+    // Criterium to compare values, overridden by Pace metrics
+    virtual bool isLowerBetter() const { return false; }
+
     // Fill in the value of the ride metric using the mapping provided.  For
     // example, average speed might be specified by the mapping
     //
