@@ -1,4 +1,5 @@
 /*
+/*
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
  *               2014 Alejandro Martinez (amtriathlon@gmail.com)
  *
@@ -166,6 +167,7 @@ class XPace : public RideMetric {
         setSymbol("xPace");
         setInternalName("xPace");
     }
+    bool isLowerBetter() const { return true; }
     void initialize() {
         setName(tr("xPace"));
         setType(RideMetric::Average);

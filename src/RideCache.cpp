@@ -492,6 +492,11 @@ bool rideCachesummaryBestGreaterThan(const AthleteBest &s1, const AthleteBest &s
      return s1.nvalue > s2.nvalue;
 }
 
+bool rideCachesummaryBestLowerThan(const AthleteBest &s1, const AthleteBest &s2)
+{
+     return s1.nvalue < s2.nvalue;
+}
+
 QList<AthleteBest> 
 RideCache::getBests(QString symbol, int n, Specification specification, bool useMetricUnits)
 {
@@ -520,7 +525,9 @@ RideCache::getBests(QString symbol, int n, Specification specification, bool use
     }
 
     // now sort
-    qStableSort(results.begin(), results.end(), rideCachesummaryBestGreaterThan);
+    qStableSort(results.begin(), results.end(), metric->isLowerBetter() ?
+                                                rideCachesummaryBestLowerThan :
+                                                rideCachesummaryBestGreaterThan);
 
     // truncate
     if (results.count() > n) results.erase(results.begin()+n,results.end());
