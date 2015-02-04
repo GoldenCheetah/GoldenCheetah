@@ -536,7 +536,11 @@ class AvgSpeed : public RideMetric {
 
         } else {
 
-            setValue(0);
+            // backup to duration if there is no speed channel
+            assert(deps.contains("workout_time"));
+            secsMoving = deps.value("workout_time")->value(true);
+            setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
+
         }
     }
 
@@ -553,7 +557,7 @@ class AvgSpeed : public RideMetric {
 
 static bool avgSpeedAdded =
     RideMetricFactory::instance().addMetric(
-        AvgSpeed(), &(QVector<QString>() << "total_distance"));
+        AvgSpeed(), &(QVector<QString>() << "total_distance" << "workout_time"));
 
 //////////////////////////////////////////////////////////////////////////////
 class Pace : public RideMetric {
@@ -567,7 +571,20 @@ class Pace : public RideMetric {
         setSymbol("pace");
         setInternalName("Pace");
     }
-    bool isTime() const { return true; }
+    // Pace ordering is reversed
+    bool isLowerBetter() const { return true; }
+    // Overrides to use Pace units setting
+    QString units(bool) const {
+        bool metricRunPace = appsettings->value(NULL, GC_PACE, true).toBool();
+        return RideMetric::units(metricRunPace);
+    }
+    double value(bool) const {
+        bool metricRunPace = appsettings->value(NULL, GC_PACE, true).toBool();
+        return RideMetric::value(metricRunPace);
+    }
+    QString toString(bool metric) const {
+        return time_to_string(value(metric)*60);
+    }
     void initialize() {
         setName(tr("Pace"));
         setType(RideMetric::Average);
@@ -618,7 +635,20 @@ class PaceSwim : public RideMetric {
         setSymbol("pace_swim");
         setInternalName("Pace Swim");
     }
-    bool isTime() const { return true; }
+    // Swim Pace ordering is reversed
+    bool isLowerBetter() const { return true; }
+    // Overrides to use Swim Pace units setting
+    QString units(bool) const {
+        bool metricRunPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        return RideMetric::units(metricRunPace);
+    }
+    double value(bool) const {
+        bool metricRunPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        return RideMetric::value(metricRunPace);
+    }
+    QString toString(bool metric) const {
+        return time_to_string(value(metric)*60);
+    }
     void initialize() {
         setName(tr("Pace Swim"));
         setType(RideMetric::Average);
