@@ -71,6 +71,9 @@ RideCache::RideCache(Context *context) : context(context)
     // load the store - will unstale once cache restored
     load();
 
+    // now sort it
+    qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
+
     // set model once we have the basics
     model_ = new RideCacheModel(context, this);
 
@@ -171,6 +174,7 @@ RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
     for (int index=0; index < rides_.count(); index++) {
         if (rides_[index]->fileName == last->fileName) {
             rides_[index] = last;
+            added = true;
             break;
         }
     }
