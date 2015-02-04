@@ -536,7 +536,11 @@ class AvgSpeed : public RideMetric {
 
         } else {
 
-            setValue(0);
+            // backup to duration if there is no speed channel
+            assert(deps.contains("workout_time"));
+            secsMoving = deps.value("workout_time")->value(true);
+            setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
+
         }
     }
 
@@ -553,7 +557,7 @@ class AvgSpeed : public RideMetric {
 
 static bool avgSpeedAdded =
     RideMetricFactory::instance().addMetric(
-        AvgSpeed(), &(QVector<QString>() << "total_distance"));
+        AvgSpeed(), &(QVector<QString>() << "total_distance" << "workout_time"));
 
 //////////////////////////////////////////////////////////////////////////////
 class Pace : public RideMetric {

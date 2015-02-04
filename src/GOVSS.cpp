@@ -364,9 +364,9 @@ class GOVSS : public RideMetric {
             double weight = uride->getWeight();
             double height = uride->getHeight();
             assert(deps.contains("average_speed"));
-            assert(deps.contains("time_riding"));
+            assert(deps.contains("workout_time"));
             double watts = running_power(weight, height, deps.value("average_speed")->value(true) / 3.6);
-            double secs = deps.value("time_riding")->value(true);
+            double secs = deps.value("workout_time")->value(true);
             double iwf = rtp->value(true) ? watts / rtp->value(true) : 0.0;
             rawGOVSS = watts * secs * iwf;
         }
@@ -389,7 +389,7 @@ static bool addAllGOVSS() {
     RideMetricFactory::instance().addMetric(IWF(), &deps);
     deps.append("govss_iwf");
     deps.append("average_speed");
-    deps.append("time_riding");
+    deps.append("workout_time");
     RideMetricFactory::instance().addMetric(GOVSS(), &deps);
     return true;
 }
