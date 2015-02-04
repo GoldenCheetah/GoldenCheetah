@@ -1015,8 +1015,7 @@ RideNavigator::cursorRide()
 
         QModelIndex group = tableView->model()->index(i,0,QModelIndex());
         for (int j=0; j<tableView->model()->rowCount(group); j++) {
-
-            QString fileName = tableView->model()->data(tableView->model()->index(j,2, group), Qt::DisplayRole).toString();
+            QString fileName = tableView->model()->data(tableView->model()->index(j,2, group), Qt::UserRole+1).toString();
             if (fileName == currentItem->fileName) {
                 // we set current index to column 2 (date/time) since we can be guaranteed it is always show (all others are removable)
                 tableView->scrollTo(tableView->model()->index(j,3,group));

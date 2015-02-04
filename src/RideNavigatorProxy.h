@@ -113,13 +113,15 @@ public:
         isRunIndex = -1;
         tempIndex = -1;
         for(int i=0; i<model->columnCount(); i++) {
+
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "Xaverage_temp") {
                 tempIndex = i;
             }
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "isRun") {
                 isRunIndex = i;
             }
-            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "filename") {
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "filename" ||
+                model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == tr("File")) {
                 fileIndex = i;
             }
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "color") {
@@ -322,7 +324,7 @@ public:
 
             } else if (role == (Qt::UserRole+1)) { // FILENAME ?
 
-                if (colorColumn != -1 && proxyIndex.internalPointer()) {
+                if (fileIndex != -1 && proxyIndex.internalPointer()) {
 
                     QString filename;
 
