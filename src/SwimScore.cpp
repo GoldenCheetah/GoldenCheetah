@@ -310,9 +310,9 @@ class SwimScore : public RideMetric {
             RideFile *uride = const_cast<RideFile*>(ride);
             double weight = uride->getWeight();
             assert(deps.contains("average_speed"));
-            assert(deps.contains("time_riding"));
+            assert(deps.contains("workout_time"));
             double watts = swimming_power(weight, deps.value("average_speed")->value(true) / 3.6);
-            double secs = deps.value("time_riding")->value(true);
+            double secs = deps.value("workout_time")->value(true);
             double sri = stp->value(true) ? watts / stp->value(true) : 0.0;
             rawGOVSS = watts * secs * sri;
         }
@@ -335,7 +335,7 @@ static bool addAllSwimScore() {
     RideMetricFactory::instance().addMetric(SRI(), &deps);
     deps.append("swimscore_ri");
     deps.append("average_speed");
-    deps.append("time_riding");
+    deps.append("workout_time");
     RideMetricFactory::instance().addMetric(SwimScore(), &deps);
     return true;
 }
