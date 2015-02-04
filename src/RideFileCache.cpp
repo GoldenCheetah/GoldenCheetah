@@ -104,6 +104,10 @@ RideFileCache::RideFileCache(Context *context, QString fileName, double weight, 
                     // WE'RE GOOD
                     if (check == false) readCache(); // if check is false we aren't just checking
                     return;
+                } else {
+                    // for debug only
+                    //qDebug()<<"refresh because version ("<<RideFileCacheVersion<<","<<head.version<<")"
+                    //        << " weight ("<< weight <<"," <<head.WEIGHT<<")";
                 }
             }
         }
