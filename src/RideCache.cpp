@@ -477,14 +477,15 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
         if (rcount) rvalue = rvalue / rcount;
     }
 
+    const_cast<RideMetric*>(metric)->setValue(rvalue);
     // Format appropriately
     QString result;
     if (metric->units(useMetricUnits) == "seconds" ||
         metric->units(useMetricUnits) == tr("seconds")) {
         if (nofmt) result = QString("%1").arg(rvalue);
-        else result = time_to_string(rvalue);
+        else result = metric->toString(useMetricUnits);
 
-    } else result = QString("%1").arg(rvalue, 0, 'f', metric->precision(useMetricUnits));
+    } else result = metric->toString(useMetricUnits);
 
     // 0 temp from aggregate means no values 
     if ((metric->symbol() == "average_temp" || metric->symbol() == "max_temp") && result == "0.0") result = "-";
