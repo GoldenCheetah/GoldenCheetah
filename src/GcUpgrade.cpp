@@ -528,6 +528,10 @@ GcUpgrade::upgradeLate(Context *context)
         int ok = 0; int fail = 0; int okConvert = 0; int failConvert = 0;
         upgradeLog->append(tr("Start conversion of native activity files to GoldenCheetah .JSON format..."),3 );
 
+        // GC file Name format
+        QRegExp rx ("^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$");
+        bool fileNameValid;
+
         foreach (QString activitiesFileName, context->athlete->home->root().entryList(QDir::Files)) {
 
             QString fullFileName = context->athlete->home->root().canonicalPath() + "/" + activitiesFileName;
@@ -539,48 +543,75 @@ GcUpgrade::upgradeLate(Context *context)
                     // We have an activity file which is NOT JSON or GC (since they have been moved already) - let's convert
                     QStringList errors;
                     QFile currentFile(fullFileName);
-                    RideFile *ride = RideFileFactory::instance().openRideFile(context, currentFile, errors);
 
-                    // did it parse ok ? (all files here were alrady parsed when importing)
-                    if (ride) {
-
-                        // serialize
-                        QString targetFileName = activitiesFileName;
-                        int dot = targetFileName.lastIndexOf(".");
-                        assert(dot >= 0);
-                        targetFileName.truncate(dot);
-                        targetFileName.append(".json");
-                        // add Source File Tag + New File Name
-                        ride->setTag("Source Filename", activitiesFileName);
-                        ride->setTag("Filename", targetFileName);
-                        JsonFileReader reader;
-                        QFile target(context->athlete->home->activities().canonicalPath() + "/" + targetFileName);
-                        reader.writeRideFile(context, ride, target);
-                        okConvert++;
-                        upgradeLog->append(tr("-> Information: Activity %1 - Successfully converted to .JSON").arg(activitiesFileName));
-
-                        // copy source file to the /imports folder (only if conversion was successful)
-                        bool success = moveFile(QString("%1/%2").arg(context->athlete->home->root().canonicalPath()).arg(activitiesFileName),
-                                                QString("%1/%2").arg(context->athlete->home->imports().canonicalPath()).arg(activitiesFileName));
-                        if (success) {
-                            ok++;
-                        } else {
-                            fail++;
-                            upgradeLog->append(tr("-> Error moving file : ") + activitiesFileName);
-                        }
+                    // Check if the filename is formattted according the GC filename format (since this format is used to determine
+                    // the ride start date and time
+                    fileNameValid = true;
+                    if (!rx.exactMatch(fullFileInfo.fileName())) {
+                        fileNameValid = false;
                     } else {
-                        failConvert++;
-                        upgradeLog->append(tr("-> Error: Activity %1 - Conversion errors: ").arg(activitiesFileName),2);
-                        foreach (QString error, errors) {
-                           upgradeLog->append(tr("......... message(s) of .JSON conversion): ") + error);
-                           upgradeLog->append("<br>");
+                        // format is fine, check if the file name really contains a valid date/time info
+                        QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt());
+                        QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
+
+                        if (!(date.isValid() && time.isValid())) {
+                            fileNameValid = false;
                         }
                     }
 
+                    // only process if the file name contains a valid date/time - otherwise user needs to check
+                    if (fileNameValid) {
 
-                    // clear
-                    delete ride;
+                        RideFile *ride = RideFileFactory::instance().openRideFile(context, currentFile, errors);
+
+                        // did it parse ok ? (all files here were alrady parsed when importing)
+                        if (ride) {
+
+                            // serialize
+                            QString targetFileName = activitiesFileName;
+                            int dot = targetFileName.lastIndexOf(".");
+                            assert(dot >= 0);
+                            targetFileName.truncate(dot);
+                            targetFileName.append(".json");
+                            // add Source File Tag + New File Name
+                            ride->setTag("Source Filename", activitiesFileName);
+                            ride->setTag("Filename", targetFileName);
+                            JsonFileReader reader;
+                            QFile target(context->athlete->home->activities().canonicalPath() + "/" + targetFileName);
+                            reader.writeRideFile(context, ride, target);
+                            okConvert++;
+                            upgradeLog->append(tr("-> Information: Activity %1 - Successfully converted to .JSON").arg(activitiesFileName));
+
+                            // copy source file to the /imports folder (only if conversion was successful)
+                            bool success = moveFile(QString("%1/%2").arg(context->athlete->home->root().canonicalPath()).arg(activitiesFileName),
+                                                    QString("%1/%2").arg(context->athlete->home->imports().canonicalPath()).arg(activitiesFileName));
+                            if (success) {
+                                ok++;
+                            } else {
+                                fail++;
+                                upgradeLog->append(tr("-> Error moving file : ") + activitiesFileName);
+                            }
+                        } else {
+                            failConvert++;
+                            upgradeLog->append(tr("-> Error: Activity %1 - Conversion errors: ").arg(activitiesFileName),2);
+                            foreach (QString error, errors) {
+                                upgradeLog->append(tr("......... message(s) of .JSON conversion): ") + error);
+                                upgradeLog->append("<br>");
+                            }
+                        }
+
+                        // clear
+                        delete ride;
+
+                    } else {
+                        failConvert++;
+                        upgradeLog->append(tr("-> Error: Activity %1 - Invalid File Name (expected format 'YYYY_MM_DD_HH_MM_SS.%2')").arg(activitiesFileName).arg(fullFileInfo.suffix()),2);
+                    }
                 }
+
+            } else {
+                failConvert++;
+                upgradeLog->append(tr("-> Error: Activity %1 - Problem reading file").arg(activitiesFileName),2);
             }
         }
 
