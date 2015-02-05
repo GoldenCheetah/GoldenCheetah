@@ -105,8 +105,9 @@
 // 99  14  Jan 2015 Damien Grauser     Added TotalCalories
 // 100 05  Feb 2015 Ale Martinez       Use duration not time moving when its 0 (rpe metrics)
 // 101 05  Feb 2015 Mark Liversedge    aPower versions of Coggan metrics aNP et al
+// 102 05  Feb 2015 Mark Liversedge    aPower versions of Skiba metrics aBikeScore et al
 
-int DBSchemaVersion = 101;
+int DBSchemaVersion = 102;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

@@ -490,6 +490,7 @@ SOURCES += \
         BatchExportDialog.cpp \
         BestIntervalDialog.cpp \
         BikeScore.cpp \
+        aBikeScore.cpp \
         BinRideFile.cpp \
         Bin2RideFile.cpp \
         BingMap.cpp \
