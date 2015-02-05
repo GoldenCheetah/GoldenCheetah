@@ -112,7 +112,7 @@ public slots:
             if (durationIndex == -1 && column == tr("Duration")) durationIndex = i;
             if (dateIndex == -1 && column == tr("Date")) dateIndex = i;
             if (filenameIndex == -1 && column == tr("File")) filenameIndex = i;
-            if (textIndex == -1 && column == tr("Calendar Text")) textIndex = i;
+            if (textIndex == -1 && column == "Calendar Text") textIndex = i;
             if (colorIndex == -1 && column == "color") colorIndex = i;
         }
 
