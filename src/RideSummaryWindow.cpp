@@ -404,8 +404,6 @@ RideSummaryWindow::htmlSummary()
     if (!ride && !ridesummary) return ""; // didn't parse!
 
     bool useMetricUnits = context->athlete->useMetricUnits;
-    bool metricRunPace = appsettings->value(this, GC_PACE, true).toBool();
-    bool metricSwimPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
 
     // ride summary and there were ridefile read errors?
     if (ridesummary && !ride) {
@@ -681,21 +679,11 @@ RideSummaryWindow::htmlSummary()
 
                     s = s.arg(ride->getTag("Temperature", "-"));
 
-                 } else if (m->internalName().startsWith("Pace") || m->internalName().startsWith("xPace")) { // pace is mm:ss
-
-                    double pace;
-                    bool metricPace = m->internalName().contains("Swim") ? metricSwimPace : metricRunPace;
-                    if (ridesummary) pace  = rideItem->getForSymbol(symbol) * (metricPace ? 1 : m->conversion()) + (metricPace ? 0 : m->conversionSum());
-                    else  pace = context->athlete->rideCache->getAggregate(symbol, specification, metricPace).toDouble();
-                    s = s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
-
                  } else {
 
                     // get the value - from metrics or from data array
                     if (ridesummary) {
-                            QString v = QString("%1").arg(rideItem->getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion())
-                                + (useMetricUnits ? 0 : m->conversionSum()), 0, 'f', m->precision(useMetricUnits));
-
+                            QString v = rideItem->getStringForSymbol(symbol, useMetricUnits);
                             // W' over 100% is not a good thing!
                             if (symbol == "skiba_wprime_max" && rideItem->getForSymbol(symbol) > 100) {
                                 v = QString("<font color=\"red\">%1<font color=\"black\">").arg(v);
