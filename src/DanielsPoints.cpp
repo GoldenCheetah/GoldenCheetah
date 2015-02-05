@@ -132,12 +132,16 @@ class DanielsEquivalentPower : public RideMetric {
         double cp = zones->getCP(zoneRange);
         assert(deps.contains("daniels_points"));
         assert(deps.contains("time_riding"));
+        assert(deps.contains("workout_time"));
         const RideMetric *danielsPoints = deps.value("daniels_points");
         const RideMetric *timeRiding = deps.value("time_riding");
+        const RideMetric *workoutTime = deps.value("workout_time");
         assert(danielsPoints);
         assert(timeRiding);
+        assert(workoutTime);
         double score = danielsPoints->value(true);
-        double secs = timeRiding->value(true);
+        double secs = timeRiding->value(true) ? timeRiding->value(true) :
+                                                workoutTime->value(true);
         watts = secs == 0.0 ? 0.0 : cp * pow(score / DanielsPoints::K / secs, 0.25);
 
         setValue(watts);
@@ -149,6 +153,7 @@ static bool added() {
     RideMetricFactory::instance().addMetric(DanielsPoints());
     QVector<QString> deps;
     deps.append("time_riding");
+    deps.append("workout_time");
     deps.append("daniels_points");
     RideMetricFactory::instance().addMetric(DanielsEquivalentPower(), &deps);
     return true;
