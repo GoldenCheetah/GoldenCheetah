@@ -103,8 +103,9 @@
 // 97  07  Jan 2015 Mark Liversedge    Added isSwim first class variable
 // 98  10  Jan 2015 Ale Martinez       Added Triscore and SwimScore metrics
 // 99  14  Jan 2015 Damien Grauser     Added TotalCalories
+// 100 05  Feb 2015 Ale Martinez       Use duration not time moving when its 0 (rpe metrics)
 
-int DBSchemaVersion = 99;
+int DBSchemaVersion = 100;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
