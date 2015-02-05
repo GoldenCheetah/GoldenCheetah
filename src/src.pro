@@ -499,6 +499,7 @@ SOURCES += \
         ChartSettings.cpp \
         ChooseCyclistDialog.cpp \
         Coggan.cpp \
+        aCoggan.cpp \
         Colors.cpp \
         ColorButton.cpp \
         CommPort.cpp \
