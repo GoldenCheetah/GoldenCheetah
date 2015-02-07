@@ -1290,6 +1290,7 @@ PowerHist::setData(RideFileCache *cache)
     standard.hrSelectedArray.resize(0);
     standard.hrZoneSelectedArray.resize(0);
     standard.kphSelectedArray.resize(0);
+    standard.paceZoneSelectedArray.resize(0);
     standard.gearSelectedArray.resize(0);
     standard.smo2SelectedArray.resize(0);
     standard.cadSelectedArray.resize(0);
@@ -1841,6 +1842,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     standard.hrSelectedArray.resize(0);
     standard.hrZoneSelectedArray.resize(0);
     standard.kphSelectedArray.resize(0);
+    standard.paceZoneSelectedArray.resize(0);
     standard.gearSelectedArray.resize(0);
     standard.smo2SelectedArray.resize(0);
     standard.cadSelectedArray.resize(0);
