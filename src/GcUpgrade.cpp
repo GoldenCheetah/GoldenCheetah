@@ -394,8 +394,7 @@ GcUpgrade::upgrade(const QDir &home)
                 ok++;
             } else {
                 fail++;
-                upgradeLog->append(tr("-> Error moving file : ") + configFile);
-            }
+             }
         }
         errorCount += fail;
         upgradeLog->append(QString(tr("%1 configuration files moved to subdirectory: %2 - %3 failed" ))
@@ -414,7 +413,6 @@ GcUpgrade::upgrade(const QDir &home)
                 ok++;
             } else {
                 fail++;
-                upgradeLog->append(tr("-> Error moving file : ") + calFile);
             }
         }
         errorCount += fail;
@@ -433,7 +431,7 @@ GcUpgrade::upgrade(const QDir &home)
                 ok++;
             } else {
                 fail++;
-                upgradeLog->append(tr("-> Error moving file : ") + logFile);
+
             }
         }
         errorCount += fail;
@@ -454,7 +452,6 @@ GcUpgrade::upgrade(const QDir &home)
                 ok++;
             } else {
                 fail++;
-                upgradeLog->append(tr("-> Error moving file : ") + jsonFile);
             }
         }
         errorCount += fail;
@@ -474,7 +471,6 @@ GcUpgrade::upgrade(const QDir &home)
                 ok++;
             } else {
                 fail++;
-                upgradeLog->append(tr("-> Error moving file : ") + bakFile);
             }
         }
         errorCount += fail;
@@ -495,7 +491,6 @@ GcUpgrade::upgrade(const QDir &home)
                     ok++;
                 } else {
                     fail++;
-                    upgradeLog->append(tr("-> Error moving file : ") + otherFile);
                 }
             }
         }
@@ -589,7 +584,6 @@ GcUpgrade::upgradeLate(Context *context)
                                 ok++;
                             } else {
                                 fail++;
-                                upgradeLog->append(tr("-> Error moving file : ") + activitiesFileName);
                             }
                         } else {
                             failConvert++;
@@ -671,18 +665,20 @@ GcUpgrade::moveFile(const QString &source, const QString &target) {
 
     // now the harder variant (copy & delete)
     if (r.copy(target))
-      {
+    {
         // try to remove - but if this fails, no problem, file has been copied at least
         if (!r.remove()) {
-            // just log, but not critical for the upgrade since the copy worked
-            upgradeLog->append(QString(tr("-> Information: Deletion of copied file %1 failed" )).arg(source));
+            // log, even though it's not very critical it needs to be cleaned up - so report as error
+            upgradeLog->append(QString(tr("-> Error: Deletion of copied file '%1' failed" )).arg(source),2);
+            return false;
+        } else {
+            // copy & remove worked fine - we are done
+            return true;
         }
-        // even if remove failed, the copy was successful - so GC is fine
-        return true;
-      }
+    }
 
-    // more required ?
-
+    // copying failed - so give up and report
+    upgradeLog->append((tr("-> Error moving file : ") + source),2);
     return false;
 
 }
