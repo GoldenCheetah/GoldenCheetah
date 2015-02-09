@@ -136,8 +136,9 @@ RideMetric::computeMetrics(const Context *context, const RideFile *ride, const Z
         }
         if (ready) {
             RideMetric *m = factory.newMetric(symbol);
-            //if (!ride->dataPoints().isEmpty())
-                m->compute(ride, zones, zoneRange, hrZones, hrZoneRange, done, context);
+            m->setValue(0.0);
+            m->setCount(0);
+            m->compute(ride, zones, zoneRange, hrZones, hrZoneRange, done, context);
             if (ride->metricOverrides.contains(symbol))
                 m->override(ride->metricOverrides.value(symbol));
             done.insert(symbol, m);
