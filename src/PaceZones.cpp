@@ -162,7 +162,7 @@ bool PaceZones::read(QFile &file)
                 Qt::CaseInsensitive)
     };
     QRegExp zonerx("^\\s*([^ ,][^,]*),\\s*([^ ,][^,]*),\\s*"
-                   "(\\d+)\\s*(%?)\\s*(?:,\\s*(\\d+|MAX)\\s*(%?)\\s*)?$",
+                   "([\\d\\.]+)\\s*(%?)\\s*(?:,\\s*([\\d\\.]+|MAX)\\s*(%?)\\s*)?$",
                    Qt::CaseInsensitive);
     QRegExp zonedefaultsx("^\\s*(?:zone)?\\s*defaults?\\s*:?\\s*$",
                           Qt::CaseInsensitive);
@@ -292,7 +292,7 @@ bool PaceZones::read(QFile &file)
                 return false;
             }
 
-            double lo = zonerx.cap(3).toInt();
+            double lo = zonerx.cap(3).toDouble();
 
             // allow for zone specified as % of CV
             bool lo_is_pct = false;
@@ -327,7 +327,7 @@ bool PaceZones::read(QFile &file)
 
             } else {
 
-                hi = zonerx.cap(5).toInt();
+                hi = zonerx.cap(5).toDouble();
 
                 // allow for zone specified as % of CV
                 if (zonerx.cap(5) == "%") {
