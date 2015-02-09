@@ -78,10 +78,12 @@ class LNP : public RideMetric {
                  const QHash<QString,RideMetric*> &,
                  const Context *) {
 
-        if(ride->recIntSecs() == 0) return;
-
-        // LNP only makes sense for running
-        if (!ride->isRun()) return;
+        // LNP only makes sense for running and it needs recIntSecs > 0
+        if (!ride->isRun() || ride->recIntSecs() == 0) {
+            setValue(0.0);
+            setCount(0);
+            return;
+        }
 
         // unconst naughty boy, get athlete's data
         RideFile *uride = const_cast<RideFile*>(ride);
@@ -194,7 +196,11 @@ class XPace : public RideMetric {
                  const QHash<QString,RideMetric*> &deps,
                  const Context *) {
         // xPace only makes sense for running
-        if (!ride->isRun()) return;
+        if (!ride->isRun()) {
+            setValue(0.0);
+            setCount(0);
+            return;
+        }
 
         // unconst naughty boy, get athlete's data
         RideFile *uride = const_cast<RideFile*>(ride);
@@ -225,6 +231,7 @@ class XPace : public RideMetric {
         else xPace = 0.0;
 
         setValue(xPace);
+        setCount(lnp->count());
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
     RideMetric *clone() const { return new XPace(*this); }
@@ -253,7 +260,10 @@ class RTP : public RideMetric {
                  const QHash<QString,RideMetric*> &,
                  const Context *context) {
         // LNP only makes sense for running
-        if (!ride->isRun()) return;
+        if (!ride->isRun()) {
+            setValue(0.0);
+            return;
+        }
 
         // unconst naughty boy, get athlete's data
         RideFile *uride = const_cast<RideFile*>(ride);
@@ -305,7 +315,11 @@ class IWF : public RideMetric {
                  const QHash<QString,RideMetric*> &deps,
                  const Context *) {
         // IWF only makes sense for running
-        if (!ride->isRun()) return;
+        if (!ride->isRun()) {
+            setValue(0.0);
+            setCount(0);
+            return;
+        }
 
         assert(deps.contains("govss_lnp"));
         LNP *lnp = dynamic_cast<LNP*>(deps.value("govss_lnp"));
@@ -344,7 +358,10 @@ class GOVSS : public RideMetric {
 	    const QHash<QString,RideMetric*> &deps,
                  const Context *) {
         // GOVSS only makes sense for running
-        if (!ride->isRun()) return;
+        if (!ride->isRun()) {
+            setValue(0.0);
+            return;
+        }
 
         assert(deps.contains("govss_lnp"));
         assert(deps.contains("govss_rtp"));
