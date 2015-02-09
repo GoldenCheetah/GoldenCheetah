@@ -30,6 +30,7 @@
 #include <QItemDelegate>
 #include <QHeaderView>
 #include <QScrollBar>
+#include <QScrollArea>
 #include <QDragMoveEvent>
 #include <QDragEnterEvent>
 
@@ -259,7 +260,8 @@ public slots:
     void buttonClicked(QString name);
 
 private:
-    QGridLayout *buttons;
+    QScrollArea *scrollarea;
+    QVBoxLayout *buttons;
     QSignalMapper *clicked;
 };
 
