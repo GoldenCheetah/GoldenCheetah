@@ -55,7 +55,6 @@ public:
         conversion_ = 1.0;
         conversionSum_ = 0.0;
         precision_ = 0;
-        imperialPrecision_ = 0;
         type_ = Total;
         count_ = 1;
         value_ = 0.0;
@@ -95,7 +94,6 @@ public:
 
     // How many digits after the decimal we should show when displaying the
     // value of a RideMetric.
-    virtual int precision(bool metric) const { if (metric) return precision_; else return imperialPrecision_; }
     virtual int precision() const { return precision_; }
 
     // The actual value of this ride metric, in the units above.
@@ -173,7 +171,6 @@ public:
     void setConversion(double x) { conversion_ = x; }
     void setConversionSum(double x) { conversionSum_ = x; }
     void setPrecision(int x) { precision_ = x; }
-    void setImperialPrecision(int x) { imperialPrecision_ = x; }
     void setMetricUnits(QString x) { metricUnits_ = x; }
     void setImperialUnits(QString x) { imperialUnits_ = x; }
     void setName(QString x) { name_ = x; }
@@ -188,8 +185,7 @@ public:
                 count_, // used when averaging
                 conversion_,
                 conversionSum_,
-                precision_,
-                imperialPrecision_;
+                precision_;
 
         QString metricUnits_, imperialUnits_;
         QString name_, symbol_, internalName_;
