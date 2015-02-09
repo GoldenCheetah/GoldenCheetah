@@ -73,8 +73,12 @@ class XPowerSwim : public RideMetric {
                  const QHash<QString,RideMetric*> &,
                  const Context *) {
 
-        // xPowerSwim only makes sense for running
-        if (!ride->isSwim()) return;
+        // xPowerSwim only makes sense for running and it needs recIntSecs > 0
+        if (!ride->isSwim() || ride->recIntSecs() == 0) {
+            setValue(0.0);
+            setCount(0);
+            return;
+        }
 
         // unconst naughty boy, get athlete's data
         RideFile *uride = const_cast<RideFile*>(ride);
@@ -157,7 +161,11 @@ class XPaceSwim : public RideMetric {
                  const QHash<QString,RideMetric*> &deps,
                  const Context *) {
         // xPaceSwim only makes sense for swimming
-        if (!ride->isSwim()) return;
+        if (!ride->isSwim()) {
+            setValue(0.0);
+            setCount(0);
+            return;
+        }
 
         // unconst naughty boy, get athlete's data
         RideFile *uride = const_cast<RideFile*>(ride);
@@ -173,6 +181,7 @@ class XPaceSwim : public RideMetric {
         xPaceSwim = speed ? (100.0/60.0) / speed : 0.0;
 
         setValue(xPaceSwim);
+        setCount(xPowerSwim->count());
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
     RideMetric *clone() const { return new XPaceSwim(*this); }
@@ -201,7 +210,10 @@ class STP : public RideMetric {
                  const QHash<QString,RideMetric*> &,
                  const Context *context) {
         // STP only makes sense for running
-        if (!ride->isSwim()) return;
+        if (!ride->isSwim()) {
+            setValue(0.0);
+            return;
+        }
 
         // unconst naughty boy, get athlete's data
         RideFile *uride = const_cast<RideFile*>(ride);
@@ -252,7 +264,11 @@ class SRI : public RideMetric {
                  const QHash<QString,RideMetric*> &deps,
                  const Context *) {
         // SRI only makes sense for swimming
-        if (!ride->isSwim()) return;
+        if (!ride->isSwim()) {
+            setValue(0.0);
+            setCount(0);
+            return;
+        }
 
         assert(deps.contains("swimscore_xpower"));
         XPowerSwim *xPowerSwim = dynamic_cast<XPowerSwim*>(deps.value("swimscore_xpower"));
@@ -291,7 +307,10 @@ class SwimScore : public RideMetric {
 	    const QHash<QString,RideMetric*> &deps,
                  const Context *) {
         // SwimScore only makes sense for swimming
-        if (!ride->isSwim()) return;
+        if (!ride->isSwim()) {
+            setValue(0.0);
+            return;
+        }
 
         assert(deps.contains("swimscore_xpower"));
         assert(deps.contains("swimscore_ri"));
