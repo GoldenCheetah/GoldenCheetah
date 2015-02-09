@@ -101,6 +101,9 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     QHBoxLayout *seriesControls = new QHBoxLayout(series);
     QFormLayout *seriesLeft = new QFormLayout(); // ride side series
     QFormLayout *seriesRight = new QFormLayout(); // ride side series
+    seriesControls->setSpacing(2);
+    seriesLeft->setSpacing(2);
+    seriesRight->setSpacing(2);
     seriesControls->addLayout(seriesLeft);
     seriesControls->addLayout(seriesRight); // ack I swapped them around !
     st->addTab(series, tr("Curves"));
