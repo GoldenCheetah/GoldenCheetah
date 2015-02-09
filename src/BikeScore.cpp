@@ -57,6 +57,12 @@ class XPower : public RideMetric {
                  const QHash<QString,RideMetric*> &,
                  const Context *) {
 
+        if (ride->recIntSecs() == 0) {
+            setValue(0.0);
+            setCount(0);
+            return;
+        }
+
         static const double EPSILON = 0.1;
         static const double NEGLIGIBLE = 0.1;
 
@@ -383,8 +389,10 @@ class BikeScore : public RideMetric {
                  const HrZones *, int,
 	    const QHash<QString,RideMetric*> &deps,
                  const Context *) {
-	    if (!zones || zoneRange < 0)
+	    if (!zones || zoneRange < 0) {
+	        setValue(0.0);
 	        return;
+        }
 
         assert(deps.contains("skiba_xpower"));
         assert(deps.contains("skiba_relative_intensity"));
