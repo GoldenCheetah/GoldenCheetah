@@ -1883,8 +1883,7 @@ class AvgLPCO : public RideMetric {
         setMetricUnits(tr("mm"));
         setImperialUnits(tr("in")); // inches would need more precision than 1
         setType(RideMetric::Average);
-        setPrecision(0);
-        setImperialPrecision(2);
+        setPrecision(2);
         setConversion(INCH_PER_MM);
     }
 
@@ -1936,8 +1935,7 @@ class AvgRPCO : public RideMetric {
         setMetricUnits(tr("mm"));
         setImperialUnits(tr("in")); // inches would need more precision than 1
         setType(RideMetric::Average);
-        setPrecision(0);
-        setImperialPrecision(2);
+        setPrecision(2);
         setConversion(INCH_PER_MM);
     }
 

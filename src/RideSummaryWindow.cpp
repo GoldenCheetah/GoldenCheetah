@@ -1708,7 +1708,7 @@ RideSummaryWindow::htmlCompareSummary() const
                                 + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
 
                     // use right precision
-                    QString strValue = QString("%1").arg(value, 0, 'f', m->precision(context->athlete->useMetricUnits));
+                    QString strValue = QString("%1").arg(value, 0, 'f', m->precision());
 
                     // or maybe its a duration (worry about local lang or translated)
                     if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
@@ -1728,7 +1728,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         // use right precision
                         QString strValue = QString("%1%2").arg(value >= 0 ? "+" : "") // - sign added anyway
-                                                        .arg(value, 0, 'f', m->precision(context->athlete->useMetricUnits));
+                                                        .arg(value, 0, 'f', m->precision());
 
                         // or maybe its a duration (worry about local lang or translated)
                         if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
@@ -1976,7 +1976,7 @@ RideSummaryWindow::htmlCompareSummary() const
                                                                                  context->athlete->useMetricUnits, true).toDouble();
 
                     // use right precision
-                    QString strValue = QString("%1").arg(value, 0, 'f', m->precision(context->athlete->useMetricUnits));
+                    QString strValue = QString("%1").arg(value, 0, 'f', m->precision());
 
                     // or maybe its a duration (worry about local lang or translated)
                     if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
@@ -1996,7 +1996,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         // use right precision
                         QString strValue = QString("%1%2").arg(value >= 0 ? "+" : "") // - sign added anyway
-                                                        .arg(value, 0, 'f', m->precision(context->athlete->useMetricUnits));
+                                                        .arg(value, 0, 'f', m->precision());
 
                         // or maybe its a duration (worry about local lang or translated)
                         if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
