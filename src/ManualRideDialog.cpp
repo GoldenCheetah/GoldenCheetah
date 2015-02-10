@@ -468,7 +468,10 @@ ManualRideDialog::okClicked()
         QMap<QString,QString> override;
         override.insert("value", QString("%1").arg(seconds));
         rideFile->metricOverrides.insert("workout_time", override);
-        rideFile->metricOverrides.insert("time_riding", override);
+        // Override time_riding to duration
+        // only if we don't have better information
+        if (!lapsEditor || lapsEditor->dataPoints().count() == 0)
+            rideFile->metricOverrides.insert("time_riding", override);
     }
 
     // basic metadata
