@@ -72,6 +72,7 @@ class CPPlot : public QwtPlot
         void setShowDelta(bool delta, bool percent);
         void setShadeMode(int x);
         void setShadeIntervals(int x);
+        void setVeloCP(int x) { veloCP = x; }
         void setDateCP(int x) { dateCP = x; }
         void setDateCV(double x) { dateCV = x; }
         void setSeries(CriticalPowerWindow::CriticalSeriesType);
@@ -141,6 +142,7 @@ class CPPlot : public QwtPlot
         // Data and State
         Context *context;
         RideFileCache *bestsCache;
+        int veloCP;
         int dateCP;
         double dateCV;
         QTime lastupdate;
