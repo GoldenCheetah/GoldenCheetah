@@ -37,6 +37,7 @@ class LogTimeScaleDraw : public QwtScaleDraw
 
         static const QList<double> ticks;
         static const QList<double> ticksEnergy;
+        static const QList<double> ticksVeloclinic;
         bool inv_time;
 
     protected:
