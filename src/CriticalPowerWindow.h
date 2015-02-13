@@ -233,6 +233,10 @@ class CriticalPowerWindow : public GcChartWindow
         void rHeatChanged(int check);
         void rDeltaChanged();
 
+        // edit CP value used for veloclinic plot
+        void setSliderFromEdit();
+        void setEditFromSlider();
+
         // menu option
         void exportData();
 
@@ -274,6 +278,11 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *rPercent, *rHeat, *rDelta, *rDeltaPercent;
         QwtPlotPicker *picker;
         QwtPlotGrid *grid;
+
+        // veloclinic controls
+        QSlider *CPSlider;
+        QLineEdit *CPEdit;
+        QLabel *CPLabel;
 
         // model helper widget
         QWidget *helper;

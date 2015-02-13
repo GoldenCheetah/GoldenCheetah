@@ -75,6 +75,11 @@ LogTimeScaleDraw::ticks = QList<double>() << 1.0/60.0 << 5.0/60.0 << 15.0/60.0 <
 QList<double> const
 LogTimeScaleDraw::ticksEnergy = QList<double>() << 1 << 5 << 10 << 20 << 30 << 60 << 120 << 180 << 300;
 
+QList<double> const
+LogTimeScaleDraw::ticksVeloclinic = QList<double>() << 100 << 200 << 300 << 400 << 500 << 600 << 700 << 800 << 900 << 1000
+                                                    << 1100 << 1200 << 1300 << 1400 << 1500 << 1600 << 1700 << 1800 << 1900 << 2000
+                                                    << 2100 << 2200 << 2300 << 2400 << 2500 << 2600 << 2700 << 2800 << 2900 << 3000;
+
 
 void
 LogTimeScaleDraw::drawLabel(QPainter *painter, double value) const
