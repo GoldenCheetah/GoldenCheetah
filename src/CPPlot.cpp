@@ -405,8 +405,8 @@ CPPlot::plotModel()
                 QVector<double> power(pdModel->size());
                 QVector<double> wprime(pdModel->size());
                 for (size_t t = 0; t < pdModel->size(); t++) {
-                    power[t] = pdModel->y(t);
-                    wprime[t] = (pdModel->y(t)-veloCP) * (pdModel->x(t)); // Joules
+                    power[t] = pdModel->y(t+1);
+                    wprime[t] = (pdModel->y(t+1)-veloCP) * (pdModel->x(t+1)); // Joules
                 }
                 modelCurve->setSamples(power.data(), wprime.data(), pdModel->size()-1);
             }
