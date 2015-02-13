@@ -32,6 +32,7 @@
 #include "GcOverlayWidget.h"
 #include "MUWidget.h"
 #include "HelpWhatsThis.h"
+#include "TabView.h" // stylesheet
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_picker.h>
@@ -95,6 +96,31 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     if (rangemode) cpPlot->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartTrends_Critical_MM));
     else cpPlot->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM));
 
+    // if we're plotting a veloclinic plot we can adjust CP to see what happens
+    CPLabel = new QLabel(tr("Critical Power "), this);
+    CPEdit = new QLineEdit(this);
+    CPEdit->setFixedWidth(50);
+    CPSlider = new QSlider(Qt::Horizontal);
+    CPSlider->setTickInterval(50);
+    CPSlider->setMinimum(100);
+    CPSlider->setMaximum(500);
+    CPSlider->setFocusPolicy(Qt::NoFocus);
+    QHBoxLayout *cpediting = new QHBoxLayout();
+
+    cpediting->addStretch();
+    cpediting->addWidget(CPLabel);
+    cpediting->addWidget(CPEdit);
+    cpediting->addWidget(CPSlider);
+    cpediting->addStretch();
+
+    CPEdit->hide();
+    CPSlider->hide();
+    CPLabel->hide();
+
+    mainLayout->addLayout(cpediting);
+    connect(CPEdit, SIGNAL(textChanged(QString)), this, SLOT(setSliderFromEdit()));
+    connect(CPSlider, SIGNAL(valueChanged(int)), this, SLOT(setEditFromSlider()));
+    
     //
     // Chart settings
     //
@@ -505,6 +531,43 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     configChanged(CONFIG_APPEARANCE); // get colors set
 }
 
+// veloclinic stuff
+void 
+CriticalPowerWindow::setSliderFromEdit()
+{
+    int value = CPEdit->text().toInt();
+    CPSlider->setValue(value);
+}
+
+void 
+CriticalPowerWindow::setEditFromSlider()
+{
+    CPEdit->setText(QString("%1").arg(CPSlider->value()));
+
+    // replot with this value if we're a velo plot
+    if (series() == veloclinicplot) {
+
+        // replot the charts using this new value
+        cpPlot->setVeloCP(CPSlider->value());
+
+        // force replot...
+        if (rangemode) {
+
+            // Refresh aggregated curve (ride added/filter changed)
+            dateRangeChanged(myDateRange);
+
+        } else {
+            Season season = seasons->seasons.at(cComboSeason->currentIndex());
+
+            // Refresh aggregated curve (ride added/filter changed)
+            cpPlot->setDateRange(season.getStart(), season.getEnd());
+
+            // if visible make the changes visible
+            if (amVisible() && myRideItem) cpPlot->setRide(myRideItem);
+        }
+    }
+}
+
 void
 CriticalPowerWindow::configChanged(qint32)
 {
@@ -517,17 +580,22 @@ CriticalPowerWindow::configChanged(qint32)
     else palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
 
     // inverted palette for data etc
     QPalette whitepalette;
     if (rangemode) {
         whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+        whitepalette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
     } else {
         whitepalette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+        whitepalette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     }
 
@@ -569,6 +637,17 @@ CriticalPowerWindow::configChanged(qint32)
     ftpRank->setPalette(whitepalette);
     eiTitle->setPalette(palette);
     eiValue->setPalette(whitepalette);
+
+    CPEdit->setPalette(whitepalette);
+    CPLabel->setPalette(whitepalette);
+    CPSlider->setPalette(whitepalette);
+
+#ifndef Q_OS_MAC
+    QString style = QString("QSpinBox { background: %1; }").arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name());
+    CPEdit->setStyleSheet(style);
+    //CPLabel->setStyleSheet(style);
+    //CPSlider->setStyleSheet(style);
+#endif
 
     QPen gridPen(GColor(CPLOTGRID));
     grid->setPen(gridPen);
@@ -1129,6 +1208,7 @@ CriticalPowerWindow::rideSelected()
         if (context->athlete->zones()) {
             int zoneRange = context->athlete->zones()->whichRange(currentRide->dateTime.date());
             int CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 0;
+            CPEdit->setText(QString("%1").arg(CP));
             cpPlot->setDateCP(CP);
         } else {
             cpPlot->setDateCP(0);
@@ -1185,6 +1265,19 @@ CriticalPowerWindow::setSeries(int index)
 
         // need a helper any more ?
         CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(index).toInt());
+
+        // hide velo cp editing
+        if (series == veloclinicplot) {
+            CPEdit->show();
+            CPSlider->show();
+            CPLabel->show();
+            cpPlot->setVeloCP(CPEdit->text().toInt());
+        } else {
+            CPEdit->hide();
+            CPSlider->hide();
+            CPLabel->hide();
+        }
+
         if ((series == watts || series == wattsKg || series == kph) && modelCombo->currentIndex() >= 1) helperWidget()->show();
         else helperWidget()->hide();
 
@@ -1507,13 +1600,13 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
     } else dateRange = myDateRange;
 
     // only change date range if its actually changed! 
-    if (dateRange.from != cfrom || dateRange.to != cto || stale) {
+    if (series() == veloclinicplot || dateRange.from != cfrom || dateRange.to != cto || stale) {
 
         cfrom = dateRange.from;
         cto = dateRange.to;
 
         // lets work out the average CP configure value
-        if (context->athlete->zones()) {
+        if (series() != veloclinicplot && context->athlete->zones()) {
             int fromZoneRange = context->athlete->zones()->whichRange(cfrom);
             int toZoneRange = context->athlete->zones()->whichRange(cto);
 
@@ -1523,6 +1616,8 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
             int dateCP = (CPfrom + CPto) / 2;
 
             cpPlot->setDateCP(dateCP);
+        } else {
+            cpPlot->setDateCP(CPEdit->text().toInt());
         }
 
         // lets work out the average CV configure value
