@@ -46,9 +46,9 @@ LapsEditor::LapsEditor(bool isSwim) : isSwim(isSwim)
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_Manual_LapsEditor));
 #ifdef Q_OS_MAC
-    setFixedSize(615,415);
+    setFixedSize(625,415);
 #else
-    setFixedSize(620,420);
+    setFixedSize(630,420);
 #endif
 
     //
@@ -57,7 +57,7 @@ LapsEditor::LapsEditor(bool isSwim) : isSwim(isSwim)
 
     // Laps table
     const int nCols = 7;
-    const int nRows = 10;
+    const int nRows = 100;
     tableWidget = new QTableWidget(nRows, nCols, this);
     QStringList hLabels;
     tableWidget->setColumnWidth(0,  48);
