@@ -229,21 +229,33 @@ LTMPlot::setData(LTMSettings *set)
         QDateTime first = context->athlete->rideCache->rides().first()->dateTime;
         QDateTime last = context->athlete->rideCache->rides().last()->dateTime;
 
-        // if dates are null we need to set them from the available data
+        // if requested date range is not overlapping with any existing data,
+        // just keep it as it is / otherwise crop
 
-        // end
-        if (settings->end == QDateTime() || settings->end > last.addDays(365)) {
-            if (settings->end < QDateTime::currentDateTime()) {
-                settings->end = QDateTime::currentDateTime();
-            } else {
-                settings->end = last;
+        if ((settings->end.isValid() && settings->start.isValid()) &&
+            (settings->end < first || settings->start > last)) {
+
+            // keep the date range - no code here (by intent) - for easier readability
+
+        } else {
+
+            // if dates are null we need to set them from the available data
+
+            // end
+            if (settings->end == QDateTime() || settings->end > last.addDays(365)) {
+                if (settings->end < QDateTime::currentDateTime()) {
+                    settings->end = QDateTime::currentDateTime();
+                } else {
+                    settings->end = last;
+                }
+            }
+
+            // start
+            if (settings->start == QDateTime() || settings->start < first.addDays(-365)) {
+                settings->start = first;
             }
         }
 
-        // start
-        if (settings->start == QDateTime() || settings->start < first.addDays(-365)) {
-            settings->start = first;
-        }
     }
 
     //setTitle(settings->title);
