@@ -647,12 +647,13 @@ RideCache::refreshCPModelMetrics()
     models << &extmodel;
 
 
-    // run backwards stopping when date is at 1990 or first ride date with data
-    QDate date = from.addDays(-84);
-    while (date < to.addDays(7)) {
+    // from has first ride with Power data / looking at the next 7 days of data with Power
+    // calculate Estimates for all data per week including the week of the last Power recording
+    QDate date = from;
+    while (date < to) {
 
         QDate begin = date;
-        QDate end = date.addDays(7);
+        QDate end = date.addDays(6);
 
         // let others know where we got to...
         emit modelProgress(date.year(), date.month());
@@ -709,7 +710,7 @@ RideCache::refreshCPModelMetrics()
             //qDebug()<<add.from<<model->code()<< "KG W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
         }
 
-        // go back a week
+        // go forward a week
         date = date.addDays(7);
     }
 
