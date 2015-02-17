@@ -229,21 +229,33 @@ LTMPlot::setData(LTMSettings *set)
         QDateTime first = context->athlete->rideCache->rides().first()->dateTime;
         QDateTime last = context->athlete->rideCache->rides().last()->dateTime;
 
-        // if dates are null we need to set them from the available data
+        // if requested date range is not overlapping with any existing data,
+        // just keep it as it is / otherwise crop
 
-        // end
-        if (settings->end == QDateTime() || settings->end > last.addDays(365)) {
-            if (settings->end < QDateTime::currentDateTime()) {
-                settings->end = QDateTime::currentDateTime();
-            } else {
-                settings->end = last;
+        if ((settings->end.isValid() && settings->start.isValid()) &&
+            (settings->end < first || settings->start > last)) {
+
+            // keep the date range - no code here (by intent) - for easier readability
+
+        } else {
+
+            // if dates are null we need to set them from the available data
+
+            // end
+            if (settings->end == QDateTime() || settings->end > last.addDays(365)) {
+                if (settings->end < QDateTime::currentDateTime()) {
+                    settings->end = QDateTime::currentDateTime();
+                } else {
+                    settings->end = last;
+                }
+            }
+
+            // start
+            if (settings->start == QDateTime() || settings->start < first.addDays(-365)) {
+                settings->start = first;
             }
         }
 
-        // start
-        if (settings->start == QDateTime() || settings->start < first.addDays(-365)) {
-            settings->start = first;
-        }
     }
 
     //setTitle(settings->title);
@@ -2571,8 +2583,30 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
 
-    // what is the first date
-    int firstDay = groupForDate(settings->start.date(), settings->groupBy);
+    // data vectors for averaging in case on Monthly/Yearly/Total grouping
+    QVector<double> xCount;
+    QVector<double> yTotal;
+
+    xCount.resize(maxdays+3);
+    yTotal.resize(maxdays+3);
+
+    // what is the first period
+    int firstPeriod = groupForDate(settings->start.date(), settings->groupBy);
+
+    // get first PDEstimate / fillup X/Y with missing time range
+    if (!context->athlete->PDEstimates.isEmpty()) {
+      PDEstimate firstEst = context->athlete->PDEstimates.first();
+      if ((settings->start.date() < firstEst.from) &&
+          (settings->end.date() > firstEst.from)){
+        int timeforward = groupForDate(firstEst.from, settings->groupBy)
+                - groupForDate(settings->start.date(), settings->groupBy);
+        for (int i = 0; i < timeforward; i++) {
+            x[n] = n;
+            y[n] = 0;
+            n++;
+        }
+      }
+    }
 
     // loop through all the estimate data
     foreach(PDEstimate est, context->athlete->PDEstimates) {
@@ -2634,22 +2668,84 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
             break;
         }
 
-        if (n <= maxdays && value > 0) {
-            int currentDay = groupForDate(from, settings->groupBy);
-            x[n] = currentDay - firstDay;
-            y[n] = value;
-            n++;
+        // PDE estimates are created in Weekly Buckets - so we need to aggregate and average or data fillup
+        // depending on the different groupings (day, week, month, year, all)
+        switch(settings->groupBy) {
 
-            int nextDay = groupForDate(to, settings->groupBy);
-            while (n <= maxdays && nextDay > currentDay) { // i.e. not the same day
-                x[n] = 1 + currentDay - firstDay;
+        case LTM_MONTH:
+        case LTM_YEAR:
+        case LTM_ALL:
+
+           // for month, year, all - aggregate the weekly values and build averages
+           if (n <= maxdays) {
+             int currentPeriod =  groupForDate(from, settings->groupBy);
+             if (n != (currentPeriod - firstPeriod)) {
+                 // data of next period of estimates is available,
+                 // so calcuated the current period and switch forward to next
+                 x[n] = n;
+                 if (xCount[n]> 0) {
+                    y[n] = yTotal[n] / xCount[n];
+                 } else {
+                    y[n] = 0;
+                 }
+                 n++;
+             };
+             // store for calcuation
+             yTotal[n] += value;
+             xCount[n]++;
+           }
+           break;
+
+        case LTM_DAY:
+            if (n <= maxdays) {
+
+                // for days - take estimate data from first day and fill the days to end of week
+                // since there is no more estimate data available until next week
+                x[n] = n;
                 y[n] = value;
                 n++;
-                currentDay++;
+                int currentDay = groupForDate(from, settings->groupBy);
+                int nextDay = groupForDate(to, settings->groupBy);
+                while (n <= maxdays && nextDay > currentDay) { // i.e. not the same day
+                    x[n] = n;
+                    y[n] = value;
+                    n++;
+                    currentDay++;
+                }
             }
+            break;
+
+        case LTM_WEEK:
+        default:
+
+            // for weeks - just take the data available - no fill,...
+            if (n <= maxdays) {
+
+                x[n] = n;
+                y[n] = value;
+                n++;
+            }
+            break;
         }
     }
 
+    // just check if we had data at all
+    if (!context->athlete->PDEstimates.isEmpty()) {
+        // add the last average value to the output
+        switch(settings->groupBy) {
+
+        case LTM_MONTH:
+        case LTM_YEAR:
+        case LTM_ALL:
+            x[n] = n;
+            if (xCount[n]> 0) {
+               y[n] = yTotal[n] / xCount[n];
+            } else {
+               y[n] = 0;
+            }
+            n++;
+        }
+    }
     // always seems to be one too many ...
     if (n>0)n--;
 }
