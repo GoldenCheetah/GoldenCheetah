@@ -121,9 +121,9 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_Manual));
 #ifdef Q_OS_MAC
-    setFixedSize(610,415);
+    setMinimumSize(610,415);
 #else
-    setFixedSize(615,360);
+    setMinimumSize(615,360);
 #endif
 
     // we haven't derived factors yet
@@ -215,7 +215,7 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     QLabel *avgKPHLabel = new QLabel(tr("Average Speed:"), this);
     avgKPH = new QDoubleSpinBox(this);
     avgKPH->setSingleStep(1.0);
-    avgKPH->setDecimals(0);
+    avgKPH->setDecimals(1);
     avgKPH->setMinimum(0);
     avgKPH->setMaximum(100);
 
