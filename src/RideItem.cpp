@@ -107,7 +107,7 @@ RideItem::setFrom(QHash<QString, RideMetricPtr> computed)
     QHashIterator<QString, RideMetricPtr> i(computed);
     while (i.hasNext()) {
         i.next();
-        metrics_[i.value()->index()] = i.value()->value(true);
+        metrics_[i.value()->index()] = i.value()->value();
     }
 }
 
@@ -410,7 +410,7 @@ RideItem::refresh()
         QHashIterator<QString, RideMetricPtr> i(computed);
         while (i.hasNext()) {
             i.next();
-            metrics_[i.value()->index()] = i.value()->value(true);
+            metrics_[i.value()->index()] = i.value()->value();
         }
 
         // clean any bad values
