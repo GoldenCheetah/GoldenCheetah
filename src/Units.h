@@ -35,8 +35,8 @@
 #define GPS_COORD_TO_STRING 8
 
 #include <QString>
-extern QString kphToPace(double kph, bool metric);
-extern QString mphToPace(double mph, bool metric);
+extern QString kphToPace(double kph, bool metric, bool isSwim=false);
+extern QString mphToPace(double mph, bool metric, bool isSwim=false);
 
 #endif // _GC_Units_h
 
