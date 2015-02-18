@@ -98,6 +98,8 @@ public:
 
     // The actual value of this ride metric, in the units above.
     virtual double value(bool metric) const { return metric ? value_ : (value_ * conversion_); }
+    // The internal value of this ride metric, useful to cache and then setValue.
+    double value() const { return value_; }
 
     // for averages the count of items included in the average
     virtual double count() const { return count_; }

@@ -19,10 +19,10 @@
 #include "Units.h"
 #include <cmath>
 
-QString kphToPace(double kph, bool metric)
+QString kphToPace(double kph, bool metric, bool isSwim)
 {
     // return a min/mile or min/kph string
-    if (!metric) kph /= KM_PER_MILE;
+    if (!metric && !isSwim) kph /= KM_PER_MILE;
 
     // stop silly stuff
     if (kph < 0.1) {
@@ -32,6 +32,9 @@ QString kphToPace(double kph, bool metric)
     if (kph > 99) {
         return "xx:xx";
     }
+
+    // Swim pace is min/100m or min/100y
+    if (isSwim) kph = kph * 10.00f / (metric ? 1.00f : METERS_PER_YARD);
 
     // now how many minutes to do 1 ?
     double pace = 60.00f / kph;
@@ -49,10 +52,10 @@ QString kphToPace(double kph, bool metric)
                   .arg(seconds, 2, 10, QLatin1Char('0'));
 }
 
-QString mphToPace(double mph, bool metric)
+QString mphToPace(double mph, bool metric, bool isSwim)
 {
     // convert to kph and then use kph function
     double kph = mph * KM_PER_MILE;
 
-    return kphToPace(kph, metric);
+    return kphToPace(kph, metric, isSwim);
 }

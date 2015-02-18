@@ -993,10 +993,7 @@ PaceZones::kphFromTime(QTimeEdit *cvedit, bool metric) const
 QString
 PaceZones::kphToPaceString(double kph, bool metric) const
 {
-    if (swim)
-        return kphToPace(kph * 10.00f * (metric ? 1.00f : METERS_PER_YARD), true);
-    else
-        return kphToPace(kph, metric);
+    return kphToPace(kph, metric, swim);
 }
 
 QString
