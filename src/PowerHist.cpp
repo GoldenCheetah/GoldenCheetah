@@ -2293,13 +2293,12 @@ PowerHist::pointHover(QwtPlotCurve *curve, int index)
                 if (series == RideFile::kph && (!rideItem || rideItem->isRun)) {
                     bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
                     QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
-                    runPaceStr = tr("\n%1 Pace (%2)").arg(context->athlete->useMetricUnits ? kphToPace(xvalue, metricPace) : mphToPace(xvalue, metricPace)).arg(paceunit);
+                    runPaceStr = tr("\n%1 Pace (%2)").arg(context->athlete->useMetricUnits ? kphToPace(xvalue, metricPace, false) : mphToPace(xvalue, metricPace, false)).arg(paceunit);
                 }
                 if (series == RideFile::kph && (!rideItem || rideItem->isSwim)) {
                     bool metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
                     QString paceunit = metricPace ? tr("min/100m") : tr("min/100yd");
-                    double swimSpeed = xvalue * 10.00f * (metricPace ? 1.00f : METERS_PER_YARD);
-                    swimPaceStr = tr("\n%1 Pace (%2)").arg(context->athlete->useMetricUnits ? kphToPace(swimSpeed, true) : mphToPace(swimSpeed, true)).arg(paceunit);
+                    swimPaceStr = tr("\n%1 Pace (%2)").arg(context->athlete->useMetricUnits ? kphToPace(xvalue, metricPace, true) : mphToPace(xvalue, metricPace, true)).arg(paceunit);
                 }
                 // output the tooltip
                 text = QString("%1 %2%5%6\n%3 %4")
