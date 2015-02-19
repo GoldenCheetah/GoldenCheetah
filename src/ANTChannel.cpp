@@ -834,7 +834,7 @@ void ANTChannel::attemptTransition(int message_id)
 
         //qDebug()<<number<<"TRANSITION from assign channel";
 
-        parent->sendMessage(ANTMessage::setChannelID(number, 0, device_id, 0)); // lets go back to allowing anything
+        parent->sendMessage(ANTMessage::setChannelID(number, device_number, device_id, 0)); // we need to be specific!
         break;
 
     case ANT_CHANNEL_ID:
