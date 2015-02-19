@@ -54,6 +54,8 @@ private:
 
     double last_distance;
     double distance;
+    double lapSecs; // for pause intervals in pool swimming files
+    enum { NotSwim, MayBeSwim, Swim } swim; // to detect pool swimming files
 
     bool   first; // first ride found, when it may contain collections!
     int	   lap;
