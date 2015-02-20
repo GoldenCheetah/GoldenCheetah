@@ -262,7 +262,8 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         last_time = time;
     } else if (qName == "Lap") {
         // for pool swimming, laps with distance 0 are pauses, without trackpoints
-        if (swim == Swim && distance == 0) {
+        // expand only if Smart Recording is enabled
+        if (swim == Swim && distance == 0 && isGarminSmartRecording.toInt()) {
             // fill in the pause, partially if too long
             for(int i = 1; i <= round(lapSecs) && i <= 10*GarminHWM.toInt(); i++)
                 rideFile->appendPoint(secs + i,
