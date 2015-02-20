@@ -193,9 +193,9 @@ class AthleteDirectoryStructure : public QObject {
             QDir root() { return myhome; }
 
             // supporting functions to work with the subDirs
-            void createAllSubdirs();
-            bool subDirsExist();
-
+            void createAllSubdirs();            // create all new SubDirectories (or create only missing ones)
+            bool subDirsExist();                // check for all new SubDirectories
+            bool upgradedDirectoriesHaveData(); // check only for /activities and /config (as the main directories which have to bee there)
 
         private:
 

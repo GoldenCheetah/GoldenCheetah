@@ -40,6 +40,18 @@ GcUpgrade::upgradeConfirmedByUser(const QDir &home)
     // but track the "upgrade success" separately in the settings on user level
     bool folderUpgradeSuccess =  appsettings->cvalue(home.dirName(), GC_UPGRADE_FOLDER_SUCCESS, false).toBool();
 
+    //  reset upgrade flag - in case flag is set "true" and subfolder "/activities" and /config do NOT exist
+    //  or - if they exists - do not contain any files, then something is wrong with the upgrade flag -
+    //  (potentially due to a not fitting data restore)
+    //  so let's reset the flag to "false" and run the upgrade again - this can never go wrong (if their is
+    //  nothing to be upgrade - upgrade a success anyway
+
+    AthleteDirectoryStructure newHome(home);
+    if (folderUpgradeSuccess && !newHome.upgradedDirectoriesHaveData()) {
+       folderUpgradeSuccess = false;
+       appsettings->setCValue(home.dirName(), GC_UPGRADE_FOLDER_SUCCESS, false);
+    }
+
     if (!folderUpgradeSuccess) {
 
         GcUpgradeExecuteDialog msgBox(home.dirName());
@@ -50,7 +62,7 @@ GcUpgrade::upgradeConfirmedByUser(const QDir &home)
 
     }
 
-    return true; // if there is no upgrade need, just proceed
+    return true; // if there is no upgrade needed, just proceed
 }
 
 int 
@@ -341,6 +353,8 @@ GcUpgrade::upgrade(const QDir &home)
     // now the special "folder structure" upgrade - which is tracked separately on success
 
     bool folderUpgradeSuccess =  appsettings->cvalue(home.dirName(), GC_UPGRADE_FOLDER_SUCCESS, false).toBool();
+
+    // now let's check if upgrade is necessary and do the job
     if (!folderUpgradeSuccess) {
 
         errorCount = 0;

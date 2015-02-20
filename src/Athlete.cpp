@@ -479,6 +479,19 @@ AthleteDirectoryStructure::subDirsExist() {
             );
 }
 
+bool
+AthleteDirectoryStructure::upgradedDirectoriesHaveData() {
+
+   if ( activities().exists() && config().exists()) {
+       QStringList activityFiles = activities().entryList(QDir::Files);
+       if (!activityFiles.isEmpty()) { return true; }
+       QStringList configFiles = config().entryList(QDir::Files);
+       if (!configFiles.isEmpty()) { return true; }
+   }
+   return false;
+
+}
+
 // working with withings data
 void 
 Athlete::setWithings(QList<WithingsReading>&x)
