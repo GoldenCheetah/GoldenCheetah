@@ -308,7 +308,14 @@ RideCache::writeAsCSV(QString filename)
 
     // open file.. truncate if exists already
     QFile file(filename);
-    file.open(QFile::WriteOnly);
+    if (!file.open(QFile::WriteOnly)) {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(tr("Problem Saving Ride Cache"));
+        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
+        msgBox.exec();
+        return;
+    };
     file.resize(0);
     QTextStream out(&file);
 

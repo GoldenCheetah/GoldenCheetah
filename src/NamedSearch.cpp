@@ -22,6 +22,8 @@
 #include "Athlete.h"
 #include "GcSideBarItem.h" // for iconFromPNG
 
+#include <QMessageBox>
+
 // Escape special characters (JSON compliance & XML)
 static QString protect(const QString string)
 {
@@ -173,6 +175,14 @@ NamedSearchParser::serialize(QString filename, QList<NamedSearch>NamedSearches)
     // open file - truncate contents
     QFile file(filename);
     file.open(QFile::WriteOnly);
+    if (!file.open(QFile::WriteOnly)) {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(QObject::tr("Problem Saving Named Search Configuration"));
+        msgBox.setInformativeText(QObject::tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
+        msgBox.exec();
+        return false;
+    };
     file.resize(0);
     QTextStream out(&file);
     out.setCodec("UTF-8");

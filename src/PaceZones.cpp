@@ -813,10 +813,16 @@ void PaceZones::write(QDir home)
 
     QFile file(home.canonicalPath() + "/" + fileName_);
     if (file.open(QFile::WriteOnly)) {
-
         QTextStream stream(&file);
         stream << strzones;
         file.close();
+    } else {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(tr("Problem Saving Pace Zones"));
+        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(home.canonicalPath() + "/" + fileName_));
+        msgBox.exec();
+        return;
     }
 }
 
