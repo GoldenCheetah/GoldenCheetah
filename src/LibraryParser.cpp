@@ -19,6 +19,7 @@
 #include "Library.h"
 #include "LibraryParser.h"
 #include <QDebug>
+#include <QMessageBox>
 
 bool LibraryParser::startDocument()
 {
@@ -72,7 +73,14 @@ LibraryParser::serialize(QDir home)
     // open file - truncate contents
     QString filename = home.canonicalPath() + "/library.xml";
     QFile file(filename);
-    file.open(QFile::WriteOnly);
+    if (!file.open(QFile::WriteOnly)) {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(QObject::tr("Problem Saving Workout Library"));
+        msgBox.setInformativeText(QObject::tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
+        msgBox.exec();
+        return false;
+    };
     file.resize(0);
     QTextStream out(&file);
     out.setCodec("UTF-8");

@@ -1032,7 +1032,14 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
 {
     // open file - truncate contents
     QFile file(filename);
-    file.open(QFile::WriteOnly);
+    if (!file.open(QFile::WriteOnly)) {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(tr("Problem Saving Meta Data"));
+        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
+        msgBox.exec();
+        return;
+    };
     file.resize(0);
     QTextStream out(&file);
     out.setCodec("UTF-8");
