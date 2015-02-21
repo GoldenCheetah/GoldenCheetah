@@ -174,7 +174,6 @@ NamedSearchParser::serialize(QString filename, QList<NamedSearch>NamedSearches)
 {
     // open file - truncate contents
     QFile file(filename);
-    file.open(QFile::WriteOnly);
     if (!file.open(QFile::WriteOnly)) {
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Critical);
