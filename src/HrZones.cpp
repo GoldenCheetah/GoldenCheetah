@@ -703,6 +703,13 @@ void HrZones::write(QDir home)
         QTextStream stream(&file);
         stream << strzones;
         file.close();
+    } else {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(tr("Problem Saving Heartrate Zones"));
+        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(home.canonicalPath() + "/hr.zones"));
+        msgBox.exec();
+        return;
     }
 }
 

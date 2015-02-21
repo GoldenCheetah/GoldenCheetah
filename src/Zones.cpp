@@ -796,6 +796,13 @@ void Zones::write(QDir home)
         QTextStream stream(&file);
         stream << strzones;
         file.close();
+    } else {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(tr("Problem Saving Power Zones"));
+        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(home.canonicalPath() + "/power.zones"));
+        msgBox.exec();
+        return;
     }
 }
 

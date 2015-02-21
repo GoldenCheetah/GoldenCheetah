@@ -63,7 +63,14 @@ CalendarDownload::downloadFinished(QNetworkReply *reply)
     if (fulltext != "") {
 
         // update remote cache - write to it!
-        remoteCacheFile.open(QFile::ReadWrite | QFile::Text);
+        if (!remoteCacheFile.open(QFile::ReadWrite | QFile::Text)) {
+            QMessageBox msgBox;
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.setText(tr("Problem Saving Calendar Download"));
+            msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(remoteCache));
+            msgBox.exec();
+            return;
+        }
         QTextStream out(&remoteCacheFile);
         out << fulltext;
         remoteCacheFile.close();

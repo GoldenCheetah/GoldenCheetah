@@ -1171,7 +1171,11 @@ HomeWindow::saveState()
     QString filename = context->athlete->home->config().canonicalPath() + "/" + name + "-layout.xml";
     QFile file(filename);
     if (!file.open(QFile::WriteOnly)) {
-        QMessageBox::critical(this, tr("Problem Saving Charts Configuration"), tr("File: %1 cannot be opened for 'Writing' ! Please check file properties.").arg(filename));
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(tr("Problem Saving Chart Bar Layout"));
+        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
+        msgBox.exec();
         return;
     };
     file.resize(0);
