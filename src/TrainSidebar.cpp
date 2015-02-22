@@ -1118,8 +1118,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 					// to within defined limits					
 				}
 
-                if (Devices[dev].type == DEV_ANTLOCAL) {
-                    rtData.setHb(local.getSmO2(), local.gettHb()); //only moxy data from ant devices right now
+                if (Devices[dev].type == DEV_ANTLOCAL || Devices[dev].type == DEV_NULL) {
+                    rtData.setHb(local.getSmO2(), local.gettHb()); //only moxy data from ant and robot devices right now
                 }
 				
                 // what are we getting from this one?
