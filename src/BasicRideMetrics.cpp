@@ -895,6 +895,45 @@ static bool avgHeartRateAdded =
 
 ///////////////////////////////////////////////////////////////////////////////
 
+struct HeartBeats : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(HeartBeats)
+
+    double total;
+
+    public:
+
+    HeartBeats()
+    {
+        setSymbol("heartbeats");
+        setInternalName("Heartbeats");
+    }
+    void initialize() {
+        setName(tr("Heartbeats"));
+        setMetricUnits(tr("beats"));
+        setImperialUnits(tr("beats"));
+        setType(RideMetric::Total);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+        total = 0;
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            total += (point->hr / 60) * ride->recIntSecs();
+        }
+        setValue(total);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("H"); }
+
+    RideMetric *clone() const { return new HeartBeats(*this); }
+};
+
+static bool hbAdded =
+    RideMetricFactory::instance().addMetric(HeartBeats());
+
+////////////////////////////////////////////////////////////////////////////////
+
 class HrPw : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(HrPw)
 
