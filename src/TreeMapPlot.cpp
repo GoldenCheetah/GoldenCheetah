@@ -113,14 +113,10 @@ TreeMapPlot::paintEvent(QPaintEvent *)
                      root->rect.width()-8,
                      root->rect.height()-8);
 
-    // first level
-    font.setPointSize(18);
-    painter.setFont(font);
+    // first level - rectangles, but not text yet
     pen.setWidth(5);
     pen.setColor(color);
     painter.setPen(pen);
-    color = GCColor::invertColor(color);
-    //color.setAlpha(127);
 
     int n=1;
     QColor cHSV, cRGB;
@@ -132,36 +128,68 @@ TreeMapPlot::paintEvent(QPaintEvent *)
         brush.setColor(cRGB);
         painter.setBrush(brush);
         painter.drawRect(first->rect);
-        painter.drawText(first->rect,
-                         Qt::AlignVCenter|Qt::AlignHCenter,
-                         first->name);
     }
 
-    // second level
+    // second level - overlay rectangles - with text
+    QPen textPen(Qt::white);
     font.setPointSize(8);
     painter.setFont(font);
-    pen.setWidth(1);
-    pen.setColor(Qt::lightGray);
-    painter.setPen(pen);
+
+    // overlay colors
     color = Qt::darkGray;
     color.setAlpha(127);
     brush.setColor(color);
     QColor hcolor(Qt::lightGray);
     hcolor.setAlpha(127);
     QBrush hbrush(hcolor);
-
-    foreach (TreeMap *first, root->children)
+    QRect textRect;
+    QRect demandedTextRect;
+    foreach (TreeMap *first, root->children) {
         foreach (TreeMap *second, first->children) {
             if (second == highlight) painter.setBrush(hbrush);
             else painter.setBrush(brush);
+
             painter.setPen(Qt::NoPen);
             painter.drawRect(second->rect.x()+2,
                              second->rect.y()+2,
                              second->rect.width()-4,
                              second->rect.height()-4);
-            painter.setPen(pen);
-            painter.drawText(second->rect, Qt::AlignTop|Qt::AlignLeft, second->name);
+
+            textRect.setRect(second->rect.x()+2, second->rect.y()+2,second->rect.width()-4, second->rect.height()-4 );
+            // determine font size based on size of window and length of text / try to apply 3 different font sizes - then fall back to "8"
+            font.setPointSize(14);
+            painter.setFont(font);
+            painter.setPen(textPen);
+            demandedTextRect = painter.boundingRect(textRect, Qt::AlignTop|Qt::AlignLeft, second->name);
+            if (!textRect.contains(demandedTextRect)) {
+                font.setPointSize(12);
+                painter.setFont(font);
+                demandedTextRect = painter.boundingRect(textRect, Qt::AlignTop|Qt::AlignLeft, second->name);
+                if (!textRect.contains(demandedTextRect)) {
+                    font.setPointSize(10);
+                    painter.setFont(font);
+                    demandedTextRect = painter.boundingRect(textRect, Qt::AlignTop|Qt::AlignLeft, second->name);
+                    if (!textRect.contains(demandedTextRect)) {
+                        // fall back to use smallest useful font / even if text may be clipped
+                        font.setPointSize(8);
+                        painter.setFont(font);
+                    }
+                }
+            }
+            painter.drawText(textRect, Qt::AlignTop|Qt::AlignLeft, second->name);
         }
+    }
+
+    // paint the text for level 1 now - to not overlap it with gray/alpha coming from level 2 drawing overlay
+    textPen.setColor(Qt::black);
+    font.setPointSize(18);
+    painter.setFont(font);
+    painter.setPen(textPen);
+    foreach (TreeMap *first, root->children) {
+        painter.drawText(first->rect,
+                         Qt::AlignVCenter|Qt::AlignHCenter,
+                         first->name);
+    }
 }
 
 bool
