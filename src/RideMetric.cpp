@@ -106,8 +106,9 @@
 // 100 05  Feb 2015 Ale Martinez       Use duration not time moving when its 0 (rpe metrics)
 // 101 05  Feb 2015 Mark Liversedge    aPower versions of Coggan metrics aNP et al
 // 102 05  Feb 2015 Mark Liversedge    aPower versions of Skiba metrics aBikeScore et al
+// 103 23  Feb 2015 Mark Liversedge    Added total heartbeats
 
-int DBSchemaVersion = 102;
+int DBSchemaVersion = 103;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
