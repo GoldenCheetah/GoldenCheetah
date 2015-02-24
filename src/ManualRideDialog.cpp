@@ -582,6 +582,6 @@ ManualRideDialog::lapsClicked()
     if (lapsEditor && lapsEditor->exec() && lapsEditor->dataPoints().count() > 0) {
         // update duration and distance
         duration->setTime(QTime(0, 0, 0).addSecs(lapsEditor->dataPoints().count()));
-        distance->setValue(lapsEditor->dataPoints()[lapsEditor->dataPoints().count()-1]->km);
+        distance->setValue(lapsEditor->dataPoints()[lapsEditor->dataPoints().count()-1]->km / (context->athlete->useMetricUnits ? 1.0 : KM_PER_MILE));
     }
 }
