@@ -48,12 +48,17 @@ PwxFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*)
 }
 
 RideFile *
-PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
+PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
 {
     RideFile *rideFile = new RideFile();
     QDomElement root = doc.documentElement();
     QDomNode workout = root.firstChildElement("workout");
     QDomNode node = workout.firstChild();
+
+    // get the Smart Recording paramaters
+    QVariant isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
+    QVariant GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
+    if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
 
     // can arrive at any time, so lets cache them
     // and sort out at the end
@@ -186,7 +191,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
 
                 // add interval
                 if (add.start != -1 && add.stop != -1) {
-                    rideFile->addInterval(add.start, add.stop, add.name);
+                    rideFile->addInterval(round(add.start+1), round(add.stop), add.name);
                 }
             }
 
@@ -196,7 +201,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
 
             // offset (secs)
             QDomElement off = node.firstChildElement("timeoffset");
-            if (!off.isNull()) add.secs = off.text().toDouble();
+            if (!off.isNull()) add.secs = round(off.text().toDouble());
             else add.secs = 0.0;
             // hr
             QDomElement hr = node.firstChildElement("hr");
@@ -243,21 +248,123 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
             // temp
             QDomElement temp = node.firstChildElement("temp");
             if (!temp.isNull()) add.temp = temp.text().toDouble();
-            else add.temp = 0.0;
+            else add.temp = RideFile::NoTemp;
 
-            // do we need to calculate distance?
-            if (add.km == 0.0 && samples) {
+            // if there are data points && a time difference > 1sec && smartRecording processing is requested at all
+            if ((!rideFile->dataPoints().empty()) && (add.secs > rtime + 1) && (isGarminSmartRecording.toInt() != 0)) {
+                bool badgps = false;
+                bool lapSwim = false;
+                // Handle smart recording if configured in preferences.  Linearly interpolate missing points.
+                RideFilePoint *prevPoint = rideFile->dataPoints().back();
+                double deltaSecs = add.secs - prevPoint->secs;
+
+                // If the last lat/lng was missing (0/0) then all points up to lat/lng are marked as 0/0.
+                if (prevPoint->lat == 0 && prevPoint->lon == 0 ) badgps = true;
+
+                double deltaCad = add.cad - prevPoint->cad;
+                double deltaHr = add.hr - prevPoint->hr;
+                double deltaDist = add.km - prevPoint->km;
+                if (add.km < 0.00001) deltaDist = 0.000f; // effectively zero distance
+                double deltaSpeed = add.kph - prevPoint->kph;
+                double deltaTorque = add.nm - prevPoint->nm;
+                double deltaPower = add.watts - prevPoint->watts;
+                double deltaAlt = add.alt - prevPoint->alt;
+                double deltaLon = add.lon - prevPoint->lon;
+                double deltaLat = add.lat - prevPoint->lat;
+                double deltaHeadwind = add.headwind - prevPoint->headwind;
+                double deltaSlope = add.slope - prevPoint->slope;
+                double deltaLeftRightBalance = add.lrbalance - prevPoint->lrbalance;
+                double deltaLeftTE = add.lte - prevPoint->lte;
+                double deltaRightTE = add.rte - prevPoint->rte;
+                double deltaLeftPS = add.lps - prevPoint->lps;
+                double deltaRightPS = add.rps - prevPoint->rps;
+                double deltaLeftPedalCenterOffset = add.lpco - prevPoint->lpco;
+                double deltaRightPedalCenterOffset = add.rpco - prevPoint->rpco;
+                double deltaLeftTopDeathCenter = add.lppb - prevPoint->lppb;
+                double deltaRightTopDeathCenter = add.rppb - prevPoint->rppb;
+                double deltaLeftBottomDeathCenter = add.lppe - prevPoint->lppe;
+                double deltaRightBottomDeathCenter = add.rppe - prevPoint->rppe;
+                double deltaLeftTopPeakPowerPhase = add.lpppb - prevPoint->lpppb;
+                double deltaRightTopPeakPowerPhase = add.rpppb - prevPoint->rpppb;
+                double deltaLeftBottomPeakPowerPhase = add.lpppe - prevPoint->lpppe;
+                double deltaRightBottomPeakPowerPhase = add.rpppe - prevPoint->rpppe;
+                double deltaSmO2 = add.smo2 - prevPoint->smo2;
+                double deltaTHb = add.thb - prevPoint->thb;
+                double deltarvert = add.rvert - prevPoint->rvert;
+                double deltarcad = add.rcad - prevPoint->rcad;
+                double deltarcontact = add.rcontact - prevPoint->rcontact;
+
+                // Swim with distance and no GPS => pool swim
+                // limited to account for weird intervals or pauses
+                if (rideFile->isSwim() && badgps && (add.km > 0 || rdist > 0)) {    lapSwim = true;
+                    add.kph = add.km > rdist ? (add.km - rdist)*3600/deltaSecs : 0.0;
+                    if (add.kph == 0.0) add.cad = 0; // rest => no stroke rate
+                }
+
+                // only smooth the maximal smart recording gap defined in
+                // preferences - we don't want to crash / stall on bad
+                // or corrupt files, lap swimming lenghts/pauses limited
+                // to 10x HWM for the same reason.
+                if (deltaSecs > 0 && (deltaSecs < GarminHWM.toInt() || (lapSwim && deltaSecs < 10*GarminHWM.toInt()))) {
+
+                    for (int i = 1; i < deltaSecs; i++) {
+                        double weight = i /deltaSecs;
+                        // running totals
+                        samples++;
+                        rtime++;
+                        rdist = prevPoint->km + (deltaDist * weight);
+                        // add the data point
+                        rideFile->appendPoint(
+                            rtime,
+                            lapSwim ? add.cad : prevPoint->cad + (deltaCad * weight),
+                            prevPoint->hr + (deltaHr * weight),
+                            rdist,
+                            lapSwim ? add.kph : prevPoint->kph + (deltaSpeed * weight),
+                            prevPoint->nm + (deltaTorque * weight),
+                            prevPoint->watts + (deltaPower * weight),
+                            prevPoint->alt + (deltaAlt * weight),
+                            (badgps == 1) ? 0 : prevPoint->lon + (deltaLon * weight),
+                            (badgps == 1) ? 0 : prevPoint->lat + (deltaLat * weight),
+                            prevPoint->headwind + (deltaHeadwind * weight),
+                            prevPoint->slope + (deltaSlope * weight),
+                            add.temp,
+                            prevPoint->lrbalance + (deltaLeftRightBalance * weight),
+                            prevPoint->lte + (deltaLeftTE * weight),
+                            prevPoint->rte + (deltaRightTE * weight),
+                            prevPoint->lps + (deltaLeftPS * weight),
+                            prevPoint->rps + (deltaRightPS * weight),
+                            prevPoint->lpco + (deltaLeftPedalCenterOffset * weight),
+                            prevPoint->rpco + (deltaRightPedalCenterOffset * weight),
+                            prevPoint->lppb + (deltaLeftTopDeathCenter * weight),
+                            prevPoint->rppb + (deltaRightTopDeathCenter * weight),
+                            prevPoint->lppe + (deltaLeftBottomDeathCenter * weight),
+                            prevPoint->rppe + (deltaRightBottomDeathCenter * weight),
+                            prevPoint->lpppb + (deltaLeftTopPeakPowerPhase * weight),
+                            prevPoint->rpppb + (deltaRightTopPeakPowerPhase * weight),
+                            prevPoint->lpppe + (deltaLeftBottomPeakPowerPhase * weight),
+                            prevPoint->rpppe + (deltaRightBottomPeakPowerPhase * weight),
+                            prevPoint->smo2 + (deltaSmO2 * weight),
+                            prevPoint->thb + (deltaTHb * weight),
+                            prevPoint->rvert + (deltarvert * weight),
+                            prevPoint->rcad + (deltarcad * weight),
+                            prevPoint->rcontact + (deltarcontact * weight),
+                            add.interval);
+                    }
+                }
+            } else if (add.km == 0.0 && samples) {
+                // do we need to calculate distance?
                 // delta secs * kph/3600
                 add.km = rdist + ((add.secs - rtime) * (add.kph/3600));
             }
 
-            // running totals
-            samples++;
-            rtime = add.secs;
-            rdist = add.km;
-
-            // add the data point
-            rideFile->appendPoint(add.secs, add.cad, add.hr, add.km, add.kph,
+            // add the data point avoiding duplicates
+            if (add.secs > rtime || rideFile->dataPoints().empty()) {
+                if (add.secs == 0.0) add.kph = 0.0; // avoids a glitch in km
+                // running totals
+                samples++;
+                rtime = add.secs;
+                rdist = add.km;
+                rideFile->appendPoint(add.secs, add.cad, add.hr, add.km, add.kph,
                     add.nm, add.watts, add.alt, add.lon, add.lat, add.headwind,
                     add.slope, add.temp, add.lrbalance,
                     add.lte, add.rte, add.lps, add.rps,
@@ -267,8 +374,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
                     add.smo2, add.thb,
                     add.rvert, add.rcad, add.rcontact,
                     add.interval);
-
-
+            }
         
         } else if (node.nodeName() == "summarydata") {
 
