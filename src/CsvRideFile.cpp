@@ -166,7 +166,10 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
     int secsIndex, minutesIndex = -1;
 
-    double precWork=0.0;
+    double precAvg=0.0;
+    //double precWatts=0.0;
+    double precSecs=0.0;
+    double maxWatts=0.0;
 
     bool eof = false;
     while (!is.atEnd() && !eof) {
@@ -649,14 +652,40 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 } else if (csvType == cpexport) {
                     // seconds, value, (model), date
                     seconds = line.section(',',0,0).toDouble();
+                    if (seconds == precSecs)
+                        continue;
                     minutes = seconds / 60.0f;
 
-                    seconds = lineno -1 ;
-                    double avgwatts = line.section(',', 1, 1).toDouble();
 
-                    watts = avgwatts * seconds - precWork; // 1000 * 1 - 700
+                    //seconds = lineno -1 ;
+                    double avgWatts = line.section(',', 1, 1).toDouble();
+                    if ( avgWatts > maxWatts ) {
+                        maxWatts = avgWatts;
+                    }
 
-                    precWork = avgwatts * seconds;
+                    //watts = (avgwatts * seconds - precSecs * precWatts) / (seconds - precSecs);
+                    watts = (avgWatts * seconds - precSecs * precAvg) / (seconds - precSecs);
+                    if ( watts > maxWatts ) {
+                        watts = maxWatts;
+                    }
+
+
+                    for (int gap=1; seconds-gap>precSecs; gap++) {
+                        rideFile->appendPoint(seconds-gap, cad, hr, km,
+                                              kph, nm, watts, alt, lon, lat,
+                                              headwind, slope, temp, lrbalance,
+                                              lte, rte, lps, rps,
+                                              0.0, 0.0,
+                                              0.0, 0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0, 0.0,
+                                              smo2, thb, 0.0, 0.0, 0.0, interval);
+                    }
+
+                    precAvg = (precAvg * precSecs + (watts>0?watts:0) * (seconds - precSecs)) / seconds;
+                    //qDebug() << seconds << avgwatts << precSecs << precWatts << ":" <<watts << "->" << precAvg;
+                    precSecs = seconds;
+                    //precWatts = avgwatts;
+
                } else {
                     if (secsIndex > -1) {
                         seconds = line.section(',', secsIndex, secsIndex).toDouble();
