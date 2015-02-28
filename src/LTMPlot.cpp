@@ -3290,7 +3290,7 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
 
         foreach (Season s, context->athlete->seasons->seasons) {
 
-            if (s.type != Season::temporary && s.name != settings->title && s.getStart() >= from && s.getStart() < to) {
+            if (s.type != Season::temporary && s.name != settings->title && s.getStart() >= from && s.getStart() <= to) {
 
                 QwtPlotMarker *mrk = new QwtPlotMarker;
                 markers.append(mrk);
