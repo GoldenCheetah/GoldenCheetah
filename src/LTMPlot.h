@@ -27,6 +27,7 @@
 #include <qwt_plot_grid.h>
 #include <qwt_scale_draw.h>
 #include <qwt_axis_id.h>
+#include "IndendPlotMarker.h"
 
 #include "LTMTool.h"
 #include "AllPlot.h" // for curve colors widget
@@ -61,6 +62,7 @@ class LTMPlot : public QwtPlot
         void pointClicked(QwtPlotCurve*, int); // point clicked
         void configChanged(qint32);
         bool eventFilter(QObject *, QEvent *);
+        virtual void replot();
 
     protected:
         friend class ::LTMPlotBackground;
@@ -106,7 +108,7 @@ class LTMPlot : public QwtPlot
               lastDate;
 
         QHash< QwtPlotCurve *, int> stacks; // map curve to stack #
-        QList<QwtPlotMarker*> markers; // seasons and events
+        QList<QwtIndPlotMarker*> markers; // seasons and events
         QVector< QVector<double>* > stackX;
         QVector< QVector<double>* > stackY;
 
