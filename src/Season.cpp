@@ -86,6 +86,11 @@ void Season::setType(int _type)
     type = _type;
 }
 
+bool Season::LessThanForStarts(const Season &a, const Season &b)
+{
+	return a.start.toJulianDay() < b.start.toJulianDay();
+}
+
 /*----------------------------------------------------------------------
  * EDIT SEASON DIALOG
  *--------------------------------------------------------------------*/

@@ -29,6 +29,7 @@
 #include "RideFileCache.h"
 #include "Settings.h"
 #include "Colors.h"
+#include "IndendPlotMarker.h"
 
 #include "PMCData.h" // for LTS/STS calculation
 #include "Zones.h"
@@ -178,10 +179,12 @@ LTMPlot::configChanged(qint32)
         foreach (QWidget *w, l->legendWidgets(itemToInfo(p))) {
             for(int m=0; m< settings->metrics.count(); m++) {
                 if (settings->metrics[m].curve == p)
+                {
                     if (settings->metrics[m].hidden == false) 
                         w->setPalette(palette);
                     else
                         w->setPalette(gray);
+                }
             }
         }
     }
@@ -288,7 +291,7 @@ LTMPlot::setData(LTMSettings *set)
     }
     labels.clear();
     // clear old markers - if there are any
-    foreach(QwtPlotMarker *m, markers) {
+    foreach(QwtIndPlotMarker *m, markers) {
         m->detach();
         delete m;
     }
@@ -1257,7 +1260,7 @@ LTMPlot::setCompareData(LTMSettings *set)
     }
     labels.clear();
     // clear old markers - if there are any
-    foreach(QwtPlotMarker *m, markers) {
+    foreach(QwtIndPlotMarker *m, markers) {
         m->detach();
         delete m;
     }
@@ -3011,6 +3014,12 @@ LTMPlot::eventFilter(QObject *obj, QEvent *event)
     return false;
 }
 
+void
+LTMPlot::replot() {
+    QwtIndPlotMarker::resetDrawnLabels();
+    QwtPlot::replot();
+}
+
 int
 LTMPlot::groupForDate(QDate date, int groupby)
 {
@@ -3272,7 +3281,7 @@ class LTMPlotZoneLabel: public QwtPlotItem
                 int x = (rect.left() + rect.right()) / 2;
                 int y = yMap.transform(watts);
 
-                // the following code based on source for QwtPlotMarker::draw()
+                // the following code based on source for QwtIndPlotMarker::draw()
                 QRect tr(QPoint(0, 0), text.textSize(painter->font()).toSize());
                 tr.moveCenter(QPoint(x, y));
                 text.draw(painter, tr);
@@ -3280,26 +3289,25 @@ class LTMPlotZoneLabel: public QwtPlotItem
         }
 };
 
-void
+    void
 LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby, QColor color)
 {
     double baseday = groupForDate(from, groupby);
-
+    QwtIndPlotMarker::resetDrawnLabels();
     // seasons and season events
     if (settings->events) {
-
-        foreach (Season s, context->athlete->seasons->seasons) {
+        QList<Season> tmpSeasons = context->athlete->seasons->seasons;
+        qSort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
+        foreach (Season s, tmpSeasons) {
 
             if (s.type != Season::temporary && s.name != settings->title && s.getStart() >= from && s.getStart() <= to) {
-
-                QwtPlotMarker *mrk = new QwtPlotMarker;
+                QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
                 markers.append(mrk);
                 mrk->attach(this);
-                mrk->setLineStyle(QwtPlotMarker::VLine);
+                mrk->setLineStyle(QwtIndPlotMarker::VLine);
                 mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
                 mrk->setLinePen(QPen(color, 0, Qt::DashLine));
-                mrk->setValue(double(groupForDate(s.getStart(), groupby)) - baseday, 0.0);
-
+                mrk->setValue(double(groupForDate(s.getStart(), groupby)) - baseday,0);
                 if (first) {
                     QwtText text(s.getName());
                     text.setFont(QFont("Helvetica", 10, QFont::Bold));
@@ -3307,17 +3315,20 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
                     mrk->setLabel(text);
                 }
             }
+        } //end foreach season
 
+        foreach (Season s, tmpSeasons) {
+            /* if (s.type != Season::temporary && s.name != settings->title && s.getStart() >= from && s.getStart() < to) { */
+            if (s.getStart() >= from && s.getStart() < to) {
             foreach (SeasonEvent event, s.events) {
-
 
                 if (event.date > from && event.date < to) {
 
                     // and the events...
-                    QwtPlotMarker *mrk = new QwtPlotMarker;
+                    QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
                     markers.append(mrk);
                     mrk->attach(this);
-                    mrk->setLineStyle(QwtPlotMarker::VLine);
+                    mrk->setLineStyle(QwtIndPlotMarker::VLine);
                     mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
                     mrk->setLinePen(QPen(color, 0, Qt::SolidLine));
                     mrk->setValue(double(groupForDate(event.date, groupby)) - baseday, 10.0);
@@ -3328,16 +3339,15 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
                         text.setColor(Qt::red);
                         mrk->setLabel(text);
                     }
-
                 }
             }
-        }
+            }
+        }//end foreach season
     }
     return;
 }
 
-void
-LTMPlot::refreshZoneLabels(QwtAxisId axisid)
+void LTMPlot::refreshZoneLabels(QwtAxisId axisid)
 {
     foreach(LTMPlotZoneLabel *label, zoneLabels) {
         label->detach();
