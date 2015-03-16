@@ -57,9 +57,14 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
     parser->parse(text, errors);
 
     int allMeasures = context->athlete->withings().count();
-    int newMeasures = parser->readings().count() - allMeasures;
+    int receivedMeasures = parser->readings().count();
+    int newMeasures = receivedMeasures - allMeasures;
 
-    QString status = QString(tr("%1 new on %2 measurements received.")).arg(newMeasures).arg(allMeasures);
+    if (receivedMeasures == 0) {
+        newMeasures = 0;
+    }
+
+    QString status = QString(tr("%1 new on %2 measurements received.")).arg(newMeasures).arg(receivedMeasures);
     QMessageBox::information(context->mainWindow, tr("Withings Data Download"), status);
 
     // hacky for now, just refresh for all dates where we have withings data
