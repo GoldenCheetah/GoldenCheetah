@@ -297,6 +297,9 @@ struct FitFileReaderState
             // does not set product at this point
            rideFile->setDeviceType("Sigmasport ROX");
         
+        } else if (manu == 260) {
+            // Zwift!
+            rideFile->setDeviceType("Zwift");
         } else {
 
             rideFile->setDeviceType(QString("Unknown FIT Device %1:%2").arg(manu).arg(prod));
