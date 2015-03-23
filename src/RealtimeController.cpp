@@ -406,7 +406,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.000803192769148186*V, 3) + pow(0.17689196198325*V,2) + (3.62446277061515*V) - 1.16783216783223);
+        rtData.setWatts(-0.000803192769148186*pow(V, 3) + 0.17689196198325*pow(V,2) + (3.62446277061515*V) - 1.16783216783223);
         }
         break;
 
@@ -414,7 +414,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.00590735326986424*V, 3) + pow(0.442531768374482*V,2) + (3.54843470904764*V) - 0.363636363636395);
+        rtData.setWatts(-0.00590735326986424*pow(V, 3) + 0.442531768374482*pow(V,2) + (3.54843470904764*V) - 0.363636363636395);
         }
         break;
 
@@ -422,7 +422,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.00917194323478923*V, 3) + pow(0.614352424962992*V,2) + (5.08762781732785*V) - 1.48951048951047);
+        rtData.setWatts(-0.00917194323478923*pow(V, 3) + 0.614352424962992*pow(V,2) + (5.08762781732785*V) - 1.48951048951047);
         }
         break;
 
@@ -430,7 +430,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.0150015681721553*V, 3) + pow(0.880112976720764*V,2) + (5.16903286351279*V) - 1.7342657342657);
+        rtData.setWatts(-0.0150015681721553*pow(V, 3) + 0.880112976720764*pow(V,2) + (5.16903286351279*V) - 1.7342657342657);
         }
         break;
 
@@ -438,7 +438,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.0172621671756449*V, 3) + pow(1.0207209560583*V,2) + (6.23730215622854*V) - 3.18881118881126);
+        rtData.setWatts(-0.0172621671756449*pow(V, 3) + 1.0207209560583*pow(V,2) + (6.23730215622854*V) - 3.18881118881126);
         }
         break;
 
@@ -446,7 +446,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.0195227661791347*V, 3) + pow(1.15505017633569*V,2) + (7.47138264900755*V) - 4.18881118881114);
+        rtData.setWatts(-0.0195227661791347*pow(V, 3) + 1.15505017633569*pow(V,2) + (7.47138264900755*V) - 4.18881118881114);
         }
         break;
 
@@ -454,7 +454,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.0222497351776137*V, 3) + pow(1.2917943039439*V,2) + (8.74972948026508*V) - 5.11888111888112);
+        rtData.setWatts(-0.0222497351776137*pow(V, 3) + 1.2917943039439*pow(V,2) + (8.74972948026508*V) - 5.11888111888112);
         }
         break;
 
@@ -462,7 +462,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.0255078477814972*V, 3) + pow(1.42902141301828*V,2) + (10.2050166192824*V) - 6.48951048951042);
+        rtData.setWatts(-0.0255078477814972*pow(V, 3) + 1.42902141301828*pow(V,2) + (10.2050166192824*V) - 6.48951048951042);
         }
         break;
     case 49:
