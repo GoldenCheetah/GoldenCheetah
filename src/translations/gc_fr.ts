@@ -81,7 +81,7 @@
     <message>
         <location filename="../WorkoutWizard.cpp" line="278"/>
         <source>Absolute Wattage Workout Creator</source>
-        <translation type="unfinished"></translation>
+        <translation>Création d&apos;entraînement en puissance absolue</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="282"/>
@@ -4685,7 +4685,11 @@ ddd, dd MMM yyyy</source>
 Current athlete data will no longer be available and GoldenCheetah will need to restart for the change to take effect.
 
 Do you want to apply and restart GoldenCheetah?</source>
-        <translation type="unfinished"></translation>
+        <translation>C&apos;est l&apos;endroit où tous nouveaux athlètes and et leurs fichiers seront stockés.
+
+Les athlètes actuels ne seront plus diponible et GoldenCheetah doit être redémarré pour que les changements prennent effet.
+
+Voulez-vous appliquer les changements et redémarrer GoldenCheetah?</translation>
     </message>
     <message>
         <source>This is where all new athletes and their ride files will now be stored.
@@ -7501,7 +7505,7 @@ Maximum absolu - C&apos;est la valeur absolue maximum pour la FC de cet athlète
     <message>
         <location filename="../FixMoxy.cpp" line="51"/>
         <source>When recording from the Moxy in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lorsque vous utilisez Moxy en mode Vitesse et Cadence les données SmO2 et tHb sont émises respectivement comme cadence et vitesse. Cette outil permet de déplacer ces données pour les replacer dans les séries adéquates.</translation>
     </message>
 </context>
 <context>
@@ -7509,7 +7513,7 @@ Maximum absolu - C&apos;est la valeur absolue maximum pour la FC de cet athlète
     <message>
         <location filename="../FixPower.cpp" line="106"/>
         <source>Adjust Power Values</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajuster les valeurs de puissance</translation>
     </message>
 </context>
 <context>
@@ -7517,19 +7521,21 @@ Maximum absolu - C&apos;est la valeur absolue maximum pour la FC de cet athlète
     <message>
         <location filename="../FixPower.cpp" line="51"/>
         <source>Power Adjustment</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustement de puissance</translation>
     </message>
     <message>
         <location filename="../FixPower.cpp" line="55"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../FixPower.cpp" line="67"/>
         <source>Adjusting power values allows you to uplift or degrade the power values by a percentage. It takes a single parameter:
 
 Power Adjustment - this defines percentage  to modify values by. Negative values are supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cet outil d&apos;ajustement de puissance permet d&apos;augmenter et de diminuer les valeurs de puissance par pourcentage. Il ne prend donc qu&apos;un seul paramètre:
+
+Ajustement de puissance - le pourcentage utilisé. Les valeurs négatives permettent de diminuer les valeurs.</translation>
     </message>
 </context>
 <context>
@@ -7656,7 +7662,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../Colors.cpp" line="66"/>
         <source>Trend Plot Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Fond du graphique des tendances</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="67"/>
@@ -7779,47 +7785,47 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../Colors.cpp" line="91"/>
         <source>Slope</source>
-        <translation type="unfinished">Pente</translation>
+        <translation>Pente</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="92"/>
         <source>Gear Ratio</source>
-        <translation type="unfinished">Braquet</translation>
+        <translation>Braquet</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="93"/>
         <source>Run Vertical Oscillation</source>
-        <translation type="unfinished"></translation>
+        <translation>Oscillation verticale de course</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="94"/>
         <source>Run Cadence</source>
-        <translation type="unfinished">Cadence de course</translation>
+        <translation>Cadence de course</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="95"/>
         <source>Run Ground Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps de contact de course</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="96"/>
         <source>Muscle Oxygen (SmO2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Oxygénation du muscle (SmO2)</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="97"/>
         <source>Haemoglobin Mass (tHb)</source>
-        <translation type="unfinished"></translation>
+        <translation>Masse d&apos;hémoglobine (tHb)</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="98"/>
         <source>Oxygenated Haemoglobin (O2Hb)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hémoglobine oxygénée (O2Hb)</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="99"/>
         <source>Deoxygenated Haemoglobin (HHb)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hémoglobine désoxygénée (HHb)</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="100"/>
@@ -8024,7 +8030,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../Colors.cpp" line="150"/>
         <source>CP Curve</source>
-        <translation type="unfinished"></translation>
+        <translation>Courbe CP</translation>
     </message>
     <message>
         <source>Ride History Group</source>
@@ -8079,22 +8085,22 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../Colors.cpp" line="141"/>
         <source>Activity History Group</source>
-        <translation type="unfinished">Groupe d&apos;activités de l&apos;historique</translation>
+        <translation>Groupe d&apos;activités de l&apos;historique</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="65"/>
         <source>Performance Plot Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Fond du graphique de performance</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="69"/>
         <source>Performance Plot X Axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Axe X du graphique de performance</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="70"/>
         <source>Performance Plot Y Axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Axe Y du graphique de performance</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="142"/>
@@ -8149,7 +8155,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../ShareDialog.cpp" line="1138"/>
         <source>Garmin Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Garmin Connect</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="1158"/>
@@ -8176,12 +8182,12 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../ShareDialog.cpp" line="1315"/>
         <source>Upload to Garmin Connect...</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement sur Garmin Connect...</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="1358"/>
         <source>Upload... Sending to Garmin Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Télécharge... Envoi sur Garmin Connect</translation>
     </message>
     <message>
         <source>Upload ride to Garmin Connect...</source>
@@ -8313,7 +8319,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../GcCrashDialog.cpp" line="270"/>
         <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Wahoo API&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Wahoo API&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</translation>
     </message>
     <message>
         <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Wahoo API&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LUCENE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
@@ -8355,7 +8361,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../GcScopeBar.cpp" line="93"/>
         <location filename="../GcScopeBar.cpp" line="132"/>
         <source>Activities</source>
-        <translation type="unfinished">Activités</translation>
+        <translation>Activités</translation>
     </message>
     <message>
         <source>Rides</source>
@@ -8364,7 +8370,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../GcScopeBar.cpp" line="104"/>
         <source>Intervals</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervalles</translation>
     </message>
     <message>
         <source>Home</source>
@@ -8415,32 +8421,32 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../GcUpgrade.cpp" line="365"/>
         <source>Start creating of: Directories... </source>
-        <translation type="unfinished"></translation>
+        <translation>Début de la création des dossiers... </translation>
     </message>
     <message>
         <location filename="../GcUpgrade.cpp" line="371"/>
         <source>Error: Creation of subdirectories failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur : la création des dossiers a échouée</translation>
     </message>
     <message>
         <location filename="../GcUpgrade.cpp" line="374"/>
         <source>Creation of subdirectories successful</source>
-        <translation type="unfinished"></translation>
+        <translation>Création des dossiers réussie</translation>
     </message>
     <message>
         <location filename="../GcUpgrade.cpp" line="401"/>
         <source>Start copying of: Configuration files... </source>
-        <translation type="unfinished"></translation>
+        <translation>Début de la copie des: fichiers de configuration... </translation>
     </message>
     <message>
         <location filename="../GcUpgrade.cpp" line="686"/>
         <source>-&gt; Error: Deletion of copied file &apos;%1&apos; failed</source>
-        <translation type="unfinished"></translation>
+        <translation>-&gt; Erreur: La suppression du fichier &apos;%1&apos; a échouée</translation>
     </message>
     <message>
         <location filename="../GcUpgrade.cpp" line="695"/>
         <source>-&gt; Error moving file : </source>
-        <translation type="unfinished"></translation>
+        <translation>-&gt; Erreur lors du déplacement de fichier : </translation>
     </message>
     <message>
         <location filename="../GcUpgrade.cpp" line="414"/>
@@ -21820,7 +21826,7 @@ native format. Should we do so?
     <message>
         <location filename="../Season.cpp" line="322"/>
         <source>Last 2 months</source>
-        <translation type="unfinished">Derniers 12 mois {2 ?}</translation>
+        <translation>Derniers 2 mois</translation>
     </message>
     <message>
         <location filename="../Season.cpp" line="329"/>
@@ -21928,7 +21934,7 @@ native format. Should we do so?
     <message>
         <location filename="../ShareDialog.cpp" line="982"/>
         <source>SelfLoops</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SelfLoops</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="995"/>
