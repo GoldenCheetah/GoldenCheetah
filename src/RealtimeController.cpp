@@ -119,7 +119,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed();
         // 7 = V100 on H: y = -0.0036x^3 + 0.2815x^2 + 3.4978x - 9.7857 
-        rtData.setWatts(pow(-0.0036*V, 3) + pow(0.2815*V,2) + (3.4978*V) - 9.7857);
+        rtData.setWatts(-0.0036*pow(V, 3) + 0.2815*pow(V,2) + (3.4978*V) - 9.7857);
         }
         break;
 
@@ -127,7 +127,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed();
         // 8 = V100 on 5: y = -0.0023x^3 + 0.2067x^2 + 3.8906x - 11.214 
-        rtData.setWatts(pow(-0.0023*V, 3) + pow(0.2067*V,2) + (3.8906*V) - 11.214);
+        rtData.setWatts(-0.0023*pow(V, 3) + 0.2067*pow(V,2) + (3.8906*V) - 11.214);
         }
         break;
 
@@ -135,7 +135,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed();
         // 9 = V100 on 4: y = -0.00173x^3 + 0.1825x^2 + 3.4036x - 10 
-        rtData.setWatts(pow(-0.00173*V, 3) + pow(0.1825*V,2) + (3.4036*V) - 10.00);
+        rtData.setWatts(-0.00173*pow(V, 3) + 0.1825*pow(V,2) + (3.4036*V) - 10.00);
         }
         break;
 
@@ -143,7 +143,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed();
         // 10 = V100 on 3: y = -0.0011x^3 + 0.1433x^2 + 2.8808x - 8.1429 
-        rtData.setWatts(pow(-0.0011*V, 3) + pow(0.1433*V,2) + (2.8808*V) - 8.1429);
+        rtData.setWatts(-0.0011*pow(V, 3) + 0.1433*pow(V,2) + (2.8808*V) - 8.1429);
         }
         break;
 
@@ -151,7 +151,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed();
         // 11 = V100 on 2: y = -0.0007x^3 + 0.1348x^2 + 1.581x - 3.3571 
-        rtData.setWatts(pow(-0.0007*V, 3) + pow(0.1348*V,2) + (1.581*V) - 3.3571);
+        rtData.setWatts(-0.0007*pow(V, 3) + 0.1348*pow(V,2) + (1.581*V) - 3.3571);
         }
         break;
 
@@ -159,7 +159,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed();
         // 12 = V100 on 1: y = 0.0004x^3 + 0.057x^2 + 1.7797x - 5.0714 
-        rtData.setWatts(pow(0.0004*V, 3) + pow(0.057*V,2) + (1.7797*V) - 5.0714);
+        rtData.setWatts(0.0004*pow(V, 3) + 0.057*pow(V,2) + (1.7797*V) - 5.0714);
         }
         break;
 
@@ -167,19 +167,68 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed();
         // 13 = V100 on L: y = 0.0557x^2 + 1.231x - 3.7143 
-        rtData.setWatts(pow(0.0557*V, 2) + (1.231*V) - 3.7143);
+        rtData.setWatts(0.0557*pow(V, 2) + (1.231*V) - 3.7143);
         }
         break;
 
-    case 14 : //SARIS POWERBEAM PRO
+    case 14 : //MINOURA V270/v130 on H
         {
         double V = rtData.getSpeed();
-        // 14 = 0.0008x^3 + 0.145x^2 + 2.5299x + 14.641 where x = speed in kph
-        rtData.setWatts(pow(0.0008*V, 3) + pow(0.145*V, 2) + (2.5299*V) + 14.641);
+        rtData.setWatts(-1.84615384615e-06*pow(V, 5) + 0.000338955162485*pow(V, 4) + -0.0237725215961*pow(V, 3) + 0.782320032908*pow(V, 2) + 0.538329905388*V + -0.628959276017);
         }
         break;
 
-    case 15 : //  TACX SATORI SETTING 2
+    case 15 : //MINOURA V270/v130 on 5
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(-9.35143288085e-07*pow(V, 5) + 0.000193281228575*pow(V, 4) + -0.0153105032223*pow(V, 3) + 0.587825311943*pow(V, 2) + 1.16395173454*V + -0.472850678733);
+        }
+        break;
+
+    case 16 : //MINOURA V270/v130 on 4
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(-3.34841628959e-07*pow(V, 5) + 0.000114219114219*pow(V, 4) + -0.0117029686*pow(V, 3) + 0.52033045386*pow(V, 2) + 1.10649184149*V + -0.364253393665);
+        }
+        break;
+
+    case 17 : //MINOURA V270/v130 on 3
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(2.32277526395e-07*pow(V, 5) + 3.96681749623e-05*pow(V, 4) + -0.00805837789661*pow(V, 3) + 0.439146098999*pow(V, 2) + 1.00085150144*V + -0.386877828054);
+        }
+        break;
+
+    case 18 : //MINOURA V270/v130 on 2
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(-5.58069381599e-07*pow(V, 5) + 0.000123625394214*pow(V, 4) + -0.0103757370081*pow(V, 3) + 0.434414507062*pow(V, 2) + 0.278777594954*V + -0.00678733031682);
+        }
+        break;
+
+    case 19 : //MINOURA V270/v130 on 1
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(3.74057315234e-07*pow(V, 5) + -1.7235705471e-05*pow(V, 4) + -0.00251391745509*pow(V, 3) + 0.237884615385*pow(V, 2) + 0.704304812834*V + -0.056561085973);
+        }
+        break;
+
+    case 20 : //MINOURA V270/v130 on L
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(3.46907993967e-07*pow(V, 5) + -3.38406691348e-05*pow(V, 4) + -6.92787604552e-05*pow(V, 3) + 0.122555189908*pow(V, 2) + 0.642516796929*V + -0.0859728506788);
+        }
+        break;
+
+    case 21 : //SARIS POWERBEAM PRO
+        {
+        double V = rtData.getSpeed();
+        // 21 = 0.0008x^3 + 0.145x^2 + 2.5299x + 14.641 where x = speed in kph
+        rtData.setWatts(0.0008*pow(V, 3) + 0.145*pow(V, 2) + (2.5299*V) + 14.641);
+        }
+        break;
+
+    case 22 : //  TACX SATORI SETTING 2
         {
         double V = rtData.getSpeed();
         double slope = 3.9;
@@ -188,7 +237,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 16 : //  TACX SATORI SETTING 4
+    case 23 : //  TACX SATORI SETTING 4
         {
         double V = rtData.getSpeed();
         double slope = 6.66;
@@ -197,7 +246,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 17 : //  TACX SATORI SETTING 6
+    case 24 : //  TACX SATORI SETTING 6
         {
         double V = rtData.getSpeed();
         double slope = 9.43;
@@ -206,7 +255,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 18 : //  TACX SATORI SETTING 8
+    case 25 : //  TACX SATORI SETTING 8
         {
         double V = rtData.getSpeed();
         double slope = 13.73;
@@ -215,7 +264,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 19 : //  TACX SATORI SETTING 10
+    case 26 : //  TACX SATORI SETTING 10
         {
         double V = rtData.getSpeed();
         double slope = 17.7;
@@ -224,7 +273,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 20 : //  TACX FLOW SETTING 0
+    case 27 : //  TACX FLOW SETTING 0
         {
         double V = rtData.getSpeed();
         double slope = 7.75;
@@ -233,7 +282,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 21 : //  TACX FLOW SETTING 2
+    case 28 : //  TACX FLOW SETTING 2
         {
         double V = rtData.getSpeed();
         double slope = 9.51;
@@ -242,7 +291,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 22 : //  TACX FLOW SETTING 4
+    case 29 : //  TACX FLOW SETTING 4
         {
         double V = rtData.getSpeed();
         double slope = 11.03;
@@ -251,7 +300,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 23 : //  TACX FLOW SETTING 6
+    case 30 : //  TACX FLOW SETTING 6
         {
         double V = rtData.getSpeed();
         double slope = 12.81;
@@ -260,7 +309,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 24 : //  TACX FLOW SETTING 8
+    case 31 : //  TACX FLOW SETTING 8
         {
         double V = rtData.getSpeed();
         double slope = 14.37;
@@ -269,7 +318,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
         
-    case 25 : //  TACX BLUE TWIST SETTING 1
+    case 32 : //  TACX BLUE TWIST SETTING 1
         {
         double V = rtData.getSpeed();
         double slope = 3.2;
@@ -278,7 +327,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 26 : //  TACX BLUE TWIST SETTING 3
+    case 33 : //  TACX BLUE TWIST SETTING 3
         {
         double V = rtData.getSpeed();
         double slope = 6.525;
@@ -287,7 +336,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 27 : //  TACX BLUE TWIST SETTING 5
+    case 34 : //  TACX BLUE TWIST SETTING 5
         {
         double V = rtData.getSpeed();
         double slope = 9.775;
@@ -296,7 +345,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 28 : //  TACX BLUE TWIST SETTING 7
+    case 35 : //  TACX BLUE TWIST SETTING 7
         {
         double V = rtData.getSpeed();
         double slope = 13.075;
@@ -305,7 +354,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
         
-    case 29 : //  TACX BLUE MOTION SETTING 2
+    case 36 : //  TACX BLUE MOTION SETTING 2
         {
         double V = rtData.getSpeed();
         double slope = 5.225;
@@ -314,7 +363,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
     
-    case 30 : //  TACX BLUE MOTION SETTING 4
+    case 37 : //  TACX BLUE MOTION SETTING 4
         {
         double V = rtData.getSpeed();
         double slope = 8.25;
@@ -323,7 +372,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 31 : //  TACX BLUE MOTION SETTING 6
+    case 38 : //  TACX BLUE MOTION SETTING 6
         {
         double V = rtData.getSpeed();
         double slope = 11.45;
@@ -332,7 +381,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 32 : //  TACX BLUE MOTION SETTING 8
+    case 39 : //  TACX BLUE MOTION SETTING 8
         {
         double V = rtData.getSpeed();
         double slope = 14.45;
@@ -341,7 +390,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 33 : //  TACX BLUE MOTION SETTING 10
+    case 40 : //  TACX BLUE MOTION SETTING 10
         {
         double V = rtData.getSpeed();
         double slope = 17.575;
@@ -353,70 +402,70 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     default : // unknown - do nothing
         break;
 
-    case 34 : // ELITE SUPERCRONO POWER MAG LEVEL 1
+    case 41 : // ELITE SUPERCRONO POWER MAG LEVEL 1
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.000803192769148186*V, 3) + pow(0.17689196198325*V,2) + (3.62446277061515*V) - 1.16783216783223);
+        rtData.setWatts(-0.000803192769148186*pow(V, 3) + 0.17689196198325*pow(V,2) + (3.62446277061515*V) - 1.16783216783223);
         }
         break;
 
-    case 35 : // ELITE SUPERCRONO POWER MAG LEVEL 2
+    case 42 : // ELITE SUPERCRONO POWER MAG LEVEL 2
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.00590735326986424*V, 3) + pow(0.442531768374482*V,2) + (3.54843470904764*V) - 0.363636363636395);
+        rtData.setWatts(-0.00590735326986424*pow(V, 3) + 0.442531768374482*pow(V,2) + (3.54843470904764*V) - 0.363636363636395);
         }
         break;
 
-    case 36 : // ELITE SUPERCRONO POWER MAG LEVEL 3
+    case 43 : // ELITE SUPERCRONO POWER MAG LEVEL 3
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.00917194323478923*V, 3) + pow(0.614352424962992*V,2) + (5.08762781732785*V) - 1.48951048951047);
+        rtData.setWatts(-0.00917194323478923*pow(V, 3) + 0.614352424962992*pow(V,2) + (5.08762781732785*V) - 1.48951048951047);
         }
         break;
 
-    case 37 : // ELITE SUPERCRONO POWER MAG LEVEL 4
+    case 44 : // ELITE SUPERCRONO POWER MAG LEVEL 4
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.0150015681721553*V, 3) + pow(0.880112976720764*V,2) + (5.16903286351279*V) - 1.7342657342657);
+        rtData.setWatts(-0.0150015681721553*pow(V, 3) + 0.880112976720764*pow(V,2) + (5.16903286351279*V) - 1.7342657342657);
         }
         break;
 
-    case 38 : // ELITE SUPERCRONO POWER MAG LEVEL 5
+    case 45 : // ELITE SUPERCRONO POWER MAG LEVEL 5
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.0172621671756449*V, 3) + pow(1.0207209560583*V,2) + (6.23730215622854*V) - 3.18881118881126);
+        rtData.setWatts(-0.0172621671756449*pow(V, 3) + 1.0207209560583*pow(V,2) + (6.23730215622854*V) - 3.18881118881126);
         }
         break;
 
-    case 39 : // ELITE SUPERCRONO POWER MAG LEVEL 6
+    case 46 : // ELITE SUPERCRONO POWER MAG LEVEL 6
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.0195227661791347*V, 3) + pow(1.15505017633569*V,2) + (7.47138264900755*V) - 4.18881118881114);
+        rtData.setWatts(-0.0195227661791347*pow(V, 3) + 1.15505017633569*pow(V,2) + (7.47138264900755*V) - 4.18881118881114);
         }
         break;
 
-    case 40 : // ELITE SUPERCRONO POWER MAG LEVEL 7
+    case 47 : // ELITE SUPERCRONO POWER MAG LEVEL 7
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.0222497351776137*V, 3) + pow(1.2917943039439*V,2) + (8.74972948026508*V) - 5.11888111888112);
+        rtData.setWatts(-0.0222497351776137*pow(V, 3) + 1.2917943039439*pow(V,2) + (8.74972948026508*V) - 5.11888111888112);
         }
         break;
 
-    case 41 : // ELITE SUPERCRONO POWER MAG LEVEL 8
+    case 48 : // ELITE SUPERCRONO POWER MAG LEVEL 8
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
         // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(pow(-0.0255078477814972*V, 3) + pow(1.42902141301828*V,2) + (10.2050166192824*V) - 6.48951048951042);
+        rtData.setWatts(-0.0255078477814972*pow(V, 3) + 1.42902141301828*pow(V,2) + (10.2050166192824*V) - 6.48951048951042);
         }
         break;
-    case 42:
+    case 49:
         {
         double V = rtData.getSpeed();
         // Power curve fit from powercurvesensor

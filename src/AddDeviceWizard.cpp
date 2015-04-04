@@ -1113,6 +1113,13 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem(tr("Power - Minoura V100 Trainer (2)"));
     virtualPower->addItem(tr("Power - Minoura V100 Trainer (1)"));
     virtualPower->addItem(tr("Power - Minoura V100 Trainer (L)"));
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (H)"));
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (5)"));
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (4)"));
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (3)"));
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (2)"));
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (1)"));
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (L)"));
     virtualPower->addItem(tr("Power - Saris Powerbeam Pro"));
     virtualPower->addItem(tr("Power - Tacx Satori (2)"));
     virtualPower->addItem(tr("Power - Tacx Satori (4)"));
