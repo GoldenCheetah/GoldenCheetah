@@ -18,10 +18,12 @@
 
 
 #include "ExtendedCriticalPower.h"
+#include "Statistic.h"
 #include "Colors.h"
 #include "Settings.h"
 #include "RideFileCache.h"
 #include <qwt_symbol.h>
+#include <qwt_color_map.h>
 
 #include <QtGui>
 #include <QMessageBox>
@@ -1218,7 +1220,7 @@ ExtendedCriticalPower::getPlotLevelForExtendedCP_5_3(TestModel model)
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(TestModel model, bool)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(TestModel model, bool stacked, bool inversed)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1232,8 +1234,11 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(TestModel model, bo
         double t = pow(tmax, x) * pow(tmin, 1-x);
 
         double power_wsecond = model.paa*(1.20-0.20*exp(-1*t))*exp(model.paa_dec*(t));
+        double power_wprime = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( model.etau/(t) );
+        double power_cp = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( 1 );
 
-        extended_cp_curve_power[i] = QwtIntervalSample(t, 0, power_wsecond);
+
+        extended_cp_curve_power[i] = QwtIntervalSample(t, (stacked?(inversed?power_cp+power_wprime:0):0), (stacked?(inversed?power_cp+power_wprime+power_wsecond:power_wsecond):power_wsecond));
     }
 
     QwtPlotIntervalCurve *extendedCPCurve = new QwtPlotIntervalCurve("eCP_5_3_WSecond");
@@ -1260,7 +1265,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(TestModel model, bo
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(TestModel model, bool stacked)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(TestModel model, bool stacked, bool inversed)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1275,8 +1280,9 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(TestModel model, boo
 
         double power_wsecond = model.paa*(1.20-0.20*exp(-1*t))*exp(model.paa_dec*(t));
         double power_wprime = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( model.etau/(t) );
+        double power_cp = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( 1 );
 
-        extended_cp_curve_power[i] = QwtIntervalSample(t, (stacked?power_wsecond:0), (stacked?power_wprime + power_wsecond:power_wprime));
+        extended_cp_curve_power[i] = QwtIntervalSample(t, (stacked?(inversed?power_cp:power_wsecond):0), (stacked?(inversed?power_wprime + power_cp: power_wprime + power_wsecond):power_wprime));
     }
 
     QwtPlotIntervalCurve *extendedCPCurve = new QwtPlotIntervalCurve("eCP_5_3_WPrime");
@@ -1304,7 +1310,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(TestModel model, boo
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_CP(TestModel model, bool stacked)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_CP(TestModel model, bool stacked, bool inversed)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1321,7 +1327,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_CP(TestModel model, bool st
         double power_wprime = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( model.etau/(t) );
         double power_cp = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( 1 );
 
-        extended_cp_curve_power[i] = QwtIntervalSample(t, (stacked?power_wprime + power_wsecond:0), (stacked?power_wprime + power_wsecond + power_cp:power_cp));
+        extended_cp_curve_power[i] = QwtIntervalSample(t, (stacked?(inversed?0:power_wprime + power_wsecond):0), (stacked?(inversed?power_cp : power_wprime + power_wsecond + power_cp):power_cp));
     }
 
     QwtPlotIntervalCurve *extendedCPCurve = new QwtPlotIntervalCurve("eCP_5_3_CP");
@@ -2022,4 +2028,165 @@ ExtendedCriticalPower::deriveDanVeloclinicCP_Parameters(bool usebest, RideFileCa
     qDebug() <<"eCP(6.3) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
 
     return model;
+}
+
+QwtPlotCurve*
+ExtendedCriticalPower::getPlotCurveFor10secRollingAverage(RideFileCache *bests, RideFile::SeriesType series) {
+    int count = bests->meanMaxArray(series).count();
+    if (count == 0)
+        return NULL;
+
+    QVector<double> smooth;
+    QVector<double> smoothed;
+    QVector<double> time;
+
+    double total = 0.0;
+
+    int l = 6;
+    int d = 3;
+    for (int i = 1; i < 1 + d; i++) {
+        double value = bests->meanMaxArray(series)[i];
+
+        smooth.append(value);
+        total += value;
+    }
+
+    for (int i=1; i < count - d; i++) {
+        double newvalue = bests->meanMaxArray(series)[i+d];
+
+        smooth.append(newvalue);
+        total += newvalue;
+
+        if (smooth.count() > l) {
+            total -= smooth.at(0);
+            smooth.remove(0);
+        }
+
+        smoothed.append(total/smooth.count());
+        time.append(i/60.0f);
+
+    }
+
+
+    QwtPlotCurve *curve = new QwtPlotCurve("rolling");
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
+        curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    QPen e2pen(Qt::green);
+    e2pen.setWidth(1);
+    e2pen.setStyle(Qt::DashLine);
+    curve->setPen(e2pen);
+    curve->setSamples(time.data(), smoothed.data(), smoothed.count());
+
+    return curve;
+}
+
+CpPlotCurve*
+ExtendedCriticalPower::getPlotCurveForQualityPoint(RideFileCache *bests, RideFile::SeriesType series) {
+    int count = bests->meanMaxArray(series).count();
+
+    QVector<double> smooth;
+    //QVector<double> smoothed;
+    QVector<QwtPoint3D> heatSamples;
+
+    double total = 0.0;
+
+    int l = 6;
+    int d = 3;
+    for (int i = 1; i < 1 + d; i++) {
+        double value = bests->meanMaxArray(series)[i];
+
+        smooth.append(value);
+        total += value;
+    }
+
+    for (int i=1; i < count - d; i++) {
+        double newvalue = bests->meanMaxArray(series)[i+d];
+
+        smooth.append(newvalue);
+        total += newvalue;
+
+        if (smooth.count() > l) {
+            total -= smooth.at(0);
+            smooth.remove(0);
+        }
+
+        //smoothed.append(total/smooth.count());
+
+        double value = bests->meanMaxArray(series)[i];
+        double heat = 500*((value-total/smooth.count())/value);
+
+        if ((value-total/smooth.count())/value > 0.0005)
+            heat = 1000;
+
+        QwtPoint3D add(i/60.00f, value, heat);
+        heatSamples << add;
+
+    }
+
+
+    CpPlotCurve *curve = new CpPlotCurve("rolling");
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
+        curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+    curve->setPenWidth(1);
+    QwtLinearColorMap *colorMap = new QwtLinearColorMap(Qt::yellow, Qt::green);
+    curve->setColorMap(colorMap);
+    curve->setSamples(heatSamples);
+    return curve;
+}
+
+QwtPlotCurve*
+ExtendedCriticalPower::getPlotCurveForDerived(RideFileCache *bests, RideFile::SeriesType series) {
+    int count = bests->meanMaxArray(series).count();
+
+    QVector<double> xValues;
+    QVector<double> yValues;
+    QVector<double> smoothed;
+    QVector<double> time;
+
+    double total = 0.0;
+
+    int l = 10;
+    int d = 5;
+    for (int i = 1; i < 1 + d; i++) {
+        double newvalue = bests->meanMaxArray(series)[i];
+
+        yValues.append(newvalue);
+        xValues.append((i)/60.0f);
+        total += newvalue;
+    }
+
+    for (int i=1; i < count - d; i++) {
+        double newvalue = bests->meanMaxArray(series)[i+d];
+
+        yValues.append(newvalue);
+        xValues.append((i+d)/60.0f);
+        total += newvalue;
+
+        if (yValues.count() > l) {
+            total -= yValues.at(0);
+            xValues.remove(0);
+            yValues.remove(0);
+        }
+
+        // perform linear regression
+        Statistic regress(xValues.data(), yValues.data(), yValues.count());
+
+        smoothed.append(regress.slope()+1200);
+        time.append(i/60.0f);
+        qDebug() << i << regress.slope();
+
+    }
+
+
+    QwtPlotCurve *curve = new QwtPlotCurve("derived");
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
+        curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    QPen e2pen(Qt::green);
+    e2pen.setWidth(1);
+    e2pen.setStyle(Qt::DashLine);
+    curve->setPen(e2pen);
+    curve->setSamples(time.data(), smoothed.data(), smoothed.count());
+
+    return curve;
 }
