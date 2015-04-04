@@ -337,18 +337,44 @@ CPPlot::initModel()
    }
 
     #if GC_HAVE_MODEL_LABS
-    // Test
-    ExtendedCriticalPower *ecp = new ExtendedCriticalPower(context);
+    if (bestsCache->meanMaxArray(rideSeries).count()>0) {
+        // Test
+        ExtendedCriticalPower *ecp = new ExtendedCriticalPower(context);
 
-    TestModel model = ecp->deriveExtendedCP_6_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-    QwtPlotCurve* plot = ecp->getPlotCurveForExtendedCP_6_3(model);
-    plot->attach(this);
-    bestsCurves.append(plot);
+        TestModel model = ecp->deriveExtendedCP_6_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+        QwtPlotCurve* plot = ecp->getPlotCurveForExtendedCP_6_3(model);
+        plot->attach(this);
+        modelCurves.append(plot);
 
-    model = ecp->deriveExtendedCP_5_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-    plot = ecp->getPlotCurveForExtendedCP_5_3(model);
-    plot->attach(this);
-    bestsCurves.append(plot);
+        model = ecp->deriveExtendedCP_5_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+        //plot = ecp->getPlotCurveForExtendedCP_5_3(model);
+        //plot->attach(this);
+        //modelCurves.append(plot);
+
+        /*QwtPlotIntervalCurve* plot2 = ecp->getPlotCurveForExtendedCP_5_3_CP(model, true, true);
+        plot2->attach(this);
+        modelIntCurves.append(plot2);
+
+        plot2 = ecp->getPlotCurveForExtendedCP_5_3_WPrime(model, true, true);
+        plot2->attach(this);
+        modelIntCurves.append(plot2);
+
+        plot2 = ecp->getPlotCurveForExtendedCP_5_3_WSecond(model, true, true);
+        plot2->attach(this);
+        modelIntCurves.append(plot2);*/
+
+        plot = ecp->getPlotCurveFor10secRollingAverage(bestsCache, rideSeries);
+        plot->attach(this);
+        modelCurves.append(plot);
+
+        CpPlotCurve *plot3 = ecp->getPlotCurveForQualityPoint(bestsCache, rideSeries);
+        plot3->attach(this);
+        modelCPCurves.append(plot3);
+
+        plot = ecp->getPlotCurveForDerived(bestsCache, rideSeries);
+        plot->attach(this);
+        modelCurves.append(plot);
+    }
     #endif
 
 }
@@ -792,6 +818,22 @@ CPPlot::clearCurves()
         delete heatAgeCurve;
         heatAgeCurve = NULL;
     }
+
+    if (modelCurves.count()) {
+        foreach (QwtPlotCurve *curve, modelCurves) delete curve;
+        modelCurves.clear();
+    }
+
+    if (modelIntCurves.count()) {
+        foreach (QwtPlotIntervalCurve *curve, modelIntCurves) delete curve;
+        modelIntCurves.clear();
+    }
+
+    if (modelCPCurves.count()) {
+        foreach (CpPlotCurve *curve, modelCPCurves) delete curve;
+        modelCPCurves.clear();
+    }
+
 }
 
 // get bests or an empty set if it is null

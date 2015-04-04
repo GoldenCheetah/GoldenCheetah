@@ -169,6 +169,10 @@ class CPPlot : public QwtPlot
         QList<QwtPlotCurve*> centileCurves;
         QList<QwtPlotCurve*> intervalCurves;
 
+        QList<QwtPlotCurve*> modelCurves;
+        QList<QwtPlotIntervalCurve*> modelIntCurves;
+        QList<CpPlotCurve*> modelCPCurves;
+
         QwtPlotCurve *rideCurve;
         QwtPlotCurve *modelCurve;
 

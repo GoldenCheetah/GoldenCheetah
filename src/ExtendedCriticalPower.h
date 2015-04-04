@@ -24,6 +24,7 @@
 #include "Athlete.h"
 #include "Zones.h"
 #include "RideMetric.h"
+#include "CpPlotCurve.h"
 #include <cmath>
 
 #include <qwt_plot_curve.h>
@@ -135,9 +136,9 @@ class ExtendedCriticalPower
         QwtPlotCurve* getPlotLevelForExtendedCP_5_3(TestModel athleteModeleCP2);
 
         // Contributions
-        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WSecond(TestModel athleteModeleCP2, bool stacked);
-        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WPrime(TestModel athleteModeleCP2, bool stacked);
-        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_CP(TestModel athleteModeleCP2, bool stacked);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WSecond(TestModel athleteModeleCP2, bool stacked, bool inversed);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WPrime(TestModel athleteModeleCP2, bool stacked, bool inversed);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_CP(TestModel athleteModeleCP2, bool stacked, bool inversed);
 
         // Extended CP Model version 6
         TestModel deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
@@ -154,7 +155,10 @@ class ExtendedCriticalPower
         // Dan-Veloclinic Model
         TestModel deriveDanVeloclinicCP_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
 
-
+        //
+        QwtPlotCurve* getPlotCurveFor10secRollingAverage(RideFileCache *bests, RideFile::SeriesType series);
+        CpPlotCurve* getPlotCurveForQualityPoint(RideFileCache *bests, RideFile::SeriesType series);
+        QwtPlotCurve* getPlotCurveForDerived(RideFileCache *bests, RideFile::SeriesType series);
 
     private:
         Context *context;
