@@ -538,6 +538,8 @@ class AllPlot : public QwtPlot
         void confirmTmpReference(double value, int axis, bool allowDelete);
         QwtPlotCurve* plotReferenceLine(const RideFilePoint *referencePoint);
 
+        virtual void replot();
+
         // remembering state etc
         CurveColors *curveColors;
 

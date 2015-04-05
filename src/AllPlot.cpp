@@ -32,6 +32,7 @@
 #include "Zones.h"
 #include "Colors.h"
 #include "WPrime.h"
+#include "IndendPlotMarker.h"
 
 #include <qwt_plot_curve.h>
 #include <qwt_plot_canvas.h>
@@ -2299,6 +2300,8 @@ AllPlot::recalc(AllPlotObject *objects)
 void
 AllPlot::refreshIntervalMarkers()
 {
+    QwtIndPlotMarker::resetDrawnLabels();
+
     foreach(QwtPlotMarker *mrk, standard->d_mrk) {
         mrk->detach();
         delete mrk;
@@ -2316,7 +2319,7 @@ AllPlot::refreshIntervalMarkers()
             if (interval.isBest() || interval.isPeak() || 
                 interval.isMatch()) nolabel = true;
 
-            QwtPlotMarker *mrk = new QwtPlotMarker;
+            QwtPlotMarker *mrk = new QwtIndPlotMarker;
             standard->d_mrk.append(mrk);
             mrk->attach(this);
             mrk->setLineStyle(QwtPlotMarker::VLine);
@@ -2473,6 +2476,11 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
     return referenceLine;
 }
 
+void
+AllPlot::replot() {
+        QwtIndPlotMarker::resetDrawnLabels();
+        QwtPlot::replot();
+    }
 
 void
 AllPlot::setYMax()
