@@ -73,6 +73,7 @@ class GeneralPage : public QWidget
         QComboBox *tireSizeCombo;
         QComboBox *wbalForm;
         QCheckBox *garminSmartRecord;
+        QCheckBox *warnOnExit;
         QLineEdit *wheelSizeEdit;
         QLineEdit *garminHWMarkedit;
         QLineEdit *hystedit;
@@ -100,6 +101,7 @@ class GeneralPage : public QWidget
             float hyst;
             int wbal;
             int lts,sts;
+            bool warn;
         } b4;
 
     private slots:
