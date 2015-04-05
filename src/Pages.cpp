@@ -227,6 +227,12 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(showSBToday, 11,1, Qt::AlignLeft);
 
     //
+    // Warn to save on exit
+    warnOnExit = new QCheckBox(tr("Warn for unsaved activities on exit"), this);
+    warnOnExit->setChecked(appsettings->cvalue(NULL, GC_WARNEXIT, true).toBool());
+    configLayout->addWidget(warnOnExit, 12,1, Qt::AlignLeft);
+
+    //
     // Athlete directory (home of athletes)
     //
     QVariant athleteDir = appsettings->value(this, GC_HOMEDIR);
@@ -237,9 +243,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     athleteBrowseButton = new QPushButton(tr("Browse"));
     athleteBrowseButton->setFixedWidth(120);
 
-    configLayout->addWidget(athleteLabel, 12,0, Qt::AlignRight);
-    configLayout->addWidget(athleteDirectory, 12,1);
-    configLayout->addWidget(athleteBrowseButton, 12,2);
+    configLayout->addWidget(athleteLabel, 13,0, Qt::AlignRight);
+    configLayout->addWidget(athleteDirectory, 13,1);
+    configLayout->addWidget(athleteBrowseButton, 13,2);
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
 
@@ -268,6 +274,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     b4.wbal = wbalForm->currentIndex();
     b4.lts = perfManLTSVal.toInt();
     b4.sts = perfManSTSVal.toInt();
+    b4.warn = warnOnExit->isChecked();
 }
 
 void
@@ -294,10 +301,13 @@ GeneralPage::saveClicked()
     };
     appsettings->setValue(GC_LANG, langs[langCombo->currentIndex()]);
 
-    // Garmon and cranks
+    // Garmin and cranks
     appsettings->setValue(GC_GARMIN_HWMARK, garminHWMarkedit->text().toInt());
     appsettings->setValue(GC_GARMIN_SMARTRECORD, garminSmartRecord->checkState());
     appsettings->setValue(GC_CRANKLENGTH, crankLengthCombo->currentText());
+
+    // save on exit
+    appsettings->setValue(GC_WARNEXIT, warnOnExit->isChecked());
 
     // save wheel size
     appsettings->setValue(GC_WHEELSIZE, wheelSizeEdit->text().toInt());
