@@ -249,7 +249,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     modelCombo->addItem(tr("3 parameter"));
     modelCombo->addItem(tr("Extended CP"));
     modelCombo->addItem(tr("Multicomponent"));
-    modelCombo->addItem(tr("Ward/Smith"));
+    modelCombo->addItem(tr("Ward-Smith"));
     modelCombo->setCurrentIndex(1);
 
     mcl->addRow(new QLabel(tr("Model")), modelCombo);

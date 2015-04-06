@@ -241,7 +241,7 @@ class WSModel : public PDModel // ward-smith
         double FTP();
         double PMax();
 
-        QString name()   { return "Ward Smith"; }  // model name e.g. CP 2 parameter model
+        QString name()   { return "Ward-Smith"; }  // model name e.g. CP 2 parameter model
         QString code()   { return "WS"; }        // short name used in metric names e.g. 2P model
 
         void saveParameters(QList<double>&here);
