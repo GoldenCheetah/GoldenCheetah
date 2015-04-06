@@ -62,6 +62,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, bool first) :
     models << new CP3Model(context);
     models << new MultiModel(context);
     models << new ExtendedModel(context);
+    models << new WSModel(context);
 
     // setup my axes
     // for now we limit to 4 on left and 4 on right
