@@ -97,8 +97,20 @@ PDModel::setIntervals(double sanI1, double sanI2, double anI1, double anI2,
 // cp, tau and t0 values needed for the model
 // this is the function originally found in CPPlot
 void
-PDModel::deriveCPParameters(bool three)
+PDModel::deriveCPParameters(int model)
 {
+    // bit of a hack, but the model deriving code is shared
+    // basically because it does pretty much the same thing
+    // for all the models and I didn't want to abstract it 
+    // any further, so we pass the subclass as a model number
+    // to control which intervals and formula to use
+    // where model is
+    // 0 = CP 2 parameter
+    // 1 = CP 3 parameter
+    // 2 = Extended Model  (Damien)
+    // 3 = Veloclinic (Mike P)
+    // 4 = Ward Smith
+
     // bounds on anaerobic interval in minutes
     const double t1 = anI1;
     const double t2 = anI2;
@@ -183,7 +195,8 @@ PDModel::deriveCPParameters(bool three)
         }
 
         // estimate t0 - but only for veloclinic/3parm cp
-        if (three) t0 = tau / (data[1] / cp - 1) - 1 / 60.0;
+        // where model is non-zero (CP2 is nonzero)
+        if (model) t0 = tau / (data[1] / cp - 1) - 1 / 60.0;
 
     } while ((fabs(tau - tau_prev) > tau_delta_max) || (fabs(t0 - t0_prev) > t0_delta_max));
 }
@@ -239,14 +252,14 @@ void CP2Model::onDataChanged()
 { 
     // calc tau etc and make sure the interval is
     // set correctly - i.e. 'domain of validity'
-    deriveCPParameters(); 
+    deriveCPParameters(0); 
     setInterval(QwtInterval(tau, PDMODEL_MAXT));
 
 }
 
 void CP2Model::onIntervalsChanged() 
 { 
-    deriveCPParameters(); 
+    deriveCPParameters(0); 
     setInterval(QwtInterval(tau, PDMODEL_MAXT));
 }
 
@@ -310,14 +323,98 @@ void CP3Model::onDataChanged()
 { 
     // calc tau etc and make sure the interval is
     // set correctly - i.e. 'domain of validity'
-    deriveCPParameters(true); 
+    deriveCPParameters(1); 
     setInterval(QwtInterval(tau, PDMODEL_MAXT));
 
 }
 
 void CP3Model::onIntervalsChanged() 
 { 
-    deriveCPParameters(true); 
+    deriveCPParameters(1); 
+    setInterval(QwtInterval(tau, PDMODEL_MAXT));
+}
+
+//
+// Ward Smith Model
+//
+WSModel::WSModel(Context *context) : PDModel(context)
+{
+    // set default intervals to search CP 30-60
+    anI1=1800;
+    anI2=2400;
+    aeI1=2400;
+    aeI2=3600;
+
+    connect (this, SIGNAL(dataChanged()), this, SLOT(onDataChanged()));
+    connect (this, SIGNAL(intervalsChanged()), this, SLOT(onIntervalsChanged()));
+}
+
+// P(t) - return y for t in 2 parameter model
+double 
+WSModel::y(double t) const
+{
+    // don't start at zero !
+    t += (!minutes?1.00f:1/60.00f);
+
+    // adjust to seconds
+    if (minutes) t *= 60.00f;
+
+    //WPrime and PMax
+    double WPrime = cp * tau * 60;
+    double PMax = cp * (double(1.00f)+tau /(((double(1)/double(60))+t0)));
+
+    // WS Model P(t) = W'/t * (1- exp(-t/( W'/(wPmax)))) + CP
+    return ((WPrime / (double(t)))  * (1- exp(-t/(WPrime/PMax)))) + cp;
+}
+
+// 2 parameter model can calculate these
+double 
+WSModel::WPrime()
+{
+    // kjoules
+    return (cp * tau * 60);
+}
+
+double
+WSModel::CP()
+{
+    return cp;
+}
+
+double
+WSModel::FTP()
+{
+    return y(45 * 60);
+}
+
+double
+WSModel::PMax()
+{
+    // casting to double across to ensure we don't lose precision
+    // but basically its the max value of the curve at time t of 1s
+    // which is cp * 1 + tau / ((t/60) + t0)
+    double WPrime = cp * tau * 60;
+    double PMax = cp * (double(1.00f)+tau /(((double(1)/double(60))+t0)));
+
+    // WS Model P(t) = W'/t * (1- exp(-t/( W'/(wPmax)))) + CP
+    return ((WPrime / (double(1)))  * (1- exp(-1/(WPrime/PMax)))) + cp;
+}
+
+
+// could have just connected signal to slot
+// but might want to be more sophisticated in future
+void WSModel::onDataChanged() 
+{ 
+    // calc tau etc and make sure the interval is
+    // set correctly - i.e. 'domain of validity'
+    deriveCPParameters(4); 
+    setInterval(QwtInterval(tau, PDMODEL_MAXT));
+
+}
+
+void WSModel::onIntervalsChanged() 
+{ 
+    deriveCPParameters(4); 
     setInterval(QwtInterval(tau, PDMODEL_MAXT));
 }
 
@@ -450,7 +547,7 @@ void MultiModel::onDataChanged()
 { 
     // calc tau etc and make sure the interval is
     // set correctly - i.e. 'domain of validity'
-    deriveCPParameters(true); 
+    deriveCPParameters(3); 
 
     // and veloclinic parameters too;
     w1 = cp*tau*60; // initial estimate from classic cp model
@@ -471,7 +568,7 @@ void MultiModel::onDataChanged()
 
 void MultiModel::onIntervalsChanged() 
 { 
-    deriveCPParameters(true); 
+    deriveCPParameters(3); 
 
     // and veloclinic paramters too;
     w1 = cp*tau*60; // initial estimate from classic model
@@ -856,6 +953,19 @@ void CP3Model::loadParameters(QList<double>&here)
     t0 = here[2];
 }
 void CP3Model::saveParameters(QList<double>&here)
+{
+    here.clear();
+    here << cp;
+    here << tau;
+    here << t0;
+}
+void WSModel::loadParameters(QList<double>&here)
+{
+    cp = here[0];
+    tau = here[1];
+    t0 = here[2];
+}
+void WSModel::saveParameters(QList<double>&here)
 {
     here.clear();
     here << cp;

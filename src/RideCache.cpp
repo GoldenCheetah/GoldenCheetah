@@ -644,6 +644,7 @@ RideCache::refreshCPModelMetrics()
     // set up the models we support
     CP2Model p2model(context);
     CP3Model p3model(context);
+    WSModel wsmodel(context);
     MultiModel multimodel(context);
     ExtendedModel extmodel(context);
 
@@ -652,6 +653,7 @@ RideCache::refreshCPModelMetrics()
     models << &p3model;
     models << &multimodel;
     models << &extmodel;
+    models << &wsmodel;
 
 
     // from has first ride with Power data / looking at the next 7 days of data with Power

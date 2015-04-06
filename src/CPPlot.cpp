@@ -322,6 +322,10 @@ CPPlot::initModel()
         pdModel = new MultiModel(context);
         pdModel->setVariant(modelVariant);
         break;
+    case 5 : // ward smith
+        pdModel = new WSModel(context);
+        pdModel->setVariant(modelVariant);
+        break;
     }
 
     if (pdModel) {
@@ -703,6 +707,10 @@ CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
         break;
     case 4 : // multimodel
         pdmodel = new MultiModel(context);
+        pdmodel->setVariant(modelVariant);
+        break;
+    case 5 : // ward smith model
+        pdmodel = new WSModel(context);
         pdmodel->setVariant(modelVariant);
         break;
     }
@@ -2004,6 +2012,10 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                 break;
             case 4 : // multimodel
                 baselineModel = new MultiModel(context);
+                baselineModel->setVariant(modelVariant);
+                break;
+            case 5 : // ward smith
+                baselineModel = new WSModel(context);
                 baselineModel->setVariant(modelVariant);
                 break;
             }

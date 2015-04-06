@@ -108,7 +108,7 @@ class PDModel : public QObject, public QwtSyntheticPointData
         // using data from setData() and intervals from setIntervals()
         // this is the old function from CPPlot to extract the best points
         // in the data series to calculate cp, tau and t0.
-        void deriveCPParameters(bool three=false); 
+        void deriveCPParameters(int model); 
 
     signals:
 
@@ -209,6 +209,39 @@ class CP3Model : public PDModel
         double PMax();
 
         QString name()   { return "Morton 3 Parameter"; }  // model name e.g. CP 2 parameter model
+        QString code()   { return "3 Parm"; }        // short name used in metric names e.g. 2P model
+
+        void saveParameters(QList<double>&here);
+        void loadParameters(QList<double>&here);
+
+    public slots:
+
+        void onDataChanged();      // catch data changes
+        void onIntervalsChanged(); //catch interval changes
+};
+
+class WSModel : public PDModel // ward-smith
+{
+    Q_OBJECT
+
+    public:
+        WSModel(Context *context);
+
+        // synthetic data for a curve
+        double y(double t) const;
+
+        bool hasWPrime() { return true; }  // can estimate W'
+        bool hasCP()     { return true; }  // can CP
+        bool hasFTP()    { return true; }  // can estimate FTP
+        bool hasPMax()   { return true; }  // can estimate p-Max
+
+        // 2 parameter model can calculate these
+        double WPrime();
+        double CP();
+        double FTP();
+        double PMax();
+
+        QString name()   { return "Ward Smith"; }  // model name e.g. CP 2 parameter model
         QString code()   { return "3 Parm"; }        // short name used in metric names e.g. 2P model
 
         void saveParameters(QList<double>&here);
