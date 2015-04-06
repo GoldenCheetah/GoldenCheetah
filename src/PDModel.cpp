@@ -362,9 +362,10 @@ WSModel::y(double t) const
     //WPrime and PMax
     double WPrime = cp * tau * 60;
     double PMax = cp * (double(1.00f)+tau /(((double(1)/double(60))+t0)));
+    double wPMax = PMax-cp;
 
     // WS Model P(t) = W'/t * (1- exp(-t/( W'/(wPmax)))) + CP
-    return ((WPrime / (double(t)))  * (1- exp(-t/(WPrime/PMax)))) + cp;
+    return ((WPrime / (double(t)))  * (1- exp(-t/(WPrime/wPMax)))) + cp;
 }
 
 // 2 parameter model can calculate these
@@ -395,9 +396,10 @@ WSModel::PMax()
     // which is cp * 1 + tau / ((t/60) + t0)
     double WPrime = cp * tau * 60;
     double PMax = cp * (double(1.00f)+tau /(((double(1)/double(60))+t0)));
+    double wPMax = PMax-cp;
 
     // WS Model P(t) = W'/t * (1- exp(-t/( W'/(wPmax)))) + CP
-    return ((WPrime / (double(1)))  * (1- exp(-1/(WPrime/PMax)))) + cp;
+    return ((WPrime / (double(1)))  * (1- exp(-1/(WPrime/wPMax)))) + cp;
 }
 
 
