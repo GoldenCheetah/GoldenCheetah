@@ -55,6 +55,22 @@ unsigned long Colors::fingerprint(const Colors *set)
     return qChecksum(ba, ba.length());
 }
 
+#ifdef Q_OS_WIN
+// handle dpi scaling on windows
+static float windowsDpiScale()
+{
+    HDC screen = GetDC( 0 );
+    FLOAT dpiX = static_cast<FLOAT>( GetDeviceCaps( screen, LOGPIXELSX ) );
+    ReleaseDC( 0, screen );
+    return dpiX / 96.0f;
+}
+
+// global
+float GCDPIScale = windowsDpiScale();
+#else
+float GCDPIScale = 1.0f;
+#endif
+
 // initialization called from constructor to enable translation
 void GCColor::setupColors()
 {
