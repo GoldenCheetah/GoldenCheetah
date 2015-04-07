@@ -481,6 +481,13 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         rtData.setWatts(4.31746 * V - 2.59259e-002 * pow(V, 2) + 9.41799e-003 * pow(V, 3));
         }
         break;
+    case 51: // CYCLOPS MAGNETO PRO (ROAD)
+        {
+        double V = rtData.getSpeed();
+        //     Watts = 6.0f + (-0.93 * speed) + (0.275 * speed^2) + (-0.00175 * speed^3)
+        rtData.setWatts(6.0f + (-0.93f * V) + (0.275f * pow(V, 2)) + (-0.00175f * pow(V, 3)));
+        }
+        break;
     }
 }
 
