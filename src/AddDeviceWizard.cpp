@@ -1100,55 +1100,56 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     // NOTE: These must correspond to the code in RealtimeController.cpp that
     //       post-processes inbound telemetry.
     virtualPower->addItem(tr("None"));
-    virtualPower->addItem(tr("Power - Kurt Kinetic Cyclone"));
-    virtualPower->addItem(tr("Power - Kurt Kinetic Road Machine"));
-    virtualPower->addItem(tr("Power - Cyclops Fluid 2"));
-    virtualPower->addItem(tr("Power - BT Advanced Training System"));
-    virtualPower->addItem(tr("Power - LeMond Revolution"));
-    virtualPower->addItem(tr("Power - 1UP USA Trainer"));
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (H)"));
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (5)"));
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (4)"));
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (3)"));
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (2)"));
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (1)"));
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (L)"));
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (H)"));
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (5)"));
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (4)"));
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (3)"));
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (2)"));
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (1)"));
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (L)"));
-    virtualPower->addItem(tr("Power - Saris Powerbeam Pro"));
-    virtualPower->addItem(tr("Power - Tacx Satori (2)"));
-    virtualPower->addItem(tr("Power - Tacx Satori (4)"));
-    virtualPower->addItem(tr("Power - Tacx Satori (6)"));
-    virtualPower->addItem(tr("Power - Tacx Satori (8)"));
-    virtualPower->addItem(tr("Power - Tacx Satori (10)"));
-    virtualPower->addItem(tr("Power - Tacx Flow (0)"));
-    virtualPower->addItem(tr("Power - Tacx Flow (2)"));
-    virtualPower->addItem(tr("Power - Tacx Flow (4)"));
-    virtualPower->addItem(tr("Power - Tacx Flow (6)"));
-    virtualPower->addItem(tr("Power - Tacx Flow (8)"));
-    virtualPower->addItem(tr("Power - Tacx Blue Twist (1)"));
-    virtualPower->addItem(tr("Power - Tacx Blue Twist (3)"));
-    virtualPower->addItem(tr("Power - Tacx Blue Twist (5)"));
-    virtualPower->addItem(tr("Power - Tacx Blue Twist (7)"));
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (2)"));
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (4)"));
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (6)"));
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (8)"));
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (10)"));
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (1)"));
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (2)"));
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (3)"));
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (4)"));
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (5)"));
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (6)"));
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (7)"));
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (8)"));
-    virtualPower->addItem(tr("Power - Elite Qubo Power Fluid"));
+    virtualPower->addItem(tr("Power - Kurt Kinetic Cyclone"));                              // 1
+    virtualPower->addItem(tr("Power - Kurt Kinetic Road Machine"));                         // 2
+    virtualPower->addItem(tr("Power - Cyclops Fluid 2"));                                   // 3
+    virtualPower->addItem(tr("Power - BT Advanced Training System"));                       // 4
+    virtualPower->addItem(tr("Power - LeMond Revolution"));                                 // 5
+    virtualPower->addItem(tr("Power - 1UP USA Trainer"));                                   // 6
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (H)"));                          // 7
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (5)"));                          // 8
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (4)"));                          // 9
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (3)"));                          // 10
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (2)"));                          // 11
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (1)"));                          // 12
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (L)"));                          // 13
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (H)"));    // 14
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (5)"));    // 15
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (4)"));    // 16
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (3)"));    // 17
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (2)"));    // 18
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (1)"));    // 19
+    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (L)"));    // 20
+    virtualPower->addItem(tr("Power - Saris Powerbeam Pro"));                               // 21
+    virtualPower->addItem(tr("Power - Tacx Satori (2)"));                                   // 22
+    virtualPower->addItem(tr("Power - Tacx Satori (4)"));                                   // 23
+    virtualPower->addItem(tr("Power - Tacx Satori (6)"));                                   // 24
+    virtualPower->addItem(tr("Power - Tacx Satori (8)"));                                   // 25
+    virtualPower->addItem(tr("Power - Tacx Satori (10)"));                                  // 26
+    virtualPower->addItem(tr("Power - Tacx Flow (0)"));                                     // 27
+    virtualPower->addItem(tr("Power - Tacx Flow (2)"));                                     // 28
+    virtualPower->addItem(tr("Power - Tacx Flow (4)"));                                     // 29
+    virtualPower->addItem(tr("Power - Tacx Flow (6)"));                                     // 30
+    virtualPower->addItem(tr("Power - Tacx Flow (8)"));                                     // 31
+    virtualPower->addItem(tr("Power - Tacx Blue Twist (1)"));                               // 32
+    virtualPower->addItem(tr("Power - Tacx Blue Twist (3)"));                               // 33
+    virtualPower->addItem(tr("Power - Tacx Blue Twist (5)"));                               // 34
+    virtualPower->addItem(tr("Power - Tacx Blue Twist (7)"));                               // 35
+    virtualPower->addItem(tr("Power - Tacx Blue Motion (2)"));                              // 36
+    virtualPower->addItem(tr("Power - Tacx Blue Motion (4)"));                              // 37
+    virtualPower->addItem(tr("Power - Tacx Blue Motion (6)"));                              // 38
+    virtualPower->addItem(tr("Power - Tacx Blue Motion (8)"));                              // 39
+    virtualPower->addItem(tr("Power - Tacx Blue Motion (10)"));                             // 40
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (1)"));                     // 41
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (2)"));                     // 42
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (3)"));                     // 43
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (4)"));                     // 44
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (5)"));                     // 45
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (6)"));                     // 46
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (7)"));                     // 47
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (8)"));                     // 48
+    virtualPower->addItem(tr("Power - Elite Turbo Muin (2013)"));                           // 49
+    virtualPower->addItem(tr("Power - Elite Qubo Power Fluid"));                            // 50
 
     //
     // Wheel size

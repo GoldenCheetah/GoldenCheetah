@@ -465,7 +465,15 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         rtData.setWatts(-0.0255078477814972*pow(V, 3) + 1.42902141301828*pow(V,2) + (10.2050166192824*V) - 6.48951048951042);
         }
         break;
-    case 49:
+
+    case 49: //ELITE TURBO MUIN 2013
+        {
+        double V = rtData.getSpeed();
+        // Power curve fit from data collected by Ray Maker at dcrainmaker.com
+        rtData.setWatts(2.30615942 * V -0.28395558 * pow(V,2) + 0.02099661 * pow(V,3));
+        }
+        break;
+    case 50: // ELITE QUBO POWER FLUID
         {
         double V = rtData.getSpeed();
         // Power curve fit from powercurvesensor
