@@ -47,6 +47,7 @@ struct SizeSettings {
 };
 
 extern SizeSettings defaultAppearance[];
+extern float GCDPIScale; // font scaling for display
 
 class Colors
 {
