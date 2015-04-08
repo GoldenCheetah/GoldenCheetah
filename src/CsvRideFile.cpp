@@ -28,7 +28,7 @@
 
 static int csvFileReaderRegistered =
     RideFileFactory::instance().registerReader(
-        "csv","Comma-Separated Values", new CsvFileReader());
+        "csv","Poweragent / PowerTap (CSV)", new CsvFileReader());
 
 int static periMonth(QString month)
 {
@@ -836,7 +836,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 }
 
 bool
-CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) const
+CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvType format) const
 {
     if (!file.open(QIODevice::WriteOnly)) return(false);
 
@@ -846,8 +846,6 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) const
     // Use the column headers that make WKO+ happy.
     double convertUnit;
     QTextStream out(&file);
-
-    CsvType format = powertap;
 
     if (format == gc) {
         // CSV File header

@@ -23,6 +23,7 @@
 #include "Athlete.h"
 #include "RideCache.h"
 #include "HelpWhatsThis.h"
+#include "CsvRideFile.h"
 
 BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWindow), context(context)
 {
@@ -82,6 +83,7 @@ BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWi
     format = new QComboBox(this);
 
     const RideFileFactory &rff = RideFileFactory::instance();
+    format->addItem(tr("Export all data (CSV)"));
     foreach(QString suffix, rff.writeSuffixes()) format->addItem(rff.description(suffix));
     format->setCurrentIndex(appsettings->value(this, GC_BE_LASTFMT, "0").toInt());
 
@@ -191,7 +193,7 @@ void
 BatchExportDialog::exportFiles()
 {
     // what format to export as?
-    QString type = RideFileFactory::instance().writeSuffixes().at(format->currentIndex());
+    QString type = format->currentIndex() > 0 ? RideFileFactory::instance().writeSuffixes().at(format->currentIndex()-1) : "csv";
 
     // loop through the table and export all selected
     for(int i=0; i<files->invisibleRootItem()->childCount(); i++) {
@@ -241,7 +243,14 @@ BatchExportDialog::exportFiles()
 
                 current->setText(4, tr("Writing...")); QApplication::processEvents();
                 QFile out(filename);
-                bool success = RideFileFactory::instance().writeRideFile(context, ride, out, type);
+
+                bool success = false;
+                if (format->currentIndex() > 0)
+                    success = RideFileFactory::instance().writeRideFile(context, ride, out, type);
+                else {
+                    CsvFileReader writer;
+                    success = writer.writeRideFile(context, ride, out, CsvFileReader::gc);
+                }
 
                 if (success) {
                     exports++;

@@ -22,12 +22,18 @@
 
 #include "RideFile.h"
 
-enum csvtypes { generic, gc, powertap, joule, ergomo, motoactv, ibike, moxy, freemotion, peripedal, cpexport };
-typedef enum csvtypes CsvType;
-
 struct CsvFileReader : public RideFileReader {
+    enum csvtypes { generic, gc, powertap, joule, ergomo, motoactv, ibike, moxy, freemotion, peripedal, cpexport };
+    typedef enum csvtypes CsvType;
+
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
-    bool writeRideFile(Context *context, const RideFile *ride, QFile &file) const;
+
+    // standard calling semantics - will write as powertap csv
+    bool writeRideFile(Context *context, const RideFile *ride, QFile &file) const
+    { return writeRideFile(context, ride, file, powertap); }
+
+    // write but able to select format
+    bool writeRideFile(Context *context, const RideFile *ride, QFile &file, CsvType format) const;
     bool hasWrite() const { return true; }
 };
 
