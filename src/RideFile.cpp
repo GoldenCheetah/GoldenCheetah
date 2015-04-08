@@ -614,6 +614,7 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         else flags += '-';
         result->setTag("Data", flags);
 
+        //foreach(RideFile::seriestype x, result->arePresent()) qDebug()<<"present="<<x;
     }
 
     return result;
@@ -1531,6 +1532,18 @@ RideFile::parseRideFileName(const QString &name, QDateTime *dt)
     }
     *dt = QDateTime(date, time);
     return true;
+}
+
+QVector<RideFile::seriestype> 
+RideFile::arePresent()
+{
+    QVector<RideFile::seriestype> returning;
+
+    for (int i=0; i< static_cast<int>(lastSeriesType()) ; i++) {
+        if (isDataPresent(static_cast<RideFile::seriestype>(i))) returning << static_cast<RideFile::seriestype>(i);
+    }
+
+    return returning;
 }
 
 //

@@ -154,7 +154,7 @@ class RideFile : public QObject // QObject to emit signals
                           aPower, wprime, aTISS, anTISS, smo2, thb, 
                           rvert, rcad, rcontact, gear, o2hb, hhb,
                           lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe,
-                          none };
+                          none }; // none must ALWAYS be last
 
         enum specialValues { NoTemp = -255 };
         typedef enum seriestype SeriesType;
@@ -208,6 +208,7 @@ class RideFile : public QObject // QObject to emit signals
         // Working with DATAPRESENT flags
         inline const RideFileDataPresent *areDataPresent() const { return &dataPresent; }
         bool isDataPresent(SeriesType series);
+        QVector<SeriesType> arePresent(); // list of what is present
 
         // Working with FIRST CLASS variables
         const QDateTime &startTime() const { return startTime_; }
