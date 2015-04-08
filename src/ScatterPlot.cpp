@@ -396,8 +396,18 @@ void ScatterPlot::setData (ScatterSettings *settings)
                     ic->setRenderHint(QwtPlotItem::RenderAntialiased);
                     ic->setSamples(xvals[idx].constData(), yvals[idx].constData(), points[idx]);
                     ic->attach(this);
-
                     intervalCurves.append(ic);
+
+                    // show as a line too, if not framed
+                    if (!settings->frame) {
+                        QwtPlotCurve *icl = new QwtPlotCurve();
+                        icl->setStyle(QwtPlotCurve::Lines);
+                        icl->setPen(QPen(intervalColor, Qt::SolidLine));
+                        icl->setRenderHint(QwtPlotItem::RenderAntialiased);
+                        icl->setSamples(xvals[idx].constData(), yvals[idx].constData(), points[idx]);
+                        icl->attach(this);
+                        intervalCurves.append(icl);
+                    }
                 }
             }
 
