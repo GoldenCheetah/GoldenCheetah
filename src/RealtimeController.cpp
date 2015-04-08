@@ -399,9 +399,6 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    default : // unknown - do nothing
-        break;
-
     case 41 : // ELITE SUPERCRONO POWER MAG LEVEL 1
         {
         double V = rtData.getSpeed() * MILES_PER_KM;
@@ -487,6 +484,30 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         //     Watts = 6.0f + (-0.93 * speed) + (0.275 * speed^2) + (-0.00175 * speed^3)
         rtData.setWatts(6.0f + (-0.93f * V) + (0.275f * pow(V, 2)) + (-0.00175f * pow(V, 3)));
         }
+        break;
+
+    case 52: // ELITE ARION MAG LEVEL 0
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(pow(v, 1.217110021) * 3.335794377);
+        }
+        break;
+
+    case 53: // ELITE ARION MAG LEVEL 1
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(pow(v, 1.206592577) * 4.362485081);
+        }
+        break;
+
+    case 54: // ELITE ARION MAG LEVEL 2
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(pow(v, 1.206984321) * 6.374459698);
+        }
+        break;
+
+    default : // unknown - do nothing
         break;
     }
 }
