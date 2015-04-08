@@ -153,6 +153,15 @@ CONFIG(debug, debug|release) {
     }
 }
 
+# libsamplerate available ?
+!isEmpty( SAMPLERATE_INSTALL ) {
+    isEmpty( SAMPLERATE_INCLUDE ) { SAMPLERATE_INCLUDE = $${SAMPLERATE_INSTALL}/include }
+    isEmpty( SAMPLERATE_LIBS )    { SAMPLERATE_LIBS    = $${SAMPLERATE_INSTALL}/lib/libsamplerate.a }
+    INCLUDEPATH += $${SAMPLERATE_INCLUDE}
+    LIBS        += $${SAMPLERATE_LIBS}
+    DEFINES     += GC_HAVE_SAMPLERATE
+}
+
 # FreeSearch replaces deprecated lucene
 HEADERS     += DataFilter.h SearchBox.h NamedSearch.h SearchFilterBox.h FreeSearch.h
 SOURCES     += DataFilter.cpp SearchBox.cpp NamedSearch.cpp SearchFilterBox.cpp FreeSearch.cpp
