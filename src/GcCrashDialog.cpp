@@ -59,6 +59,10 @@
 #include "WFApi.h"
 #endif
 
+#ifdef GC_HAVE_SAMPLERATE
+#include <samplerate.h>
+#endif
+
 GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
 {
     setAttribute(Qt::WA_DeleteOnClose, true); // caller must delete me, once they've extracted the name
@@ -246,6 +250,12 @@ QString GcCrashDialog::versionHTML()
     QString wfapi = QString("none");
     #endif
 
+    #ifdef GC_HAVE_SAMPLERATE
+    QString src = QString(src_get_version()).mid(14,6);
+    #else
+    QString src = "none";
+    #endif
+
     const RideMetricFactory &factory = RideMetricFactory::instance();
     QString gc_version = tr(
             "<p>Build date: %1 %2"
@@ -283,6 +293,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">Wahoo API</td><td>%12</td></tr>"
             "<tr><td colspan=\"2\">VLC</td><td>%13</td></tr>"
             "<tr><td colspan=\"2\">VIDEO</td><td>%14</td></tr>"
+            "<tr><td colspan=\"2\">SAMPLERATE</td><td>%15</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -307,6 +318,7 @@ QString GcCrashDialog::versionHTML()
 #elif defined GC_VIDEO_VLC
             .arg("vlc")
 #endif
+            .arg(src)
 
             ;
 

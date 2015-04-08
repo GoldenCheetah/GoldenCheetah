@@ -2006,8 +2006,8 @@ RideFile::resample(double newRecIntSecs, int interpolate)
     if (count) {
         // didn't work !
         //qDebug()<<"resampling error:"<<src_strerror(count);
-        delete input;
-        delete output;
+        free(input);
+        free(output);
         return NULL;
     } else {
 
@@ -2041,8 +2041,8 @@ RideFile::resample(double newRecIntSecs, int interpolate)
         returning->setDataPresent(secs, true);
 
         // free memory
-        delete input;
-        delete output;
+        free(input);
+        free(output);
 
         return returning;
     }
