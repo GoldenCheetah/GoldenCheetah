@@ -183,6 +183,18 @@
 # using Quicktime and on 10.6 or higher Quicktime X
 #
 
+# if you want to resample with high fidelity we can use the
+# libsamplerate libraries, this is used in RideFile::resample()
+# if you don't resample (e.g. export or merge with new recording
+# intervals) then don't bother.
+#
+# Only tested on Linux, cannot compile on Windows at present
+# Code is available at: http://www.mega-nerd.com/SRC/
+#
+#SAMPLERATE_INSTALL = /usr/local
+#SAMPLERATE_INCLUDE = /usr/local/include
+#SAMPLERATE_LIBS = /usr/local/lib/libsamplerate.a
+
 # If your system has PKG_CONFIG, QT can use this to get dependent libraries.
 # Add the names of libraries with PKG_CONFIG information.
 # eg. PKGCONFIG = oauth libical
