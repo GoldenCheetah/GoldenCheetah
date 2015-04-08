@@ -1151,6 +1151,9 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem(tr("Power - Elite Turbo Muin (2013)"));                           // 49
     virtualPower->addItem(tr("Power - Elite Qubo Power Fluid"));                            // 50
     virtualPower->addItem(tr("Power - Cyclops Magneto Pro (Road)"));                        // 51
+    virtualPower->addItem(tr("Power - Elite Arion Mag (0)"));                               // 52
+    virtualPower->addItem(tr("Power - Elite Arion Mag (1)"));                               // 53
+    virtualPower->addItem(tr("Power - Elite Arion Mag (2)"));                               // 54
 
     //
     // Wheel size
