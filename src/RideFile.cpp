@@ -34,6 +34,11 @@
 #include <cmath>
 #include <qwt_spline.h>
 
+#ifdef GC_HAVE_SAMPLERATE
+// we have libsamplerate
+#include <samplerate.h>
+#endif
+
 #define mark() \
 { \
     addInterval(start, previous->secs - recIntSecs_, \
@@ -45,9 +50,9 @@
 const QChar deltaChar(0x0394);
 
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
-            startTime_(startTime), recIntSecs_(recIntSecs),
+            wstale(true), startTime_(startTime), recIntSecs_(recIntSecs),
             deviceType_("unknown"), data(NULL), wprime_(NULL), 
-            wstale(true), weight_(0), totalCount(0), totalTemp(0), dstale(true)
+            weight_(0), totalCount(0), totalTemp(0), dstale(true)
 {
     command = new RideFileCommand(this);
 
@@ -61,8 +66,8 @@ RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
 // when constructing a temporary ridefile when computing intervals
 // and we want to get special fields and ESPECIALLY "CP" and "Weight"
 RideFile::RideFile(RideFile *p) :
-    recIntSecs_(p->recIntSecs_), deviceType_(p->deviceType_), data(NULL), wprime_(NULL), 
-    wstale(true), weight_(p->weight_), totalCount(0), dstale(true)
+    wstale(true), recIntSecs_(p->recIntSecs_), deviceType_(p->deviceType_), data(NULL), wprime_(NULL), 
+    weight_(p->weight_), totalCount(0), dstale(true)
 {
     startTime_ = p->startTime_;
     tags_ = p->tags_;
@@ -82,8 +87,8 @@ RideFile::RideFile(RideFile *p) :
 }
 
 RideFile::RideFile() : 
-    recIntSecs_(0.0), deviceType_("unknown"), data(NULL), wprime_(NULL), 
-    wstale(true), weight_(0), totalCount(0), dstale(true)
+    wstale(true), recIntSecs_(0.0), deviceType_("unknown"), data(NULL), wprime_(NULL), 
+    weight_(0), totalCount(0), dstale(true)
 {
     command = new RideFileCommand(this);
 
@@ -615,6 +620,7 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         result->setTag("Data", flags);
 
         //foreach(RideFile::seriestype x, result->arePresent()) qDebug()<<"present="<<x;
+
     }
 
     return result;
@@ -1907,6 +1913,149 @@ RideFile::recalculateDerivedSeries(bool force)
     dstale=false;
 }
 
+#ifdef GC_HAVE_SAMPLERATE
+//
+// if we have libsamplerate available we use their simple api
+// but always fill the gaps in recording according to the 
+// interpolate setting.
+//
+RideFile *
+RideFile::resample(double newRecIntSecs, int interpolate)
+{
+    Q_UNUSED(interpolate);
+
+    // structures used by libsamplerate
+    SRC_DATA data;
+    float *input, *output, *source, *target;
+
+    // too few data points !
+    if (dataPoints().count() < 3) return NULL;
+
+    // allocate space for arrays
+    QVector<RideFile::seriestype> series = arePresent();
+
+    // how many samples /should/ there be ?
+    float duration = dataPoints().last()->secs - dataPoints().first()->secs;
+
+    // backwards !?
+    if (duration <= 0) return NULL;
+
+    float insamples = 1 + (duration / recIntSecs());
+    float outsamples = 1 + (duration / newRecIntSecs);
+
+    // allocate memory
+    source = input = (float*)malloc(sizeof(float) * series.count() * insamples);
+    target = output = (float*)malloc(sizeof(float) * series.count() * outsamples); 
+
+    // create the input array
+    bool first = true;
+    RideFilePoint *lp=NULL;
+
+    int inframes = 0;
+    foreach(RideFilePoint *p, dataPoints()) {
+
+        // hit limits ?
+        if (inframes >= insamples) break;
+
+        // yuck! nasty data -- ignore it
+        if (p->secs > (25*60*60)) continue;
+
+        // always start at 0 seconds
+        if (first) {
+            first = false;
+        }
+
+        // fill gaps in recording with zeroes
+        if (lp) {
+
+            // fill with zeroes
+            for(double t=lp->secs+recIntSecs();
+                    (t + recIntSecs()) < p->secs;
+                    t += recIntSecs()) {
+
+                // add zero point
+                inframes++;
+                for(int i=0; i<series.count(); i++) *source++ = 0.0f;
+            }
+        }
+
+        // lets not go backwards -- or two samples at the same time
+        if ((lp && p->secs > lp->secs) || !lp) {
+            // add this point
+            inframes++;
+            foreach(RideFile::seriestype x, series) *source++ = float(p->value(x));
+        }
+
+        // moving on to next sample
+        lp = p;
+
+    }
+
+    //
+    // THE MAGIC HAPPENS HERE ... resample to new recording interval
+    //
+    data.src_ratio = float(recIntSecs()) / float(newRecIntSecs); 
+    data.data_in = input;
+    data.input_frames = inframes;
+    data.data_out = output;
+    data.output_frames = outsamples;
+    data.input_frames_used = 0;
+    data.output_frames_gen = 0;
+    int count = src_simple(&data, SRC_LINEAR, series.count());
+
+    if (count) {
+        // didn't work !
+        //qDebug()<<"resampling error:"<<src_strerror(count);
+        delete input;
+        delete output;
+        return NULL;
+    } else {
+
+        // build new ridefile struct
+        //qDebug()<<"went from"<<inframes<<"using"<<data.input_frames_used<<"to"<<data.output_frames_gen<<"during resampling.";
+
+        RideFile *returning = new RideFile(this);
+        returning->recIntSecs_ = newRecIntSecs;
+
+        float time = 0;
+
+        // unpack the data series
+        for(int frame=0; frame < data.output_frames_gen; frame++) {
+
+            RideFilePoint add;
+            add.secs = time;
+
+            // now set each of the series
+            foreach(RideFile::seriestype x, series) {
+                if (x != RideFile::secs)
+                    add.setValue(x, *target++);
+                else
+                    target++;
+            }
+
+            // append
+            returning->appendPoint(add);
+
+            time += newRecIntSecs;
+        }
+        returning->setDataPresent(secs, true);
+
+        // free memory
+        delete input;
+        delete output;
+
+        return returning;
+    }
+}
+
+#else
+
+//
+// If we do not have libsamplerate available we use a more primitive
+// approach by creating a spline and downsampling from it
+// This is sufficient for most users who are typically converting from
+// 1.26s sampling or higher to 1s sampling when merging data.
+//
 RideFile *
 RideFile::resample(double newRecIntSecs, int interpolate)
 {
@@ -2098,6 +2247,7 @@ RideFile::resample(double newRecIntSecs, int interpolate)
         return returning;
     }
 }
+#endif
 
 double 
 RideFile::getWeight()
