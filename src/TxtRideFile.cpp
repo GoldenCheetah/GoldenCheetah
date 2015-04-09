@@ -122,6 +122,16 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         rideFile->setDeviceType("Computrainer/Velotron");
         rideFile->setFileFormat("Computrainer/Velotron text file (txt)");
 
+
+        // for computrainer / VELOtron we need to convert from the variable rate
+        // the file uses to a fixed rate since thats a base assumption across the
+        // GC codebase. This parameter can be adjusted to the sample (recIntSecs) rate
+        // but in milliseconds
+        const int SAMPLERATE = 1000; // 1 second samples
+        RideFilePoint sample;        // we reuse this to aggregate
+        long time = 0L;              // time in milliseconds
+        double last = 0.0f;          // last sample time seen in seconds
+
         while (!is.atEnd()) {
 
             // the readLine() method doesn't handle old Macintosh CR line endings
@@ -135,6 +145,9 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             // loop through the lines we got
             foreach (QString line, lines) {
 
+                //
+                // SKIP ALL THE GUNK
+                //
                 QRegExp sectionPattern("^\\[.*\\]$");
                 QRegExp unitsPattern("^UNITS += +\\(.*\\)$");
                 QRegExp sepPattern("( +|,)");
@@ -190,55 +203,88 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 // mmm... didn't get much data
                 if (values.count() < 2) continue;
 
-                // extract out each value.  Remove double quotes if they are there (Newer Racermate TXT files)
-                double secs = timeIndex > -1 ? values[timeIndex].remove("\"").toDouble() / (double) 1000 : 0.0;
-                double watts = wattsIndex > -1 ? values[wattsIndex].remove("\"").toDouble() : 0.0;
-                double cad = cadIndex > -1 ? values[cadIndex].remove("\"").toDouble() : 0.0;
-                double hr = hrIndex > -1 ? values[hrIndex].remove("\"").toDouble() : 0.0;
-                double km = kmIndex > -1 ? values[kmIndex].remove("\"").toDouble() : 0.0;
-                double kph = kphIndex > -1 ? values[kphIndex].remove("\"").toDouble() : 0.0;
+                //
+                // EXTRACT A ROW OF DATA
+                //
+                RideFilePoint value;
+                value.secs = timeIndex > -1 ? values[timeIndex].remove("\"").toDouble() / (double) 1000 : 0.0;
+                value.watts = wattsIndex > -1 ? values[wattsIndex].remove("\"").toDouble() : 0.0;
+                value.cad = cadIndex > -1 ? values[cadIndex].remove("\"").toDouble() : 0.0;
+                value.hr = hrIndex > -1 ? values[hrIndex].remove("\"").toDouble() : 0.0;
+                value.km = kmIndex > -1 ? values[kmIndex].remove("\"").toDouble() : 0.0;
+                value.kph = kphIndex > -1 ? values[kphIndex].remove("\"").toDouble() : 0.0;
+                value.headwind = headwindIndex > -1 ? values[headwindIndex].remove("\"").toDouble() : 0.0;
+
                 double miles = milesIndex > -1 ? values[milesIndex].remove("\"").toDouble() : 0.0;
-                double headwind = headwindIndex > -1 ? values[headwindIndex].remove("\"").toDouble() : 0.0;
                 if (miles != 0) {
                     // imperial!
-                    kph *= KM_PER_MILE;
-                    km = miles * KM_PER_MILE;
+                    value.kph *= KM_PER_MILE;
+                    value.km = miles * KM_PER_MILE;
                 }
-                rideFile->appendPoint(secs, cad, hr, km, kph, 0.0, watts, 0.0, 0.0, 0.0, headwind, 0.0, RideFile::NoTemp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, 0);
 
+                // whats the dt in microseconds
+                int dt = (value.secs * 1000) - (last * 1000);
+                last = value.secs;
+
+                while (dt) {
+
+                    int need = SAMPLERATE - sample.secs;
+
+                    // aggregate
+                    if (dt < need) {
+
+                        sample.secs += dt;
+                        sample.watts += float(dt) * value.watts;
+                        sample.cad += float(dt) * value.cad;
+                        sample.hr += float(dt) * value.hr;
+                        sample.km += float(dt) * value.km;
+                        sample.kph += float(dt) * value.kph;
+                        sample.headwind += float(dt) * value.headwind;
+                        dt = 0;
+
+                    } else {
+
+                        dt -= need;
+                        sample.secs = SAMPLERATE;
+                        sample.watts += float(need) * value.watts;
+                        sample.cad += float(need) * value.cad;
+                        sample.hr += float(need) * value.hr;
+                        sample.km += float(need) * value.km;
+                        sample.kph += float(need) * value.kph;
+                        sample.headwind += float(need) * value.headwind;
+
+                        // ok, we've aggregated, lets add a sample
+                        sample.secs = time; time += double(SAMPLERATE) / 1000.0f;
+                        sample.watts /= double(SAMPLERATE);
+                        sample.cad /= double(SAMPLERATE);
+                        sample.hr /= double(SAMPLERATE);
+                        sample.km /= double(SAMPLERATE);
+                        sample.kph /= double(SAMPLERATE);
+                        sample.headwind /= double(SAMPLERATE);
+
+                        rideFile->appendPoint(sample.secs, sample.cad, sample.hr, sample.km, 
+                                              sample.kph, 0.0, sample.watts, 0.0, 0.0, 0.0, 
+                                              sample.headwind, 0.0, RideFile::NoTemp, 0.0, 
+                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                              0.0, 0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0,0.0, 0);
+
+                        // now reset the sample
+                        sample.secs = 0;
+                        sample.watts = 0;
+                        sample.cad = 0;
+                        sample.hr = 0;
+                        sample.km = 0;
+                        sample.kph = 0;
+                        sample.headwind = 0;
+                    }
+                }
             }
         }
         file.close();
 
         rideFile->setTag("Device Info", deviceInfo);
+        rideFile->setRecIntSecs(double(SAMPLERATE)/1000.0f);
 
-        //
-        // To estimate the recording interval, take the median of the
-        // first 1000 samples and round to nearest millisecond.
-        //
-        int n = rideFile->dataPoints().size();
-        n = qMin(n, 1000);
-        if (n >= 2) {
-
-            QVector<double> secs(n-1);
-            for (int i = 0; i < n-1; ++i) {
-                double now = rideFile->dataPoints()[i]->secs;
-                double then = rideFile->dataPoints()[i+1]->secs;
-                secs[i] = then - now;
-            }
-            std::sort(secs.begin(), secs.end());
-            int mid = n / 2 - 1;
-            double recint = round(secs[mid] * 1000.0) / 1000.0;
-            rideFile->setRecIntSecs(recint);
-
-        } else {
-
-            // less than 2 data points is not a valid ride file
-            errors << "Insufficient valid data in file \"" + file.fileName() + "\".";
-            delete rideFile;
-            file.close();
-            return NULL;
-        }
 
         //
         // Get date time from standard GC name
