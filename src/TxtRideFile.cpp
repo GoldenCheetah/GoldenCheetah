@@ -226,13 +226,23 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 int dt = (value.secs * 1000) - (last * 1000);
                 last = value.secs;
 
+                //
+                // AGGREGATE INTO SAMPLES
+                //
                 while (dt) {
 
+                    // we keep track of how much time has been aggregated
+                    // into sample, so 'need' is whats left to aggregate 
+                    // for the full sample
                     int need = SAMPLERATE - sample.secs;
 
                     // aggregate
                     if (dt < need) {
 
+                        // the entire sample read is less than we need
+                        // so aggregate the whole lot and wait fore more
+                        // data to be read. If there is no more data then
+                        // this will be lost, we don't keep incomplete samples
                         sample.secs += dt;
                         sample.watts += float(dt) * value.watts;
                         sample.cad += float(dt) * value.cad;
@@ -244,6 +254,8 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
                     } else {
 
+                        // dt is more than we need to fill and entire sample
+                        // so lets just take the fraction we need
                         dt -= need;
                         sample.secs = SAMPLERATE;
                         sample.watts += float(need) * value.watts;
@@ -253,7 +265,10 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         sample.kph += float(need) * value.kph;
                         sample.headwind += float(need) * value.headwind;
 
-                        // ok, we've aggregated, lets add a sample
+                        // we've got a full sample so lets factor it
+                        // back down to the average. This is because we 
+                        // aggregate time * value and now need to get 
+                        // back to just the value.
                         sample.secs = time; time += double(SAMPLERATE) / 1000.0f;
                         sample.watts /= double(SAMPLERATE);
                         sample.cad /= double(SAMPLERATE);
@@ -262,13 +277,15 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         sample.kph /= double(SAMPLERATE);
                         sample.headwind /= double(SAMPLERATE);
 
+                        // so now we can add to the ride
                         rideFile->appendPoint(sample.secs, sample.cad, sample.hr, sample.km, 
                                               sample.kph, 0.0, sample.watts, 0.0, 0.0, 0.0, 
                                               sample.headwind, 0.0, RideFile::NoTemp, 0.0, 
                                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                               0.0, 0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0,0.0, 0);
 
-                        // now reset the sample
+                        // reset back to zero so we can aggregate
+                        // the next sample
                         sample.secs = 0;
                         sample.watts = 0;
                         sample.cad = 0;
