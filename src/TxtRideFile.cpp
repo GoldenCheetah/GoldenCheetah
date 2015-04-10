@@ -269,7 +269,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         // subtract remains of this sample from the distance for
                         // the entire sample, remembering that dk is meters and
                         // dt is milliseconds
-                        sample.km += lastK - ((float(dt)/(float(odt)) * dk) / 1000.0f);
+                        sample.km = lastK - ((float(dt)/(float(odt)) * dk) / 1000.0f);
 
                         // averaging sample data
                         sample.watts += float(need) * value.watts;
