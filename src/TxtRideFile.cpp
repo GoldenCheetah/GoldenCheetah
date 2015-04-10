@@ -122,15 +122,16 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         rideFile->setDeviceType("Computrainer/Velotron");
         rideFile->setFileFormat("Computrainer/Velotron text file (txt)");
 
-
         // for computrainer / VELOtron we need to convert from the variable rate
         // the file uses to a fixed rate since thats a base assumption across the
         // GC codebase. This parameter can be adjusted to the sample (recIntSecs) rate
         // but in milliseconds
-        const int SAMPLERATE = 1000; // 1 second samples
-        RideFilePoint sample;        // we reuse this to aggregate
-        long time = 0L;              // time in milliseconds
-        double last = 0.0f;          // last sample time seen in seconds
+        const int SAMPLERATE = 1000; // we want 1 second samples, re-used below, change to taste
+
+        RideFilePoint sample;        // we reuse this to aggregate all values
+        long time = 0L;              // current time accumulates as we run through data
+        double lastT = 0.0f;         // last sample time seen in seconds
+        double lastK = 0.0f;         // last sample distance seen in kilometers
 
         while (!is.atEnd()) {
 
@@ -223,8 +224,13 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 }
 
                 // whats the dt in microseconds
-                int dt = (value.secs * 1000) - (last * 1000);
-                last = value.secs;
+                int dt = (value.secs * 1000) - (lastT * 1000);
+                int odt = dt;
+                lastT = value.secs;
+
+                // whats the dk in meters
+                int dk = (value.km * 1000) - (lastK * 1000);
+                lastK = value.km;
 
                 //
                 // AGGREGATE INTO SAMPLES
@@ -247,7 +253,6 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         sample.watts += float(dt) * value.watts;
                         sample.cad += float(dt) * value.cad;
                         sample.hr += float(dt) * value.hr;
-                        sample.km += float(dt) * value.km;
                         sample.kph += float(dt) * value.kph;
                         sample.headwind += float(dt) * value.headwind;
                         dt = 0;
@@ -257,23 +262,24 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         // dt is more than we need to fill and entire sample
                         // so lets just take the fraction we need
                         dt -= need;
-                        sample.secs = SAMPLERATE;
+
+                        // accumulating time and distance
+                        sample.secs = time; time += double(SAMPLERATE) / 1000.0f;
+
+                        // subtract remains of this sample from the distance for
+                        // the entire sample, remembering that dk is meters and
+                        // dt is milliseconds
+                        sample.km += lastK - ((float(dt)/(float(odt)) * dk) / 1000.0f);
+
+                        // averaging sample data
                         sample.watts += float(need) * value.watts;
                         sample.cad += float(need) * value.cad;
                         sample.hr += float(need) * value.hr;
-                        sample.km += float(need) * value.km;
                         sample.kph += float(need) * value.kph;
                         sample.headwind += float(need) * value.headwind;
-
-                        // we've got a full sample so lets factor it
-                        // back down to the average. This is because we 
-                        // aggregate time * value and now need to get 
-                        // back to just the value.
-                        sample.secs = time; time += double(SAMPLERATE) / 1000.0f;
                         sample.watts /= double(SAMPLERATE);
                         sample.cad /= double(SAMPLERATE);
                         sample.hr /= double(SAMPLERATE);
-                        sample.km /= double(SAMPLERATE);
                         sample.kph /= double(SAMPLERATE);
                         sample.headwind /= double(SAMPLERATE);
 
