@@ -804,7 +804,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     _canvasPicker = NULL;
 
     // curve color object
-    curveColors = new CurveColors(this);
+    curveColors = new CurveColors(this, true);
 
     // create a background object for shading
     bg = new AllPlotBackground(this);
