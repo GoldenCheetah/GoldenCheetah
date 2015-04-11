@@ -191,8 +191,8 @@ LTMPlot::configChanged(qint32)
     }
 
     // now save state
-    curveColors->saveState();
     updateLegend();
+    curveColors->saveState();
 
     if (legend()) legend()->installEventFilter(this);
 }

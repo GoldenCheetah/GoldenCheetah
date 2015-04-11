@@ -69,7 +69,7 @@ class CurveColors : public QObject
     Q_OBJECT;
 
     public:
-        CurveColors(QwtPlot *plot) : isolated(false), plot(plot) {
+        CurveColors(QwtPlot *plot, bool allplot=false) : isolated(false), allplot(allplot), plot(plot) {
 
             // span slider appears when curve isolated
             // to enable zooming in and out
@@ -104,19 +104,30 @@ class CurveColors : public QObject
 
         void restoreState() {
 
+            // if a curve is hidden, don't show its labels we hack this
+            // by hiding any labels with the same color, a bit of a
+            // hack but works largely and avoids having to integrate
+            // with the plot object to understand the relationship between
+            // labels and curves (which is only really known by LTMPlot)
+            QList<QColor> shown;
+
+            // make all the curves visible (that should be)
+            // and remember the colors so we can show/hide 
+            // the associated labels
+            QHashIterator<QwtPlotSeriesItem *, bool> c(state);
+            while (c.hasNext()) {
+                c.next();
+                c.key()->setVisible(c.value());
+                if (c.value()) shown << static_cast<QwtPlotCurve*>(c.key())->pen().color();
+            }
+
             // show all labels
             QHashIterator<QwtPlotMarker *, QwtScaleWidget*> l(labels);
             while (l.hasNext()) {
                 l.next();
 
-                l.key()->setVisible(true);
-            }
-
-            // make all the curves visible (that should be)
-            QHashIterator<QwtPlotSeriesItem *, bool> c(state);
-            while (c.hasNext()) {
-                c.next();
-                c.key()->setVisible(c.value());
+                // we cannot hide via legend on allplot so always hide/show labels
+                l.key()->setVisible(allplot || shown.contains(l.key()->label().color()));
             }
 
             // make all the axes have the right color
@@ -216,6 +227,13 @@ class CurveColors : public QObject
             isolatedAxis = plot->axisWidget(id);
             isolatedDiv = plot->axisScaleDiv(id);
 
+            // if a curve is hidden, don't show its labels we hack this
+            // by hiding any labels with the same color, a bit of a
+            // hack but works largely and avoids having to integrate
+            // with the plot object to understand the relationship between
+            // labels and curves (which is only really known by LTMPlot)
+            QList<QColor> shown;
+
             // hide curves that are not ours
             QHashIterator<QwtPlotSeriesItem *, bool> c(state);
             while (c.hasNext()) {
@@ -223,7 +241,11 @@ class CurveColors : public QObject
 
                 // isolate on axis hover (but leave huighlighters alone)
                 if (c.key()->yAxis() == id || c.key()->yAxis() == QwtAxisId(QwtAxis::yLeft,2)) {
+
+                    // show and remember color
                     c.key()->setVisible(c.value());
+                    if (c.value()) shown << static_cast<QwtPlotCurve*>(c.key())->pen().color();
+
 
                     if (showslider && c.key()->yAxis() == id) {
 
@@ -269,14 +291,15 @@ class CurveColors : public QObject
                 if (l.value() != ours) {
                     l.key()->setVisible(false);
                 } else {
-                    l.key()->setVisible(true);
+                    // we cannot hide via legend on allplot so always hide/show labels
+                    l.key()->setVisible(allplot || shown.contains(l.key()->label().color()));
                 }
             }
 
             isolated = true;
         }
 
-        bool isolated;
+        bool isolated, allplot;
 
     public slots:
         void zoomChanged() {
