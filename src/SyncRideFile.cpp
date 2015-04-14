@@ -162,7 +162,7 @@ struct SyncFileReaderState
 
                 if ((record_training_flag & 0x01) == 0) {
                     // Only new lap
-                    rideFile->addInterval(last_interval_secs, secs, QString("%1").arg(interval));
+                    rideFile->addInterval(RideFileInterval::DEVICE, last_interval_secs, secs, QString("%1").arg(interval));
                     last_interval_secs = secs;
                     interval ++;
                 }

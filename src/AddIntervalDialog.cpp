@@ -872,7 +872,8 @@ AddIntervalDialog::addClicked()
                 new IntervalItem(ride, name, start, stop,
                                  ride->timeToDistance(start),
                                  ride->timeToDistance(stop),
-                                 allIntervals->childCount()+1);
+                                 allIntervals->childCount()+1,
+                                 RideFileInterval::USER);
             last->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             // add
             allIntervals->addChild(last);

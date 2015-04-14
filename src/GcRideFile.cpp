@@ -121,7 +121,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) 
             add.stop = stop;
             add.start = interval.attribute("start").toDouble();
             add.name = interval.attribute("name");
-            rideFile->addInterval(add.start, add.stop, add.name);
+            rideFile->addInterval(RideFileInterval::DEVICE, add.start, add.stop, add.name);
         }
     }
     std::sort(intervalStops.begin(), intervalStops.end()); // just in case

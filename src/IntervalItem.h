@@ -20,6 +20,7 @@
 #define _GC_IntervalItem_h 1
 #include "GoldenCheetah.h"
 
+#include "RideItem.h"
 #include <QtGui>
 #include <QDialog>
 #include <QLabel>
@@ -31,13 +32,22 @@ class RideFile;
 class IntervalItem : public QTreeWidgetItem
 {
     public:
+        RideFileInterval::IntervalType type;
+
         const RideFile *ride;
         double start, stop; // by Time
         double startKM, stopKM; // by Distance
         int displaySequence;
 
-        IntervalItem(const RideFile *, QString, double, double, double, double, int);
+        QString groupName;
+        QColor color;
+
+        RideItem* rideSegment_;
+
+        IntervalItem(const RideFile *, QString, double, double, double, double, int, RideFileInterval::IntervalType);
         void setDisplaySequence(int seq) { displaySequence = seq; }
+
+        RideItem* rideSegment();
 
         // used by qSort()
         bool operator< (IntervalItem right) const {

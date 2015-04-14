@@ -191,7 +191,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
 
                 // add interval
                 if (add.start != -1 && add.stop != -1) {
-                    rideFile->addInterval(round(add.start+1), round(add.stop), add.name);
+                    rideFile->addInterval(RideFileInterval::DEVICE, round(add.start+1), round(add.stop), add.name);
                 }
             }
 

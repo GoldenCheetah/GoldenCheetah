@@ -158,7 +158,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
                 if ((segmentEnd-segmentStart) >= minimumSegmentSize) {
 
                     // we have a candidate
-                    segments.append(RideFileInterval(segmentStart, segmentEnd,
+                    segments.append(RideFileInterval(RideFileInterval::USER, segmentStart, segmentEnd,
                                     QString(tr("Activity Segment #%1")).arg(++counter)));
 
                 }
@@ -177,7 +177,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
     if ((segmentEnd-segmentStart) >= minimumSegmentSize) {
 
         // we have a candidate
-        segments.append(RideFileInterval(segmentStart, segmentEnd,
+        segments.append(RideFileInterval(RideFileInterval::USER, segmentStart, segmentEnd,
                                              QString(tr("Activity Segment #%1")).arg(++counter)));
 
     }
@@ -197,7 +197,8 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
             gapnum++;
 
             // add to gap list
-            RideFileInterval *gap = new RideFileInterval(lastsecs,
+            RideFileInterval *gap = new RideFileInterval(RideFileInterval::USER,
+                                                         lastsecs,
                                                          ride.start,
                                                          QString(tr("Gap in recording #%1")).arg(gapnum));
             gaps.append(gap);
@@ -212,7 +213,8 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
         gapnum++;
 
         // add to gap list
-        RideFileInterval *gap = new RideFileInterval(lastsecs,
+        RideFileInterval *gap = new RideFileInterval(RideFileInterval::USER,
+                                                     lastsecs,
                                                      rideItem->ride()->dataPoints().last()->secs,
                                                      QString(tr("Gap in recording #%1")).arg(gapnum));
         gaps.append(gap);
@@ -223,7 +225,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
 
     // first entry in list should always be entire file
     // so we can mark the start and stop for splitting
-    segments.insert(0, RideFileInterval(rideItem->ride()->dataPoints().first()->secs,
+    segments.insert(0, RideFileInterval(RideFileInterval::USER, rideItem->ride()->dataPoints().first()->secs,
                                      rideItem->ride()->dataPoints().last()->secs,
                                      tr("Entire Activity")));
 
@@ -797,9 +799,9 @@ SplitConfirm::createRideFile(long start, long stop)
 
         if (interval.start >= startTime && interval.start <= stopTime) {
             if (interval.stop > stopTime)
-                returning->addInterval(interval.start - offset, stopTime, interval.name);
+                returning->addInterval(RideFileInterval::USER, interval.start - offset, stopTime, interval.name);
             else 
-                returning->addInterval(interval.start - offset, interval.stop - offset, interval.name);
+                returning->addInterval(RideFileInterval::USER, interval.start - offset, interval.stop - offset, interval.name);
         }
     }
     return returning;

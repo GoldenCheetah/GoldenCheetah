@@ -22,6 +22,7 @@
 #include "Athlete.h"
 #include "RideFileCache.h"
 #include "RideCacheModel.h"
+#include "RideIntervalCacheModel.h"
 #include "Specification.h"
 
 #include "Route.h"
@@ -76,6 +77,7 @@ RideCache::RideCache(Context *context) : context(context)
 
     // set model once we have the basics
     model_ = new RideCacheModel(context, this);
+    intervalModel_ = new RideIntervalCacheModel(context, this);
 
     // now refresh just in case.
     refresh();
