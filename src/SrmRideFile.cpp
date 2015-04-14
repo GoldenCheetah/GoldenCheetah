@@ -362,17 +362,17 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
         int end = qMin(marker.end - 1, result->dataPoints().size() - 1);
         double end_secs = result->dataPoints()[end]->secs + result->recIntSecs();
         if( last < start_secs )
-            result->addInterval(last, start_secs, "");
+            result->addInterval(RideFileInterval::DEVICE, last, start_secs, "");
         QString note = QString("%1").arg(i);
         if( marker.note.length() )
             note += QString(" ") + marker.note;
         if( start_secs <= end_secs )
-            result->addInterval(start_secs, end_secs, note );
+            result->addInterval(RideFileInterval::DEVICE, start_secs, end_secs, note );
         last = end_secs;
     }
     if (!markers.empty() && markers.last().end < result->dataPoints().size()) {
         double start_secs = result->dataPoints().last()->secs + result->recIntSecs();
-        result->addInterval(last, start_secs, "");
+        result->addInterval(RideFileInterval::DEVICE, last, start_secs, "");
     }
 
     file.close();

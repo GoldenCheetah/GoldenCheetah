@@ -19,9 +19,48 @@
 #include "IntervalItem.h"
 #include "RideFile.h"
 
-IntervalItem::IntervalItem(const RideFile *ride, QString name, double start, double stop, double startKM, double stopKM, int displaySequence) : ride(ride), start(start), stop(stop), startKM(startKM), stopKM(stopKM), displaySequence(displaySequence)
+IntervalItem::IntervalItem(const RideFile *ride, QString name,
+                           double start, double stop, double startKM, double stopKM, int displaySequence, RideFileInterval::IntervalType type) :
+    ride(ride), start(start), stop(stop), startKM(startKM), stopKM(stopKM), displaySequence(displaySequence),
+    rideSegment_(NULL), type(type)
 {
     setText(0, name);
+}
+
+RideItem*
+IntervalItem::rideSegment()
+{
+    if (rideSegment_ == NULL) {
+        RideFile* f = new RideFile(const_cast<RideFile*>(ride));
+
+        int start = ride->timeIndex(start);
+        int end = ride->timeIndex(stop);
+
+        for (int i = start; i <= end; ++i) {
+            const RideFilePoint *p = ride->dataPoints()[i];
+            f->appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
+                          p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, p->lrbalance,
+                          p->lte, p->rte, p->lps, p->rps,
+                          p->lpco, p->rpco, p->lppb, p->rppb, p->lppe, p->rppe, p->lpppb, p->rpppb, p->lpppe, p->rpppe,
+                          p->smo2, p->thb,
+                          p->rvert, p->rcad, p->rcontact, 0);
+
+            // derived data
+            RideFilePoint *l = f->dataPoints().last();
+            l->np = p->np;
+            l->xp = p->xp;
+            l->apower = p->apower;
+        }
+
+        //f->clearIntervals();
+        //f->addInterval(RideFileInterval::Route, start, end, "1");
+
+        QDateTime date = ride->startTime().addSecs(start);
+        rideSegment_ = new RideItem(f, date, ride->context );
+
+        rideSegment_->refresh();
+    }
+    return rideSegment_;
 }
 
 /*----------------------------------------------------------------------

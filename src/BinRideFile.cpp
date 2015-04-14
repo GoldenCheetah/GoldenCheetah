@@ -547,7 +547,7 @@ struct BinFileReaderState
             }
         }
         if (interval>1) {
-            rideFile->addInterval(last_interval_secs, secs, QString("%1").arg(interval-1));
+            rideFile->addInterval(RideFileInterval::DEVICE, last_interval_secs, secs, QString("%1").arg(interval-1));
         }
         last_interval_secs = secs;
 
@@ -739,7 +739,7 @@ struct BinFileReaderState
         }
 
         if (last_interval_secs>0) {
-            rideFile->addInterval(last_interval_secs, rideFile->dataPoints().last()->secs, QString("%1").arg(interval));
+            rideFile->addInterval(RideFileInterval::DEVICE, last_interval_secs, rideFile->dataPoints().last()->secs, QString("%1").arg(interval));
         }
         if (stop) {
             file.close();

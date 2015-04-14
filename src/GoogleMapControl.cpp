@@ -849,7 +849,7 @@ WebBridge::clickPath(double lat, double lng)
         QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
 
         QTreeWidgetItem *last = new IntervalItem(rideItem->ride(), name, point->secs, point->secs, 0, 0,
-                                    allIntervals->childCount()+1);
+                                    allIntervals->childCount()+1, RideFileInterval::USER);
         last->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
         allIntervals->addChild(last);
 

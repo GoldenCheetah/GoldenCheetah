@@ -235,7 +235,8 @@ Tab::rideSelected(RideItem*)
                                                         intervals.at(i).stop,
                                                         selected->timeToDistance(intervals.at(i).start),
                                                         selected->timeToDistance(intervals.at(i).stop),
-                                                        context->athlete->allIntervals->childCount()+1);
+                                                        context->athlete->allIntervals->childCount()+1,
+                                                        intervals.at(i).type);
                 add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
                 context->athlete->allIntervals->addChild(add);
             }

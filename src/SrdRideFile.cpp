@@ -115,7 +115,7 @@ RideFile *SrdFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
                              (60 * (w->lap_data[i].cumulative.minutes)) +
                              (3600 * w->lap_data[i].cumulative.hours);
 
-            result->addInterval(add.start, add.stop, add.name);
+            result->addInterval(RideFileInterval::DEVICE, add.start, add.stop, add.name);
         }
 
         // free up s710 resources

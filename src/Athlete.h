@@ -53,6 +53,7 @@ class Routes;
 class AthleteDirectoryStructure;
 class RideAutoImportConfig;
 class RideCache;
+class IntervalCache;
 class Context;
 class ColorEngine;
 
@@ -83,11 +84,6 @@ class Athlete : public QObject
         HrZones *hrzones_;
         PaceZones *pacezones_[2];
         void setCriticalPower(int cp);
-
-#ifdef GC_HAVE_INTERVALS
-        QSqlTableModel *sqlRouteIntervalsModel;
-        QSqlTableModel *sqlBestIntervalsModel;
-#endif
 
         // Data
         Seasons *seasons;

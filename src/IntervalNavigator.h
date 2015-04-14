@@ -87,6 +87,7 @@ class IntervalNavigator : public GcWindow
 
         void configChanged(qint32);
         void refresh();
+        void backgroundRefresh();
 
         void showEvent(QShowEvent *event);
 

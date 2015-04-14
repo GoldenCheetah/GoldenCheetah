@@ -321,7 +321,8 @@ MergeActivityWizard::combine()
             if (interval.name == QString("%1").arg(x)) {
                 interval.name = QString("%1").arg(x+intervalN);
             }
-            combined->addInterval(interval.start + timeOffset,
+            combined->addInterval(interval.type,
+                                  interval.start + timeOffset,
                                   interval.stop + timeOffset, 
                                   interval.name);
         }
@@ -380,13 +381,15 @@ MergeActivityWizard::combine()
 
         // run through what we got then
         foreach(RideFileInterval interval, ride1->intervals()) {
-            combined->addInterval(interval.start + offset1,
+            combined->addInterval(interval.type,
+                                  interval.start + offset1,
                                   interval.stop + offset1, 
                                   interval.name);
         }
         // run through what we got then
         foreach(RideFileInterval interval, ride2->intervals()) {
-            combined->addInterval(interval.start + offset2,
+            combined->addInterval(interval.type,
+                                  interval.start + offset2,
                                   interval.stop + offset2, 
                                   interval.name);
         }

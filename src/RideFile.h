@@ -30,6 +30,7 @@
 
 class RideItem;
 class RideCache;
+class IntervalCache;
 class WPrime;
 class RideFile;
 struct RideFilePoint;
@@ -87,11 +88,16 @@ class RideFileInterval
     Q_DECLARE_TR_FUNCTIONS(RideFileInterval);
 
     public:
+        enum intervaltype { DEVICE, USER, PEAK, ROUTE, LAP } types;
+        typedef enum intervaltype IntervalType;
+        QString typeString;
 
+        IntervalType type;
         double start, stop;
         QString name;
         RideFileInterval() : start(0.0), stop(0.0) {}
-        RideFileInterval(double start, double stop, QString name) : start(start), stop(stop), name(name) {}
+        RideFileInterval(IntervalType type, double start, double stop, QString name) : type(type), start(start), stop(stop), name(name) {}
+
 
         // order bu start time (and stop+name for QMap)
         bool operator< (RideFileInterval right) const { return start < right.start ||
@@ -129,6 +135,7 @@ class RideFile : public QObject // QObject to emit signals
 
         friend class RideFileCommand; // tells us we were modified
         friend class RideCache; // tells us if wbal is stale
+        friend class IntervalCache; // tells us if wbal is stale
         friend class RideItem; // derived/wbal stale
         friend class MainWindow; // tells us we were modified
         friend class Context; // tells us we were saved
@@ -224,8 +231,20 @@ class RideFile : public QObject // QObject to emit signals
 
         // Working with INTERVALS
         const QList<RideFileInterval> &intervals() const { return intervals_; }
+        void addInterval(RideFileInterval::IntervalType type, double start, double stop, const QString &name) {
+            intervals_.append(RideFileInterval(type, start, stop, name));
+        }
         void addInterval(double start, double stop, const QString &name) {
-            intervals_.append(RideFileInterval(start, stop, name));
+            intervals_.append(RideFileInterval(RideFileInterval::DEVICE, start, stop, name));
+        }
+        void addInterval(QString typeString, double start, double stop, const QString &name) {
+            RideFileInterval::IntervalType type = RideFileInterval::DEVICE;
+            if (typeString == "ROUTE") {
+                type = RideFileInterval::ROUTE;
+            } else if (typeString == "USER") {
+                type = RideFileInterval::USER;
+            }
+            intervals_.append(RideFileInterval(type, start, stop, name));
         }
         void clearIntervals();
         void fillInIntervals();
@@ -421,6 +440,7 @@ class RideFileFactory {
 
         friend class ::MetricAggregator;
         friend class ::RideCache;
+        friend class ::IntervalCache;
 
         // will become private as code should work with
         // in memory representation not on disk .. but as we

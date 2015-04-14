@@ -179,7 +179,7 @@ WkoParser::WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides)
             add.stop = datapoints.at(references.at(i)->stop)->secs + results->recIntSecs()-.001;
         else continue;
 
-        results->addInterval(add.start, add.stop, add.name);
+        results->addInterval(RideFileInterval::DEVICE, add.start, add.stop, add.name);
     }
 
     // free up temporary storage for range post processing

@@ -62,7 +62,7 @@ FitlogParser::startElement( const QString&, const QString&,
         lap++;
         double start = start_time.secsTo(convertToLocalTime(qAttributes.value("StartTime")));
         double stop = start + qAttributes.value("DurationSeconds").toDouble();
-        rideFile->addInterval(start, stop, QString("%1").arg(lap));
+        rideFile->addInterval(RideFileInterval::DEVICE, start, stop, QString("%1").arg(lap));
 
     } else if (qName == "Track") {
 

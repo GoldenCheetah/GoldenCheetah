@@ -409,6 +409,7 @@ HEADERS += \
         RideFileCommand.h \
         RideFileTableModel.h \
         RideImportWizard.h \
+        RideIntervalCacheModel.h \
         RideItem.h \
         RideMetadata.h \
         RideMetric.h \
@@ -640,6 +641,7 @@ SOURCES += \
         RideFileCommand.cpp \
         RideFileTableModel.cpp \
         RideImportWizard.cpp \
+        RideIntervalCacheModel.cpp \
         RideItem.cpp \
         RideMetadata.cpp \
         RideMetric.cpp \
