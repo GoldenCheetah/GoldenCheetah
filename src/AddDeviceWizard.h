@@ -32,6 +32,7 @@
 #include "FortiusController.h"
 #endif
 #include "ComputrainerController.h"
+#include "MonarkController.h"
 #include "ANTlocalController.h"
 #include "ANTChannel.h"
 #include "NullController.h"

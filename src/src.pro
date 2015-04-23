@@ -21,7 +21,7 @@ LIBS += -lm $${LIBZ_LIBS}
 #            5.2.0 or higher
 #
 ## common modules
-QT += xml sql network script svg concurrent
+QT += xml sql network script svg concurrent serialport
 
 lessThan(QT_MAJOR_VERSION, 5) {
 
@@ -455,6 +455,9 @@ HEADERS += \
         RealtimeController.h \
         ReferenceLineDialog.h \
         ComputrainerController.h \
+        MonarkConnection.h \
+        MonarkController.h \
+        Monark.h \
         RealtimePlot.h \
         RideAutoImportConfig.h \
         RideCache.h \
@@ -702,6 +705,9 @@ SOURCES += \
         RealtimeData.cpp \
         RealtimeController.cpp \
         ComputrainerController.cpp \
+        MonarkConnection.cpp \
+        MonarkController.cpp \
+        Monark.cpp \
         RealtimePlot.cpp \
         RealtimePlotWindow.cpp \
         ReferenceLineDialog.cpp \

@@ -36,6 +36,7 @@
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
 #include "ComputrainerController.h"
+#include "MonarkController.h"
 #include "ANTlocalController.h"
 #include "NullController.h"
 #ifdef GC_HAVE_WFAPI
@@ -644,6 +645,8 @@ TrainSidebar::configChanged(qint32)
         // to interact with the device
         if (Devices.at(i).type == DEV_CT) {
             Devices[i].controller = new ComputrainerController(this, &Devices[i]);
+        } else if (Devices.at(i).type == DEV_MONARK) {
+            Devices[i].controller = new MonarkController(this, &Devices[i]);
 #ifdef GC_HAVE_LIBUSB
         } else if (Devices.at(i).type == DEV_FORTIUS) {
             Devices[i].controller = new FortiusController(this, &Devices[i]);

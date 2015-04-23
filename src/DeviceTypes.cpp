@@ -56,6 +56,9 @@ DeviceTypes::DeviceTypes()
         tr("Racermate Computrainer Lab or Pro bike trainer with the handlebar controller "
         "connected via a USB adaptor or directly connected to a local serial port.") ,
         ":images/devices/computrainer.png"                                        },
+      { DEV_MONARK,       DEV_SERIAL,  (char *) "Monark LTx/LCx",true,    false,
+        tr("Monark USB device ") ,
+        ":images/devices/monark_lt2.png"                                        },
 #ifdef GC_HAVE_LIBUSB
       { DEV_FORTIUS,  DEV_LIBUSB,  (char *) "Tacx Fortius",          true,    false,
         tr("Tacx Fortius/iMagic bike trainer with the handlebar controller connected "
