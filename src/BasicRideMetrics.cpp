@@ -1004,7 +1004,7 @@ class Workbeat : public RideMetric {
         TotalWork *work = dynamic_cast<TotalWork*>(deps.value("total_work"));
         HeartBeats *hb = dynamic_cast<HeartBeats*>(deps.value("heartbeats"));
 
-        setValue((work->value() * hb->value()) / 10000.00f);
+        setValue((work->value() * hb->value()) / 100000.00f);
     }
     RideMetric *clone() const { return new Workbeat(*this); }
 };
