@@ -978,6 +978,48 @@ static bool addHrPw()
 
 static bool hrpwAdded = addHrPw();
 
+////////////////////////////////////////////////////////////////////////////////
+
+class Workbeat : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(Workbeats)
+
+    public:
+    Workbeat()
+    {
+        setSymbol("wb");
+        setInternalName("Workbeat stress");
+    }
+    void initialize() {
+        setName(tr("Workbeat stress"));
+        setImperialUnits("");
+        setMetricUnits("");
+        setPrecision(0);
+        setType(RideMetric::Total);
+    }
+    void compute(const RideFile *, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+        TotalWork *work = dynamic_cast<TotalWork*>(deps.value("total_work"));
+        HeartBeats *hb = dynamic_cast<HeartBeats*>(deps.value("heartbeats"));
+
+        setValue((work->value() * hb->value()) / 10000.00f);
+    }
+    RideMetric *clone() const { return new Workbeat(*this); }
+};
+
+static bool addWorkbeat()
+{
+    QVector<QString> deps;
+    deps.append("total_work");
+    deps.append("heartbeats");
+    RideMetricFactory::instance().addMetric(Workbeat(), &deps);
+    return true;
+}
+
+static bool workbeatAdded = addWorkbeat();
+
 //////////////////////////////////////////////////////////////////////
 
 class WattsRPE : public RideMetric {

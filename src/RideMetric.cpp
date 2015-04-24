@@ -107,8 +107,9 @@
 // 101 05  Feb 2015 Mark Liversedge    aPower versions of Coggan metrics aNP et al
 // 102 05  Feb 2015 Mark Liversedge    aPower versions of Skiba metrics aBikeScore et al
 // 103 23  Feb 2015 Mark Liversedge    Added total heartbeats
+// 104 24  Apr 2015 Mark Liversedge    Added Workbeat stress (Work * Heartbeats) / 10000
 
-int DBSchemaVersion = 103;
+int DBSchemaVersion = 104;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
