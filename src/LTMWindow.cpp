@@ -72,19 +72,6 @@ LTMWindow::LTMWindow(Context *context) :
     
     ltmPlot = new LTMPlot(this, context, true);
     spanSlider = new QxtSpanSlider(Qt::Horizontal, this);
-#ifdef Q_OS_MAC
-    // BUG in QMacStyle and painting of spanSlider
-    // so we use a plain style to avoid it, but only
-    // on a MAC, since win and linux are fine
-#if QT_VERSION > 0x5000
-    QStyle *style = QStyleFactory::create("fusion");
-#else
-    QStyle *style = QStyleFactory::create("Cleanlooks");
-#endif
-    spanSlider->setStyle(style);
-    scrollLeft->setStyle(style);
-    scrollRight->setStyle(style);
-#endif
     spanSlider->setFocusPolicy(Qt::NoFocus);
     spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
     spanSlider->setLowerValue(0);
@@ -113,6 +100,20 @@ LTMWindow::LTMWindow(Context *context) :
     span->addWidget(scrollRight);
     plotLayout->addWidget(ltmPlot);
     plotLayout->addLayout(span);
+
+#ifdef Q_OS_MAC
+    // BUG in QMacStyle and painting of spanSlider
+    // so we use a plain style to avoid it, but only
+    // on a MAC, since win and linux are fine
+#if QT_VERSION > 0x5000
+    QStyle *style = QStyleFactory::create("fusion");
+#else
+    QStyle *style = QStyleFactory::create("Cleanlooks");
+#endif
+    spanSlider->setStyle(style);
+    scrollLeft->setStyle(style);
+    scrollRight->setStyle(style);
+#endif
 
     // the stack of plots
     plotsWidget = new QWidget(this);
