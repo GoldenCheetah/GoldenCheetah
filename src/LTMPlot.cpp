@@ -2971,7 +2971,14 @@ LTMPlot::eventFilter(QObject *obj, QEvent *event)
             }
         }
 
-        if (replotNeeded) setData(settings);
+        if (replotNeeded) {
+            // keep min/max scale though
+            int min = axisScaleDiv(QwtPlot::xBottom).lowerBound();
+            int max = axisScaleDiv(QwtPlot::xBottom).upperBound();
+            setData(settings);
+            setAxisScale(xBottom, min, max);
+            replot();
+        }
     }
 
     // is it for other objects ?

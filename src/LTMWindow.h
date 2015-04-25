@@ -39,6 +39,7 @@
 #include <cmath>
 
 class QwtPlotPanner;
+class QxtSpanSlider;
 class QwtPlotPicker;
 class AllPlot;
 
@@ -208,6 +209,11 @@ class LTMWindow : public GcChartWindow
         void useStandardRange();
         void useThruToday();
 
+        // user changed the date range
+        void spanSliderChanged();
+        void moveLeft();
+        void moveRight();
+
         void exportData();
         QString dataTable(bool html=true); // true as html, false as csv
 
@@ -243,7 +249,7 @@ class LTMWindow : public GcChartWindow
 
         // when one curve per plot we split the settings
         QScrollArea *plotArea;
-        QWidget *plotsWidget;
+        QWidget *plotWidget, *plotsWidget;
         QVBoxLayout *plotsLayout;
         QList<LTMSettings> plotSettings;
         QList<LTMPlot *> plots;
@@ -258,6 +264,8 @@ class LTMWindow : public GcChartWindow
 
         // Widgets
         LTMPlot *ltmPlot;
+        QxtSpanSlider *spanSlider;
+        QPushButton *scrollLeft, *scrollRight;
         LTMTool *ltmTool;
 
         // reveal controls

@@ -39,6 +39,12 @@
 #include <QStyle>
 #include <QStyleFactory>
 
+// span slider specials
+#include <qxtspanslider.h>
+#include <QStyleFactory>
+#include <QStyle>
+#include <QScrollBar>
+
 #include <qwt_plot_panner.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_picker.h>
@@ -53,12 +59,62 @@ LTMWindow::LTMWindow(Context *context) :
 
     // the plot
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    ltmPlot = new LTMPlot(this, context, true);
 
-    // the stack of plots
     QPalette palette;
     palette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
 
+    // single plot
+    plotWidget = new QWidget(this);
+    plotWidget->setPalette(palette);
+    QVBoxLayout *plotLayout = new QVBoxLayout(plotWidget);
+    plotLayout->setSpacing(0);
+    plotLayout->setContentsMargins(0,0,0,0);
+    
+    ltmPlot = new LTMPlot(this, context, true);
+    spanSlider = new QxtSpanSlider(Qt::Horizontal, this);
+#ifdef Q_OS_MAC
+    // BUG in QMacStyle and painting of spanSlider
+    // so we use a plain style to avoid it, but only
+    // on a MAC, since win and linux are fine
+#if QT_VERSION > 0x5000
+    QStyle *style = QStyleFactory::create("fusion");
+#else
+    QStyle *style = QStyleFactory::create("Cleanlooks");
+#endif
+    spanSlider->setStyle(style);
+    scrollLeft->setStyle(style);
+    scrollRight->setStyle(style);
+#endif
+    spanSlider->setFocusPolicy(Qt::NoFocus);
+    spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
+    spanSlider->setLowerValue(0);
+    spanSlider->setUpperValue(15);
+
+    QFont small;
+    small.setPointSize(6);
+
+    scrollLeft = new QPushButton("<", this);
+    scrollLeft->setFont(small);
+    scrollLeft->setAutoRepeat(true);
+    scrollLeft->setFixedHeight(16);
+    scrollLeft->setFixedWidth(16);
+    scrollLeft->setContentsMargins(0,0,0,0);
+
+    scrollRight = new QPushButton(">", this);
+    scrollRight->setFont(small);
+    scrollRight->setAutoRepeat(true);
+    scrollRight->setFixedHeight(16);
+    scrollRight->setFixedWidth(16);
+    scrollRight->setContentsMargins(0,0,0,0);
+
+    QHBoxLayout *span = new QHBoxLayout;
+    span->addWidget(scrollLeft);
+    span->addWidget(spanSlider);
+    span->addWidget(scrollRight);
+    plotLayout->addWidget(ltmPlot);
+    plotLayout->addLayout(span);
+
+    // the stack of plots
     plotsWidget = new QWidget(this);
     plotsWidget->setPalette(palette);
     plotsLayout = new QVBoxLayout(plotsWidget);
@@ -109,7 +165,7 @@ LTMWindow::LTMWindow(Context *context) :
 
     // the stack
     stackWidget = new QStackedWidget(this);
-    stackWidget->addWidget(ltmPlot);
+    stackWidget->addWidget(plotWidget);
     stackWidget->addWidget(dataSummary);
     stackWidget->addWidget(plotArea);
     stackWidget->addWidget(compareplotArea);
@@ -221,6 +277,12 @@ LTMWindow::LTMWindow(Context *context) :
     // custom menu item
     connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
 
+    // normal view
+    connect(spanSlider, SIGNAL(lowerPositionChanged(int)), this, SLOT(spanSliderChanged()));
+    connect(spanSlider, SIGNAL(upperPositionChanged(int)), this, SLOT(spanSliderChanged()));
+    connect(scrollLeft, SIGNAL(clicked()), this, SLOT(moveLeft()));
+    connect(scrollRight, SIGNAL(clicked()), this, SLOT(moveRight()));
+
     configChanged(CONFIG_APPEARANCE);
 }
 
@@ -316,6 +378,44 @@ LTMWindow::refreshUpdate(QDate here)
 }
 
 void
+LTMWindow::moveLeft()
+{
+    // move across by 5% of the span, or to zero if not much left
+    int span = spanSlider->upperValue() - spanSlider->lowerValue();
+    int delta = span / 20;
+    if (delta > (spanSlider->lowerValue() - spanSlider->minimum()))
+        delta = spanSlider->lowerValue() - spanSlider->minimum();
+
+    spanSlider->setLowerValue(spanSlider->lowerValue()-delta);
+    spanSlider->setUpperValue(spanSlider->upperValue()-delta);
+
+    spanSliderChanged();
+}
+
+void
+LTMWindow::moveRight()
+{
+    // move across by 5% of the span, or to zero if not much left
+    int span = spanSlider->upperValue() - spanSlider->lowerValue();
+    int delta = span / 20;
+    if (delta > (spanSlider->maximum() - spanSlider->upperValue()))
+        delta = spanSlider->maximum() - spanSlider->upperValue();
+
+    spanSlider->setLowerValue(spanSlider->lowerValue()+delta);
+    spanSlider->setUpperValue(spanSlider->upperValue()+delta);
+
+    spanSliderChanged();
+}
+
+void
+LTMWindow::spanSliderChanged()
+{
+    // so reset the axis range for ltmPlot
+    ltmPlot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue(), spanSlider->upperValue());
+    ltmPlot->replot();
+}
+
+void
 LTMWindow::refreshPlot()
 {
     if (amVisible() == true) {
@@ -348,8 +448,12 @@ LTMWindow::refreshPlot()
                 ltmPlot->setData(&settings);
                 stackWidget->setCurrentIndex(0);
                 dirty = false;
-            }
 
+                spanSlider->setMinimum(ltmPlot->axisScaleDiv(QwtPlot::xBottom).lowerBound());
+                spanSlider->setMaximum(ltmPlot->axisScaleDiv(QwtPlot::xBottom).upperBound());
+                spanSlider->setLowerValue(spanSlider->minimum());
+                spanSlider->setUpperValue(spanSlider->maximum());
+            }
         }
     }
 }
@@ -626,6 +730,8 @@ LTMWindow::refresh()
 
         refreshPlot();
         repaint(); // title changes color when filters change
+
+        // set spanslider to limits of ltmPlot
 
     } else {
         stackDirty = dirty = true;
