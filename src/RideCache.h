@@ -41,7 +41,6 @@ class RideCacheBackgroundRefresh;
 class Specification;
 class AthleteBest;
 class RideCacheModel;
-class RideIntervalCacheModel;
 
 class RideCache : public QObject
 {
@@ -54,7 +53,6 @@ class RideCache : public QObject
 
         // table models
         RideCacheModel *model() { return model_; }
-        RideIntervalCacheModel *intervalModel() { return intervalModel_; }
 
 
         // query the cache
@@ -128,7 +126,6 @@ class RideCache : public QObject
         Context *context;
         QVector<RideItem*> rides_, reverse_, delete_;
         RideCacheModel *model_;
-        RideIntervalCacheModel *intervalModel_;
         bool exiting;
 	    double progress_; // percent
         unsigned long fingerprint; // zone configuration fingerprint
@@ -144,9 +141,6 @@ class AthleteBest
     double nvalue;
     QString value; // formatted value
     QDate date;
-#ifdef GC_HAVE_INTERVALS
-    QString fileName;
-#endif
 
     // for qsort
     bool operator< (AthleteBest right) const { return (nvalue < right.nvalue); }
