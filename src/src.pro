@@ -348,7 +348,6 @@ HEADERS += \
         HrPwWindow.h \
         IndendPlotMarker.h \
         IntervalItem.h \
-        IntervalSidebar.h \
         IntervalSummaryWindow.h \
         IntervalTreeView.h \
         JouleDevice.h \
@@ -409,15 +408,12 @@ HEADERS += \
         RideFileCommand.h \
         RideFileTableModel.h \
         RideImportWizard.h \
-        RideIntervalCacheModel.h \
         RideItem.h \
         RideMetadata.h \
         RideMetric.h \
         RideNavigator.h \
         RideNavigatorProxy.h \
         RideWindow.h \
-        IntervalNavigator.h \
-        IntervalNavigatorProxy.h \
         SaveDialogs.h \
         SmallPlot.h \
         RideSummaryWindow.h \
@@ -580,7 +576,6 @@ SOURCES += \
         HrPwWindow.cpp \
         IndendPlotMarker.cpp \
         IntervalItem.cpp \
-        IntervalSidebar.cpp \
         IntervalSummaryWindow.cpp \
         IntervalTreeView.cpp \
         JouleDevice.cpp \
@@ -641,14 +636,12 @@ SOURCES += \
         RideFileCommand.cpp \
         RideFileTableModel.cpp \
         RideImportWizard.cpp \
-        RideIntervalCacheModel.cpp \
         RideItem.cpp \
         RideMetadata.cpp \
         RideMetric.cpp \
         RideNavigator.cpp \
         RideSummaryWindow.cpp \
         RideWindow.cpp \
-        IntervalNavigator.cpp \
         Route.cpp \
         RouteItem.cpp \
         RouteParser.cpp \

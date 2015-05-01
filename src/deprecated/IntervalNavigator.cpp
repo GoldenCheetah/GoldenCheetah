@@ -23,7 +23,6 @@
 #include "RideItem.h"
 #include "IntervalNavigatorProxy.h"
 #include "RideCache.h"
-#include "RideIntervalCacheModel.h"
 #include "SearchFilterBox.h"
 #include "TabView.h"
 #include "HelpWhatsThis.h"

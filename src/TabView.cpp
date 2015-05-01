@@ -26,7 +26,6 @@
 #include "GcWindowRegistry.h"
 #include "TrainDB.h"
 #include "RideNavigator.h"
-#include "IntervalNavigator.h"
 #include "MainWindow.h"
 
 #include "Settings.h"
@@ -384,12 +383,6 @@ TabView::sidebarChanged()
         // being adjusted as the splitter gets resized and reset
         if (type == VIEW_ANALYSIS && active == false && context->tab->rideNavigator()->geometry().width() != 100)
             context->tab->rideNavigator()->setWidth(context->tab->rideNavigator()->geometry().width());
-        if (type == VIEW_INTERVAL && active == false && context->tab->routeNavigator()->geometry().width() != 100) {
-            context->tab->routeNavigator()->setWidth(context->tab->routeNavigator()->geometry().width());
-        }
-        if (type == VIEW_INTERVAL && active == false && context->tab->bestNavigator()->geometry().width() != 100) {
-            context->tab->bestNavigator()->setWidth(context->tab->bestNavigator()->geometry().width());
-        }
         setUpdatesEnabled(true);
 
     } else sidebar_->hide();

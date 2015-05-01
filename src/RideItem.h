@@ -47,7 +47,6 @@ class RideItem : public QObject
 
         friend class ::RideCache;
         friend class ::RideCacheModel;
-        friend class ::IntervalCacheModel;
 
         // ridefile
         RideFile *ride_;

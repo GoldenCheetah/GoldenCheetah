@@ -25,7 +25,6 @@ class AnalysisSidebar;
 class IntervalSidebar;
 class QDialog;
 class RideNavigator;
-class IntervalNavigator;
 
 class AnalysisView : public TabView
 {
@@ -108,27 +107,4 @@ class HomeView : public TabView
         void compareChanged(bool);
 };
 
-class IntervalView : public TabView
-{
-    Q_OBJECT
-
-    public:
-
-        IntervalView(Context *context, QStackedWidget *controls);
-        ~IntervalView();
-        void close();
-        void setRide(RideItem*ride);
-
-        IntervalNavigator *routeNavigator();
-        IntervalNavigator *bestNavigator();
-
-    public slots:
-
-        bool isBlank();
-        void compareChanged(bool);
-
-    private:
-        IntervalSidebar *intervalSidebar;
-
-};
 #endif // _GC_Views_h

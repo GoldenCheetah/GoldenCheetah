@@ -22,7 +22,6 @@
 #include "Athlete.h"
 #include "RideFileCache.h"
 #include "RideCacheModel.h"
-#include "RideIntervalCacheModel.h"
 #include "Specification.h"
 
 #include "Route.h"
@@ -77,7 +76,6 @@ RideCache::RideCache(Context *context) : context(context)
 
     // set model once we have the basics
     model_ = new RideCacheModel(context, this);
-    intervalModel_ = new RideIntervalCacheModel(context, this);
 
     // now refresh just in case.
     refresh();
@@ -193,11 +191,6 @@ RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
     last->refresh();
 
     if (dosignal) context->notifyRideAdded(last); // here so emitted BEFORE rideSelected is emitted!
-
-#ifdef GC_HAVE_INTERVALS
-    //Search routes
-    context->athlete->routes->searchRoutesInRide(last->ride());
-#endif
 
     // notify everyone to select it
     context->ride = last;
