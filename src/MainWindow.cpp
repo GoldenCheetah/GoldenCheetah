@@ -670,6 +670,8 @@ MainWindow::MainWindow(const QDir &home)
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
 #ifndef Q_OS_MAC
     viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()), QKeySequence("F11"));
+#else
+    viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()));
 #endif
     showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
@@ -911,14 +913,21 @@ MainWindow::toggleStyle()
     setToolButtons();
 }
 
-#ifndef Q_OS_MAC
 void
 MainWindow::toggleFullScreen()
 {
+#ifdef Q_OS_MAC
+    QRect screenSize = desktop->availableGeometry();
+    if (screenSize.width() > frameGeometry().width() ||
+        screenSize.height() > frameGeometry().height()) 
+        showFullScreen();
+    else
+        showNormal();
+#else
     if (fullScreen) fullScreen->toggle();
     else qDebug()<<"no fullscreen support compiled in.";
-}
 #endif
+}
 
 bool
 MainWindow::eventFilter(QObject *o, QEvent *e)
@@ -934,6 +943,15 @@ MainWindow::resizeEvent(QResizeEvent*)
 {
 #ifdef Q_OS_MAC
     if (head) {
+        QRect screenSize = desktop->availableGeometry();
+        if ((screenSize.width() > frameGeometry().width() || screenSize.height() > frameGeometry().height()) && // not fullscreen
+           (!head->isVisible() && showhideToolbar->isChecked())) // not visible and we want it
+            head->show();
+        else if ((screenSize.width() == frameGeometry().width() || screenSize.height() == frameGeometry().height()) && // fullscreen
+           (head->isVisible())) // and it is visible
+            head->hide();
+
+        // painting 
         head->updateGeometry();
         repaint();
     }
@@ -1681,9 +1699,7 @@ MainWindow::saveGCState(Context *context)
     context->showSidebar = showhideSidebar->isChecked();
     //context->showTabbar = showhideTabbar->isChecked();
     context->showLowbar = showhideLowbar->isChecked();
-#ifndef Q_OS_MAC // not on a Mac
     context->showToolbar = showhideToolbar->isChecked();
-#endif
     context->searchText = searchBox->text();
     context->viewIndex = scopebar->selected();
     context->style = styleAction->isChecked();
@@ -1695,9 +1711,7 @@ MainWindow::restoreGCState(Context *context)
 {
     // restore window state from the supplied context
     showSidebar(context->showSidebar);
-#ifndef Q_OS_MAC // not on a Mac
     showToolbar(context->showToolbar);
-#endif
     //showTabbar(context->showTabbar);
     showLowbar(context->showLowbar);
     scopebar->setSelected(context->viewIndex);
