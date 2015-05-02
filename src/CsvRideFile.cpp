@@ -164,7 +164,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     bool dfpmExists   = false;
     int iBikeVersion  = 0;
 
-    int secsIndex, minutesIndex = -1;
+    int secsIndex=-1;
+    //UNUSED int minutesIndex = -1;
 
     double precAvg=0.0;
     //double precWatts=0.0;
@@ -351,9 +352,9 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     QString header = i.next();
                     if (timeHeaderSecs.indexIn(header) != -1)  {
                         secsIndex = headers.indexOf(header);
-                    } else if (timeHeaderMins.indexIn(header) != -1)  {
+                    }/* UNUSED else if (timeHeaderMins.indexIn(header) != -1)  {
                         minutesIndex = headers.indexOf(header);
-                    }
+                    } */
                 }
             }
             else if (lineno == unitsHeader && csvType != moxy && csvType != peripedal) {
@@ -384,7 +385,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 double lte = 0.0, rte = 0.0;
                 double lps = 0.0, rps = 0.0;
                 double smo2 = 0.0, thb = 0.0;
-                double o2hb = 0.0, hhb = 0.0;
+                //UNUSED double o2hb = 0.0, hhb = 0.0;
                 int interval=0;
                 int pause=0;
 
@@ -442,8 +443,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rps = line.section(',', 18, 18).toInt();
                     smo2 = line.section(',', 19, 19).toInt();
                     thb = line.section(',', 20, 20).toInt();
-                    o2hb = line.section(',', 21, 21).toInt();
-                    hhb = line.section(',', 22, 22).toInt();
+                    //UNUSED o2hb = line.section(',', 21, 21).toInt();
+                    //UNUSED hhb = line.section(',', 22, 22).toInt();
 
                 } else if (csvType == peripedal) {
 
@@ -489,8 +490,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rte = 0;
                     lps = 0;
                     rps = 0;
-                    o2hb = 0;
-                    hhb = 0;
+                    //UNUSED o2hb = 0;
+                    //UNUSED hhb = 0;
 
                 } else if (csvType == freemotion) {
                     if (line == "Ride_Totals") {

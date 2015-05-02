@@ -322,6 +322,7 @@ Serial::name() const
 bool
 Serial::setBaudRate(int speed, QString &err)
 {
+    Q_UNUSED(err);
 
     // only really needed for Moxy 
     // so not doing a big old switch/case
