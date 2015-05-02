@@ -94,7 +94,7 @@ private:
             /** C++11 Move constructor */
             /* Matrix(Matrix&&); */
             /**Copy assignment operator */
-            Matrix& operator=(const Matrix&);
+            //UNUSED Matrix& operator=(const Matrix&);
             /** C++11 Move assignment operator */
             /* Matrix& operator=(Matrix&&); */
             void set(unsigned long row, unsigned long col, bool value);

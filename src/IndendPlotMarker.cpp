@@ -43,6 +43,7 @@ QwtIndPlotMarker::Matrix::Matrix(const Matrix& m) {
     }
 }
 
+/* UNUSED
 QwtIndPlotMarker::Matrix& QwtIndPlotMarker::Matrix::operator=(const Matrix& m){
     if((m_rows!=m.rows())||(m_cols!=m.cols())) {
         resize(m.rows(),m.cols());
@@ -54,6 +55,8 @@ QwtIndPlotMarker::Matrix& QwtIndPlotMarker::Matrix::operator=(const Matrix& m){
         }
     }
 }
+*/
+
 
  /* bool& QwtIndPlotMarker::Matrix::operator() (unsigned long row, unsigned long col) const */
 /* { */

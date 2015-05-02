@@ -91,6 +91,8 @@ static bool FixMoxyAdded = DataProcessorFactory::instance().registerProcessor(QS
 bool
 FixMoxy::postProcess(RideFile *ride, DataProcessorConfig *config=0)
 {
+    Q_UNUSED(config);
+
     // does this ride have power?
     if (ride->areDataPresent()->kph == false || ride->areDataPresent()->cad == false) return false;
 

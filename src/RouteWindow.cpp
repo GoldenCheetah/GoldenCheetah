@@ -29,9 +29,10 @@ using namespace std;
 
 #define GOOGLE_KEY "ABQIAAAAS9Z2oFR8vUfLGYSzz40VwRQ69UCJw2HkJgivzGoninIyL8-QPBTtnR-6pM84ljHLEk3PDql0e2nJmg"
 
-RouteWindow::RouteWindow(Context *context) :
-    GcWindow(context), context(context), routeItem(NULL)
+RouteWindow::RouteWindow(Context *context) : GcWindow(context)
 {
+    this->context = context;
+    this->routeItem = NULL;
     this->setTitle("Routes");
 
     view = new QWebView();
@@ -560,6 +561,9 @@ RouteWindow::renameRoute() {
 
 void
 RouteWindow::routeChanged(QTreeWidgetItem *item, int column) {
+    Q_UNUSED(item);
+    Q_UNUSED(column);
+
     qDebug() << "routeChanged";
     routes->writeRoutes();
 }

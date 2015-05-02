@@ -43,9 +43,10 @@
 }*/
 
 RouteItem::RouteItem(RouteSegment *route, const RouteRide *routeRide,
-                   QString path, Context *context) :
-    QTreeWidgetItem(ROUTE_TYPE), route(route), routeRide(routeRide),
-    ride_(NULL), context(context), isdirty(false), isedit(false), path(path)
+                    QString path, Context *context) :
+                    QTreeWidgetItem(ROUTE_TYPE),
+                    ride_(NULL), route(route), routeRide(routeRide), 
+                    context(context), isdirty(false), isedit(false), path(path)
 {
     QDateTime dateTime = routeRide->startTime.addSecs(routeRide->start);
 
@@ -90,6 +91,7 @@ RouteItem::setTextAlignment(int column, int alignment)
 void
 RouteItem::setData(int column, int role, const QVariant &value, bool write)
 {
+    Q_UNUSED(write);
     //qDebug() << "setData";
     QTreeWidgetItem::setData(column, role, value);
     //if (write)

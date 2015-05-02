@@ -235,8 +235,7 @@ MUPlot::setModel(int model)
             fastCurve->setData(fastNormal = new MUNormal(MU_FASTMEAN, 0.05f));
             fastCurve->attach(this);
 
-            QColor handleColor = QColor(Qt::magenta); // customise (?)
-            handleColor.darker(30);
+            QColor handleColor = QColor(Qt::magenta).darker(30); // customise (?)
             handleColor.setAlpha(64);
 
             // now a mean line
@@ -273,8 +272,7 @@ MUPlot::setModel(int model)
             slowCurve->setData(slowNormal = new MUNormal(MU_SLOWMEAN, 0.05f));
             slowCurve->attach(this);
 
-            QColor handleColor = GColor(CCP);
-            handleColor.darker(30);
+            QColor handleColor = GColor(CCP).darker(30);
             handleColor.setAlpha(64);
 
             // now a mean line

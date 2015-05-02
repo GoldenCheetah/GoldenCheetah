@@ -32,22 +32,28 @@ class RideFile;
 class IntervalItem : public QTreeWidgetItem
 {
     public:
-        RideFileInterval::IntervalType type;
 
-        const RideFile *ride;
-        double start, stop; // by Time
-        double startKM, stopKM; // by Distance
-        int displaySequence;
-
-        QString groupName;
-        QColor color;
-
-        RideItem* rideSegment_;
-
+        // constructors and accessors
         IntervalItem(const RideFile *, QString, double, double, double, double, int, RideFileInterval::IntervalType);
+        RideItem* rideItem() { return rideItem_; }
         void setDisplaySequence(int seq) { displaySequence = seq; }
 
-        RideItem* rideSegment();
+        // ride item we are in
+        RideItem* rideItem_;
+
+        // interval details
+        QString groupName;                   // name
+        RideFileInterval::IntervalType type; // type User, Hill etc
+        double start, stop;                  // by Time
+        double startKM, stopKM;              // by Distance
+        int displaySequence;                 // order to display on ride plots
+        QColor color;                        // color to use on plots that differentiate by color
+
+        // precomputed metrics
+        QVector<double> metrics_;
+
+        // extracted sample data
+        const RideFile *ride;
 
         // used by qSort()
         bool operator< (IntervalItem right) const {

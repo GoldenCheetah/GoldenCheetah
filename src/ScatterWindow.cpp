@@ -91,7 +91,7 @@ ScatterWindow::addrStandardChannels(QxtStringSpinBox *box)
 }
 
 ScatterWindow::ScatterWindow(Context *context) :
-    GcChartWindow(context), context(context), ride(NULL), current(NULL), stale(false)
+    GcChartWindow(context), context(context), ride(NULL), stale(false), current(NULL)
 {
     //
     // reveal controls widget

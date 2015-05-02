@@ -65,7 +65,6 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(int sani2 READ sanI2 WRITE setSanI2 USER true)
     Q_PROPERTY(int laei1 READ laeI1 WRITE setLaeI1 USER true)
     Q_PROPERTY(int laei2 READ laeI2 WRITE setLaeI2 USER true)
-    Q_PROPERTY(int laei2 READ laeI2 WRITE setLaeI2 USER true)
 
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
