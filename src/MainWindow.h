@@ -86,9 +86,7 @@ class MainWindow : public QMainWindow
         bool eventFilter(QObject*,QEvent*);
 
         // GUI
-#ifndef Q_OS_MAC
         void toggleFullScreen();
-#endif
         void aboutDialog();
         void helpWindow();
         void helpView();
