@@ -91,8 +91,7 @@ class RideFileInterval
         enum intervaltype { ALL,                    // Entire workout
                             DEVICE,                 // Came from Device (Calibration?)
                             USER,                   // User defined
-                            PEAKPOWER,              // Peak Power
-                            BEST,                   // Best Effort (auto)
+                            PEAKPOWER,              // Peak Power incl. ranking 1-10 in ride
                             ROUTE,                  // GPS Route
                             PEAKHR,                 // PEAK HR
                             CLIMB,                  // Hills and Cols
