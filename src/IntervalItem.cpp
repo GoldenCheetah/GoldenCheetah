@@ -18,6 +18,8 @@
 
 #include "IntervalItem.h"
 #include "RideFile.h"
+#include "Context.h"
+#include "Athlete.h"
 
 IntervalItem::IntervalItem(const RideFile *ride, QString name, double start, double stop, 
                            double startKM, double stopKM, int displaySequence, 
@@ -46,6 +48,60 @@ void
 IntervalItem::setFrom(IntervalItem &other)
 {
     *this = other;
+}
+
+void
+IntervalItem::refresh()
+{
+    // don't open on our account - we should be called with a ride available
+    RideFile *f = rideItem_->ride_;
+    if (!f) return;
+
+    // create a temporary ride
+    RideFile intervalRide(f);
+    for (int i = f->intervalBeginSecs(start); i>= 0 &&i < f->dataPoints().size(); ++i) {
+
+        // iterate
+        const RideFilePoint *p = f->dataPoints()[i];
+        if (p->secs > stop) break;
+
+        // append all values
+        intervalRide.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
+                    p->watts, p->alt, p->lon, p->lat, p->headwind,
+                    p->slope, p->temp, p->lrbalance,
+                    p->lte, p->rte, p->lps, p->rps,
+                    p->lpco, p->rpco, p->lppb, p->rppb, p->lppe, p->rppe, p->lpppb, p->rpppb, p->lpppe, p->rpppe,
+                    p->smo2, p->thb, p->rvert, p->rcad, p->rcontact, 0);
+
+        // copy derived data
+        RideFilePoint *l = intervalRide.dataPoints().last();
+        l->np = p->np;
+        l->xp = p->xp;
+        l->apower = p->apower;
+    }
+
+    // we created a blank ride (?)
+    if (intervalRide.dataPoints().size() == 0) return;
+
+    // ok, lets collect the metrics
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(rideItem_->context, &intervalRide, rideItem_->context->athlete->zones(), 
+                                           rideItem_->context->athlete->hrZones(), factory.allMetrics());
+
+    // pack the metrics away and clean up if needed
+    metrics_.fill(0, factory.metricCount());
+
+    // snaffle away all the computed values into the array
+    QHashIterator<QString, RideMetricPtr> i(computed);
+    while (i.hasNext()) {
+        i.next();
+        metrics_[i.value()->index()] = i.value()->value();
+    }
+
+    // clean any bad values
+    for(int j=0; j<factory.metricCount(); j++)
+        if (std::isinf(metrics_[j]) || std::isnan(metrics_[j]))
+            metrics_[j] = 0.00f;
 }
 
 /*----------------------------------------------------------------------

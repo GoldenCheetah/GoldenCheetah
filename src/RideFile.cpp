@@ -370,8 +370,14 @@ struct ComparePointSecs {
 int
 RideFile::intervalBegin(const RideFileInterval &interval) const
 {
+    return intervalBeginSecs(interval.start);
+}
+
+int
+RideFile::intervalBeginSecs(const double secs) const
+{
     RideFilePoint p;
-    p.secs = interval.start;
+    p.secs = secs;
     QVector<RideFilePoint*>::const_iterator i = std::lower_bound(
         dataPoints_.begin(), dataPoints_.end(), &p, ComparePointSecs());
     if (i == dataPoints_.end())

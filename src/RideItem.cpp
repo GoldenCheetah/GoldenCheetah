@@ -555,9 +555,6 @@ RideItem::updateIntervals()
     // add those automatically for HR and Power where those
     // data series are present
 
-    // get metric factory
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-
     // ride start and end
     RideFilePoint *begin = f->dataPoints().first();
     RideFilePoint *end = f->dataPoints().last();
@@ -575,6 +572,7 @@ RideItem::updateIntervals()
     entire->rideItem_ = this;
     intervals_ << entire;
 
+    int count = 1;
     foreach(RideFileInterval interval, f->intervals()) {
 
         // skip peaks, they're autodiscovered now
@@ -589,37 +587,6 @@ RideItem::updateIntervals()
         // skip empty backward intervals
         if (interval.start >= interval.stop) continue;
 
-        // create a temporary ride
-        RideFile intervalRide(f);
-        int count = 1;
-        for (int i = f->intervalBegin(interval); i>= 0 &&i < f->dataPoints().size(); ++i) {
-
-            // iterate
-            const RideFilePoint *p = f->dataPoints()[i];
-            if (p->secs > interval.stop) break;
-
-            // append all values
-            intervalRide.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
-                        p->watts, p->alt, p->lon, p->lat, p->headwind,
-                        p->slope, p->temp, p->lrbalance,
-                        p->lte, p->rte, p->lps, p->rps,
-                        p->lpco, p->rpco, p->lppb, p->rppb, p->lppe, p->rppe, p->lpppb, p->rpppb, p->lpppe, p->rpppe,
-                        p->smo2, p->thb, p->rvert, p->rcad, p->rcontact, 0);
-
-            // copy derived data
-            RideFilePoint *l = intervalRide.dataPoints().last();
-            l->np = p->np;
-            l->xp = p->xp;
-            l->apower = p->apower;
-        }
-
-        // we created a blank ride (?)
-        if (intervalRide.dataPoints().size() == 0) continue;
-
-        // ok, lets collect the metrics
-        QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(context, &intervalRide, context->athlete->zones(), 
-                                               context->athlete->hrZones(), factory.allMetrics());
-
         // create a new interval item
         IntervalItem *intervalItem = new IntervalItem(f, interval.name, 
                                                       interval.start, interval.stop, 
@@ -627,25 +594,10 @@ RideItem::updateIntervals()
                                                       f->timeToDistance(interval.stop),
                                                       count++,  // sequence defaults to count
                                                       RideFileInterval::USER);
-        intervalItem->rideItem_ = this;
+        intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
+        intervalItem->refresh();        // XXX will get called in constructore when refactor
         intervals_ << intervalItem;
 
-        // pack the metrics away and clean up if needed
-        intervalItem->metrics_.fill(0, factory.metricCount());
-
-        // snaffle away all the computed values into the array
-        QHashIterator<QString, RideMetricPtr> i(computed);
-        while (i.hasNext()) {
-            i.next();
-            intervalItem->metrics_[i.value()->index()] = i.value()->value();
-        }
-
-        // clean any bad values
-        for(int j=0; j<factory.metricCount(); j++)
-            if (std::isinf(metrics_[j]) || std::isnan(metrics_[j]))
-                intervalItem->metrics_[j] = 0.00f;
-
-        // debug
         //qDebug()<<"interval:"<<interval.name<<interval.start<<interval.stop<<"f:"<<begin->secs<<end->secs;
     }
 
