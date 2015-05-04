@@ -332,7 +332,7 @@ BestIntervalDialog::addClicked()
                                  ride->timeToDistance(start),
                                  ride->timeToDistance(stop),
                                  allIntervals->childCount()+1,
-                                 RideFileInterval::PEAK); // TODO not always PEAK...
+                                 RideFileInterval::PEAKPOWER); // TODO not always PEAK...
             last->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             // add
             allIntervals->addChild(last);

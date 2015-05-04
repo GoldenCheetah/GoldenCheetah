@@ -31,6 +31,7 @@ struct RideDBContext {
     // Set during parser processing, using same
     // naming conventions as yacc/lex -p
     RideItem item;
+    IntervalItem interval;
 
     // term state data is held in these variables
     QString JsonString;
@@ -63,7 +64,7 @@ void RideDBerror(void*jc, const char *error) // used by parser aka yyerror()
 %parse-param { struct RideDBContext *jc }
 
 %token STRING
-%token VERSION RIDES METRICS TAGS
+%token VERSION RIDES METRICS TAGS INTERVALS
 
 %start document
 %%
@@ -112,6 +113,7 @@ ride: '{' rideelement_list '}'                                  {
                                                                     // overwrite with prior data
                                                                     jc->item.metadata().clear();
                                                                     jc->item.metrics().fill(0.0f);
+                                                                    jc->item.clearIntervals();
                                                                     jc->item.fileName = "";
                                                                 }
 
@@ -119,14 +121,15 @@ ride: '{' rideelement_list '}'                                  {
 rideelement_list: rideelement_list ',' rideelement              
                 | rideelement                                   ;
 
-/*
- * Ride state data
- */
 rideelement: ride_tuple
             | metrics
             | tags
+            | intervals
             ;
 
+/*
+ * RIDES
+ */
                                                                 /* RideItem state data */
 ride_tuple: string ':' string                                   { 
                                                                      if ($1 == "filename") jc->item.fileName = $3;
@@ -140,6 +143,7 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "isSwim") jc->item.isSwim = $3.toInt();
                                                                      else if ($1 == "present") jc->item.present = $3;
                                                                      else if ($1 == "weight") jc->item.weight = $3.toDouble();
+                                                                     else if ($1 == "samples") jc->item.samples = $3.toInt() > 0 ? true : false;
                                                                      else if ($1 == "date") {
                                                                          QDateTime aslocal = QDateTime::fromString($3, DATETIME_FORMAT);
                                                                          QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), Qt::UTC);
@@ -148,7 +152,7 @@ ride_tuple: string ':' string                                   {
                                                                 }
 
 /*
- * METRIC values
+ * RIDE METRIC values
  */
 metrics: METRICS ':' '{' metrics_list '}'                       ;
 metrics_list: metric | metrics_list ',' metric ;
@@ -161,6 +165,51 @@ metric: metric_key ':' metric_value                             /* metric comput
 
 metric_key : string                                             { jc->key = jc->JsonString; }
 metric_value : string                                           { jc->value = jc->JsonString; }
+
+/*
+ * INTERVALS
+ */
+
+intervals: INTERVALS ':' '[' intervals_list ']'                 ;
+intervals_list: intervals_list ',' interval
+                | interval
+                ;
+
+interval: '{' intervalelement_list '}'                          {
+                                                                     jc->item.addInterval(jc->interval);
+                                                                }
+
+intervalelement_list: intervalelement_list ',' interval_element
+                    | interval_element
+                    ;
+
+interval_element: interval_tuple
+                  | interval_metrics
+                  ;
+
+                                                                /* IntervalItem state data */
+interval_tuple: string ':' string                               { 
+                                                                     if ($1 == "name") jc->interval.name = $3;
+                                                                     else if ($1 == "start") jc->interval.start = $3.toDouble();
+                                                                     else if ($1 == "stop") jc->interval.stop = $3.toDouble();
+                                                                     else if ($1 == "startKM") jc->interval.startKM = $3.toDouble();
+                                                                     else if ($1 == "stopKM") jc->interval.startKM = $3.toDouble();
+                                                                     else if ($1 == "type") jc->interval.type = static_cast<RideFileInterval::intervaltype>($3.toInt());
+                                                                     else if ($1 == "color") jc->interval.color = QColor($3);
+                                                                     else if ($1 == "seq") jc->interval.start = $3.toInt();
+                                                                }
+
+interval_metrics: METRICS ':' '{' interval_metrics_list '}'                       ;
+interval_metrics_list: interval_metric | interval_metrics_list ',' interval_metric ;
+interval_metric: interval_metric_key ':' interval_metric_value                             /* metric computed value */
+                                                                { 
+                                                                    const RideMetric *m = RideMetricFactory::instance().rideMetric($1);
+                                                                    if (m) jc->interval.metrics()[m->index()] = $3.toDouble();
+                                                                    else qDebug()<<"metric not found:"<<$1;
+                                                                }
+
+interval_metric_key : string                                    { jc->key = jc->JsonString; }
+interval_metric_value : string                                  { jc->value = jc->JsonString; }
 
 /*
  * Metadata TAGS
@@ -304,6 +353,7 @@ void RideCache::save()
             stream << "\t\t\"isRun\":\"" <<item->isRun <<"\",\n";
             stream << "\t\t\"isSwim\":\"" <<item->isSwim <<"\",\n";
             stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
+            stream << "\t\t\"samples\":\"" <<(item->samples ? "1" : "0") <<"\",\n";
 
             // pre-computed metrics
             stream << "\n\t\t\"METRICS\":{\n";
@@ -313,10 +363,12 @@ void RideCache::save()
                 QString name = factory.metricName(i);
                 int index = factory.rideMetric(name)->index();
 
-                if (!firstMetric) stream << ",\n";
-                firstMetric = false;
-
-                stream << "\t\t\t\"" << name << "\":\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\"";
+                // don't output 0 values, they're set to 0 by default
+                if (item->metrics()[index] > 0.00f || item->metrics()[index] < 0.00f) {
+                    if (!firstMetric) stream << ",\n";
+                    firstMetric = false;
+                    stream << "\t\t\t\"" << name << "\":\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\"";
+                }
             }
             stream << "\n\t\t}";
 
@@ -337,6 +389,54 @@ void RideCache::save()
                 stream << "\n\t\t}";
 
             }
+
+            // intervals
+            if (item->intervals().count()) {
+
+                stream << ",\n\t\t\"INTERVALS\":[\n";
+                bool firstInterval = true;
+                foreach(IntervalItem *interval, item->intervals()) {
+
+                    // comma separate
+                    if (!firstInterval) stream << ",\n";
+                    firstInterval = false;
+
+                    stream << "\t\t\t{\n";
+                    // interval main data 
+                    stream << "\t\t\t\"name\":\"" << interval->name <<"\",\n";
+                    stream << "\t\t\t\"start\":\"" << interval->start <<"\",\n";
+                    stream << "\t\t\t\"stop\":\"" << interval->stop <<"\",\n";
+                    stream << "\t\t\t\"startKM\":\"" << interval->startKM <<"\",\n";
+                    stream << "\t\t\t\"stopKM\":\"" << interval->stopKM <<"\",\n";
+                    stream << "\t\t\t\"type\":\"" << static_cast<int>(interval->type) <<"\",\n";
+                    stream << "\t\t\t\"color\":\"" << interval->color.name() <<"\",\n";
+                    stream << "\t\t\t\"seq\":\"" << interval->displaySequence <<"\",\n";
+
+                    // pre-computed metrics
+                    stream << "\n\t\t\t\"METRICS\":{\n";
+
+                    bool firstMetric = true;
+                    for(int i=0; i<factory.metricCount(); i++) {
+                        QString name = factory.metricName(i);
+                        int index = factory.rideMetric(name)->index();
+        
+                        // don't output 0 values, they're set to 0 by default
+                        if (interval->metrics()[index] > 0.00f || interval->metrics()[index] < 0.00f) {
+                            if (!firstMetric) stream << ",\n";
+                            firstMetric = false;
+                            stream << "\t\t\t\t\"" << name << "\":\"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\"";
+                        }
+                    }
+                    stream << "\n\t\t\t\t}";
+
+                    // endof interval
+                    stream << "\n\t\t\t}";
+                }
+                // end of intervals
+                stream <<"\n\t\t]";
+
+            }
+
 
             // end of the ride
             stream << "\n\t}";

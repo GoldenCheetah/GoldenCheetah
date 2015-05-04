@@ -24,6 +24,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include <stdio.h>
 #include <QDebug>
 #include <QString>
@@ -33,8 +34,9 @@
 // version  date       who                     what
 // 1.0      Dec 2014   Mark Liversedge         initial version
 // 1.1      12 Dec 14  Mark Liversedge         added color, isRun and present
+// 1.2      03 May 15  Mark Liversedge         added intervals, samples bool and metric <> 0
 
-#define RIDEDB_VERSION "1.1"
+#define RIDEDB_VERSION "1.2"
 
 #endif
 

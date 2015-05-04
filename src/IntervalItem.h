@@ -35,14 +35,19 @@ class IntervalItem : public QTreeWidgetItem
 
         // constructors and accessors
         IntervalItem(const RideFile *, QString, double, double, double, double, int, RideFileInterval::IntervalType);
+        IntervalItem();
+
         RideItem* rideItem() { return rideItem_; }
         void setDisplaySequence(int seq) { displaySequence = seq; }
+
+        // set from other
+        void setFrom(IntervalItem &other);
 
         // ride item we are in
         RideItem* rideItem_;
 
         // interval details
-        QString groupName;                   // name
+        QString name;                   // name
         RideFileInterval::IntervalType type; // type User, Hill etc
         double start, stop;                  // by Time
         double startKM, stopKM;              // by Distance
@@ -51,6 +56,7 @@ class IntervalItem : public QTreeWidgetItem
 
         // precomputed metrics
         QVector<double> metrics_;
+        QVector<double> &metrics() { return metrics_; }
 
         // extracted sample data
         const RideFile *ride;

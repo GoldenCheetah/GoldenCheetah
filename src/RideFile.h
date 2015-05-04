@@ -88,7 +88,18 @@ class RideFileInterval
     Q_DECLARE_TR_FUNCTIONS(RideFileInterval);
 
     public:
-        enum intervaltype { DEVICE, USER, PEAK, ROUTE, LAP } types;
+        enum intervaltype { ALL,                    // Entire workout
+                            DEVICE,                 // Came from Device (Calibration?)
+                            USER,                   // User defined
+                            PEAKPOWER,              // Peak Power
+                            BEST,                   // Best Effort (auto)
+                            ROUTE,                  // GPS Route
+                            PEAKHR,                 // PEAK HR
+                            CLIMB,                  // Hills and Cols
+                            EFFORT,                 // Sustained effort
+                            LAP                     // When a loop we extract each lap
+                           } types;                 // ALWAYS ADD TO END (RideDB.json uses int values)
+
         typedef enum intervaltype IntervalType;
         QString typeString;
 
