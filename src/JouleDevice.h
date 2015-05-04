@@ -36,7 +36,7 @@ struct JouleDevice : public Device
     bool getSystemInfo(JoulePacket &response, QString &err);
 
     enum JouleType { JOULE_1_0, JOULE_GPS, JOULE_GPS_PLUS };
-    JouleType getJouleGPS(JoulePacket &versionResponse);
+    JouleType getJouleType(JoulePacket &versionResponse);
 
     bool getUnitFreeSpace(QString &txt, QString &err);
     bool getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJouleGPS, QString &err);
