@@ -603,6 +603,59 @@ RideItem::updateIntervals()
 
     // DISCOVERY
 
+    //qDebug() << "SEARCH HILLS";
+
+    int hills = 0;
+    double start = 0.0;
+    double startKm = 0.0;
+    double stop = 0.0;
+    double minAlt = -1000.0;
+    double maxAlt = -1000.0;
+    double lastAlt = -1000.0;
+
+    foreach(RideFilePoint *p, f->dataPoints()) {
+        if (minAlt == -1000.0 || minAlt > p->alt) {
+            minAlt = p->alt;
+            start = p->secs;
+            startKm = p->km;
+        }
+
+        if (maxAlt == -1000.0 || maxAlt < p->alt) {
+            maxAlt = p->alt;
+        } else if (maxAlt > p->alt+0.1*(maxAlt-minAlt)) {
+            if ((p->km - startKm >= 0.5 && (maxAlt-minAlt)/(p->km - startKm) >= 60) ||
+                (p->km - startKm >= 2.0 && (maxAlt-minAlt)/(p->km - startKm) >= 40) ||
+                (p->km - startKm >= 4.0 && (maxAlt-minAlt)/(p->km - startKm) >= 20)) {
+                //qDebug() << "NEW HILL " << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
+
+                // create a new interval item
+                IntervalItem *intervalItem = new IntervalItem(f, QString("Climb %1").arg(++hills),
+                                                              start, stop,
+                                                              f->timeToDistance(start),
+                                                              f->timeToDistance(stop),
+                                                              count++,  // sequence defaults to count
+                                                              RideFileInterval::CLIMB);
+                intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
+                intervalItem->refresh();        // XXX will get called in constructore when refactor
+                intervals_ << intervalItem;
+            } else {
+                if ((p->km - startKm) > 0.5) {
+                    //qDebug() << "NOT HILL " << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
+                    //f->addInterval(RideFileInterval::HILL, start, stop, QString("Not Hill %1").arg(++nothills));
+                }
+            }
+            minAlt = -1000.0;
+            maxAlt = -1000.0;
+            lastAlt = p->alt;
+            start = p->secs;
+            startKm = p->km;
+        } else if (lastAlt < p->alt) {
+               lastAlt = p->alt;
+               stop = p->secs;
+        }
+    }
+
+
     // TODO Search ROUTE, PEAK, HILL, ...
     //Search routes
     /*context->athlete->routes->searchRoutesInRide(this->ride());
