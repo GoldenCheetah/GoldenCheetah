@@ -106,6 +106,7 @@ void RideDBfree (void * ptr , yyscan_t /*scanner*/)
 \"METRICS\"                     return METRICS;
 \"TAGS\"                        return TAGS;
 \"VERSION\"                     return VERSION;
+\"INTERVALS\"                   return INTERVALS;
 \"([^\"]|\\\")*\"               { *yylval = unprotect(yytext); return STRING;  } /* contains non-quotes or escaped-quotes */
 [ \n\t\r]                       ;               /* we just ignore whitespace */
 .                               return yytext[0]; /* any other character, typically :, { or } */

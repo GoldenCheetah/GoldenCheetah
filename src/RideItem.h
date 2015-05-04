@@ -31,7 +31,7 @@ class RideFile;
 class RideFileCache;
 class RideCache;
 class RideCacheModel;
-class IntervalCacheModel;
+class IntervalItem;
 class Context;
 
 Q_DECLARE_METATYPE(RideItem*)
@@ -58,6 +58,8 @@ class RideItem : public QObject
         // metadata (used by navigator)
         QMap<QString,QString> metadata_;
 
+        // got any intervals
+        QList<IntervalItem*> intervals_;
 
         QStringList errors_;
 
@@ -88,6 +90,10 @@ class RideItem : public QObject
         // set metric values e.g. when working with intervals
         void setFrom(QHash<QString, RideMetricPtr>);
 
+        // add interval e.g. during load of rideDB.json
+        void addInterval(IntervalItem interval);
+        void clearIntervals() { intervals_.clear(); } // does NOT delete them
+
         // access the metric value
         double getForSymbol(QString name, bool useMetricUnits=true);
 
@@ -104,6 +110,7 @@ class RideItem : public QObject
         QString present;
         QColor color;
         bool isRun,isSwim;
+        bool samples; // has samples data
 
         // context the item was updated to
         unsigned long fingerprint; // zones
@@ -115,6 +122,7 @@ class RideItem : public QObject
         RideFile *ride(bool open=true);
         RideFileCache *fileCache();
         QVector<double> &metrics() { return metrics_; }
+        QList<IntervalItem*> &intervals() { return intervals_; }
         QMap<QString, QString> &metadata() { return metadata_; }
         const QStringList errors() { return errors_; }
         double getWeight();
@@ -152,7 +160,7 @@ class RideItem : public QObject
         bool operator>(RideItem right) const { return dateTime < right.dateTime; }
 
     private:
-        void updateAutoInterval();
+        void updateIntervals();
 };
 
 #endif // _GC_RideItem_h

@@ -321,6 +321,7 @@ struct FitFileReaderState
                         case 1: // running:
                             rideFile->setTag("Sport","Run");
                             break;
+                        default: // if we can't work it out, assume bike
                         case 2: // cycling
                             rideFile->setTag("Sport","Bike");
                             break;

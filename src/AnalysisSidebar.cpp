@@ -404,7 +404,7 @@ AnalysisSidebar::addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeS
                          ride->timeToDistance(i.start),
                          ride->timeToDistance(i.stop),
                          context->athlete->allIntervals->childCount()+1,
-                         RideFileInterval::PEAK);
+                         RideFileInterval::PEAKPOWER);
     peak->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
     context->athlete->allIntervals->addChild(peak);
 }
