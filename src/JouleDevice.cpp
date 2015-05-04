@@ -40,12 +40,12 @@
 #define ERASE_RIDE_DETAIL  0x2024
 
 static bool jouleRegistered =
-    Devices::addType("Joule 1.0 or GPS", DevicesPtr(new JouleDevices()) );
+    Devices::addType("Joule 1.0, GPS or GPS+", DevicesPtr(new JouleDevices()) );
 
 QString
 JouleDevices::downloadInstructions() const
 {
-    return (tr("Make sure the Joule (1.0 or GPS) unit is turned ON"));
+    return (tr("Make sure the Joule (1.0, GPS or GPS+) unit is turned ON"));
 }
 
 DevicePtr
@@ -115,7 +115,7 @@ JouleDevice::download( const QDir &tmpdir,
                          QList<DeviceDownloadFile> &files,
                          QString &err)
 {
-    if (JOULE_DEBUG) printf("download Joule 1.0 or GPS");
+    if (JOULE_DEBUG) printf("download Joule 1.0, GPS or GPS+");
 
     if (!dev->open(err)) {
         err = tr("ERROR: open failed: ") + err;
@@ -134,8 +134,10 @@ JouleDevice::download( const QDir &tmpdir,
         return false;
     }
 
-    bool isJouleGPS = getJouleGPS(versionResponse);
-    emit updateStatus(QString(tr("Joule %1 identified")).arg(isJouleGPS?"GPS":"1.0"));
+    bool isJouleGPS = getJouleGPS(versionResponse) == JOULE_GPS;
+    bool isJouleGPSPLUS = getJouleGPS(versionResponse) == JOULE_GPS_PLUS;
+
+    emit updateStatus(QString(tr("Joule %1 identified")).arg(isJouleGPS?"GPS":(isJouleGPSPLUS?"GPS+":"1.0")));
 
     QList<DeviceStoredRideItem> trainings;
     if (!getDownloadableRides(trainings, isJouleGPS, err))
