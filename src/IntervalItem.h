@@ -55,6 +55,7 @@ class IntervalItem : public QTreeWidgetItem
         QColor color;                        // color to use on plots that differentiate by color
 
         // precomputed metrics
+        void refresh();
         QVector<double> metrics_;
         QVector<double> &metrics() { return metrics_; }
 
