@@ -20,6 +20,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "RideCache.h"
 
 FreeSearch::FreeSearch(QObject *parent, Context *context) : QObject(parent), context(context)
@@ -93,6 +94,21 @@ QList<QString> FreeSearch::search(QString query)
             foreach(QString token, tokens) {
 
                 if (meta.value().contains(token, Qt::CaseInsensitive)) {
+                    filenames << item->fileName;
+                    goto nextItem;
+                }
+            }
+        }
+
+        // user intervals
+        foreach(IntervalItem *interval, item->intervals()) {
+
+            // just user ones
+            if (interval->type != RideFileInterval::USER) continue;
+
+            foreach (QString token, tokens) {
+
+                if (interval->name.contains(token, Qt::CaseInsensitive)) {
                     filenames << item->fileName;
                     goto nextItem;
                 }
