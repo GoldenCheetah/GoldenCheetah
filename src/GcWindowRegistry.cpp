@@ -53,7 +53,8 @@
 #include "SpinScanPlotWindow.h"
 #include "WorkoutPlotWindow.h"
 #include "BingMap.h"
-#include "RouteWindow.h"
+// Not until v4.0
+//#include "RouteWindow.h"
 
 #define VIEW_TRAIN    0x01
 #define VIEW_ANALYSIS 0x02
@@ -202,7 +203,11 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::MapWindow: returning = new MapWindow(context); break;
     case GcWindowTypes::StreetViewWindow: returning = new StreetViewWindow(context); break;
     case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(context); break;
+#if 0 // not till v4.0
     case GcWindowTypes::RouteSegment: returning = new RouteWindow(context); break;
+#else
+    case GcWindowTypes::RouteSegment: returning = new GcWindow(); break;
+#endif
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));

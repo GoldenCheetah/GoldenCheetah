@@ -469,7 +469,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
         connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
         connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
         connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));  
-        connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));  
+        connect(context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));  
 
         // Compare
         connect(context, SIGNAL(compareIntervalsStateChanged(bool)), SLOT(forceReplot()));
@@ -956,11 +956,10 @@ CriticalPowerWindow::intervalSelected()
 
     // nothing to plot
     if (!amVisible() || myRideItem == NULL) return;
-    if (context->athlete->allIntervalItems() == NULL) return; // not inited yet!
 
     // if the array hasn't been initialised properly then clean it up
     // this is because intervalsChanged gets called when selecting rides
-    if (intervalCurves.count() != context->athlete->allIntervalItems()->childCount()) {
+    if (intervalCurves.count() != myRideItem->intervals().count()) {
         // wipe away what we got, even if not visible
         // clear any interval curves -- even if we are not visible
         foreach(QwtPlotCurve *p, intervalCurves) {
@@ -972,36 +971,37 @@ CriticalPowerWindow::intervalSelected()
 
         // clear, resize to interval count and set to null
         intervalCurves.clear();
-        if (myRideItem && myRideItem->ride() && myRideItem->ride()->intervals().count())
-            for (int i=0; i< myRideItem->ride()->intervals().count(); i++)
+        if (myRideItem && myRideItem->ride() && myRideItem->intervals().count())
+            for (int i=0; i< myRideItem->intervals().count(); i++)
                 intervalCurves << NULL;
     }
 
     // which itervals are selected?
     IntervalItem *current=NULL;
-    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
-        current = static_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
+    int i=0;
+    foreach (IntervalItem*p, myRideItem->intervals()) {
         if (current != NULL) {
-            if (current->isSelected() == true) {
+            if (current->selected == true) {
                 showIntervalCurve(current, i); // set it all up
             } else {
                 hideIntervalCurve(i); // in case its shown at present
             }
         }
+        i++;
     }
     cpPlot->replot();
 }
 
 // user hovered over an interval
 void
-CriticalPowerWindow::intervalHover(RideFileInterval x)
+CriticalPowerWindow::intervalHover(IntervalItem* x)
 {
     // ignore in compare mode
     if (!amVisible() || context->isCompareIntervals) return;
 
     // do we need to fill with nulls ?
-    if (intervalCurves.count() == 0 && myRideItem && myRideItem->ride() && myRideItem->ride()->intervals().count())
-        for (int i=0; i< myRideItem->ride()->intervals().count(); i++)
+    if (intervalCurves.count() == 0 && myRideItem && myRideItem->ride() && myRideItem->intervals().count())
+        for (int i=0; i< myRideItem->intervals().count(); i++)
             intervalCurves << NULL;
 
     // only one interval can be hovered at any one time
@@ -1009,19 +1009,7 @@ CriticalPowerWindow::intervalHover(RideFileInterval x)
     // any nasty artefacts behind. And its always gray :)
 
     // first lets see what interval this actually is?
-    IntervalItem *current=NULL;
-    int index = -1;
-
-    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
-        current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
-        if (current != NULL) {
-            // is this the one ?
-            if (x.start == current->start && x.stop == current->stop) {
-                index = i;
-                break;
-            }
-        }
-    }
+    int index = myRideItem->intervals().indexOf(x);
 
     if (index >=0 && index < intervalCurves.count()) {
 
@@ -1031,7 +1019,7 @@ CriticalPowerWindow::intervalHover(RideFileInterval x)
             // get the data setup
             // but if there is no data for the ride series
             // selected they will still be null
-            showIntervalCurve(current, index); // set it all up
+            showIntervalCurve(x, index); // set it all up
             hideIntervalCurve(index); // in case its shown at present
         }
 
@@ -1136,7 +1124,7 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
 
     // set its color - based upon index in intervals!
     QColor intervalColor;
-    int count=context->athlete->allIntervalItems()->childCount();
+    int count=myRideItem->intervals().count();
     intervalColor.setHsv(index * (255/count), 255,255);
     QPen pen(intervalColor);
     double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
@@ -1299,7 +1287,7 @@ CriticalPowerWindow::setSeries(int index)
 
             // clear, resize to interval count and set to null
             intervalCurves.clear();
-            for (int i=0; i<= context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
+            for (int i=0; i<= myRideItem->intervals().count(); i++) intervalCurves << NULL;
 
             cpPlot->setSeries(series);
             cpPlot->setRide(currentRide);

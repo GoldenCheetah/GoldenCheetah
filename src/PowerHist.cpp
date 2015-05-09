@@ -1341,10 +1341,10 @@ PowerHist::setData(RideFileCache *cache)
 }
 
 void
-PowerHist::intervalHover(RideFileInterval x)
+PowerHist::intervalHover(IntervalItem *x)
 {
     // telling me to hide
-    if (x.start == 0 && x.stop == 0) {
+    if (x == NULL) {
         curveHover->hide();
         return;
     }
@@ -1783,7 +1783,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
 
     if (ride && hasData) {
         //setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
-        setArraysFromRide(ride, standard, context->athlete->zones(), RideFileInterval());
+        setArraysFromRide(ride, standard, context->athlete->zones(), NULL);
 
     } else {
 
@@ -1802,7 +1802,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
 }
 
 void
-PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zones, RideFileInterval hover)
+PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zones, IntervalItem *hover)
 {
     // predefined deltas for each series
     static const double wattsDelta = 1.0;
@@ -1866,8 +1866,8 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
         // selected if hovered -or- selected depending on
         // whether we were passed a blank or real RideFileInterval
         bool selected = false; 
-        if (hover.start != 0 && hover.stop != 0) {
-            if (p1->secs >= hover.start && p1->secs <= hover.stop) { selected = true; }
+        if (hover) {
+            if (p1->secs >= hover->start && p1->secs <= hover->stop) { selected = true; }
         } else {
             selected = isSelected(p1, ride->recIntSecs());
         }
@@ -2253,15 +2253,13 @@ bool PowerHist::shadePaceZones() const
     return (rideItem && rideItem->ride() && series == RideFile::kph && !zoned && shade == true);
 }
 
-bool PowerHist::isSelected(const RideFilePoint *p, double sample) {
-    if (context->athlete->allIntervalItems() != NULL) {
-        for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
-            IntervalItem *current = dynamic_cast<IntervalItem*>(context->athlete->allIntervalItems()->child(i));
-            if (current != NULL) {
-                if (current->isSelected() && p->secs+sample>current->start && p->secs<current->stop) {
-                    return true;
-                }
-            }
+bool PowerHist::isSelected(const RideFilePoint *p, double sample)
+{
+    if (!rideItem) {
+
+        foreach (IntervalItem *interval, rideItem->intervalsSelected()) {
+            if (interval->isSelected() && p->secs+sample>interval->start && p->secs<interval->stop) 
+                return true;
         }
     }
     return false;

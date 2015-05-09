@@ -27,6 +27,7 @@
 #include "Context.h"
 #include "IntervalItem.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "RideFile.h"
 #include "Units.h"
 #include "cmath"
@@ -86,7 +87,7 @@ class ScatterPlot : public QwtPlot
         void setAxisTitle(int axis, QString label);
 
     public slots:
-        void intervalHover(RideFileInterval);
+        void intervalHover(IntervalItem*);
         void mouseMoved();
         void configChanged(qint32);
 

@@ -48,6 +48,7 @@ struct SizeSettings {
 
 extern SizeSettings defaultAppearance[];
 extern float GCDPIScale; // font scaling for display
+extern QColor standardColor(int num);
 
 class Colors
 {

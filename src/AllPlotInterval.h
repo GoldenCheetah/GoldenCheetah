@@ -68,7 +68,7 @@ class AllPlotInterval : public QwtPlot
 
     public slots:
 
-        void intervalHover(RideFileInterval chosen);
+        void intervalHover(IntervalItem *chosen);
         void intervalCurveHover(QwtPlotIntervalCurve *); // for tooltip
         void intervalCurveClick(QwtPlotIntervalCurve *curve);
         void intervalCurveDblClick(QwtPlotIntervalCurve *curve);
@@ -76,21 +76,21 @@ class AllPlotInterval : public QwtPlot
         void configChanged(qint32); // when colors change
 
     protected:
-        void sortIntervals(QList<RideFileInterval> &intervals, QList<QList<RideFileInterval> > &intervalsGroups);
+        void sortIntervals(QList<IntervalItem*> &intervals, QList<QList<IntervalItem*> > &intervalsGroups);
         void placeIntervals();
         void refreshIntervalCurve();
 
         Context *context;
         RideItem *rideItem;
 
-        QList< QList<RideFileInterval> > intervalLigns;
+        QList< QList<IntervalItem*> > intervalLigns;
 
         QVector<QwtPlotMarker*>                         markers;
         //QVector<QwtPlotIntervalCurve*>  curves;
-        QMap<RideFileInterval, QwtPlotIntervalCurve*>   curves;
+        QMap<IntervalItem*, QwtPlotIntervalCurve*>   curves;
 
     private:
-        void setColorForIntervalCurve(QwtPlotIntervalCurve *intervalCurve, const RideFileInterval &interval, bool selected);
+        void setColorForIntervalCurve(QwtPlotIntervalCurve *intervalCurve, const IntervalItem *interval, bool selected);
 
         AllPlotIntervalCanvasPicker *canvasPicker; // allow point selection/hover
         LTMToolTip *tooltip;

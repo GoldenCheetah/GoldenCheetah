@@ -53,8 +53,8 @@
 class IntervalPlotData : public QwtSeriesData<QPointF>
 {
     public:
-    IntervalPlotData(AllPlot *allPlot, Context *context) :
-        allPlot(allPlot), context(context) {}
+    IntervalPlotData(AllPlot *allPlot, Context *context, AllPlotWindow *window) :
+        allPlot(allPlot), context(context), window(window) {}
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
@@ -64,6 +64,7 @@ class IntervalPlotData : public QwtSeriesData<QPointF>
     int intervalCount() const;
     AllPlot *allPlot;
     Context *context;
+    AllPlotWindow *window;
 
     virtual QPointF sample(size_t i) const;
     virtual QRectF boundingRect() const;
@@ -824,7 +825,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
 
     standard = new AllPlotObject(this);
 
-    standard->intervalHighlighterCurve->setSamples(new IntervalPlotData(this, context));
+    standard->intervalHighlighterCurve->setSamples(new IntervalPlotData(this, context, window));
 
     setAxisMaxMinor(xBottom, 0);
     enableAxis(xBottom, true);
@@ -2308,16 +2309,12 @@ AllPlot::refreshIntervalMarkers()
     }
     standard->d_mrk.clear();
     if (rideItem && rideItem->ride()) {
-        foreach(const RideFileInterval &interval, rideItem->ride()->intervals()) {
+        foreach(IntervalItem *interval, rideItem->intervals()) {
 
             bool nolabel = false;
 
-            // ignore climbs, its just for marking
-            if (interval.isClimb()) continue;
-
             // no label, but do add
-            if (interval.isBest() || interval.isPeak() || 
-                interval.isMatch()) nolabel = true;
+            if (interval->type != RideFileInterval::USER) nolabel = true;
 
             QwtPlotMarker *mrk = new QwtIndPlotMarker;
             standard->d_mrk.append(mrk);
@@ -2329,24 +2326,24 @@ AllPlot::refreshIntervalMarkers()
             else mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashLine));
 
             // put matches on second line down
-            QString name(interval.name);
-            if (interval.name.startsWith(tr("Match"))) name = QString("\n%1").arg(interval.name);
+            QString name(interval->name);
+            if (interval->name.startsWith(tr("Match"))) name = QString("\n%1").arg(interval->name);
 
             QwtText text(wanttext && !nolabel ? name : "");
 
             if (!nolabel) {
                 text.setFont(QFont("Helvetica", 10, QFont::Bold));
-                if (interval.name.startsWith(tr("Match"))) 
+                if (interval->name.startsWith(tr("Match"))) 
                     text.setColor(GColor(CWBAL));
                 else
                     text.setColor(GColor(CPLOTMARKER));
             }
 
             if (!bydist)
-                mrk->setValue(interval.start / 60.0, 0.0);
+                mrk->setValue(interval->start / 60.0, 0.0);
             else
                 mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
-                                rideItem->ride()->timeToDistance(interval.start), 0.0);
+                                interval->startKM, 0.0);
             mrk->setLabel(text);
         }
     }
@@ -6321,17 +6318,13 @@ AllPlot::distanceIndex(double km) const
 // selectedItems() member. N starts a one not zero.
 IntervalItem *IntervalPlotData::intervalNum(int n) const
 {
-    int highlighted=0;
-    const QTreeWidgetItem *allIntervals = context->athlete->allIntervalItems();
-    for (int i=0; i<allIntervals->childCount(); i++) {
-        IntervalItem *current = (IntervalItem *)allIntervals->child(i);
+    RideItem *rideItem = window->current;
+    if (!rideItem) return NULL;
 
-        if (current != NULL) {
-            if (current->isSelected() == true) ++highlighted;
-        } else {
-            return NULL;
-        }
-        if (highlighted == n) return current;
+    int highlighted=0;
+    foreach(IntervalItem *p, rideItem->intervals()) {
+        if (p->selected) highlighted++;
+        if (highlighted == n) return p;
     }
     return NULL;
 }
@@ -6339,19 +6332,13 @@ IntervalItem *IntervalPlotData::intervalNum(int n) const
 // how many intervals selected?
 int IntervalPlotData::intervalCount() const
 {
-    int highlighted;
-    highlighted = 0;
-    if (context->athlete->allIntervalItems() == NULL) return 0; // not inited yet!
+    RideItem *rideItem = window->current;
+    if (!rideItem) return 0;
 
-    const QTreeWidgetItem *allIntervals = context->athlete->allIntervalItems();
-    for (int i=0; i<allIntervals->childCount(); i++) {
-        IntervalItem *current = (IntervalItem *)allIntervals->child(i);
-        if (current != NULL) {
-            if (current->isSelected() == true) {
-                ++highlighted;
-            }
-        }
-    }
+    int highlighted=0;
+    foreach(IntervalItem *p, rideItem->intervals())
+        if (p->selected) highlighted++;
+            
     return highlighted;
 }
 
@@ -6514,7 +6501,7 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
     }
 
     // we don't want hoveing or we have intervals selected so no need to mouse over
-    if (!window->showHover->isChecked() || context->athlete->intervalWidget->selectedItems().count()) return;
+    if (!window->showHover->isChecked() || rideItem->intervalsSelected().count()) return;
 
     if (!context->isCompareIntervals && rideItem && rideItem->ride()) {
 
@@ -6522,7 +6509,7 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         if (bydist) X = rideItem->ride()->distanceToTime(X) / 60.00f;
 
         QVector<double>xdata, ydata;
-        RideFileInterval chosen;
+        IntervalItem *chosen = NULL;
 
         if (rideItem->ride()->dataPoints().count() > 1) {
 
@@ -6533,26 +6520,22 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
             int duration = rideduration;
 
             // loop through intervals and select FIRST we are in
-            foreach(RideFileInterval i, rideItem->ride()->intervals()) {
-                if (i.start < (X*60.00f) && i.stop > (X*60.00f)) {
-                    if ((i.stop-i.start) < duration) {
-                        duration = i.stop - i.start;
+            foreach(IntervalItem *i, rideItem->intervals()) {
+                if (i->start < (X*60.00f) && i->stop > (X*60.00f)) {
+                    if ((i->stop-i->start) < duration) {
+                        duration = i->stop - i->start;
                         chosen = i;
                     }
                 }
             }
 
             // we already chose it!
-            if (chosen == hovered) return;
+            if (chosen == NULL || chosen == hovered) return;
 
             if (duration < rideduration) {
 
                 // hover curve color aligns to the type of interval we are highlighting
-                QColor hbrush = GColor(CINTERVALHIGHLIGHTER); // for user defined
-                if (chosen.isPeak()) hbrush = QColor(Qt::lightGray);
-                if (chosen.isMatch()) hbrush = QColor(Qt::red);
-                if (chosen.isClimb()) hbrush = QColor(Qt::darkGreen);
-                if (chosen.isBest()) hbrush = QColor(Qt::darkYellow);
+                QColor hbrush = chosen->color;
                 hbrush.setAlpha(64);
                 standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
 
@@ -6560,8 +6543,8 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
                 if (bydist) {
 
                     double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
-                    double start = multiplier * rideItem->ride()->timeToDistance(chosen.start);
-                    double stop = multiplier * rideItem->ride()->timeToDistance(chosen.stop);
+                    double start = multiplier * chosen->startKM;
+                    double stop = multiplier * chosen->stopKM;
 
                     xdata << start;
                     ydata << -20;
@@ -6574,13 +6557,13 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
 
                 } else {
 
-                    xdata << chosen.start / 60.00f;
+                    xdata << chosen->start / 60.00f;
                     ydata << -20;
-                    xdata << chosen.start / 60.00f;
+                    xdata << chosen->start / 60.00f;
                     ydata << 100;
-                    xdata << chosen.stop / 60.00f;
+                    xdata << chosen->stop / 60.00f;
                     ydata << 100;
-                    xdata << chosen.stop / 60.00f;
+                    xdata << chosen->stop / 60.00f;
                     ydata << -20;
                 }
             }
@@ -6601,27 +6584,23 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
 }
 
 void
-AllPlot::intervalHover(RideFileInterval chosen)
+AllPlot::intervalHover(IntervalItem *chosen)
 {
     // no point!
     if (!isVisible() || chosen == hovered) return;
 
     QVector<double>xdata, ydata;
-    if (chosen != RideFileInterval()) {
+    if (chosen) {
 
         // hover curve color aligns to the type of interval we are highlighting
-        QColor hbrush = GColor(CINTERVALHIGHLIGHTER); // for user defined
-        if (chosen.isPeak()) hbrush = QColor(Qt::lightGray);
-        if (chosen.isMatch()) hbrush = QColor(Qt::red);
-        if (chosen.isClimb()) hbrush = QColor(Qt::darkGreen);
-        if (chosen.isBest()) hbrush = QColor(Qt::darkYellow);
+        QColor hbrush = chosen->color;
         hbrush.setAlpha(64);
         standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
 
         if (bydist) {
             double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
-            double start = multiplier * rideItem->ride()->timeToDistance(chosen.start);
-            double stop = multiplier * rideItem->ride()->timeToDistance(chosen.stop);
+            double start = multiplier * chosen->startKM;
+            double stop = multiplier * chosen->stopKM;
 
             xdata << start;
             ydata << -20;
@@ -6632,13 +6611,13 @@ AllPlot::intervalHover(RideFileInterval chosen)
             xdata << stop;
             ydata << -20;
         } else {
-            xdata << chosen.start / 60.00f;
+            xdata << chosen->start / 60.00f;
             ydata << -20;
-            xdata << chosen.start / 60.00f;
+            xdata << chosen->start / 60.00f;
             ydata << 100;
-            xdata << chosen.stop / 60.00f;
+            xdata << chosen->stop / 60.00f;
             ydata << 100;
-            xdata << chosen.stop / 60.00f;
+            xdata << chosen->stop / 60.00f;
             ydata << -20;
         }
     }
@@ -6773,7 +6752,7 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
     }
 
     // turn off hover when mouse leaves
-    if (event->type() == QEvent::Leave) context->notifyIntervalHover(RideFileInterval());
+    if (event->type() == QEvent::Leave) context->notifyIntervalHover(NULL);
 
     return false;
 }

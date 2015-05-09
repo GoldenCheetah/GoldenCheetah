@@ -253,7 +253,7 @@ void Athlete::selectRideFile(QString fileName)
 void
 Athlete::intervalTreeWidgetSelectionChanged()
 {
-    context->notifyIntervalHover(RideFileInterval()); // clear
+    context->notifyIntervalHover(NULL); // clear
     context->notifyIntervalSelected();
 }
 

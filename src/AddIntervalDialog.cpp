@@ -859,6 +859,8 @@ AddIntervalDialog::addClicked()
     // get stop in secs as a string from column 4
     for (int i=0; i<resultsTable->rowCount(); i++) {
 
+//XXX REFACTOR NEED TO DECIDE HOW TO DO THIS!!
+#if 0
         // is it checked?
         QCheckBox *c = (QCheckBox *)resultsTable->cellWidget(i,0);
         if (c->isChecked()) {
@@ -866,7 +868,6 @@ AddIntervalDialog::addClicked()
             double stop = resultsTable->item(i,4)->text().toDouble();
             QString name = resultsTable->item(i,2)->text();
             const RideFile *ride = context->ride ? context->ride->ride() : NULL;
-
             QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
             QTreeWidgetItem *last =
                 new IntervalItem(ride, name, start, stop,
@@ -878,6 +879,7 @@ AddIntervalDialog::addClicked()
             // add
             allIntervals->addChild(last);
         }
+#endif
     }
     context->athlete->updateRideFileIntervals();
     done(0);

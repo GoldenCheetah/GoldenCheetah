@@ -221,7 +221,7 @@ ScatterPlot::ScatterPlot(Context *context) : context(context)
     setAxisScaleDraw(QwtPlot::yLeft, sd);
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
-    connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
+    connect(context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
 
     // lets watch the mouse move...
     new mouseTracker(this);
@@ -277,9 +277,9 @@ void ScatterPlot::setData (ScatterSettings *settings)
     QVector<int> intervals;
     QMap<int,int> displaySequence;
 
-    for (int child=0; child<context->athlete->allIntervalItems()->childCount(); child++) {
-        IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(child));
-        if ((current != NULL) && current->isSelected()) {
+    for (int child=0; child<settings->ride->intervals().count(); child++) {
+        IntervalItem *current = settings->ride->intervals().at(child);
+        if (current->selected) {
             intervals.append(child);
             displaySequence.insert(current->displaySequence, intervals.count()-1);
         }
@@ -359,9 +359,9 @@ void ScatterPlot::setData (ScatterSettings *settings)
                     if (!(settings->ignore && (x == 0 && y ==0))) {
 
                         // which interval is it in?
-                        for (int idx=0; idx<intervals.count(); idx++) {
+                        for (int idx=0; idx<settings->ride->intervals().count(); idx++) {
 
-                            IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(intervals[idx]));
+                            IntervalItem *current = settings->ride->intervals().at(idx);
 
                             if (point->secs+settings->ride->ride()->recIntSecs() > current->start && point->secs< current->stop) {
                                 xvals[idx].append(x);
@@ -379,7 +379,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
                     int idx = order.value();
 
                     QColor intervalColor;
-                    intervalColor.setHsv((255/context->athlete->allIntervalItems()->childCount()) * (intervals[idx]), 255,255);
+                    intervalColor.setHsv((255/settings->ride->intervals().count()) * (intervals[idx]), 255,255);
                     // left / right are darker lighter
                     if (side) intervalColor = intervalColor.lighter(50);
 
@@ -589,7 +589,7 @@ void ScatterPlot::mouseMoved()
 {
     if (!isVisible()) return;
 
-    if (ride && ride->ride() && ride->ride()->intervals().count() >= intervalMarkers.count()) {
+    if (ride && ride->ride() && ride->intervals().count() >= intervalMarkers.count()) {
 
         // where is the mouse ?
         QPoint pos = QCursor::pos();
@@ -604,7 +604,7 @@ void ScatterPlot::mouseMoved()
             int dy = mpos.y() - pos.y();
 
             if ((dx > -6 && dx < 6) && (dy > -6 && dy < 6))
-                context->notifyIntervalHover(ride->ride()->intervals()[index]);
+                context->notifyIntervalHover(ride->intervals()[index]);
 
             index++;
         }
@@ -613,7 +613,7 @@ void ScatterPlot::mouseMoved()
 }
 
 void
-ScatterPlot::intervalHover(RideFileInterval ri)
+ScatterPlot::intervalHover(IntervalItem *ri)
 {
     if (!isVisible()) return;
     if (context->isCompareIntervals) return;
@@ -653,7 +653,7 @@ ScatterPlot::intervalHover(RideFileInterval ri)
             double y = pointType(p1, xseries, side, context->athlete->useMetricUnits, cranklength);
             double x = pointType(p1, yseries, side, context->athlete->useMetricUnits, cranklength);
 
-            if (p1->secs < ri.start || p1->secs > ri.stop) continue;
+            if (p1->secs < ri->start || p1->secs > ri->stop) continue;
 
             xArray << x;
             yArray << y;
@@ -662,8 +662,8 @@ ScatterPlot::intervalHover(RideFileInterval ri)
         // which interval is it or how many ?
         int count = 0;
         int ours = 0;
-        foreach(RideFileInterval p, ride->ride()->intervals()) {
-            if (p.start == ri.start && p.stop == ri.stop) ours = count;
+        foreach(IntervalItem *p, ride->intervals()) {
+            if (p->start == ri->start && p->stop == ri->stop) ours = count;
             count++;
         }
 
@@ -721,7 +721,7 @@ ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
     // do we have a ride with intervals to refresh ?
     int count=0;
 
-    if (settings->ride && settings->ride->ride() && settings->ride->ride()->dataPoints().count() && (count = settings->ride->ride()->intervals().count())) {
+    if (settings->ride && settings->ride->ride() && settings->ride->ride()->dataPoints().count() && (count = settings->ride->intervals().count())) {
 
         // accumulating...
         QVector<saccum> intervalAccumulator(count);
@@ -740,10 +740,10 @@ ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
             // accumulate values for each interval here ....
             for(int i=0; i < count; i++) {
 
-                RideFileInterval v = settings->ride->ride()->intervals()[i];
+                IntervalItem *v = settings->ride->intervals()[i];
 
                 // in our interval ?
-                if (point->secs >= v.start && point->secs <= v.stop) {
+                if (point->secs >= v->start && point->secs <= v->stop) {
                     intervalAccumulator[i].x += x;
                     intervalAccumulator[i].y += y;
                     intervalAccumulator[i].count++;

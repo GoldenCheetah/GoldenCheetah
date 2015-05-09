@@ -53,7 +53,7 @@ IntervalTreeView::mouseHover(QTreeWidgetItem *item, int)
     if (index >=0 && context->rideItem() && context->rideItem()->ride() &&
         context->rideItem()->ride()->intervals().count() > index) {
 
-        context->notifyIntervalHover(context->rideItem()->ride()->intervals()[index]);
+        //XXX REFACTORING XXX context->notifyIntervalHover(context->rideItem()->ride()->intervals()[index]);
     }
 }
 

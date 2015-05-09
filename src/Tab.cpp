@@ -186,6 +186,7 @@ Tab::rideSelected(RideItem*)
     QList<QTreeWidgetItem *> intervals = context->athlete->allIntervals->takeChildren();
     for (int i=0; i<intervals.count(); i++) delete intervals.at(i);
 
+#if 0 // XXX REFACTOR TODO
     // now add the intervals for the current ride
     if (context->ride) { // only if we have a ride pointer
         RideFile *selected = context->ride->ride();
@@ -207,6 +208,7 @@ Tab::rideSelected(RideItem*)
             }
         }
     }
+#endif
     // all done, so connected widgets can receive signals now
     context->athlete->intervalWidget->blockSignals(false);
 

@@ -442,7 +442,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     allPlot->_canvasPicker = new LTMCanvasPicker(allPlot);
 
-    connect(context, SIGNAL(intervalHover(RideFileInterval)), allPlot, SLOT(intervalHover(RideFileInterval)));
+    connect(context, SIGNAL(intervalHover(IntervalItem*)), allPlot, SLOT(intervalHover(IntervalItem*)));
     connect(allPlot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), allPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(allPlot->tooltip, SIGNAL(moved(const QPoint &)), this, SLOT(plotPickerMoved(const QPoint &)));
     connect(allPlot->tooltip, SIGNAL(appended(const QPoint &)), this, SLOT(plotPickerSelected(const QPoint &)));
@@ -2048,7 +2048,8 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
             allMarker1->setLabel(QString(""));
         }
 
-
+//XXX REFACTOR WHEN DECIDED HOW TO ADD A NEW INTERVAL
+#if 0
         if (newInterval) {
 
             QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
@@ -2075,6 +2076,7 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
             // now update the RideFileIntervals and all the plots etc
             context->athlete->updateRideFileIntervals();
         }
+#endif
     }
     active = false;
 }
@@ -3565,7 +3567,7 @@ AllPlotWindow::addPickers(AllPlot *_allPlot)
     _allPlot->tooltip->setEnabled(true);
 
     _allPlot->_canvasPicker = new LTMCanvasPicker(_allPlot);
-    connect(context, SIGNAL(intervalHover(RideFileInterval)), _allPlot, SLOT(intervalHover(RideFileInterval)));
+    connect(context, SIGNAL(intervalHover(IntervalItem*)), _allPlot, SLOT(intervalHover(IntervalItem*)));
     connect(_allPlot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), _allPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(_allPlot->tooltip, SIGNAL(moved(const QPoint &)), this, SLOT(plotPickerMoved(const QPoint &)));
     connect(_allPlot->tooltip, SIGNAL(appended(const QPoint &)), this, SLOT(plotPickerSelected(const QPoint &)));

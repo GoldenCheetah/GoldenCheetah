@@ -22,7 +22,7 @@
 #include "Athlete.h"
 
 IntervalItem::IntervalItem(const RideFile *ride, QString name, double start, double stop, 
-                           double startKM, double stopKM, int displaySequence, 
+                           double startKM, double stopKM, int displaySequence, QColor color,
                            RideFileInterval::IntervalType type)
 {
     this->name = name;
@@ -34,6 +34,8 @@ IntervalItem::IntervalItem(const RideFile *ride, QString name, double start, dou
     this->displaySequence = displaySequence;
     this->rideItem_ = NULL;
     this->type = type;
+    this->color = color;
+    this->selected = false;
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
     setText(0, name);
 }
@@ -48,6 +50,7 @@ void
 IntervalItem::setFrom(IntervalItem &other)
 {
     *this = other;
+    selected = false;
 }
 
 void
@@ -102,6 +105,46 @@ IntervalItem::refresh()
     for(int j=0; j<factory.metricCount(); j++)
         if (std::isinf(metrics_[j]) || std::isnan(metrics_[j]))
             metrics_[j] = 0.00f;
+}
+
+
+double
+IntervalItem::getForSymbol(QString name, bool useMetricUnits)
+{
+    if (metrics_.size()) {
+        // return the precomputed metric value
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        const RideMetric *m = factory.rideMetric(name);
+        if (m) {
+            if (useMetricUnits) return metrics_[m->index()];
+            else {
+                // little hack to set/get for conversion
+                const_cast<RideMetric*>(m)->setValue(metrics_[m->index()]);
+                return m->value(useMetricUnits);
+            }
+        }
+    }
+    return 0.0f;
+}
+
+QString
+IntervalItem::getStringForSymbol(QString name, bool useMetricUnits)
+{
+    QString returning("-");
+
+    if (metrics_.size()) {
+        // return the precomputed metric value
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        const RideMetric *m = factory.rideMetric(name);
+        if (m) {
+
+            double value = metrics_[m->index()];
+            if (std::isinf(value) || std::isnan(value)) value=0;
+            const_cast<RideMetric*>(m)->setValue(value);
+            returning = m->toString(useMetricUnits);
+        }
+    }
+    return returning;
 }
 
 /*----------------------------------------------------------------------

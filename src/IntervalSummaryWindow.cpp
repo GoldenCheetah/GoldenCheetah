@@ -46,7 +46,7 @@ IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context
 #endif
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-    connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
+    connect(context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(intervalSelected()));
 
     setHtml(GCColor::css() + "<body></body>");
@@ -60,7 +60,7 @@ void IntervalSummaryWindow::intervalSelected()
     // if no ride available don't bother - just reset for color changes
     RideItem *rideItem = const_cast<RideItem*>(context->currentRideItem());
 
-    if (context->athlete->intervalTreeWidget()->selectedItems().count() == 0 || 
+    if (rideItem->intervalsSelected().count() == 0 || 
         rideItem == NULL || rideItem->ride() == NULL) {
         // no ride just update the colors
 	    QString html = GCColor::css();
@@ -73,36 +73,13 @@ void IntervalSummaryWindow::intervalSelected()
 	QString html = GCColor::css();
     html += "<body>";
 
-    // summary of all intervals selected
-    QList<IntervalItem*> list;
-    if (context->athlete->allIntervalItems() != NULL) {
-        for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
-            IntervalItem *current = dynamic_cast<IntervalItem*>(context->athlete->allIntervalItems()->child(i));
-            if (current != NULL) {
-                if (current->isSelected()) {
-                    list << current;
-                }
-            }
-        }
-    }
-    if (list.count()>1) calcInterval(list, html);
+    // summarise all the intervals selected - this is painful!
+    //if (rideItem->intervalsSelected().count()>1) summarise(rideItem->intervalsSelected(), html);
 
     // summary for each of the currently selected intervals
-    if (context->athlete->allIntervalItems() != NULL) {
-        for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
-            IntervalItem *current = dynamic_cast<IntervalItem*>(context->athlete->allIntervalItems()->child(i));
-            if (current != NULL) {
-                if (current->isSelected()) {
-                    list << current;
-                    calcInterval(current, html);
-                }
-            }
-        }
-    }
+    foreach(IntervalItem *interval, rideItem->intervalsSelected()) html += summary(interval);
 
-    if (html == GCColor::css()+"<body>") {
-    	html += "<i>" + tr("select an interval for summary info") + "</i>";
-    }
+    if (html == GCColor::css()+"<body>") html += "<i>" + tr("select an interval for summary info") + "</i>";
 
     html += "</body>";
 	setHtml(html);
@@ -110,21 +87,21 @@ void IntervalSummaryWindow::intervalSelected()
 }
 
 void
-IntervalSummaryWindow::intervalHover(RideFileInterval x)
+IntervalSummaryWindow::intervalHover(IntervalItem* x)
 {
     // if we're not visible don't bother
     if (!isVisible()) return;
 
     // we already have summaries!
-    if (context->athlete->intervalWidget->selectedItems().count()) return;
+    if (x && x->rideItem()->intervalsSelected().count()) return;
 
     QString html = GCColor::css();
     html += "<body>";
 
-    if (x == RideFileInterval()) {
+    if (x == NULL) {
     	html += "<i>" + tr("select an interval for summary info") + "</i>";
     } else {
-        calcInterval(x, html);
+        html += summary(x);
     }
     html += "</body>";
     setHtml(html);
@@ -142,10 +119,14 @@ static bool contains(const RideFile*ride, QList<IntervalItem*> intervals, int in
     return false;
 }
 
+#if 0
 void IntervalSummaryWindow::calcInterval(QList<IntervalItem*> intervals, QString &html)
 {
+    // We need to create a special ridefile just for the selected intervals
+    // to calculate the aggregated metrics because intervals can OVERLAP!
+    // so we can't just aggregate the pre-computed metrics as this will lead
+    // to overstated totals and skewed averages.
 	const RideFile* ride = context->ride ? context->ride->ride() : NULL;
-
     RideFile f(const_cast<RideFile*>(ride));
 
     // for concatenating intervals
@@ -186,45 +167,17 @@ void IntervalSummaryWindow::calcInterval(QList<IntervalItem*> intervals, QString
         }
     }
 
-    summary(f, QString("%1 intervals").arg(intervals.count()), html);
+    // EEK this is getting complicated !
+    // WE NEED TO CREATE A TEMPORARY INTERVALITEM TOO..............
+    //XXX REFACTOR summary(QString("%1 intervals").arg(intervals.count()), html);
 }
+#endif
 
-void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
+QString IntervalSummaryWindow::summary(IntervalItem *interval)
 {
-	const RideFile* ride = context->ride ? context->ride->ride() : NULL;
+    QString html;
 
-    RideFile f(const_cast<RideFile*>(ride));
-    int start = ride->timeIndex(interval->start);
-    int end = ride->timeIndex(interval->stop);
-    for (int i = start; i <= end; ++i) {
-        const RideFilePoint *p = ride->dataPoints()[i];
-        f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
-                      p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, p->lrbalance, 
-                      p->lte, p->rte, p->lps, p->rps,
-                      p->lpco, p->rpco,
-                      p->lppb, p->rppb, p->lppe, p->rppe,
-                      p->lpppb, p->rpppb, p->lpppe, p->rpppe,
-                      p->smo2, p->thb,
-                      p->rvert, p->rcad, p->rcontact, 0);
-
-        // derived data
-        RideFilePoint *l = f.dataPoints().last();
-        l->np = p->np;
-        l->xp = p->xp;
-        l->apower = p->apower;
-    }
-
-    summary(f, interval->text(0), html);
-}
-
-void IntervalSummaryWindow::summary(RideFile &f, QString name, QString &html)
-{
-    bool metricUnits = context->athlete->useMetricUnits;
-
-    if (f.dataPoints().size() == 0) {
-        // Interval empty, do not compute any metrics
-        html += "<i>" + tr("empty interval") + "</tr>";
-    }
+    bool useMetricUnits = context->athlete->useMetricUnits;
 
     QString s;
     if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
@@ -233,21 +186,17 @@ void IntervalSummaryWindow::summary(RideFile &f, QString name, QString &html)
         s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
     QStringList intervalMetrics = s.split(",");
 
-    QHash<QString,RideMetricPtr> metrics =
-        RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), intervalMetrics);
-
-    html += "<b>" + name + "</b>";
+    html += "<b>" + interval->name + "</b>";
     html += "<table align=\"center\" width=\"90%\" ";
     html += "cellspacing=0 border=0>";
 
-    RideItem *rideItem = const_cast<RideItem*>(context->currentRideItem());
-
+    RideMetricFactory &factory = RideMetricFactory::instance();
     foreach (QString symbol, intervalMetrics) {
-        RideMetricPtr m = metrics.value(symbol);
+        const RideMetric *m = factory.rideMetric(symbol);
         if (!m) continue;
 
         // skip metrics that are not relevant for this ride
-        if (!rideItem || m->isRelevantForRide(rideItem) == false) continue;
+        if (!interval->rideItem() || m->isRelevantForRide(interval->rideItem()) == false) continue;
 
         html += "<tr>";
         // left column (names)
@@ -255,21 +204,24 @@ void IntervalSummaryWindow::summary(RideFile &f, QString name, QString &html)
 
         // right column (values)
         QString s("<td align=\"center\">%1</td>");
-        html += s.arg(m->toString(metricUnits));
+        html += s.arg(interval->getStringForSymbol(symbol, useMetricUnits));
         html += "<td align=\"left\" valign=\"bottom\">";
-        if (m->units(metricUnits) == "seconds" ||
-            m->units(metricUnits) == tr("seconds"))
+        if (m->units(useMetricUnits) == "seconds" ||
+            m->units(useMetricUnits) == tr("seconds"))
             ; // don't do anything
-        else if (m->units(metricUnits).size() > 0)
-            html += m->units(metricUnits);
+        else if (m->units(useMetricUnits).size() > 0)
+            html += m->units(useMetricUnits);
         html += "</td>";
 
         html += "</tr>";
 
     }
     html += "</table>";
+
+    return html;
 }
 
+#if 0
 void IntervalSummaryWindow::calcInterval(RideFileInterval interval, QString& html)
 {
 	const RideFile* ride = context->ride ? context->ride->ride() : NULL;
@@ -345,3 +297,4 @@ void IntervalSummaryWindow::calcInterval(RideFileInterval interval, QString& htm
     }
     html += "</table>";
 }
+#endif

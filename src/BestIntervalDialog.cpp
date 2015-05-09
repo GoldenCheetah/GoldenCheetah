@@ -311,6 +311,8 @@ BestIntervalDialog::doneClicked()
 void
 BestIntervalDialog::addClicked()
 {
+//XXX REFACTOR UPDATE WHEN DECIDE HOW TO ADD AN INTERVAL
+#if 0
     // run through the table row by row
     // and when the checkbox is shown
     // get name from column 2
@@ -339,4 +341,5 @@ BestIntervalDialog::addClicked()
         }
     }
     context->athlete->updateRideFileIntervals();
+#endif
 }
