@@ -145,6 +145,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     // seconds step of the upgrade - now everything of configuration needed should be in place in Context
     v3.upgradeLate(context);
 
+    // Routes
+    routes = new Routes(context, home->config());
+
     // get withings in if there is a cache
     QFile withingsJSON(QString("%1/withings.json").arg(context->athlete->home->cache().canonicalPath()));
     if (withingsJSON.exists() && withingsJSON.open(QFile::ReadOnly)) {

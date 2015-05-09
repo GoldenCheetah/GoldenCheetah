@@ -696,37 +696,41 @@ RideItem::updateIntervals()
         }
     }
 
-
-    // TODO Search ROUTE, PEAK, HILL, ...
     //Search routes
-    /*context->athlete->routes->searchRoutesInRide(this->ride());
+    //context->athlete->routes->searchRoutesInRide(f);
 
     // Search
+    //qDebug() << "find ROUTES "<< fileName;
+
     Routes* routes = context->athlete->routes;
     if (routes->routes.count()>0) {
         for (int n=0;n<routes->routes.count();n++) {
             RouteSegment* route = &routes->routes[n];
+            //qDebug() << "find route "<< route->getName() << n;
+
 
             for (int j=0;j<route->getRides().count();j++) {
                 RouteRide _ride = route->getRides()[j];
                 QDateTime rideStartDate = route->getRides()[j].startTime;
                 QString rideSegmentName = route->getRides()[j].filename;
 
-                if (this->ride()->startTime() == rideStartDate) {
-                    qDebug() << "find ride "<< fileName <<" for " <<rideSegmentName;
+                if (f->startTime() == rideStartDate) {
+                    //qDebug() << "find ride "<< fileName <<" for " <<rideSegmentName;
 
-                    // Verify interval in db
-                    // type, name, filename, start,
-                    //IntervalItem* interval = new IntervalItem(ride(), route->getName(), _ride.start, _ride.stop, 0, 0, j, IntervalItem::Route);
-
-                    //interval->name = route->getName();
-                    //interval->color = color;
-
-                    ride()->addInterval(RideFileInterval::ROUTE, _ride.start, _ride.stop, route->getName());
+                    // create a new interval item
+                    IntervalItem *intervalItem = new IntervalItem(f, route->getName(),
+                                                                  _ride.start, _ride.stop,
+                                                                  f->timeToDistance(_ride.start),
+                                                                  f->timeToDistance(_ride.stop),
+                                                                  count++,  // sequence defaults to count
+                                                                  RideFileInterval::ROUTE);
+                    intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
+                    intervalItem->refresh();        // XXX will get called in constructore when refactor
+                    intervals_ << intervalItem;
                 }
             }
         }
-    }*/
+    }
 }
 
 QList<IntervalItem*> RideItem::intervalsSelected()
