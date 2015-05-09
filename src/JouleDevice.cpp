@@ -437,10 +437,12 @@ JouleDevice::getJouleType(JoulePacket &versionResponse) {
     int major_version = qByteArray2Int(versionResponse.payload.left(1));
 
     if (major_version == 18)
+        return JOULE_1_0;
+    else if (major_version == 19)
         return JOULE_GPS;
     else if (major_version == 22)
         return JOULE_GPS_PLUS;
-    return JOULE_1_0;
+    return JOULE_UNKNOWN;
 }
 
 
