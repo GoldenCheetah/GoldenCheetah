@@ -614,7 +614,7 @@ class AllPlot : public QwtPlot
 
         // for tooltip
         void pointHover(QwtPlotCurve*, int);
-        void intervalHover(RideFileInterval h);
+        void intervalHover(IntervalItem *h);
 
     protected:
 
@@ -628,7 +628,7 @@ class AllPlot : public QwtPlot
         RideItem *rideItem;
         AllPlotBackground *bg;
         QSettings *settings;
-        RideFileInterval hovered;
+        IntervalItem *hovered;
 
         // controls
         bool shade_zones;

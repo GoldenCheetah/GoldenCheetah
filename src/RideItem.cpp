@@ -564,7 +564,8 @@ RideItem::updateIntervals()
                                             begin->secs, end->secs, 
                                             f->timeToDistance(begin->secs),
                                             f->timeToDistance(end->secs),
-                                            0,  // sequence defaults to count
+                                            0,
+                                            QColor(Qt::darkBlue),
                                             RideFileInterval::ALL);
 
     // same as the whole ride, not need to compute
@@ -577,6 +578,9 @@ RideItem::updateIntervals()
 
         // skip peaks, they're autodiscovered now
         if (interval.isPeak()) continue;
+
+        // skip climbs, they're autodiscovered now
+        if (interval.isClimb()) continue;
 
         // skip entire ride, they're autodiscovered too
         if (interval.start <= begin->secs && interval.stop >= end->secs) continue;
@@ -592,7 +596,8 @@ RideItem::updateIntervals()
                                                       interval.start, interval.stop, 
                                                       f->timeToDistance(interval.start),
                                                       f->timeToDistance(interval.stop),
-                                                      count++,  // sequence defaults to count
+                                                      count,
+                                                      standardColor(count++),
                                                       RideFileInterval::USER);
         intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
         intervalItem->refresh();        // XXX will get called in constructore when refactor
@@ -633,7 +638,8 @@ RideItem::updateIntervals()
                                                               start, stop,
                                                               f->timeToDistance(start),
                                                               f->timeToDistance(stop),
-                                                              count++,  // sequence defaults to count
+                                                              count++,
+                                                              QColor(Qt::green),
                                                               RideFileInterval::CLIMB);
                 intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
                 intervalItem->refresh();        // XXX will get called in constructore when refactor
@@ -688,3 +694,11 @@ RideItem::updateIntervals()
     }*/
 }
 
+QList<IntervalItem*> RideItem::intervalsSelected()
+{
+    QList<IntervalItem*> returning;
+    foreach(IntervalItem *p, intervals_) {
+        if (p->selected) returning << p;
+    }
+    return returning;
+}

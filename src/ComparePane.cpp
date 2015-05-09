@@ -54,6 +54,11 @@ static bool initStandardColors()
 }
 static bool init = initStandardColors();
 
+QColor standardColor(int num)
+{
+   return standardColors.at(num % standardColors.count());
+}
+
 // we need to fix the sort order!
 class CTableWidgetItem : public QTableWidgetItem
 {

@@ -23,6 +23,7 @@
 #include "RideFile.h"
 #include "RideCache.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "RideMetric.h"
 #include "PMCData.h"
 #include "Season.h"
@@ -921,16 +922,10 @@ RideSummaryWindow::htmlSummary()
         //
         // Interval Summary (recalculated on every refresh since they are not cached at present)
         //
-        if (ride->intervals().size() > 0) {
+        if (rideItem->intervals().size() > 0) {
 
             Season rideSeason;
-            bool wantRank=false;
-#ifdef GC_HAVE_RANKING
-            if (!ride->isRun() && !ride->isSwim() && ride->areDataPresent()->watts == true) {
-                rideSeason = context->athlete->seasons->seasonFor(ride->startTime().date());
-                wantRank = true;
-            }
-#endif
+
             bool firstRow = true;
             QString s;
             if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
@@ -941,42 +936,15 @@ RideSummaryWindow::htmlSummary()
             summary += "<p><h3>"+tr("Intervals")+"</h3>\n<p>\n";
             summary += "<table align=\"center\" width=\"95%\" ";
             summary += "cellspacing=0 border=0>";
+
             bool even = false;
-            foreach (RideFileInterval interval, ride->intervals()) {
-                RideFile f(ride);
-                for (int i = ride->intervalBegin(interval); i>= 0 &&i < ride->dataPoints().size(); ++i) {
-                    const RideFilePoint *p = ride->dataPoints()[i];
-                    if (p->secs > interval.stop)
-                        break;
-                    f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
-                                p->watts, p->alt, p->lon, p->lat, p->headwind,
-                                p->slope, p->temp, p->lrbalance,
-                                p->lte, p->rte, p->lps, p->rps,
-                                p->lpco, p->rpco, p->lppb, p->rppb, p->lppe, p->rppe, p->lpppb, p->rpppb, p->lpppe, p->rpppe,
-                                p->smo2, p->thb, p->rvert, p->rcad, p->rcontact, 0);
-
-                    // derived data
-                    RideFilePoint *l = f.dataPoints().last();
-                    l->np = p->np;
-                    l->xp = p->xp;
-                    l->apower = p->apower;
-                }
-                if (f.dataPoints().size() == 0) {
-                    // Interval empty, do not compute any metrics
-                    continue;
-                }
-
-                QHash<QString,RideMetricPtr> metrics =
-                    RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), intervalMetrics);
+            foreach (IntervalItem *interval, rideItem->intervals()) {
 
                 if (firstRow) {
                     summary += "<tr>";
                     summary += "<td align=\"center\" valign=\"bottom\">"+tr("Interval Name")+"</td>";
-                    if (wantRank) {
-                        summary += "<td align=\"center\" valign=\"bottom\">" + tr("Rank ") + rideSeason.name + "</td>";
-                    }
                     foreach (QString symbol, intervalMetrics) {
-                        RideMetricPtr m = metrics.value(symbol);
+                        const RideMetric *m = factory.rideMetric(symbol);
                         if (!m || !m->isRelevantForRide(rideItem)) continue;
                         summary += "<td align=\"center\" valign=\"bottom\">" + m->name();
                         if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds")) {
@@ -999,46 +967,16 @@ RideSummaryWindow::htmlSummary()
                 else summary += "<tr bgcolor='" + altColor.name() + "'";
                 even = !even;
 
-                // get the interval rank
-                int rank=0;
-                QString rankString="-";
-                if (wantRank) {
-
-                    if (f.dataPoints().count()) {
-
-                        int of;
-
-                        double duration=0;
-                        double total=0;
-                        foreach(RideFilePoint *p, f.dataPoints()) {
-                            total += f.recIntSecs() * p->watts;
-                            duration += f.recIntSecs();
-                        }
-                        double value = duration ? (total / duration) : 0;
-
-                        Specification spec;
-                        spec.setDateRange(DateRange(rideSeason.start, rideSeason.end));
-
-                        rank = RideFileCache::rank(context, RideFile::watts, duration, value, spec, of);
-
-                        rankString = rankingString(rank);
-
-                    } 
-                }
-
-                // top 3 efforts this season get color
-                if (wantRank && rank <= 3) summary += " id=\"sharp\" ";
                 summary += ">";
-                summary += "<td align=\"center\">" + interval.name + "</td>";
-
-                if (wantRank) summary += "<td align=\"center\">" + rankString + "</td>";
-
+                summary += "<td align=\"center\">" + interval->name + "</td>";
 
                 foreach (QString symbol, intervalMetrics) {
-                    RideMetricPtr m = metrics.value(symbol);
+
+                    const RideMetric *m = factory.rideMetric(symbol);
                     if (!m || !m->isRelevantForRide(rideItem)) continue;
+
                     QString s("<td align=\"center\">%1</td>");
-                    summary += s.arg(m->toString(useMetricUnits));
+                    summary += s.arg(interval->getStringForSymbol(symbol, useMetricUnits));
                 }
 
 

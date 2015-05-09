@@ -1218,23 +1218,18 @@ RideEditor::intervalSelected()
         table->selectionModel()->clear();
 
         // highlight selection and jump to last
-        foreach(QTreeWidgetItem *x, context->athlete->allIntervalItems()->treeWidget()->selectedItems()) {
+        foreach(IntervalItem *interval, ride->intervalsSelected()) {
 
-            IntervalItem *current = (IntervalItem*)x;
+            // what is the first dataPoint index for this interval?
+            int start = ride->ride()->timeIndex(interval->start);
+            int end = ride->ride()->timeIndex(interval->stop);
 
-            if (current != NULL && current->isSelected() == true) {
-
-                // what is the first dataPoint index for this interval?
-                int start = ride->ride()->timeIndex(current->start);
-                int end = ride->ride()->timeIndex(current->stop);
-
-                // select all the rows
-                table->selectionModel()->clearSelection();
-                table->selectionModel()->setCurrentIndex(model->index(start,0), QItemSelectionModel::Select);
-                table->selectionModel()->select(QItemSelection(model->index(start,0),
-                                                                   model->index(end,model->columnCount()-1)),
-                                                                    QItemSelectionModel::Select);
-            }
+            // select all the rows
+            table->selectionModel()->clearSelection();
+            table->selectionModel()->setCurrentIndex(model->index(start,0), QItemSelectionModel::Select);
+            table->selectionModel()->select(QItemSelection(model->index(start,0),
+                                                               model->index(end,model->columnCount()-1)),
+                                                                QItemSelectionModel::Select);
         }
     }
 }

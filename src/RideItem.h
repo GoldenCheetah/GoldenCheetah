@@ -124,6 +124,7 @@ class RideItem : public QObject
         RideFileCache *fileCache();
         QVector<double> &metrics() { return metrics_; }
         QList<IntervalItem*> &intervals() { return intervals_; }
+        QList<IntervalItem*> intervalsSelected();
         QMap<QString, QString> &metadata() { return metadata_; }
         const QStringList errors() { return errors_; }
         double getWeight();

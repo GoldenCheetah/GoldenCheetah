@@ -34,17 +34,24 @@ class IntervalItem : public QTreeWidgetItem
     public:
 
         // constructors and accessors
-        IntervalItem(const RideFile *, QString, double, double, double, double, int, RideFileInterval::IntervalType);
+        IntervalItem(const RideFile *, QString, double, double, double, double, int, QColor, RideFileInterval::IntervalType);
         IntervalItem();
 
+        // ride item we are in
         RideItem* rideItem() { return rideItem_; }
-        void setDisplaySequence(int seq) { displaySequence = seq; }
+        RideItem* rideItem_;
 
         // set from other
         void setFrom(IntervalItem &other);
 
-        // ride item we are in
-        RideItem* rideItem_;
+        // is this interval currently selected ?
+        bool selected;
+
+        // access the metric value
+        double getForSymbol(QString name, bool useMetricUnits=true);
+
+        // as a well formatted string
+        QString getStringForSymbol(QString name, bool useMetricUnits=true);
 
         // interval details
         QString name;                   // name
@@ -53,6 +60,9 @@ class IntervalItem : public QTreeWidgetItem
         double startKM, stopKM;              // by Distance
         int displaySequence;                 // order to display on ride plots
         QColor color;                        // color to use on plots that differentiate by color
+
+        // order to show on plot
+        void setDisplaySequence(int seq) { displaySequence = seq; }
 
         // precomputed metrics
         void refresh();

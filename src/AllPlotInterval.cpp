@@ -35,7 +35,7 @@
 class AllPlotIntervalData : public QwtArraySeriesData<QwtIntervalSample>
 {
     public:
-    AllPlotIntervalData(AllPlotInterval *plot, Context *context, int level, int max, RideItem *rideItem, const RideFileInterval interval) :
+    AllPlotIntervalData(AllPlotInterval *plot, Context *context, int level, int max, RideItem *rideItem, const IntervalItem *interval) :
         plot(plot), context(context), level(level), max(max), rideItem(rideItem), interval(interval) {}
 
     double x(size_t i) const ;
@@ -54,7 +54,7 @@ class AllPlotIntervalData : public QwtArraySeriesData<QwtIntervalSample>
     int max;
 
     RideItem *rideItem;
-    const RideFileInterval interval;
+    const IntervalItem *interval;
 
     virtual QwtIntervalSample sample(size_t i) const;
     virtual QRectF boundingRect() const;
@@ -110,7 +110,7 @@ AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
 
     canvasPicker = new AllPlotIntervalCanvasPicker(this);
 
-    connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
+    connect(context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
     connect(canvasPicker, SIGNAL(pointHover(QwtPlotIntervalCurve*, int)), this, SLOT(intervalCurveHover(QwtPlotIntervalCurve*)));
     connect(canvasPicker, SIGNAL(pointClicked(QwtPlotIntervalCurve*,int)), this, SLOT(intervalCurveClick(QwtPlotIntervalCurve*)));
     connect(canvasPicker, SIGNAL(pointDblClicked(QwtPlotIntervalCurve*,int)), this, SLOT(intervalCurveDblClick(QwtPlotIntervalCurve*)));
@@ -159,23 +159,23 @@ AllPlotInterval::refreshIntervals()
 }
 
 // Compare two RideFileInterval on duration.
-bool intervalBiggerThan(const RideFileInterval &i1, const RideFileInterval &i2)
+bool intervalBiggerThan(const IntervalItem* i1, const IntervalItem* i2)
 {
-    return (i1.stop-i1.start) > (i2.stop-i2.start);
+    return (i1->stop-i1->start) > (i2->stop-i2->start);
 }
 
 void
-AllPlotInterval::sortIntervals(QList<RideFileInterval> &intervals, QList< QList<RideFileInterval> > &intervalsGroups)
+AllPlotInterval::sortIntervals(QList<IntervalItem*> &intervals, QList< QList<IntervalItem*> > &intervalsGroups)
 {
     // Sort by duration
     qSort(intervals.begin(), intervals.end(), intervalBiggerThan);
 
-    QList<RideFileInterval> matchesGroup;
+    QList<IntervalItem*> matchesGroup;
 
     for (int i=0; i<intervals.count(); i++) {
-        RideFileInterval interval = intervals.at(i);
+        IntervalItem* interval = intervals.at(i);
 
-        if (groupMatch && interval.isMatch()) {
+        if (groupMatch && interval->type == RideFileInterval::MATCH) {
             matchesGroup.append(interval);
             intervals.removeOne(interval);
             //intervals.move(i, place++);
@@ -190,8 +190,8 @@ AllPlotInterval::sortIntervals(QList<RideFileInterval> &intervals, QList< QList<
 void
 AllPlotInterval::placeIntervals()
 {
-    QList<RideFileInterval> intervals = rideItem->ride()->intervals();
-    QList< QList<RideFileInterval> > intervalsGroups;
+    QList<IntervalItem*> intervals = rideItem->intervals();
+    QList< QList<IntervalItem*> > intervalsGroups;
 
     sortIntervals(intervals, intervalsGroups);
 
@@ -200,12 +200,12 @@ AllPlotInterval::placeIntervals()
     if (intervalsGroups.count()>0)
         intervalLigns.append(intervalsGroups.at(0));
     else {
-        QList<RideFileInterval> intervalsLign1;
+        QList<IntervalItem*> intervalsLign1;
         intervalLigns.append(intervalsLign1);
     }
 
     while (intervals.count()>0) {
-        const RideFileInterval &interval = intervals.first();
+        IntervalItem *interval = intervals.first();
 
         int lign = 0;
         bool placed = false;
@@ -218,8 +218,8 @@ AllPlotInterval::placeIntervals()
                 placed = true;
             }*/
 
-            foreach(const RideFileInterval &placedinterval, intervalLigns.at(lign)) {
-                if (interval.stop>placedinterval.start && interval.start<placedinterval.stop)
+            foreach(const IntervalItem* placedinterval, intervalLigns.at(lign)) {
+                if (interval->stop>placedinterval->start && interval->start<placedinterval->stop)
                     place = false;
             }
             if (place) {
@@ -229,7 +229,7 @@ AllPlotInterval::placeIntervals()
             } else {
                 lign++;
                 if (intervalLigns.count()<=lign) {
-                    QList<RideFileInterval> intervalsLign;
+                    QList<IntervalItem*> intervalsLign;
                     intervalLigns.append(intervalsLign);
                 }
             }
@@ -241,21 +241,9 @@ AllPlotInterval::placeIntervals()
 }
 
 void
-AllPlotInterval::setColorForIntervalCurve(QwtPlotIntervalCurve *intervalCurve, const RideFileInterval &interval, bool selected)
+AllPlotInterval::setColorForIntervalCurve(QwtPlotIntervalCurve *intervalCurve, const IntervalItem *interval, bool selected)
 {
-    QColor color;
-    if (interval.isPeak()) {
-        color = Qt::lightGray;
-    } else if (interval.isMatch()) {
-        color = Qt::red;
-    } else if (interval.isClimb()) {
-        color = Qt::darkGreen;
-    } else if (interval.isBest()) {
-        color = Qt::darkYellow;
-    } else {
-        color = GColor(CINTERVALHIGHLIGHTER);
-    }
-
+    QColor color = interval->color;
     QPen ihlPen = QPen(color);
     intervalCurve->setPen(ihlPen);
     QColor ihlbrush = QColor(color);
@@ -275,9 +263,9 @@ AllPlotInterval::refreshIntervalCurve()
     curves.clear();
 
     int level=0;
-    foreach(const QList<RideFileInterval> &intervalsLign, intervalLigns) {
+    foreach(const QList<IntervalItem*> &intervalsLign, intervalLigns) {
 
-        foreach(const RideFileInterval &interval, intervalsLign) {
+        foreach(IntervalItem *interval, intervalsLign) {
             QwtPlotIntervalCurve *intervalCurve = new QwtPlotIntervalCurve();
             intervalCurve->setYAxis(QwtAxis::yLeft);
 
@@ -294,13 +282,10 @@ AllPlotInterval::refreshIntervalCurve()
 }
 
 void
-AllPlotInterval::intervalHover(RideFileInterval chosen)
+AllPlotInterval::intervalHover(IntervalItem *chosen)
 {
-    foreach(RideFileInterval interval, curves.keys()) {
-        if (chosen == interval ||
-                (rideItem->ride()->intervals().indexOf(interval) > -1 &&
-                 context->athlete->allIntervalItems()->child(rideItem->ride()->intervals().indexOf(interval)) != NULL &&
-                 context->athlete->allIntervalItems()->child(rideItem->ride()->intervals().indexOf(interval))->isSelected() )) {
+    foreach(IntervalItem *interval, curves.keys()) {
+        if (chosen == interval) {
             setColorForIntervalCurve(curves.value(interval), interval, true);
         } else  {
             setColorForIntervalCurve(curves.value(interval), interval, false);
@@ -313,27 +298,29 @@ void
 AllPlotInterval::intervalCurveHover(QwtPlotIntervalCurve *curve)
 {
     if (curve != NULL) {
-        RideFileInterval interval = curves.key(curve);
+        IntervalItem *interval = curves.key(curve);
         //intervalHover(interval);
 
         // tell the charts -- and block signals whilst they occur
-        tooltip->setText(interval.name);
+        tooltip->setText(interval->name);
         blockSignals(true);
         context->notifyIntervalHover(interval);
         blockSignals(false);
 
     } else {
-        context->notifyIntervalHover(RideFileInterval()); // clear
+        context->notifyIntervalHover(NULL); // clear
         tooltip->setText("");
     }
 }
 
 void
 AllPlotInterval::intervalCurveClick(QwtPlotIntervalCurve *curve) {
-    RideFileInterval interval = curves.key(curve);
-    int  idx = rideItem->ride()->intervals().indexOf(interval);
+    IntervalItem *interval = curves.key(curve);
+    int  idx = rideItem->intervals().indexOf(interval);
 
 
+//XXX REFACTOR HOW TO SELECT/DESELECT AN INTERVAL
+#if 0
     if (idx != -1) {
         context->athlete->allIntervalItems()->child(idx)->setSelected(!context->athlete->allIntervalItems()->child(idx)->isSelected());
 
@@ -345,18 +332,21 @@ AllPlotInterval::intervalCurveClick(QwtPlotIntervalCurve *curve) {
             }
         }
     }
+#endif
 }
 
 void
 AllPlotInterval::intervalCurveDblClick(QwtPlotIntervalCurve *curve) {
-    RideFileInterval interval = curves.key(curve);
-    int  idx = rideItem->ride()->intervals().indexOf(interval);
+    IntervalItem *interval = curves.key(curve);
+    int  idx = rideItem->intervals().indexOf(interval);
 
-
+//XXX REFACTOR HOW TO SELECT/DESELECT AN INTERVAL
+#if 0
     if (idx != -1) {
         context->athlete->allIntervalItems()->child(idx)->setSelected(!context->athlete->allIntervalItems()->child(idx)->isSelected());
         context->notifyIntervalZoom((IntervalItem *)context->athlete->allIntervalItems()->child(idx));
     }
+#endif
 }
 
 
@@ -374,10 +364,10 @@ AllPlotIntervalData::x(size_t i) const
 
     // which point are we returning?
     switch (i%4) {
-        case 0 : return plot->bydist ? multiplier * rideItem->ride()->timeToDistance(interval.start) : interval.start/60; // bottom left
-        case 1 : return plot->bydist ? multiplier * rideItem->ride()->timeToDistance(interval.start) : interval.start/60; // top left
-        case 2 : return plot->bydist ? multiplier * rideItem->ride()->timeToDistance(interval.stop) : interval.stop/60; // top right
-        case 3 : return plot->bydist ? multiplier * rideItem->ride()->timeToDistance(interval.stop) : interval.stop/60; // bottom right
+        case 0 : return plot->bydist ? (multiplier * interval->startKM) : interval->start/60; // bottom left
+        case 1 : return plot->bydist ? (multiplier * interval->startKM) : interval->start/60; // top left
+        case 2 : return plot->bydist ? (multiplier * interval->stopKM) : interval->stop/60; // top right
+        case 3 : return plot->bydist ? (multiplier * interval->stopKM) : interval->stop/60; // bottom right
     }
     return 0; // shouldn't get here, but keeps compiler happy
 }

@@ -200,7 +200,7 @@ PfPvWindow::PfPvWindow(Context *context) :
     connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(forceReplot()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
-    connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
+    connect(context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(configChanged(qint32)), pfPvPlot, SLOT(configChanged(qint32)));
@@ -270,7 +270,7 @@ PfPvWindow::rideSelected()
 }
 
 void
-PfPvWindow::intervalHover(RideFileInterval x)
+PfPvWindow::intervalHover(IntervalItem *x)
 {
     pfPvPlot->intervalHover(x);
 }

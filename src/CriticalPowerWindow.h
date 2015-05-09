@@ -36,6 +36,7 @@ class CPPlot;
 class QwtPlotCurve;
 class Context;
 class RideItem;
+class IntervalItem;
 class QwtPlotPicker;
 class MUPlot;
 
@@ -204,7 +205,7 @@ class CriticalPowerWindow : public GcChartWindow
         void configChanged(qint32);
         void intervalSelected();
         void intervalsChanged();
-        void intervalHover(RideFileInterval);
+        void intervalHover(IntervalItem*);
         void seasonSelected(int season);
         void shadingSelected(int shading);
         void showHeatChanged(int check);

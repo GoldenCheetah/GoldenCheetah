@@ -80,7 +80,7 @@ class PfPvPlot : public QwtPlot
 
     public slots:
         void configChanged(qint32);
-        void intervalHover(RideFileInterval);
+        void intervalHover(IntervalItem*);
 
     signals:
         void changedCP( const QString& );

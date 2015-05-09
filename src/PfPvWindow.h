@@ -95,7 +95,7 @@ class PfPvWindow : public GcChartWindow
         void rideSelected();
         void forceReplot();
         void intervalSelected();
-        void intervalHover(RideFileInterval);
+        void intervalHover(IntervalItem*);
         void zonesChanged();
 
     protected slots:

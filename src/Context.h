@@ -152,7 +152,7 @@ class Context : public QObject
         void notifyZoomOut() { emit zoomOut(); }
         void notifyIntervalSelected() { intervalSelected(); }
         void notifyIntervalsChanged() { emit intervalsChanged(); }
-        void notifyIntervalHover(RideFileInterval x) { emit intervalHover(x); }
+        void notifyIntervalHover(IntervalItem *x) { emit intervalHover(x); }
         void notifyRideClean() { rideClean(ride); }
         void notifyRideDirty() { rideDirty(ride); }
         void notifyMetadataFlush() { metadataFlush(); }
@@ -195,7 +195,7 @@ class Context : public QObject
 
         void intervalSelected();
         void intervalsChanged();
-        void intervalHover(RideFileInterval);
+        void intervalHover(IntervalItem*);
         void intervalZoom(IntervalItem*);
         void zoomOut();
         void metadataFlush();

@@ -579,12 +579,10 @@ GoogleMapControl::createMarkers()
     //
     // INTERVAL MARKERS
     //
-    if (context->athlete->allIntervalItems() == NULL) return; // none to do, we are all done then
-
     int interval=0;
-    foreach (const RideFileInterval x, myRideItem->ride()->intervals()) {
+    foreach (IntervalItem *x, myRideItem->intervals()) {
 
-        int offset = myRideItem->ride()->intervalBegin(x);
+        int offset = myRideItem->ride()->intervalBeginSecs(x->start);
         code = QString(
             "{"
             "   var latlng = new google.maps.LatLng(%1,%2);"
@@ -597,7 +595,7 @@ GoogleMapControl::createMarkers()
             "}")
                                     .arg(myRideItem->ride()->dataPoints()[offset]->lat,0,'g',GPS_COORD_TO_STRING)
                                     .arg(myRideItem->ride()->dataPoints()[offset]->lon,0,'g',GPS_COORD_TO_STRING)
-                                    .arg(x.name)
+                                    .arg(x->name)
                                     .arg(interval)
                                     ;
         view->page()->mainFrame()->evaluateJavaScript(code);
@@ -656,22 +654,9 @@ void WebBridge::call(int count) { qDebug()<<"webBridge call:"<<count; }
 int
 WebBridge::intervalCount()
 {
-    int highlighted;
-    highlighted = 0;
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
-
-    if (context->athlete->allIntervalItems() == NULL ||
-        rideItem == NULL || rideItem->ride() == NULL) return 0; // not inited yet!
-
-    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
-        IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
-        if (current != NULL) {
-            if (current->isSelected() == true) {
-                ++highlighted;
-            }
-        }
-    }
-    return highlighted;
+    if (rideItem) return rideItem->intervalsSelected().count();
+    return 0;
 }
 
 // get a latlon array for the i'th selected interval
@@ -679,41 +664,26 @@ QVariantList
 WebBridge::getLatLons(int i)
 {
     QVariantList latlons;
-    int highlighted=0;
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
 
-    if (context->athlete->allIntervalItems() == NULL ||
-       rideItem ==NULL || rideItem->ride() == NULL) return latlons; // not inited yet!
+    if (rideItem && i >= 0 && rideItem->intervalsSelected().count() > i) {
 
-    if (i) {
+        IntervalItem *current = rideItem->intervalsSelected().at(i);
 
-        // get for specific interval
-        for (int j=0; j<context->athlete->allIntervalItems()->childCount(); j++) {
-            IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(j));
-            if (current != NULL) {
-                if (current->isSelected() == true) {
-                    ++highlighted;
+        // so this one is the interval we need.. lets
+        // snaffle up the points in this section
+        foreach (RideFilePoint *p1, rideItem->ride()->dataPoints()) {
+            if (p1->secs+rideItem->ride()->recIntSecs() > current->start
+                && p1->secs< current->stop) {
 
-                    // this one!
-                    if (highlighted==i) {
-
-                        // so this one is the interval we need.. lets
-                        // snaffle up the points in this section
-                        foreach (RideFilePoint *p1, rideItem->ride()->dataPoints()) {
-                            if (p1->secs+rideItem->ride()->recIntSecs() > current->start
-                                && p1->secs< current->stop) {
-
-                                if (p1->lat || p1->lon) {
-                                    latlons << p1->lat;
-                                    latlons << p1->lon;
-                                }
-                            }
-                        }
-                        return latlons;
-                    }
+                if (p1->lat || p1->lon) {
+                    latlons << p1->lat;
+                    latlons << p1->lon;
                 }
             }
         }
+        return latlons;
+
     } else {
 
         // get latlons for entire route
@@ -742,16 +712,22 @@ WebBridge::drawOverlays()
 void
 WebBridge::toggleInterval(int x)
 {
+    RideItem *rideItem = gm->property("ride").value<RideItem*>();
+    if (x < 0 || rideItem->intervals().count() >= x) return;
+
+//XXX WHEN DECIDED HOW TO SELECT/UNSELECT INTERVALS
+#if 0
     IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(x));
     if (current) current->setSelected(!current->isSelected());
-    return;
+#endif
 }
+
 void 
 WebBridge::hoverInterval(int n)
 {
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
-    if (rideItem && rideItem->ride() && rideItem->ride()->intervals().count() > n) {
-        context->notifyIntervalHover(rideItem->ride()->intervals().at(n));
+    if (rideItem && rideItem->ride() && rideItem->intervals().count() > n) {
+        context->notifyIntervalHover(rideItem->intervals().at(n));
     }
 }
 
@@ -789,10 +765,12 @@ void
 WebBridge::hoverPath(double lat, double lng)
 {
     if (point) {
+#if 0 //XXX REFACTOR -- HOW TO CREATE AND EDIT AN INTERVAL!
+
+        RideItem *rideItem = gm->property("ride").value<RideItem*>();
         QString name = QString(tr("Selection #%1 ")).arg(selection);
 
-        QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
-        int count = allIntervals->childCount();
+        int count = 
 
         if (count > 0) {
             IntervalItem *bottom = (IntervalItem *) allIntervals->child(count-1);
@@ -829,18 +807,18 @@ WebBridge::hoverPath(double lat, double lng)
         // now update the RideFileIntervals and all the plots etc
         //context->athlete->updateRideFileIntervals();
 
-
+#endif
     }
 }
 
 void
 WebBridge::clickPath(double lat, double lng)
 {
+
+#if 0 //XXX REFACTOR HOW TO SELECT AND EDIT AND INTERVAL
     selection++;
-    QString name = QString(tr("Selection #%1 ")).arg(selection);
-
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
-
+    QString name = QString(tr("Selection #%1 ")).arg(selection);
     QList<RideFilePoint*> list = searchPoint(lat, lng);
 
     if (list.count() > 0)  {
@@ -858,11 +836,13 @@ WebBridge::clickPath(double lat, double lng)
     }
     else
         point = NULL;
+#endif
 }
 
 void
 WebBridge::mouseup()
 {
+#if 0 //XXX REFACTOR CREATE AND EDIT NEW INTERVAL
     if (point) {
         gm->clearTempInterval();
         QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
@@ -876,6 +856,7 @@ WebBridge::mouseup()
         context->athlete->updateRideFileIntervals();
         point = NULL;
     }  
+#endif
 }
 
 
