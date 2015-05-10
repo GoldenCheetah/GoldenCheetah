@@ -108,8 +108,9 @@
 // 102 05  Feb 2015 Mark Liversedge    aPower versions of Skiba metrics aBikeScore et al
 // 103 23  Feb 2015 Mark Liversedge    Added total heartbeats
 // 104 24  Apr 2015 Mark Liversedge    Added Workbeat stress (Work * Heartbeats) / 10000
+// 105 09  May 2015 Ale Martinez       Added PeakPace and PeakPaceSwim metrics
 
-int DBSchemaVersion = 104;
+int DBSchemaVersion = 105;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
