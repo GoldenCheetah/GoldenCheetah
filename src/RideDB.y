@@ -193,7 +193,7 @@ interval_tuple: string ':' string                               {
                                                                      else if ($1 == "start") jc->interval.start = $3.toDouble();
                                                                      else if ($1 == "stop") jc->interval.stop = $3.toDouble();
                                                                      else if ($1 == "startKM") jc->interval.startKM = $3.toDouble();
-                                                                     else if ($1 == "stopKM") jc->interval.startKM = $3.toDouble();
+                                                                     else if ($1 == "stopKM") jc->interval.stopKM = $3.toDouble();
                                                                      else if ($1 == "type") jc->interval.type = static_cast<RideFileInterval::intervaltype>($3.toInt());
                                                                      else if ($1 == "color") jc->interval.color = QColor($3);
                                                                      else if ($1 == "seq") jc->interval.displaySequence = $3.toInt();
