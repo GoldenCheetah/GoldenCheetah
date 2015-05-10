@@ -302,6 +302,55 @@ BestIntervalDialog::findBests(const RideFile *ride, double windowSizeSecs,
 }
 
 void
+BestIntervalDialog::findBestsKPH(const RideFile *ride, double windowSizeSecs,
+                              int maxIntervals, QList<BestInterval> &results)
+{
+    QList<BestInterval> bests;
+
+    double secsDelta = ride->recIntSecs();
+    double totalKPH = 0.0;
+    QList<const RideFilePoint*> window;
+
+    // ride is shorter than the window size!
+    if (windowSizeSecs > ride->dataPoints().last()->secs + secsDelta) return;
+
+    // We're looking for intervals with durations in [windowSizeSecs, windowSizeSecs + secsDelta).
+    foreach (const RideFilePoint *point, ride->dataPoints()) {
+        // Discard points until interval duration is < windowSizeSecs + secsDelta.
+        while (!window.empty() && (intervalDuration(window.first(), point, ride) >= windowSizeSecs + secsDelta)) {
+            totalKPH -= window.first()->kph;
+            window.takeFirst();
+        }
+        // Add points until interval duration is >= windowSizeSecs.
+        totalKPH += point->kph;
+        window.append(point);
+        double duration = intervalDuration(window.first(), window.last(), ride);
+        if (duration >= windowSizeSecs) {
+            double start = window.first()->secs;
+            double stop = start + duration;
+            double avg = totalKPH * secsDelta / duration;
+            bests.append(BestInterval(start, stop, avg));
+        }
+    }
+
+    std::sort(bests.begin(), bests.end(), CompareBests());
+
+    while (!bests.empty() && (results.size() < maxIntervals)) {
+        BestInterval candidate = bests.takeFirst();
+        bool overlaps = false;
+        foreach (const BestInterval &existing, results) {
+            if (intervalsOverlap(candidate, existing)) {
+                overlaps = true;
+                break;
+            }
+        }
+        if (!overlaps)
+            results.append(candidate);
+    }
+
+}
+
+void
 BestIntervalDialog::doneClicked()
 {
     clearResultsTable(resultsTable); // clear out that table!
