@@ -95,6 +95,10 @@ IntervalSummaryWindow::intervalHover(IntervalItem* x)
     // we already have summaries!
     if (x && x->rideItem()->intervalsSelected().count()) return;
 
+    // its to clear, but if the current ride has selected intervals then we will ignore it
+    RideItem *rideItem = const_cast<RideItem*>(context->currentRideItem());
+    if (!x && rideItem && rideItem->intervalsSelected().count()) return;
+
     QString html = GCColor::css();
     html += "<body>";
 
