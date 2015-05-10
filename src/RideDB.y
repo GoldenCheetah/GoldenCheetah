@@ -410,24 +410,34 @@ void RideCache::save()
                     stream << "\t\t\t\"stopKM\":\"" << interval->stopKM <<"\",\n";
                     stream << "\t\t\t\"type\":\"" << static_cast<int>(interval->type) <<"\",\n";
                     stream << "\t\t\t\"color\":\"" << interval->color.name() <<"\",\n";
-                    stream << "\t\t\t\"seq\":\"" << interval->displaySequence <<"\",\n";
+                    stream << "\t\t\t\"seq\":\"" << interval->displaySequence <<"\""; // last one no ',\n' see METRICS below..
 
-                    // pre-computed metrics
-                    stream << "\n\t\t\t\"METRICS\":{\n";
-
-                    bool firstMetric = true;
-                    for(int i=0; i<factory.metricCount(); i++) {
-                        QString name = factory.metricName(i);
-                        int index = factory.rideMetric(name)->index();
-        
-                        // don't output 0 values, they're set to 0 by default
-                        if (interval->metrics()[index] > 0.00f || interval->metrics()[index] < 0.00f) {
-                            if (!firstMetric) stream << ",\n";
-                            firstMetric = false;
-                            stream << "\t\t\t\t\"" << name << "\":\"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\"";
+                    // check if we have any non-zero metrics
+                    bool hasMetrics=false;
+                    foreach(double v, interval->metrics()) {
+                        if (v > 0.00f || v < 0.00f) {
+                            hasMetrics=true;
+                            break;
                         }
                     }
-                    stream << "\n\t\t\t\t}";
+
+                    if (hasMetrics) {
+                        stream << ",\n\n\t\t\t\"METRICS\":{\n";
+
+                        bool firstMetric = true;
+                        for(int i=0; i<factory.metricCount(); i++) {
+                            QString name = factory.metricName(i);
+                            int index = factory.rideMetric(name)->index();
+        
+                            // don't output 0 values, they're set to 0 by default
+                            if (interval->metrics()[index] > 0.00f || interval->metrics()[index] < 0.00f) {
+                                if (!firstMetric) stream << ",\n";
+                                firstMetric = false;
+                                stream << "\t\t\t\t\"" << name << "\":\"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\"";
+                            }
+                        }
+                        stream << "\n\t\t\t\t}";
+                    }
 
                     // endof interval
                     stream << "\n\t\t\t}";

@@ -443,6 +443,9 @@ RideItem::refresh()
             if (std::isinf(metrics_[j]) || std::isnan(metrics_[j]))
                 metrics_[j] = 0.00f;
 
+        // Update auto intervals AFTER ridefilecache as used for bests
+        updateIntervals();
+
         // update current state
         isstale = false;
 
@@ -456,9 +459,6 @@ RideItem::refresh()
 
         // RideFile cache needs refreshing possibly
         RideFileCache updater(context, context->athlete->home->activities().canonicalPath() + "/" + fileName, getWeight(), ride_, true);
-
-        // Update auto intervals AFTER ridefilecache as used for bests
-        updateIntervals();
 
         // we now match
         metacrc = metaCRC();
