@@ -666,9 +666,9 @@ WebBridge::getLatLons(int i)
     QVariantList latlons;
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
 
-    if (rideItem && i >= 0 && rideItem->intervalsSelected().count() > i) {
+    if (rideItem && i > 0 && rideItem->intervalsSelected().count() >= i) {
 
-        IntervalItem *current = rideItem->intervalsSelected().at(i);
+        IntervalItem *current = rideItem->intervalsSelected().at(i-1);
 
         // so this one is the interval we need.. lets
         // snaffle up the points in this section

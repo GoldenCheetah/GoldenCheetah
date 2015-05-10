@@ -977,12 +977,11 @@ CriticalPowerWindow::intervalSelected()
     }
 
     // which itervals are selected?
-    IntervalItem *current=NULL;
     int i=0;
     foreach (IntervalItem*p, myRideItem->intervals()) {
-        if (current != NULL) {
-            if (current->selected == true) {
-                showIntervalCurve(current, i); // set it all up
+        if (p != NULL) {
+            if (p->selected == true) {
+                showIntervalCurve(p, i); // set it all up
             } else {
                 hideIntervalCurve(i); // in case its shown at present
             }
