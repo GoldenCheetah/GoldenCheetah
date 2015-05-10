@@ -281,7 +281,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
         IntervalItem *current = settings->ride->intervals().at(child);
         if (current->selected) {
             intervals.append(child);
-            displaySequence.insert(current->displaySequence, intervals.count()-1);
+            displaySequence.insert(current->displaySequence, child);
         }
     }
 
@@ -346,9 +346,9 @@ void ScatterPlot::setData (ScatterSettings *settings)
             if (intervals.count() > 0) {
 
                 // interval data in here
-                QVector<QVector<double> > xvals(intervals.count()); // array of curve x arrays
-                QVector<QVector<double> > yvals(intervals.count()); // array of curve x arrays
-                QVector<int> points(intervals.count());             // points in eac curve
+                QVector<QVector<double> > xvals(settings->ride->intervals().count()); // array of curve x arrays
+                QVector<QVector<double> > yvals(settings->ride->intervals().count()); // array of curve x arrays
+                QVector<int> points(settings->ride->intervals().count());             // points in eac curve
 
                 // extract interval data
                 foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
@@ -362,8 +362,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
                         for (int idx=0; idx<settings->ride->intervals().count(); idx++) {
 
                             IntervalItem *current = settings->ride->intervals().at(idx);
-
-                            if (point->secs+settings->ride->ride()->recIntSecs() > current->start && point->secs< current->stop) {
+                            if (current->selected && point->secs+settings->ride->ride()->recIntSecs() > current->start && point->secs< current->stop) {
                                 xvals[idx].append(x);
                                 yvals[idx].append(y);
                                 points[idx]++;
@@ -379,7 +378,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
                     int idx = order.value();
 
                     QColor intervalColor;
-                    intervalColor.setHsv((255/settings->ride->intervals().count()) * (intervals[idx]), 255,255);
+                    intervalColor.setHsv((255/settings->ride->intervals().count()) * idx, 255,255);
                     // left / right are darker lighter
                     if (side) intervalColor = intervalColor.lighter(50);
 
@@ -399,6 +398,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
                     intervalCurves.append(ic);
 
                     // show as a line too, if not framed
+#if 0 // a bit ugly tbh
                     if (!settings->frame) {
                         QwtPlotCurve *icl = new QwtPlotCurve();
                         icl->setStyle(QwtPlotCurve::Lines);
@@ -408,6 +408,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
                         icl->attach(this);
                         intervalCurves.append(icl);
                     }
+#endif
                 }
             }
 
@@ -631,6 +632,9 @@ ScatterPlot::intervalHover(IntervalItem *ri)
         delete hover2;
         hover2 = NULL;
     }
+
+    // null so just clear hover
+    if (!ri) return;
 
     // how many curves do we need ?
     if (xseries == MODEL_LRBALANCE || xseries == MODEL_TE || xseries == MODEL_PS ||
