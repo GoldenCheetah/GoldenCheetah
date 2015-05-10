@@ -87,7 +87,7 @@ RideItem::setFrom(RideItem&here) // used when loading cache/rideDB.json
     foreach(IntervalItem *p, intervals_) p->rideItem_ = this;
 	context = here.context;
 	isdirty = here.isdirty;
-	isstale = here.isstale;
+    isstale = here.isstale;
 	isedit = here.isedit;
 	skipsave = here.skipsave;
 	path = here.path;
@@ -653,7 +653,14 @@ RideItem::updateIntervals()
     double maxAlt = -1000.0;
     double lastAlt = -1000.0;
 
+
+    QVector<RideFilePoint *> milestones;
+
     foreach(RideFilePoint *p, f->dataPoints()) {
+        if (milestones.size() == 0 || p->km - milestones.last()->km > 0.5) {
+            milestones.append(p);
+        }
+
         if (minAlt == -1000.0 || minAlt > p->alt) {
             minAlt = p->alt;
             start = p->secs;
@@ -662,11 +669,36 @@ RideItem::updateIntervals()
 
         if (maxAlt == -1000.0 || maxAlt < p->alt) {
             maxAlt = p->alt;
-        } else if (maxAlt > p->alt+0.1*(maxAlt-minAlt)) {
+        } else if (maxAlt > p->alt+0.2*(maxAlt-minAlt) || p == f->dataPoints().last() )  {
             if ((p->km - startKm >= 0.5 && (maxAlt-minAlt)/(p->km - startKm) >= 60) ||
                 (p->km - startKm >= 2.0 && (maxAlt-minAlt)/(p->km - startKm) >= 40) ||
                 (p->km - startKm >= 4.0 && (maxAlt-minAlt)/(p->km - startKm) >= 20)) {
-                //qDebug() << "NEW HILL " << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
+                qDebug() << "NEW HILL " << count << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
+
+                //verify milestones
+                RideFilePoint *last = new RideFilePoint();
+                last->secs = start;
+                last->km = startKm;
+                last->alt = minAlt;
+
+                int countM = 1;
+                bool flatStart = true;
+                foreach(RideFilePoint *p, milestones) {
+                    if ((p->alt-last->alt) / (p->km-last->km) < 20) {
+                        qDebug() << "    Milestone " << countM << "flat";
+                        if (flatStart) {
+                            start = p->secs;
+                            startKm = p->km;
+                            minAlt = p->alt;
+                        }
+                    } else
+                       flatStart = false;
+                    countM++;
+                    last = p;
+                }
+
+                qDebug() << "NEW HILL(2) " << count << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
+
 
                 // create a new interval item
                 IntervalItem *intervalItem = new IntervalItem(f, QString("Climb %1").arg(++hills),
@@ -690,6 +722,8 @@ RideItem::updateIntervals()
             lastAlt = p->alt;
             start = p->secs;
             startKm = p->km;
+            milestones.clear();
+            milestones.append(p);
         } else if (lastAlt < p->alt) {
                lastAlt = p->alt;
                stop = p->secs;
@@ -723,6 +757,7 @@ RideItem::updateIntervals()
                                                                   f->timeToDistance(_ride.start),
                                                                   f->timeToDistance(_ride.stop),
                                                                   count++,  // sequence defaults to count
+                                                                  QColor(Qt::gray),
                                                                   RideFileInterval::ROUTE);
                     intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
                     intervalItem->refresh();        // XXX will get called in constructore when refactor
