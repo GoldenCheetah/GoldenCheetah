@@ -175,6 +175,10 @@ AnalysisSidebar::setRide(RideItem*ride)
     // now add the intervals for the current ride
     if (ride) { // only if we have a ride pointer
 
+        // tree has bold font
+        QFont bold;
+        bold.setWeight(QFont::Bold);
+
         // for each type add a tree structure
         foreach(IntervalItem *interval, ride->intervals()) {
 
@@ -188,6 +192,7 @@ AnalysisSidebar::setRide(RideItem*ride)
                 tree->setData(0, Qt::UserRole, qVariantFromValue((void *)NULL)); // no intervalitem related
                 tree->setText(0, RideFileInterval::typeDescription(interval->type));
                 tree->setForeground(0, GColor(CPLOTMARKER));
+                tree->setFont(0, bold);
                 tree->setExpanded(true);
                 trees.insert(interval->type, tree);
             }
