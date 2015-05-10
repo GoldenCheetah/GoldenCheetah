@@ -37,7 +37,6 @@ IntervalItem::IntervalItem(const RideFile *ride, QString name, double start, dou
     this->color = color;
     this->selected = false;
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
-    setText(0, name);
 }
 
 IntervalItem::IntervalItem() : rideItem_(NULL), name(""), type(RideFileInterval::USER), start(0), stop(0),
@@ -163,7 +162,7 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
     QLabel *to = new QLabel("To");
 
     nameEdit = new QLineEdit(this);
-    nameEdit->setText(interval.text(0));
+    //nameEdit->setText(interval.text(0));
 
     fromEdit = new QTimeEdit(this);
     fromEdit->setDisplayFormat("hh:mm:ss");
@@ -200,7 +199,7 @@ void
 EditIntervalDialog::applyClicked()
 {
     // get the values back
-    interval.setText(0, nameEdit->text());
+    //interval.setText(0, nameEdit->text());
     interval.start = QTime(0,0,0).secsTo(fromEdit->time());
     interval.stop = QTime(0,0,0).secsTo(toEdit->time());
     accept();

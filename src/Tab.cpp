@@ -177,41 +177,6 @@ Tab::selectView(int index)
 void
 Tab::rideSelected(RideItem*)
 {
-    // stop SEGV in widgets watching for intervals being
-    // selected whilst we are deleting them from the tree
-    context->athlete->intervalWidget->blockSignals(true);
-
-    // refresh interval list for bottom left
-    // first lets wipe away the existing intervals
-    QList<QTreeWidgetItem *> intervals = context->athlete->allIntervals->takeChildren();
-    for (int i=0; i<intervals.count(); i++) delete intervals.at(i);
-
-#if 0 // XXX REFACTOR TODO
-    // now add the intervals for the current ride
-    if (context->ride) { // only if we have a ride pointer
-        RideFile *selected = context->ride->ride();
-        if (selected) {
-            // get all the intervals in the currently selected RideFile
-            QList<RideFileInterval> intervals = selected->intervals();
-            for (int i=0; i < intervals.count(); i++) {
-                // add as a child to context->athlete->allIntervals
-                IntervalItem *add = new IntervalItem(selected,
-                                                        intervals.at(i).name,
-                                                        intervals.at(i).start,
-                                                        intervals.at(i).stop,
-                                                        selected->timeToDistance(intervals.at(i).start),
-                                                        selected->timeToDistance(intervals.at(i).stop),
-                                                        context->athlete->allIntervals->childCount()+1,
-                                                        intervals.at(i).type);
-                add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-                context->athlete->allIntervals->addChild(add);
-            }
-        }
-    }
-#endif
-    // all done, so connected widgets can receive signals now
-    context->athlete->intervalWidget->blockSignals(false);
-
     // update the ride property on all widgets
     // to let them know they need to replot new
     // selected ride (now the tree is up to date)

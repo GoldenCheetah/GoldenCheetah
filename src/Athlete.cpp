@@ -174,28 +174,10 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     davCalendar->download(true); // refresh the diary window but do not show any error messages
 #endif
 
-    //.INTERVALS TREE -- transitionary
-    intervalWidget = new IntervalTreeView(context);
-    intervalWidget->setColumnCount(1);
-    intervalWidget->setIndentation(5);
-    intervalWidget->setSortingEnabled(false);
-    intervalWidget->header()->hide();
-    intervalWidget->setAlternatingRowColors (false);
-    intervalWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    intervalWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    intervalWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    intervalWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    intervalWidget->setFrameStyle(QFrame::NoFrame);
-    allIntervals = context->athlete->intervalWidget->invisibleRootItem();
-    allIntervals->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
-    allIntervals->setText(0, tr("Intervals"));
-
     // trap signals
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context,SIGNAL(rideAdded(RideItem*)),this,SLOT(checkCPX(RideItem*)));
     connect(context,SIGNAL(rideDeleted(RideItem*)),this,SLOT(checkCPX(RideItem*)));
-    connect(intervalWidget,SIGNAL(itemSelectionChanged()), this, SLOT(intervalTreeWidgetSelectionChanged()));
-    connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(updateRideFileIntervals()));
 }
 
 void
@@ -248,37 +230,6 @@ void Athlete::selectRideFile(QString fileName)
             break;
     }
     context->notifyRideSelected(context->ride);
-}
-
-void
-Athlete::intervalTreeWidgetSelectionChanged()
-{
-    context->notifyIntervalHover(NULL); // clear
-    context->notifyIntervalSelected();
-}
-
-void
-Athlete::updateRideFileIntervals()
-{
-    // iterate over context->athlete->allIntervals as they are now defined
-    // and update the RideFile->intervals
-    if (context->ride) {
-
-        RideFile *current = context->ride->ride();
-        current->clearIntervals();
-
-        for (int i=0; i < allIntervals->childCount(); i++) {
-            // add the intervals as updated
-            IntervalItem *it = (IntervalItem *)allIntervals->child(i);
-            current->addInterval(it->type, it->start, it->stop, it->text(0));
-        }
-
-        // emit signal for interval data changed
-        context->notifyIntervalsChanged();
-
-        // set dirty
-        context->ride->setDirty(true);
-    }
 }
 
 void

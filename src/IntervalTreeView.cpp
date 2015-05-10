@@ -49,20 +49,19 @@ IntervalTreeView::IntervalTreeView(Context *context) : context(context)
 void
 IntervalTreeView::mouseHover(QTreeWidgetItem *item, int)
 {
-    int index = invisibleRootItem()->indexOfChild(item);
-    if (index >=0 && context->rideItem() && context->rideItem()->ride() &&
-        context->rideItem()->ride()->intervals().count() > index) {
+    QVariant v = item->data(0, Qt::UserRole);
+    IntervalItem *hover = static_cast<IntervalItem*>(v.value<void*>());
 
-        //XXX REFACTORING XXX context->notifyIntervalHover(context->rideItem()->ride()->intervals()[index]);
-    }
+    // NULL is a tree, non-NULL is a node
+    if (hover) context->notifyIntervalHover(hover);
 }
 
 void
 IntervalTreeView::dropEvent(QDropEvent* event)
 {
-    IntervalItem* item1 = (IntervalItem *)itemAt(event->pos());
+    QTreeWidgetItem* item1 = (QTreeWidgetItem *)itemAt(event->pos());
     QTreeWidget::dropEvent(event);
-    IntervalItem* item2 = (IntervalItem *)itemAt(event->pos());
+    QTreeWidgetItem* item2 = (QTreeWidgetItem *)itemAt(event->pos());
 
     if (item1==topLevelItem(0) || item1 != item2)
         QTreeWidget::itemChanged(item2, 0);
@@ -87,6 +86,7 @@ IntervalTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
     QDataStream stream(&rawData, QIODevice::WriteOnly);
     stream.setVersion(QDataStream::Qt_4_6);
 
+#if 0 //XXX REFACTOR PROLY TO PACK INTERVALITEM* ONLY
     // pack data 
     stream << (quint64)(context); // where did this come from?
     stream << (int)items.count();
@@ -103,6 +103,7 @@ IntervalTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
         stream << (quint64)i->displaySequence;
 
     }
+#endif
 
     // and return as mime data
     returning->setData("application/x-gc-intervals", rawData);

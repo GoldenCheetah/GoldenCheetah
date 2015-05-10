@@ -852,6 +852,8 @@ AddIntervalDialog::findBests(bool typeTime, const RideFile *ride, double windowS
 void
 AddIntervalDialog::addClicked()
 {
+//XXX REFACTOR NEED TO DECIDE HOW TO DO THIS!!
+#if 0
     // run through the table row by row
     // and when the checkbox is shown
     // get name from column 2
@@ -859,8 +861,6 @@ AddIntervalDialog::addClicked()
     // get stop in secs as a string from column 4
     for (int i=0; i<resultsTable->rowCount(); i++) {
 
-//XXX REFACTOR NEED TO DECIDE HOW TO DO THIS!!
-#if 0
         // is it checked?
         QCheckBox *c = (QCheckBox *)resultsTable->cellWidget(i,0);
         if (c->isChecked()) {
@@ -879,8 +879,8 @@ AddIntervalDialog::addClicked()
             // add
             allIntervals->addChild(last);
         }
-#endif
     }
     context->athlete->updateRideFileIntervals();
+#endif
     done(0);
 }
