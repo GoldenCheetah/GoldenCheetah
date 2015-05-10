@@ -680,46 +680,50 @@ PfPvPlot::intervalHover(IntervalItem *x)
         hover = NULL;
     }
 
-    // collect the data
-    QVector<double> aepfArray, cpvArray;
-    foreach(const RideFilePoint *p1, rideItem->ride()->dataPoints()) {
+    // if hovering AND no intervals are selected then lets do it
+    if (x && rideItem->intervalsSelected().count() == 0) {
 
-        if (p1->secs < x->start || p1->secs > x->stop) continue;
+        // collect the data
+        QVector<double> aepfArray, cpvArray;
+        foreach(const RideFilePoint *p1, rideItem->ride()->dataPoints()) {
 
-        if (p1->watts != 0 && p1->cad != 0) {
-            double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
-            double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
+            if (p1->secs < x->start || p1->secs > x->stop) continue;
 
-            aepfArray << aepf;
-            cpvArray << cpv;
+            if (p1->watts != 0 && p1->cad != 0) {
+                double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
+                double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
+
+                aepfArray << aepf;
+                cpvArray << cpv;
+            }
         }
-    }
 
-    // which interval is it or how many ?
-    int count = 0;
-    int ours = 0;
-    foreach(IntervalItem *p, rideItem->intervals()) {
-        if (p->start == x->start && p->stop == x->stop) ours = count;
-        count++;
-    }
+        // which interval is it or how many ?
+        int count = 0;
+        int ours = 0;
+        foreach(IntervalItem *p, rideItem->intervals()) {
+            if (p->start == x->start && p->stop == x->stop) ours = count;
+            count++;
+        }
 
-    // any data ?
-    if (aepfArray.size()) {
-        QwtSymbol *sym = new QwtSymbol;
-        sym->setStyle(QwtSymbol::Ellipse);
-        sym->setSize(4);
-        QColor color;
-        color.setHsv(ours * 255/count, 255,255);
-        color.setAlpha(128);
-        sym->setPen(QPen(color));
-        sym->setBrush(QBrush(color));
+        // any data ?
+        if (aepfArray.size()) {
+            QwtSymbol *sym = new QwtSymbol;
+            sym->setStyle(QwtSymbol::Ellipse);
+            sym->setSize(4);
+            QColor color;
+            color.setHsv(ours * 255/count, 255,255);
+            color.setAlpha(128);
+            sym->setPen(QPen(color));
+            sym->setBrush(QBrush(color));
 
-        hover = new QwtPlotCurve();
-        hover->setSymbol(sym);
-        hover->setStyle(QwtPlotCurve::Dots);
-        hover->setRenderHint(QwtPlotItem::RenderAntialiased);
-        hover->setSamples(cpvArray, aepfArray);
-        hover->attach(this);
+            hover = new QwtPlotCurve();
+            hover->setSymbol(sym);
+            hover->setStyle(QwtPlotCurve::Dots);
+            hover->setRenderHint(QwtPlotItem::RenderAntialiased);
+            hover->setSamples(cpvArray, aepfArray);
+            hover->attach(this);
+        }
     }
 
     replot(); // refresh
