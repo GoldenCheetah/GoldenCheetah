@@ -65,7 +65,7 @@ IntervalItem::refresh()
 
         // iterate
         const RideFilePoint *p = f->dataPoints()[i];
-        if (p->secs > stop) break;
+        if (p->secs+f->recIntSecs() > stop) break;
 
         // append all values
         intervalRide.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,

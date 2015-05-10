@@ -29,6 +29,7 @@
 #include "PaceZones.h"
 #include "Settings.h"
 #include "Colors.h" // for ColorEngine
+#include "BestIntervalDialog.h" // till we fixup ridefilecache to have offsets
 
 #include <cmath>
 #include <QtAlgorithms>
@@ -442,9 +443,6 @@ RideItem::refresh()
             if (std::isinf(metrics_[j]) || std::isnan(metrics_[j]))
                 metrics_[j] = 0.00f;
 
-        // Update auto intervals
-        updateIntervals();
-
         // update current state
         isstale = false;
 
@@ -458,6 +456,9 @@ RideItem::refresh()
 
         // RideFile cache needs refreshing possibly
         RideFileCache updater(context, context->athlete->home->activities().canonicalPath() + "/" + fileName, getWeight(), ride_, true);
+
+        // Update auto intervals AFTER ridefilecache as used for bests
+        updateIntervals();
 
         // we now match
         metacrc = metaCRC();
@@ -609,6 +610,36 @@ RideItem::updateIntervals()
     }
 
     // DISCOVERY
+
+    //qDebug() << "SEARCH PEAK POWERS"
+
+    // what we looking for ?
+    static int durations[] = { 1, 5, 10, 30, 60, 300, 600, 1200, 1800, 3600, 0 };
+    static const char *names[] = { "1 second", "5 seconds", "10 seconds", "30 seconds", 
+                            "1 minute", "5 minutes", "10 minutes", "20 minutes", "30 minutes", 
+                            "1 hour" };
+
+    for(int i=0; durations[i] != 0; i++) {
+
+        // go hunting for best peak
+        QList<BestIntervalDialog::BestInterval> results;
+        BestIntervalDialog::findBests(f, durations[i], 1, results);
+
+        // did we get one ?
+        if (results.count() > 0) {
+            // qDebug()<<"found"<<names[i]<<"peak power"<<results[0].start<<"-"<<results[0].stop<<"of"<<results[0].avg<<"watts";
+            IntervalItem *intervalItem = new IntervalItem(f, QString(tr("%1 (%2 watts)")).arg(names[i]).arg(int(results[0].avg)),
+                                                        results[0].start, results[0].stop, 
+                                                        f->timeToDistance(results[0].start),
+                                                        f->timeToDistance(results[0].stop),
+                                                        count++,
+                                                        QColor(Qt::gray),
+                                                        RideFileInterval::PEAKPOWER);
+            intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
+            intervalItem->refresh();        // XXX will get called in constructore when refactor
+            intervals_ << intervalItem;
+        }
+    }
 
     //qDebug() << "SEARCH HILLS";
 
