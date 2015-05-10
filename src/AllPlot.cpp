@@ -6521,6 +6521,11 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
 
             // loop through intervals and select FIRST we are in
             foreach(IntervalItem *i, rideItem->intervals()) {
+
+                // ignore peaks and all, they are really distracting
+                if (i->type == RideFileInterval::ALL || i->type == RideFileInterval::PEAKPOWER)
+                    continue;
+
                 if (i->start < (X*60.00f) && i->stop > (X*60.00f)) {
                     if ((i->stop-i->start) < duration) {
                         duration = i->stop - i->start;
@@ -6589,7 +6594,7 @@ AllPlot::intervalHover(IntervalItem *chosen)
     // no point!
     if (!isVisible() || chosen == hovered) return;
 
-    // don't highlight the all interval
+    // don't highlight the all or all the peak intervals
     if (chosen && chosen->type == RideFileInterval::ALL) return;
 
     QVector<double>xdata, ydata;
