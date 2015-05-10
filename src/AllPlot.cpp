@@ -6589,6 +6589,9 @@ AllPlot::intervalHover(IntervalItem *chosen)
     // no point!
     if (!isVisible() || chosen == hovered) return;
 
+    // don't highlight the all interval
+    if (chosen && chosen->type == RideFileInterval::ALL) return;
+
     QVector<double>xdata, ydata;
     if (chosen) {
 

@@ -24,13 +24,13 @@
 #include <QtGui>
 #include <QDialog>
 #include <QLabel>
-#include <QTreeWidgetItem>
 #include <QLineEdit>
 
 class RideFile;
 
-class IntervalItem : public QTreeWidgetItem
+class IntervalItem
 {
+
     public:
 
         // constructors and accessors

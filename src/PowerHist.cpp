@@ -2258,7 +2258,7 @@ bool PowerHist::isSelected(const RideFilePoint *p, double sample)
     if (!rideItem) {
 
         foreach (IntervalItem *interval, rideItem->intervalsSelected()) {
-            if (interval->isSelected() && p->secs+sample>interval->start && p->secs<interval->stop) 
+            if (interval->selected && p->secs+sample>interval->start && p->secs<interval->stop) 
                 return true;
         }
     }

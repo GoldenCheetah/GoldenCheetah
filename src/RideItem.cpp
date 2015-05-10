@@ -586,7 +586,9 @@ RideItem::updateIntervals()
         if (interval.start <= begin->secs && interval.stop >= end->secs) continue;
 
         // same as ride but offset by recintsecs
-        if ((interval.start - f->recIntSecs()) <= begin->secs && (interval.stop-f->recIntSecs()) >= end->secs) continue;
+        if (((interval.start - f->recIntSecs()) <= begin->secs && (interval.stop-f->recIntSecs()) >= end->secs) ||
+           (interval.start <= begin->secs && (interval.stop+f->recIntSecs()) >= end->secs))
+             continue;
 
         // skip empty backward intervals
         if (interval.start >= interval.stop) continue;

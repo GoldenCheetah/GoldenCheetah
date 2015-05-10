@@ -60,6 +60,9 @@ class AnalysisSidebar : public QWidget
         void analysisPopup();
         void showActivityMenu(const QPoint &pos);
 
+        // interval selection
+        void itemSelectionChanged();
+
         // interval menu
         void intervalPopup();
         void showIntervalMenu(const QPoint &pos);
@@ -99,6 +102,9 @@ class AnalysisSidebar : public QWidget
         QSplitter *intervalSplitter;
         IntervalSummaryWindow *intervalSummaryWindow;
         IntervalItem *activeInterval; // currently active for context menu popup
+
+        IntervalTreeView *intervalTree; // the interval tree
+        QMap<RideFileInterval::intervaltype, QTreeWidgetItem*> trees;
 };
 
 #endif // _GC_AnalysisSidebar_h

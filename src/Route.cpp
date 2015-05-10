@@ -497,7 +497,7 @@ Routes::createRouteFromInterval(IntervalItem *activeInterval) {
 
     QRegExp watts("\\([0-9]* *watts\\)");
 
-    QString name = activeInterval->text(0).trimmed();
+    QString name = activeInterval->name; //activeInterval->text(0).trimmed();
     if (name.contains(watts))
         name = name.left(name.indexOf(watts)).trimmed();
 

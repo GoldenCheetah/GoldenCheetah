@@ -86,6 +86,22 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     activityItem->addWidget(activityHistory);
 
     // INTERVALS
+    intervalTree = new IntervalTreeView(context);
+    intervalTree->setAnimated(true);
+    intervalTree->setColumnCount(1);
+    intervalTree->setIndentation(5);
+    intervalTree->setSortingEnabled(false);
+    intervalTree->header()->hide();
+    intervalTree->setAlternatingRowColors (false);
+    intervalTree->setSelectionBehavior(QAbstractItemView::SelectRows);
+    intervalTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    intervalTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    intervalTree->setContextMenuPolicy(Qt::CustomContextMenu);
+    intervalTree->setFrameStyle(QFrame::NoFrame);
+    //allIntervals = context->athlete->intervalWidget->invisibleRootItem();
+    //allIntervals->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
+    //allIntervals->setText(0, tr("Intervals"));
+
     intervalSummaryWindow = new IntervalSummaryWindow(context);
 
     HelpWhatsThis *helpSummaryWindow = new HelpWhatsThis(intervalSummaryWindow);
@@ -94,7 +110,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     intervalSplitter = new QSplitter(this);
     intervalSplitter->setHandleWidth(1);
     intervalSplitter->setOrientation(Qt::Vertical);
-    intervalSplitter->addWidget(context->athlete->intervalWidget);
+    intervalSplitter->addWidget(intervalTree);
     activeInterval = NULL;
     intervalSplitter->addWidget(intervalSummaryWindow);
     intervalSplitter->setFrameStyle(QFrame::NoFrame);
@@ -121,8 +137,9 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
 
     // right click menus...
     connect(rideNavigator,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showActivityMenu(const QPoint &)));
-    connect(context->athlete->intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showIntervalMenu(const QPoint &)));
-    connect(context->athlete->intervalWidget,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(clickZoomInterval(QTreeWidgetItem*)));
+    connect(intervalTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showIntervalMenu(const QPoint &)));
+    connect(intervalTree,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(clickZoomInterval(QTreeWidgetItem*)));
+    connect(intervalTree,SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
 
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
 
@@ -132,8 +149,94 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
 void
 AnalysisSidebar::setRide(RideItem*ride)
 {
+    // FIRST REFRESH THE INTERVAL TREE
+    // stop SEGV in widgets watching for intervals being
+    // selected whilst we are deleting them from the tree
+    intervalTree->blockSignals(true);
+
+    // refresh interval list for bottom left
+    // clear each tree and hide it until items
+    // are added. That way we get to keep the state
+    // for expanded (users can unexpand it and that
+    // is kept as they choose different activities)
+    QMapIterator<RideFileInterval::intervaltype, QTreeWidgetItem*> i(trees);
+    i.toFront();
+    while(i.hasNext()) {
+
+        i.next();
+        i.value()->takeChildren();
+
+        // now clean and hide the tree
+        QList<QTreeWidgetItem *> items = i.value()->takeChildren();
+        for (int j=0; j<items.count(); j++) delete items.at(j);
+        i.value()->setHidden(true);
+    }
+
+    // now add the intervals for the current ride
+    if (ride) { // only if we have a ride pointer
+
+        // for each type add a tree structure
+        foreach(IntervalItem *interval, ride->intervals()) {
+
+            // create trees on demand, not all will be needed by all
+            // users and just as useful to create here than at startup
+            // also means we don't need to know what all the types are
+            // in advance, we create when we see one
+            QTreeWidgetItem *tree = trees.value(interval->type, NULL);
+            if (tree == NULL) {
+                tree = new QTreeWidgetItem(intervalTree->invisibleRootItem(), interval->type);
+                tree->setData(0, Qt::UserRole, qVariantFromValue((void *)NULL)); // no intervalitem related
+                tree->setText(0, RideFileInterval::typeDescription(interval->type));
+                tree->setForeground(0, GColor(CPLOTMARKER));
+                tree->setExpanded(true);
+                trees.insert(interval->type, tree);
+            }
+            tree->setHidden(false); // we have items, so make sure it is visible
+
+            // add this interval to the tree
+            QTreeWidgetItem *add = new QTreeWidgetItem(tree, interval->type);
+            add->setText(0, interval->name);
+            add->setData(0, Qt::UserRole, qVariantFromValue((void*)interval));
+
+            // set interval to not selected (just in case)
+            interval->selected = false;
+        }
+
+    }
+
+    // all done, so connected widgets can receive signals now
+    intervalTree->blockSignals(false);
+
+    // now the other widgets
     calendarWidget->setRide(ride);
     rideNavigator->setRide(ride);
+}
+
+void
+AnalysisSidebar::itemSelectionChanged()
+{
+    // update RideItem::intervals to reflect user selection
+    QMapIterator<RideFileInterval::intervaltype, QTreeWidgetItem*> i(trees);
+    i.toFront();
+    while(i.hasNext()) {
+        i.next();
+
+        // loop through the intervals for this tree
+        for(int j=0; j<i.value()->childCount(); j++) {
+
+            // get pointer to the IntervalItem for this item
+            QVariant v = i.value()->child(j)->data(0, Qt::UserRole);
+
+            // make the IntervalItem selected flag reflect the current selection state
+            static_cast<IntervalItem*>(v.value<void*>())->selected = i.value()->child(j)->isSelected();
+        }
+    }
+
+    // clear hover now
+    context->notifyIntervalHover(NULL);
+
+    // notify the world
+    context->notifyIntervalSelected();
 }
 
 void
@@ -157,8 +260,8 @@ AnalysisSidebar::configChanged(qint32)
     rideNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
 
     // interval tree
-    context->athlete->intervalWidget->setPalette(GCColor::palette());
-    context->athlete->intervalWidget->setStyleSheet(GCColor::stylesheet());
+    intervalTree->setPalette(GCColor::palette());
+    intervalTree->setStyleSheet(GCColor::stylesheet());
 
     repaint();
 }
@@ -284,6 +387,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
 void
 AnalysisSidebar::intervalPopup()
 {
+#if 0 // XXX REFACTOR - GET BASICS DONE FIRST
     // always show the 'find best' 'find peaks' options
     QMenu menu(intervalItem);
 
@@ -334,11 +438,13 @@ AnalysisSidebar::intervalPopup()
     }
 
     menu.exec(mapToGlobal((QPoint(intervalItem->pos().x()+intervalItem->width()-20, intervalItem->pos().y()))));
+#endif
 }
 
 void
 AnalysisSidebar::showIntervalMenu(const QPoint &pos)
 {
+#if 0 // XXX REFACTOR GET BASICS FIRST
     QTreeWidgetItem *trItem = context->athlete->intervalWidget->itemAt(pos);
     if (trItem != NULL && trItem->text(0) != tr("Intervals")) {
 
@@ -367,6 +473,7 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
 
         menu.exec(context->athlete->intervalWidget->mapToGlobal(pos));
     }
+#endif
 }
 
 /*----------------------------------------------------------------------
@@ -376,6 +483,7 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
 void
 AnalysisSidebar::addIntervals()
 {
+#if 0
     if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) {
 
         AddIntervalDialog *p = new AddIntervalDialog(context);
@@ -389,11 +497,13 @@ AnalysisSidebar::addIntervals()
         else
             QMessageBox::critical(this, tr("Find Intervals"), tr("Current activity contains no data"));
     }
+#endif
 }
 
 void
 AnalysisSidebar::addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, QString name)
 {
+#if 0
     QList<BestIntervalDialog::BestInterval> results;
     BestIntervalDialog::findBests(ride, windowSizeSecs, 1, results);
     if (results.isEmpty()) return;
@@ -408,12 +518,14 @@ AnalysisSidebar::addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeS
                          RideFileInterval::PEAKPOWER);
     peak->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
     context->athlete->allIntervals->addChild(peak);
+#endif
 }
 
 void
 AnalysisSidebar::findPowerPeaks()
 {
 
+#if 0
     if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) {
 
         addIntervalForPowerPeaksForSecs(context->ride->ride(), 5, "Peak 5s");
@@ -438,6 +550,7 @@ AnalysisSidebar::findPowerPeaks()
         else
             QMessageBox::critical(this, tr("Find Power Peaks"), tr("Current activity contains no data"));
     }
+#endif
 }
 
 
@@ -449,6 +562,7 @@ lessItem(const IntervalItem *s1, const IntervalItem *s2) {
 void
 AnalysisSidebar::sortIntervals()
 {
+#if 0
     // sort them chronologically
     QList<IntervalItem*> intervals;
 
@@ -469,12 +583,14 @@ AnalysisSidebar::sortIntervals()
 
     // now update the ridefile
     context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
+#endif
 }
 
 // rename multiple intervals
 void
 AnalysisSidebar::renameIntervalsSelected()
 {
+#if 0
     QString string;
 
     // set string to first interval selected
@@ -512,19 +628,23 @@ AnalysisSidebar::renameIntervalsSelected()
 
         context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
     }
+#endif
 }
 
 void
 AnalysisSidebar::deleteIntervalSelected()
 {
+#if 0
     // delete the intervals that are selected (from the menu)
     // the normal delete intervals does that already
     deleteInterval();
+#endif
 }
 
 void
 AnalysisSidebar::deleteInterval()
 {
+#if 0
     // now delete highlighted!
     for (int i=0; i<context->athlete->allIntervals->childCount();) {
         if (context->athlete->allIntervals->child(i)->isSelected()) delete context->athlete->allIntervals->takeChild(i);
@@ -532,11 +652,13 @@ AnalysisSidebar::deleteInterval()
     }
 
     context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
+#endif
 }
 
 void
 AnalysisSidebar::renameIntervalSelected()
 {
+#if 0
     // go edit the name
     for (int i=0; i<context->athlete->allIntervals->childCount();) {
         if (context->athlete->allIntervals->child(i)->isSelected()) {
@@ -546,18 +668,23 @@ AnalysisSidebar::renameIntervalSelected()
         } else i++;
     }
     context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
+#endif
 }
 
 void
-AnalysisSidebar::renameInterval() {
+AnalysisSidebar::renameInterval() 
+{
+#if 0
     // go edit the name
     activeInterval->setFlags(activeInterval->flags() | Qt::ItemIsEditable);
     context->athlete->intervalWidget->editItem(activeInterval, 0);
+#endif
 }
 
 void
 AnalysisSidebar::editIntervalSelected()
 {
+#if 0
     // go edit the interval
     for (int i=0; i<context->athlete->allIntervals->childCount();) {
         if (context->athlete->allIntervals->child(i)->isSelected()) {
@@ -566,11 +693,13 @@ AnalysisSidebar::editIntervalSelected()
             break;
         } else i++;
     }
+#endif
 }
 
 void
 AnalysisSidebar::editInterval()
 {
+#if 0
     IntervalItem temp = *activeInterval;
     EditIntervalDialog dialog(this, temp);
 
@@ -579,17 +708,21 @@ AnalysisSidebar::editInterval()
         context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
         context->athlete->intervalWidget->update();
     }
+#endif
 }
 
 void
 AnalysisSidebar::clickZoomInterval(QTreeWidgetItem*item)
 {
+#if 0
     context->notifyIntervalZoom((IntervalItem*)item);
+#endif
 }
 
 void
 AnalysisSidebar::zoomIntervalSelected()
 {
+#if 0
     // zoom the one interval that is selected via popup menu
     for (int i=0; i<context->athlete->allIntervals->childCount();) {
         if (context->athlete->allIntervals->child(i)->isSelected()) {
@@ -597,29 +730,39 @@ AnalysisSidebar::zoomIntervalSelected()
             break;
         } else i++;
     }
+#endif
 }
 
 void
 AnalysisSidebar::zoomOut()
 {
+#if 0
     context->notifyZoomOut(); // only really used by ride plot
+#endif
 }
 
 void
-AnalysisSidebar::zoomInterval() {
+AnalysisSidebar::zoomInterval() 
+{
+#if 0
     // zoom into this interval on allPlot
     context->notifyIntervalZoom(activeInterval);
+#endif
 }
 
 void
-AnalysisSidebar::createRouteIntervalSelected() {
+AnalysisSidebar::createRouteIntervalSelected() 
+{
+#if 0
     // create a new route for this interval
     context->athlete->routes->createRouteFromInterval(activeInterval);
+#endif
 }
 
 void
 AnalysisSidebar::frontInterval()
 {
+#if 0
     int oindex = activeInterval->displaySequence;
     for (int i=0; i<context->athlete->allIntervals->childCount(); i++) {
         IntervalItem *it = (IntervalItem *)context->athlete->allIntervals->child(i);
@@ -631,11 +774,13 @@ AnalysisSidebar::frontInterval()
 
     // signal!
     context->notifyIntervalsChanged();
+#endif
 }
 
 void
 AnalysisSidebar::backInterval()
 {
+#if 0
     int oindex = activeInterval->displaySequence;
     for (int i=0; i<context->athlete->allIntervals->childCount(); i++) {
         IntervalItem *it = (IntervalItem *)context->athlete->allIntervals->child(i);
@@ -648,6 +793,7 @@ AnalysisSidebar::backInterval()
     // signal!
     context->notifyIntervalsChanged();
 
+#endif
 }
 
 

@@ -137,7 +137,7 @@ class Athlete : public QObject
         void addRide(QString name, bool bSelect=true, bool useTempActivities=false);
         void removeCurrentRide();
 
-        // xones etc
+        // zones etc
         void notifyZonesChanged() { zonesChanged(); }
         void notifySeasonsChanged() { seasonsChanged(); }
         void notifyNamedSearchesChanged() { namedSearchesChanged(); }
@@ -151,22 +151,8 @@ class Athlete : public QObject
         void namedSearchesChanged();
 
     public slots:
-        void intervalTreeWidgetSelectionChanged();
         void checkCPX(RideItem*ride);
-        void updateRideFileIntervals();
         void configChanged(qint32);
-
-    protected:
-        //XXX REFACTOR THIS WILL GO EVENTUALLY
-        friend class ::AnalysisSidebar;
-        friend class ::Tab;
-
-        // interval selection
-        QTreeWidgetItem *allIntervals;
-        IntervalTreeView *intervalWidget;
-        const QTreeWidgetItem *allIntervalItems() { return allIntervals; }
-        IntervalTreeView *intervalTreeWidget() { return intervalWidget; }
-        QTreeWidgetItem *mutableIntervalItems() { return allIntervals; }
 
 };
 
