@@ -614,9 +614,9 @@ RideItem::updateIntervals()
     //qDebug() << "SEARCH PEAK POWERS"
 
     // what we looking for ?
-    static int durations[] = { 1, 5, 10, 30, 60, 300, 600, 1200, 1800, 3600, 0 };
-    static const char *names[] = { "1 second", "5 seconds", "10 seconds", "30 seconds", 
-                            "1 minute", "5 minutes", "10 minutes", "20 minutes", "30 minutes", 
+    static int durations[] = { 1, 5, 10, 15, 20, 30, 60, 300, 600, 1200, 1800, 2700, 3600, 0 };
+    static const char *names[] = { "1 second", "5 seconds", "10 seconds", "15 seconds", "20 seconds", "30 seconds", 
+                            "1 minute", "5 minutes", "10 minutes", "20 minutes", "30 minutes", "45 minutes",
                             "1 hour" };
 
     for(int i=0; durations[i] != 0; i++) {
