@@ -50,6 +50,9 @@ class BestIntervalDialog : public QDialog
         static void findBests(const RideFile *ride, double windowSizeSecs,
                               int maxIntervals, QList<BestInterval> &results);
 
+        static void findBestsKPH(const RideFile *ride, double windowSizeSecs,
+                              int maxIntervals, QList<BestInterval> &results);
+
     private slots:
         void findClicked();
         void doneClicked();
