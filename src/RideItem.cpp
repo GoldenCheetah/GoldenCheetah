@@ -612,32 +612,34 @@ RideItem::updateIntervals()
     // DISCOVERY
 
     //qDebug() << "SEARCH PEAK POWERS"
+    if (!f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
 
-    // what we looking for ?
-    static int durations[] = { 1, 5, 10, 15, 20, 30, 60, 300, 600, 1200, 1800, 2700, 3600, 0 };
-    static const char *names[] = { "1 second", "5 seconds", "10 seconds", "15 seconds", "20 seconds", "30 seconds", 
-                            "1 minute", "5 minutes", "10 minutes", "20 minutes", "30 minutes", "45 minutes",
-                            "1 hour" };
+        // what we looking for ?
+        static int durations[] = { 1, 5, 10, 15, 20, 30, 60, 300, 600, 1200, 1800, 2700, 3600, 0 };
+        static const char *names[] = { "1 second", "5 seconds", "10 seconds", "15 seconds", "20 seconds", "30 seconds", 
+                                "1 minute", "5 minutes", "10 minutes", "20 minutes", "30 minutes", "45 minutes",
+                                "1 hour" };
+    
+        for(int i=0; durations[i] != 0; i++) {
 
-    for(int i=0; durations[i] != 0; i++) {
+            // go hunting for best peak
+            QList<BestIntervalDialog::BestInterval> results;
+            BestIntervalDialog::findBests(f, durations[i], 1, results);
 
-        // go hunting for best peak
-        QList<BestIntervalDialog::BestInterval> results;
-        BestIntervalDialog::findBests(f, durations[i], 1, results);
-
-        // did we get one ?
-        if (results.count() > 0) {
-            // qDebug()<<"found"<<names[i]<<"peak power"<<results[0].start<<"-"<<results[0].stop<<"of"<<results[0].avg<<"watts";
-            IntervalItem *intervalItem = new IntervalItem(f, QString(tr("%1 (%2 watts)")).arg(names[i]).arg(int(results[0].avg)),
-                                                        results[0].start, results[0].stop, 
-                                                        f->timeToDistance(results[0].start),
-                                                        f->timeToDistance(results[0].stop),
-                                                        count++,
-                                                        QColor(Qt::gray),
-                                                        RideFileInterval::PEAKPOWER);
-            intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
-            intervalItem->refresh();        // XXX will get called in constructore when refactor
-            intervals_ << intervalItem;
+            // did we get one ?
+            if (results.count() > 0 && results[0].avg > 0 && results[0].stop > 0) {
+                // qDebug()<<"found"<<names[i]<<"peak power"<<results[0].start<<"-"<<results[0].stop<<"of"<<results[0].avg<<"watts";
+                IntervalItem *intervalItem = new IntervalItem(f, QString(tr("%1 (%2 watts)")).arg(names[i]).arg(int(results[0].avg)),
+                                                            results[0].start, results[0].stop, 
+                                                            f->timeToDistance(results[0].start),
+                                                            f->timeToDistance(results[0].stop),
+                                                            count++,
+                                                            QColor(Qt::gray),
+                                                            RideFileInterval::PEAKPOWER);
+                intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
+                intervalItem->refresh();        // XXX will get called in constructore when refactor
+                intervals_ << intervalItem;
+            }
         }
     }
 
