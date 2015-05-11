@@ -267,6 +267,12 @@ AnalysisSidebar::configChanged(qint32)
     // interval tree
     intervalTree->setPalette(GCColor::palette());
     intervalTree->setStyleSheet(GCColor::stylesheet());
+    QMapIterator<RideFileInterval::intervaltype, QTreeWidgetItem*> i(trees);
+    i.toFront();
+    while(i.hasNext()) {
+        i.next();
+        i.value()->setForeground(0, GColor(CPLOTMARKER));
+    }
 
     repaint();
 }
