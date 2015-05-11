@@ -113,6 +113,7 @@ ride: '{' rideelement_list '}'                                  {
                                                                     // overwrite with prior data
                                                                     jc->item.metadata().clear();
                                                                     jc->item.metrics().fill(0.0f);
+                                                                    jc->interval.metrics().fill(0.0f);
                                                                     jc->item.clearIntervals();
                                                                     jc->item.fileName = "";
                                                                 }
@@ -177,6 +178,7 @@ intervals_list: intervals_list ',' interval
 
 interval: '{' intervalelement_list '}'                          {
                                                                      jc->item.addInterval(jc->interval);
+                                                                    jc->interval.metrics().fill(0.0f);
                                                                 }
 
 intervalelement_list: intervalelement_list ',' interval_element
