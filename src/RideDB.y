@@ -405,7 +405,7 @@ void RideCache::save()
 
                     stream << "\t\t\t{\n";
                     // interval main data 
-                    stream << "\t\t\t\"name\":\"" << interval->name <<"\",\n";
+                    stream << "\t\t\t\"name\":\"" << protect(interval->name) <<"\",\n";
                     stream << "\t\t\t\"start\":\"" << interval->start <<"\",\n";
                     stream << "\t\t\t\"stop\":\"" << interval->stop <<"\",\n";
                     stream << "\t\t\t\"startKM\":\"" << interval->startKM <<"\",\n";
