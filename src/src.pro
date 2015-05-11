@@ -614,6 +614,7 @@ SOURCES += \
         Pages.cpp \
         PDModel.cpp \
         PeakPower.cpp \
+        PeakPace.cpp \
         PfPvPlot.cpp \
         PfPvWindow.cpp \
         PolarRideFile.cpp \
