@@ -60,7 +60,7 @@ void GcWindow::setControls(QWidget *x)
             if (actions.count() > 1) menu->addSeparator();
         }
 
-        menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
+        menu->addAction(tr("Remove Chart"), this, SLOT(_closeWindow()));
     }
 }
 
@@ -202,7 +202,7 @@ GcWindow::GcWindow()
 
     menu = new QMenu(this);
     menuButton->setMenu(menu);
-    menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
+    menu->addAction(tr("Remove Chart"), this, SLOT(_closeWindow()));
     menuButton->hide();
 
     menuButton->move(1,1);
@@ -239,7 +239,7 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
 
     menu = new QMenu(this);
     menuButton->setMenu(menu);
-    menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
+    menu->addAction(tr("Remove Chart"), this, SLOT(_closeWindow()));
 
     menuButton->hide();
     menuButton->move(1,1);
@@ -817,7 +817,7 @@ GcChartWindow::setControls(QWidget *x)
 
             if (actions.count() > 1) menu->addSeparator();
         }
-        menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
+        menu->addAction(tr("Remove Chart"), this, SLOT(_closeWindow()));
     }
 }
 
