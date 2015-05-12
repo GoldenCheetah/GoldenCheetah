@@ -251,12 +251,8 @@ ModelWindow::setData(bool adjustPlot)
     zpane->setValue(0); // reset it!
 
     // any intervals to plot?
-    settings.intervals.clear();
-    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
-        IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
-        if (current != NULL && current->isSelected() == true)
-                settings.intervals.append(current);
-    }
+    if (ride) settings.intervals = ride->intervalsSelected();
+    else settings.intervals.clear();
 
     setUpdatesEnabled(false);
 
