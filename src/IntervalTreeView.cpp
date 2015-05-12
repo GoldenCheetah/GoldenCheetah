@@ -86,24 +86,24 @@ IntervalTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
     QDataStream stream(&rawData, QIODevice::WriteOnly);
     stream.setVersion(QDataStream::Qt_4_6);
 
-#if 0 //XXX REFACTOR PROLY TO PACK INTERVALITEM* ONLY
     // pack data 
     stream << (quint64)(context); // where did this come from?
     stream << (int)items.count();
     foreach (QTreeWidgetItem *p, items) {
 
         // convert to one of ours
-        IntervalItem *i = static_cast<IntervalItem*>(p);
+        QVariant v = p->data(0, Qt::UserRole);
+        IntervalItem *interval = static_cast<IntervalItem*>(v.value<void*>());
+        RideItem *ride = interval->rideItem();
 
         // serialize
-        stream << p->text(0); // name
-        stream << (quint64)(i->ride);
-        stream << (quint64)i->start << (quint64)i->stop; // start and stop in secs
-        stream << (quint64)i->startKM << (quint64)i->stopKM; // start and stop km
-        stream << (quint64)i->displaySequence;
+        stream << interval->name; // name
+        stream << (quint64)(ride);
+        stream << (quint64)interval->start << (quint64)interval->stop; // start and stop in secs
+        stream << (quint64)interval->startKM << (quint64)interval->stopKM; // start and stop km
+        stream << (quint64)interval->displaySequence;
 
     }
-#endif
 
     // and return as mime data
     returning->setData("application/x-gc-intervals", rawData);
