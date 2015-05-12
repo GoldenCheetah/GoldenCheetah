@@ -688,7 +688,8 @@ ComparePane::dropEvent(QDropEvent *event)
             stream >> add.name;                     // UPDATE COMPARE INTERVAL
 
             stream >> ridep;
-            RideFile *ride = (RideFile*)ridep;
+            RideItem *rideItem = (RideItem*)ridep;
+            RideFile *ride = rideItem->ride();
 
             // index into ridefile
             stream >> start;
