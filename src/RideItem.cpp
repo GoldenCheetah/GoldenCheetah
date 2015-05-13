@@ -657,8 +657,33 @@ RideItem::updateIntervals()
     QVector<RideFilePoint *> milestones;
 
     foreach(RideFilePoint *p, f->dataPoints()) {
-        if (milestones.size() == 0 || p->km - milestones.last()->km > 0.5) {
+        bool flat = false;
+
+        if (milestones.size() == 0 || p->km - milestones.last()->km > 0.1) {
             milestones.append(p);
+            if (milestones.size()>10) {
+                milestones.removeAt(0);
+
+                //verify milestones
+                RideFilePoint *last = new RideFilePoint();
+                last->secs = start;
+                last->km = startKm;
+                last->alt = minAlt;
+
+                int flatMilestones =0;
+                foreach(RideFilePoint *p2, milestones) {
+                    if ((p2->alt-last->alt) / (p2->km-last->km) < 20) {
+                        flatMilestones ++;
+                        if (flatMilestones>=10) {
+                            qDebug() << "    Flat Milestones";
+                            p=milestones.at(0);
+                            flat = true;
+                        }
+                    } else
+                       flatMilestones = 0;
+                    last = p2;
+                }
+            }
         }
 
         if (minAlt == -1000.0 || minAlt > p->alt) {
@@ -669,36 +694,11 @@ RideItem::updateIntervals()
 
         if (maxAlt == -1000.0 || maxAlt < p->alt) {
             maxAlt = p->alt;
-        } else if (maxAlt > p->alt+0.2*(maxAlt-minAlt) || p == f->dataPoints().last() )  {
+        } else if (flat || maxAlt > p->alt+0.2*(maxAlt-minAlt) || p == f->dataPoints().last() )  {
             if ((p->km - startKm >= 0.5 && (maxAlt-minAlt)/(p->km - startKm) >= 60) ||
                 (p->km - startKm >= 2.0 && (maxAlt-minAlt)/(p->km - startKm) >= 40) ||
                 (p->km - startKm >= 4.0 && (maxAlt-minAlt)/(p->km - startKm) >= 20)) {
                 qDebug() << "NEW HILL " << count << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
-
-                //verify milestones
-                RideFilePoint *last = new RideFilePoint();
-                last->secs = start;
-                last->km = startKm;
-                last->alt = minAlt;
-
-                int countM = 1;
-                bool flatStart = true;
-                foreach(RideFilePoint *p, milestones) {
-                    if ((p->alt-last->alt) / (p->km-last->km) < 20) {
-                        qDebug() << "    Milestone " << countM << "flat";
-                        if (flatStart) {
-                            start = p->secs;
-                            startKm = p->km;
-                            minAlt = p->alt;
-                        }
-                    } else
-                       flatStart = false;
-                    countM++;
-                    last = p;
-                }
-
-                qDebug() << "NEW HILL(2) " << count << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
-
 
                 // create a new interval item
                 IntervalItem *intervalItem = new IntervalItem(f, QString("Climb %1").arg(++hills),
