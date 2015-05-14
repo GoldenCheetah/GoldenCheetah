@@ -867,6 +867,15 @@ RideItem::updateIntervals()
 
     //qDebug() << "SEARCH HILLS";
 
+    // log of progress
+    QFile log(context->athlete->home->logs().canonicalPath() + "/" + "climb.log");
+    log.open(QIODevice::ReadWrite);
+    log.atEnd();
+    QTextStream out(&log);
+
+    out << "SEARCH CLIMB STARTS: " << fileName << "\r\n";
+    out << "START" << QDateTime::currentDateTime().toString() + "\r\n";
+
     int hills = 0;
     double start = 0.0;
     double startKm = 0.0;
@@ -898,6 +907,7 @@ RideItem::updateIntervals()
                         flatMilestones ++;
                         if (flatMilestones>=10) {
                             //qDebug() << "    Flat Milestones";
+                            out << "       FLAT at " << p2->km << "km " << p2->secs/60.0 << "min\r\n";
                             p=milestones.at(0);
                             flat = true;
                         }
@@ -917,10 +927,14 @@ RideItem::updateIntervals()
         if (maxAlt == -1000.0 || maxAlt < p->alt) {
             maxAlt = p->alt;
         } else if (flat || maxAlt > p->alt+0.2*(maxAlt-minAlt) || p == f->dataPoints().last() )  {
-            if ((p->km - startKm >= 0.5 && (maxAlt-minAlt)/(p->km - startKm) >= 60) ||
-                (p->km - startKm >= 2.0 && (maxAlt-minAlt)/(p->km - startKm) >= 40) ||
-                (p->km - startKm >= 4.0 && (maxAlt-minAlt)/(p->km - startKm) >= 20)) {
+            double distance = p->km - startKm;
+
+            if ((distance >= 0.5 && (maxAlt-minAlt)/(distance) >= 60-10*distance) ||
+                (distance >= 4.0 && (maxAlt-minAlt)/(distance) >= 20)) {
+
                 //qDebug() << "NEW HILL " << count << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
+                out << "     NEW HILL " << count << " at " << startKm << "km " << start/60.0 <<"-"<< stop/60.0 << "min " << (distance) << "km " << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%\r\n";
+
 
                 // create a new interval item
                 IntervalItem *intervalItem = new IntervalItem(f, QString("Climb %1").arg(++hills),
@@ -935,6 +949,8 @@ RideItem::updateIntervals()
                 intervals_ << intervalItem;
             } else {
                 if ((p->km - startKm) > 0.5) {
+                    out << "        NOT HILL " << "at " << startKm << "km " << start/60.0 <<"-"<< stop/60.0 << "min " << (p->km - startKm) << "km " << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%\r\n";
+
                     //qDebug() << "NOT HILL " << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
                     //f->addInterval(RideFileInterval::HILL, start, stop, QString("Not Hill %1").arg(++nothills));
                 }
@@ -951,6 +967,7 @@ RideItem::updateIntervals()
                stop = p->secs;
         }
     }
+    out << "STOP" << QDateTime::currentDateTime().toString() + "\r\n";
 
     //Search routes
     //context->athlete->routes->searchRoutesInRide(f);
