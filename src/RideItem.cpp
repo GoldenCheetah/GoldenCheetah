@@ -662,7 +662,7 @@ RideItem::updateIntervals()
         if (milestones.size() == 0 || p->km - milestones.last()->km > 0.1) {
             milestones.append(p);
             if (milestones.size()>10) {
-                milestones.removeAt(0);
+                milestones.remove(0);
 
                 //verify milestones
                 RideFilePoint *last = new RideFilePoint();
