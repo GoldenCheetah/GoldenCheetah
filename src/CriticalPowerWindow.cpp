@@ -1286,7 +1286,7 @@ CriticalPowerWindow::setSeries(int index)
 
             // clear, resize to interval count and set to null
             intervalCurves.clear();
-            for (int i=0; i<= myRideItem->intervals().count(); i++) intervalCurves << NULL;
+            if (myRideItem) for (int i=0; i<= myRideItem->intervals().count(); i++) intervalCurves << NULL;
 
             cpPlot->setSeries(series);
             cpPlot->setRide(currentRide);
