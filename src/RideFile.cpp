@@ -379,6 +379,7 @@ QString RideFileInterval::typeDescription(intervaltype x)
     case CLIMB : return tr("CLIMBING"); break;
     case EFFORT : return tr("EFFORTS"); break;
     case MATCH : return tr("MATCHES"); break;
+    case TTE : return tr("EXHAUSTION"); break;
     }
 }
 

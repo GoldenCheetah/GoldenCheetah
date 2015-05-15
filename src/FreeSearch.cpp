@@ -103,8 +103,9 @@ QList<QString> FreeSearch::search(QString query)
         // user intervals
         foreach(IntervalItem *interval, item->intervals()) {
 
-            // just user ones
-            if (interval->type != RideFileInterval::USER) continue;
+            // just user ones and named segments / routes
+            if (interval->type != RideFileInterval::USER &&
+                interval->type != RideFileInterval::ROUTE) continue;
 
             foreach (QString token, tokens) {
 
