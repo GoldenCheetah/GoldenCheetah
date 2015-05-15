@@ -550,6 +550,22 @@ RideItem::updateIntervals()
     // no ride data available ?
     if (!samples) return;
 
+    // Get CP and W' estimates for date of ride
+    double CP = 250;
+    double WPRIME = 22000;
+
+    if (context->athlete->zones()) {
+
+        // if range is -1 we need to fall back to a default value
+        int zoneRange = context->athlete->zones()->whichRange(dateTime.date());
+        CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 250;
+        WPRIME = zoneRange >= 0 ? context->athlete->zones()->getWprime(zoneRange) : 22000;
+
+        // did we override CP in metadata ?
+        int oCP = getText("CP","0").toInt();
+        if (oCP) CP=oCP;
+    }
+
     // USER / DEVICE INTERVALS
     // first we create interval items for all intervals
     // that are in the ridefile, but ignore Peaks since we
@@ -643,6 +659,138 @@ RideItem::updateIntervals()
         }
     }
 
+    //qDebug() << "SEARCH EFFORTS";
+    
+    if (!f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
+
+        const int SAMPLERATE = 1000; // 1000ms samplerate = 1 second samples
+
+        RideFilePoint sample;        // we reuse this to aggregate all values
+        long time = 0L;              // current time accumulates as we run through data
+        double lastT = 0.0f;         // last sample time seen in seconds
+
+        // set the array size
+        int arraySize = f->dataPoints().last()->secs + f->recIntSecs();
+
+        QTime timer;
+        timer.start();
+
+        // setup an integrated series
+        long *integrated_series = (long*)malloc(sizeof(long) * arraySize);
+        long *pi = integrated_series;
+        *pi = 0L;
+
+        int secs = 0;
+        foreach(RideFilePoint *p, f->dataPoints()) {
+
+            // whats the dt in microseconds
+            int dt = (p->secs * 1000) - (lastT * 1000);
+            lastT = p->secs;
+
+            //
+            // AGGREGATE INTO SAMPLES
+            //
+            while (dt) {
+
+                // we keep track of how much time has been aggregated
+                // into sample, so 'need' is whats left to aggregate 
+                // for the full sample
+                int need = SAMPLERATE - sample.secs;
+
+                // aggregate
+                if (dt < need) {
+
+                    // the entire sample read is less than we need
+                    // so aggregate the whole lot and wait fore more
+                    // data to be read. If there is no more data then
+                    // this will be lost, we don't keep incomplete samples
+                    sample.secs += dt;
+                    sample.watts += float(dt) * p->watts;
+                    dt = 0;
+
+                } else {
+
+                    // dt is more than we need to fill and entire sample
+                    // so lets just take the fraction we need
+                    dt -= need;
+
+                    // accumulating time and distance
+                    sample.secs = time; time += double(SAMPLERATE) / 1000.0f;
+
+                    // averaging sample data
+                    sample.watts += float(need) * p->watts;
+                    sample.watts /= 1000;
+
+                    // integrate
+                    *pi += sample.watts;
+                    *(pi+1) = *pi;
+
+                    // move on
+                    pi++;
+                    secs++;
+
+                    // reset back to zero so we can aggregate
+                    // the next sample
+                    sample.secs = 0;
+                    sample.watts = 0;
+                }
+            }
+        }
+
+        // now the data is integrated we can look at the 
+        // accumulated energy for each ride
+
+        for (int i=0; i<secs; i++) {
+
+            // start out at 30 minutes and drop back to
+            // 2 minutes, anything shorter and we are done
+            int t = (secs-i) > 3600 ? 3600 : secs-i;
+            while (t > 120) {
+
+                // calulate the TTE for the joules in the interval
+                // starting at i seconds with duration t
+                // This takes the monod equation p(t) = W'/t + CP and
+                // solves for t, but the added complication of also
+                // accounting for the fact it is expressed in joules
+                // So take Joules = (W'/t + CP) * t and solving that
+                // for t gives t = (Joules - W') / CP
+                int tc = ((integrated_series[i+t]-integrated_series[i]) - WPRIME) / CP;
+
+                // the TTE for this interval is greater or equal to
+                // the duration of the interval !
+                if (tc >= t) {
+
+                    long joules = integrated_series[i+t]-integrated_series[i];
+
+                    qDebug()<<fileName<<"IS MAXIMAL EFFORT!"<<fileName<<"at"<<i<<"duration"<<t;
+
+                    IntervalItem *intervalItem = new IntervalItem(f, 
+                                QString(tr("TTE of %1s (%2 watts)")).arg(t).arg(joules/t),
+                                i, i+t, 
+                                f->timeToDistance(i),
+                                f->timeToDistance(i+t),
+                                count++,
+                                QColor(Qt::red),
+                                RideFileInterval::TTE);
+
+                    intervalItem->rideItem_ = this; // XXX will go when we refactor 
+                    intervalItem->refresh();        // XXX will get called in constructore when refactor
+                    intervals_ << intervalItem;
+
+                    // skip forward
+                    i+=t-1;
+                    t=0; 
+
+                } else {
+                    t = tc;
+                }
+            }
+        }
+
+        free(integrated_series);
+        //qDebug()<<fileName<<"of"<<secs<<"seconds took "<<timer.elapsed()<<"ms";
+    }
+
     //qDebug() << "SEARCH HILLS";
 
     int hills = 0;
@@ -675,7 +823,7 @@ RideItem::updateIntervals()
                     if ((p2->alt-last->alt) / (p2->km-last->km) < 20) {
                         flatMilestones ++;
                         if (flatMilestones>=10) {
-                            qDebug() << "    Flat Milestones";
+                            //qDebug() << "    Flat Milestones";
                             p=milestones.at(0);
                             flat = true;
                         }
@@ -698,7 +846,7 @@ RideItem::updateIntervals()
             if ((p->km - startKm >= 0.5 && (maxAlt-minAlt)/(p->km - startKm) >= 60) ||
                 (p->km - startKm >= 2.0 && (maxAlt-minAlt)/(p->km - startKm) >= 40) ||
                 (p->km - startKm >= 4.0 && (maxAlt-minAlt)/(p->km - startKm) >= 20)) {
-                qDebug() << "NEW HILL " << count << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
+                //qDebug() << "NEW HILL " << count << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
 
                 // create a new interval item
                 IntervalItem *intervalItem = new IntervalItem(f, QString("Climb %1").arg(++hills),

@@ -96,7 +96,8 @@ class RideFileInterval
                             PEAKHR,                 // PEAK HR
                             CLIMB,                  // Hills and Cols
                             EFFORT,                 // Sustained effort
-                            MATCH                   // W'bal based "match from a matchbook"
+                            MATCH,                  // W'bal based "match from a matchbook"
+                            TTE,                    // A true TTE effort according to classic CP model
                            } types;                 // ALWAYS ADD TO END (RideDB.json uses int values)
 
         typedef enum intervaltype IntervalType;
