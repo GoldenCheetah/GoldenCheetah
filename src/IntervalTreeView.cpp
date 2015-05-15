@@ -94,6 +94,10 @@ IntervalTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
         // convert to one of ours
         QVariant v = p->data(0, Qt::UserRole);
         IntervalItem *interval = static_cast<IntervalItem*>(v.value<void*>());
+
+        // drag and drop tree !?
+        if (interval == NULL) return returning;
+
         RideItem *ride = interval->rideItem();
 
         // serialize
