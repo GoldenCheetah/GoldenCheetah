@@ -30,6 +30,7 @@
 #include "Settings.h"
 #include "Colors.h" // for ColorEngine
 #include "BestIntervalDialog.h" // till we fixup ridefilecache to have offsets
+#include "TimeUtils.h" // time_to_string()
 
 #include <cmath>
 #include <QtAlgorithms>
@@ -765,7 +766,7 @@ RideItem::updateIntervals()
                     qDebug()<<fileName<<"IS MAXIMAL EFFORT!"<<fileName<<"at"<<i<<"duration"<<t;
 
                     IntervalItem *intervalItem = new IntervalItem(f, 
-                                QString(tr("TTE of %1s (%2 watts)")).arg(t).arg(joules/t),
+                                QString(tr("TTE of %1  (%2 watts)")).arg(time_to_string(t)).arg(joules/t),
                                 i, i+t, 
                                 f->timeToDistance(i),
                                 f->timeToDistance(i+t),
