@@ -17,10 +17,78 @@
  */
 
 #include "RideMetric.h"
+#include "RideItem.h"
 #include "BestIntervalDialog.h"
 #include "Zones.h"
 #include <cmath>
 #include <QApplication>
+
+class PeakPercent : public RideMetric {
+
+    Q_DECLARE_TR_FUNCTIONS(PeakPercent)
+    double maxp;
+    double minp;
+
+    public:
+
+    PeakPercent() : maxp(0.0), minp(10000)
+    {
+        setType(RideMetric::Average);
+        setSymbol("peak_percent");
+        setInternalName("MMP Percentage");
+        setName(tr("MMP Percentage"));
+        setMetricUnits(tr("%"));
+        setPrecision(1); // e.g. 99.9%
+        setImperialUnits(tr("%"));
+
+    }
+
+     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P"); }
+
+    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+        if (ride->dataPoints().isEmpty() || !ride->areDataPresent()->watts) {
+
+            // no data or no power data
+            setValue(0.0);
+
+        } else {
+
+            int ap = deps.value("average_power")->value(true);
+            int duration = deps.value("workout_time")->value(true);
+
+            if (duration>120) {
+
+                // get W' and CP parameters for 2 parameter model
+                double CP = 250;
+                double WPRIME = 22000;
+
+                if (zones) {
+
+                    // if range is -1 we need to fall back to a default value
+                    CP = zoneRange >= 0 ? zones->getCP(zoneRange) : 250;
+                    WPRIME = zoneRange >= 0 ? zones->getWprime(zoneRange) : 22000;
+
+                    // did we override CP in metadata ?
+                    int oCP = ride->getTag("CP","0").toInt();
+                    if (oCP) CP=oCP;
+                }
+
+                // work out waht actual TTE is for this value
+                int joules = ap * duration;
+                double tc = (joules - WPRIME) / CP;
+                setValue(100.0f * tc / double(duration));
+
+            } else {
+                setValue(0); // not for < 2m
+            }
+        }
+    }
+    RideMetric *clone() const { return new PeakPercent(*this); }
+};
 
 class FatigueIndex : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(FatigueIndex)
@@ -566,6 +634,12 @@ class PeakPowerHr60m : public PeakPowerHr {
 };
 
 static bool addAllPeaks() {
+
+    QVector<QString> deps;
+    deps.clear();
+    deps.append("average_power");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(PeakPercent(), &deps);
     RideMetricFactory::instance().addMetric(FatigueIndex());
     RideMetricFactory::instance().addMetric(PacingIndex());  
 

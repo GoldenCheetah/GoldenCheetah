@@ -857,12 +857,12 @@ RideItem::updateIntervals()
             intervalItem->refresh();        // XXX will get called in constructore when refactor
             intervals_ << intervalItem;
 
-             qDebug()<<fileName<<"IS EFFORT"<<x.quality<<"at"<<x.start<<"duration"<<x.duration;
+            //qDebug()<<fileName<<"IS EFFORT"<<x.quality<<"at"<<x.start<<"duration"<<x.duration;
 
         }
 
         free(integrated_series);
-        //qDebug()<<fileName<<"of"<<secs<<"seconds took "<<timer.elapsed()<<"ms";
+        //qDebug()<<fileName<<"of"<<secs<<"seconds took "<<timer.elapsed()<<"ms to find"<<candidates.count();
     }
 
     //qDebug() << "SEARCH HILLS";
