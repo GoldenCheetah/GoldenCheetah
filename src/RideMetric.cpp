@@ -109,8 +109,9 @@
 // 103 23  Feb 2015 Mark Liversedge    Added total heartbeats
 // 104 24  Apr 2015 Mark Liversedge    Added Workbeat stress (Work * Heartbeats) / 10000
 // 105 09  May 2015 Ale Martinez       Added PeakPace and PeakPaceSwim metrics
+// 106 09  May 2015 Ale Martinez       Added MMP Percentage - %age of power for duration vs CP model
 
-int DBSchemaVersion = 105;
+int DBSchemaVersion = 106;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
