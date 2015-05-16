@@ -774,7 +774,7 @@ RideItem::updateIntervals()
 
                 // the TTE for this interval is greater or equal to
                 // the duration of the interval !
-                if (tc >= t) {
+                if (tc >= (t*0.85f)) {
 
                     if (found == false) {
 
@@ -837,17 +837,27 @@ RideItem::updateIntervals()
 
         // add any we found
         foreach(effort x, candidates) {
-            IntervalItem *intervalItem = new IntervalItem(f, 
-                                                          QString(tr("TTE of %1  (%2 watts)")).arg(time_to_string(x.duration)).arg(x.joules/x.duration),
-                                                          x.start, x.start+x.duration, 
-                                                          f->timeToDistance(x.start), f->timeToDistance(x.start+x.duration),
-                                                          count++, QColor(Qt::red), RideFileInterval::TTE);
+
+            IntervalItem *intervalItem=NULL;
+            if (x.quality >= 1.0f) {
+                intervalItem = new IntervalItem(f, 
+                                                QString(tr("TTE of %1  (%2 watts)")).arg(time_to_string(x.duration)).arg(x.joules/x.duration),
+                                                x.start, x.start+x.duration, 
+                                                f->timeToDistance(x.start), f->timeToDistance(x.start+x.duration),
+                                                count++, QColor(Qt::red), RideFileInterval::TTE);
+            } else {
+                intervalItem = new IntervalItem(f, 
+                                                QString(tr("%3% EFFORT of %1  (%2 watts)")).arg(time_to_string(x.duration)).arg(x.joules/x.duration).arg(int(x.quality*100)),
+                                                x.start, x.start+x.duration, 
+                                                f->timeToDistance(x.start), f->timeToDistance(x.start+x.duration),
+                                                count++, QColor(Qt::red), RideFileInterval::EFFORT);
+            }
 
             intervalItem->rideItem_ = this; // XXX will go when we refactor 
             intervalItem->refresh();        // XXX will get called in constructore when refactor
             intervals_ << intervalItem;
 
-             qDebug()<<fileName<<"IS MAXIMAL EFFORT!"<<fileName<<"at"<<x.start<<"duration"<<x.duration;
+             qDebug()<<fileName<<"IS EFFORT"<<x.quality<<"at"<<x.start<<"duration"<<x.duration;
 
         }
 
