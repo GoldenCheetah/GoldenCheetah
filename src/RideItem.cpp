@@ -400,13 +400,20 @@ RideItem::refresh()
 {
     if (!isstale) return;
 
-    // if already open no need to close
-    bool doclose = false;
-    if (!isOpen()) doclose = true;
+    // update current state coz we'll fix it below
+    isstale = false;
 
     // open ride file will extract details too, but only if not
-    // already open, so we refresh anyway
-    RideFile *f = ride();
+    // already open since its a user entry point and will call
+    // refresh when opened. We don't want a recursion here.
+    // And if already open no need to close
+    RideFile *f;
+    bool doclose = false;
+    if (!isOpen()) { 
+        doclose = true;
+        f = ride(); // will call us but isstale is false above
+    } else f=ride_;
+
     if (f) {
 
         // get the metadata & metric overrides
@@ -446,9 +453,6 @@ RideItem::refresh()
 
         // Update auto intervals AFTER ridefilecache as used for bests
         updateIntervals();
-
-        // update current state
-        isstale = false;
 
         // update fingerprints etc, crc done above
         fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
@@ -537,6 +541,11 @@ RideItem::getStringForSymbol(QString name, bool useMetricUnits)
     }
     return returning;
 }
+
+struct effort {
+    int start, duration, joules;
+    double quality;
+};
 
 void
 RideItem::updateIntervals()
@@ -661,6 +670,7 @@ RideItem::updateIntervals()
     }
 
     //qDebug() << "SEARCH EFFORTS";
+    QList<effort> candidates;
     
     if (!f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
 
@@ -746,6 +756,11 @@ RideItem::updateIntervals()
             // start out at 30 minutes and drop back to
             // 2 minutes, anything shorter and we are done
             int t = (secs-i) > 3600 ? 3600 : secs-i;
+
+            // if we find one lets record it
+            bool found = false;
+            effort tte;
+
             while (t > 120) {
 
                 // calulate the TTE for the joules in the interval
@@ -755,37 +770,85 @@ RideItem::updateIntervals()
                 // accounting for the fact it is expressed in joules
                 // So take Joules = (W'/t + CP) * t and solving that
                 // for t gives t = (Joules - W') / CP
-                int tc = ((integrated_series[i+t]-integrated_series[i]) - WPRIME) / CP;
+                double tc = ((integrated_series[i+t]-integrated_series[i]) - WPRIME) / CP;
 
                 // the TTE for this interval is greater or equal to
                 // the duration of the interval !
                 if (tc >= t) {
 
-                    long joules = integrated_series[i+t]-integrated_series[i];
+                    if (found == false) {
 
-                    qDebug()<<fileName<<"IS MAXIMAL EFFORT!"<<fileName<<"at"<<i<<"duration"<<t;
+                        // first one we found
+                        found = true;
 
-                    IntervalItem *intervalItem = new IntervalItem(f, 
-                                QString(tr("TTE of %1  (%2 watts)")).arg(time_to_string(t)).arg(joules/t),
-                                i, i+t, 
-                                f->timeToDistance(i),
-                                f->timeToDistance(i+t),
-                                count++,
-                                QColor(Qt::red),
-                                RideFileInterval::TTE);
+                        // register a candidate
+                        tte.start = i;
+                        tte.duration = t;
+                        tte.joules = integrated_series[i+t]-integrated_series[i];
+                        tte.quality = tc / double(t);
 
-                    intervalItem->rideItem_ = this; // XXX will go when we refactor 
-                    intervalItem->refresh();        // XXX will get called in constructore when refactor
-                    intervals_ << intervalItem;
+                    } else {
 
-                    // skip forward
-                    i+=t-1;
-                    t=0; 
+                        double thisquality = tc / double(t);
+
+                        // found one with a higher quality
+                        if (tte.quality < thisquality) {
+                            tte.duration = t;
+                            tte.joules = integrated_series[i+t]-integrated_series[i];
+                            tte.quality = thisquality;
+                        }
+
+                    }
+
+                    // look for smaller
+                    t--;
 
                 } else {
                     t = tc;
                 }
             }
+
+            // add the best one we found here
+            if (found) {
+
+                // if we overlap with the last one and
+                // we are better then replace otherwise skip
+                if (candidates.count()) {
+
+                    effort &last = candidates.last();
+                    if ((tte.start >= last.start && tte.start <= (last.start+last.duration)) ||
+                       (tte.start+tte.duration >= last.start && tte.start+tte.duration <= (last.start+last.duration))) {
+
+                        // we overlap but we are higher quality
+                        if (tte.quality > last.quality) last = tte;
+
+                    } else{
+
+                        // we don't overlap
+                        candidates << tte;
+                    }
+                } else {
+
+                    // we are the first
+                    candidates << tte;
+                }
+            }
+        }
+
+        // add any we found
+        foreach(effort x, candidates) {
+            IntervalItem *intervalItem = new IntervalItem(f, 
+                                                          QString(tr("TTE of %1  (%2 watts)")).arg(time_to_string(x.duration)).arg(x.joules/x.duration),
+                                                          x.start, x.start+x.duration, 
+                                                          f->timeToDistance(x.start), f->timeToDistance(x.start+x.duration),
+                                                          count++, QColor(Qt::red), RideFileInterval::TTE);
+
+            intervalItem->rideItem_ = this; // XXX will go when we refactor 
+            intervalItem->refresh();        // XXX will get called in constructore when refactor
+            intervals_ << intervalItem;
+
+             qDebug()<<fileName<<"IS MAXIMAL EFFORT!"<<fileName<<"at"<<x.start<<"duration"<<x.duration;
+
         }
 
         free(integrated_series);
