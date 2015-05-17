@@ -3285,12 +3285,15 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     mainLayout->setSpacing(10);
 
     addButton = new QPushButton(tr("+"));
+    editButton = new QPushButton(tr("Edit"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
     addButton->setFixedSize(20,20);
+    editButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
 #else
     addButton->setText(tr("Add"));
+    editButton->setText(tr("Edit"));
     deleteButton->setText(tr("Delete"));
 #endif
     defaultButton = new QPushButton(tr("Def"));
@@ -3311,11 +3314,13 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     zoneButtons->setSpacing(0);
     zoneButtons->addWidget(addZoneButton);
     zoneButtons->addWidget(deleteZoneButton);
+    zoneButtons->addWidget(defaultButton);
 
     QHBoxLayout *addLayout = new QHBoxLayout;
     QLabel *dateLabel = new QLabel(tr("From Date"));
     QLabel *cpLabel = new QLabel(tr("Critical Power"));
     QLabel *wLabel = new QLabel(tr("W'"));
+    QLabel *pmaxLabel = new QLabel(tr("Pmax"));
     dateEdit = new QDateEdit;
     dateEdit->setDate(QDate::currentDate());
 
@@ -3331,16 +3336,25 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     wEdit->setSingleStep(100);
     wEdit->setDecimals(0);
 
+    pmaxEdit = new QDoubleSpinBox;
+    pmaxEdit->setMinimum(0);
+    pmaxEdit->setMaximum(3000);
+    pmaxEdit->setSingleStep(1.0);
+    pmaxEdit->setDecimals(0);
+
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2);
     actionButtons->addWidget(cpLabel);
     actionButtons->addWidget(cpEdit);
     actionButtons->addWidget(wLabel);
     actionButtons->addWidget(wEdit);
+    actionButtons->addWidget(pmaxLabel);
+    actionButtons->addWidget(pmaxEdit);
     actionButtons->addStretch();
     actionButtons->addWidget(addButton);
+    actionButtons->addWidget(editButton);
     actionButtons->addWidget(deleteButton);
-    actionButtons->addWidget(defaultButton);
+    //actionButtons->addWidget(defaultButton); // moved to zoneButtons
 
     addLayout->addWidget(dateLabel);
     addLayout->addWidget(dateEdit);
@@ -3350,7 +3364,8 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     ranges->headerItem()->setText(0, tr("From Date"));
     ranges->headerItem()->setText(1, tr("Critical Power"));
     ranges->headerItem()->setText(2, tr("W'"));
-    ranges->setColumnCount(3);
+    ranges->headerItem()->setText(3, tr("Pmax"));
+    ranges->setColumnCount(4);
     ranges->setSelectionMode(QAbstractItemView::SingleSelection);
     //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     ranges->setUniformRowHeights(true);
@@ -3380,6 +3395,10 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
         add->setText(2, QString("%1").arg(zonePage->zones.getWprime(i)));
         add->setFont(2, font);
 
+        // Pmax
+        add->setText(3, QString("%1").arg(zonePage->zones.getPmax(i)));
+        add->setFont(3, font);
+
     }
 
     zones = new QTreeWidget;
@@ -3402,6 +3421,7 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
 
     // button connect
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
     connect(addZoneButton, SIGNAL(clicked()), this, SLOT(addZoneClicked()));
@@ -3428,7 +3448,10 @@ CPPage::addClicked()
     //int index = ranges->invisibleRootItem()->childCount();
     int wp = wEdit->value() ? wEdit->value() : 20000;
     if (wp < 1000) wp *= 1000; // entered in kJ we want joules
-    int index = zonePage->zones.addZoneRange(dateEdit->date(), cpEdit->value(), wp);
+
+    int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
+
+    int index = zonePage->zones.addZoneRange(dateEdit->date(), cpEdit->value(), wp, pmax);
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
@@ -3443,6 +3466,52 @@ CPPage::addClicked()
 
     // W'
     add->setText(2, QString("%1").arg(wp));
+
+    // Pmax
+    add->setText(3, QString("%1").arg(pmax));
+
+}
+
+void
+CPPage::editClicked()
+{
+    // get current scheme
+    zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+
+    int cp = cpEdit->value();
+    if( cp <= 0 ){
+        QMessageBox err;
+        err.setText(tr("CP must be > 0"));
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
+    int wp = wEdit->value() ? wEdit->value() : 20000;
+    if (wp < 1000) wp *= 1000; // entered in kJ we want joules
+
+    int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
+
+    QTreeWidgetItem *edit = ranges->selectedItems().at(0);
+    int index = ranges->indexOfTopLevelItem(edit);
+
+
+
+    // date
+    zonePage->zones.setStartDate(index, dateEdit->date());
+    edit->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
+
+    // CP
+    zonePage->zones.setCP(index, cp);
+    edit->setText(1, QString("%1").arg(cp));
+
+    // W'
+    zonePage->zones.setWprime(index, wp);
+    edit->setText(2, QString("%1").arg(wp));
+
+    // Pmax
+    zonePage->zones.setPmax(index, pmax);
+    edit->setText(3, QString("%1").arg(pmax));
 
 }
 
@@ -3498,8 +3567,14 @@ CPPage::rangeSelectionChanged()
     // fill with current details
     if (ranges->currentItem()) {
 
+
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         ZoneRange current = zonePage->zones.getZoneRange(index);
+
+        dateEdit->setDate(zonePage->zones.getStartDate(index));
+        cpEdit->setValue(zonePage->zones.getCP(index));
+        wEdit->setValue(zonePage->zones.getWprime(index));
+        pmaxEdit->setValue(zonePage->zones.getPmax(index));
 
         if (current.zonesSetFromCP) {
 
@@ -3912,12 +3987,13 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
     actionButtons->addStretch();
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
-    actionButtons->addWidget(defaultButton);
+    //actionButtons->addWidget(defaultButton); moved to zoneButtons
 
     QHBoxLayout *zoneButtons = new QHBoxLayout;
     zoneButtons->addStretch();
     zoneButtons->addWidget(addZoneButton);
     zoneButtons->addWidget(deleteZoneButton);
+    zoneButtons->addWidget(defaultButton);
 
     QHBoxLayout *addLayout = new QHBoxLayout;
     QLabel *dateLabel = new QLabel(tr("From Date"));

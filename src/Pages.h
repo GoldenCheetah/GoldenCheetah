@@ -648,6 +648,7 @@ class CPPage : public QWidget
 
     public slots:
         void addClicked();
+        void editClicked();
         void deleteClicked();
         void defaultClicked();
         void rangeSelectionChanged();
@@ -661,12 +662,13 @@ class CPPage : public QWidget
         QDateEdit *dateEdit;
         QDoubleSpinBox *cpEdit;
         QDoubleSpinBox *wEdit;
+        QDoubleSpinBox *pmaxEdit;
 
         ZonePage *zonePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
-        QPushButton *addButton, *deleteButton, *defaultButton;
-        QPushButton *addZoneButton, *deleteZoneButton;
+        QPushButton *addButton, *editButton, *deleteButton;
+        QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
 };
 
 class ZonePage : public QWidget
@@ -756,7 +758,7 @@ private:
     HrZonePage  *zonePage;
     QTreeWidget *ranges;
     QTreeWidget *zones;
-    QPushButton *addButton, *deleteButton, *defaultButton;
+    QPushButton *addButton, *editButton, *deleteButton, *defaultButton;
     QPushButton *addZoneButton, *deleteZoneButton;
 };
 
