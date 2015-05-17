@@ -3289,7 +3289,7 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
     addButton->setFixedSize(20,20);
-    editButton->setFixedSize(20,20);
+    editButton->setFixedSize(50,20);
     deleteButton->setFixedSize(20,20);
 #else
     addButton->setText(tr("Add"));

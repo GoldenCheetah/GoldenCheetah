@@ -991,6 +991,9 @@ Zones::getFingerprint(QDate forDate) const
         // W'
         x += ranges[i].wprime;
 
+        // Pmax
+        x += ranges[i].pmax;
+
         // each zone definition (manual edit/default changed)
         for (int j=0; j<ranges[i].zones.count(); j++) {
             x += ranges[i].zones[j].lo;
