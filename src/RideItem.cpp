@@ -873,107 +873,108 @@ RideItem::updateIntervals()
     log.atEnd();
     QTextStream out(&log);
 
+    //qDebug() << "SEARCH CLIMB STARTS: " << fileName;
     out << "SEARCH CLIMB STARTS: " << fileName << "\r\n";
     out << "START" << QDateTime::currentDateTime().toString() + "\r\n";
 
+    // Initialisation
     int hills = 0;
-    double start = 0.0;
-    double startKm = 0.0;
-    double stop = 0.0;
-    double minAlt = -1000.0;
-    double maxAlt = -1000.0;
-    double lastAlt = -1000.0;
 
-
-    QVector<RideFilePoint *> milestones;
+    RideFilePoint *pstart = f->dataPoints().at(0);
+    RideFilePoint *pstop = f->dataPoints().at(0);
 
     foreach(RideFilePoint *p, f->dataPoints()) {
-        bool flat = false;
-
-        if (milestones.size() == 0 || p->km - milestones.last()->km > 0.1) {
-            milestones.append(p);
-            if (milestones.size()>10) {
-                milestones.remove(0);
-
-                //verify milestones
-                RideFilePoint *last = new RideFilePoint();
-                last->secs = start;
-                last->km = startKm;
-                last->alt = minAlt;
-
-                int flatMilestones =0;
-                foreach(RideFilePoint *p2, milestones) {
-                    if ((p2->alt-last->alt) / (p2->km-last->km) < 20) {
-                        flatMilestones ++;
-                        if (flatMilestones>=10) {
-                            //qDebug() << "    Flat Milestones";
-                            out << "       FLAT at " << p2->km << "km " << p2->secs/60.0 << "min\r\n";
-                            p=milestones.at(0);
-                            flat = true;
-                        }
-                    } else
-                       flatMilestones = 0;
-                    last = p2;
-                }
-            }
+        // new min altitude
+        if (pstart->alt > p->alt) {
+            //update start
+            pstart = p;
+            // update stop
+            pstop = p;
+        }
+        // Update max altitude
+        if (pstop->alt < p->alt) {
+            // update stop
+            pstop = p;
         }
 
-        if (minAlt == -1000.0 || minAlt > p->alt) {
-            minAlt = p->alt;
-            start = p->secs;
-            startKm = p->km;
-        }
-
-        if (maxAlt == -1000.0 || maxAlt < p->alt) {
-            maxAlt = p->alt;
-        } else if (flat || maxAlt > p->alt+0.2*(maxAlt-minAlt) || p == f->dataPoints().last() )  {
-            double distance = p->km - startKm;
-
-            if ((distance >= 0.5 && (maxAlt-minAlt)/(distance) >= 60-10*distance) ||
-                (distance >= 4.0 && (maxAlt-minAlt)/(distance) >= 20)) {
-
-                //qDebug() << "NEW HILL " << count << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
-                out << "     NEW HILL " << count << " at " << startKm << "km " << start/60.0 <<"-"<< stop/60.0 << "min " << (distance) << "km " << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%\r\n";
+        bool downhill = (pstop->alt > p->alt+0.2*(pstop->alt-pstart->alt));
+        bool flat = (!downhill && (p->km - pstop->km)>1/3.0*(p->km - pstart->km));
+        bool end = (p == f->dataPoints().last() );
 
 
-                // create a new interval item
-                IntervalItem *intervalItem = new IntervalItem(f, QString("Climb %1").arg(++hills),
-                                                              start, stop,
-                                                              f->timeToDistance(start),
-                                                              f->timeToDistance(stop),
-                                                              count++,
-                                                              QColor(Qt::green),
-                                                              RideFileInterval::CLIMB);
-                intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
-                intervalItem->refresh();        // XXX will get called in constructore when refactor
-                intervals_ << intervalItem;
-            } else {
-                if ((p->km - startKm) > 0.5) {
-                    out << "        NOT HILL " << "at " << startKm << "km " << start/60.0 <<"-"<< stop/60.0 << "min " << (p->km - startKm) << "km " << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%\r\n";
 
-                    //qDebug() << "NOT HILL " << start/60.0 << stop/60.0 << (p->km - startKm) << "km" << (maxAlt-minAlt)/(p->km - startKm)/10.0 << "%";
-                    //f->addInterval(RideFileInterval::HILL, start, stop, QString("Not Hill %1").arg(++nothills));
+        if (flat || downhill || end ) {
+            double distance =  pstop->km - pstart->km;
+
+
+            if (distance >= 0.5) {
+                // Candidat
+
+                // Check groundrise at end
+                int start = f->dataPoints().indexOf(pstart);
+                int stop = f->dataPoints().indexOf(pstop);
+
+                for (int i=stop;i>start;i--) {
+                    RideFilePoint *p2 = f->dataPoints().at(i);
+                    double distance2 =  pstop->km - p2->km;
+                    if (distance2>0.1) {
+                        if ((pstop->alt-p2->alt)/distance2<20.0) {
+                            //qDebug() << "        correct stop " << (pstop->alt-p2->alt)/distance2;
+                            pstop = p2;
+                        } else
+                            i = start;
+                    }
+                }
+
+                for (int i=start;i<stop;i++) {
+                    RideFilePoint *p2 = f->dataPoints().at(i);
+                    double distance2 = p2->km-pstart->km;
+                    if (distance2>0.1) {
+                        if ((p2->alt-pstart->alt)/distance2<20.0) {
+                            //qDebug() << "        correct start " << (p2->alt-pstart->alt)/distance2;
+                            pstart = p2;
+                        } else
+                            i = stop;
+                    }
+                }
+
+                distance =  pstop->km - pstart->km;
+                double height = pstop->alt - pstart->alt;
+
+                if (distance >= 0.5) {
+
+                    if ((distance < 4.0 && height/distance >= 60-10*distance) ||
+                        (distance >= 4.0 && height/distance >= 20)) {
+
+                        //qDebug() << "    NEW HILL " << (hills+1) << " at " << pstart->km  << "km " << pstart->secs/60.0 <<"-"<< pstop->secs/60.0 << "min " << distance << "km " << height/distance/10.0 << "%";
+                        out << "    NEW HILL " << (hills+1) << " at " << pstart->km << "km " << pstart->secs/60.0 <<"-"<< pstop->secs/60.0 << "min " << distance << "km " << height/distance/10.0 << "%\r\n";
+
+
+                        // create a new interval item
+                        IntervalItem *intervalItem = new IntervalItem(f, QString("Climb %1").arg(++hills),
+                                                                      pstart->secs, pstop->secs,
+                                                                      pstart->km,
+                                                                      pstop->km,
+                                                                      count++,
+                                                                      QColor(Qt::green),
+                                                                      RideFileInterval::CLIMB);
+                        intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
+                        intervalItem->refresh();        // XXX will get called in constructore when refactor
+                        intervals_ << intervalItem;
+                    } else {
+                        out << "        NOT HILL " << "at " << pstart->km << "km " << pstart->secs/60.0 <<"-"<< pstop->secs/60.0 << "min " << distance << "km " << height/distance/10.0 << "%\r\n";
+
+                        //qDebug() << "        NOT HILL " << "at " << pstart->km << "km " <<  pstart->secs/60.0 <<"-"<< pstop->secs/60.0 << "min " <<  distance  << "km" << height/distance/10.0 << "%";
+                    }
                 }
             }
-            minAlt = -1000.0;
-            maxAlt = -1000.0;
-            lastAlt = p->alt;
-            start = p->secs;
-            startKm = p->km;
-            milestones.clear();
-            milestones.append(p);
-        } else if (lastAlt < p->alt) {
-               lastAlt = p->alt;
-               stop = p->secs;
+
+            pstart = pstop;
         }
     }
     out << "STOP" << QDateTime::currentDateTime().toString() + "\r\n";
 
     //Search routes
-    //context->athlete->routes->searchRoutesInRide(f);
-
-    // Search
-    //qDebug() << "find ROUTES "<< fileName;
 
     Routes* routes = context->athlete->routes;
     if (routes->routes.count()>0) {
