@@ -37,6 +37,7 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     QLabel *biolabel = new QLabel(tr("Bio"));
     QLabel *cplabel = new QLabel(tr("Critical Power (FTP)"));
     QLabel *wlabel = new QLabel(tr("W' (J)"));
+    QLabel *pmaxlabel = new QLabel(tr("Pmax (W)"));
     QLabel *wbaltaulabel = new QLabel(tr("W'bal Tau (s)"));
     QLabel *resthrlabel = new QLabel(tr("Resting Heartrate"));
     QLabel *lthrlabel = new QLabel(tr("Lactate Heartrate"));
@@ -74,6 +75,13 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     w->setMaximum(100000);
     w->setSingleStep(100);
     w->setValue(20000); // default to 20kj
+
+    pmax = new QSpinBox(this);
+    pmax->setMinimum(0);
+    pmax->setMaximum(3000);
+    pmax->setSingleStep(5);
+    pmax->setValue(1000); // default to 1000W
+
 
     wbaltau = new QSpinBox(this);
     wbaltau->setMinimum(30);
@@ -246,7 +254,7 @@ NewCyclistDialog::saveClicked()
 
                 // Setup Power Zones
                 Zones zones;
-                zones.addZoneRange(QDate(1900, 01, 01), cp->value(), w->value());
+                zones.addZoneRange(QDate(1900, 01, 01), cp->value(), w->value(), pmax->value());
                 zones.write(athleteHome->config().canonicalPath() + "/" + name->text());
 
                 // HR Zones too!
