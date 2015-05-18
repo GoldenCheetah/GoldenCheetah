@@ -398,6 +398,9 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
 void
 AnalysisSidebar::intervalPopup()
 {
+    // Hamburger menu appears on the sidebar widget
+    // to manipulate the interval tree
+
     // always show the 'find best' 'find peaks' options
     QMenu menu(intervalItem);
 
@@ -409,8 +412,8 @@ AnalysisSidebar::intervalPopup()
         menu.addAction(actFindBest);
 
         // sort but only if 2 or more intervals
-        if (rideItem->intervals(RideFileInterval::USER).count()) {
-            QAction *actSort = new QAction(tr("Sort Intervals"), intervalItem);
+        if (rideItem->intervals(RideFileInterval::USER).count()>1) {
+            QAction *actSort = new QAction(tr("Sort User Intervals"), intervalItem);
             connect(actSort, SIGNAL(triggered(void)), this, SLOT(sortIntervals(void)));
             menu.addAction(actSort);
         }
@@ -422,22 +425,28 @@ AnalysisSidebar::intervalPopup()
     connect(actZoomOut, SIGNAL(triggered(void)), this, SLOT(zoomOut(void)));
     menu.addAction(actZoomOut);
 
-    if (rideItem && rideItem->intervalsSelected().count()) {
+    if (rideItem && rideItem->intervalsSelected().count() == 1) {
 
         // we can zoom, rename etc if only 1 interval is selected
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalTree);
-        QAction *actEditInt = new QAction(tr("Edit interval"), intervalTree);
-        QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalTree);
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomIntervalSelected(void)));
-        connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editIntervalSelected(void)));
-        connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
         menu.addAction(actZoomInt);
-        menu.addAction(actEditInt);
-        menu.addAction(actDeleteInt);
-        menu.addSeparator();
     }
 
-    if (rideItem && rideItem->intervalsSelected(RideFileInterval::USER).count()) {
+    // EDIT / DELETE SINGLE USER INTERVAL
+    if (rideItem && rideItem->intervalsSelected(RideFileInterval::USER).count() == 1) {
+        menu.addSeparator();
+        QAction *actEditInt = new QAction(tr("Edit interval"), intervalTree);
+        QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalTree);
+        connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editIntervalSelected(void)));
+        connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
+        menu.addAction(actEditInt);
+        menu.addAction(actDeleteInt);
+    }
+
+    // RENAME DELETE LOTS OF USER INTERVALS
+    if (rideItem && rideItem->intervalsSelected(RideFileInterval::USER).count() > 1) {
+        menu.addSeparator();
         QAction *actRenameInt = new QAction(tr("Rename selected intervals"), intervalTree);
         connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameIntervalsSelected(void)));
         QAction *actDeleteInt = new QAction(tr("Delete selected intervals"), intervalTree);
@@ -453,6 +462,10 @@ AnalysisSidebar::intervalPopup()
 void
 AnalysisSidebar::showIntervalMenu(const QPoint &pos)
 {
+    // Right-Click 'Context' menu appears on an interval item
+    // to manipulate the specific interval, but we need to take
+    // care as we should only really operate on user intervals
+
     QTreeWidgetItem *trItem = intervalTree->itemAt(pos);
 
     QVariant v = trItem ? trItem->data(0, Qt::UserRole) : QVariant();
@@ -460,27 +473,35 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
 
     if (trItem != NULL && interval) {
 
+        bool isUser = interval->rideInterval != NULL;
+
         activeInterval = interval;
         QMenu menu(intervalTree);
 
-        QAction *actEditInt = new QAction(tr("Edit interval"), intervalTree);
-        QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalTree);
+        // ZOOM IN AND OUT FOR ALL
         QAction *actZoomOut = new QAction(tr("Zoom Out"), intervalTree);
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalTree);
-        QAction *actFrontInt = new QAction(tr("Bring to Front"), intervalTree);
-        QAction *actBackInt = new QAction(tr("Send to back"), intervalTree);
-
-        connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editInterval(void)));
-        connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteInterval(void)));
         connect(actZoomOut, SIGNAL(triggered(void)), this, SLOT(zoomOut(void)));
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomInterval(void)));
-        connect(actFrontInt, SIGNAL(triggered(void)), this, SLOT(frontInterval(void)));
-        connect(actBackInt, SIGNAL(triggered(void)), this, SLOT(backInterval(void)));
-
         menu.addAction(actZoomOut);
         menu.addAction(actZoomInt);
-        menu.addAction(actEditInt);
-        menu.addAction(actDeleteInt);
+
+        // EDIT / DELETE USER ONLY
+        if (isUser) {
+            QAction *actEditInt = new QAction(tr("Edit interval"), intervalTree);
+            QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalTree);
+            connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editInterval(void)));
+            connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteInterval(void)));
+            menu.addAction(actEditInt);
+            menu.addAction(actDeleteInt);
+        }
+
+        // BACK / FRONT NOT AVAILABLE YET
+        //QAction *actFrontInt = new QAction(tr("Bring to Front"), intervalTree);
+        //QAction *actBackInt = new QAction(tr("Send to back"), intervalTree);
+        //connect(actFrontInt, SIGNAL(triggered(void)), this, SLOT(frontInterval(void)));
+        //connect(actBackInt, SIGNAL(triggered(void)), this, SLOT(backInterval(void)));
+
         menu.addSeparator();
 
         menu.exec(intervalTree->mapToGlobal(pos));
@@ -645,25 +666,72 @@ AnalysisSidebar::renameIntervalsSelected()
 void
 AnalysisSidebar::deleteIntervalSelected()
 {
-#if 0
-    // delete the intervals that are selected (from the menu)
-    // the normal delete intervals does that already
-    deleteInterval();
-#endif
+    // run down the USER tree looking for the selected intervals
+    // and delete them. If none selected we do nothing.
+    QTreeWidgetItem *userIntervals = trees.value(RideFileInterval::USER, NULL);
+
+    if (userIntervals) {
+
+        QList <QTreeWidgetItem*> deleteList;
+
+        // loop through the intervals for this tree
+        for(int j=0; j<userIntervals->childCount(); j++) {
+
+            // get pointer to the IntervalItem for this item
+            QVariant v = userIntervals->child(j)->data(0, Qt::UserRole);
+
+            // make the IntervalItem selected flag reflect the current selection state
+            IntervalItem *item = static_cast<IntervalItem*>(v.value<void*>());
+
+            // is it selected and linked ?
+            if (item->selected && item->rideInterval) {
+                RideItem *rideItem = context->ride;
+                if (rideItem->removeInterval(item) == true) {
+                    deleteList << userIntervals->child(j);
+                } else {
+                    QMessageBox::warning(this, tr("Delete Interval"), tr("Unable to delete interval"));
+                }
+            }
+        }
+
+        // now wipe the trees
+        foreach (QTreeWidgetItem*item, deleteList) {
+            userIntervals->removeChild(item);
+            delete item;
+        }
+    }
 }
 
 void
 AnalysisSidebar::deleteInterval()
 {
-#if 0
-    // now delete highlighted!
-    for (int i=0; i<context->athlete->allIntervals->childCount();) {
-        if (context->athlete->allIntervals->child(i)->isSelected()) delete context->athlete->allIntervals->takeChild(i);
-        else i++;
-    }
+    // delete the activeInterval
 
-    context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
-#endif
+    // run down the USER tree looking for it and delete it
+    QTreeWidgetItem *userIntervals = trees.value(RideFileInterval::USER, NULL);
+
+    if (userIntervals) {
+
+        // loop through the intervals for this tree
+        for(int j=0; j<userIntervals->childCount(); j++) {
+
+            // get pointer to the IntervalItem for this item
+            QVariant v = userIntervals->child(j)->data(0, Qt::UserRole);
+
+            // make the IntervalItem selected flag reflect the current selection state
+            IntervalItem *item = static_cast<IntervalItem*>(v.value<void*>());
+
+            // is it selected and linked ?
+            if (item->selected && item == activeInterval && item->rideInterval) {
+                RideItem *rideItem = context->ride;
+                if (rideItem->removeInterval(item) == true) {
+                    delete userIntervals->takeChild(j);
+                } else {
+                    QMessageBox::warning(this, tr("Delete Interval"), tr("Unable to delete interval"));
+                }
+            }
+        }
+    }
 }
 
 void

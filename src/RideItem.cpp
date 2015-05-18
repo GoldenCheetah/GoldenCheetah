@@ -239,6 +239,22 @@ RideItem::setRide(RideFile *overwrite)
     //XXX because it is such an edge case (Merge) we will leave it for now
 }
 
+bool
+RideItem::removeInterval(IntervalItem *x)
+{
+    int index = intervals_.indexOf(x);
+
+    if (ride_ == NULL) return false; // file not open
+    if (index < 0 || index > intervals_.count()) return false; // out of bounds
+    if (x->type != RideFileInterval::USER) return false; // wrong type
+    if (x->rideInterval == NULL) return false; // no link to ridefileinterval
+    if (ride_->removeInterval(x->rideInterval) == false) return false; // failed to remove from ridefile
+    intervals_.removeAt(index);
+
+    setDirty(true);
+    return true;
+}
+
 void
 RideItem::addInterval(IntervalItem item)
 {

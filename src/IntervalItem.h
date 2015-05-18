@@ -71,7 +71,7 @@ class IntervalItem
 
         // extracted sample data
         const RideFile *ride;
-        const RideFileInterval *rideInterval;
+        RideFileInterval *rideInterval;
 
         // used by qSort()
         bool operator< (IntervalItem right) const {

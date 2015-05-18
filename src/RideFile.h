@@ -266,6 +266,7 @@ class RideFile : public QObject // QObject to emit signals
         }
         int intervalBegin(const RideFileInterval &interval) const;
         int intervalBeginSecs(const double secs) const;
+        bool removeInterval(RideFileInterval*);
 
         // Working with CAIBRATIONS
         const QList<RideFileCalibration*> &calibrations() const { return calibrations_; }
