@@ -878,7 +878,7 @@ RideItem::updateIntervals()
 
                 if (tc >= t) {
 
-                    if (found == false) {
+                    if (foundSprint == false) {
 
                         // first one we found
                         foundSprint = true;
@@ -901,7 +901,7 @@ RideItem::updateIntervals()
                         }
 
                     }
-                    //qDebug() << "sprint" << i << sprint.duration << sprint.joules/sprint.duration << "J";
+                    qDebug() << "sprint" << i << sprint.duration << sprint.joules/sprint.duration << "J";
                 }
                 // look for smaller
                 t--;
