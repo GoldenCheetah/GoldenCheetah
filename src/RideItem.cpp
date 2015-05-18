@@ -1016,3 +1016,21 @@ QList<IntervalItem*> RideItem::intervalsSelected()
     }
     return returning;
 }
+
+QList<IntervalItem*> RideItem::intervalsSelected(RideFileInterval::intervaltype type)
+{
+    QList<IntervalItem*> returning;
+    foreach(IntervalItem *p, intervals_) {
+        if (p->selected && p->type==type) returning << p;
+    }
+    return returning;
+}
+
+QList<IntervalItem*> RideItem::intervals(RideFileInterval::intervaltype type)
+{
+    QList<IntervalItem*> returning;
+    foreach(IntervalItem *p, intervals_) {
+        if (p->type == type) returning << p;
+    }
+    return returning;
+}
