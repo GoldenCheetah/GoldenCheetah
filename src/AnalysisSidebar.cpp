@@ -398,37 +398,36 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
 void
 AnalysisSidebar::intervalPopup()
 {
-#if 0 // XXX REFACTOR - GET BASICS DONE FIRST
     // always show the 'find best' 'find peaks' options
     QMenu menu(intervalItem);
 
     RideItem *rideItem = context->ride;
 
-    if (rideItem != NULL && rideItem->ride() && rideItem->ride()->dataPoints().count()) {
+    if (rideItem && rideItem->samples) {
         QAction *actFindBest = new QAction(tr("Find Intervals..."), intervalItem);
         connect(actFindBest, SIGNAL(triggered(void)), this, SLOT(addIntervals(void)));
         menu.addAction(actFindBest);
 
         // sort but only if 2 or more intervals
-        if (context->athlete->allIntervals->childCount() > 1) {
+        if (rideItem->intervals(RideFileInterval::USER).count()) {
             QAction *actSort = new QAction(tr("Sort Intervals"), intervalItem);
             connect(actSort, SIGNAL(triggered(void)), this, SLOT(sortIntervals(void)));
             menu.addAction(actSort);
         }
 
-        if (context->athlete->intervalWidget->selectedItems().count()) menu.addSeparator();
+        if (rideItem->intervalsSelected().count()) menu.addSeparator();
     }
 
     QAction *actZoomOut = new QAction(tr("Zoom out"), intervalItem);
     connect(actZoomOut, SIGNAL(triggered(void)), this, SLOT(zoomOut(void)));
     menu.addAction(actZoomOut);
 
-    if (context->athlete->intervalWidget->selectedItems().count() == 1) {
+    if (rideItem && rideItem->intervalsSelected().count()) {
 
         // we can zoom, rename etc if only 1 interval is selected
-        QAction *actZoomInt = new QAction(tr("Zoom to interval"), context->athlete->intervalWidget);
-        QAction *actEditInt = new QAction(tr("Edit interval"), context->athlete->intervalWidget);
-        QAction *actDeleteInt = new QAction(tr("Delete interval"), context->athlete->intervalWidget);
+        QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalTree);
+        QAction *actEditInt = new QAction(tr("Edit interval"), intervalTree);
+        QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalTree);
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomIntervalSelected(void)));
         connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editIntervalSelected(void)));
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
@@ -438,10 +437,10 @@ AnalysisSidebar::intervalPopup()
         menu.addSeparator();
     }
 
-    if (context->athlete->intervalWidget->selectedItems().count() > 1) {
-        QAction *actRenameInt = new QAction(tr("Rename selected intervals"), context->athlete->intervalWidget);
+    if (rideItem && rideItem->intervalsSelected(RideFileInterval::USER).count()) {
+        QAction *actRenameInt = new QAction(tr("Rename selected intervals"), intervalTree);
         connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameIntervalsSelected(void)));
-        QAction *actDeleteInt = new QAction(tr("Delete selected intervals"), context->athlete->intervalWidget);
+        QAction *actDeleteInt = new QAction(tr("Delete selected intervals"), intervalTree);
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
 
         menu.addAction(actRenameInt);
@@ -449,25 +448,27 @@ AnalysisSidebar::intervalPopup()
     }
 
     menu.exec(mapToGlobal((QPoint(intervalItem->pos().x()+intervalItem->width()-20, intervalItem->pos().y()))));
-#endif
 }
 
 void
 AnalysisSidebar::showIntervalMenu(const QPoint &pos)
 {
-#if 0 // XXX REFACTOR GET BASICS FIRST
-    QTreeWidgetItem *trItem = context->athlete->intervalWidget->itemAt(pos);
-    if (trItem != NULL && trItem->text(0) != tr("Intervals")) {
+    QTreeWidgetItem *trItem = intervalTree->itemAt(pos);
 
-        activeInterval = (IntervalItem *)trItem;
-        QMenu menu(context->athlete->intervalWidget);
+    QVariant v = trItem ? trItem->data(0, Qt::UserRole) : QVariant();
+    IntervalItem *interval = static_cast<IntervalItem*>(v.value<void*>());
 
-        QAction *actEditInt = new QAction(tr("Edit interval"), context->athlete->intervalWidget);
-        QAction *actDeleteInt = new QAction(tr("Delete interval"), context->athlete->intervalWidget);
-        QAction *actZoomOut = new QAction(tr("Zoom Out"), context->athlete->intervalWidget);
-        QAction *actZoomInt = new QAction(tr("Zoom to interval"), context->athlete->intervalWidget);
-        QAction *actFrontInt = new QAction(tr("Bring to Front"), context->athlete->intervalWidget);
-        QAction *actBackInt = new QAction(tr("Send to back"), context->athlete->intervalWidget);
+    if (trItem != NULL && interval) {
+
+        activeInterval = interval;
+        QMenu menu(intervalTree);
+
+        QAction *actEditInt = new QAction(tr("Edit interval"), intervalTree);
+        QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalTree);
+        QAction *actZoomOut = new QAction(tr("Zoom Out"), intervalTree);
+        QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalTree);
+        QAction *actFrontInt = new QAction(tr("Bring to Front"), intervalTree);
+        QAction *actBackInt = new QAction(tr("Send to back"), intervalTree);
 
         connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editInterval(void)));
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteInterval(void)));
@@ -482,9 +483,8 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         menu.addAction(actDeleteInt);
         menu.addSeparator();
 
-        menu.exec(context->athlete->intervalWidget->mapToGlobal(pos));
+        menu.exec(intervalTree->mapToGlobal(pos));
     }
-#endif
 }
 
 /*----------------------------------------------------------------------
@@ -725,40 +725,36 @@ AnalysisSidebar::editInterval()
 void
 AnalysisSidebar::clickZoomInterval(QTreeWidgetItem*item)
 {
-#if 0
-    context->notifyIntervalZoom((IntervalItem*)item);
-#endif
+    if (item) {
+
+        // get interval reference for this tree item
+        QVariant v = item->data(0, Qt::UserRole);
+        IntervalItem *interval = static_cast<IntervalItem*>(v.value<void*>());
+        context->notifyIntervalZoom(interval);
+    }
 }
 
 void
 AnalysisSidebar::zoomIntervalSelected()
 {
-#if 0
-    // zoom the one interval that is selected via popup menu
-    for (int i=0; i<context->athlete->allIntervals->childCount();) {
-        if (context->athlete->allIntervals->child(i)->isSelected()) {
-            context->notifyIntervalZoom((IntervalItem*)(context->athlete->allIntervals->child(i)));
-            break;
-        } else i++;
+    RideItem *rideItem = context->ride;
+    if (rideItem && rideItem->intervalsSelected().count()) {
+        // zoom the one interval that is selected via popup menu
+        context->notifyIntervalZoom(rideItem->intervalsSelected().first());
     }
-#endif
 }
 
 void
 AnalysisSidebar::zoomOut()
 {
-#if 0
     context->notifyZoomOut(); // only really used by ride plot
-#endif
 }
 
 void
 AnalysisSidebar::zoomInterval() 
 {
-#if 0
     // zoom into this interval on allPlot
     context->notifyIntervalZoom(activeInterval);
-#endif
 }
 
 void

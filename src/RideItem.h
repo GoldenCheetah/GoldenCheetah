@@ -123,11 +123,17 @@ class RideItem : public QObject
         RideFile *ride(bool open=true);
         RideFileCache *fileCache();
         QVector<double> &metrics() { return metrics_; }
-        QList<IntervalItem*> &intervals() { return intervals_; }
-        QList<IntervalItem*> intervalsSelected();
-        QMap<QString, QString> &metadata() { return metadata_; }
         const QStringList errors() { return errors_; }
         double getWeight();
+
+        // when retrieving interval lists we can provide criteria too
+        QList<IntervalItem*> &intervals() { return intervals_; }
+        QList<IntervalItem*> intervalsSelected();
+        QList<IntervalItem*> intervals(RideFileInterval::intervaltype);
+        QList<IntervalItem*> intervalsSelected(RideFileInterval::intervaltype);
+
+        // metadata
+        QMap<QString, QString> &metadata() { return metadata_; }
 
         // ride() will open the ride if it isn't already when open=true
         // if we pass false then it will just return ride_ so we can
