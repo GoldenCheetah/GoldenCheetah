@@ -390,6 +390,7 @@ QString RideFileInterval::typeDescription(intervaltype x)
     case DEVICE : return tr("DEVICE"); break;
     case USER : return tr("USER"); break;
     case PEAKPOWER : return tr("PEAK POWER"); break;
+    case SPRINT : return tr("SPRINT"); break;
     case ROUTE : return tr("SEGMENTS"); break;
     case PEAKHR : return tr("PEAK HR"); break;
     case CLIMB : return tr("CLIMBING"); break;
