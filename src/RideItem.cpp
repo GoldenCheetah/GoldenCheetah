@@ -887,11 +887,11 @@ RideItem::updateIntervals()
                         sprint.start = i;
                         sprint.duration = t;
                         sprint.joules = integrated_series[i+t]-integrated_series[i];
-                        sprint.quality = t;
+                        sprint.quality = t + (sprint.joules/sprint.duration/1000.0);
 
                     } else {
 
-                        double thisquality = double(t);
+                        double thisquality = double(t) + (integrated_series[i+t]-integrated_series[i])/t/1000.0;
 
                         // found one with a higher quality
                         if (sprint.quality < thisquality) {
@@ -901,7 +901,7 @@ RideItem::updateIntervals()
                         }
 
                     }
-                    qDebug() << "sprint" << i << sprint.duration << sprint.joules/sprint.duration << "J";
+                    //qDebug() << "sprint" << i << sprint.duration << sprint.joules/sprint.duration << "W" << sprint.quality;
                 }
                 // look for smaller
                 t--;
