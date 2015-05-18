@@ -2366,7 +2366,7 @@ AllPlot::refreshCalibrationMarkers()
     color.setAlpha(15); // almost invisible !
 
     if (rideItem && rideItem->ride()) {
-        foreach(const RideFileCalibration &calibration, rideItem->ride()->calibrations()) {
+        foreach(const RideFileCalibration *calibration, rideItem->ride()->calibrations()) {
             QwtPlotMarker *mrk = new QwtPlotMarker;
             standard->cal_mrk.append(mrk);
             mrk->attach(this);
@@ -2374,10 +2374,10 @@ AllPlot::refreshCalibrationMarkers()
             mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
             mrk->setLinePen(QPen(color, 0, Qt::SolidLine));
             if (!bydist)
-                mrk->setValue(calibration.start / 60.0, 0.0);
+                mrk->setValue(calibration->start / 60.0, 0.0);
             else
                 mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
-                                rideItem->ride()->timeToDistance(calibration.start), 0.0);
+                                rideItem->ride()->timeToDistance(calibration->start), 0.0);
 
             //Lots of markers can clutter things, so avoid texts for now
             //QwtText text(false ? ("\n\n"+calibration.name) : "");

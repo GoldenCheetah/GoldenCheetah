@@ -237,12 +237,12 @@ GcFileReader::writeRideFile(Context *,const RideFile *ride, QFile &file) const
     if (!ride->intervals().empty()) {
         QDomElement intervals = doc.createElement("intervals");
         root.appendChild(intervals);
-        foreach (RideFileInterval i, ride->intervals()) {
+        foreach (RideFileInterval *i, ride->intervals()) {
             QDomElement interval = doc.createElement("interval");
             intervals.appendChild(interval);
-            interval.setAttribute("name", i.name);
-            interval.setAttribute("start", QString("%1").arg(i.start));
-            interval.setAttribute("stop", QString("%1").arg(i.stop));
+            interval.setAttribute("name", i->name);
+            interval.setAttribute("start", QString("%1").arg(i->start));
+            interval.setAttribute("stop", QString("%1").arg(i->stop));
         }
     }
 

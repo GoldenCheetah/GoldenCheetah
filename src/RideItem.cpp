@@ -601,30 +601,30 @@ RideItem::updateIntervals()
     intervals_ << entire;
 
     int count = 1;
-    foreach(RideFileInterval interval, f->intervals()) {
+    foreach(RideFileInterval *interval, f->intervals()) {
 
         // skip peaks, they're autodiscovered now
-        if (interval.isPeak()) continue;
+        if (interval->isPeak()) continue;
 
         // skip climbs, they're autodiscovered now
-        if (interval.isClimb()) continue;
+        if (interval->isClimb()) continue;
 
         // skip entire ride, they're autodiscovered too
-        if (interval.start <= begin->secs && interval.stop >= end->secs) continue;
+        if (interval->start <= begin->secs && interval->stop >= end->secs) continue;
 
         // same as ride but offset by recintsecs
-        if (((interval.start - f->recIntSecs()) <= begin->secs && (interval.stop-f->recIntSecs()) >= end->secs) ||
-           (interval.start <= begin->secs && (interval.stop+f->recIntSecs()) >= end->secs))
+        if (((interval->start - f->recIntSecs()) <= begin->secs && (interval->stop-f->recIntSecs()) >= end->secs) ||
+           (interval->start <= begin->secs && (interval->stop+f->recIntSecs()) >= end->secs))
              continue;
 
         // skip empty backward intervals
-        if (interval.start >= interval.stop) continue;
+        if (interval->start >= interval->stop) continue;
 
         // create a new interval item
-        IntervalItem *intervalItem = new IntervalItem(f, interval.name, 
-                                                      interval.start, interval.stop, 
-                                                      f->timeToDistance(interval.start),
-                                                      f->timeToDistance(interval.stop),
+        IntervalItem *intervalItem = new IntervalItem(f, interval->name, 
+                                                      interval->start, interval->stop, 
+                                                      f->timeToDistance(interval->start),
+                                                      f->timeToDistance(interval->stop),
                                                       count,
                                                       standardColor(count++),
                                                       RideFileInterval::USER);

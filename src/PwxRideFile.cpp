@@ -749,13 +749,13 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
     }
 
     // interval "segments"
-    foreach (RideFileInterval i, ride->intervals()) {
+    foreach (RideFileInterval *i, ride->intervals()) {
         QDomElement segment = doc.createElement("segment");
         root.appendChild(segment);
 
         // name
         QDomElement name = doc.createElement("name");
-        text = doc.createTextNode(i.name); name.appendChild(text);
+        text = doc.createTextNode(i->name); name.appendChild(text);
         segment.appendChild(name);
 
         // summarydata
@@ -764,13 +764,13 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
 
         // beginning
         QDomElement beginning = doc.createElement("beginning");
-        text = doc.createTextNode(QString("%1").arg(i.start));
+        text = doc.createTextNode(QString("%1").arg(i->start));
         beginning.appendChild(text);
         summarydata.appendChild(beginning);
 
         // duration
         QDomElement duration = doc.createElement("duration");
-        text = doc.createTextNode(QString("%1").arg(i.stop - i.start));
+        text = doc.createTextNode(QString("%1").arg(i->stop - i->start));
         duration.appendChild(text);
         summarydata.appendChild(duration);
     }

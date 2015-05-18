@@ -262,27 +262,15 @@ class RideFile : public QObject // QObject to emit signals
 
         // Working with INTERVALS
         void addInterval(RideFileInterval::IntervalType type, double start, double stop, const QString &name) {
-            intervals_.append(RideFileInterval(type, start, stop, name));
-        }
-        void addInterval(double start, double stop, const QString &name) {
-            intervals_.append(RideFileInterval(RideFileInterval::DEVICE, start, stop, name));
-        }
-        void addInterval(QString typeString, double start, double stop, const QString &name) {
-            RideFileInterval::IntervalType type = RideFileInterval::DEVICE;
-            if (typeString == "ROUTE") {
-                type = RideFileInterval::ROUTE;
-            } else if (typeString == "USER") {
-                type = RideFileInterval::USER;
-            }
-            intervals_.append(RideFileInterval(type, start, stop, name));
+            intervals_.append(new RideFileInterval(type, start, stop, name));
         }
         int intervalBegin(const RideFileInterval &interval) const;
         int intervalBeginSecs(const double secs) const;
 
         // Working with CAIBRATIONS
-        const QList<RideFileCalibration> &calibrations() const { return calibrations_; }
+        const QList<RideFileCalibration*> &calibrations() const { return calibrations_; }
         void addCalibration(double start, int value, const QString &name) {
-            calibrations_.append(RideFileCalibration(start, value, name));
+            calibrations_.append(new RideFileCalibration(start, value, name));
         }
 
         // Working with REFERENCES
@@ -339,7 +327,7 @@ class RideFile : public QObject // QObject to emit signals
     protected:
 
         //  should access via IntervalItem
-        const QList<RideFileInterval> &intervals() const { return intervals_; }
+        const QList<RideFileInterval*> &intervals() const { return intervals_; }
         void clearIntervals();
         void fillInIntervals();
 
@@ -363,8 +351,8 @@ class RideFile : public QObject // QObject to emit signals
         RideFileDataPresent dataPresent;
         QString deviceType_;
         QString fileFormat_;
-        QList<RideFileInterval> intervals_;
-        QList<RideFileCalibration> calibrations_;
+        QList<RideFileInterval*> intervals_;
+        QList<RideFileCalibration*> calibrations_;
         QMap<QString,QString> tags_;
         EditorData *data;
         WPrime *wprime_;
