@@ -142,11 +142,11 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
         QDomElement laps = doc.createElement("Laps");
         activity.appendChild(laps);
 
-        foreach (RideFileInterval interval, ride->intervals()) {
+        foreach (RideFileInterval *interval, ride->intervals()) {
             RideFile f(ride->startTime(), ride->recIntSecs());
-            for (int i = ride->intervalBegin(interval); i < ride->dataPoints().size(); ++i) {
+            for (int i = ride->intervalBegin(*interval); i < ride->dataPoints().size(); ++i) {
                 const RideFilePoint *p = ride->dataPoints()[i];
-                if (p->secs >= interval.stop)
+                if (p->secs >= interval->stop)
                     break;
                 f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
                               p->watts, p->alt, p->lon, p->lat, p->headwind,
@@ -167,8 +167,8 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
                 RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), worklist);
 
             QDomElement lap = doc.createElement("Lap");
-            lap.setAttribute("StartTime", ride->startTime().addSecs(interval.start).toString(Qt::ISODate)+"Z");
-            lap.setAttribute("DurationSeconds", interval.stop-interval.start);
+            lap.setAttribute("StartTime", ride->startTime().addSecs(interval->start).toString(Qt::ISODate)+"Z");
+            lap.setAttribute("DurationSeconds", interval->stop-interval->start);
             laps.appendChild(lap);
 
             QDomElement lap_distance = doc.createElement("Distance");
