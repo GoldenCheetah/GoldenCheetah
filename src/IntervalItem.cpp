@@ -36,11 +36,12 @@ IntervalItem::IntervalItem(const RideFile *ride, QString name, double start, dou
     this->type = type;
     this->color = color;
     this->selected = false;
+    this->rideInterval = NULL;
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 IntervalItem::IntervalItem() : rideItem_(NULL), name(""), type(RideFileInterval::USER), start(0), stop(0),
-                               startKM(0), stopKM(0), displaySequence(0), color(Qt::black)
+                               startKM(0), stopKM(0), displaySequence(0), color(Qt::black), rideInterval(NULL)
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -49,6 +50,7 @@ void
 IntervalItem::setFrom(IntervalItem &other)
 {
     *this = other;
+    rideInterval = NULL;
     selected = false;
 }
 
