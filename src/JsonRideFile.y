@@ -193,7 +193,8 @@ interval: '{' NAME ':' string ','       { jc->JsonInterval.name = jc->JsonString
               START ':' number ','      { jc->JsonInterval.start = jc->JsonNumber; }
               STOP ':' number           { jc->JsonInterval.stop = jc->JsonNumber; }
           '}'
-                                        { jc->JsonRide->addInterval(jc->JsonInterval.start,
+                                        { jc->JsonRide->addInterval(RideFileInterval::USER,
+                                                                jc->JsonInterval.start,
                                                                 jc->JsonInterval.stop,
                                                                 jc->JsonInterval.name);
                                           jc->JsonInterval = RideFileInterval();
@@ -469,14 +470,14 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
         out << ",\n\t\t\"INTERVALS\":[\n";
         bool first = true;
 
-        foreach (RideFileInterval i, ride->intervals()) {
+        foreach (RideFileInterval *i, ride->intervals()) {
             if (first) first=false;
             else out << ",\n";
 
             out << "\t\t\t{ ";
-            out << "\"NAME\":\"" << protect(i.name) << "\"";
-            out << ", \"START\": " << QString("%1").arg(i.start);
-            out << ", \"STOP\": " << QString("%1").arg(i.stop) << " }";
+            out << "\"NAME\":\"" << protect(i->name) << "\"";
+            out << ", \"START\": " << QString("%1").arg(i->start);
+            out << ", \"STOP\": " << QString("%1").arg(i->stop) << " }";
         }
         out <<"\n\t\t]";
     }
@@ -489,14 +490,14 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
         out << ",\n\t\t\"CALIBRATIONS\":[\n";
         bool first = true;
 
-        foreach (RideFileCalibration i, ride->calibrations()) {
+        foreach (RideFileCalibration *i, ride->calibrations()) {
             if (first) first=false;
             else out << ",\n";
 
             out << "\t\t\t{ ";
-            out << "\"NAME\":\"" << protect(i.name) << "\"";
-            out << ", \"START\": " << QString("%1").arg(i.start);
-            out << ", \"VALUE\": " << QString("%1").arg(i.value) << " }";
+            out << "\"NAME\":\"" << protect(i->name) << "\"";
+            out << ", \"START\": " << QString("%1").arg(i->start);
+            out << ", \"VALUE\": " << QString("%1").arg(i->value) << " }";
         }
         out <<"\n\t\t]";
     }

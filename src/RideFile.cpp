@@ -103,10 +103,10 @@ RideFile::~RideFile()
     emit deleted();
     foreach(RideFilePoint *point, dataPoints_)
         delete point;
-    foreach(RideFileCalibration *calibration, calibrations_)
-        delete calibration;
-    foreach(RideFileInterval *interval, intervals_)
-        delete interval;
+    //foreach(RideFileCalibration *calibration, calibrations_)
+        //delete calibration;
+    //foreach(RideFileInterval *interval, intervals_)
+        //delete interval;
     delete command;
     if (wprime_) delete wprime_;
     //!!! if (data) delete data; // need a mechanism to notify the editor
