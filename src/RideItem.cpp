@@ -874,7 +874,7 @@ RideItem::updateIntervals()
 
 
             while (t >= 5) {
-                double tc = (integrated_series[i+t]-integrated_series[i]) / (PMAX*0.85f);
+                double tc = (integrated_series[i+t]-integrated_series[i]) / (PMAX*0.75f);
 
                 if (tc >= t) {
 
@@ -887,11 +887,11 @@ RideItem::updateIntervals()
                         sprint.start = i;
                         sprint.duration = t;
                         sprint.joules = integrated_series[i+t]-integrated_series[i];
-                        sprint.quality = tc / double(t);
+                        sprint.quality = t;
 
                     } else {
 
-                        double thisquality = tc / double(t);
+                        double thisquality = double(t);
 
                         // found one with a higher quality
                         if (sprint.quality < thisquality) {
