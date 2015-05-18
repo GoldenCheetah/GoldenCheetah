@@ -142,6 +142,40 @@ RideFile *RideItem::ride(bool open)
     ride_ = RideFileFactory::instance().openRideFile(context, file, errors_);
     if (ride_ == NULL) return NULL; // failed to read ride
 
+    // link any USER intervals to the ride, bit fiddly but only used
+    // when updating the physical model via the logical
+    if (intervals_.count()) {
+        //qDebug()<<fileName<<"LINKING INTERVALS";
+        int findex=0;
+        for(int index=0; index<intervals_.count(); index++) {
+
+            // only linking user intervals
+            if (intervals_.at(index)->type != RideFileInterval::USER) continue;
+
+            if (ride_->intervals().count()<=findex) {
+                // none left to link to, so wipe!
+                //qDebug()<<"user interval not found"<<intervals_.at(index)->name;
+
+            } else {
+
+                // look for us ...
+                while (findex < ride_->intervals().count()) {
+                    if (ride_->intervals().at(findex)->name == intervals_.at(index)->name) {
+                        //qDebug()<<"linking"<<intervals_.at(index)->name;
+                        intervals_.at(index)->rideInterval = ride_->intervals().at(findex);
+                        findex++;
+                        goto next;
+                    } else {
+                        //qDebug()<<"seeking"<<intervals_.at(index)->name;
+                        ;
+                    }
+                    findex++;
+                }
+            }
+            next:;
+        }
+    }
+
     // refresh if stale..
     refresh();
 
@@ -303,6 +337,8 @@ void
 RideItem::close()
 {
     if (ride_) {
+        // break link to ride file
+        foreach(IntervalItem *x, intervals()) x->rideInterval = NULL;
         delete ride_;
         ride_ = NULL;
     }
@@ -598,6 +634,7 @@ RideItem::updateIntervals()
     // same as the whole ride, not need to compute
     entire->metrics() = metrics();
     entire->rideItem_ = this;
+    entire->rideInterval = NULL;
     intervals_ << entire;
 
     int count = 1;
@@ -629,6 +666,7 @@ RideItem::updateIntervals()
                                                       standardColor(count++),
                                                       RideFileInterval::USER);
         intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
+        intervalItem->rideInterval = interval;
         intervalItem->refresh();        // XXX will get called in constructore when refactor
         intervals_ << intervalItem;
 
@@ -663,6 +701,7 @@ RideItem::updateIntervals()
                                                             QColor(Qt::gray),
                                                             RideFileInterval::PEAKPOWER);
                 intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
+                intervalItem->rideInterval = NULL;
                 intervalItem->refresh();        // XXX will get called in constructore when refactor
                 intervals_ << intervalItem;
             }
@@ -854,6 +893,7 @@ RideItem::updateIntervals()
             }
 
             intervalItem->rideItem_ = this; // XXX will go when we refactor 
+            intervalItem->rideInterval = NULL;
             intervalItem->refresh();        // XXX will get called in constructore when refactor
             intervals_ << intervalItem;
 
@@ -1000,6 +1040,7 @@ RideItem::updateIntervals()
                                                                   QColor(Qt::gray),
                                                                   RideFileInterval::ROUTE);
                     intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
+                    intervalItem->rideInterval = NULL;
                     intervalItem->refresh();        // XXX will get called in constructore when refactor
                     intervals_ << intervalItem;
                 }

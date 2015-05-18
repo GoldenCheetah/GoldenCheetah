@@ -730,7 +730,7 @@ AnalysisSidebar::clickZoomInterval(QTreeWidgetItem*item)
         // get interval reference for this tree item
         QVariant v = item->data(0, Qt::UserRole);
         IntervalItem *interval = static_cast<IntervalItem*>(v.value<void*>());
-        context->notifyIntervalZoom(interval);
+        if (interval) context->notifyIntervalZoom(interval);
     }
 }
 

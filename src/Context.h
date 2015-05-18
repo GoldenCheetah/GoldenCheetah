@@ -77,7 +77,6 @@ class Context : public QObject
 
         // ride item
         RideItem *rideItem() const { return ride; }
-        const RideFile *currentRide();
         const RideItem *currentRideItem() { return ride; }
         DateRange currentDateRange() { return dr_; }
 
