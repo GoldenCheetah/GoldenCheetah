@@ -98,6 +98,7 @@ class RideFileInterval
                             EFFORT,                 // Sustained effort
                             MATCH,                  // W'bal based "match from a matchbook"
                             TTE,                    // A true TTE effort according to classic CP model
+                            SPRINT                  // Sprint
                            } types;                 // ALWAYS ADD TO END (RideDB.json uses int values)
 
         typedef enum intervaltype IntervalType;
