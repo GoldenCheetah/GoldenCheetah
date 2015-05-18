@@ -359,6 +359,17 @@ RideFile::fillInIntervals()
         mark();
 }
 
+bool
+RideFile::removeInterval(RideFileInterval*x)
+{
+    int index = intervals_.indexOf(x);
+    if (index == -1) return false;
+    else {
+        intervals_.removeAt(index);
+        return true;
+    }
+}
+
 struct ComparePointKm {
     bool operator()(const RideFilePoint *p1, const RideFilePoint *p2) {
         return p1->km < p2->km;
