@@ -651,6 +651,7 @@ class CPPage : public QWidget
         void editClicked();
         void deleteClicked();
         void defaultClicked();
+        void rangeEdited();
         void rangeSelectionChanged();
         void addZoneClicked();
         void deleteZoneClicked();
@@ -667,7 +668,7 @@ class CPPage : public QWidget
         ZonePage *zonePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
-        QPushButton *addButton, *editButton, *deleteButton;
+        QPushButton *addButton, *updateButton, *deleteButton;
         QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
 };
 
