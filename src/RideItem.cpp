@@ -874,37 +874,44 @@ RideItem::updateIntervals()
             }
 
             // Search sprint
-
-
             while (t >= 5) {
-                double tc = (integrated_series[i+t]-integrated_series[i]) / (PMAX*0.75f);
+                // On Pmax only
+                // double tc = (integrated_series[i+t]-integrated_series[i]) / (PMAX);
 
-                if (tc >= t) {
+                // With the 3 components model
+                // t = W'/(P − CP) + W'/(CP − Pmax)
+                double p = (integrated_series[i+t]-integrated_series[i])/t;
 
-                    if (foundSprint == false) {
+                if (p>0.75f*PMAX) {
+                    double tc = WPRIME / (p-CP) + WPRIME / ( CP - PMAX);
 
-                        // first one we found
-                        foundSprint = true;
+                    if (tc >= (t*0.85f)) {
 
-                        // register a candidate
-                        sprint.start = i + 1; // see NOTE above
-                        sprint.duration = t;
-                        sprint.joules = integrated_series[i+t]-integrated_series[i];
-                        sprint.quality = t + (sprint.joules/sprint.duration/1000.0);
+                        if (foundSprint == false) {
 
-                    } else {
+                            // first one we found
+                            foundSprint = true;
 
-                        double thisquality = double(t) + (integrated_series[i+t]-integrated_series[i])/t/1000.0;
-
-                        // found one with a higher quality
-                        if (sprint.quality < thisquality) {
+                            // register a candidate
+                            sprint.start = i + 1; // see NOTE above
                             sprint.duration = t;
                             sprint.joules = integrated_series[i+t]-integrated_series[i];
-                            sprint.quality = thisquality;
-                        }
+                            sprint.quality = t + (sprint.joules/sprint.duration/1000.0);
 
+                        } else {
+
+                            double thisquality = double(t) + (integrated_series[i+t]-integrated_series[i])/t/1000.0;
+
+                            // found one with a higher quality
+                            if (sprint.quality < thisquality) {
+                                sprint.duration = t;
+                                sprint.joules = integrated_series[i+t]-integrated_series[i];
+                                sprint.quality = thisquality;
+                            }
+
+                        }
+                        //qDebug() << "sprint" << i << sprint.duration << sprint.joules/sprint.duration << "W" << sprint.quality;
                     }
-                    //qDebug() << "sprint" << i << sprint.duration << sprint.joules/sprint.duration << "W" << sprint.quality;
                 }
                 // look for smaller
                 t--;
