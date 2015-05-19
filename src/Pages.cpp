@@ -3284,16 +3284,17 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     QGridLayout *mainLayout = new QGridLayout(this);
     mainLayout->setSpacing(10);
 
+    updateButton = new QPushButton(tr("Update"));
+    updateButton->hide();
     addButton = new QPushButton(tr("+"));
-    editButton = new QPushButton(tr("Edit"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
     addButton->setFixedSize(20,20);
-    editButton->setFixedSize(50,20);
+    updateButton->setFixedSize(60,20);
     deleteButton->setFixedSize(20,20);
 #else
     addButton->setText(tr("Add"));
-    editButton->setText(tr("Edit"));
+    updateButton->setText(tr("Update"));
     deleteButton->setText(tr("Delete"));
 #endif
     defaultButton = new QPushButton(tr("Def"));
@@ -3351,8 +3352,8 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     actionButtons->addWidget(pmaxLabel);
     actionButtons->addWidget(pmaxEdit);
     actionButtons->addStretch();
+    actionButtons->addWidget(updateButton);
     actionButtons->addWidget(addButton);
-    actionButtons->addWidget(editButton);
     actionButtons->addWidget(deleteButton);
     //actionButtons->addWidget(defaultButton); // moved to zoneButtons
 
@@ -3420,8 +3421,13 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     mainLayout->addWidget(zones, 4,0);
 
     // button connect
+    connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
+    connect(cpEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(wEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(pmaxEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
+    connect(updateButton, SIGNAL(clicked()), this, SLOT(editClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
     connect(addZoneButton, SIGNAL(clicked()), this, SLOT(addZoneClicked()));
@@ -3479,6 +3485,7 @@ CPPage::editClicked()
     zonePage->zones.setScheme(zonePage->schemePage->getScheme());
 
     int cp = cpEdit->value();
+
     if( cp <= 0 ){
         QMessageBox err;
         err.setText(tr("CP must be > 0"));
@@ -3550,6 +3557,28 @@ CPPage::defaultClicked()
 
         // update the zones display
         rangeSelectionChanged();
+    }
+}
+
+void
+CPPage::rangeEdited()
+{
+    if (ranges->currentItem()) {
+        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+
+        int cp = cpEdit->value();
+        int ocp = zonePage->zones.getCP(index);
+
+        int wp = wEdit->value();
+        int owp = zonePage->zones.getWprime(index);
+
+        int pmax = pmaxEdit->value();
+        int opmax = zonePage->zones.getPmax(index);
+
+        if (cp != ocp || wp != owp || pmax != opmax)
+            updateButton->show();
+        else
+            updateButton->hide();
     }
 }
 
