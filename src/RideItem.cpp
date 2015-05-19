@@ -996,7 +996,7 @@ RideItem::updateIntervals()
             IntervalItem *intervalItem=NULL;
 
             intervalItem = new IntervalItem(f,
-                                            QString(tr("SPRINT of %1 secs (%2 watts)")).arg(x.duration).arg(x.joules/x.duration)),
+                                            QString(tr("SPRINT of %1 secs (%2 watts)")).arg(x.duration).arg(x.joules/x.duration),
                                             x.start, x.start+x.duration,
                                             f->timeToDistance(x.start), f->timeToDistance(x.start+x.duration),
                                             count++, QColor(Qt::red), RideFileInterval::SPRINT);
