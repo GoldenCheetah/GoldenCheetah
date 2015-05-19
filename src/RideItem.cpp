@@ -873,6 +873,9 @@ RideItem::updateIntervals()
                 }
             }
 
+            //if (t>60)
+            //    t=60;
+
             // Search sprint
             while (t >= 5) {
                 // On Pmax only
@@ -882,7 +885,7 @@ RideItem::updateIntervals()
                 // t = W'/(P − CP) + W'/(CP − Pmax)
                 double p = (integrated_series[i+t]-integrated_series[i])/t;
 
-                if (p>0.75f*PMAX) {
+                if (p>0.5*(PMAX-CP)+CP) {
                     double tc = WPRIME / (p-CP) + WPRIME / ( CP - PMAX);
 
                     if (tc >= (t*0.85f)) {
@@ -896,7 +899,7 @@ RideItem::updateIntervals()
                             sprint.start = i + 1; // see NOTE above
                             sprint.duration = t;
                             sprint.joules = integrated_series[i+t]-integrated_series[i];
-                            sprint.quality = t + (sprint.joules/sprint.duration/1000.0);
+                            sprint.quality = double(t) + (sprint.joules/sprint.duration/1000.0);
 
                         } else {
 
