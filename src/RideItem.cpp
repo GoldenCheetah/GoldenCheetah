@@ -747,14 +747,18 @@ RideItem::updateIntervals()
         // setup an integrated series
         long *integrated_series = (long*)malloc(sizeof(long) * arraySize);
         long *pi = integrated_series;
-        *pi = 0L;
+        long rtot = 0;
 
-        int secs = 0;
+        long secs = 0;
         foreach(RideFilePoint *p, f->dataPoints()) {
 
+            // increment secs by recIntSecs as the time series
+            // always starts at zero, normalized by the file reader
+            double psecs = p->secs + f->recIntSecs();
+
             // whats the dt in microseconds
-            int dt = (p->secs * 1000) - (lastT * 1000);
-            lastT = p->secs;
+            int dt = (psecs * 1000) - (lastT * 1000);
+            lastT = psecs;
 
             //
             // AGGREGATE INTO SAMPLES
@@ -791,13 +795,9 @@ RideItem::updateIntervals()
                     sample.watts /= 1000;
 
                     // integrate
-                    *pi += sample.watts;
-                    *(pi+1) = *pi;
-
-                    // move on
-                    pi++;
+                    rtot += sample.watts;
+                    *pi++ = rtot;
                     secs++;
-
                     // reset back to zero so we can aggregate
                     // the next sample
                     sample.secs = 0;
@@ -808,12 +808,11 @@ RideItem::updateIntervals()
 
         // now the data is integrated we can look at the 
         // accumulated energy for each ride
-
         for (int i=0; i<secs; i++) {
 
             // start out at 30 minutes and drop back to
             // 2 minutes, anything shorter and we are done
-            int t = (secs-i) > 3600 ? 3600 : secs-i;
+            int t = (secs-i-1) > 3600 ? 3600 : secs-i-1;
 
             // if we find one lets record it
             bool found = false;
