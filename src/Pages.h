@@ -741,8 +741,10 @@ public:
 
     public slots:
     void addClicked();
+    void editClicked();
     void deleteClicked();
     void defaultClicked();
+    void rangeEdited();
     void rangeSelectionChanged();
     void addZoneClicked();
     void deleteZoneClicked();
@@ -759,8 +761,8 @@ private:
     HrZonePage  *zonePage;
     QTreeWidget *ranges;
     QTreeWidget *zones;
-    QPushButton *addButton, *editButton, *deleteButton, *defaultButton;
-    QPushButton *addZoneButton, *deleteZoneButton;
+    QPushButton *addButton, *updateButton, *deleteButton;
+    QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
 };
 
 class HrZonePage : public QWidget
