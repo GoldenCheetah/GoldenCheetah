@@ -830,6 +830,10 @@ RideItem::updateIntervals()
                 // So take Joules = (W'/t + CP) * t and solving that
                 // for t gives t = (Joules - W') / CP
                 double tc = ((integrated_series[i+t]-integrated_series[i]) - WPRIME) / CP;
+                // NOTE FOR ABOVE: it is looking at accumulation AFTER this point
+                //                 not FROM this point, so we are looking 1s ahead of i
+                //                 which is why the interval is registered as starting
+                //                 at i+1 in the code below
 
                 // the TTE for this interval is greater or equal to
                 // the duration of the interval !
@@ -841,7 +845,7 @@ RideItem::updateIntervals()
                         found = true;
 
                         // register a candidate
-                        tte.start = i;
+                        tte.start = i + 1; // see NOTE above
                         tte.duration = t;
                         tte.joules = integrated_series[i+t]-integrated_series[i];
                         tte.quality = tc / double(t);
@@ -883,7 +887,7 @@ RideItem::updateIntervals()
                         foundSprint = true;
 
                         // register a candidate
-                        sprint.start = i;
+                        sprint.start = i + 1; // see NOTE above
                         sprint.duration = t;
                         sprint.joules = integrated_series[i+t]-integrated_series[i];
                         sprint.quality = t + (sprint.joules/sprint.duration/1000.0);
@@ -992,7 +996,7 @@ RideItem::updateIntervals()
             IntervalItem *intervalItem=NULL;
 
             intervalItem = new IntervalItem(f,
-                                            QString(tr("SPRINT of %1 secs (%2 watts)")).arg(x.duration).arg(x.joules/x.duration),
+                                            QString(tr("SPRINT of %1 secs (%2 watts)")).arg(x.duration).arg(x.joules/x.duration)),
                                             x.start, x.start+x.duration,
                                             f->timeToDistance(x.start), f->timeToDistance(x.start+x.duration),
                                             count++, QColor(Qt::red), RideFileInterval::SPRINT);
