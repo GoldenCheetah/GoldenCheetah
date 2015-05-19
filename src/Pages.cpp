@@ -3420,12 +3420,12 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     mainLayout->addLayout(zoneButtons, 3,0);
     mainLayout->addWidget(zones, 4,0);
 
-    // button connect
+    // edit connect
     connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
     connect(cpEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(wEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(pmaxEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-
+    // button connect
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(updateButton, SIGNAL(clicked()), this, SLOT(editClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
@@ -3439,6 +3439,7 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
 void
 CPPage::addClicked()
 {
+
     // get current scheme
     zonePage->zones.setScheme(zonePage->schemePage->getScheme());
 
@@ -3503,7 +3504,6 @@ CPPage::editClicked()
     int index = ranges->indexOfTopLevelItem(edit);
 
 
-
     // date
     zonePage->zones.setStartDate(index, dateEdit->date());
     edit->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
@@ -3566,6 +3566,9 @@ CPPage::rangeEdited()
     if (ranges->currentItem()) {
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
 
+        QDate date = dateEdit->date();
+        QDate odate = zonePage->zones.getStartDate(index);
+
         int cp = cpEdit->value();
         int ocp = zonePage->zones.getCP(index);
 
@@ -3575,7 +3578,7 @@ CPPage::rangeEdited()
         int pmax = pmaxEdit->value();
         int opmax = zonePage->zones.getPmax(index);
 
-        if (cp != ocp || wp != owp || pmax != opmax)
+        if (date != odate || cp != ocp || wp != owp || pmax != opmax)
             updateButton->show();
         else
             updateButton->hide();
@@ -3989,12 +3992,16 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(5);
 
+    updateButton = new QPushButton(tr("Update"));
+    updateButton->hide();
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
     addButton->setFixedSize(20,20);
+    updateButton->setFixedSize(60,20);
     deleteButton->setFixedSize(20,20);
-#else
+#else  
+    updateButton->setText(tr("Update"));
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
 #endif
@@ -4014,6 +4021,7 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2);
     actionButtons->addStretch();
+    actionButtons->addWidget(updateButton);
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
     //actionButtons->addWidget(defaultButton); moved to zoneButtons
@@ -4126,7 +4134,14 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
     mainLayout->addLayout(zoneButtons);
     mainLayout->addWidget(zones);
 
+    // edit connect
+    connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
+    connect(ltEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(restHrEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(maxHrEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+
     // button connect
+    connect(updateButton, SIGNAL(clicked()), this, SLOT(editClicked()));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
@@ -4159,6 +4174,29 @@ LTPage::addClicked()
     add->setText(2, QString("%1").arg(restHrEdit->value()));
     // Max HR
     add->setText(3, QString("%1").arg(maxHrEdit->value()));
+}
+
+void
+LTPage::editClicked()
+{
+    // get current scheme
+    zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+
+    QTreeWidgetItem *edit = ranges->selectedItems().at(0);
+    int index = ranges->indexOfTopLevelItem(edit);
+
+    // date
+    edit->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
+
+    // LT
+    zonePage->zones.setLT(index, ltEdit->value());
+    edit->setText(1, QString("%1").arg(ltEdit->value()));
+    // Rest HR
+    zonePage->zones.setRestHr(index, restHrEdit->value());
+    edit->setText(2, QString("%1").arg(restHrEdit->value()));
+    // Max HR
+    zonePage->zones.setMaxHr(index, maxHrEdit->value());
+    edit->setText(3, QString("%1").arg(maxHrEdit->value()));
 }
 
 void
@@ -4201,6 +4239,31 @@ LTPage::defaultClicked()
 }
 
 void
+LTPage::rangeEdited()
+{
+    if (ranges->currentItem()) {
+        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+
+        QDate date = dateEdit->date();
+        QDate odate = zonePage->zones.getStartDate(index);
+
+        int lt = ltEdit->value();
+        int olt = zonePage->zones.getLT(index);
+
+        int maxhr = maxHrEdit->value();
+        int omaxhr = zonePage->zones.getMaxHr(index);
+
+        int resthr = restHrEdit->value();
+        int oresthr = zonePage->zones.getRestHr(index);
+
+        if (date != odate || lt != olt || maxhr != omaxhr || resthr != oresthr)
+            updateButton->show();
+        else
+            updateButton->hide();
+    }
+}
+
+void
 LTPage::rangeSelectionChanged()
 {
     active = true;
@@ -4216,6 +4279,11 @@ LTPage::rangeSelectionChanged()
 
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         HrZoneRange current = zonePage->zones.getHrZoneRange(index);
+
+        dateEdit->setDate(zonePage->zones.getStartDate(index));
+        ltEdit->setValue(zonePage->zones.getLT(index));
+        maxHrEdit->setValue(zonePage->zones.getMaxHr(index));
+        restHrEdit->setValue(zonePage->zones.getRestHr(index));
 
         if (current.hrZonesSetFromLT) {
 
