@@ -964,6 +964,9 @@ Zones::getFingerprint() const
         // W'
         x += ranges[i].wprime;
 
+        // W'
+        x += ranges[i].pmax;
+
         // each zone definition (manual edit/default changed)
         for (int j=0; j<ranges[i].zones.count(); j++) {
             x += ranges[i].zones[j].lo;
