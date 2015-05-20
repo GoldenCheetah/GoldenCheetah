@@ -610,7 +610,10 @@ RideItem::updateIntervals()
     intervals_.clear();
 
     // no ride data available ?
-    if (!samples) return;
+    if (!samples) {
+        context->notifyIntervalsUpdate(this);
+        return;
+    }
 
     // Get CP and W' estimates for date of ride
     double CP = 250;
@@ -1172,6 +1175,9 @@ RideItem::updateIntervals()
             }
         }
     }
+
+    // tell the sidebar (or others) we refreshed
+    context->notifyIntervalsUpdate(this);
 }
 
 QList<IntervalItem*> RideItem::intervalsSelected()

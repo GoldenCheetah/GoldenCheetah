@@ -150,6 +150,7 @@ class Context : public QObject
         void notifyIntervalZoom(IntervalItem*x) { emit intervalZoom(x); }
         void notifyZoomOut() { emit zoomOut(); }
         void notifyIntervalSelected() { intervalSelected(); }
+        void notifyIntervalsUpdate(RideItem *x) { emit intervalsUpdate(x); }
         void notifyIntervalsChanged() { emit intervalsChanged(); }
         void notifyIntervalHover(IntervalItem *x) { emit intervalHover(x); }
         void notifyRideClean() { rideClean(ride); }
@@ -194,6 +195,7 @@ class Context : public QObject
 
         void intervalSelected();
         void intervalsChanged();
+        void intervalsUpdate(RideItem*);
         void intervalHover(IntervalItem*);
         void intervalZoom(IntervalItem*);
         void zoomOut();
