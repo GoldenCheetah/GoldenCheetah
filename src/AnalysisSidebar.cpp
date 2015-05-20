@@ -134,7 +134,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
 
     // GC signal
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
-    connect(context, SIGNAL(rideSaved(RideItem*)), this, SLOT(rideSaved()));
+    connect(context, SIGNAL(intervalsUpdate(RideItem*)), this, SLOT(intervalsUpdate(RideItem*)));
 
     // right click menus...
     connect(rideNavigator,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showActivityMenu(const QPoint &)));
@@ -148,9 +148,10 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
 }
 
 void
-AnalysisSidebar::rideSaved()
+AnalysisSidebar::intervalsUpdate(RideItem *changed)
 {
-    if (context->currentRideItem()) setRide(const_cast<RideItem*>(context->currentRideItem()));
+    // refresh the sidebar for ours
+    if (changed && changed == context->currentRideItem()) setRide(const_cast<RideItem*>(context->currentRideItem()));
 }
 
 void
