@@ -59,12 +59,39 @@ IntervalTreeView::mouseHover(QTreeWidgetItem *item, int)
 void
 IntervalTreeView::dropEvent(QDropEvent* event)
 {
-    QTreeWidgetItem* item1 = (QTreeWidgetItem *)itemAt(event->pos());
-    QTreeWidget::dropEvent(event);
-    QTreeWidgetItem* item2 = (QTreeWidgetItem *)itemAt(event->pos());
+    QTreeWidgetItem* target = (QTreeWidgetItem *)itemAt(event->pos());
+    QTreeWidgetItem* parent = target->parent();
 
-    if (item1==topLevelItem(0) || item1 != item2)
-        QTreeWidget::itemChanged(item2, 0);
+    QList<IntervalItem*> intervals =  context->rideItem()->intervals();
+    QList<IntervalItem*> userIntervals = context->rideItem()->intervals(RideFileInterval::USER);
+
+    int indexTo = intervals.indexOf(userIntervals.at(parent->indexOfChild(target)));
+    int offsetFrom = 0;
+    int offsetTo = 0;
+
+    foreach (QTreeWidgetItem *p, selectedItems()) {
+        if (p->parent() == parent) {
+            int indexFrom = intervals.indexOf(userIntervals.at(parent->indexOfChild(p)));
+
+            context->rideItem()->intervals().move(indexFrom+offsetFrom,indexTo+offsetTo);
+            if (indexFrom<indexTo)
+                offsetFrom--;
+            else
+                offsetTo++;
+        }
+    }
+
+
+    context->intervalsUpdate(context->rideItem());
+
+    // We don't need or want to finish the dropEvent
+    //QTreeWidget::dropEvent(event);
+
+
+    // We don't need anymore this signal
+    //
+    //if (item1==topLevelItem(0) || item1 != item2)
+    //    QTreeWidget::itemChanged(item2, 0);
 }
 
 QStringList 
