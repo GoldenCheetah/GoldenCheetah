@@ -199,7 +199,6 @@ AnalysisSidebar::setRide(RideItem*ride)
                 tree = new QTreeWidgetItem(intervalTree->invisibleRootItem(), interval->type);
                 tree->setData(0, Qt::UserRole, qVariantFromValue((void *)NULL)); // no intervalitem related
                 tree->setText(0, RideFileInterval::typeDescription(interval->type));
-                tree->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
                 tree->setForeground(0, GColor(CPLOTMARKER));
                 tree->setFont(0, bold);
                 tree->setExpanded(true);
@@ -217,10 +216,7 @@ AnalysisSidebar::setRide(RideItem*ride)
             QTreeWidgetItem *add = new QTreeWidgetItem(tree, interval->type);
             add->setText(0, interval->name);
             add->setData(0, Qt::UserRole, qVariantFromValue((void*)interval));
-            if (interval->type == RideFileInterval::USER)
-                add->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren);
-            else
-                add->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemNeverHasChildren);
+            add->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren);
 
             // set interval to not selected (just in case)
             interval->selected = false;
