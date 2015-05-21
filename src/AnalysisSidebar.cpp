@@ -214,7 +214,7 @@ AnalysisSidebar::setRide(RideItem*ride)
             tree->setHidden(false); // we have items, so make sure it is visible
 
             // add this interval to the tree
-            IntervalTreeItem *add = new IntervalTreeItem(tree, interval->type);
+            QTreeWidgetItem *add = new QTreeWidgetItem(tree, interval->type);
             add->setText(0, interval->name);
             add->setData(0, Qt::UserRole, qVariantFromValue((void*)interval));
             if (interval->type == RideFileInterval::USER)
