@@ -22,6 +22,7 @@
 #include <QtGui>
 #include <QWebFrame>
 #include <QDateTime>
+#include <QSslSocket>
 
 #include "RideMetric.h"
 #include <QtSql>
@@ -294,6 +295,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">VLC</td><td>%13</td></tr>"
             "<tr><td colspan=\"2\">VIDEO</td><td>%14</td></tr>"
             "<tr><td colspan=\"2\">SAMPLERATE</td><td>%15</td></tr>"
+            "<tr><td colspan=\"2\">SSL</td><td>%16</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -319,6 +321,7 @@ QString GcCrashDialog::versionHTML()
             .arg("vlc")
 #endif
             .arg(src)
+            .arg(QSslSocket::supportsSsl() ? "yes" : "none")
 
             ;
 
