@@ -45,4 +45,5 @@ class IntervalTreeView : public QTreeWidget
         void dropEvent(QDropEvent* event);
 
 };
+
 #endif // _GC_IntervalTreeView_h
