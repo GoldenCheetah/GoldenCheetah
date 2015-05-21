@@ -90,6 +90,55 @@ class PeakPercent : public RideMetric {
     RideMetric *clone() const { return new PeakPercent(*this); }
 };
 
+class PowerZone : public RideMetric {
+
+    Q_DECLARE_TR_FUNCTIONS(PowerZone)
+    double maxp;
+    double minp;
+
+    public:
+
+    PowerZone() : maxp(0.0), minp(10000)
+    {
+        setType(RideMetric::Average);
+        setSymbol("power_zone");
+        setInternalName("Power Zone");
+        setName(tr("Power Zone"));
+        setMetricUnits(tr(""));
+        setPrecision(0); // e.g. 99.9%
+        setImperialUnits(tr(""));
+
+    }
+
+    //QString toString(bool useMetricUnits) const {
+        //if (value() == 0) return QString("N/A");
+        //else return ;
+    //}
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P"); }
+
+    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+        if (!zones || ride->dataPoints().isEmpty() || !ride->areDataPresent()->watts) {
+
+            // no data or no power data
+            setValue(0);
+
+        } else {
+
+            double ap = deps.value("average_power")->value(true);
+
+            // if range is -1 we need to fall back to a default value
+            int zone = zoneRange >= 0 ? zones->whichZone(zoneRange, ap) : 0;
+            setValue(zone);
+        }
+    }
+    RideMetric *clone() const { return new PowerZone(*this); }
+};
+
 class FatigueIndex : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(FatigueIndex)
     double maxp;
@@ -640,6 +689,7 @@ static bool addAllPeaks() {
     deps.append("average_power");
     deps.append("workout_time");
     RideMetricFactory::instance().addMetric(PeakPercent(), &deps);
+    RideMetricFactory::instance().addMetric(PowerZone(), &deps);
     RideMetricFactory::instance().addMetric(FatigueIndex());
     RideMetricFactory::instance().addMetric(PacingIndex());  
 
