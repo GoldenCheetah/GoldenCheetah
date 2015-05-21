@@ -69,11 +69,13 @@ IntervalTreeView::dropEvent(QDropEvent* event)
     int offsetFrom = 0;
     int offsetTo = 0;
 
+    bool change = false;
     foreach (QTreeWidgetItem *p, selectedItems()) {
         if (p->parent() == parent) {
             int indexFrom = intervals.indexOf(userIntervals.at(parent->indexOfChild(p)));
 
             context->rideItem()->intervals().move(indexFrom+offsetFrom,indexTo+offsetTo);
+            change = true;
             if (indexFrom<indexTo)
                 offsetFrom--;
             else
@@ -81,17 +83,13 @@ IntervalTreeView::dropEvent(QDropEvent* event)
         }
     }
 
-
-    context->intervalsUpdate(context->rideItem());
+    if (change) {
+        context->intervalsUpdate(context->rideItem());
+        context->rideItem()->setDirty(true);
+    }
 
     // We don't need or want to finish the dropEvent
     //QTreeWidget::dropEvent(event);
-
-
-    // We don't need anymore this signal
-    //
-    //if (item1==topLevelItem(0) || item1 != item2)
-    //    QTreeWidget::itemChanged(item2, 0);
 }
 
 QStringList 
