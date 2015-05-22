@@ -1180,7 +1180,7 @@ RideItem::updateIntervals()
     context->notifyIntervalsUpdate(this);
 }
 
-QList<IntervalItem*> RideItem::intervalsSelected()
+QList<IntervalItem*> RideItem::intervalsSelected() const
 {
     QList<IntervalItem*> returning;
     foreach(IntervalItem *p, intervals_) {
@@ -1189,7 +1189,7 @@ QList<IntervalItem*> RideItem::intervalsSelected()
     return returning;
 }
 
-QList<IntervalItem*> RideItem::intervalsSelected(RideFileInterval::intervaltype type)
+QList<IntervalItem*> RideItem::intervalsSelected(RideFileInterval::intervaltype type) const
 {
     QList<IntervalItem*> returning;
     foreach(IntervalItem *p, intervals_) {
@@ -1198,7 +1198,7 @@ QList<IntervalItem*> RideItem::intervalsSelected(RideFileInterval::intervaltype 
     return returning;
 }
 
-QList<IntervalItem*> RideItem::intervals(RideFileInterval::intervaltype type)
+QList<IntervalItem*> RideItem::intervals(RideFileInterval::intervaltype type) const
 {
     QList<IntervalItem*> returning;
     foreach(IntervalItem *p, intervals_) {

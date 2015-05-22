@@ -671,45 +671,59 @@ AnalysisSidebar::sortIntervals()
 void
 AnalysisSidebar::renameIntervalsSelected()
 {
-#if 0
-    QString string;
+    QTreeWidgetItem *userIntervals = trees.value(RideFileInterval::USER, NULL);
 
-    // set string to first interval selected
-    for (int i=0; i<context->athlete->allIntervals->childCount();i++) {
-        if (context->athlete->allIntervals->child(i)->isSelected()) {
-            string = context->athlete->allIntervals->child(i)->text(0);
-            break;
+    // what are we renaming?
+    if (context->currentRideItem() && userIntervals && userIntervals->childCount() && 
+        context->currentRideItem()->intervalsSelected(RideFileInterval::USER).count()) {
+
+        QString string = context->currentRideItem()->intervalsSelected(RideFileInterval::USER).first()->name;
+
+        // type in a name and we will renumber all the intervals
+        // in the same fashion -- esp if the last characters are
+        RenameIntervalDialog dialog(string, this);
+        dialog.setFixedWidth(320);
+
+        if (dialog.exec()) {
+
+            int number = 1;
+
+            // does it end in a number?
+            // if so we use that to renumber from
+            QRegExp ends("^(.*)([0-9]+)$");
+            if (ends.exactMatch(string)) {
+
+                string = ends.cap(1);
+                number = ends.cap(2).toInt();
+
+            } else if (!string.endsWith(" ")) string += " ";
+
+            // now go and renumber from 'number' with prefix 'string'
+            for(int j=0; j<userIntervals->childCount(); j++) {
+
+                // get pointer to the IntervalItem for this item
+                QVariant v = userIntervals->child(j)->data(0, Qt::UserRole);
+
+                // make the IntervalItem selected flag reflect the current selection state
+                IntervalItem *item = static_cast<IntervalItem*>(v.value<void*>());
+
+                // is it selected and linked ?
+                if (item && item->selected && item->rideInterval) {
+
+                    // set item and ride
+                    item->rideInterval->name = item->name = 
+                    QString("%1%2").arg(string).arg(number++);
+
+                    // update tree to reflect changes!
+                    userIntervals->child(j)->setText(0, item->name);
+                }
+            }
+
+            // mark dirty and tell the charts it changed
+            const_cast<RideItem*>(context->currentRideItem())->setDirty(true);
+            context->notifyIntervalsChanged();
         }
     }
-
-    // type in a name and we will renumber all the intervals
-    // in the same fashion -- esp if the last characters are
-    RenameIntervalDialog dialog(string, this);
-    dialog.setFixedWidth(320);
-
-    if (dialog.exec()) {
-
-        int number = 1;
-
-        // does it end in a number?
-        // if so we use that to renumber from
-        QRegExp ends("^(.*[^0-9])([0-9]+)$");
-        if (ends.exactMatch(string)) {
-
-            string = ends.cap(1);
-            number = ends.cap(2).toInt();
-
-        } else if (!string.endsWith(" ")) string += " ";
-
-        // now go and renumber from 'number' with prefix 'string'
-        for (int i=0; i<context->athlete->allIntervals->childCount();i++) {
-            if (context->athlete->allIntervals->child(i)->isSelected())
-                context->athlete->allIntervals->child(i)->setText(0, QString("%1%2").arg(string).arg(number++));
-        }
-
-        context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
-    }
-#endif
 }
 
 void
@@ -748,6 +762,7 @@ AnalysisSidebar::deleteIntervalSelected()
             userIntervals->removeChild(item);
             delete item;
         }
+        context->notifyIntervalsChanged();
     }
 }
 
@@ -780,33 +795,8 @@ AnalysisSidebar::deleteInterval()
                 }
             }
         }
+        context->notifyIntervalsChanged();
     }
-}
-
-void
-AnalysisSidebar::renameIntervalSelected()
-{
-#if 0
-    // go edit the name
-    for (int i=0; i<context->athlete->allIntervals->childCount();) {
-        if (context->athlete->allIntervals->child(i)->isSelected()) {
-            context->athlete->allIntervals->child(i)->setFlags(context->athlete->allIntervals->child(i)->flags() | Qt::ItemIsEditable);
-            context->athlete->intervalWidget->editItem(context->athlete->allIntervals->child(i), 0);
-            break;
-        } else i++;
-    }
-    context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
-#endif
-}
-
-void
-AnalysisSidebar::renameInterval() 
-{
-#if 0
-    // go edit the name
-    activeInterval->setFlags(activeInterval->flags() | Qt::ItemIsEditable);
-    context->athlete->intervalWidget->editItem(activeInterval, 0);
-#endif
 }
 
 void
@@ -834,6 +824,9 @@ AnalysisSidebar::editIntervalSelected()
 
                 // update tree to reflect changes!
                 userIntervals->child(j)->setText(0, activeInterval->name);
+
+                // tell the charts !
+                context->notifyIntervalsChanged();
                 return;
             }
         }
