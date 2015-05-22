@@ -75,10 +75,8 @@ class AnalysisSidebar : public QWidget
         void findPowerPeaks();
         void editInterval(); // from right click
         void deleteInterval(); // from right click
-        void renameInterval(); // from right click
         void zoomInterval(); // from right click
         void sortIntervals(); // from menu popup
-        void renameIntervalSelected(void); // from menu popup
         void renameIntervalsSelected(void); // from menu popup -- rename a series
         void editIntervalSelected(); // from menu popup
         void deleteIntervalSelected(void); // from menu popup

@@ -218,7 +218,7 @@ EditIntervalDialog::cancelClicked()
 RenameIntervalDialog::RenameIntervalDialog(QString &string, QWidget *parent) :
     QDialog(parent, Qt::Dialog), string(string)
 {
-    setWindowTitle(tr("Renumber Intervals"));
+    setWindowTitle(tr("Rename Intervals"));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     // Grid

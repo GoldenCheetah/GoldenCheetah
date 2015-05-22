@@ -127,10 +127,10 @@ class RideItem : public QObject
         double getWeight();
 
         // when retrieving interval lists we can provide criteria too
-        QList<IntervalItem*> &intervals() { return intervals_; }
-        QList<IntervalItem*> intervalsSelected();
-        QList<IntervalItem*> intervals(RideFileInterval::intervaltype);
-        QList<IntervalItem*> intervalsSelected(RideFileInterval::intervaltype);
+        QList<IntervalItem*> &intervals()  { return intervals_; }
+        QList<IntervalItem*> intervalsSelected() const;
+        QList<IntervalItem*> intervals(RideFileInterval::intervaltype) const;
+        QList<IntervalItem*> intervalsSelected(RideFileInterval::intervaltype) const;
         bool removeInterval(IntervalItem *x);
 
         // metadata
