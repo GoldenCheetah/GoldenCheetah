@@ -71,8 +71,6 @@ class AnalysisSidebar : public QWidget
 
         // interval functions
         void addIntervals();
-        void addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, QString name);
-        void findPowerPeaks();
         void editInterval(); // from right click
         void deleteInterval(); // from right click
         void zoomInterval(); // from right click
