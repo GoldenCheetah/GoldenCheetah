@@ -256,6 +256,18 @@ RideItem::removeInterval(IntervalItem *x)
 }
 
 void
+RideItem::moveInterval(int from, int to)
+{
+    // Move in RideFile
+    int from2 = ride()->intervals().indexOf(intervals_.at(from)->rideInterval);
+    int to2 = ride()->intervals().indexOf(intervals_.at(to)->rideInterval);
+    ride()->moveInterval(from2, to2);
+
+    // Move in RideItem
+    intervals_.move(from, to);
+}
+
+void
 RideItem::addInterval(IntervalItem item)
 {
     IntervalItem *add = new IntervalItem();

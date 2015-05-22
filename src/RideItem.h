@@ -135,6 +135,7 @@ class RideItem : public QObject
         QList<IntervalItem*> intervals(RideFileInterval::intervaltype) const;
         QList<IntervalItem*> intervalsSelected(RideFileInterval::intervaltype) const;
         bool removeInterval(IntervalItem *x);
+        void moveInterval(int from, int to);
 
         // metadata
         QMap<QString, QString> &metadata() { return metadata_; }

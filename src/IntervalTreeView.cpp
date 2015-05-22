@@ -65,22 +65,19 @@ IntervalTreeView::dropEvent(QDropEvent* event)
     QList<IntervalItem*> intervals =  context->rideItem()->intervals();
     QList<IntervalItem*> userIntervals = context->rideItem()->intervals(RideFileInterval::USER);
 
-    int indexTo1 = parent->indexOfChild(target);
-    int indexTo2 = intervals.indexOf(userIntervals.at(indexTo1));
+    int indexTo = intervals.indexOf(userIntervals.at(parent->indexOfChild(target)));
     int offsetFrom = 0;
     int offsetTo = 0;
 
     bool change = false;
     foreach (QTreeWidgetItem *p, selectedItems()) {
         if (p->parent() == parent) {
-            int indexFrom1 = parent->indexOfChild(p);
-            int indexFrom2 = intervals.indexOf(userIntervals.at(indexFrom1));
+            int indexFrom = intervals.indexOf(userIntervals.at(parent->indexOfChild(p)));
 
-            context->rideItem()->ride()->moveInterval(indexFrom1+offsetFrom,indexTo1+offsetTo);
-            context->rideItem()->intervals().move(indexFrom2+offsetFrom,indexTo2+offsetTo);
-
+            context->rideItem()->moveInterval(indexFrom+offsetFrom,indexTo+offsetTo);
             change = true;
-            if (indexFrom1<indexTo1)
+
+            if (indexFrom<indexTo)
                 offsetFrom--;
             else
                 offsetTo++;
