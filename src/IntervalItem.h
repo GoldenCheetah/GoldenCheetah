@@ -26,15 +26,13 @@
 #include <QLabel>
 #include <QLineEdit>
 
-class RideFile;
-
 class IntervalItem
 {
 
     public:
 
         // constructors and accessors
-        IntervalItem(const RideFile *, QString, double, double, double, double, int, QColor, RideFileInterval::IntervalType);
+        IntervalItem(const RideItem *, QString, double, double, double, double, int, QColor, RideFileInterval::IntervalType);
         IntervalItem();
 
         // ride item we are in
@@ -74,7 +72,6 @@ class IntervalItem
         QVector<double> &metrics() { return metrics_; }
 
         // extracted sample data
-        const RideFile *ride;
         RideFileInterval *rideInterval;
 
         // used by qSort()

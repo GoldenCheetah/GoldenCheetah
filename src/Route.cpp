@@ -509,7 +509,7 @@ Routes::createRouteFromInterval(IntervalItem *activeInterval) {
     // Construct the route with interval gps data
     double dist = 0, lastLat = 0, lastLon = 0;
 
-    foreach (RideFilePoint *point, activeInterval->ride->dataPoints()) {
+    foreach (RideFilePoint *point, activeInterval->rideItem()->ride()->dataPoints()) {
         if (point->secs >= activeInterval->start && point->secs < activeInterval->stop) {
             if (lastLat != 0 && lastLon != 0 &&
                 point->lat != 0 && point->lon != 0 &&

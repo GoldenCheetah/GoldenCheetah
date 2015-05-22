@@ -537,10 +537,13 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         // ZOOM IN AND OUT FOR ALL
         QAction *actZoomOut = new QAction(tr("Zoom Out"), intervalTree);
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalTree);
+        QAction *actRoute = new QAction(tr("Create as a route"), intervalTree);
         connect(actZoomOut, SIGNAL(triggered(void)), this, SLOT(zoomOut(void)));
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomInterval(void)));
+        connect(actRoute, SIGNAL(triggered(void)), this, SLOT(createRouteIntervalSelected(void)));
         menu.addAction(actZoomOut);
         menu.addAction(actZoomInt);
+        menu.addAction(actRoute);
 
         // EDIT / DELETE USER ONLY
         if (isUser) {
@@ -854,7 +857,7 @@ AnalysisSidebar::zoomInterval()
 void
 AnalysisSidebar::createRouteIntervalSelected() 
 {
-#if 0
+#if 0 //WAIT FOR REFACTOR!!!!!!
     // create a new route for this interval
     context->athlete->routes->createRouteFromInterval(activeInterval);
 #endif
