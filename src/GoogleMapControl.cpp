@@ -713,13 +713,13 @@ void
 WebBridge::toggleInterval(int x)
 {
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
-    if (x < 0 || rideItem->intervals().count() >= x) return;
+    if (x < 0 || rideItem->intervals().count() <= x) return;
 
-//XXX WHEN DECIDED HOW TO SELECT/UNSELECT INTERVALS
-#if 0
-    IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(x));
-    if (current) current->setSelected(!current->isSelected());
-#endif
+    IntervalItem *current = rideItem->intervals().at(x);
+    if (current) {
+        current->selected = !current->selected;
+        context->notifyIntervalItemSelectionChanged(current);
+    }
 }
 
 void 

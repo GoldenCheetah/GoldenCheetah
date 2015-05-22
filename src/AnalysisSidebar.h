@@ -52,6 +52,7 @@ class AnalysisSidebar : public QWidget
         void configChanged(qint32);
         void setRide(RideItem*);
         void intervalsUpdate(RideItem*);
+        void intervalItemSelectionChanged(IntervalItem*);
 
         void filterChanged();
         void setFilter(QStringList);
