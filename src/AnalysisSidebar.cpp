@@ -98,9 +98,19 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     intervalTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
     intervalTree->setContextMenuPolicy(Qt::CustomContextMenu);
     intervalTree->setFrameStyle(QFrame::NoFrame);
-    //allIntervals = context->athlete->intervalWidget->invisibleRootItem();
-    //allIntervals->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
-    //allIntervals->setText(0, tr("Intervals"));
+
+    // create tree for user intervals, so its always at the top
+    QTreeWidgetItem *tree = new QTreeWidgetItem(intervalTree->invisibleRootItem(), RideFileInterval::USER);
+    tree->setData(0, Qt::UserRole, qVariantFromValue((void *)NULL)); // no intervalitem related
+    tree->setText(0, RideFileInterval::typeDescription(RideFileInterval::USER));
+    tree->setForeground(0, GColor(CPLOTMARKER));
+    QFont bold;
+    bold.setWeight(QFont::Bold);
+    tree->setFont(0, bold);
+    tree->setExpanded(true);
+    tree->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsDragEnabled);
+    tree->setHidden(true);
+    trees.insert(RideFileInterval::USER, tree);
 
     intervalSummaryWindow = new IntervalSummaryWindow(context);
 
@@ -221,6 +231,7 @@ AnalysisSidebar::setRide(RideItem*ride)
             // users and just as useful to create here than at startup
             // also means we don't need to know what all the types are
             // in advance, we create when we see one
+            // BUT the USER tree is always created
             QTreeWidgetItem *tree = trees.value(interval->type, NULL);
             if (tree == NULL) {
                 tree = new QTreeWidgetItem(intervalTree->invisibleRootItem(), interval->type);
@@ -229,11 +240,7 @@ AnalysisSidebar::setRide(RideItem*ride)
                 tree->setForeground(0, GColor(CPLOTMARKER));
                 tree->setFont(0, bold);
                 tree->setExpanded(true);
-                if (interval->type == RideFileInterval::USER)
-                    tree->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsDragEnabled);
-                else
-                    tree->setFlags(Qt::ItemIsEnabled);
-
+                tree->setFlags(Qt::ItemIsEnabled);
 
                 trees.insert(interval->type, tree);
             }
