@@ -539,7 +539,7 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         if (isUser) {
             QAction *actEditInt = new QAction(tr("Edit interval"), intervalTree);
             QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalTree);
-            connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editInterval(void)));
+            connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editIntervalSelected(void)));
             connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteInterval(void)));
             menu.addAction(actEditInt);
             menu.addAction(actDeleteInt);
@@ -812,31 +812,60 @@ AnalysisSidebar::renameInterval()
 void
 AnalysisSidebar::editIntervalSelected()
 {
-#if 0
-    // go edit the interval
-    for (int i=0; i<context->athlete->allIntervals->childCount();) {
-        if (context->athlete->allIntervals->child(i)->isSelected()) {
-            activeInterval = (IntervalItem*)context->athlete->allIntervals->child(i);
-            editInterval();
-            break;
-        } else i++;
+    // run down the USER tree looking for it and delete it
+    QTreeWidgetItem *userIntervals = trees.value(RideFileInterval::USER, NULL);
+
+    if (userIntervals) {
+
+        // loop through the intervals for this tree
+        for(int j=0; j<userIntervals->childCount(); j++) {
+
+            // get pointer to the IntervalItem for this item
+            QVariant v = userIntervals->child(j)->data(0, Qt::UserRole);
+
+            // make the IntervalItem selected flag reflect the current selection state
+            IntervalItem *item = static_cast<IntervalItem*>(v.value<void*>());
+
+            // is it selected and linked ?
+            if (item && item->selected && item->rideInterval) {
+
+                activeInterval = item;
+                editInterval();
+
+                // update tree to reflect changes!
+                userIntervals->child(j)->setText(0, activeInterval->name);
+                return;
+            }
+        }
     }
-#endif
 }
 
 void
 AnalysisSidebar::editInterval()
 {
-#if 0
-    IntervalItem temp = *activeInterval;
-    EditIntervalDialog dialog(this, temp);
+    IntervalItem temp;
+    temp.name = activeInterval->name;
+    temp.start = activeInterval->start;
+    temp.stop = activeInterval->stop;
+ 
+    EditIntervalDialog dialog(this, temp); // pass by reference
 
     if (dialog.exec()) {
-        *activeInterval = temp;
-        context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
-        context->athlete->intervalWidget->update();
+
+        // update the interval item
+        activeInterval->name = temp.name;
+        activeInterval->start = temp.start;
+        activeInterval->stop = temp.stop;
+        activeInterval->startKM = activeInterval->rideItem()->ride()->timeToDistance(temp.start),
+        activeInterval->stopKM = activeInterval->rideItem()->ride()->timeToDistance(temp.stop),
+
+        // update the ridefile interval
+        activeInterval->rideInterval->name = activeInterval->name;
+        activeInterval->rideInterval->start = activeInterval->start;
+        activeInterval->rideInterval->stop = activeInterval->stop;
+        activeInterval->rideItem()->setDirty(true);
+
     }
-#endif
 }
 
 void

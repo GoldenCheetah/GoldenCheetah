@@ -164,7 +164,7 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
     QLabel *to = new QLabel("To");
 
     nameEdit = new QLineEdit(this);
-    //nameEdit->setText(interval.text(0));
+    nameEdit->setText(interval.name);
 
     fromEdit = new QTimeEdit(this);
     fromEdit->setDisplayFormat("hh:mm:ss");
@@ -201,7 +201,7 @@ void
 EditIntervalDialog::applyClicked()
 {
     // get the values back
-    //interval.setText(0, nameEdit->text());
+    interval.name = nameEdit->text();
     interval.start = QTime(0,0,0).secsTo(fromEdit->time());
     interval.stop = QTime(0,0,0).secsTo(toEdit->time());
     accept();
