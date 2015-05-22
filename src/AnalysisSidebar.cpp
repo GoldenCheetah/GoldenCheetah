@@ -581,60 +581,6 @@ AnalysisSidebar::addIntervals()
 #endif
 }
 
-void
-AnalysisSidebar::addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, QString name)
-{
-#if 0
-    QList<BestIntervalDialog::BestInterval> results;
-    BestIntervalDialog::findBests(ride, windowSizeSecs, 1, results);
-    if (results.isEmpty()) return;
-    const BestIntervalDialog::BestInterval &i = results.first();
-    QTreeWidgetItem *peak =
-        new IntervalItem(ride, name+tr(" (%1 watts)").arg((int) round(i.avg)),
-                         i.start, i.stop,
-                         ride->timeToDistance(i.start),
-                         ride->timeToDistance(i.stop),
-                         context->athlete->allIntervals->childCount()+1,
-                         QColor(0,0,0),
-                         RideFileInterval::PEAKPOWER);
-    peak->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-    context->athlete->allIntervals->addChild(peak);
-#endif
-}
-
-void
-AnalysisSidebar::findPowerPeaks()
-{
-
-#if 0
-    if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) {
-
-        addIntervalForPowerPeaksForSecs(context->ride->ride(), 5, "Peak 5s");
-        addIntervalForPowerPeaksForSecs(context->ride->ride(), 10, "Peak 10s");
-        addIntervalForPowerPeaksForSecs(context->ride->ride(), 20, "Peak 20s");
-        addIntervalForPowerPeaksForSecs(context->ride->ride(), 30, "Peak 30s");
-        addIntervalForPowerPeaksForSecs(context->ride->ride(), 60, "Peak 1min");
-        addIntervalForPowerPeaksForSecs(context->ride->ride(), 120, "Peak 2min");
-        addIntervalForPowerPeaksForSecs(context->ride->ride(), 300, "Peak 5min");
-        addIntervalForPowerPeaksForSecs(context->ride->ride(), 600, "Peak 10min");
-        addIntervalForPowerPeaksForSecs(context->ride->ride(), 1200, "Peak 20min");
-        addIntervalForPowerPeaksForSecs(context->ride->ride(), 1800, "Peak 30min");
-        addIntervalForPowerPeaksForSecs(context->ride->ride(), 3600, "Peak 60min");
-
-        // now update the RideFileIntervals
-        context->athlete->updateRideFileIntervals();
-
-    } else {
-
-        if (!context->ride || !context->ride->ride())
-            QMessageBox::critical(this, tr("Find Power Peaks"), tr("No activity selected"));
-        else
-            QMessageBox::critical(this, tr("Find Power Peaks"), tr("Current activity contains no data"));
-    }
-#endif
-}
-
-
 bool
 lessItem(const IntervalItem *s1, const IntervalItem *s2) {
     return s1->start < s2->start;

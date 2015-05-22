@@ -1983,11 +1983,13 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
         // if we are in distance mode then x1 and x2 are distances
         // we need to make sure they are in KM for the rest of this
         // code.
-        if (plot->bydist && context->athlete->useMetricUnits == false) {
+        if (plot->bydist) {
 
-            // convert to metric
-            x1 *= KM_PER_MILE;
-            x2 *=  KM_PER_MILE;
+            if (context->athlete->useMetricUnits == false) {
+                // convert to metric
+                x1 *= KM_PER_MILE;
+                x2 *=  KM_PER_MILE;
+            }
 
             // distance  to time
             distance1 = x1;
