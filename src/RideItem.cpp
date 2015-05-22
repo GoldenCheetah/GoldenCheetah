@@ -264,6 +264,28 @@ RideItem::addInterval(IntervalItem item)
     intervals_ << add;
 }
 
+IntervalItem *
+RideItem::newInterval(QString name, double start, double stop, double startKM, double stopKM)
+{
+    // add a new interval to the end of the list
+    IntervalItem *add = new IntervalItem(ride(), name, start, stop, startKM, stopKM, 1, 
+                                         standardColor(intervals(RideFileInterval::USER).count()),
+                                         RideFileInterval::USER);
+    add->rideItem_ = this;
+
+    // add to RideFile
+    add->rideInterval = ride()->newInterval(name, start, stop);
+
+    // add to list
+    intervals_ << add;
+
+    // refresh metrics
+    add->refresh();
+
+    // and return
+    return add;
+}
+
 void
 RideItem::notifyRideDataChanged()
 {

@@ -95,6 +95,9 @@ class RideItem : public QObject
         void addInterval(IntervalItem interval);
         void clearIntervals() { intervals_.clear(); } // does NOT delete them
 
+        // new Interval created and needs to be reflected in ridefile
+        IntervalItem * newInterval(QString name, double start, double stop, double startKM, double stopKM);
+
         // access the metric value
         double getForSymbol(QString name, bool useMetricUnits=true);
 

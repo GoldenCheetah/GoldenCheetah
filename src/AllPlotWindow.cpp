@@ -1958,8 +1958,10 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
     QwtPlotMarker* allMarker2 = plot->standard->allMarker2;
 
     if (!allMarker2->isVisible() || allMarker2->xValue() != xValue) {
+
         allMarker2->setValue(xValue, plot->bydist ? 0 : 100);
         allMarker2->show();
+
         double x1, x2;  // time or distance depending upon mode selected
 
         // swap to low-high if neccessary
@@ -1977,106 +1979,69 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
         double distance2 = -1;
         double duration1 = -1;
         double duration2 = -1;
-        double secsMoving = 0;
-        double wattsTotal = 0;
-        double bpmTotal = 0;
-        int arrayLength = 0;
-
 
         // if we are in distance mode then x1 and x2 are distances
         // we need to make sure they are in KM for the rest of this
         // code.
         if (plot->bydist && context->athlete->useMetricUnits == false) {
+
+            // convert to metric
             x1 *= KM_PER_MILE;
             x2 *=  KM_PER_MILE;
+
+            // distance  to time
+            distance1 = x1;
+            distance2 = x2;
+            duration1 = ride->ride()->distanceToTime(x1);
+            duration2 = ride->ride()->distanceToTime(x2);
+
+        } else {
+
+            // convert to seconds from minutes
+            x1 *=60;
+            x2 *=60;
+
+            // time to distance
+            duration1 = x1;
+            duration2 = x2;
+            distance1 = ride->ride()->timeToDistance(x1);
+            distance2 = ride->ride()->timeToDistance(x2);
         }
 
-        foreach (const RideFilePoint *point, ride->ride()->dataPoints()) {
-            if ((plot->bydist==true && point->km>=x1 && point->km<x2) ||
-                (plot->bydist==false && point->secs/60>=x1 && point->secs/60<x2)) {
-
-                if (distance1 == -1) distance1 = point->km;
-                distance2 = point->km;
-
-                if (duration1 == -1) duration1 = point->secs;
-                duration2 = point->secs;
-
-                if (point->kph > 0.0)
-                   secsMoving += ride->ride()->recIntSecs();
-                wattsTotal += point->watts;
-                bpmTotal += point->hr;
-                ++arrayLength;
-            }
-        }
-        QString s("\n%1%2 %3 %4\n%5%6 %7%8 %9%10");
-        s = s.arg(context->athlete->useMetricUnits ? distance2-distance1 : (distance2-distance1)*MILES_PER_KM, 0, 'f', 2);
-        s = s.arg((context->athlete->useMetricUnits? "km":"mi"));
-        s = s.arg(time_to_string(duration2-duration1));
-        if (duration2-duration1-secsMoving>1)
-            s = s.arg("("+time_to_string(secsMoving)+")");
-        else
-            s = s.arg("");
-        s = s.arg((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) * (distance2-distance1)/secsMoving*3600, 0, 'f', 1);
-        s = s.arg((context->athlete->useMetricUnits? "km/h":"mph"));
-        if (wattsTotal>0) {
-            s = s.arg(wattsTotal/arrayLength, 0, 'f', 1);
-            s = s.arg("W");
-        }
-        else{
-            s = s.arg("");
-         s = s.arg("");
-        }
-        if (bpmTotal>0) {
-            s = s.arg(bpmTotal/arrayLength, 0, 'f', 0);
-            s = s.arg("bpm");
-        }
-        else {
-            s = s.arg("");
-            s = s.arg("");
-        }
-
-        QwtText label;
-        label.setColor(GColor(CPLOTMARKER));
-        label.setFont(QFont());
-        label.setText(s);
-        if (allMarker1->xValue()<allMarker2->xValue()) {
-            allMarker1->setLabel(label);
-            allMarker2->setLabel(QString(""));
-        }
-        else {
-            allMarker2->setLabel(label);
-            allMarker1->setLabel(QString(""));
-        }
-
-//XXX REFACTOR WHEN DECIDED HOW TO ADD A NEW INTERVAL
-#if 0
         if (newInterval) {
 
-            QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
-            int count = allIntervals->childCount();
+            // what we go already ?
+            QList<IntervalItem*> users = ride->intervals(RideFileInterval::USER);
 
             // are we adjusting an existing interval? - if so delete it and readd it
-            if (count > 0) {
-                IntervalItem *bottom = (IntervalItem *) allIntervals->child(count-1);
-                if (bottom->text(0).startsWith(name)) delete allIntervals->takeChild(count-1);
+            if (users.count() > 0 && users.last()->name.startsWith(name)) {
+
+                // update interval
+                IntervalItem *interval = users.last();
+                interval->rideInterval->start = interval->start = duration1;
+                interval->rideInterval->stop = interval->stop = duration2;
+                interval->startKM = distance1;
+                interval->stopKM = distance2;
+                interval->refresh();
+
+                // update ridefile
+                ride->setDirty(true);
+
+                // 
+
+            } else {
+
+                //create a new one
+                IntervalItem *interval = ride->newInterval(name, duration1, duration2, distance1, distance2);
+                interval->selected = true;
+
+                // rebuild list
+                context->notifyIntervalsUpdate(ride);
             }
 
-            // add average power to the end of the selection name, if available
-            if (wattsTotal && arrayLength)
-                name += tr("(%1 watts)").arg(round(wattsTotal/arrayLength));
-
-            QTreeWidgetItem *last = new IntervalItem(ride->ride(), name, duration1, duration2, distance1, distance2,
-                                        allIntervals->childCount()+1, RideFileInterval::USER);
-            last->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-            allIntervals->addChild(last);
-
-            // select this new interval --WTAF?????? NO! NO! NO!
-            context->athlete->intervalTreeWidget()->setItemSelected(last, true);
-
-            // now update the RideFileIntervals and all the plots etc
-            context->athlete->updateRideFileIntervals();
+            // charts need to update
+            context->notifyIntervalsChanged();
         }
-#endif
     }
     active = false;
 }
