@@ -224,8 +224,9 @@ AnalysisSidebar::setRide(RideItem*ride)
                           | Qt::ItemIsDragEnabled 
                           | Qt::ItemIsEditable);
 
-            // set interval to not selected (just in case)
-            interval->selected = false;
+            // set interval selected to current state since it is
+            // being maintained and we are called on resequencing etc
+            add->setSelected(interval->selected);
         }
 
     }
