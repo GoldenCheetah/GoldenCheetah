@@ -44,6 +44,10 @@ class IntervalItem
         // set from other
         void setFrom(IntervalItem &other);
 
+        // change basic values, will also apply to ridefile
+        void setValues(QString name, double duration1, double duration2, 
+                                     double distance1, double distance2);
+
         // is this interval currently selected ?
         bool selected;
 

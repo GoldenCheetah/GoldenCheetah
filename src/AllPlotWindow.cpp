@@ -2018,18 +2018,9 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
             // are we adjusting an existing interval? - if so delete it and readd it
             if (users.count() > 0 && users.last()->name.startsWith(name)) {
 
-                // update interval
+                // update interval - could do via a IntervalItem::setXX() function
                 IntervalItem *interval = users.last();
-                interval->rideInterval->start = interval->start = duration1;
-                interval->rideInterval->stop = interval->stop = duration2;
-                interval->startKM = distance1;
-                interval->stopKM = distance2;
-                interval->refresh();
-
-                // update ridefile
-                ride->setDirty(true);
-
-                // 
+                interval->setValues(interval->name, duration1, duration2, distance1, distance2);
 
             } else {
 
