@@ -216,7 +216,13 @@ AnalysisSidebar::setRide(RideItem*ride)
             QTreeWidgetItem *add = new QTreeWidgetItem(tree, interval->type);
             add->setText(0, interval->name);
             add->setData(0, Qt::UserRole, qVariantFromValue((void*)interval));
-            add->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren);
+            add->setFlags(Qt::ItemIsEnabled 
+#if QT_VERSION > 0x50000
+                          | Qt::ItemNeverHasChildren
+#endif
+                          | Qt::ItemIsSelectable 
+                          | Qt::ItemIsDragEnabled 
+                          | Qt::ItemIsEditable);
 
             // set interval to not selected (just in case)
             interval->selected = false;

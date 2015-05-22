@@ -84,7 +84,7 @@ IntervalTreeView::dropEvent(QDropEvent* event)
     }
 
     if (change) {
-        context->intervalsUpdate(context->rideItem());
+        context->notifyIntervalsUpdate(context->rideItem());
         context->rideItem()->setDirty(true);
     }
 
