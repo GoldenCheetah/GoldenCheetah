@@ -858,6 +858,8 @@ AnalysisSidebar::editInterval()
         activeInterval->rideInterval->stop = activeInterval->stop;
         activeInterval->rideItem()->setDirty(true);
 
+        // refresh metrics!
+        activeInterval->refresh();
     }
 }
 
