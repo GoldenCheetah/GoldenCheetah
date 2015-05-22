@@ -852,8 +852,9 @@ AddIntervalDialog::findBests(bool typeTime, const RideFile *ride, double windowS
 void
 AddIntervalDialog::addClicked()
 {
-//XXX REFACTOR NEED TO DECIDE HOW TO DO THIS!!
-#if 0
+    RideItem *rideItem = const_cast<RideItem*>(context->currentRideItem());
+    RideFile *ride = rideItem->ride();
+
     // run through the table row by row
     // and when the checkbox is shown
     // get name from column 2
@@ -867,20 +868,20 @@ AddIntervalDialog::addClicked()
             double start = resultsTable->item(i,3)->text().toDouble();
             double stop = resultsTable->item(i,4)->text().toDouble();
             QString name = resultsTable->item(i,2)->text();
-            const RideFile *ride = context->ride ? context->ride->ride() : NULL;
-            QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
-            QTreeWidgetItem *last =
-                new IntervalItem(ride, name, start, stop,
+
+
+            // add new one to the ride
+            rideItem->newInterval(name, start, stop,
                                  ride->timeToDistance(start),
-                                 ride->timeToDistance(stop),
-                                 allIntervals->childCount()+1,
-                                 RideFileInterval::USER);
-            last->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-            // add
-            allIntervals->addChild(last);
+                                 ride->timeToDistance(stop));
         }
     }
-    context->athlete->updateRideFileIntervals();
-#endif
+
+    // update the sidebar
+    context->notifyIntervalsUpdate(rideItem);
+
+    // charts need to update to reflect the intervals
+    context->notifyIntervalsChanged();
+
     done(0);
 }

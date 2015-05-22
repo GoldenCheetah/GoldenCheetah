@@ -574,7 +574,6 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
 void
 AnalysisSidebar::addIntervals()
 {
-#if 0
     if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) {
 
         AddIntervalDialog *p = new AddIntervalDialog(context);
@@ -588,7 +587,6 @@ AnalysisSidebar::addIntervals()
         else
             QMessageBox::critical(this, tr("Find Intervals"), tr("Current activity contains no data"));
     }
-#endif
 }
 
 bool
