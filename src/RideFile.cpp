@@ -370,6 +370,12 @@ RideFile::removeInterval(RideFileInterval*x)
     }
 }
 
+void
+RideFile::moveInterval(int from, int to)
+{
+    intervals_.move(from, to);
+}
+
 struct ComparePointKm {
     bool operator()(const RideFilePoint *p1, const RideFilePoint *p2) {
         return p1->km < p2->km;
