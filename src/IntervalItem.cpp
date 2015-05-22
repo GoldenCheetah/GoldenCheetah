@@ -21,22 +21,21 @@
 #include "Context.h"
 #include "Athlete.h"
 
-IntervalItem::IntervalItem(const RideFile *ride, QString name, double start, double stop, 
+IntervalItem::IntervalItem(const RideItem *ride, QString name, double start, double stop, 
                            double startKM, double stopKM, int displaySequence, QColor color,
                            RideFileInterval::IntervalType type)
 {
     this->name = name;
-    this->ride = ride;
     this->start = start;
     this->stop = stop;
     this->startKM = startKM;
     this->stopKM = stopKM;
     this->displaySequence = displaySequence;
-    this->rideItem_ = NULL;
     this->type = type;
     this->color = color;
     this->selected = false;
     this->rideInterval = NULL;
+    this->rideItem_ = const_cast<RideItem*>(ride);
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 

@@ -268,11 +268,9 @@ IntervalItem *
 RideItem::newInterval(QString name, double start, double stop, double startKM, double stopKM)
 {
     // add a new interval to the end of the list
-    IntervalItem *add = new IntervalItem(ride(), name, start, stop, startKM, stopKM, 1, 
+    IntervalItem *add = new IntervalItem(this, name, start, stop, startKM, stopKM, 1, 
                                          standardColor(intervals(RideFileInterval::USER).count()),
                                          RideFileInterval::USER);
-    add->rideItem_ = this;
-
     // add to RideFile
     add->rideInterval = ride()->newInterval(name, start, stop);
 
@@ -666,7 +664,7 @@ RideItem::updateIntervals()
     RideFilePoint *end = f->dataPoints().last();
 
     // add entire ride using ride metrics
-    IntervalItem *entire = new IntervalItem(f, tr("Entire Activity"), 
+    IntervalItem *entire = new IntervalItem(this, tr("Entire Activity"), 
                                             begin->secs, end->secs, 
                                             f->timeToDistance(begin->secs),
                                             f->timeToDistance(end->secs),
@@ -676,11 +674,10 @@ RideItem::updateIntervals()
 
     // same as the whole ride, not need to compute
     entire->metrics() = metrics();
-    entire->rideItem_ = this;
     entire->rideInterval = NULL;
     intervals_ << entire;
 
-    int count = 1;
+    int count = 0;
     foreach(RideFileInterval *interval, f->intervals()) {
 
         // skip peaks, they're autodiscovered now
@@ -701,14 +698,13 @@ RideItem::updateIntervals()
         if (interval->start >= interval->stop) continue;
 
         // create a new interval item
-        IntervalItem *intervalItem = new IntervalItem(f, interval->name, 
+        IntervalItem *intervalItem = new IntervalItem(this, interval->name, 
                                                       interval->start, interval->stop, 
                                                       f->timeToDistance(interval->start),
                                                       f->timeToDistance(interval->stop),
                                                       count,
                                                       standardColor(count++),
                                                       RideFileInterval::USER);
-        intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
         intervalItem->rideInterval = interval;
         intervalItem->refresh();        // XXX will get called in constructore when refactor
         intervals_ << intervalItem;
@@ -736,14 +732,13 @@ RideItem::updateIntervals()
             // did we get one ?
             if (results.count() > 0 && results[0].avg > 0 && results[0].stop > 0) {
                 // qDebug()<<"found"<<names[i]<<"peak power"<<results[0].start<<"-"<<results[0].stop<<"of"<<results[0].avg<<"watts";
-                IntervalItem *intervalItem = new IntervalItem(f, QString(tr("%1 (%2 watts)")).arg(names[i]).arg(int(results[0].avg)),
+                IntervalItem *intervalItem = new IntervalItem(this, QString(tr("%1 (%2 watts)")).arg(names[i]).arg(int(results[0].avg)),
                                                             results[0].start, results[0].stop, 
                                                             f->timeToDistance(results[0].start),
                                                             f->timeToDistance(results[0].stop),
                                                             count++,
                                                             QColor(Qt::gray),
                                                             RideFileInterval::PEAKPOWER);
-                intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
                 intervalItem->rideInterval = NULL;
                 intervalItem->refresh();        // XXX will get called in constructore when refactor
                 intervals_ << intervalItem;
@@ -1004,20 +999,19 @@ RideItem::updateIntervals()
 
             IntervalItem *intervalItem=NULL;
             if (x.quality >= 1.0f) {
-                intervalItem = new IntervalItem(f, 
+                intervalItem = new IntervalItem(this, 
                                                 QString(tr("TTE of %1  (%2 watts)")).arg(time_to_string(x.duration)).arg(x.joules/x.duration),
                                                 x.start, x.start+x.duration, 
                                                 f->timeToDistance(x.start), f->timeToDistance(x.start+x.duration),
                                                 count++, QColor(Qt::red), RideFileInterval::TTE);
             } else {
-                intervalItem = new IntervalItem(f, 
+                intervalItem = new IntervalItem(this, 
                                                 QString(tr("%3% EFFORT of %1  (%2 watts)")).arg(time_to_string(x.duration)).arg(x.joules/x.duration).arg(int(x.quality*100)),
                                                 x.start, x.start+x.duration, 
                                                 f->timeToDistance(x.start), f->timeToDistance(x.start+x.duration),
                                                 count++, QColor(Qt::red), RideFileInterval::EFFORT);
             }
 
-            intervalItem->rideItem_ = this; // XXX will go when we refactor 
             intervalItem->rideInterval = NULL;
             intervalItem->refresh();        // XXX will get called in constructore when refactor
             intervals_ << intervalItem;
@@ -1030,14 +1024,13 @@ RideItem::updateIntervals()
 
             IntervalItem *intervalItem=NULL;
 
-            intervalItem = new IntervalItem(f,
+            intervalItem = new IntervalItem(this,
                                             QString(tr("SPRINT of %1 secs (%2 watts)")).arg(x.duration).arg(x.joules/x.duration),
                                             x.start, x.start+x.duration,
                                             f->timeToDistance(x.start), f->timeToDistance(x.start+x.duration),
                                             count++, QColor(Qt::red), RideFileInterval::SPRINT);
 
 
-            intervalItem->rideItem_ = this; // XXX will go when we refactor
             intervalItem->rideInterval = NULL;
             intervalItem->refresh();        // XXX will get called in constructore when refactor
             intervals_ << intervalItem;
@@ -1137,14 +1130,13 @@ RideItem::updateIntervals()
 
 
                             // create a new interval item
-                            IntervalItem *intervalItem = new IntervalItem(f, QString("Climb %1").arg(++hills),
+                            IntervalItem *intervalItem = new IntervalItem(this, QString("Climb %1").arg(++hills),
                                                                           pstart->secs, pstop->secs,
                                                                           pstart->km,
                                                                           pstop->km,
                                                                           count++,
                                                                           QColor(Qt::green),
                                                                           RideFileInterval::CLIMB);
-                            intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
                             intervalItem->rideInterval = NULL;
                             intervalItem->refresh();        // XXX will get called in constructore when refactor
                             intervals_ << intervalItem;
@@ -1181,14 +1173,13 @@ RideItem::updateIntervals()
                         //qDebug() << "find ride "<< fileName <<" for " <<rideSegmentName;
 
                         // create a new interval item
-                        IntervalItem *intervalItem = new IntervalItem(f, route->getName(),
+                        IntervalItem *intervalItem = new IntervalItem(this, route->getName(),
                                                                       _ride.start, _ride.stop,
                                                                       f->timeToDistance(_ride.start),
                                                                       f->timeToDistance(_ride.stop),
                                                                       count++,  // sequence defaults to count
                                                                       QColor(Qt::gray),
                                                                       RideFileInterval::ROUTE);
-                        intervalItem->rideItem_ = this; // XXX will go when we refactor and be passed instead of ridefile
                         intervalItem->rideInterval = NULL;
                         intervalItem->refresh();        // XXX will get called in constructore when refactor
                         intervals_ << intervalItem;
