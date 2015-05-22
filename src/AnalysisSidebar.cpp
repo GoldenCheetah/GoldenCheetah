@@ -172,7 +172,6 @@ AnalysisSidebar::intervalItemSelectionChanged(IntervalItem*x)
             }
         }
     }
-qDebug()<<"selection changed, didn't find it!";
 }
 
 void
