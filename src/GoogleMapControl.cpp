@@ -765,16 +765,15 @@ void
 WebBridge::hoverPath(double lat, double lng)
 {
     if (point) {
-#if 0 //XXX REFACTOR -- HOW TO CREATE AND EDIT AN INTERVAL!
 
         RideItem *rideItem = gm->property("ride").value<RideItem*>();
         QString name = QString(tr("Selection #%1 ")).arg(selection);
 
-        int count = 
+        if (rideItem->intervals(RideFileInterval::USER).count()) {
 
-        if (count > 0) {
-            IntervalItem *bottom = (IntervalItem *) allIntervals->child(count-1);
-            if (bottom->text(0).startsWith(name)) { //delete allIntervals->takeChild(count-1);
+            IntervalItem *last = rideItem->intervals(RideFileInterval::USER).last();
+
+            if (last->name.startsWith(name) && last->rideInterval) { 
 
                 QList<RideFilePoint*> list = searchPoint(lat, lng);
 
@@ -783,22 +782,29 @@ WebBridge::hoverPath(double lat, double lng)
                     RideFilePoint* secondPoint = list.at(0);
 
                     if (secondPoint->secs>point->secs) {
-                        bottom->start = point->secs;
-                        bottom->stop = secondPoint->secs;
+                        last->rideInterval->start = last->start = point->secs;
+                        last->rideInterval->stop = last->stop = secondPoint->secs;
                     } else {
-                        bottom->stop = point->secs;
-                        bottom->start = secondPoint->secs;
+                        last->rideInterval->stop = last->stop = point->secs;
+                        last->rideInterval->start = last->start = secondPoint->secs;
                     }
+                    last->startKM = last->rideItem()->ride()->timeToDistance(last->start);
+                    last->stopKM = last->rideItem()->ride()->timeToDistance(last->stop);
+
+                    // update metrics
+                    last->refresh();
+
+                    // mark dirty
+                    last->rideItem()->setDirty(true);
 
                     // overlay a shaded route
-                    gm->drawTempInterval(bottom);
+                    gm->drawTempInterval(last);
+
+                    // update charts etc
+                    context->notifyIntervalsChanged();
                  }
             }
         }
-
-
-
-
 
         // add average power to the end of the selection name
         //name += QString("(%1 watts)").arg(round((wattsTotal && arrayLength) ? wattsTotal/arrayLength : 0));
@@ -806,57 +812,40 @@ WebBridge::hoverPath(double lat, double lng)
 
         // now update the RideFileIntervals and all the plots etc
         //context->athlete->updateRideFileIntervals();
-
-#endif
     }
 }
 
 void
 WebBridge::clickPath(double lat, double lng)
 {
-
-#if 0 //XXX REFACTOR HOW TO SELECT AND EDIT AND INTERVAL
     selection++;
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
     QString name = QString(tr("Selection #%1 ")).arg(selection);
     QList<RideFilePoint*> list = searchPoint(lat, lng);
 
     if (list.count() > 0)  {
+
         point = list.at(0);
 
-        QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
+        IntervalItem *add = rideItem->newInterval(name, point->secs, point->secs, 0, 0);
+        add->selected = true;
 
-        QTreeWidgetItem *last = new IntervalItem(rideItem->ride(), name, point->secs, point->secs, 0, 0,
-                                    allIntervals->childCount()+1, RideFileInterval::USER);
-        last->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-        allIntervals->addChild(last);
+        // rebuild list in sidebar
+        context->notifyIntervalsUpdate(rideItem);
 
-        context->athlete->intervalTreeWidget()->clearSelection();
-        context->athlete->intervalTreeWidget()->setItemSelected(last, true);
-    }
-    else
+    } else {
         point = NULL;
-#endif
+    }
 }
 
 void
 WebBridge::mouseup()
 {
-#if 0 //XXX REFACTOR CREATE AND EDIT NEW INTERVAL
+    // clear the temorary highlighter
     if (point) {
         gm->clearTempInterval();
-        QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
-        int count = allIntervals->childCount();
-
-        if (count > 0) {
-            IntervalItem *bottom = (IntervalItem *) allIntervals->child(count-1);
-            context->athlete->intervalTreeWidget()->setItemSelected(bottom, true);
-        }
-
-        context->athlete->updateRideFileIntervals();
         point = NULL;
     }  
-#endif
 }
 
 

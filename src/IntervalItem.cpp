@@ -55,6 +55,34 @@ IntervalItem::setFrom(IntervalItem &other)
 }
 
 void
+IntervalItem::setValues(QString name, double duration1, double duration2, 
+                                      double distance1, double distance2)
+{
+    // apply the update
+    this->name = name;
+    start = duration1;
+    stop = duration2;
+    startKM = distance1;
+    stopKM = distance2;
+
+    // only accept changes if we can send on
+    if (type == RideFileInterval::USER && rideInterval) {
+
+        // update us and our ridefileinterval
+        rideInterval->start = start = duration1;
+        rideInterval->stop = stop = duration2;
+        startKM = distance1;
+        stopKM = distance2;
+
+        // update ridefile
+        rideItem_->setDirty(true);
+    }
+
+    // update metrics
+    refresh();
+}
+
+void
 IntervalItem::refresh()
 {
     // don't open on our account - we should be called with a ride available
