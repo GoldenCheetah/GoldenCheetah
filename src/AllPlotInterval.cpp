@@ -316,40 +316,18 @@ AllPlotInterval::intervalCurveHover(QwtPlotIntervalCurve *curve)
 void
 AllPlotInterval::intervalCurveClick(QwtPlotIntervalCurve *curve) {
     IntervalItem *interval = curves.key(curve);
-    int  idx = rideItem->intervals().indexOf(interval);
 
-
-//XXX REFACTOR HOW TO SELECT/DESELECT AN INTERVAL
-#if 0
-    if (idx != -1) {
-        context->athlete->allIntervalItems()->child(idx)->setSelected(!context->athlete->allIntervalItems()->child(idx)->isSelected());
-
-        if (QApplication::keyboardModifiers() != Qt::ControlModifier) {
-            const QTreeWidgetItem *allIntervals = context->athlete->allIntervalItems();
-            for (int i=0; i<allIntervals->childCount(); i++) {
-                if (i!=idx)
-                    context->athlete->allIntervalItems()->child(i)->setSelected(false);
-            }
-        }
+    if (interval) {
+        interval->selected = !interval->selected;
+        context->notifyIntervalItemSelectionChanged(interval);
     }
-#endif
 }
 
 void
 AllPlotInterval::intervalCurveDblClick(QwtPlotIntervalCurve *curve) {
     IntervalItem *interval = curves.key(curve);
-    int  idx = rideItem->intervals().indexOf(interval);
-
-//XXX REFACTOR HOW TO SELECT/DESELECT AN INTERVAL
-#if 0
-    if (idx != -1) {
-        context->athlete->allIntervalItems()->child(idx)->setSelected(!context->athlete->allIntervalItems()->child(idx)->isSelected());
-        context->notifyIntervalZoom((IntervalItem *)context->athlete->allIntervalItems()->child(idx));
-    }
-#endif
+    if (interval) context->notifyIntervalZoom(interval);
 }
-
-
 
 
 /*

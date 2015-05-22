@@ -135,6 +135,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     // GC signal
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(intervalsUpdate(RideItem*)), this, SLOT(intervalsUpdate(RideItem*)));
+    connect(context, SIGNAL(intervalItemSelectionChanged(IntervalItem*)), this, SLOT(intervalItemSelectionChanged(IntervalItem*)));
 
     // right click menus...
     connect(rideNavigator,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showActivityMenu(const QPoint &)));
@@ -145,6 +146,33 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
 
     configChanged(CONFIG_APPEARANCE);
+}
+
+void
+AnalysisSidebar::intervalItemSelectionChanged(IntervalItem*x)
+{
+    if (!x) return; // no null please.
+
+    // find it and select/deselect
+    QMapIterator<RideFileInterval::intervaltype, QTreeWidgetItem*> i(trees);
+    i.toFront();
+    while(i.hasNext()) {
+
+        i.next();
+
+        // loop through the intervals for this tree
+        for(int j=0; j<i.value()->childCount(); j++) {
+
+            // get pointer to the IntervalItem for this item
+            QVariant v = i.value()->child(j)->data(0, Qt::UserRole);
+
+            if (static_cast<IntervalItem*>(v.value<void*>()) == x) {
+                i.value()->child(j)->setSelected(x->selected);
+                return;
+            }
+        }
+    }
+qDebug()<<"selection changed, didn't find it!";
 }
 
 void
