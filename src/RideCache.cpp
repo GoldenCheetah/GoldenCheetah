@@ -25,7 +25,6 @@
 #include "Specification.h"
 
 #include "Route.h"
-#include "RouteWindow.h"
 
 #include "Zones.h"
 #include "HrZones.h"
@@ -49,7 +48,8 @@ RideCache::RideCache(Context *context) : context(context)
     // get the new zone configuration fingerprint
     fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint())
                   + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint())
-                  + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint());
+                  + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint())
+                  + static_cast<unsigned long>(context->athlete->routes->getFingerprint());
 
     // set the list
     // populate ride list

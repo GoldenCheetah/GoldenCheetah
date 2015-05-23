@@ -418,7 +418,6 @@ HEADERS += \
         SmallPlot.h \
         RideSummaryWindow.h \
         Route.h \
-        RouteItem.h \
         RouteParser.h \
         ScatterPlot.h \
         ScatterWindow.h \
@@ -476,7 +475,9 @@ YACCSOURCES += JsonRideFile.y WithingsParser.y RideDB.y
 
 # code that is pending later releases and not compiled in currently
 DEFERRES += RouteWindow.h \
-            RouteWindow.cpp
+            RouteWindow.cpp \
+            RouteItem.h \
+            RouteItem.cpp
 
 SOURCES += \
         AboutDialog.cpp \
@@ -647,7 +648,6 @@ SOURCES += \
         RideSummaryWindow.cpp \
         RideWindow.cpp \
         Route.cpp \
-        RouteItem.cpp \
         RouteParser.cpp \
         SaveDialogs.cpp \
         ScatterPlot.cpp \

@@ -876,10 +876,12 @@ AnalysisSidebar::zoomInterval()
 void
 AnalysisSidebar::createRouteIntervalSelected() 
 {
-#if 0 //WAIT FOR REFACTOR!!!!!!
     // create a new route for this interval
     context->athlete->routes->createRouteFromInterval(activeInterval);
-#endif
+
+    // this will create a segment for the interval added
+    if (context->currentRideItem()) 
+        const_cast<RideItem*>(context->currentRideItem())->refresh();
 }
 
 void
