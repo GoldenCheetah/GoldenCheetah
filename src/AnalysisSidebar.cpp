@@ -188,7 +188,10 @@ void
 AnalysisSidebar::intervalsUpdate(RideItem *changed)
 {
     // refresh the sidebar for ours
-    if (changed && changed == context->currentRideItem()) setRide(const_cast<RideItem*>(context->currentRideItem()));
+    if (changed && changed == context->currentRideItem()) {
+        setRide(const_cast<RideItem*>(context->currentRideItem()));
+        context->notifyIntervalsChanged();
+    }
 }
 
 void

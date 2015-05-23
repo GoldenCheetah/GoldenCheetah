@@ -161,16 +161,13 @@ class RideFile : public QObject // QObject to emit signals
         friend class TcxFileReader;
         friend class PwxFileReader;
         friend class JsonFileReader;
+        friend class ManualRideDialog;
 
         // split and mergers
         friend class MergeActivityWizard;
         friend class SplitActivityWizard;
         friend class SplitConfirm;
         friend class SplitSelect;
-
-        // TEMPORARY WHILST REFACTORING!
-        friend class IntervalTreeView;
-        friend class ManualRideDialog;
 
         // utility
         static unsigned int computeFileCRC(QString); 
