@@ -40,7 +40,7 @@ public slots:
     void intervalHover(IntervalItem*);
 
 protected:
-    //XXX refactor void summarise(QList<IntervalItem*>, QString& html); // summarise for all intervals
+    QString summary(QList<IntervalItem*>);
     QString summary(IntervalItem *);
 
     Context *context;
