@@ -190,10 +190,9 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
                                                               QColor(Qt::gray),
                                                               RideFileInterval::ROUTE);
                 here << intervalItem;
-
                 start = -1;
                 n=0;
-                //break;
+                return; // just find the first occurrence
             }
         }
     }
