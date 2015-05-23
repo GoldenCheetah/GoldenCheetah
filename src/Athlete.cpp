@@ -48,7 +48,6 @@
 #include "RideAutoImportConfig.h"
 
 #include "Route.h"
-#include "RouteWindow.h"
 
 #include "GcUpgrade.h" // upgrade wizard
 #include "GcCrashDialog.h" // recovering from a crash?
@@ -211,6 +210,7 @@ Athlete::~Athlete()
 #endif
 
     delete namedSearches;
+    delete routes;
     delete seasons;
 
     delete rideMetadata_;

@@ -72,43 +72,14 @@ RouteSegment::addPoint(RoutePoint _point)
     return points.count();
 }
 
-QList<RouteRide> RouteSegment::getRides() {
-    return rides;
-}
-
-int
-RouteSegment::addRide(RouteRide _ride)
-{
-    rides.append(_ride);
-    return rides.count();
-}
-
-int
-RouteSegment::addRideForRideFile(const RideFile *ride, double start, double stop, double precision)
-{
-    RouteRide _route = RouteRide(ride->getTag("Filename",""), ride->startTime(), start, stop, precision);
-    rides.append(_route);
-    return rides.count();
-}
-
-void
-RouteSegment::removeRideInRoute(RideItem* ride)
-{
-    for (int n=0; n< this->getRides().count();n++) {
-        const RouteRide* routeride = &getRides().at(n);
-        if (ride && routeride->startTime == ride->dateTime) {
-            rides.removeAt(n);
-        }
-    }
-}
-
-void
-RouteSegment::searchRouteInRide(RideFile* ride)
+void 
+RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
 {
     double minimumprecision = 0.100; //100m
     double maximumprecision = 0.010; //10m
     double precision = -1;
 
+    int found = 0;
     int diverge = 0;
     int lastpoint = -1; // Last point to match
     double start = -1, stop = -1; // Start and stop secs
@@ -209,9 +180,17 @@ RouteSegment::searchRouteInRide(RideFile* ride)
             break;
         } else {
             if (n == this->getPoints().count()-1){
-                // OK
-                //Add the interval and continue search
-                this->addRideForRideFile(ride, start, stop, precision);
+
+                // Add the interval and continue search
+                IntervalItem *intervalItem = new IntervalItem(item, name,
+                                                              start, stop,
+                                                              ride->timeToDistance(start),
+                                                              ride->timeToDistance(stop),
+                                                              ++found,
+                                                              QColor(Qt::gray),
+                                                              RideFileInterval::ROUTE);
+                here << intervalItem;
+
                 start = -1;
                 n=0;
                 //break;
@@ -258,11 +237,23 @@ Routes::Routes(Context *context, const QDir &home)
 {
     this->home = home;
     this->context = context;
-
-    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(addRide(RideItem*)));
-    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(deleteRide(RideItem*)));
-
     readRoutes();
+}
+
+Routes::~Routes()
+{
+    writeRoutes();
+}
+
+quint16
+Routes::getFingerprint() const
+{
+    // all the QUuids will suffice
+    QByteArray ba;
+    foreach(RouteSegment segment, routes) ba += segment.id().toByteArray();
+
+    // we spot other things separately
+    return qChecksum(ba, ba.length());
 }
 
 void
@@ -290,16 +281,6 @@ Routes::newRoute(QString name)
 }
 
 void
-Routes::updateRoute(int index, QString name)
-{
-    routes[index].setName(name);
-
-    // save changes away
-    writeRoutes();
-
-}
-
-void
 Routes::deleteRoute(int index)
 {
     // now delete!
@@ -314,52 +295,29 @@ Routes::writeRoutes()
 
     QString file = QString(home.canonicalPath() + "/routes.xml");
     RouteParser::serialize(file, routes);
-
-    routesChanged(); // signal!
-}
-
-// add a ride (after import / download)
-void
-Routes::addRide(RideItem* ride)
-{
-    searchRoutesInRide(ride);
-    writeRoutes();
-}
-
-// delete a ride
-void
-Routes::deleteRide(RideItem* ride)
-{
-    for (int routecount=0;routecount<routes.count();routecount++) {
-        RouteSegment *route = &routes[routecount];
-        route->removeRideInRoute(ride);
-    }
 }
 
 void
-Routes::searchRoutesInRide(RideItem* item)
+Routes::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
 {
-    if (item->present.contains("G")) {
+    if (ride) {
 
-        bool doclose=true;
-        if(item->isOpen()) doclose=false;
-        RideFile *ride = item->ride();
-
-        if (ride) {
-
-            // we opened the ride so search all segments
-            for (int routecount=0;routecount<routes.count();routecount++) {
-                RouteSegment *segment = &routes[routecount];
-                segment->searchRouteInRide(ride);
-            }
-
-            if (doclose) item->close();
+        // search all segments
+        for (int routecount=0;routecount<routes.count();routecount++) {
+            RouteSegment *segment = &routes[routecount];
+            segment->search(item, ride, here);
         }
     }
 }
 
 void
-Routes::createRouteFromInterval(IntervalItem *activeInterval) {
+Routes::createRouteFromInterval(IntervalItem *activeInterval) 
+{
+
+    // if refresh is running cancel it now, as we're adding
+    // a new route to search, so will need to restart
+    context->athlete->rideCache->cancel();
+
     // create a new route
     int index = context->athlete->routes->newRoute("route");
     RouteSegment *route = &context->athlete->routes->routes[index];
@@ -399,4 +357,10 @@ Routes::createRouteFromInterval(IntervalItem *activeInterval) {
             lastLon = point->lon;
         }
     }
+
+    // update on disk
+    context->athlete->routes->writeRoutes();
+
+    // now go and refresh !
+    context->athlete->rideCache->refresh();
 }

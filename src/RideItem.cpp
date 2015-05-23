@@ -427,7 +427,7 @@ RideItem::checkStale()
 
         } else {
 
-            // or have cp / zones have changed ?
+            // or have cp / zones or routes fingerprints changed ?
             // note we now get the fingerprint from the zone range
             // and not the entire config so that if you add a new
             // range (e.g. set CP from today) but none of the other
@@ -437,7 +437,8 @@ RideItem::checkStale()
             // get the new zone configuration fingerprint that applies for the ride date
             unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
-                        + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()));
+                        + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
+                        + static_cast<unsigned long>(context->athlete->routes->getFingerprint());
 
             if (fingerprint != rfingerprint) {
 
@@ -541,7 +542,8 @@ RideItem::refresh()
         // update fingerprints etc, crc done above
         fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
-                    + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()));
+                    + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
+                    + static_cast<unsigned long>(context->athlete->routes->getFingerprint());
 
         dbversion = DBSchemaVersion;
         timestamp = QDateTime::currentDateTime().toTime_t();
@@ -1169,35 +1171,16 @@ RideItem::updateIntervals()
 
     //Search routes
     if (f->isDataPresent(RideFile::lon)) {
-        Routes* routes = context->athlete->routes;
-        if (routes->routes.count()>0) {
-            for (int n=0;n<routes->routes.count();n++) {
-                RouteSegment* route = &routes->routes[n];
-                //qDebug() << "find route "<< route->getName() << n;
 
+        // set intervals for routes
+        QList<IntervalItem*> here;
+        context->athlete->routes->search(this, f, here);
 
-                for (int j=0;j<route->getRides().count();j++) {
-                    RouteRide _ride = route->getRides()[j];
-                    QDateTime rideStartDate = route->getRides()[j].startTime;
-                    QString rideSegmentName = route->getRides()[j].filename;
-
-                    if (f->startTime() == rideStartDate) {
-                        //qDebug() << "find ride "<< fileName <<" for " <<rideSegmentName;
-
-                        // create a new interval item
-                        IntervalItem *intervalItem = new IntervalItem(this, route->getName(),
-                                                                      _ride.start, _ride.stop,
-                                                                      f->timeToDistance(_ride.start),
-                                                                      f->timeToDistance(_ride.stop),
-                                                                      count++,  // sequence defaults to count
-                                                                      QColor(Qt::gray),
-                                                                      RideFileInterval::ROUTE);
-                        intervalItem->rideInterval = NULL;
-                        intervalItem->refresh();        // XXX will get called in constructore when refactor
-                        intervals_ << intervalItem;
-                    }
-                }
-            }
+        // add to ride !
+        foreach(IntervalItem *add, here) {
+            add->rideInterval = NULL;
+            add->refresh();
+            intervals_ << add;
         }
     }
 

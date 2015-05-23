@@ -29,10 +29,7 @@
 #include "Context.h"
 
 class  RideFile;
-class  RouteRide2;
 class  Routes;
-
-struct RouteRide;
 struct RoutePoint;
 
 class RouteSegment // represents a segment we match against
@@ -47,21 +44,14 @@ class RouteSegment // represents a segment we match against
         void setName(QString _name);
         QUuid id() const { return _id; }
         QList<RoutePoint> getPoints();
-        QList<RouteRide> getRides();
-        QList<RouteRide2> getRouteRides();
         void setId(QUuid x) { _id = x; }
 
         // managing points and matched rides
         int addPoint(RoutePoint _point);
-        int addRide(RouteRide _ride);
-        int addRideForRideFile(const RideFile *ride, double start, double stop, double precision);
-        bool parseRideFileName(Context *context, const QString &name, QString *notesFileName, QDateTime *dt);
-
         double distance(double lat1, double lon1, double lat2, double lon2);
 
-        // segments always work on actual ridefiles
-        void searchRouteInRide(RideFile* ride);
-        void removeRideInRoute(RideItem* ride);
+        // find segments in ridefiles
+        void search(RideItem *, RideFile*, QList<IntervalItem*>&);
 
     private:
 
@@ -70,8 +60,16 @@ class RouteSegment // represents a segment we match against
 
         QString name; // name, typically users name them by year e.g. "Col de Saxel"
         QList<RoutePoint> points;
-        QList<RouteRide> rides;
 };
+
+struct RoutePoint // represents a point within a segment
+{
+    RoutePoint() : lon(0.0), lat(0.0) {}
+    RoutePoint(double lon, double lat) : lon(lon), lat(lat) {}
+
+    double lon, lat;
+};
+
 
 class Routes : public QObject { // top-level object with API and map of segments/rides
 
@@ -82,27 +80,20 @@ class Routes : public QObject { // top-level object with API and map of segments
     public:
 
         Routes(Context *context, const QDir &home);
+        ~Routes();
+
+        // checksum changes as routes added
+        quint16 getFingerprint() const;
 
         // managing the list of route segments
         void readRoutes();
         int newRoute(QString name);
         void createRouteFromInterval(IntervalItem *activeInterval);
-        void updateRoute(int index, QString name);
         void deleteRoute(int);
         void writeRoutes();
 
-        // remove/searching rides 
-        void removeRideInRoutes(RideFile* ride);
-        void searchRoutesInRide(RideItem* ride);
-
-    public slots:
-
-        // adding and deleting rides
-        void addRide(RideItem*);
-        void deleteRide(RideItem* ride);
-
-    signals:
-        void routesChanged();
+        // find in a ride
+        void search(RideItem*, RideFile* ride, QList<IntervalItem*>&here);
 
     protected:
         QList<RouteSegment> routes;
@@ -110,29 +101,6 @@ class Routes : public QObject { // top-level object with API and map of segments
     private:
         QDir home;
         Context *context;
-};
-
-
-struct RouteRide { // represents a section of a ride that matches a segment
-
-    RouteRide() {}
-    RouteRide(QString filename, QDateTime startTime, double start, double stop, double precision) : 
-              filename(filename), startTime(startTime), start(start), stop(stop), precision(precision)  {}
-
-
-    QString filename;
-    QDateTime startTime;
-    double start, stop;
-    double precision;
-
-};
-
-struct RoutePoint // represents a point within a segment
-{
-    RoutePoint() : lon(0.0), lat(0.0) {}
-    RoutePoint(double lon, double lat) : lon(lon), lat(lat) {}
-
-    double lon, lat;
 };
 
 #endif // ROUTE_H
