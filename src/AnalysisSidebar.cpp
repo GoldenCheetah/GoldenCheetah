@@ -597,28 +597,37 @@ lessItem(const IntervalItem *s1, const IntervalItem *s2) {
 void
 AnalysisSidebar::sortIntervals()
 {
-#if 0
     // sort them chronologically
-    QList<IntervalItem*> intervals;
+    QList<IntervalItem*> userIntervals = context->rideItem()->intervals(RideFileInterval::USER);
+    QList<IntervalItem*> intervals = context->rideItem()->intervals();
 
-    // set string to first interval selected
-    for (int i=0; i<context->athlete->allIntervals->childCount();i++)
-        intervals.append((IntervalItem*)(context->athlete->allIntervals->child(i)));
+    bool change = false;
 
-    // now sort them into start time order
-    qStableSort(intervals.begin(), intervals.end(), lessItem);
+    for (int i=0; i<userIntervals.count()-1;i++) {
+        int min = i;
 
-    // empty context->athlete->allIntervals
-    context->athlete->allIntervals->takeChildren();
+        for (int j=i+1; j<userIntervals.count();j++) {
+            if (userIntervals.at(j)->start < userIntervals.at(min)->start) {
+                min = j;
+            }
+        }
 
-    // and put em back in chronological sequence
-    foreach(IntervalItem* item, intervals) {
-        context->athlete->allIntervals->addChild(item);
+        if (min != i) {
+            int indexFrom = intervals.indexOf(userIntervals.at(min));
+            int indexTo = intervals.indexOf(userIntervals.at(i));
+
+            userIntervals.move(min, i);
+            intervals.move(indexFrom, indexTo);
+
+            context->rideItem()->moveInterval(indexFrom, indexTo);
+            change = true;
+        }
     }
 
-    // now update the ridefile
-    context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
-#endif
+    if (change) {
+        context->notifyIntervalsUpdate(context->rideItem());
+        context->rideItem()->setDirty(true);
+    }
 }
 
 // rename multiple intervals
