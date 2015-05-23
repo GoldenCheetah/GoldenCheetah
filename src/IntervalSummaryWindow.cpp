@@ -74,7 +74,7 @@ void IntervalSummaryWindow::intervalSelected()
     html += "<body>";
 
     // summarise all the intervals selected - this is painful!
-    //if (rideItem->intervalsSelected().count()>1) summarise(rideItem->intervalsSelected(), html);
+    if (rideItem->intervalsSelected().count()>1) html += summary(rideItem->intervalsSelected());
 
     // summary for each of the currently selected intervals
     foreach(IntervalItem *interval, rideItem->intervalsSelected()) html += summary(interval);
@@ -123,8 +123,7 @@ static bool contains(const RideFile*ride, QList<IntervalItem*> intervals, int in
     return false;
 }
 
-#if 0
-void IntervalSummaryWindow::calcInterval(QList<IntervalItem*> intervals, QString &html)
+QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals)
 {
     // We need to create a special ridefile just for the selected intervals
     // to calculate the aggregated metrics because intervals can OVERLAP!
@@ -171,11 +170,42 @@ void IntervalSummaryWindow::calcInterval(QList<IntervalItem*> intervals, QString
         }
     }
 
-    // EEK this is getting complicated !
-    // WE NEED TO CREATE A TEMPORARY INTERVALITEM TOO..............
-    //XXX REFACTOR summary(QString("%1 intervals").arg(intervals.count()), html);
+    QString s;
+    if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
+        s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS).toString();
+    else
+        s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
+    QStringList intervalMetrics = s.split(",");
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    QHash<QString,RideMetricPtr> metrics =
+        RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), intervalMetrics);
+
+    // create temp interval item to use by interval summary
+    IntervalItem temp;
+
+    // pack the metrics away and clean up if needed
+    temp.metrics().fill(0, factory.metricCount());
+
+    // snaffle away all the computed values into the array
+    QHashIterator<QString, RideMetricPtr> i(metrics);
+    while (i.hasNext()) {
+        i.next();
+        temp.metrics()[i.value()->index()] = i.value()->value();
+    }
+
+    // clean any bad values
+    for(int j=0; j<factory.metricCount(); j++)
+        if (std::isinf(temp.metrics()[j]) || std::isnan(temp.metrics()[j]))
+            temp.metrics()[j] = 0.00f;
+
+    // set name
+    temp.name = QString(tr("%1 selected intervals")).arg(intervals.count());
+    temp.rideItem_ = intervals.at(0)->rideItem_;
+
+    // use standard method from above
+    return summary(&temp);
 }
-#endif
 
 QString IntervalSummaryWindow::summary(IntervalItem *interval)
 {
@@ -224,81 +254,3 @@ QString IntervalSummaryWindow::summary(IntervalItem *interval)
 
     return html;
 }
-
-#if 0
-void IntervalSummaryWindow::calcInterval(RideFileInterval interval, QString& html)
-{
-	const RideFile* ride = context->ride ? context->ride->ride() : NULL;
-
-    bool metricUnits = context->athlete->useMetricUnits;
-
-    RideFile f(const_cast<RideFile*>(ride));
-    int start = ride->timeIndex(interval.start);
-    int end = ride->timeIndex(interval.stop);
-    for (int i = start; i <= end; ++i) {
-        const RideFilePoint *p = ride->dataPoints()[i];
-        f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
-                      p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, p->lrbalance, 
-                      p->lte, p->rte, p->lps, p->rps,
-                      p->lpco, p->rpco,
-                      p->lppb, p->rppb, p->lppe, p->rppe,
-                      p->lpppb, p->rpppb, p->lpppe, p->rpppe,
-                      p->smo2, p->thb,
-                      p->rvert, p->rcad, p->rcontact, 0);
-
-        // derived data
-        RideFilePoint *l = f.dataPoints().last();
-        l->np = p->np;
-        l->xp = p->xp;
-        l->apower = p->apower;
-    }
-    if (f.dataPoints().size() == 0) {
-        // Interval empty, do not compute any metrics
-        html += "<i>" + tr("empty interval") + "</tr>";
-    }
-
-    QString s;
-    if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
-        s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS).toString();
-    else
-        s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
-    QStringList intervalMetrics = s.split(",");
-
-    QHash<QString,RideMetricPtr> metrics =
-        RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), intervalMetrics);
-
-    html += "<b>" + interval.name + "</b>";
-    html += "<table align=\"center\" width=\"90%\" ";
-    html += "cellspacing=0 border=0>";
-
-    RideItem *rideItem = const_cast<RideItem*>(context->currentRideItem());
-
-    foreach (QString symbol, intervalMetrics) {
-        RideMetricPtr m = metrics.value(symbol);
-        if (!m) continue;
-
-        // skip metrics that are not relevant for this ride
-        if (!rideItem || m->isRelevantForRide(rideItem) == false) continue;
-
-
-        html += "<tr>";
-        // left column (names)
-        html += "<td align=\"right\" valign=\"bottom\">" + m->name() + "</td>";
-
-        // right column (values)
-        QString s("<td align=\"center\">%1</td>");
-        html += s.arg(m->toString(metricUnits));
-        html += "<td align=\"left\" valign=\"bottom\">";
-        if (m->units(metricUnits) == "seconds" ||
-            m->units(metricUnits) == tr("seconds"))
-            ; // don't do anything
-        else if (m->units(metricUnits).size() > 0)
-            html += m->units(metricUnits);
-        html += "</td>";
-
-        html += "</tr>";
-
-    }
-    html += "</table>";
-}
-#endif
