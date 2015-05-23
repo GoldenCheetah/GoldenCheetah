@@ -648,17 +648,17 @@ RideItem::updateIntervals()
     }
 
     // Get CP and W' estimates for date of ride
-    double CP = 250;
-    double WPRIME = 22000;
-    double PMAX = 1000;
+    double CP = 0;
+    double WPRIME = 0;
+    double PMAX = 0;
 
     if (context->athlete->zones()) {
 
         // if range is -1 we need to fall back to a default value
         int zoneRange = context->athlete->zones()->whichRange(dateTime.date());
-        CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 250;
-        WPRIME = zoneRange >= 0 ? context->athlete->zones()->getWprime(zoneRange) : 22000;
-        PMAX = zoneRange >= 0 ? context->athlete->zones()->getPmax(zoneRange) : 1000;
+        CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 0;
+        WPRIME = zoneRange >= 0 ? context->athlete->zones()->getWprime(zoneRange) : 0;
+        PMAX = zoneRange >= 0 ? context->athlete->zones()->getPmax(zoneRange) : 0;
 
         // did we override CP in metadata ?
         int oCP = getText("CP","0").toInt();
@@ -762,7 +762,7 @@ RideItem::updateIntervals()
     QList<effort> candidates;
     QList<effort> candidates_sprint;
     
-    if (!f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
+    if (CP > 0 && !f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
 
         const int SAMPLERATE = 1000; // 1000ms samplerate = 1 second samples
 
