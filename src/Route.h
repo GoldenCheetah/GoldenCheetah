@@ -35,19 +35,23 @@ class  Routes;
 struct RouteRide;
 struct RoutePoint;
 
-class RouteSegment
+class RouteSegment // represents a segment we match against
 {
     public:
+
         RouteSegment();
         RouteSegment(Routes *routes);
 
-        Routes *routes;
+        // accessors
         QString getName();
         void setName(QString _name);
-
         QUuid id() const { return _id; }
+        QList<RoutePoint> getPoints();
+        QList<RouteRide> getRides();
+        QList<RouteRide2> getRouteRides();
         void setId(QUuid x) { _id = x; }
 
+        // managing points and matched rides
         int addPoint(RoutePoint _point);
         int addRide(RouteRide _ride);
         int addRideForRideFile(const RideFile *ride, double start, double stop, double precision);
@@ -55,52 +59,53 @@ class RouteSegment
 
         double distance(double lat1, double lon1, double lat2, double lon2);
 
-        void searchRouteInAllRides(Context *context);
-        void searchRouteInRide(RideFile* ride, bool freememory, QTextStream* log);
-
-        void removeRideInRoute(RideFile* ride);
-
-        QList<RoutePoint> getPoints();
-
-        QList<RouteRide> getRides();
-
-        QList<RouteRide2> getRouteRides();
+        // segments always work on actual ridefiles
+        void searchRouteInRide(RideFile* ride);
+        void removeRideInRoute(RideItem* ride);
 
     private:
+
+        Routes *routes;
         QUuid _id; // unique id
 
         QString name; // name, typically users name them by year e.g. "Col de Saxel"
-
         QList<RoutePoint> points;
-
         QList<RouteRide> rides;
-
 };
 
-class Routes : public QObject {
+class Routes : public QObject { // top-level object with API and map of segments/rides
 
     Q_OBJECT;
 
+    friend class ::RideItem; // access the route/ride map
+
     public:
+
         Routes(Context *context, const QDir &home);
+
+        // managing the list of route segments
         void readRoutes();
         int newRoute(QString name);
+        void createRouteFromInterval(IntervalItem *activeInterval);
         void updateRoute(int index, QString name);
         void deleteRoute(int);
         void writeRoutes();
-        QList<RouteSegment> routes;
 
-        void createRouteFromInterval(IntervalItem *activeInterval);
-        void searchRoutesInRide(RideFile* ride);
+        // remove/searching rides 
         void removeRideInRoutes(RideFile* ride);
+        void searchRoutesInRide(RideItem* ride);
 
     public slots:
+
+        // adding and deleting rides
         void addRide(RideItem*);
         void deleteRide(RideItem* ride);
 
     signals:
         void routesChanged();
 
+    protected:
+        QList<RouteSegment> routes;
 
     private:
         QDir home;
@@ -108,43 +113,26 @@ class Routes : public QObject {
 };
 
 
-/*class RouteRide2 : public QObject {
+struct RouteRide { // represents a section of a ride that matches a segment
 
-    Q_OBJECT;
+    RouteRide() {}
+    RouteRide(QString filename, QDateTime startTime, double start, double stop, double precision) : 
+              filename(filename), startTime(startTime), start(start), stop(stop), precision(precision)  {}
 
-    public :
-        RouteRide2();
-
-        RouteRide2(QDateTime startTime, double start, double stop, double precision);// : startTime(startTime), start(start), stop(stop), precision(precision)  {}
-
-        QDateTime startTime;
-        double start, stop;
-        double precision;
-
-};*/
-
-struct RouteRide {
 
     QString filename;
     QDateTime startTime;
     double start, stop;
     double precision;
 
-
-
-    RouteRide(QString filename, QDateTime startTime, double start, double stop, double precision) : filename(filename), startTime(startTime), start(start), stop(stop), precision(precision)  {}
-
-    RouteRide() {}
 };
 
-struct RoutePoint
+struct RoutePoint // represents a point within a segment
 {
-    double lon, lat;
-
     RoutePoint() : lon(0.0), lat(0.0) {}
-
     RoutePoint(double lon, double lat) : lon(lon), lat(lat) {}
-    //double value(RideFile::SeriesType series) const;
+
+    double lon, lat;
 };
 
 #endif // ROUTE_H
