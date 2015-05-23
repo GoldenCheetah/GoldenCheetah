@@ -56,14 +56,14 @@ RouteItem::RouteItem(RouteSegment *route, const RouteRide *routeRide,
     setTextAlignment(1, Qt::AlignRight);
     setTextAlignment(2, Qt::AlignRight);
 
-    QDateTime dt;
-    foreach(RideItem *item, context->athlete->rideCache->rides()) {
+    //QDateTime dt;
+    //foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
         //XXX what is this code trying to do ??? XXX
-        if ((route->parseRideFileName(context, item->fileName, &notesFileName, &dt)) && (dt == routeRide->startTime)) { //
-            fileName = item->fileName;
-        }
-    }
+        //if ((route->parseRideFileName(context, item->fileName, &notesFileName, &dt)) && (dt == routeRide->startTime)) { //
+        //    fileName = item->fileName;
+        //}
+    //}
 }
 
 RouteItem::RouteItem(RouteSegment *route, int type,

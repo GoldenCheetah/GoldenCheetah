@@ -526,12 +526,15 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
     // care as we should only really operate on user intervals
 
     QTreeWidgetItem *trItem = intervalTree->itemAt(pos);
+    QTreeWidgetItem *root = trItem ? trItem->parent() : NULL;
 
     QVariant v = trItem ? trItem->data(0, Qt::UserRole) : QVariant();
     IntervalItem *interval = static_cast<IntervalItem*>(v.value<void*>());
 
-    if (trItem != NULL && interval) {
+    if (trItem != NULL && root && interval) {
 
+        // what kind if interval are we looking at ?
+        RideFileInterval::IntervalType type = trees.key(root, static_cast<RideFileInterval::IntervalType>(-1));
         bool isUser = interval->rideInterval != NULL;
 
         activeInterval = interval;
@@ -540,13 +543,10 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         // ZOOM IN AND OUT FOR ALL
         QAction *actZoomOut = new QAction(tr("Zoom Out"), intervalTree);
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalTree);
-        QAction *actRoute = new QAction(tr("Create as a route"), intervalTree);
         connect(actZoomOut, SIGNAL(triggered(void)), this, SLOT(zoomOut(void)));
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomInterval(void)));
-        connect(actRoute, SIGNAL(triggered(void)), this, SLOT(createRouteIntervalSelected(void)));
         menu.addAction(actZoomOut);
         menu.addAction(actZoomInt);
-        menu.addAction(actRoute);
 
         // EDIT / DELETE USER ONLY
         if (isUser) {
@@ -565,6 +565,15 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         //connect(actBackInt, SIGNAL(triggered(void)), this, SLOT(backInterval(void)));
 
         menu.addSeparator();
+
+        // CREATE NEW ROUTE SEGMENT IF GPS PRESENT (AND NOT ALREADY A ROUTE!)
+        if (type != RideFileInterval::ROUTE && 
+            context->currentRideItem() && context->currentRideItem()->present.contains("G")) {
+
+            QAction *actRoute = new QAction(tr("Create as a route"), intervalTree);
+            connect(actRoute, SIGNAL(triggered(void)), this, SLOT(createRouteIntervalSelected(void)));
+            menu.addAction(actRoute);
+        }
 
         menu.exec(intervalTree->mapToGlobal(pos));
     }
