@@ -653,11 +653,12 @@ RideItem::updateIntervals()
     double CP = 0;
     double WPRIME = 0;
     double PMAX = 0;
+    int zoneRange;
 
     if (context->athlete->zones()) {
 
         // if range is -1 we need to fall back to a default value
-        int zoneRange = context->athlete->zones()->whichRange(dateTime.date());
+        zoneRange = context->athlete->zones()->whichRange(dateTime.date());
         CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 0;
         WPRIME = zoneRange >= 0 ? context->athlete->zones()->getWprime(zoneRange) : 0;
         PMAX = zoneRange >= 0 ? context->athlete->zones()->getPmax(zoneRange) : 0;
@@ -764,7 +765,7 @@ RideItem::updateIntervals()
     QList<effort> candidates;
     QList<effort> candidates_sprint;
     
-    if (CP > 0 && !f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
+    if (zoneRange >= 0 && CP > 0 && !f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
 
         const int SAMPLERATE = 1000; // 1000ms samplerate = 1 second samples
 
@@ -1012,15 +1013,17 @@ RideItem::updateIntervals()
         foreach(effort x, candidates) {
 
             IntervalItem *intervalItem=NULL;
+            int zone = context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration);
+
             if (x.quality >= 1.0f) {
                 intervalItem = new IntervalItem(this, 
-                                                QString(tr("TTE of %1  (%2 watts)")).arg(time_to_string(x.duration)).arg(x.joules/x.duration),
+                                                QString(tr("L%3 TTE of %1  (%2 watts)")).arg(time_to_string(x.duration)).arg(x.joules/x.duration).arg(zone),
                                                 x.start, x.start+x.duration, 
                                                 f->timeToDistance(x.start), f->timeToDistance(x.start+x.duration),
-                                                count++, QColor(Qt::red), RideFileInterval::TTE);
+                                                count++, QColor(Qt::red), RideFileInterval::EFFORT);
             } else {
                 intervalItem = new IntervalItem(this, 
-                                                QString(tr("%3% EFFORT of %1  (%2 watts)")).arg(time_to_string(x.duration)).arg(x.joules/x.duration).arg(int(x.quality*100)),
+                                                QString(tr("L%4 %3% EFFORT of %1  (%2 watts)")).arg(time_to_string(x.duration)).arg(x.joules/x.duration).arg(int(x.quality*100)).arg(zone),
                                                 x.start, x.start+x.duration, 
                                                 f->timeToDistance(x.start), f->timeToDistance(x.start+x.duration),
                                                 count++, QColor(Qt::red), RideFileInterval::EFFORT);
@@ -1038,11 +1041,12 @@ RideItem::updateIntervals()
 
             IntervalItem *intervalItem=NULL;
 
+            int zone = context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration);
             intervalItem = new IntervalItem(this,
-                                            QString(tr("SPRINT of %1 secs (%2 watts)")).arg(x.duration).arg(x.joules/x.duration),
+                                            QString(tr("L%3 SPRINT of %1 secs (%2 watts)")).arg(x.duration).arg(x.joules/x.duration).arg(zone),
                                             x.start, x.start+x.duration,
                                             f->timeToDistance(x.start), f->timeToDistance(x.start+x.duration),
-                                            count++, QColor(Qt::red), RideFileInterval::SPRINT);
+                                            count++, QColor(Qt::red), RideFileInterval::EFFORT);
 
 
             intervalItem->rideInterval = NULL;
