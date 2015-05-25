@@ -254,7 +254,7 @@ AnalysisSidebar::setRide(RideItem*ride)
             add->setText(0, interval->name);
             add->setData(0, Qt::UserRole, qVariantFromValue((void*)interval));
             add->setFlags(Qt::ItemIsEnabled 
-#if QT_VERSION > 0x50000
+#if QT_VERSION >= 0x50101
                           | Qt::ItemNeverHasChildren
 #endif
                           | Qt::ItemIsSelectable 
