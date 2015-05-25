@@ -1048,6 +1048,7 @@ AllPlotWindow::compareChanged()
         QList<SeriesWanted> wanted;
         SeriesWanted s;
         if (showPower->currentIndex() < 2) { s.one = RideFile::watts; s.two = RideFile::none; wanted << s;};
+        if (showW->isChecked()) { s.one = RideFile::wprime; s.two = RideFile::none; wanted << s;};
         if (showPowerD->isChecked()) { s.one = RideFile::wattsd; s.two = RideFile::none; wanted << s;};
         if (showHr->isChecked()) { s.one = RideFile::hr; s.two = RideFile::none; wanted << s;};
         if (showHrD->isChecked()) { s.one = RideFile::hrd; s.two = RideFile::none; wanted << s;};
@@ -1075,7 +1076,6 @@ AllPlotWindow::compareChanged()
         if (showANTISS->isChecked()) { s.one = RideFile::anTISS; s.two = RideFile::none; wanted << s;};
         if (showXP->isChecked()) { s.one = RideFile::xPower; s.two = RideFile::none; wanted << s;};
         if (showAP->isChecked()) { s.one = RideFile::aPower; s.two = RideFile::none; wanted << s;};
-        if (showW->isChecked()) { s.one = RideFile::wprime; s.two = RideFile::none; wanted << s;};
         if (showBalance->isChecked()) { s.one = RideFile::lrbalance; s.two = RideFile::none; wanted << s;};
 
         /*
@@ -3223,6 +3223,7 @@ AllPlotWindow::setupSeriesStackPlots()
     SeriesWanted s;
     // lets get a list of what we need to plot -- plot is same order as options in settings
     if (showPower->currentIndex() < 2 && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::watts; s.two = RideFile::none; serieslist << s; }
+    if (showW->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::wprime; s.two = RideFile::none; serieslist << s; }
     if (showPowerD->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::wattsd;s.two = RideFile::none; serieslist << s; }
     if (showHr->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::hr; s.two = RideFile::none; serieslist << s; }
     if (showHrD->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::hrd; s.two = RideFile::none; serieslist << s; }
@@ -3250,7 +3251,6 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showANTISS->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::anTISS; s.two = RideFile::none; serieslist << s; }
     if (showXP->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::xPower; s.two = RideFile::none; serieslist << s; }
     if (showAP->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::aPower; s.two = RideFile::none; serieslist << s; }
-    if (showW->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::wprime; s.two = RideFile::none; serieslist << s; }
     if (showBalance->isChecked() && rideItem->ride()->areDataPresent()->lrbalance) { s.one = RideFile::lrbalance; s.two = RideFile::none; serieslist << s; }
     if (showTE->isChecked() && rideItem->ride()->areDataPresent()->lte) { s.one = RideFile::lte; s.two = RideFile::none; serieslist << s;
          s.one = RideFile::rte; s.two = RideFile::none; serieslist << s; }
