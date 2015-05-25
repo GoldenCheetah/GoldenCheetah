@@ -166,18 +166,15 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
                         }
                         //present = true;
                     }
-
-
-
                 }
             }
-
         }
         stop = point->secs;
 
 
         if (!present) {
             break;
+
         } else {
             if (n == this->getPoints().count()-1){
 
@@ -191,9 +188,14 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
                                                               RideFileInterval::ROUTE);
                 here << intervalItem;
 
+                // reset to restart find on next iteration
                 start = -1;
                 n=0;
-                //break;
+
+                // skip on a few samples to avoid finding the same
+                // segment again - this happens when a segment is very
+                // short and ends at lights or top of a hill.
+                lastpoint += 30;
             }
         }
     }
