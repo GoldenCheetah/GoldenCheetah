@@ -32,8 +32,12 @@ WithingsDownload::WithingsDownload(Context *context) : context(context)
 bool
 WithingsDownload::download()
 {
+    // account for trailing slash, remove it if it is there (it was the default in preferences)
+    QString server = appsettings->cvalue(context->athlete->cyclist, GC_WIURL, "http://wbsapi.withings.net").toString();
+    if (server.endsWith("/")) server=server.mid(0, server.length()-1);
+
     QString request = QString("%1/measure?action=getmeas&userid=%2&publickey=%3")
-                             .arg(appsettings->cvalue(context->athlete->cyclist, GC_WIURL, "http://wbsapi.withings.net").toString())
+                             .arg(server)
                              .arg(appsettings->cvalue(context->athlete->cyclist, GC_WIUSER, "").toString())
                              .arg(appsettings->cvalue(context->athlete->cyclist, GC_WIKEY, "").toString());
 
