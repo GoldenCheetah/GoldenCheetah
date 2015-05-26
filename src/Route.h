@@ -46,6 +46,15 @@ class RouteSegment // represents a segment we match against
         QList<RoutePoint> getPoints();
         void setId(QUuid x) { _id = x; }
 
+        double getMinLat();
+        void setMinLat(double);
+        double getMaxLat();
+        void setMaxLat(double);
+        double getMinLon();
+        void setMinLon(double);
+        double getMaxLon();
+        void setMaxLon(double);
+
         // managing points and matched rides
         int addPoint(RoutePoint _point);
         double distance(double lat1, double lon1, double lat2, double lon2);
@@ -60,6 +69,9 @@ class RouteSegment // represents a segment we match against
 
         QString name; // name, typically users name them by year e.g. "Col de Saxel"
         QList<RoutePoint> points;
+
+        double minLat, maxLat;
+        double minLon, maxLon;
 };
 
 struct RoutePoint // represents a point within a segment

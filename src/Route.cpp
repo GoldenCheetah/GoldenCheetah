@@ -61,6 +61,46 @@ RouteSegment::setName(QString _name)
     name = _name;
 }
 
+double
+RouteSegment::getMinLat() {
+    return minLat;
+}
+
+void
+RouteSegment::setMinLat(double _minLat) {
+    minLat = _minLat;
+}
+
+double
+RouteSegment::getMaxLat() {
+    return maxLat;
+}
+
+void
+RouteSegment::setMaxLat(double _maxLat) {
+    maxLat = _maxLat;
+}
+
+double
+RouteSegment::getMinLon() {
+    return minLon;
+}
+
+void
+RouteSegment::setMinLon(double _minLon) {
+    minLon = _minLon;
+}
+
+double
+RouteSegment::getMaxLon() {
+    return maxLon;
+}
+
+void
+RouteSegment::setMaxLon(double _maxLon) {
+    maxLon = _maxLon;
+}
+
 QList<RoutePoint> RouteSegment::getPoints() {
     return points;
 }
@@ -307,6 +347,12 @@ Routes::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
         // search all segments
         for (int routecount=0;routecount<routes.count();routecount++) {
             RouteSegment *segment = &routes[routecount];
+
+            if (ride->getMinPoint(RideFile::lat)<segment->getMinLat()+0.001 &&
+                ride->getMaxPoint(RideFile::lat)>segment->getMaxLat()-0.001 &&
+                ride->getMinPoint(RideFile::lon)<segment->getMinLon()+0.001 &&
+                ride->getMaxPoint(RideFile::lon)>segment->getMaxLon()-0.001   )
+
             segment->search(item, ride, here);
         }
     }

@@ -18,6 +18,7 @@
 
 #include "RideMetric.h"
 #include "BestIntervalDialog.h"
+#include "RideItem.h"
 #include "Zones.h"
 #include "Settings.h"
 #include <cmath>
@@ -312,6 +313,49 @@ class Vo2max : public RideMetric {
     RideMetric *clone() const { return new Vo2max(*this); }
 };
 
+class EtimatedAverageWPK_DrF : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(EtimatedAverageWPK_DrF)
+
+    public:
+
+    EtimatedAverageWPK_DrF()
+    {
+        setSymbol("estimated_average_wpk_drf");
+        setInternalName("estimated Watts Per Kilogram (DrF.)");
+    }
+    void initialize () {
+        setName(tr("estimated Watts Per Kilogram (DrF.)"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("w/kg"));
+        setImperialUnits(tr("w/kg"));
+        setPrecision(2);
+    }
+
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+        // unconst naughty boy
+        RideFile *uride = const_cast<RideFile*>(ride);
+
+        // get thos dependencies
+        double vam = deps.value("vam")->value(true);
+        double gradient = deps.value("gradient")->value(true);
+        double secs = deps.value("workout_time")->value(true);
+
+
+        // Calculated power output (W/kg) = [VAM (m/hour)] / [((2 + (% grade/10)) x 100)]
+        setValue( gradient>=7 ? vam / 100.0 / (2 + gradient/10.0 ) : 0 );
+
+        setCount(secs);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const {return ride->present.contains("P"); }
+
+    RideMetric *clone() const { return new EtimatedAverageWPK_DrF(*this); }
+};
+
 static bool addAllWPK() {
     RideMetricFactory::instance().addMetric(PeakWPK1s());
     RideMetricFactory::instance().addMetric(PeakWPK5s());
@@ -332,6 +376,16 @@ static bool addAllWPK() {
     deps.append("average_power");
     deps.append("workout_time");
     RideMetricFactory::instance().addMetric(AverageWPK(), &deps);
+
+    // Added for testing purpose
+    // Work pretty well but
+    // is it really a metric ?
+    /*deps.clear();
+    deps.append("vam");
+    deps.append("gradient");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(EtimatedAverageWPK_DrF(), &deps);*/
+
     return true;
 }
 
