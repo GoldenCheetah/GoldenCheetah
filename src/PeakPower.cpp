@@ -132,7 +132,7 @@ class PowerZone : public RideMetric {
             double ap = deps.value("average_power")->value(true);
 
             // if range is -1 we need to fall back to a default value
-            int zone = zoneRange >= 0 ? zones->whichZone(zoneRange, ap) : 0;
+            int zone = zoneRange >= 0 ? zones->whichZone(zoneRange, ap) + 1 : 0;
             setValue(zone);
         }
     }
