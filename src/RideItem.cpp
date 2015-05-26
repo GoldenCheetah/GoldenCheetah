@@ -630,6 +630,7 @@ RideItem::getStringForSymbol(QString name, bool useMetricUnits)
 
 struct effort {
     int start, duration, joules;
+    int zone;
     double quality;
 };
 
@@ -762,7 +763,7 @@ RideItem::updateIntervals()
     }
 
     //qDebug() << "SEARCH EFFORTS";
-    QList<effort> candidates;
+    QList<effort> candidates[10];
     QList<effort> candidates_sprint;
     
     if (zoneRange >= 0 && CP > 0 && !f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
@@ -884,6 +885,7 @@ RideItem::updateIntervals()
                         tte.duration = t;
                         tte.joules = integrated_series[i+t]-integrated_series[i];
                         tte.quality = tc / double(t);
+                        tte.zone = context->athlete->zones()->whichZone(zoneRange, tte.joules/tte.duration);
 
                     } else {
 
@@ -894,6 +896,7 @@ RideItem::updateIntervals()
                             tte.duration = t;
                             tte.joules = integrated_series[i+t]-integrated_series[i];
                             tte.quality = thisquality;
+                            tte.zone = context->athlete->zones()->whichZone(zoneRange, tte.joules/tte.duration);
                         }
 
                     }
@@ -961,9 +964,9 @@ RideItem::updateIntervals()
 
                 // if we overlap with the last one and
                 // we are better then replace otherwise skip
-                if (candidates.count()) {
+                if (candidates[tte.zone].count()) {
 
-                    effort &last = candidates.last();
+                    effort &last = candidates[tte.zone].last();
                     if ((tte.start >= last.start && tte.start <= (last.start+last.duration)) ||
                        (tte.start+tte.duration >= last.start && tte.start+tte.duration <= (last.start+last.duration))) {
 
@@ -973,12 +976,12 @@ RideItem::updateIntervals()
                     } else{
 
                         // we don't overlap
-                        candidates << tte;
+                        candidates[tte.zone] << tte;
                     }
                 } else {
 
                     // we are the first
-                    candidates << tte;
+                    candidates[tte.zone] << tte;
                 }
             }
 
@@ -1010,7 +1013,8 @@ RideItem::updateIntervals()
         }
 
         // add any we found
-        foreach(effort x, candidates) {
+        for (int i=0; i<10; i++) {
+        foreach(effort x, candidates[i]) {
 
             IntervalItem *intervalItem=NULL;
             int zone = 1 + context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration);
@@ -1035,6 +1039,7 @@ RideItem::updateIntervals()
 
             //qDebug()<<fileName<<"IS EFFORT"<<x.quality<<"at"<<x.start<<"duration"<<x.duration;
 
+        }
         }
 
         foreach(effort x, candidates_sprint) {
