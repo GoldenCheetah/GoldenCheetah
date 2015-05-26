@@ -60,8 +60,7 @@ void IntervalSummaryWindow::intervalSelected()
     // if no ride available don't bother - just reset for color changes
     RideItem *rideItem = const_cast<RideItem*>(context->currentRideItem());
 
-    if (rideItem->intervalsSelected().count() == 0 || 
-        rideItem == NULL || rideItem->ride() == NULL) {
+    if (rideItem == NULL || rideItem->intervalsSelected().count() == 0 || rideItem->ride() == NULL) {
         // no ride just update the colors
 	    QString html = GCColor::css();
         html += "<body></body>";
