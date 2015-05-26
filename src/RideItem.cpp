@@ -1013,7 +1013,7 @@ RideItem::updateIntervals()
         foreach(effort x, candidates) {
 
             IntervalItem *intervalItem=NULL;
-            int zone = context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration);
+            int zone = 1 + context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration);
 
             if (x.quality >= 1.0f) {
                 intervalItem = new IntervalItem(this, 
@@ -1041,7 +1041,7 @@ RideItem::updateIntervals()
 
             IntervalItem *intervalItem=NULL;
 
-            int zone = context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration);
+            int zone = 1 + context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration);
             intervalItem = new IntervalItem(this,
                                             QString(tr("L%3 SPRINT of %1 secs (%2 watts)")).arg(x.duration).arg(x.joules/x.duration).arg(zone),
                                             x.start, x.start+x.duration,
