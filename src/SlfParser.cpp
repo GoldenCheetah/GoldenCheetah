@@ -79,39 +79,7 @@ SlfParser::endElement( const QString&, const QString&, const QString& qName)
 {
     if (qName == "startDate")
     {
-        QString date = buffer.mid(0,buffer.indexOf("GMT")) + buffer.right(4);
-        // Fri May 1 13:55:10 GMT+0200 2015
-        /*
-         * TextDate,      // default Qt
-        ISODate,       // ISO 8601
-        SystemLocaleDate, // deprecated
-        LocalDate = SystemLocaleDate, // deprecated
-        LocaleDate,     // deprecated
-        SystemLocaleShortDate,
-        SystemLocaleLongDate,
-        DefaultLocaleShortDate,
-        DefaultLocaleLongDate,
-        RFC2822Date        // RFC 2822 (+ 850 and 1036 during parsing)
-        */
-        qDebug() << QDateTime::currentDateTime().toString(Qt::ISODate);
-        qDebug() << QDateTime::currentDateTime().toString(Qt::SystemLocaleDate);
-        qDebug() << QDateTime::currentDateTime().toString(Qt::LocalDate);
-        qDebug() << QDateTime::currentDateTime().toString(Qt::LocaleDate);
-        qDebug() << QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate);
-        qDebug() << QDateTime::currentDateTime().toString(Qt::SystemLocaleLongDate);
-        qDebug() << QDateTime::currentDateTime().toString(Qt::DefaultLocaleShortDate);
-        qDebug() << QDateTime::currentDateTime().toString(Qt::DefaultLocaleLongDate);
-        qDebug() << QDateTime::currentDateTime().toString(Qt::TextDate);
-        qDebug() << QDateTime::currentDateTime().toString("ddd MMM d HH:MM:SS yyyy");
-        qDebug() << "---";
 
-        qDebug() << buffer;
-        qDebug() << date;
-        start_time.setDate(QDate::fromString(date).addYears(100));
-        //start_time.setDate(QDate::fromString(buffer, Qt::ISODate).addYears(100));
-        qDebug() << start_time.toString(Qt::ISODate);
-
-        rideFile->setStartTime(start_time);
     }
     else if (qName == "StartDatum")
     {
