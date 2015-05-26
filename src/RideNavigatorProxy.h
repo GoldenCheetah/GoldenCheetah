@@ -251,7 +251,7 @@ public:
             // serialize
             stream << (int)1;
             stream << QString(tr("Entire Ride"));
-            stream << (quint64)(ride->ride()); // ridefile
+            stream << (quint64)(ride); // rideitem
             stream << (quint64)ride->ride()->dataPoints().first()->secs
                    << (quint64)ride->ride()->dataPoints().last()->secs;
             stream << (quint64)ride->ride()->dataPoints().first()->km
