@@ -706,9 +706,9 @@ void RideFile::updateMin(RideFilePoint* point)
        minPoint->watts = point->watts;
     if (point->alt<minPoint->alt)
        minPoint->alt = point->alt;
-    if (point->lon<minPoint->lon)
+    if (minPoint->lon == 0 || point->lon<minPoint->lon)
        minPoint->lon = point->lon;
-    if (point->lat<minPoint->lat)
+    if (minPoint->lat == 0 || point->lat<minPoint->lat)
        minPoint->lat = point->lat;
     if (point->headwind<minPoint->headwind)
        minPoint->headwind = point->headwind;

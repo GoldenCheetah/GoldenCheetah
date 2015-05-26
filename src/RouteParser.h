@@ -46,6 +46,9 @@ protected:
     RoutePoint point;
     int loadcount;
 
+    double minLon, maxLon;
+    double minLat, maxLat;
+
 };
 
 #endif // ROUTEPARSER_H

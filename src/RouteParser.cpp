@@ -38,13 +38,28 @@ bool RouteParser::endElement( const QString&, const QString&, const QString &qNa
     else if (qName == "id")
         route.setId(QUuid(buffer.trimmed()));
     else if(qName == "route") {
+        route.setMinLat(minLat);
+        route.setMaxLat(maxLat);
+        route.setMinLon(minLon);
+        route.setMaxLon(maxLon);
+
         routes.append(route);
     } else if(qName == "point") {
         route.addPoint(point);
     } else if(qName == "lat") {
         point.lat = buffer.trimmed().toDouble();
+
+        if (point.lat<minLat)
+            minLat = point.lat;
+        if (point.lat>maxLat)
+            maxLat = point.lat;
     } else if(qName == "lon") {
         point.lon = buffer.trimmed().toDouble();
+
+        if (point.lon<minLon)
+            minLon = point.lon;
+        if (point.lon>maxLon)
+            maxLon = point.lon;
     }
     return true;
 }
@@ -54,6 +69,10 @@ bool RouteParser::startElement( const QString&, const QString&, const QString &n
     buffer.clear();
     if(name == "route") {
         route = RouteSegment();
+        minLat = 180;
+        minLon = 180;
+        maxLat = -180;
+        maxLon = -180;
     } else if(name == "point") {
         point = RoutePoint();
     }
