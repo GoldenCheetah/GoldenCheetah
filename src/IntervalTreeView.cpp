@@ -25,6 +25,7 @@
 #include <QStyle>
 #include <QStyleFactory>
 #include <QScrollBar>
+#include <QStyledItemDelegate>
 
 
 IntervalTreeView::IntervalTreeView(Context *context) : context(context)
@@ -42,6 +43,9 @@ IntervalTreeView::IntervalTreeView(Context *context) : context(context)
     setStyleSheet("QTreeView::item:hover { background: lightGray; }");
     setMouseTracking(true);
     invisibleRootItem()->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+    // we want the color rectangle
+    setItemDelegate(new IntervalColorDelegate(this));
 
     connect(this, SIGNAL(itemEntered(QTreeWidgetItem*,int)), this, SLOT(mouseHover(QTreeWidgetItem*,int)));
 }
@@ -139,3 +143,4 @@ IntervalTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
     returning->setData("application/x-gc-intervals", rawData);
     return returning;
 }
+
