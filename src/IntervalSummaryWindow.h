@@ -40,7 +40,7 @@ public slots:
     void intervalHover(IntervalItem*);
 
 protected:
-    QString summary(QList<IntervalItem*>);
+    QString summary(QList<IntervalItem*>, QString&);
     QString summary(IntervalItem *);
 
     Context *context;
