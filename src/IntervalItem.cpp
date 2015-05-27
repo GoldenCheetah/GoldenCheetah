@@ -20,6 +20,7 @@
 #include "RideFile.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "ColorButton.h"
 
 IntervalItem::IntervalItem(const RideItem *ride, QString name, double start, double stop, 
                            double startKM, double stopKM, int displaySequence, QColor color,
@@ -183,12 +184,14 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
 {
     setWindowTitle(tr("Edit Interval"));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setSpacing(5);
 
     // Grid
     QGridLayout *grid = new QGridLayout;
     QLabel *name = new QLabel("Name");
     QLabel *from = new QLabel("From");
     QLabel *to = new QLabel("To");
+    QLabel *color = new QLabel("Color");
 
     nameEdit = new QLineEdit(this);
     nameEdit->setText(interval.name);
@@ -201,12 +204,16 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
     toEdit->setDisplayFormat("hh:mm:ss");
     toEdit->setTime(QTime(0,0,0,0).addSecs(interval.stop));
 
+    colorEdit = new ColorButton(this, interval.name, interval.color);
+
     grid->addWidget(name, 0,0);
     grid->addWidget(nameEdit, 0,1);
     grid->addWidget(from, 1,0);
     grid->addWidget(fromEdit, 1,1);
     grid->addWidget(to, 2,0);
     grid->addWidget(toEdit, 2,1);
+    grid->addWidget(color, 3,0);
+    grid->addWidget(colorEdit, 3,1);
 
     mainLayout->addLayout(grid);
 
@@ -231,6 +238,7 @@ EditIntervalDialog::applyClicked()
     interval.name = nameEdit->text();
     interval.start = QTime(0,0,0).secsTo(fromEdit->time());
     interval.stop = QTime(0,0,0).secsTo(toEdit->time());
+    interval.color = colorEdit->getColor();
     accept();
 }
 void

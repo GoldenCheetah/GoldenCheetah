@@ -815,6 +815,7 @@ AnalysisSidebar::editInterval()
     temp.name = activeInterval->name;
     temp.start = activeInterval->start;
     temp.stop = activeInterval->stop;
+    temp.color = activeInterval->color;
  
     EditIntervalDialog dialog(this, temp); // pass by reference
 
@@ -822,6 +823,7 @@ AnalysisSidebar::editInterval()
 
         // update the interval item
         activeInterval->name = temp.name;
+        activeInterval->color = temp.color;
         activeInterval->start = temp.start;
         activeInterval->stop = temp.stop;
         activeInterval->startKM = activeInterval->rideItem()->ride()->timeToDistance(temp.start),
@@ -835,6 +837,9 @@ AnalysisSidebar::editInterval()
 
         // refresh metrics!
         activeInterval->refresh();
+
+        // now refresh charts
+        context->notifyIntervalsChanged();
     }
 }
 

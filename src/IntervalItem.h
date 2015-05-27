@@ -21,6 +21,7 @@
 #include "GoldenCheetah.h"
 
 #include "RideItem.h"
+#include "RideItem.h"
 #include <QtGui>
 #include <QDialog>
 #include <QLabel>
@@ -98,6 +99,7 @@ class RenameIntervalDialog : public QDialog
         QLineEdit *nameEdit;
 };
 
+class ColorButton;
 class EditIntervalDialog : public QDialog
 {
     Q_OBJECT
@@ -117,6 +119,7 @@ class EditIntervalDialog : public QDialog
         QPushButton *applyButton, *cancelButton;
         QLineEdit *nameEdit;
         QTimeEdit *fromEdit, *toEdit;
+        ColorButton *colorEdit;
 };
 
 #endif // _GC_IntervalItem_h
