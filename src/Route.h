@@ -101,6 +101,7 @@ class Routes : public QObject { // top-level object with API and map of segments
         void readRoutes();
         int newRoute(QString name);
         void createRouteFromInterval(IntervalItem *activeInterval);
+        void deleteRoute(QUuid);
         void deleteRoute(int);
         void writeRoutes();
 

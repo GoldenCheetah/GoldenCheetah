@@ -226,6 +226,7 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
                                                               ++found,
                                                               QColor(Qt::gray),
                                                               RideFileInterval::ROUTE);
+                intervalItem->route = id();
                 here << intervalItem;
 
                 // reset to restart find on next iteration
@@ -320,6 +321,18 @@ Routes::newRoute(QString name)
     routes.insert(0, add);
 
     return 0; // always add at the top
+}
+
+void
+Routes::deleteRoute(QUuid identifier)
+{
+    // find via Identifier then delete
+    for(int i=0; i<routes.count(); i++) {
+        if (routes.at(i).id() == identifier) {
+            deleteRoute(i);
+            return;
+        }
+    }
 }
 
 void
