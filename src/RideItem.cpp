@@ -735,9 +735,9 @@ RideItem::updateIntervals()
 
         // what we looking for ?
         static int durations[] = { 1, 5, 10, 15, 20, 30, 60, 300, 600, 1200, 1800, 2700, 3600, 0 };
-        static const char *names[] = { "1 second", "5 seconds", "10 seconds", "15 seconds", "20 seconds", "30 seconds", 
-                                "1 minute", "5 minutes", "10 minutes", "20 minutes", "30 minutes", "45 minutes",
-                                "1 hour" };
+        static QString names[] = { tr("1 second"), tr("5 seconds"), tr("10 seconds"), tr("15 seconds"), tr("20 seconds"), tr("30 seconds"),
+                                tr("1 minute"), tr("5 minutes"), tr("10 minutes"), tr("20 minutes"), tr("30 minutes"), tr("45 minutes"),
+                                tr("1 hour") };
     
         for(int i=0; durations[i] != 0; i++) {
 
@@ -1153,7 +1153,7 @@ RideItem::updateIntervals()
 
 
                             // create a new interval item
-                            IntervalItem *intervalItem = new IntervalItem(this, QString("Climb %1").arg(++hills),
+                            IntervalItem *intervalItem = new IntervalItem(this, QString(tr("Climb %1")).arg(++hills),
                                                                           pstart->secs, pstop->secs,
                                                                           pstart->km,
                                                                           pstop->km,
