@@ -188,6 +188,7 @@ class LTMWindow : public GcChartWindow
         void refreshStackPlots();   // stacked plots
         void refreshDataTable();    // data table
 
+        void styleChanged(int);
         void compareChanged();
         void dateRangeChanged(DateRange);
         void filterChanged();

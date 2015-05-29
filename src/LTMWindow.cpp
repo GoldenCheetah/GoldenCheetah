@@ -244,6 +244,7 @@ LTMWindow::LTMWindow(Context *context) :
     cl->addWidget(ltmTool);
 
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
+    connect(this, SIGNAL(styleChanged(int)), this, SLOT(styleChanged(int)));
     connect(ltmTool, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(filterChanged()));
     connect(ltmTool->groupBy, SIGNAL(currentIndexChanged(int)), this, SLOT(groupBySelected(int)));
@@ -300,6 +301,22 @@ LTMWindow::configChanged(qint32)
     compareplotArea->setStyleSheet(TabView::ourStyleSheet());
 #endif
     refresh();
+}
+
+void
+LTMWindow::styleChanged(int style)
+{
+    if (style) {
+        // hide spanslider
+        spanSlider->hide();
+        scrollLeft->hide();
+        scrollRight->hide();
+    } else {
+        // show spanslider
+        spanSlider->show();
+        scrollLeft->show();
+        scrollRight->show();
+    }
 }
 
 void
