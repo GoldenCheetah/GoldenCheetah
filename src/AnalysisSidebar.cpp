@@ -37,6 +37,9 @@
 // working with routes
 #include "Route.h"
 
+// the ride cache
+#include "RideCache.h"
+
 AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow), context(context)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -558,6 +561,14 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
             menu.addAction(actDeleteInt);
         }
 
+        if (type == RideFileInterval::ROUTE) {
+            // stop identifying this segment
+            QAction *actDeleteRoute = new QAction(tr("Stop tracking this segment"), intervalTree);
+            connect(actDeleteRoute, SIGNAL(triggered(void)), this, SLOT(deleteRoute(void)));
+            menu.addAction(actDeleteRoute);
+
+        }
+
         // BACK / FRONT NOT AVAILABLE YET
         //QAction *actFrontInt = new QAction(tr("Bring to Front"), intervalTree);
         //QAction *actBackInt = new QAction(tr("Send to back"), intervalTree);
@@ -570,7 +581,7 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         if (type != RideFileInterval::ROUTE && 
             context->currentRideItem() && context->currentRideItem()->present.contains("G")) {
 
-            QAction *actRoute = new QAction(tr("Create as a route"), intervalTree);
+            QAction *actRoute = new QAction(tr("Create a route segment"), intervalTree);
             connect(actRoute, SIGNAL(triggered(void)), this, SLOT(createRouteIntervalSelected(void)));
             menu.addAction(actRoute);
         }
@@ -771,6 +782,24 @@ AnalysisSidebar::deleteInterval()
             }
         }
         context->notifyIntervalsChanged();
+    }
+}
+
+void
+AnalysisSidebar::deleteRoute()
+{
+    // stop tracking this route across rides
+    if (activeInterval) {
+
+        // if refresh is running cancel it !
+        context->athlete->rideCache->cancel();
+
+        // zap it
+        context->athlete->routes->deleteRoute(activeInterval->route);
+        activeInterval = NULL; // it goes below.
+
+        // the fingerprint for routes has changed, refresh is inevitable sadly
+        context->athlete->rideCache->refresh();
     }
 }
 

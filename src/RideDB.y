@@ -199,6 +199,7 @@ interval_tuple: string ':' string                               {
                                                                      else if ($1 == "type") jc->interval.type = static_cast<RideFileInterval::intervaltype>($3.toInt());
                                                                      else if ($1 == "color") jc->interval.color = QColor($3);
                                                                      else if ($1 == "seq") jc->interval.displaySequence = $3.toInt();
+                                                                     else if ($1 == "route") jc->interval.route = QUuid($3);
                                                                 }
 
 interval_metrics: METRICS ':' '{' interval_metrics_list '}'                       ;
@@ -404,6 +405,7 @@ void RideCache::save()
                     firstInterval = false;
 
                     stream << "\t\t\t{\n";
+
                     // interval main data 
                     stream << "\t\t\t\"name\":\"" << protect(interval->name) <<"\",\n";
                     stream << "\t\t\t\"start\":\"" << interval->start <<"\",\n";
@@ -412,7 +414,14 @@ void RideCache::save()
                     stream << "\t\t\t\"stopKM\":\"" << interval->stopKM <<"\",\n";
                     stream << "\t\t\t\"type\":\"" << static_cast<int>(interval->type) <<"\",\n";
                     stream << "\t\t\t\"color\":\"" << interval->color.name() <<"\",\n";
+
+                    // routes have a segment identifier
+                    if (interval->type == RideFileInterval::ROUTE) {
+                        stream << "\t\t\t\"route\":\"" << interval->route.toString() <<"\",\n"; // last one no ',\n' see METRICS below..
+                    }
+
                     stream << "\t\t\t\"seq\":\"" << interval->displaySequence <<"\""; // last one no ',\n' see METRICS below..
+
 
                     // check if we have any non-zero metrics
                     bool hasMetrics=false;

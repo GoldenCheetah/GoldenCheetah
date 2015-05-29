@@ -63,6 +63,7 @@ class IntervalItem
         double startKM, stopKM;              // by Distance
         int displaySequence;                 // order to display on ride plots
         QColor color;                        // color to use on plots that differentiate by color
+        QUuid route;                         // the route this interval is for
 
         // order to show on plot
         void setDisplaySequence(int seq) { displaySequence = seq; }
