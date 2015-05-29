@@ -613,11 +613,18 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
             kmOffset=result->dataPoints()[0]->km;
         }
 
+        // drag back samples
         if (timeOffset || kmOffset) {
             foreach (RideFilePoint *p, result->dataPoints()) {
                 p->km = p->km - kmOffset;
                 p->secs = p->secs - timeOffset;
             }
+        }
+
+        // drag back intervals
+        foreach(RideFileInterval *i, result->intervals()) {
+            i->start -= timeOffset;
+            i->stop -= timeOffset;
         }
 
         DataProcessorFactory::instance().autoProcess(result);
