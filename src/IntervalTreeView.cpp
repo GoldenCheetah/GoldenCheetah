@@ -144,3 +144,37 @@ IntervalTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
     return returning;
 }
 
+void 
+IntervalColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
+               const QModelIndex &index) const 
+{
+    QStyledItemDelegate::paint(painter, option, index);
+
+    painter->save();
+
+    // Only do this on items !
+    if(index.isValid() && index.parent().isValid()) {
+
+        // extract the state of item
+        bool hover = option.state & QStyle::State_MouseOver;
+        bool selected = option.state & QStyle::State_Selected;
+        bool focus = option.state & QStyle::State_HasFocus;
+
+        // get the interval item a bit convoluted !
+        QTreeWidgetItem *item = tree->itemFromIndexPublic(index);
+        QVariant v =  item->data(0, Qt::UserRole);
+        IntervalItem *interval = v.isValid() ? static_cast<IntervalItem*>(v.value<void*>()) : NULL;
+
+        // rhs mark to show interval colour
+        if (!selected && !hover) {
+
+            // 7 pix wide mark on rhs
+            QRect high(option.rect.x()+option.rect.width() - 7, 
+                       option.rect.y(), 7, tree->rowHeightPublic(index));
+
+            // use the interval colour
+            painter->fillRect(high, interval->color);
+        }
+    }
+    painter->restore();
+}
