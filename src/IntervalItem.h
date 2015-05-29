@@ -55,6 +55,7 @@ class IntervalItem
 
         // as a well formatted string
         QString getStringForSymbol(QString name, bool useMetricUnits=true);
+        double getValueForSymbol(QString name, bool useMetricUnits=true);
 
         // interval details
         QString name;                   // name

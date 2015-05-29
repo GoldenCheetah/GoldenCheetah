@@ -23,6 +23,7 @@
 #include "RideItem.h"
 #include "LTMOutliers.h"
 #include "Units.h"
+#include "Zones.h"
 #include "cmath"
 #include <algorithm>
 #include <QVector>
@@ -1064,6 +1065,52 @@ static bool addWattsRPE()
 }
 
 static bool wattsRPEAdded = addWattsRPE();
+
+///////////////////////////////////////////////////////////////////////////////
+
+class APPercent : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(APPercent)
+
+    public:
+    APPercent()
+    {
+        setSymbol("ap_percent_max");
+        setInternalName("Power Percent of Max");
+    }
+    void initialize() {
+        setName(tr("Power Percent of Max"));
+        setImperialUnits("");
+        setMetricUnits("");
+        setPrecision(0);
+        setType(RideMetric::Average);
+    }
+    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+        double percent = 0.0f;
+        AvgPower *pw = dynamic_cast<AvgPower*>(deps.value("average_power"));
+
+        if (pw->value(true) > 0.0f && zones && zoneRange >= 0) {
+            // get Pmax
+            double pmax = zones->getPmax(zoneRange);
+            percent = pw->value(true)/pmax * 100;
+        }
+        setValue(percent);
+    }
+    RideMetric *clone() const { return new APPercent(*this); }
+};
+
+static bool addAPPercent()
+{
+    QVector<QString> deps;
+    deps.append("average_power");
+    RideMetricFactory::instance().addMetric(APPercent(), &deps);
+    return true;
+}
+
+static bool APPercentAdded = addAPPercent();
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////

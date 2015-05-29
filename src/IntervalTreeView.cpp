@@ -22,6 +22,7 @@
 #include "RideFile.h"
 #include "Context.h"
 #include "Settings.h"
+#include "Colors.h"
 #include <QStyle>
 #include <QStyleFactory>
 #include <QScrollBar>
@@ -165,7 +166,7 @@ IntervalColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         QVariant v =  item->data(0, Qt::UserRole);
         IntervalItem *interval = v.isValid() ? static_cast<IntervalItem*>(v.value<void*>()) : NULL;
 
-        // rhs mark to show interval colour
+        // indicate color of interval in charts
         if (!selected && !hover) {
 
             // 7 pix wide mark on rhs
@@ -174,6 +175,21 @@ IntervalColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 
             // use the interval colour
             painter->fillRect(high, interval->color);
+
+        }
+
+        // indicate quality
+        double percent = interval->getValueForSymbol("peak_percent");
+
+        // highlight good efforts with a power bar
+        if (percent >= 85.0f || interval->type == RideFileInterval::EFFORT) {
+
+            // get percent of max
+            QColor alpha = GColor(CPOWER);
+            alpha.setAlpha(128); // see thru
+            QRect powerbar(option.rect.x()-5, option.rect.y(), 3, tree->rowHeightPublic(index));
+            painter->fillRect(powerbar, alpha);
+
         }
     }
     painter->restore();
