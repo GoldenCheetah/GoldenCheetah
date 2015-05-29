@@ -3825,6 +3825,12 @@ AllPlot::setDataFromPlot(AllPlot *plot)
             }
             setAxisScale(QwtPlot::yLeft, minNZ, thereCurve->maxYValue() + 0.10f);
 
+        } else if (scope == RideFile::wprime) {
+
+            // always zero or lower (don't truncate)
+            double min = thereCurve->minYValue();
+            setAxisScale(QwtPlot::yLeft, min > 0 ? 0 : min * 1.1f, 1.1f * thereCurve->maxYValue());
+
         } else if (scope != RideFile::lrbalance) {
             if (thereCurve)
                 setAxisScale(QwtPlot::yLeft, thereCurve->minYValue(), 1.1f * thereCurve->maxYValue());
