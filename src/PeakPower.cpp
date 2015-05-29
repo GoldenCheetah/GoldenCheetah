@@ -105,7 +105,7 @@ class PowerZone : public RideMetric {
         setInternalName("Power Zone");
         setName(tr("Power Zone"));
         setMetricUnits(tr(""));
-        setPrecision(0); // e.g. 99.9%
+        setPrecision(1); // e.g. 99.9%
         setImperialUnits(tr(""));
 
     }
@@ -130,10 +130,33 @@ class PowerZone : public RideMetric {
         } else {
 
             double ap = deps.value("average_power")->value(true);
+            double percent=0;
 
             // if range is -1 we need to fall back to a default value
             int zone = zoneRange >= 0 ? zones->whichZone(zoneRange, ap) + 1 : 0;
-            setValue(zone);
+
+            // ok, how far up  the zone was this?
+            if (zoneRange >= 0 && zone) {
+
+                // get zone info
+                QString name, description;
+                int low, high;
+                zones->zoneInfo(zoneRange, zone-1, name, description, low, high);
+
+                // use Pmax as upper bound, this is used
+                // for the limit of upper zone ALWAYS
+                if (high > zones->getPmax(zoneRange)) 
+                    high = zones->getPmax(zoneRange);
+
+                // how far in?
+                percent = double(ap-low) / double(high-low);
+
+                // avoid rounding up !
+                if (percent >0.9f && percent <1.00f) percent = 0.9f;
+            }
+
+            // we want 4.1 as zone, for 10% into zone 4
+            setValue(double(zone) + percent);
         }
     }
     RideMetric *clone() const { return new PowerZone(*this); }
