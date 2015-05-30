@@ -2735,13 +2735,13 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AverageWPK</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="37"/>
+        <location filename="../WattsPerKilogram.cpp" line="38"/>
         <source>Watts Per Kilogram</source>
         <translation>Spezifische Leistung</translation>
     </message>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="39"/>
         <location filename="../WattsPerKilogram.cpp" line="40"/>
+        <location filename="../WattsPerKilogram.cpp" line="41"/>
         <source>w/kg</source>
         <translation>W/kg</translation>
     </message>
@@ -4007,7 +4007,7 @@ ddd, dd.MMM yyyy</translation>
 <context>
     <name>CPWPK</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="113"/>
+        <location filename="../WattsPerKilogram.cpp" line="114"/>
         <source>60 min Peak WPK</source>
         <translation>60 min Spez. Bestleistung</translation>
     </message>
@@ -5869,17 +5869,17 @@ an den Computer anschließen und
 <context>
     <name>EditIntervalDialog</name>
     <message>
-        <location filename="../IntervalItem.cpp" line="184"/>
+        <location filename="../IntervalItem.cpp" line="185"/>
         <source>Edit Interval</source>
         <translation>Intervall bearbeiten</translation>
     </message>
     <message>
-        <location filename="../IntervalItem.cpp" line="216"/>
+        <location filename="../IntervalItem.cpp" line="223"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../IntervalItem.cpp" line="217"/>
+        <location filename="../IntervalItem.cpp" line="224"/>
         <source>&amp;Cancel</source>
         <translation>Abbre&amp;chen</translation>
     </message>
@@ -6458,6 +6458,20 @@ an den Computer anschließen und
         <location filename="../ErgFilePlot.cpp" line="421"/>
         <source>W&apos; Balance (j)</source>
         <translation>W&apos; Bilanz (j)</translation>
+    </message>
+</context>
+<context>
+    <name>EtimatedAverageWPK_DrF</name>
+    <message>
+        <location filename="../WattsPerKilogram.cpp" line="327"/>
+        <source>estimated Watts Per Kilogram (DrF.)</source>
+        <translation>geschätzte Watt pror Kilogramm (DrF.)</translation>
+    </message>
+    <message>
+        <location filename="../WattsPerKilogram.cpp" line="329"/>
+        <location filename="../WattsPerKilogram.cpp" line="330"/>
+        <source>w/kg</source>
+        <translation>W/kg</translation>
     </message>
 </context>
 <context>
@@ -10791,22 +10805,27 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation>Intervallzusammenfassung</translation>
     </message>
     <message>
-        <location filename="../IntervalSummaryWindow.cpp" line="82"/>
-        <location filename="../IntervalSummaryWindow.cpp" line="106"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="86"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="110"/>
         <source>select an interval for summary info</source>
         <translation>Intervall auswählen für Intervallzusammenfassung</translation>
     </message>
     <message>
-        <location filename="../IntervalSummaryWindow.cpp" line="203"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="241"/>
         <source>%1 selected intervals</source>
         <translation>%1 ausgewählte Intervalle</translation>
+    </message>
+    <message>
+        <location filename="../IntervalSummaryWindow.cpp" line="264"/>
+        <source>Excluding %1 selected</source>
+        <translation>Ausser %1 ausgewählt</translation>
     </message>
     <message>
         <source>empty interval</source>
         <translation type="vanished">leeres Intervall</translation>
     </message>
     <message>
-        <location filename="../IntervalSummaryWindow.cpp" line="244"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="308"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
@@ -16626,8 +16645,8 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>PeakWPK</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="75"/>
         <location filename="../WattsPerKilogram.cpp" line="76"/>
+        <location filename="../WattsPerKilogram.cpp" line="77"/>
         <source>w/kg</source>
         <translation>W/kg</translation>
     </message>
@@ -16635,7 +16654,7 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>PeakWPK10m</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="248"/>
+        <location filename="../WattsPerKilogram.cpp" line="249"/>
         <source>10 min Peak WPK</source>
         <translation>10min Spez. Bestleistung</translation>
     </message>
@@ -16643,7 +16662,7 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>PeakWPK10s</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="158"/>
+        <location filename="../WattsPerKilogram.cpp" line="159"/>
         <source>10 sec Peak WPK</source>
         <translation>10sek Spez. Bestleistung</translation>
     </message>
@@ -16651,7 +16670,7 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>PeakWPK15s</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="173"/>
+        <location filename="../WattsPerKilogram.cpp" line="174"/>
         <source>15 sec Peak WPK</source>
         <translation>15sek Spez. Bestleistung</translation>
     </message>
@@ -16659,7 +16678,7 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>PeakWPK1m</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="218"/>
+        <location filename="../WattsPerKilogram.cpp" line="219"/>
         <source>1 min Peak WPK</source>
         <translation>01min Spez. Bestleistung</translation>
     </message>
@@ -16667,7 +16686,7 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>PeakWPK1s</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="128"/>
+        <location filename="../WattsPerKilogram.cpp" line="129"/>
         <source>1 sec Peak WPK</source>
         <translation>01sek Spez. Bestleistung</translation>
     </message>
@@ -16675,7 +16694,7 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>PeakWPK20m</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="263"/>
+        <location filename="../WattsPerKilogram.cpp" line="264"/>
         <source>20 min Peak WPK</source>
         <translation>20min Spez. Bestleistung</translation>
     </message>
@@ -16683,7 +16702,7 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>PeakWPK20s</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="188"/>
+        <location filename="../WattsPerKilogram.cpp" line="189"/>
         <source>20 sec Peak WPK</source>
         <translation>20sek Spez. Bestleistung</translation>
     </message>
@@ -16691,7 +16710,7 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>PeakWPK30m</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="278"/>
+        <location filename="../WattsPerKilogram.cpp" line="279"/>
         <source>30 min Peak WPK</source>
         <translation>30min Spez. Bestleistung</translation>
     </message>
@@ -16699,7 +16718,7 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>PeakWPK30s</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="203"/>
+        <location filename="../WattsPerKilogram.cpp" line="204"/>
         <source>30 sec Peak WPK</source>
         <translation>30sek Spez. Bestleistung</translation>
     </message>
@@ -16707,7 +16726,7 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>PeakWPK5m</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="233"/>
+        <location filename="../WattsPerKilogram.cpp" line="234"/>
         <source>5 min Peak WPK</source>
         <translation>05min Spez. Bestleistung</translation>
     </message>
@@ -16715,7 +16734,7 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>PeakWPK5s</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="143"/>
+        <location filename="../WattsPerKilogram.cpp" line="144"/>
         <source>5 sec Peak WPK</source>
         <translation>05sek Spez. Bestleistung</translation>
     </message>
@@ -17301,7 +17320,7 @@ yyyy</translation>
         <location filename="../LibraryParser.cpp" line="80"/>
         <location filename="../NamedSearch.cpp" line="181"/>
         <location filename="../RideAutoImportConfig.cpp" line="150"/>
-        <location filename="../RouteParser.cpp" line="89"/>
+        <location filename="../RouteParser.cpp" line="108"/>
         <location filename="../SeasonParser.cpp" line="141"/>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
         <translation>Datei: %1 kann nicht zum &apos;Schreiben&apos; geöffnet werden. Bitte die Dateieigenschaften prüfen.</translation>
@@ -17322,7 +17341,7 @@ yyyy</translation>
         <translation>Problem beim Speichern der Autoimport Definitionen</translation>
     </message>
     <message>
-        <location filename="../RouteParser.cpp" line="88"/>
+        <location filename="../RouteParser.cpp" line="107"/>
         <source>Problem Saving Route Data</source>
         <translation>Problem beim Speichern der Routen Definitionen</translation>
     </message>
@@ -17704,17 +17723,17 @@ yyyy</translation>
         <translation type="vanished">Intervalle neu nummerieren</translation>
     </message>
     <message>
-        <location filename="../IntervalItem.cpp" line="248"/>
+        <location filename="../IntervalItem.cpp" line="256"/>
         <source>Rename Intervals</source>
         <translation>Intervalle umbenennen</translation>
     </message>
     <message>
-        <location filename="../IntervalItem.cpp" line="266"/>
+        <location filename="../IntervalItem.cpp" line="274"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../IntervalItem.cpp" line="267"/>
+        <location filename="../IntervalItem.cpp" line="275"/>
         <source>&amp;Cancel</source>
         <translation>Abbre&amp;chen</translation>
     </message>
@@ -19193,29 +19212,111 @@ Skipping file...</source>
         <translation type="vanished">dd.MMM yyyy</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="681"/>
+        <location filename="../RideItem.cpp" line="683"/>
         <source>Entire Activity</source>
         <translation>Gesamte Aktivität</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="749"/>
+        <location filename="../RideItem.cpp" line="738"/>
+        <source>1 second</source>
+        <translation>1 Sekunde</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="738"/>
+        <source>5 seconds</source>
+        <translation>5 Sekunden</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="738"/>
+        <source>10 seconds</source>
+        <translation>10 Sekunden</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="738"/>
+        <source>15 seconds</source>
+        <translation>15 Sekunden</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="738"/>
+        <source>20 seconds</source>
+        <translation>20 Sekunden</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="738"/>
+        <source>30 seconds</source>
+        <translation>30 Sekunden</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="739"/>
+        <source>1 minute</source>
+        <translation>1 Minute</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="739"/>
+        <source>5 minutes</source>
+        <translation>5 Minuten</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="739"/>
+        <source>10 minutes</source>
+        <translation>20 Minuten</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="739"/>
+        <source>20 minutes</source>
+        <translation>20 Minuten</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="739"/>
+        <source>30 minutes</source>
+        <translation>30 Minuten</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="739"/>
+        <source>45 minutes</source>
+        <translation>45 Minuten</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="740"/>
+        <source>1 hour</source>
+        <translation>1 Stunden</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="751"/>
         <source>%1 (%2 watts)</source>
         <translation>%1 (%2 Watt)</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="1017"/>
+        <location filename="../RideItem.cpp" line="1024"/>
+        <source>L%3 TTE of %1  (%2 watts)</source>
+        <translation>L%3 TTE von %1  (%2 Watt)</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="1030"/>
+        <source>L%4 %3% EFFORT of %1  (%2 watts)</source>
+        <translation>L%4 %3% BELASTUNG von %1  (%2 Watt)</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="1051"/>
+        <source>L%3 SPRINT of %1 secs (%2 watts)</source>
+        <translation>L%3 SPRINT von %1 sek (%2 Watt)</translation>
+    </message>
+    <message>
+        <location filename="../RideItem.cpp" line="1156"/>
+        <source>Climb %1</source>
+        <translation>Aufstieg %1</translation>
+    </message>
+    <message>
         <source>TTE of %1  (%2 watts)</source>
-        <translation>TTE von %1  (%2 Watt)</translation>
+        <translation type="vanished">TTE von %1  (%2 Watt)</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="1023"/>
         <source>%3% EFFORT of %1  (%2 watts)</source>
-        <translation>%3% AUFWAND von %1  (%2 Watt)</translation>
+        <translation type="vanished">%3% AUFWAND von %1  (%2 Watt)</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="1042"/>
         <source>SPRINT of %1 secs (%2 watts)</source>
-        <translation>SPRINT von %1 sec (%2 Watt)</translation>
+        <translation type="vanished">SPRINT von %1 sec (%2 Watt)</translation>
     </message>
 </context>
 <context>
@@ -19866,7 +19967,7 @@ Zeit: %1
 <context>
     <name>Routes</name>
     <message>
-        <location filename="../Route.cpp" line="332"/>
+        <location filename="../Route.cpp" line="381"/>
         <source>Route #%1</source>
         <translation>Route #%1</translation>
     </message>
@@ -23120,13 +23221,13 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>Vo2max</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="293"/>
+        <location filename="../WattsPerKilogram.cpp" line="294"/>
         <source>Estimated VO2MAX</source>
         <translation>Geschätztes VO2Max</translation>
     </message>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="295"/>
         <location filename="../WattsPerKilogram.cpp" line="296"/>
+        <location filename="../WattsPerKilogram.cpp" line="297"/>
         <source>ml/min/kg</source>
         <translation>ml/min/kg</translation>
     </message>
@@ -23236,13 +23337,13 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WithingsDownload</name>
     <message>
-        <location filename="../WithingsDownload.cpp" line="44"/>
-        <location filename="../WithingsDownload.cpp" line="68"/>
+        <location filename="../WithingsDownload.cpp" line="48"/>
+        <location filename="../WithingsDownload.cpp" line="72"/>
         <source>Withings Data Download</source>
         <translation>Withingsdaten herunterladen</translation>
     </message>
     <message>
-        <location filename="../WithingsDownload.cpp" line="67"/>
+        <location filename="../WithingsDownload.cpp" line="71"/>
         <source>%1 new on %2 measurements received.</source>
         <translation>%1 von %2 neuen Messungen empfangen.</translation>
     </message>
