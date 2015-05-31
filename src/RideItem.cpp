@@ -669,8 +669,10 @@ RideItem::updateIntervals()
         // did we override CP in metadata ?
         int oCP = getText("CP","0").toInt();
         int oW = getText("W'","0").toInt();
+        int oPMAX = getText("Pmax","0").toInt();
         if (oCP) CP=oCP;
         if (oW) WPRIME=oW;
+        if (oPMAX) PMAX=oPMAX;
 
         if (zoneRange >= 0 && context->athlete->zones()) zoneok=true;
     }
