@@ -176,27 +176,6 @@ IntervalItem::getStringForSymbol(QString name, bool useMetricUnits)
     return returning;
 }
 
-double
-IntervalItem::getValueForSymbol(QString name, bool useMetricUnits)
-{
-    double returning = 0.0f;
-
-    if (metrics_.size()) {
-        // return the precomputed metric value
-        const RideMetricFactory &factory = RideMetricFactory::instance();
-        const RideMetric *m = factory.rideMetric(name);
-        if (m) {
-
-            double value = metrics_[m->index()];
-            if (std::isinf(value) || std::isnan(value)) value=0;
-            const_cast<RideMetric*>(m)->setValue(value);
-            returning = m->value(useMetricUnits);
-        }
-    }
-    return returning;
-}
-
-
 /*----------------------------------------------------------------------
  * Edit Interval dialog
  *--------------------------------------------------------------------*/

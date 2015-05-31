@@ -31,6 +31,7 @@
 #include "Colors.h" // for ColorEngine
 #include "BestIntervalDialog.h" // till we fixup ridefilecache to have offsets
 #include "TimeUtils.h" // time_to_string()
+#include "WPrime.h" // for matches
 
 #include <cmath>
 #include <QtAlgorithms>
@@ -702,6 +703,9 @@ RideItem::updateIntervals()
         // skip climbs, they're autodiscovered now
         if (interval->isClimb()) continue;
 
+        // skip matches, they're autodiscovered now
+        if (interval->isMatch()) continue;
+
         // skip entire ride, they're autodiscovered too
         if (interval->start <= begin->secs && interval->stop >= end->secs) continue;
 
@@ -1190,6 +1194,44 @@ RideItem::updateIntervals()
             add->rideInterval = NULL;
             add->refresh();
             intervals_ << add;
+        }
+    }
+
+    // Search W' MATCHES incl. those that take us to EXHAUSTION
+    if (f->isDataPresent(RideFile::watts) && f->wprimeData()) {
+
+        // add one for each
+        foreach(struct Match match, f->wprimeData()->matches) {
+
+            // anything under 2000joules isn't worth worrying about
+            if (match.cost > 2000) {
+
+                // create a new interval item
+                IntervalItem *intervalItem = new IntervalItem(this, "", // will update name once AP computed
+                                                            match.start, match.stop,
+                                                            f->timeToDistance(match.start), f->timeToDistance(match.stop),
+                                                            count++,
+                                                            QColor(255,165,0),
+                                                            RideFileInterval::EFFORT);
+                intervalItem->rideInterval = NULL;
+                intervalItem->refresh();        // XXX will get called in constructore when refactor
+
+                // now all the metrics are computed update the name to
+                // reflect the AP which was calculated for it, and duration
+
+                // which zone was this match ?
+                double ap = intervalItem->getForSymbol("average_power");
+                double duration = intervalItem->getForSymbol("workout_time");
+                int zone = 1 + context->athlete->zones()->whichZone(zoneRange, ap);
+
+                intervalItem->name = QString(tr("L%1 MATCH %2 (%3w %4 kJ)"))
+                                                 .arg(zone)
+                                                 .arg(time_to_string(duration))
+                                                 .arg((int)ap)
+                                                 .arg(match.cost/1000);
+
+                intervals_ << intervalItem;
+            }
         }
     }
 
