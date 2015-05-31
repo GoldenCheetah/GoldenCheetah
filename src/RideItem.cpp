@@ -777,7 +777,7 @@ RideItem::updateIntervals()
     QList<effort> candidates[10];
     QList<effort> candidates_sprint;
     
-    if (zoneRange >= 0 && CP > 0 && !f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
+    if (CP > 0 && WPRIME > 0 && PMAX > 0 && !f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
 
         const int SAMPLERATE = 1000; // 1000ms samplerate = 1 second samples
 
