@@ -150,6 +150,7 @@ WPrime::setRide(RideFile *input)
 
     // Get CP
     CP = 250; // default
+    WPRIME = 20000;
     if (input->context->athlete->zones()) {
         int zoneRange = input->context->athlete->zones()->whichRange(input->startTime().date());
         CP = zoneRange >= 0 ? input->context->athlete->zones()->getCP(zoneRange) : 0;
