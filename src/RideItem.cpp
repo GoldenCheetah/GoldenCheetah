@@ -1211,7 +1211,7 @@ RideItem::updateIntervals()
                                                             match.start, match.stop,
                                                             f->timeToDistance(match.start), f->timeToDistance(match.stop),
                                                             count++,
-                                                            QColor(255,165,0),
+                                                            match.exhaust ? QColor(255,69,0) : QColor(255,165,0),
                                                             RideFileInterval::EFFORT);
                 intervalItem->rideInterval = NULL;
                 intervalItem->refresh();        // XXX will get called in constructore when refactor
@@ -1224,11 +1224,12 @@ RideItem::updateIntervals()
                 double duration = intervalItem->getForSymbol("workout_time");
                 int zone = 1 + context->athlete->zones()->whichZone(zoneRange, ap);
 
-                intervalItem->name = QString(tr("L%1 MATCH %2 (%3w %4 kJ)"))
+                intervalItem->name = QString(tr("L%1 %5 %2 (%3w %4 kJ)"))
                                                  .arg(zone)
                                                  .arg(time_to_string(duration))
                                                  .arg((int)ap)
-                                                 .arg(match.cost/1000);
+                                                 .arg(match.cost/1000)
+                                                 .arg(match.exhaust ? "TE MATCH" : "MATCH");
 
                 intervals_ << intervalItem;
             }
