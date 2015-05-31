@@ -313,7 +313,7 @@ WPrime::setRide(RideFile *input)
                 match.stop = end;
                 match.secs = (match.stop-match.start) +1; // don't fencepost!
                 match.cost = values[match.start] - values[match.stop];
-
+                match.exhaust = values[match.stop] <= 500 ? true : false; // its to exhaustion!
                 if (match.cost >= WprimeMatchMinJoules) {
                     matches << match;
                 }

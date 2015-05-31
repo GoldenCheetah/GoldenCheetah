@@ -33,6 +33,7 @@
 struct Match {
     int start, stop, secs;       // all in whole seconds
     int cost;                   // W' depletion
+    bool exhaust;
 };
 
 class WPrime {
