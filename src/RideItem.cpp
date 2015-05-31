@@ -656,6 +656,7 @@ RideItem::updateIntervals()
     double WPRIME = 0;
     double PMAX = 0;
     int zoneRange;
+    bool zoneok = false;
 
     if (context->athlete->zones()) {
 
@@ -667,7 +668,11 @@ RideItem::updateIntervals()
 
         // did we override CP in metadata ?
         int oCP = getText("CP","0").toInt();
+        int oW = getText("W'","0").toInt();
         if (oCP) CP=oCP;
+        if (oW) WPRIME=oW;
+
+        if (zoneRange >= 0 && context->athlete->zones()) zoneok=true;
     }
 
     // USER / DEVICE INTERVALS
@@ -889,7 +894,7 @@ RideItem::updateIntervals()
                         tte.duration = t;
                         tte.joules = integrated_series[i+t]-integrated_series[i];
                         tte.quality = tc / double(t);
-                        tte.zone = context->athlete->zones()->whichZone(zoneRange, tte.joules/tte.duration);
+                        tte.zone = zoneok ? context->athlete->zones()->whichZone(zoneRange, tte.joules/tte.duration) : 1;
 
                     } else {
 
@@ -900,7 +905,7 @@ RideItem::updateIntervals()
                             tte.duration = t;
                             tte.joules = integrated_series[i+t]-integrated_series[i];
                             tte.quality = thisquality;
-                            tte.zone = context->athlete->zones()->whichZone(zoneRange, tte.joules/tte.duration);
+                            tte.zone = zoneok ? context->athlete->zones()->whichZone(zoneRange, tte.joules/tte.duration) : 1;
                         }
 
                     }
@@ -1021,7 +1026,7 @@ RideItem::updateIntervals()
         foreach(effort x, candidates[i]) {
 
             IntervalItem *intervalItem=NULL;
-            int zone = 1 + context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration);
+            int zone = zoneok ? 1 + context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration) : 1;
 
             if (x.quality >= 1.0f) {
                 intervalItem = new IntervalItem(this, 
@@ -1050,7 +1055,7 @@ RideItem::updateIntervals()
 
             IntervalItem *intervalItem=NULL;
 
-            int zone = 1 + context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration);
+            int zone = zoneok ? 1 + context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration) : 1;
             intervalItem = new IntervalItem(this,
                                             QString(tr("L%3 SPRINT of %1 secs (%2 watts)")).arg(x.duration).arg(x.joules/x.duration).arg(zone),
                                             x.start, x.start+x.duration,
@@ -1222,7 +1227,7 @@ RideItem::updateIntervals()
                 // which zone was this match ?
                 double ap = intervalItem->getForSymbol("average_power");
                 double duration = intervalItem->getForSymbol("workout_time");
-                int zone = 1 + context->athlete->zones()->whichZone(zoneRange, ap);
+                int zone = zoneok ? 1 + context->athlete->zones()->whichZone(zoneRange, ap) : 1;
 
                 intervalItem->name = QString(tr("L%1 %5 %2 (%3w %4 kJ)"))
                                                  .arg(zone)

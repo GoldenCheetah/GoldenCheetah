@@ -158,6 +158,8 @@ WPrime::setRide(RideFile *input)
         // did we override CP in metadata / metrics ?
         int oCP = input->getTag("CP","0").toInt();
         if (oCP) CP=oCP;
+        int oW = input->getTag("W'","0").toInt();
+        if (oW) WPRIME=oW;
     }
     minY = maxY = WPRIME;
 
