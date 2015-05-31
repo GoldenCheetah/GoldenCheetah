@@ -179,7 +179,7 @@ IntervalColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         }
 
         // indicate quality
-        double percent = interval->getValueForSymbol("peak_percent");
+        double percent = interval->getForSymbol("peak_percent");
 
         // highlight good efforts with a power bar
         if (percent >= 85.0f || interval->type == RideFileInterval::EFFORT) {

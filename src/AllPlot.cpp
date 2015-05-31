@@ -2322,7 +2322,7 @@ AllPlot::refreshIntervalMarkers()
             mrk->setLineStyle(QwtPlotMarker::VLine);
             mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
 
-            if (nolabel) mrk->setLinePen(QPen(QColor(127,127,127,127), 0, Qt::DashLine));
+            if (nolabel) mrk->setLinePen(QPen(QColor(127,127,127,64), 0, Qt::DashLine));
             else mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashLine));
 
             // put matches on second line down
