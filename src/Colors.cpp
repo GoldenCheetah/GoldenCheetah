@@ -186,6 +186,12 @@ void GCColor::setupColors()
     init[CCALCURRENT].color = QPalette().color(QPalette::Highlight);
     init[CTOOLBAR].color = QPalette().color(QPalette::Window);
 
+#ifdef Q_OS_MAC
+    // if on yosemite set default chrome to #e5e5e5
+    if (QSysInfo::MacintoshVersion == 12)
+        init[CCHROME].color = QColor(0xe5,0xe5,0xe5);
+#endif
+
     copyArray(init, DefaultColorList);
     copyArray(init, ColorList);
 }
@@ -277,6 +283,7 @@ GCColor::readConfig()
                                         rgb[1].toInt(),
                                         rgb[2].toInt());
         } else {
+
             // set sensible defaults for any not set...
             if (ColorList[i].name == "CTOOLBAR") {
                 QPalette def;
