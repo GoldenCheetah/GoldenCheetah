@@ -41,8 +41,9 @@
  * RouteSegment
  *
  */
-RouteSegment::RouteSegment()
+RouteSegment::RouteSegment() : minLat(180), maxLat(-180), minLon(180), maxLon(-180)
 {
+
     _id = QUuid::createUuid(); // in case it isn't set yet
 }
 
@@ -109,6 +110,17 @@ int
 RouteSegment::addPoint(RoutePoint _point)
 {
     points.append(_point);
+
+    // Update Min-Max
+    if (minLat==180 || _point.lat<minLat)
+        minLat = _point.lat;
+    if (maxLat==-180 || _point.lat>maxLat)
+        maxLat = _point.lat;
+    if (minLon==180 || _point.lon<minLon)
+        minLon = _point.lon;
+    if (maxLon==-180 || _point.lon>maxLon)
+        maxLon = _point.lon;
+
     return points.count();
 }
 
@@ -361,13 +373,11 @@ Routes::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
         for (int routecount=0;routecount<routes.count();routecount++) {
             RouteSegment *segment = &routes[routecount];
 
-#if 0
             // The third decimal place is worth up to 110 m
             if (ride->getMinPoint(RideFile::lat).toDouble()<segment->getMinLat()+0.001 &&
                 ride->getMaxPoint(RideFile::lat).toDouble()>segment->getMaxLat()-0.001 &&
                 ride->getMinPoint(RideFile::lon).toDouble()<segment->getMinLon()+0.001 &&
                 ride->getMaxPoint(RideFile::lon).toDouble()>segment->getMaxLon()-0.001   )
-#endif
 
             segment->search(item, ride, here);
         }
