@@ -642,7 +642,7 @@ RideItem::updateIntervals()
     RideFile *f = ride_;
 
     // clear what is there
-    foreach(IntervalItem *x, intervals_) delete x;
+    QList<IntervalItem*> deleteList = intervals_; // delete at the end
     intervals_.clear();
 
     // no ride data available ?
@@ -1245,6 +1245,9 @@ RideItem::updateIntervals()
 
     // tell the sidebar (or others) we refreshed
     context->notifyIntervalsUpdate(this);
+
+    // now everyone knows, wipe the old ones
+    foreach(IntervalItem *x, deleteList) delete x;
 }
 
 QList<IntervalItem*> RideItem::intervalsSelected() const
