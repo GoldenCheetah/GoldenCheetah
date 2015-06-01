@@ -127,11 +127,12 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     grid->addWidget(weightlabel, 4, 0, alignment);
     grid->addWidget(cplabel, 5, 0, alignment);
     grid->addWidget(wlabel, 6, 0, alignment);
-    grid->addWidget(wbaltaulabel, 7, 0, alignment);
-    grid->addWidget(resthrlabel, 8, 0, alignment);
-    grid->addWidget(lthrlabel, 9, 0, alignment);
-    grid->addWidget(maxhrlabel, 10, 0, alignment);
-    grid->addWidget(biolabel, 11, 0, alignment);
+    grid->addWidget(pmaxlabel, 7, 0, alignment);
+    grid->addWidget(wbaltaulabel, 8, 0, alignment);
+    grid->addWidget(resthrlabel, 9, 0, alignment);
+    grid->addWidget(lthrlabel, 10, 0, alignment);
+    grid->addWidget(maxhrlabel, 11, 0, alignment);
+    grid->addWidget(biolabel, 12, 0, alignment);
 
     grid->addWidget(name, 0, 1, alignment);
     grid->addWidget(dob, 1, 1, alignment);
@@ -140,11 +141,12 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     grid->addWidget(weight, 4, 1, alignment);
     grid->addWidget(cp, 5, 1, alignment);
     grid->addWidget(w, 6, 1, alignment);
-    grid->addWidget(wbaltau, 7, 1, alignment);
-    grid->addWidget(resthr, 8, 1, alignment);
-    grid->addWidget(lthr, 9, 1, alignment);
-    grid->addWidget(maxhr, 10, 1, alignment);
-    grid->addWidget(bio, 12, 0, 1, 4);
+    grid->addWidget(pmax, 7, 1, alignment);
+    grid->addWidget(wbaltau, 8, 1, alignment);
+    grid->addWidget(resthr, 9, 1, alignment);
+    grid->addWidget(lthr, 10, 1, alignment);
+    grid->addWidget(maxhr, 11, 1, alignment);
+    grid->addWidget(bio, 13, 0, 1, 4);
 
     grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
@@ -250,17 +252,17 @@ NewCyclistDialog::saveClicked()
                 appsettings->setCValue(name->text(), GC_WBALTAU, wbaltau->value());
                 appsettings->setCValue(name->text(), GC_SEX, sex->currentIndex());
                 appsettings->setCValue(name->text(), GC_BIO, bio->toPlainText());
-                avatar.save(athleteHome->config().canonicalPath() + "/" + name->text() + "/" + "avatar.png", "PNG");
+                avatar.save(athleteHome->config().canonicalPath() + "/" + "avatar.png", "PNG");
 
                 // Setup Power Zones
                 Zones zones;
                 zones.addZoneRange(QDate(1900, 01, 01), cp->value(), w->value(), pmax->value());
-                zones.write(athleteHome->config().canonicalPath() + "/" + name->text());
+                zones.write(athleteHome->config().canonicalPath());
 
                 // HR Zones too!
                 HrZones hrzones;
                 hrzones.addHrZoneRange(QDate(1900, 01, 01), lthr->value(), resthr->value(), maxhr->value());
-                hrzones.write(athleteHome->config().canonicalPath() + "/" + name->text());
+                hrzones.write(athleteHome->config().canonicalPath());
 
 
                 accept();
