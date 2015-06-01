@@ -49,16 +49,16 @@ bool RouteParser::endElement( const QString&, const QString&, const QString &qNa
     } else if(qName == "lat") {
         point.lat = buffer.trimmed().toDouble();
 
-        if (point.lat<minLat)
+        if (minLat==180 || point.lat<minLat)
             minLat = point.lat;
-        if (point.lat>maxLat)
+        if (maxLat==-180 || point.lat>maxLat)
             maxLat = point.lat;
     } else if(qName == "lon") {
         point.lon = buffer.trimmed().toDouble();
 
-        if (point.lon<minLon)
+        if (minLon==180 || point.lon<minLon)
             minLon = point.lon;
-        if (point.lon>maxLon)
+        if (maxLon==-180 || point.lon>maxLon)
             maxLon = point.lon;
     }
     return true;
