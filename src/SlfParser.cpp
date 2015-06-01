@@ -79,7 +79,10 @@ SlfParser::endElement( const QString&, const QString&, const QString& qName)
 {
     if (qName == "startDate")
     {
-
+        // Fri May 1 13:55:10 GMT+0200 2015
+        QLocale local(QLocale::English);
+        QString date = buffer.mid(0,buffer.indexOf("GMT")) + buffer.right(4);
+        rideFile->setStartTime(local.toDateTime(date, "ddd MMM d HH:mm:ss yyyy"));
     }
     else if (qName == "StartDatum")
     {
