@@ -202,7 +202,7 @@ RideItem::~RideItem()
     //XXX need to consider what to do here for the intervalitem
     //XXX used by the RideDB parser - we don't want to wipe away
     //XXX the intervals we just passed into setFrom()
-    //XXX foreach(IntervalItem*x, intervals_) delete x;
+    foreach(IntervalItem*x, lazydelete_) delete x;
 }
 
 RideFileCache *
@@ -641,8 +641,11 @@ RideItem::updateIntervals()
     // DO NOT USE ride() since it will call a refresh !
     RideFile *f = ride_;
 
-    // clear what is there
-    QList<IntervalItem*> deleteList = intervals_; // delete at the end
+    // we delete intervals in a very lazy fashion
+    // if you don't understand this code, don't change it!
+    // hint: gui thread deref deleted items being avoided
+    foreach(IntervalItem *x, lazydelete_) delete x;
+    lazydelete_ = intervals_; // delete current, next time
     intervals_.clear();
 
     // no ride data available ?
@@ -1245,9 +1248,6 @@ RideItem::updateIntervals()
 
     // tell the sidebar (or others) we refreshed
     context->notifyIntervalsUpdate(this);
-
-    // now everyone knows, wipe the old ones
-    foreach(IntervalItem *x, deleteList) delete x;
 }
 
 QList<IntervalItem*> RideItem::intervalsSelected() const
