@@ -751,8 +751,8 @@ class WPrimeWatts : public RideMetric {
         foreach(const RideFilePoint *point, r->dataPoints()) {
             if (cp && point->watts > cp)  {
                 total += r->recIntSecs() * (point->watts - cp);
-                secs += r->recIntSecs();
             }
+            secs += r->recIntSecs();
         }
         setValue(total/secs);
         setCount(secs);
