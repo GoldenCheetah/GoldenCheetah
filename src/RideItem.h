@@ -61,8 +61,6 @@ class RideItem : public QObject
 
         // got any intervals
         QList<IntervalItem*> intervals_;
-        QList<IntervalItem*> lazydelete_; // delete late
-
         QStringList errors_;
 
         unsigned long metaCRC();
