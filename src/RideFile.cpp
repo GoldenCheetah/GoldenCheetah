@@ -714,9 +714,9 @@ void RideFile::updateMin(RideFilePoint* point)
        minPoint->watts = point->watts;
     if (point->alt<minPoint->alt)
        minPoint->alt = point->alt;
-    if (minPoint->lon == 0 || point->lon<minPoint->lon)
+    if (minPoint->lon == 0.0 || (point->lon != 0.0 && point->lon<minPoint->lon))
        minPoint->lon = point->lon;
-    if (minPoint->lat == 0 || point->lat<minPoint->lat)
+    if (minPoint->lat == 0.0 || (point->lat != 0.0 && point->lat<minPoint->lat))
        minPoint->lat = point->lat;
     if (point->headwind<minPoint->headwind)
        minPoint->headwind = point->headwind;
@@ -791,9 +791,9 @@ void RideFile::updateMax(RideFilePoint* point)
        maxPoint->watts = point->watts;
     if (point->alt>maxPoint->alt)
        maxPoint->alt = point->alt;
-    if (point->lon>maxPoint->lon)
+    if (maxPoint->lon == 0.0 || (point->lon != 0.0 && point->lon>maxPoint->lon))
        maxPoint->lon = point->lon;
-    if (point->lat>maxPoint->lat)
+    if (maxPoint->lat == 0.0 || (point->lat != 0.0 && point->lat>maxPoint->lat))
        maxPoint->lat = point->lat;
     if (point->headwind>maxPoint->headwind)
        maxPoint->headwind = point->headwind;
