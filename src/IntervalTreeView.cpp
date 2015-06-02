@@ -161,10 +161,9 @@ IntervalColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         bool selected = option.state & QStyle::State_Selected;
         bool focus = option.state & QStyle::State_HasFocus;
 
-        // get the interval item a bit convoluted !
         QTreeWidgetItem *item = tree->itemFromIndexPublic(index);
-        QVariant v =  item->data(0, Qt::UserRole);
-        IntervalItem *interval = v.isValid() ? static_cast<IntervalItem*>(v.value<void*>()) : NULL;
+        QVariant v =  item->data(0, Qt::UserRole+1);
+        QColor color = v.value<QColor>();
 
         // indicate color of interval in charts
         if (!selected && !hover) {
@@ -174,21 +173,7 @@ IntervalColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
                        option.rect.y(), 7, tree->rowHeightPublic(index));
 
             // use the interval colour
-            painter->fillRect(high, interval->color);
-
-        }
-
-        // indicate quality
-        double percent = interval->getForSymbol("peak_percent");
-
-        // highlight good efforts with a power bar
-        if (percent >= 85.0f || interval->type == RideFileInterval::EFFORT) {
-
-            // get percent of max
-            QColor alpha = GColor(CPOWER);
-            alpha.setAlpha(128); // see thru
-            QRect powerbar(option.rect.x()-5, option.rect.y(), 3, tree->rowHeightPublic(index));
-            painter->fillRect(powerbar, alpha);
+            painter->fillRect(high, color);
 
         }
     }
