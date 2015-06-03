@@ -783,7 +783,7 @@ RideItem::updateIntervals()
                                 tr("1 minute"), tr("5 minutes"), tr("10 minutes"), tr("20 minutes"), tr("30 minutes"), tr("45 minutes"),
                                 tr("1 hour") };
 
-        BOOL metric = appsettings->value(this, context->athlete->paceZones(f->isSwim())->paceSetting(), true).toBool();
+        bool metric = appsettings->value(this, context->athlete->paceZones(f->isSwim())->paceSetting(), true).toBool();
         for(int i=0; durations[i] != 0; i++) {
 
             // go hunting for best peak
