@@ -1271,8 +1271,10 @@ void
 CPPlot::plotEfforts()
 {
     // only for power, if not already plotted and there are actually some efforts
-    if (criticalSeries != CriticalPowerWindow::watts || effortCurve || !showEffort ||
-        context->currentRideItem()->intervals(RideFileInterval::EFFORT).count() ==0) return;
+    if (criticalSeries != CriticalPowerWindow::watts || effortCurve || !showEffort) return;
+
+    // nothing to plot when plotting rides
+    if (!rangemode && context->currentRideItem()->intervals(RideFileInterval::EFFORT).count() ==0) return;
 
     QwtSymbol *sym = new QwtSymbol;
     sym->setStyle(QwtSymbol::Ellipse);
