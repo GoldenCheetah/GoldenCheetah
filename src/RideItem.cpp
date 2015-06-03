@@ -437,7 +437,8 @@ RideItem::checkStale()
 
             // get the new zone configuration fingerprint that applies for the ride date
             unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
-                        + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
+                        + static_cast<unsigned long>(context->athlete->paceZones(false)->getFingerprint(dateTime.date()))
+                        + static_cast<unsigned long>(context->athlete->paceZones(true)->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->routes->getFingerprint());
 
@@ -542,7 +543,8 @@ RideItem::refresh()
 
         // update fingerprints etc, crc done above
         fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
-                    + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
+                    + static_cast<unsigned long>(context->athlete->paceZones(false)->getFingerprint(dateTime.date()))
+                    + static_cast<unsigned long>(context->athlete->paceZones(true)->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->routes->getFingerprint());
 
@@ -765,6 +767,41 @@ RideItem::updateIntervals()
                                                             count++,
                                                             QColor(Qt::gray),
                                                             RideFileInterval::PEAKPOWER);
+                intervalItem->rideInterval = NULL;
+                intervalItem->refresh();        // XXX will get called in constructore when refactor
+                intervals_ << intervalItem;
+            }
+        }
+    }
+
+    //qDebug() << "SEARCH PEAK PACE"
+    if ((f->isRun() || f->isSwim()) && f->isDataPresent(RideFile::kph)) {
+
+        // what we looking for ?
+        static int durations[] = { 10, 15, 20, 30, 60, 300, 600, 1200, 1800, 2700, 3600, 0 };
+        static QString names[] = { tr("10 seconds"), tr("15 seconds"), tr("20 seconds"), tr("30 seconds"),
+                                tr("1 minute"), tr("5 minutes"), tr("10 minutes"), tr("20 minutes"), tr("30 minutes"), tr("45 minutes"),
+                                tr("1 hour") };
+
+        BOOL metric = appsettings->value(this, context->athlete->paceZones(f->isSwim())->paceSetting(), true).toBool();
+        for(int i=0; durations[i] != 0; i++) {
+
+            // go hunting for best peak
+            QList<BestIntervalDialog::BestInterval> results;
+            BestIntervalDialog::findBestsKPH(f, durations[i], 1, results);
+
+            // did we get one ?
+            if (results.count() > 0 && results[0].avg > 0 && results[0].stop > 0) {
+                // qDebug()<<"found"<<names[i]<<"peak pace"<<results[0].start<<"-"<<results[0].stop<<"of"<<results[0].avg<<"kph";
+                IntervalItem *intervalItem = new IntervalItem(this, QString(tr("%1 (%2 %3)")).arg(names[i])
+                               .arg(context->athlete->paceZones(f->isSwim())->kphToPaceString(results[0].avg, metric))
+                               .arg(context->athlete->paceZones(f->isSwim())->paceUnits(metric)),
+                                                            results[0].start, results[0].stop, 
+                                                            f->timeToDistance(results[0].start),
+                                                            f->timeToDistance(results[0].stop),
+                                                            count++,
+                                                            QColor(Qt::gray),
+                                                            RideFileInterval::PEAKPACE);
                 intervalItem->rideInterval = NULL;
                 intervalItem->refresh();        // XXX will get called in constructore when refactor
                 intervals_ << intervalItem;

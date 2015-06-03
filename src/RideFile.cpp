@@ -403,6 +403,7 @@ QString RideFileInterval::typeDescription(intervaltype x)
     case EFFORT : return tr("EFFORTS"); break;
     case MATCH : return tr("MATCHES"); break;
     case TTE : return tr("EXHAUSTION"); break;
+    case PEAKPACE : return tr("PEAK PACE"); break;
     }
 }
 
