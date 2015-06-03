@@ -2254,6 +2254,54 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                 // overwrite ymax for VAM - if a proper value was found
                 if (rideSeries == RideFile::vam && vamYMax > 0) ymax = vamYMax;
             }
+
+            if (!showDelta && showEffort) {
+
+                // show the efforts for each date range
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setStyle(QwtSymbol::Ellipse);
+                sym->setSize(4);
+                QColor col= compareDateRanges[j].color;
+                col.setAlpha(128);
+                sym->setBrush(col);
+                sym->setPen(QPen(Qt::NoPen));
+
+                // create a curve
+                QwtPlotCurve *effortCurve = new QwtPlotCurve();
+                effortCurve->setSymbol(sym);
+                effortCurve->setStyle(QwtPlotCurve::Dots);
+                effortCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+                intervalCurves << effortCurve;
+
+                // size for all rides, can increase if needed
+                QVector<double> xvals;
+                QVector<double> yvals;
+
+                int count=0;
+                foreach(RideItem *r, compareDateRanges[j].context->athlete->rideCache->rides()) {
+
+                    // does it match ?
+                    if (!compareDateRanges[j].specification.pass(r)) continue;
+
+                    // add the intervals
+                    foreach(IntervalItem *i, r->intervals(RideFileInterval::EFFORT)) {
+
+                        // is it a silly value?
+                        if (i->getForSymbol("average_power") > 3000) continue;
+
+                        xvals << i->getForSymbol("workout_time") / 60.0f;
+                        yvals << i->getForSymbol("average_power");
+                        count++;
+                    }
+                }
+
+                if (count) {
+                    // set the data and attach to the plot
+                    effortCurve->setSamples(xvals.constData(), yvals.constData(), count);
+                    effortCurve->attach(this);
+                }
+            }
         }
     }
 
