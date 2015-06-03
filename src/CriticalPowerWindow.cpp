@@ -213,6 +213,11 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     QLabel *bestify = new QLabel(tr("Show Bests"));
     cl->addRow(bestify, showBestCheck);
 
+    showEffortCheck = new QCheckBox(this);
+    showEffortCheck->setChecked(false); // default off
+    QLabel *heaties = new QLabel(tr("Show Sustained Efforts"));
+    cl->addRow(heaties, showEffortCheck);
+
     showPercentCheck = new QCheckBox(this);
     showPercentCheck->setChecked(false); // default off
     QLabel *percentify = new QLabel(tr("Show as percentage"));
@@ -220,8 +225,8 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 
     showHeatCheck = new QCheckBox(this);
     showHeatCheck->setChecked(false); // default off
-    QLabel *heaties = new QLabel(tr("Show curve heat"));
-    cl->addRow(heaties, showHeatCheck);
+    QLabel *efforts = new QLabel(tr("Show curve heat"));
+    cl->addRow(efforts, showHeatCheck);
 
     showHeatByDateCheck = new QCheckBox(this);
     showHeatByDateCheck->setChecked(false); // default off
@@ -506,6 +511,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
     connect(shadeCheck, SIGNAL(stateChanged(int)), this, SLOT(shadingSelected(int)));
     connect(shadeIntervalsCheck, SIGNAL(stateChanged(int)), this, SLOT(shadeIntervalsChanged(int)));
+    connect(showEffortCheck, SIGNAL(stateChanged(int)), this, SLOT(showEffortChanged(int)));
     connect(showHeatCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatChanged(int)));
     connect(rHeat, SIGNAL(stateChanged(int)), this, SLOT(rHeatChanged(int)));
     connect(rDelta, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
@@ -1686,6 +1692,16 @@ void
 CriticalPowerWindow::rPercentChanged(int check)
 {
     showPercentCheck->setChecked(check);
+}
+
+void
+CriticalPowerWindow::showEffortChanged(int state)
+{
+    cpPlot->setShowEffort(state);
+
+    // redraw
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpPlot->setRide(currentRide);
 }
 
 void

@@ -68,6 +68,7 @@ class CPPlot : public QwtPlot
         void setShowPercent(bool x);
         void setShowBest(bool x);
         void setShowHeat(bool x);
+        void setShowEffort(bool x);
         void setShowHeatByDate(bool x);
         void setShowDelta(bool delta, bool percent);
         void setShadeMode(int x);
@@ -85,6 +86,7 @@ class CPPlot : public QwtPlot
         QVector<QDate> getBestDates();
         const QwtPlotCurve *getThisCurve() const { return rideCurve; }
         const QwtPlotCurve *getModelCurve() const { return modelCurve; }
+        const QwtPlotCurve *getEffortCurve() const { return effortCurve; }
 
         // when rides saved/deleted/added CPWindow
         // needs to know what range we have plotted
@@ -122,6 +124,7 @@ class CPPlot : public QwtPlot
         // plotters
         void plotRide(RideItem *);
         void plotBests();
+        void plotEfforts();
         void plotModel();
         void plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline); // for compare date range models
         void plotCentile(RideItem *);
@@ -158,6 +161,7 @@ class CPPlot : public QwtPlot
         bool showBest;
         bool showPercent;
         bool showHeat;
+        bool showEffort;
         bool showHeatByDate;
         bool showDelta; // only in compare mode
         bool showDeltaPercent; // only in compare mode
@@ -176,6 +180,7 @@ class CPPlot : public QwtPlot
         QwtPlotCurve *rideCurve;
         QwtPlotCurve *modelCurve;
 
+        QwtPlotCurve *effortCurve;
         QwtPlotCurve *heatCurve;
         CpPlotCurve *heatAgeCurve;
 

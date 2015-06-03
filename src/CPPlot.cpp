@@ -23,6 +23,7 @@
 #include "Zones.h"
 #include "Colors.h"
 #include "CPPlot.h"
+#include "RideCache.h"
 
 #include <unistd.h>
 #include <QDebug>
@@ -40,6 +41,7 @@
 
 #include "CriticalPowerWindow.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "LogTimeScaleDraw.h"
 #include "RideFile.h"
 #include "Season.h"
@@ -62,7 +64,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     plotType(0),
 
     // curves and plot objects
-    rideCurve(NULL), modelCurve(NULL), heatCurve(NULL), heatAgeCurve(NULL), pdModel(NULL)
+    rideCurve(NULL), modelCurve(NULL), effortCurve(NULL), heatCurve(NULL), heatAgeCurve(NULL), pdModel(NULL)
 
 {
     setAutoFillBackground(true);
@@ -796,6 +798,12 @@ CPPlot::clearCurves()
         rideCurve = NULL;
     }
 
+    // efforts curve
+    if (effortCurve) {
+        delete effortCurve;
+        effortCurve = NULL;
+    }
+
     // rainbow curve
     if (bestsCurves.count()) {
         foreach (QwtPlotCurve *curve, bestsCurves) delete curve;
@@ -1260,6 +1268,85 @@ CPPlot::plotBests()
 }
 
 void
+CPPlot::plotEfforts()
+{
+    // only for power, if not already plotted and there are actually some efforts
+    if (criticalSeries != CriticalPowerWindow::watts || effortCurve || !showEffort ||
+        context->currentRideItem()->intervals(RideFileInterval::EFFORT).count() ==0) return;
+
+    QwtSymbol *sym = new QwtSymbol;
+    sym->setStyle(QwtSymbol::Ellipse);
+    sym->setSize(rangemode ? 4 : 6);
+    QColor col= GColor(CPOWER);
+    col.setAlpha(128);
+    sym->setBrush(col);
+    sym->setPen(QPen(Qt::NoPen));
+
+    // create a curve
+    effortCurve = new QwtPlotCurve();
+    effortCurve->setSymbol(sym);
+    effortCurve->setStyle(QwtPlotCurve::Dots);
+    effortCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+    // plot for a range of rides
+    if (rangemode) {
+
+        // size for all rides, can increase if needed
+        QVector<double> xvals;
+        QVector<double> yvals;
+
+        FilterSet fs; // apply filters when selecting intervals
+        fs.addFilter(context->isfiltered, context->filters);
+        fs.addFilter(context->ishomefiltered, context->homeFilters);
+        Specification spec;
+        spec.setFilterSet(fs);
+        spec.setDateRange(DateRange(startDate, endDate));
+
+        int count=0;
+        foreach(RideItem *r, context->athlete->rideCache->rides()) {
+
+            // does it match ?
+            if (!spec.pass(r)) continue;
+
+            // add the intervals
+            foreach(IntervalItem *i, r->intervals(RideFileInterval::EFFORT)) {
+
+                // is it a silly value?
+                if (i->getForSymbol("average_power") > 3000) continue;
+
+                xvals << i->getForSymbol("workout_time") / 60.0f;
+                yvals << i->getForSymbol("average_power");
+                count++;
+            }
+        }
+
+        if (count) {
+            // set the data and attach to the plot
+            effortCurve->setSamples(xvals.constData(), yvals.constData(), count);
+            effortCurve->attach(this);
+        }
+    
+    } else {
+
+        // plot for the current ride
+        QList<IntervalItem *> intervals = context->currentRideItem()->intervals(RideFileInterval::EFFORT);
+
+        // size for all rides, can increase if needed
+        QVector<double> xvals(intervals.count());
+        QVector<double> yvals(intervals.count());
+
+        for(int i=0; i<intervals.count(); i++) {
+            xvals[i] = double(intervals.at(i)->getForSymbol("workout_time")) / 60.0f;
+            yvals[i] = double(intervals.at(i)->getForSymbol("average_power"));
+        }
+
+        // set the data and attach to the plot
+        effortCurve->setSamples(xvals.constData(), yvals.constData(), intervals.count());
+        effortCurve->attach(this);
+    }
+}
+
+void
 CPPlot::refreshUpdate(QDate)
 {
     // we don't need to lookat the date since we know if the data is incomplete
@@ -1433,11 +1520,19 @@ CPPlot::setRide(RideItem *rideItem)
         delete c;
     }
     intervalCurves.clear();
+    if (effortCurve) {
+        effortCurve->detach();
+        delete effortCurve;
+        effortCurve = NULL;
+    }
 
     // MAKE SURE BESTS IS UP TO DATE FIRST AS WE REFERENCE IT
     // first make sure the bests cache is up to date as we may need it
     // if plotting in percentage mode, so get data and plot it now
     plotBests();
+
+    // Plot Sustained Efforts
+    plotEfforts();
 
     // do we actually have something to plot?
     if (rideItem && rideItem->ride() && rideItem->ride()->dataPoints().count()) {
@@ -1633,6 +1728,13 @@ void
 CPPlot::setShowHeat(bool x)
 {
     showHeat = x;
+    clearCurves();
+}
+
+void
+CPPlot::setShowEffort(bool x)
+{
+    showEffort = x;
     clearCurves();
 }
 
