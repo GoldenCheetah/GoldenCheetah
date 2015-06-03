@@ -373,10 +373,10 @@ Routes::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
         for (int routecount=0;routecount<routes.count();routecount++) {
             RouteSegment *segment = &routes[routecount];
 
-            qDebug() << ride->getMinPoint(RideFile::lat);
-            qDebug() << ride->getMaxPoint(RideFile::lat);
-            qDebug() << ride->getMinPoint(RideFile::lon);
-            qDebug() << ride->getMaxPoint(RideFile::lon);
+            //qDebug() << ride->getMinPoint(RideFile::lat);
+            //qDebug() << ride->getMaxPoint(RideFile::lat);
+            //qDebug() << ride->getMinPoint(RideFile::lon);
+            //qDebug() << ride->getMaxPoint(RideFile::lon);
 
 
             // The third decimal place is worth up to 110 m
