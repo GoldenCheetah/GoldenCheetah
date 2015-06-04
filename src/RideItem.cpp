@@ -637,6 +637,11 @@ struct effort {
     double quality;
 };
 
+static bool intervalGreaterThanZone(const IntervalItem *a, const IntervalItem *b) { 
+    return const_cast<IntervalItem*>(a)->getForSymbol("power_zone") > 
+           const_cast<IntervalItem*>(b)->getForSymbol("power_zone"); 
+}
+
 void
 RideItem::updateIntervals()
 {
@@ -1279,7 +1284,47 @@ RideItem::updateIntervals()
         }
     }
 
-    // tell the sidebar (or others) we refreshed
+    // we now calculate sustained time in zone metrics
+    // this uses the EFFORT intervals, if the point
+    // is part of an effort interval we include it
+    // and we start from the top zone and work down
+
+    // aggregate in this array before updating the metric
+    QList<IntervalItem *> efforts = intervals(RideFileInterval::EFFORT);
+
+    if (efforts.count()) {
+
+        // we have some efforts so some time was in a sustained effort
+        double stiz[10];
+        for (int j=0; j<10; j++) stiz[j] = 0.00f;
+
+        // get and sort the intervals by zone high to low
+        qSort(efforts.begin(), efforts.end(), intervalGreaterThanZone);
+
+        foreach(RideFilePoint *p, f->dataPoints()) {
+
+            foreach (IntervalItem *i, efforts) {
+                if (i->start <= p->secs &&
+                    i->stop >= p->secs) {
+
+                    int zone = i->getForSymbol("power_zone")-1;
+                    if (zone >= 0 && zone < 10) stiz[zone] += f->recIntSecs();
+                    break;
+                }
+            }
+        }
+
+        // pack the values into the metric array
+        RideMetricFactory &factory = RideMetricFactory::instance();
+        for (int j=0; j<10; j++) {
+            QString symbol = QString("l%1_sustain").arg(j+1);
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            metrics()[m->index()] = stiz[j];
+        }
+    }
+
+    // tell the world we changed
     context->notifyIntervalsUpdate(this);
 
     // wipe them away now

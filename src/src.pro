@@ -671,6 +671,7 @@ SOURCES += \
         SrdRideFile.cpp \
         SrmRideFile.cpp \
         Statistic.cpp \
+        SustainMetric.cpp \
         PMCData.cpp \
         SummaryWindow.cpp \
         SyncRideFile.cpp \
