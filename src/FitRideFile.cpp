@@ -1008,8 +1008,14 @@ struct FitFileReaderState
         }
         else {
             if (!truncated) {
-                int crc = read_uint16( false ); // always littleEndian
-                (void) crc;
+                try {
+                    int crc = read_uint16( false ); // always littleEndian
+                    (void) crc;
+                }
+                catch (TruncatedRead &e) {
+                    errors << "truncated file body";
+                    return NULL;
+                }
             }
 
             foreach(int num, unknown_global_msg_nums)
