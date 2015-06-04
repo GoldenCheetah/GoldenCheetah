@@ -112,8 +112,9 @@
 // 106 09  May 2015 Mark Liversedge    Added MMP Percentage - %age of power for duration vs CP model
 // 107 29  May 2015 Mark Liversedge    Added AP as percent of maximum
 // 108 29  Jun 2015 Mark Liversedge    Added W' Power - average power contribution from W'
+// 109 29  Jun 2015 Mark Liversedge    Added Sutained Time In Zone metrics
 
-int DBSchemaVersion = 108;
+int DBSchemaVersion = 109;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
