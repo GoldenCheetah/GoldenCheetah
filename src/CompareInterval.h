@@ -25,6 +25,7 @@ class RideFileCache;
 
 #include <QObject>
 #include <QColor>
+#include <QUuid>
 
 class CompareInterval
 {
@@ -39,6 +40,7 @@ class CompareInterval
         QColor color;
         Context *sourceContext;
         RideFileCache *rideFileCache();
+        QUuid route;
         bool checked;
 
         bool isChecked() const { return checked; }
