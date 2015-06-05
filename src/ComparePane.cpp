@@ -819,7 +819,9 @@ ComparePane::dropEvent(QDropEvent *event)
                             RideItem *rideItem = matched->rideItem();
                             RideFile *ride = rideItem->ride();
 
-                            add.name = matched->name;
+                            add.name = QString("%1/%2 %3").arg(matched->rideItem()->dateTime.date().day())
+                                                          .arg(matched->rideItem()->dateTime.date().month())
+                                                          .arg(matched->name);
                             add.route = matched->route;
 
                             // just construct a ridefile for the interval
