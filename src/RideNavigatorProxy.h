@@ -256,7 +256,8 @@ public:
                    << (quint64)ride->ride()->dataPoints().last()->secs;
             stream << (quint64)ride->ride()->dataPoints().first()->km
                    << (quint64)ride->ride()->dataPoints().last()->km;
-            stream << (quint64)1;
+            stream << (quint64)1; // sequence interval only
+            stream << QUuid(); // route interval only
 
         } else {
             stream << (int)0; // nothing

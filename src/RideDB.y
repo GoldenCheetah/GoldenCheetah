@@ -114,6 +114,7 @@ ride: '{' rideelement_list '}'                                  {
                                                                     jc->item.metadata().clear();
                                                                     jc->item.metrics().fill(0.0f);
                                                                     jc->interval.metrics().fill(0.0f);
+                                                                    jc->interval.route = QUuid();
                                                                     jc->item.clearIntervals();
                                                                     jc->item.fileName = "";
                                                                 }

@@ -137,6 +137,7 @@ IntervalTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
         stream << (quint64)interval->start << (quint64)interval->stop; // start and stop in secs
         stream << (quint64)interval->startKM << (quint64)interval->stopKM; // start and stop km
         stream << (quint64)interval->displaySequence;
+        stream << interval->route;
 
     }
 
