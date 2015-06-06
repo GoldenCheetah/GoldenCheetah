@@ -1632,7 +1632,7 @@ RideSummaryWindow::htmlCompareSummary() const
                 if (rows%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
                 else summary += "<tr>";
 
-                summary += "<td>" + context->compareIntervals[counter].name + "</td>";
+                summary += "<td nowrap='yes'><font color='" + context->compareIntervals[counter].color.name() + "'>" + context->compareIntervals[counter].name + "</font></td>";
                 summary += "<td bgcolor='" + bgColor.name() +"'>&nbsp;</td>"; // spacing
 
                 foreach (QString symbol, metricsList) {
@@ -1727,7 +1727,7 @@ RideSummaryWindow::htmlCompareSummary() const
                     if (rows%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
                     else summary += "<tr>";
 
-                    summary += "<td>" + context->compareIntervals[counter].name + "</td>";
+                    summary += "<td nowrap='yes'><font color='" + context->compareIntervals[counter].color.name() + "'>" + context->compareIntervals[counter].name + "</font></td>";
                     summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                     int idx=0;
@@ -1799,7 +1799,7 @@ RideSummaryWindow::htmlCompareSummary() const
                     if (rows%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
                     else summary += "<tr>";
 
-                    summary += "<td>" + context->compareIntervals[counter].name + "</td>";
+                    summary += "<td nowrap='yes'><font color='" + context->compareIntervals[counter].color.name() + "'>" + context->compareIntervals[counter].name + "</font></td>";
                     summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                     int idx=0;
