@@ -876,7 +876,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
 void
 PfPvPlot::recalcCompare()
 {
-    // do all the calcuations for compare mode
+    // do all the calculations for compare mode
     // we do as a separate method to 'isolate' compare mode
     // updates to ensure we don't break all the charts !!
     maxAEPF = 600;

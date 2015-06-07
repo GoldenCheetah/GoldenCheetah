@@ -316,7 +316,7 @@ QStringList DataFilter::parseFilter(QString query, QStringList *list)
 
         isdynamic = treeRoot->isDynamic(treeRoot);
 
-        // successfuly parsed, lets check semantics
+        // successfully parsed, lets check semantics
         //treeRoot->print(treeRoot);
         emit parseGood();
 

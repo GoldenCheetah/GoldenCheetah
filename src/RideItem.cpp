@@ -910,7 +910,7 @@ RideItem::updateIntervals()
 
             while (t > 120) {
 
-                // calulate the TTE for the joules in the interval
+                // calculate the TTE for the joules in the interval
                 // starting at i seconds with duration t
                 // This takes the monod equation p(t) = W'/t + CP and
                 // solves for t, but the added complication of also

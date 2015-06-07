@@ -966,7 +966,7 @@ RideImportWizard::abortClicked()
 
                 // now try adding the Ride to the RideCache - since this may fail due to various reason, the activity file
                 // is stored in tmpActivities during this process to understand which file has create the problem when restarting GC
-                // - only after the step was succesfull the file is moved
+                // - only after the step was successful the file is moved
                 // to the "clean" activities folder
                 context->athlete->addRide(QFileInfo(tmpActivitiesFulltarget).fileName(),
                                           tableWidget->rowCount() < 20 ? true : false, // don't signal if mass importing

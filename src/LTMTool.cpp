@@ -319,7 +319,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     customButtons->addWidget(deleteCustomButton);
     customLayout->addLayout(customButtons);
 
-    // use seperate line to to distinguish from the operational buttons for the Table View
+    // use separate line to distinguish from the operational buttons for the Table View
     customLayout->addWidget(usePreset);
 
     tabs->addTab(basicsettings, tr("Basic"));

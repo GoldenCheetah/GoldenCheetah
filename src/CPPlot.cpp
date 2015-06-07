@@ -454,7 +454,7 @@ CPPlot::plotModel()
             modelCurve->setPen(pen);
             modelCurve->attach(this);
 
-            // update the model paramters display
+            // update the model parameters display
             CriticalPowerWindow *cpw = static_cast<CriticalPowerWindow*>(parent);
 
             // update the helper widget -- either as watts, w/kg or kph

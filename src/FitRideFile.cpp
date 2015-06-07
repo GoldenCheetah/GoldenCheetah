@@ -930,7 +930,7 @@ struct FitFileReaderState
 
     RideFile * run() {
 
-        // get the Smart Recording paramaters
+        // get the Smart Recording parameters
         isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
         GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
         if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
