@@ -71,6 +71,10 @@ class RideCache : public QObject
         QHash<QString,int> getRankedValues(QString name); // metadata
         QStringList getDistinctValues(QString name); // metadata
 
+        // Count of activities matching specification
+        void getRideTypeCounts(Specification specification, int& nActivities,
+                               int& nRides, int& nRuns, int& nSwims);
+
         // is running ?
         bool isRunning() { return future.isRunning(); }
 
