@@ -165,7 +165,7 @@ MUPlot::totalY()
 }
 
 // We are going to support multiple models; normal, normal-skew, linear
-// So for now lets make it a paramter for the model curve creation
+// So for now lets make it a parameter for the model curve creation
 // The model may end up being comprised of 'sub models' for each fibre type
 void
 MUPlot::setModel(int model)

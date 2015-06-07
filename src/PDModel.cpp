@@ -572,7 +572,7 @@ void MultiModel::onIntervalsChanged()
 { 
     deriveCPParameters(3); 
 
-    // and veloclinic paramters too;
+    // and veloclinic parameters too;
     w1 = cp*tau*60; // initial estimate from classic model
     p1 = PMax() - cp;
     p2 = cp;

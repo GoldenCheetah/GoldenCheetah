@@ -55,7 +55,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
     QDomNode workout = root.firstChildElement("workout");
     QDomNode node = workout.firstChild();
 
-    // get the Smart Recording paramaters
+    // get the Smart Recording parameters
     QVariant isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
     QVariant GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.

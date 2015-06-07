@@ -494,7 +494,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 }
                 break;
 
-                case ANT_TE_AND_PS_POWER: // 0x13 - optional extension to standard power / event Count is defined to be in sync with 0x10 - so not seperate calculation
+                case ANT_TE_AND_PS_POWER: // 0x13 - optional extension to standard power / event Count is defined to be in sync with 0x10 - so not separate calculation
                                           // and just take whatever is delivered - data may not be sent for every power reading - but minimum every 5th pwr message
                 {
                     uint8_t events = antMessage.eventCount - lastStdPwrMessage.eventCount;

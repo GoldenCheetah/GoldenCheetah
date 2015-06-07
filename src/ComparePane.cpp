@@ -755,8 +755,8 @@ ComparePane::dropEvent(QDropEvent *event)
 
         }
 
-        // if we have nothing being compared yet and are only dropping one and its a route
-        // then offer to find all times you travalled along the same route
+        // if we have nothing being compared yet and are only dropping one and it's a route
+        // then offer to find all times you traveled along the same route
         if (context->compareIntervals.count() == 0 && newOnes.count() == 1 && newOnes[0].route != QUuid()) {
 
             // how many across seasons? (there will always be the standard seasons)

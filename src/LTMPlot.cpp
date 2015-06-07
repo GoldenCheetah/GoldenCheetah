@@ -2685,7 +2685,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
              int currentPeriod =  groupForDate(from, settings->groupBy);
              if (n != (currentPeriod - firstPeriod)) {
                  // data of next period of estimates is available,
-                 // so calcuated the current period and switch forward to next
+                 // so calculate the current period and switch forward to next
                  x[n] = n;
                  if (xCount[n]> 0) {
                     y[n] = yTotal[n] / xCount[n];
@@ -2694,7 +2694,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
                  }
                  n++;
              };
-             // store for calcuation
+             // store for calculation
              yTotal[n] += value;
              xCount[n]++;
            }

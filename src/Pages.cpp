@@ -673,7 +673,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     connect(googleCalendarAuthorise, SIGNAL(clicked()), this, SLOT(authoriseGoogleCalendar()));
     connect (dvCALDAVType, SIGNAL(currentIndexChanged(int)), this, SLOT(dvCALDAVTypeChanged(int)));
 
-    // activate/deactivate the input fields aocording the the type selected
+    // activate/deactivate the input fields according to the type selected
     dvCALDAVTypeChanged(dvCALDAVType->currentIndex());
 
     //////////////////////////////////////////////////
