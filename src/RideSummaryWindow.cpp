@@ -519,6 +519,26 @@ RideSummaryWindow::htmlSummary()
     // we already have a summary metrics array
     RideMetricFactory &factory = RideMetricFactory::instance();
 
+    // get the PMC data
+    PMCData *pmc;
+    if (ridesummary) {
+        // For single activity use base metric according to sport
+        pmc = context->athlete->getPMCFor(
+                                    rideItem->isSwim ? "swimscore" :
+                                    rideItem->isRun ? "govss" :
+                                    "coggan_tss");
+    } else {
+        // For data range use base metric for single sport if homogeneous
+        // or combined if mixed
+        int nActivities, nRides, nRuns, nSwims;
+        context->athlete->rideCache->getRideTypeCounts(specification,                    nActivities, nRides, nRuns, nSwims);
+        pmc = context->athlete->getPMCFor(
+                            nActivities == nRides ? "coggan_tss" :
+                            nActivities == nRuns ? "govss" :
+                            nActivities == nSwims ? "swimscore" :
+                            "triscore");
+    }
+
     //
     // 3 top columns - total, average, maximums and metrics for entire ride
     //
@@ -541,9 +561,6 @@ RideSummaryWindow::htmlSummary()
         }
 
         if (addPMC) {
-
-            // get the PMC data
-            PMCData *pmc = context->athlete->getPMCFor("coggan_tss");
 
             if (ridesummary) {
 
@@ -784,9 +801,6 @@ RideSummaryWindow::htmlSummary()
 
             QList<AthleteBest> bests = context->athlete->rideCache->getBests(bestsColumn[i], 10, specification, useMetricUnits);
 
-            // show tsb when recorded
-            PMCData *pmcData = context->athlete->getPMCFor("coggan_tss");
-
             int pos=1;
             foreach(AthleteBest best, bests) {
 
@@ -804,7 +818,7 @@ RideSummaryWindow::htmlSummary()
                            .arg(pos++)
                            .arg(best.value)
                            .arg(best.date.toString(tr("d MMM yyyy")))
-                           .arg((int)pmcData->sb(best.date));
+                           .arg((int)pmc->sb(best.date));
             }
 
             // close that column
