@@ -643,6 +643,9 @@ ComparePane::dragLeaveEvent(QDragLeaveEvent *)
     // we might consider hiding on this?
 }
 
+// sort intervals most recent first
+static bool dateRecentFirst(const IntervalItem *a, const IntervalItem *b) { return a->rideItem_->dateTime > b->rideItem_->dateTime; }
+
 void
 ComparePane::dropEvent(QDropEvent *event)
 {
@@ -752,8 +755,10 @@ ComparePane::dropEvent(QDropEvent *event)
 
         }
 
-        // if we are only dropping one and its a route ...
-        if (newOnes.count() == 1 && newOnes[0].route != QUuid()) {
+        // if we have nothing being compared yet and are only dropping one and its a route
+        // then offer to find all times you travalled along the same route
+        table->setRowCount(context->compareIntervals.count());
+        if (context->compareIntervals.count() == 0 && newOnes.count() == 1 && newOnes[0].route != QUuid()) {
 
             // how many across seasons? (there will always be the standard seasons)
             // these are passed to the dialog to setup the combobox
@@ -785,6 +790,9 @@ ComparePane::dropEvent(QDropEvent *event)
             // add matches for this route, or just this one
             if (matches.count() > 1 ) {
 
+                // sort matches so most recent first
+                qSort(matches.begin(), matches.end(), dateRecentFirst);
+
                 // ok, lets crank up a dialog to ask
                 // one only, or the season to use
                 // the default should be the first one
@@ -812,7 +820,7 @@ ComparePane::dropEvent(QDropEvent *event)
 
                             // create a new interval for this one
                             CompareInterval add;
-                            add.checked = false; // by default unchecked because can be a bit mental with so many
+                            add.checked = seasonCount[select] <= 10; // check if not that many, don't if loads
                             add.context = context;                  // UPDATE COMPARE INTERVAL
                             add.sourceContext = newOnes[0].sourceContext;      // UPDATE COMPARE INTERVAL
 
