@@ -800,3 +800,22 @@ RideCache::getDistinctValues(QString field)
 
     return returning;
 }
+
+void
+RideCache::getRideTypeCounts(Specification specification, int& nActivities,
+                             int& nRides, int& nRuns, int& nSwims)
+{
+    nActivities = nRides = nRuns = nSwims = 0;
+
+    // loop through and aggregate
+    foreach (RideItem *ride, rides_) {
+
+        // skip filtered rides
+        if (!specification.pass(ride)) continue;
+
+        nActivities++;
+        if (ride->isSwim) nSwims++;
+        else if (ride->isRun) nRuns++;
+        else nRides++;
+    }
+}
