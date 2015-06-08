@@ -948,7 +948,7 @@ ComparePane::dropEvent(QDropEvent *event)
 RouteDropDialog::RouteDropDialog(QWidget *parent, Context *context, QString segmentName, QVector<int> &seasonCount, int &selected) :
     QDialog(parent, Qt::Dialog), context(context), seasonCount(seasonCount), selected(selected)
 {
-    setWindowTitle(QString(tr("Add Route \"%1\"")).arg(segmentName));
+    setWindowTitle(QString(tr("\"%1\"")).arg(segmentName));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(5);
 
@@ -976,9 +976,11 @@ RouteDropDialog::RouteDropDialog(QWidget *parent, Context *context, QString segm
     all = new QPushButton(tr("&All Selected"), this);
     buttonLayout->addStretch();
     one = new QPushButton(tr("Just this &One"), this);
+    buttonLayout->addStretch();
     buttonLayout->addWidget(all);
     buttonLayout->addStretch();
     buttonLayout->addWidget(one);
+    buttonLayout->addStretch();
     mainLayout->addLayout(buttonLayout);
 
     // we want Just this one to be the default button
