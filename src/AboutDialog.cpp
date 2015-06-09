@@ -116,6 +116,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
 {
     QStringList contributors;
     contributors.append("Alejandro Martinez");
+    contributors.append("Alex Harsanyi");
     contributors.append("Andrew Bryson");
     contributors.append("Andy Froncioni");
     contributors.append("Austin Roach");
