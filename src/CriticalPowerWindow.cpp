@@ -1263,7 +1263,8 @@ CriticalPowerWindow::setSeries(int index)
         CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(index).toInt());
 
         // hide velo cp editing
-        if (series == veloclinicplot) {
+        if (series == veloclinicplot ||
+            ((series == watts || series == wattsKg ) && modelCombo->currentIndex() >= 1)) {
             CPEdit->show();
             CPSlider->show();
             CPLabel->show();

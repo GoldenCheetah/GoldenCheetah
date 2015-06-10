@@ -79,7 +79,7 @@ class CPPlot : public QwtPlot
         void setSport(bool run, bool swim) { isRun = run; isSwim = swim; }
         void setSeries(CriticalPowerWindow::CriticalSeriesType);
         void setPlotType(int index);
-        void setModel(int sanI1, int sanI2, int anI1, int anI2, 
+        void setModel(int sanI1, int sanI2, int anI1, int anI2,
                       int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant);
 
         // getters
