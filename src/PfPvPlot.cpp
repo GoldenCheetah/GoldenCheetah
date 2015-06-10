@@ -144,7 +144,7 @@ public:
 
 
 PfPvPlot::PfPvPlot(Context *context)
-    : rideItem (NULL), context(context), hover(NULL), cp_ (0), cad_ (85), cl_ (0.175), shade_zones(true)
+    : rideItem (NULL), context(context), hover(NULL), cp_ (0), pmax_(0), cad_ (85), cl_ (0.175), shade_zones(true)
 {
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
@@ -175,6 +175,10 @@ PfPvPlot::PfPvPlot(Context *context)
     cpCurve = new QwtPlotCurve();
     cpCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     cpCurve->attach(this);
+
+    pmaxCurve = new QwtPlotCurve();
+    pmaxCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    pmaxCurve->attach(this);
 
     curve = new QwtPlotCurve();
     curve->attach(this);
@@ -243,6 +247,11 @@ PfPvPlot::configChanged(qint32)
     cpCurve->setPen(cp);
 
     setCL(appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH).toDouble() / 1000.0);
+    QPen pmax = GColor(CCP);
+    pmax.setStyle(Qt::DashLine);
+    pmaxCurve->setPen(pmax);
+
+    setCL(appsettings->value(this, GC_CRANKLENGTH).toDouble() / 1000.0);
 
     replot();
 }
@@ -320,6 +329,7 @@ PfPvPlot::refreshZoneItems()
 
     if (zone_range >= 0) {
         setCP(zones->getCP(zone_range));
+        setPMax(zones->getPmax(zone_range));
 
         // populate the zone curves
         QList <int> zone_power = zones->getZoneLows(zone_range);
@@ -1149,6 +1159,21 @@ PfPvPlot::recalc()
         QwtArray<double> data;
         cpCurve->setSamples(data,data);
     }
+    if (pmax_) {
+
+        // reinitialise array
+        for (int i = 0; i < contour_xvalues.size(); i ++)
+            yvalues[i] = (cpv < pmax_ / 1e6) ?  1e6 : pmax_ / contour_xvalues[i];
+
+        // generate curve at a given power
+        pmaxCurve->setSamples(contour_xvalues, yvalues);
+
+    } else {
+
+        // an empty curve if no power (or zero power) is specified
+        QwtArray<double> data;
+        pmaxCurve->setSamples(data,data);
+    }
 }
 
 int
@@ -1192,6 +1217,21 @@ PfPvPlot::setCL(double cranklen)
     recalc();
     emit changedCL( QString("%1").arg(cranklen) );
 }
+
+int
+PfPvPlot::getPMax()
+{
+    return pmax_;
+}
+
+void
+PfPvPlot::setPMax(int pmax)
+{
+    pmax_ = pmax;
+    recalc();
+    emit changedPMax( QString("%1").arg(pmax) );
+}
+
 // process checkbox for zone shading
 void
 PfPvPlot::setShadeZones(bool value)
