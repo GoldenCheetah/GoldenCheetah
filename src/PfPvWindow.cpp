@@ -156,6 +156,11 @@ PfPvWindow::PfPvWindow(Context *context) :
     qaClValue = new QLineEdit(QString("%1").arg(1000 * pfPvPlot->getCL()));
     f->addRow(qaClLabel, qaClValue);
 
+    QLabel *qaPMaxLabel = new QLabel(tr("P Max:"), this);
+    qaPMaxValue = new QLineEdit(QString("%1").arg(pfPvPlot->getPMax()));
+    qaPMaxValue->setValidator(new QIntValidator(0, 9999, qaPMaxValue));
+    f->addRow(qaPMaxLabel, qaPMaxValue);
+
     shadeZonesPfPvCheckBox = new QCheckBox;
     shadeZonesPfPvCheckBox->setText(tr("Shade zones"));
     if (appsettings->value(this, GC_SHADEZONES, true).toBool() == true)
@@ -183,9 +188,11 @@ PfPvWindow::PfPvWindow(Context *context) :
     connect(pfPvPlot, SIGNAL(changedCP(const QString&)), qaCPValue, SLOT(setText(const QString&)) );
     connect(pfPvPlot, SIGNAL(changedCAD(const QString&)), qaCadValue, SLOT(setText(const QString&)) );
     connect(pfPvPlot, SIGNAL(changedCL(const QString&)), qaClValue, SLOT(setText(const QString&)) );
+    connect(pfPvPlot, SIGNAL(changedPMax(const QString&)), qaPMaxValue, SLOT(setText(const QString&)) );
     connect(qaCPValue, SIGNAL(editingFinished()), this, SLOT(setQaCPFromLineEdit()));
     connect(qaCadValue, SIGNAL(editingFinished()), this, SLOT(setQaCADFromLineEdit()));
     connect(qaClValue, SIGNAL(editingFinished()), this, SLOT(setQaCLFromLineEdit()));
+    connect(qaPMaxValue, SIGNAL(editingFinished()), this, SLOT(setQaPMaxFromLineEdit()));
     connect(shadeZonesPfPvCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setShadeZonesPfPvFromCheckBox()));
     connect(rShade, SIGNAL(stateChanged(int)), this, SLOT(setrShadeZonesPfPvFromCheckBox()));
     connect(mergeIntervalPfPvCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setMergeIntervalsPfPvFromCheckBox()));
@@ -377,6 +384,14 @@ PfPvWindow::setQaCLFromLineEdit()
 {
     double value = qaClValue->text().toDouble();
     pfPvPlot->setCL(value);
+    pfPvPlot->replot();
+}
+
+void
+PfPvWindow::setQaPMaxFromLineEdit()
+{
+    int value = qaPMaxValue->text().toInt();
+    pfPvPlot->setPMax(value);
     pfPvPlot->replot();
 }
 
