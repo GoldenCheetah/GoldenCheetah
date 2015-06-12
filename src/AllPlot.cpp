@@ -2823,6 +2823,10 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     referencePlot = plot;
 
+    isolation = false;
+    curveColors->saveState();
+
+
     // You got to give me some data first!
     if (!plot->standard->distanceArray.count() || !plot->standard->timeArray.count()) return;
 
@@ -3276,6 +3280,9 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     }
 
     referencePlot = plot;
+
+    isolation = false;
+    curveColors->saveState();
 
     // reference the plot for data and state
     rideItem = plot->rideItem;
