@@ -309,6 +309,59 @@ class TotalDistance : public RideMetric {
 static bool totalDistanceAdded =
     RideMetricFactory::instance().addMetric(TotalDistance());
 
+// climb rating is essentially elev gain ^2 / distance
+// a concept raised by Dan Conelly on his blog
+class ClimbRating : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ClimbRating)
+    double secsMoving;
+    double km;
+
+    public:
+
+    ClimbRating() : secsMoving(0.0), km(0.0)
+    {
+        setSymbol("climb_rating");
+        setInternalName("Climb Rating");
+    }
+    void initialize() {
+        setName(tr("Climb Rating"));
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setType(RideMetric::Total);
+        setPrecision(0);
+    }
+
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+        double rating = 0.0f;
+        double distance = deps.value("total_distance")->value(true);
+
+        if (ride->areDataPresent()->alt) {
+
+            double ele = deps.value("elevation_gain")->value(true);
+
+            // 100 is HARD !
+            if (ele >0 && distance >0) {
+                rating = (ele * ele) / distance;
+                rating /= 1000.0f;
+            }
+        }
+
+        setValue(rating);
+        setCount(1);
+    }
+
+    RideMetric *clone() const { return new ClimbRating(*this); }
+};
+
+static bool climbRatingAdded =
+    RideMetricFactory::instance().addMetric(
+        ClimbRating(), &(QVector<QString>() << "total_distance" << "elevation_gain"));
+
+
 class AthleteWeight : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(AthleteWeight)
     double kg;
