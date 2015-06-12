@@ -111,10 +111,11 @@
 // 105 09  May 2015 Ale Martinez       Added PeakPace and PeakPaceSwim metrics
 // 106 09  May 2015 Mark Liversedge    Added MMP Percentage - %age of power for duration vs CP model
 // 107 29  May 2015 Mark Liversedge    Added AP as percent of maximum
-// 108 29  Jun 2015 Mark Liversedge    Added W' Power - average power contribution from W'
-// 109 29  Jun 2015 Mark Liversedge    Added Sustained Time In Zone metrics
+// 108 29  May 2015 Mark Liversedge    Added W' Power - average power contribution from W'
+// 109 29  May 2015 Mark Liversedge    Added Sustained Time In Zone metrics
+// 110 12  Jun 2015 Mark Liversedge    Added climb rating
 
-int DBSchemaVersion = 109;
+int DBSchemaVersion = 110;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
