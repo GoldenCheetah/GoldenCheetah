@@ -970,6 +970,9 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     if (!std::isfinite(rcad) || rcad<0) rcad=0;
     if (!std::isfinite(rcontact) || rcontact<0) rcontact=0;
 
+    // if bad time or distance ignore it if NOT the first sample
+    if (dataPoints_.count() != 0 && secs == 0.00f && km == 0.00f) return;
+
     // truncate alt out of bounds -- ? should do for all, but uncomfortable about
     //                                 setting an absolute max. At least We know the highest
     //                                 point on Earth (Mt Everest).
