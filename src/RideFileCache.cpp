@@ -1419,7 +1419,7 @@ static void distAggregate(QVector<double> &into, QVector<double> &other)
 
 }
 
-RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filter, QStringList files, bool onhome)
+RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filter, QStringList files, bool onhome, RideItem *rideItem)
                : start(start), end(end), incomplete(false), context(context), rideFileName(""), ride(0)
 {
 
@@ -1429,7 +1429,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
     this->onhome = onhome;
 
     // Oh lets get from the cache if we can -- but not if filtered
-    if (!filter && !context->isfiltered) {
+    if (!filter && !context->isfiltered && !rideItem) {
 
         // oh and not if we're onhome and homefiltered
         if ((onhome && !context->ishomefiltered) || !onhome) {
@@ -1496,6 +1496,8 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
             // skip globally filtered values
             if (context->isfiltered && !context->filters.contains(item->fileName)) continue;
             if (onhome && context->ishomefiltered && !context->homeFilters.contains(item->fileName)) continue;
+            // skip other sports if rideItem is given
+            if (rideItem && ((rideItem->isRun != item->isRun) || (rideItem->isSwim != item->isSwim))) continue;
 
             // get its cached values (will NOT! refresh if needed...)
             // the true means it will check only
