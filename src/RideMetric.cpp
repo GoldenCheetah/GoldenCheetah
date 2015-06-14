@@ -114,8 +114,9 @@
 // 108 29  May 2015 Mark Liversedge    Added W' Power - average power contribution from W'
 // 109 29  May 2015 Mark Liversedge    Added Sustained Time In Zone metrics
 // 110 12  Jun 2015 Mark Liversedge    Added climb rating
+// 111 14  Jun 2015 Mark Liversedge    Added W'bal time in zone metrics
 
-int DBSchemaVersion = 110;
+int DBSchemaVersion = 111;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
