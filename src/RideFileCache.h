@@ -41,7 +41,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 22;
+static const unsigned int RideFileCacheVersion = 23;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -65,12 +65,14 @@ static const unsigned int RideFileCacheVersion = 22;
 // 20       17-Nov-14    Added Polarized Zones for HR and Pace
 // 21       27-Nov-14    Added SmO2 distribution 
 // 22       02-Feb-15    Added weight to header
+// 23       14-Jun-15    Added W'bal TiZ and Distribution
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
 // n x Blocks - meanmax or distribution arrays
 // 1 x Watts TIZ - 10 floats
 // 1 x Heartrate TIZ - 10 floats
+// 1 x W'Bal TIX - 10 floats
 
 // The header is written directly to disk, the only
 // field which is endian sensitive is the count field
@@ -106,12 +108,14 @@ struct RideFileCacheHeader {
                  npDistCount,
                  wattsKgDistCount,
                  aPowerDistCount,
-                 smo2DistCount;
+                 smo2DistCount,
+                 wbalDistCount;
 
     int LTHR, // used to calculate Time in Zone (TIZ)
         CP;   // used to calculate Time in Zone (TIZ)
     double CV;   // used to calculate Time in Zone (TIZ)
     double WEIGHT; // weight in kg x 10 used for w/kg
+    double WPRIME; // W' used from config used to calculate (TIZ)
                 
 };
 
@@ -232,6 +236,7 @@ class RideFileCache
 
         // used for zoning
         int CP;
+        int WPRIME;
         int LTHR;
         double CV;
         double WEIGHT;
@@ -314,6 +319,7 @@ class RideFileCache
         QVector<float> wattsKgDistribution; // RideFile::wattsKg
         QVector<float> aPowerDistribution; // RideFile::aPower
         QVector<float> smo2Distribution; // RideFile::smo2
+        QVector<float> wbalDistribution; // RideFile::wbal
 
         QVector<double> wattsDistributionDouble; // RideFile::watts
         QVector<double> hrDistributionDouble; // RideFile::hr
@@ -326,6 +332,7 @@ class RideFileCache
         QVector<double> wattsKgDistributionDouble; // RideFile::wattsKg
         QVector<double> aPowerDistributionDouble; // RideFile::aPower
         QVector<double> smo2DistributionDouble; // RideFile::aPower
+        QVector<double> wbalDistributionDouble; // RideFile::aPower
 
 
         QVector<float> wattsTimeInZone;   // time in zone in seconds
@@ -334,6 +341,7 @@ class RideFileCache
         QVector<float> hrCPTimeInZone;   // time in zone in seconds for polarized zones
         QVector<float> paceTimeInZone;      // time in zone in seconds
         QVector<float> paceCPTimeInZone;   // time in zone in seconds for polarized zones
+        QVector<float> wbalTimeInZone;      // time in zone in seconds
 };
 
 // Ride Bests in an associative array

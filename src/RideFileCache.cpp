@@ -24,6 +24,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
+#include "WPrime.h" // for wbal zones
 #include "LTMSettings.h" // getAllBestsFor needs this
 
 #include <cmath> // for pow()
@@ -66,6 +67,7 @@ RideFileCache::RideFileCache(Context *context, QString fileName, double weight, 
     wattsKgDistribution.resize(0);
     aPowerDistribution.resize(0);
     smo2Distribution.resize(0);
+    wbalDistribution.resize(0);
 
     // time in zone are fixed to 10 zone max
     wattsTimeInZone.resize(10);
@@ -74,6 +76,7 @@ RideFileCache::RideFileCache(Context *context, QString fileName, double weight, 
     hrCPTimeInZone.resize(4); // zero, I, II, III
     paceTimeInZone.resize(10);
     paceCPTimeInZone.resize(4); // zero, I, II, III
+    wbalTimeInZone.resize(4); // 0-25, 25-50, 50-75, 75% +
 
     // Get info for ride file and cache file
     QFileInfo rideFileInfo(rideFileName);
@@ -247,12 +250,14 @@ static long offsetForTiz(RideFileCacheHeader head, RideFile::SeriesType series)
     offset += head.wattsKgDistCount * sizeof(float);
     offset += head.aPowerDistCount * sizeof(float);
     offset += head.smo2DistCount * sizeof(float);
+    offset += head.wbalDistCount * sizeof(float);
 
-    // tiz ist currently just for RideFile:watts, RideFile:hr and RideFile:kph series.
-    // watts is first - so move on with offset only for 'hr' and 'kph'
+    // tiz ist currently just for RideFile:watts, RideFile:hr, RideFile:kph and RideFile:wbal
+    // watts is first - so move on with offset only for 'hr' and 'kph' and 'wbal'
     // structure for "tiz" data - watts(10)/CPwatts(4)/HR(10)/CPhr(4)/PACE(10)/CPpace
     if (series == RideFile::hr) offset += (10+4) * sizeof(float);
     if (series == RideFile::kph) offset += 2*(10+4) * sizeof(float);
+    if (series == RideFile::wbal) offset += 3*(10+4) * sizeof(float);
 
     return offset;
 }
@@ -418,6 +423,7 @@ RideFileCache::RideFileCache(RideFile *ride) :
     wattsKgDistribution.resize(0);
     aPowerDistribution.resize(0);
     smo2Distribution.resize(0);
+    wbalDistribution.resize(0);
 
     // time in zone are fixed to 10 zone max
     wattsTimeInZone.resize(10);
@@ -426,6 +432,7 @@ RideFileCache::RideFileCache(RideFile *ride) :
     hrCPTimeInZone.resize(4);
     paceTimeInZone.resize(10);
     paceCPTimeInZone.resize(4);
+    wbalTimeInZone.resize(4);
 
     WEIGHT = ride->getWeight();
     ride->recalculateDerivedSeries(); // accel and others
@@ -464,6 +471,7 @@ RideFileCache::decimalsFor(RideFile::SeriesType series)
         case RideFile::wattsKg : return 2; break;
         case RideFile::aPower : return 0; break;
         case RideFile::smo2 : return 0; break;
+        case RideFile::wbal : return 0; break;
         case RideFile::lrbalance : return 1; break;
         case RideFile::wprime :  return 0; break;
         case RideFile::none : break;
@@ -656,6 +664,10 @@ RideFileCache::distributionArray(RideFile::SeriesType series)
             return smo2DistributionDouble;
             break;
 
+        case RideFile::wbal:
+            return wbalDistributionDouble;
+            break;
+
         case RideFile::wattsKg:
             return wattsKgDistributionDouble;
             break;
@@ -781,6 +793,7 @@ void RideFileCache::RideFileCache::compute()
     computeDistribution(wattsKgDistribution, RideFile::wattsKg);
     computeDistribution(aPowerDistribution, RideFile::aPower);
     computeDistribution(smo2Distribution, RideFile::smo2);
+    computeDistribution(wbalDistribution, RideFile::wbal);
 
     // wait for them threads
     thread1.wait();
@@ -827,6 +840,7 @@ void RideFileCache::RideFileCache::compute()
     doubleArrayForDistribution(wattsKgDistributionDouble, wattsKgDistribution);
     doubleArrayForDistribution(aPowerDistributionDouble, aPowerDistribution);
     doubleArrayForDistribution(smo2DistributionDouble, smo2Distribution);
+    doubleArrayForDistribution(wbalDistributionDouble, wbalDistribution);
 }
 
 //----------------------------------------------------------------------
@@ -1294,6 +1308,7 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     if (series == RideFile::cadd) needSeries = RideFile::cad;
     if (series == RideFile::nmd) needSeries = RideFile::nm;
     if (series == RideFile::hrd) needSeries = RideFile::hr;
+    if (series == RideFile::wbal) needSeries = RideFile::watts;
 
     // only bother if the data series is actually present
     if (ride->isDataPresent(needSeries) == false) return;
@@ -1305,6 +1320,9 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 
     if (zoneRange != -1) CP=context->athlete->zones()->getCP(zoneRange);
     else CP=0;
+
+    if (zoneRange != -1) WPRIME=context->athlete->zones()->getWprime(zoneRange);
+    else WPRIME=0;
 
     if (hrZoneRange != -1) LTHR=context->athlete->hrZones()->getLT(hrZoneRange);
     else LTHR=0;
@@ -1320,75 +1338,109 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     // lets resize the array to the right size
     // it will also initialise with a default value
     // which for longs is handily zero
-    array.resize(max-min);
+    array.resize(max-min+1);
 
-    foreach(RideFilePoint *dp, ride->dataPoints()) {
-        double value = dp->value(baseSeries);
-        if (series == RideFile::wattsKg) {
-            value /= ride->getWeight();
+    // wbal uses the wprimeData, not the ridefile
+    if (series == RideFile::wbal) {
+
+        // set timeinzone to zero
+        wbalTimeInZone.fill(0.0f, 4);
+        array.fill(0.0f);
+        int count = 0;
+
+        // lets count them first then turn into percentages
+        // after we have traversed all the data
+        foreach(int value, ride->wprimeData()->ydata()) {
+
+            // percent is PERCENT OF W' USED
+            double percent = 100.0f - ((double (value) / WPRIME) * 100.0f);
+            if (percent < 0.0f) percent = 0.0f;
+            if (percent > 100.0f) percent = 100.0f;
+
+            // increment counts
+            array[(int)percent]++;
+            count++;
+
+            // and zones in 1s increments
+            if (percent <= 25.0f) wbalTimeInZone[0]++;
+            else if (percent <= 50.0f) wbalTimeInZone[1]++;
+            else if (percent <= 75.0f) wbalTimeInZone[2]++;
+            else wbalTimeInZone[3]++;
         }
 
-        float lvalue = value * pow(10, decimals);
+        // turn array into percents (TiZ stays in seconds)
+        for(int i=0; i<100; i++) array[i] = array[i] / double(count) * 100.0f;
 
-        // watts time in zone
-        if (series == RideFile::watts && zoneRange != -1) {
-            int index = context->athlete->zones()->whichZone(zoneRange, dp->value(series));
-            if (index >=0) wattsTimeInZone[index] += ride->recIntSecs();
+    } else {
+
+        foreach(RideFilePoint *dp, ride->dataPoints()) {
+            double value = dp->value(baseSeries);
+            if (series == RideFile::wattsKg) {
+                value /= ride->getWeight();
+            }
+
+            float lvalue = value * pow(10, decimals);
+
+            // watts time in zone
+            if (series == RideFile::watts && zoneRange != -1) {
+                int index = context->athlete->zones()->whichZone(zoneRange, dp->value(series));
+                if (index >=0) wattsTimeInZone[index] += ride->recIntSecs();
+            }
+
+            // Polarized zones :- I(<0.85*CP), II (<CP and >0.85*CP), III (>CP)
+            if (series == RideFile::watts && zoneRange != -1 && CP) {
+                if (dp->value(series) < 1) // I zero watts
+                    wattsCPTimeInZone[0] += ride->recIntSecs();
+                else if (dp->value(series) < (CP*0.85f)) // I
+                    wattsCPTimeInZone[1] += ride->recIntSecs();
+                else if (dp->value(series) < CP) // II
+                    wattsCPTimeInZone[2] += ride->recIntSecs();
+                else // III
+                    wattsCPTimeInZone[3] += ride->recIntSecs();
+            }
+
+            // hr time in zone
+            if (series == RideFile::hr && hrZoneRange != -1) {
+                int index = context->athlete->hrZones()->whichZone(hrZoneRange, dp->value(series));
+                if (index >= 0) hrTimeInZone[index] += ride->recIntSecs();
+            }
+
+            // Polarized zones :- I(<0.9*LTHR), II (<LTHR and >0.9*LTHR), III (>LTHR)
+            if (series == RideFile::hr && hrZoneRange != -1 && LTHR) {
+                if (dp->value(series) < 1) // I zero
+                    hrCPTimeInZone[0] += ride->recIntSecs();
+                else if (dp->value(series) < (LTHR*0.9f)) // I
+                    hrCPTimeInZone[1] += ride->recIntSecs();
+                else if (dp->value(series) < LTHR) // II
+                    hrCPTimeInZone[2] += ride->recIntSecs();
+                else // III
+                    hrCPTimeInZone[3] += ride->recIntSecs();
+            }
+
+            // pace time in zone, only for running and swimming activities
+            if (series == RideFile::kph && paceZoneRange != -1 && (ride->isRun() || ride->isSwim())) {
+                int index = context->athlete->paceZones(ride->isSwim())->whichZone(paceZoneRange, dp->value(series));
+                if (index >= 0) paceTimeInZone[index] += ride->recIntSecs();
+            }
+
+            // Polarized zones Run:- I(<0.9*CV), II (<CV and >0.9*CV), III (>CV)
+            // Polarized zones Swim:- I(<0.975*CV), II (<CV and >0.975*CV), III (>CV)
+            if (series == RideFile::kph && paceZoneRange != -1 && CV && (ride->isRun() || ride->isSwim())) {
+                if (dp->value(series) < 0.1) // I zero
+                    paceCPTimeInZone[0] += ride->recIntSecs();
+                else if (ride->isRun() && dp->value(series) < (CV*0.9f)) // I for run
+                    paceCPTimeInZone[1] += ride->recIntSecs();
+                else if (ride->isSwim() && dp->value(series) < (CV*0.975f)) // I for swim
+                    paceCPTimeInZone[1] += ride->recIntSecs();
+                else if (dp->value(series) < CV) // II
+                    paceCPTimeInZone[2] += ride->recIntSecs();
+                else // III
+                    paceCPTimeInZone[3] += ride->recIntSecs();
+            }
+
+            int offset = lvalue - min;
+            if (offset >= 0 && offset < array.size()) array[offset] += ride->recIntSecs();
         }
-
-        // Polarized zones :- I(<0.85*CP), II (<CP and >0.85*CP), III (>CP)
-        if (series == RideFile::watts && zoneRange != -1 && CP) {
-            if (dp->value(series) < 1) // I zero watts
-                wattsCPTimeInZone[0] += ride->recIntSecs();
-            else if (dp->value(series) < (CP*0.85f)) // I
-                wattsCPTimeInZone[1] += ride->recIntSecs();
-            else if (dp->value(series) < CP) // II
-                wattsCPTimeInZone[2] += ride->recIntSecs();
-            else // III
-                wattsCPTimeInZone[3] += ride->recIntSecs();
-        }
-
-        // hr time in zone
-        if (series == RideFile::hr && hrZoneRange != -1) {
-            int index = context->athlete->hrZones()->whichZone(hrZoneRange, dp->value(series));
-            if (index >= 0) hrTimeInZone[index] += ride->recIntSecs();
-        }
-
-        // Polarized zones :- I(<0.9*LTHR), II (<LTHR and >0.9*LTHR), III (>LTHR)
-        if (series == RideFile::hr && hrZoneRange != -1 && LTHR) {
-            if (dp->value(series) < 1) // I zero
-                hrCPTimeInZone[0] += ride->recIntSecs();
-            else if (dp->value(series) < (LTHR*0.9f)) // I
-                hrCPTimeInZone[1] += ride->recIntSecs();
-            else if (dp->value(series) < LTHR) // II
-                hrCPTimeInZone[2] += ride->recIntSecs();
-            else // III
-                hrCPTimeInZone[3] += ride->recIntSecs();
-        }
-
-        // pace time in zone, only for running and swimming activities
-        if (series == RideFile::kph && paceZoneRange != -1 && (ride->isRun() || ride->isSwim())) {
-            int index = context->athlete->paceZones(ride->isSwim())->whichZone(paceZoneRange, dp->value(series));
-            if (index >= 0) paceTimeInZone[index] += ride->recIntSecs();
-        }
-
-        // Polarized zones Run:- I(<0.9*CV), II (<CV and >0.9*CV), III (>CV)
-        // Polarized zones Swim:- I(<0.975*CV), II (<CV and >0.975*CV), III (>CV)
-        if (series == RideFile::kph && paceZoneRange != -1 && CV && (ride->isRun() || ride->isSwim())) {
-            if (dp->value(series) < 0.1) // I zero
-                paceCPTimeInZone[0] += ride->recIntSecs();
-            else if (ride->isRun() && dp->value(series) < (CV*0.9f)) // I for run
-                paceCPTimeInZone[1] += ride->recIntSecs();
-            else if (ride->isSwim() && dp->value(series) < (CV*0.975f)) // I for swim
-                paceCPTimeInZone[1] += ride->recIntSecs();
-            else if (dp->value(series) < CV) // II
-                paceCPTimeInZone[2] += ride->recIntSecs();
-            else // III
-                paceCPTimeInZone[3] += ride->recIntSecs();
-        }
-
-        int offset = lvalue - min;
-        if (offset >= 0 && offset < array.size()) array[offset] += ride->recIntSecs();
     }
 }
 
@@ -1471,6 +1523,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
     wattsKgDistribution.resize(0);
     aPowerDistribution.resize(0);
     smo2Distribution.resize(0);
+    wbalDistribution.resize(0);
 
     // time in zone are fixed to 10 zone max
     wattsTimeInZone.resize(10);
@@ -1479,6 +1532,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
     hrCPTimeInZone.resize(4);
     paceTimeInZone.resize(10);
     paceCPTimeInZone.resize(4);
+    wbalTimeInZone.resize(4);
 
     // set cursor busy whilst we aggregate -- bit of feedback
     // and less intrusive than a popup box
@@ -1535,6 +1589,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
                 distAggregate(wattsKgDistributionDouble, rideCache.wattsKgDistributionDouble);
                 distAggregate(aPowerDistributionDouble, rideCache.aPowerDistributionDouble);
                 distAggregate(smo2DistributionDouble, rideCache.smo2DistributionDouble);
+                distAggregate(wbalDistributionDouble, rideCache.wbalDistributionDouble);
 
                 // cumulate timeinzones
                 for (int i=0; i<10; i++) {
@@ -1545,6 +1600,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
                         paceCPTimeInZone[i] += rideCache.paceCPTimeInZone[i];
                         hrCPTimeInZone[i] += rideCache.hrCPTimeInZone[i];
                         wattsCPTimeInZone[i] += rideCache.wattsCPTimeInZone[i];
+                        wbalTimeInZone[i] += rideCache.wbalTimeInZone[i];
                     }
                 }
             }
@@ -1616,6 +1672,7 @@ RideFileCache::serialize(QDataStream *out)
     head.version = RideFileCacheVersion;
     head.crc = crc;
     head.CP = CP;
+    head.WPRIME = WPRIME;
     head.LTHR = LTHR;
     head.CV = CV;
     head.WEIGHT = WEIGHT;
@@ -1646,6 +1703,7 @@ RideFileCache::serialize(QDataStream *out)
     head.wattsKgDistCount = wattsKgDistribution.size();
     head.aPowerDistCount = aPowerDistribution.size();
     head.smo2DistCount = smo2Distribution.size();
+    head.wbalDistCount = wbalDistribution.size();
 
     out->writeRawData((const char *) &head, sizeof(head));
 
@@ -1678,6 +1736,7 @@ RideFileCache::serialize(QDataStream *out)
     out->writeRawData((const char *) wattsKgDistribution.data(), sizeof(float) * wattsKgDistribution.size());
     out->writeRawData((const char *) aPowerDistribution.data(), sizeof(float) * aPowerDistribution.size());
     out->writeRawData((const char *) smo2Distribution.data(), sizeof(float) * smo2Distribution.size());
+    out->writeRawData((const char *) wbalDistribution.data(), sizeof(float) * wbalDistribution.size());
 
     // time in zone
     out->writeRawData((const char *) wattsTimeInZone.data(), sizeof(float) * wattsTimeInZone.size());
@@ -1686,6 +1745,7 @@ RideFileCache::serialize(QDataStream *out)
     out->writeRawData((const char *) hrCPTimeInZone.data(), sizeof(float) * hrCPTimeInZone.size());
     out->writeRawData((const char *) paceTimeInZone.data(), sizeof(float) * paceTimeInZone.size());
     out->writeRawData((const char *) paceCPTimeInZone.data(), sizeof(float) * paceCPTimeInZone.size());
+    out->writeRawData((const char *) wbalTimeInZone.data(), sizeof(float) * wbalTimeInZone.size());
 }
 
 void
@@ -1727,6 +1787,7 @@ RideFileCache::readCache()
         wattsKgDistribution.resize(head.wattsKgDistCount);
         aPowerDistribution.resize(head.aPowerDistCount);
         smo2Distribution.resize(head.smo2DistCount);
+        wbalDistribution.resize(head.wbalDistCount);
 
         // read in the arrays
         inFile.readRawData((char *) wattsMeanMax.data(), sizeof(float) * wattsMeanMax.size());
@@ -1758,6 +1819,7 @@ RideFileCache::readCache()
         inFile.readRawData((char *) wattsKgDistribution.data(), sizeof(float) * wattsKgDistribution.size());
         inFile.readRawData((char *) aPowerDistribution.data(), sizeof(float) * aPowerDistribution.size());
         inFile.readRawData((char *) smo2Distribution.data(), sizeof(float) * smo2Distribution.size());
+        inFile.readRawData((char *) wbalDistribution.data(), sizeof(float) * wbalDistribution.size());
 
         // time in zone
         inFile.readRawData((char *) wattsTimeInZone.data(), sizeof(float) * 10);
@@ -1766,6 +1828,7 @@ RideFileCache::readCache()
         inFile.readRawData((char *) hrCPTimeInZone.data(), sizeof(float) * 4);
         inFile.readRawData((char *) paceTimeInZone.data(), sizeof(float) * 10);
         inFile.readRawData((char *) paceCPTimeInZone.data(), sizeof(float) * 4);
+        inFile.readRawData((char *) wbalTimeInZone.data(), sizeof(float) * 4);
 
         // setup the doubles the users use
         doubleArray(wattsMeanMaxDouble, wattsMeanMax, RideFile::watts);
@@ -1795,6 +1858,7 @@ RideFileCache::readCache()
         doubleArrayForDistribution(wattsKgDistributionDouble, wattsKgDistribution);
         doubleArrayForDistribution(aPowerDistributionDouble, aPowerDistribution);
         doubleArrayForDistribution(smo2DistributionDouble, smo2Distribution);
+        doubleArrayForDistribution(wbalDistributionDouble, wbalDistribution);
 
         cacheFile.close();
     }

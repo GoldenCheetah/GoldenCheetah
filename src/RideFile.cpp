@@ -1086,6 +1086,7 @@ RideFile::setDataPresent(SeriesType series, bool value)
         case gear : dataPresent.gear = value; break;
         case interval : dataPresent.interval = value; break;
         case wprime : dataPresent.wprime = value; break;
+        case wbal : break; // not present
         default:
         case none : break;
     }
@@ -1389,6 +1390,7 @@ RideFile::decimalsFor(SeriesType series)
         case rcontact : return 1; break;
         case gear : return 2; break;
         case wprime : return 0; break;
+        case wbal : return 0; break;
         default:
         case none : break;
     }
@@ -1444,6 +1446,7 @@ RideFile::maximumFor(SeriesType series)
         case rcontact : return 1000; break;
         case gear : return 7; break; // 53x8
         case wprime : return 99999; break;
+        case wbal : return 100; break; // wbal is from 0% used to 100% used 
         default :
         case none : break;
     }
@@ -1499,6 +1502,7 @@ RideFile::minimumFor(SeriesType series)
         case rcontact : return 0; break;
         case gear : return 0; break;
         case wprime : return 0; break;
+        case wbal: return 0; break;
         default :
         case none : break;
     }
