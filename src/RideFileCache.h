@@ -41,7 +41,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 23;
+static const unsigned int RideFileCacheVersion = 24;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -66,6 +66,7 @@ static const unsigned int RideFileCacheVersion = 23;
 // 21       27-Nov-14    Added SmO2 distribution 
 // 22       02-Feb-15    Added weight to header
 // 23       14-Jun-15    Added W'bal TiZ and Distribution
+// 24       15-Jun-15    Fix percentify error on W'bal Distribution
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache

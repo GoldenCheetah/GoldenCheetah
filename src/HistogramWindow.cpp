@@ -28,10 +28,12 @@ static const double nmDelta    = 0.1;
 static const double hrDelta    = 1.0;
 static const double kphDelta   = 0.1;
 static const double cadDelta   = 1.0;
+static const double wbalDelta   = 1.0;
 static const double gearDelta  = 0.01; //RideFileCache creates POW(10) * decimals sections
 
 // digits for text entry validator
 static const int wattsDigits = 0;
+static const int wbalDigits = 0;
 static const int wattsKgDigits = 2;
 static const int nmDigits    = 1;
 static const int hrDigits    = 0;
@@ -844,7 +846,8 @@ void HistogramWindow::addSeries()
                << RideFile::nm
                << RideFile::aPower
                << RideFile::gear
-               << RideFile::smo2;
+               << RideFile::smo2
+               << RideFile::wbal;
 
     foreach (RideFile::SeriesType x, seriesList) 
         seriesCombo->addItem(RideFile::seriesName(x), static_cast<int>(x));
@@ -939,7 +942,7 @@ HistogramWindow::updateChart()
 
     // If no data present show the blank state page
     if (!rangemode) {
-        RideFile::SeriesType baseSeries = (series == RideFile::wattsKg) ? RideFile::watts : series;
+        RideFile::SeriesType baseSeries = (series == RideFile::wattsKg || series == RideFile::wbal) ? RideFile::watts : series;
         if (rideItem() != NULL && rideItem()->ride()->isDataPresent(baseSeries))
             setIsBlank(false);
         else
@@ -1098,6 +1101,7 @@ HistogramWindow::getDelta()
             case 5: return nmDelta;
             case 6: return wattsDelta; //aPower
             case 7: return gearDelta;
+            case 8: return wbalDelta;
             default: return 1;
         }
     }
@@ -1127,6 +1131,7 @@ HistogramWindow::getDigits()
             case  5: return nmDigits;
             case  6: return wattsDigits; // aPower
             case  7: return gearDigits;
+            case  8: return wbalDigits;
             default: return 1;
         }
     }
