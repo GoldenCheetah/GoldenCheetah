@@ -1533,7 +1533,7 @@ CPPlot::setRide(RideItem *rideItem)
     // first make sure the bests cache is up to date as we may need it
     // if plotting in percentage mode, so get data and plot it now
     // delete if sport changed
-    if (!rangemode && (rideItem->isRun != isRun || rideItem->isSwim != isSwim)) {
+    if (!rangemode) {
         setSport(rideItem->isRun, rideItem->isSwim);
         delete bestsCache;
         bestsCache = NULL;
