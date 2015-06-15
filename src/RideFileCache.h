@@ -203,6 +203,7 @@ class RideFileCache
         QVector<float> &hrCPZoneArray() { return hrCPTimeInZone; } // Polarized Zones
         QVector<float> &paceZoneArray() { return paceTimeInZone; }
         QVector<float> &paceCPZoneArray() { return paceCPTimeInZone; } // Polarized Zones
+        QVector<float> &wbalZoneArray() { return wbalTimeInZone; } // Polarized Zones
 
         QVector<float> &heatMeanMaxArray();  // will compute if neccessary
 

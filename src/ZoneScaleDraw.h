@@ -98,6 +98,30 @@ class PolarisedZoneScaleDraw: public QwtScaleDraw
         QList <QString> labels;
 };
 
+class WbalZoneScaleDraw: public QwtScaleDraw
+{
+    public:
+        WbalZoneScaleDraw() {
+            setTickLength(QwtScaleDiv::MajorTick, 3);
+
+            labels << "Recovered"; // translate tr macros !?
+            labels << "Moderate";
+            labels << "Heavy";
+            labels << "Severe";
+        }
+
+        // return label
+        virtual QwtText label(double v) const
+        {
+            int index = v;
+            if (index < 0 || index > labels.count()-1) return QString("");
+            return labels.at(index);
+        }
+
+    private:
+        QList <QString> labels;
+};
+
 class HrZoneScaleDraw: public QwtScaleDraw
 {
     public:

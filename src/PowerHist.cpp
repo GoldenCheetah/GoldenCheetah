@@ -440,10 +440,10 @@ PowerHist::recalcCompare()
                 arrayLength = cid.wattsZoneArray.size();
             }
 
-        } else if (series == RideFile::wbal && zoned == false) {
+        } else if (series == RideFile::wbal && zoned == true) {
 
-            array = &cid.wbalArray;
-            arrayLength = cid.wbalArray.size();
+            array = &cid.wbalZoneArray;
+            arrayLength = cid.wbalZoneArray.size();
 
         } else if (series == RideFile::aPower && zoned == false) {
 
@@ -675,26 +675,29 @@ PowerHist::recalcCompare()
             //
             // POWER ZONES
             //
-            if (cpzoned) {
+            if (series == RideFile::wattsKg || series == RideFile::watts) {
 
-                setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
-                setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
+                if (cpzoned) {
 
-            } else {
+                    setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
+                    setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
 
-                const Zones *zones = context->athlete->zones();
-                int zone_range = -1;
+                } else {
 
-                if (zones) {
-                    if (context->compareIntervals.count())
-                        zone_range = zones->whichRange(context->compareIntervals[0].data->startTime().date());
-                    if (zone_range == -1) zone_range = zones->whichRange(QDate::currentDate());
+                    const Zones *zones = context->athlete->zones();
+                    int zone_range = -1;
 
-                }
-                if (zones && zone_range != -1) {
-                    if ((series == RideFile::watts || series == RideFile::wattsKg)) {
-                        setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(zones, zone_range));
-                        setAxisScale(QwtPlot::xBottom, -0.99, zones->numZones(zone_range), 1);
+                    if (zones) {
+                        if (context->compareIntervals.count())
+                            zone_range = zones->whichRange(context->compareIntervals[0].data->startTime().date());
+                        if (zone_range == -1) zone_range = zones->whichRange(QDate::currentDate());
+
+                    }
+                    if (zones && zone_range != -1) {
+                        if ((series == RideFile::watts || series == RideFile::wattsKg)) {
+                            setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(zones, zone_range));
+                            setAxisScale(QwtPlot::xBottom, -0.99, zones->numZones(zone_range), 1);
+                        }
                     }
                 }
             }
@@ -743,6 +746,15 @@ PowerHist::recalcCompare()
                     }
                 }
 
+            }
+
+            //
+            // W'bal zones
+            //
+            if (!cpzoned && series == RideFile::wbal) {
+
+                setAxisScaleDraw(QwtPlot::xBottom, new WbalZoneScaleDraw());
+                setAxisScale(QwtPlot::xBottom, -0.99, 4, 1);
             }
 
             setAxisMaxMinor(QwtPlot::xBottom, 0);
@@ -986,6 +998,11 @@ PowerHist::recalc(bool force)
             }
         }
 
+        // w'bal zoned 
+        if (zoned && series == RideFile::wbal) { 
+            setAxisScaleDraw(QwtPlot::xBottom, new WbalZoneScaleDraw());
+            setAxisScale(QwtPlot::xBottom, -0.99, 4, 1);
+        }
         setAxisMaxMinor(QwtPlot::xBottom, 0);
     }
 
@@ -1023,6 +1040,12 @@ PowerHist::binData(HistData &standard, QVector<double>&x, // x-axis for data
         array = &standard.wbalArray;
         arrayLength = standard.wbalArray.size();
         selectedArray = &standard.wbalSelectedArray;
+
+    } else if (series == RideFile::wbal && zoned == true) {
+
+            array = &standard.wbalZoneArray;
+            arrayLength = standard.wbalZoneArray.size();
+            selectedArray = &standard.wbalZoneSelectedArray;
 
     } else if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned == true) {
         if (cpzoned) {
@@ -1299,6 +1322,7 @@ PowerHist::setData(RideFileCache *cache)
     standard.smo2Array.resize(0);
     standard.cadArray.resize(0);
     standard.wbalArray.resize(0);
+    standard.wbalZoneArray.resize(4);
 
     // we do not use the selected array since it is
     // not meaningful to overlay interval selection
@@ -1316,6 +1340,7 @@ PowerHist::setData(RideFileCache *cache)
     standard.smo2SelectedArray.resize(0);
     standard.cadSelectedArray.resize(0);
     standard.wbalSelectedArray.resize(0);
+    standard.wbalZoneSelectedArray.resize(0);
 
     longFromDouble(standard.wattsArray, cache->distributionArray(RideFile::watts));
     longFromDouble(standard.wattsKgArray, cache->distributionArray(RideFile::wattsKg));
@@ -1358,6 +1383,9 @@ PowerHist::setData(RideFileCache *cache)
     standard.wattsCPZoneArray[2] = cache->wattsCPZoneArray()[3];
     standard.hrCPZoneArray[2] = cache->hrCPZoneArray()[3];
     standard.paceCPZoneArray[2] = cache->paceCPZoneArray()[3];
+
+    // w'bal zones
+    for(int i=0; i<4; i++) standard.wbalZoneArray[i] = cache->wbalZoneArray()[i];
 
     curveSelected->hide();
     curveHover->hide();
@@ -1448,6 +1476,7 @@ PowerHist::setDataFromCompare()
         add.smo2Array.resize(0);
         add.cadArray.resize(0);
         add.wbalArray.resize(0);
+        add.wbalZoneArray.resize(4);
 
         longFromDouble(add.wattsArray, s->distributionArray(RideFile::watts));
         longFromDouble(add.wattsKgArray, s->distributionArray(RideFile::wattsKg));
@@ -1493,6 +1522,9 @@ PowerHist::setDataFromCompare()
         add.wattsCPZoneArray[2] = s->wattsCPZoneArray()[3];
         add.hrCPZoneArray[2] = s->hrCPZoneArray()[3];
         add.paceCPZoneArray[2] = s->paceCPZoneArray()[3];
+
+        // w'bal zones
+        for(int i=0; i<4; i++) add.wbalZoneArray[i] = s->wbalZoneArray()[i];
 
         // add to the list
         compareData << add;
@@ -1864,6 +1896,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     standard.smo2Array.resize(0);
     standard.cadArray.resize(0);
     standard.wbalArray.resize(0);
+    standard.wbalZoneArray.resize(0);
 
     standard.wattsSelectedArray.resize(0);
     standard.wattsZoneSelectedArray.resize(0);
@@ -1878,6 +1911,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     standard.smo2SelectedArray.resize(0);
     standard.cadSelectedArray.resize(0);
     standard.wbalSelectedArray.resize(0);
+    standard.wbalZoneSelectedArray.resize(0);
 
     // unit conversion factor for imperial units for selected parameters
     double torque_factor = (context->athlete->useMetricUnits ? 1.0 : 0.73756215);
@@ -1901,6 +1935,10 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
         // always do 0-100%
         standard.wbalArray.resize(101);
         standard.wbalSelectedArray.resize(101);
+
+        // fill with zeroes
+        standard.wbalZoneArray.resize(4);
+        standard.wbalZoneSelectedArray.resize(4);
 
         // t is time in seconds
         for(int t=0; t< ride->wprimeData()->ydata().count(); t++) {
@@ -1934,6 +1972,19 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
                     }
                     standard.wbalSelectedArray[wbalIndex]++;
                 }
+            }
+
+            // zones
+            if (percent < 25.0f) standard.wbalZoneArray[0] += ride->recIntSecs();
+            else if (percent < 50.0f) standard.wbalZoneArray[1] += ride->recIntSecs();
+            else if (percent < 75.0f) standard.wbalZoneArray[2] += ride->recIntSecs();
+            else if (percent >= 75.0f) standard.wbalZoneArray[3] += ride->recIntSecs();
+
+            if (selected) {
+                if (percent < 25.0f) standard.wbalZoneSelectedArray[0] += ride->recIntSecs();
+                else if (percent < 50.0f) standard.wbalZoneSelectedArray[1] += ride->recIntSecs();
+                else if (percent < 75.0f) standard.wbalZoneSelectedArray[2] += ride->recIntSecs();
+                else if (percent >= 75.0f) standard.wbalZoneSelectedArray[3] += ride->recIntSecs();
             }
         }
 
@@ -2440,8 +2491,10 @@ PowerHist::percentify(QVector<double> &array, double factor)
 bool
 PowerHist::isZoningEnabled()
 {
+    // zoning valid for power, w/kg, hr, wbal and also
+    // for speed (aka Pace; but only for swims and runs)
     return (zoned == true &&
-            (series == RideFile::watts || series == RideFile::wattsKg ||
-            series == RideFile::hr ||
+            (series == RideFile::watts || series == RideFile::wattsKg || 
+             series == RideFile::hr || series == RideFile::wbal ||
             (series == RideFile::kph && (!rideItem || rideItem->isRun || rideItem->isSwim))));
 }
