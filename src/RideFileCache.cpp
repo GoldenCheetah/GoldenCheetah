@@ -1353,12 +1353,12 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         foreach(int value, ride->wprimeData()->ydata()) {
 
             // percent is PERCENT OF W' USED
-            double percent = 100.0f - ((double (value) / WPRIME) * 100.0f);
+            int percent = 100.0f - ((double (value) / WPRIME) * 100.0f);
             if (percent < 0.0f) percent = 0.0f;
             if (percent > 100.0f) percent = 100.0f;
 
             // increment counts
-            array[(int)percent]++;
+            array[percent]++;
             count++;
 
             // and zones in 1s increments
