@@ -103,14 +103,14 @@ class HistData // each curve needs a lot of data (!? this may need refactoring, 
     public:
 
         // storage for data counts
-        QVector<unsigned int> aPowerArray, wattsArray, wattsZoneArray,
+        QVector<unsigned int> aPowerArray, wattsArray, wbalArray, wattsZoneArray,
                               wattsCPZoneArray, wattsKgArray, nmArray,
                               hrArray, hrZoneArray, hrCPZoneArray,
                               kphArray, paceZoneArray, paceCPZoneArray,
                               cadArray, gearArray, smo2Array, metricArray;
 
         // storage for data counts in interval selected
-        QVector<unsigned int> aPowerSelectedArray, wattsSelectedArray,
+        QVector<unsigned int> aPowerSelectedArray, wattsSelectedArray, wbalSelectedArray,
                               wattsZoneSelectedArray, wattsCPZoneSelectedArray,
                               wattsKgSelectedArray, nmSelectedArray,
                               hrSelectedArray, hrZoneSelectedArray, hrCPZoneSelectedArray,
@@ -204,6 +204,7 @@ class PowerHist : public QwtPlot
         void refreshPaceZoneLabels();
         void setParameterAxisTitle();
         bool isSelected(const RideFilePoint *p, double);
+        bool isSelected(const double t, double sample);
         void percentify(QVector<double> &, double factor); // and a function to convert
 
         bool shadeZones() const; // check if zone shading is both wanted and possible

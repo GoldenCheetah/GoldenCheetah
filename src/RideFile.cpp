@@ -213,6 +213,7 @@ RideFile::seriesName(SeriesType series)
     case RideFile::rcad: return QString(tr("Run Cadence"));
     case RideFile::rcontact: return QString(tr("GCT"));
     case RideFile::gear: return QString(tr("Gear Ratio"));
+    case RideFile::wbal: return QString(tr("W' Consumed"));
     default: return QString(tr("Unknown"));
     }
 }

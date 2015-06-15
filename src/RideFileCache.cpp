@@ -1368,9 +1368,6 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
             else wbalTimeInZone[3]++;
         }
 
-        // turn array into percents (TiZ stays in seconds)
-        for(int i=0; i<100; i++) array[i] = array[i] / double(count) * 100.0f;
-
     } else {
 
         foreach(RideFilePoint *dp, ride->dataPoints()) {
