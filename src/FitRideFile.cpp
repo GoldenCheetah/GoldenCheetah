@@ -106,7 +106,7 @@ struct FitFileReaderState
     int manufacturer;
     int product;
 
-    FitFileReaderState(QFile &file, QStringList &errors, QList<RideFile*> *rides) :
+    FitFileReaderState(QFile &file, QStringList &errors, QList<RideFile*> *rides=NULL) :
         file(file), errors(errors), rideFile(NULL), rides(rides),
         start_time(0),
         last_time(0), last_distance(0.00f), interval(0), calibration(0), devices(0), stopped(true),
@@ -1083,10 +1083,9 @@ struct FitFileReaderState
 
             file.close();
 
-            if (rides) 
+            if (rides && rides->count()) 
             {
-                // All our sessions are in the rides list, this one is not
-                // needed.
+                // All our sessions are in the rides list, this one is not needed.
                 delete rideFile;
                 
                 return rides->first();
