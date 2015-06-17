@@ -62,6 +62,7 @@ class AerobicDecoupling : public RideMetric {
                  const QHash<QString,RideMetric*> &,
                  const Context *) {
         double firstHalfPower = 0.0, secondHalfPower = 0.0;
+        double firstHalfSpeed = 0.0, secondHalfSpeed = 0.0;
         double firstHalfHR = 0.0, secondHalfHR = 0.0;
         int halfway = ride->dataPoints().size() / 2;
         int count = 0;
@@ -72,6 +73,7 @@ class AerobicDecoupling : public RideMetric {
             if (count++ < halfway) {
                 if (point->hr > 0) {
                     firstHalfPower += point->watts;
+                    firstHalfSpeed += point->kph;
                     firstHalfHR += point->hr;
                     ++firstHalfCount;
                 }
@@ -79,14 +81,18 @@ class AerobicDecoupling : public RideMetric {
             else {
                 if (point->hr > 0) {
                     secondHalfPower += point->watts;
+                    secondHalfSpeed += point->kph;
                     secondHalfHR += point->hr;
                     ++secondHalfCount;
                 }
             }
         }
-        if ((firstHalfPower > 0) && (secondHalfPower > 0)) {
+        if (((firstHalfPower > 0) && (secondHalfPower > 0)) ||
+            (ride->isRun() && (firstHalfSpeed > 0) && (secondHalfSpeed > 0))) {
             firstHalfPower /= firstHalfCount;
+            firstHalfSpeed /= firstHalfCount;
             secondHalfPower /= secondHalfCount;
+            secondHalfSpeed /= secondHalfCount;
             firstHalfHR /= firstHalfCount;
             secondHalfHR /= secondHalfCount;
 
@@ -97,12 +103,16 @@ class AerobicDecoupling : public RideMetric {
             // should be :
             double firstHalfRatio = firstHalfPower / firstHalfHR;
             double secondHalfRatio = secondHalfPower / secondHalfHR;
+            if (ride->isRun()) {
+                firstHalfRatio = firstHalfSpeed / firstHalfHR;
+                secondHalfRatio = secondHalfSpeed / secondHalfHR;
+            }
             percent = 100.0 * (firstHalfRatio - secondHalfRatio) / firstHalfRatio;
         }
         setValue(percent);
     }
 
-    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("H") && ride->present.contains("P"); }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("H") && (ride->present.contains("P") || (ride->isRun && ride->present.contains("S"))); }
 
     RideMetric *clone() const { return new AerobicDecoupling(*this); }
 };
