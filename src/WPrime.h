@@ -70,6 +70,12 @@ class WPrime {
 
         int minForCP(int CP);
 
+        // zoning with supplied values to avoid using a new Zones type config
+        static QString summarize(int WPRIME, QVector<double> wtiz, QColor color);
+        static int zoneCount() { return 4; }
+        static QString zoneName(int i);
+        static QString zoneDesc(int i);
+
     private:
 
         RideFile *rideFile;          // the ride file we worked on

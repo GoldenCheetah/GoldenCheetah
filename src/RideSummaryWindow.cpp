@@ -23,6 +23,7 @@
 #include "RideFile.h"
 #include "RideCache.h"
 #include "RideItem.h"
+#include "WPrime.h"
 #include "IntervalItem.h"
 #include "RideMetric.h"
 #include "PMCData.h"
@@ -513,6 +514,12 @@ RideSummaryWindow::htmlSummary()
         << "time_in_zone_H7"
         << "time_in_zone_H8";
 
+    static const QStringList timeInZonesWBAL = QStringList()
+        << "wtime_in_zone_L1"
+        << "wtime_in_zone_L2"
+        << "wtime_in_zone_L3"
+        << "wtime_in_zone_L4";
+
     // Use pre-computed and saved metric values if the ride has not
     // been edited. Otherwise we need to re-compute every time.
     // this is only for ride summary, when showing for a date range
@@ -835,8 +842,7 @@ RideSummaryWindow::htmlSummary()
     int numzones = 0;
     int range = -1;
 
-    if (ridesummary && rideItem && rideItem->ride() &&
-        (rideItem->ride()->isRun() || rideItem->ride()->isSwim())) {
+    if (ridesummary && rideItem && rideItem->ride() && (rideItem->ride()->isRun() || rideItem->ride()->isSwim())) {
 
         if (context->athlete->paceZones(rideItem->ride()->isSwim())) {
 
@@ -881,7 +887,10 @@ RideSummaryWindow::htmlSummary()
 
         }
 
+        // now we've monketed around with zone crap, lets display
         if (range > -1 && numzones > 0) {
+
+            // Power Zones
             QVector<double> time_in_zone(numzones);
             for (int i = 0; i < numzones; ++i) {
 
@@ -891,6 +900,18 @@ RideSummaryWindow::htmlSummary()
             }
             summary += tr("<h3>Power Zones</h3>");
             summary += context->athlete->zones()->summarize(range, time_in_zone, altColor); //aggregating
+
+            // W'bal Zones
+            int WPRIME = context->athlete->zones()->getWprime(range);
+            QVector<double> wtime_in_zone(4);
+            for (int i = 0; i < timeInZonesWBAL.count(); ++i) {
+
+                // if using metrics or data
+                if (ridesummary) wtime_in_zone[i] = rideItem->getForSymbol(timeInZonesWBAL[i]);
+                else wtime_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZonesWBAL[i], specification, useMetricUnits, true).toDouble();
+            }
+            summary += tr("<h3>W'bal Zones</h3>");
+            summary += WPrime::summarize(WPRIME, wtime_in_zone, altColor);
         }
     }
 
@@ -1544,6 +1565,12 @@ RideSummaryWindow::htmlCompareSummary() const
         << "time_in_zone_H7"
         << "time_in_zone_H8";
 
+    static const QStringList timeInZonesWBAL = QStringList()
+        << "wtime_in_zone_L1"
+        << "wtime_in_zone_L2"
+        << "wtime_in_zone_L3"
+        << "wtime_in_zone_L4";
+
     if (ridesummary) {
 
         //
@@ -1700,7 +1727,7 @@ RideSummaryWindow::htmlCompareSummary() const
         }
 
         //
-        // TIME IN POWER ZONES
+        // TIME IN POWER ZONES (we can't do w'bal compare at present)
         //
         if (context->athlete->zones()) { // use my zones
 
@@ -1768,6 +1795,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                 // done
                 summary += "</table>";
+
             }
         }
 
@@ -1968,7 +1996,7 @@ RideSummaryWindow::htmlCompareSummary() const
         }
 
         //
-        // TIME IN POWER ZONES
+        // TIME IN POWER ZONES AND W'BAL ZONES
         //
         if (context->athlete->zones()) { // use my zones
 
@@ -2015,6 +2043,63 @@ RideSummaryWindow::htmlCompareSummary() const
                                                                                  context->athlete->useMetricUnits, true).toDouble();
 
                         int dt = timeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZones[idx],
+                                                                        context->compareDateRanges[0].specification,
+                                                                        context->athlete->useMetricUnits, true).toDouble();
+
+                        idx++;
+
+                        // time and then +time
+                        summary += QString("<td align=\"center\">%1</td>").arg(time_to_string(timeZone));
+
+                        if (counter) summary += QString("<td align=\"center\">%1%2</td>")
+                                                .arg(dt>0 ? "+" : "-")
+                                                .arg(time_to_string(fabs(dt)));
+
+                        else summary += "<td></td>";
+                        summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
+
+                    }
+                    summary += "</tr>";
+                    counter++;
+                }
+
+                // done
+                summary += "</table>";
+
+                // now do same for W'bal zones
+                summary += tr("<h3>W'bal Zones</h3>");
+                summary += "<table align=\"center\" width=\"80%\" border=\"0\">";
+
+                // lets get some headings
+                summary += "<tr><td></td>"; // ne need to have a heading for the interval name
+                summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
+
+                for (int i=0; i<WPrime::zoneCount(); i++) {
+                    summary += QString("<td colspan=\"2\" align=\"center\"><b>%1 (%2)</b></td>").arg(WPrime::zoneDesc(i)).arg(WPrime::zoneName(i));
+                    summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
+                }
+                summary += "</tr>";
+
+                // now the summary
+                counter = 0;
+                foreach (CompareDateRange dr, context->compareDateRanges) {
+
+                    // skip if not checked
+                    if (!dr.isChecked()) continue;
+
+                    if (counter%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
+                    else summary += "<tr>";
+
+                    summary += "<td>" + dr.name + "</td>";
+                    summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
+
+                    int idx=0;
+                    for (int i=0; i<WPrime::zoneCount(); i++) {
+
+                        int timeZone = dr.context->athlete->rideCache->getAggregate(timeInZonesWBAL[idx], dr.specification,
+                                                                                 context->athlete->useMetricUnits, true).toDouble();
+
+                        int dt = timeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZonesWBAL[idx],
                                                                         context->compareDateRanges[0].specification,
                                                                         context->athlete->useMetricUnits, true).toDouble();
 

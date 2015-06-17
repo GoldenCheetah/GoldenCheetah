@@ -60,6 +60,25 @@ const double E = 2.71828183;
 const int WprimeMatchSmoothing = 25; // 25 sec smoothing looking for matches
 const int WprimeMatchMinJoules = 100; 
 
+// used by summarise
+static struct WPRIMEZONES {
+
+    int lo, hi;
+    QString name, desc;
+
+} wbal_zones[] = {
+
+    { 0, 25, "W1", "Recovered" },
+    { 25, 50, "W2", "Moderate Fatigue" },
+    { 50, 75, "W3", "Heavy Fatigue" },
+    { 75, 100, "W4", "Severe Fatigue" }
+
+};
+
+QString WPrime::zoneName(int i) { return wbal_zones[i].name; }
+QString WPrime::zoneDesc(int i) { return wbal_zones[i].desc; }
+
+
 WPrime::WPrime()
 {
     // XXX will need to reset metrics when they are added
@@ -527,6 +546,65 @@ WPrimeIntegrator::run()
         I += exp(((double)(t) / TAU)) * source[t];
         output[t] = exp(-((double)(t) / TAU)) * I;
     }
+}
+
+//
+// HTML zone summary
+//
+QString
+WPrime::summarize(int WPRIME, QVector<double> wtiz, QColor color)
+{
+    // if wtiz is not 4 big return empty
+    if (wtiz.count() != 4) return "";
+
+    // otherwise lets go
+    QString summary;
+
+    // W' used for summary
+    summary += "<table align=\"center\" width=\"70%\" border=\"0\">";
+    summary += "<tr><td align=\"center\">";
+    summary += QString(QT_TR_NOOP("W' (Joules): %1")).arg(WPRIME);
+    summary += "</td></tr></table>";
+
+    // Heading
+    summary += "<table align=\"center\" width=\"70%\" ";
+    summary += "border=\"0\">";
+    summary += "<tr>";
+    summary += QT_TR_NOOP("<td align=\"center\">Zone</td>");
+    summary += QT_TR_NOOP("<td align=\"center\">Description</td>");
+    summary += QT_TR_NOOP("<td align=\"center\">High (kJ)</td>");
+    summary += QT_TR_NOOP("<td align=\"center\">Low (kJ)</td>");
+    summary += QT_TR_NOOP("<td align=\"center\">Time</td>");
+    summary += QT_TR_NOOP("<td align=\"center\">%</td>");
+    summary += "</tr>";
+
+    // calc totals to use for percentages
+    double duration = 0;
+    foreach(double v, wtiz) {
+        duration += v;
+    }
+
+    for (int zone = 0; zone < 4; zone++) {
+
+        // alternating rows
+        if (zone % 2 == 0) summary += "<tr bgcolor='" + color.name() + "'>";
+        else summary += "<tr>"; 
+
+        // basics
+        summary += QString("<td align=\"center\">%1</td>").arg(wbal_zones[zone].name);
+        summary += QString("<td align=\"center\">%1</td>").arg(wbal_zones[zone].desc);
+        summary += QString("<td align=\"center\">%1</td>").arg(WPRIME - (WPRIME / 100.0f * wbal_zones[zone].lo), 0, 'f', 0);
+
+        if (zone == 3)
+            summary += "<td align=\"center\">MIN</td>";
+        else
+            summary += QString("<td align=\"center\">%1</td>").arg(WPRIME - (WPRIME / 100.0f * wbal_zones[zone].hi), 0, 'f', 0); 
+        summary += QString("<td align=\"center\">%1</td>").arg(time_to_string((unsigned) round(wtiz[zone])));
+        summary += QString("<td align=\"center\">%1</td>").arg((double)wtiz[zone]/duration * 100, 0, 'f', 0);
+        summary += "</tr>";
+    }
+    summary += "</table>";
+    return summary;
 }
 
 //
