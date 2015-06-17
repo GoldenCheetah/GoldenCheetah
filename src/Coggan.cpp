@@ -19,6 +19,7 @@
 #include "RideMetric.h"
 #include "RideItem.h"
 #include "Zones.h"
+#include "Units.h"
 #include <cmath>
 #include <QApplication>
 
@@ -252,6 +253,7 @@ class TSSPerHour : public RideMetric {
     RideMetric *clone() const { return new TSSPerHour(*this); }
 };
 
+/* Running update based on: http://www.joefrielsblog.com/2014/11/the-efficiency-factor-in-running.html */
 class EfficiencyFactor : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(EfficiencyFactor)
     double ef;
@@ -271,21 +273,29 @@ class EfficiencyFactor : public RideMetric {
         setPrecision(3);
     }
 
-    void compute(const RideFile *, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
                  const Context *) {
         assert(deps.contains("coggan_np"));
+        assert(deps.contains("xPace"));
         assert(deps.contains("average_hr"));
-        NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
-        assert(np);
+        if (ride->isRun()) {
+            RideMetric *xPace = dynamic_cast<RideMetric*>(deps.value("xPace"));
+            assert(xPace);
+            ef = xPace->value(true) > 0 ? ((1000.0/METERS_PER_YARD) / xPace->value(true)) : 0.0;
+        } else {
+            NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
+            assert(np);
+            ef = np->value(true);
+        }
         RideMetric *ah = dynamic_cast<RideMetric*>(deps.value("average_hr"));
         assert(ah);
-        ef = np->value(true) / ah->value(true);
+        ef = ah->value(true) > 0 ? ef / ah->value(true) : 0.0;
 
         setValue(ef);
     }
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("H") && (ride->present.contains("P") || (ride->isRun && ride->present.contains("S"))); }
     RideMetric *clone() const { return new EfficiencyFactor(*this); }
 };
 
@@ -302,6 +312,7 @@ static bool addAllCoggan() {
     RideMetricFactory::instance().addMetric(VI(), &deps);
     deps.clear();
     deps.append("coggan_np");
+    deps.append("xPace");
     deps.append("average_hr");
     RideMetricFactory::instance().addMetric(EfficiencyFactor(), &deps);
     deps.clear();
