@@ -76,6 +76,7 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int showSlope READ isShowSlope WRITE setShowSlope USER true)
     Q_PROPERTY(int showAltSlope READ isShowAltSlope WRITE setShowAltSlope USER true)
     Q_PROPERTY(int showHr READ isShowHr WRITE setShowHr USER true)
+    Q_PROPERTY(int showTcore READ isShowTcore WRITE setShowTcore USER true)
     Q_PROPERTY(int showCadD READ isShowCadD WRITE setShowCadD USER true)
     Q_PROPERTY(int showTorqueD READ isShowTorqueD WRITE setShowTorqueD USER true)
     Q_PROPERTY(int showPowerD READ isShowPowerD WRITE setShowPowerD USER true)
@@ -140,6 +141,7 @@ class AllPlotWindow : public GcChartWindow
         int isShowCad() const { return showCad->checkState(); }
         int isShowTorque() const { return showTorque->checkState(); }
         int isShowHr() const { return showHr->checkState(); }
+        int isShowTcore() const { return showTcore->checkState(); }
         int isShowPowerD() const { return showPowerD->checkState(); }
         int isShowCadD() const { return showCadD->checkState(); }
         int isShowTorqueD() const { return showTorqueD->checkState(); }
@@ -198,6 +200,7 @@ class AllPlotWindow : public GcChartWindow
         void setShowCad(int state);
         void setShowTorque(int state);
         void setShowHr(int state);
+        void setShowTcore(int state);
         void setShowPowerD(int state);
         void setShowCadD(int state);
         void setShowTorqueD(int state);
@@ -317,6 +320,7 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showCad;
         QCheckBox *showTorque;
         QCheckBox *showHr;
+        QCheckBox *showTcore;
         QCheckBox *showPowerD;
         QCheckBox *showCadD;
         QCheckBox *showTorqueD;

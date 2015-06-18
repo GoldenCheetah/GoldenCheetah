@@ -106,6 +106,7 @@ FitlogParser::startElement( const QString&, const QString&,
                               0.0, 0.0, 0.0, 0.0,
                               0.0, 0.0,
                               0.0, 0.0, 0.0,// running dynamics
+                              0.0, //tcore
                               point.interval);
     }
     return true;

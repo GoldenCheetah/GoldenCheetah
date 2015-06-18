@@ -283,6 +283,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showHr->setCheckState(Qt::Checked);
     seriesLeft->addRow(new QLabel(tr("Data series")), showHr);
 
+    showTcore = new QCheckBox(tr("Core Temperature"), this);
+    showTcore->setCheckState(Qt::Unchecked); // don't show unless user insists
+    seriesLeft->addRow(new QLabel(tr("")), showTcore);
+
     showSpeed = new QCheckBox(tr("Speed"), this);
     showSpeed->setCheckState(Qt::Checked);
     seriesLeft->addRow(new QLabel(""), showSpeed);
@@ -678,6 +682,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showCad, SIGNAL(stateChanged(int)), this, SLOT(setShowCad(int)));
     connect(showTorque, SIGNAL(stateChanged(int)), this, SLOT(setShowTorque(int)));
     connect(showHr, SIGNAL(stateChanged(int)), this, SLOT(setShowHr(int)));
+    connect(showTcore, SIGNAL(stateChanged(int)), this, SLOT(setShowTcore(int)));
     connect(showPowerD, SIGNAL(stateChanged(int)), this, SLOT(setShowPowerD(int)));
     connect(showCadD, SIGNAL(stateChanged(int)), this, SLOT(setShowCadD(int)));
     connect(showTorqueD, SIGNAL(stateChanged(int)), this, SLOT(setShowTorqueD(int)));
@@ -1051,6 +1056,7 @@ AllPlotWindow::compareChanged()
         if (showW->isChecked()) { s.one = RideFile::wprime; s.two = RideFile::none; wanted << s;};
         if (showPowerD->isChecked()) { s.one = RideFile::wattsd; s.two = RideFile::none; wanted << s;};
         if (showHr->isChecked()) { s.one = RideFile::hr; s.two = RideFile::none; wanted << s;};
+        if (showTcore->isChecked()) { s.one = RideFile::tcore; s.two = RideFile::none; wanted << s;};
         if (showHrD->isChecked()) { s.one = RideFile::hrd; s.two = RideFile::none; wanted << s;};
         if (showSpeed->isChecked()) { s.one = RideFile::kph; s.two = RideFile::none; wanted << s;};
         if (showAccel->isChecked()) { s.one = RideFile::kphd; s.two = RideFile::none; wanted << s;};
@@ -1690,6 +1696,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 	        showCad->setEnabled(dataPresent->cad);
             showTorque->setEnabled(dataPresent->nm);
 	        showHr->setEnabled(dataPresent->hr);
+	        showTcore->setEnabled(dataPresent->hr);
 	        showSpeed->setEnabled(dataPresent->kph);
 	        showAccel->setEnabled(dataPresent->kph);
 	        showAlt->setEnabled(dataPresent->alt);
@@ -1706,6 +1713,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 	        showHrD->setEnabled(false);
             showPower->setEnabled(false);
             showHr->setEnabled(false);
+            showTcore->setEnabled(false);
             showSpeed->setEnabled(false);
             showCad->setEnabled(false);
             showAlt->setEnabled(false);
@@ -2131,6 +2139,25 @@ AllPlotWindow::setShowHr(int value)
     allPlot->setShowHr(checked);
     foreach (AllPlot *plot, allPlots)
         plot->setShowHr(checked);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+}
+
+void
+AllPlotWindow::setShowTcore(int value)
+{
+    showTcore->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = ( ( value == Qt::Checked ) && showTcore->isEnabled()) ? true : false;
+    allPlot->setShowTcore(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowTcore(checked);
     // and the series stacks too
     forceSetupSeriesStackPlots(); // scope changed so force redraw
 }
@@ -3226,6 +3253,7 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showW->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::wprime; s.two = RideFile::none; serieslist << s; }
     if (showPowerD->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::wattsd;s.two = RideFile::none; serieslist << s; }
     if (showHr->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::hr; s.two = RideFile::none; serieslist << s; }
+    if (showTcore->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::tcore; s.two = RideFile::none; serieslist << s; }
     if (showHrD->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::hrd; s.two = RideFile::none; serieslist << s; }
     if (showSmO2->isChecked() && rideItem->ride()->areDataPresent()->smo2) { s.one = RideFile::smo2; s.two = RideFile::none; serieslist << s; }
     if (showtHb->isChecked() && rideItem->ride()->areDataPresent()->thb) { s.one = RideFile::thb; s.two = RideFile::none; serieslist << s; }
@@ -3428,6 +3456,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setShadeZones(showPower->currentIndex() == 0);
         _allPlot->setShowPower(showPower->currentIndex());
         _allPlot->setShowHr( (showHr->isEnabled()) ? ( showHr->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowTcore( (showTcore->isEnabled()) ? ( showTcore->checkState() == Qt::Checked ) : false );
         _allPlot->setShowSpeed((showSpeed->isEnabled()) ? ( showSpeed->checkState() == Qt::Checked ) : false );
         _allPlot->setShowAccel((showAccel->isEnabled()) ? ( showAccel->checkState() == Qt::Checked ) : false );
         _allPlot->setShowPowerD((showPowerD->isEnabled()) ? ( showPowerD->checkState() == Qt::Checked ) : false );

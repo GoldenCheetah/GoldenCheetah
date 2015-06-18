@@ -771,6 +771,8 @@ void RideFile::updateMin(RideFilePoint* point)
        minPoint->rcontact = point->rcontact;
     if (minPoint->gear == 0 || point->gear<minPoint->gear)
        minPoint->gear = point->gear;
+    if (minPoint->tcore == 0 || point->tcore<minPoint->tcore)
+       minPoint->tcore = point->tcore;
 }
 
 void RideFile::updateMax(RideFilePoint* point)
@@ -848,6 +850,8 @@ void RideFile::updateMax(RideFilePoint* point)
        maxPoint->rcontact = point->rcontact;
     if (point->gear>maxPoint->gear)
        maxPoint->gear = point->gear;
+    if (point->tcore>maxPoint->tcore)
+       maxPoint->tcore = point->tcore;
 }
 
 void RideFile::updateAvg(RideFilePoint* point)
@@ -888,6 +892,7 @@ void RideFile::updateAvg(RideFilePoint* point)
     totalPoint->rcad += point->rcad;
     totalPoint->rcontact += point->rcontact;
     totalPoint->gear += point->gear;
+    totalPoint->tcore += point->tcore;
 
     ++totalCount;
     if (point->temp != NoTemp) ++totalTemp;
@@ -929,6 +934,7 @@ void RideFile::updateAvg(RideFilePoint* point)
     avgPoint->rcad = totalPoint->rcad/totalCount;
     avgPoint->rcontact = totalPoint->rcontact/totalCount;
     avgPoint->gear = totalPoint->gear/totalCount;
+    avgPoint->tcore = totalPoint->tcore/totalCount;
 }
 
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
@@ -940,7 +946,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
                            double lppb, double rppb, double lppe, double rppe,
                            double lpppb, double rpppb, double lpppe, double rpppe,
                            double smo2, double thb,
-                           double rvert, double rcad, double rcontact,
+                           double rvert, double rcad, double rcontact, double tcore,
                            int interval)
 {
     // negative values are not good, make them zero
@@ -970,6 +976,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     if (!std::isfinite(rvert) || rvert<0) rvert=0;
     if (!std::isfinite(rcad) || rcad<0) rcad=0;
     if (!std::isfinite(rcontact) || rcontact<0) rcontact=0;
+    if (!std::isfinite(tcore) || tcore<0) tcore=0;
 
     // if bad time or distance ignore it if NOT the first sample
     if (dataPoints_.count() != 0 && secs == 0.00f && km == 0.00f) return;
@@ -987,7 +994,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
                                              lppb, rppb, lppe, rppe,
                                              lpppb, rpppb, lpppe, rpppe,
                                              smo2, thb,
-                                             rvert, rcad, rcontact,
+                                             rvert, rcad, rcontact, tcore,
                                              interval);
     dataPoints_.append(point);
 
@@ -1024,6 +1031,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.rvert    |= (rvert != 0);
     dataPresent.rcad     |= (rcad != 0);
     dataPresent.rcontact |= (rcontact != 0);
+    dataPresent.tcore    |= (tcore != 0);
     dataPresent.interval |= (interval != 0);
 
     updateMin(point);
@@ -1041,7 +1049,7 @@ void RideFile::appendPoint(const RideFilePoint &point)
                 point.lppb, point.rppb, point.lppe, point.rppe,
                 point.lpppb, point.rpppb, point.lpppe, point.rpppe,
                 point.smo2, point.thb,
-                point.rvert, point.rcad, point.rcontact,
+                point.rvert, point.rcad, point.rcontact, point.tcore,
                 point.interval);
 }
 
@@ -1087,6 +1095,7 @@ RideFile::setDataPresent(SeriesType series, bool value)
         case gear : dataPresent.gear = value; break;
         case interval : dataPresent.interval = value; break;
         case wprime : dataPresent.wprime = value; break;
+        case tcore : dataPresent.tcore = value; break;
         case wbal : break; // not present
         default:
         case none : break;
@@ -1137,6 +1146,7 @@ RideFile::isDataPresent(SeriesType series)
         case rcontact : return dataPresent.rcontact; break;
         case gear : return dataPresent.gear; break;
         case interval : return dataPresent.interval; break;
+        case tcore : return dataPresent.tcore; break;
         default:
         case none : return false; break;
     }
@@ -1182,6 +1192,7 @@ RideFile::setPointValue(int index, SeriesType series, double value)
         case rvert : dataPoints_[index]->rvert = value; break;
         case rcontact : dataPoints_[index]->rcontact = value; break;
         case interval : dataPoints_[index]->interval = value; break;
+        case tcore : dataPoints_[index]->tcore = value; break;
         default:
         case none : break;
     }
@@ -1238,6 +1249,7 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::aPower : return apower; break;
         case RideFile::aTISS : return atiss; break;
         case RideFile::anTISS : return antiss; break;
+        case RideFile::tcore : return tcore; break;
 
         default:
         case RideFile::none : break;
@@ -1296,6 +1308,7 @@ RideFilePoint::setValue(RideFile::SeriesType series, double value)
         case RideFile::aPower : apower = value; break;
         case RideFile::aTISS : atiss = value; break;
         case RideFile::anTISS : antiss = value; break;
+        case RideFile::tcore : tcore = value; break;
 
         default:
         case RideFile::none : break;
@@ -1392,6 +1405,7 @@ RideFile::decimalsFor(SeriesType series)
         case gear : return 2; break;
         case wprime : return 0; break;
         case wbal : return 0; break;
+        case tcore : return 2; break;
         default:
         case none : break;
     }
@@ -1448,6 +1462,7 @@ RideFile::maximumFor(SeriesType series)
         case gear : return 7; break; // 53x8
         case wprime : return 99999; break;
         case wbal : return 100; break; // wbal is from 0% used to 100% used 
+        case tcore : return 40; break; // anything about 40C is mad
         default :
         case none : break;
     }
@@ -1504,6 +1519,7 @@ RideFile::minimumFor(SeriesType series)
         case gear : return 0; break;
         case wprime : return 0; break;
         case wbal: return 0; break;
+        case tcore: return 36; break; // min 36C in humans
         default :
         case none : break;
     }
@@ -1570,7 +1586,7 @@ void RideFile::appendReference(const RideFilePoint &point)
                                               point.lppb, point.rppb, point.lppe, point.rppe,
                                               point.lpppb, point.rpppb, point.lpppe, point.rpppe,
                                               point.smo2, point.thb,
-                                              point.rvert, point.rcad, point.rcontact,
+                                              point.rvert, point.rcad, point.rcontact, point.tcore,
                                               point.interval));
 }
 
@@ -1614,12 +1630,34 @@ RideFile::arePresent()
 }
 
 //
-// Calculate derived data series, including a new metric aPower
+// Calculate derived data series
+
+// (1) aPower
+//
 // aPower is based upon the models and research presented in
 // "Altitude training and Athletic Performance" by Randall L. Wilber
 // and Peronnet et al. (1991): Peronnet, F., G. Thibault, and D.L. Cousineau 1991.
 // "A theoretical analisys of the effect of altitude on running
 // performance." Journal of Applied Physiology 70:399-404
+//
+
+//
+// (2) Core Body Temperature
+//
+// Tcore, the core body temperature estimate is based upon the models
+// and research presented in "Estimation of human core temperature from 
+// sequential heart rate observations" Mark J Buller, William J Tharion,
+// Samuel N Cheuvront, Scott J Montain, Robert W Kenefick, John 
+// Castellani, William A Latzka, Warren S Roberts, Mark Richter,
+// Odest Chadwicke Jenkins and Reed W Hoyt. (2013). Physiological 
+// Measurement. IOP Publishing 34 (2013) 781–798.
+//
+
+// Other derived series are calculated from well-known algorithms;
+//          * Gear ratio
+//          * Hill Slope
+//          * xPower (Skiba)
+//          * Normalized Power (Coggan)
 //
 
 void
@@ -1958,6 +1996,150 @@ RideFile::recalculateDerivedSeries(bool force)
             rtot += dataPoints_[i-smoothPoints]->slope;
         }
         setDataPresent(RideFile::slope, true);
+    }
+
+    //
+    // Core Temperature
+    //
+
+    // since we are dealing in minutes we need to resample down to minutes
+    // then upsample back to recIntSecs in-situ i.e we will use the p->Tcore
+    // value to hold the rolling 60second values (where they are non-zero)
+    // run through and calculate each value and then backfill for the seconds
+    // in between
+
+    // we need HR data for this
+    if (dataPresent.hr) {
+
+        // resample the data into 60s samples
+        static const int SAMPLERATE=60000; // milliseconds in a minute
+        QVector<double> hrArray;
+        int lastT=0;
+        RideFilePoint sample;
+
+        foreach(RideFilePoint *p, dataPoints_) {
+
+            // whats the dt in microseconds
+            int dt = (p->secs * 1000) - (lastT * 1000);
+            lastT = p->secs;
+
+            //
+            // AGGREGATE INTO SAMPLES
+            //
+            while (dt) {
+
+                // we keep track of how much time has been aggregated
+                // into sample, so 'need' is whats left to aggregate 
+                // for the full sample
+                int need = SAMPLERATE - sample.secs;
+
+                // aggregate
+                if (dt < need) {
+
+                    // the entire sample read is less than we need
+                    // so aggregate the whole lot and wait fore more
+                    // data to be read. If there is no more data then
+                    // this will be lost, we don't keep incomplete samples
+                    sample.secs += dt;
+                    sample.hr += float(dt) * p->hr;
+                    dt = 0;
+
+                } else {
+
+                    // dt is more than we need to fill and entire sample
+                    // so lets just take the fraction we need
+                    dt -= need;
+                    sample.hr += float(need) * p->hr;
+
+                    // add the accumulated value
+                    hrArray.append(sample.hr / double(SAMPLERATE));
+
+                    // reset back to zero so we can aggregate
+                    // the next sample
+                    sample.secs = 0;
+                    sample.hr = 0;
+                }
+            }
+        }
+
+        // This code is based upon the matlab function provided as
+        // part of the 2013 paper cited above, bear in mind that the
+        // input is HR in minute by minute samples NOT seconds.
+        //
+        // Props to Andy Froncioni for helping to evaluate this code.
+        //
+        // function CT = KFModel(HR,CTstart)
+        // %Inputs:
+        //   %HR = A vector of minute to minute HR values.
+        //   %CTstart = Core Body Temperature at time 0.
+        //
+        // %Outputs:
+        //   %CT = A vector of minute to minute CT estimates
+        // 
+        // %Extended Kalman Filter Parameters
+        //   a = 1; gamma = 0.022^2;
+        //   b0 = -7887.1; b1 = 384.4286; b2 = -4.5714; sigma = 18.88^2;
+        static const double CTStart = 37.0f;
+        static const double a1 = 1.0f;
+        static const double gamma = 0.022f * 0.22f;
+        static const double b0 = -7887.1f; 
+        static const double b1 = 384.4286f; 
+        static const double b2 = -4.5714f; 
+        static const double sigma = 18.88f * 18.88f;
+        //
+        // %Initialize Kalman filter
+        //   x = CTstart; v = 0;            %v = 0 assumes confidence with start value.
+        double x = CTStart;
+        double v = 0;
+        //
+        // %Iterate through HR time sequence
+        //   for time = 1:length(HR)
+        //     %Time Update Phase
+        //     x_pred = a ∗ x;                                         %Equation 3
+        //     v_pred = (a^2) ∗ v+gamma;                               %Equation 4
+        //
+        //     %Observation Update Phase
+        //     z = HR(time);
+        //     c_vc = 2 ∗  b2 ∗ x_pred+b1;                             %Equation 5
+        //     k = (v_pred ∗ c_vc)./((c_vc^2) ∗ v_pred+sigma);         %Equation 6
+        //     x = x_pred+k ∗ (z-(b2 ∗ (x_pred^2)+b1 ∗ x_pred+b0));    %Equation 7
+        //     v = (1-k ∗ c_vc) ∗ v_pred;                              %Equation 8
+        //     CT(time) = x;
+        // end
+
+        // now compute CT using the algorithm provided
+        QVector<double> ctArray(hrArray.size());
+
+        for(int i=0; i<hrArray.count(); i++) {
+            double x_pred = a1 * x;
+            double v_pred = (a1  * a1 ) * (v+gamma);
+
+            double z = hrArray[i];
+            double c_vc = 2.0f *  b2 * x_pred + b1;
+            double k = (v_pred * c_vc)/((c_vc*c_vc) * v_pred+sigma);
+
+            x = x_pred+k * (z-(b2 * (x_pred*x_pred)+b1 * x_pred+b0));
+            v = (1-k * c_vc) * v_pred;
+
+            ctArray[i] = x;
+        }
+
+        // now update the RideFile data points
+        int index=0;
+        foreach(RideFilePoint *p, dataPoints_) {
+
+            // move on to the next one
+            if (double(index)*60.0f < p->secs && index < (ctArray.count()-1)) index++;
+
+            // just use the current value first for index=0 and p->secs=0
+            p->tcore = ctArray[index];
+
+            // smooth the values
+            //if (index && p->secs > 0 && p->secs <= (double(index)*60.0f)) {
+                //double pt = (p->secs - (double(index-1)*60.00f)) / 60.0f;
+                //p->tcore = (ctArray[index] - ctArray[index-1]) * pt;
+            //}
+        }
     }
 
     // Averages and Totals

@@ -448,12 +448,14 @@ RideSummaryWindow::htmlSummary()
         << "average_speed"
         << "average_power"
         << "average_hr"
+        << "average_ct"
         << "average_cad";
 
     QStringList maximumColumn = QStringList() // not const as modified below..
         << "max_speed"
         << "max_power"
         << "max_heartrate"
+        << "max_ct"
         << "max_cadence"
         << "skiba_wprime_max";
 
@@ -1517,12 +1519,14 @@ RideSummaryWindow::htmlCompareSummary() const
         << "average_speed"
         << "average_power"
         << "average_hr"
+        << "average_ct"
         << "average_cad";
 
     QStringList maximumColumn = QStringList() // not const as modified below..
         << "max_speed"
         << "max_power"
         << "max_heartrate"
+        << "max_ct"
         << "max_cadence"
         << "skiba_wprime_max";
 

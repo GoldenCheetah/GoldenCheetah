@@ -1099,7 +1099,7 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
                        p->lte, p->rte, p->lps, p->rps,
                        p->lpco, p->rpco, p->lppb, p->rppb, p->lppe, p->rppe, p->lpppb, p->rpppb, p->lpppe, p->rpppe,
                        p->smo2, p->thb,
-                       p->rvert, p->rcad, p->rcontact, 0);
+                       p->rvert, p->rcad, p->rcontact, p->tcore, 0);
        }
     }
     // for xpower and acceleration et al

@@ -156,6 +156,7 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
                               0.0, 0.0, 0.0, 0.0,
                               0.0, 0.0,
                               0.0, 0.0, 0.0, // running dynamics
+                              0.0, //tcore
                               0);
             }
             if (f.dataPoints().size() == 0) {

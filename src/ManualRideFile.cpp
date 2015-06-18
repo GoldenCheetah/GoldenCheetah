@@ -132,6 +132,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors, QList
                                       0.0, 0.0, 0.0, 0.0, //pedal peak power phase
                                       0.0, 0.0,
                                       0.0, 0.0, 0.0, // running dynamics
+                                      0.0, //tcore
                                       interval);
                 QMap<QString,QString> bsm;
                 bsm.insert("value", QString("%1").arg(bs));

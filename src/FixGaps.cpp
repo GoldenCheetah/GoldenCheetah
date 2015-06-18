@@ -213,6 +213,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                 double rcontactdelta = (point->rcontact - last->rcontact) / (double) count;
                 double rcaddelta = (point->rcad - last->rcad) / (double) count;
                 double rvertdelta = (point->rvert - last->rvert) / (double) count;
+                double tcoredelta = (point->tcore - last->tcore) / (double) count;
 
 
                 // add the points
@@ -250,6 +251,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            last->rvert + ((i+1)*rvertdelta),
                                                            last->rcad + ((i+1)*rcaddelta),
                                                            last->rcontact + ((i+1)*rcontactdelta),
+                                                           last->tcore + ((i+1)*tcoredelta),
                                                            last->interval);
 
                     ride->command->insertPoint(position++, add);
@@ -286,6 +288,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            0.0, 0.0, 0.0, 0.0, //pedal peak power phase
                                                            0.0, 0.0, // smO2 / thb
                                                            0.0, 0.0, 0.0, // running dynamics
+                                                           0.0,
                                                            last->interval);
                     ride->command->insertPoint(position++, add);
                 }

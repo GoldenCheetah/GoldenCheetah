@@ -947,6 +947,48 @@ struct AvgHeartRate : public RideMetric {
 static bool avgHeartRateAdded =
     RideMetricFactory::instance().addMetric(AvgHeartRate());
 
+struct AvgCoreTemp : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AvgCoreTemp)
+
+    double total, count;
+
+    public:
+
+    AvgCoreTemp()
+    {
+        setSymbol("average_ct");
+        setInternalName("Average Core Temperature");
+        setPrecision(1);
+    }
+    void initialize() {
+        setName(tr("Average Core Temperature"));
+        setMetricUnits(tr("C"));
+        setImperialUnits(tr("C"));
+        setType(RideMetric::Average);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+        total = count = 0;
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->tcore > 0) {
+                total += point->tcore;
+                ++count;
+            }
+        }
+        setValue(count > 0 ? total / count : 0);
+        setCount(count);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("H"); }
+
+    RideMetric *clone() const { return new AvgCoreTemp(*this); }
+};
+
+static bool avgCTAdded =
+    RideMetricFactory::instance().addMetric(AvgCoreTemp());
+
 ///////////////////////////////////////////////////////////////////////////////
 
 struct HeartBeats : public RideMetric {
@@ -1137,7 +1179,7 @@ class APPercent : public RideMetric {
         setPrecision(0);
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
+    void compute(const RideFile *, const Zones *zones, int zoneRange,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
                  const Context *) {
@@ -1445,6 +1487,43 @@ class MaxHr : public RideMetric {
 
 static bool maxHrAdded =
     RideMetricFactory::instance().addMetric(MaxHr());
+
+//////////////////////////////////////////////////////////////////////////////
+
+class MaxCT : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MaxCT)
+    double max;
+    public:
+    MaxCT() : max(0.0)
+    {
+        setSymbol("max_ct");
+        setInternalName("Max Core Temperature");
+        setPrecision(1);
+    }
+    void initialize() {
+        setName(tr("Max Core Temperature"));
+        setMetricUnits(tr("C"));
+        setImperialUnits(tr("C"));
+        setType(RideMetric::Peak);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->tcore >= max)
+                max = point->tcore;
+        }
+        setValue(max);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("H"); }
+
+    RideMetric *clone() const { return new MaxCT(*this); }
+};
+
+static bool maxCTAdded =
+    RideMetricFactory::instance().addMetric(MaxCT());
 
 //////////////////////////////////////////////////////////////////////////////
 

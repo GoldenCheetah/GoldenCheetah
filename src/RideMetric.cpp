@@ -115,8 +115,9 @@
 // 109 29  May 2015 Mark Liversedge    Added Sustained Time In Zone metrics
 // 110 12  Jun 2015 Mark Liversedge    Added climb rating
 // 111 14  Jun 2015 Mark Liversedge    Added W'bal time in zone metrics
+// 112 18  Jun 2015 Mark Liversedge    Added Core Temp average and max
 
-int DBSchemaVersion = 111;
+int DBSchemaVersion = 112;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

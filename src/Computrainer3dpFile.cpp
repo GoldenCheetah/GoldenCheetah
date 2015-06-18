@@ -244,6 +244,7 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
                                 0.0, 0.0, 0.0, 0.0, //pedal peak power phase
                                 0.0, 0.0, //  smO2 / thb
                                 0.0, 0.0, 0.0, // running dynamics
+                                0.0, //tcore
                                 0);
         }
         // while loop since an interval in the .3dp file might
@@ -302,6 +303,7 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
                                 0.0, 0.0, 0.0, 0.0, //pedal peak power phase
                                 0.0, 0.0, // smO2 / tHb
                                 0.0, 0.0, 0.0, // running dynamics
+                                0.0, //tcore
                                 0);
 
           // reset averaging sums

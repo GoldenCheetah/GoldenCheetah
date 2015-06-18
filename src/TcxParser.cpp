@@ -186,6 +186,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                   0.0,0.0,0.0,0.0,0.0,0.0,
                                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                   0.0,rcad,0.0, // no running dynamics in the schema ?
+                                  0.0, //tcore
                                   lap);
 
         } else {
@@ -217,6 +218,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                       0.0, // vertical oscillation
                                       rcad, // run cadence
                                       0.0, // gct
+                                      0.0, // tcore
                                       lap);
 
             } else {
@@ -253,6 +255,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                           0.0, // vertical oscillation
                                           prevPoint->rcad + (deltarcad * weight),// run cadence
                                           0.0, // gct
+                                          0.0, //tcore
                                           lap);
                 }
                 prevPoint = rideFile->dataPoints().back();
@@ -286,6 +289,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                       0.0, // vertical oscillation
                                       0.0, // run cadence
                                       0.0, // gct
+                                      0.0, // tcore
                                       lap);
             last_time = last_time.addSecs(round(lapSecs));
         }

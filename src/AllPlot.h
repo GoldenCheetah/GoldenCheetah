@@ -375,6 +375,7 @@ class AllPlotObject : public QObject
     QwtPlotCurve *xpCurve;
     QwtPlotCurve *apCurve;
     QwtPlotCurve *hrCurve;
+    QwtPlotCurve *tcoreCurve;
     QwtPlotCurve *speedCurve;
     QwtPlotCurve *accelCurve;
     QwtPlotCurve *wattsDCurve;
@@ -411,6 +412,7 @@ class AllPlotObject : public QObject
     QVector<double> wprimeDist;
 
     QVector<double> hrArray;
+    QVector<double> tcoreArray;
     QVector<double> wattsArray;
     QVector<double> atissArray;
     QVector<double> antissArray;
@@ -471,6 +473,7 @@ class AllPlotObject : public QObject
     QVector<double> smoothAP;
     QVector<double> smoothXP;
     QVector<double> smoothHr;
+    QVector<double> smoothTcore;
     QVector<double> smoothSpeed;
     QVector<double> smoothAccel;
     QVector<double> smoothWattsD;
@@ -583,6 +586,7 @@ class AllPlot : public QwtPlot
         void setShowXP(bool show);
         void setShowAP(bool show);
         void setShowHr(bool show);
+        void setShowTcore(bool show);
         void setShowSpeed(bool show);
         void setShowCad(bool show);
         void setShowAlt(bool show);
@@ -640,6 +644,7 @@ class AllPlot : public QwtPlot
         bool showXP;
         bool showAP;
         bool showHr;
+        bool showTcore;
         bool showSpeed;
         bool showAccel;
         bool showPowerD;

@@ -200,7 +200,7 @@ bool
 	    // first point
             rideFile->appendPoint(secs, cad, hr, distance, speed, 0, watts, alt, lon, lat, 0, 0.0, temp, 0.0, 
                                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
+                                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
 	}
 	else {
 	    // assumption that the change in ride is linear...  :)
@@ -221,7 +221,7 @@ bool
                 // no smart recording, or delta exceeds HW treshold, or no time elements; just insert the data
                 rideFile->appendPoint(secs, cad, hr, distance, speed, 0,watts, alt, lon, lat, 0, 0.0, temp, 0.0, 
                                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
+                                      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
 
 	    } else {
 
@@ -254,6 +254,7 @@ bool
                 0.0, 0.0, 0.0, 0.0, //pedal peak power phase
                 0.0, 0.0, // SmO2 / tHb
                 0.0, 0.0, 0.0, // running dynamics
+                0.0, //tcore
 			    0);
 		}
 		prevPoint = rideFile->dataPoints().back();
