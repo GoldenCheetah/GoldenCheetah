@@ -34,7 +34,7 @@ class PeakPace : public RideMetric {
 
     PeakPace() : pace(0.0), secs(0.0)
     {
-        setType(RideMetric::Peak);
+        setType(RideMetric::Low);
     }
     // Pace ordering is reversed
     bool isLowerBetter() const { return true; }
@@ -345,7 +345,7 @@ class PeakPaceSwim : public RideMetric {
 
     PeakPaceSwim() : pace(0.0), secs(0.0)
     {
-        setType(RideMetric::Peak);
+        setType(RideMetric::Low);
     }
     // Swim Pace ordering is reversed
     bool isLowerBetter() const { return true; }
