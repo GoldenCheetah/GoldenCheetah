@@ -960,6 +960,11 @@ struct FitFileReaderState
                 case 23: /*decodeDeviceInfo(def, time_offset, values);*/ break; /* device info */
                 case 18: decodeSession(def, time_offset, values); break; /* session */
 
+                case 101: /* lap swimming length */
+                    errors << "Unsupported Lap Swimming FIT File - Use .tcx or .pwx formats";
+                    stop = true;
+                    break;
+
                 case 2: /* DEVICE_SETTINGS */
                 case 3: /* USER_PROFILE */
                 case 7: /* ZONES_TARGET12 */
