@@ -799,6 +799,7 @@ struct FitFileReaderState
                         prevPoint->rvert + (deltarvert * weight),
                         prevPoint->rcad + (deltarcad * weight),
                         prevPoint->rcontact + (deltarcontact * weight),
+                        0.0, // tcore
                         interval);
                 }
             }
@@ -810,7 +811,7 @@ struct FitFileReaderState
                      leftPedalCenterOffset, rightPedalCenterOffset,
                      leftTopDeathCenter, rightTopDeathCenter, leftBottomDeathCenter, rightBottomDeathCenter,
                      leftTopPeakPowerPhase, rightTopPeakPowerPhase, leftBottomPeakPowerPhase, rightBottomPeakPowerPhase,
-                     smO2, tHb, rvert, rcad, rcontact, interval);
+                     smO2, tHb, rvert, rcad, rcontact, 0.0, interval);
 
         last_time = time;
         last_distance = km;

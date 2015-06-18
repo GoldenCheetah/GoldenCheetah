@@ -679,7 +679,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                               0.0, 0.0,
                                               0.0, 0.0, 0.0, 0.0,
                                               0.0, 0.0, 0.0, 0.0,
-                                              smo2, thb, 0.0, 0.0, 0.0, interval);
+                                              smo2, thb, 0.0, 0.0, 0.0, 0.0, interval);
                     }
 
                     precAvg = (precAvg * precSecs + (watts>0?watts:0) * (seconds - precSecs)) / seconds;
@@ -704,7 +704,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           0.0, temp, 0.0, 0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                          0.0, 0.0, 0.0, 0.0, 0.0, interval);
+                                          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
                else if (csvType == moxy) {
 
                     // hack it in for now
@@ -716,7 +716,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
-                                          smo2, thb, 0.0, 0.0, 0.0, interval);
+                                          smo2, thb, 0.0, 0.0, 0.0, 0.0, interval);
                     rideFile->appendPoint((minutes * 60.0)+1, cad, hr, km, // dupe it so we have 1s recording easier to merge
                                           kph, nm, watts, alt, lon, lat,
                                           headwind, slope, temp, 0.0,
@@ -724,7 +724,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
-                                          smo2, thb, 0.0, 0.0, 0.0, interval);
+                                          smo2, thb, 0.0, 0.0, 0.0, 0.0, interval);
 
                } else {
                     rideFile->appendPoint(minutes * 60.0, cad, hr, km,
@@ -734,7 +734,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
-                                          smo2, thb, 0.0, 0.0, 0.0, interval);
+                                          smo2, thb, 0.0, 0.0, 0.0, 0.0, interval);
                }
             }
             ++lineno;

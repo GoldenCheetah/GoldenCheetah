@@ -248,6 +248,7 @@ sample: '{' series_list '}'             { jc->JsonRide->appendPoint(jc->JsonPoin
                                                     jc->JsonPoint.lpppe, jc->JsonPoint.rpppe,
                                                     jc->JsonPoint.smo2, jc->JsonPoint.thb,
                                                     jc->JsonPoint.rvert, jc->JsonPoint.rcad, jc->JsonPoint.rcontact,
+                                                    jc->JsonPoint.tcore,
                                                     jc->JsonPoint.interval);
                                           jc->JsonPoint = RideFilePoint();
                                         }

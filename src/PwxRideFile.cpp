@@ -348,6 +348,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
                             prevPoint->rvert + (deltarvert * weight),
                             prevPoint->rcad + (deltarcad * weight),
                             prevPoint->rcontact + (deltarcontact * weight),
+                            0.0,
                             add.interval);
                     }
                 }
@@ -373,6 +374,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
                     add.lpppb, add.rpppb, add.lpppe, add.rpppe,
                     add.smo2, add.thb,
                     add.rvert, add.rcad, add.rcontact,
+                    0.0, //tcore
                     add.interval);
             }
         

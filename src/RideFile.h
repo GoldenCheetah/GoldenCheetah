@@ -65,7 +65,7 @@ struct RideFileDataPresent
     bool smo2, thb, interval;
 
     // derived
-    bool np,xp,apower,wprime,atiss,antiss,gear,hhb,o2hb;
+    bool np,xp,apower,wprime,atiss,antiss,gear,hhb,o2hb,tcore;
 
     // running
     bool rvert, rcad, rcontact;
@@ -76,9 +76,11 @@ struct RideFileDataPresent
         kph(false), nm(false), watts(false), alt(false), lon(false), lat(false),
         headwind(false), slope(false), temp(false), 
         lrbalance(false), lte(false), rte(false), lps(false), rps(false),
-        lpco(false), rpco(false), lppb(false), rppb(false), lppe(false), rppe(false), lpppb(false), rpppb(false), lpppe(false), rpppe(false),
+        lpco(false), rpco(false), lppb(false), rppb(false), lppe(false), rppe(false),
+        lpppb(false), rpppb(false), lpppe(false), rpppe(false),
         smo2(false), thb(false), interval(false),
-        np(false), xp(false), apower(false), wprime(false), atiss(false), antiss(false),gear(false),hhb(false),o2hb(false),
+        np(false), xp(false), apower(false), wprime(false), atiss(false), antiss(false),gear(false),
+        hhb(false),o2hb(false), tcore(false),
         rvert(false), rcad(false), rcontact(false) {}
 
 };
@@ -191,7 +193,7 @@ class RideFile : public QObject // QObject to emit signals
                           aPower, wprime, aTISS, anTISS, smo2, thb, 
                           rvert, rcad, rcontact, gear, o2hb, hhb,
                           lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe,
-                          wbal,
+                          wbal, tcore,
                           none }; // none must ALWAYS be last
 
         enum specialValues { NoTemp = -255 };
@@ -226,7 +228,7 @@ class RideFile : public QObject // QObject to emit signals
                          double lppb, double rppb, double lppe, double rppe,
                          double lpppb, double rpppb, double lpppe, double rpppe,
                          double smo2, double thb,
-                         double rvert, double rcad, double rcontact,
+                         double rvert, double rcad, double rcontact, double tcore,
                          int interval);
 
         void appendPoint(const RideFilePoint &);
@@ -394,6 +396,9 @@ struct RideFilePoint
     // running data
     double rvert, rcad, rcontact;
 
+    // core temperature
+    double tcore;
+
     int interval;
 
     // derived data (we calculate it)
@@ -411,7 +416,7 @@ struct RideFilePoint
                       lpppb(0.0), rpppb(0.0), lpppe(0.0), rpppe(0.0),
                       smo2(0.0), thb(0.0),
                       hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0),
-                      rvert(0.0), rcad(0.0), rcontact(0.0),
+                      rvert(0.0), rcad(0.0), rcontact(0.0), tcore(0.0),
                       interval(0), xp(0), np(0),
                       apower(0), atiss(0.0), antiss(0.0), gear(0.0), hhb(0.0), o2hb(0.0) {}
 
@@ -425,7 +430,7 @@ struct RideFilePoint
                   double lppb, double rppb, double lppe, double rppe,
                   double lpppb, double rpppb, double lpppe, double rpppe,
                   double smo2, double thb, 
-                  double rvert, double rcad, double rcontact,
+                  double rvert, double rcad, double rcontact, double(tcore),
                   int interval) :
 
         secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm), watts(watts), alt(alt), lon(lon), 
@@ -437,7 +442,7 @@ struct RideFilePoint
         lpppb(lpppb), rpppb(rpppb), lpppe(lpppe), rpppe(rpppe),
         smo2(smo2), thb(thb),
         hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0), 
-        rvert(rvert), rcad(rcad), rcontact(rcontact), interval(interval), 
+        rvert(rvert), rcad(rcad), rcontact(rcontact), tcore(tcore), interval(interval), 
         xp(0), np(0), apower(0), atiss(0.0), antiss(0.0), gear(0.0),hhb(0.0),o2hb(0.0) {}
 
     // get the value via the series type rather than access direct to the values

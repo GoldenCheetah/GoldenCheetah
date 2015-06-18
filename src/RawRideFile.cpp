@@ -78,6 +78,7 @@ time_cb(struct tm *, time_t since_epoch, void *context)
                                  0.0, 0.0, 0.0, 0.0,
                                  0.0,0.0,
                                  0.0,0.0,0.0, // running dynamic
+                                 0.0, //tcore
                                  state->last_interval);
     state->last_secs = secs;
 }
@@ -99,6 +100,7 @@ data_cb(double secs, double nm, double mph, double watts, double miles, double a
                                  0.0,0.0,0.0,0.0,
                                  0.0,0.0,
                                  0.0,0.0,0.0,
+                                 0.0, //tcore
                                  interval);
     state->last_secs = secs;
     state->last_miles = miles;

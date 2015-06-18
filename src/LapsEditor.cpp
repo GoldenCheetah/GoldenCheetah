@@ -157,6 +157,7 @@ LapsEditor::okClicked()
                                                          0.0, 0.0, 0.0, 0.0,
                                                          0.0, 0.0,
                                                          0.0, 0.0, 0.0,
+                                                         0.0,
                                                          interval));
                 }
                 interval++;

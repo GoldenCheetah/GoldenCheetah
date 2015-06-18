@@ -168,7 +168,7 @@ QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &
                         p->lppb, p->rppb, p->lppe, p->rppe,
                         p->lpppb, p->rpppb, p->lpppe, p->rpppe,
                         p->smo2, p->thb,
-                        p->rvert, p->rcad, p->rcontact, 0);
+                        p->rvert, p->rcad, p->rcontact, p->tcore, 0);
 
             // derived data
             last = f.dataPoints().last();
@@ -194,7 +194,7 @@ QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &
                         p->lppb, p->rppb, p->lppe, p->rppe,
                         p->lpppb, p->rpppb, p->lpppe, p->rpppe,
                         p->smo2, p->thb,
-                        p->rvert, p->rcad, p->rcontact, 0);
+                        p->rvert, p->rcad, p->rcontact, p->tcore, 0);
 
             // derived data
             notlast = notf.dataPoints().last();

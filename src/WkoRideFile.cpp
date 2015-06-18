@@ -492,6 +492,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                             0.0,0.0,
                             0.0,0.0,0.0, // running dynamics
+                            0.0, // tcore
                             0);
             }
 
