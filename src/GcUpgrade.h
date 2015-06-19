@@ -50,20 +50,21 @@
 // 3101 - V3.11 DEVELOPMENT
 // 3102 - V3.11 DEVELOPMENT INCL RIDECACHE
 // 3103 - V3.2 RC1 (renamed from 3.11)
+// 3104 - V3.2 RC1X (after late commits)
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
 #define VERSION3_SP2      3032 // released
 #define VERSION31_UPG     3100 // first build with 3.1 upgrade process
 #define VERSION311_BUILD  3101 // first build with 3.1 upgrade process
-#define VERSION32_BUILD   3103 // first build for new 3.2 rename
+#define VERSION32_BUILD   3104 // first build for new 3.2 rename
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // these three will change until we release
-#define VERSION_LATEST 3103
-#define VERSION_STRING "V3.2 RC1"
+#define VERSION_LATEST 3104
+#define VERSION_STRING "V3.2 RC1X"
 
 class GcUpgradeLogDialog : public QDialog
 {
