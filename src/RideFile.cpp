@@ -2124,21 +2124,28 @@ RideFile::recalculateDerivedSeries(bool force)
             ctArray[i] = x;
         }
 
-        // now update the RideFile data points
-        int index=0;
-        foreach(RideFilePoint *p, dataPoints_) {
+        // now update the RideFile data points, but only if we got
+        // any data i.e. ride is longer than a minute long!
+        if (ctArray.count()) {
+            int index=0;
+            foreach(RideFilePoint *p, dataPoints_) {
 
-            // move on to the next one
-            if (double(index)*60.0f < p->secs && index < (ctArray.count()-1)) index++;
+                // move on to the next one
+                if (double(index)*60.0f < p->secs && index < (ctArray.count()-1)) index++;
 
-            // just use the current value first for index=0 and p->secs=0
-            p->tcore = ctArray[index];
+                // just use the current value first for index=0 and p->secs=0
+                p->tcore = ctArray[index];
 
-            // smooth the values
-            //if (index && p->secs > 0 && p->secs <= (double(index)*60.0f)) {
-                //double pt = (p->secs - (double(index-1)*60.00f)) / 60.0f;
-                //p->tcore = (ctArray[index] - ctArray[index-1]) * pt;
-            //}
+                // smooth the values
+                //if (index && p->secs > 0 && p->secs <= (double(index)*60.0f)) {
+                    //double pt = (p->secs - (double(index-1)*60.00f)) / 60.0f;
+                    //p->tcore = (ctArray[index] - ctArray[index-1]) * pt;
+                //}
+            }
+        } else {
+
+            // just set to the starting body temperature for every point
+            foreach(RideFilePoint *p, dataPoints_) p->tcore = CTStart;
         }
     }
 
