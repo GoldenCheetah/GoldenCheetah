@@ -993,7 +993,7 @@ AllPlot::configChanged(qint32)
     QPen hrPen = QPen(GColor(CHEARTRATE));
     hrPen.setWidth(width);
     standard->hrCurve->setPen(hrPen);
-    QPen tcorePen = QPen(GColor(CHEARTRATE));
+    QPen tcorePen = QPen(GColor(CCORETEMP));
     tcorePen.setWidth(width);
     standard->tcoreCurve->setPen(tcorePen);
     standard->hrDCurve->setPen(hrPen);
@@ -1390,8 +1390,12 @@ AllPlot::setLeftOnePalette()
     if (standard->cadCurve->isVisible()) {
         single = GColor(CCADENCE);
     }
-    if (standard->hrCurve->isVisible() || standard->tcoreCurve->isVisible()) {
+    if (standard->hrCurve->isVisible()) {
         single = GColor(CHEARTRATE);
+    }
+
+    if (standard->tcoreCurve->isVisible()) {
+        single = GColor(CCORETEMP);
     }
 
     // lets go
@@ -1798,9 +1802,8 @@ AllPlot::recalc(AllPlotObject *objects)
                              (!objects->hrDArray.empty() ? objects->hrDArray[i] : 0),
                              (!objects->slopeArray.empty() ? objects->slopeArray[i] : 0),
                              (!objects->tcoreArray.empty() ? objects->tcoreArray[i] : 0));
-                if (!objects->wattsArray.empty())
-                    totalWatts += objects->wattsArray[i];
 
+                if (!objects->wattsArray.empty()) totalWatts += objects->wattsArray[i];
                 if (!objects->npArray.empty()) totalNP += objects->npArray[i];
                 if (!objects->rvArray.empty()) totalRV += objects->rvArray[i];
                 if (!objects->rcadArray.empty()) totalRCad += objects->rcadArray[i];
@@ -1811,30 +1814,21 @@ AllPlot::recalc(AllPlotObject *objects)
                 if (!objects->hhbArray.empty()) totalHHb += objects->hhbArray[i];
                 if (!objects->atissArray.empty()) totalATISS += objects->atissArray[i];
                 if (!objects->antissArray.empty()) totalANTISS += objects->antissArray[i];
-
-                if (!objects->xpArray.empty())
-                    totalXP += objects->xpArray[i];
-                if (!objects->apArray.empty())
-                    totalAP += objects->apArray[i];
-                if (!objects->tcoreArray.empty())
-                    totalTcore    += objects->tcoreArray[i];
-                if (!objects->hrArray.empty())
-                    totalHr    += objects->hrArray[i];
-
+                if (!objects->xpArray.empty()) totalXP += objects->xpArray[i];
+                if (!objects->apArray.empty()) totalAP += objects->apArray[i];
+                if (!objects->tcoreArray.empty()) totalTcore    += objects->tcoreArray[i];
+                if (!objects->hrArray.empty()) totalHr    += objects->hrArray[i];
                 if (!objects->accelArray.empty()) totalAccel += objects->accelArray[i];
                 if (!objects->wattsDArray.empty()) totalWattsD += objects->wattsDArray[i];
                 if (!objects->cadDArray.empty()) totalCadD += objects->cadDArray[i];
                 if (!objects->nmDArray.empty()) totalNmD += objects->nmDArray[i];
                 if (!objects->hrDArray.empty()) totalHrD += objects->hrDArray[i];
-
-                if (!objects->speedArray.empty())
-                    totalSpeed += objects->speedArray[i];
-                if (!objects->cadArray.empty())
-                    totalCad   += objects->cadArray[i];
-                if (!objects->altArray.empty())
-                    totalAlt   += objects->altArray[i];
-                if (!objects->slopeArray.empty())
-                    totalSlope   += objects->slopeArray[i];
+                if (!objects->speedArray.empty()) totalSpeed += objects->speedArray[i];
+                if (!objects->cadArray.empty()) totalCad   += objects->cadArray[i];
+                if (!objects->altArray.empty()) totalAlt   += objects->altArray[i];
+                if (!objects->slopeArray.empty()) totalSlope   += objects->slopeArray[i];
+                if (!objects->windArray.empty()) totalWind   += objects->windArray[i];
+                if (!objects->torqueArray.empty()) totalTorque   += objects->torqueArray[i];
                 if (!objects->tempArray.empty() ) {
                     if (objects->tempArray[i] == RideFile::NoTemp) {
                         dp.temp = (i>0 && !list.empty()?list.back().temp:0.0);
@@ -1844,10 +1838,6 @@ AllPlot::recalc(AllPlotObject *objects)
                         totalTemp   += objects->tempArray[i];
                     }
                 }
-                if (!objects->windArray.empty())
-                    totalWind   += objects->windArray[i];
-                if (!objects->torqueArray.empty())
-                    totalTorque   += objects->torqueArray[i];
 
                 // left/right pedal data
                 if (!objects->balanceArray.empty())
@@ -2625,9 +2615,9 @@ AllPlot::setYMax()
         if (standard->tcoreCurve->isVisible()) {
             labels << tr("Core Temperature");
             if (referencePlot == NULL)
-                ymax = standard->tcoreCurve->maxYValue();
+                ymax = qMax(ymax, standard->tcoreCurve->maxYValue());
             else
-                ymax = referencePlot->standard->tcoreCurve->maxYValue();
+                ymax = qMax(ymax, referencePlot->standard->tcoreCurve->maxYValue());
         }
         if (standard->smo2Curve->isVisible()) {
             labels << tr("SmO2");
@@ -2672,7 +2662,25 @@ AllPlot::setYMax()
             xytick[QwtScaleDiv::MajorTick]<<i;
 
         setAxisTitle(QwtAxisId(QwtAxis::yLeft, 1), labels.join(" / "));
-        setAxisScaleDiv(QwtAxisId(QwtAxis::yLeft, 1),QwtScaleDiv(ymin, ymax, xytick));
+
+        if (labels.count() == 1 && labels[0] == tr("Core Temperature")) {
+
+            double ymin=36.5f;
+            if (ymax < 39.0f) ymax = 39.0f;
+
+            if (standard->tcoreCurve->isVisible() && standard->tcoreCurve->minYValue() < ymin)
+                ymin = standard->tcoreCurve->minYValue();
+
+            double step = 0.00f;
+            if (ymin < 100.00f) step = (ymax - ymin) / 4;
+
+            // we just have Core Temp ...
+            setAxisScale(QwtAxisId(QwtAxis::yLeft, 1),ymin<100.0f?ymin:0, ymax, step);
+
+        } else {
+
+            setAxisScaleDiv(QwtAxisId(QwtAxis::yLeft, 1),QwtScaleDiv(ymin, ymax, xytick));
+        }
     }
 
     // QwtAxis::yLeft, 3
@@ -3049,7 +3057,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->wCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showW);
     standard->mCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showW);
     standard->hrCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHr);
-    standard->tcoreCurve->setVisible(rideItem->ride()->areDataPresent()->tcore && showTcore);
+    standard->tcoreCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showTcore);
     standard->speedCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showSpeed);
     standard->accelCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showAccel);
     standard->wattsDCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerD);
@@ -3898,6 +3906,13 @@ AllPlot::setDataFromPlot(AllPlot *plot)
             double min = thereCurve->minYValue();
             setAxisScale(QwtPlot::yLeft, min > 0 ? 0 : min * 1.1f, 1.1f * thereCurve->maxYValue());
 
+        } else if (scope == RideFile::tcore) {
+
+            // always zero or lower (don't truncate)
+            double min = qMin(36.5f, float(thereCurve->minYValue()));
+            double max = qMax(39.0f, float(thereCurve->maxYValue()+0.5f));
+            setAxisScale(QwtPlot::yLeft, min, max);
+
         } else if (scope != RideFile::lrbalance) {
             if (thereCurve)
                 setAxisScale(QwtPlot::yLeft, thereCurve->minYValue(), 1.1f * thereCurve->maxYValue());
@@ -3921,6 +3936,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         if (scope == RideFile::thb || scope == RideFile::smo2 
             || scope == RideFile::o2hb || scope == RideFile::hhb) // Hb
             sd->setDecimals(2);
+        if (scope == RideFile::tcore) sd->setDecimals(1);
 
         setAxisScaleDraw(QwtPlot::yLeft, sd);
 
@@ -5129,7 +5145,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->xpArray.resize(dataPresent->xp ? npoints : 0);
         here->apArray.resize(dataPresent->apower ? npoints : 0);
         here->hrArray.resize(dataPresent->hr ? npoints : 0);
-        here->tcoreArray.resize(dataPresent->tcore ? npoints : 0);
+        here->tcoreArray.resize(dataPresent->hr ? npoints : 0);
         here->speedArray.resize(dataPresent->kph ? npoints : 0);
         here->accelArray.resize(dataPresent->kph ? npoints : 0);
         here->wattsDArray.resize(dataPresent->watts ? npoints : 0);
@@ -5285,7 +5301,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->xpCurve->setVisible(dataPresent->xp && showXP);
         here->apCurve->setVisible(dataPresent->apower && showAP);
         here->hrCurve->setVisible(dataPresent->hr && showHr);
-        here->tcoreCurve->setVisible(dataPresent->tcore && showTcore);
+        here->tcoreCurve->setVisible(dataPresent->hr && showTcore);
         here->speedCurve->setVisible(dataPresent->kph && showSpeed);
         here->cadCurve->setVisible(dataPresent->cad && showCad);
         here->altCurve->setVisible(dataPresent->alt && showAlt);

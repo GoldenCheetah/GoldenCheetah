@@ -92,6 +92,7 @@ void GCColor::setupColors()
         { tr("Plot Grid"), "COLORGRID", QColor(65,65,65) },
         { tr("Interval Highlighter"), "COLORINTERVALHIGHLIGHTER", Qt::blue },
         { tr("Heart Rate"), "COLORHEARTRATE", Qt::red },
+        { tr("Core Temperature"), "COLORCORETEMP", QColor(255, 173, 92) },
         { tr("Speed"), "COLORSPEED", Qt::green },
         { tr("Acceleration"), "COLORACCEL", Qt::cyan },
         { tr("Power"), "COLORPOWER", Qt::yellow },
