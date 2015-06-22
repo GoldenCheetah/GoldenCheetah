@@ -1405,7 +1405,7 @@ void HomeWindow::translateChartTitles(QList<GcWindow*> charts)
     titleMap.insert("PMC", tr("PMC"));
     titleMap.insert("Power", tr("Power"));
     titleMap.insert("QA", tr("QA"));
-    titleMap.insert("Ride", tr("Ride"));
+    titleMap.insert("Activity", tr("Activity"));
     titleMap.insert("Speed", tr("Speed"));
     titleMap.insert("Summary", tr("Summary"));
     titleMap.insert("Target Power", tr("Target Power"));
