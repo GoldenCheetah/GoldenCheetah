@@ -898,7 +898,7 @@ qDebug()<<"found this many devices:"<<WFApi::getInstance()->deviceCount();
     // Tree Widget of the channel controls
     channelWidget->clear();
     channelWidget->headerItem()->setText(0, tr("Sensor"));
-    channelWidget->headerItem()->setText(1, tr("ANT+ Id"));
+    channelWidget->headerItem()->setText(1, tr("BLE Id"));
     channelWidget->headerItem()->setText(2, tr("Value"));
     channelWidget->headerItem()->setText(3, tr("Status"));
     channelWidget->setColumnCount(4);
