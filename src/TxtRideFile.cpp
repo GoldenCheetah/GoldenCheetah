@@ -235,7 +235,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 //
                 // AGGREGATE INTO SAMPLES
                 //
-                while (dt) {
+                while (dt > 0) {
 
                     // we keep track of how much time has been aggregated
                     // into sample, so 'need' is whats left to aggregate 
