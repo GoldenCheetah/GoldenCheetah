@@ -814,6 +814,7 @@ RideItem::updateIntervals()
         }
     }
 
+
     //qDebug() << "SEARCH EFFORTS";
     QList<effort> candidates[10];
     QList<effort> candidates_sprint;
@@ -828,6 +829,9 @@ RideItem::updateIntervals()
 
         // set the array size
         int arraySize = f->dataPoints().last()->secs + f->recIntSecs();
+
+        // anything longer than a day or negative is skipped
+        if (arraySize >= 0 && arraySize < (24*3600)) { // no indent, as added late
 
         QTime timer;
         timer.start();
@@ -848,10 +852,14 @@ RideItem::updateIntervals()
             int dt = (psecs * 1000) - (lastT * 1000);
             lastT = psecs;
 
+
+            // ignore time goes backwards
+            if (dt < 0) continue;
+
             //
             // AGGREGATE INTO SAMPLES
             //
-            while (dt) {
+            while (secs < arraySize && dt) {
 
                 // we keep track of how much time has been aggregated
                 // into sample, so 'need' is whats left to aggregate 
@@ -1115,9 +1123,11 @@ RideItem::updateIntervals()
         }
 
         free(integrated_series);
+
+    // we skipped for whatever reason
         //qDebug()<<fileName<<"of"<<secs<<"seconds took "<<timer.elapsed()<<"ms to find"<<candidates.count();
     }
-
+    } // if arraySize is in bounds, no indent from above
 
     //qDebug() << "SEARCH HILLS";
     if (!f->isSwim() && f->isDataPresent(RideFile::alt)) {
