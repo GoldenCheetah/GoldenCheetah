@@ -194,13 +194,13 @@ RideCacheModel::configChanged(qint32)
 
                     // is a metric
                     int i=section-5;
-                    headings_<< QString("X%1").arg(factory->metricName(i));
+                    headings_<< QString("%1").arg(factory->metricName(i));
 
                 } else {
 
                     // is a metadata
                     int i= section -5 - factory->metricCount();
-                    headings_<< QString("Z%1").arg(context->specialFields.makeTechName(metadata[i].name));
+                    headings_<< QString("%1").arg(context->specialFields.makeTechName(metadata[i].name));
                 }
             }
             break;

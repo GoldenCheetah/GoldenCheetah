@@ -114,7 +114,7 @@ public:
         tempIndex = -1;
         for(int i=0; i<model->columnCount(); i++) {
 
-            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "Xaverage_temp") {
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "average_temp") {
                 tempIndex = i;
             }
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "isRun") {
@@ -127,10 +127,7 @@ public:
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "color") {
                 colorColumn = i;
             }
-            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "ZCalendar_Text") {
-                calendarText = i;
-            }
-            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "Calendar Text") {
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "Calendar_Text") {
                 calendarText = i;
             }
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "ride_date") {
