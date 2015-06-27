@@ -90,22 +90,26 @@ class RideFileInterval
     Q_DECLARE_TR_FUNCTIONS(RideFileInterval);
 
     public:
-        enum intervaltype { ALL,                    // Entire workout 
-                            DEVICE,                 // Came from Device (Calibration?)
+        enum intervaltype { DEVICE,                 // Came from Device (Calibration?)
                             USER,                   // User defined
+
+                                                    // DISCOVERED ALWAYS AFTER USER BELOW
+                            ALL,                    // Entire workout
                             PEAKPOWER,              // Peak Power incl. ranking 1-10 in ride
-                            ROUTE,                  // GPS Route
-                            PEAKHR,                 // PEAK HR
-                            CLIMB,                  // Hills and Cols
+                            PEAKPACE,               // Peak Pace
                             EFFORT,                 // Sustained effort
-                            MATCH,                  // W'bal based "match from a matchbook"
-                            TTE,                    // A true TTE effort according to classic CP model
-                            SPRINT,                 // Sprint
-                            PEAKPACE                // Peak Pace
-                           } types;                 // ALWAYS ADD TO END (RideDB.json uses int values)
+                            ROUTE,                  // GPS Route
+                            CLIMB,                  // Hills and Cols
+                                                    // ADD NEW ONES HERE AND UPDATE last() below
+
+                           } types;
+
+        static enum intervaltype last() { return CLIMB; } // update to last above!
 
         typedef enum intervaltype IntervalType;
         static QString typeDescription(IntervalType);                  // return a string to represent the type
+        static QString typeDescriptionLong(IntervalType);              // return a longer string to represent the type
+        static qint32 intervalTypeBits(IntervalType);                  // returns the bit value or'ed into GC_DISCOVERY
 
         QString typeString;
         IntervalType type;

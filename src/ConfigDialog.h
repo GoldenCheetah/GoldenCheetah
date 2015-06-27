@@ -176,6 +176,25 @@ class DeviceConfig : public QWidget
         DevicePage *devicePage;
 };
 
+// INTERCAL PAGE
+class IntervalConfig : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        IntervalConfig(QDir home, Zones *zones, Context *context);
+
+    public slots:
+        qint32 saveClicked();
+    
+    private:
+        QDir home;
+        Zones *zones;
+        Context *context;
+
+        IntervalsPage *intervalsPage;
+};
+
 class ConfigDialog : public QMainWindow
 {
     Q_OBJECT
@@ -206,6 +225,7 @@ class ConfigDialog : public QMainWindow
         PasswordConfig *password;
         DataConfig *data;
         MetricConfig *metric;
+        IntervalConfig *interval;
         DeviceConfig *device;
 };
 #endif
