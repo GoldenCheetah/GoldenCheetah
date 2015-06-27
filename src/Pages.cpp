@@ -5524,3 +5524,52 @@ AutoImportPage::browseImportDir()
     }
 }
 
+IntervalsPage::IntervalsPage(Context *context) : context(context)
+{
+    // get config
+    b4.discovery = appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 63).toInt();
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QGridLayout *layout = new QGridLayout();
+    mainLayout->addLayout(layout);
+    mainLayout->addStretch();
+
+    QLabel *heading = new QLabel(tr("Enable interval auto-discovery:"));
+    heading->setFixedHeight(QFontMetrics(heading->font()).height() + 4);
+
+    int row = 0;
+    layout->addWidget(heading, row, 0, Qt::AlignRight);
+
+    user = 99;
+    for(int i=0; i< static_cast<int>(RideFileInterval::last()); i++) {
+
+        // ignore until we get past user interval type
+        if (i == static_cast<int>(RideFileInterval::USER)) user=i;
+
+        // if past user then add
+        if (i>user) {
+            QCheckBox *add = new QCheckBox(RideFileInterval::typeDescriptionLong(static_cast<RideFileInterval::IntervalType>(i)));
+            checkBoxes << add;
+            add->setChecked(b4.discovery & RideFileInterval::intervalTypeBits(static_cast<RideFileInterval::IntervalType>(i)));
+            layout->addWidget(add, row++, 1, Qt::AlignLeft);
+        }
+    }
+}
+
+qint32
+IntervalsPage::saveClicked()
+{
+    int discovery = 0;
+
+    // now update discovery !
+    for(int i=0; i< checkBoxes.count(); i++)
+        if (checkBoxes[i]->isChecked()) 
+            discovery += RideFileInterval::intervalTypeBits(static_cast<RideFileInterval::IntervalType>(i+user+1));
+
+    // new value returned
+    appsettings->setCValue(context->athlete->cyclist, GC_DISCOVERY, discovery);
+
+    // return change !
+    if (b4.discovery != discovery) return CONFIG_DISCOVERY;
+    else return 0;
+}
