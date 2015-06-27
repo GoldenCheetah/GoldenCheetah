@@ -591,7 +591,7 @@ MainWindow::MainWindow(const QDir &home)
 #ifdef GC_HAVE_SOAP
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+T"));
-    rideMenu->addAction(tr("Synchronise TrainingPeaks..."), this, SLOT(downloadTP()), tr(""));
+    rideMenu->addAction(tr("Synchronise TrainingPeaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
 #endif
 
 #ifdef GC_HAVE_KQOAUTH
