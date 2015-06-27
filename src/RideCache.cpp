@@ -45,12 +45,6 @@ RideCache::RideCache(Context *context) : context(context)
     progress_ = 100;
     exiting = false;
 
-    // get the new zone configuration fingerprint
-    fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint())
-                  + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint())
-                  + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint())
-                  + static_cast<unsigned long>(context->athlete->routes->getFingerprint());
-
     // set the list
     // populate ride list
     RideItem *last = NULL;
@@ -123,7 +117,7 @@ RideCache::configChanged(qint32 what)
 
     // if zones or weight has changed refresh metrics
     // will add more as they come
-    qint32 want = CONFIG_ATHLETE | CONFIG_ZONES | CONFIG_NOTECOLOR | CONFIG_GENERAL;
+    qint32 want = CONFIG_ATHLETE | CONFIG_ZONES | CONFIG_NOTECOLOR | CONFIG_DISCOVERY | CONFIG_GENERAL;
     if (what & want) {
 
         // restart !

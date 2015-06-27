@@ -35,8 +35,9 @@
 // 1.0      Dec 2014   Mark Liversedge         initial version
 // 1.1      12 Dec 14  Mark Liversedge         added color, isRun and present
 // 1.2      03 May 15  Mark Liversedge         added intervals, samples bool and metric <> 0
+// 1.3      27 Jun 15  Mark Liversedge         rationalised all the discovery intervals
 
-#define RIDEDB_VERSION "1.2"
+#define RIDEDB_VERSION "1.3"
 
 #endif
 
