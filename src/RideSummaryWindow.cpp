@@ -361,6 +361,7 @@ RideSummaryWindow::refresh()
     }
 }
 
+#if 0 // not used at present
 static QString rankingString(int number)
 {
     QString ext=""; 
@@ -388,6 +389,7 @@ static QString rankingString(int number)
     }
     return QString("%1%2").arg(number).arg(ext);
 }
+#endif
 
 QString
 RideSummaryWindow::htmlSummary()

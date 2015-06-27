@@ -972,5 +972,31 @@ class AutoImportPage : public QWidget
 
 };
 
+class IntervalsPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+    public:
+        IntervalsPage(Context *context);
+        qint32 saveClicked();
+
+        unsigned int discoveryWAS;
+
+    public slots:
+
+    private:
+        Context *context;
+        int user; //index of user interval type
+
+        QList <QCheckBox*> checkBoxes;
+
+        struct {
+            int discovery;
+        } b4;
+
+    private slots:
+};
+
 
 #endif

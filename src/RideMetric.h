@@ -97,7 +97,7 @@ public:
     virtual int precision() const { return precision_; }
 
     // The actual value of this ride metric, in the units above.
-    virtual double value(bool metric) const { return metric ? value_ : (value_ * conversion_); }
+    virtual double value(bool metric) const { return metric ? value_ : (value_ * conversion_ + conversionSum_); }
     // The internal value of this ride metric, useful to cache and then setValue.
     double value() const { return value_; }
 

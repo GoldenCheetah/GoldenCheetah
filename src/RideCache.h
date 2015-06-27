@@ -132,7 +132,6 @@ class RideCache : public QObject
         RideCacheModel *model_;
         bool exiting;
 	    double progress_; // percent
-        unsigned long fingerprint; // zone configuration fingerprint
 
         QFuture<void> future;
         QFutureWatcher<void> watcher;
