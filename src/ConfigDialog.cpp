@@ -23,6 +23,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "ConfigDialog.h"
+#include "RideCache.h"
 #include "Pages.h"
 #include "Settings.h"
 #include "Zones.h"
@@ -209,6 +210,10 @@ void ConfigDialog::closeClicked()
 //   ! new mode: change the CP associated with the present mode
 void ConfigDialog::saveClicked()
 {
+    // if a refresh is happenning stop it, whilst we 
+    // update all the configuration settings!
+    context->athlete->rideCache->cancel();
+
     // what changed ?
     qint32 changed = 0;
 
