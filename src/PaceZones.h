@@ -122,6 +122,9 @@ class PaceZones : public QObject
         // or to defaults using Skiba's coefficients
         void initializeZoneParameters();
 
+        // Sport
+        bool isSwim() { return swim; }
+
         //
         // Zone history - Ranges
         //
