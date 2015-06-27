@@ -824,6 +824,48 @@ struct AvgSmO2 : public RideMetric {
 static bool avgSmO2Added =
     RideMetricFactory::instance().addMetric(AvgSmO2());
 
+struct AvgtHb : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AvgtHb)
+
+    double count, total;
+
+    public:
+
+    AvgtHb()
+    {
+        setSymbol("average_tHb");
+        setInternalName("Average tHb");
+    }
+    void initialize() {
+        setName(tr("Average tHb"));
+        setMetricUnits(tr("mg/L"));
+        setImperialUnits(tr("mg/L"));
+        setType(RideMetric::Average);
+        setPrecision(2);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+        total = count = 0;
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->thb >= 0.0) {
+                total += point->thb;
+                ++count;
+            }
+        }
+        setValue(count > 0 ? total / count : 0);
+        setCount(count);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("O"); }
+
+    RideMetric *clone() const { return new AvgtHb(*this); }
+};
+
+static bool avgtHbAdded =
+    RideMetricFactory::instance().addMetric(AvgtHb());
+
 //////////////////////////////////////////////////////////////////////////////
 
 struct AAvgPower : public RideMetric {
@@ -1419,6 +1461,41 @@ class MaxSmO2 : public RideMetric {
 static bool maxSmO2Added =
     RideMetricFactory::instance().addMetric(MaxSmO2());
 
+class MaxtHb : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MaxtHb)
+    double max;
+    public:
+    MaxtHb() : max(0.0)
+    {
+        setSymbol("max_tHb");
+        setInternalName("Max tHb");
+    }
+    void initialize() {
+        setName(tr("Max tHb"));
+        setMetricUnits(tr("mg/L"));
+        setImperialUnits(tr("mg/L"));
+        setType(RideMetric::Peak);
+        setPrecision(2);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->thb >= max)
+                max = point->thb;
+        }
+        setValue(max);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("O"); }
+
+    RideMetric *clone() const { return new MaxtHb(*this); }
+};
+
+static bool maxtHbAdded =
+    RideMetricFactory::instance().addMetric(MaxtHb());
+
 //////////////////////////////////////////////////////////////////////////////
 
 class MinSmO2 : public RideMetric {
@@ -1451,6 +1528,38 @@ class MinSmO2 : public RideMetric {
 
 static bool minSmO2Added =
     RideMetricFactory::instance().addMetric(MinSmO2());
+
+class MintHb : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MintHb)
+    double min;
+    public:
+    MintHb() : min(0.0)
+    {
+        setSymbol("min_tHb");
+        setInternalName("Min tHb");
+    }
+    void initialize() {
+        setName(tr("Min tHb"));
+        setMetricUnits(tr("mg/L"));
+        setImperialUnits(tr("mg/L"));
+        setType(RideMetric::Low);
+        setPrecision(2);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->thb > 0 && point->thb >= min)
+                min = point->thb;
+        }
+        setValue(min);
+    }
+    RideMetric *clone() const { return new MintHb(*this); }
+};
+
+static bool mintHb =
+    RideMetricFactory::instance().addMetric(MintHb());
 
 //////////////////////////////////////////////////////////////////////////////
 

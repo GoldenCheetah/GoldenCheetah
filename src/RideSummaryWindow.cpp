@@ -473,6 +473,8 @@ RideSummaryWindow::htmlSummary()
        (!ridesummary && context->athlete->rideCache->getAggregate("average_smo2", specification, true) != "-")) {
         averageColumn << "average_smo2";
         maximumColumn << "max_smo2";
+        averageColumn << "average_tHb";
+        maximumColumn << "max_tHb";
     }
 
     // users determine the metrics to display
