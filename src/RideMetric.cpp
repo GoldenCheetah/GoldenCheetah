@@ -116,8 +116,9 @@
 // 110 12  Jun 2015 Mark Liversedge    Added climb rating
 // 111 14  Jun 2015 Mark Liversedge    Added W'bal time in zone metrics
 // 112 18  Jun 2015 Mark Liversedge    Added Core Temp average and max
+// 113 27  Jun 2015 Mark Liversedge    Added Average/Min/Max tHb
 
-int DBSchemaVersion = 112;
+int DBSchemaVersion = 113;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
