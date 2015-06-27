@@ -54,9 +54,13 @@ class NewCyclistDialog : public QDialog
         QDateEdit *dob;
         QComboBox *sex;
         QLabel *weightlabel;
+        QLabel *heightlabel;
+        QLabel *cvRnlabel, *cvSwlabel;
         QComboBox *unitCombo;
         QSpinBox *cp, *w, *pmax, *lthr, *resthr, *maxhr; // mandatory non-zero, default from age
+        QTimeEdit *cvRn, *cvSw;
         QDoubleSpinBox *weight;
+        QDoubleSpinBox *height;
         QSpinBox *wbaltau;
         QTextEdit  *bio;
         QPushButton *avatarButton;
