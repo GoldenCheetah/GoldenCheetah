@@ -440,7 +440,8 @@ RideItem::checkStale()
                         + static_cast<unsigned long>(context->athlete->paceZones(false)->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->paceZones(true)->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
-                        + static_cast<unsigned long>(context->athlete->routes->getFingerprint());
+                        + static_cast<unsigned long>(context->athlete->routes->getFingerprint())
+                        + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 63).toInt();
 
             if (fingerprint != rfingerprint) {
 
@@ -546,7 +547,8 @@ RideItem::refresh()
                     + static_cast<unsigned long>(context->athlete->paceZones(false)->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->paceZones(true)->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
-                    + static_cast<unsigned long>(context->athlete->routes->getFingerprint());
+                    + static_cast<unsigned long>(context->athlete->routes->getFingerprint()) +
+                    + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 63).toInt();
 
         dbversion = DBSchemaVersion;
         timestamp = QDateTime::currentDateTime().toTime_t();
@@ -645,6 +647,9 @@ static bool intervalGreaterThanZone(const IntervalItem *a, const IntervalItem *b
 void
 RideItem::updateIntervals()
 {
+    // what do we need ?
+    int discovery = appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 63).toInt();
+
     // DO NOT USE ride() since it will call a refresh !
     RideFile *f = ride_;
 
@@ -652,7 +657,7 @@ RideItem::updateIntervals()
     intervals_.clear();
 
     // no ride data available ?
-    if (!samples) {
+    if (!samples || !discovery) {
         context->notifyIntervalsUpdate(this);
         return;
     }
@@ -693,19 +698,23 @@ RideItem::updateIntervals()
     RideFilePoint *begin = f->dataPoints().first();
     RideFilePoint *end = f->dataPoints().last();
 
-    // add entire ride using ride metrics
-    IntervalItem *entire = new IntervalItem(this, tr("Entire Activity"), 
-                                            begin->secs, end->secs, 
-                                            f->timeToDistance(begin->secs),
-                                            f->timeToDistance(end->secs),
-                                            0,
-                                            QColor(Qt::darkBlue),
-                                            RideFileInterval::ALL);
+    // ALL interval
+    if (discovery & RideFileInterval::intervalTypeBits(RideFileInterval::ALL)) {
 
-    // same as the whole ride, not need to compute
-    entire->metrics() = metrics();
-    entire->rideInterval = NULL;
-    intervals_ << entire;
+        // add entire ride using ride metrics
+        IntervalItem *entire = new IntervalItem(this, tr("Entire Activity"), 
+                                                begin->secs, end->secs, 
+                                                f->timeToDistance(begin->secs),
+                                                f->timeToDistance(end->secs),
+                                                0,
+                                                QColor(Qt::darkBlue),
+                                                RideFileInterval::ALL);
+
+        // same as the whole ride, not need to compute
+        entire->metrics() = metrics();
+        entire->rideInterval = NULL;
+        intervals_ << entire;
+    }
 
     int count = 0;
     foreach(RideFileInterval *interval, f->intervals()) {
@@ -748,7 +757,8 @@ RideItem::updateIntervals()
     // DISCOVERY
 
     //qDebug() << "SEARCH PEAK POWERS"
-    if (!f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
+    if ((discovery & RideFileInterval::intervalTypeBits(RideFileInterval::PEAKPOWER)) &&
+        !f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
 
         // what we looking for ?
         static int durations[] = { 1, 5, 10, 15, 20, 30, 60, 300, 600, 1200, 1800, 2700, 3600, 0 };
@@ -780,7 +790,8 @@ RideItem::updateIntervals()
     }
 
     //qDebug() << "SEARCH PEAK PACE"
-    if ((f->isRun() || f->isSwim()) && f->isDataPresent(RideFile::kph)) {
+    if ((discovery & RideFileInterval::intervalTypeBits(RideFileInterval::PEAKPACE)) &&
+        (f->isRun() || f->isSwim()) && f->isDataPresent(RideFile::kph)) {
 
         // what we looking for ?
         static int durations[] = { 10, 15, 20, 30, 60, 300, 600, 1200, 1800, 2700, 3600, 0 };
@@ -819,7 +830,8 @@ RideItem::updateIntervals()
     QList<effort> candidates[10];
     QList<effort> candidates_sprint;
     
-    if (CP > 0 && WPRIME > 0 && PMAX > 0 && !f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
+    if ((discovery & RideFileInterval::intervalTypeBits(RideFileInterval::EFFORT)) &&
+        CP > 0 && WPRIME > 0 && PMAX > 0 && !f->isRun() && !f->isSwim() && f->isDataPresent(RideFile::watts)) {
 
         const int SAMPLERATE = 1000; // 1000ms samplerate = 1 second samples
 
@@ -1130,7 +1142,9 @@ RideItem::updateIntervals()
     } // if arraySize is in bounds, no indent from above
 
     //qDebug() << "SEARCH HILLS";
-    if (!f->isSwim() && f->isDataPresent(RideFile::alt)) {
+    if ((discovery & RideFileInterval::intervalTypeBits(RideFileInterval::CLIMB)) &&
+        !f->isSwim() && f->isDataPresent(RideFile::alt)) {
+
         // log of progress
         QFile log(context->athlete->home->logs().canonicalPath() + "/" + "climb.log");
         log.open(QIODevice::ReadWrite);
@@ -1241,7 +1255,7 @@ RideItem::updateIntervals()
 
 
     //Search routes
-    if (f->isDataPresent(RideFile::lon)) {
+    if ((discovery & RideFileInterval::intervalTypeBits(RideFileInterval::ROUTE)) && f->isDataPresent(RideFile::lon)) {
 
         // set intervals for routes
         QList<IntervalItem*> here;
@@ -1256,7 +1270,8 @@ RideItem::updateIntervals()
     }
 
     // Search W' MATCHES incl. those that take us to EXHAUSTION
-    if (f->isDataPresent(RideFile::watts) && f->wprimeData()) {
+    if ((discovery & RideFileInterval::intervalTypeBits(RideFileInterval::EFFORT)) &&
+        f->isDataPresent(RideFile::watts) && f->wprimeData()) {
 
         // add one for each
         foreach(struct Match match, f->wprimeData()->matches) {
@@ -1302,6 +1317,7 @@ RideItem::updateIntervals()
     // aggregate in this array before updating the metric
     QList<IntervalItem *> efforts = intervals(RideFileInterval::EFFORT);
 
+    // if not discovering then there won't be any!
     if (efforts.count()) {
 
         // we have some efforts so some time was in a sustained effort

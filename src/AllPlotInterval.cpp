@@ -175,7 +175,7 @@ AllPlotInterval::sortIntervals(QList<IntervalItem*> &intervals, QList< QList<Int
     for (int i=0; i<intervals.count(); i++) {
         IntervalItem* interval = intervals.at(i);
 
-        if (groupMatch && interval->type == RideFileInterval::MATCH) {
+        if (groupMatch && interval->type == RideFileInterval::USER) {
             matchesGroup.append(interval);
             intervals.removeOne(interval);
             //intervals.move(i, place++);

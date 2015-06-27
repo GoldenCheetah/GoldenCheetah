@@ -235,6 +235,9 @@
 // wbal formula to use
 #define GC_WBALFORM               "wbal/formula"
 
+// intervals to discover
+#define GC_DISCOVERY              "intervals/discovery"
+
 // success tracking of more complex upgrades stored on athlete level
 #define GC_UPGRADE_FOLDER_SUCCESS  "upgradesuccess/folder"
 

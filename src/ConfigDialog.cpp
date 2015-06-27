@@ -65,6 +65,7 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     static QIcon appearanceIcon(QPixmap(":/images/toolbar/color.png"));
     static QIcon dataIcon(QPixmap(":/images/toolbar/data.png"));
     static QIcon metricsIcon(QPixmap(":/images/toolbar/abacus.png"));
+    static QIcon intervalIcon(QPixmap(":/images/stopwatch.png"));
     static QIcon devicesIcon(QPixmap(":/images/devices/kickr.png"));
 
     // Setup the signal mapping so the right config
@@ -100,9 +101,14 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 5);
 
-    added =head->addAction(devicesIcon, tr("Train Devices"));
+    added =head->addAction(intervalIcon, tr("Intervals"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 6);
+
+
+    added =head->addAction(devicesIcon, tr("Train Devices"));
+    connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
+    iconMapper->setMapping(added, 7);
 
     // more space
     spacer = new QWidget(this);
@@ -143,6 +149,11 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     HelpWhatsThis *metricHelp = new HelpWhatsThis(metric);
     metric->setWhatsThis(metricHelp->getWhatsThisText(HelpWhatsThis::Preferences_Metrics));
     pagesWidget->addWidget(metric);
+
+    interval = new IntervalConfig(_home, _zones, context);
+    //HelpWhatsThis *intervalHelp = new HelpWhatsThis(interval);
+    //interval->setWhatsThis(intervalHelp->getWhatsThisText(HelpWhatsThis::Preferences_Intervals));
+    pagesWidget->addWidget(interval);
 
     device = new DeviceConfig(_home, _zones, context);
     HelpWhatsThis *deviceHelp = new HelpWhatsThis(device);
@@ -208,6 +219,7 @@ void ConfigDialog::saveClicked()
     changed |= metric->saveClicked();
     changed |= data->saveClicked();
     changed |= device->saveClicked();
+    changed |= interval->saveClicked();
 
     hide();
 
@@ -405,6 +417,30 @@ qint32 MetricConfig::saveClicked()
 
     state |= bestsPage->saveClicked();
     state |= summaryPage->saveClicked();
+    state |= intervalsPage->saveClicked();
+
+    return state;
+}
+
+IntervalConfig::IntervalConfig(QDir home, Zones *zones, Context *context) :
+    home(home), zones(zones), context(context)
+{
+    // the widgets
+    intervalsPage = new IntervalsPage(context);
+
+    setContentsMargins(0,0,0,0);
+    QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    mainLayout->addWidget(intervalsPage);
+    mainLayout->addStretch();
+}
+
+qint32 IntervalConfig::saveClicked()
+{
+    qint32 state = 0;
+
     state |= intervalsPage->saveClicked();
 
     return state;

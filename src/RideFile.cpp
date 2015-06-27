@@ -396,15 +396,40 @@ QString RideFileInterval::typeDescription(intervaltype x)
     case ALL : return tr("ALL"); break;
     case DEVICE : return tr("DEVICE"); break;
     case USER : return tr("USER"); break;
+    case PEAKPACE : return tr("PEAK PACE"); break;
     case PEAKPOWER : return tr("PEAK POWER"); break;
-    case SPRINT : return tr("SPRINT"); break;
     case ROUTE : return tr("SEGMENTS"); break;
-    case PEAKHR : return tr("PEAK HR"); break;
     case CLIMB : return tr("CLIMBING"); break;
     case EFFORT : return tr("EFFORTS"); break;
-    case MATCH : return tr("MATCHES"); break;
-    case TTE : return tr("EXHAUSTION"); break;
-    case PEAKPACE : return tr("PEAK PACE"); break;
+    }
+}
+QString RideFileInterval::typeDescriptionLong(intervaltype x)
+{
+    switch (x) {
+    default:
+    case ALL : return tr("The entire activity"); break;
+    case DEVICE : return tr("Device specific intervals"); break;
+    case USER : return tr("User defined laps or marked intervals"); break;
+    case PEAKPACE : return tr("Peak pace for running and swimming"); break;
+    case PEAKPOWER : return tr("Peak powers for cycling 1s thru 1hr"); break;
+    case ROUTE : return tr("Route segments using GPS data"); break;
+    case CLIMB : return tr("Ascents for hills and mountains"); break;
+    case EFFORT : return tr("Sustained efforts and matches using power"); break;
+    }
+}
+qint32 
+RideFileInterval::intervalTypeBits(intervaltype x) // used for config what is/isn't autodiscovered
+{
+    switch (x) {
+    default:
+    case ALL : return 1;
+    case DEVICE : return 0;
+    case USER : return 0;
+    case PEAKPACE : return 2;
+    case PEAKPOWER : return 4;
+    case ROUTE : return 8;
+    case CLIMB : return 16;
+    case EFFORT : return 32;
     }
 }
 
