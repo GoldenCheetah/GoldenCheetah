@@ -29,6 +29,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_dict.h>
 #include <qwt_plot_marker.h>
+#include <qwt_plot_intervalcurve.h>
 #include <qwt_point_3d.h>
 #include <qwt_scale_widget.h>
 #include <qwt_compat.h>
@@ -118,7 +119,14 @@ class CurveColors : public QObject
             while (c.hasNext()) {
                 c.next();
                 c.key()->setVisible(c.value());
-                if (c.value()) shown << static_cast<QwtPlotCurve*>(c.key())->pen().color();
+
+                if (c.value()) {
+                    if (c.key()->rtti() == QwtPlotItem::Rtti_PlotIntervalCurve) {
+                        shown << static_cast<QwtPlotIntervalCurve*>(c.key())->pen().color();
+                    } else if (c.key()->rtti() == QwtPlotItem::Rtti_PlotCurve) {
+                        shown << static_cast<QwtPlotCurve*>(c.key())->pen().color();
+                    }
+                }
             }
 
             // show all labels
@@ -244,8 +252,13 @@ class CurveColors : public QObject
 
                     // show and remember color
                     c.key()->setVisible(c.value());
-                    if (c.value()) shown << static_cast<QwtPlotCurve*>(c.key())->pen().color();
-
+                    if (c.value()) {
+                        if (c.key()->rtti() == QwtPlotItem::Rtti_PlotIntervalCurve) {
+                            shown << static_cast<QwtPlotIntervalCurve*>(c.key())->pen().color();
+                        } else if (c.key()->rtti() == QwtPlotItem::Rtti_PlotCurve) {
+                            shown << static_cast<QwtPlotCurve*>(c.key())->pen().color();
+                        }
+                    }
 
                     if (showslider && c.key()->yAxis() == id) {
 
