@@ -838,8 +838,8 @@ struct AvgtHb : public RideMetric {
     }
     void initialize() {
         setName(tr("Average tHb"));
-        setMetricUnits(tr("mg/L"));
-        setImperialUnits(tr("mg/L"));
+        setMetricUnits(tr("g/dL"));
+        setImperialUnits(tr("g/dL"));
         setType(RideMetric::Average);
         setPrecision(2);
     }
@@ -1472,8 +1472,8 @@ class MaxtHb : public RideMetric {
     }
     void initialize() {
         setName(tr("Max tHb"));
-        setMetricUnits(tr("mg/L"));
-        setImperialUnits(tr("mg/L"));
+        setMetricUnits(tr("g/dL"));
+        setImperialUnits(tr("g/dL"));
         setType(RideMetric::Peak);
         setPrecision(2);
     }
@@ -1540,8 +1540,8 @@ class MintHb : public RideMetric {
     }
     void initialize() {
         setName(tr("Min tHb"));
-        setMetricUnits(tr("mg/L"));
-        setImperialUnits(tr("mg/L"));
+        setMetricUnits(tr("g/dL"));
+        setImperialUnits(tr("g/dL"));
         setType(RideMetric::Low);
         setPrecision(2);
     }
