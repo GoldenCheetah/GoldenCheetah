@@ -19,6 +19,7 @@
 #include "NewCyclistDialog.h"
 #include "Zones.h"
 #include "HrZones.h"
+#include "PaceZones.h"
 #include "GcUpgrade.h"
 #include "Athlete.h"
 
@@ -42,9 +43,14 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     QLabel *resthrlabel = new QLabel(tr("Resting Heartrate"));
     QLabel *lthrlabel = new QLabel(tr("Lactate Heartrate"));
     QLabel *maxhrlabel = new QLabel(tr("Maximum Heartrate"));
+    cvRnlabel = new QLabel(tr("CV Run (%1)").arg(useMetricUnits ? tr("min/km") : tr("min/mile")));
+    cvSwlabel = new QLabel(tr("CV Swim (%1)").arg(useMetricUnits ? tr("min/100m") : tr("min/100yd")));
 
     QString weighttext = QString(tr("Weight (%1)")).arg(useMetricUnits ? tr("kg") : tr("lb"));
     weightlabel = new QLabel(weighttext);
+
+    QString heighttext = QString(tr("Height (%1)")).arg(useMetricUnits ? tr("cm") : tr("in"));
+    heightlabel = new QLabel(heighttext);
 
     name = new QLineEdit(this);
 
@@ -63,6 +69,12 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     weight->setMinimum(0.0);
     weight->setDecimals(1);
     weight->setValue(75); // default
+
+    height = new QDoubleSpinBox(this);
+    height->setMaximum(999.9);
+    height->setMinimum(0.0);
+    height->setDecimals(1);
+    height->setValue(175); // default
 
     cp = new QSpinBox(this);
     cp->setMinimum(100); // juniors may average 100w for an hour, lower values might be seen for para-juniors (?)
@@ -107,6 +119,18 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     maxhr->setSingleStep(1);
     maxhr->setValue(190);
 
+    // cvRn default is a nice round number comparable to CP default
+    cvRn = new QTimeEdit(QTime::fromString("04:00", "mm:ss"));
+    cvRn->setMinimumTime(QTime::fromString("01:00", "mm:ss"));
+    cvRn->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
+    cvRn->setDisplayFormat("mm:ss");
+
+    // cvSw default is in 4-1 relation to cvRun
+    cvSw = new QTimeEdit(QTime::fromString("01:36", "mm:ss"));
+    cvSw->setMinimumTime(QTime::fromString("01:00", "mm:ss"));
+    cvSw->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
+    cvSw->setDisplayFormat("mm:ss");
+
     bio = new QTextEdit(this);
 
     avatar = QPixmap(":/images/noavatar.png");
@@ -125,28 +149,34 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     grid->addWidget(sexlabel, 2, 0, alignment);
     grid->addWidget(unitlabel, 3, 0, alignment);
     grid->addWidget(weightlabel, 4, 0, alignment);
-    grid->addWidget(cplabel, 5, 0, alignment);
-    grid->addWidget(wlabel, 6, 0, alignment);
-    grid->addWidget(pmaxlabel, 7, 0, alignment);
-    grid->addWidget(wbaltaulabel, 8, 0, alignment);
-    grid->addWidget(resthrlabel, 9, 0, alignment);
-    grid->addWidget(lthrlabel, 10, 0, alignment);
-    grid->addWidget(maxhrlabel, 11, 0, alignment);
-    grid->addWidget(biolabel, 12, 0, alignment);
+    grid->addWidget(heightlabel, 5, 0, alignment);
+    grid->addWidget(cplabel, 6, 0, alignment);
+    grid->addWidget(wlabel, 7, 0, alignment);
+    grid->addWidget(pmaxlabel, 8, 0, alignment);
+    grid->addWidget(wbaltaulabel, 9, 0, alignment);
+    grid->addWidget(resthrlabel, 10, 0, alignment);
+    grid->addWidget(lthrlabel, 11, 0, alignment);
+    grid->addWidget(maxhrlabel, 12, 0, alignment);
+    grid->addWidget(cvRnlabel, 13, 0, alignment);
+    grid->addWidget(cvSwlabel, 14, 0, alignment);
+    grid->addWidget(biolabel, 15, 0, alignment);
 
     grid->addWidget(name, 0, 1, alignment);
     grid->addWidget(dob, 1, 1, alignment);
     grid->addWidget(sex, 2, 1, alignment);
     grid->addWidget(unitCombo, 3, 1, alignment);
     grid->addWidget(weight, 4, 1, alignment);
-    grid->addWidget(cp, 5, 1, alignment);
-    grid->addWidget(w, 6, 1, alignment);
-    grid->addWidget(pmax, 7, 1, alignment);
-    grid->addWidget(wbaltau, 8, 1, alignment);
-    grid->addWidget(resthr, 9, 1, alignment);
-    grid->addWidget(lthr, 10, 1, alignment);
-    grid->addWidget(maxhr, 11, 1, alignment);
-    grid->addWidget(bio, 13, 0, 1, 4);
+    grid->addWidget(height, 5, 1, alignment);
+    grid->addWidget(cp, 6, 1, alignment);
+    grid->addWidget(w, 7, 1, alignment);
+    grid->addWidget(pmax, 8, 1, alignment);
+    grid->addWidget(wbaltau, 9, 1, alignment);
+    grid->addWidget(resthr, 10, 1, alignment);
+    grid->addWidget(lthr, 11, 1, alignment);
+    grid->addWidget(maxhr, 12, 1, alignment);
+    grid->addWidget(cvRn, 13, 1, alignment);
+    grid->addWidget(cvSw, 14, 1, alignment);
+    grid->addWidget(bio, 16, 0, 1, 4);
 
     grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
@@ -187,12 +217,36 @@ NewCyclistDialog::unitChanged(int currentIndex)
         QString weighttext = QString(tr("Weight (%1)")).arg(tr("kg"));
         weightlabel->setText(weighttext);
         weight->setValue(weight->value() / LB_PER_KG);
+        QString heighttext = QString(tr("Height (%1)")).arg(tr("cm"));
+        heightlabel->setText(heighttext);
+        height->setValue(height->value() * CM_PER_INCH);
+
+        cvRnlabel->setText(tr("CV Run (%1)").arg(tr("min/km")));
+        PaceZones rnPaceZones(false);
+        cvRn->setTime(QTime::fromString(rnPaceZones.kphToPaceString(rnPaceZones.kphFromTime(cvRn, false), true), "mm:ss"));
+
+        cvSwlabel->setText(tr("CV Swim (%1)").arg(tr("min/100m")));
+        PaceZones swPaceZones(true);
+        cvSw->setTime(QTime::fromString(swPaceZones.kphToPaceString(swPaceZones.kphFromTime(cvSw, false), true), "mm:ss"));
+
         useMetricUnits = true;
     }
     else {
         QString weighttext = QString(tr("Weight (%1)")).arg(tr("lb"));
         weightlabel->setText(weighttext);
         weight->setValue(weight->value() * LB_PER_KG);
+        QString heighttext = QString(tr("Height (%1)")).arg(tr("in"));
+        heightlabel->setText(heighttext);
+        height->setValue(height->value() / CM_PER_INCH);
+
+        cvRnlabel->setText(tr("CV Run (%1)").arg(tr("min/mile")));
+        PaceZones rnPaceZones(false);
+        cvRn->setTime(QTime::fromString(rnPaceZones.kphToPaceString(rnPaceZones.kphFromTime(cvRn, true), false), "mm:ss"));
+
+        cvSwlabel->setText(tr("CV Swim (%1)").arg(tr("min/100yd")));
+        PaceZones swPaceZones(true);
+        cvSw->setTime(QTime::fromString(swPaceZones.kphToPaceString(swPaceZones.kphFromTime(cvSw, true), false), "mm:ss"));
+
         useMetricUnits = false;
     }
 }
@@ -249,6 +303,7 @@ NewCyclistDialog::saveClicked()
 
                 appsettings->setCValue(name->text(), GC_DOB, dob->date());
                 appsettings->setCValue(name->text(), GC_WEIGHT, weight->value() * (useMetricUnits ? 1.0 : KG_PER_LB));
+                appsettings->setCValue(name->text(), GC_HEIGHT, height->value() * (useMetricUnits ? 1.0/100.0 : CM_PER_INCH/100.0));
                 appsettings->setCValue(name->text(), GC_WBALTAU, wbaltau->value());
                 appsettings->setCValue(name->text(), GC_SEX, sex->currentIndex());
                 appsettings->setCValue(name->text(), GC_BIO, bio->toPlainText());
@@ -264,6 +319,15 @@ NewCyclistDialog::saveClicked()
                 hrzones.addHrZoneRange(QDate(1900, 01, 01), lthr->value(), resthr->value(), maxhr->value());
                 hrzones.write(athleteHome->config().canonicalPath());
 
+                // Pace Zones for Run
+                PaceZones rnPaceZones(false);
+                rnPaceZones.addZoneRange(QDate(1900, 01, 01), rnPaceZones.kphFromTime(cvRn, useMetricUnits));
+                rnPaceZones.write(athleteHome->config().canonicalPath());
+
+                // Pace Zones for Run
+                PaceZones swPaceZones(true);
+                swPaceZones.addZoneRange(QDate(1900, 01, 01), swPaceZones.kphFromTime(cvSw, useMetricUnits));
+                swPaceZones.write(athleteHome->config().canonicalPath());
 
                 accept();
             } else {
