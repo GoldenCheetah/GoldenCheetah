@@ -4735,7 +4735,9 @@ CVPage::CVPage(PaceZonePage* zonePage) : zonePage(zonePage)
     dateEdit = new QDateEdit;
     dateEdit->setDate(QDate::currentDate());
 
-    cvEdit = new QTimeEdit(QTime::fromString("05:00", "mm:ss"));
+    // CV default is 4min/km for Running a round number inline with
+    // CP default and 1:36min/100 for swimming (4:1 relation)
+    cvEdit = new QTimeEdit(QTime::fromString(zonePage->zones->isSwim() ? "01:36" : "04:00", "mm:ss"));
     cvEdit->setMinimumTime(QTime::fromString("01:00", "mm:ss"));
     cvEdit->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
     cvEdit->setDisplayFormat("mm:ss");
