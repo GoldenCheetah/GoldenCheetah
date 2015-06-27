@@ -18,6 +18,7 @@
 
 #include "FitRideFile.h"
 #include "Settings.h"
+#include "Units.h"
 #include <QSharedPointer>
 #include <QMap>
 #include <QSet>
@@ -28,7 +29,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <limits>
-
+#include <cmath>
 #define FIT_DEBUG false // debug traces
 
 #define RECORD_TYPE 20
@@ -487,7 +488,6 @@ struct FitFileReaderState
                 return;
             }
         }
-
         if (rideFile->dataPoints().count()) // no samples means no laps..
             rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time, QString(QObject::tr("Lap %1")).arg(interval));
     }
@@ -648,7 +648,7 @@ struct FitFileReaderState
                          unknown_record_fields.insert(field.num);
             }
         }
-        if (time == last_time)
+        if (time <= last_time)
             return; // Sketchy, but some FIT files do this.
         if (stopped) {
             // As it turns out, this happens all the time in some FIT files.
@@ -683,7 +683,6 @@ struct FitFileReaderState
         //    time, lat, lng, alt, hr,
         //    cad, km, kph, watts, grade,
         //    resistance, time_from_course, temperature );
-
         double secs = time - start_time;
         double nm = 0;
         double headwind = 0.0;
@@ -787,9 +786,144 @@ struct FitFileReaderState
                      leftTopDeathCenter, rightTopDeathCenter, leftBottomDeathCenter, rightBottomDeathCenter,
                      leftTopPeakPowerPhase, rightTopPeakPowerPhase, leftBottomPeakPowerPhase, rightBottomPeakPowerPhase,
                      smO2, tHb, rvert, rcad, rcontact, 0.0, interval);
-
         last_time = time;
         last_distance = km;
+    }
+
+    void decodeLength(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+        time_t time = 0;
+        if (time_offset > 0)
+            time = last_time + time_offset;
+        double cad = 0, km = 0, kph = 0;
+
+        bool length_type = false;
+        double length_duration = 0.0;
+
+        int i = 0;
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+            if( value == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 0: // event
+                        if (FIT_DEBUG) qDebug() << " event:" << value;
+                        break;
+                case 1: // event type
+                        if (FIT_DEBUG) qDebug() << " event_type:" << value;
+                        break;
+                case 2: // start time
+                        time = value + qbase_time.toTime_t();
+                        // Time MUST NOT go backwards
+                        // You canny break the laws of physics, Jim
+                        if (time < last_time)
+                            time = last_time;
+                        break;
+                case 3: // total elapsed time
+                        length_duration = value / 1000;
+                        break;
+                case 4: // total timer time
+                        if (FIT_DEBUG) qDebug() << " total_timer_time:" << value;
+                        break;
+                case 5: // total strokes
+                        if (FIT_DEBUG) qDebug() << " total_strokes:" << value;
+                        break;
+                case 6: // avg speed
+                        kph = value * 3.6 / 1000.0;
+                        break;
+                case 7: // swim stroke
+                        if (FIT_DEBUG) qDebug() << " swim_stroke:" << value;
+                        break;
+                case 9: // cadence
+                        cad = value;
+                        break;
+                case 11: // total_calories
+                        if (FIT_DEBUG) qDebug() << " total_calories:" << value;
+                        break;
+                case 12: // length type: 0-rest, 1-strokes
+                        length_type = value;
+                        break;
+                case 254: // message_index
+                        if (FIT_DEBUG) qDebug() << " message_index:" << value;
+                        break;
+                default:
+                         unknown_record_fields.insert(field.num);
+            }
+        }
+
+        // Rest interval
+        if (!length_type) {
+            kph = 0.0;
+            cad = 0.0;
+        }
+        if (time == last_time)
+            return; // Sketchy, but some FIT files do this.
+        if (start_time == 0) {
+            start_time = time - 1; // recording interval?
+            QDateTime t;
+            t.setTime_t(start_time);
+            rideFile->setStartTime(t);
+        }
+
+        double secs = time - start_time;
+
+        // Normalize distance for the most common pool lengths,
+        // this is a hack to avoid the need for a double pass since
+        // pool_length comes in Session message at the end of the file.
+        double pool_length = kph*length_duration/3600;
+        if (fabs(pool_length - 0.050) < 0.004) pool_length = 0.050;
+        else if (fabs(pool_length - 0.025) < 0.002) pool_length = 0.025;
+        else if (fabs(pool_length - 0.025*METERS_PER_YARD) < 0.002) pool_length = 0.025*METERS_PER_YARD;
+        else if (fabs(pool_length - 0.020) < 0.002) pool_length = 0.020;
+
+        km = last_distance + pool_length;
+        if ((secs > last_time + 1) && (isGarminSmartRecording.toInt() != 0) && (secs - last_time < 10*GarminHWM.toInt())) {
+            double deltaSecs = secs - last_time;
+            for (int i = 1; i <= deltaSecs; i++) {
+                rideFile->appendPoint(
+                    last_time+i, 0.0, 0.0,
+                    last_distance,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, RideFile::NoTemp,
+                    0.0, 0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
+            }
+            last_time += deltaSecs;
+        }
+        double deltaSecs = length_duration;
+        double deltaDist = km - last_distance;
+
+        // only fill 10x the maximal smart recording gap defined
+        // in preferences - we don't want to crash / stall on bad
+        // or corrupt files
+        if ((isGarminSmartRecording.toInt() != 0) && deltaSecs > 0 && deltaSecs < 10*GarminHWM.toInt()) {
+
+            for (int i = 1; i <= deltaSecs; i++) {
+                double weight = i /deltaSecs;
+                rideFile->appendPoint(
+                    last_time + (deltaSecs * weight), cad, 0.0,
+                    last_distance + (deltaDist * weight),
+                    kph, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, RideFile::NoTemp,
+                    0.0, 0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
+            }
+            last_time += deltaSecs;
+            last_distance += deltaDist;
+        }
     }
 
     int read_record(bool &stop, QStringList &errors) {
@@ -935,16 +1069,14 @@ struct FitFileReaderState
                 case 23: //decodeDeviceInfo(def, time_offset, values); break; /* device info */
                 case 18: decodeSession(def, time_offset, values); break; /* session */
 
-                case 101: /* lap swimming length */
-                    errors << "Unsupported Lap Swimming FIT File - Use .tcx or .pwx formats";
-                    stop = true;
-                    break;
+                case 101: decodeLength(def, time_offset, values); break; /* lap swimming */
 
                 case 2: /* DEVICE_SETTINGS */
                 case 3: /* USER_PROFILE */
                 case 7: /* ZONES_TARGET12 */
                 case 8: /* HR_ZONE */
                 case 9: /* POWER_ZONE */
+                case 12: /* SPORT */
                 case 13: /* unknown */
                 case 22: /* undocumented */
                 case 72: /* undocumented  - new for garmin 800*/
@@ -955,6 +1087,8 @@ struct FitFileReaderState
                 case 113: /* unknown */
                 case 125: /* unknown */
                 case 128: /* unknown */
+                case 140: /* unknown */
+                case 141: /* unknown */
                 case 147: /* unknown */
 
                     break;
