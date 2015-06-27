@@ -657,7 +657,7 @@ RideItem::updateIntervals()
     intervals_.clear();
 
     // no ride data available ?
-    if (!samples || !discovery) {
+    if (!samples) {
         context->notifyIntervalsUpdate(this);
         return;
     }
@@ -719,21 +719,20 @@ RideItem::updateIntervals()
     int count = 0;
     foreach(RideFileInterval *interval, f->intervals()) {
 
-        // skip peaks, they're autodiscovered now
-        if (interval->isPeak()) continue;
+        // skip peaks when autodiscovered
+        if (discovery & RideFileInterval::intervalTypeBits(RideFileInterval::PEAKPOWER) && interval->isPeak()) continue;
 
-        // skip climbs, they're autodiscovered now
-        if (interval->isClimb()) continue;
+        // skip climbs when autodiscovered
+        if (discovery & RideFileInterval::intervalTypeBits(RideFileInterval::CLIMB) && interval->isClimb()) continue;
 
-        // skip matches, they're autodiscovered now
-        if (interval->isMatch()) continue;
+        // skip matches when autodiscovered
+        if (discovery & RideFileInterval::intervalTypeBits(RideFileInterval::EFFORT) && interval->isMatch()) continue;
 
-        // skip entire ride, they're autodiscovered too
-        if (interval->start <= begin->secs && interval->stop >= end->secs) continue;
-
-        // same as ride but offset by recintsecs
-        if (((interval->start - f->recIntSecs()) <= begin->secs && (interval->stop-f->recIntSecs()) >= end->secs) ||
-           (interval->start <= begin->secs && (interval->stop+f->recIntSecs()) >= end->secs))
+        // skip entire ride when autodiscovered
+        if (discovery & RideFileInterval::intervalTypeBits(RideFileInterval::ALL) && 
+           ((interval->start <= begin->secs && interval->stop >= end->secs) ||
+           (((interval->start - f->recIntSecs()) <= begin->secs && (interval->stop-f->recIntSecs()) >= end->secs) ||
+           (interval->start <= begin->secs && (interval->stop+f->recIntSecs()) >= end->secs))))
              continue;
 
         // skip empty backward intervals
