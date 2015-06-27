@@ -1298,9 +1298,14 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     QList<QString> buttonNames = logicalHeadings;
     qSort(buttonNames.begin(), buttonNames.end(), insensitiveLessThan);
 
+    QString last;
     foreach (QString column, buttonNames) {
 
+        // ignore groupby
         if (column == "*") continue;
+
+        // ignore meta fields that are metrics or duplicates
+        if (column == last || column.contains("_")) continue;
 
         // setup button
         QPushButton *add = new QPushButton(column, this);
@@ -1310,6 +1315,10 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
 
         connect(add, SIGNAL(pressed()), clicked, SLOT(map()));
         clicked->setMapping(add, column);
+
+        // for spotting duplicates
+        last = column;
+
     }
     scrollarea->setWidget(but);
 
