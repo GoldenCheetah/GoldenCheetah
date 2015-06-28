@@ -1251,7 +1251,7 @@ Weiter klicken, um fortzufahren
         <location filename="../AllPlot.cpp" line="2616"/>
         <location filename="../AllPlot.cpp" line="2666"/>
         <source>Core Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation>Kern Temperatur</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="2623"/>
@@ -1300,7 +1300,7 @@ Weiter klicken, um fortzufahren
         <location filename="../AllPlot.cpp" line="4120"/>
         <location filename="../AllPlot.cpp" line="4123"/>
         <source>Core Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>Kern Temperatur</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="3558"/>
@@ -1670,7 +1670,7 @@ Weiter klicken, um fortzufahren
     <message>
         <location filename="../AllPlot.cpp" line="344"/>
         <source>Core Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>Kern Temperatur</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="348"/>
@@ -1995,7 +1995,7 @@ Weiter klicken, um fortzufahren
     <message>
         <location filename="../AllPlotWindow.cpp" line="286"/>
         <source>Core Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation>Kern Temperatur</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="290"/>
@@ -2805,13 +2805,13 @@ Weiter klicken, um fortzufahren
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1006"/>
         <source>Average Core Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation>ø Kern Temperatur</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1007"/>
         <location filename="../BasicRideMetrics.cpp" line="1008"/>
         <source>C</source>
-        <translation type="unfinished">°C</translation>
+        <translation>°C</translation>
     </message>
 </context>
 <context>
@@ -3145,13 +3145,13 @@ Weiter klicken, um fortzufahren
     <message>
         <location filename="../BasicRideMetrics.cpp" line="840"/>
         <source>Average tHb</source>
-        <translation type="unfinished"></translation>
+        <translation>ø tHb</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="841"/>
         <location filename="../BasicRideMetrics.cpp" line="842"/>
         <source>g/dL</source>
-        <translation type="unfinished">g/dl</translation>
+        <translation>g/dl</translation>
     </message>
 </context>
 <context>
@@ -4511,7 +4511,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../ConfigDialog.cpp" line="105"/>
         <source>Intervals</source>
-        <translation type="unfinished">Intervalle</translation>
+        <translation>Intervalle</translation>
     </message>
     <message>
         <location filename="../ConfigDialog.cpp" line="110"/>
@@ -7102,7 +7102,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <message>
         <location filename="../Colors.cpp" line="95"/>
         <source>Core Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation>Kern Temperatur</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="96"/>
@@ -10922,7 +10922,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <message>
         <location filename="../Pages.cpp" line="5537"/>
         <source>Enable interval auto-discovery:</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervallerkennung aktivieren:</translation>
     </message>
 </context>
 <context>
@@ -13660,13 +13660,13 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1613"/>
         <source>Max Core Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation>Max. Kern Temperatur</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1614"/>
         <location filename="../BasicRideMetrics.cpp" line="1615"/>
         <source>C</source>
-        <translation type="unfinished">°C</translation>
+        <translation>°C</translation>
     </message>
 </context>
 <context>
@@ -13802,13 +13802,13 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1474"/>
         <source>Max tHb</source>
-        <translation type="unfinished"></translation>
+        <translation>Max. tHb</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1475"/>
         <location filename="../BasicRideMetrics.cpp" line="1476"/>
         <source>g/dL</source>
-        <translation type="unfinished">g/dl</translation>
+        <translation>g/dl</translation>
     </message>
 </context>
 <context>
@@ -13953,11 +13953,11 @@ on and that its display says, &quot;PC Link&quot;</source>
 The changes will be saved and cannot be undone.
 
 If you press continue the activity will be saved, if you do not want to continue either go back and change the settings or press cancel to abort.</source>
-        <translation>Wähen Sie &apos;Fertig&quot; um die aktuelle Aktivität mit den kombinierten Daten zu aktualisieren.
+        <translation type="unfinished">Wähen Sie &apos;Fertig&quot; um die aktuelle Aktivität mit den kombinierten Daten zu aktualisieren.
 
 Die Änderungen werden gesichert und können nicht zurückgenommen werden.
 
-Wenn Sie weitermachen wird die Aktivität aktualisiert. Wenn Sie dies nicht wollen, können Sie entweder zurückgehen und die Einstellungen ändern oder Sie drücken &apos;Abbrechen&apos;.</translation>
+Wenn Sie weitermachen, wird die Aktivität aktualisiert. Wenn Sie dies nicht wollen, können Sie entweder zurückgehen und die Einstellungen ändern oder Sie drücken &apos;Abbrechen&apos;.</translation>
     </message>
     <message>
         <source>Press Finish to update the current ride with  the combined data.
@@ -14021,22 +14021,22 @@ Wenn Sie weitermachen wird die Trainingseinheit aktualisiert. Wenn Sie des möch
     <message>
         <location filename="../MergeActivityWizard.cpp" line="738"/>
         <source>Merge Data to add another data series</source>
-        <translation>Zusammenführen der Daten um eine weitere Datenreihe hinzuzufügen</translation>
+        <translation>Zusammenführen um eine weitere Datenreihe hinzuzufügen</translation>
     </message>
     <message>
         <location filename="../MergeActivityWizard.cpp" line="739"/>
         <source>Merge data series from one recording into the current activity where different types of data (e.g. O2 data from a Moxy) have been  recorded by different devices. Taking care to align the data in time.</source>
-        <translation>Zusammenführen von Datenreihen einer anderen Trainingseinheitsaufzeichnung zur aktuellen Trainingseinheit. Z.B in Fälen wo unterschiedliche Datenreihen (O2 Daten von einem Moxy) von unterschiedlichen Geräten aufgezeichnet worden sind. Zeitliche Ausrichtung der Daten wird berücksichtigt.</translation>
+        <translation>Zusammenführen von Datenreihen einer anderen Trainingseinheitsaufzeichnung zur aktuellen Trainingseinheit. Z.B in Fällen wo unterschiedliche Datenreihen (O2 Daten von einem Moxy) von unterschiedlichen Geräten aufgezeichnet worden sind. Zeitliche Ausrichtung der Daten wird berücksichtigt.</translation>
     </message>
     <message>
         <location filename="../MergeActivityWizard.cpp" line="747"/>
         <source>Join Data to form a longer activity</source>
-        <translation>Zusammenfügen zu eine längeren Trainingseinheit</translation>
+        <translation>Zusammenfügen zu einer längeren Trainingseinheit</translation>
     </message>
     <message>
         <location filename="../MergeActivityWizard.cpp" line="748"/>
         <source>Append the data to the end of the current activity  to create a longer activity that was recorded in multiple parts.</source>
-        <translation>Füge die Daten am Ende der aktuellen Trainingseinheit an, um eine längere Trainingseinheit zur erhalten wenn in mehreren Abschnitten aufgezeichnet wurde.</translation>
+        <translation>Füge die Daten am Ende der aktuellen Trainingseinheit an, um eine längere Trainingseinheit zur erhalten, wenn in mehreren Abschnitten aufgezeichnet wurde.</translation>
     </message>
 </context>
 <context>
@@ -14153,7 +14153,7 @@ Wenn Sie weitermachen wird die Trainingseinheit aktualisiert. Wenn Sie des möch
     <message>
         <location filename="../MergeActivityWizard.cpp" line="437"/>
         <source>Import and combine from a file on your hard disk or device mounted as a USB disk to combine with the current activity.</source>
-        <translation>Importiere und kombiniere mit einer Datei auf der Festplatte oder einem Gerät das aus USB Festplatte installiert ist.</translation>
+        <translation>Importiere und kombiniere mit einer Datei auf der Festplatte oder einem Gerät das als USB Festplatte installiert ist.</translation>
     </message>
     <message>
         <location filename="../MergeActivityWizard.cpp" line="445"/>
@@ -14163,7 +14163,7 @@ Wenn Sie weitermachen wird die Trainingseinheit aktualisiert. Wenn Sie des möch
     <message>
         <location filename="../MergeActivityWizard.cpp" line="446"/>
         <source>Download data from a serial port device such as a Moxy Muscle Oxygen Monitor or bike computer to combine with the current activity.</source>
-        <translation>Download von Daten eines Gerät an der seriellen Schnittstelle wie ein Moxy Muscle Oxygen Monitor oder  Fahrradcomputer und kombiniere diese Daten mit der aktuellen Trainingseinheit.</translation>
+        <translation>Downloade die Daten eines Gerätes an der seriellen Schnittstelle (wie ein Moxy Muscle Oxygen Monitor oder  Fahrradcomputer) und kombiniere diese Daten mit der aktuellen Trainingseinheit.</translation>
     </message>
     <message>
         <location filename="../MergeActivityWizard.cpp" line="453"/>
@@ -14173,7 +14173,7 @@ Wenn Sie weitermachen wird die Trainingseinheit aktualisiert. Wenn Sie des möch
     <message>
         <location filename="../MergeActivityWizard.cpp" line="454"/>
         <source>Combine data from an activity that has already been imported or downloaded into GoldenCheetah. Selecting from a list of all available activities. </source>
-        <translation>Kombiniere Daten einer Trainingseinheit die bereits in GoldenCheetah vorhanden ist. Wähle aus der Liste der vorhandenen Trainingseinheiten.</translation>
+        <translation>Kombiniere die Daten mit einer Trainingseinheit die bereits in GoldenCheetah vorhanden ist. Wähle aus der Liste der vorhandenen Trainingseinheiten.</translation>
     </message>
     <message>
         <location filename="../MergeActivityWizard.cpp" line="512"/>
@@ -14372,7 +14372,7 @@ Wenn Sie weitermachen wird die Trainingseinheit aktualisiert. Wenn Sie des möch
 You will be able to import or download data before merging or joining the data and manually adjusting the alignment of data series before it is saved.</source>
         <translation>Dieser Assitent hilft Ihnen Daten mit der aktuell gewählten Trainingseinheit zu kombinieren.
 
-Sie haben die Möglichkeit vor der Zusammenführung Daten zu per Import oder Download auszuwählen und die Ausrichtung der Datenreihen vor dem Sichern manuell anzupassen.</translation>
+Sie haben die Möglichkeit vor der Zusammenführung Daten zu Importieren oder Downzuloaden und können die Ausrichtung der Datenreihen vor dem Sichern manuell anpassen.</translation>
     </message>
     <message>
         <source>This wizard will help you to merge 2 different files
@@ -14472,13 +14472,13 @@ Zeit: %1
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1542"/>
         <source>Min tHb</source>
-        <translation type="unfinished"></translation>
+        <translation>Min. tHb</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1543"/>
         <location filename="../BasicRideMetrics.cpp" line="1544"/>
         <source>g/dL</source>
-        <translation type="unfinished">g/dl</translation>
+        <translation>g/dl</translation>
     </message>
 </context>
 <context>
@@ -15192,38 +15192,38 @@ No rides found to import.
         <location filename="../NewCyclistDialog.cpp" line="224"/>
         <location filename="../NewCyclistDialog.cpp" line="242"/>
         <source>CV Run (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>CV Laufen (%1)</translation>
     </message>
     <message>
         <location filename="../NewCyclistDialog.cpp" line="46"/>
         <location filename="../NewCyclistDialog.cpp" line="224"/>
         <source>min/km</source>
-        <translation type="unfinished">min/km</translation>
+        <translation>min/km</translation>
     </message>
     <message>
         <location filename="../NewCyclistDialog.cpp" line="46"/>
         <location filename="../NewCyclistDialog.cpp" line="242"/>
         <source>min/mile</source>
-        <translation type="unfinished">min/Meile</translation>
+        <translation>min/Meile</translation>
     </message>
     <message>
         <location filename="../NewCyclistDialog.cpp" line="47"/>
         <location filename="../NewCyclistDialog.cpp" line="228"/>
         <location filename="../NewCyclistDialog.cpp" line="246"/>
         <source>CV Swim (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>CV Schwimmen (%1)</translation>
     </message>
     <message>
         <location filename="../NewCyclistDialog.cpp" line="47"/>
         <location filename="../NewCyclistDialog.cpp" line="228"/>
         <source>min/100m</source>
-        <translation type="unfinished">min/100m</translation>
+        <translation>min/100m</translation>
     </message>
     <message>
         <location filename="../NewCyclistDialog.cpp" line="47"/>
         <location filename="../NewCyclistDialog.cpp" line="246"/>
         <source>min/100yd</source>
-        <translation type="unfinished">min/100yd</translation>
+        <translation>min/100yd</translation>
     </message>
     <message>
         <location filename="../NewCyclistDialog.cpp" line="49"/>
@@ -15249,19 +15249,19 @@ No rides found to import.
         <location filename="../NewCyclistDialog.cpp" line="220"/>
         <location filename="../NewCyclistDialog.cpp" line="238"/>
         <source>Height (%1)</source>
-        <translation type="unfinished">Körpergröße (%1)</translation>
+        <translation>Körpergröße (%1)</translation>
     </message>
     <message>
         <location filename="../NewCyclistDialog.cpp" line="52"/>
         <location filename="../NewCyclistDialog.cpp" line="220"/>
         <source>cm</source>
-        <translation type="unfinished">cm</translation>
+        <translation>cm</translation>
     </message>
     <message>
         <location filename="../NewCyclistDialog.cpp" line="52"/>
         <location filename="../NewCyclistDialog.cpp" line="238"/>
         <source>in</source>
-        <translation type="unfinished">in</translation>
+        <translation>inch</translation>
     </message>
     <message>
         <location filename="../NewCyclistDialog.cpp" line="60"/>
@@ -17211,12 +17211,12 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../PowerHist.cpp" line="2299"/>
         <source>W&apos;bal zone</source>
-        <translation type="unfinished"></translation>
+        <translation>W&apos;Bilanz Zone</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="2300"/>
         <source>W&apos;Bal Consumed (%)</source>
-        <translation type="unfinished"></translation>
+        <translation>W&apos;Bilanz Verbraucht(%)</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="2310"/>
@@ -18716,7 +18716,7 @@ yyyy</translation>
     <message>
         <location filename="../RideFile.cpp" line="216"/>
         <source>W&apos; Consumed</source>
-        <translation type="unfinished"></translation>
+        <translation>W&apos; Verbraucht</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="217"/>
@@ -19013,42 +19013,42 @@ Skipping file...</source>
     <message>
         <location filename="../RideFile.cpp" line="410"/>
         <source>The entire activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Die gesamt Aktivität</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="411"/>
         <source>Device specific intervals</source>
-        <translation type="unfinished"></translation>
+        <translation>Gerätespezifische Intervalle</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="412"/>
         <source>User defined laps or marked intervals</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzerdefinierte Runden oder markierte Intervalle</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="413"/>
         <source>Peak pace for running and swimming</source>
-        <translation type="unfinished"></translation>
+        <translation>Spitzen Pace beim Laufen oder Schwimmen</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="414"/>
         <source>Peak powers for cycling 1s thru 1hr</source>
-        <translation type="unfinished"></translation>
+        <translation>Spitzen Leistung bei Radfahren 1s bis 1h</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="415"/>
         <source>Route segments using GPS data</source>
-        <translation type="unfinished"></translation>
+        <translation>Routensegmente aus GSP Daten</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="416"/>
         <source>Ascents for hills and mountains</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufstiege für Hügel und Berge</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="417"/>
         <source>Sustained efforts and matches using power</source>
-        <translation type="unfinished"></translation>
+        <translation>Ununterbrochene Aufwände und Körner aufgrund Leistung</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="2545"/>
@@ -20049,7 +20049,7 @@ Skipping file...</source>
         <location filename="../RideSummaryWindow.cpp" line="919"/>
         <location filename="../RideSummaryWindow.cpp" line="2078"/>
         <source>&lt;h3&gt;W&apos;bal Zones&lt;/h3&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;h3&gt;W&apos;bal Zonen&lt;/h3&gt;</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="956"/>
@@ -23736,37 +23736,38 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../WPrime.cpp" line="566"/>
         <source>W&apos; (Joules): %1</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>W&apos; (Joule): %1</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="573"/>
         <source>&lt;td align=&quot;center&quot;&gt;Zone&lt;/td&gt;</source>
-        <translation type="unfinished">&lt;td align=&quot;center&quot;&gt;Zone&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Zone&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="574"/>
         <source>&lt;td align=&quot;center&quot;&gt;Description&lt;/td&gt;</source>
-        <translation type="unfinished">&lt;td align=&quot;center&quot;&gt;Beschreibung&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Beschreibung&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="575"/>
         <source>&lt;td align=&quot;center&quot;&gt;High (kJ)&lt;/td&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Obergrenze (kJ)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="576"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low (kJ)&lt;/td&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Untergrenze (kJ)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="577"/>
         <source>&lt;td align=&quot;center&quot;&gt;Time&lt;/td&gt;</source>
-        <translation type="unfinished">&lt;td align=&quot;center&quot;&gt;Zeit in Zone&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Zeit in Zone&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="578"/>
         <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
-        <translation type="unfinished">&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</translation>
     </message>
 </context>
 <context>
@@ -23811,7 +23812,7 @@ F3 drücken, wenn fertig.</translation>
         <location filename="../WPrime.cpp" line="898"/>
         <location filename="../WPrime.cpp" line="899"/>
         <source>seconds</source>
-        <translation type="unfinished">Sekunden</translation>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
@@ -23819,13 +23820,13 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../WPrime.cpp" line="955"/>
         <source>W1 W&apos;bal Low Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>W1 W&apos;Bilanz Leichte Erschöpfung</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="956"/>
         <location filename="../WPrime.cpp" line="957"/>
         <source>seconds</source>
-        <translation type="unfinished">Sekunden</translation>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
@@ -23833,13 +23834,13 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../WPrime.cpp" line="973"/>
         <source>W2 W&apos;bal Moderate Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>W2 W&apos;Bilanz Moderate Erschöpfung</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="974"/>
         <location filename="../WPrime.cpp" line="975"/>
         <source>seconds</source>
-        <translation type="unfinished">Sekunden</translation>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
@@ -23847,13 +23848,13 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../WPrime.cpp" line="991"/>
         <source>W3 W&apos;bal Heavy Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>W3 W&apos;bal Schwere Erschöpfung</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="992"/>
         <location filename="../WPrime.cpp" line="993"/>
         <source>seconds</source>
-        <translation type="unfinished">Sekunden</translation>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
@@ -23861,13 +23862,13 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../WPrime.cpp" line="1009"/>
         <source>W4 W&apos;bal Severe Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>W4 W&apos;Bilanz Ernste Erschöpfung</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="1010"/>
         <location filename="../WPrime.cpp" line="1011"/>
         <source>seconds</source>
-        <translation type="unfinished">Sekunden</translation>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
