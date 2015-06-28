@@ -239,7 +239,9 @@ class MainWindow : public QMainWindow
         QAction *styleAction;
         QAction *showhideSidebar;
         QAction *showhideLowbar;
+#if (!defined Q_OS_MAC) || (QT_VERSION >= 0x50201) // not on a Mac
         QAction *showhideToolbar;
+#endif
         QAction *showhideTabbar;
 
         QAction *tweetAction;

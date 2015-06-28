@@ -1699,7 +1699,11 @@ MainWindow::saveGCState(Context *context)
     context->showSidebar = showhideSidebar->isChecked();
     //context->showTabbar = showhideTabbar->isChecked();
     context->showLowbar = showhideLowbar->isChecked();
+#if (!defined Q_OS_MAC) || (QT_VERSION >= 0x50201) // not on a Mac
     context->showToolbar = showhideToolbar->isChecked();
+#else
+    context->showToolbar = true;
+#endif
     context->searchText = searchBox->text();
     context->viewIndex = scopebar->selected();
     context->style = styleAction->isChecked();
