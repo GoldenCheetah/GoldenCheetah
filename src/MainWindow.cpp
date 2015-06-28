@@ -941,7 +941,9 @@ MainWindow::eventFilter(QObject *o, QEvent *e)
 void
 MainWindow::resizeEvent(QResizeEvent*)
 {
-#ifdef Q_OS_MAC
+// on a mac we hide/show the toolbar on fullscreen mode
+// when using QT5 since it has problems rendering
+#if (defined Q_OS_MAC) && (QT_VERSION >= 0x50201)
     if (head) {
         QRect screenSize = desktop->availableGeometry();
         if ((screenSize.width() > frameGeometry().width() || screenSize.height() > frameGeometry().height()) && // not fullscreen
