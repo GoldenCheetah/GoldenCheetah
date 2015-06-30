@@ -667,6 +667,21 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
             }
             break;
 
+
+           case CHANNEL_TYPE_FITNESS_EQUIPMENT:
+           {
+               parent->setFecChannel(number);
+
+               if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE)
+               {
+                   if (antMessage.fecInstantPower != 0xFFFF)
+                       parent->setWatts(antMessage.fecInstantPower);
+                   if (antMessage.fecCadence != 0xFF)
+                       parent->setSecondaryCadence(antMessage.fecCadence);
+               }
+               break;
+           }
+
             // Tacx Vortex trainer
             case CHANNEL_TYPE_TACX_VORTEX:
             {

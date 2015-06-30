@@ -282,6 +282,9 @@ struct setChannelAtom {
 #define TACX_VORTEX_DATA_VERSION       2
 #define TACX_VORTEX_DATA_CALIBRATION   3
 
+// ant+ fitness equipment profile data pages
+#define FITNESS_EQUIPMENT_GENERAL_PAGE 0x10
+#define FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE 0x19
 
 //======================================================================
 // Worker thread
@@ -424,6 +427,8 @@ public:
         telemetry.setRPS(rps);
     }
 
+    void setFecChannel(int channel);
+
     void setVortexData(int channel, int id);
     void refreshVortexLoad();
 
@@ -482,6 +487,9 @@ private:
     // now kickr specific
     int kickrDeviceID;
     int kickrChannel;
+
+    // fitness equipment data
+    int fecChannel;
 
     // tacx vortex (we'll probably want to abstract this out cf. kickr)
     int vortexID;

@@ -103,6 +103,8 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent), devCo
     // vortex
     vortexID = vortexChannel = -1;
 
+    fecChannel = -1;
+
     // current and desired modes/load/gradients
     // set so first time through current != desired
     currentMode = 0;
@@ -266,6 +268,12 @@ ANT::setLoad(double load)
     {
         qDebug() << "setting vortex target power to " << load;
         sendMessage(ANTMessage::tacxVortexSetPower(vortexChannel, vortexID, (int)load));
+    }
+
+    if (fecChannel != -1)
+    {
+        qDebug() << "setting fitness equipment target power to " << load;
+        sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
     }
 }
 
@@ -1127,4 +1135,9 @@ void ANT::setVortexData(int channel, int id)
 {
     vortexChannel = channel;
     vortexID = id;
+}
+
+void ANT::setFecChannel(int channel)
+{
+    fecChannel = channel;
 }
