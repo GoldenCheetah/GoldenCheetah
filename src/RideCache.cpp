@@ -425,12 +425,6 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
         // check values are bounded, just in case
         if (std::isnan(value) || std::isinf(value)) value = 0;
 
-        // imperial / metric conversion
-        if (useMetricUnits == false) {
-            value *= metric->conversion();
-            value += metric->conversionSum();
-        }
-
         // do we aggregate zero values ?
         bool aggZero = metric->aggregateZero();
 
