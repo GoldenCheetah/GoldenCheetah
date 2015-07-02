@@ -5527,7 +5527,7 @@ AutoImportPage::browseImportDir()
 IntervalsPage::IntervalsPage(Context *context) : context(context)
 {
     // get config
-    b4.discovery = appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 63).toInt();
+    b4.discovery = appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 57).toInt(); // 57 does not include search for PEAKs
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QGridLayout *layout = new QGridLayout();
