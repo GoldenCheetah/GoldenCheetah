@@ -441,7 +441,7 @@ RideItem::checkStale()
                         + static_cast<unsigned long>(context->athlete->paceZones(true)->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->routes->getFingerprint())
-                        + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 63).toInt();
+                        + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 57).toInt(); // 57 does not include search for PEAKS
 
             if (fingerprint != rfingerprint) {
 
@@ -548,7 +548,7 @@ RideItem::refresh()
                     + static_cast<unsigned long>(context->athlete->paceZones(true)->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->routes->getFingerprint()) +
-                    + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 63).toInt();
+                    + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 57).toInt(); // 57 does not include search for PEAKS
 
         dbversion = DBSchemaVersion;
         timestamp = QDateTime::currentDateTime().toTime_t();
@@ -648,7 +648,7 @@ void
 RideItem::updateIntervals()
 {
     // what do we need ?
-    int discovery = appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 63).toInt();
+    int discovery = appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 57).toInt(); // 57 does not include search for PEAKS
 
     // DO NOT USE ride() since it will call a refresh !
     RideFile *f = ride_;
