@@ -68,6 +68,9 @@ CONFIG(debug, debug|release) {
     HEADERS     += D2XX.h
     SOURCES     += D2XX.cpp
     DEFINES     += GC_HAVE_D2XX
+    unix {
+        LIBS    += -ldl
+    }
 }
 
 !isEmpty( SRMIO_INSTALL ) {
