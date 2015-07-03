@@ -46,7 +46,14 @@ static QDateTime dateTimeForRow(QString line)
     // first row has data and time ?
     QStringList tokens = line.split(",");
 
-    if (tokens.count() != 6) return QDateTime();
+    if (tokens.count() != 6 && tokens.count() !=7) return QDateTime();
+
+    // is  the date in UTC Format ?
+    // XXX we have no way of converting from UTC
+    // XXX at present since we don't know what TZ
+    // XXX the ride was recorded in ...
+    bool UTCdate = tokens.count() == 7;
+    Q_UNUSED(UTCdate);
 
     // parse date and time
     QStringList mmdd = tokens[0].split("-");
@@ -485,6 +492,7 @@ MoxyDevice::readUntilPrompt(CommPortPtr dev, char *buf, int len, QString &err)
         // we got our prompt
         if (*(buf+sofar-1) == '>') break;
     }
+
     return sofar;
 }
 
