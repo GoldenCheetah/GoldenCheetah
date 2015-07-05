@@ -76,18 +76,6 @@ struct FitFileReaderState
     QFile &file;
     QStringList &errors;
     RideFile *rideFile;
-
-    // List of rides that we imported. Most FIT files will have one ride, but
-    // multisport ones will have multiple rides, one for each sport.
-    //
-    // NOTE: this is an output parameter received from
-    // FitFileReader::openRideFile(), and may be NULL.  In that case, the
-    // multisport activity will not be split up.  This parameter is NULL only
-    // when reading FIT files from the athlete library, which only contains
-    // single ride FIT files (a multisport FIT file is saved as multiple files
-    // one for each sport.)
-    QList<RideFile*> *rides;
-
     time_t start_time;
     time_t last_time;
     double last_distance;
@@ -103,14 +91,11 @@ struct FitFileReaderState
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
 
-    int manufacturer;
-    int product;
 
-    FitFileReaderState(QFile &file, QStringList &errors, QList<RideFile*> *rides=NULL) :
-        file(file), errors(errors), rideFile(NULL), rides(rides),
-        start_time(0),
+    FitFileReaderState(QFile &file, QStringList &errors) :
+        file(file), errors(errors), rideFile(NULL), start_time(0),
         last_time(0), last_distance(0.00f), interval(0), calibration(0), devices(0), stopped(true),
-        last_event_type(-1), last_event(-1), last_msg_type(-1), manufacturer(-1), product(-1)
+        last_event_type(-1), last_event(-1), last_msg_type(-1)
     {
     }
 
@@ -255,7 +240,21 @@ struct FitFileReaderState
         return i == 0x00000000 ? NA_VALUE : i;
     }
 
-    void setDeviceTypeForRideFile(int manu, int prod) {
+    void decodeFileId(const FitDefinition &def, int, const std::vector<FitValue> values) {
+        int i = 0;
+        int manu = -1, prod = -1;
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+            if( value == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 1: manu = value; break;
+                case 2: prod = value; break;
+                default: ; // do nothing
+            }
+        }
         if (manu == 1) {
             switch (prod) {
                 case 717: rideFile->setDeviceType("Garmin FR405"); break;
@@ -298,33 +297,20 @@ struct FitFileReaderState
             // does not set product at this point
            rideFile->setDeviceType("Sigmasport ROX");
 
+        } else if (manu == 76) {
+
+            // Moxy
+            rideFile->setDeviceType("Moxy Monitor");
+
         } else if (manu == 260) {
             // Zwift!
             rideFile->setDeviceType("Zwift");
+
         } else {
 
             rideFile->setDeviceType(QString("Unknown FIT Device %1:%2").arg(manu).arg(prod));
         }
         rideFile->setFileFormat("FIT (*.fit)");
-
-    }
-
-    void decodeFileId(const FitDefinition &def, int, const std::vector<FitValue> values) {
-        int i = 0;
-        foreach(const FitField &field, def.fields) {
-            fit_value_t value = values[i++].v;
-
-            if( value == NA_VALUE )
-                continue;
-
-            switch (field.num) {
-                case 1: manufacturer = value; break;
-                case 2: product = value; break;
-                default: ; // do nothing
-            }
-        }
-
-        setDeviceTypeForRideFile(manufacturer, product);
     }
 
     void decodeSession(const FitDefinition &def, int, const std::vector<FitValue> values) {
@@ -341,9 +327,6 @@ struct FitFileReaderState
                         case 1: // running:
                             rideFile->setTag("Sport","Run");
                             break;
-                        case 3: // transition:
-                            rideFile->setTag("Sport","Transition");
-                            break;
                         default: // if we can't work it out, assume bike
                         case 2: // cycling
                             rideFile->setTag("Sport","Bike");
@@ -359,39 +342,6 @@ struct FitFileReaderState
             if (FIT_DEBUG) {
                 printf("decodeSession  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
             }
-        }
-
-        // A session record appears in the FIT file at the end of the ride.
-        // If we are reading from an external file, we store this ride in the
-        // rides array and create a fresh RideFile.  The next session in the
-        // FIT file will be added to the new ride.
-        if (rides)
-        {
-            // will only have this on external import, not when reading it
-            // from the internal data folder...
-
-            rides->append(rideFile);
-
-            rideFile = new RideFile;
-
-            // A FileId record was already seen, set the device 
-            if(manufacturer != -1)
-                setDeviceTypeForRideFile(manufacturer, product);
-            else
-                rideFile->setDeviceType("Garmin FIT");
-
-            rideFile->setRecIntSecs(1.0); // this is a terrible assumption!
-
-            start_time = 0;
-            last_time = 0;
-            last_distance = 0;
-            interval = 0;
-            calibration = 0;
-            devices = 0;
-            stopped = true;
-            last_event_type = -1;
-            last_event = -1;
-            last_msg_type = -1;
         }
     }
 
@@ -957,7 +907,7 @@ struct FitFileReaderState
                 case RECORD_TYPE: decodeRecord(def, time_offset, values); break;
                 case 21: decodeEvent(def, time_offset, values); break;
 
-                case 23: /*decodeDeviceInfo(def, time_offset, values);*/ break; /* device info */
+                case 23: //decodeDeviceInfo(def, time_offset, values); break; /* device info */
                 case 18: decodeSession(def, time_offset, values); break; /* session */
 
                 case 101: /* lap swimming length */
@@ -1089,24 +1039,14 @@ struct FitFileReaderState
 
             file.close();
 
-            if (rides && rides->count()) 
-            {
-                // All our sessions are in the rides list, this one is not needed.
-                delete rideFile;
-                
-                return rides->first();
-            }
-            else
-            {
-                return rideFile;
-            }
+            return rideFile;
         }
     }
 };
 
-RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*rides) const
+RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
-    QSharedPointer<FitFileReaderState> state(new FitFileReaderState(file, errors, rides));
+    QSharedPointer<FitFileReaderState> state(new FitFileReaderState(file, errors));
     return state->run();
 }
 
