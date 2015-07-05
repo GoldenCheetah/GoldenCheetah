@@ -31,6 +31,7 @@
 
 #include "GcRideFile.h"
 #include "JsonRideFile.h"
+#include "TcxRideFile.h" // for opening multi-ride file
 
 #include <QDebug>
 #include <QWaitCondition>
@@ -448,8 +449,8 @@ RideImportWizard::process()
 
                      // write as a temporary file, using the original
                      // filename with "-n" appended
-                     QString fulltarget = QDir::tempPath() + "/" + QFileInfo(thisfile).baseName() + QString("-%1.json").arg(counter+1);
-                     JsonFileReader reader;
+                     QString fulltarget = QDir::tempPath() + "/" + QFileInfo(thisfile).baseName() + QString("-%1.tcx").arg(counter+1);
+                     TcxFileReader reader;
                      QFile target(fulltarget);
                      reader.writeRideFile(context, extracted, target);
                      deleteMe.append(fulltarget);

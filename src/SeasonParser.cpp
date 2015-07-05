@@ -65,6 +65,14 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
                 seasons[seasons.size()-1].setEnd(season.getStart());
         }
         if (season.getStart().isValid() && season.getEnd().isValid()) {
+
+            // just check the dates are the right way around
+            if (season.start > season.end) {
+                QDate temp = season.start;
+                season.start = season.end;
+                season.end = temp;
+            }
+
             seasons.append(season);
         }
     }

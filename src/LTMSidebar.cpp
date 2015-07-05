@@ -983,6 +983,13 @@ LTMSidebar::addRange()
 
         active = true;
 
+        // check dates are right way round...
+        if (newOne.start > newOne.end) {
+            QDate temp = newOne.start;
+            newOne.start = newOne.end;
+            newOne.end = temp;
+        }
+
         // save 
         seasons->seasons.insert(0, newOne);
         seasons->writeSeasons();
@@ -1010,6 +1017,13 @@ LTMSidebar::editRange()
     if (dialog.exec()) {
 
         active = true;
+
+        // check dates are right way round...
+        if (seasons->seasons[index].start > seasons->seasons[index].end) {
+            QDate temp = seasons->seasons[index].start;
+            seasons->seasons[index].start = seasons->seasons[index].end;
+            seasons->seasons[index].end = temp;
+        }
 
         // update name
         dateRangeTree->selectedItems().first()->setText(0, seasons->seasons[index].getName());
