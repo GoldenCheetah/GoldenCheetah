@@ -305,6 +305,71 @@
 		<property name="settings" type="LTMSettings" value="AAAAIgBTAHUAcwB0AGEAaQBuAGUAZAAgAEkAbgAgAFoAbwBuAGUAAAAIADIAMAAxADQAJX0TAAAAAP8AJX52AAAAAP8AAAADAAH///////////////8AAAAMAAAABAAAAAEBAAAAFABsADQAXwBzAHUAcwB0AGEAaQBuAAAAIgBMADQAIABTAHUAcwB0AGEAaQBuAGUAZAAgAFQAaQBtAGUAAAAiAEwANAAgAFMAdQBzAHQAYQBpAG4AZQBkACAAVABpAG0AZQAAAA4AcwBlAGMAbwBuAGQAcwAAAAAAAAAAAAAAAAAAAAAAAAEAAH9HAAAAAAAAAUAAAAAABIw4AAAAAAH/////Af//Y2OFhf//AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAAAAAA4Q/////wAAAAEAAAAAAAAAAAAAAAAMADIAIABQAGEAcgBtAAAAAAAAA+cAAA4QAQAAAAAAAAABAQAAABQAbAA1AF8AcwB1AHMAdABhAGkAbgAAACIATAA1ACAAUwB1AHMAdABhAGkAbgBlAGQAIABUAGkAbQBlAAAAIgBMADUAIABTAHUAcwB0AGEAaQBuAGUAZAAgAFQAaQBtAGUAAAAOAHMAZQBjAG8AbgBkAHMAAAAAAAAAAAAAAAAAAAAAAAABAAB/RwAAAAAAAAFAAAAAAASMOAAAAAAB/////wH//9jY//9XVwAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAAwAAAOEP////8AAAAKAAAAAAAAAAAAAAAADAAyACAAUABhAHIAbQAAAAAAAAAAAAAOEAEAAAAAAAAAAQEAAAAUAGwANgBfAHMAdQBzAHQAYQBpAG4AAAAiAEwANgAgAFMAdQBzAHQAYQBpAG4AZQBkACAAVABpAG0AZQAAACIATAA2ACAAUwB1AHMAdABhAGkAbgBlAGQAIABUAGkAbQBlAAAADgBzAGUAYwBvAG4AZABzAAAAAAAAAAAAAAAAAAAAAAAAAQAAf0cAAAAAAAABQAAAAAAEjDgAAAAAAf////8B/////8LCXl4AAAAAAAA/8AAAAAAAAAAAAAAB//8AAAAAAAAAAAAAAAAAAAAAMAAADhD/////AAAACgAAAAAAAAAAAAAAAAwAMgAgAFAAYQByAG0AAAAAAAAAAAAADhABAAAAAAAAAAEBAAAAFABsADcAXwBzAHUAcwB0AGEAaQBuAAAAIgBMADcAIABTAHUAcwB0AGEAaQBuAGUAZAAgAFQAaQBtAGUAAAAiAEwANwAgAFMAdQBzAHQAYQBpAG4AZQBkACAAVABpAG0AZQAAAA4AcwBlAGMAbwBuAGQAcwAAAAAAAAAAAAAAAAAAAAAAAAEAAH9HAAAAAAAAAUAAAAAABIw4AAAAAAH/////Af////9AAAAAAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAADAAAA4Q/////wAAAAoAAAAAAAAAAAAAAAAMADIAIABQAGEAcgBtAAAAAAAAAAAAAA4QAQAAAAAAAAAAAAc=" />
 		<property name="useSelected" type="int" value="4" />
 	</chart>
+	<chart id="33" name="" title="CV" >
+		<property name="title" type="QString" value="CV" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="mode" type="int" value="5" />
+		<property name="showBest" type="bool" value="1" />
+		<property name="showPercent" type="bool" value="0" />
+		<property name="showGrid" type="bool" value="1" />
+		<property name="season" type="QString" value="" />
+		<property name="cpmodel" type="int" value="5" />
+		<property name="variant" type="int" value="0" />
+		<property name="ani1" type="int" value="100" />
+		<property name="ani2" type="int" value="120" />
+		<property name="aei1" type="int" value="1000" />
+		<property name="aei2" type="int" value="1200" />
+		<property name="sani1" type="int" value="30" />
+		<property name="sani2" type="int" value="60" />
+		<property name="laei1" type="int" value="3000" />
+		<property name="laei2" type="int" value="30000" />
+		<property name="fromDate" type="QDate" value="sáb ene 1 2000" />
+		<property name="toDate" type="QDate" value="sáb ene 1 2000" />
+		<property name="startDate" type="QDate" value="dom abr 5 2015" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="shading" type="int" value="1" />
+		<property name="showEffort" type="bool" value="0" />
+		<property name="showHeat" type="bool" value="0" />
+		<property name="showHeatByDate" type="bool" value="0" />
+		<property name="shadeIntervals" type="int" value="1" />
+		<property name="ridePlotMode" type="int" value="0" />
+		<property name="useSelected" type="int" value="4" />
+	</chart>
+	<chart id="34" name="" title="Speed" >
+		<property name="title" type="QString" value="Speed" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="series" type="int" value="3" />
+		<property name="percent" type="int" value="0" />
+		<property name="logY" type="bool" value="0" />
+		<property name="zeroes" type="bool" value="1" />
+		<property name="shade" type="bool" value="0" />
+		<property name="zoned" type="bool" value="0" />
+		<property name="cpZoned" type="bool" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="fromDate" type="QDate" value="sáb ene 1 2000" />
+		<property name="toDate" type="QDate" value="sáb ene 1 2000" />
+		<property name="startDate" type="QDate" value="dom abr 5 2015" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="plotColor" type="QString" value="#0000ff" />
+		<property name="distmetric" type="QString" value="workout_time" />
+		<property name="totalmetric" type="QString" value="ride_count" />
+		<property name="dataMode" type="bool" value="1" />
+		<property name="bin" type="double" value="0.1" />
+		<property name="useSelected" type="int" value="0" />
+	</chart>
 	<chart id="18" name="" title="Workout" >
 		<property name="title" type="QString" value="Workout" />
 		<property name="subtitle" type="QString" value="" />
