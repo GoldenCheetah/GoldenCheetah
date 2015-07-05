@@ -1246,7 +1246,7 @@ MeanMaxComputer::run()
 
     data_t *dataseries_i = integrate_series(data);
 
-    for (int i=1; i<data.points.size(); i++) {
+    for (int i=1; i<data.points.size();) {
 
         int offset;
         data_t c=divided_max_mean(dataseries_i,data.points.size(),i,&offset);
@@ -1261,6 +1261,14 @@ MeanMaxComputer::run()
             else
                 ride_bests[sec] = val;
         }
+
+        // increments to limit search scope
+        if (i<120) i++;
+        else if (i<600) i+= 2;
+        else if (i<1200) i += 5;
+        else if (i<3600) i += 20;
+        else if (i<7200) i += 120;
+        else i += 300;
     }
     free(dataseries_i);
 
