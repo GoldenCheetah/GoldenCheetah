@@ -104,6 +104,43 @@
 		<property name="ridePlotMode" type="int" value="0" />
 		<property name="useSelected" type="int" value="0" />
 	</chart>
+	<chart id="3" name="" title="CV" >
+		<property name="title" type="QString" value="CV" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="mode" type="int" value="5" />
+		<property name="showBest" type="bool" value="1" />
+		<property name="showPercent" type="bool" value="0" />
+		<property name="showGrid" type="bool" value="1" />
+		<property name="season" type="QString" value="Last 2 months" />
+		<property name="cpmodel" type="int" value="5" />
+		<property name="variant" type="int" value="0" />
+		<property name="ani1" type="int" value="100" />
+		<property name="ani2" type="int" value="120" />
+		<property name="aei1" type="int" value="1000" />
+		<property name="aei2" type="int" value="1200" />
+		<property name="sani1" type="int" value="20" />
+		<property name="sani2" type="int" value="90" />
+		<property name="laei1" type="int" value="3000" />
+		<property name="laei2" type="int" value="30000" />
+		<property name="fromDate" type="QDate" value="sáb ene 1 2000" />
+		<property name="toDate" type="QDate" value="sáb ene 1 2000" />
+		<property name="startDate" type="QDate" value="jue abr 2 2015" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="shading" type="int" value="1" />
+		<property name="showEffort" type="bool" value="0" />
+		<property name="showHeat" type="bool" value="0" />
+		<property name="showHeatByDate" type="bool" value="0" />
+		<property name="shadeIntervals" type="int" value="1" />
+		<property name="ridePlotMode" type="int" value="0" />
+		<property name="useSelected" type="int" value="0" />
+	</chart>
 	<chart id="5" name="" title="Map" >
 		<property name="title" type="QString" value="Map" />
 		<property name="subtitle" type="QString" value="" />
@@ -182,7 +219,7 @@
 		<property name="percent" type="int" value="0" />
 		<property name="logY" type="bool" value="0" />
 		<property name="zeroes" type="bool" value="0" />
-		<property name="shade" type="bool" value="0" />
+		<property name="shade" type="bool" value="1" />
 		<property name="zoned" type="bool" value="0" />
 		<property name="cpZoned" type="bool" value="0" />
 		<property name="filter" type="QString" value="search:" />
@@ -283,7 +320,7 @@
 		<property name="percent" type="int" value="0" />
 		<property name="logY" type="bool" value="0" />
 		<property name="zeroes" type="bool" value="0" />
-		<property name="shade" type="bool" value="0" />
+		<property name="shade" type="bool" value="1" />
 		<property name="zoned" type="bool" value="0" />
 		<property name="cpZoned" type="bool" value="0" />
 		<property name="filter" type="QString" value="search:" />
