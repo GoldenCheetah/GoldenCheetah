@@ -738,7 +738,8 @@ CriticalPowerWindow::modelChanged()
 
             break;
 
-    case 2 : // 3 param model: 3-30 model
+    case 2 : // 3 param model: 30-60 model
+    case 5 : // WS model: 30-60 model
 
             intervalLabel->show();
             secondsLabel->show();
