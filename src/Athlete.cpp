@@ -299,6 +299,10 @@ Athlete::translateDefaultCharts(QList<LTMSettings>&charts)
     chartNameMap.insert("PMC (Skiba)", tr("PMC (Skiba)"));
     chartNameMap.insert("PMC (TRIMP)", tr("PMC (TRIMP)"));
     chartNameMap.insert("CP History", tr("CP History"));
+    chartNameMap.insert("PMC (TriScore)", tr("PMC (TriScore)"));
+    chartNameMap.insert("Time in Pace Zones", tr("Time in Pace Zones"));
+    chartNameMap.insert("Run Pace", tr("Run Pace"));
+    chartNameMap.insert("Swim Pace", tr("Swim Pace"));
 
     for(int i=0; i<charts.count(); i++) {
         // Replace chart name for localized version, default to english name
