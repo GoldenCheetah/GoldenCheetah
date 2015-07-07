@@ -4746,6 +4746,7 @@ CVPage::CVPage(PaceZonePage* zonePage) : zonePage(zonePage)
     metric = new QCheckBox("Metric Pace");
     metric->setChecked(appsettings->value(this, zonePage->zones->paceSetting(), true).toBool());
     per->setText(zonePage->zones->paceUnits(metric->isChecked()));
+    if (!metric->isChecked()) metricChanged(); // default is metric
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2);
@@ -4832,9 +4833,10 @@ CVPage::CVPage(PaceZonePage* zonePage) : zonePage(zonePage)
 void
 CVPage::metricChanged()
 {
-    // need to switch between metric and imperial!
+    // Switch between metric and imperial!
     per->setText(zonePage->zones->paceUnits(metric->isChecked()));
-
+    double kphCV = zonePage->zones->kphFromTime(cvEdit, !metric->isChecked());
+    cvEdit->setTime(QTime::fromString(zonePage->zones->kphToPaceString(kphCV, metric->isChecked()), "mm:ss"));
 }
 
 void
