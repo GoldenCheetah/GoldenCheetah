@@ -2805,8 +2805,10 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
     }
 
 
+    // initial state
     PMCData *athletePMC = NULL;
     PMCData *localPMC = NULL;
+    n = 0;
 
     // create local PMC if filtered
     if (settings->specification.isFiltered()) {
