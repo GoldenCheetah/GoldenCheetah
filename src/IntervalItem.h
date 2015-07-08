@@ -26,7 +26,6 @@
 #include <QDialog>
 #include <QLabel>
 #include <QLineEdit>
-#include <QCheckBox>
 
 class IntervalItem
 {
@@ -112,7 +111,6 @@ class EditIntervalDialog : public QDialog
         EditIntervalDialog(QWidget *, IntervalItem &);
 
     public slots:
-        void fixDistanceChanged();
         void applyClicked();
         void cancelClicked();
 
@@ -123,8 +121,6 @@ class EditIntervalDialog : public QDialog
         QLineEdit *nameEdit;
         QTimeEdit *fromEdit, *toEdit;
         ColorButton *colorEdit;
-        QCheckBox   *fixDistance;
-        QDoubleSpinBox *distance;
 };
 
 #endif // _GC_IntervalItem_h
