@@ -37,7 +37,8 @@ struct Match {
 };
 
 class WPrime {
-
+	
+    Q_DECLARE_TR_FUNCTIONS(WPrime)
 
     public: 
 
