@@ -847,44 +847,10 @@ AnalysisSidebar::editInterval()
     temp.start = activeInterval->start;
     temp.stop = activeInterval->stop;
     temp.color = activeInterval->color;
-    temp.startKM = activeInterval->startKM;
-    temp.stopKM = activeInterval->stopKM;
-    temp.rideItem_ = activeInterval->rideItem();
  
     EditIntervalDialog dialog(this, temp); // pass by reference
 
     if (dialog.exec()) {
-
-        // Update samples to match new interval distance
-        if (temp.stopKM != activeInterval->stopKM && temp.stop > temp.start && activeInterval->rideItem()->ride()) {
-            // Query for user confirmation since we will change the samples
-            QMessageBox msgBox;
-            msgBox.setText(tr("You are about to change sample distance and speed to match the modified interval distance"));
-            msgBox.setInformativeText(tr("Do you want to continue?"));
-            msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-            msgBox.setDefaultButton(QMessageBox::Cancel);
-            msgBox.setIcon(QMessageBox::Warning);
-            msgBox.exec();
-            if(msgBox.clickedButton() == msgBox.button(QMessageBox::Ok)) {
-                RideFile *ride = activeInterval->rideItem()->ride();
-                // new speed for interval samples will be interval average
-                double kph = 3600.0 * (temp.stopKM-temp.startKM) / (temp.stop-temp.start);
-                // accumulated distance form start of interval
-                double km = -1;
-                for (int i = ride->intervalBeginSecs(temp.start); i>= 0 && i < ride->dataPoints().size(); ++i) {
-                    // iterate from beginning of interval
-                    if (ride->dataPoints()[i]->secs + ride->recIntSecs() <= temp.stop) {
-                        // within the interval, update speed
-                        ride->dataPoints()[i]->kph = kph;
-                    }
-                    // Update distance to the end
-                    if (km >= 0) ride->dataPoints()[i]->km = km + ride->dataPoints()[i]->kph * ride->recIntSecs() / 3600.0;
-                    km = ride->dataPoints()[i]->km;
-                }
-                // metrics should be refreshed
-                activeInterval->rideItem()->isstale = true;
-            }
-        }
 
         // update the interval item
         activeInterval->name = temp.name;
