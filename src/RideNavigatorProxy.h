@@ -250,7 +250,7 @@ public:
 
             // serialize
             stream << (int)1;
-            stream << QString(tr("Entire Ride"));
+            stream << QString(tr("Entire Activity"));
             stream << (quint64)(ride); // rideitem
             stream << (quint64)ride->ride()->dataPoints().first()->secs
                    << (quint64)ride->ride()->dataPoints().last()->secs;
@@ -394,13 +394,13 @@ public:
 
                 // format the group by with ride count etc
                 if (groupBy != -1) {
-                    QString returnString = QString(tr("%1: %2 (%3 rides)"))
+                    QString returnString = QString(tr("%1: %2 (%3 activities)"))
                                            .arg(sourceModel()->headerData(groupBy, Qt::Horizontal).toString())
                                            .arg(group)
                                            .arg(groupToSourceRow.value(groups[proxyIndex.row()])->count());
                     returning = QVariant(returnString);
                 } else {
-                    QString returnString = QString(tr("%1 rides"))
+                    QString returnString = QString(tr("%1 activities"))
                                            .arg(groupToSourceRow.value(groups[proxyIndex.row()])->count());
                     returning = QVariant(returnString);
                 }
@@ -491,7 +491,7 @@ public:
     QString whichGroup(int row) const {
 
         if (row < 0 || row >= rankedRows.count()) return ("");
-        if (groupBy == -1) return tr("All Rides");
+        if (groupBy == -1) return tr("All Activities");
         else return groupFromValue(headerData(groupBy+2, // accommodate virtual column
                                     Qt::Horizontal).toString(),
                                     sourceModel()->data(sourceModel()->index(row,groupBy)).toString(),
@@ -559,13 +559,13 @@ public:
 
         } else {
 
-            // Just one group by 'All Rides'
+            // Just one group by 'All Activities'
             QVector<int> *rows = new QVector<int>;
             for (int i=0; i<sourceModel()->rowCount(QModelIndex()); i++) {
                 rows->append(i);
                 sourceRowToGroupRow.append(i);
             }
-            groupToSourceRow.insert("All Rides", rows);
+            groupToSourceRow.insert("All Activities", rows);
 
         }
 

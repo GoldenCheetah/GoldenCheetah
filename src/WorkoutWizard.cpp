@@ -543,7 +543,7 @@ void GradientPage::initializePage()
     metricUnits = hackContext->athlete->useMetricUnits;
     setTitle(tr("Workout Wizard"));
 
-    setSubTitle(tr("Manually crate a workout based on gradient (slope) and distance, maximum grade is 5."));
+    setSubTitle(tr("Manually create a workout based on gradient (slope) and distance, maximum grade is 5."));
 
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);
