@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "ColorButton.h"
+#include "Units.h"
 
 IntervalItem::IntervalItem(const RideItem *ride, QString name, double start, double stop, 
                            double startKM, double stopKM, int displaySequence, QColor color,
@@ -206,6 +207,16 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
 
     colorEdit = new ColorButton(this, interval.name, interval.color);
 
+    bool useMetricUnits = interval.rideItem()->context->athlete->useMetricUnits;
+    fixDistance = new QCheckBox(tr("Fix Distance"), this);
+    fixDistance->setChecked(false);
+    QLabel *distanceLabel = new QLabel(QString(tr("Distance (%1)")).arg(useMetricUnits ? tr("km") : tr("miles")));
+    distance = new QDoubleSpinBox(this);
+    distance->setMaximum(999.999);
+    distance->setMinimum(0.000);
+    distance->setDecimals(3);
+    fixDistanceChanged(); // initialization
+
     grid->addWidget(name, 0,0);
     grid->addWidget(nameEdit, 0,1);
     grid->addWidget(from, 1,0);
@@ -214,6 +225,9 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
     grid->addWidget(toEdit, 2,1);
     grid->addWidget(color, 3,0);
     grid->addWidget(colorEdit, 3,1);
+    grid->addWidget(fixDistance, 4,0);
+    grid->addWidget(distanceLabel, 5,0);
+    grid->addWidget(distance, 5,1);
 
     mainLayout->addLayout(grid);
 
@@ -229,6 +243,7 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
     // connect up slots
     connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(fixDistance, SIGNAL(stateChanged(int)), this, SLOT(fixDistanceChanged()));
 }
 
 void
@@ -239,12 +254,28 @@ EditIntervalDialog::applyClicked()
     interval.start = QTime(0,0,0).secsTo(fromEdit->time());
     interval.stop = QTime(0,0,0).secsTo(toEdit->time());
     interval.color = colorEdit->getColor();
+    if (fixDistance->isChecked()) {
+        bool useMetricUnits = interval.rideItem()->context->athlete->useMetricUnits;
+        interval.stopKM = interval.startKM + distance->value() * (useMetricUnits ? 1.0 : KM_PER_MILE);
+    }
     accept();
 }
 void
 EditIntervalDialog::cancelClicked()
 {
     reject();
+}
+
+void
+EditIntervalDialog::fixDistanceChanged()
+{
+    // Enable/disable distance entry acordingly
+    distance->setEnabled(fixDistance->isChecked());
+    if (!fixDistance->isChecked()) {
+        // When disabled, show current distance
+        bool useMetricUnits = interval.rideItem()->context->athlete->useMetricUnits;
+        distance->setValue((interval.stopKM-interval.startKM) * (useMetricUnits ? 1.0 : MILES_PER_KM));
+    }
 }
 
 /*----------------------------------------------------------------------
