@@ -563,19 +563,19 @@ WPrime::summarize(int WPRIME, QVector<double> wtiz, QColor color)
     // W' used for summary
     summary += "<table align=\"center\" width=\"70%\" border=\"0\">";
     summary += "<tr><td align=\"center\">";
-    summary += QString(QT_TRANSLATION_NOOP("W' (Joules): %1")).arg(WPRIME);
+    summary += QString(tr("W' (Joules): %1")).arg(WPRIME);
     summary += "</td></tr></table>";
 
     // Heading
     summary += "<table align=\"center\" width=\"70%\" ";
     summary += "border=\"0\">";
     summary += "<tr>";
-    summary += QT_TRANSLATION_NOOP("<td align=\"center\">Zone</td>");
-    summary += QT_TRANSLATION_NOOP("<td align=\"center\">Description</td>");
-    summary += QT_TRANSLATION_NOOP("<td align=\"center\">High (kJ)</td>");
-    summary += QT_TRANSLATION_NOOP("<td align=\"center\">Low (kJ)</td>")
-    summary += QT_TRANSLATION_NOOP("<td align=\"center\">Time</td>");
-    summary += QT_TRANSLATION_NOOP("<td align=\"center\">%</td>");
+    summary += tr("<td align=\"center\">Zone</td>");
+    summary += tr("<td align=\"center\">Description</td>");
+    summary += tr("<td align=\"center\">High (kJ)</td>");
+    summary += tr("<td align=\"center\">Low (kJ)</td>");
+    summary += tr("<td align=\"center\">Time</td>");
+    summary += tr("<td align=\"center\">%</td>");
     summary += "</tr>";
 
     // calc totals to use for percentages
