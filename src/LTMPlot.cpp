@@ -2670,6 +2670,31 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
         case ESTIMATE_EI :
             value = est.EI;
             break;
+
+        case ESTIMATE_VO2MAX :
+            {
+                value = 0;
+
+                // get average weight in duration
+                // when from/to are not the same day
+                double kg = context->athlete->getWithingsWeight(from);
+                if (!kg) kg = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
+                if (kg <= 0.00) kg = 75.00;
+
+                // we need to find the model
+                foreach(PDModel *model, models) {
+
+                    // not the one we want
+                    if (model->code() != metricDetail.model) continue;
+
+                    // set the parameters previously derived
+                    model->loadParameters(est.parameters);
+
+                    // get the model estimate for our duration
+                    value = model->vo2max(kg);
+                }
+            }
+            break;
         }
 
         // PDE estimates are created in Weekly Buckets - so we need to aggregate and average or data fillup

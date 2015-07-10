@@ -66,6 +66,7 @@ class RideBest;
 #define ESTIMATE_PMAX    3
 #define ESTIMATE_BEST    4
 #define ESTIMATE_EI      5
+#define ESTIMATE_VO2MAX  6
 
 // type of stress
 #define STRESS_STS       0

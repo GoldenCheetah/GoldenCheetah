@@ -1469,6 +1469,7 @@ EditMetricDetailDialog::modelChanged()
     qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(3)->setEnabled(models[currentIndex]->hasPMax());
     qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(4)->setEnabled(true);
     qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(5)->setEnabled(true);
+    qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(6)->setEnabled(true);
 
     // switch to other estimate if wanted estimate is not selected
     if (ce < 0 || !qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(ce)->isEnabled())
@@ -1513,6 +1514,7 @@ EditMetricDetailDialog::estimateName()
             }
             break;
         case 5 : name = tr("Endurance Index"); break;
+        case 6 : name = tr("Vo2Max Estimate"); break;
     }
 
     // now the model
@@ -1652,6 +1654,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     estimateSelect->addItem("p-Max");
     estimateSelect->addItem("Best Power");
     estimateSelect->addItem("Endurance Index");
+    estimateSelect->addItem("Vo2Max Estimate");
 
     int n=0;
     modelSelect->setCurrentIndex(0); // default to 2parm model
