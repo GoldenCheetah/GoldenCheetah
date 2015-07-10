@@ -83,6 +83,9 @@ class PDModel : public QObject, public QwtSyntheticPointData
         double x(unsigned int index) const; 
         virtual double y(double /* t */) const { return 0; }
 
+        // return an estimate of vo2max using the predicted 5m power
+        double vo2max(double kg) { return 10.8 + (y(5)/kg) + 7; }
+
         // what capabilities do you have ?
         // sticking with 4 key measures for now
         virtual bool hasWPrime() { return false; }  // can estimate W'
