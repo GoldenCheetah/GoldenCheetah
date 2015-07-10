@@ -572,8 +572,8 @@ WPrime::summarize(int WPRIME, QVector<double> wtiz, QColor color)
     summary += "<tr>";
     summary += tr("<td align=\"center\">Zone</td>");
     summary += tr("<td align=\"center\">Description</td>");
-    summary += tr("<td align=\"center\">High (kJ)</td>");
-    summary += tr("<td align=\"center\">Low (kJ)</td>");
+    summary += tr("<td align=\"center\">High (J)</td>");
+    summary += tr("<td align=\"center\">Low (J)</td>");
     summary += tr("<td align=\"center\">Time</td>");
     summary += tr("<td align=\"center\">%</td>");
     summary += "</tr>";
