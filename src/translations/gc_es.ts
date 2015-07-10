@@ -4092,7 +4092,7 @@ Comencemos la configuración.</translation>
         <location filename="../CPPlot.cpp" line="498"/>
         <location filename="../CPPlot.cpp" line="552"/>
         <source>Pmax</source>
-        <translation></translation>
+        <translation>Pmáx</translation>
     </message>
     <message>
         <location filename="../CPPlot.cpp" line="526"/>
@@ -4136,7 +4136,7 @@ Comencemos la configuración.</translation>
     <message>
         <location filename="../CPPlot.cpp" line="602"/>
         <source>Vmax</source>
-        <translation></translation>
+        <translation>Vmáx</translation>
     </message>
     <message>
         <source>Percent of Best / Heat Rides</source>
@@ -5586,7 +5586,7 @@ Puede demorar.
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="396"/>
         <source>Pmax</source>
-        <translation></translation>
+        <translation>Pmáx</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="399"/>
@@ -7268,13 +7268,13 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
 <context>
     <name>EtimatedAverageWPK_DrF</name>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="327"/>
+        <location filename="../WattsPerKilogram.cpp" line="331"/>
         <source>estimated Watts Per Kilogram (DrF.)</source>
         <translation>Vatios por kg estimados (DrF.)</translation>
     </message>
     <message>
-        <location filename="../WattsPerKilogram.cpp" line="329"/>
-        <location filename="../WattsPerKilogram.cpp" line="330"/>
+        <location filename="../WattsPerKilogram.cpp" line="333"/>
+        <location filename="../WattsPerKilogram.cpp" line="334"/>
         <source>w/kg</source>
         <translation>vatios/kg</translation>
     </message>
@@ -9540,7 +9540,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../RideNavigator.cpp" line="816"/>
         <source>VO2Max</source>
-        <translation>VO2Max</translation>
+        <translation>VO2Máx</translation>
     </message>
     <message>
         <location filename="../RideNavigator.cpp" line="817"/>
@@ -10913,7 +10913,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../HrZones.cpp" line="46"/>
         <source>VO2Max</source>
-        <translation>VO2Max</translation>
+        <translation>VO2Máx</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="204"/>
@@ -13687,7 +13687,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <location filename="../Pages.cpp" line="4055"/>
         <location filename="../Pages.cpp" line="4079"/>
         <source>Max HR</source>
-        <translation>FC Max</translation>
+        <translation>FC Máx</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="4099"/>
@@ -13900,12 +13900,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../MUWidget.cpp" line="45"/>
         <source>P-max</source>
-        <translation></translation>
+        <translation>P-máx</translation>
     </message>
     <message>
         <location filename="../MUWidget.cpp" line="46"/>
         <source>P-min</source>
-        <translation></translation>
+        <translation>P-mín</translation>
     </message>
     <message>
         <location filename="../MUWidget.cpp" line="52"/>
@@ -13920,7 +13920,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../MUWidget.cpp" line="80"/>
         <source>Pmin</source>
-        <translation></translation>
+        <translation>Pmín</translation>
     </message>
     <message>
         <location filename="../MUWidget.cpp" line="96"/>
@@ -15416,7 +15416,7 @@ PC del ciclista %3 vatios</translation>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1613"/>
         <source>Max Core Temperature</source>
-        <translation>Max Temperatura Central</translation>
+        <translation>Temperatura Central Máx</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1614"/>
@@ -15458,7 +15458,7 @@ PC del ciclista %3 vatios</translation>
     <message>
         <location filename="../WPrime.cpp" line="683"/>
         <source>Maximum W&apos;bal Match</source>
-        <translation>Cartuchos Máx W&apos;bal</translation>
+        <translation>Cartuchos W&apos;bal Máx</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="685"/>
@@ -15494,7 +15494,7 @@ PC del ciclista %3 vatios</translation>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1440"/>
         <source>Max SmO2</source>
-        <translation></translation>
+        <translation>SmO2 Máx</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1441"/>
@@ -15544,7 +15544,7 @@ PC del ciclista %3 vatios</translation>
     <message>
         <location filename="../WPrime.cpp" line="654"/>
         <source>Max W&apos; Expended</source>
-        <translation>Máx W&apos; Utilizado</translation>
+        <translation>W&apos; Utilizado Máx</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="656"/>
@@ -15558,7 +15558,7 @@ PC del ciclista %3 vatios</translation>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1474"/>
         <source>Max tHb</source>
-        <translation></translation>
+        <translation>tHb Máx</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1475"/>
@@ -16216,7 +16216,7 @@ Tiempo empleado: %1
     <message>
         <location filename="../WPrime.cpp" line="625"/>
         <source>Minimum W&apos; bal</source>
-        <translation>Mín W&apos; bal</translation>
+        <translation>W&apos; bal Mín</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="627"/>
@@ -16230,7 +16230,7 @@ Tiempo empleado: %1
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1542"/>
         <source>Min tHb</source>
-        <translation></translation>
+        <translation>tHb Mín</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1543"/>
@@ -17583,7 +17583,7 @@ No rides found to import.
     <message>
         <location filename="../PaceZones.cpp" line="95"/>
         <source>VO2Max</source>
-        <translation>VO2Max</translation>
+        <translation>VO2Máx</translation>
     </message>
     <message>
         <location filename="../PaceZones.cpp" line="95"/>
@@ -21949,7 +21949,7 @@ Saltando archivo...</translation>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="789"/>
         <source>P-max</source>
-        <translation></translation>
+        <translation>P-máx</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="986"/>
@@ -26322,7 +26322,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../WattsPerKilogram.cpp" line="294"/>
         <source>Estimated VO2MAX</source>
-        <translation>VO2Max Estimado</translation>
+        <translation>VO2Máx Estimado</translation>
     </message>
     <message>
         <location filename="../WattsPerKilogram.cpp" line="296"/>
@@ -26399,7 +26399,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../WPrime.cpp" line="566"/>
         <source>W&apos; (Joules): %1</source>
-        <translation>W&apos; (J): %1</translation>
+        <translation>W&apos; (Julios): %1</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="573"/>
@@ -26413,13 +26413,21 @@ Presionar F3 en el controlador al finalizar.</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="575"/>
-        <source>&lt;td align=&quot;center&quot;&gt;High (kJ)&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Superior (kJ)&lt;/td&gt;</translation>
+        <source>&lt;td align=&quot;center&quot;&gt;High (J)&lt;/td&gt;</source>
+        <translation>&lt;td align=&quot;center&quot;&gt;Superior (J)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="576"/>
+        <source>&lt;td align=&quot;center&quot;&gt;Low (J)&lt;/td&gt;</source>
+        <translation>&lt;td align=&quot;center&quot;&gt;Inferior (J)&lt;/td&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;td align=&quot;center&quot;&gt;High (kJ)&lt;/td&gt;</source>
+        <translation type="vanished">&lt;td align=&quot;center&quot;&gt;Superior (kJ)&lt;/td&gt;</translation>
+    </message>
+    <message>
         <source>&lt;td align=&quot;center&quot;&gt;Low (kJ)&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Inferior (kJ)&lt;/td&gt;</translation>
+        <translation type="vanished">&lt;td align=&quot;center&quot;&gt;Inferior (kJ)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="577"/>
@@ -26621,14 +26629,23 @@ Presionar F3 en el controlador al finalizar.</translation>
     <name>WithingsDownload</name>
     <message>
         <location filename="../WithingsDownload.cpp" line="48"/>
-        <location filename="../WithingsDownload.cpp" line="72"/>
+        <location filename="../WithingsDownload.cpp" line="74"/>
         <source>Withings Data Download</source>
         <translation>Descarga de Datos Withings</translation>
     </message>
     <message>
         <location filename="../WithingsDownload.cpp" line="71"/>
+        <source>No new measurements</source>
+        <translation>Sin nuevas mediciones</translation>
+    </message>
+    <message>
+        <location filename="../WithingsDownload.cpp" line="72"/>
+        <source>%1 new measurements received.</source>
+        <translation>%1 nuevas mediciones recibidas.</translation>
+    </message>
+    <message>
         <source>%1 new on %2 measurements received.</source>
-        <translation>%1 nuevas medidas recibidas en %2.</translation>
+        <translation type="vanished">%1 nuevas medidas recibidas en %2.</translation>
     </message>
 </context>
 <context>
@@ -27118,7 +27135,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../Zones.cpp" line="44"/>
         <source>VO2Max</source>
-        <translation>VO2Max</translation>
+        <translation>VO2Máx</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="44"/>
