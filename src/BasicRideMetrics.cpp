@@ -1357,6 +1357,12 @@ struct AvgTemp : public RideMetric {
     // we DO aggregate zero, its -255 we ignore !
     bool aggregateZero() const { return true; }
 
+    // override to special case NoTemp
+    QString toString(bool useMetricUnits) const {
+        if (value() == RideFile::NoTemp) return "-";
+        return RideMetric::toString(useMetricUnits);
+    }
+
     void initialize() {
         setName(tr("Average Temp"));
         setMetricUnits(tr("C"));
@@ -1743,6 +1749,12 @@ class MaxTemp : public RideMetric {
         setPrecision(1);
         setConversion(FAHRENHEIT_PER_CENTIGRADE);
         setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);
+    }
+
+    // override to special case NoTemp
+    QString toString(bool useMetricUnits) const {
+        if (value() == RideFile::NoTemp) return "-";
+        return RideMetric::toString(useMetricUnits);
     }
 
     void compute(const RideFile *ride, const Zones *, int,
