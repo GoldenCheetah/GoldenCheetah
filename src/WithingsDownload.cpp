@@ -68,7 +68,9 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
         newMeasures = 0;
     }
 
-    QString status = QString(tr("%1 new on %2 measurements received.")).arg(newMeasures).arg(receivedMeasures);
+    QString status = tr("No new measurements");
+    if (newMeasures > 0) status = QString(tr("%1 new measurements received.")).arg(newMeasures);
+
     QMessageBox::information(context->mainWindow, tr("Withings Data Download"), status);
 
     // hacky for now, just refresh for all dates where we have withings data

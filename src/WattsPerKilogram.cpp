@@ -307,8 +307,12 @@ class Vo2max : public RideMetric {
         // Using New ACSM formula also outlined here:
         // http://blue.utb.edu/mbailey/pdf/MetCalnew.pdf
         // 10.8 * Watts / KG + 7 (3.5 per leg)
-        setValue(10.8 * wpk5m->value(false) + 7);
-        setCount(1);
+        setValue(0);
+        setCount(0);
+        if (wpk5m->value(false) > 0) {
+            setValue(10.8 * wpk5m->value(false) + 7);
+            setCount(1);
+        }
     }
     RideMetric *clone() const { return new Vo2max(*this); }
 };
