@@ -2661,6 +2661,9 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
                     // set the parameters previously derived
                     model->loadParameters(est.parameters);
 
+                    // use seconds
+                    model->setMinutes(false);
+
                     // get the model estimate for our duration
                     value = model->y(metricDetail.estimateDuration * metricDetail.estimateDuration_units);
                 }
@@ -2689,6 +2692,9 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
 
                     // set the parameters previously derived
                     model->loadParameters(est.parameters);
+
+                    // use seconds
+                    model->setMinutes(false);
 
                     // get the model estimate for our duration
                     value = model->vo2max(kg);
