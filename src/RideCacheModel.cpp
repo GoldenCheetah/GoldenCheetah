@@ -87,8 +87,25 @@ RideCacheModel::data(const QModelIndex &index, int role) const
                 // unpack metric value into ridemetric and use it to get a stringified
                 // version using the right metric/imperial conversion
                 RideMetric *m = const_cast<RideMetric*>(factory->rideMetric(factory->metricName(i)));
-                m->setValue(rideCache->rides().at(index.row())->metrics_[m->index()]);
-                return m->toString(context->athlete->useMetricUnits);
+
+                // bit of a kludge, but will return stuff with no decimal places
+                // as a number, but not if unit is seconds or high precision which means
+                // metrics with high precision don't sort this is crap XXX
+                if (m->units(true) != "km" && (m->units(true) == "seconds" || m->precision() > 0)) {
+                    m->setValue(rideCache->rides().at(index.row())->metrics_[m->index()]);
+                    return m->toString(context->athlete->useMetricUnits); // string
+                } else {
+
+                    // make low precision numbers sort, including distance which we picked
+                    // up as a special case. not sure about pace ....
+                    double value = rideCache->rides().at(index.row())->metrics_[m->index()];
+
+                    // convert to imperial if needed
+                    if (context->athlete->useMetricUnits == false) 
+                        value = (value * m->conversion()) + m->conversionSum();
+
+                    return round(value);
+                }
 
             } else {
 
