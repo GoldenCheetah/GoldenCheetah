@@ -43,13 +43,15 @@ struct Bin2FileReaderState
     double last_interval_secs;
 
     bool jouleGPS;
+    bool jouleGPS_GPSPlus;
+
     bool stopped;
 
     QString deviceInfo;
 
     Bin2FileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), secs(0), km(0),
-        interval(0), last_interval_secs(0.0),  jouleGPS(true), stopped(true)
+        interval(0), last_interval_secs(0.0),  jouleGPS(true), jouleGPS_GPSPlus(true), stopped(true)
     {
 
     }
@@ -112,7 +114,7 @@ struct Bin2FileReaderState
     {
         QDateTime date = read_date(bytes_read, sum);
 
-        if (jouleGPS) {
+        if (jouleGPS_GPSPlus) {
             read_bytes(1, bytes_read, sum); // dummy
             read_bytes(4, bytes_read, sum); // time_moving
 
@@ -139,7 +141,7 @@ struct Bin2FileReaderState
         if (BIN2_DEBUG)
             qDebug() << "read_interval_mark" << rideTime << "at" << *secs <<"secs";
 
-        if (jouleGPS)
+        if (jouleGPS_GPSPlus)
             read_bytes(24, bytes_read, sum); // dummy
         else
             read_bytes(12, bytes_read, sum); // dummy
@@ -161,7 +163,7 @@ struct Bin2FileReaderState
         double lng = 0.0;
         double km = 0.0;
 
-        if (jouleGPS) {
+        if (jouleGPS_GPSPlus) {
             cad = read_bytes(1, bytes_read, sum);
 
             read_bytes(1, bytes_read, sum); // pedal_smoothness
@@ -264,7 +266,7 @@ struct Bin2FileReaderState
 
         rideFile->setStartTime(t);
 
-        if (jouleGPS)
+        if (jouleGPS_GPSPlus)
         {
             read_bytes(148, bytes_read, sum);
 
@@ -361,7 +363,7 @@ struct Bin2FileReaderState
 
             if (page_number == 0) {
                 // Page #0
-                if (jouleGPS) {
+                if (jouleGPS_GPSPlus) {
                     read_ride_summary(&bytes_read, &sum);
                     read_interval_summary(&bytes_read, &sum);
                     read_username(&bytes_read, &sum);
@@ -382,7 +384,7 @@ struct Bin2FileReaderState
                 read_bytes(1, &bytes_read, &sum); // checksum
 
             } else {
-                if (page_number == 1 && !jouleGPS)  {
+                if (page_number == 1 && !jouleGPS_GPSPlus)  {
                     //page still contains 48 interval_summary
                     int finish = length+6-bytes_read;
 
@@ -415,7 +417,7 @@ struct Bin2FileReaderState
             read_bytes(2, &bytes_read, &sum); // length
             uint16_t page_number = read_bytes(2, &bytes_read, &sum); // Page #
 
-            if (page_number == 2 && !jouleGPS) {
+            if (page_number == 2 && !jouleGPS_GPSPlus) {
                 //page still contains 5 interval_summary in 2 blocks of 256k
                 read_bytes(512, &bytes_read, &sum);
 
@@ -429,7 +431,7 @@ struct Bin2FileReaderState
                 // Page # >0
                 // Joule GPS : 128 x record (32k)
 
-                if (!jouleGPS) {
+                if (!jouleGPS_GPSPlus) {
                     // Page # = 2
                     // Joule  : 168 x record (20k)
                     // Page # > 1
@@ -488,7 +490,7 @@ struct Bin2FileReaderState
                         // means invalid entry
                         if (BIN2_DEBUG)
                             qDebug() << "invalid at" << secs << "secs";
-                        if (jouleGPS)
+                        if (jouleGPS_GPSPlus)
                             read_bytes(31, &bytes_read, &sum); // dummy
                         else
                             read_bytes(19, &bytes_read, &sum); // dummy
@@ -500,7 +502,7 @@ struct Bin2FileReaderState
                         // or when the internal Real Time Clock is adjusted.
                         t= read_RTC_mark(&secs, &bytes_read, &sum);
                     }
-                    else if ((jouleGPS && (flag & 0x03) == 0x03) || (!jouleGPS && (flag & 0x03) == 0x02)) {
+                    else if ((jouleGPS_GPSPlus && (flag & 0x03) == 0x03) || (!jouleGPS_GPSPlus && (flag & 0x03) == 0x02)) {
                         // The Interval Mark immediately precedes a Detail Record at the same RTC time.
                         int t = read_interval_mark(&secs, &bytes_read, &sum);
                         interval = t;
@@ -512,13 +514,13 @@ struct Bin2FileReaderState
                         if (BIN2_DEBUG)
                             qDebug() << "UNKNOW: flag" << flag << "at" << secs << "secs";
 
-                        if (jouleGPS)
+                        if (jouleGPS_GPSPlus)
                             read_bytes(31, &bytes_read, &sum); // dummy
                         else
                             read_bytes(19, &bytes_read, &sum); // dummy
                     }
 
-                    if (!jouleGPS && (i+1)%12 == 0)
+                    if (!jouleGPS_GPSPlus && (i+1)%12 == 0)
                         read_bytes(16, &bytes_read, &sum); // unused
 
                 }
@@ -551,19 +553,24 @@ struct Bin2FileReaderState
 
             if (major_version == 18)
             {
+                jouleGPS_GPSPlus = false;
                 jouleGPS = false;
             } else
             {
-                jouleGPS = true;
+                jouleGPS_GPSPlus = true;
+                if (major_version == 22)
+                    jouleGPS = false;
             }
 
 
-            if (jouleGPS)
+            if (jouleGPS_GPSPlus)
                 data_version = read_bytes(2, &bytes_read, &sum);
 
             QString version = QString(minor_version<100?"%1.0%2 (%3)":"%1.%2 (%3)").arg(major_version).arg(minor_version).arg(data_version);
             if (jouleGPS)
                 deviceInfo += "Joule GPS";
+            else if (jouleGPS_GPSPlus)
+                deviceInfo += "Joule GPS+";
             else
                 deviceInfo += "Joule";
 
@@ -590,7 +597,7 @@ struct Bin2FileReaderState
         {
             read_bytes(2, &bytes_read, &sum); // length
 
-            if (jouleGPS)
+            if (jouleGPS_GPSPlus)
                 read_bytes(52, &bytes_read, &sum);
             else
                 read_bytes(50, &bytes_read, &sum);
@@ -598,7 +605,7 @@ struct Bin2FileReaderState
             uint16_t odometer = read_bytes(8, &bytes_read, &sum);
             deviceInfo += QString("Odometer %1km\n").arg(odometer/1000.0);
 
-            if (!jouleGPS)
+            if (!jouleGPS_GPSPlus)
                 read_bytes(34, &bytes_read, &sum);
 
             read_bytes(1, &bytes_read, &sum); // checksum
@@ -627,12 +634,14 @@ struct Bin2FileReaderState
 
         if (jouleGPS)
             rideFile->setDeviceType("Joule GPS");
+        else if (jouleGPS_GPSPlus)
+            rideFile->setDeviceType("Joule GPS+");
         else
             rideFile->setDeviceType("Joule");
 
         bytes_read += read_system_info();
         bytes_read += read_summary_page();
-        if (!jouleGPS)
+        if (!jouleGPS_GPSPlus)
             bytes_read += read_summary_page();
 
         while (!stop && (bytes_read < data_size)) {

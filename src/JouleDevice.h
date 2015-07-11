@@ -39,7 +39,7 @@ struct JouleDevice : public Device
     JouleType getJouleType(JoulePacket &versionResponse);
 
     bool getUnitFreeSpace(QString &txt, QString &err);
-    bool getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJouleGPS, QString &err);
+    bool getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJouleGPS_GPSPLUS, QString &err);
 
 
 };

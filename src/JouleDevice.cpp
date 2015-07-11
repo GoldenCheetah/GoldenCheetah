@@ -139,8 +139,10 @@ JouleDevice::download( const QDir &tmpdir,
 
     emit updateStatus(QString(tr("Joule %1 identified")).arg(isJouleGPS?"GPS":(isJouleGPSPLUS?"GPS+":"1.0")));
 
+    bool isJouleGPS_GPSPLUS = isJouleGPS || isJouleGPSPLUS;
+
     QList<DeviceStoredRideItem> trainings;
-    if (!getDownloadableRides(trainings, isJouleGPS, err))
+    if (!getDownloadableRides(trainings, isJouleGPS_GPSPLUS, err))
         return false;
 
     for (int i=0; i<trainings.count(); i++) {
@@ -192,12 +194,12 @@ JouleDevice::download( const QDir &tmpdir,
 
                 // timestamp from the first training
                 struct tm start;
-                start.tm_sec = (isJouleGPS ? bcd2Int(response.payload.at(4))   : qByteArray2Int(response.payload.mid(4,1))   );
-                start.tm_min = (isJouleGPS ? bcd2Int(response.payload.at(5))   : qByteArray2Int(response.payload.mid(5,1))   );
-                start.tm_hour = (isJouleGPS ? bcd2Int(response.payload.at(6))   : qByteArray2Int(response.payload.mid(6,1))   );
-                start.tm_mday = (isJouleGPS ? bcd2Int(response.payload.at(7))   : qByteArray2Int(response.payload.mid(7,1))   );
-                start.tm_mon = (isJouleGPS ? bcd2Int(response.payload.at(8))-1  : qByteArray2Int(response.payload.mid(8,1))-1 );
-                start.tm_year = (isJouleGPS ? bcd2Int(response.payload.at(9))+100  : qByteArray2Int(response.payload.mid(9,1))+100 );
+                start.tm_sec = (isJouleGPS_GPSPLUS ? bcd2Int(response.payload.at(4))   : qByteArray2Int(response.payload.mid(4,1))   );
+                start.tm_min = (isJouleGPS_GPSPLUS ? bcd2Int(response.payload.at(5))   : qByteArray2Int(response.payload.mid(5,1))   );
+                start.tm_hour = (isJouleGPS_GPSPLUS ? bcd2Int(response.payload.at(6))   : qByteArray2Int(response.payload.mid(6,1))   );
+                start.tm_mday = (isJouleGPS_GPSPLUS ? bcd2Int(response.payload.at(7))   : qByteArray2Int(response.payload.mid(7,1))   );
+                start.tm_mon = (isJouleGPS_GPSPLUS ? bcd2Int(response.payload.at(8))-1  : qByteArray2Int(response.payload.mid(8,1))-1 );
+                start.tm_year = (isJouleGPS_GPSPLUS ? bcd2Int(response.payload.at(9))+100  : qByteArray2Int(response.payload.mid(9,1))+100 );
                 start.tm_isdst = -1;
 
                 DeviceDownloadFile file;
@@ -351,7 +353,7 @@ JouleDevice::getUnitFreeSpace(QString &memory, QString &err)
 }
 
 bool
-JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJouleGPS, QString &err)
+JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJouleGPS_GPSPLUS, QString &err)
 {
     emit updateStatus(tr("Read summary..."));
     if (JOULE_DEBUG) printf("Read summary\n");
@@ -362,22 +364,22 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJou
 
     JoulePacket response = JoulePacket(READ_RIDE_SUMMARY);
     if (response.read(dev, err)) {
-        int length = (isJouleGPS?20:16);
+        int length = (isJouleGPS_GPSPLUS?20:16);
         int count = response.payload.length()/length;
 
         for (int i=0; i<count; i++) {
             int j = i*length;
-            int sec   = (isJouleGPS ? bcd2Int(response.payload.at(j))   : qByteArray2Int(response.payload.mid(j,1))   );
-            int min   = (isJouleGPS ? bcd2Int(response.payload.at(j+1)) : qByteArray2Int(response.payload.mid(j+1,1)) );
-            int hour  = (isJouleGPS ? bcd2Int(response.payload.at(j+2)) : qByteArray2Int(response.payload.mid(j+2,1)) );
-            int day   = (isJouleGPS ? bcd2Int(response.payload.at(j+3)) : qByteArray2Int(response.payload.mid(j+3,1)) );
-            int month = (isJouleGPS ? bcd2Int(response.payload.at(j+4)) : qByteArray2Int(response.payload.mid(j+4,1)) );
-            int year  = (isJouleGPS ? bcd2Int(response.payload.at(j+5)) : qByteArray2Int(response.payload.mid(j+5,1)) );
+            int sec   = (isJouleGPS_GPSPLUS ? bcd2Int(response.payload.at(j))   : qByteArray2Int(response.payload.mid(j,1))   );
+            int min   = (isJouleGPS_GPSPLUS ? bcd2Int(response.payload.at(j+1)) : qByteArray2Int(response.payload.mid(j+1,1)) );
+            int hour  = (isJouleGPS_GPSPLUS ? bcd2Int(response.payload.at(j+2)) : qByteArray2Int(response.payload.mid(j+2,1)) );
+            int day   = (isJouleGPS_GPSPLUS ? bcd2Int(response.payload.at(j+3)) : qByteArray2Int(response.payload.mid(j+3,1)) );
+            int month = (isJouleGPS_GPSPLUS ? bcd2Int(response.payload.at(j+4)) : qByteArray2Int(response.payload.mid(j+4,1)) );
+            int year  = (isJouleGPS_GPSPLUS ? bcd2Int(response.payload.at(j+5)) : qByteArray2Int(response.payload.mid(j+5,1)) );
 
             QDateTime date = QDateTime(QDate(year+2000,month-1,day), QTime(hour,min,sec));
 
             int total = qByteArray2Int(response.payload.mid(j+length-2,2));
-            qDebug() << date << total;
+
             if (total > 0) {
                 DeviceStoredRideItem ride;
                 ride.id = i;
