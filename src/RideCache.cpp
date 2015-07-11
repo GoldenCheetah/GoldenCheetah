@@ -696,7 +696,10 @@ RideCache::refreshCPModelMetrics()
             if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
 
             // so long as the model derived values are sensible ...
-            if (add.WPrime > 100.0f && add.CP > 1.0f && add.PMax > 1.0f && add.FTP > 1.0f)
+            if ((!model->hasWPrime() || add.WPrime > 10.0f) && 
+                (!model->hasCP() || add.CP > 1.0f) &&
+                (!model->hasPMax() || add.PMax > 1.0f) &&
+                (!model->hasFTP() || add.FTP > 1.0f))
                 context->athlete->PDEstimates << add;
 
             //qDebug()<<add.from<<model->code()<< "KG W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
