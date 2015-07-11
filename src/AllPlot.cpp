@@ -5490,8 +5490,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
 
     // record the max x value
     if (here->timeArray.count() && here->distanceArray.count()) {
-        int maxSECS = here->timeArray[here->timeArray.count()-1];
-        int maxKM = here->distanceArray[here->distanceArray.count()-1];
+        double maxSECS = here->timeArray[here->timeArray.count()-1];
+        double maxKM = here->distanceArray[here->distanceArray.count()-1];
         if (maxKM > here->maxKM) here->maxKM = maxKM;
         if (maxSECS > here->maxSECS) here->maxSECS = maxSECS;
     }
