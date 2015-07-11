@@ -195,6 +195,7 @@ class TimeCarrying : public RideMetric {
         setValue(secsCarrying);
 
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new TimeCarrying(*this); }
 };
 
@@ -252,6 +253,7 @@ class ElevationGainCarrying : public RideMetric {
         }
         setValue(elegain);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new ElevationGainCarrying(*this); }
 };
 
@@ -353,7 +355,7 @@ class ClimbRating : public RideMetric {
         setValue(rating);
         setCount(1);
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim; }
     RideMetric *clone() const { return new ClimbRating(*this); }
 };
 
@@ -455,6 +457,7 @@ class ElevationGain : public RideMetric {
         }
         setValue(elegain);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim; }
     RideMetric *clone() const { return new ElevationGain(*this); }
 };
 
@@ -507,6 +510,7 @@ class ElevationLoss : public RideMetric {
         }
         setValue(eleLoss);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim; }
     RideMetric *clone() const { return new ElevationLoss(*this); }
 };
 
@@ -543,6 +547,7 @@ class TotalWork : public RideMetric {
         }
         setValue(joules/1000);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new TotalWork(*this); }
 };
 
@@ -775,6 +780,7 @@ struct AvgPower : public RideMetric {
         setValue(count > 0 ? total / count : 0);
         setCount(count);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgPower(*this); }
 };
 
@@ -900,6 +906,7 @@ struct AAvgPower : public RideMetric {
         setValue(count > 0 ? total / count : 0);
         setCount(count);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AAvgPower(*this); }
 };
 
@@ -940,6 +947,7 @@ struct NonZeroPower : public RideMetric {
         setValue(count > 0 ? total / count : 0);
         setCount(count);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new NonZeroPower(*this); }
 };
 
@@ -1102,6 +1110,7 @@ class HrPw : public RideMetric {
             setValue(0);
         }
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new HrPw(*this); }
 };
 
@@ -1144,6 +1153,7 @@ class Workbeat : public RideMetric {
 
         setValue((work->value() * hb->value()) / 100000.00f);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new Workbeat(*this); }
 };
 
@@ -1190,6 +1200,7 @@ class WattsRPE : public RideMetric {
         }
         setValue(ratio);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new WattsRPE(*this); }
 };
 
@@ -1236,6 +1247,7 @@ class APPercent : public RideMetric {
         }
         setValue(percent);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new APPercent(*this); }
 };
 
@@ -1282,6 +1294,7 @@ class HrNp : public RideMetric {
             setValue(0);
         }
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new HrNp(*this); }
 };
 
@@ -1357,6 +1370,12 @@ struct AvgTemp : public RideMetric {
     // we DO aggregate zero, its -255 we ignore !
     bool aggregateZero() const { return true; }
 
+    // override to special case NoTemp
+    QString toString(bool useMetricUnits) const {
+        if (value() == RideFile::NoTemp) return "-";
+        return RideMetric::toString(useMetricUnits);
+    }
+
     void initialize() {
         setName(tr("Average Temp"));
         setMetricUnits(tr("C"));
@@ -1419,6 +1438,7 @@ class MaxPower : public RideMetric {
         }
         setValue(max);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new MaxPower(*this); }
 };
 
@@ -1745,6 +1765,12 @@ class MaxTemp : public RideMetric {
         setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);
     }
 
+    // override to special case NoTemp
+    QString toString(bool useMetricUnits) const {
+        if (value() == RideFile::NoTemp) return "-";
+        return RideMetric::toString(useMetricUnits);
+    }
+
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
@@ -1805,6 +1831,7 @@ class NinetyFivePercentHeartRate : public RideMetric {
         }
         setValue(hr);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("H"); }
     RideMetric *clone() const { return new NinetyFivePercentHeartRate(*this); }
 };
 
@@ -1837,6 +1864,7 @@ class VAM : public RideMetric {
         WorkoutTime *wt = dynamic_cast<WorkoutTime*>(deps.value("workout_time"));
         setValue((el->value(true)*3600)/wt->value(true));
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim; }
     RideMetric *clone() const { return new VAM(*this); }
 };
 
@@ -1877,6 +1905,7 @@ class EOA : public RideMetric {
         AvgPower *ap = dynamic_cast<AvgPower*>(deps.value("average_power"));
         setValue(((aap->value(true)-ap->value(true))/aap->value(true)) * 100.00f);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new EOA(*this); }
 };
 
@@ -1921,6 +1950,7 @@ class Gradient : public RideMetric {
         } else
             setValue(0.0);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim; }
     RideMetric *clone() const { return new Gradient(*this); }
 };
 
@@ -1978,6 +2008,7 @@ class MeanPowerVariance : public RideMetric {
             topRank = outliers.getYForRank(0);
         }
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new MeanPowerVariance(*this); }
 };
 
@@ -2018,6 +2049,7 @@ class MaxPowerVariance : public RideMetric {
         else
             setValue(mean->topRank);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new MaxPowerVariance(*this); }
 };
 
@@ -2078,7 +2110,7 @@ class AvgLTE : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLTE(*this); }
 };
 
@@ -2128,7 +2160,7 @@ class AvgRTE : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRTE(*this); }
 };
 
@@ -2179,7 +2211,7 @@ class AvgLPS : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPS(*this); }
 };
 
@@ -2230,7 +2262,7 @@ class AvgRPS : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPS(*this); }
 };
 
@@ -2282,7 +2314,7 @@ class AvgLPCO : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPCO(*this); }
 };
 
@@ -2334,7 +2366,7 @@ class AvgRPCO : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPCO(*this); }
 };
 
@@ -2384,7 +2416,7 @@ class AvgLPPB : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPPB(*this); }
 };
 
@@ -2434,7 +2466,7 @@ class AvgRPPB : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPPB(*this); }
 };
 
@@ -2485,7 +2517,7 @@ class AvgLPPE : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPPE(*this); }
 };
 
@@ -2535,7 +2567,7 @@ class AvgRPPE : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPPE(*this); }
 };
 
@@ -2586,7 +2618,7 @@ class AvgLPPPB : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPPPB(*this); }
 };
 
@@ -2636,7 +2668,7 @@ class AvgRPPPB : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPPPB(*this); }
 };
 
@@ -2687,7 +2719,7 @@ class AvgLPPPE : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPPPE(*this); }
 };
 
@@ -2737,7 +2769,7 @@ class AvgRPPPE : public RideMetric {
             setValue(0.0);
         }
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPPPE(*this); }
 };
 
@@ -2780,7 +2812,7 @@ class AvgLPP : public RideMetric {
         }
 
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPP(*this); }
 };
 
@@ -2824,7 +2856,7 @@ class AvgRPP : public RideMetric {
         }
 
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPP(*this); }
 };
 
@@ -2867,7 +2899,7 @@ class AvgLPPP : public RideMetric {
         }
 
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPPP(*this); }
 };
 
@@ -2911,7 +2943,7 @@ class AvgRPPP : public RideMetric {
         }
 
     }
-
+    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPPP(*this); }
 };
 
