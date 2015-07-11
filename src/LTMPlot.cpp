@@ -2678,12 +2678,6 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
             {
                 value = 0;
 
-                // get average weight in duration
-                // when from/to are not the same day
-                double kg = context->athlete->getWithingsWeight(from);
-                if (!kg) kg = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
-                if (kg <= 0.00) kg = 75.00;
-
                 // we need to find the model
                 foreach(PDModel *model, models) {
 
@@ -2696,8 +2690,10 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
                     // use seconds
                     model->setMinutes(false);
 
-                    // get the model estimate for our duration
-                    value = model->vo2max(kg);
+                    // get the model estimate for our duration, if the user
+                    // selected absolute values it will be ml/min otherwise
+                    // if will return ml/min/kg
+                    value = model->vo2max();
                 }
             }
             break;
