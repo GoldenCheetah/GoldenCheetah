@@ -5543,7 +5543,7 @@ IntervalsPage::IntervalsPage(Context *context) : context(context)
     layout->addWidget(heading, row, 0, Qt::AlignRight);
 
     user = 99;
-    for(int i=0; i< static_cast<int>(RideFileInterval::last()); i++) {
+    for(int i=0; i<= static_cast<int>(RideFileInterval::last()); i++) {
 
         // ignore until we get past user interval type
         if (i == static_cast<int>(RideFileInterval::USER)) user=i;
