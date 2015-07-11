@@ -314,6 +314,7 @@ class Vo2max : public RideMetric {
             setCount(1);
         }
     }
+    bool isRelevantForRide(const RideItem *ride) const {return ride->present.contains("P"); }
     RideMetric *clone() const { return new Vo2max(*this); }
 };
 

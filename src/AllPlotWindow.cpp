@@ -935,7 +935,7 @@ AllPlotWindow::compareChanged()
         //
         // SETUP FULLPLOT FOR COMPARE MODE
         // 
-        int maxKM=0, maxSECS=0;
+        double maxKM=0, maxSECS=0;
 
         fullPlot->standard->setVisible(false);
         if (fullPlot->smooth < 1) fullPlot->smooth = 1;
