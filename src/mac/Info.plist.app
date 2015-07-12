@@ -9,7 +9,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleGetInfoString</key>
-	<string>3.1.0 (developer)</string>
+	<string>3.2.0 (developer)</string>
 	<key>CFBundleSignature</key>
 	<string>@TYPEINFO@</string>
 	<key>CFBundleExecutable</key>
@@ -17,6 +17,6 @@
 	<key>CFBundleIdentifier</key>
 	<string>@BUNDLEIDENTIFIER@</string>
 	<key>NOTE</key>
-	<string>3.1.0 pre-release</string>
+	<string>3.2.0 pre-release</string>
 </dict>
 </plist>
