@@ -285,6 +285,13 @@ Seasons::readSeasons()
     season.setId(QUuid("{00000000-0000-0000-0000-000000000003}"));
     seasons.append(season);
 
+    season.setName(tr("Last Month"));
+    season.setType(Season::temporary);
+    season.setStart(QDate(today.year(), today.month(),1).addMonths(-1));
+    season.setEnd(QDate(today.year(), today.month(),1).addDays(-1));
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000013}"));
+    seasons.append(season);
+
     season.setName(tr("This Week"));
     season.setType(Season::temporary);
     // from Mon-Sun
@@ -294,6 +301,14 @@ Seasons::readSeasons()
     season.setStart(wstart);
     season.setEnd(wend);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000004}"));
+    seasons.append(season);
+
+    season.setName(tr("Last Week"));
+    season.setType(Season::temporary);
+    // from Mon-Sun
+    season.setStart(wstart.addDays(-7));
+    season.setEnd(wend.addDays(-7));
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000014}"));
     seasons.append(season);
 
     season.setName(tr("Last 7 days"));
