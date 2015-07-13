@@ -404,6 +404,11 @@ public:
         }
     }
 
+    void setSpeed(double x)
+    {
+        telemetry.setSpeed(x);
+    }
+
     void setWheelRpm(float x);
     void setWatts(float x) {
         telemetry.setWatts(x);

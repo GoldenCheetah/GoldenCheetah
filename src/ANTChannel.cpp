@@ -679,6 +679,12 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    if (antMessage.fecCadence != 0xFF)
                        parent->setSecondaryCadence(antMessage.fecCadence);
                }
+               else if (antMessage.data_page == FITNESS_EQUIPMENT_GENERAL_PAGE)
+               {
+                   if (antMessage.fecSpeed != 0xFF)
+                       parent->setSpeed(antMessage.fecSpeed);
+               }
+
                break;
            }
 
