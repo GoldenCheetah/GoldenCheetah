@@ -277,6 +277,11 @@ ANT::setLoad(double load)
     }
 }
 
+void ANT::refreshFecLoad()
+{
+    sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
+}
+
 void ANT::refreshVortexLoad()
 {
     if (vortexChannel == -1)

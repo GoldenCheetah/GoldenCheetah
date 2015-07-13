@@ -433,6 +433,7 @@ public:
     }
 
     void setFecChannel(int channel);
+    void refreshFecLoad();
 
     void setVortexData(int channel, int id);
     void refreshVortexLoad();

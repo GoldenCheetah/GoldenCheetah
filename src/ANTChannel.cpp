@@ -670,7 +670,13 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
            case CHANNEL_TYPE_FITNESS_EQUIPMENT:
            {
+               static int fecRefreshCounter = 1;
+
                parent->setFecChannel(number);
+               // we don't seem to receive ACK messages, so use this workaround
+               // to ensure load is always set correctly
+               if ((fecRefreshCounter++ % 10) == 0)
+                   parent->refreshFecLoad();
 
                if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE)
                {
@@ -682,7 +688,10 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                else if (antMessage.data_page == FITNESS_EQUIPMENT_GENERAL_PAGE)
                {
                    if (antMessage.fecSpeed != 0xFF)
-                       parent->setSpeed(antMessage.fecSpeed);
+                   {
+                       // FEC speed is in 0.001m/s, telemetry speed is km/h
+                       parent->setSpeed(antMessage.fecSpeed * 0.0036);
+                   }
                }
 
                break;
