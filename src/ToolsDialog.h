@@ -23,6 +23,8 @@
 #include <QLineEdit>
 #include <QLabel>
 
+typedef QDoubleSpinBox* QDoubleSpinBoxPtr;
+
 class ToolsDialog : public QDialog
 {
         Q_OBJECT
@@ -33,9 +35,12 @@ class ToolsDialog : public QDialog
         ToolsDialog(QWidget *parent = 0);
 
     private:
+        QComboBox *sportCombo;
         QPushButton *btnCalculate;
         QPushButton *btnOK;
+        QLabel *labelCP;
         QLineEdit *txtCP;
+        QLabel *labelWP;
         QLineEdit *txtWP;
         QDoubleSpinBox *shortMinsSpinBox;
         QDoubleSpinBox *shortSecsSpinBox;
@@ -44,7 +49,13 @@ class ToolsDialog : public QDialog
         QDoubleSpinBox *longSecsSpinBox;
         QDoubleSpinBox *longWattsSpinBox;
 
+        QHBoxLayout* setupMinsSecs(QDoubleSpinBoxPtr& minsSpinBox,
+                                   QDoubleSpinBoxPtr& secsSpinBox,
+                                   QDoubleSpinBoxPtr& wattsSpinBox,
+                                   double maxMin, double defaultMin);
+
     private slots:
+        void changeSport();
         void on_btnOK_clicked();
         void on_btnCalculate_clicked();
 };
