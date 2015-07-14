@@ -311,6 +311,63 @@ class TotalDistance : public RideMetric {
 static bool totalDistanceAdded =
     RideMetricFactory::instance().addMetric(TotalDistance());
 
+// DistanceSwim is TotalDistance in swim units, relevant for swims in yards //
+class DistanceSwim : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(DistanceSwim)
+    double mts;
+
+    public:
+
+    DistanceSwim() : mts(0.0)
+    {
+        setSymbol("distance_swim");
+        setInternalName("Distance Swim");
+    }
+    // Overrides to use Swim Pace units setting
+    QString units(bool) const {
+        bool metricSwPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        return RideMetric::units(metricSwPace);
+    }
+    double value(bool) const {
+        bool metricSwPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        return RideMetric::value(metricSwPace);
+    }
+    void initialize() {
+        setName(tr("Distance Swim"));
+        setType(RideMetric::Total);
+        setMetricUnits(tr("m"));
+        setImperialUnits(tr("yd"));
+        setPrecision(0);
+        setConversion(1.0/METERS_PER_YARD);
+    }
+
+    void compute(const RideFile *, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+        TotalDistance *distance = dynamic_cast<TotalDistance*>(deps.value("total_distance"));
+
+        // convert to meters
+        mts = distance->value(true) * 1000.0;
+        setValue(mts);
+        setCount(distance->count());
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
+
+    RideMetric *clone() const { return new DistanceSwim(*this); }
+};
+
+static bool addDistanceSwim()
+{
+    QVector<QString> deps;
+    deps.append("total_distance");
+    RideMetricFactory::instance().addMetric(DistanceSwim(), &deps);
+    return true;
+}
+static bool distanceSwimAdded = addDistanceSwim();
+
 // climb rating is essentially elev gain ^2 / distance
 // a concept raised by Dan Conelly on his blog
 class ClimbRating : public RideMetric {
