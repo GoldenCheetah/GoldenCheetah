@@ -507,7 +507,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
 #else
     font.setPointSize(9);
 #endif
-    GcLabel *day = new GcLabel("Mon", this);
+    GcLabel *day = new GcLabel(tr("Mon"), this);
     day->setFont(font);
     day->setAutoFillBackground(false);
     day->setFont(font);
@@ -516,7 +516,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     dayNames[0] = day;
 
     // Tue
-    day = new GcLabel("Tue", this);
+    day = new GcLabel(tr("Tue"), this);
     day->setFont(font);
     day->setAutoFillBackground(false);
     day->setFont(font);
@@ -525,7 +525,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     dayNames[1] = day;
 
     // Wed
-    day = new GcLabel("Wed", this);
+    day = new GcLabel(tr("Wed"), this);
     day->setFont(font);
     day->setAutoFillBackground(false);
     day->setFont(font);
@@ -534,7 +534,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     dayNames[2] = day;
 
     // Thu
-    day = new GcLabel("Thu", this);
+    day = new GcLabel(tr("Thu"), this);
     day->setFont(font);
     day->setAutoFillBackground(false);
     day->setFont(font);
@@ -543,7 +543,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     dayNames[3] = day;
 
     // Fri
-    day = new GcLabel("Fri", this);
+    day = new GcLabel(tr("Fri"), this);
     day->setFont(font);
     day->setAutoFillBackground(false);
     day->setFont(font);
@@ -552,7 +552,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     dayNames[4] = day;
 
     // Sat
-    day = new GcLabel("Sat", this);
+    day = new GcLabel(tr("Sat"), this);
     day->setFont(font);
     day->setAutoFillBackground(false);
     day->setFont(font);
@@ -561,7 +561,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     dayNames[5] = day;
 
     // Sun
-    day = new GcLabel("Sun", this);
+    day = new GcLabel(tr("Sun"), this);
     day->setFont(font);
     day->setAutoFillBackground(false);
     day->setFont(font);
