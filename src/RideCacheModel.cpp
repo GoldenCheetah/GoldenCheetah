@@ -91,7 +91,7 @@ RideCacheModel::data(const QModelIndex &index, int role) const
                 // bit of a kludge, but will return stuff with no decimal places
                 // as a number, but not if unit is seconds or high precision which means
                 // metrics with high precision don't sort this is crap XXX
-                if (m->units(true) != "km" && (m->units(true) == "seconds" || m->precision() > 0)) {
+                if (m->units(true) != "km" && (m->isTime() || m->precision() > 0)) {
                     m->setValue(rideCache->rides().at(index.row())->metrics_[m->index()]);
                     return m->toString(context->athlete->useMetricUnits); // string
                 } else {
