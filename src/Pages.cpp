@@ -4743,7 +4743,7 @@ CVPage::CVPage(PaceZonePage* zonePage) : zonePage(zonePage)
     cvEdit->setDisplayFormat("mm:ss");
 
     per = new QLabel(this);
-    metric = new QCheckBox("Metric Pace");
+    metric = new QCheckBox(tr("Metric Pace"));
     metric->setChecked(appsettings->value(this, zonePage->zones->paceSetting(), true).toBool());
     per->setText(zonePage->zones->paceUnits(metric->isChecked()));
     if (!metric->isChecked()) metricChanged(); // default is metric
