@@ -88,10 +88,13 @@ RideCacheModel::data(const QModelIndex &index, int role) const
                 // version using the right metric/imperial conversion
                 RideMetric *m = const_cast<RideMetric*>(factory->rideMetric(factory->metricName(i)));
 
-                // bit of a kludge, but will return stuff with no decimal places
-                // as a number, but not if unit is seconds or high precision which means
+                // bit of a kludge, but will return times as QTime,
+                // stuff with no decimal places as a number,
+                // but not if high precision, which means
                 // metrics with high precision don't sort this is crap XXX
-                if (m->units(true) != "km" && (m->isTime() || m->precision() > 0)) {
+                if (m->isTime()) {
+                    return QTime(0,0,0).addSecs(rideCache->rides().at(index.row())->metrics_[m->index()]);
+                } else if (m->units(true) != "km" && m->precision() > 0) {
                     m->setValue(rideCache->rides().at(index.row())->metrics_[m->index()]);
                     return m->toString(context->athlete->useMetricUnits); // string
                 } else {
