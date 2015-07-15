@@ -4297,6 +4297,11 @@ ddd, dd MMM yyyy</source>
         <translation>Velocidad Crítica</translation>
     </message>
     <message>
+        <location filename="../Pages.cpp" line="4746"/>
+        <source>Metric Pace</source>
+        <translation>Ritmo en unidades métricas</translation>
+    </message>
+    <message>
         <location filename="../Pages.cpp" line="4789"/>
         <location filename="../Pages.cpp" line="4865"/>
         <source>MMM d, yyyy</source>
