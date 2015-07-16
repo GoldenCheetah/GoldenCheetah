@@ -1414,6 +1414,7 @@ void HomeWindow::translateChartTitles(QList<GcWindow*> charts)
     titleMap.insert("W' In Zone", tr("W' In Zone"));
     titleMap.insert("Sustained In Zone", tr("Sustained In Zone"));
     titleMap.insert("Training Mix", tr("Training Mix"));
+    titleMap.insert("Navigator", tr("Navigator"));
     titleMap.insert("W/kg", tr("W/kg"));
     titleMap.insert("Workout", tr("Workout"));
     titleMap.insert("Stress", tr("Stress"));
