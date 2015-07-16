@@ -477,6 +477,17 @@ RideSummaryWindow::htmlSummary()
         maximumColumn << "max_tHb";
     }
 
+    // additional metrics for runs & swims
+    if (ridesummary) {
+        if (ride->isRun()) averageColumn << "pace";
+        if (ride->isSwim()) averageColumn << "pace_swim";
+    } else {
+        int nActivities, nRides, nRuns, nSwims;
+        context->athlete->rideCache->getRideTypeCounts(specification,                    nActivities, nRides, nRuns, nSwims);
+        if (nRuns > 0) averageColumn << "pace";
+        if (nSwims > 0) averageColumn << "pace_swim";
+    }
+
     // users determine the metrics to display
     QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
     if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
