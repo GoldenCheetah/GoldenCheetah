@@ -8563,6 +8563,41 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>GcMiniCalendar</name>
     <message>
+        <location filename="../DiarySidebar.cpp" line="510"/>
+        <source>Mon</source>
+        <translation>Lun</translation>
+    </message>
+    <message>
+        <location filename="../DiarySidebar.cpp" line="519"/>
+        <source>Tue</source>
+        <translation>Mar</translation>
+    </message>
+    <message>
+        <location filename="../DiarySidebar.cpp" line="528"/>
+        <source>Wed</source>
+        <translation>Mié</translation>
+    </message>
+    <message>
+        <location filename="../DiarySidebar.cpp" line="537"/>
+        <source>Thu</source>
+        <translation>Jue</translation>
+    </message>
+    <message>
+        <location filename="../DiarySidebar.cpp" line="546"/>
+        <source>Fri</source>
+        <translation>Vie</translation>
+    </message>
+    <message>
+        <location filename="../DiarySidebar.cpp" line="555"/>
+        <source>Sat</source>
+        <translation>Sáb</translation>
+    </message>
+    <message>
+        <location filename="../DiarySidebar.cpp" line="564"/>
+        <source>Sun</source>
+        <translation>Dom</translation>
+    </message>
+    <message>
         <location filename="../DiarySidebar.cpp" line="818"/>
         <source>MMMM yyyy</source>
         <translation></translation>
@@ -9047,7 +9082,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../GcWindowRegistry.cpp" line="94"/>
         <source>Navigator</source>
-        <translation>Registro</translation>
+        <translation>Registro de Actividades</translation>
     </message>
     <message>
         <location filename="../GcWindowRegistry.cpp" line="95"/>
@@ -10383,23 +10418,23 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1419"/>
+        <location filename="../HomeWindow.cpp" line="1420"/>
         <source>Stress</source>
         <translation>Estrés</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1420"/>
+        <location filename="../HomeWindow.cpp" line="1421"/>
         <source>Scatter</source>
         <translation>Dispersión</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1421"/>
-        <location filename="../HomeWindow.cpp" line="1423"/>
+        <location filename="../HomeWindow.cpp" line="1422"/>
+        <location filename="../HomeWindow.cpp" line="1424"/>
         <source>HrPw</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1422"/>
+        <location filename="../HomeWindow.cpp" line="1423"/>
         <source>Activity Log</source>
         <translation>Registro de Actividades</translation>
     </message>
@@ -10550,31 +10585,36 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1417"/>
+        <source>Navigator</source>
+        <translation>Registro de Actividades</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1418"/>
         <source>W/kg</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1418"/>
+        <location filename="../HomeWindow.cpp" line="1419"/>
         <source>Workout</source>
         <translation>Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1424"/>
+        <location filename="../HomeWindow.cpp" line="1425"/>
         <source>Tracker</source>
         <translation>Seguimiento</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1425"/>
+        <location filename="../HomeWindow.cpp" line="1426"/>
         <source>CP History</source>
         <translation>Histórico PC</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1426"/>
+        <location filename="../HomeWindow.cpp" line="1427"/>
         <source>Library</source>
         <translation>Biblioteca</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1427"/>
+        <location filename="../HomeWindow.cpp" line="1428"/>
         <source>CV</source>
         <translation>VC</translation>
     </message>
