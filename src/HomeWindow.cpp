@@ -1252,11 +1252,17 @@ HomeWindow::restoreState(bool useDefault)
 
     // parse and instantiate the charts
     xmlReader.parse(source);
+
+    // are we english language?
+    QVariant lang = appsettings->value(this, GC_LANG, QLocale::system().name());
+    bool english = lang.toString().startsWith("en") ? true : false;
+
     // translate the titles
-    translateChartTitles(handler.charts);
+    if (!english) translateChartTitles(handler.charts);
 
     // translate the metrics, but only if the built-in "default.XML"s are read (and only for LTM charts)
-    if (defaultUsed) {
+    // and only if the language is not English (i.e. translation is required).
+    if (defaultUsed and !english) {
         // define and fill translation maps
         QMap<QString, QString> nMap;  // names
         QMap<QString, QString> uMap;  // unit of measurement
