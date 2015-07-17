@@ -1856,6 +1856,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     trendType->addItem(tr("No trend Line"));
     trendType->addItem(tr("Linear Trend"));
     trendType->addItem(tr("Quadratic Trend"));
+    trendType->addItem(tr("Moving Average"));
     trendType->setCurrentIndex(metricDetail->trendtype);
 
     // add to grid

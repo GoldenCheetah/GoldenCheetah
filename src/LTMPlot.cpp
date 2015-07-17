@@ -713,6 +713,78 @@ LTMPlot::setData(LTMSettings *set)
                 trend->attach(this);
                 curves.insert(trendSymbol, trend);
             }
+
+            // Holt-Winters Exponentially Weighted Moving Average
+            if (metricDetail.trendtype == 3 && count > 5) {
+                QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
+                QString trendSymbol = QString("%1_trend")
+                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                       metricDetail.bestSymbol : metricDetail.symbol);
+
+                QwtPlotCurve *trend = new QwtPlotCurve(trendName);
+                trend->setVisible(!metricDetail.hidden);
+
+                // cosmetics
+                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                cpen.setWidth(2); // double thickness for trend lines
+                cpen.setStyle(Qt::SolidLine);
+                trend->setPen(cpen);
+                if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true)
+                    trend->setRenderHint(QwtPlotItem::RenderAntialiased);
+                trend->setBaseline(0);
+                trend->setYAxis(axisid);
+                trend->setStyle(QwtPlotCurve::Lines);
+
+                // holt-winters EWMA using span of 5 samples
+                // def holt_winters_second_order_ewma( x, span, beta ):
+                //     N = x.size
+                //     alpha = 2.0 / ( 1 + span )
+                //     s = np.zeros(( N, ))
+                //     b = np.zeros(( N, ))
+                //     s[0] = x[0]
+                //     for i in range( 1, N ):
+                //         s[i] = alpha * x[i] + ( 1 - alpha )*( s[i-1] + b[i-1] )
+                //         b[i] = beta * ( s[i] - s[i-1] ) + ( 1 - beta ) * b[i-1]
+                //     return s
+
+                // parameters, could make user definable one day
+                const double span = 10;
+                const double alpha = 2.0f / (1.0f + span);
+                double beta = 0.3f;
+
+                // we need to fill in the gaps sadly
+                int lcount = xdata[count];
+
+                // calculated values
+                QVector<double> xtrend(lcount);
+                QVector<double> btrend(lcount);
+                QVector<double> ytrend(lcount);
+
+                // initialise to same
+                ytrend.fill(0);
+                btrend.fill(0);
+
+                ytrend[0] = ydata[0];
+                xtrend[0] = 0;
+
+                for (int n=1,i=1; i<= lcount; i++) {
+
+                    // fill in gaps (and check bounds as we go too)
+                    while (n<=xdata[i] && n<lcount) {
+                        ytrend[n] = alpha * ydata[i] + ( 1 - alpha )*( ytrend[n-1] + btrend[n-1] );
+                        btrend[n] = beta * ( ytrend[n] - ytrend[n-1] ) + ( 1 - beta ) * btrend[n-1];
+                        xtrend[n] = n+1;
+                        n++;
+                    }
+                }
+
+                // point 2 is at far right of chart, not the last point
+                // since we may be forecasting...
+                trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
+
+                trend->attach(this);
+                curves.insert(trendSymbol, trend);
+            }
         }
 
         // highlight outliers
@@ -1740,6 +1812,78 @@ LTMPlot::setCompareData(LTMSettings *set)
                     trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
 
                     trend->attach(this);
+                }
+
+                // Holt-Winters Exponentially Weighted Moving Average
+                if (metricDetail.trendtype == 3 && count > 5) {
+                    QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
+                    QString trendSymbol = QString("%1_trend")
+                                           .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                           metricDetail.bestSymbol : metricDetail.symbol);
+
+                    QwtPlotCurve *trend = new QwtPlotCurve(trendName);
+                    trend->setVisible(!metricDetail.hidden);
+
+                    // cosmetics
+                    QPen cpen = QPen(metricDetail.penColor.darker(200));
+                    cpen.setWidth(2); // double thickness for trend lines
+                    cpen.setStyle(Qt::SolidLine);
+                    trend->setPen(cpen);
+                    if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true)
+                        trend->setRenderHint(QwtPlotItem::RenderAntialiased);
+                    trend->setBaseline(0);
+                    trend->setYAxis(axisid);
+                    trend->setStyle(QwtPlotCurve::Lines);
+
+                    // holt-winters EWMA using span of 5 samples
+                    // def holt_winters_second_order_ewma( x, span, beta ):
+                    //     N = x.size
+                    //     alpha = 2.0 / ( 1 + span )
+                    //     s = np.zeros(( N, ))
+                    //     b = np.zeros(( N, ))
+                    //     s[0] = x[0]
+                    //     for i in range( 1, N ):
+                    //         s[i] = alpha * x[i] + ( 1 - alpha )*( s[i-1] + b[i-1] )
+                    //         b[i] = beta * ( s[i] - s[i-1] ) + ( 1 - beta ) * b[i-1]
+                    //     return s
+
+                    // parameters, could make user definable one day
+                    const double span = 10;
+                    const double alpha = 2.0f / (1.0f + span);
+                    double beta = 0.3f;
+
+                    // we need to fill in the gaps sadly
+                    int lcount = xdata[count];
+
+                    // calculated values
+                    QVector<double> xtrend(lcount);
+                    QVector<double> btrend(lcount);
+                    QVector<double> ytrend(lcount);
+
+                    // initialise to same
+                    ytrend.fill(0);
+                    btrend.fill(0);
+
+                    ytrend[0] = ydata[0];
+                    xtrend[0] = 0;
+
+                    for (int n=1,i=1; i<= lcount; i++) {
+
+                        // fill in gaps (and check bounds as we go too)
+                        while (n<=xdata[i] && n<lcount) {
+                            ytrend[n] = alpha * ydata[i] + ( 1 - alpha )*( ytrend[n-1] + btrend[n-1] );
+                            btrend[n] = beta * ( ytrend[n] - ytrend[n-1] ) + ( 1 - beta ) * btrend[n-1];
+                            xtrend[n] = n+1;
+                            n++;
+                        }
+                    }
+
+                    // point 2 is at far right of chart, not the last point
+                    // since we may be forecasting...
+                    trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
+
+                    trend->attach(this);
+                    curves.insert(trendSymbol, trend);
                 }
             }
 
