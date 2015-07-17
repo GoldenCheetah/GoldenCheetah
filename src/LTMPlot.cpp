@@ -750,7 +750,7 @@ LTMPlot::setData(LTMSettings *set)
                 // parameters, could make user definable one day
                 const double span = 10;
                 const double alpha = 2.0f / (1.0f + span);
-                double beta = 0.3f;
+                double beta = 0.15f;
 
                 // we need to fill in the gaps sadly
                 int lcount = xdata[count];
@@ -1850,7 +1850,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                     // parameters, could make user definable one day
                     const double span = 10;
                     const double alpha = 2.0f / (1.0f + span);
-                    double beta = 0.3f;
+                    double beta = 0.15f;
 
                     // we need to fill in the gaps sadly
                     int lcount = xdata[count];
