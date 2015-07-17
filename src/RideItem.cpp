@@ -1301,7 +1301,7 @@ RideItem::updateIntervals()
                                                  .arg(time_to_string(duration))
                                                  .arg((int)ap)
                                                  .arg(match.cost/1000)
-                                                 .arg(match.exhaust ? "TE MATCH" : "MATCH");
+                                                 .arg(match.exhaust ? tr("TE MATCH") : tr("MATCH"));
 
                 intervals_ << intervalItem;
             }
