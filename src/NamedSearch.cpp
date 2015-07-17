@@ -87,6 +87,21 @@ NamedSearches::read()
     // go read them!
     list = handler.getResults();
 
+    // If there is no filters yet, add some for multisport use.
+    if (list.isEmpty()) {
+        NamedSearch namedSearch;
+        namedSearch.type = NamedSearch::filter;
+        namedSearch.name = tr("Swim");
+        namedSearch.text = "isSwim<>0";
+        list.append(namedSearch);
+        namedSearch.name = tr("Bike");
+        namedSearch.text = "(isRun=0) and (isSwim=0)";
+        list.append(namedSearch);
+        namedSearch.name = tr("Run");
+        namedSearch.text = "isRun<>0";
+        list.append(namedSearch);
+    }
+
     // let everyone know they have changed
     changed();
 }
