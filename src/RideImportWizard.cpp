@@ -566,14 +566,14 @@ RideImportWizard::process()
                        .arg(secs%3600/60,2,10,zero)
                        .arg(secs%60,2,10,zero);
                    tableWidget->item(i,3)->setText(time);
-                   tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter); // put in the middle
+                   tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
 
                    // show distance by looking at last data point
                    QString dist = context->athlete->useMetricUnits
                        ? QString ("%1 km").arg(km, 0, 'f', 1)
                        : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
                    tableWidget->item(i,4)->setText(dist);
-                   tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight); // put in the middle
+                   tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
                    delete ride;
                } else {
