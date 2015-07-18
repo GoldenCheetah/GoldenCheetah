@@ -22,6 +22,7 @@
 #include "GoldenCheetah.h"
 
 #include "RideMetric.h"
+#include "WithingsParser.h"
 
 #include <QString>
 #include <QMap>
@@ -122,11 +123,12 @@ class RideItem : public QObject
         double weight; // what weight was used ?
 
         // access to the cached data !
+        WithingsReading withings;
         RideFile *ride(bool open=true);
         RideFileCache *fileCache();
         QVector<double> &metrics() { return metrics_; }
         const QStringList errors() { return errors_; }
-        double getWeight();
+        double getWeight(int type=0);
 
         // when retrieving interval lists we can provide criteria too
         QList<IntervalItem*> &intervals()  { return intervals_; }

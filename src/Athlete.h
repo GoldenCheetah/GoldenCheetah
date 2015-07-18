@@ -130,7 +130,8 @@ class Athlete : public QObject
         // work with withings data
         void setWithings(QList<WithingsReading>&x);
         QList<WithingsReading>& withings() { return withings_; }
-        double getWithingsWeight(QDate date);
+        double getWithingsWeight(QDate date, int type=WITHINGS_WEIGHT);
+        void getWithings(QDate date, WithingsReading&);
 
         // ride collection
         void selectRideFile(QString);

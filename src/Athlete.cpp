@@ -436,17 +436,44 @@ Athlete::setWithings(QList<WithingsReading>&x)
     qSort(withings_); // date order
 }
 
-double 
-Athlete::getWithingsWeight(QDate date)
+void 
+Athlete::getWithings(QDate date, WithingsReading &here)
 {
-    if (withings_.count() == 0) return 0;
+    // the optimisation below is not thread safe and should be encapsulated
+    // by a mutex, but this kind of defeats to purpose of the optimisation!
 
-    double lastWeight=0.0f;
+    //if (withings_.count() && withings_.last().when.date() <= date) here = withings_.last();
+    //if (!withings_.count() || withings_.first().when.date() > date) here = WithingsReading();
+
+    // always set to not found before searching
+    here = WithingsReading();
+
+    // loop
     foreach(WithingsReading x, withings_) {
-        if (x.when.date() <= date) lastWeight = x.weightkg;
+        if (x.when.date() <= date) here = x;
         if (x.when.date() > date) break;
     }
-    return lastWeight;
+
+    // will be empty if none found
+    return;
+}
+
+double 
+Athlete::getWithingsWeight(QDate date, int type)
+{
+    WithingsReading withings;
+    getWithings(date, withings);
+
+    // return what was asked for!
+    switch(type) {
+
+        default:
+        case WITHINGS_WEIGHT : return withings.weightkg;
+        case WITHINGS_FATKG : return withings.fatkg;
+        case WITHINGS_FATPERCENT : return withings.fatpercent;
+        case WITHINGS_LEANKG : return withings.leankg;
+        case WITHINGS_HEIGHT : return withings.sizemeter;
+    }
 }
 
 double

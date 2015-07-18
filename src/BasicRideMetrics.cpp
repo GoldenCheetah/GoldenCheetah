@@ -467,8 +467,123 @@ static bool athleteWeightAdded =
     RideMetricFactory::instance().addMetric(AthleteWeight());
 
 //////////////////////////////////////////////////////////////////////////////
+
+class AthleteFat : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AthleteFat)
+    double kg;
+
+    public:
+
+    AthleteFat() : kg(0.0)
+    {
+        setSymbol("athlete_fat");
+        setInternalName("Athlete Bodyfat");
+    }
+    void initialize() {
+        setName(tr("Athlete Bodyfat"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("kg"));
+        setImperialUnits(tr("lbs"));
+        setPrecision(2);
+        setConversion(LB_PER_KG);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *context) {
+
+        WithingsReading here;
+
+        // withings first
+        context->athlete->getWithings(ride->startTime().date(), here);
+        setValue(here.fatkg);
+    }
+
+    RideMetric *clone() const { return new AthleteFat(*this); }
+};
+
+static bool athleteFatAdded =
+    RideMetricFactory::instance().addMetric(AthleteFat());
+
 //////////////////////////////////////////////////////////////////////////////
 
+class AthleteLean : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AthleteLean)
+    double kg;
+
+    public:
+
+    AthleteLean() : kg(0.0)
+    {
+        setSymbol("athlete_lean");
+        setInternalName("Athlete Lean Weight");
+    }
+    void initialize() {
+        setName(tr("Athlete Lean Weight"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("kg"));
+        setImperialUnits(tr("lbs"));
+        setPrecision(2);
+        setConversion(LB_PER_KG);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *context) {
+
+        WithingsReading here;
+
+        // withings first
+        context->athlete->getWithings(ride->startTime().date(), here);
+        setValue(here.leankg);
+    }
+
+    RideMetric *clone() const { return new AthleteLean(*this); }
+};
+
+static bool athleteLeanAdded =
+    RideMetricFactory::instance().addMetric(AthleteLean());
+
+//////////////////////////////////////////////////////////////////////////////
+
+class AthleteFatP : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AthleteFatP)
+    double kg;
+
+    public:
+
+    AthleteFatP() : kg(0.0)
+    {
+        setSymbol("athlete_fat_percent");
+        setInternalName("Athlete Bodyfat Percent");
+    }
+    void initialize() {
+        setName(tr("Athlete Bodyfat Percent"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("%"));
+        setImperialUnits(tr("%"));
+        setPrecision(1);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *context) {
+
+        WithingsReading here;
+
+        // withings first
+        context->athlete->getWithings(ride->startTime().date(), here);
+        setValue(here.fatpercent);
+    }
+
+    RideMetric *clone() const { return new AthleteFatP(*this); }
+};
+
+static bool athleteFatPAdded =
+    RideMetricFactory::instance().addMetric(AthleteFatP());
+
+//        case WITHINGS_LEANKG : return withings.leankg;
+//////////////////////////////////////////////////////////////////////////////
 
 class ElevationGain : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(ElevationGain)

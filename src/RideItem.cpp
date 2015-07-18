@@ -577,20 +577,38 @@ RideItem::refresh()
 }
 
 double
-RideItem::getWeight()
+RideItem::getWeight(int type)
 {
-    // withings first
-    weight = context->athlete->getWithingsWeight(dateTime.date());
+    // get any withings first
+    context->athlete->getWithings(dateTime.date(), withings);
 
-    // from metadata
-    if (!weight) weight = metadata_.value("Weight", "0.0").toDouble();
+    // return what was asked for!
+    switch(type) {
 
-    // global options
-    if (!weight) weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
+        default: // just get weight in kilos
+        case WITHINGS_WEIGHT : 
+        {
+            // get weight from whatever we got
+            weight = withings.weightkg;
+
+            // from metadata
+            if (!weight) weight = metadata_.value("Weight", "0.0").toDouble();
+
+            // global options and if not set default to 75 kg.
+            if (!weight) weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble();
     
-    // No weight default is weird, we'll set to 80kg
-    if (weight <= 0.00) weight = 80.00;
+            // No weight default is weird, we'll set to 80kg
+            if (weight <= 0.00) weight = 80.00;
 
+            return weight;
+        }
+
+        // all the other weight measures supported by withings
+        case WITHINGS_FATKG : return withings.fatkg;
+        case WITHINGS_FATPERCENT : return withings.fatpercent;
+        case WITHINGS_LEANKG : return withings.leankg;
+        case WITHINGS_HEIGHT : return withings.sizemeter;
+    }
     return weight;
 }
 
