@@ -117,9 +117,10 @@
 // 111 14  Jun 2015 Mark Liversedge    Added W'bal time in zone metrics
 // 112 18  Jun 2015 Mark Liversedge    Added Core Temp average and max
 // 113 27  Jun 2015 Mark Liversedge    Added Average/Min/Max tHb
-// 114 27  Jul 2015 Ale Martinez       Added Distance Swim
+// 114 17  Jul 2015 Ale Martinez       Added Distance Swim
+// 115 18  Jul 2015 Mark Liversedge    Added Withings Fat, Fat Percent, Lean Body Weight
 
-int DBSchemaVersion = 114;
+int DBSchemaVersion = 115;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
