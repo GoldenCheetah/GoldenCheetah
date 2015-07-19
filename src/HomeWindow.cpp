@@ -1263,11 +1263,6 @@ HomeWindow::restoreState(bool useDefault)
     // translate the metrics, but only if the built-in "default.XML"s are read (and only for LTM charts)
     // and only if the language is not English (i.e. translation is required).
     if (defaultUsed and !english) {
-        // define and fill translation maps
-        QMap<QString, QString> nMap;  // names
-        QMap<QString, QString> uMap;  // unit of measurement
-        LTMTool::getMetricsTranslationMap(nMap, uMap, context->athlete->useMetricUnits);
-
         // check all charts for LTMWindow(s)
         for (int i=0; i<handler.charts.count(); i++) {
             // find out if it's an LTMWindow via dynamic_cast
@@ -1277,16 +1272,8 @@ HomeWindow::restoreState(bool useDefault)
 
                 // now get the LTMMetrics
                 LTMSettings workSettings = ltmW->getSettings();
-                for (int j=0; j<workSettings.metrics.count(); j++){
-                    // now map and substitute
-                    QString n  = nMap.value(workSettings.metrics[j].symbol, workSettings.metrics[j].uname);
-                    QString u  = uMap.value(workSettings.metrics[j].symbol, workSettings.metrics[j].uunits);
-                    // set name, units only if there was a description before
-                    if (workSettings.metrics[j].name != "") workSettings.metrics[j].name = n;
-                    workSettings.metrics[j].uname = n;
-                    if (workSettings.metrics[j].units != "") workSettings.metrics[j].units = u;
-                    workSettings.metrics[j].uunits = u;
-                }
+                // replace name and unit for translated versions
+                workSettings.translateMetrics(context->athlete->useMetricUnits);
                 ltmW->applySettings(workSettings);
             }
         }
