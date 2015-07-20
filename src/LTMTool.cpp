@@ -210,8 +210,8 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
         // set default for the user overiddable fields
         adds.uname  = adds.name;
-        adds.units = "";
-        adds.uunits = adds.metric->units(context->athlete->useMetricUnits);
+        adds.units = adds.metric->units(context->athlete->useMetricUnits);
+        adds.uunits = adds.units;
 
         // default units to metric name if it is blank
         if (adds.uunits == "") adds.uunits = adds.name;
