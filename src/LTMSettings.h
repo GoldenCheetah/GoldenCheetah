@@ -170,6 +170,7 @@ class LTMSettings {
 
         void writeChartXML(QDir, QList<LTMSettings>);
         void readChartXML(QDir, bool, QList<LTMSettings>&charts);
+        void translateMetrics(bool useMetricUnits);
 
         QString name;
         QString title;
