@@ -1430,30 +1430,6 @@ LTMTool::addCurrent()
     context->notifyPresetsChanged();
 }
 
-void
-LTMTool::getMetricsTranslationMap (QMap<QString, QString> &nMap, QMap<QString, QString> &uMap, bool useMetricUnits) {
-
-    // build up translation maps
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (int i=0; i<factory.metricCount(); i++) {
-        const RideMetric *add = factory.rideMetric(factory.metricName(i));
-        QTextEdit processHTMLname(add->name());
-        // use the .symbol() as key - since only CHART.XML is mapped
-        nMap.insert(add->symbol(), processHTMLname.toPlainText());
-        uMap.insert(add->symbol(), add->units(useMetricUnits));
-
-    }
-    // add mapping for PM metrics (name and unit)
-    QList<MetricDetail> pmMetrics = LTMTool::providePMmetrics();
-    for (int i=0; i<pmMetrics.count(); i++)
-    {
-        nMap.insert(pmMetrics[i].symbol, pmMetrics[i].uname);
-        uMap.insert(pmMetrics[i].symbol, pmMetrics[i].uunits);
-    }
-
-}
-
-
 // set the estimateSelection based upon what is available
 void 
 EditMetricDetailDialog::modelChanged()
@@ -2248,48 +2224,6 @@ LTMTool::setFilter(QStringList files)
         filenames = files;
 
         emit filterChanged();
-}
-
-
-// metricDetails gives access to the metric details catalog by symbol
-MetricDetail*
-LTMTool::metricDetails(QString symbol)
-{
-    for(int i = 0; i < metrics.count(); i++)
-        if (metrics[i].symbol == symbol)
-            return &metrics[i];
-    return NULL;
-}
-
-void
-LTMTool::translateMetrics(Context *context, LTMSettings *settings) // settings override local scope (static function)!!
-{
-    static QMap<QString, QString> unitsMap;
-    // LTMTool instance is created to have access to metrics catalog
-    LTMTool* ltmTool = new LTMTool(context, settings);
-    if (unitsMap.isEmpty()) {
-        foreach(MetricDetail metric, ltmTool->metrics) {
-            if (metric.units != "")  // translate units
-	            unitsMap.insert(metric.units, metric.uunits);
-            if (metric.uunits != "") // keep already translated the same
-	            unitsMap.insert(metric.uunits, metric.uunits);
-        }
-    }
-    for (int j=0; j < settings->metrics.count(); j++) {
-        if (settings->metrics[j].uname == settings->metrics[j].name) {
-            MetricDetail* mdp = ltmTool->metricDetails(settings->metrics[j].symbol);
-            if (mdp != NULL) {
-                // Replace with default translated name
-                settings->metrics[j].name = mdp->name;
-                settings->metrics[j].uname = mdp->uname;
-                // replace with translated units, if available
-                if (settings->metrics[j].uunits != "")
-                    settings->metrics[j].uunits = unitsMap.value(settings->metrics[j].uunits,
-                                                                 mdp->uunits);
-            }
-        }
-    }
-    delete ltmTool;
 }
 
 void

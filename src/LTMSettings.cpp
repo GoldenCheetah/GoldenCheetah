@@ -129,28 +129,38 @@ LTMSettings::readChartXML(QDir home, bool useMetricUnits, QList<LTMSettings> &ch
 
     // translate only once and only if the built-in version is imported
     if (builtIn) {
-        // create translation maps (for names and units)
-        QMap<QString, QString> nMap;  // names
-        QMap<QString, QString> uMap;  // unit of measurement
-        LTMTool::getMetricsTranslationMap(nMap, uMap, useMetricUnits);
 
-        // now run over all chart metrics and map - name and unit
+        // now run over all charts to replace name and unit
         for (int i=0; i<charts.count(); i++) {
-            for (int j=0; j<charts[i].metrics.count(); j++){
-                // no map and substitute
-                QString n  = nMap.value(charts[i].metrics[j].symbol, charts[i].metrics[j].uname);
-                QString u  = uMap.value(charts[i].metrics[j].symbol, charts[i].metrics[j].uunits);
-                // set name, unit only if there was text before
-                if (charts[i].metrics[j].name != "") charts[i].metrics[j].name = n;
-                charts[i].metrics[j].uname = n;
-                if (charts[i].metrics[j].units != "") charts[i].metrics[j].units = u;
-                charts[i].metrics[j].units = charts[i].metrics[j].uunits = u;
-            }
+            charts[i].translateMetrics(useMetricUnits);
         }
     }
 }
 
-
+void
+LTMSettings::translateMetrics(bool useMetricUnits)
+{
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    // run over all chart metrics and replace name and unit
+    for (int j=0; j<metrics.count(); j++){
+        // get access to the metric using the .symbol() as key,
+        // since only CHART.XML and home-layout.xml are mapped
+        const RideMetric *m = factory.rideMetric(metrics[j].symbol);
+        if (m) {
+            // set name, units only if there was a description before
+            QTextEdit processHTMLname(m->name());
+            // uname is replaced only if it matches english name
+            if (metrics[j].uname == m->internalName())
+                metrics[j].uname = processHTMLname.toPlainText();
+            metrics[j].name = processHTMLname.toPlainText();
+            // uunits is replaced only if it matches unit,
+            // ir units are not saved it don't translate uunits
+            if (metrics[j].uunits == metrics[j].units)
+                metrics[j].uunits = m->units(useMetricUnits);
+            metrics[j].units = m->units(useMetricUnits);
+        }
+    }
+}
 
 /*----------------------------------------------------------------------
  * Marshall/Unmarshall to DataStream to store as a QVariant

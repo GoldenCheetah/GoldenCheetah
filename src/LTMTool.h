@@ -61,7 +61,6 @@ class LTMTool : public QWidget
 
         QList<MetricDetail> metrics;
         MetricDetail* metricDetails(QString symbol);
-        static void translateMetrics(Context *context, LTMSettings *settings);
 
         // apply settings to the metric selector
         void applySettings();
@@ -92,7 +91,6 @@ class LTMTool : public QWidget
         DateSettingsEdit *dateSetting;
 
         static QList<MetricDetail> providePMmetrics();
-        static void getMetricsTranslationMap (QMap<QString, QString>& nMap, QMap<QString, QString>& uMap, bool useMetricUnits);
 
     signals:
 
