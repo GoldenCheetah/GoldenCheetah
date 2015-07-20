@@ -166,7 +166,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     // by default, set the threshold to 25 seconds
     if (garminHWMark.isNull() || garminHWMark.toInt() == 0) garminHWMark.setValue(25);
-    QLabel *garminHWLabel = new QLabel(tr("Smart Recoding Threshold (secs):"));
+    QLabel *garminHWLabel = new QLabel(tr("Smart Recording Threshold (secs):"));
     garminHWMarkedit = new QLineEdit(garminHWMark.toString(),this);
     garminHWMarkedit->setInputMask("009");
 
