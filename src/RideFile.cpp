@@ -190,7 +190,7 @@ RideFile::seriesName(SeriesType series)
     case RideFile::lte: return QString(tr("Left Torque Efficiency"));
     case RideFile::rte: return QString(tr("Right Torque Efficiency"));
     case RideFile::lps: return QString(tr("Left Pedal Smoothness"));
-    case RideFile::rps: return QString(tr("Righ Pedal Smoothness"));
+    case RideFile::rps: return QString(tr("Right Pedal Smoothness"));
     case RideFile::lpco: return QString(tr("Left Platform Center Offset"));
     case RideFile::rpco: return QString(tr("Right Platform Center Offset"));
     case RideFile::lppb: return QString(tr("Left Power Phase Start"));
