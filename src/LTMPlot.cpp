@@ -900,7 +900,7 @@ LTMPlot::setData(LTMSettings *set)
                                      metricDetail.bestSymbol : metricDetail.symbol);
             QwtPlotCurve *top = new QwtPlotCurve(topName);
             top->setVisible(!metricDetail.hidden);
-            curves.insert(topSymbol, top);
+            curves.insert(topName, top);
 
             top->setRenderHint(QwtPlotItem::RenderAntialiased);
             top->setStyle(QwtPlotCurve::Dots);
@@ -1989,7 +1989,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                                     .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
                                         metricDetail.bestSymbol : metricDetail.symbol);
                 QwtPlotCurve *top = new QwtPlotCurve(topName);
-                curves.insert(topSymbol, top);
+                curves.insert(topName, top);
 
                 top->setRenderHint(QwtPlotItem::RenderAntialiased);
                 top->setStyle(QwtPlotCurve::Dots);
