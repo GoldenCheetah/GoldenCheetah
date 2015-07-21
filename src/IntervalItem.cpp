@@ -205,6 +205,7 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
     toEdit->setTime(QTime(0,0,0,0).addSecs(interval.stop));
 
     colorEdit = new ColorButton(this, interval.name, interval.color);
+    colorEdit->setAutoDefault(false);
 
     grid->addWidget(name, 0,0);
     grid->addWidget(nameEdit, 0,1);
