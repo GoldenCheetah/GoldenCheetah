@@ -891,7 +891,7 @@ GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWi
 
     GcMiniCalendar *mini = new GcMiniCalendar(context, true);
     calendars.append(mini);
-    mini->setDate(QDate::currentDate().month(), QDate::currentDate().year()); // default to this month
+    mini->setDate(1, 2000); // default to 01/2000 - which then moves to month of latest Ride
     layout->addWidget(mini);
 
     // only 1 months are visible right now
