@@ -666,6 +666,7 @@ LTMPlot::setData(LTMSettings *set)
                 trend->setSamples(xtrend,ytrend, 2);
 
                 trend->attach(this);
+                trend->setItemAttribute(QwtPlotItem::Legend, false);
                 curves.insert(trendSymbol, trend);
 
             }
@@ -708,6 +709,7 @@ LTMPlot::setData(LTMSettings *set)
                 trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
 
                 trend->attach(this);
+                trend->setItemAttribute(QwtPlotItem::Legend, false);
                 curves.insert(trendSymbol, trend);
             }
 
@@ -780,6 +782,7 @@ LTMPlot::setData(LTMSettings *set)
                 trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
 
                 trend->attach(this);
+                trend->setItemAttribute(QwtPlotItem::Legend, false);
                 curves.insert(trendSymbol, trend);
             }
         }
@@ -814,6 +817,7 @@ LTMPlot::setData(LTMSettings *set)
                                                           metricDetail.bestSymbol : metricDetail.symbol);
             QwtPlotCurve *out = new QwtPlotCurve(outName);
             out->setVisible(!metricDetail.hidden);
+            out->setItemAttribute(QwtPlotItem::Legend, false);
             curves.insert(outSymbol, out);
 
             out->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -895,12 +899,13 @@ LTMPlot::setData(LTMSettings *set)
             else
                 topName = QString(tr("Best %1")).arg(metricDetail.uname);
 
-            QString topSymbol = QString("%1_topN")
+            QString topSymbol = QString("%1_%2")
                                 .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
-                                     metricDetail.bestSymbol : metricDetail.symbol);
+                                    metricDetail.bestSymbol : metricDetail.symbol).arg(topName);
             QwtPlotCurve *top = new QwtPlotCurve(topName);
+            top->setItemAttribute(QwtPlotItem::Legend, false);
             top->setVisible(!metricDetail.hidden);
-            curves.insert(topName, top);
+            curves.insert(topSymbol, top);
 
             top->setRenderHint(QwtPlotItem::RenderAntialiased);
             top->setStyle(QwtPlotCurve::Dots);
@@ -1744,6 +1749,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                                         metricDetail.bestSymbol : metricDetail.symbol);
 
                     QwtPlotCurve *trend = new QwtPlotCurve(trendName);
+                    trend->setItemAttribute(QwtPlotItem::Legend, false);
                     curves.insert(trendName, trend);
 
                     // cosmetics
@@ -1779,6 +1785,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                                         metricDetail.bestSymbol : metricDetail.symbol);
 
                     QwtPlotCurve *trend = new QwtPlotCurve(trendName);
+                    trend->setItemAttribute(QwtPlotItem::Legend, false);
                     curves.insert(trendName, trend);
 
                     // cosmetics
@@ -1880,6 +1887,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                     trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
 
                     trend->attach(this);
+                    trend->setItemAttribute(QwtPlotItem::Legend, false);
                     curves.insert(trendSymbol, trend);
                 }
             }
@@ -1910,6 +1918,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                 QString outSymbol = QString("%1_outlier").arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                                             metricDetail.bestSymbol : metricDetail.symbol);
                 QwtPlotCurve *out = new QwtPlotCurve(outName);
+                out->setItemAttribute(QwtPlotItem::Legend, false);
                 curves.insert(outName, out);
 
                 out->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -1985,11 +1994,12 @@ LTMPlot::setCompareData(LTMSettings *set)
 
                 // lets setup a curve with this data then!
                 QString topName = QString(tr("%1 %2 Best")).arg(cd.name).arg(metricDetail.uname);
-                QString topSymbol = QString("%1_topN")
+                QString topSymbol = QString("%1_%2")
                                     .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
-                                        metricDetail.bestSymbol : metricDetail.symbol);
+                                        metricDetail.bestSymbol : metricDetail.symbol).arg(topName);
                 QwtPlotCurve *top = new QwtPlotCurve(topName);
-                curves.insert(topName, top);
+                top->setItemAttribute(QwtPlotItem::Legend, false);
+                curves.insert(topSymbol, top);
 
                 top->setRenderHint(QwtPlotItem::RenderAntialiased);
                 top->setStyle(QwtPlotCurve::Dots);
