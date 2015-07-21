@@ -27,6 +27,7 @@
 
 class ComputrainerController : public RealtimeController
 {
+    Q_OBJECT
 
 public:
     ComputrainerController (TrainSidebar *, DeviceConfiguration *);

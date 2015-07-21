@@ -29,6 +29,7 @@
 
 class FortiusController : public RealtimeController
 {
+    Q_OBJECT
 
 public:
     FortiusController (TrainSidebar *, DeviceConfiguration *);
