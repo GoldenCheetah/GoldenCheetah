@@ -618,7 +618,7 @@ CPPlot::plotModel()
 
                 // Endurance Index
                 if (pdModel->hasWPrime() && pdModel->WPrime() && pdModel->hasCP() && pdModel->CP()) {
-                    cpw->eiValue->setText(QString("%1").arg(pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
+                    cpw->eiValue->setText(QString("%1").arg(3.6 * pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
                 }
 
             }
