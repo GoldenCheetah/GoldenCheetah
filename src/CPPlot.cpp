@@ -578,8 +578,15 @@ CPPlot::plotModel()
 
                 //DPrime
                 cpw->wprimeTitle->setText(tr("D'"));
-                if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 km")).arg(pdModel->WPrime() / 1000.0, 0, 'f', 1));
-                else cpw->wprimeValue->setText(tr("n/a"));
+                if (pdModel->hasWPrime()) {
+                    cpw->wprimeValue->setText(QString(tr("%1 km")).arg(pdModel->WPrime() / 1000.0, 0, 'f', 3));
+                    cpw->wprimeRank->setText(QString(tr("%1 %2"))
+                                    .arg(pdModel->WPrime()/(metricPace ? 1.0 : METERS_PER_YARD), 0, 'f', 0)
+                                    .arg(metricPace ? tr("m") : tr("yd")));
+                } else {
+                    cpw->wprimeValue->setText(tr("n/a"));
+                    cpw->wprimeRank->setText(tr("n/a"));
+                }
 
                 //CV
                 cpw->cpTitle->setText(tr("CV"));
