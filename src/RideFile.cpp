@@ -2106,7 +2106,7 @@ RideFile::recalculateDerivedSeries(bool force)
         //   b0 = -7887.1; b1 = 384.4286; b2 = -4.5714; sigma = 18.88^2;
         static const double CTStart = 37.0f;
         static const double a1 = 1.0f;
-        static const double gamma = 0.022f * 0.22f;
+        static const double gamma = 0.022f * 0.022f;
         static const double b0 = -7887.1f; 
         static const double b1 = 384.4286f; 
         static const double b2 = -4.5714f; 
