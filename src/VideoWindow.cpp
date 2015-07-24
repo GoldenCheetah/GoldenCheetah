@@ -33,6 +33,8 @@ VideoWindow::VideoWindow(Context *context)  :
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);
 
+    curPosition = 0;
+
     init = true; // assume initialisation was ok ...
 
 #ifdef GC_VIDEO_VLC
@@ -302,6 +304,64 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
         p_meterWidget->update();
+
+#ifdef GC_VIDEO_NONE
+    Q_UNUSED(rtd)
+#endif
+
+#ifdef GC_VIDEO_VLC
+    if (!m) return;
+
+    // find the curPosition
+    QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
+    if (!dataPoints.count()) return;
+
+    if(dataPoints.count() < curPosition)
+    {
+        curPosition = dataPoints.count();
+    } // make sure the current position is less than the new distance
+    else if (dataPoints[curPosition]->km < rtd.getDistance())
+    {
+        for( ; curPosition < dataPoints.count(); curPosition++)
+            if(dataPoints[curPosition]->km >= rtd.getDistance())
+                break;
+    }
+    else
+    {
+        for( ; curPosition > 0; curPosition--)
+            if(dataPoints[curPosition]->km <= rtd.getDistance())
+                break;
+    }
+
+    // update the rfp
+    rfp = *dataPoints[curPosition];
+
+    // set video rate ( theoretical : video rate = training speed / ghost speed)
+    float rate;
+    float video_time_shift_ms;
+    video_time_shift_ms = (rfp.secs*1000.0 - (double) libvlc_media_player_get_time(mp));
+    if (rfp.kph == 0.0)
+        rate = 1.0;
+    else
+        rate = rtd.getSpeed() / rfp.kph;
+
+    //if video is far from ghost:
+    if (video_time_shift_ms > 3000 || video_time_shift_ms < -3000)
+        libvlc_media_player_set_time(mp, (libvlc_time_t) (rfp.secs*1000.0));
+    else
+    // otherwise add "small" corrective parameter to get video back to ghost position:
+        rate += video_time_shift_ms / 10000.0;
+
+    libvlc_media_player_set_pause(mp, (rate < 0.05));
+    libvlc_media_player_set_rate(mp, rate );
+
+#endif
+
+#ifdef GC_VIDEO_QT5
+//TODO
+//    // seek to ms position in current file
+//    mp->setPosition(ms);
+#endif
 }
 
 void VideoWindow::seekPlayback(long ms)
