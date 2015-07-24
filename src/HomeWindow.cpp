@@ -25,6 +25,7 @@
 #include "LTMSettings.h"
 #include "LTMWindow.h"
 #include "Settings.h"
+#include "GcUpgrade.h" // for VERSION_CONFIG_PREFIX url to -layout.xml
 #include "ChartBar.h"
 
 #include <QGraphicsDropShadowEffect>
@@ -32,6 +33,10 @@
 #include <QStyleFactory>
 #include <QScrollBar>
 
+// getting config via URL
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 static const int tileMargin = 20;
 static const int tileSpacing = 10;
 
@@ -665,21 +670,7 @@ HomeWindow::removeChart(int num, bool confirm)
 void
 HomeWindow::resetLayout()
 {
-    setUpdatesEnabled(false);
-    int numCharts = charts.count();
-    for(int i = numCharts - 1; i >= 0; i--) {
-        removeChart(i,false);
-    }
     restoreState(true);
-    for(int i = 0; i < charts.count(); i++) {
-        RideItem *notconst = (RideItem*)context->currentRideItem();
-        charts[i]->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-        charts[i]->setProperty("dateRange", property("dateRange"));
-        if (currentStyle != 0) charts[i]->show();
-        
-    }
-    setUpdatesEnabled(true);
-    if (currentStyle == 0 && charts.count()) tabSelected(0);
 }
 
 void
@@ -1226,62 +1217,128 @@ HomeWindow::saveState()
 void
 HomeWindow::restoreState(bool useDefault)
 {
-    bool defaultUsed = false;
-
     // restore window state
     QString filename = context->athlete->home->config().canonicalPath() + "/" + name + "-layout.xml";
     QFileInfo finfo(filename);
 
-    if (useDefault) QFile::remove(filename);
+    QString content = "";
 
-    // use a default if not there
-    if (!finfo.exists()) {
-        filename = QString(":xml/%1-layout.xml").arg(name);
-        defaultUsed = true;
-    }
+    // set content from the default
+    if (useDefault) {
 
-    // now go read...
-    QFile file(filename);
+        // for getting config
+        QNetworkAccessManager nam;
 
-    // setup the handler
-    QXmlInputSource source(&file);
-    QXmlSimpleReader xmlReader;
-    ViewParser handler(context);
-    xmlReader.setContentHandler(&handler);
-    xmlReader.setErrorHandler(&handler);
+        // remove the current saved version
+        QFile::remove(filename);
 
-    // parse and instantiate the charts
-    xmlReader.parse(source);
+        // fetch from the goldencheetah.org website
+        QString request = QString("%1/%2-layout.xml")
+                             .arg(VERSION_CONFIG_PREFIX)
+                             .arg(name);
 
-    // are we english language?
-    QVariant lang = appsettings->value(this, GC_LANG, QLocale::system().name());
-    bool english = lang.toString().startsWith("en") ? true : false;
+        QNetworkReply *reply = nam.get(QNetworkRequest(QUrl(request)));
 
-    // translate the titles
-    if (!english) translateChartTitles(handler.charts);
+        if (reply->error() == QNetworkReply::NoError) {
 
-    // translate the metrics, but only if the built-in "default.XML"s are read (and only for LTM charts)
-    // and only if the language is not English (i.e. translation is required).
-    if (defaultUsed and !english) {
-        // check all charts for LTMWindow(s)
-        for (int i=0; i<handler.charts.count(); i++) {
-            // find out if it's an LTMWindow via dynamic_cast
-            LTMWindow* ltmW = dynamic_cast<LTMWindow*> (handler.charts[i]);
-            if (ltmW) {
-                // the current chart is an LTMWindow, let's translate
+            // lets wait for a response with an event loop
+            // it quits on a 5s timeout or reply coming back
+            QEventLoop loop;
+            QTimer timer;
+            timer.setSingleShot(true);
+            connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+            connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+            timer.start(5000);
 
-                // now get the LTMMetrics
-                LTMSettings workSettings = ltmW->getSettings();
-                // replace name and unit for translated versions
-                workSettings.translateMetrics(context->athlete->useMetricUnits);
-                ltmW->applySettings(workSettings);
+            // lets block until signal received
+            loop.exec(QEventLoop::WaitForMoreEvents);
+
+            // all good?
+            if (reply->error() == QNetworkReply::NoError) {
+                content = reply->readAll();
             }
         }
     }
 
-    // layout the results
-    styleChanged(handler.style);
-    foreach(GcWindow *chart, handler.charts) addChart(chart);
+    //  if we don't have content read from file/resource
+    if (content == "") {
+
+        // if no local file fall back to qresource
+        if (!finfo.exists()) filename = QString(":xml/%1-layout.xml").arg(name);
+
+        QFile file(filename);
+        if (file.open(QIODevice::ReadOnly)) {
+            content = file.readAll();
+            file.close();
+        }
+    }
+
+    // if we *still* don't have content then something went
+    // badly wrong, so only reset if its not blank
+    if (content != "") {
+
+        // whilst this happens don't show user
+        setUpdatesEnabled(false);
+
+        // clear whatever we got
+        int numCharts = charts.count();
+        for(int i = numCharts - 1; i >= 0; i--) {
+            removeChart(i,false);
+        }
+        bool defaultUsed = false;
+
+        // setup the handler
+        QXmlInputSource source;
+        source.setData(content);
+        QXmlSimpleReader xmlReader;
+        ViewParser handler(context);
+        xmlReader.setContentHandler(&handler);
+        xmlReader.setErrorHandler(&handler);
+
+        // parse and instantiate the charts
+        xmlReader.parse(source);
+
+        // are we english language?
+        QVariant lang = appsettings->value(this, GC_LANG, QLocale::system().name());
+        bool english = lang.toString().startsWith("en") ? true : false;
+
+        // translate the titles
+        if (!english) translateChartTitles(handler.charts);
+
+        // translate the metrics, but only if the built-in "default.XML"s are read (and only for LTM charts)
+        // and only if the language is not English (i.e. translation is required).
+        if (defaultUsed and !english) {
+            // check all charts for LTMWindow(s)
+            for (int i=0; i<handler.charts.count(); i++) {
+                // find out if it's an LTMWindow via dynamic_cast
+                LTMWindow* ltmW = dynamic_cast<LTMWindow*> (handler.charts[i]);
+                if (ltmW) {
+                    // the current chart is an LTMWindow, let's translate
+
+                    // now get the LTMMetrics
+                    LTMSettings workSettings = ltmW->getSettings();
+                    // replace name and unit for translated versions
+                    workSettings.translateMetrics(context->athlete->useMetricUnits);
+                    ltmW->applySettings(workSettings);
+                }
+            }
+        }
+
+        // layout the results
+        styleChanged(handler.style);
+        foreach(GcWindow *chart, handler.charts) addChart(chart);
+    }
+
+    // set to whatever we have selected
+    for(int i = 0; i < charts.count(); i++) {
+        RideItem *notconst = (RideItem*)context->currentRideItem();
+        charts[i]->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
+        charts[i]->setProperty("dateRange", property("dateRange"));
+        if (currentStyle != 0) charts[i]->show();
+        
+    }
+    setUpdatesEnabled(true);
+    if (currentStyle == 0 && charts.count()) tabSelected(0);
 }
 
 //
