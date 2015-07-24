@@ -20,7 +20,7 @@
 #define _GC_VideoWindow_h 1
 #include "GoldenCheetah.h"
 
-// We need to determine what options the user has chosen 
+// We need to determine what options the user has chosen
 // for compiling, which differ for Mac vs Win/Linux
 //
 // Options are, GC_VIDEO_xxxx where xxxx is one of:
@@ -145,7 +145,7 @@ class MediaHelper
 
     private:
         QStringList supported;
-#ifdef GC_VIDEO_VLC 
+#ifdef GC_VIDEO_VLC
         libvlc_instance_t * inst;
 #endif
 };
@@ -167,12 +167,17 @@ class VideoWindow : public GcWindow
         void stopPlayback();
         void pausePlayback();
         void resumePlayback();
+        void telemetryUpdate(RealtimeData rtd);
         void seekPlayback(long ms);
         void mediaSelected(QString filename);
 
     protected:
 
         void resizeEvent(QResizeEvent *);
+
+        // current data
+        int curPosition;
+        RideFilePoint rfp;
 
         // passed from Context *
         Context *context;
