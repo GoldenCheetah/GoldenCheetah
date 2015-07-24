@@ -369,7 +369,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     // point 2 + 3 -or- point 1 + 2 in a 2 point model
 
     grid = new QwtPlotGrid();
-    grid->enableX(true); // not needed
+    grid->enableX(false); // not needed
     grid->enableY(true);
     grid->setZ(-20);
     grid->attach(cpPlot);
