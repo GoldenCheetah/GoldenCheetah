@@ -19,6 +19,7 @@
 #include "LTMChartParser.h"
 #include "LTMSettings.h"
 #include "LTMTool.h"
+#include "Athlete.h"
 
 #include <QDate>
 #include <QDebug>
@@ -116,7 +117,7 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
     out.setCodec("UTF-8");
 
     // begin document
-    out << "<charts>\n";
+    out << QString("<charts version=\"%1\">\n").arg(LTM_VERSION_NUMBER);
 
     // write out to file
     foreach (LTMSettings chart, charts) {
@@ -135,4 +136,76 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
 
     // close file
     file.close();
+}
+
+ChartTreeView::ChartTreeView(Context *context) : context(context)
+{
+    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropOverwriteMode(true);
+#ifdef Q_OS_MAC
+    setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+
+}
+
+void
+ChartTreeView::dropEvent(QDropEvent* event)
+{
+    // get the list of the items that are about to be dropped
+    QTreeWidgetItem* item = selectedItems()[0];
+ 
+    // row we started on
+    int idx1 = indexFromItem(item).row();
+ 
+    // the default implementation takes care of the actual move inside the tree
+    QTreeWidget::dropEvent(event);
+ 
+    // moved to !
+    int idx2 = indexFromItem(item).row();
+
+    // move it...
+    context->athlete->presets.move(idx1, idx2);
+
+    // reset
+    context->notifyPresetsChanged();
+
+    // select it!
+    invisibleRootItem()->child(0)->setSelected(false);
+    invisibleRootItem()->child(idx2)->setSelected(true);
+}
+
+QStringList 
+ChartTreeView::mimeTypes() const
+{
+    QStringList returning;
+    returning << "application/x-gc-charts";
+
+    return returning;
+}
+
+QMimeData *
+ChartTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
+{
+    QMimeData *returning = new QMimeData;
+
+    // we need to pack into a byte array
+    QByteArray rawData;
+    QDataStream stream(&rawData, QIODevice::WriteOnly);
+    stream.setVersion(QDataStream::Qt_4_6);
+
+    // pack data 
+    stream << (quint64)(context); // where did this come from?
+    stream << items.count();
+    foreach (QTreeWidgetItem *p, items) {
+
+        // get the season this is for
+        int index = p->treeWidget()->invisibleRootItem()->indexOfChild(p);
+
+        // season[index] ...
+        stream << context->athlete->presets[index]; // name
+    }
+
+    // and return as mime data
+    returning->setData("application/x-gc-charts", rawData);
+    return returning;
 }

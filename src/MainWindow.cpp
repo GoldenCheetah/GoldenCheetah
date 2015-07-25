@@ -94,6 +94,9 @@
 #include "NamedSearch.h"
 #include "SearchFilterBox.h"
 
+// LTM CHART DRAG/DROP PARSE
+#include "LTMChartParser.h"
+
 #ifdef GC_HAVE_WFAPI
 #include "WFApi.h"
 #endif
@@ -1234,15 +1237,59 @@ MainWindow::dropEvent(QDropEvent *event)
     QList<QUrl> urls = event->mimeData()->urls();
     if (urls.isEmpty()) return;
 
-    if (currentTab->currentView() != 3) { // we're not on train view
-        // We have something to process then
-        RideImportWizard *dialog = new RideImportWizard (&urls, currentTab->context);
-        dialog->process(); // do it!
-    } else {
-        QStringList filenames;
-        for (int i=0; i<urls.count(); i++)
-            filenames.append(QFileInfo(urls.value(i).toLocalFile()).absoluteFilePath());
-        Library::importFiles(currentTab->context, filenames);
+    // is this a chart file ?
+    QStringList filenames;
+    QList<LTMSettings> imported;
+    for(int i=0; i<urls.count(); i++) {
+
+        QString filename = QFileInfo(urls.value(i).toLocalFile()).absoluteFilePath();
+
+        if (filename.endsWith(".xml", Qt::CaseInsensitive)) {
+
+            QFile chartsFile(filename);
+
+            // setup XML processor
+            QXmlInputSource source( &chartsFile );
+            QXmlSimpleReader xmlReader;
+            LTMChartParser handler;
+            xmlReader.setContentHandler(&handler);
+            xmlReader.setErrorHandler(&handler);
+
+            // parse and get return values
+            xmlReader.parse(source);
+            imported = handler.getSettings();
+
+        } else {
+            filenames.append(filename);
+        }
+    }
+
+    // import any we may have extracted
+    if (imported.count()) {
+
+        // now append to the QList and QTreeWidget
+        currentTab->context->athlete->presets += imported;
+
+        // notify we changed and tree updates
+        currentTab->context->notifyPresetsChanged();
+
+        // tell the user
+        QMessageBox::information(this, tr("Chart Import"), QString(tr("Imported %1 charts")).arg(imported.count()));
+    }
+
+
+    // if there is anything left, process based upon view...
+    if (filenames.count()) {
+
+        if (currentTab->currentView() != 3) { // we're not on train view
+
+            // We have something to process then
+            RideImportWizard *dialog = new RideImportWizard (filenames, currentTab->context);
+            dialog->process(); // do it!
+
+        } else {
+            Library::importFiles(currentTab->context, filenames);
+        }
     }
     return;
 }

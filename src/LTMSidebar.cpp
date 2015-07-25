@@ -30,6 +30,7 @@
 #include "GcWindowRegistry.h" // for GcWinID types
 #include "HomeWindow.h" // for GcWindowDialog
 #include "LTMWindow.h" // for LTMWindow::settings()
+#include "LTMChartParser.h" // for LTMChartParser::serialize && ChartTreeView
 
 #include <QApplication>
 #include <QWebView>
@@ -138,10 +139,11 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     chartsWidget->addAction(moreChartAct);
     connect(moreChartAct, SIGNAL(triggered(void)), this, SLOT(presetPopup(void)));
 
-    chartTree = new QTreeWidget;
+    chartTree = new ChartTreeView(context);
     chartTree->setFrameStyle(QFrame::NoFrame);
     allCharts = chartTree->invisibleRootItem();
     allCharts->setText(0, tr("Events"));
+    allCharts->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
     chartTree->setColumnCount(1);
     chartTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
     chartTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -273,7 +275,7 @@ LTMSidebar::presetsChanged()
     foreach(LTMSettings chart, context->athlete->presets) {
         QTreeWidgetItem *add;
         add = new QTreeWidgetItem(chartTree->invisibleRootItem());
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+        add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
         add->setText(0, chart.name);
     }
     chartTree->setCurrentItem(chartTree->invisibleRootItem()->child(0));
@@ -284,7 +286,7 @@ LTMSidebar::presetSelectionChanged()
 {
     if (!chartTree->selectedItems().isEmpty()) {
         QTreeWidgetItem *which = chartTree->selectedItems().first();
-        if (which != allDateRanges) {
+        if (which != allCharts) {
             int index = allCharts->indexOfChild(which);
             if (index >=0 && index < context->athlete->presets.count())
                 context->notifyPresetSelected(index);
@@ -1331,7 +1333,6 @@ LTMSidebar::presetPopup()
         }
 
         menu.addSeparator();
-#if 0 //XXX pending second commit on Chart Sidebar Menu
         QAction *exp = NULL;
         if (chartTree->selectedItems().count() == 1) {
             exp = new QAction(tr("Export Chart"), chartTree);
@@ -1341,21 +1342,20 @@ LTMSidebar::presetPopup()
         // connect menu to functions
         menu.addAction(exp);
         connect(exp, SIGNAL(triggered(void)), this, SLOT(exportPreset(void)));
-#endif
 
     } else {
 
         // for the import/reset options
         menu.addSeparator();
     }
-#if 0 //XXX pending second commit on Chart Sidebar Menu
+
     QAction *import = new QAction(tr("Import Charts"), chartTree);
     menu.addAction(import);
     connect(import, SIGNAL(triggered(void)), this, SLOT(importPreset(void)));
 
     // this one needs to be in a corner away from the crowd
     menu.addSeparator();
-#endif
+
     QAction *reset = new QAction(tr("Reset to default"), chartTree);
     menu.addAction(reset);
     connect(reset, SIGNAL(triggered(void)), this, SLOT(resetPreset(void)));
@@ -1446,11 +1446,61 @@ LTMSidebar::deletePreset()
 void
 LTMSidebar::exportPreset()
 {
+    // get a filename to export to...
+    QString filename = QFileDialog::getSaveFileName(this, tr("Export Charts"), QDir::homePath() + "/charts.xml", tr("Chart File (*.xml)"));
+
+    // nothing given
+    if (filename.length() == 0) return;
+
+    // get a list
+    QList<LTMSettings> these;
+
+    for(int index=0; index<allCharts->childCount(); index++)
+        if (allCharts->child(index)->isSelected())
+            these << context->athlete->presets[index];
+
+    LTMChartParser::serialize(filename, these);
 }
 
 void
 LTMSidebar::importPreset()
 {
+    QFileDialog existing(this);
+    existing.setFileMode(QFileDialog::ExistingFile);
+    existing.setNameFilter(tr("Chart File (*.xml)"));
+
+    if (existing.exec()){
+
+        // we will only get one (ExistingFile not ExistingFiles)
+        QStringList filenames = existing.selectedFiles();
+
+        if (QFileInfo(filenames[0]).exists()) {
+
+            QList<LTMSettings> imported;
+            QFile chartsFile(filenames[0]);
+
+            // setup XML processor
+            QXmlInputSource source( &chartsFile );
+            QXmlSimpleReader xmlReader;
+            LTMChartParser handler;
+            xmlReader.setContentHandler(&handler);
+            xmlReader.setErrorHandler(&handler);
+
+            // parse and get return values
+            xmlReader.parse(source);
+            imported = handler.getSettings();
+
+            // now append to the QList and QTreeWidget
+            context->athlete->presets += imported;
+
+            // notify we changed and tree updates
+            context->notifyPresetsChanged();
+
+        } else {
+            // oops non existent - does this ever happen?
+            QMessageBox::warning( 0, tr("Entry Error"), QString(tr("Selected file (%1) does not exist")).arg(filenames[0]));
+        }
+    }
 }
 
 void

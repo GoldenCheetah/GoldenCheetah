@@ -181,7 +181,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     out<<settings.field1;
     out<<settings.field2;
     out<<int(-1);
-    out<<int(13);
+    out<<int(LTM_VERSION_NUMBER); // defined in LTMSettings.h
     out<<settings.metrics.count();
     foreach(MetricDetail metric, settings.metrics) {
         bool discard = false;
@@ -257,6 +257,8 @@ QDataStream &operator>>(QDataStream &in, LTMSettings &settings)
         in>>version;
         in>>counter;
     }
+
+if (version <= LTM_VERSION_NUMBER) { // only if we know how to read !
 while(counter-- && !in.atEnd()) {
         bool discard;
         MetricDetail m;
@@ -354,6 +356,7 @@ while(counter-- && !in.atEnd()) {
     }
     if (version >= 7) {
         in >>settings.stackWidth;
+    }
     }
 
     return in;

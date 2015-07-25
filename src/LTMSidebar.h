@@ -28,6 +28,7 @@
 #include "Season.h"
 #include "RideMetric.h"
 #include "LTMSettings.h"
+#include "LTMChartParser.h"
 
 #include "SearchFilterBox.h"
 
@@ -117,7 +118,7 @@ class LTMSidebar : public QWidget
         QTreeWidgetItem *allDateRanges;
 
         GcSplitterItem *chartsWidget;
-        QTreeWidget *chartTree;
+        ChartTreeView *chartTree;
         QTreeWidgetItem *allCharts;
 
         GcSplitterItem *eventsWidget;
