@@ -86,8 +86,10 @@ class DataProcessorFactory {
     private:
 
         static DataProcessorFactory *instance_;
+        static bool autoprocess;
         QMap<QString,DataProcessor*> processors;
         DataProcessorFactory() {}
+
 
     public:
 
@@ -95,6 +97,7 @@ class DataProcessorFactory {
         bool registerProcessor(QString name, DataProcessor *processor);
         QMap<QString,DataProcessor*> getProcessors() const { return processors; }
         bool autoProcess(RideFile *); // run auto processes (after open rideFile)
+        void setAutoProcessRule(bool b) { autoprocess = b; } // allows to switch autoprocess off (e.g. for Upgrades)
 };
 
 class Context;

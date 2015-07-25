@@ -30,6 +30,8 @@ DataProcessorFactory &DataProcessorFactory::instance()
     return *instance_;
 }
 
+bool DataProcessorFactory::autoprocess = true;
+
 bool
 DataProcessorFactory::registerProcessor(QString name, DataProcessor *processor)
 {
@@ -41,6 +43,9 @@ DataProcessorFactory::registerProcessor(QString name, DataProcessor *processor)
 bool
 DataProcessorFactory::autoProcess(RideFile *ride)
 {
+    // check if autoProcess is allow at all
+    if (!autoprocess) return false;
+
     bool changed = false;
 
     // run through the processors and execute them!
