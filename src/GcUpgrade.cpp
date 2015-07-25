@@ -26,6 +26,8 @@
 #include "RideFile.h"
 #include "JsonRideFile.h"
 #include "Context.h"
+#include "DataProcessor.h"
+
 #include <QDebug>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -357,6 +359,7 @@ GcUpgrade::upgrade(const QDir &home)
     // now let's check if upgrade is necessary and do the job
     if (!folderUpgradeSuccess) {
 
+        // initials logs,...
         errorCount = 0;
         upgradeLog = new GcUpgradeLogDialog(home);
         upgradeLog->show();
@@ -515,6 +518,7 @@ GcUpgrade::upgrade(const QDir &home)
         // the conversion of all activities to .json is done in "lateUpgrade" - since the prerequisites
         // on the "context" setup are not fulfilled at this early stage
 
+
     }
 
     return 0;
@@ -527,6 +531,9 @@ GcUpgrade::upgradeLate(Context *context)
     // check the special "folder structure" upgrade - which is tracked separately on success
     bool folderUpgradeSuccess =  appsettings->cvalue(context->athlete->home->root().dirName(), GC_UPGRADE_FOLDER_SUCCESS, false).toBool();
     if (!folderUpgradeSuccess) {
+
+        // switch off automatic Fix tools (
+        DataProcessorFactory::instance().setAutoProcessRule(false);
 
         // 1. convert the rest of activities to .json and move the converted ones to /imports
         // prepare the suffixes for check of the files
@@ -656,6 +663,8 @@ GcUpgrade::upgradeLate(Context *context)
 
         }
 
+        // switch automatic Fix tools on again
+        DataProcessorFactory::instance().setAutoProcessRule(true);
 
         // show upgrade log
         upgradeLog->enableButtons();
