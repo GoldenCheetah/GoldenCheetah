@@ -47,4 +47,26 @@ protected:
     int red, green, blue;
     QList<LTMSettings> settings;
 };
+
+class ChartTreeView : public QTreeWidget
+{
+    Q_OBJECT
+
+    public:
+        ChartTreeView(Context *);
+
+        // for drag/drop
+        QStringList mimeTypes () const;
+        QMimeData * mimeData ( const QList<QTreeWidgetItem *> items ) const;
+
+    signals:
+        void itemMoved(QTreeWidgetItem* item, int previous, int actual);
+
+    protected:
+        void dropEvent(QDropEvent* event);
+        Context *context;
+
+
+};
+
 #endif

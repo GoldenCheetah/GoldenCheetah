@@ -42,6 +42,12 @@ class Context;
 class RideMetric;
 class RideBest;
 
+// change history for LTMSettings
+// Prior to 13 no history was maintained
+// Date        Who              Description
+// 25 Jul 2015 Mark Liversedge  Update to charts.xml to show version number
+#define LTM_VERSION_NUMBER 13
+
 // group by settings
 #define LTM_DAY     1
 #define LTM_WEEK    2
