@@ -120,6 +120,7 @@ class Athlete : public QObject
 
         // preset charts
         QList<LTMSettings> presets;
+        void loadCharts(); // load charts.xml
         void translateDefaultCharts(QList<LTMSettings>&charts);
 
         // named filters / queries

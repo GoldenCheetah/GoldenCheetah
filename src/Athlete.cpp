@@ -125,9 +125,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     autoImportConfig = new RideAutoImportConfig(home->config());
 
     // read athlete's charts.xml and translate etc
-    LTMSettings reader;
-    reader.readChartXML(context->athlete->home->config(), context->athlete->useMetricUnits, presets);
-    translateDefaultCharts(presets);
+    loadCharts();
 
     // Search / filter
     namedSearches = new NamedSearches(this); // must be before navigator
@@ -188,6 +186,14 @@ Athlete::close()
     // set to latest so we don't repeat
     appsettings->setCValue(context->athlete->home->root().dirName(), GC_VERSION_USED, VERSION_LATEST);
     appsettings->setCValue(context->athlete->home->root().dirName(), GC_SAFEEXIT, true);
+}
+void
+Athlete::loadCharts()
+{
+    presets.clear();
+    LTMSettings reader;
+    reader.readChartXML(context->athlete->home->config(), context->athlete->useMetricUnits, presets);
+    translateDefaultCharts(presets);
 }
 
 Athlete::~Athlete()

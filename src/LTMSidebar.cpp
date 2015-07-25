@@ -22,9 +22,14 @@
 #include "Athlete.h"
 #include "RideCache.h"
 #include "Settings.h"
+#include "GcUpgrade.h" // for URL to config at www.goldencheetah.org/
 #include "Colors.h"
 #include "Units.h"
 #include "HelpWhatsThis.h"
+
+#include "GcWindowRegistry.h" // for GcWinID types
+#include "HomeWindow.h" // for GcWindowDialog
+#include "LTMWindow.h" // for LTMWindow::settings()
 
 #include <QApplication>
 #include <QWebView>
@@ -128,17 +133,18 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     // charts
     chartsWidget = new GcSplitterItem(tr("Charts"), iconFromPNG(":images/sidebar/charts.png"), this);
 
-    //XXX Chart Widget Actions Pending
-    //XXXQAction *moreChartAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
-    //XXXchartsWidget->addAction(moreChartAct);
-    //XXXconnect(moreEventAct, SIGNAL(triggered(void)), this, SLOT(eventPopup(void)));
+    // Chart Widget Actions
+    QAction *moreChartAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    chartsWidget->addAction(moreChartAct);
+    connect(moreChartAct, SIGNAL(triggered(void)), this, SLOT(presetPopup(void)));
 
     chartTree = new QTreeWidget;
     chartTree->setFrameStyle(QFrame::NoFrame);
     allCharts = chartTree->invisibleRootItem();
     allCharts->setText(0, tr("Events"));
     chartTree->setColumnCount(1);
-    chartTree->setSelectionMode(QAbstractItemView::SingleSelection);
+    chartTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    chartTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
     chartTree->header()->hide();
     chartTree->setIndentation(5);
     chartTree->expandItem(allCharts);
@@ -237,17 +243,23 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(dateRangeTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(dateRangePopup(const QPoint &)));
     connect(dateRangeTree,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(dateRangeChanged(QTreeWidgetItem*, int)));
     connect(dateRangeTree,SIGNAL(itemMoved(QTreeWidgetItem *,int, int)), this, SLOT(dateRangeMoved(QTreeWidgetItem*, int, int)));
+    connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(setSummary(DateRange)));
+
+    // filters
     connect(filterTree,SIGNAL(itemSelectionChanged()), this, SLOT(filterTreeWidgetSelectionChanged()));
+
+    // events
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
+
+    // presets
+    connect(chartTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(presetPopup(const QPoint &)));
+    connect(chartTree,SIGNAL(itemSelectionChanged()), this, SLOT(presetSelectionChanged()));
 
     // GC signal
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
     connect(context->athlete, SIGNAL(namedSearchesChanged()), this, SLOT(resetFilters()));
-
-    connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(setSummary(DateRange)));
     connect(context, SIGNAL(presetsChanged()), this, SLOT(presetsChanged()));
-    connect(chartTree,SIGNAL(itemSelectionChanged()), this, SLOT(presetTreeWidgetSelectionChanged()));
 
     // setup colors
     configChanged(CONFIG_APPEARANCE);
@@ -261,14 +273,14 @@ LTMSidebar::presetsChanged()
     foreach(LTMSettings chart, context->athlete->presets) {
         QTreeWidgetItem *add;
         add = new QTreeWidgetItem(chartTree->invisibleRootItem());
-        add->setFlags(add->flags() | Qt::ItemIsEditable);
+        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
         add->setText(0, chart.name);
     }
     chartTree->setCurrentItem(chartTree->invisibleRootItem()->child(0));
 }
 
 void
-LTMSidebar::presetTreeWidgetSelectionChanged()
+LTMSidebar::presetSelectionChanged()
 {
     if (!chartTree->selectedItems().isEmpty()) {
         QTreeWidgetItem *which = chartTree->selectedItems().first();
@@ -1278,4 +1290,237 @@ LTMSidebar::setSummary(DateRange dateRange)
         summary->page()->mainFrame()->setHtml(summaryText);
 
     }
+}
+
+//
+// Preset chart functions
+//
+void
+LTMSidebar::presetPopup(QPoint)
+{
+}
+
+void
+LTMSidebar::presetPopup()
+{
+    // item points to selection, if it exists
+    QTreeWidgetItem *item = chartTree->selectedItems().count() ? dateRangeTree->selectedItems().at(0) : NULL;
+
+    // OK - we are working with a specific event..
+    QMenu menu(chartTree);
+    QAction *add = new QAction(tr("Add Chart"), chartTree);
+    menu.addAction(add);
+    connect(add, SIGNAL(triggered(void)), this, SLOT(addPreset(void)));
+
+    if (item != NULL) {
+
+        if (chartTree->selectedItems().count() == 1) {
+            QAction *edit = new QAction(tr("Edit Chart"), chartTree);
+            QAction *del = new QAction(tr("Delete Chart"), chartTree);
+
+            menu.addAction(edit);
+            menu.addAction(del);
+
+            connect(edit, SIGNAL(triggered(void)), this, SLOT(editPreset(void)));
+            connect(del, SIGNAL(triggered(void)), this, SLOT(deletePreset(void)));
+
+        } else {
+            QAction *del = new QAction(tr("Delete Selected Charts"), chartTree);
+            menu.addAction(del);
+            connect(del, SIGNAL(triggered(void)), this, SLOT(deletePreset(void)));
+        }
+
+        menu.addSeparator();
+#if 0 //XXX pending second commit on Chart Sidebar Menu
+        QAction *exp = NULL;
+        if (chartTree->selectedItems().count() == 1) {
+            exp = new QAction(tr("Export Chart"), chartTree);
+        } else {
+            exp = new QAction(tr("Export Selected Charts"), chartTree);
+        }
+        // connect menu to functions
+        menu.addAction(exp);
+        connect(exp, SIGNAL(triggered(void)), this, SLOT(exportPreset(void)));
+#endif
+
+    } else {
+
+        // for the import/reset options
+        menu.addSeparator();
+    }
+#if 0 //XXX pending second commit on Chart Sidebar Menu
+    QAction *import = new QAction(tr("Import Charts"), chartTree);
+    menu.addAction(import);
+    connect(import, SIGNAL(triggered(void)), this, SLOT(importPreset(void)));
+
+    // this one needs to be in a corner away from the crowd
+    menu.addSeparator();
+#endif
+    QAction *reset = new QAction(tr("Reset to default"), chartTree);
+    menu.addAction(reset);
+    connect(reset, SIGNAL(triggered(void)), this, SLOT(resetPreset(void)));
+
+    // execute the menu
+    menu.exec(splitter->mapToGlobal(QPoint(chartsWidget->pos().x()+chartsWidget->width()-20,
+                                           chartsWidget->pos().y())));
+}
+
+void
+LTMSidebar::presetMoved(QTreeWidgetItem *, int, int)
+{
+}
+
+void
+LTMSidebar::addPreset()
+{
+    GcWindow *newone = NULL;
+
+    // GcWindowDialog is delete on close, so no need to delete
+    GcWindowDialog *f = new GcWindowDialog(GcWindowTypes::LTM, context, &newone);
+    f->exec();
+
+    // returns null if cancelled or closed
+    if (newone) {
+
+        // append to the chart list ...
+        LTMSettings set = static_cast<LTMWindow*>(newone)->getSettings();
+        set.name = set.title = newone->property("title").toString();
+        context->athlete->presets.append(set);
+
+        // newone
+        newone->close();
+        newone->deleteLater();
+
+        // now wipe it
+        f->hide();
+        f->deleteLater();
+
+        // tell the world
+        context->notifyPresetsChanged();
+    }
+}
+
+void
+LTMSidebar::editPreset()
+{
+    GcWindow *newone = NULL;
+
+    int index = allCharts->indexOfChild(chartTree->selectedItems()[0]);
+
+    // GcWindowDialog is delete on close, so no need to delete
+    GcWindowDialog *f = new GcWindowDialog(GcWindowTypes::LTM, context, &newone, &context->athlete->presets[index]);
+    f->exec();
+
+    // returns null if cancelled or closed
+    if (newone) {
+
+        // append to the chart list ...
+        LTMSettings set = static_cast<LTMWindow*>(newone)->getSettings();
+        set.name = set.title = newone->property("title").toString();
+        context->athlete->presets[index] = set;
+
+        // newone
+        newone->close();
+        newone->deleteLater();
+
+        // now wipe it
+        f->hide();
+        f->deleteLater();
+
+        // tell the world
+        context->notifyPresetsChanged();
+    }
+}
+
+void
+LTMSidebar::deletePreset()
+{
+    // zap all selected
+    for(int index=allCharts->childCount()-1; index>0; index--) 
+        if (allCharts->child(index)->isSelected())
+            context->athlete->presets.removeAt(index);
+
+    context->notifyPresetsChanged();
+}
+
+void
+LTMSidebar::exportPreset()
+{
+}
+
+void
+LTMSidebar::importPreset()
+{
+}
+
+void
+LTMSidebar::resetPreset()
+{
+    // confirm user is committed to this !
+    QMessageBox msgBox;
+    msgBox.setText(tr("You are about to reset the chart sidebar to the default setup"));
+    msgBox.setInformativeText(tr("Do you want to continue?"));
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
+
+    if(msgBox.clickedButton() != msgBox.button(QMessageBox::Ok)) return;
+
+    // for getting config
+    QNetworkAccessManager nam;
+    QString content;
+
+    // remove the current saved version
+    QFile::remove(context->athlete->home->config().canonicalPath() + "/charts.xml");
+
+    // fetch from the goldencheetah.org website
+    QString request = QString("%1/charts.xml").arg(VERSION_CONFIG_PREFIX);
+    QNetworkReply *reply = nam.get(QNetworkRequest(QUrl(request)));
+
+    // request submitted ok
+    if (reply->error() == QNetworkReply::NoError) {
+
+        // lets wait for a response with an event loop
+        // it quits on a 5s timeout or reply coming back
+        QEventLoop loop;
+        QTimer timer;
+        timer.setSingleShot(true);
+        connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+        connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+        timer.start(5000);
+
+        // lets block until signal received
+        loop.exec(QEventLoop::WaitForMoreEvents);
+
+        // all good?
+        if (reply->error() == QNetworkReply::NoError) {
+            content = reply->readAll();
+        }
+    }
+
+    //  if we don't have content read from resource
+    if (content == "") {
+
+        QFile file(":xml/charts.xml");
+        if (file.open(QIODevice::ReadOnly)) {
+            content = file.readAll();
+            file.close();
+        }
+    }
+
+    // still nowt? give up.
+    if (content == "") return;
+
+    // we should have content now !
+    QFile chartsxml(context->athlete->home->config().canonicalPath() + "/charts.xml");
+    chartsxml.open(QIODevice::WriteOnly);
+    QTextStream out(&chartsxml);
+    out << content;
+    chartsxml.close();
+
+    // following 2 lines could be managed by athlete, but its just a container really
+    // load and tell the world to reset
+    context->athlete->loadCharts();
+    context->notifyPresetsChanged(); 
 }
