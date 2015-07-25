@@ -63,7 +63,6 @@ class LTMSidebar : public QWidget
         void dateRangePopup();
         void dateRangeChanged(QTreeWidgetItem *, int);
         void dateRangeMoved(QTreeWidgetItem *, int, int);
-        void presetTreeWidgetSelectionChanged();
         void addRange();
         void editRange();
         void deleteRange();
@@ -74,7 +73,18 @@ class LTMSidebar : public QWidget
         void deleteEvent();
         void addEvent();
 
+        // working with preset charts
         void presetsChanged();
+        void presetSelectionChanged();
+        void presetPopup(QPoint);
+        void presetPopup();
+        void presetMoved(QTreeWidgetItem *, int, int);
+        void addPreset();
+        void editPreset();
+        void deletePreset();
+        void resetPreset();
+        void exportPreset();
+        void importPreset();
 
         void filterTreeWidgetSelectionChanged();
         void resetFilters(); // rebuild the seasons list if it changes

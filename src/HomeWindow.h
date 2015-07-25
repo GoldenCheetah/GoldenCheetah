@@ -41,6 +41,7 @@
 #endif
 
 class ChartBar;
+class LTMSettings;
 
 class HomeWindow : public GcWindow
 {
@@ -146,7 +147,7 @@ class GcWindowDialog : public QDialog
     Q_OBJECT
 
     public:
-        GcWindowDialog(GcWinID, Context *, GcWindow **);
+        GcWindowDialog(GcWinID, Context *, GcWindow **, LTMSettings *use=NULL);
         int exec();               // return pointer to window, or NULL if cancelled
 
     public slots:

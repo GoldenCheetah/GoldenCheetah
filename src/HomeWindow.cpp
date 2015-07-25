@@ -26,6 +26,7 @@
 #include "LTMWindow.h"
 #include "Settings.h"
 #include "GcUpgrade.h" // for VERSION_CONFIG_PREFIX url to -layout.xml
+#include "LTMSettings.h" // for special case of edit LTM settings
 #include "ChartBar.h"
 
 #include <QGraphicsDropShadowEffect>
@@ -1028,7 +1029,7 @@ HomeWindow::drawCursor()
     }
 }
 
-GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcWindow **here) : context(context), type(type), here(here)
+GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcWindow **here, LTMSettings *use) : context(context), type(type), here(here)
 {
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags());
@@ -1065,6 +1066,13 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcWindow **here) 
     DateRange dr = context->currentDateRange();
     win->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 
+    // settings passed as we're editing LTM chart sidebar
+    // bit of a hack, but good enough for now.
+    if (type == GcWindowTypes::LTM && use) {
+        static_cast<LTMWindow*>(win)->applySettings(*use);
+        win->setProperty("title", use->name);
+        title->setText(use->name);
+    }
 
     QHBoxLayout *buttons = new QHBoxLayout;
     mainLayout->addLayout(buttons);
@@ -1100,8 +1108,8 @@ int
 GcWindowDialog::exec()
 {
     if (QDialog::exec()) {
-
         *here = win;
+
     } else {
         *here = NULL;
     } 
