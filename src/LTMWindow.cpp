@@ -20,6 +20,7 @@
 #include "LTMTool.h"
 #include "LTMPlot.h"
 #include "LTMSettings.h"
+#include "LTMChartParser.h"
 #include "TabView.h"
 #include "Context.h"
 #include "Context.h"
@@ -210,6 +211,8 @@ LTMWindow::LTMWindow(Context *context) :
     // controls since the menu is SET from setControls
     QAction *exportData = new QAction(tr("Export Chart Data..."), this);
     addAction(exportData);
+    QAction *exportConfig = new QAction(tr("Export Chart Configuration..."), this);
+    addAction(exportConfig);
 
     // the controls
     QWidget *c = new QWidget;
@@ -278,6 +281,7 @@ LTMWindow::LTMWindow(Context *context) :
 
     // custom menu item
     connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
+    connect(exportConfig, SIGNAL(triggered()), this, SLOT(exportConfig()));
 
     // normal view
     connect(spanSlider, SIGNAL(lowerPositionChanged(int)), this, SLOT(spanSliderChanged()));
@@ -1218,6 +1222,24 @@ LTMWindow::dataTable(bool html)
     if (html) summary += "</center>";
 
     return summary;
+}
+
+void
+LTMWindow::exportConfig()
+{
+    // collect the config to export
+    QList<LTMSettings> mine;
+    mine << settings;
+    mine[0].title = mine[0].name = title();
+
+    // get a filename
+    QString filename = title()+".xml";
+    filename = QFileDialog::getSaveFileName(this, tr("Export Chart Config"),  filename, title()+".xml (*.xml)");
+
+    // export it!
+    if (!filename.isEmpty()) {
+        LTMChartParser::serialize(filename, mine);
+    }
 }
 
 void
