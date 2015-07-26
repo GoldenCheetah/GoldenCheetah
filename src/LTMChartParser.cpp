@@ -179,7 +179,7 @@ ChartTreeView::dropEvent(QDropEvent* event)
 
         context->athlete->presets.move(idxFrom+offsetFrom, idxTo+offsetTo);
 
-        idxToList << idxTo+offsetTo;
+        idxToList << idxTo+(idxFrom>idxTo?offsetTo:offsetFrom);
 
         if (idxFrom<idxTo)
             offsetFrom--;
