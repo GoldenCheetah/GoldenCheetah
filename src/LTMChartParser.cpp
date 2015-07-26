@@ -169,6 +169,10 @@ ChartTreeView::dropEvent(QDropEvent* event)
     QTreeWidgetItem* target = (QTreeWidgetItem *)itemAt(event->pos());
     int idxTo = indexFromItem(target).row();
 
+    // when dragging to past the last one, we get -1, so lets
+    // set the target row to the very last one
+    if (idxTo < 0) idxTo = invisibleRootItem()->childCount()-1;
+
     int offsetFrom = 0;
     int offsetTo = 0;
 
