@@ -183,10 +183,11 @@ ChartTreeView::dropEvent(QDropEvent* event)
     context->notifyPresetsChanged();
 
     clearSelection();
+    // xxx dgr removed because
     // select it!
-    foreach (int idx, idxToList) {
+    /*foreach (int idx, idxToList) {
         invisibleRootItem()->child(idx)->setSelected(true);
-    }
+    }*/
 }
 
 QStringList 
