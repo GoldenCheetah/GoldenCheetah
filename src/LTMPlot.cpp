@@ -2570,7 +2570,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
             unsigned long seconds = ride->getForSymbol("workout_time");
             if (currentDay > lastDay) {
                 if (lastDay && wantZero) {
-                    while (lastDay<currentDay) {
+                    while (lastDay<currentDay && n<=maxdays) {
                         lastDay++;
                         n++;
                         x[n]=lastDay - groupForDate(settings->start.date(), settings->groupBy);
@@ -2580,6 +2580,8 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
                     n++;
                 }
 
+                // drop out of roange
+                if (n>maxdays) break;
                 // first time thru
                 if (n<0) n=0;
 
