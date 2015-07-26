@@ -1061,11 +1061,6 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcWindow **here, 
         layout->setStretch(1, 50);
     }
 
-    RideItem *notconst = (RideItem*)context->currentRideItem();
-    win->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-    DateRange dr = context->currentDateRange();
-    win->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
-
     // settings passed as we're editing LTM chart sidebar
     // bit of a hack, but good enough for now.
     if (type == GcWindowTypes::LTM && use) {
@@ -1073,6 +1068,11 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcWindow **here, 
         win->setProperty("title", use->name);
         title->setText(use->name);
     }
+
+    RideItem *notconst = (RideItem*)context->currentRideItem();
+    win->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
+    DateRange dr = context->currentDateRange();
+    win->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 
     QHBoxLayout *buttons = new QHBoxLayout;
     mainLayout->addLayout(buttons);
