@@ -54,7 +54,7 @@ double str_to_interval(QString s)
     return 3600.0 * hour.toUInt() + 60.0 * min.toUInt() + sec.toDouble();
 }
 
-QString interval_to_str(double secs) 
+QString interval_to_str(double secs)
 {
     if (secs < 60.0)
         return QString("%1s").arg(secs, 0, 'f', 0, QLatin1Char('0'));
@@ -84,22 +84,27 @@ QString interval_to_str(double secs)
 QDateTime convertToLocalTime(QString timestamp)
 {
     //check if the last character is Z designating the timezone to be UTC
-    if (timestamp[timestamp.size()-1].toLower()=='z')
-    {
+    //otherwise assume the timestamp is already in local time and simply convert it
+    //ex: 2002-05-30T09:30:10+06:00
+    //see http://www.w3schools.com/Schema/schema_dtypes_date.asp
+    //for more on this date format
+
+    if (timestamp[timestamp.size()-1].toLower()=='z') {
+
+        // Z at end indicates the time is in fact UTC
         QDateTime datetime = QDateTime::fromString(timestamp, Qt::ISODate);
         datetime.setTimeSpec(Qt::UTC);
         datetime=datetime.toLocalTime();
         return datetime;
+
+    } else if (timestamp.size()>=20 && (timestamp[timestamp.size()-6]=='+' || timestamp[timestamp.size()-6]=='-')) {
+
+        // contains timezone offset in hours
+        return QDateTime::fromString(timestamp, Qt::ISODate);
     }
-    //otherwise assume the timestamp is already in local time and simply convert it
-    //something to add here would be a handler for explicitly set timezones
-    //ex: 2002-05-30T09:30:10+06:00
-    //see http://www.w3schools.com/Schema/schema_dtypes_date.asp
-    //for more on this date format
-    else
-    {
-        return QDateTime::fromString(timestamp);
-    }
+
+    // if not sure, just fallback to basic method
+    return QDateTime::fromString(timestamp);
 }
 
 DateRange::DateRange(QDate from, QDate to, QString name) : QObject()
@@ -239,7 +244,7 @@ DateSettingsEdit::DateSettingsEdit(QWidget *parent) : parent(parent), active(fal
     connect(prevperiod, SIGNAL(editingFinished()), this, SLOT(setDateSettings()));
 }
 
-void 
+void
 DateSettingsEdit::setDateSettings()
 {
     if (active) return;
@@ -397,4 +402,3 @@ DateSettingsEdit::setMode(int x)
         break;
     }
 }
-

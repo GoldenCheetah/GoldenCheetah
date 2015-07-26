@@ -19,7 +19,6 @@
 #ifndef _TimeUtils_h
 #define _TimeUtils_h
 
-#include <QObject>
 #include <QDate>
 #include <QDateEdit>
 #include <QDateTime>
