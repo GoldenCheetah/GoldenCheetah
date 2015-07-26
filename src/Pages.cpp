@@ -1674,6 +1674,12 @@ ColorsPage::saveClicked()
     default:
     case 0:
         appsettings->setValue(GC_CHROME, "Mac");
+#ifdef Q_OS_MAC
+        // if on yosemite set ALWAYS do flat chrome
+        if (QSysInfo::MacintoshVersion == 12) {
+            appsettings->setValue(GC_CHROME, "Flat");
+        }
+#endif
         break;
     case 1:
         appsettings->setValue(GC_CHROME, "Flat");
