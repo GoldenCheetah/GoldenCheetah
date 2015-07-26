@@ -151,21 +151,6 @@ ChartTreeView::ChartTreeView(Context *context) : context(context)
 void
 ChartTreeView::dropEvent(QDropEvent* event)
 {
-    // get the list of the items that are about to be dropped
-    QTreeWidgetItem* item = selectedItems()[0];
- 
-    // row we started on
-    //int idx1 = indexFromItem(item).row();
- 
-    // the default implementation takes care of the actual move inside the tree
-    //QTreeWidget::dropEvent(event);
- 
-    // moved to !
-    //int idx2 = indexFromItem(item).row();
-
-    // move it...
-    //context->athlete->presets.move(idx1, idx2);
-
     QTreeWidgetItem* target = (QTreeWidgetItem *)itemAt(event->pos());
     int idxTo = indexFromItem(target).row();
 
@@ -191,11 +176,14 @@ ChartTreeView::dropEvent(QDropEvent* event)
             offsetTo++;
     }
 
+    // the default implementation takes care of the actual move inside the tree
+    //QTreeWidget::dropEvent(event);
+
     // reset
     context->notifyPresetsChanged();
 
+    clearSelection();
     // select it!
-    invisibleRootItem()->child(0)->setSelected(false);
     foreach (int idx, idxToList) {
         invisibleRootItem()->child(idx)->setSelected(true);
     }
