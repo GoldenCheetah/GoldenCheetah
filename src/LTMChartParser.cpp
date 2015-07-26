@@ -155,23 +155,46 @@ ChartTreeView::dropEvent(QDropEvent* event)
     QTreeWidgetItem* item = selectedItems()[0];
  
     // row we started on
-    int idx1 = indexFromItem(item).row();
+    //int idx1 = indexFromItem(item).row();
  
     // the default implementation takes care of the actual move inside the tree
-    QTreeWidget::dropEvent(event);
+    //QTreeWidget::dropEvent(event);
  
     // moved to !
-    int idx2 = indexFromItem(item).row();
+    //int idx2 = indexFromItem(item).row();
 
     // move it...
-    context->athlete->presets.move(idx1, idx2);
+    //context->athlete->presets.move(idx1, idx2);
+
+    QTreeWidgetItem* target = (QTreeWidgetItem *)itemAt(event->pos());
+    int idxTo = indexFromItem(target).row();
+
+    int offsetFrom = 0;
+    int offsetTo = 0;
+
+    QList<int> idxToList;
+
+    foreach (QTreeWidgetItem *p, selectedItems()) {
+        int idxFrom = indexFromItem(p).row();
+
+        context->athlete->presets.move(idxFrom+offsetFrom, idxTo+offsetTo);
+
+        idxToList << idxTo+offsetTo;
+
+        if (idxFrom<idxTo)
+            offsetFrom--;
+        else
+            offsetTo++;
+    }
 
     // reset
     context->notifyPresetsChanged();
 
     // select it!
     invisibleRootItem()->child(0)->setSelected(false);
-    invisibleRootItem()->child(idx2)->setSelected(true);
+    foreach (int idx, idxToList) {
+        invisibleRootItem()->child(idx)->setSelected(true);
+    }
 }
 
 QStringList 
