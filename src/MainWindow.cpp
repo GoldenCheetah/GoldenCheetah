@@ -1257,7 +1257,7 @@ MainWindow::dropEvent(QDropEvent *event)
 
             // parse and get return values
             xmlReader.parse(source);
-            imported = handler.getSettings();
+            imported += handler.getSettings();
 
         } else {
             filenames.append(filename);
