@@ -147,7 +147,7 @@ class GcWindowDialog : public QDialog
     Q_OBJECT
 
     public:
-        GcWindowDialog(GcWinID, Context *, GcWindow **, LTMSettings *use=NULL);
+        GcWindowDialog(GcWinID, Context *, GcWindow **, bool sidebar=false, LTMSettings *use=NULL);
         int exec();               // return pointer to window, or NULL if cancelled
 
     public slots:
@@ -158,6 +158,7 @@ class GcWindowDialog : public QDialog
         Context *context;
         GcWinID type;
         GcWindow **here;
+        bool sidebar;
 
         // we remove from the layout at the end
         QHBoxLayout *layout;

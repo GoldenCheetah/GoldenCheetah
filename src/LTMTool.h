@@ -58,6 +58,7 @@ class LTMTool : public QWidget
     public:
 
         LTMTool(Context *context, LTMSettings *settings);
+        void hideBasic();
 
         QList<MetricDetail> metrics;
         MetricDetail* metricDetails(QString symbol);
@@ -130,6 +131,7 @@ class LTMTool : public QWidget
         QStringList filenames; // filters
 
         QTabWidget *tabs;
+        QWidget *basicsettings, *basic, *custom;
 
         // preset tab:
         QWidget *presetWidget;

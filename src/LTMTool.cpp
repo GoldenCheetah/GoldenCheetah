@@ -54,13 +54,11 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     mainLayout->setSpacing(0);
     setContentsMargins(0,0,0,0);
 
-    QWidget *basicsettings = new QWidget(this);
-    mainLayout->addWidget(basicsettings);
+    basicsettings = new QWidget(this);
     HelpWhatsThis *basicHelp = new HelpWhatsThis(basicsettings);
     basicsettings->setWhatsThis(basicHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Basic));
 
     QFormLayout *basicsettingsLayout = new QFormLayout(basicsettings);
-    basicsettingsLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
     searchBox = new SearchFilterBox(this, context);
     HelpWhatsThis *searchHelp = new HelpWhatsThis(searchBox);
@@ -72,7 +70,8 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     basicsettingsLayout->addRow(new QLabel(tr(""))); // spacing
 
     // Basic Controls
-    QWidget *basic = new QWidget(this);
+    basic = new QWidget(this);
+
     basic->setContentsMargins(0,0,0,0);
     HelpWhatsThis *presetHelp = new HelpWhatsThis(basic);
     basic->setWhatsThis(presetHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Preset));
@@ -127,6 +126,12 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     stackSlider->setValue(3);
     stackSlider->setFixedWidth(100);
     basicsettingsLayout->addRow(new QLabel(tr("Stack Zoom")), stackSlider);
+    // use separate line to distinguish from the operational buttons for the Table View
+
+    usePreset = new QCheckBox(tr("Use sidebar chart settings"));
+    usePreset->setChecked(false);
+    basicsettingsLayout->addRow(new QLabel(""), new QLabel());
+    basicsettingsLayout->addRow(new QLabel(""), usePreset);
 
     // controls
     QGridLayout *presetLayout = new QGridLayout;
@@ -140,7 +145,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     charts->setColumnCount(1);
     charts->setSelectionMode(QAbstractItemView::SingleSelection);
     charts->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    charts->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     charts->setIndentation(0);
 
     applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp (weird!?)
@@ -157,8 +161,9 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
     // connect up slots
     tabs = new QTabWidget(this);
-
     mainLayout->addWidget(tabs);
+    tabs->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     basic->setContentsMargins(20,20,20,20);
 
     // initialise the metrics catalogue and user selector
@@ -228,7 +233,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     qSort(metrics);
 
     // custom widget
-    QWidget *custom = new QWidget(this);
+    custom = new QWidget(this);
     custom->setContentsMargins(20,20,20,20);
     HelpWhatsThis *curvesHelp = new HelpWhatsThis(custom);
     custom->setWhatsThis(curvesHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Curves));
@@ -261,9 +266,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     deleteCustomButton = new QPushButton("-");
     connect(deleteCustomButton, SIGNAL(clicked()), this, SLOT(deleteMetric()));
 
-    usePreset = new QCheckBox(tr("Use sidebar chart settings"));
-    usePreset->setChecked(false);
-
 #ifndef Q_OS_MAC
     upCustomButton = new QToolButton(this);
     downCustomButton = new QToolButton(this);
@@ -291,9 +293,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     customButtons->addWidget(addCustomButton);
     customButtons->addWidget(deleteCustomButton);
     customLayout->addLayout(customButtons);
-
-    // use separate line to distinguish from the operational buttons for the Table View
-    customLayout->addWidget(usePreset);
 
     tabs->addTab(basicsettings, tr("Basic"));
     tabs->addTab(basic, tr("Preset"));
@@ -1162,6 +1161,24 @@ QList<MetricDetail> LTMTool::providePMmetrics() {
 
 }
 
+void
+LTMTool::hideBasic()
+{
+    // first make sure use sidebar is false
+    usePreset->setChecked(false);
+    if (basicsettings) {
+        delete basicsettings;
+        basicsettings=NULL;
+
+        // resize etc
+        tabs->updateGeometry();
+        basic->updateGeometry();
+        custom->updateGeometry();
+
+        // choose curves tab
+        tabs->setCurrentIndex(1);
+    }
+}
 
 void
 LTMTool::usePresetChanged()
@@ -1173,7 +1190,13 @@ LTMTool::usePresetChanged()
     upCustomButton->setEnabled(!usePreset->isChecked());
     downCustomButton->setEnabled(!usePreset->isChecked());
 
-
+    // yuck .. this doesn't work nicely !
+    //basic->setHidden(usePreset->isChecked());
+    //custom->setHidden(usePreset->isChecked());
+    // so instead we disable
+    charts->setEnabled(!usePreset->isChecked());
+    newButton->setEnabled(!usePreset->isChecked());
+    applyButton->setEnabled(!usePreset->isChecked());
 }
 
 void

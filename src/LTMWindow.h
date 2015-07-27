@@ -179,6 +179,11 @@ class LTMWindow : public GcChartWindow
             ltmTool->applySettings();
         }
 
+        // when part of library don't show the basic
+        // tab, its not relevant, but do make sure the
+        // use sidebar settings is not true !
+        void hideBasic(); 
+
     public slots:
         void rideSelected();        // notification to refresh
         void presetSelected(int index); // when a preset is selected in the sidebar
