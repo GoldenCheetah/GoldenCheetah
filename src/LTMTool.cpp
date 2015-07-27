@@ -43,7 +43,7 @@
 // PDModel estimate support
 #include "PDModel.h"
 
-LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mainWindow), settings(settings), context(context), active(false), _amFiltered(false), editing(false)
+LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mainWindow), settings(settings), context(context), active(false), _amFiltered(false)
 {
     setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
                   "QWidget { background = Qt::white; border:0 px; margin: 2px; };");
@@ -132,26 +132,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     QGridLayout *presetLayout = new QGridLayout;
     basicLayout->addLayout(presetLayout);
 
-    importButton = new QPushButton(tr("Import..."));
-    exportButton = new QPushButton(tr("Export..."));
-    upButton = new QPushButton(tr("Move up"));
-    downButton = new QPushButton(tr("Move down"));
-    renameButton = new QPushButton(tr("Rename"));
-    deleteButton = new QPushButton(tr("Delete"));
-    newButton = new QPushButton(tr("Add Current")); // connected in LTMWindow.cpp
-    connect(newButton, SIGNAL(clicked()), this, SLOT(addCurrent()));
-
-    QVBoxLayout *actionButtons = new QVBoxLayout;
-    actionButtons->addWidget(renameButton);
-    actionButtons->addWidget(deleteButton);
-    actionButtons->addWidget(upButton);
-    actionButtons->addWidget(downButton);
-    actionButtons->addStretch();
-    actionButtons->addWidget(importButton);
-    actionButtons->addWidget(exportButton);
-    actionButtons->addStretch();
-    actionButtons->addWidget(newButton);
-
     charts = new QTreeWidget;
 #ifdef Q_OS_MAC
     charts->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -163,25 +143,19 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     charts->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     charts->setIndentation(0);
 
-    applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp
+    applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp (weird!?)
+    newButton = new QPushButton(tr("Add Current")); // connected in LTMWindow.cpp
+    connect(newButton, SIGNAL(clicked()), this, SLOT(addCurrent()));
+
     QHBoxLayout *buttons = new QHBoxLayout;
     buttons->addWidget(applyButton);
     buttons->addStretch();
+    buttons->addWidget(newButton);
     basicLayout->addLayout(buttons);
 
     presetLayout->addWidget(charts, 0,0);
-    presetLayout->addLayout(actionButtons, 0,1,1,2);
 
     // connect up slots
-    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
-    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
-    connect(renameButton, SIGNAL(clicked()), this, SLOT(renameClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    connect(importButton, SIGNAL(clicked()), this, SLOT(importClicked()));
-    connect(exportButton, SIGNAL(clicked()), this, SLOT(exportClicked()));
-    connect(charts, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(editingFinished()));
-    connect(charts, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(editingStarted()));
-
     tabs = new QTabWidget(this);
 
     mainLayout->addWidget(tabs);
@@ -276,7 +250,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     customTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     customLayout->addWidget(customTable);
     connect(customTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
-
 
     // custom buttons
     editCustomButton = new QPushButton(tr("Edit"));
@@ -1211,7 +1184,7 @@ LTMTool::presetsChanged()
     foreach(LTMSettings chart, context->athlete->presets) {
         QTreeWidgetItem *add;
         add = new QTreeWidgetItem(charts->invisibleRootItem());
-        add->setFlags(add->flags() | Qt::ItemIsEditable);
+        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
         add->setText(0, chart.name);
     }
 
@@ -1426,7 +1399,6 @@ LTMTool::addCurrent()
     context->athlete->presets.append(*settings);
 
     // tree will now be refreshed
-    editing = false;
     context->notifyPresetsChanged();
 }
 
@@ -2224,162 +2196,4 @@ LTMTool::setFilter(QStringList files)
         filenames = files;
 
         emit filterChanged();
-}
-
-void
-LTMTool::editingStarted()
-{
-    editing = true; // also set from renameClicked
-}
-
-void
-LTMTool::editingFinished()
-{
-    if (!editing) return;
-
-    // take the edited versions of the name first
-    for(int i=0; i<charts->invisibleRootItem()->childCount(); i++)
-        (context->athlete->presets)[i].name = charts->invisibleRootItem()->child(i)->text(0);
-
-    // let everyone know once we're done
-    editing = false;
-    context->notifyPresetsChanged();
-}
-
-void
-LTMTool::importClicked()
-{
-    QFileDialog existing(this);
-    existing.setFileMode(QFileDialog::ExistingFile);
-    existing.setNameFilter(tr("Chart File (*.xml)"));
-    if (existing.exec()){
-        // we will only get one (ExistingFile not ExistingFiles)
-        QStringList filenames = existing.selectedFiles();
-
-        if (QFileInfo(filenames[0]).exists()) {
-
-            QList<LTMSettings> imported;
-            QFile chartsFile(filenames[0]);
-
-            // setup XML processor
-            QXmlInputSource source( &chartsFile );
-            QXmlSimpleReader xmlReader;
-            LTMChartParser handler;
-            xmlReader.setContentHandler(&handler);
-            xmlReader.setErrorHandler(&handler);
-
-            // parse and get return values
-            xmlReader.parse(source);
-            imported = handler.getSettings();
-
-            // now append to the QList and QTreeWidget
-            context->athlete->presets += imported;
-
-            // notify we changed and tree updates
-            editing = false;
-            context->notifyPresetsChanged();
-
-        } else {
-            // oops non existent - does this ever happen?
-            QMessageBox::warning( 0, tr("Entry Error"), QString(tr("Selected file (%1) does not exist")).arg(filenames[0]));
-        }
-    }
-}
-
-void
-LTMTool::exportClicked()
-{
-    QFileDialog newone(this);
-    newone.setFileMode(QFileDialog::AnyFile);
-    newone.setNameFilter(tr("Chart File (*.xml)"));
-    if (newone.exec()){
-        // we will only get one (ExistingFile not ExistingFiles)
-        QStringList filenames = newone.selectedFiles();
-
-        // if exists confirm overwrite
-        if (QFileInfo(filenames[0]).exists()) {
-            QMessageBox msgBox;
-            msgBox.setText(QString(tr("The selected file (%1) exists.")).arg(filenames[0]));
-            msgBox.setInformativeText(tr("Do you want to overwrite it?"));
-            msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-            msgBox.setDefaultButton(QMessageBox::Cancel);
-            msgBox.setIcon(QMessageBox::Warning);
-            if (msgBox.exec() != QMessageBox::Ok)
-                return;
-        }
-        LTMChartParser::serialize(filenames[0], context->athlete->presets);
-    }
-}
-
-void
-LTMTool::upClicked()
-{
-    if (charts->currentItem()) {
-        int index = charts->invisibleRootItem()->indexOfChild(charts->currentItem());
-        if (index == 0) return; // its at the top already
-
-        // movin on up!
-        LTMSettings save = (context->athlete->presets)[index];
-        context->athlete->presets.removeAt(index);
-        context->athlete->presets.insert(index-1, save);
-
-        // notify we changed
-        editing = false;
-        context->notifyPresetsChanged();
-
-        // reselect
-        charts->setCurrentItem(charts->invisibleRootItem()->child(index-1));
-    }
-}
-
-void
-LTMTool::downClicked()
-{
-    if (charts->currentItem()) {
-        int index = charts->invisibleRootItem()->indexOfChild(charts->currentItem());
-        if (index == (charts->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
-
-        // movin on up!
-        LTMSettings save = (context->athlete->presets)[index];
-        context->athlete->presets.removeAt(index);
-        context->athlete->presets.insert(index+1, save);
-
-        // notify we changed
-        editing = false;
-        context->notifyPresetsChanged();
-
-        // reselect
-        charts->setCurrentItem(charts->invisibleRootItem()->child(index+1));
-    }
-}
-
-void
-LTMTool::renameClicked()
-{
-    // which one is selected?
-    if (charts->currentItem()) {
-        editing = true;
-        charts->editItem(charts->currentItem(), 0);
-    }
-}
-
-void
-LTMTool::deleteClicked()
-{
-    // must have at least 1 child
-    if (charts->invisibleRootItem()->childCount() == 1) {
-        QMessageBox::warning(0, tr("Error"), tr("You must have at least one chart"));
-        return;
-
-    } else if (charts->currentItem()) {
-
-        int index = charts->invisibleRootItem()->indexOfChild(charts->currentItem());
-
-        // zap!
-        context->athlete->presets.removeAt(index);
-
-        // notify we changed
-        editing = false;
-        context->notifyPresetsChanged();
-    }
 }
