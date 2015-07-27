@@ -1381,7 +1381,6 @@ LTMSidebar::addPreset()
 
     // returns null if cancelled or closed
     if (newone) {
-
         // append to the chart list ...
         LTMSettings set = static_cast<LTMWindow*>(newone)->getSettings();
         set.name = set.title = newone->property("title").toString();

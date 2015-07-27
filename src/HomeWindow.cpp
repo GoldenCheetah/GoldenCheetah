@@ -1093,7 +1093,6 @@ void GcWindowDialog::okClicked()
     // note that in reject they are not and will
     // get deleted (this has been verified with
     // some debug statements in ~GcWindow).
-
     // set its title property and geometry factors
     win->setProperty("title", title->text());
     win->setProperty("widthFactor", 2.00);

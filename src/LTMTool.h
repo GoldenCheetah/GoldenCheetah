@@ -114,14 +114,6 @@ class LTMTool : public QWidget
         void presetsChanged();   // presets changed in the athlete class
         void usePresetChanged(); // we changed the checkbox
 
-        void exportClicked();
-        void importClicked();
-        void editingStarted();
-        void editingFinished();
-        void upClicked();
-        void downClicked();
-        void renameClicked();
-        void deleteClicked();
         void addCurrent();
 
     private:
@@ -142,8 +134,6 @@ class LTMTool : public QWidget
         // preset tab:
         QWidget *presetWidget;
         QLineEdit *chartName;
-        QPushButton *importButton, *exportButton;
-        QPushButton *upButton, *downButton, *renameButton, *deleteButton;
 
         // custom tab:
         QTableWidget *customTable;
