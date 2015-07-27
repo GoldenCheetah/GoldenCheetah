@@ -298,6 +298,12 @@ LTMWindow::~LTMWindow()
 }
 
 void
+LTMWindow::hideBasic()
+{
+    ltmTool->hideBasic();
+}
+
+void
 LTMWindow::configChanged(qint32)
 {
 #ifndef Q_OS_MAC

@@ -1376,7 +1376,7 @@ LTMSidebar::addPreset()
     GcWindow *newone = NULL;
 
     // GcWindowDialog is delete on close, so no need to delete
-    GcWindowDialog *f = new GcWindowDialog(GcWindowTypes::LTM, context, &newone);
+    GcWindowDialog *f = new GcWindowDialog(GcWindowTypes::LTM, context, &newone, true);
     f->exec();
 
     // returns null if cancelled or closed
@@ -1407,7 +1407,7 @@ LTMSidebar::editPreset()
     int index = allCharts->indexOfChild(chartTree->selectedItems()[0]);
 
     // GcWindowDialog is delete on close, so no need to delete
-    GcWindowDialog *f = new GcWindowDialog(GcWindowTypes::LTM, context, &newone, &context->athlete->presets[index]);
+    GcWindowDialog *f = new GcWindowDialog(GcWindowTypes::LTM, context, &newone, true, &context->athlete->presets[index]);
     f->exec();
 
     // returns null if cancelled or closed

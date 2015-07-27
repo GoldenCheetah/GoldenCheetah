@@ -29,7 +29,7 @@
 #include "LTMSettings.h" // for special case of edit LTM settings
 #include "ChartBar.h"
 
-#include <QGraphicsDropShadowEffect>
+#include <QDesktopWidget>
 #include <QStyle>
 #include <QStyleFactory>
 #include <QScrollBar>
@@ -1029,13 +1029,18 @@ HomeWindow::drawCursor()
     }
 }
 
-GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcWindow **here, LTMSettings *use) : context(context), type(type), here(here)
+GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcWindow **here, bool sidebar, LTMSettings *use) : context(context), type(type), here(here), sidebar(sidebar)
 {
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags());
     setWindowTitle(tr("Chart Setup"));
+
+    QRect size= desktop->availableGeometry();
     setMinimumHeight(500);
-    setMinimumWidth(800);
+
+    // chart and settings side by side need to be big!
+    if (size.width() >= 1300) setMinimumWidth(1200); 
+    else setMinimumWidth(800); // otherwise the old default
     setWindowModality(Qt::ApplicationModal);
 
     mainLayout = new QVBoxLayout(this);
@@ -1055,9 +1060,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcWindow **here, 
     // lets not have space for controls if there aren't any
     layout->setStretch(0, 100);
     if (win->controls()) {
-        controlLayout = new QFormLayout;
-        controlLayout->addRow(win->controls());
-        layout->addLayout(controlLayout);
+        layout->addWidget(win->controls());
         layout->setStretch(1, 50);
     }
 
@@ -1080,6 +1083,12 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcWindow **here, 
     buttons->addStretch();
     buttons->addWidget((cancel=new QPushButton(tr("Cancel"), this)));
     buttons->addWidget((ok=new QPushButton(tr("OK"), this)));
+
+    // no basic tab for library charts - remove once all in place.
+    if (sidebar) {
+        // hide the basic tab
+        static_cast<LTMWindow*>(win)->hideBasic();
+    }
 
     connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
