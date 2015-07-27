@@ -2261,9 +2261,8 @@ void RideSummaryWindow::dateRangeChanged(DateRange dr)
 {
     if (!amVisible()) return;
 
-    // range didnt change ignore it...
-    if (dr.from == current.from && dr.to == current.to) return;
-    else current = dr;
+    // refresh unconditionally, date range or filters could have changed
+    current = dr;
 
     // wipe bests coz we need to refresh
     if (!ridesummary && bestsCache) {
