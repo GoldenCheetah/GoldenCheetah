@@ -1166,9 +1166,10 @@ LTMTool::hideBasic()
 {
     // first make sure use sidebar is false
     usePreset->setChecked(false);
-    if (basicsettings) {
-        delete basicsettings;
-        basicsettings=NULL;
+    if (tabs->count() == 3) {
+
+        tabs->removeTab(0);
+        basicsettings->hide(); // it doesn't get deleted
 
         // resize etc
         tabs->updateGeometry();
