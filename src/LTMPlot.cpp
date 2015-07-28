@@ -1273,7 +1273,7 @@ LTMPlot::setData(LTMSettings *set)
         p.next();
 
         // always hide bollocksy curves
-        if (p.key().endsWith(tr("trend")) || p.key().endsWith(tr("Outliers")) || p.key().endsWith(tr("Best")) || p.key().startsWith(tr("Best")))
+        if (p.key().contains("_trend") || p.key().contains("_outliers") || p.key().contains(tr("Best"))) 
             p.value()->setItemAttribute(QwtPlotItem::Legend, false);
         else
             p.value()->setItemAttribute(QwtPlotItem::Legend, settings->legend);
@@ -2380,7 +2380,7 @@ LTMPlot::setCompareData(LTMSettings *set)
         p.next();
 
         // always hide bollocksy curves
-        if (p.key().endsWith(tr("trend")) || p.key().endsWith(tr("Outliers")) || p.key().endsWith(tr("Best")) || p.key().startsWith(tr("Best")))
+        if (p.key().contains("_trend") || p.key().contains("_outliers") || p.key().contains(tr("Best"))) 
             p.value()->setItemAttribute(QwtPlotItem::Legend, false);
         else
             p.value()->setItemAttribute(QwtPlotItem::Legend, settings->legend);
