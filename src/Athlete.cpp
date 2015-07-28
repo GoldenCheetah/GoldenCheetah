@@ -273,11 +273,12 @@ Athlete::translateDefaultCharts(QList<LTMSettings>&charts)
     // New default charts need to be added to this list to be translated
     QMap<QString, QString> chartNameMap;
 	chartNameMap.insert("PMC", tr("PMC"));
-	chartNameMap.insert("Track Weight", tr("Track Weight"));
+	chartNameMap.insert("Athlete Weight", tr("Athlete Weight"));
 	chartNameMap.insert("Time In Power Zone (Stacked)", tr("Time In Power Zone (Stacked)"));
 	chartNameMap.insert("Time In Power Zone (Bar)", tr("Time In Power Zone (Bar)"));
 	chartNameMap.insert("Time In HR Zone", tr("Time In HR Zone"));
 	chartNameMap.insert("Power Distribution", tr("Power Distribution"));
+    chartNameMap.insert("Vo2max Estimation", tr("Vo2max Estimation"));
 	chartNameMap.insert("KPI Tracker", tr("KPI Tracker"));
 	chartNameMap.insert("Critical Power Trend", tr("Critical Power Trend"));
 	chartNameMap.insert("Aerobic Power", tr("Aerobic Power"));
@@ -301,9 +302,13 @@ Athlete::translateDefaultCharts(QList<LTMSettings>&charts)
 	chartNameMap.insert("Stress and Distance", tr("Stress and Distance"));
 	chartNameMap.insert("Calories vs Duration", tr("Calories vs Duration"));
     chartNameMap.insert("Stress (TISS)", tr("Stress (TISS)"));
+    chartNameMap.insert("Aerobic Response", tr("Aerobic Response"));
+    chartNameMap.insert("Anaerobic Response", tr("Anaerobic Response"));
     chartNameMap.insert("PMC (Coggan)", tr("PMC (Coggan)"));
     chartNameMap.insert("PMC (Skiba)", tr("PMC (Skiba)"));
     chartNameMap.insert("PMC (TRIMP)", tr("PMC (TRIMP)"));
+    chartNameMap.insert("PMC (Distance)", tr("PMC (Distance)"));
+    chartNameMap.insert("PMC (Duration)", tr("PMC (Duration)"));
     chartNameMap.insert("CP History", tr("CP History"));
     chartNameMap.insert("PMC (TriScore)", tr("PMC (TriScore)"));
     chartNameMap.insert("Time in Pace Zones (Stacked)", tr("Time in Pace Zones (Stacked)"));
