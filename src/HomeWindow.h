@@ -64,6 +64,7 @@ class HomeWindow : public GcWindow
         void rideSelected();
         void dateRangeChanged(DateRange);
         void configChanged(qint32);
+        void presetSelected(int n);
 
         // QT Widget events and signals
         void tabSelected(int id);

@@ -162,6 +162,9 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     connect(chartbar, SIGNAL(currentIndexChanged(int)), this, SLOT(tabSelected(int)));
     connect(titleEdit, SIGNAL(textChanged(const QString&)), SLOT(titleChanged()));
 
+    // trends view we should select a library chart when a chart is selected.
+    if (name == "home") connect(context, SIGNAL(presetSelected(int)), this, SLOT(presetSelected(int)));
+
     installEventFilter(this);
     qApp->installEventFilter(this);
 }
@@ -1496,5 +1499,37 @@ void HomeWindow::translateChartTitles(QList<GcWindow*> charts)
     foreach(GcWindow *chart, charts) {
         QString chartTitle = chart->property("title").toString();
         chart->setProperty("title", titleMap.value(chartTitle, chartTitle));
+    }
+}
+
+void
+HomeWindow::presetSelected(int n)
+{
+    if (n > 0) {
+
+        // if we are in tabbed mode and we are not on a 'library' LTM chart
+        // then we need to select a library chart to show the selection
+
+        // tabbed is an LTM?
+        if (!currentStyle && tabbed->currentIndex() >= 0 && charts.count() > 0) {
+
+            int index = tabbed->currentIndex();
+            GcWinID type = charts[index]->property("type").value<GcWinID>();
+
+            // not on a 'library' chart
+            if (type != GcWindowTypes::LTM || static_cast<LTMWindow*>(charts[index])->preset() == false) {
+
+                // find a 'library' chart
+                for(int n=0; n<charts.count(); n++) {
+                    GcWinID type = charts[n]->property("type").value<GcWinID>();
+                    if (type == GcWindowTypes::LTM) {
+                        if (static_cast<LTMWindow*>(charts[n])->preset() == true) {
+                            chartbar->setCurrentIndex(n);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
