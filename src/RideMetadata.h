@@ -95,6 +95,7 @@ class FormField : public QWidget
         void metadataChanged();     // from GC - a new ride got picked / changed elsewhere
         void stateChanged(int);     // should we enable/disable the widget?
         void focusOut(QFocusEvent *event=NULL);
+        void metadataFlush();       // update all the tags to whatever is edited now
 
     private:
         RideMetadata *meta;
@@ -177,6 +178,7 @@ class RideMetadata : public QWidget
 
     public slots:
         void configChanged(qint32);
+        void metadataFlush();
         void metadataChanged(); // when its changed elsewhere we need to refresh fields
         void setExtraTab();     // shows fields not configured but present in ride file
         void warnDateTime(QDateTime); // warn if file already exists after date/time changed
