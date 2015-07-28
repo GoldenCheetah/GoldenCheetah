@@ -32,7 +32,7 @@
 #include <qwt_plot_marker.h>
 
 // Model
-class TestModel //: public PDModel
+class TestModel // : public PDModel
 {
     public:
 
