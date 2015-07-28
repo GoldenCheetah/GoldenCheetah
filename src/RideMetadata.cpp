@@ -570,11 +570,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
 
     // if save is being called flush all the values out ready to save as they are
-    if (definition.type == FIELD_TEXTBOX && definition.name != "Change History") 
-        connect(meta->context, SIGNAL(metadataFlush()), this, SLOT(focusOut()));
-    else {
-        connect(meta->context, SIGNAL(metadataFlush()), this, SLOT(editFinished()));
-    }
+    connect(meta->context, SIGNAL(metadataFlush()), this, SLOT(metadataFlush()));
 
     active = false;
 }
@@ -615,6 +611,124 @@ FormField::dataChanged()
 }
 
 void
+RideMetadata::metadataFlush()
+{
+    // run through each field setting the metadata text to whatever
+    // we have in the field
+    QMapIterator<QString, Form*> d(tabList);
+    d.toFront();
+    while (d.hasNext()) {
+       d.next();
+       foreach(FormField *field, d.value()->fields) // keep track so we can destroy
+          field->metadataFlush();
+    }
+
+    // now we're clean we can signal
+    RideItem *item = property("ride").value<RideItem*>();
+    if (item) item->notifyRideMetadataChanged();
+}
+
+void
+FormField::metadataFlush()
+{
+    if (ourRideItem == NULL) return;
+
+    // get values from the widgets
+    QString text;
+
+    // get the current value into a string
+    switch (definition.type) {
+    case FIELD_TEXT :
+    case FIELD_SHORTTEXT :
+             text = ((QLineEdit*)widget)->text();
+             break;
+    case FIELD_TEXTBOX :
+        {
+            text = ((GTextEdit*)widget)->document()->toPlainText();
+            break;
+        }
+
+    case FIELD_INTEGER : text = QString("%1").arg(((QSpinBox*)widget)->value()); break;
+    case FIELD_DOUBLE :
+        {
+            if (!isTime) text = QString("%1").arg(((QDoubleSpinBox*)widget)->value());
+            else {
+                text = QString("%1").arg(QTime(0,0,0,0).secsTo(((QTimeEdit*)widget)->time()));
+            }
+        }
+        break;
+    case FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd.MM.yyyy"); break;
+    case FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
+    }
+
+    // Update special field
+    if (definition.name == "Device") {
+        ourRideItem->ride()->setDeviceType(text);
+
+    } else if (definition.name == "Identifier") {
+        ourRideItem->ride()->setId(text);
+
+    } else if (definition.name == "Recording Interval") {
+        ourRideItem->ride()->setRecIntSecs(text.toDouble());
+
+    } else if (definition.name == "Start Date") {
+        QDateTime current = ourRideItem->ride()->startTime();
+        QDate date(/* year*/text.mid(6,4).toInt(),
+                   /* month */text.mid(3,2).toInt(),
+                   /* day */text.mid(0,2).toInt());
+        QDateTime update = QDateTime(date, current.time());
+        ourRideItem->setStartTime(update);
+
+    } else if (definition.name == "Start Time") {
+        QDateTime current = ourRideItem->ride()->startTime();
+        QTime time(/* hours*/ text.mid(0,2).toInt(),
+                   /* minutes */ text.mid(3,2).toInt(),
+                   /* seconds */ text.mid(6,2).toInt(),
+                   /* milliseconds */ text.mid(9,3).toInt());
+        QDateTime update = QDateTime(current.date(), time);
+        ourRideItem->setStartTime(update);
+
+    } else if (definition.name != "Summary") {
+        if (meta->sp.isMetric(definition.name) && enabled->isChecked()) {
+
+            // convert from imperial to metric if needed
+            if (!meta->context->athlete->useMetricUnits) {
+                double value = text.toDouble() * (1/ meta->sp.rideMetric(definition.name)->conversion());
+                value -= meta->sp.rideMetric(definition.name)->conversionSum();
+                text = QString("%1").arg(value);
+            }
+
+            // update metric override QMap!
+            QMap<QString,QString> override;
+            override.insert("value", text);
+            ourRideItem->ride()->metricOverrides.insert(meta->sp.metricSymbol(definition.name), override);
+
+        } else {
+
+            // we need to convert from display value to
+            // stored value for the Weight field:
+            if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
+                double kg = text.toDouble() / LB_PER_KG;
+                text = QString("%1").arg(kg);
+            }
+
+            // just update the tags QMap!
+            ourRideItem->ride()->setTag(definition.name, text);
+        }
+    }
+
+    // Construct the summary text used on the calendar
+    QString calendarText;
+    foreach (FieldDefinition field, meta->getFields()) {
+        if (field.diary == true) {
+            calendarText += QString("%1\n")
+                    .arg(ourRideItem->ride()->getTag(field.name, ""));
+        }
+    }
+    ourRideItem->ride()->setTag("Calendar Text", calendarText);
+}
+
+void
 FormField::focusOut(QFocusEvent *)
 {
     if (ourRideItem && ourRideItem->ride()) {
@@ -635,6 +749,8 @@ FormField::focusOut(QFocusEvent *)
 void
 FormField::editFinished()
 {
+    bool changed = false;
+
     if (active || ourRideItem == NULL ||
         (edited == false && definition.type != FIELD_TEXTBOX) ||
         ourRideItem == NULL) return;
@@ -678,13 +794,25 @@ FormField::editFinished()
 
     // Update special field
     if (definition.name == "Device") {
-        ourRideItem->ride()->setDeviceType(text);
+
+        if (ourRideItem->ride()->deviceType() != text) {
+            changed = true;
+            ourRideItem->ride()->setDeviceType(text);
+        }
 
     } else if (definition.name == "Identifier") {
-        ourRideItem->ride()->setId(text);
+
+        if (ourRideItem->ride()->id() != text) {
+            changed = true;
+            ourRideItem->ride()->setId(text);
+        }
 
     } else if (definition.name == "Recording Interval") {
-        ourRideItem->ride()->setRecIntSecs(text.toDouble());
+
+        if (ourRideItem->ride()->recIntSecs() != text.toDouble()) {
+            changed = true;
+            ourRideItem->ride()->setRecIntSecs(text.toDouble());
+        }
 
     } else if (definition.name == "Start Date") {
         QDateTime current = ourRideItem->ride()->startTime();
@@ -692,10 +820,14 @@ FormField::editFinished()
                    /* month */text.mid(3,2).toInt(),
                    /* day */text.mid(0,2).toInt());
         QDateTime update = QDateTime(date, current.time());
-        ourRideItem->setStartTime(update);
 
-        // warn if the ride already exists with that date/time
-        meta->warnDateTime(update);
+        if (update != current) {
+            changed = true;
+            ourRideItem->setStartTime(update);
+
+            // warn if the ride already exists with that date/time
+            meta->warnDateTime(update);
+        }
 
     } else if (definition.name == "Start Time") {
         QDateTime current = ourRideItem->ride()->startTime();
@@ -704,11 +836,15 @@ FormField::editFinished()
                    /* seconds */ text.mid(6,2).toInt(),
                    /* milliseconds */ text.mid(9,3).toInt());
         QDateTime update = QDateTime(current.date(), time);
-        ourRideItem->setStartTime(update);
-        ourRideItem->notifyRideMetadataChanged();
 
-        // warn if the ride already exists with that date/time
-        meta->warnDateTime(update);
+        if (update != current) {
+
+            changed = true;
+            ourRideItem->setStartTime(update);
+
+            // warn if the ride already exists with that date/time
+            meta->warnDateTime(update);
+        }
 
     } else if (definition.name != "Summary") {
         if (meta->sp.isMetric(definition.name) && enabled->isChecked()) {
@@ -720,10 +856,17 @@ FormField::editFinished()
                 text = QString("%1").arg(value);
             }
 
-            // update metric override QMap!
-            QMap<QString,QString> override;
-            override.insert("value", text);
-            ourRideItem->ride()->metricOverrides.insert(meta->sp.metricSymbol(definition.name), override);
+            QMap<QString, QString> empty;
+            QMap<QString,QString> current = ourRideItem->ride()->metricOverrides.value(meta->sp.metricSymbol(definition.name), empty);
+            QString currentvalue = current.value("value", "");
+
+            if (currentvalue != text) {
+                // update metric override QMap!
+                changed = true;
+                QMap<QString,QString> override;
+                override.insert("value", text);
+                ourRideItem->ride()->metricOverrides.insert(meta->sp.metricSymbol(definition.name), override);
+            }
 
         } else {
 
@@ -735,29 +878,36 @@ FormField::editFinished()
             }
 
             // just update the tags QMap!
-            ourRideItem->ride()->setTag(definition.name, text);
+            QString current = ourRideItem->ride()->getTag(definition.name, "");
+            if (current != text) {
+                changed = true;
+                ourRideItem->ride()->setTag(definition.name, text);
+            }
         }
     }
 
     // default values
-    setLinkedDefault(text);
+    if (changed) {
 
-    // Construct the summary text used on the calendar
-    QString calendarText;
-    foreach (FieldDefinition field, meta->getFields()) {
-        if (field.diary == true) {
-            calendarText += QString("%1\n")
-                    .arg(ourRideItem->ride()->getTag(field.name, ""));
+        // we actually edited it !
+        setLinkedDefault(text);
+
+        // Construct the summary text used on the calendar
+        QString calendarText;
+        foreach (FieldDefinition field, meta->getFields()) {
+            if (field.diary == true) {
+                calendarText += QString("%1\n")
+                        .arg(ourRideItem->ride()->getTag(field.name, ""));
+            }
         }
+        ourRideItem->ride()->setTag("Calendar Text", calendarText);
+
+        // and update !
+        ourRideItem->notifyRideMetadataChanged();
+
+        // rideFile is now dirty!
+        ourRideItem->setDirty(true);
     }
-    ourRideItem->ride()->setTag("Calendar Text", calendarText);
-
-    // and update !
-    ourRideItem->notifyRideMetadataChanged();
-
-    // rideFile is now dirty!
-    ourRideItem->setDirty(true);
-
     active = false;
 }
 
