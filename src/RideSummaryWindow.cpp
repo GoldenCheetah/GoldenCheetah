@@ -1402,7 +1402,7 @@ RideSummaryWindow::htmlSummary()
 
     // The extra <center> works around a bug in QT 4.3.1,
     // which will otherwise put the following above the <hr>.
-    summary += tr("<br>BikeScore is a trademark of Dr. Philip "
+    summary += tr("<br>BikeScore and SwimScore are trademarks of Dr. Philip "
         "Friere Skiba, PhysFarm Training Systems LLC");
 
     summary += tr("<br>FTP, TSS, NP and IF are trademarks of Peaksware LLC</center>");
