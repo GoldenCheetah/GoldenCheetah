@@ -1,7 +1,4 @@
 /*
-
-// named searchs
-#include "NamedSearch.h"
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -77,6 +74,7 @@ class LTMSidebar : public QWidget
         // working with preset charts
         void presetsChanged();
         void presetSelectionChanged();
+        void presetSelected(int index);
         void presetPopup(QPoint);
         void presetPopup();
         void presetMoved(QTreeWidgetItem *, int, int);

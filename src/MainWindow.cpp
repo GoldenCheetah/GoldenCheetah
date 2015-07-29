@@ -1275,6 +1275,12 @@ MainWindow::dropEvent(QDropEvent *event)
 
         // tell the user
         QMessageBox::information(this, tr("Chart Import"), QString(tr("Imported %1 charts")).arg(imported.count()));
+
+        // switch to trend view if we aren't on it
+        selectHome();
+
+        // now select what was added
+        currentTab->context->notifyPresetSelected(currentTab->context->athlete->presets.count()-1);
     }
 
 
