@@ -82,6 +82,20 @@
 			<fielddiary>0</fielddiary>
 		</field>
 		<field>
+			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Equipment"</fieldname>
+			<fieldtype>2</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"RPE"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
 			<fieldtab>"Notes"</fieldtab>
 			<fieldname>"Notes"</fieldname>
 			<fieldtype>1</fieldtype>
@@ -196,6 +210,20 @@
 		<field>
 			<fieldtab>"Metric"</fieldtab>
 			<fieldname>"BikeScore&amp;#8482;"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"GOVSS"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"SwimScore"</fieldname>
 			<fieldtype>4</fieldtype>
 			<fieldvalues>""</fieldvalues>
 			<fielddiary>0</fielddiary>
