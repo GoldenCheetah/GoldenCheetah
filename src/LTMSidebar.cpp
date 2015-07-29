@@ -262,6 +262,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
     connect(context->athlete, SIGNAL(namedSearchesChanged()), this, SLOT(resetFilters()));
     connect(context, SIGNAL(presetsChanged()), this, SLOT(presetsChanged()));
+    connect(context, SIGNAL(presetSelected(int)), this, SLOT(presetSelected(int)));
 
     // setup colors
     configChanged(CONFIG_APPEARANCE);
@@ -279,6 +280,27 @@ LTMSidebar::presetsChanged()
         add->setText(0, chart.name);
     }
     chartTree->setCurrentItem(chartTree->invisibleRootItem()->child(0));
+}
+
+void
+LTMSidebar::presetSelected(int index)
+{
+    // select it if it isn't selected now
+    if (index < allCharts->childCount() && allCharts->child(index)->isSelected() == false) {
+
+        // lets clear the current selections and select the one we want 
+        // blocking signals to prevent endless loops
+        chartTree->blockSignals(true);
+
+        // clear
+        foreach(QTreeWidgetItem *p, chartTree->selectedItems()) p->setSelected(false);
+
+        // now select!
+        allCharts->child(index)->setSelected(true);
+
+        // back to normal
+        chartTree->blockSignals(false);
+    }
 }
 
 void
