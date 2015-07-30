@@ -1079,81 +1079,81 @@ QList<MetricDetail> LTMTool::providePMmetrics() {
     trimpLTR.uunits = tr("Ramp");
     metrics.append(trimpLTR);
 
-    // GOVSS LTS
-    MetricDetail govssLTS;
-    govssLTS.type = METRIC_PM;
-    govssLTS.symbol = "govss_lts";
-    govssLTS.metric = NULL; // not a factory metric
-    govssLTS.penColor = QColor(Qt::blue);
-    govssLTS.curveStyle = QwtPlotCurve::Lines;
-    govssLTS.symbolStyle = QwtSymbol::NoSymbol;
-    govssLTS.smooth = false;
-    govssLTS.trendtype = 0;
-    govssLTS.topN = 1;
-    govssLTS.uname = govssLTS.name = tr("GOVSS Long Term Stress");
-    govssLTS.units = "Stress";
-    govssLTS.uunits = tr("Stress");
-    metrics.append(govssLTS);
+    // TriScore LTS
+    MetricDetail triscoreLTS;
+    triscoreLTS.type = METRIC_PM;
+    triscoreLTS.symbol = "triscore_lts";
+    triscoreLTS.metric = NULL; // not a factory metric
+    triscoreLTS.penColor = QColor(Qt::blue);
+    triscoreLTS.curveStyle = QwtPlotCurve::Lines;
+    triscoreLTS.symbolStyle = QwtSymbol::NoSymbol;
+    triscoreLTS.smooth = false;
+    triscoreLTS.trendtype = 0;
+    triscoreLTS.topN = 1;
+    triscoreLTS.uname = triscoreLTS.name = tr("TriScore Long Term Stress");
+    triscoreLTS.units = "Stress";
+    triscoreLTS.uunits = tr("Stress");
+    metrics.append(triscoreLTS);
 
-    MetricDetail govssSTS;
-    govssSTS.type = METRIC_PM;
-    govssSTS.symbol = "govss_sts";
-    govssSTS.metric = NULL; // not a factory metric
-    govssSTS.penColor = QColor(Qt::magenta);
-    govssSTS.curveStyle = QwtPlotCurve::Lines;
-    govssSTS.symbolStyle = QwtSymbol::NoSymbol;
-    govssSTS.smooth = false;
-    govssSTS.trendtype = 0;
-    govssSTS.topN = 1;
-    govssSTS.uname = govssSTS.name = tr("GOVSS Short Term Stress");
-    govssSTS.units = "Stress";
-    govssSTS.uunits = tr("Stress");
-    metrics.append(govssSTS);
+    MetricDetail triscoreSTS;
+    triscoreSTS.type = METRIC_PM;
+    triscoreSTS.symbol = "triscore_sts";
+    triscoreSTS.metric = NULL; // not a factory metric
+    triscoreSTS.penColor = QColor(Qt::magenta);
+    triscoreSTS.curveStyle = QwtPlotCurve::Lines;
+    triscoreSTS.symbolStyle = QwtSymbol::NoSymbol;
+    triscoreSTS.smooth = false;
+    triscoreSTS.trendtype = 0;
+    triscoreSTS.topN = 1;
+    triscoreSTS.uname = triscoreSTS.name = tr("TriScore Short Term Stress");
+    triscoreSTS.units = "Stress";
+    triscoreSTS.uunits = tr("Stress");
+    metrics.append(triscoreSTS);
 
-    MetricDetail govssSB;
-    govssSB.type = METRIC_PM;
-    govssSB.symbol = "govss_sb";
-    govssSB.metric = NULL; // not a factory metric
-    govssSB.penColor = QColor(Qt::yellow);
-    govssSB.curveStyle = QwtPlotCurve::Steps;
-    govssSB.symbolStyle = QwtSymbol::NoSymbol;
-    govssSB.smooth = false;
-    govssSB.trendtype = 0;
-    govssSB.topN = 1;
-    govssSB.uname = govssSB.name = tr("GOVSS Stress Balance");
-    govssSB.units = "Stress Balance";
-    govssSB.uunits = tr("Stress Balance");
-    metrics.append(govssSB);
+    MetricDetail triscoreSB;
+    triscoreSB.type = METRIC_PM;
+    triscoreSB.symbol = "triscore_sb";
+    triscoreSB.metric = NULL; // not a factory metric
+    triscoreSB.penColor = QColor(Qt::yellow);
+    triscoreSB.curveStyle = QwtPlotCurve::Steps;
+    triscoreSB.symbolStyle = QwtSymbol::NoSymbol;
+    triscoreSB.smooth = false;
+    triscoreSB.trendtype = 0;
+    triscoreSB.topN = 1;
+    triscoreSB.uname = triscoreSB.name = tr("TriScore Stress Balance");
+    triscoreSB.units = "Stress Balance";
+    triscoreSB.uunits = tr("Stress Balance");
+    metrics.append(triscoreSB);
 
-    MetricDetail govssSTR;
-    govssSTR.type = METRIC_PM;
-    govssSTR.symbol = "govss_sr";
-    govssSTR.metric = NULL; // not a factory metric
-    govssSTR.penColor = QColor(Qt::darkGreen);
-    govssSTR.curveStyle = QwtPlotCurve::Steps;
-    govssSTR.symbolStyle = QwtSymbol::NoSymbol;
-    govssSTR.smooth = false;
-    govssSTR.trendtype = 0;
-    govssSTR.topN = 1;
-    govssSTR.uname = govssSTR.name = tr("GOVSS STS Ramp");
-    govssSTR.units = "Ramp";
-    govssSTR.uunits = tr("Ramp");
-    metrics.append(govssSTR);
+    MetricDetail triscoreSTR;
+    triscoreSTR.type = METRIC_PM;
+    triscoreSTR.symbol = "triscore_sr";
+    triscoreSTR.metric = NULL; // not a factory metric
+    triscoreSTR.penColor = QColor(Qt::darkGreen);
+    triscoreSTR.curveStyle = QwtPlotCurve::Steps;
+    triscoreSTR.symbolStyle = QwtSymbol::NoSymbol;
+    triscoreSTR.smooth = false;
+    triscoreSTR.trendtype = 0;
+    triscoreSTR.topN = 1;
+    triscoreSTR.uname = triscoreSTR.name = tr("TriScore STS Ramp");
+    triscoreSTR.units = "Ramp";
+    triscoreSTR.uunits = tr("Ramp");
+    metrics.append(triscoreSTR);
 
-    MetricDetail govssLTR;
-    govssLTR.type = METRIC_PM;
-    govssLTR.symbol = "govss_lr";
-    govssLTR.metric = NULL; // not a factory metric
-    govssLTR.penColor = QColor(Qt::darkBlue);
-    govssLTR.curveStyle = QwtPlotCurve::Steps;
-    govssLTR.symbolStyle = QwtSymbol::NoSymbol;
-    govssLTR.smooth = false;
-    govssLTR.trendtype = 0;
-    govssLTR.topN = 1;
-    govssLTR.uname = govssLTR.name = tr("GOVSS LTS Ramp");
-    govssLTR.units = "Ramp";
-    govssLTR.uunits = tr("Ramp");
-    metrics.append(govssLTR);
+    MetricDetail triscoreLTR;
+    triscoreLTR.type = METRIC_PM;
+    triscoreLTR.symbol = "triscore_lr";
+    triscoreLTR.metric = NULL; // not a factory metric
+    triscoreLTR.penColor = QColor(Qt::darkBlue);
+    triscoreLTR.curveStyle = QwtPlotCurve::Steps;
+    triscoreLTR.symbolStyle = QwtSymbol::NoSymbol;
+    triscoreLTR.smooth = false;
+    triscoreLTR.trendtype = 0;
+    triscoreLTR.topN = 1;
+    triscoreLTR.uname = triscoreLTR.name = tr("TriScore LTS Ramp");
+    triscoreLTR.units = "Ramp";
+    triscoreLTR.uunits = tr("Ramp");
+    metrics.append(triscoreLTR);
 
     // done
 
