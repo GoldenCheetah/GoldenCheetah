@@ -115,6 +115,21 @@ RideCache::configChanged(qint32 what)
         }
     }
 
+    // if metadata changed then recompute diary text
+    if (what & CONFIG_FIELDS) {
+        foreach(RideItem *item, rides()) {
+
+            // Construct the summary text used on the calendar
+            QString calendarText;
+
+            foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) 
+                if (field.diary == true) 
+                    calendarText += QString("%1\n").arg(item->metadata_.value(field.name, ""));
+
+            item->metadata_.insert("Calendar Text", calendarText);
+        }
+    }
+
     // if zones or weight has changed refresh metrics
     // will add more as they come
     qint32 want = CONFIG_ATHLETE | CONFIG_ZONES | CONFIG_NOTECOLOR | CONFIG_DISCOVERY | CONFIG_GENERAL;
