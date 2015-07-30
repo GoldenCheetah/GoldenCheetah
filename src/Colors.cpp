@@ -538,6 +538,14 @@ Themes::Themes()
     themes << add;
     colors.clear();
 
+    add.name = tr("Corporate Junky"); // New v3.2 colors // ** DARK **
+    colors << QColor(30,30,30) << QColor(Qt::white) << QColor(85,170,255) << QColor(194,194,194) << QColor(Qt::yellow);
+    //            HR              Speed                Power                 Cadence             Torque
+    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::yellow) << QColor(0,204,204) << QColor(Qt::magenta) ;
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
 
     // now some popular combos from Kueler
     add.name = tr("Neutral Blue"); // ** DARK **
