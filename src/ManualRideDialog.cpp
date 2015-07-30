@@ -167,10 +167,10 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     distance->setMinimum(0);
     distance->setMaximum(999);
 
-    QLabel *sportLabel = new QLabel(tr("Sport:"), this);
-    sport = new QLineEdit(this);
     QLabel *wcodeLabel = new QLabel(tr("Workout Code:"), this);
     wcode = new QLineEdit(this);
+    QLabel *sportLabel = new QLabel(tr("Sport:"), this);
+    sport = new QLineEdit(this);
     QLabel *notesLabel = new QLabel(tr("Notes:"), this);
     notes = new QTextEdit(this);
 

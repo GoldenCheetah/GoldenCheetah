@@ -120,13 +120,13 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     maxhr->setValue(190);
 
     // cvRn default is a nice round number comparable to CP default
-    cvRn = new QTimeEdit(QTime::fromString("04:00", "mm:ss"));
+    cvRn = new QTimeEdit(QTime::fromString("04:00", "mm:ss"), this);
     cvRn->setMinimumTime(QTime::fromString("01:00", "mm:ss"));
     cvRn->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
     cvRn->setDisplayFormat("mm:ss");
 
     // cvSw default is in 4-1 relation to cvRun
-    cvSw = new QTimeEdit(QTime::fromString("01:36", "mm:ss"));
+    cvSw = new QTimeEdit(QTime::fromString("01:36", "mm:ss"), this);
     cvSw->setMinimumTime(QTime::fromString("01:00", "mm:ss"));
     cvSw->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
     cvSw->setDisplayFormat("mm:ss");
