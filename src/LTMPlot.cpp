@@ -2964,8 +2964,8 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
             scoreType = "skiba_wprime_exp";
         } else if (metricDetail.symbol.startsWith("distance")) {
             scoreType = "total_distance";
-        } else if (metricDetail.symbol.startsWith("govss")) {
-            scoreType = "govss";
+        } else if (metricDetail.symbol.startsWith("triscore")) {
+            scoreType = "triscore";
         }
 
         stressType = STRESS_LTS; // if in doubt
