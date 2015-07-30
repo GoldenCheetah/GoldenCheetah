@@ -128,6 +128,11 @@ RideItem::metaCRC()
     i.toFront();
     while(i.hasNext()) {
         i.next();
+
+        // ignore calendar texts as they change 
+        // with configuration, not user updates
+        if (i.key() == "Calendar Text") continue;
+
         ba.append(i.key());
         ba.append(i.value());
     }
