@@ -309,12 +309,13 @@ LTMPlot::setData(LTMSettings *set)
     // reset all min/max Y values
     for (int i=0; i<10; i++) minY[i]=0, maxY[i]=0;
 
-    // no data to display so that all folks
-    if (context->athlete->rideCache->rides().count() == 0) {
+    // how many ?
+    maxX = groupForDate(settings->end.date(), settings->groupBy) -
+           groupForDate(settings->start.date(), settings->groupBy);
 
-        // tidy up the bottom axis
-        maxX = groupForDate(settings->end.date(), settings->groupBy) -
-                groupForDate(settings->start.date(), settings->groupBy);
+    // no data to display so that all folks
+    if (context->athlete->rideCache->rides().count() == 0 || maxX <= 0) {
+
 
         setAxisScale(xBottom, 0, maxX);
         setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
