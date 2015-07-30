@@ -74,9 +74,13 @@
         <translation type="vanished">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cpp" line="62"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</source>
-        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
+        <translation type="vanished">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
+    </message>
+    <message>
+        <location filename="../AboutDialog.cpp" line="62"/>
+        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</source>
+        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore cortesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed cortesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
     </message>
 </context>
 <context>
@@ -7890,7 +7894,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>segundos</translation>
     </message>
     <message>
-        <location filename="../RideMetadata.cpp" line="656"/>
+        <location filename="../RideMetadata.cpp" line="772"/>
         <source>You entered &apos;%1&apos; which is not an expected value.</source>
         <translation>El valor ingresado &apos;%1&apos; no es válido.</translation>
     </message>
@@ -9043,7 +9047,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>GcWindowDialog</name>
     <message>
-        <location filename="../HomeWindow.cpp" line="1036"/>
+        <location filename="../HomeWindow.cpp" line="1039"/>
         <source>Chart Setup</source>
         <translation>Configuración de Gráfico</translation>
     </message>
@@ -9056,12 +9060,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">Factor de Ancho</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1084"/>
+        <location filename="../HomeWindow.cpp" line="1087"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1085"/>
+        <location filename="../HomeWindow.cpp" line="1088"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -10512,33 +10516,33 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">Agregar Cuadro..</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="625"/>
+        <location filename="../HomeWindow.cpp" line="628"/>
         <source>Are you sure you want to remove the chart?</source>
         <translation>Confirma elminación del gráfico?</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="626"/>
+        <location filename="../HomeWindow.cpp" line="629"/>
         <source>Remove</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1486"/>
+        <location filename="../HomeWindow.cpp" line="1489"/>
         <source>Stress</source>
         <translation>Estrés</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1487"/>
+        <location filename="../HomeWindow.cpp" line="1490"/>
         <source>Scatter</source>
         <translation>Dispersión</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1488"/>
-        <location filename="../HomeWindow.cpp" line="1490"/>
+        <location filename="../HomeWindow.cpp" line="1491"/>
+        <location filename="../HomeWindow.cpp" line="1493"/>
         <source>HrPw</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1489"/>
+        <location filename="../HomeWindow.cpp" line="1492"/>
         <source>Activity Log</source>
         <translation>Registro de Actividades</translation>
     </message>
@@ -10548,177 +10552,177 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Título</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1183"/>
+        <location filename="../HomeWindow.cpp" line="1186"/>
         <source>Problem Saving Chart Bar Layout</source>
         <translation>Problemas Guardando Diseño de Gráfico de Barras</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1184"/>
+        <location filename="../HomeWindow.cpp" line="1187"/>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
         <translation>Archivo: %1 no se puede abrir para &apos;Escritura&apos;. Verifique las propiedades del archivo.</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1457"/>
+        <location filename="../HomeWindow.cpp" line="1460"/>
         <source>Ride Log</source>
         <translation>Registro de Actividades</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1458"/>
+        <location filename="../HomeWindow.cpp" line="1461"/>
         <source>Aerobic Power</source>
         <translation>Potencia Aeróbica</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1459"/>
+        <location filename="../HomeWindow.cpp" line="1462"/>
         <source>Anaerobic Power</source>
         <translation>Potencia Anaeróbica</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1460"/>
+        <location filename="../HomeWindow.cpp" line="1463"/>
         <source>Cadence</source>
         <translation>Cadencia</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1461"/>
+        <location filename="../HomeWindow.cpp" line="1464"/>
         <source>Calendar</source>
         <translation>Calendario</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1462"/>
+        <location filename="../HomeWindow.cpp" line="1465"/>
         <source>CP</source>
         <translation>PC</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1463"/>
+        <location filename="../HomeWindow.cpp" line="1466"/>
         <source>Details</source>
         <translation>Detalles</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1464"/>
+        <location filename="../HomeWindow.cpp" line="1467"/>
         <source>Distance</source>
         <translation>Distancia</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1465"/>
+        <location filename="../HomeWindow.cpp" line="1468"/>
         <source>Edit</source>
         <translation>Editar</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1466"/>
+        <location filename="../HomeWindow.cpp" line="1469"/>
         <source>Elapsed Time</source>
         <translation>Tiempo Transcurrido</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1467"/>
+        <location filename="../HomeWindow.cpp" line="1470"/>
         <source>Heartrate</source>
         <translation>Frec. Cardíaca</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1468"/>
+        <location filename="../HomeWindow.cpp" line="1471"/>
         <source>Lap</source>
         <translation>Vuelta</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1469"/>
+        <location filename="../HomeWindow.cpp" line="1472"/>
         <source>Map</source>
         <translation>Mapa</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1470"/>
+        <location filename="../HomeWindow.cpp" line="1473"/>
         <source>Performance</source>
         <translation>Gráfico de Curvas</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1471"/>
+        <location filename="../HomeWindow.cpp" line="1474"/>
         <source>PMC</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1472"/>
+        <location filename="../HomeWindow.cpp" line="1475"/>
         <source>Power</source>
         <translation>Potencia</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1473"/>
+        <location filename="../HomeWindow.cpp" line="1476"/>
         <source>QA</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1474"/>
+        <location filename="../HomeWindow.cpp" line="1477"/>
         <source>Ride</source>
         <translation>Gráfico</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1475"/>
+        <location filename="../HomeWindow.cpp" line="1478"/>
         <source>Speed</source>
         <translation>Velocidad</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1476"/>
+        <location filename="../HomeWindow.cpp" line="1479"/>
         <source>Summary</source>
         <translation>Resúmen</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1477"/>
+        <location filename="../HomeWindow.cpp" line="1480"/>
         <source>Target Power</source>
         <translation>Potencia Objectivo</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1478"/>
+        <location filename="../HomeWindow.cpp" line="1481"/>
         <source>Time and Distance</source>
         <translation>Tiempo y Distancia</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1479"/>
+        <location filename="../HomeWindow.cpp" line="1482"/>
         <source>Time In Zone</source>
         <translation>Tiempo por Zonas</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1480"/>
+        <location filename="../HomeWindow.cpp" line="1483"/>
         <source>W&apos; In Zone</source>
         <translation>W&apos; En Zona</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1481"/>
+        <location filename="../HomeWindow.cpp" line="1484"/>
         <source>Sustained In Zone</source>
         <translation>Sostenido en Zona</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1482"/>
+        <location filename="../HomeWindow.cpp" line="1485"/>
         <source>Training Mix</source>
         <translation>Mezcla de Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1483"/>
+        <location filename="../HomeWindow.cpp" line="1486"/>
         <source>Navigator</source>
         <translation>Registro de Actividades</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1484"/>
+        <location filename="../HomeWindow.cpp" line="1487"/>
         <source>W/kg</source>
         <translation>Vatios/kg</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1485"/>
+        <location filename="../HomeWindow.cpp" line="1488"/>
         <source>Workout</source>
         <translation>Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1491"/>
+        <location filename="../HomeWindow.cpp" line="1494"/>
         <source>Tracker</source>
         <translation>Seguimiento</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1492"/>
+        <location filename="../HomeWindow.cpp" line="1495"/>
         <source>CP History</source>
         <translation>Histórico PC</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1493"/>
+        <location filename="../HomeWindow.cpp" line="1496"/>
         <source>Library</source>
         <translation>Biblioteca</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1494"/>
+        <location filename="../HomeWindow.cpp" line="1497"/>
         <source>CV</source>
         <translation>VC</translation>
     </message>
@@ -12466,16 +12470,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Mejores %1</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1276"/>
-        <location filename="../LTMPlot.cpp" line="2383"/>
         <source>trend</source>
-        <translation>tendencia</translation>
+        <translation type="vanished">tendencia</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1276"/>
-        <location filename="../LTMPlot.cpp" line="2383"/>
         <source>Outliers</source>
-        <translation>Atípicos</translation>
+        <translation type="vanished">Atípicos</translation>
     </message>
     <message>
         <location filename="../LTMPlot.cpp" line="1276"/>
@@ -12721,196 +12721,196 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Resúmen</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="427"/>
-        <location filename="../LTMSidebar.cpp" line="440"/>
-        <location filename="../LTMSidebar.cpp" line="471"/>
+        <location filename="../LTMSidebar.cpp" line="449"/>
+        <location filename="../LTMSidebar.cpp" line="462"/>
+        <location filename="../LTMSidebar.cpp" line="493"/>
         <source>Add season</source>
         <translation>Agregar Rango de Fechas</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="441"/>
-        <location filename="../LTMSidebar.cpp" line="476"/>
+        <location filename="../LTMSidebar.cpp" line="463"/>
+        <location filename="../LTMSidebar.cpp" line="498"/>
         <source>Edit season</source>
         <translation>Editar Rango de Fechas</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="442"/>
-        <location filename="../LTMSidebar.cpp" line="477"/>
+        <location filename="../LTMSidebar.cpp" line="464"/>
+        <location filename="../LTMSidebar.cpp" line="499"/>
         <source>Delete season</source>
         <translation>Eliminar Rango de Fechas</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="443"/>
-        <location filename="../LTMSidebar.cpp" line="478"/>
-        <location filename="../LTMSidebar.cpp" line="1072"/>
-        <location filename="../LTMSidebar.cpp" line="1079"/>
+        <location filename="../LTMSidebar.cpp" line="465"/>
+        <location filename="../LTMSidebar.cpp" line="500"/>
+        <location filename="../LTMSidebar.cpp" line="1094"/>
+        <location filename="../LTMSidebar.cpp" line="1101"/>
         <source>Add Event</source>
         <translation>Agregar Evento</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="511"/>
-        <location filename="../LTMSidebar.cpp" line="553"/>
+        <location filename="../LTMSidebar.cpp" line="533"/>
+        <location filename="../LTMSidebar.cpp" line="575"/>
         <source>Edit details</source>
         <translation>Editar detalles</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="512"/>
-        <location filename="../LTMSidebar.cpp" line="554"/>
+        <location filename="../LTMSidebar.cpp" line="534"/>
+        <location filename="../LTMSidebar.cpp" line="576"/>
         <source>Delete event</source>
         <translation>Eliminar Evento</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="522"/>
-        <location filename="../LTMSidebar.cpp" line="547"/>
+        <location filename="../LTMSidebar.cpp" line="544"/>
+        <location filename="../LTMSidebar.cpp" line="569"/>
         <source>Add event</source>
         <translation>Agregar Evento</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="580"/>
+        <location filename="../LTMSidebar.cpp" line="602"/>
         <source>Workout Code|Sport</source>
         <translation>Código Entrenamiento|Deporte</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="661"/>
-        <location filename="../LTMSidebar.cpp" line="819"/>
-        <location filename="../LTMSidebar.cpp" line="869"/>
+        <location filename="../LTMSidebar.cpp" line="683"/>
+        <location filename="../LTMSidebar.cpp" line="841"/>
+        <location filename="../LTMSidebar.cpp" line="891"/>
         <source>(blank)</source>
         <translation>(blanco)</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="919"/>
+        <location filename="../LTMSidebar.cpp" line="941"/>
         <source>Manage Filters</source>
         <translation>Administrar Filtros</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="925"/>
+        <location filename="../LTMSidebar.cpp" line="947"/>
         <source>Delete Filter%1</source>
         <translation>Borrar Filtro %1</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1026"/>
+        <location filename="../LTMSidebar.cpp" line="1048"/>
         <source>Edit Season</source>
         <translation>Editar Temporada</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1026"/>
+        <location filename="../LTMSidebar.cpp" line="1048"/>
         <source>You can only edit user defined seasons. Please select a season you have created for editing.</source>
         <translation>Solo se pueden editar temporadas definidas por el usuario. Elija una de ellas para edición.</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1059"/>
+        <location filename="../LTMSidebar.cpp" line="1081"/>
         <source>Delete Season</source>
         <translation>Eliminar Temporada</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1059"/>
+        <location filename="../LTMSidebar.cpp" line="1081"/>
         <source>You can only delete user defined seasons. Please select a season you have created for deletion.</source>
         <translation>Solo se pueden eliminar temporadas definidas por el usuario. Elija una de ellas para eliminar.</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1072"/>
-        <location filename="../LTMSidebar.cpp" line="1079"/>
+        <location filename="../LTMSidebar.cpp" line="1094"/>
+        <location filename="../LTMSidebar.cpp" line="1101"/>
         <source>You can only add events to user defined seasons. Please select a season you have created before adding an event.</source>
         <translation>Solo es posible agregar eventos a rangos de fechas definidos por el usuario, por favor seleccione un rango de fechas que haya creado previamente para agregar un evento.</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1228"/>
+        <location filename="../LTMSidebar.cpp" line="1250"/>
         <source>Totals</source>
         <translation>Totales</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1233"/>
+        <location filename="../LTMSidebar.cpp" line="1255"/>
         <source>Averages</source>
         <translation>Promedios</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1238"/>
+        <location filename="../LTMSidebar.cpp" line="1260"/>
         <source>Maximums</source>
         <translation>Máximos</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1243"/>
+        <location filename="../LTMSidebar.cpp" line="1265"/>
         <source>Metrics</source>
         <translation>Métricas</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1264"/>
+        <location filename="../LTMSidebar.cpp" line="1286"/>
         <source>^(Average|Max) </source>
         <translation>( Media| Máx)</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1268"/>
+        <location filename="../LTMSidebar.cpp" line="1290"/>
         <source>seconds</source>
         <translation>segundos</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1313"/>
+        <location filename="../LTMSidebar.cpp" line="1335"/>
         <source>Add Chart</source>
         <translation>Agregar Gráfico</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1320"/>
+        <location filename="../LTMSidebar.cpp" line="1342"/>
         <source>Edit Chart</source>
         <translation>Editar Gráfico</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1321"/>
+        <location filename="../LTMSidebar.cpp" line="1343"/>
         <source>Delete Chart</source>
         <translation>Eliminar Gráfico</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1330"/>
+        <location filename="../LTMSidebar.cpp" line="1352"/>
         <source>Delete Selected Charts</source>
         <translation>Eliminar Gráficos Seleccionados</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1338"/>
+        <location filename="../LTMSidebar.cpp" line="1360"/>
         <source>Export Chart</source>
         <translation>Exportar Gráfico</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1340"/>
+        <location filename="../LTMSidebar.cpp" line="1362"/>
         <source>Export Selected Charts</source>
         <translation>Exportar Gráficos Seleccionados</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1352"/>
+        <location filename="../LTMSidebar.cpp" line="1374"/>
         <source>Import Charts</source>
         <translation>Importar Gráficos</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1359"/>
+        <location filename="../LTMSidebar.cpp" line="1381"/>
         <source>Reset to default</source>
         <translation>Restablecer Gráficos por defecto</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1449"/>
+        <location filename="../LTMSidebar.cpp" line="1471"/>
         <source>Export Charts</source>
         <translation>Exportar Gráficos</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1449"/>
-        <location filename="../LTMSidebar.cpp" line="1469"/>
+        <location filename="../LTMSidebar.cpp" line="1471"/>
+        <location filename="../LTMSidebar.cpp" line="1491"/>
         <source>Chart File (*.xml)</source>
         <translation>Archivo de Gráfico (*.xml)</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1500"/>
+        <location filename="../LTMSidebar.cpp" line="1522"/>
         <source>Entry Error</source>
         <translation>Error de Ingreso</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1500"/>
+        <location filename="../LTMSidebar.cpp" line="1522"/>
         <source>Selected file (%1) does not exist</source>
         <translation>El archivo seleccionado (%1) no existe</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1510"/>
+        <location filename="../LTMSidebar.cpp" line="1532"/>
         <source>You are about to reset the chart sidebar to the default setup</source>
         <translation>Está por reconfigurar la barra lateral de gráficos a su estado por defecto</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1511"/>
+        <location filename="../LTMSidebar.cpp" line="1533"/>
         <source>Do you want to continue?</source>
         <translation>¿Desea continuar?</translation>
     </message>
@@ -14335,8 +14335,8 @@ Saltando archivo...</translation>
         <translation type="obsolete">&amp;Nuevo...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1699"/>
-        <location filename="../MainWindow.cpp" line="1741"/>
+        <location filename="../MainWindow.cpp" line="1705"/>
+        <location filename="../MainWindow.cpp" line="1747"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
@@ -14683,23 +14683,23 @@ Saltando archivo...</translation>
         <translation type="obsolete">Borrar intervalo seleccionado</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1333"/>
+        <location filename="../MainWindow.cpp" line="1339"/>
         <source>Select Activity</source>
         <translation>Elegir Actividad</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1333"/>
-        <location filename="../MainWindow.cpp" line="1457"/>
+        <location filename="../MainWindow.cpp" line="1339"/>
+        <location filename="../MainWindow.cpp" line="1463"/>
         <source>No activity selected!</source>
         <translation>No hay actividad seleccionada!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1344"/>
+        <location filename="../MainWindow.cpp" line="1350"/>
         <source>Export Activity</source>
         <translation>Exportar Actividad</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1358"/>
+        <location filename="../MainWindow.cpp" line="1364"/>
         <source>Export Failed</source>
         <translation>Falló la Exportación</translation>
     </message>
@@ -14708,13 +14708,13 @@ Saltando archivo...</translation>
         <translation type="vanished">Error al exportar actividad, verifique los permisos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1433"/>
-        <location filename="../MainWindow.cpp" line="1445"/>
+        <location filename="../MainWindow.cpp" line="1439"/>
+        <location filename="../MainWindow.cpp" line="1451"/>
         <source>No activity selected</source>
         <translation>No hay actividad seleccionada</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1435"/>
+        <location filename="../MainWindow.cpp" line="1441"/>
         <source>Current activity contains no data to split</source>
         <translation>La actividad seleccionada no tiene datos para dividir</translation>
     </message>
@@ -15014,7 +15014,7 @@ PC del Atleta en %3 vatios</translation>
         <translation>%1 Gráficos Importados</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1447"/>
+        <location filename="../MainWindow.cpp" line="1453"/>
         <source>Current activity contains no data to merge</source>
         <translation>La actividad seleccionada no tiene datos para combinar</translation>
     </message>
@@ -15039,13 +15039,13 @@ PC del Atleta en %3 vatios</translation>
         <translation type="vanished">La actividad seleccionada no tiene datos para combinar</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1699"/>
-        <location filename="../MainWindow.cpp" line="1741"/>
+        <location filename="../MainWindow.cpp" line="1705"/>
+        <location filename="../MainWindow.cpp" line="1747"/>
         <source>&amp;New Athlete...</source>
         <translation>&amp;Nuevo Atleta...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1818"/>
+        <location filename="../MainWindow.cpp" line="1824"/>
         <source>Refresh in Progress</source>
         <translation>Actualización en Curso</translation>
     </message>
@@ -15083,7 +15083,7 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="452"/>
-        <location filename="../MainWindow.cpp" line="1457"/>
+        <location filename="../MainWindow.cpp" line="1463"/>
         <source>Delete Activity</source>
         <translation>Eliminar Actividad</translation>
     </message>
@@ -15103,20 +15103,20 @@ PC del Atleta en %3 vatios</translation>
         <translation>Combinar actividades...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1359"/>
+        <location filename="../MainWindow.cpp" line="1365"/>
         <source>Failed to export activity, please check permissions</source>
         <translation>Error al exportar actividad, verifique los permisos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1396"/>
+        <location filename="../MainWindow.cpp" line="1402"/>
         <source>There is no currently selected activity to save.</source>
         <translation>No hay actividad seleccionada para guardar.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1433"/>
-        <location filename="../MainWindow.cpp" line="1435"/>
-        <location filename="../MainWindow.cpp" line="1445"/>
-        <location filename="../MainWindow.cpp" line="1447"/>
+        <location filename="../MainWindow.cpp" line="1439"/>
+        <location filename="../MainWindow.cpp" line="1441"/>
+        <location filename="../MainWindow.cpp" line="1451"/>
+        <location filename="../MainWindow.cpp" line="1453"/>
         <source>Split Activity</source>
         <translation>Dividir Actividad</translation>
     </message>
@@ -15197,13 +15197,13 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">El archivo %1 no se puede abrir para escritura</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1380"/>
-        <location filename="../MainWindow.cpp" line="1878"/>
+        <location filename="../MainWindow.cpp" line="1386"/>
+        <location filename="../MainWindow.cpp" line="1884"/>
         <source>Import from File</source>
         <translation>Importar de Archivo</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1395"/>
+        <location filename="../MainWindow.cpp" line="1401"/>
         <source>No Activity To Save</source>
         <translation>No hay actividad para Guardar</translation>
     </message>
@@ -15212,22 +15212,22 @@ PC del Atleta en %3 vatios</translation>
         <translation type="vanished">No hay actividad seleccionada para guardar.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1463"/>
+        <location filename="../MainWindow.cpp" line="1469"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation>Confirma que quiere eliminar la actividad:</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1824"/>
+        <location filename="../MainWindow.cpp" line="1830"/>
         <source>Export Metrics</source>
         <translation>Exportar Métricas</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1824"/>
+        <location filename="../MainWindow.cpp" line="1830"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation>Variables Separada por Comas (*.csv)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1908"/>
+        <location filename="../MainWindow.cpp" line="1914"/>
         <source>Workout Directory Invalid</source>
         <translation>Directorio de Entrenamientos Inválido</translation>
     </message>
@@ -15332,7 +15332,7 @@ PC del ciclista %3 vatios</translation>
         <translation type="vanished">Confirma que quiere eliminar la actividad: </translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1465"/>
+        <location filename="../MainWindow.cpp" line="1471"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
@@ -22053,12 +22053,12 @@ Saltando archivo...</translation>
 <context>
     <name>RideMetadata</name>
     <message>
-        <location filename="../RideMetadata.cpp" line="1038"/>
+        <location filename="../RideMetadata.cpp" line="1188"/>
         <source>Problem Saving Meta Data</source>
         <translation>Problemas Guardando Meta Datos</translation>
     </message>
     <message>
-        <location filename="../RideMetadata.cpp" line="1039"/>
+        <location filename="../RideMetadata.cpp" line="1189"/>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
         <translation>Archivo: %1 no se puede abrir para &apos;Escritura&apos;. Verifique las propiedades del archivo.</translation>
     </message>
@@ -22246,6 +22246,11 @@ Saltando archivo...</translation>
         <location filename="../RideSummaryWindow.cpp" line="1370"/>
         <source>dd MMM yyyy</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="1405"/>
+        <source>&lt;br&gt;BikeScore and SwimScore are trademarks of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
+        <translation>&lt;br&gt;BikeScore y SwimScore son marcas registradas del Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="1408"/>
@@ -22454,7 +22459,6 @@ Saltando archivo...</translation>
         <translation> entrenamientos de natación</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1405"/>
         <location filename="../RideSummaryWindow.cpp" line="2226"/>
         <source>&lt;br&gt;BikeScore is a trademark of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
         <translation>&lt;br&gt;BikeScore es una marca registrada del Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</translation>
