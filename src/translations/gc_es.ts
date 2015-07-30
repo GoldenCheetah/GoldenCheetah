@@ -13253,29 +13253,24 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>TRIMP: Rampa ELP</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1093"/>
         <source>GOVSS Long Term Stress</source>
-        <translation>GOVSS: Estrés a Largo Plazo</translation>
+        <translation type="vanished">GOVSS: Estrés a Largo Plazo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1108"/>
         <source>GOVSS Short Term Stress</source>
-        <translation>GOVSS: Estrés a Corto Plazo</translation>
+        <translation type="vanished">GOVSS: Estrés a Corto Plazo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1123"/>
         <source>GOVSS Stress Balance</source>
-        <translation>GOVSS: Balance de Estrés</translation>
+        <translation type="vanished">GOVSS: Balance de Estrés</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1138"/>
         <source>GOVSS STS Ramp</source>
-        <translation>GOVSS: Rampa ECP</translation>
+        <translation type="vanished">GOVSS: Rampa ECP</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1153"/>
         <source>GOVSS LTS Ramp</source>
-        <translation>GOVSS: Rampa ELP</translation>
+        <translation type="vanished">GOVSS: Rampa ELP</translation>
     </message>
     <message>
         <source>Entry Error</source>
@@ -13609,6 +13604,31 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <location filename="../LTMTool.cpp" line="299"/>
         <source>Curves</source>
         <translation>Curvas</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1093"/>
+        <source>TriScore Long Term Stress</source>
+        <translation>TriScore: Estrés a Largo Plazo</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1108"/>
+        <source>TriScore Short Term Stress</source>
+        <translation>TriScore: Estrés a Corto Plazo</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1123"/>
+        <source>TriScore Stress Balance</source>
+        <translation>TriScore: Balance de Estrés</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1138"/>
+        <source>TriScore STS Ramp</source>
+        <translation>TriScore: Rampa ECP</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1153"/>
+        <source>TriScore LTS Ramp</source>
+        <translation>TriScore: Rampa ELP</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1229"/>
@@ -15475,12 +15495,12 @@ PC del ciclista %3 vatios</translation>
         <translation>Distancia (%1):</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="170"/>
+        <location filename="../ManualRideDialog.cpp" line="172"/>
         <source>Sport:</source>
         <translation>Deporte:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="172"/>
+        <location filename="../ManualRideDialog.cpp" line="170"/>
         <source>Workout Code:</source>
         <translation>Código:</translation>
     </message>
