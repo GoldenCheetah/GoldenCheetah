@@ -1366,7 +1366,11 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     chromeCombo = new QComboBox(this);
     chromeCombo->addItem(tr("Metallic (Mac)"));
     chromeCombo->addItem(tr("Flat Color (Windows)"));
+#ifdef Q_OS_MAC // gets reset on yosemite anyway
     QString chrome = appsettings->value(this, GC_CHROME, "Mac").toString();
+#else
+    QString chrome = appsettings->value(this, GC_CHROME, "Flat").toString();
+#endif
     if (chrome == "Mac") chromeCombo->setCurrentIndex(0);
     if (chrome == "Flat") chromeCombo->setCurrentIndex(1);
 
