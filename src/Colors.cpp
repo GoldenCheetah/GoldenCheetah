@@ -177,7 +177,7 @@ void GCColor::setupColors()
 #ifdef Q_OS_MAC
         { tr("Toolbar and Sidebar"), "CCHROME", QColor(213,213,213) },
 #else
-        { tr("Toolbar and Sidebar"), "CCHROME", QColor(108,108,108) },
+        { tr("Toolbar and Sidebar"), "CCHROME", QColor(0xec,0xec,0xec) },
 #endif
 #endif
         { "", "", QColor(0,0,0) },
@@ -435,7 +435,12 @@ GCColor::stylesheet()
 bool
 GCColor::isFlat()
 {
+    // if not set, Mac is default on Mac, otherwise Flat everywhere else
+#ifdef Q_OS_MAC
     return (appsettings->value(NULL, GC_CHROME, "Mac").toString() == "Flat");
+#else
+    return (appsettings->value(NULL, GC_CHROME, "Flat").toString() == "Flat");
+#endif
 }
 
 // setup a linearGradient for the metallic backgrounds used on things like
