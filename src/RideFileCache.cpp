@@ -1203,7 +1203,7 @@ MeanMaxComputer::run()
     // xPower - 25s EWA - uses same algorithm as BikeScore.cpp
     if (series == RideFile::xPower) {
 
-        const double exp = 2.0f / ((25.0f / ride->recIntSecs()) + 1.0f);
+        const double exp = ride->recIntSecs() / ((25.0f / ride->recIntSecs()) + ride->recIntSecs());
         const double rem = 1.0f - exp;
 
         int rollingwindowsize = 25 / ride->recIntSecs();
