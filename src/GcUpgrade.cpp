@@ -204,7 +204,7 @@ GcUpgrade::upgrade(const QDir &home)
 
         // 4. Theme and Chrome Color
         QString theme = "Flat";
-        QColor chromeColor = QColor(Qt::darkGray);
+        QColor chromeColor = QColor(0xec,0xec,0xec);
 #ifdef Q_OS_MAC
         // Yosemite or earlier 
         if (QSysInfo::MacintoshVersion >= 12) {

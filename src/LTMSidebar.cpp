@@ -398,7 +398,10 @@ LTMSidebar::resetSeasons()
     for (i=allDateRanges->childCount(); i > 0; i--) {
         delete allDateRanges->takeChild(0);
     }
-    QString id = appsettings->cvalue(context->athlete->cyclist, GC_LTM_LAST_DATE_RANGE, seasons->seasons.at(0).id().toString()).toString();
+
+    // by default choose last 3 months not first one, since the first one is all dates
+    // and that means aggregating all data when first starting...
+    QString id = appsettings->cvalue(context->athlete->cyclist, GC_LTM_LAST_DATE_RANGE, "{00000000-0000-0000-0000-000000000012}").toString();
     for (i=0; i <seasons->seasons.count(); i++) {
         Season season = seasons->seasons.at(i);
         QTreeWidgetItem *add = new QTreeWidgetItem(allDateRanges, season.getType());
