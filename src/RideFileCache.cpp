@@ -1218,7 +1218,8 @@ MeanMaxComputer::run()
             // loop over the data and convert to a EWMA
             for (int i=0; i<data.points.size(); i++) {
 
-                if (i < rollingwindowsize) {
+                // dgr : BikeScore has weighting value from first point
+                if (false && i < rollingwindowsize) {
 
                     // get up to speed
                     sum += data.points[i].value;
@@ -1261,6 +1262,7 @@ MeanMaxComputer::run()
             else
                 ride_bests[sec] = val;
         }
+
 
         // increments to limit search scope
         if (i<120) i++;
