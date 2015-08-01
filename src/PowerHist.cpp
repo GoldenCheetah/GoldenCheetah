@@ -648,7 +648,7 @@ PowerHist::recalcCompare()
 
                         // now add a label above the bar
                         QwtPlotMarker *label = new QwtPlotMarker();
-                        QwtText text(QString("%1%2").arg(int(yval)).arg(absolutetime ? "" : "%"), QwtText::PlainText);
+                        QwtText text(QString("%1%2").arg(round(yval)).arg(absolutetime ? "" : "%"), QwtText::PlainText);
                         text.setFont(labelFont);
                         text.setColor(color);
                         label->setLabel(text);
@@ -886,7 +886,7 @@ PowerHist::recalc(bool force)
 
                 // now add a label above the bar
                 QwtPlotMarker *label = new QwtPlotMarker();
-                QwtText text(QString("%1%2").arg(int(yval)).arg(absolutetime ? "" : "%"), QwtText::PlainText);
+                QwtText text(QString("%1%2").arg(round(yval)).arg(absolutetime ? "" : "%"), QwtText::PlainText);
                 text.setFont(labelFont);
                 if (series == RideFile::watts)
                     text.setColor(GColor(CPOWER).darker(200));
