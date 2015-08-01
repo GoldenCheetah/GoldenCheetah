@@ -18,6 +18,7 @@
 
 #include "TrainDB.h"
 #include "ErgFile.h"
+#include "VideoSyncFile.h"
 
 // DB Schema Version - YOU MUST UPDATE THIS IF THE TRAIN DB SCHEMA CHANGES
 
@@ -84,6 +85,8 @@ TrainDB::rebuildDB()
     createWorkoutTable();
     dropVideoTable();
     createVideoTable();
+    dropVideoSyncTable();
+    createVideoSyncTable();
 }
 
 bool TrainDB::createVideoTable()
@@ -124,6 +127,45 @@ bool TrainDB::createVideoTable()
         // insert into table
         query.prepare("INSERT INTO version (table_name, schema_version, creation_date) values (?,?,?);");
         query.addBindValue("videos");
+	    query.addBindValue(TrainDBSchemaVersion);
+	    query.addBindValue(QDateTime::currentDateTime().toTime_t());
+        rc = query.exec();
+    }
+    return rc;
+}
+
+bool TrainDB::createVideoSyncTable()
+{
+    QSqlQuery query(db->database(sessionid));
+    bool rc;
+    bool createTables = true;
+
+    // does the table exist?
+    rc = query.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;");
+    if (rc) {
+        while (query.next()) {
+
+            QString table = query.value(0).toString();
+            if (table == "videosyncs") {
+                createTables = false;
+                break;
+            }
+        }
+    }
+    // we need to create it!
+    if (rc && createTables) {
+
+        QString createVideoSyncTable = "create table videosyncs (filepath varchar primary key,"
+                                    "filename varchar);";
+
+        rc = query.exec(createVideoSyncTable);
+
+        // add row to version database
+        query.exec("DELETE FROM version where table_name = \"videosyncs\"");
+
+        // insert into table
+        query.prepare("INSERT INTO version (table_name, schema_version, creation_date) values (?,?);");
+        query.addBindValue("videosyncs");
 	    query.addBindValue(TrainDBSchemaVersion);
 	    query.addBindValue(QDateTime::currentDateTime().toTime_t());
         rc = query.exec();
@@ -196,6 +238,13 @@ bool TrainDB::dropVideoTable()
     return rc;
 }
 
+bool TrainDB::dropVideoSyncTable()
+{
+    QSqlQuery query("DROP TABLE videosyncs", db->database(sessionid));
+    bool rc = query.exec();
+    return rc;
+}
+
 bool TrainDB::dropWorkoutTable()
 {
     QSqlQuery query("DROP TABLE workouts", db->database(sessionid));
@@ -211,6 +260,7 @@ bool TrainDB::createDatabase()
     // Workouts
 	createWorkoutTable();
 	createVideoTable();
+	createVideoSyncTable();
 
     return true;
 }
@@ -239,6 +289,9 @@ void TrainDB::checkDBVersion()
 
         dropVideoTable();
         createVideoTable();
+
+        dropVideoSyncTable();
+        createVideoSyncTable();
         return;
     }
 
@@ -246,6 +299,7 @@ void TrainDB::checkDBVersion()
     // tne current version / crc
     bool dropWorkout = false;
     bool dropVideo = false;
+    bool dropVideoSync = false;
     while (query.next()) {
 
         QString table_name = query.value(0).toString();
@@ -253,12 +307,14 @@ void TrainDB::checkDBVersion()
 
         if (table_name == "workouts" && currentversion != TrainDBSchemaVersion) dropWorkout = true;
         if (table_name == "videos" && currentversion != TrainDBSchemaVersion) dropVideo = true;
+        if (table_name == "videosyncs" && currentversion != TrainDBSchemaVersion) dropVideoSync = true;
     }
     query.finish();
 
     // "workouts" table, is it up-to-date?
     if (dropWorkout) dropWorkoutTable();
     if (dropVideo) dropVideoTable();
+    if (dropVideoSync) dropVideoSyncTable();
 }
 
 int TrainDB::getCount()
@@ -354,6 +410,42 @@ bool TrainDB::importWorkout(QString pathname, ErgFile *ergFile)
 	return rc;
 }
 
+bool TrainDB::deleteVideoSync(QString pathname)
+{
+	QSqlQuery query(db->database(sessionid));
+    QDateTime timestamp = QDateTime::currentDateTime();
+
+    // zap the current row - if there is one
+    query.prepare("DELETE FROM videosyncs WHERE filepath = ?;");
+    query.addBindValue(pathname);
+
+    return query.exec();
+}
+
+bool TrainDB::importVideoSync(QString pathname, VideoSyncFile *videosyncFile)
+{
+	QSqlQuery query(db->database(sessionid));
+    QDateTime timestamp = QDateTime::currentDateTime();
+
+    // zap the current row - if there is one
+    query.prepare("DELETE FROM videosyncs WHERE filepath = ?;");
+    query.addBindValue(pathname);
+    query.exec();
+
+    // construct an insert statement
+    QString insertStatement = "insert into videosyncs ( filepath, filename ) values ( ?,? );";
+	query.prepare(insertStatement);
+
+    // filename, path
+	query.addBindValue(pathname);
+	query.addBindValue(QFileInfo(pathname).fileName());
+
+    // go do it!
+	bool rc = query.exec();
+
+	return rc;
+}
+
 bool TrainDB::deleteVideo(QString pathname)
 {
 	QSqlQuery query(db->database(sessionid));
@@ -379,7 +471,7 @@ bool TrainDB::importVideo(QString pathname)
     QString insertStatement = "insert into videos ( filepath,filename ) values ( ?,? );";
 	query.prepare(insertStatement);
 
-    // filename, timestamp, ride date
+    // filename, path
 	query.addBindValue(pathname);
 	query.addBindValue(QFileInfo(pathname).fileName());
 
