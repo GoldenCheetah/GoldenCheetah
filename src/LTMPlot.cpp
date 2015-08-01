@@ -2494,6 +2494,12 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
 void
 LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool forceZero)
 {
+    // resize the curve array to maximum possible size
+    int maxdays = groupForDate(settings->end.date(), settings->groupBy)
+                    - groupForDate(settings->start.date(), settings->groupBy);
+
+    if (maxdays <= 0) return;
+
     // create curves depending on type ...
     if (metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
         createMetricData(context, settings, metricDetail, x,y,n, forceZero);
@@ -2647,6 +2653,9 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
     int lastDay=0;
     unsigned long secondsPerGroupBy=0;
     bool wantZero = forceZero ? 1 : (metricDetail.curveStyle == QwtPlotCurve::Steps);
+
+    // don't attempt it if the bests are not loaded
+    if (settings->bests == NULL) return;
 
     foreach (RideBest best, *(settings->bests)) { 
 
