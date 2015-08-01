@@ -338,37 +338,37 @@ GcScopeButton::paintEvent(QPaintEvent *)
 
     if (checked && underMouse()) {
         painter.setBrush(QBrush(QColor(150,150,150)));     
-        painter.drawRoundedRect(body, 19, 11);
+        painter.drawRoundedRect(body, 7,6);
         if (highlighted) {
             QColor over = GColor(CCALCURRENT);
             over.setAlpha(180);
             painter.setBrush(over);
-            painter.drawRoundedRect(body, 19, 11);
+            painter.drawRoundedRect(body, 7,6);
         }
         if (red) {
             QColor over = QColor(Qt::red);
             over.setAlpha(180);
             painter.setBrush(over);
-            painter.drawRoundedRect(body, 19, 11);
+            painter.drawRoundedRect(body, 7,6);
         }
     } else if (checked && !underMouse()) {
         painter.setBrush(QBrush(QColor(120,120,120)));     
-        painter.drawRoundedRect(body, 19, 11);
+        painter.drawRoundedRect(body, 7,6);
         if (highlighted) {
             QColor over = GColor(CCALCURRENT);
             over.setAlpha(180);
             painter.setBrush(over);
-            painter.drawRoundedRect(body, 19, 11);
+            painter.drawRoundedRect(body, 7,6);
         }
         if (red) {
             QColor over = QColor(Qt::red);
             over.setAlpha(180);
             painter.setBrush(over);
-            painter.drawRoundedRect(body, 19, 11);
+            painter.drawRoundedRect(body, 7,6);
         }
     } else if (!checked && underMouse()) {
         painter.setBrush(QBrush(QColor(180,180,180)));     
-        painter.drawRoundedRect(body, 19, 11);
+        painter.drawRoundedRect(body, 7,6);
     } else if (!checked && !underMouse()) {
     }
 
