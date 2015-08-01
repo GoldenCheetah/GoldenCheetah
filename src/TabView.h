@@ -101,7 +101,7 @@ class TabView : public QWidget
         virtual void tileModeChanged();
         virtual void selectionChanged();
         virtual void resetLayout();
-        
+
         virtual void addChart(GcWinID id);
 
         // Let the base class handle the splitter movement and
@@ -110,6 +110,7 @@ class TabView : public QWidget
 
         //void mediaSelected(QString filename);
         //void ergSelected(ErgFile *erg);
+        //void videosyncSelected(VideosyncFile *videosync);
         void configChanged(qint32);
 
         void resizeEvent(QResizeEvent*);
@@ -244,7 +245,7 @@ public:
     // handle position
     int hpos() const { if (sizes().count() == 2) return sizes()[0]; else return 0; }
 
-    void sethpos(int x) { 
+    void sethpos(int x) {
         if (x<0) return; //r requested size too small!
         QList<int> csizes = sizes();
         if (csizes.count() != 2) return; //don't have two widgets!
