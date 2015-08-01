@@ -174,12 +174,16 @@ void VideoSyncFile::parseRLV()
                         VideoSyncFilePoint add;
 
                         if (format == RLV) {
-		                    double distance = framemapping.distance; // in meters
-		                    rdist += distance * (double) (framemapping.frameNbr - PreviousFrameNbr);
-                            add.x = rdist;
+                            double distance = framemapping.distance; // in meters per frame
+                            rdist += distance * (double) (framemapping.frameNbr - PreviousFrameNbr);
+                            add.km = rdist / 1000.0;
 
-		                    // time
-                            add.t = (float) framemapping.frameNbr / VideoFrameRate; //FIXME : are we sure that video frame rate will be given prior to mapping?
+                            // time
+                            add.secs = (float) framemapping.frameNbr / VideoFrameRate; //FIXME : are we sure that video frame rate will be given prior to mapping?
+
+                            // speed
+                            add.kph = (distance / 1000.0) * (3600.0 * VideoFrameRate);
+
                             // FIXME : do we have to consider video offset and weight ?
                             PreviousFrameNbr = framemapping.frameNbr;
                         }
@@ -241,7 +245,7 @@ void VideoSyncFile::parseRLV()
         valid = true;
 
         // set RLVFile duration
-        Duration = Points.last().x;      // last is the end point in msecs // FIXME : msec or sec ?
+        Duration = Points.last().secs * 1000.0;      // last is the end point in msecs
         leftPoint = 0;
         rightPoint = 1;
 
