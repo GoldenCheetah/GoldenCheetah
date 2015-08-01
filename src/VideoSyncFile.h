@@ -46,10 +46,11 @@ class VideoSyncFilePoint
 {
     public:
 
-        VideoSyncFilePoint() : x(0), t(0) {}
+        VideoSyncFilePoint() : km(0), secs(0) {}
 
-        double x;     // x axis - distance in meters
-        double t;     // t axis - time in seconds
+        double km;       // x axis - distance in kilometers
+        double secs;     // t axis - time in seconds
+        double kph;      // speed in kilometers per hour
 };
 
 class VideoSyncCourseInfo
@@ -93,7 +94,7 @@ class VideoSyncFile
 
         int leftPoint, rightPoint;            // current points we are between
 
-        QList<VideoSyncFilePoint> Points;    // points in workout
+        QVector<VideoSyncFilePoint> Points;    // points in workout
 
         // Metrics for this workout
 

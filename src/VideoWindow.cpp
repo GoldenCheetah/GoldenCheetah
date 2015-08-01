@@ -238,29 +238,65 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
     if (!m) return;
 
     // find the curPosition
-    QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
-    if (!dataPoints.count()) return;
+    if (context->currentVideoSyncFile())
+    {
+        // when we selected a videosync file in traning mode (rlv...):
 
-    if(dataPoints.count() < curPosition)
-    {
-        curPosition = dataPoints.count();
-    } // make sure the current position is less than the new distance
-    else if (dataPoints[curPosition]->km < rtd.getDistance())
-    {
-        for( ; curPosition < dataPoints.count(); curPosition++)
-            if(dataPoints[curPosition]->km >= rtd.getDistance())
-                break;
+        QVector<VideoSyncFilePoint> VideoSyncFiledataPoints = context->currentVideoSyncFile()->Points;
+
+        if (!VideoSyncFiledataPoints.count()) return;
+
+        if(VideoSyncFiledataPoints.count() < curPosition)
+        {
+            curPosition = VideoSyncFiledataPoints.count();
+        } // make sure the current position is less than the new distance
+        else if (VideoSyncFiledataPoints[curPosition].km < rtd.getDistance())
+        {
+            for( ; curPosition < VideoSyncFiledataPoints.count(); curPosition++)
+                if(VideoSyncFiledataPoints[curPosition].km >= rtd.getDistance())
+                    break;
+        }
+        else
+        {
+            for( ; curPosition > 0; curPosition--)
+                if(VideoSyncFiledataPoints[curPosition].km <= rtd.getDistance())
+                    break;
+        }
+
+        // update the rfp
+        rfp.km = VideoSyncFiledataPoints[curPosition].km;
+        rfp.secs = VideoSyncFiledataPoints[curPosition].secs;
+        rfp.kph = VideoSyncFiledataPoints[curPosition].kph;
+        
+        //TODO : weighted average to improve smoothness
     }
     else
     {
-        for( ; curPosition > 0; curPosition--)
-            if(dataPoints[curPosition]->km <= rtd.getDistance())
-                break;
+        // otherwise we use the gpx from selected ride in analysis view:
+        QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
+        if (!dataPoints.count()) return;
+
+        if(dataPoints.count() < curPosition)
+        {
+            curPosition = dataPoints.count();
+        } // make sure the current position is less than the new distance
+        else if (dataPoints[curPosition]->km < rtd.getDistance())
+        {
+            for( ; curPosition < dataPoints.count(); curPosition++)
+                if(dataPoints[curPosition]->km >= rtd.getDistance())
+                    break;
+        }
+        else
+        {
+            for( ; curPosition > 0; curPosition--)
+                if(dataPoints[curPosition]->km <= rtd.getDistance())
+                    break;
+        }
+        // update the rfp
+        rfp = *dataPoints[curPosition];
+        
+        //TODO : weighted average to improve smoothness
     }
-
-    // update the rfp
-    rfp = *dataPoints[curPosition];
-
     // set video rate ( theoretical : video rate = training speed / ghost speed)
     float rate;
     float video_time_shift_ms;

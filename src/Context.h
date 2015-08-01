@@ -131,7 +131,7 @@ class Context : public QObject
         void notifyErgFileSelected(ErgFile *x) { workout=x; ergFileSelected(x); }
         void notifyVideoSyncFileSelected(VideoSyncFile *x) { videosync=x; VideoSyncFileSelected(x); }
         ErgFile *currentErgFile() { return workout; }
-        VideoSyncFile *currentViceoSyncFile() { return videosync; }
+        VideoSyncFile *currentVideoSyncFile() { return videosync; }
         void notifyMediaSelected( QString x) { mediaSelected(x); }
         void notifySelectVideo(QString x) { selectMedia(x); }
         void notifySelectWorkout(QString x) { selectWorkout(x); }
