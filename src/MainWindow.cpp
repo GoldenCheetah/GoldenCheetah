@@ -1406,13 +1406,15 @@ MainWindow::saveRide()
 
     // flush in-flight changes
     currentTab->context->notifyMetadataFlush();
+    currentTab->context->ride->notifyRideMetadataChanged();
 
     // nothing to do if not dirty
     if (currentTab->context->ride->isDirty() == false) return;
 
     // save
-    if (currentTab->context->ride)
+    if (currentTab->context->ride) {
         saveRideSingleDialog(currentTab->context, currentTab->context->ride); // will signal save to everyone
+    }
 }
 
 void
