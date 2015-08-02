@@ -1431,6 +1431,9 @@ LTMSidebar::editPreset()
 
     int index = allCharts->indexOfChild(chartTree->selectedItems()[0]);
 
+    // clear bests, it won't be there any more.
+    context->athlete->presets[index].bests = NULL;
+
     // GcWindowDialog is delete on close, so no need to delete
     GcWindowDialog *f = new GcWindowDialog(GcWindowTypes::LTM, context, &newone, true, &context->athlete->presets[index]);
     f->exec();
