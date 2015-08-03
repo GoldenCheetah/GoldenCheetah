@@ -11831,7 +11831,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../Pages.cpp" line="5539"/>
         <source>Enable interval auto-discovery:</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer la découverte automatique d&apos;intervalle:</translation>
     </message>
 </context>
 <context>
@@ -13678,7 +13678,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../LapsEditor.cpp" line="45"/>
         <source>Laps Editor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Editeur d&apos;intervalles</translation>
     </message>
     <message>
         <location filename="../LapsEditor.cpp" line="65"/>
@@ -13838,12 +13838,12 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../MUPlot.cpp" line="74"/>
         <source>w(x)</source>
-        <translation type="unfinished"></translation>
+        <translation>w(x)</translation>
     </message>
     <message>
         <location filename="../MUPlot.cpp" line="90"/>
         <source>Motor Unit, x</source>
-        <translation type="unfinished"></translation>
+        <translation>Unité moteur, x</translation>
     </message>
 </context>
 <context>
@@ -13851,37 +13851,37 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../MUWidget.cpp" line="36"/>
         <source>Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Masse</translation>
     </message>
     <message>
         <location filename="../MUWidget.cpp" line="45"/>
         <source>P-max</source>
-        <translation type="unfinished">Pmax</translation>
+        <translation>Pmax</translation>
     </message>
     <message>
         <location filename="../MUWidget.cpp" line="46"/>
         <source>P-min</source>
-        <translation type="unfinished"></translation>
+        <translation>Pmin</translation>
     </message>
     <message>
         <location filename="../MUWidget.cpp" line="52"/>
         <source>Tau</source>
-        <translation type="unfinished"></translation>
+        <translation>Tau</translation>
     </message>
     <message>
         <location filename="../MUWidget.cpp" line="64"/>
         <source>Pmax</source>
-        <translation type="unfinished">Pmax</translation>
+        <translation>Pmax</translation>
     </message>
     <message>
         <location filename="../MUWidget.cpp" line="80"/>
         <source>Pmin</source>
-        <translation type="unfinished"></translation>
+        <translation>Pmin</translation>
     </message>
     <message>
         <location filename="../MUWidget.cpp" line="96"/>
         <source>Alpha</source>
-        <translation type="unfinished"></translation>
+        <translation>Alpha</translation>
     </message>
 </context>
 <context>
@@ -14121,7 +14121,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="410"/>
         <source>Create Manual Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer une activité manuelle</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="432"/>
@@ -14131,7 +14131,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="448"/>
         <source>Split Activity...</source>
-        <translation type="unfinished"></translation>
+        <translation>Diviser l&apos;activité...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="460"/>
@@ -14187,7 +14187,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="598"/>
         <source>Tweet activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Tweeter l&apos;activité</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="636"/>
@@ -14211,7 +14211,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="594"/>
         <source>Ctrl+L</source>
-        <translation type="unfinished">Ctrl+L</translation>
+        <translation>Ctrl+L</translation>
     </message>
     <message>
         <source>Upload to Trainingstagebuch...</source>
@@ -14220,22 +14220,22 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="604"/>
         <source>&amp;Save activity</source>
-        <translation type="unfinished">&amp;Sauver l&apos;activité</translation>
+        <translation>&amp;Sauver l&apos;activité</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="605"/>
         <source>D&amp;elete activity...</source>
-        <translation type="unfinished">&amp;Effacer l&apos;activité</translation>
+        <translation>&amp;Effacer l&apos;activité...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="606"/>
         <source>Split &amp;activity...</source>
-        <translation type="unfinished">Diviser l&apos;&amp;activité...</translation>
+        <translation>Diviser l&apos;&amp;activité...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="607"/>
         <source>Combine activities...</source>
-        <translation type="unfinished"></translation>
+        <translation>Combiner les activités...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="623"/>
@@ -14261,17 +14261,17 @@ Fichier ignoré...</translation>
         <location filename="../MainWindow.cpp" line="1386"/>
         <location filename="../MainWindow.cpp" line="1398"/>
         <source>No activity selected</source>
-        <translation type="unfinished">Pas d&apos;activité sélectionnée</translation>
+        <translation>Pas d&apos;activité sélectionnée</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1388"/>
         <source>Current activity contains no data to split</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;activité séléctionnée ne contient pas de donnée à couper</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1400"/>
         <source>Current activity contains no data to merge</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;activité séléctionnée ne contient pas de donnée à combiner</translation>
     </message>
     <message>
         <source>Critical Power Calculator...</source>
@@ -14302,7 +14302,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="630"/>
         <source>Upload Activity to Calendar</source>
-        <translation type="unfinished">Envoyer l&apos;activité vers le calendrier</translation>
+        <translation>Envoyer l&apos;activité vers le calendrier</translation>
     </message>
     <message>
         <source>Import Calendar...</source>
@@ -14325,23 +14325,23 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="693"/>
         <source>Activities</source>
-        <translation type="unfinished">Activités</translation>
+        <translation>Activités</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1286"/>
         <source>Select Activity</source>
-        <translation type="unfinished">Sélectionner l&apos;activité</translation>
+        <translation>Sélectionner l&apos;activité</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1286"/>
         <location filename="../MainWindow.cpp" line="1410"/>
         <source>No activity selected!</source>
-        <translation type="unfinished">Pas d&apos;activité sélectionnée!</translation>
+        <translation>Pas d&apos;activité sélectionnée!</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1297"/>
         <source>Export Activity</source>
-        <translation type="unfinished">Exporter l&apos;activité</translation>
+        <translation>Exporter l&apos;activité</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1311"/>
@@ -14532,7 +14532,7 @@ CP de l&apos;athlète réglé à %3 watts</translation>
     <message>
         <location filename="../MainWindow.cpp" line="583"/>
         <source>&amp;Manual entry...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Entrée &amp;manuelle...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="585"/>
