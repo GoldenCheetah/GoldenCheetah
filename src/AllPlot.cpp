@@ -771,7 +771,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     showXP(false),
     showAP(false),
     showHr(true),
-    showTcore(true),
+    showTcore(false),
     showSpeed(true),
     showAccel(false),
     showPowerD(false),
