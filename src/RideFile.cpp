@@ -2027,6 +2027,11 @@ RideFile::recalculateDerivedSeries(bool force)
     // Core Temperature
     //
 
+    // PLEASE NOTE:
+    // The core body temperature models was developed by the U.S Army
+    // Research Institute of Environmental Medicine and is patent pending.
+    // We have sought and been granted permission to utilise this within GoldenCheetah
+
     // since we are dealing in minutes we need to resample down to minutes
     // then upsample back to recIntSecs in-situ i.e we will use the p->Tcore
     // value to hold the rolling 60second values (where they are non-zero)
