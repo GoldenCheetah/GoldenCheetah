@@ -140,7 +140,7 @@ TrainingstagebuchUploader::requestSettings()
     QString password = appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS).toString();
 
 #if QT_VERSION > 0x050000
-    QUrlQuery urlquery( TTB_URL + "/settings/list" );
+    QUrlQuery urlquery;
 #else
     QUrl urlquery( TTB_URL + "/settings/list" );
 #endif
@@ -149,12 +149,13 @@ TrainingstagebuchUploader::requestSettings()
     urlquery.addQueryItem( "pass", password );
 
 #if QT_VERSION > 0x050000
-    QUrl url;
-    url.setQuery(urlquery);
+    QUrl url (TTB_URL + "/settings/list");
+    url.setQuery(urlquery.query());
     QNetworkRequest request = QNetworkRequest(url);
 #else
     QNetworkRequest request = QNetworkRequest(urlquery);
 #endif
+
     request.setRawHeader( "Accept-Encoding", "identity" );
     request.setRawHeader( "Accept", "application/xml" );
     request.setRawHeader( "Accept-Charset", "utf-8" );
@@ -175,7 +176,7 @@ TrainingstagebuchUploader::requestSession()
     QString password = appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS).toString();
 
 #if QT_VERSION > 0x050000
-    QUrlQuery urlquery( TTB_URL + "/login/sso" );
+    QUrlQuery urlquery;
 #else
     QUrl urlquery( TTB_URL + "/login/sso" );
 #endif
@@ -184,8 +185,8 @@ TrainingstagebuchUploader::requestSession()
     urlquery.addQueryItem( "pass", password );
 
 #if QT_VERSION > 0x050000
-    QUrl url;
-    url.setQuery(urlquery);
+    QUrl url (TTB_URL + "/login/sso");
+    url.setQuery(urlquery.query());
     QNetworkRequest request = QNetworkRequest(url);
 #else
     QNetworkRequest request = QNetworkRequest(urlquery);
@@ -237,7 +238,7 @@ TrainingstagebuchUploader::requestUpload()
 
     QHttpPart filePart;
     filePart.setHeader(QNetworkRequest::ContentTypeHeader,
-    QVariant("application/occtet-stream"));
+    QVariant("application/octet-stream"));
     filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
     QVariant("form-data; name=\"file\"; filename=\"gc-upload-ttb.pwx\""));
     uploadFile->open(QIODevice::ReadOnly);
@@ -250,16 +251,17 @@ TrainingstagebuchUploader::requestUpload()
     currentRequest = reqUpload;
 
 #if QT_VERSION > 0x050000
-    QUrlQuery urlquery( TTB_URL + "/file/upload" );
+    QUrlQuery urlquery;
 #else
     QUrl urlquery( TTB_URL + "/file/upload" );
 #endif
     urlquery.addQueryItem( "view", "xml" );
     urlquery.addQueryItem( "sso", sessionId );
 
+
 #if QT_VERSION > 0x050000
-    QUrl url;
-    url.setQuery(urlquery);
+    QUrl url (TTB_URL + "/file/upload");
+    url.setQuery(urlquery.query());
     QNetworkRequest request = QNetworkRequest(url);
 #else
     QNetworkRequest request = QNetworkRequest(urlquery);
