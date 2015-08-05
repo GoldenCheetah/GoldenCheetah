@@ -1029,72 +1029,74 @@ FormField::metadataChanged()
         value ="";
     }
 
-    switch (definition.type) {
-    case FIELD_TEXT : // text
-    case FIELD_SHORTTEXT : // shorttext
-        {
-            if (meta->context->athlete->rideCache && completer &&
-                definition.values.count() == 1 && definition.values.at(0) == "*") {
+    if (!enabled) { // not a ride metric 
+        switch (definition.type) {
+        case FIELD_TEXT : // text
+        case FIELD_SHORTTEXT : // shorttext
+            {
+                if (meta->context->athlete->rideCache && completer &&
+                    definition.values.count() == 1 && definition.values.at(0) == "*") {
 
-                // set completer if needed for wildcard matching
-                QStringList values = meta->context->athlete->rideCache->getDistinctValues(definition.name);
+                    // set completer if needed for wildcard matching
+                    QStringList values = meta->context->athlete->rideCache->getDistinctValues(definition.name);
 
-                delete completer;
-                completer = new QCompleter(values, this);
-                completer->setCaseSensitivity(Qt::CaseInsensitive);
-                completer->setCompletionMode(QCompleter::InlineCompletion);
-                dynamic_cast<QLineEdit*>(widget)->setCompleter(completer);
+                    delete completer;
+                    completer = new QCompleter(values, this);
+                    completer->setCaseSensitivity(Qt::CaseInsensitive);
+                    completer->setCompletionMode(QCompleter::InlineCompletion);
+                    dynamic_cast<QLineEdit*>(widget)->setCompleter(completer);
+                }
+                ((QLineEdit*)widget)->setText(value);
             }
-            ((QLineEdit*)widget)->setText(value);
-        }
-        break;
+            break;
 
-    case FIELD_TEXTBOX : // textbox
-        if (definition.name != "Summary")
-            ((GTextEdit*)widget)->setText(value);
-        break;
+        case FIELD_TEXTBOX : // textbox
+            if (definition.name != "Summary")
+                ((GTextEdit*)widget)->setText(value);
+            break;
 
-    case FIELD_INTEGER : // integer
-        ((QSpinBox*)widget)->setValue(value.toInt());
-        break;
+        case FIELD_INTEGER : // integer
+            ((QSpinBox*)widget)->setValue(value.toInt());
+            break;
 
-    case FIELD_DOUBLE : // double
-        if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0).addSecs(value.toDouble()));
-        else {
-            if (definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
-                double lbs = value.toDouble() * LB_PER_KG;
-                value = QString("%1").arg(lbs);
+        case FIELD_DOUBLE : // double
+            if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0).addSecs(value.toDouble()));
+            else {
+                if (definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
+                    double lbs = value.toDouble() * LB_PER_KG;
+                    value = QString("%1").arg(lbs);
+                }
+                ((QDoubleSpinBox*)widget)->setValue(value.toDouble());
             }
-            ((QDoubleSpinBox*)widget)->setValue(value.toDouble());
-        }
-        break;
+            break;
 
-    case FIELD_DATE : // date
-        {
-        if (value == "") value = "          ";
-        QDate date(/* year*/value.mid(6,4).toInt(),
-                   /* month */value.mid(3,2).toInt(),
-                   /* day */value.mid(0,2).toInt());
-        ((QDateEdit*)widget)->setDate(date);
-        }
-        break;
+        case FIELD_DATE : // date
+            {
+            if (value == "") value = "          ";
+            QDate date(/* year*/value.mid(6,4).toInt(),
+                    /* month */value.mid(3,2).toInt(),
+                    /* day */value.mid(0,2).toInt());
+            ((QDateEdit*)widget)->setDate(date);
+            }
+            break;
 
-    case FIELD_TIME : // time
-        {
-        if (value == "") value = "            ";
-        QTime time(/* hours*/ value.mid(0,2).toInt(),
-                   /* minutes */ value.mid(3,2).toInt(),
-                   /* seconds */ value.mid(6,2).toInt(),
-                   /* milliseconds */ value.mid(9,3).toInt());
-        ((QTimeEdit*)widget)->setTime(time);
-        }
-        break;
+        case FIELD_TIME : // time
+            {
+            if (value == "") value = "            ";
+            QTime time(/* hours*/ value.mid(0,2).toInt(),
+                    /* minutes */ value.mid(3,2).toInt(),
+                    /* seconds */ value.mid(6,2).toInt(),
+                    /* milliseconds */ value.mid(9,3).toInt());
+            ((QTimeEdit*)widget)->setTime(time);
+            }
+            break;
 
-    case FIELD_CHECKBOX : // checkbox
-        {
-        ((QCheckBox*)widget)->setChecked((value == "1") ? true : false);
+        case FIELD_CHECKBOX : // checkbox
+            {
+            ((QCheckBox*)widget)->setChecked((value == "1") ? true : false);
+            }
+            break;
         }
-        break;
     }
     active = false;
 }
