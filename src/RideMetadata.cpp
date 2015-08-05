@@ -1305,14 +1305,20 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
     bool hasCalendarText = false;
     bool hasData = false;
 
-    foreach (FieldDefinition field, fieldDefinitions) {
-        if (field.name == "Data") {
+    for (int i=0; i<fieldDefinitions.count(); i++) {
+    
+        if (fieldDefinitions[i].name == "Data") {
             hasData = true;
         }
-        if (field.name == "Calendar Text") {
+        if (fieldDefinitions[i].name == "Calendar Text") {
             hasCalendarText = true;
         }
+
         // other fields here...
+
+        // any field called "Time Riding" on the "Metric" tab needs to be renamed "Time Moving" as we renamed it !
+        if (fieldDefinitions[i].name == "Time Riding" && fieldDefinitions[i].tab == "Metric") fieldDefinitions[i].name = "Time Moving";
+
     }
     if (!hasCalendarText) {
         FieldDefinition add;
