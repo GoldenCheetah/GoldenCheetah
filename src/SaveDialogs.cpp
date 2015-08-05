@@ -264,6 +264,7 @@ SaveOnExitDialogWidget::SaveOnExitDialogWidget(MainWindow *mainWindow, Context *
     QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), context(context), dirtyList(dirtyList)
 {
     setWindowTitle("Save Changes");
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     // Warning text
