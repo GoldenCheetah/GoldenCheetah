@@ -1331,7 +1331,7 @@ void
 LTMSidebar::presetPopup()
 {
     // item points to selection, if it exists
-    QTreeWidgetItem *item = chartTree->selectedItems().count() ? dateRangeTree->selectedItems().at(0) : NULL;
+    QTreeWidgetItem *item = chartTree->selectedItems().count() ? chartTree->selectedItems().at(0) : NULL;
 
     // OK - we are working with a specific event..
     QMenu menu(chartTree);
