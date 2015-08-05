@@ -57,6 +57,8 @@ SpecialFields::SpecialFields()
     namesmap.insert("Month", tr("Month"));                            // set by openRideFile
     namesmap.insert("Weekday", tr("Weekday"));                       // set by openRideFile
     namesmap.insert("Source Filename", tr("Source Filename"));       // set by openRideFile
+    namesmap.insert("Route", tr("Route"));                           // GPS map Route tag
+    namesmap.insert("RPE", tr("RPE"));                               // used by Session RPE metric
 
 
     // now add all the metric fields (for metric overrides)
