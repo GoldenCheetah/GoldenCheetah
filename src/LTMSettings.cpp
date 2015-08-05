@@ -339,11 +339,19 @@ while(counter-- && !in.atEnd()) {
             in >> m.units;
         }
 
+
         bool keep=true;
         // check for deprecated things and set keep=false if
         // we don't support this any more !
         if (m.type == METRIC_MEASURE) keep = false;
-        // more keep checks could be added here
+
+        // some sanity checking after strange corruption in 3.2
+        if (m.type < 0) keep = false;
+        if (m.type == METRIC_DB && m.symbol == "") keep = false;
+        if (m.type == METRIC_DB && factory.rideMetric(m.symbol)==NULL) keep = false;
+        if (m.topN > 100) m.topN = 0;
+        if (m.lowestN > 100) m.lowestN = 0;
+
         if (keep) {
             // get a metric pointer (if it exists)
             m.metric = factory.rideMetric(m.symbol);
