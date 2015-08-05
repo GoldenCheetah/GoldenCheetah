@@ -521,6 +521,32 @@ GcUpgrade::upgrade(const QDir &home)
 
     }
 
+    // other 3.2 upgrade tasks, mostly cosmetic
+    if (last < VERSION32_BUILD) {
+
+        // trend plot matches ride plot, as newly introduced
+        // just do for first time we run 3.2 and set to ride plot
+        QColor color = GCColor::getColor(CRIDEPLOTBACKGROUND);
+        GCColor::setColor(CTRENDPLOTBACKGROUND, color);
+
+        // and update config
+        QString colorstring = QString("%1:%2:%3").arg(color.red())
+                                                 .arg(color.green())
+                                                 .arg(color.blue());
+        appsettings->setValue("COLORTRENDPLOTBACKGROUND", colorstring);
+
+        // and on non-Mac platforms we want flat look and feel
+        // by default now, the metal look is de-rigeur
+#ifndef Q_OS_MAC
+        color = QColor(0xe5,0xe5,0xe5);
+        colorstring = QString("%1:%2:%3").arg(color.red())
+                                         .arg(color.green())
+                                         .arg(color.blue());
+        appsettings->setValue("CCHROME", colorstring);
+        appsettings->setValue(GC_CHROME, "Flat");
+#endif
+
+    }
     return 0;
 }
 
