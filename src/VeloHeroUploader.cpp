@@ -139,7 +139,7 @@ VeloHeroUploader::requestSession()
     QString password = appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROPASS).toString();
 
 #if QT_VERSION > 0x050000
-    QUrlQuery urlquery( VELOHERO_URL + "/sso" );
+    QUrlQuery urlquery;
 #else
     QUrl urlquery( VELOHERO_URL + "/sso" );
 #endif
@@ -148,8 +148,8 @@ VeloHeroUploader::requestSession()
     urlquery.addQueryItem( "pass", password );
 
 #if QT_VERSION > 0x050000
-    QUrl url;
-    url.setQuery(urlquery);
+    QUrl url (VELOHERO_URL + "/sso");
+    url.setQuery(urlquery.query());
     QNetworkRequest request = QNetworkRequest(url);
 #else
     QNetworkRequest request = QNetworkRequest(urlquery);
@@ -199,7 +199,7 @@ VeloHeroUploader::requestUpload()
 
     QHttpPart filePart;
     filePart.setHeader(QNetworkRequest::ContentTypeHeader,
-    QVariant("application/occtet-stream"));
+    QVariant("application/octet-stream"));
     filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
     QVariant("form-data; name=\"file\"; filename=\"gc-upload-velohero.pwx\""));
     uploadFile->open(QIODevice::ReadOnly);
@@ -212,7 +212,7 @@ VeloHeroUploader::requestUpload()
     currentRequest = reqUpload;
 
 #if QT_VERSION > 0x050000
-    QUrlQuery urlquery( VELOHERO_URL + "/upload/file" );
+    QUrlQuery urlquery;
 #else
     QUrl urlquery( VELOHERO_URL + "/upload/file" );
 #endif
@@ -220,8 +220,8 @@ VeloHeroUploader::requestUpload()
     urlquery.addQueryItem( "sso", sessionId );
 
 #if QT_VERSION > 0x050000
-    QUrl url;
-    url.setQuery(urlquery);
+    QUrl url (VELOHERO_URL + "/upload/file");
+    url.setQuery(urlquery.query());
     QNetworkRequest request = QNetworkRequest(url);
 #else
     QNetworkRequest request = QNetworkRequest(urlquery);
