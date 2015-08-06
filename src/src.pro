@@ -747,3 +747,6 @@ OTHER_FILES += \
     web/MapWindow.html \
     web/StreetViewWindow.html \
     web/Window.css
+
+HEADERS += $${LOCALHEADERS}
+SOURCE += $${LOCALSOURCE}
