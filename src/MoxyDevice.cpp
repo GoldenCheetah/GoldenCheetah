@@ -345,7 +345,8 @@ MoxyDevice::download( const QDir &tmpdir,
 
     if (files.count() > 0)  {
         emit updateProgress("Importing ...");
-        emit updateStatus(QString(tr("\nImporting %1 Ride(s)... \n")).arg(files.count()));
+	int n = files.count();
+        emit updateStatus(QString(tr("\nImporting %n ride(s)... \n", "", n)).arg(n));
 
     } else emit updateStatus(QString(tr("\nNo rides found to import. \n")));
 

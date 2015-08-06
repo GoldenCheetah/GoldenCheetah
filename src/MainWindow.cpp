@@ -1274,7 +1274,8 @@ MainWindow::dropEvent(QDropEvent *event)
         currentTab->context->notifyPresetsChanged();
 
         // tell the user
-        QMessageBox::information(this, tr("Chart Import"), QString(tr("Imported %1 charts")).arg(imported.count()));
+        int n = imported.count();
+        QMessageBox::information(this, tr("Chart Import"), QString(tr("Imported %n charts", "", n)).arg(n));
 
         // switch to trend view if we aren't on it
         selectHome();

@@ -238,7 +238,8 @@ QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &
             temp.metrics()[j] = 0.00f;
 
     // set name
-    temp.name = QString(tr("%1 selected intervals")).arg(intervals.count());
+    int n = intervals.count();
+    temp.name = QString(tr("%n selected interval(s)", "", n)).arg(n);
     temp.rideItem_ = intervals.at(0)->rideItem_;
 
     QString returning = summary(&temp);
@@ -261,7 +262,8 @@ QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &
                 temp.metrics()[j] = 0.00f;
 
         // set name
-        temp.name = QString(tr("Excluding %1 selected")).arg(intervals.count());
+        int n = intervals.count();
+        temp.name = QString(tr("Excluding %n selected", "", n)).arg(n);
         temp.rideItem_ = intervals.at(0)->rideItem_;
 
         // use standard method from above

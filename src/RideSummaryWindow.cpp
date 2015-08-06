@@ -1093,16 +1093,17 @@ RideSummaryWindow::htmlSummary()
         if (context->ishomefiltered || context->isfiltered || filtered) {
 
             // "n of x activities" shown in header of list when filtered
+            int n = totalrides;
             summary += ("<p><h3>" +
-                        QString(tr("%1 of %2")).arg(rides).arg(totalrides)
-                                           + (totalrides == 1 ? tr(" ride") : tr(" rides")) +
+                        QString(tr("%1 of %2")).arg(rides).arg(n)
+                                           + (tr("%n ride(s)", "", n)) +
                         "</h3><p>");
         } else {
 
             // just "n activities" shown in header of list when not filtered
+            int n = rides;
             summary += ("<p><h3>" +
-                        QString("%1").arg(rides) + (rides == 1 ? tr(" ride") : tr(" rides")) +
-                        "</h3><p>");
+                        QString(tr("%n ride(s)", "", n)) + "</h3><p>");
         }
         
         // table of activities
@@ -1193,16 +1194,17 @@ RideSummaryWindow::htmlSummary()
         if (context->ishomefiltered || context->isfiltered || filtered) {
 
             // "n of x activities" shown in header of list when filtered
+            int n = totalruns;
             summary += ("<p><h3>" +
-                        QString(tr("%1 of %2")).arg(runs).arg(totalruns)
-                                           + (totalruns == 1 ? tr(" run") : tr(" runs")) +
+                        QString(tr("%1 of %2")).arg(runs).arg(n)
+                                           + (tr("%n run(s)", "", n)) +
                         "</h3><p>");
         } else {
 
             // just "n activities" shown in header of list when not filtered
+            int n = runs;
             summary += ("<p><h3>" +
-                        QString("%1").arg(runs) + (runs == 1 ? tr(" run") : tr(" runs")) +
-                        "</h3><p>");
+                        QString(tr("%n run(s)", "", n)) + "</h3><p>");
         }
 
         // table of activities
@@ -1292,16 +1294,17 @@ RideSummaryWindow::htmlSummary()
         if (context->ishomefiltered || context->isfiltered || filtered) {
 
             // "n of x activities" shown in header of list when filtered
+            int n = totalswims;
             summary += ("<p><h3>" +
-                        QString(tr("%1 of %2")).arg(swims).arg(totalswims)
-                                           + (totalruns == 1 ? tr(" swim") : tr(" swims")) +
+                        QString(tr("%1 of %2")).arg(swims).arg(n)
+                                           + (tr("%n swim(s)", "", n)) +
                         "</h3><p>");
         } else {
 
             // just "n activities" shown in header of list when not filtered
+            int n = swims;
             summary += ("<p><h3>" +
-                        QString("%1").arg(swims) + (swims == 1 ? tr(" swim") : tr(" swims")) +
-                        "</h3><p>");
+                        QString(tr("%n swim(s)", "", n)) + "</h3><p>");
         }
 
         // table of activities

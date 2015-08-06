@@ -140,12 +140,12 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
         // now get the files with their full names
         QFileInfoList fileInfos = importDir->entryInfoList(allFormats, QDir::Files, QDir::NoSort);
         if (!fileInfos.isEmpty()) {
-            int j = 0;
+            int n = 0;
             foreach(QFileInfo f, fileInfos) {
                 files.append(f.absoluteFilePath());
-                j++;
+                n++;
             }
-            directoryWidget->item(i,2)->setText(tr("%1 files for import selected").arg(QString::number(j)));
+            directoryWidget->item(i,2)->setText(tr("%n file(s) for import selected", "", n).arg(QString::number(n)));
           } else {
             directoryWidget->item(i,2)->setText(tr("No activity files found"));
             continue;
