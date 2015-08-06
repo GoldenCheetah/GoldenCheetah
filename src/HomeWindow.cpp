@@ -1321,13 +1321,14 @@ HomeWindow::restoreState(bool useDefault)
         QVariant lang = appsettings->value(this, GC_LANG, QLocale::system().name());
         bool english = lang.toString().startsWith("en") ? true : false;
 
-        // translate the titles
-        if (!english) translateChartTitles(handler.charts);
-
         // translate the metrics, but only if the built-in "default.XML"s are read (and only for LTM charts)
         // and only if the language is not English (i.e. translation is required).
         if (defaultUsed and !english) {
-            // check all charts for LTMWindow(s)
+
+            // translate the titles
+            translateChartTitles(handler.charts);
+
+            // translate the LTM settings
             for (int i=0; i<handler.charts.count(); i++) {
                 // find out if it's an LTMWindow via dynamic_cast
                 LTMWindow* ltmW = dynamic_cast<LTMWindow*> (handler.charts[i]);
