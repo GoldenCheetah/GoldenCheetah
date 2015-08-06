@@ -1304,7 +1304,6 @@ HomeWindow::restoreState(bool useDefault)
         for(int i = numCharts - 1; i >= 0; i--) {
             removeChart(i,false);
         }
-        bool defaultUsed = false;
 
         // setup the handler
         QXmlInputSource source;
@@ -1323,7 +1322,7 @@ HomeWindow::restoreState(bool useDefault)
 
         // translate the metrics, but only if the built-in "default.XML"s are read (and only for LTM charts)
         // and only if the language is not English (i.e. translation is required).
-        if (defaultUsed and !english) {
+        if (useDefault && !english) {
 
             // translate the titles
             translateChartTitles(handler.charts);
