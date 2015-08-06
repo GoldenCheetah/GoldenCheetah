@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es">
+<TS version="2.0" language="es">
 <context>
     <name>AAvgPower</name>
     <message>
@@ -71,16 +71,20 @@
     </message>
     <message>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Ride files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</source>
-        <translation type="vanished">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
+        <translation type="obsolete">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
     </message>
     <message>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</source>
-        <translation type="vanished">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
+        <translation type="obsolete">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</source>
+        <translation type="obsolete">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore cortesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed cortesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cpp" line="62"/>
-        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</source>
-        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore cortesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed cortesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
+        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;/center&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -680,7 +684,7 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca G
     </message>
     <message>
         <source>&amp;Add to Ride</source>
-        <translation type="vanished">&amp;Agregar a la actividad</translation>
+        <translation type="obsolete">&amp;Agregar a la actividad</translation>
     </message>
     <message>
         <location filename="../AddIntervalDialog.cpp" line="528"/>
@@ -766,11 +770,11 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca G
     </message>
     <message>
         <source>Select Ride</source>
-        <translation type="vanished">Seleccionar Actividad</translation>
+        <translation type="obsolete">Seleccionar Actividad</translation>
     </message>
     <message>
         <source>No ride selected!</source>
-        <translation type="vanished">¡Ninguna actividad seleccionada!</translation>
+        <translation type="obsolete">¡Ninguna actividad seleccionada!</translation>
     </message>
     <message>
         <location filename="../AddIntervalDialog.cpp" line="453"/>
@@ -1073,7 +1077,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>No ride selected</source>
-        <translation type="vanished">No hay un entrenamiento seleccionado</translation>
+        <translation type="obsolete">No hay un entrenamiento seleccionado</translation>
     </message>
 </context>
 <context>
@@ -2337,7 +2341,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>Rides</source>
-        <translation type="vanished">Actividades</translation>
+        <translation type="obsolete">Actividades</translation>
     </message>
     <message>
         <source>All Rides</source>
@@ -2345,15 +2349,15 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>Delete Ride</source>
-        <translation type="vanished">Borrar Actividad</translation>
+        <translation type="obsolete">Borrar Actividad</translation>
     </message>
     <message>
         <source>Split Ride</source>
-        <translation type="vanished">Dividir Actividad</translation>
+        <translation type="obsolete">Dividir Actividad</translation>
     </message>
     <message>
         <source>Upload Ride to Calendar</source>
-        <translation type="vanished">Cargar Actividad al Calendario</translation>
+        <translation type="obsolete">Cargar Actividad al Calendario</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="409"/>
@@ -2363,7 +2367,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>Sort Intervals</source>
-        <translation type="vanished">Ordenar intervalos</translation>
+        <translation type="obsolete">Ordenar intervalos</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="487"/>
@@ -2390,7 +2394,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>Create route for interval</source>
-        <translation type="vanished">Crear ruta según intervalo</translation>
+        <translation type="obsolete">Crear ruta según intervalo</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="513"/>
@@ -2409,11 +2413,11 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>Bring to Front</source>
-        <translation type="vanished">Traer al Frente</translation>
+        <translation type="obsolete">Traer al Frente</translation>
     </message>
     <message>
         <source>Send to back</source>
-        <translation type="vanished">Mandar al fondo</translation>
+        <translation type="obsolete">Mandar al fondo</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="610"/>
@@ -2423,11 +2427,11 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>No ride selected</source>
-        <translation type="vanished">No hay un entrenamiento seleccionado</translation>
+        <translation type="obsolete">No hay un entrenamiento seleccionado</translation>
     </message>
     <message>
         <source>Current ride contains no data</source>
-        <translation type="vanished">La actividad seleccionada no tiene datos</translation>
+        <translation type="obsolete">La actividad seleccionada no tiene datos</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="610"/>
@@ -2441,11 +2445,11 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source> (%1 watts)</source>
-        <translation type="vanished"> (%1 vatios)</translation>
+        <translation type="obsolete"> (%1 vatios)</translation>
     </message>
     <message>
         <source>Find Power Peaks</source>
-        <translation type="vanished">Buscar Máximos de Potencia</translation>
+        <translation type="obsolete">Buscar Máximos de Potencia</translation>
     </message>
 </context>
 <context>
@@ -2542,7 +2546,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>Intervals</source>
-        <translation type="vanished">Intervalos</translation>
+        <translation type="obsolete">Intervalos</translation>
     </message>
     <message>
         <source>Can&apos;t rename %1 to %2</source>
@@ -2560,7 +2564,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>Track Weight</source>
-        <translation type="vanished">Seguimiento de Peso</translation>
+        <translation type="obsolete">Seguimiento de Peso</translation>
     </message>
     <message>
         <location filename="../Athlete.cpp" line="276"/>
@@ -2759,7 +2763,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>Time in Pace Zones</source>
-        <translation type="vanished">Tiempo en Zonas de Ritmo</translation>
+        <translation type="obsolete">Tiempo en Zonas de Ritmo</translation>
     </message>
     <message>
         <location filename="../Athlete.cpp" line="315"/>
@@ -2886,62 +2890,62 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AutoImportPage</name>
     <message>
-        <location filename="../Pages.cpp" line="5340"/>
+        <location filename="../Pages.cpp" line="5344"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5341"/>
+        <location filename="../Pages.cpp" line="5345"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5342"/>
+        <location filename="../Pages.cpp" line="5346"/>
         <source>Browse</source>
         <translation>Buscar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5353"/>
+        <location filename="../Pages.cpp" line="5357"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5354"/>
+        <location filename="../Pages.cpp" line="5358"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5355"/>
+        <location filename="../Pages.cpp" line="5359"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5356"/>
+        <location filename="../Pages.cpp" line="5360"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5369"/>
+        <location filename="../Pages.cpp" line="5373"/>
         <source>Directory</source>
         <translation>Carpeta</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5370"/>
+        <location filename="../Pages.cpp" line="5374"/>
         <source>Import Rule</source>
         <translation>Regla de Importación</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5463"/>
+        <location filename="../Pages.cpp" line="5467"/>
         <source>Enter directory or press [Browse] to select</source>
         <translation>Ingrese carpeta o presione [Buscar] para seleccionar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5510"/>
+        <location filename="../Pages.cpp" line="5514"/>
         <source>No autoimport</source>
         <translation>Sin importación automática</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5511"/>
+        <location filename="../Pages.cpp" line="5515"/>
         <source>Autoimport with dialog</source>
         <translation>Importación Automática Interactiva</translation>
     </message>
@@ -3029,8 +3033,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2965"/>
-        <source>°</source>
-        <translation></translation>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3042,8 +3046,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2560"/>
-        <source>°</source>
-        <translation></translation>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3055,8 +3059,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2661"/>
-        <source>°</source>
-        <translation></translation>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3068,8 +3072,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="3052"/>
-        <source>°</source>
-        <translation></translation>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3081,8 +3085,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2762"/>
-        <source>°</source>
-        <translation></translation>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3094,8 +3098,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2863"/>
-        <source>°</source>
-        <translation></translation>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3167,8 +3171,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="3009"/>
-        <source>°</source>
-        <translation></translation>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3180,8 +3184,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2711"/>
-        <source>°</source>
-        <translation></translation>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3193,8 +3197,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="3096"/>
-        <source>°</source>
-        <translation></translation>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3206,8 +3210,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2812"/>
-        <source>°</source>
-        <translation></translation>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3219,8 +3223,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2913"/>
-        <source>°</source>
-        <translation></translation>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3260,8 +3264,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2610"/>
-        <source>°</source>
-        <translation></translation>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3345,7 +3349,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>Ride Batch Export</source>
-        <translation type="vanished">Exportar Actividades en Bloque</translation>
+        <translation type="obsolete">Exportar Actividades en Bloque</translation>
     </message>
     <message>
         <location filename="../BatchExportDialog.cpp" line="45"/>
@@ -3432,7 +3436,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>%1 rides exported, %2 failed or skipped.</source>
-        <translation type="vanished">%1 actividades exportadas, %2 fallaron o fueron salteadas.</translation>
+        <translation type="obsolete">%1 actividades exportadas, %2 fallaron o fueron salteadas.</translation>
     </message>
     <message>
         <location filename="../BatchExportDialog.cpp" line="176"/>
@@ -3525,11 +3529,11 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>Select Ride</source>
-        <translation type="vanished">Seleccionar Entrenamiento</translation>
+        <translation type="obsolete">Seleccionar Entrenamiento</translation>
     </message>
     <message>
         <source>No ride selected!</source>
-        <translation type="vanished">¡Ningún entrenamiento seleccionado!</translation>
+        <translation type="obsolete">¡Ningún entrenamiento seleccionado!</translation>
     </message>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="164"/>
@@ -3545,22 +3549,22 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>BestsMetricsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1953"/>
+        <location filename="../Pages.cpp" line="1957"/>
         <source>Available Metrics</source>
         <translation>Métricas Disponibles</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1958"/>
+        <location filename="../Pages.cpp" line="1962"/>
         <source>Selected Metrics</source>
         <translation>Métricas Seleccionadas</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1974"/>
+        <location filename="../Pages.cpp" line="1978"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1975"/>
+        <location filename="../Pages.cpp" line="1979"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
@@ -3601,12 +3605,12 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <source>Rides</source>
-        <translation type="vanished">Actividades</translation>
+        <translation type="obsolete">Actividades</translation>
     </message>
     <message>
         <source>No ride ?
 Let&apos;s start with some data.</source>
-        <translation type="vanished">¿Ninguna actividad?
+        <translation type="obsolete">¿Ninguna actividad?
 Comencemos con algunos datos.</translation>
     </message>
     <message>
@@ -3811,106 +3815,106 @@ Comencemos la configuración.</translation>
         <translation type="obsolete">Borrar Zona</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3293"/>
-        <location filename="../Pages.cpp" line="3303"/>
+        <location filename="../Pages.cpp" line="3297"/>
+        <location filename="../Pages.cpp" line="3307"/>
         <source>Update</source>
         <translation>Modificar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3295"/>
-        <location filename="../Pages.cpp" line="3309"/>
+        <location filename="../Pages.cpp" line="3299"/>
+        <location filename="../Pages.cpp" line="3313"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3296"/>
-        <location filename="../Pages.cpp" line="3310"/>
+        <location filename="../Pages.cpp" line="3300"/>
+        <location filename="../Pages.cpp" line="3314"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3302"/>
-        <location filename="../Pages.cpp" line="3315"/>
+        <location filename="../Pages.cpp" line="3306"/>
+        <location filename="../Pages.cpp" line="3319"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3304"/>
-        <location filename="../Pages.cpp" line="3316"/>
+        <location filename="../Pages.cpp" line="3308"/>
+        <location filename="../Pages.cpp" line="3320"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3306"/>
+        <location filename="../Pages.cpp" line="3310"/>
         <source>Def</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3327"/>
-        <location filename="../Pages.cpp" line="3371"/>
+        <location filename="../Pages.cpp" line="3331"/>
+        <location filename="../Pages.cpp" line="3375"/>
         <source>From Date</source>
         <translation>Desde </translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3328"/>
-        <location filename="../Pages.cpp" line="3372"/>
+        <location filename="../Pages.cpp" line="3332"/>
+        <location filename="../Pages.cpp" line="3376"/>
         <source>Critical Power</source>
         <translation>Potencia Crítica</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3329"/>
-        <location filename="../Pages.cpp" line="3373"/>
+        <location filename="../Pages.cpp" line="3333"/>
+        <location filename="../Pages.cpp" line="3377"/>
         <source>W&apos;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3330"/>
-        <location filename="../Pages.cpp" line="3374"/>
+        <location filename="../Pages.cpp" line="3334"/>
+        <location filename="../Pages.cpp" line="3378"/>
         <source>Pmax</source>
         <translation>Pmáx</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3394"/>
-        <location filename="../Pages.cpp" line="3475"/>
-        <location filename="../Pages.cpp" line="3515"/>
+        <location filename="../Pages.cpp" line="3398"/>
+        <location filename="../Pages.cpp" line="3479"/>
+        <location filename="../Pages.cpp" line="3519"/>
         <source>MMM d, yyyy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3412"/>
+        <location filename="../Pages.cpp" line="3416"/>
         <source>Short</source>
         <translation>Corto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3413"/>
+        <location filename="../Pages.cpp" line="3417"/>
         <source>Long</source>
         <translation>Largo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3414"/>
+        <location filename="../Pages.cpp" line="3418"/>
         <source>From Watts</source>
         <translation>Desde vatios</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3455"/>
-        <location filename="../Pages.cpp" line="3498"/>
+        <location filename="../Pages.cpp" line="3459"/>
+        <location filename="../Pages.cpp" line="3502"/>
         <source>CP must be &gt; 0</source>
         <translation>PC debe ser &gt; 0</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3662"/>
+        <location filename="../Pages.cpp" line="3666"/>
         <source>Maximum of 10 zones reached.</source>
         <translation>Se alcancó el máximo de 10 zonas.</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3687"/>
-        <location filename="../Pages.cpp" line="3694"/>
+        <location filename="../Pages.cpp" line="3691"/>
+        <location filename="../Pages.cpp" line="3698"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3689"/>
-        <location filename="../Pages.cpp" line="3696"/>
+        <location filename="../Pages.cpp" line="3693"/>
+        <location filename="../Pages.cpp" line="3700"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -4239,11 +4243,11 @@ Comencemos la configuración.</translation>
     </message>
     <message>
         <source>Percent of Best / Heat Rides</source>
-        <translation type="vanished">Porcentaje del Mejor / Mapa de Calor</translation>
+        <translation type="obsolete">Porcentaje del Mejor / Mapa de Calor</translation>
     </message>
     <message>
         <source>Heat Rides</source>
-        <translation type="vanished">Mapa de Calor</translation>
+        <translation type="obsolete">Mapa de Calor</translation>
     </message>
     <message>
         <location filename="../CPPlot.cpp" line="1410"/>
@@ -4311,11 +4315,11 @@ ddd, dd MMM yyyy</source>
     </message>
     <message>
         <source>Rides</source>
-        <translation type="vanished">Actividades</translation>
+        <translation type="obsolete">Actividades</translation>
     </message>
     <message>
         <source>min/km</source>
-        <translation type="vanished">min/km</translation>
+        <translation type="obsolete">min/km</translation>
     </message>
     <message>
         <location filename="../CPPlot.cpp" line="657"/>
@@ -4336,7 +4340,7 @@ ddd, dd MMM yyyy</source>
     </message>
     <message>
         <source>min/mile</source>
-        <translation type="vanished">min/milla</translation>
+        <translation type="obsolete">min/milla</translation>
     </message>
     <message>
         <location filename="../CPPlot.cpp" line="2105"/>
@@ -4355,91 +4359,91 @@ ddd, dd MMM yyyy</source>
 <context>
     <name>CVPage</name>
     <message>
-        <location filename="../Pages.cpp" line="4710"/>
-        <location filename="../Pages.cpp" line="4722"/>
+        <location filename="../Pages.cpp" line="4714"/>
+        <location filename="../Pages.cpp" line="4726"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4711"/>
-        <location filename="../Pages.cpp" line="4723"/>
+        <location filename="../Pages.cpp" line="4715"/>
+        <location filename="../Pages.cpp" line="4727"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4716"/>
-        <location filename="../Pages.cpp" line="4728"/>
+        <location filename="../Pages.cpp" line="4720"/>
+        <location filename="../Pages.cpp" line="4732"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4717"/>
-        <location filename="../Pages.cpp" line="4729"/>
+        <location filename="../Pages.cpp" line="4721"/>
+        <location filename="../Pages.cpp" line="4733"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4719"/>
+        <location filename="../Pages.cpp" line="4723"/>
         <source>Def</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4739"/>
-        <location filename="../Pages.cpp" line="4774"/>
+        <location filename="../Pages.cpp" line="4743"/>
+        <location filename="../Pages.cpp" line="4778"/>
         <source>From Date</source>
         <translation>Desde </translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4740"/>
-        <location filename="../Pages.cpp" line="4775"/>
+        <location filename="../Pages.cpp" line="4744"/>
+        <location filename="../Pages.cpp" line="4779"/>
         <source>Critical Velocity</source>
         <translation>Velocidad Crítica</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4752"/>
+        <location filename="../Pages.cpp" line="4756"/>
         <source>Metric Pace</source>
         <translation>Ritmo en unidades métricas</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4795"/>
-        <location filename="../Pages.cpp" line="4871"/>
+        <location filename="../Pages.cpp" line="4799"/>
+        <location filename="../Pages.cpp" line="4875"/>
         <source>MMM d, yyyy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4811"/>
+        <location filename="../Pages.cpp" line="4815"/>
         <source>Short</source>
         <translation>Corto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4812"/>
+        <location filename="../Pages.cpp" line="4816"/>
         <source>Long</source>
         <translation>Largo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4813"/>
+        <location filename="../Pages.cpp" line="4817"/>
         <source>From</source>
         <translation>Desde</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4857"/>
+        <location filename="../Pages.cpp" line="4861"/>
         <source>CV must be &gt; 0</source>
         <translation>VC debe ser &gt; 0</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4982"/>
+        <location filename="../Pages.cpp" line="4986"/>
         <source>Maximum of 10 zones reached.</source>
         <translation>Se alcancó el máximo de 10 zonas.</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5005"/>
-        <location filename="../Pages.cpp" line="5012"/>
+        <location filename="../Pages.cpp" line="5009"/>
+        <location filename="../Pages.cpp" line="5016"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5007"/>
-        <location filename="../Pages.cpp" line="5014"/>
+        <location filename="../Pages.cpp" line="5011"/>
+        <location filename="../Pages.cpp" line="5018"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -4649,32 +4653,32 @@ ddd, dd MMM yyyy</source>
 <context>
     <name>ColorsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1385"/>
+        <location filename="../Pages.cpp" line="1389"/>
         <source>Color</source>
         <translation>Color</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1386"/>
+        <location filename="../Pages.cpp" line="1390"/>
         <source>Select</source>
         <translation>Selección</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1399"/>
+        <location filename="../Pages.cpp" line="1403"/>
         <source>Activity Scrollbar</source>
         <translation>Barra de desplazamiento de Actividades</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1402"/>
+        <location filename="../Pages.cpp" line="1406"/>
         <source>Activity Headings</source>
         <translation>Encabezados de Actividades</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1413"/>
+        <location filename="../Pages.cpp" line="1417"/>
         <source>Line Width</source>
         <translation>Ancho de Línea</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1395"/>
+        <location filename="../Pages.cpp" line="1399"/>
         <source>Antialias</source>
         <translation>Antialias</translation>
     </message>
@@ -4698,60 +4702,60 @@ ddd, dd MMM yyyy</source>
         <translation>Color Plano (Windows)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1374"/>
+        <location filename="../Pages.cpp" line="1378"/>
         <source>Swatch</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1375"/>
+        <location filename="../Pages.cpp" line="1379"/>
         <source>Name</source>
         <translation>Nombre</translation>
     </message>
     <message>
         <source>Ride Scrollbar</source>
-        <translation type="vanished">Barra Desliz. Actividades</translation>
+        <translation type="obsolete">Barra Desliz. Actividades</translation>
     </message>
     <message>
         <source>Ride Headings</source>
-        <translation type="vanished">Encabezamiento Actividades</translation>
+        <translation type="obsolete">Encabezamiento Actividades</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1410"/>
+        <location filename="../Pages.cpp" line="1414"/>
         <source>Apply Theme</source>
         <translation>Aplicar Tema</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1414"/>
+        <location filename="../Pages.cpp" line="1418"/>
         <source>Default</source>
         <translation>Por defecto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1415"/>
+        <location filename="../Pages.cpp" line="1419"/>
         <source>Title</source>
         <translation>Título</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1416"/>
+        <location filename="../Pages.cpp" line="1420"/>
         <source>Chart Markers</source>
         <translation>Marcadores de Gráfico</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1417"/>
+        <location filename="../Pages.cpp" line="1421"/>
         <source>Chart Labels</source>
         <translation>Rótulos de Gráfico</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1418"/>
+        <location filename="../Pages.cpp" line="1422"/>
         <source>Calendar Text</source>
         <translation>Texto en Calendario</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1525"/>
+        <location filename="../Pages.cpp" line="1529"/>
         <source>Theme</source>
         <translation>Tema</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1526"/>
+        <location filename="../Pages.cpp" line="1530"/>
         <source>Colors</source>
         <translation>Colores</translation>
     </message>
@@ -4900,7 +4904,7 @@ Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenC
 Current athlete data will no longer be available and GoldenCheetah will need to restart for the change to take effect.
 
 Do you want to apply and restart GoldenCheetah?</source>
-        <translation type="vanished">Allí es donde todos los nuevos atletas y actividades serán almacenadas.
+        <translation type="obsolete">Allí es donde todos los nuevos atletas y actividades serán almacenadas.
 
 Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenCheetah para que el cambio tenga efecto.
 
@@ -5552,19 +5556,19 @@ Puede demorar.
     </message>
     <message>
         <source>Ride Mean Max</source>
-        <translation type="vanished">Promedios Máximos</translation>
+        <translation type="obsolete">Promedios Máximos</translation>
     </message>
     <message>
         <source>Ride Centile</source>
-        <translation type="vanished">Porcentajes</translation>
+        <translation type="obsolete">Porcentajes</translation>
     </message>
     <message>
         <source>No Ride</source>
-        <translation type="vanished">No mostrar</translation>
+        <translation type="obsolete">No mostrar</translation>
     </message>
     <message>
         <source>Current Ride</source>
-        <translation type="vanished">Actividad Actual</translation>
+        <translation type="obsolete">Actividad Actual</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="254"/>
@@ -5902,11 +5906,11 @@ Puede demorar.
     </message>
     <message>
         <source>Upload ride to CyclingAnalytics...</source>
-        <translation type="vanished">Cargar Actividad a CyclingAnalytics...</translation>
+        <translation type="obsolete">Cargar Actividad a CyclingAnalytics...</translation>
     </message>
     <message>
         <source>Upload ride... Sending to CyclingAnalytics</source>
-        <translation type="vanished">Cargar Actividad... Enviando a CyclingAnalytics</translation>
+        <translation type="obsolete">Cargar Actividad... Enviando a CyclingAnalytics</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="939"/>
@@ -6156,62 +6160,62 @@ Cancelar para salir.</translation>
 <context>
     <name>DefaultsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2936"/>
+        <location filename="../Pages.cpp" line="2940"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2937"/>
+        <location filename="../Pages.cpp" line="2941"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2948"/>
+        <location filename="../Pages.cpp" line="2952"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2949"/>
+        <location filename="../Pages.cpp" line="2953"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2950"/>
+        <location filename="../Pages.cpp" line="2954"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2951"/>
+        <location filename="../Pages.cpp" line="2955"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2962"/>
+        <location filename="../Pages.cpp" line="2966"/>
         <source>Field</source>
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2963"/>
+        <location filename="../Pages.cpp" line="2967"/>
         <source>Value</source>
         <translation>Valor</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2964"/>
+        <location filename="../Pages.cpp" line="2968"/>
         <source>Linked field</source>
         <translation>Campo Vinculado</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2965"/>
+        <location filename="../Pages.cpp" line="2969"/>
         <source>Default Value</source>
         <translation>Valor por Defecto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3042"/>
+        <location filename="../Pages.cpp" line="3046"/>
         <source>New</source>
         <translation>Nuevo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3044"/>
+        <location filename="../Pages.cpp" line="3048"/>
         <source>New (%1)</source>
         <translation>Nuevo (%1)</translation>
     </message>
@@ -6444,7 +6448,7 @@ Cancelar para salir.</translation>
     <name>DownloadRideDialog</name>
     <message>
         <source>Download Ride Data</source>
-        <translation type="vanished">Descargar datos del Entrenamiento</translation>
+        <translation type="obsolete">Descargar datos del Entrenamiento</translation>
     </message>
     <message>
         <source>Instructions:</source>
@@ -6457,7 +6461,7 @@ Cancelar para salir.</translation>
     </message>
     <message>
         <source>&amp;Erase Ride(s)</source>
-        <translation type="vanished">&amp;Borrar Entrenamiento(s)</translation>
+        <translation type="obsolete">&amp;Borrar Entrenamiento(s)</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="38"/>
@@ -6511,11 +6515,11 @@ Cancelar para salir.</translation>
     </message>
     <message>
         <source>Getting ride list ...</source>
-        <translation type="vanished">Obteniendo lisa de actividades...</translation>
+        <translation type="obsolete">Obteniendo lisa de actividades...</translation>
     </message>
     <message>
         <source>Get ride list failed</source>
-        <translation type="vanished">Falló obtener lista de actividades</translation>
+        <translation type="obsolete">Falló obtener lista de actividades</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="324"/>
@@ -6549,7 +6553,7 @@ Cancelar para salir.</translation>
     </message>
     <message>
         <source>The ride %1 could not be converted to GoldenCheetah .JSON file format.</source>
-        <translation type="vanished">La actividad %1 no se pudo convertir a format GoldenCheetah .JSON</translation>
+        <translation type="obsolete">La actividad %1 no se pudo convertir a format GoldenCheetah .JSON</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="457"/>
@@ -6580,7 +6584,7 @@ Cancelar para salir.</translation>
     </message>
     <message>
         <source>The ride starting at %1 appears to have already been downloaded.  Do you want to overwrite the previous download?</source>
-        <translation type="vanished">La actividad que comienza en %1 parece ya haber sido descargada. La quiere sobreescribir?</translation>
+        <translation type="obsolete">La actividad que comienza en %1 parece ya haber sido descargada. La quiere sobreescribir?</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="390"/>
@@ -6679,7 +6683,7 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
     </message>
     <message>
         <source>Ride Already Downloaded</source>
-        <translation type="vanished">Entrenamiento ya descargado</translation>
+        <translation type="obsolete">Entrenamiento ya descargado</translation>
     </message>
     <message>
         <source>This ride appears to have already </source>
@@ -7428,37 +7432,37 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
 <context>
     <name>FieldsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2400"/>
+        <location filename="../Pages.cpp" line="2404"/>
         <source>Text</source>
         <translation>Texto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2401"/>
+        <location filename="../Pages.cpp" line="2405"/>
         <source>Textbox</source>
         <translation>Texto Largo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2402"/>
+        <location filename="../Pages.cpp" line="2406"/>
         <source>ShortText</source>
         <translation>Texto Corto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2403"/>
+        <location filename="../Pages.cpp" line="2407"/>
         <source>Integer</source>
         <translation>Entero</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2404"/>
+        <location filename="../Pages.cpp" line="2408"/>
         <source>Double</source>
         <translation>Doble</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2405"/>
+        <location filename="../Pages.cpp" line="2409"/>
         <source>Date</source>
         <translation>Fecha</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2406"/>
+        <location filename="../Pages.cpp" line="2410"/>
         <source>Time</source>
         <translation>Hora</translation>
     </message>
@@ -7479,72 +7483,72 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
         <translation type="obsolete">Renombrar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2660"/>
+        <location filename="../Pages.cpp" line="2664"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2661"/>
+        <location filename="../Pages.cpp" line="2665"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2662"/>
+        <location filename="../Pages.cpp" line="2666"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2647"/>
+        <location filename="../Pages.cpp" line="2651"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2407"/>
+        <location filename="../Pages.cpp" line="2411"/>
         <source>Checkbox</source>
         <translation>Botón Selección</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2648"/>
+        <location filename="../Pages.cpp" line="2652"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2659"/>
+        <location filename="../Pages.cpp" line="2663"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2673"/>
+        <location filename="../Pages.cpp" line="2677"/>
         <source>Screen Tab</source>
         <translation>Pestaña</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2674"/>
+        <location filename="../Pages.cpp" line="2678"/>
         <source>Field</source>
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2675"/>
+        <location filename="../Pages.cpp" line="2679"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2676"/>
+        <location filename="../Pages.cpp" line="2680"/>
         <source>Values</source>
         <translation>Valores</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2677"/>
+        <location filename="../Pages.cpp" line="2681"/>
         <source>Diary</source>
         <translation>Agenda</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2794"/>
+        <location filename="../Pages.cpp" line="2798"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2796"/>
+        <location filename="../Pages.cpp" line="2800"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -7916,7 +7920,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Ride Plot Background</source>
-        <translation type="vanished">Fondo de Curva de Actividad</translation>
+        <translation type="obsolete">Fondo de Curva de Actividad</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="82"/>
@@ -7935,11 +7939,11 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Ride Plot X Axis</source>
-        <translation type="vanished">Gráfico de Entrenamiento - Eje X</translation>
+        <translation type="obsolete">Gráfico de Entrenamiento - Eje X</translation>
     </message>
     <message>
         <source>Ride Plot Y Axis</source>
-        <translation type="vanished">Gráfico de Entrenamiento - Eje Y</translation>
+        <translation type="obsolete">Gráfico de Entrenamiento - Eje Y</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="87"/>
@@ -8288,7 +8292,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Ride History Group</source>
-        <translation type="vanished">Grupo de Actividades Históricas</translation>
+        <translation type="obsolete">Grupo de Actividades Históricas</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="166"/>
@@ -8297,7 +8301,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Ride CP Curve</source>
-        <translation type="vanished">Curva PC de la Actividad</translation>
+        <translation type="obsolete">Curva PC de la Actividad</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="168"/>
@@ -8495,11 +8499,11 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Upload ride to Garmin Connect...</source>
-        <translation type="vanished">Cargar Actividad a Garmin Connect...</translation>
+        <translation type="obsolete">Cargar Actividad a Garmin Connect...</translation>
     </message>
     <message>
         <source>Upload ride... Sending to Garmin Connect</source>
-        <translation type="vanished">Cargar Actividad... Enviando a Garmin Connect</translation>
+        <translation type="obsolete">Cargar Actividad... Enviando a Garmin Connect</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="1369"/>
@@ -8586,7 +8590,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Calendar Text</source>
-        <translation type="vanished">Texto en Calendario</translation>
+        <translation type="obsolete">Texto en Calendario</translation>
     </message>
 </context>
 <context>
@@ -8613,7 +8617,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Close</source>
-        <translation type="vanished">Cerrar</translation>
+        <translation type="obsolete">Cerrar</translation>
     </message>
     <message>
         <location filename="../GoldenCheetah.cpp" line="869"/>
@@ -8728,11 +8732,11 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Rides</source>
-        <translation type="vanished">Actividades</translation>
+        <translation type="obsolete">Actividades</translation>
     </message>
     <message>
         <source>Intervals</source>
-        <translation type="vanished">Intervalos</translation>
+        <translation type="obsolete">Intervalos</translation>
     </message>
     <message>
         <source>Home</source>
@@ -8801,12 +8805,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Comienza copiado de archivos de Configuración...</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="695"/>
+        <location filename="../GcUpgrade.cpp" line="721"/>
         <source>-&gt; Error: Deletion of copied file &apos;%1&apos; failed</source>
         <translation>-&gt; Error: Falló eliminación de archivo copiado &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="704"/>
+        <location filename="../GcUpgrade.cpp" line="730"/>
         <source>-&gt; Error moving file : </source>
         <translation>-&gt; Error moviendo archivo: </translation>
     </message>
@@ -8866,62 +8870,62 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>%1 archivos de medios y entrenamientos movidos al subdirectorio: %2 - fallaron %3</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="545"/>
+        <location filename="../GcUpgrade.cpp" line="571"/>
         <source>Start conversion of native activity files to GoldenCheetah .JSON format...</source>
         <translation>Comienza la conversión de archivos de actividad nativos a formato GoldenCheetah .JSON...</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="599"/>
+        <location filename="../GcUpgrade.cpp" line="625"/>
         <source>-&gt; Information: Activity %1 - Successfully converted to .JSON</source>
         <translation>-&gt; Información: Actividad %1 - Convertida exitosamente a .JSON</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="611"/>
+        <location filename="../GcUpgrade.cpp" line="637"/>
         <source>-&gt; Error: Activity %1 - Conversion errors: </source>
         <translation>-&gt; Error: Actividad %1 - Errores de conversión: </translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="613"/>
+        <location filename="../GcUpgrade.cpp" line="639"/>
         <source>......... message(s) of .JSON conversion): </source>
         <translation>........ mensaje(s) de conversión a JSON: </translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="623"/>
+        <location filename="../GcUpgrade.cpp" line="649"/>
         <source>-&gt; Error: Activity %1 - Invalid File Name (expected format &apos;YYYY_MM_DD_HH_MM_SS.%2&apos;)</source>
         <translation>-&gt; Error: Actividad %1 - Nombre de Archivo Inválido (formato esperado &apos;YYYY_MM_DD_HH_MM_SS.%2&apos;)</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="629"/>
+        <location filename="../GcUpgrade.cpp" line="655"/>
         <source>-&gt; Error: Activity %1 - Problem reading file</source>
         <translation>-&gt; Error: Actividad %1 - Problemas leyendo archivo</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="636"/>
+        <location filename="../GcUpgrade.cpp" line="662"/>
         <source>%1 activity files converted to .JSON and stored in subdirectory: %2 - %3 failed</source>
         <translation>%1 archivos de actividad convertidos a .JSON y almacenados en subdirectorio: %2 - fallaron %3</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="639"/>
+        <location filename="../GcUpgrade.cpp" line="665"/>
         <source>%1 converted activity source files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 achivos de actividad convertidos movidos al subdirectorio: %2 - fallaron %3</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="644"/>
+        <location filename="../GcUpgrade.cpp" line="670"/>
         <source>Summary: No errors detected - upgrade successful</source>
         <translation>Resúmen: Sin errores detectados - actualización exitosa</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="647"/>
+        <location filename="../GcUpgrade.cpp" line="673"/>
         <source>Summary: %1 errors detected - please check log details before proceeding</source>
         <translation>Resúmen: %1 errores detectados - por favor verifique los detalles en el registro antes de continuar</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="650"/>
+        <location filename="../GcUpgrade.cpp" line="676"/>
         <source>&lt;center&gt;&lt;br&gt;After choosing &apos;Proceed to Athlete&apos;, the system will open the athlete window using the converted data. Depending on the errors this might lead to follow-up errors and incomplete athlete data. You may either fix the error(s) in your directory directly, or go back to your last backup and correct the error(s) in the source data. &lt;br&gt;The upgrade process will be done again each time you open the athlete, until the conversion was successful - and had no more errors.&lt;/center&gt;</source>
         <translation>&lt;center&gt;&lt;br&gt;Luego de elegir &apos;Continuar con el atleta&apos;, el sistema abrirá la ventana del atleta usando los datos convertidos. Dependiendo de los error ocurridos durante la conversión es puede conducir a otros errores y datos incompletos. Usted puede corregir los errores en su directorio directamente o, volver al último respaldo y corregir los errores en los datos originales. &lt;br&gt;El proceso de actualización será repetido cada vez que abra el atleta, hasta que la conversión sea existosa - y no se reporten errores.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="657"/>
+        <location filename="../GcUpgrade.cpp" line="683"/>
         <source>&lt;center&gt;&lt;br&gt;Latest information about possible upgrade problems and concepts to resolve them are available in the&lt;br&gt;&lt;a href= &quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.2_Troubleshooting_Guide&quot; target=&quot;_blank&quot;&gt;Upgrade v3.2 Troubleshooting Guide&lt;a&gt;</source>
         <translation>&lt;center&gt;&lt;br&gt;La información más actualizada sobre posibles errores de actualización y ayuda para resolverlos disponibles en&lt;br&gt;&lt;a href= &quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.11_Troubleshooting_Guide&quot; target=&quot;_blank&quot;&gt;Upgrade v3.11 Troubleshooting Guide&lt;a&gt; {3.2_?} {3.2 ?}</translation>
     </message>
@@ -8931,36 +8935,36 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>-&gt; Information: Deletion of copied file %1 failed</source>
-        <translation type="vanished">-&gt; Información: falló el borrado del archivo copiado %1</translation>
+        <translation type="obsolete">-&gt; Información: falló el borrado del archivo copiado %1</translation>
     </message>
 </context>
 <context>
     <name>GcUpgradeExecuteDialog</name>
     <message>
-        <location filename="../GcUpgrade.cpp" line="750"/>
+        <location filename="../GcUpgrade.cpp" line="776"/>
         <source>Athlete %1</source>
         <translation>Atleta %1</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="767"/>
+        <location filename="../GcUpgrade.cpp" line="793"/>
         <source>&lt;center&gt;&lt;h2&gt;Upgrade of Athlete:&lt;br&gt;%1&lt;br&gt;&lt;/h2&gt;&lt;/center&gt;</source>
         <translation>&lt;center&gt;&lt;h2&gt;Actualización del Atleta:&lt;br&gt;%1&lt;br&gt;&lt;/h2&gt;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="772"/>
+        <location filename="../GcUpgrade.cpp" line="798"/>
         <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.2 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectories which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantined files: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.2 all downloads from devices or imported activity files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
         <translation>&lt;center&gt;&lt;b&gt;Como primera medida resguarde sus datos de &apos;Atleta&apos;!&lt;br&gt;&lt;b&gt;Por favor lea cuidadosamente antes de continuar!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Con la versión 3.2 el directorioa del &apos;Atleta&apos; ha sido reestructurado agregando un conjunto de subdirectorios que almacenan los diferentes tipos de archivos de GoldenCheetah.&lt;br&gt;&lt;br&gt;La nueva estructura es:&lt;br&gt;-&gt; Archivos de Actividades: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Configuración: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Descarga: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Importación: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Entrenamientos: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de cache: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Calendario: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Registro: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Archivos Temporarios: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;El proceso de actualización creará la nueva estructura de directorios y moverá los archivos existentes a los nuevos directorios. Durante la actualización todos los archivos de actividad serán convertidos al formato nativo GoldenCheetah .JSON y movidos al directorio&lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt;. Los archivos originales se moverán al directorio &lt;samp&gt;/imports&lt;/samp&gt;.&lt;br&gt;&lt;br&gt;Comenzando con la version 3.2 todos los archivos descargados desde cualquier dispositivo o importados serán convertidos al formato GoldenCheetah .JSON durante el proceso. Los archivos originales se almacenaran, dependiendo del origen, en el directorio &lt;samp&gt;/downloads&lt;/samp&gt; o &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt;r.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Por favor asegúrese de tener resguardo de sus datos de atleta antes de continuar con la actualización. No podemos hacernos responsables de cualquier pérdida de datos durante el proceso. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
     </message>
     <message>
         <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.2 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectories which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity/Ride files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity/Ride files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantined files: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity/ride files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.2 all downloads from devices or imported activity/ride files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
-        <translation type="vanished">&lt;center&gt;&lt;b&gt;Como primera medida resguarde sus datos de &apos;Atleta&apos;!&lt;br&gt;&lt;b&gt;Por favor lea cuidadosamente antes de continuar!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Con la versión 3.2 el directorioa del &apos;Atleta&apos; ha sido reestructurado agregando un conjunto de subdirectorios que almacenan los diferentes tipos de archivos de GoldenCheetah.&lt;br&gt;&lt;br&gt;La nueva estructura es:&lt;br&gt;-&gt; Archivos de Actividades: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Configuración: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Descarga: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Importación: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Entrenamientos: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de cache: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Calendario: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Registro: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Archivos Temporarios: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;El proceso de actualización creará la nueva estructura de directorios y moverá los archivos existentes a los nuevos directorios. Durante la actualización todos los archivos de actividad serán convertidos al formato nativo GoldenCheetah .JSON y movidos al directorio&lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt;. Los archivos originales se moverán al directorio &lt;samp&gt;/imports&lt;/samp&gt;.&lt;br&gt;&lt;br&gt;Comenzando con la version 3.2 todos los archivos descargados desde cualquier dispositivo o importados serán convertidos al formato GoldenCheetah .JSON durante el proceso. Los archivos originales se almacenaran, dependiendo del origen, en el directorio &lt;samp&gt;/downloads&lt;/samp&gt; o &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt;r.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Por favor asegúrese de tener resguardo de sus datos de atleta antes de continuar con la actualización. No podemos hacernos responsables de cualquier pérdida de datos durante el proceso. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
+        <translation type="obsolete">&lt;center&gt;&lt;b&gt;Como primera medida resguarde sus datos de &apos;Atleta&apos;!&lt;br&gt;&lt;b&gt;Por favor lea cuidadosamente antes de continuar!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Con la versión 3.2 el directorioa del &apos;Atleta&apos; ha sido reestructurado agregando un conjunto de subdirectorios que almacenan los diferentes tipos de archivos de GoldenCheetah.&lt;br&gt;&lt;br&gt;La nueva estructura es:&lt;br&gt;-&gt; Archivos de Actividades: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Configuración: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Descarga: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Importación: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Entrenamientos: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de cache: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Calendario: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Registro: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Archivos Temporarios: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;El proceso de actualización creará la nueva estructura de directorios y moverá los archivos existentes a los nuevos directorios. Durante la actualización todos los archivos de actividad serán convertidos al formato nativo GoldenCheetah .JSON y movidos al directorio&lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt;. Los archivos originales se moverán al directorio &lt;samp&gt;/imports&lt;/samp&gt;.&lt;br&gt;&lt;br&gt;Comenzando con la version 3.2 todos los archivos descargados desde cualquier dispositivo o importados serán convertidos al formato GoldenCheetah .JSON durante el proceso. Los archivos originales se almacenaran, dependiendo del origen, en el directorio &lt;samp&gt;/downloads&lt;/samp&gt; o &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt;r.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Por favor asegúrese de tener resguardo de sus datos de atleta antes de continuar con la actualización. No podemos hacernos responsables de cualquier pérdida de datos durante el proceso. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
     </message>
     <message>
         <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.11 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectory which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity/Ride files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity/Ride files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity/ride files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.11 all downloads from devices or imported activity/ride files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
         <translation type="obsolete">&lt;center&gt;&lt;b&gt;Como primera medida resguarde sus datos de &apos;Atleta&apos;!&lt;br&gt;&lt;b&gt;Por favor lea cuidadosamente antes de continuar!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Con la versión 3.11 el directorioa del &apos;Atleta&apos; ha sido reestructurado agregando un conjunto de subdirectorios que almacenan los diferentes tipos de archivos de GoldenCheetah.&lt;br&gt;&lt;br&gt;La nueva estructura es:&lt;br&gt;-&gt; Archivos de Actividades: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Configuración: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Descarga: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Importación: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Entrenamientos: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de cache: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Calendario: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Registro: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Archivos Temporarios: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;El proceso de actualización creará la nueva estructura de directorios y moverá los archivos existentes a los nuevos directorios. Durante la actualización todos los archivos de actividad serán convertidos al formato nativo GoldenCheetah .JSON y movidos al directorio&lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt;. Los archivos originales se moverán al directorio &lt;samp&gt;/imports&lt;/samp&gt;.&lt;br&gt;&lt;br&gt;Comenzando con la version 3.11 todos los archivos descargados desde cualquier dispositivo o importados serán convertidos al formato GoldenCheetah .JSON durante el proceso. Los archivos originales se almacenaran, dependiendo del origen, en el directorio &lt;samp&gt;/downloads&lt;/samp&gt; o &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt;r.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Por favor asegúrese de tener resguardo de sus datos de atleta antes de continuar con la actualización. No podemos hacernos responsables de cualquier pérdida de datos durante el proceso. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="815"/>
+        <location filename="../GcUpgrade.cpp" line="841"/>
         <source>Accept conditions and proceed with Upgrade</source>
         <translation>Aceptar las condiciones y continuar con la Actualización</translation>
     </message>
@@ -8973,7 +8977,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">Continuar Actualización</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="818"/>
+        <location filename="../GcUpgrade.cpp" line="844"/>
         <source>Abort Upgrade</source>
         <translation>Cancelar Actualización</translation>
     </message>
@@ -8981,7 +8985,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>GcUpgradeLogDialog</name>
     <message>
-        <location filename="../GcUpgrade.cpp" line="835"/>
+        <location filename="../GcUpgrade.cpp" line="861"/>
         <source>Athlete %1</source>
         <translation>Atleta %1</translation>
     </message>
@@ -8990,27 +8994,27 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">&lt;h1&gt;Registro de actualización: GoldenCheetah v3.11&lt;/h1&gt;</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="851"/>
+        <location filename="../GcUpgrade.cpp" line="877"/>
         <source>&lt;h1&gt;Upgrade log: GoldenCheetah v3.2&lt;/h1&gt;</source>
         <translation>&lt;h1&gt;Registro de actualización: GoldenCheetah v3.2&lt;/h1&gt;</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="875"/>
+        <location filename="../GcUpgrade.cpp" line="901"/>
         <source>Proceed to Athlete</source>
         <translation>Continuar con el Atleta</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="877"/>
+        <location filename="../GcUpgrade.cpp" line="903"/>
         <source>Save Upgrade Report...</source>
         <translation>Guardar Reporte de Actualización...</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="900"/>
+        <location filename="../GcUpgrade.cpp" line="926"/>
         <source>Save Log</source>
         <translation>Guardar Registro</translation>
     </message>
     <message>
-        <location filename="../GcUpgrade.cpp" line="900"/>
+        <location filename="../GcUpgrade.cpp" line="926"/>
         <source>Text File (*.txt)</source>
         <translation>Archivo de Texto (*.txt)</translation>
     </message>
@@ -9035,7 +9039,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Close</source>
-        <translation type="vanished">Cerrar</translation>
+        <translation type="obsolete">Cerrar</translation>
     </message>
     <message>
         <location filename="../GoldenCheetah.cpp" line="198"/>
@@ -9102,7 +9106,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Ride Summary</source>
-        <translation type="vanished">Resumen Actividad</translation>
+        <translation type="obsolete">Resumen Actividad</translation>
     </message>
     <message>
         <location filename="../GcWindowRegistry.cpp" line="79"/>
@@ -9176,7 +9180,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Route Segment</source>
-        <translation type="vanished">Segmento de Recorrido</translation>
+        <translation type="obsolete">Segmento de Recorrido</translation>
     </message>
     <message>
         <location filename="../GcWindowRegistry.cpp" line="93"/>
@@ -9400,7 +9404,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Smart Recoding Threshold (secs):</source>
-        <translation type="vanished">Umbral del Smart Recording (segs):</translation>
+        <translation type="obsolete">Umbral del Smart Recording (segs):</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="239"/>
@@ -9447,7 +9451,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <name>GenerateHeatMapDialog</name>
     <message>
         <source>Ride Heat Map Generator</source>
-        <translation type="vanished">Generador de Mapa de Calor p/actividades</translation>
+        <translation type="obsolete">Generador de Mapa de Calor p/actividades</translation>
     </message>
     <message>
         <location filename="../GenerateHeatMapDialog.cpp" line="31"/>
@@ -9533,7 +9537,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>%1 rides exported, %2 failed or skipped.</source>
-        <translation type="vanished">%1 actividades exportadas, %2 fallaron o fueron salteadas.</translation>
+        <translation type="obsolete">%1 actividades exportadas, %2 fallaron o fueron salteadas.</translation>
     </message>
     <message>
         <location filename="../GenerateHeatMapDialog.cpp" line="163"/>
@@ -9612,7 +9616,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Manually crate a workout based on gradient (slope) and distance, maximum grade is 5.</source>
-        <translation type="vanished">Crear un entrenamiento basado en pendiente y distancia, la pendiente máxima es 5.</translation>
+        <translation type="obsolete">Crear un entrenamiento basado en pendiente y distancia, la pendiente máxima es 5.</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="546"/>
@@ -9870,19 +9874,19 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Entire Ride</source>
-        <translation type="vanished">Actividad Completa</translation>
+        <translation type="obsolete">Actividad Completa</translation>
     </message>
     <message>
         <source>%1: %2 (%3 rides)</source>
-        <translation type="vanished">%1: %2 (%3 actividades)</translation>
+        <translation type="obsolete">%1: %2 (%3 actividades)</translation>
     </message>
     <message>
         <source>%1 rides</source>
-        <translation type="vanished">%1 actividades</translation>
+        <translation type="obsolete">%1 actividades</translation>
     </message>
     <message>
         <source>All Rides</source>
-        <translation type="vanished">Todas las Actividades</translation>
+        <translation type="obsolete">Todas las Actividades</translation>
     </message>
 </context>
 <context>
@@ -10426,11 +10430,11 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Ride Data Samples</source>
-        <translation type="vanished">Muetras de Datos</translation>
+        <translation type="obsolete">Muetras de Datos</translation>
     </message>
     <message>
         <source>Ride Metrics</source>
-        <translation type="vanished">Métricas</translation>
+        <translation type="obsolete">Métricas</translation>
     </message>
     <message>
         <location filename="../HistogramWindow.cpp" line="135"/>
@@ -10793,7 +10797,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>HrSchemePage</name>
     <message>
-        <location filename="../Pages.cpp" line="3827"/>
+        <location filename="../Pages.cpp" line="3831"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
@@ -10802,54 +10806,54 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">Renombrar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3828"/>
+        <location filename="../Pages.cpp" line="3832"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3821"/>
+        <location filename="../Pages.cpp" line="3825"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3822"/>
+        <location filename="../Pages.cpp" line="3826"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3837"/>
+        <location filename="../Pages.cpp" line="3841"/>
         <source>Short</source>
         <translation>Corto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3838"/>
+        <location filename="../Pages.cpp" line="3842"/>
         <source>Long</source>
         <translation>Largo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3839"/>
+        <location filename="../Pages.cpp" line="3843"/>
         <source>Percent of LT</source>
         <translation>Porcentaje del UL</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3840"/>
+        <location filename="../Pages.cpp" line="3844"/>
         <source>Trimp k</source>
         <translation>Trimp k</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3895"/>
+        <location filename="../Pages.cpp" line="3899"/>
         <source>Maximum of 10 zones reached.</source>
         <translation>Se alcancó el máximo de 10 zonas.</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3928"/>
-        <location filename="../Pages.cpp" line="3935"/>
+        <location filename="../Pages.cpp" line="3932"/>
+        <location filename="../Pages.cpp" line="3939"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3930"/>
-        <location filename="../Pages.cpp" line="3937"/>
+        <location filename="../Pages.cpp" line="3934"/>
+        <location filename="../Pages.cpp" line="3941"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -10933,12 +10937,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">Umbral de Lactato</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3795"/>
+        <location filename="../Pages.cpp" line="3799"/>
         <source>Lactate Threshold</source>
         <translation>Umbral de Lactado</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3796"/>
+        <location filename="../Pages.cpp" line="3800"/>
         <source>Default</source>
         <translation>Por defecto</translation>
     </message>
@@ -11694,7 +11698,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <name>ImportPage</name>
     <message>
         <source>Ride Smoothing Parameters</source>
-        <translation type="vanished">Parámetros de Suavizado</translation>
+        <translation type="obsolete">Parámetros de Suavizado</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="637"/>
@@ -11772,14 +11776,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>piés</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="737"/>
         <source>Elevation Climbed</source>
-        <translation>Desnivel Acumulado</translation>
+        <translation type="obsolete">Desnivel Acumulado</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="738"/>
         <source>Distance</source>
-        <translation>Distancia</translation>
+        <translation type="obsolete">Distancia</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="750"/>
@@ -11804,43 +11806,43 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <name>IntervalColumnChooser</name>
     <message>
         <source>Column Chooser</source>
-        <translation type="vanished">Elegir Columna</translation>
+        <translation type="obsolete">Elegir Columna</translation>
     </message>
 </context>
 <context>
     <name>IntervalGroupByModel</name>
     <message>
         <source>Entire Ride</source>
-        <translation type="vanished">Actividad Completa</translation>
+        <translation type="obsolete">Actividad Completa</translation>
     </message>
     <message>
         <source>%1 rides</source>
-        <translation type="vanished">%1 actividades</translation>
+        <translation type="obsolete">%1 actividades</translation>
     </message>
     <message>
         <source>All Rides</source>
-        <translation type="vanished">Todas las actividades</translation>
+        <translation type="obsolete">Todas las actividades</translation>
     </message>
 </context>
 <context>
     <name>IntervalMetricsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1757"/>
+        <location filename="../Pages.cpp" line="1761"/>
         <source>Available Metrics</source>
         <translation>Métricas Disponibles</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1762"/>
+        <location filename="../Pages.cpp" line="1766"/>
         <source>Selected Metrics</source>
         <translation>Métricas Seleccionadas</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1778"/>
+        <location filename="../Pages.cpp" line="1782"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1779"/>
+        <location filename="../Pages.cpp" line="1783"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
@@ -11873,80 +11875,80 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <name>IntervalNavigator</name>
     <message>
         <source>*|Date|Duration|</source>
-        <translation type="vanished">*|Fecha|Duración|</translation>
+        <translation type="obsolete">*|Fecha|Duración|</translation>
     </message>
     <message>
         <source>File</source>
-        <translation type="vanished">Archivo</translation>
+        <translation type="obsolete">Archivo</translation>
     </message>
     <message>
         <source>Last updated</source>
-        <translation type="vanished">Última actualización</translation>
+        <translation type="obsolete">Última actualización</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation type="vanished">Fecha</translation>
+        <translation type="obsolete">Fecha</translation>
     </message>
     <message>
         <source>Time</source>
-        <translation type="vanished">Hora</translation>
+        <translation type="obsolete">Hora</translation>
     </message>
     <message>
         <source>Config Checksum</source>
-        <translation type="vanished">Verificación de Configuración</translation>
+        <translation type="obsolete">Verificación de Configuración</translation>
     </message>
     <message>
         <source>Group</source>
-        <translation type="vanished">Grupo</translation>
+        <translation type="obsolete">Grupo</translation>
     </message>
     <message>
         <source>Remove Column</source>
-        <translation type="vanished">Eliminar Columna</translation>
+        <translation type="obsolete">Eliminar Columna</translation>
     </message>
     <message>
         <source>Column Chooser</source>
-        <translation type="vanished">Elegir Columna</translation>
+        <translation type="obsolete">Elegir Columna</translation>
     </message>
 </context>
 <context>
     <name>IntervalNavigatorCellDelegate</name>
     <message>
         <source>seconds</source>
-        <translation type="vanished">segundos</translation>
+        <translation type="obsolete">segundos</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation type="vanished">Fecha</translation>
+        <translation type="obsolete">Fecha</translation>
     </message>
     <message>
         <source>Time</source>
-        <translation type="vanished">Hora</translation>
+        <translation type="obsolete">Hora</translation>
     </message>
     <message>
         <source>Last updated</source>
-        <translation type="vanished">Última actualización</translation>
+        <translation type="obsolete">Última actualización</translation>
     </message>
 </context>
 <context>
     <name>IntervalSearchFilter</name>
     <message>
         <source>File</source>
-        <translation type="vanished">Archivo</translation>
+        <translation type="obsolete">Archivo</translation>
     </message>
 </context>
 <context>
     <name>IntervalSidebar</name>
     <message>
         <source>Routes</source>
-        <translation type="vanished">Recorridos</translation>
+        <translation type="obsolete">Recorridos</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="vanished">Menú</translation>
+        <translation type="obsolete">Menú</translation>
     </message>
     <message>
         <source>Bests</source>
-        <translation type="vanished">Mejores</translation>
+        <translation type="obsolete">Mejores</translation>
     </message>
     <message>
         <source>All Rides</source>
@@ -11954,15 +11956,15 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Show Column Chooser</source>
-        <translation type="vanished">Mostrar Selección de Columnas</translation>
+        <translation type="obsolete">Mostrar Selección de Columnas</translation>
     </message>
     <message>
         <source>Expand All</source>
-        <translation type="vanished">Expandir Todo</translation>
+        <translation type="obsolete">Expandir Todo</translation>
     </message>
     <message>
         <source>Collapse All</source>
-        <translation type="vanished">Colapsar Todo</translation>
+        <translation type="obsolete">Colapsar Todo</translation>
     </message>
 </context>
 <context>
@@ -11990,7 +11992,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>empty interval</source>
-        <translation type="vanished">intervalo vacío</translation>
+        <translation type="obsolete">intervalo vacío</translation>
     </message>
     <message>
         <location filename="../IntervalSummaryWindow.cpp" line="308"/>
@@ -12001,7 +12003,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>IntervalsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="5545"/>
+        <location filename="../Pages.cpp" line="5549"/>
         <source>Enable interval auto-discovery:</source>
         <translation>Habilitar auto-detección de intervalos:</translation>
     </message>
@@ -12025,7 +12027,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Read ride detail for ride %1/%2</source>
-        <translation type="vanished">Leyendo detalle de %1/%2</translation>
+        <translation type="obsolete">Leyendo detalle de %1/%2</translation>
     </message>
     <message>
         <location filename="../JouleDevice.cpp" line="149"/>
@@ -12084,11 +12086,11 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Read ride summary...</source>
-        <translation type="vanished">Leyendo resúmen...</translation>
+        <translation type="obsolete">Leyendo resúmen...</translation>
     </message>
     <message>
         <source>%1 detailed rides</source>
-        <translation type="vanished">%1 actividades detalladas</translation>
+        <translation type="obsolete">%1 actividades detalladas</translation>
     </message>
     <message>
         <source>%1 detailled rides</source>
@@ -12101,7 +12103,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Delete ride detail for ride %1/%2</source>
-        <translation type="vanished">Borrar detalle de la sesión %1/%2</translation>
+        <translation type="obsolete">Borrar detalle de la sesión %1/%2</translation>
     </message>
 </context>
 <context>
@@ -12113,7 +12115,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Make sure the Joule (1.0 or GPS) unit is turned ON</source>
-        <translation type="vanished">Asegúrese que el Joule (1.0 o GPS) está encendido</translation>
+        <translation type="obsolete">Asegúrese que el Joule (1.0 o GPS) está encendido</translation>
     </message>
     <message>
         <location filename="../JouleDevice.cpp" line="48"/>
@@ -12192,63 +12194,63 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>KeywordsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2420"/>
+        <location filename="../Pages.cpp" line="2424"/>
         <source>Field</source>
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2427"/>
+        <location filename="../Pages.cpp" line="2431"/>
         <source>Use for Background</source>
         <translation>Usar como Fondo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2443"/>
+        <location filename="../Pages.cpp" line="2447"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2445"/>
+        <location filename="../Pages.cpp" line="2449"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2446"/>
+        <location filename="../Pages.cpp" line="2450"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2458"/>
+        <location filename="../Pages.cpp" line="2462"/>
         <source>Keyword</source>
         <translation>Palabra</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2459"/>
+        <location filename="../Pages.cpp" line="2463"/>
         <source>Color</source>
         <translation>Color</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2460"/>
+        <location filename="../Pages.cpp" line="2464"/>
         <source>Related Notes Words</source>
         <translation>Palabras Relacionadas</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2589"/>
-        <location filename="../Pages.cpp" line="2595"/>
+        <location filename="../Pages.cpp" line="2593"/>
+        <location filename="../Pages.cpp" line="2599"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2597"/>
+        <location filename="../Pages.cpp" line="2601"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2431"/>
+        <location filename="../Pages.cpp" line="2435"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2432"/>
+        <location filename="../Pages.cpp" line="2436"/>
         <source>-</source>
         <translation></translation>
     </message>
@@ -12269,7 +12271,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">Renombrar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2444"/>
+        <location filename="../Pages.cpp" line="2448"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
@@ -12427,36 +12429,36 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../LTMPlot.cpp" line="104"/>
         <location filename="../LTMPlot.cpp" line="264"/>
-        <location filename="../LTMPlot.cpp" line="1441"/>
+        <location filename="../LTMPlot.cpp" line="1442"/>
         <source>Date</source>
         <translation>Fecha</translation>
     </message>
     <message>
         <location filename="../LTMPlot.cpp" line="266"/>
-        <location filename="../LTMPlot.cpp" line="1423"/>
+        <location filename="../LTMPlot.cpp" line="1424"/>
         <source>Time of Day</source>
         <translation>Hora</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="638"/>
-        <location filename="../LTMPlot.cpp" line="676"/>
-        <location filename="../LTMPlot.cpp" line="718"/>
-        <location filename="../LTMPlot.cpp" line="1823"/>
+        <location filename="../LTMPlot.cpp" line="639"/>
+        <location filename="../LTMPlot.cpp" line="677"/>
+        <location filename="../LTMPlot.cpp" line="719"/>
+        <location filename="../LTMPlot.cpp" line="1824"/>
         <source>%1 trend</source>
         <translation>%1 tendencia</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="810"/>
+        <location filename="../LTMPlot.cpp" line="811"/>
         <source>%1 Top %2 Outliers</source>
         <translation>%1 Mejores %2 Atípicos</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="814"/>
+        <location filename="../LTMPlot.cpp" line="815"/>
         <source>%1 Outlier</source>
         <translation>%1 Atípico</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="897"/>
+        <location filename="../LTMPlot.cpp" line="898"/>
         <source>%1 Best</source>
         <translation>%1 Mejor</translation>
     </message>
@@ -12465,98 +12467,98 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">%1 Mejores %2</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="900"/>
+        <location filename="../LTMPlot.cpp" line="901"/>
         <source>Best %1</source>
         <translation>Mejores %1</translation>
     </message>
     <message>
         <source>trend</source>
-        <translation type="vanished">tendencia</translation>
+        <translation type="obsolete">tendencia</translation>
     </message>
     <message>
         <source>Outliers</source>
-        <translation type="vanished">Atípicos</translation>
+        <translation type="obsolete">Atípicos</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1276"/>
-        <location filename="../LTMPlot.cpp" line="2383"/>
+        <location filename="../LTMPlot.cpp" line="1277"/>
+        <location filename="../LTMPlot.cpp" line="2384"/>
         <source>Best</source>
         <translation>Mejor</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1426"/>
+        <location filename="../LTMPlot.cpp" line="1427"/>
         <source>Day</source>
         <translation>Día</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1429"/>
+        <location filename="../LTMPlot.cpp" line="1430"/>
         <source>Week</source>
         <translation>Semana</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1432"/>
+        <location filename="../LTMPlot.cpp" line="1433"/>
         <source>Month</source>
         <translation>Mes</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1435"/>
+        <location filename="../LTMPlot.cpp" line="1436"/>
         <source>Year</source>
         <translation>Año</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1438"/>
-        <location filename="../LTMPlot.cpp" line="3250"/>
+        <location filename="../LTMPlot.cpp" line="1439"/>
+        <location filename="../LTMPlot.cpp" line="3260"/>
         <source>All</source>
         <translation>Todos</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1746"/>
-        <location filename="../LTMPlot.cpp" line="1782"/>
+        <location filename="../LTMPlot.cpp" line="1747"/>
+        <location filename="../LTMPlot.cpp" line="1783"/>
         <source>%1 %2 trend</source>
         <translation>%1 %2 tendencia</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1914"/>
+        <location filename="../LTMPlot.cpp" line="1915"/>
         <source>%1 %2 Outliers</source>
         <translation>%1 %2 Atípicos</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1996"/>
+        <location filename="../LTMPlot.cpp" line="1997"/>
         <source>%1 %2 Best</source>
         <translation>%1 %2 Mejores</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="960"/>
-        <location filename="../LTMPlot.cpp" line="1122"/>
-        <location filename="../LTMPlot.cpp" line="2054"/>
-        <location filename="../LTMPlot.cpp" line="2215"/>
-        <location filename="../LTMPlot.cpp" line="2454"/>
-        <location filename="../LTMPlot.cpp" line="2566"/>
-        <location filename="../LTMPlot.cpp" line="3116"/>
-        <location filename="../LTMPlot.cpp" line="3287"/>
+        <location filename="../LTMPlot.cpp" line="961"/>
+        <location filename="../LTMPlot.cpp" line="1123"/>
+        <location filename="../LTMPlot.cpp" line="2055"/>
+        <location filename="../LTMPlot.cpp" line="2216"/>
+        <location filename="../LTMPlot.cpp" line="2455"/>
+        <location filename="../LTMPlot.cpp" line="2573"/>
+        <location filename="../LTMPlot.cpp" line="3126"/>
+        <location filename="../LTMPlot.cpp" line="3297"/>
         <source>seconds</source>
         <translation>segundos</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="2468"/>
-        <location filename="../LTMPlot.cpp" line="2599"/>
-        <location filename="../LTMPlot.cpp" line="2695"/>
-        <location filename="../LTMPlot.cpp" line="3074"/>
+        <location filename="../LTMPlot.cpp" line="2469"/>
+        <location filename="../LTMPlot.cpp" line="2606"/>
+        <location filename="../LTMPlot.cpp" line="2705"/>
+        <location filename="../LTMPlot.cpp" line="3084"/>
         <source>Ramp</source>
         <translation>Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="3116"/>
+        <location filename="../LTMPlot.cpp" line="3126"/>
         <source>hours</source>
         <translation>horas</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="3254"/>
+        <location filename="../LTMPlot.cpp" line="3264"/>
         <source>Week Commencing %1</source>
         <translation>Semana Comenzando el %1</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1265"/>
+        <location filename="../LTMPlot.cpp" line="1266"/>
         <source>watts</source>
         <translation>vatios</translation>
     </message>
@@ -12565,7 +12567,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <name>LTMPopup</name>
     <message>
         <source>No Ride Selected</source>
-        <translation type="vanished">Ninguna actividad seleccionada</translation>
+        <translation type="obsolete">Ninguna actividad seleccionada</translation>
     </message>
     <message>
         <location filename="../LTMPopup.cpp" line="125"/>
@@ -12581,7 +12583,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>No ride selected</source>
-        <translation type="vanished">Ninguna actividad seleccionada</translation>
+        <translation type="obsolete">Ninguna actividad seleccionada</translation>
     </message>
     <message>
         <location filename="../LTMPopup.cpp" line="48"/>
@@ -12639,39 +12641,39 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source> (%1 rides)</source>
-        <translation type="vanished"> (%1 actividades)</translation>
+        <translation type="obsolete"> (%1 actividades)</translation>
     </message>
     <message>
         <source> / non ride-related metrics skipped</source>
-        <translation type="vanished"> / métrica no relacionada con actividad salteada</translation>
+        <translation type="obsolete"> / métrica no relacionada con actividad salteada</translation>
     </message>
     <message>
-        <location filename="../LTMPopup.cpp" line="415"/>
+        <location filename="../LTMPopup.cpp" line="416"/>
         <source>Totals</source>
         <translation>Totales</translation>
     </message>
     <message>
-        <location filename="../LTMPopup.cpp" line="420"/>
+        <location filename="../LTMPopup.cpp" line="421"/>
         <source>Averages</source>
         <translation>Promedios</translation>
     </message>
     <message>
-        <location filename="../LTMPopup.cpp" line="425"/>
+        <location filename="../LTMPopup.cpp" line="426"/>
         <source>Maximums</source>
         <translation>Máximos</translation>
     </message>
     <message>
-        <location filename="../LTMPopup.cpp" line="430"/>
+        <location filename="../LTMPopup.cpp" line="431"/>
         <source>Metrics</source>
         <translation>Métricas</translation>
     </message>
     <message>
-        <location filename="../LTMPopup.cpp" line="457"/>
+        <location filename="../LTMPopup.cpp" line="458"/>
         <source>^(Average|Max) </source>
         <translation>( Media| Máx)</translation>
     </message>
     <message>
-        <location filename="../LTMPopup.cpp" line="461"/>
+        <location filename="../LTMPopup.cpp" line="462"/>
         <source>seconds</source>
         <translation>segundos</translation>
     </message>
@@ -12721,196 +12723,196 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Resúmen</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="449"/>
-        <location filename="../LTMSidebar.cpp" line="462"/>
-        <location filename="../LTMSidebar.cpp" line="493"/>
+        <location filename="../LTMSidebar.cpp" line="452"/>
+        <location filename="../LTMSidebar.cpp" line="465"/>
+        <location filename="../LTMSidebar.cpp" line="496"/>
         <source>Add season</source>
         <translation>Agregar Rango de Fechas</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="463"/>
-        <location filename="../LTMSidebar.cpp" line="498"/>
+        <location filename="../LTMSidebar.cpp" line="466"/>
+        <location filename="../LTMSidebar.cpp" line="501"/>
         <source>Edit season</source>
         <translation>Editar Rango de Fechas</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="464"/>
-        <location filename="../LTMSidebar.cpp" line="499"/>
+        <location filename="../LTMSidebar.cpp" line="467"/>
+        <location filename="../LTMSidebar.cpp" line="502"/>
         <source>Delete season</source>
         <translation>Eliminar Rango de Fechas</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="465"/>
-        <location filename="../LTMSidebar.cpp" line="500"/>
-        <location filename="../LTMSidebar.cpp" line="1094"/>
-        <location filename="../LTMSidebar.cpp" line="1101"/>
+        <location filename="../LTMSidebar.cpp" line="468"/>
+        <location filename="../LTMSidebar.cpp" line="503"/>
+        <location filename="../LTMSidebar.cpp" line="1097"/>
+        <location filename="../LTMSidebar.cpp" line="1104"/>
         <source>Add Event</source>
         <translation>Agregar Evento</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="533"/>
-        <location filename="../LTMSidebar.cpp" line="575"/>
+        <location filename="../LTMSidebar.cpp" line="536"/>
+        <location filename="../LTMSidebar.cpp" line="578"/>
         <source>Edit details</source>
         <translation>Editar detalles</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="534"/>
-        <location filename="../LTMSidebar.cpp" line="576"/>
+        <location filename="../LTMSidebar.cpp" line="537"/>
+        <location filename="../LTMSidebar.cpp" line="579"/>
         <source>Delete event</source>
         <translation>Eliminar Evento</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="544"/>
-        <location filename="../LTMSidebar.cpp" line="569"/>
+        <location filename="../LTMSidebar.cpp" line="547"/>
+        <location filename="../LTMSidebar.cpp" line="572"/>
         <source>Add event</source>
         <translation>Agregar Evento</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="602"/>
+        <location filename="../LTMSidebar.cpp" line="605"/>
         <source>Workout Code|Sport</source>
         <translation>Código Entrenamiento|Deporte</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="683"/>
-        <location filename="../LTMSidebar.cpp" line="841"/>
-        <location filename="../LTMSidebar.cpp" line="891"/>
+        <location filename="../LTMSidebar.cpp" line="686"/>
+        <location filename="../LTMSidebar.cpp" line="844"/>
+        <location filename="../LTMSidebar.cpp" line="894"/>
         <source>(blank)</source>
         <translation>(blanco)</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="941"/>
+        <location filename="../LTMSidebar.cpp" line="944"/>
         <source>Manage Filters</source>
         <translation>Administrar Filtros</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="947"/>
+        <location filename="../LTMSidebar.cpp" line="950"/>
         <source>Delete Filter%1</source>
         <translation>Borrar Filtro %1</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1048"/>
+        <location filename="../LTMSidebar.cpp" line="1051"/>
         <source>Edit Season</source>
         <translation>Editar Temporada</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1048"/>
+        <location filename="../LTMSidebar.cpp" line="1051"/>
         <source>You can only edit user defined seasons. Please select a season you have created for editing.</source>
         <translation>Solo se pueden editar temporadas definidas por el usuario. Elija una de ellas para edición.</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1081"/>
+        <location filename="../LTMSidebar.cpp" line="1084"/>
         <source>Delete Season</source>
         <translation>Eliminar Temporada</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1081"/>
+        <location filename="../LTMSidebar.cpp" line="1084"/>
         <source>You can only delete user defined seasons. Please select a season you have created for deletion.</source>
         <translation>Solo se pueden eliminar temporadas definidas por el usuario. Elija una de ellas para eliminar.</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1094"/>
-        <location filename="../LTMSidebar.cpp" line="1101"/>
+        <location filename="../LTMSidebar.cpp" line="1097"/>
+        <location filename="../LTMSidebar.cpp" line="1104"/>
         <source>You can only add events to user defined seasons. Please select a season you have created before adding an event.</source>
         <translation>Solo es posible agregar eventos a rangos de fechas definidos por el usuario, por favor seleccione un rango de fechas que haya creado previamente para agregar un evento.</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1250"/>
+        <location filename="../LTMSidebar.cpp" line="1253"/>
         <source>Totals</source>
         <translation>Totales</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1255"/>
+        <location filename="../LTMSidebar.cpp" line="1258"/>
         <source>Averages</source>
         <translation>Promedios</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1260"/>
+        <location filename="../LTMSidebar.cpp" line="1263"/>
         <source>Maximums</source>
         <translation>Máximos</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1265"/>
+        <location filename="../LTMSidebar.cpp" line="1268"/>
         <source>Metrics</source>
         <translation>Métricas</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1286"/>
+        <location filename="../LTMSidebar.cpp" line="1289"/>
         <source>^(Average|Max) </source>
         <translation>( Media| Máx)</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1290"/>
+        <location filename="../LTMSidebar.cpp" line="1293"/>
         <source>seconds</source>
         <translation>segundos</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1335"/>
+        <location filename="../LTMSidebar.cpp" line="1338"/>
         <source>Add Chart</source>
         <translation>Agregar Gráfico</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1342"/>
+        <location filename="../LTMSidebar.cpp" line="1345"/>
         <source>Edit Chart</source>
         <translation>Editar Gráfico</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1343"/>
+        <location filename="../LTMSidebar.cpp" line="1346"/>
         <source>Delete Chart</source>
         <translation>Eliminar Gráfico</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1352"/>
+        <location filename="../LTMSidebar.cpp" line="1355"/>
         <source>Delete Selected Charts</source>
         <translation>Eliminar Gráficos Seleccionados</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1360"/>
+        <location filename="../LTMSidebar.cpp" line="1363"/>
         <source>Export Chart</source>
         <translation>Exportar Gráfico</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1362"/>
+        <location filename="../LTMSidebar.cpp" line="1365"/>
         <source>Export Selected Charts</source>
         <translation>Exportar Gráficos Seleccionados</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1374"/>
+        <location filename="../LTMSidebar.cpp" line="1377"/>
         <source>Import Charts</source>
         <translation>Importar Gráficos</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1381"/>
+        <location filename="../LTMSidebar.cpp" line="1384"/>
         <source>Reset to default</source>
         <translation>Restablecer Gráficos por defecto</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1471"/>
+        <location filename="../LTMSidebar.cpp" line="1477"/>
         <source>Export Charts</source>
         <translation>Exportar Gráficos</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1471"/>
-        <location filename="../LTMSidebar.cpp" line="1491"/>
+        <location filename="../LTMSidebar.cpp" line="1477"/>
+        <location filename="../LTMSidebar.cpp" line="1497"/>
         <source>Chart File (*.xml)</source>
         <translation>Archivo de Gráfico (*.xml)</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1522"/>
+        <location filename="../LTMSidebar.cpp" line="1528"/>
         <source>Entry Error</source>
         <translation>Error de Ingreso</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1522"/>
+        <location filename="../LTMSidebar.cpp" line="1528"/>
         <source>Selected file (%1) does not exist</source>
         <translation>El archivo seleccionado (%1) no existe</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1532"/>
+        <location filename="../LTMSidebar.cpp" line="1538"/>
         <source>You are about to reset the chart sidebar to the default setup</source>
         <translation>Está por reconfigurar la barra lateral de gráficos a su estado por defecto</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="1533"/>
+        <location filename="../LTMSidebar.cpp" line="1539"/>
         <source>Do you want to continue?</source>
         <translation>¿Desea continuar?</translation>
     </message>
@@ -12953,27 +12955,27 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Import...</source>
-        <translation type="vanished">Importar...</translation>
+        <translation type="obsolete">Importar...</translation>
     </message>
     <message>
         <source>Export...</source>
-        <translation type="vanished">Exportar...</translation>
+        <translation type="obsolete">Exportar...</translation>
     </message>
     <message>
         <source>Move up</source>
-        <translation type="vanished">Mover hacia arriba</translation>
+        <translation type="obsolete">Mover hacia arriba</translation>
     </message>
     <message>
         <source>Move down</source>
-        <translation type="vanished">Mover hacia abajo</translation>
+        <translation type="obsolete">Mover hacia abajo</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="vanished">Renombrar</translation>
+        <translation type="obsolete">Renombrar</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="vanished">Eliminar</translation>
+        <translation type="obsolete">Eliminar</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="151"/>
@@ -13254,47 +13256,47 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>GOVSS Long Term Stress</source>
-        <translation type="vanished">GOVSS: Estrés a Largo Plazo</translation>
+        <translation type="obsolete">GOVSS: Estrés a Largo Plazo</translation>
     </message>
     <message>
         <source>GOVSS Short Term Stress</source>
-        <translation type="vanished">GOVSS: Estrés a Corto Plazo</translation>
+        <translation type="obsolete">GOVSS: Estrés a Corto Plazo</translation>
     </message>
     <message>
         <source>GOVSS Stress Balance</source>
-        <translation type="vanished">GOVSS: Balance de Estrés</translation>
+        <translation type="obsolete">GOVSS: Balance de Estrés</translation>
     </message>
     <message>
         <source>GOVSS STS Ramp</source>
-        <translation type="vanished">GOVSS: Rampa ECP</translation>
+        <translation type="obsolete">GOVSS: Rampa ECP</translation>
     </message>
     <message>
         <source>GOVSS LTS Ramp</source>
-        <translation type="vanished">GOVSS: Rampa ELP</translation>
+        <translation type="obsolete">GOVSS: Rampa ELP</translation>
     </message>
     <message>
         <source>Entry Error</source>
-        <translation type="vanished">Error de Ingreso</translation>
+        <translation type="obsolete">Error de Ingreso</translation>
     </message>
     <message>
         <source>Selected file (%1) does not exist</source>
-        <translation type="vanished">El archivo seleccionado (%1) no existe</translation>
+        <translation type="obsolete">El archivo seleccionado (%1) no existe</translation>
     </message>
     <message>
         <source>The selected file (%1) exists.</source>
-        <translation type="vanished">El archivo seleccionado (%1) existe.</translation>
+        <translation type="obsolete">El archivo seleccionado (%1) existe.</translation>
     </message>
     <message>
         <source>Do you want to overwrite it?</source>
-        <translation type="vanished">¿Quiere sobre-escribirlo?</translation>
+        <translation type="obsolete">¿Quiere sobre-escribirlo?</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="vanished">Error</translation>
+        <translation type="obsolete">Error</translation>
     </message>
     <message>
         <source>You must have at least one chart</source>
-        <translation type="vanished">Tiene que haber al menos un gráfico</translation>
+        <translation type="obsolete">Tiene que haber al menos un gráfico</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="131"/>
@@ -13313,7 +13315,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <source>Chart File (*.xml)</source>
-        <translation type="vanished">Archivo de Gráfico (*.xml)</translation>
+        <translation type="obsolete">Archivo de Gráfico (*.xml)</translation>
     </message>
     <message>
         <source>Choose Metric Color</source>
@@ -13872,66 +13874,66 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">Eliminar Zona</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4001"/>
-        <location filename="../Pages.cpp" line="4010"/>
+        <location filename="../Pages.cpp" line="4005"/>
+        <location filename="../Pages.cpp" line="4014"/>
         <source>Update</source>
         <translation>Modificar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4003"/>
-        <location filename="../Pages.cpp" line="4017"/>
+        <location filename="../Pages.cpp" line="4007"/>
+        <location filename="../Pages.cpp" line="4021"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4004"/>
-        <location filename="../Pages.cpp" line="4018"/>
+        <location filename="../Pages.cpp" line="4008"/>
+        <location filename="../Pages.cpp" line="4022"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4011"/>
-        <location filename="../Pages.cpp" line="4023"/>
+        <location filename="../Pages.cpp" line="4015"/>
+        <location filename="../Pages.cpp" line="4027"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4012"/>
-        <location filename="../Pages.cpp" line="4024"/>
+        <location filename="../Pages.cpp" line="4016"/>
+        <location filename="../Pages.cpp" line="4028"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4014"/>
+        <location filename="../Pages.cpp" line="4018"/>
         <source>Def</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4042"/>
-        <location filename="../Pages.cpp" line="4082"/>
+        <location filename="../Pages.cpp" line="4046"/>
+        <location filename="../Pages.cpp" line="4086"/>
         <source>From Date</source>
         <translation>Desde </translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4043"/>
-        <location filename="../Pages.cpp" line="4083"/>
+        <location filename="../Pages.cpp" line="4047"/>
+        <location filename="../Pages.cpp" line="4087"/>
         <source>Lactate Threshold</source>
         <translation>Umbral de Lactado</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4350"/>
+        <location filename="../Pages.cpp" line="4354"/>
         <source>Maximum of 10 zones reached.</source>
         <translation>Se alcancó el máximo de 10 zonas.</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4385"/>
-        <location filename="../Pages.cpp" line="4392"/>
+        <location filename="../Pages.cpp" line="4389"/>
+        <location filename="../Pages.cpp" line="4396"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4387"/>
-        <location filename="../Pages.cpp" line="4394"/>
+        <location filename="../Pages.cpp" line="4391"/>
+        <location filename="../Pages.cpp" line="4398"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -13940,41 +13942,41 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">Umbral de Lactato</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4060"/>
-        <location filename="../Pages.cpp" line="4084"/>
+        <location filename="../Pages.cpp" line="4064"/>
+        <location filename="../Pages.cpp" line="4088"/>
         <source>Rest HR</source>
         <translation>FC Reposo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4061"/>
-        <location filename="../Pages.cpp" line="4085"/>
+        <location filename="../Pages.cpp" line="4065"/>
+        <location filename="../Pages.cpp" line="4089"/>
         <source>Max HR</source>
         <translation>FC Máx</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4105"/>
-        <location filename="../Pages.cpp" line="4175"/>
-        <location filename="../Pages.cpp" line="4195"/>
+        <location filename="../Pages.cpp" line="4109"/>
+        <location filename="../Pages.cpp" line="4179"/>
+        <location filename="../Pages.cpp" line="4199"/>
         <source>MMM d, yyyy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4122"/>
+        <location filename="../Pages.cpp" line="4126"/>
         <source>Short</source>
         <translation>Abreviatura</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4123"/>
+        <location filename="../Pages.cpp" line="4127"/>
         <source>Long</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4124"/>
+        <location filename="../Pages.cpp" line="4128"/>
         <source>From BPM</source>
         <translation>Desde PPM</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4125"/>
+        <location filename="../Pages.cpp" line="4129"/>
         <source>Trimp k</source>
         <translation></translation>
     </message>
@@ -14328,7 +14330,7 @@ Saltando archivo...</translation>
     </message>
     <message>
         <source>Intervals</source>
-        <translation type="vanished">Intervalos</translation>
+        <translation type="obsolete">Intervalos</translation>
     </message>
     <message>
         <source>Ride Summary</source>
@@ -14355,8 +14357,8 @@ Saltando archivo...</translation>
         <translation type="obsolete">&amp;Nuevo...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1705"/>
-        <location filename="../MainWindow.cpp" line="1747"/>
+        <location filename="../MainWindow.cpp" line="1707"/>
+        <location filename="../MainWindow.cpp" line="1749"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
@@ -14526,7 +14528,7 @@ Saltando archivo...</translation>
     </message>
     <message>
         <source>Combine rides...</source>
-        <translation type="vanished">Combinar actividades...</translation>
+        <translation type="obsolete">Combinar actividades...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="639"/>
@@ -14709,7 +14711,7 @@ Saltando archivo...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1339"/>
-        <location filename="../MainWindow.cpp" line="1463"/>
+        <location filename="../MainWindow.cpp" line="1465"/>
         <source>No activity selected!</source>
         <translation>No hay actividad seleccionada!</translation>
     </message>
@@ -14725,16 +14727,16 @@ Saltando archivo...</translation>
     </message>
     <message>
         <source>Failed to export ride, please check permissions</source>
-        <translation type="vanished">Error al exportar actividad, verifique los permisos</translation>
+        <translation type="obsolete">Error al exportar actividad, verifique los permisos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1439"/>
-        <location filename="../MainWindow.cpp" line="1451"/>
+        <location filename="../MainWindow.cpp" line="1441"/>
+        <location filename="../MainWindow.cpp" line="1453"/>
         <source>No activity selected</source>
         <translation>No hay actividad seleccionada</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1441"/>
+        <location filename="../MainWindow.cpp" line="1443"/>
         <source>Current activity contains no data to split</source>
         <translation>La actividad seleccionada no tiene datos para dividir</translation>
     </message>
@@ -14785,15 +14787,15 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <source>Split &amp;ride...</source>
-        <translation type="vanished">Dividir Actividad...</translation>
+        <translation type="obsolete">Dividir Actividad...</translation>
     </message>
     <message>
         <source>D&amp;elete ride...</source>
-        <translation type="vanished">Borrar Actividad...</translation>
+        <translation type="obsolete">Borrar Actividad...</translation>
     </message>
     <message>
         <source>&amp;Manual ride entry...</source>
-        <translation type="vanished">Ingreso &amp;Manual de actividad...</translation>
+        <translation type="obsolete">Ingreso &amp;Manual de actividad...</translation>
     </message>
     <message>
         <source>Hr Zones File Error</source>
@@ -14863,7 +14865,7 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <source>&amp;Save ride</source>
-        <translation type="vanished">&amp;Guardar actividad</translation>
+        <translation type="obsolete">&amp;Guardar actividad</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="617"/>
@@ -14911,7 +14913,7 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <source>Create Manual Ride</source>
-        <translation type="vanished">Ingreso &amp;Manual de actividad</translation>
+        <translation type="obsolete">Ingreso &amp;Manual de actividad</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="424"/>
@@ -14925,7 +14927,7 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <source>Split Ride...</source>
-        <translation type="vanished">Dividir Actividad...</translation>
+        <translation type="obsolete">Dividir Actividad...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="563"/>
@@ -14962,7 +14964,7 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <source>Upload Ride to Calendar</source>
-        <translation type="vanished">Cargar Actividad al Calendario</translation>
+        <translation type="obsolete">Cargar Actividad al Calendario</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="638"/>
@@ -14986,7 +14988,7 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <source>Rides</source>
-        <translation type="vanished">Actividades</translation>
+        <translation type="obsolete">Actividades</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="697"/>
@@ -15034,38 +15036,38 @@ PC del Atleta en %3 vatios</translation>
         <translation>%1 Gráficos Importados</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1453"/>
+        <location filename="../MainWindow.cpp" line="1455"/>
         <source>Current activity contains no data to merge</source>
         <translation>La actividad seleccionada no tiene datos para combinar</translation>
     </message>
     <message>
         <source>Export Ride</source>
-        <translation type="vanished">Exportar Actividad</translation>
+        <translation type="obsolete">Exportar Actividad</translation>
     </message>
     <message>
         <source>No Ride To Save</source>
-        <translation type="vanished">Ninguna actividad para Guardar</translation>
+        <translation type="obsolete">Ninguna actividad para Guardar</translation>
     </message>
     <message>
         <source>No ride selected</source>
-        <translation type="vanished">Ninguna actividad seleccionada</translation>
+        <translation type="obsolete">Ninguna actividad seleccionada</translation>
     </message>
     <message>
         <source>Current ride contains no data to split</source>
-        <translation type="vanished">La actividad seleccionada no tiene datos para dividir</translation>
+        <translation type="obsolete">La actividad seleccionada no tiene datos para dividir</translation>
     </message>
     <message>
         <source>Current ride contains no data to merge</source>
-        <translation type="vanished">La actividad seleccionada no tiene datos para combinar</translation>
+        <translation type="obsolete">La actividad seleccionada no tiene datos para combinar</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1705"/>
-        <location filename="../MainWindow.cpp" line="1747"/>
+        <location filename="../MainWindow.cpp" line="1707"/>
+        <location filename="../MainWindow.cpp" line="1749"/>
         <source>&amp;New Athlete...</source>
         <translation>&amp;Nuevo Atleta...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1824"/>
+        <location filename="../MainWindow.cpp" line="1826"/>
         <source>Refresh in Progress</source>
         <translation>Actualización en Curso</translation>
     </message>
@@ -15103,7 +15105,7 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="452"/>
-        <location filename="../MainWindow.cpp" line="1463"/>
+        <location filename="../MainWindow.cpp" line="1465"/>
         <source>Delete Activity</source>
         <translation>Eliminar Actividad</translation>
     </message>
@@ -15133,10 +15135,10 @@ PC del Atleta en %3 vatios</translation>
         <translation>No hay actividad seleccionada para guardar.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1439"/>
         <location filename="../MainWindow.cpp" line="1441"/>
-        <location filename="../MainWindow.cpp" line="1451"/>
+        <location filename="../MainWindow.cpp" line="1443"/>
         <location filename="../MainWindow.cpp" line="1453"/>
+        <location filename="../MainWindow.cpp" line="1455"/>
         <source>Split Activity</source>
         <translation>Dividir Actividad</translation>
     </message>
@@ -15150,11 +15152,11 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <source>Select Ride</source>
-        <translation type="vanished">Seleccionar Actividad</translation>
+        <translation type="obsolete">Seleccionar Actividad</translation>
     </message>
     <message>
         <source>No ride selected!</source>
-        <translation type="vanished">¡Ninguna actividad seleccionada!</translation>
+        <translation type="obsolete">¡Ninguna actividad seleccionada!</translation>
     </message>
     <message>
         <source>Export PWX</source>
@@ -15210,7 +15212,7 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <source>Split Ride</source>
-        <translation type="vanished">Dividir Actividad</translation>
+        <translation type="obsolete">Dividir Actividad</translation>
     </message>
     <message>
         <source>The file %1 can&apos;t be opened for writing</source>
@@ -15218,7 +15220,7 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1386"/>
-        <location filename="../MainWindow.cpp" line="1884"/>
+        <location filename="../MainWindow.cpp" line="1886"/>
         <source>Import from File</source>
         <translation>Importar de Archivo</translation>
     </message>
@@ -15229,25 +15231,25 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <source>There is no currently selected ride to save.</source>
-        <translation type="vanished">No hay actividad seleccionada para guardar.</translation>
+        <translation type="obsolete">No hay actividad seleccionada para guardar.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1469"/>
+        <location filename="../MainWindow.cpp" line="1471"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation>Confirma que quiere eliminar la actividad:</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1830"/>
+        <location filename="../MainWindow.cpp" line="1832"/>
         <source>Export Metrics</source>
         <translation>Exportar Métricas</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1830"/>
+        <location filename="../MainWindow.cpp" line="1832"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation>Variables Separada por Comas (*.csv)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1914"/>
+        <location filename="../MainWindow.cpp" line="1916"/>
         <source>Workout Directory Invalid</source>
         <translation>Directorio de Entrenamientos Inválido</translation>
     </message>
@@ -15265,7 +15267,7 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <source>Delete Ride</source>
-        <translation type="vanished">Borrar Actividad</translation>
+        <translation type="obsolete">Borrar Actividad</translation>
     </message>
     <message>
         <source>Find Best Intervals</source>
@@ -15277,7 +15279,7 @@ PC del Atleta en %3 vatios</translation>
     </message>
     <message>
         <source>Tweet Ride</source>
-        <translation type="vanished">Twitear Actividad</translation>
+        <translation type="obsolete">Twitear Actividad</translation>
     </message>
     <message>
         <source>Rename interval</source>
@@ -15349,10 +15351,10 @@ PC del ciclista %3 vatios</translation>
     </message>
     <message>
         <source>Are you sure you want to delete the ride:</source>
-        <translation type="vanished">Confirma que quiere eliminar la actividad: </translation>
+        <translation type="obsolete">Confirma que quiere eliminar la actividad: </translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1471"/>
+        <location filename="../MainWindow.cpp" line="1473"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
@@ -15453,11 +15455,11 @@ PC del ciclista %3 vatios</translation>
     </message>
     <message>
         <source>Manual Ride Entry</source>
-        <translation type="vanished">Ingreso Manual de actividad</translation>
+        <translation type="obsolete">Ingreso Manual de actividad</translation>
     </message>
     <message>
         <source>Ride date:</source>
-        <translation type="vanished">Fecha:</translation>
+        <translation type="obsolete">Fecha:</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="120"/>
@@ -15595,7 +15597,7 @@ PC del ciclista %3 vatios</translation>
     </message>
     <message>
         <source>There is already an ride with the same start time or you do not have permissions to save a file.</source>
-        <translation type="vanished">Ya existe una actividad con la misma fecha y hora de inicio o falta parmiso para grabar el archivo.</translation>
+        <translation type="obsolete">Ya existe una actividad con la misma fecha y hora de inicio o falta parmiso para grabar el archivo.</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="556"/>
@@ -15993,7 +15995,7 @@ Si presiona continuar la actividad se guardará, sino quiere continuar vuelva at
 The changes will be saved and cannot be undone.
 
 If you press continue the ride will be saved, if you do not want to continue either go back and change the settings or press cancel to abort.</source>
-        <translation type="vanished">Presione Terminar para actualizar la actividad acual con los datos combinados.
+        <translation type="obsolete">Presione Terminar para actualizar la actividad acual con los datos combinados.
 
 Los cambios se guardarán y no podran deshacerse.
 
@@ -16372,22 +16374,22 @@ de la misma actividad en un único archivo.</translation>
 <context>
     <name>MetadataPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2349"/>
+        <location filename="../Pages.cpp" line="2353"/>
         <source>Fields</source>
         <translation>Campos</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2350"/>
+        <location filename="../Pages.cpp" line="2354"/>
         <source>Notes Keywords</source>
         <translation>Palabras Clave</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2351"/>
+        <location filename="../Pages.cpp" line="2355"/>
         <source>Defaults</source>
         <translation>Valores por defecto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2352"/>
+        <location filename="../Pages.cpp" line="2356"/>
         <source>Processing</source>
         <translation>Procesamiento</translation>
     </message>
@@ -17060,7 +17062,7 @@ Analizando ...</translation>
     </message>
     <message>
         <source>Ride #%1: %2</source>
-        <translation type="vanished">Actividad #%1: %2</translation>
+        <translation type="obsolete">Actividad #%1: %2</translation>
     </message>
     <message>
         <location filename="../MoxyDevice.cpp" line="263"/>
@@ -17519,54 +17521,54 @@ No rides found to import.
 <context>
     <name>PaceSchemePage</name>
     <message>
-        <location filename="../Pages.cpp" line="4546"/>
+        <location filename="../Pages.cpp" line="4550"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4547"/>
+        <location filename="../Pages.cpp" line="4551"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4552"/>
+        <location filename="../Pages.cpp" line="4556"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4553"/>
+        <location filename="../Pages.cpp" line="4557"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4562"/>
+        <location filename="../Pages.cpp" line="4566"/>
         <source>Short</source>
         <translation>Corto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4563"/>
+        <location filename="../Pages.cpp" line="4567"/>
         <source>Long</source>
         <translation>Largo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4564"/>
+        <location filename="../Pages.cpp" line="4568"/>
         <source>Percent of CV</source>
         <translation>Porcentaje de VC</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4609"/>
+        <location filename="../Pages.cpp" line="4613"/>
         <source>Maximum of 10 zones reached.</source>
         <translation>Se alcancó el máximo de 10 zonas.</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4632"/>
-        <location filename="../Pages.cpp" line="4639"/>
+        <location filename="../Pages.cpp" line="4636"/>
+        <location filename="../Pages.cpp" line="4643"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4634"/>
-        <location filename="../Pages.cpp" line="4641"/>
+        <location filename="../Pages.cpp" line="4638"/>
+        <location filename="../Pages.cpp" line="4645"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -17672,27 +17674,27 @@ No rides found to import.
 <context>
     <name>PaceZonePage</name>
     <message>
-        <location filename="../Pages.cpp" line="4482"/>
+        <location filename="../Pages.cpp" line="4486"/>
         <source>Sport</source>
         <translation>Deporte</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4484"/>
+        <location filename="../Pages.cpp" line="4488"/>
         <source>Run</source>
         <translation>Carrera</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4485"/>
+        <location filename="../Pages.cpp" line="4489"/>
         <source>Swim</source>
         <translation>Natación</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4519"/>
+        <location filename="../Pages.cpp" line="4523"/>
         <source>Critical Velocity</source>
         <translation>Velocidad Crítica</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="4520"/>
+        <location filename="../Pages.cpp" line="4524"/>
         <source>Default</source>
         <translation>Por defecto</translation>
     </message>
@@ -19310,11 +19312,11 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>%1 of Ride (%2)</source>
-        <translation type="vanished">%1 de Actividad (%2)</translation>
+        <translation type="obsolete">%1 de Actividad (%2)</translation>
     </message>
     <message>
         <source>%1 of Ride</source>
-        <translation type="vanished">%1 de Actividad</translation>
+        <translation type="obsolete">%1 de Actividad</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="2305"/>
@@ -19596,7 +19598,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
     </message>
     <message>
         <source>Reading ride data...</source>
-        <translation type="vanished">Leyendo datos de entrenamiento...</translation>
+        <translation type="obsolete">Leyendo datos de entrenamiento...</translation>
     </message>
     <message>
         <location filename="../PowerTapDevice.cpp" line="215"/>
@@ -19635,7 +19637,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
     </message>
     <message>
         <source>Failed to find ride time.</source>
-        <translation type="vanished">Falló obtención de la fecha y hora del entrenamiento.</translation>
+        <translation type="obsolete">Falló obtención de la fecha y hora del entrenamiento.</translation>
     </message>
 </context>
 <context>
@@ -19649,27 +19651,27 @@ y que muestra la palabra &quot;Host&quot;</translation>
 <context>
     <name>ProcessorPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2862"/>
+        <location filename="../Pages.cpp" line="2866"/>
         <source>Processor</source>
         <translation>Procesador</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2863"/>
+        <location filename="../Pages.cpp" line="2867"/>
         <source>Apply</source>
         <translation>Aplicar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2864"/>
+        <location filename="../Pages.cpp" line="2868"/>
         <source>Settings</source>
         <translation>Ajustes</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2890"/>
+        <location filename="../Pages.cpp" line="2894"/>
         <source>Manual</source>
         <translation>Manual</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2891"/>
+        <location filename="../Pages.cpp" line="2895"/>
         <source>Auto</source>
         <translation>Automático</translation>
     </message>
@@ -19727,7 +19729,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <translation>usando una operación de cadena de caracteres con un número</translation>
     </message>
     <message>
-        <location filename="../FitRideFile.cpp" line="467"/>
+        <location filename="../FitRideFile.cpp" line="468"/>
         <source>Lap %1</source>
         <translation>Vuelta %1</translation>
     </message>
@@ -20363,7 +20365,7 @@ yyyy</source>
     <name>RenameIntervalDialog</name>
     <message>
         <source>Renumber Intervals</source>
-        <translation type="vanished">Renumerar Intervalos</translation>
+        <translation type="obsolete">Renumerar Intervalos</translation>
     </message>
     <message>
         <location filename="../IntervalItem.cpp" line="257"/>
@@ -20409,22 +20411,22 @@ yyyy</source>
         <translation type="obsolete">Imposible renombrar %1 a %2</translation>
     </message>
     <message>
-        <location filename="../RideCache.cpp" line="248"/>
+        <location filename="../RideCache.cpp" line="263"/>
         <source>Can&apos;t rename %1 to %2 in %3</source>
         <translation>Imposible renombrar %1 a %2 en %3</translation>
     </message>
     <message>
-        <location filename="../RideCache.cpp" line="303"/>
+        <location filename="../RideCache.cpp" line="318"/>
         <source>Problem Saving Ride Cache</source>
         <translation>Problemas Guardando Caché de Actividades</translation>
     </message>
     <message>
-        <location filename="../RideCache.cpp" line="304"/>
+        <location filename="../RideCache.cpp" line="319"/>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
         <translation>Archivo: %1 no se puede abrir para &apos;Escritura&apos;. Verifique las propiedades del archivo.</translation>
     </message>
     <message>
-        <location filename="../RideCache.cpp" line="474"/>
+        <location filename="../RideCache.cpp" line="489"/>
         <source>seconds</source>
         <translation>segundos</translation>
     </message>
@@ -20440,7 +20442,7 @@ yyyy</source>
     <name>RideCount</name>
     <message>
         <source>Rides</source>
-        <translation type="vanished">Actividades</translation>
+        <translation type="obsolete">Actividades</translation>
     </message>
     <message>
         <location filename="../ManualRideFile.cpp" line="49"/>
@@ -20966,7 +20968,7 @@ yyyy</source>
     </message>
     <message>
         <source>Righ Pedal Smoothness</source>
-        <translation type="vanished">Fluidez Pedal Der</translation>
+        <translation type="obsolete">Fluidez Pedal Der</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="194"/>
@@ -21202,26 +21204,9 @@ yyyy</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="307"/>
-        <source>°C</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../RideFile.cpp" line="313"/>
         <location filename="../RideFile.cpp" line="314"/>
         <source>mm</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../RideFile.cpp" line="315"/>
-        <location filename="../RideFile.cpp" line="316"/>
-        <location filename="../RideFile.cpp" line="317"/>
-        <location filename="../RideFile.cpp" line="318"/>
-        <location filename="../RideFile.cpp" line="319"/>
-        <location filename="../RideFile.cpp" line="320"/>
-        <location filename="../RideFile.cpp" line="321"/>
-        <location filename="../RideFile.cpp" line="322"/>
-        <source>°</source>
         <translation></translation>
     </message>
     <message>
@@ -21243,6 +21228,23 @@ yyyy</source>
         <location filename="../RideFile.cpp" line="193"/>
         <source>Right Pedal Smoothness</source>
         <translation>Fluidez Pedal Der</translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="307"/>
+        <source>Â°C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="315"/>
+        <location filename="../RideFile.cpp" line="316"/>
+        <location filename="../RideFile.cpp" line="317"/>
+        <location filename="../RideFile.cpp" line="318"/>
+        <location filename="../RideFile.cpp" line="319"/>
+        <location filename="../RideFile.cpp" line="320"/>
+        <location filename="../RideFile.cpp" line="321"/>
+        <location filename="../RideFile.cpp" line="322"/>
+        <source>Â°</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="325"/>
@@ -21285,7 +21287,7 @@ yyyy</source>
     </message>
     <message>
         <source>Invalid Ride File Name</source>
-        <translation type="vanished">Nombre de archivo inválido</translation>
+        <translation type="obsolete">Nombre de archivo inválido</translation>
     </message>
     <message>
         <source>Invalid Activity File Name</source>
@@ -21384,27 +21386,27 @@ Saltando archivo...</translation>
         <translation>Esfuerzos sostenidos y cartuchos usando potencia</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="2545"/>
+        <location filename="../RideFile.cpp" line="2550"/>
         <source>Peak</source>
         <translation>Pico</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="2545"/>
+        <location filename="../RideFile.cpp" line="2550"/>
         <source>Find</source>
         <translation>Buscar</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="2552"/>
+        <location filename="../RideFile.cpp" line="2557"/>
         <source>Match</source>
         <translation>Cartucho</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="2558"/>
+        <location filename="../RideFile.cpp" line="2563"/>
         <source>Climb</source>
         <translation>Puerto</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="2564"/>
+        <location filename="../RideFile.cpp" line="2569"/>
         <source>Best</source>
         <translation>Mejor</translation>
     </message>
@@ -21652,7 +21654,7 @@ Saltando archivo...</translation>
     </message>
     <message>
         <source>Import Ride Files</source>
-        <translation type="vanished">Importar Archivos de Entrenamiento</translation>
+        <translation type="obsolete">Importar Archivos de Entrenamiento</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="213"/>
@@ -21857,7 +21859,7 @@ Saltando archivo...</translation>
     </message>
     <message>
         <source>More than 24hrs of rides to fit into a day</source>
-        <translation type="vanished">Más de 24hs de entrenamiento en un dia</translation>
+        <translation type="obsolete">Más de 24hs de entrenamiento en un dia</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="865"/>
@@ -21944,128 +21946,128 @@ Saltando archivo...</translation>
 <context>
     <name>RideItem</name>
     <message>
-        <location filename="../RideItem.cpp" line="723"/>
+        <location filename="../RideItem.cpp" line="728"/>
         <source>Entire Activity</source>
         <translation>Actividad Completa</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="782"/>
+        <location filename="../RideItem.cpp" line="787"/>
         <source>1 second</source>
         <translation>1 segundo</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="782"/>
+        <location filename="../RideItem.cpp" line="787"/>
         <source>5 seconds</source>
         <translation>5 segundos</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="782"/>
-        <location filename="../RideItem.cpp" line="815"/>
+        <location filename="../RideItem.cpp" line="787"/>
+        <location filename="../RideItem.cpp" line="820"/>
         <source>10 seconds</source>
         <translation>10 segundos</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="782"/>
-        <location filename="../RideItem.cpp" line="815"/>
+        <location filename="../RideItem.cpp" line="787"/>
+        <location filename="../RideItem.cpp" line="820"/>
         <source>15 seconds</source>
         <translation>15 segundos</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="782"/>
-        <location filename="../RideItem.cpp" line="815"/>
+        <location filename="../RideItem.cpp" line="787"/>
+        <location filename="../RideItem.cpp" line="820"/>
         <source>20 seconds</source>
         <translation>20 segundos</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="782"/>
-        <location filename="../RideItem.cpp" line="815"/>
+        <location filename="../RideItem.cpp" line="787"/>
+        <location filename="../RideItem.cpp" line="820"/>
         <source>30 seconds</source>
         <translation>30 segundos</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="783"/>
-        <location filename="../RideItem.cpp" line="816"/>
+        <location filename="../RideItem.cpp" line="788"/>
+        <location filename="../RideItem.cpp" line="821"/>
         <source>1 minute</source>
         <translation>1 minuto</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="783"/>
-        <location filename="../RideItem.cpp" line="816"/>
+        <location filename="../RideItem.cpp" line="788"/>
+        <location filename="../RideItem.cpp" line="821"/>
         <source>5 minutes</source>
         <translation>5 minutos</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="783"/>
-        <location filename="../RideItem.cpp" line="816"/>
+        <location filename="../RideItem.cpp" line="788"/>
+        <location filename="../RideItem.cpp" line="821"/>
         <source>10 minutes</source>
         <translation>10 minutos</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="783"/>
-        <location filename="../RideItem.cpp" line="816"/>
+        <location filename="../RideItem.cpp" line="788"/>
+        <location filename="../RideItem.cpp" line="821"/>
         <source>20 minutes</source>
         <translation>20 minutos</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="783"/>
-        <location filename="../RideItem.cpp" line="816"/>
+        <location filename="../RideItem.cpp" line="788"/>
+        <location filename="../RideItem.cpp" line="821"/>
         <source>30 minutes</source>
         <translation>30 minutos</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="783"/>
-        <location filename="../RideItem.cpp" line="816"/>
+        <location filename="../RideItem.cpp" line="788"/>
+        <location filename="../RideItem.cpp" line="821"/>
         <source>45 minutes</source>
         <translation>45 minutos</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="784"/>
-        <location filename="../RideItem.cpp" line="817"/>
+        <location filename="../RideItem.cpp" line="789"/>
+        <location filename="../RideItem.cpp" line="822"/>
         <source>1 hour</source>
         <translation>1 hora</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="795"/>
+        <location filename="../RideItem.cpp" line="800"/>
         <source>%1 (%2 watts)</source>
         <translation>%1 (%2 vatios)</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="829"/>
+        <location filename="../RideItem.cpp" line="834"/>
         <source>%1 (%2 %3)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="1113"/>
+        <location filename="../RideItem.cpp" line="1118"/>
         <source>L%3 TTE of %1  (%2 watts)</source>
         <translation>L%3 TAA de %1  (%2 vatios)</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="1119"/>
+        <location filename="../RideItem.cpp" line="1124"/>
         <source>L%4 %3% EFFORT of %1  (%2 watts)</source>
         <translation>L%4 %3% Esfuerzo de %1  (%2 vatios)</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="1140"/>
+        <location filename="../RideItem.cpp" line="1145"/>
         <source>L%3 SPRINT of %1 secs (%2 watts)</source>
         <translation>L%3 EMBALAJE de %1 seg (%2 vatios)</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="1249"/>
+        <location filename="../RideItem.cpp" line="1254"/>
         <source>Climb %1</source>
         <translation>Escalada %1</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="1317"/>
+        <location filename="../RideItem.cpp" line="1322"/>
         <source>L%1 %5 %2 (%3w %4 kJ)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="1322"/>
+        <location filename="../RideItem.cpp" line="1327"/>
         <source>TE MATCH</source>
         <translation>Cartucho TA</translation>
     </message>
     <message>
-        <location filename="../RideItem.cpp" line="1322"/>
+        <location filename="../RideItem.cpp" line="1327"/>
         <source>MATCH</source>
         <translation>Cartucho</translation>
     </message>
@@ -22073,12 +22075,12 @@ Saltando archivo...</translation>
 <context>
     <name>RideMetadata</name>
     <message>
-        <location filename="../RideMetadata.cpp" line="1188"/>
+        <location filename="../RideMetadata.cpp" line="1190"/>
         <source>Problem Saving Meta Data</source>
         <translation>Problemas Guardando Meta Datos</translation>
     </message>
     <message>
-        <location filename="../RideMetadata.cpp" line="1189"/>
+        <location filename="../RideMetadata.cpp" line="1191"/>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
         <translation>Archivo: %1 no se puede abrir para &apos;Escritura&apos;. Verifique las propiedades del archivo.</translation>
     </message>
@@ -22419,7 +22421,7 @@ Saltando archivo...</translation>
     </message>
     <message>
         <source>Rank </source>
-        <translation type="vanished">Rango </translation>
+        <translation type="obsolete">Rango </translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="1097"/>
@@ -22607,11 +22609,11 @@ Saltando archivo...</translation>
     </message>
     <message>
         <source>Upload ride...</source>
-        <translation type="vanished">Cargar actividad...</translation>
+        <translation type="obsolete">Cargar actividad...</translation>
     </message>
     <message>
         <source>Upload ride... Sending to RideWithGPS</source>
-        <translation type="vanished">Cargar Actividad... Enviando a RideWithGPS</translation>
+        <translation type="obsolete">Cargar Actividad... Enviando a RideWithGPS</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="788"/>
@@ -22755,54 +22757,54 @@ Saltando archivo...</translation>
     <name>RouteSegment</name>
     <message>
         <source>Invalid Ride File Name</source>
-        <translation type="vanished">Nombre de archivo inválido</translation>
+        <translation type="obsolete">Nombre de archivo inválido</translation>
     </message>
     <message>
         <source>Invalid File Name</source>
-        <translation type="vanished">Nombre de archivo inválido</translation>
+        <translation type="obsolete">Nombre de archivo inválido</translation>
     </message>
     <message>
         <source>Invalid date/time in filename:
 %1
 Skipping file...</source>
-        <translation type="vanished">Fecha/hora inválida en el nombre de archivo:
+        <translation type="obsolete">Fecha/hora inválida en el nombre de archivo:
 %1
 Saltando archivo...</translation>
     </message>
     <message>
         <source>Searching route</source>
-        <translation type="vanished">Buscando recorrido</translation>
+        <translation type="obsolete">Buscando recorrido</translation>
     </message>
     <message>
         <source>Searching route in all rides...
 Elapsed: %1
 %2</source>
-        <translation type="vanished">Buscando recorrido en todas las actividades...
+        <translation type="obsolete">Buscando recorrido en todas las actividades...
 Transcurridos: %1
 %2</translation>
     </message>
     <message>
         <source>Route</source>
-        <translation type="vanished">Recorrido</translation>
+        <translation type="obsolete">Recorrido</translation>
     </message>
     <message>
         <source>This route &apos;%1&apos; was found %2 times in %3 activities.</source>
-        <translation type="vanished">Este recorrido %1 se encontró %2 veces en %3 actividades.</translation>
+        <translation type="obsolete">Este recorrido %1 se encontró %2 veces en %3 actividades.</translation>
     </message>
     <message>
         <source>This route &apos;%1&apos; was found %2 times in %3 rides.</source>
-        <translation type="vanished">Este recorrido %1 se encontró %2 veces en %3 actividades.</translation>
+        <translation type="obsolete">Este recorrido %1 se encontró %2 veces en %3 actividades.</translation>
     </message>
 </context>
 <context>
     <name>RouteWindow</name>
     <message>
         <source>Rename route</source>
-        <translation type="vanished">Renombrar recorrido</translation>
+        <translation type="obsolete">Renombrar recorrido</translation>
     </message>
     <message>
         <source>Delete route</source>
-        <translation type="vanished">Elminar Recorrido</translation>
+        <translation type="obsolete">Elminar Recorrido</translation>
     </message>
 </context>
 <context>
@@ -22838,7 +22840,7 @@ Transcurridos: %1
 <context>
     <name>SaveOnExitDialogWidget</name>
     <message>
-        <location filename="../SaveDialogs.cpp" line="270"/>
+        <location filename="../SaveDialogs.cpp" line="271"/>
         <source>WARNING
 
 You have made changes to some rides which
@@ -22849,22 +22851,22 @@ Se han realizado cambios en algunos entrenamientos que
 no han sido guardados. Se listan a continuación.</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="301"/>
+        <location filename="../SaveDialogs.cpp" line="302"/>
         <source>&amp;Save and Exit</source>
         <translation>Guardar y &amp;Salir</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="303"/>
+        <location filename="../SaveDialogs.cpp" line="304"/>
         <source>&amp;Discard and Exit</source>
         <translation>&amp;Descartar y Salir</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="305"/>
+        <location filename="../SaveDialogs.cpp" line="306"/>
         <source>&amp;Cancel Exit</source>
         <translation>&amp;Cancelar Salida</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="310"/>
+        <location filename="../SaveDialogs.cpp" line="311"/>
         <source>Always check for unsaved changes on exit</source>
         <translation>Siempre verificar cambios no guardados al salir</translation>
     </message>
@@ -22890,7 +22892,7 @@ Se realizaron cambios en </translation>
 them, we need to convert the ride to GoldenCheetah&apos;s
 native format. Should we do so?
 </source>
-        <translation type="vanished"> Si quiere guardarlos
+        <translation type="obsolete"> Si quiere guardarlos
 es necesario convertir el archivo al 
 formato GoldenCheetah. ¿Confirmar?</translation>
     </message>
@@ -23423,15 +23425,15 @@ formato GoldenCheetah. ¿Confirma?</translation>
     </message>
     <message>
         <source>All intervals/rides</source>
-        <translation type="vanished">Todos los intervalos/actividades</translation>
+        <translation type="obsolete">Todos los intervalos/actividades</translation>
     </message>
     <message>
         <source>First intervals/rides on X-axis</source>
-        <translation type="vanished">Primeros intervalos/actividades en eje X</translation>
+        <translation type="obsolete">Primeros intervalos/actividades en eje X</translation>
     </message>
     <message>
         <source>First intervals/rides on Y-axis</source>
-        <translation type="vanished">Primeros intervalos/actividades en eje Y</translation>
+        <translation type="obsolete">Primeros intervalos/actividades en eje Y</translation>
     </message>
     <message>
         <location filename="../ScatterWindow.cpp" line="195"/>
@@ -23488,7 +23490,7 @@ formato GoldenCheetah. ¿Confirma?</translation>
 <context>
     <name>SchemePage</name>
     <message>
-        <location filename="../Pages.cpp" line="3134"/>
+        <location filename="../Pages.cpp" line="3138"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
@@ -23497,49 +23499,49 @@ formato GoldenCheetah. ¿Confirma?</translation>
         <translation type="obsolete">Renombrar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3135"/>
+        <location filename="../Pages.cpp" line="3139"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3128"/>
+        <location filename="../Pages.cpp" line="3132"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3129"/>
+        <location filename="../Pages.cpp" line="3133"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3144"/>
+        <location filename="../Pages.cpp" line="3148"/>
         <source>Short</source>
         <translation>Abreviatura</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3145"/>
+        <location filename="../Pages.cpp" line="3149"/>
         <source>Long</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3146"/>
+        <location filename="../Pages.cpp" line="3150"/>
         <source>Percent of CP</source>
         <translation>Porcentaje de PC</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3191"/>
+        <location filename="../Pages.cpp" line="3195"/>
         <source>Maximum of 10 zones reached.</source>
         <translation>Se alcancó el máximo de 10 zonas.</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3214"/>
-        <location filename="../Pages.cpp" line="3221"/>
+        <location filename="../Pages.cpp" line="3218"/>
+        <location filename="../Pages.cpp" line="3225"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3216"/>
-        <location filename="../Pages.cpp" line="3223"/>
+        <location filename="../Pages.cpp" line="3220"/>
+        <location filename="../Pages.cpp" line="3227"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -23688,64 +23690,64 @@ formato GoldenCheetah. ¿Confirma?</translation>
 <context>
     <name>SeasonsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="5136"/>
+        <location filename="../Pages.cpp" line="5140"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5137"/>
+        <location filename="../Pages.cpp" line="5141"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5138"/>
+        <location filename="../Pages.cpp" line="5142"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5139"/>
+        <location filename="../Pages.cpp" line="5143"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5185"/>
-        <location filename="../Pages.cpp" line="5187"/>
-        <location filename="../Pages.cpp" line="5278"/>
-        <location filename="../Pages.cpp" line="5280"/>
+        <location filename="../Pages.cpp" line="5189"/>
+        <location filename="../Pages.cpp" line="5191"/>
+        <location filename="../Pages.cpp" line="5282"/>
+        <location filename="../Pages.cpp" line="5284"/>
         <source>ddd MMM d, yyyy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5124"/>
+        <location filename="../Pages.cpp" line="5128"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5125"/>
+        <location filename="../Pages.cpp" line="5129"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5119"/>
-        <location filename="../Pages.cpp" line="5150"/>
+        <location filename="../Pages.cpp" line="5123"/>
+        <location filename="../Pages.cpp" line="5154"/>
         <source>Name</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5120"/>
-        <location filename="../Pages.cpp" line="5151"/>
+        <location filename="../Pages.cpp" line="5124"/>
+        <location filename="../Pages.cpp" line="5155"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5121"/>
-        <location filename="../Pages.cpp" line="5152"/>
+        <location filename="../Pages.cpp" line="5125"/>
+        <location filename="../Pages.cpp" line="5156"/>
         <source>From</source>
         <translation>Desde</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="5122"/>
-        <location filename="../Pages.cpp" line="5153"/>
+        <location filename="../Pages.cpp" line="5126"/>
+        <location filename="../Pages.cpp" line="5157"/>
         <source>To</source>
         <translation>Hasta</translation>
     </message>
@@ -23796,11 +23798,11 @@ formato GoldenCheetah. ¿Confirma?</translation>
     </message>
     <message>
         <source>Upload ride to Selfloops...</source>
-        <translation type="vanished">Cargar a Selfloops...</translation>
+        <translation type="obsolete">Cargar a Selfloops...</translation>
     </message>
     <message>
         <source>Upload ride... Sending to Selfloops</source>
-        <translation type="vanished">Cargar Actividad... Enviando a Selfloops</translation>
+        <translation type="obsolete">Cargar Actividad... Enviando a Selfloops</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="1090"/>
@@ -23841,7 +23843,7 @@ formato GoldenCheetah. ¿Confirma?</translation>
     <name>ShareDialog</name>
     <message>
         <source>Share your ride</source>
-        <translation type="vanished">Compartir Actividad</translation>
+        <translation type="obsolete">Compartir Actividad</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="90"/>
@@ -23900,7 +23902,7 @@ formato GoldenCheetah. ¿Confirma?</translation>
     </message>
     <message>
         <source>Choose a name for your ride: </source>
-        <translation type="vanished">Elija un nombre para su actividad: </translation>
+        <translation type="obsolete">Elija un nombre para su actividad: </translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="215"/>
@@ -23909,7 +23911,7 @@ formato GoldenCheetah. ¿Confirma?</translation>
     </message>
     <message>
         <source>This Ride is marked as already on %1. Are you sure you want to upload it?</source>
-        <translation type="vanished">Esta Actividad está marcada como ya cargada en %1. ¿Desea cargarla nuevamente?</translation>
+        <translation type="obsolete">Esta Actividad está marcada como ya cargada en %1. ¿Desea cargarla nuevamente?</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="369"/>
@@ -23947,7 +23949,7 @@ formato GoldenCheetah. ¿Confirma?</translation>
     </message>
     <message>
         <source>&amp;Upload Ride</source>
-        <translation type="vanished">Cargar &amp;Actividad</translation>
+        <translation type="obsolete">Cargar &amp;Actividad</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="257"/>
@@ -24092,6 +24094,16 @@ formato GoldenCheetah. ¿Confirma?</translation>
         <translation>Histórico de Cambios</translation>
     </message>
     <message>
+        <location filename="../SpecialFields.cpp" line="60"/>
+        <source>Route</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="61"/>
+        <source>RPE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Calendar Text</source>
         <translation type="obsolete">Texto en Calendario</translation>
     </message>
@@ -24154,32 +24166,32 @@ formato GoldenCheetah. ¿Confirma?</translation>
 <context>
     <name>SpecialTabs</name>
     <message>
-        <location filename="../SpecialFields.cpp" line="142"/>
+        <location filename="../SpecialFields.cpp" line="144"/>
         <source>Workout</source>
         <translation>Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../SpecialFields.cpp" line="143"/>
+        <location filename="../SpecialFields.cpp" line="145"/>
         <source>Notes</source>
         <translation>Notas</translation>
     </message>
     <message>
-        <location filename="../SpecialFields.cpp" line="144"/>
+        <location filename="../SpecialFields.cpp" line="146"/>
         <source>Metric</source>
         <translation>Métricas</translation>
     </message>
     <message>
-        <location filename="../SpecialFields.cpp" line="145"/>
+        <location filename="../SpecialFields.cpp" line="147"/>
         <source>Extra</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../SpecialFields.cpp" line="146"/>
+        <location filename="../SpecialFields.cpp" line="148"/>
         <source>Device</source>
         <translation>Dispositivo</translation>
     </message>
     <message>
-        <location filename="../SpecialFields.cpp" line="147"/>
+        <location filename="../SpecialFields.cpp" line="149"/>
         <source>Athlete</source>
         <translation>Atleta</translation>
     </message>
@@ -24193,7 +24205,7 @@ formato GoldenCheetah. ¿Confirma?</translation>
     </message>
     <message>
         <source>Split Ride</source>
-        <translation type="vanished">Dividir Actividad</translation>
+        <translation type="obsolete">Dividir Actividad</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="65"/>
@@ -24244,11 +24256,11 @@ formato GoldenCheetah. ¿Confirma?</translation>
     </message>
     <message>
         <source>Ride Segment #%1</source>
-        <translation type="vanished">Segmento de Actividad #%1</translation>
+        <translation type="obsolete">Segmento de Actividad #%1</translation>
     </message>
     <message>
         <source>Entire Ride</source>
-        <translation type="vanished">Actividad Completa</translation>
+        <translation type="obsolete">Actividad Completa</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="162"/>
@@ -24305,7 +24317,7 @@ formato GoldenCheetah. ¿Confirma?</translation>
     </message>
     <message>
         <source>Split ride cannot be undone</source>
-        <translation type="vanished">La División de Actividad no se puede deshacer</translation>
+        <translation type="obsolete">La División de Actividad no se puede deshacer</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="668"/>
@@ -24338,7 +24350,7 @@ Are you sure you wish to proceed?</source>
     </message>
     <message>
         <source>Split Ride Completed</source>
-        <translation type="vanished">División de Actividad Finalizada</translation>
+        <translation type="obsolete">División de Actividad Finalizada</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="846"/>
@@ -24377,7 +24389,7 @@ Si usted no selecciona dicha opción, la actividad original será resguardada an
     </message>
     <message>
         <source>Do you want to keep the original ride?</source>
-        <translation type="vanished">¿Quiere mantener la actividad original?</translation>
+        <translation type="obsolete">¿Quiere mantener la actividad original?</translation>
     </message>
     <message>
         <source>If you want to keep the current ride then you should ensure you have clicked on the &quot;Keep original ride&quot; check box below.
@@ -24385,13 +24397,13 @@ Si usted no selecciona dicha opción, la actividad original será resguardada an
 If you do not choose to keep the original ride it will be backed up before removing it from the ride history.
 
 </source>
-        <translation type="vanished">Si usted quiere preservar la actividad seleccionada asegúrese de seleccionar la opción &quot;Preservar actividad original&quot; más abajo.
+        <translation type="obsolete">Si usted quiere preservar la actividad seleccionada asegúrese de seleccionar la opción &quot;Preservar actividad original&quot; más abajo.
 
 Si usted no selecciona dicha opción, la actividad original será resguardada antes de ser eliminada del registro histórico de actividades.</translation>
     </message>
     <message>
         <source>Keep original ride</source>
-        <translation type="vanished">Mantener el original</translation>
+        <translation type="obsolete">Mantener el original</translation>
     </message>
     <message>
         <source>Do you want to keep the original activity?</source>
@@ -24413,7 +24425,7 @@ Si usted no selecciona dicha opción, la actividad original será resguardada an
     </message>
     <message>
         <source>WARNING: The current ride will be backed up and removed, but a backup already exists. The existing backup will therefore be overwritten.</source>
-        <translation type="vanished">Cuidado: la actividad seleccionada será resguardada y eliminada, pero un resguardo ya existe. El resguardo existente será sobreescrito.</translation>
+        <translation type="obsolete">Cuidado: la actividad seleccionada será resguardada y eliminada, pero un resguardo ya existe. El resguardo existente será sobreescrito.</translation>
     </message>
 </context>
 <context>
@@ -24451,7 +24463,7 @@ You can define the minimum length, in time, a gap in recording should be in orde
 In addition, you can set a minimum segment size. Any segment smaller than this limit will be ignored.
 
 </source>
-        <translation type="vanished">Este asistente buscará segmentos de la actividad para separar en base a los faltantes en el registro.
+        <translation type="obsolete">Este asistente buscará segmentos de la actividad para separar en base a los faltantes en el registro.
 
 Usted puede definir la longitud mínima en tiempo que un faltante debe durar para marcar el fin de un segmento y el comienzo de otro.
 
@@ -24514,7 +24526,7 @@ Adicionalmente, usted puede elegir una duración mínima de segmento, cualquier 
     </message>
     <message>
         <source>Ride will be split between marker points selected</source>
-        <translation type="vanished">La Actividad será dividida entre los marcadores seleccionados</translation>
+        <translation type="obsolete">La Actividad será dividida entre los marcadores seleccionados</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="593"/>
@@ -24544,7 +24556,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     </message>
     <message>
         <source>Split Ride</source>
-        <translation type="vanished">Dividir Actividad</translation>
+        <translation type="obsolete">Dividir Actividad</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="456"/>
@@ -24557,7 +24569,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
 The wizard will identify segments of uninterrupted ride and allow you to select which ones to save as new rides. You will also be able to select any currently defined intervals too.
 
 If the newly created ride clashes with an existing ride (same date and time) then the wizard will adjust the start time by one or more seconds to avoid losing or overwriting any existing rides.</source>
-        <translation type="vanished">Este asistente le ayudará a dividir la actividad seleccionada en múltiples actividades
+        <translation type="obsolete">Este asistente le ayudará a dividir la actividad seleccionada en múltiples actividades
 
 El asistente identificará segmentos de actividad ininterrumpida y permitirá seleccionar cuales guardar como nuevas actividades. Usted también podrá seleccionar intervalos previamente definidos.
 
@@ -25055,11 +25067,11 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     </message>
     <message>
         <source>Upload ride to Strava...</source>
-        <translation type="vanished">Cargar a Strava...</translation>
+        <translation type="obsolete">Cargar a Strava...</translation>
     </message>
     <message>
         <source>Upload ride... Sending to Strava</source>
-        <translation type="vanished">Cargar Actividad... Enviando a Strava</translation>
+        <translation type="obsolete">Cargar Actividad... Enviando a Strava</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="529"/>
@@ -25078,7 +25090,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     </message>
     <message>
         <source>Ride processing...</source>
-        <translation type="vanished">Procesando actividad...</translation>
+        <translation type="obsolete">Procesando actividad...</translation>
     </message>
 </context>
 <context>
@@ -25091,22 +25103,22 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
 <context>
     <name>SummaryMetricsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2149"/>
+        <location filename="../Pages.cpp" line="2153"/>
         <source>Available Metrics</source>
         <translation>Métricas Disponibles</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2154"/>
+        <location filename="../Pages.cpp" line="2158"/>
         <source>Selected Metrics</source>
         <translation>Métricas Seleccionadas</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2170"/>
+        <location filename="../Pages.cpp" line="2174"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2171"/>
+        <location filename="../Pages.cpp" line="2175"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
@@ -25197,7 +25209,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     </message>
     <message>
         <source>Refresh Ride List</source>
-        <translation type="vanished">Actualizar lista de Actividades</translation>
+        <translation type="obsolete">Actualizar lista de Actividades</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="116"/>
@@ -25213,7 +25225,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     </message>
     <message>
         <source>Keep all do not delete any rides</source>
-        <translation type="vanished">Mantener todo no borrar ninguna actividad</translation>
+        <translation type="obsolete">Mantener todo no borrar ninguna actividad</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="183"/>
@@ -25232,7 +25244,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     </message>
     <message>
         <source>Downloading ride list...</source>
-        <translation type="vanished">Descargando lista de actividades...</translation>
+        <translation type="obsolete">Descargando lista de actividades...</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="115"/>
@@ -25371,7 +25383,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     </message>
     <message>
         <source>Uploading ride (%1 bytes)...</source>
-        <translation type="vanished">Cargando actividad (%1 bytes)...</translation>
+        <translation type="obsolete">Cargando actividad (%1 bytes)...</translation>
     </message>
     <message>
         <location filename="../TPUploadDialog.cpp" line="77"/>
@@ -25419,7 +25431,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <name>TabView</name>
     <message>
         <source>Compare Rides and Intervals</source>
-        <translation type="vanished">Comparar Actividades e Intervalos</translation>
+        <translation type="obsolete">Comparar Actividades e Intervalos</translation>
     </message>
     <message>
         <location filename="../TabView.cpp" line="62"/>
@@ -25448,52 +25460,57 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
 <context>
     <name>Themes</name>
     <message>
-        <location filename="../Colors.cpp" line="533"/>
+        <location filename="../Colors.cpp" line="538"/>
         <source>Default</source>
         <translation>Por defecto</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="543"/>
+        <location filename="../Colors.cpp" line="546"/>
+        <source>Corporate Junky</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="556"/>
         <source>Neutral Blue</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="551"/>
+        <location filename="../Colors.cpp" line="564"/>
         <source>Firenze</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="559"/>
+        <location filename="../Colors.cpp" line="572"/>
         <source>Mustang</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="567"/>
+        <location filename="../Colors.cpp" line="580"/>
         <source>Japanese Garden</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="575"/>
+        <location filename="../Colors.cpp" line="588"/>
         <source>Zen and Tea</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="583"/>
+        <location filename="../Colors.cpp" line="596"/>
         <source>Mono (dark)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="591"/>
+        <location filename="../Colors.cpp" line="604"/>
         <source>Mono (light)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="600"/>
+        <location filename="../Colors.cpp" line="613"/>
         <source>Schoberer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="609"/>
+        <location filename="../Colors.cpp" line="622"/>
         <source>Classic</source>
         <translation></translation>
     </message>
@@ -25516,7 +25533,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <name>TimeRiding</name>
     <message>
         <source>Time Riding</source>
-        <translation type="vanished">Tiempo Pedaleando</translation>
+        <translation type="obsolete">Tiempo Pedaleando</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="112"/>
@@ -25689,7 +25706,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     </message>
     <message>
         <source>Estimate CP</source>
-        <translation type="vanished">Estimar PC</translation>
+        <translation type="obsolete">Estimar PC</translation>
     </message>
     <message>
         <source>Calculate CP</source>
@@ -26132,72 +26149,72 @@ Presionar F3 en el controlador al finalizar.</translation>
         <translation>obteniendo Configuración de Trainingstagebuch.org...</translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="170"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="171"/>
         <source>getting new Trainingstagebuch.org Session...</source>
         <translation>obteniendo nueva sesión con Trainingstagebuch.org ...</translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="207"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="208"/>
         <source>preparing Trainingstagebuch.org data ...</source>
         <translation>preparando datos Trainingstagebuch.org ...</translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="230"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="231"/>
         <source>temporary file too large for upload: %1 &gt; %1 bytes</source>
         <translation>archivo temporario demasiado grande para carga: %1 &gt; %1 bytes</translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="248"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="249"/>
         <source>sending to Trainingstagebuch.org ...</source>
         <translation>enviando a Trainingstagebuch.org ...</translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="280"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="282"/>
         <source>request failed: </source>
         <translation>solicitud fallida: </translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="291"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="293"/>
         <source>request failed, Server response: %1 %2</source>
         <translation>solicitud fallida, respuesta del Servidor: %1 %2</translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="359"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="361"/>
         <source>failed to parse Settings response: </source>
         <translation>falló el análisis de la respuesta de Configuración: </translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="367"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="369"/>
         <source>failed to get settings: </source>
         <translation>falló la obtención de la configuración: </translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="417"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="419"/>
         <source>failed to parse Session response: </source>
         <translation>falló el análisis de la respuesta al inicio de Sesión: </translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="425"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="427"/>
         <source>failed to get new session: </source>
         <translation>falló la obtención de nueva sesión: </translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="435"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="437"/>
         <source>got empty session</source>
         <translation>sesión vacía</translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="477"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="479"/>
         <source>failed to parse upload response: </source>
         <translation>falló el análisis de la repuesta de carga: </translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="485"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="487"/>
         <source>failed to upload file: </source>
         <translation>falló la carga de archivo: </translation>
     </message>
     <message>
-        <location filename="../TrainingstagebuchUploader.cpp" line="495"/>
+        <location filename="../TrainingstagebuchUploader.cpp" line="497"/>
         <source>got empty exercise</source>
         <translation>se obtuvo un ejercicio vacío</translation>
     </message>
@@ -26251,7 +26268,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     </message>
     <message>
         <source>%1 ride%2</source>
-        <translation type="vanished">%1 actividad%2</translation>
+        <translation type="obsolete">%1 actividad%2</translation>
     </message>
     <message>
         <location filename="../TreeMapWindow.cpp" line="315"/>
@@ -26338,7 +26355,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     <name>TwitterDialog</name>
     <message>
         <source>Tweet Your Ride</source>
-        <translation type="vanished">Twitear Actividad</translation>
+        <translation type="obsolete">Twitear Actividad</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="37"/>
@@ -26352,7 +26369,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     </message>
     <message>
         <source>Time Riding</source>
-        <translation type="vanished">Tiempo Pedaleando</translation>
+        <translation type="obsolete">Tiempo Pedaleando</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="34"/>
@@ -26431,7 +26448,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     </message>
     <message>
         <source>&amp;Tweet Ride</source>
-        <translation type="vanished">&amp;Twitear Entrenamiento</translation>
+        <translation type="obsolete">&amp;Twitear Entrenamiento</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="77"/>
@@ -26509,7 +26526,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     </message>
     <message>
         <source>Time Riding: %1 </source>
-        <translation type="vanished">Tiempo Pedaleando: %1 </translation>
+        <translation type="obsolete">Tiempo Pedaleando: %1 </translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="208"/>
@@ -26866,11 +26883,11 @@ Presionar F3 en el controlador al finalizar.</translation>
     </message>
     <message>
         <source>&lt;td align=&quot;center&quot;&gt;High (kJ)&lt;/td&gt;</source>
-        <translation type="vanished">&lt;td align=&quot;center&quot;&gt;Superior (kJ)&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Superior (kJ)&lt;/td&gt;</translation>
     </message>
     <message>
         <source>&lt;td align=&quot;center&quot;&gt;Low (kJ)&lt;/td&gt;</source>
-        <translation type="vanished">&lt;td align=&quot;center&quot;&gt;Inferior (kJ)&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Inferior (kJ)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="578"/>
@@ -27088,7 +27105,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     </message>
     <message>
         <source>%1 new on %2 measurements received.</source>
-        <translation type="vanished">%1 nuevas medidas recibidas en %2.</translation>
+        <translation type="obsolete">%1 nuevas medidas recibidas en %2.</translation>
     </message>
 </context>
 <context>
@@ -27392,12 +27409,12 @@ Presionar F3 en el controlador al finalizar.</translation>
         <translation type="obsolete">Zonas por defecto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3102"/>
+        <location filename="../Pages.cpp" line="3106"/>
         <source>Critical Power</source>
         <translation>Potencia Crítica</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3103"/>
+        <location filename="../Pages.cpp" line="3107"/>
         <source>Default</source>
         <translation>Por defecto</translation>
     </message>
