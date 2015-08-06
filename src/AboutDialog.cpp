@@ -79,8 +79,9 @@ AboutPage::AboutPage(Context *context) : context(context)
                 "Physfarm Training Systems</a>.<br>"
                 "Virtual Speed courtesy of Tom Compton <a href=\"http://www.analyticcycling.com\">"
                 "AnalyticCycling</a>.<br>"
-                "<br>The core body temperature module was developed by the U.S. Army <br>"
-                "Research Institute of Environmental Medicine and is patent pending<br>"
+                "<br>The core body temperature module was developed by the <br>"
+                "<a href=\"http://www.usariem.army.mil/\">U.S. Army Research Institute of Environmental Medicine</a>"
+                "<br> and is patent pending<br>"
                 "</center>"
                 )
                 .arg(QString(QUrl::fromLocalFile(context->athlete->home->root().absolutePath()).toEncoded()))
