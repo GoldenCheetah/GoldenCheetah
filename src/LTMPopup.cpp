@@ -363,19 +363,20 @@ LTMPopup::setSummaryHTML(RideItem *item)
     QString summaryText("");
 
     // main totals
-    static const QStringList totalColumn = QStringList()
+    const QStringList totalColumn = QStringList()
         << "workout_time"
         << "time_riding"
-        << "total_distance"
+        << (item->isSwim ? "distance_swim" : "total_distance")
         << "total_work"
         << "skiba_wprime_exp"
         << "elevation_gain";
 
-    static const QStringList averageColumn = QStringList()
+    const QStringList averageColumn = QStringList()
         << "average_speed"
         << "average_power"
         << "average_hr"
-        << "average_cad";
+        << "average_cad"
+        << (item->isSwim ? "pace_swim" : "pace");
 
     static const QStringList maximumColumn = QStringList()
         << "max_speed"
