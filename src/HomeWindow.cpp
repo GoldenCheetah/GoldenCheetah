@@ -1283,7 +1283,10 @@ HomeWindow::restoreState(bool useDefault)
     if (content == "") {
 
         // if no local file fall back to qresource
-        if (!finfo.exists()) filename = QString(":xml/%1-layout.xml").arg(name);
+        if (!finfo.exists()) {
+            filename = QString(":xml/%1-layout.xml").arg(name);
+            useDefault = true;
+        }
 
         QFile file(filename);
         if (file.open(QIODevice::ReadOnly)) {
