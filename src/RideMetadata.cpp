@@ -1321,7 +1321,14 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
         // any field called "Time Riding" on the "Metric" tab needs to be renamed "Time Moving" as we renamed it !
         if (fieldDefinitions[i].name == "Time Riding" && fieldDefinitions[i].tab == "Metric") fieldDefinitions[i].name = "Time Moving";
 
+        // set type to correct value if a 1st class variable
+        if (fieldDefinitions[i].name == "Device") fieldDefinitions[i].type = FIELD_SHORTTEXT;
+        else if (fieldDefinitions[i].name == "Recording Interval") fieldDefinitions[i].type = FIELD_DOUBLE;
+        else if (fieldDefinitions[i].name == "Start Date") fieldDefinitions[i].type = FIELD_DATE;
+        else if (fieldDefinitions[i].name == "Start Time") fieldDefinitions[i].type = FIELD_TIME;
+        else if (fieldDefinitions[i].name == "Identifier") fieldDefinitions[i].type = FIELD_SHORTTEXT;
     }
+
     if (!hasCalendarText) {
         FieldDefinition add;
         add.name = "Calendar Text";
