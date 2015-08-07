@@ -42,7 +42,7 @@ GcUpgrade::upgradeConfirmedByUser(const QDir &home)
 
     if (!folderUpgradeSuccess) {
 
-        GcUpgradeExecuteDialog msgBox(home.dirName());
+        GcUpgradeExecuteDialog msgBox(home);
         if (msgBox.exec() == QDialog::Accepted) return true;
 
         // if not accepted
@@ -692,8 +692,10 @@ GcUpgrade::removeIndex(QFile &index)
 }
 
 
-GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, Qt::Dialog)
+GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QDir athleteHomeDir)
+    : QDialog(NULL, Qt::Dialog)
 {
+    const QString athlete = athleteHomeDir.dirName();
 
     setWindowTitle(QString(tr("Athlete %1").arg(athlete)));
     this->setMinimumWidth(550);
@@ -744,7 +746,10 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
                      "<center><b>Please make sure that you have done a backup of your athlete data "
                      "before proceeding with the upgrade. We can't take responsibility for "
                      "any loss of data during the process. </b> </center> <br>"
-                     ));
+                     "Please backup the athlete directory: %1"
+                     ).arg(athleteHomeDir.absolutePath()));
+    
+    qDebug() << "Path to athlete home dir: " << athleteHomeDir.absolutePath();
     scrollText = new QScrollArea();
     scrollText->setWidget(text);
     vertical = scrollText->verticalScrollBar();
