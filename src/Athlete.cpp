@@ -272,33 +272,25 @@ Athlete::translateDefaultCharts(QList<LTMSettings>&charts)
     // Map default (english) chart name to external (Localized) name
     // New default charts need to be added to this list to be translated
     QMap<QString, QString> chartNameMap;
-	chartNameMap.insert("PMC", tr("PMC"));
 	chartNameMap.insert("Athlete Weight", tr("Athlete Weight"));
-	chartNameMap.insert("Time In Power Zone (Stacked)", tr("Time In Power Zone (Stacked)"));
-	chartNameMap.insert("Time In Power Zone (Bar)", tr("Time In Power Zone (Bar)"));
+	chartNameMap.insert("Time In Power Zone", tr("Time In Power Zone"));
+	chartNameMap.insert("Sustained Time In Zone", tr("Sustained Time In Zone"));
+	chartNameMap.insert("Time in W' Zone", tr("Time in W' Zone"));
 	chartNameMap.insert("Time In HR Zone", tr("Time In HR Zone"));
 	chartNameMap.insert("Power Distribution", tr("Power Distribution"));
     chartNameMap.insert("Vo2max Estimation", tr("Vo2max Estimation"));
 	chartNameMap.insert("KPI Tracker", tr("KPI Tracker"));
 	chartNameMap.insert("Critical Power Trend", tr("Critical Power Trend"));
 	chartNameMap.insert("Aerobic Power", tr("Aerobic Power"));
-	chartNameMap.insert("Aerobic WPK", tr("Aerobic WPK"));
 	chartNameMap.insert("Power Variance", tr("Power Variance"));
 	chartNameMap.insert("Power Profile", tr("Power Profile"));
 	chartNameMap.insert("Anaerobic Power", tr("Anaerobic Power"));
-	chartNameMap.insert("Anaerobic WPK", tr("Anaerobic WPK"));
 	chartNameMap.insert("Power & Speed Trend", tr("Power & Speed Trend"));
-	chartNameMap.insert("Cardiovascular Response", tr("Cardiovascular Response"));
 	chartNameMap.insert("Tempo & Threshold Time", tr("Tempo & Threshold Time"));
 	chartNameMap.insert("Training Mix", tr("Training Mix"));
 	chartNameMap.insert("Time & Distance", tr("Time & Distance"));
-	chartNameMap.insert("Skiba Power", tr("Skiba Power"));
-	chartNameMap.insert("Daniels Power", tr("Daniels Power"));
-	chartNameMap.insert("PM Ramp & Peak", tr("PM Ramp & Peak"));
-	chartNameMap.insert("Skiba PM", tr("Skiba PM"));
-	chartNameMap.insert("Daniels PM", tr("Daniels PM"));
-	chartNameMap.insert("Device Reliability", tr("Device Reliability"));
-	chartNameMap.insert("Withings Weight", tr("Withings Weight"));
+	chartNameMap.insert("BikeScore and Intensity", tr("BikeScore and Intensity"));
+	chartNameMap.insert("TSS and IF", tr("TSS and IF"));
 	chartNameMap.insert("Stress and Distance", tr("Stress and Distance"));
 	chartNameMap.insert("Calories vs Duration", tr("Calories vs Duration"));
     chartNameMap.insert("Stress (TISS)", tr("Stress (TISS)"));
@@ -310,8 +302,9 @@ Athlete::translateDefaultCharts(QList<LTMSettings>&charts)
     chartNameMap.insert("PMC (Distance)", tr("PMC (Distance)"));
     chartNameMap.insert("PMC (Duration)", tr("PMC (Duration)"));
     chartNameMap.insert("CP History", tr("CP History"));
+    chartNameMap.insert("CP Analysis", tr("CP Analysis"));
     chartNameMap.insert("PMC (TriScore)", tr("PMC (TriScore)"));
-    chartNameMap.insert("Time in Pace Zones (Stacked)", tr("Time in Pace Zones (Stacked)"));
+    chartNameMap.insert("Time in Pace Zones", tr("Time in Pace Zones"));
     chartNameMap.insert("Run Pace", tr("Run Pace"));
     chartNameMap.insert("Swim Pace", tr("Swim Pace"));
 
