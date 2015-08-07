@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es">
+<TS version="2.1" language="es">
 <context>
     <name>AAvgPower</name>
     <message>
@@ -84,7 +84,7 @@
     <message>
         <location filename="../AboutDialog.cpp" line="62"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;/center&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;para Linux, Mac, y Windows&lt;p&gt;GoldenCheetah está licenciado bajo la&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;el código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los archivos de actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas registradas utilizadas con autorización&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore cortesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed cortesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;El módulo de temperatura corporal central fue desarrollado por el &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; y está pendiente de patentamiento&lt;br&gt;&lt;/center&gt;</translation>
     </message>
 </context>
 <context>
@@ -2558,28 +2558,35 @@ Presione Siguiente para Continuar</translation>
         <translation>Error en Archivo de Zonas de Ritmo %1</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="275"/>
-        <source>PMC</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Track Weight</source>
         <translation type="obsolete">Seguimiento de Peso</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="276"/>
+        <location filename="../Athlete.cpp" line="275"/>
         <source>Athlete Weight</source>
         <translation>Peso del Atleta</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="277"/>
         <source>Time In Power Zone (Stacked)</source>
-        <translation>Tiempo en Zonas de Potencia (Apilado)</translation>
+        <translation type="vanished">Tiempo en Zonas de Potencia (Apilado)</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="278"/>
         <source>Time In Power Zone (Bar)</source>
-        <translation>Tiempo en Zonas de Potencia (Barras)</translation>
+        <translation type="vanished">Tiempo en Zonas de Potencia (Barras)</translation>
+    </message>
+    <message>
+        <location filename="../Athlete.cpp" line="276"/>
+        <source>Time In Power Zone</source>
+        <translation>Tiempo en Zonas de Potencia</translation>
+    </message>
+    <message>
+        <location filename="../Athlete.cpp" line="277"/>
+        <source>Sustained Time In Zone</source>
+        <translation>Tiempo Sostenido en Zona</translation>
+    </message>
+    <message>
+        <source>Time In W&apos; Zone</source>
+        <translation type="vanished">Tiempo en Zonas W&apos;</translation>
     </message>
     <message>
         <location filename="../Athlete.cpp" line="279"/>
@@ -2612,166 +2619,176 @@ Presione Siguiente para Continuar</translation>
         <translation>Potencia Aeróbica</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="285"/>
         <source>Aerobic WPK</source>
-        <translation>WPK Aeróbico</translation>
+        <translation type="vanished">WPK Aeróbico</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="286"/>
+        <location filename="../Athlete.cpp" line="285"/>
         <source>Power Variance</source>
         <translation>Variación de Potencia</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="287"/>
+        <location filename="../Athlete.cpp" line="286"/>
         <source>Power Profile</source>
         <translation>Perfil de Potencia</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="288"/>
+        <location filename="../Athlete.cpp" line="287"/>
         <source>Anaerobic Power</source>
         <translation>Potencia Anaeróbica</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="289"/>
         <source>Anaerobic WPK</source>
-        <translation>WKP Anaeróbico</translation>
+        <translation type="vanished">WKP Anaeróbico</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="290"/>
+        <location filename="../Athlete.cpp" line="288"/>
         <source>Power &amp; Speed Trend</source>
         <translation>Tendencia de Potencia y Velocidad</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="291"/>
         <source>Cardiovascular Response</source>
-        <translation>Respuesta Cardiovascular</translation>
+        <translation type="vanished">Respuesta Cardiovascular</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="292"/>
+        <location filename="../Athlete.cpp" line="289"/>
         <source>Tempo &amp; Threshold Time</source>
         <translation>Tiempo en Tempo y Umbral</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="293"/>
+        <location filename="../Athlete.cpp" line="290"/>
         <source>Training Mix</source>
         <translation>Mezcla de Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="294"/>
+        <location filename="../Athlete.cpp" line="291"/>
         <source>Time &amp; Distance</source>
         <translation>Tiempo y Distancia</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="295"/>
         <source>Skiba Power</source>
-        <translation>Potencia (Skiba)</translation>
+        <translation type="vanished">Potencia (Skiba)</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="296"/>
         <source>Daniels Power</source>
-        <translation>Potencia (Daniels)</translation>
+        <translation type="vanished">Potencia (Daniels)</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="297"/>
         <source>PM Ramp &amp; Peak</source>
-        <translation>AR Rampa y Pico</translation>
+        <translation type="vanished">AR Rampa y Pico</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="298"/>
         <source>Skiba PM</source>
-        <translation>AR (Skiba)</translation>
+        <translation type="vanished">AR (Skiba)</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="299"/>
         <source>Daniels PM</source>
-        <translation>AR (Daniels)</translation>
+        <translation type="vanished">AR (Daniels)</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="300"/>
         <source>Device Reliability</source>
-        <translation>Confiabilidad de Dispositivo</translation>
+        <translation type="vanished">Confiabilidad de Dispositivo</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="301"/>
         <source>Withings Weight</source>
-        <translation>Peso Withings</translation>
+        <translation type="vanished">Peso Withings</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="302"/>
+        <location filename="../Athlete.cpp" line="278"/>
+        <source>Time in W&apos; Zone</source>
+        <translation>Tiempo en Zonas W&apos;</translation>
+    </message>
+    <message>
+        <location filename="../Athlete.cpp" line="292"/>
+        <source>BikeScore and Intensity</source>
+        <translation>BikeScore e Intensidad</translation>
+    </message>
+    <message>
+        <location filename="../Athlete.cpp" line="293"/>
+        <source>TSS and IF</source>
+        <translation>TSS e IF</translation>
+    </message>
+    <message>
+        <location filename="../Athlete.cpp" line="294"/>
         <source>Stress and Distance</source>
         <translation>Estrés y Distancia</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="303"/>
+        <location filename="../Athlete.cpp" line="295"/>
         <source>Calories vs Duration</source>
         <translation>Calorías vs Duración</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="304"/>
+        <location filename="../Athlete.cpp" line="296"/>
         <source>Stress (TISS)</source>
         <translation>Estrés (TISS)</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="305"/>
+        <location filename="../Athlete.cpp" line="297"/>
         <source>Aerobic Response</source>
         <translation>Respuesta Aeróbica</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="306"/>
+        <location filename="../Athlete.cpp" line="298"/>
         <source>Anaerobic Response</source>
         <translation>Respuesta Anaeróbica</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="307"/>
+        <location filename="../Athlete.cpp" line="299"/>
         <source>PMC (Coggan)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="308"/>
+        <location filename="../Athlete.cpp" line="300"/>
         <source>PMC (Skiba)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="309"/>
+        <location filename="../Athlete.cpp" line="301"/>
         <source>PMC (TRIMP)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="310"/>
+        <location filename="../Athlete.cpp" line="302"/>
         <source>PMC (Distance)</source>
         <translation>PMC (Distancia)</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="311"/>
+        <location filename="../Athlete.cpp" line="303"/>
         <source>PMC (Duration)</source>
         <translation>PMC (Duración)</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="312"/>
+        <location filename="../Athlete.cpp" line="304"/>
         <source>CP History</source>
         <translation>Histórico PC</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="313"/>
+        <location filename="../Athlete.cpp" line="305"/>
+        <source>CP Analysis</source>
+        <translation>Análisis de Potencia Crítica</translation>
+    </message>
+    <message>
+        <location filename="../Athlete.cpp" line="306"/>
         <source>PMC (TriScore)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="314"/>
         <source>Time in Pace Zones (Stacked)</source>
-        <translation>Tiempo en Zonas de Ritmo (Apilado)</translation>
+        <translation type="vanished">Tiempo en Zonas de Ritmo (Apilado)</translation>
     </message>
     <message>
+        <location filename="../Athlete.cpp" line="307"/>
         <source>Time in Pace Zones</source>
-        <translation type="obsolete">Tiempo en Zonas de Ritmo</translation>
+        <translation>Tiempo en Zonas de Ritmo</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="315"/>
+        <location filename="../Athlete.cpp" line="308"/>
         <source>Run Pace</source>
         <translation>Ritmo de Carrera</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="316"/>
+        <location filename="../Athlete.cpp" line="309"/>
         <source>Swim Pace</source>
         <translation>Ritmo de Nado</translation>
     </message>
@@ -3033,8 +3050,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2965"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3046,8 +3063,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2560"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3059,8 +3076,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2661"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3072,8 +3089,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="3052"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3085,8 +3102,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2762"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3098,8 +3115,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2863"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3171,8 +3188,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="3009"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3184,8 +3201,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2711"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3197,8 +3214,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="3096"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3210,8 +3227,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2812"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3223,8 +3240,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2913"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3264,8 +3281,8 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="2610"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
+        <source>°</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10530,23 +10547,23 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1489"/>
+        <location filename="../HomeWindow.cpp" line="1492"/>
         <source>Stress</source>
         <translation>Estrés</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1490"/>
+        <location filename="../HomeWindow.cpp" line="1493"/>
         <source>Scatter</source>
         <translation>Dispersión</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1491"/>
-        <location filename="../HomeWindow.cpp" line="1493"/>
+        <location filename="../HomeWindow.cpp" line="1494"/>
+        <location filename="../HomeWindow.cpp" line="1496"/>
         <source>HrPw</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1492"/>
+        <location filename="../HomeWindow.cpp" line="1495"/>
         <source>Activity Log</source>
         <translation>Registro de Actividades</translation>
     </message>
@@ -10566,167 +10583,167 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Archivo: %1 no se puede abrir para &apos;Escritura&apos;. Verifique las propiedades del archivo.</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1460"/>
+        <location filename="../HomeWindow.cpp" line="1463"/>
         <source>Ride Log</source>
         <translation>Registro de Actividades</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1461"/>
+        <location filename="../HomeWindow.cpp" line="1464"/>
         <source>Aerobic Power</source>
         <translation>Potencia Aeróbica</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1462"/>
+        <location filename="../HomeWindow.cpp" line="1465"/>
         <source>Anaerobic Power</source>
         <translation>Potencia Anaeróbica</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1463"/>
+        <location filename="../HomeWindow.cpp" line="1466"/>
         <source>Cadence</source>
         <translation>Cadencia</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1464"/>
+        <location filename="../HomeWindow.cpp" line="1467"/>
         <source>Calendar</source>
         <translation>Calendario</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1465"/>
+        <location filename="../HomeWindow.cpp" line="1468"/>
         <source>CP</source>
         <translation>PC</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1466"/>
+        <location filename="../HomeWindow.cpp" line="1469"/>
         <source>Details</source>
         <translation>Detalles</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1467"/>
+        <location filename="../HomeWindow.cpp" line="1470"/>
         <source>Distance</source>
         <translation>Distancia</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1468"/>
+        <location filename="../HomeWindow.cpp" line="1471"/>
         <source>Edit</source>
         <translation>Editar</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1469"/>
+        <location filename="../HomeWindow.cpp" line="1472"/>
         <source>Elapsed Time</source>
         <translation>Tiempo Transcurrido</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1470"/>
+        <location filename="../HomeWindow.cpp" line="1473"/>
         <source>Heartrate</source>
         <translation>Frec. Cardíaca</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1471"/>
+        <location filename="../HomeWindow.cpp" line="1474"/>
         <source>Lap</source>
         <translation>Vuelta</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1472"/>
+        <location filename="../HomeWindow.cpp" line="1475"/>
         <source>Map</source>
         <translation>Mapa</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1473"/>
+        <location filename="../HomeWindow.cpp" line="1476"/>
         <source>Performance</source>
         <translation>Gráfico de Curvas</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1474"/>
+        <location filename="../HomeWindow.cpp" line="1477"/>
         <source>PMC</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1475"/>
+        <location filename="../HomeWindow.cpp" line="1478"/>
         <source>Power</source>
         <translation>Potencia</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1476"/>
+        <location filename="../HomeWindow.cpp" line="1479"/>
         <source>QA</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1477"/>
+        <location filename="../HomeWindow.cpp" line="1480"/>
         <source>Ride</source>
         <translation>Gráfico</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1478"/>
+        <location filename="../HomeWindow.cpp" line="1481"/>
         <source>Speed</source>
         <translation>Velocidad</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1479"/>
+        <location filename="../HomeWindow.cpp" line="1482"/>
         <source>Summary</source>
         <translation>Resúmen</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1480"/>
+        <location filename="../HomeWindow.cpp" line="1483"/>
         <source>Target Power</source>
         <translation>Potencia Objectivo</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1481"/>
+        <location filename="../HomeWindow.cpp" line="1484"/>
         <source>Time and Distance</source>
         <translation>Tiempo y Distancia</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1482"/>
+        <location filename="../HomeWindow.cpp" line="1485"/>
         <source>Time In Zone</source>
         <translation>Tiempo por Zonas</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1483"/>
+        <location filename="../HomeWindow.cpp" line="1486"/>
         <source>W&apos; In Zone</source>
         <translation>W&apos; En Zona</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1484"/>
+        <location filename="../HomeWindow.cpp" line="1487"/>
         <source>Sustained In Zone</source>
         <translation>Sostenido en Zona</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1485"/>
+        <location filename="../HomeWindow.cpp" line="1488"/>
         <source>Training Mix</source>
         <translation>Mezcla de Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1486"/>
+        <location filename="../HomeWindow.cpp" line="1489"/>
         <source>Navigator</source>
         <translation>Registro de Actividades</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1487"/>
+        <location filename="../HomeWindow.cpp" line="1490"/>
         <source>W/kg</source>
         <translation>Vatios/kg</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1488"/>
+        <location filename="../HomeWindow.cpp" line="1491"/>
         <source>Workout</source>
         <translation>Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1494"/>
+        <location filename="../HomeWindow.cpp" line="1497"/>
         <source>Tracker</source>
         <translation>Seguimiento</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1495"/>
+        <location filename="../HomeWindow.cpp" line="1498"/>
         <source>CP History</source>
         <translation>Histórico PC</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1496"/>
+        <location filename="../HomeWindow.cpp" line="1499"/>
         <source>Library</source>
         <translation>Biblioteca</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1497"/>
+        <location filename="../HomeWindow.cpp" line="1500"/>
         <source>CV</source>
         <translation>VC</translation>
     </message>
@@ -11776,12 +11793,14 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>piés</translation>
     </message>
     <message>
+        <location filename="../WorkoutWizard.cpp" line="737"/>
         <source>Elevation Climbed</source>
-        <translation type="obsolete">Desnivel Acumulado</translation>
+        <translation>Desnivel Acumulado</translation>
     </message>
     <message>
+        <location filename="../WorkoutWizard.cpp" line="738"/>
         <source>Distance</source>
-        <translation type="obsolete">Distancia</translation>
+        <translation>Distancia</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="750"/>
@@ -21204,9 +21223,26 @@ yyyy</source>
         <translation>%</translation>
     </message>
     <message>
+        <location filename="../RideFile.cpp" line="307"/>
+        <source>°C</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../RideFile.cpp" line="313"/>
         <location filename="../RideFile.cpp" line="314"/>
         <source>mm</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="315"/>
+        <location filename="../RideFile.cpp" line="316"/>
+        <location filename="../RideFile.cpp" line="317"/>
+        <location filename="../RideFile.cpp" line="318"/>
+        <location filename="../RideFile.cpp" line="319"/>
+        <location filename="../RideFile.cpp" line="320"/>
+        <location filename="../RideFile.cpp" line="321"/>
+        <location filename="../RideFile.cpp" line="322"/>
+        <source>°</source>
         <translation></translation>
     </message>
     <message>
@@ -21228,23 +21264,6 @@ yyyy</source>
         <location filename="../RideFile.cpp" line="193"/>
         <source>Right Pedal Smoothness</source>
         <translation>Fluidez Pedal Der</translation>
-    </message>
-    <message>
-        <location filename="../RideFile.cpp" line="307"/>
-        <source>Â°C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../RideFile.cpp" line="315"/>
-        <location filename="../RideFile.cpp" line="316"/>
-        <location filename="../RideFile.cpp" line="317"/>
-        <location filename="../RideFile.cpp" line="318"/>
-        <location filename="../RideFile.cpp" line="319"/>
-        <location filename="../RideFile.cpp" line="320"/>
-        <location filename="../RideFile.cpp" line="321"/>
-        <location filename="../RideFile.cpp" line="322"/>
-        <source>Â°</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="325"/>
@@ -24096,12 +24115,12 @@ formato GoldenCheetah. ¿Confirma?</translation>
     <message>
         <location filename="../SpecialFields.cpp" line="60"/>
         <source>Route</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruta</translation>
     </message>
     <message>
         <location filename="../SpecialFields.cpp" line="61"/>
         <source>RPE</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Calendar Text</source>
@@ -25467,7 +25486,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../Colors.cpp" line="546"/>
         <source>Corporate Junky</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="556"/>
