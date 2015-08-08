@@ -1019,6 +1019,10 @@ FormField::metadataChanged()
                             value = QString("%1").arg(newvalue);
                         }
                     }
+
+                    // initialize widget to show overriden value
+                    if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0).addSecs(value.toDouble()));
+                    else ((QDoubleSpinBox*)widget)->setValue(value.toDouble());
                 } else {
                     value = "0.0";
                     enabled->setChecked(false);
