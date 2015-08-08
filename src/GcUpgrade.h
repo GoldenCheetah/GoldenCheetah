@@ -126,7 +126,7 @@ class GcUpgradeExecuteDialog : public QDialog
     Q_OBJECT
 
     public:
-        GcUpgradeExecuteDialog(QString);
+        GcUpgradeExecuteDialog(QDir);
 
     private:
         QScrollArea *scrollText;
