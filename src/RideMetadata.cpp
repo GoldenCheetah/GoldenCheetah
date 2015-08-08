@@ -185,17 +185,21 @@ RideMetadata::setExtraTab()
             // since we show EVERYTHING, don't let the user edit them
             // we might get more selective later?
 
-            // set Text Field to 'Read Only' to still enable scrolling,...
-            GTextEdit* textEdit = dynamic_cast<GTextEdit*> (field->widget);
-            if (textEdit)  textEdit->setReadOnly(true);
-            else {
-                QLineEdit* lineEdit = dynamic_cast<QLineEdit*> (field->widget);
-                if (lineEdit) lineEdit->setReadOnly(true);
-                else field->widget->setEnabled(false);
+            if (field->enabled) {
+                field->enabled->setEnabled(false);
+                field->widget->setEnabled(false);
+            } else {
+                // set Text Field to 'Read Only' to still enable scrolling,...
+                GTextEdit* textEdit = dynamic_cast<GTextEdit*> (field->widget);
+                if (textEdit)  textEdit->setReadOnly(true);
+                else {
+                    QLineEdit* lineEdit = dynamic_cast<QLineEdit*> (field->widget);
+                    if (lineEdit) lineEdit->setReadOnly(true);
+                    else field->widget->setEnabled(false);
 
+                }
             }
         }
-
     }
 }
 
@@ -1002,7 +1006,7 @@ FormField::metadataChanged()
                       ourRideItem->ride()->metricOverrides.value(meta->sp.metricSymbol(definition.name));
                 if (override.contains("value")) {
                     enabled->setChecked(true);
-                    widget->setEnabled(true);
+                    //widget->setEnabled(true);
                     widget->setHidden(false);
                     value = override.value("value");
 
@@ -1018,7 +1022,7 @@ FormField::metadataChanged()
                 } else {
                     value = "0.0";
                     enabled->setChecked(false);
-                    widget->setEnabled(false);
+                    //widget->setEnabled(false);
                     widget->setHidden(true);
                 }
             } else {
