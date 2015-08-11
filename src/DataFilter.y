@@ -70,7 +70,7 @@ extern Leaf *root; // root node for parsed statement
    char function[32];
 }
 
-%type <leaf> symbol value lexpr;
+%type <leaf> symbol value lexpr expr;
 %type <op> lop cop bop;
 
 %left ADD SUBTRACT DIVIDE MULTIPLY POW
@@ -83,24 +83,31 @@ extern Leaf *root; // root node for parsed statement
 filter: lexpr                       { root = $1; }
         ;
 
-lexpr : '(' lexpr ')'               { $$ = new Leaf();
-                                      $$->type = Leaf::Logical;
-                                      $$->lvalue.l = $2;
-                                      $$->op = 0; }
-
-      | lexpr lop lexpr             { $$ = new Leaf();
+lexpr : expr lop expr             { $$ = new Leaf();
                                       $$->type = Leaf::Logical;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
+        | '(' expr ')'               { $$ = new Leaf();
+                                      $$->type = Leaf::Logical;
+                                      $$->lvalue.l = $2;
+                                      $$->op = 0; }
+        | expr
+        ;
                                     
-      | lexpr cop lexpr              { $$ = new Leaf();
+
+expr : '(' expr ')'               { $$ = new Leaf();
+                                      $$->type = Leaf::Logical;
+                                      $$->lvalue.l = $2;
+                                      $$->op = 0; }
+
+      | expr cop expr              { $$ = new Leaf();
                                       $$->type = Leaf::Operation;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
 
-      | lexpr bop lexpr              { $$ = new Leaf();
+      | expr bop expr              { $$ = new Leaf();
                                       $$->type = Leaf::BinaryOperation;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
@@ -109,7 +116,6 @@ lexpr : '(' lexpr ')'               { $$ = new Leaf();
       | value                        { $$ = $1; }
 
       ;
-
 
 cop    : EQ
       | NEQ
