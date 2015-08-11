@@ -1,0 +1,316 @@
+From 7be04e65a53b22ce382d640a6c409b5d3bfe5645 Mon Sep 17 00:00:00 2001
+From: Joern <joern.rm@gmail.com>
+Date: Sat, 20 Dec 2014 12:42:37 +0100
+Subject: [PATCH] Patch-Windows-MingGW-subset for GC
+
+... reduce the libs in Make to what GoldenCheetah needs
+... add two functions missing in MingGW standard libs
+---
+ Makefile.am                 |   2 +-
+ configure.ac                |  44 -------------------
+ src/Makefile.am             |   2 +-
+ src/kml/base/file_posix.cc  | 102 ++++++++++++++++++++++++++++++++++++++++++++
+ src/kml/base/string_util.cc |  17 ++++++++
+ third_party/Makefile.am     |  42 +++---------------
+ 6 files changed, 126 insertions(+), 83 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 2be0803..e29201e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,7 +1,7 @@
+ ACLOCAL_AMFLAGS = -I m4
+ 
+ # Order is important:
+-SUBDIRS = third_party src testdata examples msvc xcode
++SUBDIRS = third_party src
+ 
+ EXTRA_DIST = \
+ 	AUTHORS \
+diff --git a/configure.ac b/configure.ac
+index d5fa75f..033128b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -203,23 +203,6 @@ AC_CHECK_LIB(pthread, pthread_create,,
+ 
+ AC_CONFIG_FILES([
+ 	Makefile
+-	examples/Makefile
+-	examples/domviewer/Makefile
+-	examples/engine/Makefile
+-	examples/gpx/Makefile
+-	examples/gx/Makefile
+-	examples/hellonet/Makefile
+-	examples/helloworld/Makefile
+-	examples/java/Makefile
+-	examples/kml/Makefile
+-	examples/python/Makefile
+-	examples/regionator/Makefile
+-	examples/wxregionator/Makefile
+-	examples/wxviewer/Makefile
+-	examples/xsd/Makefile
+-	msvc/Makefile
+-	msvc/examples/Makefile
+-	msvc/tests/Makefile
+ 	src/Makefile
+ 	src/kml/Makefile
+ 	src/kml/convenience/Makefile
+@@ -228,34 +211,7 @@ AC_CONFIG_FILES([
+ 	src/kml/regionator/Makefile
+ 	src/kml/base/Makefile
+ 	src/kml/xsd/Makefile
+-	src/swig/Makefile
+-	src/swig/java/Makefile
+-	src/swig/python/Makefile
+-	testdata/Makefile
+-	testdata/atom/Makefile
+-	testdata/balloon/Makefile
+-	testdata/csv/Makefile
+-	testdata/deprecated/Makefile
+-	testdata/gdata/Makefile
+-	testdata/gmaps/Makefile
+-	testdata/gpx/Makefile
+-	testdata/gx/Makefile
+-	testdata/kml/Makefile
+-	testdata/kmz/Makefile
+-	testdata/kmz/files/Makefile
+-	testdata/kmz/kmzfiles/Makefile
+-	testdata/kmz/rumsey/Makefile
+-	testdata/kmz/rumsey/kml/Makefile
+-	testdata/kmz/rumsey/imagery/Makefile
+-	testdata/links/Makefile
+-	testdata/style/Makefile
+-	testdata/style/weather/Makefile
+-	testdata/update/Makefile
+-	testdata/xal/Makefile
+-	testdata/xsd/Makefile
+ 	third_party/Makefile
+-	xcode/Makefile
+-	xcode/LibKML/Makefile
+ ])
+ 
+ AC_OUTPUT
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 0bf15ac..721209e 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,4 +1,4 @@
+-SUBDIRS = kml swig
++SUBDIRS = kml 
+ 
+ # TODO: use the phc files in msvc.
+ EXTRA_DIST = \
+diff --git a/src/kml/base/file_posix.cc b/src/kml/base/file_posix.cc
+index b9461c0..920a996 100644
+--- a/src/kml/base/file_posix.cc
++++ b/src/kml/base/file_posix.cc
+@@ -33,8 +33,110 @@
+ #include <sys/stat.h>
+ #include <unistd.h>  // For unlink, close.
+ 
++// START PATCH
++#include <fcntl.h>    
++#include <sys/time.h>
++#include <sys/stat.h>
++// END PATCH
++
+ namespace kmlbase {
+ 
++// START PATCH
++// Implementation of missing functions
++
++/* mkstemp extracted from libc/sysdeps/posix/tempname.c.  Copyright
++   (C) 1991-1999, 2000, 2001, 2006 Free Software Foundation, Inc.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.  */
++
++static const char letters[] =
++"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
++
++/* Generate a temporary file name based on TMPL.  TMPL must match the
++   rules for mk[s]temp (i.e. end in "XXXXXX").  The name constructed
++   does not exist at the time of the call to mkstemp.  TMPL is
++   overwritten with the result.  */
++int
++mkstemp (char *tmpl)
++{
++  int len;
++  char *XXXXXX;
++  static unsigned long value;
++  unsigned long random_time_bits;
++  unsigned int count;
++  int fd = -1;
++  int save_errno = errno;
++
++  /* A lower bound on the number of temporary files to attempt to
++     generate.  The maximum total number of temporary file names that
++     can exist for a given template is 62**6.  It should never be
++     necessary to try all these combinations.  Instead if a reasonable
++     number of names is tried (we define reasonable as 62**3) fail to
++     give the system administrator the chance to remove the problems.  */
++#define ATTEMPTS_MIN (62 * 62 * 62)
++
++  /* The number of times to attempt to generate a temporary file.  To
++     conform to POSIX, this must be no smaller than TMP_MAX.  */
++#if ATTEMPTS_MIN < TMP_MAX
++  unsigned int attempts = TMP_MAX;
++#else
++  unsigned int attempts = ATTEMPTS_MIN;
++#endif
++
++  len = strlen (tmpl);
++  if (len < 6 || strcmp (&tmpl[len - 6], "XXXXXX"))
++    {
++      errno = EINVAL;
++      return -1;
++    }
++
++/* This is where the Xs start.  */
++  XXXXXX = &tmpl[len - 6];
++
++  /* Get some more or less random data.  */
++  {
++    struct timeval tv;
++    gettimeofday (&tv, NULL);
++    random_time_bits = ((uint64_t) tv.tv_usec << 16) ^ tv.tv_sec;
++  }
++  value += random_time_bits ^ getpid ();
++
++  for (count = 0; count < attempts; value += 7777, ++count)
++    {
++      unsigned long v = value;
++
++      /* Fill in the random bits.  */
++      XXXXXX[0] = letters[v % 62];
++      v /= 62;
++      XXXXXX[1] = letters[v % 62];
++      v /= 62;
++      XXXXXX[2] = letters[v % 62];
++      v /= 62;
++      XXXXXX[3] = letters[v % 62];
++      v /= 62;
++      XXXXXX[4] = letters[v % 62];
++      v /= 62;
++      XXXXXX[5] = letters[v % 62];
++
++      fd = open (tmpl, O_RDWR | O_CREAT | O_EXCL, _S_IREAD | _S_IWRITE);
++      if (fd >= 0)
++    {
++      errno = save_errno;
++      return fd;
++    }
++      else if (errno != EEXIST)
++    return -1;
++    }
++
++  /* We got out of the loop because we ran out of combinations to try.  */
++  errno = EEXIST;
++  return -1;
++}
++// END PATCH
++
+ // Internal to the POSIX File class.
+ static bool StatFile(const char* path, struct stat* stat_data) {
+   struct stat tmp;
+diff --git a/src/kml/base/string_util.cc b/src/kml/base/string_util.cc
+index b3a9654..3fdba2b 100644
+--- a/src/kml/base/string_util.cc
++++ b/src/kml/base/string_util.cc
+@@ -31,6 +31,23 @@
+ 
+ namespace kmlbase {
+ 
++// START PATCH
++int strncasecmp(const char *s1, const char *s2, size_t n) { 
++    while (*s1 != 0 && tolower(*s1) == tolower(*s2)) { 
++        ++s1; 
++        ++s2; 
++    } 
++  
++    return 
++    (*s2 == 0) 
++    ? (*s1 != 0) 
++    : (*s1 == 0) 
++        ? -1 
++        : (tolower(*s1) - tolower(*s2)); 
++}
++
++// ENDPATCH
++
+ void b2a_hex(uint32_t i, char* out) {
+   char map[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                   'a', 'b', 'c', 'd', 'e', 'f'};
+diff --git a/third_party/Makefile.am b/third_party/Makefile.am
+index b73dec3..fe34dea 100644
+--- a/third_party/Makefile.am
++++ b/third_party/Makefile.am
+@@ -12,7 +12,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/third_party/zlib-1.2.3/contrib \
+ 	      -I$(top_srcdir)/third_party/gtest-1.7.0/include
+ 
+ lib_LTLIBRARIES = libminizip.la liburiparser.la
+-noinst_LTLIBRARIES = libgtest.la libgtest_main.la
++#noinst_LTLIBRARIES = libgtest.la libgtest_main.la
+ 
+ libminizip_la_SOURCES = \
+ 	zlib-1.2.3/contrib/minizip/unzip.c \
+@@ -83,11 +83,11 @@ libboostconfigplatforminclude_HEADERS = \
+ 	$(boost)/config/platform/linux.hpp \
+ 	$(boost)/config/platform/macos.hpp
+ 
+-libgtest_la_SOURCES = \
+-	gtest-1.7.0/src/gtest-all.cc
++#libgtest_la_SOURCES = \
++#	gtest-1.7.0/src/gtest-all.cc
+ 
+-libgtest_main_la_SOURCES = gtest-1.7.0/src/gtest_main.cc
+-libgtest_main_la_LIBADD = libgtest.la
++#libgtest_main_la_SOURCES = gtest-1.7.0/src/gtest_main.cc
++#libgtest_main_la_LIBADD = libgtest.la
+ 
+ # TODO: add the new gtest libs for windows.
+ #	gtest-1.7.0.win32/debug/gtest.lib \
+@@ -149,38 +149,6 @@ EXTRA_DIST = \
+ 	$(boost)/config/stdlib/sgi.hpp \
+ 	$(boost)/config/stdlib/stlport.hpp \
+ 	$(boost)/config/stdlib/vacpp.hpp \
+-	gtest-1.7.0/include/gtest/gtest-death-test.h \
+-	gtest-1.7.0/include/gtest/gtest-message.h \
+-	gtest-1.7.0/include/gtest/gtest-param-test.h \
+-	gtest-1.7.0/include/gtest/gtest-param-test.h.pump \
+-	gtest-1.7.0/include/gtest/gtest-printers.h \
+-	gtest-1.7.0/include/gtest/gtest-spi.h \
+-	gtest-1.7.0/include/gtest/gtest-test-part.h \
+-	gtest-1.7.0/include/gtest/gtest-typed-test.h \
+-	gtest-1.7.0/include/gtest/gtest.h \
+-	gtest-1.7.0/include/gtest/gtest_pred_impl.h \
+-	gtest-1.7.0/include/gtest/gtest_prod.h \
+-	gtest-1.7.0/include/gtest/internal/gtest-death-test-internal.h \
+-	gtest-1.7.0/include/gtest/internal/gtest-filepath.h \
+-	gtest-1.7.0/include/gtest/internal/gtest-internal.h \
+-	gtest-1.7.0/include/gtest/internal/gtest-linked_ptr.h \
+-	gtest-1.7.0/include/gtest/internal/gtest-param-util-generated.h \
+-	gtest-1.7.0/include/gtest/internal/gtest-param-util-generated.h.pump \
+-	gtest-1.7.0/include/gtest/internal/gtest-param-util.h \
+-	gtest-1.7.0/include/gtest/internal/gtest-port.h \
+-	gtest-1.7.0/include/gtest/internal/gtest-string.h \
+-	gtest-1.7.0/include/gtest/internal/gtest-tuple.h \
+-	gtest-1.7.0/include/gtest/internal/gtest-tuple.h.pump \
+-	gtest-1.7.0/include/gtest/internal/gtest-type-util.h \
+-	gtest-1.7.0/include/gtest/internal/gtest-type-util.h.pump \
+-	gtest-1.7.0/src/gtest-death-test.cc \
+-	gtest-1.7.0/src/gtest-filepath.cc \
+-	gtest-1.7.0/src/gtest-internal-inl.h \
+-	gtest-1.7.0/src/gtest-port.cc \
+-	gtest-1.7.0/src/gtest-printers.cc \
+-	gtest-1.7.0/src/gtest-test-part.cc \
+-	gtest-1.7.0/src/gtest-typed-test.cc \
+-	gtest-1.7.0/src/gtest.cc \
+ 	uriparser-0.7.5/COPYING \
+ 	uriparser-0.7.5.win32/debug/uriparser.lib \
+ 	uriparser-0.7.5.win32/release/uriparser.lib \
+-- 
+1.9.5.github.0
+
