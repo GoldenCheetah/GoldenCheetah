@@ -27,6 +27,7 @@
 #include <QStyle>
 #include <QTabBar>
 #include <QStyleFactory>
+#include <QRect>
 
 // DATA STRUCTURES
 #include "MainWindow.h"
@@ -358,10 +359,12 @@ MainWindow::MainWindow(const QDir &home)
     QStyle *toolStyle = QStyleFactory::create("Cleanlooks");
 #endif
     searchBox->setStyle(toolStyle);
-    searchBox->setFixedWidth(200);
+    searchBox->setFixedWidth(150);
     head->addWidget(searchBox);
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
+    connect(searchBox->searchbox, SIGNAL(haveFocus()), this, SLOT(searchFocusIn()));
+    connect(searchBox->searchbox, SIGNAL(lostFocus()), this, SLOT(searchFocusOut()));
 
 #endif
 
@@ -482,10 +485,12 @@ MainWindow::MainWindow(const QDir &home)
     // add a search box on far right, but with a little space too
     searchBox = new SearchFilterBox(this,context,false);
     searchBox->setStyle(toolStyle);
-    searchBox->setFixedWidth(200);
+    searchBox->setFixedWidth(150);
     head->addWidget(searchBox);
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
+    connect(searchBox->searchbox, SIGNAL(haveFocus()), this, SLOT(searchFocusIn()));
+    connect(searchBox->searchbox, SIGNAL(lostFocus()), this, SLOT(searchFocusOut()));
     HelpWhatsThis *helpSearchBox = new HelpWhatsThis(searchBox);
     searchBox->setWhatsThis(helpSearchBox->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
 
@@ -2081,5 +2086,23 @@ MainWindow::ridesAutoImport() {
 
     currentTab->context->athlete->importFilesWhenOpeningAthlete();
 
+}
+
+// grow/shrink searchbox if there is space...
+void
+MainWindow::searchFocusIn()
+{
+    QPropertyAnimation *anim = new QPropertyAnimation(searchBox, "xwidth", this);
+    anim->setDuration(300);
+    anim->setEasingCurve(QEasingCurve::InOutQuad);
+    anim->setStartValue(searchBox->width());
+    anim->setEndValue(400);
+    anim->start(QPropertyAnimation::DeleteWhenStopped);
+}
+
+void
+MainWindow::searchFocusOut()
+{
+    searchBox->setFixedWidth(150);
 }
 

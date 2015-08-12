@@ -94,6 +94,10 @@ class MainWindow : public QMainWindow
         void support();
         void actionClicked(int);
 
+        // search box gets and loses focus - make big/small
+        void searchFocusIn();
+        void searchFocusOut();
+
         // open and closing windows and tabs
         void closeAll();    // close all windows and tabs
 
