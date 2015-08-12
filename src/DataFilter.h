@@ -33,6 +33,19 @@ class RideMetric;
 class FieldDefinition;
 class DataFilter;
 
+class Result {
+    public:
+
+        // construct a result
+        Result (double value) : isNumber(true), string(""), number(value) {}
+        Result (QString value) : isNumber(false), string(value), number(0.0f) {}
+
+        // we can't use QString with union
+        bool isNumber;           // if true, value is numeric
+        QString string;
+        double number;
+};
+
 class Leaf {
 
     public:
@@ -40,7 +53,7 @@ class Leaf {
         Leaf() : type(none),op(0),series(NULL),dynamic(false) { }
 
         // evaluate against a RideItem
-        double eval(Context *context, DataFilter *df, Leaf *, RideItem *m);
+        Result eval(Context *context, DataFilter *df, Leaf *, RideItem *m);
 
         // tree traversal etc
         void print(Leaf *, int level);  // print leaf and all children
