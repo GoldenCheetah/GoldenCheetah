@@ -2096,7 +2096,7 @@ MainWindow::searchFocusIn()
     anim->setDuration(300);
     anim->setEasingCurve(QEasingCurve::InOutQuad);
     anim->setStartValue(searchBox->width());
-    anim->setEndValue(400);
+    anim->setEndValue(300);
     anim->start(QPropertyAnimation::DeleteWhenStopped);
 }
 

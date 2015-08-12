@@ -101,6 +101,7 @@ signals:
 
 private:
     Context *context;
+    QWidget *parent;
     bool filtered;
     bool nochooser;
     QToolButton *clearButton, *searchButton, *toolButton;

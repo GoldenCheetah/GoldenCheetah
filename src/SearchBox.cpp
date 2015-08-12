@@ -32,7 +32,7 @@
 #include <QDebug>
 
 SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
-    : QLineEdit(parent), context(context), filtered(false), nochooser(nochooser)
+    : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser)
 {
     setFixedHeight(21);
     //clear button
@@ -69,7 +69,7 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     connect(searchButton, SIGNAL(clicked()), this, SLOT(toggleMode()));
 
     // create an empty completer, configchanged will fix it
-    completer = new QCompleter(QStringList(), this);
+    completer = new QCompleter(QStringList(), parent);
 
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -172,8 +172,8 @@ SearchBox::configChanged(qint32)
     }
 
     // set new completer
-    completer = new QCompleter(list, this);
-    //if (mode == Filter) setCompleter(completer);
+    completer = new QCompleter(list, parent);
+    if (mode == Filter) setCompleter(completer);
 }
 
 void SearchBox::resizeEvent(QResizeEvent *)
@@ -209,7 +209,7 @@ void SearchBox::setMode(SearchBoxMode mode)
             searchButton->setIcon(filter);
             searchButton->setIconSize(QSize(11,11));
             setPlaceholderText(tr("Filter..."));
-            //setCompleter(completer);
+            setCompleter(completer);
         }
         break;
 
@@ -220,7 +220,7 @@ void SearchBox::setMode(SearchBoxMode mode)
             searchButton->setIcon(search);
             searchButton->setIconSize(QSize(11,11));
             setPlaceholderText(tr("Search..."));
-            //setCompleter(NULL);
+            setCompleter(NULL);
         }
         break;
     }
