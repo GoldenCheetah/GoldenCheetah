@@ -68,6 +68,9 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     searchButton->setCursor(Qt::ArrowCursor);
     connect(searchButton, SIGNAL(clicked()), this, SLOT(toggleMode()));
 
+    // create an empty completer, configchanged will fix it
+    completer = new QCompleter(QStringList(), this);
+
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -80,7 +83,12 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set colors and curviness
-    configChanged(CONFIG_APPEARANCE);
+    configChanged(CONFIG_APPEARANCE | CONFIG_FIELDS);
+}
+
+static bool insensitiveLessThan(const QString &a, const QString &b)
+{
+    return a.toLower() < b.toLower();
 }
 
 void
@@ -132,6 +140,40 @@ SearchBox::configChanged(qint32)
                   .arg(clearButton->sizeHint().width() + frameWidth + 12));
 
     }
+
+    // set the fields for the completer
+    setCompleter(NULL);
+    delete completer;
+
+    // get suitably formated list
+    QList<QString> list;
+    QString last;
+    SpecialFields sp;
+
+    // get sorted list
+    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+    qSort(names.begin(), names.end(), insensitiveLessThan);
+
+    foreach(QString name, names) {
+
+        // handle dups
+        if (last == name) continue;
+        last = name;
+
+        // Handle bikescore tm
+        if (name.startsWith("BikeScore")) name = QString("BikeScore");
+
+        //  Always use the "internalNames" in Filter expressions
+        name = sp.internalName(name);
+
+        // we do very little to the name, just space to _ and lower case it for now...
+        name.replace(' ', '_');
+        list << name;
+    }
+
+    // set new completer
+    completer = new QCompleter(list, this);
+    if (mode == Filter) setCompleter(completer);
 }
 
 void SearchBox::resizeEvent(QResizeEvent *)
@@ -167,6 +209,7 @@ void SearchBox::setMode(SearchBoxMode mode)
             searchButton->setIcon(filter);
             searchButton->setIconSize(QSize(11,11));
             setPlaceholderText(tr("Filter..."));
+            setCompleter(completer);
         }
         break;
 
@@ -177,6 +220,7 @@ void SearchBox::setMode(SearchBoxMode mode)
             searchButton->setIcon(search);
             searchButton->setIconSize(QSize(11,11));
             setPlaceholderText(tr("Search..."));
+            setCompleter(NULL);
         }
         break;
     }

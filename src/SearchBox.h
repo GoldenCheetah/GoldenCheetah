@@ -23,6 +23,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QDialog>
+#include <QCompleter>
 
 class QToolButton;
 class QMenu;
@@ -87,5 +88,6 @@ private:
     QToolButton *clearButton, *searchButton, *toolButton;
     QMenu *dropMenu;
     SearchBoxMode mode;
+    QCompleter *completer;
 };
 #endif
