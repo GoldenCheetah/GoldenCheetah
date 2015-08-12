@@ -173,7 +173,7 @@ SearchBox::configChanged(qint32)
 
     // set new completer
     completer = new QCompleter(list, this);
-    if (mode == Filter) setCompleter(completer);
+    //if (mode == Filter) setCompleter(completer);
 }
 
 void SearchBox::resizeEvent(QResizeEvent *)
@@ -209,7 +209,7 @@ void SearchBox::setMode(SearchBoxMode mode)
             searchButton->setIcon(filter);
             searchButton->setIconSize(QSize(11,11));
             setPlaceholderText(tr("Filter..."));
-            setCompleter(completer);
+            //setCompleter(completer);
         }
         break;
 
@@ -220,7 +220,7 @@ void SearchBox::setMode(SearchBoxMode mode)
             searchButton->setIcon(search);
             searchButton->setIconSize(QSize(11,11));
             setPlaceholderText(tr("Search..."));
-            setCompleter(NULL);
+            //setCompleter(NULL);
         }
         break;
     }
