@@ -24,11 +24,13 @@
 #include <QDropEvent>
 #include <QDialog>
 #include <QCompleter>
+#include <QDebug>
 
 class QToolButton;
 class QMenu;
 class Context;
 class QLabel;
+class QFocusEvent;
 
 class SearchBox : public QLineEdit
 {
@@ -50,6 +52,18 @@ public:
 protected:
     void resizeEvent(QResizeEvent *);
     void checkMenu(); // only show menu drop down when there is something to show
+
+    void focusInEvent(QFocusEvent *e) { 
+        emit haveFocus(); 
+        QLineEdit::focusInEvent(e); 
+    }
+
+    void focusOutEvent(QFocusEvent *e) { 
+        if (e->reason() != Qt::PopupFocusReason) { 
+            emit lostFocus(); 
+            QLineEdit::focusOutEvent(e); 
+        }
+    }
 
 private slots:
     void updateCloseButton(const QString &text);
@@ -80,6 +94,10 @@ signals:
     // db filter mode
     void submitFilter(QString);
     void clearFilter();
+
+    // focus in/out
+    void haveFocus();
+    void lostFocus();
 
 private:
     Context *context;
