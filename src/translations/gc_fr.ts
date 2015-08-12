@@ -18664,7 +18664,7 @@ Voulez-vous continuer?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="297"/>
         <source>60 min Peak Power</source>
-        <translation>Pique de puissance sur 60min</translation>
+        <translation>Pic de puissance sur 60min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="298"/>
