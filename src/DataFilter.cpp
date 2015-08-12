@@ -327,8 +327,10 @@ QStringList DataFilter::parseFilter(QString query, QStringList *list)
         foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
             // evaluate each ride...
-            if(treeRoot->eval(context, this, treeRoot, item))
+            Result result = treeRoot->eval(context, this, treeRoot, item);
+            if (result.isNumber && result.number) {
                 filenames << item->fileName;
+            }
         }
         emit results(filenames);
         if (list) *list = filenames;
@@ -351,7 +353,8 @@ DataFilter::dynamicParse()
         foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
             // evaluate each ride...
-            if(treeRoot->eval(context, this, treeRoot, item))
+            Result result = treeRoot->eval(context, this, treeRoot, item);
+            if (result.isNumber && result.number)
                 filenames << item->fileName;
         }
         emit results(filenames);
@@ -400,18 +403,35 @@ void DataFilter::configChanged(qint32)
 
 }
 
-double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
+Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
 {
     switch(leaf->type) {
 
+    //
+    // LOGICAL EXPRESSION
+    //
     case Leaf::Logical  :
     {
         switch (leaf->op) {
             case AND :
-                return (eval(context, df, leaf->lvalue.l, m) && eval(context, df, leaf->rvalue.l, m));
-
+            {
+                Result left = eval(context, df, leaf->lvalue.l, m);
+                if (left.isNumber && left.number) {
+                    Result right = eval(context, df, leaf->rvalue.l, m);
+                    if (right.isNumber && right.number) return Result(true);
+                }
+                return Result(false);
+            }
             case OR :
-                return (eval(context, df, leaf->lvalue.l, m) || eval(context, df, leaf->rvalue.l, m));
+            {
+                Result left = eval(context, df, leaf->lvalue.l, m);
+                if (left.isNumber && left.number) return Result(true);
+
+                Result right = eval(context, df, leaf->rvalue.l, m);
+                if (right.isNumber && right.number) return Result(true);
+
+                return Result(false);
+            }
 
             default : // parenthesis
                 return (eval(context, df, leaf->lvalue.l, m));
@@ -419,6 +439,9 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
     }
     break;
 
+    //
+    // FUNCTIONS
+    //
     case Leaf::Function :
     {
         double duration;
@@ -431,20 +454,19 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                 QString lookup = df->lookupMap.value(symbol, "");
                 PMCData *pmcData = context->athlete->getPMCFor(lookup);
 
-                if (leaf->function == "sts") return pmcData->sts(m->dateTime.date());
-                if (leaf->function == "lts") return pmcData->lts(m->dateTime.date());
-                if (leaf->function == "sb") return pmcData->sb(m->dateTime.date());
-                if (leaf->function == "rr") return pmcData->rr(m->dateTime.date());
+                if (leaf->function == "sts") return Result(pmcData->sts(m->dateTime.date()));
+                if (leaf->function == "lts") return Result(pmcData->lts(m->dateTime.date()));
+                if (leaf->function == "sb") return Result(pmcData->sb(m->dateTime.date()));
+                if (leaf->function == "rr") return Result(pmcData->rr(m->dateTime.date()));
         }
 
 
-        // GET LHS VALUE
         switch (leaf->lvalue.l->type) {
 
             default:
             case Leaf::Function :
             {
-                duration = eval(context, df, leaf->lvalue.l, m); // duration
+                duration = eval(context, df, leaf->lvalue.l, m).number; // duration will be zero if string
             }
             break;
 
@@ -477,339 +499,218 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
         }
 
         if (leaf->function == "best")
-            return RideFileCache::best(df->context, m->fileName, leaf->seriesType, duration);
+            return Result(RideFileCache::best(df->context, m->fileName, leaf->seriesType, duration));
 
         if (leaf->function == "tiz") // duration is really zone number
-            return RideFileCache::tiz(df->context, m->fileName, leaf->seriesType, duration); 
+            return Result(RideFileCache::tiz(df->context, m->fileName, leaf->seriesType, duration)); 
 
         // unknown function!?
-        return 0 ;
+        return Result(0) ;
     }
     break;
 
+    //
+    // SYMBOLS
+    //
+    case Leaf::Symbol :
+    {
+        double lhsdouble=0.0f;
+        bool lhsisNumber=false;
+        QString lhsstring;
+        QString rename;
+        QString symbol = *(leaf->lvalue.n);
+
+        // is it isRun ?
+        if (symbol == "isRun") {
+            lhsdouble = m->isRun ? 1 : 0;
+            lhsisNumber = true;
+
+        } else if (symbol == "isSwim") {
+            lhsdouble = m->isSwim ? 1 : 0;
+            lhsisNumber = true;
+
+        } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {
+
+            if (context->currentRideItem())
+                lhsdouble = QDate(1900,01,01).
+                daysTo(context->currentRideItem()->dateTime.date());
+            else
+                lhsdouble = 0;
+            lhsisNumber = true;
+
+        } else if (!symbol.compare("Today", Qt::CaseInsensitive)) {
+
+            lhsdouble = QDate(1900,01,01).daysTo(QDate::currentDate());
+            lhsisNumber = true;
+
+        } else if (!symbol.compare("Date", Qt::CaseInsensitive)) {
+
+            lhsdouble = QDate(1900,01,01).daysTo(m->dateTime.date());
+            lhsisNumber = true;
+
+        } else if (isCoggan(symbol)) {
+            // a coggan PMC metric
+            PMCData *pmcData = context->athlete->getPMCFor("coggan_tss");
+            if (!symbol.compare("ctl", Qt::CaseInsensitive)) lhsdouble = pmcData->lts(m->dateTime.date());
+            if (!symbol.compare("atl", Qt::CaseInsensitive)) lhsdouble = pmcData->sts(m->dateTime.date());
+            if (!symbol.compare("tsb", Qt::CaseInsensitive)) lhsdouble = pmcData->sb(m->dateTime.date());
+            lhsisNumber = true;
+
+        } else if ((lhsisNumber = df->lookupType.value(*(leaf->lvalue.n))) == true) {
+            // get symbol value
+            // check metadata string to number first ...
+            QString meta = m->getText(rename=df->lookupMap.value(symbol,""), "unknown");
+            if (meta == "unknown")
+                lhsdouble = m->getForSymbol(rename=df->lookupMap.value(symbol,""));
+            else
+                lhsdouble = meta.toDouble();
+            lhsisNumber = true;
+
+            //qDebug()<<"symbol" << *(lvalue.n) << "is" << lhsdouble << "via" << rename;
+        } else {
+            // string symbol will evaluate to zero as unary expression
+            lhsstring = m->getText(rename=df->lookupMap.value(symbol,""), "");
+            //qDebug()<<"symbol" << *(lvalue.n) << "is" << lhsstring << "via" << rename;
+        }
+        if (lhsisNumber) return Result(lhsdouble);
+        else return Result(lhsstring);
+    }
+    break;
+
+    //
+    // LITERALS
+    //
+    case Leaf::Float :
+    {
+        return Result(leaf->lvalue.f);
+    }
+    break;
+
+    case Leaf::Integer :
+    {
+        return Result(leaf->lvalue.i);
+    }
+    break;
+
+    case Leaf::String :
+    {
+        QString string = *(leaf->lvalue.s);
+
+        // dates are returned as numbers
+        QDate date = QDate::fromString(string, "yyyy/MM/dd");
+        if (date.isValid()) return Result(QDate(1900,01,01).daysTo(date));
+        else return Result(string);
+    }
+    break;
+
+    //
+    // BINARY EXPRESSION
+    //
     case Leaf::BinaryOperation :
     case Leaf::Operation :
     {
-        double lhsdouble=0.00, rhsdouble=0.00;
-        QString lhsstring, rhsstring;
-        bool lhsisNumber=false, rhsisNumber=false;
-
-        // GET LHS VALUE
-        switch (leaf->lvalue.l->type) {
-
-            default:
-            case Leaf::Function :
-            {
-                lhsdouble = eval(context, df, leaf->lvalue.l, m); // duration
-                lhsisNumber=true;
-            }
-            break;
-
-            case Leaf::Symbol :
-            {
-                QString rename;
-                QString symbol = *(leaf->lvalue.l->lvalue.n);
-
-                // is it isRun ?
-                if (symbol == "isRun") {
-                    lhsdouble = m->isRun ? 1 : 0;
-                    lhsisNumber = true;
-
-                } else if (symbol == "isSwim") {
-                    lhsdouble = m->isSwim ? 1 : 0;
-                    lhsisNumber = true;
-
-                } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {
-
-                    if (context->currentRideItem())
-                        lhsdouble = QDate(1900,01,01).
-                        daysTo(context->currentRideItem()->dateTime.date());
-                    else
-                        lhsdouble = 0;
-                    lhsisNumber = true;
-
-                } else if (!symbol.compare("Today", Qt::CaseInsensitive)) {
-
-                    lhsdouble = QDate(1900,01,01).daysTo(QDate::currentDate());
-                    lhsisNumber = true;
-
-                } else if (!symbol.compare("Date", Qt::CaseInsensitive)) {
-
-                    lhsdouble = QDate(1900,01,01).daysTo(m->dateTime.date());
-                    lhsisNumber = true;
-
-                } else if (isCoggan(symbol)) {
-                    // a coggan PMC metric
-                    PMCData *pmcData = context->athlete->getPMCFor("coggan_tss");
-                    if (!symbol.compare("ctl", Qt::CaseInsensitive)) lhsdouble = pmcData->lts(m->dateTime.date());
-                    if (!symbol.compare("atl", Qt::CaseInsensitive)) lhsdouble = pmcData->sts(m->dateTime.date());
-                    if (!symbol.compare("tsb", Qt::CaseInsensitive)) lhsdouble = pmcData->sb(m->dateTime.date());
-                    lhsisNumber = true;
-
-                } else if ((lhsisNumber = df->lookupType.value(*(leaf->lvalue.l->lvalue.n))) == true) {
-                    // get symbol value
-                    // check metadata string to number first ...
-                    QString meta = m->getText(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""), "unknown");
-                    if (meta == "unknown")
-                        lhsdouble = m->getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
-                    else
-                        lhsdouble = meta.toDouble();
-
-                    //qDebug()<<"symbol" << *(leaf->lvalue.l->lvalue.n) << "is" << lhsdouble << "via" << rename;
-                } else {
-                    // string
-                    lhsstring = m->getText(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""), "");
-                    //qDebug()<<"symbol" << *(leaf->lvalue.l->lvalue.n) << "is" << lhsstring << "via" << rename;
-                }
-            }
-            break;
-
-            case Leaf::Float :
-                lhsisNumber = true;
-                lhsdouble = leaf->lvalue.l->lvalue.f;
-                break;
-
-            case Leaf::Integer :
-                lhsisNumber = true;
-                lhsdouble = leaf->lvalue.l->lvalue.i;
-                break;
-
-            case Leaf::String :
-                QString string = *(leaf->lvalue.l->lvalue.s);
-                QDate date = QDate::fromString(string, "yyyy/MM/dd");
-                if (date.isValid()) {
-                    lhsdouble = QDate(1900,01,01).daysTo(date);
-                    lhsisNumber = true;
-                } else {
-                    lhsstring = string;
-                    lhsisNumber = false;
-                }
-                break;
-
-            break;
-        }
-
-        // GET RHS VALUE -- BUT NOT FOR FUNCTIONS
-        switch (leaf->rvalue.l->type) {
-
-            default:
-            case Leaf::Function :
-            {
-                rhsdouble = eval(context, df, leaf->rvalue.l, m);
-                rhsisNumber=true;
-            }
-            break;
-            case Leaf::Symbol :
-            {
-                QString rename;
-                QString symbol = *(leaf->rvalue.l->lvalue.n);
-
-                // is it isRun ?
-                if (symbol == "isRun") {
-
-                    rhsdouble = m->isRun ? 1 : 0;
-                    rhsisNumber = true;
-
-                } else if (symbol == "isSwim") {
-
-                    rhsdouble = m->isSwim ? 1 : 0;
-                    rhsisNumber = true;
-
-                } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {
-
-                    if (context->currentRideItem())
-                        rhsdouble = QDate(1900,01,01).
-                        daysTo(context->currentRideItem()->dateTime.date());
-                    else
-                        rhsdouble = 0;
-                    rhsisNumber = true;
-
-                } else if (!symbol.compare("Today", Qt::CaseInsensitive)) {
-
-                    rhsdouble = QDate(1900,01,01).daysTo(QDate::currentDate());
-                    rhsisNumber = true;
-
-                } else if (!symbol.compare("Date", Qt::CaseInsensitive)) {
-
-                    rhsdouble = QDate(1900,01,01).daysTo(m->dateTime.date());
-                    rhsisNumber = true;
-
-                } else if (isCoggan(symbol)) {
- 
-                    // a coggan PMC metric
-                    PMCData *pmcData = context->athlete->getPMCFor("coggan_tss");
-                    if (!symbol.compare("ctl", Qt::CaseInsensitive)) rhsdouble = pmcData->lts(m->dateTime.date());
-                    if (!symbol.compare("atl", Qt::CaseInsensitive)) rhsdouble = pmcData->sts(m->dateTime.date());
-                    if (!symbol.compare("tsb", Qt::CaseInsensitive)) rhsdouble = pmcData->sb(m->dateTime.date());
-                    rhsisNumber = true;
-
-                // get symbol value
-                } else if ((rhsisNumber=df->lookupType.value(*(leaf->rvalue.l->lvalue.n))) == true) {
-                    // numeric
-                    QString meta = m->getText(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""), "unknown");
-                    if (meta == "unknown")
-                        rhsdouble = m->getForSymbol(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""));
-                    else
-                        rhsdouble = meta.toDouble();
-                    //qDebug()<<"symbol" << *(leaf->rvalue.l->lvalue.n) << "is" << rhsdouble << "via" << rename;
-                } else {
-                    // string
-                    rhsstring = m->getText(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""), "notfound");
-                    //qDebug()<<"symbol" << *(leaf->rvalue.l->lvalue.n) << "is" << rhsstring << "via" << rename;
-                }
-            }
-            break;
-
-            case Leaf::Float :
-                rhsisNumber = true;
-                rhsdouble = leaf->rvalue.l->lvalue.f;
-                break;
-
-            case Leaf::Integer :
-                rhsisNumber = true;
-                rhsdouble = leaf->rvalue.l->lvalue.i;
-                break;
-
-            case Leaf::String :
-                QString string = *(leaf->rvalue.l->lvalue.s);
-                QDate date = QDate::fromString(string, "yyyy/MM/dd");
-                if (date.isValid()) {
-                    rhsdouble = QDate(1900,01,01).daysTo(date);
-                    rhsisNumber = true;
-                } else {
-                    rhsstring = string;
-                    rhsisNumber = false;
-                }
-                break;
-
-            break;
-        }
+        // lhs and rhs
+        Result lhs = eval(context, df, leaf->lvalue.l, m);
+        Result rhs = eval(context, df, leaf->rvalue.l, m);
 
         // NOW PERFORM OPERATION
-        //qDebug()<<"lhs="<<lhsdouble<<"rhs="<<rhsdouble;
         switch (leaf->op) {
 
         case ADD:
         {
-            if (lhsisNumber) {
-                return lhsdouble + rhsdouble;
-            } else {
-                return 0;
-            }
+            if (lhs.isNumber) return Result(lhs.number + rhs.number);
+            else return Result(0);
         }
         break;
 
         case SUBTRACT:
         {
-            if (lhsisNumber) {
-                return lhsdouble - rhsdouble;
-            } else {
-                return 0;
-            }
+            if (lhs.isNumber) return Result(lhs.number - rhs.number);
+            else return Result(0);
         }
         break;
 
         case DIVIDE:
         {
-            if (lhsisNumber && rhsdouble) { // avoid divide by zero
-                return lhsdouble / rhsdouble;
-            } else {
-                return 0;
-            }
+            // avoid divide by zero
+            if (lhs.isNumber && rhs.number) return Result(lhs.number / rhs.number);
+            else return Result(0);
         }
         break;
 
         case MULTIPLY:
         {
-            if (lhsisNumber) {
-                return lhsdouble * rhsdouble;
-            } else {
-                return 0;
-            }
+            if (lhs.isNumber) return Result(lhs.number * rhs.number);
+            else return Result(0);
         }
         break;
 
         case POW:
         {
-            if (lhsisNumber && rhsdouble) {
-                return pow(lhsdouble,rhsdouble);
-            } else {
-                return 0;
-            }
+            if (lhs.isNumber && rhs.number) return Result(pow(lhs.number,rhs.number));
+            else return Result(0);
         }
         break;
 
         case EQ:
         {
-            if (lhsisNumber) {
-                return lhsdouble == rhsdouble;
-            } else {
-                return lhsstring == rhsstring;
-            }
+            if (lhs.isNumber) return Result(lhs.number == rhs.number);
+            else return Result(lhs.string == rhs.string);
         }
         break;
 
         case NEQ:
         {
-            if (lhsisNumber) {
-                return lhsdouble != rhsdouble;
-            } else {
-                return lhsstring != rhsstring;
-            }
+            if (lhs.isNumber) return Result(lhs.number != rhs.number);
+            else return Result(lhs.string != rhs.string);
         }
         break;
 
         case LT:
         {
-            if (lhsisNumber) {
-                return lhsdouble < rhsdouble;
-            } else {
-                return lhsstring < rhsstring;
-            }
+            if (lhs.isNumber) return Result(lhs.number < rhs.number);
+            else return Result(lhs.string < rhs.string);
         }
         break;
         case LTE:
         {
-            if (lhsisNumber) {
-                return lhsdouble <= rhsdouble;
-            } else {
-                return lhsstring <= rhsstring;
-            }
+            if (lhs.isNumber) return Result(lhs.number <= rhs.number);
+            else return Result(lhs.string <= rhs.string);
         }
         break;
         case GT:
         {
-            if (lhsisNumber) {
-                return lhsdouble > rhsdouble;
-            } else {
-                return lhsstring > rhsstring;
-            }
+            if (lhs.isNumber) return Result(lhs.number > rhs.number);
+            else return Result(lhs.string > rhs.string);
         }
         break;
         case GTE:
         {
-            if (lhsisNumber) {
-                return lhsdouble >= rhsdouble;
-            } else {
-                return lhsstring >= rhsstring;
-            }
+            if (lhs.isNumber) return Result(lhs.number >= rhs.number);
+            else return Result(lhs.string >= rhs.string);
         }
         break;
 
         case MATCHES:
-            return QRegExp(rhsstring).exactMatch(lhsstring);
+            if (!lhs.isNumber && !rhs.isNumber) return Result(QRegExp(rhs.string).exactMatch(lhs.string));
+            else return Result(false);
             break;
 
         case ENDSWITH:
-            return lhsstring.endsWith(rhsstring);
+            if (!lhs.isNumber && !rhs.isNumber) return Result(lhs.string.endsWith(rhs.string));
+            else return Result(false);
             break;
 
         case BEGINSWITH:
-            return lhsstring.startsWith(rhsstring);
+            if (!lhs.isNumber && !rhs.isNumber) return Result(lhs.string.startsWith(rhs.string));
+            else return Result(false);
             break;
 
         case CONTAINS:
-            return lhsstring.contains(rhsstring) ? true : false;
+            {
+            if (!lhs.isNumber && !rhs.isNumber) return Result(lhs.string.contains(rhs.string) ? true : false);
+            else return Result(false);
+            }
             break;
 
         default:
@@ -821,5 +722,5 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
     default: // we don't need to evaluate any lower - they are leaf nodes handled above
         break;
     }
-    return false;
+    return Result(false);
 }
