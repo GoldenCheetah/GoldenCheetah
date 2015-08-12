@@ -189,7 +189,7 @@ void SearchBox::resizeEvent(QResizeEvent *)
 #endif
 
     //container->move(rect().left(), rect().bottom() + 3); // named dialog...
-    checkMenu();
+    //checkMenu(); // not needed
 }
 
 void SearchBox::toggleMode()
