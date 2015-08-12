@@ -120,6 +120,7 @@ MainWindow::MainWindow(const QDir &home)
     // bootstrap
     Context *context = new Context(this);
     context->athlete = new Athlete(context, home);
+    currentTab = new Tab(context);
 
     setWindowIcon(QIcon(":images/gc.png"));
     setWindowTitle(context->athlete->home->root().dirName());
@@ -504,7 +505,6 @@ MainWindow::MainWindow(const QDir &home)
 #endif
 
     tabStack = new QStackedWidget(this);
-    currentTab = new Tab(context);
 
     // first tab
     tabs.insert(currentTab->context->athlete->home->root().dirName(), currentTab);
