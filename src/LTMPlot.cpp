@@ -755,36 +755,38 @@ LTMPlot::setData(LTMSettings *set)
                 // we need to fill in the gaps sadly
                 int lcount = xdata[count];
 
-                // calculated values
-                QVector<double> xtrend(lcount);
-                QVector<double> btrend(lcount);
-                QVector<double> ytrend(lcount);
+                if (lcount) {
+                    // calculated values
+                    QVector<double> xtrend(lcount);
+                    QVector<double> btrend(lcount);
+                    QVector<double> ytrend(lcount);
 
-                // initialise to same
-                ytrend.fill(0);
-                btrend.fill(0);
+                    // initialise to same
+                    ytrend.fill(0);
+                    btrend.fill(0);
 
-                ytrend[0] = ydata[0];
-                xtrend[0] = 0;
+                    ytrend[0] = ydata[0];
+                    xtrend[0] = 0;
 
-                for (int n=1,i=1; i<= lcount; i++) {
+                    for (int n=1,i=1; i<= lcount && i<xdata.size(); i++) {
 
-                    // fill in gaps (and check bounds as we go too)
-                    while (n<=xdata[i] && n<lcount) {
-                        ytrend[n] = alpha * ydata[i] + ( 1 - alpha )*( ytrend[n-1] + btrend[n-1] );
-                        btrend[n] = beta * ( ytrend[n] - ytrend[n-1] ) + ( 1 - beta ) * btrend[n-1];
-                        xtrend[n] = n+1;
-                        n++;
+                        // fill in gaps (and check bounds as we go too)
+                        while (n<=xdata[i] && n<lcount) {
+                            ytrend[n] = alpha * ydata[i] + ( 1 - alpha )*( ytrend[n-1] + btrend[n-1] );
+                            btrend[n] = beta * ( ytrend[n] - ytrend[n-1] ) + ( 1 - beta ) * btrend[n-1];
+                            xtrend[n] = n+1;
+                            n++;
+                        }
                     }
+
+                    // point 2 is at far right of chart, not the last point
+                    // since we may be forecasting...
+                    trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
+
+                    trend->attach(this);
+                    trend->setItemAttribute(QwtPlotItem::Legend, false);
+                    curves.insert(trendSymbol, trend);
                 }
-
-                // point 2 is at far right of chart, not the last point
-                // since we may be forecasting...
-                trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
-
-                trend->attach(this);
-                trend->setItemAttribute(QwtPlotItem::Legend, false);
-                curves.insert(trendSymbol, trend);
             }
         }
 
@@ -1860,36 +1862,38 @@ LTMPlot::setCompareData(LTMSettings *set)
                     // we need to fill in the gaps sadly
                     int lcount = xdata[count];
 
-                    // calculated values
-                    QVector<double> xtrend(lcount);
-                    QVector<double> btrend(lcount);
-                    QVector<double> ytrend(lcount);
+                    if (lcount) {
+                        // calculated values
+                        QVector<double> xtrend(lcount);
+                        QVector<double> btrend(lcount);
+                        QVector<double> ytrend(lcount);
 
-                    // initialise to same
-                    ytrend.fill(0);
-                    btrend.fill(0);
+                        // initialise to same
+                        ytrend.fill(0);
+                        btrend.fill(0);
 
-                    ytrend[0] = ydata[0];
-                    xtrend[0] = 0;
+                        ytrend[0] = ydata[0];
+                        xtrend[0] = 0;
 
-                    for (int n=1,i=1; i<= lcount; i++) {
+                        for (int n=1,i=1; i<= lcount && i<xdata.size(); i++) {
 
-                        // fill in gaps (and check bounds as we go too)
-                        while (n<=xdata[i] && n<lcount) {
-                            ytrend[n] = alpha * ydata[i] + ( 1 - alpha )*( ytrend[n-1] + btrend[n-1] );
-                            btrend[n] = beta * ( ytrend[n] - ytrend[n-1] ) + ( 1 - beta ) * btrend[n-1];
-                            xtrend[n] = n+1;
-                            n++;
+                            // fill in gaps (and check bounds as we go too)
+                            while (n<=xdata[i] && n<lcount) {
+                                ytrend[n] = alpha * ydata[i] + ( 1 - alpha )*( ytrend[n-1] + btrend[n-1] );
+                                btrend[n] = beta * ( ytrend[n] - ytrend[n-1] ) + ( 1 - beta ) * btrend[n-1];
+                                xtrend[n] = n+1;
+                                n++;
+                            }
                         }
+
+                        // point 2 is at far right of chart, not the last point
+                        // since we may be forecasting...
+                        trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
+
+                        trend->attach(this);
+                        trend->setItemAttribute(QwtPlotItem::Legend, false);
+                        curves.insert(trendSymbol, trend);
                     }
-
-                    // point 2 is at far right of chart, not the last point
-                    // since we may be forecasting...
-                    trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
-
-                    trend->attach(this);
-                    trend->setItemAttribute(QwtPlotItem::Legend, false);
-                    curves.insert(trendSymbol, trend);
                 }
             }
 
