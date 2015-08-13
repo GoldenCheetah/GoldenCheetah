@@ -453,6 +453,7 @@ HEADERS += \
         TimeUtils.h \
         ToolsDialog.h \
         ToolsRhoEstimator.h \
+        VDOTCalculator.h \
         TrainDB.h \
         TrainSidebar.h \
         TreeMapWindow.h \
@@ -689,6 +690,7 @@ SOURCES += \
         TimeUtils.cpp \
         ToolsDialog.cpp \
         ToolsRhoEstimator.cpp \
+        VDOTCalculator.cpp \
         TrainDB.cpp \
         TrainSidebar.cpp \
         TreeMapWindow.cpp \
