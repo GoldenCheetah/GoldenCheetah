@@ -196,25 +196,31 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
     nameEdit = new QLineEdit(this);
     nameEdit->setText(interval.name);
 
-    fromEdit = new QTimeEdit(this);
-    fromEdit->setDisplayFormat("hh:mm:ss");
-    fromEdit->setTime(QTime(0,0,0,0).addSecs(interval.start));
+    if (interval.rideInterval != NULL) {
+        fromEdit = new QTimeEdit(this);
+        fromEdit->setDisplayFormat("hh:mm:ss");
+        fromEdit->setTime(QTime(0,0,0,0).addSecs(interval.start));
 
-    toEdit = new QTimeEdit(this);
-    toEdit->setDisplayFormat("hh:mm:ss");
-    toEdit->setTime(QTime(0,0,0,0).addSecs(interval.stop));
+        toEdit = new QTimeEdit(this);
+        toEdit->setDisplayFormat("hh:mm:ss");
+        toEdit->setTime(QTime(0,0,0,0).addSecs(interval.stop));
 
-    colorEdit = new ColorButton(this, interval.name, interval.color);
-    colorEdit->setAutoDefault(false);
+        colorEdit = new ColorButton(this, interval.name, interval.color);
+        colorEdit->setAutoDefault(false);
+    }
+
 
     grid->addWidget(name, 0,0);
     grid->addWidget(nameEdit, 0,1);
-    grid->addWidget(from, 1,0);
-    grid->addWidget(fromEdit, 1,1);
-    grid->addWidget(to, 2,0);
-    grid->addWidget(toEdit, 2,1);
-    grid->addWidget(color, 3,0);
-    grid->addWidget(colorEdit, 3,1);
+
+    if (interval.rideInterval != NULL) {
+        grid->addWidget(from, 1,0);
+        grid->addWidget(fromEdit, 1,1);
+        grid->addWidget(to, 2,0);
+        grid->addWidget(toEdit, 2,1);
+        grid->addWidget(color, 3,0);
+        grid->addWidget(colorEdit, 3,1);
+    }
 
     mainLayout->addLayout(grid);
 
@@ -237,9 +243,11 @@ EditIntervalDialog::applyClicked()
 {
     // get the values back
     interval.name = nameEdit->text();
-    interval.start = QTime(0,0,0).secsTo(fromEdit->time());
-    interval.stop = QTime(0,0,0).secsTo(toEdit->time());
-    interval.color = colorEdit->getColor();
+    if (interval.rideInterval != NULL) {
+        interval.start = QTime(0,0,0).secsTo(fromEdit->time());
+        interval.stop = QTime(0,0,0).secsTo(toEdit->time());
+        interval.color = colorEdit->getColor();
+    }
     accept();
 }
 void
