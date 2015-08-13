@@ -1734,6 +1734,27 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
 
     // get sorted list
     QStringList names = context->tab->rideNavigator()->logicalHeadings;
+
+    // add functions ...
+    list << "ctl";
+    list << "tsb";
+    list << "atl";
+    list << "sb(TSS)";
+    list << "lts(TSS)";
+    list << "sts(TSS)";
+    list << "rr(TSS)";
+    list << "tiz(power, 1)";
+    list << "tiz(hr, 1)";
+    list << "best(power, 3600)";
+    list << "best(hr, 3600)";
+    list << "best(cadence, 3600)";
+    list << "best(speed, 3600)";
+    list << "best(torque, 3600)";
+    list << "best(np, 3600)";
+    list << "best(xpower, 3600)";
+    list << "best(vam, 3600)";
+    list << "best(wpk, 3600)";
+
     qSort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
