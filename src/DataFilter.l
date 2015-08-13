@@ -81,8 +81,9 @@
 "/"                                         DataFilterlval.op = DIVIDE; return DIVIDE;
 "^"                                         DataFilterlval.op = POW; return POW;
 
-[ \n\t\r]                                   ;               /* we just ignore whitespace */
 
+"#"[^\r\n]*                                 ; /* ignore single-line comments */
+[ \n\t\r]                                   ; /* we just ignore whitespace */
 
 .                   return DataFiltertext[0]; /* any other character, typically :, { or } */
 %%
