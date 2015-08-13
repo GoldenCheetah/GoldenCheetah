@@ -25,12 +25,14 @@
 #include <QDialog>
 #include <QCompleter>
 #include <QDebug>
+#include <QStringListModel>
 
 class QToolButton;
 class QMenu;
 class Context;
 class QLabel;
 class QFocusEvent;
+class DataFilterCompleter;
 
 class SearchBox : public QLineEdit
 {
@@ -59,7 +61,7 @@ protected:
     }
 
     void focusOutEvent(QFocusEvent *e) { 
-        if (e->reason() != Qt::PopupFocusReason) { 
+        if (!active && e->reason() != Qt::PopupFocusReason) { 
             emit lostFocus(); 
             QLineEdit::focusOutEvent(e); 
         }
@@ -84,6 +86,12 @@ private slots:
     void setMenu();
     void addNamed();
 
+    // completer
+    void updateCompleter(const QString &);
+    void setCompleter(DataFilterCompleter *completer);
+    void insertCompletion(const QString& completion);
+    void keyPressEvent(QKeyEvent *e);
+
     void configChanged(qint32);
 
 signals:
@@ -107,6 +115,46 @@ private:
     QToolButton *clearButton, *searchButton, *toolButton;
     QMenu *dropMenu;
     SearchBoxMode mode;
-    QCompleter *completer;
+    DataFilterCompleter *completer;
+    bool active;
+};
+
+class DataFilterCompleter : public QCompleter
+{
+    Q_OBJECT
+ 
+public:
+    inline DataFilterCompleter(const QStringList& words, QObject * parent) :
+            QCompleter(parent), m_list(words), m_model()
+    {
+        setModel(&m_model);
+    }
+
+    inline void setList(QStringList list)
+    {
+        m_list = list;
+        m_model.setStringList(list);
+    }
+ 
+    inline void update(QString word)
+    {
+        // Do any filtering you like.
+        // Here we just include all items that contain word.
+        //QStringList filtered = m_list.filter(word, caseSensitivity());
+        //m_model.setStringList(filtered);
+        //m_word = word;
+        setCompletionPrefix(word);
+        complete();
+    }
+ 
+    inline QString word()
+    {
+        return m_word;
+    }
+ 
+private:
+    QStringList m_list;
+    QStringListModel m_model;
+    QString m_word;
 };
 #endif
