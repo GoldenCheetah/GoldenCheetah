@@ -74,6 +74,7 @@ class AnalysisSidebar : public QWidget
         void editInterval(); // from right click
         void deleteInterval(); // from right click
         void deleteRoute(); // stop tracking this route
+        void editRoute(); // change route name
         void zoomInterval(); // from right click
         void sortIntervals(); // from menu popup
         void renameIntervalsSelected(void); // from menu popup -- rename a series
