@@ -1244,12 +1244,16 @@ LTMTool::refreshCustomTable(int indexSelectedItem)
             t->setText(tr("Estimate"));
         else if (metricDetail.type == 7)
             t->setText(tr("Stress"));
+        else if (metricDetail.type == 8)
+            t->setText(tr("Formula"));
 
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         customTable->setItem(i,0,t);
 
         t = new QTableWidgetItem();
-        if (metricDetail.type != 5 && metricDetail.type != 6)
+        if (metricDetail.type == 8) {
+            t->setText(metricDetail.formula);
+        } else if (metricDetail.type != 5 && metricDetail.type != 6)
             t->setText(metricDetail.name);
         else {
             // text description for peak
@@ -1513,6 +1517,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     chooseBest = new QRadioButton(tr("Best"), this);
     chooseEstimate = new QRadioButton(tr("Estimate"), this);
     chooseStress = new QRadioButton(tr("Stress"), this);
+    chooseFormula = new QRadioButton(tr("Formula"), this);
 
     // put them into a button group because we
     // also have radio buttons for watts per kilo / absolute
@@ -1521,12 +1526,14 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     group->addButton(chooseBest);
     group->addButton(chooseEstimate);
     group->addButton(chooseStress);
+    group->addButton(chooseFormula);
 
     // uncheck them all
     chooseMetric->setChecked(false);
     chooseBest->setChecked(false);
     chooseEstimate->setChecked(false);
     chooseStress->setChecked(false);
+    chooseFormula->setChecked(false);
 
     // which one ?
     switch (metricDetail->type) {
@@ -1542,6 +1549,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     case 7:
         chooseStress->setChecked(true);
         break;
+    case 8:
+        chooseFormula->setChecked(true);
+        break;
     }
 
     QVBoxLayout *radioButtons = new QVBoxLayout;
@@ -1550,6 +1560,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     radioButtons->addWidget(chooseBest);
     radioButtons->addWidget(chooseEstimate);
     radioButtons->addWidget(chooseStress);
+    radioButtons->addWidget(chooseFormula);
     radioButtons->addStretch();
 
     // bests selection
@@ -1676,6 +1687,17 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     estimateLayout->addLayout(estwpk);
     estimateLayout->addStretch();
 
+    // estimate selection
+    formulaWidget = new QWidget(this);
+    //formulaWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QVBoxLayout *formulaLayout = new QVBoxLayout(formulaWidget);
+    formulaLayout->addStretch();
+    formulaEdit = new QTextEdit(this);
+    //formulaEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    formulaLayout->addWidget(formulaEdit);
+    formulaLayout->addStretch();
+    formulaEdit->setText(metricDetail->formula);
+
     // stress selection
     stressTypeSelect = new QComboBox(this);
     stressTypeSelect->addItem(tr("Short Term Stress (STS/ATL)"), STRESS_STS);
@@ -1738,6 +1760,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     typeStack->addWidget(metricWidget);
     typeStack->addWidget(bestWidget);
     typeStack->addWidget(estimateWidget);
+    typeStack->addWidget(formulaWidget);
     typeStack->setCurrentIndex(chooseMetric->isChecked() ? 0 : (chooseBest->isChecked() ? 1 : 2));
 
     // Grid
@@ -1890,6 +1913,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     connect(chooseBest, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(chooseEstimate, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(chooseStress, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
+    connect(chooseFormula, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(modelSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged()));
     connect(estimateSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(estimateChanged()));
     connect(estimateDuration, SIGNAL(valueChanged(double)), this, SLOT(estimateName()));
@@ -1924,6 +1948,7 @@ EditMetricDetailDialog::typeChanged()
         metricWidget->show();
         estimateWidget->hide();
         stressWidget->hide();
+        formulaWidget->hide();
         typeStack->setCurrentIndex(0);
     }
 
@@ -1932,6 +1957,7 @@ EditMetricDetailDialog::typeChanged()
         metricWidget->hide();
         estimateWidget->hide();
         stressWidget->hide();
+        formulaWidget->hide();
         typeStack->setCurrentIndex(1);
     }
 
@@ -1940,6 +1966,7 @@ EditMetricDetailDialog::typeChanged()
         metricWidget->hide();
         estimateWidget->show();
         stressWidget->hide();
+        formulaWidget->hide();
         typeStack->setCurrentIndex(2);
     }
 
@@ -1948,7 +1975,17 @@ EditMetricDetailDialog::typeChanged()
         metricWidget->show();
         estimateWidget->hide();
         stressWidget->show();
+        formulaWidget->hide();
         typeStack->setCurrentIndex(0);
+    }
+
+    if (chooseFormula->isChecked()) {
+        formulaWidget->show();
+        bestWidget->hide();
+        metricWidget->hide();
+        estimateWidget->hide();
+        stressWidget->hide();
+        typeStack->setCurrentIndex(3);
     }
     adjustSize();
 }
@@ -2102,6 +2139,7 @@ EditMetricDetailDialog::applyClicked()
     if (chooseBest->isChecked()) metricDetail->type = 5; // is a best
     else if (chooseEstimate->isChecked()) metricDetail->type = 6; // estimate
     else if (chooseStress->isChecked()) metricDetail->type = 7; // stress
+    else if (chooseFormula->isChecked()) metricDetail->type = 8; // stress
 
     metricDetail->estimateDuration = estimateDuration->value();
     switch (estimateDurationUnits->currentIndex()) {
@@ -2137,6 +2175,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->stack = stack->isChecked();
     metricDetail->trendtype = trendType->currentIndex();
     metricDetail->stressType = stressTypeSelect->currentIndex();
+    metricDetail->formula = formulaEdit->toPlainText();
     accept();
 }
 

@@ -178,9 +178,9 @@ class EditMetricDetailDialog : public QDialog
         LTMTool *ltmTool;
         MetricDetail *metricDetail;
 
-        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress;
+        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress, *chooseFormula;
         QButtonGroup *group;
-        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget;
+        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget, *formulaWidget;
         QStackedWidget *typeStack;
 
         // bests
@@ -203,6 +203,9 @@ class EditMetricDetailDialog : public QDialog
 
         // stress
         QComboBox *stressTypeSelect; // STS, LTS, SB, RR et al
+
+        // formula
+        QTextEdit *formulaEdit; // edit your formula
 
         QComboBox *curveStyle,
                   *curveSymbol;
