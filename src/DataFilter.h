@@ -62,14 +62,15 @@ class Leaf {
         bool isNumber(DataFilter *df, Leaf *leaf);
         void clear(Leaf*);
 
-        enum { none, Float, Integer, String, Symbol, Logical, Operation, BinaryOperation, Function } type;
+        enum { none, Float, Integer, String, Symbol, Logical, Operation, BinaryOperation, Function, Conditional } type;
         union value {
             float f;
             int i;
             QString *s;
             QString *n;
             Leaf *l;
-        } lvalue, rvalue;
+        } lvalue, rvalue, cond;
+
         int op;
         QString function;
         Leaf *series; // is a symbol
