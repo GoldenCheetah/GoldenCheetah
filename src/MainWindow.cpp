@@ -56,6 +56,7 @@
 #include "RideImportWizard.h"
 #include "ToolsDialog.h"
 #include "ToolsRhoEstimator.h"
+#include "VDOTCalculator.h"
 #include "SplitActivityWizard.h"
 #include "MergeActivityWizard.h"
 #include "GenerateHeatMapDialog.h"
@@ -623,6 +624,7 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()));
     optionsMenu->addAction(tr("CP and W' Estimator..."), this, SLOT(showTools()));
     optionsMenu->addAction(tr("Air Density (Rho) Estimator..."), this, SLOT(showRhoEstimator()));
+    optionsMenu->addAction(tr("VDOT and T-Pace Calculator..."), this, SLOT(showVDOTCalculator()));
 
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Get &Withings Data..."), this,
@@ -1068,6 +1070,12 @@ void MainWindow::showRhoEstimator()
 {
    ToolsRhoEstimator *tre = new ToolsRhoEstimator(currentTab->context);
    tre->show();
+}
+
+void MainWindow::showVDOTCalculator()
+{
+   VDOTCalculator *VDOTcalculator = new VDOTCalculator();
+   VDOTcalculator->show();
 }
 
 void MainWindow::showWorkoutWizard()

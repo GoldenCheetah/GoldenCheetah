@@ -147,6 +147,7 @@ class MainWindow : public QMainWindow
         // Analysis View
         void showTools();
         void showRhoEstimator();
+        void showVDOTCalculator();
 
         // Training View
         void addDevice();
