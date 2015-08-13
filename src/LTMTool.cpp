@@ -1702,9 +1702,30 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     formulaLayout->addStretch();
     formulaEdit = new DataFilterEdit(this);
     //formulaEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    formulaType = new QComboBox(this);
+    formulaType->addItem(tr("Total"), static_cast<int>(RideMetric::Total));
+    formulaType->addItem(tr("Average"), static_cast<int>(RideMetric::Average));
+    formulaType->addItem(tr("Peak"), static_cast<int>(RideMetric::Peak));
+    formulaType->addItem(tr("Low"), static_cast<int>(RideMetric::Low));
     formulaLayout->addWidget(formulaEdit);
+    QHBoxLayout *ftype = new QHBoxLayout;
+    ftype->addWidget(new QLabel(tr("Aggregate:")));
+    ftype->addWidget(formulaType);
+    ftype->addStretch();
+    formulaLayout->addLayout(ftype);
     formulaLayout->addStretch();
+
+    // set to the value...
+    if (metricDetail->formula == "") {
+        // lets put a template in there
+        metricDetail->formula = tr("# type in a formula to use\n" 
+                                   "# for e.g. TSS / Duration\n"
+                                   "# as you type the available metrics\n"
+                                   "# will be offered by autocomplete\n"
+                                   "# all lines beginning with # are comments.\n");
+    }
     formulaEdit->setText(metricDetail->formula);
+    formulaType->setCurrentIndex(formulaType->findData(metricDetail->formulaType));
 
     // get suitably formated list
     QList<QString> list;
@@ -2215,6 +2236,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->trendtype = trendType->currentIndex();
     metricDetail->stressType = stressTypeSelect->currentIndex();
     metricDetail->formula = formulaEdit->toPlainText();
+    metricDetail->formulaType = static_cast<RideMetric::MetricType>(formulaType->itemData(formulaType->currentIndex()).toInt());
     accept();
 }
 
