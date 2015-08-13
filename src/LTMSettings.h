@@ -35,6 +35,7 @@
 
 #include "RideFile.h" // for SeriesType
 #include "Specification.h" // for SeriesType
+#include "RideMetric.h" // for RideMetric::MetricType
 
 class LTMTool;
 class LTMSettings;
@@ -44,10 +45,12 @@ class RideBest;
 
 // change history for LTMSettings
 // Prior to 13 no history was maintained
-// Date        Who              Description
-// 25 Jul 2015 Mark Liversedge  Update to charts.xml to show version number
-// 13 Aug 2015 Mark Liversedge  Added formula metric type
-#define LTM_VERSION_NUMBER 14
+// Version   Date        Who              Description
+// 13        25 Jul 2015 Mark Liversedge  Update to charts.xml to show version number
+// 14        13 Aug 2015 Mark Liversedge  Added formula metric type
+// 15        13 Aug 2015 Mark Liversedge  Added formula aggregation type Avg, Total, Low etc
+
+#define LTM_VERSION_NUMBER 15
 
 // group by settings
 #define LTM_DAY     1
@@ -86,7 +89,8 @@ class RideBest;
 class MetricDetail {
     public:
 
-    MetricDetail() : type(METRIC_DB), stack(false), hidden(false), model(""), name(""), metric(NULL), stressType(0),
+    MetricDetail() : type(METRIC_DB), stack(false), hidden(false), model(""), formulaType(RideMetric::Average), name(""), 
+                     metric(NULL), stressType(0),
                      smooth(false), trendtype(0), topN(0), lowestN(0), topOut(0), baseline(0.0), 
                      curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
@@ -106,6 +110,7 @@ class MetricDetail {
 
     // for FORMULAs
     QString formula;
+    RideMetric::MetricType formulaType;
 
     // for METRICS
     QString symbol;

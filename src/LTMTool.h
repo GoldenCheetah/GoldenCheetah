@@ -207,6 +207,7 @@ class EditMetricDetailDialog : public QDialog
 
         // formula
         DataFilterEdit *formulaEdit; // edit your formula
+        QComboBox *formulaType;      // Average etc
 
         QComboBox *curveStyle,
                   *curveSymbol;

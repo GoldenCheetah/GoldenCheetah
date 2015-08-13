@@ -2708,7 +2708,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
             } else {
                 // sum totals, average averages and choose best for Peaks
-                int type = RideMetric::Average; //XXX todo need to let user config this
+                int type = metricDetail.formulaType;
 
                 // first time thru
                 if (n<0) n=0;
