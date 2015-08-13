@@ -127,6 +127,7 @@ public:
     inline DataFilterCompleter(const QStringList& words, QObject * parent) :
             QCompleter(parent), m_list(words), m_model()
     {
+        m_model.setStringList(words);
         setModel(&m_model);
     }
 

@@ -45,6 +45,7 @@ class DataFilter;
 class GcMiniCalendar;
 class SearchBox;
 class RideTreeView;
+class EditMetricDetailDialog;
 
 //
 // The RideNavigator
@@ -71,6 +72,7 @@ class RideNavigator : public GcWindow
     friend class ::GcMiniCalendar;
     friend class ::DataFilter;
     friend class ::SearchBox;
+    friend class ::EditMetricDetailDialog;
 
     public:
         RideNavigator(Context *, bool mainwindow = false);
