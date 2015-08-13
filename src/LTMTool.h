@@ -48,6 +48,7 @@
 #define SYS_DATE    1
 #define USER_DATE   2
 
+class DataFilterEdit;
 
 class LTMTool : public QWidget
 {
@@ -205,7 +206,7 @@ class EditMetricDetailDialog : public QDialog
         QComboBox *stressTypeSelect; // STS, LTS, SB, RR et al
 
         // formula
-        QTextEdit *formulaEdit; // edit your formula
+        DataFilterEdit *formulaEdit; // edit your formula
 
         QComboBox *curveStyle,
                   *curveSymbol;
@@ -227,5 +228,29 @@ class EditMetricDetailDialog : public QDialog
         QList<RideFile::SeriesType> seriesList;
 };
 
-#endif // _GC_LTMTool_h
+class DataFilterEdit : public QTextEdit
+{
+    Q_OBJECT
 
+public:
+    DataFilterEdit(QWidget *parent = 0);
+    ~DataFilterEdit();
+
+    void setCompleter(QCompleter *c);
+    QCompleter *completer() const;
+
+protected:
+    void keyPressEvent(QKeyEvent *e);
+    void focusInEvent(QFocusEvent *e);
+
+private slots:
+    void insertCompletion(const QString &completion);
+
+private:
+    QString textUnderCursor() const;
+
+private:
+    QCompleter *c;
+};
+
+#endif // _GC_LTMTool_h
