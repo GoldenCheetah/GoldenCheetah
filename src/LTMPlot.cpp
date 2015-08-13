@@ -30,6 +30,7 @@
 #include "Settings.h"
 #include "Colors.h"
 #include "IndendPlotMarker.h"
+#include "DataFilter.h" // formulas
 
 #include "PMCData.h" // for LTS/STS calculation
 #include "Zones.h"
@@ -2513,6 +2514,9 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
     } else if (metricDetail.type == METRIC_ESTIMATE) {
         createEstimateData(context, settings, metricDetail, x,y,n, forceZero);
         return;
+    } else if (metricDetail.type == METRIC_FORMULA) {
+        createFormulaData(context, settings, metricDetail, x,y,n, forceZero);
+        return;
     }
 
 }
@@ -2606,6 +2610,105 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
                     metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
 
                 if (metricDetail.type == METRIC_BEST) type = RideMetric::Peak;
+
+                // first time thru
+                if (n<0) n=0;
+
+                switch (type) {
+                case RideMetric::Total:
+                    y[n] += value;
+                    break;
+                case RideMetric::Average:
+                    {
+                    // average should be calculated taking into account
+                    // the duration of the ride, otherwise high value but
+                    // short rides will skew the overall average
+                    if (value || aggZero) y[n] = ((y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
+                    break;
+                    }
+                case RideMetric::Low:
+                    if (value < y[n]) y[n] = value;
+                    break;
+                case RideMetric::Peak:
+                    if (value > y[n]) y[n] = value;
+                    break;
+                }
+                secondsPerGroupBy += seconds; // increment for same group
+            }
+            lastDay = currentDay;
+        }
+    }
+}
+
+void
+LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
+                                              QVector<double>&x,QVector<double>&y,int&n, bool forceZero)
+{
+
+    // resize the curve array to maximum possible size
+    int maxdays = groupForDate(settings->end.date(), settings->groupBy)
+                    - groupForDate(settings->start.date(), settings->groupBy);
+
+    x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+    y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+
+    // parse formula
+    DataFilter parser(this, context, metricDetail.formula);
+
+    // do we aggregate ?
+    bool aggZero = false;
+
+    n=-1;
+    int lastDay=0;
+    unsigned long secondsPerGroupBy=0;
+    bool wantZero = forceZero ? 1 : (metricDetail.curveStyle == QwtPlotCurve::Steps);
+
+    foreach (RideItem *ride, context->athlete->rideCache->rides()) { 
+
+        // filter out unwanted stuff
+        if (!settings->specification.pass(ride)) continue;
+
+        // day we are on
+        int currentDay = groupForDate(ride->dateTime.date(), settings->groupBy);
+
+        // value for ride
+        double value = 0;
+
+        // PARSE + EVALUATE
+        Result res = parser.evaluate(ride);
+        if (res.isNumber) value = res.number;
+
+        // check values are bounded to stop QWT going berserk
+        if (std::isnan(value) || std::isinf(value)) value = 0;
+
+        if (value || wantZero) {
+            unsigned long seconds = ride->getForSymbol("workout_time");
+            if (currentDay > lastDay) {
+                if (lastDay && wantZero) {
+                    while (lastDay<currentDay && n<=maxdays) {
+                        lastDay++;
+                        n++;
+                        x[n]=lastDay - groupForDate(settings->start.date(), settings->groupBy);
+                        y[n]=0;
+                    }
+                } else {
+                    n++;
+                }
+
+                // drop out of roange
+                if (n>maxdays) break;
+                // first time thru
+                if (n<0) n=0;
+
+                y[n] = value;
+                x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
+
+                // only increment counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy = seconds; 
+
+            } else {
+                // sum totals, average averages and choose best for Peaks
+                int type = RideMetric::Average; //XXX todo need to let user config this
 
                 // first time thru
                 if (n<0) n=0;
