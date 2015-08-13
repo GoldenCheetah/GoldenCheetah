@@ -57,7 +57,8 @@ extern Leaf *root; // root node for parsed statement
 %token <function> BEST TIZ STS LTS SB RR
 
 // comparative operators
-%token <op> EQ NEQ LT LTE GT GTE 
+%token <op> Q COL
+%token <op> EQ NEQ LT LTE GT GTE
 %token <op> ADD SUBTRACT DIVIDE MULTIPLY POW
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
 
@@ -99,7 +100,7 @@ lexpr : expr lop expr             { $$ = new Leaf();
                                       $$->op = 0; }
         | expr
         ;
-                                    
+
 
 expr : '(' expr ')'               { $$ = new Leaf();
                                       $$->type = Leaf::Logical;
@@ -117,6 +118,14 @@ expr : '(' expr ')'               { $$ = new Leaf();
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
+
+      | expr Q expr COL expr      { $$ = new Leaf();
+                                    $$->type = Leaf::Conditional;
+                                    $$->op = 0; // unused
+                                    $$->lvalue.l = $3;
+                                    $$->rvalue.l = $5;
+                                    $$->cond.l = $1;
+                                  }
 
       | value                        { $$ = $1; }
 

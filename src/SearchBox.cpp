@@ -179,7 +179,8 @@ SearchBox::updateCompleter(const QString &text)
     if (mode == Filter && text.length()) {
         QChar last = text[text.length()-1];
 
-        if (last.isLetterOrNumber()) {
+        // are we tying characters that might be a symbol ?
+        if (last.isLetterOrNumber() || last == '_') {
 
             // find out what end is
             int i=text.length();
@@ -192,6 +193,10 @@ SearchBox::updateCompleter(const QString &text)
             if (completer->completionCount()) {
                 completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
             }
+        } else {
+
+            // hide it when we stop typing
+            completer->popup()->hide();
         }
 
     }

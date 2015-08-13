@@ -79,6 +79,14 @@ Leaf::isDynamic(Leaf *leaf)
                     else return leaf->dynamic;
                     break;
         break;
+    case Leaf::Conditional :
+        {
+                    return leaf->isDynamic(leaf->cond.l) ||
+                           leaf->isDynamic(leaf->lvalue.l) ||
+                           leaf->isDynamic(leaf->rvalue.l);
+                    break;
+        }
+        break;
 
     }
     return false;
@@ -108,6 +116,14 @@ void Leaf::print(Leaf *leaf, int level)
     case Leaf::Function : qDebug()<<"function"<<leaf->function<<"series="<<*(leaf->series->lvalue.n);
                     if (leaf->lvalue.l) leaf->print(leaf->lvalue.l, level+1);
                     break;
+    case Leaf::Conditional : qDebug()<<"cond";
+        {
+                    leaf->print(leaf->cond.l, level+1);
+                    leaf->print(leaf->lvalue.l, level+1);
+                    leaf->print(leaf->rvalue.l, level+1);
+        }
+        break;
+
     default:
         break;
 
@@ -155,6 +171,12 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
     case Leaf::Operation : return true;
     case Leaf::BinaryOperation : return true;
     case Leaf::Function : return true;
+    case Leaf::Conditional :
+        {
+            return true;
+        }
+        break;
+
     default:
         return false;
         break;
@@ -266,6 +288,16 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             if (leaf->op) validateFilter(df, leaf->rvalue.l);
         }
         break;
+
+    case Leaf::Conditional :
+        {
+            // three expressions to validate
+            validateFilter(df, leaf->cond.l);
+            validateFilter(df, leaf->lvalue.l);
+            validateFilter(df, leaf->rvalue.l);
+        }
+        break;
+
     default:
         break;
     }
@@ -716,6 +748,14 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
         default:
             break;
         }
+    }
+    break;
+
+    case Leaf::Conditional :
+    {
+        Result cond = eval(context, df, leaf->cond.l, m);
+        if (cond.isNumber && cond.number) return eval(context, df, leaf->lvalue.l, m);
+        else return eval(context, df, leaf->rvalue.l, m);
     }
     break;
 
