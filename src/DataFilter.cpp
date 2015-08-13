@@ -64,17 +64,17 @@ Leaf::isDynamic(Leaf *leaf)
 {
     switch(leaf->type) {
     default:
-    case Leaf::Symbol : 
+    case Leaf::Symbol :
                     return leaf->dynamic;
                     break;
 
-    case Leaf::Logical  : 
+    case Leaf::Logical  :
                     if (leaf->op == 0) return leaf->isDynamic(leaf->lvalue.l);
     case Leaf::Operation :
-    case Leaf::BinaryOperation : 
+    case Leaf::BinaryOperation :
                     return leaf->isDynamic(leaf->lvalue.l) || leaf->isDynamic(leaf->rvalue.l);
                     break;
-    case Leaf::Function : 
+    case Leaf::Function :
                     if (leaf->lvalue.l) return leaf->isDynamic(leaf->lvalue.l);
                     else return leaf->dynamic;
                     break;
@@ -143,7 +143,7 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
     switch(leaf->type) {
     case Leaf::Float : return true;
     case Leaf::Integer : return true;
-    case Leaf::String : 
+    case Leaf::String :
         {
             // strings that evaluate as a date
             // will be returned as a number of days
@@ -155,7 +155,7 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
                 return false;
             }
         }
-    case Leaf::Symbol : 
+    case Leaf::Symbol :
         {
             QString symbol = *(leaf->lvalue.n);
             if (symbol == "isRun") return true;
@@ -221,9 +221,9 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             if (lookup == "") {
 
                 // isRun isa special, we may add more later (e.g. date)
-                if (symbol.compare("Date", Qt::CaseInsensitive) && 
-                    symbol.compare("Today", Qt::CaseInsensitive) && 
-                    symbol.compare("Current", Qt::CaseInsensitive) && 
+                if (symbol.compare("Date", Qt::CaseInsensitive) &&
+                    symbol.compare("Today", Qt::CaseInsensitive) &&
+                    symbol.compare("Current", Qt::CaseInsensitive) &&
                     symbol != "isSwim" && symbol != "isRun" && !isCoggan(symbol))
                     DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
 
@@ -238,7 +238,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             // is the symbol valid?
             QRegExp bestValidSymbols("^(apower|power|hr|cadence|speed|torque|vam|xpower|np|wpk)$", Qt::CaseInsensitive);
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
-            QString symbol = *(leaf->series->lvalue.n); 
+            QString symbol = *(leaf->series->lvalue.n);
 
             if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb" || leaf->function == "rr") {
 
@@ -248,10 +248,10 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
             } else {
 
-                if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol)) 
+                if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol))
                     DataFiltererrors << QString(QObject::tr("invalid data series for best(): %1")).arg(symbol);
 
-                if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol)) 
+                if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol))
                     DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
 
                 // now set the series type
@@ -282,7 +282,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
         }
         break;
 
-    case Leaf::Logical : 
+    case Leaf::Logical :
         {
             validateFilter(df, leaf->lvalue.l);
             if (leaf->op) validateFilter(df, leaf->rvalue.l);
@@ -308,6 +308,35 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
     configChanged(CONFIG_FIELDS);
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(dynamicParse()));
+}
+
+DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QObject(parent), context(context), isdynamic(false), treeRoot(NULL)
+{
+    configChanged(CONFIG_FIELDS);
+
+    DataFiltererrors.clear(); // clear out old errors
+    DataFilter_setString(formula);
+    DataFilterparse();
+    DataFilter_clearString();
+    treeRoot = root;
+
+    // if it parsed (syntax) then check logic (semantics)
+    if (treeRoot && DataFiltererrors.count() == 0)
+        treeRoot->validateFilter(this, treeRoot);
+    else
+        treeRoot=NULL;
+
+    // save away the results if it passed semantic validation
+    if (DataFiltererrors.count() != 0)
+        treeRoot= NULL;
+}
+
+Result DataFilter::evaluate(RideItem *item)
+{
+    if (!item || !treeRoot || DataFiltererrors.count()) return Result(0);
+
+    Result res = treeRoot->eval(context, this, treeRoot, item);
+    return res;
 }
 
 QStringList DataFilter::parseFilter(QString query, QStringList *list)
@@ -482,7 +511,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
         if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb" || leaf->function == "rr") {
 
                 // get metric technical name
-                QString symbol = *(leaf->series->lvalue.n); 
+                QString symbol = *(leaf->series->lvalue.n);
                 QString lookup = df->lookupMap.value(symbol, "");
                 PMCData *pmcData = context->athlete->getPMCFor(lookup);
 
@@ -534,7 +563,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
             return Result(RideFileCache::best(df->context, m->fileName, leaf->seriesType, duration));
 
         if (leaf->function == "tiz") // duration is really zone number
-            return Result(RideFileCache::tiz(df->context, m->fileName, leaf->seriesType, duration)); 
+            return Result(RideFileCache::tiz(df->context, m->fileName, leaf->seriesType, duration));
 
         // unknown function!?
         return Result(0) ;
@@ -672,7 +701,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
 
         case MULTIPLY:
         {
-            if (lhs.isNumber) return Result(lhs.number * rhs.number);
+            if (lhs.isNumber && rhs.isNumber) return Result(lhs.number * rhs.number);
             else return Result(0);
         }
         break;

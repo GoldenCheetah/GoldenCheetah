@@ -84,6 +84,7 @@ class DataFilter : public QObject
 
     public:
         DataFilter(QObject *parent, Context *context);
+        DataFilter(QObject *parent, Context *context, QString formula);
 
         Context *context;
         QStringList &files() { return filenames; }
@@ -94,6 +95,9 @@ class DataFilter : public QObject
         // used by Leaf
         QMap<QString,QString> lookupMap;
         QMap<QString,bool> lookupType; // true if a number, false if a string
+
+        // when used for formulas
+        Result evaluate(RideItem *rideItem);
 
     public slots:
         QStringList parseFilter(QString query, QStringList *list=0);

@@ -123,6 +123,7 @@ class LTMPlot : public QwtPlot
 
         // create curve data from metadata or metric (from ridecache)
         void createMetricData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
+        void createFormulaData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
 
         // create curve data from bests (from ridefile cache)
         void createBestsData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
