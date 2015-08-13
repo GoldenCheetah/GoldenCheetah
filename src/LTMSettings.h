@@ -46,7 +46,8 @@ class RideBest;
 // Prior to 13 no history was maintained
 // Date        Who              Description
 // 25 Jul 2015 Mark Liversedge  Update to charts.xml to show version number
-#define LTM_VERSION_NUMBER 13
+// 13 Aug 2015 Mark Liversedge  Added formula metric type
+#define LTM_VERSION_NUMBER 14
 
 // group by settings
 #define LTM_DAY     1
@@ -64,6 +65,7 @@ class RideBest;
 #define METRIC_BEST      5
 #define METRIC_ESTIMATE  6
 #define METRIC_STRESS    7
+#define METRIC_FORMULA   8
 
 // type of estimate
 #define ESTIMATE_WPRIME  0
@@ -101,6 +103,9 @@ class MetricDetail {
     int estimateDuration;       // n x units below for seconds
     int estimateDuration_units; // 1=secs, 60=mins, 3600=hours
     bool wpk; // absolute or wpk 
+
+    // for FORMULAs
+    QString formula;
 
     // for METRICS
     QString symbol;

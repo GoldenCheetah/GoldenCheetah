@@ -223,6 +223,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.wpk;
         out<<metric.stressType;
         out<<metric.units;
+        out<<metric.formula;
     }
     out<<settings.showData;
     out<<settings.stack;
@@ -338,7 +339,9 @@ while(counter-- && !in.atEnd()) {
         if (version >= 13) {
             in >> m.units;
         }
-
+        if (version >= 14) {
+            in >> m.formula;
+        }
 
         bool keep=true;
         // check for deprecated things and set keep=false if
