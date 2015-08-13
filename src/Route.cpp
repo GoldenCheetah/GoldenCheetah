@@ -356,6 +356,21 @@ Routes::deleteRoute(int index)
 }
 
 void
+Routes::renameRoute(QUuid identifier, QString newname)
+{
+    // find via Identifier then delete
+    for(int i=0; i<routes.count(); i++) {
+        if (routes.at(i).id() == identifier) {
+            RouteSegment route = routes.at(i);
+            route.setName(newname);
+            routes.replace(i, route);
+            writeRoutes();
+            return;
+        }
+    }
+}
+
+void
 Routes::writeRoutes()
 {
     // update routes.xml
