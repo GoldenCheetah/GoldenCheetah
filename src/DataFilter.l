@@ -52,6 +52,7 @@
 [Ss][Tt][Ss]                               strcpy(DataFilterlval.function, "sts"); return STS;
 [Ss][Bb]                                   strcpy(DataFilterlval.function, "sb"); return SB;
 [Rr][Rr]                                   strcpy(DataFilterlval.function, "rr"); return RR;
+[Cc][Oo][Nn][Ff][Ii][Gg]                   strcpy(DataFilterlval.function, "config"); return CONFIG;
 
 "&&"                                        DataFilterlval.op = AND; return AND;
 [Aa][nN][Dd]                                DataFilterlval.op = AND; return AND;
@@ -72,6 +73,9 @@
 "Max_W'_Expended"                           return SYMBOL; /* special case */
 "W'_Work"                                   return SYMBOL; /* special case */
 "W'bal_TAU"                                 return SYMBOL; /* special case */
+[Ww]\'                                      return SYMBOL; /* special case */
+[Dd]\'                                      return SYMBOL; /* special case */
+[Ss][Dd]\'                                  return SYMBOL; /* special case */
 [a-zA-Z0-9][a-zA-Z0-9_%™]+                  return SYMBOL; /* symbols can start with 0-9 */
 
 
