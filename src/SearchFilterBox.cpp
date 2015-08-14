@@ -21,6 +21,9 @@
 #include "FreeSearch.h"
 #include "DataFilter.h"
 #include "SearchBox.h"
+#include "Athlete.h"
+#include "RideCache.h"
+#include "RideItem.h"
 
 SearchFilterBox::SearchFilterBox(QWidget *parent, Context *context, bool nochooser) : QWidget(parent), context(context)
 {
@@ -51,6 +54,59 @@ SearchFilterBox::SearchFilterBox(QWidget *parent, Context *context, bool nochoos
     // syntax check
     connect(datafilter, SIGNAL(parseGood()), searchbox, SLOT(setGood()));
     connect(datafilter, SIGNAL(parseBad(QStringList)), searchbox, SLOT(setBad(QStringList)));
+}
+
+// static utility function to get list of files that match a filter
+QStringList 
+SearchFilterBox::matches(Context *context, QString filter)
+{
+    QStringList returning;
+    SearchBox::SearchBoxMode mode = SearchBox::Search;
+    QString spec;
+
+    // what kind of matching are we going to perform ?
+    if (filter.startsWith("search:")) {
+        mode = SearchBox::Search;
+        spec = (filter.mid(7, filter.length()-7));
+    } else if (filter.startsWith("filter")) {
+        mode = SearchBox::Filter;
+        spec = (filter.mid(7, filter.length()-7));
+    } else {
+        // whatever we were passed
+        spec = filter;
+    }
+
+    // no spec/filter just return all
+    if (spec == "") {
+        foreach(RideItem *item, context->athlete->rideCache->rides()) returning << item->fileName;
+        return returning;
+    }
+
+    // search or filter then.......
+    if (mode == SearchBox::Filter) {
+
+        DataFilter df(NULL, context, spec);
+        foreach(RideItem *item, context->athlete->rideCache->rides()) {
+            Result res = df.evaluate(item);
+            if (res.isNumber && res.number)
+                returning << item->fileName;
+        }
+    }
+
+    if (mode == SearchBox::Search) {
+
+        FreeSearch fs(NULL, context);
+        returning = fs.search(spec);
+    }
+
+    return returning;
+}
+
+bool 
+SearchFilterBox::isNull(QString filter) // is the filter null ?
+{
+    if (filter == "filter:" || filter == "search:" || filter == "") return true;
+    else return false;
 }
 
 QString

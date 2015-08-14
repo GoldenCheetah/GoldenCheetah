@@ -225,6 +225,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.units;
         out<<metric.formula;
         out<<static_cast<int>(metric.formulaType);
+        out<<metric.datafilter;
     }
     out<<settings.showData;
     out<<settings.stack;
@@ -346,6 +347,9 @@ while(counter-- && !in.atEnd()) {
         if (version >= 15) {
             int x;
             in>> x; m.formulaType = static_cast<RideMetric::MetricType>(x);  // curveStyle change between qwt 5 and 6
+        }
+        if (version >= 16) {
+            in >> m.datafilter;
         }
         bool keep=true;
         // check for deprecated things and set keep=false if
