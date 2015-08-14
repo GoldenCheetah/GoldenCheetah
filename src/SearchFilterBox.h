@@ -49,6 +49,8 @@ public:
     void setXWidth(int x) { setFixedWidth(x); }
     int xwidth() const { return width(); }
 
+    static QStringList matches(Context *context, QString filter); // get matches
+    static bool isNull(QString filter); // is the filter null ?
 
 private slots:
 

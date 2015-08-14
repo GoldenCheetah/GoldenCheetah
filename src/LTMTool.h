@@ -184,6 +184,9 @@ class EditMetricDetailDialog : public QDialog
         QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget, *formulaWidget;
         QStackedWidget *typeStack;
 
+        // filter
+        SearchFilterBox *dataFilter;
+
         // bests
         QDoubleSpinBox *duration;
         QComboBox *durationUnits;
