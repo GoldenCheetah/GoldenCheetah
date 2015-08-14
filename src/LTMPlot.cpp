@@ -2799,7 +2799,23 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
     // don't attempt it if the bests are not loaded
     if (settings->bests == NULL) return;
 
-    foreach (RideBest best, *(settings->bests)) { 
+    // list of bests we're gonna show
+    QList<RideBest> bestresults;
+
+    // get filtered bests if we are applying a filter
+    if (!SearchFilterBox::isNull(metricDetail.datafilter)) {
+
+        // add the curve filters to the specification to use
+        Specification spec = settings->specification;
+        spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+        bestresults = RideFileCache::getAllBestsFor(context, settings->metrics, spec);
+
+    } else {
+
+        bestresults = *(settings->bests);
+    }
+
+    foreach (RideBest best, bestresults) { 
 
         // filter has already been applied
 
