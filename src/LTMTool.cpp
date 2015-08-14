@@ -1737,6 +1737,17 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QStringList names = context->tab->rideNavigator()->logicalHeadings;
 
     // add functions ...
+    list << "config(cp)";
+    list << "config(w')";
+    list << "config(pmax)";
+    list << "config(cv)";
+    list << "config(scv)";
+    list << "config(height)";
+    list << "config(weight)";
+    list << "config(lthr)";
+    list << "config(maxhr)";
+    list << "config(rhr)";
+    list << "config(units)";
     list << "ctl";
     list << "tsb";
     list << "atl";

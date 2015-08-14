@@ -73,6 +73,7 @@ class Leaf {
 
         int op;
         QString function;
+
         Leaf *series; // is a symbol
         bool dynamic;
         RideFile::SeriesType seriesType; // for ridefilecache
