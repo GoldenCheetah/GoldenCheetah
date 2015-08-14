@@ -25,6 +25,10 @@
 #include "PMCData.h"
 #include <QDebug>
 
+#include "Zones.h"
+#include "PaceZones.h"
+#include "HrZones.h"
+
 #include "DataFilter_yacc.h"
 
 // LEXER VARIABLES WE INTERACT WITH
@@ -113,7 +117,7 @@ void Leaf::print(Leaf *leaf, int level)
                     leaf->print(leaf->lvalue.l, level+1);
                     leaf->print(leaf->rvalue.l, level+1);
                     break;
-    case Leaf::Function : qDebug()<<"function"<<leaf->function<<"series="<<*(leaf->series->lvalue.n);
+    case Leaf::Function : qDebug()<<"function"<<leaf->function<<"parm="<<*(leaf->series->lvalue.n);
                     if (leaf->lvalue.l) leaf->print(leaf->lvalue.l, level+1);
                     break;
     case Leaf::Conditional : qDebug()<<"cond";
@@ -238,7 +242,8 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             // is the symbol valid?
             QRegExp bestValidSymbols("^(apower|power|hr|cadence|speed|torque|vam|xpower|np|wpk)$", Qt::CaseInsensitive);
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
-            QString symbol = *(leaf->series->lvalue.n);
+            QRegExp configValidSymbols("^(cp|w\\'|pmax|cv|d\\'|scv|sd\\'|height|weight|lthr|maxhr|rhr|units)$", Qt::CaseInsensitive);
+            QString symbol = leaf->series->lvalue.n->toLower();
 
             if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb" || leaf->function == "rr") {
 
@@ -254,10 +259,15 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                 if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol))
                     DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
 
-                // now set the series type
-                leaf->seriesType = nameToSeries(symbol);
-            }
+                if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol))
+                    DataFiltererrors << QString(QObject::tr("invalid data series for config(): %1")).arg(symbol);
 
+                if (leaf->function == "best" || leaf->function == "tiz") {
+                    // now set the series type used as parameter 1 to best/tiz
+                    leaf->seriesType = nameToSeries(symbol);
+                }
+
+            }
         }
         break;
 
@@ -521,7 +531,111 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                 if (leaf->function == "rr") return Result(pmcData->rr(m->dateTime.date()));
         }
 
+        if (leaf->function == "config") {
 
+            //
+            // Get CP and W' estimates for date of ride
+            //
+            double CP = 0;
+            double WPRIME = 0;
+            double PMAX = 0;
+            int zoneRange;
+
+            if (context->athlete->zones()) {
+
+                // if range is -1 we need to fall back to a default value
+                zoneRange = context->athlete->zones()->whichRange(m->dateTime.date());
+                CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 0;
+                WPRIME = zoneRange >= 0 ? context->athlete->zones()->getWprime(zoneRange) : 0;
+                PMAX = zoneRange >= 0 ? context->athlete->zones()->getPmax(zoneRange) : 0;
+
+                // did we override CP in metadata ?
+                int oCP = m->getText("CP","0").toInt();
+                int oW = m->getText("W'","0").toInt();
+                int oPMAX = m->getText("Pmax","0").toInt();
+                if (oCP) CP=oCP;
+                if (oW) WPRIME=oW;
+                if (oPMAX) PMAX=oPMAX;
+            }
+
+            //
+            // LTHR, MaxHR, RHR
+            //
+            int hrZoneRange = context->athlete->hrZones() ? 
+                              context->athlete->hrZones()->whichRange(m->dateTime.date()) 
+                              : -1;
+
+            int LTHR = hrZoneRange != -1 ?  context->athlete->hrZones()->getLT(hrZoneRange) : 0;
+            int RHR = hrZoneRange != -1 ?  context->athlete->hrZones()->getRestHr(hrZoneRange) : 0;
+            int MaxHR = hrZoneRange != -1 ?  context->athlete->hrZones()->getMaxHr(hrZoneRange) : 0;
+
+            //
+            // CV' D'
+            //
+            int paceZoneRange = context->athlete->paceZones(false) ? 
+                                context->athlete->paceZones(false)->whichRange(m->dateTime.date()) : 
+                                -1;
+
+            double CV = (paceZoneRange != -1) ? context->athlete->paceZones(false)->getCV(paceZoneRange) : 0.0;
+            double DPRIME = 0; //XXX(paceZoneRange != -1) ? context->athlete->paceZones(false)->getDPrime(paceZoneRange) : 0.0;
+
+            int spaceZoneRange = context->athlete->paceZones(true) ? 
+                                context->athlete->paceZones(true)->whichRange(m->dateTime.date()) : 
+                                -1;
+            double SCV = (spaceZoneRange != -1) ? context->athlete->paceZones(true)->getCV(spaceZoneRange) : 0.0;
+            double SDPRIME = 0; //XXX (spaceZoneRange != -1) ? context->athlete->paceZones(true)->getDPrime(spaceZoneRange) : 0.0;
+
+            //
+            // HEIGHT and WEIGHT
+            //
+            double HEIGHT = m->getText("Height","0").toDouble();
+            if (HEIGHT == 0) HEIGHT = context->athlete->getHeight(NULL);
+            double WEIGHT = m->getWeight();
+
+            QString symbol = leaf->series->lvalue.n->toLower();
+
+            if (symbol == "cp") {
+                return Result(CP);
+            }
+            if (symbol == "w'") {
+                return Result(WPRIME);
+            }
+            if (symbol == "pmax") {
+                return Result(PMAX);
+            }
+            if (symbol == "scv") {
+                return Result(SCV);
+            }
+            if (symbol == "sd'") {
+                return Result(SDPRIME);
+            }
+            if (symbol == "cv") {
+                return Result(CV);
+            }
+            if (symbol == "d'") {
+                return Result(DPRIME);
+            }
+            if (symbol == "lthr") {
+                return Result(LTHR);
+            }
+            if (symbol == "rhr") {
+                return Result(RHR);
+            }
+            if (symbol == "maxhr") {
+                return Result(MaxHR);
+            }
+            if (symbol == "weight") {
+                return Result(WEIGHT);
+            }
+            if (symbol == "height") {
+                return Result(HEIGHT);
+            }
+            if (symbol == "units") {
+                return Result(context->athlete->useMetricUnits ? 1 : 0);
+            }
+        }
+
+        // get here for tiz and best
         switch (leaf->lvalue.l->type) {
 
             default:
