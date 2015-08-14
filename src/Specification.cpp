@@ -41,3 +41,9 @@ Specification::setFilterSet(FilterSet fs)
 {
     this->fs = fs;
 }
+
+void
+Specification::addMatches(QStringList other)
+{
+    fs.addFilter(true, other);
+}

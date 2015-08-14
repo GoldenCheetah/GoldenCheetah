@@ -74,6 +74,7 @@ class Specification
         // set criteria
         void setDateRange(DateRange dr);
         void setFilterSet(FilterSet fs);
+        void addMatches(QStringList matches);
 
         DateRange dateRange() { return dr; }
         FilterSet filterSet() { return fs; }

@@ -2445,9 +2445,14 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
 
     for (int i=0; i<(24); i++) x[i]=i;
 
+    // curve specific filter
+    Specification spec = settings->specification;
+    if (!SearchFilterBox::isNull(metricDetail.datafilter))
+        spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+
     foreach (RideItem *ride, context->athlete->rideCache->rides()) {
 
-        if (!settings->specification.pass(ride)) continue;
+        if (!spec.pass(ride)) continue;
 
         double value = ride->getForSymbol(metricDetail.symbol);
 
@@ -2552,10 +2557,15 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
     unsigned long secondsPerGroupBy=0;
     bool wantZero = forceZero ? 1 : (metricDetail.curveStyle == QwtPlotCurve::Steps);
 
+    // curve specific filter
+    Specification spec = settings->specification;
+    if (!SearchFilterBox::isNull(metricDetail.datafilter))
+        spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+
     foreach (RideItem *ride, context->athlete->rideCache->rides()) { 
 
         // filter out unwanted stuff
-        if (!settings->specification.pass(ride)) continue;
+        if (!spec.pass(ride)) continue;
 
         // day we are on
         int currentDay = groupForDate(ride->dateTime.date(), settings->groupBy);
@@ -2675,10 +2685,15 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
     unsigned long secondsPerGroupBy=0;
     bool wantZero = forceZero ? 1 : (metricDetail.curveStyle == QwtPlotCurve::Steps);
 
+    // curve specific filter
+    Specification spec = settings->specification;
+    if (!SearchFilterBox::isNull(metricDetail.datafilter))
+        spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+
     foreach (RideItem *ride, context->athlete->rideCache->rides()) { 
 
         // filter out unwanted stuff
-        if (!settings->specification.pass(ride)) continue;
+        if (!spec.pass(ride)) continue;
 
         // day we are on
         int currentDay = groupForDate(ride->dateTime.date(), settings->groupBy);
@@ -3128,10 +3143,15 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
     n = 0;
 
     // create local PMC if filtered
-    if (settings->specification.isFiltered()) {
+    if (!SearchFilterBox::isNull(metricDetail.datafilter) || settings->specification.isFiltered()) {
 
         // don't filter for date range!!
         Specification allDates = settings->specification;
+
+        // curve specific filter
+        if (!SearchFilterBox::isNull(metricDetail.datafilter))
+            allDates.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+
         allDates.setDateRange(DateRange(QDate(),QDate()));
         localPMC = new PMCData(context, allDates, scoreType);
     }

@@ -49,8 +49,9 @@ class RideBest;
 // 13        25 Jul 2015 Mark Liversedge  Update to charts.xml to show version number
 // 14        13 Aug 2015 Mark Liversedge  Added formula metric type
 // 15        13 Aug 2015 Mark Liversedge  Added formula aggregation type Avg, Total, Low etc
+// 16        14 Aug 2015 Mark Liversedge  Added curve specific filter
 
-#define LTM_VERSION_NUMBER 15
+#define LTM_VERSION_NUMBER 16
 
 // group by settings
 #define LTM_DAY     1
@@ -141,6 +142,8 @@ class MetricDetail {
     bool showOnPlot;
     int filter;         // 0 no filter, 1 = include, 2 = exclude
     double from, to;
+
+    QString datafilter;
 
     // curve type and symbol
     QwtPlotCurve::CurveStyle curveStyle;      // how should this metric be plotted?

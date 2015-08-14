@@ -1848,6 +1848,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // Grid
     QGridLayout *grid = new QGridLayout;
 
+    QLabel *filter = new QLabel(tr("Filter"));
+    dataFilter = new SearchFilterBox(this, context);
+    dataFilter->setFilter(metricDetail->datafilter);
+
     QLabel *name = new QLabel(tr("Name"));
     QLabel *units = new QLabel(tr("Axis Label / Units"));
     userName = new QLineEdit(this);
@@ -1937,39 +1941,41 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     trendType->setCurrentIndex(metricDetail->trendtype);
 
     // add to grid
-    grid->addLayout(radioButtons, 0, 0, 1, 1, Qt::AlignTop|Qt::AlignLeft);
-    grid->addWidget(typeStack, 0, 1, 1, 3);
+    grid->addWidget(filter, 0,0);
+    grid->addWidget(dataFilter, 0,1,1,3);
+    grid->addLayout(radioButtons, 1, 0, 1, 1, Qt::AlignTop|Qt::AlignLeft);
+    grid->addWidget(typeStack, 1, 1, 1, 3);
     QWidget *spacer1 = new QWidget(this);
     spacer1->setFixedHeight(10);
-    grid->addWidget(spacer1, 1,0);
-    grid->addWidget(name, 2,0);
-    grid->addWidget(userName, 2, 1, 1, 3);
-    grid->addWidget(units, 3,0);
-    grid->addWidget(userUnits, 3,1);
-    grid->addWidget(style, 4,0);
-    grid->addWidget(curveStyle, 4,1);
-    grid->addWidget(symbol, 5,0);
-    grid->addWidget(curveSymbol, 5,1);
+    grid->addWidget(spacer1, 2,0);
+    grid->addWidget(name, 3,0);
+    grid->addWidget(userName, 3, 1, 1, 3);
+    grid->addWidget(units, 4,0);
+    grid->addWidget(userUnits, 4,1);
+    grid->addWidget(style, 5,0);
+    grid->addWidget(curveStyle, 5,1);
+    grid->addWidget(symbol, 6,0);
+    grid->addWidget(curveSymbol, 6,1);
     QWidget *spacer2 = new QWidget(this);
     spacer2->setFixedHeight(10);
-    grid->addWidget(spacer2, 6,0);
-    grid->addWidget(stackLabel, 7, 0);
-    grid->addWidget(stack, 7, 1);
-    grid->addWidget(color, 8,0);
-    grid->addWidget(curveColor, 8,1);
-    grid->addWidget(fill, 9,0);
-    grid->addWidget(fillCurve, 9,1);
-    grid->addWidget(topN, 3,2);
-    grid->addWidget(showBest, 3,3);
-    grid->addWidget(bottomN, 4,2);
-    grid->addWidget(showLowest, 4,3);
-    grid->addWidget(outN, 5,2);
-    grid->addWidget(showOut, 5,3);
-    grid->addWidget(baseline, 6, 2);
-    grid->addWidget(baseLine, 6,3);
-    grid->addWidget(trendType, 7,2);
-    grid->addWidget(curveSmooth, 8,2);
-    grid->addWidget(labels, 9,2);
+    grid->addWidget(spacer2, 7,0);
+    grid->addWidget(stackLabel, 8, 0);
+    grid->addWidget(stack, 8, 1);
+    grid->addWidget(color, 9,0);
+    grid->addWidget(curveColor, 9,1);
+    grid->addWidget(fill, 10,0);
+    grid->addWidget(fillCurve, 10,1);
+    grid->addWidget(topN, 4,2);
+    grid->addWidget(showBest, 4,3);
+    grid->addWidget(bottomN, 5,2);
+    grid->addWidget(showLowest, 5,3);
+    grid->addWidget(outN, 6,2);
+    grid->addWidget(showOut, 6,3);
+    grid->addWidget(baseline, 7, 2);
+    grid->addWidget(baseLine, 7,3);
+    grid->addWidget(trendType, 8,2);
+    grid->addWidget(curveSmooth, 9,2);
+    grid->addWidget(labels, 10,2);
 
     mainLayout->addLayout(grid);
 
@@ -2238,6 +2244,7 @@ EditMetricDetailDialog::applyClicked()
         case 2 :
         default: metricDetail->duration_units = 3600; break;
     }
+    metricDetail->datafilter = dataFilter->filter();
     metricDetail->wpk = wpk->isChecked();
     metricDetail->series = seriesList.at(dataSeries->currentIndex());
     metricDetail->model = models[modelSelect->currentIndex()]->code();
