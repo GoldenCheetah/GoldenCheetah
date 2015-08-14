@@ -1704,6 +1704,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     //formulaEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     formulaType = new QComboBox(this);
     formulaType->addItem(tr("Total"), static_cast<int>(RideMetric::Total));
+    formulaType->addItem(tr("Running Total"), static_cast<int>(RideMetric::RunningTotal));
     formulaType->addItem(tr("Average"), static_cast<int>(RideMetric::Average));
     formulaType->addItem(tr("Peak"), static_cast<int>(RideMetric::Peak));
     formulaType->addItem(tr("Low"), static_cast<int>(RideMetric::Low));

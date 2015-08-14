@@ -220,6 +220,7 @@ LTMPlot::setData(LTMSettings *set)
 
     curveColors->isolated = false;
     isolation = false;
+    int user=0;
 
     //qDebug()<<"Starting.."<<timer.elapsed();
 
@@ -367,7 +368,9 @@ LTMPlot::setData(LTMSettings *set)
     stacks.clear();
 
     int r=0;
+
     foreach (MetricDetail metricDetail, settings->metrics) {
+
         if (metricDetail.stack == true) {
 
             // register this data
@@ -417,6 +420,7 @@ LTMPlot::setData(LTMSettings *set)
 
         int count=0;
         MetricDetail metricDetail = settings->metrics[m];
+        if (metricDetail.type == METRIC_FORMULA) metricDetail.symbol = QString("user_%1").arg(user++);
 
         if (metricDetail.stack == false) continue;
 
@@ -568,6 +572,7 @@ LTMPlot::setData(LTMSettings *set)
     for(int m=0; m<settings->metrics.count(); m++) { 
 
         MetricDetail metricDetail = settings->metrics[m];
+        if (metricDetail.type == METRIC_FORMULA) metricDetail.symbol = QString("user_%1").arg(user++);
 
         //
         // *ONLY* PLOT NON-STACKS
@@ -1315,6 +1320,7 @@ LTMPlot::setCompareData(LTMSettings *set)
 
     MAXX=0.0; // maximum value for x, always from 0-n
     settings = set;
+    int user=0;
 
     //qDebug()<<"Starting.."<<timer.elapsed();
 
@@ -1525,6 +1531,7 @@ LTMPlot::setCompareData(LTMSettings *set)
 
             int count=0;
             MetricDetail metricDetail = settings->metrics[m];
+            if (metricDetail.type == METRIC_FORMULA) metricDetail.symbol = QString("user_%1").arg(user++);
 
             if (metricDetail.stack == false) continue;
 
@@ -2655,6 +2662,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+    y.fill(0);
 
     // parse formula
     DataFilter parser(this, context, metricDetail.formula);
@@ -2684,6 +2692,9 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;
+
+        // convert seconds to hours
+        if (metricDetail.uunits == tr("seconds")) value /= 3600;
 
         if (value || wantZero) {
             unsigned long seconds = ride->getForSymbol("workout_time");
@@ -2739,6 +2750,15 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
                 secondsPerGroupBy += seconds; // increment for same group
             }
             lastDay = currentDay;
+        }
+    }
+
+    // running total accumulation
+    if (metricDetail.formulaType == RideMetric::RunningTotal) {
+        double rtot = 0;
+        for (int i=0; i<y.size(); i++) {
+            rtot += y[i];
+            y[i] = rtot;
         }
     }
 }
