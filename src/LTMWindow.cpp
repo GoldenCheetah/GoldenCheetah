@@ -393,6 +393,12 @@ LTMWindow::presetSelected(int index)
 
         ltmTool->applySettings();
         refresh();
+
+        setProperty("subtitle", settings.name);
+
+    } else {
+
+        setProperty("subtitle", property("title").toString());
     }
 }
 
