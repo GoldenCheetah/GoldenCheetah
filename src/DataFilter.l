@@ -46,6 +46,8 @@
 [Ee][Nn][Dd][Ss][Ww][Ii][Tt][Hh]            DataFilterlval.op = ENDSWITH; return ENDSWITH;
 [Cc][Oo][Nn][Tt][Aa][Ii][Nn][Ss]            DataFilterlval.op = CONTAINS; return CONTAINS;
 
+                                           /* functions identified by name in the lexer is probably
+                                              going to limit us in the future */
 [Bb][Ee][Ss][Tt]                           strcpy(DataFilterlval.function, "best"); return BEST;
 [Tt][Ii][Zz]                               strcpy(DataFilterlval.function, "tiz"); return TIZ;
 [Ll][Tt][Ss]                               strcpy(DataFilterlval.function, "lts"); return LTS;
@@ -53,6 +55,7 @@
 [Ss][Bb]                                   strcpy(DataFilterlval.function, "sb"); return SB;
 [Rr][Rr]                                   strcpy(DataFilterlval.function, "rr"); return RR;
 [Cc][Oo][Nn][Ff][Ii][Gg]                   strcpy(DataFilterlval.function, "config"); return CONFIG;
+[Cc][Oo][Nn][Ss][Tt]                       strcpy(DataFilterlval.function, "const"); return CONST;
 
 "&&"                                        DataFilterlval.op = AND; return AND;
 [Aa][nN][Dd]                                DataFilterlval.op = AND; return AND;
