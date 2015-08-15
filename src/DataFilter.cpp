@@ -848,8 +848,8 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
         case 17 : { return Result(round(eval(context, df, leaf->fparms[0], m).number)); } // ROUND(x)
 
         case 18 : { return Result(fabs(eval(context, df, leaf->fparms[0], m).number)); } // FABS(x)
-        case 19 : { return Result(isinf(eval(context, df, leaf->fparms[0], m).number)); } // ISINF(x)
-        case 20 : { return Result(isnan(eval(context, df, leaf->fparms[0], m).number)); } // ISNAN(x)
+        case 19 : { return Result(std::isinf(eval(context, df, leaf->fparms[0], m).number)); } // ISINF(x)
+        case 20 : { return Result(std::isnan(eval(context, df, leaf->fparms[0], m).number)); } // ISNAN(x)
         default:
             return Result(0);
         }
