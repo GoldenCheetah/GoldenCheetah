@@ -24,6 +24,7 @@
 #include "RideNavigator.h"
 #include "GcSideBarItem.h"
 #include "AnalysisSidebar.h"
+#include "DataFilter.h"
 #include <QToolButton>
 #include <QInputDialog>
 
@@ -147,6 +148,42 @@ SearchBox::configChanged(qint32)
     QString last;
     SpecialFields sp;
 
+    // start with just a list of functions
+    list = DataFilter::functions();
+
+    // add special functions (older code needs fixing !)
+    list << "config(cp)";
+    list << "config(w')";
+    list << "config(pmax)";
+    list << "config(cv)";
+    list << "config(scv)";
+    list << "config(height)";
+    list << "config(weight)";
+    list << "config(lthr)";
+    list << "config(maxhr)";
+    list << "config(rhr)";
+    list << "config(units)";
+    list << "const(e)";
+    list << "const(pi)";
+    list << "ctl";
+    list << "tsb";
+    list << "atl";
+    list << "sb(TSS)";
+    list << "lts(TSS)";
+    list << "sts(TSS)";
+    list << "rr(TSS)";
+    list << "tiz(power, 1)";
+    list << "tiz(hr, 1)";
+    list << "best(power, 3600)";
+    list << "best(hr, 3600)";
+    list << "best(cadence, 3600)";
+    list << "best(speed, 3600)";
+    list << "best(torque, 3600)";
+    list << "best(np, 3600)";
+    list << "best(xpower, 3600)";
+    list << "best(vam, 3600)";
+    list << "best(wpk, 3600)";
+
     // get sorted list
     QStringList names = context->tab->rideNavigator()->logicalHeadings;
     qSort(names.begin(), names.end(), insensitiveLessThan);
@@ -167,6 +204,9 @@ SearchBox::configChanged(qint32)
         name.replace(' ', '_');
         list << name;
     }
+
+    // sort the list
+    qSort(list.begin(), list.end(), insensitiveLessThan);
 
     // set new list
     completer->setList(list);

@@ -45,6 +45,9 @@
 // PDModel estimate support
 #include "PDModel.h"
 
+// Filter / formula
+#include "DataFilter.h"
+
 LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mainWindow), settings(settings), context(context), active(false), _amFiltered(false)
 {
     setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
@@ -1736,7 +1739,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // get sorted list
     QStringList names = context->tab->rideNavigator()->logicalHeadings;
 
-    // add functions ...
+    // start with just a list of functions
+    list = DataFilter::functions();
+
+    // add special functions (older code needs fixing !)
     list << "config(cp)";
     list << "config(w')";
     list << "config(pmax)";
