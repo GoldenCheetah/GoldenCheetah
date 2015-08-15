@@ -24,6 +24,7 @@
 #include <QDebug>
 #include <QList>
 #include <QStringList>
+#include <QTextDocument>
 #include "RideCache.h"
 #include "RideFile.h" //for SeriesType
 
@@ -50,13 +51,14 @@ class Leaf {
 
     public:
 
-        Leaf() : type(none),op(0),series(NULL),dynamic(false) { }
+        Leaf(int loc, int leng) : type(none),op(0),series(NULL),dynamic(false),loc(loc),leng(leng) { }
 
         // evaluate against a RideItem
         Result eval(Context *context, DataFilter *df, Leaf *, RideItem *m);
 
         // tree traversal etc
         void print(Leaf *, int level);  // print leaf and all children
+        void color(Leaf *, QTextDocument *);  // update the document to match
         bool isDynamic(Leaf *);
         void validateFilter(DataFilter *, Leaf*); // validate
         bool isNumber(DataFilter *df, Leaf *leaf);
@@ -78,6 +80,7 @@ class Leaf {
         Leaf *series; // is a symbol
         bool dynamic;
         RideFile::SeriesType seriesType; // for ridefilecache
+        int loc, leng;
 };
 
 class DataFilter : public QObject
@@ -100,11 +103,14 @@ class DataFilter : public QObject
 
         // when used for formulas
         Result evaluate(RideItem *rideItem);
+        QStringList getErrors() { return errors; };
+        void colorSyntax(QTextDocument *content);
 
         static QStringList functions(); // return list of functions supported
 
     public slots:
         QStringList parseFilter(QString query, QStringList *list=0);
+        QStringList check(QString query);
         void clearFilter();
         void configChanged(qint32);
         void dynamicParse();

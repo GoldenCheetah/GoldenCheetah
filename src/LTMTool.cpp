@@ -1703,7 +1703,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     //formulaWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QVBoxLayout *formulaLayout = new QVBoxLayout(formulaWidget);
     formulaLayout->addStretch();
-    formulaEdit = new DataFilterEdit(this);
+    formulaEdit = new DataFilterEdit(this, context);
     //formulaEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     formulaType = new QComboBox(this);
     formulaType->addItem(tr("Total"), static_cast<int>(RideMetric::Total));
@@ -2370,13 +2370,25 @@ LTMTool::setFilter(QStringList files)
         emit filterChanged();
 } 
 
-DataFilterEdit::DataFilterEdit(QWidget *parent)
-: QTextEdit(parent), c(0)
+DataFilterEdit::DataFilterEdit(QWidget *parent, Context *context)
+: QTextEdit(parent), context(context), c(0)
 {
 }
 
 DataFilterEdit::~DataFilterEdit()
 {
+}
+
+void
+DataFilterEdit::checkErrors()
+{
+    // parse and present errors to user
+    DataFilter checker(this, context);
+    QStringList errors = checker.check(toPlainText());
+    checker.colorSyntax(document());
+
+    // need to fixup for errors!
+    // XXX next commit
 }
 
 void DataFilterEdit::setCompleter(QCompleter *completer)
@@ -2411,6 +2423,16 @@ void DataFilterEdit::insertCompletion(const QString& completion)
     tc.movePosition(QTextCursor::EndOfWord);
     tc.insertText(completion.right(extra));
     setTextCursor(tc);
+
+    checkErrors();
+}
+
+void
+DataFilterEdit::setText(const QString &text)
+{
+    // set text..
+    QTextEdit::setText(text);
+    checkErrors();
 }
 
 QString DataFilterEdit::textUnderCursor() const
@@ -2428,6 +2450,7 @@ void DataFilterEdit::focusInEvent(QFocusEvent *e)
 
 void DataFilterEdit::keyPressEvent(QKeyEvent *e)
 {
+    // wait a couple of seconds before checking the changes....
     if (c && c->popup()->isVisible()) {
         // The following keys are forwarded by the completer to the widget
        switch (e->key()) {
@@ -2446,6 +2469,9 @@ void DataFilterEdit::keyPressEvent(QKeyEvent *e)
     bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
     if (!c || !isShortcut) // do not process the shortcut when we have a completer
         QTextEdit::keyPressEvent(e);
+
+    // check
+    checkErrors();
 
     const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
     if (!c || (ctrlOrShift && e->text().isEmpty()))
