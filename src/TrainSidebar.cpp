@@ -377,7 +377,7 @@ intensity->hide(); //XXX!!! temporary
     mediaItem->addWidget(mediaTree);
     trainSplitter->addWidget(mediaItem);
 
-    videosyncItem = new GcSplitterItem(tr("VideoSync"), iconFromPNG(":images/sidebar/movie.png"), this);
+    videosyncItem = new GcSplitterItem(tr("VideoSync"), iconFromPNG(":images/sidebar/sync.png"), this);
     QAction *moreVideoSyncAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     videosyncItem->addAction(moreVideoSyncAct);
     connect(moreVideoSyncAct, SIGNAL(triggered(void)), this, SLOT(videosyncPopup(void)));
