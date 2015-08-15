@@ -71,6 +71,8 @@ extern Leaf *root; // root node for parsed statement
    char function[32];
 }
 
+%locations
+
 %type <leaf> symbol value lexpr expr parms;
 %type <op> lop cop bop;
 
@@ -84,7 +86,7 @@ extern Leaf *root; // root node for parsed statement
 filter: lexpr                       { root = $1; }
         ;
 
-parms: lexpr                        { $$ = new Leaf();
+parms: lexpr                        { $$ = new Leaf(@1.first_column, @1.last_column);
                                       $$->type = Leaf::Parameters;
                                       $$->fparms << $1;
                                     }
@@ -92,42 +94,42 @@ parms: lexpr                        { $$ = new Leaf();
         | parms ',' lexpr           { $1->fparms << $3; }
         ;
 
-lexpr   : expr lop expr             { $$ = new Leaf();
+lexpr   : expr lop expr             { $$ = new Leaf(@1.first_column, @3.last_column);
                                       $$->type = Leaf::Logical;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
-        | lexpr lop lexpr             { $$ = new Leaf();
+        | lexpr lop lexpr             { $$ = new Leaf(@1.first_column, @3.last_column);
                                       $$->type = Leaf::Logical;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
-        | '(' expr ')'               { $$ = new Leaf();
+        | '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
                                       $$->type = Leaf::Logical;
                                       $$->lvalue.l = $2;
                                       $$->op = 0; }
-        | expr
+        | expr                       { $$ = $1; }
         ;
 
 
-expr : '(' expr ')'               { $$ = new Leaf();
+expr : '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
                                       $$->type = Leaf::Logical;
                                       $$->lvalue.l = $2;
                                       $$->op = 0; }
 
-      | expr cop expr              { $$ = new Leaf();
+      | expr cop expr              { $$ = new Leaf(@1.first_column, @3.last_column);
                                       $$->type = Leaf::Operation;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
 
-      | expr bop expr              { $$ = new Leaf();
+      | expr bop expr              { $$ = new Leaf(@1.first_column, @3.last_column);
                                       $$->type = Leaf::BinaryOperation;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
 
-      | expr Q expr COL expr      { $$ = new Leaf();
+      | expr Q expr COL expr      { $$ = new Leaf(@1.first_column, @5.last_column);
                                     $$->type = Leaf::Conditional;
                                     $$->op = 0; // unused
                                     $$->lvalue.l = $3;
@@ -179,63 +181,64 @@ bop   : ADD
       | POW
       ;
 
-symbol : SYMBOL                      { $$ = new Leaf(); $$->type = Leaf::Symbol;
-                                      if (QString(DataFiltertext) == "BikeScore")
-                                        $$->lvalue.n = new QString("BikeScore&#8482;");
-                                      else
-                                        $$->lvalue.n = new QString(DataFiltertext);
-                                    }
+symbol : SYMBOL                      { $$ = new Leaf(@1.first_column, @1.last_column); 
+                                       $$->type = Leaf::Symbol;
+                                       if (QString(DataFiltertext) == "BikeScore")
+                                          $$->lvalue.n = new QString("BikeScore&#8482;");
+                                       else
+                                          $$->lvalue.n = new QString(DataFiltertext);
+                                     }
         ;
 
 value : symbol                      { $$ = $1; }
 
-      | DF_STRING                      { $$ = new Leaf(); $$->type = Leaf::String;
+      | DF_STRING                      { $$ = new Leaf(@1.first_column, @1.last_column); $$->type = Leaf::String;
                                       QString s2(DataFiltertext);
                                       $$->lvalue.s = new QString(s2.mid(1,s2.length()-2)); }
-      | DF_FLOAT                       { $$ = new Leaf(); $$->type = Leaf::Float;
+      | DF_FLOAT                       { $$ = new Leaf(@1.first_column, @1.last_column); $$->type = Leaf::Float;
                                       $$->lvalue.f = QString(DataFiltertext).toFloat(); }
-      | DF_INTEGER                     { $$ = new Leaf(); $$->type = Leaf::Integer;
+      | DF_INTEGER                     { $$ = new Leaf(@1.first_column, @1.last_column); $$->type = Leaf::Integer;
                                       $$->lvalue.i = QString(DataFiltertext).toInt(); }
 
-      | BEST '(' symbol ',' lexpr ')' { $$ = new Leaf(); $$->type = Leaf::Function;
+      | BEST '(' symbol ',' lexpr ')' { $$ = new Leaf(@1.first_column, @6.last_column); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
                                         $$->lvalue.l = $5;
                                       }
 
 
-      | TIZ '(' symbol ',' lexpr ')' { $$ = new Leaf(); $$->type = Leaf::Function;
+      | TIZ '(' symbol ',' lexpr ')' { $$ = new Leaf(@1.first_column, @6.last_column); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
                                         $$->lvalue.l = $5;
                                       }
 
-      | LTS '(' symbol ')'            { $$ = new Leaf(); $$->type = Leaf::Function;
+      | LTS '(' symbol ')'            { $$ = new Leaf(@1.first_column, @4.last_column); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
                                         $$->lvalue.l = NULL;
                                       }
-      | STS '(' symbol ')'            { $$ = new Leaf(); $$->type = Leaf::Function;
+      | STS '(' symbol ')'            { $$ = new Leaf(@1.first_column, @4.last_column); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
                                         $$->lvalue.l = NULL;
                                       }
-      | RR '(' symbol ')'             { $$ = new Leaf(); $$->type = Leaf::Function;
+      | RR '(' symbol ')'             { $$ = new Leaf(@1.first_column, @4.last_column); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
                                         $$->lvalue.l = NULL;
                                       }
-      | SB '(' symbol ')'             { $$ = new Leaf(); $$->type = Leaf::Function;
+      | SB '(' symbol ')'             { $$ = new Leaf(@1.first_column, @4.last_column); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
                                         $$->lvalue.l = NULL;
                                       }
-      | CONFIG '(' symbol ')'       {   $$ = new Leaf(); $$->type = Leaf::Function;
+      | CONFIG '(' symbol ')'       {   $$ = new Leaf(@1.first_column, @4.last_column); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
                                         $$->lvalue.l = NULL;
                                       }
-      | CONST_ '(' symbol ')'       {   $$ = new Leaf(); $$->type = Leaf::Function;
+      | CONST_ '(' symbol ')'       {   $$ = new Leaf(@1.first_column, @4.last_column); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
                                         $$->lvalue.l = NULL;
