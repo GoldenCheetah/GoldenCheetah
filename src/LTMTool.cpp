@@ -1748,6 +1748,8 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     list << "config(maxhr)";
     list << "config(rhr)";
     list << "config(units)";
+    list << "const(e)";
+    list << "const(pi)";
     list << "ctl";
     list << "tsb";
     list << "atl";
