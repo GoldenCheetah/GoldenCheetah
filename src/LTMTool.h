@@ -237,7 +237,7 @@ class DataFilterEdit : public QTextEdit
     Q_OBJECT
 
 public:
-    DataFilterEdit(QWidget *parent = 0);
+    DataFilterEdit(QWidget *parent, Context *context);
     ~DataFilterEdit();
 
     void setCompleter(QCompleter *c);
@@ -247,14 +247,17 @@ protected:
     void keyPressEvent(QKeyEvent *e);
     void focusInEvent(QFocusEvent *e);
 
-private slots:
+public slots:
+    void setText(const QString&);
     void insertCompletion(const QString &completion);
+    void checkErrors();
 
 private:
     QString textUnderCursor() const;
 
 private:
     QCompleter *c;
+    Context *context;
 };
 
 #endif // _GC_LTMTool_h

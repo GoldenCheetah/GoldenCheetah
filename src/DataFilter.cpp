@@ -155,6 +155,144 @@ Leaf::isDynamic(Leaf *leaf)
     return false;
 }
 
+void
+DataFilter::colorSyntax(QTextDocument *document)
+{
+    // for looking for comments
+    QString string = document->toPlainText();
+
+    // clear formatting and color comments
+    QTextCharFormat normal;
+    normal.setUnderlineStyle(QTextCharFormat::NoUnderline);
+    normal.setForeground(Qt::black);
+
+    QTextCharFormat comment;
+    comment.setUnderlineStyle(QTextCharFormat::NoUnderline);
+    comment.setForeground(Qt::blue);
+
+    QTextCursor cursor(document);
+
+    // set all black
+    cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+    cursor.selectionStart();
+    cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+    cursor.selectionEnd();
+    cursor.setCharFormat(normal);
+
+    // color comments
+    bool instring=false;
+    bool incomment=false;
+    int commentstart=0;
+
+    for(int i=0; i<string.length(); i++) {
+
+        // watch for being in a string
+        if (string[i] == '"' && !incomment) instring=!instring;
+
+        // watch for being in a comment
+        if (string[i] == '#' && !instring && !incomment) {
+            incomment = true;
+            commentstart=i;
+        }
+
+        if ((string[i] == '\r' || string[i] == '\n')) {
+
+            // mark if we have a comment
+            if (incomment) {
+
+                // we have a line of comments to here from commentstart
+                incomment = false;
+
+                // comments are blue
+                cursor.setPosition(commentstart, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.setCharFormat(comment);
+            } else {
+                instring = false; // always quit on end of line
+            }
+        }
+    }
+
+    // apply selective coloring to the symbols and expressions
+    if(treeRoot) treeRoot->color(treeRoot, document);
+}
+
+void Leaf::color(Leaf *leaf, QTextDocument *document)
+{
+    // nope
+    if (leaf == NULL) return;
+
+    QTextCharFormat apply;
+    apply.setForeground(Qt::red); // default to yucky
+
+    switch(leaf->type) {
+    case Leaf::Float : 
+    case Leaf::Integer : 
+    case Leaf::String : 
+                    apply.setForeground(Qt::red);
+                    break;
+
+    case Leaf::Symbol :
+                    apply.setForeground(Qt::green);
+                    break;
+
+    case Leaf::Logical  :
+                    leaf->color(leaf->lvalue.l, document);
+                    if (leaf->op) leaf->color(leaf->rvalue.l, document);
+                    return;
+                    break;
+
+    case Leaf::Operation : 
+                    leaf->color(leaf->lvalue.l, document);
+                    leaf->color(leaf->rvalue.l, document);
+                    return;
+                    break;
+
+    case Leaf::BinaryOperation : 
+                    leaf->color(leaf->lvalue.l, document);
+                    leaf->color(leaf->rvalue.l, document);
+                    return;
+                    break;
+
+    case Leaf::Function :
+                    if (leaf->series) {
+                        if (leaf->lvalue.l) leaf->color(leaf->lvalue.l, document);
+                        return;
+                    } else {
+                        foreach(Leaf*l, leaf->fparms) leaf->color(l, document);
+                        apply.setForeground(Qt::green);
+                    }
+                    break;
+
+    case Leaf::Conditional : 
+        {
+                    leaf->color(leaf->cond.l, document);
+                    leaf->color(leaf->lvalue.l, document);
+                    leaf->color(leaf->rvalue.l, document);
+                    return;
+        }
+        break;
+
+    default:
+        return;
+        break;
+
+    }
+
+    // lets apply that then
+    QTextCursor cursor(document);
+
+    // highlight this token and apply
+    cursor.setPosition(leaf->loc, QTextCursor::MoveAnchor);
+    cursor.selectionStart();
+    cursor.setPosition(leaf->leng+1, QTextCursor::KeepAnchor);
+    cursor.selectionEnd();
+
+    cursor.setCharFormat(apply);
+}
+
 void Leaf::print(Leaf *leaf, int level)
 {
     qDebug()<<"LEVEL"<<level;
@@ -340,7 +478,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                         DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
 
                     if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol))
-                        DataFiltererrors << QString(QObject::tr("invalid data series for config(): %1")).arg(symbol);
+                        DataFiltererrors << QString(QObject::tr("invalid literal for config(): %1")).arg(symbol);
 
                     if (leaf->function == "const") {
                         if (!constValidSymbols.exactMatch(symbol))
@@ -471,6 +609,35 @@ Result DataFilter::evaluate(RideItem *item)
 
     Result res = treeRoot->eval(context, this, treeRoot, item);
     return res;
+}
+
+QStringList DataFilter::check(QString query)
+{
+    // remember where we apply
+    isdynamic=false;
+
+    // Parse from string
+    DataFiltererrors.clear(); // clear out old errors
+    DataFilter_setString(query);
+    DataFilterparse();
+    DataFilter_clearString();
+
+    // save away the results
+    treeRoot = root;
+
+    // if it passed syntax lets check semantics
+    if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(this, treeRoot);
+
+    // ok, did it pass all tests?
+    if (!treeRoot || DataFiltererrors.count() > 0) { // nope
+
+        // no errors just failed to finish
+        if (!treeRoot) DataFiltererrors << tr("malformed expression.");
+
+    }
+
+    errors = DataFiltererrors;
+    return errors;
 }
 
 QStringList DataFilter::parseFilter(QString query, QStringList *list)
