@@ -54,7 +54,7 @@ extern Leaf *root; // root node for parsed statement
 
 // Constants can be a string or a number
 %token <leaf> DF_STRING DF_INTEGER DF_FLOAT
-%token <function> BEST TIZ STS LTS SB RR CONFIG CONST
+%token <function> BEST TIZ STS LTS SB RR CONFIG CONST_
 
 // comparative operators
 %token <op> Q COL
@@ -235,7 +235,7 @@ value : symbol                      { $$ = $1; }
                                         $$->series = $3;
                                         $$->lvalue.l = NULL;
                                       }
-      | CONST '(' symbol ')'       {   $$ = new Leaf(); $$->type = Leaf::Function;
+      | CONST_ '(' symbol ')'       {   $$ = new Leaf(); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
                                         $$->lvalue.l = NULL;
