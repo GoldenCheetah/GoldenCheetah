@@ -243,6 +243,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             QRegExp bestValidSymbols("^(apower|power|hr|cadence|speed|torque|vam|xpower|np|wpk)$", Qt::CaseInsensitive);
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
             QRegExp configValidSymbols("^(cp|w\\'|pmax|cv|d\\'|scv|sd\\'|height|weight|lthr|maxhr|rhr|units)$", Qt::CaseInsensitive);
+            QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
             QString symbol = leaf->series->lvalue.n->toLower();
 
             if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb" || leaf->function == "rr") {
@@ -261,6 +262,19 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
                 if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol))
                     DataFiltererrors << QString(QObject::tr("invalid data series for config(): %1")).arg(symbol);
+
+                if (leaf->function == "const") {
+                    if (!constValidSymbols.exactMatch(symbol))
+                        DataFiltererrors << QString(QObject::tr("invalid literal for const(): %1")).arg(symbol);
+                    else {
+
+                        // convert to a float
+                        leaf->type = Leaf::Float;
+                        leaf->lvalue.f = 0.0L;
+                        if (symbol == "e") leaf->lvalue.f = MATHCONST_E;
+                        if (symbol == "pi") leaf->lvalue.f = MATHCONST_PI;
+                    }
+                }
 
                 if (leaf->function == "best" || leaf->function == "tiz") {
                     // now set the series type used as parameter 1 to best/tiz
