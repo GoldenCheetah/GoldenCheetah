@@ -62,7 +62,7 @@ class Leaf {
         bool isNumber(DataFilter *df, Leaf *leaf);
         void clear(Leaf*);
 
-        enum { none, Float, Integer, String, Symbol, Logical, Operation, BinaryOperation, Function, Conditional } type;
+        enum { none, Float, Integer, String, Symbol, Logical, Operation, BinaryOperation, Function, Conditional, Parameters } type;
         union value {
             float f;
             int i;
@@ -72,7 +72,8 @@ class Leaf {
         } lvalue, rvalue, cond;
 
         int op;
-        QString function;
+        QString function;    // function
+        QList<Leaf*> fparms; // passed parameters
 
         Leaf *series; // is a symbol
         bool dynamic;
@@ -99,6 +100,8 @@ class DataFilter : public QObject
 
         // when used for formulas
         Result evaluate(RideItem *rideItem);
+
+        static QStringList functions(); // return list of functions supported
 
     public slots:
         QStringList parseFilter(QString query, QStringList *list=0);

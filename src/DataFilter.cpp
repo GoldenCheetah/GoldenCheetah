@@ -31,6 +31,65 @@
 
 #include "DataFilter_yacc.h"
 
+// v4 functions
+static struct {
+
+    QString name;
+    int parameters;
+
+} DataFilterFunctions[] = {
+
+    // ALWAYS ADD TO BOTTOM OF LIST AS ARRAY OFFSET
+    // USED IN SWITCH STATEMENT AT RUNTIME DO NOT BE
+    // TEMPTED TO ADD IN THE MIDDLE !!!!
+
+    // math.h
+    { "cos", 1 },
+    { "tan", 1 },
+    { "sin", 1 },
+    { "acos", 1 },
+    { "atan", 1 },
+    { "asin", 1 },
+    { "cosh", 1 },
+    { "tanh", 1 },
+    { "sinh", 1 },
+    { "acosh", 1 },
+    { "atanh", 1 },
+    { "asinh", 1 },
+
+    { "exp", 1 },
+    { "log", 1 },
+    { "log10", 1 },
+
+    { "ceil", 1 },
+    { "floor", 1 },
+    { "round", 1 },
+
+    { "fabs", 1 },
+    { "isinf", 1 },
+    { "isnan", 1 },
+
+    // add new ones above this line
+    { "", -1 }
+};
+
+QStringList
+DataFilter::functions()
+{
+    QStringList returning;
+
+    for(int i=0; DataFilterFunctions[i].parameters != -1; i++) {
+        QString function = DataFilterFunctions[i].name + "(";
+        for(int j=0; j<DataFilterFunctions[i].parameters; j++) {
+            if (j) function += ", ";
+             function += QString("p%1").arg(j+1);
+        }
+        function += ")";
+        returning << function;
+    }
+    return returning;
+}
+
 // LEXER VARIABLES WE INTERACT WITH
 // Standard yacc/lex variables / functions
 extern int DataFilterlex(); // the lexer aka yylex()
@@ -99,6 +158,10 @@ Leaf::isDynamic(Leaf *leaf)
 void Leaf::print(Leaf *leaf, int level)
 {
     qDebug()<<"LEVEL"<<level;
+    if (leaf == NULL) {
+        qDebug()<<"NULL";
+        return;
+    }
     switch(leaf->type) {
     case Leaf::Float : qDebug()<<"float"<<leaf->lvalue.f<<leaf->dynamic; break;
     case Leaf::Integer : qDebug()<<"integer"<<leaf->lvalue.i<<leaf->dynamic; break;
@@ -117,14 +180,26 @@ void Leaf::print(Leaf *leaf, int level)
                     leaf->print(leaf->lvalue.l, level+1);
                     leaf->print(leaf->rvalue.l, level+1);
                     break;
-    case Leaf::Function : qDebug()<<"function"<<leaf->function<<"parm="<<*(leaf->series->lvalue.n);
-                    if (leaf->lvalue.l) leaf->print(leaf->lvalue.l, level+1);
+    case Leaf::Function :
+                    if (leaf->series) {
+                        qDebug()<<"function"<<leaf->function<<"parm="<<*(leaf->series->lvalue.n);
+                        if (leaf->lvalue.l) leaf->print(leaf->lvalue.l, level+1);
+                    } else {
+                        qDebug()<<"function"<<leaf->function<<"parms:"<<leaf->fparms.count();
+                        foreach(Leaf*l, leaf->fparms) leaf->print(l, level+1);
+                    }
                     break;
     case Leaf::Conditional : qDebug()<<"cond";
         {
                     leaf->print(leaf->cond.l, level+1);
                     leaf->print(leaf->lvalue.l, level+1);
                     leaf->print(leaf->rvalue.l, level+1);
+        }
+        break;
+    case Leaf::Parameters :
+        {
+        qDebug()<<"parameters"<<leaf->fparms.count();
+        foreach(Leaf*l, fparms) leaf->print(l, level+1);
         }
         break;
 
@@ -180,6 +255,7 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
             return true;
         }
         break;
+    case Leaf::Parameters : return false; break;
 
     default:
         return false;
@@ -244,42 +320,69 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
             QRegExp configValidSymbols("^(cp|w\\'|pmax|cv|d\\'|scv|sd\\'|height|weight|lthr|maxhr|rhr|units)$", Qt::CaseInsensitive);
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
-            QString symbol = leaf->series->lvalue.n->toLower();
 
-            if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb" || leaf->function == "rr") {
+            if (leaf->series) { // old way of hand crafting each function in the lexer including support for literal parameter e.g. (power, 1)
 
-                // does the symbol exist though ?
-                QString lookup = df->lookupMap.value(symbol, "");
-                if (lookup == "") DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
+                QString symbol = leaf->series->lvalue.n->toLower();
 
-            } else {
+                if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb" || leaf->function == "rr") {
 
-                if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol))
-                    DataFiltererrors << QString(QObject::tr("invalid data series for best(): %1")).arg(symbol);
+                    // does the symbol exist though ?
+                    QString lookup = df->lookupMap.value(symbol, "");
+                    if (lookup == "") DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
 
-                if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol))
-                    DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
+                } else {
 
-                if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol))
-                    DataFiltererrors << QString(QObject::tr("invalid data series for config(): %1")).arg(symbol);
+                    if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol))
+                        DataFiltererrors << QString(QObject::tr("invalid data series for best(): %1")).arg(symbol);
 
-                if (leaf->function == "const") {
-                    if (!constValidSymbols.exactMatch(symbol))
-                        DataFiltererrors << QString(QObject::tr("invalid literal for const(): %1")).arg(symbol);
-                    else {
+                    if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol))
+                        DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
 
-                        // convert to a float
-                        leaf->type = Leaf::Float;
-                        leaf->lvalue.f = 0.0L;
-                        if (symbol == "e") leaf->lvalue.f = MATHCONST_E;
-                        if (symbol == "pi") leaf->lvalue.f = MATHCONST_PI;
+                    if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol))
+                        DataFiltererrors << QString(QObject::tr("invalid data series for config(): %1")).arg(symbol);
+
+                    if (leaf->function == "const") {
+                        if (!constValidSymbols.exactMatch(symbol))
+                            DataFiltererrors << QString(QObject::tr("invalid literal for const(): %1")).arg(symbol);
+                        else {
+
+                            // convert to a float
+                            leaf->type = Leaf::Float;
+                            leaf->lvalue.f = 0.0L;
+                            if (symbol == "e") leaf->lvalue.f = MATHCONST_E;
+                            if (symbol == "pi") leaf->lvalue.f = MATHCONST_PI;
+                        }
+                    }
+
+                    if (leaf->function == "best" || leaf->function == "tiz") {
+                        // now set the series type used as parameter 1 to best/tiz
+                        leaf->seriesType = nameToSeries(symbol);
+                    }
+                }
+            } else { // generic functions, math etc
+
+                bool found=false;
+
+                // are the parameters well formed ?
+                foreach(Leaf *p, leaf->fparms) validateFilter(df, p);
+
+                // does it exist?
+                for(int i=0; DataFilterFunctions[i].parameters != -1; i++) {
+                    if (DataFilterFunctions[i].name == leaf->function) {
+
+                        // with the right number of parameters?
+                        if (leaf->fparms.count() != DataFilterFunctions[i].parameters) {
+                            DataFiltererrors << QString(QObject::tr("function '%1' expects %2 parameter(s) not %3")).arg(leaf->function)
+                                                .arg(DataFilterFunctions[i].parameters).arg(fparms.count());
+                        }
+                        found = true;
+                        break;
                     }
                 }
 
-                if (leaf->function == "best" || leaf->function == "tiz") {
-                    // now set the series type used as parameter 1 to best/tiz
-                    leaf->seriesType = nameToSeries(symbol);
-                }
+                // not known!
+                if (!found) DataFiltererrors << QString(QObject::tr("unknown function %1")).arg(leaf->function);
 
             }
         }
@@ -319,6 +422,13 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             validateFilter(df, leaf->cond.l);
             validateFilter(df, leaf->lvalue.l);
             validateFilter(df, leaf->rvalue.l);
+        }
+        break;
+
+    case Leaf::Parameters :
+        {
+            // should never get here !
+            DataFiltererrors << QObject::tr("internal parser error: parms");
         }
         break;
 
@@ -575,8 +685,8 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
             //
             // LTHR, MaxHR, RHR
             //
-            int hrZoneRange = context->athlete->hrZones() ? 
-                              context->athlete->hrZones()->whichRange(m->dateTime.date()) 
+            int hrZoneRange = context->athlete->hrZones() ?
+                              context->athlete->hrZones()->whichRange(m->dateTime.date())
                               : -1;
 
             int LTHR = hrZoneRange != -1 ?  context->athlete->hrZones()->getLT(hrZoneRange) : 0;
@@ -586,15 +696,15 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
             //
             // CV' D'
             //
-            int paceZoneRange = context->athlete->paceZones(false) ? 
-                                context->athlete->paceZones(false)->whichRange(m->dateTime.date()) : 
+            int paceZoneRange = context->athlete->paceZones(false) ?
+                                context->athlete->paceZones(false)->whichRange(m->dateTime.date()) :
                                 -1;
 
             double CV = (paceZoneRange != -1) ? context->athlete->paceZones(false)->getCV(paceZoneRange) : 0.0;
             double DPRIME = 0; //XXX(paceZoneRange != -1) ? context->athlete->paceZones(false)->getDPrime(paceZoneRange) : 0.0;
 
-            int spaceZoneRange = context->athlete->paceZones(true) ? 
-                                context->athlete->paceZones(true)->whichRange(m->dateTime.date()) : 
+            int spaceZoneRange = context->athlete->paceZones(true) ?
+                                context->athlete->paceZones(true)->whichRange(m->dateTime.date()) :
                                 -1;
             double SCV = (spaceZoneRange != -1) ? context->athlete->paceZones(true)->getCV(spaceZoneRange) : 0.0;
             double SDPRIME = 0; //XXX (spaceZoneRange != -1) ? context->athlete->paceZones(true)->getDPrime(spaceZoneRange) : 0.0;
@@ -650,51 +760,99 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
         }
 
         // get here for tiz and best
-        switch (leaf->lvalue.l->type) {
+        if (leaf->function == "best" || leaf->function == "tiz") {
 
-            default:
-            case Leaf::Function :
-            {
-                duration = eval(context, df, leaf->lvalue.l, m).number; // duration will be zero if string
-            }
-            break;
+            switch (leaf->lvalue.l->type) {
 
-            case Leaf::Symbol :
-            {
-                QString rename;
-                // get symbol value
-                if (df->lookupType.value(*(leaf->lvalue.l->lvalue.n)) == true) {
-                    // numeric
-                    duration = m->getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
-                } else {
-                    duration = 0;
+                default:
+                case Leaf::Function :
+                {
+                    duration = eval(context, df, leaf->lvalue.l, m).number; // duration will be zero if string
                 }
+                break;
+
+                case Leaf::Symbol :
+                {
+                    QString rename;
+                    // get symbol value
+                    if (df->lookupType.value(*(leaf->lvalue.l->lvalue.n)) == true) {
+                        // numeric
+                        duration = m->getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
+                    } else {
+                        duration = 0;
+                    }
+                }
+                break;
+
+                case Leaf::Float :
+                    duration = leaf->lvalue.l->lvalue.f;
+                    break;
+
+                case Leaf::Integer :
+                    duration = leaf->lvalue.l->lvalue.i;
+                    break;
+
+                case Leaf::String :
+                    duration = (leaf->lvalue.l->lvalue.s)->toDouble();
+                    break;
+
+                break;
             }
-            break;
 
-            case Leaf::Float :
-                duration = leaf->lvalue.l->lvalue.f;
-                break;
+            if (leaf->function == "best")
+                return Result(RideFileCache::best(df->context, m->fileName, leaf->seriesType, duration));
 
-            case Leaf::Integer :
-                duration = leaf->lvalue.l->lvalue.i;
-                break;
-
-            case Leaf::String :
-                duration = (leaf->lvalue.l->lvalue.s)->toDouble();
-                break;
-
-            break;
+            if (leaf->function == "tiz") // duration is really zone number
+                return Result(RideFileCache::tiz(df->context, m->fileName, leaf->seriesType, duration));
         }
 
-        if (leaf->function == "best")
-            return Result(RideFileCache::best(df->context, m->fileName, leaf->seriesType, duration));
+        // if we get here its general function handling
+        // what function is being called?
+        int fnum=-1;
+        for (int i=0; DataFilterFunctions[i].parameters != -1; i++) {
+            if (DataFilterFunctions[i].name == leaf->function) {
 
-        if (leaf->function == "tiz") // duration is really zone number
-            return Result(RideFileCache::tiz(df->context, m->fileName, leaf->seriesType, duration));
+                // parameter mismatch not allowed; function signature mismatch
+                // should be impossible...
+                if (DataFilterFunctions[i].parameters != leaf->fparms.count())
+                    fnum=-1;
+                else
+                    fnum = i;
+                break;
+            }
+        }
 
-        // unknown function!?
-        return Result(0) ;
+        // not found...
+        if (fnum < 0) return Result(0);
+
+        switch (fnum) {
+        case 0 : { return Result(cos(eval(context, df, leaf->fparms[0], m).number)); } // COS(x)
+        case 1 : { return Result(tan(eval(context, df, leaf->fparms[0], m).number)); } // TAN(x)
+        case 2 : { return Result(sin(eval(context, df, leaf->fparms[0], m).number)); } // SIN(x)
+        case 3 : { return Result(acos(eval(context, df, leaf->fparms[0], m).number)); } // ACOS(x)
+        case 4 : { return Result(atan(eval(context, df, leaf->fparms[0], m).number)); } // ATAN(x)
+        case 5 : { return Result(asin(eval(context, df, leaf->fparms[0], m).number)); } // ASIN(x)
+        case 6 : { return Result(cosh(eval(context, df, leaf->fparms[0], m).number)); } // COSH(x)
+        case 7 : { return Result(tanh(eval(context, df, leaf->fparms[0], m).number)); } // TANH(x)
+        case 8 : { return Result(sinh(eval(context, df, leaf->fparms[0], m).number)); } // SINH(x)
+        case 9 : { return Result(acosh(eval(context, df, leaf->fparms[0], m).number)); } // ACOSH(x)
+        case 10 : { return Result(atanh(eval(context, df, leaf->fparms[0], m).number)); } // ATANH(x)
+        case 11 : { return Result(asinh(eval(context, df, leaf->fparms[0], m).number)); } // ASINH(x)
+
+        case 12 : { return Result(exp(eval(context, df, leaf->fparms[0], m).number)); } // EXP(x)
+        case 13 : { return Result(log(eval(context, df, leaf->fparms[0], m).number)); } // LOG(x)
+        case 14 : { return Result(log10(eval(context, df, leaf->fparms[0], m).number)); } // LOG10(x)
+
+        case 15 : { return Result(ceil(eval(context, df, leaf->fparms[0], m).number)); } // CEIL(x)
+        case 16 : { return Result(floor(eval(context, df, leaf->fparms[0], m).number)); } // FLOOR(x)
+        case 17 : { return Result(round(eval(context, df, leaf->fparms[0], m).number)); } // ROUND(x)
+
+        case 18 : { return Result(fabs(eval(context, df, leaf->fparms[0], m).number)); } // FABS(x)
+        case 19 : { return Result(isinf(eval(context, df, leaf->fparms[0], m).number)); } // ISINF(x)
+        case 20 : { return Result(isnan(eval(context, df, leaf->fparms[0], m).number)); } // ISNAN(x)
+        default:
+            return Result(0);
+        }
     }
     break;
 

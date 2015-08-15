@@ -71,7 +71,7 @@ extern Leaf *root; // root node for parsed statement
    char function[32];
 }
 
-%type <leaf> symbol value lexpr expr;
+%type <leaf> symbol value lexpr expr parms;
 %type <op> lop cop bop;
 
 %left ADD SUBTRACT DIVIDE MULTIPLY POW
@@ -84,7 +84,15 @@ extern Leaf *root; // root node for parsed statement
 filter: lexpr                       { root = $1; }
         ;
 
-lexpr : expr lop expr             { $$ = new Leaf();
+parms: lexpr                        { $$ = new Leaf();
+                                      $$->type = Leaf::Parameters;
+                                      $$->fparms << $1;
+                                    }
+
+        | parms ',' lexpr           { $1->fparms << $3; }
+        ;
+
+lexpr   : expr lop expr             { $$ = new Leaf();
                                       $$->type = Leaf::Logical;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
@@ -128,6 +136,23 @@ expr : '(' expr ')'               { $$ = new Leaf();
                                   }
 
       | value                        { $$ = $1; }
+
+                                    /* functions all have zero or more parameters */
+
+      | symbol '(' parms ')'    { /* need to convert symbol to a function */
+                                  $1->type = Leaf::Function;
+                                  $1->series = NULL; // not tiz/best
+                                  $1->function = *($1->lvalue.n);
+                                  $1->fparms = $3->fparms;
+                                }
+
+      | symbol '(' ')'          {
+                                  /* need to convert symbol to function */
+                                  $1->type = Leaf::Function;
+                                  $1->series = NULL; // not tiz/best
+                                  $1->function = *($1->lvalue.n);
+                                  $1->fparms.clear(); // no parameters!
+                                }
 
       ;
 
