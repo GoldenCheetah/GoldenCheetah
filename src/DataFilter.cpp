@@ -255,7 +255,6 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
     case Leaf::BinaryOperation : 
                     leaf->color(leaf->lvalue.l, document);
                     leaf->color(leaf->rvalue.l, document);
-                    return;
                     break;
 
     case Leaf::Function :
@@ -272,6 +271,7 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
                     leaf->color(leaf->lvalue.l, document);
                     leaf->color(leaf->fparms[0], document);
                     leaf->color(leaf->fparms[1], document);
+                    return;
                     break;
 
     case Leaf::Conditional : 
@@ -297,6 +297,11 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
     cursor.selectionStart();
     cursor.setPosition(leaf->leng+1, QTextCursor::KeepAnchor);
     cursor.selectionEnd();
+
+    if (leaf->inerror == true) {
+        apply.setUnderlineStyle(QTextCharFormat::WaveUnderline);
+        apply.setUnderlineColor(Qt::red);
+    }
 
     cursor.setCharFormat(apply);
 }
@@ -440,6 +445,8 @@ Q_UNUSED(leaf);
 
 void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 {
+    leaf->inerror = false;
+
     switch(leaf->type) {
     case Leaf::Symbol :
         {
@@ -455,8 +462,10 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                 if (symbol.compare("Date", Qt::CaseInsensitive) &&
                     symbol.compare("Today", Qt::CaseInsensitive) &&
                     symbol.compare("Current", Qt::CaseInsensitive) &&
-                    symbol != "isSwim" && symbol != "isRun" && !isCoggan(symbol))
+                    symbol != "isSwim" && symbol != "isRun" && !isCoggan(symbol)) {
                     DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
+                    leaf->inerror = true;
+                }
 
                 if (symbol.compare("Current", Qt::CaseInsensitive))
                     leaf->dynamic = true;
@@ -489,18 +498,27 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
                     // does the symbol exist though ?
                     QString lookup = df->lookupMap.value(symbol, "");
-                    if (lookup == "") DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
+                    if (lookup == "") {
+                        DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
+                        leaf->inerror = true;
+                    }
 
                 } else {
 
-                    if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol))
+                    if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol)) {
                         DataFiltererrors << QString(QObject::tr("invalid data series for best(): %1")).arg(symbol);
+                        leaf->inerror = true;
+                    }
 
-                    if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol))
+                    if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol)) {
                         DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
+                        leaf->inerror = true;
+                    }
 
                     if (leaf->function == "daterange" && !dateRangeValidSymbols.exactMatch(symbol)) {
                         DataFiltererrors << QString(QObject::tr("invalid literal for daterange(): %1")).arg(symbol);
+                        leaf->inerror = true;
+
                     } else {
                         // convert to int days since using current date range config
                         // should be able to get from parent somehow
@@ -510,13 +528,16 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                         else leaf->lvalue.i = 0;
                     }
 
-                    if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol))
+                    if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol)) {
                         DataFiltererrors << QString(QObject::tr("invalid literal for config(): %1")).arg(symbol);
+                        leaf->inerror = true;
+                    }
 
                     if (leaf->function == "const") {
-                        if (!constValidSymbols.exactMatch(symbol))
+                        if (!constValidSymbols.exactMatch(symbol)) {
                             DataFiltererrors << QString(QObject::tr("invalid literal for const(): %1")).arg(symbol);
-                        else {
+                            leaf->inerror = true;
+                        } else {
 
                             // convert to a float
                             leaf->type = Leaf::Float;
@@ -546,6 +567,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                         if (leaf->fparms.count() != DataFilterFunctions[i].parameters) {
                             DataFiltererrors << QString(QObject::tr("function '%1' expects %2 parameter(s) not %3")).arg(leaf->function)
                                                 .arg(DataFilterFunctions[i].parameters).arg(fparms.count());
+                            leaf->inerror = true;
                         }
                         found = true;
                         break;
@@ -553,8 +575,10 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                 }
 
                 // not known!
-                if (!found) DataFiltererrors << QString(QObject::tr("unknown function %1")).arg(leaf->function);
-
+                if (!found) {
+                    DataFiltererrors << QString(QObject::tr("unknown function %1")).arg(leaf->function);
+                    leaf->inerror=true;
+                }
             }
         }
         break;
@@ -567,12 +591,14 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             bool rhsType = Leaf::isNumber(df, leaf->rvalue.l);
             if (lhsType != rhsType) {
                 DataFiltererrors << QString(QObject::tr("comparing strings with numbers"));
+                leaf->inerror = true;
             }
 
             // what about using string operations on a lhs/rhs that
             // are numeric?
             if ((lhsType || rhsType) && leaf->op >= MATCHES && leaf->op <= CONTAINS) {
                 DataFiltererrors << QObject::tr("using a string operations with a number");
+                leaf->inerror = true;
             }
 
             validateFilter(df, leaf->lvalue.l);
@@ -600,6 +626,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
         {
             // should never get here !
             DataFiltererrors << QObject::tr("internal parser error: parms");
+            leaf->inerror = true;
         }
         break;
 

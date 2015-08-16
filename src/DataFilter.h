@@ -52,7 +52,7 @@ class Leaf {
 
     public:
 
-        Leaf(int loc, int leng) : type(none),op(0),series(NULL),dynamic(false),loc(loc),leng(leng) { }
+        Leaf(int loc, int leng) : type(none),op(0),series(NULL),dynamic(false),loc(loc),leng(leng),inerror(false) { }
 
         // evaluate against a RideItem
         Result eval(Context *context, DataFilter *df, Leaf *, RideItem *m);
@@ -86,6 +86,7 @@ class Leaf {
         bool dynamic;
         RideFile::SeriesType seriesType; // for ridefilecache
         int loc, leng;
+        bool inerror;
 };
 
 class DataFilter : public QObject
