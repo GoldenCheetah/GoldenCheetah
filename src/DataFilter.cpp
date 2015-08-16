@@ -265,6 +265,7 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
     case Leaf::BinaryOperation : 
                     leaf->color(leaf->lvalue.l, document);
                     leaf->color(leaf->rvalue.l, document);
+                    return;
                     break;
 
     case Leaf::Function :
