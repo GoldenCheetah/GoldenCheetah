@@ -149,6 +149,8 @@ Leaf::isDynamic(Leaf *leaf)
                            leaf->isDynamic(leaf->rvalue.l);
                     break;
         }
+    case Leaf::Vector :
+        return true;
         break;
 
     }
@@ -266,6 +268,12 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
                     }
                     break;
 
+    case Leaf::Vector :
+                    leaf->color(leaf->lvalue.l, document);
+                    leaf->color(leaf->fparms[0], document);
+                    leaf->color(leaf->fparms[1], document);
+                    break;
+
     case Leaf::Conditional : 
         {
                     leaf->color(leaf->cond.l, document);
@@ -327,6 +335,10 @@ void Leaf::print(Leaf *leaf, int level)
                         foreach(Leaf*l, leaf->fparms) leaf->print(l, level+1);
                     }
                     break;
+    case Leaf::Vector : qDebug()<<"vector";
+                    leaf->print(leaf->lvalue.l, level+1);
+                    leaf->print(leaf->fparms[0], level+1);
+                    leaf->print(leaf->fparms[1], level+1);
     case Leaf::Conditional : qDebug()<<"cond";
         {
                     leaf->print(leaf->cond.l, level+1);
@@ -388,6 +400,7 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
     case Leaf::Operation : return true;
     case Leaf::BinaryOperation : return true;
     case Leaf::Function : return true;
+    case Leaf::Vector :
     case Leaf::Conditional :
         {
             return true;
@@ -451,6 +464,14 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
         }
         break;
 
+    case Leaf::Vector :
+        {
+            leaf->validateFilter(df, leaf->lvalue.l);
+            leaf->validateFilter(df, leaf->fparms[0]);
+            leaf->validateFilter(df, leaf->fparms[1]);
+        }
+        return;
+
     case Leaf::Function :
         {
             // is the symbol valid?
@@ -458,6 +479,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
             QRegExp configValidSymbols("^(cp|w\\'|pmax|cv|d\\'|scv|sd\\'|height|weight|lthr|maxhr|rhr|units)$", Qt::CaseInsensitive);
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
+            QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
 
             if (leaf->series) { // old way of hand crafting each function in the lexer including support for literal parameter e.g. (power, 1)
 
@@ -476,6 +498,17 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
                     if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol))
                         DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
+
+                    if (leaf->function == "daterange" && !dateRangeValidSymbols.exactMatch(symbol)) {
+                        DataFiltererrors << QString(QObject::tr("invalid literal for daterange(): %1")).arg(symbol);
+                    } else {
+                        // convert to int days since using current date range config
+                        // should be able to get from parent somehow
+                        leaf->type = Leaf::Integer;
+                        if (symbol == "start") leaf->lvalue.i = QDate(1900,01,01).daysTo(df->context->currentDateRange().from);
+                        else if (symbol == "stop") leaf->lvalue.i = QDate(1900,01,01).daysTo(df->context->currentDateRange().to);
+                        else leaf->lvalue.i = 0;
+                    }
 
                     if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol))
                         DataFiltererrors << QString(QObject::tr("invalid literal for config(): %1")).arg(symbol);
@@ -1240,6 +1273,55 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
         else return eval(context, df, leaf->rvalue.l, m);
     }
     break;
+
+    case Leaf::Vector :
+    {
+        // places results in vector, and number is sum of all
+        // explicit funcions sum/avg/max/min will return non-sum
+        // values. No vector operations are supported at present
+        // as a DESIGN DECISION. They are too complex for the average
+        // user to understand. We will integrate to R for users
+        // that want that kind of power.
+        //
+        // Vectors are about collecting data from across a date range
+        // so you can use them within a formula for simple kinds of
+        // operations; e.g. how much of todays' workouts in time
+        // does this workout represent would be:
+        // Duration / Duration[today:today] * 100.00
+
+        Specification spec;
+
+        // get date range
+        int fromDS = eval(context, df, leaf->fparms[0], m).number;
+        int toDS = eval(context, df, leaf->fparms[1], m).number;
+
+        // swap dates if needed
+        if (toDS < fromDS) {
+            int swap=fromDS;
+            fromDS = toDS;
+            toDS = swap;
+        }
+
+        spec.setDateRange(DateRange(QDate(1900,01,01).addDays(fromDS),QDate(1900,01,01).addDays(toDS)));
+
+        Result returning(0);
+
+        // now iterate and evaluate for each
+        foreach(RideItem *ride, context->athlete->rideCache->rides()) {
+
+            if (!spec.pass(ride)) continue;
+
+            // calculate value
+            Result res = eval(context, df, leaf->lvalue.l, ride);
+            if (res.isNumber) {
+                returning.number += res.number; // sum for easy access
+                returning.vector << res.number;
+            }
+        }
+
+        // always return as sum number (for now)
+        return returning;
+    }
 
     default: // we don't need to evaluate any lower - they are leaf nodes handled above
         break;

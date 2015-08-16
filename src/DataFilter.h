@@ -45,6 +45,7 @@ class Result {
         bool isNumber;           // if true, value is numeric
         QString string;
         double number;
+        QList<double> vector;
 };
 
 class Leaf {
@@ -64,7 +65,11 @@ class Leaf {
         bool isNumber(DataFilter *df, Leaf *leaf);
         void clear(Leaf*);
 
-        enum { none, Float, Integer, String, Symbol, Logical, Operation, BinaryOperation, Function, Conditional, Parameters } type;
+        enum { none, Float, Integer, String, Symbol, 
+               Logical, Operation, BinaryOperation, 
+               Function, Conditional, Vector,
+               Parameters } type;
+
         union value {
             float f;
             int i;
