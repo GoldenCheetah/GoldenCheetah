@@ -45,8 +45,6 @@ int DataFiltercolumn = 1;
 "<="                                        DataFilterlval.op = LTE; return LTE;
 ">"                                         DataFilterlval.op = GT; return GT;
 ">="                                        DataFilterlval.op = GTE; return GTE;
-":"                                         DataFilterlval.op = COL; return COL;
-"?"                                         DataFilterlval.op = Q; return Q;
 
 [Mm][Aa][Tt][Cc][Hh][Ee][Ss]                DataFilterlval.op = MATCHES; return MATCHES;
 [Bb][Ee][Gg][Ii][Nn][Ss][Ww][Ii][Tt][Hh]    DataFilterlval.op = BEGINSWITH; return BEGINSWITH;
@@ -62,6 +60,7 @@ int DataFiltercolumn = 1;
 [Ss][Bb]                                   strcpy(DataFilterlval.function, "sb"); return SB;
 [Rr][Rr]                                   strcpy(DataFilterlval.function, "rr"); return RR;
 [Cc][Oo][Nn][Ff][Ii][Gg]                   strcpy(DataFilterlval.function, "config"); return CONFIG;
+[Dd][Aa][Tt][Ee][Rr][Aa][Nn][Gg][Ee]       strcpy(DataFilterlval.function, "daterange"); return DATERANGE;
 [Cc][Oo][Nn][Ss][Tt]                       strcpy(DataFilterlval.function, "const"); return CONST_;
 
 "&&"                                        DataFilterlval.op = AND; return AND;
