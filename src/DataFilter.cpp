@@ -35,7 +35,7 @@
 static struct {
 
     QString name;
-    int parameters;
+    int parameters; // -1 is end of list, 0 is variable number, >0 is number of parms needed
 
 } DataFilterFunctions[] = {
 
@@ -69,6 +69,15 @@ static struct {
     { "isinf", 1 },
     { "isnan", 1 },
 
+    // primarily for working with vectors, but can
+    // have variable number of parameters so probably
+    // quite useful for a number of things
+    { "sum", 0 },
+    { "mean", 0 },
+    { "max", 0 },
+    { "min", 0 },
+    { "count", 0 },
+
     // add new ones above this line
     { "", -1 }
 };
@@ -84,7 +93,8 @@ DataFilter::functions()
             if (j) function += ", ";
              function += QString("p%1").arg(j+1);
         }
-        function += ")";
+        if (DataFilterFunctions[i].parameters) function += ")";
+        else function += "...)";
         returning << function;
     }
     return returning;
@@ -564,7 +574,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     if (DataFilterFunctions[i].name == leaf->function) {
 
                         // with the right number of parameters?
-                        if (leaf->fparms.count() != DataFilterFunctions[i].parameters) {
+                        if (DataFilterFunctions[i].parameters && leaf->fparms.count() != DataFilterFunctions[i].parameters) {
                             DataFiltererrors << QString(QObject::tr("function '%1' expects %2 parameter(s) not %3")).arg(leaf->function)
                                                 .arg(DataFilterFunctions[i].parameters).arg(fparms.count());
                             leaf->inerror = true;
@@ -1041,7 +1051,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
 
                 // parameter mismatch not allowed; function signature mismatch
                 // should be impossible...
-                if (DataFilterFunctions[i].parameters != leaf->fparms.count())
+                if (DataFilterFunctions[i].parameters && DataFilterFunctions[i].parameters != leaf->fparms.count())
                     fnum=-1;
                 else
                     fnum = i;
@@ -1077,6 +1087,84 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
         case 18 : { return Result(fabs(eval(context, df, leaf->fparms[0], m).number)); } // FABS(x)
         case 19 : { return Result(std::isinf(eval(context, df, leaf->fparms[0], m).number)); } // ISINF(x)
         case 20 : { return Result(std::isnan(eval(context, df, leaf->fparms[0], m).number)); } // ISNAN(x)
+
+        case 21 : { /* SUM( ... ) */
+                    double sum=0;
+
+                    foreach(Leaf *l, leaf->fparms) {
+                        sum += eval(context, df, l, m).number; // for vectors number is sum
+                    }
+                    return Result(sum);
+                  }
+                  break;
+
+        case 22 : { /* MEAN( ... ) */
+                    double sum=0;
+                    int count=0;
+
+                    foreach(Leaf *l, leaf->fparms) {
+                        Result res = eval(context, df, l, m); // for vectors number is sum
+                        sum += res.number;
+                        if (res.vector.count()) count += res.vector.count();
+                        else count++;
+                    }
+                    return count ? Result(sum/double(count)) : Result(0);
+                  }
+                  break;
+
+        case 23 : { /* MAX( ... ) */
+                    double max=0;
+                    bool set=false;
+
+                    foreach(Leaf *l, leaf->fparms) {
+                        Result res = eval(context, df, l, m);
+                        if (res.vector.count()) {
+                            foreach(double x, res.vector) {
+                                if (set && x>max) max=x;
+                                else if (!set) { set=true; max=x; }
+                            }
+
+                        } else {
+                            if (set && res.number>max) max=res.number;
+                            else if (!set) { set=true; max=res.number; }
+                        }
+                    }
+                    return Result(max);
+                  }
+                  break;
+
+        case 24 : { /* MIN( ... ) */
+                    double min=0;
+                    bool set=false;
+
+                    foreach(Leaf *l, leaf->fparms) {
+                        Result res = eval(context, df, l, m);
+                        if (res.vector.count()) {
+                            foreach(double x, res.vector) {
+                                if (set && x<min) min=x;
+                                else if (!set) { set=true; min=x; }
+                            }
+
+                        } else {
+                            if (set && res.number<min) min=res.number;
+                            else if (!set) { set=true; min=res.number; }
+                        }
+                    }
+                    return Result(min);
+                  }
+                  break;
+
+        case 25 : { /* COUNT( ... ) */
+
+                    int count = 0;
+                    foreach(Leaf *l, leaf->fparms) {
+                        Result res = eval(context, df, l, m);
+                        if (res.vector.count()) count += res.vector.count();
+                        else count++;
+                    }
+                    return Result(count);
+                  }
+                  break;
         default:
             return Result(0);
         }
