@@ -165,6 +165,8 @@ SearchBox::configChanged(qint32)
     list << "config(units)";
     list << "const(e)";
     list << "const(pi)";
+    list << "daterange(start)";
+    list << "daterange(stop)";
     list << "ctl";
     list << "tsb";
     list << "atl";

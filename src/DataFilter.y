@@ -54,10 +54,9 @@ extern Leaf *root; // root node for parsed statement
 
 // Constants can be a string or a number
 %token <leaf> DF_STRING DF_INTEGER DF_FLOAT
-%token <function> BEST TIZ STS LTS SB RR CONFIG CONST_
+%token <function> BEST TIZ STS LTS SB RR CONFIG CONST_ DATERANGE
 
 // comparative operators
-%token <op> Q COL
 %token <op> EQ NEQ LT LTE GT GTE
 %token <op> ADD SUBTRACT DIVIDE MULTIPLY POW
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
@@ -104,11 +103,13 @@ lexpr   : expr lop expr             { $$ = new Leaf(@1.first_column, @3.last_col
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
+
         | '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
                                       $$->type = Leaf::Logical;
                                       $$->lvalue.l = $2;
                                       $$->op = 0; }
         | expr                       { $$ = $1; }
+
         ;
 
 
@@ -129,13 +130,21 @@ expr : '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_colum
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
 
-      | expr Q expr COL expr      { $$ = new Leaf(@1.first_column, @5.last_column);
+      | expr '?' expr ':' expr      { $$ = new Leaf(@1.first_column, @5.last_column);
                                     $$->type = Leaf::Conditional;
                                     $$->op = 0; // unused
                                     $$->lvalue.l = $3;
                                     $$->rvalue.l = $5;
                                     $$->cond.l = $1;
                                   }
+
+        | expr '[' expr ':' expr ']' { $$ = new Leaf(@1.first_column, @6.last_column);
+                                          $$->type = Leaf::Vector;
+                                          $$->lvalue.l = $1;
+                                          $$->fparms << $3;
+                                          $$->fparms << $5;
+                                          $$->op = 0; }
+
 
       | value                        { $$ = $1; }
 
@@ -239,6 +248,11 @@ value : symbol                      { $$ = $1; }
                                         $$->lvalue.l = NULL;
                                       }
       | CONST_ '(' symbol ')'       {   $$ = new Leaf(@1.first_column, @4.last_column); $$->type = Leaf::Function;
+                                        $$->function = QString($1);
+                                        $$->series = $3;
+                                        $$->lvalue.l = NULL;
+                                      }
+      | DATERANGE '(' symbol ')'       {   $$ = new Leaf(@1.first_column, @4.last_column); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
                                         $$->lvalue.l = NULL;
