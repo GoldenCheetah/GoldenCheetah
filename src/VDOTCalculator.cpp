@@ -14,6 +14,10 @@
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * The Daniels-Gilbert fomula used for VDOT and vVDOT was taken from:
+ * http://www.simpsonassociatesinc.com/runningmath1.htm
+ * T-PACE as 90%vVDOT from Daniels' Running Formula book
  */
 
 #include "VDOTCalculator.h"
@@ -136,17 +140,17 @@ void VDOTCalculator::on_btnCalculate_clicked()
     double dist = distSpinBox->value();
     // velocity m/min
     double vel = (metricRnPace ? 1.0 : KM_PER_MILE)*1000*dist/mins;
-    // estimated VO2
+    // estimated VO2 costo of running at vel speed
     double VO2 = -4.3 + 0.182258*vel + 0.000104*pow(vel, 2);
-    // fractional utilization of VO2max
+    // fractional utilization of VO2max for mins duration
     double FVO2 = 0.8 + 0.1894393*exp(-0.012778*mins) + 0.2989558*exp(-0.1932605*mins);
-    // VDOT: estimated VO2max based on Daniels' Running Formula
+    // VDOT: estimated VO2max based on Daniels/Gilbert Formula
     double VDOT = VO2 / FVO2;
     txtVDOT->setText(QString("%1 ml/min/kg").arg(round(VDOT*10)/10));
-    // velocity at VO2max according to Daniels' Running Formula
-    double vVO2max = 29.54 + 5.000663*VDOT - 0.007546*pow(VDOT, 2);
-    // Threshold Pace estimated at 90% vVO2max
-    double TPACE = 1000.0/vVO2max/0.9;
+    // velocity at VO2max according to Daniels/Gilbert Formula
+    double vVDOT = 29.54 + 5.000663*VDOT - 0.007546*pow(VDOT, 2);
+    // Threshold Pace estimated at 90%vVDOT, from Daniels's Running Formula
+    double TPACE = 1000.0/vVDOT/0.9;
     txtTPACE->setText(QString("%1 %2")
         .arg(QTime(0,0,0).addSecs(TPACE*60*(metricRnPace ? 1.0 : KM_PER_MILE)).toString("mm:ss"))
         .arg(metricRnPace ? tr("min/km") : tr("min/mi")));
