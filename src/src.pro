@@ -376,6 +376,7 @@ HEADERS += \
         ManualRideFile.h \
         MergeActivityWizard.h \
         MetadataWindow.h \
+        MeterWidget.h \
         MoxyDevice.h \
         MUPlot.h \
         MUPool.h \
@@ -609,6 +610,7 @@ SOURCES += \
         ManualRideFile.cpp \
         MergeActivityWizard.cpp \
         MetadataWindow.cpp \
+        MeterWidget.cpp \
         MoxyDevice.cpp \
         MUPlot.cpp \
         MUWidget.cpp \

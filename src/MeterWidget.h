@@ -1,0 +1,87 @@
+/*
+ * Copyright (c) 2015 Vianney Boyer (vlcvboyer@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#ifndef _MeterWidget_h
+#define _MeterWidget_h 1
+
+#include <QtWidgets>
+
+class MeterWidget : public QWidget
+{
+  public:
+    explicit MeterWidget(QWidget *parent = 0, float RelativeWidth = 100.0, float RelativeHeight = 100.0, float RelativePosX = 0.0, float RelativePosY = 0.0);
+    virtual void SetRelativeSize(float RelativeWidth, float RelativeHeight);
+    virtual void SetRelativePos(float RelativePosX, float RelativePosY);
+    virtual void AdjustSizePos();
+    virtual void ComputeSize();
+    virtual void paintEvent(QPaintEvent* paintevent);
+    virtual QSize sizeHint() const;
+    virtual QSize minimumSize() const;
+
+    float Value, ValueMin, ValueMax;
+    float RangeMin, RangeMax;
+    QString Text, AltText;
+
+    QColor MainColor;
+    QColor ScaleColor;
+    QColor OutlineColor;
+    QFont  MainFont;
+    QFont  AltFont;
+    QColor BackgroundColor;
+
+  protected:
+    QWidget *m_container;
+    float  m_RelativeWidth, m_RelativeHeight;
+    float  m_RelativePosX, m_RelativePosY;
+    int    m_PosX, m_PosY, m_Width, m_Height;
+
+    QBrush m_MainBrush;
+    QBrush m_BackgroundBrush;
+    QBrush m_AltBrush;
+    QPen   m_OutlinePen;
+    QPen   m_ScalePen;
+};
+
+class TextMeterWidget : public MeterWidget
+{
+  public:
+    explicit TextMeterWidget(QWidget *parent = 0, float RelativeWidth = 100.0, float RelativeHeight = 100.0, float RelativePosX = 0.0, float RelativePosY = 0.0);
+    virtual void ComputeSize();
+    virtual void paintEvent(QPaintEvent* paintevent);
+};
+
+class CircularIndicatorMeterWidget : public MeterWidget
+{
+  public:
+    explicit CircularIndicatorMeterWidget(QWidget *parent = 0, float RelativeWidth = 100.0, float RelativeHeight = 100.0, float RelativePosX = 0.0, float RelativePosY = 0.0);
+    virtual void paintEvent(QPaintEvent* paintevent);
+    QConicalGradient IndicatorGradient;
+    float Angle;
+};
+
+class NeedleMeterWidget : public MeterWidget
+{
+  public:
+    explicit NeedleMeterWidget(QWidget *parent = 0, float RelativeWidth = 100.0, float RelativeHeight = 100.0, float RelativePosX = 0.0, float RelativePosY = 0.0);
+    virtual void paintEvent(QPaintEvent* paintevent);
+    float Angle;
+    int   SubRange;
+};
+
+
+#endif // _MeterWidget_h
