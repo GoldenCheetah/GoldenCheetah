@@ -66,7 +66,7 @@ class Leaf {
         void clear(Leaf*);
 
         enum { none, Float, Integer, String, Symbol, 
-               Logical, Operation, BinaryOperation, 
+               Logical, Operation, BinaryOperation, UnaryOperation,
                Function, Conditional, Vector,
                Parameters } type;
 
