@@ -143,6 +143,9 @@ Leaf::isDynamic(Leaf *leaf)
 
     case Leaf::Logical  :
                     if (leaf->op == 0) return leaf->isDynamic(leaf->lvalue.l);
+    case Leaf::UnaryOperation :
+                    return leaf->isDynamic(leaf->lvalue.l);
+                    break;
     case Leaf::Operation :
     case Leaf::BinaryOperation :
                     return leaf->isDynamic(leaf->lvalue.l) || leaf->isDynamic(leaf->rvalue.l);
@@ -262,6 +265,10 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
                     return;
                     break;
 
+    case Leaf::UnaryOperation : 
+                    leaf->color(leaf->lvalue.l, document);
+                    return;
+                    break;
     case Leaf::BinaryOperation : 
                     leaf->color(leaf->lvalue.l, document);
                     leaf->color(leaf->rvalue.l, document);
@@ -337,6 +344,9 @@ void Leaf::print(Leaf *leaf, int level)
     case Leaf::Operation : qDebug()<<"cop"<<leaf->op;
                     leaf->print(leaf->lvalue.l, level+1);
                     leaf->print(leaf->rvalue.l, level+1);
+                    break;
+    case Leaf::UnaryOperation : qDebug()<<"uop"<<leaf->op;
+                    leaf->print(leaf->lvalue.l, level+1);
                     break;
     case Leaf::BinaryOperation : qDebug()<<"bop"<<leaf->op;
                     leaf->print(leaf->lvalue.l, level+1);
@@ -414,6 +424,7 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
         break;
     case Leaf::Logical  : return true; // not possible!
     case Leaf::Operation : return true;
+    case Leaf::UnaryOperation : return true;
     case Leaf::BinaryOperation : return true;
     case Leaf::Function : return true;
     case Leaf::Vector :
@@ -594,6 +605,14 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
         }
         break;
 
+    case Leaf::UnaryOperation :
+        { // only 1 at present, unary minus return the value * -1
+            if (!Leaf::isNumber(df, leaf->lvalue.l)) {
+                DataFiltererrors << QString(QObject::tr("unary negation on a string!"));
+                leaf->inerror = true;
+            }
+        }
+        break;
     case Leaf::BinaryOperation  :
     case Leaf::Operation  :
         {
@@ -1263,6 +1282,18 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
         QDate date = QDate::fromString(string, "yyyy/MM/dd");
         if (date.isValid()) return Result(QDate(1900,01,01).daysTo(date));
         else return Result(string);
+    }
+    break;
+
+    //
+    // UNARY EXPRESSION
+    //
+
+    case Leaf::UnaryOperation :
+    {
+        // get result
+        Result lhs = eval(context, df, leaf->lvalue.l, m);
+        return Result(lhs.number * -1);
     }
     break;
 
