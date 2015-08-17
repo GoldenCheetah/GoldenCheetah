@@ -72,8 +72,10 @@ extern Leaf *root; // root node for parsed statement
 
 %type <leaf> symbol value lexpr expr parms;
 
-%left ADD SUBTRACT POW
+%right '?' ':'
+%left ADD SUBTRACT
 %left MULTIPLY DIVIDE
+%right POW
 %right EQ NEQ LT LTE GT GTE MATCHES ENDSWITH CONTAINS
 %right AND OR
 
