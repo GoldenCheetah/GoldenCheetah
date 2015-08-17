@@ -60,10 +60,7 @@ extern Leaf *root; // root node for parsed statement
 %token <op> EQ NEQ LT LTE GT GTE
 %token <op> ADD SUBTRACT DIVIDE MULTIPLY POW
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
-%type <op> lop cop;
-
-// logical operators
-%token <op> AND OR
+%type <op> AND OR cop;
 
 %union {
    Leaf *leaf;
@@ -96,12 +93,38 @@ parms: lexpr                        { $$ = new Leaf(@1.first_column, @1.last_col
 
 lexpr   : expr                       { $$ = $1; }
 
-        | expr cop expr              { $$ = new Leaf(@1.first_column, @3.last_column);
+        | '(' lexpr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
+                                      $$->type = Leaf::Logical;
+                                      $$->lvalue.l = $2;
+                                      $$->op = 0; }
+
+        | lexpr cop lexpr              { $$ = new Leaf(@1.first_column, @3.last_column);
                                       $$->type = Leaf::Operation;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
-        | lexpr lop lexpr             { $$ = new Leaf(@1.first_column, @3.last_column);
+
+        | lexpr '?' lexpr ':' lexpr      { $$ = new Leaf(@1.first_column, @5.last_column);
+                                    $$->type = Leaf::Conditional;
+                                    $$->op = 0; // unused
+                                    $$->lvalue.l = $3;
+                                    $$->rvalue.l = $5;
+                                    $$->cond.l = $1;
+                                  }
+
+        | lexpr '[' lexpr ':' lexpr ']' { $$ = new Leaf(@1.first_column, @6.last_column);
+                                          $$->type = Leaf::Vector;
+                                          $$->lvalue.l = $1;
+                                          $$->fparms << $3;
+                                          $$->fparms << $5;
+                                          $$->op = 0; }
+
+        | lexpr OR lexpr             { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Logical;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+        | lexpr AND lexpr             { $$ = new Leaf(@1.first_column, @3.last_column);
                                       $$->type = Leaf::Logical;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
@@ -141,30 +164,11 @@ expr : expr SUBTRACT expr              { $$ = new Leaf(@1.first_column, @3.last_
                                       $$->op = $1;
                                       $$->rvalue.l = NULL; 
                                      }
-      | expr '?' expr ':' expr      { $$ = new Leaf(@1.first_column, @5.last_column);
-                                    $$->type = Leaf::Conditional;
-                                    $$->op = 0; // unused
-                                    $$->lvalue.l = $3;
-                                    $$->rvalue.l = $5;
-                                    $$->cond.l = $1;
-                                  }
-
-        | expr '[' expr ':' expr ']' { $$ = new Leaf(@1.first_column, @6.last_column);
-                                          $$->type = Leaf::Vector;
-                                          $$->lvalue.l = $1;
-                                          $$->fparms << $3;
-                                          $$->fparms << $5;
-                                          $$->op = 0; }
 
 
       | value                        { $$ = $1; }
 
                                     /* functions all have zero or more parameters */
-
-     | '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
-                                      $$->type = Leaf::Logical;
-                                      $$->lvalue.l = $2;
-                                      $$->op = 0; }
 
       | symbol '(' parms ')'    { /* need to convert symbol to a function */
                                   $1->type = Leaf::Function;
@@ -200,11 +204,6 @@ cop    : EQ
       | BEGINSWITH
       | CONTAINS
       ;
-
-lop   : AND
-      | OR
-      ;
-
 
 symbol : SYMBOL                      { $$ = new Leaf(@1.first_column, @1.last_column); 
                                        $$->type = Leaf::Symbol;
