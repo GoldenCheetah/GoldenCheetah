@@ -60,6 +60,7 @@ extern Leaf *root; // root node for parsed statement
 %token <op> EQ NEQ LT LTE GT GTE
 %token <op> ADD SUBTRACT DIVIDE MULTIPLY POW
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
+%type <op> lop cop;
 
 // logical operators
 %token <op> AND OR
@@ -73,11 +74,11 @@ extern Leaf *root; // root node for parsed statement
 %locations
 
 %type <leaf> symbol value lexpr expr parms;
-%type <op> lop cop bop;
 
-%left ADD SUBTRACT DIVIDE MULTIPLY POW
-%left EQ NEQ LT LTE GT GTE MATCHES ENDSWITH CONTAINS
-%left AND OR
+%left ADD SUBTRACT POW
+%left MULTIPLY DIVIDE
+%right EQ NEQ LT LTE GT GTE MATCHES ENDSWITH CONTAINS
+%right AND OR
 
 %start filter;
 %%
@@ -93,8 +94,10 @@ parms: lexpr                        { $$ = new Leaf(@1.first_column, @1.last_col
         | parms ',' lexpr           { $1->fparms << $3; }
         ;
 
-lexpr   : expr lop expr             { $$ = new Leaf(@1.first_column, @3.last_column);
-                                      $$->type = Leaf::Logical;
+lexpr   : expr                       { $$ = $1; }
+
+        | expr cop expr              { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Operation;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
@@ -104,27 +107,30 @@ lexpr   : expr lop expr             { $$ = new Leaf(@1.first_column, @3.last_col
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
 
-        | '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
-                                      $$->type = Leaf::Logical;
-                                      $$->lvalue.l = $2;
-                                      $$->op = 0; }
-        | expr                       { $$ = $1; }
-
         ;
 
 
-expr : '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
-                                      $$->type = Leaf::Logical;
-                                      $$->lvalue.l = $2;
-                                      $$->op = 0; }
-
-      | expr cop expr              { $$ = new Leaf(@1.first_column, @3.last_column);
-                                      $$->type = Leaf::Operation;
+expr : expr SUBTRACT expr              { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::BinaryOperation;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
-
-      | expr bop expr              { $$ = new Leaf(@1.first_column, @3.last_column);
+      | expr ADD expr              { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::BinaryOperation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+      | expr DIVIDE expr              { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::BinaryOperation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+      | expr MULTIPLY expr              { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::BinaryOperation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+      | expr POW expr              { $$ = new Leaf(@1.first_column, @3.last_column);
                                       $$->type = Leaf::BinaryOperation;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
@@ -150,6 +156,11 @@ expr : '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_colum
 
                                     /* functions all have zero or more parameters */
 
+     | '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
+                                      $$->type = Leaf::Logical;
+                                      $$->lvalue.l = $2;
+                                      $$->op = 0; }
+
       | symbol '(' parms ')'    { /* need to convert symbol to a function */
                                   $1->type = Leaf::Function;
                                   $1->series = NULL; // not tiz/best
@@ -164,6 +175,7 @@ expr : '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_colum
                                   $1->function = *($1->lvalue.n);
                                   $1->fparms.clear(); // no parameters!
                                 }
+
 
       ;
 
@@ -183,12 +195,6 @@ lop   : AND
       | OR
       ;
 
-bop   : ADD
-      | SUBTRACT
-      | DIVIDE
-      | MULTIPLY
-      | POW
-      ;
 
 symbol : SYMBOL                      { $$ = new Leaf(@1.first_column, @1.last_column); 
                                        $$->type = Leaf::Symbol;
