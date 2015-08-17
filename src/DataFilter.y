@@ -70,7 +70,7 @@ extern Leaf *root; // root node for parsed statement
 
 %locations
 
-%type <leaf> symbol value lexpr expr parms;
+%type <leaf> symbol literal lexpr expr parms;
 
 %right '?' ':'
 %left ADD SUBTRACT
@@ -168,64 +168,6 @@ expr : expr SUBTRACT expr              { $$ = new Leaf(@1.first_column, @3.last_
                                      }
 
 
-      | value                        { $$ = $1; }
-
-                                    /* functions all have zero or more parameters */
-
-      | symbol '(' parms ')'    { /* need to convert symbol to a function */
-                                  $1->type = Leaf::Function;
-                                  $1->series = NULL; // not tiz/best
-                                  $1->function = *($1->lvalue.n);
-                                  $1->fparms = $3->fparms;
-                                }
-
-      | symbol '(' ')'          {
-                                  /* need to convert symbol to function */
-                                  $1->type = Leaf::Function;
-                                  $1->series = NULL; // not tiz/best
-                                  $1->function = *($1->lvalue.n);
-                                  $1->fparms.clear(); // no parameters!
-                                }
-
-      | '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
-                                      $$->type = Leaf::Logical;
-                                      $$->lvalue.l = $2;
-                                      $$->op = 0; }
-
-
-      ;
-
-cop    : EQ
-      | NEQ
-      | LT
-      | LTE
-      | GT
-      | GTE
-      | MATCHES
-      | ENDSWITH
-      | BEGINSWITH
-      | CONTAINS
-      ;
-
-symbol : SYMBOL                      { $$ = new Leaf(@1.first_column, @1.last_column); 
-                                       $$->type = Leaf::Symbol;
-                                       if (QString(DataFiltertext) == "BikeScore")
-                                          $$->lvalue.n = new QString("BikeScore&#8482;");
-                                       else
-                                          $$->lvalue.n = new QString(DataFiltertext);
-                                     }
-        ;
-
-value : symbol                      { $$ = $1; }
-
-      | DF_STRING                      { $$ = new Leaf(@1.first_column, @1.last_column); $$->type = Leaf::String;
-                                      QString s2(DataFiltertext);
-                                      $$->lvalue.s = new QString(s2.mid(1,s2.length()-2)); }
-      | DF_FLOAT                       { $$ = new Leaf(@1.first_column, @1.last_column); $$->type = Leaf::Float;
-                                      $$->lvalue.f = QString(DataFiltertext).toFloat(); }
-      | DF_INTEGER                     { $$ = new Leaf(@1.first_column, @1.last_column); $$->type = Leaf::Integer;
-                                      $$->lvalue.i = QString(DataFiltertext).toInt(); }
-
       | BEST '(' symbol ',' lexpr ')' { $$ = new Leaf(@1.first_column, @6.last_column); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
@@ -274,6 +216,64 @@ value : symbol                      { $$ = $1; }
                                         $$->series = $3;
                                         $$->lvalue.l = NULL;
                                       }
+
+                                    /* functions all have zero or more parameters */
+
+      | symbol '(' parms ')'    { /* need to convert symbol to a function */
+                                  $1->type = Leaf::Function;
+                                  $1->series = NULL; // not tiz/best
+                                  $1->function = *($1->lvalue.n);
+                                  $1->fparms = $3->fparms;
+                                }
+
+      | symbol '(' ')'          {
+                                  /* need to convert symbol to function */
+                                  $1->type = Leaf::Function;
+                                  $1->series = NULL; // not tiz/best
+                                  $1->function = *($1->lvalue.n);
+                                  $1->fparms.clear(); // no parameters!
+                                }
+
+      | '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
+                                      $$->type = Leaf::Logical;
+                                      $$->lvalue.l = $2;
+                                      $$->op = 0; }
+
+      | symbol                  { $$ = $1; }
+
+      | literal                        { $$ = $1; }
+
+      ;
+
+cop    : EQ
+      | NEQ
+      | LT
+      | LTE
+      | GT
+      | GTE
+      | MATCHES
+      | ENDSWITH
+      | BEGINSWITH
+      | CONTAINS
+      ;
+
+symbol : SYMBOL                      { $$ = new Leaf(@1.first_column, @1.last_column); 
+                                       $$->type = Leaf::Symbol;
+                                       if (QString(DataFiltertext) == "BikeScore")
+                                          $$->lvalue.n = new QString("BikeScore&#8482;");
+                                       else
+                                          $$->lvalue.n = new QString(DataFiltertext);
+                                     }
+        ;
+
+literal : DF_STRING                      { $$ = new Leaf(@1.first_column, @1.last_column); $$->type = Leaf::String;
+                                      QString s2(DataFiltertext);
+                                      $$->lvalue.s = new QString(s2.mid(1,s2.length()-2)); }
+      | DF_FLOAT                       { $$ = new Leaf(@1.first_column, @1.last_column); $$->type = Leaf::Float;
+                                      $$->lvalue.f = QString(DataFiltertext).toFloat(); }
+      | DF_INTEGER                     { $$ = new Leaf(@1.first_column, @1.last_column); $$->type = Leaf::Integer;
+                                      $$->lvalue.i = QString(DataFiltertext).toInt(); }
+
       ;
 
 %%

@@ -537,17 +537,20 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                         leaf->inerror = true;
                     }
 
-                    if (leaf->function == "daterange" && !dateRangeValidSymbols.exactMatch(symbol)) {
-                        DataFiltererrors << QString(QObject::tr("invalid literal for daterange(): %1")).arg(symbol);
-                        leaf->inerror = true;
+                    if (leaf->function == "daterange") {
 
-                    } else {
-                        // convert to int days since using current date range config
-                        // should be able to get from parent somehow
-                        leaf->type = Leaf::Integer;
-                        if (symbol == "start") leaf->lvalue.i = QDate(1900,01,01).daysTo(df->context->currentDateRange().from);
-                        else if (symbol == "stop") leaf->lvalue.i = QDate(1900,01,01).daysTo(df->context->currentDateRange().to);
-                        else leaf->lvalue.i = 0;
+                        if (!dateRangeValidSymbols.exactMatch(symbol)) {
+                            DataFiltererrors << QString(QObject::tr("invalid literal for daterange(): %1")).arg(symbol);
+                            leaf->inerror = true;
+
+                        } else {
+                            // convert to int days since using current date range config
+                            // should be able to get from parent somehow
+                            leaf->type = Leaf::Integer;
+                            if (symbol == "start") leaf->lvalue.i = QDate(1900,01,01).daysTo(df->context->currentDateRange().from);
+                            else if (symbol == "stop") leaf->lvalue.i = QDate(1900,01,01).daysTo(df->context->currentDateRange().to);
+                            else leaf->lvalue.i = 0;
+                        }
                     }
 
                     if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol)) {
