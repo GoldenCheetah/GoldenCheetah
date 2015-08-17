@@ -185,6 +185,11 @@ expr : expr SUBTRACT expr              { $$ = new Leaf(@1.first_column, @3.last_
                                   $1->fparms.clear(); // no parameters!
                                 }
 
+      | '(' expr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
+                                      $$->type = Leaf::Logical;
+                                      $$->lvalue.l = $2;
+                                      $$->op = 0; }
+
 
       ;
 
