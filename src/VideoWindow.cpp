@@ -17,6 +17,7 @@
 * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <QGraphicsPathItem>
 #include "VideoWindow.h"
 #include "Context.h"
 #include "RideItem.h"
@@ -345,7 +346,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
         //TODO : weighted average to improve smoothness
     }
-    else
+    else if (myRideItem->ride())
     {
         // otherwise we use the gpx from selected ride in analysis view:
         QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
@@ -381,15 +382,31 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
     else
         rate = rtd.getSpeed() / rfp.kph;
 
-    //if video is far from ghost:
-    if (video_time_shift_ms > 3000 || video_time_shift_ms < -3000)
-        libvlc_media_player_set_time(mp, (libvlc_time_t) (rfp.secs*1000.0));
-    else
-    // otherwise add "small" corrective parameter to get video back to ghost position:
-        rate += video_time_shift_ms / 10000.0;
+    // FIXME : remove debug info
+/*
+    qDebug() << "TimeDiff=" << qPrintable(QString("%1").arg(video_time_shift_ms / 1000.0, 5, 'f', 2, ' ')) \
+             << "  TargetRate=" << qPrintable(QString("%1").arg(rate, 5, 'f', 2, ' ')) \
+             << "  Corr=" << qPrintable(QString("%1").arg(1.0 + video_time_shift_ms / 10000.0, 5, 'f', 2, ' ')) \
+             << "  CurrentRate=" << qPrintable(QString("%1").arg(currentVideoRate, 5, 'f', 2, ' '));
+*/
 
-    libvlc_media_player_set_pause(mp, (rate < 0.05));
-    libvlc_media_player_set_rate(mp, rate );
+    //if video is far (empiric) from ghost:
+    if (fabs(video_time_shift_ms) > 15000)
+    {
+        libvlc_media_player_set_time(mp, (libvlc_time_t) (rfp.secs*1000.0));
+    }
+    else
+    // otherwise add "small" empiric corrective parameter to get video back to ghost position:
+        rate *= 1.0 + (video_time_shift_ms / 10000.0);
+
+    libvlc_media_player_set_pause(mp, (rate < 0.01));
+
+    // change video rate but only if there is a significant change
+    if ((rate != 0.0) && (fabs((rate - currentVideoRate) / rate) > 0.05))
+    {
+        libvlc_media_player_set_rate(mp, rate );
+        currentVideoRate = rate;
+    }
 
 #endif
 
