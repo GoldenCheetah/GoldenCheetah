@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009 Mark Liversedge (liversedge@gmail.com)
+ *               2015 Vianney Boyer   (vlcvboyer@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -19,6 +20,7 @@
 #ifndef _GC_VideoWindow_h
 #define _GC_VideoWindow_h 1
 #include "GoldenCheetah.h"
+#include "MeterWidget.h"
 
 // We need to determine what options the user has chosen 
 // for compiling, which differ for Mac vs Win/Linux
@@ -167,6 +169,7 @@ class VideoWindow : public GcWindow
         void stopPlayback();
         void pausePlayback();
         void resumePlayback();
+        void telemetryUpdate(RealtimeData rtd);
         void seekPlayback(long ms);
         void mediaSelected(QString filename);
 
@@ -174,10 +177,24 @@ class VideoWindow : public GcWindow
 
         void resizeEvent(QResizeEvent *);
 
+        // current data
+        RideFilePoint rfp;
+
         // passed from Context *
         Context *context;
 
         bool m_MediaChanged;
+
+        QList<MeterWidget*> m_metersWidget;
+
+        NeedleMeterWidget* speedmeterwidget;
+        TextMeterWidget* textspeedmeterwidget;
+        CircularIndicatorMeterWidget* powermeterwidget;
+        TextMeterWidget* textpowermeterwidget;
+        TextMeterWidget* textHRMmeterwidget;
+        CircularIndicatorMeterWidget* cadencemeterwidget;
+        TextMeterWidget* textcadencemeterwidget;
+
 
 #ifdef GC_VIDEO_VLC
 
