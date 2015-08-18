@@ -60,7 +60,7 @@ extern Leaf *root; // root node for parsed statement
 %token <op> EQ NEQ LT LTE GT GTE
 %token <op> ADD SUBTRACT DIVIDE MULTIPLY POW
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
-%type <op> AND OR cop;
+%type <op> AND OR;
 
 %union {
    Leaf *leaf;
@@ -70,14 +70,15 @@ extern Leaf *root; // root node for parsed statement
 
 %locations
 
-%type <leaf> symbol literal lexpr expr parms;
+%type <leaf> symbol literal lexpr cexpr expr parms;
 
 %right '?' ':'
+%right '[' ']'
+%right AND OR
+%right EQ NEQ LT LTE GT GTE MATCHES ENDSWITH CONTAINS
 %left ADD SUBTRACT
 %left MULTIPLY DIVIDE
 %right POW
-%right EQ NEQ LT LTE GT GTE MATCHES ENDSWITH CONTAINS
-%right AND OR
 
 %start filter;
 %%
@@ -95,16 +96,12 @@ parms: lexpr                        { $$ = new Leaf(@1.first_column, @1.last_col
 
 lexpr   : expr                       { $$ = $1; }
 
+        | cexpr                      { $$ = $1; }
+
         | '(' lexpr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
                                       $$->type = Leaf::Logical;
                                       $$->lvalue.l = $2;
                                       $$->op = 0; }
-
-        | lexpr cop lexpr              { $$ = new Leaf(@1.first_column, @3.last_column);
-                                      $$->type = Leaf::Operation;
-                                      $$->lvalue.l = $1;
-                                      $$->op = $2;
-                                      $$->rvalue.l = $3; }
 
         | lexpr '?' lexpr ':' lexpr      { $$ = new Leaf(@1.first_column, @5.last_column);
                                     $$->type = Leaf::Conditional;
@@ -134,6 +131,67 @@ lexpr   : expr                       { $$ = $1; }
 
         ;
 
+cexpr   : expr EQ expr              { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Operation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+
+        | expr NEQ expr             { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Operation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+
+        | expr LT expr              { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Operation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+
+        | expr LTE expr             { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Operation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+
+        | expr GT expr              { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Operation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+
+        | expr GTE expr             { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Operation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+
+        | expr MATCHES expr         { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Operation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+
+        | expr ENDSWITH expr        { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Operation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+
+        | expr BEGINSWITH expr      { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Operation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+
+        | expr CONTAINS expr        { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Operation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+
+        ;
 
 expr : expr SUBTRACT expr              { $$ = new Leaf(@1.first_column, @3.last_column);
                                       $$->type = Leaf::BinaryOperation;
@@ -243,18 +301,6 @@ expr : expr SUBTRACT expr              { $$ = new Leaf(@1.first_column, @3.last_
 
       | literal                        { $$ = $1; }
 
-      ;
-
-cop    : EQ
-      | NEQ
-      | LT
-      | LTE
-      | GT
-      | GTE
-      | MATCHES
-      | ENDSWITH
-      | BEGINSWITH
-      | CONTAINS
       ;
 
 symbol : SYMBOL                      { $$ = new Leaf(@1.first_column, @1.last_column); 
