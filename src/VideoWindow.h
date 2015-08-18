@@ -180,6 +180,7 @@ class VideoWindow : public GcWindow
         // current data
         int curPosition;
         RideFilePoint rfp;
+        float currentVideoRate;
 
         // passed from Context *
         Context *context;
