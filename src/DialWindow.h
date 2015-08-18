@@ -130,7 +130,7 @@ class DialWindow : public GcWindow
         // used by XPower algorithm
         double rsum, ewma;
 
-        void resetValues() { 
+        void resetValues() {
 
             rolling.fill(0.00);
             rsum = ewma = 0.0f;

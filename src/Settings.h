@@ -80,6 +80,7 @@
 #define GC_WARNCONVERT      "warnconvert"
 #define GC_WARNEXIT      "warnexit"
 #define GC_WORKOUTDIR      "workoutDir"
+#define GC_VIDEOSYNCDIR      "videosyncDir"
 #define GC_TRAIN_SPLITTER_SIZES  "trainwindow/splitterSizes"
 #define GC_LTM_SPLITTER_SIZES  "ltmwindow/splitterSizes"
 #define GC_LTM_LAST_DATE_RANGE "ltmwindow/lastDateRange"

@@ -100,7 +100,7 @@ void ANTChannel::open(int device, int chan_type)
     qDebug()<<"** OPENING CHANNEL"<<number<<"**";
     status = Opening;
 
-    // start the transition process 
+    // start the transition process
     attemptTransition(TRANSITION_START);
 }
 
@@ -384,7 +384,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                             }
                             break;
 
-                        default: 
+                        default:
                             break;
                     }
 
@@ -666,6 +666,36 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 parent->setHb(value2, value);
             }
             break;
+
+
+           case CHANNEL_TYPE_FITNESS_EQUIPMENT:
+           {
+               static int fecRefreshCounter = 1;
+
+               parent->setFecChannel(number);
+               // we don't seem to receive ACK messages, so use this workaround
+               // to ensure load is always set correctly
+               if ((fecRefreshCounter++ % 10) == 0)
+                   parent->refreshFecLoad();
+
+               if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE)
+               {
+                   if (antMessage.fecInstantPower != 0xFFFF)
+                       parent->setWatts(antMessage.fecInstantPower);
+                   if (antMessage.fecCadence != 0xFF)
+                       parent->setSecondaryCadence(antMessage.fecCadence);
+               }
+               else if (antMessage.data_page == FITNESS_EQUIPMENT_GENERAL_PAGE)
+               {
+                   if (antMessage.fecSpeed != 0xFF)
+                   {
+                       // FEC speed is in 0.001m/s, telemetry speed is km/h
+                       parent->setSpeed(antMessage.fecSpeed * 0.0036);
+                   }
+               }
+
+               break;
+           }
 
             // Tacx Vortex trainer
             case CHANNEL_TYPE_TACX_VORTEX:

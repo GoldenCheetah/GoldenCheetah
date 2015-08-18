@@ -1,5 +1,6 @@
 /*
 * Copyright (c) 2009 Mark Liversedge (liversedge@gmail.com)
+*               2015 Vianney Boyer   (vlcvboyer@gmail.com)
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the Free
@@ -16,8 +17,12 @@
 * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <QGraphicsPathItem>
 #include "VideoWindow.h"
 #include "Context.h"
+#include "RideItem.h"
+#include "RideFile.h"
+#include "MeterWidget.h"
 
 VideoWindow::VideoWindow(Context *context)  :
     GcWindow(context), context(context), m_MediaChanged(false)
@@ -27,6 +32,8 @@ VideoWindow::VideoWindow(Context *context)  :
 
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);
+
+    curPosition = 0;
 
     init = true; // assume initialisation was ok ...
 
@@ -64,14 +71,14 @@ VideoWindow::VideoWindow(Context *context)  :
 
         m = NULL;
         //vlc_exceptions(&exceptions);
-        
+
         /* Create a media player playing environement */
         mp = libvlc_media_player_new (inst);
         //vlc_exceptions(&exceptions);
 
         //vlc_exceptions(&exceptions);
 
- 
+
     /* This is a non working code that show how to hooks into a window,
      * if we have a window around */
 #ifdef Q_OS_LINUX
@@ -88,6 +95,47 @@ VideoWindow::VideoWindow(Context *context)  :
         container = new QWidget(this);
         layout->addWidget(container);
         libvlc_media_player_set_hwnd (mp, (HWND)(container->winId()));
+
+        speedmeterwidget = new NeedleMeterWidget(container, 20.0, 15.0, 20.0, 77.0);
+        speedmeterwidget->MainColor = QColor(255,0,0,180);
+        speedmeterwidget->BackgroundColor = QColor(100,100,100,100);
+        speedmeterwidget->RangeMax = 60.0;
+        speedmeterwidget->Angle = 220.0;
+        speedmeterwidget->SubRange = 6;
+        m_metersWidget.append(speedmeterwidget);
+        textspeedmeterwidget = new TextMeterWidget(speedmeterwidget, 70.0, 40.0, 50.0, 75.0);
+        textspeedmeterwidget->MainColor = QColor(255,0,0,180);
+        m_metersWidget.append(textspeedmeterwidget);
+
+        powermeterwidget = new CircularIndicatorMeterWidget(container, 20.0, 15.0, 80.0, 77.0);
+        powermeterwidget->Angle = 280.0;
+        powermeterwidget->RangeMax = 350.0;
+        m_metersWidget.append(powermeterwidget);
+        textpowermeterwidget = new TextMeterWidget(powermeterwidget, 50.0, 40.0, 50.0, 50.0);
+        textpowermeterwidget->MainColor = QColor(255,100,100,180);
+        m_metersWidget.append(textpowermeterwidget);
+        TextMeterWidget* unitpowermeterwidget = new TextMeterWidget(powermeterwidget, 50.0, 20.0, 50.0, 85.0);
+        unitpowermeterwidget->MainColor = QColor(255,100,100,180);
+        unitpowermeterwidget->Text = tr("Watts");
+        m_metersWidget.append(unitpowermeterwidget);
+
+        cadencemeterwidget = new CircularIndicatorMeterWidget(container, 20.0, 15.0, 50.0, 77.0);
+        m_metersWidget.append(cadencemeterwidget);
+        cadencemeterwidget->Angle = 280.0;
+        cadencemeterwidget->RangeMax = 350.0;
+        m_metersWidget.append(cadencemeterwidget);
+        textcadencemeterwidget = new TextMeterWidget(cadencemeterwidget, 50.0, 40.0, 50.0, 50.0);
+        textcadencemeterwidget->MainColor = QColor(255,100,100,180);
+        m_metersWidget.append(textcadencemeterwidget);
+        TextMeterWidget* unitcadencemeterwidget = new TextMeterWidget(cadencemeterwidget, 50.0, 20.0, 50.0, 85.0);
+        unitcadencemeterwidget->MainColor = QColor(255,100,100,180);
+        unitcadencemeterwidget->Text = tr("rpm");
+        m_metersWidget.append(unitcadencemeterwidget);
+
+        textHRMmeterwidget = new TextMeterWidget(container, 15.0, 5.0, 50.0, 90.0);
+        textHRMmeterwidget->MainColor = QColor(255,0,0,180);
+        m_metersWidget.append(textHRMmeterwidget);
+        
 #endif
     } else {
 
@@ -108,6 +156,8 @@ VideoWindow::VideoWindow(Context *context)  :
 #endif
 
     if (init) {
+        // get updates..
+        connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
         connect(context, SIGNAL(stop()), this, SLOT(stopPlayback()));
         connect(context, SIGNAL(start()), this, SLOT(startPlayback()));
         connect(context, SIGNAL(pause()), this, SLOT(pausePlayback()));
@@ -121,9 +171,9 @@ VideoWindow::~VideoWindow()
 {
     if (!init) return; // we didn't initialise properly so all bets are off
 
-#if (defined Q_OS_LINUX) && (QT_VERSION < 0x050000) && (defined GC_VIDEO_VLC) 
+#if (defined Q_OS_LINUX) && (QT_VERSION < 0x050000) && (defined GC_VIDEO_VLC)
     // unembed vlc backend first
-    x11Container->discardClient(); 
+    x11Container->discardClient();
 #endif
 
     stopPlayback();
@@ -137,7 +187,7 @@ VideoWindow::~VideoWindow()
     /* nor the player */
     libvlc_media_player_release (mp);
 
-    // unload vlc 
+    // unload vlc
     libvlc_release (inst);
 #endif
 
@@ -150,7 +200,10 @@ VideoWindow::~VideoWindow()
 
 void VideoWindow::resizeEvent(QResizeEvent * )
 {
-    // do nothing .. for now
+    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+    {
+        p_meterWidget->AdjustSizePos();
+    }
 }
 
 void VideoWindow::startPlayback()
@@ -174,6 +227,16 @@ void VideoWindow::startPlayback()
     // open the media object
     mp->play();
 #endif
+
+    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+    {
+        p_meterWidget->setWindowOpacity(1); // Show the widget
+        p_meterWidget->AdjustSizePos();
+        p_meterWidget->update();
+
+        p_meterWidget->raise();
+        p_meterWidget->show();
+    }
 }
 
 void VideoWindow::stopPlayback()
@@ -188,6 +251,9 @@ void VideoWindow::stopPlayback()
 #ifdef GC_VIDEO_QT5
     mp->stop();
 #endif
+    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+        p_meterWidget->hide();
+
 }
 
 void VideoWindow::pausePlayback()
@@ -219,6 +285,137 @@ void VideoWindow::resumePlayback()
 #ifdef GC_VIDEO_QT5
     mp->play();
 #endif
+}
+
+void VideoWindow::telemetryUpdate(RealtimeData rtd)
+{
+
+#ifdef GC_VIDEO_NONE
+    Q_UNUSED(rtd)
+#endif
+
+#ifdef GC_VIDEO_VLC
+    if (!m) return;
+
+    // find the curPosition
+    if (context->currentVideoSyncFile())
+    {
+        // when we selected a videosync file in traning mode (rlv...):
+
+        QVector<VideoSyncFilePoint> VideoSyncFiledataPoints = context->currentVideoSyncFile()->Points;
+
+        if (!VideoSyncFiledataPoints.count()) return;
+
+        if(VideoSyncFiledataPoints.count() < curPosition)
+        {
+            curPosition = VideoSyncFiledataPoints.count();
+        } // make sure the current position is less than the new distance
+        else if (VideoSyncFiledataPoints[curPosition].km < rtd.getDistance())
+        {
+            for( ; curPosition < VideoSyncFiledataPoints.count(); curPosition++)
+                if(VideoSyncFiledataPoints[curPosition].km >= rtd.getDistance())
+                    break;
+        }
+        else
+        {
+            for( ; curPosition > 0; curPosition--)
+                if(VideoSyncFiledataPoints[curPosition].km <= rtd.getDistance())
+                    break;
+        }
+
+        // update the rfp
+        rfp.km = VideoSyncFiledataPoints[curPosition].km;
+        rfp.secs = VideoSyncFiledataPoints[curPosition].secs;
+        rfp.kph = VideoSyncFiledataPoints[curPosition].kph;
+
+        //TODO : weighted average to improve smoothness
+    }
+    else if (myRideItem->ride())
+    {
+        // otherwise we use the gpx from selected ride in analysis view:
+        QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
+        if (!dataPoints.count()) return;
+
+        if(dataPoints.count() < curPosition)
+        {
+            curPosition = dataPoints.count();
+        } // make sure the current position is less than the new distance
+        else if (dataPoints[curPosition]->km < rtd.getDistance())
+        {
+            for( ; curPosition < dataPoints.count(); curPosition++)
+                if(dataPoints[curPosition]->km >= rtd.getDistance())
+                    break;
+        }
+        else
+        {
+            for( ; curPosition > 0; curPosition--)
+                if(dataPoints[curPosition]->km <= rtd.getDistance())
+                    break;
+        }
+        // update the rfp
+        rfp = *dataPoints[curPosition];
+
+        //TODO : weighted average to improve smoothness
+    }
+    // set video rate ( theoretical : video rate = training speed / ghost speed)
+    float rate;
+    float video_time_shift_ms;
+    video_time_shift_ms = (rfp.secs*1000.0 - (double) libvlc_media_player_get_time(mp));
+    if (rfp.kph == 0.0)
+        rate = 1.0;
+    else
+        rate = rtd.getSpeed() / rfp.kph;
+
+    // FIXME : remove debug info
+/*
+    qDebug() << "TimeDiff=" << qPrintable(QString("%1").arg(video_time_shift_ms / 1000.0, 5, 'f', 2, ' ')) \
+             << "  TargetRate=" << qPrintable(QString("%1").arg(rate, 5, 'f', 2, ' ')) \
+             << "  Corr=" << qPrintable(QString("%1").arg(1.0 + video_time_shift_ms / 10000.0, 5, 'f', 2, ' ')) \
+             << "  CurrentRate=" << qPrintable(QString("%1").arg(currentVideoRate, 5, 'f', 2, ' '));
+*/
+
+    //if video is far (empiric) from ghost:
+    if (fabs(video_time_shift_ms) > 15000)
+    {
+        libvlc_media_player_set_time(mp, (libvlc_time_t) (rfp.secs*1000.0));
+    }
+    else
+    // otherwise add "small" empiric corrective parameter to get video back to ghost position:
+        rate *= 1.0 + (video_time_shift_ms / 10000.0);
+
+    libvlc_media_player_set_pause(mp, (rate < 0.01));
+
+    // change video rate but only if there is a significant change
+    if ((rate != 0.0) && (fabs((rate - currentVideoRate) / rate) > 0.05))
+    {
+        libvlc_media_player_set_rate(mp, rate );
+        currentVideoRate = rate;
+    }
+
+#endif
+
+#ifdef GC_VIDEO_QT5
+//TODO
+//    // seek to ms position in current file
+//    mp->setPosition(ms);
+#endif
+
+    speedmeterwidget->Value = rtd.getSpeed();
+    textspeedmeterwidget->Text = QString::number((int) rtd.getSpeed());
+    textspeedmeterwidget->AltText = QString(".") +QString::number((int)(rtd.getSpeed() * 10.0) - (((int) rtd.getSpeed()) * 10)) + tr(" kph");
+
+    powermeterwidget->Value =  rtd.getWatts();
+    textpowermeterwidget->Text = QString::number((int)powermeterwidget->Value);
+
+    cadencemeterwidget->Value = rtd.getCadence();
+    textcadencemeterwidget->Text = QString::number((int)cadencemeterwidget->Value);
+
+    textHRMmeterwidget->Text = QString::number((int)rtd.getHr()) + tr(" bpm");
+
+    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+    {
+        p_meterWidget->update();
+    }
 }
 
 void VideoWindow::seekPlayback(long ms)
@@ -312,7 +509,7 @@ MediaHelper::~MediaHelper()
 {
 }
 
-QStringList 
+QStringList
 MediaHelper::listMedia(QDir dir)
 {
     QStringList returning;

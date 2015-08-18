@@ -376,6 +376,7 @@ HEADERS += \
         ManualRideFile.h \
         MergeActivityWizard.h \
         MetadataWindow.h \
+        MeterWidget.h \
         MoxyDevice.h \
         MUPlot.h \
         MUPool.h \
@@ -461,6 +462,7 @@ HEADERS += \
         TrainingstagebuchUploader.h \
         Units.h \
         VeloHeroUploader.h \
+        VideoSyncFile.h \
         Views.h \
         WithingsDownload.h \
         WkoRideFile.h \
@@ -608,6 +610,7 @@ SOURCES += \
         ManualRideFile.cpp \
         MergeActivityWizard.cpp \
         MetadataWindow.cpp \
+        MeterWidget.cpp \
         MoxyDevice.cpp \
         MUPlot.cpp \
         MUWidget.cpp \
@@ -699,6 +702,7 @@ SOURCES += \
         TRIMPPoints.cpp \
         Units.cpp \
         VeloHeroUploader.cpp \
+        VideoSyncFile.cpp \
         Views.cpp \
         WattsPerKilogram.cpp \
         WithingsDownload.cpp \

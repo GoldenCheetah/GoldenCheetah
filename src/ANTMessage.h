@@ -75,6 +75,9 @@ class ANTMessage {
         static ANTMessage tacxVortexSetCalibrationValue(const uint8_t channel, const uint16_t vortexId, const uint8_t calibrationValue);
         static ANTMessage tacxVortexSetPower(const uint8_t channel, const uint16_t vortexId, const uint16_t power);
 
+        // fitness equipment control messages
+        static ANTMessage fecSetTargetPower(const uint8_t channel, const uint16_t targetPower);
+
         // kickr command channel messages all sent as broadcast data
         // over the command channel as type 0x4E
         static ANTMessage kickrErgMode(const unsigned char channel, ushort usDeviceId, ushort usWatts, bool bSimSpeed);
@@ -134,6 +137,9 @@ class ANTMessage {
         uint16_t vortexId, vortexSpeed, vortexPower, vortexCadence;
         uint8_t vortexCalibration, vortexCalibrationState, vortexPage;
         uint8_t vortexUsingVirtualSpeed;
+        // fitness equipment data fields
+        uint16_t fecSpeed, fecInstantPower;
+        uint8_t fecCadence;
 
 
     private:

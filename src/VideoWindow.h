@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009 Mark Liversedge (liversedge@gmail.com)
+ *               2015 Vianney Boyer   (vlcvboyer@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -19,8 +20,9 @@
 #ifndef _GC_VideoWindow_h
 #define _GC_VideoWindow_h 1
 #include "GoldenCheetah.h"
+#include "MeterWidget.h"
 
-// We need to determine what options the user has chosen 
+// We need to determine what options the user has chosen
 // for compiling, which differ for Mac vs Win/Linux
 //
 // Options are, GC_VIDEO_xxxx where xxxx is one of:
@@ -145,7 +147,7 @@ class MediaHelper
 
     private:
         QStringList supported;
-#ifdef GC_VIDEO_VLC 
+#ifdef GC_VIDEO_VLC
         libvlc_instance_t * inst;
 #endif
 };
@@ -167,6 +169,7 @@ class VideoWindow : public GcWindow
         void stopPlayback();
         void pausePlayback();
         void resumePlayback();
+        void telemetryUpdate(RealtimeData rtd);
         void seekPlayback(long ms);
         void mediaSelected(QString filename);
 
@@ -174,11 +177,27 @@ class VideoWindow : public GcWindow
 
         void resizeEvent(QResizeEvent *);
 
+        // current data
+        int curPosition;
+        RideFilePoint rfp;
+        float currentVideoRate;
+
         // passed from Context *
         Context *context;
 
         bool m_MediaChanged;
 
+        QList<MeterWidget*> m_metersWidget;
+        
+        NeedleMeterWidget* speedmeterwidget;
+        TextMeterWidget* textspeedmeterwidget;
+        CircularIndicatorMeterWidget* powermeterwidget;
+        TextMeterWidget* textpowermeterwidget;
+        TextMeterWidget* textHRMmeterwidget;
+        CircularIndicatorMeterWidget* cadencemeterwidget;
+        TextMeterWidget* textcadencemeterwidget;
+        
+        
 #ifdef GC_VIDEO_VLC
 
         // vlc for older QT
