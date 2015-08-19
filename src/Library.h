@@ -127,7 +127,7 @@ class LibrarySearch : public QThread
     private:
         volatile bool aborted;
         QString path;
-        bool findMedia, findVideoSync, findWorkout;
+        bool findMedia, findWorkout, findVideoSync;
 };
 
 class WorkoutImportDialog : public QDialog

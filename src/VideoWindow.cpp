@@ -25,6 +25,7 @@
 #include "MeterWidget.h"
 #include "VideoLayoutParser.h"
 
+
 VideoWindow::VideoWindow(Context *context)  :
     GcWindow(context), context(context), m_MediaChanged(false)
 {
@@ -322,29 +323,20 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
         if (!VideoSyncFiledataPoints.count()) return;
 
-        if(VideoSyncFiledataPoints.count() < curPosition)
-        {
-            curPosition = VideoSyncFiledataPoints.count();
-        } // make sure the current position is less than the new distance
-        else if (VideoSyncFiledataPoints[curPosition].km < rtd.getDistance())
-        {
-            for( ; curPosition < VideoSyncFiledataPoints.count(); curPosition++)
-                if(VideoSyncFiledataPoints[curPosition].km >= rtd.getDistance())
-                    break;
-        }
-        else
-        {
-            for( ; curPosition > 0; curPosition--)
-                if(VideoSyncFiledataPoints[curPosition].km <= rtd.getDistance())
-                    break;
-        }
+        if(curPosition > VideoSyncFiledataPoints.count()-1 || curPosition < 0)
+            curPosition = 1;
+        
+        // make sure the current position is less than the new distance
+        while ((VideoSyncFiledataPoints[curPosition].km > rtd.getDistance()) && (curPosition > 1))
+            curPosition--;
+        while ((VideoSyncFiledataPoints[curPosition].km <= rtd.getDistance()) && (curPosition < VideoSyncFiledataPoints.count()-1))
+            curPosition++;
 
         // update the rfp
-        rfp.km = VideoSyncFiledataPoints[curPosition].km;
-        rfp.secs = VideoSyncFiledataPoints[curPosition].secs;
-        rfp.kph = VideoSyncFiledataPoints[curPosition].kph;
-
-        //TODO : weighted average to improve smoothness
+        float weighted_average = (VideoSyncFiledataPoints[curPosition].km - VideoSyncFiledataPoints[curPosition-1].km != 0.0)?(rtd.getDistance()-VideoSyncFiledataPoints[curPosition-1].km) / (VideoSyncFiledataPoints[curPosition].km - VideoSyncFiledataPoints[curPosition-1].km):0.0;
+        rfp.km = rtd.getDistance();
+        rfp.secs = VideoSyncFiledataPoints[curPosition-1].secs + weighted_average * (VideoSyncFiledataPoints[curPosition].secs - VideoSyncFiledataPoints[curPosition-1].secs);
+        rfp.kph = VideoSyncFiledataPoints[curPosition-1].kph + weighted_average * (VideoSyncFiledataPoints[curPosition].kph - VideoSyncFiledataPoints[curPosition-1].kph);
     }
     else if (myRideItem->ride())
     {
@@ -352,26 +344,19 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
         if (!dataPoints.count()) return;
 
-        if(dataPoints.count() < curPosition)
-        {
-            curPosition = dataPoints.count();
-        } // make sure the current position is less than the new distance
-        else if (dataPoints[curPosition]->km < rtd.getDistance())
-        {
-            for( ; curPosition < dataPoints.count(); curPosition++)
-                if(dataPoints[curPosition]->km >= rtd.getDistance())
-                    break;
-        }
-        else
-        {
-            for( ; curPosition > 0; curPosition--)
-                if(dataPoints[curPosition]->km <= rtd.getDistance())
-                    break;
-        }
+        if(curPosition > dataPoints.count()-1 || curPosition < 0)
+            curPosition = 1;
+        
+        // make sure the current position is less than the new distance
+        while ((dataPoints[curPosition]->km > rtd.getDistance()) && (curPosition > 1))
+            curPosition--;
+        while ((dataPoints[curPosition]->km <= rtd.getDistance()) && (curPosition < dataPoints.count()-1))
+            curPosition++;
+      
         // update the rfp
         rfp = *dataPoints[curPosition];
 
-        //TODO : weighted average to improve smoothness
+        //TODO : weighted average to improve smoothness as it has been done just before with RLV files
     }
     // set video rate ( theoretical : video rate = training speed / ghost speed)
     float rate;
@@ -382,16 +367,8 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
     else
         rate = rtd.getSpeed() / rfp.kph;
 
-    // FIXME : remove debug info
-/*
-    qDebug() << "TimeDiff=" << qPrintable(QString("%1").arg(video_time_shift_ms / 1000.0, 5, 'f', 2, ' ')) \
-             << "  TargetRate=" << qPrintable(QString("%1").arg(rate, 5, 'f', 2, ' ')) \
-             << "  Corr=" << qPrintable(QString("%1").arg(1.0 + video_time_shift_ms / 10000.0, 5, 'f', 2, ' ')) \
-             << "  CurrentRate=" << qPrintable(QString("%1").arg(currentVideoRate, 5, 'f', 2, ' '));
-*/
-
     //if video is far (empiric) from ghost:
-    if (fabs(video_time_shift_ms) > 15000)
+    if (fabs(video_time_shift_ms) > 5000)
     {
         libvlc_media_player_set_time(mp, (libvlc_time_t) (rfp.secs*1000.0));
     }
