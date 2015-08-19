@@ -240,17 +240,14 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
     if (leaf == NULL) return;
 
     QTextCharFormat apply;
-    apply.setForeground(Qt::red); // default to yucky
 
     switch(leaf->type) {
     case Leaf::Float : 
     case Leaf::Integer : 
     case Leaf::String : 
-                    apply.setForeground(Qt::red);
                     break;
 
     case Leaf::Symbol :
-                    apply.setForeground(Qt::green);
                     break;
 
     case Leaf::Logical  :
@@ -281,7 +278,6 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
                         return;
                     } else {
                         foreach(Leaf*l, leaf->fparms) leaf->color(l, document);
-                        apply.setForeground(Qt::green);
                     }
                     break;
 
@@ -307,21 +303,22 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
 
     }
 
-    // lets apply that then
-    QTextCursor cursor(document);
-
-    // highlight this token and apply
-    cursor.setPosition(leaf->loc, QTextCursor::MoveAnchor);
-    cursor.selectionStart();
-    cursor.setPosition(leaf->leng+1, QTextCursor::KeepAnchor);
-    cursor.selectionEnd();
-
+    // all we do now is highlight if in error.
     if (leaf->inerror == true) {
+        QTextCursor cursor(document);
+
+        // highlight this token and apply
+        cursor.setPosition(leaf->loc, QTextCursor::MoveAnchor);
+        cursor.selectionStart();
+        cursor.setPosition(leaf->leng+1, QTextCursor::KeepAnchor);
+        cursor.selectionEnd();
+
         apply.setUnderlineStyle(QTextCharFormat::WaveUnderline);
         apply.setUnderlineColor(Qt::red);
+
+        cursor.mergeCharFormat(apply);
     }
 
-    cursor.setCharFormat(apply);
 }
 
 void Leaf::print(Leaf *leaf, int level)
