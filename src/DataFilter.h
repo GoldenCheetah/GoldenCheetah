@@ -110,7 +110,7 @@ class DataFilter : public QObject
         // when used for formulas
         Result evaluate(RideItem *rideItem);
         QStringList getErrors() { return errors; };
-        void colorSyntax(QTextDocument *content);
+        void colorSyntax(QTextDocument *content, int pos);
 
         static QStringList functions(); // return list of functions supported
 
