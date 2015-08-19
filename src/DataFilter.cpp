@@ -171,8 +171,11 @@ Leaf::isDynamic(Leaf *leaf)
 }
 
 void
-DataFilter::colorSyntax(QTextDocument *document)
+DataFilter::colorSyntax(QTextDocument *document, int pos)
 {
+    // matched brace position
+    int bpos = -1;
+
     // for looking for comments
     QString string = document->toPlainText();
 
@@ -181,6 +184,11 @@ DataFilter::colorSyntax(QTextDocument *document)
     normal.setFontWeight(QFont::Normal);
     normal.setUnderlineStyle(QTextCharFormat::NoUnderline);
     normal.setForeground(Qt::black);
+
+    QTextCharFormat cyanbg;
+    cyanbg.setBackground(Qt::cyan);
+    QTextCharFormat redbg;
+    redbg.setBackground(QColor(255,153,153));
 
     QTextCharFormat symbol;
     symbol.setFontWeight(QFont::Bold);
@@ -215,6 +223,7 @@ DataFilter::colorSyntax(QTextDocument *document)
     int stringstart=0;
     int numberstart=0;
     int symbolstart=0;
+    int brace=0;
 
     for(int i=0; i<string.length(); i++) {
 
@@ -236,6 +245,8 @@ DataFilter::colorSyntax(QTextDocument *document)
 
                 // isRun isa special, we may add more later (e.g. date)
                 if (!sym.compare("Date", Qt::CaseInsensitive) ||
+                    !sym.compare("best", Qt::CaseInsensitive) ||
+                    !sym.compare("tiz", Qt::CaseInsensitive) ||
                     !sym.compare("const", Qt::CaseInsensitive) ||
                     !sym.compare("config", Qt::CaseInsensitive) ||
                     !sym.compare("ctl", Qt::CaseInsensitive) ||
@@ -254,8 +265,8 @@ DataFilter::colorSyntax(QTextDocument *document)
 
                 // still not found ?
                 // is it a function then ?
-                for(int i=0; DataFilterFunctions[i].parameters != -1; i++) {
-                    if (DataFilterFunctions[i].name == sym) {
+                for(int j=0; DataFilterFunctions[j].parameters != -1; j++) {
+                    if (DataFilterFunctions[j].name == sym) {
                         found = true;
                         break;
                     }
@@ -361,6 +372,97 @@ DataFilter::colorSyntax(QTextDocument *document)
                     cursor.selectionEnd();
                     cursor.setCharFormat(literal);
                 }
+            }
+        }
+
+        // are the braces balanced ?
+        if (!instring && !incomment && string[i]=='(') {
+            brace++;
+
+            // match close/open if over cursor
+            if (i==pos-1) {
+                cursor.setPosition(i, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.mergeCharFormat(cyanbg);
+
+                // run forward looking for match
+                int bb=0;
+                for(int j=i; j<string.length(); j++) {
+                    if (string[j]=='(') bb++;
+                    if (string[j]==')') {
+                        bb--;
+                        if (bb == 0) {
+                            bpos = j; // matched brace here, don't change color!
+
+                            cursor.setPosition(j, QTextCursor::MoveAnchor);
+                            cursor.selectionStart();
+                            cursor.setPosition(j+1, QTextCursor::KeepAnchor);
+                            cursor.selectionEnd();
+                            cursor.mergeCharFormat(cyanbg);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (!instring && !incomment && string[i]==')') {
+            brace--;
+
+            if (i==pos-1) {
+
+                cursor.setPosition(i, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.mergeCharFormat(cyanbg);
+
+                // run backward looking for match
+                int bb=0;
+                for(int j=i; j>=0; j--) {
+                    if (string[j]==')') bb++;
+                    if (string[j]=='(') {
+                        bb--;
+                        if (bb == 0) {
+                            bpos = j; // matched brace here, don't change color!
+
+                            cursor.setPosition(j, QTextCursor::MoveAnchor);
+                            cursor.selectionStart();
+                            cursor.setPosition(j+1, QTextCursor::KeepAnchor);
+                            cursor.selectionEnd();
+                            cursor.mergeCharFormat(cyanbg);
+                            break;
+                        }
+                    }
+                }
+
+            } else if (brace < 0 && i != bpos-1) {
+
+                cursor.setPosition(i, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.mergeCharFormat(redbg);
+            }
+        }
+    }
+
+    // unbalanced braces - do same as above, backwards?
+    //XXX braces in comments fuck things up ... XXX
+    if (brace > 0) {
+        brace = 0;
+        for(int i=string.length(); i>=0; i--) {
+
+            if (string[i] == ')') brace++;
+            if (string[i] == '(') brace--;
+
+            if (brace < 0 && string[i] == '(' && i != pos-1 && i != bpos-1) {
+                cursor.setPosition(i, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.mergeCharFormat(redbg);
             }
         }
     }

@@ -2375,6 +2375,7 @@ LTMTool::setFilter(QStringList files)
 DataFilterEdit::DataFilterEdit(QWidget *parent, Context *context)
 : QTextEdit(parent), context(context), c(0)
 {
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(checkErrors()));
 }
 
 DataFilterEdit::~DataFilterEdit()
@@ -2387,7 +2388,7 @@ DataFilterEdit::checkErrors()
     // parse and present errors to user
     DataFilter checker(this, context);
     QStringList errors = checker.check(toPlainText());
-    checker.colorSyntax(document()); // syntax + error highlighting
+    checker.colorSyntax(document(), textCursor().position()); // syntax + error highlighting
 
     // need to fixup for errors!
     // XXX next commit
