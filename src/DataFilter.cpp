@@ -178,10 +178,22 @@ DataFilter::colorSyntax(QTextDocument *document)
 
     // clear formatting and color comments
     QTextCharFormat normal;
+    normal.setFontWeight(QFont::Normal);
     normal.setUnderlineStyle(QTextCharFormat::NoUnderline);
     normal.setForeground(Qt::black);
 
+    QTextCharFormat symbol;
+    symbol.setFontWeight(QFont::Bold);
+    symbol.setUnderlineStyle(QTextCharFormat::NoUnderline);
+    symbol.setForeground(Qt::black);
+
+    QTextCharFormat literal;
+    literal.setFontWeight(QFont::Normal);
+    literal.setUnderlineStyle(QTextCharFormat::NoUnderline);
+    literal.setForeground(Qt::red);
+
     QTextCharFormat comment;
+    comment.setFontWeight(QFont::Normal);
     comment.setUnderlineStyle(QTextCharFormat::NoUnderline);
     comment.setForeground(Qt::blue);
 
@@ -196,13 +208,118 @@ DataFilter::colorSyntax(QTextDocument *document)
 
     // color comments
     bool instring=false;
+    bool innumber=false;
     bool incomment=false;
+    bool insymbol=false;
     int commentstart=0;
+    int stringstart=0;
+    int numberstart=0;
+    int symbolstart=0;
 
     for(int i=0; i<string.length(); i++) {
 
-        // watch for being in a string
-        if (string[i] == '"' && !incomment) instring=!instring;
+        // enter into symbol
+        if (!insymbol && !incomment && !instring && string[i].isLetter()) {
+            insymbol = true;
+            symbolstart = i;
+        }
+
+        // end of symbol ?
+        if (insymbol && (!string[i].isLetterOrNumber() && string[i] != '_')) {
+
+            insymbol = false;
+            QString sym = string.mid(symbolstart, i-symbolstart);
+
+            bool found=false;
+            QString lookup = lookupMap.value(sym, "");
+            if (lookup == "") {
+
+                // isRun isa special, we may add more later (e.g. date)
+                if (!sym.compare("Date", Qt::CaseInsensitive) ||
+                    !sym.compare("const", Qt::CaseInsensitive) ||
+                    !sym.compare("config", Qt::CaseInsensitive) ||
+                    !sym.compare("ctl", Qt::CaseInsensitive) ||
+                    !sym.compare("lts", Qt::CaseInsensitive) ||
+                    !sym.compare("tsb", Qt::CaseInsensitive) ||
+                    !sym.compare("sb", Qt::CaseInsensitive) ||
+                    !sym.compare("atl", Qt::CaseInsensitive) ||
+                    !sym.compare("sts", Qt::CaseInsensitive) ||
+                    !sym.compare("rr", Qt::CaseInsensitive) ||
+                    !sym.compare("daterange", Qt::CaseInsensitive) ||
+                    !sym.compare("Today", Qt::CaseInsensitive) ||
+                    !sym.compare("Current", Qt::CaseInsensitive) ||
+                    sym == "isSwim" || sym == "isRun") {
+                    found = true;
+                }
+
+                // still not found ?
+                // is it a function then ?
+                for(int i=0; DataFilterFunctions[i].parameters != -1; i++) {
+                    if (DataFilterFunctions[i].name == sym) {
+                        found = true;
+                        break;
+                    }
+                }
+            } else {
+                found = true;
+            }
+
+            if (found) {
+
+                // lets color it red, its a literal.
+                cursor.setPosition(symbolstart, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.setCharFormat(symbol);
+            }
+        }
+
+        // numeric literal
+        if (!insymbol && string[i].isNumber()) {
+
+            // start of number ?
+            if (!incomment && !instring && !innumber) {
+
+                innumber = true;
+                numberstart = i;
+
+            }
+
+        } else if (!insymbol && !incomment && !instring &&innumber) {
+
+            // now out of number
+
+            innumber = false;
+
+            // lets color it red, its a literal.
+            cursor.setPosition(numberstart, QTextCursor::MoveAnchor);
+            cursor.selectionStart();
+            cursor.setPosition(i, QTextCursor::KeepAnchor);
+            cursor.selectionEnd();
+            cursor.setCharFormat(literal);
+        }
+
+        // watch for being in a string, but remember escape!
+        if ((i==0 || string[i-1] != '\\') && string[i] == '"') {
+
+            if (!incomment && instring) {
+
+                instring = false;
+
+                // lets color it red, its a literal.
+                cursor.setPosition(stringstart, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.setCharFormat(literal);
+
+            } else if (!incomment && !instring) {
+
+                stringstart=i;
+                instring=true;
+            }
+        }
 
         // watch for being in a comment
         if (string[i] == '#' && !instring && !incomment) {
@@ -210,7 +327,8 @@ DataFilter::colorSyntax(QTextDocument *document)
             commentstart=i;
         }
 
-        if ((string[i] == '\r' || string[i] == '\n')) {
+        // end of text or line
+        if (i+1 == string.length() || (string[i] == '\r' || string[i] == '\n')) {
 
             // mark if we have a comment
             if (incomment) {
@@ -224,8 +342,25 @@ DataFilter::colorSyntax(QTextDocument *document)
                 cursor.setPosition(i, QTextCursor::KeepAnchor);
                 cursor.selectionEnd();
                 cursor.setCharFormat(comment);
+
             } else {
-                instring = false; // always quit on end of line
+
+                int start=0;
+                if (instring) start=stringstart;
+                if (innumber) start=numberstart;
+
+                // end of string ...
+                if (instring || innumber) {
+
+                    innumber = instring = false; // always quit on end of line
+
+                    // lets color it red, its a literal.
+                    cursor.setPosition(start, QTextCursor::MoveAnchor);
+                    cursor.selectionStart();
+                    cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                    cursor.selectionEnd();
+                    cursor.setCharFormat(literal);
+                }
             }
         }
     }
@@ -242,9 +377,9 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
     QTextCharFormat apply;
 
     switch(leaf->type) {
-    case Leaf::Float : 
-    case Leaf::Integer : 
-    case Leaf::String : 
+    case Leaf::Float :
+    case Leaf::Integer :
+    case Leaf::String :
                     break;
 
     case Leaf::Symbol :
@@ -256,17 +391,17 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
                     return;
                     break;
 
-    case Leaf::Operation : 
+    case Leaf::Operation :
                     leaf->color(leaf->lvalue.l, document);
                     leaf->color(leaf->rvalue.l, document);
                     return;
                     break;
 
-    case Leaf::UnaryOperation : 
+    case Leaf::UnaryOperation :
                     leaf->color(leaf->lvalue.l, document);
                     return;
                     break;
-    case Leaf::BinaryOperation : 
+    case Leaf::BinaryOperation :
                     leaf->color(leaf->lvalue.l, document);
                     leaf->color(leaf->rvalue.l, document);
                     return;
@@ -288,7 +423,7 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
                     return;
                     break;
 
-    case Leaf::Conditional : 
+    case Leaf::Conditional :
         {
                     leaf->color(leaf->cond.l, document);
                     leaf->color(leaf->lvalue.l, document);
@@ -305,6 +440,7 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
 
     // all we do now is highlight if in error.
     if (leaf->inerror == true) {
+
         QTextCursor cursor(document);
 
         // highlight this token and apply
@@ -318,7 +454,6 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
 
         cursor.mergeCharFormat(apply);
     }
-
 }
 
 void Leaf::print(Leaf *leaf, int level)

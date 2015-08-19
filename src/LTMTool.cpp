@@ -2387,7 +2387,7 @@ DataFilterEdit::checkErrors()
     // parse and present errors to user
     DataFilter checker(this, context);
     QStringList errors = checker.check(toPlainText());
-    checker.colorSyntax(document());
+    checker.colorSyntax(document()); // syntax + error highlighting
 
     // need to fixup for errors!
     // XXX next commit
