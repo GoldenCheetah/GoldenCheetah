@@ -171,6 +171,34 @@ Leaf::isDynamic(Leaf *leaf)
 }
 
 void
+DataFilter::setSignature(QString &query)
+{
+    // strip out all whitespace and comments
+    // from the formula so it can be used as
+    // a signature when placed into a hash
+    sig.clear();
+
+    bool incomment=false;
+    bool instring=false;
+
+    for (int i=0; i<query.length(); i++) {
+
+        // get out of comments and strings at end of a line
+        if (query[i] == '\n') instring = incomment=false;
+
+        // get into comments
+        if (!instring && query[i] == '#') incomment=true;
+
+        // not in comment and not escaped
+        if (query[i] == '"' && !incomment && (((i && query[i-1] != '\\') || i==0))) instring = !instring;
+
+        // keep anything that isn't whitespace, or a comment
+        if (instring || (!incomment && !query[i].isSpace())) sig += query[i];
+    
+    }
+}
+
+void
 DataFilter::colorSyntax(QTextDocument *document, int pos)
 {
     // matched brace position
@@ -917,6 +945,9 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
 {
     configChanged(CONFIG_FIELDS);
 
+    // regardless of success or failure set signature
+    setSignature(formula);
+
     DataFiltererrors.clear(); // clear out old errors
     DataFilter_setString(formula);
     DataFilterparse();
@@ -932,6 +963,7 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
     // save away the results if it passed semantic validation
     if (DataFiltererrors.count() != 0)
         treeRoot= NULL;
+
 }
 
 Result DataFilter::evaluate(RideItem *item)
@@ -944,6 +976,9 @@ Result DataFilter::evaluate(RideItem *item)
 
 QStringList DataFilter::check(QString query)
 {
+    // since we may use it afterwards
+    setSignature(query);
+
     // remember where we apply
     isdynamic=false;
 
@@ -976,6 +1011,9 @@ QStringList DataFilter::parseFilter(QString query, QStringList *list)
     // remember where we apply
     this->list = list;
     isdynamic=false;
+
+    // regardless of fail/pass set the signature
+    setSignature(query);
 
     //DataFilterdebug = 2; // no debug -- needs bison -t in src.pro
     root = NULL;
@@ -1062,6 +1100,7 @@ void DataFilter::clearFilter()
         treeRoot = NULL;
     }
     isdynamic = false;
+    sig = "";
 }
 
 void DataFilter::configChanged(qint32)
