@@ -32,7 +32,7 @@
 class VideoLayoutParser : public QXmlDefaultHandler
 {
 public:
-    VideoLayoutParser(QObject* layoutFile, QList<MeterWidget*>& metersWidget, QWidget* VideoContainer);
+    VideoLayoutParser(QList<MeterWidget*>* metersWidget, QWidget* VideoContainer);
 
     bool startElement( const QString&, const QString&, const QString&,
 		       const QXmlAttributes& );
@@ -42,8 +42,7 @@ public:
     void SetDefaultValues();
 
 private:
-    QObject*    layoutFile;
-    QList<MeterWidget*> metersWidget;
+    QList<MeterWidget*>* metersWidget;
     QWidget*    VideoContainer;
 
     QString     buffer;

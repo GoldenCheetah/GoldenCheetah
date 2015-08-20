@@ -38,8 +38,8 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     MainFont = QFont(this->font().family(), 64);
     AltFont = QFont(this->font().family(), 48);
     BackgroundColor = QColor(96, 96, 96, 200);
-    RangeMin = 0;
-    RangeMax = 100;
+    m_RangeMin = 0;
+    m_RangeMax = 100;
 }
 
 void MeterWidget::SetRelativeSize(float RelativeWidth, float RelativeHeight)
@@ -167,7 +167,7 @@ void CircularIndicatorMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.save();
     painter.rotate(-Angle/2);
 
-    double CPAngle = qBound((float) -1.0, (Value-RangeMin) / (RangeMax-RangeMin), (float) 1.0) * Angle;
+    double CPAngle = qBound((float) -1.0, (Value-m_RangeMin) / (m_RangeMax-m_RangeMin), (float) 1.0) * Angle;
     QPainterPath CPEmptyPath;
     CPEmptyPath.moveTo(CP_pt1);
     CPEmptyPath.arcMoveTo(CP_intRect, 90 - CPAngle);
@@ -236,7 +236,7 @@ void NeedleMeterWidget::paintEvent(QPaintEvent* paintevent)
     QPainterPath my_painterPath;
     painter.save();
     painter.translate(m_Width / 2, m_Height / 2);
-    painter.rotate(-Angle/2+(qBound((float) -1.0, (Value-RangeMin)/(RangeMax-RangeMin), (float) 1.0)*Angle));
+    painter.rotate(-Angle/2+(qBound((float) -1.0, (Value-m_RangeMin)/(m_RangeMax-m_RangeMin), (float) 1.0)*Angle));
     my_painterPath.moveTo(-2, 0);
     my_painterPath.lineTo(0, -m_Height*4/10);
     my_painterPath.lineTo(+2, 0);

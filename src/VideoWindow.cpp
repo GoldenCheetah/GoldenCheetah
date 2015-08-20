@@ -22,6 +22,7 @@
 #include "RideItem.h"
 #include "RideFile.h"
 #include "MeterWidget.h"
+#include "VideoLayoutParser.h"
 
 VideoWindow::VideoWindow(Context *context)  :
     GcWindow(context), context(context), m_MediaChanged(false)
@@ -93,15 +94,51 @@ VideoWindow::VideoWindow(Context *context)  :
         layout->addWidget(container);
         libvlc_media_player_set_hwnd (mp, (HWND)(container->winId()));
 
-        speedmeterwidget = new NeedleMeterWidget(QString("speedometer"),container, QString("Speed"));
+        QString filename = context->athlete->home->config().canonicalPath() + "/" + "video-layout.xml";
+        QFileInfo finfo(filename);
+
+        if (finfo.exists())
+        {
+            QFile file(filename);
+/*
+            QString content = "";
+            if (file.open(QIODevice::ReadOnly))
+            {
+                content = file.readAll();
+                file.close();
+            }
+            if (content != "")
+            {*/
+                // clear previous layout
+                qDebug() << "Clean previous layout";
+                foreach(MeterWidget* p_meterWidget, m_metersWidget)
+                {
+                    m_metersWidget.removeAll(p_meterWidget);
+                    delete p_meterWidget;
+                }
+
+                VideoLayoutParser handler(&m_metersWidget, container);
+
+                QXmlInputSource source (&file);
+                QXmlSimpleReader reader;
+                reader.setContentHandler (&handler);
+                qDebug() << "Parse XML for new layout";
+                reader.parse (source);
+        
+        
+            //}
+        }
+/*        FIXME: remove when XML parser will be operational
+        speedmeterwidget = new NeedleMeterWidget(QString("speedometer classic"),container, QString("Speed"));
         speedmeterwidget->SetRelativeSize(20.0, 15.0);
         speedmeterwidget->SetRelativePos(20.0, 77.0);
         speedmeterwidget->MainColor = QColor(255,0,0,180);
         speedmeterwidget->BackgroundColor = QColor(100,100,100,100);
-        speedmeterwidget->RangeMax = 60.0;
+        speedmeterwidget->m_RangeMax = 60.0;
         speedmeterwidget->Angle = 220.0;
         speedmeterwidget->SubRange = 6;
         m_metersWidget.append(speedmeterwidget);
+        
         textspeedmeterwidget = new TextMeterWidget(QString("speedometertext"),speedmeterwidget, QString("Speed"));
         textspeedmeterwidget->SetRelativeSize(70.0, 40.0);
         textspeedmeterwidget->SetRelativePos(50.0, 75.0);
@@ -112,7 +149,7 @@ VideoWindow::VideoWindow(Context *context)  :
         powermeterwidget->SetRelativeSize(20.0, 15.0);
         powermeterwidget->SetRelativePos(80.0, 77.0);
         powermeterwidget->Angle = 280.0;
-        powermeterwidget->RangeMax = 350.0;
+        powermeterwidget->m_RangeMax = 350.0;
         m_metersWidget.append(powermeterwidget);
         textpowermeterwidget = new TextMeterWidget(QString("powermetertext"),powermeterwidget, QString("Watt"));
         textpowermeterwidget->SetRelativeSize(50.0, 40.0);
@@ -131,7 +168,7 @@ VideoWindow::VideoWindow(Context *context)  :
         cadencemeterwidget->SetRelativePos(50.0, 77.0);
         m_metersWidget.append(cadencemeterwidget);
         cadencemeterwidget->Angle = 280.0;
-        cadencemeterwidget->RangeMax = 350.0;
+        cadencemeterwidget->m_RangeMax = 350.0;
         m_metersWidget.append(cadencemeterwidget);
         textcadencemeterwidget = new TextMeterWidget(QString("cadencemetertext"),cadencemeterwidget, QString("Cadence"));
         textcadencemeterwidget->SetRelativeSize(50.0, 40.0);
@@ -150,7 +187,7 @@ VideoWindow::VideoWindow(Context *context)  :
         textHRMmeterwidget->SetRelativePos(50.0, 90.0);
         textHRMmeterwidget->MainColor = QColor(255,0,0,180);
         m_metersWidget.append(textHRMmeterwidget);
-
+*/
 #endif
     } else {
 
@@ -217,6 +254,11 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 {
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {
+        qDebug() << qPrintable("resize meter : ") << p_meterWidget->Name();
+        qDebug() << qPrintable("   X,Y  WxH : ") << QString::number(p_meterWidget->PosX()) << "," << QString::number(p_meterWidget->PosY()) << "  " << QString::number(p_meterWidget->Width()) << "x" << QString::number(p_meterWidget->Height());
+        qDebug() << qPrintable("   relative : ") << QString::number(p_meterWidget->RelativePosX()) << "," << QString::number(p_meterWidget->RelativePosY()) << "  " << QString::number(p_meterWidget->RelativeWidth()) << "x" << QString::number(p_meterWidget->RelativeHeight());
+        qDebug() << qPrintable("   container : ") << QString("0x%1").arg((quintptr)p_meterWidget->container(), QT_POINTER_SIZE * 2, 16, QChar('0'));
+
         p_meterWidget->AdjustSizePos();
     }
 }
@@ -243,8 +285,13 @@ void VideoWindow::startPlayback()
     mp->play();
 #endif
 
+    qDebug() << qPrintable("Start playback ! p_meterWidget.count()=") << QString::number(m_metersWidget.count());
+    
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {
+        qDebug() << qPrintable("meter : ") << p_meterWidget->Name();
+        qDebug() << qPrintable("X,Y, W,H : ") << QString::number(p_meterWidget->PosX()) << "," << QString::number(p_meterWidget->PosY()) << "," << QString::number(p_meterWidget->Width()) << "," << QString::number(p_meterWidget->Height());
+        
         p_meterWidget->setWindowOpacity(1); // Show the widget
         p_meterWidget->AdjustSizePos();
         p_meterWidget->update();

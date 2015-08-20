@@ -29,8 +29,8 @@
 // use stc strtod to bypass Qt toDouble() issues
 #include <stdlib.h>
 
-VideoLayoutParser::VideoLayoutParser (QObject* layoutFile, QList<MeterWidget*>& metersWidget, QWidget* VideoContainer)
-    : layoutFile(layoutFile), metersWidget(metersWidget), VideoContainer(VideoContainer)
+VideoLayoutParser::VideoLayoutParser (QList<MeterWidget*>* metersWidget, QWidget* VideoContainer)
+    : metersWidget(metersWidget), VideoContainer(VideoContainer)
 {
     nonameindex = 0;
     meterWidget = NULL;
@@ -45,8 +45,8 @@ void VideoLayoutParser::SetDefaultValues()
         meterWidget->m_RelativePosX = 50.0;
         meterWidget->m_RelativePosY = 80.0;
 
-        meterWidget->RangeMin = 0.0;
-        meterWidget->RangeMax = 80.0;
+        meterWidget->m_RangeMin = 0.0;
+        meterWidget->m_RangeMax = 80.0;
         meterWidget->MainColor = QColor(255,0,0,200);
         meterWidget->ScaleColor = QColor(255,255,255,200);
         meterWidget->OutlineColor = QColor(100,100,100,200);
@@ -87,16 +87,18 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
             meterType = qAttributes.value(i);
         else
             meterType = QString("Text"); 
-
-        //TODO: allows creation of meter when container will be created later
+        
+        //TODO: allow creation of meter when container will be created later
         QWidget* containerWidget = NULL;
         if (container == QString("Video"))
         {
             containerWidget = VideoContainer;
+            
+            qDebug() << "   Container = Main window = " + QString("0x%1").arg((quintptr)VideoContainer, QT_POINTER_SIZE * 2, 16, QChar('0'));
         }
         else
         {
-            foreach(MeterWidget* p_meterWidget , metersWidget)
+            foreach(MeterWidget* p_meterWidget , *metersWidget)
             {
                 if (p_meterWidget->m_Name == container)
                     containerWidget = p_meterWidget;
@@ -111,6 +113,7 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         else if (meterType == QString("NeedleMeter"))
         {
             meterWidget = new NeedleMeterWidget(meterName, containerWidget, source);
+            qDebug() << qPrintable("NeedleMeterWidget created !");
         }
         else if (meterType == QString("CircularMeter"))
         {
@@ -121,7 +124,9 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
             qDebug() << QObject::tr("Error creating meter");
         }
         
+        qDebug() << qPrintable("SetDefaultValues...in progress...");
         SetDefaultValues();
+        qDebug() << qPrintable("SetDefaultValues...done!");
     }
 
     return true;
@@ -133,29 +138,35 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
     {
         if (qName == "RelativeWidth")
         {
-            meterWidget->m_RelativeWidth = buffer.toFloat();
+            qDebug() << qPrintable("Set Relative Width");
+            meterWidget->m_RelativeWidth = buffer.toFloat() / 100.0;
         }
         else if (qName == "RelativeHeight")
         {
-            meterWidget->m_RelativeHeight = buffer.toFloat();
+            qDebug() << qPrintable("Set Relative Height");
+            meterWidget->m_RelativeHeight = buffer.toFloat() / 100.0;
         }
         else if (qName == "RelativePosX")
         {
-            meterWidget->m_RelativePosX = buffer.toFloat();
+            qDebug() << qPrintable("Set Relative PosX");
+            meterWidget->m_RelativePosX = buffer.toFloat() / 100.0;
         }
         else if (qName == "RelativePosY")
         {
-            meterWidget->m_RelativePosY = buffer.toFloat();
+            qDebug() << qPrintable("Set Relative PosY");
+            meterWidget->m_RelativePosY = buffer.toFloat() / 100.0;
         }
         else if (qName == "RangeMin")
         {
+            qDebug() << qPrintable("Set RangeMin");
             meterWidget->m_RangeMin = buffer.toFloat();
         }
         else if (qName == "RangeMax")
         {
+            qDebug() << qPrintable("Set...");
             meterWidget->m_RangeMax = buffer.toFloat();
         }
-        
+
     /*
     //TODO:    
         MainColor
@@ -170,8 +181,14 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
     */
 
         else if (qName == "meter")
-        {
-            metersWidget.append(meterWidget);
+        {        
+            qDebug() << qPrintable("Ready to append meter");
+            
+            if (metersWidget)
+            {
+                metersWidget->append(meterWidget);
+                qDebug() << qPrintable("Ready to append meter...done!") << meterWidget->m_Name << " " << metersWidget->count();
+            }
             meterWidget = NULL;
         }
 

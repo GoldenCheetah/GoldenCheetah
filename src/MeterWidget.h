@@ -26,6 +26,16 @@ class MeterWidget : public QWidget
   public:
     explicit MeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
     QString Source() const { return m_Source; };
+    QString Name() const { return m_Name; };
+    int     Width() const { return m_Width; };
+    int     Height() const { return m_Height; };
+    int     PosX() const { return m_PosX; };
+    int     PosY() const { return m_PosY; };
+    float   RelativeWidth() const { return m_RelativeWidth; };
+    float   RelativeHeight() const { return m_RelativeHeight; };
+    float   RelativePosX() const { return m_RelativePosX; };
+    float   RelativePosY() const { return m_RelativePosY; };
+    QWidget* container() const { return m_container; };
     virtual void SetRelativeSize(float RelativeWidth = 100.0, float RelativeHeight = 100.0);
     virtual void SetRelativePos(float RelativePosX = 50.0, float RelativePosY = 50.0);
     virtual void AdjustSizePos();
@@ -35,7 +45,6 @@ class MeterWidget : public QWidget
     virtual QSize minimumSize() const;
 
     float Value, ValueMin, ValueMax;
-    float RangeMin, RangeMax;
     QString Text, AltText;
 
     QColor MainColor;
@@ -44,6 +53,7 @@ class MeterWidget : public QWidget
     QFont  MainFont;
     QFont  AltFont;
     QColor BackgroundColor;
+    float    m_RangeMin, m_RangeMax; //FIXME : protect it when XML will be operational
 
   protected:
     QString  m_Name;

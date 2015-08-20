@@ -11,4 +11,67 @@
 		<MainColor>255,0,0,180</MainColor>
 		<BackgroundColor>100,100,100,100</BackgroundColor>
 	</meter>
+	<meter name="Speedometer-text" container="Speedometer" source="Speed" type="Text">
+		<RelativeWidth>70.0</RelativeWidth>
+		<RelativeHeight>40.0</RelativeHeight>
+		<RelativePosX>50.0</RelativePosX>
+		<RelativePosY>75.0</RelativePosY>
+		<MainColor>255,0,0,180</MainColor>
+	</meter>
+	<meter name="Wattmeter" container="Video" source="Watt" type="CircularMeter">
+		<RelativeWidth>20.0</RelativeWidth>
+		<RelativeHeight>15.0</RelativeHeight>
+		<RelativePosX>80.0</RelativePosX>
+		<RelativePosY>77.0</RelativePosY>
+		<RangeMin>0.0</RangeMin>
+		<RangeMax>350.0</RangeMax>
+		<Angle>280.0</Angle>
+	</meter>
+	<meter name="Wattmeter-text" container="Wattmeter" source="Watt" type="Text">
+		<RelativeWidth>50.0</RelativeWidth>
+		<RelativeHeight>40.0</RelativeHeight>
+		<RelativePosX>50.0</RelativePosX>
+		<RelativePosY>50.0</RelativePosY>
+		<MainColor>255,100,100,180</MainColor>
+	</meter>
+	<meter name="Wattmeter-unit" container="Wattmeter" source="None" type="Text">
+		<RelativeWidth>50.0</RelativeWidth>
+		<RelativeHeight>20.0</RelativeHeight>
+		<RelativePosX>50.0</RelativePosX>
+		<RelativePosY>85.0</RelativePosY>
+		<MainColor>255,100,100,180</MainColor>
+		<Text>Watts</Text>
+	</meter>
+
+	<meter name="Cadencemeter" container="Video" source="Cadence" type="CircularMeter">
+		<RelativeWidth>20.0</RelativeWidth>
+		<RelativeHeight>15.0</RelativeHeight>
+		<RelativePosX>50.0</RelativePosX>
+		<RelativePosY>77.0</RelativePosY>
+		<RangeMin>0.0</RangeMin>
+		<RangeMax>200.0</RangeMax>
+		<Angle>280.0</Angle>
+	</meter>
+	<meter name="Cadencemeter-text" container="Cadencemeter" source="Cadence" type="Text">
+		<RelativeWidth>50.0</RelativeWidth>
+		<RelativeHeight>40.0</RelativeHeight>
+		<RelativePosX>50.0</RelativePosX>
+		<RelativePosY>50.0</RelativePosY>
+		<MainColor>255,100,100,180</MainColor>
+	</meter>
+	<meter name="Cadencemeter-unit" container="Cadencemeter" source="None" type="Text">
+		<RelativeWidth>50.0</RelativeWidth>
+		<RelativeHeight>20.0</RelativeHeight>
+		<RelativePosX>50.0</RelativePosX>
+		<RelativePosY>85.0</RelativePosY>
+		<MainColor>255,100,100,180</MainColor>
+		<Text>rpm</Text>
+	</meter>
+	<meter name="HRM-text" container="Video" source="HRM" type="Text">
+		<RelativeWidth>15.0</RelativeWidth>
+		<RelativeHeight>5.0</RelativeHeight>
+		<RelativePosX>50.0</RelativePosX>
+		<RelativePosY>90.0</RelativePosY>
+		<MainColor>255,0,0,180</MainColor>
+	</meter>
 </layout>
