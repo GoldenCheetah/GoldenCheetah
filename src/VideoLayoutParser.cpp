@@ -64,31 +64,30 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
 
     if(qName == "meter")
     {
-        int i = qAttributes.index("Name"); // To be used to enclose another sub meter (typ. text within NeedleMeter)
+        int i = qAttributes.index("name"); // To be used to enclose another sub meter (typ. text within NeedleMeter)
         if(i >= 0)
             meterName = qAttributes.value(i);
         else
             meterName = QString("noname_") + QString::number(nonameindex++);
         
-        i = qAttributes.index("Container"); // Video, ... or other meter name
+        i = qAttributes.index("container"); // Video, ... or other meter name
         if(i >= 0)
             container = qAttributes.value(i);
         else
             container = QString("Video");
 
-        i = qAttributes.index("Source"); // Watt, Speed...
+        i = qAttributes.index("source"); // Watt, Speed...
         if(i >= 0)
             source = qAttributes.value(i);
         else
             source = QString("None");
 
-        i = qAttributes.index("Type"); // Text, NeedleMeter, CircularMeter...
+        i = qAttributes.index("type"); // Text, NeedleMeter, CircularMeter...
         if(i >= 0)
             meterType = qAttributes.value(i);
         else
             meterType = QString("Text"); 
 
-        //FIXME: container = text instead of Widget !
         //TODO: allows creation of meter when container will be created later
         QWidget* containerWidget = NULL;
         if (container == QString("Video"))
@@ -148,17 +147,26 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
         {
             meterWidget->m_RelativePosY = buffer.toFloat();
         }
+        else if (qName == "RangeMin")
+        {
+            meterWidget->m_RangeMin = buffer.toFloat();
+        }
+        else if (qName == "RangeMax")
+        {
+            meterWidget->m_RangeMax = buffer.toFloat();
+        }
         
     /*
     //TODO:    
-        RangeMin
-        RangeMax
         MainColor
         ScaleColor
         OutlineColor
         BackgroundColor
         MainFont
         AltFont
+        speedmeterwidget->Angle = 220.0;
+        speedmeterwidget->SubRange = 6;
+        
     */
 
         else if (qName == "meter")

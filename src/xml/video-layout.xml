@@ -1,0 +1,14 @@
+<layout name="preset_1">
+	<meter name="Speedometer" container="Video" source="Speed" type="NeedleMeter">
+		<RelativeWidth>20.0</RelativeWidth>
+		<RelativeHeight>15.0</RelativeHeight>
+		<RelativePosX>20.0</RelativePosX>
+		<RelativePosY>77.0</RelativePosY>
+		<RangeMin>0.0</RangeMin>
+		<RangeMax>60.0</RangeMax>
+		<Angle>220.0</Angle>
+		<SubRange>6</SubRange>
+		<MainColor>255,0,0,180</MainColor>
+		<BackgroundColor>100,100,100,100</BackgroundColor>
+	</meter>
+</layout>
