@@ -195,7 +195,38 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     connect (unitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(unitChanged(int)));
     connect (save, SIGNAL(clicked()), this, SLOT(saveClicked()));
     connect (cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+
+    this->installEventFilter(this);
+    
 }
+
+/**
+ * Create a default action of Saving the new Cyclist rather than
+ * selecting components within the dialog. Previously this was
+ * the choose avitar
+ */
+bool
+NewCyclistDialog::eventFilter(QObject *object, QEvent *e)
+{
+    switch(e->type())
+    {
+        case QEvent::KeyPress:
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+            if (keyEvent->modifiers() & Qt::NoModifier) {
+                
+                // No modifiers - create a default save button rather than choose picture
+                switch (keyEvent->key()) {
+                        
+                    case Qt::Key_Return:
+                    case Qt::Key_Enter:
+                        emit saveClicked();
+                        return true;
+                }
+            }
+    }
+    return QObject::eventFilter(object, e);
+}
+
 
 void
 NewCyclistDialog::chooseAvatar()
