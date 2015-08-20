@@ -190,10 +190,13 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
     QTextCharFormat redbg;
     redbg.setBackground(QColor(255,153,153));
 
+    QTextCharFormat function;
+    function.setUnderlineStyle(QTextCharFormat::NoUnderline);
+    function.setForeground(Qt::blue);
+
     QTextCharFormat symbol;
-    symbol.setFontWeight(QFont::Bold);
     symbol.setUnderlineStyle(QTextCharFormat::NoUnderline);
-    symbol.setForeground(Qt::black);
+    symbol.setForeground(Qt::blue);
 
     QTextCharFormat literal;
     literal.setFontWeight(QFont::Normal);
@@ -203,7 +206,7 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
     QTextCharFormat comment;
     comment.setFontWeight(QFont::Normal);
     comment.setUnderlineStyle(QTextCharFormat::NoUnderline);
-    comment.setForeground(Qt::blue);
+    comment.setForeground(Qt::darkGreen);
 
     QTextCursor cursor(document);
 
@@ -236,6 +239,7 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
         // end of symbol ?
         if (insymbol && (!string[i].isLetterOrNumber() && string[i] != '_')) {
 
+            bool isfunction = false;
             insymbol = false;
             QString sym = string.mid(symbolstart, i-symbolstart);
 
@@ -260,14 +264,14 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
                     !sym.compare("Today", Qt::CaseInsensitive) ||
                     !sym.compare("Current", Qt::CaseInsensitive) ||
                     sym == "isSwim" || sym == "isRun") {
-                    found = true;
+                    isfunction = found = true;
                 }
 
                 // still not found ?
                 // is it a function then ?
                 for(int j=0; DataFilterFunctions[j].parameters != -1; j++) {
                     if (DataFilterFunctions[j].name == sym) {
-                        found = true;
+                        isfunction = found = true;
                         break;
                     }
                 }
@@ -282,7 +286,7 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
                 cursor.selectionStart();
                 cursor.setPosition(i, QTextCursor::KeepAnchor);
                 cursor.selectionEnd();
-                cursor.setCharFormat(symbol);
+                cursor.setCharFormat(isfunction ? function : symbol);
             }
         }
 
