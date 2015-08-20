@@ -563,6 +563,10 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         }
 
         if (type == RideFileInterval::ROUTE) {
+            QAction *actEditInt = new QAction(tr("Rename route"), intervalTree);
+            connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editRoute(void)));
+            menu.addAction(actEditInt);
+
             // stop identifying this segment
             QAction *actDeleteRoute = new QAction(tr("Stop tracking this segment"), intervalTree);
             connect(actDeleteRoute, SIGNAL(triggered(void)), this, SLOT(deleteRoute(void)));
@@ -805,6 +809,34 @@ AnalysisSidebar::deleteRoute()
 }
 
 void
+AnalysisSidebar::editRoute()
+{
+    // stop tracking this route across rides
+    if (activeInterval) {
+        // if refresh is running cancel it !
+        context->athlete->rideCache->cancel();
+
+        QString name = activeInterval->name;
+        editInterval();
+        if (name != activeInterval->name) {
+            context->athlete->routes->renameRoute(activeInterval->route, activeInterval->name);
+
+            // loop through rides finding intervals on this route
+            foreach(RideItem *ride, context->athlete->rideCache->rides()) {
+                // find the interval?
+                foreach(IntervalItem *interval, ride->intervals(RideFileInterval::ROUTE)) {
+                    if (interval->route == activeInterval->route) {
+                        //Make stale
+                        ride->isstale = true;
+                    }
+                }
+            }
+            context->athlete->rideCache->refresh();
+        }
+    }
+}
+
+void
 AnalysisSidebar::editIntervalSelected()
 {
     // run down the USER tree looking for it and delete it
@@ -857,20 +889,22 @@ AnalysisSidebar::editInterval()
         activeInterval->color = temp.color;
         activeInterval->start = temp.start;
         activeInterval->stop = temp.stop;
-        activeInterval->startKM = activeInterval->rideItem()->ride()->timeToDistance(temp.start),
-        activeInterval->stopKM = activeInterval->rideItem()->ride()->timeToDistance(temp.stop),
+        activeInterval->startKM = activeInterval->rideItem()->ride()->timeToDistance(temp.start);
+        activeInterval->stopKM = activeInterval->rideItem()->ride()->timeToDistance(temp.stop);
 
-        // update the ridefile interval
-        activeInterval->rideInterval->name = activeInterval->name;
-        activeInterval->rideInterval->start = activeInterval->start;
-        activeInterval->rideInterval->stop = activeInterval->stop;
-        activeInterval->rideItem()->setDirty(true);
+        if (activeInterval->rideInterval != NULL) { // User interval
+            // update the ridefile interval
+            activeInterval->rideInterval->name = activeInterval->name;
+            activeInterval->rideInterval->start = activeInterval->start;
+            activeInterval->rideInterval->stop = activeInterval->stop;
+            activeInterval->rideItem()->setDirty(true);
 
-        // refresh metrics!
-        activeInterval->refresh();
+            // refresh metrics!
+            activeInterval->refresh();
 
-        // now refresh charts
-        context->notifyIntervalsChanged();
+            // now refresh charts
+            context->notifyIntervalsChanged();
+        }
     }
 }
 

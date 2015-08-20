@@ -35,6 +35,7 @@
 
 #include "RideFile.h" // for SeriesType
 #include "Specification.h" // for SeriesType
+#include "RideMetric.h" // for RideMetric::MetricType
 
 class LTMTool;
 class LTMSettings;
@@ -44,9 +45,13 @@ class RideBest;
 
 // change history for LTMSettings
 // Prior to 13 no history was maintained
-// Date        Who              Description
-// 25 Jul 2015 Mark Liversedge  Update to charts.xml to show version number
-#define LTM_VERSION_NUMBER 13
+// Version   Date        Who              Description
+// 13        25 Jul 2015 Mark Liversedge  Update to charts.xml to show version number
+// 14        13 Aug 2015 Mark Liversedge  Added formula metric type
+// 15        13 Aug 2015 Mark Liversedge  Added formula aggregation type Avg, Total, Low etc
+// 16        14 Aug 2015 Mark Liversedge  Added curve specific filter
+
+#define LTM_VERSION_NUMBER 16
 
 // group by settings
 #define LTM_DAY     1
@@ -64,6 +69,7 @@ class RideBest;
 #define METRIC_BEST      5
 #define METRIC_ESTIMATE  6
 #define METRIC_STRESS    7
+#define METRIC_FORMULA   8
 
 // type of estimate
 #define ESTIMATE_WPRIME  0
@@ -84,7 +90,8 @@ class RideBest;
 class MetricDetail {
     public:
 
-    MetricDetail() : type(METRIC_DB), stack(false), hidden(false), model(""), name(""), metric(NULL), stressType(0),
+    MetricDetail() : type(METRIC_DB), stack(false), hidden(false), model(""), formulaType(RideMetric::Average), name(""), 
+                     metric(NULL), stressType(0),
                      smooth(false), trendtype(0), topN(0), lowestN(0), topOut(0), baseline(0.0), 
                      curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
@@ -101,6 +108,10 @@ class MetricDetail {
     int estimateDuration;       // n x units below for seconds
     int estimateDuration_units; // 1=secs, 60=mins, 3600=hours
     bool wpk; // absolute or wpk 
+
+    // for FORMULAs
+    QString formula;
+    RideMetric::MetricType formulaType;
 
     // for METRICS
     QString symbol;
@@ -131,6 +142,8 @@ class MetricDetail {
     bool showOnPlot;
     int filter;         // 0 no filter, 1 = include, 2 = exclude
     double from, to;
+
+    QString datafilter;
 
     // curve type and symbol
     QwtPlotCurve::CurveStyle curveStyle;      // how should this metric be plotted?

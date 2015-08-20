@@ -48,6 +48,7 @@
 #define SYS_DATE    1
 #define USER_DATE   2
 
+class DataFilterEdit;
 
 class LTMTool : public QWidget
 {
@@ -178,10 +179,13 @@ class EditMetricDetailDialog : public QDialog
         LTMTool *ltmTool;
         MetricDetail *metricDetail;
 
-        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress;
+        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress, *chooseFormula;
         QButtonGroup *group;
-        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget;
+        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget, *formulaWidget;
         QStackedWidget *typeStack;
+
+        // filter
+        SearchFilterBox *dataFilter;
 
         // bests
         QDoubleSpinBox *duration;
@@ -204,6 +208,10 @@ class EditMetricDetailDialog : public QDialog
         // stress
         QComboBox *stressTypeSelect; // STS, LTS, SB, RR et al
 
+        // formula
+        DataFilterEdit *formulaEdit; // edit your formula
+        QComboBox *formulaType;      // Average etc
+
         QComboBox *curveStyle,
                   *curveSymbol;
         QCheckBox *stack;
@@ -224,5 +232,32 @@ class EditMetricDetailDialog : public QDialog
         QList<RideFile::SeriesType> seriesList;
 };
 
-#endif // _GC_LTMTool_h
+class DataFilterEdit : public QTextEdit
+{
+    Q_OBJECT
 
+public:
+    DataFilterEdit(QWidget *parent, Context *context);
+    ~DataFilterEdit();
+
+    void setCompleter(QCompleter *c);
+    QCompleter *completer() const;
+
+protected:
+    void keyPressEvent(QKeyEvent *e);
+    void focusInEvent(QFocusEvent *e);
+
+public slots:
+    void setText(const QString&);
+    void insertCompletion(const QString &completion);
+    void checkErrors();
+
+private:
+    QString textUnderCursor() const;
+
+private:
+    QCompleter *c;
+    Context *context;
+};
+
+#endif // _GC_LTMTool_h

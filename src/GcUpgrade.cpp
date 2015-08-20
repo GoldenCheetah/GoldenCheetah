@@ -56,7 +56,7 @@ GcUpgrade::upgradeConfirmedByUser(const QDir &home)
 
     if (!folderUpgradeSuccess) {
 
-        GcUpgradeExecuteDialog msgBox(home.dirName());
+        GcUpgradeExecuteDialog msgBox(home);
         if (msgBox.exec() == QDialog::Accepted) return true;
 
         // if not accepted
@@ -770,8 +770,10 @@ GcUpgrade::removeIndex(QFile &index)
 }
 
 
-GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, Qt::Dialog)
+GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QDir athleteHomeDir) : QDialog(NULL, Qt::Dialog)
 {
+
+    const QString athlete = athleteHomeDir.dirName();
 
     setWindowTitle(QString(tr("Athlete %1").arg(athlete)));
     this->setMinimumWidth(550);
@@ -831,10 +833,24 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
     scrollText = new QScrollArea();
     scrollText->setWidget(text);
 
+    QLabel *footer1 = new QLabel(this);
+    footer1->setWordWrap(true);
+    footer1->setTextFormat(Qt::RichText);
+    footer1->setText(QString(tr("<center>Please backup the athlete directory:</center>")));
+
+    QLabel *footer2 = new QLabel(this);
+    footer2->setWordWrap(true);
+    footer2->setTextFormat(Qt::RichText);
+    footer2->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    footer2->setText(QString("<center><b>%1</b></center>").arg(athleteHomeDir.absolutePath()));
+
     toprow->addWidget(critical);
     toprow->addWidget(header);
     layout->addLayout(toprow);
     layout->addWidget(scrollText);
+    layout->addWidget(footer1);
+    layout->addWidget(footer2);
+
 
     QHBoxLayout *lastRow = new QHBoxLayout;
 

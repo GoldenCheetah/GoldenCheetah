@@ -618,8 +618,7 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         QString calendarText;
         foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
             if (field.diary == true && result->getTag(field.name, "") != "") {
-                calendarText += QString("%1\n")
-                        .arg(result->getTag(field.name, ""));
+                calendarText += field.calendarText(result->getTag(field.name, ""));
             }
         }
         result->setTag("Calendar Text", calendarText);

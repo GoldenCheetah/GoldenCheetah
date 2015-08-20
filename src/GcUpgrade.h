@@ -55,22 +55,26 @@
 // 3106 - V3.2 RC3
 // 3107 - V3.2 RC4 (lost due to push fail by Mark)
 // 3108 - V3.2 RC4X (some problems with tagging)
+// 3200 - V3.2 RELEASE (August 12 2015)
+// 3900 - V4.0 DEVELOPMENT STARTS
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
 #define VERSION3_SP2      3032 // released
 #define VERSION31_UPG     3100 // first build with 3.1 upgrade process
 #define VERSION311_BUILD  3101 // first build with 3.1 upgrade process
-#define VERSION32_BUILD   3108 // current 3.2 build
+#define VERSION32_BUILD   3200 // released
+#define VERSION40_BUILD   3900 // development release
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // these three will change until we release
-#define VERSION_LATEST 3108
-#define VERSION_STRING "V3.2 RC4X"
+#define VERSION_LATEST 3900
+#define VERSION_STRING "V4.0 DEV"
 
 // default config for this release is available and maintained here:
+// not updated for v4.0 *yet*
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.2"
 
 class GcUpgradeLogDialog : public QDialog
@@ -126,7 +130,7 @@ class GcUpgradeExecuteDialog : public QDialog
     Q_OBJECT
 
     public:
-        GcUpgradeExecuteDialog(QString);
+        GcUpgradeExecuteDialog(QDir);
 
     private:
         QScrollArea *scrollText;

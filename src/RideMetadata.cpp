@@ -185,17 +185,21 @@ RideMetadata::setExtraTab()
             // since we show EVERYTHING, don't let the user edit them
             // we might get more selective later?
 
-            // set Text Field to 'Read Only' to still enable scrolling,...
-            GTextEdit* textEdit = dynamic_cast<GTextEdit*> (field->widget);
-            if (textEdit)  textEdit->setReadOnly(true);
-            else {
-                QLineEdit* lineEdit = dynamic_cast<QLineEdit*> (field->widget);
-                if (lineEdit) lineEdit->setReadOnly(true);
-                else field->widget->setEnabled(false);
+            if (field->enabled) {
+                field->enabled->setEnabled(false);
+                field->widget->setEnabled(false);
+            } else {
+                // set Text Field to 'Read Only' to still enable scrolling,...
+                GTextEdit* textEdit = dynamic_cast<GTextEdit*> (field->widget);
+                if (textEdit)  textEdit->setReadOnly(true);
+                else {
+                    QLineEdit* lineEdit = dynamic_cast<QLineEdit*> (field->widget);
+                    if (lineEdit) lineEdit->setReadOnly(true);
+                    else field->widget->setEnabled(false);
 
+                }
             }
         }
-
     }
 }
 
@@ -721,8 +725,7 @@ FormField::metadataFlush()
     QString calendarText;
     foreach (FieldDefinition field, meta->getFields()) {
         if (field.diary == true) {
-            calendarText += QString("%1\n")
-                    .arg(ourRideItem->ride()->getTag(field.name, ""));
+            calendarText += field.calendarText(ourRideItem->ride()->getTag(field.name, ""));
         }
     }
     ourRideItem->ride()->setTag("Calendar Text", calendarText);
@@ -1002,7 +1005,7 @@ FormField::metadataChanged()
                       ourRideItem->ride()->metricOverrides.value(meta->sp.metricSymbol(definition.name));
                 if (override.contains("value")) {
                     enabled->setChecked(true);
-                    widget->setEnabled(true);
+                    //widget->setEnabled(true);
                     widget->setHidden(false);
                     value = override.value("value");
 
@@ -1015,10 +1018,14 @@ FormField::metadataChanged()
                             value = QString("%1").arg(newvalue);
                         }
                     }
+
+                    // initialize widget to show overriden value
+                    if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0).addSecs(value.toDouble()));
+                    else ((QDoubleSpinBox*)widget)->setValue(value.toDouble());
                 } else {
                     value = "0.0";
                     enabled->setChecked(false);
-                    widget->setEnabled(false);
+                    //widget->setEnabled(false);
                     widget->setHidden(true);
                 }
             } else {
@@ -1142,6 +1149,24 @@ FieldDefinition::getCompleter(QObject *parent)
         }
     }
     return completer;
+}
+
+QString
+FieldDefinition::calendarText(QString value)
+{
+    switch (type) {
+    case FIELD_INTEGER:
+    case FIELD_DOUBLE:
+    case FIELD_DATE:
+    case FIELD_TIME:
+    case FIELD_CHECKBOX:
+        return QString("%1: %2\n").arg(name).arg(value);
+    case FIELD_TEXT:
+    case FIELD_TEXTBOX:
+    case FIELD_SHORTTEXT:
+    default:
+        return QString("%1\n").arg(value);
+    }
 }
 
 unsigned long

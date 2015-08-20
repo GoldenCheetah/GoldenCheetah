@@ -166,7 +166,10 @@ overrides_list: override | overrides_list ',' override ;
 override: '{' override_name ':' override_values '}' { jc->JsonRide->metricOverrides.insert(jc->JsonOverName, jc->JsonOverrides);
                                                       jc->JsonOverrides.clear();
                                                     }
-override_name: string                   { jc->JsonOverName = jc->JsonString; }
+
+                                         // we renamed time riding to time moving ...
+override_name: string                   { if (jc->JsonString == "Time Riding") jc->JsonOverName = "Time Moving";
+                                          else jc->JsonOverName = jc->JsonString; }
 
 override_values: '{' override_value_list '}';
 override_value_list: override_value | override_value_list ',' override_value ;
@@ -181,7 +184,10 @@ tags: TAGS ':' '{' tags_list '}'
 tags_list: tag | tags_list ',' tag ;
 tag: tag_key ':' tag_value              { jc->JsonRide->setTag(jc->JsonTagKey, jc->JsonTagValue); }
 
-tag_key : string                        { jc->JsonTagKey = jc->JsonString; }
+                                          // we renamed time riding to time moving ...
+tag_key : string                        { if (jc->JsonString == "Time Riding") jc->JsonTagKey = "Time Moving";
+                                          else jc->JsonTagKey = jc->JsonString; }
+
 tag_value : string                      { jc->JsonTagValue = jc->JsonString; }
 
 /*

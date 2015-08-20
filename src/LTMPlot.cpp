@@ -30,6 +30,7 @@
 #include "Settings.h"
 #include "Colors.h"
 #include "IndendPlotMarker.h"
+#include "DataFilter.h" // formulas
 
 #include "PMCData.h" // for LTS/STS calculation
 #include "Zones.h"
@@ -219,6 +220,7 @@ LTMPlot::setData(LTMSettings *set)
 
     curveColors->isolated = false;
     isolation = false;
+    int user=0;
 
     //qDebug()<<"Starting.."<<timer.elapsed();
 
@@ -366,7 +368,9 @@ LTMPlot::setData(LTMSettings *set)
     stacks.clear();
 
     int r=0;
+
     foreach (MetricDetail metricDetail, settings->metrics) {
+
         if (metricDetail.stack == true) {
 
             // register this data
@@ -416,6 +420,7 @@ LTMPlot::setData(LTMSettings *set)
 
         int count=0;
         MetricDetail metricDetail = settings->metrics[m];
+        if (metricDetail.type == METRIC_FORMULA) metricDetail.symbol = QString("user_%1").arg(user++);
 
         if (metricDetail.stack == false) continue;
 
@@ -567,6 +572,7 @@ LTMPlot::setData(LTMSettings *set)
     for(int m=0; m<settings->metrics.count(); m++) { 
 
         MetricDetail metricDetail = settings->metrics[m];
+        if (metricDetail.type == METRIC_FORMULA) metricDetail.symbol = QString("user_%1").arg(user++);
 
         //
         // *ONLY* PLOT NON-STACKS
@@ -755,36 +761,38 @@ LTMPlot::setData(LTMSettings *set)
                 // we need to fill in the gaps sadly
                 int lcount = xdata[count];
 
-                // calculated values
-                QVector<double> xtrend(lcount);
-                QVector<double> btrend(lcount);
-                QVector<double> ytrend(lcount);
+                if (lcount) {
+                    // calculated values
+                    QVector<double> xtrend(lcount);
+                    QVector<double> btrend(lcount);
+                    QVector<double> ytrend(lcount);
 
-                // initialise to same
-                ytrend.fill(0);
-                btrend.fill(0);
+                    // initialise to same
+                    ytrend.fill(0);
+                    btrend.fill(0);
 
-                ytrend[0] = ydata[0];
-                xtrend[0] = 0;
+                    ytrend[0] = ydata[0];
+                    xtrend[0] = 0;
 
-                for (int n=1,i=1; i<= lcount; i++) {
+                    for (int n=1,i=1; i<= lcount && i<xdata.size(); i++) {
 
-                    // fill in gaps (and check bounds as we go too)
-                    while (n<=xdata[i] && n<lcount) {
-                        ytrend[n] = alpha * ydata[i] + ( 1 - alpha )*( ytrend[n-1] + btrend[n-1] );
-                        btrend[n] = beta * ( ytrend[n] - ytrend[n-1] ) + ( 1 - beta ) * btrend[n-1];
-                        xtrend[n] = n+1;
-                        n++;
+                        // fill in gaps (and check bounds as we go too)
+                        while (n<=xdata[i] && n<lcount) {
+                            ytrend[n] = alpha * ydata[i] + ( 1 - alpha )*( ytrend[n-1] + btrend[n-1] );
+                            btrend[n] = beta * ( ytrend[n] - ytrend[n-1] ) + ( 1 - beta ) * btrend[n-1];
+                            xtrend[n] = n+1;
+                            n++;
+                        }
                     }
+
+                    // point 2 is at far right of chart, not the last point
+                    // since we may be forecasting...
+                    trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
+
+                    trend->attach(this);
+                    trend->setItemAttribute(QwtPlotItem::Legend, false);
+                    curves.insert(trendSymbol, trend);
                 }
-
-                // point 2 is at far right of chart, not the last point
-                // since we may be forecasting...
-                trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
-
-                trend->attach(this);
-                trend->setItemAttribute(QwtPlotItem::Legend, false);
-                curves.insert(trendSymbol, trend);
             }
         }
 
@@ -1312,6 +1320,7 @@ LTMPlot::setCompareData(LTMSettings *set)
 
     MAXX=0.0; // maximum value for x, always from 0-n
     settings = set;
+    int user=0;
 
     //qDebug()<<"Starting.."<<timer.elapsed();
 
@@ -1522,6 +1531,7 @@ LTMPlot::setCompareData(LTMSettings *set)
 
             int count=0;
             MetricDetail metricDetail = settings->metrics[m];
+            if (metricDetail.type == METRIC_FORMULA) metricDetail.symbol = QString("user_%1").arg(user++);
 
             if (metricDetail.stack == false) continue;
 
@@ -1860,36 +1870,38 @@ LTMPlot::setCompareData(LTMSettings *set)
                     // we need to fill in the gaps sadly
                     int lcount = xdata[count];
 
-                    // calculated values
-                    QVector<double> xtrend(lcount);
-                    QVector<double> btrend(lcount);
-                    QVector<double> ytrend(lcount);
+                    if (lcount) {
+                        // calculated values
+                        QVector<double> xtrend(lcount);
+                        QVector<double> btrend(lcount);
+                        QVector<double> ytrend(lcount);
 
-                    // initialise to same
-                    ytrend.fill(0);
-                    btrend.fill(0);
+                        // initialise to same
+                        ytrend.fill(0);
+                        btrend.fill(0);
 
-                    ytrend[0] = ydata[0];
-                    xtrend[0] = 0;
+                        ytrend[0] = ydata[0];
+                        xtrend[0] = 0;
 
-                    for (int n=1,i=1; i<= lcount; i++) {
+                        for (int n=1,i=1; i<= lcount && i<xdata.size(); i++) {
 
-                        // fill in gaps (and check bounds as we go too)
-                        while (n<=xdata[i] && n<lcount) {
-                            ytrend[n] = alpha * ydata[i] + ( 1 - alpha )*( ytrend[n-1] + btrend[n-1] );
-                            btrend[n] = beta * ( ytrend[n] - ytrend[n-1] ) + ( 1 - beta ) * btrend[n-1];
-                            xtrend[n] = n+1;
-                            n++;
+                            // fill in gaps (and check bounds as we go too)
+                            while (n<=xdata[i] && n<lcount) {
+                                ytrend[n] = alpha * ydata[i] + ( 1 - alpha )*( ytrend[n-1] + btrend[n-1] );
+                                btrend[n] = beta * ( ytrend[n] - ytrend[n-1] ) + ( 1 - beta ) * btrend[n-1];
+                                xtrend[n] = n+1;
+                                n++;
+                            }
                         }
+
+                        // point 2 is at far right of chart, not the last point
+                        // since we may be forecasting...
+                        trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
+
+                        trend->attach(this);
+                        trend->setItemAttribute(QwtPlotItem::Legend, false);
+                        curves.insert(trendSymbol, trend);
                     }
-
-                    // point 2 is at far right of chart, not the last point
-                    // since we may be forecasting...
-                    trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
-
-                    trend->attach(this);
-                    trend->setItemAttribute(QwtPlotItem::Legend, false);
-                    curves.insert(trendSymbol, trend);
                 }
             }
 
@@ -2433,9 +2445,14 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
 
     for (int i=0; i<(24); i++) x[i]=i;
 
+    // curve specific filter
+    Specification spec = settings->specification;
+    if (!SearchFilterBox::isNull(metricDetail.datafilter))
+        spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+
     foreach (RideItem *ride, context->athlete->rideCache->rides()) {
 
-        if (!settings->specification.pass(ride)) continue;
+        if (!spec.pass(ride)) continue;
 
         double value = ride->getForSymbol(metricDetail.symbol);
 
@@ -2513,6 +2530,9 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
     } else if (metricDetail.type == METRIC_ESTIMATE) {
         createEstimateData(context, settings, metricDetail, x,y,n, forceZero);
         return;
+    } else if (metricDetail.type == METRIC_FORMULA) {
+        createFormulaData(context, settings, metricDetail, x,y,n, forceZero);
+        return;
     }
 
 }
@@ -2537,10 +2557,15 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
     unsigned long secondsPerGroupBy=0;
     bool wantZero = forceZero ? 1 : (metricDetail.curveStyle == QwtPlotCurve::Steps);
 
+    // curve specific filter
+    Specification spec = settings->specification;
+    if (!SearchFilterBox::isNull(metricDetail.datafilter))
+        spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+
     foreach (RideItem *ride, context->athlete->rideCache->rides()) { 
 
         // filter out unwanted stuff
-        if (!settings->specification.pass(ride)) continue;
+        if (!spec.pass(ride)) continue;
 
         // day we are on
         int currentDay = groupForDate(ride->dateTime.date(), settings->groupBy);
@@ -2637,6 +2662,123 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 }
 
 void
+LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
+                                              QVector<double>&x,QVector<double>&y,int&n, bool forceZero)
+{
+
+    // resize the curve array to maximum possible size
+    int maxdays = groupForDate(settings->end.date(), settings->groupBy)
+                    - groupForDate(settings->start.date(), settings->groupBy);
+
+    x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+    y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+    y.fill(0);
+
+    // parse formula
+    DataFilter parser(this, context, metricDetail.formula);
+
+    // do we aggregate ?
+    bool aggZero = false;
+
+    n=-1;
+    int lastDay=0;
+    unsigned long secondsPerGroupBy=0;
+    bool wantZero = forceZero ? 1 : (metricDetail.curveStyle == QwtPlotCurve::Steps);
+
+    // curve specific filter
+    Specification spec = settings->specification;
+    if (!SearchFilterBox::isNull(metricDetail.datafilter))
+        spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+
+    foreach (RideItem *ride, context->athlete->rideCache->rides()) { 
+
+        // filter out unwanted stuff
+        if (!spec.pass(ride)) continue;
+
+        // day we are on
+        int currentDay = groupForDate(ride->dateTime.date(), settings->groupBy);
+
+        // value for ride
+        double value = 0;
+
+        // PARSE + EVALUATE
+        Result res = parser.evaluate(ride);
+        if (res.isNumber) value = res.number;
+
+        // check values are bounded to stop QWT going berserk
+        if (std::isnan(value) || std::isinf(value)) value = 0;
+
+        // convert seconds to hours
+        if (metricDetail.uunits == tr("seconds")) value /= 3600;
+
+        if (value || wantZero) {
+            unsigned long seconds = ride->getForSymbol("workout_time");
+            if (currentDay > lastDay) {
+                if (lastDay && wantZero) {
+                    while (lastDay<currentDay && n<=maxdays) {
+                        lastDay++;
+                        n++;
+                        x[n]=lastDay - groupForDate(settings->start.date(), settings->groupBy);
+                        y[n]=0;
+                    }
+                } else {
+                    n++;
+                }
+
+                // drop out of roange
+                if (n>maxdays) break;
+                // first time thru
+                if (n<0) n=0;
+
+                y[n] = value;
+                x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
+
+                // only increment counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy = seconds; 
+
+            } else {
+                // sum totals, average averages and choose best for Peaks
+                int type = metricDetail.formulaType;
+
+                // first time thru
+                if (n<0) n=0;
+
+                switch (type) {
+                case RideMetric::Total:
+                    y[n] += value;
+                    break;
+                case RideMetric::Average:
+                    {
+                    // average should be calculated taking into account
+                    // the duration of the ride, otherwise high value but
+                    // short rides will skew the overall average
+                    if (value || aggZero) y[n] = ((y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
+                    break;
+                    }
+                case RideMetric::Low:
+                    if (value < y[n]) y[n] = value;
+                    break;
+                case RideMetric::Peak:
+                    if (value > y[n]) y[n] = value;
+                    break;
+                }
+                secondsPerGroupBy += seconds; // increment for same group
+            }
+            lastDay = currentDay;
+        }
+    }
+
+    // running total accumulation
+    if (metricDetail.formulaType == RideMetric::RunningTotal) {
+        double rtot = 0;
+        for (int i=0; i<y.size(); i++) {
+            rtot += y[i];
+            y[i] = rtot;
+        }
+    }
+}
+
+void
 LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool forceZero)
 {
     // resize the curve array to maximum possible size
@@ -2657,7 +2799,23 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
     // don't attempt it if the bests are not loaded
     if (settings->bests == NULL) return;
 
-    foreach (RideBest best, *(settings->bests)) { 
+    // list of bests we're gonna show
+    QList<RideBest> bestresults;
+
+    // get filtered bests if we are applying a filter
+    if (!SearchFilterBox::isNull(metricDetail.datafilter)) {
+
+        // add the curve filters to the specification to use
+        Specification spec = settings->specification;
+        spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+        bestresults = RideFileCache::getAllBestsFor(context, settings->metrics, spec);
+
+    } else {
+
+        bestresults = *(settings->bests);
+    }
+
+    foreach (RideBest best, bestresults) { 
 
         // filter has already been applied
 
@@ -3001,10 +3159,15 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
     n = 0;
 
     // create local PMC if filtered
-    if (settings->specification.isFiltered()) {
+    if (!SearchFilterBox::isNull(metricDetail.datafilter) || settings->specification.isFiltered()) {
 
         // don't filter for date range!!
         Specification allDates = settings->specification;
+
+        // curve specific filter
+        if (!SearchFilterBox::isNull(metricDetail.datafilter))
+            allDates.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+
         allDates.setDateRange(DateRange(QDate(),QDate()));
         localPMC = new PMCData(context, allDates, scoreType);
     }

@@ -27,6 +27,7 @@
 #include <QStyle>
 #include <QTabBar>
 #include <QStyleFactory>
+#include <QRect>
 
 // DATA STRUCTURES
 #include "MainWindow.h"
@@ -55,6 +56,7 @@
 #include "RideImportWizard.h"
 #include "ToolsDialog.h"
 #include "ToolsRhoEstimator.h"
+#include "VDOTCalculator.h"
 #include "SplitActivityWizard.h"
 #include "MergeActivityWizard.h"
 #include "GenerateHeatMapDialog.h"
@@ -120,6 +122,7 @@ MainWindow::MainWindow(const QDir &home)
     // bootstrap
     Context *context = new Context(this);
     context->athlete = new Athlete(context, home);
+    currentTab = new Tab(context);
 
     setWindowIcon(QIcon(":images/gc.png"));
     setWindowTitle(context->athlete->home->root().dirName());
@@ -357,10 +360,12 @@ MainWindow::MainWindow(const QDir &home)
     QStyle *toolStyle = QStyleFactory::create("Cleanlooks");
 #endif
     searchBox->setStyle(toolStyle);
-    searchBox->setFixedWidth(200);
+    searchBox->setFixedWidth(150);
     head->addWidget(searchBox);
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
+    connect(searchBox->searchbox, SIGNAL(haveFocus()), this, SLOT(searchFocusIn()));
+    connect(searchBox->searchbox, SIGNAL(lostFocus()), this, SLOT(searchFocusOut()));
 
 #endif
 
@@ -481,10 +486,12 @@ MainWindow::MainWindow(const QDir &home)
     // add a search box on far right, but with a little space too
     searchBox = new SearchFilterBox(this,context,false);
     searchBox->setStyle(toolStyle);
-    searchBox->setFixedWidth(200);
+    searchBox->setFixedWidth(150);
     head->addWidget(searchBox);
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
+    connect(searchBox->searchbox, SIGNAL(haveFocus()), this, SLOT(searchFocusIn()));
+    connect(searchBox->searchbox, SIGNAL(lostFocus()), this, SLOT(searchFocusOut()));
     HelpWhatsThis *helpSearchBox = new HelpWhatsThis(searchBox);
     searchBox->setWhatsThis(helpSearchBox->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
 
@@ -504,7 +511,6 @@ MainWindow::MainWindow(const QDir &home)
 #endif
 
     tabStack = new QStackedWidget(this);
-    currentTab = new Tab(context);
 
     // first tab
     tabs.insert(currentTab->context->athlete->home->root().dirName(), currentTab);
@@ -618,6 +624,7 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()));
     optionsMenu->addAction(tr("CP and W' Estimator..."), this, SLOT(showTools()));
     optionsMenu->addAction(tr("Air Density (Rho) Estimator..."), this, SLOT(showRhoEstimator()));
+    optionsMenu->addAction(tr("VDOT and T-Pace Calculator..."), this, SLOT(showVDOTCalculator()));
 
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Get &Withings Data..."), this,
@@ -1063,6 +1070,12 @@ void MainWindow::showRhoEstimator()
 {
    ToolsRhoEstimator *tre = new ToolsRhoEstimator(currentTab->context);
    tre->show();
+}
+
+void MainWindow::showVDOTCalculator()
+{
+   VDOTCalculator *VDOTcalculator = new VDOTCalculator();
+   VDOTcalculator->show();
 }
 
 void MainWindow::showWorkoutWizard()
@@ -2081,5 +2094,23 @@ MainWindow::ridesAutoImport() {
 
     currentTab->context->athlete->importFilesWhenOpeningAthlete();
 
+}
+
+// grow/shrink searchbox if there is space...
+void
+MainWindow::searchFocusIn()
+{
+    QPropertyAnimation *anim = new QPropertyAnimation(searchBox, "xwidth", this);
+    anim->setDuration(300);
+    anim->setEasingCurve(QEasingCurve::InOutQuad);
+    anim->setStartValue(searchBox->width());
+    anim->setEndValue(350);
+    anim->start(QPropertyAnimation::DeleteWhenStopped);
+}
+
+void
+MainWindow::searchFocusOut()
+{
+    searchBox->setFixedWidth(150);
 }
 

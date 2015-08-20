@@ -29,6 +29,8 @@ class SearchFilterBox : public QWidget
 {
     Q_OBJECT
 
+    Q_PROPERTY(int xwidth READ xwidth WRITE setXWidth USER true)
+
 public:
     SearchFilterBox(QWidget *parent, Context *context, bool nochooser = true);
     void setMode(SearchBox::SearchBoxMode x) { searchbox->setMode(x); }
@@ -42,6 +44,14 @@ public:
 
     void setContext(Context *c) { context = c; searchbox->setContext(c); }
 
+    SearchBox *searchbox;
+
+    void setXWidth(int x) { setFixedWidth(x); }
+    int xwidth() const { return width(); }
+
+    static QStringList matches(Context *context, QString filter); // get matches
+    static bool isNull(QString filter); // is the filter null ?
+
 private slots:
 
 signals:
@@ -52,7 +62,6 @@ private:
     Context *context;
     FreeSearch *freeSearch;
     DataFilter *datafilter;
-    SearchBox *searchbox;
 };
 
 #endif

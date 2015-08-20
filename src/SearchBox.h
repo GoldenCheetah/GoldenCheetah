@@ -23,11 +23,16 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QDialog>
+#include <QCompleter>
+#include <QDebug>
+#include <QStringListModel>
 
 class QToolButton;
 class QMenu;
 class Context;
 class QLabel;
+class QFocusEvent;
+class DataFilterCompleter;
 
 class SearchBox : public QLineEdit
 {
@@ -50,6 +55,18 @@ protected:
     void resizeEvent(QResizeEvent *);
     void checkMenu(); // only show menu drop down when there is something to show
 
+    void focusInEvent(QFocusEvent *e) { 
+        emit haveFocus(); 
+        QLineEdit::focusInEvent(e); 
+    }
+
+    void focusOutEvent(QFocusEvent *e) { 
+        if (!active && e->reason() != Qt::PopupFocusReason) { 
+            emit lostFocus(); 
+            QLineEdit::focusOutEvent(e); 
+        }
+    }
+
 private slots:
     void updateCloseButton(const QString &text);
     void searchSubmit();
@@ -69,6 +86,12 @@ private slots:
     void setMenu();
     void addNamed();
 
+    // completer
+    void updateCompleter(const QString &);
+    void setCompleter(DataFilterCompleter *completer);
+    void insertCompletion(const QString& completion);
+    void keyPressEvent(QKeyEvent *e);
+
     void configChanged(qint32);
 
 signals:
@@ -80,12 +103,59 @@ signals:
     void submitFilter(QString);
     void clearFilter();
 
+    // focus in/out
+    void haveFocus();
+    void lostFocus();
+
 private:
     Context *context;
+    QWidget *parent;
     bool filtered;
     bool nochooser;
     QToolButton *clearButton, *searchButton, *toolButton;
     QMenu *dropMenu;
     SearchBoxMode mode;
+    DataFilterCompleter *completer;
+    bool active;
+};
+
+class DataFilterCompleter : public QCompleter
+{
+    Q_OBJECT
+ 
+public:
+    inline DataFilterCompleter(const QStringList& words, QObject * parent) :
+            QCompleter(parent), m_list(words), m_model()
+    {
+        m_model.setStringList(words);
+        setModel(&m_model);
+    }
+
+    inline void setList(QStringList list)
+    {
+        m_list = list;
+        m_model.setStringList(list);
+    }
+ 
+    inline void update(QString word)
+    {
+        // Do any filtering you like.
+        // Here we just include all items that contain word.
+        //QStringList filtered = m_list.filter(word, caseSensitivity());
+        //m_model.setStringList(filtered);
+        //m_word = word;
+        setCompletionPrefix(word);
+        complete();
+    }
+ 
+    inline QString word()
+    {
+        return m_word;
+    }
+ 
+private:
+    QStringList m_list;
+    QStringListModel m_model;
+    QString m_word;
 };
 #endif

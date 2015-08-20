@@ -24,6 +24,7 @@
 #include "RideNavigator.h"
 #include "GcSideBarItem.h"
 #include "AnalysisSidebar.h"
+#include "DataFilter.h"
 #include <QToolButton>
 #include <QInputDialog>
 
@@ -32,7 +33,7 @@
 #include <QDebug>
 
 SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
-    : QLineEdit(parent), context(context), filtered(false), nochooser(nochooser)
+    : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false)
 {
     setFixedHeight(21);
     //clear button
@@ -68,6 +69,10 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     searchButton->setCursor(Qt::ArrowCursor);
     connect(searchButton, SIGNAL(clicked()), this, SLOT(toggleMode()));
 
+    // create an empty completer, configchanged will fix it
+    completer = new DataFilterCompleter(QStringList(), parent);
+    setCompleter(completer);
+
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -80,7 +85,12 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set colors and curviness
-    configChanged(CONFIG_APPEARANCE);
+    configChanged(CONFIG_APPEARANCE | CONFIG_FIELDS);
+}
+
+static bool insensitiveLessThan(const QString &a, const QString &b)
+{
+    return a.toLower() < b.toLower();
 }
 
 void
@@ -132,6 +142,107 @@ SearchBox::configChanged(qint32)
                   .arg(clearButton->sizeHint().width() + frameWidth + 12));
 
     }
+
+    // get suitably formated list
+    QList<QString> list;
+    QString last;
+    SpecialFields sp;
+
+    // start with just a list of functions
+    list = DataFilter::functions();
+
+    // add special functions (older code needs fixing !)
+    list << "config(cp)";
+    list << "config(w')";
+    list << "config(pmax)";
+    list << "config(cv)";
+    list << "config(scv)";
+    list << "config(height)";
+    list << "config(weight)";
+    list << "config(lthr)";
+    list << "config(maxhr)";
+    list << "config(rhr)";
+    list << "config(units)";
+    list << "const(e)";
+    list << "const(pi)";
+    list << "daterange(start)";
+    list << "daterange(stop)";
+    list << "ctl";
+    list << "tsb";
+    list << "atl";
+    list << "sb(TSS)";
+    list << "lts(TSS)";
+    list << "sts(TSS)";
+    list << "rr(TSS)";
+    list << "tiz(power, 1)";
+    list << "tiz(hr, 1)";
+    list << "best(power, 3600)";
+    list << "best(hr, 3600)";
+    list << "best(cadence, 3600)";
+    list << "best(speed, 3600)";
+    list << "best(torque, 3600)";
+    list << "best(np, 3600)";
+    list << "best(xpower, 3600)";
+    list << "best(vam, 3600)";
+    list << "best(wpk, 3600)";
+
+    // get sorted list
+    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+    qSort(names.begin(), names.end(), insensitiveLessThan);
+
+    foreach(QString name, names) {
+
+        // handle dups
+        if (last == name) continue;
+        last = name;
+
+        // Handle bikescore tm
+        if (name.startsWith("BikeScore")) name = QString("BikeScore");
+
+        //  Always use the "internalNames" in Filter expressions
+        name = sp.internalName(name);
+
+        // we do very little to the name, just space to _ and lower case it for now...
+        name.replace(' ', '_');
+        list << name;
+    }
+
+    // sort the list
+    qSort(list.begin(), list.end(), insensitiveLessThan);
+
+    // set new list
+    completer->setList(list);
+}
+
+void
+SearchBox::updateCompleter(const QString &text)
+{
+    active = true;
+    if (mode == Filter && text.length()) {
+        QChar last = text[text.length()-1];
+
+        // are we tying characters that might be a symbol ?
+        if (last.isLetterOrNumber() || last == '_') {
+
+            // find out what end is
+            int i=text.length();
+            while (i && text[i-1].isLetterOrNumber()) i--;
+            QString prefix = text.mid(i, text.length()-i);
+
+            completer->update(prefix);
+
+            // get that popup ?
+            if (completer->completionCount()) {
+                completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
+            }
+        } else {
+
+            // hide it when we stop typing
+            completer->popup()->hide();
+        }
+
+    }
+    active=false;
 }
 
 void SearchBox::resizeEvent(QResizeEvent *)
@@ -147,7 +258,7 @@ void SearchBox::resizeEvent(QResizeEvent *)
 #endif
 
     //container->move(rect().left(), rect().bottom() + 3); // named dialog...
-    checkMenu();
+    //checkMenu(); // not needed
 }
 
 void SearchBox::toggleMode()
@@ -333,4 +444,78 @@ SearchBox::addNamed()
         context->athlete->namedSearches->getList().append(x);
         context->athlete->namedSearches->write();
     }
+}
+
+//
+// Working with the the autocompleter
+//
+void SearchBox::setCompleter(DataFilterCompleter *completer)
+{
+    if (this->completer) QObject::disconnect(this->completer, 0, this, 0);
+ 
+    this->completer = completer;
+ 
+    if (!this->completer) return;
+ 
+    this->completer->setWidget(this);
+    connect(completer, SIGNAL(activated(const QString&)), this, SLOT(insertCompletion(const QString&)));
+}
+ 
+void SearchBox::insertCompletion(const QString& completion)
+{
+    if (mode == Search) return;
+
+    QString t = text();
+
+    QChar last = t[t.length()-1];
+
+    if (last.isLetterOrNumber()) {
+
+        // find out what end is
+        int i=t.length();
+        while (i && t[i-1].isLetterOrNumber()) i--;
+        t.replace(i, t.length()-i, completion);
+
+        // now replace
+        setText(t);
+    }
+}
+ 
+ 
+void SearchBox::keyPressEvent(QKeyEvent *e)
+{
+    // only intercept in filter mode
+    if (mode == Search) return QLineEdit::keyPressEvent(e);
+
+    if (completer && completer->popup()->isVisible())
+    {
+        // The following keys are forwarded by the completer to the widget
+        switch (e->key())
+        {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+        case Qt::Key_Escape:
+        case Qt::Key_Tab:
+        case Qt::Key_Backtab:
+            e->ignore();
+            return; // Let the completer do default behavior
+        }
+    }
+ 
+    bool isShortcut = (e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E;
+    if (!isShortcut)
+        QLineEdit::keyPressEvent(e); // Don't send the shortcut (CTRL-E) to the text edit.
+ 
+    if (!this->completer) return;
+ 
+    bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
+    if (!isShortcut && !ctrlOrShift && e->modifiers() != Qt::NoModifier)
+    {
+        completer->popup()->hide();
+        return;
+    }
+
+    updateCompleter(text()); 
+    //completer->update(text());
+    //completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
 }

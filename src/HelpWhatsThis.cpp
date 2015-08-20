@@ -117,6 +117,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Menu%20Bar_Tools").arg(tr("Estimation of critical power using the Monod/Scherrer power model"));
     case MenuBar_Tools_AirDens_EST:
         return text.arg("Menu%20Bar_Tools").arg(tr("Estimation of Air Density (Rho)"));
+    case MenuBar_Tools_VDOT_CALC:
+        return text.arg("Menu%20Bar_Tools").arg(tr("Calculation of VDOT and Threshold Pace according to Daniels' Running Formula"));
     case MenuBar_Tools_Download_ERGDB:
         return text.arg("Menu%20Bar_Tools").arg(tr("Downloading of Workouts for the ERGDB (online workout DB) for Train - Indoor Riding"));
     case MenuBar_Tools_CreateWorkout:

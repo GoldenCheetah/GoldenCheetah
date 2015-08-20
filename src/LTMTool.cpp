@@ -22,6 +22,8 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Tab.h"
+#include "RideNavigator.h"
 #include "HelpWhatsThis.h"
 #include <QApplication>
 #include <QtGui>
@@ -42,6 +44,9 @@
 
 // PDModel estimate support
 #include "PDModel.h"
+
+// Filter / formula
+#include "DataFilter.h"
 
 LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mainWindow), settings(settings), context(context), active(false), _amFiltered(false)
 {
@@ -1244,12 +1249,16 @@ LTMTool::refreshCustomTable(int indexSelectedItem)
             t->setText(tr("Estimate"));
         else if (metricDetail.type == 7)
             t->setText(tr("Stress"));
+        else if (metricDetail.type == 8)
+            t->setText(tr("Formula"));
 
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         customTable->setItem(i,0,t);
 
         t = new QTableWidgetItem();
-        if (metricDetail.type != 5 && metricDetail.type != 6)
+        if (metricDetail.type == 8) {
+            t->setText(metricDetail.formula);
+        } else if (metricDetail.type != 5 && metricDetail.type != 6)
             t->setText(metricDetail.name);
         else {
             // text description for peak
@@ -1498,6 +1507,12 @@ EditMetricDetailDialog::estimateName()
 /*----------------------------------------------------------------------
  * EDIT METRIC DETAIL DIALOG
  *--------------------------------------------------------------------*/
+
+static bool insensitiveLessThan(const QString &a, const QString &b)
+{
+    return a.toLower() < b.toLower();
+}
+
 EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmTool, MetricDetail *metricDetail) :
     QDialog(context->mainWindow, Qt::Dialog), context(context), ltmTool(ltmTool), metricDetail(metricDetail)
 {
@@ -1513,6 +1528,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     chooseBest = new QRadioButton(tr("Best"), this);
     chooseEstimate = new QRadioButton(tr("Estimate"), this);
     chooseStress = new QRadioButton(tr("Stress"), this);
+    chooseFormula = new QRadioButton(tr("Formula"), this);
 
     // put them into a button group because we
     // also have radio buttons for watts per kilo / absolute
@@ -1521,12 +1537,14 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     group->addButton(chooseBest);
     group->addButton(chooseEstimate);
     group->addButton(chooseStress);
+    group->addButton(chooseFormula);
 
     // uncheck them all
     chooseMetric->setChecked(false);
     chooseBest->setChecked(false);
     chooseEstimate->setChecked(false);
     chooseStress->setChecked(false);
+    chooseFormula->setChecked(false);
 
     // which one ?
     switch (metricDetail->type) {
@@ -1542,6 +1560,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     case 7:
         chooseStress->setChecked(true);
         break;
+    case 8:
+        chooseFormula->setChecked(true);
+        break;
     }
 
     QVBoxLayout *radioButtons = new QVBoxLayout;
@@ -1550,6 +1571,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     radioButtons->addWidget(chooseBest);
     radioButtons->addWidget(chooseEstimate);
     radioButtons->addWidget(chooseStress);
+    radioButtons->addWidget(chooseFormula);
     radioButtons->addStretch();
 
     // bests selection
@@ -1676,6 +1698,114 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     estimateLayout->addLayout(estwpk);
     estimateLayout->addStretch();
 
+    // estimate selection
+    formulaWidget = new QWidget(this);
+    //formulaWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QVBoxLayout *formulaLayout = new QVBoxLayout(formulaWidget);
+    formulaLayout->addStretch();
+
+    // courier font
+    formulaEdit = new DataFilterEdit(this, context);
+    QFont courier("Courier", QFont().pointSize());
+
+    formulaEdit->setFont(courier);
+    //formulaEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    formulaType = new QComboBox(this);
+    formulaType->addItem(tr("Total"), static_cast<int>(RideMetric::Total));
+    formulaType->addItem(tr("Running Total"), static_cast<int>(RideMetric::RunningTotal));
+    formulaType->addItem(tr("Average"), static_cast<int>(RideMetric::Average));
+    formulaType->addItem(tr("Peak"), static_cast<int>(RideMetric::Peak));
+    formulaType->addItem(tr("Low"), static_cast<int>(RideMetric::Low));
+    formulaLayout->addWidget(formulaEdit);
+    QHBoxLayout *ftype = new QHBoxLayout;
+    ftype->addWidget(new QLabel(tr("Aggregate:")));
+    ftype->addWidget(formulaType);
+    ftype->addStretch();
+    formulaLayout->addLayout(ftype);
+    formulaLayout->addStretch();
+
+    // set to the value...
+    if (metricDetail->formula == "") {
+        // lets put a template in there
+        metricDetail->formula = tr("# type in a formula to use\n" 
+                                   "# for e.g. TSS / Duration\n"
+                                   "# as you type the available metrics\n"
+                                   "# will be offered by autocomplete\n"
+                                   "# all lines beginning with # are comments.\n");
+    }
+    formulaEdit->setText(metricDetail->formula);
+    formulaType->setCurrentIndex(formulaType->findData(metricDetail->formulaType));
+
+    // get suitably formated list
+    QList<QString> list;
+    QString last;
+    SpecialFields sp;
+
+    // get sorted list
+    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+
+    // start with just a list of functions
+    list = DataFilter::functions();
+
+    // add special functions (older code needs fixing !)
+    list << "config(cp)";
+    list << "config(w')";
+    list << "config(pmax)";
+    list << "config(cv)";
+    list << "config(scv)";
+    list << "config(height)";
+    list << "config(weight)";
+    list << "config(lthr)";
+    list << "config(maxhr)";
+    list << "config(rhr)";
+    list << "config(units)";
+    list << "const(e)";
+    list << "const(pi)";
+    list << "daterange(start)";
+    list << "daterange(stop)";
+    list << "ctl";
+    list << "tsb";
+    list << "atl";
+    list << "sb(TSS)";
+    list << "lts(TSS)";
+    list << "sts(TSS)";
+    list << "rr(TSS)";
+    list << "tiz(power, 1)";
+    list << "tiz(hr, 1)";
+    list << "best(power, 3600)";
+    list << "best(hr, 3600)";
+    list << "best(cadence, 3600)";
+    list << "best(speed, 3600)";
+    list << "best(torque, 3600)";
+    list << "best(np, 3600)";
+    list << "best(xpower, 3600)";
+    list << "best(vam, 3600)";
+    list << "best(wpk, 3600)";
+
+    qSort(names.begin(), names.end(), insensitiveLessThan);
+
+    foreach(QString name, names) {
+
+        // handle dups
+        if (last == name) continue;
+        last = name;
+
+        // Handle bikescore tm
+        if (name.startsWith("BikeScore")) name = QString("BikeScore");
+
+        //  Always use the "internalNames" in Filter expressions
+        name = sp.internalName(name);
+
+        // we do very little to the name, just space to _ and lower case it for now...
+        name.replace(' ', '_');
+        list << name;
+    }
+
+    // set new list
+    // create an empty completer, configchanged will fix it
+    DataFilterCompleter *completer = new DataFilterCompleter(list, this);
+    formulaEdit->setCompleter(completer);
+
     // stress selection
     stressTypeSelect = new QComboBox(this);
     stressTypeSelect->addItem(tr("Short Term Stress (STS/ATL)"), STRESS_STS);
@@ -1738,10 +1868,15 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     typeStack->addWidget(metricWidget);
     typeStack->addWidget(bestWidget);
     typeStack->addWidget(estimateWidget);
+    typeStack->addWidget(formulaWidget);
     typeStack->setCurrentIndex(chooseMetric->isChecked() ? 0 : (chooseBest->isChecked() ? 1 : 2));
 
     // Grid
     QGridLayout *grid = new QGridLayout;
+
+    QLabel *filter = new QLabel(tr("Filter"));
+    dataFilter = new SearchFilterBox(this, context);
+    dataFilter->setFilter(metricDetail->datafilter);
 
     QLabel *name = new QLabel(tr("Name"));
     QLabel *units = new QLabel(tr("Axis Label / Units"));
@@ -1832,39 +1967,41 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     trendType->setCurrentIndex(metricDetail->trendtype);
 
     // add to grid
-    grid->addLayout(radioButtons, 0, 0, 1, 1, Qt::AlignTop|Qt::AlignLeft);
-    grid->addWidget(typeStack, 0, 1, 1, 3);
+    grid->addWidget(filter, 0,0);
+    grid->addWidget(dataFilter, 0,1,1,3);
+    grid->addLayout(radioButtons, 1, 0, 1, 1, Qt::AlignTop|Qt::AlignLeft);
+    grid->addWidget(typeStack, 1, 1, 1, 3);
     QWidget *spacer1 = new QWidget(this);
     spacer1->setFixedHeight(10);
-    grid->addWidget(spacer1, 1,0);
-    grid->addWidget(name, 2,0);
-    grid->addWidget(userName, 2, 1, 1, 3);
-    grid->addWidget(units, 3,0);
-    grid->addWidget(userUnits, 3,1);
-    grid->addWidget(style, 4,0);
-    grid->addWidget(curveStyle, 4,1);
-    grid->addWidget(symbol, 5,0);
-    grid->addWidget(curveSymbol, 5,1);
+    grid->addWidget(spacer1, 2,0);
+    grid->addWidget(name, 3,0);
+    grid->addWidget(userName, 3, 1, 1, 3);
+    grid->addWidget(units, 4,0);
+    grid->addWidget(userUnits, 4,1);
+    grid->addWidget(style, 5,0);
+    grid->addWidget(curveStyle, 5,1);
+    grid->addWidget(symbol, 6,0);
+    grid->addWidget(curveSymbol, 6,1);
     QWidget *spacer2 = new QWidget(this);
     spacer2->setFixedHeight(10);
-    grid->addWidget(spacer2, 6,0);
-    grid->addWidget(stackLabel, 7, 0);
-    grid->addWidget(stack, 7, 1);
-    grid->addWidget(color, 8,0);
-    grid->addWidget(curveColor, 8,1);
-    grid->addWidget(fill, 9,0);
-    grid->addWidget(fillCurve, 9,1);
-    grid->addWidget(topN, 3,2);
-    grid->addWidget(showBest, 3,3);
-    grid->addWidget(bottomN, 4,2);
-    grid->addWidget(showLowest, 4,3);
-    grid->addWidget(outN, 5,2);
-    grid->addWidget(showOut, 5,3);
-    grid->addWidget(baseline, 6, 2);
-    grid->addWidget(baseLine, 6,3);
-    grid->addWidget(trendType, 7,2);
-    grid->addWidget(curveSmooth, 8,2);
-    grid->addWidget(labels, 9,2);
+    grid->addWidget(spacer2, 7,0);
+    grid->addWidget(stackLabel, 8, 0);
+    grid->addWidget(stack, 8, 1);
+    grid->addWidget(color, 9,0);
+    grid->addWidget(curveColor, 9,1);
+    grid->addWidget(fill, 10,0);
+    grid->addWidget(fillCurve, 10,1);
+    grid->addWidget(topN, 4,2);
+    grid->addWidget(showBest, 4,3);
+    grid->addWidget(bottomN, 5,2);
+    grid->addWidget(showLowest, 5,3);
+    grid->addWidget(outN, 6,2);
+    grid->addWidget(showOut, 6,3);
+    grid->addWidget(baseline, 7, 2);
+    grid->addWidget(baseLine, 7,3);
+    grid->addWidget(trendType, 8,2);
+    grid->addWidget(curveSmooth, 9,2);
+    grid->addWidget(labels, 10,2);
 
     mainLayout->addLayout(grid);
 
@@ -1890,6 +2027,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     connect(chooseBest, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(chooseEstimate, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(chooseStress, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
+    connect(chooseFormula, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(modelSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged()));
     connect(estimateSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(estimateChanged()));
     connect(estimateDuration, SIGNAL(valueChanged(double)), this, SLOT(estimateName()));
@@ -1924,6 +2062,7 @@ EditMetricDetailDialog::typeChanged()
         metricWidget->show();
         estimateWidget->hide();
         stressWidget->hide();
+        formulaWidget->hide();
         typeStack->setCurrentIndex(0);
     }
 
@@ -1932,6 +2071,7 @@ EditMetricDetailDialog::typeChanged()
         metricWidget->hide();
         estimateWidget->hide();
         stressWidget->hide();
+        formulaWidget->hide();
         typeStack->setCurrentIndex(1);
     }
 
@@ -1940,6 +2080,7 @@ EditMetricDetailDialog::typeChanged()
         metricWidget->hide();
         estimateWidget->show();
         stressWidget->hide();
+        formulaWidget->hide();
         typeStack->setCurrentIndex(2);
     }
 
@@ -1948,7 +2089,17 @@ EditMetricDetailDialog::typeChanged()
         metricWidget->show();
         estimateWidget->hide();
         stressWidget->show();
+        formulaWidget->hide();
         typeStack->setCurrentIndex(0);
+    }
+
+    if (chooseFormula->isChecked()) {
+        formulaWidget->show();
+        bestWidget->hide();
+        metricWidget->hide();
+        estimateWidget->hide();
+        stressWidget->hide();
+        typeStack->setCurrentIndex(3);
     }
     adjustSize();
 }
@@ -2102,6 +2253,7 @@ EditMetricDetailDialog::applyClicked()
     if (chooseBest->isChecked()) metricDetail->type = 5; // is a best
     else if (chooseEstimate->isChecked()) metricDetail->type = 6; // estimate
     else if (chooseStress->isChecked()) metricDetail->type = 7; // stress
+    else if (chooseFormula->isChecked()) metricDetail->type = 8; // stress
 
     metricDetail->estimateDuration = estimateDuration->value();
     switch (estimateDurationUnits->currentIndex()) {
@@ -2118,6 +2270,7 @@ EditMetricDetailDialog::applyClicked()
         case 2 :
         default: metricDetail->duration_units = 3600; break;
     }
+    metricDetail->datafilter = dataFilter->filter();
     metricDetail->wpk = wpk->isChecked();
     metricDetail->series = seriesList.at(dataSeries->currentIndex());
     metricDetail->model = models[modelSelect->currentIndex()]->code();
@@ -2137,6 +2290,8 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->stack = stack->isChecked();
     metricDetail->trendtype = trendType->currentIndex();
     metricDetail->stressType = stressTypeSelect->currentIndex();
+    metricDetail->formula = formulaEdit->toPlainText();
+    metricDetail->formulaType = static_cast<RideMetric::MetricType>(formulaType->itemData(formulaType->currentIndex()).toInt());
     accept();
 }
 
@@ -2220,4 +2375,137 @@ LTMTool::setFilter(QStringList files)
         filenames = files;
 
         emit filterChanged();
+} 
+
+DataFilterEdit::DataFilterEdit(QWidget *parent, Context *context)
+: QTextEdit(parent), context(context), c(0)
+{
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(checkErrors()));
+}
+
+DataFilterEdit::~DataFilterEdit()
+{
+}
+
+void
+DataFilterEdit::checkErrors()
+{
+    // parse and present errors to user
+    DataFilter checker(this, context);
+    QStringList errors = checker.check(toPlainText());
+    checker.colorSyntax(document(), textCursor().position()); // syntax + error highlighting
+
+    // need to fixup for errors!
+    // XXX next commit
+}
+
+void DataFilterEdit::setCompleter(QCompleter *completer)
+{
+    if (c)
+        QObject::disconnect(c, 0, this, 0);
+
+    c = completer;
+
+    if (!c)
+        return;
+
+    c->setWidget(this);
+    c->setCompletionMode(QCompleter::PopupCompletion);
+    c->setCaseSensitivity(Qt::CaseInsensitive);
+    QObject::connect(c, SIGNAL(activated(QString)),
+                     this, SLOT(insertCompletion(QString)));
+}
+
+QCompleter *DataFilterEdit::completer() const
+{
+    return c;
+}
+
+void DataFilterEdit::insertCompletion(const QString& completion)
+{
+    if (c->widget() != this)
+        return;
+    QTextCursor tc = textCursor();
+    int extra = completion.length() - c->completionPrefix().length();
+    tc.movePosition(QTextCursor::Left);
+    tc.movePosition(QTextCursor::EndOfWord);
+    tc.insertText(completion.right(extra));
+    setTextCursor(tc);
+
+    checkErrors();
+}
+
+void
+DataFilterEdit::setText(const QString &text)
+{
+    // set text..
+    QTextEdit::setText(text);
+    checkErrors();
+}
+
+QString DataFilterEdit::textUnderCursor() const
+{
+    QTextCursor tc = textCursor();
+    tc.select(QTextCursor::WordUnderCursor);
+    return tc.selectedText();
+}
+
+void DataFilterEdit::focusInEvent(QFocusEvent *e)
+{
+    if (c) c->setWidget(this);
+    QTextEdit::focusInEvent(e);
+}
+
+void DataFilterEdit::keyPressEvent(QKeyEvent *e)
+{
+    // wait a couple of seconds before checking the changes....
+    if (c && c->popup()->isVisible()) {
+        // The following keys are forwarded by the completer to the widget
+       switch (e->key()) {
+       case Qt::Key_Enter:
+       case Qt::Key_Return:
+       case Qt::Key_Escape:
+       case Qt::Key_Tab:
+       case Qt::Key_Backtab:
+            e->ignore();
+            return; // let the completer do default behavior
+       default:
+           break;
+       }
+    }
+
+    bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
+    if (!c || !isShortcut) // do not process the shortcut when we have a completer
+        QTextEdit::keyPressEvent(e);
+
+    // check
+    checkErrors();
+
+    const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
+    if (!c || (ctrlOrShift && e->text().isEmpty()))
+        return;
+
+    static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-="); // end of word
+    bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
+    QString completionPrefix = textUnderCursor();
+
+    // are we in a comment ?
+    QString line = textCursor().block().text().trimmed();
+    for(int i=textCursor().positionInBlock(); i>=0; i--)
+        if (line[i]=='#') return;
+
+    if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1
+                      || eow.contains(e->text().right(1)))) {
+        c->popup()->hide();
+        return;
+    }
+
+    if (completionPrefix != c->completionPrefix()) {
+        c->setCompletionPrefix(completionPrefix);
+        c->popup()->setCurrentIndex(c->completionModel()->index(0, 0));
+    }
+    QRect cr = cursorRect();
+    cr.setWidth(c->popup()->sizeHintForColumn(0)
+                + c->popup()->verticalScrollBar()->sizeHint().width());
+    c->complete(cr); // popup it up!
 }

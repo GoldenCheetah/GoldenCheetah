@@ -19,8 +19,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301	 USA
  */
 
-#ifndef _TcxParser_h
-#define _TcxParser_h
+#ifndef _GpxParser_h
+#define _GpxParser_h
 #include "GoldenCheetah.h"
 
 #include "RideFile.h"
@@ -69,5 +69,5 @@ private:
 
 };
 
-#endif // _TcxParser_h
+#endif // _GpxParser_h
 

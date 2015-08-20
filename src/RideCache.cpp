@@ -124,7 +124,7 @@ RideCache::configChanged(qint32 what)
 
             foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) 
                 if (field.diary == true) 
-                    calendarText += QString("%1\n").arg(item->metadata_.value(field.name, ""));
+                    calendarText += field.calendarText(item->metadata_.value(field.name, ""));
 
             item->metadata_.insert("Calendar Text", calendarText);
         }

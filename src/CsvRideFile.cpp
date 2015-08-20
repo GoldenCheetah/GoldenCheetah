@@ -28,7 +28,7 @@
 
 static int csvFileReaderRegistered =
     RideFileFactory::instance().registerReader(
-        "csv","Poweragent / PowerTap (CSV)", new CsvFileReader());
+        "csv","Poweragent / PowerTap CSV", new CsvFileReader());
 
 int static periMonth(QString month)
 {
