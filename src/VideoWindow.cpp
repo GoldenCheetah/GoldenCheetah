@@ -69,14 +69,14 @@ VideoWindow::VideoWindow(Context *context)  :
 
         m = NULL;
         //vlc_exceptions(&exceptions);
-        
+
         /* Create a media player playing environement */
         mp = libvlc_media_player_new (inst);
         //vlc_exceptions(&exceptions);
 
         //vlc_exceptions(&exceptions);
 
- 
+
     /* This is a non working code that show how to hooks into a window,
      * if we have a window around */
 #ifdef Q_OS_LINUX
@@ -100,94 +100,22 @@ VideoWindow::VideoWindow(Context *context)  :
         if (finfo.exists())
         {
             QFile file(filename);
-/*
-            QString content = "";
-            if (file.open(QIODevice::ReadOnly))
+
+            // clean previous layout
+            foreach(MeterWidget* p_meterWidget, m_metersWidget)
             {
-                content = file.readAll();
-                file.close();
+                m_metersWidget.removeAll(p_meterWidget);
+                delete p_meterWidget;
             }
-            if (content != "")
-            {*/
-                // clear previous layout
-                qDebug() << "Clean previous layout";
-                foreach(MeterWidget* p_meterWidget, m_metersWidget)
-                {
-                    m_metersWidget.removeAll(p_meterWidget);
-                    delete p_meterWidget;
-                }
 
-                VideoLayoutParser handler(&m_metersWidget, container);
+            VideoLayoutParser handler(&m_metersWidget, container);
 
-                QXmlInputSource source (&file);
-                QXmlSimpleReader reader;
-                reader.setContentHandler (&handler);
-                qDebug() << "Parse XML for new layout";
-                reader.parse (source);
-        
-        
-            //}
+            QXmlInputSource source (&file);
+            QXmlSimpleReader reader;
+            reader.setContentHandler (&handler);
+
+            reader.parse (source);
         }
-/*        FIXME: remove when XML parser will be operational
-        speedmeterwidget = new NeedleMeterWidget(QString("speedometer classic"),container, QString("Speed"));
-        speedmeterwidget->SetRelativeSize(20.0, 15.0);
-        speedmeterwidget->SetRelativePos(20.0, 77.0);
-        speedmeterwidget->MainColor = QColor(255,0,0,180);
-        speedmeterwidget->BackgroundColor = QColor(100,100,100,100);
-        speedmeterwidget->m_RangeMax = 60.0;
-        speedmeterwidget->Angle = 220.0;
-        speedmeterwidget->SubRange = 6;
-        m_metersWidget.append(speedmeterwidget);
-        
-        textspeedmeterwidget = new TextMeterWidget(QString("speedometertext"),speedmeterwidget, QString("Speed"));
-        textspeedmeterwidget->SetRelativeSize(70.0, 40.0);
-        textspeedmeterwidget->SetRelativePos(50.0, 75.0);
-        textspeedmeterwidget->MainColor = QColor(255,0,0,180);
-        m_metersWidget.append(textspeedmeterwidget);
-
-        powermeterwidget = new CircularIndicatorMeterWidget(QString("powermeter"),container, QString("Watt"));
-        powermeterwidget->SetRelativeSize(20.0, 15.0);
-        powermeterwidget->SetRelativePos(80.0, 77.0);
-        powermeterwidget->Angle = 280.0;
-        powermeterwidget->m_RangeMax = 350.0;
-        m_metersWidget.append(powermeterwidget);
-        textpowermeterwidget = new TextMeterWidget(QString("powermetertext"),powermeterwidget, QString("Watt"));
-        textpowermeterwidget->SetRelativeSize(50.0, 40.0);
-        textpowermeterwidget->SetRelativePos(50.0, 50.0);
-        textpowermeterwidget->MainColor = QColor(255,100,100,180);
-        m_metersWidget.append(textpowermeterwidget);
-        TextMeterWidget* unitpowermeterwidget = new TextMeterWidget(QString("powermeterunit"),powermeterwidget, QString("None"));
-        unitpowermeterwidget->SetRelativeSize(50.0, 20.0);
-        unitpowermeterwidget->SetRelativePos(50.0, 85.0);
-        unitpowermeterwidget->MainColor = QColor(255,100,100,180);
-        unitpowermeterwidget->Text = tr("Watts");
-        m_metersWidget.append(unitpowermeterwidget);
-
-        cadencemeterwidget = new CircularIndicatorMeterWidget(QString("cadencemeter"),container, QString("Cadence"));
-        cadencemeterwidget->SetRelativeSize(20.0, 15.0);
-        cadencemeterwidget->SetRelativePos(50.0, 77.0);
-        m_metersWidget.append(cadencemeterwidget);
-        cadencemeterwidget->Angle = 280.0;
-        cadencemeterwidget->m_RangeMax = 350.0;
-        m_metersWidget.append(cadencemeterwidget);
-        textcadencemeterwidget = new TextMeterWidget(QString("cadencemetertext"),cadencemeterwidget, QString("Cadence"));
-        textcadencemeterwidget->SetRelativeSize(50.0, 40.0);
-        textcadencemeterwidget->SetRelativePos(50.0, 50.0);
-        textcadencemeterwidget->MainColor = QColor(255,100,100,180);
-        m_metersWidget.append(textcadencemeterwidget);
-        TextMeterWidget* unitcadencemeterwidget = new TextMeterWidget(QString("cadencemeterunit"),cadencemeterwidget, QString("None"));
-        unitcadencemeterwidget->SetRelativeSize(50.0, 20.0);
-        unitcadencemeterwidget->SetRelativePos(50.0, 85.0);
-        unitcadencemeterwidget->MainColor = QColor(255,100,100,180);
-        unitcadencemeterwidget->Text = tr("rpm");
-        m_metersWidget.append(unitcadencemeterwidget);
-
-        textHRMmeterwidget = new TextMeterWidget(QString("HRM"),container, QString("HRM"));
-        textHRMmeterwidget->SetRelativeSize(15.0, 5.0);
-        textHRMmeterwidget->SetRelativePos(50.0, 90.0);
-        textHRMmeterwidget->MainColor = QColor(255,0,0,180);
-        m_metersWidget.append(textHRMmeterwidget);
-*/
 #endif
     } else {
 
@@ -223,9 +151,9 @@ VideoWindow::~VideoWindow()
 {
     if (!init) return; // we didn't initialise properly so all bets are off
 
-#if (defined Q_OS_LINUX) && (QT_VERSION < 0x050000) && (defined GC_VIDEO_VLC) 
+#if (defined Q_OS_LINUX) && (QT_VERSION < 0x050000) && (defined GC_VIDEO_VLC)
     // unembed vlc backend first
-    x11Container->discardClient(); 
+    x11Container->discardClient();
 #endif
 
     stopPlayback();
@@ -239,7 +167,7 @@ VideoWindow::~VideoWindow()
     /* nor the player */
     libvlc_media_player_release (mp);
 
-    // unload vlc 
+    // unload vlc
     libvlc_release (inst);
 #endif
 
@@ -253,14 +181,7 @@ VideoWindow::~VideoWindow()
 void VideoWindow::resizeEvent(QResizeEvent * )
 {
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
-    {
-        qDebug() << qPrintable("resize meter : ") << p_meterWidget->Name();
-        qDebug() << qPrintable("   X,Y  WxH : ") << QString::number(p_meterWidget->PosX()) << "," << QString::number(p_meterWidget->PosY()) << "  " << QString::number(p_meterWidget->Width()) << "x" << QString::number(p_meterWidget->Height());
-        qDebug() << qPrintable("   relative : ") << QString::number(p_meterWidget->RelativePosX()) << "," << QString::number(p_meterWidget->RelativePosY()) << "  " << QString::number(p_meterWidget->RelativeWidth()) << "x" << QString::number(p_meterWidget->RelativeHeight());
-        qDebug() << qPrintable("   container : ") << QString("0x%1").arg((quintptr)p_meterWidget->container(), QT_POINTER_SIZE * 2, 16, QChar('0'));
-
         p_meterWidget->AdjustSizePos();
-    }
 }
 
 void VideoWindow::startPlayback()
@@ -285,13 +206,8 @@ void VideoWindow::startPlayback()
     mp->play();
 #endif
 
-    qDebug() << qPrintable("Start playback ! p_meterWidget.count()=") << QString::number(m_metersWidget.count());
-    
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {
-        qDebug() << qPrintable("meter : ") << p_meterWidget->Name();
-        qDebug() << qPrintable("X,Y, W,H : ") << QString::number(p_meterWidget->PosX()) << "," << QString::number(p_meterWidget->PosY()) << "," << QString::number(p_meterWidget->Width()) << "," << QString::number(p_meterWidget->Height());
-        
         p_meterWidget->setWindowOpacity(1); // Show the widget
         p_meterWidget->AdjustSizePos();
         p_meterWidget->update();
@@ -351,31 +267,32 @@ void VideoWindow::resumePlayback()
 
 void VideoWindow::telemetryUpdate(RealtimeData rtd)
 {
-
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {
         if (p_meterWidget->Source() == QString("None"))
         {
+            //Nothing
         }
-        if (p_meterWidget->Source() == QString("Speed"))
+        else if (p_meterWidget->Source() == QString("Speed"))
         {
             p_meterWidget->Value = rtd.getSpeed();
             p_meterWidget->Text = QString::number((int) rtd.getSpeed());
-            p_meterWidget->AltText = QString(".") +QString::number((int)(rtd.getSpeed() * 10.0) - (((int) rtd.getSpeed()) * 10)) + tr(" kph");
+            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + tr(" kph");
         }
-        if (p_meterWidget->Source() == QString("Cadence"))
+        else if (p_meterWidget->Source() == QString("Cadence"))
         {
             p_meterWidget->Value = rtd.getCadence();
-            p_meterWidget->Text = QString::number((int)cadencemeterwidget->Value);
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
         }
-        if (p_meterWidget->Source() == QString("Watt"))
+        else if (p_meterWidget->Source() == QString("Watt"))
         {
             p_meterWidget->Value =  rtd.getWatts();
-            p_meterWidget->Text = QString::number((int)powermeterwidget->Value);
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
         }
-        if (p_meterWidget->Source() == QString("HRM"))
+        else if (p_meterWidget->Source() == QString("HRM"))
         {
-            p_meterWidget->Text = QString::number((int)rtd.getHr()) + tr(" bpm");
+            p_meterWidget->Value =  rtd.getHr();
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value) + tr(" bpm");
         }
     }
 
@@ -429,7 +346,6 @@ void VideoWindow::mediaSelected(QString filename)
 #endif
         //qDebug()<<"file url="<<fileURL;
 
-
         /* open media */
         m = libvlc_media_new_location(inst, filename.endsWith("/DVD") ? "dvd://" : fileURL.toLatin1());
 
@@ -474,7 +390,7 @@ MediaHelper::~MediaHelper()
 {
 }
 
-QStringList 
+QStringList
 MediaHelper::listMedia(QDir dir)
 {
     QStringList returning;

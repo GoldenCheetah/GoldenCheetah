@@ -53,7 +53,6 @@ class MeterWidget : public QWidget
     QFont  MainFont;
     QFont  AltFont;
     QColor BackgroundColor;
-    float    m_RangeMin, m_RangeMax; //FIXME : protect it when XML will be operational
 
   protected:
     QString  m_Name;
@@ -62,6 +61,7 @@ class MeterWidget : public QWidget
     float    m_RelativeWidth, m_RelativeHeight;
     float    m_RelativePosX, m_RelativePosY;
     int      m_PosX, m_PosY, m_Width, m_Height;
+    float    m_RangeMin, m_RangeMax;
 
     QBrush m_MainBrush;
     QBrush m_BackgroundBrush;

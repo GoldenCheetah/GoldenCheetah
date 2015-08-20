@@ -8,15 +8,15 @@
 		<RangeMax>60.0</RangeMax>
 		<Angle>220.0</Angle>
 		<SubRange>6</SubRange>
-		<MainColor>255,0,0,180</MainColor>
-		<BackgroundColor>100,100,100,100</BackgroundColor>
+		<MainColor R=255 G=0 B=0 A=180 />
+		<BackgroundColor R=100 G=100 B=100 A=100 />
 	</meter>
 	<meter name="Speedometer-text" container="Speedometer" source="Speed" type="Text">
 		<RelativeWidth>70.0</RelativeWidth>
 		<RelativeHeight>40.0</RelativeHeight>
 		<RelativePosX>50.0</RelativePosX>
 		<RelativePosY>75.0</RelativePosY>
-		<MainColor>255,0,0,180</MainColor>
+		<MainColor R=255 G=0 B=0 A=180 />
 	</meter>
 	<meter name="Wattmeter" container="Video" source="Watt" type="CircularMeter">
 		<RelativeWidth>20.0</RelativeWidth>
@@ -32,14 +32,14 @@
 		<RelativeHeight>40.0</RelativeHeight>
 		<RelativePosX>50.0</RelativePosX>
 		<RelativePosY>50.0</RelativePosY>
-		<MainColor>255,100,100,180</MainColor>
+		<MainColor R=255 G=100 B=100 A=180 />
 	</meter>
 	<meter name="Wattmeter-unit" container="Wattmeter" source="None" type="Text">
 		<RelativeWidth>50.0</RelativeWidth>
 		<RelativeHeight>20.0</RelativeHeight>
 		<RelativePosX>50.0</RelativePosX>
 		<RelativePosY>85.0</RelativePosY>
-		<MainColor>255,100,100,180</MainColor>
+		<MainColor R=255 G=100 B=100 A=180 />
 		<Text>Watts</Text>
 	</meter>
 
@@ -57,14 +57,14 @@
 		<RelativeHeight>40.0</RelativeHeight>
 		<RelativePosX>50.0</RelativePosX>
 		<RelativePosY>50.0</RelativePosY>
-		<MainColor>255,100,100,180</MainColor>
+		<MainColor R=255 G=100 B=100 A=180 />
 	</meter>
 	<meter name="Cadencemeter-unit" container="Cadencemeter" source="None" type="Text">
 		<RelativeWidth>50.0</RelativeWidth>
 		<RelativeHeight>20.0</RelativeHeight>
 		<RelativePosX>50.0</RelativePosX>
 		<RelativePosY>85.0</RelativePosY>
-		<MainColor>255,100,100,180</MainColor>
+		<MainColor R=255 G=100 B=100 A=180 />
 		<Text>rpm</Text>
 	</meter>
 	<meter name="HRM-text" container="Video" source="HRM" type="Text">
@@ -72,6 +72,6 @@
 		<RelativeHeight>5.0</RelativeHeight>
 		<RelativePosX>50.0</RelativePosX>
 		<RelativePosY>90.0</RelativePosY>
-		<MainColor>255,0,0,180</MainColor>
+		<MainColor R=255 G=0 B=0 A=180 />
 	</meter>
 </layout>
