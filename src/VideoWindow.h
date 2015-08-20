@@ -177,24 +177,12 @@ class VideoWindow : public GcWindow
 
         void resizeEvent(QResizeEvent *);
 
-        // current data
-        RideFilePoint rfp;
-
         // passed from Context *
         Context *context;
 
         bool m_MediaChanged;
 
         QList<MeterWidget*> m_metersWidget;
-
-        NeedleMeterWidget* speedmeterwidget;
-        TextMeterWidget* textspeedmeterwidget;
-        CircularIndicatorMeterWidget* powermeterwidget;
-        TextMeterWidget* textpowermeterwidget;
-        TextMeterWidget* textHRMmeterwidget;
-        CircularIndicatorMeterWidget* cadencemeterwidget;
-        TextMeterWidget* textcadencemeterwidget;
-
 
 #ifdef GC_VIDEO_VLC
 
