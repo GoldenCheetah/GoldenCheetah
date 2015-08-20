@@ -1703,7 +1703,12 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     //formulaWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QVBoxLayout *formulaLayout = new QVBoxLayout(formulaWidget);
     formulaLayout->addStretch();
+
+    // courier font
     formulaEdit = new DataFilterEdit(this, context);
+    QFont courier("Courier", QFont().pointSize());
+
+    formulaEdit->setFont(courier);
     //formulaEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     formulaType = new QComboBox(this);
     formulaType->addItem(tr("Total"), static_cast<int>(RideMetric::Total));
