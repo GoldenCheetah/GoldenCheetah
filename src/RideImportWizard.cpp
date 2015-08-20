@@ -1047,12 +1047,15 @@ ImportFutureStatus RideImportWizard::processSaveFile(volatile bool *aborted, con
         QFile target(tmpActivitiesFulltarget);
         if (reader.writeRideFile(context, ride, target)) {
             
+            
+// here we should try to block all the signals that get emitted to only do it once!
+            
             // now try adding the Ride to the RideCache - since this may fail due to various reason, the activity file
             // is stored in tmpActivities during this process to understand which file has create the problem when restarting GC
             // - only after the step was successful the file is moved
             // to the "clean" activities folder
-            context->athlete->addRide(QFileInfo(tmpActivitiesFulltarget).fileName(),
-                                      tableWidget->rowCount() < 20 ? true : false, // don't signal if mass importing
+            context->athlete->addRideSilent(QFileInfo(tmpActivitiesFulltarget).fileName(),
+                                      false, // don't signal if mass importing
                                       true);                                       // file is available only in /tmpActivities, so use this one please
             // rideCache is successfully updated, let's move the file to the real /activities
             if (moveFile(tmpActivitiesFulltarget, finalActivitiesFulltarget)) {

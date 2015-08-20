@@ -242,6 +242,13 @@ void Athlete::selectRideFile(QString fileName)
 }
 
 void
+Athlete::addRideSilent(QString name, bool dosignal, bool useTempActivities)
+{
+    RideItem* last = NULL;
+    rideCache->addRideSilent(name, dosignal, useTempActivities, last);
+}
+
+void
 Athlete::addRide(QString name, bool dosignal, bool useTempActivities)
 {
     rideCache->addRide(name, dosignal, useTempActivities);

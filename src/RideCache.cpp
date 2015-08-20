@@ -160,24 +160,28 @@ RideCache::itemChanged()
     }
 }
 
-// add a new ride
 void
-RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
+RideCache::addRideSilent(QString name, bool dosignal, bool useTempActivities, RideItem *last)
 {
     // ignore malformed names
     QDateTime dt;
     if (!RideFile::parseRideFileName(name, &dt)) return;
-
+    
     // new ride item
-    RideItem *last;
+    //RideItem *last;
     if (useTempActivities)
-       last = new RideItem(context->athlete->home->tmpActivities().canonicalPath(), name, dt, context);
+        last = new RideItem(context->athlete->home->tmpActivities().canonicalPath(), name, dt, context);
     else
-       last = new RideItem(context->athlete->home->activities().canonicalPath(), name, dt, context);
-
+        last = new RideItem(context->athlete->home->activities().canonicalPath(), name, dt, context);
+    
     connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
     connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
 
+}
+
+void
+RideCache::addRidePt2(bool dosignal, RideItem *last)
+{
     // now add to the list, or replace if already there
     bool added = false;
     for (int index=0; index < rides_.count(); index++) {
@@ -187,7 +191,10 @@ RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
             break;
         }
     }
-
+    
+    // what if this is import?
+    
+    
     // add and sort, model needs to know !
     if (!added) {
         model_->beginReset();
@@ -195,15 +202,26 @@ RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
         qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
         model_->endReset();
     }
-
-    // refresh metrics for *this ride only* 
+    
+    // refresh metrics for *this ride only*
     last->refresh();
-
+    
     if (dosignal) context->notifyRideAdded(last); // here so emitted BEFORE rideSelected is emitted!
-
+    
     // notify everyone to select it
     context->ride = last;
     context->notifyRideSelected(last);
+
+}
+
+// add a new ride
+void
+RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
+{
+    RideItem *last = NULL;
+    addRideSilent(name, dosignal, useTempActivities, last);
+    
+    addRidePt2(dosignal, last);
 }
 
 void

@@ -377,6 +377,8 @@ RideItem::setDirty(bool val)
 void
 RideItem::setFileName(QString path, QString fileName)
 {
+    Q_ASSERT(path != NULL);
+    Q_ASSERT(fileName != NULL);
     this->path = path;
     this->fileName = fileName;
 }
