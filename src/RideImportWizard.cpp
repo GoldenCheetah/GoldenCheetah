@@ -160,6 +160,50 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
 
 }
 
+void
+RideImportWizard::allocateRow(const QString filename, int i)
+{
+    // Filename
+    QTableWidgetItem *t = new QTableWidgetItem();
+    if (autoImportMode)
+        t->setText(QFileInfo(filename).canonicalFilePath());
+    else
+        t->setText(QFileInfo(filename).fileName());
+    t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+    tableWidget->setItem(i,0,t);
+    
+    // Date
+    t = new QTableWidgetItem();
+    t->setText(tr(""));
+    t->setFlags(t->flags()  | Qt::ItemIsEditable);
+    t->setBackgroundColor(Qt::red);
+    tableWidget->setItem(i,1,t);
+    
+    // Time
+    t = new QTableWidgetItem();
+    t->setText(tr(""));
+    t->setFlags(t->flags() | Qt::ItemIsEditable);
+    tableWidget->setItem(i,2,t);
+    
+    // Duration
+    t = new QTableWidgetItem();
+    t->setText(tr(""));
+    t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+    tableWidget->setItem(i,3,t);
+    
+    // Distance
+    t = new QTableWidgetItem();
+    t->setText(tr(""));
+    t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+    tableWidget->setItem(i,4,t);
+    
+    // Import Status
+    t = new QTableWidgetItem();
+    t->setText(tr(""));
+    t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+    tableWidget->setItem(i,5,t);
+}
+
 
 void
 RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
@@ -240,50 +284,11 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
 
     // Fill in the filenames and all the textItems
     for (int i=0; i < files.count(); i++) {
-        QTableWidgetItem *t;
 
         filenames.append(QFileInfo(files[i]).canonicalFilePath());
         blanks.append(true); // by default editable
 
-        // Filename
-        t = new QTableWidgetItem();
-        if (autoImportMode)
-            t->setText(QFileInfo(files[i]).canonicalFilePath());
-        else
-            t->setText(QFileInfo(files[i]).fileName());
-        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        tableWidget->setItem(i,0,t);
-
-        // Date
-        t = new QTableWidgetItem();
-        t->setText(tr(""));
-        t->setFlags(t->flags()  | Qt::ItemIsEditable);
-        t->setBackgroundColor(Qt::red);
-        tableWidget->setItem(i,1,t);
-
-        // Time
-        t = new QTableWidgetItem();
-        t->setText(tr(""));
-        t->setFlags(t->flags() | Qt::ItemIsEditable);
-        tableWidget->setItem(i,2,t);
-
-        // Duration
-        t = new QTableWidgetItem();
-        t->setText(tr(""));
-        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        tableWidget->setItem(i,3,t);
-
-        // Distance
-        t = new QTableWidgetItem();
-        t->setText(tr(""));
-        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        tableWidget->setItem(i,4,t);
-
-        // Import Status
-        t = new QTableWidgetItem();
-        t->setText(tr(""));
-        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        tableWidget->setItem(i,5,t);
+        allocateRow(files[i], i);
     }
 
     // put into our dialog box
@@ -343,9 +348,217 @@ RideImportWizard::getNumberOfFiles() {
     return numberOfFiles;
 }
 
+#define NITEMS(x) (int)(sizeof(x)/sizeof(x[0]))
+
+class ImportFutureStatus {
+public:
+    QString* text[6];
+    QString* filename;
+    int elapsedTime;
+    int index;
+    
+    ImportFutureStatus() {
+        // init all ptrs to null
+        for (int i = 0; i < NITEMS(text); i++) {
+            text[i] = NULL;
+        }
+        filename = NULL;
+    }
+};
+
+// use multi-threading
+static bool futuresEnabled = true;
+
+/**
+ * This will allow putting the processing of one file into a background process.
+ */
+ImportFutureStatus RideImportWizard::processFile(const QString filename, const int i)
+{
+    ImportFutureStatus status;
+    status.index = i;
+    
+    QTime myTimer;
+    myTimer.start();
+    qDebug() << "ix: " << status.index << "Processing started for file: " << filename;
+    
+    status.filename = new QString(filename);
+    
+    QStringList errors;
+    QFile thisfile(filename);
+    
+    QList<RideFile*> rides;
+    RideFile *ride = RideFileFactory::instance().openRideFile(context, thisfile, errors, &rides);
+
+    int nMilliseconds = myTimer.elapsed();
+    qDebug() << "ix: " << status.index << "openRideFile took: " << nMilliseconds;
+    
+    // is this an archive of files?
+    if (rides.count() > 1) {
+        // for any archive-file we will push onto the tail of the table.
+        
+        int here = i;
+        
+        // remove current filename from state arrays and tableview
+        filenames.removeAt(here);
+        blanks.removeAt(here);
+        tableWidget->removeRow(here);
+        
+        // resize dialog according to the number of rows we expect
+        int willhave = filenames.count() + rides.count();
+        resize(920 + ((willhave > 16 ? 24 : 0) +
+                      ((willhave > 9 && willhave < 17) ? 8 : 0)),
+               118 + ((willhave > 16 ? 17*20 : (willhave+1) * 20)));
+        
+        
+        // ok so create a temporary file and add to the tableWidget
+        int counter = 0;
+        foreach(RideFile *extracted, rides) {
+            
+            // write as a temporary file, using the original
+            // filename with "-n" appended
+            QString fulltarget = QDir::tempPath() + "/" + QFileInfo(thisfile).baseName() + QString("-%1.tcx").arg(counter+1);
+            TcxFileReader reader;
+            QFile target(fulltarget);
+            reader.writeRideFile(context, extracted, target);
+            deleteMe.append(fulltarget);
+            delete extracted;
+            
+            // use a mutex here with a RAII guard to release when the insert & allocate into the table is completed
+            {QMutexLocker locker(&tableGrowMutex);
+            // now add each temporary file ...
+            filenames.append(fulltarget);
+            
+            // reset here to be the new size - append at the end.
+            here = filenames.size();
+            blanks.insert(here, true); // by default editable
+            tableWidget->insertRow(here+counter);
+            tableWidget->adjustSize();
+
+            allocateRow(fulltarget, here);
+            }
+            
+            if (futuresEnabled) {
+                // add a new file to the queue for processing
+                qDebug() << "ix: " << status.index << ", " << here <<  " SPLIT future for file: " << filenames[here];
+                QFuture<ImportFutureStatus> future = QtConcurrent::run(this, &RideImportWizard::processFile, filenames[here], here);
+                synchronizer.addFuture(future);
+            } else {
+                ImportFutureStatus stat = processFile(filenames[here], here);
+                processImportStatus(stat);
+            }
+        }
+        QApplication::processEvents();
+        
+        // progress bar needs to adjust...
+        //progressBar->setMaximum(filenames.count()*4);
+        
+        // then go back one and re-parse from there
+        rides.clear();
+        
+        //i--;
+        //goto next; // buttugly I know, but count em across 100,000 lines of code
+
+    }
+    
+    qDebug() << "ix: " << status.index << "checking ride for parsing";
+    
+    // did it parse ok?
+    if (ride) {
+        
+        // ride != NULL but !errors.isEmpty() means they're just warnings
+        if (errors.isEmpty()) {
+            status.text[5] = new QString(tr("Validated"));
+        } else {
+            status.text[5] = new QString(tr("Warning - ") + errors.join(tr(" ")));
+        }
+        
+        // Set Date and Time
+        if (ride->startTime().isNull()) {
+            
+            // Poo. The user needs to supply the date/time for this ride
+            blanks[i] = true;
+            status.text[1] = new QString(tr(""));
+            status.text[2] = new QString(tr(""));
+            
+        } else {
+            
+            // Cool, the date and time was extracted from the source file
+            blanks[i] = false;
+            status.text[1] = new QString(ride->startTime().toString(tr("dd MMM yyyy")));
+            status.text[2] = new QString(ride->startTime().toString("hh:mm:ss"));
+        }
+        
+        tableWidget->item(i,1)->setTextAlignment(Qt::AlignRight); // put in the middle
+        tableWidget->item(i,2)->setTextAlignment(Qt::AlignRight); // put in the middle
+        
+        // time and distance from tags (.gc files)
+        QMap<QString,QString> lookup;
+        lookup = ride->metricOverrides.value("total_distance");
+        double km = lookup.value("value", "0.0").toDouble();
+        
+        lookup = ride->metricOverrides.value("workout_time");
+        int secs = lookup.value("value", "0.0").toDouble();
+        
+        // show duration by looking at last data point
+        if (!ride->dataPoints().isEmpty() && ride->dataPoints().last() != NULL) {
+            if (!secs) secs = ride->dataPoints().last()->secs;
+            if (!km) km = ride->dataPoints().last()->km;
+        }
+        
+        QChar zero = QLatin1Char ( '0' );
+        QString time = QString("%1:%2:%3").arg(secs/3600,2,10,zero)
+            .arg(secs%3600/60,2,10,zero)
+            .arg(secs%60,2,10,zero);
+        tableWidget->item(i,3)->setText(time);
+        status.text[3] = new QString(time);
+        tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
+        
+        // show distance by looking at last data point
+        QString dist = context->athlete->useMetricUnits
+            ? QString ("%1 km").arg(km, 0, 'f', 1)
+            : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
+        status.text[4] = new QString(dist);
+        tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        
+        delete ride;
+    } else {
+        // nope - can't handle this file
+        tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(" ")));
+        status.text[5] = new QString(tr("Error - ") + errors.join(tr(" ")));
+    }
+    
+    //progressBar->setValue(progressBar->value()+1);
+    
+    qDebug() << "ix: " << status.index << "finished processing for file: " << filename;
+    status.elapsedTime = myTimer.elapsed();
+    
+    return status;
+}
+
+void
+RideImportWizard::processImportStatus(ImportFutureStatus& stat) {
+    int index = stat.index;
+
+    qDebug()  << "ix: " << stat.index << " processing status: " << *stat.filename;
+    
+    // element 0 is never allocated/deleted because that is a numeric row in the grid
+    for (int x = 1; x < NITEMS(stat.text); x++)
+    {
+        if (NULL != stat.text[x]) {
+            tableWidget->item(index,x)->setText(*stat.text[x]);
+            delete stat.text[x];
+        }
+    }
+    if (NULL != stat.filename)
+        delete stat.filename;
+}
+
 int
 RideImportWizard::process()
 {
+    QTime myTimer;
+    myTimer.start();
+    qDebug() << "import process started";
 
     // Make visible and put in front prior to running down the list & processing...
     if (!isActiveWindow()) activateWindow();
@@ -395,7 +608,7 @@ RideImportWizard::process()
 
         progressBar->setValue(progressBar->value()+1);
 
-    }
+    } //- for(filenames)
 
     if (aborted) { done(0); }
     if (!isActiveWindow()) activateWindow();
@@ -403,7 +616,7 @@ RideImportWizard::process()
     QApplication::processEvents();
 
     // Pass 2 - Read in with the relevant RideFileReader method
-
+    
     phaseLabel->setText(tr("Step 2 of 4: Validating Files"));
    for (int i=0; i< filenames.count(); i++) {
 
@@ -423,173 +636,54 @@ RideImportWizard::process()
               this->repaint();
               QApplication::processEvents();
 
-              QList<RideFile*> rides;
-              RideFile *ride = RideFileFactory::instance().openRideFile(context, thisfile, errors, &rides);
-
-              // is this an archive of files?
-              if (rides.count() > 1) {
-
-                 int here = i;
-
-                 // remove current filename from state arrays and tableview
-                 filenames.removeAt(here);
-                 blanks.removeAt(here);
-                 tableWidget->removeRow(here);
-
-                 // resize dialog according to the number of rows we expect
-                 int willhave = filenames.count() + rides.count();
-                 resize(920 + ((willhave > 16 ? 24 : 0) +
-                     ((willhave > 9 && willhave < 17) ? 8 : 0)),
-                     118 + ((willhave > 16 ? 17*20 : (willhave+1) * 20)));
-
-
-                 // ok so create a temporary file and add to the tableWidget
-                 int counter = 0;
-                 foreach(RideFile *extracted, rides) {
-
-                     // write as a temporary file, using the original
-                     // filename with "-n" appended
-                     QString fulltarget = QDir::tempPath() + "/" + QFileInfo(thisfile).baseName() + QString("-%1.tcx").arg(counter+1);
-                     TcxFileReader reader;
-                     QFile target(fulltarget);
-                     reader.writeRideFile(context, extracted, target);
-                     deleteMe.append(fulltarget);
-                     delete extracted;
-                     
-                     // now add each temporary file ...
-                     filenames.insert(here, fulltarget);
-                     blanks.insert(here, true); // by default editable
-                     tableWidget->insertRow(here+counter);
-
-                     QTableWidgetItem *t;
-
-                     // Filename
-                     t = new QTableWidgetItem();
-                     t->setText(fulltarget);
-                     t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                     tableWidget->setItem(here+counter,0,t);
-
-                     // Date
-                     t = new QTableWidgetItem();
-                     t->setText(tr(""));
-                     t->setFlags(t->flags()  | Qt::ItemIsEditable);
-                     t->setBackgroundColor(Qt::red);
-                     tableWidget->setItem(here+counter,1,t);
-
-                     // Time
-                     t = new QTableWidgetItem();
-                     t->setText(tr(""));
-                     t->setFlags(t->flags() | Qt::ItemIsEditable);
-                     tableWidget->setItem(here+counter,2,t);
-
-                     // Duration
-                     t = new QTableWidgetItem();
-                     t->setText(tr(""));
-                     t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                     tableWidget->setItem(here+counter,3,t);
-
-                     // Distance
-                     t = new QTableWidgetItem();
-                     t->setText(tr(""));
-                     t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                     tableWidget->setItem(here+counter,4,t);
-
-                     // Import Status
-                     t = new QTableWidgetItem();
-                     t->setText(tr(""));
-                     t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                     tableWidget->setItem(here+counter,5,t);
-
-                     counter++;
-
-                     tableWidget->adjustSize();
-                 }
-                 QApplication::processEvents();
-
-
-                 // progress bar needs to adjust...
-                 progressBar->setMaximum(filenames.count()*4);
-
-                 // then go back one and re-parse from there
-                 rides.clear();
-   
-                 i--;
-                 goto next; // buttugly I know, but count em across 100,000 lines of code
-
-              }
-
-              // did it parse ok?
-              if (ride) {
-
-                   // ride != NULL but !errors.isEmpty() means they're just warnings
-                   if (errors.isEmpty())
-                       tableWidget->item(i,5)->setText(tr("Validated"));
-                   else {
-                       tableWidget->item(i,5)->setText(tr("Warning - ") + errors.join(tr(" ")));
-                   }
-
-                   // Set Date and Time
-                   if (ride->startTime().isNull()) {
-
-                       // Poo. The user needs to supply the date/time for this ride
-                       blanks[i] = true;
-                       tableWidget->item(i,1)->setText(tr(""));
-                       tableWidget->item(i,2)->setText(tr(""));
-
-                   } else {
-
-                       // Cool, the date and time was extracted from the source file
-                       blanks[i] = false;
-                       tableWidget->item(i,1)->setText(ride->startTime().toString(tr("dd MMM yyyy")));
-                       tableWidget->item(i,2)->setText(ride->startTime().toString("hh:mm:ss"));
-                   }
-
-                   tableWidget->item(i,1)->setTextAlignment(Qt::AlignRight); // put in the middle
-                   tableWidget->item(i,2)->setTextAlignment(Qt::AlignRight); // put in the middle
-
-                   // time and distance from tags (.gc files)
-                   QMap<QString,QString> lookup;
-                   lookup = ride->metricOverrides.value("total_distance");
-                   double km = lookup.value("value", "0.0").toDouble();
-
-                   lookup = ride->metricOverrides.value("workout_time");
-                   int secs = lookup.value("value", "0.0").toDouble();
-
-                   // show duration by looking at last data point
-                   if (!ride->dataPoints().isEmpty() && ride->dataPoints().last() != NULL) {
-                       if (!secs) secs = ride->dataPoints().last()->secs;
-                       if (!km) km = ride->dataPoints().last()->km;
-                   }
-
-                   QChar zero = QLatin1Char ( '0' );
-                   QString time = QString("%1:%2:%3").arg(secs/3600,2,10,zero)
-                       .arg(secs%3600/60,2,10,zero)
-                       .arg(secs%60,2,10,zero);
-                   tableWidget->item(i,3)->setText(time);
-                   tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
-
-                   // show distance by looking at last data point
-                   QString dist = context->athlete->useMetricUnits
-                       ? QString ("%1 km").arg(km, 0, 'f', 1)
-                       : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
-                   tableWidget->item(i,4)->setText(dist);
-                   tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-
-                   delete ride;
-               } else {
-                   // nope - can't handle this file
-                   tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(" ")));
-               }
+            if (futuresEnabled) {
+                qDebug() << "index: " << i <<  " Starting future for file: " << filenames[i];
+                QFuture<ImportFutureStatus> future = QtConcurrent::run(this, &RideImportWizard::processFile, filenames[i], i);
+                synchronizer.addFuture(future);
+                
+            } else {
+                ImportFutureStatus stat = processFile(filenames[i], i);
+                int i = stat.index;
+                //tableWidget->item(i,0)->setText(*stat.text[0]);
+                tableWidget->item(i,1)->setText(*stat.text[1]);
+                tableWidget->item(i,2)->setText(*stat.text[2]);
+                tableWidget->item(i,3)->setText(*stat.text[3]);
+                tableWidget->item(i,4)->setText(*stat.text[4]);
+                tableWidget->item(i,5)->setText(*stat.text[5]);
+                
+                //delete stat.text[0];
+                delete stat.text[1];
+                delete stat.text[2];
+                delete stat.text[3];
+                delete stat.text[4];
+                delete stat.text[5];
+            }
         }
+
         progressBar->setValue(progressBar->value()+1);
         QApplication::processEvents();
         if (aborted) { done(0); }
         if (!isActiveWindow()) activateWindow();
         this->repaint();
 
-        next:;
     }
-
+    
+    if (futuresEnabled) {
+        // wait for all futures to complete
+        qDebug() << "Waiting on all futures to finish";
+        QTime timerMain;
+        timerMain.start();
+        
+        synchronizer.waitForFinished();
+        int mainThreadWaited = timerMain.elapsed();
+        qDebug() << "Main thread was waiting for: " << mainThreadWaited;
+    
+        foreach(QFuture<ImportFutureStatus> thread, synchronizer.futures()) {
+            ImportFutureStatus stat = thread.result();
+            processImportStatus(stat);
+        }
+    }
+    
     // Pass 3 - get missing date and times for imported files
     //         Actually allow us to edit date on ANY ride, we
     //         make sure that the ride date/time is set from
