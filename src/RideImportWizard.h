@@ -65,7 +65,8 @@ private slots:
 private:
     void init(QList<QString> files, Context *context);
     bool moveFile(const QString &source, const QString &target);
-    ImportFutureStatus processFile(const QString filename, const int i);
+    ImportFutureStatus processValidateFile(volatile bool *aborted, const QString filename, const int i);
+    ImportFutureStatus processSaveFile(volatile bool *aborted, const QString filename, const int i);
     void allocateRow(const QString filename, int i);
     void processImportStatus(ImportFutureStatus& stat);
 
@@ -75,7 +76,7 @@ private:
     QDir homeImports; // target directory for source files
     QDir homeActivities; // target directory for .JSON
     QDir tmpActivities; // activitiy .JSON is stored here until rideCache() update was successfull
-    bool aborted;
+    volatile bool aborted;
     bool autoImportMode;
     QLabel *phaseLabel;
     QTableWidget *tableWidget;
