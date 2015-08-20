@@ -32,14 +32,16 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     setAttribute(Qt::WA_TransparentForMouseEvents);
 
     //default settings
-    MainColor = QColor(255,0,0,180);
-    ScaleColor = QColor(200,200,200,200);
-    OutlineColor = QColor(128,128,128,180);
-    MainFont = QFont(this->font().family(), 64);
-    AltFont = QFont(this->font().family(), 48);
-    BackgroundColor = QColor(96, 96, 96, 200);
+    m_MainColor = QColor(255,0,0,180);
+    m_ScaleColor = QColor(200,200,200,200);
+    m_OutlineColor = QColor(128,128,128,180);
+    m_MainFont = QFont(this->font().family(), 64);
+    m_AltFont = QFont(this->font().family(), 48);
+    m_BackgroundColor = QColor(96, 96, 96, 200);
     m_RangeMin = 0;
     m_RangeMax = 100;
+    m_Angle = 180.0;
+    m_SubRange = 10;
 }
 
 void MeterWidget::SetRelativeSize(float RelativeWidth, float RelativeHeight)
@@ -104,8 +106,8 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
 {
     MeterWidget::paintEvent(paintevent);
 
-    m_MainBrush = QBrush(MainColor);
-    m_OutlinePen = QPen(OutlineColor);
+    m_MainBrush = QBrush(m_MainColor);
+    m_OutlinePen = QPen(m_OutlineColor);
     m_OutlinePen.setWidth(1);
     m_OutlinePen.setStyle(Qt::SolidLine);
 
@@ -114,8 +116,8 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.setRenderHint(QPainter::Antialiasing);
 
     QPainterPath my_painterPath;
-    my_painterPath.addText(QPointF(0,0),MainFont,Text);
-    my_painterPath.addText(QPointF(QFontMetrics(MainFont).width(Text), 0),AltFont,AltText);
+    my_painterPath.addText(QPointF(0,0),m_MainFont,Text);
+    my_painterPath.addText(QPointF(QFontMetrics(m_MainFont).width(Text), 0),m_AltFont,AltText);
     QRectF ValueBoundingRct = my_painterPath.boundingRect();
 
     // define scale
@@ -137,15 +139,14 @@ CircularIndicatorMeterWidget::CircularIndicatorMeterWidget(QString Name, QWidget
     IndicatorGradient.setColorAt(0.3, QColor(255,255,0,180));
     IndicatorGradient.setColorAt(0.7, QColor(0,255,0,180));
     IndicatorGradient.setColorAt(1.0, QColor(0,255,0,180));
-    Angle = 280.0;
 }
 
 void CircularIndicatorMeterWidget::paintEvent(QPaintEvent* paintevent)
 {
     MeterWidget::paintEvent(paintevent);
 
-    m_MainBrush = QBrush(MainColor);
-    m_OutlinePen = QPen(OutlineColor);
+    m_MainBrush = QBrush(m_MainColor);
+    m_OutlinePen = QPen(m_OutlineColor);
     m_OutlinePen.setWidth(1);
     m_OutlinePen.setStyle(Qt::SolidLine);
 
@@ -160,14 +161,13 @@ void CircularIndicatorMeterWidget::paintEvent(QPaintEvent* paintevent)
     // Define coordinates:
     static const QPoint CP_pt1(0, -70);
     static const QPoint CP_pt2(0, -90);
-    static const QPoint CP_pt4(-70,0);
     static const QRectF CP_extRect(-90,-90,180,180);
     static const QRectF CP_intRect(-70,-70,140,140);
     // rotate painter
     painter.save();
-    painter.rotate(-Angle/2);
+    painter.rotate(-m_Angle/2);
 
-    double CPAngle = qBound((float) -1.0, (Value-m_RangeMin) / (m_RangeMax-m_RangeMin), (float) 1.0) * Angle;
+    double CPAngle = qBound((float) -1.0, (Value-m_RangeMin) / (m_RangeMax-m_RangeMin), (float) 1.0) * m_Angle;
     QPainterPath CPEmptyPath;
     CPEmptyPath.moveTo(CP_pt1);
     CPEmptyPath.arcMoveTo(CP_intRect, 90 - CPAngle);
@@ -185,21 +185,18 @@ void CircularIndicatorMeterWidget::paintEvent(QPaintEvent* paintevent)
 
 NeedleMeterWidget::NeedleMeterWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
 {
-    //defaut settings
-    Angle = 180.0;
-    SubRange = 10;
 }
 
 void NeedleMeterWidget::paintEvent(QPaintEvent* paintevent)
 {
     MeterWidget::paintEvent(paintevent);
 
-    m_MainBrush = QBrush(MainColor);
-    m_BackgroundBrush = QBrush(BackgroundColor);
-    m_OutlinePen = QPen(OutlineColor);
+    m_MainBrush = QBrush(m_MainColor);
+    m_BackgroundBrush = QBrush(m_BackgroundColor);
+    m_OutlinePen = QPen(m_OutlineColor);
     m_OutlinePen.setWidth(1);
     m_OutlinePen.setStyle(Qt::SolidLine);
-    m_ScalePen = QPen(ScaleColor);
+    m_ScalePen = QPen(m_ScaleColor);
     m_ScalePen.setWidth(2);
     m_ScalePen.setStyle(Qt::SolidLine);
 
@@ -217,16 +214,16 @@ void NeedleMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.setBrush(Qt::NoBrush);
     painter.save();
     painter.translate(m_Width / 2, m_Height / 2);
-    painter.rotate(Angle/2.0-90.0);
-    painter.drawArc (-m_Width*4/10, -m_Height*4/10, m_Width*8/10, m_Height*8/10, 0, (int) (16.0*Angle));
+    painter.rotate(m_Angle/2.0-90.0);
+    painter.drawArc (-m_Width*4/10, -m_Height*4/10, m_Width*8/10, m_Height*8/10, 0, (int) (16.0*m_Angle));
     painter.restore();
     painter.save();
     painter.translate(m_Width / 2, m_Height / 2);
-    painter.rotate((360.0-Angle)/2.0);
-    for (int i=0; i<=SubRange; i++)
+    painter.rotate((360.0-m_Angle)/2.0);
+    for (int i=0; i<=m_SubRange; i++)
     {
         painter.drawLine (0, m_Height*3/10, 0, m_Height*4/10);
-        painter.rotate(Angle/SubRange);
+        painter.rotate(m_Angle/m_SubRange);
     }
     painter.restore();
 
@@ -236,7 +233,7 @@ void NeedleMeterWidget::paintEvent(QPaintEvent* paintevent)
     QPainterPath my_painterPath;
     painter.save();
     painter.translate(m_Width / 2, m_Height / 2);
-    painter.rotate(-Angle/2+(qBound((float) -1.0, (Value-m_RangeMin)/(m_RangeMax-m_RangeMin), (float) 1.0)*Angle));
+    painter.rotate(-m_Angle/2+(qBound((float) -1.0, (Value-m_RangeMin)/(m_RangeMax-m_RangeMin), (float) 1.0)*m_Angle));
     my_painterPath.moveTo(-2, 0);
     my_painterPath.lineTo(0, -m_Height*4/10);
     my_painterPath.lineTo(+2, 0);

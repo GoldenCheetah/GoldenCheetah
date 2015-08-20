@@ -47,13 +47,6 @@ class MeterWidget : public QWidget
     float Value, ValueMin, ValueMax;
     QString Text, AltText;
 
-    QColor MainColor;
-    QColor ScaleColor;
-    QColor OutlineColor;
-    QFont  MainFont;
-    QFont  AltFont;
-    QColor BackgroundColor;
-
   protected:
     QString  m_Name;
     QWidget* m_container;
@@ -62,6 +55,15 @@ class MeterWidget : public QWidget
     float    m_RelativePosX, m_RelativePosY;
     int      m_PosX, m_PosY, m_Width, m_Height;
     float    m_RangeMin, m_RangeMax;
+    float    m_Angle;
+    int      m_SubRange;
+
+    QColor  m_MainColor;
+    QColor  m_ScaleColor;
+    QColor  m_OutlineColor;
+    QColor  m_BackgroundColor;
+    QFont   m_MainFont;
+    QFont   m_AltFont;
 
     QBrush m_MainBrush;
     QBrush m_BackgroundBrush;
@@ -86,7 +88,6 @@ class CircularIndicatorMeterWidget : public MeterWidget
     explicit CircularIndicatorMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
     virtual void paintEvent(QPaintEvent* paintevent);
     QConicalGradient IndicatorGradient;
-    float Angle;
 };
 
 class NeedleMeterWidget : public MeterWidget
@@ -94,8 +95,6 @@ class NeedleMeterWidget : public MeterWidget
   public:
     explicit NeedleMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
     virtual void paintEvent(QPaintEvent* paintevent);
-    float Angle;
-    int   SubRange;
 };
 
 

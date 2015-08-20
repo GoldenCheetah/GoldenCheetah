@@ -1,76 +1,56 @@
 <layout name="preset_1">
 	<meter name="Speedometer" container="Video" source="Speed" type="NeedleMeter">
-		<RelativeWidth>20.0</RelativeWidth>
-		<RelativeHeight>15.0</RelativeHeight>
-		<RelativePosX>20.0</RelativePosX>
-		<RelativePosY>77.0</RelativePosY>
-		<RangeMin>0.0</RangeMin>
-		<RangeMax>60.0</RangeMax>
+		<RelativeSize Width="20.0" Height="15.0" />
+		<RelativePosition X="20.0" Y="77.0" />
+		<Range Min="0.0" Max="60.0" />
 		<Angle>220.0</Angle>
 		<SubRange>6</SubRange>
-		<MainColor R="255" G="0" B="0" A="180" />
+		<MainColor R="0" G="255" B="0" A="180" />
 		<BackgroundColor R="100" G="100" B="100" A="100" />
 	</meter>
 	<meter name="Speedometer-text" container="Speedometer" source="Speed" type="Text">
-		<RelativeWidth>70.0</RelativeWidth>
-		<RelativeHeight>40.0</RelativeHeight>
-		<RelativePosX>50.0</RelativePosX>
-		<RelativePosY>75.0</RelativePosY>
-		<MainColor R="255" G="0" B="0" A="180" />
+		<RelativeSize Width="70.0" Height="40.0" />
+		<RelativePosition X="50.0" Y="75.0" />
+		<MainColor R="0" G="255" B="0" A="180" />
+		<MainFont Name="Consolas" Size="64" />
 	</meter>
 	<meter name="Wattmeter" container="Video" source="Watt" type="CircularMeter">
-		<RelativeWidth>20.0</RelativeWidth>
-		<RelativeHeight>15.0</RelativeHeight>
-		<RelativePosX>80.0</RelativePosX>
-		<RelativePosY>77.0</RelativePosY>
-		<RangeMin>0.0</RangeMin>
-		<RangeMax>350.0</RangeMax>
+		<RelativeSize Width="20.0" Height="15.0" />
+		<RelativePosition X="80.0" Y="77.0" />
+		<Range Min="0.0" Max="350.0" />
 		<Angle>280.0</Angle>
 	</meter>
 	<meter name="Wattmeter-text" container="Wattmeter" source="Watt" type="Text">
-		<RelativeWidth>50.0</RelativeWidth>
-		<RelativeHeight>40.0</RelativeHeight>
-		<RelativePosX>50.0</RelativePosX>
-		<RelativePosY>50.0</RelativePosY>
+		<RelativeSize Width="50.0" Height="40.0" />
+		<RelativePosition X="50.0" Y="50.0" />
 		<MainColor R="255" G="100" B="100" A="180" />
 	</meter>
 	<meter name="Wattmeter-unit" container="Wattmeter" source="None" type="Text">
-		<RelativeWidth>50.0</RelativeWidth>
-		<RelativeHeight>20.0</RelativeHeight>
-		<RelativePosX>50.0</RelativePosX>
-		<RelativePosY>85.0</RelativePosY>
+		<RelativeSize Width="50.0" Height="20.0" />
+		<RelativePosition X="50.0" Y="85.0" />
 		<MainColor R="255" G="100" B="100" A="180" />
 		<Text>Watts</Text>
 	</meter>
 	<meter name="Cadencemeter" container="Video" source="Cadence" type="CircularMeter">
-		<RelativeWidth>20.0</RelativeWidth>
-		<RelativeHeight>15.0</RelativeHeight>
-		<RelativePosX>50.0</RelativePosX>
-		<RelativePosY>77.0</RelativePosY>
-		<RangeMin>0.0</RangeMin>
-		<RangeMax>200.0</RangeMax>
+		<RelativeSize Width="20.0" Height="15.0" />
+		<RelativePosition X="50.0" Y="77.0" />
+		<Range Min="0.0" Max="200.0" />
 		<Angle>280.0</Angle>
 	</meter>
 	<meter name="Cadencemeter-text" container="Cadencemeter" source="Cadence" type="Text">
-		<RelativeWidth>50.0</RelativeWidth>
-		<RelativeHeight>40.0</RelativeHeight>
-		<RelativePosX>50.0</RelativePosX>
-		<RelativePosY>50.0</RelativePosY>
+		<RelativeSize Width="50.0" Height="40.0" />
+		<RelativePosition X="50.0" Y="50.0" />
 		<MainColor R="255" G="100" B="100" A="180" />
 	</meter>
 	<meter name="Cadencemeter-unit" container="Cadencemeter" source="None" type="Text">
-		<RelativeWidth>50.0</RelativeWidth>
-		<RelativeHeight>20.0</RelativeHeight>
-		<RelativePosX>50.0</RelativePosX>
-		<RelativePosY>85.0</RelativePosY>
+		<RelativeSize Width="50.0" Height="20.0" />
+		<RelativePosition X="50.0" Y="85.0" />
 		<MainColor R="255" G="100" B="100" A="180" />
 		<Text>rpm</Text>
 	</meter>
 	<meter name="HRM-text" container="Video" source="HRM" type="Text">
-		<RelativeWidth>15.0</RelativeWidth>
-		<RelativeHeight>5.0</RelativeHeight>
-		<RelativePosX>50.0</RelativePosX>
-		<RelativePosY>90.0</RelativePosY>
+		<RelativeSize Width="15.0" Height="5.0" />
+		<RelativePosition X="50.0" Y="90.0" />
 		<MainColor R="255" G="0" B="0" A="180" />
 	</meter>
 </layout>

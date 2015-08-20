@@ -44,13 +44,30 @@ void VideoLayoutParser::SetDefaultValues()
 
         meterWidget->m_RangeMin = 0.0;
         meterWidget->m_RangeMax = 80.0;
-        meterWidget->MainColor = QColor(255,0,0,200);
-        meterWidget->ScaleColor = QColor(255,255,255,200);
-        meterWidget->OutlineColor = QColor(100,100,100,200);
-        meterWidget->BackgroundColor = QColor(100,100,100,200);
-        meterWidget->MainFont = QFont(meterWidget->font().family(), 64);
-        meterWidget->AltFont = QFont(meterWidget->font().family(), 48);
+        meterWidget->m_MainColor = QColor(255,0,0,200);
+        meterWidget->m_ScaleColor = QColor(255,255,255,200);
+        meterWidget->m_OutlineColor = QColor(100,100,100,200);
+        meterWidget->m_BackgroundColor = QColor(100,100,100,200);
+        meterWidget->m_MainFont = QFont(meterWidget->font().family(), 64);
+        meterWidget->m_AltFont = QFont(meterWidget->font().family(), 48);
     }
+}
+
+QColor GetColorFromFields(const QXmlAttributes& qAttributes)
+{
+        int i;
+        int R,G,B,A;
+        // reset all
+        R=G=B=A=0;
+        if((i = qAttributes.index("R"))>= 0)
+            R = qAttributes.value(i).toInt();
+        if((i = qAttributes.index("G"))>= 0)
+            G = qAttributes.value(i).toInt();
+        if((i = qAttributes.index("B"))>= 0)
+            B = qAttributes.value(i).toInt();
+        if((i = qAttributes.index("A"))>= 0)
+            A = qAttributes.value(i).toInt();
+        return QColor(R,G,B,A);
 }
 
 bool VideoLayoutParser::startElement( const QString&, const QString&,
@@ -120,6 +137,61 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
 
         SetDefaultValues();
     }
+    else if ((qName == "MainColor") && meterWidget)
+        meterWidget->m_MainColor =  GetColorFromFields(qAttributes);
+    else if ((qName == "OutlineColor") && meterWidget)
+        meterWidget->m_OutlineColor =  GetColorFromFields(qAttributes);
+    else if ((qName == "ScaleColor") && meterWidget)
+        meterWidget->m_ScaleColor =  GetColorFromFields(qAttributes);
+    else if ((qName == "BackgroundColor") && meterWidget)
+        meterWidget->m_BackgroundColor =  GetColorFromFields(qAttributes);
+
+    else if ((qName == "RelativeSize") && meterWidget)
+    {
+        int i;
+        if ((i = qAttributes.index("Width")) >= 0)
+            meterWidget->m_RelativeWidth = qAttributes.value(i).toFloat()/100.0;
+        if ((i = qAttributes.index("Height")) >= 0)
+            meterWidget->m_RelativeHeight = qAttributes.value(i).toFloat()/100.0;
+    }
+    else if ((qName == "RelativePosition") && meterWidget)
+    {
+        int i;
+        if ((i = qAttributes.index("X")) >= 0)
+            meterWidget->m_RelativePosX = qAttributes.value(i).toFloat()/100.0;
+        if ((i = qAttributes.index("Y")) >= 0)
+            meterWidget->m_RelativePosY = qAttributes.value(i).toFloat()/100.0;
+    }
+    else if ((qName == "Range") && meterWidget)
+    {
+        int i;
+        if ((i = qAttributes.index("Min")) >= 0)
+            meterWidget->m_RangeMin = qAttributes.value(i).toFloat();
+        if ((i = qAttributes.index("Max")) >= 0)
+            meterWidget->m_RangeMax = qAttributes.value(i).toFloat();
+    }
+    else if ((qName == "MainFont") && meterWidget)
+    {
+        int i;
+        int FontSize = 64;
+        QString FontName = "Arial";
+        if ((i = qAttributes.index("Name")) >= 0)
+            FontName = qAttributes.value(i);
+        if ((i = qAttributes.index("Size")) >= 0)
+            FontSize = qAttributes.value(i).toInt();
+        meterWidget->m_MainFont = QFont(FontName, FontSize);
+    }
+    else if ((qName == "AltFont") && meterWidget)
+    {
+        int i;
+        int FontSize = 48;
+        QString FontName = "Arial";
+        if ((i = qAttributes.index("Name")) >= 0)
+            FontName = qAttributes.value(i);
+        if ((i = qAttributes.index("Size")) >= 0)
+            FontSize = qAttributes.value(i).toInt();
+        meterWidget->m_AltFont = QFont(FontName, FontSize);
+    }
 
     return true;
 }
@@ -128,30 +200,10 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
 {
     if (meterWidget)
     {
-        if (qName == "RelativeWidth")
-            meterWidget->m_RelativeWidth = buffer.toFloat() / 100.0;
-        else if (qName == "RelativeHeight")
-            meterWidget->m_RelativeHeight = buffer.toFloat() / 100.0;
-        else if (qName == "RelativePosX")
-            meterWidget->m_RelativePosX = buffer.toFloat() / 100.0;
-        else if (qName == "RelativePosY")
-            meterWidget->m_RelativePosY = buffer.toFloat() / 100.0;
-        else if (qName == "RangeMin")
-            meterWidget->m_RangeMin = buffer.toFloat();
-        else if (qName == "RangeMax")
-            meterWidget->m_RangeMax = buffer.toFloat();
-
-    /*
-    //TODO:
-        MainColor
-        ScaleColor
-        OutlineColor
-        BackgroundColor
-        MainFont
-        AltFont
-        speedmeterwidget->Angle = 220.0;
-        speedmeterwidget->SubRange = 6;
-    */
+        if (qName == "Angle")
+            meterWidget->m_Angle = buffer.toFloat();
+        else if (qName == "SubRange")
+            meterWidget->m_SubRange = buffer.toInt();
 
         else if (qName == "meter")
         {
@@ -161,7 +213,6 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
         }
 
         return true;
-
     }
     else
         return false;
