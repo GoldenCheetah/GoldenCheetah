@@ -106,6 +106,7 @@ ChooseCyclistDialog::newCyclistDialog(QDir &homeDir, QWidget *)
     else
         name = "";
 
+    
     // zap the dialog now we have the results
     delete newone;
 
@@ -117,7 +118,10 @@ void
 ChooseCyclistDialog::newClicked()
 {
     QString name = newCyclistDialog(home, this);
-    if (!name.isEmpty())
-        new QListWidgetItem(name, listWidget);
+    if (!name.isEmpty()) {
+        QListWidgetItem* item = new QListWidgetItem(name, listWidget);
+        // here we should select the newest athlete
+        listWidget->setCurrentItem(item);
+    }
 }
 
