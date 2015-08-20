@@ -706,7 +706,6 @@ RideImportWizard::process()
             ImportFutureStatus stat = thread.result();
             processImportStatus(stat);
         }
-        int size = synchronizer.futures().size();
         synchronizer.clearFutures();
         Q_ASSERT(0 == synchronizer.futures().size());
     }
@@ -1187,7 +1186,6 @@ RideImportWizard::abortClicked()
             ImportFutureStatus stat = thread.result();
             processImportStatus(stat);
         }
-        int size = synchronizer.futures().size();
         synchronizer.clearFutures();
         Q_ASSERT(0 == synchronizer.futures().size());
 
