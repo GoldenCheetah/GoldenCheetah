@@ -725,8 +725,7 @@ FormField::metadataFlush()
     QString calendarText;
     foreach (FieldDefinition field, meta->getFields()) {
         if (field.diary == true) {
-            calendarText += QString("%1\n")
-                    .arg(ourRideItem->ride()->getTag(field.name, ""));
+            calendarText += field.calendarText(ourRideItem->ride()->getTag(field.name, ""));
         }
     }
     ourRideItem->ride()->setTag("Calendar Text", calendarText);
@@ -1150,6 +1149,24 @@ FieldDefinition::getCompleter(QObject *parent)
         }
     }
     return completer;
+}
+
+QString
+FieldDefinition::calendarText(QString value)
+{
+    switch (type) {
+    case FIELD_INTEGER:
+    case FIELD_DOUBLE:
+    case FIELD_DATE:
+    case FIELD_TIME:
+    case FIELD_CHECKBOX:
+        return QString("%1: %2\n").arg(name).arg(value);
+    case FIELD_TEXT:
+    case FIELD_TEXTBOX:
+    case FIELD_SHORTTEXT:
+    default:
+        return QString("%1\n").arg(value);
+    }
 }
 
 unsigned long
