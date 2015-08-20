@@ -20,9 +20,8 @@
 #include <QGraphicsPathItem>
 #include "MeterWidget.h"
 
-MeterWidget::MeterWidget(QWidget *parent, float RelativeWidth, float RelativeHeight, float RelativePosX, float RelativePosY) : QWidget(parent)
+MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
 {
-    m_container = parent;
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
@@ -31,9 +30,6 @@ MeterWidget::MeterWidget(QWidget *parent, float RelativeWidth, float RelativeHei
     setAttribute(Qt::WA_PaintOnScreen);
 
     setAttribute(Qt::WA_TransparentForMouseEvents);
-
-    SetRelativeSize(RelativeWidth, RelativeHeight);
-    SetRelativePos(RelativePosX, RelativePosY);
 
     //default settings
     MainColor = QColor(255,0,0,180);
@@ -44,7 +40,6 @@ MeterWidget::MeterWidget(QWidget *parent, float RelativeWidth, float RelativeHei
     BackgroundColor = QColor(96, 96, 96, 200);
     RangeMin = 0;
     RangeMax = 100;
-
 }
 
 void MeterWidget::SetRelativeSize(float RelativeWidth, float RelativeHeight)
@@ -95,7 +90,7 @@ void MeterWidget::paintEvent(QPaintEvent* paintevent)
     Q_UNUSED(paintevent);
 }
 
-TextMeterWidget::TextMeterWidget(QWidget *parent, float RelativeWidth, float RelativeHeight, float RelativePosX, float RelativePosY) : MeterWidget(parent, RelativeWidth, RelativeHeight, RelativePosX, RelativePosY)
+TextMeterWidget::TextMeterWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
 {
 }
 
@@ -134,7 +129,7 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.drawPath(my_painterPath);
 }
 
-CircularIndicatorMeterWidget::CircularIndicatorMeterWidget(QWidget *parent, float RelativeWidth, float RelativeHeight, float RelativePosX, float RelativePosY) : MeterWidget(parent, RelativeWidth, RelativeHeight, RelativePosX, RelativePosY)
+CircularIndicatorMeterWidget::CircularIndicatorMeterWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
 {
     //defaut settings
     IndicatorGradient = QConicalGradient(0, 0, 150);
@@ -188,7 +183,7 @@ void CircularIndicatorMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.restore();
 }
 
-NeedleMeterWidget::NeedleMeterWidget(QWidget *parent, float RelativeWidth, float RelativeHeight, float RelativePosX, float RelativePosY) : MeterWidget(parent, RelativeWidth, RelativeHeight, RelativePosX, RelativePosY)
+NeedleMeterWidget::NeedleMeterWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
 {
     //defaut settings
     Angle = 180.0;

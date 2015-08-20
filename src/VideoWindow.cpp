@@ -17,7 +17,6 @@
 * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <QGraphicsPathItem>
 #include "VideoWindow.h"
 #include "Context.h"
 #include "RideItem.h"
@@ -94,43 +93,61 @@ VideoWindow::VideoWindow(Context *context)  :
         layout->addWidget(container);
         libvlc_media_player_set_hwnd (mp, (HWND)(container->winId()));
 
-        speedmeterwidget = new NeedleMeterWidget(container, 20.0, 15.0, 20.0, 77.0);
+        speedmeterwidget = new NeedleMeterWidget(QString("speedometer"),container, QString("Speed"));
+        speedmeterwidget->SetRelativeSize(20.0, 15.0);
+        speedmeterwidget->SetRelativePos(20.0, 77.0);
         speedmeterwidget->MainColor = QColor(255,0,0,180);
         speedmeterwidget->BackgroundColor = QColor(100,100,100,100);
         speedmeterwidget->RangeMax = 60.0;
         speedmeterwidget->Angle = 220.0;
         speedmeterwidget->SubRange = 6;
         m_metersWidget.append(speedmeterwidget);
-        textspeedmeterwidget = new TextMeterWidget(speedmeterwidget, 70.0, 40.0, 50.0, 75.0);
+        textspeedmeterwidget = new TextMeterWidget(QString("speedometertext"),speedmeterwidget, QString("Speed"));
+        textspeedmeterwidget->SetRelativeSize(70.0, 40.0);
+        textspeedmeterwidget->SetRelativePos(50.0, 75.0);
         textspeedmeterwidget->MainColor = QColor(255,0,0,180);
         m_metersWidget.append(textspeedmeterwidget);
 
-        powermeterwidget = new CircularIndicatorMeterWidget(container, 20.0, 15.0, 80.0, 77.0);
+        powermeterwidget = new CircularIndicatorMeterWidget(QString("powermeter"),container, QString("Watt"));
+        powermeterwidget->SetRelativeSize(20.0, 15.0);
+        powermeterwidget->SetRelativePos(80.0, 77.0);
         powermeterwidget->Angle = 280.0;
         powermeterwidget->RangeMax = 350.0;
         m_metersWidget.append(powermeterwidget);
-        textpowermeterwidget = new TextMeterWidget(powermeterwidget, 50.0, 40.0, 50.0, 50.0);
+        textpowermeterwidget = new TextMeterWidget(QString("powermetertext"),powermeterwidget, QString("Watt"));
+        textpowermeterwidget->SetRelativeSize(50.0, 40.0);
+        textpowermeterwidget->SetRelativePos(50.0, 50.0);
         textpowermeterwidget->MainColor = QColor(255,100,100,180);
         m_metersWidget.append(textpowermeterwidget);
-        TextMeterWidget* unitpowermeterwidget = new TextMeterWidget(powermeterwidget, 50.0, 20.0, 50.0, 85.0);
+        TextMeterWidget* unitpowermeterwidget = new TextMeterWidget(QString("powermeterunit"),powermeterwidget, QString("None"));
+        unitpowermeterwidget->SetRelativeSize(50.0, 20.0);
+        unitpowermeterwidget->SetRelativePos(50.0, 85.0);
         unitpowermeterwidget->MainColor = QColor(255,100,100,180);
         unitpowermeterwidget->Text = tr("Watts");
         m_metersWidget.append(unitpowermeterwidget);
 
-        cadencemeterwidget = new CircularIndicatorMeterWidget(container, 20.0, 15.0, 50.0, 77.0);
+        cadencemeterwidget = new CircularIndicatorMeterWidget(QString("cadencemeter"),container, QString("Cadence"));
+        cadencemeterwidget->SetRelativeSize(20.0, 15.0);
+        cadencemeterwidget->SetRelativePos(50.0, 77.0);
         m_metersWidget.append(cadencemeterwidget);
         cadencemeterwidget->Angle = 280.0;
         cadencemeterwidget->RangeMax = 350.0;
         m_metersWidget.append(cadencemeterwidget);
-        textcadencemeterwidget = new TextMeterWidget(cadencemeterwidget, 50.0, 40.0, 50.0, 50.0);
+        textcadencemeterwidget = new TextMeterWidget(QString("cadencemetertext"),cadencemeterwidget, QString("Cadence"));
+        textcadencemeterwidget->SetRelativeSize(50.0, 40.0);
+        textcadencemeterwidget->SetRelativePos(50.0, 50.0);
         textcadencemeterwidget->MainColor = QColor(255,100,100,180);
         m_metersWidget.append(textcadencemeterwidget);
-        TextMeterWidget* unitcadencemeterwidget = new TextMeterWidget(cadencemeterwidget, 50.0, 20.0, 50.0, 85.0);
+        TextMeterWidget* unitcadencemeterwidget = new TextMeterWidget(QString("cadencemeterunit"),cadencemeterwidget, QString("None"));
+        unitcadencemeterwidget->SetRelativeSize(50.0, 20.0);
+        unitcadencemeterwidget->SetRelativePos(50.0, 85.0);
         unitcadencemeterwidget->MainColor = QColor(255,100,100,180);
         unitcadencemeterwidget->Text = tr("rpm");
         m_metersWidget.append(unitcadencemeterwidget);
 
-        textHRMmeterwidget = new TextMeterWidget(container, 15.0, 5.0, 50.0, 90.0);
+        textHRMmeterwidget = new TextMeterWidget(QString("HRM"),container, QString("HRM"));
+        textHRMmeterwidget->SetRelativeSize(15.0, 5.0);
+        textHRMmeterwidget->SetRelativePos(50.0, 90.0);
         textHRMmeterwidget->MainColor = QColor(255,0,0,180);
         m_metersWidget.append(textHRMmeterwidget);
 
@@ -287,22 +304,36 @@ void VideoWindow::resumePlayback()
 
 void VideoWindow::telemetryUpdate(RealtimeData rtd)
 {
-    speedmeterwidget->Value = rtd.getSpeed();
-    textspeedmeterwidget->Text = QString::number((int) rtd.getSpeed());
-    textspeedmeterwidget->AltText = QString(".") +QString::number((int)(rtd.getSpeed() * 10.0) - (((int) rtd.getSpeed()) * 10)) + tr(" kph");
-
-    powermeterwidget->Value =  rtd.getWatts();
-    textpowermeterwidget->Text = QString::number((int)powermeterwidget->Value);
-
-    cadencemeterwidget->Value = rtd.getCadence();
-    textcadencemeterwidget->Text = QString::number((int)cadencemeterwidget->Value);
-
-    textHRMmeterwidget->Text = QString::number((int)rtd.getHr()) + tr(" bpm");
 
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {
-        p_meterWidget->update();
+        if (p_meterWidget->Source() == QString("None"))
+        {
+        }
+        if (p_meterWidget->Source() == QString("Speed"))
+        {
+            p_meterWidget->Value = rtd.getSpeed();
+            p_meterWidget->Text = QString::number((int) rtd.getSpeed());
+            p_meterWidget->AltText = QString(".") +QString::number((int)(rtd.getSpeed() * 10.0) - (((int) rtd.getSpeed()) * 10)) + tr(" kph");
+        }
+        if (p_meterWidget->Source() == QString("Cadence"))
+        {
+            p_meterWidget->Value = rtd.getCadence();
+            p_meterWidget->Text = QString::number((int)cadencemeterwidget->Value);
+        }
+        if (p_meterWidget->Source() == QString("Watt"))
+        {
+            p_meterWidget->Value =  rtd.getWatts();
+            p_meterWidget->Text = QString::number((int)powermeterwidget->Value);
+        }
+        if (p_meterWidget->Source() == QString("HRM"))
+        {
+            p_meterWidget->Text = QString::number((int)rtd.getHr()) + tr(" bpm");
+        }
     }
+
+    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+        p_meterWidget->update();
 }
 
 void VideoWindow::seekPlayback(long ms)

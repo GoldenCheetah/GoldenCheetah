@@ -24,9 +24,10 @@
 class MeterWidget : public QWidget
 {
   public:
-    explicit MeterWidget(QWidget *parent = 0, float RelativeWidth = 100.0, float RelativeHeight = 100.0, float RelativePosX = 0.0, float RelativePosY = 0.0);
-    virtual void SetRelativeSize(float RelativeWidth, float RelativeHeight);
-    virtual void SetRelativePos(float RelativePosX, float RelativePosY);
+    explicit MeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
+    QString Source() const { return m_Source; };
+    virtual void SetRelativeSize(float RelativeWidth = 100.0, float RelativeHeight = 100.0);
+    virtual void SetRelativePos(float RelativePosX = 50.0, float RelativePosY = 50.0);
     virtual void AdjustSizePos();
     virtual void ComputeSize();
     virtual void paintEvent(QPaintEvent* paintevent);
@@ -45,22 +46,26 @@ class MeterWidget : public QWidget
     QColor BackgroundColor;
 
   protected:
-    QWidget *m_container;
-    float  m_RelativeWidth, m_RelativeHeight;
-    float  m_RelativePosX, m_RelativePosY;
-    int    m_PosX, m_PosY, m_Width, m_Height;
+    QString  m_Name;
+    QWidget* m_container;
+    QString  m_Source;
+    float    m_RelativeWidth, m_RelativeHeight;
+    float    m_RelativePosX, m_RelativePosY;
+    int      m_PosX, m_PosY, m_Width, m_Height;
 
     QBrush m_MainBrush;
     QBrush m_BackgroundBrush;
     QBrush m_AltBrush;
     QPen   m_OutlinePen;
     QPen   m_ScalePen;
+
+    friend class VideoLayoutParser;
 };
 
 class TextMeterWidget : public MeterWidget
 {
   public:
-    explicit TextMeterWidget(QWidget *parent = 0, float RelativeWidth = 100.0, float RelativeHeight = 100.0, float RelativePosX = 0.0, float RelativePosY = 0.0);
+    explicit TextMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
     virtual void ComputeSize();
     virtual void paintEvent(QPaintEvent* paintevent);
 };
@@ -68,7 +73,7 @@ class TextMeterWidget : public MeterWidget
 class CircularIndicatorMeterWidget : public MeterWidget
 {
   public:
-    explicit CircularIndicatorMeterWidget(QWidget *parent = 0, float RelativeWidth = 100.0, float RelativeHeight = 100.0, float RelativePosX = 0.0, float RelativePosY = 0.0);
+    explicit CircularIndicatorMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
     virtual void paintEvent(QPaintEvent* paintevent);
     QConicalGradient IndicatorGradient;
     float Angle;
@@ -77,7 +82,7 @@ class CircularIndicatorMeterWidget : public MeterWidget
 class NeedleMeterWidget : public MeterWidget
 {
   public:
-    explicit NeedleMeterWidget(QWidget *parent = 0, float RelativeWidth = 100.0, float RelativeHeight = 100.0, float RelativePosX = 0.0, float RelativePosY = 0.0);
+    explicit NeedleMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
     virtual void paintEvent(QPaintEvent* paintevent);
     float Angle;
     int   SubRange;

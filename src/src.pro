@@ -462,6 +462,7 @@ HEADERS += \
         TrainingstagebuchUploader.h \
         Units.h \
         VeloHeroUploader.h \
+        VideoLayoutParser.h \
         Views.h \
         WithingsDownload.h \
         WkoRideFile.h \
@@ -701,6 +702,7 @@ SOURCES += \
         TRIMPPoints.cpp \
         Units.cpp \
         VeloHeroUploader.cpp \
+        VideoLayoutParser.cpp \
         Views.cpp \
         WattsPerKilogram.cpp \
         WithingsDownload.cpp \
