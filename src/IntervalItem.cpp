@@ -196,7 +196,7 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
     nameEdit = new QLineEdit(this);
     nameEdit->setText(interval.name);
 
-    if (interval.rideInterval != NULL) {
+    if (interval.type == RideFileInterval::USER) {
         fromEdit = new QTimeEdit(this);
         fromEdit->setDisplayFormat("hh:mm:ss");
         fromEdit->setTime(QTime(0,0,0,0).addSecs(interval.start));
@@ -213,7 +213,7 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
     grid->addWidget(name, 0,0);
     grid->addWidget(nameEdit, 0,1);
 
-    if (interval.rideInterval != NULL) {
+    if (interval.type == RideFileInterval::USER) {
         grid->addWidget(from, 1,0);
         grid->addWidget(fromEdit, 1,1);
         grid->addWidget(to, 2,0);
