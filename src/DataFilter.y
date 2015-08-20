@@ -45,7 +45,7 @@ extern QStringList DataFiltererrors;
 static void DataFiltererror(const char *error) { DataFiltererrors << QString(error);}
 extern int DataFilterparse();
 
-extern Leaf *root; // root node for parsed statement
+extern Leaf *DataFilterroot; // root node for parsed statement
 
 %}
 
@@ -83,7 +83,7 @@ extern Leaf *root; // root node for parsed statement
 %start filter;
 %%
 
-filter: lexpr                       { root = $1; }
+filter: lexpr                       { DataFilterroot = $1; }
         ;
 
 parms: lexpr                        { $$ = new Leaf(@1.first_column, @1.last_column);

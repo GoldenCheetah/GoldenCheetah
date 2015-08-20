@@ -64,6 +64,8 @@ class Leaf {
         void validateFilter(DataFilter *, Leaf*); // validate
         bool isNumber(DataFilter *df, Leaf *leaf);
         void clear(Leaf*);
+        QString toString(); // return as string
+        QString signature() { return toString(); }
 
         enum { none, Float, Integer, String, Symbol, 
                Logical, Operation, BinaryOperation, UnaryOperation,
@@ -100,6 +102,7 @@ class DataFilter : public QObject
         Context *context;
         QStringList &files() { return filenames; }
         QString signature() { return sig; }
+        Leaf *root() { return treeRoot; }
 
         // needs to be reapplied as the ride selection changes
         bool isdynamic;
