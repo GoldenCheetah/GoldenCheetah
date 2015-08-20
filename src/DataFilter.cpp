@@ -196,12 +196,12 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
 
     QTextCharFormat symbol;
     symbol.setUnderlineStyle(QTextCharFormat::NoUnderline);
-    symbol.setForeground(Qt::blue);
+    symbol.setForeground(Qt::red);
 
     QTextCharFormat literal;
     literal.setFontWeight(QFont::Normal);
     literal.setUnderlineStyle(QTextCharFormat::NoUnderline);
-    literal.setForeground(Qt::red);
+    literal.setForeground(Qt::magenta);
 
     QTextCharFormat comment;
     comment.setFontWeight(QFont::Normal);
