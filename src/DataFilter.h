@@ -99,6 +99,7 @@ class DataFilter : public QObject
 
         Context *context;
         QStringList &files() { return filenames; }
+        QString signature() { return sig; }
 
         // needs to be reapplied as the ride selection changes
         bool isdynamic;
@@ -130,11 +131,14 @@ class DataFilter : public QObject
         void results(QStringList);
 
     private:
+        void setSignature(QString &query);
+
         Leaf *treeRoot;
         QStringList errors;
 
         QStringList filenames;
         QStringList *list;
+        QString sig;
 };
 
 extern int DataFilterdebug;
