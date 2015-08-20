@@ -137,7 +137,8 @@ class Athlete : public QObject
         // ride collection
         void selectRideFile(QString);
         void addRide(QString name, bool bSelect=true, bool useTempActivities=false);
-        void addRideSilent(QString name, bool dosignal, bool useTempActivities);
+        RideItem* addRideSilent(QString name, bool dosignal, bool useTempActivities);
+        void refreshAfterImport();
         void removeCurrentRide();
 
         // zones etc

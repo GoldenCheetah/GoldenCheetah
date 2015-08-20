@@ -923,6 +923,7 @@ RideImportWizard::todayClicked(int index)
 void
 RideImportWizard::cancelClicked()
 {
+    // here this should signal to select the last item imported?
     done(0); // you are the weakest link, goodbye.
 }
 
@@ -1054,7 +1055,7 @@ ImportFutureStatus RideImportWizard::processSaveFile(volatile bool *aborted, con
             // is stored in tmpActivities during this process to understand which file has create the problem when restarting GC
             // - only after the step was successful the file is moved
             // to the "clean" activities folder
-            context->athlete->addRideSilent(QFileInfo(tmpActivitiesFulltarget).fileName(),
+            RideItem* ride = context->athlete->addRideSilent(QFileInfo(tmpActivitiesFulltarget).fileName(),
                                       false, // don't signal if mass importing
                                       true);                                       // file is available only in /tmpActivities, so use this one please
             // rideCache is successfully updated, let's move the file to the real /activities
@@ -1063,7 +1064,8 @@ ImportFutureStatus RideImportWizard::processSaveFile(volatile bool *aborted, con
                 status.text[5] = new QString(tr("File Saved"));
 
                 // and correct the path locally stored in Ride Item
-                context->ride->setFileName(homeActivities.canonicalPath(), activitiesTarget);
+                Q_ASSERT(NULL != ride);
+                ride->setFileName(homeActivities.canonicalPath(), activitiesTarget);
             }  else {
                 //tableWidget->item(i,5)->setText(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
                 status.text[5] = new QString(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
@@ -1193,6 +1195,9 @@ RideImportWizard::abortClicked()
         Q_ASSERT(0 == synchronizer.futures().size());
 
     }
+    
+    context->athlete->refreshAfterImport();
+    
     if (!isActiveWindow()) activateWindow();
     
     

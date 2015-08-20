@@ -160,15 +160,16 @@ RideCache::itemChanged()
     }
 }
 
-void
-RideCache::addRideSilent(QString name, bool dosignal, bool useTempActivities, RideItem *last)
+RideItem*
+RideCache::addRideSilent(QString name, bool dosignal, bool useTempActivities)
 {
     // ignore malformed names
     QDateTime dt;
-    if (!RideFile::parseRideFileName(name, &dt)) return;
+    if (!RideFile::parseRideFileName(name, &dt))
+        return NULL;
     
     // new ride item
-    //RideItem *last;
+    RideItem *last;
     if (useTempActivities)
         last = new RideItem(context->athlete->home->tmpActivities().canonicalPath(), name, dt, context);
     else
@@ -177,11 +178,7 @@ RideCache::addRideSilent(QString name, bool dosignal, bool useTempActivities, Ri
     connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
     connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
 
-}
-
-void
-RideCache::addRidePt2(bool dosignal, RideItem *last)
-{
+    
     // now add to the list, or replace if already there
     bool added = false;
     for (int index=0; index < rides_.count(); index++) {
@@ -192,16 +189,45 @@ RideCache::addRidePt2(bool dosignal, RideItem *last)
         }
     }
     
-    // what if this is import?
-    
-    
-    // add and sort, model needs to know !
     if (!added) {
-        model_->beginReset();
         rides_ << last;
+    }
+    
+    return last;
+}
+
+void
+RideCache::refreshAfterImport()
+{
+    model_->beginReset();
+    qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
+    model_->endReset();
+    
+    // the selection here should be added on the do-close of the RideImportWizard.
+    // if there's nothing selected - select one
+    if (NULL == context->ride)
+    {
+        RideItem* last = rides_.last();
+        if (NULL != last) {
+            last->refresh();
+            context->notifyRideAdded(last);
+            context->ride = last;
+            context->notifyRideSelected(last);
+        }
+    }
+    
+}
+
+void
+RideCache::addRidePt2(bool dosignal, RideItem *last)
+{
+    // add and sort, model needs to know !
+//    if (!added) {
+        model_->beginReset();
+//        rides_ << last;
         qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
         model_->endReset();
-    }
+//    }
     
     // refresh metrics for *this ride only*
     last->refresh();
@@ -218,9 +244,7 @@ RideCache::addRidePt2(bool dosignal, RideItem *last)
 void
 RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
 {
-    RideItem *last = NULL;
-    addRideSilent(name, dosignal, useTempActivities, last);
-    
+    RideItem *last = addRideSilent(name, dosignal, useTempActivities);
     addRidePt2(dosignal, last);
 }
 

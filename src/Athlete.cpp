@@ -241,12 +241,18 @@ void Athlete::selectRideFile(QString fileName)
     context->notifyRideSelected(context->ride);
 }
 
-void
+RideItem*
 Athlete::addRideSilent(QString name, bool dosignal, bool useTempActivities)
 {
-    RideItem* last = NULL;
-    rideCache->addRideSilent(name, dosignal, useTempActivities, last);
+    return rideCache->addRideSilent(name, dosignal, useTempActivities);
 }
+
+void
+Athlete::refreshAfterImport()
+{
+    rideCache->refreshAfterImport();
+}
+
 
 void
 Athlete::addRide(QString name, bool dosignal, bool useTempActivities)

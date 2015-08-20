@@ -83,8 +83,9 @@ class RideCache : public QObject
 
         // add/remove a ride to the list
         void addRide(QString name, bool dosignal, bool useTempActivities);
-    void addRideSilent(QString name, bool dosignal, bool useTempActivities, RideItem *last);
+    RideItem* addRideSilent(QString name, bool dosignal, bool useTempActivities);
     void addRidePt2(bool dosignal, RideItem *last);
+    void refreshAfterImport();
     
     
         void removeCurrentRide();
