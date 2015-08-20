@@ -24,6 +24,8 @@
 #include "RideMetric.h"
 #include "Specification.h"
 
+#include "DataFilter.h"
+
 #include <QtCore>
 #include <QList>
 #include <QDateTime>
@@ -40,6 +42,7 @@ class PMCData : public QObject {
         // create a PMC data series for the athlete
         // for ALL date ranges
         PMCData(Context *, Specification specification, QString metricName, int stsDays=-1, int ltsDays=-1);
+        PMCData(Context *, Specification specification, DataFilter *df, int stsDays=-1, int ltsDays=-1);
 
         // set parameters
         void setStsDays(int x) { stsDays_ = x; invalidate(); }
@@ -93,6 +96,9 @@ class PMCData : public QObject {
         // who we for ?
         Context *context;
         Specification specification_;
+
+        bool fromDataFilter;
+        DataFilter *df;
 
         // parameters
         QString metricName_;

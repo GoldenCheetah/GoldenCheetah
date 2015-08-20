@@ -39,6 +39,42 @@ PMCData::PMCData(Context *context, Specification spec, QString metricName, int s
     // get defaults if not passed
     useDefaults = false;
 
+    // we're not from a datafilter
+    fromDataFilter = false;
+    df = NULL;
+
+    if (ltsDays < 0) {
+        QVariant lts = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
+        if (lts.isNull() || lts.toInt() == 0) ltsDays_ = 42;
+        else ltsDays_ = lts.toInt();
+        useDefaults=true;
+    }
+    if (stsDays < 0) {
+        QVariant sts = appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS);
+        if (sts.isNull() || sts.toInt() == 0) stsDays_ = 7;
+        else stsDays_ = sts.toInt();
+        useDefaults=true;
+    }
+
+
+    refresh();
+    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(invalidate()));
+    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(invalidate()));
+    connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(invalidate()));
+}
+
+PMCData::PMCData(Context *context, Specification spec, DataFilter *df, int stsDays, int ltsDays) 
+    : context(context), specification_(spec), metricName_(""), stsDays_(stsDays), ltsDays_(ltsDays), isstale(true)
+{
+    // get defaults if not passed
+    useDefaults = false;
+    fromDataFilter = true;
+    this->df = df;
+
+    // we're not from a datafilter
+    fromDataFilter = false;
+    df = NULL;
+
     if (ltsDays < 0) {
         QVariant lts = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
         if (lts.isNull() || lts.toInt() == 0) ltsDays_ = 42;
@@ -179,7 +215,10 @@ void PMCData::refresh()
 
             // although metrics are cleansed, we check here because development
             // builds have a rideDB.json that has nan and inf values in it.
-            double value = item->getForSymbol(metricName_);
+            double value = 0;;
+            if (fromDataFilter) value = df->evaluate(item).number;
+            else value = item->getForSymbol(metricName_);
+
             if (!std::isinf(value) && !std::isnan(value))
                 stress_[offset] += value;
         }
