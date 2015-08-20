@@ -112,7 +112,7 @@ extern void DataFilter_clearString();
 QStringList DataFiltererrors;
 extern int DataFilterparse();
 
-Leaf *root; // root node for parsed statement
+Leaf *DataFilterroot; // root node for parsed statement
 
 static RideFile::SeriesType nameToSeries(QString name)
 {
@@ -194,7 +194,6 @@ DataFilter::setSignature(QString &query)
 
         // keep anything that isn't whitespace, or a comment
         if (instring || (!incomment && !query[i].isSpace())) sig += query[i];
-    
     }
 }
 
@@ -590,6 +589,68 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
     }
 }
 
+// convert expression to string, without white space
+// this can be used as a signature when caching values etc
+
+QString
+Leaf::toString()
+{
+    switch(type) {
+    case Leaf::Float : return QString("%1").arg(lvalue.f); break;
+    case Leaf::Integer : return QString("%1").arg(lvalue.i); break;
+    case Leaf::String : return *lvalue.s; break;
+    case Leaf::Symbol : return *lvalue.n; break;
+    case Leaf::Logical  :
+    case Leaf::Operation :
+    case Leaf::BinaryOperation :
+                    return QString("%1%2%3")
+                    .arg(lvalue.l->toString())
+                    .arg(op)
+                    .arg(op ? rvalue.l->toString() : "");
+                    break;
+    case Leaf::UnaryOperation :
+                    return QString("-%1").arg(lvalue.l->toString());
+                    break;
+    case Leaf::Function :
+                    if (series) {
+                        if (lvalue.l) return QString("%1(%2,%3)")
+                        .arg(function).arg(*(series->lvalue.n))
+                        .arg(lvalue.l->toString());
+                    } else {
+                        QString f= function + "(";
+                        bool first=true;
+                        foreach(Leaf*l, fparms) {
+                            f+= (first ? "," : "") + l->toString();
+                            first = false;
+                        }
+                        f += ")";
+                        return f;
+                    }
+                    break;
+    case Leaf::Vector :
+                    return QString("%1[%2:%3]")
+                        .arg(lvalue.l->toString())
+                        .arg(fparms[0]->toString())
+                        .arg(fparms[1]->toString());
+
+    case Leaf::Conditional : qDebug()<<"cond";
+        {
+                    return QString("%1?%2:%3")
+                    .arg(cond.l->toString())
+                    .arg(lvalue.l->toString())
+                    .arg(rvalue.l->toString());
+        }
+        break;
+    case Leaf::Parameters :
+        break;
+
+    default:
+        break;
+
+    }
+    return "";
+}
+
 void Leaf::print(Leaf *leaf, int level)
 {
     qDebug()<<"LEVEL"<<level;
@@ -952,7 +1013,7 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
     DataFilter_setString(formula);
     DataFilterparse();
     DataFilter_clearString();
-    treeRoot = root;
+    treeRoot = DataFilterroot;
 
     // if it parsed (syntax) then check logic (semantics)
     if (treeRoot && DataFiltererrors.count() == 0)
@@ -989,7 +1050,7 @@ QStringList DataFilter::check(QString query)
     DataFilter_clearString();
 
     // save away the results
-    treeRoot = root;
+    treeRoot = DataFilterroot;
 
     // if it passed syntax lets check semantics
     if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(this, treeRoot);
@@ -1016,7 +1077,7 @@ QStringList DataFilter::parseFilter(QString query, QStringList *list)
     setSignature(query);
 
     //DataFilterdebug = 2; // no debug -- needs bison -t in src.pro
-    root = NULL;
+    DataFilterroot = NULL;
 
     // if something was left behind clear it up now
     clearFilter();
@@ -1028,7 +1089,7 @@ QStringList DataFilter::parseFilter(QString query, QStringList *list)
     DataFilter_clearString();
 
     // save away the results
-    treeRoot = root;
+    treeRoot = DataFilterroot;
 
     // if it passed syntax lets check semantics
     if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(this, treeRoot);
