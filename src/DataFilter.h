@@ -118,6 +118,9 @@ class DataFilter : public QObject
 
         static QStringList functions(); // return list of functions supported
 
+        // pd models for estimates
+        QList <PDModel*>models;
+
     public slots:
         QStringList parseFilter(QString query, QStringList *list=0);
         QStringList check(QString query);
@@ -132,6 +135,7 @@ class DataFilter : public QObject
         void parseBad(QStringList erorrs);
 
         void results(QStringList);
+
 
     private:
         void setSignature(QString &query);

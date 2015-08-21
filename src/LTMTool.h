@@ -251,6 +251,7 @@ public slots:
     void setText(const QString&);
     void insertCompletion(const QString &completion);
     void checkErrors();
+    bool event(QEvent *);
 
 private:
     QString textUnderCursor() const;

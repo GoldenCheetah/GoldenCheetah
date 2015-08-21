@@ -97,6 +97,9 @@ class Athlete : public QObject
         RideCache *rideCache;
         QList<WithingsReading> withings_;
 
+        // Estimates
+        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk);
+
         // PMC Data
         PMCData *getPMCFor(QString metricName, int stsDays = -1, int ltsDays = -1); // no Specification used!
         PMCData *getPMCFor(Leaf *expr, DataFilter *df, int stsDays = -1, int ltsDays = -1); // no Specification used!
