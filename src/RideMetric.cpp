@@ -119,8 +119,9 @@
 // 113 27  Jun 2015 Mark Liversedge    Added Average/Min/Max tHb
 // 114 17  Jul 2015 Ale Martinez       Added Distance Swim
 // 115 18  Jul 2015 Mark Liversedge    Added Withings Fat, Fat Percent, Lean Body Weight
+// 116 21  Aug 2015 Ale Martinez       TRIMP Zonal Points fallback when Average HR has been entered manually
 
-int DBSchemaVersion = 115;
+int DBSchemaVersion = 116;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
