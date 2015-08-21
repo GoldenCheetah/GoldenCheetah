@@ -84,9 +84,25 @@ static struct {
     { "sb", 1 },
     { "rr", 1 },
 
+    // estimate
+    { "estimate", 2 }, // estimate(model, (cp|ftp|w'|pmax|x))
+
     // add new ones above this line
     { "", -1 }
 };
+
+static QStringList pdmodels()
+{
+    QStringList returning;
+
+    returning << "2p";
+    returning << "3p";
+    returning << "ext";
+    returning << "ws";
+    returning << "velo";
+
+    return returning;
+}
 
 QStringList
 DataFilter::functions()
@@ -94,13 +110,23 @@ DataFilter::functions()
     QStringList returning;
 
     for(int i=0; DataFilterFunctions[i].parameters != -1; i++) {
-        QString function = DataFilterFunctions[i].name + "(";
-        for(int j=0; j<DataFilterFunctions[i].parameters; j++) {
-            if (j) function += ", ";
-             function += QString("p%1").arg(j+1);
+
+        QString function;
+
+        if (i == 30) { // special case 'estimate' we describe it
+
+            foreach(QString model, pdmodels())
+                returning << "estimate(" + model + ", x)";
+
+        } else {
+            function = DataFilterFunctions[i].name + "(";
+            for(int j=0; j<DataFilterFunctions[i].parameters; j++) {
+                if (j) function += ", ";
+                function += QString("p%1").arg(j+1);
+            }
+            if (DataFilterFunctions[i].parameters) function += ")";
+            else function += "...)";
         }
-        if (DataFilterFunctions[i].parameters) function += ")";
-        else function += "...)";
         returning << function;
     }
     return returning;
@@ -267,6 +293,9 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
         if (!insymbol && !incomment && !instring && string[i].isLetter()) {
             insymbol = true;
             symbolstart = i;
+
+            // it starts with numbers but ends with letters - number becomes symbol
+            if (innumber) { symbolstart=numberstart; innumber=false; }
         }
 
         // end of symbol ?
@@ -900,7 +929,46 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                 bool found=false;
 
                 // are the parameters well formed ?
-                foreach(Leaf *p, leaf->fparms) validateFilter(df, p);
+                if (leaf->function == "estimate") {
+
+                    // we only want two parameters and they must be
+                    // a model name and then either ftp, cp, pmax, w'
+                    // or a duration
+                    if (leaf->fparms.count() > 0) {
+                        // check the model name
+                        if (leaf->fparms[0]->type != Leaf::Symbol) {
+
+                            leaf->fparms[0]->inerror = true;
+                            DataFiltererrors << QString(QObject::tr("estimate function expects model name as first parameter"));
+
+                        } else {
+
+                            if (!pdmodels().contains(*(leaf->fparms[0]->lvalue.n))) {
+                                leaf->inerror = leaf->fparms[0]->inerror = true;
+                                DataFiltererrors << QString(QObject::tr("estimate function expects model name as first parameter"));
+                            }
+                        }
+
+                        if (leaf->fparms.count() > 1) {
+
+                            // check symbol name if it is a symbol
+                            if (leaf->fparms[1]->type == Leaf::Symbol) {
+                                QRegExp estimateValidSymbols("^(cp|ftp|pmax|w')$", Qt::CaseInsensitive);
+                                if (!estimateValidSymbols.exactMatch(*(leaf->fparms[1]->lvalue.n))) {
+                                    leaf->inerror = leaf->fparms[1]->inerror = true;
+                                    DataFiltererrors << QString(QObject::tr("estimate function expects parameter or duration as second parameter"));
+                                }
+                            } else {
+                                validateFilter(df, leaf->fparms[1]);
+                            }
+                        }
+                    }
+
+                } else {
+
+                    // normal parm check !
+                    foreach(Leaf *p, leaf->fparms) validateFilter(df, p);
+                }
 
                 // does it exist?
                 for(int i=0; DataFilterFunctions[i].parameters != -1; i++) {
@@ -988,6 +1056,13 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
 DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), context(context), isdynamic(false), treeRoot(NULL)
 {
+    // set up the models we support
+    models << new CP2Model(context);
+    models << new CP3Model(context);
+    models << new MultiModel(context);
+    models << new ExtendedModel(context);
+    models << new WSModel(context);
+
     configChanged(CONFIG_FIELDS);
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(dynamicParse()));
@@ -995,6 +1070,13 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
 
 DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QObject(parent), context(context), isdynamic(false), treeRoot(NULL)
 {
+    // set up the models we support
+    models << new CP2Model(context);
+    models << new CP3Model(context);
+    models << new MultiModel(context);
+    models << new ExtendedModel(context);
+    models << new WSModel(context);
+
     configChanged(CONFIG_FIELDS);
 
     // regardless of success or failure set signature
@@ -1189,6 +1271,9 @@ void DataFilter::configChanged(qint32)
 
 Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
 {
+    // if error state all bets are off
+    if (inerror) return Result(0);
+
     switch(leaf->type) {
 
     //
@@ -1527,6 +1612,64 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                     return Result(pmcData->rr(m->dateTime.date()));
                   }
                   break;
+
+        case 30 :
+                { /* ESTIMATE( model, CP | FTP | W' | PMAX | duration ) */
+
+                    // which model ?
+                    QString model = *leaf->fparms[0]->lvalue.n;
+                    if (model == "2p") model = "2 Parm";
+                    if (model == "3p") model = "3 Parm";
+                    if (model == "ws") model = "WS";
+                    if (model == "velo") model = "Velo";
+                    if (model == "ext") model = "Ext";
+
+                    // what we looking for ?
+                    QString parm = leaf->fparms[1]->type == Leaf::Symbol ? *leaf->fparms[1]->lvalue.n : "";
+                    bool toDuration = parm == "" ? true : false;
+                    double duration = toDuration ? eval(context, df, leaf->fparms[1], m).number : 0;
+
+                    // get the PD Estimate for this date - note we always work with the absolulte
+                    // power estimates in formulas, since the user can just divide by config(weight)
+                    // or Athlete_Weight (which takes into account values stored in ride files.
+                    PDEstimate pde = context->athlete->getPDEstimateFor(m->dateTime.date(), model, false);
+
+                    // no model estimate for this date
+                    if (pde.parameters.count() == 0) return Result(0);
+
+                    // get a duration
+                    if (toDuration == true) {
+
+                        double value = 0;
+
+                        // we need to find the model
+                        foreach(PDModel *pdm, df->models) {
+
+                            // not the one we want
+                            if (pdm->code() != model) continue;
+
+                            // set the parameters previously derived
+                            pdm->loadParameters(pde.parameters);
+
+                            // use seconds
+                            pdm->setMinutes(false);
+
+                            // get the model estimate for our duration
+                            value = pdm->y(duration);
+
+                            // our work here is done
+                            return Result(value);
+                        }
+
+                    } else {
+                        if (parm == "cp") return Result(pde.CP);
+                        if (parm == "w'") return Result(pde.WPrime);
+                        if (parm == "ftp") return Result(pde.FTP);
+                        if (parm == "pmax") return Result(pde.PMax);
+                    }
+                    return Result(0);
+                }
+                break;
 
         default:
             return Result(0);

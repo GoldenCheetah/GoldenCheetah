@@ -1730,8 +1730,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
         metricDetail->formula = tr("# type in a formula to use\n" 
                                    "# for e.g. TSS / Duration\n"
                                    "# as you type the available metrics\n"
-                                   "# will be offered by autocomplete\n"
-                                   "# all lines beginning with # are comments.\n");
+                                   "# will be offered by autocomplete\n");
     }
     formulaEdit->setText(metricDetail->formula);
     formulaType->setCurrentIndex(formulaType->findData(metricDetail->formulaType));
@@ -2397,6 +2396,18 @@ DataFilterEdit::checkErrors()
 
     // need to fixup for errors!
     // XXX next commit
+}
+
+bool
+DataFilterEdit::event(QEvent *e)
+{
+    // intercept all events
+    if (e->type() == QEvent::ToolTip) {
+       // XXX error reporting when mouse over error
+    }
+
+    // call standard event handler
+    return QTextEdit::event(e);
 }
 
 void DataFilterEdit::setCompleter(QCompleter *completer)

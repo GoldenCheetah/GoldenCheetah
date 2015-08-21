@@ -258,6 +258,7 @@ expr : expr SUBTRACT expr              { $$ = new Leaf(@1.first_column, @3.last_
                                     /* functions all have zero or more parameters */
 
       | symbol '(' parms ')'    { /* need to convert symbol to a function */
+                                  $1->leng = @4.last_column;
                                   $1->type = Leaf::Function;
                                   $1->series = NULL; // not tiz/best
                                   $1->function = *($1->lvalue.n);
