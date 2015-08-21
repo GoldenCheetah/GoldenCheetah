@@ -181,6 +181,7 @@ class VideoWindow : public GcWindow
         int curPosition;
         RideFilePoint rfp;
         float currentVideoRate;
+        float ManualOffset; // when seeking video manually
 
         // passed from Context *
         Context *context;

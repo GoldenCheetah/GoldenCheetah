@@ -48,9 +48,9 @@ class VideoSyncFilePoint
 
         VideoSyncFilePoint() : km(0), secs(0) {}
 
-        double km;       // x axis - distance in kilometers
+        double km;       // x axis - distance in km
         double secs;     // t axis - time in seconds
-        double kph;      // speed in kilometers per hour
+        double kph;      // speed in km per hour
 };
 
 class VideoSyncCourseInfo
@@ -90,9 +90,8 @@ class VideoSyncFile
                 Source;         // where did this come from
 
         long    Duration;       // Duration of this workout in msecs
-        bool valid;             // did it parse ok?
-
-        int leftPoint, rightPoint;            // current points we are between
+        double  Distance;       // Distance of this workout in km
+        bool    valid;          // did it parse ok?
 
         QVector<VideoSyncFilePoint> Points;    // points in workout
 
