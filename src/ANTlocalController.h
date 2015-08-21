@@ -78,7 +78,7 @@ private:
     QQueue<setChannelAtom> channelQueue;
     ANTLogger logger;
 
-    
+
 };
 
 #endif // _GC_ANTlocalController_h

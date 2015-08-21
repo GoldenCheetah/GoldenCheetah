@@ -85,6 +85,7 @@ class ANTChannel : public QObject {
         ANTMessage lastMessage, lastStdPwrMessage;
         int dualNullCount, nullCount, stdNullCount;
         double last_message_timestamp;
+        uint8_t fecPrevRawDistance;
         double blanking_timestamp;
         int blanked;
         char id[10]; // short identifier

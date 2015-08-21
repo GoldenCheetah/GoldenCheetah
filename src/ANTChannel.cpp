@@ -54,6 +54,7 @@ ANTChannel::init()
     burstInit();
     value2=value=0;
     status = Closed;
+    fecPrevRawDistance=0;
 }
 
 //
@@ -676,7 +677,17 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                // we don't seem to receive ACK messages, so use this workaround
                // to ensure load is always set correctly
                if ((fecRefreshCounter++ % 10) == 0)
+               {
                    parent->refreshFecLoad();
+               }
+
+               // TODO: place this somewhere else : when we connect the device for the first time will be perfect
+               // in addition toggle a flag in order to do this request only once
+               if ((fecRefreshCounter % 10) == 5)
+               {
+//                   qDebug() << qPrintable("Ask for capabilities");
+                   parent->requestFecCapabilities();
+               }
 
                if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE)
                {
@@ -687,13 +698,17 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                }
                else if (antMessage.data_page == FITNESS_EQUIPMENT_GENERAL_PAGE)
                {
-                   if (antMessage.fecSpeed != 0xFF)
+                   if (antMessage.fecSpeed != 0xFFFF)
                    {
                        // FEC speed is in 0.001m/s, telemetry speed is km/h
                        parent->setSpeed(antMessage.fecSpeed * 0.0036);
                    }
-               }
 
+                   // FEC distance is in m, telemetry is km
+                   parent->incAltDistance((antMessage.fecRawDistance - fecPrevRawDistance
+                                          + (fecPrevRawDistance > antMessage.fecRawDistance ? 256 : 0)) * 0.001);
+                   fecPrevRawDistance = antMessage.fecRawDistance;
+               }
                break;
            }
 

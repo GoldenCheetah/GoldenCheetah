@@ -521,17 +521,64 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
 
             case ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT:
             {
+//                qDebug() << qPrintable("ANT FE-C received data page: 0x" + QString("%1").arg( data_page, 2, 0x10 ).toUpper());
                 switch (data_page)
                 {
                 case FITNESS_EQUIPMENT_GENERAL_PAGE:
+                    //based on "ANT+ Device Profile Fitness Equipment" rev 4.1 p 42: 6.5.2 Data page 0x10 - General FE Data
+                    fecEqtType = message[5];
+                    fecRawDistance = message[7];
                     fecSpeed = (message[9] << 8) | message[8];
+
+//                    qDebug() << qPrintable("    ANT FE-C general page");
+//                    qDebug() << qPrintable(" FE type=" + QString("%1").arg( fecEqtType, 2, 0x10 ).toUpper())
+//                             << qPrintable(" speed=" + QString("%1").arg( fecSpeed, 4, 10 ).toUpper())
+//                             << qPrintable(" rawDist=" + QString("%1").arg( fecRawDistance, 4, 10 ).toUpper())
+//                             << qPrintable(" Total=" + QString("%1").arg( fecTotalDistance, 4, 10 ).toUpper());
                     break;
 
                 case FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE:
+//                    qDebug() << qPrintable("    ANT FE-C trainer page");
                     fecCadence = message[6];
                     fecInstantPower = message[9];
                     fecInstantPower |= (message[10] & 0x0F) << 8;
                     break;
+
+                case FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE:
+//                    qDebug() << qPrintable("    ANT FE-C capabilities details");
+                    fecMaxResistance         = message[9];
+                    fecMaxResistance        |= (message[10]) << 8;
+                    fecCapabilities          = message[11];
+                    fecResistModeCapability  = fecCapabilities & 0x01;
+                    fecPowerModeCapability   = fecCapabilities & 0x02;
+                    fecSimulModeCapability   = fecCapabilities & 0x04;
+                    break;
+
+                case FITNESS_EQUIPMENT_COMMAND_STATUS_PAGE:
+//                    qDebug() << qPrintable("    ANT FE-C received acknowledge from device");
+                    // Acknowledge from device
+                    fecLastCommandReceived = message[5];
+                    fecLastCommandSeq      = message[6];
+                    fecLastCommandStatus   = message[7];
+                    switch (fecLastCommandReceived)
+                    {
+                    case FITNESS_EQUIPMENT_BASIC_RESISTANCE_ID:
+                        fecSetResistanceAck = (double) message[11] * 0.5;
+                        break;
+                    case FITNESS_EQUIPMENT_TARGET_POWER_ID:
+                        fecSetTargetPowerAck   = message[10] >> 2;   // device power step is 0.25W, GC consider 1W accuracy only
+                        fecSetTargetPowerAck  |= (message[11]) << 6;
+                        break;
+                    case FITNESS_EQUIPMENT_WIND_RESISTANCE_ID:
+                        fecSetWindResistanceAck = (double) message[9] * 0.01;
+                        fecSetWindSpeedAck      = message[10];
+                        fecSetDraftingFactorAck = message[11];
+                        break;
+                    case FITNESS_EQUIPMENT_TRACK_RESISTANCE_ID:
+                        fecSetGradeAck          = (double) ((int16_t) message[9] | ((int16_t) message[10] << 8)) * 0.01;
+                        fecSetRollResistanceAck = (double) message[11] * 0.00005;
+                        break;
+                    }
                 }
 
                 break;
@@ -905,10 +952,60 @@ ANTMessage ANTMessage::kickrInitSpindown(const unsigned char channel, ushort usD
            KICKR_READ_MODE, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8)); // preamble
 }
 
+ANTMessage ANTMessage::fecSetResistance(const uint8_t channel, const uint8_t resistance) // unit is 0.5% => 200 = 100%
+{
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      FITNESS_EQUIPMENT_BASIC_RESISTANCE_ID,
+                      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, resistance);
+}
+
 ANTMessage ANTMessage::fecSetTargetPower(const uint8_t channel, const uint16_t targetPower)
 {
     // unit is 0.25W, but targetPower are full watts and theres no trainer with that precision anyway
     uint16_t powerValue = targetPower * 4;
     return ANTMessage(9, ANT_ACK_DATA, channel,
-                      0x31, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, (uint8_t)(powerValue & 0xFF), (uint8_t)(powerValue >> 8));
+                      FITNESS_EQUIPMENT_TARGET_POWER_ID,
+                      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, (uint8_t)(powerValue & 0xFF), (uint8_t)(powerValue >> 8));
+}
+
+ANTMessage ANTMessage::fecSetWindResistance(const uint8_t channel, const double windResistance, const uint8_t windSpeed, const uint8_t draftingFactor)
+                                                                    //     0.00 < kg/m < 1.86         -127 < kph < + 127               0 < % < 100%
+{
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      FITNESS_EQUIPMENT_WIND_RESISTANCE_ID,
+                      0xFF, 0xFF, 0xFF, 0xFF, (uint8_t) (windResistance * 100), windSpeed, draftingFactor);
+}
+
+ANTMessage ANTMessage::fecSetTrackResistance(const uint8_t channel, const double grade, const double rollingResistance)
+                                                             //     -200 < % < +200%                   0.0 <  < 0.0127
+{
+    uint16_t gradeValue = grade * 100.0;
+    uint8_t  rollingResistanceValue = rollingResistance / 0.00005;
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      FITNESS_EQUIPMENT_TRACK_RESISTANCE_ID,
+                      0xFF, 0xFF, 0xFF, 0xFF, (uint8_t)(gradeValue & 0xFF), (uint8_t)(gradeValue >> 8), rollingResistanceValue);
+}
+
+ANTMessage ANTMessage::fecRequestCapabilities(const uint8_t channel)
+{
+    // based on ANT+ Common Pages, Rev 2.4 p 14: 6.2  Common Data Page 70: Request Data Page
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      0x46,        // data page request
+                      0xFF, 0xFF,  // reserved
+                      0xFF, 0xFF,  // descriptors
+                      0x01,        // requested transmission response (1 time only)
+                      0x36,        // requested page
+                      0x01);       // request data page
+}
+
+ANTMessage ANTMessage::fecRequestCommandStatus(const uint8_t channel)
+{
+    // based on ANT+ Common Pages, Rev 2.4 p 14: 6.2  Common Data Page 70: Request Data Page
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      0x46,        // data page request
+                      0xFF, 0xFF,  // reserved
+                      0xFF, 0xFF,  // descriptors
+                      0x01,        // requested transmission response (1 time only)
+                      0x47,        // requested page
+                      0x01);       // request data page
 }
