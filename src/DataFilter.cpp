@@ -78,6 +78,12 @@ static struct {
     { "min", 0 },
     { "count", 0 },
 
+    // PMC functions
+    { "lts", 1 },
+    { "sts", 1 },
+    { "sb", 1 },
+    { "rr", 1 },
+
     // add new ones above this line
     { "", -1 }
 };
@@ -281,12 +287,8 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
                     !sym.compare("const", Qt::CaseInsensitive) ||
                     !sym.compare("config", Qt::CaseInsensitive) ||
                     !sym.compare("ctl", Qt::CaseInsensitive) ||
-                    !sym.compare("lts", Qt::CaseInsensitive) ||
                     !sym.compare("tsb", Qt::CaseInsensitive) ||
-                    !sym.compare("sb", Qt::CaseInsensitive) ||
                     !sym.compare("atl", Qt::CaseInsensitive) ||
-                    !sym.compare("sts", Qt::CaseInsensitive) ||
-                    !sym.compare("rr", Qt::CaseInsensitive) ||
                     !sym.compare("daterange", Qt::CaseInsensitive) ||
                     !sym.compare("Today", Qt::CaseInsensitive) ||
                     !sym.compare("Current", Qt::CaseInsensitive) ||
@@ -843,67 +845,56 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
                 QString symbol = leaf->series->lvalue.n->toLower();
 
-                if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb" || leaf->function == "rr") {
+                if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol)) {
+                    DataFiltererrors << QString(QObject::tr("invalid data series for best(): %1")).arg(symbol);
+                    leaf->inerror = true;
+                }
 
-                    // does the symbol exist though ?
-                    QString lookup = df->lookupMap.value(symbol, "");
-                    if (lookup == "") {
-                        DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
+                if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol)) {
+                    DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
+                    leaf->inerror = true;
+                }
+
+                if (leaf->function == "daterange") {
+
+                    if (!dateRangeValidSymbols.exactMatch(symbol)) {
+                        DataFiltererrors << QString(QObject::tr("invalid literal for daterange(): %1")).arg(symbol);
                         leaf->inerror = true;
-                    }
 
-                } else {
-
-                    if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol)) {
-                        DataFiltererrors << QString(QObject::tr("invalid data series for best(): %1")).arg(symbol);
-                        leaf->inerror = true;
-                    }
-
-                    if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol)) {
-                        DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
-                        leaf->inerror = true;
-                    }
-
-                    if (leaf->function == "daterange") {
-
-                        if (!dateRangeValidSymbols.exactMatch(symbol)) {
-                            DataFiltererrors << QString(QObject::tr("invalid literal for daterange(): %1")).arg(symbol);
-                            leaf->inerror = true;
-
-                        } else {
-                            // convert to int days since using current date range config
-                            // should be able to get from parent somehow
-                            leaf->type = Leaf::Integer;
-                            if (symbol == "start") leaf->lvalue.i = QDate(1900,01,01).daysTo(df->context->currentDateRange().from);
-                            else if (symbol == "stop") leaf->lvalue.i = QDate(1900,01,01).daysTo(df->context->currentDateRange().to);
-                            else leaf->lvalue.i = 0;
-                        }
-                    }
-
-                    if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol)) {
-                        DataFiltererrors << QString(QObject::tr("invalid literal for config(): %1")).arg(symbol);
-                        leaf->inerror = true;
-                    }
-
-                    if (leaf->function == "const") {
-                        if (!constValidSymbols.exactMatch(symbol)) {
-                            DataFiltererrors << QString(QObject::tr("invalid literal for const(): %1")).arg(symbol);
-                            leaf->inerror = true;
-                        } else {
-
-                            // convert to a float
-                            leaf->type = Leaf::Float;
-                            leaf->lvalue.f = 0.0L;
-                            if (symbol == "e") leaf->lvalue.f = MATHCONST_E;
-                            if (symbol == "pi") leaf->lvalue.f = MATHCONST_PI;
-                        }
-                    }
-
-                    if (leaf->function == "best" || leaf->function == "tiz") {
-                        // now set the series type used as parameter 1 to best/tiz
-                        leaf->seriesType = nameToSeries(symbol);
+                    } else {
+                        // convert to int days since using current date range config
+                        // should be able to get from parent somehow
+                        leaf->type = Leaf::Integer;
+                        if (symbol == "start") leaf->lvalue.i = QDate(1900,01,01).daysTo(df->context->currentDateRange().from);
+                        else if (symbol == "stop") leaf->lvalue.i = QDate(1900,01,01).daysTo(df->context->currentDateRange().to);
+                        else leaf->lvalue.i = 0;
                     }
                 }
+
+                if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol)) {
+                    DataFiltererrors << QString(QObject::tr("invalid literal for config(): %1")).arg(symbol);
+                    leaf->inerror = true;
+                }
+
+                if (leaf->function == "const") {
+                    if (!constValidSymbols.exactMatch(symbol)) {
+                        DataFiltererrors << QString(QObject::tr("invalid literal for const(): %1")).arg(symbol);
+                        leaf->inerror = true;
+                    } else {
+
+                        // convert to a float
+                        leaf->type = Leaf::Float;
+                        leaf->lvalue.f = 0.0L;
+                        if (symbol == "e") leaf->lvalue.f = MATHCONST_E;
+                        if (symbol == "pi") leaf->lvalue.f = MATHCONST_PI;
+                    }
+                }
+
+                if (leaf->function == "best" || leaf->function == "tiz") {
+                    // now set the series type used as parameter 1 to best/tiz
+                    leaf->seriesType = nameToSeries(symbol);
+                }
+
             } else { // generic functions, math etc
 
                 bool found=false;
@@ -1239,20 +1230,6 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
     {
         double duration;
 
-        // pmc data ...
-        if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb" || leaf->function == "rr") {
-
-                // get metric technical name
-                QString symbol = *(leaf->series->lvalue.n);
-                QString lookup = df->lookupMap.value(symbol, "");
-                PMCData *pmcData = context->athlete->getPMCFor(lookup);
-
-                if (leaf->function == "sts") return Result(pmcData->sts(m->dateTime.date()));
-                if (leaf->function == "lts") return Result(pmcData->lts(m->dateTime.date()));
-                if (leaf->function == "sb") return Result(pmcData->sb(m->dateTime.date()));
-                if (leaf->function == "rr") return Result(pmcData->rr(m->dateTime.date()));
-        }
-
         if (leaf->function == "config") {
 
             //
@@ -1526,6 +1503,31 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                     return Result(count);
                   }
                   break;
+
+        case 26 : { /* LTS (expr) */
+                    PMCData *pmcData = context->athlete->getPMCFor(leaf->fparms[0], df);
+                    return Result(pmcData->lts(m->dateTime.date()));
+                  }
+                  break;
+
+        case 27 : { /* STS (expr) */
+                    PMCData *pmcData = context->athlete->getPMCFor(leaf->fparms[0], df);
+                    return Result(pmcData->sts(m->dateTime.date()));
+                  }
+                  break;
+
+        case 28 : { /* SB (expr) */
+                    PMCData *pmcData = context->athlete->getPMCFor(leaf->fparms[0], df);
+                    return Result(pmcData->sb(m->dateTime.date()));
+                  }
+                  break;
+
+        case 29 : { /* RR (expr) */
+                    PMCData *pmcData = context->athlete->getPMCFor(leaf->fparms[0], df);
+                    return Result(pmcData->rr(m->dateTime.date()));
+                  }
+                  break;
+
         default:
             return Result(0);
         }
