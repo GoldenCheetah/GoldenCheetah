@@ -66,7 +66,6 @@ void VideoSyncFile::parseRLV()
     Name = "";
     Duration = -1;
     valid = false;             // did it parse ok?
-    rightPoint = leftPoint = 0;
     format = RLV; // default to rlv until we know
     Points.clear();
 
@@ -246,9 +245,7 @@ void VideoSyncFile::parseRLV()
 
         // set RLVFile duration
         Duration = Points.last().secs * 1000.0;      // last is the end point in msecs
-        leftPoint = 0;
-        rightPoint = 1;
-
+        Distance = Points.last().km;
     }
 }
 

@@ -1602,7 +1602,7 @@ void TrainSidebar::FFwd()
         context->notifySeek(load_msecs);
     }
     else displayWorkoutDistance += 1; // jump forward a kilometer in the workout
-
+// TODO: RLV file to be taken care
 }
 
 void TrainSidebar::Rewind()
@@ -1617,6 +1617,7 @@ void TrainSidebar::Rewind()
         displayWorkoutDistance -=1; // jump back a kilometer
         if (displayWorkoutDistance < 0) displayWorkoutDistance = 0;
     }
+// TODO: RLV file to be taken care
 }
 
 

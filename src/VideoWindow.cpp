@@ -194,6 +194,8 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 
 void VideoWindow::startPlayback()
 {
+    ManualOffset = 0.0;
+
 #ifdef GC_VIDEO_VLC
     if (!m) return; // ignore if no media selected
 
@@ -227,6 +229,8 @@ void VideoWindow::startPlayback()
 
 void VideoWindow::stopPlayback()
 {
+    ManualOffset = 0.0;
+    
 #ifdef GC_VIDEO_VLC
     if (!m) return; // ignore if no media selected
 
@@ -248,7 +252,7 @@ void VideoWindow::pausePlayback()
     if (!m) return; // ignore if no media selected
 
     // stop playback & wipe player
-    libvlc_media_player_pause (mp);
+    libvlc_media_player_set_pause(mp, true);
 #endif
 
 #ifdef GC_VIDEO_QT5
@@ -265,7 +269,7 @@ void VideoWindow::resumePlayback()
     if(m_MediaChanged)
         startPlayback();
     else
-        libvlc_media_player_pause (mp);
+        libvlc_media_player_set_pause(mp, false);
 #endif
 
 #ifdef GC_VIDEO_QT5
@@ -326,15 +330,17 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         if(curPosition > VideoSyncFiledataPoints.count()-1 || curPosition < 0)
             curPosition = 1;
         
+        double CurrentDistance = qBound(0.0,  rtd.getDistance() + ManualOffset, context->currentVideoSyncFile()->Distance);
+
         // make sure the current position is less than the new distance
-        while ((VideoSyncFiledataPoints[curPosition].km > rtd.getDistance()) && (curPosition > 1))
+        while ((VideoSyncFiledataPoints[curPosition].km > CurrentDistance) && (curPosition > 1))
             curPosition--;
-        while ((VideoSyncFiledataPoints[curPosition].km <= rtd.getDistance()) && (curPosition < VideoSyncFiledataPoints.count()-1))
+        while ((VideoSyncFiledataPoints[curPosition].km <= CurrentDistance) && (curPosition < VideoSyncFiledataPoints.count()-1))
             curPosition++;
 
         // update the rfp
-        float weighted_average = (VideoSyncFiledataPoints[curPosition].km - VideoSyncFiledataPoints[curPosition-1].km != 0.0)?(rtd.getDistance()-VideoSyncFiledataPoints[curPosition-1].km) / (VideoSyncFiledataPoints[curPosition].km - VideoSyncFiledataPoints[curPosition-1].km):0.0;
-        rfp.km = rtd.getDistance();
+        float weighted_average = (VideoSyncFiledataPoints[curPosition].km - VideoSyncFiledataPoints[curPosition-1].km != 0.0)?(CurrentDistance-VideoSyncFiledataPoints[curPosition-1].km) / (VideoSyncFiledataPoints[curPosition].km - VideoSyncFiledataPoints[curPosition-1].km):0.0;
+        rfp.km = CurrentDistance;
         rfp.secs = VideoSyncFiledataPoints[curPosition-1].secs + weighted_average * (VideoSyncFiledataPoints[curPosition].secs - VideoSyncFiledataPoints[curPosition-1].secs);
         rfp.kph = VideoSyncFiledataPoints[curPosition-1].kph + weighted_average * (VideoSyncFiledataPoints[curPosition].kph - VideoSyncFiledataPoints[curPosition-1].kph);
     }
@@ -396,7 +402,6 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
 void VideoWindow::seekPlayback(long ms)
 {
-
 #ifdef GC_VIDEO_NONE
     Q_UNUSED(ms)
 #endif
@@ -404,8 +409,16 @@ void VideoWindow::seekPlayback(long ms)
 #ifdef GC_VIDEO_VLC
     if (!m) return;
 
-    // seek to ms position in current file
-    libvlc_media_player_set_time(mp, (libvlc_time_t) ms);
+    // when we selected a videosync file in traning mode (rlv...)
+    if (context->currentVideoSyncFile())
+    {
+        ManualOffset += 25.0 * (double) ms / 3600000.0; //we consider 25km/h
+    }
+    else
+    {
+        // seek to ms position in current file
+        libvlc_media_player_set_time(mp, (libvlc_time_t) ms);
+    }
 #endif
 
 #ifdef GC_VIDEO_QT5
