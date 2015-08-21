@@ -541,3 +541,22 @@ Athlete::getPMCFor(QString metricName, int stsdays, int ltsdays)
 
     return returning;
 }
+
+PMCData *
+Athlete::getPMCFor(Leaf *expr, DataFilter *df, int stsdays, int ltsdays)
+{
+    PMCData *returning = NULL;
+
+    // if we don't already have one, create it
+    returning = pmcData.value(expr->signature(), NULL);
+    if (!returning) {
+
+        // specification is blank and passes for all
+        returning = new PMCData(context, Specification(), expr, df, stsdays, ltsdays);
+
+        // add to our collection
+        pmcData.insert(expr->signature(), returning);
+    }
+
+    return returning;
+}

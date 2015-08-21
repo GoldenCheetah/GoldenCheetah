@@ -42,7 +42,7 @@ class PMCData : public QObject {
         // create a PMC data series for the athlete
         // for ALL date ranges
         PMCData(Context *, Specification specification, QString metricName, int stsDays=-1, int ltsDays=-1);
-        PMCData(Context *, Specification specification, DataFilter *df, int stsDays=-1, int ltsDays=-1);
+        PMCData(Context *, Specification specification, Leaf *expr, DataFilter *df, int stsDays=-1, int ltsDays=-1);
 
         // set parameters
         void setStsDays(int x) { stsDays_ = x; invalidate(); }
@@ -99,6 +99,7 @@ class PMCData : public QObject {
 
         bool fromDataFilter;
         DataFilter *df;
+        Leaf *expr;
 
         // parameters
         QString metricName_;
