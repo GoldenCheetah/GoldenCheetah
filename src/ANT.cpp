@@ -282,6 +282,11 @@ void ANT::refreshFecLoad()
     sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
 }
 
+void ANT::requestFecCapabilities()
+{
+    sendMessage(ANTMessage::fecRequestCapabilities(fecChannel));
+}
+
 void ANT::refreshVortexLoad()
 {
     if (vortexChannel == -1)

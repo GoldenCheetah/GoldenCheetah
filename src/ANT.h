@@ -283,8 +283,18 @@ struct setChannelAtom {
 #define TACX_VORTEX_DATA_CALIBRATION   3
 
 // ant+ fitness equipment profile data pages
-#define FITNESS_EQUIPMENT_GENERAL_PAGE 0x10
-#define FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE 0x19
+#define FITNESS_EQUIPMENT_GENERAL_PAGE              0x10
+#define FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE     0x19
+#define FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE 0x36
+#define FITNESS_EQUIPMENT_COMMAND_STATUS_PAGE       0x47
+
+#define FITNESS_EQUIPMENT_BASIC_RESISTANCE_ID       0x30
+#define FITNESS_EQUIPMENT_TARGET_POWER_ID           0x31
+#define FITNESS_EQUIPMENT_WIND_RESISTANCE_ID        0x32
+#define FITNESS_EQUIPMENT_TRACK_RESISTANCE_ID       0x33
+
+#define ANT_MANUFACTURER_ID_PAGE                    0x50
+#define ANT_PRODUCT_INFO_PAGE                       0x51
 
 //======================================================================
 // Worker thread
@@ -409,6 +419,11 @@ public:
         telemetry.setSpeed(x);
     }
 
+    void incAltDistance(double x)
+    {
+        telemetry.setAltDistance(telemetry.getAltDistance() + x);
+    }
+
     void setWheelRpm(float x);
     void setWatts(float x) {
         telemetry.setWatts(x);
@@ -434,6 +449,7 @@ public:
 
     void setFecChannel(int channel);
     void refreshFecLoad();
+    void requestFecCapabilities();
 
     void setVortexData(int channel, int id);
     void refreshVortexLoad();

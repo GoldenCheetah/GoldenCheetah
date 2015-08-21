@@ -56,6 +56,7 @@ public:
     void setName(char *name);
     void setWatts(double watts);
     void setAltWatts(double watts);
+    void setAltDistance(double distance);
     void setHr(double hr);
     void setTime(long time);
     void setSpeed(double speed);
@@ -90,6 +91,7 @@ public:
 
     double getWatts() const;
     double getAltWatts() const;
+    double getAltDistance() const;
     double getHr() const;
     long getTime() const;
     double getSpeed() const;
@@ -116,7 +118,7 @@ private:
     char name[64];
 
     // realtime telemetry
-    double hr, watts, altWatts, speed, wheelRpm, load, slope, lrbalance;
+    double hr, watts, altWatts, altDistance, speed, wheelRpm, load, slope, lrbalance;
     double cadence;      // in rpm
     double smo2, thb;
     double lte, rte, lps, rps; // torque efficiency and pedal smoothness
