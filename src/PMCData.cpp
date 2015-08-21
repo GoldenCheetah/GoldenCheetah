@@ -42,6 +42,7 @@ PMCData::PMCData(Context *context, Specification spec, QString metricName, int s
     // we're not from a datafilter
     fromDataFilter = false;
     df = NULL;
+    expr = NULL;
 
     if (ltsDays < 0) {
         QVariant lts = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
@@ -63,17 +64,16 @@ PMCData::PMCData(Context *context, Specification spec, QString metricName, int s
     connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(invalidate()));
 }
 
-PMCData::PMCData(Context *context, Specification spec, DataFilter *df, int stsDays, int ltsDays) 
+PMCData::PMCData(Context *context, Specification spec, Leaf *expr, DataFilter *df, int stsDays, int ltsDays) 
     : context(context), specification_(spec), metricName_(""), stsDays_(stsDays), ltsDays_(ltsDays), isstale(true)
 {
     // get defaults if not passed
     useDefaults = false;
+
+    // use an expression
     fromDataFilter = true;
     this->df = df;
-
-    // we're not from a datafilter
-    fromDataFilter = false;
-    df = NULL;
+    this->expr = expr;
 
     if (ltsDays < 0) {
         QVariant lts = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
@@ -216,7 +216,7 @@ void PMCData::refresh()
             // although metrics are cleansed, we check here because development
             // builds have a rideDB.json that has nan and inf values in it.
             double value = 0;;
-            if (fromDataFilter) value = df->evaluate(item).number;
+            if (fromDataFilter) value = expr->eval(context, df, expr, item).number;
             else value = item->getForSymbol(metricName_);
 
             if (!std::isinf(value) && !std::isnan(value))

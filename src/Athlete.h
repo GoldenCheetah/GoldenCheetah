@@ -58,6 +58,8 @@ class Context;
 class ColorEngine;
 class AnalysisSidebar;
 class Tab;
+class Leaf;
+class DataFilter;
 
 class Athlete : public QObject
 {
@@ -97,6 +99,7 @@ class Athlete : public QObject
 
         // PMC Data
         PMCData *getPMCFor(QString metricName, int stsDays = -1, int ltsDays = -1); // no Specification used!
+        PMCData *getPMCFor(Leaf *expr, DataFilter *df, int stsDays = -1, int ltsDays = -1); // no Specification used!
         QMap<QString, PMCData*> pmcData; // all the different PMC series
 
         // athlete measures
