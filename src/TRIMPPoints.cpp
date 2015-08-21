@@ -289,6 +289,25 @@ public:
             value += trimpk8 * time8;
         }
 
+        // When time in zone is 0 fallback to Average HR for zone id,
+        // since it could have been overridden, and assign time_riding
+        // if available or workout_time to that zone.
+        if (value == 0) {
+            assert(deps.contains("time_riding"));
+            assert(deps.contains("workout_time"));
+            const RideMetric *timeRidingMetric = deps.value("time_riding");
+            const RideMetric *durationMetric = deps.value("workout_time");
+            assert(timeRidingMetric);
+            assert(durationMetric);
+            assert(averageHrMetric);
+            double secs = timeRidingMetric->value(true) ?
+                            timeRidingMetric->value(true) :
+                            durationMetric->value(true);;
+            int nZone = hrZones->whichZone(hrZoneRange, hr);
+            if (nZone >= 0 && nZone < trimpk.size())
+                value += trimpk[nZone] * secs;
+        }
+
         setValue(value/60);
         return;
     }
@@ -371,6 +390,8 @@ static bool added() {
     deps.append("time_in_zone_H6");
     deps.append("time_in_zone_H7");
     deps.append("time_in_zone_H8");
+    deps.append("time_riding");
+    deps.append("workout_time");
     RideMetricFactory::instance().addMetric(TRIMPZonalPoints(), &deps);
 
     deps.clear();
