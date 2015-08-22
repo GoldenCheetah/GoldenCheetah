@@ -1707,8 +1707,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // courier font
     formulaEdit = new DataFilterEdit(this, context);
     QFont courier("Courier", QFont().pointSize());
+    QFontMetrics fm(courier);
 
     formulaEdit->setFont(courier);
+    formulaEdit->setTabStopWidth(4 * fm.width(' ')); // 4 char tabstop
     //formulaEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     formulaType = new QComboBox(this);
     formulaType->addItem(tr("Total"), static_cast<int>(RideMetric::Total));
