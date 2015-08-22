@@ -26,6 +26,7 @@
 #include "Colors.h"
 #include "TabView.h"
 #include "HelpWhatsThis.h"
+#include "HrZones.h"
 
 #include <QtGui>
 #include <QString>
@@ -391,6 +392,19 @@ AnomalyDialog::check()
     //anomalyList->setHorizontalHeaderLabels(header);
     anomalyList->horizontalHeader()->hide();
 
+    // use MaxHR if available for suspicious, otherwise 200
+    const HrZones *hrZones = rideEditor->context->athlete->hrZones();
+    int hrZR = hrZones ? hrZones->whichRange(rideEditor->ride->dateTime.date()) : -1;
+    int maxHR = hrZR > 0 ? hrZones->getMaxHr(hrZR) : 200;
+
+    // Speed threshold depends on sport (9kph~20"/50m, 36kph~10"/100m)
+    double maxKPH = rideEditor->ride->isSwim ? 9.0 :
+                    rideEditor->ride->isSwim ? 36.0 : 100.0;
+
+    // Cadence threshold depends on sport
+    int maxCad = rideEditor->ride->isSwim ? 80 :
+                 rideEditor->ride->isSwim ? 120 : 200;
+
     QVector<double> power;
     QVector<double> secs;
     double lastdistance=9;
@@ -420,15 +434,15 @@ AnomalyDialog::check()
         lastdistance = point->km;
 
         // suspicious values
-        if (point->cad > 150) {
+        if (point->cad > maxCad) {
             rideEditor->data->anomalies.insert(xsstring(count, RideFile::cad),
                                    tr("Suspiciously high cadence"));
         }
-        if (point->hr > 200) {
+        if (point->hr > maxHR) {
             rideEditor->data->anomalies.insert(xsstring(count, RideFile::hr),
                                    tr("Suspiciously high heartrate"));
         }
-        if (point->kph > 100) {
+        if (point->kph > maxKPH) {
             rideEditor->data->anomalies.insert(xsstring(count, RideFile::kph),
                                    tr("Suspiciously high speed"));
         }
@@ -440,7 +454,11 @@ AnomalyDialog::check()
             rideEditor->data->anomalies.insert(xsstring(count, RideFile::lon),
                                    tr("Out of bounds value"));
         }
-        if (rideEditor->ride->ride()->areDataPresent()->cad && point->nm && !point->cad) {
+        // Non-zero torque but zero cadence is not an anomaly for runs or swims
+        if (!rideEditor->ride->isRun && !rideEditor->ride->isSwim &&
+            rideEditor->ride->ride()->areDataPresent()->cad &&
+            point->nm && !point->cad) {
+
             rideEditor->data->anomalies.insert(xsstring(count, RideFile::nm),
                                    tr("Non-zero torque but zero cadence"));
 
