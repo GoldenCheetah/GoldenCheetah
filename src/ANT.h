@@ -293,6 +293,10 @@ struct setChannelAtom {
 #define FITNESS_EQUIPMENT_WIND_RESISTANCE_ID        0x32
 #define FITNESS_EQUIPMENT_TRACK_RESISTANCE_ID       0x33
 
+#define FITNESS_EQUIPMENT_RESIST_MODE_CAPABILITY    0x01
+#define FITNESS_EQUIPMENT_POWER_MODE_CAPABILITY     0x02
+#define FITNESS_EQUIPMENT_SIMUL_MODE_CAPABILITY     0x04
+
 #define ANT_MANUFACTURER_ID_PAGE                    0x50
 #define ANT_PRODUCT_INFO_PAGE                       0x51
 
@@ -504,6 +508,7 @@ private:
     // generic trainer settings
     double currentLoad, load;
     double currentGradient, gradient;
+    double currentRollingResistance, rollingResistance;
     int currentMode, mode;
 
     // now kickr specific
