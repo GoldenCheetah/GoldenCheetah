@@ -165,6 +165,7 @@ struct setChannelAtom {
 #define ANT_VERSION            0x3E
 #define ANT_CAPABILITIES       0x54
 #define ANT_SERIAL_NUMBER      0x61
+#define ANT_NOTIF_STARTUP      0x6F
 #define ANT_CW_INIT            0x53
 #define ANT_CW_TEST            0x48
 
@@ -530,6 +531,7 @@ private:
     QTime elapsedTime;
 #endif
 
+    bool ANT_Reset_Acknowledge;
     unsigned char rxMessage[ANT_MAX_MESSAGE_SIZE];
 
     // state machine whilst receiving bytes
