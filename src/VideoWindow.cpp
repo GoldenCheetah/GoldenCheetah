@@ -194,7 +194,8 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 
 void VideoWindow::startPlayback()
 {
-    ManualOffset = 0.0;
+    if (context->currentVideoSyncFile())
+        context->currentVideoSyncFile()->manualOffset = 0.0;
 
 #ifdef GC_VIDEO_VLC
     if (!m) return; // ignore if no media selected
@@ -229,8 +230,9 @@ void VideoWindow::startPlayback()
 
 void VideoWindow::stopPlayback()
 {
-    ManualOffset = 0.0;
-    
+    if (context->currentVideoSyncFile())
+        context->currentVideoSyncFile()->manualOffset = 0.0;
+
 #ifdef GC_VIDEO_VLC
     if (!m) return; // ignore if no media selected
 
@@ -329,8 +331,9 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
         if(curPosition > VideoSyncFiledataPoints.count()-1 || curPosition < 0)
             curPosition = 1;
-        
-        double CurrentDistance = qBound(0.0,  rtd.getDistance() + ManualOffset, context->currentVideoSyncFile()->Distance);
+
+        double CurrentDistance = qBound(0.0,  rtd.getDistance() + context->currentVideoSyncFile()->manualOffset, context->currentVideoSyncFile()->Distance);
+        context->currentVideoSyncFile()->km = CurrentDistance;
 
         // make sure the current position is less than the new distance
         while ((VideoSyncFiledataPoints[curPosition].km > CurrentDistance) && (curPosition > 1))
@@ -352,13 +355,13 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
         if(curPosition > dataPoints.count()-1 || curPosition < 0)
             curPosition = 1;
-        
+
         // make sure the current position is less than the new distance
         while ((dataPoints[curPosition]->km > rtd.getDistance()) && (curPosition > 1))
             curPosition--;
         while ((dataPoints[curPosition]->km <= rtd.getDistance()) && (curPosition < dataPoints.count()-1))
             curPosition++;
-      
+
         // update the rfp
         rfp = *dataPoints[curPosition];
 
@@ -412,7 +415,7 @@ void VideoWindow::seekPlayback(long ms)
     // when we selected a videosync file in traning mode (rlv...)
     if (context->currentVideoSyncFile())
     {
-        ManualOffset += 25.0 * (double) ms / 3600000.0; //we consider 25km/h
+        context->currentVideoSyncFile()->manualOffset += (double) ms; //we consider +/- 1km
     }
     else
     {
