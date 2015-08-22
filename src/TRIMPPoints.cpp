@@ -299,10 +299,9 @@ public:
             const RideMetric *durationMetric = deps.value("workout_time");
             assert(timeRidingMetric);
             assert(durationMetric);
-            assert(averageHrMetric);
             double secs = timeRidingMetric->value(true) ?
                             timeRidingMetric->value(true) :
-                            durationMetric->value(true);;
+                            durationMetric->value(true);
             int nZone = hrZones->whichZone(hrZoneRange, hr);
             if (nZone >= 0 && nZone < trimpk.size())
                 value += trimpk[nZone] * secs;
