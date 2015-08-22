@@ -116,6 +116,10 @@ VideoWindow::VideoWindow(Context *context)  :
 
             reader.parse (source);
         }
+        else
+        {
+            qDebug() << qPrintable(QString("file" + filename + " (video layout XML file) not found"));
+        }
 #endif
     } else {
 
