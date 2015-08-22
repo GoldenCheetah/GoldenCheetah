@@ -976,11 +976,12 @@ ANTMessage ANTMessage::fecSetWindResistance(const uint8_t channel, const double 
 ANTMessage ANTMessage::fecSetTrackResistance(const uint8_t channel, const double grade, const double rollingResistance)
                                                              //     -200 < % < +200%                   0.0 <  < 0.0127
 {
-    uint16_t gradeValue = grade * 100.0;
+    uint16_t rawGradeValue = (uint16_t) ((grade+200.0) * 100.0);
     uint8_t  rollingResistanceValue = rollingResistance / 0.00005;
+    qDebug() << qPrintable("ANTMessage::fecSetTrackResistance("+QString::number(rawGradeValue)+","+ QString::number(rollingResistanceValue)+")");
     return ANTMessage(9, ANT_ACK_DATA, channel,
                       FITNESS_EQUIPMENT_TRACK_RESISTANCE_ID,
-                      0xFF, 0xFF, 0xFF, 0xFF, (uint8_t)(gradeValue & 0xFF), (uint8_t)(gradeValue >> 8), rollingResistanceValue);
+                      0xFF, 0xFF, 0xFF, 0xFF, (uint8_t)(rawGradeValue & 0xFF), (uint8_t)(rawGradeValue >> 8), rollingResistanceValue);
 }
 
 ANTMessage ANTMessage::fecRequestCapabilities(const uint8_t channel)
