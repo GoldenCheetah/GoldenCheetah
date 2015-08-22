@@ -92,6 +92,8 @@ class VideoSyncFile
         long    Duration;       // Duration of this workout in msecs
         double  Distance;       // Distance of this workout in km
         bool    valid;          // did it parse ok?
+        float   manualOffset;   // when user seek video manually
+        double  km;             // current cyclist position
 
         QVector<VideoSyncFilePoint> Points;    // points in workout
 

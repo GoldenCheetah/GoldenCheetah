@@ -1308,7 +1308,14 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             // Distance assumes current speed for the last second. from km/h to km/sec
             displayDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
-            displayWorkoutDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
+
+            if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile()))
+            {
+                displayWorkoutDistance = context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset;
+                // TODO : graphs to be shown at seek position
+            }
+            else
+                displayWorkoutDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
             rtData.setDistance(displayDistance);
 
             // time
@@ -1601,8 +1608,11 @@ void TrainSidebar::FFwd()
         load_msecs += 10000; // jump forward 10 seconds
         context->notifySeek(load_msecs);
     }
+    else if (context->currentVideoSyncFile())
+    {
+        context->notifySeek(+1); // in case of video with RLV file synchronisation just ask to go forward
+    }
     else displayWorkoutDistance += 1; // jump forward a kilometer in the workout
-// TODO: RLV file to be taken care
 }
 
 void TrainSidebar::Rewind()
@@ -1613,11 +1623,15 @@ void TrainSidebar::Rewind()
         load_msecs -=10000; // jump back 10 seconds
         if (load_msecs < 0) load_msecs = 0;
         context->notifySeek(load_msecs);
-    } else {
+    }
+    else if (context->currentVideoSyncFile())
+    {
+        context->notifySeek(-1); // in case of video with RLV file synchronisation just ask to go backward
+    }
+    else {
         displayWorkoutDistance -=1; // jump back a kilometer
         if (displayWorkoutDistance < 0) displayWorkoutDistance = 0;
     }
-// TODO: RLV file to be taken care
 }
 
 

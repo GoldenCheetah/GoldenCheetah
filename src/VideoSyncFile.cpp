@@ -60,6 +60,7 @@ void VideoSyncFile::reload()
 void VideoSyncFile::parseRLV()
 {
     // Initialise
+    manualOffset = 0;
     Version = "";
     Units = "";
     Filename = "";
