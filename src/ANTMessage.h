@@ -81,7 +81,7 @@ class ANTMessage {
         static ANTMessage fecSetWindResistance(const uint8_t channel, const double windResistance, const uint8_t windSpeed, const uint8_t draftingFactor);
         static ANTMessage fecSetTrackResistance(const uint8_t channel, const double grade, const double rollingResistance);
         static ANTMessage fecRequestCapabilities(const uint8_t channel);
-        static ANTMessage fecRequestCommandStatus(const uint8_t channel, const uint8_t page)
+        static ANTMessage fecRequestCommandStatus(const uint8_t channel, const uint8_t page);
 
         // kickr command channel messages all sent as broadcast data
         // over the command channel as type 0x4E
