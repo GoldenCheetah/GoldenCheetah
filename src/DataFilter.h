@@ -24,6 +24,7 @@
 #include <QDebug>
 #include <QList>
 #include <QMap>
+#include <QHash>
 #include <QStringList>
 #include <QTextDocument>
 #include "RideCache.h"
@@ -41,6 +42,7 @@ class Result {
         // construct a result
         Result (double value) : isNumber(true), string(""), number(value) {}
         Result (QString value) : isNumber(false), string(value), number(0.0f) {}
+        Result () : isNumber(true), string(""), number(0) {}
 
         // we can't use QString with union
         bool isNumber;           // if true, value is numeric
@@ -56,7 +58,7 @@ class Leaf {
         Leaf(int loc, int leng) : type(none),op(0),series(NULL),dynamic(false),loc(loc),leng(leng),inerror(false) { }
 
         // evaluate against a RideItem
-        Result eval(Context *context, DataFilter *df, Leaf *, RideItem *m);
+        Result eval(Context *context, DataFilter *df, Leaf *, float x, RideItem *m);
 
         // tree traversal etc
         void print(Leaf *, int level);  // print leaf and all children
@@ -123,7 +125,7 @@ class DataFilter : public QObject
         QList <PDModel*>models;
 
         // microcache for oft-repeated vector operations
-        QMap<QString, Result> snips;
+        QHash<QString, Result> snips;
 
     public slots:
         QStringList parseFilter(QString query, QStringList *list=0);

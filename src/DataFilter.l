@@ -82,6 +82,7 @@ int DataFiltercolumn = 1;
 [Dd]\'                                      return SYMBOL; /* special case */
 [Ss][Dd]\'                                  return SYMBOL; /* special case */
 [a-zA-Z0-9][a-zA-Z0-9_%™]+                  return SYMBOL; /* symbols can start with 0-9 */
+"x"                                         return SYMBOL; /* the only 1 char symbol allowed */
 
 
 "+"                                         DataFilterlval.op = ADD; return ADD;
