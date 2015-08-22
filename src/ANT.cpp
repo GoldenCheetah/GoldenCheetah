@@ -112,7 +112,7 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent), devCo
     currentLoad = 0;
     load = 100; // always set to something
     currentGradient = 0;
-    currentRollingResistance = rollingResistance = 0.0;
+    currentRollingResistance = rollingResistance = 0.004; // typical for road
     gradient = 0.1;
 
     // state machine
@@ -316,6 +316,7 @@ ANT::setGradient(double gradient)
         qDebug() << "setting fitness equipment target gradient to " << gradient;
         sendMessage(ANTMessage::fecSetTrackResistance(fecChannel, gradient, currentRollingResistance));
         currentGradient = gradient;
+        // TODO : obtain acknowledge / confirm value using fecRequestCommandStatus
     }
 }
 

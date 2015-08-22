@@ -996,7 +996,7 @@ ANTMessage ANTMessage::fecRequestCapabilities(const uint8_t channel)
                       0x01);       // request data page
 }
 
-ANTMessage ANTMessage::fecRequestCommandStatus(const uint8_t channel)
+ANTMessage ANTMessage::fecRequestCommandStatus(const uint8_t channel, const uint8_t page)
 {
     // based on ANT+ Common Pages, Rev 2.4 p 14: 6.2  Common Data Page 70: Request Data Page
     return ANTMessage(9, ANT_ACK_DATA, channel,
@@ -1004,6 +1004,6 @@ ANTMessage ANTMessage::fecRequestCommandStatus(const uint8_t channel)
                       0xFF, 0xFF,  // reserved
                       0xFF, 0xFF,  // descriptors
                       0x01,        // requested transmission response (1 time only)
-                      0x47,        // requested page
+                      page,        // requested page (0x30 = resistance, 0x31 = power, 0x32 = wind, 0x33 = slope/track)
                       0x01);       // request data page
 }
