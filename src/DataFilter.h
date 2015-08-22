@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QDebug>
 #include <QList>
+#include <QMap>
 #include <QStringList>
 #include <QTextDocument>
 #include "RideCache.h"
@@ -120,6 +121,9 @@ class DataFilter : public QObject
 
         // pd models for estimates
         QList <PDModel*>models;
+
+        // microcache for oft-repeated vector operations
+        QMap<QString, Result> snips;
 
     public slots:
         QStringList parseFilter(QString query, QStringList *list=0);
