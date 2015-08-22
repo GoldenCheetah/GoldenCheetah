@@ -83,7 +83,6 @@ class ANTMessage {
         static ANTMessage fecRequestCapabilities(const uint8_t channel);
         static ANTMessage fecRequestCommandStatus(const uint8_t channel);
 
-
         // kickr command channel messages all sent as broadcast data
         // over the command channel as type 0x4E
         static ANTMessage kickrErgMode(const unsigned char channel, ushort usDeviceId, ushort usWatts, bool bSimSpeed);

@@ -112,6 +112,7 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent), devCo
     currentLoad = 0;
     load = 100; // always set to something
     currentGradient = 0;
+    currentRollingResistance = rollingResistance = 0.0;
     gradient = 0.1;
 
     // state machine
@@ -258,6 +259,7 @@ void ANT::run()
 void
 ANT::setLoad(double load)
 {
+    qDebug() << "ask for Load update to " << load;
     if (this->load == load) return;
 
     // load has changed
@@ -270,6 +272,7 @@ ANT::setLoad(double load)
         sendMessage(ANTMessage::tacxVortexSetPower(vortexChannel, vortexID, (int)load));
     }
 
+    // if we have a FE-C trainer connected, relay the change in target power to the brake
     if (fecChannel != -1)
     {
         qDebug() << "setting fitness equipment target power to " << load;
@@ -298,11 +301,24 @@ void ANT::refreshVortexLoad()
 void
 ANT::setGradient(double gradient)
 {
+    qDebug() << "ask for gradient update to " << gradient;
+    if (fecChannel != -1)
+        qDebug() << "We have fec trainer connected, simulation capabilities=" << antChannel[fecChannel]->capabilities();
+
     if (this->gradient == gradient) return;
 
     // gradient changed
     this->gradient = gradient;
+
+    // if we have a FE-C trainer connected, relay the change in simulated slope of trainer electronic
+    if ((fecChannel != -1) && (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_SIMUL_MODE_CAPABILITY))
+    {
+        qDebug() << "setting fitness equipment target gradient to " << gradient;
+        sendMessage(ANTMessage::fecSetTrackResistance(fecChannel, gradient, currentRollingResistance));
+        currentGradient = gradient;
+    }
 }
+
 void
 ANT::setMode(int mode)
 {

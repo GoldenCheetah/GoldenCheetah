@@ -521,7 +521,7 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
 
             case ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT:
             {
-//                qDebug() << qPrintable("ANT FE-C received data page: 0x" + QString("%1").arg( data_page, 2, 0x10 ).toUpper());
+                qDebug() << qPrintable("ANT FE-C received data page: 0x" + QString("%1").arg( data_page, 2, 0x10 ).toUpper());
                 switch (data_page)
                 {
                 case FITNESS_EQUIPMENT_GENERAL_PAGE:
@@ -530,7 +530,7 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                     fecRawDistance = message[7];
                     fecSpeed = (message[9] << 8) | message[8];
 
-//                    qDebug() << qPrintable("    ANT FE-C general page");
+                    qDebug() << qPrintable("    ANT FE-C general page");
 //                    qDebug() << qPrintable(" FE type=" + QString("%1").arg( fecEqtType, 2, 0x10 ).toUpper())
 //                             << qPrintable(" speed=" + QString("%1").arg( fecSpeed, 4, 10 ).toUpper())
 //                             << qPrintable(" rawDist=" + QString("%1").arg( fecRawDistance, 4, 10 ).toUpper())
@@ -538,20 +538,17 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                     break;
 
                 case FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE:
-//                    qDebug() << qPrintable("    ANT FE-C trainer page");
+                    qDebug() << qPrintable("    ANT FE-C trainer page");
                     fecCadence = message[6];
                     fecInstantPower = message[9];
                     fecInstantPower |= (message[10] & 0x0F) << 8;
                     break;
 
                 case FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE:
-//                    qDebug() << qPrintable("    ANT FE-C capabilities details");
+                    qDebug() << qPrintable("    ANT FE-C capabilities details");
                     fecMaxResistance         = message[9];
                     fecMaxResistance        |= (message[10]) << 8;
                     fecCapabilities          = message[11];
-                    fecResistModeCapability  = fecCapabilities & 0x01;
-                    fecPowerModeCapability   = fecCapabilities & 0x02;
-                    fecSimulModeCapability   = fecCapabilities & 0x04;
                     break;
 
                 case FITNESS_EQUIPMENT_COMMAND_STATUS_PAGE:

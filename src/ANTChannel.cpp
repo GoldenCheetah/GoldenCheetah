@@ -37,6 +37,7 @@ ANTChannel::init()
     channel_type_flags=0;
     is_kickr=false;
     is_moxy=false;
+    is_fec=false;
     is_cinqo=0;
     is_old_cinqo=0;
     is_alt=0;
@@ -55,6 +56,7 @@ ANTChannel::init()
     value2=value=0;
     status = Closed;
     fecPrevRawDistance=0;
+    fecCapabilities=0;
 }
 
 //
@@ -671,6 +673,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
            case CHANNEL_TYPE_FITNESS_EQUIPMENT:
            {
+               is_fec = true;
                static int fecRefreshCounter = 1;
 
                parent->setFecChannel(number);
@@ -685,7 +688,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                // in addition toggle a flag in order to do this request only once
                if ((fecRefreshCounter % 10) == 5)
                {
-//                   qDebug() << qPrintable("Ask for capabilities");
+                   qDebug() << qPrintable("Ask for capabilities");
                    parent->requestFecCapabilities();
                }
 
@@ -708,6 +711,11 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    parent->incAltDistance((antMessage.fecRawDistance - fecPrevRawDistance
                                           + (fecPrevRawDistance > antMessage.fecRawDistance ? 256 : 0)) * 0.001);
                    fecPrevRawDistance = antMessage.fecRawDistance;
+               }
+               else if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE)
+               {
+                   fecCapabilities = antMessage.fecCapabilities;
+                   qDebug() << "Capabilities received from ANT FEC Device:" << fecCapabilities;
                }
                break;
            }
@@ -937,6 +945,20 @@ void ANTChannel::attemptTransition(int message_id)
     default:
         break;
     }
+}
+
+uint8_t ANTChannel::capabilities()
+{
+    if (!is_fec)
+        return 0;
+
+    if (fecCapabilities)
+        return fecCapabilities;
+
+    // if we do not know device capabilities, request it
+    qDebug() << qPrintable("Ask for capabilities");
+    parent->requestFecCapabilities();
+        return 0;
 }
 
 // Calibrate... needs fixing in version 3.1
