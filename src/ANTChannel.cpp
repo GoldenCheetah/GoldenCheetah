@@ -684,14 +684,6 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    parent->refreshFecLoad();
                }
 
-               // TODO: place this somewhere else : when we connect the device for the first time will be perfect
-               // in addition toggle a flag in order to do this request only once
-               if ((fecRefreshCounter % 10) == 5)
-               {
-                   qDebug() << qPrintable("Ask for capabilities");
-                   parent->requestFecCapabilities();
-               }
-
                if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE)
                {
                    if (antMessage.fecInstantPower != 0xFFFF)
@@ -876,6 +868,7 @@ void ANTChannel::attemptTransition(int message_id)
     case ANT_UNASSIGN_CHANNEL:
         //qDebug()<<number<<"TRANSITION from unassigned";
 
+        qDebug()<<number<<"assign channel type RX";
         // assign and set channel id all in one
         parent->sendMessage(ANTMessage::assignChannel(number, CHANNEL_TYPE_RX, st->network)); // receive channel on network 1
 
@@ -949,6 +942,7 @@ void ANTChannel::attemptTransition(int message_id)
 
 uint8_t ANTChannel::capabilities()
 {
+    // TODO: run this request once when just connected to device
     if (!is_fec)
         return 0;
 
