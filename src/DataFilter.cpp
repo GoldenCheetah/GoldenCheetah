@@ -87,6 +87,9 @@ static struct {
     // estimate
     { "estimate", 2 }, // estimate(model, (cp|ftp|w'|pmax|x))
 
+    // more vector operations
+    { "which", 0 }, // which(expr, ...) - create vector contain values that pass expr
+
     // add new ones above this line
     { "", -1 }
 };
@@ -1102,6 +1105,9 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
 
 Result DataFilter::evaluate(RideItem *item)
 {
+    // clear the micro-cache
+    snips.clear();
+
     if (!item || !treeRoot || DataFiltererrors.count()) return Result(0);
 
     Result res = treeRoot->eval(context, this, treeRoot, item);
@@ -1924,6 +1930,10 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
 
         Specification spec;
 
+        // is this already snipped?
+        Result snipped = df->snips.value(leaf->signature(), Result(0));
+        if (snipped.vector.count() != 0) return snipped;
+
         // get date range
         int fromDS = eval(context, df, leaf->fparms[0], m).number;
         int toDS = eval(context, df, leaf->fparms[1], m).number;
@@ -1951,6 +1961,10 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                 returning.vector << res.number;
             }
         }
+
+        // vectors of more than 100 items need snipping
+        if (returning.vector.count() > 100) 
+            df->snips.insert(leaf->signature(), returning);
 
         // always return as sum number (for now)
         return returning;
