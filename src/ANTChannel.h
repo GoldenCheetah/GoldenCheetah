@@ -23,6 +23,7 @@
 #include "ANT.h"
 #include "ANTMessage.h"
 #include <QObject>
+#include <QTime>
 
 #define CHANNEL_TYPE_QUICK_SEARCH 0x10 // or'ed with current channel type
 /* after fast search, wait for slow search.  Otherwise, starting slow
@@ -93,8 +94,9 @@ class ANTChannel : public QObject {
         char id[10]; // short identifier
         ANTChannelInitialisation mi;
 
-        int messages_received; // for signal strength metric
-        int messages_dropped;
+        int   messages_received; // for signal strength metric
+        int   messages_dropped;
+        QTime lastMessageTimestamp;
 
         unsigned char rx_burst_data[RX_BURST_DATA_LEN];
         int           rx_burst_data_index;
