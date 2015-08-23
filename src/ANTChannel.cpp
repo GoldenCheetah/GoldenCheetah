@@ -58,7 +58,7 @@ ANTChannel::init()
     status = Closed;
     fecPrevRawDistance=0;
     fecCapabilities=0;
-    lastMessageTimestamp = QTime::currentTime();
+    lastMessageTimestamp = lastMessageTimestamp2 = QTime::currentTime();
 }
 
 //
@@ -629,9 +629,9 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    rpm = 1024*60*revs / time;
                    if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
                    else parent->setWheelRpm(rpm);
-                   lastMessageTimestamp = QTime::currentTime();
+                   lastMessageTimestamp2 = QTime::currentTime();
                } else {
-                   int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
+                   int ms = lastMessageTimestamp2.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getWheelRpm());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
                    parent->setWheelRpm(rpm);
