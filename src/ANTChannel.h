@@ -97,6 +97,7 @@ class ANTChannel : public QObject {
         int   messages_received; // for signal strength metric
         int   messages_dropped;
         QTime lastMessageTimestamp;
+        QTime lastMessageTimestamp2;
 
         unsigned char rx_burst_data[RX_BURST_DATA_LEN];
         int           rx_burst_data_index;
