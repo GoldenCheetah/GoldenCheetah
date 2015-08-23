@@ -32,9 +32,11 @@ class FixDerivePowerConfig : public DataProcessorConfig
 
     friend class ::FixDerivePower;
     protected:
-        //QHBoxLayout *layout;
-        //QLabel *taLabel;
-        //QLineEdit *ta;
+        QHBoxLayout *layout;
+        QLabel *bikeWeightLabel;
+        QDoubleSpinBox *bikeWeight;
+        QLabel *crrLabel;
+        QDoubleSpinBox *crr;
 
     public:
         FixDerivePowerConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -42,40 +44,62 @@ class FixDerivePowerConfig : public DataProcessorConfig
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_EstimatePowerValues));
 
-            //layout = new QHBoxLayout(this);
+            layout = new QHBoxLayout(this);
 
-            //layout->setContentsMargins(0,0,0,0);
-            //setContentsMargins(0,0,0,0);
+            layout->setContentsMargins(0,0,0,0);
+            setContentsMargins(0,0,0,0);
 
-            //taLabel = new QLabel(tr("Torque Adjust"));
+            bikeWeightLabel = new QLabel(tr("Bike Weight (kg)"));
+            crrLabel = new QLabel(tr("Crr"));
 
-            //ta = new QLineEdit();
+            bikeWeight = new QDoubleSpinBox();
+            bikeWeight->setMaximum(99.9);
+            bikeWeight->setMinimum(0);
+            bikeWeight->setSingleStep(0.1);
+            bikeWeight->setDecimals(1);
 
-            //layout->addWidget(taLabel);
-            //layout->addWidget(ta);
-            //layout->addStretch();
+            crr = new QDoubleSpinBox();
+            crr->setMaximum(0.0999);
+            crr->setMinimum(0);
+            crr->setSingleStep(0.0001);
+            crr->setDecimals(4);
+
+            layout->addWidget(bikeWeightLabel);
+            layout->addWidget(bikeWeight);
+            layout->addWidget(crrLabel);
+            layout->addWidget(crr);
+            layout->addStretch();
         }
 
         //~FixDerivePowerConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
 
         QString explain() {
-            return(QString(tr("Derive estimated power data based on speed/elevation/weight etc")));
+            return(QString(tr("Derive estimated power data based on "
+                              "speed/elevation/weight etc\n\n"
+                              "Bike Weight parameter is added to athlete's "
+                              "weight to compound total mass, it should "
+                              "include apparel, shoes, etc\n\n"
+                              "CRR parameter is the coefficient of rolling "
+                              "resistance, it depends on tires and surface")));
         }
 
         void readConfig() {
-            //ta->setText(appsettings->value(NULL, GC_DPTA, "0 nm").toString());
+            double MBik = appsettings->value(NULL, GC_DPDP_BIKEWEIGHT, "9.5").toDouble();
+            bikeWeight->setValue(MBik);
+            double Crr = appsettings->value(NULL, GC_DPDP_CRR, "0.0031").toDouble();
+            crr->setValue(Crr);
         }
 
         void saveConfig() {
-            //appsettings->setValue(GC_DPTA, ta->text());
+            appsettings->setValue(GC_DPDP_BIKEWEIGHT, bikeWeight->value());
+            appsettings->setValue(GC_DPDP_CRR, crr->value());
         }
 };
 
 
-// RideFile Dataprocessor -- used to handle gaps in recording
-//                           by inserting interpolated/zero samples
-//                           to ensure dataPoints are contiguous in time
+// RideFile Dataprocessor -- Derive estimated power data based on
+//                           speed/elevation/weight etc
 //
 class FixDerivePower : public DataProcessor {
     Q_DECLARE_TR_FUNCTIONS(FixDerivePower)
@@ -103,7 +127,16 @@ static bool FixDerivePowerAdded = DataProcessorFactory::instance().registerProce
 bool
 FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
 {
-    Q_UNUSED(config);
+    // get settings
+    double MBik; // Bike weight kg
+    double CrV;  // Coefficient of Rolling Resistance
+    if (config == NULL) { // being called automatically
+        MBik = appsettings->value(NULL, GC_DPDP_BIKEWEIGHT, "9.5").toDouble();
+        CrV = appsettings->value(NULL, GC_DPDP_CRR, "0.0031").toDouble();
+    } else { // being called manually
+        MBik = ((FixDerivePowerConfig*)(config))->bikeWeight->value();
+        CrV = ((FixDerivePowerConfig*)(config))->crr->value();
+    }
 
     // if its already there do nothing !
     if (ride->areDataPresent()->watts) return false;
@@ -112,9 +145,8 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
     if (!ride->areDataPresent()->alt || !ride->areDataPresent()->kph) return false;
 
     // Power Estimation Constants
-    double hRider = 1.7 ; //Height in m
+    double hRider = ride->getHeight(); //Height in m
     double M = ride->getWeight(); //Weight kg
-    double MBik = 9.5; //Bike weight kg
     double T = 15; //Temp degC in not in ride data
     double W = 0; //Assume no wind
     double cCad=.002;
@@ -125,7 +157,6 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
     double afCATireV = 1.1;
     double afCATireH = 0.9;
     double afAFrame = 0.048;
-    double CrV = 0.0031;
     double ATire = 0.031;
     double CrEff = CrV;
     double adipos = sqrt(M/(hRider*750));
