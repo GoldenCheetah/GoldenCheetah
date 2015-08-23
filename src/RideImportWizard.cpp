@@ -36,6 +36,8 @@
 #include <QDebug>
 #include <QWaitCondition>
 #include <QMessageBox>
+#include <QtConcurrent>
+#include <QFuture>
 
 static const QChar zero = QLatin1Char ( '0' );
 
