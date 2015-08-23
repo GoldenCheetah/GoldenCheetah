@@ -272,6 +272,7 @@ struct FitFileReaderState
                 case 1765: rideFile->setDeviceType("Garmin Fenix3"); break;
                 case 1836: rideFile->setDeviceType("Garmin Edge 1000"); break;
                 case 1967: rideFile->setDeviceType("Garmin Fenix2"); break;
+                case 2067: rideFile->setDeviceType("Garmin Edge 520"); break;
                 case 20119: rideFile->setDeviceType("Garmin Training Center"); break;
                 case 65534: rideFile->setDeviceType("Garmin Connect Website"); break;
                 default: rideFile->setDeviceType(QString("Garmin %1").arg(prod));
