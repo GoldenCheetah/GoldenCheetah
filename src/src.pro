@@ -12,7 +12,7 @@ DEPENDPATH += .
 QMAKE_INFO_PLIST = ./mac/Info.plist.app
 
 ## qwt and libz
-INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE} ../qtsolutions/json
+INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE} ../qtsolutions/json ../qtsolutions/qwtcurve
 LIBS += ../qwt/lib/libqwt.a
 LIBS += -lm $${LIBZ_LIBS}
 
@@ -265,6 +265,10 @@ isEmpty( QTSOAP_INSTALL ) {
 HEADERS += TPUpload.h TPUploadDialog.h TPDownload.h TPDownloadDialog.h
 SOURCES += TPUpload.cpp TPUploadDialog.cpp TPDownload.cpp TPDownloadDialog.cpp
 DEFINES += GC_HAVE_SOAP
+
+# gapped curve
+HEADERS += ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.h
+SOURCES +=  ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp
 
 HEADERS += \
         AboutDialog.h \
