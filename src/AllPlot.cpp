@@ -46,6 +46,9 @@
 #include <qwt_text.h>
 #include <qwt_legend.h>
 #include <qwt_series_data.h>
+
+#include "qwt_plot_gapped_curve.h"
+
 #include <QMultiMap>
 
 #include <string.h> // for memcpy
@@ -279,7 +282,7 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
 {
     maxKM = maxSECS = 0;
 
-    wattsCurve = new QwtPlotCurve(tr("Power"));
+    wattsCurve = (QwtPlotCurve*)new QwtPlotGappedCurve(tr("Power"), 3); // > 3s is a power gap
     wattsCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     wattsCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
 
@@ -4202,7 +4205,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
 
             case RideFile::watts:
                 {
-                ourCurve = new QwtPlotCurve(tr("Power"));
+                ourCurve = (QwtPlotCurve*)(new QwtPlotGappedCurve(tr("Power"), 3));
                 ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
                 thereCurve = referencePlot->standard->wattsCurve;
                 title = tr("Power");
