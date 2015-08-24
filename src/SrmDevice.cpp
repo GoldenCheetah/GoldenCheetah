@@ -177,7 +177,7 @@ SrmDevice::open( QString &err )
         break;
 
       default:
-        err = tr("unsupported SRM Protocl version: %1")
+        err = tr("unsupported SRM Protocol version: %1")
             .arg(protoVersion);
         goto fail;
     }
