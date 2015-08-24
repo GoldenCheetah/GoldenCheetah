@@ -190,6 +190,8 @@ AllPlotInterval::sortIntervals(QList<IntervalItem*> &intervals, QList< QList<Int
 void
 AllPlotInterval::placeIntervals()
 {
+    if (!rideItem) return;
+
     QList<IntervalItem*> intervals = rideItem->intervals();
     QList< QList<IntervalItem*> > intervalsGroups;
 
