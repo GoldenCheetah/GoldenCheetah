@@ -399,11 +399,11 @@ AnomalyDialog::check()
 
     // Speed threshold depends on sport (9kph~20"/50m, 36kph~10"/100m)
     double maxKPH = rideEditor->ride->isSwim ? 9.0 :
-                    rideEditor->ride->isSwim ? 36.0 : 100.0;
+                    rideEditor->ride->isRun ? 36.0 : 100.0;
 
     // Cadence threshold depends on sport
     int maxCad = rideEditor->ride->isSwim ? 80 :
-                 rideEditor->ride->isSwim ? 120 : 200;
+                 rideEditor->ride->isRun ? 120 : 200;
 
     QVector<double> power;
     QVector<double> secs;
