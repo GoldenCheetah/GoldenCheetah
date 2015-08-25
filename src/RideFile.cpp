@@ -2569,3 +2569,83 @@ RideFileInterval::isBest() const
     return QRegExp(best).exactMatch(name); 
 }
 
+
+// ride data is referenced with symbols in upper case to make 
+// it clear that this is raw data
+static struct {
+    QString symbol;
+    RideFile::SeriesType series;
+} seriesSymbolTable[] = {
+
+	{ "SECS", RideFile::secs },
+	{ "CADENCE", RideFile::cad },
+	{ "CADENCED", RideFile::cadd },
+	{ "HEARTRATE", RideFile::hr },
+	{ "HEARTRATED", RideFile::hrd },
+	{ "DISTANCE", RideFile::km },
+	{ "SPEED", RideFile::kph },
+	{ "SPEEDD", RideFile::kphd },
+	{ "TORQUE", RideFile::nm },
+	{ "TORQUED", RideFile::nmd },
+	{ "POWER", RideFile::watts },
+	{ "POWERD", RideFile::wattsd },
+	{ "ALTITUDE", RideFile::alt },
+	{ "LON", RideFile::lon },
+	{ "LAT", RideFile::lat },
+	{ "HEADWIND", RideFile::headwind },
+	{ "SLOPE", RideFile::slope },
+	{ "TEMPERATURE", RideFile::temp },
+	{ "BALANCE", RideFile::lrbalance },
+	{ "LEFTEFFECTIVENESS", RideFile::lte },
+	{ "RIGHTEFFECTIVENESS", RideFile::rte },
+	{ "LEFTSMOOTHNESS", RideFile::lps },
+	{ "RIGHTSMOOTHNESS", RideFile::rps },
+	{ "SMO2", RideFile::smo2 },
+	{ "THB", RideFile::thb },
+	{ "RUNVERT", RideFile::rvert },
+	{ "RUNCADENCE", RideFile::rcad },
+	{ "RUNCONTACT", RideFile::rcontact },
+	{ "LEFTPCO", RideFile::lpco },
+	{ "RIGHTPCO", RideFile::rpco },
+	{ "LEFTPPB", RideFile::lppb },
+	{ "RIGHTPPB", RideFile::rppb },
+	{ "LEFTPPE", RideFile::lppe },
+	{ "RIGHTPPE", RideFile::rppe },
+	{ "LEFTPPPB", RideFile::lpppb },
+	{ "RIGHTPPPB", RideFile::rpppb },
+	{ "LEFTPPPE", RideFile::lpppe },
+	{ "RIGHTPPPE", RideFile::rpppe },
+	{ "", RideFile::none  },
+};
+
+QStringList 
+RideFile::symbols()
+{
+    // list of valid symbols
+    QStringList returning;
+    for(int i=0; seriesSymbolTable[i].series != none; i++)
+        returning << seriesSymbolTable[i].symbol;
+
+    return returning;
+}
+
+RideFile::SeriesType RideFile::seriesForSymbol(QString symbol)
+{
+    // get type for symbol
+    for(int i=0; seriesSymbolTable[i].series != none; i++)
+        if (seriesSymbolTable[i].symbol == symbol)
+            return seriesSymbolTable[i].series;
+
+    return none;
+}
+
+QString 
+RideFile::symbolForSeries(SeriesType series)
+{
+    // get type for symbol
+    for(int i=0; seriesSymbolTable[i].series != none; i++)
+        if (seriesSymbolTable[i].series == series)
+            return seriesSymbolTable[i].symbol;
+
+    return "";
+}
