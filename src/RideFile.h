@@ -204,6 +204,10 @@ class RideFile : public QObject // QObject to emit signals
         typedef enum seriestype SeriesType;
         static SeriesType lastSeriesType() { return none; }
 
+        static QStringList symbols(); // get a list of symbols for each series to use in a formula
+        static SeriesType seriesForSymbol(QString symbol); // get series for symbol
+        static QString symbolForSeries(SeriesType);
+
         static QString seriesName(SeriesType);
         static QString unitName(SeriesType, Context *context);
         static int decimalsFor(SeriesType series);

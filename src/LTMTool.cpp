@@ -1748,6 +1748,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // start with just a list of functions
     list = DataFilter::functions();
 
+    // ridefile data series symbols
+    list += RideFile::symbols();
+
     // add special functions (older code needs fixing !)
     list << "config(cp)";
     list << "config(w')";

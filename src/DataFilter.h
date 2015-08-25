@@ -58,7 +58,7 @@ class Leaf {
         Leaf(int loc, int leng) : type(none),op(0),series(NULL),dynamic(false),loc(loc),leng(leng),inerror(false) { }
 
         // evaluate against a RideItem
-        Result eval(Context *context, DataFilter *df, Leaf *, float x, RideItem *m);
+        Result eval(Context *context, DataFilter *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL);
 
         // tree traversal etc
         void print(Leaf *, int level);  // print leaf and all children
@@ -115,11 +115,12 @@ class DataFilter : public QObject
         QMap<QString,bool> lookupType; // true if a number, false if a string
 
         // when used for formulas
-        Result evaluate(RideItem *rideItem);
+        Result evaluate(RideItem *rideItem, RideFilePoint *p = NULL);
         QStringList getErrors() { return errors; };
         void colorSyntax(QTextDocument *content, int pos);
 
         static QStringList functions(); // return list of functions supported
+        QStringList dataSeriesSymbols;
 
         // pd models for estimates
         QList <PDModel*>models;
