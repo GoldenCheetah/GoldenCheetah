@@ -130,6 +130,10 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         {
             meterWidget = new CircularIndicatorMeterWidget(meterName, containerWidget, source);
         }
+        else if (meterType == QString("CircularBargraph"))
+        {
+            meterWidget = new CircularBargraphMeterWidget(meterName, containerWidget, source);
+        }
         else
         {
             qDebug() << QObject::tr("Error creating meter");

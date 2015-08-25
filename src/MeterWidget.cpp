@@ -183,6 +183,37 @@ void CircularIndicatorMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.restore();
 }
 
+CircularBargraphMeterWidget::CircularBargraphMeterWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
+{
+}
+
+void CircularBargraphMeterWidget::paintEvent(QPaintEvent* paintevent)
+{
+    MeterWidget::paintEvent(paintevent);
+
+    m_MainBrush = QBrush(m_MainColor);
+    m_OutlinePen = QPen(m_MainColor);
+    m_OutlinePen.setWidth(3);
+    m_OutlinePen.setStyle(Qt::SolidLine);
+
+    //painter
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    //draw bargraph
+    painter.setPen(m_OutlinePen);
+    painter.setBrush(m_MainBrush);
+    painter.save();
+    painter.translate(m_Width / 2, m_Height / 2);
+    painter.rotate((360.0-m_Angle)/2.0);
+    for (int i=0; i<=(int)(m_SubRange*qMin(1.0,(double)(Value-m_RangeMin)/(m_RangeMax-m_RangeMin))); i++)
+    {
+        painter.drawLine (0, m_Height*2/10, 0, m_Height*4/10);
+        painter.rotate(m_Angle/m_SubRange);
+    }
+    painter.restore();
+}
+
 NeedleMeterWidget::NeedleMeterWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
 {
 }

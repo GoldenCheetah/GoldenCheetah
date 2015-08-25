@@ -90,6 +90,13 @@ class CircularIndicatorMeterWidget : public MeterWidget
     QConicalGradient IndicatorGradient;
 };
 
+class CircularBargraphMeterWidget : public MeterWidget
+{
+  public:
+    explicit CircularBargraphMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
+    virtual void paintEvent(QPaintEvent* paintevent);
+};
+
 class NeedleMeterWidget : public MeterWidget
 {
   public:
