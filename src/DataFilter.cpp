@@ -330,6 +330,9 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
                     isfunction = found = true;
                 }
 
+                // ride sample symbol
+                if (dataSeriesSymbols.contains(sym)) found = true;
+
                 // still not found ?
                 // is it a function then ?
                 for(int j=0; DataFilterFunctions[j].parameters != -1; j++) {
