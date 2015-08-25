@@ -1618,7 +1618,7 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
 
         // lets work out the average CV configure value
         FilterSet fs;
-        fs.addFilter(searchBox->isFiltered(), QStringList(filter()));
+        fs.addFilter(searchBox->isFiltered(), SearchFilterBox::matches(context, filter()));
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
         int nActivities, nRides, nRuns, nSwims;
@@ -1663,6 +1663,8 @@ void CriticalPowerWindow::seasonSelected(int iSeason)
 void CriticalPowerWindow::filterChanged()
 {
     cpPlot->setRide(currentRide);
+    // Pace Zones Shading and Pace Units needs updating if sport(s) changed
+    forceReplot();
 }
 
 void
