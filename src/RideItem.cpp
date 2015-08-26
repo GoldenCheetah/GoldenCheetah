@@ -308,6 +308,9 @@ RideItem::notifyRideDataChanged()
     // refresh the metrics
     isstale=true;
 
+    // wipe user data
+    userCache.clear();
+
     // force a recompute of derived data series
     if (ride_) {
         ride_->wstale = true;
@@ -570,6 +573,7 @@ RideItem::refresh()
         } else {
 
             // if it is open then recompute
+            userCache.clear();
             ride_->wstale = true;
             ride_->recalculateDerivedSeries(true);
         }

@@ -976,6 +976,13 @@ AllPlotWindow::setUserData(QString settings)
     refreshCustomTable();
 }
 
+void 
+AllPlotWindow::setRideForUserData()
+{
+    // user data needs refreshing
+    foreach(UserData *x, userDataSeries) x->setRideItem(current);
+}
+
 //
 // configuring user data series
 //
@@ -1709,6 +1716,9 @@ AllPlotWindow::rideSelected()
 
     // ok, its now the current ride
     current = ride;
+
+    // setup user data if needed
+    setRideForUserData();
 
     // clear any previous selections
     clearSelection();

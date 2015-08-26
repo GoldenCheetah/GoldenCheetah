@@ -34,6 +34,7 @@ class RideCache;
 class RideCacheModel;
 class IntervalItem;
 class Context;
+class UserData;
 
 Q_DECLARE_METATYPE(RideItem*)
 
@@ -49,6 +50,7 @@ class RideItem : public QObject
         friend class ::RideCache;
         friend class ::RideCacheModel;
         friend class ::IntervalItem;
+        friend class ::UserData;
 
         // ridefile
         RideFile *ride_;
@@ -63,6 +65,9 @@ class RideItem : public QObject
         // got any intervals
         QList<IntervalItem*> intervals_;
         QStringList errors_;
+
+        // userdata cache
+        QMap<QString, QVector<double> > userCache;
 
         unsigned long metaCRC();
 
