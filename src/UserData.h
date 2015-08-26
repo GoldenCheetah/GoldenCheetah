@@ -34,7 +34,11 @@
 #include "DataFilter.h"
 #include "RideMetric.h"
 
+// formula editor
+#include "LTMTool.h"
+
 class UserDataParser;
+class EditUserDataDialog;
 
 // provide API for working with user defined data series
 class UserData : public QObject {
@@ -51,6 +55,13 @@ class UserData : public QObject {
         UserData(QString name, QString units, QString formula, QColor color);
         ~UserData();
 
+        // user maintained attributes, keep public
+        // as get/set is tedious for these kinds of attrs
+        QString name, 
+                units,
+                formula;
+        QColor color;
+
     public slots:
 
         // allow user to maintain, returns true if changed
@@ -63,16 +74,43 @@ class UserData : public QObject {
         void setRideItem(RideItem*);
 
     friend class ::UserDataParser;
+    friend class ::EditUserDataDialog;
     protected:
-
-        // user maintained attributes
-        QString name, 
-                units,
-                formula;
-        QColor color;
 
         // Ride item we are working on
         RideItem *rideItem;
+};
+
+class EditUserDataDialog : public QDialog
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        EditUserDataDialog(Context *, UserData *);
+
+    public slots:
+        void colorClicked();
+        void applyClicked();
+        void cancelClicked();
+
+    private:
+        Context *context;
+        UserData *here; // where to update
+
+        // name, units
+        QLineEdit *nameEdit,
+                  *unitsEdit;
+        QPushButton *seriesColor;
+        QColor color; // remember what we edited
+        void setButtonIcon(QColor);
+
+        // formula
+        DataFilterEdit *formulaEdit; // edit your formula
+
+        // buttons
+        QPushButton *applyButton, *cancelButton;
 };
 
 class UserDataParser : public QXmlDefaultHandler
