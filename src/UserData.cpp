@@ -172,12 +172,18 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     setButtonIcon(color);
 
     // Widgets
-    QFormLayout *widgets = new QFormLayout;
-    widgets->addRow(new QLabel(tr("Name")), nameEdit);
-    widgets->addRow(new QLabel(tr("Units")), unitsEdit);
-    widgets->addRow(new QLabel(tr("Formula")), formulaEdit);
-    widgets->addRow(new QLabel(tr("Color")), seriesColor);
+    QGridLayout *widgets = new QGridLayout;
+    widgets->addWidget(new QLabel(tr("Name")), 0, 0);
+    widgets->addWidget(nameEdit, 0, 1);
+    widgets->addWidget(new QLabel(tr("Units")), 1, 0);
+    widgets->addWidget(unitsEdit, 1, 1);
+    widgets->addWidget(new QLabel(tr("Formula")), 2, 0, Qt::AlignLeft|Qt::AlignTop);
+    widgets->addWidget(formulaEdit, 2, 1);
+    widgets->addWidget(new QLabel(tr("Color")), 3, 0);
+    widgets->addWidget(seriesColor, 3, 1);
     mainLayout->addLayout(widgets);
+    widgets->setColumnStretch(1,100);
+    widgets->setRowStretch(2,100);
 
     // Buttons
     QHBoxLayout *buttonLayout = new QHBoxLayout;
