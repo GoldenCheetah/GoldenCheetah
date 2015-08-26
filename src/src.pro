@@ -464,6 +464,7 @@ HEADERS += \
         TreeMapPlot.h \
         TrainingstagebuchUploader.h \
         Units.h \
+        UserData.h \
         VeloHeroUploader.h \
         Views.h \
         WithingsDownload.h \
@@ -702,6 +703,7 @@ SOURCES += \
         TrainingstagebuchUploader.cpp \
         TRIMPPoints.cpp \
         Units.cpp \
+        UserData.cpp \
         VeloHeroUploader.cpp \
         Views.cpp \
         WattsPerKilogram.cpp \
