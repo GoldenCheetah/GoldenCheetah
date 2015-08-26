@@ -26,6 +26,8 @@
 #include <QStyle>
 #include <QStyleFactory>
 
+#include "UserData.h"
+
 class AllPlot;
 class AllPlotInterval;
 class AllPlotObject;
@@ -103,6 +105,8 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int byDistance READ isByDistance WRITE setByDistance USER true)
     Q_PROPERTY(int smoothing READ smoothing WRITE setSmoothing USER true)
     Q_PROPERTY(int paintBrush READ isPaintBrush WRITE setPaintBrush USER true)
+
+    Q_PROPERTY(QString userData READ getUserData WRITE setUserData USER true)
 
     public:
 
@@ -230,6 +234,9 @@ class AllPlotWindow : public GcChartWindow
         void setStacked(int value);
         void setBySeries(int value);
 
+        QString getUserData() const;
+        void setUserData(QString);
+
         // trap widget signals
         void zoomChanged();
         void zoomOut();
@@ -244,6 +251,14 @@ class AllPlotWindow : public GcChartWindow
 
         // compare mode started or items to compare changed
         void compareChanged();
+
+        // user data config page
+        void editUserData();
+        void doubleClicked( int row, int column );
+        void addUserData();
+        void deleteUserData();
+        void moveUserDataUp();
+        void moveUserDataDown();
 
     protected:
 
@@ -347,6 +362,17 @@ class AllPlotWindow : public GcChartWindow
         QLineEdit *smoothLineEdit;
         QxtSpanSlider *spanSlider;
 
+        // User data tab
+        QWidget *custom;
+        QTableWidget *customTable;
+        QPushButton *editCustomButton, *addCustomButton, *deleteCustomButton;
+#ifndef Q_OS_MAC
+        QToolButton *upCustomButton, *downCustomButton;
+#else
+        QPushButton *upCustomButton, *downCustomButton;
+#endif
+        void refreshCustomTable(int indexSelectedItem = -1); // refreshes the table from LTMSettings
+
     private:
         // reveal controls
         QLabel *rSmooth;
@@ -355,6 +381,9 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *rStack, *rBySeries, *rFull, *rHelp;
         QStackedWidget *allPlotStack;
         IntervalSummaryWindow *overlayIntervals;
+
+        // user data series widgets
+        QList<UserData*> userDataSeries;
 
         // comparing 
         QList<AllPlotObject*> compareIntervalCurves; // one per compareInterval

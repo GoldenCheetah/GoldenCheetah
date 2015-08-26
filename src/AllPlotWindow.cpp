@@ -111,6 +111,73 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     HelpWhatsThis *seriesHelp = new HelpWhatsThis(series);
     series->setWhatsThis(seriesHelp->getWhatsThisText(HelpWhatsThis::ChartRides_Performance_Config_Series));
 
+    // user data widget
+    custom = new QWidget(this);
+    st->addTab(custom, tr("User Data"));
+    custom->setContentsMargins(20,20,20,20);
+    //HelpWhatsThis *curvesHelp = new HelpWhatsThis(custom);
+    //custom->setWhatsThis(curvesHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Curves));
+    QVBoxLayout *customLayout = new QVBoxLayout(custom);
+    customLayout->setContentsMargins(0,0,0,0);
+    customLayout->setSpacing(5);
+
+    // custom table
+    customTable = new QTableWidget(this);
+#ifdef Q_OS_MAX
+    customTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+    customTable->setColumnCount(2);
+    customTable->horizontalHeader()->setStretchLastSection(true);
+    QStringList headings;
+    headings << tr("Name");
+    headings << tr("Formula");
+    customTable->setHorizontalHeaderLabels(headings);
+    customTable->setSortingEnabled(false);
+    customTable->verticalHeader()->hide();
+    customTable->setShowGrid(false);
+    customTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    customTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    customLayout->addWidget(customTable);
+    connect(customTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
+
+    // custom buttons
+    editCustomButton = new QPushButton(tr("Edit"));
+    connect(editCustomButton, SIGNAL(clicked()), this, SLOT(editUserData()));
+
+    addCustomButton = new QPushButton("+");
+    connect(addCustomButton, SIGNAL(clicked()), this, SLOT(addUserData()));
+
+    deleteCustomButton = new QPushButton("-");
+    connect(deleteCustomButton, SIGNAL(clicked()), this, SLOT(deleteUserData()));
+
+#ifndef Q_OS_MAC
+    upCustomButton = new QToolButton(this);
+    downCustomButton = new QToolButton(this);
+    upCustomButton->setArrowType(Qt::UpArrow);
+    downCustomButton->setArrowType(Qt::DownArrow);
+    upCustomButton->setFixedSize(20,20);
+    downCustomButton->setFixedSize(20,20);
+    addCustomButton->setFixedSize(20,20);
+    deleteCustomButton->setFixedSize(20,20);
+#else
+    upCustomButton = new QPushButton(tr("Up"));
+    downCustomButton = new QPushButton(tr("Down"));
+#endif
+    connect(upCustomButton, SIGNAL(clicked()), this, SLOT(moveUserDataUp()));
+    connect(downCustomButton, SIGNAL(clicked()), this, SLOT(moveUserDataDown()));
+
+
+    QHBoxLayout *customButtons = new QHBoxLayout;
+    customButtons->setSpacing(2);
+    customButtons->addWidget(upCustomButton);
+    customButtons->addWidget(downCustomButton);
+    customButtons->addStretch();
+    customButtons->addWidget(editCustomButton);
+    customButtons->addStretch();
+    customButtons->addWidget(addCustomButton);
+    customButtons->addWidget(deleteCustomButton);
+    customLayout->addLayout(customButtons);
+
     // Main layout
     //QGridLayout *mainLayout = new QGridLayout();
     //mainLayout->setContentsMargins(2,2,2,2);
@@ -871,6 +938,182 @@ AllPlotWindow::configChanged(qint32 state)
     // just force a replot if wbal changed
     // and we are actually plotting wbal !
     if (state & CONFIG_WBAL && showW->isChecked()) forceReplot();
+}
+
+QString
+AllPlotWindow::getUserData() const
+{
+    //XXX fixme soon
+    return "";
+}
+
+void
+AllPlotWindow::setUserData(QString)
+{
+    //XXX fixme soon
+}
+
+//
+// configuring user data series
+//
+void
+AllPlotWindow::refreshCustomTable(int indexSelectedItem)
+{
+    // clear then repopulate custom table settings to reflect
+    // the current LTMSettings.
+    customTable->clear();
+
+    // get headers back
+    QStringList header;
+    header << tr("Name") << tr("Formula"); 
+    customTable->setHorizontalHeaderLabels(header);
+
+    QTableWidgetItem *selected = new QTableWidgetItem();
+    // now lets add a row for each metric
+    customTable->setRowCount(userDataSeries.count());
+    int i=0;
+    foreach (UserData *x, userDataSeries) {
+
+        QTableWidgetItem *t = new QTableWidgetItem();
+        t->setText(x->name); // only metrics .. for now ..
+        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        customTable->setItem(i,0,t);
+
+        t = new QTableWidgetItem();
+        t->setText(x->formula);
+        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        customTable->setItem(i,1,t);
+
+        // keep the selected item from previous step (relevant for moving up/down)
+        if (indexSelectedItem == i) {
+            selected = t;
+        }
+
+        i++;
+    }
+
+    if (selected) {
+      customTable->setCurrentItem(selected);
+    }
+}
+
+void
+AllPlotWindow::editUserData()
+{
+    QList<QTableWidgetItem*> items = customTable->selectedItems();
+    if (items.count() < 1) return;
+
+    int index = customTable->row(items.first());
+
+    UserData edit(userDataSeries[index]->name,
+                  userDataSeries[index]->units,
+                  userDataSeries[index]->formula,
+                  userDataSeries[index]->color);
+
+    EditUserDataDialog dialog(context, &edit);
+
+    if (dialog.exec()) {
+
+        // apply!
+        userDataSeries[index]->formula = edit.formula;
+        userDataSeries[index]->name = edit.name;
+        userDataSeries[index]->units = edit.units;
+        userDataSeries[index]->color = edit.color;
+
+        // update
+        refreshCustomTable();
+        //XXXcurvesChanged();
+    }
+}
+
+void
+AllPlotWindow::doubleClicked( int row, int )
+{
+    UserData edit(userDataSeries[row]->name,
+                  userDataSeries[row]->units,
+                  userDataSeries[row]->formula,
+                  userDataSeries[row]->color);
+
+    EditUserDataDialog dialog(context, &edit);
+
+    if (dialog.exec()) {
+
+        // apply!
+        userDataSeries[row]->formula = edit.formula;
+        userDataSeries[row]->name = edit.name;
+        userDataSeries[row]->units = edit.units;
+        userDataSeries[row]->color = edit.color;
+
+        // update
+        refreshCustomTable();
+        //XXXcurvesChanged();
+    }
+}
+
+void
+AllPlotWindow::deleteUserData()
+{
+    QList<QTableWidgetItem*> items = customTable->selectedItems();
+    if (items.count() < 1) return;
+    
+    int index = customTable->row(items.first());
+    UserData *deleteme = userDataSeries[index];
+
+    // wipe
+    userDataSeries.removeAt(index);
+    delete deleteme;
+
+    // refresh
+    refreshCustomTable();
+    //XXX curvesChanged();
+}
+
+void
+AllPlotWindow::addUserData()
+{
+    UserData add;
+    EditUserDataDialog dialog(context, &add);
+
+    if (dialog.exec()) {
+        // apply
+        userDataSeries.append(new UserData(add.name, add.units, add.formula, add.color));
+
+        // refresh
+        refreshCustomTable();
+        //XXX curvesChanged();
+    }
+}
+
+void
+AllPlotWindow::moveUserDataUp()
+{
+    QList<QTableWidgetItem*> items = customTable->selectedItems();
+    if (items.count() < 1) return;
+
+    int index = customTable->row(items.first());
+
+    if (index > 0) {
+        userDataSeries.swap(index, index-1);
+         // refresh
+        refreshCustomTable(index-1);
+        //XXX curvesChanged();
+    }
+}
+
+void
+AllPlotWindow::moveUserDataDown()
+{
+    QList<QTableWidgetItem*> items = customTable->selectedItems();
+    if (items.count() < 1) return;
+
+    int index = customTable->row(items.first());
+
+    if (index+1 <  userDataSeries.size()) {
+        userDataSeries.swap(index, index+1);
+         // refresh
+        refreshCustomTable(index+1);
+        //XXX curvesChanged();
+    }
 }
 
 bool
