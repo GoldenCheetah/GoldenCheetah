@@ -357,9 +357,34 @@ UserData::getRideItem() const
     return rideItem;
 }
 
+// set ride item and therefore set the data
 void 
 UserData::setRideItem(RideItem*m)
 {
     rideItem = m;
-}
 
+    // parse formula
+    DataFilter parser(this, rideItem->context, formula);
+
+    // clear what we got
+    vector.clear();
+
+    // if real ..
+    if (rideItem) {
+
+        // is it cached ?
+        vector = rideItem->userCache.value(parser.signature(), QVector<double>());
+
+        if (vector.count() == 0 && rideItem->ride()) {
+
+            // run through each sample and create an equivalent
+            foreach(RideFilePoint *p, rideItem->ride()->dataPoints()) {
+                Result res = parser.evaluate(rideItem, p);
+                vector << res.number;
+            }
+
+            // cache for next time !
+            rideItem->userCache.insert(parser.signature(), vector);
+        }
+    }
+}

@@ -236,6 +236,7 @@ class AllPlotWindow : public GcChartWindow
 
         QString getUserData() const;
         void setUserData(QString);
+        void setRideForUserData();
 
         // trap widget signals
         void zoomChanged();

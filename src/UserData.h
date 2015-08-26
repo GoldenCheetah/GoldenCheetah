@@ -62,6 +62,8 @@ class UserData : public QObject {
                 formula;
         QColor color;
 
+        QVector<double> vector; // the actuall data series !
+
     public slots:
 
         // allow user to maintain, returns true if changed
