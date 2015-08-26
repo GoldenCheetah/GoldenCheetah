@@ -218,6 +218,10 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *)
                 errors++;
             }
         }
+
+        // Invalidate slope data to be recomputed based on new altitude data
+        if (ride->areDataPresent()->slope == true)
+            ride->command->setDataPresent(RideFile::slope, false);
     }
 
     // close LUW
