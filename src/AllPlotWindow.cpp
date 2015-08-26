@@ -943,14 +943,37 @@ AllPlotWindow::configChanged(qint32 state)
 QString
 AllPlotWindow::getUserData() const
 {
-    //XXX fixme soon
-    return "";
+    QString returning;
+    foreach(UserData *x, userDataSeries)
+        returning += x->settings();
+
+    return returning;
 }
 
 void
-AllPlotWindow::setUserData(QString)
+AllPlotWindow::setUserData(QString settings)
 {
-    //XXX fixme soon
+    // wipe whats there
+    foreach(UserData *x, userDataSeries) delete x;
+    userDataSeries.clear();
+
+    // snip into discrete user data xml snippets
+    QRegExp snippet("(\\<userdata .*\\<\\/userdata\\>)");
+    snippet.setMinimal(true); // don't match too much
+    QStringList snips;
+    int pos = 0;
+
+    while ((pos = snippet.indexIn(settings, pos)) != -1) {
+        snips << snippet.cap(1);
+        pos += snippet.matchedLength();
+    }
+
+    // now create and add each series
+    foreach(QString set, snips)
+        userDataSeries << new UserData(set);
+
+    // and update table
+    refreshCustomTable();
 }
 
 //

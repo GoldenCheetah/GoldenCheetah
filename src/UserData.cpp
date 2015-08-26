@@ -265,6 +265,8 @@ static QString xmlprotect(QString string)
     s.replace( "<", "&lt;" );
     s.replace( "\"", "&quot;" );
     s.replace( "\'", "&apos;" );
+    s.replace( "\n", "\\n" );
+    s.replace( "\r", "\\r" );
     return s;
 }
 
@@ -280,6 +282,8 @@ static QString unprotect(QString buffer)
     // replace html (TM) with local TM character
     s.replace( "&#8482;", tm );
 
+    s.replace( "\\n", "\n" );
+    s.replace( "\\r", "\r" );
     // html special chars are automatically handled
     // NOTE: other special characters will not work
     // cross-platform but will work locally, so not a biggie
@@ -329,11 +333,10 @@ UserData::setSettings(QString settings)
 // view layout parser - reads in athletehome/xxx-layout.xml
 //
 
-bool UserDataParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs )
+bool UserDataParser::startElement( const QString&, const QString&, const QString &, const QXmlAttributes &attrs )
 {
     // get the attributes; color, name, units
     for(int i=0; i<attrs.count(); i++) {
-
         // only 3 attributes for now
         if (attrs.qName(i) == "color") here->color = QColor(attrs.value(i));
         if (attrs.qName(i) == "name")  here->name  = unprotect(attrs.value(i));
