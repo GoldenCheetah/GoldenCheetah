@@ -308,6 +308,14 @@ this differently
 		    }
 		    if (seconds>=p->secs)
 		      igpx += 1;
+		    // Must check if current HRM speed is zero while
+		    // we have GPX speed
+		    if (kph==0.0 & p->kph>1.0)
+		      {
+			kph = p->kph;
+			distance += kph/60/60*recInterval;
+			km = distance;
+		      }
 		  }
 		
 		rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, lon, lat, 0.0, 0.0, RideFile::NoTemp, lrbalance, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
