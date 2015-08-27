@@ -293,6 +293,7 @@ this differently
         }
     }
 
+    rideFile->setTag("Notes", note);
     QRegExp rideTime("^.*/(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_"
                      "(\\d\\d)_(\\d\\d)_(\\d\\d)\\.hrm$");
     if (rideTime.indexIn(file.fileName()) >= 0) {
