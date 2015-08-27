@@ -595,6 +595,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getCadence());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
+                   if (rpm < (float) 4.0)
+                       rpm = 0.0; // if rpm is less than 4 then we consider that we are stopped
                }
                parent->setCadence(rpm);
                value2 = value = rpm;
@@ -618,6 +620,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getCadence());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
+                   if (rpm < (float) 4.0)
+                       rpm = 0.0; // if rpm is less than 4 then we consider that we are stopped
                    parent->setCadence(rpm);
                }
                value = rpm;
@@ -634,6 +638,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    int ms = lastMessageTimestamp2.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getWheelRpm());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
+                   if (rpm < (float) 4.0)
+                       rpm = 0.0; // if rpm is less than 4 then we consider that we are stopped
                    parent->setWheelRpm(rpm);
                }
                value2 = rpm;
@@ -653,6 +659,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getWheelRpm());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
+                   if (rpm < (float) 4.0)
+                       rpm = 0.0; // if rpm is less than 4 then we consider that we are stopped
                }
                parent->setWheelRpm(rpm);
                value2=value=rpm;
