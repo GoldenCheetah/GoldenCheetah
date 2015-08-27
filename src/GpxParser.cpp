@@ -147,12 +147,19 @@ bool
 
     else if (qName == "trkpt")
     {
+        // Time from beginning of activity
+        double secs = start_time.secsTo(time);
+
         if(lastLon == 0)
         {
             // update the "lasts" and find the next point
             last_time = time;
             lastLon = lon;
             lastLat = lat;
+	    // first point
+            rideFile->appendPoint(secs, cad, hr, 0, 0, 0, watts, alt, lon, lat, 0, 0.0, temp, 0.0, 
+                                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
             return true;
         }
         // we need to figure out the distance by using the lon,lat
@@ -187,30 +194,15 @@ bool
             speed= 1000.0 * delta_d / delta_t_ms * 3600.0;
         }
 
-        // Time from beginning of activity
-        double secs = start_time.secsTo(time);
-
         // Record trackpoint
 
 	// for smart recording, the delta_t will not be constant
 	// average all the calculations based on the previous
 	// point.
 
-	if(rideFile->dataPoints().empty()) {
-	    // first point
-            rideFile->appendPoint(secs, cad, hr, distance, speed, 0, watts, alt, lon, lat, 0, 0.0, temp, 0.0, 
-                                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
-	}
-	else {
-	    // assumption that the change in ride is linear...  :)
-	    RideFilePoint *prevPoint = rideFile->dataPoints().back();
-	    double deltaSecs = secs - prevPoint->secs;
-	    double deltaDist = distance - prevPoint->km;
-	    double deltaSpeed = speed - prevPoint->kph;
-	    double deltaAlt = alt - prevPoint->alt;
-	    double deltaLon = lon - prevPoint->lon;
-	    double deltaLat = lat - prevPoint->lat;
+	// assumption that the change in ride is linear...  :)
+	RideFilePoint *prevPoint = rideFile->dataPoints().back();
+	double deltaSecs = secs - prevPoint->secs;
 
 	    // Smart Recording High Water Mark.
         if ((isGarminSmartRecording.toInt() == 0) ||
@@ -224,6 +216,11 @@ bool
                                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
 
 	    } else {
+       	        double deltaDist = distance - prevPoint->km;
+		double deltaSpeed = speed - prevPoint->kph;
+		double deltaAlt = alt - prevPoint->alt;
+		double deltaLon = lon - prevPoint->lon;
+		double deltaLat = lat - prevPoint->lat;
 
 		// smart recording is on and delta is less than GarminHWM seconds.
 		for(int i = 1; i <= deltaSecs; i++) {
@@ -258,7 +255,6 @@ bool
 			    0);
 		}
 		prevPoint = rideFile->dataPoints().back();
-	    }
 	}
 	// update the "lasts" and find the next point
         last_time = time;
