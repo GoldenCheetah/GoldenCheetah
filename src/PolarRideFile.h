@@ -20,9 +20,12 @@
 #define _PolarRideFile_h
 #include "GoldenCheetah.h"
 
-#include "RideFile.h"
+#include "GpxRideFile.h"
+//#include "RideFile.h"
 
-struct PolarFileReader : public RideFileReader {
+class PolarFileReader : public RideFileReader {
+    public:
+
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
     bool hasWrite() const { return false; }
 };
