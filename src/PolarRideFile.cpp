@@ -46,6 +46,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
     double seconds=0;
     double distance=0;
     int interval = 0;
+    int StartDelay = 0;
 
     bool speed = false;
     bool cadence = false;
@@ -165,7 +166,13 @@ this differently
 
                 } else if (line.contains("Interval=")) {
                     recInterval = line.remove(0,9).toInt();
-                    rideFile->setRecIntSecs(recInterval);
+		    if (recInterval==238){
+		        /* This R-R data */
+		        rideFile->setRecIntSecs(1);
+		    }
+		    else {
+		      rideFile->setRecIntSecs(recInterval);
+		    }
                 } else if (line.contains("Date=")) {
                     line.remove(0,5);
                     date= QDate(line.left(4).toInt(),
@@ -178,8 +185,15 @@ this differently
                                             line.mid(3,2).toInt(),
                                             line.mid(6,2).toInt()));
                     rideFile->setStartTime(datetime);
-                 }
-
+		} else if (line.contains("StartDelay=")){
+		  StartDelay = line.remove(0,11).toInt();
+		  if (recInterval==238){
+		    seconds = StartDelay/1000.0;
+		  }
+		  else{
+		    seconds = recInterval;
+		  }
+		}
 
             }
             else if (section == "[Note]"){
@@ -203,13 +217,11 @@ this differently
                 }
             }
             else if (section == "[HRData]"){
-                double nm=0,kph=0,watts=0,km=0,cad=0,hr=0,alt=0;
+	        double nm=0,kph=0,watts=0,km=0,cad=0,hr=0,alt=0,hrm=0;
                 double lrbalance=0;
 
-                seconds += recInterval;
-
-                int i=0;
-                hr = line.section('\t', i, i).toDouble();
+		int i=0;
+		hrm = line.section('\t', i, i).toDouble();
                 i++;
 
                 if (speed) {
@@ -262,8 +274,19 @@ this differently
                     alt *= METERS_PER_FOOT;
                 }
 
+		if (recInterval==238){
+		  hr = 60000.0/hrm;
+		} else {
+		  hr = hrm;
+		}
+
                 rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, 0.0, 0.0, 0.0, 0.0, RideFile::NoTemp, lrbalance, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
 	            //fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
+		if (recInterval==238){
+		  seconds += hrm / 1000.0;
+		} else {
+		  seconds += recInterval;
+		}
             }
 
         ++lineno;
