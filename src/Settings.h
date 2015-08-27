@@ -157,7 +157,7 @@
 #define GC_DPPA           "dataprocess/poweradjust/adjustment"
 #define GC_DPFHRS_MAX     "dataprocess/fixhrspikes/max"
 #define GC_DPDP_BIKEWEIGHT "dataprocess/fixderivepower/bikewheight"
-#define GC_DPDP_CRR       "dataprocess/fixderivepower/bikewheight"
+#define GC_DPDP_CRR       "dataprocess/fixderivepower/crr"
 
 // ride navigator
 #define GC_NAVHEADINGS      "navigator/headings"
