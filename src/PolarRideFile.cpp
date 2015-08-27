@@ -22,13 +22,13 @@
 #include <QTextStream>
 #include <algorithm> // for std::sort
 #include "cmath"
-
+#include <assert.h>
 
 static int polarFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "hrm", "Polar Precision", new PolarFileReader());
 
-RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
+RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*rideList) const
 {
 /*
 * Polar HRM file format documented at www.polar.fi/files/Polar_HRM_file%20format.pdf
@@ -53,10 +53,28 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
     bool altitude = false;
     bool power = false;
     bool balance = false;
-
-
+    bool haveGPX = false;
+    int igpx = 0;
+    int ngpx = 0;
+    double lat=0,lon=0;
     int recInterval = 1;
 
+    // Read Polar GPX file (if exist with same name as hrm file).
+    RideFile *gpxresult;
+    RideFilePoint *p;
+    QString suffix = file.fileName();
+    int dot = suffix.lastIndexOf(".");
+    assert(dot >= 0);
+    QFile gpxfile(suffix.left(dot)+".gpx");
+    haveGPX = gpxfile.exists();
+    
+    if (haveGPX)
+      {
+	GpxFileReader reader;
+	gpxresult = reader.openRideFile(gpxfile,errors,rideList);
+	ngpx = gpxresult->dataPoints().count();
+      }
+      
     if (!file.open(QFile::ReadOnly)) {
         errors << ("Could not open ride file: \""
                    + file.fileName() + "\"");
@@ -226,6 +244,8 @@ this differently
 
                 if (speed) {
                     kph = line.section('\t', i, i).toDouble()/10;
+		    distance += kph/60/60*recInterval;
+		    km = distance;
                     i++;
                 }
                 if (cadence) {
@@ -257,9 +277,6 @@ this differently
                     i++;
                 }
 
-                distance = distance + kph/60/60*recInterval;
-                km = distance;
-
                 if (next_interval < seconds) {
                     interval = intervals.indexOf(next_interval);
                     if (intervals.count()>interval+1){
@@ -279,9 +296,22 @@ this differently
 		} else {
 		  hr = hrm;
 		}
-
-                rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, 0.0, 0.0, 0.0, 0.0, RideFile::NoTemp, lrbalance, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
-	            //fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
+		
+		if (haveGPX & (igpx<ngpx))
+		  {
+		    p = gpxresult->dataPoints()[igpx];
+		    // Use previous value if GPS is momentarely
+		    // lost. Should have option for interpolating.
+		    if (p->lat!=0.0&p->lon!=0.0){
+		      lat = p->lat;
+		      lon = p->lon;
+		    }
+		    if (seconds>=p->secs)
+		      igpx += 1;
+		  }
+		
+		rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, lon, lat, 0.0, 0.0, RideFile::NoTemp, lrbalance, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
+		// fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
 		if (recInterval==238){
 		  seconds += hrm / 1000.0;
 		} else {
