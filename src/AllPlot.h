@@ -45,7 +45,7 @@
 #include <QStyleFactory>
 #include <QStyle>
 
-
+#include "UserData.h"
 #include "RideFile.h"
 
 class QwtPlotCurve;
@@ -341,6 +341,14 @@ class CurveColors : public QObject
 
 };
 
+// Plotting user data
+struct UserObject {
+    QVector<double> array;
+    QVector<double> smooth;
+    QwtPlotCurve    *curve;
+    QColor          color;
+};
+
 class AllPlot;
 class MergeAdjust;
 class AllPlotObject : public QObject
@@ -353,7 +361,7 @@ class AllPlotObject : public QObject
 
     public:
 
-    AllPlotObject(AllPlot*); // construct associate with a plot
+    AllPlotObject(AllPlot*, QList<UserData*>); // construct associate with a plot
     ~AllPlotObject(); // delete and disassociate from a plot
 
     void setVisible(bool); // show or hide objects
@@ -514,6 +522,10 @@ class AllPlotObject : public QObject
     QVector<QwtIntervalSample> smoothLPPP;
     QVector<QwtIntervalSample> smoothRPPP;
     QVector<QwtIntervalSample> smoothRelSpeed;
+
+    // setup as copy from user data
+    void setUserData(QList<UserData*>); // reset below to reflect current
+    QList<UserObject> U;
 
     // highlighting intervals
     QwtPlotCurve *intervalHighlighterCurve,  // highlight selected intervals on the Plot

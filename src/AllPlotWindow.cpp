@@ -972,6 +972,9 @@ AllPlotWindow::setUserData(QString settings)
     foreach(QString set, snips)
         userDataSeries << new UserData(set);
 
+    // tell full plot we have some.
+    fullPlot->standard->setUserData(userDataSeries);
+
     // and update table
     refreshCustomTable();
 }
@@ -1052,7 +1055,10 @@ AllPlotWindow::editUserData()
 
         // update
         refreshCustomTable();
-        //XXXcurvesChanged();
+
+        // tell full plot we have some.
+        fullPlot->standard->setUserData(userDataSeries);
+
     }
 }
 
@@ -1076,7 +1082,9 @@ AllPlotWindow::doubleClicked( int row, int )
 
         // update
         refreshCustomTable();
-        //XXXcurvesChanged();
+
+        // tell full plot we have some.
+        fullPlot->standard->setUserData(userDataSeries);
     }
 }
 
@@ -1095,7 +1103,9 @@ AllPlotWindow::deleteUserData()
 
     // refresh
     refreshCustomTable();
-    //XXX curvesChanged();
+
+    // tell full plot we have some.
+    fullPlot->standard->setUserData(userDataSeries);
 }
 
 void
@@ -1110,7 +1120,9 @@ AllPlotWindow::addUserData()
 
         // refresh
         refreshCustomTable();
-        //XXX curvesChanged();
+
+        // tell full plot we have some.
+        fullPlot->standard->setUserData(userDataSeries);
     }
 }
 
@@ -1126,7 +1138,9 @@ AllPlotWindow::moveUserDataUp()
         userDataSeries.swap(index, index-1);
          // refresh
         refreshCustomTable(index-1);
-        //XXX curvesChanged();
+
+        // tell full plot we have some.
+        fullPlot->standard->setUserData(userDataSeries);
     }
 }
 
@@ -1142,7 +1156,9 @@ AllPlotWindow::moveUserDataDown()
         userDataSeries.swap(index, index+1);
          // refresh
         refreshCustomTable(index+1);
-        //XXX curvesChanged();
+
+        // tell full plot we have some.
+        fullPlot->standard->setUserData(userDataSeries);
     }
 }
 
@@ -1214,7 +1230,7 @@ AllPlotWindow::compareChanged()
         if (fullPlot->smooth < 1) fullPlot->smooth = 1;
         foreach(CompareInterval ci, context->compareIntervals) {
 
-            AllPlotObject *po = new AllPlotObject(fullPlot);
+            AllPlotObject *po = new AllPlotObject(fullPlot, userDataSeries);
             if (ci.isChecked()) fullPlot->setDataFromRideFile(ci.data, po);
 
             // what was the maximum x value?
