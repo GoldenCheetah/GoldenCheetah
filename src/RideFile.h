@@ -169,7 +169,7 @@ class RideFile : public QObject // QObject to emit signals
         friend class PwxFileReader;
         friend class JsonFileReader;
         friend class ManualRideDialog;
-
+        friend class PolarFileReader;
         // split and mergers
         friend class MergeActivityWizard;
         friend class SplitActivityWizard;
