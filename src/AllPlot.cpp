@@ -278,9 +278,12 @@ class TimeScaleDraw: public ScaleScaleDraw
 static inline double
 max(double a, double b) { if (a > b) return a; else return b; }
 
-AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
+AllPlotObject::AllPlotObject(AllPlot *plot, QList<UserData*> user) : plot(plot)
 {
     maxKM = maxSECS = 0;
+
+    // user data
+    setUserData(user);
 
     wattsCurve = (QwtPlotCurve*)new QwtPlotGappedCurve(tr("Power"), 3); // > 3s is a power gap
     wattsCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
@@ -482,6 +485,42 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
 
 }
 
+void 
+AllPlotObject::setUserData(QList<UserData*>user)
+{
+    // wipe away current
+    // user objects
+    foreach(UserObject u, U) {
+
+        // wipe any curves
+        u.curve->detach(); delete u.curve;
+    }
+    U.clear();
+
+    // setup the U array
+    foreach(UserData *userdata, user) {
+
+        UserObject add;
+
+        // create curve
+        add.curve = new QwtPlotCurve(userdata->name);
+        add.curve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+        add.curve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0)); // for now.
+
+        // default the color
+        add.color = userdata->color;
+        add.color.setAlpha(200);
+
+        QPen pen;
+        pen.setWidth(1.0);
+        pen.setColor(userdata->color);
+        add.curve->setPen(pen);
+
+        // register
+        U << add;
+    }
+}
+
 // we tend to only do this for the compare objects
 void
 AllPlotObject::setColor(QColor color)
@@ -578,6 +617,14 @@ AllPlotObject::~AllPlotObject()
     rppCurve->detach(); delete rppCurve;
     lpppCurve->detach(); delete lpppCurve;
     rpppCurve->detach(); delete rpppCurve;
+
+    // user objects
+    foreach(UserObject u, U) {
+
+        // wipe any curves
+        u.curve->detach(); delete u.curve;
+    }
+    U.clear();
 }
 
 void
@@ -585,6 +632,7 @@ AllPlotObject::setVisible(bool show)
 {
     if (show == false) {
 
+        foreach(UserObject u, U) u.curve->detach();
         grid->detach(); 
         mCurve->detach();
         wCurve->detach();
@@ -643,6 +691,7 @@ AllPlotObject::setVisible(bool show)
     } else {
 
 
+        foreach(UserObject u, U) u.curve->attach(plot);
         altCurve->attach(plot); // always do first as it hasa brush
         grid->attach(plot);
         mCurve->attach(plot);
@@ -835,7 +884,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
 
     setXTitle();
 
-    standard = new AllPlotObject(this);
+    standard = new AllPlotObject(this, window->userDataSeries);
 
     standard->intervalHighlighterCurve->setSamples(new IntervalPlotData(this, context, window));
 
@@ -1479,17 +1528,20 @@ struct DataPoint {
            lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe,
            kphd, wattsd, cadd, nmd, hrd, slope, tcore;
 
+    // user values
+    QList<double>user;
+
     DataPoint(double t, double h, double w, double at, double an, double n, double rv, double rcad, double rgct,
               double smo2, double thb, double o2hb, double hhb, double l, double x, double s, double c,
               double a, double te, double wi, double tq, double lrb, double lte, double rte, double lps, double rps,
               double lpco, double rpco, double lppb, double rppb, double lppe, double rppe, double lpppb, double rpppb, double lpppe, double rpppe,
-              double kphd, double wattsd, double cadd, double nmd, double hrd, double sl, double tcore) :
+              double kphd, double wattsd, double cadd, double nmd, double hrd, double sl, double tcore, QList<double>user) :
 
               time(t), hr(h), watts(w), atiss(at), antiss(an), np(n), rv(rv), rcad(rcad), rgct(rgct),
               smo2(smo2), thb(thb), o2hb(o2hb), hhb(hhb), ap(l), xp(x), speed(s), cad(c),
               alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb), lte(lte), rte(rte), lps(lps), rps(rps),
               lpco(lpco), rpco(rpco), lppb(lppb), rppb(rppb), lppe(lppe), rppe(rppe), lpppb(lpppb), rpppb(rpppb), lpppe(lpppe), rpppe(rpppe),
-              kphd(kphd), wattsd(wattsd), cadd(cadd), nmd(nmd), hrd(hrd), slope(sl), tcore(tcore) {}
+              kphd(kphd), wattsd(wattsd), cadd(cadd), nmd(nmd), hrd(hrd), slope(sl), tcore(tcore), user(user) {}
 };
 
 bool AllPlot::shadeZones() const
@@ -1620,6 +1672,11 @@ AllPlot::recalc(AllPlotObject *objects)
         if (!objects->tcoreArray.empty()) objects->tcoreCurve->setSamples(data, data);
         if (!objects->speedArray.empty()) objects->speedCurve->setSamples(data, data);
 
+        // user data
+        foreach(UserObject obj, objects->U) {
+            if (!obj.array.empty()) obj.curve->setSamples(data,data);
+        }
+
         // deltas
         if (!objects->accelArray.empty()) objects->accelCurve->setSamples(data, data);
         if (!objects->wattsDArray.empty()) objects->wattsDCurve->setSamples(data, data);
@@ -1663,6 +1720,12 @@ AllPlot::recalc(AllPlotObject *objects)
     if (context->isCompareIntervals && applysmooth == 0) applysmooth = 1;
     
     // we should only smooth the curves if objects->smoothed rate is greater than sample rate
+
+    // user data totals
+    QVector<double> utotals;
+    utotals.resize(objects->U.count());
+    utotals.fill(0);
+
     if (applysmooth > 0) {
 
         double totalWatts = 0.0;
@@ -1755,6 +1818,9 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothRPP.resize(rideTimeSecs + 1);
         objects->smoothLPPP.resize(rideTimeSecs + 1);
         objects->smoothRPPP.resize(rideTimeSecs + 1);
+        for(int k=0; k<objects->U.count(); k++) {
+            objects->U[k].smooth.resize(rideTimeSecs + 1);
+        }
 
         // do the smoothing by calculating the average of the "applysmooth" values left
         // of the current data point - for points in time smaller than "applysmooth"
@@ -1762,6 +1828,12 @@ AllPlot::recalc(AllPlotObject *objects)
         int i = 0;
         for (int secs = 0; secs <= rideTimeSecs; ++secs) {
             while ((i < objects->timeArray.count()) && (objects->timeArray[i] <= secs)) {
+
+                // collect user data if its there
+                QList<double> udata;
+                for (int k=0; k<objects->U.count(); k++) udata << (objects->U[k].array.size() > i ? objects->U[k].array[i] : 0);
+
+                // add to list
                 DataPoint dp(objects->timeArray[i],
                              (!objects->hrArray.empty() ? objects->hrArray[i] : 0),
                              (!objects->wattsArray.empty() ? objects->wattsArray[i] : 0),
@@ -1804,8 +1876,13 @@ AllPlot::recalc(AllPlotObject *objects)
                              (!objects->nmDArray.empty() ? objects->nmDArray[i] : 0),
                              (!objects->hrDArray.empty() ? objects->hrDArray[i] : 0),
                              (!objects->slopeArray.empty() ? objects->slopeArray[i] : 0),
-                             (!objects->tcoreArray.empty() ? objects->tcoreArray[i] : 0));
+                             (!objects->tcoreArray.empty() ? objects->tcoreArray[i] : 0),
+                            udata);
 
+                // apend to list
+                list.append(dp);
+
+                // maintain totals
                 if (!objects->wattsArray.empty()) totalWatts += objects->wattsArray[i];
                 if (!objects->npArray.empty()) totalNP += objects->npArray[i];
                 if (!objects->rvArray.empty()) totalRV += objects->rvArray[i];
@@ -1841,43 +1918,30 @@ AllPlot::recalc(AllPlotObject *objects)
                         totalTemp   += objects->tempArray[i];
                     }
                 }
-
-                // left/right pedal data
-                if (!objects->balanceArray.empty())
-                    totalBalance   += (objects->balanceArray[i]>0?objects->balanceArray[i]:50);
-                if (!objects->lteArray.empty())
-                    totalLTE   += (objects->lteArray[i]>0?objects->lteArray[i]:0);
-                if (!objects->rteArray.empty())
-                    totalRTE   += (objects->rteArray[i]>0?objects->rteArray[i]:0);
-                if (!objects->lpsArray.empty())
-                    totalLPS   += (objects->lpsArray[i]>0?objects->lpsArray[i]:0);
-                if (!objects->rpsArray.empty())
-                    totalRPS   += (objects->rpsArray[i]>0?objects->rpsArray[i]:0);
-                if (!objects->lpcoArray.empty())
-                    totalLPCO   += objects->lpcoArray[i];
-                if (!objects->rpcoArray.empty())
-                    totalRPCO   += objects->rpcoArray[i];
-                if (!objects->lppbArray.empty())
-                    totalLPPB   += (objects->lppbArray[i]>0?objects->lppbArray[i]:0);
-                if (!objects->rppbArray.empty())
-                    totalRPPB   += (objects->rppbArray[i]>0?objects->rppbArray[i]:0);
-                if (!objects->lppeArray.empty())
-                    totalLPPE   += (objects->lppeArray[i]>0?objects->lppeArray[i]:0);
-                if (!objects->rppeArray.empty())
-                    totalRPPE   += (objects->rppeArray[i]>0?objects->rppeArray[i]:0);
-                if (!objects->lpppbArray.empty())
-                    totalLPPPB   += (objects->lpppbArray[i]>0?objects->lpppbArray[i]:0);
-                if (!objects->rpppbArray.empty())
-                    totalRPPPB   += (objects->rpppbArray[i]>0?objects->rpppbArray[i]:0);
-                if (!objects->lpppeArray.empty())
-                    totalLPPPE   += (objects->lpppeArray[i]>0?objects->lpppeArray[i]:0);
-                if (!objects->rpppeArray.empty())
-                    totalRPPPE   += (objects->rpppeArray[i]>0?objects->rpppeArray[i]:0);
-
+                if (!objects->balanceArray.empty()) totalBalance   += (objects->balanceArray[i]>0?objects->balanceArray[i]:50);
+                if (!objects->lteArray.empty()) totalLTE   += (objects->lteArray[i]>0?objects->lteArray[i]:0);
+                if (!objects->rteArray.empty()) totalRTE   += (objects->rteArray[i]>0?objects->rteArray[i]:0);
+                if (!objects->lpsArray.empty()) totalLPS   += (objects->lpsArray[i]>0?objects->lpsArray[i]:0);
+                if (!objects->rpsArray.empty()) totalRPS   += (objects->rpsArray[i]>0?objects->rpsArray[i]:0);
+                if (!objects->lpcoArray.empty()) totalLPCO   += objects->lpcoArray[i];
+                if (!objects->rpcoArray.empty()) totalRPCO   += objects->rpcoArray[i];
+                if (!objects->lppbArray.empty()) totalLPPB   += (objects->lppbArray[i]>0?objects->lppbArray[i]:0);
+                if (!objects->rppbArray.empty()) totalRPPB   += (objects->rppbArray[i]>0?objects->rppbArray[i]:0);
+                if (!objects->lppeArray.empty()) totalLPPE   += (objects->lppeArray[i]>0?objects->lppeArray[i]:0);
+                if (!objects->rppeArray.empty()) totalRPPE   += (objects->rppeArray[i]>0?objects->rppeArray[i]:0);
+                if (!objects->lpppbArray.empty()) totalLPPPB   += (objects->lpppbArray[i]>0?objects->lpppbArray[i]:0);
+                if (!objects->rpppbArray.empty()) totalRPPPB   += (objects->rpppbArray[i]>0?objects->rpppbArray[i]:0);
+                if (!objects->lpppeArray.empty()) totalLPPPE   += (objects->lpppeArray[i]>0?objects->lpppeArray[i]:0);
+                if (!objects->rpppeArray.empty()) totalRPPPE   += (objects->rpppeArray[i]>0?objects->rpppeArray[i]:0);
                 totalDist   = objects->distanceArray[i];
-                list.append(dp);
+
+                // totalise user data
+                for(int k=0; k<utotals.count(); k++) utotals[k] += udata[k];
+
                 ++i;
             }
+
+            // remove data from before smoothing duration (er, really?)
             while (!list.empty() && (list.front().time < secs - applysmooth)) {
                 DataPoint &dp = list.front();
                 totalWatts -= dp.watts;
@@ -1922,11 +1986,16 @@ AllPlot::recalc(AllPlotObject *objects)
                 totalLPPPE  -= dp.lpppe;
                 totalRPPPE  -= dp.rpppe;
                 totalBalance   -= (dp.lrbalance>0?dp.lrbalance:50);
+                for(int k=0; k<utotals.count(); k++) utotals[k] -= dp.user[k];
+
                 list.removeFirst();
             }
+
             // TODO: this is wrong.  We should do a weighted average over the
             // seconds represented by each point...
             if (list.empty()) {
+
+                for (int k=0; k<objects->U.count(); k++) objects->U[k].smooth[secs] = 0.0;
                 objects->smoothWatts[secs] = 0.0;
                 objects->smoothNP[secs] = 0.0;
                 objects->smoothRV[secs] = 0.0;
@@ -1967,8 +2036,10 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothRPPP[secs] = QwtIntervalSample();
                 objects->smoothBalanceL[secs] = 50;
                 objects->smoothBalanceR[secs] = 50;
-            }
-            else {
+
+            } else {
+
+                for(int k=0; k<utotals.count(); k++) objects->U[k].smooth[secs] = utotals[k] / list.size();
                 objects->smoothWatts[secs]    = totalWatts / list.size();
                 objects->smoothNP[secs]    = totalNP / list.size();
                 objects->smoothRV[secs]    = totalRV / list.size();
@@ -1995,9 +2066,12 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothSlope[secs]      = totalSlope / double(list.size());
                 objects->smoothTemp[secs]      = totalTemp / list.size();
                 objects->smoothWind[secs]    = totalWind / list.size();
-                objects->smoothRelSpeed[secs] =  QwtIntervalSample( bydist ? totalDist : secs / 60.0, QwtInterval(qMin(totalWind / list.size(), totalSpeed / list.size()), qMax(totalWind / list.size(), totalSpeed / list.size()) ) );
                 objects->smoothTorque[secs]    = totalTorque / list.size();
-
+                objects->smoothRelSpeed[secs] =  QwtIntervalSample(bydist ? totalDist : secs / 60.0, 
+                                                                   QwtInterval(qMin(totalWind / list.size(),
+                                                                   totalSpeed / list.size()), 
+                                                                   qMax(totalWind / list.size(), 
+                                                                   totalSpeed / list.size())));
 
                 // left /right pedal data
                 double balance = totalBalance / list.size();
@@ -2037,6 +2111,7 @@ AllPlot::recalc(AllPlotObject *objects)
     } else {
 
         // no standard->smoothing .. just raw data
+        for (int k=0; k<objects->U.count(); k++) objects->U[k].smooth.resize(0);
         objects->smoothWatts.resize(0);
         objects->smoothNP.resize(0);
         objects->smoothGear.resize(0);
@@ -2081,6 +2156,8 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothBalanceL.resize(0);
         objects->smoothBalanceR.resize(0);
 
+        // fill with raw data
+        for (int k=0; k<objects->U.count(); k++) objects->U[k].smooth = objects->U[k].array;
         foreach (RideFilePoint *dp, rideItem->ride()->dataPoints()) {
             objects->smoothWatts.append(dp->watts);
             objects->smoothNP.append(dp->np);
@@ -2159,6 +2236,13 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->mCurve->setSamples(bydist ? objects->matchDist.data() : objects->matchTime.data(), 
                                     objects->match.data(), objects->match.count());
         setMatchLabels(objects);
+    }
+
+    // set curve.
+    for(int k=0; k<objects->U.count(); k++) {
+        if (!objects->U[k].array.empty()) {
+            objects->U[k].curve->setSamples(xaxis.data() + startingIndex, objects->U[k].smooth.data() + startingIndex, totalPoints);
+        }
     }
 
     if (!objects->wattsArray.empty()) {
@@ -5121,6 +5205,9 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
 void
 AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
 {
+//XXX  fixme up to set from USERDATA !!! 
+//XXX
+//XXX
     if (ride && ride->dataPoints().size()) {
         const RideFileDataPresent *dataPresent = ride->areDataPresent();
         int npoints = ride->dataPoints().size();
@@ -5178,6 +5265,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->rpppeArray.resize(dataPresent->rpppe ? npoints : 0);
         here->timeArray.resize(npoints);
         here->distanceArray.resize(npoints);
+        for(int k=0; k<here->U.count(); k++) here->U[k].array.resize(npoints);
 
         // attach appropriate curves
         here->wCurve->detach();
@@ -5350,6 +5438,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
             double msecs = round((point->secs - secs) * 100) * 10;
 
             here->timeArray[arrayLength]  = secs + msecs/1000;
+
+            for(int k=0; k<here->U.count(); k++) here->U[k].array[arrayLength] = window->userDataSeries[k]->vector[arrayLength];
             if (!here->wattsArray.empty()) here->wattsArray[arrayLength] = max(0, point->watts);
             if (!here->atissArray.empty()) here->atissArray[arrayLength] = max(0, point->atiss);
             if (!here->antissArray.empty()) here->antissArray[arrayLength] = max(0, point->antiss);
