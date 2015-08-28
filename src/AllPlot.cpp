@@ -506,6 +506,7 @@ AllPlotObject::setUserData(QList<UserData*>user)
         add.curve = new QwtPlotCurve(userdata->name);
         add.curve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
         add.curve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0)); // for now.
+        add.curve->attach(plot);
 
         // default the color
         add.color = userdata->color;
