@@ -499,6 +499,8 @@ AllPlotObject::setUserData(QList<UserData*>user)
 
     // setup the U array
     int k=0;
+    bool antialias = appsettings->value(this, GC_ANTIALIAS, true).toBool();
+
     foreach(UserData *userdata, user) {
 
         UserObject add;
@@ -519,6 +521,9 @@ AllPlotObject::setUserData(QList<UserData*>user)
         pen.setWidth(1.0);
         pen.setColor(userdata->color);
         add.curve->setPen(pen);
+
+        // antialias
+        if (antialias) add.curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
         // register
         U << add;
