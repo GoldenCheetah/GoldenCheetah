@@ -343,6 +343,7 @@ class CurveColors : public QObject
 
 // Plotting user data
 struct UserObject {
+    QString name, units;
     QVector<double> array;
     QVector<double> smooth;
     QwtPlotCurve    *curve;
