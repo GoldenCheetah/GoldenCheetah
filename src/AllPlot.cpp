@@ -498,14 +498,17 @@ AllPlotObject::setUserData(QList<UserData*>user)
     U.clear();
 
     // setup the U array
+    int k=0;
     foreach(UserData *userdata, user) {
 
         UserObject add;
 
         // create curve
+        add.name = userdata->name;
+        add.units = userdata->units;
         add.curve = new QwtPlotCurve(userdata->name);
         add.curve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
-        add.curve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0)); // for now.
+        add.curve->setYAxis(QwtAxisId(QwtAxis::yRight, 4 + k)); // for now.
         add.curve->attach(plot);
 
         // default the color
@@ -519,6 +522,38 @@ AllPlotObject::setUserData(QList<UserData*>user)
 
         // register
         U << add;
+
+        k++; // keep count
+    }
+
+    // reset the y axis to accomodate us
+    plot->setAxesCount(QwtAxis::yRight, 4 + U.count());
+    QPalette pal = plot->palette();
+    for(int k=0; k < U.count(); k++) {
+
+        // set axis
+        plot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight, 4 + k), 0);
+        plot->axisWidget(QwtAxisId(QwtAxis::yRight, 4 + k))->installEventFilter(this);
+
+        // scale and color for axis
+        ScaleScaleDraw *sd = new ScaleScaleDraw;
+        sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+        sd->enableComponent(ScaleScaleDraw::Ticks, false);
+        sd->enableComponent(ScaleScaleDraw::Backbone, false);
+        plot->setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 4 + k), sd);
+        pal.setColor(QPalette::WindowText, U[k].color);
+        pal.setColor(QPalette::Text, U[k].color);
+        plot->axisWidget(QwtAxisId(QwtAxis::yRight, 4 + k))->setPalette(pal);
+
+        // title
+        plot->setAxisTitle(QwtAxisId(QwtAxis::yRight, 4 + k), U[k].units);
+
+        // and hide if plot is scoped for only one series, for now
+        if (plot->scope != RideFile::none) {
+            plot->axisWidget(QwtAxisId(QwtAxis::yRight, 4 + k))->setVisible(false);
+            U[k].curve->setVisible(false);
+            U[k].curve->detach();
+        }
     }
 }
 
@@ -860,6 +895,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
         shade_zones = false;
 
     smooth = 1;
+    standard = NULL; // until its created
     wantxaxis = wantaxis = true;
     setAutoDelete(false); // no - we are managing it via the AllPlotObjects now
     referencePlot = NULL;
@@ -880,7 +916,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     // set the axes that we use.. yLeft 3 is ALWAYS the highlighter axes and never visible
     // yLeft 4 is balance stuff
     setAxesCount(QwtAxis::yLeft, 4);
-    setAxesCount(QwtAxis::yRight, 4);
+    setAxesCount(QwtAxis::yRight, 4 + window->userDataSeries.count());
     setAxesCount(QwtAxis::xBottom, 1);
 
     setXTitle();
@@ -923,6 +959,11 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     axisWidget(QwtAxisId(QwtAxis::yRight, 1))->installEventFilter(this);
     axisWidget(QwtAxisId(QwtAxis::yRight, 2))->installEventFilter(this);
     axisWidget(QwtAxisId(QwtAxis::yRight, 3))->installEventFilter(this);
+
+    for(int k=0; k < standard->U.count(); k++) {
+        setAxisMaxMinor(QwtAxisId(QwtAxis::yRight, 4 + k), 0);
+        axisWidget(QwtAxisId(QwtAxis::yRight, 4 + k))->installEventFilter(this);
+    }
 
     configChanged(CONFIG_APPEARANCE); // set colors
 }
@@ -1395,7 +1436,6 @@ AllPlot::configChanged(qint32)
     pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
     axisWidget(QwtAxisId(QwtAxis::yLeft, 3))->setPalette(pal);
-
 
     sd = new ScaleScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -2593,9 +2633,16 @@ AllPlot::replot() {
 void
 AllPlot::setYMax()
 {
+//XXX partially updated to hide userdata axis
+
     // first lets show or hide, otherwise all the efforts to set scales
     // etc are ignored because the axis is not visible
     if (wantaxis) {
+
+        // hide user data axis
+        for(int k=0; k<standard->U.count(); k++) {
+            setAxisVisible(QwtAxisId(QwtAxis::yRight, 4+k), standard->U[k].curve->isVisible());
+        }
 
         setAxisVisible(yLeft, standard->wattsCurve->isVisible() || 
                               standard->atissCurve->isVisible() || 
@@ -2633,7 +2680,10 @@ AllPlot::setYMax()
         setAxisVisible(QwtAxisId(QwtPlot::yRight,1), false);
         setAxisVisible(QwtAxisId(QwtAxis::yRight,2), false);
         setAxisVisible(QwtAxisId(QwtAxis::yRight,3), false);
-
+        // hide user data axis
+        for(int k=0; k<standard->U.count(); k++) {
+            setAxisVisible(QwtAxisId(QwtAxis::yRight, 4+k), false);
+        }
     }
 
     // might want xaxis
@@ -2954,6 +3004,7 @@ static void setSymbol(QwtPlotCurve *curve, int points)
 void
 AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 {
+//XXX updated for user data
     if (plot == NULL) {
         rideItem = NULL;
         return;
@@ -2963,7 +3014,6 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     isolation = false;
     curveColors->saveState();
-
 
     // You got to give me some data first!
     if (!plot->standard->distanceArray.count() || !plot->standard->timeArray.count()) return;
@@ -2988,6 +3038,11 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     // make sure indexes are still valid
     if (startidx > stopidx || startidx < 0 || stopidx < 0) return;
+
+    // user data smoothing
+    QList<double*> smoothU;
+    for(int k=0; k<plot->standard->U.count(); k++)
+        smoothU << &plot->standard->U[k].smooth[startidx];
 
     double *smoothW = &plot->standard->smoothWatts[startidx];
     double *smoothN = &plot->standard->smoothNP[startidx];
@@ -3084,6 +3139,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         standard->curveTitle.setLabel(QwtText(""));
     }
 
+    for(int k=0; k<standard->U.count(); k++) standard->U[k].curve->detach();
     standard->wCurve->detach();
     standard->mCurve->detach();
     standard->wattsCurve->detach();
@@ -3128,6 +3184,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->lpppCurve->detach();
     standard->rpppCurve->detach();
 
+    for(int k=0; k<standard->U.count(); k++) standard->U[k].curve->setVisible(true);
     standard->wattsCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState < 2);
     standard->atissCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showATISS);
     standard->antissCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showANTISS);
@@ -3180,6 +3237,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         setMatchLabels(standard);
     }
     int points = stopidx - startidx + 1; // e.g. 10 to 12 is 3 points 10,11,12, so not 12-10 !
+    for(int k=0; k<standard->U.count(); k++) standard->U[k].curve->setSamples(xaxis,smoothU[k], points);
     standard->wattsCurve->setSamples(xaxis,smoothW,points);
     standard->atissCurve->setSamples(xaxis,smoothAT,points);
     standard->antissCurve->setSamples(xaxis,smoothANT,points);
@@ -3243,6 +3301,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         tmpWND.append(inter); // plot->standard->smoothRelSpeed.at(i)
     }*/
 
+    for(int k=0; k<standard->U.count(); k++) setSymbol(standard->U[k].curve, points);
     setSymbol(standard->wCurve, points);
     setSymbol(standard->wattsCurve, points);
     setSymbol(standard->antissCurve, points);
@@ -3280,6 +3339,13 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     setSymbol(standard->rpsCurve, points);
     setSymbol(standard->lpcoCurve, points);
     setSymbol(standard->rpcoCurve, points);
+
+    // show if got data
+    for(int k=0; k<standard->U.count(); k++) {
+        if (!plot->standard->U[k].smooth.empty()) {
+            standard->U[k].curve->attach(this);
+        }
+    }
 
     if (!plot->standard->smoothAltitude.empty()) {
         standard->altCurve->attach(this);
@@ -3420,6 +3486,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 void
 AllPlot::setDataFromPlot(AllPlot *plot)
 {
+//XXX modded to hide curve only
     if (plot == NULL) {
         rideItem = NULL;
         return;
@@ -3435,6 +3502,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     bydist = plot->bydist;
 
     // remove all curves from the plot
+    for(int k=0; k<standard->U.count(); k++) standard->U[k].curve->detach();
     standard->wCurve->detach();
     standard->mCurve->detach();
     standard->wattsCurve->detach();
@@ -3479,6 +3547,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->lpppCurve->detach();
     standard->rpppCurve->detach();
 
+    for(int k=0; k<standard->U.count(); k++) standard->U[k].curve->setVisible(false);
     standard->wCurve->setVisible(false);
     standard->mCurve->setVisible(false);
     standard->wattsCurve->setVisible(false);
@@ -6952,6 +7021,14 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 
     axes << axisWidget(QwtAxisId(QwtAxis::yRight, 3));
     axesId << QwtAxisId(QwtAxis::yRight, 3);
+
+    // user axis
+    if (standard) {
+        for(int k=0; k<standard->U.count(); k++) {
+            axes << axisWidget(QwtAxisId(QwtAxis::yRight, 4 + k));
+            axesId << QwtAxisId(QwtAxis::yRight, 4 + k);
+        }
+    }
 
     if (axes.contains(obj)) {
 
