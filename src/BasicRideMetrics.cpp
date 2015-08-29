@@ -1791,6 +1791,46 @@ static bool maxHrAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
+class MinHr : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MinHr)
+    double min;
+    public:
+    MinHr() : min(0.0)
+    {
+        setSymbol("min_heartrate");
+        setInternalName("Min Heartrate");
+    }
+    void initialize() {
+        setName(tr("Min Heartrate"));
+        setMetricUnits(tr("bpm"));
+        setImperialUnits(tr("bpm"));
+        setType(RideMetric::Peak);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+        bool notset = true;
+        min = 0;
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->hr > 0 && (notset || point->hr < min)) {
+                min = point->hr;
+                notset = false;
+            }
+        }
+        setValue(min);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("H"); }
+
+    RideMetric *clone() const { return new MinHr(*this); }
+};
+
+static bool minHrAdded =
+    RideMetricFactory::instance().addMetric(MinHr());
+
+//////////////////////////////////////////////////////////////////////////////
+
 class MaxCT : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(MaxCT)
     double max;
