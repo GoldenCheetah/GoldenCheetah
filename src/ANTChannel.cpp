@@ -679,7 +679,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                parent->setFecChannel(number);
                // we don't seem to receive ACK messages, so use this workaround
                // to ensure load is always set correctly
-               if ((fecRefreshCounter++ % 10) == 0)
+               if ((fecRefreshCounter++ % 10) == 0 && parent->modeERGO())
                {
                    parent->refreshFecLoad();
                }

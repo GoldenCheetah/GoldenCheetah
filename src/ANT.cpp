@@ -170,6 +170,11 @@ void ANT::setBaud(int x)
     baud = x;
 }
 
+bool ANT::modeERGO(void) const
+{
+    return mode==RT_MODE_ERGO; 
+}
+
 double ANT::channelValue2(int channel)
 {
     return antChannel[channel]->channelValue2();
