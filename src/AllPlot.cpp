@@ -522,6 +522,14 @@ AllPlotObject::setUserData(QList<UserData*>user)
         pen.setColor(userdata->color);
         add.curve->setPen(pen);
 
+        if (plot->fill) {
+            QColor p = add.color;
+            p.setAlpha(64);
+            add.curve->setBrush(QBrush(p));
+        } else {
+            add.curve->setBrush(Qt::NoBrush);
+        }
+
         // antialias
         if (antialias) add.curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
@@ -1199,6 +1207,13 @@ AllPlot::configChanged(qint32)
 
     // curve brushes
     if (fill) {
+
+        for(int k=0; k<standard->U.count(); k++) {
+            QColor p = standard->U[k].color;
+            p.setAlpha(64);
+            standard->U[k].curve->setBrush(QBrush(p));
+        }
+
         QColor p;
         p = standard->wattsCurve->pen().color();
         p.setAlpha(64);
@@ -1360,6 +1375,9 @@ AllPlot::configChanged(qint32)
         p.setAlpha(64);
         standard->balanceRCurve->setBrush(QBrush(p));*/
     } else {
+        for(int k=0; k<standard->U.count(); k++) {
+            standard->U[k].curve->setBrush(Qt::NoBrush);
+        }
         standard->wattsCurve->setBrush(Qt::NoBrush);
         standard->atissCurve->setBrush(Qt::NoBrush);
         standard->antissCurve->setBrush(Qt::NoBrush);
@@ -6372,6 +6390,12 @@ AllPlot::setPaintBrush(int state)
     fill = state;
     if (state) {
 
+        for(int k=0; k<standard->U.count(); k++) {
+            QColor p = standard->U[k].color;
+            p.setAlpha(64);
+            standard->U[k].curve->setBrush(QBrush(p));
+        }
+
         QColor p;
         p = standard->wCurve->pen().color();
         p.setAlpha(64);
@@ -6514,6 +6538,10 @@ AllPlot::setPaintBrush(int state)
         p.setAlpha(64);
         standard->balanceRCurve->setBrush(QBrush(p));*/
     } else {
+        for(int k=0; k<standard->U.count(); k++) {
+            standard->U[k].curve->setBrush(Qt::NoBrush);
+        }
+
         standard->wCurve->setBrush(Qt::NoBrush);
         standard->wattsCurve->setBrush(Qt::NoBrush);
         standard->npCurve->setBrush(Qt::NoBrush);
