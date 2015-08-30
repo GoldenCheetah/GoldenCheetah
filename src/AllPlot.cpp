@@ -490,10 +490,10 @@ AllPlotObject::setUserData(QList<UserData*>user)
 {
     // wipe away current
     // user objects
-    foreach(UserObject u, U) {
+    for(int k=0; k<U.count(); k++) {
 
         // wipe any curves
-        u.curve->detach(); delete u.curve;
+        U[k].curve->detach(); delete U[k].curve;
     }
     U.clear();
 
@@ -508,7 +508,7 @@ AllPlotObject::setUserData(QList<UserData*>user)
         // create curve
         add.name = userdata->name;
         add.units = userdata->units;
-        add.curve = new QwtPlotCurve(userdata->name);
+        add.curve = new QwtPlotGappedCurve(userdata->name, 3);
         add.curve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
         add.curve->setYAxis(QwtAxisId(QwtAxis::yRight, 4 + k)); // for now.
         add.curve->attach(plot);
@@ -538,7 +538,7 @@ AllPlotObject::setUserData(QList<UserData*>user)
 
         // set axis
         plot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight, 4 + k), 0);
-        plot->axisWidget(QwtAxisId(QwtAxis::yRight, 4 + k))->installEventFilter(this);
+        plot->axisWidget(QwtAxisId(QwtAxis::yRight, 4 + k))->installEventFilter(plot);
 
         // scale and color for axis
         ScaleScaleDraw *sd = new ScaleScaleDraw;
@@ -560,6 +560,7 @@ AllPlotObject::setUserData(QList<UserData*>user)
             U[k].curve->detach();
         }
     }
+    plot->curveColors->saveState();
 }
 
 // we tend to only do this for the compare objects
@@ -2638,8 +2639,6 @@ AllPlot::replot() {
 void
 AllPlot::setYMax()
 {
-//XXX partially updated to hide userdata axis
-
     // first lets show or hide, otherwise all the efforts to set scales
     // etc are ignored because the axis is not visible
     if (wantaxis) {
@@ -3009,7 +3008,6 @@ static void setSymbol(QwtPlotCurve *curve, int points)
 void
 AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 {
-//XXX updated for user data
     if (plot == NULL) {
         rideItem = NULL;
         return;
@@ -3491,7 +3489,6 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 void
 AllPlot::setDataFromPlot(AllPlot *plot)
 {
-//XXX modded to hide curve only
     if (plot == NULL) {
         rideItem = NULL;
         return;
@@ -3936,6 +3933,14 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         break;
 
     default:
+        if (scope > RideFile::none) {
+
+            // user defined series
+            int index = scope - (RideFile::none+1);
+            ourCurve = standard->U[index].curve;
+            thereCurve = referencePlot->standard->U[index].curve;
+            title = referencePlot->standard->U[index].name;
+        }
     case RideFile::interval:
     case RideFile::vam:
     case RideFile::wattsKg:
@@ -4124,6 +4129,10 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 1), false);
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 2), false);
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 3), false);
+
+        // hide user axes
+        for(int k=0; k<standard->U.count(); k++)
+            setAxisVisible(QwtAxisId(QwtAxis::yRight, 4 + k), false);
 
         // plot standard->grid
         standard->grid->setVisible(referencePlot->standard->grid->isVisible());
@@ -5280,9 +5289,6 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
 void
 AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
 {
-//XXX  fixme up to set from USERDATA !!! 
-//XXX
-//XXX
     if (ride && ride->dataPoints().size()) {
         const RideFileDataPresent *dataPresent = ride->areDataPresent();
         int npoints = ride->dataPoints().size();

@@ -972,16 +972,26 @@ AllPlotWindow::setUserData(QString settings)
     foreach(QString set, snips)
         userDataSeries << new UserData(set);
 
-    // tell full plot we have some.
+    // fill with the current rideItem
+    setRideForUserData();
+    
+    // tell full plot we have some and get allplot
+    // to match too, since it sets from fullplot
     fullPlot->standard->setUserData(userDataSeries);
+    allPlot->standard->setUserData(userDataSeries);
 
     // and update table
     refreshCustomTable();
+
+    // replot
+    forceReplot();
 }
 
 void 
 AllPlotWindow::setRideForUserData()
 {
+    if (!current) return;
+
     // user data needs refreshing
     foreach(UserData *x, userDataSeries) x->setRideItem(current);
 }
@@ -1058,6 +1068,10 @@ AllPlotWindow::editUserData()
 
         // tell full plot we have some.
         fullPlot->standard->setUserData(userDataSeries);
+        allPlot->standard->setUserData(userDataSeries);
+
+        // replot
+        forceReplot();
 
     }
 }
@@ -1085,6 +1099,10 @@ AllPlotWindow::doubleClicked( int row, int )
 
         // tell full plot we have some.
         fullPlot->standard->setUserData(userDataSeries);
+        allPlot->standard->setUserData(userDataSeries);
+
+        // replot
+        forceReplot();
     }
 }
 
@@ -1106,6 +1124,10 @@ AllPlotWindow::deleteUserData()
 
     // tell full plot we have some.
     fullPlot->standard->setUserData(userDataSeries);
+    allPlot->standard->setUserData(userDataSeries);
+
+    // replot
+    forceReplot();
 }
 
 void
@@ -1123,6 +1145,10 @@ AllPlotWindow::addUserData()
 
         // tell full plot we have some.
         fullPlot->standard->setUserData(userDataSeries);
+        allPlot->standard->setUserData(userDataSeries);
+
+        // replot
+        forceReplot();
     }
 }
 
@@ -1141,6 +1167,10 @@ AllPlotWindow::moveUserDataUp()
 
         // tell full plot we have some.
         fullPlot->standard->setUserData(userDataSeries);
+        allPlot->standard->setUserData(userDataSeries);
+
+        // replot
+        forceReplot();
     }
 }
 
@@ -1159,6 +1189,10 @@ AllPlotWindow::moveUserDataDown()
 
         // tell full plot we have some.
         fullPlot->standard->setUserData(userDataSeries);
+        allPlot->standard->setUserData(userDataSeries);
+
+        // replot
+        forceReplot();
     }
 }
 
@@ -1758,14 +1792,13 @@ AllPlotWindow::rideSelected()
         startidx = ride->ride()->timeIndex( spanSlider->lowerValue() );
         stopidx = ride->ride()->timeIndex( spanSlider->upperValue() );
     }
-    allPlot->setDataFromPlot( fullPlot, startidx, stopidx );
 
     // redraw all the plots, they will check
     // to see if they are currently visible
     // and only redraw if neccessary
     redrawFullPlot();
-    redrawIntervalPlot();
     redrawAllPlot();
+    redrawIntervalPlot();
 
     // we need to reset the stacks as the ride has changed
     // but it may ignore if not in stacked mode.
@@ -3581,6 +3614,13 @@ AllPlotWindow::setupSeriesStackPlots()
          s.one = RideFile::rppb; s.two = RideFile::rppe; serieslist << s; }
     if (showPPP->isChecked() && rideItem->ride()->areDataPresent()->lpppb) { s.one = RideFile::lpppb; s.two = RideFile::lpppe; serieslist << s;
          s.one = RideFile::rpppb; s.two = RideFile::rpppe; serieslist << s; }
+
+    // and the user series
+    for(int k=0; k<userDataSeries.count(); k++) {
+        s.one = static_cast<RideFile::SeriesType>(RideFile::none + 1 + k);
+        s.two = RideFile::none;
+        serieslist << s;
+    }
 
     bool first = true;
     foreach(SeriesWanted x, serieslist) {
