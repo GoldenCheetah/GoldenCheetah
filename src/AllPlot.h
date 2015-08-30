@@ -49,6 +49,7 @@
 #include "RideFile.h"
 
 class QwtPlotCurve;
+class QwtPlotGappedCurve;
 class QwtPlotIntervalCurve;
 class QwtPlotGrid;
 class QwtPlotMarker;
@@ -346,7 +347,7 @@ struct UserObject {
     QString name, units;
     QVector<double> array;
     QVector<double> smooth;
-    QwtPlotCurve    *curve;
+    QwtPlotGappedCurve    *curve;
     QColor          color;
 };
 
