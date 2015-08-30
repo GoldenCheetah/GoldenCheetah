@@ -402,6 +402,8 @@ public:
     int rawRead(uint8_t bytes[], int size);
     int rawWrite(uint8_t *bytes, int size);
 
+    bool modeERGO(void) const;
+
     // channels update our telemetry
     double channelValue(int channel);
     double channelValue2(int channel);
