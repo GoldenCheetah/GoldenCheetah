@@ -5285,7 +5285,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
 }
 
 void
-AllPlot::setDataFromRide(RideItem *_rideItem)
+AllPlot::setDataFromRide(RideItem *_rideItem, QList<UserData*>user)
 {
     rideItem = _rideItem;
     if (_rideItem == NULL) return;
@@ -5297,7 +5297,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
     //standard->wattsArray.clear();
     //standard->curveTitle.setLabel(QwtText(QString(""), QwtText::PlainText)); // default to no title
 
-    setDataFromRideFile(rideItem->ride(), standard);
+    setDataFromRideFile(rideItem->ride(), standard, user);
 
     // remember the curves and colors
     isolation = false;
@@ -5305,7 +5305,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
 }
 
 void
-AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
+AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here, QList<UserData*>user)
 {
     if (ride && ride->dataPoints().size()) {
         const RideFileDataPresent *dataPresent = ride->areDataPresent();
@@ -5364,7 +5364,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->rpppeArray.resize(dataPresent->rpppe ? npoints : 0);
         here->timeArray.resize(npoints);
         here->distanceArray.resize(npoints);
-        for(int k=0; k<here->U.count(); k++) here->U[k].array.resize(npoints);
+        for(int k=0; k<user.count(); k++) here->U[k].array.resize(npoints);
 
         // attach appropriate curves
         here->wCurve->detach();
@@ -5538,7 +5538,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
 
             here->timeArray[arrayLength]  = secs + msecs/1000;
 
-            for(int k=0; k<here->U.count(); k++) here->U[k].array[arrayLength] = window->userDataSeries[k]->vector[arrayLength];
+            for(int k=0; k<user.count(); k++) here->U[k].array[arrayLength] = user[k]->vector[arrayLength];
             if (!here->wattsArray.empty()) here->wattsArray[arrayLength] = max(0, point->watts);
             if (!here->atissArray.empty()) here->atissArray[arrayLength] = max(0, point->atiss);
             if (!here->antissArray.empty()) here->antissArray[arrayLength] = max(0, point->antiss);
