@@ -385,6 +385,7 @@ class AllPlotWindow : public GcChartWindow
 
         // user data series widgets
         QList<UserData*> userDataSeries;
+        QList<QList<UserData*> > compareUserDataSeries;
 
         // comparing 
         QList<AllPlotObject*> compareIntervalCurves; // one per compareInterval
