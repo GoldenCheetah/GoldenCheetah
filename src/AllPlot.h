@@ -557,8 +557,8 @@ class AllPlot : public QwtPlot
         bool eventFilter(QObject *object, QEvent *e);
 
         // set the curve data e.g. when a ride is selected
-        void setDataFromRide(RideItem *_rideItem);
-        void setDataFromRideFile(RideFile *ride, AllPlotObject *object); // when plotting lots of rides on fullPlot
+        void setDataFromRide(RideItem *_rideItem, QList<UserData*>);
+        void setDataFromRideFile(RideFile *ride, AllPlotObject *object, QList<UserData*>); // when plotting lots of rides on fullPlot
         void setDataFromPlot(AllPlot *plot, int startidx, int stopidx);
         void setDataFromPlot(AllPlot *plot); // used for single series plotting
         void setDataFromPlots(QList<AllPlot*>); // user for single series comparing

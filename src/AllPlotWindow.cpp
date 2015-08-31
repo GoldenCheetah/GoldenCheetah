@@ -1243,7 +1243,7 @@ AllPlotWindow::compareChanged()
 
         // first, lets init fullPlot, just in case its never
         // been set (ie, switched to us before ever plotting a ride
-        if (myRideItem) fullPlot->setDataFromRide(myRideItem);
+        if (myRideItem) fullPlot->setDataFromRide(myRideItem, QList<UserData*>()); //XXX
 
         // and even if the current ride is blank, we're not
         // going to be blank !!
@@ -1265,7 +1265,7 @@ AllPlotWindow::compareChanged()
         foreach(CompareInterval ci, context->compareIntervals) {
 
             AllPlotObject *po = new AllPlotObject(fullPlot, userDataSeries);
-            if (ci.isChecked()) fullPlot->setDataFromRideFile(ci.data, po);
+            if (ci.isChecked()) fullPlot->setDataFromRideFile(ci.data, po, QList<UserData*>());
 
             // what was the maximum x value?
             if (po->maxKM > maxKM) maxKM = po->maxKM;
@@ -1463,6 +1463,10 @@ AllPlotWindow::compareChanged()
             plot->setAxisVisible(QwtPlot::xBottom, true);
             plot->enableAxis(QwtPlot::xBottom, true);
             plot->setAxisTitle(QwtPlot::xBottom,NULL);
+
+            // get rid of the User Data axis
+            for(int k=0; k<userDataSeries.count(); k++) 
+                plot->setAxisVisible(QwtAxisId(QwtAxis::yRight,4 + k), false);
 
             // common y axis
             QwtScaleDraw *sd = new QwtScaleDraw;
@@ -1779,7 +1783,7 @@ AllPlotWindow::rideSelected()
     setAllPlotWidgets(ride);
 
     // setup the charts to reflect current ride selection
-    fullPlot->setDataFromRide(ride);
+    fullPlot->setDataFromRide(ride, userDataSeries);
     intervalPlot->setDataFromRide(ride);
 
 
@@ -1821,7 +1825,7 @@ AllPlotWindow::rideDeleted(RideItem *ride)
         // they will try and reference AllPlot::rideItem
         if (!isCompare()) {
             setAllPlotWidgets(NULL);
-            fullPlot->setDataFromRide(NULL);
+            fullPlot->setDataFromRide(NULL,QList<UserData*>());
         }
     }
 }
