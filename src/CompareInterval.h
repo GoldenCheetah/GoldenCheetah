@@ -22,10 +22,12 @@
 class Context;
 class RideFile;
 class RideFileCache;
+class RideItem;
 
 #include <QObject>
 #include <QColor>
 #include <QUuid>
+
 
 class CompareInterval
 {
@@ -36,6 +38,8 @@ class CompareInterval
 
         Context *context;
         QString name;
+
+        RideItem *rideItem; // fake for use with DataFilter eval
         RideFile *data;
         QColor color;
         Context *sourceContext;

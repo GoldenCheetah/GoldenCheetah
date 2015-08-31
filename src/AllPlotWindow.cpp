@@ -1264,8 +1264,8 @@ AllPlotWindow::compareChanged()
         if (fullPlot->smooth < 1) fullPlot->smooth = 1;
         foreach(CompareInterval ci, context->compareIntervals) {
 
-            AllPlotObject *po = new AllPlotObject(fullPlot, userDataSeries);
-            if (ci.isChecked()) fullPlot->setDataFromRideFile(ci.data, po, QList<UserData*>());
+            AllPlotObject *po = new AllPlotObject(fullPlot, QList<UserData*>()); //XXX
+            if (ci.isChecked()) fullPlot->setDataFromRideFile(ci.data, po, QList<UserData*>()); //XXX
 
             // what was the maximum x value?
             if (po->maxKM > maxKM) maxKM = po->maxKM;
