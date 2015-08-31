@@ -4177,6 +4177,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     curveColors->saveState();
 
     // remove all curves from the plot
+    for(int k=0; k<standard->U.count(); k++) standard->U[k].curve->detach();
     standard->wCurve->detach();
     standard->mCurve->detach();
     standard->wattsCurve->detach();
@@ -4221,6 +4222,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->lpppCurve->detach();
     standard->rpppCurve->detach();
 
+    for(int k=0; k<standard->U.count(); k++) standard->U[k].curve->setVisible(false);
     standard->wCurve->setVisible(false);
     standard->mCurve->setVisible(false);
     standard->wattsCurve->setVisible(false);
@@ -4672,6 +4674,14 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                 break;
 
             default:
+                if (scope > RideFile::none) {
+
+                    // user defined series
+                    int index = scope - (RideFile::none+1);
+                    ourCurve = static_cast<QwtPlotCurve*>(new QwtPlotGappedCurve(referencePlot->standard->U[index].name, 3));
+                    thereCurve = referencePlot->standard->U[index].curve;
+                    title = referencePlot->standard->U[index].name;
+                }
             case RideFile::interval:
             case RideFile::vam:
             case RideFile::wattsKg:
@@ -4701,10 +4711,13 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                     ourCurve->attach(this);
 
                     // lets clone the data
-                    QVector<QPointF> array;
-                    for (size_t i=0; i<thereCurve->data()->size(); i++) array << thereCurve->data()->sample(i);
+                    QVector<double> x,y;
+                    for (size_t i=0; i<thereCurve->data()->size(); i++) {
+                        x << thereCurve->data()->sample(i).x();
+                        y << thereCurve->data()->sample(i).y();
+                    }
 
-                    ourCurve->setSamples(array);
+                    ourCurve->setSamples(x,y);
                     ourCurve->setYAxis(yLeft);
                     ourCurve->setBaseline(thereCurve->baseline());
 
@@ -4712,7 +4725,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                     if (ourCurve->minYValue() < MINY) MINY = ourCurve->minYValue();
 
                     // symbol when zoomed in super close
-                    if (array.size() < 150) {
+                    if (x.size() < 150) {
                         QwtSymbol *sym = new QwtSymbol;
                         sym->setPen(QPen(GColor(CPLOTMARKER)));
                         sym->setStyle(QwtSymbol::Ellipse);
@@ -4886,6 +4899,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     bydist = reference->bydist;
 
     // remove all curves from the plot
+    for(int k=0; k<standard->U.count(); k++) standard->U[k].curve->detach();
     standard->wCurve->detach();
     standard->mCurve->detach();
     standard->wattsCurve->detach();
@@ -4926,6 +4940,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->intervalHighlighterCurve->detach();
     standard->intervalHoverCurve->detach();
 
+    for(int k=0; k<standard->U.count(); k++) standard->U[k].curve->setVisible(false);
     standard->wCurve->setVisible(false);
     standard->mCurve->setVisible(false);
     standard->wattsCurve->setVisible(false);
@@ -4977,6 +4992,17 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
         standard->mCurve->setSamples(bydist ? object->matchDist.data() : object->matchTime.data(), 
                                     object->match.data(), object->match.count());
         setMatchLabels(standard);
+    }
+
+    // show user data curves
+    for(int k=0; k< standard->U.count() && k<object->U.count(); k++) {
+
+        if (!object->U[k].smooth.empty()) {
+
+            standard->U[k].curve->setSamples(xaxis.data(), object->U[k].smooth.data(), totalPoints);
+            standard->U[k].curve->attach(this);
+            standard->U[k].curve->setVisible(true);
+        }
     }
 
     if (!object->wattsArray.empty()) {
@@ -5616,6 +5642,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here, QList<UserData
             ++arrayLength;
         }
         recalc(here);
+
     }
     else {
         //setTitle("no data");

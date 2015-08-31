@@ -1238,12 +1238,30 @@ AllPlotWindow::compareChanged()
     foreach(AllPlotObject *p, compareIntervalCurves) delete p;
     compareIntervalCurves.clear();
 
+    // clean away old compare user data
+    foreach(QList<UserData*>user, compareUserDataSeries) {
+        foreach(UserData *p, user)
+            delete p;
+    }
+    compareUserDataSeries.clear();
+
     // new ones ..
     if (context->isCompareIntervals) {
 
+        // generate the user data series for each interval
+        foreach(CompareInterval ci, context->compareIntervals) {
+            QList<UserData*> list;
+            foreach(UserData *u, userDataSeries) {
+                UserData *p = new UserData(u->name, u->units, u->formula, ci.color); // use context for interval
+                p->setRideItem(ci.rideItem);
+                list << p;
+            }
+            compareUserDataSeries << list;
+        }
+
         // first, lets init fullPlot, just in case its never
         // been set (ie, switched to us before ever plotting a ride
-        if (myRideItem) fullPlot->setDataFromRide(myRideItem, QList<UserData*>()); //XXX
+        if (myRideItem) fullPlot->setDataFromRide(myRideItem, QList<UserData*>());
 
         // and even if the current ride is blank, we're not
         // going to be blank !!
@@ -1262,10 +1280,11 @@ AllPlotWindow::compareChanged()
 
         fullPlot->standard->setVisible(false);
         if (fullPlot->smooth < 1) fullPlot->smooth = 1;
+        int k=0;
         foreach(CompareInterval ci, context->compareIntervals) {
 
-            AllPlotObject *po = new AllPlotObject(fullPlot, QList<UserData*>()); //XXX
-            if (ci.isChecked()) fullPlot->setDataFromRideFile(ci.data, po, QList<UserData*>()); //XXX
+            AllPlotObject *po = new AllPlotObject(fullPlot, compareUserDataSeries[k]);
+            if (ci.isChecked()) fullPlot->setDataFromRideFile(ci.data, po, compareUserDataSeries[k]);
 
             // what was the maximum x value?
             if (po->maxKM > maxKM) maxKM = po->maxKM;
@@ -1277,6 +1296,9 @@ AllPlotWindow::compareChanged()
 
             // remember
             compareIntervalCurves << po;
+
+            // next
+            k++;
         }
 
         // what is the longest compareInterval?
@@ -1284,10 +1306,12 @@ AllPlotWindow::compareChanged()
         else fullPlot->setAxisScale(QwtPlot::xBottom, 0, maxSECS/60);
 
         // now set it it in all the compare objects so they all get set
-        // to the same time / duration
+        // to the same time / duration and all the data is set too
+        k=0;
         foreach (AllPlotObject *po, compareIntervalCurves) {
             po->maxKM = maxKM;
             po->maxSECS = maxSECS;
+            k++;
         }
 
         if (fullPlot->bydist == false) {
@@ -1325,6 +1349,8 @@ AllPlotWindow::compareChanged()
             AllPlot *ap = new AllPlot(this, this, context);
             ap->bydist = fullPlot->bydist;
             ap->setShadeZones(showPower->currentIndex() == 0);
+
+            // user data series needs setting up
             ap->setDataFromObject(compareIntervalCurves[i], fullPlot);
 
             // simpler to keep the indexes aligned
@@ -1407,6 +1433,13 @@ AllPlotWindow::compareChanged()
         if (showAP->isChecked()) { s.one = RideFile::aPower; s.two = RideFile::none; wanted << s;};
         if (showBalance->isChecked()) { s.one = RideFile::lrbalance; s.two = RideFile::none; wanted << s;};
 
+        // and the user series
+        for(int k=0; k<userDataSeries.count(); k++) {
+            s.one = static_cast<RideFile::SeriesType>(RideFile::none + 1 + k);
+            s.two = RideFile::none;
+            wanted << s;
+        }
+
         /*
         if (showTE->isChecked()) {
             s.one = RideFile::lte; s.two = RideFile::none; wanted << s;
@@ -1474,18 +1507,34 @@ AllPlotWindow::compareChanged()
             sd->enableComponent(QwtScaleDraw::Ticks, false);
             sd->enableComponent(QwtScaleDraw::Backbone, false);
             plot->setAxisScaleDraw(QwtPlot::yLeft, sd);
-    
-            // y-axis title and colour
-            if (x.one == RideFile::alt && x.two == RideFile::slope) {
-                plot->setAxisTitle(QwtPlot::yLeft, tr("Alt/Slope"));
-                plot->showAltSlopeState = allPlot->showAltSlopeState;
-                plot->setAltSlopePlotStyle(allPlot->standard->altSlopeCurve);
-               } else {
-                plot->setAxisTitle(QwtPlot::yLeft, RideFile::seriesName(x.one));
-            }
+   
+            // default paletter override below if needed 
             QPalette pal;
             pal.setColor(QPalette::WindowText, RideFile::colorFor(x.one));
             pal.setColor(QPalette::Text, RideFile::colorFor(x.one));
+
+            // y-axis title and colour
+            if (x.one == RideFile::alt && x.two == RideFile::slope) {
+
+                // alt/slope special case
+                plot->setAxisTitle(QwtPlot::yLeft, tr("Alt/Slope"));
+                plot->showAltSlopeState = allPlot->showAltSlopeState;
+                plot->setAltSlopePlotStyle(allPlot->standard->altSlopeCurve);
+
+            } else {
+
+                // user defined series
+                if (x.one > RideFile::none) {
+                    int index = (int)(x.one) - (RideFile::none + 1);
+                    plot->setAxisTitle(QwtPlot::yLeft, userDataSeries[index]->name);
+                    pal.setColor(QPalette::WindowText, userDataSeries[index]->color);
+                    pal.setColor(QPalette::Text, userDataSeries[index]->color);
+                } else {
+                    // everything else
+                    plot->setAxisTitle(QwtPlot::yLeft, RideFile::seriesName(x.one));
+                }
+            }
+
             plot->axisWidget(QwtPlot::yLeft)->setPalette(pal);
 
             // remember them
