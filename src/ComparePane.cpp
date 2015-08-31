@@ -712,6 +712,7 @@ ComparePane::dropEvent(QDropEvent *event)
             add.data = new RideFile(ride);
             add.data->context = context;
 
+
             // manage offsets
             bool first = true;
             double offset = 0.0f, offsetKM = 0.0f;
@@ -749,6 +750,32 @@ ComparePane::dropEvent(QDropEvent *event)
             // we will of course repeat, but the user can
             // just edit them using the button
             add.color = standardColors.at((i + context->compareIntervals.count()) % standardColors.count());
+
+            // construct a fake RideItem, slightly hacky need to fix this later XXX fixme
+            //                            mostly cut and paste from RideItem::refresh
+            //                            we do this to support user data series in compare mode
+            //                            so UserData can be generated from this rideItem
+            add.rideItem = new RideItem(add.data, add.data->context);
+            add.rideItem->setFrom(*rideItem);
+            add.rideItem->metadata_ = add.data->tags();
+            add.rideItem->getWeight();
+            add.rideItem->isRun = add.data->isRun();
+            add.rideItem->isSwim = add.data->isSwim();
+            add.rideItem->present = add.data->getTag("Data", "");
+            add.rideItem->samples = add.data->dataPoints().count() > 0;
+            const RideMetricFactory &factory = RideMetricFactory::instance();
+            QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(add.data->context, add.data, add.data->context->athlete->zones(), 
+                                               add.data->context->athlete->hrZones(), factory.allMetrics());
+            add.rideItem->metrics_.fill(0, factory.metricCount());
+            QHashIterator<QString, RideMetricPtr> l(computed);
+            while (l.hasNext()) {
+                l.next();
+                add.rideItem->metrics_[l.value()->index()] = l.value()->value();
+            }
+            for(int j=0; j<factory.metricCount(); j++)
+                if (std::isinf(add.rideItem->metrics_[j]) || std::isnan(add.rideItem->metrics_[j]))
+                    add.rideItem->metrics_[j] = 0.00f;
+            // end of fake RideItem hack XXX
 
             // now add but only if not empty
             if (!add.data->dataPoints().empty()) newOnes << add;

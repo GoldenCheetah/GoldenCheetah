@@ -35,6 +35,7 @@ class RideCacheModel;
 class IntervalItem;
 class Context;
 class UserData;
+class ComparePane;
 
 Q_DECLARE_METATYPE(RideItem*)
 
@@ -51,6 +52,7 @@ class RideItem : public QObject
         friend class ::RideCacheModel;
         friend class ::IntervalItem;
         friend class ::UserData;
+        friend class ::ComparePane;
 
         // ridefile
         RideFile *ride_;
