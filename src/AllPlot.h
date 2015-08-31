@@ -179,7 +179,7 @@ class CurveColors : public QObject
                              static_cast<QwtPlotSeriesItem*>(item)->isVisible());
 
                 QwtScaleWidget *x = plot->axisWidget(static_cast<QwtPlotSeriesItem*>(item)->yAxis());
-                colors.insert(x, x->palette());
+                if (x) colors.insert(x, x->palette());
 
                 QwtPlotCurve *curve = static_cast<QwtPlotCurve*>(item);
 
@@ -197,7 +197,7 @@ class CurveColors : public QObject
                              static_cast<QwtPlotSeriesItem*>(item)->isVisible());
 
                 QwtScaleWidget *x = plot->axisWidget(static_cast<QwtPlotSeriesItem*>(item)->yAxis());
-                colors.insert(x, x->palette());
+                if (x) colors.insert(x, x->palette());
 
             }
         }
