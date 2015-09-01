@@ -67,6 +67,8 @@ class NewCyclistDialog : public QDialog
         QPixmap     avatar;
 
         QPushButton *cancel, *save;
+        virtual bool eventFilter(QObject *, QEvent *);
+
 };
 
 #endif

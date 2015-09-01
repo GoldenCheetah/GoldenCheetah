@@ -36,6 +36,11 @@
 #include <QDebug>
 #include <QWaitCondition>
 #include <QMessageBox>
+#include <QtConcurrent>
+#include <QFuture>
+
+static const QChar zero = QLatin1Char ( '0' );
+
 
 // drag and drop passes urls ... convert to a list of files and call main constructor
 RideImportWizard::RideImportWizard(QList<QUrl> *urls, Context *context, QWidget *parent) : QDialog(parent), context(context)
@@ -160,6 +165,50 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
 
 }
 
+void
+RideImportWizard::allocateRow(const QString filename, int i)
+{
+    // Filename
+    QTableWidgetItem *t = new QTableWidgetItem();
+    if (autoImportMode)
+        t->setText(QFileInfo(filename).canonicalFilePath());
+    else
+        t->setText(QFileInfo(filename).fileName());
+    t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+    tableWidget->setItem(i,0,t);
+    
+    // Date
+    t = new QTableWidgetItem();
+    t->setText(tr(""));
+    t->setFlags(t->flags()  | Qt::ItemIsEditable);
+    t->setBackgroundColor(Qt::red);
+    tableWidget->setItem(i,1,t);
+    
+    // Time
+    t = new QTableWidgetItem();
+    t->setText(tr(""));
+    t->setFlags(t->flags() | Qt::ItemIsEditable);
+    tableWidget->setItem(i,2,t);
+    
+    // Duration
+    t = new QTableWidgetItem();
+    t->setText(tr(""));
+    t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+    tableWidget->setItem(i,3,t);
+    
+    // Distance
+    t = new QTableWidgetItem();
+    t->setText(tr(""));
+    t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+    tableWidget->setItem(i,4,t);
+    
+    // Import Status
+    t = new QTableWidgetItem();
+    t->setText(tr(""));
+    t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+    tableWidget->setItem(i,5,t);
+}
+
 
 void
 RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
@@ -240,50 +289,11 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
 
     // Fill in the filenames and all the textItems
     for (int i=0; i < files.count(); i++) {
-        QTableWidgetItem *t;
 
         filenames.append(QFileInfo(files[i]).canonicalFilePath());
         blanks.append(true); // by default editable
 
-        // Filename
-        t = new QTableWidgetItem();
-        if (autoImportMode)
-            t->setText(QFileInfo(files[i]).canonicalFilePath());
-        else
-            t->setText(QFileInfo(files[i]).fileName());
-        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        tableWidget->setItem(i,0,t);
-
-        // Date
-        t = new QTableWidgetItem();
-        t->setText(tr(""));
-        t->setFlags(t->flags()  | Qt::ItemIsEditable);
-        t->setBackgroundColor(Qt::red);
-        tableWidget->setItem(i,1,t);
-
-        // Time
-        t = new QTableWidgetItem();
-        t->setText(tr(""));
-        t->setFlags(t->flags() | Qt::ItemIsEditable);
-        tableWidget->setItem(i,2,t);
-
-        // Duration
-        t = new QTableWidgetItem();
-        t->setText(tr(""));
-        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        tableWidget->setItem(i,3,t);
-
-        // Distance
-        t = new QTableWidgetItem();
-        t->setText(tr(""));
-        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        tableWidget->setItem(i,4,t);
-
-        // Import Status
-        t = new QTableWidgetItem();
-        t->setText(tr(""));
-        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        tableWidget->setItem(i,5,t);
+        allocateRow(files[i], i);
     }
 
     // put into our dialog box
@@ -343,9 +353,251 @@ RideImportWizard::getNumberOfFiles() {
     return numberOfFiles;
 }
 
+#define NITEMS(x) (int)(sizeof(x)/sizeof(x[0]))
+
+class ImportFutureStatus {
+public:
+    QString* text[6];
+    QString* filename;
+    int elapsedTime;
+    int index;
+    
+    ImportFutureStatus() {
+        // init all ptrs to null
+        for (int i = 0; i < NITEMS(text); i++) {
+            text[i] = NULL;
+        }
+        filename = NULL;
+    }
+    
+    virtual ~ImportFutureStatus() {}
+};
+
+
+
+// use multi-threading
+static bool futuresEnabled = true;
+
+/**
+ * This will allow putting the processing of one file into a background process.
+ */
+ImportFutureStatus RideImportWizard::processValidateFile(volatile bool *aborted, const QString filename, const int i)
+{
+    Q_ASSERT(filename != NULL);
+
+    ImportFutureStatus status;
+    status.index = i;
+    
+    QTime myTimer;
+    myTimer.start();
+    qDebug() << "ix: " << status.index << "Processing started for file: " << filename;
+    
+    status.filename = new QString(filename);
+    
+    if (*aborted) {
+        qDebug() << "Detected abort signal on index: " << i;
+        return status;
+    }
+    
+    QStringList errors;
+    QFile thisfile(filename);
+    
+    QList<RideFile*> rides;
+    RideFile *ride = RideFileFactory::instance().openRideFile(context, thisfile, errors, &rides);
+
+    if (*aborted) {
+        qDebug() << "Detected abort signal on index: " << i;
+        if (ride) delete ride;
+        return status;
+    }
+
+    int nMilliseconds = myTimer.elapsed();
+    qDebug() << "ix: " << status.index << "openRideFile took: " << nMilliseconds;
+    
+    // is this an archive of files?
+    if (rides.count() > 1) {
+        // for any archive-file we will push onto the tail of the table.
+        
+        int here = i;
+        
+        // remove current filename from state arrays and tableview
+        filenames.removeAt(here);
+        blanks.removeAt(here);
+        tableWidget->removeRow(here);
+        
+        // resize dialog according to the number of rows we expect
+        int willhave = filenames.count() + rides.count();
+        resize(920 + ((willhave > 16 ? 24 : 0) +
+                      ((willhave > 9 && willhave < 17) ? 8 : 0)),
+               118 + ((willhave > 16 ? 17*20 : (willhave+1) * 20)));
+        
+        
+        // ok so create a temporary file and add to the tableWidget
+        int counter = 0;
+        foreach(RideFile *extracted, rides) {
+            
+            // write as a temporary file, using the original
+            // filename with "-n" appended
+            QString fulltarget = QDir::tempPath() + "/" + QFileInfo(thisfile).baseName() + QString("-%1.tcx").arg(counter+1);
+            TcxFileReader reader;
+            QFile target(fulltarget);
+            reader.writeRideFile(context, extracted, target);
+            deleteMe.append(fulltarget);
+            delete extracted;
+            
+            if (*aborted) {
+                qDebug() << "Detected abort signal on index: " << i;
+                if (ride) delete ride;
+                return status;
+            }
+
+            // use a mutex here with a RAII guard to release when the insert & allocate into the table is completed
+            {QMutexLocker locker(&tableGrowMutex);
+            // now add each temporary file ...
+            filenames.append(fulltarget);
+            
+            // reset here to be the new size - append at the end.
+            here = filenames.size();
+            blanks.insert(here, true); // by default editable
+            tableWidget->insertRow(here+counter);
+            tableWidget->adjustSize();
+
+            allocateRow(fulltarget, here);
+            }
+            
+            if (futuresEnabled) {
+                // add a new file to the queue for processing
+                qDebug() << "ix: " << status.index << ", " << here <<  " SPLIT future for file: " << filenames[here];
+                QFuture<ImportFutureStatus> future = QtConcurrent::run(this, &RideImportWizard::processValidateFile, aborted, filenames[here], here);
+                synchronizer.addFuture(future);
+            } else {
+                ImportFutureStatus stat = processValidateFile(aborted, filenames[here], here);
+                processImportStatus(stat);
+            }
+        }
+        
+        if (!futuresEnabled) {
+            QApplication::processEvents();
+        }
+        
+        // progress bar needs to adjust...
+        //progressBar->setMaximum(filenames.count()*4);
+        
+        // then go back one and re-parse from there
+        rides.clear();
+        
+        //i--;
+        //goto next; // buttugly I know, but count em across 100,000 lines of code
+
+    }
+    
+    qDebug() << "ix: " << status.index << "checking ride for parsing";
+    
+    if (*aborted) {
+        qDebug() << "Detected abort signal on index: " << i;
+        if (ride) delete ride;
+        return status;
+    }
+
+    
+    // did it parse ok?
+    if (ride) {
+        
+        // ride != NULL but !errors.isEmpty() means they're just warnings
+        if (errors.isEmpty()) {
+            status.text[5] = new QString(tr("Validated"));
+        } else {
+            status.text[5] = new QString(tr("Warning - ") + errors.join(tr(" ")));
+        }
+        
+        // Set Date and Time
+        if (ride->startTime().isNull()) {
+            
+            // Poo. The user needs to supply the date/time for this ride
+            blanks[i] = true;
+            status.text[1] = new QString(tr(""));
+            status.text[2] = new QString(tr(""));
+            
+        } else {
+            
+            // Cool, the date and time was extracted from the source file
+            blanks[i] = false;
+            status.text[1] = new QString(ride->startTime().toString(tr("dd MMM yyyy")));
+            status.text[2] = new QString(ride->startTime().toString("hh:mm:ss"));
+        }
+        
+        tableWidget->item(i,1)->setTextAlignment(Qt::AlignRight); // put in the middle
+        tableWidget->item(i,2)->setTextAlignment(Qt::AlignRight); // put in the middle
+        
+        // time and distance from tags (.gc files)
+        QMap<QString,QString> lookup;
+        lookup = ride->metricOverrides.value("total_distance");
+        double km = lookup.value("value", "0.0").toDouble();
+        
+        lookup = ride->metricOverrides.value("workout_time");
+        int secs = lookup.value("value", "0.0").toDouble();
+        
+        // show duration by looking at last data point
+        if (!ride->dataPoints().isEmpty() && ride->dataPoints().last() != NULL) {
+            if (!secs) secs = ride->dataPoints().last()->secs;
+            if (!km) km = ride->dataPoints().last()->km;
+        }
+        
+        QChar zero = QLatin1Char ( '0' );
+        QString time = QString("%1:%2:%3").arg(secs/3600,2,10,zero)
+            .arg(secs%3600/60,2,10,zero)
+            .arg(secs%60,2,10,zero);
+        tableWidget->item(i,3)->setText(time);
+        status.text[3] = new QString(time);
+        tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
+        
+        // show distance by looking at last data point
+        QString dist = context->athlete->useMetricUnits
+            ? QString ("%1 km").arg(km, 0, 'f', 1)
+            : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
+        status.text[4] = new QString(dist);
+        tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        
+        delete ride;
+    } else {
+        // nope - can't handle this file
+        tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(" ")));
+        status.text[5] = new QString(tr("Error - ") + errors.join(tr(" ")));
+    }
+    
+    //progressBar->setValue(progressBar->value()+1);
+    
+    qDebug() << "ix: " << status.index << "finished processing for file: " << filename;
+    status.elapsedTime = myTimer.elapsed();
+    
+    return status;
+}
+
+void
+RideImportWizard::processImportStatus(ImportFutureStatus& stat) {
+    int index = stat.index;
+
+    if (NULL != stat.filename) {
+        qDebug()  << "ix: " << stat.index << " processing status: " << *stat.filename;
+        delete stat.filename;
+    }
+    
+    // element 0 is never allocated/deleted because that is a numeric row in the grid
+    for (int x = 1; x < NITEMS(stat.text) && x < tableWidget->columnCount(); x++)
+    {
+        if (NULL != stat.text[x]) {
+            tableWidget->item(index,x)->setText(*stat.text[x]);
+            delete stat.text[x];
+        }
+    }
+}
+
 int
 RideImportWizard::process()
 {
+    QTime myTimer;
+    myTimer.start();
+    qDebug() << "import process started";
 
     // Make visible and put in front prior to running down the list & processing...
     if (!isActiveWindow()) activateWindow();
@@ -395,7 +647,7 @@ RideImportWizard::process()
 
         progressBar->setValue(progressBar->value()+1);
 
-    }
+    } //- for(filenames)
 
     if (aborted) { done(0); }
     if (!isActiveWindow()) activateWindow();
@@ -403,7 +655,7 @@ RideImportWizard::process()
     QApplication::processEvents();
 
     // Pass 2 - Read in with the relevant RideFileReader method
-
+    
     phaseLabel->setText(tr("Step 2 of 4: Validating Files"));
    for (int i=0; i< filenames.count(); i++) {
 
@@ -423,173 +675,43 @@ RideImportWizard::process()
               this->repaint();
               QApplication::processEvents();
 
-              QList<RideFile*> rides;
-              RideFile *ride = RideFileFactory::instance().openRideFile(context, thisfile, errors, &rides);
-
-              // is this an archive of files?
-              if (rides.count() > 1) {
-
-                 int here = i;
-
-                 // remove current filename from state arrays and tableview
-                 filenames.removeAt(here);
-                 blanks.removeAt(here);
-                 tableWidget->removeRow(here);
-
-                 // resize dialog according to the number of rows we expect
-                 int willhave = filenames.count() + rides.count();
-                 resize(920 + ((willhave > 16 ? 24 : 0) +
-                     ((willhave > 9 && willhave < 17) ? 8 : 0)),
-                     118 + ((willhave > 16 ? 17*20 : (willhave+1) * 20)));
-
-
-                 // ok so create a temporary file and add to the tableWidget
-                 int counter = 0;
-                 foreach(RideFile *extracted, rides) {
-
-                     // write as a temporary file, using the original
-                     // filename with "-n" appended
-                     QString fulltarget = QDir::tempPath() + "/" + QFileInfo(thisfile).baseName() + QString("-%1.tcx").arg(counter+1);
-                     TcxFileReader reader;
-                     QFile target(fulltarget);
-                     reader.writeRideFile(context, extracted, target);
-                     deleteMe.append(fulltarget);
-                     delete extracted;
-                     
-                     // now add each temporary file ...
-                     filenames.insert(here, fulltarget);
-                     blanks.insert(here, true); // by default editable
-                     tableWidget->insertRow(here+counter);
-
-                     QTableWidgetItem *t;
-
-                     // Filename
-                     t = new QTableWidgetItem();
-                     t->setText(fulltarget);
-                     t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                     tableWidget->setItem(here+counter,0,t);
-
-                     // Date
-                     t = new QTableWidgetItem();
-                     t->setText(tr(""));
-                     t->setFlags(t->flags()  | Qt::ItemIsEditable);
-                     t->setBackgroundColor(Qt::red);
-                     tableWidget->setItem(here+counter,1,t);
-
-                     // Time
-                     t = new QTableWidgetItem();
-                     t->setText(tr(""));
-                     t->setFlags(t->flags() | Qt::ItemIsEditable);
-                     tableWidget->setItem(here+counter,2,t);
-
-                     // Duration
-                     t = new QTableWidgetItem();
-                     t->setText(tr(""));
-                     t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                     tableWidget->setItem(here+counter,3,t);
-
-                     // Distance
-                     t = new QTableWidgetItem();
-                     t->setText(tr(""));
-                     t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                     tableWidget->setItem(here+counter,4,t);
-
-                     // Import Status
-                     t = new QTableWidgetItem();
-                     t->setText(tr(""));
-                     t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                     tableWidget->setItem(here+counter,5,t);
-
-                     counter++;
-
-                     tableWidget->adjustSize();
-                 }
-                 QApplication::processEvents();
-
-
-                 // progress bar needs to adjust...
-                 progressBar->setMaximum(filenames.count()*4);
-
-                 // then go back one and re-parse from there
-                 rides.clear();
-   
-                 i--;
-                 goto next; // buttugly I know, but count em across 100,000 lines of code
-
-              }
-
-              // did it parse ok?
-              if (ride) {
-
-                   // ride != NULL but !errors.isEmpty() means they're just warnings
-                   if (errors.isEmpty())
-                       tableWidget->item(i,5)->setText(tr("Validated"));
-                   else {
-                       tableWidget->item(i,5)->setText(tr("Warning - ") + errors.join(tr(" ")));
-                   }
-
-                   // Set Date and Time
-                   if (ride->startTime().isNull()) {
-
-                       // Poo. The user needs to supply the date/time for this ride
-                       blanks[i] = true;
-                       tableWidget->item(i,1)->setText(tr(""));
-                       tableWidget->item(i,2)->setText(tr(""));
-
-                   } else {
-
-                       // Cool, the date and time was extracted from the source file
-                       blanks[i] = false;
-                       tableWidget->item(i,1)->setText(ride->startTime().toString(tr("dd MMM yyyy")));
-                       tableWidget->item(i,2)->setText(ride->startTime().toString("hh:mm:ss"));
-                   }
-
-                   tableWidget->item(i,1)->setTextAlignment(Qt::AlignRight); // put in the middle
-                   tableWidget->item(i,2)->setTextAlignment(Qt::AlignRight); // put in the middle
-
-                   // time and distance from tags (.gc files)
-                   QMap<QString,QString> lookup;
-                   lookup = ride->metricOverrides.value("total_distance");
-                   double km = lookup.value("value", "0.0").toDouble();
-
-                   lookup = ride->metricOverrides.value("workout_time");
-                   int secs = lookup.value("value", "0.0").toDouble();
-
-                   // show duration by looking at last data point
-                   if (!ride->dataPoints().isEmpty() && ride->dataPoints().last() != NULL) {
-                       if (!secs) secs = ride->dataPoints().last()->secs;
-                       if (!km) km = ride->dataPoints().last()->km;
-                   }
-
-                   QChar zero = QLatin1Char ( '0' );
-                   QString time = QString("%1:%2:%3").arg(secs/3600,2,10,zero)
-                       .arg(secs%3600/60,2,10,zero)
-                       .arg(secs%60,2,10,zero);
-                   tableWidget->item(i,3)->setText(time);
-                   tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
-
-                   // show distance by looking at last data point
-                   QString dist = context->athlete->useMetricUnits
-                       ? QString ("%1 km").arg(km, 0, 'f', 1)
-                       : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
-                   tableWidget->item(i,4)->setText(dist);
-                   tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-
-                   delete ride;
-               } else {
-                   // nope - can't handle this file
-                   tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(" ")));
-               }
+            if (futuresEnabled) {
+                qDebug() << "index: " << i <<  " Starting future for file: " << filenames[i];
+                QFuture<ImportFutureStatus> future = QtConcurrent::run(this, &RideImportWizard::processValidateFile, &aborted, filenames[i], i);
+                synchronizer.addFuture(future);
+                
+            } else {
+                ImportFutureStatus stat = processValidateFile(&aborted, filenames[i], i);
+                processImportStatus(stat);
+            }
         }
+
         progressBar->setValue(progressBar->value()+1);
         QApplication::processEvents();
         if (aborted) { done(0); }
         if (!isActiveWindow()) activateWindow();
         this->repaint();
 
-        next:;
     }
-
+    
+    if (futuresEnabled) {
+        // wait for all futures to complete
+        qDebug() << "Waiting on all futures to finish";
+        QTime timerMain;
+        timerMain.start();
+        
+        synchronizer.waitForFinished();
+        int mainThreadWaited = timerMain.elapsed();
+        qDebug() << "Main thread was waiting for: " << mainThreadWaited;
+    
+        foreach(QFuture<ImportFutureStatus> thread, synchronizer.futures()) {
+            ImportFutureStatus stat = thread.result();
+            processImportStatus(stat);
+        }
+        synchronizer.clearFutures();
+        Q_ASSERT(0 == synchronizer.futures().size());
+    }
+    
     // Pass 3 - get missing date and times for imported files
     //         Actually allow us to edit date on ANY ride, we
     //         make sure that the ride date/time is set from
@@ -803,6 +925,7 @@ RideImportWizard::todayClicked(int index)
 void
 RideImportWizard::cancelClicked()
 {
+    // here this should signal to select the last item imported?
     done(0); // you are the weakest link, goodbye.
 }
 
@@ -810,6 +933,163 @@ RideImportWizard::cancelClicked()
 struct cpi_file_info {
     QString file, inname, outname;
 };
+
+
+ImportFutureStatus RideImportWizard::processSaveFile(volatile bool *aborted, const QString filename, const int i)
+{
+    Q_ASSERT(filename != NULL);
+    
+    ImportFutureStatus status;
+    status.index = i;
+    
+    QTime myTimer;
+    myTimer.start();
+    qDebug() << "ix: " << status.index << "Processing save started for input file: " << filename;
+    
+    status.filename = new QString(filename);
+    Q_ASSERT(status.filename != NULL);
+    
+    if (*aborted) {
+        qDebug() << "Detected abort signal on index: " << i;
+        return status;
+    }
+
+    if (!futuresEnabled) {
+        tableWidget->item(i,5)->setText(tr("Saving..."));
+        tableWidget->setCurrentCell(i,5);
+        QApplication::processEvents();
+        if (*aborted) { done(0); }
+        if (!isActiveWindow()) activateWindow();
+        this->repaint();
+    }
+    
+    
+    // SAVE STEP 3 - prepare the new file names for the next steps - basic name and .JSON in GC format
+    
+    QDateTime ridedatetime = QDateTime(QDate().fromString(tableWidget->item(i,1)->text(), tr("dd MMM yyyy")),
+                                       QTime().fromString(tableWidget->item(i,2)->text(), "hh:mm:ss"));
+    
+
+    
+    QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
+    .arg ( ridedatetime.date().year(), 4, 10, zero )
+    .arg ( ridedatetime.date().month(), 2, 10, zero )
+    .arg ( ridedatetime.date().day(), 2, 10, zero )
+    .arg ( ridedatetime.time().hour(), 2, 10, zero )
+    .arg ( ridedatetime.time().minute(), 2, 10, zero )
+    .arg ( ridedatetime.time().second(), 2, 10, zero );
+    QString activitiesTarget = QString ("%1.%2" ).arg ( targetnosuffix ).arg ( "json" );
+    
+    // create filenames incl. directory path for GC .JSON for both /tmpActivities and /activities directory
+    QString tmpActivitiesFulltarget = tmpActivities.canonicalPath() + "/" + activitiesTarget;
+    QString finalActivitiesFulltarget = homeActivities.canonicalPath() + "/" + activitiesTarget;
+    
+    // check if a ride at this point of time already exists in /activities - if yes, skip import
+    if (QFileInfo(finalActivitiesFulltarget).exists()) {
+        //tableWidget->item(i,5)->setText(tr("Error - Activity file exists"));
+        status.text[5] = new QString(tr("Error - Activity file exists"));
+        qDebug() << "import exists: " << finalActivitiesFulltarget;
+        return status;
+    }
+    
+    
+    // SAVE STEP 4 - copy the source file to "/imports" directory (if it's not taken from there as source)
+    // add the date/time of the target to the source file name (for identification)
+    
+    // copy the sourceFile to /imports ONLY if the source is NOT coming from /imports itself
+    QFileInfo sourceFileInfo (filenames[i]);
+    QString importsTarget;
+    if (sourceFileInfo.canonicalPath() != homeImports.canonicalPath()) {
+        
+        // add the GC file base name to create unique file names during import
+        // there should not be 2 ride files with exactly the same time stamp (as this is also not foreseen for the .json)
+        importsTarget = sourceFileInfo.baseName() + "_" + targetnosuffix + "." + sourceFileInfo.suffix();
+        QString importsFulltarget = homeImports.canonicalPath() + "/" + importsTarget;
+        // copy the source file to /imports with adjusted name
+        QFile source(filenames[i]);
+        if (!source.copy(importsFulltarget)) {
+            //tableWidget->item(i,5)->setText(tr("Error - copy of %1 to import directory failed").arg(importsTarget));
+            status.text[5] = new QString(tr("Error - copy of %1 to import directory failed").arg(importsTarget));
+            return status;
+        }
+    } else {
+        // file is re-imported from /imports - keep the name for .JSON Source File Tag
+        importsTarget = sourceFileInfo.fileName();
+    }
+    
+    
+    // SAVE STEP 5 - open the file with the respective format reader and export as .JSON
+    // to track if addRideCache() has caused an error due to bad data we work with a interim directory for the activities
+    // -- first   export to /tmpactivities
+    // -- second  create RideCache() entry
+    // -- third   move file from /tmpactivities to /activities
+    
+    //tableWidget->item(i,5)->setText(tr("Saving file..."));
+    
+    // serialize the file to .JSON
+    QStringList errors;
+    QFile thisfile(filenames[i]);
+    RideFile *ride(RideFileFactory::instance().openRideFile(context, thisfile, errors));
+    
+    if (*aborted) {
+        qDebug() << "Detected abort signal on index: " << i;
+        if (ride) delete ride;
+        return status;
+    }
+    
+    // did the input file parse ok ? (should be fine here - since it was alrady checked before - but just in case)
+    if (ride) {
+        
+        // update ridedatetime and set the Source File name
+        ride->setStartTime(ridedatetime);
+        ride->setTag("Source Filename", importsTarget);
+        ride->setTag("Filename", activitiesTarget);
+        
+        // serialize
+        JsonFileReader reader;
+        QFile target(tmpActivitiesFulltarget);
+        if (reader.writeRideFile(context, ride, target)) {
+            
+            
+// here we should try to block all the signals that get emitted to only do it once!
+            
+            // now try adding the Ride to the RideCache - since this may fail due to various reason, the activity file
+            // is stored in tmpActivities during this process to understand which file has create the problem when restarting GC
+            // - only after the step was successful the file is moved
+            // to the "clean" activities folder
+            RideItem* ride = context->athlete->addRideSilent(QFileInfo(tmpActivitiesFulltarget).fileName(),
+                                      false, // don't signal if mass importing
+                                      true);                                       // file is available only in /tmpActivities, so use this one please
+            // rideCache is successfully updated, let's move the file to the real /activities
+            if (moveFile(tmpActivitiesFulltarget, finalActivitiesFulltarget)) {
+                //tableWidget->item(i,5)->setText(tr("File Saved"));
+                status.text[5] = new QString(tr("File Saved"));
+
+                // and correct the path locally stored in Ride Item
+                Q_ASSERT(NULL != ride);
+                ride->setFileName(homeActivities.canonicalPath(), activitiesTarget);
+            }  else {
+                //tableWidget->item(i,5)->setText(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
+                status.text[5] = new QString(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
+            }
+            
+        }  else {
+            //tableWidget->item(i,5)->setText(tr("Error - .JSON creation failed"));
+            status.text[5] = new QString(tr("Error - .JSON creation failed"));
+        }
+    } else {
+        //tableWidget->item(i,5)->setText(tr("Error - Import of activitiy file failed"));
+        status.text[5] = new QString(tr("Error - Import of activitiy file failed"));
+    }
+    
+    // clear
+    delete ride;
+
+    
+    
+    return status;
+}
+
 
 
 void
@@ -878,124 +1158,52 @@ RideImportWizard::abortClicked()
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
     }
 
-    QChar zero = QLatin1Char ( '0' );
-
-
+    
     // Saving now - process the files one-by-one
     for (int i=0; i< filenames.count(); i++) {
 
         if (tableWidget->item(i,5)->text().startsWith(tr("Error"))) continue; // skip errors
 
-        tableWidget->item(i,5)->setText(tr("Saving..."));
-        tableWidget->setCurrentCell(i,5);
-        QApplication::processEvents();
-        if (aborted) { done(0); }
-        if (!isActiveWindow()) activateWindow();
-        this->repaint();
-
-
-        // SAVE STEP 3 - prepare the new file names for the next steps - basic name and .JSON in GC format
-
-        QDateTime ridedatetime = QDateTime(QDate().fromString(tableWidget->item(i,1)->text(), tr("dd MMM yyyy")),
-                                           QTime().fromString(tableWidget->item(i,2)->text(), "hh:mm:ss"));
-        QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
-                .arg ( ridedatetime.date().year(), 4, 10, zero )
-                .arg ( ridedatetime.date().month(), 2, 10, zero )
-                .arg ( ridedatetime.date().day(), 2, 10, zero )
-                .arg ( ridedatetime.time().hour(), 2, 10, zero )
-                .arg ( ridedatetime.time().minute(), 2, 10, zero )
-                .arg ( ridedatetime.time().second(), 2, 10, zero );
-        QString activitiesTarget = QString ("%1.%2" ).arg ( targetnosuffix ).arg ( "json" );
-
-        // create filenames incl. directory path for GC .JSON for both /tmpActivities and /activities directory
-        QString tmpActivitiesFulltarget = tmpActivities.canonicalPath() + "/" + activitiesTarget;
-        QString finalActivitiesFulltarget = homeActivities.canonicalPath() + "/" + activitiesTarget;
-
-        // check if a ride at this point of time already exists in /activities - if yes, skip import
-        if (QFileInfo(finalActivitiesFulltarget).exists()) { tableWidget->item(i,5)->setText(tr("Error - Activity file exists")); continue; }
-
-
-        // SAVE STEP 4 - copy the source file to "/imports" directory (if it's not taken from there as source)
-        // add the date/time of the target to the source file name (for identification)
-
-        // copy the sourceFile to /imports ONLY if the source is NOT coming from /imports itself
-        QFileInfo sourceFileInfo (filenames[i]);
-        QString importsTarget;
-        if (sourceFileInfo.canonicalPath() != homeImports.canonicalPath()) {
-
-            // add the GC file base name to create unique file names during import
-            // there should not be 2 ride files with exactly the same time stamp (as this is also not foreseen for the .json)
-            importsTarget = sourceFileInfo.baseName() + "_" + targetnosuffix + "." + sourceFileInfo.suffix();
-            QString importsFulltarget = homeImports.canonicalPath() + "/" + importsTarget;
-            // copy the source file to /imports with adjusted name
-            QFile source(filenames[i]);
-            if (!source.copy(importsFulltarget)) {
-                tableWidget->item(i,5)->setText(tr("Error - copy of %1 to import directory failed").arg(importsTarget));
-            }
+        if (futuresEnabled) {
+            qDebug() << "ix: " << i << " dispatch save future: " << filenames[i];
+            QFuture<ImportFutureStatus> future = QtConcurrent::run(this, &RideImportWizard::processSaveFile, &aborted, filenames[i], i);
+            synchronizer.addFuture(future);
+            
         } else {
-            // file is re-imported from /imports - keep the name for .JSON Source File Tag
-            importsTarget = sourceFileInfo.fileName();
+            processSaveFile(&aborted, filenames[i], i);
         }
 
-
-        // SAVE STEP 5 - open the file with the respective format reader and export as .JSON
-        // to track if addRideCache() has caused an error due to bad data we work with a interim directory for the activities
-        // -- first   export to /tmpactivities
-        // -- second  create RideCache() entry
-        // -- third   move file from /tmpactivities to /activities
-
-        tableWidget->item(i,5)->setText(tr("Saving file..."));
-
-        // serialize the file to .JSON
-        QStringList errors;
-        QFile thisfile(filenames[i]);
-        RideFile *ride(RideFileFactory::instance().openRideFile(context, thisfile, errors));
-
-        // did the input file parse ok ? (should be fine here - since it was alrady checked before - but just in case)
-        if (ride) {
-
-            // update ridedatetime and set the Source File name
-            ride->setStartTime(ridedatetime);
-            ride->setTag("Source Filename", importsTarget);
-            ride->setTag("Filename", activitiesTarget);
-
-            // serialize
-            JsonFileReader reader;
-            QFile target(tmpActivitiesFulltarget);
-            if (reader.writeRideFile(context, ride, target)) {
-
-                // now try adding the Ride to the RideCache - since this may fail due to various reason, the activity file
-                // is stored in tmpActivities during this process to understand which file has create the problem when restarting GC
-                // - only after the step was successful the file is moved
-                // to the "clean" activities folder
-                context->athlete->addRide(QFileInfo(tmpActivitiesFulltarget).fileName(),
-                                          tableWidget->rowCount() < 20 ? true : false, // don't signal if mass importing
-                                          true);                                       // file is available only in /tmpActivities, so use this one please
-                // rideCache is successfully updated, let's move the file to the real /activities
-                if (moveFile(tmpActivitiesFulltarget, finalActivitiesFulltarget)) {
-                    tableWidget->item(i,5)->setText(tr("File Saved"));
-                    // and correct the path locally stored in Ride Item
-                    context->ride->setFileName(homeActivities.canonicalPath(), activitiesTarget);
-                }  else {
-                    tableWidget->item(i,5)->setText(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
-                }
-
-            }  else {
-                tableWidget->item(i,5)->setText(tr("Error - .JSON creation failed"));
-            }
-        } else {
-            tableWidget->item(i,5)->setText(tr("Error - Import of activitiy file failed"));
-        }
-
-        // clear
-        delete ride;
-
-        QApplication::processEvents();
-        if (aborted) { done(0); }
+        //QApplication::processEvents();
+        //if (aborted) { done(0); }
         progressBar->setValue(progressBar->value()+1);
-        if (!isActiveWindow()) activateWindow();
-        this->repaint();
+        //if (!isActiveWindow()) activateWindow();
+        //this->repaint();
     }
+    
+    
+    
+    
+    if (futuresEnabled) {
+        // wait for all futures to complete
+        qDebug() << "Waiting on all saving...";
+        synchronizer.waitForFinished();
+        qDebug() << "All saving finished";
+        
+        foreach(QFuture<ImportFutureStatus> thread, synchronizer.futures()) {
+            ImportFutureStatus stat = thread.result();
+            processImportStatus(stat);
+        }
+        synchronizer.clearFutures();
+        Q_ASSERT(0 == synchronizer.futures().size());
+
+    }
+    
+    context->athlete->refreshAfterImport();
+    
+    if (!isActiveWindow()) activateWindow();
+    
+    
+    
 
     // how did we get on in the end then ...
     int completed = 0;
