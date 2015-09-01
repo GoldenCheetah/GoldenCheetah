@@ -269,11 +269,16 @@ struct FitFileReaderState
                 case 1561: rideFile->setDeviceType("Garmin Edge 510"); break;
                 case 1567: rideFile->setDeviceType("Garmin Edge 810"); break;
                 case 1623: rideFile->setDeviceType("Garmin FR620"); break;
-                case 1765: rideFile->setDeviceType("Garmin Fenix3"); break;
+                case 1765: rideFile->setDeviceType("Garmin FR920XT"); break;
                 case 1836: rideFile->setDeviceType("Garmin Edge 1000"); break;
                 case 1967: rideFile->setDeviceType("Garmin Fenix2"); break;
+                case 2050: rideFile->setDeviceType("Garmin Fenix3"); break;
                 case 2067: rideFile->setDeviceType("Garmin Edge 520"); break;
+                case 2147: rideFile->setDeviceType("Garmin Edge 25"); break;
+                case 2153: rideFile->setDeviceType("Garmin FR225"); break;
+                case 2238: rideFile->setDeviceType("Garmin Edge 20"); break;
                 case 20119: rideFile->setDeviceType("Garmin Training Center"); break;
+                case 65532: rideFile->setDeviceType("Android ANT+ Plugin"); break;
                 case 65534: rideFile->setDeviceType("Garmin Connect Website"); break;
                 default: rideFile->setDeviceType(QString("Garmin %1").arg(prod));
             }
