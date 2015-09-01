@@ -958,6 +958,8 @@ RideImportWizard::abortClicked()
             ride->setStartTime(ridedatetime);
             ride->setTag("Source Filename", importsTarget);
             ride->setTag("Filename", activitiesTarget);
+            if (errors.count() > 0)
+                ride->setTag("Import errors", errors.join("\n"));
 
             // serialize
             JsonFileReader reader;

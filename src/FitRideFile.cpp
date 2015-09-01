@@ -932,6 +932,8 @@ struct FitFileReaderState
                 case 2: /* DEVICE_SETTINGS */
                 case 3: /* USER_PROFILE */
                 case 7: /* ZONES_TARGET12 */
+                case 8: /* HR_ZONE */
+                case 9: /* POWER_ZONE */
                 case 13: /* unknown */
                 case 22: /* undocumented */
                 case 72: /* undocumented  - new for garmin 800*/
