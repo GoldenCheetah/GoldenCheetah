@@ -22,6 +22,7 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QLabel>
+#include <QTableWidget>
 
 class VDOTCalculator : public QDialog
 {
@@ -38,7 +39,7 @@ class VDOTCalculator : public QDialog
         QLabel *labelVDOT;
         QLineEdit *txtVDOT;
         QLabel *labelTPACE;
-        QLineEdit *txtTPACE;
+        QTableWidget *tableWidgetTPACE;
         QDoubleSpinBox *distSpinBox;
         QDoubleSpinBox *hoursSpinBox;
         QDoubleSpinBox *minsSpinBox;
