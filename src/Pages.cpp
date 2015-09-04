@@ -1891,6 +1891,7 @@ IntervalMetricsPage::leftClicked()
     selectedList->takeItem(selectedList->row(item));
     availList->addItem(item);
     changed = true;
+    selectedChanged();
 }
 
 void
@@ -2087,6 +2088,7 @@ BestsMetricsPage::leftClicked()
     selectedList->takeItem(selectedList->row(item));
     availList->addItem(item);
     changed = true;
+    selectedChanged();
 }
 
 void
@@ -2279,6 +2281,7 @@ SummaryMetricsPage::leftClicked()
     selectedList->takeItem(selectedList->row(item));
     availList->addItem(item);
     changed = true;
+    selectedChanged();
 }
 
 void
