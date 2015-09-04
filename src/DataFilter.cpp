@@ -90,6 +90,9 @@ static struct {
     // more vector operations
     { "which", 0 }, // which(expr, ...) - create vector contain values that pass expr
 
+    // set
+    { "set", 3 }, // set(symbol, value, filter)
+
     // add new ones above this line
     { "", -1 }
 };
@@ -123,6 +126,8 @@ DataFilter::functions()
         } else if (i == 31) { // which example
             returning << "which(x>0, ...)";
 
+        } else if (i == 32) { // set example
+            returning <<"set(field, value, expr)";
         } else {
             function = DataFilterFunctions[i].name + "(";
             for(int j=0; j<DataFilterFunctions[i].parameters; j++) {
@@ -857,7 +862,6 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             QString lookup = df->lookupMap.value(symbol, "");
             if (lookup == "") {
 
-
                 // isRun isa special, we may add more later (e.g. date)
                 if (symbol.compare("Date", Qt::CaseInsensitive) &&
                     symbol.compare("x", Qt::CaseInsensitive) && // used by which
@@ -961,6 +965,42 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
                     // still normal parm check !
                     foreach(Leaf *p, leaf->fparms) validateFilter(df, p);
+
+                } else if (leaf->function == "set") {
+
+                    // don't run it everytime a ride is selected!
+                    leaf->dynamic = false;
+
+                    // is the first a symbol ?
+                    if (leaf->fparms.count() > 1) {
+                        if (leaf->fparms[0]->type != Leaf::Symbol) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(QObject::tr("set function first parameter is field/metric to set."));
+                        } else {
+                            QString symbol = *(leaf->fparms[0]->lvalue.n);
+
+                            //  some specials are not allowed
+                            if (!symbol.compare("Date", Qt::CaseInsensitive) ||
+                                !symbol.compare("x", Qt::CaseInsensitive) || // used by which
+                                !symbol.compare("Today", Qt::CaseInsensitive) ||
+                                !symbol.compare("Current", Qt::CaseInsensitive) ||
+                                df->dataSeriesSymbols.contains(symbol) ||
+                                symbol == "isSwim" || symbol == "isRun" || isCoggan(symbol)) {
+                                DataFiltererrors << QString(QObject::tr("%1 is not supported in set operations")).arg(symbol);
+                                leaf->inerror = true;
+                            }
+                        }
+                    }
+
+                    // make sure we have 3 parameters though!
+                    if (leaf->fparms.count() != 3) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(QObject::tr("set function needs 3 paramaters; symbol, value and expression."));
+                    } else {
+
+                        // still normal parm check !
+                        foreach(Leaf *p, leaf->fparms) validateFilter(df, p);
+                    }
 
                 } else if (leaf->function == "estimate") {
 
@@ -1753,6 +1793,76 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                 }
                 break;
 
+        case 32 :
+                {   // SET (field, value, expression ) returns expression evaluated
+                    Result returning(0);
+
+                    if (leaf->fparms.count() < 3) return returning;
+                    else returning = eval(context, df, leaf->fparms[2], x, m, p);
+
+                    if (returning.number) {
+
+                        // symbol we are setting
+                        QString symbol = *(leaf->fparms[0]->lvalue.n);
+
+                        // lookup metrics (we override them)
+                        QString o_symbol = df->lookupMap.value(symbol,"");
+                        RideMetricFactory &factory = RideMetricFactory::instance();
+                        const RideMetric *e = factory.rideMetric(o_symbol);
+
+                        // ack ! we need to set, so open the ride
+                        RideFile *f = m->ride();
+
+                        if (!f) return Result(0); // eek!
+
+                        // evaluate second argument, its the value
+                        Result r = eval(context, df, leaf->fparms[1], x, m, p);
+
+                        // now set an override or a tag
+                        if (o_symbol != "" && e) { // METRIC OVERRIDE
+
+                            // lets set the override
+                            QMap<QString,QString> override;
+                            override  = f->metricOverrides.value(o_symbol);
+
+                            // clear and reset override value for this metric
+                            override.insert("value", QString("%1").arg(r.number)); // add metric value
+
+                            // update overrides for this metric in the main QMap
+                            f->metricOverrides.insert(o_symbol, override);
+
+                            // rideFile is now dirty!
+                            m->setDirty(true);
+
+                            // get refresh done, coz overrides state has changed
+                            m->notifyRideMetadataChanged();
+
+                        } else { // METADATA TAG
+
+                            // need to set metadata tag
+                            bool isnumeric = df->lookupType.value(symbol);
+
+                            // are we using the right types ?
+                            if (r.isNumber && isnumeric) {
+                                f->setTag(o_symbol, QString("%1").arg(r.number));
+                            } else if (!r.isNumber && !isnumeric) {
+                                f->setTag(o_symbol, r.string);
+                            } else {
+                                // nope
+                                return Result(0); // not changing it !
+                            }
+
+                            // rideFile is now dirty!
+                            m->setDirty(true);
+
+                            // get refresh done, coz overrides state has changed
+                            m->notifyRideMetadataChanged();
+
+                        }
+                    }
+                    return returning;
+                }
+                break;
         default:
             return Result(0);
         }
