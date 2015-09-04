@@ -541,19 +541,23 @@ StravaUploader::requestUploadStravaFinished(QNetworkReply *reply)
         MVJSONReader jsonResponse(string(response.toLatin1()));
 
         // get error field
-        if (jsonResponse.root->hasField("error")) {
-            uploadError = jsonResponse.root->getFieldString("error").c_str();
-        } else {
-            uploadError = ""; // no error
-        }
+        if (jsonResponse.root) {
+            if (jsonResponse.root->hasField("error")) {
+                uploadError = jsonResponse.root->getFieldString("error").c_str();
+            } else {
+                uploadError = ""; // no error
+            }
 
-        // get upload_id, but if not available use id
-        if (jsonResponse.root->hasField("upload_id")) {
-            stravaUploadId = jsonResponse.root->getFieldInt("upload_id");
-        } else if (jsonResponse.root->hasField("id")) {
-            stravaUploadId = jsonResponse.root->getFieldInt("id");
+            // get upload_id, but if not available use id
+            if (jsonResponse.root->hasField("upload_id")) {
+                stravaUploadId = jsonResponse.root->getFieldInt("upload_id");
+            } else if (jsonResponse.root->hasField("id")) {
+                stravaUploadId = jsonResponse.root->getFieldInt("id");
+            } else {
+                stravaUploadId = 0;
+            }
         } else {
-            stravaUploadId = 0;
+            uploadError = "no connection";
         }
     } catch(...) { // not really sure what exceptions to expect so do them all (bad, sorry)
         uploadError=tr("invalid response or parser exception.");
