@@ -297,8 +297,9 @@ struct FitFileReaderState
         } else if (manu == 9 ) {
             // Powertap
             switch (prod) {
+                case 14: rideFile->setDeviceType("Joule 2.0");break;
                 case 18: rideFile->setDeviceType("Joule");break;
-                case 20: rideFile->setDeviceType("Joule GPS");break;
+                case 19: rideFile->setDeviceType("Joule GPS");break;
                 case 22: rideFile->setDeviceType("Joule GPS+");break;
 
                 default: rideFile->setDeviceType(QString("Powertap Device %1").arg(prod));break;
