@@ -105,6 +105,7 @@ RideItem::setFrom(RideItem&here) // used when loading cache/rideDB.json
     isRun = here.isRun;
     isSwim = here.isSwim;
 	weight = here.weight;
+	overrides_ = here.overrides_;
     samples = here.samples;
 }
 
