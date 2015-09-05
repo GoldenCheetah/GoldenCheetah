@@ -93,6 +93,7 @@ static struct {
     // set
     { "set", 3 }, // set(symbol, value, filter)
     { "unset", 2 }, // unset(symbol, filter)
+    { "isset", 1 }, // isset(symbol) - is the metric or metadata overridden/defined
 
     // add new ones above this line
     { "", -1 }
@@ -967,13 +968,13 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     // still normal parm check !
                     foreach(Leaf *p, leaf->fparms) validateFilter(df, p);
 
-                } else if (leaf->function == "set" || leaf->function == "unset") {
+                } else if (leaf->function == "isset" || leaf->function == "set" || leaf->function == "unset") {
 
                     // don't run it everytime a ride is selected!
                     leaf->dynamic = false;
 
                     // is the first a symbol ?
-                    if (leaf->fparms.count() > 1) {
+                    if (leaf->fparms.count() > 0) {
                         if (leaf->fparms[0]->type != Leaf::Symbol) {
                             leaf->inerror = true;
                             DataFiltererrors << QString(QObject::tr("isset/set/unset function first parameter is field/metric to set."));
@@ -987,14 +988,19 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                                 !symbol.compare("Current", Qt::CaseInsensitive) ||
                                 df->dataSeriesSymbols.contains(symbol) ||
                                 symbol == "isSwim" || symbol == "isRun" || isCoggan(symbol)) {
-                                DataFiltererrors << QString(QObject::tr("%1 is not supported in set/unset operations")).arg(symbol);
+                                DataFiltererrors << QString(QObject::tr("%1 is not supported in isset/set/unset operations")).arg(symbol);
                                 leaf->inerror = true;
                             }
                         }
                     }
 
                     // make sure we have the right parameters though!
-                    if ((leaf->function == "set" && leaf->fparms.count() != 3) ||
+                    if (leaf->function == "issset" && leaf->fparms.count() != 1) {
+
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(QObject::tr("isset has one parameter, a symbol to check."));
+
+                    } else if ((leaf->function == "set" && leaf->fparms.count() != 3) ||
                         (leaf->function == "unset" && leaf->fparms.count() != 2)) {
 
                         leaf->inerror = true;
@@ -1917,6 +1923,31 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                         }
                     }
                     return returning;
+                }
+                break;
+
+        case 34 :
+                {   // ISSET (field) is the metric overriden or metadata set ?
+
+                    if (leaf->fparms.count() != 1) return Result(0);
+
+                    // symbol we are setting
+                    QString symbol = *(leaf->fparms[0]->lvalue.n);
+
+                    // lookup metrics (we override them)
+                    QString o_symbol = df->lookupMap.value(symbol,"");
+                    RideMetricFactory &factory = RideMetricFactory::instance();
+                    const RideMetric *e = factory.rideMetric(o_symbol);
+
+                    // now remove the override
+                    if (o_symbol != "" && e) { // METRIC OVERRIDE
+
+                        return Result (m->overrides_.contains(o_symbol));
+
+                    } else { // METADATA TAG
+
+                        return Result (m->hasText(o_symbol));
+                    }
                 }
                 break;
 

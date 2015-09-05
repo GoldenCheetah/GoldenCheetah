@@ -148,6 +148,13 @@ RideFile *RideItem::ride(bool open)
     ride_ = RideFileFactory::instance().openRideFile(context, file, errors_);
     if (ride_ == NULL) return NULL; // failed to read ride
 
+    // update the overrides
+    overrides_.clear();
+    QMap<QString,QMap<QString, QString> >::const_iterator k;
+    for (k=ride_->metricOverrides.constBegin(); k != ride_->metricOverrides.constEnd(); k++) {
+        overrides_ << k.key();
+    }
+
     // link any USER intervals to the ride, bit fiddly but only used
     // when updating the physical model via the logical
     if (intervals_.count()) {
@@ -512,8 +519,15 @@ RideItem::refresh()
 
     if (f) {
 
-        // get the metadata & metric overrides
+        // get the metadata
         metadata_ = f->tags();
+
+        // overrides
+        overrides_.clear();
+        QMap<QString,QMap<QString, QString> >::const_iterator k;
+        for (k=ride_->metricOverrides.constBegin(); k != ride_->metricOverrides.constEnd(); k++) {
+            overrides_ << k.key();
+        }
 
         // get weight that applies to the date
         getWeight();

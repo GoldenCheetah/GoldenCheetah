@@ -144,6 +144,7 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "isRun") jc->item.isRun = $3.toInt();
                                                                      else if ($1 == "isSwim") jc->item.isSwim = $3.toInt();
                                                                      else if ($1 == "present") jc->item.present = $3;
+                                                                     else if ($1 == "overrides") jc->item.overrides_ = $3.split(",");
                                                                      else if ($1 == "weight") jc->item.weight = $3.toDouble();
                                                                      else if ($1 == "samples") jc->item.samples = $3.toInt() > 0 ? true : false;
                                                                      else if ($1 == "date") {
@@ -357,6 +358,10 @@ void RideCache::save()
             stream << "\t\t\"isRun\":\"" <<item->isRun <<"\",\n";
             stream << "\t\t\"isSwim\":\"" <<item->isSwim <<"\",\n";
             stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
+
+            // if there are overrides, do share them
+            if (item->overrides_.count()) stream << "\t\t\"overrides\":\"" <<item->overrides_.join(",") <<"\",\n";
+
             stream << "\t\t\"samples\":\"" <<(item->samples ? "1" : "0") <<"\",\n";
 
             // pre-computed metrics
