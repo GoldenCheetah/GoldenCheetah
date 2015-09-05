@@ -1942,7 +1942,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                     // now remove the override
                     if (o_symbol != "" && e) { // METRIC OVERRIDE
 
-                        return Result (m->overrides_.contains(o_symbol));
+                        return Result (m->overrides_.contains(o_symbol) == true);
 
                     } else { // METADATA TAG
 
