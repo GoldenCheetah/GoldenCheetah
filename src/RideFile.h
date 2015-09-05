@@ -305,6 +305,7 @@ class RideFile : public QObject // QObject to emit signals
         const QMap<QString,QString>& tags() const { return tags_; }
         QString getTag(QString name, QString fallback) const { return tags_.value(name, fallback); }
         void setTag(QString name, QString value) { tags_.insert(name, value); }
+        bool removeTag(QString name) { return tags_.remove(name); }
 
         Context *context;
         double getWeight(); // legacy - moved to Athlete::getWeight

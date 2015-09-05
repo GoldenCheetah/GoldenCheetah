@@ -92,6 +92,7 @@ static struct {
 
     // set
     { "set", 3 }, // set(symbol, value, filter)
+    { "unset", 2 }, // unset(symbol, filter)
 
     // add new ones above this line
     { "", -1 }
@@ -193,7 +194,7 @@ Leaf::isDynamic(Leaf *leaf)
                     return leaf->isDynamic(leaf->lvalue.l) || leaf->isDynamic(leaf->rvalue.l);
                     break;
     case Leaf::Function :
-                    if (leaf->lvalue.l) return leaf->isDynamic(leaf->lvalue.l);
+                    if (leaf->series && leaf->lvalue.l) return leaf->isDynamic(leaf->lvalue.l);
                     else return leaf->dynamic;
                     break;
         break;
@@ -966,7 +967,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     // still normal parm check !
                     foreach(Leaf *p, leaf->fparms) validateFilter(df, p);
 
-                } else if (leaf->function == "set") {
+                } else if (leaf->function == "set" || leaf->function == "unset") {
 
                     // don't run it everytime a ride is selected!
                     leaf->dynamic = false;
@@ -975,7 +976,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     if (leaf->fparms.count() > 1) {
                         if (leaf->fparms[0]->type != Leaf::Symbol) {
                             leaf->inerror = true;
-                            DataFiltererrors << QString(QObject::tr("set function first parameter is field/metric to set."));
+                            DataFiltererrors << QString(QObject::tr("isset/set/unset function first parameter is field/metric to set."));
                         } else {
                             QString symbol = *(leaf->fparms[0]->lvalue.n);
 
@@ -986,16 +987,21 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                                 !symbol.compare("Current", Qt::CaseInsensitive) ||
                                 df->dataSeriesSymbols.contains(symbol) ||
                                 symbol == "isSwim" || symbol == "isRun" || isCoggan(symbol)) {
-                                DataFiltererrors << QString(QObject::tr("%1 is not supported in set operations")).arg(symbol);
+                                DataFiltererrors << QString(QObject::tr("%1 is not supported in set/unset operations")).arg(symbol);
                                 leaf->inerror = true;
                             }
                         }
                     }
 
-                    // make sure we have 3 parameters though!
-                    if (leaf->fparms.count() != 3) {
+                    // make sure we have the right parameters though!
+                    if ((leaf->function == "set" && leaf->fparms.count() != 3) ||
+                        (leaf->function == "unset" && leaf->fparms.count() != 2)) {
+
                         leaf->inerror = true;
-                        DataFiltererrors << QString(QObject::tr("set function needs 3 paramaters; symbol, value and expression."));
+                        DataFiltererrors << (leaf->function == "set" ? 
+                            QString(QObject::tr("set function needs 3 paramaters; symbol, value and expression.")) : 
+                            QString(QObject::tr("unset function needs 2 paramaters; symbol and expression.")));
+
                     } else {
 
                         // still normal parm check !
@@ -1863,6 +1869,57 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                     return returning;
                 }
                 break;
+        case 33 :
+                {   // UNSET (field, expression ) remove override or tag
+                    Result returning(0);
+
+                    if (leaf->fparms.count() < 2) return returning;
+                    else returning = eval(context, df, leaf->fparms[1], x, m, p);
+
+                    if (returning.number) {
+
+                        // symbol we are setting
+                        QString symbol = *(leaf->fparms[0]->lvalue.n);
+
+                        // lookup metrics (we override them)
+                        QString o_symbol = df->lookupMap.value(symbol,"");
+                        RideMetricFactory &factory = RideMetricFactory::instance();
+                        const RideMetric *e = factory.rideMetric(o_symbol);
+
+                        // ack ! we need to set, so open the ride
+                        RideFile *f = m->ride();
+
+                        if (!f) return Result(0); // eek!
+
+                        // now remove the override
+                        if (o_symbol != "" && e) { // METRIC OVERRIDE
+
+                            // update overrides for this metric in the main QMap
+                            f->metricOverrides.remove(o_symbol);
+
+                            // rideFile is now dirty!
+                            m->setDirty(true);
+
+                            // get refresh done, coz overrides state has changed
+                            m->notifyRideMetadataChanged();
+
+                        } else { // METADATA TAG
+
+                            // remove the tag
+                            f->removeTag(o_symbol);
+
+                            // rideFile is now dirty!
+                            m->setDirty(true);
+
+                            // get refresh done, coz overrides state has changed
+                            m->notifyRideMetadataChanged();
+
+                        }
+                    }
+                    return returning;
+                }
+                break;
+
         default:
             return Result(0);
         }
