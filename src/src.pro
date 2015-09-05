@@ -270,6 +270,36 @@ DEFINES += GC_HAVE_SOAP
 HEADERS += ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.h
 SOURCES +=  ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp
 
+# web server to provide web-services for external integration with R
+!isEmpty ( HTPATH ) {
+    INCLUDEPATH += $$HTPATH
+    DEPENDPATH += $$HTPATH
+    HEADERS +=  $$HTPATH/httpglobal.h \
+                $$HTPATH/httplistener.h \
+                $$HTPATH/httpconnectionhandler.h \
+                $$HTPATH/httpconnectionhandlerpool.h \
+                $$HTPATH/httprequest.h \
+                $$HTPATH/httpresponse.h \
+                $$HTPATH/httpcookie.h \
+                $$HTPATH/httprequesthandler.h \
+                $$HTPATH/httpsession.h \
+                $$HTPATH/httpsessionstore.h \
+                $$HTPATH/staticfilecontroller.h
+    SOURCES +=  $$HTPATH/httpglobal.cpp \
+                $$HTPATH/httplistener.cpp \
+                $$HTPATH/httpconnectionhandler.cpp \
+                $$HTPATH/httpconnectionhandlerpool.cpp \
+                $$HTPATH/httprequest.cpp \
+                $$HTPATH/httpresponse.cpp \
+                $$HTPATH/httpcookie.cpp \
+                $$HTPATH/httprequesthandler.cpp \
+                $$HTPATH/httpsession.cpp \
+                $$HTPATH/httpsessionstore.cpp \
+                $$HTPATH/staticfilecontroller.cpp
+}
+
+HEADERS += $${LOCALHEADERS}
+SOURCE += $${LOCALSOURCE}
 HEADERS += \
         AboutDialog.h \
         AddDeviceWizard.h \
@@ -757,5 +787,3 @@ OTHER_FILES += \
     web/StreetViewWindow.html \
     web/Window.css
 
-HEADERS += $${LOCALHEADERS}
-SOURCE += $${LOCALSOURCE}

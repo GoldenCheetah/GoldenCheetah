@@ -226,6 +226,9 @@ macx {
     #INCLUDEPATH += /Library/Developer/CommandLineTools/SDKs/MacOSX10.9.sdk/usr/include/ 
 }
 
+# uncomment below for R integration via webservices
+#HTPATH = ../httpserver
+
 #if you want a 'robot' to test realtime code without having
 #to get on your trainer and ride then uncomment below
 #DEFINES += GC_WANT_ROBOT
