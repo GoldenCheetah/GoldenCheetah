@@ -58,7 +58,7 @@ class RideItem : public QObject
         RideFile *ride_;
         RideFileCache *fileCache_;
 
-        // precomputed metrics
+        // precomputed metrics & user overrides
         QVector<double> metrics_;
 
         // metadata (used by navigator)
@@ -95,6 +95,9 @@ class RideItem : public QObject
         // set from another, e.g. during load of rideDB.json
         void setFrom(RideItem&);
 
+        // record of any overrides, used by formula "isset" function
+        QStringList overrides_;
+
         // set metric values e.g. when working with intervals
         void setFrom(QHash<QString, RideMetricPtr>);
 
@@ -113,6 +116,7 @@ class RideItem : public QObject
 
         // access the metadata
         QString getText(QString name, QString fallback) { return metadata_.value(name, fallback); }
+        bool hasText(QString name) { return metadata_.contains(name); }
 
         // get at the first class data
         QString path;
