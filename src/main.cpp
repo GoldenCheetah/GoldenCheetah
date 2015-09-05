@@ -26,6 +26,10 @@
 #include "Settings.h"
 #include "TrainDB.h"
 #include "Colors.h"
+#ifdef GC_WANT_HTTP
+#include "httplistener.h"
+#include "httprequesthandler.h"
+#endif
 
 #include "GcUpgrade.h"
 
@@ -280,6 +284,37 @@ main(int argc, char *argv[])
             
         }
 
+#ifdef GC_WANT_HTTP
+        // does the ini file exist ?
+        qDebug()<<"starting web server...";
+        QString httpini = home.absolutePath() + "/httpserver.ini";
+        if (!QFile(httpini).exists()) {
+
+            // read default ini file
+            QFile file(":webservice/httpserver.ini");
+            QString content;
+            if (file.open(QIODevice::ReadOnly)) {
+                content = file.readAll();
+                file.close();
+            }
+
+            // write default ini file
+            QFile out(httpini);
+            if (out.open(QIODevice::WriteOnly)) {
+                
+                out.resize(0);
+                QTextStream stream(&out);
+                stream << content;
+                out.close();
+            }
+        }
+
+        // use the default handler (just get an error page)
+        QSettings* settings=new QSettings(httpini,QSettings::IniFormat,application);
+        HttpListener* listener=new HttpListener(settings,new HttpRequestHandler(application),application);
+
+#endif
+
         // lets attempt to open as asked/remembered
         bool anyOpened = false;
         if (lastOpened != QVariant()) {
@@ -342,6 +377,12 @@ main(int argc, char *argv[])
 
         // clear web caches (stop warning of WebKit leaks)
         QWebSettings::clearMemoryCaches();
+
+#ifdef GC_WANT_HTTP
+        // stop web server if running
+        qDebug()<<"stopping web server...";
+        listener->close();
+#endif
 
     } while (restarting);
 
