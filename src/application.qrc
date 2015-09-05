@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>gcconfig.pri</file>
+        <file>webservice/httpserver.ini</file>
         <file>images/devices/garminusb.png</file>
         <file>images/devices/computrainer.png</file>
         <file>images/devices/kickr.png</file>

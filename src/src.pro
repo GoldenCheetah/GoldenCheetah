@@ -272,8 +272,12 @@ SOURCES +=  ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp
 
 # web server to provide web-services for external integration with R
 !isEmpty ( HTPATH ) {
+
     INCLUDEPATH += $$HTPATH
     DEPENDPATH += $$HTPATH
+
+    DEFINES += GC_WANT_HTTP
+
     HEADERS +=  $$HTPATH/httpglobal.h \
                 $$HTPATH/httplistener.h \
                 $$HTPATH/httpconnectionhandler.h \
