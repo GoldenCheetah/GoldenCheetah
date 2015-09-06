@@ -22,12 +22,79 @@
 void
 APIWebService::service(HttpRequest &request, HttpResponse &response)
 {
-    // request needs a response, just provide the home page
-    // response to everything for now
-    // Set a response header
-    response.setHeader("Content-Type", "text/html; charset=ISO-8859-1");
-    response.write("<html><body>");
-    response.write("GoldenCheetah ");
-    response.write(QString("%1").arg(VERSION_STRING).toLocal8Bit());
-    response.write("</body></html>");
+    // remove trailing '/' from request, just to be consistent
+    QString fullPath = request.getPath();
+    while (fullPath.endsWith("/")) fullPath.chop(1);
+
+    // get the paths
+    QStringList paths = QString(request.getPath()).split("/");
+
+    // we need to look at the first path to determine action
+    if (paths.count() < 2) return; // impossible really
+
+    // get ride of first blank, all URLs start with a '/'
+    paths.removeFirst();
+
+    // ROOT PATH RETURNS A LIST OF ATHLETES
+    if (paths[0] == "") {
+        listAthletes(response); // return csv list of all athlete and their characteristics
+        return;
+    }
+
+    // we don't have a fave icon
+    if (paths[0] == "favicon.ico") return;
+
+    // Call to retreive athlete data, downstream will resolve
+    // which functions to call for different data requests
+    athleteData(paths, response);
+}
+
+void
+APIWebService::athleteData(QStringList &paths, HttpResponse &response)
+{
+
+    // LIST ACTIVITIES FOR ATHLETE
+    if (paths.count() == 2) listRides(paths[0], response);
+    else if (paths.count() > 2) {
+
+        QString athlete = paths[0];
+        paths.removeFirst();
+
+        // GET ACTIVITY
+        if (paths[0] == "activity") listActivity(athlete, paths, response);
+
+        // GET MMP
+        if (paths[0] == "mmp") listMMP(athlete, paths, response);
+    }
+}
+
+void
+APIWebService::listAthletes(HttpResponse &response)
+{
+    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+    response.write("list athletes under construction");
+}
+
+void
+APIWebService::listRides(QString athlete, HttpResponse &response)
+{
+    // list activities and associated metrics
+    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+    response.write("get athlete ride list under construction");
+}
+
+void
+APIWebService::listActivity(QString athlete, QStringList paths, HttpResponse &response)
+{
+    // list activities and associated metrics
+    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+    response.write("get activity under construction");
+}
+
+void
+APIWebService::listMMP(QString athlete, QStringList paths, HttpResponse &response)
+{
+    // list activities and associated metrics
+    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+    response.write("get mmp under construction");
 }
