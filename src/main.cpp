@@ -338,7 +338,7 @@ main(int argc, char *argv[])
 
             // use the default handler (just get an error page)
             QSettings* settings=new QSettings(httpini,QSettings::IniFormat,application);
-            listener=new HttpListener(settings,new APIWebService(application),application);
+            listener=new HttpListener(settings,new APIWebService(home, application),application);
 
             // catch ^C exit
             signal(SIGINT, sigabort);
