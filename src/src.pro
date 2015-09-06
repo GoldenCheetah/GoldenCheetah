@@ -278,6 +278,9 @@ SOURCES +=  ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp
 
     DEFINES += GC_WANT_HTTP
 
+    HEADERS +=  APIWebService.h
+    SOURCES +=  APIWebService.cpp
+
     HEADERS +=  $$HTPATH/httpglobal.h \
                 $$HTPATH/httplistener.h \
                 $$HTPATH/httpconnectionhandler.h \
