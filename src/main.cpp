@@ -87,7 +87,7 @@ main(int argc, char *argv[])
 #else
     bool debug = false;
 #endif
-
+    bool server = false;
     bool help = false;
 
     // honour command line switches
@@ -99,6 +99,7 @@ main(int argc, char *argv[])
             help = true;
             fprintf(stderr, "GoldenCheetah %s (%d)\nusage: GoldenCheetah [[directory] athlete]\n\n", VERSION_STRING, VERSION_LATEST);
             fprintf(stderr, "--help or --version to print this message and exit\n");
+            fprintf(stderr, "--server to run as an API server\n");
 #ifdef GC_DEBUG
             fprintf(stderr, "--debug             to turn on redirection of messages to goldencheetah.log [debug build]\n");
 #else
@@ -106,6 +107,10 @@ main(int argc, char *argv[])
 #endif
             fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
+
+        } else if (arg == "--server") {
+
+                server = true;
 
         } else if (arg == "--debug") {
 
@@ -258,10 +263,11 @@ main(int argc, char *argv[])
 
         // lets do what the command line says ...
         QVariant lastOpened;
-        if(args.count() == 2) { // $ ./GoldenCheetah Mark
+        if(args.count() == 2) { // $ ./GoldenCheetah Mark -or- ./GoldenCheetah --server ~/athletedir
 
             // athlete
-            lastOpened = args.at(1);
+            if (!server) lastOpened = args.at(1);
+            else home.cd(args.at(1));
 
         } else if (args.count() == 3) { // $ ./GoldenCheetah ~/Athletes Mark
 
@@ -285,34 +291,47 @@ main(int argc, char *argv[])
         }
 
 #ifdef GC_WANT_HTTP
-        // does the ini file exist ?
-        qDebug()<<"starting web server...";
-        QString httpini = home.absolutePath() + "/httpserver.ini";
-        if (!QFile(httpini).exists()) {
 
-            // read default ini file
-            QFile file(":webservice/httpserver.ini");
-            QString content;
-            if (file.open(QIODevice::ReadOnly)) {
-                content = file.readAll();
-                file.close();
-            }
+        // The API server offers webservices (default port 12021, see httpserver.ini)
+        // This is to enable integration with R and similar
+        if (server) {
 
-            // write default ini file
-            QFile out(httpini);
-            if (out.open(QIODevice::WriteOnly)) {
+            // does the ini file exist ?
+            qDebug()<<"Starting GoldenCheetah API web-services...";
+            qDebug()<<"Athlete directory:"<<home.absolutePath();
+
+            QString httpini = home.absolutePath() + "/httpserver.ini";
+            if (!QFile(httpini).exists()) {
+
+                // read default ini file
+                QFile file(":webservice/httpserver.ini");
+                QString content;
+                if (file.open(QIODevice::ReadOnly)) {
+                    content = file.readAll();
+                    file.close();
+                }
+
+                // write default ini file
+                QFile out(httpini);
+                if (out.open(QIODevice::WriteOnly)) {
                 
-                out.resize(0);
-                QTextStream stream(&out);
-                stream << content;
-                out.close();
+                    out.resize(0);
+                    QTextStream stream(&out);
+                    stream << content;
+                    out.close();
+                }
             }
+
+            // use the default handler (just get an error page)
+            QSettings* settings=new QSettings(httpini,QSettings::IniFormat,application);
+            HttpListener* listener=new HttpListener(settings,new HttpRequestHandler(application),application);
+
+            ret = application->exec();
+
+            // stop web server if running
+            qDebug()<<"Stopping GoldenCheetah API web-services...";
+            listener->close();
         }
-
-        // use the default handler (just get an error page)
-        QSettings* settings=new QSettings(httpini,QSettings::IniFormat,application);
-        HttpListener* listener=new HttpListener(settings,new HttpRequestHandler(application),application);
-
 #endif
 
         // lets attempt to open as asked/remembered
@@ -377,12 +396,6 @@ main(int argc, char *argv[])
 
         // clear web caches (stop warning of WebKit leaks)
         QWebSettings::clearMemoryCaches();
-
-#ifdef GC_WANT_HTTP
-        // stop web server if running
-        qDebug()<<"stopping web server...";
-        listener->close();
-#endif
 
     } while (restarting);
 
