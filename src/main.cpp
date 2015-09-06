@@ -33,6 +33,8 @@
 
 #include "GcUpgrade.h"
 
+#include <signal.h>
+
 // redirect errors to `home'/goldencheetah.log
 // sadly, no equivalent on Windows
 #ifndef WIN32
@@ -67,6 +69,17 @@ bool restarting = false;
 
 // root directory shared by all
 QString gcroot;
+
+QApplication *application;
+
+#ifdef GC_WANT_HTTP
+HttpListener *listener;
+void sigabort(int)
+{
+    qDebug()<<""; // newline
+    application->exit();
+}
+#endif
 
 int
 main(int argc, char *argv[])
@@ -151,7 +164,7 @@ main(int argc, char *argv[])
 #endif
 
     // create the application -- only ever ONE regardless of restarts
-    QApplication *application = new QApplication(argc, argv);
+    application = new QApplication(argc, argv);
 
 #ifdef Q_OS_MAC
     // get an autorelease pool setup
@@ -297,7 +310,7 @@ main(int argc, char *argv[])
         if (server) {
 
             // does the ini file exist ?
-            qDebug()<<"Starting GoldenCheetah API web-services...";
+            qDebug()<<"Starting GoldenCheetah API web-services... (hit ^C to close)";
             qDebug()<<"Athlete directory:"<<home.absolutePath();
 
             QString httpini = home.absolutePath() + "/httpserver.ini";
@@ -324,13 +337,19 @@ main(int argc, char *argv[])
 
             // use the default handler (just get an error page)
             QSettings* settings=new QSettings(httpini,QSettings::IniFormat,application);
-            HttpListener* listener=new HttpListener(settings,new HttpRequestHandler(application),application);
+            listener=new HttpListener(settings,new HttpRequestHandler(application),application);
+
+            // catch ^C exit
+            signal(SIGINT, sigabort);
 
             ret = application->exec();
 
             // stop web server if running
             qDebug()<<"Stopping GoldenCheetah API web-services...";
             listener->close();
+
+            // and done
+            exit(0);
         }
 #endif
 
