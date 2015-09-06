@@ -17,6 +17,8 @@
  */
 
 #include "APIWebService.h"
+
+#include "Settings.h"
 #include "GcUpgrade.h"
 
 void
@@ -72,7 +74,31 @@ void
 APIWebService::listAthletes(HttpResponse &response)
 {
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");
-    response.write("list athletes under construction");
+
+    // This will read the user preferences and change the file list order as necessary:
+    QFlags<QDir::Filter> spec = QDir::Dirs;
+    QStringList names;
+    names << "*"; // anything
+
+    response.write("name,dob,weight,height,sex\n");
+    foreach(QString name, home.entryList(names, spec, QDir::Name)) {
+
+        // sure fire sign the athlete has been upgraded to post 3.2 and not some
+        // random directory full of other things & check something basic is set
+        QString ridedb = home.absolutePath() + "/" + name + "/cache/rideDB.json";
+        if (QFile(ridedb).exists() && appsettings->cvalue(name, GC_SEX, "") != "") {
+            // we got one
+            QString line = name;
+            line += ", " + appsettings->cvalue(name, GC_DOB).toDate().toString("yyyy/MM/dd");
+            line += ", " + QString("%1").arg(appsettings->cvalue(name, GC_WEIGHT).toDouble());
+            line += ", " + QString("%1").arg(appsettings->cvalue(name, GC_HEIGHT).toDouble());
+            line += (appsettings->cvalue(name, GC_SEX).toInt() == 0) ? ", Male" : ", Female";
+            line += "\n";
+
+            // out a line
+            response.write(line.toLocal8Bit());
+        }
+    }
 }
 
 void
