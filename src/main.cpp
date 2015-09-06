@@ -73,6 +73,7 @@ QString gcroot;
 QApplication *application;
 
 #ifdef GC_WANT_HTTP
+#include "APIWebService.h"
 HttpListener *listener;
 void sigabort(int)
 {
@@ -337,7 +338,7 @@ main(int argc, char *argv[])
 
             // use the default handler (just get an error page)
             QSettings* settings=new QSettings(httpini,QSettings::IniFormat,application);
-            listener=new HttpListener(settings,new HttpRequestHandler(application),application);
+            listener=new HttpListener(settings,new APIWebService(application),application);
 
             // catch ^C exit
             signal(SIGINT, sigabort);
