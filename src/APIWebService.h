@@ -29,8 +29,15 @@ class APIWebService : public HttpRequestHandler
         // nothing to do in constructor
         APIWebService(QObject *parent=NULL) : HttpRequestHandler(parent) {}
 
-        // handle request and update response
+        // request despatchers
         void service(HttpRequest &request, HttpResponse &response);
+        void athleteData(QStringList &paths, HttpResponse &response);
+
+        // Discrete API endpoints
+        void listAthletes(HttpResponse &response);
+        void listRides(QString athlete, HttpResponse &response);
+        void listActivity(QString athlete, QStringList paths, HttpResponse &response);
+        void listMMP(QString athlete, QStringList paths, HttpResponse &response);
 };
 
 #endif
