@@ -505,7 +505,7 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
             response.write(", BikeScore");
         else {
             response.write(", ");
-            response.write(m->name().toLocal8Bit());
+            response.write(underscored.toLocal8Bit());
         }
 
         // index of wanted metrics
