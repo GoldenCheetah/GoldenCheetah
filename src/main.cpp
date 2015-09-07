@@ -113,7 +113,9 @@ main(int argc, char *argv[])
             help = true;
             fprintf(stderr, "GoldenCheetah %s (%d)\nusage: GoldenCheetah [[directory] athlete]\n\n", VERSION_STRING, VERSION_LATEST);
             fprintf(stderr, "--help or --version to print this message and exit\n");
+#ifdef GC_WANT_HTTP
             fprintf(stderr, "--server to run as an API server\n");
+#endif
 #ifdef GC_DEBUG
             fprintf(stderr, "--debug             to turn on redirection of messages to goldencheetah.log [debug build]\n");
 #else
@@ -123,8 +125,12 @@ main(int argc, char *argv[])
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
 
         } else if (arg == "--server") {
-
+#ifdef GC_WANT_HTTP
                 server = true;
+#else
+                fprintf(stderr, "HTTP support not compiled in, exiting.\n");
+                exit(1);
+#endif
 
         } else if (arg == "--debug") {
 
