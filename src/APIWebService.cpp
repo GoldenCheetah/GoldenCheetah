@@ -20,6 +20,7 @@
 
 #include "Settings.h"
 #include "GcUpgrade.h"
+#include "RideDB.h"
 
 void
 APIWebService::service(HttpRequest &request, HttpResponse &response)
@@ -101,12 +102,23 @@ APIWebService::listAthletes(HttpResponse &response)
     }
 }
 
-void
-APIWebService::listRides(QString athlete, HttpResponse &response)
+
+void 
+APIWebService::writeRideLine(RideItem &item, HttpResponse *response)
 {
-    // list activities and associated metrics
-    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
-    response.write("get athlete ride list under construction");
+    // date, time, filename
+    response->write(item.dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
+    response->write(",");
+    response->write(item.dateTime.time().toString("hh:mm:ss").toLocal8Bit());;
+    response->write(",");
+    response->write(item.fileName.toLocal8Bit());
+
+    // metrics...
+    foreach(double value, item.metrics()) {
+        response->write(",");
+        response->write(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
+    }
+    response->write("\n");
 }
 
 void

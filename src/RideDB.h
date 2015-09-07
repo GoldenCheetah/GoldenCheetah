@@ -40,5 +40,34 @@
 
 #define RIDEDB_VERSION "1.4"
 
+class APIWebService;
+class HttpResponse;
+
+// using context (we are reentrant)
+struct RideDBContext {
+
+    // either reading a cache or providing an api ...
+    RideCache *cache;
+
+    APIWebService *api;
+    HttpResponse *response;
+
+    // the scanner
+    void *scanner;
+
+    // Set during parser processing, using same
+    // naming conventions as yacc/lex -p
+    RideItem item;
+    IntervalItem interval;
+
+    // term state data is held in these variables
+    QString JsonString;
+    QString key, value;
+    QStringList errors;
+
+    // is cache/rideDB.json an older version ?
+    bool old;
+};
+
 #endif
 
