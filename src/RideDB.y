@@ -18,29 +18,7 @@
  */
 
 #include "RideDB.h"
-
-// using context (we are reentrant)
-struct RideDBContext {
-
-    // the cache
-    RideCache *cache;
-
-    // the scanner
-    void *scanner;
-
-    // Set during parser processing, using same
-    // naming conventions as yacc/lex -p
-    RideItem item;
-    IntervalItem interval;
-
-    // term state data is held in these variables
-    QString JsonString;
-    QString key, value;
-    QStringList errors;
-
-    // is cache/rideDB.json an older version ?
-    bool old;
-};
+#include "APIWebService.h"
 
 #define YYSTYPE QString
 
@@ -94,20 +72,29 @@ ride: '{' rideelement_list '}'                                  {
                                                                     // search for one to update using serial search,
                                                                     // if the performance is too slow we can move to
                                                                     // a binary search, but suspect this ok < 10000 rides
-                                                                    bool found = false;
-                                                                    foreach(RideItem *i, jc->cache->rides()) {
-                                                                        if (i->fileName == jc->item.fileName) {
+                                                                    if (jc->api != NULL) {
 
-                                                                            found = true;
+                                                                        // we're listing rides in the api
+                                                                        jc->api->writeRideLine(jc->item, jc->response);
 
-                                                                            // update from our loaded value
-                                                                            i->setFrom(jc->item);
-                                                                            break;
+                                                                    } else {
+
+                                                                        // we're loading the cache
+                                                                        bool found = false;
+                                                                        foreach(RideItem *i, jc->cache->rides()) {
+                                                                            if (i->fileName == jc->item.fileName) {
+
+                                                                                found = true;
+
+                                                                                // update from our loaded value
+                                                                                i->setFrom(jc->item);
+                                                                                break;
+                                                                            }
                                                                         }
+                                                                        // not found !
+                                                                        if (found == false)
+                                                                            qDebug()<<"unable to load:"<<jc->item.fileName<<jc->item.dateTime<<jc->item.weight;
                                                                     }
-                                                                    // not found !
-                                                                    if (found == false)
-                                                                        qDebug()<<"unable to load:"<<jc->item.fileName<<jc->item.dateTime<<jc->item.weight;
 
                                                                     // now set our ride item clean again, so we don't
                                                                     // overwrite with prior data
@@ -260,6 +247,7 @@ RideCache::load()
         // create scanner context for reentrant parsing
         RideDBContext *jc = new RideDBContext;
         jc->cache = this;
+        jc->api = NULL;
         jc->old = false;
 
         // clean item
@@ -476,3 +464,79 @@ void RideCache::save()
     }
 }
 
+void
+APIWebService::listRides(QString athlete, HttpResponse &response)
+{
+    // list activities and associated metrics
+    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+
+    // write headings
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    QVector<const RideMetric *> indexed(factory.metricCount());
+
+    // get metrics indexed in same order as the array
+    foreach(QString name, factory.allMetrics()) {
+
+        const RideMetric *m = factory.rideMetric(name);
+        indexed[m->index()] = m;
+    }
+
+    // write headings
+    response.write("date, time, filename");
+    foreach(const RideMetric *m, indexed) {
+        if (m->name().startsWith("BikeScore"))
+            response.write(", BikeScore");
+        else {
+            response.write(", ");
+            response.write(m->name().toLocal8Bit());
+        }
+    }
+    response.write("\n");
+
+    // parse the rideDB and write a line for each entry
+    QString ridedb = QString("%1/%2/cache/rideDB.json").arg(home.absolutePath()).arg(athlete);
+    QFile rideDB(ridedb);
+    if (rideDB.exists() && rideDB.open(QFile::ReadOnly)) {
+
+        // ok, lets read it in
+        QTextStream stream(&rideDB);
+        stream.setCodec("UTF-8");
+
+        // Read the entire file into a QString -- we avoid using fopen since it
+        // doesn't handle foreign characters well. Instead we use QFile and parse
+        // from a QString
+        QString contents = stream.readAll();
+        rideDB.close();
+
+        // create scanner context for reentrant parsing
+        RideDBContext *jc = new RideDBContext;
+        jc->cache = NULL;
+        jc->api = this;
+        jc->response = &response;
+        jc->old = false;
+
+        // clean item
+        jc->item.path = home.absolutePath() + "/activities";
+        jc->item.context = NULL;
+        jc->item.isstale = jc->item.isdirty = jc->item.isedit = false;
+
+        RideDBlex_init(&scanner);
+
+        // inform the parser/lexer we have a new file
+        RideDB_setString(contents, scanner);
+
+        // setup
+        jc->errors.clear();
+
+        // parse it
+        RideDBparse(jc);
+
+        // clean up
+        RideDBlex_destroy(scanner);
+
+        // regardless of errors we're done !
+        delete jc;
+
+        return;
+    }
+}

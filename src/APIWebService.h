@@ -20,6 +20,7 @@
 #define _GC_APIWebService_h
 
 #include "httprequesthandler.h"
+#include "RideItem.h"
 #include <QDir>
 
 class APIWebService : public HttpRequestHandler
@@ -39,6 +40,9 @@ class APIWebService : public HttpRequestHandler
         void listRides(QString athlete, HttpResponse &response);
         void listActivity(QString athlete, QStringList paths, HttpResponse &response);
         void listMMP(QString athlete, QStringList paths, HttpResponse &response);
+
+        // utility
+        void writeRideLine(RideItem &item, HttpResponse *response);
 
     private:
         QDir home;
