@@ -18,7 +18,10 @@
  */
 
 #include "RideDB.h"
+
+#ifdef GC_WANT_HTTP
 #include "APIWebService.h"
+#endif
 
 #define YYSTYPE QString
 
@@ -73,10 +76,10 @@ ride: '{' rideelement_list '}'                                  {
                                                                     // if the performance is too slow we can move to
                                                                     // a binary search, but suspect this ok < 10000 rides
                                                                     if (jc->api != NULL) {
-
+                                                                    #ifdef GC_HAVE_HTTP
                                                                         // we're listing rides in the api
                                                                         jc->api->writeRideLine(jc->wanted, jc->item, jc->request, jc->response);
-
+                                                                    #endif
                                                                     } else {
 
                                                                         // we're loading the cache
@@ -464,6 +467,7 @@ void RideCache::save()
     }
 }
 
+#ifdef GC_WANT_HTTP
 void
 APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &response)
 {
@@ -562,3 +566,4 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
         return;
     }
 }
+#endif
