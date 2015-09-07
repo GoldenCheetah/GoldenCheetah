@@ -106,6 +106,15 @@ APIWebService::listAthletes(HttpRequest &request, HttpResponse &response)
 void 
 APIWebService::writeRideLine(QList<int> wanted, RideItem &item, HttpRequest *request, HttpResponse *response)
 {
+
+    // honour the since parameter
+    QString sincep(request->getParameter("since"));
+    QDate since(1900,01,01);
+    if (sincep != "") since = QDate::fromString(sincep,"yyyy/MM/dd");
+
+    // new enough ?
+    if (item.dateTime.date() < since) return;
+
     // date, time, filename
     response->write(item.dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
     response->write(",");
