@@ -40,7 +40,7 @@ APIWebService::service(HttpRequest &request, HttpResponse &response)
 
     // ROOT PATH RETURNS A LIST OF ATHLETES
     if (paths[0] == "") {
-        listAthletes(response); // return csv list of all athlete and their characteristics
+        listAthletes(request, response); // return csv list of all athlete and their characteristics
         return;
     }
 
@@ -49,30 +49,30 @@ APIWebService::service(HttpRequest &request, HttpResponse &response)
 
     // Call to retreive athlete data, downstream will resolve
     // which functions to call for different data requests
-    athleteData(paths, response);
+    athleteData(paths, request, response);
 }
 
 void
-APIWebService::athleteData(QStringList &paths, HttpResponse &response)
+APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpResponse &response)
 {
 
     // LIST ACTIVITIES FOR ATHLETE
-    if (paths.count() == 2) listRides(paths[0], response);
+    if (paths.count() == 2) listRides(paths[0], request, response);
     else if (paths.count() > 2) {
 
         QString athlete = paths[0];
         paths.removeFirst();
 
         // GET ACTIVITY
-        if (paths[0] == "activity") listActivity(athlete, paths, response);
+        if (paths[0] == "activity") listActivity(athlete, paths, request, response);
 
         // GET MMP
-        if (paths[0] == "mmp") listMMP(athlete, paths, response);
+        if (paths[0] == "mmp") listMMP(athlete, paths, request, response);
     }
 }
 
 void
-APIWebService::listAthletes(HttpResponse &response)
+APIWebService::listAthletes(HttpRequest &request, HttpResponse &response)
 {
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");
 
@@ -104,7 +104,7 @@ APIWebService::listAthletes(HttpResponse &response)
 
 
 void 
-APIWebService::writeRideLine(RideItem &item, HttpResponse *response)
+APIWebService::writeRideLine(QList<int> wanted, RideItem &item, HttpRequest *request, HttpResponse *response)
 {
     // date, time, filename
     response->write(item.dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
@@ -113,16 +113,26 @@ APIWebService::writeRideLine(RideItem &item, HttpResponse *response)
     response->write(",");
     response->write(item.fileName.toLocal8Bit());
 
-    // metrics...
-    foreach(double value, item.metrics()) {
-        response->write(",");
-        response->write(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
+    if (wanted.count()) {
+        // specific metrics
+        foreach(int index, wanted) {
+            double value = item.metrics()[index];
+            response->write(",");
+            response->write(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
+        }
+    } else {
+
+        // all metrics...
+        foreach(double value, item.metrics()) {
+            response->write(",");
+            response->write(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
+        }
     }
     response->write("\n");
 }
 
 void
-APIWebService::listActivity(QString athlete, QStringList paths, HttpResponse &response)
+APIWebService::listActivity(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response)
 {
     // list activities and associated metrics
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");
@@ -130,7 +140,7 @@ APIWebService::listActivity(QString athlete, QStringList paths, HttpResponse &re
 }
 
 void
-APIWebService::listMMP(QString athlete, QStringList paths, HttpResponse &response)
+APIWebService::listMMP(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response)
 {
     // list activities and associated metrics
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");

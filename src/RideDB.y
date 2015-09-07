@@ -75,7 +75,7 @@ ride: '{' rideelement_list '}'                                  {
                                                                     if (jc->api != NULL) {
 
                                                                         // we're listing rides in the api
-                                                                        jc->api->writeRideLine(jc->item, jc->response);
+                                                                        jc->api->writeRideLine(jc->wanted, jc->item, jc->request, jc->response);
 
                                                                     } else {
 
@@ -465,7 +465,7 @@ void RideCache::save()
 }
 
 void
-APIWebService::listRides(QString athlete, HttpResponse &response)
+APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &response)
 {
     // list activities and associated metrics
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");
@@ -481,15 +481,35 @@ APIWebService::listRides(QString athlete, HttpResponse &response)
         indexed[m->index()] = m;
     }
 
+    // was the metric parameter passed?
+    QString metrics(request.getParameter("metrics"));
+
+    // do all ?
+    QStringList wantedNames;
+    QList<int> wanted;
+    if (metrics != "") wantedNames = metrics.split(",");
+
     // write headings
     response.write("date, time, filename");
+
+    int i=0;
     foreach(const RideMetric *m, indexed) {
+
+        i++;
+
+        // if limited don't do limited headings
+        QString underscored = m->name().replace(" ","_");
+        if (wantedNames.count() && !wantedNames.contains(underscored)) continue;
+
         if (m->name().startsWith("BikeScore"))
             response.write(", BikeScore");
         else {
             response.write(", ");
             response.write(m->name().toLocal8Bit());
         }
+
+        // index of wanted metrics
+        wanted << (i-1);
     }
     response.write("\n");
 
@@ -513,6 +533,8 @@ APIWebService::listRides(QString athlete, HttpResponse &response)
         jc->cache = NULL;
         jc->api = this;
         jc->response = &response;
+        jc->request = &request;
+        jc->wanted = wanted;
         jc->old = false;
 
         // clean item

@@ -42,6 +42,7 @@
 
 class APIWebService;
 class HttpResponse;
+class HttpRequest;
 
 // using context (we are reentrant)
 struct RideDBContext {
@@ -49,8 +50,11 @@ struct RideDBContext {
     // either reading a cache or providing an api ...
     RideCache *cache;
 
+    // api parms
     APIWebService *api;
+    HttpRequest *request;
     HttpResponse *response;
+    QList<int> wanted;
 
     // the scanner
     void *scanner;
