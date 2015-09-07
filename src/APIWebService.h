@@ -33,16 +33,16 @@ class APIWebService : public HttpRequestHandler
 
         // request despatchers
         void service(HttpRequest &request, HttpResponse &response);
-        void athleteData(QStringList &paths, HttpResponse &response);
+        void athleteData(QStringList &paths, HttpRequest &request, HttpResponse &response);
 
         // Discrete API endpoints
-        void listAthletes(HttpResponse &response);
-        void listRides(QString athlete, HttpResponse &response);
-        void listActivity(QString athlete, QStringList paths, HttpResponse &response);
-        void listMMP(QString athlete, QStringList paths, HttpResponse &response);
+        void listAthletes(HttpRequest &request, HttpResponse &response);
+        void listRides(QString athlete, HttpRequest &request, HttpResponse &response);
+        void listActivity(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
+        void listMMP(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
 
         // utility
-        void writeRideLine(RideItem &item, HttpResponse *response);
+        void writeRideLine(QList<int> wanted, RideItem &item, HttpRequest *request, HttpResponse *response);
 
     private:
         QDir home;
