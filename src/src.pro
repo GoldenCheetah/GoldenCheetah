@@ -765,7 +765,8 @@ TRANSLATIONS = translations/gc_fr.ts \
                translations/gc_cs.ts \
                translations/gc_es.ts \
                translations/gc_pt.ts \
-               translations/gc_ru.ts
+               translations/gc_ru.ts \
+	       translations/gc_zh-tw.ts
 
 !isEmpty(TRANSLATIONS) {
 
