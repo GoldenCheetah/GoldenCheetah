@@ -134,8 +134,14 @@ APIWebService::writeRideLine(QList<int> wanted, RideItem &item, HttpRequest *req
     QDate since(1900,01,01);
     if (sincep != "") since = QDate::fromString(sincep,"yyyy/MM/dd");
 
-    // new enough ?
+    // before parameter
+    QString beforep(request->getParameter("before"));
+    QDate before(3000,01,01);
+    if (beforep != "") before = QDate::fromString(beforep,"yyyy/MM/dd");
+
+    // in range?
     if (item.dateTime.date() < since) return;
+    if (item.dateTime.date() > before) return;
 
     // date, time, filename
     response->bwrite(item.dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
