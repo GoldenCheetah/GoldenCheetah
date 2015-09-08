@@ -482,7 +482,12 @@ StravaUploader::requestUploadStrava()
 
     QHttpPart activityTypePart;
     activityTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"activity_type\""));
-    activityTypePart.setBody("ride");
+    if (ride->isRun)
+      activityTypePart.setBody("run");
+    else if (ride->isSwim)
+      activityTypePart.setBody("swim");
+    else
+      activityTypePart.setBody("ride");
 
     QHttpPart activityNamePart;
     activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"activity_name\""));
