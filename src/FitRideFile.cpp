@@ -257,32 +257,42 @@ struct FitFileReaderState
         }
         if (manu == 1) {
             // Garmin
+	    // Product IDs can be found in c/fit_example.h in the FIT SDK.
+	    // Multiple product IDs refer to different regions e.g. China, Japan etc.
             switch (prod) {
-                case 717: rideFile->setDeviceType("Garmin FR405"); break;
-                case 782: rideFile->setDeviceType("Garmin FR50"); break;
-                case 988: rideFile->setDeviceType("Garmin FR60"); break;
-                case 1018: rideFile->setDeviceType("Garmin FR310XT"); break;
-                case 1036: rideFile->setDeviceType("Garmin Edge 500"); break;
-                case 1124: rideFile->setDeviceType("Garmin FR110"); break;
-                case 1169: rideFile->setDeviceType("Garmin Edge 800"); break;
-                case 1325: rideFile->setDeviceType("Garmin Edge 200"); break;
-                case 1328: rideFile->setDeviceType("Garmin FR910XT"); break;
-                case 1561: rideFile->setDeviceType("Garmin Edge 510"); break;
-                case 1567: rideFile->setDeviceType("Garmin Edge 810"); break;
-                case 1623: rideFile->setDeviceType("Garmin FR620"); break;
-                case 1765: rideFile->setDeviceType("Garmin FR920XT"); break;
-                case 1836: rideFile->setDeviceType("Garmin Edge 1000"); break;
-                case 1903: rideFile->setDeviceType("Garmin FR15"); break;
-                case 1967: rideFile->setDeviceType("Garmin Fenix2"); break;
-                case 2050: rideFile->setDeviceType("Garmin Fenix3"); break;
-                case 2067: rideFile->setDeviceType("Garmin Edge 520"); break;
-                case 2147: rideFile->setDeviceType("Garmin Edge 25"); break;
-                case 2153: rideFile->setDeviceType("Garmin FR225"); break;
-                case 2238: rideFile->setDeviceType("Garmin Edge 20"); break;
-                case 20119: rideFile->setDeviceType("Garmin Training Center"); break;
-                case 65532: rideFile->setDeviceType("Android ANT+ Plugin"); break;
-                case 65534: rideFile->setDeviceType("Garmin Connect Website"); break;
-                default: rideFile->setDeviceType(QString("Garmin %1").arg(prod));
+	    case 473: case 474: case 475: case 494: rideFile->setDeviceType("Garmin FR301"); break;
+	    case 717: case 987: rideFile->setDeviceType("Garmin FR405"); break;
+	    case 782: rideFile->setDeviceType("Garmin FR50"); break;
+	    case 988: rideFile->setDeviceType("Garmin FR60"); break;
+	    case 1018: rideFile->setDeviceType("Garmin FR310XT"); break;
+	    case 1036: case 1199: case 1213: case 1387: rideFile->setDeviceType("Garmin Edge 500"); break;
+	    case 1124: case 1274: rideFile->setDeviceType("Garmin FR110"); break;
+	    case 1169: case 1333: case 1334: case 1386: rideFile->setDeviceType("Garmin Edge 800"); break;
+	    case 1325: rideFile->setDeviceType("Garmin Edge 200"); break;
+	    case 1328: rideFile->setDeviceType("Garmin FR910XT"); break;
+	    case 1345: case 1410: rideFile->setDeviceType("Garmin FR610"); break;
+	    case 1360: rideFile->setDeviceType("Garmin FR210"); break;
+	    case 1436: rideFile->setDeviceType("Garmin FR70"); break;
+	    case 1446: rideFile->setDeviceType("Garmin FR310XT 4T"); break;
+	    case 1482: case 1688: rideFile->setDeviceType("Garmin FR10"); break;
+	    case 1499: rideFile->setDeviceType("Garmin Swim"); break;
+	    case 1551: rideFile->setDeviceType("Garmin Fenix"); break;
+	    case 1561: case 1742: case 1821: rideFile->setDeviceType("Garmin Edge 510"); break;
+	    case 1567: rideFile->setDeviceType("Garmin Edge 810"); break;
+	    case 1623: rideFile->setDeviceType("Garmin FR620"); break;
+	    case 1765: case 2130: case 2131: case 2132: rideFile->setDeviceType("Garmin FR920XT"); break;
+	    case 1836: case 2052: case 2053: case 2070: case 2100: rideFile->setDeviceType("Garmin Edge 1000"); break;
+	    case 1903: rideFile->setDeviceType("Garmin FR15"); break;
+	    case 1967: rideFile->setDeviceType("Garmin Fenix2"); break;
+	    case 2050: case 2188: case 2189: rideFile->setDeviceType("Garmin Fenix3"); break;
+	    case 2067: rideFile->setDeviceType("Garmin Edge 520"); break;
+	    case 2147: rideFile->setDeviceType("Garmin Edge 25"); break;
+	    case 2153: rideFile->setDeviceType("Garmin FR225"); break;
+	    case 2238: rideFile->setDeviceType("Garmin Edge 20"); break;
+	    case 20119: rideFile->setDeviceType("Garmin Training Center"); break;
+	    case 65532: rideFile->setDeviceType("Android ANT+ Plugin"); break;
+	    case 65534: rideFile->setDeviceType("Garmin Connect Website"); break;
+	    default: rideFile->setDeviceType(QString("Garmin %1").arg(prod));
             }
         } else if (manu == 6 ) {
             // SRM
