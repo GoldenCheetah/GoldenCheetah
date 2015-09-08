@@ -11,6 +11,8 @@ HttpResponse::HttpResponse(QTcpSocket* socket) {
     statusText="OK";
     sentHeaders=false;
     sentLastPart=false;
+    buffersize=4096;
+    barry.reserve(4096);
 }
 
 void HttpResponse::setHeader(QByteArray name, QByteArray value) {
@@ -70,6 +72,25 @@ bool HttpResponse::writeToSocket(QByteArray data) {
         remaining-=written;
     }
     return true;
+}
+
+void HttpResponse::bwrite(QByteArray data)
+{
+    if (barry.size() && (barry.size() + data.size() > buffersize)) {
+        // flush buffer
+        write(barry);
+        barry = data;
+    } else {
+        barry.append(data);
+    }
+}
+
+void HttpResponse::flush()
+{
+    if (barry.size()) {
+        write(barry, true);
+        barry.clear();
+    }
 }
 
 void HttpResponse::write(QByteArray data, bool lastPart) {

@@ -494,7 +494,7 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
     if (metrics != "") wantedNames = metrics.split(",");
 
     // write headings
-    response.write("date, time, filename");
+    response.bwrite("date, time, filename");
 
     int i=0;
     foreach(const RideMetric *m, indexed) {
@@ -506,16 +506,16 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
         if (wantedNames.count() && !wantedNames.contains(underscored)) continue;
 
         if (m->name().startsWith("BikeScore"))
-            response.write(", BikeScore");
+            response.bwrite(", BikeScore");
         else {
-            response.write(", ");
-            response.write(underscored.toLocal8Bit());
+            response.bwrite(", ");
+            response.bwrite(underscored.toLocal8Bit());
         }
 
         // index of wanted metrics
         wanted << (i-1);
     }
-    response.write("\n");
+    response.bwrite("\n");
 
     // parse the rideDB and write a line for each entry
     QString ridedb = QString("%1/%2/cache/rideDB.json").arg(home.absolutePath()).arg(athlete);
@@ -562,8 +562,7 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
 
         // regardless of errors we're done !
         delete jc;
-
-        return;
     }
+    response.flush();
 }
 #endif
