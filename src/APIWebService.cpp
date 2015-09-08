@@ -116,28 +116,28 @@ APIWebService::writeRideLine(QList<int> wanted, RideItem &item, HttpRequest *req
     if (item.dateTime.date() < since) return;
 
     // date, time, filename
-    response->write(item.dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
-    response->write(",");
-    response->write(item.dateTime.time().toString("hh:mm:ss").toLocal8Bit());;
-    response->write(",");
-    response->write(item.fileName.toLocal8Bit());
+    response->bwrite(item.dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
+    response->bwrite(",");
+    response->bwrite(item.dateTime.time().toString("hh:mm:ss").toLocal8Bit());;
+    response->bwrite(",");
+    response->bwrite(item.fileName.toLocal8Bit());
 
     if (wanted.count()) {
         // specific metrics
         foreach(int index, wanted) {
             double value = item.metrics()[index];
-            response->write(",");
-            response->write(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
+            response->bwrite(",");
+            response->bwrite(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
         }
     } else {
 
         // all metrics...
         foreach(double value, item.metrics()) {
-            response->write(",");
-            response->write(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
+            response->bwrite(",");
+            response->bwrite(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
         }
     }
-    response->write("\n");
+    response->bwrite("\n");
 }
 
 void

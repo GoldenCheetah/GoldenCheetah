@@ -85,6 +85,11 @@ public:
     */
     void write(QByteArray data, bool lastPart=false);
 
+    // buffered write
+    void setBuffersize(int size) { buffersize=size; barry.reserve(size); }
+    void bwrite(QByteArray data);
+    void flush();
+
     /**
       Indicates wheter the body has been sent completely. Used by the connection
       handler to terminate the body automatically when necessary.
@@ -136,6 +141,8 @@ private:
     */
     void writeHeaders();
 
+    int buffersize;
+    QByteArray barry;
 };
 
 #endif // HTTPRESPONSE_H
