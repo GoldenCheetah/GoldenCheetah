@@ -567,7 +567,7 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
     // athlete details
     QDomElement athlete = doc.createElement("athlete");
     QDomElement name = doc.createElement("name");
-    text = doc.createTextNode(context->athlete->cyclist); name.appendChild(text);
+    text = doc.createTextNode(context ? context->athlete->cyclist : "athlete"); name.appendChild(text);
     athlete.appendChild(name);
     double cyclistweight = ride->getTag("Weight", "0.0").toDouble();
     if (cyclistweight) {

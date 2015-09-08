@@ -109,54 +109,57 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     QStringList worklist = QStringList();
     for (int i=0; metrics[i];i++) worklist << metrics[i];
 
-    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, ride, context->athlete->zones(), context->athlete->hrZones(), worklist);
+    QHash<QString, RideMetricPtr> computed; 
+    if (context) { // can't do this standalone
+        computed = RideMetric::computeMetrics(context, ride, context->athlete->zones(), context->athlete->hrZones(), worklist);
 
-    QDomElement lap_time = doc.createElement("TotalTimeSeconds");
-    text = doc.createTextNode(QString("%1").arg(computed.value("workout_time")->value(true)));
-    //text = doc.createTextNode(ride->dataPoints().last()->secs);
-    lap_time.appendChild(text);
-    lap.appendChild(lap_time);
+        QDomElement lap_time = doc.createElement("TotalTimeSeconds");
+        text = doc.createTextNode(QString("%1").arg(computed.value("workout_time")->value(true)));
+        //text = doc.createTextNode(ride->dataPoints().last()->secs);
+        lap_time.appendChild(text);
+        lap.appendChild(lap_time);
 
-    QDomElement lap_distance = doc.createElement("DistanceMeters");
-    text = doc.createTextNode(QString("%1").arg(1000*computed.value("total_distance")->value(true)));
-    //text = doc.createTextNode(ride->dataPoints().last()->km);
-    lap_distance.appendChild(text);
-    lap.appendChild(lap_distance);
+        QDomElement lap_distance = doc.createElement("DistanceMeters");
+        text = doc.createTextNode(QString("%1").arg(1000*computed.value("total_distance")->value(true)));
+        //text = doc.createTextNode(ride->dataPoints().last()->km);
+        lap_distance.appendChild(text);
+        lap.appendChild(lap_distance);
 
-    QDomElement max_speed = doc.createElement("MaximumSpeed");
-    text = doc.createTextNode(QString("%1")
-        .arg(computed.value("max_speed")->value(true) / 3.6));
-    max_speed.appendChild(text);
-    lap.appendChild(max_speed);
+        QDomElement max_speed = doc.createElement("MaximumSpeed");
+        text = doc.createTextNode(QString("%1")
+            .arg(computed.value("max_speed")->value(true) / 3.6));
+        max_speed.appendChild(text);
+        lap.appendChild(max_speed);
 
-    QDomElement lap_calories = doc.createElement("Calories");
-    text = doc.createTextNode(QString("%1").arg((int)computed.value("total_work")->value(true)));
-    lap_calories.appendChild(text);
-    lap.appendChild(lap_calories);
+        QDomElement lap_calories = doc.createElement("Calories");
+        text = doc.createTextNode(QString("%1").arg((int)computed.value("total_work")->value(true)));
+        lap_calories.appendChild(text);
+        lap.appendChild(lap_calories);
 
-    QDomElement avg_heartrate = doc.createElement("AverageHeartRateBpm");
-    QDomElement value = doc.createElement("Value");
-    text = doc.createTextNode(QString("%1").arg((int)computed.value("average_hr")->value(true)));
-    value.appendChild(text);
-    avg_heartrate.appendChild(value);
-    lap.appendChild(avg_heartrate);
+        QDomElement avg_heartrate = doc.createElement("AverageHeartRateBpm");
+        QDomElement value = doc.createElement("Value");
+        text = doc.createTextNode(QString("%1").arg((int)computed.value("average_hr")->value(true)));
+        value.appendChild(text);
+        avg_heartrate.appendChild(value);
+        lap.appendChild(avg_heartrate);
 
-    QDomElement max_heartrate = doc.createElement("MaximumHeartRateBpm");
-    value = doc.createElement("Value");
-    text = doc.createTextNode(QString("%1").arg((int)computed.value("max_heartrate")->value(true)));
-    value.appendChild(text);
-    max_heartrate.appendChild(value);
-    lap.appendChild(max_heartrate);
+        QDomElement max_heartrate = doc.createElement("MaximumHeartRateBpm");
+        value = doc.createElement("Value");
+        text = doc.createTextNode(QString("%1").arg((int)computed.value("max_heartrate")->value(true)));
+        value.appendChild(text);
+        max_heartrate.appendChild(value);
+        lap.appendChild(max_heartrate);
 
-    QDomElement lap_intensity = doc.createElement("Intensity");
-    text = doc.createTextNode("Active");
-    lap_intensity.appendChild(text);
-    lap.appendChild(lap_intensity);
+        QDomElement lap_intensity = doc.createElement("Intensity");
+        text = doc.createTextNode("Active");
+        lap_intensity.appendChild(text);
+        lap.appendChild(lap_intensity);
 
-    QDomElement lap_triggerMethod = doc.createElement("TriggerMethod");
-    text = doc.createTextNode("Manual");
-    lap_triggerMethod.appendChild(text);
-    lap.appendChild(lap_triggerMethod);
+        QDomElement lap_triggerMethod = doc.createElement("TriggerMethod");
+        text = doc.createTextNode("Manual");
+        lap_triggerMethod.appendChild(text);
+        lap.appendChild(lap_triggerMethod);
+    }
 
     // samples
     // data points: timeoffset, dist, hr, spd, pwr, torq, cad, lat, lon, alt
@@ -263,144 +266,145 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     }
 
 
-    // Activity Extensions
-    QDomElement extensions = doc.createElement("Extensions");
-    lap.appendChild(extensions);
-    QDomElement lx = doc.createElement("LX");
-    lx.setAttribute("xmlns", "http://www.garmin.com/xmlschemas/ActivityExtension/v2");
-    extensions.appendChild(lx);
+    if (context) {
+        // Activity Extensions
+        QDomElement extensions = doc.createElement("Extensions");
+        lap.appendChild(extensions);
+        QDomElement lx = doc.createElement("LX");
+        lx.setAttribute("xmlns", "http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+        extensions.appendChild(lx);
 
-    QDomElement max_cad = doc.createElement("MaxBikeCadence");
-    text = doc.createTextNode(QString("%1").arg(computed.value("max_cadence")->value(true)));
-    max_cad.appendChild(text);
-    lx.appendChild(max_cad);
+        QDomElement max_cad = doc.createElement("MaxBikeCadence");
+        text = doc.createTextNode(QString("%1").arg(computed.value("max_cadence")->value(true)));
+        max_cad.appendChild(text);
+        lx.appendChild(max_cad);
 
-    lx = doc.createElement("LX");
-    lx.setAttribute("xmlns", "http://www.garmin.com/xmlschemas/ActivityExtension/v2");
-    extensions.appendChild(lx);
+        lx = doc.createElement("LX");
+        lx.setAttribute("xmlns", "http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+        extensions.appendChild(lx);
 
-    QDomElement avg_speed = doc.createElement("AvgSpeed");
-    text = doc.createTextNode(QString("%1")
-        .arg(computed.value("average_speed")->value(true) / 3.6));
-    avg_speed.appendChild(text);
-    lx.appendChild(avg_speed);
+        QDomElement avg_speed = doc.createElement("AvgSpeed");
+        text = doc.createTextNode(QString("%1")
+            .arg(computed.value("average_speed")->value(true) / 3.6));
+        avg_speed.appendChild(text);
+        lx.appendChild(avg_speed);
 
-    lx = doc.createElement("LX");
-    lx.setAttribute("xmlns", "http://www.garmin.com/xmlschemas/ActivityExtension/v2");
-    extensions.appendChild(lx);
+        lx = doc.createElement("LX");
+        lx.setAttribute("xmlns", "http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+        extensions.appendChild(lx);
 
-    QDomElement avg_power = doc.createElement("AvgWatts");
-    text = doc.createTextNode(QString("%1").arg((int)computed.value("average_power")->value(true)));
-    avg_power.appendChild(text);
-    lx.appendChild(avg_power);
+        QDomElement avg_power = doc.createElement("AvgWatts");
+        text = doc.createTextNode(QString("%1").arg((int)computed.value("average_power")->value(true)));
+        avg_power.appendChild(text);
+        lx.appendChild(avg_power);
 
-    lx = doc.createElement("LX");
-    lx.setAttribute("xmlns", "http://www.garmin.com/xmlschemas/ActivityExtension/v2");
-    extensions.appendChild(lx);
+        lx = doc.createElement("LX");
+        lx.setAttribute("xmlns", "http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+        extensions.appendChild(lx);
 
-    QDomElement max_power = doc.createElement("MaxWatts");
-    text = doc.createTextNode(QString("%1").arg((int)computed.value("max_power")->value(true)));
-    max_power.appendChild(text);
-    lx.appendChild(max_power);
+        QDomElement max_power = doc.createElement("MaxWatts");
+        text = doc.createTextNode(QString("%1").arg((int)computed.value("max_power")->value(true)));
+        max_power.appendChild(text);
+        lx.appendChild(max_power);
 
-    // Creator - Device
-    QDomElement creator = doc.createElement("Creator");
-    creator.setAttribute("xsi:type", "Device_t");
-    activity.appendChild(creator);
+        // Creator - Device
+        QDomElement creator = doc.createElement("Creator");
+        creator.setAttribute("xsi:type", "Device_t");
+        activity.appendChild(creator);
 
-    QDomElement creator_name = doc.createElement("Name");
-    if (ride->deviceType() != "")
-        text = doc.createTextNode(ride->deviceType());
-    else
-        text = doc.createTextNode("Unknown");
-    creator_name.appendChild(text);
-    creator.appendChild(creator_name);
+        QDomElement creator_name = doc.createElement("Name");
+        if (ride->deviceType() != "")
+            text = doc.createTextNode(ride->deviceType());
+        else
+            text = doc.createTextNode("Unknown");
+        creator_name.appendChild(text);
+        creator.appendChild(creator_name);
 
-    QDomElement creator_unitId = doc.createElement("UnitId");
-    text = doc.createTextNode("0");
-    creator_unitId.appendChild(text);
-    creator.appendChild(creator_unitId);
+        QDomElement creator_unitId = doc.createElement("UnitId");
+        text = doc.createTextNode("0");
+        creator_unitId.appendChild(text);
+        creator.appendChild(creator_unitId);
 
-    QDomElement creator_productId = doc.createElement("ProductID");
-    text = doc.createTextNode("0");
-    creator_productId.appendChild(text);
-    creator.appendChild(creator_productId);
+        QDomElement creator_productId = doc.createElement("ProductID");
+        text = doc.createTextNode("0");
+        creator_productId.appendChild(text);
+        creator.appendChild(creator_productId);
 
-    QDomElement creator_version = doc.createElement("Version");
-    creator.appendChild(creator_version);
+        QDomElement creator_version = doc.createElement("Version");
+        creator.appendChild(creator_version);
 
-    QDomElement creator_version_version_major = doc.createElement("VersionMajor");
-    text = doc.createTextNode("3");
-    creator_version_version_major.appendChild(text);
-    creator_version.appendChild(creator_version_version_major);
+        QDomElement creator_version_version_major = doc.createElement("VersionMajor");
+        text = doc.createTextNode("3");
+        creator_version_version_major.appendChild(text);
+        creator_version.appendChild(creator_version_version_major);
 
-    QDomElement creator_version_version_minor = doc.createElement("VersionMinor");
-    text = doc.createTextNode("0");
-    creator_version_version_minor.appendChild(text);
-    creator_version.appendChild(creator_version_version_minor);
+        QDomElement creator_version_version_minor = doc.createElement("VersionMinor");
+        text = doc.createTextNode("0");
+        creator_version_version_minor.appendChild(text);
+        creator_version.appendChild(creator_version_version_minor);
 
-    QDomElement creator_version_build_major = doc.createElement("BuildMajor");
-    text = doc.createTextNode("0");
-    creator_version_build_major.appendChild(text);
-    creator_version.appendChild(creator_version_build_major);
+        QDomElement creator_version_build_major = doc.createElement("BuildMajor");
+        text = doc.createTextNode("0");
+        creator_version_build_major.appendChild(text);
+        creator_version.appendChild(creator_version_build_major);
 
-    QDomElement creator_version_build_minor = doc.createElement("BuildMinor");
-    text = doc.createTextNode("0");
-    creator_version_build_minor.appendChild(text);
-    creator_version.appendChild(creator_version_build_minor);
+        QDomElement creator_version_build_minor = doc.createElement("BuildMinor");
+        text = doc.createTextNode("0");
+        creator_version_build_minor.appendChild(text);
+        creator_version.appendChild(creator_version_build_minor);
 
-    // Author - Application
-    QDomElement author = doc.createElement("Author");
-    author.setAttribute("xsi:type", "Application_t");
-    tcx.appendChild(author);
+        // Author - Application
+        QDomElement author = doc.createElement("Author");
+        author.setAttribute("xsi:type", "Application_t");
+        tcx.appendChild(author);
 
-    QDomElement author_name = doc.createElement("Name");
-    text = doc.createTextNode("GoldenCheetah");
-    author_name.appendChild(text);
-    author.appendChild(author_name);
+        QDomElement author_name = doc.createElement("Name");
+        text = doc.createTextNode("GoldenCheetah");
+        author_name.appendChild(text);
+        author.appendChild(author_name);
 
-    QDomElement author_build = doc.createElement("Build");
-    author.appendChild(author_build);
+        QDomElement author_build = doc.createElement("Build");
+        author.appendChild(author_build);
 
-    QDomElement author_version = doc.createElement("Version");
-    author_build.appendChild(author_version);
+        QDomElement author_version = doc.createElement("Version");
+        author_build.appendChild(author_version);
 
-    QDomElement author_version_version_major = doc.createElement("VersionMajor");
-    text = doc.createTextNode("3");
-    author_version_version_major.appendChild(text);
-    author_version.appendChild(author_version_version_major);
+        QDomElement author_version_version_major = doc.createElement("VersionMajor");
+        text = doc.createTextNode("3");
+        author_version_version_major.appendChild(text);
+        author_version.appendChild(author_version_version_major);
 
-    QDomElement author_version_version_minor = doc.createElement("VersionMinor");
-    text = doc.createTextNode("0");
-    author_version_version_minor.appendChild(text);
-    author_version.appendChild(author_version_version_minor);
+        QDomElement author_version_version_minor = doc.createElement("VersionMinor");
+        text = doc.createTextNode("0");
+        author_version_version_minor.appendChild(text);
+        author_version.appendChild(author_version_version_minor);
 
-    QDomElement author_version_build_major = doc.createElement("BuildMajor");
-    text = doc.createTextNode("0");
-    author_version_build_major.appendChild(text);
-    author_version.appendChild(author_version_build_major);
+        QDomElement author_version_build_major = doc.createElement("BuildMajor");
+        text = doc.createTextNode("0");
+        author_version_build_major.appendChild(text);
+        author_version.appendChild(author_version_build_major);
 
-    QDomElement author_version_build_minor = doc.createElement("BuildMinor");
-    text = doc.createTextNode("0");
-    author_version_build_minor.appendChild(text);
-    author_version.appendChild(author_version_build_minor);
+        QDomElement author_version_build_minor = doc.createElement("BuildMinor");
+        text = doc.createTextNode("0");
+        author_version_build_minor.appendChild(text);
+        author_version.appendChild(author_version_build_minor);
 
-    QDomElement author_type = doc.createElement("Type");
-    text = doc.createTextNode("Beta"); // was GC_VERSION but should be Interna | Alpha | Beta | Release
-    author_type.appendChild(text);
-    author_build.appendChild(author_type);
+        QDomElement author_type = doc.createElement("Type");
+        text = doc.createTextNode("Beta"); // was GC_VERSION but should be Interna | Alpha | Beta | Release
+        author_type.appendChild(text);
+        author_build.appendChild(author_type);
 
-    QDomElement author_lang = doc.createElement("LangID");
-    QVariant lang = appsettings->value(NULL, GC_LANG, QLocale::system().name());
-    text = doc.createTextNode(lang.toString());
-    author_lang.appendChild(text);
-    author.appendChild(author_lang);
+        QDomElement author_lang = doc.createElement("LangID");
+        QVariant lang = appsettings->value(NULL, GC_LANG, QLocale::system().name());
+        text = doc.createTextNode(lang.toString());
+        author_lang.appendChild(text);
+        author.appendChild(author_lang);
 
-    QDomElement author_part_number = doc.createElement("PartNumber");
-    text = doc.createTextNode("000-00000-00");
-    author_part_number.appendChild(text);
-    author.appendChild(author_part_number);
-
+        QDomElement author_part_number = doc.createElement("PartNumber");
+        text = doc.createTextNode("000-00000-00");
+        author_part_number.appendChild(text);
+        author.appendChild(author_part_number);
+    }
 
     return doc.toByteArray(4);
 }

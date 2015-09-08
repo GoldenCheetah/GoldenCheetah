@@ -616,9 +616,11 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
 
         // Construct the summary text used on the calendar
         QString calendarText;
-        foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
-            if (field.diary == true && result->getTag(field.name, "") != "") {
-                calendarText += field.calendarText(result->getTag(field.name, ""));
+        if (context) { // will be null in standalone open
+            foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+                if (field.diary == true && result->getTag(field.name, "") != "") {
+                    calendarText += field.calendarText(result->getTag(field.name, ""));
+                }
             }
         }
         result->setTag("Calendar Text", calendarText);
@@ -627,7 +629,7 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         result->setTag("Filename", QFileInfo(file.fileName()).fileName());
         result->setTag("Device", result->deviceType());
         result->setTag("File Format", result->fileFormat());
-        result->setTag("Athlete", context->athlete->cyclist);
+        if (context) result->setTag("Athlete", context->athlete->cyclist);
         result->setTag("Year", result->startTime().toString("yyyy"));
         result->setTag("Month", result->startTime().toString("MMMM"));
         result->setTag("Weekday", result->startTime().toString("ddd"));
@@ -656,7 +658,7 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         DataProcessorFactory::instance().autoProcess(result);
 
         // calculate derived data series -- after data fixers applied above
-        result->recalculateDerivedSeries();
+        if (context) result->recalculateDerivedSeries();
 
         // what data is present - after processor in case 'derived' or adjusted
         QString flags;
