@@ -76,7 +76,7 @@ ride: '{' rideelement_list '}'                                  {
                                                                     // if the performance is too slow we can move to
                                                                     // a binary search, but suspect this ok < 10000 rides
                                                                     if (jc->api != NULL) {
-                                                                    #ifdef GC_HAVE_HTTP
+                                                                    #ifdef GC_WANT_HTTP
                                                                         // we're listing rides in the api
                                                                         jc->api->writeRideLine(jc->wanted, jc->item, jc->request, jc->response);
                                                                     #endif
