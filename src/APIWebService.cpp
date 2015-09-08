@@ -57,18 +57,35 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
 {
 
     // LIST ACTIVITIES FOR ATHLETE
-    if (paths.count() == 2) listRides(paths[0], request, response);
-    else if (paths.count() > 2) {
+    if (paths.count() == 2) {
+
+        listRides(paths[0], request, response);
+        return;
+
+    } else if (paths.count() == 3) {
 
         QString athlete = paths[0];
         paths.removeFirst();
 
         // GET ACTIVITY
-        if (paths[0] == "activity") listActivity(athlete, paths, request, response);
+        if (paths[0] == "activity") {
+            paths.removeFirst();
+            listActivity(athlete, paths, request, response);
+            return;
+        }
 
         // GET MMP
-        if (paths[0] == "mmp") listMMP(athlete, paths, request, response);
+        if (paths[0] == "mmp") {
+            paths.removeFirst();
+            listMMP(athlete, paths, request, response);
+            return;
+        }
     }
+
+    // GET HERE ITS BAD!
+    response.setStatus(404); // malformed URL
+    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+    response.write("malformed url");
 }
 
 void
@@ -145,7 +162,31 @@ APIWebService::listActivity(QString athlete, QStringList paths, HttpRequest &req
 {
     // list activities and associated metrics
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");
-    response.write("get activity under construction");
+
+    // does it exist ?
+    QString filename = QString("%1/%2/activities/%3").arg(home.absolutePath()).arg(athlete).arg(paths[0]);
+
+    QString contents;
+    QFile file(filename);
+    if (file.exists() && file.open(QFile::ReadOnly | QFile::Text)) {
+
+        // read in the whole thing
+        QTextStream in(&file);
+        // GC .JSON is stored in UTF-8 with BOM(Byte order mark) for identification
+        in.setCodec ("UTF-8");
+        contents = in.readAll();
+        file.close();
+
+        // write back in one hit
+        response.write(contents.toLocal8Bit(), true);
+
+    } else {
+
+       // nope?
+       response.setStatus(404);
+       response.write("file not found");
+       return;
+    }
 }
 
 void
