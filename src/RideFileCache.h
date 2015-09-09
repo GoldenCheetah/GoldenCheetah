@@ -81,30 +81,8 @@ static const unsigned int RideFileCacheVersion = 24;
 // files are local caches we do not worry about endianness
 struct RideFileCacheHeader {
 
-    public:
     unsigned int version;
     unsigned int crc;
-
-    int count(RideFile::SeriesType series) {
-        switch (series) {
-        case RideFile::watts: return wattsMeanMaxCount;
-        case RideFile::hr: return hrMeanMaxCount;
-        case RideFile::cad: return cadMeanMaxCount;
-        case RideFile::nm: return nmMeanMaxCount;
-        case RideFile::kph: return kphMeanMaxCount;
-        case RideFile::kphd: return kphdMeanMaxCount;
-        case RideFile::wattsd: return wattsdMeanMaxCount;
-        case RideFile::cadd: return caddMeanMaxCount;
-        case RideFile::nmd: return nmdMeanMaxCount;
-        case RideFile::hrd: return hrdMeanMaxCount;
-        case RideFile::xPower: return xPowerMeanMaxCount;
-        case RideFile::NP: return npMeanMaxCount;
-        case RideFile::vam: return vamMeanMaxCount;
-        //XXX eek case RideFile::wpk: return wattsKgMeanMaxCount;
-        case RideFile::aPower: return aPowerMeanMaxCount;
-        default: return -1;
-        }
-    }
 
     unsigned int wattsMeanMaxCount,
                  hrMeanMaxCount,

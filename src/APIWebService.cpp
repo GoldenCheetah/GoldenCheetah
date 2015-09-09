@@ -313,13 +313,32 @@ APIWebService::listMMP(QString athlete, QStringList paths, HttpRequest &request,
     // list activities and associated metrics
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");
 
+    // what series do we want ?
+    QString seriesp = request.getParameter("series");
+    RideFile::SeriesType series;
+    if (seriesp == "") series = RideFile::watts;
+    else {
+        if (seriesp == "hr") series = RideFile::hr;
+        if (seriesp == "cad") series = RideFile::cad;
+        if (seriesp == "speed") series = RideFile::kph;
+        if (seriesp == "watts") series = RideFile::watts;
+        if (seriesp == "vam") series = RideFile::vam;
+        if (seriesp == "NP") series = RideFile::NP;
+        if (seriesp == "xPower") series = RideFile::xPower;
+        if (seriesp == "nm") series = RideFile::nm;
+    }
+
     QString filename=paths[0];
     QString CPXfilename = home.absolutePath() + "/" + athlete + "/cache/" + QFileInfo(filename).completeBaseName() + ".cpx";
 
-    response.bwrite("secs, watts\n");
+    // header
+    response.bwrite("secs, ");
+    response.bwrite(RideFile::seriesName(series).toLocal8Bit());
+    response.bwrite("\n");
+
     if (QFileInfo(CPXfilename).exists()) {
         int secs=0;
-        foreach(float value, RideFileCache::meanMaxFor(CPXfilename, RideFile::watts)) {
+        foreach(float value, RideFileCache::meanMaxFor(CPXfilename, series)) {
             if (secs >0) response.bwrite(QString("%1, %2\n").arg(secs).arg(value).toLocal8Bit());
             secs++;
         }
