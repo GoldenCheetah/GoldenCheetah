@@ -597,12 +597,12 @@ int Fortius::openPort()
 
 int Fortius::rawWrite(uint8_t *bytes, int size) // unix!!
 {
-    return usb2->write((char *)bytes, size);
+    return usb2->write(bytes, size);
 }
 
 int Fortius::rawRead(uint8_t bytes[], int size)
 {
-    return usb2->read((char *)bytes, size);
+    return usb2->read(bytes, size);
 }
 
 // check to see of there is a port at the device specified
