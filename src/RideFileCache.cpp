@@ -392,6 +392,55 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float>&w
 
 }
 
+// used by the API web services to extract meanmax data from the cache
+QVector<float> RideFileCache::meanMaxFor(QString cacheFilename, RideFile::SeriesType series)
+{
+    QTime start;
+    start.start();
+
+    QVector<float> returning;
+
+    // Get info for ride file and cache file
+    QFileInfo cacheFileInfo(cacheFilename);
+
+    // is it up-to-date?
+    if (cacheFileInfo.exists() && cacheFileInfo.size() >= (int)sizeof(struct RideFileCacheHeader)) {
+
+        // we have a file, it is more recent than the ride file
+        // but is it the latest version?
+        RideFileCacheHeader head;
+        QFile cacheFile(cacheFilename);
+        if (cacheFile.open(QIODevice::ReadOnly) == true) {
+
+            // read the header
+            QDataStream inFile(&cacheFile);
+            inFile.readRawData((char *) &head, sizeof(head));
+
+            int count = head.count(series);
+
+            // check its an up to date format and contains power
+            if (head.version == RideFileCacheVersion && count>0) {
+
+                // seek to start of meanmax array in the cache
+                long offset = offsetForMeanMax(head, series) + sizeof(head);
+                cacheFile.seek(qint64(offset));
+
+                // read from cache and put straight into QVector memory
+                // a little naughty but seems to work ok
+                returning.resize(count);
+                inFile.readRawData((char*)returning.constData(), count * sizeof(float));
+            }
+
+            // we're done reading
+            cacheFile.close();
+        }
+    }
+
+    // will be empty if no up to date cache
+    return returning;
+
+}
+
 RideFileCache::RideFileCache(RideFile *ride) :
                incomplete(false), context(ride->context), rideFileName(""), ride(ride)
 {
