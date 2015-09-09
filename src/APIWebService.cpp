@@ -171,9 +171,6 @@ APIWebService::writeRideLine(QList<int> wanted, RideItem &item, HttpRequest *req
 void
 APIWebService::listActivity(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response)
 {
-    // list activities and associated metrics
-    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
-
     // does it exist ?
     QString filename = QString("%1/%2/activities/%3").arg(home.absolutePath()).arg(athlete).arg(paths[0]);
 
@@ -186,8 +183,27 @@ APIWebService::listActivity(QString athlete, QStringList paths, HttpRequest &req
 
         // what format to use ?
         QString format(request.getParameter("format"));
+        if (format == "") {
+
+            // if not passed in the URL then is content type
+            // caller can accept listed in the header?
+            // there is probably a more complete way of handling
+            // wildcards etc, but the user can always force via     
+            // the format parameter in the URL
+            foreach(QByteArray accepts, request.getHeaders("Accept")) {
+                if (accepts == "application/json") format="json";
+                if (accepts == "text/csv") format="csv";
+                if (accepts == "application/vnd.garmin.tcx") format="tcx";
+                if (accepts == "application/vnd.trainingpeaks.pwx") format="pwx";
+                if (accepts == "application/xml" || accepts == "text/xml") format="tcx";
+                if (format != "") break;
+            }
+        }
 
         if (format == "") {
+
+            // list activities and associated metrics
+            response.setHeader("Content-Type", "application/json; charset=ISO-8859-1");
 
             // read in the whole thing
             QTextStream in(&file);
@@ -218,6 +234,13 @@ APIWebService::listActivity(QString athlete, QStringList paths, HttpRequest &req
                 }
                 response.write("\r\n");
                 return;
+            } else {
+
+                // set the content type appropriately
+                if (format == "tcx") response.setHeader("Content-Type", "application/vnd.garmin.tcx+xml; charset=ISO-8859-1");
+                if (format == "csv") response.setHeader("Content-Type", "text/csv; charset=ISO-8859-1");
+                if (format == "json") response.setHeader("Content-Type", "application/json; charset=ISO-8859-1");
+                if (format == "pwx") response.setHeader("Content-Type", "application/vnd.trainingpeaks.pwx+xml; charset=ISO-8859-1");
             }
 
             // lets read the file in as a ridefile
