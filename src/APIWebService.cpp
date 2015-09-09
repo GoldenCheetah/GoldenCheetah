@@ -23,6 +23,7 @@
 #include "RideDB.h"
 
 #include "RideFile.h"
+#include "RideFileCache.h"
 #include "CsvRideFile.h"
 
 #include <QTemporaryFile>
@@ -80,7 +81,7 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
         }
 
         // GET MMP
-        if (paths[0] == "mmp") {
+        if (paths[0] == "meanmax") {
             paths.removeFirst();
             listMMP(athlete, paths, request, response);
             return;
@@ -311,5 +312,17 @@ APIWebService::listMMP(QString athlete, QStringList paths, HttpRequest &request,
 {
     // list activities and associated metrics
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");
-    response.write("get mmp under construction");
+
+    QString filename=paths[0];
+    QString CPXfilename = home.absolutePath() + "/" + athlete + "/cache/" + QFileInfo(filename).completeBaseName() + ".cpx";
+
+    response.bwrite("secs, watts\n");
+    if (QFileInfo(CPXfilename).exists()) {
+        int secs=0;
+        foreach(float value, RideFileCache::meanMaxFor(CPXfilename, RideFile::watts)) {
+            if (secs >0) response.bwrite(QString("%1, %2\n").arg(secs).arg(value).toLocal8Bit());
+            secs++;
+        }
+    }
+    response.flush();
 }
