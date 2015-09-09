@@ -416,7 +416,7 @@ QVector<float> RideFileCache::meanMaxFor(QString cacheFilename, RideFile::Series
             QDataStream inFile(&cacheFile);
             inFile.readRawData((char *) &head, sizeof(head));
 
-            int count = head.count(series);
+            int count = countForMeanMax(head, series);
 
             // check its an up to date format and contains power
             if (head.version == RideFileCacheVersion && count>0) {
