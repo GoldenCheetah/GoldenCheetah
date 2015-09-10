@@ -315,17 +315,24 @@ APIWebService::listMMP(QString athlete, QStringList paths, HttpRequest &request,
 
     // what series do we want ?
     QString seriesp = request.getParameter("series");
+    if (seriesp == "") seriesp = "watts";
     RideFile::SeriesType series;
-    if (seriesp == "") series = RideFile::watts;
+
+    // what asked for ?
+    if (seriesp == "hr") series = RideFile::hr;
+    else if (seriesp == "cad") series = RideFile::cad;
+    else if (seriesp == "speed") series = RideFile::kph;
+    else if (seriesp == "watts") series = RideFile::watts;
+    else if (seriesp == "vam") series = RideFile::vam;
+    else if (seriesp == "NP") series = RideFile::NP;
+    else if (seriesp == "xPower") series = RideFile::xPower;
+    else if (seriesp == "nm") series = RideFile::nm;
     else {
-        if (seriesp == "hr") series = RideFile::hr;
-        if (seriesp == "cad") series = RideFile::cad;
-        if (seriesp == "speed") series = RideFile::kph;
-        if (seriesp == "watts") series = RideFile::watts;
-        if (seriesp == "vam") series = RideFile::vam;
-        if (seriesp == "NP") series = RideFile::NP;
-        if (seriesp == "xPower") series = RideFile::xPower;
-        if (seriesp == "nm") series = RideFile::nm;
+
+        // unknown series
+        response.setStatus(500);
+        response.write("unknown series requested.\n");
+        return;
     }
 
     QString filename=paths[0];
@@ -333,7 +340,7 @@ APIWebService::listMMP(QString athlete, QStringList paths, HttpRequest &request,
 
     // header
     response.bwrite("secs, ");
-    response.bwrite(RideFile::seriesName(series).toLocal8Bit());
+    response.bwrite(seriesp.toLocal8Bit());
     response.bwrite("\n");
 
     if (QFileInfo(CPXfilename).exists()) {
