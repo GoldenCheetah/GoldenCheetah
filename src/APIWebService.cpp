@@ -324,6 +324,11 @@ APIWebService::listMMP(QString athlete, QStringList paths, HttpRequest &request,
 
     if (paths[0] == "bests") {
 
+        // header
+        response.bwrite("secs, ");
+        response.bwrite(seriesp.toLocal8Bit());
+        response.bwrite("\n");
+
         // honour the since parameter
         QString sincep(request.getParameter("since"));
         QDate since(1900,01,01);
