@@ -26,6 +26,10 @@
 #include "RideFileCache.h"
 #include "CsvRideFile.h"
 
+#include "Zones.h"
+#include "HrZones.h"
+#include "PaceZones.h"
+
 #include <QTemporaryFile>
 
 void
@@ -35,23 +39,19 @@ APIWebService::service(HttpRequest &request, HttpResponse &response)
     QString fullPath = request.getPath();
     while (fullPath.endsWith("/")) fullPath.chop(1);
 
-    // get the paths
+    // get the paths, strip empty stuff
     QStringList paths = QString(request.getPath()).split("/");
+    while (paths.count() && paths[paths.count()-1] == "") paths.removeLast();
+    while (paths.count() && paths[0] == "") paths.removeFirst();
 
-    // we need to look at the first path to determine action
-    if (paths.count() < 2) return; // impossible really
-
-    // get ride of first blank, all URLs start with a '/'
-    paths.removeFirst();
+    // we don't have a fave icon
+    if (paths.count() && paths[0] == "favicon.ico") return;
 
     // ROOT PATH RETURNS A LIST OF ATHLETES
-    if (paths[0] == "") {
+    if (paths.count() == 0) {
         listAthletes(request, response); // return csv list of all athlete and their characteristics
         return;
     }
-
-    // we don't have a fave icon
-    if (paths[0] == "favicon.ico") return;
 
     // Call to retreive athlete data, downstream will resolve
     // which functions to call for different data requests
@@ -62,11 +62,24 @@ void
 APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpResponse &response)
 {
 
-    // LIST ACTIVITIES FOR ATHLETE
-    if (paths.count() == 2) {
+    if (paths.count() == 1) {
 
+        // LIST ACTIVITIES FOR ATHLETE
+        // http://localhost:12021/athlete
         listRides(paths[0], request, response);
         return;
+
+    } else if (paths.count() == 2) {
+
+        QString athlete = paths[0];
+        paths.removeFirst();
+
+        // GET ZONES
+        // http://localhost:12021/athlete/zones
+        if (paths[0] == "zones") {
+            listZones(athlete, paths, request, response);
+            return;
+        }
 
     } else if (paths.count() == 3) {
 
@@ -74,7 +87,9 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
         paths.removeFirst();
 
         // GET ACTIVITY
+        // http://localhost:12021/athlete/activity/filename
         if (paths[0] == "activity") {
+
             paths.removeFirst();
             listActivity(athlete, paths, request, response);
             return;
@@ -82,10 +97,14 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
 
         // GET MMP
         if (paths[0] == "meanmax") {
+
+            // http://localhost:12021/athlete/meanmax/filename
+            // http://localhost:12021/athlete/meanmax/bests
             paths.removeFirst();
             listMMP(athlete, paths, request, response);
             return;
         }
+
     }
 
     // GET HERE ITS BAD!
@@ -95,7 +114,7 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
 }
 
 void
-APIWebService::listAthletes(HttpRequest &request, HttpResponse &response)
+APIWebService::listAthletes(HttpRequest &, HttpResponse &response)
 {
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");
 
@@ -362,5 +381,145 @@ APIWebService::listMMP(QString athlete, QStringList paths, HttpRequest &request,
             }
         }
         response.flush();
+    }
+}
+
+void
+APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, HttpResponse &response)
+{
+    // list activities and associated metrics
+    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+
+    // what zones we support
+    QStringList zonelist;
+    zonelist << "power" << "hr" << "pace" << "swimpace";
+
+    // what series do we want ?
+    QString zonesFor = request.getParameter("for");
+    if (zonesFor == "") zonesFor = "power";
+    else if (!zonelist.contains(zonesFor)) {
+        response.setStatus(404);
+        response.write("unknown zones type; one of power, hr, pace and swimpace expected.\n");
+        return;
+    }
+
+    // power zones
+    if (zonesFor == "power") {
+
+        // Power Zones
+        QFile zonesFile(home.absolutePath() + "/" + athlete + "/config/power.zones");
+        if (zonesFile.exists()) {
+            Zones *zones = new Zones;
+            if (zones->read(zonesFile)) {
+
+                // success - write out
+                response.write("date, cp, w', pmax\n");
+                for(int i=0; i<zones->getRangeSize(); i++) {
+                    response.write(
+                    QString("%1, %2, %3, %4\n")
+                           .arg(zones->getStartDate(i).toString("yyyy/MM/dd"))
+                           .arg(zones->getCP(i))
+                           .arg(zones->getWprime(i))
+                           .arg(zones->getPmax(i))
+                           .toLocal8Bit()
+                    );
+                }
+                return;
+            }
+        }
+
+        // drop here on fail
+        response.setStatus(500);
+        response.write("unable to read/parse the athlete's power.zones file.\n");
+        return;
+    }
+
+    // hr zones
+    if (zonesFor == "hr") {
+
+        // Zones
+        QFile zonesFile(home.absolutePath() + "/" + athlete + "/config/hr.zones");
+        if (zonesFile.exists()) {
+            HrZones *zones = new HrZones;
+            if (zones->read(zonesFile)) {
+
+                // success - write out
+                response.write("date, lthr, maxhr, rhr\n");
+                for(int i=0; i<zones->getRangeSize(); i++) {
+                    response.write(
+                    QString("%1, %2, %3, %4\n")
+                           .arg(zones->getStartDate(i).toString("yyyy/MM/dd"))
+                           .arg(zones->getLT(i))
+                           .arg(zones->getMaxHr(i))
+                           .arg(zones->getRestHr(i))
+                           .toLocal8Bit()
+                    );
+                }
+                return;
+            }
+        }
+
+        // drop here on fail
+        response.setStatus(500);
+        response.write("unable to read/parse the athlete's hr.zones file.\n");
+        return;
+    }
+
+    // pace zones
+    if (zonesFor == "pace") {
+
+        // Zones
+        QFile zonesFile(home.absolutePath() + "/" + athlete + "/config/run-pace.zones");
+        if (zonesFile.exists()) {
+            PaceZones *zones = new PaceZones;
+            if (zones->read(zonesFile)) {
+
+                // success - write out
+                response.write("date, CV\n");
+                for(int i=0; i<zones->getRangeSize(); i++) {
+                    response.write(
+                    QString("%1, %2\n")
+                           .arg(zones->getStartDate(i).toString("yyyy/MM/dd"))
+                           .arg(zones->getCV(i))
+                           .toLocal8Bit()
+                    );
+                }
+                return;
+            }
+        }
+
+        // drop here on fail
+        response.setStatus(500);
+        response.write("unable to read/parse the athlete's run-pace.zones file.\n");
+        return;
+    }
+
+    // swim pace zones
+    if (zonesFor == "swimpace") {
+
+        // Zones
+        QFile zonesFile(home.absolutePath() + "/" + athlete + "/config/swim-pace.zones");
+        if (zonesFile.exists()) {
+            PaceZones *zones = new PaceZones;
+            if (zones->read(zonesFile)) {
+
+                // success - write out
+                response.write("date, CV\n");
+                for(int i=0; i<zones->getRangeSize(); i++) {
+                    response.write(
+                    QString("%1, %2\n")
+                           .arg(zones->getStartDate(i).toString("yyyy/MM/dd"))
+                           .arg(zones->getCV(i))
+                           .toLocal8Bit()
+                    );
+                }
+                return;
+            }
+        }
+
+        // drop here on fail
+        response.setStatus(500);
+        response.write("unable to read/parse the athlete's swim-pace.zones file.\n");
+        return;
     }
 }

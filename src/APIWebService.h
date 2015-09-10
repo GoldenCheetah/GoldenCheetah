@@ -40,6 +40,7 @@ class APIWebService : public HttpRequestHandler
         void listRides(QString athlete, HttpRequest &request, HttpResponse &response);
         void listActivity(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
         void listMMP(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
+        void listZones(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
 
         // utility
         void writeRideLine(QList<int> wanted, RideItem &item, HttpRequest *request, HttpResponse *response);
