@@ -201,101 +201,86 @@ APIWebService::listActivity(QString athlete, QStringList paths, HttpRequest &req
             }
         }
 
-        if (format == "") {
+        // default to json
+        if (format == "") format = "json";
 
-            // list activities and associated metrics
-            response.setHeader("Content-Type", "application/json; charset=ISO-8859-1");
+        // lets go with tcx/pwx as xml, full csv (not powertap) and GC json
+        QStringList formats;
+        formats << "tcx"; // garmin training centre
+        formats << "csv"; // full csv list (not powertap)
+        formats << "json"; // gc json
+        formats << "pwx"; // gc json
+
+        // unsupported format
+        if (!formats.contains(format)) {
+            response.setStatus(500);
+            response.write("unsupported format; we support:");
+            foreach(QString fmt, formats) {
+                response.write(" ");
+                response.write(fmt.toLocal8Bit());
+            }
+            response.write("\r\n");
+            return;
+        } else {
+
+            // set the content type appropriately
+            if (format == "tcx") response.setHeader("Content-Type", "application/vnd.garmin.tcx+xml; charset=ISO-8859-1");
+            if (format == "csv") response.setHeader("Content-Type", "text/csv; charset=ISO-8859-1");
+            if (format == "json") response.setHeader("Content-Type", "application/json; charset=ISO-8859-1");
+            if (format == "pwx") response.setHeader("Content-Type", "application/vnd.trainingpeaks.pwx+xml; charset=ISO-8859-1");
+        }
+
+        // lets read the file in as a ridefile
+        QStringList errors;
+        RideFile *f = RideFileFactory::instance().openRideFile(NULL, file, errors);
+
+        // error reading (!)
+        if (f == NULL) {
+            response.setStatus(500);
+            foreach(QString error, errors) {
+                response.write(error.toLocal8Bit());
+                response.write("\r\n");
+            }
+            return;
+        }
+
+        // write out to a temporary file in
+        // the format requested
+        bool success;
+        QTemporaryFile tempfile; // deletes file when goes out of scope
+        QString tempname;
+        if (tempfile.open()) tempname = tempfile.fileName();
+        else {
+            response.setStatus(500);
+            response.write("error opening temporary file");
+            return;
+        }
+        QFile out(tempname);
+
+        if (format == "csv") {
+            CsvFileReader writer;
+            success = writer.writeRideFile(NULL, f, out, CsvFileReader::gc);
+        } else {
+            success = RideFileFactory::instance().writeRideFile(NULL, f, out, format);
+        }
+
+        if (success) {
 
             // read in the whole thing
-            QTextStream in(&file);
-            // GC .JSON is stored in UTF-8 with BOM(Byte order mark) for identification
+            out.open(QFile::ReadOnly | QFile::Text);
+            QTextStream in(&out);
             in.setCodec ("UTF-8");
             contents = in.readAll();
-            file.close();
+            out.close();
 
             // write back in one hit
             response.write(contents.toLocal8Bit(), true);
+            return;
 
         } else {
-
-            // lets go with tcx/pwx as xml, full csv (not powertap) and GC json
-            QStringList formats;
-            formats << "tcx"; // garmin training centre
-            formats << "csv"; // full csv list (not powertap)
-            formats << "json"; // gc json
-            formats << "pwx"; // gc json
-
-            // unsupported format
-            if (!formats.contains(format)) {
-                response.setStatus(500);
-                response.write("unsupported format; we support:");
-                foreach(QString fmt, formats) {
-                    response.write(" ");
-                    response.write(fmt.toLocal8Bit());
-                }
-                response.write("\r\n");
-                return;
-            } else {
-
-                // set the content type appropriately
-                if (format == "tcx") response.setHeader("Content-Type", "application/vnd.garmin.tcx+xml; charset=ISO-8859-1");
-                if (format == "csv") response.setHeader("Content-Type", "text/csv; charset=ISO-8859-1");
-                if (format == "json") response.setHeader("Content-Type", "application/json; charset=ISO-8859-1");
-                if (format == "pwx") response.setHeader("Content-Type", "application/vnd.trainingpeaks.pwx+xml; charset=ISO-8859-1");
-            }
-
-            // lets read the file in as a ridefile
-            QStringList errors;
-            RideFile *f = RideFileFactory::instance().openRideFile(NULL, file, errors);
-
-            // error reading (!)
-            if (f == NULL) {
-                response.setStatus(500);
-                foreach(QString error, errors) {
-                    response.write(error.toLocal8Bit());
-                    response.write("\r\n");
-                }
-                return;
-            }
-
-            // write out to a temporary file in
-            // the format requested
-            bool success;
-            QTemporaryFile tempfile; // deletes file when goes out of scope
-            QString tempname;
-            if (tempfile.open()) tempname = tempfile.fileName();
-            else {
-                response.setStatus(500);
-                response.write("error opening temporary file");
-                return;
-            }
-            QFile out(tempname);
-
-            if (format == "csv") {
-                CsvFileReader writer;
-                success = writer.writeRideFile(NULL, f, out, CsvFileReader::gc);
-            } else {
-                success = RideFileFactory::instance().writeRideFile(NULL, f, out, format);
-            }
-
-            if (success) {
-
-                // read in the whole thing
-                out.open(QFile::ReadOnly | QFile::Text);
-                QTextStream in(&out);
-                in.setCodec ("UTF-8");
-                contents = in.readAll();
-                out.close();
-
-                // write back in one hit
-                response.write(contents.toLocal8Bit(), true);
-                return;
-
-            } else {
-                response.setStatus(500);
-                response.write("unable to write output, internal error.\n");
-                return;
-            }
+            response.setStatus(500);
+            response.write("unable to write output, internal error.\n");
+            return;
         }
 
     } else {
