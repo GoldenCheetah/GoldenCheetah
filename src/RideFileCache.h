@@ -171,8 +171,9 @@ class RideFileCache
         static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QDate from, QDate to);
         static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QString filename);
 
-        // used by the API - get MM for any series
+        // used by the API - get MM for any series for an activity or date range
         static QVector<float> meanMaxFor(QString cachFilename, RideFile::SeriesType series);
+        static QVector<float> meanMaxFor(QString cacheDir, RideFile::SeriesType series, QDate from, QDate to);
 
         // not actually a copy constructor -- but we call it IN the constructor.
         RideFileCache(RideFileCache *other) { *this = *other; }

@@ -321,19 +321,41 @@ APIWebService::listMMP(QString athlete, QStringList paths, HttpRequest &request,
     }
 
     QString filename=paths[0];
-    QString CPXfilename = home.absolutePath() + "/" + athlete + "/cache/" + QFileInfo(filename).completeBaseName() + ".cpx";
 
-    // header
-    response.bwrite("secs, ");
-    response.bwrite(seriesp.toLocal8Bit());
-    response.bwrite("\n");
+    if (paths[0] == "bests") {
 
-    if (QFileInfo(CPXfilename).exists()) {
+        // honour the since parameter
+        QString sincep(request.getParameter("since"));
+        QDate since(1900,01,01);
+        if (sincep != "") since = QDate::fromString(sincep,"yyyy/MM/dd");
+
+        // before parameter
+        QString beforep(request.getParameter("before"));
+        QDate before(3000,01,01);
+        if (beforep != "") before = QDate::fromString(beforep,"yyyy/MM/dd");
+
         int secs=0;
-        foreach(float value, RideFileCache::meanMaxFor(CPXfilename, series)) {
+        foreach(float value, RideFileCache::meanMaxFor(home.absolutePath() + "/" + athlete + "/cache", series, since, before)) {
             if (secs >0) response.bwrite(QString("%1, %2\n").arg(secs).arg(value).toLocal8Bit());
             secs++;
         }
+
+
+    } else {
+        QString CPXfilename = home.absolutePath() + "/" + athlete + "/cache/" + QFileInfo(filename).completeBaseName() + ".cpx";
+
+        // header
+        response.bwrite("secs, ");
+        response.bwrite(seriesp.toLocal8Bit());
+        response.bwrite("\n");
+
+        if (QFileInfo(CPXfilename).exists()) {
+            int secs=0;
+            foreach(float value, RideFileCache::meanMaxFor(CPXfilename, series)) {
+                if (secs >0) response.bwrite(QString("%1, %2\n").arg(secs).arg(value).toLocal8Bit());
+                secs++;
+            }
+        }
+        response.flush();
     }
-    response.flush();
 }

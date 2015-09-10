@@ -392,7 +392,9 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float>&w
 
 }
 
-// used by the API web services to extract meanmax data from the cache
+// the next 2 are used by the API web services to extract meanmax data from the cache
+
+// API bests for a ride
 QVector<float> RideFileCache::meanMaxFor(QString cacheFilename, RideFile::SeriesType series)
 {
     QTime start;
@@ -433,6 +435,49 @@ QVector<float> RideFileCache::meanMaxFor(QString cacheFilename, RideFile::Series
 
             // we're done reading
             cacheFile.close();
+        }
+    }
+
+    // will be empty if no up to date cache
+    return returning;
+
+}
+
+// API bests for a date range
+QVector<float> RideFileCache::meanMaxFor(QString cacheDir, RideFile::SeriesType series, QDate from, QDate to)
+{
+    QTime start;
+    start.start();
+
+    bool first = true;
+    QVector<float> returning;
+
+    // loop through all CPX files
+    foreach(QString cacheFilename, QDir(cacheDir).entryList(QDir::Files)) {
+
+        // is it a cpx file ?
+        if (!cacheFilename.endsWith(".cpx")) continue;
+   
+        // is it big enough ? 
+        if (QFileInfo(cacheDir + "/" + cacheFilename).size() < (int)sizeof(struct RideFileCacheHeader)) continue;
+
+        // lets check it parses ok ?
+        QDateTime dt;
+        if (!RideFile::parseRideFileName(cacheFilename, &dt)) continue; 
+
+        // in range?
+        if (dt.date() < from || dt.date() > to) continue;
+
+        // get data
+        QVector<float> current = RideFileCache::meanMaxFor(cacheDir + "/" + cacheFilename, series);
+
+        // first ?
+        if (first) {
+            first = false;
+            returning = current;
+        } else {
+            if (current.size() > returning.size()) returning.resize(current.size());
+            for(int i=0; i< current.size(); i++) if (current[i] > returning[i]) returning[i]=current[i];
         }
     }
 
