@@ -471,8 +471,19 @@ void RideCache::save()
 void
 APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &response)
 {
+    // the ride db
+    QString ridedb = QString("%1/%2/cache/rideDB.json").arg(home.absolutePath()).arg(athlete);
+    QFile rideDB(ridedb);
+
     // list activities and associated metrics
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+
+    // not known..
+    if (!rideDB.exists()) {
+        response.setStatus(404);
+        response.write("malformed URL or unknown athlete.\n");
+        return;
+    }
 
     // write headings
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -518,8 +529,6 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
     response.bwrite("\n");
 
     // parse the rideDB and write a line for each entry
-    QString ridedb = QString("%1/%2/cache/rideDB.json").arg(home.absolutePath()).arg(athlete);
-    QFile rideDB(ridedb);
     if (rideDB.exists() && rideDB.open(QFile::ReadOnly)) {
 
         // ok, lets read it in
