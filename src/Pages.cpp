@@ -67,6 +67,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     langCombo->addItem(tr("Czech"));
     langCombo->addItem(tr("Spanish"));
     langCombo->addItem(tr("Portugese"));
+	langCombo->addItem(tr("Chinese (Traditional)"));
 
     // Default to system locale
     QVariant lang = appsettings->value(this, GC_LANG, QLocale::system().name());
@@ -81,6 +82,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     else if(lang.toString().startsWith("cs")) langCombo->setCurrentIndex(7);
     else if(lang.toString().startsWith("es")) langCombo->setCurrentIndex(8);
     else if(lang.toString().startsWith("pt")) langCombo->setCurrentIndex(9);
+	else if (lang.toString().startsWith("zh-tw")) langCombo->setCurrentIndex(10);
     else langCombo->setCurrentIndex(0);
 
     configLayout->addWidget(langLabel, 0,0, Qt::AlignRight);
@@ -297,7 +299,7 @@ GeneralPage::saveClicked()
 {
     // Language
     static const QString langs[] = {
-        "en", "fr", "ja", "pt-br", "it", "de", "ru", "cs", "es", "pt"
+        "en", "fr", "ja", "pt-br", "it", "de", "ru", "cs", "es", "pt", "zh-tw"
     };
     appsettings->setValue(GC_LANG, langs[langCombo->currentIndex()]);
 
