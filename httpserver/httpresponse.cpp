@@ -11,8 +11,8 @@ HttpResponse::HttpResponse(QTcpSocket* socket) {
     statusText="OK";
     sentHeaders=false;
     sentLastPart=false;
-    buffersize=4096;
-    barry.reserve(4096);
+    buffersize=40960;
+    barry.reserve(40960);
 }
 
 void HttpResponse::setHeader(QByteArray name, QByteArray value) {
