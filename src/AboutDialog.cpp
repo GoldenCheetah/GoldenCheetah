@@ -164,9 +164,10 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Mark Rages");
     contributors.append("Michael Puchowicz");
     contributors.append("Mitsukuni Sato");
-    contributors.append("Omar Torres");
     contributors.append("Ned Harding");
+    contributors.append("Nicholas Feng");
     contributors.append("Okano Takayoshi");
+    contributors.append("Omar Torres");
     contributors.append("Patrick McNerthney");
     contributors.append("Dr Phil Skiba");
     contributors.append("Philip Willoughby");
