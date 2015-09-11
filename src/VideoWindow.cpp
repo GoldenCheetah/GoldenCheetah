@@ -1,5 +1,6 @@
 /*
 * Copyright (c) 2009 Mark Liversedge (liversedge@gmail.com)
+*               2015 Vianney Boyer   (vlcvboyer@gmail.com)
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the Free
@@ -18,6 +19,10 @@
 
 #include "VideoWindow.h"
 #include "Context.h"
+#include "RideItem.h"
+#include "RideFile.h"
+#include "MeterWidget.h"
+#include "VideoLayoutParser.h"
 
 VideoWindow::VideoWindow(Context *context)  :
     GcWindow(context), context(context), m_MediaChanged(false)
@@ -64,14 +69,14 @@ VideoWindow::VideoWindow(Context *context)  :
 
         m = NULL;
         //vlc_exceptions(&exceptions);
-        
+
         /* Create a media player playing environement */
         mp = libvlc_media_player_new (inst);
         //vlc_exceptions(&exceptions);
 
         //vlc_exceptions(&exceptions);
 
- 
+
     /* This is a non working code that show how to hooks into a window,
      * if we have a window around */
 #ifdef Q_OS_LINUX
@@ -88,6 +93,33 @@ VideoWindow::VideoWindow(Context *context)  :
         container = new QWidget(this);
         layout->addWidget(container);
         libvlc_media_player_set_hwnd (mp, (HWND)(container->winId()));
+
+        QString filename = context->athlete->home->config().canonicalPath() + "/" + "video-layout.xml";
+        QFileInfo finfo(filename);
+
+        if (finfo.exists())
+        {
+            QFile file(filename);
+
+            // clean previous layout
+            foreach(MeterWidget* p_meterWidget, m_metersWidget)
+            {
+                m_metersWidget.removeAll(p_meterWidget);
+                delete p_meterWidget;
+            }
+
+            VideoLayoutParser handler(&m_metersWidget, container);
+
+            QXmlInputSource source (&file);
+            QXmlSimpleReader reader;
+            reader.setContentHandler (&handler);
+
+            reader.parse (source);
+        }
+        else
+        {
+            qDebug() << qPrintable(QString("file" + filename + " (video layout XML file) not found"));
+        }
 #endif
     } else {
 
@@ -108,6 +140,8 @@ VideoWindow::VideoWindow(Context *context)  :
 #endif
 
     if (init) {
+        // get updates..
+        connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
         connect(context, SIGNAL(stop()), this, SLOT(stopPlayback()));
         connect(context, SIGNAL(start()), this, SLOT(startPlayback()));
         connect(context, SIGNAL(pause()), this, SLOT(pausePlayback()));
@@ -121,9 +155,9 @@ VideoWindow::~VideoWindow()
 {
     if (!init) return; // we didn't initialise properly so all bets are off
 
-#if (defined Q_OS_LINUX) && (QT_VERSION < 0x050000) && (defined GC_VIDEO_VLC) 
+#if (defined Q_OS_LINUX) && (QT_VERSION < 0x050000) && (defined GC_VIDEO_VLC)
     // unembed vlc backend first
-    x11Container->discardClient(); 
+    x11Container->discardClient();
 #endif
 
     stopPlayback();
@@ -137,7 +171,7 @@ VideoWindow::~VideoWindow()
     /* nor the player */
     libvlc_media_player_release (mp);
 
-    // unload vlc 
+    // unload vlc
     libvlc_release (inst);
 #endif
 
@@ -150,7 +184,8 @@ VideoWindow::~VideoWindow()
 
 void VideoWindow::resizeEvent(QResizeEvent * )
 {
-    // do nothing .. for now
+    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+        p_meterWidget->AdjustSizePos();
 }
 
 void VideoWindow::startPlayback()
@@ -174,6 +209,16 @@ void VideoWindow::startPlayback()
     // open the media object
     mp->play();
 #endif
+
+    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+    {
+        p_meterWidget->setWindowOpacity(1); // Show the widget
+        p_meterWidget->AdjustSizePos();
+        p_meterWidget->update();
+
+        p_meterWidget->raise();
+        p_meterWidget->show();
+    }
 }
 
 void VideoWindow::stopPlayback()
@@ -188,6 +233,9 @@ void VideoWindow::stopPlayback()
 #ifdef GC_VIDEO_QT5
     mp->stop();
 #endif
+    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+        p_meterWidget->hide();
+
 }
 
 void VideoWindow::pausePlayback()
@@ -219,6 +267,41 @@ void VideoWindow::resumePlayback()
 #ifdef GC_VIDEO_QT5
     mp->play();
 #endif
+}
+
+void VideoWindow::telemetryUpdate(RealtimeData rtd)
+{
+    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+    {
+        if (p_meterWidget->Source() == QString("None"))
+        {
+            //Nothing
+        }
+        else if (p_meterWidget->Source() == QString("Speed"))
+        {
+            p_meterWidget->Value = rtd.getSpeed();
+            p_meterWidget->Text = QString::number((int) rtd.getSpeed());
+            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + tr(" kph");
+        }
+        else if (p_meterWidget->Source() == QString("Cadence"))
+        {
+            p_meterWidget->Value = rtd.getCadence();
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
+        }
+        else if (p_meterWidget->Source() == QString("Watt"))
+        {
+            p_meterWidget->Value =  rtd.getWatts();
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
+        }
+        else if (p_meterWidget->Source() == QString("HRM"))
+        {
+            p_meterWidget->Value =  rtd.getHr();
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value) + tr(" bpm");
+        }
+    }
+
+    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+        p_meterWidget->update();
 }
 
 void VideoWindow::seekPlayback(long ms)
@@ -267,7 +350,6 @@ void VideoWindow::mediaSelected(QString filename)
 #endif
         //qDebug()<<"file url="<<fileURL;
 
-
         /* open media */
         m = libvlc_media_new_location(inst, filename.endsWith("/DVD") ? "dvd://" : fileURL.toLatin1());
 
@@ -312,7 +394,7 @@ MediaHelper::~MediaHelper()
 {
 }
 
-QStringList 
+QStringList
 MediaHelper::listMedia(QDir dir)
 {
     QStringList returning;
