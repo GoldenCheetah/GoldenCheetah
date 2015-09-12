@@ -19,6 +19,7 @@
 #include "RideMetric.h"
 #include "RideItem.h"
 #include "Zones.h"
+#include "Settings.h"
 #include "Units.h"
 #include <cmath>
 #include <QApplication>
@@ -156,8 +157,20 @@ class IntensityFactor : public RideMetric {
             assert(deps.contains("coggan_np"));
             NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
             assert(np);
-            int cp = r->getTag("CP","0").toInt();
-            rif = np->value(true) / (cp ? cp : zones->getCP(zoneRange));
+
+            int ftp = r->getTag("FTP","0").toInt();
+
+            bool useCPForFTP = (appsettings->value(NULL, GC_USE_CP_FOR_FTP, "1").toString() == "0");
+
+            if (useCPForFTP) {
+                int cp = r->getTag("CP","0").toInt();
+                if (cp == 0)
+                    cp = zones->getCP(zoneRange);
+
+                ftp = cp;
+            }
+
+            rif = np->value(true) / (ftp ? ftp : zones->getFTP(zoneRange));
             secs = np->count();
 
             setValue(rif);
@@ -197,8 +210,20 @@ class TSS : public RideMetric {
         assert(rif);
         double normWork = np->value(true) * np->count();
         double rawTSS = normWork * rif->value(true);
-        int cp = r->getTag("CP","0").toInt();
-        double workInAnHourAtCP = (cp ? cp : zones->getCP(zoneRange)) * 3600;
+
+        int ftp = r->getTag("FTP","0").toInt();
+
+        bool useCPForFTP = (appsettings->value(NULL, GC_USE_CP_FOR_FTP, "1").toString() == "0");
+
+        if (useCPForFTP) {
+            int cp = r->getTag("CP","0").toInt();
+            if (cp == 0)
+                cp = zones->getCP(zoneRange);
+
+            ftp = cp;
+        }
+
+        double workInAnHourAtCP = (ftp ? ftp : zones->getFTP(zoneRange)) * 3600;
         score = rawTSS / workInAnHourAtCP * 100.0;
 
         setValue(score);

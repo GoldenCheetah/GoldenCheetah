@@ -74,6 +74,7 @@ class GeneralPage : public QWidget
         QComboBox *wbalForm;
         QCheckBox *garminSmartRecord;
         QCheckBox *warnOnExit;
+        QCheckBox *useCPForFTPCheckBox;
         QLineEdit *wheelSizeEdit;
         QLineEdit *garminHWMarkedit;
         QLineEdit *hystedit;
@@ -662,6 +663,7 @@ class CPPage : public QWidget
 
         QDateEdit *dateEdit;
         QDoubleSpinBox *cpEdit;
+        QDoubleSpinBox *ftpEdit;
         QDoubleSpinBox *wEdit;
         QDoubleSpinBox *pmaxEdit;
 

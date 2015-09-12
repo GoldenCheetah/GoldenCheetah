@@ -188,6 +188,13 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(hystlabel, 7,0, Qt::AlignRight);
     configLayout->addWidget(hystedit, 7,1, Qt::AlignLeft);
 
+    // Use CP for FTP
+    QVariant useCPForFTP = appsettings->value(this, GC_USE_CP_FOR_FTP, Qt::Checked);
+    useCPForFTPCheckBox = new QCheckBox(tr("Use CP for FTP"), this);
+    useCPForFTPCheckBox->setCheckState(useCPForFTP.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
+
+    configLayout->addWidget(useCPForFTPCheckBox, 8,1, Qt::AlignLeft);
+
     // wbal formula preference
     QLabel *wbalFormLabel = new QLabel(tr("W' bal formula:"));
     wbalForm = new QComboBox(this);
@@ -196,8 +203,8 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     if (appsettings->value(this, GC_WBALFORM, "diff").toString() == "diff") wbalForm->setCurrentIndex(0);
     else wbalForm->setCurrentIndex(1);
 
-    configLayout->addWidget(wbalFormLabel, 8,0, Qt::AlignRight);
-    configLayout->addWidget(wbalForm, 8,1, Qt::AlignLeft);
+    configLayout->addWidget(wbalFormLabel, 9,0, Qt::AlignRight);
+    configLayout->addWidget(wbalForm, 9,1, Qt::AlignLeft);
 
     //
     // Performance manager
@@ -222,17 +229,17 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
     showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
 
-    configLayout->addWidget(perfManSTSLabel, 9,0, Qt::AlignRight);
-    configLayout->addWidget(perfManSTSavg, 9,1, Qt::AlignLeft);
-    configLayout->addWidget(perfManLTSLabel, 10,0, Qt::AlignRight);
-    configLayout->addWidget(perfManLTSavg, 10,1, Qt::AlignLeft);
-    configLayout->addWidget(showSBToday, 11,1, Qt::AlignLeft);
+    configLayout->addWidget(perfManSTSLabel, 10,0, Qt::AlignRight);
+    configLayout->addWidget(perfManSTSavg, 10,1, Qt::AlignLeft);
+    configLayout->addWidget(perfManLTSLabel, 11,0, Qt::AlignRight);
+    configLayout->addWidget(perfManLTSavg, 11,1, Qt::AlignLeft);
+    configLayout->addWidget(showSBToday, 12,1, Qt::AlignLeft);
 
     //
     // Warn to save on exit
     warnOnExit = new QCheckBox(tr("Warn for unsaved activities on exit"), this);
     warnOnExit->setChecked(appsettings->cvalue(NULL, GC_WARNEXIT, true).toBool());
-    configLayout->addWidget(warnOnExit, 12,1, Qt::AlignLeft);
+    configLayout->addWidget(warnOnExit, 13,1, Qt::AlignLeft);
 
     //
     // Athlete directory (home of athletes)
@@ -245,9 +252,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     athleteBrowseButton = new QPushButton(tr("Browse"));
     athleteBrowseButton->setFixedWidth(120);
 
-    configLayout->addWidget(athleteLabel, 13,0, Qt::AlignRight);
-    configLayout->addWidget(athleteDirectory, 13,1);
-    configLayout->addWidget(athleteBrowseButton, 13,2);
+    configLayout->addWidget(athleteLabel, 14,0, Qt::AlignRight);
+    configLayout->addWidget(athleteDirectory, 14,1);
+    configLayout->addWidget(athleteBrowseButton, 14,2);
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
 
@@ -263,9 +270,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     workoutBrowseButton = new QPushButton(tr("Browse"));
     workoutBrowseButton->setFixedWidth(120);
 
-    configLayout->addWidget(workoutLabel, 14,0, Qt::AlignRight);
-    configLayout->addWidget(workoutDirectory, 14,1);
-    configLayout->addWidget(workoutBrowseButton, 14,2);
+    configLayout->addWidget(workoutLabel, 15,0, Qt::AlignRight);
+    configLayout->addWidget(workoutDirectory, 15,1);
+    configLayout->addWidget(workoutBrowseButton, 15,2);
 
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
 
@@ -318,6 +325,9 @@ GeneralPage::saveClicked()
     appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
     appsettings->setValue(GC_HOMEDIR, athleteDirectory->text());
     appsettings->setValue(GC_ELEVATION_HYSTERESIS, hystedit->text());
+
+    // FTP
+    appsettings->setValue(GC_USE_CP_FOR_FTP, useCPForFTPCheckBox->checkState());
 
     // wbal formula
     appsettings->setValue(GC_WBALFORM, wbalForm->currentIndex() ? "int" : "diff");
@@ -3335,6 +3345,7 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     QHBoxLayout *addLayout = new QHBoxLayout;
     QLabel *dateLabel = new QLabel(tr("From Date"));
     QLabel *cpLabel = new QLabel(tr("Critical Power"));
+    QLabel *ftpLabel = new QLabel(tr("FTP"));
     QLabel *wLabel = new QLabel(tr("W'"));
     QLabel *pmaxLabel = new QLabel(tr("Pmax"));
     dateEdit = new QDateEdit;
@@ -3345,6 +3356,12 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     cpEdit->setMaximum(1000);
     cpEdit->setSingleStep(1.0);
     cpEdit->setDecimals(0);
+
+    ftpEdit = new QDoubleSpinBox;
+    ftpEdit->setMinimum(0);
+    ftpEdit->setMaximum(100000);
+    ftpEdit->setSingleStep(100);
+    ftpEdit->setDecimals(0);
 
     wEdit = new QDoubleSpinBox;
     wEdit->setMinimum(0);
@@ -3362,6 +3379,18 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     actionButtons->setSpacing(2);
     actionButtons->addWidget(cpLabel);
     actionButtons->addWidget(cpEdit);
+
+
+    actionButtons->addWidget(ftpLabel);
+    actionButtons->addWidget(ftpEdit);
+
+    bool useCPForFTP = (appsettings->value(this, GC_USE_CP_FOR_FTP, "1").toString() == "0");
+
+    if (useCPForFTP) {
+        ftpLabel->setVisible(true);
+        ftpEdit->setVisible(true);
+    }
+
     actionButtons->addWidget(wLabel);
     actionButtons->addWidget(wEdit);
     actionButtons->addWidget(pmaxLabel);
@@ -3377,11 +3406,15 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     addLayout->addStretch();
 
     ranges = new QTreeWidget;
-    ranges->headerItem()->setText(0, tr("From Date"));
-    ranges->headerItem()->setText(1, tr("Critical Power"));
-    ranges->headerItem()->setText(2, tr("W'"));
-    ranges->headerItem()->setText(3, tr("Pmax"));
-    ranges->setColumnCount(4);
+    int column = 0;
+    ranges->headerItem()->setText(column++, tr("From Date"));
+    ranges->headerItem()->setText(column++, tr("Critical Power"));
+    if (useCPForFTP) {
+        ranges->headerItem()->setText(column++, tr("FTP"));
+    }
+    ranges->headerItem()->setText(column++, tr("W'"));
+    ranges->headerItem()->setText(column++, tr("Pmax"));
+    ranges->setColumnCount(column);
     ranges->setSelectionMode(QAbstractItemView::SingleSelection);
     //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     ranges->setUniformRowHeights(true);
@@ -3399,21 +3432,28 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
         font.setWeight(zonePage->zones.getZoneRange(i).zonesSetFromCP ?
                                         QFont::Normal : QFont::Black);
 
+        int column = 0;
         // date
-        add->setText(0, zonePage->zones.getStartDate(i).toString(tr("MMM d, yyyy")));
-        add->setFont(0, font);
+        add->setText(column, zonePage->zones.getStartDate(i).toString(tr("MMM d, yyyy")));
+        add->setFont(column++, font);
 
         // CP
-        add->setText(1, QString("%1").arg(zonePage->zones.getCP(i)));
-        add->setFont(1, font);
+        add->setText(column, QString("%1").arg(zonePage->zones.getCP(i)));
+        add->setFont(column++, font);
+
+        if (useCPForFTP) {
+            // FTP
+            add->setText(column, QString("%1").arg(zonePage->zones.getFTP(i)));
+            add->setFont(column++, font);
+        }
 
         // W'
-        add->setText(2, QString("%1").arg(zonePage->zones.getWprime(i)));
-        add->setFont(2, font);
+        add->setText(column, QString("%1").arg(zonePage->zones.getWprime(i)));
+        add->setFont(column++, font);
 
         // Pmax
-        add->setText(3, QString("%1").arg(zonePage->zones.getPmax(i)));
-        add->setFont(3, font);
+        add->setText(column, QString("%1").arg(zonePage->zones.getPmax(i)));
+        add->setFont(column++, font);
 
     }
 
@@ -3438,6 +3478,7 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     // edit connect
     connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
     connect(cpEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(ftpEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(wEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(pmaxEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     // button connect
@@ -3459,7 +3500,7 @@ CPPage::addClicked()
     zonePage->zones.setScheme(zonePage->schemePage->getScheme());
 
     int cp = cpEdit->value();
-    if( cp <= 0 ){
+    if( cp <= 0 ) {
         QMessageBox err;
         err.setText(tr("CP must be > 0"));
         err.setIcon(QMessageBox::Warning);
@@ -3467,30 +3508,39 @@ CPPage::addClicked()
         return;
     }
 
+    bool useCPForFTP = (appsettings->value(this, GC_USE_CP_FOR_FTP, "1").toString() == "0");
+
     //int index = ranges->invisibleRootItem()->childCount();
     int wp = wEdit->value() ? wEdit->value() : 20000;
     if (wp < 1000) wp *= 1000; // entered in kJ we want joules
 
     int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
 
-    int index = zonePage->zones.addZoneRange(dateEdit->date(), cpEdit->value(), wp, pmax);
+    int index = zonePage->zones.addZoneRange(dateEdit->date(), cpEdit->value(), ftpEdit->value(), wp, pmax);
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
     add->setFlags(add->flags() & ~Qt::ItemIsEditable);
     ranges->invisibleRootItem()->insertChild(index, add);
 
+    int column = 0;
+
     // date
-    add->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
+    add->setText(column++, dateEdit->date().toString(tr("MMM d, yyyy")));
 
     // CP
-    add->setText(1, QString("%1").arg(cpEdit->value()));
+    add->setText(column++, QString("%1").arg(cpEdit->value()));
+
+    if (useCPForFTP){
+        // FTP
+        add->setText(column++, QString("%1").arg(ftpEdit->value()));
+    }
 
     // W'
-    add->setText(2, QString("%1").arg(wp));
+    add->setText(column++, QString("%1").arg(wp));
 
     // Pmax
-    add->setText(3, QString("%1").arg(pmax));
+    add->setText(column++, QString("%1").arg(pmax));
 
 }
 
@@ -3509,6 +3559,9 @@ CPPage::editClicked()
         err.exec();
         return;
     }
+    bool useCPForFTP = (appsettings->value(this, GC_USE_CP_FOR_FTP, "1").toString() == "0");
+
+    int ftp = ftpEdit->value() ? ftpEdit->value() : cp;
 
     int wp = wEdit->value() ? wEdit->value() : 20000;
     if (wp < 1000) wp *= 1000; // entered in kJ we want joules
@@ -3519,21 +3572,29 @@ CPPage::editClicked()
     int index = ranges->indexOfTopLevelItem(edit);
 
 
+    int columns = 0;
+
     // date
     zonePage->zones.setStartDate(index, dateEdit->date());
-    edit->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
+    edit->setText(columns++, dateEdit->date().toString(tr("MMM d, yyyy")));
 
     // CP
     zonePage->zones.setCP(index, cp);
-    edit->setText(1, QString("%1").arg(cp));
+    edit->setText(columns++, QString("%1").arg(cp));
+
+    if (useCPForFTP){
+        // FTP
+        zonePage->zones.setFTP(index, ftp);
+        edit->setText(columns++, QString("%1").arg(ftp));
+    }
 
     // W'
     zonePage->zones.setWprime(index, wp);
-    edit->setText(2, QString("%1").arg(wp));
+    edit->setText(columns++, QString("%1").arg(wp));
 
     // Pmax
     zonePage->zones.setPmax(index, pmax);
-    edit->setText(3, QString("%1").arg(pmax));
+    edit->setText(columns++, QString("%1").arg(pmax));
 
 }
 
@@ -3587,13 +3648,16 @@ CPPage::rangeEdited()
         int cp = cpEdit->value();
         int ocp = zonePage->zones.getCP(index);
 
+        int ftp = ftpEdit->value();
+        int oftp = zonePage->zones.getFTP(index);
+
         int wp = wEdit->value();
         int owp = zonePage->zones.getWprime(index);
 
         int pmax = pmaxEdit->value();
         int opmax = zonePage->zones.getPmax(index);
 
-        if (date != odate || cp != ocp || wp != owp || pmax != opmax)
+        if (date != odate || cp != ocp || ftp != oftp || wp != owp || pmax != opmax)
             updateButton->show();
         else
             updateButton->hide();
@@ -3620,6 +3684,7 @@ CPPage::rangeSelectionChanged()
 
         dateEdit->setDate(zonePage->zones.getStartDate(index));
         cpEdit->setValue(zonePage->zones.getCP(index));
+        ftpEdit->setValue(zonePage->zones.getFTP(index));
         wEdit->setValue(zonePage->zones.getWprime(index));
         pmaxEdit->setValue(zonePage->zones.getPmax(index));
 
