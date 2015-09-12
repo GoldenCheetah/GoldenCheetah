@@ -234,6 +234,9 @@
 // show tabbar
 #define GC_TABBAR                 "show/tabbar"
 
+// use CP for FTP
+#define GC_USE_CP_FOR_FTP         "cp/useforftp"
+
 // wbal formula to use
 #define GC_WBALFORM               "wbal/formula"
 
