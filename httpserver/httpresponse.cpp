@@ -13,6 +13,7 @@ HttpResponse::HttpResponse(QTcpSocket* socket) {
     sentLastPart=false;
     buffersize=40960;
     barry.reserve(40960);
+    userdata_=NULL;
 }
 
 void HttpResponse::setHeader(QByteArray name, QByteArray value) {

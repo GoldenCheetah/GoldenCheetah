@@ -163,29 +163,72 @@ APIWebService::writeRideLine(QList<int> wanted, RideItem &item, HttpRequest *req
     if (item.dateTime.date() < since) return;
     if (item.dateTime.date() > before) return;
 
-    // date, time, filename
-    response->bwrite(item.dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
-    response->bwrite(",");
-    response->bwrite(item.dateTime.time().toString("hh:mm:ss").toLocal8Bit());;
-    response->bwrite(",");
-    response->bwrite(item.fileName.toLocal8Bit());
+    // are we doing rides or intervals?
+    listRideSettings *settings = static_cast<listRideSettings *>(response->userData());
 
-    if (wanted.count()) {
-        // specific metrics
-        foreach(int index, wanted) {
-            double value = item.metrics()[index];
-            response->bwrite(",");
-            response->bwrite(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
+    if (settings->intervals == true) {
+
+        // loop through all available intervals for this ride item
+        foreach(IntervalItem *interval, item.intervals()){ 
+
+            // date, time, filename
+            response->bwrite(item.dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
+            response->bwrite(", ");
+            response->bwrite(item.dateTime.time().toString("hh:mm:ss").toLocal8Bit());;
+            response->bwrite(", ");
+            response->bwrite(item.fileName.toLocal8Bit());
+
+            // now the interval name and type
+            response->bwrite(", \"");
+            response->bwrite(interval->name.toLocal8Bit());
+            response->bwrite("\", ");
+            response->bwrite(QString("%1").arg(static_cast<int>(interval->type)).toLocal8Bit());
+
+            // essentially the same as below .. cut and paste (refactor?XXX)
+            if (wanted.count()) {
+                // specific metrics
+                foreach(int index, wanted) {
+                    double value = interval->metrics()[index];
+                    response->bwrite(",");
+                    response->bwrite(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
+                }
+            } else {
+    
+                // all metrics...
+                foreach(double value, interval->metrics()) {
+                    response->bwrite(",");
+                    response->bwrite(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
+                }
+            }
+            response->bwrite("\n");
         }
+
     } else {
 
-        // all metrics...
-        foreach(double value, item.metrics()) {
-            response->bwrite(",");
-            response->bwrite(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
+        // date, time, filename
+        response->bwrite(item.dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
+        response->bwrite(",");
+        response->bwrite(item.dateTime.time().toString("hh:mm:ss").toLocal8Bit());;
+        response->bwrite(",");
+        response->bwrite(item.fileName.toLocal8Bit());
+
+        if (wanted.count()) {
+            // specific metrics
+            foreach(int index, wanted) {
+                double value = item.metrics()[index];
+                response->bwrite(",");
+                response->bwrite(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
+            }
+        } else {
+    
+            // all metrics...
+            foreach(double value, item.metrics()) {
+                response->bwrite(",");
+                response->bwrite(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
+            }
         }
+        response->bwrite("\n");
     }
-    response->bwrite("\n");
 }
 
 void
