@@ -19,11 +19,7 @@
 #ifndef _MeterWidget_h
 #define _MeterWidget_h 1
 
-#if QT_VERSION > 0x050000
-#include <QtWidgets>
-#else
-#include <QtGui>
-#endif
+#include <QWidget>
 
 class MeterWidget : public QWidget
 {
