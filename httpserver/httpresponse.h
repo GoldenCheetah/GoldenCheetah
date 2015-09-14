@@ -90,6 +90,10 @@ public:
     void bwrite(QByteArray data);
     void flush();
 
+    // user data for response
+    void setUserData(void *here) { userdata_ = here; }
+    void *userData() { return userdata_; }
+
     /**
       Indicates wheter the body has been sent completely. Used by the connection
       handler to terminate the body automatically when necessary.
@@ -143,6 +147,8 @@ private:
 
     int buffersize;
     QByteArray barry;
+
+    void *userdata_;
 };
 
 #endif // HTTPRESPONSE_H

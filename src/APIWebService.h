@@ -23,6 +23,10 @@
 #include "RideItem.h"
 #include <QDir>
 
+struct listRideSettings {
+    bool intervals;
+};
+
 class APIWebService : public HttpRequestHandler
 {
 

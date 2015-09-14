@@ -471,6 +471,8 @@ void RideCache::save()
 void
 APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &response)
 {
+    listRideSettings settings;
+
     // the ride db
     QString ridedb = QString("%1/%2/cache/rideDB.json").arg(home.absolutePath()).arg(athlete);
     QFile rideDB(ridedb);
@@ -484,6 +486,14 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
         response.write("malformed URL or unknown athlete.\n");
         return;
     }
+
+    // intervals or rides?
+    QString intervalsp = request.getParameter("intervals");
+    if (intervalsp.toUpper() == "TRUE") settings.intervals = true;
+    else settings.intervals = false;
+
+    // set user data
+    response.setUserData(&settings);
 
     // write headings
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -506,6 +516,9 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
 
     // write headings
     response.bwrite("date, time, filename");
+
+    // if intervals, add interval name
+    if (settings.intervals == true) response.bwrite(", interval name, interval type");
 
     int i=0;
     foreach(const RideMetric *m, indexed) {
