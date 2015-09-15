@@ -930,12 +930,12 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     // set the axes that we use.. yLeft 3 is ALWAYS the highlighter axes and never visible
     // yLeft 4 is balance stuff
     setAxesCount(QwtAxis::yLeft, 4);
-    setAxesCount(QwtAxis::yRight, 4 + window->userDataSeries.count());
+    setAxesCount(QwtAxis::yRight, 4 + (window ? window->userDataSeries.count() : 0));
     setAxesCount(QwtAxis::xBottom, 1);
 
     setXTitle();
 
-    standard = new AllPlotObject(this, window->userDataSeries);
+    standard = new AllPlotObject(this, window ? window->userDataSeries : QList<UserData*>());
 
     standard->intervalHighlighterCurve->setSamples(new IntervalPlotData(this, context, window));
 
