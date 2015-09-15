@@ -1183,6 +1183,7 @@ bool
 MergeConfirm::validatePage()
 {
     // We are done -- recalculate derived series, save and mark done
+    wizard->current->rideDataChanged();
     wizard->combined->recalculateDerivedSeries(true);
     wizard->current->setRide(wizard->combined);
     wizard->context->mainWindow->saveSilent(wizard->context, wizard->current);
