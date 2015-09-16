@@ -510,6 +510,7 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
     QString metrics(request.getParameter("metrics"));
 
     // do all ?
+    bool nometrics = false;
     QStringList wantedNames;
     QList<int> wanted;
     if (metrics != "") wantedNames = metrics.split(",");
@@ -517,73 +518,120 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
     // write headings
     response.bwrite("date, time, filename");
 
+    // don't want metrics, so do it fast by traversing the ride directory
+    if (wantedNames.count() == 1 && wantedNames[0].toUpper() == "NONE") nometrics = true;
+
     // if intervals, add interval name
     if (settings.intervals == true) response.bwrite(", interval name, interval type");
 
-    int i=0;
-    foreach(const RideMetric *m, indexed) {
+    // list 'em by reading the ride cache from disk
+    if (nometrics == false && settings.intervals == false) {
 
-        i++;
+        int i=0;
+        foreach(const RideMetric *m, indexed) {
 
-        // if limited don't do limited headings
-        QString underscored = m->name().replace(" ","_");
-        if (wantedNames.count() && !wantedNames.contains(underscored)) continue;
+            i++;
 
-        if (m->name().startsWith("BikeScore"))
-            response.bwrite(", BikeScore");
-        else {
-            response.bwrite(", ");
-            response.bwrite(underscored.toLocal8Bit());
+            // if limited don't do limited headings
+            QString underscored = m->name().replace(" ","_");
+            if (wantedNames.count() && !wantedNames.contains(underscored)) continue;
+
+            if (m->name().startsWith("BikeScore"))
+                response.bwrite(", BikeScore");
+            else {
+                response.bwrite(", ");
+                response.bwrite(underscored.toLocal8Bit());
+            }
+
+            // index of wanted metrics
+            wanted << (i-1);
+        }
+        response.bwrite("\n");
+
+        // parse the rideDB and write a line for each entry
+        if (rideDB.exists() && rideDB.open(QFile::ReadOnly)) {
+
+            // ok, lets read it in
+            QTextStream stream(&rideDB);
+            stream.setCodec("UTF-8");
+
+            // Read the entire file into a QString -- we avoid using fopen since it
+            // doesn't handle foreign characters well. Instead we use QFile and parse
+            // from a QString
+            QString contents = stream.readAll();
+            rideDB.close();
+
+            // create scanner context for reentrant parsing
+            RideDBContext *jc = new RideDBContext;
+            jc->cache = NULL;
+            jc->api = this;
+            jc->response = &response;
+            jc->request = &request;
+            jc->wanted = wanted;
+            jc->old = false;
+
+            // clean item
+            jc->item.path = home.absolutePath() + "/activities";
+            jc->item.context = NULL;
+            jc->item.isstale = jc->item.isdirty = jc->item.isedit = false;
+
+            RideDBlex_init(&scanner);
+
+            // inform the parser/lexer we have a new file
+            RideDB_setString(contents, scanner);
+
+            // setup
+            jc->errors.clear();
+
+            // parse it
+            RideDBparse(jc);
+
+            // clean up
+            RideDBlex_destroy(scanner);
+
+            // regardless of errors we're done !
+            delete jc;
         }
 
-        // index of wanted metrics
-        wanted << (i-1);
-    }
-    response.bwrite("\n");
+    } else {
 
-    // parse the rideDB and write a line for each entry
-    if (rideDB.exists() && rideDB.open(QFile::ReadOnly)) {
+        // honour the since parameter
+        QString sincep(request.getParameter("since"));
+        QDate since(1900,01,01);
+        if (sincep != "") since = QDate::fromString(sincep,"yyyy/MM/dd");
 
-        // ok, lets read it in
-        QTextStream stream(&rideDB);
-        stream.setCodec("UTF-8");
+        // before parameter
+        QString beforep(request.getParameter("before"));
+        QDate before(3000,01,01);
+        if (beforep != "") before = QDate::fromString(beforep,"yyyy/MM/dd");
 
-        // Read the entire file into a QString -- we avoid using fopen since it
-        // doesn't handle foreign characters well. Instead we use QFile and parse
-        // from a QString
-        QString contents = stream.readAll();
-        rideDB.close();
+        // fast list of rides by traversing the directory
+        response.bwrite("\n"); // headings have no metric columns
 
-        // create scanner context for reentrant parsing
-        RideDBContext *jc = new RideDBContext;
-        jc->cache = NULL;
-        jc->api = this;
-        jc->response = &response;
-        jc->request = &request;
-        jc->wanted = wanted;
-        jc->old = false;
+        // This will read the user preferences and change the file list order as necessary:
+        QFlags<QDir::Filter> spec = QDir::Files;
+        QStringList names;
+        names << "*"; // anything
 
-        // clean item
-        jc->item.path = home.absolutePath() + "/activities";
-        jc->item.context = NULL;
-        jc->item.isstale = jc->item.isdirty = jc->item.isedit = false;
+        // loop through files, make sure in time range wanted
+        QDir activities(home.absolutePath() + "/" + athlete + "/activities");
+        foreach(QString name, activities.entryList(names, spec, QDir::Name)) {
 
-        RideDBlex_init(&scanner);
+            // parse it into date and time
+            QDateTime dateTime;
+            if (!RideFile::parseRideFileName(name, &dateTime)) continue; 
 
-        // inform the parser/lexer we have a new file
-        RideDB_setString(contents, scanner);
+            // in range?
+            if (dateTime.date() < since || dateTime.date() > before) continue;
 
-        // setup
-        jc->errors.clear();
-
-        // parse it
-        RideDBparse(jc);
-
-        // clean up
-        RideDBlex_destroy(scanner);
-
-        // regardless of errors we're done !
-        delete jc;
+            // out a line
+            response.bwrite(dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
+            response.bwrite(", ");
+            response.bwrite(dateTime.time().toString("hh:mm:ss").toLocal8Bit());;
+            response.bwrite(", ");
+            response.bwrite(name.toLocal8Bit());
+            response.bwrite("\n");
+        }
     }
     response.flush();
 }
