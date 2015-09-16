@@ -93,8 +93,13 @@ typedef struct {
  *
  * The target processor is reset at the end of this upload.
  */
+#if defined GC_HAVE_LIBUSB1
 extern int ezusb_load_ram(libusb_device_handle *device,
 	const char *path, int fx_type, int img_type, int stage);
+#else
+extern int ezusb_load_ram(usb_dev_handle *device,
+    const char *path, int fx_type, int img_type, int stage);
+#endif
 
 /*
  * This function uploads the firmware from the given file into EEPROM.
@@ -107,8 +112,13 @@ extern int ezusb_load_ram(libusb_device_handle *device,
  * The caller must have preloaded a second stage loader that knows
  * how to respond to the EEPROM write request.
  */
+#if defined GC_HAVE_LIBUSB1
 extern int ezusb_load_eeprom(libusb_device_handle *device,
 	const char *path, int fx_type, int img_type, int config);
+#else
+extern int ezusb_load_eeprom(usb_dev_handle *device,
+    const char *path, int fx_type, int img_type, int config);
+#endif
 
 /* Verbosity level (default 1). Can be increased or decreased with options v/q  */
 extern int verbose;

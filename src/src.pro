@@ -120,7 +120,7 @@ CONFIG(debug, debug|release) {
     SOURCES     += ICalendar.cpp DiaryWindow.cpp CalDAV.cpp
 }
 
-# are we supporting USB2 devices
+# are we supporting USB2 devices - LibUsb 0.1.12
 !isEmpty( LIBUSB_INSTALL ) {
     isEmpty( LIBUSB_INCLUDE ) { LIBUSB_INCLUDE = $${LIBUSB_INSTALL}/include }
     isEmpty( LIBUSB_LIBS )    {
@@ -130,6 +130,20 @@ CONFIG(debug, debug|release) {
     INCLUDEPATH += $${LIBUSB_INCLUDE}
     LIBS        += $${LIBUSB_LIBS}
     DEFINES     += GC_HAVE_LIBUSB
+    SOURCES     += LibUsb.cpp EzUsb.c Fortius.cpp FortiusController.cpp
+    HEADERS     += LibUsb.h EzUsb.h Fortius.cpp FortiusController.h
+}
+
+# are we supporting USB2 devices - LibUsb 1.0.18+
+!isEmpty( LIBUSB1_INSTALL ) {
+    isEmpty( LIBUSB1_INCLUDE ) { LIBUSB1_INCLUDE = $${LIBUSB1_INSTALL}/include }
+    isEmpty( LIBUSB1_LIBS )    {
+        unix  { LIBUSB1_LIBS = -lusb-1.0 }
+        win32 { LIBUSB1_LIBS = -lusb-1.0 }
+    }
+    INCLUDEPATH += $${LIBUSB1_INCLUDE}
+    LIBS        += $${LIBUSB1_LIBS}
+    DEFINES     += GC_HAVE_LIBUSB GC_HAVE_LIBUSB1
     SOURCES     += LibUsb.cpp EzUsb.c Fortius.cpp FortiusController.cpp
     HEADERS     += LibUsb.h EzUsb.h Fortius.cpp FortiusController.h
 }
@@ -277,9 +291,6 @@ SOURCES +=  ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp
     DEPENDPATH += $$HTPATH
 
     DEFINES += GC_WANT_HTTP
-
-    HEADERS +=  APIWebService.h
-    SOURCES +=  APIWebService.cpp
 
     HEADERS +=  $$HTPATH/httpglobal.h \
                 $$HTPATH/httplistener.h \

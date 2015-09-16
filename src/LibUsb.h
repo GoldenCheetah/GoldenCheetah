@@ -26,8 +26,21 @@
 #include <windows.h>
 #endif
 
+#if defined GC_HAVE_LIBUSB1
 #include <libusb-1.0/libusb.h>
-
+#elif defined GC_HAVE_LIBUSB
+#include <usb.h> // for the constants etc
+#include <errno.h>
+const int LIBUSB_ERROR_IO = -EIO;
+const int LIBUSB_ERROR_TIMEOUT = -ETIMEDOUT;
+const int LIBUSB_ERROR_PIPE = -EPIPE;
+const int LIBUSB_ERROR_NO_DEVICE = -ENODEV;
+#else
+const int LIBUSB_ERROR_IO = -1;
+const int LIBUSB_ERROR_TIMEOUT = -1;
+const int LIBUSB_ERROR_PIPE = -1;
+const int LIBUSB_ERROR_NO_DEVICE = -1;
+#endif
 
 // EZ-USB firmware loader for Fortius
 #include "EzUsb.h"
@@ -66,6 +79,7 @@ public:
     int write(uint8_t *buf, int bytes);
     bool find();
 private:
+#if defined GC_HAVE_LIBUSB1
     // Resprentation of a libusb session.
     libusb_context *ctx;
     libusb_device *device;
@@ -92,13 +106,27 @@ private:
     // Initialise the Fortius device by loading the firmware.
     int initialise_fortius(libusb_device *device);
 
+    QQueue<uint8_t> read_buffer;
+#else
+    struct usb_dev_handle* OpenAntStick();
+    struct usb_dev_handle* OpenFortius();
+    bool findAntStick();
+    bool findFortius();
+
+    struct usb_interface_descriptor* usb_find_interface(struct usb_config_descriptor* config_descriptor);
+    struct usb_dev_handle* device;
+    struct usb_interface_descriptor* intf;
+
+    char readBuf[64];
+    int readBufIndex;
+    int readBufSize;
+#endif
+
     // The I/O endpoints on the USB ANT+ device.
     // These four values are set by open_device().
     int readEndpoint, writeEndpoint;
     int interface;
     int alternate;
-
-    QQueue<uint8_t> read_buffer;
 
     // The type of device -- ANT or FORTIUS.
     int type;
