@@ -27,7 +27,22 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+#if defined GC_HAVE_LIBUSB1
 #include <libusb-1.0/libusb.h>
+#else
+#include <usb.h> // for the constants etc
+#include <errno.h>
+
+const int LIBUSB_ERROR_IO = -EIO;
+const int LIBUSB_ERROR_TIMEOUT = -ETIMEDOUT;
+const int LIBUSB_ERROR_PIPE = -EPIPE;
+const int LIBUSB_ERROR_NO_DEVICE = -ENODEV;
+
+static const char *libusb_error_name(int error_code) {
+    return usb_strerror();
+}
+
+#endif
 #include "EzUsb.h"
 
 static void logerror(const char *format, ...)
@@ -129,17 +144,29 @@ static bool fx2lp_is_external(uint32_t addr, size_t len)
 /*
  * Issues the specified vendor-specific write request.
  */
+#if defined GC_HAVE_LIBUSB1
 static int ezusb_write(libusb_device_handle *device, const char *label,
 	uint8_t opcode, uint32_t addr, const unsigned char *data, size_t len)
+#else
+static int ezusb_write(usb_dev_handle *device, const char *label,
+    uint8_t opcode, uint32_t addr, const unsigned char *data, size_t len)
+#endif
 {
 	int status;
 
 	if (verbose > 1)
 		logerror("%s, addr 0x%08x len %4u (0x%04x)\n", label, addr, (unsigned)len, (unsigned)len);
+#if defined GC_HAVE_LIBUSB1
 	status = libusb_control_transfer(device,
 		LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
 		opcode, addr & 0xFFFF, addr >> 16,
 		(unsigned char*)data, (uint16_t)len, 1000);
+#else
+    status = usb_control_msg(device,
+        USB_ENDPOINT_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
+        opcode, addr & 0xFFFF, addr >> 16,
+        (unsigned char*)data, (uint16_t)len, 1000);
+#endif
 	if (status != len) {
 		if (status < 0)
 			logerror("%s: %s\n", label, libusb_error_name(status));
@@ -152,17 +179,29 @@ static int ezusb_write(libusb_device_handle *device, const char *label,
 /*
  * Issues the specified vendor-specific read request.
  */
+#if defined GC_HAVE_LIBUSB1
 static int ezusb_read(libusb_device_handle *device, const char *label,
 	uint8_t opcode, uint32_t addr, const unsigned char *data, size_t len)
+#else
+static int ezusb_read(usb_dev_handle *device, const char *label,
+    uint8_t opcode, uint32_t addr, const unsigned char *data, size_t len)
+#endif
 {
 	int status;
 
 	if (verbose > 1)
 		logerror("%s, addr 0x%08x len %4u (0x%04x)\n", label, addr, (unsigned)len, (unsigned)len);
+#if defined GC_HAVE_LIBUSB1
 	status = libusb_control_transfer(device,
 		LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
 		opcode, addr & 0xFFFF, addr >> 16,
 		(unsigned char*)data, (uint16_t)len, 1000);
+#else
+    status = usb_control_msg(device,
+        USB_ENDPOINT_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
+        opcode, addr & 0xFFFF, addr >> 16,
+        (unsigned char*)data, (uint16_t)len, 1000);
+#endif
 	if (status != len) {
 		if (status < 0)
 			logerror("%s: %s\n", label, libusb_error_name(status));
@@ -176,17 +215,28 @@ static int ezusb_read(libusb_device_handle *device, const char *label,
  * Modifies the CPUCS register to stop or reset the CPU.
  * Returns false on error.
  */
+#if defined GC_HAVE_LIBUSB1
 static bool ezusb_cpucs(libusb_device_handle *device, uint32_t addr, bool doRun)
+#else
+static bool ezusb_cpucs(usb_dev_handle *device, uint32_t addr, bool doRun)
+#endif
 {
 	int status;
 	uint8_t data = doRun ? 0x00 : 0x01;
 
 	if (verbose)
 		logerror("%s\n", data ? "stop CPU" : "reset CPU");
+#if defined GC_HAVE_LIBUSB1
 	status = libusb_control_transfer(device,
 		LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
 		RW_INTERNAL, addr & 0xFFFF, addr >> 16,
 		&data, 1, 1000);
+#else
+    status = usb_control_msg(device,
+        USB_ENDPOINT_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
+        RW_INTERNAL, addr & 0xFFFF, addr >> 16,
+        NULL, 0, 1000);
+#endif
 	if ((status != 1) &&
 		/* We may get an I/O error from libusb as the device disappears */
 		((!doRun) || (status != LIBUSB_ERROR_IO)))
@@ -205,16 +255,27 @@ static bool ezusb_cpucs(libusb_device_handle *device, uint32_t addr, bool doRun)
  * Send an FX3 jumpt to address command
  * Returns false on error.
  */
+#if defined GC_HAVE_LIBUSB1
 static bool ezusb_fx3_jump(libusb_device_handle *device, uint32_t addr)
+#else
+static bool ezusb_fx3_jump(usb_dev_handle *device, uint32_t addr)
+#endif
 {
 	int status;
 
 	if (verbose)
 		logerror("transfer execution to Program Entry at 0x%08x\n", addr);
+#if defined GC_HAVE_LIBUSB1
 	status = libusb_control_transfer(device,
 		LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
 		RW_INTERNAL, addr & 0xFFFF, addr >> 16,
 		NULL, 0, 1000);
+#else
+    status = usb_control_msg(device,
+        USB_ENDPOINT_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
+        RW_INTERNAL, addr & 0xFFFF, addr >> 16,
+        NULL, 0, 1000);
+#endif
 	/* We may get an I/O error from libusb as the device disappears */
 	if ((status != 0) && (status != LIBUSB_ERROR_IO))
 	{
@@ -502,7 +563,11 @@ typedef enum {
 } ram_mode;
 
 struct ram_poke_context {
+#if defined GC_HAVE_LIBUSB1
 	libusb_device_handle *device;
+#else
+    usb_dev_handle *device;
+#endif
 	ram_mode mode;
 	size_t total, count;
 };
@@ -570,7 +635,11 @@ static int ram_poke(void *context, uint32_t addr, bool external,
  * Load a Cypress Image file into target RAM.
  * See http://www.cypress.com/?docID=41351 (AN76405 PDF) for more info.
  */
+#if defined GC_HAVE_LIBUSB1
 static int fx3_load_ram(libusb_device_handle *device, const char *path)
+#else
+static int fx3_load_ram(usb_dev_handle *device, const char *path)
+#endif
 {
 	uint32_t dCheckSum, dExpectedCheckSum, dAddress, i, dLen, dLength;
 	uint32_t* dImageBuf;
@@ -722,7 +791,11 @@ exit:
  * memory is written, expecting a second stage loader to have already
  * been loaded.  Then file is re-parsed and on-chip memory is written.
  */
+#if defined GC_HAVE_LIBUSB1
 int ezusb_load_ram(libusb_device_handle *device, const char *path, int fx_type, int img_type, int stage)
+#else
+int ezusb_load_ram(usb_dev_handle *device, const char *path, int fx_type, int img_type, int stage)
+#endif
 {
 	FILE *image;
 	uint32_t cpucs_addr;

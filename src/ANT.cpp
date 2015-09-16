@@ -248,6 +248,7 @@ void ANT::run()
 	if (rc > 0)
 	  receiveByte(byte);
         else {
+#if defined GC_HAVE_LIBUSB
 	  if (rc == LIBUSB_ERROR_NO_DEVICE) {
 	    // Can happen when the USB stick is pulled.
 	    stop();
@@ -258,6 +259,9 @@ void ANT::run()
 	    // Typically a timeout (error -110).
 	    msleep(5);
 	  }
+#else
+          msleep(5);
+#endif
 	}
         //----------------------------------------------------------------------
         // LISTEN TO CONTROLLER FOR COMMANDS
