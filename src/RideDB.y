@@ -624,6 +624,9 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
             // in range?
             if (dateTime.date() < since || dateTime.date() > before) continue;
 
+            // is it a backup ?
+            if (name.endsWith(".bak")) continue;
+
             // out a line
             response.bwrite(dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
             response.bwrite(", ");
