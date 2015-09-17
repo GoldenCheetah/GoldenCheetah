@@ -75,6 +75,9 @@ class GeneralPage : public QWidget
         QCheckBox *garminSmartRecord;
         QCheckBox *warnOnExit;
         QCheckBox *useCPForFTPCheckBox;
+#ifdef GC_WANT_HTTP
+        QCheckBox *startHttp;
+#endif
         QLineEdit *wheelSizeEdit;
         QLineEdit *garminHWMarkedit;
         QLineEdit *hystedit;
@@ -103,6 +106,9 @@ class GeneralPage : public QWidget
             int wbal;
             int lts,sts;
             bool warn;
+#ifdef GC_WANT_HTTP
+            bool starthttp;
+#endif
         } b4;
 
     private slots:

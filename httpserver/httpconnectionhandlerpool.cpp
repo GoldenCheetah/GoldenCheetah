@@ -26,7 +26,7 @@ HttpConnectionHandlerPool::~HttpConnectionHandlerPool() {
        delete handler;
     }
     delete sslConfiguration;
-    qDebug("HttpConnectionHandlerPool (%p): destroyed", this);
+    wDebug("HttpConnectionHandlerPool (%p): destroyed", this);
 }
 
 
@@ -64,7 +64,7 @@ void HttpConnectionHandlerPool::cleanup() {
             if (++idleCounter > maxIdleHandlers) {
                 pool.removeOne(handler);
                 delete handler;
-                qDebug("HttpConnectionHandlerPool: Removed connection handler (%p), pool size is now %i",handler,pool.size());
+                wDebug("HttpConnectionHandlerPool: Removed connection handler (%p), pool size is now %i",handler,pool.size());
                 break; // remove only one handler in each interval
             }
         }
@@ -125,7 +125,7 @@ void HttpConnectionHandlerPool::loadSslConfig() {
             sslConfiguration->setPeerVerifyMode(QSslSocket::VerifyNone);
             sslConfiguration->setProtocol(QSsl::TlsV1SslV3);
 
-            qDebug("HttpConnectionHandlerPool: SSL settings loaded");
+            wDebug("HttpConnectionHandlerPool: SSL settings loaded");
          #endif
     }
 }

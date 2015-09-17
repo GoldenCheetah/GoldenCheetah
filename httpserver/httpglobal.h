@@ -23,5 +23,9 @@
 /** Get the library version number */
 DECLSPEC const char* getQtWebAppLibVersion();
 
+/** wDebug() uses QT QMessageLogger but as info to log
+    rather than interfering with normal qDebug usage **/
+#define wDebug QMessageLogger(QT_MESSAGELOG_FILE, QT_MESSAGELOG_LINE, QT_MESSAGELOG_FUNC).warning
+
 #endif // HTTPGLOBAL_H
 
