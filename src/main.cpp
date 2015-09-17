@@ -72,8 +72,34 @@ QString gcroot;
 
 QApplication *application;
 
+bool nogui;
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
+#if QT_VERSION > 0x50000
+void myMessageOutput(QtMsgType type, const QMessageLogContext &, const QString &string)
+ {
+    const char *msg = string.toLocal8Bit().constData();
+#else
+void myMessageOutput(QtMsgType type, const char *msg)
+ {
+#endif
+     //in this function, you can write the message to any stream!
+     switch (type) {
+     case QtDebugMsg:
+         fprintf(stderr, "Debug: %s\n", msg);
+         break;
+     case QtWarningMsg: // supress warnings unless server mode
+         if (nogui) fprintf(stderr, "Warning: %s\n", msg);
+         break;
+     case QtCriticalMsg:
+         fprintf(stderr, "Critical: %s\n", msg);
+         break;
+     case QtFatalMsg:
+         fprintf(stderr, "Fatal: %s\n", msg);
+         abort();
+     }
+ }
+
 HttpListener *listener;
 void sigabort(int)
 {
@@ -102,6 +128,7 @@ main(int argc, char *argv[])
     bool debug = false;
 #endif
     bool server = false;
+    nogui = false;
     bool help = false;
 
     // honour command line switches
@@ -126,7 +153,7 @@ main(int argc, char *argv[])
 
         } else if (arg == "--server") {
 #ifdef GC_WANT_HTTP
-                server = true;
+                nogui = server = true;
 #else
                 fprintf(stderr, "HTTP support not compiled in, exiting.\n");
                 exit(1);
@@ -314,11 +341,20 @@ main(int argc, char *argv[])
 
         // The API server offers webservices (default port 12021, see httpserver.ini)
         // This is to enable integration with R and similar
-        if (server) {
+        if (appsettings->value(NULL, GC_START_HTTP).toBool() || server) {
 
-            // does the ini file exist ?
-            qDebug()<<"Starting GoldenCheetah API web-services... (hit ^C to close)";
-            qDebug()<<"Athlete directory:"<<home.absolutePath();
+            // notifications etc
+            if (nogui) {
+                qDebug()<<"Starting GoldenCheetah API web-services... (hit ^C to close)";
+                qDebug()<<"Athlete directory:"<<home.absolutePath();
+            } else {
+                // switch off warnings if in gui mode
+#if QT_VERSION > 0x50000
+                qInstallMessageHandler(myMessageOutput);
+#else
+                qInstallMsgHandler(myMessageOutput);
+#endif
+            }
 
             QString httpini = home.absolutePath() + "/httpserver.ini";
             if (!QFile(httpini).exists()) {
@@ -346,17 +382,20 @@ main(int argc, char *argv[])
             QSettings* settings=new QSettings(httpini,QSettings::IniFormat,application);
             listener=new HttpListener(settings,new APIWebService(home, application),application);
 
-            // catch ^C exit
-            signal(SIGINT, sigabort);
+            // if not going on to launch a gui...
+            if (nogui) {
+                // catch ^C exit
+                signal(SIGINT, sigabort);
 
-            ret = application->exec();
+                ret = application->exec();
 
-            // stop web server if running
-            qDebug()<<"Stopping GoldenCheetah API web-services...";
-            listener->close();
+                // stop web server if running
+                qDebug()<<"Stopping GoldenCheetah API web-services...";
+                listener->close();
 
-            // and done
-            exit(0);
+                // and done
+                exit(0);
+            }
         }
 #endif
 

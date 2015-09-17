@@ -1,4 +1,5 @@
 /*
+#endif
  * Copyright (c) 2012 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -242,6 +243,17 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(warnOnExit, 13,1, Qt::AlignLeft);
 
     //
+    // Run API web services when running
+    //
+    int offset=0;
+#ifdef GC_WANT_HTTP
+    offset += 1;
+    startHttp = new QCheckBox(tr("Enable API Web Services"), this);
+    startHttp->setChecked(appsettings->cvalue(NULL, GC_START_HTTP, true).toBool());
+    configLayout->addWidget(startHttp, 14,1, Qt::AlignLeft);
+#endif
+
+    //
     // Athlete directory (home of athletes)
     //
     QVariant athleteDir = appsettings->value(this, GC_HOMEDIR);
@@ -252,9 +264,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     athleteBrowseButton = new QPushButton(tr("Browse"));
     athleteBrowseButton->setFixedWidth(120);
 
-    configLayout->addWidget(athleteLabel, 14,0, Qt::AlignRight);
-    configLayout->addWidget(athleteDirectory, 14,1);
-    configLayout->addWidget(athleteBrowseButton, 14,2);
+    configLayout->addWidget(athleteLabel, 14 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(athleteDirectory, 14 + offset,1);
+    configLayout->addWidget(athleteBrowseButton, 14 + offset,2);
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
 
@@ -270,9 +282,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     workoutBrowseButton = new QPushButton(tr("Browse"));
     workoutBrowseButton->setFixedWidth(120);
 
-    configLayout->addWidget(workoutLabel, 15,0, Qt::AlignRight);
-    configLayout->addWidget(workoutDirectory, 15,1);
-    configLayout->addWidget(workoutBrowseButton, 15,2);
+    configLayout->addWidget(workoutLabel, 15 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(workoutDirectory, 15 + offset,1);
+    configLayout->addWidget(workoutBrowseButton, 15 + offset,2);
 
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
 
@@ -284,6 +296,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     b4.lts = perfManLTSVal.toInt();
     b4.sts = perfManSTSVal.toInt();
     b4.warn = warnOnExit->isChecked();
+    b4.starthttp = startHttp->isChecked();
 }
 
 void
@@ -345,11 +358,19 @@ GeneralPage::saveClicked()
     appsettings->setValue(GC_SB_NAME, appsettings->value(this, GC_SB_NAME,tr("Stress Balance")));
     appsettings->setValue(GC_SB_ACRONYM, appsettings->value(this, GC_SB_ACRONYM,tr("SB")));
 
+#ifdef GC_WANT_HTTP
+    // start http
+    appsettings->setValue(GC_START_HTTP, startHttp->isChecked());
+#endif
+
     qint32 state=0;
 
     // general stuff changed ?
     if (b4.wheel != wheelSizeEdit->text().toInt() ||
         b4.crank != crankLengthCombo->currentIndex() ||
+#ifdef GC_WANT_HTTP
+        b4.starthttp != startHttp->isChecked() ||
+#endif
         b4.hyst != hystedit->text().toFloat())
         state += CONFIG_GENERAL;
 

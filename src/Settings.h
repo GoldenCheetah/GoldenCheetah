@@ -23,6 +23,7 @@
 
 #define GC_HOMEDIR                  "homedirectory"
 #define GC_VERSION_USED             "versionused"
+#define GC_START_HTTP               "starthttp"
 #define GC_SAFEEXIT                 "safeexit"
 #define GC_SETTINGS_CO              "goldencheetah.org"
 #define GC_SETTINGS_APP             "GoldenCheetah"

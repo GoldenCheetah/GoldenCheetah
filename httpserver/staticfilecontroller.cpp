@@ -27,11 +27,11 @@ StaticFileController::StaticFileController(QSettings* settings, QObject* parent)
             docroot=QFileInfo(configFile.absolutePath(),docroot).absoluteFilePath();
         }
     }
-    qDebug("StaticFileController: docroot=%s, encoding=%s, maxAge=%i",qPrintable(docroot),qPrintable(encoding),maxAge);
+    wDebug("StaticFileController: docroot=%s, encoding=%s, maxAge=%i",qPrintable(docroot),qPrintable(encoding),maxAge);
     maxCachedFileSize=settings->value("maxCachedFileSize","65536").toInt();
     cache.setMaxCost(settings->value("cacheSize","1000000").toInt());
     cacheTimeout=settings->value("cacheTime","60000").toInt();
-    qDebug("StaticFileController: cache timeout=%i, size=%i",cacheTimeout,cache.maxCost());
+    wDebug("StaticFileController: cache timeout=%i, size=%i",cacheTimeout,cache.maxCost());
 }
 
 
@@ -45,7 +45,7 @@ void StaticFileController::service(HttpRequest& request, HttpResponse& response)
         QByteArray document=entry->document; //copy the cached document, because other threads may destroy the cached entry immediately after mutex unlock.
         QByteArray filename=entry->filename;
         mutex.unlock();
-        qDebug("StaticFileController: Cache hit for %s",path.data());
+        wDebug("StaticFileController: Cache hit for %s",path.data());
         setContentType(filename,response);
         response.setHeader("Cache-Control","max-age="+QByteArray::number(maxAge/1000));
         response.write(document);
@@ -53,7 +53,7 @@ void StaticFileController::service(HttpRequest& request, HttpResponse& response)
     else {
         mutex.unlock();
         // The file is not in cache.
-        qDebug("StaticFileController: Cache miss for %s",path.data());
+        wDebug("StaticFileController: Cache miss for %s",path.data());
         // Forbid access to files outside the docroot directory
         if (path.contains("/..")) {
             qWarning("StaticFileController: detected forbidden characters in path %s",path.data());
@@ -67,7 +67,7 @@ void StaticFileController::service(HttpRequest& request, HttpResponse& response)
         }
         // Try to open the file
         QFile file(docroot+path);
-        qDebug("StaticFileController: Open file %s",qPrintable(file.fileName()));
+        wDebug("StaticFileController: Open file %s",qPrintable(file.fileName()));
         if (file.open(QIODevice::ReadOnly)) {
             setContentType(path,response);
             response.setHeader("Cache-Control","max-age="+QByteArray::number(maxAge/1000));
