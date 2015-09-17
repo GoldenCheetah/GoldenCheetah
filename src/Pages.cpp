@@ -296,7 +296,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     b4.lts = perfManLTSVal.toInt();
     b4.sts = perfManSTSVal.toInt();
     b4.warn = warnOnExit->isChecked();
+#ifdef GC_WANT_HTTP
     b4.starthttp = startHttp->isChecked();
+#endif
 }
 
 void
