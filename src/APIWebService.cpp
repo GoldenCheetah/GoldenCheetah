@@ -231,7 +231,10 @@ APIWebService::writeRideLine(RideItem &item, HttpRequest *request, HttpResponse 
         // all the metadata asked for
         foreach(QString name, settings->metawanted) {
             QString text = item.getText(name,"");
-            text.replace("\"","'"); // don't use double quotes!
+            text.replace("\"","'");   // don't use double quotes...
+            text.replace("\n","\\n"); // newlines
+            text.replace("\r","\\r"); // carriage returns
+            text.replace("\t","\\t"); // tabs
 
             response->bwrite(",\"");
             response->bwrite(text.toLocal8Bit());
