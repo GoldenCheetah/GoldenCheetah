@@ -54,7 +54,6 @@ struct RideDBContext {
     APIWebService *api;
     HttpRequest *request;
     HttpResponse *response;
-    QList<int> wanted;
 
     // the scanner
     void *scanner;

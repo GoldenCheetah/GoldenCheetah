@@ -78,7 +78,7 @@ ride: '{' rideelement_list '}'                                  {
                                                                     if (jc->api != NULL) {
                                                                     #ifdef GC_WANT_HTTP
                                                                         // we're listing rides in the api
-                                                                        jc->api->writeRideLine(jc->wanted, jc->item, jc->request, jc->response);
+                                                                        jc->api->writeRideLine(jc->item, jc->request, jc->response);
                                                                     #endif
                                                                     } else {
 
@@ -512,7 +512,6 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
     // do all ?
     bool nometrics = false;
     QStringList wantedNames;
-    QList<int> wanted;
     if (metrics != "") wantedNames = metrics.split(",");
 
     // write headings
@@ -544,7 +543,7 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
             }
 
             // index of wanted metrics
-            wanted << (i-1);
+            settings.wanted << (i-1);
         }
         response.bwrite("\n");
 
@@ -567,7 +566,6 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
             jc->api = this;
             jc->response = &response;
             jc->request = &request;
-            jc->wanted = wanted;
             jc->old = false;
 
             // clean item
