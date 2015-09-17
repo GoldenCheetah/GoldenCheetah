@@ -21,11 +21,14 @@
 
 #include "httprequesthandler.h"
 #include "RideItem.h"
+#include "RideMetadata.h"
 #include <QDir>
 
 struct listRideSettings {
     bool intervals;
-    QList<int> wanted;
+    QList<int> wanted; // metrics to list
+    QList<FieldDefinition> metafields;
+    QList<QString> metawanted; // metadata to list
 };
 
 class APIWebService : public HttpRequestHandler

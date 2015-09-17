@@ -227,6 +227,17 @@ APIWebService::writeRideLine(RideItem &item, HttpRequest *request, HttpResponse 
                 response->bwrite(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
             }
         }
+
+        // all the metadata asked for
+        foreach(QString name, settings->metawanted) {
+            QString text = item.getText(name,"");
+            text.replace("\"","'"); // don't use double quotes!
+
+            response->bwrite(",\"");
+            response->bwrite(text.toLocal8Bit());
+            response->bwrite("\"");
+        }
+
         response->bwrite("\n");
     }
 }
