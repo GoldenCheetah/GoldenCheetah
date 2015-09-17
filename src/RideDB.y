@@ -468,6 +468,8 @@ void RideCache::save()
 }
 
 #ifdef GC_WANT_HTTP
+#include "RideMetadata.h"
+
 void
 APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &response)
 {
@@ -523,8 +525,59 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
     // if intervals, add interval name
     if (settings.intervals == true) response.bwrite(", interval name, interval type");
 
+    // get metadata definitions into settings
+    QString metadata = request.getParameter("metadata");
+    bool nometa = true;
+    if (metadata.toUpper() != "NONE" && metadata != "") {
+
+        // first lets read in meta config
+        QDir config(home.absolutePath() + "/" + athlete + "/config");
+        QString metaConfig = config.canonicalPath()+"/metadata.xml";
+        if (QFile(metaConfig).exists()) {
+
+            // params to readXML - we ignore them
+            QList<KeywordDefinition> keywordDefinitions;
+            QString colorfield;
+            QList<DefaultDefinition> defaultDefinitions;
+
+            RideMetadata::readXML(metaConfig, keywordDefinitions, settings.metafields, colorfield, defaultDefinitions);
+        }
+
+        SpecialFields sp;
+
+        // what is being asked for ?
+        if (metadata.toUpper() == "ALL") {
+
+            // output all metadata
+            foreach(FieldDefinition field, settings.metafields) {
+                // don't do metric overrides !
+                if(!sp.isMetric(field.name)) settings.metawanted << field.name;
+            }
+
+        } else {
+
+            // selected fields - check they exist !
+            QStringList meta = metadata.split(",");
+            foreach(QString field, meta) {
+
+                // don't do metric overrides !
+                if(sp.isMetric(field)) continue;
+
+                // does it exist ?
+                QString lookup = field;
+                lookup.replace("_", " ");
+                foreach(FieldDefinition field, settings.metafields) {
+                    if (field.name == lookup) settings.metawanted << field.name;
+                }
+            }
+        }
+
+        // we found some?
+        if(settings.metawanted.count()) nometa = false;
+    }
+
     // list 'em by reading the ride cache from disk
-    if (nometrics == false && settings.intervals == false) {
+    if ((nometa == false || nometrics == false) && settings.intervals == false) {
 
         int i=0;
         foreach(const RideMetric *m, indexed) {
@@ -544,6 +597,14 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
 
             // index of wanted metrics
             settings.wanted << (i-1);
+        }
+
+        // do we want metadata too ?
+        foreach(QString meta, settings.metawanted) {
+            meta.replace(" ", "_");
+            response.bwrite(", \"");
+            response.bwrite(meta.toLocal8Bit());
+            response.bwrite("\"");
         }
         response.bwrite("\n");
 
