@@ -146,7 +146,7 @@ APIWebService::listAthletes(HttpRequest &, HttpResponse &response)
 
 
 void 
-APIWebService::writeRideLine(QList<int> wanted, RideItem &item, HttpRequest *request, HttpResponse *response)
+APIWebService::writeRideLine(RideItem &item, HttpRequest *request, HttpResponse *response)
 {
 
     // honour the since parameter
@@ -185,9 +185,9 @@ APIWebService::writeRideLine(QList<int> wanted, RideItem &item, HttpRequest *req
             response->bwrite(QString("%1").arg(static_cast<int>(interval->type)).toLocal8Bit());
 
             // essentially the same as below .. cut and paste (refactor?XXX)
-            if (wanted.count()) {
+            if (settings->wanted.count()) {
                 // specific metrics
-                foreach(int index, wanted) {
+                foreach(int index, settings->wanted) {
                     double value = interval->metrics()[index];
                     response->bwrite(",");
                     response->bwrite(QString("%1").arg(value, 'f').simplified().toLocal8Bit());
@@ -212,9 +212,9 @@ APIWebService::writeRideLine(QList<int> wanted, RideItem &item, HttpRequest *req
         response->bwrite(",");
         response->bwrite(item.fileName.toLocal8Bit());
 
-        if (wanted.count()) {
+        if (settings->wanted.count()) {
             // specific metrics
-            foreach(int index, wanted) {
+            foreach(int index, settings->wanted) {
                 double value = item.metrics()[index];
                 response->bwrite(",");
                 response->bwrite(QString("%1").arg(value, 'f').simplified().toLocal8Bit());

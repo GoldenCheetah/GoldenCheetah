@@ -25,6 +25,7 @@
 
 struct listRideSettings {
     bool intervals;
+    QList<int> wanted;
 };
 
 class APIWebService : public HttpRequestHandler
@@ -47,7 +48,7 @@ class APIWebService : public HttpRequestHandler
         void listZones(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
 
         // utility
-        void writeRideLine(QList<int> wanted, RideItem &item, HttpRequest *request, HttpResponse *response);
+        void writeRideLine(RideItem &item, HttpRequest *request, HttpResponse *response);
 
     private:
         QDir home;
