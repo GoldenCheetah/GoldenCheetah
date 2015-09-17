@@ -341,7 +341,7 @@ main(int argc, char *argv[])
 
         // The API server offers webservices (default port 12021, see httpserver.ini)
         // This is to enable integration with R and similar
-        if (appsettings->value(NULL, GC_START_HTTP).toBool() || server) {
+        if (appsettings->value(NULL, GC_START_HTTP, true).toBool() || server) {
 
             // notifications etc
             if (nogui) {
