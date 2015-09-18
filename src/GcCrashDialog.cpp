@@ -388,7 +388,7 @@ GcCrashDialog::setHTML()
     // files...
     text += "<center><h3>Athlete Directory - Activities</h3></center>";
     text += "<center><table border=0 cellspacing=10 width=\"90%\">";
-    foreach(QString file, home.activities().entryList(QDir::NoFilter, QDir::Time)) {
+    foreach(QString file, home.activities().entryList(QDir::NoDotAndDotDot, QDir::Time)) {
         text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
                 .arg(file)
                 .arg(QFileInfo(home.activities().canonicalPath() + "/" + file).lastModified().toString());
@@ -397,7 +397,7 @@ GcCrashDialog::setHTML()
 
     text += "<center><h3>Athlete Directory - Cache</h3></center>";
     text += "<center><table border=0 cellspacing=10 width=\"90%\">";
-    foreach(QString file, home.cache().entryList(QDir::NoFilter, QDir::Time)) {
+    foreach(QString file, home.cache().entryList(QDir::NoDotAndDotDot, QDir::Time)) {
         text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
                 .arg(file)
                 .arg(QFileInfo(home.cache().canonicalPath() + "/" + file).lastModified().toString());
@@ -406,7 +406,7 @@ GcCrashDialog::setHTML()
 
     text += "<center><h3>Athlete Directory - Config</h3></center>";
     text += "<center><table border=0 cellspacing=10 width=\"90%\">";
-    foreach(QString file, home.config().entryList(QDir::NoFilter, QDir::Time)) {
+    foreach(QString file, home.config().entryList(QDir::NoDotAndDotDot, QDir::Time)) {
         text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
                 .arg(file)
                 .arg(QFileInfo(home.config().canonicalPath() + "/" + file).lastModified().toString());
@@ -415,7 +415,7 @@ GcCrashDialog::setHTML()
 
     text += "<center><h3>Athlete Directory - Workouts</h3></center>";
     text += "<center><table border=0 cellspacing=10 width=\"90%\">";
-    foreach(QString file, home.workouts().entryList(QDir::NoFilter, QDir::Time)) {
+    foreach(QString file, home.workouts().entryList(QDir::NoDotAndDotDot, QDir::Time)) {
         text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
                 .arg(file)
                 .arg(QFileInfo(home.workouts().canonicalPath() + "/" + file).lastModified().toString());
@@ -424,7 +424,7 @@ GcCrashDialog::setHTML()
 
     text += "<center><h3>Athlete Directory - Imports</h3></center>";
     text += "<center><table border=0 cellspacing=10 width=\"90%\">";
-    foreach(QString file, home.imports().entryList(QDir::NoFilter, QDir::Time)) {
+    foreach(QString file, home.imports().entryList(QDir::NoDotAndDotDot, QDir::Time)) {
         text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
                 .arg(file)
                 .arg(QFileInfo(home.imports().canonicalPath() + "/" + file).lastModified().toString());
@@ -433,7 +433,7 @@ GcCrashDialog::setHTML()
 
     text += "<center><h3>Athlete Directory - Downloads</h3></center>";
     text += "<center><table border=0 cellspacing=10 width=\"90%\">";
-    foreach(QString file, home.downloads().entryList(QDir::NoFilter, QDir::Time)) {
+    foreach(QString file, home.downloads().entryList(QDir::NoDotAndDotDot, QDir::Time)) {
         text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
                 .arg(file)
                 .arg(QFileInfo(home.downloads().canonicalPath() + "/" + file).lastModified().toString());
@@ -447,17 +447,25 @@ GcCrashDialog::setHTML()
 
         // RESPECT PRIVACY
         // we do not disclose user names and passwords or key ids
-        if (key.endsWith("/user") || key.endsWith("/pass") || key.endsWith("/key")) continue;
+        if (key.endsWith("/user") || key.endsWith("/pass") || key.endsWith("/key") ||
+            key.endsWith("_token") || key.endsWith("_secret") || key.endsWith("googlecalid")) continue;
 
         // we do not disclose personally identifiable information
-        if (key.endsWith("/dob") || key.endsWith("/weight") ||
-            key.endsWith("/sex") || key.endsWith("/bio")) continue;
+        if (key.endsWith("dob") || key.endsWith("weight") ||
+            key.endsWith("sex") || key.endsWith("bio") ||
+            key.endsWith("height") || key.endsWith("nickname")) continue;
 
-
-        text += QString("<tr><td align=\"right\" width=\"50%\"> %1</td><td align=\"left\">"
-                        "<span style=\"max-width:50%;\">%2</span></td></tr>")
-                .arg(key)
-                .arg(appsettings->value(NULL, key).toString().leftJustified(60, ' ', true));
+        if (key.startsWith("<athlete-")) {
+            text += QString("<tr><td align=\"right\" width=\"50%\"> %1</td><td align=\"left\">"
+                            "<span style=\"max-width:50%;\">%2</span></td></tr>")
+                    .arg(key)
+                    .arg(appsettings->cvalue(home.root().dirName(), key).toString().leftJustified(60, ' ', true));
+        } else {
+            text += QString("<tr><td align=\"right\" width=\"50%\"> %1</td><td align=\"left\">"
+                            "<span style=\"max-width:50%;\">%2</span></td></tr>")
+                    .arg(key)
+                    .arg(appsettings->value(NULL, key).toString().leftJustified(60, ' ', true));
+        }
     }
     text += "</table></center>";
 

@@ -296,7 +296,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
     minY = minX = 65535;
 
     // get application settings
-    cranklength = appsettings->value(this, GC_CRANKLENGTH, 175.00).toDouble() / 1000.0;
+    cranklength = appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH, 175.00).toDouble() / 1000.0;
 
     // how many curves do we need ?
     if (xseries == MODEL_LRBALANCE || xseries == MODEL_TE || xseries == MODEL_PS ||

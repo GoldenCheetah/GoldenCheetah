@@ -588,6 +588,9 @@ AddPair::AddPair(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent)
 
     channelWidget = new QTreeWidget(this);
     layout->addWidget(channelWidget);
+
+    cyclist = parent->context->athlete->cyclist;
+
 }
 
 static void
@@ -791,7 +794,7 @@ AddPair::getChannelValues()
 
                 dynamic_cast<QLabel *>(channelWidget->itemWidget(item,2))->setText(QString("%1 %2")
                 .arg((int)dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue2(i) //speed
-                          * (appsettings->value(NULL, GC_WHEELSIZE, 2100).toInt()/1000) * 60 / 1000)
+                          * (appsettings->cvalue(cyclist, GC_WHEELSIZE, 2100).toInt()/1000) * 60 / 1000)
                 .arg((int)dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue(i))); // cad
 
             } else if (p->itemData(p->currentIndex()) == ANTChannel::CHANNEL_TYPE_MOXY) {
@@ -849,6 +852,9 @@ AddPairBTLE::AddPairBTLE(AddDeviceWizard *parent) : QWizardPage(parent), wizard(
 
     channelWidget = new QTreeWidget(this);
     layout->addWidget(channelWidget);
+
+    cyclist = parent->context->athlete->cyclist;
+
 }
 
 void
@@ -1026,7 +1032,7 @@ AddPairBTLE::getChannelValues()
             if (p->itemData(p->currentIndex()) == ANTChannel::CHANNEL_TYPE_SandC) {
             dynamic_cast<QLabel *>(channelWidget->itemWidget(item,2))->setText(QString("%1 %2")
                 .arg((int)dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue2(i) //speed
-                          * (appsettings->value(NULL, GC_WHEELSIZE, 2100).toInt()/1000) * 60 / 1000)
+                          * (appsettings->cvalue(cyclist, GC_WHEELSIZE, 2100).toInt()/1000) * 60 / 1000)
                 .arg((int)dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue(i))); // cad
             } else {
             dynamic_cast<QLabel *>(channelWidget->itemWidget(item,2))->setText(QString("%1")
@@ -1158,7 +1164,7 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     //
     // Wheel size
     //
-    int wheelSize = appsettings->value(this, GC_WHEELSIZE, 2100).toInt();
+    int wheelSize = appsettings->cvalue(parent->context->athlete->cyclist, GC_WHEELSIZE, 2100).toInt();
 
     rimSizeCombo = new QComboBox();
     rimSizeCombo->addItems(WheelSize::RIM_SIZES);

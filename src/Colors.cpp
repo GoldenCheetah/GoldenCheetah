@@ -522,6 +522,17 @@ GCColor::linearGradient(int size, bool active, bool alternate)
     return returning; 
 }
 
+QStringList
+GCColor::getConfigKeys() {
+
+    QStringList result;
+    for (unsigned int i=0; ColorList[i].name != ""; i++) {
+        result.append(ColorList[i].setting);
+    }
+    return result;
+}
+
+
 //
 // Themes
 //

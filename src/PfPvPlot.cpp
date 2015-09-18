@@ -179,7 +179,7 @@ PfPvPlot::PfPvPlot(Context *context)
     curve = new QwtPlotCurve();
     curve->attach(this);
 
-    cl_ = appsettings->value(this, GC_CRANKLENGTH).toDouble() / 1000.0;
+    cl_ = appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH).toDouble() / 1000.0;
 
     // markup timeInQuadrant
     tiqMarker[0] = new QwtPlotMarker(); tiqMarker[0]->attach(this);
@@ -242,7 +242,7 @@ PfPvPlot::configChanged(qint32)
     mY->setLinePen(marker);
     cpCurve->setPen(cp);
 
-    setCL(appsettings->value(this, GC_CRANKLENGTH).toDouble() / 1000.0);
+    setCL(appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH).toDouble() / 1000.0);
 
     replot();
 }

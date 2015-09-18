@@ -345,7 +345,7 @@ ModelDataProvider::describeType(int type, bool longer)
 ModelDataProvider::ModelDataProvider (ModelPlot &plot, ModelSettings *settings) : Function(plot), plot(plot)
 {
     // get application settings
-    cranklength = appsettings->value(NULL, GC_CRANKLENGTH, 0.0).toDouble() / 1000.0;
+    cranklength = appsettings->cvalue(plot.context->athlete->cyclist, GC_CRANKLENGTH, 0.0).toDouble() / 1000.0;
     useMetricUnits = plot.context->athlete->useMetricUnits;
 
     // if there are no settings or incomplete settings
