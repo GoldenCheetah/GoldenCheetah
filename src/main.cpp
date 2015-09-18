@@ -380,6 +380,12 @@ main(int argc, char *argv[])
 
             // use the default handler (just get an error page)
             QSettings* settings=new QSettings(httpini,QSettings::IniFormat,application);
+
+            if (listener) {
+                // when changing the Athlete Directory, there is already a listener running
+                // close first to avoid errors
+                listener->close();
+            }
             listener=new HttpListener(settings,new APIWebService(home, application),application);
 
             // if not going on to launch a gui...
