@@ -171,6 +171,7 @@ class AddPair : public QWizardPage
         QTreeWidget *channelWidget;
         QSignalMapper *signalMapper;
         QTimer updateValues;
+        QString cyclist;
 };
 
 class AddPairBTLE : public QWizardPage
@@ -199,6 +200,8 @@ class AddPairBTLE : public QWizardPage
         QTreeWidget *channelWidget;
         QSignalMapper *signalMapper;
         QTimer updateValues;
+        QString cyclist;
+
 };
 
 class AddFinal : public QWizardPage

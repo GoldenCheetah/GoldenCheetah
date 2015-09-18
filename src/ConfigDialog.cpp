@@ -251,6 +251,9 @@ void ConfigDialog::saveClicked()
             // lets restart
             restarting = true;
 
+            // save all setttings to disk
+            appsettings->syncQSettings();
+
             // close all the mainwindows
             foreach(MainWindow *m, mainwindows) m->byebye();
 

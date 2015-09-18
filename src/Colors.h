@@ -119,6 +119,9 @@ class GCColor : public QObject
         static void readConfig();
         static void setupColors();
 
+        // for upgrade/migration of Config
+        static QStringList getConfigKeys();
+
 };
 
 // return a color for a ride file

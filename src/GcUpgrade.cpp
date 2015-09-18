@@ -27,6 +27,7 @@
 #include "JsonRideFile.h"
 #include "Context.h"
 #include "DataProcessor.h"
+#include "MainWindow.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -43,7 +44,7 @@ GcUpgrade::upgradeConfirmedByUser(const QDir &home)
     bool folderUpgradeSuccess =  appsettings->cvalue(home.dirName(), GC_UPGRADE_FOLDER_SUCCESS, false).toBool();
 
     //  reset upgrade flag - in case flag is set "true" and subfolder "/activities" and /config do NOT exist
-    //  or - if they exists - do not contain any files, then something is wrong with the upgrade flag -
+    //  or - if they exists, but config does not contain any files, then something is wrong with the upgrade flag -
     //  (potentially due to a not fitting data restore)
     //  so let's reset the flag to "false" and run the upgrade again - this can never go wrong (if their is
     //  nothing to be upgrade - upgrade a success anyway
@@ -114,32 +115,31 @@ GcUpgrade::upgrade(const QDir &home)
             if (weight_ <= 0.00) appsettings->setCValue(home.dirName(), GC_WEIGHT, "75.0");
 
             // 5. startup with common sidebars shown (less ugly)
-            appsettings->setCValue(home.dirName(), "splitter/LTM/hide", true);
-            appsettings->setCValue(home.dirName(), "splitter/LTM/hide/0", false);
-            appsettings->setCValue(home.dirName(), "splitter/LTM/hide/1", false);
-            appsettings->setCValue(home.dirName(), "splitter/LTM/hide/2", false);
-            appsettings->setCValue(home.dirName(), "splitter/LTM/hide/3", true);
-            appsettings->setCValue(home.dirName(), "splitter/analysis/hide", true);
-            appsettings->setCValue(home.dirName(), "splitter/analysis/hide/0", false);
-            appsettings->setCValue(home.dirName(), "splitter/analysis/hide/1", true);
-            appsettings->setCValue(home.dirName(), "splitter/analysis/hide/2", false);
-            appsettings->setCValue(home.dirName(), "splitter/analysis/hide/3", true);
-            appsettings->setCValue(home.dirName(), "splitter/diary/hide", true);
-            appsettings->setCValue(home.dirName(), "splitter/diary/hide/0", false);
-            appsettings->setCValue(home.dirName(), "splitter/diary/hide/1", false);
-            appsettings->setCValue(home.dirName(), "splitter/diary/hide/2", true);
-            appsettings->setCValue(home.dirName(), "splitter/train/hide", true);
-            appsettings->setCValue(home.dirName(), "splitter/train/hide/0", false);
-            appsettings->setCValue(home.dirName(), "splitter/train/hide/1", false);
-            appsettings->setCValue(home.dirName(), "splitter/train/hide/2", false);
-            appsettings->setCValue(home.dirName(), "splitter/train/hide/3", false);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide"), true);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide/0"), false);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide/1"), false);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide/2"), false);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide/3"), true);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide"), true);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/0"), false);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/1"), true);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/2"), false);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/3"), true);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide"), true);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide/0"), false);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide/1"), false);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide/2"), true);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide"), true);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/0"), false);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/1"), false);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/2"), false);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/3"), false);
 
             // 6. Delete any old measures.xml -- its for withings only
             QFile msxml(QString("%1/measures.xml").arg(home.canonicalPath()));
             if (msxml.exists()) msxml.remove();
 
-            // FINALLY -- Set latest version - so only tries to upgrade once
-            appsettings->setCValue(home.dirName(), GC_VERSION_USED, VERSION_LATEST);
+
         }
     }
 
@@ -160,6 +160,7 @@ GcUpgrade::upgrade(const QDir &home)
         // 3. Remove metricDBv3 - force rebuild including the search index
         QFile db(QString("%1/metricDBv3").arg(home.canonicalPath()));
         if (db.exists()) db.remove();
+
     }
 
     //----------------------------------------------------------------------
@@ -347,6 +348,20 @@ GcUpgrade::upgrade(const QDir &home)
 
     }
 
+
+    //----------------------------------------------------------------------
+    // ... here any further Release Number dependent Upgrade Process is to be added ...
+    //----------------------------------------------------------------------
+
+
+
+    //----------------------------------------------------------------------
+    // All Version dependent Upgrade Steps are done ...
+    //----------------------------------------------------------------------
+
+    // FINALLY -- Set latest version - so only tries to upgrade once
+    appsettings->setCValue(home.dirName(), GC_VERSION_USED, VERSION_LATEST);
+
     //----------------------------------------------------------------------
     // 3.2 new subfolder introduction and upgrade processing
     //----------------------------------------------------------------------
@@ -369,6 +384,8 @@ GcUpgrade::upgrade(const QDir &home)
 
         AthleteDirectoryStructure newHome(home);
         newHome.createAllSubdirs();
+        //now we can created the QSettings for the Athlete and Migrate the oldseetings
+        appsettings->initializeQSettingsAthlete(gcroot, home.dirName());
 
         if (!newHome.subDirsExist()) {
            upgradeLog->append(QString(tr("Error: Creation of subdirectories failed")),2);
