@@ -173,6 +173,8 @@ GSettings::setValue(QString key, QVariant value)
 QVariant
 GSettings::cvalue(QString athleteName, QString key, QVariant def) {
 
+    if (athleteName.isNull() || athleteName.isEmpty()) return def;
+
     QString keyVar = QString(key);
     if (newFormat) {
         int store;
