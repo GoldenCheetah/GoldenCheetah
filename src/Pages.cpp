@@ -5593,17 +5593,18 @@ AutoImportPage::saveClicked()
 
     // re-read
     context->athlete->autoImportConfig->readConfig();
-
     return 0;
 }
 
 void
 AutoImportPage::addRuleTypes(QComboBox *p) {
 
+    RideAutoImportRule* config = new RideAutoImportRule();
+    QList<QString> descriptions = config->getRuleDescriptions();
 
-    p->addItem(tr("No autoimport"));
-    p->addItem(tr("Autoimport with dialog"));
-
+    foreach(QString description, descriptions) {
+           p->addItem(description);
+    }
 }
 
 void
