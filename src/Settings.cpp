@@ -467,6 +467,15 @@ GSettings::migrateCValue(QString athlete, QString key) {
 }
 
 void
+GSettings::migrateAndRenameCValue(QString athlete, QString wrongKey, QString key) {
+
+    wrongKey.remove(QRegExp("^<.*>"));
+    if (oldsystemsettings->contains(athlete+"/"+wrongKey)) {
+        setCValue(athlete, key, oldsystemsettings->value(athlete+"/"+wrongKey));
+    }
+}
+
+void
 GSettings::migrateValueToCValue(QString athlete, QString key) {
 
     QString oldKey = key;
@@ -631,13 +640,13 @@ GSettings::upgradeAthlete(QString athlete) {
     migrateCValue(athlete, GC_LTS_DAYS);
     migrateCValue(athlete, GC_STS_DAYS);
     migrateCValue(athlete, GC_NAVHEADINGS);
-    migrateCValue(athlete, GC_NAVHEADINGWIDTHS);
     migrateCValue(athlete, GC_NAVGROUPBY);
     migrateCValue(athlete, GC_SORTBY);
     migrateCValue(athlete, GC_WEBCAL_URL);
     migrateCValue(athlete, GC_DIARY_VIEW);
     migrateCValue(athlete, GC_USE_CP_FOR_FTP);
 
+    migrateAndRenameCValue(athlete, "bavigator/headingwidths", GC_NAVHEADINGWIDTHS);
 
     // Handle the splittersizes keys
     QStringList splitterKeys = oldsystemsettings->allKeys();

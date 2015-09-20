@@ -211,7 +211,7 @@
 
 // ride navigator
 #define GC_NAVHEADINGS                  "<athlete-preferences>navigator/headings"
-#define GC_NAVHEADINGWIDTHS             "<athlete-preferences>bavigator/headingwidths"
+#define GC_NAVHEADINGWIDTHS             "<athlete-preferences>navigator/headingwidths"
 #define GC_NAVGROUPBY                   "<athlete-preferences>navigator/groupby"
 #define GC_SORTBY                       "<athlete-preferences>navigator/sortby"
 #define GC_SORTBYORDER                  "<athlete-preferences>navigator/sortbyorder"
@@ -326,6 +326,7 @@ private:
     // special methods for Migration/Upgrade
     void migrateValue(QString key);
     void migrateCValue(QString athleteName, QString key);
+    void migrateAndRenameCValue(QString athleteName, QString wrongKey, QString key);
     void migrateValueToCValue(QString athleteName, QString key);
 
     void upgradeSystem();
