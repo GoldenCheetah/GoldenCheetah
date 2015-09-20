@@ -2166,7 +2166,7 @@ PasteSpecialDialog::setResultsTable()
         for (int i=0; hasHeader->isChecked() ? (i<sourceHeadings.count()) : (i<cells[0].count()); i++) {
             if (hasHeader->isChecked() == true) {
                 // have we mapped this before?
-                QString lookup = "colmap/" + sourceHeadings[i];
+                QString lookup = GC_QSETTINGS_GLOBAL_GENERAL+QString("colmap/") + sourceHeadings[i];
                 QString mapto = appsettings->value(this, lookup, "Ignore").toString();
                 // is this an available heading tho?
                 if (columnSelect->findText(mapto) != -1) {
@@ -2475,7 +2475,7 @@ PasteSpecialDialog::columnChanged()
 
     // lets remember this mapping if its to a source header
     if (hasHeader->isChecked() && headings[column] != "Ignore") {
-        QString lookup = "colmap/" + sourceHeadings[column];
+        QString lookup = GC_QSETTINGS_GLOBAL_GENERAL+QString("colmap/") + sourceHeadings[column];
         appsettings->setValue(lookup, headings[column]);
     }
 }

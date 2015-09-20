@@ -82,8 +82,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
     if (unit == 0) {
         // Default to system locale
-        unit = appsettings->value(this, GC_UNIT,
-             QLocale::system().measurementSystem() == QLocale::MetricSystem ? GC_UNIT_METRIC : GC_UNIT_IMPERIAL);
+        unit = QLocale::system().measurementSystem() == QLocale::MetricSystem ? GC_UNIT_METRIC : GC_UNIT_IMPERIAL;
         appsettings->setCValue(cyclist, GC_UNIT, unit);
     }
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
@@ -423,8 +422,7 @@ bool
 AthleteDirectoryStructure::upgradedDirectoriesHaveData() {
 
    if ( activities().exists() && config().exists()) {
-       QStringList activityFiles = activities().entryList(QDir::Files);
-       if (!activityFiles.isEmpty()) { return true; }
+       // just check for config files (activities are empty in case of a new athlete)
        QStringList configFiles = config().entryList(QDir::Files);
        if (!configFiles.isEmpty()) { return true; }
    }

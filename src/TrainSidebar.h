@@ -83,6 +83,8 @@ class TrainSidebar : public GcWindow
     public:
 
         TrainSidebar(Context *context);
+        Context *context;
+
         QStringList listWorkoutFiles(const QDir &) const;
 
         QList<int> devices(); // convenience function for iterating over active devices
@@ -171,7 +173,6 @@ class TrainSidebar : public GcWindow
 
         friend class ::MultiDeviceDialog;
 
-        Context *context;
         GcSplitter   *trainSplitter;
         GcSplitterItem *deviceItem,
                        *workoutItem,

@@ -1532,9 +1532,11 @@ MainWindow::openWindow(QString name)
 {
     // open window...
     QDir home(gcroot);
+    appsettings->initializeQSettingsGlobal(gcroot);
     home.cd(name);
 
     if (!home.exists()) return;
+    appsettings->initializeQSettingsAthlete(gcroot, name);
 
     GcUpgrade v3;
     if (!v3.upgradeConfirmedByUser(home)) return;
@@ -1549,6 +1551,7 @@ void
 MainWindow::closeWindow()
 {
     // just call close, we might do more later
+    appsettings->syncQSettings();
     close();
 }
 
@@ -1556,9 +1559,11 @@ void
 MainWindow::openTab(QString name)
 {
     QDir home(gcroot);
+    appsettings->initializeQSettingsGlobal(gcroot);
     home.cd(name);
 
     if (!home.exists()) return;
+    appsettings->initializeQSettingsAthlete(gcroot, name);
 
     GcUpgrade v3;
     if (!v3.upgradeConfirmedByUser(home)) return;
@@ -1623,7 +1628,7 @@ MainWindow::closeTab()
     else {
         removeTab(currentTab);
     }
-
+    appsettings->syncQSettings();
     // we did it
     return true;
 }

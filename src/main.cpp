@@ -208,15 +208,17 @@ main(int argc, char *argv[])
     static CocoaInitializer cocoaInitializer;
 #endif
 
+    // set default colors
+    GCColor::setupColors();
+    appsettings->migrateQSettingsSystem(); // colors must be setup before migration can take place, but reading has to be from the migrated ones
+    GCColor::readConfig();
+
     // set defaultfont
     QFont font;
     font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
     font.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
     application->setFont(font); // set default font
 
-    // set default colors
-    GCColor::setupColors();
-    GCColor::readConfig();
 
     //
     // OPEN FIRST MAINWINDOW
@@ -282,6 +284,8 @@ main(int argc, char *argv[])
 
         // set global root directory
         gcroot = home.canonicalPath();
+        appsettings->initializeQSettingsGlobal(gcroot);
+
 
         // now redirect stderr
 #ifndef WIN32
@@ -334,9 +338,16 @@ main(int argc, char *argv[])
             // no parameters passed lets open the last athlete we worked with
             lastOpened = appsettings->value(NULL, GC_SETTINGS_LAST);
 
-            // but hang on, did they crash? if so we need to open with a menu
-            if(appsettings->cvalue(lastOpened.toString(), GC_SAFEEXIT, true).toBool() != true)
+            // does lastopened Directory exists at all
+            QDir lastOpenedDir(gcroot+"/"+lastOpened.toString());
+            if (lastOpenedDir.exists()) {
+                // but hang on, did they crash? if so we need to open with a menu
+                appsettings->initializeQSettingsAthlete(gcroot, lastOpened.toString());
+                if(appsettings->cvalue(lastOpened.toString(), GC_SAFEEXIT, true).toBool() != true)
+                    lastOpened = QVariant();
+            } else {
                 lastOpened = QVariant();
+            }
             
         }
 
@@ -415,7 +426,9 @@ main(int argc, char *argv[])
             QStringListIterator i(list);
             while (i.hasNext()) {
                 QString cyclist = i.next();
+                QString homeDir = home.canonicalPath();
                 if (home.cd(cyclist)) {
+                    appsettings->initializeQSettingsAthlete(homeDir, cyclist);
                     GcUpgrade v3;
                     if (v3.upgradeConfirmedByUser(home)) {
                         MainWindow *mainWindow = new MainWindow(home);
@@ -445,12 +458,14 @@ main(int argc, char *argv[])
             }
 
             // chosen, so lets get the choice..
+            QString homeDir = home.canonicalPath();
             home.cd(d.choice());
             if (!home.exists()) {
                 delete trainDB;
                 exit(0);
             }
 
+            appsettings->initializeQSettingsAthlete(homeDir, d.choice());
             // .. and open a mainwindow
             GcUpgrade v3;
             if (v3.upgradeConfirmedByUser(home)) {
@@ -467,6 +482,9 @@ main(int argc, char *argv[])
 
         // close trainDB
         delete trainDB;
+
+        // reset QSettings (global & Athlete)
+        appsettings->clearGlobalAndAthletes();
 
         // clear web caches (stop warning of WebKit leaks)
         QWebSettings::clearMemoryCaches();

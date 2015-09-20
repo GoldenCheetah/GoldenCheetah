@@ -689,6 +689,8 @@ class ZonePage : public QWidget
     public:
 
         ZonePage(Context *);
+        Context *context;
+
         qint32 saveClicked();
 
         //ZoneScheme scheme;
@@ -704,7 +706,6 @@ class ZonePage : public QWidget
 
     protected:
 
-        Context *context;
         bool changed;
 
         QTabWidget *tabs;

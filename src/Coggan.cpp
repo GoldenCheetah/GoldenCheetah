@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "Context.h"
 #include "RideMetric.h"
 #include "RideItem.h"
 #include "Zones.h"
@@ -23,6 +24,7 @@
 #include "Units.h"
 #include <cmath>
 #include <QApplication>
+
 
 class NP : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(NP)
@@ -152,7 +154,7 @@ class IntensityFactor : public RideMetric {
     void compute(const RideFile *r, const Zones *zones, int zoneRange,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+                 const Context *context) {
         if (zones && zoneRange >= 0) {
             assert(deps.contains("coggan_np"));
             NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
@@ -160,7 +162,7 @@ class IntensityFactor : public RideMetric {
 
             int ftp = r->getTag("FTP","0").toInt();
 
-            bool useCPForFTP = (appsettings->value(NULL, GC_USE_CP_FOR_FTP, "1").toString() == "0");
+            bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, "1").toString() == "0");
 
             if (useCPForFTP) {
                 int cp = r->getTag("CP","0").toInt();
@@ -200,7 +202,7 @@ class TSS : public RideMetric {
     void compute(const RideFile *r, const Zones *zones, int zoneRange,
                  const HrZones *, int,
 	    const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+                 const Context *context) {
 	if (!zones || zoneRange < 0)
 	    return;
         assert(deps.contains("coggan_np"));
@@ -213,7 +215,7 @@ class TSS : public RideMetric {
 
         int ftp = r->getTag("FTP","0").toInt();
 
-        bool useCPForFTP = (appsettings->value(NULL, GC_USE_CP_FOR_FTP, "1").toString() == "0");
+        bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, "1").toString() == "0");
 
         if (useCPForFTP) {
             int cp = r->getTag("CP","0").toInt();
