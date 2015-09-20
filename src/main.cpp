@@ -183,6 +183,9 @@ main(int argc, char *argv[])
     //
     // INITIALISE ONE TIME OBJECTS
     //
+#ifdef GC_WANT_HTTP
+    listener = NULL;
+#endif
 
 #ifdef Q_OS_X11
     XInitThreads();
