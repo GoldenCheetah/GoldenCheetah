@@ -190,6 +190,7 @@
 #define GC_BLANK_DIARY                  "<athlete-layout>blank/diary"
 #define GC_SETTINGS_SPLITTER_SIZES      "<athlete-layout>mainwindow/splitterSizes"
 
+
 #define GC_UNIT                         "<athlete-preferences>unit"
 #define GC_NICKNAME                     "<athlete-preferences>nickname"
 #define GC_DOB                          "<athlete-preferences>dob"
@@ -221,9 +222,9 @@
 
 #define GC_TPURL                        "<athlete-private>tp/url"
 #define GC_TWURL                        "<athlete-private>tw/url"
-#define GC_TPUSER                       "<athlete-private>tp/urltp/user"
-#define GC_TPPASS                       "<athlete-private>tp/urltp/pass"
-#define GC_TPTYPE                       "<athlete-private>tp/urltp/type"
+#define GC_TPUSER                       "<athlete-private>tp/user"
+#define GC_TPPASS                       "<athlete-private>tp/pass"
+#define GC_TPTYPE                       "<athlete-private>tp/type"
 #define GC_RWGPSUSER                    "<athlete-private>rwgps/user"
 #define GC_RWGPSPASS                    "<athlete-private>rwgps/pass"
 #define GC_TTBUSER                      "<athlete-private>ttb/user"
