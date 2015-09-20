@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
+ * Copyright (c) 2015 Joern Rischmueller (joern.rm@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -21,260 +22,319 @@
 #include "GoldenCheetah.h"
 #include <QDebug>
 
-#define GC_HOMEDIR                  "homedirectory"
-#define GC_VERSION_USED             "versionused"
-#define GC_START_HTTP               "starthttp"
-#define GC_SAFEEXIT                 "safeexit"
-#define GC_SETTINGS_CO              "goldencheetah.org"
-#define GC_SETTINGS_APP             "GoldenCheetah"
-#define GC_SETTINGS_LAST            "mainwindow/lastOpened"
-#define GC_SETTINGS_MAIN_WIDTH      "mainwindow/width"
-#define GC_SETTINGS_MAIN_HEIGHT     "mainwindow/height"
-#define GC_SETTINGS_MAIN_X          "mainwindow/x"
-#define GC_SETTINGS_MAIN_Y          "mainwindow/y"
-#define GC_SETTINGS_MAIN_GEOM       "mainwindow/geometry"
-#define GC_SETTINGS_MAIN_STATE      "mainwindow/state"
-#define GC_SETTINGS_SPLITTER_SIZES  "mainwindow/splitterSizes"
-#define GC_SETTINGS_CALENDAR_SIZES  "mainwindow/calendarSizes"
-#define GC_TABS_TO_HIDE             "mainwindow/tabsToHide"
-#define GC_ELEVATION_HYSTERESIS     "elevationHysteresis"
-#define GC_SETTINGS_SUMMARY_METRICS "rideSummaryWindow/summaryMetrics"
-#define GC_SETTINGS_BESTS_METRICS    "rideSummaryWindow/bestsMetrics"
-#define GC_SETTINGS_INTERVAL_METRICS "rideSummaryWindow/intervalMetrics"
-#define GC_RIDE_PLOT_SMOOTHING       "ridePlot/Smoothing"
-#define GC_RIDE_PLOT_STACK           "ridePlot/Stack"
-#define GC_PERF_MAN_METRIC           "performanceManager/metric"
-#define GC_HIST_BIN_WIDTH            "histogamWindow/binWidth"
+
+
+/*
+ *  Global GC Properties which are not stored as GSettings are defined here
+ */
+
+#define GC_SETTINGS_CO                        "goldencheetah.org"
+#define GC_SETTINGS_APP                       "GoldenCheetah"
 #define GC_SETTINGS_BESTS_METRICS_DEFAULT "5s_critical_power,1m_critical_power,5m_critical_power,20m_critical_power,60m_critical_power,3m_critical_pace,20m_critical_pace,3m_critical_pace_swim,20m_critical_pace_swim"
 #define GC_SETTINGS_SUMMARY_METRICS_DEFAULT "triscore,skiba_xpower,skiba_relative_intensity,xPace,swimscore_xpace,trimp_points,aerobic_decoupling"
 #define GC_SETTINGS_INTERVAL_METRICS_DEFAULT "workout_time,total_distance,total_work,average_power,average_hr,average_cad,average_speed,pace,pace_swim,distance_swim"
-#define GC_DATETIME_FORMAT          "ddd MMM dd, yyyy, hh:mm"
-#define GC_UNIT                     "unit"
-#define GC_PACE                     "pace"
-#define GC_SWIMPACE                 "swimpace"
-#define GC_LANG                     "lang"
-#define GC_NICKNAME                 "nickname"
-#define GC_DOB                      "dob"
-#define GC_WEIGHT                   "weight"
-#define GC_HEIGHT                   "height"
-#define GC_WBALTAU                  "wbaltau"
-#define GC_SEX                      "sex"
-#define GC_BIO                      "bio"
-#define GC_AVATAR                   "avatar"
-#define GC_SETTINGS_LAST_IMPORT_PATH "mainwindow/lastImportPath"
-#define GC_SETTINGS_LAST_WORKOUT_PATH "mainwindow/lastWorkoutPath"
-#define GC_LAST_DOWNLOAD_DEVICE      "mainwindow/lastDownloadDevice"
-#define GC_LAST_DOWNLOAD_PORT        "mainwindow/lastDownloadPort"
-#define GC_CRANKLENGTH              "crankLength"
-#define GC_WHEELSIZE                "wheelsize"
-#define GC_BIKESCOREDAYS	    "bikeScoreDays"
-#define GC_BIKESCOREMODE	    "bikeScoreMode"
-#define GC_SB_TODAY             "PMshowSBtoday"
-#define GC_LTS_DAYS		    "LTSdays"
-#define GC_STS_DAYS		    "STSdays"
-#define GC_STS_NAME			"STSname"
-#define GC_STS_ACRONYM			"STS"
-#define GC_LTS_NAME			"LTSname"
-#define GC_LTS_ACRONYM			"LTS"
-#define GC_SB_NAME			"SBname"
-#define GC_SB_ACRONYM			"SB"
-#define GC_WARNCONVERT      "warnconvert"
-#define GC_WARNEXIT      "warnexit"
-#define GC_WORKOUTDIR      "workoutDir"
-#define GC_TRAIN_SPLITTER_SIZES  "trainwindow/splitterSizes"
-#define GC_LTM_SPLITTER_SIZES  "ltmwindow/splitterSizes"
-#define GC_LTM_LAST_DATE_RANGE "ltmwindow/lastDateRange"
-#define GC_LTM_AUTOFILTERS "ltmwindow/autofilters"
-#define GC_BLANK_ANALYSIS "blank/analysis"
-#define GC_BLANK_TRAIN    "blank/train"
-#define GC_BLANK_HOME     "blank/home"
-#define GC_BLANK_DIARY    "blank/diary"
-#define GC_LINEWIDTH      "linewidth"
-#define GC_ANTIALIAS      "antialias"
-#define GC_CHROME         "chrome" // mac or flat only so far
-#define GC_RIDEBG         "rideBG"
-#define GC_RIDESCROLL     "rideScroll"
-#define GC_RIDEHEAD       "rideHead"
-#define GC_DROPSHADOW     "dropshadow"
-#define GC_SHADEZONES     "shadezones"
-#define GC_PROXYTYPE      "proxy/type"
-#define GC_PROXYHOST      "proxy/host"
-#define GC_PROXYPORT      "proxy/port"
-#define GC_PROXYUSER      "proxy/user"
-#define GC_PROXYPASS      "proxy/pass"
-#define GC_GCURL          "gc/url"
-#define GC_GCUSER         "gc/user"
-#define GC_GCPASS         "gc/pass"
-#define GC_TPURL          "tp/url"
-#define GC_TPUSER         "tp/user"
-#define GC_TPPASS         "tp/pass"
-#define GC_TPTYPE         "tp/type"
-#define GC_TWURL          "tw/url"
-#define GC_TWUSER         "tw/user"
-#define GC_TWPASS         "tw/pass"
-#define GC_STRUSER        "str/user"
-#define GC_STRPASS        "str/pass"
-#define GC_RWGPSUSER      "rwgps/user"
-#define GC_RWGPSPASS      "rwgps/pass"
-#define GC_TTBUSER        "ttb/user"
-#define GC_TTBPASS        "ttb/pass"
-#define GC_VELOHEROUSER   "velohero/user"
-#define GC_VELOHEROPASS   "velohero/pass"
-#define GC_SELUSER        "sel/user"
-#define GC_SELPASS        "sel/pass"
-#define GC_WIURL          "wi/url"
-#define GC_WIUSER         "wi/user"
-#define GC_WIKEY          "wi/key"
-#define GC_DVURL          "dv/url"
-#define GC_DVUSER         "dv/user"
-#define GC_DVPASS         "dv/pass"
-#define GC_DVCALDAVTYPE   "dv/type"
-#define GC_DVGOOGLE_CALID "dv/googlecalid"
-#define GC_ZEOURL         "zeo/url"
-#define GC_ZEOUSER        "zeo/user"
-#define GC_ZEOPASS        "zeo/pass"
+#define GC_UNIT_METRIC                       "Metric"
+#define GC_UNIT_IMPERIAL                     "Imperial"
 
-#define GC_UNIT_METRIC    "Metric"
-#define GC_UNIT_IMPERIAL  "Imperial"
+//Twitter oauth keys / see also Athlete parameter
+#define GC_TWITTER_CONSUMER_KEY    "qbbmhDt8bG8ZBcT3r9nYw" //< consumer key
+#define GC_TWITTER_CONSUMER_SECRET "IWXu2G6mQC5xvhM8V0ohA0mPTUOqAFutiuKIva3LQg"
+
+//Google Calendar-CALDAV oauthkeys / see also Athlete parameter
+#define GC_GOOGLE_CALENDAR_CLIENT_ID      "426009671216-c588t1u6hafep30tfs7g0g1nuo72s8ko.apps.googleusercontent.com"
+
+//Strava / see also Athlete parameter
+#define GC_STRAVA_CLIENT_ID    "83" // client id
+
+//Cycling Analytics / see also Athlete parameter
+#define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
+
+
+/*
+ *  GoldenCheetah Properties are stored in different locations, depending on the prefix defined in the property name. The following different prefixes are supported
+ *  <system>
+ *  - Storage: the property value is stored in the system specific QSettings - e.g. Registry on Windows, PList on Mac,...
+ *  - Use: such properties relate to GC instance running / e.g. dependent on the hardware/screen-size,...
+ *
+ *  <global-$filename>
+ *  - Storage: the property value is stored in the .INI file with name "global_$filename.gc", which means that any change of the athlete directory means the settings are lost / have to be copied
+ *  - Use: such properties are shared between all Athletes in the same athlete Directory and are the same for all GC instance which point to this Athlete Directory
+ *    The supported filenames (substitute for $filename) are defined as GC_SETTINGS_... below - ANYTHING ELSE WILL CAUSE ERRORS - OR JUST NOT STORE ANYTHING WORK
+ *
+ *  <athlete-$filename>
+ *  - Storage: the property is stored in .INI file which is store in the athlete/config directory - the name of the file is "athlete-$filename.gc"
+ *  - Use: such properties are Athlete specific - the separation in different config files is aimed to help sharing such properties with others and easier backup/restore
+ *    The supported filenames (substitute for $filename) are defined as GC_SETTINGS_... below - - ANYTHING ELSE WILL CAUSE ERRORS - OR JUST NOT STORE ANYTHING WORK
+
+ *
+ *  Settings which get special coded treatment:
+ *  - Colors.h/Color.cpp -> stored in <system> since every PC/Mac may look different / similar to Fonts
+ *
+ */
+
+// - Prefixes to be used for the QSettings in any code - to identify which QSettings are to be used
+
+#define GC_QSETTINGS_SYSTEM              "<system>"
+#define GC_QSETTINGS_GLOBAL_GENERAL      "<global-general>"
+#define GC_QSETTINGS_GLOBAL_TRAIN        "<global-trainmode>"
+#define GC_QSETTINGS_ATHLETE_GENERAL     "<athlete-general>"
+#define GC_QSETTINGS_ATHLETE_LAYOUT      "<athlete-layout>"
+#define GC_QSETTINGS_ATHLETE_PREFERENCES "<athlete-preferences>"
+#define GC_QSETTINGS_ATHLETE_PRIVATE     "<athlete-private>"
+
+// -----------------------------------------------------------------------------------------------------------------------
+//    System specific properties - OS/PC dependent - stored in .ini file in the OS specific directory defined by QSettings
+// -----------------------------------------------------------------------------------------------------------------------
+
+#define GC_HOMEDIR                      "<system>homedirectory"
+#define GC_START_HTTP                   "<system>starthttp"
+
+#define GC_SETTINGS_LAST                "<system>mainwindow/lastOpened"
+#define GC_SETTINGS_MAIN_GEOM           "<system>mainwindow/geometry"
+#define GC_SETTINGS_MAIN_STATE          "<system>mainwindow/state"
+#define GC_SETTINGS_LAST_IMPORT_PATH    "<system>mainwindow/lastImportPath"
+#define GC_SETTINGS_LAST_WORKOUT_PATH   "<system>mainwindow/lastWorkoutPath"
+#define GC_LAST_DOWNLOAD_DEVICE         "<system>mainwindow/lastDownloadDevice"
+#define GC_LAST_DOWNLOAD_PORT           "<system>mainwindow/lastDownloadPort"
+
+// batch export last options
+#define GC_BE_LASTDIR                   "<system>batchexport/lastdir"
+#define GC_BE_LASTFMT                   "<system>batchexport/lastfmt"
+// Fonts
+#define GC_FONT_DEFAULT                 "<system>font/default"
+#define GC_FONT_TITLES                  "<system>font/titles"
+#define GC_FONT_CHARTMARKERS            "<system>font/chartmarkers"
+#define GC_FONT_CHARTLABELS             "<system>font/chartlabels"
+#define GC_FONT_CALENDAR                "<system>font/calendar"
+#define GC_FONT_DEFAULT_SIZE            "<system>font/defaultsize"
+#define GC_FONT_TITLES_SIZE             "<system>font/titlessize"
+#define GC_FONT_CHARTMARKERS_SIZE       "<system>font/chartmarkerssize"
+#define GC_FONT_CHARTLABELS_SIZE        "<system>font/chartlabelssize"
+#define GC_FONT_CALENDAR_SIZE           "<system>font/calendarsize"
+
+// Colors/Chrome - see special treatment sections (also stored in <system>)
+#define GC_CHROME                       "<system>chrome" // mac or flat only so far
+
+
+
+// --------------------------------------------------------------------
+// Global Properties - Stored in "root" of the active Athlete Directory
+// --------------------------------------------------------------------
+
+
+#define GC_SETTINGS_SUMMARY_METRICS     "<global-general>rideSummaryWindow/summaryMetrics"
+#define GC_SETTINGS_BESTS_METRICS       "<global-general>rideSummaryWindow/bestsMetrics"
+#define GC_SETTINGS_INTERVAL_METRICS    "<global-general>rideSummaryWindow/intervalMetrics"
+#define GC_TABBAR                       "<global-general>show/tabbar"                        // show tabbar
+#define GC_WBALFORM                     "<global-general>wbal/formula"                       // wbal formula to use
+#define GC_BIKESCOREDAYS	            "<global-general>bikeScoreDays"
+#define GC_BIKESCOREMODE	            "<global-general>bikeScoreMode"
+#define GC_WARNCONVERT                  "<global-general>warnconvert"
+#define GC_WARNEXIT                     "<global-general>warnexit"
+#define GC_HIST_BIN_WIDTH               "<global-general>histogamWindow/binWidth"
+#define GC_WORKOUTDIR                   "<global-general>workoutDir"
+#define GC_LINEWIDTH                    "<global-general>linewidth"
+#define GC_ANTIALIAS                    "<global-general>antialias"
+#define GC_RIDEBG                       "<global-general>rideBG"
+#define GC_RIDESCROLL                   "<global-general>rideScroll"
+#define GC_RIDEHEAD                     "<global-general>rideHead"
+#define GC_SHADEZONES                   "<global-general>shadezones"
+#define GC_LANG                         "<global-general>lang"
+#define GC_PACE                         "<global-general>pace"
+#define GC_SWIMPACE                     "<global-general>swimpace"
+#define GC_ELEVATION_HYSTERESIS         "<global-general>elevationHysteresis"
+
+
+// Fit/Tcx Smart recording
+#define GC_GARMIN_SMARTRECORD           "<global-general>garminSmartRecord"
+#define GC_GARMIN_HWMARK                "<global-general>garminHWMark"
+
+// data processor config
+#define GC_DPFG_TOLERANCE               "<global-general>dataprocess/fixgaps/tolerance"
+#define GC_DPFG_STOP                    "<global-general>dataprocess/fixgaps/stop"
+#define GC_DPFS_MAX                     "<global-general>dataprocess/fixspikes/max"
+#define GC_DPFS_VARIANCE                "<global-general>dataprocess/fixspikes/variance"
+#define GC_DPTA                         "<global-general>dataprocess/torqueadjust/adjustment"
+#define GC_DPPA                         "<global-general>dataprocess/poweradjust/adjustment"
+#define GC_DPFHRS_MAX                   "<global-general>dataprocess/fixhrspikes/max"
+#define GC_DPDP_BIKEWEIGHT              "<global-general>dataprocess/fixderivepower/bikewheight"
+#define GC_DPDP_CRR                     "<global-general>dataprocess/fixderivepower/crr"
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where
 // n is defined in GC_DEV_COUNT
-#define GC_DEV_COUNT "devices"
-#define GC_DEV_NAME  "devicename"
-#define GC_DEV_SPEC  "devicespec"
-#define GC_DEV_PROF  "deviceprof"
-#define GC_DEV_TYPE  "devicetype"
-#define GC_DEV_DEF   "devicedef"
-#define GC_DEV_WHEEL "devicewheel"
-#define GC_DEV_VIRTUAL  "devicepostProcess"
+#define GC_DEV_COUNT                    "<global-trainmode>devices"
+#define GC_DEV_NAME                     "<global-trainmode>devicename"
+#define GC_DEV_SPEC                     "<global-trainmode>devicespec"
+#define GC_DEV_PROF                     "<global-trainmode>deviceprof"
+#define GC_DEV_TYPE                     "<global-trainmode>devicetype"
+#define GC_DEV_DEF                      "<global-trainmode>devicedef"
+#define GC_DEV_WHEEL                    "<global-trainmode>devicewheel"
+#define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
+#define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
+#define TRAIN_MULTI                     "<global-trainmode>train/multi"
 
-// data processor config
-#define GC_DPFG_TOLERANCE "dataprocess/fixgaps/tolerance"
-#define GC_DPFG_STOP      "dataprocess/fixgaps/stop"
-#define GC_DPFS_MAX       "dataprocess/fixspikes/max"
-#define GC_DPFS_VARIANCE  "dataprocess/fixspikes/variance"
-#define GC_DPTA           "dataprocess/torqueadjust/adjustment"
-#define GC_DPPA           "dataprocess/poweradjust/adjustment"
-#define GC_DPFHRS_MAX     "dataprocess/fixhrspikes/max"
-#define GC_DPDP_BIKEWEIGHT "dataprocess/fixderivepower/bikewheight"
-#define GC_DPDP_CRR       "dataprocess/fixderivepower/crr"
+// --------------------------------------------------------------------------------
+// Athlete Specific Properties - Stored in /config subfolder of the related athlete
+// --------------------------------------------------------------------------------
+
+#define GC_VERSION_USED                 "<athlete-general>versionused"
+#define GC_SAFEEXIT                     "<athlete-general>safeexit"
+#define GC_UPGRADE_FOLDER_SUCCESS       "<athlete-general>upgradesuccess/folder"     // success tracking of folder upgrade stored on athlete level
+
+#define GC_LTM_LAST_DATE_RANGE          "<athlete-layout>ltmwindow/lastDateRange"
+#define GC_LTM_AUTOFILTERS              "<athlete-layout>ltmwindow/autofilters"
+#define GC_BLANK_ANALYSIS               "<athlete-layout>blank/analysis"
+#define GC_BLANK_TRAIN                  "<athlete-layout>blank/train"
+#define GC_BLANK_HOME                   "<athlete-layout>blank/home"
+#define GC_BLANK_DIARY                  "<athlete-layout>blank/diary"
+#define GC_SETTINGS_SPLITTER_SIZES      "<athlete-layout>mainwindow/splitterSizes"
+
+
+#define GC_UNIT                         "<athlete-preferences>unit"
+#define GC_NICKNAME                     "<athlete-preferences>nickname"
+#define GC_DOB                          "<athlete-preferences>dob"
+#define GC_WEIGHT                       "<athlete-preferences>weight"
+#define GC_HEIGHT                       "<athlete-preferences>height"
+#define GC_WBALTAU                      "<athlete-preferences>wbaltau"
+#define GC_SEX                          "<athlete-preferences>sex"
+#define GC_BIO                          "<athlete-preferences>bio"
+#define GC_AVATAR                       "<athlete-preferences>avatar"
+#define GC_DISCOVERY                    "<athlete-preferences>intervals/discovery"   // intervals to discover
+#define GC_SB_TODAY                     "<athlete-preferences>PMshowSBtoday"
+#define GC_LTS_DAYS		                "<athlete-preferences>LTSdays"
+#define GC_STS_DAYS		                "<athlete-preferences>STSdays"
+#define GC_CRANKLENGTH                  "<athlete-preferences>crankLength"
+#define GC_WHEELSIZE                    "<athlete-preferences>wheelsize"
+#define GC_USE_CP_FOR_FTP               "<athlete-preferences>cp/useforftp"                       // use CP for FTP
+
 
 // ride navigator
-#define GC_NAVHEADINGS      "navigator/headings"
-#define GC_NAVHEADINGWIDTHS "bavigator/headingwidths"
-#define GC_NAVGROUPBY       "navigator/groupby"
-#define GC_SORTBY           "navigator/sortby"
-#define GC_SORTBYORDER      "navigator/sortbyorder"
-
-// route interval navigator
-#define GC_ROUTEHEADINGS      "routenavigator/headings"
-#define GC_ROUTEHEADINGWIDTHS "routenavigator/headingwidths"
-#define GC_ROUTESORTBY        "routenavigator/sortby"
-#define GC_ROUTESORTBYORDER   "routenavigator/sortbyorder"
-
-// best interval navigator
-#define GC_BESTHEADINGS      "bestnavigator/headings"
-#define GC_BESTHEADINGWIDTHS "bestnavigator/headingwidths"
-#define GC_BESTSORTBY        "bestnavigator/sortby"
-#define GC_BESTSORTBYORDER   "bestnavigator/sortbyorder"
-
-//Twitter oauth keys
-#define GC_TWITTER_CONSUMER_KEY    "qbbmhDt8bG8ZBcT3r9nYw" //< consumer key
-#define GC_TWITTER_CONSUMER_SECRET "IWXu2G6mQC5xvhM8V0ohA0mPTUOqAFutiuKIva3LQg"
-#define GC_TWITTER_TOKEN "twitter_token"
-#define GC_TWITTER_SECRET "twitter_secret"
-
-//Google Calendar-CALDAV oauthkeys
-//Google Calendar-CALDAV oauthkeys
-#define GC_GOOGLE_CALENDAR_CLIENT_ID      "426009671216-c588t1u6hafep30tfs7g0g1nuo72s8ko.apps.googleusercontent.com"
-#define GC_GOOGLE_CALENDAR_REFRESH_TOKEN  "google_cal_refresh_token"
-
-//Strava
-#define GC_STRAVA_CLIENT_ID    "83" // client id
-#define GC_STRAVA_TOKEN "strava_token"
-
-//Cycling Analytics
-#define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
-#define GC_CYCLINGANALYTICS_TOKEN "cyclinganalytics_token"
-
-// Tcx Smart recording
-#define GC_GARMIN_SMARTRECORD "garminSmartRecord"
-#define GC_GARMIN_HWMARK "garminHWMark"
-
+#define GC_NAVHEADINGS                  "<athlete-preferences>navigator/headings"
+#define GC_NAVHEADINGWIDTHS             "<athlete-preferences>navigator/headingwidths"
+#define GC_NAVGROUPBY                   "<athlete-preferences>navigator/groupby"
+#define GC_SORTBY                       "<athlete-preferences>navigator/sortby"
+#define GC_SORTBYORDER                  "<athlete-preferences>navigator/sortbyorder"
 // Calendar sync
-#define GC_WEBCAL_URL "webcal_url"
-
+#define GC_WEBCAL_URL                   "<athlete-preferences>webcal_url"
 // Default view on Diary
-#define GC_DIARY_VIEW "diaryview"
+#define GC_DIARY_VIEW                   "<athlete-preferences>diaryview"
 
-// Fonts
-#define GC_FONT_DEFAULT           "font/default"
-#define GC_FONT_TITLES            "font/titles"
-#define GC_FONT_CHARTMARKERS      "font/chartmarkers"
-#define GC_FONT_CHARTLABELS       "font/chartlabels"
-#define GC_FONT_CALENDAR          "font/calendar"
-#define GC_FONT_DEFAULT_SIZE      "font/defaultsize"
-#define GC_FONT_TITLES_SIZE       "font/titlessize"
-#define GC_FONT_CHARTMARKERS_SIZE "font/chartmarkerssize"
-#define GC_FONT_CHARTLABELS_SIZE  "font/chartlabelssize"
-#define GC_FONT_CALENDAR_SIZE     "font/calendarsize"
+#define GC_TPURL                        "<athlete-private>tp/url"
+#define GC_TWURL                        "<athlete-private>tw/url"
+#define GC_TPUSER                       "<athlete-private>tp/user"
+#define GC_TPPASS                       "<athlete-private>tp/pass"
+#define GC_TPTYPE                       "<athlete-private>tp/type"
+#define GC_RWGPSUSER                    "<athlete-private>rwgps/user"
+#define GC_RWGPSPASS                    "<athlete-private>rwgps/pass"
+#define GC_TTBUSER                      "<athlete-private>ttb/user"
+#define GC_TTBPASS                      "<athlete-private>ttb/pass"
+#define GC_VELOHEROUSER                 "<athlete-private>velohero/user"
+#define GC_VELOHEROPASS                 "<athlete-private>velohero/pass"
+#define GC_SELUSER                      "<athlete-private>sel/user"
+#define GC_SELPASS                      "<athlete-private>sel/pass"
+#define GC_WIURL                        "<athlete-private>wi/url"
+#define GC_WIUSER                       "<athlete-private>wi/user"
+#define GC_WIKEY                        "<athlete-private>wi/key"
+#define GC_DVURL                        "<athlete-private>dv/url"
+#define GC_DVUSER                       "<athlete-private>dv/user"
+#define GC_DVPASS                       "<athlete-private>dv/pass"
+#define GC_DVCALDAVTYPE                 "<athlete-private>dv/type"
+#define GC_DVGOOGLE_CALID               "<athlete-private>dv/googlecalid"
+//Twitter oauth keys
+#define GC_TWITTER_TOKEN                "<athlete-private>twitter_token"
+#define GC_TWITTER_SECRET               "<athlete-private>twitter_secret"
+//Google Calendar-CALDAV oauthkeys
+#define GC_GOOGLE_CALENDAR_REFRESH_TOKEN  "<athlete-private>google_cal_refresh_token"
+//Strava
+#define GC_STRAVA_TOKEN                 "<athlete-private>strava_token"
+//Cycling Analytics
+#define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
 
-// TreeMap selection
-#define GC_TM_FIRST               "tm/first"
-#define GC_TM_SECOND              "tm/second"
-#define GC_TM_METRIC              "tm/metric"
 
-#define FORTIUS_FIRMWARE          "fortius/firmware"
-#define TRAIN_MULTI               "train/multi"
 
-// batch export last options
-#define GC_BE_LASTDIR             "batchexport/lastdir"
-#define GC_BE_LASTFMT             "batchexport/lastfmt"
 
-// show tabbar
-#define GC_TABBAR                 "show/tabbar"
-
-// use CP for FTP
-#define GC_USE_CP_FOR_FTP         "cp/useforftp"
-
-// wbal formula to use
-#define GC_WBALFORM               "wbal/formula"
-
-// intervals to discover
-#define GC_DISCOVERY              "intervals/discovery"
-
-// success tracking of more complex upgrades stored on athlete level
-#define GC_UPGRADE_FOLDER_SUCCESS  "upgradesuccess/folder"
-
+// --------------------------------------------------------------------------------
 #include <QSettings>
 #include <QFileInfo>
 
-// wrap the standard QSettings so we can offer members
-// to get global or cyclist specific settings
-// via value() and cvalue()
-class GSettings : public QSettings
-{
+// Helper Class for the Athlete QSettings
+
+class AthleteQSettings {
     public:
-    GSettings(QString org, QString scope) : QSettings(org,scope) { }
-    GSettings(QString file, Format format) : QSettings(file,format) { }
-    ~GSettings() { QSettings::sync(); }
 
-    // standard access to global config
-    QVariant value(const QObject *me, const QString key, const QVariant def = 0) const ;
-    void setValue(QString key, QVariant value) {
-        QSettings::setValue(key,value);
-    }
+      AthleteQSettings() {}
+      ~AthleteQSettings() {}
 
-    // access to cyclist specific config
-    QVariant cvalue(QString cyclist, QString key, QVariant def = 0) {
-        return QSettings::value(cyclist+"/"+key, def);
-    }
-    void setCValue(QString cyclist, QString key, QVariant value) {
-        QSettings::setValue(cyclist + "/" + key,value);
-    }
+      void setQSettings(QSettings* settings, int index) {athlete[index] = settings; }
+      QSettings* getQSettings(int index) const { return athlete[index]; }
+
+    private:
+      QSettings* athlete[4];  // we support exactly 4 Athlete specific QSettings right now
 
 };
+
+
+// wrap the standard QSettings so we can offer members
+// to get global or atheleteName specific settings
+// via value() and cvalue()
+
+class GSettings
+{
+
+public:
+    // 2 Variants are supported - still the "old" one where ALL properties are in ONE .INI file and the
+    // new one were the properties are distributed as explained above (this is to keep compatibility)
+    GSettings(QString org, QString app);
+    GSettings(QString file, QSettings::Format format);
+    ~GSettings();
+
+    // standard access to global config
+    QVariant value(const QObject *me, const QString key, const QVariant def = 0) ;
+    void setValue(QString key, QVariant value);
+
+    // access to athleteName specific config
+    QVariant cvalue(QString athleteName, QString key, QVariant def = 0);
+
+    void setCValue(QString athleteName, QString key, QVariant value);
+
+    // add QSettings methods - which cannot be inherited since not a single, but multiple QSettings make GSettings
+    QStringList allKeys() const;
+    bool contains(const QString & key) const;
+
+    // initialization of global and athlete QSettings can only happen after they path and the athlete is known
+    void migrateQSettingsSystem();
+    void initializeQSettingsGlobal(QString athletesRootDir);
+    void initializeQSettingsAthlete(QString athletesRootDir, QString athleteName);
+    void initializeQSettingsNewAthlete(QString athletesRootDir, QString athleteName);
+
+    // QSettings need to be synched for all QSetting objects
+    void syncQSettings();
+    void syncQSettingsGlobal();
+    void syncQSettingsAllAthletes();
+
+    // Cleanup if AthleteDir is changed
+    void clearGlobalAndAthletes();
+
+private:
+    bool newFormat;
+    QSettings *systemsettings;
+    QSettings *oldsystemsettings;
+    QVector<QSettings*> *global;
+    QHash<QString, AthleteQSettings*> athlete;
+
+    // special methods for Migration/Upgrade
+    void migrateValue(QString key);
+    void migrateCValue(QString athleteName, QString key);
+    void migrateAndRenameCValue(QString athleteName, QString wrongKey, QString key);
+    void migrateValueToCValue(QString athleteName, QString key);
+
+    void upgradeSystem();
+    void upgradeGlobal();
+    void upgradeAthlete(QString athleteName);
+
+};
+
 
 extern GSettings *appsettings;
 extern int OperatingSystem;

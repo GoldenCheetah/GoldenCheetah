@@ -54,7 +54,7 @@ DataProcessorFactory::autoProcess(RideFile *ride)
     while (i.hasNext()) {
         i.next();
         QString configsetting = QString("dp/%1/apply").arg(i.key());
-        if (appsettings->value(NULL, configsetting, "Manual").toString() == "Auto")
+        if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Manual").toString() == "Auto")
             i.value()->postProcess(ride);
     }
 

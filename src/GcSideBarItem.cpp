@@ -90,7 +90,7 @@ GcSplitter::prepare(QString cyclist, QString name)
     control->addWidget(spacer);
 
     // get saved state
-    QString statesetting = QString("splitter/%1/sizes").arg(name);
+    QString statesetting = GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/%1/sizes").arg(name);
     QVariant sizes = appsettings->cvalue(cyclist, statesetting); 
     if (sizes != QVariant()) {
         splitter->restoreState(sizes.toByteArray());
@@ -99,7 +99,7 @@ GcSplitter::prepare(QString cyclist, QString name)
 
     // should we hide / show each widget?
     for(int i=0; i<splitter->count(); i++) {
-        QString hidesetting = QString("splitter/%1/hide/%2").arg(name).arg(i);
+        QString hidesetting = GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/%1/hide/%2").arg(name).arg(i);
         QVariant hidden = appsettings->cvalue(cyclist, hidesetting);
         if (i && hidden != QVariant()) {
             if (hidden.toBool() == true) {
@@ -113,12 +113,12 @@ void
 GcSplitter::saveSettings()
 {
     // get saved state
-    QString statesetting = QString("splitter/%1/sizes").arg(name);
+    QString statesetting = GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/%1/sizes").arg(name);
     appsettings->setCValue(cyclist, statesetting, splitter->saveState()); 
 
     // should we hide / show each widget?
     for(int i=0; i<splitter->count(); i++) {
-        QString hidesetting = QString("splitter/%1/hide/%2").arg(name).arg(i);
+        QString hidesetting = GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/%1/hide/%2").arg(name).arg(i);
         appsettings->setCValue(cyclist, hidesetting, QVariant(splitter->widget(i)->isHidden()));
     }
 }

@@ -25,7 +25,14 @@
 
 ANTlocalController::ANTlocalController(TrainSidebar *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
-    myANTlocal = new ANT (parent, dc);
+    // for Device Pairing the controller is called with parent = NULL
+    QString cyclist;
+    if (parent) {
+        cyclist = parent->context->athlete->cyclist;
+    } else {
+        cyclist = QString();
+    }
+    myANTlocal = new ANT (parent, dc, cyclist);
     connect(myANTlocal, SIGNAL(foundDevice(int,int,int)), this, SIGNAL(foundDevice(int,int,int)));
     connect(myANTlocal, SIGNAL(lostDevice(int)), this, SIGNAL(lostDevice(int)));
     connect(myANTlocal, SIGNAL(searchTimeout(int)), this, SIGNAL(searchTimeout(int)));

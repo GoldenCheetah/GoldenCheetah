@@ -265,35 +265,39 @@ NewCyclistDialog::saveClicked()
         if (!home.exists(name->text())) {
             if (home.mkdir(name->text())) {
 
-                QDir athleteDir = QDir(home.absolutePath()+'/'+name->text());
+                QDir athleteDir = QDir(home.canonicalPath()+'/'+name->text());
                 AthleteDirectoryStructure *athleteHome = new AthleteDirectoryStructure(athleteDir);
 
                 // create the sub-Dirs here
                 athleteHome->createAllSubdirs();
 
                 // new Athlete/new Directories - no Upgrade required
+                appsettings->initializeQSettingsNewAthlete(home.canonicalPath(), name->text());
                 appsettings->setCValue(name->text(), GC_UPGRADE_FOLDER_SUCCESS, true);
 
+                // set the version under which the Athlete is created - to avoid unneccary upgrade execution
+                appsettings->setCValue(name->text(), GC_VERSION_USED, QVariant(VERSION_LATEST));           
+
                 // nice sidebars please!
-                appsettings->setCValue(name->text(), "splitter/LTM/hide", true);
-                appsettings->setCValue(name->text(), "splitter/LTM/hide/0", false);
-                appsettings->setCValue(name->text(), "splitter/LTM/hide/1", false);
-                appsettings->setCValue(name->text(), "splitter/LTM/hide/2", false);
-                appsettings->setCValue(name->text(), "splitter/LTM/hide/3", true);
-                appsettings->setCValue(name->text(), "splitter/analysis/hide", true);
-                appsettings->setCValue(name->text(), "splitter/analysis/hide/0", false);
-                appsettings->setCValue(name->text(), "splitter/analysis/hide/1", true);
-                appsettings->setCValue(name->text(), "splitter/analysis/hide/2", false);
-                appsettings->setCValue(name->text(), "splitter/analysis/hide/3", true);
-                appsettings->setCValue(name->text(), "splitter/diary/hide", true);
-                appsettings->setCValue(name->text(), "splitter/diary/hide/0", false);
-                appsettings->setCValue(name->text(), "splitter/diary/hide/1", false);
-                appsettings->setCValue(name->text(), "splitter/diary/hide/2", true);
-                appsettings->setCValue(name->text(), "splitter/train/hide", true);
-                appsettings->setCValue(name->text(), "splitter/train/hide/0", false);
-                appsettings->setCValue(name->text(), "splitter/train/hide/1", false);
-                appsettings->setCValue(name->text(), "splitter/train/hide/2", false);
-                appsettings->setCValue(name->text(), "splitter/train/hide/3", false);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide"), true);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide/0"), false);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide/1"), false);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide/2"), false);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide/3"), true);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide"), true);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/0"), false);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/1"), true);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/2"), false);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/3"), true);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide"), true);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide/0"), false);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide/1"), false);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide/2"), true);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide"), true);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/0"), false);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/1"), false);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/2"), false);
+                appsettings->setCValue(name->text(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/3"), false);
 
                 // lets setup!
                 if (unitCombo->currentIndex()==0)
@@ -328,6 +332,8 @@ NewCyclistDialog::saveClicked()
                 PaceZones swPaceZones(true);
                 swPaceZones.addZoneRange(QDate(1900, 01, 01), swPaceZones.kphFromTime(cvSw, useMetricUnits));
                 swPaceZones.write(athleteHome->config().canonicalPath());
+
+                appsettings->syncQSettingsAllAthletes();
 
                 accept();
             } else {

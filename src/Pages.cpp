@@ -93,7 +93,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     // Crank length - only used by PfPv chart (should move there!)
     //
     QLabel *crankLengthLabel = new QLabel(tr("Crank Length:"));
-    QVariant crankLength = appsettings->value(this, GC_CRANKLENGTH);
+    QVariant crankLength = appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH);
     crankLengthCombo = new QComboBox();
     crankLengthCombo->addItem("150");
     crankLengthCombo->addItem("155");
@@ -129,7 +129,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     // Wheel size
     //
     QLabel *wheelSizeLabel = new QLabel(tr("Wheelsize:"), this);
-    int wheelSize = appsettings->value(this, GC_WHEELSIZE, 2100).toInt();
+    int wheelSize = appsettings->cvalue(context->athlete->cyclist, GC_WHEELSIZE, 2100).toInt();
 
     rimSizeCombo = new QComboBox();
     rimSizeCombo->addItems(WheelSize::RIM_SIZES);
@@ -190,7 +190,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(hystedit, 7,1, Qt::AlignLeft);
 
     // Use CP for FTP
-    QVariant useCPForFTP = appsettings->value(this, GC_USE_CP_FOR_FTP, Qt::Checked);
+    QVariant useCPForFTP = appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, Qt::Checked);
     useCPForFTPCheckBox = new QCheckBox(tr("Use CP for FTP"), this);
     useCPForFTPCheckBox->setCheckState(useCPForFTP.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
 
@@ -328,13 +328,13 @@ GeneralPage::saveClicked()
     // Garmin and cranks
     appsettings->setValue(GC_GARMIN_HWMARK, garminHWMarkedit->text().toInt());
     appsettings->setValue(GC_GARMIN_SMARTRECORD, garminSmartRecord->checkState());
-    appsettings->setValue(GC_CRANKLENGTH, crankLengthCombo->currentText());
+    appsettings->setCValue(context->athlete->cyclist, GC_CRANKLENGTH, crankLengthCombo->currentText());
 
     // save on exit
     appsettings->setValue(GC_WARNEXIT, warnOnExit->isChecked());
 
     // save wheel size
-    appsettings->setValue(GC_WHEELSIZE, wheelSizeEdit->text().toInt());
+    appsettings->setCValue(context->athlete->cyclist, GC_WHEELSIZE, wheelSizeEdit->text().toInt());
 
     // Bike score estimation
     appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
@@ -342,7 +342,7 @@ GeneralPage::saveClicked()
     appsettings->setValue(GC_ELEVATION_HYSTERESIS, hystedit->text());
 
     // FTP
-    appsettings->setValue(GC_USE_CP_FOR_FTP, useCPForFTPCheckBox->checkState());
+    appsettings->setCValue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, useCPForFTPCheckBox->checkState());
 
     // wbal formula
     appsettings->setValue(GC_WBALFORM, wbalForm->currentIndex() ? "int" : "diff");
@@ -351,14 +351,6 @@ GeneralPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
     appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
     appsettings->setCValue(context->athlete->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
-
-    // set default stress names if not set:
-    appsettings->setValue(GC_STS_NAME, appsettings->value(this, GC_STS_NAME,tr("Short Term Stress")));
-    appsettings->setValue(GC_STS_ACRONYM, appsettings->value(this, GC_STS_ACRONYM,tr("STS")));
-    appsettings->setValue(GC_LTS_NAME, appsettings->value(this, GC_LTS_NAME,tr("Long Term Stress")));
-    appsettings->setValue(GC_LTS_ACRONYM, appsettings->value(this, GC_LTS_ACRONYM,tr("LTS")));
-    appsettings->setValue(GC_SB_NAME, appsettings->value(this, GC_SB_NAME,tr("Stress Balance")));
-    appsettings->setValue(GC_SB_ACRONYM, appsettings->value(this, GC_SB_ACRONYM,tr("SB")));
 
 #ifdef GC_WANT_HTTP
     // start http
@@ -2904,7 +2896,8 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
     processorTree->headerItem()->setText(0, tr("Processor"));
     processorTree->headerItem()->setText(1, tr("Apply"));
     processorTree->headerItem()->setText(2, tr("Settings"));
-    processorTree->setColumnCount(3);
+    processorTree->headerItem()->setText(3, "Technical Name of Processor"); // add invisible Column with technical name
+    processorTree->setColumnCount(4);
     processorTree->setSelectionMode(QAbstractItemView::NoSelection);
     processorTree->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     processorTree->setUniformRowHeights(true);
@@ -2926,6 +2919,8 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
 
         // Processor Name: it shows the localized name
         add->setText(0, i.value()->name());
+        // Processer Key - for Settings
+        add->setText(3, i.key());
 
         // Auto or Manual run?
         QComboBox *comboButton = new QComboBox(this);
@@ -2934,7 +2929,7 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
         processorTree->setItemWidget(add, 1, comboButton);
 
         QString configsetting = QString("dp/%1/apply").arg(i.key());
-        if (appsettings->value(this, configsetting, "Manual").toString() == "Manual")
+        if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Manual").toString() == "Manual")
             comboButton->setCurrentIndex(0);
         else
             comboButton->setCurrentIndex(1);
@@ -2943,8 +2938,10 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
         DataProcessorConfig *config = i.value()->processorConfig(this);
         config->readConfig();
 
-        processorTree->setItemWidget(add, 2, config);
+        processorTree->setItemWidget(add, 2, config);       
+
     }
+    processorTree->setColumnHidden(3, true);
 
     mainLayout->addWidget(processorTree, 0,0);
 }
@@ -2956,10 +2953,10 @@ ProcessorPage::saveClicked()
     // write away separately
     for (int i=0; i<processorTree->invisibleRootItem()->childCount(); i++) {
         // auto or manual?
-        QString configsetting = QString("dp/%1/apply").arg(processorTree->invisibleRootItem()->child(i)->text(0));
+        QString configsetting = QString("dp/%1/apply").arg(processorTree->invisibleRootItem()->child(i)->text(3));
         QString apply = ((QComboBox*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 1)))->currentIndex() ?
                         "Auto" : "Manual";
-        appsettings->setValue(configsetting, apply);
+        appsettings->setValue(GC_QSETTINGS_GLOBAL_GENERAL+configsetting, apply);
         ((DataProcessorConfig*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 2)))->saveConfig();
     }
 
@@ -3407,7 +3404,7 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     actionButtons->addWidget(ftpLabel);
     actionButtons->addWidget(ftpEdit);
 
-    bool useCPForFTP = (appsettings->value(this, GC_USE_CP_FOR_FTP, "1").toString() == "0");
+    bool useCPForFTP = (appsettings->cvalue(zonePage->context->athlete->cyclist, GC_USE_CP_FOR_FTP, "1").toString() == "0");
 
     if (useCPForFTP) {
         ftpLabel->setVisible(true);
@@ -3531,7 +3528,7 @@ CPPage::addClicked()
         return;
     }
 
-    bool useCPForFTP = (appsettings->value(this, GC_USE_CP_FOR_FTP, "1").toString() == "0");
+    bool useCPForFTP = (appsettings->cvalue(zonePage->context->athlete->cyclist, GC_USE_CP_FOR_FTP, "1").toString() == "0");
 
     //int index = ranges->invisibleRootItem()->childCount();
     int wp = wEdit->value() ? wEdit->value() : 20000;
@@ -3582,7 +3579,7 @@ CPPage::editClicked()
         err.exec();
         return;
     }
-    bool useCPForFTP = (appsettings->value(this, GC_USE_CP_FOR_FTP, "1").toString() == "0");
+    bool useCPForFTP = (appsettings->cvalue(zonePage->context->athlete->cyclist, GC_USE_CP_FOR_FTP, "1").toString() == "0");
 
     int ftp = ftpEdit->value() ? ftpEdit->value() : cp;
 
