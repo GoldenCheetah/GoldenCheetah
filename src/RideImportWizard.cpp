@@ -116,7 +116,7 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
         directoryWidget->setItem(i,2,t);
 
         // only add files if configured to do so
-        if (rule.getImportRule() == 0) {
+        if (rule.getImportRule() == RideAutoImportRule::noImport) {
             directoryWidget->item(i,2)->setText(tr("No import"));
             continue;
         }
@@ -137,24 +137,55 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
             continue;
         }
 
-        // now get the files with their full names
+        // determine timerange in the past which should considerd in import
+        QDate selectAfter = QDate::currentDate();
+        switch(rule.getImportRule()) {
+        case RideAutoImportRule::importLast90days:
+            selectAfter = selectAfter.addDays(Q_INT64_C(-90));
+            break;
+        case RideAutoImportRule::importLast180days:
+            selectAfter = selectAfter.addDays(Q_INT64_C(-180));
+            break;
+        case RideAutoImportRule::importLast360days:
+            selectAfter = selectAfter.addDays(Q_INT64_C(-360));
+            break;
+        }
+
+        // now get the files with their full names      
         QFileInfoList fileInfos = importDir->entryInfoList(allFormats, QDir::Files, QDir::NoSort);
         if (!fileInfos.isEmpty()) {
             int j = 0;
             foreach(QFileInfo f, fileInfos) {
-                files.append(f.absoluteFilePath());
-                j++;
+                // append following the import rules
+                switch (rule.getImportRule()) {
+                case RideAutoImportRule::importAll:
+                    files.append(f.absoluteFilePath());
+                    j++;
+                    break;
+                case RideAutoImportRule::importLast90days:
+                case RideAutoImportRule::importLast180days:
+                case RideAutoImportRule::importLast360days:
+                    if (f.created().date() >= selectAfter || f.lastModified().date() >= selectAfter) {
+                        files.append(f.absoluteFilePath());
+                        j++;
+                    };
+                    break;
+                }
             }
-            directoryWidget->item(i,2)->setText(tr("%1 files for import selected").arg(QString::number(j)));
-          } else {
+            if (j > 0) {
+                directoryWidget->item(i,2)->setText(tr("%1 files for import selected").arg(QString::number(j)));
+            } else {
+                directoryWidget->item(i,2)->setText(tr("No files in requested time range"));
+            }
+        } else {
             directoryWidget->item(i,2)->setText(tr("No activity files found"));
             continue;
         }
     }
 
-    directoryWidget->setColumnWidth(0, 480);
-    directoryWidget->setColumnWidth(1, 150);
-    directoryWidget->setColumnWidth(2, 250);
+    directoryWidget->setColumnWidth(0, 400);
+    directoryWidget->setColumnWidth(1, 250);
+    directoryWidget->setColumnWidth(2, 230);
 
     init(files, context);
 
