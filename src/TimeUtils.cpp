@@ -101,6 +101,10 @@ QDateTime convertToLocalTime(QString timestamp)
 
         // contains timezone offset in hours
         return QDateTime::fromString(timestamp, Qt::ISODate);
+    } else if (timestamp.size() == 19 && timestamp[10].toLower() == 't') {
+
+        // ISO format without timezone offset
+        return QDateTime::fromString(timestamp, Qt::ISODate);
     }
 
     // if not sure, just fallback to basic method
