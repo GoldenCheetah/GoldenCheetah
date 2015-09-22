@@ -108,6 +108,9 @@ int LibUsb::open()
 }
 
 int LibUsb::reset_device(libusb_device *device) {
+    // Reset USB device on Mac and Linux to ensure that ANT
+    // devices can bind properly.
+#ifndef WIN32
     qDebug() << "LibUsb::reset_device: resetting device";
     struct libusb_device_handle *h;
     int r = libusb_open(device, &h);
@@ -115,6 +118,7 @@ int LibUsb::reset_device(libusb_device *device) {
         return -1;
     libusb_reset_device(h);
     libusb_close(h);
+#endif
     return 0;
 }
 
