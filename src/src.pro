@@ -481,6 +481,8 @@ HEADERS += \
         SlfRideFile.h \
         SmfParser.h \
         SmfRideFile.h \
+        SmlParser.h \
+        SmlRideFile.h \
         SrdRideFile.h \
         SrmRideFile.h \
         Statistic.h \
@@ -718,6 +720,8 @@ SOURCES += \
         SlfRideFile.cpp \
         SmfParser.cpp \
         SmfRideFile.cpp \
+        SmlParser.cpp \
+        SmlRideFile.cpp \
         SrdRideFile.cpp \
         SrmRideFile.cpp \
         Statistic.cpp \
