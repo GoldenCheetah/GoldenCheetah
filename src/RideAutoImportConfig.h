@@ -30,7 +30,7 @@ class RideAutoImportRule {
 
 public:
     static QList<QString> rules;
-    enum ImportRule { noImport=0, ignoreDuplicateErrors=1, ignoreAllErrors=2 };
+    enum ImportRule { noImport=0, importAll=1, importLast90days=2, importLast180days=3, importLast360days=4 };
 
     RideAutoImportRule();
 
