@@ -177,14 +177,12 @@ class CredentialsPage : public QScrollArea
     private:
         Context *context;
 
-        QLineEdit *tpURL; // url for training peaks.com ... http://www.trainingpeaks.com
         QLineEdit *tpUser;
         QLineEdit *tpPass;
         QComboBox *tpType;
         QPushButton *tpTest;
 
 #ifdef GC_HAVE_KQOAUTH
-        QLineEdit *twitterURL; // url for twitter.com
         QPushButton *twitterAuthorise;
 #endif
 

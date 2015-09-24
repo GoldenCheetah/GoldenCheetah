@@ -47,7 +47,6 @@ TPAthlete::list(int type, QString user, QString pass)
     if (waiting == true) return;
 
     // setup the soap message
-    QString url = appsettings->value(this, GC_TPURL, "www.trainingpeaks.com").toString();
     http.setHost("www.trainingpeaks.com");
     http.setAction("http://www.trainingpeaks.com/TPWebServices/GetAccessibleAthletes");
     current.setMethod("GetAccessibleAthletes", "http://www.trainingpeaks.com/TPWebServices/");
@@ -124,7 +123,6 @@ TPWorkout::list(int id, QDate from, QDate to, QString user, QString pass)
     current = QtSoapMessage(); // reset
 
     // setup the soap message
-    QString url = appsettings->value(this, GC_TPURL, "www.trainingpeaks.com").toString();
     http.setHost("www.trainingpeaks.com");
     http.setAction("http://www.trainingpeaks.com/TPWebServices/GetWorkoutsForAccessibleAthlete");
     current.setMethod("GetWorkoutsForAccessibleAthlete", "http://www.trainingpeaks.com/TPWebServices/");
@@ -199,7 +197,6 @@ TPDownload::download(QString cyclist, int personId, int workoutId)
     current = QtSoapMessage();
 
     // setup the soap message
-    QString url = appsettings->value(this, GC_TPURL, "www.trainingpeaks.com").toString();
     http.setHost("www.trainingpeaks.com");
     http.setAction("http://www.trainingpeaks.com/TPWebServices/GetExtendedWorkoutsForAccessibleAthlete");
     current.setMethod("GetExtendedWorkoutsForAccessibleAthlete", "http://www.trainingpeaks.com/TPWebServices/");
