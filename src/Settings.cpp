@@ -660,8 +660,6 @@ GSettings::upgradeAthlete(QString athlete) {
     }
 
     // --- private --- //
-    migrateCValue(athlete, GC_TWURL);
-    migrateCValue(athlete, GC_TPURL);
     migrateCValue(athlete, GC_TPUSER);
     migrateCValue(athlete, GC_TPPASS);
     migrateCValue(athlete, GC_TPTYPE);

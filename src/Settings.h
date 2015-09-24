@@ -220,8 +220,6 @@
 // Default view on Diary
 #define GC_DIARY_VIEW                   "<athlete-preferences>diaryview"
 
-#define GC_TPURL                        "<athlete-private>tp/url"
-#define GC_TWURL                        "<athlete-private>tw/url"
 #define GC_TPUSER                       "<athlete-private>tp/user"
 #define GC_TPPASS                       "<athlete-private>tp/pass"
 #define GC_TPTYPE                       "<athlete-private>tp/type"
