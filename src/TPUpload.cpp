@@ -94,7 +94,6 @@ TPUpload::upload(Context *context, const RideFile *ride)
 
     // setup the soap message
     current = QtSoapMessage();
-    QString url = appsettings->value(this, GC_TPURL, "www.trainingpeaks.com").toString();
     http.setHost("www.trainingpeaks.com");
     http.setAction("http://www.trainingpeaks.com/TPWebServices/ImportFileForUser");
     current.setMethod("ImportFileForUser", "http://www.trainingpeaks.com/TPWebServices/");

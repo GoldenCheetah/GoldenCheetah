@@ -417,13 +417,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     QLabel *tp = new QLabel(tr("TrainingPeaks"));
     tp->setFont(current);
 
-    QLabel *urlLabel = new QLabel(tr("Website"));
     QLabel *userLabel = new QLabel(tr("Username"));
     QLabel *passLabel = new QLabel(tr("Password"));
     QLabel *typeLabel = new QLabel(tr("Account Type"));
-
-    tpURL = new QLineEdit(this);
-    tpURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_TPURL, "http://www.trainingpeaks.com").toString());
 
     tpUser = new QLineEdit(this);
     tpUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_TPUSER, "").toString());
@@ -444,9 +440,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     grid->addWidget(tp, row, 0);
 
-    grid->addWidget(urlLabel, ++row, 0);
-    grid->addWidget(tpURL, row, 1, 0);
-
     grid->addWidget(userLabel, ++row, 0);
     grid->addWidget(tpUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
@@ -464,12 +457,8 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     QLabel *twp = new QLabel(tr("Twitter"));
     twp->setFont(current);
 
-    QLabel *twurlLabel = new QLabel(tr("Website"));
     QLabel *twauthLabel = new QLabel(tr("Authorise"));
 
-
-    twitterURL = new QLineEdit(this);
-    twitterURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_TWURL, "http://www.twitter.com").toString());
     twitterAuthorise = new QPushButton(tr("Authorise"), this);
 
     twitterAuthorised = new QPushButton(this);
@@ -480,9 +469,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     twitterAuthorised->setFixedWidth(16);
 
     grid->addWidget(twp, ++row, 0);
-
-    grid->addWidget(twurlLabel, ++row, 0);
-    grid->addWidget(twitterURL, row, 1, 0);
 
     grid->addWidget(twauthLabel, ++row, 0);
     grid->addWidget(twitterAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
@@ -865,7 +851,6 @@ void CredentialsPage::dvCALDAVTypeChanged(int type)
 qint32
 CredentialsPage::saveClicked()
 {
-    appsettings->setCValue(context->athlete->cyclist, GC_TPURL, tpURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TPUSER, tpUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TPPASS, tpPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_RWGPSUSER, rideWithGPSUser->text());
