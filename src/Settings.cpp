@@ -312,8 +312,14 @@ GSettings::migrateQSettingsSystem() {
 
     // do the migration for the System Settings - if not yet done
     // - System is only migrated once per PC (since it only exists once
+    // on MAC GC_CHROME is already set previously - so migrate anyway
 
-    if (systemsettings->allKeys().isEmpty()) {
+    bool migrateMac = false;
+    QStringList currentKeys = systemsettings->allKeys();
+#ifdef Q_OS_MAC
+    migrateMac = true;
+#endif
+    if (currentKeys.size() == 0 || (migrateMac && currentKeys.size() == 1)) {
         upgradeSystem();
         systemsettings->sync();
     }
