@@ -1836,6 +1836,7 @@ AllPlot::recalc(AllPlotObject *objects)
         double totalRPPPB = 0.0;
         double totalLPPPE = 0.0;
         double totalRPPPE = 0.0;
+        double currentGearRatio = 0.0;
 
 
         QList<DataPoint> list;
@@ -1998,6 +1999,9 @@ AllPlot::recalc(AllPlotObject *objects)
                 if (!objects->rpppbArray.empty()) totalRPPPB   += (objects->rpppbArray[i]>0?objects->rpppbArray[i]:0);
                 if (!objects->lpppeArray.empty()) totalLPPPE   += (objects->lpppeArray[i]>0?objects->lpppeArray[i]:0);
                 if (!objects->rpppeArray.empty()) totalRPPPE   += (objects->rpppeArray[i]>0?objects->rpppeArray[i]:0);
+
+                // set values which must not be smoothed
+                if (!objects->gearArray.empty()) currentGearRatio = (objects->gearArray[i]>0?objects->gearArray[i]:0);
                 totalDist   = objects->distanceArray[i];
 
                 // totalise user data
@@ -2162,15 +2166,10 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothLPPP[secs]   = QwtIntervalSample( bydist ? totalDist : secs / 60.0, QwtInterval(totalLPPPB / list.size(), totalLPPPE / list.size() ) );
                 objects->smoothRPPP[secs]   = QwtIntervalSample( bydist ? totalDist : secs / 60.0, QwtInterval(totalRPPPB / list.size(), totalRPPPE / list.size() ) );
             }
+            objects->smoothGear[secs] = currentGearRatio;
             objects->smoothDistance[secs] = totalDist;
             objects->smoothTime[secs]  = secs / 60.0;
 
-            // set data series (gearRatio) which are not smoothed at all
-            if (objects->gearArray.empty() || secs >= objects->gearArray.count()) {
-                objects->smoothGear[secs] = 0.0f;
-            } else {
-                objects->smoothGear[secs] = objects->gearArray[secs];
-            }
         }
 
     } else {
