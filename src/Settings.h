@@ -161,6 +161,7 @@
 #define GC_DPFHRS_MAX                   "<global-general>dataprocess/fixhrspikes/max"
 #define GC_DPDP_BIKEWEIGHT              "<global-general>dataprocess/fixderivepower/bikewheight"
 #define GC_DPDP_CRR                     "<global-general>dataprocess/fixderivepower/crr"
+#define GC_DPFV_MA                     "<global-general>dataprocess/fixspeed/ma"
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where
