@@ -90,6 +90,121 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(langCombo, 0,1, Qt::AlignLeft);
 
     //
+    // Garmin crap
+    //
+    // garmin Smart Recording options
+    QVariant garminHWMark = appsettings->value(this, GC_GARMIN_HWMARK);
+    garminSmartRecord = new QCheckBox(tr("Use Garmin Smart Recording"), this);
+    QVariant isGarminSmartRecording = appsettings->value(this, GC_GARMIN_SMARTRECORD, Qt::Checked);
+    garminSmartRecord->setCheckState(isGarminSmartRecording.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
+
+    // by default, set the threshold to 25 seconds
+    if (garminHWMark.isNull() || garminHWMark.toInt() == 0) garminHWMark.setValue(25);
+    QLabel *garminHWLabel = new QLabel(tr("Smart Recording Threshold (secs):"));
+    garminHWMarkedit = new QLineEdit(garminHWMark.toString(),this);
+    garminHWMarkedit->setInputMask("009");
+
+    configLayout->addWidget(garminSmartRecord, 1,1, Qt::AlignLeft);
+    configLayout->addWidget(garminHWLabel, 2,0, Qt::AlignRight);
+    configLayout->addWidget(garminHWMarkedit, 2,1, Qt::AlignLeft);
+
+    // Elevation hysterisis  GC_ELEVATION_HYSTERISIS
+    QVariant elevationHysteresis = appsettings->value(this, GC_ELEVATION_HYSTERESIS);
+    if (elevationHysteresis.isNull() || elevationHysteresis.toFloat() == 0.0)
+       elevationHysteresis.setValue(3.0);  // default is 1 meter
+
+    QLabel *hystlabel = new QLabel(tr("Elevation hysteresis (meters):"));
+    hystedit = new QLineEdit(elevationHysteresis.toString(),this);
+    hystedit->setInputMask("9.00");
+    
+    configLayout->addWidget(hystlabel, 3,0, Qt::AlignRight);
+    configLayout->addWidget(hystedit, 3,1, Qt::AlignLeft);
+
+
+    // wbal formula preference
+    QLabel *wbalFormLabel = new QLabel(tr("W' bal formula:"));
+    wbalForm = new QComboBox(this);
+    wbalForm->addItem(tr("Differential"));
+    wbalForm->addItem(tr("Integral"));
+    if (appsettings->value(this, GC_WBALFORM, "diff").toString() == "diff") wbalForm->setCurrentIndex(0);
+    else wbalForm->setCurrentIndex(1);
+
+    configLayout->addWidget(wbalFormLabel, 4,0, Qt::AlignRight);
+    configLayout->addWidget(wbalForm, 4,1, Qt::AlignLeft);
+
+
+    //
+    // Warn to save on exit
+    warnOnExit = new QCheckBox(tr("Warn for unsaved activities on exit"), this);
+    warnOnExit->setChecked(appsettings->value(NULL, GC_WARNEXIT, true).toBool());
+    configLayout->addWidget(warnOnExit, 5,1, Qt::AlignLeft);
+
+    //
+    // Run API web services when running
+    //
+    int offset=0;
+#ifdef GC_WANT_HTTP
+    offset += 1;
+    startHttp = new QCheckBox(tr("Enable API Web Services"), this);
+    startHttp->setChecked(appsettings->value(NULL, GC_START_HTTP, true).toBool());
+    configLayout->addWidget(startHttp, 6,1, Qt::AlignLeft);
+#endif
+
+    //
+    // Athlete directory (home of athletes)
+    //
+    QVariant athleteDir = appsettings->value(this, GC_HOMEDIR);
+    athleteLabel = new QLabel(tr("Athlete Library:"));
+    athleteDirectory = new QLineEdit;
+    athleteDirectory->setText(athleteDir.toString() == "0" ? "" : athleteDir.toString());
+    athleteWAS = athleteDirectory->text(); // remember what we started with ...
+    athleteBrowseButton = new QPushButton(tr("Browse"));
+    athleteBrowseButton->setFixedWidth(120);
+
+    configLayout->addWidget(athleteLabel, 7 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(athleteDirectory, 7 + offset,1);
+    configLayout->addWidget(athleteBrowseButton, 7 + offset,2);
+
+    connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
+
+    //
+    // Workout directory (train view)
+    //
+    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR, "");
+    // fix old bug..
+    if (workoutDir == "0") workoutDir = "";
+    workoutLabel = new QLabel(tr("Workout Library:"));
+    workoutDirectory = new QLineEdit;
+    workoutDirectory->setText(workoutDir.toString());
+    workoutBrowseButton = new QPushButton(tr("Browse"));
+    workoutBrowseButton->setFixedWidth(120);
+
+    configLayout->addWidget(workoutLabel, 8 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(workoutDirectory, 8 + offset,1);
+    configLayout->addWidget(workoutBrowseButton, 8 + offset,2);
+
+    connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
+
+    //----------------------------------------------------------------------
+    // And now general athlete specific settings, but not personal ones ....
+    //----------------------------------------------------------------------
+
+    QLabel *line1 = new QLabel(this);
+    line1->setFrameStyle(QLabel::HLine);
+    QLabel *line2 = new QLabel(this);
+    line2->setFrameStyle(QLabel::HLine);
+    QLabel *line3 = new QLabel(this);
+    line3->setFrameStyle(QLabel::HLine);
+    configLayout->addWidget(line1, 9+offset,0);
+    configLayout->addWidget(line2, 9+offset,1);
+    configLayout->addWidget(line3, 9+offset,2);
+    QLabel *athleteLabel = new QLabel(tr("<b>Athlete specific settings for:</b>"));
+    QLabel *athleteName = new QLabel(this);
+    athleteName->setText(context->athlete->cyclist);
+    configLayout->addWidget(athleteLabel, 10 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(athleteName, 10 + offset,1, Qt::AlignLeft);
+
+    //
     // Crank length - only used by PfPv chart (should move there!)
     //
     QLabel *crankLengthLabel = new QLabel(tr("Crank Length:"));
@@ -122,8 +237,8 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     if(crankLength.toString() == "182.5") crankLengthCombo->setCurrentIndex(11);
     if(crankLength.toString() == "185") crankLengthCombo->setCurrentIndex(12);
 
-    configLayout->addWidget(crankLengthLabel, 1,0, Qt::AlignRight);
-    configLayout->addWidget(crankLengthCombo, 1,1, Qt::AlignLeft);
+    configLayout->addWidget(crankLengthLabel, 11+offset,0, Qt::AlignRight);
+    configLayout->addWidget(crankLengthCombo, 11+offset,1, Qt::AlignLeft);
 
     //
     // Wheel size
@@ -154,58 +269,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
     connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
 
-    configLayout->addWidget(wheelSizeLabel, 2,0, Qt::AlignRight);
-    configLayout->addLayout(wheelSizeLayout, 2,1, Qt::AlignLeft);
+    configLayout->addWidget(wheelSizeLabel, 12+offset,0, Qt::AlignRight);
+    configLayout->addLayout(wheelSizeLayout, 12+offset,1, Qt::AlignLeft);
 
-
-    //
-    // Garmin crap
-    //
-    // garmin Smart Recording options
-    QVariant garminHWMark = appsettings->value(this, GC_GARMIN_HWMARK);
-    garminSmartRecord = new QCheckBox(tr("Use Garmin Smart Recording"), this);
-    QVariant isGarminSmartRecording = appsettings->value(this, GC_GARMIN_SMARTRECORD, Qt::Checked);
-    garminSmartRecord->setCheckState(isGarminSmartRecording.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
-
-    // by default, set the threshold to 25 seconds
-    if (garminHWMark.isNull() || garminHWMark.toInt() == 0) garminHWMark.setValue(25);
-    QLabel *garminHWLabel = new QLabel(tr("Smart Recording Threshold (secs):"));
-    garminHWMarkedit = new QLineEdit(garminHWMark.toString(),this);
-    garminHWMarkedit->setInputMask("009");
-
-    configLayout->addWidget(garminSmartRecord, 3,1, Qt::AlignLeft);
-    configLayout->addWidget(garminHWLabel, 4,0, Qt::AlignRight);
-    configLayout->addWidget(garminHWMarkedit, 4,1, Qt::AlignLeft);
-
-    // Elevation hysterisis  GC_ELEVATION_HYSTERISIS
-    QVariant elevationHysteresis = appsettings->value(this, GC_ELEVATION_HYSTERESIS);
-    if (elevationHysteresis.isNull() || elevationHysteresis.toFloat() == 0.0)
-       elevationHysteresis.setValue(3.0);  // default is 1 meter
-
-    QLabel *hystlabel = new QLabel(tr("Elevation hysteresis (meters):"));
-    hystedit = new QLineEdit(elevationHysteresis.toString(),this);
-    hystedit->setInputMask("9.00");
-    
-    configLayout->addWidget(hystlabel, 7,0, Qt::AlignRight);
-    configLayout->addWidget(hystedit, 7,1, Qt::AlignLeft);
-
-    // Use CP for FTP
-    QVariant useCPForFTP = appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, Qt::Checked);
-    useCPForFTPCheckBox = new QCheckBox(tr("Use CP for FTP"), this);
-    useCPForFTPCheckBox->setCheckState(useCPForFTP.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
-
-    configLayout->addWidget(useCPForFTPCheckBox, 8,1, Qt::AlignLeft);
-
-    // wbal formula preference
-    QLabel *wbalFormLabel = new QLabel(tr("W' bal formula:"));
-    wbalForm = new QComboBox(this);
-    wbalForm->addItem(tr("Differential"));
-    wbalForm->addItem(tr("Integral"));
-    if (appsettings->value(this, GC_WBALFORM, "diff").toString() == "diff") wbalForm->setCurrentIndex(0);
-    else wbalForm->setCurrentIndex(1);
-
-    configLayout->addWidget(wbalFormLabel, 9,0, Qt::AlignRight);
-    configLayout->addWidget(wbalForm, 9,1, Qt::AlignLeft);
 
     //
     // Performance manager
@@ -230,63 +296,18 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
     showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
 
-    configLayout->addWidget(perfManSTSLabel, 10,0, Qt::AlignRight);
-    configLayout->addWidget(perfManSTSavg, 10,1, Qt::AlignLeft);
-    configLayout->addWidget(perfManLTSLabel, 11,0, Qt::AlignRight);
-    configLayout->addWidget(perfManLTSavg, 11,1, Qt::AlignLeft);
-    configLayout->addWidget(showSBToday, 12,1, Qt::AlignLeft);
+    configLayout->addWidget(perfManSTSLabel, 13+offset,0, Qt::AlignRight);
+    configLayout->addWidget(perfManSTSavg, 13+offset,1, Qt::AlignLeft);
+    configLayout->addWidget(perfManLTSLabel, 14+offset,0, Qt::AlignRight);
+    configLayout->addWidget(perfManLTSavg, 14+offset,1, Qt::AlignLeft);
+    configLayout->addWidget(showSBToday, 15+offset,1, Qt::AlignLeft);
 
-    //
-    // Warn to save on exit
-    warnOnExit = new QCheckBox(tr("Warn for unsaved activities on exit"), this);
-    warnOnExit->setChecked(appsettings->cvalue(NULL, GC_WARNEXIT, true).toBool());
-    configLayout->addWidget(warnOnExit, 13,1, Qt::AlignLeft);
+    // Use CP for FTP
+    QVariant useCPForFTP = appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, Qt::Checked);
+    useCPForFTPCheckBox = new QCheckBox(tr("Use CP for FTP"), this);
+    useCPForFTPCheckBox->setCheckState(useCPForFTP.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
 
-    //
-    // Run API web services when running
-    //
-    int offset=0;
-#ifdef GC_WANT_HTTP
-    offset += 1;
-    startHttp = new QCheckBox(tr("Enable API Web Services"), this);
-    startHttp->setChecked(appsettings->cvalue(NULL, GC_START_HTTP, true).toBool());
-    configLayout->addWidget(startHttp, 14,1, Qt::AlignLeft);
-#endif
-
-    //
-    // Athlete directory (home of athletes)
-    //
-    QVariant athleteDir = appsettings->value(this, GC_HOMEDIR);
-    athleteLabel = new QLabel(tr("Athlete Library:"));
-    athleteDirectory = new QLineEdit;
-    athleteDirectory->setText(athleteDir.toString() == "0" ? "" : athleteDir.toString());
-    athleteWAS = athleteDirectory->text(); // remember what we started with ...
-    athleteBrowseButton = new QPushButton(tr("Browse"));
-    athleteBrowseButton->setFixedWidth(120);
-
-    configLayout->addWidget(athleteLabel, 14 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(athleteDirectory, 14 + offset,1);
-    configLayout->addWidget(athleteBrowseButton, 14 + offset,2);
-
-    connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
-
-    //
-    // Workout directory (train view)
-    //
-    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR, "");
-    // fix old bug..
-    if (workoutDir == "0") workoutDir = "";
-    workoutLabel = new QLabel(tr("Workout Library:"));
-    workoutDirectory = new QLineEdit;
-    workoutDirectory->setText(workoutDir.toString());
-    workoutBrowseButton = new QPushButton(tr("Browse"));
-    workoutBrowseButton->setFixedWidth(120);
-
-    configLayout->addWidget(workoutLabel, 15 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(workoutDirectory, 15 + offset,1);
-    configLayout->addWidget(workoutBrowseButton, 15 + offset,2);
-
-    connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
+    configLayout->addWidget(useCPForFTPCheckBox, 16+offset,1, Qt::AlignLeft);
 
     // save away initial values
     b4.wheel = wheelSize;
