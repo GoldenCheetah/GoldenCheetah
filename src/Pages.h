@@ -68,17 +68,12 @@ class GeneralPage : public QWidget
         Context *context;
 
         QComboBox *langCombo;
-        QComboBox *crankLengthCombo;
-        QComboBox *rimSizeCombo;
-        QComboBox *tireSizeCombo;
         QComboBox *wbalForm;
         QCheckBox *garminSmartRecord;
         QCheckBox *warnOnExit;
-        QCheckBox *useCPForFTPCheckBox;
 #ifdef GC_WANT_HTTP
         QCheckBox *startHttp;
 #endif
-        QLineEdit *wheelSizeEdit;
         QLineEdit *garminHWMarkedit;
         QLineEdit *hystedit;
         QLineEdit *athleteDirectory;
@@ -91,29 +86,16 @@ class GeneralPage : public QWidget
         QLabel *workoutLabel;
         QLabel *athleteLabel;
 
-        QLabel *perfManSTSLabel;
-        QLabel *perfManLTSLabel;
-        QLineEdit *perfManSTSavg;
-        QLineEdit *perfManLTSavg;
-        QCheckBox *showSBToday;
-        QIntValidator *perfManSTSavgValidator;
-        QIntValidator *perfManLTSavgValidator;
-
         struct {
-            int wheel;
-            int crank;
             float hyst;
             int wbal;
-            int lts,sts;
             bool warn;
 #ifdef GC_WANT_HTTP
             bool starthttp;
 #endif
         } b4;
 
-    private slots:
-        void calcWheelSize();
-        void resetWheelSize();
+
 };
 
 class RiderPage : public QWidget
@@ -146,12 +128,32 @@ class RiderPage : public QWidget
         QTextEdit  *bio;
         QPushButton *avatarButton;
         QPixmap     avatar;
+        QComboBox *crankLengthCombo;
+        QComboBox *rimSizeCombo;
+        QComboBox *tireSizeCombo;
+        QCheckBox *useCPForFTPCheckBox;
+        QLineEdit *wheelSizeEdit;
+        QLabel *perfManSTSLabel;
+        QLabel *perfManLTSLabel;
+        QLineEdit *perfManSTSavg;
+        QLineEdit *perfManLTSavg;
+        QIntValidator *perfManSTSavgValidator;
+        QIntValidator *perfManLTSavgValidator;
+        QCheckBox *showSBToday;
+
 
     struct {
         int unit;
         double weight;
         double height;
+        int wheel;
+        int crank;
+        int lts,sts;
     } b4;
+
+    private slots:
+        void calcWheelSize();
+        void resetWheelSize();
 
 };
 
