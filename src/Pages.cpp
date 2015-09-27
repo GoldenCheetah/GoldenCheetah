@@ -90,75 +90,6 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(langCombo, 0,1, Qt::AlignLeft);
 
     //
-    // Crank length - only used by PfPv chart (should move there!)
-    //
-    QLabel *crankLengthLabel = new QLabel(tr("Crank Length:"));
-    QVariant crankLength = appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH);
-    crankLengthCombo = new QComboBox();
-    crankLengthCombo->addItem("150");
-    crankLengthCombo->addItem("155");
-    crankLengthCombo->addItem("160");
-    crankLengthCombo->addItem("162.5");
-    crankLengthCombo->addItem("165");
-    crankLengthCombo->addItem("167.5");
-    crankLengthCombo->addItem("170");
-    crankLengthCombo->addItem("172.5");
-    crankLengthCombo->addItem("175");
-    crankLengthCombo->addItem("177.5");
-    crankLengthCombo->addItem("180");
-    crankLengthCombo->addItem("182.5");
-    crankLengthCombo->addItem("185");
-    if(crankLength.toString() == "150") crankLengthCombo->setCurrentIndex(0);
-    if(crankLength.toString() == "155") crankLengthCombo->setCurrentIndex(1);
-    if(crankLength.toString() == "160") crankLengthCombo->setCurrentIndex(2);
-    if(crankLength.toString() == "162.5") crankLengthCombo->setCurrentIndex(3);
-    if(crankLength.toString() == "165") crankLengthCombo->setCurrentIndex(4);
-    if(crankLength.toString() == "167.5") crankLengthCombo->setCurrentIndex(5);
-    if(crankLength.toString() == "170") crankLengthCombo->setCurrentIndex(6);
-    if(crankLength.toString() == "172.5") crankLengthCombo->setCurrentIndex(7);
-    if(crankLength.toString() == "175") crankLengthCombo->setCurrentIndex(8);
-    if(crankLength.toString() == "177.5") crankLengthCombo->setCurrentIndex(9);
-    if(crankLength.toString() == "180") crankLengthCombo->setCurrentIndex(10);
-    if(crankLength.toString() == "182.5") crankLengthCombo->setCurrentIndex(11);
-    if(crankLength.toString() == "185") crankLengthCombo->setCurrentIndex(12);
-
-    configLayout->addWidget(crankLengthLabel, 1,0, Qt::AlignRight);
-    configLayout->addWidget(crankLengthCombo, 1,1, Qt::AlignLeft);
-
-    //
-    // Wheel size
-    //
-    QLabel *wheelSizeLabel = new QLabel(tr("Wheelsize:"), this);
-    int wheelSize = appsettings->cvalue(context->athlete->cyclist, GC_WHEELSIZE, 2100).toInt();
-
-    rimSizeCombo = new QComboBox();
-    rimSizeCombo->addItems(WheelSize::RIM_SIZES);
-
-    tireSizeCombo = new QComboBox();
-    tireSizeCombo->addItems(WheelSize::TIRE_SIZES);
-
-
-    wheelSizeEdit = new QLineEdit(QString("%1").arg(wheelSize),this);
-    wheelSizeEdit->setInputMask("0000");
-    wheelSizeEdit->setFixedWidth(40);
-
-    QLabel *wheelSizeUnitLabel = new QLabel(tr("mm"), this);
-
-    QHBoxLayout *wheelSizeLayout = new QHBoxLayout();
-    wheelSizeLayout->addWidget(rimSizeCombo);
-    wheelSizeLayout->addWidget(tireSizeCombo);
-    wheelSizeLayout->addWidget(wheelSizeEdit);
-    wheelSizeLayout->addWidget(wheelSizeUnitLabel);
-
-    connect(rimSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
-    connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
-    connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
-
-    configLayout->addWidget(wheelSizeLabel, 2,0, Qt::AlignRight);
-    configLayout->addLayout(wheelSizeLayout, 2,1, Qt::AlignLeft);
-
-
-    //
     // Garmin crap
     //
     // garmin Smart Recording options
@@ -173,9 +104,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     garminHWMarkedit = new QLineEdit(garminHWMark.toString(),this);
     garminHWMarkedit->setInputMask("009");
 
-    configLayout->addWidget(garminSmartRecord, 3,1, Qt::AlignLeft);
-    configLayout->addWidget(garminHWLabel, 4,0, Qt::AlignRight);
-    configLayout->addWidget(garminHWMarkedit, 4,1, Qt::AlignLeft);
+    configLayout->addWidget(garminSmartRecord, 1,1, Qt::AlignLeft);
+    configLayout->addWidget(garminHWLabel, 2,0, Qt::AlignRight);
+    configLayout->addWidget(garminHWMarkedit, 2,1, Qt::AlignLeft);
 
     // Elevation hysterisis  GC_ELEVATION_HYSTERISIS
     QVariant elevationHysteresis = appsettings->value(this, GC_ELEVATION_HYSTERESIS);
@@ -186,15 +117,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     hystedit = new QLineEdit(elevationHysteresis.toString(),this);
     hystedit->setInputMask("9.00");
     
-    configLayout->addWidget(hystlabel, 7,0, Qt::AlignRight);
-    configLayout->addWidget(hystedit, 7,1, Qt::AlignLeft);
+    configLayout->addWidget(hystlabel, 3,0, Qt::AlignRight);
+    configLayout->addWidget(hystedit, 3,1, Qt::AlignLeft);
 
-    // Use CP for FTP
-    QVariant useCPForFTP = appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, Qt::Checked);
-    useCPForFTPCheckBox = new QCheckBox(tr("Use CP for FTP"), this);
-    useCPForFTPCheckBox->setCheckState(useCPForFTP.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
-
-    configLayout->addWidget(useCPForFTPCheckBox, 8,1, Qt::AlignLeft);
 
     // wbal formula preference
     QLabel *wbalFormLabel = new QLabel(tr("W' bal formula:"));
@@ -204,43 +129,15 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     if (appsettings->value(this, GC_WBALFORM, "diff").toString() == "diff") wbalForm->setCurrentIndex(0);
     else wbalForm->setCurrentIndex(1);
 
-    configLayout->addWidget(wbalFormLabel, 9,0, Qt::AlignRight);
-    configLayout->addWidget(wbalForm, 9,1, Qt::AlignLeft);
+    configLayout->addWidget(wbalFormLabel, 4,0, Qt::AlignRight);
+    configLayout->addWidget(wbalForm, 4,1, Qt::AlignLeft);
 
-    //
-    // Performance manager
-    //
-
-    perfManSTSLabel = new QLabel(tr("STS average (days):"));
-    perfManLTSLabel = new QLabel(tr("LTS average (days):"));
-    perfManSTSavgValidator = new QIntValidator(1,21,this);
-    perfManLTSavgValidator = new QIntValidator(7,56,this);
-
-    // get config or set to defaults
-    QVariant perfManSTSVal = appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS);
-    if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0) perfManSTSVal = 7;
-    QVariant perfManLTSVal = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
-    if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0) perfManLTSVal = 42;
-
-    perfManSTSavg = new QLineEdit(perfManSTSVal.toString(),this);
-    perfManSTSavg->setValidator(perfManSTSavgValidator);
-    perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
-    perfManLTSavg->setValidator(perfManLTSavgValidator);
-
-    showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
-    showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
-
-    configLayout->addWidget(perfManSTSLabel, 10,0, Qt::AlignRight);
-    configLayout->addWidget(perfManSTSavg, 10,1, Qt::AlignLeft);
-    configLayout->addWidget(perfManLTSLabel, 11,0, Qt::AlignRight);
-    configLayout->addWidget(perfManLTSavg, 11,1, Qt::AlignLeft);
-    configLayout->addWidget(showSBToday, 12,1, Qt::AlignLeft);
 
     //
     // Warn to save on exit
     warnOnExit = new QCheckBox(tr("Warn for unsaved activities on exit"), this);
-    warnOnExit->setChecked(appsettings->cvalue(NULL, GC_WARNEXIT, true).toBool());
-    configLayout->addWidget(warnOnExit, 13,1, Qt::AlignLeft);
+    warnOnExit->setChecked(appsettings->value(NULL, GC_WARNEXIT, true).toBool());
+    configLayout->addWidget(warnOnExit, 5,1, Qt::AlignLeft);
 
     //
     // Run API web services when running
@@ -249,8 +146,8 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 #ifdef GC_WANT_HTTP
     offset += 1;
     startHttp = new QCheckBox(tr("Enable API Web Services"), this);
-    startHttp->setChecked(appsettings->cvalue(NULL, GC_START_HTTP, true).toBool());
-    configLayout->addWidget(startHttp, 14,1, Qt::AlignLeft);
+    startHttp->setChecked(appsettings->value(NULL, GC_START_HTTP, true).toBool());
+    configLayout->addWidget(startHttp, 6,1, Qt::AlignLeft);
 #endif
 
     //
@@ -264,9 +161,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     athleteBrowseButton = new QPushButton(tr("Browse"));
     athleteBrowseButton->setFixedWidth(120);
 
-    configLayout->addWidget(athleteLabel, 14 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(athleteDirectory, 14 + offset,1);
-    configLayout->addWidget(athleteBrowseButton, 14 + offset,2);
+    configLayout->addWidget(athleteLabel, 7 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(athleteDirectory, 7 + offset,1);
+    configLayout->addWidget(athleteBrowseButton, 7 + offset,2);
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
 
@@ -282,39 +179,21 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     workoutBrowseButton = new QPushButton(tr("Browse"));
     workoutBrowseButton->setFixedWidth(120);
 
-    configLayout->addWidget(workoutLabel, 15 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(workoutDirectory, 15 + offset,1);
-    configLayout->addWidget(workoutBrowseButton, 15 + offset,2);
+    configLayout->addWidget(workoutLabel, 8 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(workoutDirectory, 8 + offset,1);
+    configLayout->addWidget(workoutBrowseButton, 8 + offset,2);
 
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
 
     // save away initial values
-    b4.wheel = wheelSize;
-    b4.crank = crankLengthCombo->currentIndex();
     b4.hyst = elevationHysteresis.toFloat();
     b4.wbal = wbalForm->currentIndex();
-    b4.lts = perfManLTSVal.toInt();
-    b4.sts = perfManSTSVal.toInt();
     b4.warn = warnOnExit->isChecked();
 #ifdef GC_WANT_HTTP
     b4.starthttp = startHttp->isChecked();
 #endif
 }
 
-void
-GeneralPage::calcWheelSize()
-{
-   int diameter = WheelSize::calcPerimeter(rimSizeCombo->currentIndex(), tireSizeCombo->currentIndex());
-   if (diameter>0)
-        wheelSizeEdit->setText(QString("%1").arg(diameter));
-}
-
-void
-GeneralPage::resetWheelSize()
-{
-   rimSizeCombo->setCurrentIndex(0);
-   tireSizeCombo->setCurrentIndex(0);
-}
 
 qint32
 GeneralPage::saveClicked()
@@ -328,29 +207,18 @@ GeneralPage::saveClicked()
     // Garmin and cranks
     appsettings->setValue(GC_GARMIN_HWMARK, garminHWMarkedit->text().toInt());
     appsettings->setValue(GC_GARMIN_SMARTRECORD, garminSmartRecord->checkState());
-    appsettings->setCValue(context->athlete->cyclist, GC_CRANKLENGTH, crankLengthCombo->currentText());
 
     // save on exit
     appsettings->setValue(GC_WARNEXIT, warnOnExit->isChecked());
-
-    // save wheel size
-    appsettings->setCValue(context->athlete->cyclist, GC_WHEELSIZE, wheelSizeEdit->text().toInt());
 
     // Bike score estimation
     appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
     appsettings->setValue(GC_HOMEDIR, athleteDirectory->text());
     appsettings->setValue(GC_ELEVATION_HYSTERESIS, hystedit->text());
 
-    // FTP
-    appsettings->setCValue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, useCPForFTPCheckBox->checkState());
-
     // wbal formula
     appsettings->setValue(GC_WBALFORM, wbalForm->currentIndex() ? "int" : "diff");
 
-    // Performance Manager
-    appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
 
 #ifdef GC_WANT_HTTP
     // start http
@@ -360,21 +228,16 @@ GeneralPage::saveClicked()
     qint32 state=0;
 
     // general stuff changed ?
-    if (b4.wheel != wheelSizeEdit->text().toInt() ||
-        b4.crank != crankLengthCombo->currentIndex() ||
 #ifdef GC_WANT_HTTP
-        b4.starthttp != startHttp->isChecked() ||
+    if (b4.hyst != hystedit->text().toFloat() ||
+        b4.starthttp != startHttp->isChecked())
+#else
+    if (b4.hyst != hystedit->text().toFloat())
 #endif
-        b4.hyst != hystedit->text().toFloat())
         state += CONFIG_GENERAL;
 
     if (b4.wbal != wbalForm->currentIndex())
         state += CONFIG_WBAL;
-
-    // PMC constants changed ?
-    if(b4.lts != perfManLTSavg->text().toInt() ||
-        b4.sts != perfManSTSavg->text().toInt()) 
-        state += CONFIG_PMC;
 
     return state;
 }
@@ -961,6 +824,97 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     avatarButton->setFixedHeight(140);
     avatarButton->setFixedWidth(140);
 
+    //
+    // Crank length - only used by PfPv chart (should move there!)
+    //
+    QLabel *crankLengthLabel = new QLabel(tr("Crank Length"));
+    QVariant crankLength = appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH);
+    crankLengthCombo = new QComboBox();
+    crankLengthCombo->addItem("150");
+    crankLengthCombo->addItem("155");
+    crankLengthCombo->addItem("160");
+    crankLengthCombo->addItem("162.5");
+    crankLengthCombo->addItem("165");
+    crankLengthCombo->addItem("167.5");
+    crankLengthCombo->addItem("170");
+    crankLengthCombo->addItem("172.5");
+    crankLengthCombo->addItem("175");
+    crankLengthCombo->addItem("177.5");
+    crankLengthCombo->addItem("180");
+    crankLengthCombo->addItem("182.5");
+    crankLengthCombo->addItem("185");
+    if(crankLength.toString() == "150") crankLengthCombo->setCurrentIndex(0);
+    if(crankLength.toString() == "155") crankLengthCombo->setCurrentIndex(1);
+    if(crankLength.toString() == "160") crankLengthCombo->setCurrentIndex(2);
+    if(crankLength.toString() == "162.5") crankLengthCombo->setCurrentIndex(3);
+    if(crankLength.toString() == "165") crankLengthCombo->setCurrentIndex(4);
+    if(crankLength.toString() == "167.5") crankLengthCombo->setCurrentIndex(5);
+    if(crankLength.toString() == "170") crankLengthCombo->setCurrentIndex(6);
+    if(crankLength.toString() == "172.5") crankLengthCombo->setCurrentIndex(7);
+    if(crankLength.toString() == "175") crankLengthCombo->setCurrentIndex(8);
+    if(crankLength.toString() == "177.5") crankLengthCombo->setCurrentIndex(9);
+    if(crankLength.toString() == "180") crankLengthCombo->setCurrentIndex(10);
+    if(crankLength.toString() == "182.5") crankLengthCombo->setCurrentIndex(11);
+    if(crankLength.toString() == "185") crankLengthCombo->setCurrentIndex(12);
+
+    //
+    // Wheel size
+    //
+    QLabel *wheelSizeLabel = new QLabel(tr("Wheelsize"), this);
+    int wheelSize = appsettings->cvalue(context->athlete->cyclist, GC_WHEELSIZE, 2100).toInt();
+
+    rimSizeCombo = new QComboBox();
+    rimSizeCombo->addItems(WheelSize::RIM_SIZES);
+
+    tireSizeCombo = new QComboBox();
+    tireSizeCombo->addItems(WheelSize::TIRE_SIZES);
+
+
+    wheelSizeEdit = new QLineEdit(QString("%1").arg(wheelSize),this);
+    wheelSizeEdit->setInputMask("0000");
+    wheelSizeEdit->setFixedWidth(40);
+
+    QLabel *wheelSizeUnitLabel = new QLabel(tr("mm"), this);
+
+    QHBoxLayout *wheelSizeLayout = new QHBoxLayout();
+    wheelSizeLayout->addWidget(rimSizeCombo);
+    wheelSizeLayout->addWidget(tireSizeCombo);
+    wheelSizeLayout->addWidget(wheelSizeEdit);
+    wheelSizeLayout->addWidget(wheelSizeUnitLabel);
+
+    connect(rimSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
+    connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
+    connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
+
+
+    //
+    // Performance manager
+    //
+
+    perfManSTSLabel = new QLabel(tr("STS average (days)"));
+    perfManLTSLabel = new QLabel(tr("LTS average (days)"));
+    perfManSTSavgValidator = new QIntValidator(1,21,this);
+    perfManLTSavgValidator = new QIntValidator(7,56,this);
+
+    // get config or set to defaults
+    QVariant perfManSTSVal = appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS);
+    if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0) perfManSTSVal = 7;
+    QVariant perfManLTSVal = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
+    if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0) perfManLTSVal = 42;
+
+    perfManSTSavg = new QLineEdit(perfManSTSVal.toString(),this);
+    perfManSTSavg->setValidator(perfManSTSavgValidator);
+    perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
+    perfManLTSavg->setValidator(perfManLTSavgValidator);
+
+    showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
+    showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
+
+     // Use CP for FTP
+    QVariant useCPForFTP = appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, Qt::Checked);
+    useCPForFTPCheckBox = new QCheckBox(tr("Use CP for FTP"), this);
+    useCPForFTPCheckBox->setCheckState(useCPForFTP.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
+
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
 
     grid->addWidget(nicklabel, 0, 0, alignment);
@@ -968,21 +922,33 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     grid->addWidget(sexlabel, 2, 0, alignment);
     grid->addWidget(unitlabel, 3, 0, alignment);
     grid->addWidget(weightlabel, 4, 0, alignment);
-    grid->addWidget(heightlabel, 4, 2, alignment);
-    grid->addWidget(wbaltaulabel, 5, 0, alignment);
-    grid->addWidget(biolabel, 6, 0, alignment);
+    grid->addWidget(heightlabel, 5, 0, alignment);
+    grid->addWidget(wbaltaulabel, 6, 0, alignment);
 
     grid->addWidget(nickname, 0, 1, alignment);
     grid->addWidget(dob, 1, 1, alignment);
     grid->addWidget(sex, 2, 1, alignment);
     grid->addWidget(unitCombo, 3, 1, alignment);
     grid->addWidget(weight, 4, 1, alignment);
-    grid->addWidget(height, 4, 3, alignment);
-    grid->addWidget(wbaltau, 5, 1, alignment);
-    grid->addWidget(bio, 7, 0, 1, 4);
+    grid->addWidget(height, 5, 1, alignment);
+    grid->addWidget(wbaltau, 6, 1, alignment);
 
-    grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
 
+    grid->addWidget(crankLengthLabel, 7, 0, alignment);
+    grid->addWidget(crankLengthCombo, 7, 1, alignment);
+    grid->addWidget(wheelSizeLabel, 8, 0, alignment);
+    grid->addLayout(wheelSizeLayout, 8, 1, 1, 2, alignment);
+    grid->addWidget(perfManSTSLabel, 9, 0, alignment);
+    grid->addWidget(perfManSTSavg, 9, 1, alignment);
+    grid->addWidget(perfManLTSLabel, 10, 0, alignment);
+    grid->addWidget(perfManLTSavg, 10, 1, alignment);
+    grid->addWidget(showSBToday, 11, 1, alignment);
+    grid->addWidget(useCPForFTPCheckBox, 12, 1, alignment);
+
+    grid->addWidget(biolabel, 13, 0, alignment);
+    grid->addWidget(bio, 14, 0, 1, 3);
+
+    grid->addWidget(avatarButton, 0, 1, 5, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
     all->addStretch();
 
@@ -996,6 +962,10 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     // height and weight as stored (always metric)
     b4.height = appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble();
     b4.weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
+    b4.wheel = wheelSize;
+    b4.crank = crankLengthCombo->currentIndex();
+    b4.lts = perfManLTSVal.toInt();
+    b4.sts = perfManSTSVal.toInt();
 
     connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
     connect (unitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(unitChanged(int)));
@@ -1037,6 +1007,20 @@ RiderPage::unitChanged(int currentIndex)
     }
 }
 
+void
+RiderPage::calcWheelSize()
+{
+   int diameter = WheelSize::calcPerimeter(rimSizeCombo->currentIndex(), tireSizeCombo->currentIndex());
+   if (diameter>0)
+        wheelSizeEdit->setText(QString("%1").arg(diameter));
+}
+
+void
+RiderPage::resetWheelSize()
+{
+   rimSizeCombo->setCurrentIndex(0);
+   tireSizeCombo->setCurrentIndex(0);
+}
 
 qint32
 RiderPage::saveClicked()
@@ -1056,7 +1040,28 @@ RiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_BIO, bio->toPlainText());
     avatar.save(context->athlete->home->config().canonicalPath() + "/" + "avatar.png", "PNG");
 
+    appsettings->setCValue(context->athlete->cyclist, GC_CRANKLENGTH, crankLengthCombo->currentText());
+    appsettings->setCValue(context->athlete->cyclist, GC_WHEELSIZE, wheelSizeEdit->text().toInt());
+
+    appsettings->setCValue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, useCPForFTPCheckBox->checkState());
+
+    // Performance Manager
+    appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
+
     qint32 state=0;
+
+    // general stuff changed ?
+    if (b4.wheel != wheelSizeEdit->text().toInt() ||
+        b4.crank != crankLengthCombo->currentIndex() )
+        state += CONFIG_GENERAL;
+
+    // PMC constants changed ?
+    if(b4.lts != perfManLTSavg->text().toInt() ||
+        b4.sts != perfManSTSavg->text().toInt())
+        state += CONFIG_PMC;
+
 
     // units prefs changed?
     if (b4.unit != unitCombo->currentIndex())
