@@ -237,6 +237,15 @@ macx {
 #the Dwmapi.h header then uncomment this line
 #DEFINES += GC_HAVE_DWM
 
+# USING THE DROPBOX API
+# register your app at https://www.dropbox.com/developers/apps and
+# make sure the redirect_uri for the app includes  the url: 
+# https://goldencheetah.github.io/blank.html and full permissions 
+# are granted. Then set the client # and secret in the two defines
+# below replacing the xxxxxxxxxxxxxx with the actual values.
+#DEFINES += GC_DROPBOX_CLIENT_ID=\\\"xxxxxxxxxxxxxxx\\\"
+#DEFINES += GC_DROPBOX_CLIENT_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
+
 # What video playback do you want?
 DEFINES += GC_VIDEO_NONE             # dont add any video playback support
 #DEFINES += GC_VIDEO_QUICKTIME        # mac only and the default
