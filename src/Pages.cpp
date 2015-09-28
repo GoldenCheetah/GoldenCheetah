@@ -1,5 +1,4 @@
 /*
-#endif
  * Copyright (c) 2012 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -317,12 +316,23 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     // Twitter
 
 #ifdef GC_HAVE_KQOAUTH
+    QLabel *dwp = new QLabel(tr("Dropbox"));
+    dwp->setFont(current);
     QLabel *twp = new QLabel(tr("Twitter"));
     twp->setFont(current);
 
     QLabel *twauthLabel = new QLabel(tr("Authorise"));
+    QLabel *dropauthLabel = new QLabel(tr("Authorise"));
 
     twitterAuthorise = new QPushButton(tr("Authorise"), this);
+    dropboxAuthorise = new QPushButton(tr("Authorise"), this);
+
+    dropboxAuthorised = new QPushButton(this);
+    dropboxAuthorised->setContentsMargins(0,0,0,0);
+    dropboxAuthorised->setIcon(passwords.scaled(16,16));
+    dropboxAuthorised->setIconSize(QSize(16,16));
+    dropboxAuthorised->setFixedHeight(16);
+    dropboxAuthorised->setFixedWidth(16);
 
     twitterAuthorised = new QPushButton(this);
     twitterAuthorised->setContentsMargins(0,0,0,0);
@@ -341,6 +351,17 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
         twitterAuthorised->hide(); // if no token no show
 
     connect(twitterAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTwitter()));
+
+    grid->addWidget(dwp, ++row, 0);
+
+    grid->addWidget(dropauthLabel, ++row, 0);
+    grid->addWidget(dropboxAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    if (appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "")!="")
+        grid->addWidget(dropboxAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    else
+        dropboxAuthorised->hide(); // if no token no show
+
+    connect(dropboxAuthorise, SIGNAL(clicked()), this, SLOT(authoriseDropbox()));
 #endif
 
     //grid->addWidget(twpinLabel, ++row, 0);
@@ -644,6 +665,17 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 void CredentialsPage::authoriseTwitter()
 {
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TWITTER);
+    if (oauthDialog->sslLibMissing()) {
+        delete oauthDialog;
+    } else {
+        oauthDialog->setWindowModality(Qt::ApplicationModal);
+        oauthDialog->exec();
+    }
+}
+
+void CredentialsPage::authoriseDropbox()
+{
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::DROPBOX);
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {

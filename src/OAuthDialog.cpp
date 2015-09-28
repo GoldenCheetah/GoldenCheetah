@@ -62,6 +62,15 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
         urlstr.append("response_type=code&");
         urlstr.append("approval_prompt=force");
 
+    } else if (site == DROPBOX) {
+
+        urlstr = QString("https://www.dropbox.com/1/oauth2/authorize?");
+
+        urlstr.append("client_id=").append(GC_DROPBOX_CLIENT_ID).append("&");
+        urlstr.append("redirect_uri=https://goldencheetah.github.io/blank.html&");
+        urlstr.append("response_type=code&");
+        urlstr.append("force_reapprove=true");
+
     } else if (site == TWITTER) {
 
 #ifdef GC_HAVE_KQOAUTH
@@ -115,7 +124,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
     }
 
     // different process to get the token for STRAVA, CYCLINGANALYTICS vs. TWITTER
-    if (site == STRAVA || site == CYCLING_ANALYTICS || site == GOOGLE_CALENDAR ) {
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == GOOGLE_CALENDAR ) {
 
 
         url = QUrl(urlstr);
@@ -194,12 +203,11 @@ void
 OAuthDialog::urlChanged(const QUrl &url)
 {
     // STRAVA & CYCLINGANALYTICS work with Call-back URLs / change of URL indicates next step is required
-
-    if (site == STRAVA || site == CYCLING_ANALYTICS) {
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS) {
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
+                url.toString().contains("blank.html?code=") ||
                 url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
             QString code = url.toString().right(url.toString().length()-url.toString().indexOf("code=")-5);
-
             QByteArray data;
 #if QT_VERSION > 0x050000
             QUrlQuery params;
@@ -209,7 +217,18 @@ OAuthDialog::urlChanged(const QUrl &url)
             QString urlstr = "";
 
             // now get the final token to store
-            if (site == STRAVA) {
+            if (site == DROPBOX) {
+                urlstr = QString("https://api.dropboxapi.com/1/oauth2/token?");
+                urlstr.append("redirect_uri=https://goldencheetah.github.io/blank.html&");
+                params.addQueryItem("grant_type", "authorization_code");
+                params.addQueryItem("client_id", GC_DROPBOX_CLIENT_ID);
+#ifdef GC_DROPBOX_CLIENT_SECRET
+                params.addQueryItem("client_secret", GC_DROPBOX_CLIENT_SECRET);
+#endif
+            }
+
+            // now get the final token to store
+            else if (site == STRAVA) {
                 urlstr = QString("https://www.strava.com/oauth/token?");
                 params.addQueryItem("client_id", GC_STRAVA_CLIENT_ID);
 #ifdef GC_STRAVA_CLIENT_SECRET
@@ -320,7 +339,12 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
             from = next + 1;
             int to = payload.indexOf("\"", from);
             QString access_token = payload.mid(from, to-from);
-            if (site == STRAVA) {
+            if (site == DROPBOX) {
+                appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_TOKEN, access_token);
+                QString info = QString(tr("Dropbox authorization was successful."));
+                QMessageBox information(QMessageBox::Information, tr("Information"), info);
+                information.exec();
+            } else if (site == STRAVA) {
                 appsettings->setCValue(context->athlete->cyclist, GC_STRAVA_TOKEN, access_token);
                 QString info = QString(tr("Strava authorization was successful."));
                 QMessageBox information(QMessageBox::Information, tr("Information"), info);
