@@ -177,6 +177,9 @@ struct Bin2FileReaderState
             nm = read_bytes(2, bytes_read, sum);
             kph = read_bytes(2, bytes_read, sum);
             alt = read_bytes(2, bytes_read, sum); // todo this value is signed
+            if (data_version>=9) {
+                alt = (alt-5000)/10.0; // todo this value is signed
+            }
             temp = read_bytes(2, bytes_read, sum); // °C × 10 todo this value is signed
             lat = read_bytes(4, bytes_read, sum); // todo this value is signed
             lng = read_bytes(4, bytes_read, sum); // todo this value is signed
