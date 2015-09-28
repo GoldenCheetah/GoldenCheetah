@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2015 Mark Liversedge (liversedge@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #ifndef PAGES_H
 #define PAGES_H
 #include "GoldenCheetah.h"
@@ -170,6 +188,7 @@ class CredentialsPage : public QScrollArea
     public slots:
 #ifdef GC_HAVE_KQOAUTH
         void authoriseTwitter();
+        void authoriseDropbox();
 #endif
         void authoriseStrava();
         void authoriseCyclingAnalytics();
@@ -186,10 +205,11 @@ class CredentialsPage : public QScrollArea
 
 #ifdef GC_HAVE_KQOAUTH
         QPushButton *twitterAuthorise;
+        QPushButton *dropboxAuthorise;
 #endif
 
         QComboBox *dvCALDAVType;
-        QPushButton *stravaAuthorise, *stravaAuthorised, *twitterAuthorised;
+        QPushButton *stravaAuthorise, *stravaAuthorised, *twitterAuthorised, *dropboxAuthorised;
         QPushButton *cyclingAnalyticsAuthorise, *cyclingAnalyticsAuthorised;
         QPushButton *googleCalendarAuthorise, *googleCalendarAuthorised;
 

@@ -240,6 +240,7 @@
 #define GC_DVCALDAVTYPE                 "<athlete-private>dv/type"
 #define GC_DVGOOGLE_CALID               "<athlete-private>dv/googlecalid"
 //Twitter oauth keys
+#define GC_DROPBOX_TOKEN                "<athlete-private>dropbox/token"
 #define GC_TWITTER_TOKEN                "<athlete-private>twitter_token"
 #define GC_TWITTER_SECRET               "<athlete-private>twitter_secret"
 //Google Calendar-CALDAV oauthkeys

@@ -48,6 +48,7 @@ public:
     typedef enum {
         STRAVA,
         TWITTER,
+        DROPBOX,
         CYCLING_ANALYTICS,
         GOOGLE_CALENDAR,
     } OAuthSite;
