@@ -36,6 +36,9 @@
 #include "OAuthDialog.h"
 #include "RideAutoImportConfig.h"
 #include "HelpWhatsThis.h"
+#if QT_VERSION >= 0x050000
+#include "Dropbox.h"
+#endif
 
 //
 // Main Config Page - tabs for each sub-page
@@ -316,24 +319,12 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     // Twitter
 
 #ifdef GC_HAVE_KQOAUTH
-    QLabel *dwp = new QLabel(tr("Dropbox"));
-    dwp->setFont(current);
     QLabel *twp = new QLabel(tr("Twitter"));
     twp->setFont(current);
 
     QLabel *twauthLabel = new QLabel(tr("Authorise"));
-    QLabel *dropauthLabel = new QLabel(tr("Authorise"));
 
     twitterAuthorise = new QPushButton(tr("Authorise"), this);
-    dropboxAuthorise = new QPushButton(tr("Authorise"), this);
-
-    dropboxAuthorised = new QPushButton(this);
-    dropboxAuthorised->setContentsMargins(0,0,0,0);
-    dropboxAuthorised->setIcon(passwords.scaled(16,16));
-    dropboxAuthorised->setIconSize(QSize(16,16));
-    dropboxAuthorised->setFixedHeight(16);
-    dropboxAuthorised->setFixedWidth(16);
-
     twitterAuthorised = new QPushButton(this);
     twitterAuthorised->setContentsMargins(0,0,0,0);
     twitterAuthorised->setIcon(passwords.scaled(16,16));
@@ -351,6 +342,24 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
         twitterAuthorised->hide(); // if no token no show
 
     connect(twitterAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTwitter()));
+#endif
+
+#if QT_VERSION >= 0x050000 // only in QT5 or higher
+    //
+    // Authorising Dropbox via an OAuthDialog...
+    QLabel *dwp = new QLabel(tr("Dropbox"));
+    dwp->setFont(current);
+
+    QLabel *dropauthLabel = new QLabel(tr("Authorise"));
+
+    dropboxAuthorise = new QPushButton(tr("Authorise"), this);
+
+    dropboxAuthorised = new QPushButton(this);
+    dropboxAuthorised->setContentsMargins(0,0,0,0);
+    dropboxAuthorised->setIcon(passwords.scaled(16,16));
+    dropboxAuthorised->setIconSize(QSize(16,16));
+    dropboxAuthorised->setFixedHeight(16);
+    dropboxAuthorised->setFixedWidth(16);
 
     grid->addWidget(dwp, ++row, 0);
 
@@ -362,9 +371,21 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
         dropboxAuthorised->hide(); // if no token no show
 
     connect(dropboxAuthorise, SIGNAL(clicked()), this, SLOT(authoriseDropbox()));
-#endif
 
+    //
+    // Selecting the athlete folder in dropbox
+    QLabel *dropfolderLabel = new QLabel(tr("Athlete Folder"));
+    dropboxFolder = new QLineEdit(this);
+    dropboxFolder->setText(appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER, "").toString());
+    dropboxBrowse = new QPushButton(tr("Browse"));
+    connect(dropboxBrowse, SIGNAL(clicked()), this, SLOT(chooseDropboxFolder()));
+    QHBoxLayout *dfchoose = new QHBoxLayout;
+    dfchoose->addWidget(dropboxFolder);
+    dfchoose->addWidget(dropboxBrowse);
+    grid->addWidget(dropfolderLabel, ++row, 0);
+    grid->addLayout(dfchoose, row, 1);
     //grid->addWidget(twpinLabel, ++row, 0);
+#endif
 
     //////////////////////////////////////////////////
     // Strava
@@ -660,6 +681,29 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
 }
 
+void CredentialsPage::chooseDropboxFolder()
+{
+#if QT_VERSION >= 0x050000 // only in QT5 or higher
+    Dropbox dropbox(context);
+
+    // open the connection
+    QStringList errors;
+    if (dropbox.open(errors) == false) {
+        QMessageBox err;
+        err.setText(tr("Dropbox Connection Failed"));
+        err.setDetailedText(errors.join("\n\n"));
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
+    //XXX NEED A FileStore::FileOpenDialog
+    //    that builds a tree and view based upon
+    //    the directory details returned by the
+    //    dropbox.readdir() functions
+    //XXX
+#endif
+}
 
 #ifdef GC_HAVE_KQOAUTH
 void CredentialsPage::authoriseTwitter()
@@ -672,9 +716,11 @@ void CredentialsPage::authoriseTwitter()
         oauthDialog->exec();
     }
 }
+#endif
 
 void CredentialsPage::authoriseDropbox()
 {
+#if QT_VERSION >= 0x050000 // only in QT5 or higher
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::DROPBOX);
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
@@ -682,8 +728,8 @@ void CredentialsPage::authoriseDropbox()
         oauthDialog->setWindowModality(Qt::ApplicationModal);
         oauthDialog->exec();
     }
-}
 #endif
+}
 
 
 void CredentialsPage::authoriseStrava()
