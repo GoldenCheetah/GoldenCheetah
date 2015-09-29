@@ -66,7 +66,9 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
 
         urlstr = QString("https://www.dropbox.com/1/oauth2/authorize?");
 
+#ifdef GC_DROPBOX_CLIENT_ID
         urlstr.append("client_id=").append(GC_DROPBOX_CLIENT_ID).append("&");
+#endif
         urlstr.append("redirect_uri=https://goldencheetah.github.io/blank.html&");
         urlstr.append("response_type=code&");
         urlstr.append("force_reapprove=true");
@@ -221,7 +223,9 @@ OAuthDialog::urlChanged(const QUrl &url)
                 urlstr = QString("https://api.dropboxapi.com/1/oauth2/token?");
                 urlstr.append("redirect_uri=https://goldencheetah.github.io/blank.html&");
                 params.addQueryItem("grant_type", "authorization_code");
+#ifdef GC_DROPBOX_CLIENT_ID
                 params.addQueryItem("client_id", GC_DROPBOX_CLIENT_ID);
+#endif
 #ifdef GC_DROPBOX_CLIENT_SECRET
                 params.addQueryItem("client_secret", GC_DROPBOX_CLIENT_SECRET);
 #endif
