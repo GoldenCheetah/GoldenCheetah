@@ -37,6 +37,10 @@ lessThan(QT_MAJOR_VERSION, 5) {
     } else {
         QT += multimedia multimediawidgets
     }
+
+    ## QT5 can support complex JSON documents
+    SOURCES += Dropbox.cpp
+    HEADERS += Dropbox.h
 }
 
 # if we are building in debug mode
@@ -363,6 +367,7 @@ HEADERS += \
         ErgDBDownloadDialog.h \
         ErgFilePlot.h \
         ExtendedCriticalPower.h \
+        FileStore.h \
         FitlogRideFile.h \
         FitlogParser.h \
         FitRideFile.h \ 
@@ -590,6 +595,7 @@ SOURCES += \
         ErgFile.cpp \
         ErgFilePlot.cpp \
         ExtendedCriticalPower.cpp \
+        FileStore.cpp \
         FitlogRideFile.cpp \
         FitlogParser.cpp \
         FitRideFile.cpp \
