@@ -697,11 +697,15 @@ void CredentialsPage::chooseDropboxFolder()
         return;
     }
 
-    //XXX NEED A FileStore::FileOpenDialog
-    //    that builds a tree and view based upon
-    //    the directory details returned by the
-    //    dropbox.readdir() functions
-    //XXX
+    // did the user type something ?
+    QString path = dropboxFolder->text();
+    if (path == "") path = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER, "/").toString();
+
+    FileStoreDialog dialog(this, &dropbox, tr("Choose Athlete Directory"), path, true);
+    int ret = dialog.exec();
+
+    // did we actually select something?
+    if (ret == QDialog::Accepted) dropboxFolder->setText(dialog.pathnameSelected());
 #endif
 }
 

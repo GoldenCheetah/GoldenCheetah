@@ -24,6 +24,14 @@
 #include <QStringList>
 #include <QDateTime>
 #include <QObject>
+
+#include <QDialog>
+#include <QTreeWidget>
+#include <QSplitter>
+#include <QLineEdit>
+#include <QLabel>
+#include <QPushButton>
+
 #include "Context.h"
 
 // A filestore is a base class for working with data stores
@@ -53,7 +61,10 @@ class FileStore : public QObject {
         virtual bool open(QStringList &errors) { Q_UNUSED(errors); return false; }
         virtual bool close() { return false; }
 
-        // we use a dirent style API 
+        // create a folder
+        virtual bool createFolder(QString path) { Q_UNUSED(path); return false; }
+
+        // we use a dirent style API for traversing
         // root - get me the root of the store
         // readdir - get me the contents of a path
         virtual FileStoreEntry *root() { return NULL; }
@@ -75,6 +86,68 @@ class FileStore : public QObject {
         
 };
 
+// XXX a better approach might be to reimplement QFileSystemModel on 
+// a FileStore and use the standard file dialogs instead. XXX
+class FileStoreDialog : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        FileStoreDialog(QWidget *parent, FileStore *store, QString title, QString pathname, bool dironly=false);
+        QString pathnameSelected() { return pathname; }
+
+    public slots:
+
+        // trap enter pressed as we don't want to close on it
+        bool eventFilter(QObject *obj, QEvent *evt);
+
+        // user hit return on the path edit
+        void returnPressed();
+        void folderSelectionChanged();
+        void folderClicked(QTreeWidgetItem*, int);
+
+        // user double clicked on a file
+        void fileDoubleClicked(QTreeWidgetItem*, int);
+
+        // user typed or selected a path
+        void setPath(QString path, bool refresh=false);
+
+        // set the folder or files list
+        void setFolders(FileStoreEntry *fse);
+        void setFiles(FileStoreEntry *fse);
+
+        // create a folder
+        void createFolderClicked();
+
+    protected:
+        QLineEdit   *pathEdit; // full path shown
+        QSplitter   *splitter; // left and right had side
+        QTreeWidget *folders;  // left side folder list
+        QTreeWidget *files;    // right side "files" list
+
+        QPushButton *cancel;   // ugh. did the wrong thing
+        QPushButton *open;     // open the selected "file"
+        QPushButton *create;   // create a folder
+
+        FileStore *store;
+        QString title;
+        QString pathname;
+        bool dironly;
+};
+
+class FolderNameDialog : public QDialog
+{
+    public:
+        FolderNameDialog(QWidget *parent);
+        QString name() { return nameEdit->text(); }
+        
+        QLineEdit   *nameEdit; // full path shown
+        QPushButton *cancel;   // ugh. did the wrong thing
+        QPushButton *create;     // use name we just provided
+
+};
+
+
 class FileStoreEntry
 {
     public:
@@ -88,5 +161,20 @@ class FileStoreEntry
         // parent and children
         FileStoreEntry *parent;             // parent directory, NULL for root.
         QList<FileStoreEntry *> children;   // parent directory, NULL for root.
+        bool initial;                       // haven't scanned for children yet.
+
+        
+        int child(QString directory) {
+            bool found = false;
+            int i = 0;
+            for(; i<children.count(); i++) {
+                if (children[i]->name == directory) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) return i;
+            else return -1;
+        }
 };
 #endif
