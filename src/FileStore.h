@@ -31,6 +31,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QPushButton>
+#include <QProgressBar>
 
 #include "Context.h"
 
@@ -41,6 +42,7 @@
 // to sync / backup to a pen drive or similar
 
 class FileStoreEntry;
+class RideItem;
 class FileStore : public QObject {
 
     Q_OBJECT
@@ -64,6 +66,16 @@ class FileStore : public QObject {
         // create a folder
         virtual bool createFolder(QString path) { Q_UNUSED(path); return false; }
 
+        // write a file 
+        virtual bool writeFile(QByteArray data, QString remotename) {
+            Q_UNUSED(data); Q_UNUSED(remotename); return false;
+        }
+
+        // read a file 
+        virtual bool readFile(QString localpath, QString remotename) {
+            Q_UNUSED(localpath); Q_UNUSED(remotename); return false;
+        }
+
         // we use a dirent style API for traversing
         // root - get me the root of the store
         // readdir - get me the contents of a path
@@ -71,6 +83,9 @@ class FileStore : public QObject {
         virtual QList<FileStoreEntry*> readdir(QString path, QStringList &errors) { 
             Q_UNUSED(path); errors << "not implemented."; return QList<FileStoreEntry*>(); 
         }
+
+        // PUBLIC INTERFACES. DO NOT REIMPLEMENT
+        static bool upload(QWidget *parent, FileStore *store, RideItem*);
 
     protected:
 
@@ -84,6 +99,30 @@ class FileStore : public QObject {
     private:
         Context *context;
         
+};
+
+// UPLOADER dialog to upload a single rideitem to the file
+//          store. Typically as a quick ^U type operation or
+//          via a MainWindow menu option
+class FileStoreUploadDialog : public QDialog
+{
+
+    Q_OBJECT
+
+    public:
+        FileStoreUploadDialog(QWidget *parent, FileStore *store, RideItem *item);
+
+        QLabel *info;               // how much being uploaded / status
+        QProgressBar *progress;     // whilst we wait
+        QPushButton *okcancel;      // cancel whilst occurring, ok once done
+
+    public slots:
+        void completed(QString name, QString message);
+
+    private:
+        FileStore *store;
+        RideItem *item;
+        QByteArray data;            // compressed data to upload
 };
 
 // XXX a better approach might be to reimplement QFileSystemModel on 

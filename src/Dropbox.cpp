@@ -170,3 +170,41 @@ Dropbox::readdir(QString path, QStringList &errors)
     // all good ?
     return returning;
 }
+
+bool 
+Dropbox::writeFile(QByteArray data, QString remotename)
+{
+    // this must be performed asyncronously and call made
+    // to notifyWriteCompleted(QString remotename, QString message) when done
+
+    // do we have a token ?
+    QString token = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "").toString();
+    if (token == "") return false;
+
+    // is the path set ?
+    QString path = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER, "").toString();
+    if (path == "") return false;
+
+    // lets connect and get basic info on the root directory
+    QString url("https://content.dropboxapi.com/1/files_put/auto/" + path + "/" + remotename + "?overwrite=true&autorename=false");
+
+    // request using the bearer token
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+
+    // put the file
+    QNetworkReply *reply = nam->put(request, data);
+
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    return true;
+}
+
+void
+Dropbox::writeFileCompleted()
+{
+    //XXX never gets here, async writes not working
+    //XXX notifyWriteComplete("xxxx", "Success.");
+}

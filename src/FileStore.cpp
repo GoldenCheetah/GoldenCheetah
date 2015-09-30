@@ -18,6 +18,13 @@
 
 #include "FileStore.h"
 
+#include "RideItem.h"
+#include <zlib.h>
+
+//
+// FILESTORE BASE CLASS
+//
+
 // nothing doing in base class, for now
 FileStore::FileStore(Context *context) : context(context)
 {
@@ -38,6 +45,73 @@ FileStore::newFileStoreEntry()
     p->initial = true;
     list_ << p;
     return p;
+}
+
+bool
+FileStore::upload(QWidget *parent, FileStore *store, RideItem *item)
+{
+
+    // open a dialog to do it
+    FileStoreUploadDialog uploader(parent, store, item);
+    int ret = uploader.exec();
+
+    // was it successfull ?
+    if (ret == QDialog::Accepted) return true;
+    else return false;
+}
+
+FileStoreUploadDialog::FileStoreUploadDialog(QWidget *parent, FileStore *store, RideItem *item) : QDialog(parent), store(store), item(item)
+{
+    // compress via a temporary file
+    QTemporaryFile tempfile;
+    if (tempfile.open()) {
+        QString tempname = tempfile.fileName();
+
+        // write
+        QFile out(tempname);
+        if (RideFileFactory::instance().writeRideFile(NULL, item->ride(), out, "json") == true) {
+
+            // read the whole thing back and compress it
+            out.open(QFile::ReadOnly);
+
+            // compress it
+            data = qCompress(out.readAll());
+            out.close();
+        }
+    }
+
+    // setup the gui!
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    info = new QLabel(QString(tr("Uploading %1 bytes...")).arg(data.size()));
+    layout->addWidget(info);
+
+    progress = new QProgressBar(this);
+    progress->setMaximum(0);
+    progress->setValue(0);
+    layout->addWidget(progress);
+
+    okcancel = new QPushButton(tr("Cancel"));
+    QHBoxLayout *buttons = new QHBoxLayout;
+    buttons->addStretch();
+    buttons->addWidget(okcancel);
+    layout->addLayout(buttons);
+
+    // ok, so now we can kickoff the upload
+    store->writeFile(data, item->fileName + "-zip");
+
+    // XXX totally broken, threads/signals need fixups
+    connect(okcancel, SIGNAL(clicked()), this, SLOT(reject()));
+}
+
+void
+FileStoreUploadDialog::completed(QString file, QString message)
+{
+    //XXX never gets here
+    info->setText(file + ":" + message);
+    progress->setMaximum(1);
+    progress->setValue(1);
+    okcancel->setText(tr("OK"));
+    connect(okcancel, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
 FileStoreDialog::FileStoreDialog(QWidget *parent, FileStore *store, QString title, QString pathname, bool dironly) :
