@@ -77,6 +77,9 @@
 #include "CalDAV.h"
 #endif
 #include "CalendarDownload.h"
+#if QT_VERSION > 0x050000
+#include "Dropbox.h"
+#endif
 
 // GUI Widgets
 #include "Tab.h"
@@ -597,6 +600,10 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(shareAction);
     rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), tr("Ctrl+E"));
     rideMenu->addAction(tr("&Batch export..."), this, SLOT(exportBatch()), tr("Ctrl+B"));
+#if QT_VERSION > 0x050000
+    rideMenu->addSeparator ();
+    rideMenu->addAction(tr("Upload to &Dropbox"), this, SLOT(uploadDropbox()), tr("Ctrl+R"));
+#endif
 #ifdef GC_HAVE_SOAP
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+T"));
@@ -1948,6 +1955,21 @@ MainWindow::manageLibrary()
     search->exec();
 }
 
+/*----------------------------------------------------------------------
+ * Dropbox.com
+ *--------------------------------------------------------------------*/
+#if QT_VERSION > 0x050000
+void
+MainWindow::uploadDropbox()
+{
+    // upload current ride, if we have one
+    if (currentTab->context->ride) {
+        Dropbox db(currentTab->context);
+        FileStore::upload(this, &db, currentTab->context->ride);
+    }
+}
+
+#endif
 /*----------------------------------------------------------------------
  * TrainingPeaks.com
  *--------------------------------------------------------------------*/
