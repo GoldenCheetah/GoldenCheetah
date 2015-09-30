@@ -451,7 +451,8 @@ void WSModel::onIntervalsChanged()
 // Currently deciding which of the three formulations to use
 // as the base for GoldenCheetah (we have enough models already !)
 MultiModel::MultiModel(Context *context) :
-    PDModel(context)
+    PDModel(context),
+    variant(0), w1(0), p1(0), p2(0), tau1(0), tau2(0), alpha(0), beta(0)
 {
     // set default intervals to search CP 30-60
     // uses the same as the 3 parameter model
@@ -594,7 +595,9 @@ void MultiModel::onIntervalsChanged()
 // Extended CP Model
 //
 ExtendedModel::ExtendedModel(Context *context) :
-    PDModel(context)
+    PDModel(context),
+    paa(0), paa_dec(0), ecp(0), etau(0), ecp_del(0), tau_del(0), ecp_dec(0),
+    ecp_dec_del(0)
 {
     // set default intervals to search Extended CP
     sanI1=20;
