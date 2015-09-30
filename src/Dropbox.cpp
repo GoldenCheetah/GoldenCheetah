@@ -125,7 +125,7 @@ Dropbox::readdir(QString path, QStringList &errors)
     }
 
     // lets connect and get basic info on the root directory
-    QString url("https://api.dropboxapi.com/1/metadata/auto" + path + "?list=true");
+    QString url("https://api.dropboxapi.com/1/metadata/auto" + path + "?include_deleted=false&list=true");
 
     // request using the bearer token
     QNetworkRequest request(url);
@@ -163,6 +163,7 @@ Dropbox::readdir(QString path, QStringList &errors)
             // dates in format "Tue, 19 Jul 2011 21:55:38 +0000"
             add->modified = QDateTime::fromString(each.toObject()["modified"].toString().mid(0,25),
                                "ddd, dd MMM yyyy hh:mm:ss");
+
             returning << add;
         }
     }
