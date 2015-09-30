@@ -283,7 +283,8 @@ void
 FileStoreDialog::fileDoubleClicked(QTreeWidgetItem*item, int)
 {
     // try and set the path to the item double clicked
-    setPath(pathname + "/" + item->text(0));
+    if (pathname.endsWith("/")) setPath(pathname + item->text(0));
+    else setPath(pathname + "/" + item->text(0));
 }
 
 void
@@ -314,10 +315,10 @@ FileStoreDialog::setFiles(FileStoreEntry *fse)
     // add each FOLDER from the list
     foreach(FileStoreEntry *p, fse->children) {
 
-        // directories only
-        if (dironly && !p->isDir) continue;
-
         QTreeWidgetItem *item = new QTreeWidgetItem(files);
+
+        // if only directories disable files for selection (but show for context)
+        if (dironly && !p->isDir) item->setFlags(item->flags() & ~(Qt::ItemIsSelectable|Qt::ItemIsEnabled));
 
         // name
         item->setText(0, p->name);
