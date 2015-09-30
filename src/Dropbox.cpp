@@ -89,6 +89,29 @@ Dropbox::close()
     return true;
 }
 
+bool Dropbox::createFolder(QString path)
+{
+    // do we have a token
+    QString token = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "").toString();
+    if (token == "") return false;
+
+    // lets connect and get basic info on the root directory
+    QString url("https://api.dropboxapi.com/1/fileops/create_folder?root=auto&path=" + path);
+
+    // request using the bearer token
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+    QNetworkReply *reply = nam->get(request);
+
+    // blocking request
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    // 403 EXISTS, otherwise OK
+    return (reply->error() == QNetworkReply::NoError);
+}
+
 QList<FileStoreEntry*> 
 Dropbox::readdir(QString path, QStringList &errors)
 {
@@ -132,10 +155,14 @@ Dropbox::readdir(QString path, QStringList &errors)
             QJsonValue each = contents.at(i);
             FileStoreEntry *add = newFileStoreEntry();
 
-            add->name = each.toObject()["path"].toString();
+            //dropbox has full path, we just want the file name
+            add->name = QFileInfo(each.toObject()["path"].toString()).fileName();
             add->isDir = each.toObject()["is_dir"].toBool();
             add->size = each.toObject()["bytes"].toInt();
 
+            // dates in format "Tue, 19 Jul 2011 21:55:38 +0000"
+            add->modified = QDateTime::fromString(each.toObject()["modified"].toString().mid(0,25),
+                               "ddd, dd MMM yyyy hh:mm:ss");
             returning << add;
         }
     }

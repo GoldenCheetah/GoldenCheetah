@@ -35,6 +35,8 @@ class Dropbox : public FileStore {
         bool open(QStringList &errors);
         bool close();
 
+        bool createFolder(QString path);
+
         FileStoreEntry *root() { return root_; }
         QList<FileStoreEntry*> readdir(QString path, QStringList &errors);
 
