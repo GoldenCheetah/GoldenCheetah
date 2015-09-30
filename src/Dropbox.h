@@ -24,6 +24,8 @@
 
 class Dropbox : public FileStore {
 
+    Q_OBJECT
+
     public:
 
         Dropbox(Context *context);

@@ -66,10 +66,11 @@ class FileStore : public QObject {
         // create a folder
         virtual bool createFolder(QString path) { Q_UNUSED(path); return false; }
 
-        // write a file 
+        // write a file - call notify when done
         virtual bool writeFile(QByteArray data, QString remotename) {
             Q_UNUSED(data); Q_UNUSED(remotename); return false;
         }
+        void notifyWriteComplete(QString x,QString y) { emit writeComplete(x,y); }
 
         // read a file 
         virtual bool readFile(QString localpath, QString remotename) {
@@ -86,6 +87,9 @@ class FileStore : public QObject {
 
         // PUBLIC INTERFACES. DO NOT REIMPLEMENT
         static bool upload(QWidget *parent, FileStore *store, RideItem*);
+
+    signals:
+        void writeComplete(QString file, QString message);
 
     protected:
 

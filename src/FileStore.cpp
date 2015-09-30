@@ -96,17 +96,16 @@ FileStoreUploadDialog::FileStoreUploadDialog(QWidget *parent, FileStore *store, 
     buttons->addWidget(okcancel);
     layout->addLayout(buttons);
 
+    // get notification when done
+    connect(store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completed(QString,QString)));
+
     // ok, so now we can kickoff the upload
     store->writeFile(data, item->fileName + "-zip");
-
-    // XXX totally broken, threads/signals need fixups
-    connect(okcancel, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
 void
 FileStoreUploadDialog::completed(QString file, QString message)
 {
-    //XXX never gets here
     info->setText(file + ":" + message);
     progress->setMaximum(1);
     progress->setValue(1);

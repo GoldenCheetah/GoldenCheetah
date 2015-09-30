@@ -195,16 +195,12 @@ Dropbox::writeFile(QByteArray data, QString remotename)
     // put the file
     QNetworkReply *reply = nam->put(request, data);
 
-    QEventLoop loop;
-    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
-
+    connect(reply, SIGNAL(finished()), this, SLOT(writeFileCompleted()));
     return true;
 }
 
 void
 Dropbox::writeFileCompleted()
 {
-    //XXX never gets here, async writes not working
-    //XXX notifyWriteComplete("xxxx", "Success.");
+    notifyWriteComplete("", "Success.");
 }
