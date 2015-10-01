@@ -79,11 +79,11 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     if (returnCode != 0) return;
 
     // metric / non-metric
-    QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
+    QVariant unit = appsettings->value(NULL, GC_UNIT, GC_UNIT_METRIC);
     if (unit == 0) {
         // Default to system locale
         unit = QLocale::system().measurementSystem() == QLocale::MetricSystem ? GC_UNIT_METRIC : GC_UNIT_IMPERIAL;
-        appsettings->setCValue(cyclist, GC_UNIT, unit);
+        appsettings->setValue(GC_UNIT, unit);
     }
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
@@ -318,7 +318,7 @@ Athlete::configChanged(qint32 state)
 {
     // change units
     if (state & CONFIG_UNITS) {
-        QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
+        QVariant unit = appsettings->value(NULL, GC_UNIT, GC_UNIT_METRIC);
         useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
     }
 

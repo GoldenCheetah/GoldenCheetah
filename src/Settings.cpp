@@ -491,6 +491,20 @@ GSettings::migrateValueToCValue(QString athlete, QString key) {
     }
 }
 
+void
+GSettings::migrateCValueToValue(QString athlete, QString key) {
+
+    // only migrate if the value does not yet exist on the target INI file
+    if (!contains(key)) {
+        QString oldKey = key;
+        oldKey.remove(QRegExp("^<.*>"));
+        oldKey = athlete+"/"+oldKey;
+        if (oldsystemsettings->contains(oldKey)) {
+            setValue(key, oldsystemsettings->value(oldKey));
+        }
+    }
+}
+
 
 void
 GSettings::upgradeSystem() {
@@ -632,7 +646,6 @@ GSettings::upgradeAthlete(QString athlete) {
     migrateCValue(athlete, GC_BLANK_TRAIN);
     migrateCValue(athlete, GC_BLANK_HOME);
     migrateCValue(athlete, GC_BLANK_DIARY);
-    migrateCValue(athlete, GC_UNIT);
     migrateCValue(athlete, GC_NICKNAME);
     migrateCValue(athlete, GC_DOB);
     migrateCValue(athlete, GC_WEIGHT);
@@ -653,6 +666,7 @@ GSettings::upgradeAthlete(QString athlete) {
     migrateCValue(athlete, GC_USE_CP_FOR_FTP);
 
     migrateAndRenameCValue(athlete, "bavigator/headingwidths", GC_NAVHEADINGWIDTHS);
+    migrateCValueToValue(athlete, GC_UNIT);
 
     // Handle the splittersizes keys
     QStringList splitterKeys = oldsystemsettings->allKeys();
