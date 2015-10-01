@@ -36,6 +36,11 @@
 // QUrl split into QUrlQuerty in QT5
 #if QT_VERSION > 0x050000
 #include <QUrlQuery>
+// QWebEngine
+#include <QWebEngineHistory>
+#include <QWebEngineHistoryItem>
+#include <QWebEnginePage>
+#include <QWebEngineView>
 #endif
 
 
@@ -81,7 +86,14 @@ private:
     OAuthSite site;
 
     QVBoxLayout *layout;
+
+    // QUrl split into QUrlQuerty in QT5
+    #if QT_VERSION < 0x050000
     QWebView *view;
+    #else
+    QWebEngineView *view;
+    #endif
+
     QNetworkAccessManager* manager;
 
     QUrl url;
