@@ -91,6 +91,22 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(langLabel, 0,0, Qt::AlignRight);
     configLayout->addWidget(langCombo, 0,1, Qt::AlignLeft);
 
+    QLabel *unitlabel = new QLabel(tr("Unit"));
+    unitCombo = new QComboBox();
+    unitCombo->addItem(tr("Metric"));
+    unitCombo->addItem(tr("Imperial"));
+
+    if (context->athlete->useMetricUnits)
+        unitCombo->setCurrentIndex(0);
+    else
+        unitCombo->setCurrentIndex(1);
+
+    configLayout->addWidget(unitlabel, 1,0, Qt::AlignRight);
+    configLayout->addWidget(unitCombo, 1,1, Qt::AlignLeft);
+
+    connect (unitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(unitChanged(int)));
+
+
     //
     // Garmin crap
     //
@@ -106,9 +122,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     garminHWMarkedit = new QLineEdit(garminHWMark.toString(),this);
     garminHWMarkedit->setInputMask("009");
 
-    configLayout->addWidget(garminSmartRecord, 1,1, Qt::AlignLeft);
-    configLayout->addWidget(garminHWLabel, 2,0, Qt::AlignRight);
-    configLayout->addWidget(garminHWMarkedit, 2,1, Qt::AlignLeft);
+    configLayout->addWidget(garminSmartRecord, 2,1, Qt::AlignLeft);
+    configLayout->addWidget(garminHWLabel, 3,0, Qt::AlignRight);
+    configLayout->addWidget(garminHWMarkedit, 3,1, Qt::AlignLeft);
 
     // Elevation hysterisis  GC_ELEVATION_HYSTERISIS
     QVariant elevationHysteresis = appsettings->value(this, GC_ELEVATION_HYSTERESIS);
@@ -119,8 +135,8 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     hystedit = new QLineEdit(elevationHysteresis.toString(),this);
     hystedit->setInputMask("9.00");
     
-    configLayout->addWidget(hystlabel, 3,0, Qt::AlignRight);
-    configLayout->addWidget(hystedit, 3,1, Qt::AlignLeft);
+    configLayout->addWidget(hystlabel, 4,0, Qt::AlignRight);
+    configLayout->addWidget(hystedit, 4,1, Qt::AlignLeft);
 
 
     // wbal formula preference
@@ -131,15 +147,15 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     if (appsettings->value(this, GC_WBALFORM, "diff").toString() == "diff") wbalForm->setCurrentIndex(0);
     else wbalForm->setCurrentIndex(1);
 
-    configLayout->addWidget(wbalFormLabel, 4,0, Qt::AlignRight);
-    configLayout->addWidget(wbalForm, 4,1, Qt::AlignLeft);
+    configLayout->addWidget(wbalFormLabel, 5,0, Qt::AlignRight);
+    configLayout->addWidget(wbalForm, 5,1, Qt::AlignLeft);
 
 
     //
     // Warn to save on exit
     warnOnExit = new QCheckBox(tr("Warn for unsaved activities on exit"), this);
     warnOnExit->setChecked(appsettings->value(NULL, GC_WARNEXIT, true).toBool());
-    configLayout->addWidget(warnOnExit, 5,1, Qt::AlignLeft);
+    configLayout->addWidget(warnOnExit, 6,1, Qt::AlignLeft);
 
     //
     // Run API web services when running
@@ -149,7 +165,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     offset += 1;
     startHttp = new QCheckBox(tr("Enable API Web Services"), this);
     startHttp->setChecked(appsettings->value(NULL, GC_START_HTTP, true).toBool());
-    configLayout->addWidget(startHttp, 6,1, Qt::AlignLeft);
+    configLayout->addWidget(startHttp, 7,1, Qt::AlignLeft);
 #endif
 
     //
@@ -188,6 +204,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
 
     // save away initial values
+    b4.unit = unitCombo->currentIndex();
     b4.hyst = elevationHysteresis.toFloat();
     b4.wbal = wbalForm->currentIndex();
     b4.warn = warnOnExit->isChecked();
@@ -221,6 +238,11 @@ GeneralPage::saveClicked()
     // wbal formula
     appsettings->setValue(GC_WBALFORM, wbalForm->currentIndex() ? "int" : "diff");
 
+    if (unitCombo->currentIndex()==0)
+        appsettings->setValue(GC_UNIT, GC_UNIT_METRIC);
+    else if (unitCombo->currentIndex()==1)
+        appsettings->setValue(GC_UNIT, GC_UNIT_IMPERIAL);
+
 
 #ifdef GC_WANT_HTTP
     // start http
@@ -240,6 +262,10 @@ GeneralPage::saveClicked()
 
     if (b4.wbal != wbalForm->currentIndex())
         state += CONFIG_WBAL;
+
+    // units prefs changed?
+    if (b4.unit != unitCombo->currentIndex())
+        state += CONFIG_UNITS;
 
     return state;
 }
@@ -837,7 +863,6 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     QLabel *nicklabel = new QLabel(tr("Nickname"));
     QLabel *doblabel = new QLabel(tr("Date of Birth"));
     QLabel *sexlabel = new QLabel(tr("Sex"));
-    QLabel *unitlabel = new QLabel(tr("Unit"));
     QLabel *biolabel = new QLabel(tr("Bio"));
 
     QString weighttext = QString(tr("Weight (%1)")).arg(context->athlete->useMetricUnits ? tr("kg") : tr("lb"));
@@ -863,15 +888,6 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     // we set to 0 or 1 for male or female since this
     // is language independent (and for once the code is easier!)
     sex->setCurrentIndex(appsettings->cvalue(context->athlete->cyclist, GC_SEX).toInt());
-
-    unitCombo = new QComboBox();
-    unitCombo->addItem(tr("Metric"));
-    unitCombo->addItem(tr("Imperial"));
-
-    if (context->athlete->useMetricUnits)
-        unitCombo->setCurrentIndex(0);
-    else
-        unitCombo->setCurrentIndex(1);
 
     weight = new QDoubleSpinBox(this);
     weight->setMaximum(999.9);
@@ -1003,7 +1019,6 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     grid->addWidget(nicklabel, 0, 0, alignment);
     grid->addWidget(doblabel, 1, 0, alignment);
     grid->addWidget(sexlabel, 2, 0, alignment);
-    grid->addWidget(unitlabel, 3, 0, alignment);
     grid->addWidget(weightlabel, 4, 0, alignment);
     grid->addWidget(heightlabel, 5, 0, alignment);
     grid->addWidget(wbaltaulabel, 6, 0, alignment);
@@ -1011,7 +1026,6 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     grid->addWidget(nickname, 0, 1, alignment);
     grid->addWidget(dob, 1, 1, alignment);
     grid->addWidget(sex, 2, 1, alignment);
-    grid->addWidget(unitCombo, 3, 1, alignment);
     grid->addWidget(weight, 4, 1, alignment);
     grid->addWidget(height, 5, 1, alignment);
     grid->addWidget(wbaltau, 6, 1, alignment);
@@ -1040,7 +1054,6 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     // since they are not used, nor the W'bal tau used in
     // the realtime code. This is limited to stuff we
     // care about tracking as it is used by metrics
-    b4.unit = unitCombo->currentIndex();
 
     // height and weight as stored (always metric)
     b4.height = appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble();
@@ -1051,7 +1064,6 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     b4.sts = perfManSTSVal.toInt();
 
     connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
-    connect (unitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(unitChanged(int)));
 }
 
 void
@@ -1110,14 +1122,10 @@ RiderPage::saveClicked()
 {
     appsettings->setCValue(context->athlete->cyclist, GC_NICKNAME, nickname->text());
     appsettings->setCValue(context->athlete->cyclist, GC_DOB, dob->date());
-    appsettings->setCValue(context->athlete->cyclist, GC_WEIGHT, weight->value() * (unitCombo->currentIndex() ? KG_PER_LB : 1.0));
-    appsettings->setCValue(context->athlete->cyclist, GC_HEIGHT, height->value() * (unitCombo->currentIndex() ? CM_PER_INCH/100.0 : 1.0/100.0));
+    appsettings->setCValue(context->athlete->cyclist, GC_WEIGHT, weight->value() * (context->athlete->useMetricUnits ? 1.0 : KG_PER_LB));
+    appsettings->setCValue(context->athlete->cyclist, GC_HEIGHT, height->value() * (context->athlete->useMetricUnits ? 1.0/100.0 : CM_PER_INCH/100.0));
     appsettings->setCValue(context->athlete->cyclist, GC_WBALTAU, wbaltau->value());
 
-    if (unitCombo->currentIndex()==0)
-        appsettings->setCValue(context->athlete->cyclist, GC_UNIT, GC_UNIT_METRIC);
-    else if (unitCombo->currentIndex()==1)
-        appsettings->setCValue(context->athlete->cyclist, GC_UNIT, GC_UNIT_IMPERIAL);
 
     appsettings->setCValue(context->athlete->cyclist, GC_SEX, sex->currentIndex());
     appsettings->setCValue(context->athlete->cyclist, GC_BIO, bio->toPlainText());
@@ -1144,11 +1152,6 @@ RiderPage::saveClicked()
     if(b4.lts != perfManLTSavg->text().toInt() ||
         b4.sts != perfManSTSavg->text().toInt())
         state += CONFIG_PMC;
-
-
-    // units prefs changed?
-    if (b4.unit != unitCombo->currentIndex())
-        state += CONFIG_UNITS;
 
     // default height or weight changed ?
     if (b4.height != appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble() ||

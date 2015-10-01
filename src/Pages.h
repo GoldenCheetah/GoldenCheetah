@@ -98,6 +98,8 @@ class GeneralPage : public QWidget
         QLineEdit *workoutDirectory;
         QPushButton *workoutBrowseButton;
         QPushButton *athleteBrowseButton;
+        QComboBox *unitCombo;
+
 
         QLabel *langLabel;
         QLabel *warningLabel;
@@ -105,6 +107,7 @@ class GeneralPage : public QWidget
         QLabel *athleteLabel;
 
         struct {
+            int unit;
             float hyst;
             int wbal;
             bool warn;
@@ -139,7 +142,6 @@ class RiderPage : public QWidget
         QLabel *weightlabel;
         QLabel *heightlabel;
         QLabel *wbaltaulabel;
-        QComboBox *unitCombo;
         QDoubleSpinBox *weight;
         QDoubleSpinBox *height;
         QSpinBox *wbaltau;
@@ -161,7 +163,6 @@ class RiderPage : public QWidget
 
 
     struct {
-        int unit;
         double weight;
         double height;
         int wheel;
