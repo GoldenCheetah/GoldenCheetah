@@ -21,6 +21,9 @@
 #include "RideItem.h"
 #include <zlib.h>
 
+#include <QIcon>
+#include <QFileIconProvider>
+
 //
 // FILESTORE BASE CLASS
 //
@@ -290,18 +293,23 @@ FileStoreDialog::fileDoubleClicked(QTreeWidgetItem*item, int)
 void
 FileStoreDialog::setFolders(FileStoreEntry *fse)
 {
+    // icons
+    QFileIconProvider provider;
+
     // set the folders tree widget
     folders->clear();
 
     // Add ROOT
     QTreeWidgetItem *rootitem = new QTreeWidgetItem(folders);
     rootitem->setText(0, "/");
+    rootitem->setIcon(0, provider.icon(QFileIconProvider::Folder));
 
     // add each FOLDER from the list
     foreach(FileStoreEntry *p, fse->children) {
         if (p->isDir) {
             QTreeWidgetItem *item = new QTreeWidgetItem(folders);
             item->setText(0, p->name);
+            item->setIcon(0, provider.icon(QFileIconProvider::Folder));
         }
     }
 }
@@ -309,6 +317,9 @@ FileStoreDialog::setFolders(FileStoreEntry *fse)
 void
 FileStoreDialog::setFiles(FileStoreEntry *fse)
 {
+    // icons
+    QFileIconProvider provider;
+
     // set the files tree widget
     files->clear();
 
@@ -324,9 +335,12 @@ FileStoreDialog::setFiles(FileStoreEntry *fse)
         item->setText(0, p->name);
 
         // type
-        if (p->isDir) item->setText(1, "Folder");
-        else {
+        if (p->isDir) {
+            item->setText(1, "Folder");
+            item->setIcon(0, provider.icon(QFileIconProvider::Folder));
+        } else {
             item->setText(1, QFileInfo(p->name).suffix().toLower());
+            item->setIcon(0, provider.icon(QFileIconProvider::File));
         }
 
         // modified - time or date?
