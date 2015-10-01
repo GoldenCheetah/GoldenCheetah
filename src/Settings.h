@@ -51,6 +51,18 @@
 // Dropbox id
 #define GC_DROPBOX_CLIENT_ID "753fbblhri06ah3"
 
+// MapQuest default API key.
+// If you have reliability problems with Fix Elevation, caused by too
+// many API requests per day using this key, then apply for your own
+// Free API key at https://developer.mapquest.com/.  Create a new
+// key for GoldenCheetah under 'Keys & Reporting' and place your
+// Consumer Key in here:
+#define GC_MAPQUESTAPI_KEY "Fmjtd%7Cluur20uznu%2Ca2%3Do5-9ayshw"
+
+// Tcx Smart recording
+#define GC_GARMIN_SMARTRECORD "garminSmartRecord"
+#define GC_GARMIN_HWMARK "garminHWMark"
+
 /*
  *  GoldenCheetah Properties are stored in different locations, depending on the prefix defined in the property name. The following different prefixes are supported
  *  <system>
