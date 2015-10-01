@@ -37,6 +37,8 @@ lessThan(QT_MAJOR_VERSION, 5) {
     } else {
         QT += multimedia multimediawidgets
     }
+    ## QT5 specific modules : webengine
+    QT += webenginewidgets
 
     ## QT5 can support complex JSON documents
     SOURCES += Dropbox.cpp

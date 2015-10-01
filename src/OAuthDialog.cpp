@@ -46,7 +46,13 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
     layout->setContentsMargins(2,0,2,2);
     setLayout(layout);
 
+
+    #if QT_VERSION < 0x050000
     view = new QWebView();
+    #else
+    view = new QWebEngineView();
+    #endif
+
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
