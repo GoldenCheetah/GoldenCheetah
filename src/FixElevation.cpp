@@ -126,7 +126,6 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *)
     QStringList elevationPoints;
     QString latLngCollection = "";
     int pointCount = 0;
-    qDebug() << "elvPoints.size() = " << elvPoints.size();
     try {
         for (std::vector<elevationGPSPoint>::iterator point = elvPoints.begin();
              point != elvPoints.end(); ++point) {
@@ -154,7 +153,6 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *)
 
 
     if (elevationPoints.length() > 0) {
-        qDebug() << "elevationPoints.length()=" << elevationPoints.length();
         QVector<double> smoothArray(elevationPoints.length());
         double lastGoodElevation = 0;
         for (int i=0; i<elevationPoints.length(); i++) {
@@ -180,7 +178,6 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *)
             rtot -= here;
             rtot += smoothArray[i-10];
         }
-        qDebug() << "smoothArray.size() = " << smoothArray.size();
         int loopCount = 0;
 
         for( std::vector<elevationGPSPoint>::iterator point = elvPoints.begin() ; point != elvPoints.end() ; ++point ) {
@@ -274,7 +271,7 @@ FetchElevationDataFromMapQuest(QString latLngCollection)
     elevationJSON.replace("{\"distance\":", "");
     elevationJSON.replace(",\"height\":", "|");
     elevationJSON.replace("}", "");
-    qDebug() << elevationJSON;
+    //qDebug() << elevationJSON;
     elevationPoints = elevationJSON.split(",");
 
     return elevationPoints;
