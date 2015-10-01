@@ -36,7 +36,9 @@
 // QUrl split into QUrlQuerty in QT5
 #if QT_VERSION > 0x050000
 #include <QUrlQuery>
+#endif
 // QWebEngine
+#if QT_VERSION > 0x050000 && defined(Q_OS_MAC)
 #include <QWebEngineHistory>
 #include <QWebEngineHistoryItem>
 #include <QWebEnginePage>
@@ -88,7 +90,7 @@ private:
     QVBoxLayout *layout;
 
     // QUrl split into QUrlQuerty in QT5
-    #if QT_VERSION < 0x050000
+    #if QT_VERSION < 0x050000 || !defined(Q_OS_MAC)
     QWebView *view;
     #else
     QWebEngineView *view;
