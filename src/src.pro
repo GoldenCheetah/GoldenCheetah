@@ -33,12 +33,10 @@ lessThan(QT_MAJOR_VERSION, 5) {
     ## QT5 specific modules
     QT += webkitwidgets widgets concurrent
     macx {
-        QT += macextras
+        QT += macextras webenginewidgets
     } else {
         QT += multimedia multimediawidgets
     }
-    ## QT5 specific modules : webengine
-    QT += webenginewidgets
 
     ## QT5 can support complex JSON documents
     SOURCES += Dropbox.cpp

@@ -47,7 +47,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
     setLayout(layout);
 
 
-    #if QT_VERSION < 0x050000
+    #if QT_VERSION < 0x050000 || !defined(Q_OS_MAC)
     view = new QWebView();
     #else
     view = new QWebEngineView();
