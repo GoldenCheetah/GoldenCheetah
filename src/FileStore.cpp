@@ -331,14 +331,14 @@ FileStoreDialog::setFiles(FileStoreEntry *fse)
         // if only directories disable files for selection (but show for context)
         if (dironly && !p->isDir) item->setFlags(item->flags() & ~(Qt::ItemIsSelectable|Qt::ItemIsEnabled));
 
-        // name
-        item->setText(0, p->name);
 
         // type
         if (p->isDir) {
             item->setText(1, "Folder");
+            item->setText(0, p->name);
             item->setIcon(0, provider.icon(QFileIconProvider::Folder));
         } else {
+            item->setText(0, QFileInfo(p->name).baseName()); // no need for extensions
             item->setText(1, QFileInfo(p->name).suffix().toLower());
             item->setIcon(0, provider.icon(QFileIconProvider::File));
         }
