@@ -363,10 +363,12 @@ main(int argc, char *argv[])
                 qDebug()<<"Athlete directory:"<<home.absolutePath();
             } else {
                 // switch off warnings if in gui mode
+#ifndef GC_WANT_ALLDEBUG
 #if QT_VERSION > 0x50000
                 qInstallMessageHandler(myMessageOutput);
 #else
                 qInstallMsgHandler(myMessageOutput);
+#endif
 #endif
             }
 

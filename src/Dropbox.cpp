@@ -89,6 +89,13 @@ Dropbox::close()
     return true;
 }
 
+// home dire
+QString
+Dropbox::home()
+{
+    return appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER, "").toString(); 
+}
+
 bool Dropbox::createFolder(QString path)
 {
     // do we have a token
@@ -172,8 +179,43 @@ Dropbox::readdir(QString path, QStringList &errors)
     return returning;
 }
 
+// read a file at location (relative to home) into passed array
+bool
+Dropbox::readFile(QByteArray *data, QString remotename)
+{
+    // this must be performed asyncronously and call made
+    // to notifyReadCompleted(QByteArray &data, QString remotename, QString message) when done
+
+    // do we have a token ?
+    QString token = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "").toString();
+    if (token == "") return false;
+
+    // is the path set ?
+    QString path = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER, "").toString();
+    if (path == "") return false;
+
+    // lets connect and get basic info on the root directory
+    QString url("https://content.dropboxapi.com/1/files/auto/" + path + "/" + remotename);
+
+    // request using the bearer token
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+
+    // put the file
+    QNetworkReply *reply = nam->get(request);
+
+    // remember
+    mapReply(reply,remotename);
+    buffers.insert(reply,data);
+
+    // catch finished signal
+    connect(reply, SIGNAL(finished()), this, SLOT(readFileCompleted()));
+    connect(reply, SIGNAL(readyRead()), this, SLOT(readyRead()));
+    return true;
+}
+
 bool 
-Dropbox::writeFile(QByteArray data, QString remotename)
+Dropbox::writeFile(QByteArray &data, QString remotename)
 {
     // this must be performed asyncronously and call made
     // to notifyWriteCompleted(QString remotename, QString message) when done
@@ -196,12 +238,30 @@ Dropbox::writeFile(QByteArray data, QString remotename)
     // put the file
     QNetworkReply *reply = nam->put(request, data);
 
+    // catch finished signal
     connect(reply, SIGNAL(finished()), this, SLOT(writeFileCompleted()));
+
+    // remember
+    mapReply(reply,remotename);
     return true;
 }
 
 void
 Dropbox::writeFileCompleted()
 {
-    notifyWriteComplete("", "Success.");
+    notifyWriteComplete(replyName(static_cast<QNetworkReply*>(QObject::sender())), "Completed.");
+}
+
+void
+Dropbox::readyRead()
+{
+    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    buffers.value(reply)->append(reply->readAll());
+}
+
+void
+Dropbox::readFileCompleted()
+{
+    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    notifyReadComplete(buffers.value(reply), replyName(reply), "Completed.");
 }

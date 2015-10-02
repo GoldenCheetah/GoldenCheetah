@@ -24,8 +24,10 @@
 #include <QStringList>
 #include <QDateTime>
 #include <QObject>
+#include <QNetworkReply>
 
 #include <QDialog>
+#include <QCheckBox>
 #include <QTreeWidget>
 #include <QSplitter>
 #include <QLineEdit>
@@ -63,19 +65,23 @@ class FileStore : public QObject {
         virtual bool open(QStringList &errors) { Q_UNUSED(errors); return false; }
         virtual bool close() { return false; }
 
+        // what is the path to the home directory on this store
+        virtual QString home() { return "/"; }
+
         // create a folder
         virtual bool createFolder(QString path) { Q_UNUSED(path); return false; }
 
         // write a file - call notify when done
-        virtual bool writeFile(QByteArray data, QString remotename) {
+        virtual bool writeFile(QByteArray &data, QString remotename) {
             Q_UNUSED(data); Q_UNUSED(remotename); return false;
         }
-        void notifyWriteComplete(QString x,QString y) { emit writeComplete(x,y); }
+        void notifyWriteComplete(QString name,QString message) { emit writeComplete(name,message); }
 
-        // read a file 
-        virtual bool readFile(QString localpath, QString remotename) {
-            Q_UNUSED(localpath); Q_UNUSED(remotename); return false;
+        // read a file  and notify when done
+        virtual bool readFile(QByteArray *data, QString remotename) {
+            Q_UNUSED(data); Q_UNUSED(remotename); return false;
         }
+        void notifyReadComplete(QByteArray *data, QString name, QString message) { emit readComplete(data,name,message); }
 
         // we use a dirent style API for traversing
         // root - get me the root of the store
@@ -85,11 +91,18 @@ class FileStore : public QObject {
             Q_UNUSED(path); errors << "not implemented."; return QList<FileStoreEntry*>(); 
         }
 
+        // UTILITY
+        void mapReply(QNetworkReply *reply, QString name) { replymap_.insert(reply,name); }
+        QString replyName(QNetworkReply *reply) { return replymap_.value(reply,""); }
+        void compressRide(RideFile*ride, QByteArray &data);
+        RideFile *uncompressRide(QByteArray *data, QString name, QStringList &errors);
+
         // PUBLIC INTERFACES. DO NOT REIMPLEMENT
         static bool upload(QWidget *parent, FileStore *store, RideItem*);
 
     signals:
-        void writeComplete(QString file, QString message);
+        void writeComplete(QString name, QString message);
+        void readComplete(QByteArray *data, QString name, QString message);
 
     protected:
 
@@ -98,6 +111,7 @@ class FileStore : public QObject {
         // don't have to. When the filestore is deleted
         // these entries are deleted too
         FileStoreEntry *newFileStoreEntry();
+        QMap<QNetworkReply*,QString> replymap_;
         QList<FileStoreEntry*> list_;
 
     private:
@@ -190,23 +204,112 @@ class FolderNameDialog : public QDialog
 
 };
 
+//
+// The Sync Dialog
+//
+class FileStoreSyncDialog : public QDialog
+{
+    Q_OBJECT
+    G_OBJECT
 
+
+    public:
+        FileStoreSyncDialog(Context *context, FileStore *store);
+	
+    public slots:
+
+        void cancelClicked();
+        void refreshClicked();
+        void tabChanged(int);
+        void downloadClicked();
+        void refreshCount();
+        void refreshUpCount();
+        void refreshSyncCount();
+        void selectAllChanged(int);
+        void selectAllUpChanged(int);
+        void selectAllSyncChanged(int);
+
+        void completedRead(QByteArray *data, QString name, QString message);
+        void completedWrite(QString name,QString message);
+    private:
+        Context *context;
+        FileStore *store;
+
+        bool downloading;
+        bool sync;
+        bool aborted;
+
+        // Quick lists for checking if file exists
+        // locally (rideFiles) or remotely (uploadFiles)
+        QStringList rideFiles;
+        QStringList uploadFiles;
+
+        // keeping track of progress...
+        int downloadcounter,    // *x* of n downloading
+            downloadtotal,      // x of *n* downloading
+            successful,         // how many downloaded ok?
+            listindex;          // where in rideList we've got to
+
+        bool saveRide(RideFile *, QStringList &);
+        bool syncNext();        // kick off another download/upload
+                                // returns false if none left
+        bool downloadNext();    // kick off another download
+                                // returns false if none left
+        bool uploadNext();     // kick off another upload
+                                // returns false if none left
+
+        // tabs - Upload/Download
+        QTabWidget *tabs;
+
+        // athlete selection
+        //QMap<QString, QString> athlete;
+        QComboBox *athleteCombo;
+
+        QPushButton *refreshButton;
+        QPushButton *cancelButton;
+        QPushButton *downloadButton;
+
+        QDateEdit *from, *to;
+
+        // Download
+        QCheckBox *selectAll;
+        QTreeWidget *rideListDown;
+
+        // Upload
+        QCheckBox *selectAllUp;
+        QTreeWidget *rideListUp;
+
+        // Sync
+        QCheckBox *selectAllSync;
+        QTreeWidget *rideListSync;
+        QComboBox *syncMode;
+
+        // show progress
+        QProgressBar *progressBar;
+        QLabel *progressLabel;
+
+        QCheckBox *overwrite;
+};
+
+// Representing a File or Folder
 class FileStoreEntry
 {
     public:
 
-        // about me
+        // THESE MEMBERS NEED TO BE MAINTAINED BY
+        // THE FILESTORE IMPLEMENTATION (Dropbox, Google etc)
         QString name;                       // file name
         bool isDir;                         // is a directory
         unsigned long size;                 // my size
         QDateTime modified;                 // last modification date
 
-        // parent and children
+        // THESE MEMBERS ARE MAINTAINED BY THE 
+        // FILESTORE BASE IMPLEMENTATION
         FileStoreEntry *parent;             // parent directory, NULL for root.
         QList<FileStoreEntry *> children;   // parent directory, NULL for root.
         bool initial;                       // haven't scanned for children yet.
 
-        
+        // find the index of a child, return -1 if not found
         int child(QString directory) {
             bool found = false;
             int i = 0;

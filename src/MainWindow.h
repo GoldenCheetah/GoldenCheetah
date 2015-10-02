@@ -186,6 +186,7 @@ class MainWindow : public QMainWindow
 #endif
 #if QT_VERSION > 0x050000
         void uploadDropbox();
+        void syncDropbox();
 #endif
         void importFile();
         void splitRide();

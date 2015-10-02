@@ -37,16 +37,29 @@ class Dropbox : public FileStore {
         bool open(QStringList &errors);
         bool close();
 
-        // write a file 
-        bool writeFile(QByteArray data, QString remotename);
+        // home directory
+        QString home();
 
+        // write a file 
+        bool writeFile(QByteArray &data, QString remotename);
+
+        // read a file
+        bool readFile(QByteArray *data, QString remotename); 
+
+        // create a folder
         bool createFolder(QString path);
 
+        // dirent style api
         FileStoreEntry *root() { return root_; }
         QList<FileStoreEntry*> readdir(QString path, QStringList &errors);
 
     public slots:
 
+        // getting data
+        void readyRead(); // a readFile operation has work to do
+        void readFileCompleted();
+
+        // sending data
         void writeFileCompleted();
 
     private:
@@ -54,5 +67,7 @@ class Dropbox : public FileStore {
         QNetworkAccessManager *nam;
         QNetworkReply *reply;
         FileStoreEntry *root_;
+
+        QMap<QNetworkReply*, QByteArray*> buffers;
 };
 #endif
