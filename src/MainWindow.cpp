@@ -604,7 +604,7 @@ MainWindow::MainWindow(const QDir &home)
 #if QT_VERSION > 0x050000
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("Upload to &Dropbox"), this, SLOT(uploadDropbox()), tr("Ctrl+R"));
-    rideMenu->addAction(tr("Synchronise Dropbox..."), this, SLOT(syncDropbox()), tr("Ctrl+B"));
+    rideMenu->addAction(tr("Synchronise Dropbox..."), this, SLOT(syncDropbox()), tr("Ctrl+O"));
 #endif
 #ifdef GC_HAVE_SOAP
     rideMenu->addSeparator ();
