@@ -556,8 +556,8 @@ FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store)
     selectAllSync->setChecked(Qt::Unchecked);
     syncMode = new QComboBox(this);
     syncMode->addItem(tr("Keep all do not delete"));
-    syncMode->addItem(tr("Keep TP.com but delete Local"));
-    syncMode->addItem(tr("Keep Local but delete TP.com"));
+    syncMode->addItem(tr("Keep %1 but delete Local").arg(store->name()));
+    syncMode->addItem(tr("Keep Local but delete %1").arg(store->name()));
     QHBoxLayout *syncList = new QHBoxLayout;
     syncList->addWidget(selectAllSync);
     syncList->addStretch();
@@ -810,7 +810,7 @@ FileStoreSyncDialog::refreshClicked()
                            .arg ( ride->dateTime.time().minute(), 2, 10, zero )
                            .arg ( ride->dateTime.time().second(), 2, 10, zero );
 
-        // check if on TP.com already
+        // check if on <FileStore> already
         if (uploadFiles.contains(targetnosuffix.mid(0,14))) exists->setChecked(Qt::Checked);
         else {
             exists->setChecked(Qt::Unchecked);
