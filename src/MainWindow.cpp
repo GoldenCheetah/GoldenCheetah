@@ -80,6 +80,7 @@
 #if QT_VERSION > 0x050000
 #include "Dropbox.h"
 #endif
+#include "FileStore.h"
 
 // GUI Widgets
 #include "Tab.h"
@@ -603,6 +604,7 @@ MainWindow::MainWindow(const QDir &home)
 #if QT_VERSION > 0x050000
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("Upload to &Dropbox"), this, SLOT(uploadDropbox()), tr("Ctrl+R"));
+    rideMenu->addAction(tr("Synchronise Dropbox..."), this, SLOT(syncDropbox()), tr("Ctrl+B"));
 #endif
 #ifdef GC_HAVE_SOAP
     rideMenu->addSeparator ();
@@ -1967,6 +1969,15 @@ MainWindow::uploadDropbox()
         Dropbox db(currentTab->context);
         FileStore::upload(this, &db, currentTab->context->ride);
     }
+}
+
+void
+MainWindow::syncDropbox()
+{
+    // upload current ride, if we have one
+    Dropbox db(currentTab->context);
+    FileStoreSyncDialog upload(currentTab->context, &db);
+    upload.exec();
 }
 
 #endif
