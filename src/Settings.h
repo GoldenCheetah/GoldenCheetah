@@ -143,6 +143,8 @@
 #define GC_PACE                         "<global-general>pace"
 #define GC_SWIMPACE                     "<global-general>swimpace"
 #define GC_ELEVATION_HYSTERESIS         "<global-general>elevationHysteresis"
+#define GC_UNIT                         "<global-general>unit"
+
 
 
 // Fit/Tcx Smart recording
@@ -191,7 +193,6 @@
 #define GC_SETTINGS_SPLITTER_SIZES      "<athlete-layout>mainwindow/splitterSizes"
 
 
-#define GC_UNIT                         "<athlete-preferences>unit"
 #define GC_NICKNAME                     "<athlete-preferences>nickname"
 #define GC_DOB                          "<athlete-preferences>dob"
 #define GC_WEIGHT                       "<athlete-preferences>weight"
@@ -250,8 +251,6 @@
 #define GC_STRAVA_TOKEN                 "<athlete-private>strava_token"
 //Cycling Analytics
 #define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
-
-
 
 
 // --------------------------------------------------------------------------------
@@ -328,6 +327,7 @@ private:
     void migrateCValue(QString athleteName, QString key);
     void migrateAndRenameCValue(QString athleteName, QString wrongKey, QString key);
     void migrateValueToCValue(QString athleteName, QString key);
+    void migrateCValueToValue(QString athleteName, QString key);
 
     void upgradeSystem();
     void upgradeGlobal();

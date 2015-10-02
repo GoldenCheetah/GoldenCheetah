@@ -301,9 +301,9 @@ NewCyclistDialog::saveClicked()
 
                 // lets setup!
                 if (unitCombo->currentIndex()==0)
-                    appsettings->setCValue(name->text(), GC_UNIT, GC_UNIT_METRIC);
+                    appsettings->setValue(GC_UNIT, GC_UNIT_METRIC);
                 else if (unitCombo->currentIndex()==1)
-                    appsettings->setCValue(name->text(), GC_UNIT, GC_UNIT_IMPERIAL);
+                    appsettings->setValue(GC_UNIT, GC_UNIT_IMPERIAL);
 
                 appsettings->setCValue(name->text(), GC_DOB, dob->date());
                 appsettings->setCValue(name->text(), GC_WEIGHT, weight->value() * (useMetricUnits ? 1.0 : KG_PER_LB));
