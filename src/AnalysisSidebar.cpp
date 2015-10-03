@@ -879,6 +879,7 @@ AnalysisSidebar::editInterval()
     temp.start = activeInterval->start;
     temp.stop = activeInterval->stop;
     temp.color = activeInterval->color;
+    temp.rideInterval = activeInterval->rideInterval;
  
     EditIntervalDialog dialog(this, temp); // pass by reference
 
