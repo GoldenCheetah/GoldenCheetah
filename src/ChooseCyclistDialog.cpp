@@ -23,12 +23,67 @@
 #include "Athlete.h"
 #include <QtGui>
 
+static void recursiveDelete(QDir dir)
+{   
+    // delete the directory contents recursively before
+    // removing the directory itself
+    foreach(QString name, dir.entryList()) {
+
+        // ignore . and ..
+        if (name == "." || name == "..") continue;
+
+        QString path = dir.absolutePath() + "/" + name;
+
+        // directory?
+        if (QFileInfo(path).isDir()) {
+            recursiveDelete(QDir(path));
+            dir.rmdir(name);
+        } else dir.remove(name);
+    }
+}
+
 ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : home(home)
 {
     setWindowTitle(tr("Choose an Athlete"));
 
     listWidget = new QListWidget(this);
     listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    getList();
+
+    if (allowNew)
+        newButton = new QPushButton(tr("&New..."), this);
+    okButton = new QPushButton(tr("&Open"), this);
+    cancelButton = new QPushButton(tr("&Cancel"), this);
+    deleteButton = new QPushButton(tr("Delete"), this);
+
+    okButton->setEnabled(false);
+    deleteButton->setEnabled(false);
+
+    connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    if (allowNew) connect(newButton, SIGNAL(clicked()), this, SLOT(newClicked()));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(listWidget, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(enableOkDelete(QListWidgetItem*)));
+    connect(listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(accept()));
+
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    if (allowNew) buttonLayout->addWidget(newButton);
+    buttonLayout->addWidget(deleteButton);
+    buttonLayout->addStretch();
+    buttonLayout->addWidget(cancelButton);
+    buttonLayout->addWidget(okButton);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->addWidget(listWidget);
+    mainLayout->addLayout(buttonLayout);
+}
+
+void
+ChooseCyclistDialog::getList()
+{
+    // clean current
+    listWidget->clear();
 
     QStringListIterator i(home.entryList(QDir::Dirs | QDir::NoDotAndDotDot));
     while (i.hasNext()) {
@@ -46,34 +101,6 @@ ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : home
             }
         }
     }
-
-    if (allowNew)
-        newButton = new QPushButton(tr("&New..."), this);
-    okButton = new QPushButton(tr("&Open"), this);
-    cancelButton = new QPushButton(tr("&Cancel"), this);
-
-    okButton->setEnabled(false);
-
-    connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
-    if (allowNew)
-        connect(newButton, SIGNAL(clicked()), this, SLOT(newClicked()));
-    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-    connect(listWidget,
-            SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
-            this, SLOT(enableOk(QListWidgetItem*)));
-    connect(listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-            this, SLOT(accept()));
-
-    QHBoxLayout *buttonLayout = new QHBoxLayout;
-    if (allowNew)
-        buttonLayout->addWidget(newButton);
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(cancelButton);
-    buttonLayout->addWidget(okButton);
-
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->addWidget(listWidget);
-    mainLayout->addLayout(buttonLayout);
 }
 
 QString
@@ -83,15 +110,47 @@ ChooseCyclistDialog::choice()
 }
 
 void
-ChooseCyclistDialog::enableOk(QListWidgetItem *item)
+ChooseCyclistDialog::enableOkDelete(QListWidgetItem *item)
 {
     okButton->setEnabled(item != NULL);
+    deleteButton->setEnabled(item != NULL);
 }
 
 void
 ChooseCyclistDialog::cancelClicked()
 {
     reject();
+}
+
+void
+ChooseCyclistDialog::deleteClicked()
+{
+    // nothing selected
+    if (listWidget->selectedItems().count() <= 0) return;
+
+    QListWidgetItem *item = listWidget->selectedItems().first();
+
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(tr("Delete athlete"));
+    msgBox.setText(tr("You are about to delete ") + item->text());
+    msgBox.setInformativeText(tr("This cannot be undone and all data will be permanently deleted.\n\nAre you sure?"));
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
+
+    if(msgBox.clickedButton() == msgBox.button(QMessageBox::Ok)) {
+
+        // ok .. lets wipe the athlete !
+        QDir athleteDir = QDir(home.absolutePath() + "/" + item->text());
+
+        // zap!
+        recursiveDelete(athleteDir);
+        home.rmdir(item->text());
+
+        // list again, with athlete now gone
+        getList();
+    }
 }
 
 QString
