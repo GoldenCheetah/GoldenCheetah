@@ -1069,6 +1069,10 @@ FileStoreSyncDialog::syncNext()
         check->setChecked(false);
     }
     progressLabel->setText(QString(tr("Processed %1 of %2 successfully")).arg(successful).arg(downloadtotal));
+
+    // save the ride cache, we don't want to lose that if we crash etc.
+    context->athlete->rideCache->save();
+
     return false;
 }
 
@@ -1118,6 +1122,10 @@ FileStoreSyncDialog::downloadNext()
         check->setChecked(false);
     }
     progressLabel->setText(QString(tr("Downloaded %1 of %2 successfully")).arg(successful).arg(downloadtotal));
+
+    // save the ride cache, we don't want to lose that if we crash etc.
+    context->athlete->rideCache->save();
+
     return false;
 }
 

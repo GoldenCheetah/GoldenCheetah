@@ -42,18 +42,20 @@ class ChooseCyclistDialog : public QDialog
     public:
         ChooseCyclistDialog(const QDir &home, bool allowNew);
         QString choice();
+        void getList();
         static QString newCyclistDialog(QDir &homeDir, QWidget *parent);
 
     private slots:
         void newClicked();
         void cancelClicked();
-        void enableOk(QListWidgetItem *item);
+        void enableOkDelete(QListWidgetItem *item);
+        void deleteClicked();
 
     private:
 
         QDir home;
         QListWidget *listWidget;
-        QPushButton *okButton, *newButton, *cancelButton;
+        QPushButton *okButton, *newButton, *cancelButton, *deleteButton;
 };
 
 #endif // _GC_ChooseCyclistDialog_h
