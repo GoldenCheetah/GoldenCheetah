@@ -40,6 +40,11 @@ static void recursiveDelete(QDir dir)
             dir.rmdir(name);
         } else dir.remove(name);
     }
+
+    // on a mac .DS_Store gets created and we should wipe it
+#ifdef Q_OS_MAC
+    if (QFileInfo(dir.absolutePath() + "/.DS_Store").exists()) dir.remove(".DS_Store");
+#endif
 }
 
 ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : home(home)
