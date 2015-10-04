@@ -150,7 +150,7 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
     {
         distance = buffer.toDouble()/1000.0; // Distance comes in meters
     }
-    else if (qName == "Bikepower")
+    else if (qName == "BikePower")
     {
         watts = buffer.toDouble();
     }
