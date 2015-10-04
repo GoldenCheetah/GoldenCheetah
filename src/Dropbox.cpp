@@ -127,7 +127,7 @@ Dropbox::readdir(QString path, QStringList &errors)
     // do we have a token
     QString token = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "").toString();
     if (token == "") {
-        errors << "You must authorise with Dropbox first";
+        errors << tr("You must authorise with Dropbox first");
         return returning;
     }
 
@@ -249,7 +249,7 @@ Dropbox::writeFile(QByteArray &data, QString remotename)
 void
 Dropbox::writeFileCompleted()
 {
-    notifyWriteComplete(replyName(static_cast<QNetworkReply*>(QObject::sender())), "Completed.");
+    notifyWriteComplete(replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Completed."));
 }
 
 void
@@ -263,5 +263,5 @@ void
 Dropbox::readFileCompleted()
 {
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
-    notifyReadComplete(buffers.value(reply), replyName(reply), "Completed.");
+    notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
 }
