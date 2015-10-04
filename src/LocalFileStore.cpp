@@ -16,21 +16,21 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "NetworkFileStore.h"
+#include "LocalFileStore.h"
 #include "Athlete.h"
 #include "Settings.h"
 
-NetworkFileStore::NetworkFileStore(Context *context) : FileStore(context), context(context), root_(NULL) {
+LocalFileStore::LocalFileStore(Context *context) : FileStore(context), context(context), root_(NULL) {
 
 }
 
-NetworkFileStore::~NetworkFileStore() {
+LocalFileStore::~LocalFileStore() {
 
 }
 
 // open by connecting and getting a basic list of folders available
 bool
-NetworkFileStore::open(QStringList &errors)
+LocalFileStore::open(QStringList &errors)
 {
 
     QString folder = appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString();
@@ -59,7 +59,7 @@ NetworkFileStore::open(QStringList &errors)
 }
 
 bool 
-NetworkFileStore::close()
+LocalFileStore::close()
 {
     // nothing to do for now
     return true;
@@ -67,20 +67,20 @@ NetworkFileStore::close()
 
 // home dire
 QString
-NetworkFileStore::home()
+LocalFileStore::home()
 {
     return appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString();
 }
 
 bool
-NetworkFileStore::createFolder(QString path)
+LocalFileStore::createFolder(QString path)
 {
     // not used for this FileStore, since the standard QFileDialog is used to define the Directory
     return false;
 }
 
 QList<FileStoreEntry*> 
-NetworkFileStore::readdir(QString path, QStringList &errors)
+LocalFileStore::readdir(QString path, QStringList &errors)
 {
     QList<FileStoreEntry*> returning;
 
@@ -113,7 +113,7 @@ NetworkFileStore::readdir(QString path, QStringList &errors)
 
 // read a file at location (relative to home) into passed array
 bool
-NetworkFileStore::readFile(QByteArray *data, QString remotename)
+LocalFileStore::readFile(QByteArray *data, QString remotename)
 {
 
     // is the path set ?
@@ -141,7 +141,7 @@ NetworkFileStore::readFile(QByteArray *data, QString remotename)
 }
 
 bool 
-NetworkFileStore::writeFile(QByteArray &data, QString remotename)
+LocalFileStore::writeFile(QByteArray &data, QString remotename)
 {
 
     // is the path set ?
