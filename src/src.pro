@@ -427,6 +427,7 @@ HEADERS += \
         MUPlot.h \
         MUPool.h \
         MUWidget.h \
+        NetworkFileStore.h \
         NewCyclistDialog.h \
         NullController.h \
         OAuthDialog.h \
@@ -665,6 +666,7 @@ SOURCES += \
         MoxyDevice.cpp \
         MUPlot.cpp \
         MUWidget.cpp \
+        NetworkFileStore.cpp \
         NewCyclistDialog.cpp \
         NullController.cpp \
         OAuthDialog.cpp \

@@ -80,6 +80,7 @@
 #if QT_VERSION > 0x050000
 #include "Dropbox.h"
 #endif
+#include "NetworkFileStore.h"
 #include "FileStore.h"
 
 // GUI Widgets
@@ -606,6 +607,9 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("Upload to &Dropbox"), this, SLOT(uploadDropbox()), tr("Ctrl+R"));
     rideMenu->addAction(tr("Synchronise Dropbox..."), this, SLOT(syncDropbox()), tr("Ctrl+O"));
 #endif
+    rideMenu->addSeparator ();
+    rideMenu->addAction(tr("Upload to Shared Network Folder"), this, SLOT(uploadNetworkFileStore()));
+    rideMenu->addAction(tr("Synchronise Shared Network Folder..."), this, SLOT(syncNetworkFileStore()));
 #ifdef GC_HAVE_SOAP
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+T"));
@@ -1981,6 +1985,30 @@ MainWindow::syncDropbox()
 }
 
 #endif
+
+/*----------------------------------------------------------------------
+ * Network File Share (e.g. a mounted WebDAV folder)
+ *--------------------------------------------------------------------*/
+void
+MainWindow::uploadNetworkFileStore()
+{
+    // upload current ride, if we have one
+    if (currentTab->context->ride) {
+        NetworkFileStore db(currentTab->context);
+        FileStore::upload(this, &db, currentTab->context->ride);
+    }
+}
+
+void
+MainWindow::syncNetworkFileStore()
+{
+    // upload current ride, if we have one
+    NetworkFileStore db(currentTab->context);
+    FileStoreSyncDialog upload(currentTab->context, &db);
+    upload.exec();
+}
+
+
 /*----------------------------------------------------------------------
  * TrainingPeaks.com
  *--------------------------------------------------------------------*/
