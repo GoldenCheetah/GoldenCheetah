@@ -196,6 +196,7 @@ class CredentialsPage : public QScrollArea
         void authoriseCyclingAnalytics();
         void authoriseGoogleCalendar();
         void dvCALDAVTypeChanged(int);
+        void chooseNetworkFileStoreFolder();
 
     private:
         Context *context;
@@ -212,7 +213,9 @@ class CredentialsPage : public QScrollArea
 
         QComboBox *dvCALDAVType;
         QPushButton *stravaAuthorise, *stravaAuthorised, *twitterAuthorised, *dropboxAuthorised, *dropboxBrowse;
+        QPushButton *networkFileStoreFolderBrowse;
         QLineEdit *dropboxFolder;
+        QLineEdit *networkFileStoreFolder;
         QPushButton *cyclingAnalyticsAuthorise, *cyclingAnalyticsAuthorised;
         QPushButton *googleCalendarAuthorise, *googleCalendarAuthorised;
 

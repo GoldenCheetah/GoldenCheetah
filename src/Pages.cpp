@@ -39,6 +39,7 @@
 #if QT_VERSION >= 0x050000
 #include "Dropbox.h"
 #endif
+#include "NetworkFileStore.h"
 
 //
 // Main Config Page - tabs for each sub-page
@@ -414,6 +415,27 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 #endif
 
     //////////////////////////////////////////////////
+    // Network FileStore
+
+
+    QLabel *nfs = new QLabel(tr("Shared Network Folder"));
+    nfs->setFont(current);
+    grid->addWidget(nfs, ++row, 0);
+
+    // Selecting the storage folder folder of the Network File Store
+    QLabel *networkFileStoreFolderLabel = new QLabel(tr("Shared Network Athlete Folder"));
+    networkFileStoreFolder = new QLineEdit(this);
+    networkFileStoreFolder->setText(appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString());
+    networkFileStoreFolderBrowse = new QPushButton(tr("Browse"));
+    connect(networkFileStoreFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseNetworkFileStoreFolder()));
+    QHBoxLayout *nwfsfchoose = new QHBoxLayout;
+    nwfsfchoose->addWidget(networkFileStoreFolder);
+    nwfsfchoose->addWidget(networkFileStoreFolderBrowse);
+    grid->addWidget(networkFileStoreFolderLabel, ++row, 0);
+    grid->addLayout(nwfsfchoose, row, 1);
+
+
+    //////////////////////////////////////////////////
     // Strava
 
     QLabel *str = new QLabel(tr("Strava"));
@@ -707,6 +729,8 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
 }
 
+
+
 void CredentialsPage::chooseDropboxFolder()
 {
 #if QT_VERSION >= 0x050000 // only in QT5 or higher
@@ -734,6 +758,19 @@ void CredentialsPage::chooseDropboxFolder()
     if (ret == QDialog::Accepted) dropboxFolder->setText(dialog.pathnameSelected());
 #endif
 }
+
+
+void CredentialsPage::chooseNetworkFileStoreFolder()
+{
+    // did the user type something ? if not, get it from the Settings
+    QString path = networkFileStoreFolder->text();
+    if (path == "") path = appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString();
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Shared Network Folder Athlete Directory"),
+                            path, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (dir != "") networkFileStoreFolder->setText(dir);  //only overwrite current dir, if a new was selected
+
+}
+
 
 #ifdef GC_HAVE_KQOAUTH
 void CredentialsPage::authoriseTwitter()
@@ -839,6 +876,7 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_FOLDER, dropboxFolder->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, networkFileStoreFolder->text());
 
     // escape the at character
     QString url = dvURL->text();

@@ -188,6 +188,8 @@ class MainWindow : public QMainWindow
         void uploadDropbox();
         void syncDropbox();
 #endif
+        void uploadNetworkFileStore();
+        void syncNetworkFileStore();
         void importFile();
         void splitRide();
         void mergeRide();
