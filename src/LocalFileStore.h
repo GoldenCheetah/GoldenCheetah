@@ -30,7 +30,7 @@ class LocalFileStore : public FileStore {
         LocalFileStore(Context *context);
         ~LocalFileStore();
 
-        QString name() { return (tr("Shared Network Folder")); }
+        QString name() { return (tr("Local Store ") + home()); }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);
