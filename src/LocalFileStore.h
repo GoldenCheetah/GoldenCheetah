@@ -16,19 +16,19 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef GC_NetworkFileStore_h
-#define GC_NetworkFileStore_h
+#ifndef GC_LocalFileStore_h
+#define GC_LocalFileStore_h
 
 #include "FileStore.h"
 
-class NetworkFileStore : public FileStore {
+class LocalFileStore : public FileStore {
 
     Q_OBJECT
 
     public:
 
-        NetworkFileStore(Context *context);
-        ~NetworkFileStore();
+        LocalFileStore(Context *context);
+        ~LocalFileStore();
 
         QString name() { return (tr("Shared Network Folder")); }
 

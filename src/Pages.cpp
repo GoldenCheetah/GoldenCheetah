@@ -39,7 +39,7 @@
 #if QT_VERSION >= 0x050000
 #include "Dropbox.h"
 #endif
-#include "NetworkFileStore.h"
+#include "LocalFileStore.h"
 
 //
 // Main Config Page - tabs for each sub-page
@@ -415,19 +415,19 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 #endif
 
     //////////////////////////////////////////////////
-    // Network FileStore
+    // Local FileStore
 
 
-    QLabel *nfs = new QLabel(tr("Shared Network Folder"));
+    QLabel *nfs = new QLabel(tr("Shared Local Folder"));
     nfs->setFont(current);
     grid->addWidget(nfs, ++row, 0);
 
-    // Selecting the storage folder folder of the Network File Store
-    QLabel *networkFileStoreFolderLabel = new QLabel(tr("Shared Network Athlete Folder"));
+    // Selecting the storage folder folder of the Local File Store
+    QLabel *networkFileStoreFolderLabel = new QLabel(tr("Shared Local Athlete Folder"));
     networkFileStoreFolder = new QLineEdit(this);
     networkFileStoreFolder->setText(appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString());
     networkFileStoreFolderBrowse = new QPushButton(tr("Browse"));
-    connect(networkFileStoreFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseNetworkFileStoreFolder()));
+    connect(networkFileStoreFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseLocalFileStoreFolder()));
     QHBoxLayout *nwfsfchoose = new QHBoxLayout;
     nwfsfchoose->addWidget(networkFileStoreFolder);
     nwfsfchoose->addWidget(networkFileStoreFolderBrowse);
@@ -760,12 +760,12 @@ void CredentialsPage::chooseDropboxFolder()
 }
 
 
-void CredentialsPage::chooseNetworkFileStoreFolder()
+void CredentialsPage::chooseLocalFileStoreFolder()
 {
     // did the user type something ? if not, get it from the Settings
     QString path = networkFileStoreFolder->text();
     if (path == "") path = appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString();
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Shared Network Folder Athlete Directory"),
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Shared Local Folder Athlete Directory"),
                             path, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     if (dir != "") networkFileStoreFolder->setText(dir);  //only overwrite current dir, if a new was selected
 

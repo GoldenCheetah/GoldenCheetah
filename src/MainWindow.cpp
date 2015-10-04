@@ -80,7 +80,7 @@
 #if QT_VERSION > 0x050000
 #include "Dropbox.h"
 #endif
-#include "NetworkFileStore.h"
+#include "LocalFileStore.h"
 #include "FileStore.h"
 
 // GUI Widgets
@@ -608,8 +608,8 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("Synchronise Dropbox..."), this, SLOT(syncDropbox()), tr("Ctrl+O"));
 #endif
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("Upload to Shared Network Folder"), this, SLOT(uploadNetworkFileStore()));
-    rideMenu->addAction(tr("Synchronise Shared Network Folder..."), this, SLOT(syncNetworkFileStore()));
+    rideMenu->addAction(tr("Write to Local Store"), this, SLOT(uploadLocalFileStore()));
+    rideMenu->addAction(tr("Synchronise Local Store..."), this, SLOT(syncLocalFileStore()));
 #ifdef GC_HAVE_SOAP
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+T"));
@@ -1990,20 +1990,20 @@ MainWindow::syncDropbox()
  * Network File Share (e.g. a mounted WebDAV folder)
  *--------------------------------------------------------------------*/
 void
-MainWindow::uploadNetworkFileStore()
+MainWindow::uploadLocalFileStore()
 {
     // upload current ride, if we have one
     if (currentTab->context->ride) {
-        NetworkFileStore db(currentTab->context);
+        LocalFileStore db(currentTab->context);
         FileStore::upload(this, &db, currentTab->context->ride);
     }
 }
 
 void
-MainWindow::syncNetworkFileStore()
+MainWindow::syncLocalFileStore()
 {
     // upload current ride, if we have one
-    NetworkFileStore db(currentTab->context);
+    LocalFileStore db(currentTab->context);
     FileStoreSyncDialog upload(currentTab->context, &db);
     upload.exec();
 }

@@ -196,7 +196,7 @@ class CredentialsPage : public QScrollArea
         void authoriseCyclingAnalytics();
         void authoriseGoogleCalendar();
         void dvCALDAVTypeChanged(int);
-        void chooseNetworkFileStoreFolder();
+        void chooseLocalFileStoreFolder();
 
     private:
         Context *context;
