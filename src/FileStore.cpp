@@ -98,7 +98,7 @@ FileStore::uncompressRide(QByteArray *data, QString name, QStringList &errors)
 {
     // make sure its named as we expect
     if (!name.endsWith("-zip")) {
-        errors << "expected compressed activity file.";
+        errors << tr("expected compressed activity file.");
         return NULL;
     }
 
@@ -378,7 +378,7 @@ FileStoreDialog::setFiles(FileStoreEntry *fse)
 
         // type
         if (p->isDir) {
-            item->setText(1, "Folder");
+            item->setText(1, tr("Folder"));
             item->setText(0, p->name);
             item->setIcon(0, provider.icon(QFileIconProvider::Folder));
         } else {
@@ -502,11 +502,11 @@ FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store)
     // ride list
     rideListDown = new QTreeWidget(this);
     rideListDown->headerItem()->setText(0, " ");
-    rideListDown->headerItem()->setText(1, "Workout Id");
-    rideListDown->headerItem()->setText(2, "Date");
-    rideListDown->headerItem()->setText(3, "Time");
-    rideListDown->headerItem()->setText(4, "Exists");
-    rideListDown->headerItem()->setText(5, "Status");
+    rideListDown->headerItem()->setText(1, tr("Workout Id"));
+    rideListDown->headerItem()->setText(2, tr("Date"));
+    rideListDown->headerItem()->setText(3, tr("Time"));
+    rideListDown->headerItem()->setText(4, tr("Exists"));
+    rideListDown->headerItem()->setText(5, tr("Status"));
     rideListDown->setColumnCount(6);
     rideListDown->setSelectionMode(QAbstractItemView::SingleSelection);
     rideListDown->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
@@ -528,13 +528,13 @@ FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store)
     // ride list
     rideListUp = new QTreeWidget(this);
     rideListUp->headerItem()->setText(0, " ");
-    rideListUp->headerItem()->setText(1, "File");
-    rideListUp->headerItem()->setText(2, "Date");
-    rideListUp->headerItem()->setText(3, "Time");
-    rideListUp->headerItem()->setText(4, "Duration");
-    rideListUp->headerItem()->setText(5, "Distance");
-    rideListUp->headerItem()->setText(6, "Exists");
-    rideListUp->headerItem()->setText(7, "Status");
+    rideListUp->headerItem()->setText(1, tr("File"));
+    rideListUp->headerItem()->setText(2, tr("Date"));
+    rideListUp->headerItem()->setText(3, tr("Time"));
+    rideListUp->headerItem()->setText(4, tr("Duration"));
+    rideListUp->headerItem()->setText(5, tr("Distance"));
+    rideListUp->headerItem()->setText(6, tr("Exists"));
+    rideListUp->headerItem()->setText(7, tr("Status"));
     rideListUp->setColumnCount(8);
     rideListUp->setSelectionMode(QAbstractItemView::SingleSelection);
     rideListUp->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
@@ -567,13 +567,13 @@ FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store)
     // ride list
     rideListSync = new QTreeWidget(this);
     rideListSync->headerItem()->setText(0, " ");
-    rideListSync->headerItem()->setText(1, "Source");
-    rideListSync->headerItem()->setText(2, "Date");
-    rideListSync->headerItem()->setText(3, "Time");
-    rideListSync->headerItem()->setText(4, "Duration");
-    rideListSync->headerItem()->setText(5, "Distance");
-    rideListSync->headerItem()->setText(6, "Action");
-    rideListSync->headerItem()->setText(7, "Status");
+    rideListSync->headerItem()->setText(1, tr("Source"));
+    rideListSync->headerItem()->setText(2, tr("Date"));
+    rideListSync->headerItem()->setText(3, tr("Time"));
+    rideListSync->headerItem()->setText(4, tr("Duration"));
+    rideListSync->headerItem()->setText(5, tr("Distance"));
+    rideListSync->headerItem()->setText(6, tr("Action"));
+    rideListSync->headerItem()->setText(7, tr("Status"));
     rideListSync->setColumnCount(8);
     rideListSync->setSelectionMode(QAbstractItemView::SingleSelection);
     rideListSync->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
@@ -593,7 +593,7 @@ FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store)
 
     // show progress
     progressBar = new QProgressBar(this);
-    progressLabel = new QLabel("Initial", this);
+    progressLabel = new QLabel(tr("Initial"), this);
 
     overwrite = new QCheckBox(tr("Overwrite existing files"), this);
 
@@ -906,7 +906,7 @@ FileStoreSyncDialog::refreshUpCount()
         QCheckBox *check = (QCheckBox*)rideListUp->itemWidget(curr, 0);
         if (check->isChecked()) selected++;
     }
-    progressLabel->setText(QString("%1 of %2 selected").arg(selected)
+    progressLabel->setText(QString(tr("%1 of %2 selected")).arg(selected)
                             .arg(rideListUp->invisibleRootItem()->childCount()));
 }
 
@@ -920,7 +920,7 @@ FileStoreSyncDialog::refreshSyncCount()
         QCheckBox *check = (QCheckBox*)rideListSync->itemWidget(curr, 0);
         if (check->isChecked()) selected++;
     }
-    progressLabel->setText(QString("%1 of %2 selected").arg(selected)
+    progressLabel->setText(QString(tr("%1 of %2 selected")).arg(selected)
                             .arg(rideListSync->invisibleRootItem()->childCount()));
 }
 
@@ -934,7 +934,7 @@ FileStoreSyncDialog::refreshCount()
         QCheckBox *check = (QCheckBox*)rideListDown->itemWidget(curr, 0);
         if (check->isChecked()) selected++;
     }
-    progressLabel->setText(QString("%1 of %2 selected").arg(selected)
+    progressLabel->setText(QString(tr("%1 of %2 selected")).arg(selected)
                             .arg(rideListDown->invisibleRootItem()->childCount()));
 }
 
@@ -1041,7 +1041,7 @@ FileStoreSyncDialog::syncNext()
                     return true;
 
                 } else {
-                    curr->setText(7, "Parse failure");
+                    curr->setText(7, tr("Parse failure"));
                     QApplication::processEvents();
                 }
 
@@ -1208,7 +1208,7 @@ FileStoreSyncDialog::uploadNext()
                     return true;
 
             } else {
-                curr->setText(7, "Parse failure");
+                curr->setText(7, tr("Parse failure"));
                 QApplication::processEvents();
             }
         }
@@ -1278,7 +1278,7 @@ FileStoreSyncDialog::saveRide(RideFile *ride, QStringList &errors)
     // exists?
     QFileInfo fileinfo(filename);
     if (fileinfo.exists() && overwrite->isChecked() == false) {
-        errors << "File exists";
+        errors << tr("File exists");
         return false;
     }
 
