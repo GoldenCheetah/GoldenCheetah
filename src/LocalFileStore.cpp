@@ -20,7 +20,15 @@
 #include "Athlete.h"
 #include "Settings.h"
 
-LocalFileStore::LocalFileStore(Context *context) : FileStore(context), context(context), root_(NULL) {
+LocalFileStore::LocalFileStore(Context *context) : FileStore(context), context(context) {
+
+    // we have a root
+    root_ = newFileStoreEntry();
+
+    // root is always root on a local file store
+    root_->name = "/";
+    root_->isDir = true;
+    root_->size = 1;
 
 }
 
@@ -45,14 +53,6 @@ LocalFileStore::open(QStringList &errors)
         return false;
     }
 
-    // we have a root
-    root_ = newFileStoreEntry();
-
-    // path name
-    root_->name = folder_dir.canonicalPath();
-    root_->isDir = true;
-    root_->size = 1;
-
     // ok so far ?
     if (errors.count()) return false;
     return true;
@@ -75,7 +75,11 @@ LocalFileStore::home()
 bool
 LocalFileStore::createFolder(QString path)
 {
-    // not used for this FileStore, since the standard QFileDialog is used to define the Directory
+    // create a folder on the store e.g. preferences / for a backup etc
+    QDir directory = QFileInfo(path).dir();
+    if (directory.exists())
+        return directory.mkdir(QFileInfo(path).fileName());
+
     return false;
 }
 
@@ -92,6 +96,9 @@ LocalFileStore::readdir(QString path, QStringList &errors)
 
     QFileInfoList files = current_path.entryInfoList();
     foreach (QFileInfo info, files) {
+
+        // skip . and ..
+        if (info.fileName() == "." || info.fileName() == "..") continue;
 
         FileStoreEntry *add = newFileStoreEntry();
 
