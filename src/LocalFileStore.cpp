@@ -135,7 +135,7 @@ LocalFileStore::readFile(QByteArray *data, QString remotename)
         return false;
     };
 
-    emit readComplete(data, "", tr("Completed"));
+    emit readComplete(data, "", tr("Completed."));
 
     return true;
 }
@@ -168,7 +168,7 @@ LocalFileStore::writeFile(QByteArray &data, QString remotename)
         return false;
     };
 
-    emit writeComplete("", tr("Completed"));
+    emit writeComplete("", tr("Completed."));
 
     return true;
 }
