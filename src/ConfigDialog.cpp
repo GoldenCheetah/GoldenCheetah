@@ -131,6 +131,9 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     athlete->setWhatsThis(athleteHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About));
     pagesWidget->addWidget(athlete);
 
+    // units change on general affects units used on entry in athlete pages
+    connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->athletePage, SLOT(unitChanged(int)));
+
     password = new PasswordConfig(_home, _zones, context);
     HelpWhatsThis *passwordHelp = new HelpWhatsThis(password);
     password->setWhatsThis(passwordHelp->getWhatsThisText(HelpWhatsThis::Preferences_Passwords));
