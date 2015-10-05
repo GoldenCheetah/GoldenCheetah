@@ -77,6 +77,7 @@ class GeneralPage : public QWidget
         qint32 saveClicked();
 
         QString athleteWAS; // remember what we started with !
+        QComboBox *unitCombo;
 
     public slots:
         void browseWorkoutDir();
@@ -98,8 +99,6 @@ class GeneralPage : public QWidget
         QLineEdit *workoutDirectory;
         QPushButton *workoutBrowseButton;
         QPushButton *athleteBrowseButton;
-        QComboBox *unitCombo;
-
 
         QLabel *langLabel;
         QLabel *warningLabel;

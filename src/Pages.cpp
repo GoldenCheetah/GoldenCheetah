@@ -105,9 +105,6 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(unitlabel, 1,0, Qt::AlignRight);
     configLayout->addWidget(unitCombo, 1,1, Qt::AlignLeft);
 
-    connect (unitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(unitChanged(int)));
-
-
     //
     // Garmin crap
     //
