@@ -596,31 +596,8 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
     rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
     rideMenu->addSeparator ();
-    shareAction = new QAction(tr("Share Online..."), this);
-    shareAction->setShortcut(tr("Ctrl+U"));
-    connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
-    rideMenu->addAction(shareAction);
     rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), tr("Ctrl+E"));
     rideMenu->addAction(tr("&Batch export..."), this, SLOT(exportBatch()), tr("Ctrl+B"));
-#if QT_VERSION > 0x050000
-    rideMenu->addSeparator ();
-    rideMenu->addAction(tr("Upload to &Dropbox"), this, SLOT(uploadDropbox()), tr("Ctrl+R"));
-    rideMenu->addAction(tr("Synchronise Dropbox..."), this, SLOT(syncDropbox()), tr("Ctrl+O"));
-#endif
-    rideMenu->addSeparator ();
-    rideMenu->addAction(tr("Write to Local Store"), this, SLOT(uploadLocalFileStore()));
-    rideMenu->addAction(tr("Synchronise Local Store..."), this, SLOT(syncLocalFileStore()));
-#ifdef GC_HAVE_SOAP
-    rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+T"));
-    rideMenu->addAction(tr("Synchronise TrainingPeaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
-#endif
-
-#ifdef GC_HAVE_KQOAUTH
-    tweetAction = new QAction(tr("Tweet activity"), this);
-    connect(tweetAction, SIGNAL(triggered(bool)), this, SLOT(tweetRide()));
-    rideMenu->addAction(tweetAction);
-#endif
 
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
@@ -631,6 +608,38 @@ MainWindow::MainWindow(const QDir &home)
 
     HelpWhatsThis *helpRideMenu = new HelpWhatsThis(rideMenu);
     rideMenu->setWhatsThis(helpRideMenu->getWhatsThisText(HelpWhatsThis::MenuBar_Activity));
+
+    // SHARE MENU
+    QMenu *shareMenu = menuBar()->addMenu("Sha&re");
+    shareAction = new QAction(tr("Share Online..."), this);
+    shareAction->setShortcut(tr("Ctrl+U"));
+    connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
+    shareMenu->addAction(shareAction);
+#ifdef GC_HAVE_KQOAUTH
+    tweetAction = new QAction(tr("Tweet activity"), this);
+    connect(tweetAction, SIGNAL(triggered(bool)), this, SLOT(tweetRide()));
+    shareMenu->addAction(tweetAction);
+#endif
+#ifdef GC_HAVE_ICAL
+    shareMenu->addSeparator();
+    shareMenu->addAction(tr("Upload Activity to Calendar"), this, SLOT(uploadCalendar()), tr (""));
+    //optionsMenu->addAction(tr("Import Calendar..."), this, SLOT(importCalendar()), tr ("")); // planned for v3.1
+    //optionsMenu->addAction(tr("Export Calendar..."), this, SLOT(exportCalendar()), tr ("")); // planned for v3.1
+    shareMenu->addAction(tr("Refresh Calendar"), this, SLOT(refreshCalendar()), tr (""));
+#endif
+    shareMenu->addSeparator ();
+    shareMenu->addAction(tr("Write to Local Store"), this, SLOT(uploadLocalFileStore()));
+    shareMenu->addAction(tr("Synchronise Local Store..."), this, SLOT(syncLocalFileStore()));
+#if QT_VERSION > 0x050000
+    shareMenu->addSeparator ();
+    shareMenu->addAction(tr("Upload to &Dropbox"), this, SLOT(uploadDropbox()), tr("Ctrl+R"));
+    shareMenu->addAction(tr("Synchronise Dropbox..."), this, SLOT(syncDropbox()), tr("Ctrl+O"));
+#endif
+#ifdef GC_HAVE_SOAP
+    shareMenu->addSeparator ();
+    shareMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+T"));
+    shareMenu->addAction(tr("Synchronise TrainingPeaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
+#endif
 
     // TOOLS MENU
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
@@ -648,13 +657,6 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addAction(tr("Import workouts or videos..."), this, SLOT(importWorkout()));
     optionsMenu->addAction(tr("Scan disk for videos and workouts..."), this, SLOT(manageLibrary()));
 
-#ifdef GC_HAVE_ICAL
-    optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("Upload Activity to Calendar"), this, SLOT(uploadCalendar()), tr (""));
-    //optionsMenu->addAction(tr("Import Calendar..."), this, SLOT(importCalendar()), tr ("")); // planned for v3.1
-    //optionsMenu->addAction(tr("Export Calendar..."), this, SLOT(exportCalendar()), tr ("")); // planned for v3.1
-    optionsMenu->addAction(tr("Refresh Calendar"), this, SLOT(refreshCalendar()), tr (""));
-#endif
     optionsMenu->addAction(tr("Create Heat Map..."), this, SLOT(generateHeatMap()), tr(""));
     optionsMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
     optionsMenu->addSeparator();
