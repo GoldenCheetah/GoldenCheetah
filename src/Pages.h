@@ -150,7 +150,6 @@ class RiderPage : public QWidget
         QComboBox *crankLengthCombo;
         QComboBox *rimSizeCombo;
         QComboBox *tireSizeCombo;
-        QCheckBox *useCPForFTPCheckBox;
         QLineEdit *wheelSizeEdit;
         QLabel *perfManSTSLabel;
         QLabel *perfManLTSLabel;
@@ -677,6 +676,7 @@ class CPPage : public QWidget
 
     public:
         CPPage(ZonePage *parent);
+        QCheckBox *useCPForFTPCheckBox;
 
     public slots:
         void addClicked();

@@ -894,6 +894,11 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
 {
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
+#ifdef Q_OS_MAX
+    setContentsMargins(10,10,10,10);
+    grid->setSpacing(5);
+    all->setSpacing(5);
+#endif
 
     QLabel *nicklabel = new QLabel(tr("Nickname"));
     QLabel *doblabel = new QLabel(tr("Date of Birth"));
@@ -1044,41 +1049,35 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
     showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
 
-     // Use CP for FTP
-    QVariant useCPForFTP = appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, Qt::Checked);
-    useCPForFTPCheckBox = new QCheckBox(tr("Use CP for FTP"), this);
-    useCPForFTPCheckBox->setCheckState(useCPForFTP.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
-
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
 
     grid->addWidget(nicklabel, 0, 0, alignment);
     grid->addWidget(doblabel, 1, 0, alignment);
     grid->addWidget(sexlabel, 2, 0, alignment);
-    grid->addWidget(weightlabel, 4, 0, alignment);
-    grid->addWidget(heightlabel, 5, 0, alignment);
-    grid->addWidget(wbaltaulabel, 6, 0, alignment);
+    grid->addWidget(weightlabel, 3, 0, alignment);
+    grid->addWidget(heightlabel, 4, 0, alignment);
+    grid->addWidget(wbaltaulabel, 5, 0, alignment);
 
     grid->addWidget(nickname, 0, 1, alignment);
     grid->addWidget(dob, 1, 1, alignment);
     grid->addWidget(sex, 2, 1, alignment);
-    grid->addWidget(weight, 4, 1, alignment);
-    grid->addWidget(height, 5, 1, alignment);
-    grid->addWidget(wbaltau, 6, 1, alignment);
+    grid->addWidget(weight, 3, 1, alignment);
+    grid->addWidget(height, 4, 1, alignment);
+    grid->addWidget(wbaltau, 5, 1, alignment);
 
 
-    grid->addWidget(crankLengthLabel, 7, 0, alignment);
-    grid->addWidget(crankLengthCombo, 7, 1, alignment);
-    grid->addWidget(wheelSizeLabel, 8, 0, alignment);
-    grid->addLayout(wheelSizeLayout, 8, 1, 1, 2, alignment);
-    grid->addWidget(perfManSTSLabel, 9, 0, alignment);
-    grid->addWidget(perfManSTSavg, 9, 1, alignment);
-    grid->addWidget(perfManLTSLabel, 10, 0, alignment);
-    grid->addWidget(perfManLTSavg, 10, 1, alignment);
-    grid->addWidget(showSBToday, 11, 1, alignment);
-    grid->addWidget(useCPForFTPCheckBox, 12, 1, alignment);
+    grid->addWidget(crankLengthLabel, 6, 0, alignment);
+    grid->addWidget(crankLengthCombo, 6, 1, alignment);
+    grid->addWidget(wheelSizeLabel, 7, 0, alignment);
+    grid->addLayout(wheelSizeLayout, 7, 1, 1, 2, alignment);
+    grid->addWidget(perfManSTSLabel, 8, 0, alignment);
+    grid->addWidget(perfManSTSavg, 8, 1, alignment);
+    grid->addWidget(perfManLTSLabel, 9, 0, alignment);
+    grid->addWidget(perfManLTSavg, 9, 1, alignment);
+    grid->addWidget(showSBToday, 10, 1, alignment);
 
-    grid->addWidget(biolabel, 13, 0, alignment);
-    grid->addWidget(bio, 14, 0, 1, 3);
+    grid->addWidget(biolabel, 11, 0, alignment);
+    grid->addWidget(bio, 12, 0, 1, 3);
 
     grid->addWidget(avatarButton, 0, 1, 5, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
@@ -1168,8 +1167,6 @@ RiderPage::saveClicked()
 
     appsettings->setCValue(context->athlete->cyclist, GC_CRANKLENGTH, crankLengthCombo->currentText());
     appsettings->setCValue(context->athlete->cyclist, GC_WHEELSIZE, wheelSizeEdit->text().toInt());
-
-    appsettings->setCValue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, useCPForFTPCheckBox->checkState());
 
     // Performance Manager
     appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
@@ -3266,6 +3263,10 @@ ZonePage::saveClicked()
     QFile zonesFile(context->athlete->home->config().canonicalPath() + "/power.zones");
     context->athlete->zones_->read(zonesFile);
 
+    // use CP for FTP?
+    appsettings->setCValue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, cpPage->useCPForFTPCheckBox->checkState());
+
+
     // did we change ?
     if (zones.getFingerprint() != b4Fingerprint) return CONFIG_ZONES;
     else return 0;
@@ -3482,6 +3483,11 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     dateEdit = new QDateEdit;
     dateEdit->setDate(QDate::currentDate());
 
+     // Use CP for FTP
+    bool useCPForFTP = appsettings->cvalue(zonePage->context->athlete->cyclist, GC_USE_CP_FOR_FTP, Qt::Checked).toBool();
+    useCPForFTPCheckBox = new QCheckBox(tr("Use CP for FTP"), this);
+    useCPForFTPCheckBox->setCheckState(useCPForFTP ? Qt::Checked : Qt::Unchecked);
+
     cpEdit = new QDoubleSpinBox;
     cpEdit->setMinimum(0);
     cpEdit->setMaximum(1000);
@@ -3515,13 +3521,6 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     actionButtons->addWidget(ftpLabel);
     actionButtons->addWidget(ftpEdit);
 
-    bool useCPForFTP = (appsettings->cvalue(zonePage->context->athlete->cyclist, GC_USE_CP_FOR_FTP, "1").toString() == "0");
-
-    if (useCPForFTP) {
-        ftpLabel->setVisible(true);
-        ftpEdit->setVisible(true);
-    }
-
     actionButtons->addWidget(wLabel);
     actionButtons->addWidget(wEdit);
     actionButtons->addWidget(pmaxLabel);
@@ -3535,6 +3534,7 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     addLayout->addWidget(dateLabel);
     addLayout->addWidget(dateEdit);
     addLayout->addStretch();
+    addLayout->addWidget(useCPForFTPCheckBox);
 
     ranges = new QTreeWidget;
     int column = 0;
@@ -3639,8 +3639,6 @@ CPPage::addClicked()
         return;
     }
 
-    bool useCPForFTP = (appsettings->cvalue(zonePage->context->athlete->cyclist, GC_USE_CP_FOR_FTP, "1").toString() == "0");
-
     //int index = ranges->invisibleRootItem()->childCount();
     int wp = wEdit->value() ? wEdit->value() : 20000;
     if (wp < 1000) wp *= 1000; // entered in kJ we want joules
@@ -3662,10 +3660,8 @@ CPPage::addClicked()
     // CP
     add->setText(column++, QString("%1").arg(cpEdit->value()));
 
-    if (useCPForFTP){
-        // FTP
-        add->setText(column++, QString("%1").arg(ftpEdit->value()));
-    }
+    // FTP
+    add->setText(column++, QString("%1").arg(ftpEdit->value()));
 
     // W'
     add->setText(column++, QString("%1").arg(wp));
@@ -3690,10 +3686,8 @@ CPPage::editClicked()
         err.exec();
         return;
     }
-    bool useCPForFTP = (appsettings->cvalue(zonePage->context->athlete->cyclist, GC_USE_CP_FOR_FTP, "1").toString() == "0");
 
     int ftp = ftpEdit->value() ? ftpEdit->value() : cp;
-
     int wp = wEdit->value() ? wEdit->value() : 20000;
     if (wp < 1000) wp *= 1000; // entered in kJ we want joules
 
@@ -3713,11 +3707,8 @@ CPPage::editClicked()
     zonePage->zones.setCP(index, cp);
     edit->setText(columns++, QString("%1").arg(cp));
 
-    if (useCPForFTP){
-        // FTP
-        zonePage->zones.setFTP(index, ftp);
-        edit->setText(columns++, QString("%1").arg(ftp));
-    }
+    zonePage->zones.setFTP(index, ftp);
+    edit->setText(columns++, QString("%1").arg(ftp));
 
     // W'
     zonePage->zones.setWprime(index, wp);
