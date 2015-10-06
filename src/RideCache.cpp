@@ -164,6 +164,8 @@ RideCache::itemChanged()
 void
 RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
 {
+    RideItem *prior = context->ride;
+
     // ignore malformed names
     QDateTime dt;
     if (!RideFile::parseRideFileName(name, &dt)) return;
@@ -200,6 +202,11 @@ RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
     last->refresh();
 
     if (dosignal) context->notifyRideAdded(last); // here so emitted BEFORE rideSelected is emitted!
+
+    // free up memory from last one, which is no biggie when importing
+    // a single ride, but means we don't exhaust memory when we import
+    // hundreds/thousands of rides in a batch import.
+    if (prior) prior->close();
 
     // notify everyone to select it
     context->ride = last;

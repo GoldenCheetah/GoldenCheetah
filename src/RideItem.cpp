@@ -401,12 +401,23 @@ RideItem::isOpen()
 void
 RideItem::close()
 {
+    // ride data
     if (ride_) {
         // break link to ride file
         foreach(IntervalItem *x, intervals()) x->rideInterval = NULL;
         delete ride_;
         ride_ = NULL;
     }
+
+    // and the cpx data
+    if (fileCache_) {
+    	delete fileCache_;
+	fileCache_=NULL;
+    }
+
+    // and the intervals
+    foreach(IntervalItem*x, intervals_) delete x;
+    intervals_.clear();
 }
 
 void
