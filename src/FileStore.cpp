@@ -1098,7 +1098,7 @@ FileStoreSyncDialog::downloadNext()
             rideListDown->setCurrentItem(curr);
             progressLabel->setText(QString(tr("Downloaded %1 of %2")).arg(downloadcounter).arg(downloadtotal));
 
-            QByteArray *data = new QByteArray;
+            QByteArray *data = new QByteArray; // gets deleted when read completes
             store->readFile(data, curr->text(1));
             QApplication::processEvents();
             return true;
@@ -1145,7 +1145,8 @@ FileStoreSyncDialog::completedRead(QByteArray *data, QString name, QString messa
     // uncompress and parse
     QStringList errors;
     RideFile *ride = store->uncompressRide(data, name, errors);
-    
+
+    // was allocated in before calling readfile
     delete data;
 
     progressBar->setValue(++downloadcounter);
@@ -1158,6 +1159,9 @@ FileStoreSyncDialog::completedRead(QByteArray *data, QString name, QString messa
         } else {
             curr->setText(col, errors.join(" "));
         }
+
+	// delete once saved
+	delete ride;
     } else {
         curr->setText(col, errors.join(" "));
     }
