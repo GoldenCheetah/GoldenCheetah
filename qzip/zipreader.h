@@ -63,7 +63,7 @@ QT_BEGIN_NAMESPACE
 
 class ZipReaderPrivate;
 
-class Q_GUI_EXPORT ZipReader
+class ZipReader
 {
 public:
     ZipReader(const QString &fileName, QIODevice::OpenMode mode = QIODevice::ReadOnly );
@@ -76,7 +76,7 @@ public:
     bool isReadable() const;
     bool exists() const;
 
-    struct Q_GUI_EXPORT FileInfo
+    struct FileInfo
     {
         FileInfo();
         FileInfo(const FileInfo &other);
