@@ -309,6 +309,11 @@ SOURCES +=  ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp
                 $$HTPATH/staticfilecontroller.cpp
 }
 
+# qzipreader/qzipwriter always
+HEADERS += ../qzip/zipreader.h \
+           ../qzip/zipwriter.h
+SOURCES += ../qzip/zip.cpp
+
 HEADERS += $${LOCALHEADERS}
 SOURCE += $${LOCALSOURCE}
 HEADERS += \
