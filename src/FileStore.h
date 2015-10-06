@@ -94,7 +94,7 @@ class FileStore : public QObject {
         // UTILITY
         void mapReply(QNetworkReply *reply, QString name) { replymap_.insert(reply,name); }
         QString replyName(QNetworkReply *reply) { return replymap_.value(reply,""); }
-        void compressRide(RideFile*ride, QByteArray &data);
+        void compressRide(RideFile*ride, QByteArray &data, QString name);
         RideFile *uncompressRide(QByteArray *data, QString name, QStringList &errors);
 
         // PUBLIC INTERFACES. DO NOT REIMPLEMENT

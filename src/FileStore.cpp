@@ -30,7 +30,9 @@
 #include <QMessageBox>
 #include <QHeaderView>
 
-#include <zlib.h>
+#include "../qzip/ZipWriter.h"
+#include "../qzip/ZipReader.h"
+
 //
 // FILESTORE BASE CLASS
 //
@@ -71,45 +73,69 @@ FileStore::upload(QWidget *parent, FileStore *store, RideItem *item)
 }
 
 void
-FileStore::compressRide(RideFile*ride, QByteArray &data)
+FileStore::compressRide(RideFile*ride, QByteArray &data, QString name)
 {
     // compress via a temporary file
     QTemporaryFile tempfile;
-    if (tempfile.open()) {
-        QString tempname = tempfile.fileName();
+    tempfile.open();
+    tempfile.close();
 
-        // write
-        QFile out(tempname);
-        if (RideFileFactory::instance().writeRideFile(NULL, ride, out, "json") == true) {
+    // write as json
+    QFile jsonFile(tempfile.fileName());
+    if (RideFileFactory::instance().writeRideFile(NULL, ride, jsonFile, "json") == true) {
 
-            // read the whole thing back and compress it
-            out.open(QFile::ReadOnly);
+        // create a temp zip file
+        QTemporaryFile zipFile;
+        zipFile.open();
+        zipFile.close();
 
-            // compress it
-            data = qCompress(out.readAll());
-            out.close();
-        }
+        // add files using zip writer
+        QString zipname = zipFile.fileName();
+        ZipWriter writer(zipname);
+
+        // read the ride file back and add to zip file
+        jsonFile.open(QFile::ReadOnly);
+        writer.addFile(name, jsonFile.readAll());
+        jsonFile.close();
+        writer.close();
+
+        // now read in the zipfile
+        QFile zip(zipname);
+        zip.open(QFile::ReadOnly);
+        data = zip.readAll();
+        zip.close();
     }
 }
 
-// name is the source name (i.e. what it is called on the file store (xxxxx.json-zip)
+// name is the source name (i.e. what it is called on the file store (xxxxx.json.zip)
 RideFile *
 FileStore::uncompressRide(QByteArray *data, QString name, QStringList &errors)
 {
     // make sure its named as we expect
-    if (!name.endsWith("-zip")) {
+    if (!name.endsWith(".json.zip")) {
         errors << tr("expected compressed activity file.");
         return NULL;
     }
 
-    // uncompress and write to tmp without the -zip
+    // write out to a zip file first
+    QTemporaryFile zipfile;
+    zipfile.open();
+    zipfile.write(*data);
+    zipfile.close();
+
+    // open zip
+    ZipReader reader(zipfile.fileName());
+    ZipReader::FileInfo info = reader.entryInfoAt(0);
+    QByteArray jsonData = reader.fileData(info.filePath);
+
+    // uncompress and write to tmp without the .zip
     name = name.mid(0, name.length()-4);
     QString tmp = context->athlete->home->temp().absolutePath() + "/" + QFileInfo(name).baseName() + "." + QFileInfo(name).suffix();
     
     // uncompress and write a file
     QFile file(tmp);
     file.open(QFile::WriteOnly);
-    file.write(qUncompress(*data));
+    file.write(jsonData);
     file.close();
 
     // read the file in using the correct ridefile reader
@@ -125,7 +151,7 @@ FileStore::uncompressRide(QByteArray *data, QString name, QStringList &errors)
 FileStoreUploadDialog::FileStoreUploadDialog(QWidget *parent, FileStore *store, RideItem *item) : QDialog(parent), store(store), item(item)
 {
     // get a compressed version
-    store->compressRide(item->ride(), data);
+    store->compressRide(item->ride(), data, QFileInfo(item->fileName).baseName() + ".json");
 
     // setup the gui!
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -147,7 +173,7 @@ FileStoreUploadDialog::FileStoreUploadDialog(QWidget *parent, FileStore *store, 
     connect(store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completed(QString,QString)));
 
     // ok, so now we can kickoff the upload
-    store->writeFile(data, item->fileName + "-zip");
+    store->writeFile(data, QFileInfo(item->fileName).baseName() + ".json.zip");
 }
 
 void
@@ -1033,10 +1059,10 @@ FileStoreSyncDialog::syncNext()
 
                     // get a compressed version
                     QByteArray data;
-                    store->compressRide(ride, data);
+                    store->compressRide(ride, data, QFileInfo(curr->text(1)).baseName() + ".json");
                     delete ride; // clean up!
 
-                    store->writeFile(data, curr->text(1) + "-zip");
+                    store->writeFile(data, QFileInfo(curr->text(1)).baseName() + ".json.zip");
                     QApplication::processEvents();
                     return true;
 
@@ -1204,10 +1230,10 @@ FileStoreSyncDialog::uploadNext()
 
                     // get a compressed version
                     QByteArray data;
-                    store->compressRide(ride, data);
+                    store->compressRide(ride, data, QFileInfo(curr->text(1)).baseName() + ".json");
                     delete ride; // clean up!
 
-                    store->writeFile(data, curr->text(1) + "-zip");
+                    store->writeFile(data, QFileInfo(curr->text(1)).baseName() + ".json.zip");
                     QApplication::processEvents();
                     return true;
 
