@@ -30,8 +30,8 @@
 #include <QMessageBox>
 #include <QHeaderView>
 
-#include "../qzip/ZipWriter.h"
-#include "../qzip/ZipReader.h"
+#include "../qzip/zipwriter.h"
+#include "../qzip/zipreader.h"
 
 //
 // FILESTORE BASE CLASS
