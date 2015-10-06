@@ -414,10 +414,6 @@ RideItem::close()
     	delete fileCache_;
 	fileCache_=NULL;
     }
-
-    // and the intervals
-    foreach(IntervalItem*x, intervals_) delete x;
-    intervals_.clear();
 }
 
 void
