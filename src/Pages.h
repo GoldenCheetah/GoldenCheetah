@@ -841,7 +841,7 @@ class PaceSchemePage : public QWidget
 
 
     public:
-        PaceSchemePage(PaceZonePage *parent);
+        PaceSchemePage(PaceZones* paceZones);
         PaceZoneScheme getScheme();
         qint32 saveClicked();
 
@@ -851,7 +851,7 @@ class PaceSchemePage : public QWidget
         void renameClicked();
 
     private:
-        PaceZonePage *zonePage;
+        PaceZones* paceZones;
         QTreeWidget *scheme;
         QPushButton *addButton, *renameButton, *deleteButton;
 };
@@ -863,7 +863,7 @@ class CVPage : public QWidget
 
 
     public:
-        CVPage(PaceZonePage *parent);
+        CVPage(PaceZones* paceZones, PaceSchemePage *schemePage);
         QCheckBox *metric;
 
     public slots:
@@ -883,7 +883,8 @@ class CVPage : public QWidget
         QDateEdit *dateEdit;
         QTimeEdit *cvEdit;
 
-        PaceZonePage *zonePage;
+        PaceZones* paceZones;
+        PaceSchemePage *schemePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
         QPushButton *addButton, *deleteButton, *defaultButton;
@@ -900,15 +901,8 @@ class PaceZonePage : public QWidget
     public:
 
         PaceZonePage(Context *);
-        ~PaceZonePage() { delete zones; }
+        ~PaceZonePage();
         qint32 saveClicked();
-
-        PaceZones* zones;
-        quint16 b4Fingerprint; // how did it start ?
-
-        // Children talk to each other
-        PaceSchemePage *schemePage;
-        CVPage *cvPage;
 
     public slots:
 
@@ -916,17 +910,23 @@ class PaceZonePage : public QWidget
     protected:
 
         Context *context;
-        bool changed;
 
         QTabWidget *tabs;
 
     private:
 
+        static const int nSports = 2;
+
         QLabel *sportLabel;
         QComboBox *sportCombo;
 
+        PaceZones* paceZones[nSports];
+        quint16 b4Fingerprint[nSports]; // how did it start ?
+        PaceSchemePage* schemePages[nSports];
+        CVPage* cvPages[nSports];
+
     private slots:
-        void changeSport();
+        void changeSport(int i);
 
 };
 
