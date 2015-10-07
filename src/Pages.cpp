@@ -4685,57 +4685,66 @@ PaceZonePage::PaceZonePage(Context *context) : context(context)
     hlayout->addWidget(sportCombo);
     hlayout->addStretch();
     layout->addLayout(hlayout);
-    connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSport()));
-    zones = NULL;
-    tabs = NULL;
+    connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSport(int)));
+    tabs = new QTabWidget(this);
+    layout->addWidget(tabs);
+
+    for (int i=0; i < nSports; i++) {
+        paceZones[i] = new PaceZones(i > 0);
+
+        // get current config by reading it in (leave mainwindow zones alone)
+        QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + paceZones[i]->fileName());
+        if (zonesFile.exists()) {
+            paceZones[i]->read(zonesFile);
+            zonesFile.close();
+            b4Fingerprint[i] = paceZones[i]->getFingerprint(); // remember original state
+        }
+
+        // setup maintenance pages using current config
+        schemePages[i] = new PaceSchemePage(paceZones[i]);
+        cvPages[i] = new CVPage(paceZones[i], schemePages[i]);
+    }
+
     // finish setup for the default sport
-    changeSport();
+    changeSport(sportCombo->currentIndex());
+}
+
+PaceZonePage::~PaceZonePage()
+{
+    for (int i=0; i<nSports; i++) delete paceZones[i];
 }
 
 void
-PaceZonePage::changeSport()
+PaceZonePage::changeSport(int i)
 {
-    delete zones;
-    zones = new PaceZones(sportCombo->currentIndex() > 0);
-
-    // get current config by reading it in (leave mainwindow zones alone)
-    QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + zones->fileName());
-    if (zonesFile.exists()) {
-        zones->read(zonesFile);
-        zonesFile.close();
-        b4Fingerprint = zones->getFingerprint(); // remember original state
-    }
-
-    // setup maintenance pages using current config
-    delete tabs; // schemePage & cvPage deleted by parent-child relationship
-    schemePage = new PaceSchemePage(this);
-    cvPage = new CVPage(this);
-
-    tabs = new QTabWidget(this);
-    tabs->addTab(cvPage, tr("Critical Velocity"));
-    tabs->addTab(schemePage, tr("Default"));
-
-    layout()->addWidget(tabs);
+    // change tabs according to the selected sport
+    tabs->clear();
+    tabs->addTab(cvPages[i], tr("Critical Velocity"));
+    tabs->addTab(schemePages[i], tr("Default"));
 }
 
 qint32
 PaceZonePage::saveClicked()
 {
+    qint32 changed = 0;
     // write it
-    appsettings->setValue(zones->paceSetting(), cvPage->metric->isChecked());
-    zones->setScheme(schemePage->getScheme());
-    zones->write(context->athlete->home->config());
+    for (int i=0; i < nSports; i++) {
+        appsettings->setValue(paceZones[i]->paceSetting(), cvPages[i]->metric->isChecked());
+        paceZones[i]->setScheme(schemePages[i]->getScheme());
+        paceZones[i]->write(context->athlete->home->config());
 
-    // reread Pace zones
-    QFile pacezonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->pacezones_[sportCombo->currentIndex()]->fileName());
-    context->athlete->pacezones_[sportCombo->currentIndex()]->read(pacezonesFile);
+        // reread Pace zones
+        QFile pacezonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->pacezones_[i]->fileName());
+        context->athlete->pacezones_[i]->read(pacezonesFile);
 
-    // did we change ?
-    if (zones->getFingerprint() != b4Fingerprint) return CONFIG_ZONES;
-    else return 0;
+        // did we change ?
+        if (paceZones[i]->getFingerprint() != b4Fingerprint[i])
+            changed = CONFIG_ZONES;
+    }
+    return changed;
 }
 
-PaceSchemePage::PaceSchemePage(PaceZonePage* zonePage) : zonePage(zonePage)
+PaceSchemePage::PaceSchemePage(PaceZones* paceZones) : paceZones(paceZones)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -4768,15 +4777,15 @@ PaceSchemePage::PaceSchemePage(PaceZonePage* zonePage) : zonePage(zonePage)
     //scheme->header()->resizeSection(2,80);
 
     // setup list
-    for (int i=0; i< zonePage->zones->getScheme().nzones_default; i++) {
+    for (int i=0; i< paceZones->getScheme().nzones_default; i++) {
 
         QTreeWidgetItem *add = new QTreeWidgetItem(scheme->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);
 
         // tab name
-        add->setText(0, zonePage->zones->getScheme().zone_default_name[i]);
+        add->setText(0, paceZones->getScheme().zone_default_name[i]);
         // field name
-        add->setText(1, zonePage->zones->getScheme().zone_default_desc[i]);
+        add->setText(1, paceZones->getScheme().zone_default_desc[i]);
 
         // low
         QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
@@ -4784,7 +4793,7 @@ PaceSchemePage::PaceSchemePage(PaceZonePage* zonePage) : zonePage(zonePage)
         loedit->setMaximum(1000);
         loedit->setSingleStep(1.0);
         loedit->setDecimals(0);
-        loedit->setValue(zonePage->zones->getScheme().zone_default[i]);
+        loedit->setValue(paceZones->getScheme().zone_default[i]);
         scheme->setItemWidget(add, 2, loedit);
     }
 
@@ -4896,7 +4905,8 @@ PaceSchemePage::getScheme()
     return results;
 }
 
-CVPage::CVPage(PaceZonePage* zonePage) : zonePage(zonePage)
+CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
+               paceZones(paceZones), schemePage(schemePage)
 {
     active = false;
 
@@ -4939,15 +4949,15 @@ CVPage::CVPage(PaceZonePage* zonePage) : zonePage(zonePage)
 
     // CV default is 4min/km for Running a round number inline with
     // CP default and 1:36min/100 for swimming (4:1 relation)
-    cvEdit = new QTimeEdit(QTime::fromString(zonePage->zones->isSwim() ? "01:36" : "04:00", "mm:ss"));
+    cvEdit = new QTimeEdit(QTime::fromString(paceZones->isSwim() ? "01:36" : "04:00", "mm:ss"));
     cvEdit->setMinimumTime(QTime::fromString("01:00", "mm:ss"));
     cvEdit->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
     cvEdit->setDisplayFormat("mm:ss");
 
     per = new QLabel(this);
     metric = new QCheckBox(tr("Metric Pace"));
-    metric->setChecked(appsettings->value(this, zonePage->zones->paceSetting(), true).toBool());
-    per->setText(zonePage->zones->paceUnits(metric->isChecked()));
+    metric->setChecked(appsettings->value(this, paceZones->paceSetting(), true).toBool());
+    per->setText(paceZones->paceUnits(metric->isChecked()));
     if (!metric->isChecked()) metricChanged(); // default is metric
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
@@ -4977,28 +4987,28 @@ CVPage::CVPage(PaceZonePage* zonePage) : zonePage(zonePage)
     //ranges->header()->resizeSection(0,180);
 
     // setup list of ranges
-    for (int i=0; i< zonePage->zones->getRangeSize(); i++) {
+    for (int i=0; i< paceZones->getRangeSize(); i++) {
 
         QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);
 
         // Embolden ranges with manually configured zones
         QFont font;
-        font.setWeight(zonePage->zones->getZoneRange(i).zonesSetFromCV ?
+        font.setWeight(paceZones->getZoneRange(i).zonesSetFromCV ?
                                         QFont::Normal : QFont::Black);
 
         // date
-        add->setText(0, zonePage->zones->getStartDate(i).toString(tr("MMM d, yyyy")));
+        add->setText(0, paceZones->getStartDate(i).toString(tr("MMM d, yyyy")));
         add->setFont(0, font);
 
         // CV
-        double kph = zonePage->zones->getCV(i);
+        double kph = paceZones->getCV(i);
 
         add->setText(1, QString("%1 %2 %3 %4")
-                    .arg(zonePage->zones->kphToPaceString(kph, true))
-                    .arg(zonePage->zones->paceUnits(true))
-                    .arg(zonePage->zones->kphToPaceString(kph, false))
-                    .arg(zonePage->zones->paceUnits(false)));
+                    .arg(paceZones->kphToPaceString(kph, true))
+                    .arg(paceZones->paceUnits(true))
+                    .arg(paceZones->kphToPaceString(kph, false))
+                    .arg(paceZones->paceUnits(false)));
         add->setFont(1, font);
 
     }
@@ -5036,18 +5046,18 @@ void
 CVPage::metricChanged()
 {
     // Switch between metric and imperial!
-    per->setText(zonePage->zones->paceUnits(metric->isChecked()));
-    double kphCV = zonePage->zones->kphFromTime(cvEdit, !metric->isChecked());
-    cvEdit->setTime(QTime::fromString(zonePage->zones->kphToPaceString(kphCV, metric->isChecked()), "mm:ss"));
+    per->setText(paceZones->paceUnits(metric->isChecked()));
+    double kphCV = paceZones->kphFromTime(cvEdit, !metric->isChecked());
+    cvEdit->setTime(QTime::fromString(paceZones->kphToPaceString(kphCV, metric->isChecked()), "mm:ss"));
 }
 
 void
 CVPage::addClicked()
 {
     // get current scheme
-    zonePage->zones->setScheme(zonePage->schemePage->getScheme());
+    paceZones->setScheme(schemePage->getScheme());
 
-    int cp = zonePage->zones->kphFromTime(cvEdit, metric->isChecked());
+    int cp = paceZones->kphFromTime(cvEdit, metric->isChecked());
     if( cp <= 0 ){
         QMessageBox err;
         err.setText(tr("CV must be > 0"));
@@ -5056,7 +5066,7 @@ CVPage::addClicked()
         return;
     }
 
-    int index = zonePage->zones->addZoneRange(dateEdit->date(), zonePage->zones->kphFromTime(cvEdit, metric->isChecked()));
+    int index = paceZones->addZoneRange(dateEdit->date(), paceZones->kphFromTime(cvEdit, metric->isChecked()));
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
@@ -5067,13 +5077,13 @@ CVPage::addClicked()
     add->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
 
     // CV
-    double kph = zonePage->zones->kphFromTime(cvEdit, metric->isChecked());
+    double kph = paceZones->kphFromTime(cvEdit, metric->isChecked());
 
     add->setText(1, QString("%1 %2 %3 %4")
-            .arg(zonePage->zones->kphToPaceString(kph, true))
-            .arg(zonePage->zones->paceUnits(true))
-            .arg(zonePage->zones->kphToPaceString(kph, false))
-            .arg(zonePage->zones->paceUnits(false)));
+            .arg(paceZones->kphToPaceString(kph, true))
+            .arg(paceZones->paceUnits(true))
+            .arg(paceZones->kphToPaceString(kph, false))
+            .arg(paceZones->paceUnits(false)));
 
 }
 
@@ -5083,7 +5093,7 @@ CVPage::deleteClicked()
     if (ranges->currentItem()) {
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         delete ranges->invisibleRootItem()->takeChild(index);
-        zonePage->zones->deleteRange(index);
+        paceZones->deleteRange(index);
     }
 }
 
@@ -5093,7 +5103,7 @@ CVPage::defaultClicked()
     if (ranges->currentItem()) {
 
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        PaceZoneRange current = zonePage->zones->getZoneRange(index);
+        PaceZoneRange current = paceZones->getZoneRange(index);
 
         // unbold
         QFont font;
@@ -5104,8 +5114,8 @@ CVPage::defaultClicked()
 
 
         // set the range to use defaults on the scheme page
-        zonePage->zones->setScheme(zonePage->schemePage->getScheme());
-        zonePage->zones->setZonesFromCV(index);
+        paceZones->setScheme(schemePage->getScheme());
+        paceZones->setZonesFromCV(index);
 
         // hide the default button since we are now using defaults
         defaultButton->hide();
@@ -5130,14 +5140,14 @@ CVPage::rangeSelectionChanged()
     if (ranges->currentItem()) {
 
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        PaceZoneRange current = zonePage->zones->getZoneRange(index);
+        PaceZoneRange current = paceZones->getZoneRange(index);
 
         if (current.zonesSetFromCV) {
 
             // reapply the scheme in case it has been changed
-            zonePage->zones->setScheme(zonePage->schemePage->getScheme());
-            zonePage->zones->setZonesFromCV(index);
-            current = zonePage->zones->getZoneRange(index);
+            paceZones->setScheme(schemePage->getScheme());
+            paceZones->setZonesFromCV(index);
+            current = paceZones->getZoneRange(index);
 
             defaultButton->hide();
 
@@ -5154,7 +5164,7 @@ CVPage::rangeSelectionChanged()
             add->setText(1, current.zones[i].desc);
 
             // low
-            QTimeEdit *loedit = new QTimeEdit(QTime::fromString(zonePage->zones->kphToPaceString(current.zones[i].lo, metric->isChecked()), "mm:ss"), this);
+            QTimeEdit *loedit = new QTimeEdit(QTime::fromString(paceZones->kphToPaceString(current.zones[i].lo, metric->isChecked()), "mm:ss"), this);
             loedit->setMinimumTime(QTime::fromString("00:00", "mm:ss"));
             loedit->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
             loedit->setDisplayFormat("mm:ss");
@@ -5243,7 +5253,7 @@ CVPage::zonesChanged()
         if (ranges->currentItem()) {
 
             int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-            PaceZoneRange current = zonePage->zones->getZoneRange(index);
+            PaceZoneRange current = paceZones->getZoneRange(index);
 
             // embolden that range on the list to show it has been edited
             QFont font;
@@ -5263,7 +5273,7 @@ CVPage::zonesChanged()
             for (int i=0; i< zones->invisibleRootItem()->childCount(); i++) {
                 QTreeWidgetItem *item = zones->invisibleRootItem()->child(i);
                 QTimeEdit *loTimeEdit = (QTimeEdit*)zones->itemWidget(item, 2);
-                double kph = loTimeEdit->time() == QTime(0,0,0) ? 0.0 : zonePage->zones->kphFromTime(loTimeEdit, metric->isChecked());
+                double kph = loTimeEdit->time() == QTime(0,0,0) ? 0.0 : paceZones->kphFromTime(loTimeEdit, metric->isChecked());
                 zoneinfos << PaceZoneInfo(item->text(0),
                                       item->text(1),
                                       kph,
@@ -5283,7 +5293,7 @@ CVPage::zonesChanged()
             current.zones = zoneinfos;
 
             // now replace the current range struct
-            zonePage->zones->setZoneRange(index, current);
+            paceZones->setZoneRange(index, current);
         }
     }
 }
