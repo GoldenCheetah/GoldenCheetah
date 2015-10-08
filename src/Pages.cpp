@@ -3033,7 +3033,7 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
         // Auto or Manual run?
         QComboBox *comboButton = new QComboBox(this);
         comboButton->addItem(tr("Manual"));
-        comboButton->addItem(tr("Auto"));
+        comboButton->addItem(tr("Import"));
         processorTree->setItemWidget(add, 1, comboButton);
 
         QString configsetting = QString("dp/%1/apply").arg(i.key());
@@ -3060,7 +3060,7 @@ ProcessorPage::saveClicked()
     // call each processor config widget's saveConfig() to
     // write away separately
     for (int i=0; i<processorTree->invisibleRootItem()->childCount(); i++) {
-        // auto or manual?
+        // auto (which means run on import) or manual?
         QString configsetting = QString("dp/%1/apply").arg(processorTree->invisibleRootItem()->child(i)->text(3));
         QString apply = ((QComboBox*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 1)))->currentIndex() ?
                         "Auto" : "Manual";

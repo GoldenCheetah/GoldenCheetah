@@ -655,8 +655,6 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
             i->stop -= timeOffset;
         }
 
-        DataProcessorFactory::instance().autoProcess(result);
-
         // calculate derived data series -- after data fixers applied above
         if (context) result->recalculateDerivedSeries();
 
