@@ -613,6 +613,7 @@ SOURCES += \
         FixGPS.cpp \
         FixMoxy.cpp \
         FixPower.cpp \
+        FixSpeed.cpp \
         FixSpikes.cpp \
         FixTorque.cpp \
         FixHRSpikes.cpp \

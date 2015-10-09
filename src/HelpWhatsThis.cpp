@@ -149,6 +149,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Menu%20Bar_Tools#tool-fix-hr-spikes").arg(tr("Fix HR Spikes"));
     case MenuBar_Edit_FixPowerSpikes:
         return text.arg("Menu%20Bar_Toolss#tool-fix-power-spikes").arg(tr("Fix Power Spikes"));
+    case MenuBar_Edit_FixSpeed:
+        return text.arg("Menu%20Bar_Toolss#tool-fix-speed").arg(tr("Fix Speed"));
 
     case MenuBar_View:
         return text.arg("Menu%20Bar_View").arg(tr("Options to show/hide views (e.g. Sidebar) as well as adding charts and resetting chart layouts to factory settings"));
