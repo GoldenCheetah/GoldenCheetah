@@ -415,7 +415,12 @@ TcxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
     QByteArray xml = toByteArray(context, ride, true, true, true, true);
 
     if (!file.open(QIODevice::WriteOnly)) return(false);
-    if (file.write(xml) != xml.size()) return(false);
+    file.resize(0);
+    QTextStream out(&file);
+    out.setCodec("UTF-8");
+    out.setGenerateByteOrderMark(true);
+    out << xml;
+    out.flush();
     file.close();
     return(true);
 }
