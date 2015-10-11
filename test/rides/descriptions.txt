@@ -86,3 +86,7 @@ Move_2014_01_17_09_33_11.gpx
 moxy.fit
    A moxy .fit file with smO2 and thb data.
 
+2015-09-27-0755_Road_Cycling_WF.tcx
+  Contains out of bound values for speed and power that can cause
+  crashes when making assumptions about data values in code.
+
