@@ -1080,7 +1080,7 @@ RideItem::updateIntervals()
 
 
             // add the best one we found here
-            if (found) {
+            if (found && tte.zone >= 0) {
 
                 // if we overlap with the last one and
                 // we are better then replace otherwise skip
