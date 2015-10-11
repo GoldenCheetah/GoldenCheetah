@@ -519,6 +519,24 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 newsmo2 = 0.1f * double (((message[10] & 0xc0)>>6) + (message[11]<<2));
                 break;
 
+            case ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT:
+            {
+                switch (data_page)
+                {
+                case FITNESS_EQUIPMENT_GENERAL_PAGE:
+                    fecSpeed = (message[9] << 8) | message[8];
+                    break;
+
+                case FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE:
+                    fecCadence = message[6];
+                    fecInstantPower = message[9];
+                    fecInstantPower |= (message[10] & 0x0F) << 8;
+                    break;
+                }
+
+                break;
+            }
+
             case ANTChannel::CHANNEL_TYPE_TACX_VORTEX:
             {
                 const uint8_t* const payload = message + 4;
@@ -885,4 +903,12 @@ ANTMessage ANTMessage::kickrInitSpindown(const unsigned char channel, ushort usD
 {
     return ANTMessage(5, ANT_BROADCAST_DATA, channel, // broadcast
            KICKR_READ_MODE, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8)); // preamble
+}
+
+ANTMessage ANTMessage::fecSetTargetPower(const uint8_t channel, const uint16_t targetPower)
+{
+    // unit is 0.25W, but targetPower are full watts and theres no trainer with that precision anyway
+    uint16_t powerValue = targetPower * 4;
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      0x31, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, (uint8_t)(powerValue & 0xFF), (uint8_t)(powerValue >> 8));
 }

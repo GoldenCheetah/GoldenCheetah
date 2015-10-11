@@ -67,6 +67,8 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
                 ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Remote Control", 'r', ":images/IconCadence.png" },
   { true, ANTChannel::CHANNEL_TYPE_TACX_VORTEX, ANT_SPORT_TACX_VORTEX_PERIOD, ANT_SPORT_TACX_VORTEX_TYPE,
                 ANT_TACX_VORTEX_FREQUENCY, DEFAULT_NETWORK_NUMBER, "Tacx Vortex Smart", 'v', ":images/IconPower.png" },
+  { true, ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT, ANT_SPORT_FITNESS_EQUIPMENT_PERIOD, ANT_SPORT_FITNESS_EQUIPMENT_TYPE,
+                ANT_FITNESS_EQUIPMENT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Fitness Equipment Control (FE-C)", 'f', ":images/IconPower.png" },
   { false, ANTChannel::CHANNEL_TYPE_GUARD, 0, 0, 0, 0, "", '\0', "" }
 };
 
@@ -103,6 +105,8 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString cyclist) : QThre
 
     // vortex
     vortexID = vortexChannel = -1;
+
+    fecChannel = -1;
 
     // current and desired modes/load/gradients
     // set so first time through current != desired
@@ -269,6 +273,17 @@ ANT::setLoad(double load)
         qDebug() << "setting vortex target power to " << load;
         sendMessage(ANTMessage::tacxVortexSetPower(vortexChannel, vortexID, (int)load));
     }
+
+    if (fecChannel != -1)
+    {
+        qDebug() << "setting fitness equipment target power to " << load;
+        sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
+    }
+}
+
+void ANT::refreshFecLoad()
+{
+    sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
 }
 
 void ANT::refreshVortexLoad()
@@ -402,6 +417,7 @@ ANT::setup()
             if (channels > 4) {
                 addDevice(0, ANTChannel::CHANNEL_TYPE_SandC, 4);
                 addDevice(0, ANTChannel::CHANNEL_TYPE_MOXY, 5);
+                addDevice(0, ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT, 6);
             }
         }
     }
@@ -1128,4 +1144,9 @@ void ANT::setVortexData(int channel, int id)
 {
     vortexChannel = channel;
     vortexID = id;
+}
+
+void ANT::setFecChannel(int channel)
+{
+    fecChannel = channel;
 }
