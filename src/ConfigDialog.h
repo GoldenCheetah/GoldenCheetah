@@ -62,7 +62,8 @@ class AthleteConfig : public QWidget
 
     public:
         AthleteConfig(QDir home, Zones *zones, Context *context);
-        RiderPage *athletePage;
+        AboutRiderPage *athletePage;
+        RiderPhysPage *athletePhysPage;
 
     public slots:
         qint32 saveClicked();
