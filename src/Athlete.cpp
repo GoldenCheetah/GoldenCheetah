@@ -46,6 +46,7 @@
 #include "LTMSettings.h"
 #include "RideImportWizard.h"
 #include "RideAutoImportConfig.h"
+#include "AthleteBackup.h"
 
 #include "Route.h"
 
@@ -185,6 +186,11 @@ Athlete::close()
     // set to latest so we don't repeat
     appsettings->setCValue(context->athlete->home->root().dirName(), GC_VERSION_USED, VERSION_LATEST);
     appsettings->setCValue(context->athlete->home->root().dirName(), GC_SAFEEXIT, true);
+
+    // run autobackup on close (if configured)
+    AthleteBackup *backup = new AthleteBackup(context);
+    backup->backupOnClose();
+
 }
 void
 Athlete::loadCharts()
