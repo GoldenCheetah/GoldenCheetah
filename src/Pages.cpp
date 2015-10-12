@@ -1049,6 +1049,24 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
     showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
 
+
+    //
+    // Auto Backup
+    //
+    // Selecting the storage folder folder of the Local File Store
+    QLabel *autoBackupFolderLabel = new QLabel(tr("Auto Backup Folder"));
+    autoBackupFolder = new QLineEdit(this);
+    autoBackupFolder->setText(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, "").toString());
+    autoBackupFolderBrowse = new QPushButton(tr("Browse"));
+    connect(autoBackupFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseAutoBackupFolder()));
+    autoBackupPeriod = new QSpinBox(this);
+    autoBackupPeriod->setMinimum(0);
+    autoBackupPeriod->setMaximum(9999);
+    autoBackupPeriod->setSingleStep(1);
+    QLabel *autoBackupPeriodLabel = new QLabel(tr("Auto Backup Period"));
+    autoBackupPeriod->setValue(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_PERIOD, 0).toInt());
+
+
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
 
     grid->addWidget(nicklabel, 0, 0, alignment);
@@ -1075,9 +1093,14 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     grid->addWidget(perfManLTSLabel, 9, 0, alignment);
     grid->addWidget(perfManLTSavg, 9, 1, alignment);
     grid->addWidget(showSBToday, 10, 1, alignment);
+    grid->addWidget(autoBackupFolderLabel, 11,0, alignment);
+    grid->addWidget(autoBackupFolder, 11, 1, alignment);
+    grid->addWidget(autoBackupFolderBrowse, 11, 2, alignment);
+    grid->addWidget(autoBackupPeriodLabel, 12, 0,alignment);
+    grid->addWidget(autoBackupPeriod, 12, 1, alignment);
 
-    grid->addWidget(biolabel, 11, 0, alignment);
-    grid->addWidget(bio, 12, 0, 1, 3);
+    grid->addWidget(biolabel, 13, 0, alignment);
+    grid->addWidget(bio, 14, 0, 1, 3);
 
     grid->addWidget(avatarButton, 0, 1, 5, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
@@ -1111,6 +1134,17 @@ RiderPage::chooseAvatar()
         avatarButton->setIcon(avatar.scaled(140,140));
         avatarButton->setIconSize(QSize(140,140));
     }
+}
+
+void RiderPage::chooseAutoBackupFolder()
+{
+    // did the user type something ? if not, get it from the Settings
+    QString path = autoBackupFolder->text();
+    if (path == "") path = appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, "").toString();
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Backup Directory"),
+                            path, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (dir != "") autoBackupFolder->setText(dir);  //only overwrite current dir, if a new was selected
+
 }
 
 void
@@ -1172,6 +1206,11 @@ RiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
     appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
     appsettings->setCValue(context->athlete->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
+
+    // Auto Backup
+    appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, autoBackupFolder->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_PERIOD, autoBackupPeriod->value());
+
 
     qint32 state=0;
 
