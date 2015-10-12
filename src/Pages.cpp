@@ -890,7 +890,7 @@ CredentialsPage::saveClicked()
 //
 // About me
 //
-RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
+AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
@@ -903,15 +903,6 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     QLabel *nicklabel = new QLabel(tr("Nickname"));
     QLabel *doblabel = new QLabel(tr("Date of Birth"));
     QLabel *sexlabel = new QLabel(tr("Sex"));
-    QLabel *biolabel = new QLabel(tr("Bio"));
-
-    QString weighttext = QString(tr("Weight (%1)")).arg(context->athlete->useMetricUnits ? tr("kg") : tr("lb"));
-    weightlabel = new QLabel(weighttext);
-
-    QString heighttext = QString(tr("Height (%1)")).arg(context->athlete->useMetricUnits ? tr("cm") : tr("in"));
-    heightlabel = new QLabel(heighttext);
-
-    wbaltaulabel = new QLabel(tr("W'bal tau (s)"));
 
     nickname = new QLineEdit(this);
     nickname->setText(appsettings->cvalue(context->athlete->cyclist, GC_NICKNAME, "").toString());
@@ -928,27 +919,6 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     // we set to 0 or 1 for male or female since this
     // is language independent (and for once the code is easier!)
     sex->setCurrentIndex(appsettings->cvalue(context->athlete->cyclist, GC_SEX).toInt());
-
-    weight = new QDoubleSpinBox(this);
-    weight->setMaximum(999.9);
-    weight->setMinimum(0.0);
-    weight->setDecimals(1);
-    weight->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() * (context->athlete->useMetricUnits ? 1.0 : LB_PER_KG));
-
-    height = new QDoubleSpinBox(this);
-    height->setMaximum(999.9);
-    height->setMinimum(0.0);
-    height->setDecimals(1);
-    height->setValue(appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble() * (context->athlete->useMetricUnits ? 100.0 : 100.0/CM_PER_INCH));
-
-    wbaltau = new QSpinBox(this);
-    wbaltau->setMinimum(30);
-    wbaltau->setMaximum(1200);
-    wbaltau->setSingleStep(10);
-    wbaltau->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt());
-
-    bio = new QTextEdit(this);
-    bio->setText(appsettings->cvalue(context->athlete->cyclist, GC_BIO).toString());
 
     if (QFileInfo(context->athlete->home->config().canonicalPath() + "/" + "avatar.png").exists())
         avatar = QPixmap(context->athlete->home->config().canonicalPath() + "/" + "avatar.png");
@@ -1027,30 +997,6 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
 
 
     //
-    // Performance manager
-    //
-
-    perfManSTSLabel = new QLabel(tr("STS average (days)"));
-    perfManLTSLabel = new QLabel(tr("LTS average (days)"));
-    perfManSTSavgValidator = new QIntValidator(1,21,this);
-    perfManLTSavgValidator = new QIntValidator(7,56,this);
-
-    // get config or set to defaults
-    QVariant perfManSTSVal = appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS);
-    if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0) perfManSTSVal = 7;
-    QVariant perfManLTSVal = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
-    if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0) perfManLTSVal = 42;
-
-    perfManSTSavg = new QLineEdit(perfManSTSVal.toString(),this);
-    perfManSTSavg->setValidator(perfManSTSavgValidator);
-    perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
-    perfManLTSavg->setValidator(perfManLTSavgValidator);
-
-    showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
-    showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
-
-
-    //
     // Auto Backup
     //
     // Selecting the storage folder folder of the Local File Store
@@ -1072,37 +1018,22 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     grid->addWidget(nicklabel, 0, 0, alignment);
     grid->addWidget(doblabel, 1, 0, alignment);
     grid->addWidget(sexlabel, 2, 0, alignment);
-    grid->addWidget(weightlabel, 3, 0, alignment);
-    grid->addWidget(heightlabel, 4, 0, alignment);
-    grid->addWidget(wbaltaulabel, 5, 0, alignment);
 
     grid->addWidget(nickname, 0, 1, alignment);
     grid->addWidget(dob, 1, 1, alignment);
     grid->addWidget(sex, 2, 1, alignment);
-    grid->addWidget(weight, 3, 1, alignment);
-    grid->addWidget(height, 4, 1, alignment);
-    grid->addWidget(wbaltau, 5, 1, alignment);
 
+    grid->addWidget(crankLengthLabel, 4, 0, alignment);
+    grid->addWidget(crankLengthCombo, 4, 1, alignment);
+    grid->addWidget(wheelSizeLabel, 5, 0, alignment);
+    grid->addLayout(wheelSizeLayout, 5, 1, 1, 2, alignment);
+    grid->addWidget(autoBackupFolderLabel, 7,0, alignment);
+    grid->addWidget(autoBackupFolder, 7, 1, alignment);
+    grid->addWidget(autoBackupFolderBrowse, 7, 2, alignment);
+    grid->addWidget(autoBackupPeriodLabel, 8, 0,alignment);
+    grid->addWidget(autoBackupPeriod, 8, 1, alignment);
 
-    grid->addWidget(crankLengthLabel, 6, 0, alignment);
-    grid->addWidget(crankLengthCombo, 6, 1, alignment);
-    grid->addWidget(wheelSizeLabel, 7, 0, alignment);
-    grid->addLayout(wheelSizeLayout, 7, 1, 1, 2, alignment);
-    grid->addWidget(perfManSTSLabel, 8, 0, alignment);
-    grid->addWidget(perfManSTSavg, 8, 1, alignment);
-    grid->addWidget(perfManLTSLabel, 9, 0, alignment);
-    grid->addWidget(perfManLTSavg, 9, 1, alignment);
-    grid->addWidget(showSBToday, 10, 1, alignment);
-    grid->addWidget(autoBackupFolderLabel, 11,0, alignment);
-    grid->addWidget(autoBackupFolder, 11, 1, alignment);
-    grid->addWidget(autoBackupFolderBrowse, 11, 2, alignment);
-    grid->addWidget(autoBackupPeriodLabel, 12, 0,alignment);
-    grid->addWidget(autoBackupPeriod, 12, 1, alignment);
-
-    grid->addWidget(biolabel, 13, 0, alignment);
-    grid->addWidget(bio, 14, 0, 1, 3);
-
-    grid->addWidget(avatarButton, 0, 1, 5, 2, Qt::AlignRight|Qt::AlignVCenter);
+    grid->addWidget(avatarButton, 0, 1, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
     all->addStretch();
 
@@ -1113,18 +1044,14 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     // care about tracking as it is used by metrics
 
     // height and weight as stored (always metric)
-    b4.height = appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble();
-    b4.weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
     b4.wheel = wheelSize;
     b4.crank = crankLengthCombo->currentIndex();
-    b4.lts = perfManLTSVal.toInt();
-    b4.sts = perfManSTSVal.toInt();
 
     connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
 }
 
 void
-RiderPage::chooseAvatar()
+AboutRiderPage::chooseAvatar()
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Choose Picture"),
                             "", tr("Images (*.png *.jpg *.bmp)"));
@@ -1136,7 +1063,7 @@ RiderPage::chooseAvatar()
     }
 }
 
-void RiderPage::chooseAutoBackupFolder()
+void AboutRiderPage::chooseAutoBackupFolder()
 {
     // did the user type something ? if not, get it from the Settings
     QString path = autoBackupFolder->text();
@@ -1148,7 +1075,7 @@ void RiderPage::chooseAutoBackupFolder()
 }
 
 void
-RiderPage::unitChanged(int currentIndex)
+RiderPhysPage::unitChanged(int currentIndex)
 {
     if (currentIndex == 0) {
         QString weighttext = QString(tr("Weight (%1)")).arg(tr("kg"));
@@ -1171,7 +1098,7 @@ RiderPage::unitChanged(int currentIndex)
 }
 
 void
-RiderPage::calcWheelSize()
+AboutRiderPage::calcWheelSize()
 {
    int diameter = WheelSize::calcPerimeter(rimSizeCombo->currentIndex(), tireSizeCombo->currentIndex());
    if (diameter>0)
@@ -1179,33 +1106,24 @@ RiderPage::calcWheelSize()
 }
 
 void
-RiderPage::resetWheelSize()
+AboutRiderPage::resetWheelSize()
 {
    rimSizeCombo->setCurrentIndex(0);
    tireSizeCombo->setCurrentIndex(0);
 }
 
 qint32
-RiderPage::saveClicked()
+AboutRiderPage::saveClicked()
 {
     appsettings->setCValue(context->athlete->cyclist, GC_NICKNAME, nickname->text());
     appsettings->setCValue(context->athlete->cyclist, GC_DOB, dob->date());
-    appsettings->setCValue(context->athlete->cyclist, GC_WEIGHT, weight->value() * (context->athlete->useMetricUnits ? 1.0 : KG_PER_LB));
-    appsettings->setCValue(context->athlete->cyclist, GC_HEIGHT, height->value() * (context->athlete->useMetricUnits ? 1.0/100.0 : CM_PER_INCH/100.0));
-    appsettings->setCValue(context->athlete->cyclist, GC_WBALTAU, wbaltau->value());
 
 
     appsettings->setCValue(context->athlete->cyclist, GC_SEX, sex->currentIndex());
-    appsettings->setCValue(context->athlete->cyclist, GC_BIO, bio->toPlainText());
     avatar.save(context->athlete->home->config().canonicalPath() + "/" + "avatar.png", "PNG");
 
     appsettings->setCValue(context->athlete->cyclist, GC_CRANKLENGTH, crankLengthCombo->currentText());
     appsettings->setCValue(context->athlete->cyclist, GC_WHEELSIZE, wheelSizeEdit->text().toInt());
-
-    // Performance Manager
-    appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
 
     // Auto Backup
     appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, autoBackupFolder->text());
@@ -1218,6 +1136,119 @@ RiderPage::saveClicked()
     if (b4.wheel != wheelSizeEdit->text().toInt() ||
         b4.crank != crankLengthCombo->currentIndex() )
         state += CONFIG_GENERAL;
+
+    return state;
+}
+
+//
+// About me - physiology settings
+//
+RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
+{
+    QVBoxLayout *all = new QVBoxLayout(this);
+    QGridLayout *grid = new QGridLayout;
+#ifdef Q_OS_MAX
+    setContentsMargins(10,10,10,10);
+    grid->setSpacing(5);
+    all->setSpacing(5);
+#endif
+
+    QString weighttext = QString(tr("Weight (%1)")).arg(context->athlete->useMetricUnits ? tr("kg") : tr("lb"));
+    weightlabel = new QLabel(weighttext);
+
+    QString heighttext = QString(tr("Height (%1)")).arg(context->athlete->useMetricUnits ? tr("cm") : tr("in"));
+    heightlabel = new QLabel(heighttext);
+
+    wbaltaulabel = new QLabel(tr("W'bal tau (s)"));
+
+    weight = new QDoubleSpinBox(this);
+    weight->setMaximum(999.9);
+    weight->setMinimum(0.0);
+    weight->setDecimals(1);
+    weight->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() * (context->athlete->useMetricUnits ? 1.0 : LB_PER_KG));
+
+    height = new QDoubleSpinBox(this);
+    height->setMaximum(999.9);
+    height->setMinimum(0.0);
+    height->setDecimals(1);
+    height->setValue(appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble() * (context->athlete->useMetricUnits ? 100.0 : 100.0/CM_PER_INCH));
+
+    wbaltau = new QSpinBox(this);
+    wbaltau->setMinimum(30);
+    wbaltau->setMaximum(1200);
+    wbaltau->setSingleStep(10);
+    wbaltau->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt());
+
+    //
+    // Performance manager
+    //
+
+    perfManSTSLabel = new QLabel(tr("STS average (days)"));
+    perfManLTSLabel = new QLabel(tr("LTS average (days)"));
+    perfManSTSavgValidator = new QIntValidator(1,21,this);
+    perfManLTSavgValidator = new QIntValidator(7,56,this);
+
+    // get config or set to defaults
+    QVariant perfManSTSVal = appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS);
+    if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0) perfManSTSVal = 7;
+    QVariant perfManLTSVal = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
+    if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0) perfManLTSVal = 42;
+
+    perfManSTSavg = new QLineEdit(perfManSTSVal.toString(),this);
+    perfManSTSavg->setValidator(perfManSTSavgValidator);
+    perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
+    perfManLTSavg->setValidator(perfManLTSavgValidator);
+
+    showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
+    showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
+
+    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+
+    grid->addWidget(weightlabel, 1, 0, alignment);
+    grid->addWidget(heightlabel, 2, 0, alignment);
+    grid->addWidget(wbaltaulabel, 3, 0, alignment);
+
+    grid->addWidget(weight, 1, 1, alignment);
+    grid->addWidget(height, 2, 1, alignment);
+    grid->addWidget(wbaltau, 3, 1, alignment);
+
+
+    grid->addWidget(perfManSTSLabel, 4, 0, alignment);
+    grid->addWidget(perfManSTSavg, 4, 1, alignment);
+    grid->addWidget(perfManLTSLabel, 5, 0, alignment);
+    grid->addWidget(perfManLTSavg, 5, 1, alignment);
+    grid->addWidget(showSBToday, 6, 1, alignment);
+
+    all->addLayout(grid);
+    all->addStretch();
+
+    // save initial values for things we care about
+    // note we don't worry about age or sex at this point
+    // since they are not used, nor the W'bal tau used in
+    // the realtime code. This is limited to stuff we
+    // care about tracking as it is used by metrics
+
+    // height and weight as stored (always metric)
+    b4.height = appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble();
+    b4.weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
+    b4.lts = perfManLTSVal.toInt();
+    b4.sts = perfManSTSVal.toInt();
+}
+
+qint32
+RiderPhysPage::saveClicked()
+{
+    appsettings->setCValue(context->athlete->cyclist, GC_WEIGHT, weight->value() * (context->athlete->useMetricUnits ? 1.0 : KG_PER_LB));
+    appsettings->setCValue(context->athlete->cyclist, GC_HEIGHT, height->value() * (context->athlete->useMetricUnits ? 1.0/100.0 : CM_PER_INCH/100.0));
+    appsettings->setCValue(context->athlete->cyclist, GC_WBALTAU, wbaltau->value());
+
+
+    // Performance Manager
+    appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
+
+    qint32 state=0;
 
     // PMC constants changed ?
     if(b4.lts != perfManLTSavg->text().toInt() ||

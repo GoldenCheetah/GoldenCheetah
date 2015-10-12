@@ -64,7 +64,7 @@ class MetadataPage;
 class KeywordsPage;
 class FieldsPage;
 class Colors;
-class RiderPage;
+class AboutRiderPage;
 class SeasonsPage;
 
 class GeneralPage : public QWidget
@@ -118,39 +118,28 @@ class GeneralPage : public QWidget
 
 };
 
-class RiderPage : public QWidget
+class RiderPhysPage : public QWidget
 {
     Q_OBJECT
     G_OBJECT
 
 
     public:
-        RiderPage(QWidget *parent, Context *context);
+        RiderPhysPage(QWidget *parent, Context *context);
         qint32 saveClicked();
 
     public slots:
-        void chooseAvatar();
         void unitChanged(int currentIndex);
 
     private:
         Context *context;
 
-        QLineEdit *nickname;
-        QDateEdit *dob;
-        QComboBox *sex;
+        QLabel *wbaltaulabel;
         QLabel *weightlabel;
         QLabel *heightlabel;
-        QLabel *wbaltaulabel;
         QDoubleSpinBox *weight;
         QDoubleSpinBox *height;
         QSpinBox *wbaltau;
-        QTextEdit  *bio;
-        QPushButton *avatarButton;
-        QPixmap     avatar;
-        QComboBox *crankLengthCombo;
-        QComboBox *rimSizeCombo;
-        QComboBox *tireSizeCombo;
-        QLineEdit *wheelSizeEdit;
         QLabel *perfManSTSLabel;
         QLabel *perfManLTSLabel;
         QLineEdit *perfManSTSavg;
@@ -158,25 +147,55 @@ class RiderPage : public QWidget
         QIntValidator *perfManSTSavgValidator;
         QIntValidator *perfManLTSavgValidator;
         QCheckBox *showSBToday;
+
+    struct {
+        double weight;
+        double height;
+        int lts,sts;
+    } b4;
+
+    private slots:
+};
+
+class AboutRiderPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        AboutRiderPage(QWidget *parent, Context *context);
+        qint32 saveClicked();
+
+    public slots:
+        void chooseAvatar();
+
+    private:
+        Context *context;
+
+        QLineEdit *nickname;
+        QDateEdit *dob;
+        QComboBox *sex;
+        QPushButton *avatarButton;
+        QPixmap     avatar;
+        QComboBox *crankLengthCombo;
+        QComboBox *rimSizeCombo;
+        QComboBox *tireSizeCombo;
+        QLineEdit *wheelSizeEdit;
         QSpinBox *autoBackupPeriod;
         QLineEdit *autoBackupFolder;
         QPushButton *autoBackupFolderBrowse;
 
 
     struct {
-        double weight;
-        double height;
         int wheel;
         int crank;
-        int lts,sts;
     } b4;
 
     private slots:
         void calcWheelSize();
         void resetWheelSize();
         void chooseAutoBackupFolder();
-
-
 };
 
 class CredentialsPage : public QScrollArea
