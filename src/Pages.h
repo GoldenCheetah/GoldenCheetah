@@ -158,6 +158,9 @@ class RiderPage : public QWidget
         QIntValidator *perfManSTSavgValidator;
         QIntValidator *perfManLTSavgValidator;
         QCheckBox *showSBToday;
+        QSpinBox *autoBackupPeriod;
+        QLineEdit *autoBackupFolder;
+        QPushButton *autoBackupFolderBrowse;
 
 
     struct {
@@ -171,6 +174,8 @@ class RiderPage : public QWidget
     private slots:
         void calcWheelSize();
         void resetWheelSize();
+        void chooseAutoBackupFolder();
+
 
 };
 
