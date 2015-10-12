@@ -334,6 +334,7 @@ HEADERS += \
         ANTMessages.h \
         ANTlocalController.h \
         Athlete.h \
+        AthleteBackup.h \
         BatchExportDialog.h \
         BestIntervalDialog.h \
         BinRideFile.h \
@@ -558,6 +559,7 @@ SOURCES += \
         ANTMessage.cpp \
         ANTlocalController.cpp \
         Athlete.cpp \
+        AthleteBackup.cpp \
         BasicRideMetrics.cpp \
         BatchExportDialog.cpp \
         BestIntervalDialog.cpp \
