@@ -726,11 +726,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
 }
 
-
-
+#if QT_VERSION >= 0x050000 // only in QT5 or higher
 void CredentialsPage::chooseDropboxFolder()
 {
-#if QT_VERSION >= 0x050000 // only in QT5 or higher
     Dropbox dropbox(context);
 
     // open the connection
@@ -753,8 +751,8 @@ void CredentialsPage::chooseDropboxFolder()
 
     // did we actually select something?
     if (ret == QDialog::Accepted) dropboxFolder->setText(dialog.pathnameSelected());
-#endif
 }
+#endif
 
 
 void CredentialsPage::chooseLocalFileStoreFolder()
@@ -782,9 +780,9 @@ void CredentialsPage::authoriseTwitter()
 }
 #endif
 
+#if QT_VERSION >= 0x050000 // only in QT5 or higher
 void CredentialsPage::authoriseDropbox()
 {
-#if QT_VERSION >= 0x050000 // only in QT5 or higher
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::DROPBOX);
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
@@ -792,8 +790,8 @@ void CredentialsPage::authoriseDropbox()
         oauthDialog->setWindowModality(Qt::ApplicationModal);
         oauthDialog->exec();
     }
-#endif
 }
+#endif
 
 
 void CredentialsPage::authoriseStrava()
