@@ -212,8 +212,10 @@ class CredentialsPage : public QScrollArea
 #ifdef GC_HAVE_KQOAUTH
         void authoriseTwitter();
 #endif
+#if QT_VERSION >= 0x050000
         void authoriseDropbox();
         void chooseDropboxFolder();
+#endif
         void authoriseStrava();
         void authoriseCyclingAnalytics();
         void authoriseGoogleCalendar();
@@ -231,12 +233,15 @@ class CredentialsPage : public QScrollArea
 #ifdef GC_HAVE_KQOAUTH
         QPushButton *twitterAuthorise;
 #endif
+#if QT_VERSION >= 0x050000
         QPushButton *dropboxAuthorise;
+        QPushButton *dropboxAuthorised, *dropboxBrowse;
+        QLineEdit *dropboxFolder;
+#endif
 
         QComboBox *dvCALDAVType;
-        QPushButton *stravaAuthorise, *stravaAuthorised, *twitterAuthorised, *dropboxAuthorised, *dropboxBrowse;
+        QPushButton *stravaAuthorise, *stravaAuthorised, *twitterAuthorised;
         QPushButton *networkFileStoreFolderBrowse;
-        QLineEdit *dropboxFolder;
         QLineEdit *networkFileStoreFolder;
         QPushButton *cyclingAnalyticsAuthorise, *cyclingAnalyticsAuthorised;
         QPushButton *googleCalendarAuthorise, *googleCalendarAuthorised;
