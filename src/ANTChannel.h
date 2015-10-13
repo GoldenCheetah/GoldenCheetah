@@ -85,6 +85,9 @@ class ANTChannel : public QObject {
         ANTMessage lastMessage, lastStdPwrMessage;
         int dualNullCount, nullCount, stdNullCount;
         double last_message_timestamp;
+        uint8_t fecPrevRawDistance;
+        uint8_t  fecCapabilities;
+
         double blanking_timestamp;
         int blanked;
         char id[10]; // short identifier
@@ -118,6 +121,7 @@ class ANTChannel : public QObject {
             CHANNEL_TYPE_MOXY,
             CHANNEL_TYPE_CONTROL,
             CHANNEL_TYPE_TACX_VORTEX,
+            CHANNEL_TYPE_FITNESS_EQUIPMENT,
             CHANNEL_TYPE_GUARD
         };
         typedef enum channeltype ChannelType;
@@ -143,6 +147,7 @@ class ANTChannel : public QObject {
         bool is_moxy; // bool
         bool is_cinqo; // bool
         bool is_old_cinqo; // bool, set for cinqo needing separate control channel
+        bool is_fec;
         bool is_alt; // is alternative channel for power
 
         int search_type;
@@ -175,6 +180,7 @@ class ANTChannel : public QObject {
         double channelValue() { return value; }
         double channelValue2() { return value2; }
         double value,value2; // used during config, rather than rtData
+        uint8_t capabilities();
 
         // search
         int isSearching();

@@ -217,6 +217,7 @@ struct setChannelAtom {
 #define ANT_SPORT_KICKR_PERIOD 2048
 #define ANT_SPORT_MOXY_PERIOD 8192
 #define ANT_SPORT_TACX_VORTEX_PERIOD 8192
+#define ANT_SPORT_FITNESS_EQUIPMENT_PERIOD 8192
 #define ANT_FAST_QUARQ_PERIOD (8182/16)
 #define ANT_QUARQ_PERIOD (8182*4)
 
@@ -228,6 +229,7 @@ struct setChannelAtom {
 #define ANT_SPORT_MOXY_TYPE 0x1F
 #define ANT_SPORT_CONTROL_TYPE 0x10
 #define ANT_SPORT_TACX_VORTEX_TYPE 61
+#define ANT_SPORT_FITNESS_EQUIPMENT_TYPE 0x11
 #define ANT_FAST_QUARQ_TYPE_WAS 11 // before release 1.8
 #define ANT_FAST_QUARQ_TYPE 0x60
 #define ANT_QUARQ_TYPE 0x60
@@ -238,6 +240,7 @@ struct setChannelAtom {
 #define ANT_KICKR_FREQUENCY 52
 #define ANT_MOXY_FREQUENCY 57
 #define ANT_TACX_VORTEX_FREQUENCY 66
+#define ANT_FITNESS_EQUIPMENT_FREQUENCY 57
 
 #define ANT_SPORT_CALIBRATION_MESSAGE                 0x01
 
@@ -279,6 +282,23 @@ struct setChannelAtom {
 #define TACX_VORTEX_DATA_VERSION       2
 #define TACX_VORTEX_DATA_CALIBRATION   3
 
+// ant+ fitness equipment profile data pages
+#define FITNESS_EQUIPMENT_GENERAL_PAGE              0x10
+#define FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE     0x19
+#define FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE 0x36
+#define FITNESS_EQUIPMENT_COMMAND_STATUS_PAGE       0x47
+
+#define FITNESS_EQUIPMENT_BASIC_RESISTANCE_ID       0x30
+#define FITNESS_EQUIPMENT_TARGET_POWER_ID           0x31
+#define FITNESS_EQUIPMENT_WIND_RESISTANCE_ID        0x32
+#define FITNESS_EQUIPMENT_TRACK_RESISTANCE_ID       0x33
+
+#define FITNESS_EQUIPMENT_RESIST_MODE_CAPABILITY    0x01
+#define FITNESS_EQUIPMENT_POWER_MODE_CAPABILITY     0x02
+#define FITNESS_EQUIPMENT_SIMUL_MODE_CAPABILITY     0x04
+
+#define ANT_MANUFACTURER_ID_PAGE                    0x50
+#define ANT_PRODUCT_INFO_PAGE                       0x51
 
 //======================================================================
 // Worker thread
@@ -382,6 +402,8 @@ public:
     int rawRead(uint8_t bytes[], int size);
     int rawWrite(uint8_t *bytes, int size);
 
+    bool modeERGO(void) const;
+
     // channels update our telemetry
     double channelValue(int channel);
     double channelValue2(int channel);
@@ -396,6 +418,16 @@ public:
         if (lastCadenceMessage.toTime_t() == 0 || (QDateTime::currentDateTime().toTime_t() - lastCadenceMessage.toTime_t())>10)  {
             telemetry.setCadence(x);
         }
+    }
+
+    void setSpeed(double x)
+    {
+        telemetry.setSpeed(x);
+    }
+
+    void incAltDistance(double x)
+    {
+        telemetry.setAltDistance(telemetry.getAltDistance() + x);
     }
 
     void setWheelRpm(float x);
@@ -420,6 +452,10 @@ public:
         telemetry.setLPS(lps);
         telemetry.setRPS(rps);
     }
+
+    void setFecChannel(int channel);
+    void refreshFecLoad();
+    void requestFecCapabilities();
 
     void setVortexData(int channel, int id);
     void refreshVortexLoad();
@@ -474,11 +510,15 @@ private:
     // generic trainer settings
     double currentLoad, load;
     double currentGradient, gradient;
+    double currentRollingResistance, rollingResistance;
     int currentMode, mode;
 
     // now kickr specific
     int kickrDeviceID;
     int kickrChannel;
+
+    // fitness equipment data
+    int fecChannel;
 
     // tacx vortex (we'll probably want to abstract this out cf. kickr)
     int vortexID;

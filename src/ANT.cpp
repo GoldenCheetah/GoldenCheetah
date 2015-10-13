@@ -45,7 +45,7 @@
 // network key
 const unsigned char ANT::key[8] = { 0xB9, 0xA5, 0x21, 0xFB, 0xBD, 0x72, 0xC3, 0x45 };
 
-// !!! THE INITIALISATION OF ant_sensor_types BELOW MUST MATCH THE 
+// !!! THE INITIALISATION OF ant_sensor_types BELOW MUST MATCH THE
 // !!! ENUM FOR CHANNELTYPE IN ANTChannel.h (SORRY, ITS HORRIBLE)
 
 // supported sensor types
@@ -67,6 +67,8 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
                 ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Remote Control", 'r', ":images/IconCadence.png" },
   { true, ANTChannel::CHANNEL_TYPE_TACX_VORTEX, ANT_SPORT_TACX_VORTEX_PERIOD, ANT_SPORT_TACX_VORTEX_TYPE,
                 ANT_TACX_VORTEX_FREQUENCY, DEFAULT_NETWORK_NUMBER, "Tacx Vortex Smart", 'v', ":images/IconPower.png" },
+  { true, ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT, ANT_SPORT_FITNESS_EQUIPMENT_PERIOD, ANT_SPORT_FITNESS_EQUIPMENT_TYPE,
+                ANT_FITNESS_EQUIPMENT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Fitness Equipment Control (FE-C)", 'f', ":images/IconPower.png" },
   { false, ANTChannel::CHANNEL_TYPE_GUARD, 0, 0, 0, 0, "", '\0', "" }
 };
 
@@ -104,6 +106,8 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString cyclist) : QThre
     // vortex
     vortexID = vortexChannel = -1;
 
+    fecChannel = -1;
+
     // current and desired modes/load/gradients
     // set so first time through current != desired
     currentMode = 0;
@@ -111,6 +115,7 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString cyclist) : QThre
     currentLoad = 0;
     load = 100; // always set to something
     currentGradient = 0;
+    currentRollingResistance = rollingResistance = 0.004; // typical for road
     gradient = 0.1;
 
     // state machine
@@ -167,6 +172,11 @@ void ANT::setDevice(QString x)
 void ANT::setBaud(int x)
 {
     baud = x;
+}
+
+bool ANT::modeERGO(void) const
+{
+    return mode==RT_MODE_ERGO; 
 }
 
 double ANT::channelValue2(int channel)
@@ -258,6 +268,7 @@ void ANT::run()
 void
 ANT::setLoad(double load)
 {
+    qDebug() << "ask for Load update to " << load;
     if (this->load == load) return;
 
     // load has changed
@@ -269,6 +280,23 @@ ANT::setLoad(double load)
         qDebug() << "setting vortex target power to " << load;
         sendMessage(ANTMessage::tacxVortexSetPower(vortexChannel, vortexID, (int)load));
     }
+
+    // if we have a FE-C trainer connected, relay the change in target power to the brake
+    if (fecChannel != -1)
+    {
+        qDebug() << "setting fitness equipment target power to " << load;
+        sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
+    }
+}
+
+void ANT::refreshFecLoad()
+{
+    sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
+}
+
+void ANT::requestFecCapabilities()
+{
+    sendMessage(ANTMessage::fecRequestCapabilities(fecChannel));
 }
 
 void ANT::refreshVortexLoad()
@@ -282,11 +310,25 @@ void ANT::refreshVortexLoad()
 void
 ANT::setGradient(double gradient)
 {
+    qDebug() << "ask for gradient update to " << gradient;
+    if (fecChannel != -1)
+        qDebug() << "We have fec trainer connected, simulation capabilities=" << antChannel[fecChannel]->capabilities();
+
     if (this->gradient == gradient) return;
 
     // gradient changed
     this->gradient = gradient;
+
+    // if we have a FE-C trainer connected, relay the change in simulated slope of trainer electronic
+    if ((fecChannel != -1) && (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_SIMUL_MODE_CAPABILITY))
+    {
+        qDebug() << "setting fitness equipment target gradient to " << gradient;
+        sendMessage(ANTMessage::fecSetTrackResistance(fecChannel, gradient, currentRollingResistance));
+        currentGradient = gradient;
+        // TODO : obtain acknowledge / confirm value using fecRequestCommandStatus
+    }
 }
+
 void
 ANT::setMode(int mode)
 {
@@ -311,7 +353,7 @@ ANT::kickrCommand()
             }
            break;
 
-        case RT_MODE_SPIN : // need to setup for "sim" mode, so sending lots of 
+        case RT_MODE_SPIN : // need to setup for "sim" mode, so sending lots of
                             // config to overcome the default values
             {
             }
@@ -328,7 +370,7 @@ ANT::kickrCommand()
     }
 
     // load has changed ?
-    if (mode == RT_MODE_ERGO && load != currentLoad) { 
+    if (mode == RT_MODE_ERGO && load != currentLoad) {
         currentLoad = load;
     }
 
@@ -343,7 +385,7 @@ ANT::kickrCommand()
     switch (mode) {
 
     default:
-    case RT_MODE_ERGO: 
+    case RT_MODE_ERGO:
         toSend = ANTMessage::kickrErgMode(kickrChannel, kickrDeviceID, load, false);
         break;
 
@@ -402,6 +444,7 @@ ANT::setup()
             if (channels > 4) {
                 addDevice(0, ANTChannel::CHANNEL_TYPE_SandC, 4);
                 addDevice(0, ANTChannel::CHANNEL_TYPE_MOXY, 5);
+                addDevice(0, ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT, 6);
             }
         }
     }
@@ -1128,4 +1171,9 @@ void ANT::setVortexData(int channel, int id)
 {
     vortexChannel = channel;
     vortexID = id;
+}
+
+void ANT::setFecChannel(int channel)
+{
+    fecChannel = channel;
 }
