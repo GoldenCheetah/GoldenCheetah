@@ -675,7 +675,6 @@ Q_UNUSED(name);
 #endif
 
 #ifdef Q_OS_LINUX
-
     // All we can do for USB1 sticks is see if the cp210x driver module
     // is loaded for this device, and if it is, we will use the device
     // they are getting rarer and rarer these days (no longer sold by
@@ -686,7 +685,8 @@ Q_UNUSED(name);
     int maj = major(s.st_rdev);
     int min = minor(s.st_rdev);
     QString sysFile = QString("/sys/dev/char/%1:%2/device/driver/module/drivers/usb:cp210x").arg(maj).arg(min);
-    if (QFileInfo(sysFile).exists()) return true;
+    QString sysFileSerial = QString("/sys/dev/char/%1:%2/device/driver/module/drivers/usb-serial:cp210x").arg(maj).arg(min);
+    if (QFileInfo(sysFile).exists() || QFileInfo(sysFileSerial).exists()) return true;
 #endif
 
 #ifdef Q_OS_MAC
