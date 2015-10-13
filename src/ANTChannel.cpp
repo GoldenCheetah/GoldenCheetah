@@ -37,6 +37,7 @@ ANTChannel::init()
     channel_type_flags=0;
     is_kickr=false;
     is_moxy=false;
+    is_fec=false;
     is_cinqo=0;
     is_old_cinqo=0;
     is_alt=0;
@@ -54,6 +55,8 @@ ANTChannel::init()
     burstInit();
     value2=value=0;
     status = Closed;
+    fecPrevRawDistance=0;
+    fecCapabilities=0;
 }
 
 //
@@ -100,7 +103,7 @@ void ANTChannel::open(int device, int chan_type)
     qDebug()<<"** OPENING CHANNEL"<<number<<"**";
     status = Opening;
 
-    // start the transition process 
+    // start the transition process
     attemptTransition(TRANSITION_START);
 }
 
@@ -384,7 +387,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                             }
                             break;
 
-                        default: 
+                        default:
                             break;
                     }
 
@@ -667,6 +670,48 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
             }
             break;
 
+
+           case CHANNEL_TYPE_FITNESS_EQUIPMENT:
+           {
+               is_fec = true;
+               static int fecRefreshCounter = 1;
+
+               parent->setFecChannel(number);
+               // we don't seem to receive ACK messages, so use this workaround
+               // to ensure load is always set correctly
+               if ((fecRefreshCounter++ % 10) == 0 && parent->modeERGO())
+               {
+                   parent->refreshFecLoad();
+               }
+
+               if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE)
+               {
+                   if (antMessage.fecInstantPower != 0xFFFF)
+                       parent->setWatts(antMessage.fecInstantPower);
+                   if (antMessage.fecCadence != 0xFF)
+                       parent->setSecondaryCadence(antMessage.fecCadence);
+               }
+               else if (antMessage.data_page == FITNESS_EQUIPMENT_GENERAL_PAGE)
+               {
+                   if (antMessage.fecSpeed != 0xFFFF)
+                   {
+                       // FEC speed is in 0.001m/s, telemetry speed is km/h
+                       parent->setSpeed(antMessage.fecSpeed * 0.0036);
+                   }
+
+                   // FEC distance is in m, telemetry is km
+                   parent->incAltDistance((antMessage.fecRawDistance - fecPrevRawDistance
+                                          + (fecPrevRawDistance > antMessage.fecRawDistance ? 256 : 0)) * 0.001);
+                   fecPrevRawDistance = antMessage.fecRawDistance;
+               }
+               else if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE)
+               {
+                   fecCapabilities = antMessage.fecCapabilities;
+                   qDebug() << "Capabilities received from ANT FEC Device:" << fecCapabilities;
+               }
+               break;
+           }
+
             // Tacx Vortex trainer
             case CHANNEL_TYPE_TACX_VORTEX:
             {
@@ -823,6 +868,7 @@ void ANTChannel::attemptTransition(int message_id)
     case ANT_UNASSIGN_CHANNEL:
         //qDebug()<<number<<"TRANSITION from unassigned";
 
+        qDebug()<<number<<"assign channel type RX";
         // assign and set channel id all in one
         parent->sendMessage(ANTMessage::assignChannel(number, CHANNEL_TYPE_RX, st->network)); // receive channel on network 1
 
@@ -892,6 +938,21 @@ void ANTChannel::attemptTransition(int message_id)
     default:
         break;
     }
+}
+
+uint8_t ANTChannel::capabilities()
+{
+    // TODO: run this request once when just connected to device
+    if (!is_fec)
+        return 0;
+
+    if (fecCapabilities)
+        return fecCapabilities;
+
+    // if we do not know device capabilities, request it
+    qDebug() << qPrintable("Ask for capabilities");
+    parent->requestFecCapabilities();
+        return 0;
 }
 
 // Calibrate... needs fixing in version 3.1

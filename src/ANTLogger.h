@@ -28,9 +28,9 @@ class ANTLogger : public QObject
     Q_OBJECT
 public:
     explicit ANTLogger(QObject *parent = 0);
-    
+
 signals:
-    
+
 public slots:
     void logRawAntMessage(const ANTMessage message, const struct timeval timestamp);
     void open();
