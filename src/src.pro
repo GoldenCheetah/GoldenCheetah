@@ -519,6 +519,7 @@ HEADERS += \
         UserData.h \
         VeloHeroUploader.h \
         VideoLayoutParser.h \
+        VideoSyncFile.h \
         Views.h \
         WithingsDownload.h \
         WkoRideFile.h \
@@ -767,6 +768,7 @@ SOURCES += \
         UserData.cpp \
         VeloHeroUploader.cpp \
         VideoLayoutParser.cpp \
+        VideoSyncFile.cpp \
         Views.cpp \
         WattsPerKilogram.cpp \
         WithingsDownload.cpp \

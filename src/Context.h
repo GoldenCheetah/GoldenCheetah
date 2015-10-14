@@ -39,7 +39,7 @@
 // to different config and save it all at once.
 
 #define CONFIG_ATHLETE           0x1        // includes default weight, height etc
-#define CONFIG_ZONES             0x2 
+#define CONFIG_ZONES             0x2
 #define CONFIG_GENERAL           0x4        // includes default weight, w'bal formula, directories
 #define CONFIG_APPEARANCE        0x10
 #define CONFIG_FIELDS            0x20       // metadata fields
@@ -56,6 +56,7 @@
 class RideItem;
 class IntervalItem;
 class ErgFile;
+class VideoSyncFile;
 
 class Context;
 class Athlete;
@@ -88,6 +89,7 @@ class Context : public QObject
         RideItem *ride;  // the currently selected ride
         DateRange dr_;
         ErgFile *workout; // the currently selected workout file
+        VideoSyncFile *videosync; // the currently selected videosync file
         long now; // point in time during train session
         SpecialFields specialFields;
 
@@ -127,10 +129,13 @@ class Context : public QObject
         // realtime signals
         void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
         void notifyErgFileSelected(ErgFile *x) { workout=x; ergFileSelected(x); }
+        void notifyVideoSyncFileSelected(VideoSyncFile *x) { videosync=x; VideoSyncFileSelected(x); }
         ErgFile *currentErgFile() { return workout; }
+        VideoSyncFile *currentVideoSyncFile() { return videosync; }
         void notifyMediaSelected( QString x) { mediaSelected(x); }
         void notifySelectVideo(QString x) { selectMedia(x); }
         void notifySelectWorkout(QString x) { selectWorkout(x); }
+        void notifySelectVideoSync(QString x) { selectVideoSync(x); }
         void notifySetNow(long x) { now = x; setNow(x); }
         long getNow() { return now; }
         void notifyNewLap() { emit newLap(); }
@@ -141,6 +146,7 @@ class Context : public QObject
         void notifySeek(long x) { emit seek(x); }
 
         void notifyWorkoutsChanged() { emit workoutsChanged(); }
+        void notifyVideoSyncChanged() { emit VideoSyncChanged(); }
 
         void notifyRideSelected(RideItem*x) { ride=x; rideSelected(x); }
         void notifyRideAdded(RideItem *x) { ride=x; rideAdded(x); }
@@ -178,6 +184,7 @@ class Context : public QObject
         void configChanged(qint32);
 
         void workoutsChanged(); // added or deleted a workout in train view
+        void VideoSyncChanged(); // added or deleted a workout in train view
         void presetsChanged();
         void presetSelected(int);
 
@@ -209,9 +216,11 @@ class Context : public QObject
         // realtime
         void telemetryUpdate(RealtimeData rtData);
         void ergFileSelected(ErgFile *);
+        void VideoSyncFileSelected(VideoSyncFile *);
         void mediaSelected(QString);
         void selectWorkout(QString); // ask traintool to select this
         void selectMedia(QString); // ask traintool to select this
+        void selectVideoSync(QString); // ask traintool to select this
         void setNow(long);
         void seek(long);
         void newLap();
