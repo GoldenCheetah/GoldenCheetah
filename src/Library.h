@@ -63,6 +63,7 @@ class LibrarySearchDialog : public QDialog
         void pathsearching(QString);
         void foundWorkout(QString);
         void foundVideo(QString);
+        void foundVideoSync(QString);
 
         void addDirectory();
         void removeDirectory();
@@ -74,9 +75,9 @@ class LibrarySearchDialog : public QDialog
         Library *library;
         LibrarySearch *searcher;
         bool searching;
-        int pathIndex, workoutCountN, videoCountN;
+        int pathIndex, workoutCountN, videoCountN, videosyncCountN;
 
-        QStringList workoutsFound, videosFound;
+        QStringList workoutsFound, videosFound, videosyncsFound;
 
         // let us know we are searching
         void setSearching(bool amsearching) {
@@ -89,6 +90,7 @@ class LibrarySearchDialog : public QDialog
 
         // gui widgets
         QCheckBox *findWorkouts,
+                  *findVideoSyncs,
                   *findMedia;
         QPushButton *addPath,
                     *removePath;
@@ -97,8 +99,8 @@ class LibrarySearchDialog : public QDialog
         QTreeWidget *refTable;
         QTreeWidgetItem *allRefs;
         QTreeWidgetItem *allPaths;
-        QLabel *pathLabelTitle, *mediaCountTitle, *workoutCountTitle;
-        QLabel *pathLabel, *mediaCount, *workoutCount;
+        QLabel *pathLabelTitle, *mediaCountTitle, *videosyncCountTitle, *workoutCountTitle;
+        QLabel *pathLabel, *mediaCount, *videosyncCount, *workoutCount;
         QPushButton *cancelButton,
                     *searchButton;
 };
@@ -108,7 +110,7 @@ class LibrarySearch : public QThread
     Q_OBJECT
 
     public:
-        LibrarySearch(QString path, bool findMedia, bool findWorkout);
+        LibrarySearch(QString path, bool findMedia, bool findVideoSync, bool findWorkout);
         void run();
 
     public slots:
@@ -119,12 +121,13 @@ class LibrarySearch : public QThread
         void searching(QString);
         void done();
         void foundVideo(QString);
+        void foundVideoSync(QString);
         void foundWorkout(QString);
 
     private:
         volatile bool aborted;
         QString path;
-        bool findMedia, findWorkout;
+        bool findMedia, findWorkout, findVideoSync;
 };
 
 class WorkoutImportDialog : public QDialog
@@ -141,7 +144,7 @@ class WorkoutImportDialog : public QDialog
         Context *context;
         QStringList files;
  
-        QStringList videos, workouts;
+        QStringList videos, videosyncs, workouts;
 
         QTreeWidget *fileTable;
         QPushButton *okButton, *cancelButton;

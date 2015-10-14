@@ -26,6 +26,7 @@
 #include "DeviceConfiguration.h"
 #include "DeviceTypes.h"
 #include "ErgFile.h"
+#include "VideoSyncFile.h"
 #include "ErgFilePlot.h"
 #include "GcSideBarItem.h"
 
@@ -126,6 +127,7 @@ class TrainSidebar : public GcWindow
     private slots:
         void deviceTreeWidgetSelectionChanged();
         void workoutTreeWidgetSelectionChanged();
+        void videosyncTreeWidgetSelectionChanged();
         void mediaTreeWidgetSelectionChanged();
 
         void deviceTreeMenuPopup(const QPoint &);
@@ -133,17 +135,20 @@ class TrainSidebar : public GcWindow
 
         void devicePopup();
         void workoutPopup();
+        void videosyncPopup();
         void mediaPopup();
 
         void refresh(); // when TrainDB is updated...
 
         void selectVideo(QString fullpath);
+        void selectVideoSync(QString fullpath);
         void selectWorkout(QString fullpath);
 
     public slots:
         void configChanged(qint32);
         void deleteWorkouts(); // deletes selected workouts
         void deleteVideos(); // deletes selected workouts
+        void deleteVideoSyncs(); // deletes selected VideoSync
 
         void Start();       // when start button is pressed
         void Pause();       // when Paude is pressed
@@ -176,21 +181,26 @@ class TrainSidebar : public GcWindow
         GcSplitter   *trainSplitter;
         GcSplitterItem *deviceItem,
                        *workoutItem,
+                       *videosyncItem,
                        *mediaItem;
 
         QWidget *toolbarButtons;
 
         QSqlTableModel *videoModel;
+        QSqlTableModel *videosyncModel;
         QSqlTableModel *workoutModel;
 
         QTreeWidget *deviceTree;
         QTreeView *workoutTree;
+        QTreeView *videosyncTree;
+        QTreeView *mediaTree;
         QSortFilterProxyModel *sortModel;  // sorting workout list
         QSortFilterProxyModel *vsortModel; // sorting video list
-        QTreeView *mediaTree;
+        QSortFilterProxyModel *vssortModel; // sorting videosync list
 
         QTreeWidgetItem *allWorkouts;
         QTreeWidgetItem *workout;
+        QTreeWidgetItem *videosync;
         QTreeWidgetItem *media;
 
         // Panel buttons
@@ -222,6 +232,7 @@ class TrainSidebar : public GcWindow
 
         QFile *recordFile;      // where we record!
         ErgFile *ergFile;       // workout file
+        VideoSyncFile *videosyncFile;       // videosync file
 
         long total_msecs,
              lap_msecs,

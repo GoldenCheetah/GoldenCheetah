@@ -68,9 +68,9 @@ GcUpgrade::upgradeConfirmedByUser(const QDir &home)
     return true; // if there is no upgrade needed, just proceed
 }
 
-int 
+int
 GcUpgrade::upgrade(const QDir &home)
-{ 
+{
 
     // what was the last version? -- do we need to upgrade?
     int last = appsettings->cvalue(home.dirName(), GC_VERSION_USED, 0).toInt();
@@ -207,7 +207,7 @@ GcUpgrade::upgrade(const QDir &home)
         QString theme = "Flat";
         QColor chromeColor = QColor(0xec,0xec,0xec);
 #ifdef Q_OS_MAC
-        // Yosemite or earlier 
+        // Yosemite or earlier
         if (QSysInfo::MacintoshVersion >= 12) {
 
             chromeColor = QColor(235,235,235);
@@ -272,15 +272,15 @@ GcUpgrade::upgrade(const QDir &home)
                 if (pos < 0) pos = 1;
 
                 // add them
-                if (indexAnTISS < 0) { 
+                if (indexAnTISS < 0) {
                     add.name = tr("Anaerobic TISS");
                     fieldDefinitions.insert(pos, add);
                 }
-                if (indexAeTISS < 0) { 
+                if (indexAeTISS < 0) {
                     add.name = tr("Aerobic TISS");
                     fieldDefinitions.insert(pos, add);
                 }
-                if (indexTSS < 0) { 
+                if (indexTSS < 0) {
                     add.name = tr("TSS");
                     fieldDefinitions.insert(pos, add);
                 }
@@ -757,7 +757,7 @@ class FileUtil
 
             bool result = true;
             QDir dir(dirName);
- 
+
             if (dir.exists(dirName)) {
                 foreach(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
                     if (info.isDir()) {
@@ -767,13 +767,13 @@ class FileUtil
 
                         result = QFile::remove(info.absoluteFilePath());
                     }
- 
+
                     if (!result) { return result; }
 
                 }
                 result = dir.rmdir(dirName);
             }
- 
+
         return result;
     }
 

@@ -23,6 +23,7 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
 {
     ride = NULL;
     workout = NULL;
+    videosync = NULL;
     isfiltered = ishomefiltered = false;
     isCompareIntervals = isCompareDateRanges = false;
 }

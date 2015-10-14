@@ -17,12 +17,14 @@
 * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <QGraphicsPathItem>
 #include "VideoWindow.h"
 #include "Context.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "MeterWidget.h"
 #include "VideoLayoutParser.h"
+
 
 VideoWindow::VideoWindow(Context *context)  :
     GcWindow(context), context(context), m_MediaChanged(false)
@@ -32,6 +34,8 @@ VideoWindow::VideoWindow(Context *context)  :
 
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);
+
+    curPosition = 0;
 
     init = true; // assume initialisation was ok ...
 
@@ -190,6 +194,9 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 
 void VideoWindow::startPlayback()
 {
+    if (context->currentVideoSyncFile())
+        context->currentVideoSyncFile()->manualOffset = 0.0;
+
 #ifdef GC_VIDEO_VLC
     if (!m) return; // ignore if no media selected
 
@@ -223,6 +230,9 @@ void VideoWindow::startPlayback()
 
 void VideoWindow::stopPlayback()
 {
+    if (context->currentVideoSyncFile())
+        context->currentVideoSyncFile()->manualOffset = 0.0;
+
 #ifdef GC_VIDEO_VLC
     if (!m) return; // ignore if no media selected
 
@@ -244,7 +254,7 @@ void VideoWindow::pausePlayback()
     if (!m) return; // ignore if no media selected
 
     // stop playback & wipe player
-    libvlc_media_player_pause (mp);
+    libvlc_media_player_set_pause(mp, true);
 #endif
 
 #ifdef GC_VIDEO_QT5
@@ -261,7 +271,7 @@ void VideoWindow::resumePlayback()
     if(m_MediaChanged)
         startPlayback();
     else
-        libvlc_media_player_pause (mp);
+        libvlc_media_player_set_pause(mp, false);
 #endif
 
 #ifdef GC_VIDEO_QT5
@@ -302,11 +312,99 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
         p_meterWidget->update();
+
+#ifdef GC_VIDEO_NONE
+    Q_UNUSED(rtd)
+#endif
+
+#ifdef GC_VIDEO_VLC
+    if (!m) return;
+
+    // find the curPosition
+    if (context->currentVideoSyncFile())
+    {
+        // when we selected a videosync file in traning mode (rlv...):
+
+        QVector<VideoSyncFilePoint> VideoSyncFiledataPoints = context->currentVideoSyncFile()->Points;
+
+        if (!VideoSyncFiledataPoints.count()) return;
+
+        if(curPosition > VideoSyncFiledataPoints.count()-1 || curPosition < 0)
+            curPosition = 1;
+
+        double CurrentDistance = qBound(0.0,  rtd.getDistance() + context->currentVideoSyncFile()->manualOffset, context->currentVideoSyncFile()->Distance);
+        context->currentVideoSyncFile()->km = CurrentDistance;
+
+        // make sure the current position is less than the new distance
+        while ((VideoSyncFiledataPoints[curPosition].km > CurrentDistance) && (curPosition > 1))
+            curPosition--;
+        while ((VideoSyncFiledataPoints[curPosition].km <= CurrentDistance) && (curPosition < VideoSyncFiledataPoints.count()-1))
+            curPosition++;
+
+        // update the rfp
+        float weighted_average = (VideoSyncFiledataPoints[curPosition].km - VideoSyncFiledataPoints[curPosition-1].km != 0.0)?(CurrentDistance-VideoSyncFiledataPoints[curPosition-1].km) / (VideoSyncFiledataPoints[curPosition].km - VideoSyncFiledataPoints[curPosition-1].km):0.0;
+        rfp.km = CurrentDistance;
+        rfp.secs = VideoSyncFiledataPoints[curPosition-1].secs + weighted_average * (VideoSyncFiledataPoints[curPosition].secs - VideoSyncFiledataPoints[curPosition-1].secs);
+        rfp.kph = VideoSyncFiledataPoints[curPosition-1].kph + weighted_average * (VideoSyncFiledataPoints[curPosition].kph - VideoSyncFiledataPoints[curPosition-1].kph);
+    }
+    else if (myRideItem->ride())
+    {
+        // otherwise we use the gpx from selected ride in analysis view:
+        QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
+        if (!dataPoints.count()) return;
+
+        if(curPosition > dataPoints.count()-1 || curPosition < 0)
+            curPosition = 1;
+
+        // make sure the current position is less than the new distance
+        while ((dataPoints[curPosition]->km > rtd.getDistance()) && (curPosition > 1))
+            curPosition--;
+        while ((dataPoints[curPosition]->km <= rtd.getDistance()) && (curPosition < dataPoints.count()-1))
+            curPosition++;
+
+        // update the rfp
+        rfp = *dataPoints[curPosition];
+
+        //TODO : weighted average to improve smoothness as it has been done just before with RLV files
+    }
+    // set video rate ( theoretical : video rate = training speed / ghost speed)
+    float rate;
+    float video_time_shift_ms;
+    video_time_shift_ms = (rfp.secs*1000.0 - (double) libvlc_media_player_get_time(mp));
+    if (rfp.kph == 0.0)
+        rate = 1.0;
+    else
+        rate = rtd.getSpeed() / rfp.kph;
+
+    //if video is far (empiric) from ghost:
+    if (fabs(video_time_shift_ms) > 5000)
+    {
+        libvlc_media_player_set_time(mp, (libvlc_time_t) (rfp.secs*1000.0));
+    }
+    else
+    // otherwise add "small" empiric corrective parameter to get video back to ghost position:
+        rate *= 1.0 + (video_time_shift_ms / 10000.0);
+
+    libvlc_media_player_set_pause(mp, (rate < 0.01));
+
+    // change video rate but only if there is a significant change
+    if ((rate != 0.0) && (fabs((rate - currentVideoRate) / rate) > 0.05))
+    {
+        libvlc_media_player_set_rate(mp, rate );
+        currentVideoRate = rate;
+    }
+
+#endif
+
+#ifdef GC_VIDEO_QT5
+//TODO
+//    // seek to ms position in current file
+//    mp->setPosition(ms);
+#endif
 }
 
 void VideoWindow::seekPlayback(long ms)
 {
-
 #ifdef GC_VIDEO_NONE
     Q_UNUSED(ms)
 #endif
@@ -314,8 +412,16 @@ void VideoWindow::seekPlayback(long ms)
 #ifdef GC_VIDEO_VLC
     if (!m) return;
 
-    // seek to ms position in current file
-    libvlc_media_player_set_time(mp, (libvlc_time_t) ms);
+    // when we selected a videosync file in traning mode (rlv...)
+    if (context->currentVideoSyncFile())
+    {
+        context->currentVideoSyncFile()->manualOffset += (double) ms; //we consider +/- 1km
+    }
+    else
+    {
+        // seek to ms position in current file
+        libvlc_media_player_set_time(mp, (libvlc_time_t) ms);
+    }
 #endif
 
 #ifdef GC_VIDEO_QT5

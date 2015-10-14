@@ -113,6 +113,48 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QStyle *cde = QStyleFactory::create(OS_STYLE);
     mediaTree->verticalScrollBar()->setStyle(cde);
 #endif
+
+
+
+    videosyncModel = new QSqlTableModel(this, trainDB->connection());
+    videosyncModel->setTable("videosyncs");
+    videosyncModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    videosyncModel->select();
+    while (videosyncModel->canFetchMore(QModelIndex())) videosyncModel->fetchMore(QModelIndex());
+
+    vssortModel = new QSortFilterProxyModel(this);
+    vssortModel->setSourceModel(videosyncModel);
+    vssortModel->setDynamicSortFilter(true);
+    vssortModel->sort(1, Qt::AscendingOrder); //filename order
+
+    videosyncTree = new QTreeView;
+    videosyncTree->setModel(vssortModel);
+
+    // hide unwanted columns and header
+    for(int i=0; i<videosyncTree->header()->count(); i++)
+        videosyncTree->setColumnHidden(i, true);
+    videosyncTree->setColumnHidden(1, false); // show filename
+    videosyncTree->header()->hide();
+
+    videosyncTree->setSortingEnabled(false);
+    videosyncTree->setAlternatingRowColors(false);
+    videosyncTree->setEditTriggers(QAbstractItemView::NoEditTriggers); // read-only
+    videosyncTree->expandAll();
+    videosyncTree->header()->setCascadingSectionResizes(true); // easier to resize this way
+    videosyncTree->setContextMenuPolicy(Qt::CustomContextMenu);
+    videosyncTree->header()->setStretchLastSection(true);
+    videosyncTree->header()->setMinimumSectionSize(0);
+    videosyncTree->header()->setFocusPolicy(Qt::NoFocus);
+    videosyncTree->setFrameStyle(QFrame::NoFrame);
+#ifdef Q_OS_MAC
+    videosyncTree->header()->setSortIndicatorShown(false); // blue looks nasty
+    videosyncTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+#ifdef Q_OS_WIN
+    QStyle *cdevideosync = QStyleFactory::create(OS_STYLE);
+    videosyncTree->verticalScrollBar()->setStyle(cdevideosync);
+#endif
+
 #endif
 
     deviceTree = new QTreeWidget;
@@ -334,6 +376,13 @@ intensity->hide(); //XXX!!! temporary
     connect(moreMediaAct, SIGNAL(triggered(void)), this, SLOT(mediaPopup(void)));
     mediaItem->addWidget(mediaTree);
     trainSplitter->addWidget(mediaItem);
+
+    videosyncItem = new GcSplitterItem(tr("VideoSync"), iconFromPNG(":images/sidebar/sync.png"), this);
+    QAction *moreVideoSyncAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    videosyncItem->addAction(moreVideoSyncAct);
+    connect(moreVideoSyncAct, SIGNAL(triggered(void)), this, SLOT(videosyncPopup(void)));
+    videosyncItem->addWidget(videosyncTree);
+    trainSplitter->addWidget(videosyncItem);
 #endif
     trainSplitter->prepare(context->athlete->cyclist, "train");
 
@@ -341,6 +390,7 @@ intensity->hide(); //XXX!!! temporary
     // get rid of annoying focus rectangle for sidebar components
 #if !defined GC_VIDEO_NONE
     mediaTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+    videosyncTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
     deviceTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -354,6 +404,9 @@ intensity->hide(); //XXX!!! temporary
     connect(mediaTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
                             this, SLOT(mediaTreeWidgetSelectionChanged()));
     connect(context, SIGNAL(selectMedia(QString)), this, SLOT(selectVideo(QString)));
+    connect(videosyncTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
+                            this, SLOT(videosyncTreeWidgetSelectionChanged()));
+    connect(context, SIGNAL(selectVideoSync(QString)), this, SLOT(selectVideoSync(QString)));
 #endif
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(selectWorkout(QString)), this, SLOT(selectWorkout(QString)));
@@ -366,6 +419,7 @@ intensity->hide(); //XXX!!! temporary
     // set home
     //XXX ??? main = parent;
     ergFile = NULL;
+    videosyncFile = NULL;
     calibrating = false;
 
     // now the GUI is setup lets sort our control variables
@@ -424,6 +478,17 @@ TrainSidebar::refresh()
 
     // restore selection
     selectVideo(videoPath);
+
+    // remember selection
+    row = videosyncTree->currentIndex().row();
+    QString videosyncPath = videosyncTree->model()->data(videosyncTree->model()->index(row,0)).toString();
+
+    // refresh data
+    videosyncModel->select();
+    while (videosyncModel->canFetchMore(QModelIndex())) videosyncModel->fetchMore(QModelIndex());
+
+    // restore selection
+    selectVideoSync(videosyncPath);
 #endif
 
     row = workoutTree->currentIndex().row();
@@ -502,11 +567,41 @@ TrainSidebar::mediaPopup()
 }
 
 void
+TrainSidebar::videosyncPopup()
+{
+    // OK - we are working with a specific event..
+    QMenu menu(videosyncTree);
+    QAction *import = new QAction(tr("Import VideoSync from File"), videosyncTree);
+    QAction *scan = new QAction(tr("Scan for VideoSyncs"), videosyncTree);
+
+    menu.addAction(import);
+    menu.addAction(scan);
+
+    // connect menu to functions
+    connect(import, SIGNAL(triggered(void)), context->mainWindow, SLOT(importWorkout(void)));
+    connect(scan, SIGNAL(triggered(void)), context->mainWindow, SLOT(manageLibrary(void)));
+
+    QModelIndex current = videosyncTree->currentIndex();
+    QModelIndex target = vssortModel->mapToSource(current);
+    QString filename = videosyncModel->data(videosyncModel->index(target.row(), 0), Qt::DisplayRole).toString();
+    if (QFileInfo(filename).exists()) {
+        QAction *del = new QAction(tr("Delete selected videoSync"), workoutTree);
+        menu.addAction(del);
+        connect(del, SIGNAL(triggered(void)), this, SLOT(deleteVideoSyncs(void)));
+    }
+
+    // execute the menu
+    menu.exec(trainSplitter->mapToGlobal(QPoint(videosyncItem->pos().x()+videosyncItem->width()-20,
+                                           videosyncItem->pos().y())));
+}
+
+void
 TrainSidebar::configChanged(qint32)
 {
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 #if !defined GC_VIDEO_NONE
     mediaTree->setStyleSheet(GCColor::stylesheet());
+    videosyncTree->setStyleSheet(GCColor::stylesheet());
 #endif
     workoutTree->setStyleSheet(GCColor::stylesheet());
     deviceTree->setStyleSheet(GCColor::stylesheet());
@@ -730,6 +825,41 @@ TrainSidebar::deleteVideos()
         trainDB->endLUW();
     }
 }
+
+void
+TrainSidebar::deleteVideoSyncs()
+{
+    QModelIndex current = videosyncTree->currentIndex();
+    QModelIndex target = vssortModel->mapToSource(current);
+    QString filename = videosyncModel->data(videosyncModel->index(target.row(), 0), Qt::DisplayRole).toString();
+
+    if (QFileInfo(filename).exists()) {
+        // are you sure?
+        QMessageBox msgBox;
+        msgBox.setText(tr("Are you sure you want to delete this videosync?"));
+        msgBox.setInformativeText(filename);
+        QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
+        msgBox.setStandardButtons(QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+
+        if(msgBox.clickedButton() != deleteButton) return;
+
+        // delete from disk
+        //XXX QFile(filename).remove(); // lets not for now..
+
+        // remove any reference (from drag and drop)
+        Library *l = Library::findLibrary("VideoSync Library");
+        if (l) l->removeRef(context, filename);
+
+        // delete from DB
+        trainDB->startLUW();
+        trainDB->deleteVideoSync(filename);
+        trainDB->endLUW();
+    }
+}
+
 void
 TrainSidebar::deleteWorkouts()
 {
@@ -769,6 +899,36 @@ TrainSidebar::mediaTreeWidgetSelectionChanged()
     context->notifyMediaSelected(filename);
 }
 
+void
+TrainSidebar::videosyncTreeWidgetSelectionChanged()
+{
+
+    QModelIndex current = videosyncTree->currentIndex();
+    QModelIndex target = vssortModel->mapToSource(current);
+    QString filename = videosyncModel->data(videosyncModel->index(target.row(), 0), Qt::DisplayRole).toString();
+
+    // wip away the current selected videosync
+    if (videosyncFile) {
+        delete videosyncFile;
+        videosyncFile = NULL;
+    }
+
+    if (filename == "") {
+        context->notifyVideoSyncFileSelected(NULL);
+        return;
+    }
+
+
+    videosyncFile = new VideoSyncFile(filename, mode, context);
+    if (videosyncFile->isValid()) {
+        context->notifyVideoSyncFileSelected(videosyncFile);
+    } else {
+        delete videosyncFile;
+        videosyncFile = NULL;
+        context->notifyVideoSyncFileSelected(NULL);
+    }
+}
+
 /*--------------------------------------------------------------------------------
  * Was realtime window, now local and manages controller and chart updates etc
  *------------------------------------------------------------------------------*/
@@ -794,6 +954,7 @@ void TrainSidebar::Start()       // when start button is pressed
 
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
+        videosyncTree->setEnabled(false);
 #endif
 
         // tell the world
@@ -816,6 +977,7 @@ void TrainSidebar::Start()       // when start button is pressed
 #if !defined GC_VIDEO_NONE
         // enable media tree so we can change movie - mid workout
         mediaTree->setEnabled(true);
+        videosyncTree->setEnabled(true);
 #endif
 
         // tell the world
@@ -842,6 +1004,7 @@ void TrainSidebar::Start()       // when start button is pressed
 
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
+        videosyncTree->setEnabled(false);
 #endif
         workoutTree->setEnabled(false);
         deviceTree->setEnabled(false);
@@ -935,6 +1098,7 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
+        videosyncTree->setEnabled(false);
 #endif
 
         // tell the world
@@ -954,6 +1118,7 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
         // enable media tree so we can change movie
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(true);
+        videosyncTree->setEnabled(true);
 #endif
 
         // tell the world
@@ -971,6 +1136,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     // media or workouts whilst a workout is in progress
 #if !defined GC_VIDEO_NONE
     mediaTree->setEnabled(true);
+    videosyncTree->setEnabled(true);
 #endif
     workoutTree->setEnabled(true);
     deviceTree->setEnabled(true);
@@ -1114,14 +1280,14 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
 				if (Devices[dev].type == DEV_FORTIUS) {
 	                rtData.setLoad(local.getLoad()); // and get load in case it was adjusted
-                    rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted	
-					// to within defined limits					
+                    rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted
+					// to within defined limits
 				}
 
                 if (Devices[dev].type == DEV_ANTLOCAL || Devices[dev].type == DEV_NULL) {
                     rtData.setHb(local.getSmO2(), local.gettHb()); //only moxy data from ant and robot devices right now
                 }
-				
+
                 // what are we getting from this one?
                 if (dev == bpmTelemetry) rtData.setHr(local.getHr());
                 if (dev == rpmTelemetry) rtData.setCadence(local.getCadence());
@@ -1142,7 +1308,14 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             // Distance assumes current speed for the last second. from km/h to km/sec
             displayDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
-            displayWorkoutDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
+
+            if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile()))
+            {
+                displayWorkoutDistance = context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset;
+                // TODO : graphs to be shown at seek position
+            }
+            else
+                displayWorkoutDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
             rtData.setDistance(displayDistance);
 
             // time
@@ -1435,8 +1608,11 @@ void TrainSidebar::FFwd()
         load_msecs += 10000; // jump forward 10 seconds
         context->notifySeek(load_msecs);
     }
+    else if (context->currentVideoSyncFile())
+    {
+        context->notifySeek(+1); // in case of video with RLV file synchronisation just ask to go forward
+    }
     else displayWorkoutDistance += 1; // jump forward a kilometer in the workout
-
 }
 
 void TrainSidebar::Rewind()
@@ -1447,7 +1623,12 @@ void TrainSidebar::Rewind()
         load_msecs -=10000; // jump back 10 seconds
         if (load_msecs < 0) load_msecs = 0;
         context->notifySeek(load_msecs);
-    } else {
+    }
+    else if (context->currentVideoSyncFile())
+    {
+        context->notifySeek(-1); // in case of video with RLV file synchronisation just ask to go backward
+    }
+    else {
         displayWorkoutDistance -=1; // jump back a kilometer
         if (displayWorkoutDistance < 0) displayWorkoutDistance = 0;
     }
@@ -1779,6 +1960,19 @@ TrainSidebar::selectVideo(QString fullpath)
         QString path = mediaTree->model()->data(mediaTree->model()->index(i,0)).toString();
         if (path == fullpath) {
             mediaTree->setCurrentIndex(mediaTree->model()->index(i,0));
+            break;
+        }
+    }
+}
+
+void
+TrainSidebar::selectVideoSync(QString fullpath)
+{
+    // look at each entry in the top videosyncTree
+    for (int i=0; i<videosyncTree->model()->rowCount(); i++) {
+        QString path = videosyncTree->model()->data(videosyncTree->model()->index(i,0)).toString();
+        if (path == fullpath) {
+            videosyncTree->setCurrentIndex(videosyncTree->model()->index(i,0));
             break;
         }
     }
