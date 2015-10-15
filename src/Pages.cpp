@@ -302,7 +302,7 @@ GeneralPage::browseVideoSyncDir()
     QString currentDir = videosyncDirectory->text();
     if (!QDir(currentDir).exists()) currentDir = "";    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
                             currentDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    if (dir != "") workoutDirectory->setText(dir);  //only overwrite current dir, if a new was selected
+    if (dir != "") videosyncDirectory->setText(dir);  //only overwrite current dir, if a new was selected
 }
 
 
