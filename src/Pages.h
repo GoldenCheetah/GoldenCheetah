@@ -81,6 +81,7 @@ class GeneralPage : public QWidget
 
     public slots:
         void browseWorkoutDir();
+        void browseVideoSyncDir();
         void browseAthleteDir();
 
     private:
@@ -97,12 +98,15 @@ class GeneralPage : public QWidget
         QLineEdit *hystedit;
         QLineEdit *athleteDirectory;
         QLineEdit *workoutDirectory;
+        QLineEdit *videosyncDirectory;
         QPushButton *workoutBrowseButton;
         QPushButton *athleteBrowseButton;
+        QPushButton *videosyncBrowseButton;
 
         QLabel *langLabel;
         QLabel *warningLabel;
         QLabel *workoutLabel;
+        QLabel *videosyncLabel;
         QLabel *athleteLabel;
 
         struct {
