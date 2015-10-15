@@ -200,6 +200,21 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(workoutBrowseButton, 8 + offset,2);
 
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
+    //
+    // Videosync directory (train view)
+    //
+    QVariant videosyncDir = appsettings->value(this, GC_VIDEOSYNCDIR, "");
+    videosyncLabel = new QLabel(tr("VideoSync Library:"));
+    videosyncDirectory = new QLineEdit;
+    videosyncDirectory->setText(videosyncDir.toString());
+    videosyncBrowseButton = new QPushButton(tr("Browse"));
+    videosyncBrowseButton->setFixedWidth(120);
+
+    configLayout->addWidget(videosyncLabel, 9 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(videosyncDirectory, 9 + offset,1);
+    configLayout->addWidget(videosyncBrowseButton, 9 + offset,2);
+
+    connect(videosyncBrowseButton, SIGNAL(clicked()), this, SLOT(browseVideoSyncDir()));
 
     // save away initial values
     b4.unit = unitCombo->currentIndex();
@@ -228,9 +243,12 @@ GeneralPage::saveClicked()
     // save on exit
     appsettings->setValue(GC_WARNEXIT, warnOnExit->isChecked());
 
-    // Bike score estimation
+    // Directories
     appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
     appsettings->setValue(GC_HOMEDIR, athleteDirectory->text());
+    appsettings->setValue(GC_VIDEOSYNCDIR, videosyncDirectory->text());
+
+    // Elevation
     appsettings->setValue(GC_ELEVATION_HYSTERESIS, hystedit->text());
 
     // wbal formula
@@ -271,16 +289,30 @@ GeneralPage::saveClicked()
 void
 GeneralPage::browseWorkoutDir()
 {
+    QString currentDir = workoutDirectory->text();
+    if (!QDir(currentDir).exists()) currentDir = "";
     QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
-                            "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+                            currentDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     if (dir != "") workoutDirectory->setText(dir);  //only overwrite current dir, if a new was selected
 }
 
 void
+GeneralPage::browseVideoSyncDir()
+{
+    QString currentDir = videosyncDirectory->text();
+    if (!QDir(currentDir).exists()) currentDir = "";    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
+                            currentDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (dir != "") workoutDirectory->setText(dir);  //only overwrite current dir, if a new was selected
+}
+
+
+void
 GeneralPage::browseAthleteDir()
 {
+    QString currentDir = athleteDirectory->text();
+    if (!QDir(currentDir).exists()) currentDir = "";
     QString dir = QFileDialog::getExistingDirectory(this, tr("Select Athlete Library"),
-                            "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+                            currentDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     if (dir != "") athleteDirectory->setText(dir);  //only overwrite current dir, if a new was selected
 }
 

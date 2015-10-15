@@ -163,6 +163,12 @@ MainWindow::MainWindow(const QDir &home)
     if (appsettings->value(NULL, GC_WORKOUTDIR).toString() == "")
         appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home->root().canonicalPath() + "/../").canonicalPath());
 
+    // if no videosynct directory is configured, default to the
+    // top level GoldenCheetah directory
+    if (appsettings->value(NULL, GC_VIDEOSYNCDIR).toString() == "")
+        appsettings->setValue(GC_VIDEOSYNCDIR, QFileInfo(context->athlete->home->root().canonicalPath() + "/../").canonicalPath());
+
+
     /*----------------------------------------------------------------------
      *  GUI setup
      *--------------------------------------------------------------------*/
@@ -1947,9 +1953,8 @@ MainWindow::downloadErgDB()
         d->exec();
     } else{
         QMessageBox::critical(this, tr("Workout Directory Invalid"),
-        "The workout directory is not configured, or the directory"
-        " selected no longer exists.\n\n"
-        "Please check your preference settings.");
+        tr("The workout directory is not configured, or the directory selected no longer exists.\n\n"
+        "Please check your preference settings."));
     }
 }
 
