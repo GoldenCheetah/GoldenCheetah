@@ -129,7 +129,7 @@ class Context : public QObject
         // realtime signals
         void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
         void notifyErgFileSelected(ErgFile *x) { workout=x; ergFileSelected(x); }
-        void notifyVideoSyncFileSelected(VideoSyncFile *x) { videosync=x; VideoSyncFileSelected(x); }
+        void notifyVideoSyncFileSelected(VideoSyncFile *x) { videosync=x; videoSyncFileSelected(x); }
         ErgFile *currentErgFile() { return workout; }
         VideoSyncFile *currentVideoSyncFile() { return videosync; }
         void notifyMediaSelected( QString x) { mediaSelected(x); }
@@ -216,7 +216,7 @@ class Context : public QObject
         // realtime
         void telemetryUpdate(RealtimeData rtData);
         void ergFileSelected(ErgFile *);
-        void VideoSyncFileSelected(VideoSyncFile *);
+        void videoSyncFileSelected(VideoSyncFile *);
         void mediaSelected(QString);
         void selectWorkout(QString); // ask traintool to select this
         void selectMedia(QString); // ask traintool to select this

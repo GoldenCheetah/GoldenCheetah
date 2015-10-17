@@ -144,6 +144,10 @@ class TrainSidebar : public GcWindow
         void selectVideoSync(QString fullpath);
         void selectWorkout(QString fullpath);
 
+        void removeInvalidVideoSync();
+        void removeInvalidWorkout();
+
+
     public slots:
         void configChanged(qint32);
         void deleteWorkouts(); // deletes selected workouts
