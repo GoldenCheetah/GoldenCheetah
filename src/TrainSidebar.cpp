@@ -233,6 +233,9 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     rewind->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     rewind->setAutoRepeat(true);
     rewind->setAutoRepeatDelay(200);
+#if QT_VERSION > 0x050400
+    rewind->setShortcut(Qt::Key_MediaPrevious);
+#endif
     toolbuttons->addWidget(rewind);
 
     QIcon stopIcon(":images/oxygen/stop.png");
@@ -243,6 +246,9 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     stop->setAutoDefault(false);
     stop->setFlat(true);
     stop->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+#if QT_VERSION > 0x050400
+    stop->setShortcut(Qt::Key_MediaStop);
+#endif
     toolbuttons->addWidget(stop);
 
     QIcon playIcon(":images/oxygen/play.png");
@@ -253,6 +259,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     play->setAutoDefault(false);
     play->setFlat(true);
     play->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    play->setShortcut(Qt::Key_MediaTogglePlayPause);
     toolbuttons->addWidget(play);
 
     QIcon fwdIcon(":images/oxygen/ffwd.png");
@@ -265,6 +272,9 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     forward->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     forward->setAutoRepeat(true);
     forward->setAutoRepeatDelay(200);
+#if QT_VERSION > 0x050400
+    forward->setShortcut(Qt::Key_MediaNext);
+#endif
     toolbuttons->addWidget(forward);
 
     QIcon lapIcon(":images/oxygen/lap.png");
@@ -275,6 +285,9 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     lap->setAutoDefault(false);
     lap->setFlat(true);
     lap->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+#if QT_VERSION > 0x050400
+    lap->setShortcut(Qt::Key_0);
+#endif
     toolbuttons->addWidget(lap);
     toolbuttons->addStretch();
 
