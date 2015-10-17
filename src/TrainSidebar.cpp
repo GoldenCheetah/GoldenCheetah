@@ -413,10 +413,7 @@ intensity->hide(); //XXX!!! temporary
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     connect(workoutTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(workoutTreeWidgetSelectionChanged()));
-    // add a watch on all directories
-    QVariant workoutDir = appsettings->value(NULL, GC_WORKOUTDIR);
 
-    // set home
     //XXX ??? main = parent;
     ergFile = NULL;
     videosyncFile = NULL;
@@ -521,7 +518,7 @@ TrainSidebar::workoutPopup()
     QModelIndex target = sortModel->mapToSource(current);
     QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
     if (QFileInfo(filename).exists()) {
-        QAction *del = new QAction(tr("Delete selected workout"), workoutTree);
+        QAction *del = new QAction(tr("Delete selected Workout"), workoutTree);
         menu.addAction(del);
         connect(del, SIGNAL(triggered(void)), this, SLOT(deleteWorkouts(void)));
     }
@@ -556,7 +553,7 @@ TrainSidebar::mediaPopup()
     QModelIndex target = vsortModel->mapToSource(current);
     QString filename = videoModel->data(videoModel->index(target.row(), 0), Qt::DisplayRole).toString();
     if (QFileInfo(filename).exists()) {
-        QAction *del = new QAction(tr("Delete selected video"), workoutTree);
+        QAction *del = new QAction(tr("Remove reference to selected video"), workoutTree);
         menu.addAction(del);
         connect(del, SIGNAL(triggered(void)), this, SLOT(deleteVideos(void)));
     }
@@ -585,7 +582,7 @@ TrainSidebar::videosyncPopup()
     QModelIndex target = vssortModel->mapToSource(current);
     QString filename = videosyncModel->data(videosyncModel->index(target.row(), 0), Qt::DisplayRole).toString();
     if (QFileInfo(filename).exists()) {
-        QAction *del = new QAction(tr("Delete selected videoSync"), workoutTree);
+        QAction *del = new QAction(tr("Delete selected VideoSync"), workoutTree);
         menu.addAction(del);
         connect(del, SIGNAL(triggered(void)), this, SLOT(deleteVideoSyncs(void)));
     }
@@ -757,6 +754,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
             delete ergFile;
             ergFile = NULL;
             context->notifyErgFileSelected(NULL);
+            removeInvalidWorkout();
             mode = ERG;
             status &= ~RT_WORKOUT;
             setLabels();
@@ -802,9 +800,9 @@ TrainSidebar::deleteVideos()
     if (QFileInfo(filename).exists()) {
         // are you sure?
         QMessageBox msgBox;
-        msgBox.setText(tr("Are you sure you want to delete this video?"));
+        msgBox.setText(tr("Are you sure you want to remove the reference to this video?"));
         msgBox.setInformativeText(filename);
-        QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
+        QPushButton *deleteButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
         msgBox.setStandardButtons(QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Cancel);
         msgBox.setIcon(QMessageBox::Critical);
@@ -826,6 +824,7 @@ TrainSidebar::deleteVideos()
     }
 }
 
+
 void
 TrainSidebar::deleteVideoSyncs()
 {
@@ -836,7 +835,7 @@ TrainSidebar::deleteVideoSyncs()
     if (QFileInfo(filename).exists()) {
         // are you sure?
         QMessageBox msgBox;
-        msgBox.setText(tr("Are you sure you want to delete this videosync?"));
+        msgBox.setText(tr("Are you sure you want to delete this VideoSync?"));
         msgBox.setInformativeText(filename);
         QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
         msgBox.setStandardButtons(QMessageBox::Cancel);
@@ -847,17 +846,37 @@ TrainSidebar::deleteVideoSyncs()
         if(msgBox.clickedButton() != deleteButton) return;
 
         // delete from disk
-        //XXX QFile(filename).remove(); // lets not for now..
-
-        // remove any reference (from drag and drop)
-        Library *l = Library::findLibrary("VideoSync Library");
-        if (l) l->removeRef(context, filename);
+        QFile(filename).remove();
 
         // delete from DB
         trainDB->startLUW();
         trainDB->deleteVideoSync(filename);
         trainDB->endLUW();
     }
+}
+
+void
+TrainSidebar::removeInvalidVideoSync()
+{
+    QModelIndex current = videosyncTree->currentIndex();
+    QModelIndex target = vssortModel->mapToSource(current);
+    QString filename = videosyncModel->data(videosyncModel->index(target.row(), 0), Qt::DisplayRole).toString();
+    QMessageBox msgBox;
+    msgBox.setText(tr("The VideoSync file is either not valid or not existing and will be removed from the library."));
+    msgBox.setInformativeText(filename);
+    QPushButton *removeButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
+    msgBox.setStandardButtons(QMessageBox::Cancel);
+    msgBox.setDefaultButton(removeButton);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.exec();
+
+    if(msgBox.clickedButton() != removeButton) return;
+
+    // delete from DB
+    trainDB->startLUW();
+    trainDB->deleteVideoSync(filename);
+    trainDB->endLUW();
+
 }
 
 void
@@ -868,9 +887,10 @@ TrainSidebar::deleteWorkouts()
     QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
 
     if (QFileInfo(filename).exists()) {
+
         // are you sure?
         QMessageBox msgBox;
-        msgBox.setText(tr("Are you sure you want to delete this workout?"));
+        msgBox.setText(tr("Are you sure you want to delete this Workout?"));
         msgBox.setInformativeText(filename);
         QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
         msgBox.setStandardButtons(QMessageBox::Cancel);
@@ -887,6 +907,31 @@ TrainSidebar::deleteWorkouts()
         trainDB->deleteWorkout(filename);
         trainDB->endLUW();
     }
+}
+
+void
+TrainSidebar::removeInvalidWorkout()
+{
+    QModelIndex current = workoutTree->currentIndex();
+    QModelIndex target = sortModel->mapToSource(current);
+    QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
+
+    QMessageBox msgBox;
+    msgBox.setText(tr("The Workout file is either not valid or not existing and will be removed from the library."));
+    msgBox.setInformativeText(filename);
+    QPushButton *removeButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
+    msgBox.setStandardButtons(QMessageBox::Cancel);
+    msgBox.setDefaultButton(removeButton);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.exec();
+
+    if(msgBox.clickedButton() != removeButton) return;
+
+    // delete from DB
+    trainDB->startLUW();
+    trainDB->deleteWorkout(filename);
+    trainDB->endLUW();
+
 }
 
 void
@@ -926,6 +971,7 @@ TrainSidebar::videosyncTreeWidgetSelectionChanged()
         delete videosyncFile;
         videosyncFile = NULL;
         context->notifyVideoSyncFileSelected(NULL);
+        removeInvalidVideoSync();
     }
 }
 
