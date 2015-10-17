@@ -163,12 +163,6 @@ MainWindow::MainWindow(const QDir &home)
     if (appsettings->value(NULL, GC_WORKOUTDIR).toString() == "")
         appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home->root().canonicalPath() + "/../").canonicalPath());
 
-    // if no videosynct directory is configured, default to the
-    // top level GoldenCheetah directory
-    if (appsettings->value(NULL, GC_VIDEOSYNCDIR).toString() == "")
-        appsettings->setValue(GC_VIDEOSYNCDIR, QFileInfo(context->athlete->home->root().canonicalPath() + "/../").canonicalPath());
-
-
     /*----------------------------------------------------------------------
      *  GUI setup
      *--------------------------------------------------------------------*/
@@ -660,8 +654,8 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Download workouts from ErgDB..."), this, SLOT(downloadErgDB()));
-    optionsMenu->addAction(tr("Import workouts or videos..."), this, SLOT(importWorkout()));
-    optionsMenu->addAction(tr("Scan disk for videos and workouts..."), this, SLOT(manageLibrary()));
+    optionsMenu->addAction(tr("Import workouts, videos, videoSyncs..."), this, SLOT(importWorkout()));
+    optionsMenu->addAction(tr("Scan disk for workouts, videos, videoSyncs..."), this, SLOT(manageLibrary()));
 
     optionsMenu->addAction(tr("Create Heat Map..."), this, SLOT(generateHeatMap()), tr(""));
     optionsMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));

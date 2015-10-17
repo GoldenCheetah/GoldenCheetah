@@ -211,11 +211,11 @@ bool TrainDB::createWorkoutTable()
         // adding a space at the front of string to make manual mode always
         // appear first in a sorted list is a bit of a hack, but works ok
         QString manualErg = QString("INSERT INTO workouts (filepath, filename) values (\"//1\", \"%1\");")
-                         .arg(tr(" Manual Erg Mode"));
+                         .arg(" " + tr("Manual Erg Mode")); // keep the SPACE seperate so that translation cannot remove it
         rc = query.exec(manualErg);
 
         QString manualCrs = QString("INSERT INTO workouts (filepath, filename) values (\"//2\", \"%1\");")
-                         .arg(tr(" Manual Slope Mode"));
+                         .arg(" " + tr("Manual Slope Mode")); // keep the SPACE seperate so that translation cannot remove it
         rc = query.exec(manualCrs);
 
         // add row to version database
