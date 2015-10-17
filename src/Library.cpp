@@ -125,8 +125,8 @@ Library::importFiles(Context *context, QStringList files)
     // nothing to dialog about...
     if (!videos.count() && !workouts.count() && !videosyncs.count()) {
 
-        QMessageBox::warning(NULL, tr("Import Videos, Sync and Workouts"),
-            "No supported videos, sync or workouts were found to import");
+        QMessageBox::warning(NULL, tr("Import Videos, VideoSyncs and Workouts"),
+            tr("No supported videos, videoSyncs or workouts were found to import"));
 
         return;
     }
@@ -156,7 +156,7 @@ Library::importFiles(Context *context, QStringList files)
             trainDB->importVideo(videos[0]);
         }
 
-        QString target;
+        QString targetSync; // dedicated variable for notification
 
         // import the videosync...
         if (videosyncs.count()) {
@@ -164,7 +164,7 @@ Library::importFiles(Context *context, QStringList files)
             QFile source(videosyncs[0]);
 
             // set target directory
-            QString videosyncDir = appsettings->value(NULL, GC_VIDEOSYNCDIR).toString();
+            QString videosyncDir = appsettings->value(NULL, GC_WORKOUTDIR).toString();
             if (videosyncDir == "") {
                 QDir root = context->athlete->home->root();
                 root.cdUp();
@@ -172,19 +172,21 @@ Library::importFiles(Context *context, QStringList files)
             }
 
             // set target filename
-            target = videosyncDir + "/" + QFileInfo(source).fileName();
+            targetSync = videosyncDir + "/" + QFileInfo(source).fileName();
 
-            if (!source.copy(target)) {
+            if (!source.copy(targetSync)) {
 
-                QMessageBox::warning(NULL, tr("Copy Videosync Failed"),
-                    QString("%1 already exists in videosync library").arg(QFileInfo(target).fileName()));
+                QMessageBox::warning(NULL, tr("Copy VideoSync Failed"),
+                    QString(tr("%1 already exists in videoSync library: %2")).arg(QFileInfo(targetSync).fileName()).arg(videosyncDir));
             }
 
             // still add it, it may not have been scanned
             int mode;
-            VideoSyncFile file(target, mode, context);
-            trainDB->importVideoSync(target, &file);
+            VideoSyncFile file(targetSync, mode, context);
+            trainDB->importVideoSync(targetSync, &file);
         }
+
+        QString targetWorkout; // dedicated variable for notification
 
         if (workouts.count()) {
 
@@ -199,18 +201,18 @@ Library::importFiles(Context *context, QStringList files)
             }
 
             // set target filename
-            target = workoutDir + "/" + QFileInfo(source).fileName();
+            targetWorkout = workoutDir + "/" + QFileInfo(source).fileName();
 
-            if (!source.copy(target)) {
+            if (!source.copy(targetWorkout)) {
 
                 QMessageBox::warning(NULL, tr("Copy Workout Failed"),
-                    QString("%1 already exists in workout library").arg(QFileInfo(target).fileName()));
+                    QString(tr("%1 already exists in workout library: %2")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
             }
 
             // still add it, it may noit have been scanned...
             int mode;
-            ErgFile file(target, mode, context);
-            trainDB->importWorkout(target, &file);
+            ErgFile file(targetWorkout, mode, context);
+            trainDB->importWorkout(targetWorkout, &file);
 
         }
 
@@ -221,8 +223,8 @@ Library::importFiles(Context *context, QStringList files)
 
         // Tell traintool to select what was imported
         if (videos.count()) context->notifySelectVideo(videos[0]);
-        if (workouts.count()) context->notifySelectWorkout(target);
-        if (videosyncs.count()) context->notifySelectVideoSync(target);
+        if (workouts.count()) context->notifySelectWorkout(targetWorkout);
+        if (videosyncs.count()) context->notifySelectVideoSync(targetSync);
 
     } else {
 
@@ -260,9 +262,8 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     findWorkouts->setChecked(true);
     findMedia = new QCheckBox(tr("Video files (.mp4, .avi etc)"), this);
     findMedia->setChecked(true);
-    findVideoSyncs = new QCheckBox(tr("VideoSync files (.rlv, .gpx etc)"), this);
+    findVideoSyncs = new QCheckBox(tr("VideoSync files (.rlv)"), this);
     findVideoSyncs->setChecked(true);
-
     addPath = new QPushButton("+", this);
     removePath = new QPushButton("-", this);
     removeRef = new QPushButton("-", this);
@@ -320,12 +321,12 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     workoutCount = new QLabel(this);
     videosyncCountTitle = new QLabel(tr("VideoSyncs"), this);
     videosyncCount = new QLabel(this);
-    mediaCount->setFixedWidth(40);
-    mediaCountTitle->setFixedWidth(40);
-    workoutCount->setFixedWidth(60);
-    workoutCountTitle->setFixedWidth(60);
-    videosyncCount->setFixedWidth(60);
-    videosyncCountTitle->setFixedWidth(60);
+    mediaCount->setFixedWidth(80);
+    mediaCountTitle->setFixedWidth(80);
+    workoutCount->setFixedWidth(80);
+    workoutCountTitle->setFixedWidth(80);
+    videosyncCount->setFixedWidth(80);
+    videosyncCountTitle->setFixedWidth(80);
 
     cancelButton = new QPushButton(tr("Cancel"), this);
     cancelButton->setDefault(false);
@@ -361,12 +362,15 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     progressLayout->addWidget(pathLabelTitle, 0,0);
     progressLayout->addWidget(mediaCountTitle, 0,1);
     progressLayout->addWidget(workoutCountTitle, 0,2);
+    progressLayout->addWidget(videosyncCountTitle, 0,3);
     progressLayout->addWidget(pathLabel, 1,0);
     progressLayout->addWidget(mediaCount, 1,1);
     progressLayout->addWidget(workoutCount, 1,2);
-    progressLayout->setColumnStretch(0, 7);
+    progressLayout->addWidget(videosyncCount, 1,3);
+    progressLayout->setColumnStretch(0, 6);
     progressLayout->setColumnStretch(1, 1);
     progressLayout->setColumnStretch(2, 1);
+    progressLayout->setColumnStretch(3, 1);
     mainLayout->addLayout(progressLayout);
 
     QHBoxLayout *buttons = new QHBoxLayout;
@@ -709,7 +713,7 @@ LibrarySearch::run()
 
 
     emit done();
-};
+}
 
 void
 LibrarySearch::abort()
@@ -761,12 +765,12 @@ WorkoutImportDialog::WorkoutImportDialog(Context *context, QStringList files) :
 
     QLabel *notice = new QLabel(this);
     notice->setWordWrap(true);
-    notice->setText("Please note, that when importing or drag and dropping "
+    notice->setText(tr("Please note, that when importing or drag and dropping "
                     "videos into the library we DO NOT copy the file into "
                     "the GoldenCheetah library, instead we add a REFERENCE "
-                    "to it. We DO copy workout files, since they are smaller.\n\n"
+                    "to it. We DO copy workout and videoSync files, since they are smaller.\n\n"
                     "You can remove references when managing the library "
-                    "via the tools menu option"); // TODO : how to manage videosync files?
+                    "via the context menu options")); // TODO : how to manage videosync files
 
     fileTable = new QTreeWidget(this);
 #ifdef Q_OS_MAC
@@ -790,7 +794,7 @@ WorkoutImportDialog::WorkoutImportDialog(Context *context, QStringList files) :
     okButton = new QPushButton(tr("OK"), this);
     okButton->setDefault(true);
 
-    // if importing workouts..
+    // if importing workouts and videosync files
     overwrite = new QCheckBox(tr("Overwite existing files"),this);
     if (!workouts.count() && !videosyncs.count()) overwrite->hide();
 
@@ -859,19 +863,22 @@ WorkoutImportDialog::import()
         // get target name
         QString target = workoutDir + "/" + QFileInfo(workout).fileName();
 
-        // don't overwrite existing
-        if (QFile(target).exists() && !overwrite->isChecked()) continue;
+        // only copy if source != target otherwise just keep what we have
+        if (target != workout) {
+            // don't overwrite existing
+            if (QFile(target).exists() && !overwrite->isChecked()) continue;
 
-        // wipe and copy
-        if (QFile(target).exists()) QFile::remove(target); // zap it
-        QFile(workout).copy(target);
+            // wipe and copy
+            if (QFile(target).exists()) QFile::remove(target); // zap it
+            QFile(workout).copy(target);
+        }
 
         // add to library now
         trainDB->importWorkout(target, &file);
     }
 
     // set target directory
-    QString videosyncDir = appsettings->value(NULL, GC_VIDEOSYNCDIR).toString();
+    QString videosyncDir = appsettings->value(NULL, GC_WORKOUTDIR).toString();
     if (videosyncDir == "") {
         QDir root = context->athlete->home->root();
         root.cdUp();
@@ -892,12 +899,15 @@ WorkoutImportDialog::import()
         // get target name
         QString target = videosyncDir + "/" + QFileInfo(videosync).fileName();
 
-        // don't overwrite existing
-        if (QFile(target).exists() && !overwrite->isChecked()) continue;
+        // only copy if source != target otherwise just keep what we have
+        if (target != videosync) {
+            // don't overwrite existing
+            if (QFile(target).exists() && !overwrite->isChecked()) continue;
 
-        // wipe and copy
-        if (QFile(target).exists()) QFile::remove(target); // zap it
-        QFile(videosync).copy(target);
+            // wipe and copy
+            if (QFile(target).exists()) QFile::remove(target); // zap it
+            QFile(videosync).copy(target);
+        }
 
         // add to library now
         trainDB->importVideoSync(target, &file);
