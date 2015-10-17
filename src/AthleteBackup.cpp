@@ -129,7 +129,7 @@ AthleteBackup::backupOnClose()
     zipFile.close();
     ZipWriter writer(zipFile.fileName());
 
-    QProgressDialog progress(tr("Adding files to backup %1 for athlete %2 ...").arg(targetFileName).arg(cyclist), tr("Abort Backup"), 0, fileCount, NULL);
+    QProgressDialog progress(tr("Adding files to backup %1 for athlete %2 ...").arg(targetFileName).arg(cyclist), tr("Abort Backup and Reset Counter"), 0, fileCount, NULL);
     progress.setWindowModality(Qt::WindowModal);
 
     // now do the Zipping
@@ -163,8 +163,8 @@ AthleteBackup::backupOnClose()
     } else {
         // we are done, full progress and reset of counter
         progress.setValue(fileCount);
-        appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_COUNTER, 0);
-    }
+    };
+    appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_COUNTER, 0);
 
 }
 
