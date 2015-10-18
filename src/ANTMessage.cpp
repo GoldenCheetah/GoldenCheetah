@@ -393,7 +393,6 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             case ANTChannel::CHANNEL_TYPE_POWER:
 
                 channel = message[3];
-                //qDebug()<<channel<<"power event page:"<<data_page;
                 switch (data_page) {
 
                 case ANT_STANDARD_POWER: // 0x10 - standard power
@@ -520,8 +519,6 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 break;
 
             case ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT:
-            {
-                qDebug() << qPrintable("ANT FE-C received data page: 0x" + QString("%1").arg( data_page, 2, 0x10 ).toUpper());
                 switch (data_page)
                 {
                 case FITNESS_EQUIPMENT_GENERAL_PAGE:
@@ -530,29 +527,21 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                     fecRawDistance = message[7];
                     fecSpeed = (message[9] << 8) | message[8];
 
-                    qDebug() << qPrintable("    ANT FE-C general page");
-//                    qDebug() << qPrintable(" FE type=" + QString("%1").arg( fecEqtType, 2, 0x10 ).toUpper())
-//                             << qPrintable(" speed=" + QString("%1").arg( fecSpeed, 4, 10 ).toUpper())
-//                             << qPrintable(" rawDist=" + QString("%1").arg( fecRawDistance, 4, 10 ).toUpper())
-//                             << qPrintable(" Total=" + QString("%1").arg( fecTotalDistance, 4, 10 ).toUpper());
                     break;
 
                 case FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE:
-                    qDebug() << qPrintable("    ANT FE-C trainer page");
                     fecCadence = message[6];
                     fecInstantPower = message[9];
                     fecInstantPower |= (message[10] & 0x0F) << 8;
                     break;
 
                 case FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE:
-                    qDebug() << qPrintable("    ANT FE-C capabilities details");
                     fecMaxResistance         = message[9];
                     fecMaxResistance        |= (message[10]) << 8;
                     fecCapabilities          = message[11];
                     break;
 
                 case FITNESS_EQUIPMENT_COMMAND_STATUS_PAGE:
-//                    qDebug() << qPrintable("    ANT FE-C received acknowledge from device");
                     // Acknowledge from device
                     fecLastCommandReceived = message[5];
                     fecLastCommandSeq      = message[6];
@@ -576,10 +565,10 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                         fecSetRollResistanceAck = (double) message[11] * 0.00005;
                         break;
                     }
-                }
+                    break;
 
+                }
                 break;
-            }
 
             case ANTChannel::CHANNEL_TYPE_TACX_VORTEX:
             {
@@ -978,7 +967,6 @@ ANTMessage ANTMessage::fecSetTrackResistance(const uint8_t channel, const double
 {
     uint16_t rawGradeValue = (uint16_t) ((grade+200.0) * 100.0);
     uint8_t  rollingResistanceValue = rollingResistance / 0.00005;
-    qDebug() << qPrintable("ANTMessage::fecSetTrackResistance("+QString::number(rawGradeValue)+","+ QString::number(rollingResistanceValue)+")");
     return ANTMessage(9, ANT_ACK_DATA, channel,
                       FITNESS_EQUIPMENT_TRACK_RESISTANCE_ID,
                       0xFF, 0xFF, 0xFF, 0xFF, (uint8_t)(rawGradeValue & 0xFF), (uint8_t)(rawGradeValue >> 8), rollingResistanceValue);
