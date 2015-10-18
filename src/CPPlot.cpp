@@ -1660,6 +1660,14 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
             const PaceZones *zones = context->athlete->paceZones(isSwim);
             bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), true).toBool() : true;
             paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace)).arg(zones->paceUnits(metricPace));
+            double km = yvalue*xvalue/60.0; // distance in km
+            if (isSwim) {
+                paceStr += tr("\n%1 m %2 yd").arg(1000*km, 0, 'f', 0)
+                                    .arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
+            } else {
+                paceStr += tr("\n%1 km %2 mi").arg(km, 0, 'f', 3)
+                                    .arg(MILES_PER_KM*km, 0, 'f', 3);
+            }
         }
 
         // output the tooltip
