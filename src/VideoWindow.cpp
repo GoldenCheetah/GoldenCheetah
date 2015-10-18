@@ -346,54 +346,54 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         rfp.km = CurrentDistance;
         rfp.secs = VideoSyncFiledataPoints[curPosition-1].secs + weighted_average * (VideoSyncFiledataPoints[curPosition].secs - VideoSyncFiledataPoints[curPosition-1].secs);
         rfp.kph = VideoSyncFiledataPoints[curPosition-1].kph + weighted_average * (VideoSyncFiledataPoints[curPosition].kph - VideoSyncFiledataPoints[curPosition-1].kph);
+
+        /*
+        //TODO : GPX file format
+            // otherwise we use the gpx from selected ride in analysis view:
+            QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
+            if (!dataPoints.count()) return;
+
+            if(curPosition > dataPoints.count()-1 || curPosition < 0)
+                curPosition = 1;
+
+            // make sure the current position is less than the new distance
+            while ((dataPoints[curPosition]->km > rtd.getDistance()) && (curPosition > 1))
+                curPosition--;
+            while ((dataPoints[curPosition]->km <= rtd.getDistance()) && (curPosition < dataPoints.count()-1))
+                curPosition++;
+
+            // update the rfp
+            rfp = *dataPoints[curPosition];
+
+        }
+    */
+        // set video rate ( theoretical : video rate = training speed / ghost speed)
+        float rate;
+        float video_time_shift_ms;
+        video_time_shift_ms = (rfp.secs*1000.0 - (double) libvlc_media_player_get_time(mp));
+        if (rfp.kph == 0.0)
+            rate = 1.0;
+        else
+            rate = rtd.getSpeed() / rfp.kph;
+
+        //if video is far (empiric) from ghost:
+        if (fabs(video_time_shift_ms) > 5000)
+        {
+            libvlc_media_player_set_time(mp, (libvlc_time_t) (rfp.secs*1000.0));
+        }
+        else
+        // otherwise add "small" empiric corrective parameter to get video back to ghost position:
+            rate *= 1.0 + (video_time_shift_ms / 10000.0);
+
+        libvlc_media_player_set_pause(mp, (rate < 0.01));
+
+        // change video rate but only if there is a significant change
+        if ((rate != 0.0) && (fabs((rate - currentVideoRate) / rate) > 0.05))
+        {
+            libvlc_media_player_set_rate(mp, rate );
+            currentVideoRate = rate;
+        }
     }
-    else if (myRideItem->ride())
-    {
-        // otherwise we use the gpx from selected ride in analysis view:
-        QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
-        if (!dataPoints.count()) return;
-
-        if(curPosition > dataPoints.count()-1 || curPosition < 0)
-            curPosition = 1;
-
-        // make sure the current position is less than the new distance
-        while ((dataPoints[curPosition]->km > rtd.getDistance()) && (curPosition > 1))
-            curPosition--;
-        while ((dataPoints[curPosition]->km <= rtd.getDistance()) && (curPosition < dataPoints.count()-1))
-            curPosition++;
-
-        // update the rfp
-        rfp = *dataPoints[curPosition];
-
-        //TODO : weighted average to improve smoothness as it has been done just before with RLV files
-    }
-    // set video rate ( theoretical : video rate = training speed / ghost speed)
-    float rate;
-    float video_time_shift_ms;
-    video_time_shift_ms = (rfp.secs*1000.0 - (double) libvlc_media_player_get_time(mp));
-    if (rfp.kph == 0.0)
-        rate = 1.0;
-    else
-        rate = rtd.getSpeed() / rfp.kph;
-
-    //if video is far (empiric) from ghost:
-    if (fabs(video_time_shift_ms) > 5000)
-    {
-        libvlc_media_player_set_time(mp, (libvlc_time_t) (rfp.secs*1000.0));
-    }
-    else
-    // otherwise add "small" empiric corrective parameter to get video back to ghost position:
-        rate *= 1.0 + (video_time_shift_ms / 10000.0);
-
-    libvlc_media_player_set_pause(mp, (rate < 0.01));
-
-    // change video rate but only if there is a significant change
-    if ((rate != 0.0) && (fabs((rate - currentVideoRate) / rate) > 0.05))
-    {
-        libvlc_media_player_set_rate(mp, rate );
-        currentVideoRate = rate;
-    }
-
 #endif
 
 #ifdef GC_VIDEO_QT5
