@@ -206,6 +206,9 @@ void VideoWindow::startPlayback()
     /* set the media to playback */
     libvlc_media_player_set_media (mp, m);
 
+    /* set the playback rate to the media default - since there may be a different one set from RLV */
+    libvlc_media_player_set_rate(mp, libvlc_media_player_get_fps(mp));
+
     /* play the media_player */
     libvlc_media_player_play (mp);
 
