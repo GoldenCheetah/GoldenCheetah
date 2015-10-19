@@ -154,11 +154,16 @@ bool TrainDB::createVideoSyncTable()
     }
     // we need to create it!
     if (rc && createTables) {
-
         QString createVideoSyncTable = "create table videosyncs (filepath varchar primary key,"
                                     "filename varchar);";
 
         rc = query.exec(createVideoSyncTable);
+
+        // adding a space at the front of string to make "None" always
+        // appear first in a sorted list is a bit of a hack, but works ok
+        QString NoneSync = QString("INSERT INTO videosyncs (filepath, filename) values (\"//1\", \"%1\");")
+                         .arg(" " + tr("None")); // keep the SPACE seperate so that translation cannot remove it
+        rc = query.exec(NoneSync);
 
         // add row to version database
         query.exec("DELETE FROM version where table_name = \"videosyncs\"");

@@ -971,20 +971,26 @@ TrainSidebar::videosyncTreeWidgetSelectionChanged()
         videosyncFile = NULL;
     }
 
-    if (filename == "") {
+     if (filename == "") {
         context->notifyVideoSyncFileSelected(NULL);
         return;
     }
 
-
-    videosyncFile = new VideoSyncFile(filename, mode, context);
-    if (videosyncFile->isValid()) {
-        context->notifyVideoSyncFileSelected(videosyncFile);
-    } else {
-        delete videosyncFile;
-        videosyncFile = NULL;
+    // is "None" selected?
+    int index = target.row();
+    if (index == 0) {
+        // None menu entry
         context->notifyVideoSyncFileSelected(NULL);
-        removeInvalidVideoSync();
+    } else {
+        videosyncFile = new VideoSyncFile(filename, mode, context);
+        if (videosyncFile->isValid()) {
+            context->notifyVideoSyncFileSelected(videosyncFile);
+        } else {
+            delete videosyncFile;
+            videosyncFile = NULL;
+            context->notifyVideoSyncFileSelected(NULL);
+            removeInvalidVideoSync();
+        }
     }
 }
 
