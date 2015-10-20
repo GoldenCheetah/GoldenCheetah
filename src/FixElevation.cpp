@@ -176,7 +176,7 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *)
         int loopCount = 0;
 
         for( std::vector<elevationGPSPoint>::iterator point = elvPoints.begin() ; point != elvPoints.end() ; ++point ) {
-            double elev = smoothArray[loopCount];
+            double elev = smoothArray.size() > loopCount ? smoothArray[loopCount] : -100;
             // ignore any seriously negative points
             if (elev>-100) ride->command->setPointValue(point->rideFileIndex, RideFile::alt, elev);
             ++loopCount;
