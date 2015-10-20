@@ -3123,41 +3123,62 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
 
     // create a custom set of summary metric data!
     if (metricDetail.type == METRIC_PM) {
+        int valuesType = VALUES_CALCULATED;
 
-        if (metricDetail.symbol.startsWith("skiba")) {
+        QString symbol = metricDetail.symbol;
+        if (symbol.startsWith("planned_")) {
+            valuesType = VALUES_PLANNED;
+            symbol = symbol.right(symbol.length()-8);
+        } else if (symbol.startsWith("expected_")) {
+            valuesType = VALUES_EXPECTED;
+            symbol = symbol.right(symbol.length()-9);
+        }
+
+        if (symbol.startsWith("skiba")) {
             scoreType = "skiba_bike_score";
-        } else if (metricDetail.symbol.startsWith("antiss")) {
+        } else if (symbol.startsWith("antiss")) {
             scoreType = "antiss_score";
-        } else if (metricDetail.symbol.startsWith("atiss")) {
+        } else if (symbol.startsWith("atiss")) {
             scoreType = "atiss_score";
-        } else if (metricDetail.symbol.startsWith("coggan")) {
+        } else if (symbol.startsWith("coggan")) {
             scoreType = "coggan_tss";
-        } else if (metricDetail.symbol.startsWith("daniels")) {
+        } else if (symbol.startsWith("daniels")) {
             scoreType = "daniels_points";
-        } else if (metricDetail.symbol.startsWith("trimp")) {
+        } else if (symbol.startsWith("trimp")) {
             scoreType = "trimp_points";
-        } else if (metricDetail.symbol.startsWith("work")) {
+        } else if (symbol.startsWith("work")) {
             scoreType = "total_work";
-        } else if (metricDetail.symbol.startsWith("cp_")) {
+        } else if (symbol.startsWith("cp_")) {
             scoreType = "skiba_cp_exp";
-        } else if (metricDetail.symbol.startsWith("wprime")) {
+        } else if (symbol.startsWith("wprime")) {
             scoreType = "skiba_wprime_exp";
-        } else if (metricDetail.symbol.startsWith("distance")) {
+        } else if (symbol.startsWith("distance")) {
             scoreType = "total_distance";
-        } else if (metricDetail.symbol.startsWith("triscore")) {
+        } else if (symbol.startsWith("triscore")) {
             scoreType = "triscore";
         }
 
         stressType = STRESS_LTS; // if in doubt
-        if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl")) 
-            stressType = STRESS_LTS;
-        else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl")) 
-            stressType = STRESS_STS;
-        else if (metricDetail.symbol.endsWith("sb")) 
-            stressType = STRESS_SB;
-        else if (metricDetail.symbol.endsWith("lr")) 
-            stressType = STRESS_RR;
-
+        if (valuesType == VALUES_CALCULATED) {
+            if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl"))
+                stressType = STRESS_LTS;
+            else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl"))
+                stressType = STRESS_STS;
+            else if (metricDetail.symbol.endsWith("sb"))
+                stressType = STRESS_SB;
+            else if (metricDetail.symbol.endsWith("lr"))
+                stressType = STRESS_RR;
+        }
+        else if (valuesType == VALUES_PLANNED) {
+            if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl"))
+                stressType = STRESS_PLANNED_LTS;
+            else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl"))
+                stressType = STRESS_PLANNED_STS;
+            else if (metricDetail.symbol.endsWith("sb"))
+                stressType = STRESS_PLANNED_SB;
+            else if (metricDetail.symbol.endsWith("lr"))
+                stressType = STRESS_PLANNED_RR;
+        }
     } else {
 
         scoreType = metricDetail.symbol; // just use the selected metric

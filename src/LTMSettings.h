@@ -81,10 +81,23 @@ class RideBest;
 #define ESTIMATE_VO2MAX  6
 
 // type of stress
-#define STRESS_STS       0
-#define STRESS_LTS       1
-#define STRESS_SB        2
-#define STRESS_RR        3
+#define STRESS_STS          0
+#define STRESS_LTS          1
+#define STRESS_SB           2
+#define STRESS_RR           3
+#define STRESS_PLANNED_STS  4
+#define STRESS_PLANNED_LTS  5
+#define STRESS_PLANNED_SB   6
+#define STRESS_PLANNED_RR   7
+#define STRESS_EXPECTED_STS 8
+#define STRESS_EXPECTED_LTS 9
+#define STRESS_EXPECTED_SB  10
+#define STRESS_EXPECTED_RR  11
+
+// type of values
+#define VALUES_CALCULATED   0
+#define VALUES_PLANNED      1
+#define VALUES_EXPECTED     2
 
 // We catalogue each metric and the curve settings etc here
 class MetricDetail {

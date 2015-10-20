@@ -162,7 +162,7 @@ void PMCData::refresh()
         lts_.resize(days_);
         sts_.resize(days_);
         sb_.resize(days_+1); // for SB tomorrow!
-        rr_.resize(days_); // for SB tomorrow!
+        rr_.resize(days_);
 
     } else {
 
