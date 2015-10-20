@@ -111,6 +111,8 @@ class PMCData : public QObject {
         QDate start_, end_;
         int days_;
         QVector<double> stress_, lts_, sts_, sb_, rr_;
+        QVector<double> planned_stress_, planned_lts_, planned_sts_, planned_sb_, planned_rr_;
+        QVector<double> expected_stress_, expected_lts_, expected_sts_, expected_sb_, expected_rr_;
 
         bool isstale; // needs refreshing
 };

@@ -1026,6 +1026,51 @@ QList<MetricDetail> LTMTool::providePMmetrics() {
     cogganLTR.uunits = tr("Ramp");
     metrics.append(cogganLTR);
 
+    MetricDetail cogganExpectedCTL;
+    cogganExpectedCTL.type = METRIC_PM;
+    cogganExpectedCTL.symbol = "expected_coggan_ctl";
+    cogganExpectedCTL.metric = NULL; // not a factory metric
+    cogganExpectedCTL.penColor = QColor(Qt::blue);
+    cogganExpectedCTL.curveStyle = QwtPlotCurve::Dots;
+    cogganExpectedCTL.symbolStyle = QwtSymbol::NoSymbol;
+    cogganExpectedCTL.smooth = false;
+    cogganExpectedCTL.trendtype = 0;
+    cogganExpectedCTL.topN = 1;
+    cogganExpectedCTL.uname = cogganExpectedCTL.name = tr("Coggan Expected Chronic Training Load");
+    cogganExpectedCTL.units = "CTL";
+    cogganExpectedCTL.uunits = "CTL";
+    metrics.append(cogganExpectedCTL);
+
+    MetricDetail cogganExpectedATL;
+    cogganExpectedATL.type = METRIC_PM;
+    cogganExpectedATL.symbol = "expected_coggan_atl";
+    cogganExpectedATL.metric = NULL; // not a factory metric
+    cogganExpectedATL.penColor = QColor(Qt::magenta);
+    cogganExpectedATL.curveStyle = QwtPlotCurve::Dots;
+    cogganExpectedATL.symbolStyle = QwtSymbol::NoSymbol;
+    cogganExpectedATL.smooth = false;
+    cogganExpectedATL.trendtype = 0;
+    cogganExpectedATL.topN = 1;
+    cogganExpectedATL.uname = cogganExpectedATL.name = tr("Coggan Expected Acute Training Load");
+    cogganExpectedATL.units = "ATL";
+    cogganExpectedATL.uunits = "ATL";
+    metrics.append(cogganExpectedATL);
+
+    MetricDetail cogganExpectedTSB;
+    cogganExpectedTSB.type = METRIC_PM;
+    cogganExpectedTSB.symbol = "expected_coggan_tsb";
+    cogganExpectedTSB.metric = NULL; // not a factory metric
+    cogganExpectedTSB.penColor = QColor(Qt::yellow);
+    cogganExpectedTSB.curveStyle = QwtPlotCurve::Dots;
+    cogganExpectedTSB.symbolStyle = QwtSymbol::NoSymbol;
+    cogganExpectedTSB.smooth = false;
+    cogganExpectedTSB.trendtype = 0;
+    cogganExpectedTSB.topN = 1;
+    cogganExpectedTSB.uname = cogganExpectedTSB.name = tr("Coggan Expected Training Stress Balance");
+    cogganExpectedTSB.units = "TSB";
+    cogganExpectedTSB.uunits = "TSB";
+    metrics.append(cogganExpectedTSB);
+
     // TRIMP LTS
     MetricDetail trimpLTS;
     trimpLTS.type = METRIC_PM;
