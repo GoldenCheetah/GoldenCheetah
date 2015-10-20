@@ -306,6 +306,9 @@ RideItem::newInterval(QString name, double start, double stop, double startKM, d
     // refresh metrics
     add->refresh();
 
+    // still the item is dirty and needs to be saved
+    setDirty(true);
+
     // and return
     return add;
 }
