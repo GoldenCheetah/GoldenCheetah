@@ -131,8 +131,7 @@
 #define GC_WARNCONVERT                  "<global-general>warnconvert"
 #define GC_WARNEXIT                     "<global-general>warnexit"
 #define GC_HIST_BIN_WIDTH               "<global-general>histogamWindow/binWidth"
-#define GC_WORKOUTDIR                   "<global-general>workoutDir"
-#define GC_VIDEOSYNCDIR                 "<global-general>videosyncDir"
+#define GC_WORKOUTDIR                   "<global-general>workoutDir"                         // used for Workouts and Videosyn files
 #define GC_LINEWIDTH                    "<global-general>linewidth"
 #define GC_ANTIALIAS                    "<global-general>antialias"
 #define GC_RIDEBG                       "<global-general>rideBG"
