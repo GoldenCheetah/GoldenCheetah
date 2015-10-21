@@ -572,12 +572,12 @@ RideImportWizard::process()
 
                        // Cool, the date and time was extracted from the source file
                        blanks[i] = false;
-                       tableWidget->item(i,1)->setText(ride->startTime().toString(tr("dd MMM yyyy")));
+                       tableWidget->item(i,1)->setText(ride->startTime().date().toString(Qt::ISODate));
                        tableWidget->item(i,2)->setText(ride->startTime().toString("hh:mm:ss"));
                    }
 
-                   tableWidget->item(i,1)->setTextAlignment(Qt::AlignRight); // put in the middle
-                   tableWidget->item(i,2)->setTextAlignment(Qt::AlignRight); // put in the middle
+                   tableWidget->item(i,1)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
+                   tableWidget->item(i,2)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
 
                    // time and distance from tags (.gc files)
                    QMap<QString,QString> lookup;
@@ -811,7 +811,7 @@ RideImportWizard::todayClicked(int index)
             tableWidget->item(i,5)->isSelected()) {
 
             // set the date to date selected
-            tableWidget->item(i,1)->setText(selectedDate.toString(tr("dd MMM yyyy")));
+            tableWidget->item(i,1)->setText(selectedDate.toString(Qt::ISODate));
             // look at rides with missing start time - we need to populate those
 
             // ride duration
@@ -928,7 +928,7 @@ RideImportWizard::abortClicked()
 
         // SAVE STEP 3 - prepare the new file names for the next steps - basic name and .JSON in GC format
 
-        QDateTime ridedatetime = QDateTime(QDate().fromString(tableWidget->item(i,1)->text(), tr("dd MMM yyyy")),
+        QDateTime ridedatetime = QDateTime(QDate().fromString(tableWidget->item(i,1)->text(), Qt::ISODate),
                                            QTime().fromString(tableWidget->item(i,2)->text(), "hh:mm:ss"));
         QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
                 .arg ( ridedatetime.date().year(), 4, 10, zero )
@@ -1110,7 +1110,7 @@ void RideDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
         QString text = QString("%1").arg(value);
 
         QStyleOptionViewItem myOption = option;
-        myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
+        myOption.displayAlignment = Qt::AlignHCenter | Qt::AlignVCenter;
         drawDisplay(painter, myOption, myOption.rect, text);
         drawFocus(painter, myOption, myOption.rect);
 
@@ -1121,7 +1121,7 @@ void RideDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
         QString text = QString("%1").arg(value);
 
         QStyleOptionViewItem myOption = option;
-        myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
+        myOption.displayAlignment = Qt::AlignHCenter | Qt::AlignVCenter;
         drawDisplay(painter, myOption, myOption.rect, text);
         drawFocus(painter, myOption, myOption.rect);
 
@@ -1139,7 +1139,7 @@ QWidget *RideDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 
         // edit that date!
         QDateEdit *dateEdit = new QDateEdit(parent);
-        dateEdit->setDisplayFormat(tr("dd MMM yyyy"));
+        dateEdit->setDisplayFormat("yyyy-MM-dd"); // ISO Format, no translation analog Qt::ISODate
         connect(dateEdit, SIGNAL(editingFinished()), this, SLOT(commitAndCloseDateEditor()));
         return dateEdit;
     } else if (index.column() == dateColumn+1) {
@@ -1176,7 +1176,7 @@ void RideDelegate::setEditorData(QWidget *editor, const QModelIndex &index) cons
    // stored as text field
     if (index.column() == dateColumn) {
         QDateEdit *dateEdit = qobject_cast<QDateEdit *>(editor);
-        QDate date = QDate().fromString(index.model()->data(index, Qt::DisplayRole).toString(), tr("dd MMM yyyy"));
+        QDate date = QDate().fromString(index.model()->data(index, Qt::DisplayRole).toString(), Qt::ISODate);
         dateEdit->setDate(date);
     } else if (index.column() == dateColumn+1) {
         QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>(editor);
@@ -1192,7 +1192,7 @@ void RideDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
     // stored as text field
     if (index.column() == dateColumn) {
         QDateEdit *dateEdit = qobject_cast<QDateEdit *>(editor);
-        QString value = dateEdit->date().toString(tr("dd MMM yyyy"));
+        QString value = dateEdit->date().toString(Qt::ISODate);
         // Place in the view
         model->setData(index, value, Qt::DisplayRole);
     } else if (index.column() == dateColumn+1) {
