@@ -27,6 +27,26 @@
 
 #include <QHeaderView>
 
+double
+VDOTCalculator::vdot(double mins, double vel)
+{
+    // estimated VO2 cost of running at vel speed in m/min
+    double VO2 = -4.3 + 0.182258*vel + 0.000104*pow(vel, 2);
+
+    // fractional utilization of VO2max for mins duration
+    double FVO2 = 0.8 + 0.1894393*exp(-0.012778*mins) + 0.2989558*exp(-0.1932605*mins);
+
+    // VDOT: estimated VO2max based on Daniels/Gilbert Formula
+    return VO2 / FVO2;
+}
+
+double
+VDOTCalculator::vVdot(double VDOT)
+{
+    // velocity at VO2max according to Daniels/Gilbert Formula
+    return 29.54 + 5.000663*VDOT - 0.007546*pow(VDOT, 2);
+}
+
 VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
 {
     bool metricRnPace = appsettings->value(this, GC_PACE, true).toBool();
@@ -164,18 +184,10 @@ void VDOTCalculator::on_btnCalculate_clicked()
     // velocity m/min
     double vel = paceFactor*1000*dist/mins;
 
-    // estimated VO2 cost of running at vel speed
-    double VO2 = -4.3 + 0.182258*vel + 0.000104*pow(vel, 2);
-
-    // fractional utilization of VO2max for mins duration
-    double FVO2 = 0.8 + 0.1894393*exp(-0.012778*mins) + 0.2989558*exp(-0.1932605*mins);
-
-    // VDOT: estimated VO2max based on Daniels/Gilbert Formula
-    double VDOT = VO2 / FVO2;
+    double VDOT = vdot(mins, vel);
     txtVDOT->setText(QString("%1 ml/min/kg").arg(round(VDOT*10)/10));
 
-    // velocity at VO2max according to Daniels/Gilbert Formula
-    double vVDOT = 29.54 + 5.000663*VDOT - 0.007546*pow(VDOT, 2);
+    double vVDOT = vVdot(VDOT);
 
     // Training Paces relative to vVDOT from Daniels's Running Formula
     double relVDOT[] = { 0.72, 0.85, 0.9, 0.98, 1.05 };

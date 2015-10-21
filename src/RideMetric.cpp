@@ -122,8 +122,9 @@
 // 116 21  Aug 2015 Ale Martinez       TRIMP Zonal Points fallback when Average HR has been entered manually
 // 117 29  Aug 2015 Mark Liversedge    Min non-zero HR
 // 118 16  Sep 2015 Damien Grauser     Use FTP for TSS and IF
+// 119 20  Oct 2015 Ale Martinez       Added VDOT and TPace for Running
 
-int DBSchemaVersion = 118;
+int DBSchemaVersion = 119;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

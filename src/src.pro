@@ -757,6 +757,7 @@ SOURCES += \
         TimeUtils.cpp \
         ToolsDialog.cpp \
         ToolsRhoEstimator.cpp \
+        VDOT.cpp \
         VDOTCalculator.cpp \
         TrainDB.cpp \
         TrainSidebar.cpp \
