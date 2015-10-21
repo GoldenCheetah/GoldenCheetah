@@ -32,6 +32,8 @@ class VDOTCalculator : public QDialog
 
     public:
         VDOTCalculator(QWidget *parent = 0);
+        static double vdot(double mins, double vel);
+        static double vVdot(double VDOT);
 
     private:
         QPushButton *btnCalculate;
