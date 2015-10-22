@@ -97,7 +97,7 @@ class Athlete : public QObject
         QList<PDEstimate> PDEstimates;
         Routes *routes;
         QList<RideFileCache*> cpxCache;
-        RideCache *rideCache;
+        RideCache *rideCache, *plannedCache;
         QList<WithingsReading> withings_;
 
         // Estimates

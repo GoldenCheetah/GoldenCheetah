@@ -78,6 +78,18 @@ class PMCData : public QObject {
         double sb(QDate);
         double rr(QDate);
 
+        double plannedLts(QDate);
+        double plannedSts(QDate);
+        double plannedStress(QDate);
+        double plannedSb(QDate);
+        double plannedRr(QDate);
+
+        double expectedLts(QDate);
+        double expectedSts(QDate);
+        double expectedStress(QDate);
+        double expectedSb(QDate);
+        double expectedRr(QDate);
+
         // colour coding the 4 series for RAG reporting
         static QColor ltsColor(double, QColor defaultColor);
         static QColor stsColor(double, QColor defaultColor);
@@ -112,7 +124,7 @@ class PMCData : public QObject {
         int days_;
         QVector<double> stress_, lts_, sts_, sb_, rr_;
         QVector<double> planned_stress_, planned_lts_, planned_sts_, planned_sb_, planned_rr_;
-        QVector<double> expected_stress_, expected_lts_, expected_sts_, expected_sb_, expected_rr_;
+        QVector<double> expected_lts_, expected_sts_, expected_sb_, expected_rr_;
 
         bool isstale; // needs refreshing
 };
