@@ -48,7 +48,7 @@ class RideCache : public QObject
 
     public:
 
-        RideCache(Context *context);
+        RideCache(Context *context, bool planned = false);
         ~RideCache();
 
         // table models
@@ -97,8 +97,8 @@ class RideCache : public QObject
     public slots:
 
         // restore / dump cache to disk (json)
-        void load();
-        void save();
+        void load(bool planned = false);
+        void save(bool planned = false);
 
         // user updated options/preferences
         void configChanged(qint32);
@@ -127,6 +127,9 @@ class RideCache : public QObject
         friend class ::RideCacheBackgroundRefresh;
 
         Context *context;
+        bool planned;
+        QDir directory;
+
         QVector<RideItem*> rides_, reverse_, delete_;
         RideCacheModel *model_;
         bool exiting;

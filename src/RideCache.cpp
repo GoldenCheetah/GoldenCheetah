@@ -47,8 +47,12 @@
 bool rideCacheGreaterThan(const RideItem *a, const RideItem *b) { return a->dateTime > b->dateTime; }
 bool rideCacheLessThan(const RideItem *a, const RideItem *b) { return a->dateTime < b->dateTime; }
 
-RideCache::RideCache(Context *context) : context(context)
+RideCache::RideCache(Context *context, bool planned) : context(context), planned(planned)
 {
+    directory = context->athlete->home->activities();
+    if (planned)
+        directory = context->athlete->home->planned();
+
     progress_ = 100;
     exiting = false;
 
@@ -84,12 +88,12 @@ RideCache::RideCache(Context *context) : context(context)
     // set the list
     // populate ride list
     RideItem *last = NULL;
-    QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home->activities()));
+    QStringListIterator i(RideFileFactory::instance().listRideFiles(directory));
     while (i.hasNext()) {
         QString name = i.next();
         QDateTime dt;
         if (RideFile::parseRideFileName(name, &dt)) {
-            last = new RideItem(context->athlete->home->activities().canonicalPath(), name, dt, context);
+            last = new RideItem(directory.canonicalPath(), name, dt, context);
 
             connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
             connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
@@ -99,7 +103,7 @@ RideCache::RideCache(Context *context) : context(context)
     }
 
     // load the store - will unstale once cache restored
-    load();
+    load(planned);
 
     // now sort it
     qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
@@ -129,7 +133,7 @@ RideCache::~RideCache()
     cancel();
 
     // save to store
-    save();
+    save(planned);
 }
 
 void
@@ -203,7 +207,7 @@ RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
     if (useTempActivities)
        last = new RideItem(context->athlete->home->tmpActivities().canonicalPath(), name, dt, context);
     else
-       last = new RideItem(context->athlete->home->activities().canonicalPath(), name, dt, context);
+       last = new RideItem(directory.canonicalPath(), name, dt, context);
 
     connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
     connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
@@ -286,7 +290,7 @@ RideCache::removeCurrentRide()
     // delete the file by renaming it
     QString strOldFileName = context->ride->fileName;
 
-    QFile file(context->athlete->home->activities().canonicalPath() + "/" + strOldFileName);
+    QFile file(directory.canonicalPath() + "/" + strOldFileName);
     // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
     QString strNewName = strOldFileName + ".bak";
 

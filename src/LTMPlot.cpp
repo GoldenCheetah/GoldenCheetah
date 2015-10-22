@@ -3179,6 +3179,16 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
             else if (metricDetail.symbol.endsWith("lr"))
                 stressType = STRESS_PLANNED_RR;
         }
+        else if (valuesType == VALUES_EXPECTED) {
+            if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl"))
+                stressType = STRESS_EXPECTED_LTS;
+            else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl"))
+                stressType = STRESS_EXPECTED_STS;
+            else if (metricDetail.symbol.endsWith("sb"))
+                stressType = STRESS_EXPECTED_SB;
+            else if (metricDetail.symbol.endsWith("lr"))
+                stressType = STRESS_EXPECTED_RR;
+        }
     } else {
 
         scoreType = metricDetail.symbol; // just use the selected metric
@@ -3246,6 +3256,30 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
             break;
         case STRESS_RR:
             value = pmcData->rr(date);
+            break;
+        case STRESS_PLANNED_LTS:
+            value = pmcData->plannedLts(date);
+            break;
+        case STRESS_PLANNED_STS:
+            value = pmcData->plannedSts(date);
+            break;
+        case STRESS_PLANNED_SB:
+            value = pmcData->plannedSb(date);
+            break;
+        case STRESS_PLANNED_RR:
+            value = pmcData->plannedRr(date);
+            break;
+        case STRESS_EXPECTED_LTS:
+            value = pmcData->expectedLts(date);
+            break;
+        case STRESS_EXPECTED_STS:
+            value = pmcData->expectedSts(date);
+            break;
+        case STRESS_EXPECTED_SB:
+            value = pmcData->expectedSb(date);
+            break;
+        case STRESS_EXPECTED_RR:
+            value = pmcData->expectedRr(date);
             break;
         default:
             value = 0;
