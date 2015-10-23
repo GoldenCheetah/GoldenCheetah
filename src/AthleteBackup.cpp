@@ -89,7 +89,7 @@ AthleteBackup::backupImmediate()
     backupFolder = dir;
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("Athlete Backup"));
-    msgBox.setText( tr("Any unsaved data will not be included into the backup .zip file.").arg(athlete));
+    msgBox.setText( tr("Any unsaved data will not be included into the backup .zip file."));
     msgBox.setInformativeText("Do you want to proceed?");
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::Yes);
