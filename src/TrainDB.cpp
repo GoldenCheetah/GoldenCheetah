@@ -89,6 +89,15 @@ TrainDB::rebuildDB()
     createVideoSyncTable();
 }
 
+bool
+TrainDB::updateDefaultEntries() {
+
+    bool rc1 = createDefaultEntriesWorkout();
+    bool rc2 = createDefaultEntriesVideosync();
+    return rc1 && rc2;
+}
+
+
 bool TrainDB::createVideoTable()
 {
     QSqlQuery query(db->database(sessionid));
@@ -159,17 +168,13 @@ bool TrainDB::createVideoSyncTable()
 
         rc = query.exec(createVideoSyncTable);
 
-        // adding a space at the front of string to make "None" always
-        // appear first in a sorted list is a bit of a hack, but works ok
-        QString NoneSync = QString("INSERT INTO videosyncs (filepath, filename) values (\"//1\", \"%1\");")
-                         .arg(" " + tr("None")); // keep the SPACE seperate so that translation cannot remove it
-        rc = query.exec(NoneSync);
+        rc = createDefaultEntriesVideosync();
 
         // add row to version database
         query.exec("DELETE FROM version where table_name = \"videosyncs\"");
 
         // insert into table
-        query.prepare("INSERT INTO version (table_name, schema_version, creation_date) values (?,?);");
+        query.prepare("INSERT INTO version (table_name, schema_version, creation_date) values (?,?,?);");
         query.addBindValue("videosyncs");
 	    query.addBindValue(TrainDBSchemaVersion);
 	    query.addBindValue(QDateTime::currentDateTime().toTime_t());
@@ -213,15 +218,7 @@ bool TrainDB::createWorkoutTable()
 
         rc = query.exec(createMetricTable);
 
-        // adding a space at the front of string to make manual mode always
-        // appear first in a sorted list is a bit of a hack, but works ok
-        QString manualErg = QString("INSERT INTO workouts (filepath, filename) values (\"//1\", \"%1\");")
-                         .arg(" " + tr("Manual Erg Mode")); // keep the SPACE seperate so that translation cannot remove it
-        rc = query.exec(manualErg);
-
-        QString manualCrs = QString("INSERT INTO workouts (filepath, filename) values (\"//2\", \"%1\");")
-                         .arg(" " + tr("Manual Slope Mode")); // keep the SPACE seperate so that translation cannot remove it
-        rc = query.exec(manualCrs);
+        rc = createDefaultEntriesWorkout();
 
         // add row to version database
         query.exec("DELETE FROM version where table_name = \"workouts\"");
@@ -484,4 +481,46 @@ bool TrainDB::importVideo(QString pathname)
 	bool rc = query.exec();
 
 	return rc;
+}
+
+bool TrainDB::createDefaultEntriesWorkout()
+{
+
+    QSqlQuery query(db->database(sessionid));
+    bool rc;
+
+    // remove existing entries - just in case
+    query.exec("DELETE FROM workouts where filepath = \"//1\"");
+    query.exec("DELETE FROM workouts where filepath = \"//2\"");
+
+    // adding a space at the front of string to make manual mode always
+    // appear first in a sorted list is a bit of a hack, but works ok
+    QString manualErg = QString("INSERT INTO workouts (filepath, filename) values (\"//1\", \"%1\");")
+            .arg(" " + tr("Manual Erg Mode")); // keep the SPACE separate so that translation cannot remove it
+    rc = query.exec(manualErg);
+
+    QString manualCrs = QString("INSERT INTO workouts (filepath, filename) values (\"//2\", \"%1\");")
+            .arg(" " + tr("Manual Slope Mode")); // keep the SPACE separate so that translation cannot remove it
+    rc = query.exec(manualCrs);
+
+
+    return rc;
+}
+
+bool TrainDB::createDefaultEntriesVideosync()
+{
+    QSqlQuery query(db->database(sessionid));
+    bool rc;
+
+    // remove existing entries - just in case
+    query.exec("DELETE FROM videosyncs where filepath = \"//1\"");
+
+    // adding a space at the front of string to make "None" always
+    // appear first in a sorted list is a bit of a hack, but works ok
+    QString NoneSync = QString("INSERT INTO videosyncs (filepath, filename) values (\"//1\", \"%1\");")
+                     .arg(" " + tr("None")); // keep the SPACE separate so that translation cannot remove it
+    rc = query.exec(NoneSync);
+
+    return rc;
+
 }
