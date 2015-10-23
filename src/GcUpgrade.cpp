@@ -28,6 +28,7 @@
 #include "Context.h"
 #include "DataProcessor.h"
 #include "MainWindow.h"
+#include "TrainDB.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -345,6 +346,18 @@ GcUpgrade::upgrade(const QDir &home)
     if (last < VERSION311_BUILD) {
 
         // add here the standard upgrade tasks
+
+    }
+
+
+    //----------------------------------------------------------------------
+    // 3.3 upgrade processing
+    //----------------------------------------------------------------------
+
+    if (last < VERSION33_BUILD) {
+
+        // cleanup/restore default entries in the trainDB
+        trainDB->updateDefaultEntries();
 
     }
 
