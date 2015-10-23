@@ -258,7 +258,7 @@ void PMCData::refresh()
 
             if (!std::isinf(value) && !std::isnan(value)) {
                 stress_[offset] += value;
-                qDebug()<<"stress_["<<offset<<"] :"<<stress_[offset];
+                //qDebug()<<"stress_["<<offset<<"] :"<<stress_[offset];
             }
         }
     }
@@ -280,7 +280,7 @@ void PMCData::refresh()
 
             if (!std::isinf(value) && !std::isnan(value)) {
                 planned_stress_[offset] += value;
-                qDebug()<<"planned_stress_["<<offset<<"] :"<<planned_stress_[offset]<<item->fileName;
+                //qDebug()<<"planned_stress_["<<offset<<"] :"<<planned_stress_[offset]<<item->fileName;
             }
         }
     }
@@ -297,6 +297,11 @@ void PMCData::refresh()
     double planned_lastSTS=0.0f;
 
     double planned_rollingStress=0;
+
+    double expected_lastLTS=0.0f;
+    double expected_lastSTS=0.0f;
+
+    double expected_rollingStress=0;
 
     for(int day=0; day < days_; day++) {
 
@@ -354,10 +359,6 @@ void PMCData::refresh()
             planned_sts_[day] *= -1;
         }
 
-        qDebug()<<"planned_stress_["<<day<<"] :"<<planned_stress_[day];
-        qDebug()<<"planned_lts_["<<day<<"] :"<<planned_lts_[day];
-        qDebug()<<"planned_sts_["<<day<<"] :"<<planned_sts_[day];
-
         // rolling stress for STS days
         if (day && day <= stsDays_) {
             // just starting out
@@ -373,6 +374,76 @@ void PMCData::refresh()
         // We allow it to be shown today or tomorrow where
         // most (sane/thinking) folks usually show SB on the following day
         planned_sb_[day+(sbToday ? 0 : 1)] =  planned_lts_[day] - planned_sts_[day];
+
+        // ********************
+        // ****  EXPECTED  ****
+        // ********************
+
+        if (start_.addDays(day).daysTo(QDate::currentDate())<0) {
+            double lastLts = 0.0;
+            double lastSts = 0.0;
+            double ltsAtStsDays1 = 0.0;
+            double ltsAtStsDays2 = 0.0;
+
+            if (day) {
+                if (start_.addDays(day).daysTo(QDate::currentDate())<-1) {
+                    lastLts = expected_lts_[day-1];
+                    lastSts = expected_sts_[day-1];
+                } else {
+                    lastLts = lts_[day-1];
+                    lastSts = sts_[day-1];
+                }
+                if (day <= stsDays_) {
+                    if (start_.addDays(day).daysTo(QDate::currentDate())<-1-stsDays_) {
+                        ltsAtStsDays1 = expected_lts_[day-stsDays_-1];
+                    } else {
+                        ltsAtStsDays1 = lts_[day-stsDays_-1];
+                    }
+
+                    if (start_.addDays(day).daysTo(QDate::currentDate())<-stsDays_) {
+                        ltsAtStsDays2 = expected_lts_[day-stsDays_];
+                    } else {
+                        ltsAtStsDays2 = lts_[day-stsDays_];
+                    }
+                }
+            }
+
+            // not seeded
+            if (expected_lts_[day] >=0 || expected_sts_[day]>=0) {
+                // LTS
+                expected_lts_[day] = (planned_stress_[day] * (1.0 - lte)) + (lastLts * lte);
+
+                // STS
+                expected_sts_[day] = (planned_stress_[day] * (1.0 - ste)) + (lastSts * ste);
+
+            } else if (expected_lts_[day]< 0 || expected_sts_[day]<0) {
+                expected_lts_[day] *= -1;
+                expected_sts_[day] *= -1;
+            }
+
+            // rolling stress for STS days
+            if (day && day <= stsDays_) {
+                // just starting out
+                expected_rollingStress += expected_lts_[day] - lastLts;
+                expected_rr_[day] = expected_rollingStress;
+            } else if (day) {
+                expected_rollingStress += expected_lts_[day] - lastLts;
+                expected_rollingStress -= ltsAtStsDays2 - ltsAtStsDays1;
+                expected_rr_[day] = expected_rollingStress;
+            }
+
+            // SB (stress balance)  long term - short term
+            // We allow it to be shown today or tomorrow where
+            // most (sane/thinking) folks usually show SB on the following day
+            expected_sb_[day+(sbToday ? 0 : 1)] =  expected_lts_[day] - expected_sts_[day];
+        } else {
+            expected_lts_[day] = 0;
+            expected_sts_[day] = 0;
+            expected_sb_[day] = 0;
+            expected_rr_[day] = 0;
+
+        }
+
     }
 
     //qDebug()<<"refresh PMC in="<<timer.elapsed()<<"ms";
