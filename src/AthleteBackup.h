@@ -21,7 +21,6 @@
 
 #include <QString>
 
-#include "Context.h"
 #include "Athlete.h"
 
 
@@ -30,14 +29,18 @@ class AthleteBackup : public QObject
     Q_OBJECT
 
     public:
-        AthleteBackup(Context *context);
+        AthleteBackup(QDir athlete);
         ~AthleteBackup();
         void backupOnClose();
+        void backupImmediate();
 
     private:
-        Context *context;
-        QString cyclist;
-        QList<QDir> sourceFolder;
+        AthleteDirectoryStructure *athleteDirs;
+        QString athlete;
+        QString backupFolder;
+        QList<QDir> sourceFolderList;
+        bool backup(QString progressText);
+
 };
 
 
