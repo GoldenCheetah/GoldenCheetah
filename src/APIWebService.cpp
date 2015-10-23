@@ -88,6 +88,9 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
 
         // GET ACTIVITY
         // http://localhost:12021/athlete/activity/filename
+        // optional query parameters:
+        //      ?format=json    (default)
+        //      ?format=<xx>    xx = one of (csv, tcx, pwx)
         if (paths[0] == "activity") {
 
             paths.removeFirst();
@@ -99,13 +102,19 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
         if (paths[0] == "meanmax") {
 
             // http://localhost:12021/athlete/meanmax/filename
+            // optional query parameter:
+            //    ?series=watts     (default)
+            //    ?series=<xx>  xx= one of (cad, speed, vam, NP, xPower, nm)
             // http://localhost:12021/athlete/meanmax/bests
+            // optional query parameter:
+            //    ?series=watts     (default)
+            //    ?series=<xx>  xx=1 of (cad, speed, vam, NP, xPower, nm)
             paths.removeFirst();
             listMMP(athlete, paths, request, response);
             return;
         }
 
-    }
+     }
 
     // GET HERE ITS BAD!
     response.setStatus(404); // malformed URL
