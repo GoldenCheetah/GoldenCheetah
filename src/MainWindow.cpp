@@ -33,6 +33,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "AthleteBackup.h"
 
 #include "Colors.h"
 #include "RideCache.h"
@@ -581,6 +582,12 @@ MainWindow::MainWindow(const QDir &home)
 
     tabMapper = new QSignalMapper(this); // maps each option
     connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openTab(const QString &)));
+
+    fileMenu->addSeparator();
+    backupAthleteMenu = fileMenu->addMenu(tr("Backup Athlete Data"));
+    connect(backupAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setBackupAthleteMenu()));
+    backupMapper = new QSignalMapper(this); // maps each option
+    connect(backupMapper, SIGNAL(mapped(const QString &)), this, SLOT(backupAthlete(const QString &)));
 
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
@@ -1780,6 +1787,43 @@ MainWindow::setOpenTabMenu()
     // add create new option
     openTabMenu->addSeparator();
     openTabMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistTab()), tr("Ctrl+N"));
+}
+
+void
+MainWindow::setBackupAthleteMenu()
+{
+    // wipe existing
+    backupAthleteMenu->clear();
+
+    // get a list of all cyclists
+    QStringListIterator i(QDir(gcroot).entryList(QDir::Dirs | QDir::NoDotAndDotDot));
+    while (i.hasNext()) {
+
+        QString name = i.next();
+
+        // new action
+        QAction *action = new QAction(QString("%1").arg(name), this);
+
+        // get the config directory
+        AthleteDirectoryStructure subDirs(name);
+        // icon / mugshot ?
+        QString icon = QString("%1/%2/%3/avatar.png").arg(gcroot).arg(name).arg(subDirs.config().dirName());
+        if (QFile(icon).exists()) action->setIcon(QIcon(icon));
+
+        // add to menu
+        backupAthleteMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), backupMapper, SLOT(map()));
+        backupMapper->setMapping(action, name);
+    }
+
+}
+
+void
+MainWindow::backupAthlete(QString name)
+{
+    AthleteBackup *backup = new AthleteBackup(QDir(gcroot+"/"+name));
+    backup->backupImmediate();
+    delete backup;
 }
 
 void

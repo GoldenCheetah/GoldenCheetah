@@ -188,8 +188,9 @@ Athlete::close()
     appsettings->setCValue(context->athlete->home->root().dirName(), GC_SAFEEXIT, true);
 
     // run autobackup on close (if configured)
-    AthleteBackup *backup = new AthleteBackup(context);
+    AthleteBackup *backup = new AthleteBackup(context->athlete->home->root());
     backup->backupOnClose();
+    delete backup;
 
 }
 void
