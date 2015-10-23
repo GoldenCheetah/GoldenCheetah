@@ -394,8 +394,6 @@ RideImportWizard::process()
     // So, therefore the progress bar runs from 0 to files*4. (since step 5 is not implemented yet)
     progressBar->setMinimum(0);
     progressBar->setMaximum(filenames.count()*4);
-    if (!isActiveWindow()) activateWindow();
-
 
     // Pass one - Is it valid?
     phaseLabel->setText(tr("Step 1 of 4: Check file permissions"));
@@ -430,7 +428,6 @@ RideImportWizard::process()
     }
 
     if (aborted) { done(0); }
-    if (!isActiveWindow()) activateWindow();
     repaint();
     QApplication::processEvents();
 
@@ -451,7 +448,6 @@ RideImportWizard::process()
               QApplication::processEvents();
 
               if (aborted) { done(0); }
-              if (!isActiveWindow()) activateWindow();
               this->repaint();
               QApplication::processEvents();
 
@@ -616,7 +612,6 @@ RideImportWizard::process()
         progressBar->setValue(progressBar->value()+1);
         QApplication::processEvents();
         if (aborted) { done(0); }
-        if (!isActiveWindow()) activateWindow();
         this->repaint();
 
         next:;
@@ -639,11 +634,10 @@ RideImportWizard::process()
 
         // does nothing for the moment
         progressBar->setValue(progressBar->value()+1);
-        if (!isActiveWindow()) activateWindow();
         progressBar->repaint();
    }
-   // get it on top
-   activateWindow();
+   // get it on top to save / correct missing dates
+    if (!isActiveWindow()) activateWindow();
 
    // Wait for user to press save
    abortButton->setText(tr("Save"));
@@ -827,7 +821,6 @@ RideImportWizard::todayClicked(int index)
     }
     // phew! - repaint!
     QApplication::processEvents();
-    if (!isActiveWindow()) activateWindow();
     tableWidget->repaint();
 
 }
@@ -922,7 +915,6 @@ RideImportWizard::abortClicked()
         tableWidget->setCurrentCell(i,5);
         QApplication::processEvents();
         if (aborted) { done(0); }
-        if (!isActiveWindow()) activateWindow();
         this->repaint();
 
 
@@ -1031,7 +1023,6 @@ RideImportWizard::abortClicked()
         QApplication::processEvents();
         if (aborted) { done(0); }
         progressBar->setValue(progressBar->value()+1);
-        if (!isActiveWindow()) activateWindow();
         this->repaint();
     }
 
@@ -1049,6 +1040,7 @@ RideImportWizard::abortClicked()
     progressBar->setValue(progressBar->maximum());
     phaseLabel->setText(donemessage);
     abortButton->setText(tr("Finish"));
+    if (!isActiveWindow()) activateWindow();
     aborted = false;
 }
 
