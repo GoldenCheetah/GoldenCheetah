@@ -1015,20 +1015,32 @@ MainWindow::closeEvent(QCloseEvent* event)
 {
     QList<Tab*> closing = tabList;
     bool needtosave = false;
+    bool importrunning = false;
 
     // close all the tabs .. if any refuse we need to ignore
     //                       the close event
     foreach(Tab *tab, closing) {
 
-        // do we need to save?
-        if (tab->context->mainWindow->saveRideExitDialog(tab->context) == true)
-            removeTab(tab);
-        else
-            needtosave = true;
+        // check for if RideImport is is process and let it finalize / or be stopped by the user
+        if (tab->context->athlete->autoImport) {
+            if (tab->context->athlete->autoImport->importInProcess() ) {
+                importrunning = true;
+                QMessageBox::information(this, tr("Activity Import"), tr("Closing of athlete window not possible while background activity import is in progress..."));
+            }
+        }
+
+        // only check for unsaved if autoimport is not running any more
+        if (!importrunning) {
+            // do we need to save?
+            if (tab->context->mainWindow->saveRideExitDialog(tab->context) == true)
+                removeTab(tab);
+            else
+                needtosave = true;
+        }
     }
 
-    // were any left hanging around?
-    if (needtosave) event->ignore();
+    // were any left hanging around? or autoimport in action on any windows, then don't close any
+    if (needtosave || importrunning) event->ignore();
     else {
 
         // finish off the job and leave
@@ -1631,7 +1643,17 @@ MainWindow::openTab(QString name)
 void
 MainWindow::closeTabClicked(int index)
 {
+
     Tab *tab = tabList[index];
+
+    // check for autoimport and let it finalize
+    if (tab->context->athlete->autoImport) {
+        if (tab->context->athlete->autoImport->importInProcess() ) {
+            QMessageBox::information(this, tr("Activity Import"), tr("Closing of athlete window not possible while background activity import is in progress..."));
+            return;
+        }
+    }
+
     if (saveRideExitDialog(tab->context) == false) return;
 
     // lets wipe it
@@ -1641,6 +1663,14 @@ MainWindow::closeTabClicked(int index)
 bool
 MainWindow::closeTab()
 {
+  // check for autoimport and let it finalize
+    if (currentTab->context->athlete->autoImport) {
+        if (currentTab->context->athlete->autoImport->importInProcess() ) {
+            QMessageBox::information(this, tr("Activity Import"), tr("Closing of athlete window not possible while background activity import is in progress..."));
+            return false;
+        }
+    }
+
     // wipe it down ...
     if (saveRideExitDialog(currentTab->context) == false) return false;
 

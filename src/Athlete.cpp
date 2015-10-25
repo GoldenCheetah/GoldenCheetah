@@ -121,8 +121,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
         }
     }
 
-    // read athlete's autoimport configuration
+    // read athlete's autoimport configuration and initialize the autoimport process
     autoImportConfig = new RideAutoImportConfig(home->config());
+    autoImport = NULL;
 
     // read athlete's charts.xml and translate etc
     loadCharts();
@@ -230,6 +231,9 @@ Athlete::~Athlete()
     delete zones_;
     delete hrzones_;
     for (int i=0; i<2; i++) delete pacezones_[i];
+    delete autoImportConfig;
+    delete autoImport;
+
 }
 
 void Athlete::selectRideFile(QString fileName)
@@ -343,16 +347,15 @@ Athlete::configChanged(qint32 state)
 void
 Athlete::importFilesWhenOpeningAthlete() {
 
+    autoImport = NULL;
     // just do it if something is configured
     if (autoImportConfig->hasRules()) {
 
-        RideImportWizard *import = new RideImportWizard(autoImportConfig, context);
+        autoImport = new RideImportWizard(autoImportConfig, context);
 
         // only process the popup if we have any files available at all
-        if ( import->getNumberOfFiles() > 0) {
-           import->process();
-        } else {
-           delete import;
+        if ( autoImport->getNumberOfFiles() > 0) {
+           autoImport->process();
         }
     }
 }
