@@ -41,29 +41,42 @@
 // drag and drop passes urls ... convert to a list of files and call main constructor
 RideImportWizard::RideImportWizard(QList<QUrl> *urls, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
+    _importInProcess = true;
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     QList<QString> filenames;
     for (int i=0; i<urls->count(); i++)
         filenames.append(QFileInfo(urls->value(i).toLocalFile()).absoluteFilePath());
     autoImportMode = false;
+    autoImportStealth = false;
     init(filenames, context);
     filenames.clear();
+    _importInProcess = false;
+
 }
 
 RideImportWizard::RideImportWizard(QList<QString> files, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
+    _importInProcess = true;
+    setAttribute(Qt::WA_DeleteOnClose);
     autoImportMode = false;
+    autoImportStealth = false;
     init(files, context);
+    _importInProcess = false;
+
 }
 
 
 RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context, QWidget *parent) : QDialog(parent), context(context), importConfig(dirs)
 {
+    _importInProcess = true;
     autoImportMode = true;
+    autoImportStealth = true;
+
+    if (autoImportStealth) hide();
     QList<QString> files;
 
-    // get the directories
+    // get the directories & rules
     QList<RideAutoImportRule> rules = importConfig->getConfig();
 
     // prepare the widget to show the status of the directory
@@ -142,13 +155,27 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
         QDate selectAfter = QDate::currentDate();
         switch(rule.getImportRule()) {
         case RideAutoImportRule::importLast90days:
+        case RideAutoImportRule::importBackground90:
             selectAfter = selectAfter.addDays(Q_INT64_C(-90));
             break;
         case RideAutoImportRule::importLast180days:
+        case RideAutoImportRule::importBackground180:
             selectAfter = selectAfter.addDays(Q_INT64_C(-180));
             break;
         case RideAutoImportRule::importLast360days:
+        case RideAutoImportRule::importBackground360:
             selectAfter = selectAfter.addDays(Q_INT64_C(-360));
+            break;
+        }
+
+        // if any of the rules says "with Dialog" then we keep the dialog - if not it's stealth
+        switch (rule.getImportRule()) {
+
+        case RideAutoImportRule::importAll:
+        case RideAutoImportRule::importLast90days:
+        case RideAutoImportRule::importLast180days:
+        case RideAutoImportRule::importLast360days:
+            autoImportStealth = false;
             break;
         }
 
@@ -160,12 +187,16 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
                 // append following the import rules
                 switch (rule.getImportRule()) {
                 case RideAutoImportRule::importAll:
+                case RideAutoImportRule::importBackgroundAll:
                     files.append(f.absoluteFilePath());
                     j++;
                     break;
                 case RideAutoImportRule::importLast90days:
                 case RideAutoImportRule::importLast180days:
                 case RideAutoImportRule::importLast360days:
+                case RideAutoImportRule::importBackground90:
+                case RideAutoImportRule::importBackground180:
+                case RideAutoImportRule::importBackground360:
                     if (f.created().date() >= selectAfter || f.lastModified().date() >= selectAfter) {
                         files.append(f.absoluteFilePath());
                         j++;
@@ -189,6 +220,9 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
     directoryWidget->setColumnWidth(2, 230);
 
     init(files, context);
+
+    _importInProcess = false;
+
 
 }
 
@@ -379,9 +413,14 @@ int
 RideImportWizard::process()
 {
 
+    // import process is starting
+    _importInProcess = true;
+
     // Make visible and put in front prior to running down the list & processing...
-    if (!isActiveWindow()) activateWindow();
-    this->show();
+    if (!autoImportStealth) {
+        if (!isActiveWindow()) activateWindow();
+        this->show();
+    }
 
     // set progress bar limits - for each file we
     // will make 5 passes over the files
@@ -427,7 +466,7 @@ RideImportWizard::process()
 
     }
 
-    if (aborted) { done(0); }
+    if (aborted) { done(0); return 0; }
     repaint();
     QApplication::processEvents();
 
@@ -447,7 +486,7 @@ RideImportWizard::process()
               tableWidget->setCurrentCell(i,5);
               QApplication::processEvents();
 
-              if (aborted) { done(0); }
+              if (aborted) { done(0); return 0; }
               this->repaint();
               QApplication::processEvents();
 
@@ -611,7 +650,7 @@ RideImportWizard::process()
         }
         progressBar->setValue(progressBar->value()+1);
         QApplication::processEvents();
-        if (aborted) { done(0); }
+        if (aborted) { done(0); return 0; }
         this->repaint();
 
         next:;
@@ -637,8 +676,13 @@ RideImportWizard::process()
         progressBar->repaint();
    }
    // get it on top to save / correct missing dates
-    if (!isActiveWindow()) activateWindow();
-
+   if (autoImportStealth && needdates > 0) {
+       // leave the stealth mode
+       this->show();
+       activateWindow();
+   } else {
+       if (!isActiveWindow()) activateWindow();
+   }
    // Wait for user to press save
    abortButton->setText(tr("Save"));
    aborted = false;
@@ -656,8 +700,8 @@ RideImportWizard::process()
       // without user intervention
 
       abortButton->setDisabled(false);
+      if (autoImportStealth) abortClicked();  // simulate "Save" by User
 
-      // abortClicked();
    } else {
 
       // de-activate Save button until the dates and times are sorted
@@ -856,6 +900,10 @@ RideImportWizard::abortClicked()
     if (label == tr("Finish")) {
        // phew. our work is done. -- lets force an update stats...
        hide();
+       if (autoImportStealth) {
+           // inform the user that the work is done
+           QMessageBox::information(NULL, tr("Auto Import"), tr("Automatic import from defined directories is completed."));
+       }
        done(0);
        return;
     }
@@ -914,7 +962,7 @@ RideImportWizard::abortClicked()
         tableWidget->item(i,5)->setText(tr("Saving..."));
         tableWidget->setCurrentCell(i,5);
         QApplication::processEvents();
-        if (aborted) { done(0); }
+        if (aborted) { done(0); return; }
         this->repaint();
 
 
@@ -1021,7 +1069,7 @@ RideImportWizard::abortClicked()
         delete ride;
 
         QApplication::processEvents();
-        if (aborted) { done(0); }
+        if (aborted) { done(0); return; }
         progressBar->setValue(progressBar->value()+1);
         this->repaint();
     }
@@ -1040,8 +1088,12 @@ RideImportWizard::abortClicked()
     progressBar->setValue(progressBar->maximum());
     phaseLabel->setText(donemessage);
     abortButton->setText(tr("Finish"));
-    if (!isActiveWindow()) activateWindow();
     aborted = false;
+    if (autoImportStealth) {
+        abortClicked();  // simulate pressing the "Finish" button - even if the window got visible
+    } else {
+        if (!isActiveWindow()) activateWindow();
+    }
 }
 
 
@@ -1066,6 +1118,23 @@ RideImportWizard::moveFile(const QString &source, const QString &target) {
 
     return false;
 
+}
+
+
+void
+RideImportWizard::closeEvent(QCloseEvent* event)
+{
+    if (_importInProcess)
+        event->ignore();
+    else
+        event->accept();
+}
+
+void
+RideImportWizard::done(int rc)
+{
+    _importInProcess = false;
+    QDialog::done(rc);
 }
 
 // clean up files
