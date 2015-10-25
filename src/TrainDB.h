@@ -64,6 +64,9 @@ class TrainDB : public QObject
     // drop and recreate tables
     void rebuildDB();
 
+    // update default entries in the tables
+    bool updateDefaultEntries();
+
     signals:
         void dataChanged();
 
@@ -81,6 +84,9 @@ class TrainDB : public QObject
         bool dropVideoTable();
         bool createVideoSyncTable();
         bool dropVideoSyncTable();
+
+        bool createDefaultEntriesWorkout();
+        bool createDefaultEntriesVideosync();
 };
 
 extern TrainDB *trainDB;
