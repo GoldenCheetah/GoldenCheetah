@@ -51,6 +51,7 @@ class PMCData;
 class LTMSettings;
 class Routes;
 class AthleteDirectoryStructure;
+class RideImportWizard;
 class RideAutoImportConfig;
 class RideCache;
 class IntervalCache;
@@ -118,7 +119,8 @@ class Athlete : public QObject
         CalDAV *davCalendar;
 #endif
 
-        // Athlete's autoimport configuration
+        // Athlete's autoimport handling
+        RideImportWizard *autoImport;
         RideAutoImportConfig *autoImportConfig;
 
         // ride metadata definitions
