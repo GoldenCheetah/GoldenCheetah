@@ -22,7 +22,7 @@ before_install:
 #  - brew install pkgconfig
   - brew install srmio
   - brew install libsamplerate
-  - brew install --HEAD https://raw.github.com/gcoco/CI-for-GoldenCheetah/master/libkml.rb
+  - brew install --HEAD travis/libkml.rb
   # Need to set +w on brew files or macdeployqt fails
   - sudo chmod -R +w /usr/local
   # Download D2XX for MAC
