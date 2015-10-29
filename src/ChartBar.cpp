@@ -23,7 +23,7 @@
 #include "Context.h"
 #include "QtMacButton.h"
 
-#include <QFontMetrics.h>
+#include <QFontMetrics>
 
 ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(context)
 {
