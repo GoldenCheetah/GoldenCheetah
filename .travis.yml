@@ -7,7 +7,6 @@ env:
   - QT=5
 
 before_install:
-  - cd GoldenCheetah
   - pwd
   - sh travis/$TRAVIS_OS_NAME/before_install_QT$QT.sh $TRAVIS_OS_NAME $QT
 
