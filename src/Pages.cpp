@@ -4990,12 +4990,16 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     QGridLayout *mainLayout = new QGridLayout(this);
     mainLayout->setSpacing(10);
 
+    updateButton = new QPushButton(tr("Update"));
+    updateButton->hide();
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
+    updateButton->setFixedSize(60,20);
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
 #else
+    updateButton->setText(tr("Update"));
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
 #endif
@@ -5045,6 +5049,7 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     actionButtons->addStretch();
     actionButtons->addWidget(metric);
     actionButtons->addStretch();
+    actionButtons->addWidget(updateButton);
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
     actionButtons->addWidget(defaultButton);
@@ -5108,7 +5113,12 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     mainLayout->addLayout(zoneButtons, 3,0);
     mainLayout->addWidget(zones, 4,0);
 
+    // edit connect
+    connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
+    connect(cvEdit, SIGNAL(timeChanged(QTime)), this, SLOT(rangeEdited()));
+
     // button connect
+    connect(updateButton, SIGNAL(clicked()), this, SLOT(editClicked()));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
@@ -5165,6 +5175,28 @@ CVPage::addClicked()
 }
 
 void
+CVPage::editClicked()
+{
+    // get current scheme
+    paceZones->setScheme(schemePage->getScheme());
+
+    QTreeWidgetItem *edit = ranges->selectedItems().at(0);
+    int index = ranges->indexOfTopLevelItem(edit);
+
+    // date
+    edit->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
+
+    // CV
+    double kph = paceZones->kphFromTime(cvEdit, metric->isChecked());
+    paceZones->setCV(index, kph);
+    edit->setText(1, QString("%1 %2 %3 %4")
+            .arg(paceZones->kphToPaceString(kph, true))
+            .arg(paceZones->paceUnits(true))
+            .arg(paceZones->kphToPaceString(kph, false))
+            .arg(paceZones->paceUnits(false)));
+}
+
+void
 CVPage::deleteClicked()
 {
     if (ranges->currentItem()) {
@@ -5203,6 +5235,24 @@ CVPage::defaultClicked()
 }
 
 void
+CVPage::rangeEdited()
+{
+    if (ranges->currentItem()) {
+        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+
+        QDate date = dateEdit->date();
+        QDate odate = paceZones->getStartDate(index);
+        QTime cv = cvEdit->time();
+        QTime ocv = QTime::fromString(paceZones->kphToPaceString(paceZones->getCV(index), metric->isChecked()), "mm:ss");
+
+        if (date != odate || cv != ocv)
+            updateButton->show();
+        else
+            updateButton->hide();
+    }
+}
+
+void
 CVPage::rangeSelectionChanged()
 {
     active = true;
@@ -5218,6 +5268,8 @@ CVPage::rangeSelectionChanged()
 
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         PaceZoneRange current = paceZones->getZoneRange(index);
+        dateEdit->setDate(paceZones->getStartDate(index));
+        cvEdit->setTime(QTime::fromString(paceZones->kphToPaceString(paceZones->getCV(index), metric->isChecked()), "mm:ss"));
 
         if (current.zonesSetFromCV) {
 
