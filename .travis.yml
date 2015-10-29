@@ -83,10 +83,8 @@ before_script:
   - echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
   
   - cat src/gcconfig.pri
-  - cd ..
 
 script:
-  - cd $BRANCH
   # Qt4
   #- /usr/local/bin/qmake -makefile -spec unsupported/macx-clang -recursive CONFIG+=release CONFIG+=static QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
   # Qt5
