@@ -7,17 +7,15 @@ env:
   - QT=5
 
 before_install:
-  - git clone --depth=1 https://github.com/GoldenCheetah/GoldenCheetah.git GoldenCheetah
-  - cp -R travis-ci GoldenCheetah/
   - cd GoldenCheetah
   - pwd
-  - sh travis-ci/$TRAVIS_OS_NAME/before_install_QT$QT.sh $TRAVIS_OS_NAME $QT
+  - sh travis/$TRAVIS_OS_NAME/before_install_QT$QT.sh $TRAVIS_OS_NAME $QT
 
 before_script:
-  - sh travis-ci/$TRAVIS_OS_NAME/before_script_QT$QT.sh $TRAVIS_OS_NAME $QT
+  - sh travis/$TRAVIS_OS_NAME/before_script_QT$QT.sh $TRAVIS_OS_NAME $QT
 
 script:
-  - sh travis-ci/$TRAVIS_OS_NAME/script_QT$QT.sh $TRAVIS_OS_NAME $QT
+  - sh travis/$TRAVIS_OS_NAME/script_QT$QT.sh $TRAVIS_OS_NAME $QT
 
 after_success:
-  - sh travis-ci/$TRAVIS_OS_NAME/after_success_QT$QT.sh $TRAVIS_OS_NAME $QT
+  - sh travis/$TRAVIS_OS_NAME/after_success_QT$QT.sh $TRAVIS_OS_NAME $QT
