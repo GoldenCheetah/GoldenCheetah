@@ -42,6 +42,7 @@ class GcScopeButton : public QWidget
         bool ishighlighted() const { return highlighted; }
         void setRed(bool x) { red = x; }
 
+        QString text;
     signals:
         void clicked(bool);
 
@@ -53,7 +54,6 @@ class GcScopeButton : public QWidget
         bool checked;
         bool highlighted;
         bool red;
-        QString text;
 };
 
 #endif

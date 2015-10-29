@@ -23,13 +23,14 @@
 #include "Context.h"
 #include "QtMacButton.h"
 
+#include <QFontMetrics.h>
+
 ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(context)
 {
     // left / right scroller icon
     static QIcon leftIcon = iconFromPNG(":images/mac/left.png");
     static QIcon rightIcon = iconFromPNG(":images/mac/right.png");
 
-    setFixedHeight(23);
     setContentsMargins(0,0,0,0);
 
     // main layout
@@ -54,7 +55,6 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
 
     // scrollarea
     scrollArea = new QScrollArea(this);
-    scrollArea->setFixedHeight(23);
     scrollArea->setAutoFillBackground(false);
     scrollArea->setWidgetResizable(true);
     scrollArea->setFrameStyle(QFrame::NoFrame);
@@ -107,11 +107,14 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     //connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
 
 #ifdef Q_OS_MAC
-    buttonFont.setPointSize(12); // is bigger on mac
+    //buttonFont.setPointSize(12); // is bigger on mac
 #else
-    buttonFont.setPointSize(10);
+    //buttonFont.setPointSize(10);
 #endif
-    buttonFont.setWeight(QFont::Black);
+    //buttonFont.setWeight(QFont::Black);
+    QFontMetrics fs(buttonFont);
+    setFixedHeight(fs.height()+4);
+    scrollArea->setFixedHeight(fs.height()+4);
 
     signalMapper = new QSignalMapper(this); // maps each option
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
@@ -126,6 +129,26 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
 
     // trap resize / mouse events
     installEventFilter(this);
+
+    // appearance update
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+}
+
+void
+ChartBar::configChanged(qint32)
+{
+#ifndef Q_OS_MAC
+    buttonFont = QFont();
+    QFontMetrics fs(buttonFont);
+    setFixedHeight(fs.height()+4);
+    scrollArea->setFixedHeight(fs.height()+4);
+    foreach(GcScopeButton *b, buttons) {
+    	int width = fs.width(b->text);
+    	b->setFont(buttonFont);
+    	b->setFixedWidth(width+20);
+    	b->setFixedHeight(fs.height()+2);
+    }
+#endif
 }
 
 void
@@ -143,6 +166,7 @@ ChartBar::addWidget(QString title)
     QFontMetrics fontMetric(buttonFont);
     int width = fontMetric.width(title);
     newbutton->setFixedWidth(width+20);
+    newbutton->setFixedHeight(fontMetric.height()+2);
 
     // add to layout
     layout->addWidget(newbutton);
