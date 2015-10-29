@@ -897,8 +897,10 @@ class CVPage : public QWidget
 
     public slots:
         void addClicked();
+        void editClicked();
         void deleteClicked();
         void defaultClicked();
+        void rangeEdited();
         void rangeSelectionChanged();
         void addZoneClicked();
         void deleteZoneClicked();
@@ -916,8 +918,8 @@ class CVPage : public QWidget
         PaceSchemePage *schemePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
-        QPushButton *addButton, *deleteButton, *defaultButton;
-        QPushButton *addZoneButton, *deleteZoneButton;
+        QPushButton *addButton, *updateButton, *deleteButton;
+        QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
         QLabel *per;
 };
 
