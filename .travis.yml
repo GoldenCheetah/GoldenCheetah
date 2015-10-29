@@ -1,19 +1,107 @@
-os:
-  - osx
+branches:
+    - master
+
+language: 
+  - objective-c
+  
+compiler:
+  - clang
+  - gcc
   
 env:
-  - QT=4
-  - QT=5
+    - BRANCH=master QT=qt4 QT_PATH=qt
+    - BRANCH=master QT=qt5 QT_PATH=qt5
 
 before_install:
-  - pwd
-  - sh travis/$TRAVIS_OS_NAME/before_install_QT$QT.sh $TRAVIS_OS_NAME $QT
-
+  - date
+  - brew update
+  - sh travis/install-qt.sh
+  - brew install libical
+  - brew install libusb libusb-compat
+#  - brew install boost
+#  - brew install pkgconfig
+  - brew install srmio
+  - brew install libsamplerate
+  - brew install --HEAD https://raw.github.com/gcoco/CI-for-GoldenCheetah/master/libkml.rb
+  # Need to set +w on brew files or macdeployqt fails
+  - sudo chmod -R +w /usr/local
+  # Download D2XX for MAC
+  - curl -O http://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.2.2.dmg
+  # Let's build our own QWTPLOT3D.
+  - git clone --depth 1 https://github.com/sintegrial/qwtplot3d.git qwtplot3d
+  - cd qwtplot3d
+  - CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
+  - CC=clang CXX=clang++ make -j2 
+  - cd ..
+  # Lets build our own kQOAuth
+  - git clone --branch 0.98 https://github.com/kypeli/kQOAuth.git kQOAuth-0.98
+  - cd kQOAuth-0.98
+  - CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
+  - CC=clang CXX=clang++ make -j2 qmake_all 
+  - CC=clang CXX=clang++ sudo make install
+  - cd ..
+  - hdiutil mount D2XX1.2.2.dmg
+  
 before_script:
-  - sh travis/$TRAVIS_OS_NAME/before_script_QT$QT.sh $TRAVIS_OS_NAME $QT
+#  - git checkout `cat $TRAVIS_BUILD_DIR/commit`
+#  - sh $TRAVIS_BUILD_DIR/git-info.sh
+  # Copy in the libftd2xx libs/includes
+  - mkdir D2XX
+  - cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib D2XX
+  - sudo cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib /usr/local/lib
+  - cp /Volumes/release/D2XX/bin/*.h D2XX
+  - sed -i "" "s|libftd2xx.dylib|@executable_path/../Frameworks/libftd2xx.1.2.2.dylib|" src/D2XX.cpp
+  # Configure GoldenCheetah
+  - cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
+  - cp src/gcconfig.pri.in src/gcconfig.pri
+  - /usr/local/opt/$QT_PATH/bin/lupdate src/src.pro
+  - sed -i "" "s|#\(CONFIG += release.*\)|\1 static |" src/gcconfig.pri
+#  - sed -i "" "s|#\(QMAKE_LFLAGS\).*|\1_RELEASE += -mmacosx-version-min=10.7 -arch x86_64|" src/gcconfig.pri
+  - sed -i "" "s|#\(QMAKE_LRELEASE\).*|\1 += /usr/local/opt/$QT_PATH/bin/lrelease|" src/gcconfig.pri
+  - sed -i "" "s|#\(QMAKE_CXXFLAGS\).*|\1_RELEASE += -mmacosx-version-min=10.7 -arch x86_64|" src/gcconfig.pri
+  - sed -i "" "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
+  - sed -i "" "s|#\(D2XX_INCLUDE =.*\)|\1 ../D2XX|" src/gcconfig.pri
+  - sed -i "" "s|#\(D2XX_LIBS    =.*\)|\1 -L../D2XX -lftd2xx.1.2.2|" src/gcconfig.pri
+  - sed -i "" "s|#\(KQOAUTH_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
+  - sed -i "" "s|#\(KQOAUTH_INCLUDE =.*\)|\1 \$\$[QT_INSTALL_LIBS]/kqoauth.framework/Headers|" src/gcconfig.pri
+  - sed -i "" "s|#\(KQOAUTH_LIBS =.*\)|\1 -F\$\$[QT_INSTALL_LIBS] -framework kqoauth|" src/gcconfig.pri
+  - sed -i "" "s|#\(QWT3D_INSTALL =.*\)|\1 ../../qwtplot3d|" src/gcconfig.pri
+  - sed -i "" "s|#\(KML_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
+  - sed -i "" "s|#\(KML_LIBS    =.*\)|\1 -L/usr/local/lib -lkmlxsd -lkmlregionator -lkmldom -lkmlconvenience -lkmlengine -lkmlbase|" src/gcconfig.pri
+  - sed -i "" "s|#\(ICAL_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
+  - sed -i "" "s|#\(ICAL_LIBS    =.*\)|\1 -L/usr/local/lib -lical|" src/gcconfig.pri
+  - sed -i "" "s|#\(LIBUSB_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
+  - sed -i "" "s|#\(LIBUSB_LIBS    =.*\)|\1 -L/usr/local/lib -lusb|" src/gcconfig.pri
+  - sed -i "" "s|#\(SAMPLERATE_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
+  - sed -i "" "s|#\(SAMPLERATE_LIBS =\).*|\1 -L/usr/local/lib -lsamplerate|" src/gcconfig.pri
+  - sed -i "" "s|#\(DEFINES += GC_HAVE_LION*\)|\1|" src/gcconfig.pri
+  - sed -i "" "s|#\(HTPATH = ../httpserver.*\)|\1 |" src/gcconfig.pri
+  - sed -i "" "s|#\(DEFINES += GC_DROPBOX*\)|\1 |" src/gcconfig.pri
+  - sed -i "" "s|#\(DEFINES += GC_WANT_ROBOT.*\)|\1 |" src/gcconfig.pri
+  - sed -i "" "s|\(DEFINES += GC_VIDEO_NONE.*\)|#\1 |" src/gcconfig.pri
+  - sed -i "" "s|#\(DEFINES += GC_VIDEO_QUICKTIME.*\)|\1 |" src/gcconfig.pri
+  - echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
+  
+  - cat src/gcconfig.pri
+  - cd ..
 
 script:
-  - sh travis/$TRAVIS_OS_NAME/script_QT$QT.sh $TRAVIS_OS_NAME $QT
+  - cd $BRANCH
+  # Qt4
+  #- /usr/local/bin/qmake -makefile -spec unsupported/macx-clang -recursive CONFIG+=release CONFIG+=static QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
+  # Qt5
+  - CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
+  - CC=clang CXX=clang++ make qmake_all 
+  - CC=clang CXX=clang++ make -j4 sub-qwt --silent
+  - CC=clang CXX=clang++ make -j4 sub-src
 
 after_success:
-  - sh travis/$TRAVIS_OS_NAME/after_success_QT$QT.sh $TRAVIS_OS_NAME $QT
+  - cd src
+  - ls -laR GoldenCheetah.app
+  - sh travis/check-gc.sh
+  - /usr/local/opt/$QT_PATH/bin/macdeployqt GoldenCheetah.app -verbose=2 -dmg
+  - brew remove $QT
+  - hdiutil mount GoldenCheetah.dmg
+  - cd /Volumes/GoldenCheetah
+  - ls -laR GoldenCheetah.app
+  - GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
