@@ -106,15 +106,14 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     mlayout->addWidget(menuButton);
     //connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
 
-#ifdef Q_OS_MAC
-    //buttonFont.setPointSize(12); // is bigger on mac
-#else
-    //buttonFont.setPointSize(10);
-#endif
-    //buttonFont.setWeight(QFont::Black);
     QFontMetrics fs(buttonFont);
+#ifdef Q_OS_MAC
+    setFixedHeight(fs.height()+7);
+    scrollArea->setFixedHeight(fs.height()+7);
+#else
     setFixedHeight(fs.height()+4);
     scrollArea->setFixedHeight(fs.height()+4);
+#endif
 
     signalMapper = new QSignalMapper(this); // maps each option
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
