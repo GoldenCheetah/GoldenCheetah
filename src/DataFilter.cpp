@@ -23,6 +23,7 @@
 #include "RideNavigator.h"
 #include "RideFileCache.h"
 #include "PMCData.h"
+#include "VDOTCalculator.h"
 #include <QDebug>
 
 #include "Zones.h"
@@ -94,6 +95,9 @@ static struct {
     { "set", 3 }, // set(symbol, value, filter)
     { "unset", 2 }, // unset(symbol, filter)
     { "isset", 1 }, // isset(symbol) - is the metric or metadata overridden/defined
+
+    // VDOT functions
+    { "vdottime", 2 }, // vdottime(VDOT, distance[km]) - result is seconds
 
     // add new ones above this line
     { "", -1 }
@@ -1948,6 +1952,15 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
 
                         return Result (m->hasText(o_symbol));
                     }
+                }
+                break;
+
+        case 35 :
+                {   // VDOTTIME (VDOT, distance[km])
+
+                    if (leaf->fparms.count() != 2) return Result(0);
+
+                    return Result (60*VDOTCalculator::eqvTime(eval(context, df, leaf->fparms[0], x, m, p).number, 1000*eval(context, df, leaf->fparms[1], x, m, p).number));
                 }
                 break;
 
