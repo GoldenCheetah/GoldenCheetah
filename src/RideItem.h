@@ -126,6 +126,7 @@ class RideItem : public QObject
         QDateTime dateTime;
         QString present;
         QColor color;
+        bool planned;
         bool isRun,isSwim;
         bool samples; // has samples data
 
@@ -167,7 +168,7 @@ class RideItem : public QObject
         // create and destroy
         RideItem();
         RideItem(RideFile *ride, Context *context);
-        RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context);
+        RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context, bool planned);
         RideItem(RideFile *ride, QDateTime &dateTime, Context *context);
 
         ~RideItem();

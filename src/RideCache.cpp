@@ -93,7 +93,7 @@ RideCache::RideCache(Context *context, bool planned) : context(context), planned
         QString name = i.next();
         QDateTime dt;
         if (RideFile::parseRideFileName(name, &dt)) {
-            last = new RideItem(directory.canonicalPath(), name, dt, context);
+            last = new RideItem(directory.canonicalPath(), name, dt, context, planned);
 
             connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
             connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
@@ -205,9 +205,9 @@ RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
     // new ride item
     RideItem *last;
     if (useTempActivities)
-       last = new RideItem(context->athlete->home->tmpActivities().canonicalPath(), name, dt, context);
+       last = new RideItem(context->athlete->home->tmpActivities().canonicalPath(), name, dt, context, planned);
     else
-       last = new RideItem(directory.canonicalPath(), name, dt, context);
+       last = new RideItem(directory.canonicalPath(), name, dt, context, planned);
 
     connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
     connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
