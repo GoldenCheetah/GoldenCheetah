@@ -582,11 +582,13 @@ ANT::addDevice(int device_number, int device_type, int channel_number)
             antChannel[i]->open(device_number, device_type);
 
             // this is an alternate channel for power
-            if (device_type == ANTChannel::CHANNEL_TYPE_POWER) {
+            if ((device_type == ANTChannel::CHANNEL_TYPE_POWER) ||
+                (device_type == ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT)) {
 
                 // if we are not the first power channel then set to update
                 // the alternate power channel
-                if (powerchannels) antChannel[i]->setAlt(true);
+                if (powerchannels)
+                    antChannel[i]->setAlt(true);
 
                 // increment the number of power channels
                 powerchannels++;
