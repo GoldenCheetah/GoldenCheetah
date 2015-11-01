@@ -480,6 +480,7 @@ HEADERS += \
         ScatterWindow.h \
         Season.h \
         SeasonParser.h \
+        Secrets.h \
         Serial.h \
         Settings.h \
         ShareDialog.h \

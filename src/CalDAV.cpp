@@ -16,6 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "Secrets.h"
+
 #include "CalDAV.h"
 #include "MainWindow.h"
 #include "Athlete.h"
