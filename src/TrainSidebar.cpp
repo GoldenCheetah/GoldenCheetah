@@ -291,6 +291,34 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     toolbuttons->addWidget(lap);
     toolbuttons->addStretch();
 
+    QIcon upIcon(":images/oxygen/up.png");
+    QPushButton *up = new QPushButton(upIcon, "", this);
+    up->setFocusPolicy(Qt::NoFocus);
+    up->setIconSize(QSize(64,64));
+    up->setAutoFillBackground(false);
+    up->setAutoDefault(false);
+    up->setFlat(true);
+    up->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+#if QT_VERSION > 0x050400
+    up->setShortcut(Qt::Key_PageUp);
+#endif
+    toolbuttons->addWidget(up);
+    toolbuttons->addStretch();
+
+    QIcon downIcon(":images/oxygen/down.png");
+    QPushButton *down = new QPushButton(downIcon, "", this);
+    down->setFocusPolicy(Qt::NoFocus);
+    down->setIconSize(QSize(64,64));
+    down->setAutoFillBackground(false);
+    down->setAutoDefault(false);
+    down->setFlat(true);
+    down->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+#if QT_VERSION > 0x050400
+    down->setShortcut(Qt::Key_PageDown);
+#endif
+    toolbuttons->addWidget(down);
+    toolbuttons->addStretch();
+
     QHBoxLayout *slideLayout = new QHBoxLayout;
     slideLayout->setSpacing(0);
     slideLayout->setContentsMargins(0,0,0,0);
@@ -354,6 +382,8 @@ intensity->hide(); //XXX!!! temporary
     connect(lap, SIGNAL(clicked()), this, SLOT(newLap()));
     connect(context, SIGNAL(newLap()), this, SLOT(resetLapTimer()));
     connect(intensitySlider, SIGNAL(valueChanged(int)), this, SLOT(adjustIntensity()));
+    connect(up, SIGNAL(clicked()), this, SLOT(Higher()));
+    connect(down, SIGNAL(clicked()), this, SLOT(Lower()));
 
     // not used but kept in case re-instated in the future
     recordSelector = new QCheckBox(this);
