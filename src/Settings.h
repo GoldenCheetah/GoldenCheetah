@@ -48,6 +48,8 @@
 //Cycling Analytics / see also Athlete parameter
 #define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
 
+// Dropbox id
+#define GC_DROPBOX_CLIENT_ID "753fbblhri06ah3"
 
 /*
  *  GoldenCheetah Properties are stored in different locations, depending on the prefix defined in the property name. The following different prefixes are supported
