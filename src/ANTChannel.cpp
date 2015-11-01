@@ -560,7 +560,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            // HR
            case CHANNEL_TYPE_HR:
            {
-               // cadence first...
+               // Heart rate
                uint16_t time = antMessage.measurementTime - lastMessage.measurementTime;
                if (time) {
                    nullCount = 0;
