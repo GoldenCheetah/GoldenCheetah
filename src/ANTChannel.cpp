@@ -686,7 +686,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
                if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE)
                {
-                   if (antMessage.fecInstantPower != 0xFFFF)
+                   if (antMessage.fecInstantPower != 0xFFF)
                        parent->setWatts(antMessage.fecInstantPower);
                    if (antMessage.fecCadence != 0xFF)
                        parent->setSecondaryCadence(antMessage.fecCadence);
