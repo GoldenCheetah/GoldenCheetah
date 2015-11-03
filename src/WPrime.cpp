@@ -1096,7 +1096,7 @@ class WCPZoneTime : public RideMetric {
 
     bool canAggregate() { return false; }
     void aggregateWith(const RideMetric &) {}
-    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new WCPZoneTime(*this); }
 };
 
