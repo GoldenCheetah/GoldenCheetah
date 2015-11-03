@@ -96,7 +96,16 @@ after_success:
 - sh travis/check-gc.sh
 - /usr/local/opt/$QT_PATH/bin/macdeployqt GoldenCheetah.app -verbose=2 -dmg
 - brew remove $QT
-- hdiutil mount GoldenCheetah.dmg
-- cd /Volumes/GoldenCheetah
+- mv GoldenCheetah.dmg GoldenCheetah_$QT.dmg
+- hdiutil mount GoldenCheetah_$QT.dmg
+- cd /Volumes/GoldenCheetah_$QT
 - ls -laR GoldenCheetah.app
 - GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
+
+deploy:
+  provider: releases
+  api_key: $GH_OAUTH_TOKEN
+  file: GoldenCheetah_$QT.dmg
+  skip_cleanup: true
+  on:
+    tags: true
