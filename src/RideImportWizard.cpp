@@ -41,29 +41,42 @@
 // drag and drop passes urls ... convert to a list of files and call main constructor
 RideImportWizard::RideImportWizard(QList<QUrl> *urls, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
+    _importInProcess = true;
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     QList<QString> filenames;
     for (int i=0; i<urls->count(); i++)
         filenames.append(QFileInfo(urls->value(i).toLocalFile()).absoluteFilePath());
     autoImportMode = false;
+    autoImportStealth = false;
     init(filenames, context);
     filenames.clear();
+    _importInProcess = false;
+
 }
 
 RideImportWizard::RideImportWizard(QList<QString> files, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
+    _importInProcess = true;
+    setAttribute(Qt::WA_DeleteOnClose);
     autoImportMode = false;
+    autoImportStealth = false;
     init(files, context);
+    _importInProcess = false;
+
 }
 
 
 RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context, QWidget *parent) : QDialog(parent), context(context), importConfig(dirs)
 {
+    _importInProcess = true;
     autoImportMode = true;
+    autoImportStealth = true;
+
+    if (autoImportStealth) hide();
     QList<QString> files;
 
-    // get the directories
+    // get the directories & rules
     QList<RideAutoImportRule> rules = importConfig->getConfig();
 
     // prepare the widget to show the status of the directory
@@ -142,13 +155,27 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
         QDate selectAfter = QDate::currentDate();
         switch(rule.getImportRule()) {
         case RideAutoImportRule::importLast90days:
+        case RideAutoImportRule::importBackground90:
             selectAfter = selectAfter.addDays(Q_INT64_C(-90));
             break;
         case RideAutoImportRule::importLast180days:
+        case RideAutoImportRule::importBackground180:
             selectAfter = selectAfter.addDays(Q_INT64_C(-180));
             break;
         case RideAutoImportRule::importLast360days:
+        case RideAutoImportRule::importBackground360:
             selectAfter = selectAfter.addDays(Q_INT64_C(-360));
+            break;
+        }
+
+        // if any of the rules says "with Dialog" then we keep the dialog - if not it's stealth
+        switch (rule.getImportRule()) {
+
+        case RideAutoImportRule::importAll:
+        case RideAutoImportRule::importLast90days:
+        case RideAutoImportRule::importLast180days:
+        case RideAutoImportRule::importLast360days:
+            autoImportStealth = false;
             break;
         }
 
@@ -160,12 +187,16 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
                 // append following the import rules
                 switch (rule.getImportRule()) {
                 case RideAutoImportRule::importAll:
+                case RideAutoImportRule::importBackgroundAll:
                     files.append(f.absoluteFilePath());
                     j++;
                     break;
                 case RideAutoImportRule::importLast90days:
                 case RideAutoImportRule::importLast180days:
                 case RideAutoImportRule::importLast360days:
+                case RideAutoImportRule::importBackground90:
+                case RideAutoImportRule::importBackground180:
+                case RideAutoImportRule::importBackground360:
                     if (f.created().date() >= selectAfter || f.lastModified().date() >= selectAfter) {
                         files.append(f.absoluteFilePath());
                         j++;
@@ -189,6 +220,9 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
     directoryWidget->setColumnWidth(2, 230);
 
     init(files, context);
+
+    _importInProcess = false;
+
 
 }
 
@@ -379,9 +413,14 @@ int
 RideImportWizard::process()
 {
 
+    // import process is starting
+    _importInProcess = true;
+
     // Make visible and put in front prior to running down the list & processing...
-    if (!isActiveWindow()) activateWindow();
-    this->show();
+    if (!autoImportStealth) {
+        if (!isActiveWindow()) activateWindow();
+        this->show();
+    }
 
     // set progress bar limits - for each file we
     // will make 5 passes over the files
@@ -394,8 +433,6 @@ RideImportWizard::process()
     // So, therefore the progress bar runs from 0 to files*4. (since step 5 is not implemented yet)
     progressBar->setMinimum(0);
     progressBar->setMaximum(filenames.count()*4);
-    if (!isActiveWindow()) activateWindow();
-
 
     // Pass one - Is it valid?
     phaseLabel->setText(tr("Step 1 of 4: Check file permissions"));
@@ -429,8 +466,7 @@ RideImportWizard::process()
 
     }
 
-    if (aborted) { done(0); }
-    if (!isActiveWindow()) activateWindow();
+    if (aborted) { done(0); return 0; }
     repaint();
     QApplication::processEvents();
 
@@ -450,8 +486,7 @@ RideImportWizard::process()
               tableWidget->setCurrentCell(i,5);
               QApplication::processEvents();
 
-              if (aborted) { done(0); }
-              if (!isActiveWindow()) activateWindow();
+              if (aborted) { done(0); return 0; }
               this->repaint();
               QApplication::processEvents();
 
@@ -572,12 +607,12 @@ RideImportWizard::process()
 
                        // Cool, the date and time was extracted from the source file
                        blanks[i] = false;
-                       tableWidget->item(i,1)->setText(ride->startTime().toString(tr("dd MMM yyyy")));
+                       tableWidget->item(i,1)->setText(ride->startTime().date().toString(Qt::ISODate));
                        tableWidget->item(i,2)->setText(ride->startTime().toString("hh:mm:ss"));
                    }
 
-                   tableWidget->item(i,1)->setTextAlignment(Qt::AlignRight); // put in the middle
-                   tableWidget->item(i,2)->setTextAlignment(Qt::AlignRight); // put in the middle
+                   tableWidget->item(i,1)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
+                   tableWidget->item(i,2)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
 
                    // time and distance from tags (.gc files)
                    QMap<QString,QString> lookup;
@@ -615,8 +650,7 @@ RideImportWizard::process()
         }
         progressBar->setValue(progressBar->value()+1);
         QApplication::processEvents();
-        if (aborted) { done(0); }
-        if (!isActiveWindow()) activateWindow();
+        if (aborted) { done(0); return 0; }
         this->repaint();
 
         next:;
@@ -639,12 +673,16 @@ RideImportWizard::process()
 
         // does nothing for the moment
         progressBar->setValue(progressBar->value()+1);
-        if (!isActiveWindow()) activateWindow();
         progressBar->repaint();
    }
-   // get it on top
-   activateWindow();
-
+   // get it on top to save / correct missing dates
+   if (autoImportStealth && needdates > 0) {
+       // leave the stealth mode
+       this->show();
+       activateWindow();
+   } else {
+       if (!isActiveWindow()) activateWindow();
+   }
    // Wait for user to press save
    abortButton->setText(tr("Save"));
    aborted = false;
@@ -662,8 +700,8 @@ RideImportWizard::process()
       // without user intervention
 
       abortButton->setDisabled(false);
+      if (autoImportStealth) abortClicked();  // simulate "Save" by User
 
-      // abortClicked();
    } else {
 
       // de-activate Save button until the dates and times are sorted
@@ -811,7 +849,7 @@ RideImportWizard::todayClicked(int index)
             tableWidget->item(i,5)->isSelected()) {
 
             // set the date to date selected
-            tableWidget->item(i,1)->setText(selectedDate.toString(tr("dd MMM yyyy")));
+            tableWidget->item(i,1)->setText(selectedDate.toString(Qt::ISODate));
             // look at rides with missing start time - we need to populate those
 
             // ride duration
@@ -827,7 +865,6 @@ RideImportWizard::todayClicked(int index)
     }
     // phew! - repaint!
     QApplication::processEvents();
-    if (!isActiveWindow()) activateWindow();
     tableWidget->repaint();
 
 }
@@ -863,6 +900,10 @@ RideImportWizard::abortClicked()
     if (label == tr("Finish")) {
        // phew. our work is done. -- lets force an update stats...
        hide();
+       if (autoImportStealth) {
+           // inform the user that the work is done
+           QMessageBox::information(NULL, tr("Auto Import"), tr("Automatic import from defined directories is completed."));
+       }
        done(0);
        return;
     }
@@ -921,14 +962,13 @@ RideImportWizard::abortClicked()
         tableWidget->item(i,5)->setText(tr("Saving..."));
         tableWidget->setCurrentCell(i,5);
         QApplication::processEvents();
-        if (aborted) { done(0); }
-        if (!isActiveWindow()) activateWindow();
+        if (aborted) { done(0); return; }
         this->repaint();
 
 
         // SAVE STEP 3 - prepare the new file names for the next steps - basic name and .JSON in GC format
 
-        QDateTime ridedatetime = QDateTime(QDate().fromString(tableWidget->item(i,1)->text(), tr("dd MMM yyyy")),
+        QDateTime ridedatetime = QDateTime(QDate().fromString(tableWidget->item(i,1)->text(), Qt::ISODate),
                                            QTime().fromString(tableWidget->item(i,2)->text(), "hh:mm:ss"));
         QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
                 .arg ( ridedatetime.date().year(), 4, 10, zero )
@@ -1029,9 +1069,8 @@ RideImportWizard::abortClicked()
         delete ride;
 
         QApplication::processEvents();
-        if (aborted) { done(0); }
+        if (aborted) { done(0); return; }
         progressBar->setValue(progressBar->value()+1);
-        if (!isActiveWindow()) activateWindow();
         this->repaint();
     }
 
@@ -1050,6 +1089,11 @@ RideImportWizard::abortClicked()
     phaseLabel->setText(donemessage);
     abortButton->setText(tr("Finish"));
     aborted = false;
+    if (autoImportStealth) {
+        abortClicked();  // simulate pressing the "Finish" button - even if the window got visible
+    } else {
+        if (!isActiveWindow()) activateWindow();
+    }
 }
 
 
@@ -1074,6 +1118,23 @@ RideImportWizard::moveFile(const QString &source, const QString &target) {
 
     return false;
 
+}
+
+
+void
+RideImportWizard::closeEvent(QCloseEvent* event)
+{
+    if (_importInProcess)
+        event->ignore();
+    else
+        event->accept();
+}
+
+void
+RideImportWizard::done(int rc)
+{
+    _importInProcess = false;
+    QDialog::done(rc);
 }
 
 // clean up files
@@ -1110,7 +1171,7 @@ void RideDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
         QString text = QString("%1").arg(value);
 
         QStyleOptionViewItem myOption = option;
-        myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
+        myOption.displayAlignment = Qt::AlignHCenter | Qt::AlignVCenter;
         drawDisplay(painter, myOption, myOption.rect, text);
         drawFocus(painter, myOption, myOption.rect);
 
@@ -1121,7 +1182,7 @@ void RideDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
         QString text = QString("%1").arg(value);
 
         QStyleOptionViewItem myOption = option;
-        myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
+        myOption.displayAlignment = Qt::AlignHCenter | Qt::AlignVCenter;
         drawDisplay(painter, myOption, myOption.rect, text);
         drawFocus(painter, myOption, myOption.rect);
 
@@ -1139,7 +1200,7 @@ QWidget *RideDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 
         // edit that date!
         QDateEdit *dateEdit = new QDateEdit(parent);
-        dateEdit->setDisplayFormat(tr("dd MMM yyyy"));
+        dateEdit->setDisplayFormat("yyyy-MM-dd"); // ISO Format, no translation analog Qt::ISODate
         connect(dateEdit, SIGNAL(editingFinished()), this, SLOT(commitAndCloseDateEditor()));
         return dateEdit;
     } else if (index.column() == dateColumn+1) {
@@ -1176,7 +1237,7 @@ void RideDelegate::setEditorData(QWidget *editor, const QModelIndex &index) cons
    // stored as text field
     if (index.column() == dateColumn) {
         QDateEdit *dateEdit = qobject_cast<QDateEdit *>(editor);
-        QDate date = QDate().fromString(index.model()->data(index, Qt::DisplayRole).toString(), tr("dd MMM yyyy"));
+        QDate date = QDate().fromString(index.model()->data(index, Qt::DisplayRole).toString(), Qt::ISODate);
         dateEdit->setDate(date);
     } else if (index.column() == dateColumn+1) {
         QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>(editor);
@@ -1192,7 +1253,7 @@ void RideDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
     // stored as text field
     if (index.column() == dateColumn) {
         QDateEdit *dateEdit = qobject_cast<QDateEdit *>(editor);
-        QString value = dateEdit->date().toString(tr("dd MMM yyyy"));
+        QString value = dateEdit->date().toString(Qt::ISODate);
         // Place in the view
         model->setData(index, value, Qt::DisplayRole);
     } else if (index.column() == dateColumn+1) {

@@ -480,6 +480,7 @@ HEADERS += \
         ScatterWindow.h \
         Season.h \
         SeasonParser.h \
+        Secrets.h \
         Serial.h \
         Settings.h \
         ShareDialog.h \
@@ -757,6 +758,7 @@ SOURCES += \
         TimeUtils.cpp \
         ToolsDialog.cpp \
         ToolsRhoEstimator.cpp \
+        VDOT.cpp \
         VDOTCalculator.cpp \
         TrainDB.cpp \
         TrainSidebar.cpp \

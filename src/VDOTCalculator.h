@@ -32,6 +32,9 @@ class VDOTCalculator : public QDialog
 
     public:
         VDOTCalculator(QWidget *parent = 0);
+        static double vdot(double mins, double vel);
+        static double vVdot(double VDOT);
+        static double eqvTime(double VDOT, double dist);
 
     private:
         QPushButton *btnCalculate;
@@ -44,6 +47,9 @@ class VDOTCalculator : public QDialog
         QDoubleSpinBox *hoursSpinBox;
         QDoubleSpinBox *minsSpinBox;
         QDoubleSpinBox *secsSpinBox;
+        QDoubleSpinBox *targetSpinBox;
+        QLabel *labelEQV;
+        QLineEdit *txtEQV;
 
     private slots:
         void on_btnOK_clicked();

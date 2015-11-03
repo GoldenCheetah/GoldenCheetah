@@ -48,10 +48,13 @@ public:
     RideImportWizard(RideAutoImportConfig *dirs, Context *context, QWidget *parent = 0);
 
     ~RideImportWizard();
+    void closeEvent(QCloseEvent*);
+    void done(int);
+
     int getNumberOfFiles();  // get the number of files selected for processing
     int process();
-
-signals:
+    bool importInProcess() { return _importInProcess; }
+    bool isAutoImport() { return autoImportMode;}
 
 private slots:
     void abortClicked();
@@ -72,6 +75,8 @@ private:
     QDir tmpActivities; // activitiy .JSON is stored here until rideCache() update was successfull
     bool aborted;
     bool autoImportMode;
+    bool autoImportStealth;
+    bool _importInProcess;
     QLabel *phaseLabel;
     QTableWidget *tableWidget;
     QTableWidget *directoryWidget;

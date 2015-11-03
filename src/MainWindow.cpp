@@ -33,6 +33,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "AthleteBackup.h"
 
 #include "Colors.h"
 #include "RideCache.h"
@@ -583,6 +584,12 @@ MainWindow::MainWindow(const QDir &home)
     connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openTab(const QString &)));
 
     fileMenu->addSeparator();
+    backupAthleteMenu = fileMenu->addMenu(tr("Backup Athlete Data"));
+    connect(backupAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setBackupAthleteMenu()));
+    backupMapper = new QSignalMapper(this); // maps each option
+    connect(backupMapper, SIGNAL(mapped(const QString &)), this, SLOT(backupAthlete(const QString &)));
+
+    fileMenu->addSeparator();
     fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
     fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab()));
     fileMenu->addAction(tr("&Quit All Windows"), this, SLOT(closeAll()), tr("Ctrl+Q"));
@@ -1008,20 +1015,32 @@ MainWindow::closeEvent(QCloseEvent* event)
 {
     QList<Tab*> closing = tabList;
     bool needtosave = false;
+    bool importrunning = false;
 
     // close all the tabs .. if any refuse we need to ignore
     //                       the close event
     foreach(Tab *tab, closing) {
 
-        // do we need to save?
-        if (tab->context->mainWindow->saveRideExitDialog(tab->context) == true)
-            removeTab(tab);
-        else
-            needtosave = true;
+        // check for if RideImport is is process and let it finalize / or be stopped by the user
+        if (tab->context->athlete->autoImport) {
+            if (tab->context->athlete->autoImport->importInProcess() ) {
+                importrunning = true;
+                QMessageBox::information(this, tr("Activity Import"), tr("Closing of athlete window not possible while background activity import is in progress..."));
+            }
+        }
+
+        // only check for unsaved if autoimport is not running any more
+        if (!importrunning) {
+            // do we need to save?
+            if (tab->context->mainWindow->saveRideExitDialog(tab->context) == true)
+                removeTab(tab);
+            else
+                needtosave = true;
+        }
     }
 
-    // were any left hanging around?
-    if (needtosave) event->ignore();
+    // were any left hanging around? or autoimport in action on any windows, then don't close any
+    if (needtosave || importrunning) event->ignore();
     else {
 
         // finish off the job and leave
@@ -1624,7 +1643,17 @@ MainWindow::openTab(QString name)
 void
 MainWindow::closeTabClicked(int index)
 {
+
     Tab *tab = tabList[index];
+
+    // check for autoimport and let it finalize
+    if (tab->context->athlete->autoImport) {
+        if (tab->context->athlete->autoImport->importInProcess() ) {
+            QMessageBox::information(this, tr("Activity Import"), tr("Closing of athlete window not possible while background activity import is in progress..."));
+            return;
+        }
+    }
+
     if (saveRideExitDialog(tab->context) == false) return;
 
     // lets wipe it
@@ -1634,6 +1663,14 @@ MainWindow::closeTabClicked(int index)
 bool
 MainWindow::closeTab()
 {
+  // check for autoimport and let it finalize
+    if (currentTab->context->athlete->autoImport) {
+        if (currentTab->context->athlete->autoImport->importInProcess() ) {
+            QMessageBox::information(this, tr("Activity Import"), tr("Closing of athlete window not possible while background activity import is in progress..."));
+            return false;
+        }
+    }
+
     // wipe it down ...
     if (saveRideExitDialog(currentTab->context) == false) return false;
 
@@ -1780,6 +1817,43 @@ MainWindow::setOpenTabMenu()
     // add create new option
     openTabMenu->addSeparator();
     openTabMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistTab()), tr("Ctrl+N"));
+}
+
+void
+MainWindow::setBackupAthleteMenu()
+{
+    // wipe existing
+    backupAthleteMenu->clear();
+
+    // get a list of all cyclists
+    QStringListIterator i(QDir(gcroot).entryList(QDir::Dirs | QDir::NoDotAndDotDot));
+    while (i.hasNext()) {
+
+        QString name = i.next();
+
+        // new action
+        QAction *action = new QAction(QString("%1").arg(name), this);
+
+        // get the config directory
+        AthleteDirectoryStructure subDirs(name);
+        // icon / mugshot ?
+        QString icon = QString("%1/%2/%3/avatar.png").arg(gcroot).arg(name).arg(subDirs.config().dirName());
+        if (QFile(icon).exists()) action->setIcon(QIcon(icon));
+
+        // add to menu
+        backupAthleteMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), backupMapper, SLOT(map()));
+        backupMapper->setMapping(action, name);
+    }
+
+}
+
+void
+MainWindow::backupAthlete(QString name)
+{
+    AthleteBackup *backup = new AthleteBackup(QDir(gcroot+"/"+name));
+    backup->backupImmediate();
+    delete backup;
 }
 
 void

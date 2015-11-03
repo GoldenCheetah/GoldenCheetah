@@ -3420,7 +3420,7 @@ AllPlotWindow::resetSeriesStackedDatas()
 void
 AllPlotWindow::resetStackedDatas()
 {
-    if (!current) return;
+    if (!allPlot->rideItem || !allPlot->rideItem->ride() || !current) return;
 
     int _stackWidth = stackWidth;
     if (allPlot->bydist)

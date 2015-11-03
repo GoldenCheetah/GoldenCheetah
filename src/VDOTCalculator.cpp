@@ -27,6 +27,44 @@
 
 #include <QHeaderView>
 
+double
+VDOTCalculator::vdot(double mins, double vel)
+{
+    // estimated VO2 cost of running at vel speed in m/min
+    double VO2 = -4.6 + 0.182258*vel + 0.000104*pow(vel, 2);
+
+    // fractional utilization of VO2max for mins duration
+    double FVO2 = 0.8 + 0.1894393*exp(-0.012778*mins) + 0.2989558*exp(-0.1932605*mins);
+
+    // VDOT: estimated VO2max based on Daniels/Gilbert Formula
+    return VO2 / FVO2;
+}
+
+double
+VDOTCalculator::vVdot(double VDOT)
+{
+    // velocity at VO2max according to Daniels/Gilbert Formula
+    return 29.54 + 5.000663*VDOT - 0.007546*pow(VDOT, 2);
+}
+
+double
+VDOTCalculator::eqvTime(double VDOT, double dist)
+{
+    // equivalent time for VDOT at dist, estimated by Newton-Raphson method
+    double t = dist/vVdot(VDOT)/0.9; // initial guess at TPace
+    int iter = 100; // max iterations
+    double f_t, fprime_t;
+
+    do {
+        f_t = (0.000104*pow(dist, 2)*pow(t, -2) + 0.182258*dist*pow(t, -1) -4.6)/(0.2989558*exp(-0.1932605*t) + 0.1894393*exp(-0.012778*t) + 0.8) - VDOT;
+        fprime_t = ((0.2989558*exp(-0.1932605*t) + 0.1894393*exp(-0.012778*t) + 0.8)*(-0.000208*pow(dist, 2)*pow(t,-3) - 0.182258*dist*pow(t, -2)) - ((0.000104*pow(dist, 2)*pow(t, -2) + 0.182258*dist*pow(t, -1) -4.6) * (-0.1932605*0.2989558*exp( -0.1932605*t) + -0.012778*0.1894393*exp(-0.012778*t)))) / pow(0.2989558*exp(-0.1932605*t) + 0.1894393*exp(-0.012778*t) + 0.8, 2);
+        t -= f_t/fprime_t;
+        iter--;
+    } while (abs(f_t/fprime_t) > 1e-3 && iter > 0);
+
+    return t;
+}
+
 VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
 {
     bool metricRnPace = appsettings->value(this, GC_PACE, true).toBool();
@@ -37,13 +75,13 @@ VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
 
     setAttribute(Qt::WA_DeleteOnClose);
 
-    setFixedSize(300, 450);
+    setFixedSize(300, 480);
 
     QVBoxLayout *mainVBox = new QVBoxLayout(this);
 
-    mainVBox->addWidget(new QLabel(tr("Your race (1500 to Marathon):")));
-
     QHBoxLayout *distHBox = new QHBoxLayout;
+    distHBox->addWidget(new QLabel(tr("Your Test Race:")));
+    distHBox->addStretch();
     distSpinBox = new QDoubleSpinBox(this);
     distSpinBox->setDecimals(3);
     if (metricRnPace) {
@@ -129,8 +167,42 @@ VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
         }
     }
     tableWidgetTPACE->selectRow(2); // Highlight T-Pace
+    tableWidgetTPACE->resizeRowsToContents();
     tableLayout->addWidget(tableWidgetTPACE);
     mainVBox->addLayout(tableLayout);
+
+    mainVBox->addStretch();
+
+    QHBoxLayout *targetHBox = new QHBoxLayout;
+    targetHBox->addWidget(new QLabel(tr("Your Target Race:")));
+    targetHBox->addStretch();
+    targetSpinBox = new QDoubleSpinBox(this);
+    targetSpinBox->setDecimals(3);
+    if (metricRnPace) {
+        targetSpinBox->setRange(1.5, 42.195);
+        targetSpinBox->setSuffix(tr(" km"));
+        targetSpinBox->setValue(21.0975);
+    } else {
+        targetSpinBox->setRange(1.5/KM_PER_MILE, 42.195/KM_PER_MILE);
+        targetSpinBox->setSuffix(tr(" mi"));
+        targetSpinBox->setValue(21.0975/KM_PER_MILE);
+    }
+    targetSpinBox->setSingleStep(1.0);
+    targetSpinBox->setWrapping(false);
+    targetSpinBox->setAlignment(Qt::AlignRight);
+    targetHBox->addWidget(targetSpinBox);
+    targetHBox->addStretch();
+    mainVBox->addLayout(targetHBox);
+    QHBoxLayout *eqvHBox = new QHBoxLayout;
+    eqvHBox->addStretch();
+    labelEQV = new QLabel(tr("Equivalent Time:"));
+    eqvHBox->addWidget(labelEQV);
+    txtEQV = new QLineEdit(this);
+    txtEQV->setAlignment(Qt::AlignRight);
+    txtEQV->setReadOnly(true);
+    eqvHBox->addWidget(txtEQV, Qt::AlignLeft);
+    eqvHBox->addStretch();
+    mainVBox->addLayout(eqvHBox);
 
     mainVBox->addStretch();
 
@@ -164,18 +236,10 @@ void VDOTCalculator::on_btnCalculate_clicked()
     // velocity m/min
     double vel = paceFactor*1000*dist/mins;
 
-    // estimated VO2 cost of running at vel speed
-    double VO2 = -4.3 + 0.182258*vel + 0.000104*pow(vel, 2);
-
-    // fractional utilization of VO2max for mins duration
-    double FVO2 = 0.8 + 0.1894393*exp(-0.012778*mins) + 0.2989558*exp(-0.1932605*mins);
-
-    // VDOT: estimated VO2max based on Daniels/Gilbert Formula
-    double VDOT = VO2 / FVO2;
+    double VDOT = vdot(mins, vel);
     txtVDOT->setText(QString("%1 ml/min/kg").arg(round(VDOT*10)/10));
 
-    // velocity at VO2max according to Daniels/Gilbert Formula
-    double vVDOT = 29.54 + 5.000663*VDOT - 0.007546*pow(VDOT, 2);
+    double vVDOT = vVdot(VDOT);
 
     // Training Paces relative to vVDOT from Daniels's Running Formula
     double relVDOT[] = { 0.72, 0.85, 0.9, 0.98, 1.05 };
@@ -194,4 +258,6 @@ void VDOTCalculator::on_btnCalculate_clicked()
         tableWidgetTPACE->item(i, 2)->setData(Qt::EditRole, QString("%1")
             .arg(i < 4 ? QTime(0,0,0).addSecs(pace).toString("mm:ss") : "-----"));
     }
+    double targetDist = paceFactor*1000*targetSpinBox->value();
+    txtEQV->setText(QTime(0,0,0).addSecs(60*eqvTime(VDOT, targetDist)).toString("hh:mm:ss"));
 }

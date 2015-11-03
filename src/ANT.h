@@ -414,6 +414,7 @@ public:
         lastCadenceMessage = QDateTime(QDateTime::currentDateTime());
         telemetry.setCadence(x);
     }
+    float getCadence(void) { return telemetry.getCadence(); }
     void setSecondaryCadence(float x) {
         if (lastCadenceMessage.toTime_t() == 0 || (QDateTime::currentDateTime().toTime_t() - lastCadenceMessage.toTime_t())>10)  {
             telemetry.setCadence(x);
@@ -431,6 +432,8 @@ public:
     }
 
     void setWheelRpm(float x);
+    float getWheelRpm(void) { return telemetry.getWheelRpm(); }
+
     void setWatts(float x) {
         telemetry.setWatts(x);
     }

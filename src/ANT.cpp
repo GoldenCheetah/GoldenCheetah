@@ -268,7 +268,6 @@ void ANT::run()
 void
 ANT::setLoad(double load)
 {
-    qDebug() << "ask for Load update to " << load;
     if (this->load == load) return;
 
     // load has changed
@@ -277,14 +276,12 @@ ANT::setLoad(double load)
     // if we have a vortex trainer connected, relay the change in target power to the brake
     if (vortexChannel != -1)
     {
-        qDebug() << "setting vortex target power to " << load;
         sendMessage(ANTMessage::tacxVortexSetPower(vortexChannel, vortexID, (int)load));
     }
 
     // if we have a FE-C trainer connected, relay the change in target power to the brake
     if (fecChannel != -1)
     {
-        qDebug() << "setting fitness equipment target power to " << load;
         sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
     }
 }
@@ -310,9 +307,8 @@ void ANT::refreshVortexLoad()
 void
 ANT::setGradient(double gradient)
 {
-    qDebug() << "ask for gradient update to " << gradient;
-    if (fecChannel != -1)
-        qDebug() << "We have fec trainer connected, simulation capabilities=" << antChannel[fecChannel]->capabilities();
+//    if (fecChannel != -1)
+//        qDebug() << "We have fec trainer connected, simulation capabilities=" << antChannel[fecChannel]->capabilities();
 
     if (this->gradient == gradient) return;
 
@@ -322,7 +318,7 @@ ANT::setGradient(double gradient)
     // if we have a FE-C trainer connected, relay the change in simulated slope of trainer electronic
     if ((fecChannel != -1) && (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_SIMUL_MODE_CAPABILITY))
     {
-        qDebug() << "setting fitness equipment target gradient to " << gradient;
+        //set fitness equipment target gradient
         sendMessage(ANTMessage::fecSetTrackResistance(fecChannel, gradient, currentRollingResistance));
         currentGradient = gradient;
         // TODO : obtain acknowledge / confirm value using fecRequestCommandStatus
@@ -586,11 +582,13 @@ ANT::addDevice(int device_number, int device_type, int channel_number)
             antChannel[i]->open(device_number, device_type);
 
             // this is an alternate channel for power
-            if (device_type == ANTChannel::CHANNEL_TYPE_POWER) {
+            if ((device_type == ANTChannel::CHANNEL_TYPE_POWER) ||
+                (device_type == ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT)) {
 
                 // if we are not the first power channel then set to update
                 // the alternate power channel
-                if (powerchannels) antChannel[i]->setAlt(true);
+                if (powerchannels)
+                    antChannel[i]->setAlt(true);
 
                 // increment the number of power channels
                 powerchannels++;

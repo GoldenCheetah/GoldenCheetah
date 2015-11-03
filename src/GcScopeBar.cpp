@@ -315,7 +315,7 @@ GcScopeButton::GcScopeButton(QWidget *parent) : QWidget(parent)
     red = highlighted = checked = false;
     QFont font;
     font.setPointSize(10);
-    font.setWeight(QFont::Black);
+    //font.setWeight(QFont::Black);
     setFont(font);
 }
 

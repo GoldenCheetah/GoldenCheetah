@@ -78,10 +78,9 @@ class CTableWidgetItem : public QTableWidgetItem
 
                 case 2 : return text() < other.text(); // athlete
 
-                case 3 : // the date format in "toString" and "fromString" must be the same !
-                         //: Ensure EQUAL translation for EACH variant of date format used, don't mix
-                         return QDate::fromString(text(), QObject::tr("dd MMM, yyyy")) <
-                                QDate::fromString(other.text(), QObject::tr("dd MMM, yyyy")); // date
+                case 3 : return QDate::fromString(text(), Qt::ISODate) <
+                                QDate::fromString(other.text(), Qt::ISODate); // date
+
                 case 4 : // date or time depending on which view
                          if (text().contains(":")) {
 
@@ -90,9 +89,9 @@ class CTableWidgetItem : public QTableWidgetItem
 
                          } else {
 
-                            return // the date format in "toString" and "fromString" must be the same !
-                                   QDate::fromString(text(), QObject::tr("dd MMM, yyyy")) <
-                                   QDate::fromString(other.text(), QObject::tr("dd MMM, yyyy")); // date
+                            return //
+                                   QDate::fromString(text(), Qt::ISODate) <
+                                   QDate::fromString(other.text(), Qt::ISODate); // date
 
                          }
                 default: // work it out ..
@@ -283,7 +282,7 @@ ComparePane::refreshTable()
 
             // date
             t = new CTableWidgetItem;
-            t->setText(x.data->startTime().date().toString(tr("dd MMM, yyyy")));
+            t->setText(x.data->startTime().date().toString(Qt::ISODate));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, 3, t);
 
@@ -445,13 +444,13 @@ ComparePane::refreshTable()
 
             // date from
             t = new CTableWidgetItem;
-            t->setText(x.start.toString(tr("dd MMM, yyyy")));
+            t->setText(x.start.toString(Qt::ISODate));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, 3, t);
 
             // date to
             t = new CTableWidgetItem;
-            t->setText(x.end.toString(tr("dd MMM, yyyy")));
+            t->setText(x.end.toString(Qt::ISODate));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, 4, t);
 

@@ -62,6 +62,7 @@ public slots:
     void tidy();
     void setChartMenu();
     void menuPopup();
+    void configChanged(qint32); // appearance
 
 signals:
     void currentIndexChanged(int);
