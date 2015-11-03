@@ -428,7 +428,10 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
 {
     // get the metric details, so we can convert etc
     const RideMetric *metric = RideMetricFactory::instance().rideMetric(name);
-    if (!metric) return QString("%1 unknown").arg(name);
+    if (!metric) {
+        qDebug()<<"unknown metric:"<<name;
+        return QString("%1 unknown").arg(name);
+    }
 
     // what we will return
     double rvalue = 0;

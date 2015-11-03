@@ -537,6 +537,12 @@ RideSummaryWindow::htmlSummary()
         << "wtime_in_zone_L3"
         << "wtime_in_zone_L4";
 
+    static const QStringList workInZonesWBAL = QStringList()
+        << "wwork_in_zone_L1"
+        << "wwork_in_zone_L2"
+        << "wwork_in_zone_L3"
+        << "wwork_in_zone_L4";
+
     static const QStringList timeInZonesCPWBAL = QStringList()
         << "wcptime_in_zone_L1"
         << "wcptime_in_zone_L2"
@@ -927,6 +933,7 @@ RideSummaryWindow::htmlSummary()
             // W'bal Zones
             int WPRIME = context->athlete->zones()->getWprime(range);
             QVector<double> wtime_in_zone(4);
+            QVector<double> wwork_in_zone(4);
             QVector<double> wcptime_in_zone(4);
             for (int i = 0; i < timeInZonesWBAL.count(); ++i) {
 
@@ -934,14 +941,16 @@ RideSummaryWindow::htmlSummary()
                 if (ridesummary) {
                     wtime_in_zone[i] = rideItem->getForSymbol(timeInZonesWBAL[i]);
                     wcptime_in_zone[i] = rideItem->getForSymbol(timeInZonesCPWBAL[i]);
+                    wwork_in_zone[i] = rideItem->getForSymbol(workInZonesWBAL[i]);
 
                 } else {
                     wtime_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZonesWBAL[i], specification, useMetricUnits, true).toDouble();
+                    wwork_in_zone[i] = context->athlete->rideCache->getAggregate(workInZonesWBAL[i], specification, useMetricUnits, true).toDouble();
                     wcptime_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZonesCPWBAL[i], specification, useMetricUnits, true).toDouble();
                 }
             }
             summary += tr("<h3>W'bal Zones</h3>");
-            summary += WPrime::summarize(WPRIME, wtime_in_zone, wcptime_in_zone, altColor);
+            summary += WPrime::summarize(WPRIME, wtime_in_zone, wcptime_in_zone, wwork_in_zone, altColor);
         }
     }
 

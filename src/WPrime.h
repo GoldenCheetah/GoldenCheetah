@@ -57,6 +57,7 @@ class WPrime {
 
         // array of power >CP
         QVector<int> powerValues;
+        QVector<int> smoothArray;
 
         QVector<double> &mydata() { check(); return mvalues; }
         QVector<double> &mxdata(bool bydist) { check(); return bydist ? mxdvalues : mxvalues; }
@@ -75,7 +76,7 @@ class WPrime {
         int minForCP(int CP);
 
         // zoning with supplied values to avoid using a new Zones type config
-        static QString summarize(int WPRIME, QVector<double> wtiz, QVector<double> wcptiz, QColor color);
+        static QString summarize(int WPRIME, QVector<double> wtiz, QVector<double> wcptiz, QVector<double> wworktiz, QColor color);
         static int zoneCount() { return 4; }
         static QString zoneName(int i);
         static QString zoneDesc(int i);
