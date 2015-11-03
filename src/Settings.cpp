@@ -310,6 +310,8 @@ GSettings::contains(const QString & key) const {
 void
 GSettings::migrateQSettingsSystem() {
 
+    if (!newFormat) return;
+
     // do the migration for the System Settings - if not yet done
     // - System is only migrated once per PC (since it only exists once
     // on MAC GC_CHROME is already set previously - so migrate anyway
