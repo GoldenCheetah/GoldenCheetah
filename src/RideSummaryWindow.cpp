@@ -537,6 +537,12 @@ RideSummaryWindow::htmlSummary()
         << "wtime_in_zone_L3"
         << "wtime_in_zone_L4";
 
+    static const QStringList timeInZonesCPWBAL = QStringList()
+        << "wcptime_in_zone_L1"
+        << "wcptime_in_zone_L2"
+        << "wcptime_in_zone_L3"
+        << "wcptime_in_zone_L4";
+
     // Use pre-computed and saved metric values if the ride has not
     // been edited. Otherwise we need to re-compute every time.
     // this is only for ride summary, when showing for a date range
@@ -921,14 +927,21 @@ RideSummaryWindow::htmlSummary()
             // W'bal Zones
             int WPRIME = context->athlete->zones()->getWprime(range);
             QVector<double> wtime_in_zone(4);
+            QVector<double> wcptime_in_zone(4);
             for (int i = 0; i < timeInZonesWBAL.count(); ++i) {
 
                 // if using metrics or data
-                if (ridesummary) wtime_in_zone[i] = rideItem->getForSymbol(timeInZonesWBAL[i]);
-                else wtime_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZonesWBAL[i], specification, useMetricUnits, true).toDouble();
+                if (ridesummary) {
+                    wtime_in_zone[i] = rideItem->getForSymbol(timeInZonesWBAL[i]);
+                    wcptime_in_zone[i] = rideItem->getForSymbol(timeInZonesCPWBAL[i]);
+
+                } else {
+                    wtime_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZonesWBAL[i], specification, useMetricUnits, true).toDouble();
+                    wcptime_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZonesCPWBAL[i], specification, useMetricUnits, true).toDouble();
+                }
             }
             summary += tr("<h3>W'bal Zones</h3>");
-            summary += WPrime::summarize(WPRIME, wtime_in_zone, altColor);
+            summary += WPrime::summarize(WPRIME, wtime_in_zone, wcptime_in_zone, altColor);
         }
     }
 
@@ -1590,6 +1603,12 @@ RideSummaryWindow::htmlCompareSummary() const
         << "wtime_in_zone_L3"
         << "wtime_in_zone_L4";
 
+    static const QStringList timeInZonesCPWBAL = QStringList()
+        << "wcptime_in_zone_L1"
+        << "wcptime_in_zone_L2"
+        << "wcptime_in_zone_L3"
+        << "wcptime_in_zone_L4";
+
     if (ridesummary) {
 
         //
@@ -2115,6 +2134,15 @@ RideSummaryWindow::htmlCompareSummary() const
                     int idx=0;
                     for (int i=0; i<WPrime::zoneCount(); i++) {
 
+                        // above cp W'bal time in zone
+                        int cptimeZone = dr.context->athlete->rideCache->getAggregate(timeInZonesCPWBAL[idx], dr.specification,
+                                                                                 context->athlete->useMetricUnits, true).toDouble();
+
+                        int cpdt = cptimeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZonesCPWBAL[idx],
+                                                                        context->compareDateRanges[0].specification,
+                                                                        context->athlete->useMetricUnits, true).toDouble();
+
+                        // all W'bal time in zone
                         int timeZone = dr.context->athlete->rideCache->getAggregate(timeInZonesWBAL[idx], dr.specification,
                                                                                  context->athlete->useMetricUnits, true).toDouble();
 
