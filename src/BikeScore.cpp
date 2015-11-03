@@ -97,7 +97,7 @@ class XPower : public RideMetric {
         setValue(xpower);
         setCount(secs);
     }
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new XPower(*this); }
 };
 
@@ -136,7 +136,7 @@ class VariabilityIndex : public RideMetric {
 
         setValue(vi);
     }
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new VariabilityIndex(*this); }
 };
 
@@ -187,7 +187,7 @@ class RelativeIntensity : public RideMetric {
     }
     // end added djconnel
 
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new RelativeIntensity(*this); }
 };
 
@@ -230,7 +230,7 @@ class CriticalPower : public RideMetric {
         setValue(other.value(true) > value(true) ? other.value(true) : value(true));
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new CriticalPower(*this); }
 };
 
@@ -277,7 +277,7 @@ class aTISS : public RideMetric {
         setValue(aTISS);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new aTISS(*this); }
 };
 
@@ -325,7 +325,7 @@ class anTISS : public RideMetric {
         setValue(anTISS);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
 
     RideMetric *clone() const { return new anTISS(*this); }
 };
@@ -365,7 +365,7 @@ class dTISS : public RideMetric {
         else setValue((atscore/(atscore+antscore)) * 100.00f);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new dTISS(*this); }
 };
 class BikeScore : public RideMetric {
@@ -408,7 +408,7 @@ class BikeScore : public RideMetric {
         setValue(score);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new BikeScore(*this); }
 };
 
@@ -445,7 +445,7 @@ class ResponseIndex : public RideMetric {
 
         setValue(ri);
     }
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new ResponseIndex(*this); }
 };
 

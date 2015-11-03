@@ -638,7 +638,7 @@ class MinWPrime : public RideMetric {
     }
 
     bool canAggregate() { return false; }
-    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new MinWPrime(*this); }
 };
 
@@ -668,7 +668,7 @@ class MaxWPrime : public RideMetric {
     }
 
     bool canAggregate() { return false; }
-    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new MaxWPrime(*this); }
 };
 
@@ -698,7 +698,7 @@ class MaxMatch : public RideMetric {
     }
 
     bool canAggregate() { return false; }
-    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new MaxMatch(*this); }
 };
 
@@ -730,7 +730,7 @@ class Matches : public RideMetric {
     }
 
     bool canAggregate() { return false; }
-    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new Matches(*this); }
 };
 
@@ -760,7 +760,7 @@ class WPrimeTau : public RideMetric {
     }
 
     bool canAggregate() { return false; }
-    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new WPrimeTau(*this); }
 };
 
@@ -802,7 +802,7 @@ class WPrimeExp : public RideMetric {
     }
 
     bool canAggregate() { return false; }
-    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new WPrimeExp(*this); }
 };
 
@@ -844,7 +844,7 @@ class WPrimeWatts : public RideMetric {
     }
 
     bool canAggregate() { return false; }
-    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new WPrimeWatts(*this); }
 };
 
@@ -889,7 +889,7 @@ class CPExp : public RideMetric {
     }
 
     bool canAggregate() { return false; }
-    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new CPExp(*this); }
 };
 
@@ -946,7 +946,7 @@ class WZoneTime : public RideMetric {
 
     bool canAggregate() { return false; }
     void aggregateWith(const RideMetric &) {}
-    bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new WZoneTime(*this); }
 };
 

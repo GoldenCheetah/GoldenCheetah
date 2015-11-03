@@ -88,7 +88,7 @@ class aNP : public RideMetric {
         setValue(np);
         setCount(secs);
     }
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new aNP(*this); }
 };
 
@@ -126,7 +126,7 @@ class aVI : public RideMetric {
             setCount(secs);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new aVI(*this); }
 };
 
@@ -164,7 +164,7 @@ class aIntensityFactor : public RideMetric {
         }
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new aIntensityFactor(*this); }
 };
 
@@ -203,7 +203,7 @@ class aTSS : public RideMetric {
         setValue(score);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new aTSS(*this); }
 };
 
@@ -248,7 +248,7 @@ class aTSSPerHour : public RideMetric {
             setCount(hours);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new aTSSPerHour(*this); }
 };
 
@@ -285,7 +285,7 @@ class aEfficiencyFactor : public RideMetric {
 
         setValue(ef);
     }
-    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new aEfficiencyFactor(*this); }
 };
 
