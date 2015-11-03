@@ -137,7 +137,7 @@ ChooseCyclistDialog::deleteClicked()
 
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("Delete athlete"));
-    msgBox.setText(tr("You are about to delete ") + item->text());
+    msgBox.setText(tr("You are about to delete %1").arg(item->text()));
     msgBox.setInformativeText(tr("This cannot be undone and all data will be permanently deleted.\n\nAre you sure?"));
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
