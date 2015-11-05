@@ -684,10 +684,13 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
                parent->setFecChannel(number);
                // we don't seem to receive ACK messages, so use this workaround
-               // to ensure load is always set correctly
-               if ((fecRefreshCounter++ % 10) == 0 && parent->modeERGO())
+               // to ensure load/gradient is always set correctly
+               if ((fecRefreshCounter++ % 10) == 0)
                {
-                   parent->refreshFecLoad();
+                   if  (parent->modeERGO())
+                       parent->refreshFecLoad();
+                   else if (parent->modeSLOPE())
+                        parent->refreshFecGradient();
                }
 
                if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE)
