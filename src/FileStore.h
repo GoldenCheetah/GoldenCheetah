@@ -194,6 +194,7 @@ class FileStoreDialog : public QDialog
 
 class FolderNameDialog : public QDialog
 {
+    Q_DECLARE_TR_FUNCTIONS(FolderNameDialog)
     public:
         FolderNameDialog(QWidget *parent);
         QString name() { return nameEdit->text(); }
