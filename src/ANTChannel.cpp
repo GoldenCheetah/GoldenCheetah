@@ -679,7 +679,6 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
            case CHANNEL_TYPE_FITNESS_EQUIPMENT:
            {
-               is_fec = true;
                static int fecRefreshCounter = 1;
 
                parent->setFecChannel(number);
@@ -779,6 +778,12 @@ void ANTChannel::channelId(unsigned char *ant_message) {
 
     if (is_kickr) {
         qDebug()<<number<<"KICKR DETECTED VIA CHANNEL ID EVENT";
+    }
+
+    is_fec = (device_id == ANT_SPORT_FITNESS_EQUIPMENT_TYPE);
+
+    if (is_fec) {
+        qDebug()<<number<<"ANT FE-C DETECTED VIA CHANNEL ID EVENT";
     }
 
     // tell controller we got a new channel id
@@ -951,7 +956,6 @@ void ANTChannel::attemptTransition(int message_id)
 
 uint8_t ANTChannel::capabilities()
 {
-    // TODO: run this request once when just connected to device
     if (!is_fec)
         return 0;
 
@@ -961,7 +965,7 @@ uint8_t ANTChannel::capabilities()
     // if we do not know device capabilities, request it
     qDebug() << qPrintable("Ask for capabilities");
     parent->requestFecCapabilities();
-        return 0;
+    return 0;
 }
 
 // Calibrate... needs fixing in version 3.1
