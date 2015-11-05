@@ -730,6 +730,13 @@ ANT::channelInfo(int channel, int device_number, int device_id)
         qDebug()<<"kickr found."<<kickrDeviceID<<"on channel"<<kickrChannel;
     }
 
+    // ANT FE-C DEVICE DETECTED - ACT ACCORDINGLY !
+    // if we just got an ANT FE-C trainer, request the capabilities
+    if (!configuring && antChannel[channel]->is_fec) {
+        antChannel[channel]->capabilities();
+        qDebug()<<"ANT FE-C device found."<<device_number<<"on channel"<<channel;
+    }
+
     //qDebug()<<"found device number"<<device_number<<"type"<<device_id<<"on channel"<<channel
     //<< "is a "<<deviceTypeDescription(device_id) << "with code"<<deviceTypeCode(device_id);
 }
