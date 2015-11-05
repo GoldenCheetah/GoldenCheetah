@@ -296,7 +296,7 @@ void ANT::refreshFecLoad()
     if (fecChannel == -1)
         return;
 
-    if ((fecChannel != -1) && (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_POWER_MODE_CAPABILITY))
+    if (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_POWER_MODE_CAPABILITY)
         sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
 }
 
