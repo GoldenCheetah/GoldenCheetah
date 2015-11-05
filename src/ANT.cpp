@@ -285,7 +285,7 @@ ANT::setLoad(double load)
     }
 
     // if we have a FE-C trainer connected, relay the change in target power to the brake
-    if (fecChannel != -1)
+    if ((fecChannel != -1) && (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_POWER_MODE_CAPABILITY))
     {
         sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
     }
@@ -293,7 +293,11 @@ ANT::setLoad(double load)
 
 void ANT::refreshFecLoad()
 {
-    sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
+    if (fecChannel == -1)
+        return;
+
+    if ((fecChannel != -1) && (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_POWER_MODE_CAPABILITY))
+        sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
 }
 
 void ANT::refreshFecGradient()
