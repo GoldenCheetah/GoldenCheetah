@@ -179,6 +179,11 @@ bool ANT::modeERGO(void) const
     return mode==RT_MODE_ERGO; 
 }
 
+bool ANT::modeSLOPE(void) const
+{
+    return mode==RT_MODE_SLOPE;
+}
+
 double ANT::channelValue2(int channel)
 {
     return antChannel[channel]->channelValue2();
@@ -289,6 +294,15 @@ ANT::setLoad(double load)
 void ANT::refreshFecLoad()
 {
     sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
+}
+
+void ANT::refreshFecGradient()
+{
+    if (fecChannel == -1)
+        return;
+
+    if (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_SIMUL_MODE_CAPABILITY)
+        sendMessage(ANTMessage::fecSetTrackResistance(fecChannel, gradient, currentRollingResistance));
 }
 
 void ANT::requestFecCapabilities()
