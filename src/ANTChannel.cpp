@@ -586,17 +586,19 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            case CHANNEL_TYPE_CADENCE:
            {
                float rpm;
+               static float last_measured_rpm;
                uint16_t time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
                uint16_t revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
                if (time) {
                    rpm = 1024*60*revs / time;
+                   last_measured_rpm = rpm;
                    lastMessageTimestamp = QTime::currentTime();
                } else {
                    int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getCadence());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
-                   if (rpm < (float) 4.0)
-                       rpm = 0.0; // if rpm is less than 4 then we consider that we are stopped
+                   if (rpm < last_measured_rpm / 2.0)
+                       rpm = 0.0; // if rpm is less than half previous cadence we consider that we are stopped
                }
                parent->setCadence(rpm);
                value2 = value = rpm;
@@ -607,11 +609,13 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            case CHANNEL_TYPE_SandC:
            {
                float rpm;
+               static float last_measured_rpm;
                // cadence first...
                uint16_t time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
                uint16_t revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
                if (time) {
                    rpm = 1024*60*revs / time;
+                   last_measured_rpm = rpm;
 
                    if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
                    else parent->setCadence(rpm);
@@ -620,8 +624,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getCadence());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
-                   if (rpm < (float) 4.0)
-                       rpm = 0.0; // if rpm is less than 4 then we consider that we are stopped
+                   if (rpm < last_measured_rpm / 2.0)
+                       rpm = 0.0; // if rpm is less than half previous cadence we consider that we are stopped
                    parent->setCadence(rpm);
                }
                value = rpm;
@@ -638,8 +642,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    int ms = lastMessageTimestamp2.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getWheelRpm());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
-                   if (rpm < (float) 4.0)
-                       rpm = 0.0; // if rpm is less than 4 then we consider that we are stopped
+                   if (rpm < (float) 15.0)
+                       rpm = 0.0; // if rpm is less than 15rpm (=4s) then we consider that we are stopped
                    parent->setWheelRpm(rpm);
                }
                value2 = rpm;
@@ -659,8 +663,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getWheelRpm());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
-                   if (rpm < (float) 4.0)
-                       rpm = 0.0; // if rpm is less than 4 then we consider that we are stopped
+                   if (rpm < (float) 15.0)
+                       rpm = 0.0; // if rpm is less than 15 (4s) then we consider that we are stopped
                }
                parent->setWheelRpm(rpm);
                value2=value=rpm;
