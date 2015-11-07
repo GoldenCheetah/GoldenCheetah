@@ -1,6 +1,5 @@
 branches:
 - master
-osx_image: xcode7.1
 language:
 - objective-c
 compiler:
@@ -21,8 +20,7 @@ env:
 before_install:
 - date
 - brew update
-##- sh travis/install-qt.sh
-- brew install $QT
+- sh travis/install-qt.sh
 - brew install libical
 - brew install libusb libusb-compat
 - brew install srmio
@@ -90,7 +88,7 @@ before_script:
 - sed -i "" "s/__GC_TWITTER_CONSUMER_SECRET__/"$GC_TWITTER_CONSUMER_SECRET"/" src/Secrets.h
 - cat src/gcconfig.pri
 script:
-- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field QMAKE_MAC_SDK=macosx10.11
+- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
 - CC=clang CXX=clang++ make qmake_all
 - CC=clang CXX=clang++ make -j4 sub-qwt --silent
 - CC=clang CXX=clang++ make -j4 sub-src
