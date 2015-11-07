@@ -99,7 +99,7 @@ after_success:
 - mkdir -p GoldenCheetah.app/Contents/MacOS/platforms
 - cp /usr/local/opt/$QT_PATH/plugins/platforms/libqcocoa.dylib GoldenCheetah.app/Contents/MacOS/platforms/
 - ls -laR GoldenCheetah.app
-- sh travis/check-gc.sh
+- sh ../travis/check-gc.sh
 - /usr/local/opt/$QT_PATH/bin/macdeployqt GoldenCheetah.app -verbose=2 -dmg
 - brew remove $QT
 - mv GoldenCheetah.dmg GoldenCheetah_$QT.dmg
