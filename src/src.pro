@@ -544,6 +544,7 @@ DEFERRES += RouteWindow.h \
             RouteItem.cpp
 
 SOURCES += \
+        main.cpp \
         AboutDialog.cpp \
         AddDeviceWizard.cpp \
         AddIntervalDialog.cpp \

@@ -1,6 +1,6 @@
 branches:
 - master
-osx_image: xcode7
+##osx_image: xcode7 #or xcode6.4 or xcode7.1
 language:
 - objective-c
 compiler:
@@ -8,8 +8,8 @@ compiler:
 - gcc
 env:
   matrix:
-## For now, but build with QT5
-##  - BRANCH=master QT=qt4 QT_PATH=qt
+## Test 4.8 or 5.4.2
+  - BRANCH=master QT=qt4 QT_PATH=qt
   - BRANCH=master QT=qt5 QT_PATH=qt5
   global:
   - secure: iqYW7f3//ZkMVzeCEarYn0S0DqKjFU9juBh0KF6WTlUsKX902Jtsk7dFoJlNDYBf63HLgV+wW2Hc6MxI9sGiUkom0gY9/To/aeGIJFGEX2sLm/e0Ok3qN521FA0Q/OiCFsD0RC6J+yrHxzI+rf8Z1rujceUsz2KgsrfAjYYv+BY=
@@ -20,9 +20,8 @@ env:
   - secure: FXJzm98lwbc1R2eh9/CvVReVRHEPLDm+sCRjiV9HJgeCveIUauLasp9Skamz0c6OKLmkjLY8JERPT491ZgCG8YcQ9x1bM8HGbmRqnn9xSUxINIRzVmyTiLMBoT/ibHHeFjFpyiGfukOAkHwMNNsrSrbaekhiJuekaXo7iTwYQB0=
 before_install:
 - date
-- brew update; brew update
-##- sh travis/install-qt.sh
-- brew install $QT
+- brew update
+- sh travis/install-qt.sh
 - brew install libical
 - brew install libusb libusb-compat
 - brew install srmio
@@ -97,8 +96,9 @@ script:
 after_success:
 - cd src
 #fix for libcocoa.dylib issue with qt5.4.2
-- mkdir -p GoldenCheetah.app/Contents/MacOS/platforms
-- cp /usr/local/opt/$QT_PATH/plugins/platforms/libqcocoa.dylib GoldenCheetah.app/Contents/MacOS/platforms/
+#not much of a fix, but will checkout macdeployqtfix shortly...
+##- mkdir -p GoldenCheetah.app/Contents/MacOS/platforms
+##- cp /usr/local/opt/$QT_PATH/plugins/platforms/libqcocoa.dylib GoldenCheetah.app/Contents/MacOS/platforms/
 - ls -laR GoldenCheetah.app
 - sh ../travis/check-gc.sh
 - /usr/local/opt/$QT_PATH/bin/macdeployqt GoldenCheetah.app -verbose=2 -dmg
