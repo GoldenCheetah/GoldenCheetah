@@ -285,7 +285,7 @@ ANT::setLoad(double load)
     }
 
     // if we have a FE-C trainer connected, relay the change in target power to the brake
-    if (fecChannel != -1)
+    if ((fecChannel != -1) && (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_POWER_MODE_CAPABILITY))
     {
         sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
     }
@@ -293,7 +293,11 @@ ANT::setLoad(double load)
 
 void ANT::refreshFecLoad()
 {
-    sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
+    if (fecChannel == -1)
+        return;
+
+    if (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_POWER_MODE_CAPABILITY)
+        sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
 }
 
 void ANT::refreshFecGradient()
@@ -728,6 +732,13 @@ ANT::channelInfo(int channel, int device_number, int device_id)
 
         // need to find a way to communicate back on error
         qDebug()<<"kickr found."<<kickrDeviceID<<"on channel"<<kickrChannel;
+    }
+
+    // ANT FE-C DEVICE DETECTED - ACT ACCORDINGLY !
+    // if we just got an ANT FE-C trainer, request the capabilities
+    if (!configuring && antChannel[channel]->is_fec) {
+        antChannel[channel]->capabilities();
+        qDebug()<<"ANT FE-C device found."<<device_number<<"on channel"<<channel;
     }
 
     //qDebug()<<"found device number"<<device_number<<"type"<<device_id<<"on channel"<<channel
