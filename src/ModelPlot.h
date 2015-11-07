@@ -28,6 +28,10 @@
 #include <QLabel>
 #include "Context.h"
 
+// sintegral fork of QwtPlot3D defines IS_NAN as isnan instead of std::isnan
+// so we add a macro to fix that; applies when compiling on QT5.5.1
+#define isnan(x) std::isnan(x)
+
 #include <qwt3d_global.h>
 
 // qwtplot3d api changes between 0.2.x and 0.3.x
