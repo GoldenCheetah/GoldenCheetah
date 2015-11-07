@@ -3673,13 +3673,13 @@ Setup starten.</translation>
 <context>
     <name>CPExp</name>
     <message>
-        <location filename="../WPrime.cpp" line="866"/>
+        <location filename="../WPrime.cpp" line="868"/>
         <source>Below CP Work</source>
         <translation>Sub-CP-Arbeit</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="868"/>
-        <location filename="../WPrime.cpp" line="869"/>
+        <location filename="../WPrime.cpp" line="870"/>
+        <location filename="../WPrime.cpp" line="871"/>
         <source>kJ</source>
         <translation>kJ</translation>
     </message>
@@ -7321,7 +7321,7 @@ CRR ist der Rollwiderstandskoeffizient; er hängt von Reifen und Oberfläche ab<
     <message>
         <location filename="../FixElevation.cpp" line="85"/>
         <source>Fix Elevation errors</source>
-        <translation>Korrigiere Höhen Fehler</translation>
+        <translation>Korrigiere Höhenfehler</translation>
     </message>
 </context>
 <context>
@@ -7341,7 +7341,7 @@ INTERNET Verbindung muss vorhanden sein. </translation>
     <message>
         <location filename="../FixGPS.cpp" line="73"/>
         <source>Fix GPS errors</source>
-        <translation>GPS Fehler beheben</translation>
+        <translation>Korrigiere GPS Fehler</translation>
     </message>
 </context>
 <context>
@@ -7357,7 +7357,7 @@ INTERNET Verbindung muss vorhanden sein. </translation>
     <message>
         <location filename="../FixGaps.cpp" line="130"/>
         <source>Fix Gaps in Recording</source>
-        <translation>Lücken in der Aufzeichung beheben</translation>
+        <translation>Korrigiere Lücken in der Aufzeichung</translation>
     </message>
 </context>
 <context>
@@ -7399,7 +7399,7 @@ Stopp - Dieser Wert definiert die maximale Dauer einer Lücke (in Sekunden), wel
     <message>
         <location filename="../FixHRSpikes.cpp" line="115"/>
         <source>Fix HR Spikes</source>
-        <translation>HF-Ausreißer beheben</translation>
+        <translation>Korrigiere HF-Ausreißer</translation>
     </message>
 </context>
 <context>
@@ -7499,7 +7499,7 @@ Der Parameter &apos;Sekunden (Gleitender Durchschnitt)&apos; ermöglicht die Ein
     <message>
         <location filename="../FixSpikes.cpp" line="131"/>
         <source>Fix Power Spikes</source>
-        <translation>Leistungsausreißer beheben</translation>
+        <translation>Korrigiere Leistungsausreißer</translation>
     </message>
 </context>
 <context>
@@ -7541,7 +7541,7 @@ Varianz (%) - Dies glättet jeden Wert, welcher mehr als der definierte Grenzwer
     <message>
         <location filename="../FixTorque.cpp" line="104"/>
         <source>Adjust Torque Values</source>
-        <translation>Drehmomentwerte abgleichen</translation>
+        <translation>Korrigiere Drehmomentwerte</translation>
     </message>
 </context>
 <context>
@@ -9475,12 +9475,12 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <message>
         <location filename="../HelpWhatsThis.cpp" line="139"/>
         <source>Adjust Torque Values</source>
-        <translation>Drehmomentwerte abgleichen</translation>
+        <translation>Korrigiere Drehmomentwerte</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="141"/>
         <source>Estimate Power Values</source>
-        <translation>Geschätzte Leistungswerte</translation>
+        <translation>Schätze Leistungswerte</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="143"/>
@@ -9490,27 +9490,27 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <message>
         <location filename="../HelpWhatsThis.cpp" line="145"/>
         <source>Fix Gaps in Recording</source>
-        <translation>Lücken in der Aufzeichung beheben</translation>
+        <translation>Korrigiere Lücken in der Aufzeichung</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="147"/>
         <source>Fix GPS Errors</source>
-        <translation>GPS Fehler beheben</translation>
+        <translation>Korrigiere GPS Fehler</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="149"/>
         <source>Fix HR Spikes</source>
-        <translation>HF-Ausreißer beheben</translation>
+        <translation>Korrigiere HF-Ausreißer</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="151"/>
         <source>Fix Power Spikes</source>
-        <translation>Leistungsausreißer beheben</translation>
+        <translation>Korrigiere Leistungsausreißer</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="153"/>
         <source>Fix Speed</source>
-        <translation>Geschwindigkeitsausreißer beheben</translation>
+        <translation>Korrigiere Geschwindigkeitsausreißer</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="156"/>
@@ -14031,7 +14031,7 @@ Please check your preference settings.</source>
 <context>
     <name>Matches</name>
     <message>
-        <location filename="../WPrime.cpp" line="720"/>
+        <location filename="../WPrime.cpp" line="722"/>
         <source>W&apos;bal Matches</source>
         <translation>W&apos;bal Körner</translation>
     </message>
@@ -14081,13 +14081,13 @@ Please check your preference settings.</source>
 <context>
     <name>MaxMatch</name>
     <message>
-        <location filename="../WPrime.cpp" line="690"/>
+        <location filename="../WPrime.cpp" line="692"/>
         <source>Maximum W&apos;bal Match</source>
         <translation>Maximum W&apos;bal Korn</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="692"/>
-        <location filename="../WPrime.cpp" line="693"/>
+        <location filename="../WPrime.cpp" line="694"/>
+        <location filename="../WPrime.cpp" line="695"/>
         <source>kJ</source>
         <translation>kJ</translation>
     </message>
@@ -14167,13 +14167,13 @@ Please check your preference settings.</source>
 <context>
     <name>MaxWPrime</name>
     <message>
-        <location filename="../WPrime.cpp" line="660"/>
+        <location filename="../WPrime.cpp" line="662"/>
         <source>Max W&apos; Expended</source>
         <translation>Max. W&apos; ausgeschöpft</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="662"/>
-        <location filename="../WPrime.cpp" line="663"/>
+        <location filename="../WPrime.cpp" line="664"/>
+        <location filename="../WPrime.cpp" line="665"/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -14564,13 +14564,13 @@ Sie haben die Möglichkeit vor der Zusammenführung Daten zu Importieren oder Do
 <context>
     <name>MinWPrime</name>
     <message>
-        <location filename="../WPrime.cpp" line="630"/>
+        <location filename="../WPrime.cpp" line="632"/>
         <source>Minimum W&apos; bal</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="632"/>
-        <location filename="../WPrime.cpp" line="633"/>
+        <location filename="../WPrime.cpp" line="634"/>
+        <location filename="../WPrime.cpp" line="635"/>
         <source>kJ</source>
         <translation>kJ</translation>
     </message>
@@ -17589,7 +17589,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../Pages.cpp" line="3112"/>
         <source>Manual</source>
-        <translation>manuell</translation>
+        <translation>Manuell</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="3113"/>
@@ -18329,7 +18329,7 @@ yyyy</translation>
         <translation>Datei: %1 kann nicht zum &apos;Schreiben&apos; geöffnet werden. Bitte die Dateieigenschaften prüfen.</translation>
     </message>
     <message>
-        <location filename="../RideCache.cpp" line="496"/>
+        <location filename="../RideCache.cpp" line="499"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
@@ -19952,7 +19952,7 @@ Skipping file...</source>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="430"/>
-        <location filename="../RideSummaryWindow.cpp" line="1529"/>
+        <location filename="../RideSummaryWindow.cpp" line="1538"/>
         <source>Totals</source>
         <translation>Summen</translation>
     </message>
@@ -19963,38 +19963,38 @@ Skipping file...</source>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="430"/>
-        <location filename="../RideSummaryWindow.cpp" line="1529"/>
+        <location filename="../RideSummaryWindow.cpp" line="1538"/>
         <source>Averages</source>
         <translation>Durchschnittswerte</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="430"/>
-        <location filename="../RideSummaryWindow.cpp" line="1529"/>
+        <location filename="../RideSummaryWindow.cpp" line="1538"/>
         <source>Maximums</source>
         <translation>Maxima</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1421"/>
-        <location filename="../RideSummaryWindow.cpp" line="2257"/>
+        <location filename="../RideSummaryWindow.cpp" line="1430"/>
+        <location filename="../RideSummaryWindow.cpp" line="2266"/>
         <source>&lt;br&gt;FTP, TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
         <translation>&lt;br&gt;FTP, TSS, NP und IF sind Warenzeichen von Peaksware LLC&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1529"/>
+        <location filename="../RideSummaryWindow.cpp" line="1538"/>
         <source>Metrics*</source>
         <translation>Metriken*</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="707"/>
-        <location filename="../RideSummaryWindow.cpp" line="1693"/>
-        <location filename="../RideSummaryWindow.cpp" line="1967"/>
+        <location filename="../RideSummaryWindow.cpp" line="713"/>
+        <location filename="../RideSummaryWindow.cpp" line="1702"/>
+        <location filename="../RideSummaryWindow.cpp" line="1976"/>
         <source>^(Average|Max) </source>
         <translatorcomment>Since Metrics use the &quot;Average&quot; sign in DE, added here.</translatorcomment>
         <translation>^(Durchschnitt|Maximale|ø) </translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="189"/>
-        <location filename="../RideSummaryWindow.cpp" line="770"/>
+        <location filename="../RideSummaryWindow.cpp" line="776"/>
         <source>&lt;h3&gt;Model&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Modell&lt;/h3&gt;</translation>
     </message>
@@ -20058,234 +20058,234 @@ Skipping file...</source>
         <translation>Metriken</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="677"/>
+        <location filename="../RideSummaryWindow.cpp" line="683"/>
         <source>&lt;tr&gt;&lt;td&gt;CTL:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;%3 (%1 - %2)&lt;/td&gt;&lt;/tr&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="679"/>
+        <location filename="../RideSummaryWindow.cpp" line="685"/>
         <source>&lt;tr&gt;&lt;td&gt;ATL:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;%3 (%1 - %2)&lt;/td&gt;&lt;/tr&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="681"/>
+        <location filename="../RideSummaryWindow.cpp" line="687"/>
         <source>&lt;tr&gt;&lt;td&gt;TSB:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;%3 (%1 - %2)&lt;/td&gt;&lt;/tr&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="710"/>
-        <location filename="../RideSummaryWindow.cpp" line="1015"/>
-        <location filename="../RideSummaryWindow.cpp" line="1149"/>
-        <location filename="../RideSummaryWindow.cpp" line="1157"/>
-        <location filename="../RideSummaryWindow.cpp" line="1249"/>
-        <location filename="../RideSummaryWindow.cpp" line="1257"/>
-        <location filename="../RideSummaryWindow.cpp" line="1348"/>
-        <location filename="../RideSummaryWindow.cpp" line="1356"/>
-        <location filename="../RideSummaryWindow.cpp" line="1688"/>
-        <location filename="../RideSummaryWindow.cpp" line="1731"/>
-        <location filename="../RideSummaryWindow.cpp" line="1751"/>
-        <location filename="../RideSummaryWindow.cpp" line="1962"/>
-        <location filename="../RideSummaryWindow.cpp" line="2000"/>
-        <location filename="../RideSummaryWindow.cpp" line="2020"/>
+        <location filename="../RideSummaryWindow.cpp" line="716"/>
+        <location filename="../RideSummaryWindow.cpp" line="1024"/>
+        <location filename="../RideSummaryWindow.cpp" line="1158"/>
+        <location filename="../RideSummaryWindow.cpp" line="1166"/>
+        <location filename="../RideSummaryWindow.cpp" line="1258"/>
+        <location filename="../RideSummaryWindow.cpp" line="1266"/>
+        <location filename="../RideSummaryWindow.cpp" line="1357"/>
+        <location filename="../RideSummaryWindow.cpp" line="1365"/>
+        <location filename="../RideSummaryWindow.cpp" line="1697"/>
+        <location filename="../RideSummaryWindow.cpp" line="1740"/>
+        <location filename="../RideSummaryWindow.cpp" line="1760"/>
+        <location filename="../RideSummaryWindow.cpp" line="1971"/>
+        <location filename="../RideSummaryWindow.cpp" line="2009"/>
+        <location filename="../RideSummaryWindow.cpp" line="2029"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="774"/>
+        <location filename="../RideSummaryWindow.cpp" line="780"/>
         <source>W&apos;</source>
         <translation>W&apos;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="784"/>
+        <location filename="../RideSummaryWindow.cpp" line="790"/>
         <source>CP</source>
         <translation>CP</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="786"/>
-        <location filename="../RideSummaryWindow.cpp" line="808"/>
+        <location filename="../RideSummaryWindow.cpp" line="792"/>
+        <location filename="../RideSummaryWindow.cpp" line="814"/>
         <source>watts</source>
         <translation>Watt</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="797"/>
+        <location filename="../RideSummaryWindow.cpp" line="803"/>
         <source>FTP (watts)</source>
         <translation>FTP (Watt)</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="800"/>
+        <location filename="../RideSummaryWindow.cpp" line="806"/>
         <source>FTP (w/kg)</source>
         <translation>FTP (W/kg)</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="806"/>
+        <location filename="../RideSummaryWindow.cpp" line="812"/>
         <source>P-max</source>
         <translation>Pmax</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="789"/>
-        <location filename="../RideSummaryWindow.cpp" line="811"/>
+        <location filename="../RideSummaryWindow.cpp" line="795"/>
+        <location filename="../RideSummaryWindow.cpp" line="817"/>
         <source>w/kg</source>
         <translation>W/kg</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="602"/>
+        <location filename="../RideSummaryWindow.cpp" line="608"/>
         <source>&lt;tr&gt;&lt;td&gt;CTL:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;&lt;font color=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="606"/>
+        <location filename="../RideSummaryWindow.cpp" line="612"/>
         <source>&lt;tr&gt;&lt;td&gt;ATL:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;&lt;font color=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="610"/>
+        <location filename="../RideSummaryWindow.cpp" line="616"/>
         <source>&lt;tr&gt;&lt;td&gt;TSB:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;&lt;font color=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="614"/>
+        <location filename="../RideSummaryWindow.cpp" line="620"/>
         <source>&lt;tr&gt;&lt;td&gt;RR:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;&lt;font color=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="683"/>
+        <location filename="../RideSummaryWindow.cpp" line="689"/>
         <source>&lt;tr&gt;&lt;td&gt;RR:&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;%3 (%1 - %2)&lt;/td&gt;&lt;/tr&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="820"/>
+        <location filename="../RideSummaryWindow.cpp" line="826"/>
         <source>&lt;h3&gt;Athlete Bests&lt;/h3&gt;
 </source>
         <translation>&lt;h3&gt;Athleten Bestwerte&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="850"/>
+        <location filename="../RideSummaryWindow.cpp" line="856"/>
         <source>d MMM yyyy</source>
         <translation>dd.MMM yyyy</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="890"/>
+        <location filename="../RideSummaryWindow.cpp" line="896"/>
         <source>&lt;h3&gt;Pace Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Pace Zones&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="924"/>
-        <location filename="../RideSummaryWindow.cpp" line="1782"/>
-        <location filename="../RideSummaryWindow.cpp" line="2051"/>
+        <location filename="../RideSummaryWindow.cpp" line="930"/>
+        <location filename="../RideSummaryWindow.cpp" line="1791"/>
+        <location filename="../RideSummaryWindow.cpp" line="2060"/>
         <source>&lt;h3&gt;Power Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Leistungszonen&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="943"/>
-        <location filename="../RideSummaryWindow.cpp" line="2108"/>
+        <location filename="../RideSummaryWindow.cpp" line="952"/>
+        <location filename="../RideSummaryWindow.cpp" line="2117"/>
         <source>&lt;h3&gt;W&apos;bal Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;W&apos;bal Zonen&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="980"/>
+        <location filename="../RideSummaryWindow.cpp" line="989"/>
         <source>&lt;h3&gt;Heart Rate Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Herzfrequenz Zonen&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1010"/>
+        <location filename="../RideSummaryWindow.cpp" line="1019"/>
         <source>Interval Name</source>
         <translation>Intervallname</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1110"/>
-        <location filename="../RideSummaryWindow.cpp" line="1210"/>
-        <location filename="../RideSummaryWindow.cpp" line="1309"/>
+        <location filename="../RideSummaryWindow.cpp" line="1119"/>
+        <location filename="../RideSummaryWindow.cpp" line="1219"/>
+        <location filename="../RideSummaryWindow.cpp" line="1318"/>
         <source>%1 of %2</source>
         <translation>%1 von %2</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1111"/>
-        <location filename="../RideSummaryWindow.cpp" line="1117"/>
+        <location filename="../RideSummaryWindow.cpp" line="1120"/>
+        <location filename="../RideSummaryWindow.cpp" line="1126"/>
         <source> ride</source>
         <translation> Trainingseinheit</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1111"/>
-        <location filename="../RideSummaryWindow.cpp" line="1117"/>
+        <location filename="../RideSummaryWindow.cpp" line="1120"/>
+        <location filename="../RideSummaryWindow.cpp" line="1126"/>
         <source> rides</source>
         <translation> Trainingseinheiten</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1126"/>
-        <location filename="../RideSummaryWindow.cpp" line="1226"/>
-        <location filename="../RideSummaryWindow.cpp" line="1325"/>
+        <location filename="../RideSummaryWindow.cpp" line="1135"/>
+        <location filename="../RideSummaryWindow.cpp" line="1235"/>
+        <location filename="../RideSummaryWindow.cpp" line="1334"/>
         <source>&lt;td align=&quot;center&quot;&gt;Date&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Datum&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1143"/>
-        <location filename="../RideSummaryWindow.cpp" line="1243"/>
-        <location filename="../RideSummaryWindow.cpp" line="1342"/>
+        <location filename="../RideSummaryWindow.cpp" line="1152"/>
+        <location filename="../RideSummaryWindow.cpp" line="1252"/>
+        <location filename="../RideSummaryWindow.cpp" line="1351"/>
         <source>&lt;td align=&quot;center&quot;&gt;&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1185"/>
-        <location filename="../RideSummaryWindow.cpp" line="1284"/>
-        <location filename="../RideSummaryWindow.cpp" line="1383"/>
+        <location filename="../RideSummaryWindow.cpp" line="1194"/>
+        <location filename="../RideSummaryWindow.cpp" line="1293"/>
+        <location filename="../RideSummaryWindow.cpp" line="1392"/>
         <source>dd MMM yyyy</source>
         <translation>dd.MMM yyyy</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1211"/>
-        <location filename="../RideSummaryWindow.cpp" line="1217"/>
+        <location filename="../RideSummaryWindow.cpp" line="1220"/>
+        <location filename="../RideSummaryWindow.cpp" line="1226"/>
         <source> run</source>
         <translation> Lauf</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1211"/>
-        <location filename="../RideSummaryWindow.cpp" line="1217"/>
+        <location filename="../RideSummaryWindow.cpp" line="1220"/>
+        <location filename="../RideSummaryWindow.cpp" line="1226"/>
         <source> runs</source>
         <translation> Läufe</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1310"/>
-        <location filename="../RideSummaryWindow.cpp" line="1316"/>
+        <location filename="../RideSummaryWindow.cpp" line="1319"/>
+        <location filename="../RideSummaryWindow.cpp" line="1325"/>
         <source> swim</source>
         <translation> Schwimmeinheit</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1310"/>
-        <location filename="../RideSummaryWindow.cpp" line="1316"/>
+        <location filename="../RideSummaryWindow.cpp" line="1319"/>
+        <location filename="../RideSummaryWindow.cpp" line="1325"/>
         <source> swims</source>
         <translation> Schwimmeinheiten</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1418"/>
+        <location filename="../RideSummaryWindow.cpp" line="1427"/>
         <source>&lt;br&gt;BikeScore and SwimScore are trademarks of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
         <translation>&lt;br&gt;BikeScore und SwimScore sind Warenzeichen von Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="2254"/>
+        <location filename="../RideSummaryWindow.cpp" line="2263"/>
         <source>&lt;br&gt;BikeScore is a trademark of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
         <translation>&lt;br&gt;BikeScore ist ein Warenzeichen von Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1485"/>
-        <location filename="../RideSummaryWindow.cpp" line="1489"/>
         <location filename="../RideSummaryWindow.cpp" line="1494"/>
-        <location filename="../RideSummaryWindow.cpp" line="1499"/>
+        <location filename="../RideSummaryWindow.cpp" line="1498"/>
+        <location filename="../RideSummaryWindow.cpp" line="1503"/>
+        <location filename="../RideSummaryWindow.cpp" line="1508"/>
         <source>N/A</source>
         <translation>n.v.</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1855"/>
-        <location filename="../RideSummaryWindow.cpp" line="2190"/>
+        <location filename="../RideSummaryWindow.cpp" line="1864"/>
+        <location filename="../RideSummaryWindow.cpp" line="2199"/>
         <source>&lt;h3&gt;Heartrate Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Herzfrequenz Zonen&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1001"/>
+        <location filename="../RideSummaryWindow.cpp" line="1010"/>
         <source>Intervals</source>
         <translation>Intervalle</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="1408"/>
+        <location filename="../RideSummaryWindow.cpp" line="1417"/>
         <source>&lt;p&gt;&lt;h2&gt;Errors reading file:&lt;/h2&gt;&lt;ul&gt;</source>
         <translation>&lt;p&gt;&lt;h2&gt;Fehler beim Einlesen der Datei:&lt;/h2&gt;&lt;ul&gt;</translation>
     </message>
@@ -20527,8 +20527,8 @@ You have made changes to some rides which
 have not been saved. They are listed below.</source>
         <translation>WARNUNG
 
-Folgende Änderungen an Trainingseinheiten
-wurden noch nicht gespeichert.</translation>
+Die von Ihnen gemachten Änderungen an den nachfolgend 
+aufgelisteten Trainingseinheiten wurden noch nicht gespeichert.</translation>
     </message>
     <message>
         <location filename="../SaveDialogs.cpp" line="302"/>
@@ -23835,8 +23835,8 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WCPZoneTime</name>
     <message>
-        <location filename="../WPrime.cpp" line="1041"/>
-        <location filename="../WPrime.cpp" line="1042"/>
+        <location filename="../WPrime.cpp" line="1043"/>
+        <location filename="../WPrime.cpp" line="1044"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
@@ -23844,13 +23844,13 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WCPZoneTime1</name>
     <message>
-        <location filename="../WPrime.cpp" line="1115"/>
+        <location filename="../WPrime.cpp" line="1117"/>
         <source>W1 Above CP W&apos;bal Low Fatigue</source>
         <translation>W1 über CP W&apos;Bilanz Leichte Erschöpfung</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="1116"/>
-        <location filename="../WPrime.cpp" line="1117"/>
+        <location filename="../WPrime.cpp" line="1118"/>
+        <location filename="../WPrime.cpp" line="1119"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
@@ -23858,13 +23858,13 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WCPZoneTime2</name>
     <message>
-        <location filename="../WPrime.cpp" line="1133"/>
+        <location filename="../WPrime.cpp" line="1135"/>
         <source>W2 Above CP W&apos;bal Moderate Fatigue</source>
         <translation>W2 über CP W&apos;Bilanz Moderate Erschöpfung</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="1134"/>
-        <location filename="../WPrime.cpp" line="1135"/>
+        <location filename="../WPrime.cpp" line="1136"/>
+        <location filename="../WPrime.cpp" line="1137"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
@@ -23872,13 +23872,13 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WCPZoneTime3</name>
     <message>
-        <location filename="../WPrime.cpp" line="1151"/>
+        <location filename="../WPrime.cpp" line="1153"/>
         <source>W3 Above CP W&apos;bal Heavy Fatigue</source>
         <translation>W3 über W&apos;bal Schwere Erschöpfung</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="1152"/>
-        <location filename="../WPrime.cpp" line="1153"/>
+        <location filename="../WPrime.cpp" line="1154"/>
+        <location filename="../WPrime.cpp" line="1155"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
@@ -23886,13 +23886,13 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WCPZoneTime4</name>
     <message>
-        <location filename="../WPrime.cpp" line="1169"/>
+        <location filename="../WPrime.cpp" line="1171"/>
         <source>W4 W&apos;bal Severe Fatigue</source>
         <translation>W4 über CP W&apos;Bilanz Ernste Erschöpfung</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="1170"/>
-        <location filename="../WPrime.cpp" line="1171"/>
+        <location filename="../WPrime.cpp" line="1172"/>
+        <location filename="../WPrime.cpp" line="1173"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
@@ -23990,17 +23990,22 @@ F3 drücken, wenn fertig.</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="578"/>
+        <source>&lt;td align=&quot;center&quot;&gt;Work (kJ)&lt;/td&gt;</source>
+        <translation>&lt;td align=&quot;center&quot;&gt;Arbeit (kJ)&lt;/td&gt;</translation>
+    </message>
+    <message>
+        <location filename="../WPrime.cpp" line="579"/>
         <source>&lt;td align=&quot;center&quot;&gt;Time&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Zeit in Zone&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="579"/>
-        <location filename="../WPrime.cpp" line="581"/>
+        <location filename="../WPrime.cpp" line="580"/>
+        <location filename="../WPrime.cpp" line="582"/>
         <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="580"/>
+        <location filename="../WPrime.cpp" line="581"/>
         <source>&lt;td align=&quot;center&quot;&gt;Above CP Time&lt;/td&gt;</source>
         <translation>Zeit über CP</translation>
     </message>
@@ -24008,13 +24013,13 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WPrimeExp</name>
     <message>
-        <location filename="../WPrime.cpp" line="782"/>
+        <location filename="../WPrime.cpp" line="784"/>
         <source>W&apos; Work</source>
         <translation>W&apos; Arbeit</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="784"/>
-        <location filename="../WPrime.cpp" line="785"/>
+        <location filename="../WPrime.cpp" line="786"/>
+        <location filename="../WPrime.cpp" line="787"/>
         <source>kJ</source>
         <translation>kJ</translation>
     </message>
@@ -24022,7 +24027,7 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WPrimeTau</name>
     <message>
-        <location filename="../WPrime.cpp" line="752"/>
+        <location filename="../WPrime.cpp" line="754"/>
         <source>W&apos;bal TAU</source>
         <translation>W&apos;bal TAU</translation>
     </message>
@@ -24030,13 +24035,13 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WPrimeWatts</name>
     <message>
-        <location filename="../WPrime.cpp" line="824"/>
+        <location filename="../WPrime.cpp" line="826"/>
         <source>W&apos; Power</source>
         <translation>W&apos; Leistung</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="826"/>
-        <location filename="../WPrime.cpp" line="827"/>
+        <location filename="../WPrime.cpp" line="828"/>
+        <location filename="../WPrime.cpp" line="829"/>
         <source>watts</source>
         <translation>Watt</translation>
     </message>
@@ -24044,8 +24049,8 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WZoneTime</name>
     <message>
-        <location filename="../WPrime.cpp" line="911"/>
-        <location filename="../WPrime.cpp" line="912"/>
+        <location filename="../WPrime.cpp" line="913"/>
+        <location filename="../WPrime.cpp" line="914"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
@@ -24053,13 +24058,13 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WZoneTime1</name>
     <message>
-        <location filename="../WPrime.cpp" line="969"/>
+        <location filename="../WPrime.cpp" line="971"/>
         <source>W1 W&apos;bal Low Fatigue</source>
         <translation>W1 W&apos;Bilanz Leichte Erschöpfung</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="970"/>
-        <location filename="../WPrime.cpp" line="971"/>
+        <location filename="../WPrime.cpp" line="972"/>
+        <location filename="../WPrime.cpp" line="973"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
@@ -24067,13 +24072,13 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WZoneTime2</name>
     <message>
-        <location filename="../WPrime.cpp" line="987"/>
+        <location filename="../WPrime.cpp" line="989"/>
         <source>W2 W&apos;bal Moderate Fatigue</source>
         <translation>W2 W&apos;Bilanz Moderate Erschöpfung</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="988"/>
-        <location filename="../WPrime.cpp" line="989"/>
+        <location filename="../WPrime.cpp" line="990"/>
+        <location filename="../WPrime.cpp" line="991"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
@@ -24081,13 +24086,13 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WZoneTime3</name>
     <message>
-        <location filename="../WPrime.cpp" line="1005"/>
+        <location filename="../WPrime.cpp" line="1007"/>
         <source>W3 W&apos;bal Heavy Fatigue</source>
-        <translation>W3 W&apos;bal Schwere Erschöpfung</translation>
+        <translation>W3 W&apos;Bilanz Schwere Erschöpfung</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="1006"/>
-        <location filename="../WPrime.cpp" line="1007"/>
+        <location filename="../WPrime.cpp" line="1008"/>
+        <location filename="../WPrime.cpp" line="1009"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
@@ -24095,15 +24100,80 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>WZoneTime4</name>
     <message>
-        <location filename="../WPrime.cpp" line="1023"/>
+        <location filename="../WPrime.cpp" line="1025"/>
         <source>W4 W&apos;bal Severe Fatigue</source>
         <translation>W4 W&apos;Bilanz Ernste Erschöpfung</translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="1024"/>
-        <location filename="../WPrime.cpp" line="1025"/>
+        <location filename="../WPrime.cpp" line="1026"/>
+        <location filename="../WPrime.cpp" line="1027"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
+    </message>
+</context>
+<context>
+    <name>WZoneWork</name>
+    <message>
+        <location filename="../WPrime.cpp" line="1189"/>
+        <location filename="../WPrime.cpp" line="1190"/>
+        <source>kJ</source>
+        <translation>kJ</translation>
+    </message>
+</context>
+<context>
+    <name>WZoneWork1</name>
+    <message>
+        <location filename="../WPrime.cpp" line="1250"/>
+        <source>W1 W&apos;bal Work Low Fatigue</source>
+        <translation>W1 W&apos;Bilanz Arbeit Leichte Erschöpfung</translation>
+    </message>
+    <message>
+        <location filename="../WPrime.cpp" line="1251"/>
+        <location filename="../WPrime.cpp" line="1252"/>
+        <source>kJ</source>
+        <translation>kJ</translation>
+    </message>
+</context>
+<context>
+    <name>WZoneWork2</name>
+    <message>
+        <location filename="../WPrime.cpp" line="1268"/>
+        <source>W2 W&apos;bal Work Moderate Fatigue</source>
+        <translation>W2 W&apos;Bilanz Arbeit Moderate Erschöpfung</translation>
+    </message>
+    <message>
+        <location filename="../WPrime.cpp" line="1269"/>
+        <location filename="../WPrime.cpp" line="1270"/>
+        <source>kJ</source>
+        <translation>kJ</translation>
+    </message>
+</context>
+<context>
+    <name>WZoneWork3</name>
+    <message>
+        <location filename="../WPrime.cpp" line="1286"/>
+        <source>W3 W&apos;bal Work Heavy Fatigue</source>
+        <translation>W3 W&apos;Bilanz Arbeit Schwere Erschöpfung</translation>
+    </message>
+    <message>
+        <location filename="../WPrime.cpp" line="1287"/>
+        <location filename="../WPrime.cpp" line="1288"/>
+        <source>kJ</source>
+        <translation>kJ</translation>
+    </message>
+</context>
+<context>
+    <name>WZoneWork4</name>
+    <message>
+        <location filename="../WPrime.cpp" line="1304"/>
+        <source>W4 W&apos;bal Work Severe Fatigue</source>
+        <translation>W4 W&apos;Bilanz Arbeit Ernste Erschöpfung</translation>
+    </message>
+    <message>
+        <location filename="../WPrime.cpp" line="1305"/>
+        <location filename="../WPrime.cpp" line="1306"/>
+        <source>kJ</source>
+        <translation>kJ</translation>
     </message>
 </context>
 <context>
