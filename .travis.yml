@@ -20,8 +20,7 @@ env:
 before_install:
 - date
 - brew update
-## want latest brew offers- sh travis/install-qt.sh
-- brew install $QT
+- sh travis/install-qt.sh
 - brew install libical
 - brew install libusb libusb-compat
 - brew install srmio
@@ -30,12 +29,11 @@ before_install:
 ##- brew install --HEAD travis/libkml.rb
 - sudo chmod -R +w /usr/local
 - curl -O http://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.2.2.dmg
-## QWTplot3d fails to build on QT5.5 due to ISNAN not isnan
-##- git clone --depth 1 https://github.com/sintegrial/qwtplot3d.git qwtplot3d
-##- cd qwtplot3d
-##- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
-##- CC=clang CXX=clang++ make -j2
-##- cd ..
+- git clone --depth 1 https://github.com/sintegrial/qwtplot3d.git qwtplot3d
+- cd qwtplot3d
+- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
+- CC=clang CXX=clang++ make -j2
+- cd ..
 - git clone --branch 0.98 https://github.com/kypeli/kQOAuth.git kQOAuth-0.98
 - cd kQOAuth-0.98
 - CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
@@ -66,8 +64,7 @@ before_script:
   src/gcconfig.pri
 - sed -i "" "s|#\(KQOAUTH_LIBS =.*\)|\1 -F\$\$[QT_INSTALL_LIBS] -framework kqoauth|"
   src/gcconfig.pri
-##Disable 3d for now
-##- sed -i "" "s|#\(QWT3D_INSTALL =.*\)|\1 ../qwtplot3d|" src/gcconfig.pri
+- sed -i "" "s|#\(QWT3D_INSTALL =.*\)|\1 ../qwtplot3d|" src/gcconfig.pri
 ## Disable KML for now
 ##- sed -i "" "s|#\(KML_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
 ##- sed -i "" "s|#\(KML_LIBS    =.*\)|\1 -L/usr/local/lib -lkmlxsd -lkmlregionator -lkmldom
@@ -98,6 +95,9 @@ script:
 - CC=clang CXX=clang++ make -j4 sub-src
 after_success:
 - cd src
+#fix for libcocoa.dylib issue with qt5.4.2
+- mkdir -p GoldenCheetah.app/Contents/MacOS/platforms
+- cp /usr/local/opt/$QT_PATH/plugins/platforms/libqcocoa.dylib GoldenCheetah.app/Contents/MacOS/platforms/
 - ls -laR GoldenCheetah.app
 - sh travis/check-gc.sh
 - /usr/local/opt/$QT_PATH/bin/macdeployqt GoldenCheetah.app -verbose=2 -dmg
