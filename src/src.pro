@@ -613,6 +613,7 @@ SOURCES += \
         FixDerivePower.cpp \
         FixDeriveTorque.cpp \
         FixElevation.cpp \
+        FixFreewheeling.cpp \
         FixGaps.cpp \
         FixGPS.cpp \
         FixMoxy.cpp \
