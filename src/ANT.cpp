@@ -340,6 +340,8 @@ ANT::setGradient(double gradient)
         sendMessage(ANTMessage::fecSetTrackResistance(fecChannel, gradient, currentRollingResistance));
         currentGradient = gradient;
         // TODO : obtain acknowledge / confirm value using fecRequestCommandStatus
+        // TODO : if trainer does not have simulation capabilities, use power mode & let GC calculate
+        //        the desired load based on gradient, wind, rolling resistance...
     }
 }
 
