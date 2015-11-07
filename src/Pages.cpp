@@ -1016,9 +1016,13 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     autoBackupPeriod->setMinimum(0);
     autoBackupPeriod->setMaximum(9999);
     autoBackupPeriod->setSingleStep(1);
-    QLabel *autoBackupPeriodLabel = new QLabel(tr("Auto Backup Period"));
+    QLabel *autoBackupPeriodLabel = new QLabel(tr("Auto Backup execution every"));
     autoBackupPeriod->setValue(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_PERIOD, 0).toInt());
-
+    QLabel *autoBackupUnitLabel = new QLabel(tr("times the athlete is closed - 0 means never"));
+    QHBoxLayout *backupInput = new QHBoxLayout();
+    backupInput->addWidget(autoBackupPeriod);
+    //backupInput->addStretch();
+    backupInput->addWidget(autoBackupUnitLabel);
 
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
 
@@ -1038,7 +1042,7 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     grid->addWidget(autoBackupFolder, 7, 1, alignment);
     grid->addWidget(autoBackupFolderBrowse, 7, 2, alignment);
     grid->addWidget(autoBackupPeriodLabel, 8, 0,alignment);
-    grid->addWidget(autoBackupPeriod, 8, 1, alignment);
+    grid->addLayout(backupInput, 8, 1, alignment);
 
     grid->addWidget(avatarButton, 0, 1, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
