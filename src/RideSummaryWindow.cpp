@@ -529,7 +529,9 @@ RideSummaryWindow::htmlSummary()
         << "time_in_zone_H5"
         << "time_in_zone_H6"
         << "time_in_zone_H7"
-        << "time_in_zone_H8";
+        << "time_in_zone_H8"
+        << "time_in_zone_H9"
+        << "time_in_zone_H10";
 
     static const QStringList timeInZonesWBAL = QStringList()
         << "wtime_in_zone_L1"
@@ -980,7 +982,6 @@ RideSummaryWindow::htmlSummary()
 
         QVector<double> time_in_zone(numhrzones);
         for (int i = 0; i < numhrzones; ++i) {
-
             // if using metrics or data
             if (ridesummary) time_in_zone[i] = rideItem->getForSymbol(timeInZonesHR[i]);
             else time_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZonesHR[i], specification, useMetricUnits, true).toDouble();
@@ -1604,7 +1605,9 @@ RideSummaryWindow::htmlCompareSummary() const
         << "time_in_zone_H5"
         << "time_in_zone_H6"
         << "time_in_zone_H7"
-        << "time_in_zone_H8";
+        << "time_in_zone_H8"
+        << "time_in_zone_H9"
+        << "time_in_zone_H10";
 
     static const QStringList timeInZonesWBAL = QStringList()
         << "wtime_in_zone_L1"
