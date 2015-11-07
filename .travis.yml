@@ -1,5 +1,6 @@
 branches:
 - master
+osx_image: xcode6.4
 language:
 - objective-c
 compiler:
@@ -20,7 +21,8 @@ env:
 before_install:
 - date
 - brew update
-- sh travis/install-qt.sh
+##- sh travis/install-qt.sh
+- brew install $QT
 - brew install libical
 - brew install libusb libusb-compat
 - brew install srmio
