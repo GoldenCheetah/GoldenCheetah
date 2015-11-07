@@ -29,8 +29,10 @@
 #include "Context.h"
 
 // sintegral fork of QwtPlot3D defines IS_NAN as isnan instead of std::isnan
-// so we add a macro to fix that; applies when compiling on QT5.5.1
+// so we add a macro to fix that; this only applies when compiling on QT5.5.1
+#if QT_VERSION >= 0x050501
 #define isnan(x) std::isnan(x)
+#endif
 
 #include <qwt3d_global.h>
 
