@@ -20,7 +20,7 @@ env:
   - secure: FXJzm98lwbc1R2eh9/CvVReVRHEPLDm+sCRjiV9HJgeCveIUauLasp9Skamz0c6OKLmkjLY8JERPT491ZgCG8YcQ9x1bM8HGbmRqnn9xSUxINIRzVmyTiLMBoT/ibHHeFjFpyiGfukOAkHwMNNsrSrbaekhiJuekaXo7iTwYQB0=
 before_install:
 - date
-- brew update
+- brew update; brew update
 ##- sh travis/install-qt.sh
 - brew install $QT
 - brew install libical
