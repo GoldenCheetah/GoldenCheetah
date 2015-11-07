@@ -125,8 +125,9 @@
 // 119 20  Oct 2015 Ale Martinez       Added VDOT and TPace for Running
 // 120 3   Nov 2015 Mark Liversedge    Added Above CP time in W'bal zones
 // 121 3   Nov 2015 Mark Liversedge    Added Work in W'bal zones
+// 122 7   Nov 2015 Mark Liversedge    Added HR Zones 9 and 10
 
-int DBSchemaVersion = 121;
+int DBSchemaVersion = 122;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
