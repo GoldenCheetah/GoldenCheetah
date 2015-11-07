@@ -2,7 +2,6 @@ branches:
 - master
 language:
 - objective-c
-osx_image: xcode7.1
 compiler:
 - clang
 - gcc
@@ -21,8 +20,7 @@ env:
 before_install:
 - date
 - brew update
-##- sh travis/install-qt.sh
-- brew install $QT
+- sh travis/install-qt.sh
 - brew install libical
 - brew install libusb libusb-compat
 - brew install srmio
