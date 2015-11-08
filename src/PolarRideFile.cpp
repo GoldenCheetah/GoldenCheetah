@@ -297,17 +297,17 @@ this differently
 		  hr = hrm;
 		}
 		
-		if (haveGPX & (igpx<ngpx))
+		if (haveGPX && (igpx<ngpx))
 		  {
 		    p = gpxresult->dataPoints()[igpx];
 		    // Use previous value if GPS is momentarely
 		    // lost. Should have option for interpolating.
-		    if (p->lat!=0.0&p->lon!=0.0){
+		    if (p->lat!=0.0 && p->lon!=0.0){
 		      lat = p->lat;
 		      lon = p->lon;
 		      // Must check if current HRM speed is zero while
 		      // we have GPX speed
-		      if (kph==0.0 & p->kph>1.0)
+		      if (kph==0.0 && p->kph>1.0)
 			{
 			  kph = p->kph;
 			  distance += kph/60/60*recInterval;

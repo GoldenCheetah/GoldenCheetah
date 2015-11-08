@@ -542,7 +542,10 @@ int
 BWebBridge::intervalCount()
 {
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
-    if (rideItem) return rideItem->intervalsSelected().count();
+    if (rideItem)
+        return rideItem->intervalsSelected().count();
+    else
+        return 0;
 }
 
 // get a latlon array for the i'th selected interval
