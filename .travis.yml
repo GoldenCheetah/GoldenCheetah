@@ -1,6 +1,6 @@
 branches:
 - master
-osx_image: xcode7.2 # will also get OSX El Capitan
+osx_image: xcode7.2b1 # will also get OSX El Capitan
 language:
 - objective-c
 compiler:
