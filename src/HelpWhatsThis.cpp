@@ -139,6 +139,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Menu%20Bar_Tools#tool-adjust-power").arg(tr("Adjust Torque Values"));
     case MenuBar_Edit_EstimatePowerValues:
         return text.arg("Menu%20Bar_Tools#tool-estimate-power").arg(tr("Estimate Power Values"));
+    case MenuBar_Edit_EstimateDistanceValues:
+        return text.arg("Menu%20Bar_Tools#tool-estimate-distance").arg(tr("Estimate Distance Values"));
     case MenuBar_Edit_FixElevationErrors:
         return text.arg("Menu%20Bar_Tools#tool-fix-elevation-errors").arg(tr("Fix Elevation Errors"));
     case MenuBar_Edit_FixGapsInRecording:
@@ -260,6 +262,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Preferences_General").arg(tr("General"));
     case Preferences_Athlete_About:
         return text.arg("Preferences_Athlete").arg(tr("Athlete"));
+    case Preferences_Athlete_About_Phys:
+        return text.arg("Preferences_Athlete_Phys").arg(tr("Athlete"));
     case Preferences_Athlete_TrainingZones_Power:
         return text.arg("Preferences_Athlete_Training-Zones#power-zones").arg(tr("Training Zone definition for power"));
     case Preferences_Athlete_TrainingZones_HR:

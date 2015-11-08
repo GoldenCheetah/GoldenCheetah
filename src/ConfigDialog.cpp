@@ -307,7 +307,7 @@ AthleteConfig::AthleteConfig(QDir home, Zones *zones, Context *context) :
 
     athletePhysPage = new RiderPhysPage(this, context);
     HelpWhatsThis *athletePhysHelp = new HelpWhatsThis(athletePhysPage);
-    athletePhysPage->setWhatsThis(athleteHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About_Phys));
+    athletePhysPage->setWhatsThis(athletePhysHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About_Phys));
 
     zonePage = new ZonePage(context);
     HelpWhatsThis *zoneHelp = new HelpWhatsThis(zonePage);
