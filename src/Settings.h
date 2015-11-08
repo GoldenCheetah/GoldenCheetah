@@ -59,6 +59,14 @@
 // Consumer Key in here:
 #define GC_MAPQUESTAPI_KEY "Fmjtd%7Cluur20uznu%2Ca2%3Do5-9ayshw"
 
+// MapQuest default API key.
+// If you have reliability problems with Fix Elevation, caused by too
+// many API requests per day using this key, then apply for your own
+// Free API key at https://developer.mapquest.com/.  Create a new
+// key for GoldenCheetah under 'Keys & Reporting' and place your
+// Consumer Key in here:
+#define GC_MAPQUESTAPI_KEY "Fmjtd%7Cluur20uznu%2Ca2%3Do5-9ayshw"
+
 // Tcx Smart recording
 #define GC_GARMIN_SMARTRECORD "garminSmartRecord"
 #define GC_GARMIN_HWMARK "garminHWMark"
