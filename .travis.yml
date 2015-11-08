@@ -105,7 +105,7 @@ after_success:
 - brew remove $QT
 - mv GoldenCheetah.dmg GoldenCheetah_$QT.dmg
 - hdiutil mount GoldenCheetah_$QT.dmg
-- cd /Volumes/GoldenCheetah_$QT
+- cd /Volumes/GoldenCheetah
 - ls -laR GoldenCheetah.app
 - GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
 
