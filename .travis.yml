@@ -100,7 +100,7 @@ after_success:
 ##- mkdir -p GoldenCheetah.app/Contents/MacOS/platforms
 ##- cp /usr/local/opt/$QT_PATH/plugins/platforms/libqcocoa.dylib GoldenCheetah.app/Contents/MacOS/platforms/
 ## fix up the bundle with macdeployqtfix
-- python ../travis/macdeployqtfix GoldenCheetah.app /usr/local/opt/$QT_PATH
+- python ../travis/macdeployqtfix.py GoldenCheetah.app /usr/local/opt/$QT_PATH
 - ls -laR GoldenCheetah.app
 - sh ../travis/check-gc.sh
 - /usr/local/opt/$QT_PATH/bin/macdeployqt GoldenCheetah.app -verbose=2 -dmg
