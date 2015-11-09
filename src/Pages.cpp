@@ -720,6 +720,30 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
 
     //////////////////////////////////////////////////
+    // SportPlusHealth
+
+    QLabel *sph = new QLabel(tr("SportPlusHealth"));
+    sph->setFont(current);
+
+    QLabel *sphUserLabel = new QLabel(tr("Username"));
+    QLabel *sphPassLabel = new QLabel(tr("Password"));
+
+    sphUser = new QLineEdit(this);
+    sphUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER, "").toString());
+
+    sphPass = new QLineEdit(this);
+    sphPass->setEchoMode(QLineEdit::Password);
+    sphPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHPASS, "").toString());
+
+    grid->addWidget(sph, ++row, 0);
+
+    grid->addWidget(sphUserLabel, ++row, 0);
+    grid->addWidget(sphUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(sphPassLabel, ++row, 0);
+    grid->addWidget(sphPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    //////////////////////////////////////////////////
     // End of grid
 
     grid->setColumnStretch(0,0);
@@ -869,6 +893,8 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_TTBPASS, ttbPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_VELOHEROUSER, veloHeroUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_VELOHEROPASS, veloHeroPass->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER, sphUser->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SPORTPLUSHEALTHPASS, sphPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_SELUSER, selUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_SELPASS, selPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TPTYPE, tpType->currentIndex());
