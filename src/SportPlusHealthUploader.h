@@ -57,19 +57,11 @@ public:
 private slots:
     void dispatchReply( QNetworkReply *reply );
 
-    void requestSettings();
-    void finishSettings(QNetworkReply *reply);
-
-    void requestSession();
-    void finishSession(QNetworkReply *reply);
-
     void requestUpload();
     void finishUpload(QNetworkReply *reply);
 
 private:
     enum requestType {
-        reqSettings,
-        reqSession,
         reqUpload,
     };
 
@@ -77,7 +69,6 @@ private:
     QNetworkAccessManager networkMgr;
     requestType currentRequest;
 
-    bool proMember;
     QString sessionId;
     QString exerciseId;
     bool uploadSuccessful;

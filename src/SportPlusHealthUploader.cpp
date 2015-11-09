@@ -23,31 +23,124 @@
 #include "TimeUtils.h"
 #include "Units.h"
 
+#include <QMessageLogger>
 #include <stdio.h>
 
 // access to metrics
 #include "PwxRideFile.h"
 
-/*
- * - reuse single QNetworkAccessManager for all requests to allow
- * connection re-use.
- *
- * - replies must be handled differently - based on request, but there's
- * just a single mgr.finish() handler.
- *
- * - can't connect() to QNetworkReply::finish, as there's a
- * slight chance for a race condition: request finished between call to
- * mgr.post() and connect(). Therefore have to connect(QNetworkAccessManager::finish)
- *
- * - can't subclass QNetworkRequest and add attribute, as
- * QNetworkAccessManager only takes a reference and clones a plain
- * QNetworkRequest from it.
- *
- * - so... hack around this with currentRequest + dispatchRequest TODO: fix
- */
+const QString SPH_URL( "http://dev.sportplushealth.com/sport/en/api/1" );
 
-const QString SPH_URL( "http://www.sportplushealth.com/devel/en/api/1" );
+SportPlusHealthUploader::SportPlusHealthUploader(Context *context, RideItem *ride, ShareDialog *parent ) :
+    ShareDialogUploader( tr("SportPlusHealth"), context, ride, parent)
+{
+    exerciseId = ride->ride()->getTag("SphExercise", "");
 
+    connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(dispatchReply(QNetworkReply*)));
+}
+
+bool
+SportPlusHealthUploader::canUpload( QString &err )
+{
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER).toString();
+
+    if( username.length() > 0 ){
+        return true;
+    }
+
+    err = tr("Cannot upload to SportPlusHealth without credentials. Check Settings");
+    return false;
+}
+
+bool
+SportPlusHealthUploader::wasUploaded()
+{
+    return exerciseId.length() > 0;
+}
+
+void
+SportPlusHealthUploader::upload()
+{
+    uploadSuccessful = false;
+    requestUpload();
+
+    if( !uploadSuccessful ){
+        parent->progressLabel->setText(tr("error uploading to SportPlusHealth"));
+
+    } else {
+        parent->progressLabel->setText(tr("successfully uploaded to SportPlusHealth as %1").arg(exerciseId));
+
+        ride->ride()->setTag("SphExercise", exerciseId );
+        ride->setDirty(true);
+    }
+}
+
+void
+SportPlusHealthUploader::requestUpload()
+{
+    QMessageLogger().info() << "---> Starting...";
+    parent->progressLabel->setText(tr("sending to SportPlusHealth..."));
+
+    //Retrieve user credentials
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER).toString();
+    QString password = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHPASS).toString();
+
+    //Building URL of the API, including credentials for authentication
+    QUrl url(SPH_URL + "/" + username + "/importGC");
+    QMessageLogger().info() << "---> URL: " << url;
+
+    //Building the message content
+    QHttpMultiPart *body = new QHttpMultiPart( QHttpMultiPart::FormDataType );
+
+    //Including the optional session name
+    QHttpPart textPart;
+    textPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"session_name\""));
+    textPart.setBody(QByteArray(insertedName.toLatin1()));
+    QMessageLogger().info() << "---> NAME: " << insertedName;
+
+    body->append(textPart);
+
+    //Including file in the request
+    QString fname = context->athlete->home->temp().absoluteFilePath(".sph-upload.pwx" );
+    QFile *uploadFile = new QFile( fname );
+    uploadFile->setParent(body);
+
+    PwxFileReader reader;
+    reader.writeRideFile(context, ride->ride(), *uploadFile );
+    parent->progressBar->setValue(parent->progressBar->value()+20/parent->shareSiteCount);
+
+    int limit = 16777216; // 16MB
+    if( uploadFile->size() >= limit ){
+        parent->errorLabel->setText(tr("temporary file too large for upload: %1 > %1 bytes")
+                                    .arg(uploadFile->size())
+                                    .arg(limit) );
+
+        eventLoop.quit();
+        return;
+    }
+
+    QHttpPart filePart;
+    filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/octet-stream"));
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"datafile\"; filename=\"gc-upload-sph.pwx\""));
+    uploadFile->open(QIODevice::ReadOnly);
+    filePart.setBodyDevice(uploadFile);
+    body->append( filePart );
+
+    //Sending the authenticated post request to the API
+    QNetworkRequest request;
+    request.setUrl(url);
+    request.setRawHeader("Authorization", "Basic " + QByteArray(QString("%1:%2").arg(username).arg(password).toLatin1()).toBase64());
+    QNetworkReply *reply = networkMgr.post(request, body);
+
+
+
+    //TODO: Resta da gestire il corretto valore di ritorno in base al contenuto della risposta JSON
+    uploadSuccessful = true;
+}
+
+/*////////////////////
+/// QXML HANDLER
+////////////////////*/
 class SphParser : public QXmlDefaultHandler
 {
 public:
@@ -79,197 +172,9 @@ protected:
     QString error;
 };
 
-
-SportPlusHealthUploader::SportPlusHealthUploader(Context *context, RideItem *ride, ShareDialog *parent ) :
-    ShareDialogUploader( tr("SportPlusHealth"), context, ride, parent),
-    proMember( false )
-{
-    exerciseId = ride->ride()->getTag("SphExercise", "");
-
-    connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(dispatchReply(QNetworkReply*)));
-}
-
-bool
-SportPlusHealthUploader::canUpload( QString &err )
-{
-    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER).toString();
-
-    if( username.length() > 0 ){
-        return true;
-    }
-
-    err = tr("Cannot upload to SportPlusHealth without credentials. Check Settings");
-    return false;
-}
-
-bool
-SportPlusHealthUploader::wasUploaded()
-{
-    return exerciseId.length() > 0;
-}
-
-
-void
-SportPlusHealthUploader::upload()
-{
-    uploadSuccessful = false;
-    requestSettings();
-
-    if( !uploadSuccessful ){
-        parent->progressLabel->setText(tr("Error uploading to SportPlusHealth"));
-
-    } else {
-        parent->progressLabel->setText(tr("successfully uploaded to SportPlusHealth as %1").arg(exerciseId));
-
-        ride->ride()->setTag("SphExercise", exerciseId );
-        ride->setDirty(true);
-    }
-}
-
-void
-SportPlusHealthUploader::requestSettings() //TODO: Check if this method is actually needed
-{
-    parent->progressLabel->setText(tr("getting Settings from SportPlusHealth..."));
-
-    currentRequest = reqSettings;
-
-    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER).toString();
-    QString password = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHPASS).toString();
-
-#if QT_VERSION > 0x050000
-    QUrlQuery urlquery;
-#else
-    QUrl urlquery(SPH_URL + "/settings");
-#endif
-    urlquery.addQueryItem( "view", "xml" );
-    urlquery.addQueryItem( "user", username );
-    urlquery.addQueryItem( "pass", password );
-
-#if QT_VERSION > 0x050000
-    QUrl url (SPH_URL + "/settings");
-    url.setQuery(urlquery.query());
-    QNetworkRequest request = QNetworkRequest(url);
-#else
-    QNetworkRequest request = QNetworkRequest(urlquery);
-#endif
-
-    request.setRawHeader( "Accept-Encoding", "identity" );
-    request.setRawHeader( "Accept", "application/xml" );
-    request.setRawHeader( "Accept-Charset", "utf-8" );
-
-    networkMgr.get( request );
-    parent->progressBar->setValue(parent->progressBar->value()+5/parent->shareSiteCount);
-    eventLoop.exec();
-}
-
-void
-SportPlusHealthUploader::requestSession()
-{
-    parent->progressLabel->setText(tr("getting new SportPlusHealth Session..."));
-
-    currentRequest = reqSession;
-
-    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER).toString();
-    QString password = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHPASS).toString();
-
-#if QT_VERSION > 0x050000
-    QUrlQuery urlquery;
-#else
-    QUrl urlquery(SPH_URL + "/login");
-#endif
-    urlquery.addQueryItem( "view", "xml" );
-    urlquery.addQueryItem( "user", username );
-    urlquery.addQueryItem( "pass", password );
-
-#if QT_VERSION > 0x050000
-    QUrl url (SPH_URL + "/login");
-    url.setQuery(urlquery.query());
-    QNetworkRequest request = QNetworkRequest(url);
-#else
-    QNetworkRequest request = QNetworkRequest(urlquery);
-#endif
-
-    request.setRawHeader( "Accept-Encoding", "identity" );
-    request.setRawHeader( "Accept", "application/xml" );
-    request.setRawHeader( "Accept-Charset", "utf-8" );
-
-    networkMgr.get( request );
-    parent->progressBar->setValue(parent->progressBar->value()+5/parent->shareSiteCount);
-}
-
-void
-SportPlusHealthUploader::requestUpload()
-{
-    assert(sessionId.length() > 0 );
-
-    parent->progressLabel->setText(tr("preparing SportPlusHealth data ..."));
-
-    QHttpMultiPart *body = new QHttpMultiPart( QHttpMultiPart::FormDataType );
-
-    QHttpPart textPart;
-    textPart.setHeader(QNetworkRequest::ContentDispositionHeader,
-    QVariant("form-data; name=\"upload_submit\""));
-    textPart.setBody("hrm");
-    body->append( textPart );
-
-
-    QString fname = context->athlete->home->temp().absoluteFilePath(".pwx" );
-    QFile *uploadFile = new QFile( fname );
-    uploadFile->setParent(body);
-
-    PwxFileReader reader;
-    reader.writeRideFile(context, ride->ride(), *uploadFile );
-    parent->progressBar->setValue(parent->progressBar->value()+20/parent->shareSiteCount);
-
-    int limit = proMember
-        ? 8 * 1024 * 1024
-        : 4 * 1024 * 1024;
-    if( uploadFile->size() >= limit ){
-        parent->errorLabel->setText(tr("temporary file too large for upload: %1 > %1 bytes")
-            .arg(uploadFile->size())
-            .arg(limit) );
-
-        eventLoop.quit();
-        return;
-    }
-
-    QHttpPart filePart;
-    filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/octet-stream"));
-    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\"gc-upload-sph.pwx\""));
-    uploadFile->open(QIODevice::ReadOnly);
-    filePart.setBodyDevice(uploadFile);
-    body->append( filePart );
-
-
-    parent->progressLabel->setText(tr("sending to SportPlusHealth ..."));
-
-    currentRequest = reqUpload;
-
-#if QT_VERSION > 0x050000
-    QUrlQuery urlquery;
-#else
-    QUrl urlquery(SPH_URL + "/importGC");
-#endif
-    urlquery.addQueryItem( "view", "xml" );
-    urlquery.addQueryItem( "sso", sessionId );
-
-
-#if QT_VERSION > 0x050000
-    QUrl url (SPH_URL + "/importGC");
-    url.setQuery(urlquery.query());
-    QNetworkRequest request = QNetworkRequest(url);
-#else
-    QNetworkRequest request = QNetworkRequest(urlquery);
-#endif
-
-    request.setRawHeader( "Accept-Encoding", "identity" );
-    request.setRawHeader( "Accept", "application/xml" );
-    request.setRawHeader( "Accept-Charset", "utf-8" );
-
-    QNetworkReply *reply = networkMgr.post( request, body );
-    body->setParent( reply );
-}
-
+/*////////////////////
+/// RESULTS HANDLER
+////////////////////*/
 void
 SportPlusHealthUploader::dispatchReply( QNetworkReply *reply )
 {
@@ -293,144 +198,7 @@ SportPlusHealthUploader::dispatchReply( QNetworkReply *reply )
         return;
     }
 
-    switch( currentRequest ){
-      case reqSettings:
-        finishSettings( reply );
-        break;
-
-      case reqSession:
-        finishSession( reply );
-        break;
-
-      case reqUpload:
-        finishUpload( reply );
-        break;
-    }
-}
-
-class SphSettingsParser : public SphParser
-{
-public:
-    friend class SportPlusHealthUploader;
-
-    SphSettingsParser() :
-        pro(false),
-        reFalse("\\s*(0|false|no|)\\s*",Qt::CaseInsensitive )
-    {}
-
-    bool endElement( const QString& a, const QString&b, const QString& qName )
-    {
-        if( qName == "pro" ){
-            pro = ! reFalse.exactMatch(cdata);
-            return true;
-
-        } else if( qName == "session" ){
-            session = cdata;
-            return true;
-
-        }
-
-        return SphParser::endElement( a, b, qName );
-    }
-
-protected:
-    bool    pro;
-    QString session;
-
-    QRegExp reFalse;
-};
-
-void
-SportPlusHealthUploader::finishSettings(QNetworkReply *reply)
-{
-    parent->progressBar->setValue(parent->progressBar->value()+5/parent->shareSiteCount);
-
-    SphSettingsParser handler;
-    QXmlInputSource source( reply );
-
-    QXmlSimpleReader reader;
-    reader.setContentHandler( &handler );
-
-    if( ! reader.parse( source ) ){
-        parent->errorLabel->setText(tr("failed to parse Settings response: ") + handler.errorString());
-
-        eventLoop.quit();
-        return;
-    }
-
-    if( handler.error.length() > 0 ){
-        parent->errorLabel->setText(tr("failed to get settings: ") + handler.error );
-
-        eventLoop.quit();
-        return;
-    }
-
-    sessionId = handler.session;
-    proMember = handler.pro;
-
-    if( sessionId.length() == 0 ){
-        requestSession();
-    } else {
-        requestUpload();
-    }
-}
-
-class SphSessionParser : public SphParser
-{
-public:
-    friend class SportPlusHealthUploader;
-
-    bool endElement( const QString& a, const QString&b, const QString& qName )
-    {
-        if( qName == "session" ){
-            session = cdata;
-            return true;
-
-        }
-
-        return SphParser::endElement( a, b, qName );
-    };
-
-protected:
-    QString session;
-
-};
-
-void
-SportPlusHealthUploader::finishSession(QNetworkReply *reply)
-{
-    parent->progressBar->setValue(parent->progressBar->value()+5/parent->shareSiteCount);
-
-    SphSessionParser handler;
-    QXmlInputSource source( reply );
-
-    QXmlSimpleReader reader;
-    reader.setContentHandler( &handler );
-
-    if( ! reader.parse( source ) ){
-        parent->errorLabel->setText(tr("failed to parse Session response: ") + handler.errorString());
-
-        eventLoop.quit();
-        return;
-    }
-
-    if( handler.error.length() > 0 ){
-        parent->errorLabel->setText(tr("failed to get new session: ") + handler.error );
-
-        eventLoop.quit();
-        return;
-    }
-
-    sessionId = handler.session;
-
-    if( sessionId.length() == 0 ){
-        parent->errorLabel->setText(tr("got empty session"));
-
-        eventLoop.quit();
-        return;
-    }
-
-    requestUpload();
+    finishUpload( reply );
 }
 
 class SphUploadParser : public SphParser
@@ -464,6 +232,9 @@ SportPlusHealthUploader::finishUpload(QNetworkReply *reply)
 
     QXmlSimpleReader reader;
     reader.setContentHandler( &handler );
+
+    QMessageLogger().info() << "---> ANSWER (1): " << handler.errorString();
+    QMessageLogger().info() << "---> ANSWER (2): " << reader.contentHandler();
 
     if( ! reader.parse( source ) ){
         parent->errorLabel->setText(tr("failed to parse upload response: ") + handler.errorString());

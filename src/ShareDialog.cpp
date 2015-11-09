@@ -343,6 +343,7 @@ ShareDialog::upload()
         doUploader( trainingstagebuchUploader );
     }
     if (sportplushealthChk->isEnabled() && sportplushealthChk->isChecked()) {
+        sportplushealthUploader->insertedName = QString(titleEdit->text()).toLatin1();
         doUploader( sportplushealthUploader );
     }
     //if (garminChk->isEnabled() && garminChk->isChecked()) {
