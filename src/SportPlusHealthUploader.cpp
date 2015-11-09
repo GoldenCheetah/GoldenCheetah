@@ -22,6 +22,7 @@
 #include "Settings.h"
 #include "TimeUtils.h"
 #include "Units.h"
+#include "mvjson.h"
 
 #include <stdio.h>
 
@@ -195,9 +196,14 @@ SportPlusHealthUploader::finishUpload(QNetworkReply *reply)
 {
     //Parsing JSON server reply
     QString strReply = (QString)reply->readAll();
-    QJsonObject jsonObj = QJsonDocument::fromJson(strReply.toUtf8()).object();
-    jsonResponseSuccess = jsonObj["success"].toBool();
-    jsonResponseErrorCode = jsonObj["error_code"].toInt();
+    MVJSONReader jsonResponse(string(strReply.toLatin1()));
+    if(jsonResponse.root && jsonResponse.root->hasField("success") && jsonResponse.root->hasField("error_code")) {
+        jsonResponseSuccess = jsonResponse.root->getFieldBool("success");
+        jsonResponseErrorCode = jsonResponse.root->getFieldInt("error_code");
+    } else {
+        jsonResponseSuccess = false;
+        jsonResponseErrorCode = -1;
+    }
     reply->deleteLater();
 
     if(!jsonResponseSuccess) {
