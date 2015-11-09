@@ -29,7 +29,7 @@
 // access to metrics
 #include "TcxRideFile.h"
 
-const QString SPH_URL( "http://dev.sportplushealth.com/sport/en/api/1" );
+const QString SPH_URL( "http://www.sportplushealth.com/sport/en/api/1" );
 
 SportPlusHealthUploader::SportPlusHealthUploader(Context *context, RideItem *ride, ShareDialog *parent ) :
     ShareDialogUploader( tr("SportPlusHealth"), context, ride, parent)
@@ -67,17 +67,11 @@ SportPlusHealthUploader::upload()
 void
 SportPlusHealthUploader::requestUpload()
 {
-    QMessageLogger().info() << "---> Starting...";
     parent->progressLabel->setText(tr("sending to SportPlusHealth..."));
     parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
 
-    //Retrieve user credentials
     QString username = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER).toString();
     QString password = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHPASS).toString();
-
-    //Building URL of the API, including credentials for authentication
-    QUrl url(SPH_URL + "/" + username + "/importGC");
-    QMessageLogger().info() << "---> URL: " << url;
 
     //Building the message content
     QHttpMultiPart *body = new QHttpMultiPart( QHttpMultiPart::FormDataType );
@@ -86,7 +80,6 @@ SportPlusHealthUploader::requestUpload()
     QHttpPart textPart;
     textPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"session_name\""));
     textPart.setBody(QByteArray(insertedName.toLatin1()));
-    QMessageLogger().info() << "---> NAME: " << insertedName;
     body->append(textPart);
 
     //Including the content data type
@@ -105,6 +98,7 @@ SportPlusHealthUploader::requestUpload()
 
     //Sending the authenticated post request to the API
     parent->progressBar->setValue(parent->progressBar->value()+20/parent->shareSiteCount);
+    QUrl url(SPH_URL + "/" + username + "/importGC");
     QNetworkRequest request;
     request.setUrl(url);
     request.setRawHeader("Authorization", "Basic " + QByteArray(QString("%1:%2").arg(username).arg(password).toLatin1()).toBase64());
@@ -200,11 +194,8 @@ protected:
 void
 SportPlusHealthUploader::finishUpload(QNetworkReply *reply)
 {
-    qDebug() << "BARRA 1:" << parent->progressBar->value();
-
     //Parsing JSON server reply
     QString strReply = (QString)reply->readAll();
-    qDebug() << "Response:" << strReply;
     QJsonObject jsonObj = QJsonDocument::fromJson(strReply.toUtf8()).object();
     jsonResponseSuccess = jsonObj["success"].toBool();
     jsonResponseErrorCode = jsonObj["error_code"].toInt();
