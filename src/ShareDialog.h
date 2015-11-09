@@ -54,6 +54,8 @@ public:
     virtual bool wasUploaded();
     virtual void upload()=0;
 
+    QString insertedName;
+
 private:
     QString _name;
 
@@ -61,7 +63,6 @@ protected:
     Context *context;
     RideItem *ride;
     ShareDialog *parent;
-
 };
 
 // uploader to strava.com
