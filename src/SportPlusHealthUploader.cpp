@@ -23,7 +23,6 @@
 #include "TimeUtils.h"
 #include "Units.h"
 
-#include <QMessageLogger>
 #include <stdio.h>
 
 // access to metrics
