@@ -27,7 +27,7 @@
 #include <stdio.h>
 
 // access to metrics
-#include "PwxRideFile.h"
+#include "TcxRideFile.h"
 
 const QString SPH_URL( "http://dev.sportplushealth.com/sport/en/api/1" );
 
@@ -87,38 +87,24 @@ SportPlusHealthUploader::requestUpload()
     textPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"session_name\""));
     textPart.setBody(QByteArray(insertedName.toLatin1()));
     QMessageLogger().info() << "---> NAME: " << insertedName;
-
     body->append(textPart);
 
+    //Including the content data type
+    QHttpPart dataTypePart;
+    dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"format\""));
+    dataTypePart.setBody("tcx");
+    body->append(dataTypePart);
+
     //Including file in the request
-    QString fname = context->athlete->home->temp().absoluteFilePath(".sph-upload.pwx" );
-    QFile *uploadFile = new QFile( fname );
-    uploadFile->setParent(body);
-
-    PwxFileReader reader;
-    reader.writeRideFile(context, ride->ride(), *uploadFile );
-    qDebug() << "BARRA 2:" << parent->progressBar->value();
-
-    int limit = 16777216; // 16MB
-    if( uploadFile->size() >= limit ){
-        parent->progressLabel->setText(tr("error uploading to SportPlusHealth"));
-        parent->errorLabel->setText(tr("temporary file too large for upload: %1 > %1 bytes")
-                                    .arg(uploadFile->size())
-                                    .arg(limit) );
-
-        eventLoop.quit();
-        return;
-    }
-
+    TcxFileReader reader;
+    QByteArray file = reader.toByteArray(context, ride->ride(), parent->altitudeChk->isChecked(), parent->powerChk->isChecked(), parent->heartrateChk->isChecked(), parent->cadenceChk->isChecked());
     QHttpPart filePart;
-    filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/octet-stream"));
-    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"datafile\"; filename=\"gc-upload-sph.pwx\""));
-    uploadFile->open(QIODevice::ReadOnly);
-    filePart.setBodyDevice(uploadFile);
-    body->append( filePart );
-    parent->progressBar->setValue(parent->progressBar->value()+20/parent->shareSiteCount);
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"datafile\"; filename=\"sph_file.tcx\"; type=\"text/xml\""));
+    filePart.setBody(file);
+    body->append(filePart);
 
     //Sending the authenticated post request to the API
+    parent->progressBar->setValue(parent->progressBar->value()+20/parent->shareSiteCount);
     QNetworkRequest request;
     request.setUrl(url);
     request.setRawHeader("Authorization", "Basic " + QByteArray(QString("%1:%2").arg(username).arg(password).toLatin1()).toBase64());
