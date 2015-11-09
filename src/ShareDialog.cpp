@@ -26,6 +26,7 @@
 #include "Units.h"
 #include "VeloHeroUploader.h"
 #include "TrainingstagebuchUploader.h"
+#include "SportPlusHealthUploader.h"
 #include "HelpWhatsThis.h"
 
 // access to metrics
@@ -158,6 +159,15 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
         trainingstagebuchChk->setChecked( true );
     }
     vbox1->addWidget(trainingstagebuchChk,0,col++);
+
+    sportplushealthUploader = new SportPlusHealthUploader(context, ride, this);
+    sportplushealthChk = new QCheckBox(tr("SportPlusHealth"));
+    if( ! sportplushealthUploader->canUpload( err ) ){
+        sportplushealthChk->setEnabled( false );
+    } else if( ! sportplushealthUploader->wasUploaded() ){
+        sportplushealthChk->setChecked( true );
+    }
+    vbox1->addWidget(sportplushealthChk,0,col++);
 
     //garminUploader = new GarminUploader(context, ride, this); // not in 3.1
     //garminChk = new QCheckBox(tr("Garmin Connect"));
