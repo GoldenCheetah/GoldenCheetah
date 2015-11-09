@@ -170,8 +170,10 @@ CONFIG(debug, debug|release) {
 }
 
 # FreeSearch replaces deprecated lucene
-HEADERS     += DataFilter.h SearchBox.h NamedSearch.h SearchFilterBox.h FreeSearch.h
-SOURCES     += DataFilter.cpp SearchBox.cpp NamedSearch.cpp SearchFilterBox.cpp FreeSearch.cpp
+HEADERS     += DataFilter.h SearchBox.h NamedSearch.h SearchFilterBox.h FreeSearch.h \
+    SportPlusHealthUploader.h
+SOURCES     += DataFilter.cpp SearchBox.cpp NamedSearch.cpp SearchFilterBox.cpp FreeSearch.cpp \
+    SportPlusHealthUploader.cpp
 YACCSOURCES += DataFilter.y
 LEXSOURCES  += DataFilter.l
 

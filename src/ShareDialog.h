@@ -262,6 +262,7 @@ private:
      QCheckBox *selfLoopsChk;
      QCheckBox *veloHeroChk;
      QCheckBox *trainingstagebuchChk;
+     QCheckBox *sportplushealthChk;
      //QCheckBox *garminChk;
 
      RideItem *ride;
@@ -272,6 +273,7 @@ private:
      ShareDialogUploader *selfLoopsUploader;
      ShareDialogUploader *veloHeroUploader;
      ShareDialogUploader *trainingstagebuchUploader;
+     ShareDialogUploader *sportplushealthUploader;
      //ShareDialogUploader *garminUploader;
 
      QString athleteId;
