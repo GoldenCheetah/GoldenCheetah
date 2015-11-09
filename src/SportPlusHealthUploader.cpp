@@ -69,6 +69,7 @@ SportPlusHealthUploader::requestUpload()
 {
     QMessageLogger().info() << "---> Starting...";
     parent->progressLabel->setText(tr("sending to SportPlusHealth..."));
+    parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
 
     //Retrieve user credentials
     QString username = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER).toString();
@@ -96,7 +97,7 @@ SportPlusHealthUploader::requestUpload()
 
     PwxFileReader reader;
     reader.writeRideFile(context, ride->ride(), *uploadFile );
-    parent->progressBar->setValue(parent->progressBar->value()+20/parent->shareSiteCount);
+    qDebug() << "BARRA 2:" << parent->progressBar->value();
 
     int limit = 16777216; // 16MB
     if( uploadFile->size() >= limit ){
@@ -115,12 +116,14 @@ SportPlusHealthUploader::requestUpload()
     uploadFile->open(QIODevice::ReadOnly);
     filePart.setBodyDevice(uploadFile);
     body->append( filePart );
+    parent->progressBar->setValue(parent->progressBar->value()+20/parent->shareSiteCount);
 
     //Sending the authenticated post request to the API
     QNetworkRequest request;
     request.setUrl(url);
     request.setRawHeader("Authorization", "Basic " + QByteArray(QString("%1:%2").arg(username).arg(password).toLatin1()).toBase64());
     networkMgr.post(request, body);
+    parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
 }
 
 /*////////////////////
@@ -211,7 +214,7 @@ protected:
 void
 SportPlusHealthUploader::finishUpload(QNetworkReply *reply)
 {
-    parent->progressBar->setValue(parent->progressBar->value()+60/parent->shareSiteCount);
+    qDebug() << "BARRA 1:" << parent->progressBar->value();
 
     //Parsing JSON server reply
     QString strReply = (QString)reply->readAll();
@@ -231,6 +234,7 @@ SportPlusHealthUploader::finishUpload(QNetworkReply *reply)
        return;
     }
 
+    parent->progressBar->setValue(parent->progressBar->value()+60/parent->shareSiteCount);
     parent->progressLabel->setText(tr("successfully uploaded to SportPlusHealth"));
     eventLoop.quit();
 }
