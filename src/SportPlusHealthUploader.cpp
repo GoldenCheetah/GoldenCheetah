@@ -61,18 +61,7 @@ SportPlusHealthUploader::wasUploaded()
 void
 SportPlusHealthUploader::upload()
 {
-    uploadSuccessful = false;
     requestUpload();
-
-    if( !uploadSuccessful ){
-        parent->progressLabel->setText(tr("error uploading to SportPlusHealth"));
-
-    } else {
-        parent->progressLabel->setText(tr("successfully uploaded to SportPlusHealth as %1").arg(exerciseId));
-
-        ride->ride()->setTag("SphExercise", exerciseId );
-        ride->setDirty(true);
-    }
 }
 
 void
@@ -111,6 +100,7 @@ SportPlusHealthUploader::requestUpload()
 
     int limit = 16777216; // 16MB
     if( uploadFile->size() >= limit ){
+        parent->progressLabel->setText(tr("error uploading to SportPlusHealth"));
         parent->errorLabel->setText(tr("temporary file too large for upload: %1 > %1 bytes")
                                     .arg(uploadFile->size())
                                     .arg(limit) );
@@ -130,12 +120,7 @@ SportPlusHealthUploader::requestUpload()
     QNetworkRequest request;
     request.setUrl(url);
     request.setRawHeader("Authorization", "Basic " + QByteArray(QString("%1:%2").arg(username).arg(password).toLatin1()).toBase64());
-    QNetworkReply *reply = networkMgr.post(request, body);
-
-
-
-    //TODO: Resta da gestire il corretto valore di ritorno in base al contenuto della risposta JSON
-    uploadSuccessful = true;
+    networkMgr.post(request, body);
 }
 
 /*////////////////////
@@ -179,6 +164,7 @@ void
 SportPlusHealthUploader::dispatchReply( QNetworkReply *reply )
 {
     if( reply->error() != QNetworkReply::NoError ){
+        parent->progressLabel->setText(tr("error uploading to SportPlusHealth"));
         parent->errorLabel->setText( tr("request failed: ") + reply->errorString() );
 
         eventLoop.quit();
@@ -189,12 +175,12 @@ SportPlusHealthUploader::dispatchReply( QNetworkReply *reply )
     if( ! status.isValid() || status.toInt() != 200 ){
         QVariant msg( reply->attribute( QNetworkRequest::HttpReasonPhraseAttribute ) );
 
+        parent->progressLabel->setText(tr("error uploading to SportPlusHealth"));
         parent->errorLabel->setText( tr("request failed, Server response: %1 %2")
             .arg(status.toInt())
             .arg(msg.toString()) );
 
         eventLoop.quit();
-
         return;
     }
 
@@ -227,38 +213,24 @@ SportPlusHealthUploader::finishUpload(QNetworkReply *reply)
 {
     parent->progressBar->setValue(parent->progressBar->value()+60/parent->shareSiteCount);
 
-    SphUploadParser handler;
-    QXmlInputSource source( reply );
+    //Parsing JSON server reply
+    QString strReply = (QString)reply->readAll();
+    qDebug() << "Response:" << strReply;
+    QJsonObject jsonObj = QJsonDocument::fromJson(strReply.toUtf8()).object();
+    jsonResponseSuccess = jsonObj["success"].toBool();
+    jsonResponseErrorCode = jsonObj["error_code"].toInt();
+    reply->deleteLater();
 
-    QXmlSimpleReader reader;
-    reader.setContentHandler( &handler );
+    if(!jsonResponseSuccess) {
+       parent->progressLabel->setText(tr("error uploading to SportPlusHealth"));
+       parent->errorLabel->setText(tr("failed to upload file (cod. %1)").arg(jsonResponseErrorCode));
+       ride->ride()->setTag("SphExercise", exerciseId );
+       ride->setDirty(true);
 
-    QMessageLogger().info() << "---> ANSWER (1): " << handler.errorString();
-    QMessageLogger().info() << "---> ANSWER (2): " << reader.contentHandler();
-
-    if( ! reader.parse( source ) ){
-        parent->errorLabel->setText(tr("failed to parse upload response: ") + handler.errorString());
-
-        eventLoop.quit();
-        return;
+       eventLoop.quit();
+       return;
     }
 
-    if( handler.error.length() > 0 ){
-        parent->errorLabel->setText(tr("failed to upload file: ") + handler.error );
-
-        eventLoop.quit();
-        return;
-    }
-
-    exerciseId = handler.id;
-
-    if( exerciseId.length() == 0 ){
-        parent->errorLabel->setText(tr("got empty exercise"));
-
-        eventLoop.quit();
-        return;
-    }
-
-    uploadSuccessful = true;
+    parent->progressLabel->setText(tr("successfully uploaded to SportPlusHealth"));
     eventLoop.quit();
 }

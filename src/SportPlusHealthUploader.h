@@ -72,6 +72,8 @@ private:
     QString sessionId;
     QString exerciseId;
     bool uploadSuccessful;
+    bool jsonResponseSuccess;
+    int jsonResponseErrorCode;
 };
 
 #endif // SPORTPLUSHEALTHUPLOADER_H
