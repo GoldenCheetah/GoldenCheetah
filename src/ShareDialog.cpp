@@ -284,7 +284,7 @@ ShareDialog::upload()
     if ( !rideWithGPSChk->isChecked() && !selfLoopsChk->isChecked()
         && !veloHeroChk->isChecked() && !trainingstagebuchChk->isChecked()
         && !stravaChk->isChecked() && !cyclingAnalyticsChk->isChecked()
-        //&& !garminChk->isChecked()
+        && !sportplushealthChk->isChecked() //&& !garminChk->isChecked()
         ) {
         QMessageBox aMsgBox;
         aMsgBox.setText(tr("No share site selected !"));
@@ -317,6 +317,9 @@ ShareDialog::upload()
     if (trainingstagebuchChk->isChecked()) {
         shareSiteCount ++;
     }
+    if (sportplushealthChk->isChecked()) {
+        shareSiteCount ++;
+    }
     //if (garminChk->isChecked()) {
     //    shareSiteCount ++;
     //}
@@ -338,6 +341,9 @@ ShareDialog::upload()
     }
     if (trainingstagebuchChk->isEnabled() && trainingstagebuchChk->isChecked()) {
         doUploader( trainingstagebuchUploader );
+    }
+    if (sportplushealthChk->isEnabled() && sportplushealthChk->isChecked()) {
+        doUploader( sportplushealthUploader );
     }
     //if (garminChk->isEnabled() && garminChk->isChecked()) {
     //    doUploader( garminUploader );
