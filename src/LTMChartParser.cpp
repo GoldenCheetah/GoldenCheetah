@@ -107,8 +107,8 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
     if (!file.open(QFile::WriteOnly)) {
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setText(QObject::tr("Problem Saving Charts Configuration"));
-        msgBox.setInformativeText(QObject::tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
+        msgBox.setText(tr("Problem Saving Charts Configuration"));
+        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
         msgBox.exec();
         return;
     };

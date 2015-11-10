@@ -133,7 +133,7 @@ VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
 
     QHBoxLayout *vdotHBox = new QHBoxLayout;
     vdotHBox->addStretch();
-    labelVDOT = new QLabel(tr("Your VDOT:"));
+    labelVDOT = new QLabel(tr("Your Daniels VDOT:"));
     vdotHBox->addWidget(labelVDOT);
     txtVDOT = new QLineEdit(this);
     txtVDOT->setAlignment(Qt::AlignRight);
@@ -146,7 +146,7 @@ VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
 
     // Training Pace Table
     QVBoxLayout *tableLayout = new QVBoxLayout;
-    labelTPACE = new QLabel(tr("Your Daniels' Training Paces:"));
+    labelTPACE = new QLabel(tr("Your Training Paces:"));
     tableLayout->addWidget(labelTPACE);
     tableWidgetTPACE = new QTableWidget(5, 3, this);
     for (int j = 0; j< 3; j++) tableWidgetTPACE->setColumnWidth(j, 60);

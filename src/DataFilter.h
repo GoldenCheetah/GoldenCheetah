@@ -52,6 +52,7 @@ class Result {
 };
 
 class Leaf {
+    Q_DECLARE_TR_FUNCTIONS(Leaf)
 
     public:
 

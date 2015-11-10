@@ -875,7 +875,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     symbol.compare("Current", Qt::CaseInsensitive) &&
                     !df->dataSeriesSymbols.contains(symbol) &&
                     symbol != "isSwim" && symbol != "isRun" && !isCoggan(symbol)) {
-                    DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
+                    DataFiltererrors << QString(tr("%1 is unknown")).arg(symbol);
                     leaf->inerror = true;
                 }
 
@@ -907,19 +907,19 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                 QString symbol = leaf->series->lvalue.n->toLower();
 
                 if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol)) {
-                    DataFiltererrors << QString(QObject::tr("invalid data series for best(): %1")).arg(symbol);
+                    DataFiltererrors << QString(tr("invalid data series for best(): %1")).arg(symbol);
                     leaf->inerror = true;
                 }
 
                 if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol)) {
-                    DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
+                    DataFiltererrors << QString(tr("invalid data series for tiz(): %1")).arg(symbol);
                     leaf->inerror = true;
                 }
 
                 if (leaf->function == "daterange") {
 
                     if (!dateRangeValidSymbols.exactMatch(symbol)) {
-                        DataFiltererrors << QString(QObject::tr("invalid literal for daterange(): %1")).arg(symbol);
+                        DataFiltererrors << QString(tr("invalid literal for daterange(): %1")).arg(symbol);
                         leaf->inerror = true;
 
                     } else {
@@ -933,13 +933,13 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                 }
 
                 if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol)) {
-                    DataFiltererrors << QString(QObject::tr("invalid literal for config(): %1")).arg(symbol);
+                    DataFiltererrors << QString(tr("invalid literal for config(): %1")).arg(symbol);
                     leaf->inerror = true;
                 }
 
                 if (leaf->function == "const") {
                     if (!constValidSymbols.exactMatch(symbol)) {
-                        DataFiltererrors << QString(QObject::tr("invalid literal for const(): %1")).arg(symbol);
+                        DataFiltererrors << QString(tr("invalid literal for const(): %1")).arg(symbol);
                         leaf->inerror = true;
                     } else {
 
@@ -966,7 +966,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     // 2 or more
                     if (leaf->fparms.count() < 2) {
                         leaf->inerror = true;
-                        DataFiltererrors << QString(QObject::tr("which function has at least 2 parameters."));
+                        DataFiltererrors << QString(tr("which function has at least 2 parameters."));
                     }
 
                     // still normal parm check !
@@ -981,7 +981,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     if (leaf->fparms.count() > 0) {
                         if (leaf->fparms[0]->type != Leaf::Symbol) {
                             leaf->inerror = true;
-                            DataFiltererrors << QString(QObject::tr("isset/set/unset function first parameter is field/metric to set."));
+                            DataFiltererrors << QString(tr("isset/set/unset function first parameter is field/metric to set."));
                         } else {
                             QString symbol = *(leaf->fparms[0]->lvalue.n);
 
@@ -992,7 +992,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                                 !symbol.compare("Current", Qt::CaseInsensitive) ||
                                 df->dataSeriesSymbols.contains(symbol) ||
                                 symbol == "isSwim" || symbol == "isRun" || isCoggan(symbol)) {
-                                DataFiltererrors << QString(QObject::tr("%1 is not supported in isset/set/unset operations")).arg(symbol);
+                                DataFiltererrors << QString(tr("%1 is not supported in isset/set/unset operations")).arg(symbol);
                                 leaf->inerror = true;
                             }
                         }
@@ -1002,15 +1002,15 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     if (leaf->function == "issset" && leaf->fparms.count() != 1) {
 
                         leaf->inerror = true;
-                        DataFiltererrors << QString(QObject::tr("isset has one parameter, a symbol to check."));
+                        DataFiltererrors << QString(tr("isset has one parameter, a symbol to check."));
 
                     } else if ((leaf->function == "set" && leaf->fparms.count() != 3) ||
                         (leaf->function == "unset" && leaf->fparms.count() != 2)) {
 
                         leaf->inerror = true;
                         DataFiltererrors << (leaf->function == "set" ? 
-                            QString(QObject::tr("set function needs 3 paramaters; symbol, value and expression.")) : 
-                            QString(QObject::tr("unset function needs 2 paramaters; symbol and expression.")));
+                            QString(tr("set function needs 3 paramaters; symbol, value and expression.")) : 
+                            QString(tr("unset function needs 2 paramaters; symbol and expression.")));
 
                     } else {
 
@@ -1028,13 +1028,13 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                         if (leaf->fparms[0]->type != Leaf::Symbol) {
 
                             leaf->fparms[0]->inerror = true;
-                            DataFiltererrors << QString(QObject::tr("estimate function expects model name as first parameter."));
+                            DataFiltererrors << QString(tr("estimate function expects model name as first parameter."));
 
                         } else {
 
                             if (!pdmodels().contains(*(leaf->fparms[0]->lvalue.n))) {
                                 leaf->inerror = leaf->fparms[0]->inerror = true;
-                                DataFiltererrors << QString(QObject::tr("estimate function expects model name as first parameter"));
+                                DataFiltererrors << QString(tr("estimate function expects model name as first parameter"));
                             }
                         }
 
@@ -1045,7 +1045,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                                 QRegExp estimateValidSymbols("^(cp|ftp|pmax|w')$", Qt::CaseInsensitive);
                                 if (!estimateValidSymbols.exactMatch(*(leaf->fparms[1]->lvalue.n))) {
                                     leaf->inerror = leaf->fparms[1]->inerror = true;
-                                    DataFiltererrors << QString(QObject::tr("estimate function expects parameter or duration as second parameter"));
+                                    DataFiltererrors << QString(tr("estimate function expects parameter or duration as second parameter"));
                                 }
                             } else {
                                 validateFilter(df, leaf->fparms[1]);
@@ -1065,7 +1065,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
                         // with the right number of parameters?
                         if (DataFilterFunctions[i].parameters && leaf->fparms.count() != DataFilterFunctions[i].parameters) {
-                            DataFiltererrors << QString(QObject::tr("function '%1' expects %2 parameter(s) not %3")).arg(leaf->function)
+                            DataFiltererrors << QString(tr("function '%1' expects %2 parameter(s) not %3")).arg(leaf->function)
                                                 .arg(DataFilterFunctions[i].parameters).arg(fparms.count());
                             leaf->inerror = true;
                         }
@@ -1076,7 +1076,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
                 // not known!
                 if (!found) {
-                    DataFiltererrors << QString(QObject::tr("unknown function %1")).arg(leaf->function);
+                    DataFiltererrors << QString(tr("unknown function %1")).arg(leaf->function);
                     leaf->inerror=true;
                 }
             }
@@ -1086,7 +1086,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
     case Leaf::UnaryOperation :
         { // only 1 at present, unary minus return the value * -1
             if (!Leaf::isNumber(df, leaf->lvalue.l)) {
-                DataFiltererrors << QString(QObject::tr("unary negation on a string!"));
+                DataFiltererrors << QString(tr("unary negation on a string!"));
                 leaf->inerror = true;
             }
         }
@@ -1098,14 +1098,14 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             bool lhsType = Leaf::isNumber(df, leaf->lvalue.l);
             bool rhsType = Leaf::isNumber(df, leaf->rvalue.l);
             if (lhsType != rhsType) {
-                DataFiltererrors << QString(QObject::tr("comparing strings with numbers"));
+                DataFiltererrors << QString(tr("comparing strings with numbers"));
                 leaf->inerror = true;
             }
 
             // what about using string operations on a lhs/rhs that
             // are numeric?
             if ((lhsType || rhsType) && leaf->op >= MATCHES && leaf->op <= CONTAINS) {
-                DataFiltererrors << QObject::tr("using a string operations with a number");
+                DataFiltererrors << tr("using a string operations with a number");
                 leaf->inerror = true;
             }
 
@@ -1133,7 +1133,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
     case Leaf::Parameters :
         {
             // should never get here !
-            DataFiltererrors << QObject::tr("internal parser error: parms");
+            DataFiltererrors << tr("internal parser error: parms");
             leaf->inerror = true;
         }
         break;
