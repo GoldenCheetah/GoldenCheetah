@@ -1456,7 +1456,7 @@ MainWindow::saveRide()
     currentTab->context->ride->notifyRideMetadataChanged();
 
     // nothing to do if not dirty
-    if (currentTab->context->ride->isDirty() == false) return;
+    //XXX FORCE A SAVE if (currentTab->context->ride->isDirty() == false) return;
 
     // save
     if (currentTab->context->ride) {

@@ -65,7 +65,7 @@ setWarnExit(bool setting)
 bool
 MainWindow::saveRideSingleDialog(Context *context, RideItem *rideItem)
 {
-    if (rideItem->isDirty() == false) return false; // nothing to save you must be a ^S addict.
+    //XXX always save if (rideItem->isDirty() == false) return false; // nothing to save you must be a ^S addict.
 
     // get file type
     QFile   currentFile(rideItem->path + QDir::separator() + rideItem->fileName);
