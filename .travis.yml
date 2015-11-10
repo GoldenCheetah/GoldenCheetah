@@ -96,7 +96,7 @@ script:
 after_success:
 - cd src
 - ls -laR GoldenCheetah.app
-- sh ../travis/check-gc.sh
+- GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
 - /usr/local/opt/$QT_PATH/bin/macdeployqt GoldenCheetah.app -verbose=2 -dmg
 ## fix up the bundle with macdeployqtfix
 - python ../travis/macdeployqtfix.py GoldenCheetah.app /usr/local/opt/$QT_PATH
