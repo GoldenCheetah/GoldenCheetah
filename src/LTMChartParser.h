@@ -28,6 +28,7 @@
 
 class LTMChartParser : public QXmlDefaultHandler
 {
+    Q_DECLARE_TR_FUNCTIONS(LTMChartParser)
 
 public:
     static void serialize(QString, QList<LTMSettings>);
