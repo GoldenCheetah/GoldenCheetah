@@ -218,6 +218,8 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     avgKPH->setDecimals(1);
     avgKPH->setMinimum(0);
     avgKPH->setMaximum(100);
+    // Average Speed depends on Distance and Duration, only for display
+    avgKPH->setEnabled(false);
 
     // how to estimate stress
     QLabel *modeLabel = new QLabel(tr("Estimate Stress by:"), this);
@@ -489,13 +491,6 @@ ManualRideDialog::okClicked()
         QMap<QString,QString> override;
         override.insert("value", QString("%1").arg(avgRPM->value()));
         rideFile->metricOverrides.insert("average_cad", override);
-    }
-    if (avgKPH->value()) {
-        QMap<QString,QString> override;
-        // Avg Speed is shown according to units preferences
-        double kph = (context->athlete->useMetricUnits ? 1.0 : KM_PER_MILE) * avgKPH->value();
-        override.insert("value", QString("%1").arg(kph));
-        rideFile->metricOverrides.insert("average_speed", override);
     }
     if (avgWatts->value()) {
         QMap<QString,QString> override;
