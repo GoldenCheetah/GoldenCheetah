@@ -40,8 +40,8 @@ class FixMoxyConfig : public DataProcessorConfig
     public:
         FixMoxyConfig(QWidget *parent) : DataProcessorConfig(parent) {
 
-            //HelpWhatsThis *help = new HelpWhatsThis(parent);
-            //parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixMoxy));
+            HelpWhatsThis *help = new HelpWhatsThis(parent);
+            parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixMoxy));
         }
 
         //~FixMoxyConfig() {} // deliberately not declared since Qt will delete
