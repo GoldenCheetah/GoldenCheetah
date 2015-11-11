@@ -8591,9 +8591,13 @@ Máx Absoluto - define un valor máximo para la FC, cualquier valor superior ser
 <context>
     <name>FixMoxyConfig</name>
     <message>
-        <location filename="../FixMoxy.cpp" line="51"/>
         <source>When recording from the Moxy in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
-        <translation>Cuando los registros Moxy se realizan en modo Velocidad y Cadencia los datos SmO2 y tHg se envía como cadencia y velocidad respectivamente. Esta herramientoa actualiza el archivo de actividad para mover los valores de velocidad y cadencia a las series Moxy.</translation>
+        <translation type="vanished">Cuando los registros Moxy se realizan en modo Velocidad y Cadencia los datos SmO2 y tHg se envía como cadencia y velocidad respectivamente. Esta herramientoa actualiza el archivo de actividad para mover los valores de velocidad y cadencia a las series Moxy.</translation>
+    </message>
+    <message>
+        <location filename="../FixMoxy.cpp" line="51"/>
+        <source>When recording from the Moxy or BSX Insight in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
