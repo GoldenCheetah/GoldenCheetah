@@ -48,7 +48,7 @@ class FixMoxyConfig : public DataProcessorConfig
                               // the widget and its children when the config pane is deleted
 
         QString explain() {
-            return(QString(tr("When recording from the Moxy in Speed and"
+            return(QString(tr("When recording from the Moxy or BSX Insight in Speed and"
                            " cadence mode the SmO2 and tHb data is sent as"
                            " cadence and speed respectively. This tool will"
                            " update the activity file to move the values from speed"
