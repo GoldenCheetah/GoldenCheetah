@@ -89,7 +89,7 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
 {
     setWindowTitle(tr("Share your activity"));
     HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_Share));
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Share_Online));
 
     // make the dialog a resonable size
     setMinimumWidth(550);
