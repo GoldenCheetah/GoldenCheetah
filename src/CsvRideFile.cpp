@@ -144,6 +144,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
     QRegExp iBikeCSV("iBike,\\d\\d?,[a-z]+", Qt::CaseInsensitive);
     QRegExp moxyCSV("FW Part Number:", Qt::CaseInsensitive);
+    QRegExp smo2CSV("Type,Local Number,Message");
     QRegExp gcCSV("secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb");
     QRegExp periCSV("mm-dd,hh:mm:ss,SmO2 Live,SmO2 Averaged,THb,Target Power,Heart Rate,Speed,Power,Cadence");
     QRegExp freemotionCSV("Stages Data", Qt::CaseInsensitive);
@@ -166,6 +167,9 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
     int secsIndex=-1;
     //UNUSED int minutesIndex = -1;
+    int wattsIndex=-1;
+    int smo2Index=-1;
+    int hrIndex=-1;
 
     double precAvg=0.0;
     //double precWatts=0.0;
@@ -249,6 +253,15 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     ++lineno;
                     continue;
                 }
+                else if(smo2CSV.indexIn(line) != -1) {
+                   csvType = bsx;
+                   rideFile->setDeviceType("BSX Insight");
+                   rideFile->setFileFormat("BSX Insight CSV (csv)");
+                   unitsHeader = 6;
+                   recInterval = 1;
+                   ++lineno;
+                   continue;
+               }
                 else if(gcCSV.indexIn(line) != -1) {
                     csvType = gc;
                     rideFile->setDeviceType("GoldenCheetah");
@@ -341,9 +354,12 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
                 }
             }
-            if (lineno == unitsHeader && csvType == generic) {
-                QRegExp timeHeaderSecs("( )*(secs|sec|time)( )*", Qt::CaseInsensitive);
-                QRegExp timeHeaderMins("( )*(min|minutes)( )*", Qt::CaseInsensitive);
+            if (lineno == unitsHeader && (csvType == generic || csvType == bsx)) {
+                QRegExp timeHeaderSecs("( )*(secs|sec|time|timestamp)( )*", Qt::CaseInsensitive);
+                //QRegExp timeHeaderMins("( )*(min|minutes)( )*", Qt::CaseInsensitive);
+                QRegExp wattsHeader("( )*(watts|power)( )*", Qt::CaseInsensitive);
+                QRegExp smo2Header("( )*(smo2)( )*", Qt::CaseInsensitive);
+                QRegExp hrHeader("( )*(hr|heart_rate)( )*", Qt::CaseInsensitive);
                 QStringList headers = line.split(",");
 
                 QStringListIterator i(headers);
@@ -352,9 +368,26 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     QString header = i.next();
                     if (timeHeaderSecs.indexIn(header) != -1)  {
                         secsIndex = headers.indexOf(header);
+                        if (csvType == bsx)
+                            secsIndex++;
                     }/* UNUSED else if (timeHeaderMins.indexIn(header) != -1)  {
                         minutesIndex = headers.indexOf(header);
                     } */
+                    if (wattsHeader.indexIn(header) != -1)  {
+                        wattsIndex = headers.indexOf(header);
+                        if (csvType == bsx)
+                            wattsIndex++;
+                    }
+                    if (hrHeader.indexIn(header) != -1)  {
+                        hrIndex = headers.indexOf(header);
+                        if (csvType == bsx)
+                            hrIndex++;
+                    }
+                    if (smo2Header.indexIn(header) != -1)  {
+                        smo2Index = headers.indexOf(header);
+                        if (csvType == bsx)
+                            smo2Index++;
+                    }
                 }
             }
             else if (lineno == unitsHeader && csvType != moxy && csvType != peripedal) {
@@ -374,7 +407,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 else if (degFUnits.indexIn(line) != -1)
                     tempType = degF;
 
-            } else if (lineno > unitsHeader) {
+            }
+            else if (lineno > unitsHeader) {
                 double minutes=0,nm=0,kph=0,watts=0,km=0,cad=0,alt=0,hr=0,dfpm=0, seconds=0.0;
                 double temp=RideFile::NoTemp;
                 double slope=0.0;
@@ -578,6 +612,28 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         minutes = seconds / 60.0f;
                         smo2 = line.section(',', 2, 2).remove("\"").toDouble();
                         thb = line.section(',', 4, 4).remove("\"").toDouble();
+                    }
+                }
+                else if (csvType == bsx)  {
+                    if (secsIndex > -1) {
+                        seconds = line.section(',', secsIndex, secsIndex).toDouble();
+                        QDateTime time = QDateTime::fromTime_t(seconds);
+                        if (startTime == QDateTime()) {
+                            startTime = time;
+                            seconds = 1;
+                        }
+                        else
+                            seconds = startTime.secsTo(time)+1;
+                        minutes = seconds / 60.0f;
+                    }
+                    if (wattsIndex > -1) {
+                        watts = line.section(',', wattsIndex, wattsIndex).toDouble();
+                    }
+                    if (hrIndex > -1) {
+                        hr = line.section(',', hrIndex, hrIndex).toDouble();
+                    }
+                    if (smo2Index > -1) {
+                        smo2 = line.section(',', smo2Index, smo2Index).toDouble();
                     }
                 }
                else if(csvType == motoactv) {
