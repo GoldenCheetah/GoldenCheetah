@@ -51,10 +51,13 @@ Q_OBJECT
                  MenuBar_Activity_Import,
                  MenuBar_Activity_Manual,
                  MenuBar_Activity_Manual_LapsEditor,
-                 MenuBar_Activity_Share,
                  MenuBar_Activity_BatchExport,
                  MenuBar_Activity_SplitRide,
                  MenuBar_Activity_CombineRides,
+
+                 MenuBar_Share,
+                 MenuBar_Share_Online,
+
 
                  MenuBar_Tools,
                  MenuBar_Tools_CP_EST,
@@ -77,6 +80,8 @@ Q_OBJECT
                  MenuBar_Edit_FixHRSpikes,
                  MenuBar_Edit_FixPowerSpikes,
                  MenuBar_Edit_FixSpeed,
+                 MenuBar_Edit_FixFreewheeling,
+                 MenuBar_Edit_FixMoxy,
 
                  MenuBar_View,
                  MenuBar_Help,
@@ -86,6 +91,7 @@ Q_OBJECT
                  ChartTrends_MetricTrends_Config_Preset,
                  ChartTrends_MetricTrends_Config_Curves,
                  ChartTrends_MetricTrends_Curves_Settings,
+                 ChartTrends_MetricTrends_User_Data,
 
                  ChartTrends_CollectionTreeMap,
                  ChartTrends_Critical_MM,
@@ -142,6 +148,7 @@ Q_OBJECT
                  Preferences_Athlete_Autoimport,
                  Preferences_Passwords,
                  Preferences_Appearance,
+                 Preferences_Intervals,
                  Preferences_DataFields,
                  Preferences_DataFields_Fields,
                  Preferences_DataFields_Notes_Keywords,

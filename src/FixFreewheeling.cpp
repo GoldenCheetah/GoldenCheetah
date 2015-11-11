@@ -36,8 +36,8 @@ class FixFreewheelingConfig : public DataProcessorConfig
     public:
         FixFreewheelingConfig(QWidget *parent) : DataProcessorConfig(parent) {
 
-            //HelpWhatsThis *help = new HelpWhatsThis(parent);
-            //parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixFreewheeling));
+            HelpWhatsThis *help = new HelpWhatsThis(parent);
+            parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixFreewheeling));
         }
 
         //~FixFreewheelingConfig() {} // deliberately not declared since Qt will delete

@@ -155,8 +155,8 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     pagesWidget->addWidget(metric);
 
     interval = new IntervalConfig(_home, _zones, context);
-    //HelpWhatsThis *intervalHelp = new HelpWhatsThis(interval);
-    //interval->setWhatsThis(intervalHelp->getWhatsThisText(HelpWhatsThis::Preferences_Intervals));
+    HelpWhatsThis *intervalHelp = new HelpWhatsThis(interval);
+    interval->setWhatsThis(intervalHelp->getWhatsThisText(HelpWhatsThis::Preferences_Intervals));
     pagesWidget->addWidget(interval);
 
     device = new DeviceConfig(_home, _zones, context);

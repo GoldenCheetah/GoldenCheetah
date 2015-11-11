@@ -101,15 +101,19 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Menu%20Bar_Activity").arg(tr("Manual creation of an activity where the most relevant data can be added in this dialog"));
     case MenuBar_Activity_Manual_LapsEditor:
         return text.arg("Menu%20Bar_Activity").arg(tr("Laps Editor allows to enter a sequence of work-rest intervals series -defined by number of repetitions (reps), distance (dist, units according to preferences in Pace Zones) and duration (min and sec)- to generate the data points for the activity"));
-    case MenuBar_Activity_Share:
-        return text.arg("Special%20Topics_Upload_Download%20to_from%20external%20web-sites#execution")
-                .arg(tr("Sharing an activity with other trainingsites - only sites for which the authorization has been configured can be seleted for sharing here"));
+
     case MenuBar_Activity_BatchExport:
         return text.arg("Menu%20Bar_Activity").arg(tr("Exports a (selectable) set of activties in one of the supported export formats"));
     case MenuBar_Activity_SplitRide:
         return text.arg("Menu%20Bar_Activity").arg(tr("Wizard to split an activity into multiple activities based on configurable criteria"));
     case MenuBar_Activity_CombineRides:
         return text.arg("Menu%20Bar_Activity").arg(tr("Wizard to combine data with the currently selected activity in multiple ways"));
+
+    case MenuBar_Share:
+            return text.arg("Menu%20Bar_Share").arg(tr("All functions related to sharing of activities with cloud services"));
+    case MenuBar_Share_Online:
+        return text.arg("Special%20Topics_Upload_Download%20to_from%20external%20web-sites#execution")
+                .arg(tr("Sharing an activity with other trainingsites - only sites for which the authorization has been configured can be seleted for sharing here"));
 
     case MenuBar_Tools:
         return text.arg("Menu%20Bar_Tools").arg(tr("A set of functions related different features in GoldenCheetah - please check the details for more information"));
@@ -132,27 +136,32 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case MenuBar_Edit:
         return text.arg("Menu%20Bar_Edit").arg(tr("Wizards which fix, adjust, add series data of the current activity"));
     case MenuBar_Edit_AddTorqueValues:
-        return text.arg("Menu%20Bar_Tools#tool-add-torque").arg(tr("Add Torque Values"));
+        return text.arg("Menu%20Bar_Edit").arg(tr("Add Torque Values"));
     case MenuBar_Edit_AdjustPowerValues:
-        return text.arg("Menu%20Bar_Tools#tool-adjust-torque").arg(tr("Adjust Power Values"));
+        return text.arg("Menu%20Bar_Edit").arg(tr("Adjust Power Values"));
     case MenuBar_Edit_AdjustTorqueValues:
-        return text.arg("Menu%20Bar_Tools#tool-adjust-power").arg(tr("Adjust Torque Values"));
+        return text.arg("Menu%20Bar_Edit").arg(tr("Adjust Torque Values"));
     case MenuBar_Edit_EstimatePowerValues:
-        return text.arg("Menu%20Bar_Tools#tool-estimate-power").arg(tr("Estimate Power Values"));
+        return text.arg("Menu%20Bar_Edit").arg(tr("Estimate Power Values"));
     case MenuBar_Edit_EstimateDistanceValues:
-        return text.arg("Menu%20Bar_Tools#tool-estimate-distance").arg(tr("Estimate Distance Values"));
+        return text.arg("Menu%20Bar_Edit").arg(tr("Estimate Distance Values"));
     case MenuBar_Edit_FixElevationErrors:
-        return text.arg("Menu%20Bar_Tools#tool-fix-elevation-errors").arg(tr("Fix Elevation Errors"));
+        return text.arg("Menu%20Bar_Edit").arg(tr("Fix Elevation Errors"));
     case MenuBar_Edit_FixGapsInRecording:
-        return text.arg("Menu%20Bar_Tools#tool-fix-gaps-in-recording").arg(tr("Fix Gaps in Recording"));
+        return text.arg("Menu%20Bar_Edit").arg(tr("Fix Gaps in Recording"));
     case MenuBar_Edit_FixGPSErrors:
-        return text.arg("Menu%20Bar_Tools#tool-fix-gps-errors").arg(tr("Fix GPS Errors"));
+        return text.arg("Menu%20Bar_Edits").arg(tr("Fix GPS Errors"));
     case MenuBar_Edit_FixHRSpikes:
-        return text.arg("Menu%20Bar_Tools#tool-fix-hr-spikes").arg(tr("Fix HR Spikes"));
+        return text.arg("Menu%20Bar_Edit").arg(tr("Fix HR Spikes"));
     case MenuBar_Edit_FixPowerSpikes:
-        return text.arg("Menu%20Bar_Toolss#tool-fix-power-spikes").arg(tr("Fix Power Spikes"));
+        return text.arg("Menu%20Bar_Edit").arg(tr("Fix Power Spikes"));
     case MenuBar_Edit_FixSpeed:
-        return text.arg("Menu%20Bar_Toolss#tool-fix-speed").arg(tr("Fix Speed"));
+        return text.arg("Menu%20Bar_Edit").arg(tr("Fix Speed"));
+    case MenuBar_Edit_FixFreewheeling:
+        return text.arg("Menu%20Bar_Edit").arg(tr("Fix Freewheeling from Power and Speed"));
+    case MenuBar_Edit_FixMoxy:
+        return text.arg("Menu%20Bar_Edit").arg(tr("Fix Moxy data by moving the moxy values from speed"
+                                                  " and cadence into the Moxy series"));
 
     case MenuBar_View:
         return text.arg("Menu%20Bar_View").arg(tr("Options to show/hide views (e.g. Sidebar) as well as adding charts and resetting chart layouts to factory settings"));
@@ -170,6 +179,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Trends#curves").arg(tr("Curves which are plotted for the specific chart - based on presets or individually added and modified here"));
     case ChartTrends_MetricTrends_Curves_Settings:
         return text.arg("ChartTypes_Trends#curves-details").arg(tr("Individual curve configuration"));
+    case ChartTrends_MetricTrends_User_Data:
+        return text.arg("ChartTypes_Trends#user-data").arg(tr("User defined formulas"));
 
     case ChartTrends_CollectionTreeMap:
         return text.arg("ChartTypes_Trends#collection-tree-map").arg(tr("Tree map visulation of activity data by two selectable dimensions for a configurable metric"));
@@ -276,6 +287,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Preferences_Passwords").arg(tr("Passwords"));
     case Preferences_Appearance:
         return text.arg("Preferences_Appearance").arg(tr("Appearance"));
+    case Preferences_Intervals:
+        return text.arg("Preferences_Intervals").arg(tr("Automatic Interval Detection"));
     case Preferences_DataFields:
         return text.arg("Preferences_Data%20Fields").arg(tr("Data Fields"));
     case Preferences_DataFields_Fields:
