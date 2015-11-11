@@ -403,6 +403,7 @@ public:
     int rawWrite(uint8_t *bytes, int size);
 
     bool modeERGO(void) const;
+    bool modeSLOPE(void) const;
 
     // channels update our telemetry
     double channelValue(int channel);
@@ -458,6 +459,7 @@ public:
 
     void setFecChannel(int channel);
     void refreshFecLoad();
+    void refreshFecGradient();
     void requestFecCapabilities();
 
     void setVortexData(int channel, int id);

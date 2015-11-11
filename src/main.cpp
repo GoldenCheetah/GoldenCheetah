@@ -16,22 +16,24 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "Context.h"
+#include "Athlete.h"
+#include "MainWindow.h"
+#include "Settings.h"
+#include "TrainDB.h"
+#include "Colors.h"
+#include "GcUpgrade.h"
+
 #include <QApplication>
 #include <QtGui>
 #include <QFile>
 #include <QWebSettings>
 #include <QMessageBox>
 #include "ChooseCyclistDialog.h"
-#include "MainWindow.h"
-#include "Settings.h"
-#include "TrainDB.h"
-#include "Colors.h"
 #ifdef GC_WANT_HTTP
 #include "httplistener.h"
 #include "httprequesthandler.h"
 #endif
-
-#include "GcUpgrade.h"
 
 #include <signal.h>
 

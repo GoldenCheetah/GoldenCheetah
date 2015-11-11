@@ -586,17 +586,19 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            case CHANNEL_TYPE_CADENCE:
            {
                float rpm;
+               static float last_measured_rpm;
                uint16_t time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
                uint16_t revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
                if (time) {
                    rpm = 1024*60*revs / time;
+                   last_measured_rpm = rpm;
                    lastMessageTimestamp = QTime::currentTime();
                } else {
                    int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getCadence());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
-                   if (rpm < (float) 4.0)
-                       rpm = 0.0; // if rpm is less than 4 then we consider that we are stopped
+                   if (rpm < last_measured_rpm / 2.0)
+                       rpm = 0.0; // if rpm is less than half previous cadence we consider that we are stopped
                }
                parent->setCadence(rpm);
                value2 = value = rpm;
@@ -607,11 +609,13 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            case CHANNEL_TYPE_SandC:
            {
                float rpm;
+               static float last_measured_rpm;
                // cadence first...
                uint16_t time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
                uint16_t revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
                if (time) {
                    rpm = 1024*60*revs / time;
+                   last_measured_rpm = rpm;
 
                    if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
                    else parent->setCadence(rpm);
@@ -620,8 +624,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getCadence());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
-                   if (rpm < (float) 4.0)
-                       rpm = 0.0; // if rpm is less than 4 then we consider that we are stopped
+                   if (rpm < last_measured_rpm / 2.0)
+                       rpm = 0.0; // if rpm is less than half previous cadence we consider that we are stopped
                    parent->setCadence(rpm);
                }
                value = rpm;
@@ -638,8 +642,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    int ms = lastMessageTimestamp2.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getWheelRpm());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
-                   if (rpm < (float) 4.0)
-                       rpm = 0.0; // if rpm is less than 4 then we consider that we are stopped
+                   if (rpm < (float) 15.0)
+                       rpm = 0.0; // if rpm is less than 15rpm (=4s) then we consider that we are stopped
                    parent->setWheelRpm(rpm);
                }
                value2 = rpm;
@@ -659,8 +663,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getWheelRpm());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
-                   if (rpm < (float) 4.0)
-                       rpm = 0.0; // if rpm is less than 4 then we consider that we are stopped
+                   if (rpm < (float) 15.0)
+                       rpm = 0.0; // if rpm is less than 15 (4s) then we consider that we are stopped
                }
                parent->setWheelRpm(rpm);
                value2=value=rpm;
@@ -679,15 +683,17 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
            case CHANNEL_TYPE_FITNESS_EQUIPMENT:
            {
-               is_fec = true;
                static int fecRefreshCounter = 1;
 
                parent->setFecChannel(number);
                // we don't seem to receive ACK messages, so use this workaround
-               // to ensure load is always set correctly
-               if ((fecRefreshCounter++ % 10) == 0 && parent->modeERGO())
+               // to ensure load/gradient is always set correctly
+               if ((fecRefreshCounter++ % 10) == 0)
                {
-                   parent->refreshFecLoad();
+                   if  (parent->modeERGO())
+                       parent->refreshFecLoad();
+                   else if (parent->modeSLOPE())
+                        parent->refreshFecGradient();
                }
 
                if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE)
@@ -778,6 +784,12 @@ void ANTChannel::channelId(unsigned char *ant_message) {
         qDebug()<<number<<"KICKR DETECTED VIA CHANNEL ID EVENT";
     }
 
+    is_fec = (device_id == ANT_SPORT_FITNESS_EQUIPMENT_TYPE);
+
+    if (is_fec) {
+        qDebug()<<number<<"ANT FE-C DETECTED VIA CHANNEL ID EVENT";
+    }
+
     // tell controller we got a new channel id
     setId();
     emit channelInfo(number, device_number, device_id);
@@ -851,8 +863,10 @@ void ANTChannel::attemptTransition(int message_id)
     const ant_sensor_type_t *st;
     int previous_state=state;
     st=&(parent->ant_sensor_types[channel_type]);
+    device_id=st->device_id;
+    setId();
 
-    //qDebug()<<number<<"type="<<channel_type<<"device type="<<device_id<<"freq="<<st->frequency;
+    qDebug()<<number<<"type="<<channel_type<<"device type="<<device_id<<"freq="<<st->frequency;
 
     // update state
     state=message_id;
@@ -875,11 +889,9 @@ void ANTChannel::attemptTransition(int message_id)
         //qDebug()<<number<<"TRANSITION from unassigned";
 
         qDebug()<<number<<"assign channel type RX";
+
         // assign and set channel id all in one
         parent->sendMessage(ANTMessage::assignChannel(number, CHANNEL_TYPE_RX, st->network)); // receive channel on network 1
-
-        device_id=st->device_id;
-        setId();
         break;
 
     case ANT_ASSIGN_CHANNEL:
@@ -948,7 +960,6 @@ void ANTChannel::attemptTransition(int message_id)
 
 uint8_t ANTChannel::capabilities()
 {
-    // TODO: run this request once when just connected to device
     if (!is_fec)
         return 0;
 
@@ -958,7 +969,7 @@ uint8_t ANTChannel::capabilities()
     // if we do not know device capabilities, request it
     qDebug() << qPrintable("Ask for capabilities");
     parent->requestFecCapabilities();
-        return 0;
+    return 0;
 }
 
 // Calibrate... needs fixing in version 3.1

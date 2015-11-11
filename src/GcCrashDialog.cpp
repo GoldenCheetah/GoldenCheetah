@@ -311,14 +311,14 @@ QString GcCrashDialog::versionHTML()
             .arg(libusb)
             .arg(wfapi)
             .arg(vlc)
-#ifdef GC_VIDEO_NONE
-            .arg("none")
-#elif defined GC_VIDEO_QUICKTIME
+#if defined GC_VIDEO_QUICKTIME
             .arg("quicktime")
 #elif defined GC_VIDEO_QT5
             .arg("qt5")
 #elif defined GC_VIDEO_VLC
             .arg("vlc")
+#else
+            .arg("none")
 #endif
             .arg(src)
             .arg(QSslSocket::supportsSsl() ? "yes" : "none")

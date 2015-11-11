@@ -166,6 +166,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Mitsukuni Sato");
     contributors.append("Ned Harding");
     contributors.append("Nicholas Feng");
+    contributors.append("Nick Burrett");
     contributors.append("Okano Takayoshi");
     contributors.append("Omar Torres");
     contributors.append("Patrick McNerthney");

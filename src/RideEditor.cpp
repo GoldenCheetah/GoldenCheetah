@@ -406,12 +406,16 @@ AnomalyDialog::check()
                  rideEditor->ride->isRun ? 120 : 200;
 
     QVector<double> power;
+    QVector<double> cad;
     QVector<double> secs;
     double lastdistance=9;
+    double lastpower=0;
+    double lastcad=0;
     int count = 0;
 
     foreach (RideFilePoint *point, rideEditor->ride->ride()->dataPoints()) {
         power.append(point->watts);
+        cad.append(point->cad);
         secs.append(point->secs);
 
         if (count) {
@@ -430,8 +434,24 @@ AnomalyDialog::check()
                 rideEditor->data->anomalies.insert(xsstring(count, RideFile::km),
                                        tr("Distance goes backwards."));
 
+            // check for non-zeroed cadence/power "triplet"
+            if (count >= 3 && point->cad == 0 && point->watts == 0 &&
+                              lastcad != 0 && lastpower != 0) {
+
+                // look at previous 3
+                if (power[count-1] == power[count-2] && power[count-2] == power[count-3] &&
+                    cad[count-1] == cad[count-2] && cad[count-2] == cad[count-3]) {
+
+                    rideEditor->data->anomalies.insert(xsstring(count-1, RideFile::cad),
+                                       tr("Cadence/Power duplicated when freewheeling."));
+                }
+            }
         }
+
+        // so we can look back one quickly
         lastdistance = point->km;
+        lastpower = point->watts;
+        lastcad = point->cad;
 
         // suspicious values
         if (point->cad > maxCad) {

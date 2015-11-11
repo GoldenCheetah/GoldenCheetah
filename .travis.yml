@@ -7,6 +7,7 @@ compiler:
 - gcc
 env:
   matrix:
+## Test 4.8 or 5.4.2
   - BRANCH=master QT=qt4 QT_PATH=qt
   - BRANCH=master QT=qt5 QT_PATH=qt5
   global:
@@ -19,12 +20,14 @@ env:
 before_install:
 - date
 - brew update
-- sh travis/install-qt.sh
+##- sh travis/install-qt.sh
+- brew install $QT
 - brew install libical
 - brew install libusb libusb-compat
 - brew install srmio
 - brew install libsamplerate
-- brew install --HEAD travis/libkml.rb
+## Disable KML for now
+##- brew install --HEAD travis/libkml.rb
 - sudo chmod -R +w /usr/local
 - curl -O http://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.2.2.dmg
 - git clone --depth 1 https://github.com/sintegrial/qwtplot3d.git qwtplot3d
@@ -63,9 +66,10 @@ before_script:
 - sed -i "" "s|#\(KQOAUTH_LIBS =.*\)|\1 -F\$\$[QT_INSTALL_LIBS] -framework kqoauth|"
   src/gcconfig.pri
 - sed -i "" "s|#\(QWT3D_INSTALL =.*\)|\1 ../qwtplot3d|" src/gcconfig.pri
-- sed -i "" "s|#\(KML_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(KML_LIBS    =.*\)|\1 -L/usr/local/lib -lkmlxsd -lkmlregionator -lkmldom
-  -lkmlconvenience -lkmlengine -lkmlbase|" src/gcconfig.pri
+## Disable KML for now
+##- sed -i "" "s|#\(KML_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
+##- sed -i "" "s|#\(KML_LIBS    =.*\)|\1 -L/usr/local/lib -lkmlxsd -lkmlregionator -lkmldom
+##  -lkmlconvenience -lkmlengine -lkmlbase|" src/gcconfig.pri
 - sed -i "" "s|#\(ICAL_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
 - sed -i "" "s|#\(ICAL_LIBS    =.*\)|\1 -L/usr/local/lib -lical|" src/gcconfig.pri
 - sed -i "" "s|#\(LIBUSB_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
@@ -74,7 +78,6 @@ before_script:
 - sed -i "" "s|#\(SAMPLERATE_LIBS =\).*|\1 -L/usr/local/lib -lsamplerate|" src/gcconfig.pri
 - sed -i "" "s|#\(DEFINES += GC_HAVE_LION*\)|\1|" src/gcconfig.pri
 - sed -i "" "s|#\(HTPATH = ../httpserver.*\)|\1 |" src/gcconfig.pri
-- sed -i "" "s|#\(DEFINES += GC_DROPBOX*\)|\1 |" src/gcconfig.pri
 - sed -i "" "s|#\(DEFINES += GC_WANT_ROBOT.*\)|\1 |" src/gcconfig.pri
 - sed -i "" "s|\(DEFINES += GC_VIDEO_NONE.*\)|#\1 |" src/gcconfig.pri
 - sed -i "" "s|#\(DEFINES += GC_VIDEO_QUICKTIME.*\)|\1 |" src/gcconfig.pri
@@ -93,12 +96,14 @@ script:
 after_success:
 - cd src
 - ls -laR GoldenCheetah.app
-- sh travis/check-gc.sh
+- GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
 - /usr/local/opt/$QT_PATH/bin/macdeployqt GoldenCheetah.app -verbose=2 -dmg
+## fix up the bundle with macdeployqtfix
+- python ../travis/macdeployqtfix.py GoldenCheetah.app /usr/local/opt/$QT_PATH
 - brew remove $QT
 - mv GoldenCheetah.dmg GoldenCheetah_$QT.dmg
 - hdiutil mount GoldenCheetah_$QT.dmg
-- cd /Volumes/GoldenCheetah_$QT
+- cd /Volumes/GoldenCheetah
 - ls -laR GoldenCheetah.app
 - GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
 

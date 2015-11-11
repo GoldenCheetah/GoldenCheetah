@@ -60,7 +60,7 @@ VDOTCalculator::eqvTime(double VDOT, double dist)
         fprime_t = ((0.2989558*exp(-0.1932605*t) + 0.1894393*exp(-0.012778*t) + 0.8)*(-0.000208*pow(dist, 2)*pow(t,-3) - 0.182258*dist*pow(t, -2)) - ((0.000104*pow(dist, 2)*pow(t, -2) + 0.182258*dist*pow(t, -1) -4.6) * (-0.1932605*0.2989558*exp( -0.1932605*t) + -0.012778*0.1894393*exp(-0.012778*t)))) / pow(0.2989558*exp(-0.1932605*t) + 0.1894393*exp(-0.012778*t) + 0.8, 2);
         t -= f_t/fprime_t;
         iter--;
-    } while (abs(f_t/fprime_t) > 1e-3 && iter > 0);
+    } while (fabs(f_t/fprime_t) > 1e-3 && iter > 0);
 
     return t;
 }
@@ -133,7 +133,7 @@ VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
 
     QHBoxLayout *vdotHBox = new QHBoxLayout;
     vdotHBox->addStretch();
-    labelVDOT = new QLabel(tr("Your VDOT:"));
+    labelVDOT = new QLabel(tr("Your Daniels VDOT:"));
     vdotHBox->addWidget(labelVDOT);
     txtVDOT = new QLineEdit(this);
     txtVDOT->setAlignment(Qt::AlignRight);
@@ -146,7 +146,7 @@ VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
 
     // Training Pace Table
     QVBoxLayout *tableLayout = new QVBoxLayout;
-    labelTPACE = new QLabel(tr("Your Daniels' Training Paces:"));
+    labelTPACE = new QLabel(tr("Your Training Paces:"));
     tableLayout->addWidget(labelTPACE);
     tableWidgetTPACE = new QTableWidget(5, 3, this);
     for (int j = 0; j< 3; j++) tableWidgetTPACE->setColumnWidth(j, 60);

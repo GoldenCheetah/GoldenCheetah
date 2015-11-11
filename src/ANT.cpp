@@ -179,6 +179,11 @@ bool ANT::modeERGO(void) const
     return mode==RT_MODE_ERGO; 
 }
 
+bool ANT::modeSLOPE(void) const
+{
+    return mode==RT_MODE_SLOPE;
+}
+
 double ANT::channelValue2(int channel)
 {
     return antChannel[channel]->channelValue2();
@@ -280,7 +285,7 @@ ANT::setLoad(double load)
     }
 
     // if we have a FE-C trainer connected, relay the change in target power to the brake
-    if (fecChannel != -1)
+    if ((fecChannel != -1) && (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_POWER_MODE_CAPABILITY))
     {
         sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
     }
@@ -288,7 +293,20 @@ ANT::setLoad(double load)
 
 void ANT::refreshFecLoad()
 {
-    sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
+    if (fecChannel == -1)
+        return;
+
+    if (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_POWER_MODE_CAPABILITY)
+        sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
+}
+
+void ANT::refreshFecGradient()
+{
+    if (fecChannel == -1)
+        return;
+
+    if (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_SIMUL_MODE_CAPABILITY)
+        sendMessage(ANTMessage::fecSetTrackResistance(fecChannel, gradient, currentRollingResistance));
 }
 
 void ANT::requestFecCapabilities()
@@ -322,6 +340,8 @@ ANT::setGradient(double gradient)
         sendMessage(ANTMessage::fecSetTrackResistance(fecChannel, gradient, currentRollingResistance));
         currentGradient = gradient;
         // TODO : obtain acknowledge / confirm value using fecRequestCommandStatus
+        // TODO : if trainer does not have simulation capabilities, use power mode & let GC calculate
+        //        the desired load based on gradient, wind, rolling resistance...
     }
 }
 
@@ -714,6 +734,13 @@ ANT::channelInfo(int channel, int device_number, int device_id)
 
         // need to find a way to communicate back on error
         qDebug()<<"kickr found."<<kickrDeviceID<<"on channel"<<kickrChannel;
+    }
+
+    // ANT FE-C DEVICE DETECTED - ACT ACCORDINGLY !
+    // if we just got an ANT FE-C trainer, request the capabilities
+    if (!configuring && antChannel[channel]->is_fec) {
+        antChannel[channel]->capabilities();
+        qDebug()<<"ANT FE-C device found."<<device_number<<"on channel"<<channel;
     }
 
     //qDebug()<<"found device number"<<device_number<<"type"<<device_id<<"on channel"<<channel

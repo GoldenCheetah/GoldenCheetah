@@ -123,8 +123,11 @@
 // 117 29  Aug 2015 Mark Liversedge    Min non-zero HR
 // 118 16  Sep 2015 Damien Grauser     Use FTP for TSS and IF
 // 119 20  Oct 2015 Ale Martinez       Added VDOT and TPace for Running
+// 120 3   Nov 2015 Mark Liversedge    Added Above CP time in W'bal zones
+// 121 3   Nov 2015 Mark Liversedge    Added Work in W'bal zones
+// 122 7   Nov 2015 Mark Liversedge    Added HR Zones 9 and 10
 
-int DBSchemaVersion = 119;
+int DBSchemaVersion = 122;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

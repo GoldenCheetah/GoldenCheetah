@@ -222,7 +222,7 @@ class XPace : public RideMetric {
         else do {
             speed = (low + high)/2.0;
             double watts = running_power(weight, height, speed);
-            if (abs(watts - lnp_watts) < 0.001) break;
+            if (fabs(watts - lnp_watts) < 0.001) break;
             else if (watts < lnp_watts) low = speed;
             else if (watts > lnp_watts) high = speed;
         } while (high - low > 0.01);

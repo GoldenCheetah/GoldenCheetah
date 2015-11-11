@@ -215,6 +215,43 @@ public:
     RideMetric *clone() const { return new HrZoneTime8(*this); }
 };
 
+class HrZoneTime9 : public HrZoneTime {
+    Q_DECLARE_TR_FUNCTIONS(HrZoneTime9)
+
+public:
+    HrZoneTime9()
+    {
+        setLevel(9);
+        setSymbol("time_in_zone_H9");
+        setInternalName("H9 Time in Zone");
+    }
+    void initialize ()
+    {
+        setName(tr("H9 Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+    }
+    RideMetric *clone() const { return new HrZoneTime9(*this); }
+};
+class HrZoneTime10 : public HrZoneTime {
+    Q_DECLARE_TR_FUNCTIONS(HrZoneTime10)
+
+public:
+    HrZoneTime10()
+    {
+        setLevel(10);
+        setSymbol("time_in_zone_H10");
+        setInternalName("H10 Time in Zone");
+    }
+    void initialize ()
+    {
+        setName(tr("H10 Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+    }
+    RideMetric *clone() const { return new HrZoneTime10(*this); }
+};
+
 // Now for Time In Zone as a Percentage of Ride Time
 class HrZonePTime1 : public RideMetric {
 
@@ -567,6 +604,92 @@ class HrZonePTime8 : public RideMetric {
         void aggregateWith(const RideMetric &) {}
         RideMetric *clone() const { return new HrZonePTime8(*this); }
 };
+class HrZonePTime9 : public RideMetric {
+
+        Q_DECLARE_TR_FUNCTIONS(HrZonePTime9)
+
+    public:
+
+        HrZonePTime9()
+        {
+            setSymbol("percent_in_zone_H9");
+            setInternalName("H9 Percent in Zone");
+            setType(RideMetric::Average);
+            setMetricUnits("%");
+            setImperialUnits("%");
+            setPrecision(0);
+            setConversion(1.0);
+        }
+
+        void initialize ()
+        {
+            setName(tr("H9 Percent in Zone"));
+        }
+
+        void compute(const RideFile *, const Zones *, int,
+                    const HrZones *, int,
+                    const QHash<QString,RideMetric*> &deps,
+                    const Context *)
+        {
+            assert(deps.contains("time_in_zone_H9"));
+            assert(deps.contains("workout_time"));
+
+            // compute
+            double time = deps.value("workout_time")->value(true);
+            double inzone = deps.value("time_in_zone_H9")->value(true);
+
+            if (time && inzone) setValue((inzone / time) * 100.00);
+            else setValue(0);
+            setCount(time);
+        }
+
+        bool canAggregate() { return false; }
+        void aggregateWith(const RideMetric &) {}
+        RideMetric *clone() const { return new HrZonePTime9(*this); }
+};
+class HrZonePTime10 : public RideMetric {
+
+        Q_DECLARE_TR_FUNCTIONS(HrZonePTime10)
+
+    public:
+
+        HrZonePTime10()
+        {
+            setSymbol("percent_in_zone_H10");
+            setInternalName("H10 Percent in Zone");
+            setType(RideMetric::Average);
+            setMetricUnits("%");
+            setImperialUnits("%");
+            setPrecision(0);
+            setConversion(1.0);
+        }
+
+        void initialize ()
+        {
+            setName(tr("H10 Percent in Zone"));
+        }
+
+        void compute(const RideFile *, const Zones *, int,
+                    const HrZones *, int,
+                    const QHash<QString,RideMetric*> &deps,
+                    const Context *)
+        {
+            assert(deps.contains("time_in_zone_H10"));
+            assert(deps.contains("workout_time"));
+
+            // compute
+            double time = deps.value("workout_time")->value(true);
+            double inzone = deps.value("time_in_zone_H10")->value(true);
+
+            if (time && inzone) setValue((inzone / time) * 100.00);
+            else setValue(0);
+            setCount(time);
+        }
+
+        bool canAggregate() { return false; }
+        void aggregateWith(const RideMetric &) {}
+        RideMetric *clone() const { return new HrZonePTime10(*this); }
+};
 static bool addAllHrZones() {
     RideMetricFactory::instance().addMetric(HrZoneTime1());
     RideMetricFactory::instance().addMetric(HrZoneTime2());
@@ -576,6 +699,8 @@ static bool addAllHrZones() {
     RideMetricFactory::instance().addMetric(HrZoneTime6());
     RideMetricFactory::instance().addMetric(HrZoneTime7());
     RideMetricFactory::instance().addMetric(HrZoneTime8());
+    RideMetricFactory::instance().addMetric(HrZoneTime9());
+    RideMetricFactory::instance().addMetric(HrZoneTime10());
     QVector<QString> deps;
     deps.append("time_in_zone_H1");
     deps.append("workout_time");
@@ -608,6 +733,14 @@ static bool addAllHrZones() {
     deps.append("time_in_zone_H8");
     deps.append("workout_time");
     RideMetricFactory::instance().addMetric(HrZonePTime8(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_H9");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(HrZonePTime9(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_H10");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(HrZonePTime10(), &deps);
     return true;
 }
 

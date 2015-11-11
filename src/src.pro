@@ -544,6 +544,7 @@ DEFERRES += RouteWindow.h \
             RouteItem.cpp
 
 SOURCES += \
+        main.cpp \
         AboutDialog.cpp \
         AddDeviceWizard.cpp \
         AddIntervalDialog.cpp \
@@ -613,6 +614,7 @@ SOURCES += \
         FixDerivePower.cpp \
         FixDeriveTorque.cpp \
         FixElevation.cpp \
+        FixFreewheeling.cpp \
         FixGaps.cpp \
         FixGPS.cpp \
         FixMoxy.cpp \
@@ -779,7 +781,6 @@ SOURCES += \
         WorkoutWizard.cpp \
         WPrime.cpp \
         Zones.cpp \
-        main.cpp \
         ../qtsolutions/json/mvjson.cpp
 
 RESOURCES = application.qrc \
