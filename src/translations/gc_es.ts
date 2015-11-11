@@ -8597,7 +8597,7 @@ Máx Absoluto - define un valor máximo para la FC, cualquier valor superior ser
     <message>
         <location filename="../FixMoxy.cpp" line="51"/>
         <source>When recording from the Moxy or BSX Insight in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cuando los registros Moxy o BSX se realizan en modo Velocidad y Cadencia los datos SmO2 y tHg se envía como cadencia y velocidad respectivamente. Esta herramientoa actualiza el archivo de actividad para mover los valores de velocidad y cadencia a las series Moxy.</translation>
     </message>
 </context>
 <context>
@@ -8628,6 +8628,18 @@ Power Adjustment - this defines percentage  to modify values by. Negative values
         <translation>Ajustar valores de potencia permite aumentar o disminuir los valores de potencia en un porcentaje. Utilizar un único parámetro:
 
 Ajuste de Potencia: define el porcentaje de modificación. Admite valores negativos.</translation>
+    </message>
+</context>
+<context>
+    <name>FixSmO2Config</name>
+    <message>
+        <location filename="../FixSmO2.cpp" line="49"/>
+        <source>Occasionally SmO2 (%) will erroneously report high values (0% or &gt;100%).
+
+This function will look for spikes/anomalies in SmO2 data and replace the erroneous data by smoothing/interpolating the data from either side of the 3 points in question</source>
+        <translation>Ocasionalmente SmO2 (%) reporta valores erróneos (0% o &gt;100%)
+
+Esta función busca picos/anomalías en los datos SmO2 y los reemplaza por valores suavizados/interpolados desde ambos lados de los 3 puntos involucrados</translation>
     </message>
 </context>
 <context>
@@ -8663,6 +8675,11 @@ El parámetro Segundos de Promedio Móvil permite definir los segundos durante l
         <location filename="../FixSpikes.cpp" line="131"/>
         <source>Fix Power Spikes</source>
         <translation>Corregir Picos</translation>
+    </message>
+    <message>
+        <location filename="../FixSmO2.cpp" line="80"/>
+        <source>Fix SmO2 Anomaly</source>
+        <translation>Corregir Anomalías SmO2</translation>
     </message>
 </context>
 <context>
@@ -10231,7 +10248,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../Pages.cpp" line="192"/>
         <source>Workout and VideoSync Library:</source>
-        <translation>Biblioteca de Entrenamientos y Sincronización de Video:</translation>
+        <translation>Biblioteca de Entrenamientos y VideoSync:</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="289"/>
@@ -15127,22 +15144,22 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../Library.cpp" line="128"/>
         <source>Import Videos, VideoSyncs and Workouts</source>
-        <translation>Importar Videos, Sincronización de Videos y Entrenamientos</translation>
+        <translation>Importar Videos, VideoSyncs y Entrenamientos</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="129"/>
         <source>No supported videos, videoSyncs or workouts were found to import</source>
-        <translation>No se encontraron videos, sincronización de videos o entrenamientos para importar</translation>
+        <translation>No se encontraron videos, videoSyncs o entrenamientos para importar</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="179"/>
         <source>Copy VideoSync Failed</source>
-        <translation>Falló copia de Sincronización de Video</translation>
+        <translation>Falló copia de VideoSync</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="180"/>
         <source>%1 already exists in videoSync library: %2</source>
-        <translation>%1 ya existe en la biblioteca de sincronizaciones de video: %2</translation>
+        <translation>%1 ya existe en la biblioteca de videoSync: %2</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="208"/>
@@ -15179,7 +15196,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../Library.cpp" line="265"/>
         <source>VideoSync files (.rlv)</source>
-        <translation>Archivos de Sincronización de Video (.rlv)</translation>
+        <translation>Archivos de VideoSync (.rlv)</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="283"/>
@@ -15209,7 +15226,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../Library.cpp" line="322"/>
         <source>VideoSyncs</source>
-        <translation>Sincronizaciones de Video</translation>
+        <translation>VideoSyncs</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="331"/>
@@ -16273,6 +16290,11 @@ PC del Atleta en %3 vatios</translation>
         <translation>Combinar actividades...</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="620"/>
+        <source>Sha&amp;re</source>
+        <translation>Compa&amp;rtir</translation>
+    </message>
+    <message>
         <location filename="../MainWindow.cpp" line="638"/>
         <source>Write to Local Store</source>
         <translation>Guardar en Almacenamiento Local</translation>
@@ -16305,12 +16327,12 @@ PC del Atleta en %3 vatios</translation>
     <message>
         <location filename="../MainWindow.cpp" line="664"/>
         <source>Import workouts, videos, videoSyncs...</source>
-        <translation>Importar entrenamientos, videso y sincronizaciones de video...</translation>
+        <translation>Importar entrenamientos, videos y videoSyncs...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="665"/>
         <source>Scan disk for workouts, videos, videoSyncs...</source>
-        <translation>Buscar entrenamientos, videos y sincronizaciones de video en el disco...</translation>
+        <translation>Buscar entrenamientos, videos y videoSyncs en el disco...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1028"/>
@@ -16748,12 +16770,12 @@ PC del ciclista %3 vatios</translation>
         <translation>Estimar estrés por:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="567"/>
+        <location filename="../ManualRideDialog.cpp" line="564"/>
         <source>Swim</source>
         <translation>Natación</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="570"/>
+        <location filename="../ManualRideDialog.cpp" line="567"/>
         <source>Run</source>
         <translation>Carrera</translation>
     </message>
@@ -16802,7 +16824,7 @@ PC del ciclista %3 vatios</translation>
         <translation>Métricas</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="555"/>
+        <location filename="../ManualRideDialog.cpp" line="552"/>
         <source>Unable to save</source>
         <translation>Imposible guardar</translation>
     </message>
@@ -16811,7 +16833,7 @@ PC del ciclista %3 vatios</translation>
         <translation type="obsolete">Ya existe una actividad con la misma fecha y hora de inicio o falta parmiso para grabar el archivo.</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="556"/>
+        <location filename="../ManualRideDialog.cpp" line="553"/>
         <source>There is already an activity with the same start time or you do not have permissions to save a file.</source>
         <translation>Ya existe una actividad con la misma fecha y hora o no tiene permisos para guardar un archivo.</translation>
     </message>
@@ -27227,7 +27249,7 @@ Cancelar para salir.</translation>
     <message>
         <location filename="../TrainSidebar.cpp" line="393"/>
         <source>VideoSync</source>
-        <translation>Sincronizacion de Video</translation>
+        <translation>VideoSync</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="519"/>
@@ -27262,17 +27284,17 @@ Cancelar para salir.</translation>
     <message>
         <location filename="../TrainSidebar.cpp" line="584"/>
         <source>Import VideoSync from File</source>
-        <translation>Importar Sincronizaciones de Video desde Archivo</translation>
+        <translation>Importar VideoSync desde Archivo</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="585"/>
         <source>Scan for VideoSyncs</source>
-        <translation>Buscar Sincronizaciones de Video</translation>
+        <translation>Buscar VideoSyncs</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="598"/>
         <source>Delete selected VideoSync</source>
-        <translation>Eliminar las Sincronizaciones de Video seleccionadas</translation>
+        <translation>Eliminar las VideoSync seleccionadas</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="816"/>
@@ -27289,12 +27311,12 @@ Cancelar para salir.</translation>
     <message>
         <location filename="../TrainSidebar.cpp" line="851"/>
         <source>Are you sure you want to delete this VideoSync?</source>
-        <translation>¿Está seguro de eliminar esta Sincronización de Video?</translation>
+        <translation>¿Está seguro de eliminar esta VideoSync?</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="878"/>
         <source>The VideoSync file is either not valid or not existing and will be removed from the library.</source>
-        <translation>La Sincronización de Video no es válida o no existe y será eliminada de la biblioteca.</translation>
+        <translation>La VideoSync no es válida o no existe y será eliminada de la biblioteca.</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="906"/>
@@ -28843,7 +28865,7 @@ Presionar F3 en el controlador al finalizar.</translation>
         <source>Please note, that when importing or drag and dropping videos into the library we DO NOT copy the file into the GoldenCheetah library, instead we add a REFERENCE to it. We DO copy workout and videoSync files, since they are smaller.
 
 You can remove references when managing the library via the context menu options</source>
-        <translation>Por favor tenga en cuenta que, cuando importa o arrastra y suelta videos en la biblitoteca NO copiamos el archivo, solo agregamos una REFERENCIA al mismo. En cambio SI copiamos los entrenamientos y archivos de sincronización de video dado que son más pequeños.
+        <translation>Por favor tenga en cuenta que, cuando importa o arrastra y suelta videos en la biblitoteca NO copiamos el archivo, solo agregamos una REFERENCIA al mismo. En cambio SI copiamos los entrenamientos y archivos de videoSync dado que son más pequeños.
 
 Usted puede eliminar las referencias cuando administra la biblitoteca usando el menú de contexto</translation>
     </message>
