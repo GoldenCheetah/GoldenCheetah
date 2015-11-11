@@ -236,8 +236,7 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     // Restore from last time
     QVariant BSmode = appsettings->value(this, GC_BIKESCOREMODE); // remember from before
     if (BSmode.toString() == "time") byDuration->setChecked(true);
-    else if (BSmode.toString() == "dist") byDistance->setChecked(true);
-    else byManual->setChecked(true);
+    else byDistance->setChecked(true);
 
     // Derived metrics
     QLabel *BSLabel = new QLabel("BikeScore (TM): ", this);
@@ -377,14 +376,6 @@ ManualRideDialog::~ManualRideDialog() {
 void
 ManualRideDialog::estimate()
 {
-    QTime time = duration->time();
-    double hours = (time.hour()) + (time.minute() / 60.00) + (time.second() / 3600.00);
-    double dist = distance->value();
-
-    // Estimate average speed
-    if (hours && dist) avgKPH->setValue(dist / hours);
-    else avgKPH->setValue(0.0);
-
     if (byManual->isChecked()) {
         BS->setEnabled(true);
         DP->setEnabled(true);
@@ -404,6 +395,9 @@ ManualRideDialog::estimate()
 
     if (byDuration->isChecked()) {
         // by time
+        QTime time = duration->time();
+        double hours = (time.hour()) + (time.minute() / 60.00) + (time.second() / 3600.00);
+
         BS->setValue(hours * timeBS);
         DP->setValue(hours * timeDP);
         TSS->setValue(hours * timeTSS);
@@ -411,6 +405,8 @@ ManualRideDialog::estimate()
 
     } else {
         // by distance
+        double dist = distance->value();
+
         BS->setValue(dist * distanceBS);
         DP->setValue(dist * distanceDP);
         TSS->setValue(dist * distanceTSS);
