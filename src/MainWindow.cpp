@@ -617,7 +617,7 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->setWhatsThis(helpRideMenu->getWhatsThisText(HelpWhatsThis::MenuBar_Activity));
 
     // SHARE MENU
-    QMenu *shareMenu = menuBar()->addMenu("Sha&re");
+    QMenu *shareMenu = menuBar()->addMenu(tr("Sha&re"));
     shareAction = new QAction(tr("Share Online..."), this);
     shareAction->setShortcut(tr("Ctrl+U"));
     connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
