@@ -236,7 +236,8 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     // Restore from last time
     QVariant BSmode = appsettings->value(this, GC_BIKESCOREMODE); // remember from before
     if (BSmode.toString() == "time") byDuration->setChecked(true);
-    else byDistance->setChecked(true);
+    else if (BSmode.toString() == "dist") byDistance->setChecked(true);
+    else byManual->setChecked(true);
 
     // Derived metrics
     QLabel *BSLabel = new QLabel("BikeScore (TM): ", this);
