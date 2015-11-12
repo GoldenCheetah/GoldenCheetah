@@ -1,0 +1,5 @@
+QMAKE_PRL_BUILD_DIR = /home/markl/Projects/Live/GoldenCheetah/kqoauth
+QMAKE_PRO_INPUT = kqoauth.pro
+QMAKE_PRL_TARGET = libkqoauth.so.0.97.0
+QMAKE_PRL_CONFIG = lex yacc exceptions depend_includepath testcase_targets import_plugins import_qpa_plugin qt warn_on release link_prl incremental shared qpa no_mocdepend release qt_no_framework linux unix posix gcc create_prl static_and_shared have_target dll thread opengl moc resources
+QMAKE_PRL_VERSION = 0.97

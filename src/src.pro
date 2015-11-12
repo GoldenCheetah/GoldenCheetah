@@ -52,17 +52,29 @@ CONFIG(debug, debug|release) {
 
 
 # KQOAuth .pro in default creates different libs for release and debug
-!isEmpty( KQOAUTH_INSTALL ) {
-    isEmpty( KQOAUTH_INCLUDE ) { KQOAUTH_INCLUDE += $${KQOAUTH_INSTALL}/src }
-    isEmpty( KQOAUTH_LIBS ) {
-        #KQOAUTH_LIBS = $${KQOAUTH_INSTALL}/lib/libkqoauth0.a
-        KQOAUTH_LIBS = -lkqoauth
-    }
-    INCLUDEPATH += $${KQOAUTH_INCLUDE}
-    LIBS        += $${KQOAUTH_LIBS}
-    DEFINES     += GC_HAVE_KQOAUTH
+unix {
+
+    # build from version in repo for Linux builds since
+    # kqoauth is not packaged for the Debian build
+    INCLUDEPATH += ../kqoauth
+    LIBS += -L../kqoauth -lkqoauth
+    DEFINES += GC_HAVE_KQOAUTH
     SOURCES     += TwitterDialog.cpp
     HEADERS     += TwitterDialog.h
+
+} else {
+    !isEmpty( KQOAUTH_INSTALL ) {
+        isEmpty( KQOAUTH_INCLUDE ) { KQOAUTH_INCLUDE += $${KQOAUTH_INSTALL}/src }
+        isEmpty( KQOAUTH_LIBS ) {
+            #KQOAUTH_LIBS = $${KQOAUTH_INSTALL}/lib/libkqoauth0.a
+            KQOAUTH_LIBS = -lkqoauth
+        }
+        INCLUDEPATH += $${KQOAUTH_INCLUDE}
+        LIBS        += $${KQOAUTH_LIBS}
+        DEFINES     += GC_HAVE_KQOAUTH
+        SOURCES     += TwitterDialog.cpp
+        HEADERS     += TwitterDialog.h
+    }
 }
 
 
