@@ -126,12 +126,12 @@
     <message>
         <location filename="../Pages.cpp" line="1019"/>
         <source>Auto Backup execution every</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisches Backup bei jedem </translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1021"/>
         <source>times the athlete is closed - 0 means never</source>
-        <translation type="unfinished"></translation>
+        <translation>.ten Schließen durchführen - 0 bedeutet nie</translation>
     </message>
     <message>
         <source>Auto Backup Period</source>
@@ -2415,7 +2415,7 @@ Weiter klicken, um fortzufahren
     <message>
         <location filename="../RideEditor.cpp" line="446"/>
         <source>Cadence/Power duplicated when freewheeling.</source>
-        <translation type="unfinished"></translation>
+        <translation>Trittfrequenz/Leistung beim Rollen dupliziert.</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="459"/>
@@ -6508,12 +6508,12 @@ an den Computer anschließen und
 <context>
     <name>EditUserDataDialog</name>
     <message>
-        <location filename="../UserData.cpp" line="65"/>
+        <location filename="../UserData.cpp" line="66"/>
         <source>User Data Series</source>
         <translation>Benutzer Datenreihe</translation>
     </message>
     <message>
-        <location filename="../UserData.cpp" line="88"/>
+        <location filename="../UserData.cpp" line="89"/>
         <source># type in a formula to use
 # for e.g. TSS / Duration
 # as you type the available metrics
@@ -6528,37 +6528,37 @@ an den Computer anschließen und
 </translation>
     </message>
     <message>
-        <location filename="../UserData.cpp" line="176"/>
+        <location filename="../UserData.cpp" line="177"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../UserData.cpp" line="178"/>
+        <location filename="../UserData.cpp" line="179"/>
         <source>Units</source>
         <translation>Maßeinheiten</translation>
     </message>
     <message>
-        <location filename="../UserData.cpp" line="180"/>
+        <location filename="../UserData.cpp" line="181"/>
         <source>Formula</source>
         <translation>Formel</translation>
     </message>
     <message>
-        <location filename="../UserData.cpp" line="182"/>
+        <location filename="../UserData.cpp" line="183"/>
         <source>Color</source>
         <translation>Farbe</translation>
     </message>
     <message>
-        <location filename="../UserData.cpp" line="191"/>
+        <location filename="../UserData.cpp" line="192"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../UserData.cpp" line="192"/>
+        <location filename="../UserData.cpp" line="193"/>
         <source>&amp;Cancel</source>
         <translation>Abbre&amp;chen</translation>
     </message>
     <message>
-        <location filename="../UserData.cpp" line="227"/>
+        <location filename="../UserData.cpp" line="228"/>
         <source>Choose Metric Color</source>
         <translation>Farbe für Metrik auswählen</translation>
     </message>
@@ -7355,7 +7355,7 @@ INTERNET Verbindung muss vorhanden sein. </translation>
     <message>
         <location filename="../FixFreewheeling.cpp" line="80"/>
         <source>Fix freewheeling power/cadence.</source>
-        <translation type="unfinished"></translation>
+        <translation>Korrigiere Leistung/Trittfrequenz im Freilauf.</translation>
     </message>
 </context>
 <context>
@@ -7363,7 +7363,7 @@ INTERNET Verbindung muss vorhanden sein. </translation>
     <message>
         <location filename="../FixFreewheeling.cpp" line="47"/>
         <source>ANT+ crank based power meters will send  3 duplicate values for power and cadence when the  rider starts to freewheel. The duplicates should  not be retained. This tool removes the duplicates.</source>
-        <translation type="unfinished"></translation>
+        <translation>ANT+ Kubelbasierte Leistungsmesser senden 3 duplikative Werte für Leistung und Trittfrequenz wenn der Radfahrer in den Freilauf wechselt. Diese Duplikate sollten nicht in den Daten stehen. Dieses Werkzug entfernt die Duplikate.</translation>
     </message>
 </context>
 <context>
@@ -7468,7 +7468,7 @@ Der Parameter &quot;Absolutes Maximum&quot; definiert einen Wert für Herzfreque
     <message>
         <location filename="../FixMoxy.cpp" line="51"/>
         <source>When recording from the Moxy or BSX Insight in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn die Aufzeichnungen des Moxy oder BSX Insight im Geschwindigkeit/Trittfrequenz Modus erfolgen werden SmO2 and tHb als Geschwindigkeit und Trittfrequenz übermittelt. Dieser Assistent verschiebt Werte vonr Geschwindigkeit und Trittfrequenz in die Moxy Datenfelder.</translation>
     </message>
 </context>
 <context>
@@ -7499,6 +7499,18 @@ Power Adjustment - this defines percentage  to modify values by. Negative values
         <translation>Anpassung von Leistungswerten ermöglicht die prozentuale Korrektur der Leistungswerte (Erhöhung oder Verminderung). Es wird ein Parameter verwendet:
 
 Leistungsanpassung - dieser definiert den Prozentsatz mit dem die Werte verändert werden. Negative Prozentsätze sind möglich.</translation>
+    </message>
+</context>
+<context>
+    <name>FixSmO2Config</name>
+    <message>
+        <location filename="../FixSmO2.cpp" line="49"/>
+        <source>Occasionally SmO2 (%) will erroneously report high values (0% or &gt;100%).
+
+This function will look for spikes/anomalies in SmO2 data and replace the erroneous data by smoothing/interpolating the data from either side of the 3 points in question</source>
+        <translation>Gelegentlich werden Sm2O2 (%) Werte falsch ausgewiesen (0% oder &gt; 100%).
+
+Diese Funktion sucht nach Ausreissern/Anomalien in den SmO2 Daten und ersetzt diese fehlerhaften Daten mit geglätteten Werte der 3 Datenpunkte links und rechts des fehlerhaften Wertes</translation>
     </message>
 </context>
 <context>
@@ -7534,6 +7546,11 @@ Der Parameter &apos;Sekunden (Gleitender Durchschnitt)&apos; ermöglicht die Ein
         <location filename="../FixSpikes.cpp" line="131"/>
         <source>Fix Power Spikes</source>
         <translation>Korrigiere Leistungsausreißer</translation>
+    </message>
+    <message>
+        <location filename="../FixSmO2.cpp" line="80"/>
+        <source>Fix SmO2 Anomaly</source>
+        <translation>Korrigiere SmO2 Anomalie</translation>
     </message>
 </context>
 <context>
@@ -9417,42 +9434,42 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="108"/>
+        <location filename="../HelpWhatsThis.cpp" line="106"/>
         <source>Exports a (selectable) set of activties in one of the supported export formats</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="112"/>
+        <location filename="../HelpWhatsThis.cpp" line="110"/>
         <source>Wizard to combine data with the currently selected activity in multiple ways</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="115"/>
+        <location filename="../HelpWhatsThis.cpp" line="119"/>
         <source>A set of functions related different features in GoldenCheetah - please check the details for more information</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="117"/>
+        <location filename="../HelpWhatsThis.cpp" line="121"/>
         <source>Estimation of critical power using the Monod/Scherrer power model</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="119"/>
+        <location filename="../HelpWhatsThis.cpp" line="123"/>
         <source>Estimation of Air Density (Rho)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="123"/>
+        <location filename="../HelpWhatsThis.cpp" line="127"/>
         <source>Downloading of Workouts for the ERGDB (online workout DB) for Train - Indoor Riding</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="125"/>
+        <location filename="../HelpWhatsThis.cpp" line="129"/>
         <source>Creation of a new Workout for Train - Indoor Riding</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="127"/>
+        <location filename="../HelpWhatsThis.cpp" line="131"/>
         <source>Search for Workout files and Video files in a configurable set of folders and add to the Train - Indoor Riding - Workout/Video library</source>
         <translation></translation>
     </message>
@@ -9472,361 +9489,386 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="106"/>
+        <location filename="../HelpWhatsThis.cpp" line="116"/>
         <source>Sharing an activity with other trainingsites - only sites for which the authorization has been configured can be seleted for sharing here</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="110"/>
+        <location filename="../HelpWhatsThis.cpp" line="108"/>
         <source>Wizard to split an activity into multiple activities based on configurable criteria</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="121"/>
+        <location filename="../HelpWhatsThis.cpp" line="113"/>
+        <source>All functions related to sharing of activities with cloud services</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="125"/>
         <source>Calculation of VDOT and Threshold Pace according to Daniels&apos; Running Formula</source>
         <translation>Berechnung von VDOT und Threshold Pace nach Daniels&apos; Laufformel</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="130"/>
+        <location filename="../HelpWhatsThis.cpp" line="134"/>
         <source>Creates an activity heat map using the selected activities and stores it in the choosen folder - &quot;HeatMap.htm&quot;. Opened in a Web-Browser the map shows where most activity took place.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="133"/>
+        <location filename="../HelpWhatsThis.cpp" line="137"/>
         <source>Wizards which fix, adjust, add series data of the current activity</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="135"/>
+        <location filename="../HelpWhatsThis.cpp" line="139"/>
         <source>Add Torque Values</source>
         <translation>Füge Drehmoment Wert hinzu</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="137"/>
+        <location filename="../HelpWhatsThis.cpp" line="141"/>
         <source>Adjust Power Values</source>
         <translation>Korrigiere Leistungswerte</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="139"/>
+        <location filename="../HelpWhatsThis.cpp" line="143"/>
         <source>Adjust Torque Values</source>
         <translation>Korrigiere Drehmomentwerte</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="141"/>
+        <location filename="../HelpWhatsThis.cpp" line="145"/>
         <source>Estimate Power Values</source>
         <translation>Schätze Leistungswerte</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="143"/>
+        <location filename="../HelpWhatsThis.cpp" line="147"/>
         <source>Estimate Distance Values</source>
-        <translation type="unfinished">Schätze Distanz Werte</translation>
+        <translation>Schätze Distanz Werte</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="145"/>
+        <location filename="../HelpWhatsThis.cpp" line="149"/>
         <source>Fix Elevation Errors</source>
         <translation>Korrigiere Höhenfehler</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="147"/>
+        <location filename="../HelpWhatsThis.cpp" line="151"/>
         <source>Fix Gaps in Recording</source>
         <translation>Korrigiere Lücken in der Aufzeichung</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="149"/>
+        <location filename="../HelpWhatsThis.cpp" line="153"/>
         <source>Fix GPS Errors</source>
         <translation>Korrigiere GPS Fehler</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="151"/>
+        <location filename="../HelpWhatsThis.cpp" line="155"/>
         <source>Fix HR Spikes</source>
         <translation>Korrigiere HF-Ausreißer</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="153"/>
+        <location filename="../HelpWhatsThis.cpp" line="157"/>
         <source>Fix Power Spikes</source>
         <translation>Korrigiere Leistungsausreißer</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="155"/>
+        <location filename="../HelpWhatsThis.cpp" line="159"/>
         <source>Fix Speed</source>
         <translation>Korrigiere Geschwindigkeitsausreißer</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="158"/>
+        <location filename="../HelpWhatsThis.cpp" line="161"/>
+        <source>Fix Freewheeling from Power and Speed</source>
+        <translation>Korrigiere Leistung/Trittfrequenz im Freilauf</translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="163"/>
+        <source>Fix Moxy data by moving the moxy values from speed and cadence into the Moxy series</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="167"/>
         <source>Options to show/hide views (e.g. Sidebar) as well as adding charts and resetting chart layouts to factory settings</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="160"/>
+        <location filename="../HelpWhatsThis.cpp" line="169"/>
         <source>Help options of GoldenCheetah</source>
         <translation>Hilfe Funktionen von Golden Cheetah</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="164"/>
+        <location filename="../HelpWhatsThis.cpp" line="173"/>
         <source>Full configurable chart type to track performance and trends for metrics, user-definable best durations and model estimates</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="166"/>
+        <location filename="../HelpWhatsThis.cpp" line="175"/>
         <source>Date range, data grouping settings which apply to a single chart</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="168"/>
+        <location filename="../HelpWhatsThis.cpp" line="177"/>
         <source>Prefined sets of curves which can be applied as chart definition, or as starting point for individual adjustments</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="170"/>
+        <location filename="../HelpWhatsThis.cpp" line="179"/>
         <source>Curves which are plotted for the specific chart - based on presets or individually added and modified here</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="172"/>
+        <location filename="../HelpWhatsThis.cpp" line="181"/>
         <source>Individual curve configuration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="175"/>
+        <location filename="../HelpWhatsThis.cpp" line="183"/>
+        <source>User defined formulas</source>
+        <translation>Anwenderdefinierte Formeln</translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="186"/>
         <source>Tree map visulation of activity data by two selectable dimensions for a configurable metric</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="184"/>
-        <location filename="../HelpWhatsThis.cpp" line="213"/>
+        <location filename="../HelpWhatsThis.cpp" line="195"/>
+        <location filename="../HelpWhatsThis.cpp" line="224"/>
         <source>Distribution of activity data samples or metrics according time spent in a certain segment</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="192"/>
+        <location filename="../HelpWhatsThis.cpp" line="203"/>
         <source>Detailed information of a single activity - the metrics shown here are configurable</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="196"/>
+        <location filename="../HelpWhatsThis.cpp" line="207"/>
         <source>Editor for activity file data - allowing to change/correct data, find entries and find anomalies</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="199"/>
+        <location filename="../HelpWhatsThis.cpp" line="210"/>
         <source>Plot of all activity data series in various ways</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="203"/>
+        <location filename="../HelpWhatsThis.cpp" line="214"/>
         <source>Selection of all additional curves to be shown in the diagram - plotted only in case data is available in the activity file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="217"/>
+        <location filename="../HelpWhatsThis.cpp" line="228"/>
         <source>Analysis of heartrate vs. power along the activity data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="219"/>
+        <location filename="../HelpWhatsThis.cpp" line="230"/>
         <source>Map of activity</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="221"/>
+        <location filename="../HelpWhatsThis.cpp" line="232"/>
         <source>Configurable 2D scatter plot of the current activity</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="223"/>
+        <location filename="../HelpWhatsThis.cpp" line="234"/>
         <source>Configurable 3D plot of the current activity</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="234"/>
+        <location filename="../HelpWhatsThis.cpp" line="245"/>
         <source>Predefined and configurable set of data ranges for selection of activities to be analysed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="240"/>
+        <location filename="../HelpWhatsThis.cpp" line="251"/>
         <source>Powerful filter and search engine to determine the activities which are considered in diagram</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="246"/>
+        <location filename="../HelpWhatsThis.cpp" line="257"/>
         <source>Configurable list of activities</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="256"/>
+        <location filename="../HelpWhatsThis.cpp" line="267"/>
         <source>Entry field for sophisticated Searching and Filtering of activities</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="258"/>
+        <location filename="../HelpWhatsThis.cpp" line="269"/>
         <source>Adding intervals to an activity using simple query methods</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="284"/>
+        <location filename="../HelpWhatsThis.cpp" line="291"/>
+        <source>Automatic Interval Detection</source>
+        <translation>Autmatische Intervallerkennung</translation>
+    </message>
+    <message>
+        <location filename="../HelpWhatsThis.cpp" line="297"/>
         <source>Definition of coloring rules for activities</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="178"/>
-        <location filename="../HelpWhatsThis.cpp" line="206"/>
+        <location filename="../HelpWhatsThis.cpp" line="189"/>
+        <location filename="../HelpWhatsThis.cpp" line="217"/>
         <source>Critical Mean Maximal Power Curve</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="180"/>
-        <location filename="../HelpWhatsThis.cpp" line="208"/>
+        <location filename="../HelpWhatsThis.cpp" line="191"/>
+        <location filename="../HelpWhatsThis.cpp" line="219"/>
         <source>Basic configuration like date range, what series to use and how to plot</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="182"/>
-        <location filename="../HelpWhatsThis.cpp" line="210"/>
+        <location filename="../HelpWhatsThis.cpp" line="193"/>
+        <location filename="../HelpWhatsThis.cpp" line="221"/>
         <source>Configuration of the CP Model to be used to plot the curve</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="186"/>
+        <location filename="../HelpWhatsThis.cpp" line="197"/>
         <source>Definition which date range is used for this particular chart</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="188"/>
-        <location filename="../HelpWhatsThis.cpp" line="244"/>
-        <location filename="../HelpWhatsThis.cpp" line="250"/>
+        <location filename="../HelpWhatsThis.cpp" line="199"/>
+        <location filename="../HelpWhatsThis.cpp" line="255"/>
+        <location filename="../HelpWhatsThis.cpp" line="261"/>
         <source>Calendar</source>
         <translation>Kalender</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="190"/>
+        <location filename="../HelpWhatsThis.cpp" line="201"/>
         <source>Configurable activity log - with build in search capabilities</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="201"/>
+        <location filename="../HelpWhatsThis.cpp" line="212"/>
         <source>Selection how the power data series is shown in the plot and general settings on the diagram structure</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="215"/>
+        <location filename="../HelpWhatsThis.cpp" line="226"/>
         <source>Quadrant analysis of pedal velocity vs. effective pedal force</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="225"/>
+        <location filename="../HelpWhatsThis.cpp" line="236"/>
         <source>Chung&apos;s Aerolab analysis</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="228"/>
+        <location filename="../HelpWhatsThis.cpp" line="239"/>
         <source>Overview/summary of the selected data range - data shown in &apos;Athlete&apos;s Best&apos; are configurable</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="230"/>
+        <location filename="../HelpWhatsThis.cpp" line="241"/>
         <source>Chart specific filter/search and date range settings</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="236"/>
+        <location filename="../HelpWhatsThis.cpp" line="247"/>
         <source>Definition of points in time &apos;Events&apos; which are marked explicitely on time related diagrams</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="238"/>
-        <location filename="../HelpWhatsThis.cpp" line="252"/>
+        <location filename="../HelpWhatsThis.cpp" line="249"/>
+        <location filename="../HelpWhatsThis.cpp" line="263"/>
         <source>Simple summary view</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="242"/>
+        <location filename="../HelpWhatsThis.cpp" line="253"/>
         <source>Alternative access to the charts created for the main view</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="248"/>
+        <location filename="../HelpWhatsThis.cpp" line="259"/>
         <source>Display the available and add new intervals using simple query methods</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="262"/>
+        <location filename="../HelpWhatsThis.cpp" line="273"/>
         <source>General</source>
         <translation>Allgemein</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="264"/>
-        <location filename="../HelpWhatsThis.cpp" line="266"/>
+        <location filename="../HelpWhatsThis.cpp" line="275"/>
+        <location filename="../HelpWhatsThis.cpp" line="277"/>
         <source>Athlete</source>
         <translation>Athlet</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="268"/>
+        <location filename="../HelpWhatsThis.cpp" line="279"/>
         <source>Training Zone definition for power</source>
         <translation>Trainingszonen Defintion für Leistung</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="270"/>
+        <location filename="../HelpWhatsThis.cpp" line="281"/>
         <source>Training Zone definition for heartrate</source>
         <translation>Trainingszonen Defintion für Herzfrequenz</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="272"/>
+        <location filename="../HelpWhatsThis.cpp" line="283"/>
         <source>Training Zone definition for Swim and Run</source>
         <translation>Trainingszonen Defintion für Schwimmen und Laufen</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="274"/>
+        <location filename="../HelpWhatsThis.cpp" line="285"/>
         <source>Autoimport</source>
         <translation>Automatischer Import</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="276"/>
+        <location filename="../HelpWhatsThis.cpp" line="287"/>
         <source>Passwords</source>
         <translation>Passwörter</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="278"/>
+        <location filename="../HelpWhatsThis.cpp" line="289"/>
         <source>Appearance</source>
         <translation>Erscheinungsbild</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="280"/>
-        <location filename="../HelpWhatsThis.cpp" line="282"/>
+        <location filename="../HelpWhatsThis.cpp" line="293"/>
+        <location filename="../HelpWhatsThis.cpp" line="295"/>
         <source>Data Fields</source>
         <translation>Datenfelder</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="286"/>
+        <location filename="../HelpWhatsThis.cpp" line="299"/>
         <source>Definition of default value(s) for data fields</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="288"/>
+        <location filename="../HelpWhatsThis.cpp" line="301"/>
         <source>Definition of processing default parameters for the fix, adjust,... tools</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="290"/>
+        <location filename="../HelpWhatsThis.cpp" line="303"/>
         <source>Metrics</source>
         <translation>Metriken</translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="292"/>
+        <location filename="../HelpWhatsThis.cpp" line="305"/>
         <source>Metrics shown in &apos;Bests&apos;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="294"/>
+        <location filename="../HelpWhatsThis.cpp" line="307"/>
         <source>Metrics shown in &apos;Summary&apos;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="296"/>
+        <location filename="../HelpWhatsThis.cpp" line="309"/>
         <source>Metrics shown in &apos;Intervals&apos;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HelpWhatsThis.cpp" line="298"/>
+        <location filename="../HelpWhatsThis.cpp" line="311"/>
         <source>Train Devices</source>
         <translation>Trainingsgeräte</translation>
     </message>
@@ -10294,7 +10336,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <message>
         <location filename="../HrTimeInZone.cpp" line="669"/>
         <source>H10 Percent in Zone</source>
-        <translation type="unfinished">H8 Prozent in der Zone {10 ?}</translation>
+        <translation>H10 Prozent in der Zone</translation>
     </message>
 </context>
 <context>
@@ -10358,7 +10400,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <message>
         <location filename="../HrTimeInZone.cpp" line="626"/>
         <source>H9 Percent in Zone</source>
-        <translation type="unfinished">H8 Prozent in der Zone {9 ?}</translation>
+        <translation>H9 Prozent in der Zone</translation>
     </message>
 </context>
 <context>
@@ -10402,13 +10444,13 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <message>
         <location filename="../HrTimeInZone.cpp" line="248"/>
         <source>H10 Time in Zone</source>
-        <translation type="unfinished">H8 Zeit in Zone {10 ?}</translation>
+        <translation>H10 Zeit in Zone</translation>
     </message>
     <message>
         <location filename="../HrTimeInZone.cpp" line="249"/>
         <location filename="../HrTimeInZone.cpp" line="250"/>
         <source>seconds</source>
-        <translation type="unfinished">Sekunden</translation>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
@@ -10514,13 +10556,13 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <message>
         <location filename="../HrTimeInZone.cpp" line="230"/>
         <source>H9 Time in Zone</source>
-        <translation type="unfinished">H8 Zeit in Zone {9 ?}</translation>
+        <translation>H9 Zeit in Zone</translation>
     </message>
     <message>
         <location filename="../HrTimeInZone.cpp" line="231"/>
         <location filename="../HrTimeInZone.cpp" line="232"/>
         <source>seconds</source>
-        <translation type="unfinished">Sekunden</translation>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
@@ -11766,12 +11808,12 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <message>
         <location filename="../LTMChartParser.cpp" line="110"/>
         <source>Problem Saving Charts Configuration</source>
-        <translation type="unfinished">Problem beim Speichern der Diagrammdefinitionen</translation>
+        <translation>Problem beim Speichern der Diagrammkonfiguration</translation>
     </message>
     <message>
         <location filename="../LTMChartParser.cpp" line="111"/>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
-        <translation type="unfinished">Datei: %1 kann nicht zum &apos;Schreiben&apos; geöffnet werden. Bitte die Dateieigenschaften prüfen.</translation>
+        <translation>Datei: %1 kann nicht zum &apos;Schreiben&apos; geöffnet werden. Bitte die Dateieigenschaften prüfen.</translation>
     </message>
 </context>
 <context>
@@ -13052,107 +13094,107 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <message>
         <location filename="../DataFilter.cpp" line="878"/>
         <source>%1 is unknown</source>
-        <translation type="unfinished">%1 ist unbekannt</translation>
+        <translation>%1 ist unbekannt</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="910"/>
         <source>invalid data series for best(): %1</source>
-        <translation type="unfinished">ungültige Datenserie für &quot;best()&quot;: %1</translation>
+        <translation>ungültige Datenserie für &quot;best()&quot;: %1</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="915"/>
         <source>invalid data series for tiz(): %1</source>
-        <translation type="unfinished">ungültige Datenserie für &quot;tiz()&quot;: %1</translation>
+        <translation>ungültige Datenserie für &quot;tiz()&quot;: %1</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="922"/>
         <source>invalid literal for daterange(): %1</source>
-        <translation type="unfinished">ungültiges Schlüsselwort für daterange(): %1</translation>
+        <translation>ungültiges Schlüsselwort für &quot;daterange()&quot;: %1</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="936"/>
         <source>invalid literal for config(): %1</source>
-        <translation type="unfinished">ungültiges Schlüsselwort für config(): %1</translation>
+        <translation>ungültiges Schlüsselwort für &quot;config()&quot;: %1</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="942"/>
         <source>invalid literal for const(): %1</source>
-        <translation type="unfinished">ungültiges Schlüsselwort für const(): %1</translation>
+        <translation>ungültiges Schlüsselwort für &quot;const()&quot;: %1</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="969"/>
         <source>which function has at least 2 parameters.</source>
-        <translation type="unfinished">die Funktion hat mindestens 2 Parameter.</translation>
+        <translation>die Funktion hat mindestens 2 Parameter.</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="984"/>
         <source>isset/set/unset function first parameter is field/metric to set.</source>
-        <translation type="unfinished">&apos;isset/set/unset&apos; Funktionen - der erste Parameter muss &apos;field/metric&apos; sein.</translation>
+        <translation>&quot;isset&quot;/&quot;set&quot;/&quot;unset&quot; Funktionen - der erste Parameter muss ein Feld oder eine Metric sein.</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="995"/>
         <source>%1 is not supported in isset/set/unset operations</source>
-        <translation type="unfinished">%1 wird bei &apos;isset/set/unset&apos; Operationen nicht unterstützt</translation>
+        <translation>%1 wird bei &quot;isset&quot;/&quot;set&quot;/&quot;unset&quot; Operationen nicht unterstützt</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1005"/>
         <source>isset has one parameter, a symbol to check.</source>
-        <translation type="unfinished">&apos;isset&apos; hat einen Parameter - das zu prüfenden &apos;symbol&apos;.</translation>
+        <translation>&quot;isset&quot; hat einen Parameter - das zu prüfenden Symbol.</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1012"/>
         <source>set function needs 3 paramaters; symbol, value and expression.</source>
-        <translation type="unfinished">&apos;set&apos; Funktion benötigt 3 Parameter - &apos; symbol&apos;,&apos; value&apos; und &apos;expression&apos;.</translation>
+        <translation>&quot;set&quot; Funktion benötigt 3 Parameter - Symbol, Wert und Ausdruck.</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1013"/>
         <source>unset function needs 2 paramaters; symbol and expression.</source>
-        <translation type="unfinished">&apos;unset&apos; Funktion benötigt 2 Parameter - &apos;symbol&apos; und &apos;expression&apos;.</translation>
+        <translation>&quot;unset&quot; Funktion benötigt 2 Parameter - Symbol und Ausdruck.</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1031"/>
         <source>estimate function expects model name as first parameter.</source>
-        <translation type="unfinished">&apos;estimate&apos; Funktion erwartet &apos;model name&apos; als ersten Parameter.</translation>
+        <translation>&quot;estimate&quot; Funktion erwartet dem Modelnamen als ersten Parameter.</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1037"/>
         <source>estimate function expects model name as first parameter</source>
-        <translation type="unfinished">&apos;estimate&apos; Funktion erwartet &apos;model name&apos; als ersten Parameter.</translation>
+        <translation>&quot;estimate&quot; Funktion erwartet dem Modelnamen als ersten Parameter</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1048"/>
         <source>estimate function expects parameter or duration as second parameter</source>
-        <translation type="unfinished">&apos;estimate&apos; Funktion erwartet &apos;parameter&apos; oder &apos;duration&quot; als zweiten Parameter</translation>
+        <translation>&quot;estimate&quot; Funktion erwartet Parameter oder Dauer als zweiten Parameter</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1068"/>
         <source>function &apos;%1&apos; expects %2 parameter(s) not %3</source>
-        <translation type="unfinished">Funktion &apos;%1&apos; erwartet %2 Parameter, nicht %3</translation>
+        <translation>Funktion &apos;%1&apos; erwartet %2 Parameter, nicht %3</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1079"/>
         <source>unknown function %1</source>
-        <translation type="unfinished">Funktion %1 nicht bekannt</translation>
+        <translation>Funktion %1 nicht bekannt</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1089"/>
         <source>unary negation on a string!</source>
-        <translation type="unfinished">unäre &apos;-&apos; Operation bei einem &apos;string&apos;!</translation>
+        <translation>unäre &apos;-&apos; Operation bei einem Text!</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1101"/>
         <source>comparing strings with numbers</source>
-        <translation type="unfinished">vergleiche Text mit Zahlen</translation>
+        <translation>vergleiche Text mit Zahlen</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1108"/>
         <source>using a string operations with a number</source>
-        <translation type="unfinished">verwende eine Text Operation mit einer Zahl</translation>
+        <translation>verwende eine Text Operation mit einer Zahl</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1136"/>
         <source>internal parser error: parms</source>
-        <translation type="unfinished">Interval Parser Fehler: &apos;parms&apos;</translation>
+        <translation>Interner Parser Fehler: Parameter</translation>
     </message>
 </context>
 <context>
@@ -13489,8 +13531,8 @@ on and that its display says, &quot;PC Link&quot;</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../MainWindow.cpp" line="1777"/>
-        <location filename="../MainWindow.cpp" line="1819"/>
+        <location filename="../MainWindow.cpp" line="1780"/>
+        <location filename="../MainWindow.cpp" line="1822"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
@@ -13512,18 +13554,18 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>&amp;Download von Gerät...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="729"/>
+        <location filename="../MainWindow.cpp" line="732"/>
         <source>Diary</source>
         <translation>Tagebuch</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="727"/>
+        <location filename="../MainWindow.cpp" line="730"/>
         <source>Train</source>
         <translation>Trainieren</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="230"/>
-        <location filename="../MainWindow.cpp" line="732"/>
+        <location filename="../MainWindow.cpp" line="735"/>
         <source>Add Chart</source>
         <translation>Diagramm hinzufügen</translation>
     </message>
@@ -13549,7 +13591,7 @@ on and that its display says, &quot;PC Link&quot;</source>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="463"/>
-        <location filename="../MainWindow.cpp" line="1512"/>
+        <location filename="../MainWindow.cpp" line="1515"/>
         <source>Delete Activity</source>
         <translation>Aktivität löschen</translation>
     </message>
@@ -13619,7 +13661,7 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>Aktivitäten kombinieren...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="656"/>
+        <location filename="../MainWindow.cpp" line="659"/>
         <source>VDOT and T-Pace Calculator...</source>
         <translation>VDOT und T-Pace Kalkulator...</translation>
     </message>
@@ -13629,61 +13671,61 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>Aktivität in Kalender hochladen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="668"/>
+        <location filename="../MainWindow.cpp" line="671"/>
         <source>Export Metrics as CSV...</source>
         <translation>Metriken als .CSV exportieren...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1324"/>
+        <location filename="../MainWindow.cpp" line="1327"/>
         <source>Chart Import</source>
         <translation>Diagramm Import</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1324"/>
+        <location filename="../MainWindow.cpp" line="1327"/>
         <source>Imported %1 charts</source>
         <translation>%1 Diagramme importiert</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1412"/>
+        <location filename="../MainWindow.cpp" line="1415"/>
         <source>Failed to export activity, please check permissions</source>
         <translation>Konnte Aktivität nicht exportieren, bitte Dateizugriffsrechte prüfen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1448"/>
+        <location filename="../MainWindow.cpp" line="1451"/>
         <source>No Activity To Save</source>
         <translation>Keine Aktivität zum Sichern vorhanden</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1449"/>
+        <location filename="../MainWindow.cpp" line="1452"/>
         <source>There is no currently selected activity to save.</source>
         <translation>Keine der aktuell ausgewählten Aktivitäten muss gespeichert werden.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1488"/>
-        <location filename="../MainWindow.cpp" line="1490"/>
-        <location filename="../MainWindow.cpp" line="1500"/>
-        <location filename="../MainWindow.cpp" line="1502"/>
+        <location filename="../MainWindow.cpp" line="1491"/>
+        <location filename="../MainWindow.cpp" line="1493"/>
+        <location filename="../MainWindow.cpp" line="1503"/>
+        <location filename="../MainWindow.cpp" line="1505"/>
         <source>Split Activity</source>
         <translation>Aktivität aufteilen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1488"/>
-        <location filename="../MainWindow.cpp" line="1500"/>
+        <location filename="../MainWindow.cpp" line="1491"/>
+        <location filename="../MainWindow.cpp" line="1503"/>
         <source>No activity selected</source>
         <translation>Keine Aktivität ausgewählt</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1490"/>
+        <location filename="../MainWindow.cpp" line="1493"/>
         <source>Current activity contains no data to split</source>
         <translation>Aktuelle Aktivität enthält keine Daten zum Aufteilien</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1502"/>
+        <location filename="../MainWindow.cpp" line="1505"/>
         <source>Current activity contains no data to merge</source>
         <translation>Aktuelle Aktivität enthält keine Daten zum Zusammenführen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1518"/>
+        <location filename="../MainWindow.cpp" line="1521"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation>Sind Sie sicher, dass Sie diese Aktivität löschen möchten:</translation>
     </message>
@@ -13703,12 +13745,12 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="655"/>
+        <location filename="../MainWindow.cpp" line="658"/>
         <source>Air Density (Rho) Estimator...</source>
         <translation>Luftdichte (Rho) Rechner...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="659"/>
+        <location filename="../MainWindow.cpp" line="662"/>
         <source>Get &amp;Withings Data...</source>
         <translation>&amp;Withings-Daten holen...</translation>
     </message>
@@ -13718,38 +13760,38 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>Kalender aktualisieren</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="670"/>
+        <location filename="../MainWindow.cpp" line="673"/>
         <source>Find intervals...</source>
         <translation>Intervalle suchen...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1124"/>
+        <location filename="../MainWindow.cpp" line="1127"/>
         <source>You are about to reset all charts to the default setup</source>
         <translation>Sie sind dabei, alle Diagramme auf die Voreinstellungen zurückzusetzen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1125"/>
+        <location filename="../MainWindow.cpp" line="1128"/>
         <source>Do you want to continue?</source>
         <translation>Wollen Sie die Diagramme zurücksetzen ?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1386"/>
+        <location filename="../MainWindow.cpp" line="1389"/>
         <source>Select Activity</source>
         <translation>Aktivität auswählen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1386"/>
-        <location filename="../MainWindow.cpp" line="1512"/>
+        <location filename="../MainWindow.cpp" line="1389"/>
+        <location filename="../MainWindow.cpp" line="1515"/>
         <source>No activity selected!</source>
         <translation>Keine Aktivität ausgewählt!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1397"/>
+        <location filename="../MainWindow.cpp" line="1400"/>
         <source>Export Activity</source>
         <translation>Exportiere Aktivität</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1411"/>
+        <location filename="../MainWindow.cpp" line="1414"/>
         <source>Export Failed</source>
         <translation>Export nicht erfolgreich</translation>
     </message>
@@ -13805,6 +13847,11 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>Reiter s&amp;chließen</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="620"/>
+        <source>Sha&amp;re</source>
+        <translation>Teilen</translation>
+    </message>
+    <message>
         <location filename="../MainWindow.cpp" line="621"/>
         <source>Share Online...</source>
         <translation>Online Teilen...</translation>
@@ -13850,72 +13897,72 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>Synchronisiere TrainingsPeaks...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="654"/>
+        <location filename="../MainWindow.cpp" line="657"/>
         <source>CP and W&apos; Estimator...</source>
         <translation>CP und W&apos; schätzen...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="664"/>
+        <location filename="../MainWindow.cpp" line="667"/>
         <source>Import workouts, videos, videoSyncs...</source>
         <translation>Importiere Workouts, Videos, VideoSyncs...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="665"/>
+        <location filename="../MainWindow.cpp" line="668"/>
         <source>Scan disk for workouts, videos, videoSyncs...</source>
         <translation>Nach Workouts, Videos, VideoSyncs auf Festplatte suchen...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="667"/>
+        <location filename="../MainWindow.cpp" line="670"/>
         <source>Create Heat Map...</source>
         <translation>Heat Map erzeugen...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="676"/>
+        <location filename="../MainWindow.cpp" line="679"/>
         <source>&amp;Edit</source>
         <translation>&amp;Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="725"/>
+        <location filename="../MainWindow.cpp" line="728"/>
         <source>Activities</source>
         <translation>Aktivitäten</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="734"/>
+        <location filename="../MainWindow.cpp" line="737"/>
         <source>Tabbed not Tiled</source>
         <translation>Reiter statt Kacheln</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="747"/>
+        <location filename="../MainWindow.cpp" line="750"/>
         <source>&amp;Help Overview</source>
         <translation>Überblick &amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="751"/>
+        <location filename="../MainWindow.cpp" line="754"/>
         <source>&amp;Discussion and Support Forum</source>
         <translation>Diskussions- und Supportforum</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1028"/>
-        <location filename="../MainWindow.cpp" line="1652"/>
-        <location filename="../MainWindow.cpp" line="1669"/>
+        <location filename="../MainWindow.cpp" line="1031"/>
+        <location filename="../MainWindow.cpp" line="1655"/>
+        <location filename="../MainWindow.cpp" line="1672"/>
         <source>Activity Import</source>
         <translation>Aktivitäten importieren</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1028"/>
-        <location filename="../MainWindow.cpp" line="1652"/>
-        <location filename="../MainWindow.cpp" line="1669"/>
+        <location filename="../MainWindow.cpp" line="1031"/>
+        <location filename="../MainWindow.cpp" line="1655"/>
+        <location filename="../MainWindow.cpp" line="1672"/>
         <source>Closing of athlete window not possible while background activity import is in progress...</source>
         <translation>Schliessen des Athleten Fensters ist nicht möglich solange im Hintergrund der Aktivitäten Import läuft...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1777"/>
-        <location filename="../MainWindow.cpp" line="1819"/>
+        <location filename="../MainWindow.cpp" line="1780"/>
+        <location filename="../MainWindow.cpp" line="1822"/>
         <source>&amp;New Athlete...</source>
         <translation>&amp;Neuer Athlet...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2024"/>
+        <location filename="../MainWindow.cpp" line="2027"/>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
@@ -13932,33 +13979,33 @@ Please check your preference settings.</source>
         <translation>Crtl+M</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="652"/>
+        <location filename="../MainWindow.cpp" line="655"/>
         <source>&amp;Tools</source>
         <translation>&amp;Werkzeuge</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="653"/>
+        <location filename="../MainWindow.cpp" line="656"/>
         <source>&amp;Options...</source>
         <translation>&amp;Optionen...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="702"/>
+        <location filename="../MainWindow.cpp" line="705"/>
         <source>&amp;View</source>
         <translation>Ansich&amp;t</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="704"/>
-        <location filename="../MainWindow.cpp" line="706"/>
+        <location filename="../MainWindow.cpp" line="707"/>
+        <location filename="../MainWindow.cpp" line="709"/>
         <source>Toggle Full Screen</source>
         <translation>Vollbild an/aus</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="708"/>
+        <location filename="../MainWindow.cpp" line="711"/>
         <source>Show Left Sidebar</source>
         <translation>Linke Sidebar anzeigen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="715"/>
+        <location filename="../MainWindow.cpp" line="718"/>
         <source>Show Toolbar</source>
         <translation>Toolbar anzeigen</translation>
     </message>
@@ -13968,12 +14015,12 @@ Please check your preference settings.</source>
         <translation>Ansicht mit Reitern</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="662"/>
+        <location filename="../MainWindow.cpp" line="665"/>
         <source>Create a new workout...</source>
         <translation>Neues Workout erstellen...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="663"/>
+        <location filename="../MainWindow.cpp" line="666"/>
         <source>Download workouts from ErgDB...</source>
         <translation>Workouts von der ErgDB herunterladen...</translation>
     </message>
@@ -13986,73 +14033,73 @@ Please check your preference settings.</source>
         <translation type="vanished">Nach Videos und Workouts auf Festplatte suchen...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="711"/>
+        <location filename="../MainWindow.cpp" line="714"/>
         <source>Show Compare Pane</source>
         <translation>Vergleichsbereich anzeigen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="719"/>
+        <location filename="../MainWindow.cpp" line="722"/>
         <source>Show Athlete Tabs</source>
         <translation>Athleten Reiter anzeigen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="726"/>
+        <location filename="../MainWindow.cpp" line="729"/>
         <source>Trends</source>
         <translation>Trends</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="733"/>
+        <location filename="../MainWindow.cpp" line="736"/>
         <source>Reset Layout</source>
         <translation>Layout zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="746"/>
+        <location filename="../MainWindow.cpp" line="749"/>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="749"/>
+        <location filename="../MainWindow.cpp" line="752"/>
         <source>&amp;User Guide</source>
         <translation>Ben&amp;utzerhandbuch</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="750"/>
+        <location filename="../MainWindow.cpp" line="753"/>
         <source>&amp;Log a bug or feature request</source>
         <translation>Fehler me&amp;lden oder neue Funktion vorschlagen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="753"/>
+        <location filename="../MainWindow.cpp" line="756"/>
         <source>&amp;About GoldenCheetah</source>
         <translation>Über GoldenCheet&amp;ah</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1433"/>
-        <location filename="../MainWindow.cpp" line="1993"/>
+        <location filename="../MainWindow.cpp" line="1436"/>
+        <location filename="../MainWindow.cpp" line="1996"/>
         <source>Import from File</source>
         <translation>Aus Datei importieren...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1933"/>
+        <location filename="../MainWindow.cpp" line="1936"/>
         <source>Refresh in Progress</source>
         <translation>Aktualisierung läuft</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1939"/>
+        <location filename="../MainWindow.cpp" line="1942"/>
         <source>Export Metrics</source>
         <translation>Metriken exportieren</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1939"/>
+        <location filename="../MainWindow.cpp" line="1942"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation>Comma Separated Values (*.csv)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2023"/>
+        <location filename="../MainWindow.cpp" line="2026"/>
         <source>Workout Directory Invalid</source>
         <translation>Verzeichnis für Workouts ungültig</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1520"/>
+        <location filename="../MainWindow.cpp" line="1523"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
@@ -14188,22 +14235,22 @@ Please check your preference settings.</source>
         <translation>Metriken</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="555"/>
+        <location filename="../ManualRideDialog.cpp" line="552"/>
         <source>Unable to save</source>
         <translation>Fehler beim Speichern</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="556"/>
+        <location filename="../ManualRideDialog.cpp" line="553"/>
         <source>There is already an activity with the same start time or you do not have permissions to save a file.</source>
         <translation>Es gibt bereits eine Aktivität mit derselben Startzeit oder Sie haben keine Berechtigung die Datei zu speichern.</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="567"/>
+        <location filename="../ManualRideDialog.cpp" line="564"/>
         <source>Swim</source>
         <translation>Schwimmen</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="570"/>
+        <location filename="../ManualRideDialog.cpp" line="567"/>
         <source>Run</source>
         <translation>Laufen</translation>
     </message>
@@ -23810,12 +23857,12 @@ F3 drücken, wenn fertig.</translation>
     <message>
         <location filename="../VDOTCalculator.cpp" line="136"/>
         <source>Your Daniels VDOT:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihr Daniels VDOT:</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="149"/>
         <source>Your Training Paces:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihre Trainingspaces:</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="154"/>
