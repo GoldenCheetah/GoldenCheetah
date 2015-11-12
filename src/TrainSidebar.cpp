@@ -1077,7 +1077,7 @@ void TrainSidebar::Start()       // when start button is pressed
         // START!
         play->setIcon(pauseIcon);
 
-        load = 0;
+        load = 100;
         slope = 0.0;
 
         if (mode == ERG || mode == MRC) {
