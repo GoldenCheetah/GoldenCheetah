@@ -52,7 +52,7 @@ CONFIG(debug, debug|release) {
 
 
 # KQOAuth .pro in default creates different libs for release and debug
-unix {
+unix:!macx {
 
     # build from version in repo for Linux builds since
     # kqoauth is not packaged for the Debian build
