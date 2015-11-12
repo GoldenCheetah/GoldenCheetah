@@ -681,7 +681,7 @@ AddPair::initializePage()
 
     // defaults
     static const int index4[4] = { 1,2,3,5 };
-    static const int index8[8] = { 1,2,3,4,5,6,0,0 };
+    static const int index8[8] = { 1,2,3,4,5,6,9,0 };
     const int *index = channels == 4 ? index4 : index8;
 
     // how many devices we got then?
