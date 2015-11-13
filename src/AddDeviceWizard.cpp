@@ -141,6 +141,7 @@ AddType::clicked(QString p)
         case DEV_ANTLOCAL : next = 50; break; // pair 
         default:
         case DEV_CT : next = 60; break; // confirm and add 
+        case DEV_MONARK : next = 60; break; // confirm and add
         case DEV_FORTIUS : next = 30; break; // confirm and add 
         }
     }
@@ -201,6 +202,9 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
 
     // we will need a factory for this soon..
     case DEV_CT : wizard->controller = new ComputrainerController(NULL, NULL); break;
+#if QT_VERSION >= 0x050000
+    case DEV_MONARK : wizard->controller = new MonarkController(NULL, NULL); break;
+#endif
 #ifdef GC_HAVE_LIBUSB
     case DEV_FORTIUS : wizard->controller = new FortiusController(NULL, NULL); break;
 #endif
@@ -453,6 +457,7 @@ AddSearch::nextId() const
         default:
         case DEV_KICKR :
         case DEV_CT : return 60; break; // confirm and add 
+        case DEV_MONARK : return 60; break; // confirm and add
         case DEV_FORTIUS : return 30; break; // confirm and add 
         }
     }

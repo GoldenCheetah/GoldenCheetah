@@ -31,7 +31,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 } else {
 
     ## QT5 specific modules
-    QT += webkitwidgets widgets concurrent
+    QT += webkitwidgets widgets concurrent serialport
     macx {
         QT += macextras webenginewidgets
     } else {
@@ -41,6 +41,10 @@ lessThan(QT_MAJOR_VERSION, 5) {
     ## QT5 can support complex JSON documents
     SOURCES += Dropbox.cpp
     HEADERS += Dropbox.h
+
+    ## Monark support needs QtSerialPort
+    SOURCES += Monark.cpp MonarkController.cpp MonarkConnection.cpp
+    HEADERS += Monark.h MonarkController.h MonarkConnection.h
 }
 
 # if we are building in debug mode
