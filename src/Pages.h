@@ -255,6 +255,9 @@ class CredentialsPage : public QScrollArea
         QLineEdit *veloHeroUser;
         QLineEdit *veloHeroPass;
 
+        QLineEdit *sphUser;
+        QLineEdit *sphPass;
+
         QLineEdit *selUser;
         QLineEdit *selPass;
 
