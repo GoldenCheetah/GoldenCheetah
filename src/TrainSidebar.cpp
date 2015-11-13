@@ -36,7 +36,9 @@
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
 #include "ComputrainerController.h"
+#if QT_VERSION >= 0x050000
 #include "MonarkController.h"
+#endif
 #include "ANTlocalController.h"
 #include "NullController.h"
 #ifdef GC_HAVE_WFAPI
