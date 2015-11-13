@@ -42,7 +42,7 @@ SportPlusHealthUploader::SportPlusHealthUploader(Context *context, RideItem *rid
 bool
 SportPlusHealthUploader::canUpload( QString &err )
 {
-    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER).toString();
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER, "").toString();
 
     if( username.length() > 0 ){
         return true;
