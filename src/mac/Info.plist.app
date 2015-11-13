@@ -16,6 +16,8 @@
 	<string>@EXECUTABLE@</string>
 	<key>CFBundleIdentifier</key>
 	<string>@BUNDLEIDENTIFIER@</string>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
 	<key>NOTE</key>
 	<string>3.3.0 pre-release</string>
 </dict>
