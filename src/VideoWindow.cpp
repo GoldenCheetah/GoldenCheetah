@@ -35,7 +35,7 @@ VideoWindow::VideoWindow(Context *context)  :
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);
 
-    curPosition = 0;
+    curPosition = 1;
 
     init = true; // assume initialisation was ok ...
 
@@ -332,7 +332,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
         if (!VideoSyncFiledataPoints.count()) return;
 
-        if(curPosition > VideoSyncFiledataPoints.count()-1 || curPosition < 0)
+        if(curPosition > VideoSyncFiledataPoints.count()-1 || curPosition < 1)
             curPosition = 1;
 
         double CurrentDistance = qBound(0.0,  rtd.getDistance() + context->currentVideoSyncFile()->manualOffset, context->currentVideoSyncFile()->Distance);
@@ -356,7 +356,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
             if (!dataPoints.count()) return;
 
-            if(curPosition > dataPoints.count()-1 || curPosition < 0)
+            if(curPosition > dataPoints.count()-1 || curPosition < 1)
                 curPosition = 1;
 
             // make sure the current position is less than the new distance
