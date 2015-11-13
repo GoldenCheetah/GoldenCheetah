@@ -23,7 +23,7 @@
 #include "RideFile.h"
 
 struct CsvFileReader : public RideFileReader {
-    enum csvtypes { generic, gc, powertap, joule, ergomo, motoactv, ibike, moxy, freemotion, peripedal, cpexport };
+    enum csvtypes { generic, gc, powertap, joule, ergomo, motoactv, ibike, moxy, freemotion, peripedal, cpexport, bsx };
     typedef enum csvtypes CsvType;
 
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 

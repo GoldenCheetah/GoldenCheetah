@@ -2189,7 +2189,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../AllPlotWindow.cpp" line="116"/>
         <source>User Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Données utilisateur</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="132"/>
@@ -2201,7 +2201,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
         <location filename="../AllPlotWindow.cpp" line="133"/>
         <location filename="../AllPlotWindow.cpp" line="1011"/>
         <source>Formula</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Formule</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="144"/>
@@ -2456,7 +2456,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="566"/>
         <source>Rename route</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Renommer le trajet</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="571"/>
@@ -3581,7 +3581,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="745"/>
         <source>kph</source>
-        <translation></translation>
+        <translation>km/h</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="746"/>
@@ -5713,7 +5713,7 @@ Ceci peut prendre un certain temps.</translation>
     <message>
         <location filename="../Pages.cpp" line="538"/>
         <source>Public Key</source>
-        <translation></translation>
+        <translation>Clef publique</translation>
     </message>
     <message>
         <source>Zeo Sleep Data</source>
@@ -5736,22 +5736,22 @@ Ceci peut prendre un certain temps.</translation>
     <message>
         <location filename="../Pages.cpp" line="578"/>
         <source>CalDAV Calendar</source>
-        <translation></translation>
+        <translation>calendrier CalDAV</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="587"/>
         <source>CalDAV URL</source>
-        <translation></translation>
+        <translation>URL CalDAV</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="588"/>
         <source>CalDAV User Id</source>
-        <translation></translation>
+        <translation>Identifiant CalDAV</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="589"/>
         <source>CalDAV Password</source>
-        <translation></translation>
+        <translation>Mot de passe CalDAV</translation>
     </message>
 </context>
 <context>
@@ -7062,7 +7062,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../DownloadRideDialog.cpp" line="390"/>
         <source>Failed to remove existing file %1: %2</source>
-        <translation></translation>
+        <translation>Impossible de supprimer le fichier %1: %2</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="394"/>
@@ -7285,7 +7285,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../LTMTool.cpp" line="1531"/>
         <source>Formula</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Formule</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1586"/>
@@ -7324,7 +7324,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../LTMTool.cpp" line="1716"/>
         <source>Total</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Total</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1717"/>
@@ -7334,7 +7334,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../LTMTool.cpp" line="1718"/>
         <source>Average</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Moyenne</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1720"/>
@@ -7717,7 +7717,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../UserData.cpp" line="180"/>
         <source>Formula</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Formule</translation>
     </message>
     <message>
         <location filename="../UserData.cpp" line="182"/>
@@ -8073,12 +8073,12 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../FileStore.cpp" line="116"/>
         <source>expected compressed activity file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">fichier d&apos;activité compressé souhaité.</translation>
     </message>
     <message>
         <location filename="../FileStore.h" line="62"/>
         <source>Base class</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Classe de base</translation>
     </message>
 </context>
 <context>
@@ -8087,7 +8087,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
         <location filename="../FileStore.cpp" line="205"/>
         <location filename="../FileStore.cpp" line="407"/>
         <source>Folder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Répertoire</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="212"/>
@@ -8102,17 +8102,17 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../FileStore.cpp" line="214"/>
         <source>Modified</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifié</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="229"/>
         <source>Create Folder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Créer un répertoire</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="230"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Annuler</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="231"/>
@@ -8125,17 +8125,17 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../FileStore.cpp" line="465"/>
         <source>Synchronise </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">synchronise </translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="473"/>
         <source>Sync with </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sync. avec </translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="474"/>
         <source>Unable to connect, check your configuration in preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impossible de se connecter, vérifiez votre configuration dans les préférences</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="493"/>
@@ -8188,7 +8188,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../FileStore.cpp" line="531"/>
         <source>Workout Id</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Identifiant entrainement</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="532"/>
@@ -8202,13 +8202,13 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
         <location filename="../FileStore.cpp" line="559"/>
         <location filename="../FileStore.cpp" line="598"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Heure</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="534"/>
         <location filename="../FileStore.cpp" line="562"/>
         <source>Exists</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Existe</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="535"/>
@@ -8242,17 +8242,17 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../FileStore.cpp" line="585"/>
         <source>Keep %1 but delete Local</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Conserver %1 mais effacer Local</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="586"/>
         <source>Keep Local but delete %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Conserver Local et supprimer %1</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="596"/>
         <source>Source</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Source</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="601"/>
@@ -8262,7 +8262,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../FileStore.cpp" line="622"/>
         <source>Initial</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Initial</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="624"/>
@@ -8274,7 +8274,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
         <location filename="../FileStore.cpp" line="949"/>
         <location filename="../FileStore.cpp" line="963"/>
         <source>%1 of %2 selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 parmis %2 selectionnés</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1040"/>
@@ -8297,12 +8297,12 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
         <location filename="../FileStore.cpp" line="1070"/>
         <location filename="../FileStore.cpp" line="1241"/>
         <source>Parse failure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erreur d&apos;interpréteur</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1085"/>
         <source>Sync complete</source>
-        <translation type="unfinished">Synchronisation complete</translation>
+        <translation type="unfinished">Synchronisation terminée</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1097"/>
@@ -8324,7 +8324,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../FileStore.cpp" line="1139"/>
         <source>Downloads complete</source>
-        <translation type="unfinished">Téléchargement complet</translation>
+        <translation type="unfinished">Téléchargement terminé</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1150"/>
@@ -10798,7 +10798,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="86"/>
         <source>Activate / De-activate the Sidebar - which provides different sub-sections to select data shown in the main view</source>
-        <translation></translation>
+        <translation>Activer / désactiver la barre latérale - qui donne accès a différentes sous-sections pour sélectionner les données visualisées dans l&apos;écran principal</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="92"/>
@@ -11156,7 +11156,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../HelpWhatsThis.cpp" line="264"/>
         <location filename="../HelpWhatsThis.cpp" line="266"/>
         <source>Athlete</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Athlète</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="268"/>
@@ -11176,7 +11176,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="274"/>
         <source>Autoimport</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importation automatique</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="276"/>
@@ -12431,47 +12431,47 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../ICalendar.cpp" line="98"/>
         <source>Related to</source>
-        <translation></translation>
+        <translation>Relatif à</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="99"/>
         <source>Related to Calendar Identifier</source>
-        <translation></translation>
+        <translation>Relatif à l&apos;identifiant du calendrier</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="100"/>
         <source>Repeat</source>
-        <translation></translation>
+        <translation>Répéter</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="101"/>
         <source>Request Status</source>
-        <translation></translation>
+        <translation>Statut de la requête</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="102"/>
         <source>Resources</source>
-        <translation></translation>
+        <translation>Ressources</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="103"/>
         <source>Restriction</source>
-        <translation></translation>
+        <translation>Restriction</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="104"/>
         <source>Rule</source>
-        <translation></translation>
+        <translation>Règle</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="105"/>
         <source>Scope</source>
-        <translation></translation>
+        <translation>Etendue</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="106"/>
         <source>Sequence Number</source>
-        <translation></translation>
+        <translation>Numéro de séquence</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="107"/>
@@ -12501,37 +12501,37 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../ICalendar.cpp" line="112"/>
         <source>Trigger</source>
-        <translation></translation>
+        <translation>Seuil</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="113"/>
         <source>Timezone Identifier</source>
-        <translation></translation>
+        <translation>Identifiant de fuseau horaire</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="114"/>
         <source>Timezone Name</source>
-        <translation></translation>
+        <translation>Nom du fuseau horaire</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="115"/>
         <source>Timezone Offset from</source>
-        <translation></translation>
+        <translation>Décalage horaire depuis </translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="116"/>
         <source>Timezone Offset to</source>
-        <translation></translation>
+        <translation>Décalage horaire vers </translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="117"/>
         <source>Timezone URL</source>
-        <translation></translation>
+        <translation>URL du fuseau horaire</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="118"/>
         <source>Unique Identifier</source>
-        <translation></translation>
+        <translation>Identifiant unique</translation>
     </message>
     <message>
         <location filename="../ICalendar.cpp" line="119"/>
@@ -14355,7 +14355,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../LTMTool.cpp" line="303"/>
         <source>Preset</source>
-        <translation></translation>
+        <translation>Pré-réglage</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="304"/>
@@ -14410,7 +14410,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../LTMTool.cpp" line="1253"/>
         <source>Formula</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Formule</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1429"/>
@@ -14845,7 +14845,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../LapsEditor.cpp" line="87"/>
         <source>&amp;Cancel</source>
-        <translation></translation>
+        <translation>&amp;Annuler</translation>
     </message>
 </context>
 <context>
@@ -14868,17 +14868,17 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../DataFilter.cpp" line="922"/>
         <source>invalid literal for daterange(): %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">litéral invalide pour &apos;daterange()&apos;: &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="936"/>
         <source>invalid literal for config(): %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">litéral invalide pour &apos;config()&apos;: &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="942"/>
         <source>invalid literal for const(): %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">litéral invalide pour &apos;const()&apos;: &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="969"/>
@@ -14888,52 +14888,52 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../DataFilter.cpp" line="984"/>
         <source>isset/set/unset function first parameter is field/metric to set.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">la fonction &apos;isset/set/unset&apos; demande la donnée en premier paramètre</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="995"/>
         <source>%1 is not supported in isset/set/unset operations</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&apos;%1&apos; n&apos;est pas supporté par isset/set/unset</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1005"/>
         <source>isset has one parameter, a symbol to check.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&apos;isset&apos; demande un paramètre, le symbol à vérifier</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1012"/>
         <source>set function needs 3 paramaters; symbol, value and expression.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">la fonction &apos;set&apos; demande 3 paramètres: symbole, valeur et expression</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1013"/>
         <source>unset function needs 2 paramaters; symbol and expression.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">la fonction &apos;unset&apos; demande deux paramètres: symbole et expression </translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1031"/>
         <source>estimate function expects model name as first parameter.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">la fonction &apos;estimate&apos; demande un nom de modèle en premier paramètre</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1037"/>
         <source>estimate function expects model name as first parameter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">la fonction &apos;estimate&apos; demande un nom de modèle en premier paramètre</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1048"/>
         <source>estimate function expects parameter or duration as second parameter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">la fonction &apos;estimate&apos; demande un paramètre ou une durée en second paramètre</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1068"/>
         <source>function &apos;%1&apos; expects %2 parameter(s) not %3</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">la fonction &apos;%1&apos; demande %2 parametres et non %3</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1079"/>
         <source>unknown function %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">fonction inconnue %1</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1089"/>
@@ -14953,7 +14953,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../DataFilter.cpp" line="1136"/>
         <source>internal parser error: parms</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">erreur de l&apos;analyseur syntaxique interne: parms</translation>
     </message>
 </context>
 <context>
@@ -17391,7 +17391,7 @@ Effectuées: %1
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1804"/>
         <source>Min Heartrate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pulsations min</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1805"/>
@@ -20652,7 +20652,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../PwxRideFile.cpp" line="583"/>
         <source>Bike</source>
-        <translation>Bike</translation>
+        <translation>Vélo</translation>
     </message>
     <message>
         <source>%1 is unknown</source>
@@ -22721,7 +22721,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../RideImportWizard.cpp" line="905"/>
         <source>Automatic import from defined directories is completed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">L&apos;import automatique à partir des répertoires sélectionnés est terminé</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="987"/>
@@ -22797,7 +22797,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../RideImportWizard.cpp" line="210"/>
         <source>No files in requested time range</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pas de fichier pour la période demandée</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="213"/>
@@ -25652,7 +25652,7 @@ Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&
     <message>
         <location filename="../SrmDevice.cpp" line="619"/>
         <source>cleaning device ...</source>
-        <translation>effece les données ...</translation>
+        <translation>efface les données ...</translation>
     </message>
     <message>
         <location filename="../SrmDevice.cpp" line="622"/>
@@ -26714,17 +26714,17 @@ Choisir Annuler pour sortir.</translation>
     <message>
         <location filename="../TrainDB.cpp" line="499"/>
         <source>Manual Erg Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode Erg manuel</translation>
     </message>
     <message>
         <location filename="../TrainDB.cpp" line="503"/>
         <source>Manual Slope Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode pente en manuel</translation>
     </message>
     <message>
         <location filename="../TrainDB.cpp" line="521"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aucun</translation>
     </message>
     <message>
         <source> Manual Erg Mode</source>
@@ -26840,7 +26840,7 @@ Choisir Annuler pour sortir.</translation>
     <message>
         <location filename="../TrainSidebar.cpp" line="906"/>
         <source>Are you sure you want to delete this Workout?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Etes vous sur de vouloir supprimer cet entraînement?</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="933"/>
@@ -27494,7 +27494,7 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../VDOTCalculator.cpp" line="107"/>
         <source> hours</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"> heures</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="116"/>
@@ -27579,7 +27579,7 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../VDOTCalculator.cpp" line="211"/>
         <source>Calculate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Calculer</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="215"/>
@@ -28221,7 +28221,9 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
         <source>Please note, that when importing or drag and dropping videos into the library we DO NOT copy the file into the GoldenCheetah library, instead we add a REFERENCE to it. We DO copy workout and videoSync files, since they are smaller.
 
 You can remove references when managing the library via the context menu options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Veuillez noter que lors de l&amp;import ou glisser-déposer de vidéos dans la bibliothèque nous NE copions PAS les fichiers dans la bibliothèque de GoldenCheetah, mais nous créons un lien vers celui-ci. Nous copions les fichiers de synchronisation car ils sont plus petits.
+        
+Vous pouvez supprimez ces liens lorsque vous gérez votre bibliothèque par l&apos;intermédaire du menu contextuel d&amp;option</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="782"/>
