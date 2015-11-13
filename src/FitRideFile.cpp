@@ -86,6 +86,7 @@ struct FitFileReaderState
     int calibration;
     int devices;
     bool stopped;
+    bool isLapSwim;
     int last_event_type;
     int last_event;
     int last_msg_type;
@@ -95,7 +96,7 @@ struct FitFileReaderState
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
-        last_time(0), last_distance(0.00f), interval(0), calibration(0), devices(0), stopped(true),
+        last_time(0), last_distance(0.00f), interval(0), calibration(0), devices(0), stopped(true), isLapSwim(false),
         last_event_type(-1), last_event(-1), last_msg_type(-1)
     {
     }
@@ -493,6 +494,7 @@ struct FitFileReaderState
     }
 
     void decodeRecord(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+        if (isLapSwim) return; // We use the length message for Lap Swimming
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
@@ -791,6 +793,20 @@ struct FitFileReaderState
     }
 
     void decodeLength(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+        if (!isLapSwim) {
+            isLapSwim = true;
+            // reset rideFile if not empty
+            if (!rideFile->dataPoints().empty()) {
+                start_time = 0;
+                last_time = 0;
+                last_distance = 0.00f;
+                interval = 0;
+                delete rideFile;
+                rideFile = new RideFile;
+                rideFile->setDeviceType("Garmin FIT");
+                rideFile->setRecIntSecs(1.0);
+             }
+        }
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
