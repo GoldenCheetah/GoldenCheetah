@@ -25,7 +25,10 @@ MonarkConnection::MonarkConnection() :
     m_serial(0),
     m_pollInterval(1000),
     m_timer(0),
-    m_canControlPower(false)
+    m_canControlPower(false),
+    m_load(0),
+    m_loadToWrite(0),
+    m_shouldWriteLoad(false)
 {
 }
 
@@ -108,6 +111,7 @@ void MonarkConnection::run()
         if (m_id.toLower().startsWith("lc"))
         {
             m_canControlPower = true;
+            setLoad(100);
         }
 
         // Set up polling
@@ -129,6 +133,15 @@ void MonarkConnection::requestAll()
     requestPower();
     requestPulse();
     requestCadence();
+
+    if ((m_loadToWrite != m_load) && m_canControlPower)
+    {
+        QString cmd = QString("power %1\r").arg(m_loadToWrite);
+        m_serial->write(cmd.toStdString().c_str());
+        if (m_serial->waitForBytesWritten(100))
+            m_load = m_loadToWrite;
+        QByteArray data = m_serial->readAll();
+    }
 
     m_mutex.unlock();
 }
@@ -158,6 +171,12 @@ void MonarkConnection::requestCadence()
     QByteArray data = readAnswer();
     quint32 c = data.toInt();
     emit cadence(c);
+}
+
+void MonarkConnection::setLoad(unsigned int load)
+{
+    m_loadToWrite = load;
+    m_shouldWriteLoad = true;
 }
 
 /*

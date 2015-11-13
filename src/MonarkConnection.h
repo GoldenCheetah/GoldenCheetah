@@ -40,6 +40,7 @@ public slots:
     void requestPower();
     void requestPulse();
     void requestCadence();
+    void setLoad(unsigned int load);
 
 private:
     QString m_serialPortName;
@@ -51,6 +52,9 @@ private:
     QByteArray readAnswer(int timeoutMs = -1);
     QMutex m_mutex;
     bool m_canControlPower;
+    unsigned int m_load;
+    unsigned int m_loadToWrite;
+    bool m_shouldWriteLoad;
 
 signals:
     void pulse(quint32);

@@ -45,13 +45,13 @@ public:
     quint32 cadence() {return m_cadence;}
     bool discover(QString portName);
 
+    void setLoad(double load);
 
 private:
-    MonarkConnection m_lt2;
+    MonarkConnection m_monarkConnection;
     quint32 m_heartRate;
     quint32 m_power;
     quint32 m_cadence;
-
 
 private slots:
     void newHeartRate(quint32);
