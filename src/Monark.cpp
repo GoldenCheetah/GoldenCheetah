@@ -26,10 +26,10 @@ Monark::Monark(QObject *parent,  QString devname) : QObject(parent),
     m_power(0),
     m_cadence(0)
 {
-    m_lt2.setSerialPort(devname);
-    connect(&m_lt2, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection);
-    connect(&m_lt2, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection);
-    connect(&m_lt2, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection);
+    m_monarkConnection.setSerialPort(devname);
+    connect(&m_monarkConnection, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection);
+    connect(&m_monarkConnection, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection);
+    connect(&m_monarkConnection, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection);
 }
 
 Monark::~Monark()
@@ -38,7 +38,7 @@ Monark::~Monark()
 
 int Monark::start()
 {
-    m_lt2.start();
+    m_monarkConnection.start();
     return 0;
 }
 
@@ -80,7 +80,7 @@ bool Monark::discover(QString portName)
 
     if (sp.open(QSerialPort::ReadWrite))
     {
-        m_lt2.configurePort(&sp);
+        m_monarkConnection.configurePort(&sp);
 
         // Discard any existing data
         QByteArray data = sp.readAll();
@@ -113,4 +113,10 @@ bool Monark::discover(QString portName)
     sp.close();
 
     return found;
+}
+
+
+void Monark::setLoad(double load)
+{
+    m_monarkConnection.setLoad((unsigned int)load);
 }

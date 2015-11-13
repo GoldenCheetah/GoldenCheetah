@@ -71,7 +71,7 @@ MonarkController::discover(QString name)
 
 bool MonarkController::doesPush() { return false; }
 bool MonarkController::doesPull() { return true; }
-bool MonarkController::doesLoad() { return false; }
+bool MonarkController::doesLoad() { return true; }
 
 /*
  * gets called from the GUI to get updated telemetry.
@@ -89,4 +89,7 @@ MonarkController::getRealtimeData(RealtimeData &rtData)
 
 void MonarkController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
 
-
+void MonarkController::setLoad(double load)
+{
+    m_monark->setLoad(load);
+}
