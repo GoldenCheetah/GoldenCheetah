@@ -92,7 +92,7 @@ bool Monark::discover(QString portName)
         QByteArray id;
         do
         {
-            bool readyToRead = sp.waitForReadyRead(-1);
+            bool readyToRead = sp.waitForReadyRead(1000);
             if (readyToRead)
             {
                 id.append(sp.readAll());
