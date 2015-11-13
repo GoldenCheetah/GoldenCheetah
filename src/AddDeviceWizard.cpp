@@ -202,7 +202,9 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
 
     // we will need a factory for this soon..
     case DEV_CT : wizard->controller = new ComputrainerController(NULL, NULL); break;
+#if QT_VERSION >= 0x050000
     case DEV_MONARK : wizard->controller = new MonarkController(NULL, NULL); break;
+#endif
 #ifdef GC_HAVE_LIBUSB
     case DEV_FORTIUS : wizard->controller = new FortiusController(NULL, NULL); break;
 #endif

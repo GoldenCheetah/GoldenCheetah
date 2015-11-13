@@ -21,7 +21,7 @@ LIBS += -lm $${LIBZ_LIBS}
 #            5.2.0 or higher
 #
 ## common modules
-QT += xml sql network script svg concurrent serialport
+QT += xml sql network script svg concurrent
 
 lessThan(QT_MAJOR_VERSION, 5) {
 
@@ -31,7 +31,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 } else {
 
     ## QT5 specific modules
-    QT += webkitwidgets widgets concurrent
+    QT += webkitwidgets widgets concurrent serialport
     macx {
         QT += macextras webenginewidgets
     } else {
@@ -41,6 +41,10 @@ lessThan(QT_MAJOR_VERSION, 5) {
     ## QT5 can support complex JSON documents
     SOURCES += Dropbox.cpp
     HEADERS += Dropbox.h
+
+    ## Monark support needs QtSerialPort
+    SOURCES += Monark.cpp MonarkController.cpp MonarkConnection.cpp
+    HEADERS += Monark.h MonarkController.h MonarkConnection.h
 }
 
 # if we are building in debug mode
@@ -455,9 +459,6 @@ HEADERS += \
         RealtimeController.h \
         ReferenceLineDialog.h \
         ComputrainerController.h \
-        MonarkConnection.h \
-        MonarkController.h \
-        Monark.h \
         RealtimePlot.h \
         RideAutoImportConfig.h \
         RideCache.h \
@@ -705,9 +706,6 @@ SOURCES += \
         RealtimeData.cpp \
         RealtimeController.cpp \
         ComputrainerController.cpp \
-        MonarkConnection.cpp \
-        MonarkController.cpp \
-        Monark.cpp \
         RealtimePlot.cpp \
         RealtimePlotWindow.cpp \
         ReferenceLineDialog.cpp \
