@@ -32,13 +32,13 @@ DeviceTypes::DeviceTypes()
     static DeviceType SupportedDevices[] =
     {
 #ifdef Q_OS_WIN32
-      { DEV_ANTLOCAL, DEV_USB,     (char *) "Native ANT+",            true,    false,
-        tr("ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, "
+      { DEV_ANTLOCAL, DEV_USB,     (char *) "ANT+ and FE-C",            true,    false,
+        tr("ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM and Powertap power meters, Heart rate belts, "
         "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick"),
         ":images/devices/garminusb.png" },
 #else
-      { DEV_ANTLOCAL, DEV_SERIAL,  (char *) "Native ANT+",           true,    false,
-        tr("ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, "
+      { DEV_ANTLOCAL, DEV_SERIAL,  (char *) "ANT+ and FE-C",           true,    false,
+        tr("ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM, Powertap or Quarq power meters, Heart rate belts, "
         "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick") ,
         ":images/devices/garminusb.png" },
 #endif
