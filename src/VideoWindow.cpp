@@ -330,10 +330,10 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
         QVector<VideoSyncFilePoint> VideoSyncFiledataPoints = context->currentVideoSyncFile()->Points;
 
-        if (!VideoSyncFiledataPoints.count()) return;
+        if (VideoSyncFiledataPoints.count()<2) return;
 
         if(curPosition > VideoSyncFiledataPoints.count()-1 || curPosition < 1)
-            curPosition = 1;
+            curPosition = 1; // minimum curPosition is 1 as we will use [curPosition-1]
 
         double CurrentDistance = qBound(0.0,  rtd.getDistance() + context->currentVideoSyncFile()->manualOffset, context->currentVideoSyncFile()->Distance);
         context->currentVideoSyncFile()->km = CurrentDistance;
@@ -354,10 +354,10 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         //TODO : GPX file format
             // otherwise we use the gpx from selected ride in analysis view:
             QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
-            if (!dataPoints.count()) return;
+            if (dataPoints.count()<2) return;
 
             if(curPosition > dataPoints.count()-1 || curPosition < 1)
-                curPosition = 1;
+                curPosition = 1; // minimum curPosition is 1 as we will use [curPosition-1]
 
             // make sure the current position is less than the new distance
             while ((dataPoints[curPosition]->km > rtd.getDistance()) && (curPosition > 1))
