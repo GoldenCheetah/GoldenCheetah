@@ -32,8 +32,8 @@
        <Text>Watts</Text>
    </meter>
    <meter name="Cadencemeter" container="Video" source="Cadence" type="CircularBargraph">
-       <RelativeSize Width="20.0" Height="15.0" />
-       <RelativePosition X="50.0" Y="77.0" />
+       <RelativeSize Width="20.0" Height="13.0" />
+       <RelativePosition X="50.0" Y="73.0" />
        <Range Min="0.0" Max="200.0" />
        <MainColor R="5" G="0" B="255" A="180" />
        <Angle>280.0</Angle>
@@ -54,5 +54,9 @@
        <RelativeSize Width="15.0" Height="5.0" />
        <RelativePosition X="50.0" Y="90.0" />
        <MainColor R="255" G="0" B="0" A="180" />
+   </meter>
+   <meter name="status" container="Video" source="TrainerStatus" type="Text">
+       <RelativeSize Width="15.0" Height="5.0" />
+       <RelativePosition X="1.0" Y="10.0" />
    </meter>
 </layout>

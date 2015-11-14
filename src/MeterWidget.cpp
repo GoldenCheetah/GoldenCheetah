@@ -92,6 +92,11 @@ void MeterWidget::paintEvent(QPaintEvent* paintevent)
     Q_UNUSED(paintevent);
 }
 
+void  MeterWidget::setColor(QColor  mainColor)
+{
+    m_MainColor = mainColor;
+}
+
 TextMeterWidget::TextMeterWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
 {
 }
