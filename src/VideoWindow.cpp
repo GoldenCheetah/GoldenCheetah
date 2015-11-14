@@ -311,6 +311,37 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             p_meterWidget->Value =  rtd.getHr();
             p_meterWidget->Text = QString::number((int)p_meterWidget->Value) + tr(" bpm");
         }
+        else if (p_meterWidget->Source() == QString("TrainerStatus"))
+        {
+            if (!rtd.getTrainerStatusAvailable())
+            {  // we don't have status from trainer thus we cannot indicate anything on screen
+                p_meterWidget->Text = tr("");
+            }
+            else if (rtd.getTrainerCalibRequired())
+            {
+                p_meterWidget->setColor(QColor(255,0,0,180));
+                p_meterWidget->Text = tr("Calibration required");
+            }
+            else if (rtd.getTrainerConfigRequired())
+            {
+                p_meterWidget->setColor(QColor(255,0,0,180));
+                p_meterWidget->Text = tr("Configuration required");
+            }
+            else if (rtd.getTrainerBrakeFault())
+            {
+                p_meterWidget->setColor(QColor(255,0,0,180));
+                p_meterWidget->Text = tr("brake fault");
+            }
+            else if (rtd.getTrainerReady())
+            {
+                p_meterWidget->setColor(QColor(0,255,0,180));
+                p_meterWidget->Text = tr("Ready");
+            }
+            else
+            {
+                p_meterWidget->Text = tr("");
+            }
+        }
     }
 
     foreach(MeterWidget* p_meterWidget , m_metersWidget)

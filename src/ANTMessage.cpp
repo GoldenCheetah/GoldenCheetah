@@ -522,24 +522,49 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 switch (data_page)
                 {
                 case FITNESS_EQUIPMENT_GENERAL_PAGE:
-                    //based on "ANT+ Device Profile Fitness Equipment" rev 4.1 p 42: 6.5.2 Data page 0x10 - General FE Data
-                    fecEqtType = message[5];
-                    fecRawDistance = message[7];
-                    fecSpeed = (message[9] << 8) | message[8];
-
-                    break;
+                     //based on "ANT+ Device Profile Fitness Equipment" rev 4.1 p 42: 6.5.2 Data page 0x10 - General FE Data
+                     fecEqtType = message[5] & 0x1F;
+                     elapsedTime = message[6];                  // elapsed time since begining of workout ; unit 0.25s ; rollover 64s
+                     fecRawDistance = message[7];               // accumulated distance ; unit = m ; rollover = 256m
+                     fecSpeed = (message[9] << 8) | message[8]; // instantaneous speed ; unit=0.001 m/s ; 0xFFFF=invalid
+                     instantHeartrate = message[10];            // instantaneous heartrate ; unit = bpm ; 0xFF=invalid
+                     fecHRSource = message[11] & 0x03;
+                     fecDistanceCapability = (message[11] & 0x04) == 0x04;
+                     fecSpeedIsVirtual     = (message[11] & 0x08) == 0x08;
+                     fecState = (message[11] & 0xF0) >> 4;
+                     break;
 
                 case FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE:
-                    fecCadence = message[6];
-                    fecInstantPower = message[9];
-                    fecInstantPower |= (message[10] & 0x0F) << 8;
-                    break;
+                     //based on "ANT+ Device Profile Fitness Equipment" rev 4.1 p 58: 6.6.7 Data page 0x19 - Specific trainer data
+                     fecPage0x19EventCount = message[5];
+                     fecCadence = message[6];
+                     fecAccumulatedPower = message[7];
+                     fecAccumulatedPower |= message[8] << 8;
+                     fecInstantPower = message[9];
+                     fecInstantPower |= (message[10] & 0x0F) << 8;
+                     fecPowerCalibRequired = ((message[10] & 0xF0) >> 4) & FITNESS_EQUIPMENT_POWERCALIB_REQU;
+                     fecResisCalibRequired = ((message[10] & 0xF0) >> 4) & FITNESS_EQUIPMENT_RESISCALIB_REQU;
+                     fecUserConfigRequired = ((message[10] & 0xF0) >> 4) & FITNESS_EQUIPMENT_USERCONFIG_REQU;
+                     fecPowerOverLimits = message[11] & 0x0F;
+                     fecState = (message[11] & 0xF0) >> 4;
+                     break;
+
+                case FITNESS_EQUIPMENT_TRAINER_TORQUE_PAGE:
+                     //based on "ANT+ Device Profile Fitness Equipment" rev 4.1 p 61: 6.6.8 Data page 0x20 - Specific trainer torque data
+                     fecPage0x20EventCount = message[5];
+                     wheelRevolutions = message[6];                 // increments with each wheel revolution, rollover 256 revolutions
+                     wheelAccumulatedPeriod = message[7];           // accumulated wheel period ; unit: 1/2048s ; rollover 32s
+                     wheelAccumulatedPeriod |= message[8] << 8;
+                     accumulatedTorque = message[9];                // accumulated torque ; unit: 1/32Nm ; rollover 2048Nm
+                     accumulatedTorque |= message[10] << 8;
+                     fecState = (message[11] & 0xF0) >> 4;
+                     break;
 
                 case FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE:
-                    fecMaxResistance         = message[9];
-                    fecMaxResistance        |= (message[10]) << 8;
-                    fecCapabilities          = message[11];
-                    break;
+                     fecMaxResistance         = message[9];
+                     fecMaxResistance        |= (message[10]) << 8;
+                     fecCapabilities          = message[11];
+                     break;
 
                 case FITNESS_EQUIPMENT_COMMAND_STATUS_PAGE:
                     // Acknowledge from device
@@ -700,6 +725,12 @@ void ANTMessage::init()
     pedalPower = 0;
     leftTorqueEffectiveness = rightTorqueEffectiveness = 0;
     leftOrCombinedPedalSmoothness = rightPedalSmoothness = 0;
+    fecSpeed = fecInstantPower = fecAccumulatedPower = 0;
+    fecRawDistance = fecCadence = fecPage0x19EventCount = fecPage0x20EventCount = 0;
+    fecPowerCalibRequired = fecResisCalibRequired = fecUserConfigRequired = false;
+    fecPowerOverLimits = fecState = fecHRSource = 0;
+    fecDistanceCapability = fecSpeedIsVirtual = false;
+    fecEqtType = 0;
 }
 
 ANTMessage ANTMessage::resetSystem()

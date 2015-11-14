@@ -76,7 +76,6 @@ class ANTChannelInitialisation {
 
 
 class ANTChannel : public QObject {
-
     private:
 
         Q_OBJECT

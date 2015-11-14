@@ -1376,6 +1376,15 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setLPS(local.getLPS());
                     rtData.setRPS(local.getRPS());
                 }
+                if (local.getTrainerStatusAvailable())
+                {
+                    rtData.setTrainerStatusAvailable(true);
+                    rtData.setTrainerReady(local.getTrainerReady());
+                    rtData.setTrainerRunning(local.getTrainerRunning());
+                    rtData.setTrainerCalibRequired(local.getTrainerCalibRequired());
+                    rtData.setTrainerConfigRequired(local.getTrainerConfigRequired());
+                    rtData.setTrainerBrakeFault(local.getTrainerBrakeFault());
+                }
             }
 
             // Distance assumes current speed for the last second. from km/h to km/sec
