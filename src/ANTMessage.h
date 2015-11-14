@@ -131,6 +131,9 @@ class ANTMessage {
         uint16_t slope, period, torque; // power
         uint16_t sumPower, instantPower; // power
         uint16_t wheelRevolutions, crankRevolutions; // speed and power and cadence
+        uint16_t wheelAccumulatedPeriod;
+        uint16_t accumulatedTorque;
+        uint8_t  elapsedTime;
         uint8_t instantCadence; // cadence
         uint8_t autoZeroStatus, autoZeroEnable;
         bool utcTimeRequired; // moxy
@@ -144,8 +147,14 @@ class ANTMessage {
         uint8_t vortexUsingVirtualSpeed;
 
         // fitness equipment data fields
-        uint16_t fecSpeed, fecInstantPower;
-        uint8_t  fecRawDistance, fecCadence;
+        uint16_t fecSpeed, fecInstantPower, fecAccumulatedPower;
+        uint8_t  fecRawDistance, fecCadence, fecPage0x19EventCount, fecPage0x20EventCount;
+        bool     fecPowerCalibRequired, fecResisCalibRequired, fecUserConfigRequired;
+        uint8_t  fecPowerOverLimits;
+        uint8_t  fecState;
+        uint8_t  fecHRSource;
+        bool     fecDistanceCapability;
+        bool     fecSpeedIsVirtual;
 
         uint8_t  fecEqtType, fecCapabilities;
         bool     fecResistModeCapability, fecPowerModeCapability, fecSimulModeCapability;
