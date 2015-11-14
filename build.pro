@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
-SUBDIRS = qwt src
+SUBDIRS = qwt
 unix:!macx {
     SUBDIRS += kqoauth
 }
+SUBDIRS += src
 CONFIG += ordered
