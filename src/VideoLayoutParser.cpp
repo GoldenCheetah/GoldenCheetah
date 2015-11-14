@@ -208,6 +208,8 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
             meterWidget->m_Angle = buffer.toFloat();
         else if (qName == "SubRange")
             meterWidget->m_SubRange = buffer.toInt();
+        else if (qName == "Text")
+            meterWidget->Text = QString(buffer);
 
         else if (qName == "meter")
         {

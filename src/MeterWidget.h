@@ -43,6 +43,7 @@ class MeterWidget : public QWidget
     virtual void paintEvent(QPaintEvent* paintevent);
     virtual QSize sizeHint() const;
     virtual QSize minimumSize() const;
+    void    setColor(QColor  mainColor);
 
     float Value, ValueMin, ValueMax;
     QString Text, AltText;
