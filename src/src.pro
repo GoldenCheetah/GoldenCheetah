@@ -61,8 +61,8 @@ unix:!macx {
     # build from version in repo for Linux builds since
     # kqoauth is not packaged for the Debian build
     INCLUDEPATH += ../kqoauth
-    LIBS += -L../kqoauth -lkqoauth
-    DEFINES += GC_HAVE_KQOAUTH
+    LIBS        += ../kqoauth/libkqoauth.a
+    DEFINES     += GC_HAVE_KQOAUTH
     SOURCES     += TwitterDialog.cpp
     HEADERS     += TwitterDialog.h
 
