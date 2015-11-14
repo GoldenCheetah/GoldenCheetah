@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ * Rox 10.0 support by Carlos Giraldo (carlitosgiraldo@gmail.com)
  */
 
 #include <QString>
@@ -70,7 +72,24 @@ SlfParser::startElement( const QString&, const QString&,
     {
         restSec = qAttributes.value("zeit").toDouble();
     }
-
+    // Rox 10 Entries
+    else if (qName == "Entry")
+    {
+        double secs = qAttributes.value("trainingTimeAbsolute").toDouble()/100; 
+        double cadence = qAttributes.value("cadence").toDouble(); 
+        double hr = qAttributes.value("heartrate").toDouble();
+        double distance = qAttributes.value("distanceAbsolute").toDouble()/1000;
+        double speed = qAttributes.value("speed").toDouble()*3.6;
+        double torque = 0.0;
+        double power = qAttributes.value("power").toDouble();
+        double alt = qAttributes.value("altitude").toDouble()/1000;
+        double lon = qAttributes.value("longitude").toDouble();
+        double lat = qAttributes.value("latitude").toDouble();
+        double headwind = 0.0;
+        double temp = qAttributes.value("temperature").toDouble();
+        double slope = qAttributes.value("incline").toDouble();
+        rideFile->appendPoint(secs, cadence, hr, distance, speed, torque, power, alt, lon, lat, headwind, slope, temp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, lap);
+    } 
     return true;
 }
 
@@ -100,6 +119,13 @@ SlfParser::endElement( const QString&, const QString&, const QString& qName)
         workout.insert("value", QString("%1").arg(start_time.secsTo(stop_time)));
         rideFile->metricOverrides.insert("workout_time", workout);
     }
+    // ROX 10.0 format
+    else if (qName == "trainingTime")
+    {
+        QMap<QString, QString> workout;
+        workout.insert("value", QString("%1").arg(buffer.toDouble()/100));
+        rideFile->metricOverrides.insert("workout_time", workout);
+    }
     else if (qName == "StoppZeit")
     {
         stop_time.setTime(QTime::fromString(buffer, "hh:mm:ss"));
@@ -122,6 +148,12 @@ SlfParser::endElement( const QString&, const QString&, const QString& qName)
     {
         //Seems like the sampling rate is rounded...
         samplingRate = buffer.toDouble() - 0.5;
+        rideFile->setRecIntSecs(samplingRate);
+    }
+    // Rox 10.0 format
+    else if (qName == "samplingRate")
+    {
+        samplingRate = buffer.toDouble();
         rideFile->setRecIntSecs(samplingRate);
     }
     else if (qName == "Speed")
