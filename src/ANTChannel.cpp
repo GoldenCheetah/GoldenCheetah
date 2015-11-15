@@ -438,7 +438,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 //
                 case ANT_WHEELTORQUE_POWER: // 0x11 - wheel torque (Powertap)
                 {
-                    uint8_t events = antMessage.eventCount - lastMessage.eventCount;
+                    uint8_t events = eventCount(antMessage, lastMessage);
                     uint16_t period = antMessage.period - lastMessage.period;
                     uint16_t torque = antMessage.torque - lastMessage.torque;
 
@@ -476,7 +476,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 //
                 case ANT_STANDARD_POWER: // 0x10 - standard power
                 {
-                    uint8_t events = antMessage.eventCount - lastStdPwrMessage.eventCount;
+                    uint8_t events = eventCount(antMessage, lastStdPwrMessage);
                     if (lastStdPwrMessage.type && events) {
                         stdNullCount = 0;
                         is_alt ? parent->setAltWatts(antMessage.instantPower) : parent->setWatts(antMessage.instantPower);
@@ -502,7 +502,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 case ANT_TE_AND_PS_POWER: // 0x13 - optional extension to standard power / event Count is defined to be in sync with 0x10 - so not separate calculation
                                           // and just take whatever is delivered - data may not be sent for every power reading - but minimum every 5th pwr message
                 {
-                    uint8_t events = antMessage.eventCount - lastStdPwrMessage.eventCount;
+                    uint8_t events = eventCount(antMessage, lastStdPwrMessage);
                     if (events) {
                         // provide valid values only
                         if (antMessage.leftTorqueEffectiveness != 0xFF && antMessage.rightTorqueEffectiveness != 0xFF) {
@@ -528,7 +528,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 //
                 case ANT_CRANKTORQUE_POWER: // 0x12 - crank torque (Quarq)
                 {
-                    uint8_t events = antMessage.eventCount - lastMessage.eventCount;
+                    uint8_t events = eventCount(antMessage, lastMessage);
                     uint16_t period = antMessage.period - lastMessage.period;
                     uint16_t torque = antMessage.torque - lastMessage.torque;
 
