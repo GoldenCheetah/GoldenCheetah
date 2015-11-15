@@ -285,8 +285,18 @@ struct setChannelAtom {
 // ant+ fitness equipment profile data pages
 #define FITNESS_EQUIPMENT_GENERAL_PAGE              0x10
 #define FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE     0x19
+#define FITNESS_EQUIPMENT_TRAINER_TORQUE_PAGE       0x20
 #define FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE 0x36
 #define FITNESS_EQUIPMENT_COMMAND_STATUS_PAGE       0x47
+
+#define FITNESS_EQUIPMENT_TYPE_GENERAL              0x10
+#define FITNESS_EQUIPMENT_TYPE_TREADMILL            0x13
+#define FITNESS_EQUIPMENT_TYPE_ELLIPTICAL           0x14
+#define FITNESS_EQUIPMENT_TYPE_STAT_BIKE            0x15
+#define FITNESS_EQUIPMENT_TYPE_ROWER                0x16
+#define FITNESS_EQUIPMENT_TYPE_CLIMBER              0x17
+#define FITNESS_EQUIPMENT_TYPE_NORDIC_SKI           0x18
+#define FITNESS_EQUIPMENT_TYPE_TRAINER              0x19
 
 #define FITNESS_EQUIPMENT_BASIC_RESISTANCE_ID       0x30
 #define FITNESS_EQUIPMENT_TARGET_POWER_ID           0x31
@@ -296,6 +306,20 @@ struct setChannelAtom {
 #define FITNESS_EQUIPMENT_RESIST_MODE_CAPABILITY    0x01
 #define FITNESS_EQUIPMENT_POWER_MODE_CAPABILITY     0x02
 #define FITNESS_EQUIPMENT_SIMUL_MODE_CAPABILITY     0x04
+
+#define FITNESS_EQUIPMENT_POWERCALIB_REQU           0x01
+#define FITNESS_EQUIPMENT_RESISCALIB_REQU           0x02
+#define FITNESS_EQUIPMENT_USERCONFIG_REQU           0x04
+
+#define FITNESS_EQUIPMENT_ASLEEP                    0x01
+#define FITNESS_EQUIPMENT_READY                     0x02
+#define FITNESS_EQUIPMENT_IN_USE                    0x03
+#define FITNESS_EQUIPMENT_FINISHED                  0x04
+
+#define FITNESS_EQUIPMENT_POWER_OK                  0x00
+#define FITNESS_EQUIPMENT_POWER_NOK_LOWSPEED        0x01 // trainer unable to brake as per request due to low speed
+#define FITNESS_EQUIPMENT_POWER_NOK_HIGHSPEED       0x02 // trainer unable to brake as per request due to high speed
+#define FITNESS_EQUIPMENT_POWER_NOK                 0x03 // trainer unable to brake as per request (no details available)
 
 #define ANT_MANUFACTURER_ID_PAGE                    0x50
 #define ANT_PRODUCT_INFO_PAGE                       0x51
@@ -464,6 +488,13 @@ public:
 
     void setVortexData(int channel, int id);
     void refreshVortexLoad();
+
+    void setTrainerStatusAvailable(bool status) { telemetry.setTrainerStatusAvailable(status); }
+    void setTrainerCalibRequired(bool status) { telemetry.setTrainerCalibRequired(status); }
+    void setTrainerConfigRequired(bool status) { telemetry.setTrainerConfigRequired(status); }
+    void setTrainerBrakeFault(bool status) { telemetry.setTrainerBrakeFault(status); }
+    void setTrainerReady(bool status) { telemetry.setTrainerReady(status); }
+    void setTrainerRunning(bool status) { telemetry.setTrainerRunning(status); }
 
 private:
 
