@@ -82,6 +82,9 @@ class ANTMessage {
         static ANTMessage fecSetTrackResistance(const uint8_t channel, const double grade, const double rollingResistance);
         static ANTMessage fecRequestCapabilities(const uint8_t channel);
         static ANTMessage fecRequestCommandStatus(const uint8_t channel, const uint8_t page);
+        static ANTMessage fecUserConfig(const uint8_t channel, const float kgCyclistWeight, const float kgCycleWeight,
+                                        const float mmDiameter, const float gearRatio);
+        static ANTMessage fecRequestCalib(const uint8_t channel, const bool zeroOffset, const bool spinDownTime);
 
         // kickr command channel messages all sent as broadcast data
         // over the command channel as type 0x4E
@@ -159,6 +162,7 @@ class ANTMessage {
         uint8_t  fecEqtType, fecCapabilities;
         bool     fecResistModeCapability, fecPowerModeCapability, fecSimulModeCapability;
         uint16_t fecMaxResistance;
+        bool     fecResisCalibInProgress, fecPowerCalibInProgress,  fecResisCalibSpeedUp, fecResisCalibFreeWheel;
 
         // for details and equations see ANT+ Fitness Equipment Device Profile, Rev 4.1 p 66... "6.8  Control Data Pages"
         uint8_t  fecLastCommandReceived, fecLastCommandSeq, fecLastCommandStatus;

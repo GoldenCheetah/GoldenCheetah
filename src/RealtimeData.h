@@ -25,6 +25,17 @@
 #include <QString>
 #include <QApplication>
 
+#define CALIBRATED                  0x00
+#define CALIBR_REQUIRED             0x01
+#define CALIBR_INPROGRESS           0x02
+#define CALIBR_INPROGRESS_SPEEDUP   0x03
+#define CALIBR_INPROGRESS_FREEWHEEL 0x04
+
+#define TRAINER_BRAKE_OK            0x00
+#define TRAINER_BRAKE_NOK_LOWSPEED  0x01
+#define TRAINER_BRAKE_NOK_HIGHSPEED 0x02
+#define TRAINER_BRAKE_NOK           0x03
+
 class RealtimeData
 {
     Q_DECLARE_TR_FUNCTIONS(RealtimeData)
@@ -117,14 +128,14 @@ public:
     bool getTrainerStatusAvailable() const;
     void setTrainerReady(bool status);
     void setTrainerRunning(bool status);
-    void setTrainerCalibRequired(bool status);
+    void setTrainerCalibStatus(uint8_t status);
     void setTrainerConfigRequired(bool status);
-    void setTrainerBrakeFault(bool status);
+    void setTrainerBrakeStatus(uint8_t status);
     bool getTrainerReady() const;
     bool getTrainerRunning() const;
-    bool getTrainerCalibRequired() const;
+    uint8_t getTrainerCalibStatus() const;
     bool getTrainerConfigRequired() const;
-    bool getTrainerBrakeFault() const;
+    uint8_t getTrainerBrakeStatus() const;
 
     uint8_t spinScan[24];
 
@@ -150,9 +161,9 @@ private:
     bool trainerStatusAvailable;
     bool trainerReady;
     bool trainerRunning;
-    bool trainerCalibRequired;
     bool trainerConfigRequired;
-    bool trainerBrakeFault;
+    uint8_t trainerBrakeStatus;
+    uint8_t trainerCalibStatus;
 };
 
 #endif

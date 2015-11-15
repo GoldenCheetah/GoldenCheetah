@@ -566,6 +566,29 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                      fecCapabilities          = message[11];
                      break;
 
+                case FITNESS_EQUIPMENT_CALIBRATION_PAGE:
+                     // qDebug() << "fecPowerCalib poweroffset = " << QString::number(((uint16_t)message[8] | (uint16_t)message[9]<<8));
+                     // qDebug() << "fecResisCalib spindowntime = " << QString::number(((uint16_t)message[10] | (uint16_t)message[11]<<8));
+                     fecPowerCalibInProgress = !(message[5] & 0x40);
+                     fecResisCalibInProgress = !(message[5] & 0x80);
+                     break;
+
+                case FITNESS_EQUIPMENT_CALIBRATION_PROGRESS_PAGE:
+                     fecPowerCalibInProgress = (message[5] & 0x40);
+                     fecResisCalibInProgress = (message[5] & 0x80);
+                     if ((message[6] & 0x30) == 0x10)
+                         qDebug() << "fecCalib temperature too low";
+                     if ((message[6] & 0x30) == 0x30)
+                         qDebug() << "fecCalib temperature too high";
+                     if ((message[6] & 0x30) == 0x20)
+                         qDebug() << "fecCalib temperature OK";
+                     fecResisCalibSpeedUp = ( (message[6] & 0xC0) == 0x40 );
+                     fecResisCalibFreeWheel = ( (message[6] & 0xC0) == 0x80 );
+                     if (message[7]!=0xFF)
+                        qDebug() << "current temperature = " << QString::number(( (float)message[7]) * 0.5 -25.0);
+                     qDebug() << "minimum speed required = " << QString::number((float)(((uint16_t)message[8]) | (((uint16_t)message[9]) << 8)) * 3.6 / 1000.0) << "km/h";
+                     break;
+
                 case FITNESS_EQUIPMENT_COMMAND_STATUS_PAGE:
                     // Acknowledge from device
                     fecLastCommandReceived = message[5];
@@ -1007,11 +1030,11 @@ ANTMessage ANTMessage::fecRequestCapabilities(const uint8_t channel)
 {
     // based on ANT+ Common Pages, Rev 2.4 p 14: 6.2  Common Data Page 70: Request Data Page
     return ANTMessage(9, ANT_ACK_DATA, channel,
-                      0x46,        // data page request
+                      FITNESS_EQUIPMENT_REQUEST_DATA_PAGE,        // data page request
                       0xFF, 0xFF,  // reserved
                       0xFF, 0xFF,  // descriptors
                       0x01,        // requested transmission response (1 time only)
-                      0x36,        // requested page
+                      FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE,        // requested page
                       0x01);       // request data page
 }
 
@@ -1019,10 +1042,48 @@ ANTMessage ANTMessage::fecRequestCommandStatus(const uint8_t channel, const uint
 {
     // based on ANT+ Common Pages, Rev 2.4 p 14: 6.2  Common Data Page 70: Request Data Page
     return ANTMessage(9, ANT_ACK_DATA, channel,
-                      0x46,        // data page request
+                      FITNESS_EQUIPMENT_REQUEST_DATA_PAGE,        // data page request
                       0xFF, 0xFF,  // reserved
                       0xFF, 0xFF,  // descriptors
                       0x01,        // requested transmission response (1 time only)
                       page,        // requested page (0x30 = resistance, 0x31 = power, 0x32 = wind, 0x33 = slope/track)
                       0x01);       // request data page
+}
+
+ANTMessage ANTMessage::fecUserConfig(const uint8_t channel, const float kgCyclistWeight, const float kgCycleWeight, const float mmDiameter, const float gearRatio)
+{
+    // values encoding
+    uint8_t  diameter = (uint8_t)(mmDiameter/10.0);                           // diameter (unit=cm)
+    uint8_t  diameterOffset = (uint8_t)(mmDiameter - (float)diameter * 10.0); // diameter remainder (unit=mm)
+    uint16_t bicycleWeight = (uint16_t) (kgCycleWeight / 0.05);               // bicycle weight (unit=0.05kg)
+    uint16_t cyclistWeight = (uint16_t) (kgCyclistWeight / 0.01);             // cyclist weight (unit=0.01kg)
+    uint8_t  ratio = (uint8_t) (gearRatio/0.03);
+
+    qDebug() << "UserConfig (ANTMessage::fecUserConfig)";
+    qDebug() << "diameter " << QString::number(diameter);
+    qDebug() << "diameterOffset " << QString::number(diameterOffset);
+    qDebug() << "bicycleWeight " << QString::number(bicycleWeight);
+    qDebug() << "cyclistWeight " << QString::number(cyclistWeight);
+    qDebug() << "ratio " << QString::number(ratio);
+
+    return ANTMessage(9, ANT_ACK_DATA, channel,                              // broadcast
+                      FITNESS_EQUIPMENT_TRAINER_USER_CONFIG_PAGE,
+                      (uint8_t)(cyclistWeight & 0x00FF), (uint8_t)(cyclistWeight >> 8),
+                      0xFF,
+                      diameterOffset | (uint8_t)((bicycleWeight & 0x000F)<<4),
+                      (uint8_t)((bicycleWeight & 0x0FF0)>>4),
+                      diameter,
+                      ratio);
+}
+
+ANTMessage ANTMessage::fecRequestCalib(const uint8_t channel, const bool zeroOffset, const bool spinDownTime)
+{
+    // values encoding
+    uint8_t  request = (uint8_t) (zeroOffset?0x40:0x00) | (spinDownTime?0x80:0x00);
+    qDebug() << "RequestCalib (ANTMessage::fecRequestCalib)" << QString::number(request);
+
+    return ANTMessage(9, ANT_ACK_DATA, channel,                              // broadcast
+                      FITNESS_EQUIPMENT_CALIBRATION_PAGE,
+                      request,
+                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
 }

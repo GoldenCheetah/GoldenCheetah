@@ -32,9 +32,9 @@ RealtimeData::RealtimeData()
     trainerStatusAvailable = false;
     trainerReady = true;
     trainerRunning = true;
-    trainerCalibRequired = false;
+    trainerCalibStatus = CALIBRATED;
     trainerConfigRequired = false;
-    trainerBrakeFault = false;
+    trainerBrakeStatus = TRAINER_BRAKE_OK;
     memset(spinScan, 0, 24);
 }
 
@@ -235,9 +235,9 @@ void RealtimeData::setTrainerRunning(bool status)
     this->trainerRunning = status;
 }
 
-void RealtimeData::setTrainerCalibRequired(bool status)
+void RealtimeData::setTrainerCalibStatus(uint8_t status)
 {
-    this->trainerCalibRequired = status;
+    this->trainerCalibStatus = status;
 }
 
 void RealtimeData::setTrainerConfigRequired(bool status)
@@ -245,9 +245,9 @@ void RealtimeData::setTrainerConfigRequired(bool status)
     this->trainerConfigRequired = status;
 }
 
-void RealtimeData::setTrainerBrakeFault(bool status)
+void RealtimeData::setTrainerBrakeStatus(uint8_t status)
 {
-    this->trainerBrakeFault = status;
+    this->trainerBrakeStatus = status;
 }
 
 bool RealtimeData::getTrainerReady() const
@@ -260,9 +260,9 @@ bool RealtimeData::getTrainerRunning() const
     return trainerRunning;
 }
 
-bool RealtimeData::getTrainerCalibRequired() const
+uint8_t RealtimeData::getTrainerCalibStatus() const
 {
-    return trainerCalibRequired;
+    return trainerCalibStatus;
 }
 
 bool RealtimeData::getTrainerConfigRequired() const
@@ -270,9 +270,9 @@ bool RealtimeData::getTrainerConfigRequired() const
     return trainerConfigRequired;
 }
 
-bool RealtimeData::getTrainerBrakeFault() const
+uint8_t RealtimeData::getTrainerBrakeStatus() const
 {
-    return trainerBrakeFault;
+    return trainerBrakeStatus;
 }
 
 double RealtimeData::value(DataSeries series) const

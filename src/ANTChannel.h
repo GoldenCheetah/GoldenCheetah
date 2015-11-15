@@ -25,6 +25,8 @@
 #include <QObject>
 #include <QTime>
 
+#define pi 3.14159265358979323846
+
 #define CHANNEL_TYPE_QUICK_SEARCH 0x10 // or'ed with current channel type
 /* after fast search, wait for slow search.  Otherwise, starting slow
    search might postpone the fast search on another channel. */
@@ -94,7 +96,8 @@ class ANTChannel : public QObject {
         int dualNullCount, nullCount, stdNullCount;
         double last_message_timestamp;
         uint8_t fecPrevRawDistance;
-        uint8_t  fecCapabilities;
+        uint8_t fecCapabilities;
+        bool    fecPowerCalibInProgress, fecResisCalibInProgress;
 
         double blanking_timestamp;
         int blanked;
@@ -191,6 +194,10 @@ class ANTChannel : public QObject {
         double channelValue2() { return value2; }
         double value,value2; // used during config, rather than rtData
         uint8_t capabilities();
+        bool   getFecPowerCalibInProgress() const { return fecPowerCalibInProgress; }
+        bool   getFecResisCalibInProgress() const { return fecResisCalibInProgress; }
+        void   setFecPowerCalibInProgress( const bool calibInProgress ) { fecPowerCalibInProgress = calibInProgress; }
+        void   setFecResisCalibInProgress( const bool calibInProgress ) { fecResisCalibInProgress = calibInProgress; }
 
         // search
         int isSearching();

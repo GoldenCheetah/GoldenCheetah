@@ -58,6 +58,8 @@ ANTChannel::init()
     status = Closed;
     fecPrevRawDistance=0;
     fecCapabilities=0;
+    fecPowerCalibInProgress = fecResisCalibInProgress = false;
+
     lastMessageTimestamp = lastMessageTimestamp2 = QTime::currentTime();
 }
 
@@ -721,7 +723,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    if  (parent->modeERGO())
                        parent->refreshFecLoad();
                    else if (parent->modeSLOPE())
-                        parent->refreshFecGradient();
+                       parent->refreshFecGradient();
                }
 
                if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE)
@@ -734,19 +736,50 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    if (antMessage.fecCadence != 0xFF)
                        parent->setSecondaryCadence(antMessage.fecCadence);
                    parent->setTrainerStatusAvailable(true);
-                   // temporarily disabled until calibration included in the code / TODO : remove && false
-                   parent->setTrainerCalibRequired((antMessage.fecPowerCalibRequired || antMessage.fecResisCalibRequired) && false);
+                   if (antMessage.fecPowerCalibRequired || antMessage.fecResisCalibRequired)
+                        parent->setTrainerCalibStatus(CALIBR_REQUIRED);
+                   if (!antMessage.fecPowerCalibRequired && !antMessage.fecResisCalibRequired)
+                        parent->setTrainerCalibStatus(CALIBRATED);
                    if (antMessage.fecPowerCalibRequired)
+                   {
                         qDebug() << "Trainer calibration required (power)";
+                        // FIXME: if you want automatic calibration remove "&& false" but user will not know how to calibrate as there is no GUI at present
+                        if (!fecPowerCalibInProgress && !fecResisCalibInProgress && false)
+                            parent->requestFecCalib(true /* powercalib */, false /*resisCalib*/ );
+                   }
                    if (antMessage.fecResisCalibRequired)
+                   {
                         qDebug() << "Trainer calibration required (resistance)";
-                   // temporarily disabled until calibration included in the code / TODO : remove && false
-                   parent->setTrainerConfigRequired(antMessage.fecUserConfigRequired && false);
+                        // FIXME: if you want automatic calibration remove "&& false" but user will not know how to calibrate as there is no GUI at present
+                        if (!fecPowerCalibInProgress && !fecResisCalibInProgress && false)
+                            parent->requestFecCalib(false /* powercalib */, true /*resisCalib*/ );
+                   }
+                   parent->setTrainerConfigRequired(antMessage.fecUserConfigRequired);
                    if (antMessage.fecUserConfigRequired)
-                        qDebug() << "Trainer configuration required";
-                   parent->setTrainerBrakeFault(antMessage.fecPowerOverLimits==FITNESS_EQUIPMENT_POWER_NOK_LOWSPEED
-                                            ||  antMessage.fecPowerOverLimits==FITNESS_EQUIPMENT_POWER_NOK_HIGHSPEED
-                                            ||  antMessage.fecPowerOverLimits==FITNESS_EQUIPMENT_POWER_NOK);
+                   {
+                        qDebug() << "Trainer configuration required. Applying current GC settings...";
+                        float wheelSize = appsettings->cvalue(parent->getTrainCyclist(), GC_WHEELSIZE, 2100).toFloat() / pi;
+                        float kgCyclistWeight = appsettings->cvalue(parent->getTrainCyclist(), GC_WEIGHT, 75).toFloat();
+                        float gearRatio = 0.5; // TODO : add a parameter? Not really needed if we have external cadence meter.
+                        float kgCycleWeight = appsettings->value(NULL, GC_DPDP_BIKEWEIGHT, "9.5").toFloat();
+                        qDebug() << "wheel diameter: " << QString::number(wheelSize) << "mm, cyclist: " << QString::number(kgCyclistWeight) << "kg, cycle: " << QString::number(kgCycleWeight) << "kg, gear ratio: " << QString::number(gearRatio);
+                        parent->fecUserConfig(kgCyclistWeight, kgCycleWeight, wheelSize, gearRatio);
+                   }
+                   switch (antMessage.fecPowerOverLimits)
+                   {
+                        case FITNESS_EQUIPMENT_POWER_NOK_LOWSPEED:
+                             parent->setTrainerBrakeStatus(TRAINER_BRAKE_NOK_LOWSPEED);
+                             break;
+                        case FITNESS_EQUIPMENT_POWER_NOK_HIGHSPEED:
+                             parent->setTrainerBrakeStatus(TRAINER_BRAKE_NOK_HIGHSPEED);
+                             break;
+                        case FITNESS_EQUIPMENT_POWER_NOK:
+                             parent->setTrainerBrakeStatus(TRAINER_BRAKE_NOK);
+                             break;
+                        default:
+                             parent->setTrainerBrakeStatus(TRAINER_BRAKE_OK);
+                             break;
+                   }
                    parent->setTrainerReady(antMessage.fecState==FITNESS_EQUIPMENT_READY);
                    parent->setTrainerRunning(antMessage.fecState==FITNESS_EQUIPMENT_IN_USE);
                }
@@ -755,6 +788,32 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    // TODO: Manage "wheelRevolutions" information
                    // TODO: Manage "wheelAccumulatedPeriod" information
                    // Note : accumulatedTorque information available but not used
+               }
+               else if (antMessage.data_page == FITNESS_EQUIPMENT_CALIBRATION_PAGE)
+               {
+                    qDebug() << "antMessage.data_page == FITNESS_EQUIPMENT_CALIBRATION_PAGE";
+                    // this page is sent by FE-C device when calibration is completed or faulty
+                    parent->setFecPowerCalibInProgress(antMessage.fecPowerCalibInProgress);
+                    parent->setFecResisCalibInProgress(antMessage.fecResisCalibInProgress);
+                    if (!antMessage.fecPowerCalibInProgress && !antMessage.fecResisCalibInProgress)
+                        parent->setTrainerCalibStatus(CALIBRATED);
+               }
+               else if (antMessage.data_page == FITNESS_EQUIPMENT_CALIBRATION_PROGRESS_PAGE)
+               {
+                    qDebug() << "antMessage.data_page == FITNESS_EQUIPMENT_CALIBRATION_PROGRESS_PAGE";
+                    parent->setFecPowerCalibInProgress(antMessage.fecPowerCalibInProgress);
+                    if (antMessage.fecPowerCalibInProgress)
+                         parent->setTrainerCalibStatus(CALIBR_INPROGRESS);
+
+                    parent->setFecResisCalibInProgress(antMessage.fecResisCalibInProgress);
+                    if (antMessage.fecResisCalibInProgress)
+                    {
+                        if (parent->getTrainerCalibStatus() != CALIBR_INPROGRESS_FREEWHEEL
+                             && antMessage.fecResisCalibSpeedUp)
+                            parent->setTrainerCalibStatus(CALIBR_INPROGRESS_SPEEDUP);
+                        else if (antMessage.fecResisCalibFreeWheel && !antMessage.fecResisCalibSpeedUp)
+                            parent->setTrainerCalibStatus(CALIBR_INPROGRESS_FREEWHEEL);
+                    }
                }
                else if (antMessage.data_page == FITNESS_EQUIPMENT_GENERAL_PAGE)
                {
