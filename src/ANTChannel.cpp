@@ -474,6 +474,18 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 //                        updated with this message and instead we
                 //                        store in a special lastStdPwrMessage
                 //
+                // The Garmin Vector issues a ANT_STANDARD_POWER event
+                // once every 2 seconds.  Interspersed between that event
+                // are typically three ANT_CRANKTORQUE_POWER events
+                // and one ANT_TE_AND_PS_POWER event i.e.
+                //   ANT_STANDARD_POWER eventCount=1
+                //   ANT_CRANKTORQUE_POWER eventCount=1
+                //   ANT_CRANKTORQUE_POWER eventCount=2
+                //   ANT_CRANKTORQUE_POWER eventCount=3
+                //   ANT_TE_AND_PS_POWER eventCount=3
+                // The eventCount of the ANT_TE_AND_PS_POWER event will match
+                // against the latest power reading from with the ANT_STANDARD_POWER
+                // or the ANT_CRANKTORQUE_POWER.
                 case ANT_STANDARD_POWER: // 0x10 - standard power
                 {
                     uint8_t events = antMessage.eventCount - lastStdPwrMessage.eventCount;
@@ -495,15 +507,21 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                        }
                     }
                     lastStdPwrMessage = antMessage;
+                    // Mark power event for possible match-up against a future
+                    // ANT_TE_AND_PS_POWER event.
+                    lastPwrForTePsMessage = lastStdPwrMessage;
                     savemessage = false;
                 }
                 break;
 
-                case ANT_TE_AND_PS_POWER: // 0x13 - optional extension to standard power / event Count is defined to be in sync with 0x10 - so not separate calculation
-                                          // and just take whatever is delivered - data may not be sent for every power reading - but minimum every 5th pwr message
+                case ANT_TE_AND_PS_POWER:
                 {
-                    uint8_t events = antMessage.eventCount - lastStdPwrMessage.eventCount;
-                    if (events) {
+                    // 0x13 - optional extension to standard power.
+                    // eventCount is defined to be in sync with ANT_STANDARD_POWER or
+                    // ANT_CRANKTORQUE_POWER so not a separate calculation.
+                    // Just take whatever is delivered.  Data may not be sent for every
+                    // power reading - but minimum every 5th pwr message
+                    if (antMessage.eventCount == lastPwrForTePsMessage.eventCount) {
                         // provide valid values only
                         if (antMessage.leftTorqueEffectiveness != 0xFF && antMessage.rightTorqueEffectiveness != 0xFF) {
                             parent->setTE((antMessage.leftTorqueEffectiveness / 2),(antMessage.rightTorqueEffectiveness / 2));  // values are given in 1/2 %
@@ -524,15 +542,20 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 break;
 
                 //
-                // Quarq - Crank torque
+                // Crank Torque (0x12) - Quarq and Garmin Vector
+                // The Garmin Vector will typically send three ANT_CRANKTORQUE_POWER
+                // events for between each ANT_STANDARD_POWER event.
+                // Since these messages are interleaved with other broadcast messages,
+                // we need to make sure that lastMessage is not updated and instead
+                // use lastCrankTorquePwrMessage.
                 //
-                case ANT_CRANKTORQUE_POWER: // 0x12 - crank torque (Quarq)
+                case ANT_CRANKTORQUE_POWER:
                 {
-                    uint8_t events = antMessage.eventCount - lastMessage.eventCount;
-                    uint16_t period = antMessage.period - lastMessage.period;
-                    uint16_t torque = antMessage.torque - lastMessage.torque;
+                    uint8_t events = antMessage.eventCount - lastCrankTorquePwrMessage.eventCount;
+                    uint16_t period = antMessage.period - lastCrankTorquePwrMessage.period;
+                    uint16_t torque = antMessage.torque - lastCrankTorquePwrMessage.torque;
 
-                    if (events && period && lastMessage.period) {
+                    if (events && period && lastCrankTorquePwrMessage.period) {
                         nullCount = 0;
 
                         float nm_torque = torque / (32.0 * events);
@@ -551,6 +574,10 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                             value2 = value = 0;
                         }
                     }
+                    lastCrankTorquePwrMessage = antMessage;
+                    // Mark power event for possible match-up against a future
+                    // ANT_TE_AND_PS_POWER event.
+                    lastPwrForTePsMessage = antMessage;
                 }
                 break;
 
