@@ -46,6 +46,7 @@ public:
                       LeftPedalSmoothness, RightPedalSmoothness};
 
     typedef enum dataseries DataSeries;
+
     double value(DataSeries) const;
     static QString seriesName(DataSeries);
     static const QList<DataSeries> &listDataSeries();
@@ -112,6 +113,19 @@ public:
     double getRPS() const;
 
 
+    void setTrainerStatusAvailable(bool status);
+    bool getTrainerStatusAvailable() const;
+    void setTrainerReady(bool status);
+    void setTrainerRunning(bool status);
+    void setTrainerCalibRequired(bool status);
+    void setTrainerConfigRequired(bool status);
+    void setTrainerBrakeFault(bool status);
+    bool getTrainerReady() const;
+    bool getTrainerRunning() const;
+    bool getTrainerCalibRequired() const;
+    bool getTrainerConfigRequired() const;
+    bool getTrainerBrakeFault() const;
+
     uint8_t spinScan[24];
 
 private:
@@ -132,6 +146,13 @@ private:
     long msecs;
     long lapMsecs;
     long lapMsecsRemaining;
+
+    bool trainerStatusAvailable;
+    bool trainerReady;
+    bool trainerRunning;
+    bool trainerCalibRequired;
+    bool trainerConfigRequired;
+    bool trainerBrakeFault;
 };
 
 #endif

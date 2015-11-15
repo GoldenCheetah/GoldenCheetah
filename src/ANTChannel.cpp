@@ -688,6 +688,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                parent->setFecChannel(number);
                // we don't seem to receive ACK messages, so use this workaround
                // to ensure load/gradient is always set correctly
+               // TODO : use acknowledge sent by FE-C devices, see FITNESS_EQUIPMENT_GENERAL_PAGE below
                if ((fecRefreshCounter++ % 10) == 0)
                {
                    if  (parent->modeERGO())
@@ -700,11 +701,37 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                {
                    if (antMessage.fecInstantPower != 0xFFF)
                        is_alt ? parent->setAltWatts(antMessage.fecInstantPower) : parent->setWatts(antMessage.fecInstantPower);
+                   // TODO : as per ANT specification instantaneous power is to be used for display purpose only
+                   //        but shall not be taken into account for records and calculations as it will not be accurate in case of transmission loss
+                   //        accumulated power to be used instead as it is not affected by any transmission loss
                    if (antMessage.fecCadence != 0xFF)
                        parent->setSecondaryCadence(antMessage.fecCadence);
+                   parent->setTrainerStatusAvailable(true);
+                   // temporarily disabled until calibration included in the code / TODO : remove && false
+                   parent->setTrainerCalibRequired((antMessage.fecPowerCalibRequired || antMessage.fecResisCalibRequired) && false);
+                   if (antMessage.fecPowerCalibRequired)
+                        qDebug() << "Trainer calibration required (power)";
+                   if (antMessage.fecResisCalibRequired)
+                        qDebug() << "Trainer calibration required (resistance)";
+                   // temporarily disabled until calibration included in the code / TODO : remove && false
+                   parent->setTrainerConfigRequired(antMessage.fecUserConfigRequired && false);
+                   if (antMessage.fecUserConfigRequired)
+                        qDebug() << "Trainer configuration required";
+                   parent->setTrainerBrakeFault(antMessage.fecPowerOverLimits==FITNESS_EQUIPMENT_POWER_NOK_LOWSPEED
+                                            ||  antMessage.fecPowerOverLimits==FITNESS_EQUIPMENT_POWER_NOK_HIGHSPEED
+                                            ||  antMessage.fecPowerOverLimits==FITNESS_EQUIPMENT_POWER_NOK);
+                   parent->setTrainerReady(antMessage.fecState==FITNESS_EQUIPMENT_READY);
+                   parent->setTrainerRunning(antMessage.fecState==FITNESS_EQUIPMENT_IN_USE);
+               }
+               else if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_TORQUE_PAGE)
+               {
+                   // TODO: Manage "wheelRevolutions" information
+                   // TODO: Manage "wheelAccumulatedPeriod" information
+                   // Note : accumulatedTorque information available but not used
                }
                else if (antMessage.data_page == FITNESS_EQUIPMENT_GENERAL_PAGE)
                {
+                   // Note: fecEqtType information available but not used
                    if (antMessage.fecSpeed != 0xFFFF)
                    {
                        // FEC speed is in 0.001m/s, telemetry speed is km/h
@@ -716,8 +743,22 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                                           + (fecPrevRawDistance > antMessage.fecRawDistance ? 256 : 0)) * 0.001);
                    fecPrevRawDistance = antMessage.fecRawDistance;
                }
+               else if (antMessage.data_page == FITNESS_EQUIPMENT_GENERAL_PAGE)
+               {
+                   // TODO: Manage "fecLastCommandReceived" information
+                   // TODO: Manage "fecLastCommandSeq" information
+                   // TODO: Manage "fecLastCommandStatus" information
+                   // TODO: Manage "fecSetResistanceAck" information
+                   // TODO: Manage "fecSetTargetPowerAck" information
+                   // TODO: Manage "fecSetWindResistanceAck" information
+                   // TODO: Manage "fecSetWindSpeedAck" information
+                   // TODO: Manage "fecSetDraftingFactorAck" information
+                   // TODO: Manage "fecSetGradeAck" information
+                   // TODO: Manage "fecSetRollResistanceAck" information
+               }
                else if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE)
                {
+                   // Note : fecMaxResistance information available but not used
                    fecCapabilities = antMessage.fecCapabilities;
                    qDebug() << "Capabilities received from ANT FEC Device:" << fecCapabilities;
                }

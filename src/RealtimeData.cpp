@@ -29,7 +29,12 @@ RealtimeData::RealtimeData()
 	lap = msecs = lapMsecs = lapMsecsRemaining = 0;
     thb = smo2 = o2hb = hhb = 0.0;
     lrbalance = rte = lte = lps = rps = 0.0;
-
+    trainerStatusAvailable = false;
+    trainerReady = true;
+    trainerRunning = true;
+    trainerCalibRequired = false;
+    trainerConfigRequired = false;
+    trainerBrakeFault = false;
     memset(spinScan, 0, 24);
 }
 
@@ -210,6 +215,65 @@ double RealtimeData::getRPS() const
     return rps;
 }
 
+void RealtimeData::setTrainerStatusAvailable(bool status)
+{
+    this->trainerStatusAvailable = status;
+}
+
+bool RealtimeData::getTrainerStatusAvailable() const
+{
+    return trainerStatusAvailable;
+}
+
+void RealtimeData::setTrainerReady(bool status)
+{
+    this->trainerReady = status;
+}
+
+void RealtimeData::setTrainerRunning(bool status)
+{
+    this->trainerRunning = status;
+}
+
+void RealtimeData::setTrainerCalibRequired(bool status)
+{
+    this->trainerCalibRequired = status;
+}
+
+void RealtimeData::setTrainerConfigRequired(bool status)
+{
+    this->trainerConfigRequired = status;
+}
+
+void RealtimeData::setTrainerBrakeFault(bool status)
+{
+    this->trainerBrakeFault = status;
+}
+
+bool RealtimeData::getTrainerReady() const
+{
+    return trainerReady;
+}
+
+bool RealtimeData::getTrainerRunning() const
+{
+    return trainerRunning;
+}
+
+bool RealtimeData::getTrainerCalibRequired() const
+{
+    return trainerCalibRequired;
+}
+
+bool RealtimeData::getTrainerConfigRequired() const
+{
+    return trainerConfigRequired;
+}
+
+bool RealtimeData::getTrainerBrakeFault() const
+{
+    return trainerBrakeFault;
+}
 
 double RealtimeData::value(DataSeries series) const
 {
