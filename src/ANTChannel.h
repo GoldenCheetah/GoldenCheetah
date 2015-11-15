@@ -109,6 +109,16 @@ class ANTChannel : public QObject {
         int product_id;
         int product_version;
 
+        // Calculate number of events between the curr and last
+        // ANTMessages, accounting for overflow.
+        uint8_t eventCount(const ANTMessage &curr,
+                           const ANTMessage &last) const {
+            // The event count wraps around at 0xFF.
+            if (curr.eventCount < last.eventCount)
+                return ((curr.eventCount + 256) - last.eventCount) & 0xff;
+            return curr.eventCount - last.eventCount;
+        }
+
     public:
 
         // !!! THIS ENUM LIST MUST MATCH THE ORDER THAT ant_sensor_type_t
