@@ -20,7 +20,7 @@ CONTENTS
 2. ADDING OPTIONAL DEPENDENCIES
    - FTDI D2XX
    - SRMIO
-   - liboauth
+   - kQOAuth
    - QwtPlot3d
    - libkml
    - libusb
@@ -94,12 +94,12 @@ $ cd GoldenCheetah
 $ ls
 
 You should see a number of directories such as doc, qwt, src etc. If you are
-building the latest development release you may need to check it out. At the
-time of writing the latest development release is release_3.0.0dev, if you
-want to build version 3 then you should perform the next command, otherwise 
-skip to 1.5.
+wanting to build a particular release you need to checkout the release. To
+build a release you need to checkout the code at the tag for the release.
 
-$ checkout release_3.0.0dev
+A list of releases can be found at: https://github.com/GoldenCheetah/GoldenCheetah/tags
+
+$ git checkout V3.3-RC1
 $ ls
 
 You will now see an updated version of this walkthrough, please jump to using
@@ -227,7 +227,7 @@ And you're up and running.
 ===============================
 
    - SRMIO
-   - liboauth
+   - kQOAuth
    - QwtPlot3d
    - libkml
    - libusb
@@ -244,12 +244,13 @@ should be taken into account.
 SRMIO (git)
 ./configure CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64" CPPFLAGS=-I/usr/local/D2XX/ --disable-dependency-tracking
 
-2.2 Liboauth - For Twitter support
-----------------------------------
+2.2 kQOAuth - For OAuth Authentication
+--------------------------------------
 
-oauth (0.8.8)
+kQOauth (0.98)
 
-./configure CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64 CURL_CFLAGS="-I/Developer/SDKs/MacOSX10.7.sdk/usr/include/curl"  CURL_LIBS="-lcurl" --disable-dependency-tracking
+qmake
+
 
 2.3 QwtPlot3d - For 3d plot support
 -----------------------------------
