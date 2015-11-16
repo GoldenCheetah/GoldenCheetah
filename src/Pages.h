@@ -708,7 +708,7 @@ class CPPage : public QWidget
 
     public:
         CPPage(ZonePage *parent);
-        QCheckBox *useCPForFTPCheckBox;
+        QComboBox *useCPForFTPCombo;
 
     public slots:
         void addClicked();
@@ -720,6 +720,7 @@ class CPPage : public QWidget
         void addZoneClicked();
         void deleteZoneClicked();
         void zonesChanged();
+        void initializeRanges();
 
     private:
         bool active;

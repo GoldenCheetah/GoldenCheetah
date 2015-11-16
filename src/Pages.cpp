@@ -3371,7 +3371,7 @@ ZonePage::saveClicked()
     context->athlete->zones_->read(zonesFile);
 
     // use CP for FTP?
-    appsettings->setCValue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, cpPage->useCPForFTPCheckBox->checkState());
+    appsettings->setCValue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, cpPage->useCPForFTPCombo->currentIndex());
 
 
     // did we change ?
@@ -3590,9 +3590,11 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     dateEdit->setDate(QDate::currentDate());
 
      // Use CP for FTP
-    bool useCPForFTP = appsettings->cvalue(zonePage->context->athlete->cyclist, GC_USE_CP_FOR_FTP, Qt::Checked).toBool();
-    useCPForFTPCheckBox = new QCheckBox(tr("Use CP for FTP"), this);
-    useCPForFTPCheckBox->setCheckState(useCPForFTP ? Qt::Checked : Qt::Unchecked);
+    useCPForFTPCombo = new QComboBox(this);
+    useCPForFTPCombo->addItem(tr("Use CP for all metrics"));
+    useCPForFTPCombo->addItem(tr("Use FTP for Coggan metrics"));
+
+    useCPForFTPCombo->setCurrentIndex(appsettings->cvalue(zonePage->context->athlete->cyclist, GC_USE_CP_FOR_FTP, Qt::Checked).toInt());
 
     cpEdit = new QDoubleSpinBox;
     cpEdit->setMinimum(0);
@@ -3640,59 +3642,10 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     addLayout->addWidget(dateLabel);
     addLayout->addWidget(dateEdit);
     addLayout->addStretch();
-    addLayout->addWidget(useCPForFTPCheckBox);
+    addLayout->addWidget(useCPForFTPCombo);
 
     ranges = new QTreeWidget;
-    int column = 0;
-    ranges->headerItem()->setText(column++, tr("From Date"));
-    ranges->headerItem()->setText(column++, tr("Critical Power"));
-    if (useCPForFTP) {
-        ranges->headerItem()->setText(column++, tr("FTP"));
-    }
-    ranges->headerItem()->setText(column++, tr("W'"));
-    ranges->headerItem()->setText(column++, tr("Pmax"));
-    ranges->setColumnCount(column);
-    ranges->setSelectionMode(QAbstractItemView::SingleSelection);
-    //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    ranges->setUniformRowHeights(true);
-    ranges->setIndentation(0);
-    //ranges->header()->resizeSection(0,180);
-
-    // setup list of ranges
-    for (int i=0; i< zonePage->zones.getRangeSize(); i++) {
-
-        QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-
-        // Embolden ranges with manually configured zones
-        QFont font;
-        font.setWeight(zonePage->zones.getZoneRange(i).zonesSetFromCP ?
-                                        QFont::Normal : QFont::Black);
-
-        int column = 0;
-        // date
-        add->setText(column, zonePage->zones.getStartDate(i).toString(tr("MMM d, yyyy")));
-        add->setFont(column++, font);
-
-        // CP
-        add->setText(column, QString("%1").arg(zonePage->zones.getCP(i)));
-        add->setFont(column++, font);
-
-        if (useCPForFTP) {
-            // FTP
-            add->setText(column, QString("%1").arg(zonePage->zones.getFTP(i)));
-            add->setFont(column++, font);
-        }
-
-        // W'
-        add->setText(column, QString("%1").arg(zonePage->zones.getWprime(i)));
-        add->setFont(column++, font);
-
-        // Pmax
-        add->setText(column, QString("%1").arg(zonePage->zones.getPmax(i)));
-        add->setFont(column++, font);
-
-    }
+    initializeRanges();
 
     zones = new QTreeWidget;
     zones->headerItem()->setText(0, tr("Short"));
@@ -3725,9 +3678,81 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
     connect(addZoneButton, SIGNAL(clicked()), this, SLOT(addZoneClicked()));
     connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
+    connect(useCPForFTPCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(initializeRanges()));
     connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
 }
+
+void
+CPPage::initializeRanges() {
+    bool useCPForFTP = (useCPForFTPCombo->currentIndex() == 0? true : false);
+
+    int column = 0;
+
+    bool resize = (ranges->columnCount() == 4);
+
+    while( int nb = ranges->topLevelItemCount () )
+    {
+        delete ranges->takeTopLevelItem( nb - 1 );
+    }
+    ranges->headerItem()->setText(column++, tr("From Date"));
+
+    ranges->headerItem()->setText(column++, tr("Critical Power"));
+    if (!useCPForFTP) {
+        ranges->headerItem()->setText(column++, tr("FTP"));
+    }
+
+    ranges->headerItem()->setText(column++, tr("W'"));
+    ranges->headerItem()->setText(column++, tr("Pmax"));
+
+    if (resize)
+        ranges->setColumnWidth(3, ranges->columnWidth(3)/2);
+
+    ranges->setColumnCount(column);
+
+    ranges->setSelectionMode(QAbstractItemView::SingleSelection);
+    //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    ranges->setUniformRowHeights(true);
+    ranges->setIndentation(0);
+
+    // setup list of ranges
+    for (int i=0; i< zonePage->zones.getRangeSize(); i++) {
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
+        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+
+        // Embolden ranges with manually configured zones
+        QFont font;
+        font.setWeight(zonePage->zones.getZoneRange(i).zonesSetFromCP ?
+                                        QFont::Normal : QFont::Black);
+
+        int column = 0;
+        // date
+        add->setText(column, zonePage->zones.getStartDate(i).toString(tr("MMM d, yyyy")));
+        add->setFont(column++, font);
+
+        // CP
+        add->setText(column, QString("%1").arg(zonePage->zones.getCP(i)));
+        add->setFont(column++, font);
+
+        if (!useCPForFTP) {
+            // FTP
+            add->setText(column, QString("%1").arg(zonePage->zones.getFTP(i)));
+            add->setFont(column++, font);
+        }
+
+        // W'
+        add->setText(column, QString("%1").arg(zonePage->zones.getWprime(i)));
+        add->setFont(column++, font);
+
+        // Pmax
+        add->setText(column, QString("%1").arg(zonePage->zones.getPmax(i)));
+        add->setFont(column++, font);
+    }
+
+}
+
+
 
 void
 CPPage::addClicked()
