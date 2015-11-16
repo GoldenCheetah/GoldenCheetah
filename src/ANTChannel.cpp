@@ -758,7 +758,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    if (antMessage.fecUserConfigRequired)
                    {
                         qDebug() << "Trainer configuration required. Applying current GC settings...";
-                        float wheelSize = appsettings->cvalue(parent->getTrainCyclist(), GC_WHEELSIZE, 2100).toFloat() / pi;
+                        float wheelSize = appsettings->cvalue(parent->getTrainCyclist(), GC_WHEELSIZE, 2100).toFloat() / MATHCONST_PI;
                         float kgCyclistWeight = appsettings->cvalue(parent->getTrainCyclist(), GC_WEIGHT, 75).toFloat();
                         float gearRatio = 0.5; // TODO : add a parameter? Not really needed if we have external cadence meter.
                         float kgCycleWeight = appsettings->value(NULL, GC_DPDP_BIKEWEIGHT, "9.5").toFloat();

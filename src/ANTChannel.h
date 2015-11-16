@@ -25,7 +25,9 @@
 #include <QObject>
 #include <QTime>
 
-#define pi 3.14159265358979323846
+#ifndef MATHCONST_PI
+#define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
+#endif
 
 #define CHANNEL_TYPE_QUICK_SEARCH 0x10 // or'ed with current channel type
 /* after fast search, wait for slow search.  Otherwise, starting slow
