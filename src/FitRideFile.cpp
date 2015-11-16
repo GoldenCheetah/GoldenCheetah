@@ -87,6 +87,7 @@ struct FitFileReaderState
     int devices;
     bool stopped;
     bool isLapSwim;
+    double pool_length;
     int last_event_type;
     int last_event;
     int last_msg_type;
@@ -96,7 +97,7 @@ struct FitFileReaderState
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
-        last_time(0), last_distance(0.00f), interval(0), calibration(0), devices(0), stopped(true), isLapSwim(false),
+        last_time(0), last_distance(0.00f), interval(0), calibration(0), devices(0), stopped(true), isLapSwim(false), pool_length(0.0),
         last_event_type(-1), last_event(-1), last_msg_type(-1)
     {
     }
@@ -355,6 +356,9 @@ struct FitFileReaderState
                             rideFile->setTag("Sport","Run");
                             break;
                         default: // if we can't work it out, assume bike
+                            // but only if not already set to another sport,
+                            // Garmin Swim send 2 tags for example
+                            if (rideFile->getTag("Sport", "Bike") != "Bike") break;
                         case 2: // cycling
                             rideFile->setTag("Sport","Bike");
                             break;
@@ -362,6 +366,9 @@ struct FitFileReaderState
                             rideFile->setTag("Sport","Swim");
                             break;
                     }
+                    break;
+                case 44: // pool_length
+                    pool_length = value/100000;
                     break;
                 default: ; // do nothing
             }
@@ -650,7 +657,7 @@ struct FitFileReaderState
                          unknown_record_fields.insert(field.num);
             }
         }
-        if (time <= last_time)
+        if (time == last_time)
             return; // Sketchy, but some FIT files do this.
         if (stopped) {
             // As it turns out, this happens all the time in some FIT files.
@@ -885,15 +892,19 @@ struct FitFileReaderState
         double secs = time - start_time;
 
         // Normalize distance for the most common pool lengths,
-        // this is a hack to avoid the need for a double pass since
+        // this is a hack to avoid the need for a double pass when
         // pool_length comes in Session message at the end of the file.
-        double pool_length = kph*length_duration/3600;
-        if (fabs(pool_length - 0.050) < 0.004) pool_length = 0.050;
-        else if (fabs(pool_length - 0.025) < 0.002) pool_length = 0.025;
-        else if (fabs(pool_length - 0.025*METERS_PER_YARD) < 0.002) pool_length = 0.025*METERS_PER_YARD;
-        else if (fabs(pool_length - 0.020) < 0.002) pool_length = 0.020;
+        if (pool_length == 0.0) {
+            pool_length = kph*length_duration/3600;
+            if (fabs(pool_length - 0.050) < 0.004) pool_length = 0.050;
+            else if (fabs(pool_length - 0.025) < 0.002) pool_length = 0.025;
+            else if (fabs(pool_length - 0.025*METERS_PER_YARD) < 0.002) pool_length = 0.025*METERS_PER_YARD;
+            else if (fabs(pool_length - 0.020) < 0.002) pool_length = 0.020;
+        }
 
-        km = last_distance + pool_length;
+        // another pool length or pause
+        km = last_distance + (kph > 0.0 ? pool_length : 0.0);
+
         if ((secs > last_time + 1) && (isGarminSmartRecording.toInt() != 0) && (secs - last_time < 10*GarminHWM.toInt())) {
             double deltaSecs = secs - last_time;
             for (int i = 1; i <= deltaSecs; i++) {
