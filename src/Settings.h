@@ -42,9 +42,6 @@
 //Google Calendar-CALDAV oauthkeys / see also Athlete parameter
 #define GC_GOOGLE_CALENDAR_CLIENT_ID      "426009671216-c588t1u6hafep30tfs7g0g1nuo72s8ko.apps.googleusercontent.com"
 
-//Strava / see also Athlete parameter
-#define GC_STRAVA_CLIENT_ID    "83" // client id
-
 //Cycling Analytics / see also Athlete parameter
 #define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
 
@@ -256,7 +253,9 @@
 //Google Calendar-CALDAV oauthkeys
 #define GC_GOOGLE_CALENDAR_REFRESH_TOKEN  "<athlete-private>google_cal_refresh_token"
 //Strava
-#define GC_STRAVA_TOKEN                 "<athlete-private>strava_token"
+#define GC_STRAVA_CLIENT_ID             "<athlete-private>strava/client_id"
+#define GC_STRAVA_TOKEN                 "<athlete-private>strava/token"
+#define GC_STRAVA_CLIENT_SECRET         "<athlete-private>strava/client_secret"
 //Cycling Analytics
 #define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
 
