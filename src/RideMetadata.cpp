@@ -661,6 +661,9 @@ FormField::metadataFlush()
             }
         }
         break;
+    case FIELD_CHECKBOX :
+        text = ((QCheckBox *)widget)->isChecked() ? "1" : "0";
+        break;
     case FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd.MM.yyyy"); break;
     case FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
     }
