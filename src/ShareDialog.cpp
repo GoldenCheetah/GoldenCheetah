@@ -415,15 +415,16 @@ StravaUploader::StravaUploader(Context *context, RideItem *ride, ShareDialog *pa
 bool
 StravaUploader::canUpload( QString &err )
 {
-#ifdef GC_STRAVA_CLIENT_SECRET
-   token = appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "").toString();
-   if( token!="" )
-        return true;
+    if (appsettings->cvalue(context->athlete->cyclist,
+                            GC_STRAVA_CLIENT_SECRET, "") == "") {
+        err = tr("No Strava tokens are defined in athlete-private.ini");
+    } else {
+        token = appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "").toString();
+        if (token != "")
+            return true;
 
-    err = tr("no Strava token set. Please authorize in Settings.");
-#else
-    err = tr("Strava support isn't enabled in this build");
-#endif
+        err = tr("No Strava token set. Please authorize in Settings.");
+    }
     return false;
 }
 

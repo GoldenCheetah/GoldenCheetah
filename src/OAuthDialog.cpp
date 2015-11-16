@@ -63,7 +63,11 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
     QString urlstr = "";
     if (site == STRAVA) {
         urlstr = QString("https://www.strava.com/oauth/authorize?");
-        urlstr.append("client_id=").append(GC_STRAVA_CLIENT_ID).append("&");
+        urlstr.append("client_id=")
+                .append(appsettings->cvalue(
+                        context->athlete->cyclist,
+                        GC_STRAVA_CLIENT_ID, "83").toString())
+                .append("&");
         urlstr.append("scope=view_private,write&");
         urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
         urlstr.append("response_type=code&");
@@ -241,10 +245,14 @@ OAuthDialog::urlChanged(const QUrl &url)
             // now get the final token to store
             else if (site == STRAVA) {
                 urlstr = QString("https://www.strava.com/oauth/token?");
-                params.addQueryItem("client_id", GC_STRAVA_CLIENT_ID);
-#ifdef GC_STRAVA_CLIENT_SECRET
-                params.addQueryItem("client_secret", GC_STRAVA_CLIENT_SECRET);
-#endif
+                params.addQueryItem("client_id",
+                                    appsettings->cvalue(
+                                            context->athlete->cyclist,
+                                            GC_STRAVA_CLIENT_ID, "83").toString());
+                params.addQueryItem("client_secret",
+                                    appsettings->cvalue(
+                                            context->athlete->cyclist,
+                                            GC_STRAVA_CLIENT_SECRET, "").toString());
             }
 
             else if (site == CYCLING_ANALYTICS) {

@@ -448,10 +448,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     QLabel *strauthLabel = new QLabel(tr("Authorise"));
 
     stravaAuthorise = new QPushButton(tr("Authorise"), this);
-
-#ifndef GC_STRAVA_CLIENT_SECRET
-    stravaAuthorise->setEnabled(false);
-#endif
+    if (appsettings->cvalue(context->athlete->cyclist,
+                            GC_STRAVA_CLIENT_SECRET, "") == "")
+        stravaAuthorise->setEnabled(false);
 
     stravaAuthorised = new QPushButton(this);
     stravaAuthorised->setContentsMargins(0,0,0,0);
