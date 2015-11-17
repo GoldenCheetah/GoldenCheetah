@@ -26,6 +26,16 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 
+// MapQuest default API key.
+// If you have reliability problems with Fix Elevation, caused by too
+// many API requests per day using this key, then apply for your own
+// Free API key at https://developer.mapquest.com/.
+// You can then add it to gcconfig.pri
+
+#ifndef GC_MAPQUESTAPI_KEY 
+#define GC_MAPQUESTAPI_KEY "Fmjtd%7Cluur20uznu%2Ca2%3Do5-9ayshw"
+#endif
+
 struct elevationGPSPoint {
     int rideFileIndex;
     double lon;
@@ -126,24 +136,29 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *)
     QStringList elevationPoints;
     QString latLngCollection = "";
     int pointCount = 0;
-    for( std::vector<elevationGPSPoint>::iterator point = elvPoints.begin() ; point != elvPoints.end() ; ++point ) {
-        if (latLngCollection.length()!=0) {
+    try {
+        for (std::vector<elevationGPSPoint>::iterator point = elvPoints.begin();
+             point != elvPoints.end(); ++point) {
+            if (latLngCollection.length() != 0) {
+                latLngCollection.append(',');
+            }
+            latLngCollection.append(QString::number(point->lat));
             latLngCollection.append(',');
+            latLngCollection.append(QString::number(point->lon));
+            if (pointCount == 400) {
+                elevationPoints = elevationPoints + FetchElevationDataFromMapQuest(latLngCollection);
+                latLngCollection = "";
+                pointCount = 0;
+            } else {
+                ++pointCount;
+            }
         }
-        latLngCollection.append(QString::number(point->lat));
-        latLngCollection.append(',');
-        latLngCollection.append(QString::number(point->lon));
-        if (pointCount == 400) {
+        if (pointCount > 0) {
             elevationPoints = elevationPoints + FetchElevationDataFromMapQuest(latLngCollection);
-            latLngCollection = "";
-            pointCount = 0;
-        } else {
-            ++pointCount;
         }
-    }
-
-    if (pointCount > 0) {
-        elevationPoints = elevationPoints + FetchElevationDataFromMapQuest(latLngCollection);
+    } catch (QString err) {
+        qDebug() << "Cannot fetch elevation data: " << err;
+        return false;
     }
 
 
@@ -240,7 +255,9 @@ FetchElevationDataFromMapQuest(QString latLngCollection)
     // http://open.mapquestapi.com/elevation/v1/profile?key=Fmjtd%7Cluur20uznu%2Ca2%3Do5-9ayshw&shapeFormat=raw&latLngCollection=52.677,0.94589,52.6769,0.94565,52.6767,0.94545,52.6765,0.94529,52.6764,0.94511,52.6762,0.94488,52.6761,0.94466,52.6759,0.94453,52.6758,0.9447,52.6756,0.94497,52.6756,0.94527,52.6758,0.94553,52.6759,0.94572,52.6761,0.94594,52.6763,0.94611,52.6765,0.94627,52.6766,0.94635,52.6768,0.94639,52.6771,0.9464,52.6772,0.94639,52.6775,0.94637,52.6777,0.94638,52.6779,0.9464,52.6781,0.94645,52.6783,0.94652,52.6784,0.9466,52.6786,0.94672,52.6788,0.94686,52.679,0.94701,52.6792,0.94713,52.6794,0.94721,52.6796,0.94724
     QStringList elevationPoints;
     QNetworkAccessManager *networkMgr = new QNetworkAccessManager();
-    QNetworkReply *reply = networkMgr->get( QNetworkRequest( QUrl( "http://open.mapquestapi.com/elevation/v1/profile?key=Fmjtd%7Cluur20uznu%2Ca2%3Do5-9ayshw&shapeFormat=raw&useFilter=true&latLngCollection=" + latLngCollection ) ) );
+    QNetworkReply *reply = networkMgr->get( QNetworkRequest(
+            QUrl( "http://open.mapquestapi.com/elevation/v1/profile?key=" GC_MAPQUESTAPI_KEY
+                          "&shapeFormat=raw&useFilter=true&latLngCollection=" + latLngCollection ) ) );
 
     QEventLoop loop;
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
@@ -252,16 +269,20 @@ FetchElevationDataFromMapQuest(QString latLngCollection)
     QString elevationJSON;
     elevationJSON = reply->readAll();
 
-    if (!elevationJSON.contains("Bad Request")) {
+    delete networkMgr;
 
-        elevationJSON = elevationJSON.mid(elevationJSON.indexOf("elevationProfile")+19);
-        elevationJSON = elevationJSON.mid(0, elevationJSON.indexOf("]"));
-        elevationJSON.replace("{\"distance\":", "");
-        elevationJSON.replace(",\"height\":", "|");
-        elevationJSON.replace("}", "");
-        //qDebug() << elevationJSON;
-        elevationPoints = elevationJSON.split(",");
-    }
+    if (elevationJSON.contains("Exceeded developer limit configuration"))
+        throw QString("Developer limit exceeded");
+    if (elevationJSON.contains("Bad Request"))
+        throw QString("Bad request");
+
+    elevationJSON = elevationJSON.mid(elevationJSON.indexOf("elevationProfile") + 19);
+    elevationJSON = elevationJSON.mid(0, elevationJSON.indexOf("]"));
+    elevationJSON.replace("{\"distance\":", "");
+    elevationJSON.replace(",\"height\":", "|");
+    elevationJSON.replace("}", "");
+    //qDebug() << elevationJSON;
+    elevationPoints = elevationJSON.split(",");
 
     return elevationPoints;
 }

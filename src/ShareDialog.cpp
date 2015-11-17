@@ -26,6 +26,7 @@
 #include "Units.h"
 #include "VeloHeroUploader.h"
 #include "TrainingstagebuchUploader.h"
+#include "SportPlusHealthUploader.h"
 #include "HelpWhatsThis.h"
 
 // access to metrics
@@ -159,6 +160,15 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     }
     vbox1->addWidget(trainingstagebuchChk,0,col++);
 
+    sportplushealthUploader = new SportPlusHealthUploader(context, ride, this);
+    sportplushealthChk = new QCheckBox(tr("SportPlusHealth"));
+    if( ! sportplushealthUploader->canUpload( err ) ){
+        sportplushealthChk->setEnabled( false );
+    } else if( ! sportplushealthUploader->wasUploaded() ){
+        sportplushealthChk->setChecked( true );
+    }
+    vbox1->addWidget(sportplushealthChk,0,col++);
+
     //garminUploader = new GarminUploader(context, ride, this); // not in 3.1
     //garminChk = new QCheckBox(tr("Garmin Connect"));
     //garminChk->setVisible(false);
@@ -274,7 +284,7 @@ ShareDialog::upload()
     if ( !rideWithGPSChk->isChecked() && !selfLoopsChk->isChecked()
         && !veloHeroChk->isChecked() && !trainingstagebuchChk->isChecked()
         && !stravaChk->isChecked() && !cyclingAnalyticsChk->isChecked()
-        //&& !garminChk->isChecked()
+        && !sportplushealthChk->isChecked() //&& !garminChk->isChecked()
         ) {
         QMessageBox aMsgBox;
         aMsgBox.setText(tr("No share site selected !"));
@@ -307,6 +317,9 @@ ShareDialog::upload()
     if (trainingstagebuchChk->isChecked()) {
         shareSiteCount ++;
     }
+    if (sportplushealthChk->isChecked()) {
+        shareSiteCount ++;
+    }
     //if (garminChk->isChecked()) {
     //    shareSiteCount ++;
     //}
@@ -328,6 +341,10 @@ ShareDialog::upload()
     }
     if (trainingstagebuchChk->isEnabled() && trainingstagebuchChk->isChecked()) {
         doUploader( trainingstagebuchUploader );
+    }
+    if (sportplushealthChk->isEnabled() && sportplushealthChk->isChecked()) {
+        sportplushealthUploader->insertedName = QString(titleEdit->text()).toLatin1();
+        doUploader( sportplushealthUploader );
     }
     //if (garminChk->isEnabled() && garminChk->isChecked()) {
     //    doUploader( garminUploader );
@@ -482,7 +499,12 @@ StravaUploader::requestUploadStrava()
 
     QHttpPart activityTypePart;
     activityTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"activity_type\""));
-    activityTypePart.setBody("ride");
+    if (ride->isRun)
+      activityTypePart.setBody("run");
+    else if (ride->isSwim)
+      activityTypePart.setBody("swim");
+    else
+      activityTypePart.setBody("ride");
 
     QHttpPart activityNamePart;
     activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"activity_name\""));

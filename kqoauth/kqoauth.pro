@@ -9,7 +9,7 @@ QT += network
 CONFIG += \
     create_prl
 
-!macx: CONFIG += static_and_shared
+unix:!macx: CONFIG += static
 
 INC_DIR = .
 

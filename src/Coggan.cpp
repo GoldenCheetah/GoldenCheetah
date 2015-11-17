@@ -162,7 +162,7 @@ class IntensityFactor : public RideMetric {
 
             int ftp = r->getTag("FTP","0").toInt();
 
-            bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, "1").toString() == "0");
+            bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, true).toBool());
 
             if (useCPForFTP) {
                 int cp = r->getTag("CP","0").toInt();
@@ -215,7 +215,7 @@ class TSS : public RideMetric {
 
         int ftp = r->getTag("FTP","0").toInt();
 
-        bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, "1").toString() == "0");
+        bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, true).toBool());
 
         if (useCPForFTP) {
             int cp = r->getTag("CP","0").toInt();

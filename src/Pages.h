@@ -255,6 +255,9 @@ class CredentialsPage : public QScrollArea
         QLineEdit *veloHeroUser;
         QLineEdit *veloHeroPass;
 
+        QLineEdit *sphUser;
+        QLineEdit *sphPass;
+
         QLineEdit *selUser;
         QLineEdit *selPass;
 
@@ -705,7 +708,7 @@ class CPPage : public QWidget
 
     public:
         CPPage(ZonePage *parent);
-        QCheckBox *useCPForFTPCheckBox;
+        QComboBox *useCPForFTPCombo;
 
     public slots:
         void addClicked();
@@ -717,6 +720,7 @@ class CPPage : public QWidget
         void addZoneClicked();
         void deleteZoneClicked();
         void zonesChanged();
+        void initializeRanges();
 
     private:
         bool active;

@@ -32,13 +32,13 @@ DeviceTypes::DeviceTypes()
     static DeviceType SupportedDevices[] =
     {
 #ifdef Q_OS_WIN32
-      { DEV_ANTLOCAL, DEV_USB,     (char *) "Native ANT+",            true,    false,
-        tr("ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, "
+      { DEV_ANTLOCAL, DEV_USB,     (char *) "ANT+ and FE-C",            true,    false,
+        tr("ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM and Powertap power meters, Heart rate belts, "
         "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick"),
         ":images/devices/garminusb.png" },
 #else
-      { DEV_ANTLOCAL, DEV_SERIAL,  (char *) "Native ANT+",           true,    false,
-        tr("ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, "
+      { DEV_ANTLOCAL, DEV_SERIAL,  (char *) "ANT+ and FE-C",           true,    false,
+        tr("ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM, Powertap or Quarq power meters, Heart rate belts, "
         "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick") ,
         ":images/devices/garminusb.png" },
 #endif
@@ -56,6 +56,11 @@ DeviceTypes::DeviceTypes()
         tr("Racermate Computrainer Lab or Pro bike trainer with the handlebar controller "
         "connected via a USB adaptor or directly connected to a local serial port.") ,
         ":images/devices/computrainer.png"                                        },
+#if QT_VERSION >= 0x050000
+      { DEV_MONARK,       DEV_SERIAL,  (char *) "Monark LTx/LCx",true,    false,
+        tr("Monark USB device ") ,
+        ":images/devices/monark_lt2.png"                                        },
+#endif
 #ifdef GC_HAVE_LIBUSB
       { DEV_FORTIUS,  DEV_LIBUSB,  (char *) "Tacx Fortius",          true,    false,
         tr("Tacx Fortius/iMagic bike trainer with the handlebar controller connected "

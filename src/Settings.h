@@ -51,6 +51,7 @@
 // Dropbox id
 #define GC_DROPBOX_CLIENT_ID "753fbblhri06ah3"
 
+
 /*
  *  GoldenCheetah Properties are stored in different locations, depending on the prefix defined in the property name. The following different prefixes are supported
  *  <system>
@@ -235,6 +236,8 @@
 #define GC_TTBPASS                      "<athlete-private>ttb/pass"
 #define GC_VELOHEROUSER                 "<athlete-private>velohero/user"
 #define GC_VELOHEROPASS                 "<athlete-private>velohero/pass"
+#define GC_SPORTPLUSHEALTHUSER          "<athlete-private>sph/user"
+#define GC_SPORTPLUSHEALTHPASS          "<athlete-private>sph/pass"
 #define GC_SELUSER                      "<athlete-private>sel/user"
 #define GC_SELPASS                      "<athlete-private>sel/pass"
 #define GC_WIURL                        "<athlete-private>wi/url"

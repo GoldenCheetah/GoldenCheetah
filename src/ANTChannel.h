@@ -76,14 +76,21 @@ class ANTChannelInitialisation {
 
 
 class ANTChannel : public QObject {
-
     private:
 
         Q_OBJECT
 
         ANT *parent;
 
-        ANTMessage lastMessage, lastStdPwrMessage;
+        // Stores the last message.
+        ANTMessage lastMessage;
+        // Stores last message for ANT_STANDARD_POWER.
+        ANTMessage lastStdPwrMessage;
+        // Stores last message for ANT_CRANKTORQUE_POWER.
+        ANTMessage lastCrankTorquePwrMessage;
+        // Stores latest ANT_STANDARD_POWER or ANT_CRANKTORQUE_POWER
+        // for use by ANT_TE_AND_PS_POWER.
+        ANTMessage lastPwrForTePsMessage;
         int dualNullCount, nullCount, stdNullCount;
         double last_message_timestamp;
         uint8_t fecPrevRawDistance;

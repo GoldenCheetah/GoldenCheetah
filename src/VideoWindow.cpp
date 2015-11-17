@@ -35,7 +35,7 @@ VideoWindow::VideoWindow(Context *context)  :
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);
 
-    curPosition = 0;
+    curPosition = 1;
 
     init = true; // assume initialisation was ok ...
 
@@ -311,6 +311,37 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             p_meterWidget->Value =  rtd.getHr();
             p_meterWidget->Text = QString::number((int)p_meterWidget->Value) + tr(" bpm");
         }
+        else if (p_meterWidget->Source() == QString("TrainerStatus"))
+        {
+            if (!rtd.getTrainerStatusAvailable())
+            {  // we don't have status from trainer thus we cannot indicate anything on screen
+                p_meterWidget->Text = tr("");
+            }
+            else if (rtd.getTrainerCalibRequired())
+            {
+                p_meterWidget->setColor(QColor(255,0,0,180));
+                p_meterWidget->Text = tr("Calibration required");
+            }
+            else if (rtd.getTrainerConfigRequired())
+            {
+                p_meterWidget->setColor(QColor(255,0,0,180));
+                p_meterWidget->Text = tr("Configuration required");
+            }
+            else if (rtd.getTrainerBrakeFault())
+            {
+                p_meterWidget->setColor(QColor(255,0,0,180));
+                p_meterWidget->Text = tr("brake fault");
+            }
+            else if (rtd.getTrainerReady())
+            {
+                p_meterWidget->setColor(QColor(0,255,0,180));
+                p_meterWidget->Text = tr("Ready");
+            }
+            else
+            {
+                p_meterWidget->Text = tr("");
+            }
+        }
     }
 
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
@@ -330,10 +361,10 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
         QVector<VideoSyncFilePoint> VideoSyncFiledataPoints = context->currentVideoSyncFile()->Points;
 
-        if (!VideoSyncFiledataPoints.count()) return;
+        if (VideoSyncFiledataPoints.count()<2) return;
 
-        if(curPosition > VideoSyncFiledataPoints.count()-1 || curPosition < 0)
-            curPosition = 1;
+        if(curPosition > VideoSyncFiledataPoints.count()-1 || curPosition < 1)
+            curPosition = 1; // minimum curPosition is 1 as we will use [curPosition-1]
 
         double CurrentDistance = qBound(0.0,  rtd.getDistance() + context->currentVideoSyncFile()->manualOffset, context->currentVideoSyncFile()->Distance);
         context->currentVideoSyncFile()->km = CurrentDistance;
@@ -354,10 +385,10 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         //TODO : GPX file format
             // otherwise we use the gpx from selected ride in analysis view:
             QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
-            if (!dataPoints.count()) return;
+            if (dataPoints.count()<2) return;
 
-            if(curPosition > dataPoints.count()-1 || curPosition < 0)
-                curPosition = 1;
+            if(curPosition > dataPoints.count()-1 || curPosition < 1)
+                curPosition = 1; // minimum curPosition is 1 as we will use [curPosition-1]
 
             // make sure the current position is less than the new distance
             while ((dataPoints[curPosition]->km > rtd.getDistance()) && (curPosition > 1))

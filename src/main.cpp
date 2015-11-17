@@ -292,6 +292,8 @@ main(int argc, char *argv[])
         // now redirect stderr
 #ifndef WIN32
         if (!debug) nostderr(home.canonicalPath());
+#else
+        Q_UNUSED(debug)
 #endif
 
         // install QT Translator to enable QT Dialogs translation
