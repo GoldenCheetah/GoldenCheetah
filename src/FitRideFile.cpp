@@ -31,6 +31,7 @@
 #include <limits>
 #include <cmath>
 #define FIT_DEBUG false // debug traces
+#define LAPSWIM_DEBUG false
 
 #define RECORD_TYPE 20
 
@@ -475,6 +476,8 @@ struct FitFileReaderState
         int i = 0;
         time_t this_start_time = 0;
         ++interval;
+        double total_elapsed_time = 0.0;
+        double total_distance = 0.0;
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
 
@@ -484,9 +487,12 @@ struct FitFileReaderState
             switch (field.num) {
                 case 253: time = value + qbase_time.toTime_t(); break;
                 case 2: this_start_time = value + qbase_time.toTime_t(); break;
+                case 7: total_elapsed_time = round(value / 1000.0); break;
+                case 9: total_distance = value / 100000.0; break;
                 default: ; // ignore it
             }
         }
+        if (LAPSWIM_DEBUG) qDebug() << "Lap" << interval << this_start_time - start_time << total_elapsed_time << time - this_start_time << total_distance;
         if (this_start_time == 0 || this_start_time-start_time < 0) {
             //errors << QString("lap %1 has invalid start time").arg(interval);
             this_start_time = start_time; // time was corrected after lap start
@@ -496,8 +502,13 @@ struct FitFileReaderState
                 return;
             }
         }
-        if (rideFile->dataPoints().count()) // no samples means no laps..
-            rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time, QString(QObject::tr("Lap %1")).arg(interval));
+        if (rideFile->dataPoints().count()) { // no samples means no laps..
+            if (isLapSwim && total_elapsed_time > 0.0) {
+                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, this_start_time - start_time + total_elapsed_time, QObject::tr("Lap %1").arg(interval));
+            } else {
+                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time, QString(QObject::tr("Lap %1")).arg(interval));
+            }
+        }
     }
 
     void decodeRecord(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
@@ -897,6 +908,7 @@ struct FitFileReaderState
         if (pool_length == 0.0) {
             pool_length = kph*length_duration/3600;
             if (fabs(pool_length - 0.050) < 0.004) pool_length = 0.050;
+            else if (fabs(pool_length - 0.033) < 0.003) pool_length = 0.033;
             else if (fabs(pool_length - 0.025) < 0.002) pool_length = 0.025;
             else if (fabs(pool_length - 0.025*METERS_PER_YARD) < 0.002) pool_length = 0.025*METERS_PER_YARD;
             else if (fabs(pool_length - 0.020) < 0.002) pool_length = 0.020;
@@ -907,6 +919,7 @@ struct FitFileReaderState
 
         if ((secs > last_time + 1) && (isGarminSmartRecording.toInt() != 0) && (secs - last_time < 10*GarminHWM.toInt())) {
             double deltaSecs = secs - last_time;
+            if (LAPSWIM_DEBUG) qDebug() << "Pause" << last_time+1 << deltaSecs;
             for (int i = 1; i <= deltaSecs; i++) {
                 rideFile->appendPoint(
                     last_time+i, 0.0, 0.0,
@@ -924,19 +937,19 @@ struct FitFileReaderState
             }
             last_time += deltaSecs;
         }
-        double deltaSecs = length_duration;
-        double deltaDist = km - last_distance;
 
         // only fill 10x the maximal smart recording gap defined
         // in preferences - we don't want to crash / stall on bad
         // or corrupt files
-        if ((isGarminSmartRecording.toInt() != 0) && deltaSecs > 0 && deltaSecs < 10*GarminHWM.toInt()) {
-
+        if ((isGarminSmartRecording.toInt() != 0) && length_duration > 0 && length_duration < 10*GarminHWM.toInt()) {
+            double deltaSecs = length_duration;
+            double deltaDist = km - last_distance;
+            kph = 3600.0 * deltaDist / deltaSecs;
+            if (LAPSWIM_DEBUG) qDebug() << "Length" << last_time+1 << deltaSecs << deltaDist;
             for (int i = 1; i <= deltaSecs; i++) {
-                double weight = i /deltaSecs;
                 rideFile->appendPoint(
-                    last_time + (deltaSecs * weight), cad, 0.0,
-                    last_distance + (deltaDist * weight),
+                    last_time + i, cad, 0.0,
+                    last_distance + (deltaDist * i/deltaSecs),
                     kph, 0.0, 0.0, 0.0, 0.0, 0.0,
                     0.0, 0.0, RideFile::NoTemp,
                     0.0, 0.0, 0.0,
