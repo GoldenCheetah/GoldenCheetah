@@ -709,6 +709,11 @@ class CPPage : public QWidget
     public:
         CPPage(ZonePage *parent);
         QComboBox *useCPForFTPCombo;
+        qint32 saveClicked();
+
+    struct {
+        int cpforftp;
+    } b4;
 
     public slots:
         void addClicked();

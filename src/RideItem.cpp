@@ -463,6 +463,7 @@ RideItem::checkStale()
 
             // get the new zone configuration fingerprint that applies for the ride date
             unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
+                        + (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, 0).toInt() ? 1 : 0)
                         + static_cast<unsigned long>(context->athlete->paceZones(false)->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->paceZones(true)->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
@@ -577,6 +578,7 @@ RideItem::refresh()
 
         // update fingerprints etc, crc done above
         fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
+                    + (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, 0).toInt() ? 1 : 0)
                     + static_cast<unsigned long>(context->athlete->paceZones(false)->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->paceZones(true)->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))

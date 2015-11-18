@@ -3374,9 +3374,12 @@ ZonePage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, cpPage->useCPForFTPCombo->currentIndex());
 
 
+    // did cp for ftp change ?
+    qint32 cppage = cpPage->saveClicked();
+
     // did we change ?
-    if (zones.getFingerprint() != b4Fingerprint) return CONFIG_ZONES;
-    else return 0;
+    if (zones.getFingerprint() != b4Fingerprint) return cppage | CONFIG_ZONES;
+    else return cppage;
 }
 
 SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
@@ -3594,7 +3597,8 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     useCPForFTPCombo->addItem(tr("Use CP for all metrics"));
     useCPForFTPCombo->addItem(tr("Use FTP for Coggan metrics"));
 
-    useCPForFTPCombo->setCurrentIndex(appsettings->cvalue(zonePage->context->athlete->cyclist, GC_USE_CP_FOR_FTP, Qt::Checked).toInt());
+    b4.cpforftp = appsettings->cvalue(zonePage->context->athlete->cyclist, GC_USE_CP_FOR_FTP, 0).toInt() ? 1 : 0;
+    useCPForFTPCombo->setCurrentIndex(b4.cpforftp);
 
     cpEdit = new QDoubleSpinBox;
     cpEdit->setMinimum(0);
@@ -3681,6 +3685,15 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     connect(useCPForFTPCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(initializeRanges()));
     connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
+}
+
+qint32
+CPPage::saveClicked()
+{
+    if (b4.cpforftp != useCPForFTPCombo->currentIndex())
+        return CONFIG_ZONES;
+    else
+        return 0;
 }
 
 void
