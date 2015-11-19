@@ -61,6 +61,10 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     context->athlete = this;
     cyclist = this->home->root().dirName();
 
+    // get id and set id all at one
+    id = QUuid(appsettings->cvalue(cyclist, GC_ATHLETE_ID, QUuid::createUuid().toString()).toString());
+    appsettings->setCValue(cyclist, GC_ATHLETE_ID, id.toString());
+
     // Recovering from a crash?
     if(!appsettings->cvalue(cyclist, GC_SAFEEXIT, true).toBool()) {
         GcCrashDialog *crashed = new GcCrashDialog(homeDir);
