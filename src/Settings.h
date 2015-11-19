@@ -183,6 +183,7 @@
 // Athlete Specific Properties - Stored in /config subfolder of the related athlete
 // --------------------------------------------------------------------------------
 
+#define GC_ATHLETE_ID                   "<athlete-general>id"
 #define GC_VERSION_USED                 "<athlete-general>versionused"
 #define GC_SAFEEXIT                     "<athlete-general>safeexit"
 #define GC_UPGRADE_FOLDER_SUCCESS       "<athlete-general>upgradesuccess/folder"     // success tracking of folder upgrade stored on athlete level

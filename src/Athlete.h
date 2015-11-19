@@ -23,6 +23,7 @@
 #include <QSqlDatabase>
 #include <QTreeWidget>
 #include <QtGui>
+#include <QUuid>
 #include <QNetworkReply>
 #include <QHeaderView>
 
@@ -73,6 +74,7 @@ class Athlete : public QObject
 
         // basic athlete info
         QString cyclist; // the cyclist name
+        QUuid id; // unique identifier
         bool useMetricUnits;
         AthleteDirectoryStructure *home;
         const AthleteDirectoryStructure *directoryStructure() const {return home; }
