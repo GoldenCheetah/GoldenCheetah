@@ -356,9 +356,7 @@ GcUpgrade::upgrade(const QDir &home)
 
     if (last < VERSION33_BUILD) {
 
-        // cleanup/restore default entries in the trainDB
-        trainDB->updateDefaultEntries();
-
+        trainDB->upgradeDefaultEntriesWorkout();
     }
 
 
