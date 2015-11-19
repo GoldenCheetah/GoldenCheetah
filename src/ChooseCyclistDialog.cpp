@@ -50,9 +50,13 @@ static void recursiveDelete(QDir dir)
 ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : home(home)
 {
     setWindowTitle(tr("Choose an Athlete"));
+    setMinimumHeight(300);
 
     listWidget = new QListWidget(this);
     listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    listWidget->setIconSize(QSize(64, 64));
+    listWidget->setSpacing(0);
+    listWidget->setContentsMargins(0,0,0,0);
 
     getList();
 
@@ -96,6 +100,16 @@ ChooseCyclistDialog::getList()
 
         QListWidgetItem *newone = new QListWidgetItem(name, listWidget);
 
+        // get avatar image if it exists
+        QString iconpath = home.absolutePath() + "/" + name + "/config/avatar.png";
+        if (QFile(iconpath).exists()) {
+            QPixmap px(iconpath);
+            newone->setIcon(QIcon(px.scaled(64,64)));
+        }
+
+        // taller less spacing
+        newone->setSizeHint(QSize(newone->sizeHint().width(), 64));
+
         // only allow selection of cyclists which are not already open
         foreach (MainWindow *x, mainwindows) {
             QMapIterator<QString, Tab*> t(x->tabs);
@@ -103,6 +117,7 @@ ChooseCyclistDialog::getList()
                 t.next();
                 if (t.key() == name)
                     newone->setFlags(newone->flags() & ~Qt::ItemIsEnabled);
+
             }
         }
     }
@@ -181,7 +196,18 @@ void
 ChooseCyclistDialog::newClicked()
 {
     QString name = newCyclistDialog(home, this);
-    if (!name.isEmpty())
-        new QListWidgetItem(name, listWidget);
+    if (!name.isEmpty()) {
+        QListWidgetItem *newone = new QListWidgetItem(name, listWidget);
+
+        // get avatar image if it exists
+        QString iconpath = home.absolutePath() + "/" + name + "/config/avatar.png";
+        if (QFile(iconpath).exists()) {
+            QPixmap px(iconpath);
+            newone->setIcon(QIcon(px.scaled(64,64)));
+        }
+
+        // taller less spacing
+        newone->setSizeHint(QSize(newone->sizeHint().width(), 64));
+    }
 }
 
