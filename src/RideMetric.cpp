@@ -126,8 +126,9 @@
 // 120 3   Nov 2015 Mark Liversedge    Added Above CP time in W'bal zones
 // 121 3   Nov 2015 Mark Liversedge    Added Work in W'bal zones
 // 122 7   Nov 2015 Mark Liversedge    Added HR Zones 9 and 10
+// 123 19  Nov 2015 Mark Liversedge    Force recompute of TSS/IF after logic fix
 
-int DBSchemaVersion = 122;
+int DBSchemaVersion = 123;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
