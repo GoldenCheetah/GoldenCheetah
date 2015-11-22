@@ -935,9 +935,9 @@ AllPlotWindow::configChanged(qint32 state)
         redrawStackPlot();
     }
 
-    // just force a replot if wbal changed
-    // and we are actually plotting wbal !
-    if (state & CONFIG_WBAL && showW->isChecked()) forceReplot();
+    // just force a replot if (a) units changed (e.g. temp, speed etc are now in different units
+    // or the wbal formula changed and we are actually plotting wbal !
+    if (state & CONFIG_UNITS || (state & CONFIG_WBAL && showW->isChecked())) forceReplot();
 }
 
 QString
