@@ -327,6 +327,15 @@ SOURCES +=  ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp
                 $$HTPATH/staticfilecontroller.cpp
 }
 
+# cloudDB features (APP_NAME and BASIC_AUTH must be defined) see gcconfig.pri.in
+equals ( CloudDB, active ) {
+
+    HEADERS += ChartExchange.h
+    SOURCES += ChartExchange.cpp
+    DEFINES += GC_HAS_CLOUD_DB
+}
+
+
 # qzipreader/qzipwriter always
 HEADERS += ../qzip/zipreader.h \
            ../qzip/zipwriter.h

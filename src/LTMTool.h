@@ -66,7 +66,7 @@ class LTMTool : public QWidget
 
         // apply settings to the metric selector
         void applySettings();
-        void setUseSelected(int);;
+        void setUseSelected(int);
         int useSelected();
 
         bool isFiltered() { return _amFiltered; }
@@ -85,10 +85,12 @@ class LTMTool : public QWidget
         QCheckBox *showEvents;
         QCheckBox *showStack;
         QSlider *stackSlider;
-        QPushButton *saveButton;
+
+        // Preset Tab
+        QTreeWidget *charts;
         QPushButton *applyButton;
         QPushButton *newButton;
-        QTreeWidget *charts;
+        QPushButton *sharedChartsDialogButton;
 
         DateSettingsEdit *dateSetting;
 
@@ -114,9 +116,13 @@ class LTMTool : public QWidget
         void setFilter(QStringList);
 
         void presetsChanged();   // presets changed in the athlete class
+
         void usePresetChanged(); // we changed the checkbox
 
         void addCurrent();
+#ifdef GC_HAS_CLOUD_DB
+        void sharedChartsDialog();
+#endif
 
     private:
 
@@ -132,11 +138,7 @@ class LTMTool : public QWidget
         QStringList filenames; // filters
 
         QTabWidget *tabs;
-        QWidget *basicsettings, *basic, *custom;
-
-        // preset tab:
-        QWidget *presetWidget;
-        QLineEdit *chartName;
+        QWidget *basicsettings, *presets, *custom;
 
         // custom tab:
         QTableWidget *customTable;
