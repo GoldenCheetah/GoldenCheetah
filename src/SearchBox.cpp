@@ -152,6 +152,7 @@ SearchBox::configChanged(qint32)
     list = DataFilter::functions();
 
     // add special functions (older code needs fixing !)
+    list << "config(cranklength)";
     list << "config(cp)";
     list << "config(w')";
     list << "config(pmax)";

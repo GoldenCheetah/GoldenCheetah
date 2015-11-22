@@ -898,7 +898,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             // is the symbol valid?
             QRegExp bestValidSymbols("^(apower|power|hr|cadence|speed|torque|vam|xpower|np|wpk)$", Qt::CaseInsensitive);
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
-            QRegExp configValidSymbols("^(cp|w\\'|pmax|cv|d\\'|scv|sd\\'|height|weight|lthr|maxhr|rhr|units)$", Qt::CaseInsensitive);
+            QRegExp configValidSymbols("^(cranklength|cp|w\\'|pmax|cv|d\\'|scv|sd\\'|height|weight|lthr|maxhr|rhr|units)$", Qt::CaseInsensitive);
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
 
@@ -1469,6 +1469,10 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
             double WEIGHT = m->getWeight();
 
             QString symbol = leaf->series->lvalue.n->toLower();
+
+            if (symbol == "cranklength") {
+                return Result(appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH, 175.00f).toDouble() / 1000.0);
+            }
 
             if (symbol == "cp") {
                 return Result(CP);
