@@ -427,10 +427,20 @@ ANT::setup()
     // fixme: better synchronisation?
     msleep(500);
 
-    sendMessage(ANTMessage::resetSystem());
+    uint8_t attempts = 0;
+    do
+    {
+        ANT_Reset_Acknowledge = false;
+        sendMessage(ANTMessage::resetSystem());
 
-    // specs say wait 500ms after reset before sending any more host commands
-    msleep(500);
+        // specs say wait 500ms after reset before sending any more host commands
+        msleep(500);
+
+        if (!ANT_Reset_Acknowledge)
+            qDebug() << "ANT device reset was not acknowledged !...try again";
+//        else
+//            qDebug() << "ANT device reset successful !";
+    } while (!ANT_Reset_Acknowledge && attempts++<3);
 
     sendMessage(ANTMessage::setNetworkKey(1, key));
 
@@ -885,6 +895,9 @@ ANT::processMessage(void) {
     emit receivedAntMessage(m, timestamp);
 
     switch (rxMessage[ANT_OFFSET_ID]) {
+        case ANT_NOTIF_STARTUP:
+            ANT_Reset_Acknowledge = true;
+            break;
         case ANT_ACK_DATA:
         case ANT_BROADCAST_DATA:
         case ANT_CHANNEL_STATUS:
