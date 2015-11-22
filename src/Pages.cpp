@@ -3805,7 +3805,9 @@ CPPage::addClicked()
     add->setText(column++, QString("%1").arg(cpEdit->value()));
 
     // FTP
-    add->setText(column++, QString("%1").arg(ftpEdit->value()));
+    if (useCPForFTPCombo->currentIndex() == 1) {
+        add->setText(column++, QString("%1").arg(ftpEdit->value()));
+    }
 
     // W'
     add->setText(column++, QString("%1").arg(wp));
@@ -3851,8 +3853,11 @@ CPPage::editClicked()
     zonePage->zones.setCP(index, cp);
     edit->setText(columns++, QString("%1").arg(cp));
 
-    zonePage->zones.setFTP(index, ftp);
-    edit->setText(columns++, QString("%1").arg(ftp));
+    // show FTP if we use FTP for Coggan Metrics
+    if (useCPForFTPCombo->currentIndex() == 1) {
+        zonePage->zones.setFTP(index, ftp);
+        edit->setText(columns++, QString("%1").arg(ftp));
+    }
 
     // W'
     zonePage->zones.setWprime(index, wp);
