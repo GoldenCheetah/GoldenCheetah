@@ -605,9 +605,17 @@ WPrime::summarize(int WPRIME, QVector<double> wtiz, QVector<double> wcptiz, QVec
             summary += QString("<td align=\"center\">%1</td>").arg(WPRIME - (WPRIME / 100.0f * wbal_zones[zone].hi), 0, 'f', 0); 
         summary += QString("<td align=\"center\">%1</td>").arg(wworktiz[zone], 0, 'f', 1);
         summary += QString("<td align=\"center\">%1</td>").arg(time_to_string((unsigned) round(wtiz[zone])));
-        summary += QString("<td align=\"center\">%1</td>").arg((double)wtiz[zone]/duration * 100, 0, 'f', 0);
+        if (duration == 0) {
+            summary += QString("<td align=\"center\">0</td>");
+        } else {
+            summary += QString("<td align=\"center\">%1</td>").arg((double)wtiz[zone]/duration * 100, 0, 'f', 0);
+        }
         summary += QString("<td align=\"center\">%1</td>").arg(time_to_string((unsigned) round(wcptiz[zone])));
-        summary += QString("<td align=\"center\">%1</td>").arg((double)wcptiz[zone]/wtiz[zone] * 100, 0, 'f', 0);
+        if (wtiz[zone] == 0) {
+            summary += QString("<td align=\"center\">0</td>");
+        } else {
+            summary += QString("<td align=\"center\">%1</td>").arg((double)wcptiz[zone]/wtiz[zone] * 100, 0, 'f', 0);
+        }
         summary += "</tr>";
     }
     summary += "</table>";
