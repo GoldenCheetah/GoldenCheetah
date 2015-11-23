@@ -91,35 +91,30 @@ void MonarkConnection::run()
     m_serial->setPortName(m_serialPortName);
 
     m_timer = new QTimer();
+    QTimer *startupTimer = new QTimer();
 
     if (!m_serial->open(QSerialPort::ReadWrite))
     {
         qDebug() << "Error opening serial";
     } else {
         configurePort(m_serial);
+
         // Discard any existing data
         QByteArray data = m_serial->readAll();
 
-        // Read id from bike
-        m_serial->write("id\r");
-        m_serial->waitForBytesWritten(-1);
-        QByteArray id = readAnswer(1000);
-        m_id = QString(id);
-
-        qDebug() << "Connected to bike: " << m_id;
-
-        if (m_id.toLower().startsWith("lc"))
-        {
-            m_canControlPower = true;
-            setLoad(100);
-        }
-
         // Set up polling
         connect(m_timer, SIGNAL(timeout()), this, SLOT(requestAll()),Qt::DirectConnection);
+
+        // Set up initial model detection
+        connect(startupTimer, SIGNAL(timeout()), this, SLOT(identifyModel()),Qt::DirectConnection);
     }
 
     m_timer->setInterval(1000);
     m_timer->start();
+
+    startupTimer->setSingleShot(true);
+    startupTimer->setInterval(0);
+    startupTimer->start();
 
     exec();
 }
@@ -138,8 +133,12 @@ void MonarkConnection::requestAll()
     {
         QString cmd = QString("power %1\r").arg(m_loadToWrite);
         m_serial->write(cmd.toStdString().c_str());
-        if (m_serial->waitForBytesWritten(100))
-            m_load = m_loadToWrite;
+        if (!m_serial->waitForBytesWritten(500))
+        {
+            // failure to write to device, bail out
+            this->exit(-1);
+        }
+        m_load = m_loadToWrite;
         QByteArray data = m_serial->readAll();
     }
 
@@ -149,8 +148,12 @@ void MonarkConnection::requestAll()
 void MonarkConnection::requestPower()
 {
     m_serial->write("power\r");
-    m_serial->waitForBytesWritten(-1);
-    QByteArray data = readAnswer();
+    if (!m_serial->waitForBytesWritten(500))
+    {
+        // failure to write to device, bail out
+        this->exit(-1);
+    }
+    QByteArray data = readAnswer(500);
     quint32 p = data.toInt();
     emit power(p);
 }
@@ -158,8 +161,12 @@ void MonarkConnection::requestPower()
 void MonarkConnection::requestPulse()
 {
     m_serial->write("pulse\r");
-    m_serial->waitForBytesWritten(-1);
-    QByteArray data = readAnswer();
+    if (!m_serial->waitForBytesWritten(500))
+    {
+        // failure to write to device, bail out
+        this->exit(-1);
+    }
+    QByteArray data = readAnswer(500);
     quint32 p = data.toInt();
     emit pulse(p);
 }
@@ -167,10 +174,34 @@ void MonarkConnection::requestPulse()
 void MonarkConnection::requestCadence()
 {
     m_serial->write("pedal\r");
-    m_serial->waitForBytesWritten(-1);
-    QByteArray data = readAnswer();
+    if (!m_serial->waitForBytesWritten(500))
+    {
+        // failure to write to device, bail out
+        this->exit(-1);
+    }
+    QByteArray data = readAnswer(500);
     quint32 c = data.toInt();
     emit cadence(c);
+}
+
+void MonarkConnection::identifyModel()
+{
+    m_serial->write("id\r");
+    if (!m_serial->waitForBytesWritten(500))
+    {
+        // failure to write to device, bail out
+        this->exit(-1);
+    }
+    QByteArray data = readAnswer(500);
+    m_id = QString(data);
+
+    qDebug() << "Connected to bike: " << m_id;
+
+    if (m_id.toLower().startsWith("lc"))
+    {
+        m_canControlPower = true;
+        setLoad(100);
+    }
 }
 
 void MonarkConnection::setLoad(unsigned int load)

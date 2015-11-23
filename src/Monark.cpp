@@ -24,12 +24,14 @@
 Monark::Monark(QObject *parent,  QString devname) : QObject(parent),
     m_heartRate(0),
     m_power(0),
-    m_cadence(0)
+    m_cadence(0),
+    m_isMonarkConnectionAlive(true)
 {
     m_monarkConnection.setSerialPort(devname);
     connect(&m_monarkConnection, SIGNAL(power(quint32)), this, SLOT(newPower(quint32)), Qt::QueuedConnection);
     connect(&m_monarkConnection, SIGNAL(cadence(quint32)), this, SLOT(newCadence(quint32)), Qt::QueuedConnection);
     connect(&m_monarkConnection, SIGNAL(pulse(quint32)), this, SLOT(newHeartRate(quint32)), Qt::QueuedConnection);
+    connect(&m_monarkConnection, SIGNAL(finished()), this, SLOT(onMonarkConnectionFinished()), Qt::QueuedConnection);
 }
 
 Monark::~Monark()
@@ -119,4 +121,14 @@ bool Monark::discover(QString portName)
 void Monark::setLoad(double load)
 {
     m_monarkConnection.setLoad((unsigned int)load);
+}
+
+bool Monark::isConnected()
+{
+    return m_isMonarkConnectionAlive;
+}
+
+void Monark::onMonarkConnectionFinished()
+{
+    m_isMonarkConnectionAlive = false;
 }
