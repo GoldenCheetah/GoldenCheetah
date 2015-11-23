@@ -40,6 +40,7 @@ public slots:
     void requestPower();
     void requestPulse();
     void requestCadence();
+    void identifyModel();
     void setLoad(unsigned int load);
 
 private:
