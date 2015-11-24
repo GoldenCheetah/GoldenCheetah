@@ -96,6 +96,7 @@ void MonarkConnection::run()
     if (!m_serial->open(QSerialPort::ReadWrite))
     {
         qDebug() << "Error opening serial";
+        this->exit(-1);
     } else {
         configurePort(m_serial);
 
