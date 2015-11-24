@@ -58,5 +58,6 @@
    <meter name="status" container="Video" source="TrainerStatus" type="Text">
        <RelativeSize Width="15.0" Height="5.0" />
        <RelativePosition X="1.0" Y="10.0" />
+       <BackgroundColor R="100" G="100" B="100" A="100" />
    </meter>
 </layout>

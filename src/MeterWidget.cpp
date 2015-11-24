@@ -134,6 +134,7 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
     MeterWidget::paintEvent(paintevent);
 
     m_MainBrush = QBrush(m_MainColor);
+    m_BackgroundBrush = QBrush(m_BackgroundColor);
     m_OutlinePen = QPen(m_OutlineColor);
     m_OutlinePen.setWidth(1);
     m_OutlinePen.setStyle(Qt::SolidLine);
@@ -141,6 +142,12 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
     //painter
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
+
+    //draw background
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(m_BackgroundBrush);
+    if (Text!=QString(""))
+        painter.drawRect (0, 0, m_Width, m_Height);
 
     QPainterPath my_painterPath;
     my_painterPath.addText(QPointF(0,0),m_MainFont,Text);
