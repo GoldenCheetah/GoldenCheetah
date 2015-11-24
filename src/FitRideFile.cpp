@@ -369,7 +369,8 @@ struct FitFileReaderState
                     }
                     break;
                 case 44: // pool_length
-                    pool_length = value/100000;
+                    pool_length = value / 100000.0;
+                    if (LAPSWIM_DEBUG) qDebug() << "Pool length" << pool_length;
                     break;
                 default: ; // do nothing
             }
@@ -915,7 +916,7 @@ struct FitFileReaderState
         }
 
         // another pool length or pause
-        km = last_distance + (kph > 0.0 ? pool_length : 0.0);
+        km = last_distance + (length_type ? pool_length : 0.0);
 
         if ((secs > last_time + 1) && (isGarminSmartRecording.toInt() != 0) && (secs - last_time < 10*GarminHWM.toInt())) {
             double deltaSecs = secs - last_time;
@@ -945,7 +946,7 @@ struct FitFileReaderState
             double deltaSecs = length_duration;
             double deltaDist = km - last_distance;
             kph = 3600.0 * deltaDist / deltaSecs;
-            if (LAPSWIM_DEBUG) qDebug() << "Length" << last_time+1 << deltaSecs << deltaDist;
+            if (LAPSWIM_DEBUG) qDebug() << "Length" << last_time+1 << deltaSecs << deltaDist << "type" << length_type;
             for (int i = 1; i <= deltaSecs; i++) {
                 rideFile->appendPoint(
                     last_time + i, cad, 0.0,
