@@ -820,9 +820,10 @@ struct FitFileReaderState
                 last_time = 0;
                 last_distance = 0.00f;
                 interval = 0;
+                QString deviceType = rideFile->deviceType();
                 delete rideFile;
                 rideFile = new RideFile;
-                rideFile->setDeviceType("Garmin FIT");
+                rideFile->setDeviceType(deviceType);
                 rideFile->setRecIntSecs(1.0);
              }
         }
