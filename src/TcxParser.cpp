@@ -225,7 +225,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
                 // smart recording is on and delta is less than GarminHWM seconds
                 // or it is pool swimming and we limit expansion for safety
-                for(int i = 1; i <= deltaSecs && i <= 10*GarminHWM.toInt(); i++) {
+                for(int i = 1; i <= deltaSecs && i <= 300*GarminHWM.toInt(); i++) {
                     double weight = i/ deltaSecs;
                     double kph = (swim == Swim) ? speed : prevPoint->kph + (deltaSpeed *weight);
                     // need to make sure speed goes to zero
@@ -268,7 +268,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         // expand only if Smart Recording is enabled
         if (swim == Swim && distance == 0 && isGarminSmartRecording.toInt()) {
             // fill in the pause, partially if too long
-            for(int i = 1; i <= round(lapSecs) && i <= 10*GarminHWM.toInt(); i++)
+            for(int i = 1; i <= round(lapSecs) && i <= 300*GarminHWM.toInt(); i++)
                 rideFile->appendPoint(secs + i,
                                       0.0,
                                       0.0,
