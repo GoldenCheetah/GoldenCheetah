@@ -296,6 +296,35 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             p_meterWidget->Text = QString::number((int) rtd.getSpeed());
             p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + tr(" kph");
         }
+        else if (p_meterWidget->Source() == QString("Distance"))
+        {
+            p_meterWidget->Value = rtd.getDistance();
+            p_meterWidget->Text = QString::number((int) p_meterWidget->Value);
+            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + tr(" km");
+        }
+        else if (p_meterWidget->Source() == QString("Duration"))
+        {
+            // TODO add fixed size property to TextWidget to avoid small movement of text
+            //     ... to be used when source is speed, duration & distance
+            p_meterWidget->Value = rtd.getMsecs();
+            int hours = p_meterWidget->Value / 3600000L;
+            int minutes = ((long)p_meterWidget->Value % 3600000L) / 60000L;
+            int seconds = ((long)p_meterWidget->Value % 60000L) / 1000L;
+            int dsecs = ((long)p_meterWidget->Value % 1000L) / 100L;
+            p_meterWidget->Text = QString("%1:%2").arg((int)hours,(int)1,(int)10,QLatin1Char('0')).arg((int)minutes,(int)2,(int)10,QLatin1Char('0'));
+            p_meterWidget->AltText = QString(":%1.%2").arg((int)seconds,(int)2,(int)10,QLatin1Char('0')).arg((int)dsecs,(int)1,(int)10,QLatin1Char('0'));
+        }
+        else if (p_meterWidget->Source() == QString("Gradient"))
+        {
+            // TODO : do not show when not in slope simulation mode
+            int curLap;
+            double slope = 0.0;
+            if (context && context->currentErgFile() && context->currentVideoSyncFile())
+                slope = context->currentErgFile()->gradientAt((context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset) * 1000.0, curLap);
+            p_meterWidget->Value = slope; // TODO to be tested
+            p_meterWidget->Text = ((-1.0 < slope && slope < 0.0)?QString("-"):QString("")) + QString::number((int) p_meterWidget->Value);
+            p_meterWidget->AltText = QString(".") + QString::number(abs((int)(p_meterWidget->Value * 10.0) % 10)) + QString("%");
+        }
         else if (p_meterWidget->Source() == QString("Cadence"))
         {
             p_meterWidget->Value = rtd.getCadence();
