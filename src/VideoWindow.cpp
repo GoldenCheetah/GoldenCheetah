@@ -325,6 +325,24 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             p_meterWidget->Text = ((-1.0 < slope && slope < 0.0)?QString("-"):QString("")) + QString::number((int) p_meterWidget->Value);
             p_meterWidget->AltText = QString(".") + QString::number(abs((int)(p_meterWidget->Value * 10.0) % 10)) + QString("%");
         }
+        else if (p_meterWidget->Source() == QString("Elevation"))
+        {
+            if (context && context->currentVideoSyncFile())
+                p_meterWidget->Value = context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset;
+            ElevationMeterWidget* elevationMeterWidget = dynamic_cast<ElevationMeterWidget*>(p_meterWidget);
+            if (!elevationMeterWidget)
+                qDebug() << "Error: Elevation keyword used but widget is not elevation type";
+            else
+            {
+                elevationMeterWidget->setContext(context);
+                // TODO : do not use gradient when not in slope simulation mode
+                int curLap;
+                double slope = 0.0;
+                if (context && context->currentErgFile() && context->currentVideoSyncFile())
+                    slope = context->currentErgFile()->gradientAt((context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset) * 1000.0, curLap);
+                elevationMeterWidget->gradientValue = slope; // TODO to be tested
+            }
+        }
         else if (p_meterWidget->Source() == QString("Cadence"))
         {
             p_meterWidget->Value = rtd.getCadence();

@@ -65,6 +65,13 @@
         <RelativePosition X="10.0" Y="15.0" />
 		<BackgroundColor R="100" G="100" B="100" A="100" />
 	</meter>
+    <meter name="elevation" container="Video" source="Elevation" type="Elevation">
+        <RelativeSize Width="47.0" Height="20.0" />
+        <RelativePosition X="57.0" Y="85.0" />
+		<BackgroundColor R="100" G="100" B="100" A="100" />
+		<OutlineColor R="255" G="255" B="255" A="250" />
+		<MainColor R="255" G="0" B="0" A="250" />
+	</meter>
     <meter name="elapsed" container="Video" source="Duration" type="Text">
         <RelativeSize Width="10.0" Height="5.0" />
         <RelativePosition X="90.0" Y="3.0" />
