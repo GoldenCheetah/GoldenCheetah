@@ -37,7 +37,7 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     m_OutlineColor = QColor(128,128,128,180);
     m_MainFont = QFont(this->font().family(), 64);
     m_AltFont = QFont(this->font().family(), 48);
-    m_BackgroundColor = QColor(96, 96, 96, 200);
+    m_BackgroundColor = QColor(96, 96, 96, 0);
     m_RangeMin = 0;
     m_RangeMax = 100;
     m_Angle = 180.0;

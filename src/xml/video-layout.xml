@@ -5,13 +5,13 @@
        <Range Min="0.0" Max="60.0" />
        <Angle>220.0</Angle>
        <SubRange>6</SubRange>
-       <MainColor R="0" G="255" B="0" A="180" />
+       <MainColor R="0" G="255" B="0" A="250" />
        <BackgroundColor R="100" G="100" B="100" A="100" />
    </meter>
    <meter name="Speedometer-text" container="Speedometer" source="Speed" type="Text">
        <RelativeSize Width="70.0" Height="40.0" />
        <RelativePosition X="50.0" Y="75.0" />
-       <MainColor R="0" G="255" B="0" A="180" />
+       <MainColor R="0" G="255" B="0" A="230" />
        <MainFont Name="Consolas" Size="64" />
    </meter>
    <meter name="Wattmeter" container="Video" source="Watt" type="CircularMeter">
@@ -23,12 +23,12 @@
    <meter name="Wattmeter-text" container="Wattmeter" source="Watt" type="Text">
        <RelativeSize Width="50.0" Height="40.0" />
        <RelativePosition X="50.0" Y="50.0" />
-       <MainColor R="255" G="100" B="100" A="180" />
+       <MainColor R="255" G="0" B="0" A="230" />
    </meter>
    <meter name="Wattmeter-unit" container="Wattmeter" source="None" type="Text">
        <RelativeSize Width="50.0" Height="20.0" />
        <RelativePosition X="50.0" Y="85.0" />
-       <MainColor R="255" G="100" B="100" A="180" />
+       <MainColor R="255" G="0" B="0" A="230" />
        <Text>Watts</Text>
    </meter>
    <meter name="Cadencemeter" container="Video" source="Cadence" type="CircularBargraph">
@@ -42,18 +42,18 @@
    <meter name="Cadencemeter-text" container="Cadencemeter" source="Cadence" type="Text">
        <RelativeSize Width="40.0" Height="30.0" />
        <RelativePosition X="50.0" Y="50.0" />
-       <MainColor R="255" G="100" B="100" A="180" />
+       <MainColor R="255" G="0" B="0" A="250" />
    </meter>
    <meter name="Cadencemeter-unit" container="Cadencemeter" source="None" type="Text">
        <RelativeSize Width="50.0" Height="20.0" />
        <RelativePosition X="50.0" Y="85.0" />
-       <MainColor R="255" G="100" B="100" A="180" />
+       <MainColor R="255" G="0" B="0" A="250" />
        <Text>rpm</Text>
    </meter>
    <meter name="HRM-text" container="Video" source="HRM" type="Text">
        <RelativeSize Width="15.0" Height="5.0" />
        <RelativePosition X="50.0" Y="90.0" />
-       <MainColor R="255" G="0" B="0" A="180" />
+       <MainColor R="255" G="0" B="0" A="250" />
    </meter>
    <meter name="status" container="Video" source="TrainerStatus" type="Text">
        <RelativeSize Width="15.0" Height="5.0" />
