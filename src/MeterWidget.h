@@ -59,6 +59,7 @@ class MeterWidget : public QWidget
     float    m_RangeMin, m_RangeMax;
     float    m_Angle;
     int      m_SubRange;
+    bool     forceSquareRatio;
 
     QColor  m_MainColor;
     QColor  m_ScaleColor;
@@ -83,7 +84,6 @@ class TextMeterWidget : public MeterWidget
 {
   public:
     explicit TextMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
-    virtual void ComputeSize();
     virtual void paintEvent(QPaintEvent* paintevent);
 };
 
