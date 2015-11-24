@@ -69,6 +69,8 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
         if (sport == "Biking") rideFile->setTag("Sport", "Bike");
         else if (sport == "Running") rideFile->setTag("Sport", "Run");
         else if (sport == "Other") swim = MayBeSwim;
+        // start of last length for lap swimming
+        lastLength = 0.0;
 
     } else if (qName == "Lap") {
 
@@ -142,6 +144,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         // Lets derive Speed from Distance or vice-versa
         // If we have neither Speed nor Distance then we
         // add a point with 0 for speed and distance
+        double sample_dist = distance;
         if (speed == 0 || distance < 0) {
 
             // compute the elapsed time and distance traveled since the
@@ -220,6 +223,24 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                       0.0, // gct
                                       0.0, // tcore
                                       lap);
+
+                // Update distance and speed for swimming lengths
+                if (swim == Swim && sample_dist > 0.0 && secs > lastLength) {
+                    double deltaSecs = secs - lastLength;
+                    double deltaDist = (distance - last_distance) / deltaSecs;
+                    double kph = 3600.0 * deltaDist;
+                    for (int i = rideFile->timeIndex(lastLength);
+                         i>= 0 && i < rideFile->dataPoints().size() &&
+                         rideFile->dataPoints()[i]->secs <= secs;
+                         ++i) {
+                        rideFile->dataPoints()[i]->kph = kph;
+                        rideFile->dataPoints()[i]->km = last_distance;
+                        last_distance += deltaDist;
+                    }
+                    last_distance = distance;
+                    if (kph > 0.0) rideFile->setDataPresent(rideFile->kph, true);
+                    lastLength = secs;
+                }
 
             } else {
 
