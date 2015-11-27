@@ -30,7 +30,7 @@
 #include <time.h>
 #include <limits>
 #include <cmath>
-#define FIT_DEBUG false // debug traces
+#define FIT_DEBUG true // debug traces
 #define LAPSWIM_DEBUG false
 
 #define RECORD_TYPE 20
@@ -95,13 +95,12 @@ struct FitFileReaderState
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
 
-
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
-        last_time(0), last_distance(0.00f), interval(0), calibration(0), devices(0), stopped(true), isLapSwim(false), pool_length(0.0),
+        last_time(0), last_distance(0.00f), interval(0), calibration(0),
+        devices(0), stopped(true), isLapSwim(false), pool_length(0.0),
         last_event_type(-1), last_event(-1), last_msg_type(-1)
-    {
-    }
+    {}
 
     struct TruncatedRead {};
 
@@ -244,7 +243,8 @@ struct FitFileReaderState
         return i == 0x00000000 ? NA_VALUE : i;
     }
 
-    void decodeFileId(const FitDefinition &def, int, const std::vector<FitValue> values) {
+    void decodeFileId(const FitDefinition &def, int,
+                      const std::vector<FitValue>& values) {
         int i = 0;
         int manu = -1, prod = -1;
         foreach(const FitField &field, def.fields) {
@@ -342,7 +342,8 @@ struct FitFileReaderState
         rideFile->setFileFormat("FIT (*.fit)");
     }
 
-    void decodeSession(const FitDefinition &def, int, const std::vector<FitValue> values) {
+    void decodeSession(const FitDefinition &def, int,
+                       const std::vector<FitValue>& values) {
         int i = 0;
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
@@ -380,7 +381,8 @@ struct FitFileReaderState
         }
     }
 
-    void decodeDeviceInfo(const FitDefinition &def, int, const std::vector<FitValue> values) {
+    void decodeDeviceInfo(const FitDefinition &def, int,
+                          const std::vector<FitValue>& values) {
         int i = 0;
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
@@ -394,7 +396,8 @@ struct FitFileReaderState
         }
     }
 
-    void decodeEvent(const FitDefinition &def, int, const std::vector<FitValue> values) {
+    void decodeEvent(const FitDefinition &def, int,
+                     const std::vector<FitValue>& values) {
         int time = -1;
         int event = -1;
         int event_type = -1;
@@ -467,7 +470,8 @@ struct FitFileReaderState
         last_event_type = event_type;
     }
 
-    void decodeLap(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+    void decodeLap(const FitDefinition &def, int time_offset,
+                   const std::vector<FitValue>& values) {
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
@@ -511,7 +515,8 @@ struct FitFileReaderState
         }
     }
 
-    void decodeRecord(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+    void decodeRecord(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
         if (isLapSwim) return; // We use the length message for Lap Swimming
         time_t time = 0;
         if (time_offset > 0)
@@ -810,7 +815,8 @@ struct FitFileReaderState
         last_distance = km;
     }
 
-    void decodeLength(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+    void decodeLength(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
         if (!isLapSwim) {
             isLapSwim = true;
             // reset rideFile if not empty
