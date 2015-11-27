@@ -25,15 +25,18 @@
 #include <QtEndian>
 #include <QDebug>
 #include <QTime>
-#include <stdio.h>
+#include <cstdio>
 #include <stdint.h>
 #include <time.h>
 #include <limits>
 #include <cmath>
-#define FIT_DEBUG true // debug traces
+
+#define FIT_DEBUG     false // debug traces
 #define LAPSWIM_DEBUG false
 
-#define RECORD_TYPE 20
+#define LAP_TYPE     19
+#define RECORD_TYPE  20
+#define SEGMENT_TYPE 142
 
 static int fitFileReaderRegistered =
     RideFileFactory::instance().registerReader(
@@ -104,7 +107,7 @@ struct FitFileReaderState
 
     struct TruncatedRead {};
 
-    void read_unknown( int size, int *count = NULL ){
+    void read_unknown( int size, int *count = NULL ) {
         char c[size+1];
 
         if (file.read(c, size ) != size)
@@ -113,8 +116,7 @@ struct FitFileReaderState
             (*count) += size;
     }
 
-    fit_string_value read_text(int len, int *count = NULL)
-    {
+    fit_string_value read_text(int len, int *count = NULL) {
         char c;
         fit_string_value res = "";
         for (int i = 0; i < len; ++i) {
@@ -242,6 +244,10 @@ struct FitFileReaderState
 
         return i == 0x00000000 ? NA_VALUE : i;
     }
+
+    void DumpFitValue(const FitValue& v) {
+        printf("type: %d %llx %llx %s\n", v.type, v.v, v.v2, v.s.c_str());
+    }    
 
     void decodeFileId(const FitDefinition &def, int,
                       const std::vector<FitValue>& values) {
@@ -482,21 +488,41 @@ struct FitFileReaderState
         ++interval;
         double total_elapsed_time = 0.0;
         double total_distance = 0.0;
+        if (FIT_DEBUG)  {
+            printf( " FIT decode lap \n");
+        }
+        QString segment_name;
         foreach(const FitField &field, def.fields) {
-            fit_value_t value = values[i++].v;
-
-            if( value == NA_VALUE )
-                continue;
-
+            const FitValue& value = values[i++];
+            if (FIT_DEBUG) {
+                printf ("\tfield: num: %d ", field.num);
+                DumpFitValue(value);
+            }
             switch (field.num) {
-                case 253: time = value + qbase_time.toTime_t(); break;
-                case 2: this_start_time = value + qbase_time.toTime_t(); break;
-                case 7: total_elapsed_time = round(value / 1000.0); break;
-                case 9: total_distance = value / 100000.0; break;
-                default: ; // ignore it
+                case 253:
+                    time = value.v + qbase_time.toTime_t();
+                    break;
+                case 2:
+                    this_start_time = value.v + qbase_time.toTime_t();
+                    break;
+                case 7:
+                    total_elapsed_time = round(value.v / 1000.0);
+                    break;
+                case 9:
+                    total_distance = value.v / 100000.0;
+                    break;
+                case 29:                    
+                    segment_name = QString(value.s.c_str());
+                    if (FIT_DEBUG)  {
+                        printf("Found segment name: %s\n", segment_name.toStdString().c_str());
+                    }
+                    break;
+                default:
+                    continue; // ignore it
             }
         }
-        if (LAPSWIM_DEBUG) qDebug() << "Lap" << interval << this_start_time - start_time << total_elapsed_time << time - this_start_time << total_distance;
+        if (LAPSWIM_DEBUG) qDebug() << "Lap" << interval << this_start_time - start_time << total_elapsed_time
+                                    << time - this_start_time << total_distance;
         if (this_start_time == 0 || this_start_time-start_time < 0) {
             //errors << QString("lap %1 has invalid start time").arg(interval);
             this_start_time = start_time; // time was corrected after lap start
@@ -507,14 +533,19 @@ struct FitFileReaderState
             }
         }
         if (rideFile->dataPoints().count()) { // no samples means no laps..
+            if (segment_name == "") {
+                segment_name = QObject::tr("Lap %1").arg(interval);
+            }
             if (isLapSwim && total_elapsed_time > 0.0) {
-                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, this_start_time - start_time + total_elapsed_time, QObject::tr("Lap %1").arg(interval));
+                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time,
+                                      this_start_time - start_time + total_elapsed_time, segment_name);
             } else {
-                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time, QString(QObject::tr("Lap %1")).arg(interval));
+                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time,
+                                      segment_name);
             }
         }
     }
-
+    
     void decodeRecord(const FitDefinition &def, int time_offset,
                       const std::vector<FitValue>& values) {
         if (isLapSwim) return; // We use the length message for Lap Swimming
@@ -1061,8 +1092,11 @@ struct FitFileReaderState
                         break;
                     case 5: value.type = SingleValue; value.v = read_int32(def.is_big_endian, &count); size = 4;  break;
                     case 6: value.type = SingleValue; value.v = read_uint32(def.is_big_endian, &count); size = 4;  break;
-                    case 7: value.type = StringValue; value.s = read_text(field.size, &count); size = field.size; break;
-
+                    case 7:
+                        value.type = StringValue;
+                        value.s = read_text(field.size, &count);
+                        size = field.size;
+                        break;
 
                     //case 8: // FLOAT32
                     //case 9: // FLOAT64
@@ -1073,6 +1107,12 @@ struct FitFileReaderState
 
                     // we may need to add support for float, string + byte base types here
                     default:
+                        if (FIT_DEBUG)  {
+                            // TODO: Dump raw data.
+                            printf("unknown type: %d size: %d \n", field.type,
+                                   field.size);
+                                  
+                        }
                         read_unknown( field.size, &count );
                         value.type = SingleValue;
                         value.v = NA_VALUE;
@@ -1098,7 +1138,7 @@ struct FitFileReaderState
                     else if (value.type == DoubleValue)
                         printf( "value=%lld value2=%lld\n", value.v, value.v2 );
                     else if (value.type == StringValue)
-                        printf( "salue=%s\n",value.s.c_str() );
+                        printf( "value=%s\n", value.s.c_str() );
                 }
             }
             // Most of the record types in the FIT format aren't actually all
@@ -1108,14 +1148,20 @@ struct FitFileReaderState
             // shows up as manufacturer #65535, even though it should be #7.
             switch (def.global_msg_num) {
                 case 0:  decodeFileId(def, time_offset, values); break;
-                case 19: decodeLap(def, time_offset, values); break;
+                case LAP_TYPE:
+                    decodeLap(def, time_offset, values);
+                    break;
                 case RECORD_TYPE: decodeRecord(def, time_offset, values); break;
                 case 21: decodeEvent(def, time_offset, values); break;
 
                 case 23: //decodeDeviceInfo(def, time_offset, values); break; /* device info */
-                case 18: decodeSession(def, time_offset, values); break; /* session */
+                case 18:
+                    decodeSession(def, time_offset, values);
+                    break; /* session */
 
-                case 101: decodeLength(def, time_offset, values); break; /* lap swimming */
+                case 101:
+                    decodeLength(def, time_offset, values);
+                    break; /* lap swimming */
 
                 case 2: /* DEVICE_SETTINGS */
                 case 3: /* USER_PROFILE */
@@ -1135,8 +1181,11 @@ struct FitFileReaderState
                 case 128: /* unknown */
                 case 140: /* unknown */
                 case 141: /* unknown */
-                case 147: /* unknown */
-
+                    break;
+            case SEGMENT_TYPE:  /* Segment which contains a name. Looks like a lap */
+                    decodeLap(def, time_offset, values);
+                    break;
+            case 147: /* unknown */
                     break;
 
                 default:
