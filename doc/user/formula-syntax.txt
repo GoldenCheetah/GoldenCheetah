@@ -28,6 +28,11 @@ mean(...)
 max(...)
 min(...)
 count(...)
+which(...) 
+
+MODEL FUNCTIONS
+estimate(model, (cp|ftp|w'|pmax|x))
+vdottime(VDOT, distance)
 
 PMC FUNCTIONS
 lts(p1)
@@ -40,6 +45,7 @@ rr(p1)
 
 SET/UNSET FUNCTIONS
 set(...)
+unset(...)
 isset(p1)
 
 CONFIGURED PARAMETERS
