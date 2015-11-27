@@ -8,6 +8,7 @@ moc_*
 # shared libs
 *.so
 *.so.*
+*.prl
 
 # ignore qmake-generated Makefile
 Makefile
