@@ -34,6 +34,10 @@ MODEL FUNCTIONS
 estimate(model, (cp|ftp|w'|pmax|x))
 vdottime(VDOT, distance)
 
+MEAN MAX and ZONE FUNCTIONS
+best(...)
+tiz(...)
+
 PMC FUNCTIONS
 lts(p1)
 sts(p1)
