@@ -10,5 +10,8 @@ moc_*
 *.so.*
 *.prl
 
+#static libs
+*.a
+
 # ignore qmake-generated Makefile
 Makefile
