@@ -1061,16 +1061,12 @@ class WCPZoneTime : public RideMetric {
                  const Context *)
     {
 
-        double CP = 250; // default
         double WPRIME = 20000;
         if (zones && zoneRange > 0) {
-            CP = zones->getCP(zoneRange);
             WPRIME = zones->getWprime(zoneRange);
         }
 
         // did we override CP in metadata / metrics ?
-        int oCP = ride->getTag("CP","0").toInt();
-        if (oCP) CP=oCP;
         int oW = ride->getTag("W'","0").toInt();
         if (oW) WPRIME=oW;
 

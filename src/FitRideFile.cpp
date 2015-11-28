@@ -376,7 +376,8 @@ struct FitFileReaderState
                     }
                     break;
                 case 44: // pool_length
-                    pool_length = value/100000;
+                    pool_length = value / 100000.0;
+                    if (LAPSWIM_DEBUG) qDebug() << "Pool length" << pool_length;
                     break;
                 default: ; // do nothing
             }
@@ -856,9 +857,10 @@ struct FitFileReaderState
                 last_time = 0;
                 last_distance = 0.00f;
                 interval = 0;
+                QString deviceType = rideFile->deviceType();
                 delete rideFile;
                 rideFile = new RideFile;
-                rideFile->setDeviceType("Garmin FIT");
+                rideFile->setDeviceType(deviceType);
                 rideFile->setRecIntSecs(1.0);
              }
         }
@@ -952,7 +954,7 @@ struct FitFileReaderState
         }
 
         // another pool length or pause
-        km = last_distance + (kph > 0.0 ? pool_length : 0.0);
+        km = last_distance + (length_type ? pool_length : 0.0);
 
         if ((secs > last_time + 1) && (isGarminSmartRecording.toInt() != 0) && (secs - last_time < 10*GarminHWM.toInt())) {
             double deltaSecs = secs - last_time;
@@ -982,7 +984,7 @@ struct FitFileReaderState
             double deltaSecs = length_duration;
             double deltaDist = km - last_distance;
             kph = 3600.0 * deltaDist / deltaSecs;
-            if (LAPSWIM_DEBUG) qDebug() << "Length" << last_time+1 << deltaSecs << deltaDist;
+            if (LAPSWIM_DEBUG) qDebug() << "Length" << last_time+1 << deltaSecs << deltaDist << "type" << length_type;
             for (int i = 1; i <= deltaSecs; i++) {
                 rideFile->appendPoint(
                     last_time + i, cad, 0.0,
@@ -1155,10 +1157,10 @@ struct FitFileReaderState
                 case 21: decodeEvent(def, time_offset, values); break;
 
                 case 23: //decodeDeviceInfo(def, time_offset, values); break; /* device info */
+                    break;
                 case 18:
                     decodeSession(def, time_offset, values);
                     break; /* session */
-
                 case 101:
                     decodeLength(def, time_offset, values);
                     break; /* lap swimming */
@@ -1176,13 +1178,16 @@ struct FitFileReaderState
                 case 49: /* file creator */
                 case 79: /* unknown */
                 case 104: /* battery */
-                case 113: /* unknown */
+                case 113: /* unknowHn */
                 case 125: /* unknown */
                 case 128: /* unknown */
                 case 140: /* unknown */
                 case 141: /* unknown */
                     break;
-            case SEGMENT_TYPE:  /* Segment which contains a name. Looks like a lap */
+            case SEGMENT_TYPE:
+                    /* Segment which contains a name. Looks like a lap, 
+                     * except there's a name in the data. 
+                     */
                     decodeLap(def, time_offset, values);
                     break;
             case 147: /* unknown */
