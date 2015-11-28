@@ -1108,7 +1108,7 @@ struct FitFileReaderState
                 case RECORD_TYPE: decodeRecord(def, time_offset, values); break;
                 case 21: decodeEvent(def, time_offset, values); break;
 
-                case 23: //decodeDeviceInfo(def, time_offset, values); break; /* device info */
+                case 23: /* decodeDeviceInfo(def, time_offset, values); */ break; /* device info */
                 case 18: decodeSession(def, time_offset, values); break; /* session */
 
                 case 101: decodeLength(def, time_offset, values); break; /* lap swimming */
