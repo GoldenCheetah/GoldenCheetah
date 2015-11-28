@@ -152,28 +152,23 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
     float firstKM = 0;
     bool gotFirstKM = false;
 
-    // computrainer doesn't have a fixed inter-sample-interval; GC
-    // expects one, and estimating one by averaging causes problems
-    // for some calculations that GC does.  also, computrainer samples
-    // so frequently (once every 30-50ms) that the O(n^2) critical
-    // power plot calculation takes waaaaay too long.  to solve both
-    // problems at once, we smooth the file, emitting an averaged data
-    // point every 250 milliseconds.
-    //
-    // for HR, cadence, watts, and speed, we'll do time averaging to
-    // figure out the correct average since the last emitted point.
-    // for distance and altitude, we just need to interpolate from the
-    // last data point in the computrainer file itself.
-    float lastAltitude = 100.0;
-    uint32_t lastEmittedMS = 0;
-    uint32_t lastSampleMS = 0;
-    double hr_sum = 0.0, cad_sum=0.0, speed_sum=0.0, watts_sum=0.0;
+    // for computrainer / VELOtron we need to convert from the variable rate
+    // the file uses to a fixed rate since thats a base assumption across the
+    // GC codebase. This parameter can be adjusted to the sample (recIntSecs) rate
+    // but in milliseconds
+    const int SAMPLERATE = 1000; // we want 1 second samples, re-used below, change to taste
 
-#define CT_EMIT_MS 250
+    RideFilePoint sample;        // we reuse this to aggregate all values
+    long time = 0L;              // current time accumulates as we run through data
+    double lastT = 0.0f;         // last sample time seen in seconds
+    double lastK = 0.0f;         // last sample distance seen in kilometers
 
-    // loop over each sample in the file, do the averaging, interpolation,
-    // and emit smoothed points every CT_EMIT_MS milliseconds
+    // loop through samples
     for (; numberSamples; numberSamples--) {
+
+        //
+        // READ A SAMPLE FROM FILE - VARIABLE BUT HI-RESOLUTION SAMPLE RATE
+        //
 
         // 1 byte heart rate, in BPM
         uint8_t hr;
@@ -229,122 +224,109 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
         // not sure what the next 28 bytes are.
         is.skipRawData(0x1c);
 
-        // OK -- we've pulled the next data point out of the ride
-        // file.  let's figure out if it's time to emit the next
-        // CT_EMIT_MS interval(s).  if so, emit it(them), and reset
-        // the averaging sums.
-        if (ms == 0) {
-          // special case first data point
-          rideFile->appendPoint((double) ms/1000, (double) cad,
-                                (double) hr, km, speed, 0.0, watts,
-                                altitude, 0, 0, 0.0, 0.0, RideFile::NoTemp, 0.0,
-                                0.0, 0.0, 0.0, 0.0, // pedal torque eff / pedal smoothness
-                                0.0, 0.0, // pedal platform offset
-                                0.0, 0.0, 0.0, 0.0, //pedal power phase
-                                0.0, 0.0, 0.0, 0.0, //pedal peak power phase
-                                0.0, 0.0, //  smO2 / thb
-                                0.0, 0.0, 0.0, // running dynamics
-                                0.0, //tcore
-                                0);
+        //
+        // LETS SAVE OUR SAMPLE
+        //
+        RideFilePoint value;
+        value.secs = ms/1000;
+        value.watts = watts;
+        value.cad = cad;
+        value.hr = hr;
+        value.km = km;
+        value.kph = speed;
+        value.alt = altitude;
+
+        // whats the dt in microseconds
+        int dt = (value.secs * 1000) - (lastT * 1000);
+        int odt = dt;
+        lastT = value.secs;
+
+        // whats the dk in meters
+        int dk = (value.km * 1000) - (lastK * 1000);
+        lastK = value.km;
+
+        //
+        // RESAMPLE INTO SAMPLERATE
+        //
+        while (dt > 0) {
+
+            // we keep track of how much time has been aggregated
+            // into sample, so 'need' is whats left to aggregate 
+            // for the full sample
+            int need = SAMPLERATE - sample.secs;
+
+            // aggregate
+            if (dt < need) {
+
+                // the entire sample read is less than we need
+                // so aggregate the whole lot and wait fore more
+                // data to be read. If there is no more data then
+                // this will be lost, we don't keep incomplete samples
+                sample.secs += dt;
+                sample.watts += float(dt) * value.watts;
+                sample.cad += float(dt) * value.cad;
+                sample.hr += float(dt) * value.hr;
+                sample.kph += float(dt) * value.kph;
+                dt = 0;
+
+            } else {
+
+                // dt is more than we need to fill and entire sample
+                // so lets just take the fraction we need
+                dt -= need;
+
+                // accumulating time and distance
+                sample.secs = time; time += double(SAMPLERATE) / 1000.0f;
+
+                // subtract remains of this sample from the distance for
+                // the entire sample, remembering that dk is meters and
+                // dt is milliseconds
+                sample.km = lastK - ((float(dt)/(float(odt)) * dk) / 1000.0f);
+
+                // averaging sample data
+                sample.watts += float(need) * value.watts;
+                sample.cad += float(need) * value.cad;
+                sample.hr += float(need) * value.hr;
+                sample.kph += float(need) * value.kph;
+                sample.watts /= double(SAMPLERATE);
+                sample.cad /= double(SAMPLERATE);
+                sample.hr /= double(SAMPLERATE);
+                sample.kph /= double(SAMPLERATE);
+
+                // so now we can add to the ride
+                rideFile->appendPoint(sample.secs, sample.cad, sample.hr, sample.km, 
+                                      sample.kph, 0.0, sample.watts, sample.alt, 0.0, 0.0, 
+                                      0.0, 0.0, RideFile::NoTemp, 0.0, 
+                                      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                      0.0, 0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0,0.0,0.0, 0);
+
+                // reset back to zero so we can aggregate
+                // the next sample
+                sample.secs = 0;
+                sample.watts = 0;
+                sample.cad = 0;
+                sample.hr = 0;
+                sample.km = 0;
+                sample.kph = 0;
+                sample.alt = 0;
+                sample.headwind = 0;
+            }
         }
-        // while loop since an interval in the .3dp file might
-        // span more than one CT_EMIT_MS interval
-        while ((ms - lastEmittedMS) >= CT_EMIT_MS) {
-          uint32_t sum_interval_ms;
-          float interpol_km, interpol_alt, interpol_fraction;
-
-          // figure out the averaging sum update interval (i.e., time
-          // since we last added to the averaging sums).  it's either
-          // the time since the last sample from the CT file, or
-          // CT_EMIT_MS, depending on whether we've gone through this
-          // while loop already, or this is the first loop through.
-          if (lastSampleMS > lastEmittedMS)
-            sum_interval_ms = (lastEmittedMS + CT_EMIT_MS) - lastSampleMS;
-          else
-            sum_interval_ms = CT_EMIT_MS;
-
-          // update averaging sums with final bit of this sampling interval
-          hr_sum += ((double) hr) * ((double) sum_interval_ms);
-          cad_sum += ((double) cad) * ((double) sum_interval_ms);
-          speed_sum += ((double) speed) * ((double) sum_interval_ms);
-          watts_sum += ((double) watts) * ((double) sum_interval_ms);
-
-          // figure out interpolation points based on time from previous
-          // sample from the computrainer file
-          interpol_fraction =
-            ((float) ((lastEmittedMS + CT_EMIT_MS) - lastSampleMS)) /
-            ((float) (ms - lastSampleMS));
-          interpol_km = lastKM + (km - lastKM) * interpol_fraction;
-          interpol_alt = lastAltitude +
-            (altitude - lastAltitude) * interpol_fraction;
-
-          // update last sample emit time
-          lastEmittedMS = lastEmittedMS + CT_EMIT_MS;
-
-          // emit averages and interpolated distance/altitude
-          rideFile->appendPoint(
-                                ((double) lastEmittedMS) / 1000,
-                                ((double) cad_sum) / CT_EMIT_MS,
-                                ((double) hr_sum) / CT_EMIT_MS,
-                                interpol_km,
-                                ((double) speed_sum) / CT_EMIT_MS,
-                                0.0,
-                                ((double) watts_sum) / CT_EMIT_MS,
-                                interpol_alt,
-                                0, // lon
-                                0, // lat
-                                0.0, // headwind
-                                0.0, // slope
-                                RideFile::NoTemp, // temp
-                                0.0,
-                                0.0, 0.0, 0.0, 0.0, // pedal torque effectiveness / pedal smoothness
-                                0.0, 0.0, // pedal platform offset
-                                0.0, 0.0, 0.0, 0.0, //pedal power phase
-                                0.0, 0.0, 0.0, 0.0, //pedal peak power phase
-                                0.0, 0.0, // smO2 / tHb
-                                0.0, 0.0, 0.0, // running dynamics
-                                0.0, //tcore
-                                0);
-
-          // reset averaging sums
-          hr_sum = cad_sum = speed_sum = watts_sum = 0.0;
-        }
-
-        // update averaging sums with interval to current
-        // data point in .3dp file
-        if (ms > lastEmittedMS) {
-          uint32_t sum_interval_ms;
-
-          if (lastSampleMS > lastEmittedMS)
-            sum_interval_ms = ms - lastSampleMS;
-          else
-            sum_interval_ms = ms - lastEmittedMS;
-          hr_sum += ((double) hr) * ((double) sum_interval_ms);
-          cad_sum += ((double) cad) * ((double) sum_interval_ms);
-          speed_sum += ((double) speed) * ((double) sum_interval_ms);
-          watts_sum += ((double) watts) * ((double) sum_interval_ms);
-        }
-
-        // stash away distance, altitude, and time at end this
-        // interval so can calculate distance traveled over next
-        // interval in next loop iteration, and so we can interpolate.
-        lastSampleMS = ms;
-        lastKM = km;
-        lastAltitude = altitude;
     }
+    file.close();
 
     // convert the start time we parsed from the header into
     // what GC wants.
     QDateTime dateTime;
     QDate date;
-    QTime time;
+    QTime ridetime;
     date.setDate(year, month, day);
-    time.setHMS(hour, minute, 0, 0);
+    ridetime.setHMS(hour, minute, 0, 0);
     dateTime.setDate(date);
-    dateTime.setTime(time);
+    dateTime.setTime(ridetime);
     rideFile->setStartTime(dateTime);
 
-    rideFile->setRecIntSecs(((double) CT_EMIT_MS) / 1000.0);
+    rideFile->setRecIntSecs(((double) SAMPLERATE) / 1000.0);
 
     // tell GC what kind of device a computrainer is
     rideFile->setDeviceType("Computrainer");
