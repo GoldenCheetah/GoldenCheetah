@@ -88,77 +88,77 @@
     <message>
         <location filename="../Pages.cpp" line="936"/>
         <source>Nickname</source>
-        <translation type="unfinished">Surnom</translation>
+        <translation>Surnom</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="937"/>
         <source>Date of Birth</source>
-        <translation type="unfinished">Date de naissance</translation>
+        <translation>Date de naissance</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="938"/>
         <source>Sex</source>
-        <translation type="unfinished">Sexe</translation>
+        <translation>Sexe</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="948"/>
         <source>Male</source>
-        <translation type="unfinished">Homme</translation>
+        <translation>Homme</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="949"/>
         <source>Female</source>
-        <translation type="unfinished">Femme</translation>
+        <translation>Femme</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="972"/>
         <source>Crank Length</source>
-        <translation type="unfinished">Longueur des manivelles</translation>
+        <translation>Longueur des manivelles</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1005"/>
         <source>Wheelsize</source>
-        <translation type="unfinished">Taille de la roue</translation>
+        <translation>Taille de la roue</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1019"/>
         <source>mm</source>
-        <translation type="unfinished">mm</translation>
+        <translation>mm</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1036"/>
         <source>Auto Backup Folder</source>
-        <translation type="unfinished">Dossier de sauvegarde automatique</translation>
+        <translation>Dossier de sauvegarde automatique</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1039"/>
         <source>Browse</source>
-        <translation type="unfinished">Parcourir</translation>
+        <translation>Parcourir</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1045"/>
         <source>Auto Backup execution every</source>
-        <translation type="unfinished">Sauvegarde automatique tou(te)s les</translation>
+        <translation>Sauvegarde automatique tou(te)s les</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1047"/>
         <source>times the athlete is closed - 0 means never</source>
-        <translation type="unfinished"></translation>
+        <translation>après un nombre de fermeture - 0 pour jamais</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1093"/>
         <source>Choose Picture</source>
-        <translation type="unfinished">Choisir une photo</translation>
+        <translation>Choisir une photo</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1094"/>
         <source>Images (*.png *.jpg *.bmp)</source>
-        <translation type="unfinished">Images (*.png *.jpg *.bmp)</translation>
+        <translation>Images (*.png *.jpg *.bmp)</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1108"/>
         <source>Choose Backup Directory</source>
-        <translation type="unfinished">Choisissez le répertoire de sauvegarde</translation>
+        <translation>Choisissez le répertoire de sauvegarde</translation>
     </message>
 </context>
 <context>
@@ -2195,28 +2195,28 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
         <location filename="../AllPlotWindow.cpp" line="132"/>
         <location filename="../AllPlotWindow.cpp" line="1011"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="133"/>
         <location filename="../AllPlotWindow.cpp" line="1011"/>
         <source>Formula</source>
-        <translation type="unfinished">Formule</translation>
+        <translation>Formule</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="144"/>
         <source>Edit</source>
-        <translation type="unfinished">Editer</translation>
+        <translation>Editer</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="163"/>
         <source>Up</source>
-        <translation type="unfinished">Vers le haut</translation>
+        <translation>Vers le haut</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="164"/>
         <source>Down</source>
-        <translation type="unfinished">Vers le bas</translation>
+        <translation>Vers le bas</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="365"/>
@@ -2456,7 +2456,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="566"/>
         <source>Rename route</source>
-        <translation type="unfinished">Renommer le trajet</translation>
+        <translation>Renommer le trajet</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="571"/>
@@ -2612,7 +2612,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../RideEditor.cpp" line="446"/>
         <source>Cadence/Power duplicated when freewheeling.</source>
-        <translation type="unfinished">Duplication cadence/puissance en roue libre</translation>
+        <translation>Duplication cadence/puissance en roue libre</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="459"/>
@@ -2944,12 +2944,12 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../AthleteBackup.cpp" line="72"/>
         <source>Abort Backup and Reset Counter</source>
-        <translation type="unfinished">Interrompre la sauvegarde et mettre à zéro du compteur</translation>
+        <translation>Interrompre la sauvegarde et mettre à zéro le compteur</translation>
     </message>
     <message>
         <location filename="../AthleteBackup.cpp" line="82"/>
         <source>Select Backup Directory</source>
-        <translation type="unfinished">Définir le repertoire de sauvegarde</translation>
+        <translation>Définir le repertoire de sauvegarde</translation>
     </message>
     <message>
         <location filename="../AthleteBackup.cpp" line="85"/>
@@ -2961,53 +2961,53 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
         <location filename="../AthleteBackup.cpp" line="151"/>
         <location filename="../AthleteBackup.cpp" line="171"/>
         <source>Athlete Backup</source>
-        <translation type="unfinished">Sauvegarde de l&apos;athlète</translation>
+        <translation>Sauvegarde de l&apos;athlète</translation>
     </message>
     <message>
         <location filename="../AthleteBackup.cpp" line="85"/>
         <source>No backup directory selected - backup aborted</source>
-        <translation type="unfinished">Pas de répertoire de sauveragrde indiqué - sauvegarde interrompue</translation>
+        <translation>Pas de répertoire de sauveragrde indiqué - sauvegarde interrompue</translation>
     </message>
     <message>
         <location filename="../AthleteBackup.cpp" line="92"/>
         <source>Any unsaved data will not be included into the backup .zip file.</source>
-        <translation type="unfinished">Les données non enregistrées ne seront pas incluses dans le fichier .zip de sauvegarde.</translation>
+        <translation>Les données non enregistrées ne seront pas incluses dans le fichier .zip de sauvegarde.</translation>
     </message>
     <message>
         <location filename="../AthleteBackup.cpp" line="105"/>
         <source>Abort Backup</source>
-        <translation type="unfinished">Sauvegarde interrompue</translation>
+        <translation>Sauvegarde interrompue</translation>
     </message>
     <message>
         <location filename="../AthleteBackup.cpp" line="106"/>
         <source>Backup successfully stored in %1</source>
-        <translation type="unfinished">Sauvegarde effectuée dans %1</translation>
+        <translation>Sauvegarde effectuée dans %1</translation>
     </message>
     <message>
         <location filename="../AthleteBackup.cpp" line="131"/>
         <source>No files found for athlete %1 - all athlete sub-directories are empty.</source>
-        <translation type="unfinished">Pas de fichier pour l&apos;athlète %1 - tous les sous-répertoires sont vides.</translation>
+        <translation>Pas de fichier pour l&apos;athlète %1 - tous les sous-répertoires sont vides.</translation>
     </message>
     <message>
         <location filename="../AthleteBackup.cpp" line="141"/>
         <source>Not enough space available on disk: %1 - no backup .zip file created</source>
-        <translation type="unfinished">Espace disque insuffisant sur le disque: %1 - pas de fichier de sauvegarde .zip crée</translation>
+        <translation>Espace disque insuffisant sur le disque: %1 - pas de fichier de sauvegarde .zip crée</translation>
     </message>
     <message>
         <location filename="../AthleteBackup.cpp" line="145"/>
         <location filename="../AthleteBackup.cpp" line="151"/>
         <source>Directory %1 not available. No backup .zip file created for athlete %2.</source>
-        <translation type="unfinished">Répertoire %1 non accessible. Pas de fichier de sauvegarde .zip créé pour l&apos;athlète %2.</translation>
+        <translation>Répertoire %1 non accessible. Pas de fichier de sauvegarde .zip créé pour l&apos;athlète %2.</translation>
     </message>
     <message>
         <location filename="../AthleteBackup.cpp" line="171"/>
         <source>Backup file %1 cannot be created.</source>
-        <translation type="unfinished">Le fichier de suavegarde %1 ne peut être créé.</translation>
+        <translation>Le fichier de sauvegarde %1 ne peut être créé.</translation>
     </message>
     <message>
         <location filename="../AthleteBackup.cpp" line="177"/>
         <source>Adding files to backup %1 for athlete %2 ...</source>
-        <translation type="unfinished">Ajout des fichiers de sauvegarde %1 pour l&apos;athlète %2 ...</translation>
+        <translation>Ajout des fichiers de sauvegarde %1 pour l&apos;athlète %2 ...</translation>
     </message>
 </context>
 <context>
@@ -3020,7 +3020,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../ConfigDialog.cpp" line="335"/>
         <source>Measures</source>
-        <translation type="unfinished">Mesures</translation>
+        <translation>Mesures</translation>
     </message>
     <message>
         <location filename="../ConfigDialog.cpp" line="336"/>
@@ -3626,7 +3626,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../BT40Controller.cpp" line="98"/>
         <source>Cannot Connect to BT40</source>
-        <translation>Impossible de ce connecter au BT40</translation>
+        <translation>Impossible de se connecter au BT40</translation>
     </message>
 </context>
 <context>
@@ -4158,7 +4158,7 @@ Commençons par la configuration.</translation>
         <location filename="../Pages.cpp" line="3589"/>
         <location filename="../Pages.cpp" line="3715"/>
         <source>FTP</source>
-        <translation type="unfinished">FTP</translation>
+        <translation>FTP</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="3590"/>
@@ -4191,12 +4191,12 @@ Commençons par la configuration.</translation>
     <message>
         <location filename="../Pages.cpp" line="3597"/>
         <source>Use CP for all metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser CP pour tous les métriques</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="3598"/>
         <source>Use FTP for Coggan metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser FTP pour les métriques Coggan</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="3656"/>
@@ -4511,13 +4511,13 @@ Commençons par la configuration.</translation>
         <location filename="../CPPlot.cpp" line="1665"/>
         <source>
 %1 m %2 yd</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 m %2 yd</translation>
     </message>
     <message>
         <location filename="../CPPlot.cpp" line="1668"/>
         <source>
 %1 km %2 mi</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 km %2 mi</translation>
     </message>
     <message>
         <source>min/km</source>
@@ -4691,7 +4691,7 @@ ddd, dd MMM yyyy</source>
         <location filename="../Pages.cpp" line="5065"/>
         <location filename="../Pages.cpp" line="5074"/>
         <source>Update</source>
-        <translation type="unfinished">Mettre à jour</translation>
+        <translation>Mettre à jour</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="5067"/>
@@ -4977,7 +4977,7 @@ ddd, dd MMM yyyy</source>
         <source>This cannot be undone and all data will be permanently deleted.
 
 Are you sure?</source>
-        <translation type="unfinished">Ceci ne peut être annulé. toutes les données seront effacées définitivement.
+        <translation>Ceci ne peut être annulé. toutes les données seront effacées définitivement.
 
 Etes-vous sûr?</translation>
     </message>
@@ -5191,7 +5191,7 @@ Etes-vous sûr?</translation>
     <message>
         <location filename="../ComputrainerController.cpp" line="87"/>
         <source>Cannot Connect to Computrainer</source>
-        <translation>Impossible de ce connecter au Computrainer</translation>
+        <translation>Impossible de se connecter au Computrainer</translation>
     </message>
 </context>
 <context>
@@ -5629,23 +5629,23 @@ Ceci peut prendre un certain temps.</translation>
     <message>
         <location filename="../Pages.cpp" line="408"/>
         <source>Athlete Folder</source>
-        <translation type="unfinished">Répertoire de l&apos;athlète</translation>
+        <translation>Répertoire de l&apos;athlète</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="411"/>
         <location filename="../Pages.cpp" line="433"/>
         <source>Browse</source>
-        <translation type="unfinished">Parcourir</translation>
+        <translation>Parcourir</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="425"/>
         <source>Shared Local Folder</source>
-        <translation type="unfinished">Répertoire local partagé</translation>
+        <translation>Répertoire local partagé</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="430"/>
         <source>Shared Local Athlete Folder</source>
-        <translation type="unfinished">Répertoire local partagé de l&apos;athlète</translation>
+        <translation>Répertoire local partagé de l&apos;athlète</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="445"/>
@@ -5701,22 +5701,22 @@ Ceci peut prendre un certain temps.</translation>
     <message>
         <location filename="../Pages.cpp" line="725"/>
         <source>SportPlusHealth</source>
-        <translation type="unfinished"></translation>
+        <translation>SportPlusHealth</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="769"/>
         <source>Dropbox Connection Failed</source>
-        <translation type="unfinished">Erreur de connection à Dropbox</translation>
+        <translation>Erreur de connection à Dropbox</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="780"/>
         <source>Choose Athlete Directory</source>
-        <translation type="unfinished">Choisir le répertoire de l&apos;athlète</translation>
+        <translation>Choisir le répertoire de l&apos;athlète</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="794"/>
         <source>Choose Shared Local Folder Athlete Directory</source>
-        <translation type="unfinished">Choisir le répertoire local partagé de l&apos;athlète</translation>
+        <translation>Choisir le répertoire local partagé de l&apos;athlète</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="533"/>
@@ -6723,12 +6723,12 @@ Choisir Annuler pour sortir.</translation>
     <message>
         <location filename="../DeviceTypes.cpp" line="36"/>
         <source>ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM and Powertap power meters, Heart rate belts, speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick</source>
-        <translation type="unfinished"></translation>
+        <translation>Les périphériques ANT+ and Home Trainers comme Kickr, NEO, Muin, SRM et capteurs de puissance Powertap, ceinture cardiaque, capteur de vitesse ou cadence via un stick USB Garmin ANT+ USB1 ou USB2</translation>
     </message>
     <message>
         <location filename="../DeviceTypes.cpp" line="41"/>
         <source>ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM, Powertap or Quarq power meters, Heart rate belts, speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick</source>
-        <translation type="unfinished"></translation>
+        <translation>Les périphériques ANT+ and Home Trainers comme Kickr, NEO, Muin, SRM et capteurs de puissance (Powertap, Quarq,...), ceinture cardiaque, capteur de vitesse ou cadence via un stick USB Garmin ANT+ USB1 ou USB2</translation>
     </message>
     <message>
         <location filename="../DeviceTypes.cpp" line="48"/>
@@ -6748,7 +6748,7 @@ Choisir Annuler pour sortir.</translation>
     <message>
         <location filename="../DeviceTypes.cpp" line="61"/>
         <source>Monark USB device </source>
-        <translation type="unfinished"></translation>
+        <translation>Monark USB device </translation>
     </message>
     <message>
         <location filename="../DeviceTypes.cpp" line="66"/>
@@ -7169,28 +7169,28 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../Dropbox.cpp" line="77"/>
         <source>invalid root path.</source>
-        <translation type="unfinished"></translation>
+        <translation>Répertoire racine invalide.</translation>
     </message>
     <message>
         <location filename="../Dropbox.cpp" line="78"/>
         <source>root is not a directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>La racine n&apos;est pas un repertoire.</translation>
     </message>
     <message>
         <location filename="../Dropbox.cpp" line="130"/>
         <source>You must authorise with Dropbox first</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous devez d&apos;abord autoriser GC avec Dropbox</translation>
     </message>
     <message>
         <location filename="../Dropbox.cpp" line="252"/>
         <location filename="../Dropbox.cpp" line="266"/>
         <source>Completed.</source>
-        <translation type="unfinished">Accompli.</translation>
+        <translation>Accompli.</translation>
     </message>
     <message>
         <location filename="../Dropbox.h" line="34"/>
         <source>Dropbox Cloud Storage</source>
-        <translation type="unfinished">Sauvegarde décentralisée Dropbox</translation>
+        <translation>Sauvegarde décentralisée Dropbox</translation>
     </message>
 </context>
 <context>
@@ -7316,7 +7316,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../LTMTool.cpp" line="1531"/>
         <source>Formula</source>
-        <translation type="unfinished">Formule</translation>
+        <translation>Formule</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1586"/>
@@ -7355,27 +7355,27 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../LTMTool.cpp" line="1716"/>
         <source>Total</source>
-        <translation type="unfinished">Total</translation>
+        <translation>Total</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1717"/>
         <source>Running Total</source>
-        <translation type="unfinished"></translation>
+        <translation>Total pour la course</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1718"/>
         <source>Average</source>
-        <translation type="unfinished">Moyenne</translation>
+        <translation>Moyenne</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1720"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimum</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1723"/>
         <source>Aggregate:</source>
-        <translation type="unfinished"></translation>
+        <translation>Agrégat:</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1732"/>
@@ -7384,7 +7384,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
 # as you type the available metrics
 # will be offered by autocomplete
 </source>
-        <translation type="unfinished"># entrez un formule a utiliser
+        <translation># entrez un formule a utiliser
 # par ex. TSS / Duration
 # lors de la saisie 
 # les noms seront proposés
@@ -7418,7 +7418,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../LTMTool.cpp" line="1882"/>
         <source>Filter</source>
-        <translation type="unfinished">Filtre</translation>
+        <translation>Filtre</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1893"/>
@@ -7728,7 +7728,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../UserData.cpp" line="66"/>
         <source>User Data Series</source>
-        <translation type="unfinished"></translation>
+        <translation>Série de données de l&apos;utilisateur</translation>
     </message>
     <message>
         <location filename="../UserData.cpp" line="89"/>
@@ -7737,7 +7737,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
 # as you type the available metrics
 # will be offered by autocomplete
 </source>
-        <translation type="unfinished"># entrez un formule a utiliser
+        <translation># entrez un formule a utiliser
 # par ex. TSS / Duration
 # lors de la saisie 
 # les noms seront proposés
@@ -7746,37 +7746,37 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../UserData.cpp" line="178"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <location filename="../UserData.cpp" line="180"/>
         <source>Units</source>
-        <translation type="unfinished">Unités</translation>
+        <translation>Unités</translation>
     </message>
     <message>
         <location filename="../UserData.cpp" line="182"/>
         <source>Formula</source>
-        <translation type="unfinished">Formule</translation>
+        <translation>Formule</translation>
     </message>
     <message>
         <location filename="../UserData.cpp" line="184"/>
         <source>Color</source>
-        <translation type="unfinished">Couleur</translation>
+        <translation>Couleur</translation>
     </message>
     <message>
         <location filename="../UserData.cpp" line="193"/>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location filename="../UserData.cpp" line="194"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Annuler</translation>
     </message>
     <message>
         <location filename="../UserData.cpp" line="229"/>
         <source>Choose Metric Color</source>
-        <translation type="unfinished">Choisir la couleur du mérique</translation>
+        <translation>Choisir la couleur du mérique</translation>
     </message>
 </context>
 <context>
@@ -8112,12 +8112,12 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../FileStore.cpp" line="116"/>
         <source>expected compressed activity file.</source>
-        <translation type="unfinished">fichier d&apos;activité compressé souhaité.</translation>
+        <translation>fichier d&apos;activité compressé souhaité.</translation>
     </message>
     <message>
         <location filename="../FileStore.h" line="62"/>
         <source>Base class</source>
-        <translation type="unfinished">Classe de base</translation>
+        <translation>Classe de base</translation>
     </message>
 </context>
 <context>
@@ -8126,37 +8126,37 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
         <location filename="../FileStore.cpp" line="205"/>
         <location filename="../FileStore.cpp" line="407"/>
         <source>Folder</source>
-        <translation type="unfinished">Répertoire</translation>
+        <translation>Répertoire</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="212"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="213"/>
         <source>Type</source>
-        <translation type="unfinished">Type</translation>
+        <translation>Type</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="214"/>
         <source>Modified</source>
-        <translation type="unfinished">Modifié</translation>
+        <translation>Modifié</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="229"/>
         <source>Create Folder</source>
-        <translation type="unfinished">Créer un répertoire</translation>
+        <translation>Créer un répertoire</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="230"/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="231"/>
         <source>Open</source>
-        <translation type="unfinished">Ouvrir</translation>
+        <translation>Ouvrir</translation>
     </message>
 </context>
 <context>
@@ -8164,17 +8164,17 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../FileStore.cpp" line="465"/>
         <source>Synchronise </source>
-        <translation type="unfinished">synchronise </translation>
+        <translation>Synchronise </translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="473"/>
         <source>Sync with </source>
-        <translation type="unfinished">Sync. avec </translation>
+        <translation>Sync. avec </translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="474"/>
         <source>Unable to connect, check your configuration in preferences.</source>
-        <translation type="unfinished">Impossible de se connecter, vérifiez votre configuration dans les préférences</translation>
+        <translation>Impossible de se connecter, vérifiez votre configuration dans les préférences.</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="493"/>
@@ -8182,224 +8182,224 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
         <location filename="../FileStore.cpp" line="780"/>
         <location filename="../FileStore.cpp" line="880"/>
         <source>Download</source>
-        <translation type="unfinished">Télécharger</translation>
+        <translation>Télécharger</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="494"/>
         <location filename="../FileStore.cpp" line="861"/>
         <location filename="../FileStore.cpp" line="884"/>
         <source>Upload</source>
-        <translation type="unfinished">Envoyer</translation>
+        <translation>Envoyer</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="495"/>
         <location filename="../FileStore.cpp" line="888"/>
         <source>Synchronize</source>
-        <translation type="unfinished">Synchronise</translation>
+        <translation>Synchronise</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="510"/>
         <source>From:</source>
-        <translation type="unfinished">Depuis:</translation>
+        <translation>Depuis:</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="511"/>
         <source>To:</source>
-        <translation type="unfinished">à:</translation>
+        <translation>à:</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="521"/>
         <source>Refresh List</source>
-        <translation type="unfinished">Rafraîchir la liste</translation>
+        <translation>Rafraîchir la liste</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="522"/>
         <source>Close</source>
-        <translation type="unfinished">Fermer</translation>
+        <translation>Fermer</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="525"/>
         <location filename="../FileStore.cpp" line="551"/>
         <location filename="../FileStore.cpp" line="581"/>
         <source>Select all</source>
-        <translation type="unfinished">Tout sélectionnes</translation>
+        <translation>Tout sélectionnes</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="531"/>
         <source>Workout Id</source>
-        <translation type="unfinished">Identifiant entrainement</translation>
+        <translation>Identifiant entrainement</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="532"/>
         <location filename="../FileStore.cpp" line="558"/>
         <location filename="../FileStore.cpp" line="597"/>
         <source>Date</source>
-        <translation type="unfinished">Date</translation>
+        <translation>Date</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="533"/>
         <location filename="../FileStore.cpp" line="559"/>
         <location filename="../FileStore.cpp" line="598"/>
         <source>Time</source>
-        <translation type="unfinished">Heure</translation>
+        <translation>Heure</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="534"/>
         <location filename="../FileStore.cpp" line="562"/>
         <source>Exists</source>
-        <translation type="unfinished">Existe</translation>
+        <translation>Existe</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="535"/>
         <location filename="../FileStore.cpp" line="563"/>
         <location filename="../FileStore.cpp" line="602"/>
         <source>Status</source>
-        <translation type="unfinished">Statut</translation>
+        <translation>Statut</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="557"/>
         <source>File</source>
-        <translation type="unfinished">Fichier</translation>
+        <translation>Fichier</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="560"/>
         <location filename="../FileStore.cpp" line="599"/>
         <source>Duration</source>
-        <translation type="unfinished">Durée</translation>
+        <translation>Durée</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="561"/>
         <location filename="../FileStore.cpp" line="600"/>
         <source>Distance</source>
-        <translation type="unfinished">Distance</translation>
+        <translation>Distance</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="584"/>
         <source>Keep all do not delete</source>
-        <translation type="unfinished">Tout conserver, n&apos;effacer aucune activité</translation>
+        <translation>Tout conserver, n&apos;effacer aucune activité</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="585"/>
         <source>Keep %1 but delete Local</source>
-        <translation type="unfinished">Conserver %1 mais effacer Local</translation>
+        <translation>Conserver %1 mais effacer Local</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="586"/>
         <source>Keep Local but delete %1</source>
-        <translation type="unfinished">Conserver Local et supprimer %1</translation>
+        <translation>Conserver Local et supprimer %1</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="596"/>
         <source>Source</source>
-        <translation type="unfinished">Source</translation>
+        <translation>Source</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="601"/>
         <source>Action</source>
-        <translation type="unfinished">Action</translation>
+        <translation>Action</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="622"/>
         <source>Initial</source>
-        <translation type="unfinished">Initial</translation>
+        <translation>Initial</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="624"/>
         <source>Overwrite existing files</source>
-        <translation type="unfinished">Ecraser les fichiers existants</translation>
+        <translation>Ecraser les fichiers existants</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="935"/>
         <location filename="../FileStore.cpp" line="949"/>
         <location filename="../FileStore.cpp" line="963"/>
         <source>%1 of %2 selected</source>
-        <translation type="unfinished">%1 parmis %2 selectionnés</translation>
+        <translation>%1 parmis %2 selectionnés</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1040"/>
         <source>Processed %1 of %2</source>
-        <translation type="unfinished">Traité %1 sur %2</translation>
+        <translation>Traité %1 sur %2</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1042"/>
         <location filename="../FileStore.cpp" line="1123"/>
         <source>Downloading</source>
-        <translation type="unfinished">Téléchargement</translation>
+        <translation>Téléchargement</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1050"/>
         <location filename="../FileStore.cpp" line="1220"/>
         <source>Uploading</source>
-        <translation type="unfinished">Envoi</translation>
+        <translation>Envoi</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1070"/>
         <location filename="../FileStore.cpp" line="1241"/>
         <source>Parse failure</source>
-        <translation type="unfinished">Erreur d&apos;interpréteur</translation>
+        <translation>Erreur d&apos;interpréteur</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1085"/>
         <source>Sync complete</source>
-        <translation type="unfinished">Synchronisation terminée</translation>
+        <translation>Synchronisation terminée</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1097"/>
         <source>Processed %1 of %2 successfully</source>
-        <translation type="unfinished">Traité %1 sur %2 avec succès</translation>
+        <translation>Traité %1 sur %2 avec succès</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1115"/>
         <location filename="../FileStore.cpp" line="1212"/>
         <location filename="../FileStore.cpp" line="1311"/>
         <source>File exists</source>
-        <translation type="unfinished">Le fichier existe</translation>
+        <translation>Le fichier existe</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1125"/>
         <source>Downloaded %1 of %2</source>
-        <translation type="unfinished">Téléchargement: %1 sur %2</translation>
+        <translation>Téléchargement: %1 sur %2</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1139"/>
         <source>Downloads complete</source>
-        <translation type="unfinished">Téléchargement terminé</translation>
+        <translation>Téléchargement terminé</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1150"/>
         <source>Downloaded %1 of %2 successfully</source>
-        <translation type="unfinished">Téléchargement réussi: %1 sur %2</translation>
+        <translation>Téléchargement réussi: %1 sur %2</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1167"/>
         <location filename="../FileStore.cpp" line="1275"/>
         <source>Aborted</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1183"/>
         <source>Saved</source>
-        <translation type="unfinished">Sauvé</translation>
+        <translation>Sauvé</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1222"/>
         <source>Uploaded %1 of %2</source>
-        <translation type="unfinished">Envoi %1 sur %2</translation>
+        <translation>Envoi %1 sur %2</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1252"/>
         <source>Uploads complete</source>
-        <translation type="unfinished">Envoi réussi</translation>
+        <translation>Envoi réussi</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1263"/>
         <source>Uploaded %1 of %2 successfully</source>
-        <translation type="unfinished">Envoi %1 sur %2 avec succès</translation>
+        <translation>Envoi %1 sur %2 avec succès</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="1283"/>
         <source>Completed.</source>
-        <translation type="unfinished">Accompli.</translation>
+        <translation>Accompli.</translation>
     </message>
 </context>
 <context>
@@ -8407,17 +8407,17 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../FileStore.cpp" line="158"/>
         <source>Uploading %1 bytes...</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoi (%1 bytes)...</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="166"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="185"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -8487,12 +8487,12 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../FixDeriveDistance.cpp" line="97"/>
         <source>Estimate Distance Values</source>
-        <translation type="unfinished">Estimer les distances</translation>
+        <translation>Estimer les distances</translation>
     </message>
     <message>
         <location filename="../FixDeriveDistance.cpp" line="150"/>
         <source>Derive Distance from GPS on </source>
-        <translation type="unfinished">Determine la distance par GPS </translation>
+        <translation>Determine la distance par GPS </translation>
     </message>
 </context>
 <context>
@@ -8504,7 +8504,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
 Some unit doesn&apos;t record distance without a speedometer but record position (eg Timex Cycle Trainer)
 
 </source>
-        <translation type="unfinished">Determine la distance à partir du GPS
+        <translation>Determine la distance à partir du GPS
 
 Certains équipements n&apos;enregistrent pas la distance mais la position (ex: Timex Cycle Trainer)
 
@@ -8533,7 +8533,7 @@ Certains équipements n&apos;enregistrent pas la distance mais la position (ex: 
     <message>
         <location filename="../FixDerivePower.cpp" line="53"/>
         <source>Crr</source>
-        <translation type="unfinished">Crr</translation>
+        <translation>Crr</translation>
     </message>
     <message>
         <location filename="../FixDerivePower.cpp" line="78"/>
@@ -8542,7 +8542,7 @@ Certains équipements n&apos;enregistrent pas la distance mais la position (ex: 
 Bike Weight parameter is added to athlete&apos;s weight to compound total mass, it should include apparel, shoes, etc
 
 CRR parameter is the coefficient of rolling resistance, it depends on tires and surface</source>
-        <translation type="unfinished">Estime la puissance en se basant sur la vitesse, etc.
+        <translation>Estime la puissance en se basant sur la vitesse, etc.
 
 Le poids du vélo est ajuté au poids de l&apos;athlète pour déterminer la masse totale. Il faut inclure les accessoires et vêtements.
 
@@ -8590,7 +8590,7 @@ Une connection internet est requise pour ce service.</translation>
     <message>
         <location filename="../FixFreewheeling.cpp" line="80"/>
         <source>Fix freewheeling power/cadence.</source>
-        <translation type="unfinished">Corrige puissance et cadence en roue libre</translation>
+        <translation>Corrige puissance et cadence en roue libre.</translation>
     </message>
 </context>
 <context>
@@ -8598,7 +8598,7 @@ Une connection internet est requise pour ce service.</translation>
     <message>
         <location filename="../FixFreewheeling.cpp" line="47"/>
         <source>ANT+ crank based power meters will send  3 duplicate values for power and cadence when the  rider starts to freewheel. The duplicates should  not be retained. This tool removes the duplicates.</source>
-        <translation type="unfinished">Certains équipements dupliquent 3 fois les données de puissance et cadence en roue libre. Ils ne doivent pas être pris en compte. Cet outil neutralise ces doublons.</translation>
+        <translation>Certains équipements dupliquent 3 fois les données de puissance et cadence en roue libre. Ils ne doivent pas être pris en compte. Cet outil neutralise ces doublons.</translation>
     </message>
 </context>
 <context>
@@ -8705,7 +8705,7 @@ Maximum absolu - C&apos;est la valeur absolue maximum pour la FC de cet athlète
     <message>
         <location filename="../FixMoxy.cpp" line="51"/>
         <source>When recording from the Moxy or BSX Insight in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lorsque vous utilisez Moxy en mode Vitesse et Cadence les données SmO2 et tHb sont émises respectivement comme cadence et vitesse. Cette outil permet de déplacer ces données pour les replacer dans les séries adéquates.</translation>
     </message>
 </context>
 <context>
@@ -8745,7 +8745,9 @@ Ajustement de puissance - le pourcentage utilisé. Les valeurs négatives permet
         <source>Occasionally SmO2 (%) will erroneously report high values (0% or &gt;100%).
 
 This function will look for spikes/anomalies in SmO2 data and replace the erroneous data by smoothing/interpolating the data from either side of the 3 points in question</source>
-        <translation type="unfinished"></translation>
+        <translation>Parfois la SmO2 (%) enregistré par la cadence va reporter des valeurs aberrantes(0% or &gt;100%).
+
+Cette fonction va chercher les pics/anomalies dans les données SmO2 et les remplacer en lissant/extrapolant avec les 3 points suivants et précédant la valeur en question</translation>
     </message>
 </context>
 <context>
@@ -8753,7 +8755,7 @@ This function will look for spikes/anomalies in SmO2 data and replace the errone
     <message>
         <location filename="../FixSpeed.cpp" line="104"/>
         <source>Fix Speed from Distance</source>
-        <translation type="unfinished">Corriger la vitesse selon la distance</translation>
+        <translation>Corriger la vitesse selon la distance</translation>
     </message>
 </context>
 <context>
@@ -8761,7 +8763,7 @@ This function will look for spikes/anomalies in SmO2 data and replace the errone
     <message>
         <location filename="../FixSpeed.cpp" line="49"/>
         <source>Moving Average Seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Secondes pour la moyenne mobile</translation>
     </message>
     <message>
         <location filename="../FixSpeed.cpp" line="65"/>
@@ -8769,7 +8771,10 @@ This function will look for spikes/anomalies in SmO2 data and replace the errone
 This tool replaces the existing speed channel, or creates a new one if not present, based on travelled distance
 
 Moving Average Seconds parameter allows to set the seconds of the MA filter to smooth speed spikes</source>
-        <translation type="unfinished"></translation>
+        <translation>Certain sappareils enregistre des vitesses qui ne correspondent pas au déplacement, par exemple en utilisant un accéléromètre pour la vitesse et un GPS pour la distance.
+Cet outil remplace les données de vitesses ou les ajoute si elles ne sont pas présentes, basé sur les distances parcourus.
+
+La durée de la moyenne mobile (en secondes) permet de lisser les pics de vitesses</translation>
     </message>
 </context>
 <context>
@@ -8782,7 +8787,7 @@ Moving Average Seconds parameter allows to set the seconds of the MA filter to s
     <message>
         <location filename="../FixSmO2.cpp" line="80"/>
         <source>Fix SmO2 Anomaly</source>
-        <translation type="unfinished"></translation>
+        <translation>Corriger les anomalies SmO2</translation>
     </message>
 </context>
 <context>
@@ -8849,7 +8854,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../FileStore.cpp" line="442"/>
         <source>Folder Name</source>
-        <translation type="unfinished">Nom du répertoire</translation>
+        <translation>Nom du répertoire</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="449"/>
@@ -8859,7 +8864,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../FileStore.cpp" line="450"/>
         <source>Create</source>
-        <translation type="unfinished">Créer</translation>
+        <translation>Créer</translation>
     </message>
 </context>
 <context>
@@ -8891,7 +8896,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../FortiusController.cpp" line="87"/>
         <source>Cannot Connect to Fortius</source>
-        <translation>Impossible de ce connecter au Fortius</translation>
+        <translation>Impossible de se connecter au Fortius</translation>
     </message>
 </context>
 <context>
@@ -10199,22 +10204,22 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../Pages.cpp" line="74"/>
         <source>Chinese (Traditional)</source>
-        <translation type="unfinished">Chinois (traditionel)</translation>
+        <translation>Chinois (traditionel)</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="95"/>
         <source>Unit</source>
-        <translation type="unfinished">Unités</translation>
+        <translation>Unités</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="97"/>
         <source>Metric</source>
-        <translation type="unfinished">Métrique</translation>
+        <translation>Métrique</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="98"/>
         <source>Imperial</source>
-        <translation type="unfinished">Impérial</translation>
+        <translation>Impérial</translation>
     </message>
     <message>
         <source>Crank Length:</source>
@@ -10268,12 +10273,12 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../Pages.cpp" line="164"/>
         <source>Enable API Web Services</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="192"/>
         <source>Workout and VideoSync Library:</source>
-        <translation type="unfinished">Répertoire d&apos;entraînements et syncho video:</translation>
+        <translation>Répertoire d&apos;entraînements et syncho video:</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="289"/>
@@ -10875,57 +10880,57 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="101"/>
         <source>Manual creation of an activity where the most relevant data can be added in this dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer manuellement une activité basée sur les données renseignées sur ce dialogue</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="106"/>
         <source>Exports a (selectable) set of activties in one of the supported export formats</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter un ensemble d&apos;activités dans un des formats d&apos;exportation disponibles</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="110"/>
         <source>Wizard to combine data with the currently selected activity in multiple ways</source>
-        <translation type="unfinished"></translation>
+        <translation>Assistant pour combiner l&apos;activité sélectionnée de multiples manières</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="119"/>
         <source>A set of functions related different features in GoldenCheetah - please check the details for more information</source>
-        <translation type="unfinished">Un ensemble de fonctions incluses dans GoldenCheetah - voir les détails pour plus d&apos;informations</translation>
+        <translation>Un ensemble de fonctions incluses dans GoldenCheetah - voir les détails pour plus d&apos;informations</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="121"/>
         <source>Estimation of critical power using the Monod/Scherrer power model</source>
-        <translation type="unfinished">Estimation de la puissance critique (CP) en utilisant le modèle Monod/Scherrer</translation>
+        <translation>Estimation de la puissance critique (CP) en utilisant le modèle Monod/Scherrer</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="123"/>
         <source>Estimation of Air Density (Rho)</source>
-        <translation type="unfinished">Estimation de la densité de l&apos;air (Rho)</translation>
+        <translation>Estimation de la densité de l&apos;air (Rho)</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="127"/>
         <source>Downloading of Workouts for the ERGDB (online workout DB) for Train - Indoor Riding</source>
-        <translation type="unfinished">Télécharger des entraînements depuis ERGDB (base de données en ligne) - en salle</translation>
+        <translation>Télécharger des entraînements depuis ERGDB (base de données en ligne) - en salle</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="129"/>
         <source>Creation of a new Workout for Train - Indoor Riding</source>
-        <translation type="unfinished">Création d&apos;une nouvelle séance d&apos;entraînement - en salle</translation>
+        <translation>Création d&apos;une nouvelle séance d&apos;entraînement - en salle</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="131"/>
         <source>Search for Workout files and Video files in a configurable set of folders and add to the Train - Indoor Riding - Workout/Video library</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechercher des fichiers d&apos;entrainement ou vidéos dans un ensemble de répertoires configuré et les ajouter dans la bibliothèque de la vue entrainement</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="74"/>
         <source>Analysis of a single activity with diagrams like activity plot, W&apos;bal, ... and Chung&apos;s Aerolab</source>
-        <translation type="unfinished"></translation>
+        <translation>Analyser une activité avec les graphiques et diagrammes</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="88"/>
         <source>Activate / De-activate the Compare Pane - which allows to compare activities, intervals or date ranges - also across athletes</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer ou desactiver le pannel de comparaison - qui permet de comparer des activités, des intervales ou des périodes . même entre athlètes</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="103"/>
@@ -10965,67 +10970,67 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="139"/>
         <source>Add Torque Values</source>
-        <translation type="unfinished">Corriger les valeurs de couple</translation>
+        <translation>Corriger les valeurs de couple</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="141"/>
         <source>Adjust Power Values</source>
-        <translation type="unfinished">Ajuster les valeurs de puissance</translation>
+        <translation>Ajuster les valeurs de puissance</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="143"/>
         <source>Adjust Torque Values</source>
-        <translation type="unfinished">Corriger les valeurs de couple</translation>
+        <translation>Corriger les valeurs de couple</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="145"/>
         <source>Estimate Power Values</source>
-        <translation type="unfinished">Estimer la puissance</translation>
+        <translation>Estimer la puissance</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="147"/>
         <source>Estimate Distance Values</source>
-        <translation type="unfinished">Estimer les distances</translation>
+        <translation>Estimer les distances</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="149"/>
         <source>Fix Elevation Errors</source>
-        <translation type="unfinished">Corriger les erreurs d&apos;altitude</translation>
+        <translation>Corriger les erreurs d&apos;altitude</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="151"/>
         <source>Fix Gaps in Recording</source>
-        <translation type="unfinished">Corriger les trous dans l&apos;enregistrement</translation>
+        <translation>Corriger les trous dans l&apos;enregistrement</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="153"/>
         <source>Fix GPS Errors</source>
-        <translation type="unfinished">Corriger les erreurs GPS</translation>
+        <translation>Corriger les erreurs GPS</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="155"/>
         <source>Fix HR Spikes</source>
-        <translation type="unfinished">Corriger les pics de FC</translation>
+        <translation>Corriger les pics de FC</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="157"/>
         <source>Fix Power Spikes</source>
-        <translation type="unfinished">Corriger des pics de puissance</translation>
+        <translation>Corriger des pics de puissance</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="159"/>
         <source>Fix Speed</source>
-        <translation type="unfinished">Corriger la vitesse</translation>
+        <translation>Corriger la vitesse</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="161"/>
         <source>Fix Freewheeling from Power and Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Corriger les périodes de roue libre</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="163"/>
         <source>Fix Moxy data by moving the moxy values from speed and cadence into the Moxy series</source>
-        <translation type="unfinished"></translation>
+        <translation>Corriger les valeurs des données Moxy en déplacant les séries depuis la vitesse et la cadence</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="167"/>
@@ -11045,22 +11050,22 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="175"/>
         <source>Date range, data grouping settings which apply to a single chart</source>
-        <translation type="unfinished">Plage de date, regroupement de valeurs appliqués a un graphe</translation>
+        <translation>Plage de date, regroupement de valeurs appliqués a un graphe</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="177"/>
         <source>Prefined sets of curves which can be applied as chart definition, or as starting point for individual adjustments</source>
-        <translation type="unfinished">Liste de courbes prédéfinies qui peuvent être utilisées pour un graphe ou comme point de départ pour les ajustements individuels</translation>
+        <translation>Liste de courbes prédéfinies qui peuvent être utilisées pour un graphe ou comme point de départ pour les ajustements individuels</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="179"/>
         <source>Curves which are plotted for the specific chart - based on presets or individually added and modified here</source>
-        <translation type="unfinished">Courbes qui sont tracées pour un graphe spécifique - basés sur un modèle ou une insertion manuelle modifiée ici</translation>
+        <translation>Courbes qui sont tracées pour un graphe spécifique - basés sur un modèle ou une insertion manuelle modifiée ici</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="181"/>
         <source>Individual curve configuration</source>
-        <translation type="unfinished">Configuration des courbes individuellement</translation>
+        <translation>Configuration des courbes individuellement</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="183"/>
@@ -11106,7 +11111,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="230"/>
         <source>Map of activity</source>
-        <translation type="unfinished">Carte de l&apos;activité</translation>
+        <translation>Carte de l&apos;activité</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="232"/>
@@ -11116,7 +11121,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="234"/>
         <source>Configurable 3D plot of the current activity</source>
-        <translation type="unfinished">Graphe 3D configurable pour l&apos;activité courante</translation>
+        <translation>Graphe 3D configurable pour l&apos;activité courante</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="245"/>
@@ -11131,7 +11136,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="257"/>
         <source>Configurable list of activities</source>
-        <translation type="unfinished">Listes d&apos;activités configurable</translation>
+        <translation>Listes d&apos;activités configurable</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="267"/>
@@ -11141,7 +11146,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="269"/>
         <source>Adding intervals to an activity using simple query methods</source>
-        <translation type="unfinished">Ajouter des intervalles à une activité par méthode simplifiée</translation>
+        <translation>Ajouter des intervalles à une activité par méthode simplifiée</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="291"/>
@@ -11151,7 +11156,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="297"/>
         <source>Definition of coloring rules for activities</source>
-        <translation type="unfinished">Définir les règles de coloration des activités</translation>
+        <translation>Définir les règles de coloration des activités</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="189"/>
@@ -11181,7 +11186,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../HelpWhatsThis.cpp" line="255"/>
         <location filename="../HelpWhatsThis.cpp" line="261"/>
         <source>Calendar</source>
-        <translation type="unfinished">Calendrier</translation>
+        <translation>Calendrier</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="201"/>
@@ -11237,13 +11242,13 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="273"/>
         <source>General</source>
-        <translation type="unfinished">Général</translation>
+        <translation>Général</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="275"/>
         <location filename="../HelpWhatsThis.cpp" line="277"/>
         <source>Athlete</source>
-        <translation type="unfinished">Athlète</translation>
+        <translation>Athlète</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="279"/>
@@ -11263,23 +11268,23 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="285"/>
         <source>Autoimport</source>
-        <translation type="unfinished">Importation automatique</translation>
+        <translation>Importation automatique</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="287"/>
         <source>Passwords</source>
-        <translation type="unfinished">Mots de passe</translation>
+        <translation>Mots de passe</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="289"/>
         <source>Appearance</source>
-        <translation type="unfinished">Apparence</translation>
+        <translation>Apparence</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="293"/>
         <location filename="../HelpWhatsThis.cpp" line="295"/>
         <source>Data Fields</source>
-        <translation type="unfinished">Champs de données</translation>
+        <translation>Champs de données</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="299"/>
@@ -11314,7 +11319,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="311"/>
         <source>Train Devices</source>
-        <translation type="unfinished">Périphériques d&apos;entrainement</translation>
+        <translation>Périphériques d&apos;entrainement</translation>
     </message>
 </context>
 <context>
@@ -11820,7 +11825,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HrTimeInZone.cpp" line="669"/>
         <source>H10 Percent in Zone</source>
-        <translation type="unfinished">Pourcentage dans la zone H8 {10 ?}</translation>
+        <translation>Pourcentage dans la zone H10</translation>
     </message>
 </context>
 <context>
@@ -11884,7 +11889,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HrTimeInZone.cpp" line="626"/>
         <source>H9 Percent in Zone</source>
-        <translation type="unfinished">Pourcentage dans la zone H8 {9 ?}</translation>
+        <translation>Pourcentage dans la zone H9</translation>
     </message>
 </context>
 <context>
@@ -11940,13 +11945,13 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HrTimeInZone.cpp" line="248"/>
         <source>H10 Time in Zone</source>
-        <translation type="unfinished">Temps dans la Zone H8 {10 ?}</translation>
+        <translation>Temps dans la Zone H10</translation>
     </message>
     <message>
         <location filename="../HrTimeInZone.cpp" line="249"/>
         <location filename="../HrTimeInZone.cpp" line="250"/>
         <source>seconds</source>
-        <translation type="unfinished">secondes</translation>
+        <translation>secondes</translation>
     </message>
 </context>
 <context>
@@ -12052,13 +12057,13 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HrTimeInZone.cpp" line="230"/>
         <source>H9 Time in Zone</source>
-        <translation type="unfinished">Temps dans la Zone H8 {9 ?}</translation>
+        <translation>Temps dans la Zone H9</translation>
     </message>
     <message>
         <location filename="../HrTimeInZone.cpp" line="231"/>
         <location filename="../HrTimeInZone.cpp" line="232"/>
         <source>seconds</source>
-        <translation type="unfinished">secondes</translation>
+        <translation>secondes</translation>
     </message>
 </context>
 <context>
@@ -13215,7 +13220,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../KickrController.cpp" line="92"/>
         <source>Cannot Connect to Kickr</source>
-        <translation>Impossible de ce connecter au Kickr</translation>
+        <translation>Impossible de se connecter au Kickr</translation>
     </message>
 </context>
 <context>
@@ -13363,12 +13368,12 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../LTMChartParser.cpp" line="110"/>
         <source>Problem Saving Charts Configuration</source>
-        <translation type="unfinished">Problème lors de la sauvegarde de la configuration des graphiques</translation>
+        <translation>Problème lors de la sauvegarde de la configuration des graphiques</translation>
     </message>
     <message>
         <location filename="../LTMChartParser.cpp" line="111"/>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
-        <translation type="unfinished">Le fichier: %1 ne peut pas être ouvert pour écriture. Veuillez vérifiez les propriétés du fichier.</translation>
+        <translation>Le fichier: %1 ne peut pas être ouvert pour écriture. Veuillez vérifiez les propriétés du fichier.</translation>
     </message>
 </context>
 <context>
@@ -14497,7 +14502,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../LTMTool.cpp" line="1253"/>
         <source>Formula</source>
-        <translation type="unfinished">Formule</translation>
+        <translation>Formule</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1429"/>
@@ -14940,107 +14945,107 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../DataFilter.cpp" line="878"/>
         <source>%1 is unknown</source>
-        <translation type="unfinished">%1 est inconnu</translation>
+        <translation>%1 est inconnu</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="910"/>
         <source>invalid data series for best(): %1</source>
-        <translation type="unfinished">série de données invalide pour best(): %1</translation>
+        <translation>série de données invalide pour best(): %1</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="915"/>
         <source>invalid data series for tiz(): %1</source>
-        <translation type="unfinished">série de données invalide pour tiz(): %1</translation>
+        <translation>série de données invalide pour tiz(): %1</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="922"/>
         <source>invalid literal for daterange(): %1</source>
-        <translation type="unfinished">litéral invalide pour &apos;daterange()&apos;: &apos;%1&apos;</translation>
+        <translation>litéral invalide pour &apos;daterange()&apos;: &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="936"/>
         <source>invalid literal for config(): %1</source>
-        <translation type="unfinished">litéral invalide pour &apos;config()&apos;: &apos;%1&apos;</translation>
+        <translation>litéral invalide pour &apos;config()&apos;: &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="942"/>
         <source>invalid literal for const(): %1</source>
-        <translation type="unfinished">litéral invalide pour &apos;const()&apos;: &apos;%1&apos;</translation>
+        <translation>litéral invalide pour &apos;const()&apos;: &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="969"/>
         <source>which function has at least 2 parameters.</source>
-        <translation type="unfinished"></translation>
+        <translation>dont la fonction a au moins 2 paramètres.</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="984"/>
         <source>isset/set/unset function first parameter is field/metric to set.</source>
-        <translation type="unfinished">la fonction &apos;isset/set/unset&apos; demande la donnée en premier paramètre</translation>
+        <translation>la fonction &apos;isset/set/unset&apos; demande la donnée en premier paramètre.</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="995"/>
         <source>%1 is not supported in isset/set/unset operations</source>
-        <translation type="unfinished">&apos;%1&apos; n&apos;est pas supporté par isset/set/unset</translation>
+        <translation>&apos;%1&apos; n&apos;est pas supporté par les opérations isset/set/unset</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1005"/>
         <source>isset has one parameter, a symbol to check.</source>
-        <translation type="unfinished">&apos;isset&apos; demande un paramètre, le symbol à vérifier</translation>
+        <translation>&apos;isset&apos; demande un paramètre, le symbol à vérifier.</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1012"/>
         <source>set function needs 3 paramaters; symbol, value and expression.</source>
-        <translation type="unfinished">la fonction &apos;set&apos; demande 3 paramètres: symbole, valeur et expression</translation>
+        <translation>la fonction &apos;set&apos; demande 3 paramètres: symbole, valeur et expression.</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1013"/>
         <source>unset function needs 2 paramaters; symbol and expression.</source>
-        <translation type="unfinished">la fonction &apos;unset&apos; demande deux paramètres: symbole et expression </translation>
+        <translation>la fonction &apos;unset&apos; demande deux paramètres: symbole et expression.</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1031"/>
         <source>estimate function expects model name as first parameter.</source>
-        <translation type="unfinished">la fonction &apos;estimate&apos; demande un nom de modèle en premier paramètre</translation>
+        <translation>la fonction &apos;estimate&apos; demande un nom de modèle en premier paramètre.</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1037"/>
         <source>estimate function expects model name as first parameter</source>
-        <translation type="unfinished">la fonction &apos;estimate&apos; demande un nom de modèle en premier paramètre</translation>
+        <translation>la fonction &apos;estimate&apos; demande un nom de modèle en premier paramètre</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1048"/>
         <source>estimate function expects parameter or duration as second parameter</source>
-        <translation type="unfinished">la fonction &apos;estimate&apos; demande un paramètre ou une durée en second paramètre</translation>
+        <translation>la fonction &apos;estimate&apos; demande un paramètre ou une durée en second paramètre</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1068"/>
         <source>function &apos;%1&apos; expects %2 parameter(s) not %3</source>
-        <translation type="unfinished">la fonction &apos;%1&apos; demande %2 parametres et non %3</translation>
+        <translation>la fonction &apos;%1&apos; demande %2 paramètres et non %3</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1079"/>
         <source>unknown function %1</source>
-        <translation type="unfinished">fonction inconnue %1</translation>
+        <translation>fonction inconnue %1</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1089"/>
         <source>unary negation on a string!</source>
-        <translation type="unfinished"></translation>
+        <translation>negation sur un texte!</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1101"/>
         <source>comparing strings with numbers</source>
-        <translation type="unfinished">Comparaison de textes avec nombres</translation>
+        <translation>Comparaison de textes avec nombres</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1108"/>
         <source>using a string operations with a number</source>
-        <translation type="unfinished">utilise une opération texte sur un nombre</translation>
+        <translation>utilise une opération texte sur un nombre</translation>
     </message>
     <message>
         <location filename="../DataFilter.cpp" line="1136"/>
         <source>internal parser error: parms</source>
-        <translation type="unfinished">erreur de l&apos;analyseur syntaxique interne: parms</translation>
+        <translation>erreur de l&apos;analyseur syntaxique interne: parms</translation>
     </message>
 </context>
 <context>
@@ -15066,22 +15071,22 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../Library.cpp" line="128"/>
         <source>Import Videos, VideoSyncs and Workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer des vidéos, VideoSyncs et des entrainements</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="129"/>
         <source>No supported videos, videoSyncs or workouts were found to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune vidéo, VideoSyncs ou entrainements n&apos;ont été trouvé à importer</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="179"/>
         <source>Copy VideoSync Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>La copie de VideoSync à échoué</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="180"/>
         <source>%1 already exists in videoSync library: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 existe déjà dans la bibliothèque des videoSync: %2</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="208"/>
@@ -15091,7 +15096,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../Library.cpp" line="209"/>
         <source>%1 already exists in workout library: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 existe déjà dans la bibliothèque des entrainements: %2</translation>
     </message>
 </context>
 <context>
@@ -15103,7 +15108,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../Library.cpp" line="254"/>
         <source>Search for Workouts, Syncs and Media</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechercher des entraînements, Syncs et des vidéos</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="261"/>
@@ -15118,7 +15123,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../Library.cpp" line="265"/>
         <source>VideoSync files (.rlv)</source>
-        <translation type="unfinished"></translation>
+        <translation>fichiers VideoSync (.rlv)</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="283"/>
@@ -15148,7 +15153,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../Library.cpp" line="322"/>
         <source>VideoSyncs</source>
-        <translation type="unfinished"></translation>
+        <translation>VideoSyncs</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="331"/>
@@ -15194,34 +15199,34 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../LocalFileStore.cpp" line="46"/>
         <location filename="../LocalFileStore.cpp" line="157"/>
         <source>You must define a network folder first</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous devez d&apos;abord définir un dossier réseau</translation>
     </message>
     <message>
         <location filename="../LocalFileStore.cpp" line="52"/>
         <source>Folder %1 does not exist/is not accessible</source>
-        <translation type="unfinished"></translation>
+        <translation>Le dossier %1 n&apos;existe pas ou n&apos;est pas disponible</translation>
     </message>
     <message>
         <location filename="../LocalFileStore.cpp" line="93"/>
         <source>Folder %1 does not exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Le dossier %1 n&apos;existe pas</translation>
     </message>
     <message>
         <location filename="../LocalFileStore.cpp" line="145"/>
         <location filename="../LocalFileStore.cpp" line="178"/>
         <source>Completed.</source>
-        <translation type="unfinished">Accompli.</translation>
+        <translation>Accompli.</translation>
     </message>
     <message>
         <location filename="../LocalFileStore.cpp" line="164"/>
         <location filename="../LocalFileStore.cpp" line="174"/>
         <source>Write to folder %1 failed</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;écriture dans le dossier %1 à échouée</translation>
     </message>
     <message>
         <location filename="../LocalFileStore.h" line="33"/>
         <source>Local Store </source>
-        <translation type="unfinished"></translation>
+        <translation>Stockage local </translation>
     </message>
 </context>
 <context>
@@ -15436,7 +15441,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="643"/>
         <source>Ctrl+O</source>
-        <translation type="unfinished">Ctrl+O</translation>
+        <translation>Ctrl+O</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
@@ -15632,7 +15637,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="659"/>
         <source>VDOT and T-Pace Calculator...</source>
-        <translation type="unfinished"></translation>
+        <translation>Calculateur VDOT and T-Pace...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="665"/>
@@ -15725,12 +15730,12 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="667"/>
         <source>Import workouts, videos, videoSyncs...</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer des vidéos, VideoSyncs et des entrainements...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="668"/>
         <source>Scan disk for workouts, videos, videoSyncs...</source>
-        <translation type="unfinished"></translation>
+        <translation>Parcourir le disque à la recherche de vidéos, videoSyncs...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="673"/>
@@ -15747,14 +15752,14 @@ Fichier ignoré...</translation>
         <location filename="../MainWindow.cpp" line="1655"/>
         <location filename="../MainWindow.cpp" line="1672"/>
         <source>Activity Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer une activité</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1031"/>
         <location filename="../MainWindow.cpp" line="1655"/>
         <location filename="../MainWindow.cpp" line="1672"/>
         <source>Closing of athlete window not possible while background activity import is in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de fermer l&apos;athlète tant que l&apos;importation est en progression...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1389"/>
@@ -15951,7 +15956,7 @@ CP de l&apos;athlète réglé à %3 watts</translation>
     <message>
         <location filename="../MainWindow.cpp" line="587"/>
         <source>Backup Athlete Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde des données de l&apos;athlète</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="593"/>
@@ -15971,7 +15976,7 @@ CP de l&apos;athlète réglé à %3 watts</translation>
     <message>
         <location filename="../MainWindow.cpp" line="620"/>
         <source>Sha&amp;re</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Partager</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="621"/>
@@ -15981,17 +15986,17 @@ CP de l&apos;athlète réglé à %3 watts</translation>
     <message>
         <location filename="../MainWindow.cpp" line="638"/>
         <source>Write to Local Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Ecrire dans le stockage local </translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="639"/>
         <source>Synchronise Local Store...</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronise le stockage local...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="642"/>
         <source>Upload to &amp;Dropbox</source>
-        <translation type="unfinished">Téléverser vers Dropbox</translation>
+        <translation>Téléverser vers &amp;Dropbox</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="642"/>
@@ -17485,13 +17490,13 @@ Effectuées: %1
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1804"/>
         <source>Min Heartrate</source>
-        <translation type="unfinished">Pulsations min</translation>
+        <translation>Pulsations min</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1805"/>
         <location filename="../BasicRideMetrics.cpp" line="1806"/>
         <source>bpm</source>
-        <translation type="unfinished">puls</translation>
+        <translation>puls</translation>
     </message>
 </context>
 <context>
@@ -18025,7 +18030,7 @@ Effectuées: %1
     <message>
         <location filename="../MonarkController.cpp" line="88"/>
         <source>Cannot Connect to Monark</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de se connecter au Monark</translation>
     </message>
 </context>
 <context>
@@ -18505,7 +18510,7 @@ No rides found to import.
     <message>
         <location filename="../OAuthDialog.cpp" line="355"/>
         <source>Dropbox authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;autorisation pour Dropbox a été un réussi.</translation>
     </message>
     <message>
         <location filename="../OAuthDialog.cpp" line="360"/>
@@ -20688,7 +20693,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../Pages.cpp" line="3143"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -20916,7 +20921,7 @@ yyyy</translation>
     <message>
         <location filename="../VideoLayoutParser.cpp" line="139"/>
         <source>Error creating meter</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur de création de la mesure</translation>
     </message>
 </context>
 <context>
@@ -21447,37 +21452,37 @@ yyyy</translation>
     <message>
         <location filename="../RideAutoImportConfig.cpp" line="35"/>
         <source>Autoimport with dialog - past  90 days</source>
-        <translation type="unfinished"></translation>
+        <translation>Importation automatique avec dialogue - derniers  90 jours</translation>
     </message>
     <message>
         <location filename="../RideAutoImportConfig.cpp" line="36"/>
         <source>Autoimport with dialog - past 180 days</source>
-        <translation type="unfinished"></translation>
+        <translation>Importation automatique avec dialogue - derniers  180 jours</translation>
     </message>
     <message>
         <location filename="../RideAutoImportConfig.cpp" line="37"/>
         <source>Autoimport with dialog - past 360 days</source>
-        <translation type="unfinished"></translation>
+        <translation>Importation automatique avec dialogue - derniers  360 jours</translation>
     </message>
     <message>
         <location filename="../RideAutoImportConfig.cpp" line="38"/>
         <source>Autoimport in background</source>
-        <translation type="unfinished"></translation>
+        <translation>Importation automatique en tache de fond</translation>
     </message>
     <message>
         <location filename="../RideAutoImportConfig.cpp" line="39"/>
         <source>Autoimport in background - past  90 days</source>
-        <translation type="unfinished"></translation>
+        <translation>Importation automatique - derniers  90 jours</translation>
     </message>
     <message>
         <location filename="../RideAutoImportConfig.cpp" line="40"/>
         <source>Autoimport in background - past 180 days</source>
-        <translation type="unfinished"></translation>
+        <translation>Importation automatique - derniers  180 jours</translation>
     </message>
     <message>
         <location filename="../RideAutoImportConfig.cpp" line="41"/>
         <source>Autoimport in background - past 360 days</source>
-        <translation type="unfinished"></translation>
+        <translation>Importation automatique - derniers  360 jours</translation>
     </message>
 </context>
 <context>
@@ -22819,12 +22824,12 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../RideImportWizard.cpp" line="905"/>
         <source>Auto Import</source>
-        <translation type="unfinished">Importation automaique</translation>
+        <translation>Importation automatique</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="905"/>
         <source>Automatic import from defined directories is completed.</source>
-        <translation type="unfinished">L&apos;import automatique à partir des répertoires sélectionnés est terminé</translation>
+        <translation>L&apos;import automatique à partir des répertoires sélectionnés est terminé</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="987"/>
@@ -22900,7 +22905,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../RideImportWizard.cpp" line="210"/>
         <source>No files in requested time range</source>
-        <translation type="unfinished">Pas de fichier pour la période demandée</translation>
+        <translation>Pas de fichier pour la période demandée</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="213"/>
@@ -23778,58 +23783,58 @@ Fichier ignoré...</translation>
         <location filename="../Pages.cpp" line="1127"/>
         <location filename="../Pages.cpp" line="1193"/>
         <source>Weight (%1)</source>
-        <translation type="unfinished">Poids (%1)</translation>
+        <translation>Poids (%1)</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1118"/>
         <location filename="../Pages.cpp" line="1193"/>
         <source>kg</source>
-        <translation type="unfinished">kg</translation>
+        <translation>kg</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1122"/>
         <location filename="../Pages.cpp" line="1131"/>
         <location filename="../Pages.cpp" line="1196"/>
         <source>Height (%1)</source>
-        <translation type="unfinished">Taille (%1)</translation>
+        <translation>Taille (%1)</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1122"/>
         <location filename="../Pages.cpp" line="1196"/>
         <source>cm</source>
-        <translation type="unfinished">cm</translation>
+        <translation>cm</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1127"/>
         <location filename="../Pages.cpp" line="1193"/>
         <source>lb</source>
-        <translation type="unfinished">lb</translation>
+        <translation>lb</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1131"/>
         <location filename="../Pages.cpp" line="1196"/>
         <source>in</source>
-        <translation type="unfinished">in</translation>
+        <translation>in</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1199"/>
         <source>W&apos;bal tau (s)</source>
-        <translation type="unfinished">W&apos;bal tau (s)</translation>
+        <translation>W&apos;bal tau (s)</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1223"/>
         <source>STS average (days)</source>
-        <translation type="unfinished">STS moyen (par jour)</translation>
+        <translation>STS moyen (par jour)</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1224"/>
         <source>LTS average (days)</source>
-        <translation type="unfinished">LTS moyen (par jours)</translation>
+        <translation>LTS moyen (par jour)</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1239"/>
         <source>PMC Stress Balance Today</source>
-        <translation type="unfinished">Valeur actuelle de l&apos;équilibre de charge</translation>
+        <translation>Valeur actuelle de l&apos;équilibre de charge</translation>
     </message>
 </context>
 <context>
@@ -24938,7 +24943,7 @@ Devons-nous le faire?</translation>
     <message>
         <location filename="../ShareDialog.cpp" line="164"/>
         <source>SportPlusHealth</source>
-        <translation type="unfinished"></translation>
+        <translation>SportPlusHealth</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="187"/>
@@ -25600,44 +25605,44 @@ Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&
     <message>
         <location filename="../SportPlusHealthUploader.cpp" line="35"/>
         <source>SportPlusHealth</source>
-        <translation type="unfinished"></translation>
+        <translation>SportPlusHealth</translation>
     </message>
     <message>
         <location filename="../SportPlusHealthUploader.cpp" line="51"/>
         <source>Cannot upload to SportPlusHealth without credentials. Check Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas de jeton pour SportPlusHealth. Veuillez vérifier les permissions dans les préférences</translation>
     </message>
     <message>
         <location filename="../SportPlusHealthUploader.cpp" line="70"/>
         <source>sending to SportPlusHealth...</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoi vers SportPlusHealth, téléchargement... </translation>
     </message>
     <message>
         <location filename="../SportPlusHealthUploader.cpp" line="150"/>
         <location filename="../SportPlusHealthUploader.cpp" line="161"/>
         <location filename="../SportPlusHealthUploader.cpp" line="210"/>
         <source>error uploading to SportPlusHealth</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur pendant le téléchargement sur SportPlusHealth</translation>
     </message>
     <message>
         <location filename="../SportPlusHealthUploader.cpp" line="151"/>
         <source>request failed: </source>
-        <translation type="unfinished">Echec de la requête: </translation>
+        <translation>Echec de la requête: </translation>
     </message>
     <message>
         <location filename="../SportPlusHealthUploader.cpp" line="162"/>
         <source>request failed, Server response: %1 %2</source>
-        <translation type="unfinished">la requête a échouée, Réponse du serveur: %1 %2</translation>
+        <translation>la requête a échouée, Réponse du serveur: %1 %2</translation>
     </message>
     <message>
         <location filename="../SportPlusHealthUploader.cpp" line="211"/>
         <source>failed to upload file (cod. %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Echec lors du téléchargement du fichier (cod. %1)</translation>
     </message>
     <message>
         <location filename="../SportPlusHealthUploader.cpp" line="220"/>
         <source>successfully uploaded to SportPlusHealth</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoyer avec succès vers SportPlusHealth</translation>
     </message>
 </context>
 <context>
@@ -25678,7 +25683,7 @@ Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&
     <message>
         <location filename="../SrmDevice.cpp" line="180"/>
         <source>unsupported SRM Protocol version: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette version de potocole SRM n&apos;est pas supportée : %1</translation>
     </message>
     <message>
         <location filename="../SrmDevice.cpp" line="185"/>
@@ -26385,17 +26390,17 @@ Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&
     <message>
         <location filename="../VDOT.cpp" line="104"/>
         <source>TPace</source>
-        <translation type="unfinished"></translation>
+        <translation>TPace</translation>
     </message>
     <message>
         <location filename="../VDOT.cpp" line="106"/>
         <source>min/km</source>
-        <translation type="unfinished">min/km</translation>
+        <translation>min/km</translation>
     </message>
     <message>
         <location filename="../VDOT.cpp" line="107"/>
         <source>min/mile</source>
-        <translation type="unfinished">min/mile</translation>
+        <translation>min/mile</translation>
     </message>
 </context>
 <context>
@@ -26868,18 +26873,18 @@ Choisir Annuler pour sortir.</translation>
         <location filename="../TrainDB.cpp" line="491"/>
         <location filename="../TrainDB.cpp" line="512"/>
         <source>Manual Erg Mode</source>
-        <translation type="unfinished">Mode Erg manuel</translation>
+        <translation>Mode Erg manuel</translation>
     </message>
     <message>
         <location filename="../TrainDB.cpp" line="495"/>
         <location filename="../TrainDB.cpp" line="516"/>
         <source>Manual Slope Mode</source>
-        <translation type="unfinished">Mode pente en manuel</translation>
+        <translation>Mode pente en manuel</translation>
     </message>
     <message>
         <location filename="../TrainDB.cpp" line="534"/>
         <source>None</source>
-        <translation type="unfinished">Aucun</translation>
+        <translation>Aucun</translation>
     </message>
     <message>
         <source> Manual Erg Mode</source>
@@ -26923,7 +26928,7 @@ Choisir Annuler pour sortir.</translation>
     <message>
         <location filename="../TrainSidebar.cpp" line="397"/>
         <source>VideoSync</source>
-        <translation type="unfinished"></translation>
+        <translation>VideoSync</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="523"/>
@@ -26948,64 +26953,64 @@ Choisir Annuler pour sortir.</translation>
     <message>
         <location filename="../TrainSidebar.cpp" line="549"/>
         <source>Delete selected Workout</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer l&apos;entrainement sélectionné</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="552"/>
         <source>Delete %1 selected Workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer ler %1 entrainements sélectionnés</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="588"/>
         <source>Remove reference to selected video</source>
-        <translation type="unfinished"></translation>
+        <translation>Retirer les références sur la vidéo sélectionnée</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="603"/>
         <source>Import VideoSync from File</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer un VideoSync</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="604"/>
         <source>Scan for VideoSyncs</source>
-        <translation type="unfinished"></translation>
+        <translation>Balayer à la recherche de VideoSyncs</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="617"/>
         <source>Delete selected VideoSync</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer la VideoSync sélectionnée</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="839"/>
         <source>Are you sure you want to remove the reference to this video?</source>
-        <translation type="unfinished"></translation>
+        <translation>Etes-vous sûr de vouloir retirer les références à cette vidéo?</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="841"/>
         <location filename="../TrainSidebar.cpp" line="903"/>
         <location filename="../TrainSidebar.cpp" line="979"/>
         <source>Remove</source>
-        <translation type="unfinished">Retirer</translation>
+        <translation>Retirer</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="874"/>
         <source>Are you sure you want to delete this VideoSync?</source>
-        <translation type="unfinished"></translation>
+        <translation>Etes-vous sûr de vouloir effacer cette VideoSync?</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="901"/>
         <source>The VideoSync file is either not valid or not existing and will be removed from the library.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette VideoSync n&apos;existe plus ou n&apos;est pas valide elle sera supprimée de la bibliothèque.</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="935"/>
         <source>Are you sure you want to delete this Workout?</source>
-        <translation type="unfinished">Etes vous sur de vouloir supprimer cet entraînement?</translation>
+        <translation>Etes-vous sur de vouloir supprimer cet entraînement?</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="938"/>
         <source>Are you sure you want to delete this %1 workouts?</source>
-        <translation type="unfinished"></translation>
+        <translation>Etes-vous sûr de vouloir supprimer ces %1 entraînements?</translation>
     </message>
     <message>
         <location filename="../TrainSidebar.cpp" line="977"/>
@@ -27642,7 +27647,7 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../VDOTCalculator.cpp" line="71"/>
         <source>VDOT and T-Pace Calculator</source>
-        <translation type="unfinished">Calculateur VODT et T-Pace</translation>
+        <translation>Calculateur VODT et T-Pace</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="89"/>
@@ -27674,17 +27679,17 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../VDOTCalculator.cpp" line="83"/>
         <source>Your Test Race:</source>
-        <translation type="unfinished"></translation>
+        <translation>Votre course de test:</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="136"/>
         <source>Your Daniels VDOT:</source>
-        <translation type="unfinished">Votre VODT Daniels :</translation>
+        <translation>Votre VODT Daniels :</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="149"/>
         <source>Your Training Paces:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vos allures d&apos;entrainement:</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="154"/>
@@ -27714,42 +27719,42 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../VDOTCalculator.cpp" line="158"/>
         <source>200</source>
-        <translation type="unfinished">3D {200?}</translation>
+        <translation>200</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="158"/>
         <source>400</source>
-        <translation type="unfinished">3D {400?}</translation>
+        <translation>400</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="158"/>
         <source>1000</source>
-        <translation type="unfinished">3D {1000?}</translation>
+        <translation>1000</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="158"/>
         <source>mile</source>
-        <translation type="unfinished"></translation>
+        <translation>mile</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="177"/>
         <source>Your Target Race:</source>
-        <translation type="unfinished"></translation>
+        <translation>Votre objectif de course:</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="198"/>
         <source>Equivalent Time:</source>
-        <translation type="unfinished">Temps équivalent</translation>
+        <translation>Temps équivalent:</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="211"/>
         <source>Calculate</source>
-        <translation type="unfinished">Calculer</translation>
+        <translation>Calculer</translation>
     </message>
     <message>
         <location filename="../VDOTCalculator.cpp" line="215"/>
         <source>Done</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -27859,32 +27864,32 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../VideoWindow.cpp" line="297"/>
         <source> kph</source>
-        <translation type="unfinished"> km/h</translation>
+        <translation> km/h</translation>
     </message>
     <message>
         <location filename="../VideoWindow.cpp" line="312"/>
         <source> bpm</source>
-        <translation type="unfinished"></translation>
+        <translation> puls</translation>
     </message>
     <message>
         <location filename="../VideoWindow.cpp" line="323"/>
         <source>Calibration required</source>
-        <translation type="unfinished"></translation>
+        <translation>Calibration requise</translation>
     </message>
     <message>
         <location filename="../VideoWindow.cpp" line="328"/>
         <source>Configuration required</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration requise</translation>
     </message>
     <message>
         <location filename="../VideoWindow.cpp" line="333"/>
         <source>brake fault</source>
-        <translation type="unfinished"></translation>
+        <translation>Faute sur le frein</translation>
     </message>
     <message>
         <location filename="../VideoWindow.cpp" line="338"/>
         <source>Ready</source>
-        <translation type="unfinished"></translation>
+        <translation>Prêt</translation>
     </message>
 </context>
 <context>
@@ -27939,7 +27944,7 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
         <location filename="../WPrime.cpp" line="1051"/>
         <location filename="../WPrime.cpp" line="1052"/>
         <source>seconds</source>
-        <translation type="unfinished">secondes</translation>
+        <translation>secondes</translation>
     </message>
 </context>
 <context>
@@ -27947,13 +27952,13 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../WPrime.cpp" line="1121"/>
         <source>W1 Above CP W&apos;bal Low Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>W1 au dessus de CP W&apos;bal Fatigue légère</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="1122"/>
         <location filename="../WPrime.cpp" line="1123"/>
         <source>seconds</source>
-        <translation type="unfinished">secondes</translation>
+        <translation>secondes</translation>
     </message>
 </context>
 <context>
@@ -27961,13 +27966,13 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../WPrime.cpp" line="1139"/>
         <source>W2 Above CP W&apos;bal Moderate Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>W2 au dessus de CP W&apos;bal fatigue modérée</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="1140"/>
         <location filename="../WPrime.cpp" line="1141"/>
         <source>seconds</source>
-        <translation type="unfinished">secondes</translation>
+        <translation>secondes</translation>
     </message>
 </context>
 <context>
@@ -27975,13 +27980,13 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../WPrime.cpp" line="1157"/>
         <source>W3 Above CP W&apos;bal Heavy Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>W3 au dessus de CP W&apos;bal fatigue importante</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="1158"/>
         <location filename="../WPrime.cpp" line="1159"/>
         <source>seconds</source>
-        <translation type="unfinished">secondes</translation>
+        <translation>secondes</translation>
     </message>
 </context>
 <context>
@@ -27989,13 +27994,13 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../WPrime.cpp" line="1175"/>
         <source>W4 W&apos;bal Severe Fatigue</source>
-        <translation type="unfinished">W4 W&apos;bal fatigue sévère</translation>
+        <translation>W4 W&apos;bal fatigue sévère</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="1176"/>
         <location filename="../WPrime.cpp" line="1177"/>
         <source>seconds</source>
-        <translation type="unfinished">secondes</translation>
+        <translation>secondes</translation>
     </message>
 </context>
 <context>
@@ -28091,7 +28096,7 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../WPrime.cpp" line="578"/>
         <source>&lt;td align=&quot;center&quot;&gt;Work (kJ)&lt;/td&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Travail (kJ)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="579"/>
@@ -28107,7 +28112,7 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../WPrime.cpp" line="581"/>
         <source>&lt;td align=&quot;center&quot;&gt;Above CP Time&lt;/td&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Temps auu dessus CP&lt;/td&gt;</translation>
     </message>
 </context>
 <context>
@@ -28217,7 +28222,7 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
         <location filename="../WPrime.cpp" line="1193"/>
         <location filename="../WPrime.cpp" line="1194"/>
         <source>kJ</source>
-        <translation type="unfinished">kJ</translation>
+        <translation>kJ</translation>
     </message>
 </context>
 <context>
@@ -28225,13 +28230,13 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../WPrime.cpp" line="1254"/>
         <source>W1 W&apos;bal Work Low Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>W1 W&apos;bal Travail fatigue légère</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="1255"/>
         <location filename="../WPrime.cpp" line="1256"/>
         <source>kJ</source>
-        <translation type="unfinished">kJ</translation>
+        <translation>kJ</translation>
     </message>
 </context>
 <context>
@@ -28239,13 +28244,13 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../WPrime.cpp" line="1272"/>
         <source>W2 W&apos;bal Work Moderate Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>W2 W&apos;bal Travail fatigue modérée</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="1273"/>
         <location filename="../WPrime.cpp" line="1274"/>
         <source>kJ</source>
-        <translation type="unfinished">kJ</translation>
+        <translation>kJ</translation>
     </message>
 </context>
 <context>
@@ -28253,13 +28258,13 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../WPrime.cpp" line="1290"/>
         <source>W3 W&apos;bal Work Heavy Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>W3 W&apos;bal Travail fatigue importante</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="1291"/>
         <location filename="../WPrime.cpp" line="1292"/>
         <source>kJ</source>
-        <translation type="unfinished">kJ</translation>
+        <translation>kJ</translation>
     </message>
 </context>
 <context>
@@ -28267,13 +28272,13 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../WPrime.cpp" line="1308"/>
         <source>W4 W&apos;bal Work Severe Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>W4 W&apos;bal Travail fatigue sévère</translation>
     </message>
     <message>
         <location filename="../WPrime.cpp" line="1309"/>
         <location filename="../WPrime.cpp" line="1310"/>
         <source>kJ</source>
-        <translation type="unfinished">kJ</translation>
+        <translation>kJ</translation>
     </message>
 </context>
 <context>
@@ -28406,8 +28411,8 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
         <source>Please note, that when importing or drag and dropping videos into the library we DO NOT copy the file into the GoldenCheetah library, instead we add a REFERENCE to it. We DO copy workout and videoSync files, since they are smaller.
 
 You can remove references when managing the library via the context menu options</source>
-        <translation type="unfinished">Veuillez noter que lors de l&amp;import ou glisser-déposer de vidéos dans la bibliothèque nous NE copions PAS les fichiers dans la bibliothèque de GoldenCheetah, mais nous créons un lien vers celui-ci. Nous copions les fichiers de synchronisation car ils sont plus petits.
-        
+        <translation>Veuillez noter que lors de l&amp;import ou glisser-déposer de vidéos dans la bibliothèque nous NE copions PAS les fichiers dans la bibliothèque de GoldenCheetah, mais nous créons un lien vers celui-ci. Nous copions les fichiers de synchronisation car ils sont plus petits.
+
 Vous pouvez supprimez ces liens lorsque vous gérez votre bibliothèque par l&apos;intermédaire du menu contextuel d&amp;option</translation>
     </message>
     <message>
