@@ -61,7 +61,7 @@
 // 3902 - V3.3 RC1
 // 3903 - V3.3 RC2
 // 3904 - V3.3 RC3
-// 3910 - V3.3 RELEASE (November 29 2015)
+// 3933 - V3.3 RELEASE (November 29 2015)
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
