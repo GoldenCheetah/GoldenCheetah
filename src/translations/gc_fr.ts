@@ -10935,37 +10935,37 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="103"/>
         <source>Laps Editor allows to enter a sequence of work-rest intervals series -defined by number of repetitions (reps), distance (dist, units according to preferences in Pace Zones) and duration (min and sec)- to generate the data points for the activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Laps Editor permet d&apos;entrer une séquence de série d&apos;intervalles -définit par nombre de répétitions ( reps ) , la distance ( dist , unités selon les préférences des zones d&apos;allure ) et la durée (min et sec ) - pour générer les données pour l&apos;activité</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="116"/>
         <source>Sharing an activity with other trainingsites - only sites for which the authorization has been configured can be seleted for sharing here</source>
-        <translation type="unfinished"></translation>
+        <translation>Partage d&apos;une activité avec d&apos;autres sites d&apos;entraînement - seuls les sites pour lesquels l&apos;autorisation a été configurée peuvent être sélectionnés</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="108"/>
         <source>Wizard to split an activity into multiple activities based on configurable criteria</source>
-        <translation type="unfinished">Assistant pour scinder une activité en plusieurs selon des critères configurables</translation>
+        <translation>Assistant pour scinder une activité en plusieurs selon des critères configurables</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="113"/>
         <source>All functions related to sharing of activities with cloud services</source>
-        <translation type="unfinished"></translation>
+        <translation>Toutes les fonctions liées au partage des activités avec des services cloud</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="125"/>
         <source>Calculation of VDOT and Threshold Pace according to Daniels&apos; Running Formula</source>
-        <translation type="unfinished"></translation>
+        <translation>Calcul de VDOT et d&apos;allure au seuil selon formule de course de Daniels</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="134"/>
         <source>Creates an activity heat map using the selected activities and stores it in the choosen folder - &quot;HeatMap.htm&quot;. Opened in a Web-Browser the map shows where most activity took place.</source>
-        <translation type="unfinished"></translation>
+        <translation>Crée une carte thermique des activités et l&apos;enregistre dans le dossier choisi - &quot; HeatMap.htm &quot; . Ouvert dans un navigateur web la carte montre où la plupart des activités a eu lieu.</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="137"/>
         <source>Wizards which fix, adjust, add series data of the current activity</source>
-        <translation type="unfinished">Assistants de correction et d&apos;ajustement des valeurs de l&apos;activité courante</translation>
+        <translation>Assistants de correction et d&apos;ajustement des valeurs de l&apos;activité courante</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="139"/>
@@ -11035,17 +11035,17 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="167"/>
         <source>Options to show/hide views (e.g. Sidebar) as well as adding charts and resetting chart layouts to factory settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Options pour afficher/masquer des vues (par exemple barre latérale) ainsi que l&apos;ajout de graphiques ou la réinitialisation aux réglages d&apos;usine</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="169"/>
         <source>Help options of GoldenCheetah</source>
-        <translation type="unfinished"></translation>
+        <translation>Options d&apos;aide de GoldenCheetah</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="173"/>
         <source>Full configurable chart type to track performance and trends for metrics, user-definable best durations and model estimates</source>
-        <translation type="unfinished"></translation>
+        <translation>Graphique configurable pour suivre l&apos;évolution des performances ou les métriques, les meilleures performances sur des durées définissables par l&apos;utilisateur et les estimations à l&apos;aide de modèle</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="175"/>
@@ -11070,43 +11070,43 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="183"/>
         <source>User defined formulas</source>
-        <translation type="unfinished"></translation>
+        <translation>Formule de l&apos;utilisateur</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="186"/>
         <source>Tree map visulation of activity data by two selectable dimensions for a configurable metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Visulation des données d&apos;activité sous forme de Treemap en deux dimensions pour des métriques sélectionnés</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="195"/>
         <location filename="../HelpWhatsThis.cpp" line="224"/>
         <source>Distribution of activity data samples or metrics according time spent in a certain segment</source>
-        <translation type="unfinished"></translation>
+        <translation>Distribution des données ou métriques selon le temps passé dans certain segment</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="203"/>
         <source>Detailed information of a single activity - the metrics shown here are configurable</source>
-        <translation type="unfinished"></translation>
+        <translation>Informations détaillées d&apos;une seule activité - les indicateurs présentés ici sont configurables</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="207"/>
         <source>Editor for activity file data - allowing to change/correct data, find entries and find anomalies</source>
-        <translation type="unfinished"></translation>
+        <translation>Editeur de données d&apos;activité - permettant de modifier/corriger les données, trouver des entrées et de trouver des anomalies</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="210"/>
         <source>Plot of all activity data series in various ways</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche les données des activités de diverses manières</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="214"/>
         <source>Selection of all additional curves to be shown in the diagram - plotted only in case data is available in the activity file</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélection des courbes a afficher sur le graphique - pour les données disponibles dans le fichier d&apos;activité</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="228"/>
         <source>Analysis of heartrate vs. power along the activity data</source>
-        <translation type="unfinished"></translation>
+        <translation>Analyse de la fréquence cardiaque par rapport à la puissance durant l&apos;activité</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="230"/>
@@ -11116,7 +11116,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="232"/>
         <source>Configurable 2D scatter plot of the current activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuage de points 2D configurable pour l&apos;activité courante</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="234"/>
@@ -11126,12 +11126,12 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="245"/>
         <source>Predefined and configurable set of data ranges for selection of activities to be analysed</source>
-        <translation type="unfinished"></translation>
+        <translation>Plages de données, prédéfinies ou configurable, pour la sélection des activités à analyser</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="251"/>
         <source>Powerful filter and search engine to determine the activities which are considered in diagram</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtre et moteur de recherche afin de déterminer les activités utilisées dans les diagrammes</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="257"/>
@@ -11141,7 +11141,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="267"/>
         <source>Entry field for sophisticated Searching and Filtering of activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Champ de saisie pour la recherche et filtrage des activités</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="269"/>
@@ -11151,7 +11151,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="291"/>
         <source>Automatic Interval Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Détection automatique d&apos;intervalles</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="297"/>
@@ -11162,24 +11162,24 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../HelpWhatsThis.cpp" line="189"/>
         <location filename="../HelpWhatsThis.cpp" line="217"/>
         <source>Critical Mean Maximal Power Curve</source>
-        <translation type="unfinished"></translation>
+        <translation>Courbe des maximaux moyens de puissance</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="191"/>
         <location filename="../HelpWhatsThis.cpp" line="219"/>
         <source>Basic configuration like date range, what series to use and how to plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration de base , comme la plage de dates ou quelle série utiliser et tracer</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="193"/>
         <location filename="../HelpWhatsThis.cpp" line="221"/>
         <source>Configuration of the CP Model to be used to plot the curve</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration du modèle de CP à afficher</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="197"/>
         <source>Definition which date range is used for this particular chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Définition des plages de dates à utiliser pour ce tableau en particulier</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="199"/>
@@ -11191,53 +11191,53 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="201"/>
         <source>Configurable activity log - with build in search capabilities</source>
-        <translation type="unfinished"></translation>
+        <translation>Journal d&apos;activité configurable - avec recherche intégrée</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="212"/>
         <source>Selection how the power data series is shown in the plot and general settings on the diagram structure</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélection comment la série de données de puissance est affichée</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="226"/>
         <source>Quadrant analysis of pedal velocity vs. effective pedal force</source>
-        <translation type="unfinished"></translation>
+        <translation>Analyse par cadrant de la vitesse de la pédale vs force effective sur la pédale</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="236"/>
         <source>Chung&apos;s Aerolab analysis</source>
-        <translation type="unfinished"></translation>
+        <translation>Analyse Aerolab/Chung</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="239"/>
         <source>Overview/summary of the selected data range - data shown in &apos;Athlete&apos;s Best&apos; are configurable</source>
-        <translation type="unfinished"></translation>
+        <translation>Vue d&apos;ensemble/résumé de la plage de données sélectionnée - les données présentées dans &apos;Meilleurs&apos; sont configurables</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="241"/>
         <source>Chart specific filter/search and date range settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres spécifiques  pour la recherche/filtrage et plages de date</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="247"/>
         <source>Definition of points in time &apos;Events&apos; which are marked explicitely on time related diagrams</source>
-        <translation type="unfinished"></translation>
+        <translation>Définition de dates d&apos;«événements» qui seront affichées explicitement sur ​​les diagrammes en rapport avec le temps</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="249"/>
         <location filename="../HelpWhatsThis.cpp" line="263"/>
         <source>Simple summary view</source>
-        <translation type="unfinished"></translation>
+        <translation>Vue résumé simple</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="253"/>
         <source>Alternative access to the charts created for the main view</source>
-        <translation type="unfinished"></translation>
+        <translation>Accès alternatif aux diagrammes créés pour la vue principale</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="259"/>
         <source>Display the available and add new intervals using simple query methods</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher la disposition et ajouter de nouveaux intervalles en utilisant des méthodes de requêtes simples</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="273"/>
@@ -11253,17 +11253,17 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="279"/>
         <source>Training Zone definition for power</source>
-        <translation type="unfinished"></translation>
+        <translation>Définition des zones d&apos;entraînement pour la puissance</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="281"/>
         <source>Training Zone definition for heartrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Définition des zones d&apos;entraînement pour les pulsations</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="283"/>
         <source>Training Zone definition for Swim and Run</source>
-        <translation type="unfinished"></translation>
+        <translation>Définition des zones d&apos;entraînement pour la natation et la course</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="285"/>
@@ -11289,32 +11289,32 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HelpWhatsThis.cpp" line="299"/>
         <source>Definition of default value(s) for data fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Dénition des valeurs par défaut pour les champs de données</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="301"/>
         <source>Definition of processing default parameters for the fix, adjust,... tools</source>
-        <translation type="unfinished"></translation>
+        <translation>Dénition des paramètres pour les processus automatiques des outils d&apos;ajustement et correction</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="303"/>
         <source>Metrics</source>
-        <translation type="unfinished">Métriques</translation>
+        <translation>Métriques</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="305"/>
         <source>Metrics shown in &apos;Bests&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Données métriques des &apos;Meilleurs&apos;</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="307"/>
         <source>Metrics shown in &apos;Summary&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Données métriques du résumé</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="309"/>
         <source>Metrics shown in &apos;Intervals&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Données métriques des &apos;Intervalles&apos;</translation>
     </message>
     <message>
         <location filename="../HelpWhatsThis.cpp" line="311"/>
