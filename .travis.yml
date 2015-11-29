@@ -106,12 +106,13 @@ after_success:
 - cd /Volumes/GoldenCheetah
 - ls -laR GoldenCheetah.app
 - GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
-before_deploy:
-- gem install mime-types -v 2.6.2
-deploy:
-  provider: releases
-  api_key: $GH_OAUTH_TOKEN
-  file: GoldenCheetah_$QT.dmg
-  skip_cleanup: true
-  on:
-    tags: true
+##deploy broken in travis, read-only filesystem error
+##before_deploy:
+##- gem install mime-types -v 2.6.2
+##deploy:
+##  provider: releases
+##  api_key: $GH_OAUTH_TOKEN
+##  file: GoldenCheetah_$QT.dmg
+##  skip_cleanup: true
+##  on:
+##    tags: true
