@@ -27,6 +27,7 @@
 
 class MonarkController : public RealtimeController
 {
+    Q_DECLARE_TR_FUNCTIONS(MonarkController)
 
 public:
     MonarkController (TrainSidebar *, DeviceConfiguration *);
