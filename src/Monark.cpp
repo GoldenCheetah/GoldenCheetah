@@ -107,7 +107,8 @@ bool Monark::discover(QString portName)
 
         // Should check for all bike ids known to use this protocol
         if (QString(id).toLower().contains("lt") ||
-            QString(id).toLower().contains("lc")) {
+            QString(id).toLower().contains("lc") ||
+            QString(id).toLower().contains("novo")) {
             found = true;
         }
     }
