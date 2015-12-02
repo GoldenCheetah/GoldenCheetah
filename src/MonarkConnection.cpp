@@ -187,6 +187,8 @@ void MonarkConnection::requestCadence()
 
 void MonarkConnection::identifyModel()
 {
+    QString servo = "";
+
     m_serial->write("id\r");
     if (!m_serial->waitForBytesWritten(500))
     {
@@ -196,13 +198,31 @@ void MonarkConnection::identifyModel()
     QByteArray data = readAnswer(500);
     m_id = QString(data);
 
+    if (m_id.toLower().startsWith("novo"))
+    {
+        m_serial->write("servo\r");
+        if (!m_serial->waitForBytesWritten(500))
+        {
+            // failure to write to device, bail out
+            this->exit(-1);
+        }
+        QByteArray data = readAnswer(500);
+        servo = QString(data);
+    }
+
+
     qDebug() << "Connected to bike: " << m_id;
+    qDebug() << "Servo: : " << servo;
 
     if (m_id.toLower().startsWith("lc"))
     {
         m_canControlPower = true;
         setLoad(100);
+    } else if (m_id.toLower().startsWith("novo") && servo != "manual") {
+        m_canControlPower = true;
+        setLoad(100);
     }
+
 }
 
 void MonarkConnection::setLoad(unsigned int load)
