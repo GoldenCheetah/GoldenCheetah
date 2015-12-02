@@ -696,6 +696,33 @@ struct FitFileReaderState
                         printf("Found segment name: %s\n", segment_name.toStdString().c_str());
                     }
                     break;
+
+                // other data (ignored at present):
+                case 254: // lap nbr
+                case 3: // start_position_lat
+                case 4: // start_position_lon
+                case 5: // end_position_lat
+                case 6: // end_position_lon
+                case 8: // total_timer_time
+                case 10: // total_cycles
+                case 11: // total calories
+                case 12: // total fat calories
+                case 13: // avg_speed
+                case 14: // max_speed
+                case 15: // avg HR (bpm)
+                case 16: // Max HR
+                case 17: // AvCad
+                case 18: // MaxCad
+                case 21: // total ascent
+                case 22: // total descent
+                case 27: // north-east lat (bounding box)
+                case 28: // north-east lon
+                // FIXME : since commit ca38fff25114c673e515925cf40e1a662bda711b
+                //   segment name extracted from message SEGMENT_TYPE using "decodeLap"
+                //   which normally parses message LAP_TYPE which structure is different!
+                // case 29: // south west lat
+                case 30: // south west lon
+                    break;
                 default:
                     continue; // ignore it
             }
@@ -851,7 +878,7 @@ struct FitFileReaderState
                 case 57: // SMO2
                         smO2= value/10.0f;
                         break;
-                case 61: // ? GPS Altitude ?
+                case 61: // ? GPS Altitude ? or atmospheric pressure ?
                         break;
                 case 66: // ??
                         break;
