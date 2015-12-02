@@ -510,6 +510,26 @@ struct FitFileReaderState
             if( value == NA_VALUE )
                 continue;
 
+            switch (field.num) {
+
+                // all fields are ignored at present
+                case 253: //timestamp
+                case 3:   // serial number
+                case 2:   // manufacturer
+                case 4:   // product
+                case 5:   // software version
+                case 10:  // battery voltage
+                case 0:   // device index
+                case 1:   // ANT+ device type
+                          // details: 0x78 = HRM, 0x79 = Spd&Cad, 0x7A = Cad, 0x7B = Speed
+                case 6:   // hardware version
+                case 11:  // battery status
+                case 22:  // ANT network
+                case 25:  // source type
+                case 24:  // equipment ID
+                default: ; // do nothing
+            }
+
             if (FIT_DEBUG) {
                 printf("decodeDeviceInfo  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
             }
@@ -1117,6 +1137,7 @@ struct FitFileReaderState
             last_distance += deltaDist;
         }
     }
+
 
     int read_record(bool &stop, QStringList &errors) {
         stop = false;
