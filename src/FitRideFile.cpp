@@ -559,48 +559,93 @@ struct FitFileReaderState
                     event_type = value; break;
                 case 2: // data16 field
                     data16 = value; break;
+
+                // additional values (ignored at present):
+                case 3: //data
+                case 4: // event group
                 default: ; // do nothing
             }
         }
-        if (event == 0) { // Timer event
-            switch (event_type) {
-                case 0: // start
-                    stopped = false;
-                    break;
-                case 1: // stop
-                    stopped = true;
-                    break;
-                case 2: // consecutive_depreciated
-                case 3: // marker
-                    break;
-                case 4: // stop all
-                    stopped = true;
-                    break;
-                case 5: // begin_depreciated
-                case 6: // end_depreciated
-                case 7: // end_all_depreciated
-                case 8: // stop_disable
-                    stopped = true;
-                    break;
-                case 9: // stop_disable_all
-                    stopped = true;
-                    break;
-                default:
-                    errors << QString("Unknown timer event type %1").arg(event_type);
-            }
-        }
-        else if (event == 36) { // Calibration event
-            int secs = (start_time==0?0:time-start_time);
-            switch (event_type) {
-                case 3: // marker
-                    ++calibration;
-                    rideFile->addCalibration(secs, data16, QString("Calibration %1 (%2)").arg(calibration).arg(data16));
-                    //qDebug() << "marker" << secs << data16;
-                    break;
-                default:
-                    errors << QString("Unknown calibration event type %1").arg(event_type);
-                    break;
-            }
+
+        switch (event) {
+            case 0: // Timer event
+                {
+                    switch (event_type) {
+                        case 0: // start
+                            stopped = false;
+                            break;
+                        case 1: // stop
+                            stopped = true;
+                            break;
+                        case 2: // consecutive_depreciated
+                        case 3: // marker
+                            break;
+                        case 4: // stop all
+                            stopped = true;
+                            break;
+                        case 5: // begin_depreciated
+                        case 6: // end_depreciated
+                        case 7: // end_all_depreciated
+                        case 8: // stop_disable
+                            stopped = true;
+                            break;
+                        case 9: // stop_disable_all
+                            stopped = true;
+                            break;
+                        default:
+                            errors << QString("Unknown timer event type %1").arg(event_type);
+                    }
+                }
+                break;
+
+            case 36: // Calibration event
+                {
+                    int secs = (start_time==0?0:time-start_time);
+                    switch (event_type) {
+                        case 3: // marker
+                            ++calibration;
+                            rideFile->addCalibration(secs, data16, QString("Calibration %1 (%2)").arg(calibration).arg(data16));
+                            //qDebug() << "marker" << secs << data16;
+                            break;
+                        default:
+                            errors << QString("Unknown calibration event type %1").arg(event_type);
+                            break;
+                    }
+                }
+                break;
+
+            case 3: /* workout */
+            case 4: /* workout_step */
+            case 5: /* power_down */
+            case 6: /* power_up */
+            case 7: /* off_course */
+            case 8: /* session */
+            case 9: /* lap */
+            case 10: /* course_point */
+            case 11: /* battery */
+            case 12: /* virtual_partner_pace */
+            case 13: /* hr_high_alert */
+            case 14: /* hr_low_alert */
+            case 15: /* speed_high_alert */
+            case 16: /* speed_low_alert */
+            case 17: /* cad_high_alert */
+            case 18: /* cad_low_alert */
+            case 19: /* power_high_alert */
+            case 20: /* power_low_alert */
+            case 21: /* recovery_hr */
+            case 22: /* battery_low */
+            case 23: /* time_duration_alert */
+            case 24: /* distance_duration_alert */
+            case 25: /* calorie_duration_alert */
+            case 26: /* activity */
+            case 27: /* fitness_equipment */
+            case 28: /* length */
+            case 32: /* user_marker */
+            case 33: /* sport_point */
+            case 42: /* front_gear_change */
+            case 43: /* rear_gear_change */
+
+            default: ;
         }
 
         if (FIT_DEBUG) {
@@ -1137,6 +1182,21 @@ struct FitFileReaderState
             last_distance += deltaDist;
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     int read_record(bool &stop, QStringList &errors) {
