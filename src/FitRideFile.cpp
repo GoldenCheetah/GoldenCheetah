@@ -1225,21 +1225,48 @@ struct FitFileReaderState
         }
     }
 
+    /* weather broadcast as observed at weather station (undocumented) */
+    void decodeWeather(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+        Q_UNUSED(time_offset);
+        int i = 0;
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
 
+            if( value == NA_VALUE )
+                continue;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+            switch (field.num) {
+                case 253: // Timestamp
+                          // ignored
+                          break;
+                case 8:   // Weather station name
+                          // ignored
+                        break;
+                case 9:   // Weather observation timestamp
+                          // ignored
+                        break;
+                case 10: // Weather station latitude
+                         // ignored
+                        break;
+                case 11: // Weather station longitude
+                         // ignored
+                        break;
+                case 3:  // Wind heading (0deg=North)
+                        rideFile->setWindHeading(value / 180.0 * MATHCONST_PI);
+                        break;
+                case 4:  // Wind speed (mm/s)
+                        rideFile->setWindSpeed(value * 0.0036);
+                        break;
+                case 1:  // Temperature
+                         // ignored
+                        break;
+                case 7:  // Humidity
+                         // ignored at present
+                        break;
+                default: ; // ignore it
+            }
+        }
+    }
 
     int read_record(bool &stop, QStringList &errors) {
         stop = false;
