@@ -1268,6 +1268,30 @@ struct FitFileReaderState
         }
     }
 
+    void decodeDeviceSettings(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+        Q_UNUSED(time_offset);
+        int i = 0;
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+            if( value == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 0:  // Active timezone
+                         // ignored
+                        break;
+                case 1:  // UTC offset
+                         // ignored
+                        break;
+                case 5:  // timezone offset
+                         // ignored
+                        break;
+                default: ; // ignore it
+            }
+        }
+    }
+
     int read_record(bool &stop, QStringList &errors) {
         stop = false;
         int count = 0;
