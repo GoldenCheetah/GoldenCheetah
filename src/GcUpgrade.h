@@ -62,6 +62,7 @@
 // 3903 - V3.3 RC2
 // 3904 - V3.3 RC3
 // 3933 - V3.3 RELEASE (November 29 2015)
+// 3940 - V4.0 DEVELOPMENT STARTS
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -70,13 +71,14 @@
 #define VERSION311_BUILD  3101 // first build with 3.1 upgrade process
 #define VERSION32_BUILD   3200 // released
 #define VERSION33_BUILD   3933 // development release
+#define VERSION40_BUILD   3940 // development release
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // these three will change until we release
-#define VERSION_LATEST 3933
-#define VERSION_STRING "V3.3"
+#define VERSION_LATEST 3940
+#define VERSION_STRING "V4.0 DEV"
 
 // default config for this release is available and maintained here:
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.3"
