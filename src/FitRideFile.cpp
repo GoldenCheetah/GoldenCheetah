@@ -1648,6 +1648,8 @@ struct FitFileReaderState
         // start
         rideFile = new RideFile;
         rideFile->setDeviceType("Garmin FIT");
+        rideFile->setWindHeading(0.0);
+        rideFile->setWindSpeed(0.0);
         rideFile->setRecIntSecs(1.0); // this is a terrible assumption!
         if (!file.open(QIODevice::ReadOnly)) {
             delete rideFile;
