@@ -357,12 +357,14 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     if ( m_Width!=0 && (maxY-minY) / 0.05 < (double)m_Height * 0.80 * (maxX-minX) / (double)m_Width)
         maxY = minY + (double)m_Height * 0.80 * (maxX-minX) / (double)m_Width * 0.05;
     double bubbleSize = (double)m_Height*0.10f;
+    double cyclistCircleSize = (double)m_Height*0.05f;
     minY -= (maxY-minY) * 0.20f; // add 20% as bottom headroom (slope gradient will be shown there in a bubble)
     double cyclistX = (this->Value * 1000.0 - minX) * (double)m_Width / (maxX-minX);
+    double cyclistY = 0.0;
 
     QPolygon polygon;
     polygon << QPoint(0.0, (double)m_Height);
-    double x, y, pt=0;
+    double x, prevX, y, prevY, pt=0;
     double nextX = 1;
     for( pt=0; pt < context->currentErgFile()->Points.size(); pt++)
     {
@@ -370,10 +372,18 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
         {
             x = (context->currentErgFile()->Points[pt].x - minX) * (double)m_Width / (maxX-minX);
             y = (context->currentErgFile()->Points[pt].y - minY) * (double)m_Height / (maxY-minY);
+            if (pt==0)
+            {
+                prevX = x; prevY = y;
+                cyclistY = (double)m_Height - y;
+            }
+            if (prevX < cyclistX && cyclistX <= x)
+                 cyclistY = (double)m_Height - (prevY + ((x-prevX) !=0 ? (y-prevY) / (x-prevX) * (cyclistX-prevX) : 0) );
         }
         // FIXME : we should not have twice pt++
         polygon << QPoint(x, (double)m_Height - y);
         nextX = floor(x) + 1.0;
+        prevX=x; prevY=y;
     }
     polygon << QPoint((double) m_Width, (double)m_Height);
     polygon << QPoint(fmin((double) m_Width,cyclistX+bubbleSize), (double)m_Height);
@@ -388,7 +398,8 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     m_OutlinePen.setWidth(1);
     m_OutlinePen.setStyle(Qt::SolidLine);
     painter.setPen(m_OutlinePen);
-    painter.drawLine(cyclistX, 0.0, cyclistX, (double)m_Height-bubbleSize);
+    painter.drawLine(cyclistX, cyclistY+cyclistCircleSize/2.0, cyclistX, (double)m_Height-bubbleSize);
+    painter.drawEllipse(QPointF(cyclistX, cyclistY), (qreal) (cyclistCircleSize/2.0), (qreal) (cyclistCircleSize/2.0));
 
     // TODO : indicate slope in the bottom 10% of the widget, under position mark
 }
