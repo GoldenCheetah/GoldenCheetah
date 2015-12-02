@@ -268,6 +268,16 @@ struct FitFileReaderState
             switch (field.num) {
                 case 1: manu = value; break;
                 case 2: prod = value; break;
+
+                // other are ignored at present:
+                case 0: // file type:
+                    // 4:  activity log
+                    // 6:  Itinary
+                    // 34: segment
+                    break;
+                case 3: //serial number
+                case 4: //timestamp
+                case 5: //number
                 default: ; // do nothing
             }
         }
