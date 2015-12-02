@@ -1547,48 +1547,87 @@ struct FitFileReaderState
             // shows up as manufacturer #65535, even though it should be #7.
             switch (def.global_msg_num) {
                 case 0:  decodeFileId(def, time_offset, values); break;
-                case LAP_TYPE:
+                case 18: decodeSession(def, time_offset, values); break; /* session */
+                case LAP_TYPE: // #19
                     decodeLap(def, time_offset, values);
                     break;
-                case RECORD_TYPE: decodeRecord(def, time_offset, values); break;
-                case 21: decodeEvent(def, time_offset, values); break;
-
-
-                case 23: //decodeDeviceInfo(def, time_offset, values); break; /* device info */
+                case RECORD_TYPE: // #20
+                    decodeRecord(def, time_offset, values);
                     break;
-                case 18:
-                    decodeSession(def, time_offset, values);
-                    break; /* session */
+                case 21: decodeEvent(def, time_offset, values); break;
+                case 23: //decodeDeviceInfo(def, time_offset, values); /* device info */
+                    break;
                 case 101:
                     decodeLength(def, time_offset, values);
                     break; /* lap swimming */
+                case 128: decodeWeather(def, time_offset, values); break; /* weather broadcast */
 
-                case 2: /* DEVICE_SETTINGS */
+                case 1: /* capabilities, device settings and timezone */ break;
+                case 2: decodeDeviceSettings(def, time_offset, values); break;
                 case 3: /* USER_PROFILE */
-                case 7: /* ZONES_TARGET12 */
+                case 4: /* hrm profile */
+                case 5: /* sdm profile */
+                case 6: /* bike profile */
+                case 7: /* ZONES_TARGET field#1 = MaxHR (bpm) */
                 case 8: /* HR_ZONE */
                 case 9: /* POWER_ZONE */
+                case 10: /* MET_ZONE */
                 case 12: /* SPORT */
                 case 13: /* unknown */
-                case 22: /* undocumented */
-                case 72: /* undocumented  - new for garmin 800*/
+                case 15: /* goal */
+                case 22: /* source (undocumented) = sensors used for records ; see details below: */
+                         /* #253: timestamp  /  #0: SPD/DIST  /  #1: SPD/DIST  /  #2: cadence  /  #4: HRM  /  #5: HRM */
+                case 26: /* workout */
+                case 27: /* workout step */
+                case 28: /* schedule */
+                case 29: /* location */
+                case 30: /* weight scale */
+                case 31: /* course */
+                case 32: /* course point */
+                case 33: /* totals */
                 case 34: /* activity */
-                case 49: /* file creator */
-                case 79: /* unknown */
+                case 35: /* software */
+                case 37: /* file capabilities */
+                case 38: /* message capabilities */
+                case 39: /* field capabilities */
+                case 49: /* file creator, software version ; see details below: */
+                         /* #0: software version / #1: hardware version */
+                case 51: /* blood pressure */
+                case 53: /* speed zone */
+                case 55: /* monitoring */
+                case 72: /* training file (undocumented) : new since garmin 800 */
+                case 78: /* hrv */
+                case 79: /* HR zone (undocumented) ; see details below: */
+                         /* #253: timestamp / #1: default Min HR / #2: default Max HR / #5: user Min HR / #6: user Max HR */
+                case 103: /* monitoring info */
                 case 104: /* battery */
-                case 113: /* unknowHn */
+                case 105: /* pad */
+                case 106: /* salve device */
+                case 113: /* unknown */
+
                 case 125: /* unknown */
-                case 128: /* unknown */
+                case 131: /* cadence zone */
+
                 case 140: /* unknown */
                 case 141: /* unknown */
                     break;
-            case SEGMENT_TYPE:
+                case SEGMENT_TYPE: // #142
                     /* Segment which contains a name. Looks like a lap, 
                      * except there's a name in the data. 
                      */
+                    // FIXME : normally decodeLap should not be used for segment
                     decodeLap(def, time_offset, values);
                     break;
-            case 147: /* unknown */
+                // decodeSegment(def, time_offset, values); break; /* segment data */
+                case 145: /* memo glob */
+                case 147: /* equipment (undocumented) = sensors presets (sensor name, wheel circumference, etc.)  ; see details below: */
+                          /* #0: equipment ID / #2: equipment name / #10: default wheel circ. value / #21: user wheel circ. value / #254: local eqt idx */
+                case 148: /* segment description (undocumented) ; see details below: */
+                          /* #0: segment name */
+                case 149: /* segment reference cyclists (undocumented) ; see details below: */
+                          /* #1: who (0=leader, 1=user, 4=challenger)  / #3: timestamp / #4: time (s) / #254: idx */
+                case 150: /* segment trackpoint (undocumented) ; see details below: */
+                          /* #1: latitude / #2: longitude / #3: distance / #4: elevation / #5: timer (ms) / #6: index */
                     break;
 
                 default:
