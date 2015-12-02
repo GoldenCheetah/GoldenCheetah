@@ -1292,6 +1292,113 @@ struct FitFileReaderState
         }
     }
 
+    void decodeSegment(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+        Q_UNUSED(time_offset);
+        int i = 0;
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+            if( value == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 253: // Timestamp
+                          // ignored
+                          break;
+                case 2:   // seems to be a timestamp
+                          // ignored
+                          break;
+                case 3:  // start latitude
+                         // ignored
+                        break;
+                case 4:  // start longitude
+                         // ignored
+                        break;
+                case 5:  // end latitude
+                         // ignored
+                        break;
+                case 6:  // end longitude
+                         // ignored
+                        break;
+                case 7:  // personal best (ms) ? to be confirmed.
+                         // ignored
+                        break;
+                case 8:  // personal best (ms) ? to be confirmed.
+                         // ignored
+                        break;
+                case 9:  // leader best (ms) ? to be confirmed.
+                         // ignored
+                        break;
+                case 10: // personal rank ? to be confirmed
+                         // ignored
+                        break;
+                case 25:  // north-east latitude (bounding box)
+                         // ignored
+                        break;
+                case 26:  // north-east longitude
+                         // ignored
+                        break;
+                case 27:  // south-west latitude
+                         // ignored
+                        break;
+                case 28:  // south-west longitude
+                         // ignored
+                        break;
+                case 33:  /* undocumented, ignored */  break;
+                case 71:  /* undocumented, ignored */  break;
+                case 75:  /* undocumented, ignored */  break;
+                case 76:  /* undocumented, ignored */  break;
+                case 77:  /* undocumented, ignored */  break;
+                case 78:  /* undocumented, ignored */  break;
+                case 79:  /* undocumented, ignored */  break;
+                case 80:  /* undocumented, ignored */  break;
+                case 254:  /* undocumented, ignored */  break;
+                case 11:  /* undocumented, ignored */  break;
+                case 12:  /* undocumented, ignored */  break;
+                case 13:  /* undocumented, ignored */  break;
+                case 14:  /* undocumented, ignored */  break;
+                case 19:  /* undocumented, ignored */  break;
+                case 20:  /* undocumented, ignored */  break;
+                case 22:  /* undocumented, ignored */  break;
+                case 30:  /* undocumented, ignored */  break;
+                case 31:  /* undocumented, ignored */  break;
+                case 69:  /* undocumented, ignored */  break;
+                case 70:  /* undocumented, ignored */  break;
+                case 72:  /* undocumented, ignored */  break;
+                case 0:  /* undocumented, ignored */  break;
+                case 1:  /* undocumented, ignored */  break;
+                case 15:  /* undocumented (HR?), ignored */  break;
+                case 16:  /* undocumented (HR?), ignored */  break;
+                case 17:  /* undocumented (cadence?), ignored */  break;
+                case 18:  /* undocumented (cadence?), ignored */  break;
+                case 23:  /* undocumented, ignored */  break;
+                case 24:  /* undocumented, ignored */  break;
+                case 29:  // Segment name
+                         // ignored
+                        break;
+                case 32:  /* undocumented, ignored */  break;
+                case 58:  /* undocumented, ignored */  break;
+                case 59:  /* undocumented, ignored */  break;
+                case 60:  /* undocumented, ignored */  break;
+                case 61:  /* undocumented, ignored */  break;
+                case 62:  /* undocumented, ignored */  break;
+                case 63:  /* undocumented, ignored */  break;
+                case 64:  /* undocumented, ignored */  break;
+                case 65:  // Segment ID
+                         // ignored
+                        break;
+                case 66:  /* undocumented, ignored */  break;
+                case 67:  /* undocumented, ignored */  break;
+                case 68:  /* undocumented, ignored */  break;
+                case 73:  /* undocumented, ignored */  break;
+                case 74:  /* undocumented, ignored */  break;
+                case 81:  /* undocumented, ignored */  break;
+                case 82:  /* undocumented, ignored */  break;
+                default: ; // ignore it
+            }
+        }
+    }
+
     int read_record(bool &stop, QStringList &errors) {
         stop = false;
         int count = 0;
