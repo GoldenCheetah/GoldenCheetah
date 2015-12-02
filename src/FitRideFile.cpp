@@ -34,6 +34,10 @@
 #define FIT_DEBUG     false // debug traces
 #define LAPSWIM_DEBUG false
 
+#ifndef MATHCONST_PI
+#define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
+#endif
+
 #define LAP_TYPE     19
 #define RECORD_TYPE  20
 #define SEGMENT_TYPE 142
@@ -43,6 +47,8 @@ static int fitFileReaderRegistered =
         "fit", "Garmin FIT", new FitFileReader());
 
 static const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), Qt::UTC);
+
+static double bearing = 0; // used to compute headwind depending on wind/cyclist bearing difference
 
 struct FitField {
     int num;
@@ -1155,6 +1161,7 @@ struct FitFileReaderState
                     break;
                 case RECORD_TYPE: decodeRecord(def, time_offset, values); break;
                 case 21: decodeEvent(def, time_offset, values); break;
+
 
                 case 23: //decodeDeviceInfo(def, time_offset, values); break; /* device info */
                     break;
