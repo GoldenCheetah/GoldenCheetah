@@ -389,12 +389,109 @@ struct FitFileReaderState
                         case 5: // swimming
                             rideFile->setTag("Sport","Swim");
                             break;
+/*
+                        // other sports are ignored at present:
+                        case 0:    // generic
+                        case 3:    // transition
+                        case 4:    // fitness_equipment
+                        case 6:    // basketball
+                        case 7:    // soccer
+                        case 8:    // tennis
+                        case 9:    // american_football
+                        case 10:    // training
+                        case 11:    // walking
+                        case 12:    // cross_country_skiing
+                        case 13:    // alpine_skiing
+                        case 14:    // snowboarding
+                        case 15:    // rowing
+                        case 16:    // mountaineering
+                        case 17:    // hiking
+                        case 18:    // multisport
+                        case 19:    // paddling
+                        case 254:    // all
+*/
+                    }
+                    break;
+                case 6: // sub sport (ignored at present)
+                    switch (value) {
+                        case 0:    // generic
+                        case 1:    // treadmill
+                        case 2:    // street
+                        case 3:    // trail
+                        case 4:    // track
+                        case 5:    // spin
+                        case 6:    // home trainer
+                        case 7:    // route
+                        case 8:    // mountain
+                        case 9:    // downhill
+                        case 10:    // recumbent
+                        case 11:    // cyclocross
+                        case 12:    // hand_cycling
+                        case 13:    // piste
+                        case 14:    // indoor_rowing
+                        case 15:    // elliptical
+                        case 254:    // all
+                        default:
+                            break;
                     }
                     break;
                 case 44: // pool_length
                     pool_length = value / 100000.0;
                     if (LAPSWIM_DEBUG) qDebug() << "Pool length" << pool_length;
                     break;
+
+                // other fields are ignored at present
+                case 253: //timestamp
+                case 254: //index
+                case 0:   //event
+                case 1:    /* event_type */
+                case 2:    /* start_time */
+                case 3:    /* start_position_lat */
+                case 4:    /* start_position_long */
+                case 7:    /* total elapsed time */
+                case 8:    /* total timer time */
+                case 9:    /* total distance */
+                case 10:    /* total_cycles */
+                case 11:    /* total calories */
+                case 13:    /* total fat calories */
+                case 14:    /* avg_speed */
+                case 15:    /* max_speed */
+                case 16:    /* avg_HR */
+                case 17:    /* max_HR */
+                case 18:    /* avg_cad */
+                case 19:    /* max_cad */
+                case 20:    /* avg_pwr */
+                case 21:    /* max_pwr */
+                case 22:    /* total ascent */
+                case 23:    /* total descent */
+                case 25:    /* first lap index */
+                case 26:    /* num lap */
+                case 29:    /* north-east lat = bounding box */
+                case 30:    /* north-east lon = bounding box */
+                case 31:    /* south west lat = bounding box */
+                case 32:    /* south west lon = bounding box */
+                case 34:    /* normalized power */
+                case 48:    /* total work (J) */
+                case 49:    /* avg altitude */
+                case 50:    /* max altitude */
+                case 52:    /* avg grade */
+                case 53:    /* avg positive grade */
+                case 54:    /* avg negative grade */
+                case 55:    /* max pos grade */
+                case 56:    /* max neg grade */
+                case 57:    /* avg temperature (Celsius. deg) */
+                case 58:    /* max temp */
+                case 59:    /* total_moving_time */
+                case 60:    /* avg_pos_vertical_speed (m/s) */
+                case 61:    /* avg_neg_vertical_speed */
+                case 62:    /* max_pos_vertical_speed */
+                case 63:    /* max neg_vertical_speed */
+                case 64:    /* min HR bpm */
+                case 69:    /* avg lap time */
+                case 70:    /* best lap index */
+                case 71:    /* min altitude */
+                case 92:    /* fractional avg cadence (rpm) */
+                case 93:    /* fractional max cadence */
                 default: ; // do nothing
             }
 
