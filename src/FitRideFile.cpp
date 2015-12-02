@@ -947,7 +947,22 @@ struct FitFileReaderState
         //    resistance, time_from_course, temperature );
         double secs = time - start_time;
         double nm = 0;
-        double headwind = 0.0;
+
+        // compute bearing in order to calculate headwind
+        if ((!rideFile->dataPoints().empty()) && (last_time != 0))
+        {
+            RideFilePoint *prevPoint = rideFile->dataPoints().back();
+            // ensure a movement occurred and valid lat/lon in order to compute cyclist direction
+            if (  (prevPoint->lat != lat || prevPoint->lon != lng )
+               && (prevPoint->lat != 0 || prevPoint->lon != 0 )
+               && (lat != 0 || lng != 0 ) )
+                        bearing = atan2(cos(lat)*sin(lng - prevPoint->lon),
+                                        cos(prevPoint->lat)*sin(lat)-sin(prevPoint->lat)*cos(lat)*cos(lng - prevPoint->lon));
+        }
+        // else keep previous bearing or 0 at beginning
+
+        double headwind = cos(bearing - rideFile->windHeading()) * rideFile->windSpeed() + kph;
+
         int interval = 0;
         // if there are data points && a time difference > 1sec && smartRecording processing is requested at all
         if ((!rideFile->dataPoints().empty()) && (last_time != 0) &&
