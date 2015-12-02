@@ -1226,7 +1226,8 @@ struct FitFileReaderState
     }
 
     /* weather broadcast as observed at weather station (undocumented) */
-    void decodeWeather(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+    void decodeWeather(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
         Q_UNUSED(time_offset);
         int i = 0;
         foreach(const FitField &field, def.fields) {
@@ -1268,7 +1269,8 @@ struct FitFileReaderState
         }
     }
 
-    void decodeDeviceSettings(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+    void decodeDeviceSettings(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
         Q_UNUSED(time_offset);
         int i = 0;
         foreach(const FitField &field, def.fields) {
@@ -1292,7 +1294,8 @@ struct FitFileReaderState
         }
     }
 
-    void decodeSegment(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+    void decodeSegment(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
         Q_UNUSED(time_offset);
         int i = 0;
         foreach(const FitField &field, def.fields) {
