@@ -1,14 +1,20 @@
 Makefile
 .qmake.stash
+*.o
+*.so.*
+*.so
+*.a
 
 # old skool
 .svn
 *.pri
+*.prl
 
 # osx noise
 .DS_Store
 profile
 
+moc_*
 moc/
 obj/
 lib/
