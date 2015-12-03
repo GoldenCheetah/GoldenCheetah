@@ -336,6 +336,11 @@ class RideFile : public QObject // QObject to emit signals
         void setDataPresent(SeriesType, bool);
         // ************************************************************
 
+        const double &windSpeed() const { return windSpeed_; }
+        void setWindSpeed(const double &value) {windSpeed_ = value; }
+        const double &windHeading() const { return windHeading_; }
+        void setWindHeading(const double &value) {windHeading_ = value; }
+
     signals:
         void saved();
         void reverted();
@@ -383,6 +388,9 @@ class RideFile : public QObject // QObject to emit signals
         void updateAvg(RideFilePoint* point);
 
         bool dstale; // is derived data up to date?
+
+        // data required to compute headwind based on weather broadcast
+        double windSpeed_, windHeading_;
 };
 
 struct RideFilePoint

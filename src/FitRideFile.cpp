@@ -34,6 +34,10 @@
 #define FIT_DEBUG     false // debug traces
 #define LAPSWIM_DEBUG false
 
+#ifndef MATHCONST_PI
+#define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
+#endif
+
 #define LAP_TYPE     19
 #define RECORD_TYPE  20
 #define SEGMENT_TYPE 142
@@ -43,6 +47,8 @@ static int fitFileReaderRegistered =
         "fit", "Garmin FIT", new FitFileReader());
 
 static const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), Qt::UTC);
+
+static double bearing = 0; // used to compute headwind depending on wind/cyclist bearing difference
 
 struct FitField {
     int num;
@@ -262,6 +268,16 @@ struct FitFileReaderState
             switch (field.num) {
                 case 1: manu = value; break;
                 case 2: prod = value; break;
+
+                // other are ignored at present:
+                case 0: // file type:
+                    // 4:  activity log
+                    // 6:  Itinary
+                    // 34: segment
+                    break;
+                case 3: //serial number
+                case 4: //timestamp
+                case 5: //number
                 default: ; // do nothing
             }
         }
@@ -373,12 +389,109 @@ struct FitFileReaderState
                         case 5: // swimming
                             rideFile->setTag("Sport","Swim");
                             break;
+/*
+                        // other sports are ignored at present:
+                        case 0:    // generic
+                        case 3:    // transition
+                        case 4:    // fitness_equipment
+                        case 6:    // basketball
+                        case 7:    // soccer
+                        case 8:    // tennis
+                        case 9:    // american_football
+                        case 10:    // training
+                        case 11:    // walking
+                        case 12:    // cross_country_skiing
+                        case 13:    // alpine_skiing
+                        case 14:    // snowboarding
+                        case 15:    // rowing
+                        case 16:    // mountaineering
+                        case 17:    // hiking
+                        case 18:    // multisport
+                        case 19:    // paddling
+                        case 254:    // all
+*/
+                    }
+                    break;
+                case 6: // sub sport (ignored at present)
+                    switch (value) {
+                        case 0:    // generic
+                        case 1:    // treadmill
+                        case 2:    // street
+                        case 3:    // trail
+                        case 4:    // track
+                        case 5:    // spin
+                        case 6:    // home trainer
+                        case 7:    // route
+                        case 8:    // mountain
+                        case 9:    // downhill
+                        case 10:    // recumbent
+                        case 11:    // cyclocross
+                        case 12:    // hand_cycling
+                        case 13:    // piste
+                        case 14:    // indoor_rowing
+                        case 15:    // elliptical
+                        case 254:    // all
+                        default:
+                            break;
                     }
                     break;
                 case 44: // pool_length
                     pool_length = value / 100000.0;
                     if (LAPSWIM_DEBUG) qDebug() << "Pool length" << pool_length;
                     break;
+
+                // other fields are ignored at present
+                case 253: //timestamp
+                case 254: //index
+                case 0:   //event
+                case 1:    /* event_type */
+                case 2:    /* start_time */
+                case 3:    /* start_position_lat */
+                case 4:    /* start_position_long */
+                case 7:    /* total elapsed time */
+                case 8:    /* total timer time */
+                case 9:    /* total distance */
+                case 10:    /* total_cycles */
+                case 11:    /* total calories */
+                case 13:    /* total fat calories */
+                case 14:    /* avg_speed */
+                case 15:    /* max_speed */
+                case 16:    /* avg_HR */
+                case 17:    /* max_HR */
+                case 18:    /* avg_cad */
+                case 19:    /* max_cad */
+                case 20:    /* avg_pwr */
+                case 21:    /* max_pwr */
+                case 22:    /* total ascent */
+                case 23:    /* total descent */
+                case 25:    /* first lap index */
+                case 26:    /* num lap */
+                case 29:    /* north-east lat = bounding box */
+                case 30:    /* north-east lon = bounding box */
+                case 31:    /* south west lat = bounding box */
+                case 32:    /* south west lon = bounding box */
+                case 34:    /* normalized power */
+                case 48:    /* total work (J) */
+                case 49:    /* avg altitude */
+                case 50:    /* max altitude */
+                case 52:    /* avg grade */
+                case 53:    /* avg positive grade */
+                case 54:    /* avg negative grade */
+                case 55:    /* max pos grade */
+                case 56:    /* max neg grade */
+                case 57:    /* avg temperature (Celsius. deg) */
+                case 58:    /* max temp */
+                case 59:    /* total_moving_time */
+                case 60:    /* avg_pos_vertical_speed (m/s) */
+                case 61:    /* avg_neg_vertical_speed */
+                case 62:    /* max_pos_vertical_speed */
+                case 63:    /* max neg_vertical_speed */
+                case 64:    /* min HR bpm */
+                case 69:    /* avg lap time */
+                case 70:    /* best lap index */
+                case 71:    /* min altitude */
+                case 92:    /* fractional avg cadence (rpm) */
+                case 93:    /* fractional max cadence */
                 default: ; // do nothing
             }
 
@@ -396,6 +509,26 @@ struct FitFileReaderState
 
             if( value == NA_VALUE )
                 continue;
+
+            switch (field.num) {
+
+                // all fields are ignored at present
+                case 253: //timestamp
+                case 3:   // serial number
+                case 2:   // manufacturer
+                case 4:   // product
+                case 5:   // software version
+                case 10:  // battery voltage
+                case 0:   // device index
+                case 1:   // ANT+ device type
+                          // details: 0x78 = HRM, 0x79 = Spd&Cad, 0x7A = Cad, 0x7B = Speed
+                case 6:   // hardware version
+                case 11:  // battery status
+                case 22:  // ANT network
+                case 25:  // source type
+                case 24:  // equipment ID
+                default: ; // do nothing
+            }
 
             if (FIT_DEBUG) {
                 printf("decodeDeviceInfo  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
@@ -426,48 +559,93 @@ struct FitFileReaderState
                     event_type = value; break;
                 case 2: // data16 field
                     data16 = value; break;
+
+                // additional values (ignored at present):
+                case 3: //data
+                case 4: // event group
                 default: ; // do nothing
             }
         }
-        if (event == 0) { // Timer event
-            switch (event_type) {
-                case 0: // start
-                    stopped = false;
-                    break;
-                case 1: // stop
-                    stopped = true;
-                    break;
-                case 2: // consecutive_depreciated
-                case 3: // marker
-                    break;
-                case 4: // stop all
-                    stopped = true;
-                    break;
-                case 5: // begin_depreciated
-                case 6: // end_depreciated
-                case 7: // end_all_depreciated
-                case 8: // stop_disable
-                    stopped = true;
-                    break;
-                case 9: // stop_disable_all
-                    stopped = true;
-                    break;
-                default:
-                    errors << QString("Unknown timer event type %1").arg(event_type);
-            }
-        }
-        else if (event == 36) { // Calibration event
-            int secs = (start_time==0?0:time-start_time);
-            switch (event_type) {
-                case 3: // marker
-                    ++calibration;
-                    rideFile->addCalibration(secs, data16, QString("Calibration %1 (%2)").arg(calibration).arg(data16));
-                    //qDebug() << "marker" << secs << data16;
-                    break;
-                default:
-                    errors << QString("Unknown calibration event type %1").arg(event_type);
-                    break;
-            }
+
+        switch (event) {
+            case 0: // Timer event
+                {
+                    switch (event_type) {
+                        case 0: // start
+                            stopped = false;
+                            break;
+                        case 1: // stop
+                            stopped = true;
+                            break;
+                        case 2: // consecutive_depreciated
+                        case 3: // marker
+                            break;
+                        case 4: // stop all
+                            stopped = true;
+                            break;
+                        case 5: // begin_depreciated
+                        case 6: // end_depreciated
+                        case 7: // end_all_depreciated
+                        case 8: // stop_disable
+                            stopped = true;
+                            break;
+                        case 9: // stop_disable_all
+                            stopped = true;
+                            break;
+                        default:
+                            errors << QString("Unknown timer event type %1").arg(event_type);
+                    }
+                }
+                break;
+
+            case 36: // Calibration event
+                {
+                    int secs = (start_time==0?0:time-start_time);
+                    switch (event_type) {
+                        case 3: // marker
+                            ++calibration;
+                            rideFile->addCalibration(secs, data16, QString("Calibration %1 (%2)").arg(calibration).arg(data16));
+                            //qDebug() << "marker" << secs << data16;
+                            break;
+                        default:
+                            errors << QString("Unknown calibration event type %1").arg(event_type);
+                            break;
+                    }
+                }
+                break;
+
+            case 3: /* workout */
+            case 4: /* workout_step */
+            case 5: /* power_down */
+            case 6: /* power_up */
+            case 7: /* off_course */
+            case 8: /* session */
+            case 9: /* lap */
+            case 10: /* course_point */
+            case 11: /* battery */
+            case 12: /* virtual_partner_pace */
+            case 13: /* hr_high_alert */
+            case 14: /* hr_low_alert */
+            case 15: /* speed_high_alert */
+            case 16: /* speed_low_alert */
+            case 17: /* cad_high_alert */
+            case 18: /* cad_low_alert */
+            case 19: /* power_high_alert */
+            case 20: /* power_low_alert */
+            case 21: /* recovery_hr */
+            case 22: /* battery_low */
+            case 23: /* time_duration_alert */
+            case 24: /* distance_duration_alert */
+            case 25: /* calorie_duration_alert */
+            case 26: /* activity */
+            case 27: /* fitness_equipment */
+            case 28: /* length */
+            case 32: /* user_marker */
+            case 33: /* sport_point */
+            case 42: /* front_gear_change */
+            case 43: /* rear_gear_change */
+
+            default: ;
         }
 
         if (FIT_DEBUG) {
@@ -494,6 +672,11 @@ struct FitFileReaderState
         }
         QString segment_name;
         foreach(const FitField &field, def.fields) {
+            // FIXME : validity check has been removed, to be confirmed:
+            // fit_value_t value = values[i++].v;
+            //
+            // if( value == NA_VALUE )
+            //    continue;
             const FitValue& value = values[i++];
             if (FIT_DEBUG) {
                 printf ("\tfield: num: %d ", field.num);
@@ -517,6 +700,33 @@ struct FitFileReaderState
                     if (FIT_DEBUG)  {
                         printf("Found segment name: %s\n", segment_name.toStdString().c_str());
                     }
+                    break;
+
+                // other data (ignored at present):
+                case 254: // lap nbr
+                case 3: // start_position_lat
+                case 4: // start_position_lon
+                case 5: // end_position_lat
+                case 6: // end_position_lon
+                case 8: // total_timer_time
+                case 10: // total_cycles
+                case 11: // total calories
+                case 12: // total fat calories
+                case 13: // avg_speed
+                case 14: // max_speed
+                case 15: // avg HR (bpm)
+                case 16: // Max HR
+                case 17: // AvCad
+                case 18: // MaxCad
+                case 21: // total ascent
+                case 22: // total descent
+                case 27: // north-east lat (bounding box)
+                case 28: // north-east lon
+                // FIXME : since commit ca38fff25114c673e515925cf40e1a662bda711b
+                //   segment name extracted from message SEGMENT_TYPE using "decodeLap"
+                //   which normally parses message LAP_TYPE which structure is different!
+                // case 29: // south west lat
+                case 30: // south west lon
                     break;
                 default:
                     continue; // ignore it
@@ -673,7 +883,7 @@ struct FitFileReaderState
                 case 57: // SMO2
                         smO2= value/10.0f;
                         break;
-                case 61: // ? GPS Altitude ?
+                case 61: // ? GPS Altitude ? or atmospheric pressure ?
                         break;
                 case 66: // ??
                         break;
@@ -742,7 +952,22 @@ struct FitFileReaderState
         //    resistance, time_from_course, temperature );
         double secs = time - start_time;
         double nm = 0;
-        double headwind = 0.0;
+
+        // compute bearing in order to calculate headwind
+        if ((!rideFile->dataPoints().empty()) && (last_time != 0))
+        {
+            RideFilePoint *prevPoint = rideFile->dataPoints().back();
+            // ensure a movement occurred and valid lat/lon in order to compute cyclist direction
+            if (  (prevPoint->lat != lat || prevPoint->lon != lng )
+               && (prevPoint->lat != 0 || prevPoint->lon != 0 )
+               && (lat != 0 || lng != 0 ) )
+                        bearing = atan2(cos(lat)*sin(lng - prevPoint->lon),
+                                        cos(prevPoint->lat)*sin(lat)-sin(prevPoint->lat)*cos(lat)*cos(lng - prevPoint->lon));
+        }
+        // else keep previous bearing or 0 at beginning
+
+        double headwind = cos(bearing - rideFile->windHeading()) * rideFile->windSpeed() + kph;
+
         int interval = 0;
         // if there are data points && a time difference > 1sec && smartRecording processing is requested at all
         if ((!rideFile->dataPoints().empty()) && (last_time != 0) &&
@@ -1005,6 +1230,183 @@ struct FitFileReaderState
         }
     }
 
+    /* weather broadcast as observed at weather station (undocumented) */
+    void decodeWeather(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
+        Q_UNUSED(time_offset);
+        int i = 0;
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+            if( value == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 253: // Timestamp
+                          // ignored
+                          break;
+                case 8:   // Weather station name
+                          // ignored
+                        break;
+                case 9:   // Weather observation timestamp
+                          // ignored
+                        break;
+                case 10: // Weather station latitude
+                         // ignored
+                        break;
+                case 11: // Weather station longitude
+                         // ignored
+                        break;
+                case 3:  // Wind heading (0deg=North)
+                        rideFile->setWindHeading(value / 180.0 * MATHCONST_PI);
+                        break;
+                case 4:  // Wind speed (mm/s)
+                        rideFile->setWindSpeed(value * 0.0036);
+                        break;
+                case 1:  // Temperature
+                         // ignored
+                        break;
+                case 7:  // Humidity
+                         // ignored at present
+                        break;
+                default: ; // ignore it
+            }
+        }
+    }
+
+    void decodeDeviceSettings(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
+        Q_UNUSED(time_offset);
+        int i = 0;
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+            if( value == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 0:  // Active timezone
+                         // ignored
+                        break;
+                case 1:  // UTC offset
+                         // ignored
+                        break;
+                case 5:  // timezone offset
+                         // ignored
+                        break;
+                default: ; // ignore it
+            }
+        }
+    }
+
+    void decodeSegment(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
+        Q_UNUSED(time_offset);
+        int i = 0;
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+            if( value == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 253: // Timestamp
+                          // ignored
+                          break;
+                case 2:   // seems to be a timestamp
+                          // ignored
+                          break;
+                case 3:  // start latitude
+                         // ignored
+                        break;
+                case 4:  // start longitude
+                         // ignored
+                        break;
+                case 5:  // end latitude
+                         // ignored
+                        break;
+                case 6:  // end longitude
+                         // ignored
+                        break;
+                case 7:  // personal best (ms) ? to be confirmed.
+                         // ignored
+                        break;
+                case 8:  // personal best (ms) ? to be confirmed.
+                         // ignored
+                        break;
+                case 9:  // leader best (ms) ? to be confirmed.
+                         // ignored
+                        break;
+                case 10: // personal rank ? to be confirmed
+                         // ignored
+                        break;
+                case 25:  // north-east latitude (bounding box)
+                         // ignored
+                        break;
+                case 26:  // north-east longitude
+                         // ignored
+                        break;
+                case 27:  // south-west latitude
+                         // ignored
+                        break;
+                case 28:  // south-west longitude
+                         // ignored
+                        break;
+                case 33:  /* undocumented, ignored */  break;
+                case 71:  /* undocumented, ignored */  break;
+                case 75:  /* undocumented, ignored */  break;
+                case 76:  /* undocumented, ignored */  break;
+                case 77:  /* undocumented, ignored */  break;
+                case 78:  /* undocumented, ignored */  break;
+                case 79:  /* undocumented, ignored */  break;
+                case 80:  /* undocumented, ignored */  break;
+                case 254:  /* undocumented, ignored */  break;
+                case 11:  /* undocumented, ignored */  break;
+                case 12:  /* undocumented, ignored */  break;
+                case 13:  /* undocumented, ignored */  break;
+                case 14:  /* undocumented, ignored */  break;
+                case 19:  /* undocumented, ignored */  break;
+                case 20:  /* undocumented, ignored */  break;
+                case 22:  /* undocumented, ignored */  break;
+                case 30:  /* undocumented, ignored */  break;
+                case 31:  /* undocumented, ignored */  break;
+                case 69:  /* undocumented, ignored */  break;
+                case 70:  /* undocumented, ignored */  break;
+                case 72:  /* undocumented, ignored */  break;
+                case 0:  /* undocumented, ignored */  break;
+                case 1:  /* undocumented, ignored */  break;
+                case 15:  /* undocumented (HR?), ignored */  break;
+                case 16:  /* undocumented (HR?), ignored */  break;
+                case 17:  /* undocumented (cadence?), ignored */  break;
+                case 18:  /* undocumented (cadence?), ignored */  break;
+                case 23:  /* undocumented, ignored */  break;
+                case 24:  /* undocumented, ignored */  break;
+                case 29:  // Segment name
+                         // ignored
+                        break;
+                case 32:  /* undocumented, ignored */  break;
+                case 58:  /* undocumented, ignored */  break;
+                case 59:  /* undocumented, ignored */  break;
+                case 60:  /* undocumented, ignored */  break;
+                case 61:  /* undocumented, ignored */  break;
+                case 62:  /* undocumented, ignored */  break;
+                case 63:  /* undocumented, ignored */  break;
+                case 64:  /* undocumented, ignored */  break;
+                case 65:  // Segment ID
+                         // ignored
+                        break;
+                case 66:  /* undocumented, ignored */  break;
+                case 67:  /* undocumented, ignored */  break;
+                case 68:  /* undocumented, ignored */  break;
+                case 73:  /* undocumented, ignored */  break;
+                case 74:  /* undocumented, ignored */  break;
+                case 81:  /* undocumented, ignored */  break;
+                case 82:  /* undocumented, ignored */  break;
+                default: ; // ignore it
+            }
+        }
+    }
+
     int read_record(bool &stop, QStringList &errors) {
         stop = false;
         int count = 0;
@@ -1150,47 +1552,87 @@ struct FitFileReaderState
             // shows up as manufacturer #65535, even though it should be #7.
             switch (def.global_msg_num) {
                 case 0:  decodeFileId(def, time_offset, values); break;
-                case LAP_TYPE:
+                case 18: decodeSession(def, time_offset, values); break; /* session */
+                case LAP_TYPE: // #19
                     decodeLap(def, time_offset, values);
                     break;
-                case RECORD_TYPE: decodeRecord(def, time_offset, values); break;
-                case 21: decodeEvent(def, time_offset, values); break;
-
-                case 23: //decodeDeviceInfo(def, time_offset, values); break; /* device info */
+                case RECORD_TYPE: // #20
+                    decodeRecord(def, time_offset, values);
                     break;
-                case 18:
-                    decodeSession(def, time_offset, values);
-                    break; /* session */
+                case 21: decodeEvent(def, time_offset, values); break;
+                case 23: //decodeDeviceInfo(def, time_offset, values); /* device info */
+                    break;
                 case 101:
                     decodeLength(def, time_offset, values);
                     break; /* lap swimming */
+                case 128: decodeWeather(def, time_offset, values); break; /* weather broadcast */
 
-                case 2: /* DEVICE_SETTINGS */
+                case 1: /* capabilities, device settings and timezone */ break;
+                case 2: decodeDeviceSettings(def, time_offset, values); break;
                 case 3: /* USER_PROFILE */
-                case 7: /* ZONES_TARGET12 */
+                case 4: /* hrm profile */
+                case 5: /* sdm profile */
+                case 6: /* bike profile */
+                case 7: /* ZONES_TARGET field#1 = MaxHR (bpm) */
                 case 8: /* HR_ZONE */
                 case 9: /* POWER_ZONE */
+                case 10: /* MET_ZONE */
                 case 12: /* SPORT */
                 case 13: /* unknown */
-                case 22: /* undocumented */
-                case 72: /* undocumented  - new for garmin 800*/
+                case 15: /* goal */
+                case 22: /* source (undocumented) = sensors used for records ; see details below: */
+                         /* #253: timestamp  /  #0: SPD/DIST  /  #1: SPD/DIST  /  #2: cadence  /  #4: HRM  /  #5: HRM */
+                case 26: /* workout */
+                case 27: /* workout step */
+                case 28: /* schedule */
+                case 29: /* location */
+                case 30: /* weight scale */
+                case 31: /* course */
+                case 32: /* course point */
+                case 33: /* totals */
                 case 34: /* activity */
-                case 49: /* file creator */
-                case 79: /* unknown */
+                case 35: /* software */
+                case 37: /* file capabilities */
+                case 38: /* message capabilities */
+                case 39: /* field capabilities */
+                case 49: /* file creator, software version ; see details below: */
+                         /* #0: software version / #1: hardware version */
+                case 51: /* blood pressure */
+                case 53: /* speed zone */
+                case 55: /* monitoring */
+                case 72: /* training file (undocumented) : new since garmin 800 */
+                case 78: /* hrv */
+                case 79: /* HR zone (undocumented) ; see details below: */
+                         /* #253: timestamp / #1: default Min HR / #2: default Max HR / #5: user Min HR / #6: user Max HR */
+                case 103: /* monitoring info */
                 case 104: /* battery */
-                case 113: /* unknowHn */
+                case 105: /* pad */
+                case 106: /* salve device */
+                case 113: /* unknown */
+
                 case 125: /* unknown */
-                case 128: /* unknown */
+                case 131: /* cadence zone */
+
                 case 140: /* unknown */
                 case 141: /* unknown */
                     break;
-            case SEGMENT_TYPE:
+                case SEGMENT_TYPE: // #142
                     /* Segment which contains a name. Looks like a lap, 
                      * except there's a name in the data. 
                      */
+                    // FIXME : normally decodeLap should not be used for segment
                     decodeLap(def, time_offset, values);
                     break;
-            case 147: /* unknown */
+                // decodeSegment(def, time_offset, values); break; /* segment data */
+                case 145: /* memo glob */
+                case 147: /* equipment (undocumented) = sensors presets (sensor name, wheel circumference, etc.)  ; see details below: */
+                          /* #0: equipment ID / #2: equipment name / #10: default wheel circ. value / #21: user wheel circ. value / #254: local eqt idx */
+                case 148: /* segment description (undocumented) ; see details below: */
+                          /* #0: segment name */
+                case 149: /* segment reference cyclists (undocumented) ; see details below: */
+                          /* #1: who (0=leader, 1=user, 4=challenger)  / #3: timestamp / #4: time (s) / #254: idx */
+                case 150: /* segment trackpoint (undocumented) ; see details below: */
+                          /* #1: latitude / #2: longitude / #3: distance / #4: elevation / #5: timer (ms) / #6: index */
                     break;
 
                 default:
@@ -1211,6 +1653,8 @@ struct FitFileReaderState
         // start
         rideFile = new RideFile;
         rideFile->setDeviceType("Garmin FIT");
+        rideFile->setWindHeading(0.0);
+        rideFile->setWindSpeed(0.0);
         rideFile->setRecIntSecs(1.0); // this is a terrible assumption!
         if (!file.open(QIODevice::ReadOnly)) {
             delete rideFile;
