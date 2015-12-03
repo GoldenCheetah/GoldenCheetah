@@ -670,18 +670,18 @@ struct FitFileReaderState
         if (FIT_DEBUG)  {
             printf( " FIT decode lap \n");
         }
-        QString segment_name;
+
         foreach(const FitField &field, def.fields) {
-            // FIXME : validity check has been removed, to be confirmed:
-            // fit_value_t value = values[i++].v;
-            //
-            // if( value == NA_VALUE )
-            //    continue;
             const FitValue& value = values[i++];
+
+            if( value.v == NA_VALUE )
+                continue;
+
             if (FIT_DEBUG) {
                 printf ("\tfield: num: %d ", field.num);
                 DumpFitValue(value);
             }
+
             switch (field.num) {
                 case 253:
                     time = value.v + qbase_time.toTime_t();
@@ -694,12 +694,6 @@ struct FitFileReaderState
                     break;
                 case 9:
                     total_distance = value.v / 100000.0;
-                    break;
-                case 29:                    
-                    segment_name = QString(value.s.c_str());
-                    if (FIT_DEBUG)  {
-                        printf("Found segment name: %s\n", segment_name.toStdString().c_str());
-                    }
                     break;
 
                 // other data (ignored at present):
@@ -722,14 +716,10 @@ struct FitFileReaderState
                 case 22: // total descent
                 case 27: // north-east lat (bounding box)
                 case 28: // north-east lon
-                // FIXME : since commit ca38fff25114c673e515925cf40e1a662bda711b
-                //   segment name extracted from message SEGMENT_TYPE using "decodeLap"
-                //   which normally parses message LAP_TYPE which structure is different!
-                // case 29: // south west lat
+                case 29: // south west lat
                 case 30: // south west lon
                     break;
-                default:
-                    continue; // ignore it
+                default: ; // ignore it
             }
         }
         if (LAPSWIM_DEBUG) qDebug() << "Lap" << interval << this_start_time - start_time << total_elapsed_time
@@ -744,19 +734,17 @@ struct FitFileReaderState
             }
         }
         if (rideFile->dataPoints().count()) { // no samples means no laps..
-            if (segment_name == "") {
-                segment_name = QObject::tr("Lap %1").arg(interval);
-            }
             if (isLapSwim && total_elapsed_time > 0.0) {
                 rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time,
-                                      this_start_time - start_time + total_elapsed_time, segment_name);
+                                      this_start_time - start_time + total_elapsed_time,
+                                      QObject::tr("Lap %1").arg(interval));
             } else {
                 rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time,
-                                      segment_name);
+                                      QObject::tr("Lap %1").arg(interval));
             }
         }
     }
-    
+
     void decodeRecord(const FitDefinition &def, int time_offset,
                       const std::vector<FitValue>& values) {
         if (isLapSwim) return; // We use the length message for Lap Swimming
@@ -1301,21 +1289,37 @@ struct FitFileReaderState
 
     void decodeSegment(const FitDefinition &def, int time_offset,
                       const std::vector<FitValue>& values) {
-        Q_UNUSED(time_offset);
-        int i = 0;
-        foreach(const FitField &field, def.fields) {
-            fit_value_t value = values[i++].v;
+        time_t time = 0;
+        if (time_offset > 0)
+            time = last_time + time_offset;
+        else
+            time = last_time;
 
-            if( value == NA_VALUE )
+        int i = 0;
+        time_t this_start_time = 0;
+        ++interval;
+        double total_elapsed_time = 0.0;
+        double total_distance = 0.0;
+
+        QString segment_name;
+        foreach(const FitField &field, def.fields) {
+            const FitValue& value = values[i++];
+
+            if( value.type != StringValue && value.v == NA_VALUE )
                 continue;
 
+            if (FIT_DEBUG) {
+                printf ("\tfield: num: %d ", field.num);
+                DumpFitValue(value);
+            }
+
             switch (field.num) {
-                case 253: // Timestamp
-                          // ignored
-                          break;
-                case 2:   // seems to be a timestamp
-                          // ignored
-                          break;
+                case 253: // Message timestamp
+                    time = value.v + qbase_time.toTime_t();
+                    break;
+                case 2:   // start timestamp ?
+                    this_start_time = value.v + qbase_time.toTime_t();
+                    break;
                 case 3:  // start latitude
                          // ignored
                         break;
@@ -1328,15 +1332,20 @@ struct FitFileReaderState
                 case 6:  // end longitude
                          // ignored
                         break;
-                case 7:  // personal best (ms) ? to be confirmed.
+                case 7:  // personal best (ms) ? segment elapsed time from this activity (ms) ?
+                         // => depends on file / device / version ?
+                         // FIXME: to be investigated/confirmed.
+                    total_elapsed_time = round(value.v / 1000.0);
+                    break;
+                case 8:  // challenger best (ms) ? segment total timer time from this activity (ms) ?
+                         // => depends on file / device / version ?
+                         // FIXME: to be investigated/confirmed.
                          // ignored
                         break;
-                case 8:  // personal best (ms) ? to be confirmed.
-                         // ignored
-                        break;
-                case 9:  // leader best (ms) ? to be confirmed.
-                         // ignored
-                        break;
+                case 9:  // leader best (ms) ? segment distance ? FIXME : to be investigated.
+                         // => depends on file / device / version ?
+                    total_distance = value.v / 100000.0;
+                    break;
                 case 10: // personal rank ? to be confirmed
                          // ignored
                         break;
@@ -1352,6 +1361,12 @@ struct FitFileReaderState
                 case 28:  // south-west longitude
                          // ignored
                         break;
+                case 29:  // Segment name
+                    segment_name = QString(value.s.c_str());
+                    if (FIT_DEBUG)  {
+                        printf("Found segment name: %s\n", segment_name.toStdString().c_str());
+                    }
+                    break;
                 case 33:  /* undocumented, ignored */  break;
                 case 71:  /* undocumented, ignored */  break;
                 case 75:  /* undocumented, ignored */  break;
@@ -1381,9 +1396,6 @@ struct FitFileReaderState
                 case 18:  /* undocumented (cadence?), ignored */  break;
                 case 23:  /* undocumented, ignored */  break;
                 case 24:  /* undocumented, ignored */  break;
-                case 29:  // Segment name
-                         // ignored
-                        break;
                 case 32:  /* undocumented, ignored */  break;
                 case 58:  /* undocumented, ignored */  break;
                 case 59:  /* undocumented, ignored */  break;
@@ -1405,6 +1417,31 @@ struct FitFileReaderState
                 default: ; // ignore it
             }
         }
+
+        if (LAPSWIM_DEBUG) qDebug() << "Lap" << interval << this_start_time - start_time << total_elapsed_time
+                                    << time - this_start_time << total_distance;
+        if (this_start_time == 0 || this_start_time-start_time < 0) {
+            //errors << QString("lap %1 has invalid start time").arg(interval);
+            this_start_time = start_time; // time was corrected after lap start
+
+            if (time == 0 || time-start_time < 0) {
+                errors << QString("lap %1 is ignored (invalid end time)").arg(interval);
+                return;
+            }
+        }
+        if (rideFile->dataPoints().count()) { // no samples means no laps..
+            if (segment_name == "") {
+                segment_name = QObject::tr("Lap %1").arg(interval);
+            }
+            if (isLapSwim && total_elapsed_time > 0.0) {
+                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time,
+                                      this_start_time - start_time + total_elapsed_time, segment_name);
+            } else {
+                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time,
+                                      segment_name);
+            }
+        }
+
     }
 
     int read_record(bool &stop, QStringList &errors) {
@@ -1617,13 +1654,8 @@ struct FitFileReaderState
                 case 141: /* unknown */
                     break;
                 case SEGMENT_TYPE: // #142
-                    /* Segment which contains a name. Looks like a lap, 
-                     * except there's a name in the data. 
-                     */
-                    // FIXME : normally decodeLap should not be used for segment
-                    decodeLap(def, time_offset, values);
+                    decodeSegment(def, time_offset, values); /* segment data */
                     break;
-                // decodeSegment(def, time_offset, values); break; /* segment data */
                 case 145: /* memo glob */
                 case 147: /* equipment (undocumented) = sensors presets (sensor name, wheel circumference, etc.)  ; see details below: */
                           /* #0: equipment ID / #2: equipment name / #10: default wheel circ. value / #21: user wheel circ. value / #254: local eqt idx */
