@@ -672,12 +672,11 @@ struct FitFileReaderState
         }
 
         foreach(const FitField &field, def.fields) {
-            // FIXME : validity check has been removed, to be confirmed:
-            // fit_value_t value = values[i++].v;
-            //
-            // if( value == NA_VALUE )
-            //    continue;
             const FitValue& value = values[i++];
+
+            if( value.v == NA_VALUE )
+                continue;
+
             if (FIT_DEBUG) {
                 printf ("\tfield: num: %d ", field.num);
                 DumpFitValue(value);
