@@ -44,7 +44,7 @@ SmlParser::SmlParser(RideFile* rideFile) : rideFile(rideFile)
     lon = 0;
     lat = 0;
     hr = 0;
-    temp = RideFile::NoTemp;
+    temp = RideFile::NA;
     periodic = false;
     swimming = false;
     header = false;
@@ -74,7 +74,7 @@ SmlParser::startElement(const QString&, const QString&,
         watts = 0;
         alt = 0;
         hr = 0;
-        temp = RideFile::NoTemp;
+        temp = RideFile::NA;
         periodic = false;
         swimming = false;
     }

@@ -731,7 +731,7 @@ RideSummaryWindow::htmlSummary()
 
                  // when summarising a ride temperature is -255 when not present, when aggregating its 0.0
                  if ((symbol == "average_temp" || symbol == "max_temp") && ridesummary 
-                     && rideItem->getForSymbol(symbol) == RideFile::NoTemp) {
+                     && rideItem->getForSymbol(symbol) == RideFile::NA) {
 
                     s = s.arg(ride->getTag("Temperature", "-"));
 

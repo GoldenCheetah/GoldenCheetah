@@ -764,7 +764,7 @@ struct FitFileReaderState
         if (time_offset > 0)
             time = last_time + time_offset;
         double alt = 0, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = 0;
-        double kph = 0, temperature = RideFile::NoTemp, watts = 0, slope = 0;
+        double kph = 0, temperature = RideFile::NA, watts = 0, slope = 0;
         double leftTorqueEff = 0, rightTorqueEff = 0, leftPedalSmooth = 0, rightPedalSmooth = 0;
 
         double leftPedalCenterOffset = 0;
@@ -1189,7 +1189,7 @@ struct FitFileReaderState
                     last_time+i, 0.0, 0.0,
                     last_distance,
                     0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.0, RideFile::NoTemp,
+                    0.0, 0.0, RideFile::NA,
                     0.0, 0.0, 0.0,
                     0.0, 0.0,
                     0.0, 0.0,
@@ -1215,7 +1215,7 @@ struct FitFileReaderState
                     last_time + i, cad, 0.0,
                     last_distance + (deltaDist * i/deltaSecs),
                     kph, 0.0, 0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.0, RideFile::NoTemp,
+                    0.0, 0.0, RideFile::NA,
                     0.0, 0.0, 0.0,
                     0.0, 0.0,
                     0.0, 0.0,

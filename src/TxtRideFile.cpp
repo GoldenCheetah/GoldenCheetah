@@ -286,7 +286,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         // so now we can add to the ride
                         rideFile->appendPoint(sample.secs, sample.cad, sample.hr, sample.km, 
                                               sample.kph, 0.0, sample.watts, 0.0, 0.0, 0.0, 
-                                              sample.headwind, 0.0, RideFile::NoTemp, 0.0, 
+                                              sample.headwind, 0.0, RideFile::NA, 0.0, 
                                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                               0.0, 0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0,0.0,0.0, 0);
 
@@ -455,7 +455,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 if (torqIndex >= 0) torq = tokens.at(torqIndex).toDouble();
                 if (wattsIndex >= 0) watts = tokens.at(wattsIndex).toDouble();
 
-                rideFile->appendPoint(secs, rpm, bpm, km, kph, torq, watts, 0.0, 0.0, 0.0, 0.0, 0.0, RideFile::NoTemp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, 0);
+                rideFile->appendPoint(secs, rpm, bpm, km, kph, torq, watts, 0.0, 0.0, 0.0, 0.0, 0.0, RideFile::NA, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, 0);
             }
         }
 

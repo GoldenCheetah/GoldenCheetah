@@ -127,8 +127,9 @@
 // 121 3   Nov 2015 Mark Liversedge    Added Work in W'bal zones
 // 122 7   Nov 2015 Mark Liversedge    Added HR Zones 9 and 10
 // 123 19  Nov 2015 Mark Liversedge    Force recompute of TSS/IF after logic fix
+// 124 03  Dec 2015 Mark Liversedge    Min Temp
 
-int DBSchemaVersion = 123;
+int DBSchemaVersion = 124;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

@@ -1542,9 +1542,9 @@ struct AvgTemp : public RideMetric {
     // we DO aggregate zero, its -255 we ignore !
     bool aggregateZero() const { return true; }
 
-    // override to special case NoTemp
+    // override to special case NA
     QString toString(bool useMetricUnits) const {
-        if (value() == RideFile::NoTemp) return "-";
+        if (value() == RideFile::NA) return "-";
         return RideMetric::toString(useMetricUnits);
     }
 
@@ -1565,7 +1565,7 @@ struct AvgTemp : public RideMetric {
         if (ride->areDataPresent()->temp) {
             total = count = 0;
             foreach (const RideFilePoint *point, ride->dataPoints()) {
-                if (point->temp != RideFile::NoTemp) {
+                if (point->temp != RideFile::NA) {
                     total += point->temp;
                     ++count;
                 }
@@ -1573,7 +1573,7 @@ struct AvgTemp : public RideMetric {
             setValue(count > 0 ? total / count : count);
             setCount(count);
         } else {
-            setValue(RideFile::NoTemp);
+            setValue(RideFile::NA);
             setCount(1);
         }
     }
@@ -1977,9 +1977,9 @@ class MaxTemp : public RideMetric {
         setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);
     }
 
-    // override to special case NoTemp
+    // override to special case NA
     QString toString(bool useMetricUnits) const {
-        if (value() == RideFile::NoTemp) return "-";
+        if (value() == RideFile::NA) return "-";
         return RideMetric::toString(useMetricUnits);
     }
 
@@ -1991,11 +1991,11 @@ class MaxTemp : public RideMetric {
         if (ride->areDataPresent()->temp) {
             double max = 0.0;
             foreach (const RideFilePoint *point, ride->dataPoints())
-                if (point->temp != RideFile::NoTemp && point->temp > max) max = point->temp;
+                if (point->temp != RideFile::NA && point->temp > max) max = point->temp;
 
             setValue(max);
         } else {
-            setValue(RideFile::NoTemp);
+            setValue(RideFile::NA);
         }
     }
 
@@ -2010,6 +2010,61 @@ class MaxTemp : public RideMetric {
 
 static bool maxTempAdded =
     RideMetricFactory::instance().addMetric(MaxTemp());
+
+//////////////////////////////////////////////////////////////////////////////
+
+class MinTemp : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MinTemp)
+    public:
+
+    MinTemp()
+    {
+        setSymbol("min_temp");
+        setInternalName("Min Temp");
+    }
+    void initialize() {
+        setName(tr("Min Temp"));
+        setMetricUnits(tr("C"));
+        setImperialUnits(tr("F"));
+        setType(RideMetric::Peak);
+        setPrecision(1);
+        setConversion(FAHRENHEIT_PER_CENTIGRADE);
+        setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);
+    }
+
+    // override to special case NA
+    QString toString(bool useMetricUnits) const {
+        if (value() == RideFile::NA) return "-";
+        return RideMetric::toString(useMetricUnits);
+    }
+
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        if (ride->areDataPresent()->temp) {
+            double min = 10000;
+            foreach (const RideFilePoint *point, ride->dataPoints())
+                if (point->temp != RideFile::NA && point->temp < min) min = point->temp;
+
+            setValue(min < 10000 ? min : RideFile::NA);
+        } else {
+            setValue(RideFile::NA);
+        }
+    }
+
+    void aggregateWith(const RideMetric &other) {
+        assert(symbol() == other.symbol());
+        const MinTemp &mc = dynamic_cast<const MinTemp&>(other);
+
+        setValue(mc.value(true) < value(true) ? mc.value(true) : value(true));
+    }
+    RideMetric *clone() const { return new MinTemp(*this); }
+};
+
+static bool minTempAdded =
+    RideMetricFactory::instance().addMetric(MinTemp());
 
 //////////////////////////////////////////////////////////////////////////////
 
