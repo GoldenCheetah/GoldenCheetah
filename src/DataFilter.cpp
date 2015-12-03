@@ -2099,7 +2099,12 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
     {
         // lhs and rhs
         Result lhs = eval(context, df, leaf->lvalue.l, x, m, p);
-        Result rhs = eval(context, df, leaf->rvalue.l, x, m, p);
+        Result rhs;
+
+        // if elvis we only evaluate rhs if we are null
+        if (leaf->op != ELVIS || lhs.number == 0) {
+            rhs = eval(context, df, leaf->rvalue.l, x, m, p);
+        }
 
         // NOW PERFORM OPERATION
         switch (leaf->op) {
@@ -2179,6 +2184,13 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
         }
         break;
 
+        case ELVIS:
+        {
+            // it was evaluated above, which is kinda cheating
+            // but its optimal and this is a special case.
+            if (lhs.isNumber && lhs.number) return Result(lhs.number);
+            else return Result(rhs.number);
+        }
         case MATCHES:
             if (!lhs.isNumber && !rhs.isNumber) return Result(QRegExp(rhs.string).exactMatch(lhs.string));
             else return Result(false);

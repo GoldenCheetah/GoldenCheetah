@@ -57,7 +57,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %token <function> BEST TIZ CONFIG CONST_ DATERANGE
 
 // comparative operators
-%token <op> EQ NEQ LT LTE GT GTE
+%token <op> EQ NEQ LT LTE GT GTE ELVIS
 %token <op> ADD SUBTRACT DIVIDE MULTIPLY POW
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
 %type <op> AND OR;
@@ -166,6 +166,13 @@ cexpr   : expr EQ expr              { $$ = new Leaf(@1.first_column, @3.last_col
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
+
+        | expr ELVIS expr           { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Operation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+
 
         | expr MATCHES expr         { $$ = new Leaf(@1.first_column, @3.last_column);
                                       $$->type = Leaf::Operation;
