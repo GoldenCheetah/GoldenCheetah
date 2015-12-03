@@ -45,6 +45,7 @@ int DataFiltercolumn = 1;
 "<="                                        DataFilterlval.op = LTE; return LTE;
 ">"                                         DataFilterlval.op = GT; return GT;
 ">="                                        DataFilterlval.op = GTE; return GTE;
+"?:"                                        DataFilterlval.op = ELVIS; return ELVIS;
 
 [Mm][Aa][Tt][Cc][Hh][Ee][Ss]                DataFilterlval.op = MATCHES; return MATCHES;
 [Bb][Ee][Gg][Ii][Nn][Ss][Ww][Ii][Tt][Hh]    DataFilterlval.op = BEGINSWITH; return BEGINSWITH;
