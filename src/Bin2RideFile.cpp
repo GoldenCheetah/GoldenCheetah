@@ -158,7 +158,7 @@ struct Bin2FileReaderState
         int nm = 0;
         double kph = 0.0;
         int alt = 0;
-        double temp = RideFile::NoTemp;
+        double temp = RideFile::NA;
         double lat = 0.0;
         double lng = 0.0;
         double km = 0.0;
@@ -223,7 +223,7 @@ struct Bin2FileReaderState
             kph = kph/10.0;
 
         if (temp == 0x8000) //0x8000 = invalid
-            temp = RideFile::NoTemp;
+            temp = RideFile::NA;
         else if (temp > 0x7FFF) // Negative
             temp = (temp-0xFFFF)/10.0;
         else

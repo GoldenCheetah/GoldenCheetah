@@ -2459,6 +2459,9 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;
 
+        // skip unavailable values
+        if (value == RideFile::NA) continue;
+
         // Special computed metrics (LTS/STS) have a null metric pointer
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
@@ -2477,7 +2480,7 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
         bool aggZero = metricDetail.metric ? metricDetail.metric->aggregateZero() : false;
 
         // set aggZero to false and value to zero if is temperature and -255
-        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NA) {
             value = 0;
             aggZero = false;
         }
@@ -2580,8 +2583,11 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;
 
+        // skip unavailable values
+        if (value == RideFile::NA) continue;
+
         // set aggZero to false and value to zero if is temperature and -255
-        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NA) {
             value = 0;
             aggZero = false;
         }
@@ -2708,6 +2714,9 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;
 
+        // skip unavailable values
+        if (value == RideFile::NA) continue;
+
         // convert seconds to hours
         if (metricDetail.uunits == tr("seconds")) value /= 3600;
 
@@ -2829,8 +2838,11 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;
 
+        // skip unavailable values
+        if (value == RideFile::NA) continue;
+
         // set aggZero to false and value to zero if is temperature and -255
-        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NA) {
             value = 0;
             aggZero = false;
         }

@@ -200,7 +200,7 @@ class RideFile : public QObject // QObject to emit signals
                           wbal, tcore,
                           none }; // none must ALWAYS be last
 
-        enum specialValues { NoTemp = -255 };
+        enum specialValues { NA = -255 };
         typedef enum seriestype SeriesType;
         static SeriesType lastSeriesType() { return none; }
 
