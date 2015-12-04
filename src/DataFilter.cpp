@@ -1084,8 +1084,8 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
         break;
 
     case Leaf::UnaryOperation :
-        { // only 1 at present, unary minus return the value * -1
-            if (!Leaf::isNumber(df, leaf->lvalue.l)) {
+        { // unary minus needs a number, unary ! is happy with anything
+            if (leaf->op == '-' && !Leaf::isNumber(df, leaf->lvalue.l)) {
                 DataFiltererrors << QString(tr("unary negation on a string!"));
                 leaf->inerror = true;
             }
@@ -2087,7 +2087,15 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
     {
         // get result
         Result lhs = eval(context, df, leaf->lvalue.l, x, m, p);
-        return Result(lhs.number * -1);
+
+        // unary minus
+        if (leaf->op == '-') return Result(lhs.number * -1);
+
+        // unary not
+        if (leaf->op == '!') return Result(!lhs.number);
+
+        // unknown
+        return(Result(0));
     }
     break;
 

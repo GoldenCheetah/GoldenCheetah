@@ -117,6 +117,12 @@ lexpr   : expr                       { $$ = $1; }
                                           $$->fparms << $3;
                                           $$->fparms << $5;
                                           $$->op = 0; }
+        | '!' lexpr %prec OR         { $$ = new Leaf(@1.first_column, @2.last_column);
+                                      $$->type = Leaf::UnaryOperation;
+                                      $$->lvalue.l = $2;
+                                      $$->op = '!';
+                                      $$->rvalue.l = NULL; 
+                                     }
 
         | lexpr OR lexpr             { $$ = new Leaf(@1.first_column, @3.last_column);
                                       $$->type = Leaf::Logical;
