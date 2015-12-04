@@ -57,7 +57,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %token <function> BEST TIZ CONFIG CONST_ DATERANGE
 
 // comparative operators
-%token <op> EQ NEQ LT LTE GT GTE ELVIS
+%token <op> EQ NEQ LT LTE GT GTE ELVIS ASSIGN
 %token <op> ADD SUBTRACT DIVIDE MULTIPLY POW
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
 %type <op> AND OR;
@@ -98,6 +98,14 @@ lexpr   : expr                       { $$ = $1; }
 
         | cexpr                      { $$ = $1; }
 
+        | symbol ASSIGN expr        {
+                                        $$ = new Leaf(@1.first_column, @3.last_column);
+                                        $$->type = Leaf::Operation;
+                                        $$->lvalue.l = $1;
+                                        $$->op = $2;
+                                        $$->rvalue.l = $3;
+                                     }
+
         | '(' lexpr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
                                       $$->type = Leaf::Logical;
                                       $$->lvalue.l = $2;
@@ -121,7 +129,7 @@ lexpr   : expr                       { $$ = $1; }
                                       $$->type = Leaf::UnaryOperation;
                                       $$->lvalue.l = $2;
                                       $$->op = '!';
-                                      $$->rvalue.l = NULL; 
+                                      $$->rvalue.l = NULL;
                                      }
 
         | lexpr OR lexpr             { $$ = new Leaf(@1.first_column, @3.last_column);
@@ -235,7 +243,7 @@ expr : expr SUBTRACT expr              { $$ = new Leaf(@1.first_column, @3.last_
                                       $$->type = Leaf::UnaryOperation;
                                       $$->lvalue.l = $2;
                                       $$->op = $1;
-                                      $$->rvalue.l = NULL; 
+                                      $$->rvalue.l = NULL;
                                      }
 
 
@@ -297,7 +305,7 @@ expr : expr SUBTRACT expr              { $$ = new Leaf(@1.first_column, @3.last_
 
       ;
 
-symbol : SYMBOL                      { $$ = new Leaf(@1.first_column, @1.last_column); 
+symbol : SYMBOL                      { $$ = new Leaf(@1.first_column, @1.last_column);
                                        $$->type = Leaf::Symbol;
                                        if (QString(DataFiltertext) == "BikeScore")
                                           $$->lvalue.n = new QString("BikeScore&#8482;");

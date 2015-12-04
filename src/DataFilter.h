@@ -129,6 +129,9 @@ class DataFilter : public QObject
         // microcache for oft-repeated vector operations
         QHash<QString, Result> snips;
 
+        // user defined symbols
+        QHash<QString, Result> symbols;
+
     public slots:
         QStringList parseFilter(QString query, QStringList *list=0);
         QStringList check(QString query);
