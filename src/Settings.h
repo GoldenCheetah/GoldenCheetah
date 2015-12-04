@@ -166,6 +166,9 @@
 #define GC_DPDP_BIKEWEIGHT              "<global-general>dataprocess/fixderivepower/bikewheight"
 #define GC_DPDP_CRR                     "<global-general>dataprocess/fixderivepower/crr"
 #define GC_DPFV_MA                     "<global-general>dataprocess/fixspeed/ma"
+#define GC_CAD2SMO2                     "<global-general>dataprocess/fixmoxy/cad2smo2"
+#define GC_SPD2THB			"<global-general>dataprocess/fixmoxy/spd2thb"
+
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where
