@@ -453,7 +453,20 @@ GSettings::clearGlobalAndAthletes() {
 }
 
 
-//------------------ special methods for Upgrade/Migration -------------------------------------//
+/*-------------------------------- special methods for Upgrade/Migration --------------------------
+ *
+ * The .INI based storage of Settings has been introduced with GoldenCheetah v3.3.0
+ *
+ * To transition existing settings (in PLISTs (OSX) and Registry (WINDOWS) from the
+ * propriety storage to the common .INI files an automatic migration of Settings takes
+ * place when no Settings are found. The methods executing the migration are implemented here
+ *
+ * Any development starting starting after v3.3 (so v4.0 and onwards) does not need
+ * to take the migration into account, since any newly defined settings are only stored
+ * using the new .INI based technique.
+ *
+ -----------------------------------------------------------------------------------------------*/
+
 void
 GSettings::migrateValue(QString key) {
 
@@ -514,6 +527,8 @@ GSettings::upgradeSystem() {
     // by explicitely naming all the properties, and not choosing the "allKeys()" function,
     // only the properties still in use are migrated - and not any orphans for previous releases
 
+    // NOTE: Migrating values is only required for settings introduced in GC version until v3.3
+
     migrateValue(GC_HOMEDIR);
     migrateValue(GC_SETTINGS_LAST);
     migrateValue(GC_SETTINGS_MAIN_GEOM);
@@ -552,6 +567,9 @@ GSettings::upgradeGlobal() {
     // by explicitely naming all the properties, and not choosing the "allKeys()" function,
     // only the properties still in use are migrated - and not any orphans for previous releases
 
+    // NOTE: Migrating values is only required for settings introduced in GC version until v3.3
+
+
     migrateValue(GC_SETTINGS_SUMMARY_METRICS);
     migrateValue(GC_SETTINGS_BESTS_METRICS);
     migrateValue(GC_SETTINGS_INTERVAL_METRICS);
@@ -585,10 +603,6 @@ GSettings::upgradeGlobal() {
     migrateValue(GC_SWIMPACE);
     migrateValue(GC_ELEVATION_HYSTERESIS);
     migrateValue(GC_START_HTTP);
-    migrateValue(GC_CAD2SMO2);
-    migrateValue(GC_SPD2THB);
-
-
 
     // Handle the Dataprocessor dp/%1/apply keys
     // Handle the RideEditor colmap/%1 keys
@@ -640,6 +654,8 @@ GSettings::upgradeAthlete(QString athlete) {
 
     // by explicitely naming all the properties, and not choosing the "allKeys()" function,
     // only the properties still in use are migrated - and not any orphans for previous releases
+
+    // NOTE: Migrating values is only required for settings introduced in GC version until v3.3
 
     migrateCValue(athlete, GC_VERSION_USED);
     migrateCValue(athlete, GC_SAFEEXIT);
