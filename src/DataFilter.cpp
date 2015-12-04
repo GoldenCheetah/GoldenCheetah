@@ -799,6 +799,7 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
     case Leaf::Symbol :
         {
             QString symbol = *(leaf->lvalue.n);
+            if (df->symbols.contains(symbol)) return true;
             if (symbol == "isRun") return true;
             if (symbol == "x") return true;
             else if (symbol == "isSwim") return true;
@@ -875,8 +876,12 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     symbol.compare("Current", Qt::CaseInsensitive) &&
                     !df->dataSeriesSymbols.contains(symbol) &&
                     symbol != "isSwim" && symbol != "isRun" && !isCoggan(symbol)) {
-                    DataFiltererrors << QString(tr("%1 is unknown")).arg(symbol);
-                    leaf->inerror = true;
+
+                    // unknown, is it user defined ?
+                    if (!df->symbols.contains(symbol)) {
+                        DataFiltererrors << QString(tr("%1 is unknown")).arg(symbol);
+                        leaf->inerror = true;
+                    }
                 }
 
                 if (symbol.compare("Current", Qt::CaseInsensitive))
@@ -1094,23 +1099,51 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
     case Leaf::BinaryOperation  :
     case Leaf::Operation  :
         {
-            // first lets make sure the lhs and rhs are of the same type
-            bool lhsType = Leaf::isNumber(df, leaf->lvalue.l);
-            bool rhsType = Leaf::isNumber(df, leaf->rvalue.l);
-            if (lhsType != rhsType) {
-                DataFiltererrors << QString(tr("comparing strings with numbers"));
-                leaf->inerror = true;
-            }
+            if (leaf->op == ASSIGN) {
 
-            // what about using string operations on a lhs/rhs that
-            // are numeric?
-            if ((lhsType || rhsType) && leaf->op >= MATCHES && leaf->op <= CONTAINS) {
-                DataFiltererrors << tr("using a string operations with a number");
-                leaf->inerror = true;
-            }
+                // add the symbol first
+                if (leaf->lvalue.l->type == Leaf::Symbol) {
 
-            validateFilter(df, leaf->lvalue.l);
-            validateFilter(df, leaf->rvalue.l);
+                    // add symbol
+                    QString symbol = *(leaf->lvalue.l->lvalue.n);
+                    df->symbols.insert(symbol, Result(0));
+
+                    // validate rhs is numeric
+                    bool rhsType = Leaf::isNumber(df, leaf->rvalue.l);
+                    if (!rhsType) {
+                        DataFiltererrors << QString(tr("variables must be numeric."));
+                        leaf->inerror = true;
+                    }
+
+                } else {
+
+                    DataFiltererrors << QString(tr("assignment must be to a symbol."));
+                    leaf->inerror = true;
+                }
+
+                // and check the rhs is good too
+                validateFilter(df, leaf->rvalue.l);
+
+            } else {
+
+                // first lets make sure the lhs and rhs are of the same type
+                bool lhsType = Leaf::isNumber(df, leaf->lvalue.l);
+                bool rhsType = Leaf::isNumber(df, leaf->rvalue.l);
+                if (lhsType != rhsType) {
+                    DataFiltererrors << QString(tr("comparing strings with numbers"));
+                    leaf->inerror = true;
+                }
+
+                // what about using string operations on a lhs/rhs that
+                // are numeric?
+                if ((lhsType || rhsType) && leaf->op >= MATCHES && leaf->op <= CONTAINS) {
+                    DataFiltererrors << tr("using a string operations with a number");
+                    leaf->inerror = true;
+                }
+
+                validateFilter(df, leaf->lvalue.l);
+                validateFilter(df, leaf->rvalue.l);
+            }
         }
         break;
 
@@ -1235,6 +1268,7 @@ QStringList DataFilter::parseFilter(QString query, QStringList *list)
     this->list = list;
     isdynamic=false;
     snips.clear();
+    symbols.clear();
 
     // regardless of fail/pass set the signature
     setSignature(query);
@@ -1985,6 +2019,9 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
         QString rename;
         QString symbol = *(leaf->lvalue.n);
 
+        // user defined symbols override all others !
+        if (df->symbols.contains(symbol)) return Result(df->symbols.value(symbol));
+
         // is it isRun ?
         if (symbol == "x") {
 
@@ -2106,16 +2143,32 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
     case Leaf::Operation :
     {
         // lhs and rhs
-        Result lhs = eval(context, df, leaf->lvalue.l, x, m, p);
-        Result rhs;
+        Result lhs;
+        if (leaf->op != ASSIGN) lhs = eval(context, df, leaf->lvalue.l, x, m, p);
 
         // if elvis we only evaluate rhs if we are null
+        Result rhs;
         if (leaf->op != ELVIS || lhs.number == 0) {
             rhs = eval(context, df, leaf->rvalue.l, x, m, p);
         }
 
         // NOW PERFORM OPERATION
         switch (leaf->op) {
+
+        case ASSIGN:
+        {
+            // LHS MUST be a symbol...
+            if (leaf->lvalue.l->type == Leaf::Symbol) {
+
+                QString symbol = *(leaf->lvalue.l->lvalue.n);
+                Result value(rhs.isNumber ? rhs.number : 0);
+                df->symbols.insert(symbol, value);
+
+                return value;
+            }
+            return Result(0);
+        }
+        break;
 
         case ADD:
         {
