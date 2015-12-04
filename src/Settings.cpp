@@ -585,6 +585,8 @@ GSettings::upgradeGlobal() {
     migrateValue(GC_SWIMPACE);
     migrateValue(GC_ELEVATION_HYSTERESIS);
     migrateValue(GC_START_HTTP);
+    migrateValue(GC_CAD2SMO2);
+    migrateValue(GC_SPD2THB);
 
 
 

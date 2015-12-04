@@ -23,6 +23,7 @@
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
+#include <QCheckBox>
 
 // Config widget used by the Preferences/Options config panes
 class FixMoxy;
@@ -36,13 +37,28 @@ class FixMoxyConfig : public DataProcessorConfig
         QLabel *paLabel;
         QLabel *percentLabel;
         QLineEdit *pa;
-
+	QCheckBox *cadConv;
+	QCheckBox *spdConv;
     public:
         FixMoxyConfig(QWidget *parent) : DataProcessorConfig(parent) {
 
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixMoxy));
-        }
+
+	    layout = new QHBoxLayout(this);
+
+	    layout->setContentsMargins(0,0,0,0);
+	    setContentsMargins(0,0,0,0);
+	    paLabel = new QLabel(tr("Field Adjustment"));
+
+	    cadConv = new QCheckBox(tr("Cadence to SMO2"));
+	    spdConv = new QCheckBox(tr("Speed to tHb"));
+
+	    layout->addWidget(paLabel);
+	    layout->addWidget(cadConv);
+	    layout->addWidget(spdConv);
+	    layout->addStretch();
+	}
 
         //~FixMoxyConfig() {} // deliberately not declared since Qt will delete
                               // the widget and its children when the config pane is deleted
@@ -55,9 +71,17 @@ class FixMoxyConfig : public DataProcessorConfig
                            " and cadence into the Moxy series."
                            )));
         }
-
-        void readConfig() { }
-        void saveConfig() { }
+        void readConfig() {
+	    bool isCad = appsettings->value(NULL, GC_CAD2SMO2, Qt::Checked).toBool();
+	    bool isSpd = appsettings->value(NULL, GC_SPD2THB, Qt::Checked).toBool();
+	    cadConv->setCheckState(isCad ? Qt::Checked : Qt::Unchecked);
+	    spdConv->setCheckState(isSpd ? Qt::Checked : Qt::Unchecked);
+	    
+	}
+        void saveConfig() {
+	    appsettings->setValue(GC_CAD2SMO2, cadConv->checkState());
+	    appsettings->setValue(GC_SPD2THB, spdConv->checkState());
+	}
 };
 
 
@@ -92,26 +116,46 @@ bool
 FixMoxy::postProcess(RideFile *ride, DataProcessorConfig *config=0)
 {
     Q_UNUSED(config);
+    bool isCad;
+    bool isSpd;
+
+    if (config == NULL) { // being called automatically
+	isCad = appsettings->value(NULL, GC_CAD2SMO2, Qt::Checked).toBool();
+	isSpd = appsettings->value(NULL, GC_SPD2THB, Qt::Checked).toBool();
+    } else { // being called manually
+	isCad = ((FixMoxyConfig*)(config))->cadConv->checkState();
+	isSpd = ((FixMoxyConfig*)(config))->spdConv->checkState();
+    }
 
     // does this ride have power?
-    if (ride->areDataPresent()->kph == false || ride->areDataPresent()->cad == false) return false;
+    if ((isSpd && ride->areDataPresent()->kph == false) ||
+	(isCad && ride->areDataPresent()->cad == false))
+	return false;
 
     // apply the change
     ride->command->startLUW("Fix Moxy");
     for (int i=0; i<ride->dataPoints().count(); i++) {
         RideFilePoint *point = ride->dataPoints()[i];
 
-        ride->command->setPointValue(i, RideFile::smo2, point->cad);
-        ride->command->setPointValue(i, RideFile::thb, point->kph);
-        ride->command->setPointValue(i, RideFile::cad, 0.00f);
-        ride->command->setPointValue(i, RideFile::kph, 0.00f);
+	if (isCad) {
+	    ride->command->setPointValue(i, RideFile::smo2, point->cad);
+	    ride->command->setPointValue(i, RideFile::cad, 0.00f);
+	}
+	if (isSpd) {
+	    ride->command->setPointValue(i, RideFile::thb, point->kph);
+	    ride->command->setPointValue(i, RideFile::kph, 0.00f);
+	}
     }
 
     // shift the data present flags
-    ride->command->setDataPresent(RideFile::smo2, true);
-    ride->command->setDataPresent(RideFile::thb, true);
-    ride->command->setDataPresent(RideFile::cad, false);
-    ride->command->setDataPresent(RideFile::kph, false);
+    if (isCad) {
+	ride->command->setDataPresent(RideFile::cad, false);
+	ride->command->setDataPresent(RideFile::smo2, true);
+    }
+    if (isSpd) {
+	ride->command->setDataPresent(RideFile::thb, true);
+	ride->command->setDataPresent(RideFile::kph, false);
+    }
     ride->command->endLUW();
 
     return true;
