@@ -74,7 +74,7 @@ class Leaf {
         enum { none, Float, Integer, String, Symbol, 
                Logical, Operation, BinaryOperation, UnaryOperation,
                Function, Conditional, Vector,
-               Parameters } type;
+               Parameters, Compound } type;
 
         union value {
             float f;
@@ -82,6 +82,7 @@ class Leaf {
             QString *s;
             QString *n;
             Leaf *l;
+            QList<Leaf *> *b;
         } lvalue, rvalue, cond;
 
         int op;
