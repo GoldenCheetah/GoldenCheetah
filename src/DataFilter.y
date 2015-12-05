@@ -71,7 +71,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %locations
 
-%type <leaf> symbol literal lexpr cexpr expr parms block;
+%type <leaf> symbol literal lexpr cexpr expr parms block statement;
 %type <comp> statements
 
 %right '?' ':'
@@ -95,9 +95,20 @@ block: '{' statements '}'           { $$ = new Leaf(@1.first_column, @3.last_col
                                     }
         ;
 
-statements: lexpr ';'               { $$ = new QList<Leaf*>(); $$->append($1); }
-          | statements lexpr ';'    { $$->append($2); }
+statements: statement ';'               { $$ = new QList<Leaf*>(); $$->append($1); }
+          | statements statement ';'    { $$->append($2); }
           ;
+
+statement: lexpr                    { $$ = $1; }
+        | symbol ASSIGN lexpr        {
+                                        $$ = new Leaf(@1.first_column, @3.last_column);
+                                        $$->type = Leaf::Operation;
+                                        $$->lvalue.l = $1;
+                                        $$->op = $2;
+                                        $$->rvalue.l = $3;
+                                     }
+
+        ;
 
 parms: lexpr                        { $$ = new Leaf(@1.first_column, @1.last_column);
                                       $$->type = Leaf::Parameters;
@@ -110,14 +121,6 @@ parms: lexpr                        { $$ = new Leaf(@1.first_column, @1.last_col
 lexpr   : expr                       { $$ = $1; }
 
         | cexpr                      { $$ = $1; }
-
-        | symbol ASSIGN expr        {
-                                        $$ = new Leaf(@1.first_column, @3.last_column);
-                                        $$->type = Leaf::Operation;
-                                        $$->lvalue.l = $1;
-                                        $$->op = $2;
-                                        $$->rvalue.l = $3;
-                                     }
 
         | '(' lexpr ')'               { $$ = new Leaf(@2.first_column, @2.last_column);
                                       $$->type = Leaf::Logical;
