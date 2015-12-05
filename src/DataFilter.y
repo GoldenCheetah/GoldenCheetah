@@ -73,6 +73,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %locations
 
 %type <leaf> symbol literal lexpr cexpr expr parms block statement expression;
+%type <leaf> simple_statement if_clause;
 %type <comp> statements
 
 %right '?' ':'
@@ -86,11 +87,12 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %start filter;
 %%
 
-filter: statement                       { DataFilterroot = $1; }
+filter: simple_statement            { DataFilterroot = $1; }
+        | if_clause                 { DataFilterroot = $1; }
         | block                     { DataFilterroot = $1; }
         ;
 
-expression: statement ';'           { $$ = $1; }
+expression: statement               { $$ = $1; }
             | block                 { $$ = $1; }
             ;
 
@@ -100,13 +102,27 @@ block: '{' statements '}'           { $$ = new Leaf(@1.first_column, @3.last_col
                                     }
         ;
 
-statements: statement ';'               { $$ = new QList<Leaf*>(); $$->append($1); }
-          | statements statement ';'    { $$->append($2); }
+statements: statement                { $$ = new QList<Leaf*>(); $$->append($1); }
+          | statements statement     { $$->append($2); }
           ;
 
-statement: lexpr                    { $$ = $1; }
+statement: simple_statement ';'
+          | if_clause
+          ;
 
-        | IF_ '(' lexpr ')' expression  { $$ = new Leaf(@1.first_column, @5.last_column);
+simple_statement: lexpr                     { $$ = $1; }
+        | symbol ASSIGN lexpr         {
+                                        $$ = new Leaf(@1.first_column, @3.last_column);
+                                        $$->type = Leaf::Operation;
+                                        $$->lvalue.l = $1;
+                                        $$->op = $2;
+                                        $$->rvalue.l = $3;
+                                     }
+        ;
+
+if_clause: 
+
+        IF_ '(' lexpr ')' expression  { $$ = new Leaf(@1.first_column, @5.last_column);
                                        $$->type = Leaf::Conditional;
                                        $$->op = 0;
                                        $$->lvalue.l = $5;
@@ -121,13 +137,6 @@ statement: lexpr                    { $$ = $1; }
                                                   $$->cond.l = $3;
                                                 }
 
-        | symbol ASSIGN lexpr        {
-                                        $$ = new Leaf(@1.first_column, @3.last_column);
-                                        $$->type = Leaf::Operation;
-                                        $$->lvalue.l = $1;
-                                        $$->op = $2;
-                                        $$->rvalue.l = $3;
-                                     }
 
         ;
 
