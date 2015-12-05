@@ -615,6 +615,13 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
         }
         break;
 
+    case Leaf::Compound :
+        {
+            foreach(Leaf *statement, *(leaf->lvalue.b)) leaf->color(statement, document);
+            // don't return in case the whole thing is a mess...
+        }
+        break;
+
     default:
         return;
         break;
