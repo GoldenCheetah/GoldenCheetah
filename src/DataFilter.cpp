@@ -718,6 +718,12 @@ void Leaf::print(Leaf *leaf, int level)
         return;
     }
     switch(leaf->type) {
+    case Leaf::Compound: 
+                        qDebug()<<"{";
+                        foreach(Leaf *p, *(leaf->lvalue.b)) print(p, level+1);
+                        qDebug()<<"}";
+                        break;
+
     case Leaf::Float : qDebug()<<"float"<<leaf->lvalue.f<<leaf->dynamic; break;
     case Leaf::Integer : qDebug()<<"integer"<<leaf->lvalue.i<<leaf->dynamic; break;
     case Leaf::String : qDebug()<<"string"<<*leaf->lvalue.s<<leaf->dynamic; break;
@@ -782,6 +788,7 @@ static bool isCoggan(QString symbol)
 bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
 {
     switch(leaf->type) {
+    case Leaf::Compound : return true; // last statement is value of block
     case Leaf::Float : return true;
     case Leaf::Integer : return true;
     case Leaf::String :
@@ -1168,6 +1175,14 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             // should never get here !
             DataFiltererrors << tr("internal parser error: parms");
             leaf->inerror = true;
+        }
+        break;
+
+    case Leaf::Compound :
+        {
+            // a list of statements, the last of which is what we
+            // evaluate to for the purposes of filtering etc 
+            foreach(Leaf *p, *(leaf->lvalue.b)) validateFilter(df, p);
         }
         break;
 
@@ -2119,7 +2134,6 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
     //
     // UNARY EXPRESSION
     //
-
     case Leaf::UnaryOperation :
     {
         // get result
@@ -2280,6 +2294,9 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
     }
     break;
 
+    //
+    // CONDITIONAL TERNARY
+    //
     case Leaf::Conditional :
     {
         Result cond = eval(context, df, leaf->cond.l, x, m, p);
@@ -2288,6 +2305,9 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
     }
     break;
 
+    //
+    // VECTORS
+    //
     case Leaf::Vector :
     {
         // places results in vector, and number is sum of all
@@ -2347,6 +2367,22 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
         // always return as sum number (for now)
         return returning;
     }
+    break;
+
+    //
+    // COMPOUND EXPRESSION
+    //
+    case Leaf::Compound :
+    {
+        Result returning(0);
+
+        // evaluate each statement
+        foreach(Leaf *statement, *(leaf->lvalue.b)) returning = eval(context, df, statement, x, m, p);
+
+        // compound statements evaluate to the value of the last statement
+        return returning;
+    }
+    break;
 
     default: // we don't need to evaluate any lower - they are leaf nodes handled above
         break;

@@ -64,13 +64,15 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %union {
    Leaf *leaf;
+   QList<Leaf*> *comp;
    int op;
    char function[32];
 }
 
 %locations
 
-%type <leaf> symbol literal lexpr cexpr expr parms;
+%type <leaf> symbol literal lexpr cexpr expr parms block;
+%type <comp> statements
 
 %right '?' ':'
 %right '[' ']'
@@ -84,7 +86,18 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %%
 
 filter: lexpr                       { DataFilterroot = $1; }
+        | block                     { DataFilterroot = $1; }
         ;
+
+block: '{' statements '}'           { $$ = new Leaf(@1.first_column, @3.last_column);
+                                      $$->type = Leaf::Compound;
+                                      $$->lvalue.b = $2;
+                                    }
+        ;
+
+statements: lexpr ';'               { $$ = new QList<Leaf*>(); $$->append($1); }
+          | statements lexpr ';'    { $$->append($2); }
+          ;
 
 parms: lexpr                        { $$ = new Leaf(@1.first_column, @1.last_column);
                                       $$->type = Leaf::Parameters;
