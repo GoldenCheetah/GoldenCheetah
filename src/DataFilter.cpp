@@ -207,7 +207,7 @@ Leaf::isDynamic(Leaf *leaf)
         {
                     return leaf->isDynamic(leaf->cond.l) ||
                            leaf->isDynamic(leaf->lvalue.l) ||
-                           leaf->isDynamic(leaf->rvalue.l);
+                           (leaf->rvalue.l && leaf->isDynamic(leaf->rvalue.l));
                     break;
         }
     case Leaf::Vector :
@@ -610,7 +610,7 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
         {
                     leaf->color(leaf->cond.l, document);
                     leaf->color(leaf->lvalue.l, document);
-                    leaf->color(leaf->rvalue.l, document);
+                    if (leaf->rvalue.l) leaf->color(leaf->rvalue.l, document);
                     return;
         }
         break;
@@ -701,10 +701,16 @@ Leaf::toString()
 
     case Leaf::Conditional : qDebug()<<"cond";
         {
-                    return QString("%1?%2:%3")
-                    .arg(cond.l->toString())
-                    .arg(lvalue.l->toString())
-                    .arg(rvalue.l->toString());
+                    if (rvalue.l) {
+                        return QString("%1?%2:%3")
+                        .arg(cond.l->toString())
+                        .arg(lvalue.l->toString())
+                        .arg(rvalue.l->toString());
+                    } else {
+                        return QString("%1?%2")
+                        .arg(cond.l->toString())
+                        .arg(lvalue.l->toString());
+                    }
         }
         break;
     case Leaf::Parameters :
@@ -768,7 +774,7 @@ void Leaf::print(Leaf *leaf, int level)
         {
                     leaf->print(leaf->cond.l, level+1);
                     leaf->print(leaf->lvalue.l, level+1);
-                    leaf->print(leaf->rvalue.l, level+1);
+                    if (leaf->rvalue.l) leaf->print(leaf->rvalue.l, level+1);
         }
         break;
     case Leaf::Parameters :
@@ -1173,7 +1179,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             // three expressions to validate
             validateFilter(df, leaf->cond.l);
             validateFilter(df, leaf->lvalue.l);
-            validateFilter(df, leaf->rvalue.l);
+            if (leaf->rvalue.l) validateFilter(df, leaf->rvalue.l);
         }
         break;
 
@@ -2302,13 +2308,18 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
     break;
 
     //
-    // CONDITIONAL TERNARY
+    // CONDITIONAL TERNARY / IF .. ELSE ..
     //
     case Leaf::Conditional :
     {
         Result cond = eval(context, df, leaf->cond.l, x, m, p);
         if (cond.isNumber && cond.number) return eval(context, df, leaf->lvalue.l, x, m, p);
-        else return eval(context, df, leaf->rvalue.l, x, m, p);
+        else {
+
+            // conditional may not have an else clause!
+            if (leaf->rvalue.l) return eval(context, df, leaf->rvalue.l, x, m, p);
+            else return Result(0);
+        }
     }
     break;
 

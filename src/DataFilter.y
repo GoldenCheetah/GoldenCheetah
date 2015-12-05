@@ -57,6 +57,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %token <function> BEST TIZ CONFIG CONST_ DATERANGE
 
 // comparative operators
+%token <op> IF_ ELSE_
 %token <op> EQ NEQ LT LTE GT GTE ELVIS ASSIGN
 %token <op> ADD SUBTRACT DIVIDE MULTIPLY POW
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
@@ -71,7 +72,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %locations
 
-%type <leaf> symbol literal lexpr cexpr expr parms block statement;
+%type <leaf> symbol literal lexpr cexpr expr parms block statement expression;
 %type <comp> statements
 
 %right '?' ':'
@@ -85,9 +86,13 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %start filter;
 %%
 
-filter: lexpr                       { DataFilterroot = $1; }
+filter: statement                       { DataFilterroot = $1; }
         | block                     { DataFilterroot = $1; }
         ;
+
+expression: statement ';'           { $$ = $1; }
+            | block                 { $$ = $1; }
+            ;
 
 block: '{' statements '}'           { $$ = new Leaf(@1.first_column, @3.last_column);
                                       $$->type = Leaf::Compound;
@@ -100,6 +105,22 @@ statements: statement ';'               { $$ = new QList<Leaf*>(); $$->append($1
           ;
 
 statement: lexpr                    { $$ = $1; }
+
+        | IF_ '(' lexpr ')' expression  { $$ = new Leaf(@1.first_column, @5.last_column);
+                                       $$->type = Leaf::Conditional;
+                                       $$->op = 0;
+                                       $$->lvalue.l = $5;
+                                       $$->rvalue.l = NULL;
+                                       $$->cond.l = $3;
+                                    }
+        | IF_ '(' lexpr ')' expression ELSE_ expression { $$ = new Leaf(@1.first_column, @5.last_column);
+                                                  $$->type = Leaf::Conditional;
+                                                  $$->op = 0; 
+                                                  $$->lvalue.l = $5;
+                                                  $$->rvalue.l = $7;
+                                                  $$->cond.l = $3;
+                                                }
+
         | symbol ASSIGN lexpr        {
                                         $$ = new Leaf(@1.first_column, @3.last_column);
                                         $$->type = Leaf::Operation;
