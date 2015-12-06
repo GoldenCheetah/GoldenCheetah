@@ -675,6 +675,8 @@ TrainSidebar::configChanged(qint32)
             Devices[i].controller = new NullController(this, &Devices[i]);
         } else if (Devices.at(i).type == DEV_ANTLOCAL) {
             Devices[i].controller = new ANTlocalController(this, &Devices[i]);
+            // connect slot for receiving remote control commands
+            connect(Devices[i].controller, SIGNAL(antRemoteControl(uint16_t)), this, SLOT(remoteControl(uint16_t)));
 #ifdef GC_HAVE_WFAPI
         } else if (Devices.at(i).type == DEV_KICKR) {
             Devices[i].controller = new KickrController(this, &Devices[i]);
@@ -2108,5 +2110,38 @@ TrainSidebar::selectWorkout(QString fullpath)
             workoutTree->setCurrentIndex(workoutTree->model()->index(i,0));
             break;
         }
+    }
+}
+
+// got a remote control command
+void
+TrainSidebar::remoteControl(uint16_t command)
+{
+    // todo: move command mappings to a configuration file
+
+    switch(command){
+
+    case ANT_CONTROL_GENERIC_CMD_START:
+        this->Start();
+        break;
+
+    case ANT_CONTROL_GENERIC_CMD_STOP:
+        this->Stop();
+        break;
+
+    case ANT_CONTROL_GENERIC_CMD_LAP:
+        this->newLap();
+        break;
+
+    case ANT_CONTROL_GENERIC_CMD_MENU_UP:
+        this->Higher();
+        break;
+
+    case ANT_CONTROL_GENERIC_CMD_MENU_DOWN:
+        this->Lower();
+        break;
+
+    default:
+        break;
     }
 }
