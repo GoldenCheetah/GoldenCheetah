@@ -169,6 +169,9 @@ struct setChannelAtom {
 #define ANT_CW_INIT            0x53
 #define ANT_CW_TEST            0x48
 
+#define ANT_TX_TYPE_SLAVE      0x00
+#define ANT_TX_TYPE_MASTER     0x05 // typical tx type for master device, see ANT Message Protocol and Usage doc
+
 #define TRANSITION_START       0x00 // start of transition when opening
 
 // ANT message structure.
@@ -511,6 +514,8 @@ public:
     void setVortexData(int channel, int id);
     void refreshVortexLoad();
 
+    void setControlChannel(int channel);
+
     void setTrainerStatusAvailable(bool status) { telemetry.setTrainerStatusAvailable(status); }
     void setTrainerCalibRequired(bool status) { telemetry.setTrainerCalibRequired(status); }
     void setTrainerConfigRequired(bool status) { telemetry.setTrainerConfigRequired(status); }
@@ -582,6 +587,9 @@ private:
     // tacx vortex (we'll probably want to abstract this out cf. kickr)
     int vortexID;
     int vortexChannel;
+
+    // remote control data
+    int controlChannel;
 
     // cylist for wheelsize settings
     QString trainCyclist;
