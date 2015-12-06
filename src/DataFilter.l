@@ -51,6 +51,8 @@ int DataFiltercolumn = 1;
 "if"                                        DataFilterlval.op = IF_; return IF_;
 "else"                                      DataFilterlval.op = ELSE_; return ELSE_;
 
+"while"                                     DataFilterlval.op = WHILE; return WHILE;
+
 [Mm][Aa][Tt][Cc][Hh][Ee][Ss]                DataFilterlval.op = MATCHES; return MATCHES;
 [Bb][Ee][Gg][Ii][Nn][Ss][Ww][Ii][Tt][Hh]    DataFilterlval.op = BEGINSWITH; return BEGINSWITH;
 [Ee][Nn][Dd][Ss][Ww][Ii][Tt][Hh]            DataFilterlval.op = ENDSWITH; return ENDSWITH;

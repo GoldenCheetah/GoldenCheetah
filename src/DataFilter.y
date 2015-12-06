@@ -57,7 +57,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %token <function> BEST TIZ CONFIG CONST_ DATERANGE
 
 // comparative operators
-%token <op> IF_ ELSE_
+%token <op> IF_ ELSE_ WHILE
 %token <op> EQ NEQ LT LTE GT GTE ELVIS ASSIGN
 %token <op> ADD SUBTRACT DIVIDE MULTIPLY POW
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
@@ -73,7 +73,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %locations
 
 %type <leaf> symbol literal lexpr cexpr expr parms block statement expression;
-%type <leaf> simple_statement if_clause;
+%type <leaf> simple_statement if_clause while_clause;
 %type <comp> statements
 
 %right '?' ':'
@@ -87,8 +87,23 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %start filter;
 %%
 
+/* a one line filter needs to be accounted for as well as a
+   complex filter comprised of a block, this is an anomaly
+   caused by using the same code for filtering e.g. TSS > 100
+   as well as custom metric code involving variables, if and
+   while clauses etc
+
+   As a result the 'filter' needs to explicitly list every
+   type of clause that could be used rather than reference
+   a 'statement', since we don't want to force the user to
+   add a semi-colon to one line filters and formulas. This
+   is particularly important since this was all that was
+   possible before 3.3
+*/
+
 filter: simple_statement            { DataFilterroot = $1; }
         | if_clause                 { DataFilterroot = $1; }
+        | while_clause              { DataFilterroot = $1; }
         | block                     { DataFilterroot = $1; }
         ;
 
@@ -108,6 +123,7 @@ statements: statement                { $$ = new QList<Leaf*>(); $$->append($1); 
 
 statement: simple_statement ';'
           | if_clause
+          | while_clause
           ;
 
 simple_statement: lexpr                     { $$ = $1; }
@@ -124,20 +140,31 @@ if_clause:
 
         IF_ '(' lexpr ')' expression  { $$ = new Leaf(@1.first_column, @5.last_column);
                                        $$->type = Leaf::Conditional;
-                                       $$->op = 0;
+                                       $$->op = IF_;
                                        $$->lvalue.l = $5;
                                        $$->rvalue.l = NULL;
                                        $$->cond.l = $3;
                                     }
         | IF_ '(' lexpr ')' expression ELSE_ expression { $$ = new Leaf(@1.first_column, @5.last_column);
                                                   $$->type = Leaf::Conditional;
-                                                  $$->op = 0; 
+                                                  $$->op = IF_; 
                                                   $$->lvalue.l = $5;
                                                   $$->rvalue.l = $7;
                                                   $$->cond.l = $3;
                                                 }
 
 
+        ;
+
+while_clause:
+
+        WHILE '(' lexpr ')' expression          { $$ = new Leaf(@1.first_column, @5.last_column);
+                                                  $$->type = Leaf::Conditional;
+                                                  $$->op = WHILE; 
+                                                  $$->lvalue.l = $5;
+                                                  $$->rvalue.l = NULL;
+                                                  $$->cond.l = $3;
+                                                }
         ;
 
 parms: lexpr                        { $$ = new Leaf(@1.first_column, @1.last_column);
@@ -159,7 +186,7 @@ lexpr   : expr                       { $$ = $1; }
 
         | lexpr '?' lexpr ':' lexpr      { $$ = new Leaf(@1.first_column, @5.last_column);
                                     $$->type = Leaf::Conditional;
-                                    $$->op = 0; // unused
+                                    $$->op = 0; // zero for tertiary
                                     $$->lvalue.l = $3;
                                     $$->rvalue.l = $5;
                                     $$->cond.l = $1;
