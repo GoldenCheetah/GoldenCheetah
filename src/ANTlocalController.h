@@ -74,6 +74,9 @@ signals:
     // made a special case to support HRV tool without complication
     void rrData(uint16_t  measurementTime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 
+    // signal for passing remote control commands
+    void antRemoteControl(uint16_t command);
+
 private:
     QQueue<setChannelAtom> channelQueue;
     ANTLogger logger;

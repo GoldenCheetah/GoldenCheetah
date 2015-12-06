@@ -151,6 +151,7 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString cyclist) : QThre
         connect(antChannel[i], SIGNAL(broadcastTimerStop(int)), this, SLOT(slotStopBroadcastTimer(int)));
 
         // remote control
+        connect(antChannel[i], SIGNAL(antRemoteControl(uint16_t)), this, SIGNAL(antRemoteControl(uint16_t)));
         antChannel[i]->channelTimer = new QTimer(this);
     }
 

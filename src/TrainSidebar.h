@@ -178,6 +178,9 @@ class TrainSidebar : public GcWindow
         // User adjusted intensity
         void adjustIntensity();     // Intensity of workout user adjusted
 
+        // slot for receiving remote control commands
+        void remoteControl(uint16_t);
+
     protected:
 
         friend class ::MultiDeviceDialog;
