@@ -699,7 +699,7 @@ Leaf::toString()
                         .arg(fparms[0]->toString())
                         .arg(fparms[1]->toString());
 
-    case Leaf::Conditional : qDebug()<<"cond";
+    case Leaf::Conditional : qDebug()<<"cond:"<<op;
         {
                     if (rvalue.l) {
                         return QString("%1?%2:%3")
@@ -770,7 +770,7 @@ void Leaf::print(Leaf *leaf, int level)
                     leaf->print(leaf->lvalue.l, level+1);
                     leaf->print(leaf->fparms[0], level+1);
                     leaf->print(leaf->fparms[1], level+1);
-    case Leaf::Conditional : qDebug()<<"cond";
+    case Leaf::Conditional : qDebug()<<"cond"<<op;
         {
                     leaf->print(leaf->cond.l, level+1);
                     leaf->print(leaf->lvalue.l, level+1);
@@ -2308,17 +2308,46 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
     break;
 
     //
-    // CONDITIONAL TERNARY / IF .. ELSE ..
+    // CONDITIONAL TERNARY / IF .. ELSE ../ WHILE
     //
     case Leaf::Conditional :
     {
-        Result cond = eval(context, df, leaf->cond.l, x, m, p);
-        if (cond.isNumber && cond.number) return eval(context, df, leaf->lvalue.l, x, m, p);
-        else {
 
-            // conditional may not have an else clause!
-            if (leaf->rvalue.l) return eval(context, df, leaf->rvalue.l, x, m, p);
-            else return Result(0);
+        switch(leaf->op) {
+
+        case IF_:
+        case 0 :
+            {
+                Result cond = eval(context, df, leaf->cond.l, x, m, p);
+                if (cond.isNumber && cond.number) return eval(context, df, leaf->lvalue.l, x, m, p);
+                else {
+
+                    // conditional may not have an else clause!
+                    if (leaf->rvalue.l) return eval(context, df, leaf->rvalue.l, x, m, p);
+                    else return Result(0);
+                }
+            }
+        case WHILE :
+            {
+                // we bound while to make sure it doesn't consume all
+                // CPU and 'hang' for badly written code..
+                static int maxwhile = 10000;
+                int count=0;
+                QTime timer;
+                timer.start();
+
+                Result returning(0);
+                while (count++ < maxwhile && eval(context, df, leaf->cond.l, x, m, p).number) {
+                    returning = eval(context, df, leaf->lvalue.l, x, m, p);
+                }
+
+                // we had to terminate warn user !
+                if (count >= maxwhile) {
+                    qDebug()<<"WARNING: "<< "[ loops="<<count<<"ms="<<timer.elapsed() <<"] runaway while loop terminated, check formula/filter.";
+                }
+
+                return returning;
+            }
         }
     }
     break;
