@@ -337,6 +337,8 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
                     !sym.compare("daterange", Qt::CaseInsensitive) ||
                     !sym.compare("Today", Qt::CaseInsensitive) ||
                     !sym.compare("Current", Qt::CaseInsensitive) ||
+                    !sym.compare("RECINTSECS", Qt::CaseInsensitive) ||
+                    !sym.compare("NA", Qt::CaseInsensitive) ||
                     sym == "isSwim" || sym == "isRun") {
                     isfunction = found = true;
                 }
@@ -826,6 +828,8 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
             else if (!symbol.compare("Date", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Today", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Current", Qt::CaseInsensitive)) return true;
+            else if (!symbol.compare("RECINTSECS", Qt::CaseInsensitive)) return true;
+            else if (!symbol.compare("NA", Qt::CaseInsensitive)) return true;
             else if (isCoggan(symbol)) return true;
             else if (df->dataSeriesSymbols.contains(symbol)) return true;
             else return df->lookupType.value(symbol, false);
@@ -894,6 +898,8 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     symbol.compare("x", Qt::CaseInsensitive) && // used by which
                     symbol.compare("Today", Qt::CaseInsensitive) &&
                     symbol.compare("Current", Qt::CaseInsensitive) &&
+                    symbol.compare("RECINTSECS", Qt::CaseInsensitive) &&
+                    symbol.compare("NA", Qt::CaseInsensitive) &&
                     !df->dataSeriesSymbols.contains(symbol) &&
                     symbol != "isSwim" && symbol != "isRun" && !isCoggan(symbol)) {
 
@@ -1015,6 +1021,8 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                                 !symbol.compare("x", Qt::CaseInsensitive) || // used by which
                                 !symbol.compare("Today", Qt::CaseInsensitive) ||
                                 !symbol.compare("Current", Qt::CaseInsensitive) ||
+                                !symbol.compare("RECINTSECS", Qt::CaseInsensitive) ||
+                                !symbol.compare("NA", Qt::CaseInsensitive) ||
                                 df->dataSeriesSymbols.contains(symbol) ||
                                 symbol == "isSwim" || symbol == "isRun" || isCoggan(symbol)) {
                                 DataFiltererrors << QString(tr("%1 is not supported in isset/set/unset operations")).arg(symbol);
@@ -2062,6 +2070,17 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
 
         } else if (symbol == "isSwim") {
             lhsdouble = m->isSwim ? 1 : 0;
+            lhsisNumber = true;
+
+        } else if (!symbol.compare("NA", Qt::CaseInsensitive)) {
+
+            lhsdouble = RideFile::NA;
+            lhsisNumber = true;
+
+        } else if (!symbol.compare("RECINTSECS", Qt::CaseInsensitive)) {
+
+            lhsdouble = 1; // if in doubt
+            if (m->ride(false)) lhsdouble = m->ride(false)->recIntSecs();
             lhsisNumber = true;
 
         } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {

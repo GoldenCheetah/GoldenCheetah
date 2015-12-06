@@ -186,6 +186,9 @@ SearchBox::configChanged(qint32)
     list << "best(xpower, 3600)";
     list << "best(vam, 3600)";
     list << "best(wpk, 3600)";
+    //list<<"RECINTSECS" is NOT added since its really only
+    //valid to use it when working on ride samples
+    list << "NA";
 
     // get sorted list
     QStringList names = context->tab->rideNavigator()->logicalHeadings;
