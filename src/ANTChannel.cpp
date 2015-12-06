@@ -830,9 +830,37 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 }
 
 // we got an acknowledgement, so lets process it
-// does nothing for now
-void ANTChannel::ackEvent(unsigned char * /*ant_message*/) { }
+void ANTChannel::ackEvent(unsigned char *ant_message)
+{
+    ANTMessage antMessage(parent, ant_message);
 
+    switch (channel_type) {
+        case CHANNEL_TYPE_CONTROL:
+        {
+            uint8_t  controlSeq;
+            uint16_t controlCmd;
+            static uint8_t lastControlSeq = 255; // don't start at 0, else likely to ignore first command
+
+            qDebug()<<number<<"Remote control command received..";
+
+            switch(antMessage.data_page) {
+
+            case ANT_CONTROL_GENERIC_CMD_PAGE:
+                controlCmd = antMessage.controlCmd;
+                controlSeq = antMessage.controlSeq;
+
+                qDebug()<<number<<"..generic data page command"<<controlCmd;
+
+                if (controlSeq != lastControlSeq)
+                    emit antRemoteControl(controlCmd);
+
+                lastControlSeq = controlSeq;
+                break;
+            }
+        }
+        break;
+    }
+}
 
 // we got a channel ID notification
 void ANTChannel::channelId(unsigned char *ant_message) {

@@ -644,8 +644,36 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 break;
             }
             break;
+
         case ANT_ACK_DATA:
+            //qDebug()<<"ack data on channel" << channel;
+            channel = message[3];
+            data_page = message[4];
+
+            switch(parent->antChannel[message[3]]->channel_type)
+            {
+            case ANTChannel::CHANNEL_TYPE_CONTROL:
+                switch (data_page) {
+                case ANT_CONTROL_GENERIC_CMD_PAGE:
+                    controlSerial = (message[6] << 8) | message[5];
+                    controlVendor = (message[8] << 8) | message[7];
+                    controlSeq = message[9];
+                    controlCmd = (message[11] << 8) | message[10];
+                    break;
+
+                default:
+                    qDebug()<<"Unhandled remote control command page on channel" << channel;
+
+                }
+                break;
+
+            default:
+                qDebug()<<"Unhandled acknowledged ANT message on channel " << channel;
+                break;
+
+            }
             break;
+
         case ANT_BURST_DATA:
             break;
         case ANT_CHANNEL_EVENT:
@@ -1025,4 +1053,15 @@ ANTMessage ANTMessage::fecRequestCommandStatus(const uint8_t channel, const uint
                       0x01,        // requested transmission response (1 time only)
                       page,        // requested page (0x30 = resistance, 0x31 = power, 0x32 = wind, 0x33 = slope/track)
                       0x01);       // request data page
+}
+
+ANTMessage ANTMessage::controlDeviceAvailability(const uint8_t channel)
+{
+    // based on ANT+ Managed Network Document – Controls Device Profile, Rev 2.0 p 26: 8.2 Data Page 2 – Control Device Availability
+    return ANTMessage(9, ANT_BROADCAST_DATA, channel,
+                      ANT_CONTROL_DEVICE_AVAILABILITY_PAGE, // data page request
+                      0x00, 0x00,                           // reserved
+                      0x00, 0x00,                           // reserved
+                      0x00, 0x00,                           // reserved
+                      ANT_CONTROL_DEVICE_SUPPORT_GENERIC);  // support for generic remote controls
 }
