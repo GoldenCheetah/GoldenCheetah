@@ -1038,6 +1038,10 @@ void ANTChannel::attemptTransition(int message_id)
         //qDebug()<<number<<"TRANSITION from channel freq";
         parent->sendMessage(ANTMessage::open(number));
         mi.initialise();
+        if (is_master) {
+            qDebug()<<number<<"Starting timer..";
+            emit broadcastTimerStart(number);
+        }
         break;
 
     case ANT_OPEN_CHANNEL:
@@ -1055,6 +1059,10 @@ void ANTChannel::attemptTransition(int message_id)
         //qDebug()<<number<<"TRANSITION from closed";
         status = Closed;
         //qDebug()<<"** CHANNEL"<<number<<"NOW CLOSED **";
+        if (is_master) {
+            qDebug()<<number<<"Stopping timer..";
+            emit broadcastTimerStop(number);
+        }
         break;
 
     default:
