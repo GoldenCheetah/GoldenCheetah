@@ -42,6 +42,7 @@ ANTChannel::init()
     is_cinqo=0;
     is_old_cinqo=0;
     is_alt=0;
+    is_master=0;
     manufacturer_id=0;
     product_id=0;
     product_version=0;
@@ -100,6 +101,11 @@ void ANTChannel::open(int device, int chan_type)
     channel_type_flags = CHANNEL_TYPE_QUICK_SEARCH ;
     device_number=device;
     setId();
+
+    if (channel_type == CHANNEL_TYPE_CONTROL) {
+        is_master = true;
+        parent->setControlChannel(number);
+    }
 
     // lets open the channel
     qDebug()<<"** OPENING CHANNEL"<<number<<"**";
@@ -984,17 +990,19 @@ void ANTChannel::attemptTransition(int message_id)
     case ANT_UNASSIGN_CHANNEL:
         //qDebug()<<number<<"TRANSITION from unassigned";
 
-        qDebug()<<number<<"assign channel type RX";
+        if (is_master)
+            qDebug()<<number<<"assign channel type TX";
+        else
+            qDebug()<<number<<"assign channel type RX";
 
         // assign and set channel id all in one
-        parent->sendMessage(ANTMessage::assignChannel(number, CHANNEL_TYPE_RX, st->network)); // receive channel on network 1
+        parent->sendMessage(ANTMessage::assignChannel(number, is_master ? CHANNEL_TYPE_TX : CHANNEL_TYPE_RX, st->network)); // receive channel on network 1
         break;
 
     case ANT_ASSIGN_CHANNEL:
-
         //qDebug()<<number<<"TRANSITION from assign channel";
 
-        parent->sendMessage(ANTMessage::setChannelID(number, device_number, device_id, 0)); // we need to be specific!
+        parent->sendMessage(ANTMessage::setChannelID(number, device_number, device_id, is_master ? ANT_TX_TYPE_MASTER : ANT_TX_TYPE_SLAVE)); // we need to be specific!
         break;
 
     case ANT_CHANNEL_ID:

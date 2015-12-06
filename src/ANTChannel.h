@@ -159,6 +159,7 @@ class ANTChannel : public QObject {
         bool is_old_cinqo; // bool, set for cinqo needing separate control channel
         bool is_fec;
         bool is_alt; // is alternative channel for power
+        bool is_master; // is a master channel (for remote control)
 
         int search_type;
         int srm_offset;

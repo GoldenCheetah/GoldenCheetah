@@ -1215,3 +1215,8 @@ void ANT::setFecChannel(int channel)
 {
     fecChannel = channel;
 }
+
+void ANT::setControlChannel(int channel)
+{
+    controlChannel = channel;
+}
