@@ -403,6 +403,10 @@ public slots:
     void slotSearchTimeout(int number); // search timed out
     void slotSearchComplete(int number); // search completed successfully
 
+    void slotStartBroadcastTimer(int number);
+    void slotStopBroadcastTimer(int number);
+    void slotControlTimerEvent();
+
     // get telemetry
     void getRealtimeData(RealtimeData &);             // return current realtime data
 
