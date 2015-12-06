@@ -325,6 +325,27 @@ struct setChannelAtom {
 #define ANT_MANUFACTURER_ID_PAGE                    0x50
 #define ANT_PRODUCT_INFO_PAGE                       0x51
 
+// ANT remote controls
+#define ANT_CONTROL_DEVICE_AVAILABILITY_PAGE        0x02
+#define ANT_CONTROL_GENERIC_CMD_PAGE                0x49
+
+#define ANT_CONTROL_DEVICE_SUPPORT_AUDIO            0x01
+#define ANT_CONTROL_DEVICE_SUPPORT_KEYPAD           0x08
+#define ANT_CONTROL_DEVICE_SUPPORT_GENERIC          0x10
+#define ANT_CONTROL_DEVICE_SUPPORT_VIDEO            0x20
+#define ANT_CONTROL_DEVICE_SUPPORT_BURST            0x40
+
+#define ANT_CONTROL_GENERIC_CMD_MENU_UP             0x00
+#define ANT_CONTROL_GENERIC_CMD_MENU_DOWN           0x01
+#define ANT_CONTROL_GENERIC_CMD_MENU_SELECT         0x02
+#define ANT_CONTROL_GENERIC_CMD_MENU_BACK           0x03
+#define ANT_CONTROL_GENERIC_CMD_HOME                0x04
+#define ANT_CONTROL_GENERIC_CMD_START               0x20
+#define ANT_CONTROL_GENERIC_CMD_STOP                0x21
+#define ANT_CONTROL_GENERIC_CMD_RESET               0x22
+#define ANT_CONTROL_GENERIC_CMD_LENGTH              0x23
+#define ANT_CONTROL_GENERIC_CMD_LAP                 0x24
+
 //======================================================================
 // Worker thread
 //======================================================================
