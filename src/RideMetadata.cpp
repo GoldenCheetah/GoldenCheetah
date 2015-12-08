@@ -724,14 +724,6 @@ FormField::metadataFlush()
         }
     }
 
-    // Construct the summary text used on the calendar
-    QString calendarText;
-    foreach (FieldDefinition field, meta->getFields()) {
-        if (field.diary == true) {
-            calendarText += field.calendarText(ourRideItem->ride()->getTag(field.name, ""));
-        }
-    }
-    ourRideItem->ride()->setTag("Calendar Text", calendarText);
 }
 
 void
@@ -897,16 +889,6 @@ FormField::editFinished()
 
         // we actually edited it !
         setLinkedDefault(text);
-
-        // Construct the summary text used on the calendar
-        QString calendarText;
-        foreach (FieldDefinition field, meta->getFields()) {
-            if (field.diary == true) {
-                calendarText += QString("%1\n")
-                        .arg(ourRideItem->ride()->getTag(field.name, ""));
-            }
-        }
-        ourRideItem->ride()->setTag("Calendar Text", calendarText);
 
         // and update !
         ourRideItem->notifyRideMetadataChanged();
@@ -1155,8 +1137,19 @@ FieldDefinition::getCompleter(QObject *parent)
 }
 
 QString
-FieldDefinition::calendarText(QString value)
+FieldDefinition::calendarText(RideItem *rideItem, RideMetadata *meta)
 {
+    // "Weight" field is replace by "Athlete Weight" metric
+    QString fieldName = (name == "Weight") ? "Athlete Weight" : name;
+    QString value;
+    if (meta->sp.isMetric(fieldName)) {
+        value = rideItem->getStringForSymbol(meta->sp.rideMetric(fieldName)->symbol(), meta->context->athlete->useMetricUnits);
+    } else {
+        value = rideItem->ride()->getTag(fieldName, "");
+    }
+
+    if (value.isEmpty()) return value;
+
     switch (type) {
     case FIELD_INTEGER:
     case FIELD_DOUBLE:
