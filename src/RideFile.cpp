@@ -614,17 +614,6 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
             notesFile.close();
         }
 
-        // Construct the summary text used on the calendar
-        QString calendarText;
-        if (context) { // will be null in standalone open
-            foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
-                if (field.diary == true && result->getTag(field.name, "") != "") {
-                    calendarText += field.calendarText(result->getTag(field.name, ""));
-                }
-            }
-        }
-        result->setTag("Calendar Text", calendarText);
-
         // set other "special" fields
         result->setTag("Filename", QFileInfo(file.fileName()).fileName());
         result->setTag("Device", result->deviceType());

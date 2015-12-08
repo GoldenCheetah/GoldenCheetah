@@ -121,11 +121,11 @@ RideCache::configChanged(qint32 what)
 
             // Construct the summary text used on the calendar
             QString calendarText;
-
-            foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) 
-                if (field.diary == true) 
-                    calendarText += field.calendarText(item->metadata_.value(field.name, ""));
-
+            foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+                if (field.diary == true) {
+                    calendarText += field.calendarText(item, context->athlete->rideMetadata());
+                }
+            }
             item->metadata_.insert("Calendar Text", calendarText);
         }
     }
