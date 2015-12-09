@@ -73,7 +73,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %locations
 
 %type <leaf> symbol literal lexpr cexpr expr parms block statement expression;
-%type <leaf> simple_statement if_clause while_clause;
+%type <leaf> simple_statement if_clause while_clause function_def;
 %type <comp> statements
 
 %right '?' ':'
@@ -147,6 +147,7 @@ statement:
         simple_statement ';'
         | if_clause
         | while_clause
+        | function_def
         ;
 
 /*
@@ -199,6 +200,18 @@ while_clause:
                                                   $$->lvalue.l = $5;
                                                   $$->rvalue.l = NULL;
                                                   $$->cond.l = $3;
+                                                }
+        ;
+
+/*
+ * A user defined function which may be a function that is called by
+ * the user metric framework; e.g. init, sample, value, count etc
+ */
+
+function_def:
+
+        symbol block                            { $$ = $2; 
+                                                  $$->function = *($1->lvalue.n);
                                                 }
         ;
 

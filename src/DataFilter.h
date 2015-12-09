@@ -121,7 +121,7 @@ class DataFilter : public QObject
         QStringList getErrors() { return errors; };
         void colorSyntax(QTextDocument *content, int pos);
 
-        static QStringList functions(); // return list of functions supported
+        static QStringList builtins(); // return list of functions supported
         QStringList dataSeriesSymbols;
 
         // pd models for estimates
@@ -132,6 +132,9 @@ class DataFilter : public QObject
 
         // user defined symbols
         QHash<QString, Result> symbols;
+
+        // user defined functions
+        QHash<QString, Leaf*> functions;
 
     public slots:
         QStringList parseFilter(QString query, QStringList *list=0);

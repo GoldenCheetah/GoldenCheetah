@@ -117,7 +117,7 @@ static QStringList pdmodels()
 }
 
 QStringList
-DataFilter::functions()
+DataFilter::builtins()
 {
     QStringList returning;
 
@@ -933,7 +933,16 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
 
-            if (leaf->series) { // old way of hand crafting each function in the lexer including support for literal parameter e.g. (power, 1)
+            if (leaf->function != "") {
+
+                // calling a user defined function, does it exist >=?
+                if (!df->functions.contains(leaf->function)) {
+
+                    DataFiltererrors << QString(tr("unknown user function %1")).arg(leaf->function);
+                    leaf->inerror = true;
+                }
+
+            } else if (leaf->series) { // old way of hand crafting each function in the lexer including support for literal parameter e.g. (power, 1)
 
                 QString symbol = leaf->series->lvalue.n->toLower();
 
@@ -1201,6 +1210,13 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
     case Leaf::Compound :
         {
+            // is this a user defined function ?
+            if (leaf->function != "") {
+
+                // register it
+                df->functions.insert(leaf->function, leaf);
+            }
+
             // a list of statements, the last of which is what we
             // evaluate to for the purposes of filtering etc 
             foreach(Leaf *p, *(leaf->lvalue.b)) validateFilter(df, p);
@@ -1262,7 +1278,21 @@ Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
 {
     if (!item || !treeRoot || DataFiltererrors.count()) return Result(0);
 
-    Result res = treeRoot->eval(context, this, treeRoot, 0, item, p);
+    Result res(0);
+
+    // if we are a set of functions..
+    if (functions.count()) {
+
+        // ... start at main
+        if (functions.contains("main"))
+            res = treeRoot->eval(context, this, functions.value("main"), 0, item, p);
+
+    } else {
+
+        // otherwise just evaluate the entire tree
+        res = treeRoot->eval(context, this, treeRoot, 0, item, p);
+    }
+
     return res;
 }
 
@@ -1476,6 +1506,12 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
     case Leaf::Function :
     {
         double duration;
+
+        // calling a user defined function
+        if (df->functions.contains(leaf->function)) {
+
+            return eval(context, df, df->functions.value(leaf->function), x, m, p);
+        }
 
         if (leaf->function == "config") {
 
