@@ -103,7 +103,7 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     QStringList names = context->tab->rideNavigator()->logicalHeadings;
 
     // start with just a list of functions
-    list = DataFilter::functions();
+    list = DataFilter::builtins();
 
     // ridefile data series symbols
     list += RideFile::symbols();

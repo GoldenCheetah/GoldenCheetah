@@ -1746,7 +1746,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QStringList names = context->tab->rideNavigator()->logicalHeadings;
 
     // start with just a list of functions
-    list = DataFilter::functions();
+    list = DataFilter::builtins();
 
     // ridefile data series symbols
     list += RideFile::symbols();
