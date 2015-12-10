@@ -1702,7 +1702,6 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     formulaWidget = new QWidget(this);
     //formulaWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QVBoxLayout *formulaLayout = new QVBoxLayout(formulaWidget);
-    formulaLayout->addStretch();
 
     // courier font
     formulaEdit = new DataFilterEdit(this, context);
@@ -1724,7 +1723,6 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     ftype->addWidget(formulaType);
     ftype->addStretch();
     formulaLayout->addLayout(ftype);
-    formulaLayout->addStretch();
 
     // set to the value...
     if (metricDetail->formula == "") {
