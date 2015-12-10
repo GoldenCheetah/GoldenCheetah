@@ -1278,6 +1278,9 @@ Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
 {
     if (!item || !treeRoot || DataFiltererrors.count()) return Result(0);
 
+    // reset stack
+    stack = 0;
+
     Result res(0);
 
     // if we are a set of functions..
@@ -1510,7 +1513,22 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
         // calling a user defined function
         if (df->functions.contains(leaf->function)) {
 
-            return eval(context, df, df->functions.value(leaf->function), x, m, p);
+            // going down
+            df->stack += 1;
+
+            // stack overflow
+            if (df->stack > 500) {
+                qDebug()<<"stack overflow";
+                df->stack = 0;
+                return Result(0);
+            }
+
+            Result res = eval(context, df, df->functions.value(leaf->function), x, m, p);
+
+            // pop stack - if we haven't overflowed and reset
+            if (df->stack > 0) df->stack -= 1;
+
+            return res;
         }
 
         if (leaf->function == "config") {
