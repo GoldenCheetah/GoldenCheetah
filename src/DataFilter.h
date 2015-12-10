@@ -112,6 +112,9 @@ class DataFilter : public QObject
         // needs to be reapplied as the ride selection changes
         bool isdynamic;
 
+        // stack count (to stop recursion 'hanging'
+        int stack;
+
         // used by Leaf
         QMap<QString,QString> lookupMap;
         QMap<QString,bool> lookupType; // true if a number, false if a string
