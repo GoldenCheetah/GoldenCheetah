@@ -1145,7 +1145,7 @@ FieldDefinition::calendarText(RideItem *rideItem, RideMetadata *meta)
     if (meta->sp.isMetric(fieldName)) {
         value = rideItem->getStringForSymbol(meta->sp.rideMetric(fieldName)->symbol(), meta->context->athlete->useMetricUnits);
     } else {
-        value = rideItem->ride()->getTag(fieldName, "");
+        value = rideItem->getText(fieldName, "");
     }
 
     if (value.isEmpty()) return value;
