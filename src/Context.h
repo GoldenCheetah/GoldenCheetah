@@ -126,6 +126,9 @@ class Context : public QObject
         void setFilter(QStringList&f) { filters=f; isfiltered=true; emit filterChanged(); }
         void clearFilter() { filters.clear(); isfiltered=false; emit filterChanged(); }
 
+        // user metrics - cascade
+        void notifyUserMetricsChanged() { emit userMetricsChanged(); }
+
         // realtime signals
         void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
         void notifyErgFileSelected(ErgFile *x) { workout=x; ergFileSelected(x); }
@@ -188,6 +191,8 @@ class Context : public QObject
         void presetsChanged();
         void presetSelected(int);
 
+        // user metrics
+        void userMetricsChanged();
 
         // refreshing stats
         void refreshStart();

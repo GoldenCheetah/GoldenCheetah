@@ -536,6 +536,8 @@ HEADERS += \
         TrainingstagebuchUploader.h \
         Units.h \
         UserData.h \
+        UserMetricParser.h \
+        UserMetricSettings.h \
         VeloHeroUploader.h \
         VideoLayoutParser.h \
         VideoSyncFile.h \
@@ -789,6 +791,8 @@ SOURCES += \
         TRIMPPoints.cpp \
         Units.cpp \
         UserData.cpp \
+        UserMetric.cpp \
+        UserMetricParser.cpp \
         VeloHeroUploader.cpp \
         VideoLayoutParser.cpp \
         VideoSyncFile.cpp \
