@@ -66,7 +66,7 @@ class FieldDefinition
 
         static unsigned long fingerprint(QList<FieldDefinition>);
         QCompleter *getCompleter(QObject *parent);
-        QString calendarText(QString value);
+        QString calendarText(RideItem *rideItem, RideMetadata *meta);
 
         FieldDefinition() : tab(""), name(""), type(0), diary(false), values() {}
         FieldDefinition(QString tab, QString name, int type, bool diary, QStringList values)
