@@ -17,6 +17,7 @@
  */
 
 #include "RideMetric.h"
+#include "UserMetricSettings.h"
 #include "TimeUtils.h"
 #include "Zones.h"
 #include "HrZones.h"
@@ -133,6 +134,8 @@ int DBSchemaVersion = 125;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
+
+QList<UserMetricSettings> _userMetrics;
 
 QHash<QString,RideMetricPtr>
 RideMetric::computeMetrics(const Context *context, const RideFile *ride, const Zones *zones, const HrZones *hrZones,

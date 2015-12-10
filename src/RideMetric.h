@@ -27,10 +27,10 @@
 #include <assert.h>
 #include <cmath>
 #include <QDebug>
+#include <QList>
 
 #include "RideFile.h"
-
-extern int DBSchemaVersion; // moved from old DBAccess
+#include "UserMetricSettings.h"
 
 class Zones;
 class HrZones;
@@ -38,7 +38,10 @@ class Context;
 class RideMetric;
 class RideFile;
 class RideItem;
+class DataFilter;
 
+extern int DBSchemaVersion; // moved from old DBAccess
+extern QList<UserMetricSettings> _userMetrics;
 typedef QSharedPointer<RideMetric> RideMetricPtr;
 
 class RideMetric {
@@ -61,6 +64,9 @@ public:
         index_ = -1;
     }
     virtual ~RideMetric() {}
+
+    // is this a user defined one?
+    virtual bool isUser() const { return false; }
 
     // need an index for offset into array, each metric
     // now has a numeric identifier from 0 - metricCount
@@ -160,9 +166,12 @@ public:
             break;
         }
     }
+
+    // XXX we need to deprecate this XXX 
     virtual bool canAggregate() { return aggregate_; }
 
-    virtual RideMetric *clone() const = 0;
+    // XXX we need to deprecate this XXX */
+    virtual RideMetric *clone() const { return NULL; }
 
     static QHash<QString,RideMetricPtr>
     computeMetrics(const Context *context, const RideFile *ride, const Zones *zones, const HrZones *hrZones,
@@ -182,7 +191,7 @@ public:
     void setType(MetricType x) { type_ = x; }
     void setAggregate(bool x) { aggregate_ = x; }
 
-    private:
+    protected:
         bool    aggregate_;
         double  value_,
                 count_, // used when averaging
@@ -193,6 +202,89 @@ public:
         QString metricUnits_, imperialUnits_;
         QString name_, symbol_, internalName_;
         MetricType type_;
+};
+
+
+//
+// The interface between a UserMetric and the codebase
+// for working with ride metrics.
+//
+class UserMetric: public RideMetric {
+
+public:
+
+    UserMetric(UserMetricSettings settings);
+    ~UserMetric();
+
+    // is this a user defined one?
+    bool isUser() const { return true; }
+
+    void initialize();
+
+    QString symbol() const;
+
+    // A short string suitable for showing to the user in the ride
+    // summaries, configuration dialogs, etc.  It should be translated
+    // using tr().
+    QString name() const; 
+    QString internalName() const; 
+
+    // Long term metrics charts
+    RideMetric::MetricType type() const; 
+
+    // units
+    QString units(bool metric) const; 
+
+    // Factor to multiple value to convert from metric to imperial
+    double conversion() const;
+    // And sum for example Fahrenheit from CentigradE
+    double conversionSum() const;
+
+    // How many digits after the decimal we should show when displaying the
+    // value of a UserRideMetric.
+    int precision() const; 
+
+    // Get the value and apply conversion if needed
+    double value(bool metric) const;
+
+    // The internal value of this ride metric, useful to cache and then setValue.
+    double value() const;
+
+    // for averages the count of items included in the average
+    double count() const; 
+
+    // when aggregating averages, should we include zeroes ? no by default
+    bool aggregateZero() const; 
+
+    // is this metric relevant
+    bool isRelevantForRide(const RideItem *) const; 
+
+    // Compute the ride metric from a file.
+    void compute(const RideFile *ride,
+                         const Zones *zones, int zoneRange,
+                         const HrZones *hrzones, int hrzoneRange,
+                         const QHash<QString,RideMetric*> &deps,
+                         const Context *context = 0);
+
+    // is a time value, ie. render as hh:mm:ss
+    bool isTime() const;
+
+    // WE DO NOT REIMPLEMENT THE STANDARD toString() METHOD
+    // virtual QString toString(bool useMetricUnits) const;
+
+    // WE DO NOT REIMPLEMENT THE STANDARD isLowerBetter() METHOD
+    // virtual bool isLowerBetter() const { return type_ == Low ? true : false; }
+
+    private:
+
+        // all attributes and methods are implemented in the
+        // usermetric class (which uses a datafilter and has
+        // utility classes for editing, save/load config etc).
+        UserMetricSettings settings;
+
+        // and we compile into this for runtime
+        DataFilter *program;
+
 };
 
 class RideMetricFactory {
