@@ -300,7 +300,7 @@ EditUserMetricDialog::refreshStats()
     setSettings(here);
 
     // Build a metric
-    UserMetric test(here);
+    UserMetric *test = new UserMetric(here);
 
     // fetch the inputs to ridemetric compute ..
     RideFile *ride = context->rideItem()->ride();
@@ -309,11 +309,12 @@ EditUserMetricDialog::refreshStats()
     const QHash<QString,RideMetric*> deps; // no deps yet
 
     // compute it 
-    test.setValue(0.0);
-    test.setCount(0);
-    test.compute(ride, context->athlete->zones(), zoneRange, context->athlete->hrZones(), hrZoneRange, deps, context);
+    test->setValue(0.0);
+    test->setCount(0);
+    test->compute(ride, context->athlete->zones(), zoneRange, context->athlete->hrZones(), hrZoneRange, deps, context);
 
     // get the value out
-    mValue->setText(test.toString(true));
-    iValue->setText(test.toString(false));
+    mValue->setText(test->toString(true));
+    iValue->setText(test->toString(false));
+
 }

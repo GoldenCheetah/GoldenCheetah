@@ -35,6 +35,7 @@ UserMetric::initialize()
 QString
 UserMetric::symbol() const
 {
+    return "";
 }
 
 // A short string suitable for showing to the user in the ride
@@ -43,11 +44,13 @@ UserMetric::symbol() const
 QString
 UserMetric::name() const
 {
+    return "";
 }
 
 QString
 UserMetric::internalName() const
 {
+    return "";
 }
 
 RideMetric::MetricType
@@ -59,18 +62,21 @@ UserMetric::type() const
 QString
 UserMetric::units(bool metric) const
 {
+    return "";
 }
 
 // Factor to multiple value to convert from metric to imperial
 double
 UserMetric::conversion() const
 {
+    return 1;
 }
 
 // And sum for example Fahrenheit from CentigradE
 double
 UserMetric::conversionSum() const
 {
+    return 0;
 }
 
 // How many digits after the decimal we should show when displaying the
@@ -78,24 +84,28 @@ UserMetric::conversionSum() const
 int
 UserMetric::precision() const
 {
+    return 0;
 }
 
 // Get the value and apply conversion if needed
 double
 UserMetric::value(bool metric) const
 {
+    return 0;
 }
 
 // The internal value of this ride metric, useful to cache and then setValue.
 double
 UserMetric::value() const
 {
+    return 0;
 }
 
 // for averages the count of items included in the average
 double
 UserMetric::count() const
 {
+    return 0;
 }
 
 // when aggregating averages, should we include zeroes ? no by default
@@ -109,6 +119,7 @@ UserMetric::aggregateZero() const
 bool
 UserMetric::isRelevantForRide(const RideItem *) const
 {
+    return true;
 }
 
 // Compute the ride metric from a file.
