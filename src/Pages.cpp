@@ -2406,9 +2406,9 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     layout->addWidget(table);
 
     editButton = new QPushButton(tr("Edit"));
-#ifndef Q_OS_MAC
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
+#ifndef Q_OS_MAC
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
 #else
