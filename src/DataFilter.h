@@ -58,8 +58,8 @@ class Leaf {
 
         Leaf(int loc, int leng) : type(none),op(0),series(NULL),dynamic(false),loc(loc),leng(leng),inerror(false) { }
 
-        // evaluate against a RideItem
-        Result eval(Context *context, DataFilter *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL);
+        // evaluate against a RideItem using its context
+        Result eval(DataFilter *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL);
 
         // tree traversal etc
         void print(Leaf *, int level);  // print leaf and all children
@@ -122,8 +122,8 @@ class DataFilter : public QObject
         QMap<QString,QString> lookupMap;
         QMap<QString,bool> lookupType; // true if a number, false if a string
 
-        // when used for formulas
-        Result evaluate(RideItem *rideItem, RideFilePoint *p = NULL);
+        // RideItem always available and supplies th context
+        Result evaluate(RideItem *rideItem, RideFilePoint *p);
         QStringList getErrors() { return errors; };
         void colorSyntax(QTextDocument *content, int pos);
 
@@ -143,7 +143,7 @@ class DataFilter : public QObject
         QHash<QString, Leaf*> functions;
 
     public slots:
-        QStringList parseFilter(QString query, QStringList *list=0);
+        QStringList parseFilter(Context *context, QString query, QStringList *list=0);
         QStringList check(QString query);
         void clearFilter();
         void configChanged(qint32);

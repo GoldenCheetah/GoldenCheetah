@@ -90,7 +90,7 @@ EditUserMetricDialog::EditUserMetricDialog(Context *context, UserMetricSettings 
 
     QLabel *precisionLabel = new QLabel(tr("Precision"), this);
     precision = new QDoubleSpinBox(this);
-    precision->setDecimals(3);
+    precision->setDecimals(0);
     precision->setValue(settings.precision);
 
     aggzero = new QCheckBox(tr("Aggregate Zero"));
@@ -300,7 +300,7 @@ EditUserMetricDialog::refreshStats()
     setSettings(here);
 
     // Build a metric
-    UserMetric *test = new UserMetric(here);
+    UserMetric test(context, here);
 
     // fetch the inputs to ridemetric compute ..
     RideFile *ride = context->rideItem()->ride();
@@ -309,12 +309,12 @@ EditUserMetricDialog::refreshStats()
     const QHash<QString,RideMetric*> deps; // no deps yet
 
     // compute it 
-    test->setValue(0.0);
-    test->setCount(0);
-    test->compute(ride, context->athlete->zones(), zoneRange, context->athlete->hrZones(), hrZoneRange, deps, context);
+    test.setValue(0.0);
+    test.setCount(0);
+    test.compute(ride, context->athlete->zones(), zoneRange, context->athlete->hrZones(), hrZoneRange, deps, context);
 
     // get the value out
-    mValue->setText(test->toString(true));
-    iValue->setText(test->toString(false));
+    mValue->setText(test.toString(true));
+    iValue->setText(test.toString(false));
 
 }

@@ -1293,12 +1293,12 @@ Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
 
         // ... start at main
         if (functions.contains("main"))
-            res = treeRoot->eval(context, this, functions.value("main"), 0, item, p);
+            res = treeRoot->eval(this, functions.value("main"), 0, item, p);
 
     } else {
 
         // otherwise just evaluate the entire tree
-        res = treeRoot->eval(context, this, treeRoot, 0, item, p);
+        res = treeRoot->eval(this, treeRoot, 0, item, p);
     }
 
     return res;
@@ -1336,7 +1336,7 @@ QStringList DataFilter::check(QString query)
     return errors;
 }
 
-QStringList DataFilter::parseFilter(QString query, QStringList *list)
+QStringList DataFilter::parseFilter(Context *context, QString query, QStringList *list)
 {
     // remember where we apply
     this->list = list;
@@ -1390,7 +1390,7 @@ QStringList DataFilter::parseFilter(QString query, QStringList *list)
         foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
             // evaluate each ride...
-            Result result = treeRoot->eval(context, this, treeRoot, 0, item, NULL);
+            Result result = treeRoot->eval(this, treeRoot, 0, item, NULL);
             if (result.isNumber && result.number) {
                 filenames << item->fileName;
             }
@@ -1416,7 +1416,7 @@ DataFilter::dynamicParse()
         foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
             // evaluate each ride...
-            Result result = treeRoot->eval(context, this, treeRoot, 0, item, NULL);
+            Result result = treeRoot->eval(this, treeRoot, 0, item, NULL);
             if (result.isNumber && result.number)
                 filenames << item->fileName;
         }
@@ -1469,7 +1469,7 @@ void DataFilter::configChanged(qint32)
     dataSeriesSymbols = RideFile::symbols();
 }
 
-Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideItem *m, RideFilePoint *p)
+Result Leaf::eval(DataFilter *df, Leaf *leaf, float x, RideItem *m, RideFilePoint *p)
 {
     // if error state all bets are off
     if (inerror) return Result(0);
@@ -1484,26 +1484,26 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
         switch (leaf->op) {
             case AND :
             {
-                Result left = eval(context, df, leaf->lvalue.l, x, m, p);
+                Result left = eval(df, leaf->lvalue.l, x, m, p);
                 if (left.isNumber && left.number) {
-                    Result right = eval(context, df, leaf->rvalue.l, x, m, p);
+                    Result right = eval(df, leaf->rvalue.l, x, m, p);
                     if (right.isNumber && right.number) return Result(true);
                 }
                 return Result(false);
             }
             case OR :
             {
-                Result left = eval(context, df, leaf->lvalue.l, x, m, p);
+                Result left = eval(df, leaf->lvalue.l, x, m, p);
                 if (left.isNumber && left.number) return Result(true);
 
-                Result right = eval(context, df, leaf->rvalue.l, x, m, p);
+                Result right = eval(df, leaf->rvalue.l, x, m, p);
                 if (right.isNumber && right.number) return Result(true);
 
                 return Result(false);
             }
 
             default : // parenthesis
-                return (eval(context, df, leaf->lvalue.l, x, m, p));
+                return (eval(df, leaf->lvalue.l, x, m, p));
         }
     }
     break;
@@ -1528,7 +1528,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                 return Result(0);
             }
 
-            Result res = eval(context, df, df->functions.value(leaf->function), x, m, p);
+            Result res = eval(df, df->functions.value(leaf->function), x, m, p);
 
             // pop stack - if we haven't overflowed and reset
             if (df->stack > 0) df->stack -= 1;
@@ -1546,13 +1546,13 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
             double PMAX = 0;
             int zoneRange;
 
-            if (context->athlete->zones()) {
+            if (m->context->athlete->zones()) {
 
                 // if range is -1 we need to fall back to a default value
-                zoneRange = context->athlete->zones()->whichRange(m->dateTime.date());
-                CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 0;
-                WPRIME = zoneRange >= 0 ? context->athlete->zones()->getWprime(zoneRange) : 0;
-                PMAX = zoneRange >= 0 ? context->athlete->zones()->getPmax(zoneRange) : 0;
+                zoneRange = m->context->athlete->zones()->whichRange(m->dateTime.date());
+                CP = zoneRange >= 0 ? m->context->athlete->zones()->getCP(zoneRange) : 0;
+                WPRIME = zoneRange >= 0 ? m->context->athlete->zones()->getWprime(zoneRange) : 0;
+                PMAX = zoneRange >= 0 ? m->context->athlete->zones()->getPmax(zoneRange) : 0;
 
                 // did we override CP in metadata ?
                 int oCP = m->getText("CP","0").toInt();
@@ -1566,41 +1566,41 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
             //
             // LTHR, MaxHR, RHR
             //
-            int hrZoneRange = context->athlete->hrZones() ?
-                              context->athlete->hrZones()->whichRange(m->dateTime.date())
+            int hrZoneRange = m->context->athlete->hrZones() ?
+                              m->context->athlete->hrZones()->whichRange(m->dateTime.date())
                               : -1;
 
-            int LTHR = hrZoneRange != -1 ?  context->athlete->hrZones()->getLT(hrZoneRange) : 0;
-            int RHR = hrZoneRange != -1 ?  context->athlete->hrZones()->getRestHr(hrZoneRange) : 0;
-            int MaxHR = hrZoneRange != -1 ?  context->athlete->hrZones()->getMaxHr(hrZoneRange) : 0;
+            int LTHR = hrZoneRange != -1 ?  m->context->athlete->hrZones()->getLT(hrZoneRange) : 0;
+            int RHR = hrZoneRange != -1 ?  m->context->athlete->hrZones()->getRestHr(hrZoneRange) : 0;
+            int MaxHR = hrZoneRange != -1 ?  m->context->athlete->hrZones()->getMaxHr(hrZoneRange) : 0;
 
             //
             // CV' D'
             //
-            int paceZoneRange = context->athlete->paceZones(false) ?
-                                context->athlete->paceZones(false)->whichRange(m->dateTime.date()) :
+            int paceZoneRange = m->context->athlete->paceZones(false) ?
+                                m->context->athlete->paceZones(false)->whichRange(m->dateTime.date()) :
                                 -1;
 
-            double CV = (paceZoneRange != -1) ? context->athlete->paceZones(false)->getCV(paceZoneRange) : 0.0;
-            double DPRIME = 0; //XXX(paceZoneRange != -1) ? context->athlete->paceZones(false)->getDPrime(paceZoneRange) : 0.0;
+            double CV = (paceZoneRange != -1) ? m->context->athlete->paceZones(false)->getCV(paceZoneRange) : 0.0;
+            double DPRIME = 0; //XXX(paceZoneRange != -1) ? m->context->athlete->paceZones(false)->getDPrime(paceZoneRange) : 0.0;
 
-            int spaceZoneRange = context->athlete->paceZones(true) ?
-                                context->athlete->paceZones(true)->whichRange(m->dateTime.date()) :
+            int spaceZoneRange = m->context->athlete->paceZones(true) ?
+                                m->context->athlete->paceZones(true)->whichRange(m->dateTime.date()) :
                                 -1;
-            double SCV = (spaceZoneRange != -1) ? context->athlete->paceZones(true)->getCV(spaceZoneRange) : 0.0;
-            double SDPRIME = 0; //XXX (spaceZoneRange != -1) ? context->athlete->paceZones(true)->getDPrime(spaceZoneRange) : 0.0;
+            double SCV = (spaceZoneRange != -1) ? m->context->athlete->paceZones(true)->getCV(spaceZoneRange) : 0.0;
+            double SDPRIME = 0; //XXX (spaceZoneRange != -1) ? m->context->athlete->paceZones(true)->getDPrime(spaceZoneRange) : 0.0;
 
             //
             // HEIGHT and WEIGHT
             //
             double HEIGHT = m->getText("Height","0").toDouble();
-            if (HEIGHT == 0) HEIGHT = context->athlete->getHeight(NULL);
+            if (HEIGHT == 0) HEIGHT = m->context->athlete->getHeight(NULL);
             double WEIGHT = m->getWeight();
 
             QString symbol = leaf->series->lvalue.n->toLower();
 
             if (symbol == "cranklength") {
-                return Result(appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH, 175.00f).toDouble() / 1000.0);
+                return Result(appsettings->cvalue(m->context->athlete->cyclist, GC_CRANKLENGTH, 175.00f).toDouble() / 1000.0);
             }
 
             if (symbol == "cp") {
@@ -1640,7 +1640,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                 return Result(HEIGHT);
             }
             if (symbol == "units") {
-                return Result(context->athlete->useMetricUnits ? 1 : 0);
+                return Result(m->context->athlete->useMetricUnits ? 1 : 0);
             }
         }
 
@@ -1652,7 +1652,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                 default:
                 case Leaf::Function :
                 {
-                    duration = eval(context, df, leaf->lvalue.l, x, m, p).number; // duration will be zero if string
+                    duration = eval(df, leaf->lvalue.l, x, m, p).number; // duration will be zero if string
                 }
                 break;
 
@@ -1687,10 +1687,10 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
             }
 
             if (leaf->function == "best")
-                return Result(RideFileCache::best(df->context, m->fileName, leaf->seriesType, duration));
+                return Result(RideFileCache::best(m->context, m->fileName, leaf->seriesType, duration));
 
             if (leaf->function == "tiz") // duration is really zone number
-                return Result(RideFileCache::tiz(df->context, m->fileName, leaf->seriesType, duration));
+                return Result(RideFileCache::tiz(m->context, m->fileName, leaf->seriesType, duration));
         }
 
         // if we get here its general function handling
@@ -1713,36 +1713,36 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
         if (fnum < 0) return Result(0);
 
         switch (fnum) {
-        case 0 : { return Result(cos(eval(context, df, leaf->fparms[0], x, m, p).number)); } // COS(x)
-        case 1 : { return Result(tan(eval(context, df, leaf->fparms[0], x, m, p).number)); } // TAN(x)
-        case 2 : { return Result(sin(eval(context, df, leaf->fparms[0], x, m, p).number)); } // SIN(x)
-        case 3 : { return Result(acos(eval(context, df, leaf->fparms[0], x, m, p).number)); } // ACOS(x)
-        case 4 : { return Result(atan(eval(context, df, leaf->fparms[0], x, m, p).number)); } // ATAN(x)
-        case 5 : { return Result(asin(eval(context, df, leaf->fparms[0], x, m, p).number)); } // ASIN(x)
-        case 6 : { return Result(cosh(eval(context, df, leaf->fparms[0], x, m, p).number)); } // COSH(x)
-        case 7 : { return Result(tanh(eval(context, df, leaf->fparms[0], x, m, p).number)); } // TANH(x)
-        case 8 : { return Result(sinh(eval(context, df, leaf->fparms[0], x, m, p).number)); } // SINH(x)
-        case 9 : { return Result(acosh(eval(context, df, leaf->fparms[0], x, m, p).number)); } // ACOSH(x)
-        case 10 : { return Result(atanh(eval(context, df, leaf->fparms[0], x, m, p).number)); } // ATANH(x)
-        case 11 : { return Result(asinh(eval(context, df, leaf->fparms[0], x, m, p).number)); } // ASINH(x)
+        case 0 : { return Result(cos(eval(df, leaf->fparms[0], x, m, p).number)); } // COS(x)
+        case 1 : { return Result(tan(eval(df, leaf->fparms[0], x, m, p).number)); } // TAN(x)
+        case 2 : { return Result(sin(eval(df, leaf->fparms[0], x, m, p).number)); } // SIN(x)
+        case 3 : { return Result(acos(eval(df, leaf->fparms[0], x, m, p).number)); } // ACOS(x)
+        case 4 : { return Result(atan(eval(df, leaf->fparms[0], x, m, p).number)); } // ATAN(x)
+        case 5 : { return Result(asin(eval(df, leaf->fparms[0], x, m, p).number)); } // ASIN(x)
+        case 6 : { return Result(cosh(eval(df, leaf->fparms[0], x, m, p).number)); } // COSH(x)
+        case 7 : { return Result(tanh(eval(df, leaf->fparms[0], x, m, p).number)); } // TANH(x)
+        case 8 : { return Result(sinh(eval(df, leaf->fparms[0], x, m, p).number)); } // SINH(x)
+        case 9 : { return Result(acosh(eval(df, leaf->fparms[0], x, m, p).number)); } // ACOSH(x)
+        case 10 : { return Result(atanh(eval(df, leaf->fparms[0], x, m, p).number)); } // ATANH(x)
+        case 11 : { return Result(asinh(eval(df, leaf->fparms[0], x, m, p).number)); } // ASINH(x)
 
-        case 12 : { return Result(exp(eval(context, df, leaf->fparms[0], x, m, p).number)); } // EXP(x)
-        case 13 : { return Result(log(eval(context, df, leaf->fparms[0], x, m, p).number)); } // LOG(x)
-        case 14 : { return Result(log10(eval(context, df, leaf->fparms[0], x, m, p).number)); } // LOG10(x)
+        case 12 : { return Result(exp(eval(df, leaf->fparms[0], x, m, p).number)); } // EXP(x)
+        case 13 : { return Result(log(eval(df, leaf->fparms[0], x, m, p).number)); } // LOG(x)
+        case 14 : { return Result(log10(eval(df, leaf->fparms[0], x, m, p).number)); } // LOG10(x)
 
-        case 15 : { return Result(ceil(eval(context, df, leaf->fparms[0], x, m, p).number)); } // CEIL(x)
-        case 16 : { return Result(floor(eval(context, df, leaf->fparms[0], x, m, p).number)); } // FLOOR(x)
-        case 17 : { return Result(round(eval(context, df, leaf->fparms[0], x, m, p).number)); } // ROUND(x)
+        case 15 : { return Result(ceil(eval(df, leaf->fparms[0], x, m, p).number)); } // CEIL(x)
+        case 16 : { return Result(floor(eval(df, leaf->fparms[0], x, m, p).number)); } // FLOOR(x)
+        case 17 : { return Result(round(eval(df, leaf->fparms[0], x, m, p).number)); } // ROUND(x)
 
-        case 18 : { return Result(fabs(eval(context, df, leaf->fparms[0], x, m, p).number)); } // FABS(x)
-        case 19 : { return Result(std::isinf(eval(context, df, leaf->fparms[0], x, m, p).number)); } // ISINF(x)
-        case 20 : { return Result(std::isnan(eval(context, df, leaf->fparms[0], x, m, p).number)); } // ISNAN(x)
+        case 18 : { return Result(fabs(eval(df, leaf->fparms[0], x, m, p).number)); } // FABS(x)
+        case 19 : { return Result(std::isinf(eval(df, leaf->fparms[0], x, m, p).number)); } // ISINF(x)
+        case 20 : { return Result(std::isnan(eval(df, leaf->fparms[0], x, m, p).number)); } // ISNAN(x)
 
         case 21 : { /* SUM( ... ) */
                     double sum=0;
 
                     foreach(Leaf *l, leaf->fparms) {
-                        sum += eval(context, df, l, x, m, p).number; // for vectors number is sum
+                        sum += eval(df, l, x, m, p).number; // for vectors number is sum
                     }
                     return Result(sum);
                   }
@@ -1753,7 +1753,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                     int count=0;
 
                     foreach(Leaf *l, leaf->fparms) {
-                        Result res = eval(context, df, l, x, m, p); // for vectors number is sum
+                        Result res = eval(df, l, x, m, p); // for vectors number is sum
                         sum += res.number;
                         if (res.vector.count()) count += res.vector.count();
                         else count++;
@@ -1767,7 +1767,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                     bool set=false;
 
                     foreach(Leaf *l, leaf->fparms) {
-                        Result res = eval(context, df, l, x, m, p);
+                        Result res = eval(df, l, x, m, p);
                         if (res.vector.count()) {
                             foreach(double x, res.vector) {
                                 if (set && x>max) max=x;
@@ -1788,7 +1788,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                     bool set=false;
 
                     foreach(Leaf *l, leaf->fparms) {
-                        Result res = eval(context, df, l, x, m, p);
+                        Result res = eval(df, l, x, m, p);
                         if (res.vector.count()) {
                             foreach(double x, res.vector) {
                                 if (set && x<min) min=x;
@@ -1808,7 +1808,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
 
                     int count = 0;
                     foreach(Leaf *l, leaf->fparms) {
-                        Result res = eval(context, df, l, x, m, p);
+                        Result res = eval(df, l, x, m, p);
                         if (res.vector.count()) count += res.vector.count();
                         else count++;
                     }
@@ -1817,25 +1817,25 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                   break;
 
         case 26 : { /* LTS (expr) */
-                    PMCData *pmcData = context->athlete->getPMCFor(leaf->fparms[0], df);
+                    PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     return Result(pmcData->lts(m->dateTime.date()));
                   }
                   break;
 
         case 27 : { /* STS (expr) */
-                    PMCData *pmcData = context->athlete->getPMCFor(leaf->fparms[0], df);
+                    PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     return Result(pmcData->sts(m->dateTime.date()));
                   }
                   break;
 
         case 28 : { /* SB (expr) */
-                    PMCData *pmcData = context->athlete->getPMCFor(leaf->fparms[0], df);
+                    PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     return Result(pmcData->sb(m->dateTime.date()));
                   }
                   break;
 
         case 29 : { /* RR (expr) */
-                    PMCData *pmcData = context->athlete->getPMCFor(leaf->fparms[0], df);
+                    PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     return Result(pmcData->rr(m->dateTime.date()));
                   }
                   break;
@@ -1854,12 +1854,12 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                     // what we looking for ?
                     QString parm = leaf->fparms[1]->type == Leaf::Symbol ? *leaf->fparms[1]->lvalue.n : "";
                     bool toDuration = parm == "" ? true : false;
-                    double duration = toDuration ? eval(context, df, leaf->fparms[1], x, m, p).number : 0;
+                    double duration = toDuration ? eval(df, leaf->fparms[1], x, m, p).number : 0;
 
                     // get the PD Estimate for this date - note we always work with the absolulte
                     // power estimates in formulas, since the user can just divide by config(weight)
                     // or Athlete_Weight (which takes into account values stored in ride files.
-                    PDEstimate pde = context->athlete->getPDEstimateFor(m->dateTime.date(), model, false);
+                    PDEstimate pde = m->context->athlete->getPDEstimateFor(m->dateTime.date(), model, false);
 
                     // no model estimate for this date
                     if (pde.parameters.count() == 0) return Result(0);
@@ -1913,7 +1913,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                     for(int i=1; i< leaf->fparms.count(); i++) {
 
                         // evaluate the parameter
-                        Result ex = eval(context, df, leaf->fparms[i], x, m, p);
+                        Result ex = eval(df, leaf->fparms[i], x, m, p);
 
                         if (ex.vector.count()) {
 
@@ -1921,7 +1921,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                             foreach(double x, ex.vector) {
 
                                 // did it get selected?
-                                Result which = eval(context, df, leaf->fparms[0], x, m, p);
+                                Result which = eval(df, leaf->fparms[0], x, m, p);
                                 if (which.number) {
                                     returning.vector << x;
                                     returning.number += x;
@@ -1931,7 +1931,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                         } else {
 
                             // does the parameter get selected ?
-                            Result which = eval(context, df, leaf->fparms[0], ex.number, m, p);
+                            Result which = eval(df, leaf->fparms[0], ex.number, m, p);
                             if (which.number) {
                                 returning.vector << ex.number;
                                 returning.number += ex.number;
@@ -1947,7 +1947,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                     Result returning(0);
 
                     if (leaf->fparms.count() < 3) return returning;
-                    else returning = eval(context, df, leaf->fparms[2], x, m, p);
+                    else returning = eval(df, leaf->fparms[2], x, m, p);
 
                     if (returning.number) {
 
@@ -1965,7 +1965,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                         if (!f) return Result(0); // eek!
 
                         // evaluate second argument, its the value
-                        Result r = eval(context, df, leaf->fparms[1], x, m, p);
+                        Result r = eval(df, leaf->fparms[1], x, m, p);
 
                         // now set an override or a tag
                         if (o_symbol != "" && e) { // METRIC OVERRIDE
@@ -2017,7 +2017,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                     Result returning(0);
 
                     if (leaf->fparms.count() < 2) return returning;
-                    else returning = eval(context, df, leaf->fparms[1], x, m, p);
+                    else returning = eval(df, leaf->fparms[1], x, m, p);
 
                     if (returning.number) {
 
@@ -2093,7 +2093,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
 
                     if (leaf->fparms.count() != 2) return Result(0);
 
-                    return Result (60*VDOTCalculator::eqvTime(eval(context, df, leaf->fparms[0], x, m, p).number, 1000*eval(context, df, leaf->fparms[1], x, m, p).number));
+                    return Result (60*VDOTCalculator::eqvTime(eval(df, leaf->fparms[0], x, m, p).number, 1000*eval(df, leaf->fparms[1], x, m, p).number));
                 }
                 break;
 
@@ -2144,9 +2144,9 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
 
         } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {
 
-            if (context->currentRideItem())
+            if (m->context->currentRideItem())
                 lhsdouble = QDate(1900,01,01).
-                daysTo(context->currentRideItem()->dateTime.date());
+                daysTo(m->context->currentRideItem()->dateTime.date());
             else
                 lhsdouble = 0;
             lhsisNumber = true;
@@ -2163,7 +2163,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
 
         } else if (isCoggan(symbol)) {
             // a coggan PMC metric
-            PMCData *pmcData = context->athlete->getPMCFor("coggan_tss");
+            PMCData *pmcData = m->context->athlete->getPMCFor("coggan_tss");
             if (!symbol.compare("ctl", Qt::CaseInsensitive)) lhsdouble = pmcData->lts(m->dateTime.date());
             if (!symbol.compare("atl", Qt::CaseInsensitive)) lhsdouble = pmcData->sts(m->dateTime.date());
             if (!symbol.compare("tsb", Qt::CaseInsensitive)) lhsdouble = pmcData->sb(m->dateTime.date());
@@ -2228,7 +2228,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
     case Leaf::UnaryOperation :
     {
         // get result
-        Result lhs = eval(context, df, leaf->lvalue.l, x, m, p);
+        Result lhs = eval(df, leaf->lvalue.l, x, m, p);
 
         // unary minus
         if (leaf->op == '-') return Result(lhs.number * -1);
@@ -2249,12 +2249,12 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
     {
         // lhs and rhs
         Result lhs;
-        if (leaf->op != ASSIGN) lhs = eval(context, df, leaf->lvalue.l, x, m, p);
+        if (leaf->op != ASSIGN) lhs = eval(df, leaf->lvalue.l, x, m, p);
 
         // if elvis we only evaluate rhs if we are null
         Result rhs;
         if (leaf->op != ELVIS || lhs.number == 0) {
-            rhs = eval(context, df, leaf->rvalue.l, x, m, p);
+            rhs = eval(df, leaf->rvalue.l, x, m, p);
         }
 
         // NOW PERFORM OPERATION
@@ -2396,12 +2396,12 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
         case IF_:
         case 0 :
             {
-                Result cond = eval(context, df, leaf->cond.l, x, m, p);
-                if (cond.isNumber && cond.number) return eval(context, df, leaf->lvalue.l, x, m, p);
+                Result cond = eval(df, leaf->cond.l, x, m, p);
+                if (cond.isNumber && cond.number) return eval(df, leaf->lvalue.l, x, m, p);
                 else {
 
                     // conditional may not have an else clause!
-                    if (leaf->rvalue.l) return eval(context, df, leaf->rvalue.l, x, m, p);
+                    if (leaf->rvalue.l) return eval(df, leaf->rvalue.l, x, m, p);
                     else return Result(0);
                 }
             }
@@ -2415,8 +2415,8 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
                 timer.start();
 
                 Result returning(0);
-                while (count++ < maxwhile && eval(context, df, leaf->cond.l, x, m, p).number) {
-                    returning = eval(context, df, leaf->lvalue.l, x, m, p);
+                while (count++ < maxwhile && eval(df, leaf->cond.l, x, m, p).number) {
+                    returning = eval(df, leaf->lvalue.l, x, m, p);
                 }
 
                 // we had to terminate warn user !
@@ -2457,8 +2457,8 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
         }
 
         // get date range
-        int fromDS = eval(context, df, leaf->fparms[0], x, m, p).number;
-        int toDS = eval(context, df, leaf->fparms[1], x, m, p).number;
+        int fromDS = eval(df, leaf->fparms[0], x, m, p).number;
+        int toDS = eval(df, leaf->fparms[1], x, m, p).number;
 
         // swap dates if needed
         if (toDS < fromDS) {
@@ -2472,12 +2472,12 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
         Result returning(0);
 
         // now iterate and evaluate for each
-        foreach(RideItem *ride, context->athlete->rideCache->rides()) {
+        foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
 
             if (!spec.pass(ride)) continue;
 
             // calculate value
-            Result res = eval(context, df, leaf->lvalue.l, x, ride, p);
+            Result res = eval(df, leaf->lvalue.l, x, ride, p);
             if (res.isNumber) {
                 returning.number += res.number; // sum for easy access
                 returning.vector << res.number;
@@ -2502,7 +2502,7 @@ Result Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, float x, RideIte
         Result returning(0);
 
         // evaluate each statement
-        foreach(Leaf *statement, *(leaf->lvalue.b)) returning = eval(context, df, statement, x, m, p);
+        foreach(Leaf *statement, *(leaf->lvalue.b)) returning = eval(df, statement, x, m, p);
 
         // compound statements evaluate to the value of the last statement
         return returning;

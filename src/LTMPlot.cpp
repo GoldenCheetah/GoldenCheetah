@@ -2708,7 +2708,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
         double value = 0;
 
         // PARSE + EVALUATE
-        Result res = parser.evaluate(ride);
+        Result res = parser.evaluate(ride, NULL);
         if (res.isNumber) value = res.number;
 
         // check values are bounded to stop QWT going berserk
