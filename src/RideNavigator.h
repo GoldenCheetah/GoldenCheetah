@@ -47,6 +47,7 @@ class SearchBox;
 class RideTreeView;
 class EditMetricDetailDialog;
 class EditUserDataDialog;
+class EditUserMetricDialog;
 
 //
 // The RideNavigator
@@ -75,6 +76,7 @@ class RideNavigator : public GcWindow
     friend class ::SearchBox;
     friend class ::EditMetricDetailDialog;
     friend class ::EditUserDataDialog;
+    friend class ::EditUserMetricDialog;
 
     public:
         RideNavigator(Context *, bool mainwindow = false);

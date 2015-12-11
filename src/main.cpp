@@ -333,9 +333,11 @@ main(int argc, char *argv[])
             xmlReader.parse(source);
             _userMetrics = handler.getSettings();
 
+#if 0 //XXX not yet .. next commit needs to fixup UserMetric methods etc
             // now add initial metrics
             foreach(UserMetricSettings m, _userMetrics)
                 RideMetricFactory::instance().addMetric(UserMetric(m));
+#endif
         }
 
         // Initialize metrics once the translator is installed

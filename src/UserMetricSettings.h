@@ -20,7 +20,18 @@
 #define _GC_UserMetricSettings_h 1
 #include "GoldenCheetah.h"
 
-#include "RideMetric.h"
+// Edit dialog
+#include <QDialog>
+#include <QTextEdit>
+#include <QLineEdit>
+#include <QDoubleSpinBox>
+#include <QLabel>
+#include <QPushButton>
+#include <QComboBox>
+
+// defined in LTMTool
+class Context;
+class DataFilterEdit;
 
 // what version of user metric structure are we using?
 // Version      Date           Who               What
@@ -33,15 +44,78 @@ class UserMetricSettings {
 
     public:
 
+        bool operator!= (UserMetricSettings right) const {
+
+            // mostly used to see if it changed when editing
+            if (this->symbol != right.symbol ||
+                this->name != right.name ||
+                this->description != right.description ||
+                this->unitsMetric != right.unitsMetric ||
+                this->unitsImperial != right.unitsImperial ||
+                this->conversion != right.conversion ||
+                this->conversionSum != right.conversionSum ||
+                this->program != right.program ||
+                this->fingerprint != right.fingerprint)
+                return true;
+            else
+                return false;
+        }
+
         QString symbol,
                 name,
                 description,
                 unitsMetric,
                 unitsImperial;
 
+        int type;
+        int precision;
+
         double  conversion,
                 conversionSum;
 
-        QString program;
+        QString program,
+                fingerprint; // condensed form of program
+};
+
+class EditUserMetricDialog : public QDialog {
+
+    Q_OBJECT
+
+    public:
+
+        EditUserMetricDialog(Context *context, UserMetricSettings &here);
+
+    public slots:
+
+        // refresh the outputs (time to compute, value for
+        // the current ride, time to compute all rides)
+        void refreshStats();
+        void okClicked();
+
+    private:
+
+        void setSettings(UserMetricSettings &);
+
+        Context *context;
+        UserMetricSettings &settings;
+
+        QLineEdit *symbol,
+                  *name,
+                  *unitsMetric,
+                  *unitsImperial;
+
+        QComboBox *type;
+        QTextEdit *description;
+
+        QDoubleSpinBox *conversion,
+                       *conversionSum,
+                       *precision;
+
+        DataFilterEdit *formulaEdit; // edit your formula
+
+        QLabel *mValue, *iValue, *elapsed;
+
+        QPushButton *test, *okButton, *cancelButton;
+
 };
 #endif

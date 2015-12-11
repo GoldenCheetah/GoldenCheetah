@@ -414,17 +414,18 @@ MetricConfig::MetricConfig(QDir home, Zones *zones, Context *context) :
     bestsPage = new BestsMetricsPage(this);
     intervalsPage = new IntervalMetricsPage(this);
     summaryPage = new SummaryMetricsPage(this);
+    customPage = new CustomMetricsPage(this, context);
 
     setContentsMargins(0,0,0,0);
-    QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
 
     QTabWidget *tabs = new QTabWidget(this);
+    tabs->addTab(customPage, tr("Custom"));
     tabs->addTab(bestsPage, tr("Bests"));
     tabs->addTab(summaryPage, tr("Summary"));
     tabs->addTab(intervalsPage, tr("Intervals"));
-
     mainLayout->addWidget(tabs);
 }
 
@@ -435,6 +436,7 @@ qint32 MetricConfig::saveClicked()
     state |= bestsPage->saveClicked();
     state |= summaryPage->saveClicked();
     state |= intervalsPage->saveClicked();
+    state |= customPage->saveClicked();
 
     return state;
 }

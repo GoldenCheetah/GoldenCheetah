@@ -19,6 +19,12 @@
 #include "Context.h"
 #include "Athlete.h"
 
+#include "RideMetric.h"
+#include "UserMetricSettings.h"
+#include "UserMetricParser.h"
+#include <QXmlInputSource>
+#include <QXmlSimpleReader>
+
 Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
 {
     ride = NULL;
@@ -69,6 +75,32 @@ Context::notifyConfigChanged(qint32 state)
     //if (state & CONFIG_APPEARANCE) qDebug()<<"Appearance config changed!";
     //if (state & CONFIG_NOTECOLOR) qDebug()<<"Note color config changed!";
     //if (state & CONFIG_FIELDS) qDebug()<<"Metadata config changed!";
+qDebug()<<"config changed!"<<state;
+    if (state & CONFIG_USERMETRICS) userMetricsConfigChanged();
     configChanged(state);
 }
 
+void 
+Context::userMetricsConfigChanged()
+{
+    // read em in...
+    QString metrics = QString("%1/../usermetrics.xml").arg(athlete->home->root().absolutePath());
+    if (QFile(metrics).exists()) {
+
+        QFile metricfile(metrics);
+        QXmlInputSource source(&metricfile);
+        QXmlSimpleReader xmlReader;
+        UserMetricParser handler;
+
+        xmlReader.setContentHandler(&handler);
+        xmlReader.setErrorHandler(&handler);
+
+        // parse and get return values
+        xmlReader.parse(source);
+        _userMetrics = handler.getSettings();
+    }
+
+    // update metric factory XXX
+    // notify everyone XXX
+    // what about delete a metric thats in use!!! XXX XXX
+}

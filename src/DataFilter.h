@@ -104,6 +104,9 @@ class DataFilter : public QObject
         DataFilter(QObject *parent, Context *context);
         DataFilter(QObject *parent, Context *context, QString formula);
 
+        // get a signature for a datafilter
+        static QString fingerprint(QString &query);
+
         Context *context;
         QStringList &files() { return filenames; }
         QString signature() { return sig; }
