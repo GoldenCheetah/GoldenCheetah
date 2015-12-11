@@ -63,10 +63,13 @@ bool UserMetricParser::startElement( const QString&, const QString&, const QStri
         if (attrs.qName(i) == "symbol") add.symbol=attrs.value(i);
         if (attrs.qName(i) == "name") add.name=attrs.value(i);
         if (attrs.qName(i) == "description") add.description=attrs.value(i);
+        if (attrs.qName(i) == "precision") add.description=attrs.value(i).toInt();
+        if (attrs.qName(i) == "type") add.description=attrs.value(i).toInt();
         if (attrs.qName(i) == "unitsMetric") add.unitsMetric=attrs.value(i);
         if (attrs.qName(i) == "unitsImperial") add.unitsImperial=attrs.value(i);
         if (attrs.qName(i) == "conversion") add.conversion=attrs.value(i).toDouble();
         if (attrs.qName(i) == "conversionSum") add.conversion=attrs.value(i).toDouble();
+        if (attrs.qName(i) == "fingerprint") add.fingerprint=attrs.value(i);
     }
 
     return true;
@@ -139,8 +142,11 @@ UserMetricParser::serialize(QString filename, QList<UserMetricSettings> metrics)
         out <<"description=\"" << xmlprotect(metric.description) << "\" ";
         out <<"unitsMetric=\"" << xmlprotect(metric.unitsMetric) << "\" ";
         out <<"unitsImperial=\"" << xmlprotect(metric.unitsImperial) << "\" ";
+        out <<"precision=\"" << metric.precision << "\" ";
+        out <<"type=\"" << metric.type << "\" ";
         out <<"conversion=\"" << metric.conversion << "\" ";
         out <<"conversionSum=\"" << metric.conversionSum << "\" ";
+        out <<"fingerprint=\"" << xmlprotect(metric.fingerprint) << "\" ";
 
         out << ">\n";
         out << xmlprotect(metric.program);

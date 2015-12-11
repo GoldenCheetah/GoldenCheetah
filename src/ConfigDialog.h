@@ -156,6 +156,7 @@ class MetricConfig : public QWidget
         BestsMetricsPage *bestsPage;
         IntervalMetricsPage *intervalsPage;
         SummaryMetricsPage *summaryPage;
+        CustomMetricsPage *customPage;
 };
 
 // DEVICE PAGE

@@ -25,6 +25,7 @@
 #include "Pages.h"
 #include "Units.h"
 #include "Settings.h"
+#include "UserMetricParser.h"
 #include "Units.h"
 #include "Colors.h"
 #include "AddDeviceWizard.h"
@@ -2382,6 +2383,179 @@ BestsMetricsPage::saveClicked()
     appsettings->setValue(GC_SETTINGS_BESTS_METRICS, metrics.join(","));
 
     return 0;
+}
+
+CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
+    QWidget(parent), context(context)
+{
+    // copy as current, so we can edit...
+    metrics = _userMetrics;
+
+    table = new QTreeWidget;
+    table->headerItem()->setText(0, tr("Symbol"));
+    table->headerItem()->setText(1, tr("Name"));
+    table->setColumnCount(2);
+    table->setColumnWidth(0,200);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+    table->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
+    table->setIndentation(0);
+
+    refreshTable();
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(table);
+
+    editButton = new QPushButton(tr("Edit"));
+#ifndef Q_OS_MAC
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+    addButton->setFixedSize(20,20);
+    deleteButton->setFixedSize(20,20);
+#else
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
+#endif
+    QHBoxLayout *buttons = new QHBoxLayout();
+    buttons->addStretch();
+    buttons->addWidget(editButton);
+    buttons->addStretch();
+    buttons->addWidget(addButton);
+    buttons->addWidget(deleteButton);
+
+    layout->addLayout(buttons);
+
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
+}
+
+void
+CustomMetricsPage::refreshTable()
+{
+    table->clear();
+    foreach(UserMetricSettings m, metrics) {
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(table->invisibleRootItem());
+        add->setText(0, m.symbol);
+        add->setText(1, m.name);
+    }
+}
+
+void
+CustomMetricsPage::deleteClicked()
+{
+    // nothing selected
+    if (table->selectedItems().count() <= 0) return;
+
+    // which one?
+    QTreeWidgetItem *item = table->selectedItems().first();
+    int row = table->invisibleRootItem()->indexOfChild(item);
+
+    // Are you sure ?
+    QMessageBox msgBox;
+    msgBox.setText(tr("Are you sure you want to delete this metric?"));
+    msgBox.setInformativeText(metrics[row].name);
+    QPushButton *deleteButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
+    msgBox.setStandardButtons(QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.exec();
+
+    // nope, don't want to
+    if(msgBox.clickedButton() != deleteButton) return;
+
+    // wipe it away
+    metrics.removeAt(row);
+
+    // refresh
+    refreshTable();
+}
+
+void
+CustomMetricsPage::addClicked()
+{
+    UserMetricSettings here;
+
+    // provide an example program to edit....
+    here.symbol = "My_Average_Power";
+    here.name = "My Average Power";
+    here.type = 1;
+    here.precision = 0;
+    here.description = "Average Power computed using Joules to account for variable recording.";
+    here.unitsMetric = "watts";
+    here.unitsImperial = "watts";
+    here.conversion = 1.00;
+    here.conversionSum = 0.00;
+    here.program ="{\n\
+    # only calculate for rides containing power\n\
+    relevant { Data contains \"P\"; }\n\
+\n\
+    # initialise aggregating variables\n\
+    init { joules <- 0; seconds <- 0; }\n\
+\n\
+    # joules = power x time, for each sample\n\
+    sample { \n\
+        joules <- joules + (POWER * RECINTSECS);\n\
+        seconds <- seconds + RECINTSECS;\n\
+    }\n\
+\n\
+    # calculate metric value at end\n\
+    value { joules / seconds; }\n\
+    count { seconds; }\n\
+}";
+
+    EditUserMetricDialog editor(context, here);
+    if (editor.exec() == QDialog::Accepted) {
+
+        // add to the list
+        metrics.append(here);
+        refreshTable();
+
+    }
+}
+
+void
+CustomMetricsPage::editClicked()
+{
+    // nothing selected
+    if (table->selectedItems().count() <= 0) return;
+
+    // which one?
+    QTreeWidgetItem *item = table->selectedItems().first();
+    int row = table->invisibleRootItem()->indexOfChild(item);
+
+    // edit it 
+    UserMetricSettings here = metrics[row];
+
+    EditUserMetricDialog editor(context, here);
+    if (editor.exec() == QDialog::Accepted) {
+
+        // add to the list
+        metrics[row] = here;
+        refreshTable();
+
+    }
+}
+
+
+qint32
+CustomMetricsPage::saveClicked()
+{
+    bool changed = false;
+    if (metrics.count() != _userMetrics.count()) changed = true;
+    else {
+        for(int i=0; i<metrics.count(); i++)
+            if (metrics[i] != _userMetrics[i])
+                changed = true;
+    }
+
+    // save away OUR version to top-level NOT athlete dir
+    // and don't overwrite in memory version the signal handles that
+    QString filename = QString("%1/../usermetrics.xml").arg(context->athlete->home->root().absolutePath());
+    UserMetricParser::serialize(filename, metrics);
+
+    // the change will need to be signalled by context, not us
+    return changed ? CONFIG_USERMETRICS : 0;
 }
 
 SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :

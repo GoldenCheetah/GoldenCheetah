@@ -621,6 +621,7 @@ SOURCES += \
         DiarySidebar.cpp \
         DownloadRideDialog.cpp \
         DragBar.cpp \
+        EditUserMetricDialog.cpp \
         ErgDB.cpp \
         ErgDBDownloadDialog.cpp \
         ErgFile.cpp \

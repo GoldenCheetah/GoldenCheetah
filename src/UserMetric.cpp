@@ -102,6 +102,7 @@ UserMetric::count() const
 bool
 UserMetric::aggregateZero() const
 {
+    return true;
 }
 
 // is this metric relevant
@@ -124,4 +125,5 @@ UserMetric::compute(const RideFile *ride,
 bool
 UserMetric::isTime() const
 {
+    return false;
 }

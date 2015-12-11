@@ -221,10 +221,13 @@ Leaf::isDynamic(Leaf *leaf)
 void
 DataFilter::setSignature(QString &query)
 {
-    // strip out all whitespace and comments
-    // from the formula so it can be used as
-    // a signature when placed into a hash
-    sig.clear();
+    sig = fingerprint(query);
+}
+
+QString
+DataFilter::fingerprint(QString &query)
+{
+    QString sig;
 
     bool incomment=false;
     bool instring=false;
@@ -243,6 +246,8 @@ DataFilter::setSignature(QString &query)
         // keep anything that isn't whitespace, or a comment
         if (instring || (!incomment && !query[i].isSpace())) sig += query[i];
     }
+
+    return sig;
 }
 
 void

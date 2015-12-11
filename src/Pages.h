@@ -380,6 +380,34 @@ class BestsMetricsPage : public QWidget
 #endif
 };
 
+class CustomMetricsPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+    public:
+
+    CustomMetricsPage(QWidget *parent, Context *context);
+
+    public slots:
+
+        void refreshTable();
+        qint32 saveClicked();
+
+        void deleteClicked();
+        void addClicked();
+        void editClicked();
+
+    protected:
+        Context *context;
+
+        QPushButton *addButton,
+                    *deleteButton,
+                    *editButton;
+        QTreeWidget *table;
+        QList<UserMetricSettings> metrics;
+};
+
 class IntervalMetricsPage : public QWidget
 {
     Q_OBJECT
