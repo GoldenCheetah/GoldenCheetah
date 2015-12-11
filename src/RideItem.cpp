@@ -595,13 +595,7 @@ RideItem::refresh()
         metacrc = metaCRC();
 
         // Construct the summary text used on the calendar
-        QString calendarText;
-        foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
-            if (field.diary == true) {
-                calendarText += field.calendarText(this, context->athlete->rideMetadata());
-            }
-        }
-        metadata_.insert("Calendar Text", calendarText);
+        metadata_.insert("Calendar Text", context->athlete->rideMetadata()->calendarText(this));
 
         // close if we opened it
         if (doclose) {
