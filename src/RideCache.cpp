@@ -118,15 +118,7 @@ RideCache::configChanged(qint32 what)
     // if metadata changed then recompute diary text
     if (what & CONFIG_FIELDS) {
         foreach(RideItem *item, rides()) {
-
-            // Construct the summary text used on the calendar
-            QString calendarText;
-            foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
-                if (field.diary == true) {
-                    calendarText += field.calendarText(item, context->athlete->rideMetadata());
-                }
-            }
-            item->metadata_.insert("Calendar Text", calendarText);
+            item->metadata_.insert("Calendar Text", context->athlete->rideMetadata()->calendarText(item));
         }
     }
 

@@ -66,7 +66,7 @@ class FieldDefinition
 
         static unsigned long fingerprint(QList<FieldDefinition>);
         QCompleter *getCompleter(QObject *parent);
-        QString calendarText(RideItem *rideItem, RideMetadata *meta);
+        QString calendarText(QString value);
 
         FieldDefinition() : tab(""), name(""), type(0), diary(false), values() {}
         FieldDefinition(QString tab, QString name, int type, bool diary, QStringList values)
@@ -158,6 +158,7 @@ class RideMetadata : public QWidget
         QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
         QList<FieldDefinition> getFields() { return fieldDefinitions; }
         QList<DefaultDefinition> getDefaults() { return defaultDefinitions; }
+        QString calendarText(RideItem *rideItem);
 
         QString getColorField() const { return colorfield; }
         void setColorField(QString x) { colorfield = x; }

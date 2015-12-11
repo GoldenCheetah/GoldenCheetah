@@ -316,6 +316,27 @@ QVector<FormField *> RideMetadata::getFormFields()
     return formFields;
 }
 
+// Construct the summary text used on the calendar
+QString
+RideMetadata::calendarText(RideItem *rideItem)
+{
+    QString calendarText;
+
+    foreach (FieldDefinition field, getFields()) {
+        // "Weight" field is replace by "Athlete Weight" metric
+        QString fieldName = (field.name == "Weight") ? "Athlete Weight" :
+                                                       field.name;
+        QString value;
+        if (sp.isMetric(fieldName)) {
+            value = rideItem->getStringForSymbol(sp.rideMetric(fieldName)->symbol(), context->athlete->useMetricUnits);
+        } else {
+            value = rideItem->getText(fieldName, "");
+        }
+        calendarText += field.calendarText(value);
+    }
+
+    return calendarText;
+}
 
 /*----------------------------------------------------------------------
  * Forms (one per tab)
@@ -1137,31 +1158,22 @@ FieldDefinition::getCompleter(QObject *parent)
 }
 
 QString
-FieldDefinition::calendarText(RideItem *rideItem, RideMetadata *meta)
+FieldDefinition::calendarText(QString value)
 {
-    // "Weight" field is replace by "Athlete Weight" metric
-    QString fieldName = (name == "Weight") ? "Athlete Weight" : name;
-    QString value;
-    if (meta->sp.isMetric(fieldName)) {
-        value = rideItem->getStringForSymbol(meta->sp.rideMetric(fieldName)->symbol(), meta->context->athlete->useMetricUnits);
-    } else {
-        value = rideItem->getText(fieldName, "");
-    }
-
-    if (value.isEmpty()) return value;
+    if (value.isEmpty() || diary != true) return QString();
 
     switch (type) {
-    case FIELD_INTEGER:
-    case FIELD_DOUBLE:
-    case FIELD_DATE:
-    case FIELD_TIME:
-    case FIELD_CHECKBOX:
-        return QString("%1: %2\n").arg(name).arg(value);
-    case FIELD_TEXT:
-    case FIELD_TEXTBOX:
-    case FIELD_SHORTTEXT:
-    default:
-        return QString("%1\n").arg(value);
+        case FIELD_INTEGER:
+        case FIELD_DOUBLE:
+        case FIELD_DATE:
+        case FIELD_TIME:
+        case FIELD_CHECKBOX:
+            return QString("%1: %2\n").arg(name).arg(value);
+        case FIELD_TEXT:
+        case FIELD_TEXTBOX:
+        case FIELD_SHORTTEXT:
+        default:
+            return QString("%1\n").arg(value);
     }
 }
 
