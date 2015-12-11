@@ -93,6 +93,12 @@ EditUserMetricDialog::EditUserMetricDialog(Context *context, UserMetricSettings 
     precision->setDecimals(3);
     precision->setValue(settings.precision);
 
+    aggzero = new QCheckBox(tr("Aggregate Zero"));
+    aggzero->setChecked(settings.aggzero);
+
+    istime = new QCheckBox(tr("Time"));
+    istime->setChecked(settings.istime);
+
     QLabel *formulaEditLabel = new QLabel(tr("Program"), this);
     formulaEdit = new DataFilterEdit(this, context);
     QFont courier("Courier", QFont().pointSize());
@@ -199,13 +205,15 @@ EditUserMetricDialog::EditUserMetricDialog(Context *context, UserMetricSettings 
     head->addWidget(typeLabel, 1,0);
     head->addWidget(type, 1,1);
     head->addWidget(descriptionLabel, 1,2);
-    head->addWidget(description, 1,3,2,2);
+    head->addWidget(description, 1,3,2,3);
 
     // third row; precision and middle of description
     head->addWidget(precisionLabel, 2,0);
     head->addWidget(precision, 2,1);
 
-    // fourth row; empty and bottom of description
+    // fourth row; aggzero and istime and bottom of description
+    head->addWidget(istime, 3,1);
+    head->addWidget(aggzero, 3,2);
 
     // fifth row; labels for units etc
     head->addWidget(unitsMetricLabel, 4,0);
@@ -264,6 +272,8 @@ EditUserMetricDialog::setSettings(UserMetricSettings &here)
     here.type = type->currentIndex();
     here.conversion = conversion->value();
     here.conversionSum = conversionSum->value();
+    here.aggzero = aggzero->isChecked();
+    here.istime = istime->isChecked();
     here.precision = precision->value();
     here.program = formulaEdit->document()->toPlainText();
     here.fingerprint = DataFilter::fingerprint(here.program);
