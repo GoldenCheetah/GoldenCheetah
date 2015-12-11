@@ -28,6 +28,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QComboBox>
+#include <QCheckBox>
 
 // defined in LTMTool
 class Context;
@@ -70,6 +71,8 @@ class UserMetricSettings {
         int type;
         int precision;
 
+        bool aggzero, istime;
+
         double  conversion,
                 conversionSum;
 
@@ -106,6 +109,8 @@ class EditUserMetricDialog : public QDialog {
 
         QComboBox *type;
         QTextEdit *description;
+
+        QCheckBox *istime, *aggzero;
 
         QDoubleSpinBox *conversion,
                        *conversionSum,
