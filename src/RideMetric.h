@@ -213,7 +213,7 @@ class UserMetric: public RideMetric {
 
 public:
 
-    UserMetric(UserMetricSettings settings);
+    UserMetric(Context *context, UserMetricSettings settings);
     ~UserMetric();
 
     // is this a user defined one?

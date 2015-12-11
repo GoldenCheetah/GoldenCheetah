@@ -18,24 +18,31 @@
 
 #include "RideMetric.h"
 #include "UserMetricSettings.h"
+#include "DataFilter.h"
 
-UserMetric::UserMetric(UserMetricSettings settings)
+
+UserMetric::UserMetric(Context *context, UserMetricSettings settings)
+    : RideMetric(), settings(settings), program(NULL)
 {
+    // compile the program - built in a context that can close.
+    program = new DataFilter(NULL, context, settings.program);
 }
 
 UserMetric::~UserMetric()
 {
+    if (program) delete program;
 }
 
 void
 UserMetric::initialize()
 {
+    return; // nothing doing
 }
 
 QString
 UserMetric::symbol() const
 {
-    return "";
+    return settings.symbol;
 }
 
 // A short string suitable for showing to the user in the ride
@@ -44,39 +51,40 @@ UserMetric::symbol() const
 QString
 UserMetric::name() const
 {
-    return "";
+    return settings.name;
 }
 
 QString
 UserMetric::internalName() const
 {
-    return "";
+    return settings.name;
 }
 
 RideMetric::MetricType
 UserMetric::type() const
 {
+    return static_cast<RideMetric::MetricType>(settings.type);
 }
 
 // units
 QString
 UserMetric::units(bool metric) const
 {
-    return "";
+    return metric ? settings.unitsMetric : settings.unitsImperial;
 }
 
 // Factor to multiple value to convert from metric to imperial
 double
 UserMetric::conversion() const
 {
-    return 1;
+    return settings.conversion;
 }
 
 // And sum for example Fahrenheit from CentigradE
 double
 UserMetric::conversionSum() const
 {
-    return 0;
+    return settings.conversionSum;
 }
 
 // How many digits after the decimal we should show when displaying the
@@ -84,42 +92,51 @@ UserMetric::conversionSum() const
 int
 UserMetric::precision() const
 {
-    return 0;
+    return settings.precision;
 }
 
 // Get the value and apply conversion if needed
 double
 UserMetric::value(bool metric) const
 {
-    return 0;
+    if (metric) return value();
+    else return (value() * conversion()) + conversionSum();
 }
 
 // The internal value of this ride metric, useful to cache and then setValue.
 double
 UserMetric::value() const
 {
-    return 0;
+    return value_;
 }
 
 // for averages the count of items included in the average
 double
 UserMetric::count() const
 {
-    return 0;
+    return count_;
 }
 
 // when aggregating averages, should we include zeroes ? no by default
 bool
 UserMetric::aggregateZero() const
 {
-    return true;
+    return settings.aggzero;
 }
 
 // is this metric relevant
 bool
-UserMetric::isRelevantForRide(const RideItem *) const
+UserMetric::isRelevantForRide(const RideItem *item) const
 {
-    return true;
+    if (item->context && program->root()) {
+        if (program->functions.contains("relevant")) {
+            Result res = program->root()->eval(program, program->functions.value("relevant"), 0, const_cast<RideItem*>(item), NULL);
+qDebug()<<"CALLING USER METHOD FOR RELEVANT!";
+            return res.number;
+        } else
+            return true;
+    }
+    return false;
 }
 
 // Compute the ride metric from a file.
@@ -130,11 +147,17 @@ UserMetric::compute(const RideFile *ride,
                          const QHash<QString,RideMetric*> &deps,
                          const Context *context)
 {
+    // XXX todo
+    // relevant ?
+    // init ?
+    // samples ?
+    // value ?
+    // count?
 }
 
 
 bool
 UserMetric::isTime() const
 {
-    return false;
+    return settings.istime;
 }

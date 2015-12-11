@@ -749,7 +749,7 @@ LTMSidebar::filterTreeWidgetSelectionChanged()
                 {
                     // use a data filter
                     DataFilter f(this, context);
-                    errors = f.parseFilter(ns.text, &results);
+                    errors = f.parseFilter(context, ns.text, &results);
                 }
                 break;
 

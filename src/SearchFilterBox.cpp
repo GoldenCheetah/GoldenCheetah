@@ -46,7 +46,7 @@ SearchFilterBox::SearchFilterBox(QWidget *parent, Context *context, bool nochoos
     connect(searchbox, SIGNAL(clearQuery()), this, SIGNAL(searchClear()));
 
     // data filtering
-    connect(searchbox, SIGNAL(submitFilter(QString)), datafilter, SLOT(parseFilter(QString)));
+    connect(searchbox, SIGNAL(submitFilter(Context*,QString)), datafilter, SLOT(parseFilter(Context*,QString)));
     connect(datafilter, SIGNAL(results(QStringList)), this, SIGNAL(searchResults(QStringList)));
     connect(searchbox, SIGNAL(clearFilter()), this, SIGNAL(searchClear()));
     connect(searchbox, SIGNAL(clearFilter()), datafilter, SLOT(clearFilter()));
@@ -87,7 +87,7 @@ SearchFilterBox::matches(Context *context, QString filter)
 
         DataFilter df(NULL, context, spec);
         foreach(RideItem *item, context->athlete->rideCache->rides()) {
-            Result res = df.evaluate(item);
+            Result res = df.evaluate(item, NULL);
             if (res.isNumber && res.number)
                 returning << item->fileName;
         }
