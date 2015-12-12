@@ -18,15 +18,26 @@
 
 #include "Specification.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
+#include "RideFile.h"
 
-Specification::Specification(DateRange dr, FilterSet fs) : dr(dr), fs(fs) {}
-Specification::Specification() {}
+Specification::Specification(DateRange dr, FilterSet fs) : dr(dr), fs(fs), it(NULL), recintsecs(0), ri(NULL) {}
+Specification::Specification(IntervalItem *it, double recintsecs) : it(it), recintsecs(recintsecs), ri(NULL) {}
+Specification::Specification() : it(NULL), recintsecs(0), ri(NULL) {}
 
 // does the rideitem pass the specification ?
 bool 
 Specification::pass(RideItem*item)
 {
     return (dr.pass(item->dateTime.date()) && fs.pass(item->fileName));
+}
+
+bool
+Specification::pass(RideFilePoint *p)
+{
+    if (it == NULL) return true;
+    else if ((p->secs+recintsecs) >= it->start && p->secs <= it->stop) return true;
+    return false;
 }
 
 // set criteria
@@ -46,4 +57,17 @@ void
 Specification::addMatches(QStringList other)
 {
     fs.addFilter(true, other);
+}
+
+void
+Specification::setIntervalItem(IntervalItem *it, double recintsecs)
+{
+    this->it = it;
+    this->recintsecs = recintsecs;
+}
+
+void
+Specification::setRideItem(RideItem *ri)
+{
+    this->ri = ri;
 }
