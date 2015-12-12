@@ -33,7 +33,7 @@
 //
 class RideItem;
 class IntervalItem;
-class RideFilePoint;
+struct RideFilePoint;
 
 class FilterSet
 {
