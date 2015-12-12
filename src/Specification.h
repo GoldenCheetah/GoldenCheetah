@@ -72,8 +72,10 @@ class FilterSet
         int count() { return filters_.count(); }
 };
 
+class RideFileIterator;
 class Specification
 {
+    friend class ::RideFileIterator;
     public:
         Specification(DateRange dr, FilterSet fs);
         Specification(IntervalItem *it, double recintsecs);
@@ -96,6 +98,13 @@ class Specification
         DateRange dateRange() { return dr; }
         FilterSet filterSet() { return fs; }
         bool isFiltered() { return (fs.count() > 0); }
+
+    protected:
+        // when working with intervals secs start and end
+        // if no interval is set then they return -1 to indicate
+        // that the entire ride is in scope
+        double secsStart();
+        double secsEnd();
 
     private:
         DateRange dr;

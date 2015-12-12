@@ -2638,3 +2638,87 @@ RideFile::symbolForSeries(SeriesType series)
 
     return "";
 }
+
+// Iterator
+RideFileIterator::RideFileIterator(RideFile *f, Specification spec)
+    : f(f)
+{
+    // index, start and stop are set to -1
+    // if they are out of bounds or f is NULL
+    if (f != NULL) {
+
+        // ok, so lets work out the begin and end index
+        double startsecs = spec.secsStart();
+        if (startsecs < 0) start = 0;
+        else start = f->timeIndex(start);
+
+        // check!
+        if (start >= f->dataPoints().count()) start = -1;
+
+        // ok, so lets work out the begin and end index
+        double stopsecs = spec.secsStart();
+        if (stopsecs < 0) stop = f->dataPoints().count()-1;
+        else stop = f->timeIndex(stopsecs);
+
+        // check!
+        if (stop >= f->dataPoints().count()) stop = -1;
+
+    } else {
+
+        // nothing doing
+        start = stop = -1;
+    }
+
+    // move to front by default
+    index = start;
+}
+
+void
+RideFileIterator::toFront()
+{
+    index = start;
+}
+
+void
+RideFileIterator::toBack()
+{
+    index = stop;
+}
+
+struct RideFilePoint *
+RideFileIterator::first()
+{
+    return start > 0 ? f->dataPoints()[start] : NULL; // efficient since dataPoints() returns a reference
+}
+
+struct RideFilePoint *
+RideFileIterator::last()
+{
+    return stop > 0 ? f->dataPoints()[stop] : NULL; // efficient since dataPoints() returns a reference
+}
+
+bool
+RideFileIterator::hasNext() const
+{
+    return (index > 0 && index <= stop);
+}
+
+bool
+RideFileIterator::hasPrevious() const
+{
+    return (index > 0 && index >= start);
+}
+
+struct RideFilePoint *
+RideFileIterator::next()
+{
+    if (index > 0 && index <= stop) return f->dataPoints()[index++];
+    else return NULL;
+}
+
+struct RideFilePoint *
+RideFileIterator::previous()
+{
+    if (index > 0 && index >= start) return f->dataPoints()[index--];
+    else return NULL;
+}

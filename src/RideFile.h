@@ -30,6 +30,7 @@
 
 class RideItem;
 class RideCache;
+class Specification;
 class IntervalItem;
 class WPrime;
 class RideFile;
@@ -465,6 +466,29 @@ struct RideFilePoint
     // get the value via the series type rather than access direct to the values
     double value(RideFile::SeriesType series) const;
     void setValue(RideFile::SeriesType series, double value);
+};
+
+class RideFileIterator {
+
+    public:
+
+        RideFileIterator(RideFile *, Specification);
+
+        void toFront();
+        void toBack();
+
+        struct RideFilePoint *first();
+        struct RideFilePoint *last();
+
+        bool hasNext() const;
+        bool hasPrevious() const;
+
+        struct RideFilePoint *next();
+        struct RideFilePoint *previous();
+
+    private:
+        RideFile *f;
+        int start, stop, index;
 };
 
 struct RideFileReader {
