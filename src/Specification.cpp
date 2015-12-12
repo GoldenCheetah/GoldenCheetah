@@ -66,6 +66,20 @@ Specification::setIntervalItem(IntervalItem *it, double recintsecs)
     this->recintsecs = recintsecs;
 }
 
+double 
+Specification::secsStart()
+{
+    if (it) return it->start;
+    else return -1;
+}
+
+double 
+Specification::secsEnd()
+{
+    if (it) return it->stop;
+    else return -1;
+}
+
 void
 Specification::setRideItem(RideItem *ri)
 {
