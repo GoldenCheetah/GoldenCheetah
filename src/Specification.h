@@ -23,7 +23,17 @@
 #include <QStringList>
 #include "TimeUtils.h"
 
+//
+// A 'specification' can be passed around to use as a filter.
+// It can be used om collections of ride items, or on ride samples.
+//
+// The same object it used, can be set with filters for either
+// but the pass() function should be passed either a ride item
+// or a ride point.
+//
 class RideItem;
+class IntervalItem;
+class RideFilePoint;
 
 class FilterSet
 {
@@ -66,14 +76,21 @@ class Specification
 {
     public:
         Specification(DateRange dr, FilterSet fs);
+        Specification(IntervalItem *it, double recintsecs);
         Specification();
 
         // does the rideitem pass the specification ?
         bool pass(RideItem*);
 
+        // does the ridepoint pass the specification ?
+        bool pass(RideFilePoint *p);
+
         // set criteria
         void setDateRange(DateRange dr);
         void setFilterSet(FilterSet fs);
+        void setIntervalItem(IntervalItem *it, double recintsecs);
+        void setRideItem(RideItem *ri);
+
         void addMatches(QStringList matches);
 
         DateRange dateRange() { return dr; }
@@ -83,5 +100,8 @@ class Specification
     private:
         DateRange dr;
         FilterSet fs;
+        IntervalItem *it;
+        double recintsecs;
+        RideItem *ri;
 };
 #endif
