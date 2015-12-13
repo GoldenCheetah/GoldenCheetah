@@ -144,7 +144,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
     charts = new QTreeWidget;
 #ifdef Q_OS_MAC
-    presetCharts->setAttribute(Qt::WA_MacShowFocusRect, 0);
+    charts->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     charts->headerItem()->setText(0, tr("Charts"));
     charts->setColumnCount(1);
