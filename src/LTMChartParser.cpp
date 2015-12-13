@@ -138,6 +138,38 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
     file.close();
 }
 
+void
+LTMChartParser::serializeToQString(QString* string, QList<LTMSettings> charts)
+{
+    // difference to "serialize" is that it does not contain any /n newlines
+
+    QTextStream out(string);
+    out.setCodec("UTF-8");
+
+    // begin document
+    out << QString("<charts version=\"%1\">").arg(LTM_VERSION_NUMBER);
+
+    // write out to file
+    foreach (LTMSettings chart, charts) {
+
+        out <<"\t<chart name=\"" << xmlprotect(chart.name) <<"\">\"";
+        // chart name
+        QByteArray marshall;
+        QDataStream s(&marshall, QIODevice::WriteOnly);
+        s << chart;
+        out<<marshall.toBase64();
+        out<<"\"</chart>";
+    }
+
+    // end document
+    out << "</charts>";
+
+    // write all to out
+    out.flush();
+
+}
+
+
 ChartTreeView::ChartTreeView(Context *context) : context(context)
 {
     setDragDropMode(QAbstractItemView::InternalMove);
