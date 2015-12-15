@@ -17,6 +17,8 @@
  */
 
 #include "RideMetric.h"
+#include "RideItem.h"
+#include "Specification.h"
 #include "UserMetricSettings.h"
 #include "TimeUtils.h"
 #include "Zones.h"
@@ -138,20 +140,31 @@ QVector<QString> RideMetricFactory::noDeps;
 QList<UserMetricSettings> _userMetrics;
 
 QHash<QString,RideMetricPtr>
-RideMetric::computeMetrics(const Context *context, const RideFile *ride, const Zones *zones, const HrZones *hrZones,
-                           const QStringList &metrics)
+RideMetric::computeMetrics(RideItem *item, Specification spec, const QStringList &metrics)
 {
-    int zoneRange = zones->whichRange(ride->startTime().date());
-    int hrZoneRange = hrZones->whichRange(ride->startTime().date());
+    // this is our worklist
+    QStringList todo = metrics;
+
+    // this is what we've completed as we go
+    QHash<QString,RideMetric*> done;
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    QStringList todo = metrics;
-    QHash<QString,RideMetric*> done;
+
+    // working through the todo list...
     while (!todo.isEmpty()) {
+
+        // next one to do
         QString symbol = todo.takeFirst();
+
+        // doesn't exist !
         if (!factory.haveMetric(symbol)) continue;
+
+        // does this one have any dependencies?
         const QVector<QString> &deps = factory.dependencies(symbol);
+
         bool ready = true;
+
+        // if the dependencies aren't done yet add to the end of the list
         foreach (QString dep, deps) {
             if (!done.contains(dep)) {
                 ready = false;
@@ -159,27 +172,46 @@ RideMetric::computeMetrics(const Context *context, const RideFile *ride, const Z
                     todo.append(dep);
             }
         }
+
+        // if all our depencies are computed we can do this one
         if (ready) {
+
+            // we clone so we can remain thread safe
+            // do not be tempted to change this (!)
             RideMetric *m = factory.newMetric(symbol);
             m->setValue(0.0);
             m->setCount(0);
-            m->compute(ride, zones, zoneRange, hrZones, hrZoneRange, done, context);
-            if (ride->metricOverrides.contains(symbol))
-                m->override(ride->metricOverrides.value(symbol));
+            m->compute(item, spec, done);
+
+            // override the computed value if set by user
+            if (item->ride() && item->ride()->metricOverrides.contains(symbol))
+                m->override(item->ride()->metricOverrides.value(symbol));
+
+            // all computed add to the return list
             done.insert(symbol, m);
-        }
-        else {
+
+        } else {
+
+            // we need to wait for our dependencies so add
+            // to the back of the list 
             if (!todo.contains(symbol))
                 todo.append(symbol);
         }
     }
+
+    // lets prepate the results using a shared pointer
+    // which is deleted when reference count 0 and goes out of scope
     QHash<QString,RideMetricPtr> result;
     foreach (QString symbol, metrics) {
         result.insert(symbol, QSharedPointer<RideMetric>(done.value(symbol)));
         done.remove(symbol);
     }
+
+    // delete the cloned metrics, no memory leak here :)
     foreach (QString symbol, done.keys())
         delete done.value(symbol);
+
+    // and we're done
     return result;
 }
 

@@ -1626,35 +1626,11 @@ RideSummaryWindow::htmlCompareSummary() const
         //
         // SUMMARISING INTERVALS SO ALWAYS COMPUTE METRICS ON DEMAND
         //
+        // intervals are already computed in rideitem
         QList<RideItem*> intervalMetrics;
-
-        QStringList worklist;
-        worklist += totalColumn;
-        worklist += averageColumn;
-        worklist += maximumColumn;
-        worklist += metricColumn;
-        worklist += timeInZones;
-        worklist += timeInZonesHR;
-        // computeMetrics expects unique keys, no duplicates
-        worklist.removeDuplicates();
-
-        // go calculate them then...
         RideMetricFactory &factory = RideMetricFactory::instance();
-        for (int j=0; j<context->compareIntervals.count(); j++) {
-
-            RideItem *metrics = new RideItem;
-
-            // calculate using the source context of course!
-            QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(
-                                                     context->compareIntervals.at(j).sourceContext,
-                                                     context->compareIntervals.at(j).data,
-                                                     context->compareIntervals.at(j).sourceContext->athlete->zones(),
-                                                     context->compareIntervals.at(j).sourceContext->athlete->hrZones(), 
-                                                     worklist);
-
-            metrics->setFrom(computed);
-            intervalMetrics << metrics;
-        }
+        for (int j=0; j<context->compareIntervals.count(); j++) 
+            intervalMetrics << context->compareIntervals.at(j).rideItem;
 
         // LETS FORMAT THE HTML
         summary = GCColor::css(ridesummary);

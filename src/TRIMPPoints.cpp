@@ -17,12 +17,14 @@
  */
 
 #include "RideMetric.h"
+#include "RideItem.h"
 #include "Settings.h"
 #include "Zones.h"
 #include "HrZones.h"
 #include <cmath>
 #include "Context.h"
 #include "Athlete.h"
+#include "Specification.h"
 #include <QApplication>
 
 // This is Morton/Banister with Green et al coefficient.
@@ -53,22 +55,18 @@ class TRIMPPoints : public RideMetric {
         setType(RideMetric::Total);
     }
 
-    void compute(const RideFile *rideFile,
-                 const Zones *, int,
-                 const HrZones *hrZones, int hrZoneRange,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *context)
-    {
-        if (!hrZones || hrZoneRange < 0) {
-            setValue(0);
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        if (!item->context->athlete->hrZones() || item->hrZoneRange < 0) {
+            setValue(RideFile::NIL);
             return;
         }
 
         // use resting HR from zones, but allow it to be
         // overriden in ride metadata
-        double maxHr = hrZones->getMaxHr(hrZoneRange);
-        double restHr = hrZones->getRestHr(hrZoneRange);
-        restHr = rideFile->getTag("Rest HR", QString("%1").arg(restHr)).toDouble();
+        double maxHr = item->context->athlete->hrZones()->getMaxHr(item->hrZoneRange);
+        double restHr = item->context->athlete->hrZones()->getRestHr(item->hrZoneRange);
+        restHr = item->getText("Rest HR", QString("%1").arg(restHr)).toDouble();
 
         assert(deps.contains("time_riding"));
         assert(deps.contains("workout_time"));
@@ -81,20 +79,15 @@ class TRIMPPoints : public RideMetric {
         assert(durationMetric);
         assert(averageHrMetric);
 
-        double secs = timeRidingMetric->value(true) ? timeRidingMetric->value(true) :
-                                                      durationMetric->value(true);;
+        double secs = timeRidingMetric->value(true) ? timeRidingMetric->value(true) : durationMetric->value(true);;
         double hr = averageHrMetric->value(true);
 
         //TRIMP: = t x %HRR x 0.64e1,92(%HRR)
 
-        // Can we lookup the athletes gender?
-        // Default to male if we fail
-        QString athlete;
+        // gender
         double ksex = 1.92;
-        if ((athlete = rideFile->getTag("Athlete", "unknown")) != "unknown") {
-            if (appsettings->cvalue(context->athlete->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
-            else ksex = 1.92; // Male
-        }
+        if (appsettings->cvalue(item->context->athlete->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
+        else ksex = 1.92; // Male
 
         // ok lets work the score out
         score = (secs == 0.0 || hr<restHr) ? 0.0 :  secs/60 *
@@ -128,23 +121,19 @@ public:
         setType(RideMetric::Total);
     }
 
-    void compute(const RideFile *rideFile,
-                 const Zones *, int,
-                 const HrZones *hrZones, int hrZoneRange,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *context)
-    {
-        if (!hrZones || hrZoneRange < 0) {
-            setValue(0);
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        if (!item->context->athlete->hrZones() || item->hrZoneRange < 0) {
+            setValue(RideFile::NIL);
             return;
         }
 
         // use resting HR from zones, but allow it to be
         // overriden in ride metadata
-        double maxHr = hrZones->getMaxHr(hrZoneRange);
-        double restHr = hrZones->getRestHr(hrZoneRange);
-        double ltHr = hrZones->getLT(hrZoneRange);
-        restHr = rideFile->getTag("Rest HR", QString("%1").arg(restHr)).toDouble();
+        double maxHr = item->context->athlete->hrZones()->getMaxHr(item->hrZoneRange);
+        double restHr = item->context->athlete->hrZones()->getRestHr(item->hrZoneRange);
+        double ltHr = item->context->athlete->hrZones()->getLT(item->hrZoneRange);
+        restHr = item->getText("Rest HR", QString("%1").arg(restHr)).toDouble();
 
 
         assert(deps.contains("trimp_points"));
@@ -154,14 +143,10 @@ public:
 
         //TRIMP: = t x %HRR x 0.64e1,92(%HRR)
 
-        // Can we lookup the athletes gender?
-        // Default to male if we fail
-        QString athlete;
+        // gender
         double ksex = 1.92;
-        if ((athlete = rideFile->getTag("Athlete", "unknown")) != "unknown") {
-            if (appsettings->cvalue(context->athlete->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
-            else ksex = 1.92; // Male
-        }
+        if (appsettings->cvalue(item->context->athlete->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
+        else ksex = 1.92; // Male
 
         score = trimp == 0.0 ? 0.0 :  100 * trimp /
                 (60 * (ltHr-restHr)/(maxHr-restHr)*0.64*exp(ksex*(ltHr-restHr)/(maxHr-restHr)));
@@ -198,23 +183,19 @@ public:
         setType(RideMetric::Total);
     }
 
-    void compute(const RideFile *,
-                 const Zones *, int,
-                 const HrZones *hrZones, int hrZoneRange,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *)
-    {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        if (!item->context->athlete->hrZones() || item->hrZoneRange < 0) {
+            setValue(RideFile::NIL);
+            return;
+        }
+
         assert(deps.contains("average_hr"));
         const RideMetric *averageHrMetric = deps.value("average_hr");
         assert(averageHrMetric);
         double hr = averageHrMetric->value(true);
 
-        if (hrZoneRange == -1 || hr == 0) {
-            setValue(0);
-            return;
-        }
-
-        QList <double> trimpk = hrZones->getZoneTrimps(hrZoneRange);
+        QList <double> trimpk = item->context->athlete->hrZones()->getZoneTrimps(item->hrZoneRange);
         double value = 0;
 
         if (trimpk.size()>0) {
@@ -302,7 +283,7 @@ public:
             double secs = timeRidingMetric->value(true) ?
                             timeRidingMetric->value(true) :
                             durationMetric->value(true);
-            int nZone = hrZones->whichZone(hrZoneRange, hr);
+            int nZone = item->context->athlete->hrZones()->whichZone(item->hrZoneRange, hr);
             if (nZone >= 0 && nZone < trimpk.size())
                 value += trimpk[nZone] * secs;
         }
@@ -341,14 +322,16 @@ class SessionRPE : public RideMetric {
         setImperialUnits("");
         setType(RideMetric::Total);
     }
-    void compute(const RideFile *rideFile,
-                 const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *)
-    {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        if (!item->context->athlete->hrZones() || item->hrZoneRange < 0) {
+            setValue(RideFile::NIL);
+            return;
+        }
+
         // use RPE value in ride metadata
-        double rpe = rideFile->getTag("RPE", "0.0").toDouble();
+        double rpe = item->getText("RPE", "0.0").toDouble();
 
         assert(deps.contains("time_riding"));
         const RideMetric *timeRidingMetric = deps.value("time_riding");

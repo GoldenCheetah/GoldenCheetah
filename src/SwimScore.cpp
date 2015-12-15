@@ -23,6 +23,9 @@
 #include "Units.h"
 #include "Settings.h"
 #include "RideItem.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "Specification.h"
 #include <cmath>
 #include <algorithm>
 #include <QApplication>
@@ -68,26 +71,23 @@ class XPowerSwim : public RideMetric {
         setImperialUnits(tr("watts"));
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        // xPowerSwim only makes sense for running and it needs recIntSecs > 0
-        if (!ride->isSwim() || ride->recIntSecs() == 0) {
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) ||
+            // xPowerSwim only makes sense for running and it needs recIntSecs > 0
+            !item->isSwim || item->ride()->recIntSecs() == 0) {
+            setValue(RideFile::NIL);
             setCount(0);
             return;
         }
 
-        // unconst naughty boy, get athlete's data
-        RideFile *uride = const_cast<RideFile*>(ride);
-        double weight = uride->getWeight();
+        double weight = item->getWeight();
 
         static const double EPSILON = 0.1;
         static const double NEGLIGIBLE = 0.1;
 
-        double secsDelta = ride->recIntSecs();
+        double secsDelta = item->ride()->recIntSecs();
         double sampsPerWindow = 25.0 / secsDelta;
         double attenuation = sampsPerWindow / (sampsPerWindow + secsDelta);
         double sampleWeight = secsDelta / (sampsPerWindow + secsDelta);
@@ -98,7 +98,9 @@ class XPowerSwim : public RideMetric {
         double total = 0.0;
         int count = 0;
 
-        foreach(const RideFilePoint *point, ride->dataPoints()) {
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             while ((weighted > NEGLIGIBLE)
                    && (point->secs > lastSecs + secsDelta + EPSILON)) {
                 weighted *= attenuation;
@@ -156,20 +158,18 @@ class XPaceSwim : public RideMetric {
         setPrecision(1);
         setConversion(METERS_PER_YARD);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-        // xPaceSwim only makes sense for swimming
-        if (!ride->isSwim()) {
-            setValue(0.0);
+
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        // xPowerSwim only makes sense for running and it needs recIntSecs > 0
+        if (!item->isSwim || item->ride()->recIntSecs() == 0) {
+            setValue(RideFile::NIL);
             setCount(0);
             return;
         }
 
-        // unconst naughty boy, get athlete's data
-        RideFile *uride = const_cast<RideFile*>(ride);
-        double weight = uride->getWeight();
+        double weight = item->getWeight();
 
         assert(deps.contains("swimscore_xpower"));
         XPowerSwim *xPowerSwim = dynamic_cast<XPowerSwim*>(deps.value("swimscore_xpower"));
@@ -205,25 +205,23 @@ class STP : public RideMetric {
         setImperialUnits(tr("watts"));
         setPrecision(0);
     }
-    void compute(const RideFile *ride, const Zones *, int ,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *context) {
-        // STP only makes sense for running
-        if (!ride->isSwim()) {
-            setValue(0.0);
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+
+        // xPowerSwim only makes sense for running and it needs recIntSecs > 0
+        if (!item->isSwim || item->ride()->recIntSecs() == 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
             return;
         }
 
-        // unconst naughty boy, get athlete's data
-        RideFile *uride = const_cast<RideFile*>(ride);
-        double weight = uride->getWeight();
+        double weight = item->getWeight();
         
-        const PaceZones *zones = context->athlete->paceZones(true);
-        int zoneRange = context->athlete->paceZones(true)->whichRange(ride->startTime().date());
+        const PaceZones *zones = item->context->athlete->paceZones(true);
+        int zoneRange = item->context->athlete->paceZones(true)->whichRange(item->dateTime.date());
 
         // did user override for this ride?
-        double cv = ride->getTag("CV","0").toInt();
+        double cv = item->getText("CV","0").toInt();
 
         // not overriden so use the set value
         // if it has been set at all
@@ -259,13 +257,12 @@ class SRI : public RideMetric {
         setImperialUnits(tr(""));
         setPrecision(2);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-        // SRI only makes sense for swimming
-        if (!ride->isSwim()) {
-            setValue(0.0);
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        // xPowerSwim only makes sense for running and it needs recIntSecs > 0
+        if (!item->isSwim || item->ride()->recIntSecs() == 0) {
+            setValue(RideFile::NIL);
             setCount(0);
             return;
         }
@@ -302,16 +299,15 @@ class SwimScore : public RideMetric {
         setName("SwimScore");
         setType(RideMetric::Total);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-	    const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-        // SwimScore only makes sense for swimming
-        if (!ride->isSwim()) {
-            setValue(0.0);
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        // xPowerSwim only makes sense for running and it needs recIntSecs > 0
+        if (!item->isSwim || item->ride()->recIntSecs() == 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
             return;
         }
-
         assert(deps.contains("swimscore_xpower"));
         assert(deps.contains("swimscore_ri"));
         assert(deps.contains("swimscore_tp"));
@@ -326,8 +322,7 @@ class SwimScore : public RideMetric {
         // No samples in manual workouts, use power at average speed and duration
         if (rawGOVSS == 0.0) {
             // unconst naughty boy, get athlete's data
-            RideFile *uride = const_cast<RideFile*>(ride);
-            double weight = uride->getWeight();
+            double weight = item->getWeight();
             assert(deps.contains("average_speed"));
             assert(deps.contains("workout_time"));
             double watts = swimming_power(weight, deps.value("average_speed")->value(true) / 3.6);
@@ -377,15 +372,12 @@ class TriScore : public RideMetric {
         setName("TriScore");
         setType(RideMetric::Total);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-	    const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
-        if (ride->isSwim()) {
+        if (item->isSwim) {
             assert(deps.contains("swimscore"));
             score = deps.value("swimscore")->value(true);
-        } else if (ride->isRun()) {
+        } else if (item->isRun) {
             assert(deps.contains("govss"));
             score = deps.value("govss")->value(true);
         } else {

@@ -2650,15 +2650,15 @@ RideFileIterator::RideFileIterator(RideFile *f, Specification spec)
         // ok, so lets work out the begin and end index
         double startsecs = spec.secsStart();
         if (startsecs < 0) start = 0;
-        else start = f->timeIndex(start);
+        else start = f->timeIndex(startsecs);
 
         // check!
         if (start >= f->dataPoints().count()) start = -1;
 
         // ok, so lets work out the begin and end index
-        double stopsecs = spec.secsStart();
+        double stopsecs = spec.secsEnd();
         if (stopsecs < 0) stop = f->dataPoints().count()-1;
-        else stop = f->timeIndex(stopsecs);
+        else stop = f->timeIndex(stopsecs)-1;
 
         // check!
         if (stop >= f->dataPoints().count()) stop = -1;
@@ -2688,37 +2688,37 @@ RideFileIterator::toBack()
 struct RideFilePoint *
 RideFileIterator::first()
 {
-    return start > 0 ? f->dataPoints()[start] : NULL; // efficient since dataPoints() returns a reference
+    return start >= 0 ? f->dataPoints()[start] : NULL; // efficient since dataPoints() returns a reference
 }
 
 struct RideFilePoint *
 RideFileIterator::last()
 {
-    return stop > 0 ? f->dataPoints()[stop] : NULL; // efficient since dataPoints() returns a reference
+    return stop >= 0 ? f->dataPoints()[stop] : NULL; // efficient since dataPoints() returns a reference
 }
 
 bool
 RideFileIterator::hasNext() const
 {
-    return (index > 0 && index <= stop);
+    return (index >= 0 && index <= stop);
 }
 
 bool
 RideFileIterator::hasPrevious() const
 {
-    return (index > 0 && index >= start);
+    return (index >= 0 && index >= start);
 }
 
 struct RideFilePoint *
 RideFileIterator::next()
 {
-    if (index > 0 && index <= stop) return f->dataPoints()[index++];
+    if (index >= 0 && index <= stop) return f->dataPoints()[index++];
     else return NULL;
 }
 
 struct RideFilePoint *
 RideFileIterator::previous()
 {
-    if (index > 0 && index >= start) return f->dataPoints()[index--];
+    if (index >= 0 && index >= start) return f->dataPoints()[index--];
     else return NULL;
 }

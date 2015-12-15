@@ -109,6 +109,7 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     QStringList worklist = QStringList();
     for (int i=0; metrics[i];i++) worklist << metrics[i];
 
+#if 0 //XXX REFACTOR COMPUTE METRICS
     QHash<QString, RideMetricPtr> computed; 
     if (context) { // can't do this standalone
         computed = RideMetric::computeMetrics(context, ride, context->athlete->zones(), context->athlete->hrZones(), worklist);
@@ -160,6 +161,7 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
         lap_triggerMethod.appendChild(text);
         lap.appendChild(lap_triggerMethod);
     }
+#endif
 
     // samples
     // data points: timeoffset, dist, hr, spd, pwr, torq, cad, lat, lon, alt
@@ -265,7 +267,7 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
         }
     }
 
-
+#if 0 // REFACTOR METRICS
     if (context) {
         // Activity Extensions
         QDomElement extensions = doc.createElement("Extensions");
@@ -405,6 +407,7 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
         author_part_number.appendChild(text);
         author.appendChild(author_part_number);
     }
+#endif
 
     return doc.toByteArray(4);
 }

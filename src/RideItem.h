@@ -33,6 +33,7 @@ class RideFileCache;
 class RideCache;
 class RideCacheModel;
 class IntervalItem;
+class IntervalSummaryWindow;
 class Context;
 class UserData;
 class ComparePane;
@@ -51,6 +52,7 @@ class RideItem : public QObject
         friend class ::RideCache;
         friend class ::RideCacheModel;
         friend class ::IntervalItem;
+        friend class ::IntervalSummaryWindow;
         friend class ::UserData;
         friend class ::ComparePane;
 
@@ -93,7 +95,7 @@ class RideItem : public QObject
         bool skipsave;    // on exit we don't save the state to force rebuild at startup
 
         // set from another, e.g. during load of rideDB.json
-        void setFrom(RideItem&);
+        void setFrom(RideItem&, bool temp=false);
 
         // record of any overrides, used by formula "isset" function
         QStringList overrides_;
@@ -126,6 +128,9 @@ class RideItem : public QObject
         QColor color;
         bool isRun,isSwim;
         bool samples; // has samples data
+
+        // which range to use?
+        int zoneRange, hrZoneRange, paceZoneRange;
 
         // context the item was updated to
         unsigned long fingerprint; // zones

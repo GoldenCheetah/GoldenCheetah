@@ -30,6 +30,7 @@
 
 class Context;
 class RideFile;
+class Specification;
 
 class BestIntervalDialog : public QDialog
 {
@@ -47,10 +48,10 @@ class BestIntervalDialog : public QDialog
 
         BestIntervalDialog(Context *context);
 
-        static void findBests(const RideFile *ride, double windowSizeSecs,
+        static void findBests(const RideFile *ride, Specification spec, double windowSizeSecs,
                               int maxIntervals, QList<BestInterval> &results);
 
-        static void findBestsKPH(const RideFile *ride, double windowSizeSecs,
+        static void findBestsKPH(const RideFile *ride, Specification spec, double windowSizeSecs,
                               int maxIntervals, QList<BestInterval> &results);
 
     private slots:

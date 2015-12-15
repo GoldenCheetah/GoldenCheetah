@@ -20,6 +20,7 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
+#include "Specification.h"
 #include "RideItem.h"
 #include "LTMOutliers.h"
 #include "Units.h"
@@ -47,12 +48,10 @@ class L1Sustain : public RideMetric {
         setImperialUnits(tr("seconds"));
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
+
     RideMetric *clone() const { return new L1Sustain(*this); }
 };
 
@@ -67,16 +66,14 @@ class L2Sustain : public RideMetric {
         setSymbol("l2_sustain");
         setInternalName("L2 Sustained Time");
     }
+
     void initialize() {
         setName(tr("L2 Sustained Time"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
     RideMetric *clone() const { return new L2Sustain(*this); }
@@ -99,10 +96,7 @@ class L3Sustain : public RideMetric {
         setImperialUnits(tr("seconds"));
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
     RideMetric *clone() const { return new L3Sustain(*this); }
@@ -125,10 +119,7 @@ class L4Sustain : public RideMetric {
         setImperialUnits(tr("seconds"));
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
     RideMetric *clone() const { return new L4Sustain(*this); }
@@ -151,10 +142,7 @@ class L5Sustain : public RideMetric {
         setImperialUnits(tr("seconds"));
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
     RideMetric *clone() const { return new L5Sustain(*this); }
@@ -177,10 +165,7 @@ class L6Sustain : public RideMetric {
         setImperialUnits(tr("seconds"));
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
     RideMetric *clone() const { return new L6Sustain(*this); }
@@ -203,10 +188,7 @@ class L7Sustain : public RideMetric {
         setImperialUnits(tr("seconds"));
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
     RideMetric *clone() const { return new L7Sustain(*this); }
@@ -229,10 +211,7 @@ class L8Sustain : public RideMetric {
         setImperialUnits(tr("seconds"));
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
     RideMetric *clone() const { return new L8Sustain(*this); }
@@ -255,10 +234,7 @@ class L9Sustain : public RideMetric {
         setImperialUnits(tr("seconds"));
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
     RideMetric *clone() const { return new L9Sustain(*this); }
@@ -281,10 +257,7 @@ class L10Sustain : public RideMetric {
         setImperialUnits(tr("seconds"));
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
     RideMetric *clone() const { return new L10Sustain(*this); }

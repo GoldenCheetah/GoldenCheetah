@@ -201,7 +201,10 @@ class RideFile : public QObject // QObject to emit signals
                           wbal, tcore,
                           none }; // none must ALWAYS be last
 
-        enum specialValues { NA = -255 };
+        // NA = Not Applicable - i.e Temperature no recorded value
+        // NIL = Not available, but still set to zero for compatibility
+        //       We should consider looking at code to handle NIL / NA 
+        enum specialValues { NA = -255, NIL = 0 };
         typedef enum seriestype SeriesType;
         static SeriesType lastSeriesType() { return none; }
 
@@ -479,6 +482,9 @@ class RideFileIterator {
 
         struct RideFilePoint *first();
         struct RideFilePoint *last();
+
+        int firstIndex() { return start; }
+        int lastIndex() { return stop; }
 
         bool hasNext() const;
         bool hasPrevious() const;

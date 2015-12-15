@@ -17,7 +17,11 @@
  */
 
 #include "RideMetric.h"
+#include "RideItem.h"
 #include "Zones.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "Specification.h"
 #include <cmath>
 #include <QApplication>
 
@@ -47,25 +51,28 @@ class DanielsPoints : public RideMetric {
         setSymbol("daniels_points");
         setInternalName("Daniels Points");
     }
+
     void initialize() {
         setName(tr("Daniels Points"));
         setMetricUnits("");
         setImperialUnits("");
         setType(RideMetric::Total);
     }
-    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
-                const HrZones *, int,
-                const QHash<QString,RideMetric*> &,
-                const Context *) {
-        if (!zones || zoneRange < 0) {
-            setValue(0);
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) ||
+            item->context->athlete->zones() == NULL || item->zoneRange < 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
             return;
         }
 
         static const double EPSILON = 0.1;
         static const double NEGLIGIBLE = 0.1;
 
-        double secsDelta = ride->recIntSecs();
+        double secsDelta = item->ride()->recIntSecs();
         double sampsPerWindow = 25.0 / secsDelta;
         double attenuation = sampsPerWindow / (sampsPerWindow + secsDelta);
         double sampleWeight = secsDelta / (sampsPerWindow + secsDelta);
@@ -74,9 +81,11 @@ class DanielsPoints : public RideMetric {
         double weighted = 0.0;
 
         score = 0.0;
-        double cp = zones->getCP(zoneRange);
+        double cp = item->context->athlete->zones()->getCP(item->zoneRange);
 
-        foreach(const RideFilePoint *point, ride->dataPoints()) {
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             while ((weighted > NEGLIGIBLE)
                    && (point->secs > lastSecs + secsDelta + EPSILON)) {
                 weighted *= attenuation;
@@ -112,6 +121,7 @@ class DanielsEquivalentPower : public RideMetric {
         setSymbol("daniels_equivalent_power");
         setInternalName("Daniels EqP");
     }
+
     void initialize() {
         setName(tr("Daniels EqP"));
         setMetricUnits(tr("watts"));
@@ -119,17 +129,17 @@ class DanielsEquivalentPower : public RideMetric {
         setType(RideMetric::Average);
     }
 
-    void compute(const RideFile *, const Zones *zones, int zoneRange,
-                const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                const Context *)
-    {
-        if (!zones || zoneRange < 0) {
-            setValue(0);
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        // no zones
+        if (item->context->athlete->zones() == NULL || item->zoneRange < 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
             return;
         }
 
-        double cp = zones->getCP(zoneRange);
+        double cp = item->context->athlete->zones()->getCP(item->zoneRange);
+
         assert(deps.contains("daniels_points"));
         assert(deps.contains("time_riding"));
         assert(deps.contains("workout_time"));

@@ -20,6 +20,9 @@
 #include "BestIntervalDialog.h"
 #include "RideItem.h"
 #include "Zones.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "Specification.h"
 #include "Settings.h"
 #include <cmath>
 #include <QApplication>
@@ -42,17 +45,11 @@ class AverageWPK : public RideMetric {
         setPrecision(2);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-
-        // unconst naughty boy
-        RideFile *uride = const_cast<RideFile*>(ride);
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // get thos dependencies
         double secs = deps.value("workout_time")->value(true);
-        double weight = uride->getWeight();
+        double weight = item->ride()->getWeight();
         double ap = deps.value("average_power")->value(true);
 
         // calculate watts per kilo
@@ -78,24 +75,22 @@ class PeakWPK : public RideMetric {
         setPrecision(2);
     }
     void setSecs(double secs) { this->secs=secs; }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        // unconst naughty boy
-        RideFile *uride = const_cast<RideFile*>(ride);
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (!ride->dataPoints().isEmpty()) {
-            weight = uride->getWeight();
-            //weight = ride->getTag("Weight", appsettings->cvalue(GC_WEIGHT, "75.0").toString()).toDouble(); // default to 75kg
-            QList<BestIntervalDialog::BestInterval> results;
-            BestIntervalDialog::findBests(ride, secs, 1, results);
-            if (results.count() > 0 && results.first().avg < 3000) wpk = results.first().avg / weight;
-            else wpk = 0.0;
-        } else {
-            wpk = 0.0;
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        weight = item->ride()->getWeight();
+        //weight = ride->getTag("Weight", appsettings->cvalue(GC_WEIGHT, "75.0").toString()).toDouble(); // default to 75kg
+        QList<BestIntervalDialog::BestInterval> results;
+        BestIntervalDialog::findBests(item->ride(), spec, secs, 1, results);
+        if (results.count() > 0 && results.first().avg < 3000) wpk = results.first().avg / weight;
+        else wpk = 0.0;
         setValue(wpk);
     }
     RideMetric *clone() const { return new PeakWPK(*this); }
@@ -297,10 +292,7 @@ class Vo2max : public RideMetric {
         setImperialUnits(tr("ml/min/kg"));
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         PeakWPK5m *wpk5m = dynamic_cast<PeakWPK5m*>(deps.value("5m_peak_wpk"));
 
@@ -336,13 +328,7 @@ class EtimatedAverageWPK_DrF : public RideMetric {
         setPrecision(2);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-
-        // unconst naughty boy
-        RideFile *uride = const_cast<RideFile*>(ride);
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // get thos dependencies
         double vam = deps.value("vam")->value(true);

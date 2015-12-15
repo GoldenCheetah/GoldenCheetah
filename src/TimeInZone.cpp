@@ -18,8 +18,12 @@
  */
 
 #include "RideMetric.h"
-#include "BestIntervalDialog.h"
+#include "RideItem.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "Specification.h"
 #include "Zones.h"
+#include "BestIntervalDialog.h"
 #include <cmath>
 #include <QApplication>
 
@@ -41,27 +45,33 @@ class ZoneTime : public RideMetric {
         setPrecision(0);
         setConversion(1.0);
     }
+
     bool isTime() const { return true; }
     void setLevel(int level) { this->level=level-1; } // zones start from zero not 1
-    void compute(const RideFile *ride, const Zones *zone, int zoneRange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *)
-    {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) ||
+            item->context->athlete->zones() == NULL || item->zoneRange < 0 ||
+            !item->ride()->areDataPresent()->watts) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         seconds = 0;
-        // get zone ranges
-        if (zone && zoneRange >= 0 && ride->areDataPresent()->watts) {
-            // iterate and compute
-            foreach(const RideFilePoint *point, ride->dataPoints()) {
-                if (zone->whichZone(zoneRange, point->watts) == level)
-                    seconds += ride->recIntSecs();
-            }
+
+        // iterate and compute
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (item->context->athlete->zones()->whichZone(item->zoneRange, point->watts) == level)
+                seconds += item->ride()->recIntSecs();
         }
         setValue(seconds);
     }
 
-    bool canAggregate() { return false; }
-    void aggregateWith(const RideMetric &) {}
     RideMetric *clone() const { return new ZoneTime(*this); }
 };
 
@@ -280,11 +290,8 @@ class ZonePTime1 : public RideMetric {
             setName(tr("L1 Percent in Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_L1"));
             assert(deps.contains("workout_time"));
 
@@ -297,8 +304,6 @@ class ZonePTime1 : public RideMetric {
             setCount(time);
         }
 
-        bool canAggregate() { return false; }
-        void aggregateWith(const RideMetric &) {}
         RideMetric *clone() const { return new ZonePTime1(*this); }
 };
 
@@ -324,11 +329,8 @@ class ZonePTime2 : public RideMetric {
             setName(tr("L2 Percent in Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_L2"));
             assert(deps.contains("workout_time"));
 
@@ -341,8 +343,6 @@ class ZonePTime2 : public RideMetric {
             setCount(time);
         }
 
-        bool canAggregate() { return false; }
-        void aggregateWith(const RideMetric &) {}
         RideMetric *clone() const { return new ZonePTime2(*this); }
 };
 
@@ -368,11 +368,8 @@ class ZonePTime3 : public RideMetric {
             setName(tr("L3 Percent in Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_L3"));
             assert(deps.contains("workout_time"));
 
@@ -385,8 +382,6 @@ class ZonePTime3 : public RideMetric {
             setCount(time);
         }
 
-        bool canAggregate() { return false; }
-        void aggregateWith(const RideMetric &) {}
         RideMetric *clone() const { return new ZonePTime3(*this); }
 };
 
@@ -412,11 +407,8 @@ class ZonePTime4 : public RideMetric {
             setName(tr("L4 Percent in Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_L4"));
             assert(deps.contains("workout_time"));
 
@@ -429,8 +421,6 @@ class ZonePTime4 : public RideMetric {
             setCount(time);
         }
 
-        bool canAggregate() { return false; }
-        void aggregateWith(const RideMetric &) {}
         RideMetric *clone() const { return new ZonePTime4(*this); }
 };
 
@@ -456,11 +446,8 @@ class ZonePTime5 : public RideMetric {
             setName(tr("L5 Percent in Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_L5"));
             assert(deps.contains("workout_time"));
 
@@ -473,8 +460,6 @@ class ZonePTime5 : public RideMetric {
             setCount(time);
         }
 
-        bool canAggregate() { return false; }
-        void aggregateWith(const RideMetric &) {}
         RideMetric *clone() const { return new ZonePTime5(*this); }
 };
 
@@ -500,11 +485,8 @@ class ZonePTime6 : public RideMetric {
             setName(tr("L6 Percent in Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_L6"));
             assert(deps.contains("workout_time"));
 
@@ -517,8 +499,6 @@ class ZonePTime6 : public RideMetric {
             setCount(time);
         }
 
-        bool canAggregate() { return false; }
-        void aggregateWith(const RideMetric &) {}
         RideMetric *clone() const { return new ZonePTime6(*this); }
 };
 
@@ -544,11 +524,8 @@ class ZonePTime7 : public RideMetric {
             setName(tr("L7 Percent in Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_L7"));
             assert(deps.contains("workout_time"));
 
@@ -561,8 +538,6 @@ class ZonePTime7 : public RideMetric {
             setCount(time);
         }
 
-        bool canAggregate() { return false; }
-        void aggregateWith(const RideMetric &) {}
         RideMetric *clone() const { return new ZonePTime7(*this); }
 };
 
@@ -588,11 +563,8 @@ class ZonePTime8 : public RideMetric {
             setName(tr("L8 Percent in Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_L8"));
             assert(deps.contains("workout_time"));
 
@@ -605,8 +577,6 @@ class ZonePTime8 : public RideMetric {
             setCount(time);
         }
 
-        bool canAggregate() { return false; }
-        void aggregateWith(const RideMetric &) {}
         RideMetric *clone() const { return new ZonePTime8(*this); }
 };
 
@@ -632,11 +602,8 @@ class ZonePTime9 : public RideMetric {
             setName(tr("L9 Percent in Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_L9"));
             assert(deps.contains("workout_time"));
 
@@ -649,8 +616,6 @@ class ZonePTime9 : public RideMetric {
             setCount(time);
         }
 
-        bool canAggregate() { return false; }
-        void aggregateWith(const RideMetric &) {}
         RideMetric *clone() const { return new ZonePTime9(*this); }
 };
 
@@ -676,11 +641,8 @@ class ZonePTime10 : public RideMetric {
             setName(tr("L10 Percent in Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_L10"));
             assert(deps.contains("workout_time"));
 
@@ -693,8 +655,6 @@ class ZonePTime10 : public RideMetric {
             setCount(time);
         }
 
-        bool canAggregate() { return false; }
-        void aggregateWith(const RideMetric &) {}
         RideMetric *clone() const { return new ZonePTime10(*this); }
 };
 
