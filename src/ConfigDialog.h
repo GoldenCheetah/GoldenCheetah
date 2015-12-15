@@ -33,7 +33,6 @@ class QListWidget;
 class QListWidgetItem;
 class QStackedWidget;
 class Context;
-class Zones;
 
 // GENERAL PAGE
 class GeneralConfig : public QWidget
@@ -41,7 +40,7 @@ class GeneralConfig : public QWidget
     Q_OBJECT
 
     public:
-        GeneralConfig(QDir home, Zones *zones, Context *context);
+        GeneralConfig(QDir home, Context *context);
 
         GeneralPage *generalPage;
 
@@ -50,7 +49,6 @@ class GeneralConfig : public QWidget
 
     private:
         QDir home;
-        Zones *zones;
         Context *context;
 
 };
@@ -61,7 +59,7 @@ class AthleteConfig : public QWidget
     Q_OBJECT
 
     public:
-        AthleteConfig(QDir home, Zones *zones, Context *context);
+        AthleteConfig(QDir home, Context *context);
         AboutRiderPage *athletePage;
         RiderPhysPage *athletePhysPage;
 
@@ -70,7 +68,6 @@ class AthleteConfig : public QWidget
     
     private:
         QDir home;
-        Zones *zones;
         Context *context;
 
         // about me, power ones and hr zones
@@ -86,14 +83,13 @@ class AppearanceConfig : public QWidget
     Q_OBJECT
 
     public:
-        AppearanceConfig(QDir home, Zones *zones, Context *context);
+        AppearanceConfig(QDir home, Context *context);
 
     public slots:
         qint32 saveClicked();
     
     private:
         QDir home;
-        Zones *zones;
         Context *context;
 
         ColorsPage *appearancePage;
@@ -105,14 +101,13 @@ class PasswordConfig : public QWidget
     Q_OBJECT
 
     public:
-        PasswordConfig(QDir home, Zones *zones, Context *context);
+        PasswordConfig(QDir home, Context *context);
 
     public slots:
         qint32 saveClicked();
     
     private:
         QDir home;
-        Zones *zones;
         Context *context;
 
         CredentialsPage *passwordPage;
@@ -124,14 +119,13 @@ class DataConfig : public QWidget
     Q_OBJECT
 
     public:
-        DataConfig(QDir home, Zones *zones, Context *context);
+        DataConfig(QDir home, Context *context);
 
     public slots:
         qint32 saveClicked();
     
     private:
         QDir home;
-        Zones *zones;
         Context *context;
 
         MetadataPage *dataPage;
@@ -143,14 +137,13 @@ class MetricConfig : public QWidget
     Q_OBJECT
 
     public:
-        MetricConfig(QDir home, Zones *zones, Context *context);
+        MetricConfig(QDir home, Context *context);
 
     public slots:
         qint32 saveClicked();
     
     private:
         QDir home;
-        Zones *zones;
         Context *context;
 
         BestsMetricsPage *bestsPage;
@@ -165,14 +158,13 @@ class DeviceConfig : public QWidget
     Q_OBJECT
 
     public:
-        DeviceConfig(QDir home, Zones *zones, Context *context);
+        DeviceConfig(QDir home, Context *context);
 
     public slots:
         qint32 saveClicked();
     
     private:
         QDir home;
-        Zones *zones;
         Context *context;
 
         DevicePage *devicePage;
@@ -184,14 +176,13 @@ class IntervalConfig : public QWidget
     Q_OBJECT
 
     public:
-        IntervalConfig(QDir home, Zones *zones, Context *context);
+        IntervalConfig(QDir home, Context *context);
 
     public slots:
         qint32 saveClicked();
     
     private:
         QDir home;
-        Zones *zones;
         Context *context;
 
         IntervalsPage *intervalsPage;
@@ -203,7 +194,7 @@ class ConfigDialog : public QMainWindow
     G_OBJECT
 
     public:
-        ConfigDialog(QDir home, Zones *zones, Context *context);
+        ConfigDialog(QDir home, Context *context);
 
     public slots:
         void changePage(int);
@@ -213,7 +204,6 @@ class ConfigDialog : public QMainWindow
     private:
         QSettings *settings;
         QDir home;
-        Zones *zones;
         Context *context;
 
         QStackedWidget *pagesWidget;
