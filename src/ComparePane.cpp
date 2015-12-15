@@ -253,8 +253,7 @@ ComparePane::refreshTable()
 
             // compute the metrics for this ride
             RideItem metrics;
-            QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, x.data,
-                                                     context->athlete->zones(), context->athlete->hrZones(), worklist);
+            QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(x.rideItem, Specification(), worklist);
 
             metrics.setFrom(computed);
 
@@ -718,7 +717,7 @@ ComparePane::dropEvent(QDropEvent *event)
 
             foreach(RideFilePoint *p, ride->dataPoints()) {
 
-                if (p->secs > stop) break;
+                if (p->secs >= stop) break;
 
                 if (p->secs >= start) {
 
@@ -755,16 +754,18 @@ ComparePane::dropEvent(QDropEvent *event)
             //                            we do this to support user data series in compare mode
             //                            so UserData can be generated from this rideItem
             add.rideItem = new RideItem(add.data, add.data->context);
-            add.rideItem->setFrom(*rideItem);
+            add.rideItem->setFrom(*rideItem, true); // this wipes ride_ so put back
+            add.rideItem->ride_ = add.data;
             add.rideItem->metadata_ = add.data->tags();
             add.rideItem->getWeight();
             add.rideItem->isRun = add.data->isRun();
             add.rideItem->isSwim = add.data->isSwim();
             add.rideItem->present = add.data->getTag("Data", "");
             add.rideItem->samples = add.data->dataPoints().count() > 0;
+
             const RideMetricFactory &factory = RideMetricFactory::instance();
-            QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(add.data->context, add.data, add.data->context->athlete->zones(), 
-                                               add.data->context->athlete->hrZones(), factory.allMetrics());
+
+            QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(add.rideItem, Specification(), factory.allMetrics());
             add.rideItem->metrics_.fill(0, factory.metricCount());
             QHashIterator<QString, RideMetricPtr> l(computed);
             while (l.hasNext()) {
@@ -778,7 +779,6 @@ ComparePane::dropEvent(QDropEvent *event)
 
             // now add but only if not empty
             if (!add.data->dataPoints().empty()) newOnes << add;
-
         }
 
         // if we have nothing being compared yet and are only dropping one and it's a route
@@ -899,16 +899,17 @@ ComparePane::dropEvent(QDropEvent *event)
                             //                            we do this to support user data series in compare mode
                             //                            so UserData can be generated from this rideItem
                             add.rideItem = new RideItem(add.data, add.data->context);
-                            add.rideItem->setFrom(*matched->rideItem());
+                            add.rideItem->setFrom(*matched->rideItem(), true); // this wipes ride_ so put back below
+                            add.rideItem->ride_ = add.data;
                             add.rideItem->metadata_ = add.data->tags();
                             add.rideItem->getWeight();
                             add.rideItem->isRun = add.data->isRun();
                             add.rideItem->isSwim = add.data->isSwim();
                             add.rideItem->present = add.data->getTag("Data", "");
                             add.rideItem->samples = add.data->dataPoints().count() > 0;
+
                             const RideMetricFactory &factory = RideMetricFactory::instance();
-                            QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(add.data->context, add.data, add.data->context->athlete->zones(), 
-                                               add.data->context->athlete->hrZones(), factory.allMetrics());
+                            QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(add.rideItem, Specification(), factory.allMetrics());
                             add.rideItem->metrics_.fill(0, factory.metricCount());
                             QHashIterator<QString, RideMetricPtr> l(computed);
                             while (l.hasNext()) {

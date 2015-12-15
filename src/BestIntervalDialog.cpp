@@ -167,7 +167,7 @@ BestIntervalDialog::findClicked()
     }
 
     QList<BestInterval> results;
-    findBests(ride, windowSizeSecs, maxIntervals, results);
+    findBests(ride, Specification(), windowSizeSecs, maxIntervals, results);
 
     // clear the table
     clearResultsTable(resultsTable);
@@ -253,7 +253,7 @@ BestIntervalDialog::findClicked()
 }
 
 void
-BestIntervalDialog::findBests(const RideFile *ride, double windowSizeSecs,
+BestIntervalDialog::findBests(const RideFile *ride, Specification spec, double windowSizeSecs,
                               int maxIntervals, QList<BestInterval> &results)
 {
     QList<BestInterval> bests;
@@ -266,7 +266,10 @@ BestIntervalDialog::findBests(const RideFile *ride, double windowSizeSecs,
     if (windowSizeSecs > ride->dataPoints().last()->secs + secsDelta) return;
 
     // We're looking for intervals with durations in [windowSizeSecs, windowSizeSecs + secsDelta).
-    foreach (const RideFilePoint *point, ride->dataPoints()) {
+    RideFileIterator it(const_cast<RideFile*>(ride), spec);
+    while (it.hasNext()) {
+        struct RideFilePoint *point = it.next();
+
         // Discard points until interval duration is < windowSizeSecs + secsDelta.
         while (!window.empty() && (intervalDuration(window.first(), point, ride) >= windowSizeSecs + secsDelta)) {
             totalWatts -= window.first()->watts;
@@ -302,7 +305,7 @@ BestIntervalDialog::findBests(const RideFile *ride, double windowSizeSecs,
 }
 
 void
-BestIntervalDialog::findBestsKPH(const RideFile *ride, double windowSizeSecs,
+BestIntervalDialog::findBestsKPH(const RideFile *ride, Specification spec, double windowSizeSecs,
                               int maxIntervals, QList<BestInterval> &results)
 {
     QList<BestInterval> bests;
@@ -315,7 +318,10 @@ BestIntervalDialog::findBestsKPH(const RideFile *ride, double windowSizeSecs,
     if (windowSizeSecs > ride->dataPoints().last()->secs + secsDelta) return;
 
     // We're looking for intervals with durations in [windowSizeSecs, windowSizeSecs + secsDelta).
-    foreach (const RideFilePoint *point, ride->dataPoints()) {
+    RideFileIterator it(const_cast<RideFile*>(ride), spec);
+    while (it.hasNext()) {
+        struct RideFilePoint *point = it.next();
+
         // Discard points until interval duration is < windowSizeSecs + secsDelta.
         while (!window.empty() && (intervalDuration(window.first(), point, ride) >= windowSizeSecs + secsDelta)) {
             totalKPH -= window.first()->kph;

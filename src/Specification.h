@@ -32,6 +32,7 @@
 // or a ride point.
 //
 class RideItem;
+class RideFile;
 class IntervalItem;
 struct RideFilePoint;
 
@@ -87,6 +88,9 @@ class Specification
         // does the ridepoint pass the specification ?
         bool pass(RideFilePoint *p);
 
+        // would it yield no data points for this ride ?
+        bool isEmpty(RideFile *);
+
         // set criteria
         void setDateRange(DateRange dr);
         void setFilterSet(FilterSet fs);
@@ -98,6 +102,10 @@ class Specification
         DateRange dateRange() { return dr; }
         FilterSet filterSet() { return fs; }
         bool isFiltered() { return (fs.count() > 0); }
+
+        // just start/stop and item for now
+        // when working with samples
+        void print();
 
     protected:
         // when working with intervals secs start and end

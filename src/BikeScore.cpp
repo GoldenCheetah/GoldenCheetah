@@ -18,6 +18,10 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "Specification.h"
+#include "RideFile.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "Zones.h"
 #include <cmath>
 #include <QApplication>
@@ -45,6 +49,7 @@ class XPower : public RideMetric {
         setSymbol("skiba_xpower");
         setInternalName("xPower");
     }
+
     void initialize() {
         setName(tr("xPower"));
         setType(RideMetric::Average);
@@ -52,13 +57,11 @@ class XPower : public RideMetric {
         setImperialUnits(tr("watts"));
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->recIntSecs() == 0) {
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || item->ride()->recIntSecs()==0) {
+            setValue(RideFile::NIL);
             setCount(0);
             return;
         }
@@ -66,7 +69,7 @@ class XPower : public RideMetric {
         static const double EPSILON = 0.1;
         static const double NEGLIGIBLE = 0.1;
 
-        double secsDelta = ride->recIntSecs();
+        double secsDelta = item->ride()->recIntSecs();
         double sampsPerWindow = 25.0 / secsDelta;
         double attenuation = sampsPerWindow / (sampsPerWindow + secsDelta);
         double sampleWeight = secsDelta / (sampsPerWindow + secsDelta);
@@ -77,7 +80,10 @@ class XPower : public RideMetric {
         double total = 0.0;
         int count = 0;
 
-        foreach(const RideFilePoint *point, ride->dataPoints()) {
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             while ((weighted > NEGLIGIBLE)
                    && (point->secs > lastSecs + secsDelta + EPSILON)) {
                 weighted *= attenuation;
@@ -113,6 +119,7 @@ class VariabilityIndex : public RideMetric {
         setSymbol("skiba_variability_index");
         setInternalName("Skiba VI");
     }
+
     void initialize() {
         setName(tr("Skiba VI"));
         setType(RideMetric::Average);
@@ -121,10 +128,8 @@ class VariabilityIndex : public RideMetric {
         setPrecision(3);
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
         assert(deps.contains("skiba_xpower"));
         assert(deps.contains("average_power"));
         XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
@@ -152,6 +157,7 @@ class RelativeIntensity : public RideMetric {
         setSymbol("skiba_relative_intensity");
         setInternalName("Relative Intensity");
     }
+
     void initialize() {
         setName(tr("Relative Intensity"));
         setType(RideMetric::Average);
@@ -159,33 +165,20 @@ class RelativeIntensity : public RideMetric {
         setImperialUnits(tr(""));
         setPrecision(3);
     }
-    void compute(const RideFile *r, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-        if (zones && zoneRange >= 0) {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        if (item->context->athlete->zones() && item->zoneRange >= 0) {
             assert(deps.contains("skiba_xpower"));
             XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
             assert(xp);
-            int cp = r->getTag("CP","0").toInt();
-            reli = xp->value(true) / (cp ? cp : zones->getCP(zoneRange));
+            int cp = item->getText("CP","0").toInt();
+            reli = xp->value(true) / (cp ? cp : item->context->athlete->zones()->getCP(item->zoneRange));
             secs = xp->count();
         }
         setValue(reli);
         setCount(secs);
     }
-
-    // added djconnel: allow RI to be combined across rides
-    bool canAggregate() { return true; }
-    void aggregateWith(const RideMetric &other) {
-        assert(symbol() == other.symbol());
-	    const RelativeIntensity &ap = dynamic_cast<const RelativeIntensity&>(other);
-	    reli = secs * pow(reli, bikeScoreN) + ap.count() * pow(ap.value(true), bikeScoreN);
-	    secs += ap.count();
-	    reli = pow(reli / secs, 1.0 / bikeScoreN);
-        setValue(reli);
-    }
-    // end added djconnel
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new RelativeIntensity(*this); }
@@ -201,6 +194,7 @@ class CriticalPower : public RideMetric {
         setSymbol("cp_setting");
         setInternalName("CP setting");
     }
+
     void initialize() {
         setName(tr("Critical Power"));
         setType(RideMetric::Average);
@@ -208,26 +202,18 @@ class CriticalPower : public RideMetric {
         setImperialUnits(tr(""));
         setPrecision(0);
     }
-    void compute(const RideFile *r, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
         // did user override for this ride?
-        int cp = r->getTag("CP","0").toInt();
+        int cp = item->getText("CP","0").toInt();
 
         // not overriden so use the set value
         // if it has been set at all
-        if (!cp && zones && zoneRange >= 0) 
-            cp = zones->getCP(zoneRange);
+        if (!cp && item->context->athlete->zones() && item->zoneRange >= 0) 
+            cp = item->context->athlete->zones()->getCP(item->zoneRange);
         
         setValue(cp);
-    }
-
-    bool canAggregate() { return true; }
-    void aggregateWith(const RideMetric &other) {
-        assert(symbol() == other.symbol());
-        setValue(other.value(true) > value(true) ? other.value(true) : value(true));
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
@@ -244,19 +230,23 @@ class aTISS : public RideMetric {
         setSymbol("atiss_score");
         setInternalName("Aerobic TISS");
     }
+
     void initialize() {
         setName(tr("Aerobic TISS"));
         setMetricUnits("");
         setImperialUnits("");
     }
 
-    void compute(const RideFile *r, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-	    const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-	    if (!zones || zoneRange < 0)
-	        return;
+	    if (!item->context->athlete->zones() || item->zoneRange < 0) return;
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         // aTISS - Aerobic Training Impact Scoring System
         static const double a = 0.663788683661645f;
@@ -264,14 +254,17 @@ class aTISS : public RideMetric {
         static const double c = -0.86118031563782;
         double aTISS = 0.0f;
 
-        int cp = r->getTag("CP","0").toInt();
-        if (!cp) cp = zones->getCP(zoneRange);
+        int cp = item->getText("CP","0").toInt();
+        if (!cp) cp = item->context->athlete->zones()->getCP(item->zoneRange);
 
-        if (cp && r->areDataPresent()->watts) {
-            foreach (RideFilePoint *p, r->dataPoints()) {
+        if (cp && item->ride()->areDataPresent()->watts) {
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
 
                 // a * exp (b * exp (c * fraction of cp) ) 
-                aTISS += r->recIntSecs() * (a * exp(b * exp(c * (double(p->watts) / double(cp)))));
+                aTISS += item->ride()->recIntSecs() * (a * exp(b * exp(c * (double(point->watts) / double(cp)))));
             }
         }
         setValue(aTISS);
@@ -291,19 +284,23 @@ class anTISS : public RideMetric {
         setSymbol("antiss_score");
         setInternalName("Anaerobic TISS");
     }
+
     void initialize() {
         setName(tr("Anaerobic TISS"));
         setMetricUnits("");
         setImperialUnits("");
     }
 
-    void compute(const RideFile *r, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-	    const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-	    if (!zones || zoneRange < 0)
-	        return;
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+	    if (!item->context->athlete->zones() || item->zoneRange < 0) return;
 
         // anTISS - Aerobic Training Impact Scoring System
         static const double a = 0.238923886004611f;
@@ -312,14 +309,16 @@ class anTISS : public RideMetric {
         static const double c = -1.73549567522521f;
         double anTISS = 0.0f;
 
-        int cp = r->getTag("CP","0").toInt();
-        if (!cp) cp = zones->getCP(zoneRange);
+        int cp = item->getText("CP","0").toInt();
+        if (!cp) cp = item->context->athlete->zones()->getCP(item->zoneRange);
 
-        if (cp && r->areDataPresent()->watts) {
-            foreach (RideFilePoint *p, r->dataPoints()) {
+        if (cp && item->ride()->areDataPresent()->watts) {
+            RideFileIterator it(item->ride(), spec);
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
 
                 // a * exp (b * exp (c * fraction of cp) ) 
-                anTISS += r->recIntSecs() * (a * exp(b * exp(c * (double(p->watts) / double(cp)))));
+                anTISS += item->ride()->recIntSecs() * (a * exp(b * exp(c * (double(point->watts) / double(cp)))));
             }
         }
         setValue(anTISS);
@@ -341,19 +340,16 @@ class dTISS : public RideMetric {
         setInternalName("TISS Aerobicity");
         setType(RideMetric::Average);
     }
+
     void initialize() {
         setName(tr("TISS Aerobicity"));
         setMetricUnits("Percent");
         setImperialUnits("Percent");
     }
 
-    void compute(const RideFile *, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-	    const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
-	    if (!zones || zoneRange < 0)
-	        return;
+	    if (!item->context->athlete->zones() || item->zoneRange < 0) return;
 
         assert(deps.contains("atiss_score"));
         assert(deps.contains("antiss_score"));
@@ -368,6 +364,7 @@ class dTISS : public RideMetric {
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new dTISS(*this); }
 };
+
 class BikeScore : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(BikeScore)
     double score;
@@ -379,19 +376,20 @@ class BikeScore : public RideMetric {
         setSymbol("skiba_bike_score");
         setInternalName("BikeScore&#8482;");
     }
+
     void initialize() {
         setName("BikeScore&#8482;");  // Don't translate as many places have special coding for the "TM" sign
         setMetricUnits("");
         setImperialUnits("");
     }
 
-    void compute(const RideFile *r, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-	    const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-	    if (!zones || zoneRange < 0) {
-	        setValue(0.0);
-	        return;
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        // no zones
+        if (item->context->athlete->zones()==NULL || item->zoneRange < 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
 
         assert(deps.contains("skiba_xpower"));
@@ -401,8 +399,8 @@ class BikeScore : public RideMetric {
         assert(ri);
         double normWork = xp->value(true) * xp->count();
         double rawBikeScore = normWork * ri->value(true);
-        int cp = r->getTag("CP","0").toInt();
-        double workInAnHourAtCP = (cp ? cp : zones->getCP(zoneRange)) * 3600;
+        int cp = item->getText("CP","0").toInt();
+        double workInAnHourAtCP = (cp ? cp : item->context->athlete->zones()->getCP(item->zoneRange)) * 3600;
         score = rawBikeScore / workInAnHourAtCP * 100.0;
 
         setValue(score);
@@ -423,6 +421,7 @@ class ResponseIndex : public RideMetric {
         setSymbol("skiba_response_index");
         setInternalName("Response Index");
     }
+
     void initialize() {
         setName(tr("Response Index"));
         setType(RideMetric::Average);
@@ -431,10 +430,8 @@ class ResponseIndex : public RideMetric {
         setPrecision(3);
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
         assert(deps.contains("skiba_xpower"));
         assert(deps.contains("average_hr"));
         XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));

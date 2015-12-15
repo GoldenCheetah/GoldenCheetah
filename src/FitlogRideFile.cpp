@@ -98,6 +98,7 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
         NULL
     };
 
+#if 0 //XXX REFACTOR COMPUTE METRICS
     QStringList worklist = QStringList();
     for (int i=0; metrics[i];i++) worklist << metrics[i];
 
@@ -134,7 +135,7 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
     QDomElement calories = doc.createElement("Calories");
     calories.setAttribute("TotalCal", QString("%1").arg(computed.value("total_work")->value(true)));
     activity.appendChild(calories);
-
+#endif
     //QDomElement laps = doc.createElement("Laps");
     //activity.appendChild(laps);
 
@@ -164,6 +165,7 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
                 continue;
             }
 
+#if 0
             computed =
                 RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), worklist);
 
@@ -199,6 +201,7 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
             QDomElement lap_calories = doc.createElement("Calories");
             lap_calories.setAttribute("TotalCal", QString("%1").arg(computed.value("total_work")->value(true)));
             lap.appendChild(lap_calories);
+#endif
         }
     }
 

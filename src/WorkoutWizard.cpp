@@ -352,8 +352,11 @@ void AbsWattagePage::updateMetrics()
     metrics.append("average_power");
     metrics.append("skiba_bike_score");
     metrics.append("skiba_xpower");
+
+#if 0 //XXX REFACTOR METRICS
     QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(),hackContext->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
+#endif
 }
 
 void AbsWattagePage::SaveWorkout()
@@ -486,8 +489,10 @@ void RelWattagePage::updateMetrics()
     metrics.append("average_power");
     metrics.append("skiba_bike_score");
     metrics.append("skiba_xpower");
+#if 0 //XXX REFACTOR METRICS
     QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(),hackContext->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
+#endif
 }
 
 void RelWattagePage::SaveWorkout()

@@ -54,7 +54,6 @@ public:
 
     RideMetric() {
         // some sensible defaults
-        aggregate_ = true;
         conversion_ = 1.0;
         conversionSum_ = 0.0;
         precision_ = 0;
@@ -122,11 +121,7 @@ public:
     virtual double conversionSum() const { return conversionSum_; }
 
     // Compute the ride metric from a file.
-    virtual void compute(const RideFile *ride,
-                         const Zones *zones, int zoneRange,
-                         const HrZones *hrzones, int hrzoneRange,
-                         const QHash<QString,RideMetric*> &deps,
-                         const Context *context = 0) = 0;
+    virtual void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &deps) = 0;
 
     // is a time value, ie. render as hh:mm:ss
     virtual bool isTime() const { return false; }
@@ -167,15 +162,14 @@ public:
         }
     }
 
-    // XXX we need to deprecate this XXX 
-    virtual bool canAggregate() { return aggregate_; }
-
-    // XXX we need to deprecate this XXX */
+    // because we compute metrics in a map/reduce operation using
+    // multiple threads the metric object is cloned to ensure
+    // no conflict, but the clone operation can dereference
+    // members from source and reference count them to be space efficient
     virtual RideMetric *clone() const { return NULL; }
 
     static QHash<QString,RideMetricPtr>
-    computeMetrics(const Context *context, const RideFile *ride, const Zones *zones, const HrZones *hrZones,
-                   const QStringList &metrics);
+    computeMetrics(RideItem *item, Specification spec, const QStringList &metrics);
 
     // Initialisers for derived classes to setup basic data
     void setValue(double x) { value_ = x; }
@@ -189,10 +183,8 @@ public:
     void setInternalName(QString x) { internalName_ = x; }
     void setSymbol(QString x) { symbol_ = x; }
     void setType(MetricType x) { type_ = x; }
-    void setAggregate(bool x) { aggregate_ = x; }
 
     protected:
-        bool    aggregate_;
         double  value_,
                 count_, // used when averaging
                 conversion_,
@@ -260,11 +252,7 @@ public:
     bool isRelevantForRide(const RideItem *) const; 
 
     // Compute the ride metric from a file.
-    void compute(const RideFile *ride,
-                         const Zones *zones, int zoneRange,
-                         const HrZones *hrzones, int hrzoneRange,
-                         const QHash<QString,RideMetric*> &deps,
-                         const Context *context = 0);
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &deps);
 
     // is a time value, ie. render as hh:mm:ss
     bool isTime() const;

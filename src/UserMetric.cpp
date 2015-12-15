@@ -141,11 +141,7 @@ qDebug()<<"CALLING USER METHOD FOR RELEVANT!";
 
 // Compute the ride metric from a file.
 void
-UserMetric::compute(const RideFile *ride,
-                         const Zones *zones, int zoneRange,
-                         const HrZones *hrzones, int hrzoneRange,
-                         const QHash<QString,RideMetric*> &deps,
-                         const Context *context)
+UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &deps)
 {
     // XXX todo
     // relevant ?

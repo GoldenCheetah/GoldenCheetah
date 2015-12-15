@@ -138,6 +138,9 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "overrides") jc->item.overrides_ = $3.split(",");
                                                                      else if ($1 == "weight") jc->item.weight = $3.toDouble();
                                                                      else if ($1 == "samples") jc->item.samples = $3.toInt() > 0 ? true : false;
+                                                                     else if ($1 == "zonerange") jc->item.zoneRange = $3.toInt();
+                                                                     else if ($1 == "hrzonerange") jc->item.hrZoneRange = $3.toInt();
+                                                                     else if ($1 == "pacezonerange") jc->item.paceZoneRange = $3.toInt();
                                                                      else if ($1 == "date") {
                                                                          QDateTime aslocal = QDateTime::fromString($3, DATETIME_FORMAT);
                                                                          QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), Qt::UTC);
@@ -350,6 +353,10 @@ void RideCache::save()
             stream << "\t\t\"isRun\":\"" <<item->isRun <<"\",\n";
             stream << "\t\t\"isSwim\":\"" <<item->isSwim <<"\",\n";
             stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
+
+            if (item->zoneRange >= 0) stream << "\t\t\"zonerange\":\"" <<item->zoneRange <<"\",\n";
+            if (item->hrZoneRange >= 0) stream << "\t\t\"hrzonerange\":\"" <<item->hrZoneRange <<"\",\n";
+            if (item->paceZoneRange >= 0) stream << "\t\t\"pacezonerange\":\"" <<item->paceZoneRange <<"\",\n";
 
             // if there are overrides, do share them
             if (item->overrides_.count()) stream << "\t\t\"overrides\":\"" <<item->overrides_.join(",") <<"\",\n";

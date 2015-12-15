@@ -80,8 +80,38 @@ Specification::secsEnd()
     else return -1;
 }
 
+bool
+Specification::isEmpty(RideFile *ride)
+{
+    // its null !
+    if (!ride) return true;
+
+    // no data points
+    if (ride->dataPoints().count() <= 0) return true;
+
+    // interval points yield no points ?
+    if (it) {
+        RideFileIterator i(ride, *this);
+
+        // yikes
+        if (i.firstIndex() < 0 || i.lastIndex() < 0) return true;
+
+        // reversed (1s interval has same start and stop)
+        if ((i.lastIndex() - i.firstIndex()) < 0) return true;
+    }
+
+    return false;
+}
+
 void
 Specification::setRideItem(RideItem *ri)
 {
     this->ri = ri;
+}
+
+void
+Specification::print()
+{
+    if (it) qDebug()<<it->name<<it->start<<it->stop;
+    else qDebug()<<"item";
 }
