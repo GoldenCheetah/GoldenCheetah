@@ -206,10 +206,14 @@ class UserMetric: public RideMetric {
 public:
 
     UserMetric(Context *context, UserMetricSettings settings);
+    UserMetric(const UserMetric *from);
     ~UserMetric();
 
     // is this a user defined one?
     bool isUser() const { return true; }
+
+    // did we clone (i.e. datafilter doesn't belong to us)
+    bool isClone() const { return clone_; }
 
     void initialize();
 
@@ -257,6 +261,8 @@ public:
     // is a time value, ie. render as hh:mm:ss
     bool isTime() const;
 
+    RideMetric *clone() const; 
+
     // WE DO NOT REIMPLEMENT THE STANDARD toString() METHOD
     // virtual QString toString(bool useMetricUnits) const;
 
@@ -272,6 +278,9 @@ public:
 
         // and we compile into this for runtime
         DataFilter *program;
+
+        // true if we are a clone
+        bool clone_;
 
 };
 

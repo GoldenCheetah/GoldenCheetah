@@ -255,6 +255,7 @@ EditUserMetricDialog::EditUserMetricDialog(Context *context, UserMetricSettings 
     mainLayout->addLayout(head);
 
     connect(test, SIGNAL(clicked()), this, SLOT(refreshStats()));
+    connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(refreshStats()));
     connect (cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
     connect (okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
 }
