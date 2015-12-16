@@ -70,7 +70,7 @@ bool UserMetricParser::startElement( const QString&, const QString&, const QStri
         if (attrs.qName(i) == "unitsMetric") add.unitsMetric=attrs.value(i);
         if (attrs.qName(i) == "unitsImperial") add.unitsImperial=attrs.value(i);
         if (attrs.qName(i) == "conversion") add.conversion=attrs.value(i).toDouble();
-        if (attrs.qName(i) == "conversionSum") add.conversion=attrs.value(i).toDouble();
+        if (attrs.qName(i) == "conversionSum") add.conversionSum=attrs.value(i).toDouble();
         if (attrs.qName(i) == "fingerprint") add.fingerprint=attrs.value(i);
     }
 
