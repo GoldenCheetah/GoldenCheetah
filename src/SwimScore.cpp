@@ -218,7 +218,7 @@ class STP : public RideMetric {
         double weight = item->getWeight();
         
         const PaceZones *zones = item->context->athlete->paceZones(true);
-        int zoneRange = item->context->athlete->paceZones(true)->whichRange(item->dateTime.date());
+        int zoneRange = item->paceZoneRange;
 
         // did user override for this ride?
         double cv = item->getText("CV","0").toInt();

@@ -471,8 +471,7 @@ RideItem::checkStale()
             // get the new zone configuration fingerprint that applies for the ride date
             unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
                         + (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, 0).toInt() ? 1 : 0)
-                        + static_cast<unsigned long>(context->athlete->paceZones(false)->getFingerprint(dateTime.date()))
-                        + static_cast<unsigned long>(context->athlete->paceZones(true)->getFingerprint(dateTime.date()))
+                        + static_cast<unsigned long>(context->athlete->paceZones(isSwim)->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->routes->getFingerprint())
                         + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 57).toInt(); // 57 does not include search for PEAKS
@@ -565,7 +564,7 @@ RideItem::refresh()
         if (context->athlete->hrZones()) hrZoneRange = context->athlete->hrZones()->whichRange(dateTime.date());
         else hrZoneRange = -1;
 
-        if (context->athlete->paceZones(true)) paceZoneRange = context->athlete->paceZones(true)->whichRange(dateTime.date());
+        if (context->athlete->paceZones(isSwim)) paceZoneRange = context->athlete->paceZones(isSwim)->whichRange(dateTime.date());
         else paceZoneRange = -1;
 
         // refresh metrics etc
@@ -597,8 +596,7 @@ RideItem::refresh()
         // update fingerprints etc, crc done above
         fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
                     + (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, 0).toInt() ? 1 : 0)
-                    + static_cast<unsigned long>(context->athlete->paceZones(false)->getFingerprint(dateTime.date()))
-                    + static_cast<unsigned long>(context->athlete->paceZones(true)->getFingerprint(dateTime.date()))
+                    + static_cast<unsigned long>(context->athlete->paceZones(isSwim)->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->routes->getFingerprint()) +
                     + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 57).toInt(); // 57 does not include search for PEAKS
