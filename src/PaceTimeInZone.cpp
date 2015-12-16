@@ -64,7 +64,7 @@ class PaceZoneTime : public RideMetric {
         seconds = 0;
 
         const PaceZones *zone = item->context->athlete->paceZones(item->isSwim);
-        int zoneRange = zone ? zone->whichRange(item->dateTime.date()) : -1;
+        int zoneRange = item->paceZoneRange;
 
         // get zone ranges
         if (zone && zoneRange >= 0) {
