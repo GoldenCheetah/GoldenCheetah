@@ -3513,50 +3513,86 @@ DefaultsPage::getDefinitions(QList<DefaultDefinition> &defaultList)
 ZonePage::ZonePage(Context *context) : context(context)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
+    QHBoxLayout *hlayout = new QHBoxLayout;
 
-    // get current config by reading it in (leave mainwindow zones alone)
-    QFile zonesFile(context->athlete->home->config().canonicalPath() + "/power.zones");
-    if (zonesFile.exists()) {
-        zones.read(zonesFile);
-        zonesFile.close();
-        b4Fingerprint = zones.getFingerprint(); // remember original state
+    sportLabel = new QLabel(tr("Sport"));
+    sportCombo = new QComboBox();
+    sportCombo->addItem(tr("Bike"));
+    sportCombo->addItem(tr("Run"));
+    sportCombo->setCurrentIndex(0);
+    hlayout->addStretch();
+    hlayout->addWidget(sportLabel);
+    hlayout->addWidget(sportCombo);
+    hlayout->addStretch();
+    layout->addLayout(hlayout);
+    connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSport(int)));
+    tabs = new QTabWidget(this);
+    layout->addWidget(tabs);
+
+    for (int i=0; i < nSports; i++) {
+        zones[i] = new Zones(i > 0);
+
+        // get current config by reading it in (leave mainwindow zones alone)
+        QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + zones[i]->fileName());
+        if (zonesFile.exists()) {
+            zones[i]->read(zonesFile);
+            zonesFile.close();
+            b4Fingerprint[i] = zones[i]->getFingerprint(); // remember original state
+        }
+
+        // setup maintenance pages using current config
+        schemePage[i] = new SchemePage(zones[i]);
+        cpPage[i] = new CPPage(context, zones[i], schemePage[i]);
     }
 
-    // setup maintenance pages using current config
-    schemePage = new SchemePage(this);
-    cpPage = new CPPage(this);
-
-    tabs = new QTabWidget(this);
-    tabs->addTab(cpPage, tr("Critical Power"));
-    tabs->addTab(schemePage, tr("Default"));
-
-    layout->addWidget(tabs);
+    // finish setup for the default sport
+    changeSport(sportCombo->currentIndex());
 }
+
+ZonePage::~ZonePage()
+{
+    for (int i=0; i<nSports; i++) delete zones[i];
+}
+
+void
+ZonePage::changeSport(int i)
+{
+    // change tabs according to the selected sport
+    tabs->clear();
+    tabs->addTab(cpPage[i], tr("Critical Power"));
+    tabs->addTab(schemePage[i], tr("Default"));
+}
+
 
 qint32
 ZonePage::saveClicked()
 {
+    qint32 changed = 0;
+    qint32 cppageChanged = 0;
     // write
-    zones.setScheme(schemePage->getScheme());
-    zones.write(context->athlete->home->config());
+    for (int i=0; i < nSports; i++) {
+        zones[i]->setScheme(schemePage[i]->getScheme());
+        zones[i]->write(context->athlete->home->config());
 
-    // re-read Zones in case it changed
-    QFile zonesFile(context->athlete->home->config().canonicalPath() + "/power.zones");
-    context->athlete->zones_[0]->read(zonesFile);
+        // re-read Zones in case it changed
+        QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->zones_[i]->fileName());
+        context->athlete->zones_[i]->read(zonesFile);
 
-    // use CP for FTP?
-    appsettings->setCValue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, cpPage->useCPForFTPCombo->currentIndex());
+        // use CP for FTP?
+        appsettings->setCValue(context->athlete->cyclist, zones[i]->useCPforFTPSetting(), cpPage[i]->useCPForFTPCombo->currentIndex());
 
 
-    // did cp for ftp change ?
-    qint32 cppage = cpPage->saveClicked();
+        // did cp for ftp change ?
+        cppageChanged |= cpPage[i]->saveClicked();
 
-    // did we change ?
-    if (zones.getFingerprint() != b4Fingerprint) return cppage | CONFIG_ZONES;
-    else return cppage;
+        // did we change ?
+        if (zones[i]->getFingerprint() != b4Fingerprint[i])
+            changed = CONFIG_ZONES;
+    }
+    return changed | cppageChanged;
 }
 
-SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
+SchemePage::SchemePage(Zones* zones) : zones(zones)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -3589,15 +3625,15 @@ SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
     //scheme->header()->resizeSection(2,80);
 
     // setup list
-    for (int i=0; i< zonePage->zones.getScheme().nzones_default; i++) {
+    for (int i=0; i< zones->getScheme().nzones_default; i++) {
 
         QTreeWidgetItem *add = new QTreeWidgetItem(scheme->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);
 
         // tab name
-        add->setText(0, zonePage->zones.getScheme().zone_default_name[i]);
+        add->setText(0, zones->getScheme().zone_default_name[i]);
         // field name
-        add->setText(1, zonePage->zones.getScheme().zone_default_desc[i]);
+        add->setText(1, zones->getScheme().zone_default_desc[i]);
 
         // low
         QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
@@ -3605,7 +3641,7 @@ SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
         loedit->setMaximum(1000);
         loedit->setSingleStep(1.0);
         loedit->setDecimals(0);
-        loedit->setValue(zonePage->zones.getScheme().zone_default[i]);
+        loedit->setValue(zones->getScheme().zone_default[i]);
         scheme->setItemWidget(add, 2, loedit);
     }
 
@@ -3718,7 +3754,8 @@ SchemePage::getScheme()
 }
 
 
-CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
+CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
+               context(context), zones_(zones_), schemePage(schemePage)
 {
     active = false;
 
@@ -3771,7 +3808,7 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     useCPForFTPCombo->addItem(tr("Use CP for all metrics"));
     useCPForFTPCombo->addItem(tr("Use FTP for Coggan metrics"));
 
-    b4.cpforftp = appsettings->cvalue(zonePage->context->athlete->cyclist, GC_USE_CP_FOR_FTP, 0).toInt() ? 1 : 0;
+    b4.cpforftp = appsettings->cvalue(context->athlete->cyclist, zones_->useCPforFTPSetting(), 0).toInt() ? 1 : 0;
     useCPForFTPCombo->setCurrentIndex(b4.cpforftp);
 
     cpEdit = new QDoubleSpinBox;
@@ -3903,37 +3940,37 @@ CPPage::initializeRanges() {
     ranges->setIndentation(0);
 
     // setup list of ranges
-    for (int i=0; i< zonePage->zones.getRangeSize(); i++) {
+    for (int i=0; i< zones_->getRangeSize(); i++) {
 
         QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);
 
         // Embolden ranges with manually configured zones
         QFont font;
-        font.setWeight(zonePage->zones.getZoneRange(i).zonesSetFromCP ?
+        font.setWeight(zones_->getZoneRange(i).zonesSetFromCP ?
                                         QFont::Normal : QFont::Black);
 
         int column = 0;
         // date
-        add->setText(column, zonePage->zones.getStartDate(i).toString(tr("MMM d, yyyy")));
+        add->setText(column, zones_->getStartDate(i).toString(tr("MMM d, yyyy")));
         add->setFont(column++, font);
 
         // CP
-        add->setText(column, QString("%1").arg(zonePage->zones.getCP(i)));
+        add->setText(column, QString("%1").arg(zones_->getCP(i)));
         add->setFont(column++, font);
 
         if (!useCPForFTP) {
             // FTP
-            add->setText(column, QString("%1").arg(zonePage->zones.getFTP(i)));
+            add->setText(column, QString("%1").arg(zones_->getFTP(i)));
             add->setFont(column++, font);
         }
 
         // W'
-        add->setText(column, QString("%1").arg(zonePage->zones.getWprime(i)));
+        add->setText(column, QString("%1").arg(zones_->getWprime(i)));
         add->setFont(column++, font);
 
         // Pmax
-        add->setText(column, QString("%1").arg(zonePage->zones.getPmax(i)));
+        add->setText(column, QString("%1").arg(zones_->getPmax(i)));
         add->setFont(column++, font);
     }
 
@@ -3946,7 +3983,7 @@ CPPage::addClicked()
 {
 
     // get current scheme
-    zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+    zones_->setScheme(schemePage->getScheme());
 
     int cp = cpEdit->value();
     if( cp <= 0 ) {
@@ -3963,7 +4000,7 @@ CPPage::addClicked()
 
     int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
 
-    int index = zonePage->zones.addZoneRange(dateEdit->date(), cpEdit->value(), ftpEdit->value(), wp, pmax);
+    int index = zones_->addZoneRange(dateEdit->date(), cpEdit->value(), ftpEdit->value(), wp, pmax);
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
@@ -3995,7 +4032,7 @@ void
 CPPage::editClicked()
 {
     // get current scheme
-    zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+    zones_->setScheme(schemePage->getScheme());
 
     int cp = cpEdit->value();
 
@@ -4020,25 +4057,25 @@ CPPage::editClicked()
     int columns = 0;
 
     // date
-    zonePage->zones.setStartDate(index, dateEdit->date());
+    zones_->setStartDate(index, dateEdit->date());
     edit->setText(columns++, dateEdit->date().toString(tr("MMM d, yyyy")));
 
     // CP
-    zonePage->zones.setCP(index, cp);
+    zones_->setCP(index, cp);
     edit->setText(columns++, QString("%1").arg(cp));
 
     // show FTP if we use FTP for Coggan Metrics
     if (useCPForFTPCombo->currentIndex() == 1) {
-        zonePage->zones.setFTP(index, ftp);
+        zones_->setFTP(index, ftp);
         edit->setText(columns++, QString("%1").arg(ftp));
     }
 
     // W'
-    zonePage->zones.setWprime(index, wp);
+    zones_->setWprime(index, wp);
     edit->setText(columns++, QString("%1").arg(wp));
 
     // Pmax
-    zonePage->zones.setPmax(index, pmax);
+    zones_->setPmax(index, pmax);
     edit->setText(columns++, QString("%1").arg(pmax));
 
 }
@@ -4049,7 +4086,7 @@ CPPage::deleteClicked()
     if (ranges->currentItem()) {
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         delete ranges->invisibleRootItem()->takeChild(index);
-        zonePage->zones.deleteRange(index);
+        zones_->deleteRange(index);
     }
 }
 
@@ -4059,7 +4096,7 @@ CPPage::defaultClicked()
     if (ranges->currentItem()) {
 
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        ZoneRange current = zonePage->zones.getZoneRange(index);
+        ZoneRange current = zones_->getZoneRange(index);
 
         // unbold
         QFont font;
@@ -4070,8 +4107,8 @@ CPPage::defaultClicked()
 
 
         // set the range to use defaults on the scheme page
-        zonePage->zones.setScheme(zonePage->schemePage->getScheme());
-        zonePage->zones.setZonesFromCP(index);
+        zones_->setScheme(schemePage->getScheme());
+        zones_->setZonesFromCP(index);
 
         // hide the default button since we are now using defaults
         defaultButton->hide();
@@ -4088,19 +4125,19 @@ CPPage::rangeEdited()
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
 
         QDate date = dateEdit->date();
-        QDate odate = zonePage->zones.getStartDate(index);
+        QDate odate = zones_->getStartDate(index);
 
         int cp = cpEdit->value();
-        int ocp = zonePage->zones.getCP(index);
+        int ocp = zones_->getCP(index);
 
         int ftp = ftpEdit->value();
-        int oftp = zonePage->zones.getFTP(index);
+        int oftp = zones_->getFTP(index);
 
         int wp = wEdit->value();
-        int owp = zonePage->zones.getWprime(index);
+        int owp = zones_->getWprime(index);
 
         int pmax = pmaxEdit->value();
-        int opmax = zonePage->zones.getPmax(index);
+        int opmax = zones_->getPmax(index);
 
         if (date != odate || cp != ocp || ftp != oftp || wp != owp || pmax != opmax)
             updateButton->show();
@@ -4125,20 +4162,20 @@ CPPage::rangeSelectionChanged()
 
 
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        ZoneRange current = zonePage->zones.getZoneRange(index);
+        ZoneRange current = zones_->getZoneRange(index);
 
-        dateEdit->setDate(zonePage->zones.getStartDate(index));
-        cpEdit->setValue(zonePage->zones.getCP(index));
-        ftpEdit->setValue(zonePage->zones.getFTP(index));
-        wEdit->setValue(zonePage->zones.getWprime(index));
-        pmaxEdit->setValue(zonePage->zones.getPmax(index));
+        dateEdit->setDate(zones_->getStartDate(index));
+        cpEdit->setValue(zones_->getCP(index));
+        ftpEdit->setValue(zones_->getFTP(index));
+        wEdit->setValue(zones_->getWprime(index));
+        pmaxEdit->setValue(zones_->getPmax(index));
 
         if (current.zonesSetFromCP) {
 
             // reapply the scheme in case it has been changed
-            zonePage->zones.setScheme(zonePage->schemePage->getScheme());
-            zonePage->zones.setZonesFromCP(index);
-            current = zonePage->zones.getZoneRange(index);
+            zones_->setScheme(schemePage->getScheme());
+            zones_->setZonesFromCP(index);
+            current = zones_->getZoneRange(index);
 
             defaultButton->hide();
 
@@ -4248,7 +4285,7 @@ CPPage::zonesChanged()
         if (ranges->currentItem()) {
 
             int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-            ZoneRange current = zonePage->zones.getZoneRange(index);
+            ZoneRange current = zones_->getZoneRange(index);
 
             // embolden that range on the list to show it has been edited
             QFont font;
@@ -4286,7 +4323,7 @@ CPPage::zonesChanged()
             current.zones = zoneinfos;
 
             // now replace the current range struct
-            zonePage->zones.setZoneRange(index, current);
+            zones_->setZoneRange(index, current);
         }
     }
 }
