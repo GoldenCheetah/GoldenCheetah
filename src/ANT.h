@@ -336,7 +336,7 @@ class ANT : public QThread
 
 
 public:
-    ANT(QObject *parent = 0, DeviceConfiguration *dc=0, QString cyclist="");
+    ANT(QObject *parent = 0, DeviceConfiguration *dc=0, QString athlete="");
     ~ANT();
 
 signals:
@@ -562,8 +562,8 @@ private:
     int vortexID;
     int vortexChannel;
 
-    // cylist for wheelsize settings
-    QString trainCyclist;
+    // athlete for wheelsize settings, etc.
+    QString trainAthlete;
 };
 
 #include "ANTMessage.h"
