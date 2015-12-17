@@ -213,6 +213,9 @@ class Zones : public QObject
         // can be more granular -- did the zone config for the date of
         // a particular ride change ?
         quint16 getFingerprint(QDate date) const;
+
+        // USE_CP_FOR_FTP setting differenciated by sport
+        QString useCPforFTPSetting() const;
 };
 
 QColor zoneColor(int zone, int num_zones);

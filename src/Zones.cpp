@@ -1052,3 +1052,8 @@ Zones::getFingerprint(QDate forDate) const
     return qChecksum(ba, ba.length());
 }
 
+QString
+Zones::useCPforFTPSetting() const
+{
+    return run ? GC_USE_CP_FOR_FTP_RUN : GC_USE_CP_FOR_FTP;
+}
