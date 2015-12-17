@@ -156,18 +156,18 @@
 #     http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/0.1.12.2/
 # You may override the INCLUDE and LIB files if you like.
 # You *must* define LIBUSB_INSTALL to use this feature and ensure that the LIBUSB1_*
-# definitons are commented out.
+# definitions are commented out.
 #LIBUSB_INSTALL = /usr/local
 #LIBUSB_INCLUDE = 
-#LIBUSB_LIBS    =  -lusb1.0
+#LIBUSB_LIBS    = 
 
 # If you want to use version 1.0.18+, then ensure that the LIBUSB_*
 # definitions above are commented out and the LIBUSB1_INSTALL is
 # uncommented.
 #
-#LIBUSB1_INSTALL = /usr
-#LIBUSB1_INCLUDE = /usr/include
-#LIBUSB1_LIBS = -lusb-1.0
+#LIBUSB1_INSTALL = /usr/local
+#LIBUSB1_INCLUDE = 
+#LIBUSB1_LIBS = 
 
 # if you want video playback on training mode then
 # download and install vlc (videolan) from

@@ -244,25 +244,25 @@ void ANT::run()
     {
         // read more bytes from the device
         uint8_t byte;
-	int rc = rawRead(&byte, 1);
-	if (rc > 0)
-	  receiveByte(byte);
+        int rc = rawRead(&byte, 1);
+        if (rc > 0)
+          receiveByte(byte);
         else {
 #if defined GC_HAVE_LIBUSB
-	  if (rc == LIBUSB_ERROR_NO_DEVICE) {
-	    // Can happen when the USB stick is pulled.
-	    stop();
-	  } else if (rc == LIBUSB_ERROR_PIPE) {
-	    // Endpoint halted.
-	    restart();
-	  } else {
-	    // Typically a timeout (error -110).
-	    msleep(5);
-	  }
+          if (rc == LIBUSB_ERROR_NO_DEVICE) {
+            // Can happen when the USB stick is pulled.
+            stop();
+          } else if (rc == LIBUSB_ERROR_PIPE) {
+            // Endpoint halted.
+            restart();
+          } else {
+            // Typically a timeout (error -110).
+            msleep(5);
+          }
 #else
           msleep(5);
 #endif
-	}
+        }
         //----------------------------------------------------------------------
         // LISTEN TO CONTROLLER FOR COMMANDS
         //----------------------------------------------------------------------

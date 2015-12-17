@@ -142,8 +142,8 @@ CONFIG(debug, debug|release) {
 !isEmpty( LIBUSB1_INSTALL ) {
     isEmpty( LIBUSB1_INCLUDE ) { LIBUSB1_INCLUDE = $${LIBUSB1_INSTALL}/include }
     isEmpty( LIBUSB1_LIBS )    {
-        unix  { LIBUSB1_LIBS = -lusb-1.0 }
-        win32 { LIBUSB1_LIBS = -lusb-1.0 }
+        unix  { LIBUSB1_LIBS = $${LIBUSB1_INSTALL}/lib/libusb-1.0.a -ludev }
+        win32 { LIBUSB1_LIBS = $${LIBUSB1_INSTALL}/lib/libusb-1.0.a -ludev }
     }
     INCLUDEPATH += $${LIBUSB1_INCLUDE}
     LIBS        += $${LIBUSB1_LIBS}
@@ -295,6 +295,9 @@ SOURCES +=  ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp
     DEPENDPATH += $$HTPATH
 
     DEFINES += GC_WANT_HTTP
+
+    HEADERS +=  APIWebService.h
+    SOURCES +=  APIWebService.cpp
 
     HEADERS +=  $$HTPATH/httpglobal.h \
                 $$HTPATH/httplistener.h \
