@@ -164,7 +164,7 @@ class IntensityFactor : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no zones
-        if (!item->context->athlete->zones() || item->zoneRange < 0) {
+        if (!item->context->athlete->zones(item->isRun) || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -176,17 +176,17 @@ class IntensityFactor : public RideMetric {
 
         int ftp = item->getText("FTP","0").toInt();
 
-        bool useCPForFTP = (appsettings->cvalue(item->context->athlete->cyclist, GC_USE_CP_FOR_FTP, 0).toInt() == 0);
+        bool useCPForFTP = (appsettings->cvalue(item->context->athlete->cyclist, item->context->athlete->zones(item->isRun)->useCPforFTPSetting(), 0).toInt() == 0);
 
         if (useCPForFTP) {
             int cp = item->getText("CP","0").toInt();
             if (cp == 0)
-                cp = item->context->athlete->zones()->getCP(item->zoneRange);
+                cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
 
             ftp = cp;
         }
 
-        rif = np->value(true) / (ftp ? ftp : item->context->athlete->zones()->getFTP(item->zoneRange));
+        rif = np->value(true) / (ftp ? ftp : item->context->athlete->zones(item->isRun)->getFTP(item->zoneRange));
         secs = np->count();
 
         setValue(rif);
@@ -217,7 +217,7 @@ class TSS : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no zones
-        if (!item->context->athlete->zones() || item->zoneRange < 0) {
+        if (!item->context->athlete->zones(item->isRun) || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -233,17 +233,17 @@ class TSS : public RideMetric {
 
         int ftp = item->getText("FTP","0").toInt();
 
-        bool useCPForFTP = (appsettings->cvalue(item->context->athlete->cyclist, GC_USE_CP_FOR_FTP, 0).toInt() == 0);
+        bool useCPForFTP = (appsettings->cvalue(item->context->athlete->cyclist, item->context->athlete->zones(item->isRun)->useCPforFTPSetting(), 0).toInt() == 0);
 
         if (useCPForFTP) {
             int cp = item->getText("CP","0").toInt();
             if (cp == 0)
-                cp = item->context->athlete->zones()->getCP(item->zoneRange);
+                cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
 
             ftp = cp;
         }
 
-        double workInAnHourAtCP = (ftp ? ftp : item->context->athlete->zones()->getFTP(item->zoneRange)) * 3600;
+        double workInAnHourAtCP = (ftp ? ftp : item->context->athlete->zones(item->isRun)->getFTP(item->zoneRange)) * 3600;
         score = rawTSS / workInAnHourAtCP * 100.0;
 
         setValue(score);
