@@ -309,9 +309,60 @@ void ANT::refreshFecGradient()
         sendMessage(ANTMessage::fecSetTrackResistance(fecChannel, gradient, currentRollingResistance));
 }
 
+bool ANT::getFecPowerCalibInProgress() const
+{
+    if (fecChannel == -1)
+        return false;
+
+    return antChannel[fecChannel]->getFecPowerCalibInProgress();
+}
+
+bool ANT::getFecResisCalibInProgress() const
+{
+    if (fecChannel == -1)
+        return false;
+
+    return antChannel[fecChannel]->getFecResisCalibInProgress();
+}
+
+void ANT::setFecPowerCalibInProgress(const bool calibInProgress)
+{
+    if (fecChannel == -1)
+        return;
+
+    antChannel[fecChannel]->setFecPowerCalibInProgress(calibInProgress);
+}
+
+void ANT::setFecResisCalibInProgress(const bool calibInProgress)
+{
+    if (fecChannel == -1)
+        return;
+
+    antChannel[fecChannel]->setFecResisCalibInProgress(calibInProgress);
+}
+
 void ANT::requestFecCapabilities()
 {
+    if (fecChannel == -1)
+        return;
+
     sendMessage(ANTMessage::fecRequestCapabilities(fecChannel));
+}
+
+void ANT::requestFecCalib(const bool zeroOffset, const bool spinDownTime)
+{
+    if (fecChannel == -1)
+        return;
+
+    sendMessage(ANTMessage::fecRequestCalib(fecChannel, zeroOffset, spinDownTime));
+}
+
+void ANT::fecUserConfig(const float kgCyclistWeight, const float kgCycleWeight, const float mmDiameter, const float gearRatio)
+{
+    if (fecChannel == -1)
+        return;
+
+    sendMessage(ANTMessage::fecUserConfig(fecChannel, kgCyclistWeight, kgCycleWeight, mmDiameter, gearRatio));
 }
 
 void ANT::refreshVortexLoad()

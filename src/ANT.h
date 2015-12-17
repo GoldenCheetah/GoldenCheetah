@@ -284,10 +284,14 @@ struct setChannelAtom {
 #define TACX_VORTEX_DATA_CALIBRATION   3
 
 // ant+ fitness equipment profile data pages
+#define FITNESS_EQUIPMENT_CALIBRATION_PAGE          0x01
+#define FITNESS_EQUIPMENT_CALIBRATION_PROGRESS_PAGE 0x02
 #define FITNESS_EQUIPMENT_GENERAL_PAGE              0x10
 #define FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE     0x19
 #define FITNESS_EQUIPMENT_TRAINER_TORQUE_PAGE       0x20
 #define FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE 0x36
+#define FITNESS_EQUIPMENT_TRAINER_USER_CONFIG_PAGE  0x37
+#define FITNESS_EQUIPMENT_REQUEST_DATA_PAGE         0x46
 #define FITNESS_EQUIPMENT_COMMAND_STATUS_PAGE       0x47
 
 #define FITNESS_EQUIPMENT_TYPE_GENERAL              0x10
@@ -482,20 +486,28 @@ public:
         telemetry.setRPS(rps);
     }
 
+    QString getTrainCyclist() const { return trainCyclist; };
+
     void setFecChannel(int channel);
     void refreshFecLoad();
     void refreshFecGradient();
     void requestFecCapabilities();
-
+    void requestFecCalib(const bool zeroOffset, const bool spinDownTime);
+    void fecUserConfig(const float kgCyclistWeight, const float kgCycleWeight, const float mmDiameter, const float gearRatio);
+    bool getFecPowerCalibInProgress() const;
+    bool getFecResisCalibInProgress() const;
+    void setFecPowerCalibInProgress(const bool calibInProgress);
+    void setFecResisCalibInProgress(const bool calibInProgress);
     void setVortexData(int channel, int id);
     void refreshVortexLoad();
 
     void setTrainerStatusAvailable(bool status) { telemetry.setTrainerStatusAvailable(status); }
-    void setTrainerCalibRequired(bool status) { telemetry.setTrainerCalibRequired(status); }
+    void setTrainerCalibStatus(uint8_t status) { telemetry.setTrainerCalibStatus(status); }
     void setTrainerConfigRequired(bool status) { telemetry.setTrainerConfigRequired(status); }
-    void setTrainerBrakeFault(bool status) { telemetry.setTrainerBrakeFault(status); }
+    void setTrainerBrakeStatus(uint8_t status) { telemetry.setTrainerBrakeStatus(status); }
     void setTrainerReady(bool status) { telemetry.setTrainerReady(status); }
     void setTrainerRunning(bool status) { telemetry.setTrainerRunning(status); }
+    uint8_t getTrainerCalibStatus() const { return telemetry.getTrainerCalibStatus(); }
 
 private:
 
