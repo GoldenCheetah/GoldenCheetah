@@ -1000,7 +1000,7 @@ MainWindow::resizeEvent(QResizeEvent*)
 void
 MainWindow::showOptions()
 {
-    ConfigDialog *cd = new ConfigDialog(currentTab->context->athlete->home->root(), currentTab->context->athlete->zones_, currentTab->context);
+    ConfigDialog *cd = new ConfigDialog(currentTab->context->athlete->home->root(), currentTab->context);
 
     // move to the centre of the screen
     cd->move(geometry().center()-QPoint(cd->geometry().width()/2, cd->geometry().height()/2));

@@ -3542,7 +3542,7 @@ ZonePage::saveClicked()
 
     // re-read Zones in case it changed
     QFile zonesFile(context->athlete->home->config().canonicalPath() + "/power.zones");
-    context->athlete->zones_->read(zonesFile);
+    context->athlete->zones_[0]->read(zonesFile);
 
     // use CP for FTP?
     appsettings->setCValue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, cpPage->useCPForFTPCombo->currentIndex());
