@@ -418,6 +418,7 @@ bool TrainDB::deleteVideoSync(QString pathname)
 
 bool TrainDB::importVideoSync(QString pathname, VideoSyncFile *videosyncFile)
 {
+    Q_UNUSED(videosyncFile) // not used at present
 	QSqlQuery query(db->database(sessionid));
     QDateTime timestamp = QDateTime::currentDateTime();
 
