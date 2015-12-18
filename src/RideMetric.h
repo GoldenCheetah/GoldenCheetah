@@ -373,7 +373,7 @@ class RideMetricFactory {
                 metrics.remove(current);
                 dependencyMap.remove(current);
                 metricNames.takeAt(firstUser);
-                metricTypes.takeAt(firstUser);
+                metricTypes.remove(firstUser);
             }
         }
     }
