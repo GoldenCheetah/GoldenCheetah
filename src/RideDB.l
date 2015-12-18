@@ -114,7 +114,7 @@ void RideDBfree (void * ptr , yyscan_t /*scanner*/)
 
 // Older versions of flex (prior to 2.5.9) do not have the destroy function
 // Or We're not using GNU flex then we also won't have a destroy function
-#if !defined(FLEX_SCANNER) || (YY_FLEX_SUBMINOR_VERSION < 9)
+#if !defined(FLEX_SCANNER) || (YY_FLEX_MINOR_VERSION < 6 && YY_FLEX_SUBMINOR_VERSION < 9)
 int RideDBlex_destroy(void*) { return 0; }
 #endif
 
