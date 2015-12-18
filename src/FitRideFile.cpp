@@ -1375,14 +1375,15 @@ struct FitFileReaderState
                 case 78:  /* undocumented, ignored */  break;
                 case 79:  /* undocumented, ignored */  break;
                 case 80:  /* undocumented, ignored */  break;
-                case 254:  /* undocumented, ignored */  break;
+                case 254:  /* message counter idx, ignored */  break;
                 case 11:  /* undocumented, ignored */  break;
                 case 12:  /* undocumented, ignored */  break;
                 case 13:  /* undocumented, ignored */  break;
                 case 14:  /* undocumented, ignored */  break;
                 case 19:  /* undocumented, ignored */  break;
                 case 20:  /* undocumented, ignored */  break;
-                case 22:  /* undocumented, ignored */  break;
+                case 21:  /* total ascent ? ignored */  break;
+                case 22:  /* total descent ? ignored */  break;
                 case 30:  /* undocumented, ignored */  break;
                 case 31:  /* undocumented, ignored */  break;
                 case 69:  /* undocumented, ignored */  break;
@@ -1404,7 +1405,7 @@ struct FitFileReaderState
                 case 62:  /* undocumented, ignored */  break;
                 case 63:  /* undocumented, ignored */  break;
                 case 64:  /* undocumented, ignored */  break;
-                case 65:  // Segment ID
+                case 65:  // Segment UID
                          // ignored
                         break;
                 case 66:  /* undocumented, ignored */  break;
@@ -1659,12 +1660,14 @@ struct FitFileReaderState
                 case 145: /* memo glob */
                 case 147: /* equipment (undocumented) = sensors presets (sensor name, wheel circumference, etc.)  ; see details below: */
                           /* #0: equipment ID / #2: equipment name / #10: default wheel circ. value / #21: user wheel circ. value / #254: local eqt idx */
-                case 148: /* segment description (undocumented) ; see details below: */
-                          /* #0: segment name */
-                case 149: /* segment reference cyclists (undocumented) ; see details below: */
-                          /* #1: who (0=leader, 1=user, 4=challenger)  / #3: timestamp / #4: time (s) / #254: idx */
+                case 148: /* segment description & metadata (undocumented) ; see details below: */
+                          /* #0: segment name (string) / #1: segment UID (string) / #2: unknown, seems to be always 2 (enum) / #3: unknown, seems to be always 1 (enum)
+                           / #4: exporting_user_id ? =user ID from connect ? (uint32) / #6: unknown, seems to be always 0 */
+                case 149: /* segment leaderboard (undocumented) ; see details below: */
+                          /* #1: who (0=segment leader, 1=personal best, 2=connection, 3=group leader, 4=challenger, 5+=H) 
+                           / #3: ID of source garmin connect activity (uint32) ? OR ? timestamp ? / #4: time to finish (ms) / #254: message counter idx */
                 case 150: /* segment trackpoint (undocumented) ; see details below: */
-                          /* #1: latitude / #2: longitude / #3: distance / #4: elevation / #5: timer (ms) / #6: index */
+                          /* #1: latitude / #2: longitude / #3: distance from start point / #4: elevation / #5: timer since start (ms) / #6: message counter index */
                     break;
 
                 default:
