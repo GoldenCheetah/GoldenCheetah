@@ -2390,6 +2390,7 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
 {
     // copy as current, so we can edit...
     metrics = _userMetrics;
+    b4.crc = RideMetric::userMetricFingerprint(metrics);
 
     table = new QTreeWidget;
     table->headerItem()->setText(0, tr("Symbol"));
@@ -2541,13 +2542,11 @@ CustomMetricsPage::editClicked()
 qint32
 CustomMetricsPage::saveClicked()
 {
-    bool changed = false;
-    if (metrics.count() != _userMetrics.count()) changed = true;
-    else {
-        for(int i=0; i<metrics.count(); i++)
-            if (metrics[i] != _userMetrics[i])
-                changed = true;
-    }
+    qint32 returning=0;
+
+    // did we actually change them ?
+    if (b4.crc != RideMetric::userMetricFingerprint(metrics))
+        returning |= CONFIG_USERMETRICS;
 
     // save away OUR version to top-level NOT athlete dir
     // and don't overwrite in memory version the signal handles that
@@ -2555,7 +2554,7 @@ CustomMetricsPage::saveClicked()
     UserMetricParser::serialize(filename, metrics);
 
     // the change will need to be signalled by context, not us
-    return changed ? CONFIG_USERMETRICS : 0;
+    return returning;
 }
 
 SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :

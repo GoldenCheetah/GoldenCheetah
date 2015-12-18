@@ -22,8 +22,12 @@
 #include "RideMetric.h"
 #include "UserMetricSettings.h"
 #include "UserMetricParser.h"
+
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
+#include <QMutex>
+
+static QList<Context*> _contexts;
 
 Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
 {
@@ -32,6 +36,14 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
     videosync = NULL;
     isfiltered = ishomefiltered = false;
     isCompareIntervals = isCompareDateRanges = false;
+
+    _contexts.append(this);
+}
+
+Context::~Context()
+{
+    int i=_contexts.indexOf(this);
+    if (i >= 0) _contexts.removeAt(i);
 }
 
 void 
@@ -99,7 +111,25 @@ Context::userMetricsConfigChanged()
         _userMetrics = handler.getSettings();
     }
 
-    // update metric factory XXX
-    // notify everyone XXX
-    // what about delete a metric thats in use!!! XXX XXX
+    // change the schema version
+    quint16 changed = RideMetric::userMetricFingerprint(_userMetrics);
+
+    if (UserMetricSchemaVersion != changed) {
+
+        // we'll fix it
+        UserMetricSchemaVersion = changed;
+
+        // update metric factory 
+        RideMetricFactory::instance().removeUserMetrics();
+    
+        // now add initial metrics -- what about multiple contexts (?) XXX
+        foreach(UserMetricSettings m, _userMetrics) {
+            RideMetricFactory::instance().addMetric(UserMetric(this, m));
+        }
+
+        // tell eveyone else to compute metrics...
+        foreach(Context *x, _contexts)
+            if (x != this)
+                x->notifyConfigChanged(CONFIG_USERMETRICS);
+    }
 }

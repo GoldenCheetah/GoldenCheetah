@@ -45,14 +45,14 @@
 RideItem::RideItem() 
     : 
     ride_(NULL), fileCache_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
-    color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) {
+    color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
     ride_(ride), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
-    color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) 
+    color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -61,7 +61,7 @@ RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context 
     :
     ride_(NULL), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), skipsave(false), path(path), 
     fileName(fileName), dateTime(dateTime), color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), 
-    metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) 
+    metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -71,7 +71,7 @@ RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context 
 RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
     :
     ride_(ride), fileCache_(NULL), context(context), isdirty(true), isstale(true), isedit(false), skipsave(false), dateTime(dateTime),
-    zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0)
+    zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0)
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -107,6 +107,7 @@ RideItem::setFrom(RideItem&here, bool temp) // used when loading cache/rideDB.js
     crc = here.crc;
 	timestamp = here.timestamp;
 	dbversion = here.dbversion;
+	udbversion = here.udbversion;
 	color = here.color;
 	present = here.present;
     isRun = here.isRun;
@@ -444,7 +445,7 @@ RideItem::checkStale()
     color = context->athlete->colorEngine->colorFor(getText(context->athlete->rideMetadata()->getColorField(), ""));
 
     // upgraded metrics
-    if (dbversion != DBSchemaVersion) {
+    if (udbversion != UserMetricSchemaVersion || dbversion != DBSchemaVersion) {
 
         isstale = true;
 
@@ -570,18 +571,18 @@ RideItem::refresh()
         // refresh metrics etc
         const RideMetricFactory &factory = RideMetricFactory::instance();
 
-        // we compute all with not specification (not an interval)
-        QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(this, Specification(), factory.allMetrics());
-
-
         // ressize and initialize so we can store metric values at
         // RideMetric::index offsets into the metrics_ qvector
         metrics_.fill(0, factory.metricCount());
+
+        // we compute all with not specification (not an interval)
+        QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(this, Specification(), factory.allMetrics());
 
         // snaffle away all the computed values into the array
         QHashIterator<QString, RideMetricPtr> i(computed);
         while (i.hasNext()) {
             i.next();
+            //DEBUG if (i.value()->isUser()) qDebug()<<dateTime.date()<<i.value()->symbol()<<i.value()->value();
             metrics_[i.value()->index()] = i.value()->value();
         }
 
@@ -602,6 +603,7 @@ RideItem::refresh()
                     + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 57).toInt(); // 57 does not include search for PEAKS
 
         dbversion = DBSchemaVersion;
+        udbversion = UserMetricSchemaVersion;
         timestamp = QDateTime::currentDateTime().toTime_t();
 
         // RideFile cache needs refreshing possibly
@@ -670,9 +672,9 @@ RideItem::getWeight(int type)
 double
 RideItem::getForSymbol(QString name, bool useMetricUnits)
 {
-    if (metrics_.size()) {
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    if (metrics_.size() && metrics_.size() == factory.metricCount()) {
         // return the precomputed metric value
-        const RideMetricFactory &factory = RideMetricFactory::instance();
         const RideMetric *m = factory.rideMetric(name);
         if (m) {
             if (useMetricUnits) return metrics_[m->index()];
@@ -691,9 +693,10 @@ RideItem::getStringForSymbol(QString name, bool useMetricUnits)
 {
     QString returning("-");
 
-    if (metrics_.size()) {
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    if (metrics_.size() && metrics_.size() == factory.metricCount()) {
+
         // return the precomputed metric value
-        const RideMetricFactory &factory = RideMetricFactory::instance();
         const RideMetric *m = factory.rideMetric(name);
         if (m) {
 

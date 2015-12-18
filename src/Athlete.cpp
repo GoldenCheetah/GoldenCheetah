@@ -557,7 +557,7 @@ Athlete::getPMCFor(QString metricName, int stsdays, int ltsdays)
 }
 
 PMCData *
-Athlete::getPMCFor(Leaf *expr, DataFilter *df, int stsdays, int ltsdays)
+Athlete::getPMCFor(Leaf *expr, DataFilterRuntime *df, int stsdays, int ltsdays)
 {
     PMCData *returning = NULL;
 

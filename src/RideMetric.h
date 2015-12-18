@@ -39,9 +39,14 @@ class RideMetric;
 class RideFile;
 class RideItem;
 class DataFilter;
+class DataFilterRuntime;
+class Leaf;
 
-extern int DBSchemaVersion; // moved from old DBAccess
+// keep track of schema changes
+extern int DBSchemaVersion;
 extern QList<UserMetricSettings> _userMetrics;
+extern quint16 UserMetricSchemaVersion;
+
 typedef QSharedPointer<RideMetric> RideMetricPtr;
 
 class RideMetric {
@@ -171,6 +176,10 @@ public:
     static QHash<QString,RideMetricPtr>
     computeMetrics(RideItem *item, Specification spec, const QStringList &metrics);
 
+    // generate a CRC based upon the user metric settings
+    // using the currently loaded _userMetrics
+    static quint16 userMetricFingerprint(QList<UserMetricSettings> these);
+
     // Initialisers for derived classes to setup basic data
     void setValue(double x) { value_ = x; }
     void setCount(double x) { count_ = x; }
@@ -278,6 +287,13 @@ public:
 
         // and we compile into this for runtime
         DataFilter *program;
+        Leaf *root;
+
+        // functions, to save lots of lookups
+        Leaf *finit, *frelevant, *fsample, *fvalue, *fcount;
+
+        // our runtime
+        DataFilterRuntime *rt;
 
         // true if we are a clone
         bool clone_;
@@ -336,6 +352,30 @@ class RideMetricFactory {
         assert(metrics.contains(symbol));
         checkDependencies();
         return metrics.value(symbol)->clone();
+    }
+
+    // clear out user metrics, we're readding them
+    void removeUserMetrics() {
+        int firstUser=-1;
+        for(int i=0; i<metricNames.count(); i++) {
+            RideMetric *m = metrics.value(metricNames[i], NULL);
+            if (m && m->isUser()) {
+                firstUser=i;
+                break;
+            }
+        }
+
+        // now delete
+        if (firstUser >0) {
+            while (firstUser < metricNames.count()) {
+                QString current = metricNames.at(firstUser);
+
+                metrics.remove(current);
+                dependencyMap.remove(current);
+                metricNames.removeAt(firstUser);
+                metricTypes.removeAt(firstUser);
+            }
+        }
     }
 
     bool addMetric(const RideMetric &metric,

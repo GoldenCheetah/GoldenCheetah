@@ -18,6 +18,7 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "Specification.h"
 #include "UserMetricSettings.h"
 #include "TimeUtils.h"
@@ -137,7 +138,21 @@ int DBSchemaVersion = 125;
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
 
+// user defined metrics are loaded by the ridecache on startup
+// and then reloaded by ridecache if they change
 QList<UserMetricSettings> _userMetrics;
+quint16 UserMetricSchemaVersion = 0;
+
+quint16
+RideMetric::userMetricFingerprint(QList<UserMetricSettings> these)
+{
+    // run through loaded metrics and compute a fingerprint CRC
+    QByteArray fingers;
+    foreach(UserMetricSettings x, these)
+        fingers += x.fingerprint.toLocal8Bit();
+
+    return qChecksum(fingers.constData(), fingers.size());
+}
 
 QHash<QString,RideMetricPtr>
 RideMetric::computeMetrics(RideItem *item, Specification spec, const QStringList &metrics)
@@ -149,6 +164,14 @@ RideMetric::computeMetrics(RideItem *item, Specification spec, const QStringList
     QHash<QString,RideMetric*> done;
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
+
+    // resize the metric array in the interval if needed
+    if (spec.interval() && spec.interval()->metrics().size() < factory.metricCount()) 
+        spec.interval()->metrics().resize(factory.metricCount());
+
+    // resize the metric array in the interval if needed
+    if (!spec.interval() && item->metrics().size() < factory.metricCount())
+        item->metrics().resize(factory.metricCount());
 
     // working through the todo list...
     while (!todo.isEmpty()) {
@@ -189,6 +212,12 @@ RideMetric::computeMetrics(RideItem *item, Specification spec, const QStringList
 
             // all computed add to the return list
             done.insert(symbol, m);
+
+            // put into value array too. user metrics will interrogate
+            // this for symbol values, rather than the metric pointer
+            if (spec.interval()) spec.interval()->metrics()[m->index()] = m->value();
+            else item->metrics()[m->index()] = m->value();
+
 
         } else {
 

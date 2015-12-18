@@ -70,6 +70,7 @@ class Context : public QObject
 
     public:
         Context(MainWindow *mainWindow);
+        ~Context();
 
         // mainwindow state
         int viewIndex;
