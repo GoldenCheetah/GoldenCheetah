@@ -327,7 +327,7 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
             QString sym = string.mid(symbolstart, i-symbolstart);
 
             bool found=false;
-            QString lookup = lookupMap.value(sym, "");
+            QString lookup = rt.lookupMap.value(sym, "");
             if (lookup == "") {
 
                 // isRun isa special, we may add more later (e.g. date)
@@ -349,7 +349,7 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
                 }
 
                 // ride sample symbol
-                if (dataSeriesSymbols.contains(sym)) found = true;
+                if (rt.dataSeriesSymbols.contains(sym)) found = true;
 
                 // still not found ?
                 // is it a function then ?
@@ -805,7 +805,7 @@ static bool isCoggan(QString symbol)
     return false;
 }
 
-bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
+bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
 {
     switch(leaf->type) {
     case Leaf::Compound : return true; // last statement is value of block
@@ -883,7 +883,7 @@ Q_UNUSED(leaf);
 #endif
 }
 
-void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
+void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 {
     leaf->inerror = false;
 
@@ -923,9 +923,9 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
     case Leaf::Vector :
         {
-            leaf->validateFilter(df, leaf->lvalue.l);
-            leaf->validateFilter(df, leaf->fparms[0]);
-            leaf->validateFilter(df, leaf->fparms[1]);
+            leaf->validateFilter(context, df, leaf->lvalue.l);
+            leaf->validateFilter(context, df, leaf->fparms[0]);
+            leaf->validateFilter(context, df, leaf->fparms[1]);
         }
         return;
 
@@ -971,8 +971,8 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                         // convert to int days since using current date range config
                         // should be able to get from parent somehow
                         leaf->type = Leaf::Integer;
-                        if (symbol == "start") leaf->lvalue.i = QDate(1900,01,01).daysTo(df->context->currentDateRange().from);
-                        else if (symbol == "stop") leaf->lvalue.i = QDate(1900,01,01).daysTo(df->context->currentDateRange().to);
+                        if (symbol == "start") leaf->lvalue.i = QDate(1900,01,01).daysTo(context->currentDateRange().from);
+                        else if (symbol == "stop") leaf->lvalue.i = QDate(1900,01,01).daysTo(context->currentDateRange().to);
                         else leaf->lvalue.i = 0;
                     }
                 }
@@ -1015,7 +1015,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     }
 
                     // still normal parm check !
-                    foreach(Leaf *p, leaf->fparms) validateFilter(df, p);
+                    foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
 
                 } else if (leaf->function == "isset" || leaf->function == "set" || leaf->function == "unset") {
 
@@ -1062,7 +1062,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     } else {
 
                         // still normal parm check !
-                        foreach(Leaf *p, leaf->fparms) validateFilter(df, p);
+                        foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
                     }
 
                 } else if (leaf->function == "estimate") {
@@ -1095,7 +1095,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                                     DataFiltererrors << QString(tr("estimate function expects parameter or duration as second parameter"));
                                 }
                             } else {
-                                validateFilter(df, leaf->fparms[1]);
+                                validateFilter(context, df, leaf->fparms[1]);
                             }
                         }
                     }
@@ -1103,7 +1103,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                 } else {
 
                     // normal parm check !
-                    foreach(Leaf *p, leaf->fparms) validateFilter(df, p);
+                    foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
                 }
 
                 // does it exist?
@@ -1164,7 +1164,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                 }
 
                 // and check the rhs is good too
-                validateFilter(df, leaf->rvalue.l);
+                validateFilter(context, df, leaf->rvalue.l);
 
             } else {
 
@@ -1183,25 +1183,25 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     leaf->inerror = true;
                 }
 
-                validateFilter(df, leaf->lvalue.l);
-                validateFilter(df, leaf->rvalue.l);
+                validateFilter(context, df, leaf->lvalue.l);
+                validateFilter(context, df, leaf->rvalue.l);
             }
         }
         break;
 
     case Leaf::Logical :
         {
-            validateFilter(df, leaf->lvalue.l);
-            if (leaf->op) validateFilter(df, leaf->rvalue.l);
+            validateFilter(context, df, leaf->lvalue.l);
+            if (leaf->op) validateFilter(context, df, leaf->rvalue.l);
         }
         break;
 
     case Leaf::Conditional :
         {
             // three expressions to validate
-            validateFilter(df, leaf->cond.l);
-            validateFilter(df, leaf->lvalue.l);
-            if (leaf->rvalue.l) validateFilter(df, leaf->rvalue.l);
+            validateFilter(context, df, leaf->cond.l);
+            validateFilter(context, df, leaf->lvalue.l);
+            if (leaf->rvalue.l) validateFilter(context, df, leaf->rvalue.l);
         }
         break;
 
@@ -1224,7 +1224,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
             // a list of statements, the last of which is what we
             // evaluate to for the purposes of filtering etc 
-            foreach(Leaf *p, *(leaf->lvalue.b)) validateFilter(df, p);
+            foreach(Leaf *p, *(leaf->lvalue.b)) validateFilter(context, df, p);
         }
         break;
 
@@ -1233,28 +1233,34 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
     }
 }
 
-DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), context(context), isdynamic(false), treeRoot(NULL)
+DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), context(context), treeRoot(NULL)
 {
+    // be sure not to enable this by accident!
+    rt.isdynamic = false;
+
     // set up the models we support
-    models << new CP2Model(context);
-    models << new CP3Model(context);
-    models << new MultiModel(context);
-    models << new ExtendedModel(context);
-    models << new WSModel(context);
+    rt.models << new CP2Model(context);
+    rt.models << new CP3Model(context);
+    rt.models << new MultiModel(context);
+    rt.models << new ExtendedModel(context);
+    rt.models << new WSModel(context);
 
     configChanged(CONFIG_FIELDS);
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(dynamicParse()));
 }
 
-DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QObject(parent), context(context), isdynamic(false), treeRoot(NULL)
+DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QObject(parent), context(context), treeRoot(NULL)
 {
+    // be sure not to enable this by accident!
+    rt.isdynamic = false;
+
     // set up the models we support
-    models << new CP2Model(context);
-    models << new CP3Model(context);
-    models << new MultiModel(context);
-    models << new ExtendedModel(context);
-    models << new WSModel(context);
+    rt.models << new CP2Model(context);
+    rt.models << new CP3Model(context);
+    rt.models << new MultiModel(context);
+    rt.models << new ExtendedModel(context);
+    rt.models << new WSModel(context);
 
     configChanged(CONFIG_FIELDS);
 
@@ -1269,7 +1275,7 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
 
     // if it parsed (syntax) then check logic (semantics)
     if (treeRoot && DataFiltererrors.count() == 0)
-        treeRoot->validateFilter(this, treeRoot);
+        treeRoot->validateFilter(context, &rt, treeRoot);
     else
         treeRoot=NULL;
 
@@ -1284,21 +1290,21 @@ Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
     if (!item || !treeRoot || DataFiltererrors.count()) return Result(0);
 
     // reset stack
-    stack = 0;
+    rt.stack = 0;
 
     Result res(0);
 
     // if we are a set of functions..
-    if (functions.count()) {
+    if (rt.functions.count()) {
 
         // ... start at main
-        if (functions.contains("main"))
-            res = treeRoot->eval(this, functions.value("main"), 0, item, p);
+        if (rt.functions.contains("main"))
+            res = treeRoot->eval(&rt, rt.functions.value("main"), 0, item, p);
 
     } else {
 
         // otherwise just evaluate the entire tree
-        res = treeRoot->eval(this, treeRoot, 0, item, p);
+        res = treeRoot->eval(&rt, treeRoot, 0, item, p);
     }
 
     return res;
@@ -1310,7 +1316,7 @@ QStringList DataFilter::check(QString query)
     setSignature(query);
 
     // remember where we apply
-    isdynamic=false;
+    rt.isdynamic=false;
 
     // Parse from string
     DataFiltererrors.clear(); // clear out old errors
@@ -1322,7 +1328,7 @@ QStringList DataFilter::check(QString query)
     treeRoot = DataFilterroot;
 
     // if it passed syntax lets check semantics
-    if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(this, treeRoot);
+    if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(context, &rt, treeRoot);
 
     // ok, did it pass all tests?
     if (!treeRoot || DataFiltererrors.count() > 0) { // nope
@@ -1340,9 +1346,9 @@ QStringList DataFilter::parseFilter(Context *context, QString query, QStringList
 {
     // remember where we apply
     this->list = list;
-    isdynamic=false;
-    snips.clear();
-    symbols.clear();
+    rt.isdynamic=false;
+    rt.snips.clear();
+    rt.symbols.clear();
 
     // regardless of fail/pass set the signature
     setSignature(query);
@@ -1363,7 +1369,7 @@ QStringList DataFilter::parseFilter(Context *context, QString query, QStringList
     treeRoot = DataFilterroot;
 
     // if it passed syntax lets check semantics
-    if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(this, treeRoot);
+    if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(context, &rt, treeRoot);
 
     // ok, did it pass all tests?
     if (!treeRoot || DataFiltererrors.count() > 0) { // nope
@@ -1377,7 +1383,7 @@ QStringList DataFilter::parseFilter(Context *context, QString query, QStringList
 
     } else { // yep! .. we have a winner!
 
-        isdynamic = treeRoot->isDynamic(treeRoot);
+        rt.isdynamic = treeRoot->isDynamic(treeRoot);
 
         // successfully parsed, lets check semantics
         //treeRoot->print(treeRoot);
@@ -1390,7 +1396,7 @@ QStringList DataFilter::parseFilter(Context *context, QString query, QStringList
         foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
             // evaluate each ride...
-            Result result = treeRoot->eval(this, treeRoot, 0, item, NULL);
+            Result result = treeRoot->eval(&rt, treeRoot, 0, item, NULL);
             if (result.isNumber && result.number) {
                 filenames << item->fileName;
             }
@@ -1406,7 +1412,7 @@ QStringList DataFilter::parseFilter(Context *context, QString query, QStringList
 void
 DataFilter::dynamicParse()
 {
-    if (isdynamic) {
+    if (rt.isdynamic) {
         // need to reapply on current state
 
         // clear current filter list
@@ -1416,7 +1422,7 @@ DataFilter::dynamicParse()
         foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
             // evaluate each ride...
-            Result result = treeRoot->eval(this, treeRoot, 0, item, NULL);
+            Result result = treeRoot->eval(&rt, treeRoot, 0, item, NULL);
             if (result.isNumber && result.number)
                 filenames << item->fileName;
         }
@@ -1431,14 +1437,14 @@ void DataFilter::clearFilter()
         treeRoot->clear(treeRoot);
         treeRoot = NULL;
     }
-    isdynamic = false;
+    rt.isdynamic = false;
     sig = "";
 }
 
 void DataFilter::configChanged(qint32)
 {
-    lookupMap.clear();
-    lookupType.clear();
+    rt.lookupMap.clear();
+    rt.lookupType.clear();
 
     // create lookup map from 'friendly name' to INTERNAL-name used in summaryMetrics
     // to enable a quick lookup && the lookup for the field type (number, text)
@@ -1447,8 +1453,8 @@ void DataFilter::configChanged(qint32)
         QString symbol = factory.metricName(i);
         QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
 
-        lookupMap.insert(name.replace(" ","_"), symbol);
-        lookupType.insert(name.replace(" ","_"), true);
+        rt.lookupMap.insert(name.replace(" ","_"), symbol);
+        rt.lookupType.insert(name.replace(" ","_"), true);
     }
 
     // now add the ride metadata fields -- should be the same generally
@@ -1460,19 +1466,19 @@ void DataFilter::configChanged(qint32)
                 underscored = context->specialFields.internalName(underscored);
                 field.name = context->specialFields.internalName((field.name));
 
-                lookupMap.insert(underscored.replace(" ","_"), field.name);
-                lookupType.insert(underscored.replace(" ","_"), (field.type > 2)); // true if is number
+                rt.lookupMap.insert(underscored.replace(" ","_"), field.name);
+                rt.lookupType.insert(underscored.replace(" ","_"), (field.type > 2)); // true if is number
             }
     }
 
     // sample date series
-    dataSeriesSymbols = RideFile::symbols();
+    rt.dataSeriesSymbols = RideFile::symbols();
 }
 
-Result Leaf::eval(DataFilter *df, Leaf *leaf, float x, RideItem *m, RideFilePoint *p)
+Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideFilePoint *p)
 {
     // if error state all bets are off
-    if (inerror) return Result(0);
+    //if (inerror) return Result(0);
 
     switch(leaf->type) {
 

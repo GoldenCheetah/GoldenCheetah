@@ -21,21 +21,43 @@
 #include "UserMetricSettings.h"
 #include "DataFilter.h"
 
-
 UserMetric::UserMetric(Context *context, UserMetricSettings settings)
-    : RideMetric(), settings(settings), program(NULL)
+    : RideMetric(), settings(settings)
 {
     // compile the program - built in a context that can close.
     program = new DataFilter(NULL, context, settings.program);
+    root = program->root();
+    rt = &program->rt;
+
+    // lookup functions we need
+    finit = rt->functions.contains("init") ? rt->functions.value("init") : NULL;
+    frelevant = rt->functions.contains("relevant") ? rt->functions.value("relevant") : NULL;
+    fsample = rt->functions.contains("sample") ? rt->functions.value("sample") : NULL;
+    fvalue = rt->functions.contains("value") ? rt->functions.value("value") : NULL;
+    fcount = rt->functions.contains("count") ? rt->functions.value("count") : NULL;
 
     // we're not a clone, we're the original
     clone_ = false;
 }
 
-UserMetric::UserMetric(const UserMetric *here)
+UserMetric::UserMetric(const UserMetric *from) : RideMetric()
 {
-    this->settings = here->settings;
-    this->program = here->program;
+    this->settings = from->settings;
+    this->program = from->program;
+
+    this->root = from->program->root();
+    this->finit = from->finit;
+    this->frelevant = from->frelevant;
+    this->fsample = from->fsample;
+    this->fvalue = from->fvalue;
+    this->fcount = from->fcount;
+
+    this->index_ = from->index_;
+
+    rt = new DataFilterRuntime;
+
+    // and copy it in an atomic operation
+    *rt = *from->rt;
 
     // we are being cloned
     clone_ = true;
@@ -44,6 +66,7 @@ UserMetric::UserMetric(const UserMetric *here)
 UserMetric::~UserMetric()
 {
     if (!clone_ && program) delete program;
+    if (clone_) delete rt;
 }
 
 RideMetric *
@@ -147,9 +170,9 @@ UserMetric::aggregateZero() const
 bool
 UserMetric::isRelevantForRide(const RideItem *item) const
 {
-    if (item->context && program->root()) {
-        if (program->functions.contains("relevant")) {
-            Result res = program->root()->eval(program, program->functions.value("relevant"), 0, const_cast<RideItem*>(item), NULL);
+    if (item->context && root) {
+        if (frelevant) {
+            Result res = root->eval(rt, frelevant, 0, const_cast<RideItem*>(item), NULL);
             return res.number;
         } else
             return true;
@@ -164,45 +187,51 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
     QTime timer;
     timer.start();
 
-qDebug()<<"INIT";
-    // always init first
-    if (program->functions.contains("init"))
-            program->root()->eval(program, program->functions.value("init"), 0, const_cast<RideItem*>(item), NULL);
-
-qDebug()<<"CHECK";
-    // can it provide a value and is it relevant ?
-    if (!program->functions.contains("value") || !isRelevantForRide(item)) {
+    //qDebug()<<"CODE";
+    if (!root) {
         setValue(RideFile::NIL);
         setCount(0);
         return;
     }
 
-qDebug()<<"SAMPLE";
+    //qDebug()<<"INIT";
+    // always init first
+    if (finit) root->eval(rt, finit, 0, const_cast<RideItem*>(item), NULL);
+
+    //qDebug()<<"CHECK";
+    // can it provide a value and is it relevant ?
+    if (!fvalue || !isRelevantForRide(item)) {
+        setValue(RideFile::NIL);
+        setCount(0);
+        return;
+    }
+
+    //qDebug()<<"SAMPLE";
     // process samples, if there are any and a function exists
-    if (!spec.isEmpty(item->ride()) && program->functions.contains("sample")) {
+    if (!spec.isEmpty(item->ride()) && fsample) {
         RideFileIterator it(item->ride(), spec);
 
         while(it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            program->root()->eval(program, program->functions.value("sample"), 0, const_cast<RideItem*>(item), point);
+            root->eval(rt, fsample, 0, const_cast<RideItem*>(item), point);
         }
     }
 
-qDebug()<<"VALUE";
+    //qDebug()<<"VALUE";
     // value ?
-    if (program->functions.contains("value")) {
-        Result v = program->root()->eval(program, program->functions.value("value"), 0, const_cast<RideItem*>(item), NULL);
+    if (fvalue) {
+        Result v = root->eval(rt, fvalue, 0, const_cast<RideItem*>(item), NULL);
         setValue(v.number);
     }
 
-qDebug()<<"COUNT";
+    //qDebug()<<"COUNT";
     // count?
-    if (program->functions.contains("count")) {
-        Result c = program->root()->eval(program, program->functions.value("count"), 0, const_cast<RideItem*>(item), NULL);
+    if (fcount) {
+        Result c = root->eval(rt, fcount, 0, const_cast<RideItem*>(item), NULL);
         setCount(c.number);
     }
 
-qDebug()<<"ELAPSED="<<timer.elapsed()<<"ms";
+    //qDebug()<<symbol()<<index_<<value_<<"ELAPSED="<<timer.elapsed()<<"ms";
 }
 
 

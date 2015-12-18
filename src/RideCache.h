@@ -54,7 +54,6 @@ class RideCache : public QObject
         // table models
         RideCacheModel *model() { return model_; }
 
-
         // query the cache
         int count() const { return rides_.count(); }
         RideItem *getRide(QString filename);

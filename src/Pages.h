@@ -406,6 +406,10 @@ class CustomMetricsPage : public QWidget
                     *editButton;
         QTreeWidget *table;
         QList<UserMetricSettings> metrics;
+
+        struct {
+            quint16 crc;
+        } b4;
 };
 
 class IntervalMetricsPage : public QWidget

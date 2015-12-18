@@ -136,6 +136,7 @@ class RideItem : public QObject
         unsigned long fingerprint; // zones
         unsigned long metacrc, crc, timestamp; // file content
         int dbversion; // metric version
+        int udbversion; // user metric version
         double weight; // what weight was used ?
 
         // access to the cached data !

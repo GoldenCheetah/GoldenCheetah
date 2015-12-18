@@ -35,13 +35,6 @@
 #include "httprequesthandler.h"
 #endif
 
-// we initialise the global user metrics
-#include "RideMetric.h"
-#include "UserMetricSettings.h"
-#include "UserMetricParser.h"
-#include <QXmlInputSource>
-#include <QXmlSimpleReader>
-
 #include <signal.h>
 
 // redirect errors to `home'/goldencheetah.log
@@ -316,29 +309,6 @@ main(int argc, char *argv[])
         QTranslator gcTranslator;
         gcTranslator.load(":translations/gc_" + lang.toString() + ".qm");
         application->installTranslator(&gcTranslator);
-
-        // initial load of user defined metrics
-        QString metrics = QString("%1/usermetrics.xml").arg(home.absolutePath());
-        if (QFile(metrics).exists()) {
-
-            QFile metricfile(metrics);
-            QXmlInputSource source(&metricfile);
-            QXmlSimpleReader xmlReader;
-            UserMetricParser handler;
-
-            xmlReader.setContentHandler(&handler);
-            xmlReader.setErrorHandler(&handler);
-
-            // parse and get return values
-            xmlReader.parse(source);
-            _userMetrics = handler.getSettings();
-
-#if 0 //XXX not yet .. next commit needs to fixup UserMetric methods etc
-            // now add initial metrics
-            foreach(UserMetricSettings m, _userMetrics)
-                RideMetricFactory::instance().addMetric(UserMetric(m));
-#endif
-        }
 
         // Initialize metrics once the translator is installed
         RideMetricFactory::instance().initialize();

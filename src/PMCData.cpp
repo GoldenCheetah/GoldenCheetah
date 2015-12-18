@@ -64,7 +64,7 @@ PMCData::PMCData(Context *context, Specification spec, QString metricName, int s
     connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(invalidate()));
 }
 
-PMCData::PMCData(Context *context, Specification spec, Leaf *expr, DataFilter *df, int stsDays, int ltsDays) 
+PMCData::PMCData(Context *context, Specification spec, Leaf *expr, DataFilterRuntime *df, int stsDays, int ltsDays) 
     : context(context), specification_(spec), metricName_(""), stsDays_(stsDays), ltsDays_(ltsDays), isstale(true)
 {
     // get defaults if not passed

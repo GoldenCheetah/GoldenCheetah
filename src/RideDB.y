@@ -131,6 +131,7 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "metacrc") jc->item.metacrc = $3.toULongLong();
                                                                      else if ($1 == "timestamp") jc->item.timestamp = $3.toULongLong();
                                                                      else if ($1 == "dbversion") jc->item.dbversion = $3.toInt();
+                                                                     else if ($1 == "udbversion") jc->item.udbversion = $3.toInt();
                                                                      else if ($1 == "color") jc->item.color = QColor($3);
                                                                      else if ($1 == "isRun") jc->item.isRun = $3.toInt();
                                                                      else if ($1 == "isSwim") jc->item.isSwim = $3.toInt();
@@ -348,6 +349,7 @@ void RideCache::save()
             stream << "\t\t\"metacrc\":\"" <<item->metacrc <<"\",\n";
             stream << "\t\t\"timestamp\":\"" <<item->timestamp <<"\",\n";
             stream << "\t\t\"dbversion\":\"" <<item->dbversion <<"\",\n";
+            stream << "\t\t\"udbversion\":\"" <<item->udbversion <<"\",\n";
             stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
             stream << "\t\t\"present\":\"" <<item->present <<"\",\n";
             stream << "\t\t\"isRun\":\"" <<item->isRun <<"\",\n";

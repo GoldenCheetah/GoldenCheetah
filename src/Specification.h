@@ -91,6 +91,9 @@ class Specification
         // would it yield no data points for this ride ?
         bool isEmpty(RideFile *);
 
+        // non-null if exists
+        IntervalItem *interval() { return it; }
+
         // set criteria
         void setDateRange(DateRange dr);
         void setFilterSet(FilterSet fs);

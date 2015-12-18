@@ -90,12 +90,14 @@ IntervalItem::refresh()
     RideFile *f = rideItem_->ride_;
     if (!f) return;
 
-    // ok, lets collect the metrics
+    // metrics
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(rideItem_, Specification(this, f->recIntSecs()), factory.allMetrics());
 
-    // pack the metrics away and clean up if needed
+    // resize and set to zero
     metrics_.fill(0, factory.metricCount());
+
+    // ok, lets collect the metrics
+    QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(rideItem_, Specification(this, f->recIntSecs()), factory.allMetrics());
 
     // snaffle away all the computed values into the array
     QHashIterator<QString, RideMetricPtr> i(computed);
@@ -114,9 +116,10 @@ IntervalItem::refresh()
 double
 IntervalItem::getForSymbol(QString name, bool useMetricUnits)
 {
-    if (metrics_.size()) {
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    if (metrics_.size() && metrics_.size() == factory.metricCount()) {
+
         // return the precomputed metric value
-        const RideMetricFactory &factory = RideMetricFactory::instance();
         const RideMetric *m = factory.rideMetric(name);
         if (m) {
             if (useMetricUnits) return metrics_[m->index()];
@@ -135,9 +138,10 @@ IntervalItem::getStringForSymbol(QString name, bool useMetricUnits)
 {
     QString returning("-");
 
-    if (metrics_.size()) {
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    if (metrics_.size() && metrics_.size() == factory.metricCount()) {
+
         // return the precomputed metric value
-        const RideMetricFactory &factory = RideMetricFactory::instance();
         const RideMetric *m = factory.rideMetric(name);
         if (m) {
 

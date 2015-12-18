@@ -36,6 +36,13 @@
 #include "unistd.h"
 #endif
 
+// we initialise the global user metrics
+#include "RideMetric.h"
+#include "UserMetricSettings.h"
+#include "UserMetricParser.h"
+#include <QXmlInputSource>
+#include <QXmlSimpleReader>
+
 // for sorting
 bool rideCacheGreaterThan(const RideItem *a, const RideItem *b) { return a->dateTime > b->dateTime; }
 bool rideCacheLessThan(const RideItem *a, const RideItem *b) { return a->dateTime < b->dateTime; }
@@ -44,6 +51,35 @@ RideCache::RideCache(Context *context) : context(context)
 {
     progress_ = 100;
     exiting = false;
+
+    // initial load of user defined metrics - do once we have an initial context
+    // but before we refresh or check metrics for the first time
+    if (UserMetricSchemaVersion == 0) {
+
+        QString metrics = QString("%1/../usermetrics.xml").arg(context->athlete->home->root().absolutePath());
+        if (QFile(metrics).exists()) {
+
+            QFile metricfile(metrics);
+            QXmlInputSource source(&metricfile);
+            QXmlSimpleReader xmlReader;
+            UserMetricParser handler;
+
+            xmlReader.setContentHandler(&handler);
+            xmlReader.setErrorHandler(&handler);
+
+            // parse and get return values
+            xmlReader.parse(source);
+            _userMetrics = handler.getSettings();
+
+            // reset schema version
+            UserMetricSchemaVersion = RideMetric::userMetricFingerprint(_userMetrics);
+
+            // now add initial metrics
+            foreach(UserMetricSettings m, _userMetrics) {
+                RideMetricFactory::instance().addMetric(UserMetric(context, m));
+            }
+        }
+    }
 
     // set the list
     // populate ride list
@@ -124,7 +160,7 @@ RideCache::configChanged(qint32 what)
 
     // if zones or weight has changed refresh metrics
     // will add more as they come
-    qint32 want = CONFIG_ATHLETE | CONFIG_ZONES | CONFIG_NOTECOLOR | CONFIG_DISCOVERY | CONFIG_GENERAL;
+    qint32 want = CONFIG_ATHLETE | CONFIG_ZONES | CONFIG_NOTECOLOR | CONFIG_DISCOVERY | CONFIG_GENERAL | CONFIG_USERMETRICS;
     if (what & want) {
 
         // restart !
@@ -452,6 +488,7 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
         }
 
         switch (metric->type()) {
+        case RideMetric::RunningTotal:
         case RideMetric::Total:
             rvalue += value;
             break;
