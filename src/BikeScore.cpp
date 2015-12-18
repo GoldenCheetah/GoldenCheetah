@@ -168,12 +168,12 @@ class RelativeIntensity : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
-        if (item->context->athlete->zones() && item->zoneRange >= 0) {
+        if (item->context->athlete->zones(item->isRun) && item->zoneRange >= 0) {
             assert(deps.contains("skiba_xpower"));
             XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
             assert(xp);
             int cp = item->getText("CP","0").toInt();
-            reli = xp->value(true) / (cp ? cp : item->context->athlete->zones()->getCP(item->zoneRange));
+            reli = xp->value(true) / (cp ? cp : item->context->athlete->zones(item->isRun)->getCP(item->zoneRange));
             secs = xp->count();
         }
         setValue(reli);
@@ -210,8 +210,8 @@ class CriticalPower : public RideMetric {
 
         // not overriden so use the set value
         // if it has been set at all
-        if (!cp && item->context->athlete->zones() && item->zoneRange >= 0) 
-            cp = item->context->athlete->zones()->getCP(item->zoneRange);
+        if (!cp && item->context->athlete->zones(item->isRun) && item->zoneRange >= 0) 
+            cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
         
         setValue(cp);
     }
@@ -239,7 +239,7 @@ class aTISS : public RideMetric {
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-	    if (!item->context->athlete->zones() || item->zoneRange < 0) return;
+	    if (!item->context->athlete->zones(item->isRun) || item->zoneRange < 0) return;
 
         // no ride or no samples
         if (spec.isEmpty(item->ride())) {
@@ -255,7 +255,7 @@ class aTISS : public RideMetric {
         double aTISS = 0.0f;
 
         int cp = item->getText("CP","0").toInt();
-        if (!cp) cp = item->context->athlete->zones()->getCP(item->zoneRange);
+        if (!cp) cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
 
         if (cp && item->ride()->areDataPresent()->watts) {
 
@@ -300,7 +300,7 @@ class anTISS : public RideMetric {
             return;
         }
 
-	    if (!item->context->athlete->zones() || item->zoneRange < 0) return;
+	    if (!item->context->athlete->zones(item->isRun) || item->zoneRange < 0) return;
 
         // anTISS - Aerobic Training Impact Scoring System
         static const double a = 0.238923886004611f;
@@ -310,7 +310,7 @@ class anTISS : public RideMetric {
         double anTISS = 0.0f;
 
         int cp = item->getText("CP","0").toInt();
-        if (!cp) cp = item->context->athlete->zones()->getCP(item->zoneRange);
+        if (!cp) cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
 
         if (cp && item->ride()->areDataPresent()->watts) {
             RideFileIterator it(item->ride(), spec);
@@ -349,7 +349,7 @@ class dTISS : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
-	    if (!item->context->athlete->zones() || item->zoneRange < 0) return;
+	    if (!item->context->athlete->zones(item->isRun) || item->zoneRange < 0) return;
 
         assert(deps.contains("atiss_score"));
         assert(deps.contains("antiss_score"));
@@ -386,7 +386,7 @@ class BikeScore : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no zones
-        if (item->context->athlete->zones()==NULL || item->zoneRange < 0) {
+        if (item->context->athlete->zones(item->isRun)==NULL || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -400,7 +400,7 @@ class BikeScore : public RideMetric {
         double normWork = xp->value(true) * xp->count();
         double rawBikeScore = normWork * ri->value(true);
         int cp = item->getText("CP","0").toInt();
-        double workInAnHourAtCP = (cp ? cp : item->context->athlete->zones()->getCP(item->zoneRange)) * 3600;
+        double workInAnHourAtCP = (cp ? cp : item->context->athlete->zones(item->isRun)->getCP(item->zoneRange)) * 3600;
         score = rawBikeScore / workInAnHourAtCP * 100.0;
 
         setValue(score);

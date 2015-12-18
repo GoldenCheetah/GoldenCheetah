@@ -89,11 +89,11 @@ BingMap::rideSelected()
     range=-1;
     rideCP=300;
 
-    if (context->athlete->zones()) {
+    if (context->athlete->zones(ride->isRun)) {
 
         // get the right range and CP
-        range = context->athlete->zones()->whichRange(ride->dateTime.date());
-        if (range >= 0) rideCP = context->athlete->zones()->getCP(range);
+        range = context->athlete->zones(ride->isRun)->whichRange(ride->dateTime.date());
+        if (range >= 0) rideCP = context->athlete->zones(ride->isRun)->getCP(range);
     }
 
     loadRide();
@@ -292,7 +292,7 @@ void BingMap::createHtml()
 QColor BingMap::GetColor(int watts)
 {
     if (range < 0) return Qt::red;
-    else return zoneColor(context->athlete->zones()->whichZone(range, watts), 7);
+    else return zoneColor(context->athlete->zones(myRideItem ? myRideItem->isRun : false)->whichZone(range, watts), 7);
 }
 
 // create the ride line

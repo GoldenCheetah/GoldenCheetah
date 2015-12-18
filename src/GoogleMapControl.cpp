@@ -130,9 +130,9 @@ GoogleMapControl::rideSelected()
     rideCP = 300;
     stale = false;
 
-    if (context->athlete->zones()) {
-        range = context->athlete->zones()->whichRange(ride->dateTime.date());
-        if (range >= 0) rideCP = context->athlete->zones()->getCP(range);
+    if (context->athlete->zones(ride->isRun)) {
+        range = context->athlete->zones(ride->isRun)->whichRange(ride->dateTime.date());
+        if (range >= 0) rideCP = context->athlete->zones(ride->isRun)->getCP(range);
     }
 
     loadRide();
@@ -352,7 +352,7 @@ void GoogleMapControl::createHtml()
 QColor GoogleMapControl::GetColor(int watts)
 {
     if (range < 0) return Qt::red;
-    else return zoneColor(context->athlete->zones()->whichZone(range, watts), 7);
+    else return zoneColor(context->athlete->zones(myRideItem ? myRideItem->isRun : false)->whichZone(range, watts), 7);
 }
 
 // create the ride line

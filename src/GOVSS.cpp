@@ -274,7 +274,7 @@ class RTP : public RideMetric {
         double weight = item->ride()->getWeight();
         double height = item->ride()->getHeight();
         
-        const PaceZones *zones = item->context->athlete->paceZones();
+        const PaceZones *zones = item->context->athlete->paceZones(false);
         int zoneRange = item->paceZoneRange;
 
         // did user override for this ride?

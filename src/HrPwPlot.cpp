@@ -592,7 +592,7 @@ class HrPwPlotBackground: public QwtPlotItem
                 return;
 
             int zone_range = -1;
-            const Zones *zones = parent->context->athlete->zones();
+            const Zones *zones = parent->context->athlete->zones(rideItem->isRun);
             if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
             if (parent->isShadeZones() && zones && (zone_range >= 0)) {
@@ -641,7 +641,7 @@ class HrPwPlotZoneLabel: public QwtPlotItem
                 return;
 
             int zone_range = -1;
-            const Zones *zones = parent->context->athlete->zones();
+            const Zones *zones = parent->context->athlete->zones(rideItem->isRun);
             if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
             // create new zone labels if we're shading
@@ -717,10 +717,10 @@ HrPwPlot::refreshZoneLabels() {
         bg = NULL;
     }
 
-    if (rideItem && context->athlete->zones()) {
+    if (rideItem && context->athlete->zones(rideItem->isRun)) {
 
         int zone_range = -1;
-        const Zones *zones = context->athlete->zones();
+        const Zones *zones = context->athlete->zones(rideItem->isRun);
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
         // generate labels for existing zones

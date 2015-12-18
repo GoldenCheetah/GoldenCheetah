@@ -166,12 +166,12 @@ class aRelativeIntensity : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
-        if (item->context->athlete->zones() && item->zoneRange >= 0) {
+        if (item->context->athlete->zones(item->isRun) && item->zoneRange >= 0) {
             assert(deps.contains("a_skiba_xpower"));
             aXPower *xp = dynamic_cast<aXPower*>(deps.value("a_skiba_xpower"));
             assert(xp);
             int cp = item->getText("CP","0").toInt();
-            reli = xp->value(true) / (cp ? cp : item->context->athlete->zones()->getCP(item->zoneRange));
+            reli = xp->value(true) / (cp ? cp : item->context->athlete->zones(item->isRun)->getCP(item->zoneRange));
             secs = xp->count();
         }
         setValue(reli);
@@ -201,7 +201,7 @@ class aBikeScore : public RideMetric {
 
    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
-        if (!item->context->athlete->zones() || item->zoneRange < 0) {
+        if (!item->context->athlete->zones(item->isRun) || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -215,7 +215,7 @@ class aBikeScore : public RideMetric {
         double normWork = xp->value(true) * xp->count();
         double rawBikeScore = normWork * ri->value(true);
         int cp = item->getText("CP","0").toInt();
-        double workInAnHourAtCP = (cp ? cp : item->context->athlete->zones()->getCP(item->zoneRange)) * 3600;
+        double workInAnHourAtCP = (cp ? cp : item->context->athlete->zones(item->isRun)->getCP(item->zoneRange)) * 3600;
         score = rawBikeScore / workInAnHourAtCP * 100.0;
 
         setValue(score);

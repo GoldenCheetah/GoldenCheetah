@@ -354,7 +354,7 @@ void AbsWattagePage::updateMetrics()
     metrics.append("skiba_xpower");
 
 #if 0 //XXX REFACTOR METRICS
-    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(),hackContext->athlete->hrZones(),metrics);
+    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(false),hackContext->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
 #endif
 }
@@ -408,8 +408,8 @@ RelWattagePage::RelWattagePage(QWidget *parent) : WorkoutPage(parent) {}
 
 void RelWattagePage::initializePage()
 {
-    int zoneRange = hackContext->athlete->zones()->whichRange(QDate::currentDate());
-    ftp = hackContext->athlete->zones()->getCP(zoneRange);
+    int zoneRange = hackContext->athlete->zones(false)->whichRange(QDate::currentDate());
+    ftp = hackContext->athlete->zones(false)->getCP(zoneRange);
 
     setTitle(tr("Workout Wizard"));
     QString subTitle = tr("Relative Wattage Workout Wizard, current CP60 = ") + QString::number(ftp);
@@ -490,7 +490,7 @@ void RelWattagePage::updateMetrics()
     metrics.append("skiba_bike_score");
     metrics.append("skiba_xpower");
 #if 0 //XXX REFACTOR METRICS
-    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(),hackContext->athlete->hrZones(),metrics);
+    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(false),hackContext->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
 #endif
 }
@@ -543,8 +543,8 @@ GradientPage::GradientPage(QWidget *parent) : WorkoutPage(parent) {}
 
 void GradientPage::initializePage()
 {
-    int zoneRange = hackContext->athlete->zones()->whichRange(QDate::currentDate());
-    ftp = hackContext->athlete->zones()->getCP(zoneRange);
+    int zoneRange = hackContext->athlete->zones(false)->whichRange(QDate::currentDate());
+    ftp = hackContext->athlete->zones(false)->getCP(zoneRange);
     metricUnits = hackContext->athlete->useMetricUnits;
     setTitle(tr("Workout Wizard"));
 
