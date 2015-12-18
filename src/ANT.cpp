@@ -311,6 +311,9 @@ void ANT::refreshFecGradient()
 
 void ANT::requestFecCapabilities()
 {
+    if (fecChannel == -1)
+        return;
+
     sendMessage(ANTMessage::fecRequestCapabilities(fecChannel));
 }
 
