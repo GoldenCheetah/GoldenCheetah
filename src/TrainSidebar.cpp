@@ -308,7 +308,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     intensitySlider->setValue(100);
     slideLayout->addStretch();
     slideLayout->addWidget(intensitySlider);
-intensitySlider->hide(); //XXX!!! temporary
+    intensitySlider->hide(); // FIXME: XXX!!! temporary
 
 #ifdef Q_OS_MAC
 #if QT_VERSION > 0x5000
