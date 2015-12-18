@@ -3553,8 +3553,8 @@ class LTMPlotBackground: public QwtPlotItem
                       const QwtScaleMap &xMap, const QwtScaleMap &yMap,
                       const QRectF &rect) const
     {
-        const Zones *zones       = parent->parent->context->athlete->zones();
-        int zone_range_size     = parent->parent->context->athlete->zones()->getRangeSize();
+        const Zones *zones       = parent->parent->context->athlete->zones(false);
+        int zone_range_size     = parent->parent->context->athlete->zones(false)->getRangeSize();
 
         if (zone_range_size >= 0) { //parent->shadeZones() &&
             for (int i = 0; i < zone_range_size; i ++) {
@@ -3610,7 +3610,7 @@ class LTMPlotZoneLabel: public QwtPlotItem
             parent = _parent;
             zone_number = _zone_number;
 
-            const Zones *zones       = parent->parent->context->athlete->zones();
+            const Zones *zones       = parent->parent->context->athlete->zones(false);
             int zone_range     = zones->whichRange(settings->start.addDays((settings->end.date().toJulianDay()-settings->start.date().toJulianDay())/2).date());
 
             // which axis has watts?
@@ -3737,7 +3737,7 @@ void LTMPlot::refreshZoneLabels(QwtAxisId axisid)
     }
     if (axisid == QwtAxisId(-1,-1)) return; // our job is done - no zones to plot
 
-    const Zones *zones       = context->athlete->zones();
+    const Zones *zones       = context->athlete->zones(false);
 
     if (zones == NULL || zones->getRangeSize()==0) return; // no zones to plot
 

@@ -53,7 +53,7 @@ class ZoneTime : public RideMetric {
 
         // no ride or no samples
         if (spec.isEmpty(item->ride()) ||
-            item->context->athlete->zones() == NULL || item->zoneRange < 0 ||
+            item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0 ||
             !item->ride()->areDataPresent()->watts) {
             setValue(RideFile::NIL);
             setCount(0);
@@ -66,7 +66,7 @@ class ZoneTime : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (item->context->athlete->zones()->whichZone(item->zoneRange, point->watts) == level)
+            if (item->context->athlete->zones(item->isRun)->whichZone(item->zoneRange, point->watts) == level)
                 seconds += item->ride()->recIntSecs();
         }
         setValue(seconds);
