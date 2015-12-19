@@ -69,13 +69,13 @@ int DataFiltercolumn = 1;
 [Ee][Nn][Dd][Ss][Ww][Ii][Tt][Hh]            DataFilterlval.op = ENDSWITH; return ENDSWITH;
 [Cc][Oo][Nn][Tt][Aa][Ii][Nn][Ss]            DataFilterlval.op = CONTAINS; return CONTAINS;
 
-                                           /* functions identified by name in the lexer is probably
+                                            /* functions identified by name in the lexer is probably
                                               going to limit us in the future */
-[Bb][Ee][Ss][Tt]                           strcpy(DataFilterlval.function, "best"); return BEST;
-[Tt][Ii][Zz]                               strcpy(DataFilterlval.function, "tiz"); return TIZ;
-[Cc][Oo][Nn][Ff][Ii][Gg]                   strcpy(DataFilterlval.function, "config"); return CONFIG;
-[Dd][Aa][Tt][Ee][Rr][Aa][Nn][Gg][Ee]       strcpy(DataFilterlval.function, "daterange"); return DATERANGE;
-[Cc][Oo][Nn][Ss][Tt]                       strcpy(DataFilterlval.function, "const"); return CONST_;
+[Bb][Ee][Ss][Tt]                            strcpy(DataFilterlval.function, "best"); return BEST;
+[Tt][Ii][Zz]                                strcpy(DataFilterlval.function, "tiz"); return TIZ;
+[Cc][Oo][Nn][Ff][Ii][Gg]                    strcpy(DataFilterlval.function, "config"); return CONFIG;
+[Dd][Aa][Tt][Ee][Rr][Aa][Nn][Gg][Ee]        strcpy(DataFilterlval.function, "daterange"); return DATERANGE;
+[Cc][Oo][Nn][Ss][Tt]                        strcpy(DataFilterlval.function, "const"); return CONST_;
 
 "&&"                                        DataFilterlval.op = AND; return AND;
 [Aa][nN][Dd]                                DataFilterlval.op = AND; return AND;
@@ -83,9 +83,9 @@ int DataFiltercolumn = 1;
 [Oo][Rr]                                    DataFilterlval.op = OR; return OR;
 
 
-[0-9]+                                 return DF_INTEGER;
-[0-9]+e-[0-9]+                         return DF_FLOAT;
-[0-9]+\.[-e0-9]*                       return DF_FLOAT;
+[0-9]+                                      return DF_INTEGER;
+[0-9]+e-[0-9]+                              return DF_FLOAT;
+[0-9]+\.[-e0-9]*                            return DF_FLOAT;
 \"([^\"]|\\\")*\"                           return DF_STRING;  /* contains non-quotes or escaped-quotes */
 
 
@@ -113,7 +113,8 @@ int DataFiltercolumn = 1;
 "#"[^\r\n]*                                 ; /* ignore single-line comments */
 [ \n\t\r]                                   ; /* we just ignore whitespace */
 
-.                   return DataFiltertext[0]; /* any other character, typically :, { or } */
+                                            /* any other character, typically :, { or } */
+.                                           return DataFiltertext[0];
 %%
 
 // Older versions of flex (prior to 2.5.9) do not have the destroy function
