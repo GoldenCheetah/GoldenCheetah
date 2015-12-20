@@ -169,7 +169,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // now most dependencies are in get cache
     rideCache = new RideCache(context);
-    plannedCache = new RideCache(context, true);
 
     // Downloaders
     withingsDownload = new WithingsDownload(context);
@@ -214,7 +213,6 @@ Athlete::~Athlete()
 {
     // close the ride cache down first
     delete rideCache;
-    delete plannedCache;
 
     // save those preset charts
     LTMSettings reader;
@@ -260,9 +258,9 @@ void Athlete::selectRideFile(QString fileName)
 }
 
 void
-Athlete::addRide(QString name, bool dosignal, bool useTempActivities)
+Athlete::addRide(QString name, bool dosignal, bool planned, bool useTempActivities)
 {
-    rideCache->addRide(name, dosignal, useTempActivities);
+    rideCache->addRide(name, dosignal, planned, useTempActivities);
 }
 
 void

@@ -235,14 +235,12 @@ string: STRING                                               { jc->JsonString = 
 
 
 void 
-RideCache::load(bool planned)
+RideCache::load()
 {
     // only load if it exists !
-    QFile rideDB(QString("%1/%2").arg(context->athlete->home->cache().canonicalPath()).arg(planned?"plannedRideDB.json":"rideDB.json"));
+    QFile rideDB(QString("%1/%2").arg(context->athlete->home->cache().canonicalPath()).arg("rideDB.json"));
     if (rideDB.exists() && rideDB.open(QFile::ReadOnly)) {
         QDir directory = context->athlete->home->activities();
-        if (planned)
-            directory = context->athlete->home->planned();
 
         // ok, lets read it in
         QTextStream stream(&rideDB);
@@ -311,11 +309,11 @@ static QString protect(const QString string)
 }
 
 // save cache to disk, "cache/rideDB.json"
-void RideCache::save(bool planned)
+void RideCache::save()
 {
 
     // now save data away
-    QFile rideDB(QString("%1/%2").arg(context->athlete->home->cache().canonicalPath()).arg(planned?"plannedRideDB.json":"rideDB.json"));
+    QFile rideDB(QString("%1/%2").arg(context->athlete->home->cache().canonicalPath()).arg("rideDB.json"));
     if (rideDB.open(QFile::WriteOnly)) {
 
         const RideMetricFactory &factory = RideMetricFactory::instance();

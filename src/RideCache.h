@@ -48,7 +48,7 @@ class RideCache : public QObject
 
     public:
 
-        RideCache(Context *context, bool planned = false);
+        RideCache(Context *context);
         ~RideCache();
 
         // table models
@@ -81,7 +81,7 @@ class RideCache : public QObject
 	    QVector<RideItem*>&rides() { return rides_; } 
 
         // add/remove a ride to the list
-        void addRide(QString name, bool dosignal, bool useTempActivities);
+        void addRide(QString name, bool dosignal, bool planned, bool useTempActivities);
         void removeCurrentRide();
 
         // export metrics in CSV format
@@ -97,8 +97,8 @@ class RideCache : public QObject
     public slots:
 
         // restore / dump cache to disk (json)
-        void load(bool planned = false);
-        void save(bool planned = false);
+        void load();
+        void save();
 
         // user updated options/preferences
         void configChanged(qint32);
@@ -127,8 +127,7 @@ class RideCache : public QObject
         friend class ::RideCacheBackgroundRefresh;
 
         Context *context;
-        bool planned;
-        QDir directory;
+        QDir directory, plannedDirectory;
 
         QVector<RideItem*> rides_, reverse_, delete_;
         RideCacheModel *model_;

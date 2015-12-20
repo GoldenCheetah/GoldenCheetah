@@ -257,30 +257,11 @@ void PMCData::refresh()
             else value = item->getForSymbol(metricName_);
 
             if (!std::isinf(value) && !std::isnan(value)) {
-                stress_[offset] += value;
+                if (item->planned)
+                    planned_stress_[offset] += value;
+                else
+                    stress_[offset] += value;
                 //qDebug()<<"stress_["<<offset<<"] :"<<stress_[offset];
-            }
-        }
-    }
-
-    // add the planned/expected stress scores
-    foreach(RideItem *item, context->athlete->plannedCache->rides()) {
-
-        if (!specification_.pass(item)) continue;
-
-        // seed with score for this one
-        int offset = start_.daysTo(item->dateTime.date());
-        if (offset > 0 && offset < planned_stress_.count()) {
-
-            // although metrics are cleansed, we check here because development
-            // builds have a rideDB.json that has nan and inf values in it.
-            double value = 0;;
-            if (fromDataFilter) value = expr->eval(context, df, expr, 0, item).number;
-            else value = item->getForSymbol(metricName_);
-
-            if (!std::isinf(value) && !std::isnan(value)) {
-                planned_stress_[offset] += value;
-                //qDebug()<<"planned_stress_["<<offset<<"] :"<<planned_stress_[offset]<<item->fileName;
             }
         }
     }

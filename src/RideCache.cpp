@@ -47,11 +47,10 @@
 bool rideCacheGreaterThan(const RideItem *a, const RideItem *b) { return a->dateTime > b->dateTime; }
 bool rideCacheLessThan(const RideItem *a, const RideItem *b) { return a->dateTime < b->dateTime; }
 
-RideCache::RideCache(Context *context, bool planned) : context(context), planned(planned)
+RideCache::RideCache(Context *context) : context(context)
 {
     directory = context->athlete->home->activities();
-    if (planned)
-        directory = context->athlete->home->planned();
+    plannedDirectory = context->athlete->home->planned();
 
     progress_ = 100;
     exiting = false;
@@ -93,7 +92,23 @@ RideCache::RideCache(Context *context, bool planned) : context(context), planned
         QString name = i.next();
         QDateTime dt;
         if (RideFile::parseRideFileName(name, &dt)) {
-            last = new RideItem(directory.canonicalPath(), name, dt, context, planned);
+            last = new RideItem(directory.canonicalPath(), name, dt, context, false);
+
+            connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
+            connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
+
+            rides_ << last;
+        }
+    }
+
+    // set the list
+    // populate the planned ride list
+    QStringListIterator j(RideFileFactory::instance().listRideFiles(plannedDirectory));
+    while (j.hasNext()) {
+        QString name = j.next();
+        QDateTime dt;
+        if (RideFile::parseRideFileName(name, &dt)) {
+            last = new RideItem(plannedDirectory.canonicalPath(), name, dt, context, true);
 
             connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
             connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
@@ -103,7 +118,7 @@ RideCache::RideCache(Context *context, bool planned) : context(context), planned
     }
 
     // load the store - will unstale once cache restored
-    load(planned);
+    load();
 
     // now sort it
     qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
@@ -133,7 +148,7 @@ RideCache::~RideCache()
     cancel();
 
     // save to store
-    save(planned);
+    save();
 }
 
 void
@@ -194,7 +209,7 @@ RideCache::itemChanged()
 
 // add a new ride
 void
-RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
+RideCache::addRide(QString name, bool dosignal, bool planned, bool useTempActivities)
 {
     RideItem *prior = context->ride;
 
@@ -205,7 +220,9 @@ RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
     // new ride item
     RideItem *last;
     if (useTempActivities)
-       last = new RideItem(context->athlete->home->tmpActivities().canonicalPath(), name, dt, context, planned);
+       last = new RideItem(context->athlete->home->tmpActivities().canonicalPath(), name, dt, context, false);
+    else if (planned)
+       last = new RideItem(plannedDirectory.canonicalPath(), name, dt, context, planned);
     else
        last = new RideItem(directory.canonicalPath(), name, dt, context, planned);
 
