@@ -96,7 +96,8 @@ RideItem::setFrom(RideItem&here, bool temp) // used when loading cache/rideDB.js
     isstale = here.isstale;
 	isedit = here.isedit;
 	skipsave = here.skipsave;
-	path = here.path;
+    if (planned == false)
+        path = here.path;
 	fileName = here.fileName;
 	dateTime = here.dateTime;
     zoneRange = here.zoneRange;
