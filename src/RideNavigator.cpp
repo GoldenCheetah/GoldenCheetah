@@ -61,6 +61,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     searchFilter = new SearchFilter(this);
     searchFilter->setSourceModel(context->athlete->rideCache->model()); // filter out/in search results
 
+
     groupByModel = new GroupByModel(this);
     groupByModel->setSourceModel(searchFilter);
 

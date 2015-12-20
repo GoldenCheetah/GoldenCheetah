@@ -152,16 +152,16 @@ RideFileCache::checkStale(Context *context, RideItem*item)
     // check if we're stale ?
     // Get info for ride file and cache file
     QString rideFileName;
-    /*if (ride->planned)
+    if (item->planned)
         rideFileName = context->athlete->home->planned().canonicalPath() + "/" + item->fileName;
-    else*/
+    else
         rideFileName = context->athlete->home->activities().canonicalPath() + "/" + item->fileName;
 
     QFileInfo rideFileInfo(rideFileName);
     QString cacheFileName;
-    /*if (planned)
+    if (item->planned)
         cacheFileName = context->athlete->home->cache().canonicalPath() + "/planned/" + rideFileInfo.baseName() + ".cpx";
-    else*/
+    else
         cacheFileName = context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx";
 
     QFileInfo cacheFileInfo(cacheFileName);

@@ -97,7 +97,7 @@ class Athlete : public QObject
         QList<PDEstimate> PDEstimates;
         Routes *routes;
         QList<RideFileCache*> cpxCache;
-        RideCache *rideCache, *plannedCache;
+        RideCache *rideCache;
         QList<WithingsReading> withings_;
 
         // Estimates
@@ -146,7 +146,7 @@ class Athlete : public QObject
 
         // ride collection
         void selectRideFile(QString);
-        void addRide(QString name, bool bSelect=true, bool useTempActivities=false);
+        void addRide(QString name, bool bSelect=true, bool planned=false, bool useTempActivities=false);
         void removeCurrentRide();
 
         // zones etc
