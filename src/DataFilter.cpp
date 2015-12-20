@@ -938,16 +938,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
 
-            if (leaf->function != "") {
-
-                // calling a user defined function, does it exist >=?
-                if (!df->functions.contains(leaf->function)) {
-
-                    DataFiltererrors << QString(tr("unknown user function %1")).arg(leaf->function);
-                    leaf->inerror = true;
-                }
-
-            } else if (leaf->series) { // old way of hand crafting each function in the lexer including support for literal parameter e.g. (power, 1)
+            if (leaf->series) { // old way of hand crafting each function in the lexer including support for literal parameter e.g. (power, 1)
 
                 QString symbol = leaf->series->lvalue.n->toLower();
 
@@ -1121,10 +1112,11 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     }
                 }
 
-                // not known!
-                if (!found) {
+                // calling a user defined function, does it exist >=?
+                if (!df->functions.contains(leaf->function)) {
+
                     DataFiltererrors << QString(tr("unknown function %1")).arg(leaf->function);
-                    leaf->inerror=true;
+                    leaf->inerror = true;
                 }
             }
         }
@@ -1543,7 +1535,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         }
 
         if (leaf->function == "config") {
-
             //
             // Get CP and W' estimates for date of ride
             //
@@ -1568,7 +1559,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 if (oW) WPRIME=oW;
                 if (oPMAX) PMAX=oPMAX;
             }
-
             //
             // LTHR, MaxHR, RHR
             //
