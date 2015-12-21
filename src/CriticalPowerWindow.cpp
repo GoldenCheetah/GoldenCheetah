@@ -1201,9 +1201,9 @@ CriticalPowerWindow::rideSelected()
 
     if (currentRide) {
 
-        if (context->athlete->zones()) {
-            int zoneRange = context->athlete->zones()->whichRange(currentRide->dateTime.date());
-            int CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 0;
+        if (context->athlete->zones(currentRide->isRun)) {
+            int zoneRange = context->athlete->zones(currentRide->isRun)->whichRange(currentRide->dateTime.date());
+            int CP = zoneRange >= 0 ? context->athlete->zones(currentRide->isRun)->getCP(zoneRange) : 0;
             CPEdit->setText(QString("%1").arg(CP));
             cpPlot->setDateCP(CP);
         } else {
@@ -1601,13 +1601,22 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
         cfrom = dateRange.from;
         cto = dateRange.to;
 
-        // lets work out the average CP configure value
-        if (series() != veloclinicplot && context->athlete->zones()) {
-            int fromZoneRange = context->athlete->zones()->whichRange(cfrom);
-            int toZoneRange = context->athlete->zones()->whichRange(cto);
+        FilterSet fs;
+        fs.addFilter(searchBox->isFiltered(), SearchFilterBox::matches(context, filter()));
+        fs.addFilter(context->isfiltered, context->filters);
+        fs.addFilter(context->ishomefiltered, context->homeFilters);
+        int nActivities, nRides, nRuns, nSwims;
+        context->athlete->rideCache->getRideTypeCounts(
+                                        Specification(dateRange, fs),
+                                        nActivities, nRides, nRuns, nSwims);
 
-            int CPfrom = fromZoneRange >= 0 ? context->athlete->zones()->getCP(fromZoneRange) : 0;
-            int CPto = toZoneRange >= 0 ? context->athlete->zones()->getCP(toZoneRange) : CPfrom;
+        // lets work out the average CP configure value
+        if (series() != veloclinicplot && context->athlete->zones(nActivities == nRuns)) {
+            int fromZoneRange = context->athlete->zones(nActivities == nRuns)->whichRange(cfrom);
+            int toZoneRange = context->athlete->zones(nActivities == nRuns)->whichRange(cto);
+
+            int CPfrom = fromZoneRange >= 0 ? context->athlete->zones(nActivities == nRuns)->getCP(fromZoneRange) : 0;
+            int CPto = toZoneRange >= 0 ? context->athlete->zones(nActivities == nRuns)->getCP(toZoneRange) : CPfrom;
             if (CPfrom == 0) CPfrom = CPto;
             int dateCP = (CPfrom + CPto) / 2;
 
@@ -1617,14 +1626,6 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
         }
 
         // lets work out the average CV configure value
-        FilterSet fs;
-        fs.addFilter(searchBox->isFiltered(), SearchFilterBox::matches(context, filter()));
-        fs.addFilter(context->isfiltered, context->filters);
-        fs.addFilter(context->ishomefiltered, context->homeFilters);
-        int nActivities, nRides, nRuns, nSwims;
-        context->athlete->rideCache->getRideTypeCounts(
-                                        Specification(dateRange, fs),
-                                        nActivities, nRides, nRuns, nSwims);
         if (((nActivities == nRuns) || (nActivities == nSwims)) &&
              context->athlete->paceZones(nActivities == nSwims)) {
             int fromZoneRange = context->athlete->paceZones(nActivities == nSwims)->whichRange(cfrom);

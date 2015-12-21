@@ -1543,13 +1543,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             double PMAX = 0;
             int zoneRange;
 
-            if (m->context->athlete->zones()) {
+            if (m->context->athlete->zones(m->isRun)) {
 
                 // if range is -1 we need to fall back to a default value
-                zoneRange = m->context->athlete->zones()->whichRange(m->dateTime.date());
-                CP = zoneRange >= 0 ? m->context->athlete->zones()->getCP(zoneRange) : 0;
-                WPRIME = zoneRange >= 0 ? m->context->athlete->zones()->getWprime(zoneRange) : 0;
-                PMAX = zoneRange >= 0 ? m->context->athlete->zones()->getPmax(zoneRange) : 0;
+                zoneRange = m->context->athlete->zones(m->isRun)->whichRange(m->dateTime.date());
+                CP = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getCP(zoneRange) : 0;
+                WPRIME = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getWprime(zoneRange) : 0;
+                PMAX = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getPmax(zoneRange) : 0;
 
                 // did we override CP in metadata ?
                 int oCP = m->getText("CP","0").toInt();

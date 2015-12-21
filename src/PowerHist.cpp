@@ -298,7 +298,7 @@ PowerHist::refreshZoneLabels()
 
     if (series == RideFile::watts || series == RideFile::wattsKg) {
 
-        const Zones *zones = context->athlete->zones();
+        const Zones *zones = context->athlete->zones(rideItem->isRun);
         int zone_range = zones->whichRange(rideItem->dateTime.date());
 
         // generate labels for existing zones
@@ -684,7 +684,7 @@ PowerHist::recalcCompare()
 
                 } else {
 
-                    const Zones *zones = context->athlete->zones();
+                    const Zones *zones = context->athlete->zones(rideItem ? rideItem->isRun : false);
                     int zone_range = -1;
 
                     if (zones) {
@@ -730,7 +730,7 @@ PowerHist::recalcCompare()
             //
             if (!cpzoned) {
 
-                const PaceZones *pacezones = context->athlete->paceZones();
+                const PaceZones *pacezones = context->athlete->paceZones(false);
                 int pacezone_range = -1;
 
                 if (pacezones) {
@@ -911,16 +911,16 @@ PowerHist::recalc(bool force)
         curveSelected->setSamples(sx, sy);
 
         // zone scale draw
-        if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned && rideItem && context->athlete->zones()) {
+        if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned && rideItem && context->athlete->zones(rideItem->isRun)) {
 
             if (cpzoned) {
                 setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
                 setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
             } else {
-                int zone_range = context->athlete->zones()->whichRange(rideItem->dateTime.date());
-                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(context->athlete->zones(), zone_range));
+                int zone_range = context->athlete->zones(rideItem->isRun)->whichRange(rideItem->dateTime.date());
+                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(context->athlete->zones(rideItem->isRun), zone_range));
                 if (zone_range >= 0)
-                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->zones()->numZones(zone_range), 1);
+                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->zones(rideItem->isRun)->numZones(zone_range), 1);
                 else
                     setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
             }
@@ -963,14 +963,14 @@ PowerHist::recalc(bool force)
         }
 
         // watts zoned for a time range
-        if (source == Cache && zoned && (series == RideFile::watts || series == RideFile::wattsKg) && context->athlete->zones()) {
+        if (source == Cache && zoned && (series == RideFile::watts || series == RideFile::wattsKg) && context->athlete->zones(rideItem ? rideItem->isRun : false)) {
             if (cpzoned) {
                 setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
                 setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
             } else {
-                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(context->athlete->zones(), 0));
-                if (context->athlete->zones()->getRangeSize())
-                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->zones()->numZones(0), 1); // use zones from first defined range
+                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(context->athlete->zones(rideItem ? rideItem->isRun : false), 0));
+                if (context->athlete->zones(rideItem ? rideItem->isRun : false)->getRangeSize())
+                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->zones(rideItem ? rideItem->isRun : false)->numZones(0), 1); // use zones from first defined range
             }
         }
 
@@ -987,14 +987,14 @@ PowerHist::recalc(bool force)
         }
 
         // pace zoned for a time range using run zones for scale
-        if (source == Cache && zoned && series == RideFile::kph && context->athlete->paceZones()) {
+        if (source == Cache && zoned && series == RideFile::kph && context->athlete->paceZones(false)) {
             if (cpzoned) {
                 setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
                 setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
             } else {
-                setAxisScaleDraw(QwtPlot::xBottom, new PaceZoneScaleDraw(context->athlete->paceZones(), 0));
-                if (context->athlete->paceZones()->getRangeSize())
-                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->paceZones()->numZones(0), 1); // use zones from first defined range
+                setAxisScaleDraw(QwtPlot::xBottom, new PaceZoneScaleDraw(context->athlete->paceZones(false), 0));
+                if (context->athlete->paceZones(false)->getRangeSize())
+                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->paceZones(false)->numZones(0), 1); // use zones from first defined range
             }
         }
 
@@ -1409,7 +1409,7 @@ PowerHist::intervalHover(IntervalItem *x)
 
         // set data
         HistData hoverData;
-        setArraysFromRide(rideItem->ride(), hoverData, context->athlete->zones(), x);
+        setArraysFromRide(rideItem->ride(), hoverData, context->athlete->zones(rideItem->isRun), x);
 
         // set curve
         QVector<double>x,y,sx,sy;
@@ -1844,7 +1844,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
 
     if (ride && hasData) {
         //setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
-        setArraysFromRide(ride, standard, context->athlete->zones(), NULL);
+        setArraysFromRide(ride, standard, context->athlete->zones(rideItem->isRun), NULL);
 
     } else {
 

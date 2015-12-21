@@ -44,18 +44,18 @@ bool ErgFile::isWorkout(QString name)
 ErgFile::ErgFile(QString filename, int &mode, Context *context) : 
     filename(filename), context(context), mode(mode)
 {
-    if (context->athlete->zones()) {
-        int zonerange = context->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
-        if (zonerange >= 0) CP = context->athlete->zones()->getCP(zonerange);
+    if (context->athlete->zones(false)) {
+        int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
+        if (zonerange >= 0) CP = context->athlete->zones(false)->getCP(zonerange);
     }
     reload();
 }
 
 ErgFile::ErgFile(Context *context) : context(context), mode(nomode)
 {
-    if (context->athlete->zones()) {
-        int zonerange = context->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
-        if (zonerange >= 0) CP = context->athlete->zones()->getCP(zonerange);
+    if (context->athlete->zones(false)) {
+        int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
+        if (zonerange >= 0) CP = context->athlete->zones(false)->getCP(zonerange);
     } else {
         CP = 300;
     }
@@ -720,9 +720,9 @@ ErgFile::calculateMetrics()
         AP = apsum / count;
 
         // CP
-        if (context->athlete->zones()) {
-            int zonerange = context->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
-            if (zonerange >= 0) CP = context->athlete->zones()->getCP(zonerange);
+        if (context->athlete->zones(false)) {
+            int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
+            if (zonerange >= 0) CP = context->athlete->zones(false)->getCP(zonerange);
         }
 
         // IF

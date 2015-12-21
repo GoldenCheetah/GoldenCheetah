@@ -1037,7 +1037,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
             // set zones from shading CP
             QList <int> power_zone;
-            int n_zones = context->athlete->zones()->lowsFromCP(&power_zone, (int) int(shadingCP));
+            int n_zones = context->athlete->zones(isRun)->lowsFromCP(&power_zone, (int) int(shadingCP));
 
             // now run through each zone and create a curve
             int high = maxNonZero - 1;
@@ -1092,7 +1092,7 @@ CPPlot::plotBests(RideItem *rideItem)
                 // now the labels
                 if (shadeMode && (criticalSeries != CriticalPowerWindow::work || work[high] > 100.0)) {
 
-                    QwtText text(context->athlete->zones()->getDefaultZoneName(zone));
+                    QwtText text(context->athlete->zones(isRun)->getDefaultZoneName(zone));
                     text.setFont(QFont("Helvetica", 20, QFont::Bold));
                     color.setAlpha(255);
                     text.setColor(color);

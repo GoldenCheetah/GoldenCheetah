@@ -276,9 +276,9 @@ ErgFilePlot::configChanged(qint32)
 
     // set CP Marker
     double CP = 0; // default
-    if (context->athlete->zones()) {
-        int zoneRange = context->athlete->zones()->whichRange(QDate::currentDate());
-        if (zoneRange >= 0) CP = context->athlete->zones()->getCP(zoneRange);
+    if (context->athlete->zones(false)) {
+        int zoneRange = context->athlete->zones(false)->whichRange(QDate::currentDate());
+        if (zoneRange >= 0) CP = context->athlete->zones(false)->getCP(zoneRange);
     }
     if (CP) {
         CPMarker->setYValue(CP);
