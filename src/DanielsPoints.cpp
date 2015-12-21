@@ -63,7 +63,7 @@ class DanielsPoints : public RideMetric {
 
         // no ride or no samples
         if (spec.isEmpty(item->ride()) ||
-            item->context->athlete->zones() == NULL || item->zoneRange < 0) {
+            item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -81,7 +81,7 @@ class DanielsPoints : public RideMetric {
         double weighted = 0.0;
 
         score = 0.0;
-        double cp = item->context->athlete->zones()->getCP(item->zoneRange);
+        double cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
 
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
@@ -132,13 +132,13 @@ class DanielsEquivalentPower : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no zones
-        if (item->context->athlete->zones() == NULL || item->zoneRange < 0) {
+        if (item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
         }
 
-        double cp = item->context->athlete->zones()->getCP(item->zoneRange);
+        double cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
 
         assert(deps.contains("daniels_points"));
         assert(deps.contains("time_riding"));

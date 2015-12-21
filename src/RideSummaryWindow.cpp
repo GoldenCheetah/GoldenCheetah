@@ -868,19 +868,19 @@ RideSummaryWindow::htmlSummary()
     }
 
     //
-    // Time In Zones for Running and Swimming
+    // Time In Pace Zones for Running and Swimming
     //
     int numzones = 0;
     int range = -1;
 
-    if (ridesummary && rideItem && rideItem->ride() && (rideItem->ride()->isRun() || rideItem->ride()->isSwim())) {
+    if (ridesummary && rideItem && (rideItem->isRun || rideItem->isSwim)) {
 
-        if (context->athlete->paceZones(rideItem->ride()->isSwim())) {
+        if (context->athlete->paceZones(rideItem->isSwim)) {
 
-            range = context->athlete->paceZones(rideItem->ride()->isSwim())->whichRange(rideItem->dateTime.date());
+            range = context->athlete->paceZones(rideItem->isSwim)->whichRange(rideItem->dateTime.date());
             if (range > -1) {
 
-                numzones = context->athlete->paceZones(rideItem->ride()->isSwim())->numZones(range);
+                numzones = context->athlete->paceZones(rideItem->isSwim)->numZones(range);
 
                 if (numzones > 0) {
 
@@ -896,25 +896,30 @@ RideSummaryWindow::htmlSummary()
                     }
         
                     summary += tr("<h3>Pace Zones</h3>");
-                    summary += context->athlete->paceZones(rideItem->ride()->isSwim())->summarize(range, time_in_zone, altColor); //aggregating
+                    summary += context->athlete->paceZones(rideItem->isSwim)->summarize(range, time_in_zone, altColor); //aggregating
                 }
             }
         }
 
-    } else {
+    }
 
-        if (ridesummary && rideItem && context->athlete->zones()) {
+    //
+    // Time In Power Zones, when there is power data
+    //
+    if (!ridesummary || !rideItem || rideItem->present.contains("P")) {
+
+        if (ridesummary && rideItem && context->athlete->zones(rideItem->isRun)) {
 
             // get zones to use via ride for ridesummary
-            range = context->athlete->zones()->whichRange(rideItem->dateTime.date());
-            if (range > -1) numzones = context->athlete->zones()->numZones(range);
+            range = context->athlete->zones(rideItem->isRun)->whichRange(rideItem->dateTime.date());
+            if (range > -1) numzones = context->athlete->zones(rideItem->isRun)->numZones(range);
 
         // or for end of daterange plotted for daterange summary
-        } else if (context->athlete->zones()) {
+        } else if (context->athlete->zones(false)) {
 
             // get from end if period
-            range = context->athlete->zones()->whichRange(myDateRange.to);
-            if (range > -1) numzones = context->athlete->zones()->numZones(range);
+            range = context->athlete->zones(false)->whichRange(myDateRange.to);
+            if (range > -1) numzones = context->athlete->zones(false)->numZones(range);
 
         }
 
@@ -930,10 +935,10 @@ RideSummaryWindow::htmlSummary()
                 else time_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZones[i], specification, useMetricUnits, true).toDouble();
             }
             summary += tr("<h3>Power Zones</h3>");
-            summary += context->athlete->zones()->summarize(range, time_in_zone, altColor); //aggregating
+            summary += context->athlete->zones(rideItem ? rideItem->isRun : false)->summarize(range, time_in_zone, altColor); //aggregating
 
             // W'bal Zones
-            int WPRIME = context->athlete->zones()->getWprime(range);
+            int WPRIME = context->athlete->zones(rideItem ? rideItem->isRun : false)->getWprime(range);
             QVector<double> wtime_in_zone(4);
             QVector<double> wwork_in_zone(4);
             QVector<double> wcptime_in_zone(4);
@@ -1755,14 +1760,14 @@ RideSummaryWindow::htmlCompareSummary() const
         //
         // TIME IN POWER ZONES (we can't do w'bal compare at present)
         //
-        if (context->athlete->zones()) { // use my zones
+        if (context->athlete->zones(false)) { // use my zones
 
             // get from end if period
-            int rangeidx = context->athlete->zones()->whichRange(QDate::currentDate()); // use current zone names et al
+            int rangeidx = context->athlete->zones(false)->whichRange(QDate::currentDate()); // use current zone names et al
             if (rangeidx > -1) {
 
                 // get the list of zones
-                ZoneRange range = const_cast<Zones*>(context->athlete->zones())->getZoneRange(rangeidx);
+                ZoneRange range = const_cast<Zones*>(context->athlete->zones(false))->getZoneRange(rangeidx);
                 QList<ZoneInfo> zones = range.zones;
 
                 // we've got a range and a count of zones so all is well
@@ -2024,14 +2029,14 @@ RideSummaryWindow::htmlCompareSummary() const
         //
         // TIME IN POWER ZONES AND W'BAL ZONES
         //
-        if (context->athlete->zones()) { // use my zones
+        if (context->athlete->zones(false)) { // use my zones
 
             // get from end if period
-            int rangeidx = context->athlete->zones()->whichRange(QDate::currentDate()); // use current zone names et al
+            int rangeidx = context->athlete->zones(false)->whichRange(QDate::currentDate()); // use current zone names et al
             if (rangeidx > -1) {
 
                 // get the list of zones
-                ZoneRange range = const_cast<Zones*>(context->athlete->zones())->getZoneRange(rangeidx);
+                ZoneRange range = const_cast<Zones*>(context->athlete->zones(false))->getZoneRange(rangeidx);
                 QList<ZoneInfo> zones = range.zones;
 
                 // we've got a range and a count of zones so all is well

@@ -84,9 +84,9 @@ class Athlete : public QObject
         ColorEngine *colorEngine;
 
         // zones
-        const Zones *zones(bool isRun=false) const { return zones_[isRun]; }
+        const Zones *zones(bool isRun) const { return zones_[isRun]; }
         const HrZones *hrZones() const { return hrzones_; }
-        const PaceZones *paceZones(bool isSwim=false) const { return pacezones_[isSwim]; }
+        const PaceZones *paceZones(bool isSwim) const { return pacezones_[isSwim]; }
         Zones *zones_[2];
         HrZones *hrzones_;
         PaceZones *pacezones_[2];

@@ -313,7 +313,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const Zones *zones = parent->context->athlete->zones();
+	const Zones *zones = parent->context->athlete->zones(rideItem->isRun);
         int zone_range = -1;
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
@@ -376,7 +376,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const Zones *zones = parent->context->athlete->zones();
+	const Zones *zones = parent->context->athlete->zones(rideItem->isRun);
         int zone_range = -1;
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 

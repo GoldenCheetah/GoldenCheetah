@@ -53,9 +53,9 @@ class PaceZoneTime : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         // no ride or no samples
-        if (spec.isEmpty(item->ride()) ||
+        if (spec.isEmpty(item->ride()) &&
             // pace only makes sense for running or swimming
-            !item->isRun || !item->isSwim) {
+            !item->isRun && !item->isSwim) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
