@@ -904,23 +904,33 @@ RideSummaryWindow::htmlSummary()
     }
 
     //
-    // Time In Power Zones, when there is power data
+    // Time In Power Zones, when there is power data for a ride, or summarising date range
     //
-    if (!ridesummary || !rideItem || rideItem->present.contains("P")) {
+    if (!ridesummary || (rideItem && rideItem->present.contains("P"))) {
+
+        // set to unknown just in case
+        range = -1;
+        int WPRIME=22000; // reasonable default
 
         if (ridesummary && rideItem && context->athlete->zones(rideItem->isRun)) {
 
             // get zones to use via ride for ridesummary
             range = context->athlete->zones(rideItem->isRun)->whichRange(rideItem->dateTime.date());
-            if (range > -1) numzones = context->athlete->zones(rideItem->isRun)->numZones(range);
+            if (range > -1) {
+                numzones = context->athlete->zones(rideItem->isRun)->numZones(range);
+                WPRIME = context->athlete->zones(rideItem ? rideItem->isRun : false)->getWprime(range);
+            }
 
-        // or for end of daterange plotted for daterange summary
-        } else if (context->athlete->zones(false)) {
+        // or for end of daterange plotted for daterange summary but use cylcing power zones
+        // XXX what to do if summarising time in zone for cycling and running for a date range ? XXX
+        } else if (!ridesummary && context->athlete->zones(false)) {
 
             // get from end if period
             range = context->athlete->zones(false)->whichRange(myDateRange.to);
-            if (range > -1) numzones = context->athlete->zones(false)->numZones(range);
-
+            if (range > -1) {
+                numzones = context->athlete->zones(false)->numZones(range);
+                WPRIME = context->athlete->zones(false)->getWprime(range);
+            }
         }
 
         // now we've monketed around with zone crap, lets display
@@ -935,10 +945,11 @@ RideSummaryWindow::htmlSummary()
                 else time_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZones[i], specification, useMetricUnits, true).toDouble();
             }
             summary += tr("<h3>Power Zones</h3>");
-            summary += context->athlete->zones(rideItem ? rideItem->isRun : false)->summarize(range, time_in_zone, altColor); //aggregating
+
+            if (ridesummary) summary += context->athlete->zones(rideItem ? rideItem->isRun : false)->summarize(range, time_in_zone, altColor);
+            else summary += context->athlete->zones(false)->summarize(range, time_in_zone, altColor); //aggregating  for date range
 
             // W'bal Zones
-            int WPRIME = context->athlete->zones(rideItem ? rideItem->isRun : false)->getWprime(range);
             QVector<double> wtime_in_zone(4);
             QVector<double> wwork_in_zone(4);
             QVector<double> wcptime_in_zone(4);
