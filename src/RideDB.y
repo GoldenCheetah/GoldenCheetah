@@ -241,6 +241,7 @@ RideCache::load()
     QFile rideDB(QString("%1/%2").arg(context->athlete->home->cache().canonicalPath()).arg("rideDB.json"));
     if (rideDB.exists() && rideDB.open(QFile::ReadOnly)) {
         QDir directory = context->athlete->home->activities();
+        QDir plannedDirectory = context->athlete->home->planned();
 
         // ok, lets read it in
         QTextStream stream(&rideDB);
@@ -259,7 +260,7 @@ RideCache::load()
         jc->old = false;
 
         // clean item
-        jc->item.path = directory.canonicalPath();
+        jc->item.path = directory.canonicalPath(); // TODO use plannedDirectory for planned
         jc->item.context = context;
         jc->item.isstale = jc->item.isdirty = jc->item.isedit = false;
 

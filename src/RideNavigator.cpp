@@ -976,6 +976,10 @@ RideNavigator::setRide(RideItem*rideItem)
 void
 RideNavigator::selectionChanged(QItemSelection selected)
 {
+    if (selected.isEmpty()) {
+        return;
+    }
+
     QModelIndex ref = selected.indexes().first();
     QModelIndex fileIndex = tableView->model()->index(ref.row(), 3, ref.parent());
     QString filename = tableView->model()->data(fileIndex, Qt::DisplayRole).toString();
