@@ -26,28 +26,42 @@
 #include <windows.h>
 #endif
 
+#if defined GC_HAVE_LIBUSB1
+#include <libusb-1.0/libusb.h>
+#elif defined GC_HAVE_LIBUSB
 #include <usb.h> // for the constants etc
+#include <errno.h>
+const int LIBUSB_ERROR_IO = -EIO;
+const int LIBUSB_ERROR_TIMEOUT = -ETIMEDOUT;
+const int LIBUSB_ERROR_PIPE = -EPIPE;
+const int LIBUSB_ERROR_NO_DEVICE = -ENODEV;
+#else
+const int LIBUSB_ERROR_IO = -1;
+const int LIBUSB_ERROR_TIMEOUT = -1;
+const int LIBUSB_ERROR_PIPE = -1;
+const int LIBUSB_ERROR_NO_DEVICE = -1;
+#endif
 
 // EZ-USB firmware loader for Fortius
-extern "C" {
 #include "EzUsb.h"
-}
 
 #ifdef WIN32
 #include <QLibrary> // for dynamically loading libusb0.dll
 #endif
 
-#define GARMIN_USB2_VID   0x0fcf
-#define GARMIN_USB2_PID   0x1008
-#define GARMIN_OEM_PID    0x1009
+#include <QQueue>
 
-#define FORTIUS_VID       0x3561
-#define FORTIUS_INIT_PID  0xe6be    // uninitialised Fortius PID
-#define FORTIUS_PID       0x1942    // once firmware loaded Fortius PID
-#define FORTIUSVR_PID     0x1932    // Fortius VR doesn't need firmware download ?
+const int GARMIN_USB2_VID = 0x0fcf;
+const int GARMIN_USB2_PID = 0x1008;
+const int GARMIN_OEM_PID  = 0x1009;
 
-#define TYPE_ANT     0
-#define TYPE_FORTIUS 1
+const int FORTIUS_VID      = 0x3561;
+const int FORTIUS_INIT_PID = 0xe6be;  // uninitialised Fortius PID
+const int FORTIUS_PID      = 0x1942;  // once firmware loaded Fortius PID
+const int FORTIUSVR_PID    = 0x1932;  // Fortius VR doesn't need firmware download ?
+
+const int TYPE_ANT = 0;
+const int TYPE_FORTIUS = 1;
 
 class Context;
 
@@ -55,13 +69,45 @@ class LibUsb {
 
 public:
     LibUsb(int type);
+    ~LibUsb();
+
+    // Finds an appropriate USB device and opens a handle to it.
+    // Returns 0 on success, -1 on error.
     int open();
     void close();
-    int read(char *buf, int bytes);
-    int write(char *buf, int bytes);
+    int read(uint8_t *buf, int bytes);
+    int write(uint8_t *buf, int bytes);
     bool find();
 private:
+#if defined GC_HAVE_LIBUSB1
+    // Resprentation of a libusb session.
+    libusb_context *ctx;
+    libusb_device *device;
+    libusb_device_handle *handle;
 
+    // The list of USB devices currently attached to the system.
+    libusb_device **devlist;
+    // The size of that USB device list.
+    ssize_t devlist_size;
+
+    // Refresh our copy of the USB device list.
+    void refresh_device_list();
+
+    // Reset the USB interface.
+    int reset_device(libusb_device *device);
+
+    int open_device(libusb_device *device,
+		    const struct libusb_device_descriptor &desc);
+    
+    // Initialise a USB ANT+ device.
+    int initialise_ant(libusb_device *device,
+		       const struct libusb_device_descriptor &desc);
+
+    // Initialise the Fortius device by loading the firmware.
+    int initialise_fortius(libusb_device *device);
+
+    QQueue<uint8_t> read_buffer;
+#else
     struct usb_dev_handle* OpenAntStick();
     struct usb_dev_handle* OpenFortius();
     bool findAntStick();
@@ -71,14 +117,18 @@ private:
     struct usb_dev_handle* device;
     struct usb_interface_descriptor* intf;
 
+    char readBuf[64];
+    int readBufIndex;
+    int readBufSize;
+#endif
+
+    // The I/O endpoints on the USB ANT+ device.
+    // These four values are set by open_device().
     int readEndpoint, writeEndpoint;
     int interface;
     int alternate;
 
-    char readBuf[64];
-    int readBufIndex;
-    int readBufSize;
-
+    // The type of device -- ANT or FORTIUS.
     int type;
 };
 #endif

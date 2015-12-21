@@ -1,8 +1,9 @@
 #ifndef __ezusb_H
 #define __ezusb_H
 /*
- * Copyright (c) 2001 Stephen Williams (steve@icarus.com)
- * Copyright (c) 2002 David Brownell (dbrownell@users.sourceforge.net)
+ * Copyright © 2001 Stephen Williams (steve@icarus.com)
+ * Copyright © 2002 David Brownell (dbrownell@users.sourceforge.net)
+ * Copyright © 2013 Federico Manzan (f.manzan@gmail.com)
  *
  *    This source code is free software; you can redistribute it
  *    and/or modify it in source code form under the terms of the GNU
@@ -19,63 +20,111 @@
  *    along with this program; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
+#if !defined(_MSC_VER)
+#include <stdbool.h>
+#else
+#define __attribute__(x)
+#if !defined(bool)
+#define bool int
+#endif
+#if !defined(true)
+#define true (1 == 1)
+#endif
+#if !defined(false)
+#define false (!true)
+#endif
+#if defined(_PREFAST_)
+#pragma warning(disable:28193)
+#endif
+#endif
 
+#define FX_TYPE_UNDEFINED  -1
+#define FX_TYPE_AN21       0	/* Original AnchorChips parts */
+#define FX_TYPE_FX1        1	/* Updated Cypress versions */
+#define FX_TYPE_FX2        2	/* USB 2.0 versions */
+#define FX_TYPE_FX2LP      3	/* Updated FX2 */
+#define FX_TYPE_FX3        4	/* USB 3.0 versions */
+#define FX_TYPE_MAX        5
+#define FX_TYPE_NAMES      { "an21", "fx", "fx2", "fx2lp", "fx3" }
 
-/*
- * This function loads the firmware from the given file into RAM.
- * The file is assumed to be in Intel HEX format.  If fx2 is set, uses
- * appropriate reset commands.  Stage == 0 means this is a single stage
- * load (or the first of two stages).  Otherwise it's the second of
- * two stages; the caller preloaded the second stage loader.
- *
- * The target processor is reset at the end of this download.
+#define IMG_TYPE_UNDEFINED -1
+#define IMG_TYPE_HEX       0	/* Intel HEX */
+#define IMG_TYPE_IIC       1	/* Cypress 8051 IIC */
+#define IMG_TYPE_BIX       2	/* Cypress 8051 BIX */
+#define IMG_TYPE_IMG       3	/* Cypress IMG format */
+#define IMG_TYPE_MAX       4
+#define IMG_TYPE_NAMES     { "Intel HEX", "Cypress 8051 IIC", "Cypress 8051 BIX", "Cypress IMG format" }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* 
+ * Automatically identified devices (VID, PID, type, designation).
+ * TODO: Could use some validation. Also where's the FX2?
  */
-extern int ezusb_load_ram (usb_dev_handle *device, const char *path, int fx2, int stage);
+typedef struct {
+	uint16_t vid;
+	uint16_t pid;
+	int type;
+	const char* designation;
+} fx_known_device;
 
+#define FX_KNOWN_DEVICES { \
+	{ 0x0547, 0x2122, FX_TYPE_AN21, "Cypress EZ-USB (2122S)" },\
+	{ 0x0547, 0x2125, FX_TYPE_AN21, "Cypress EZ-USB (2121S/2125S)" },\
+	{ 0x0547, 0x2126, FX_TYPE_AN21, "Cypress EZ-USB (2126S)" },\
+	{ 0x0547, 0x2131, FX_TYPE_AN21, "Cypress EZ-USB (2131Q/2131S/2135S)" },\
+	{ 0x0547, 0x2136, FX_TYPE_AN21, "Cypress EZ-USB (2136S)" },\
+	{ 0x0547, 0x2225, FX_TYPE_AN21, "Cypress EZ-USB (2225)" },\
+	{ 0x0547, 0x2226, FX_TYPE_AN21, "Cypress EZ-USB (2226)" },\
+	{ 0x0547, 0x2235, FX_TYPE_AN21, "Cypress EZ-USB (2235)" },\
+	{ 0x0547, 0x2236, FX_TYPE_AN21, "Cypress EZ-USB (2236)" },\
+	{ 0x04b4, 0x6473, FX_TYPE_FX1, "Cypress EZ-USB FX1" },\
+	{ 0x04b4, 0x8613, FX_TYPE_FX2LP, "Cypress EZ-USB FX2LP (68013A/68014A/68015A/68016A)" }, \
+	{ 0x04b4, 0x00f3, FX_TYPE_FX3, "Cypress FX3" },\
+}
 
 /*
- * This function stores the firmware from the given file into EEPROM.
- * The file is assumed to be in Intel HEX format.  This uses the right
- * CPUCS address to terminate the EEPROM load with a reset command,
- * where FX parts behave differently than FX2 ones.  The configuration
- * byte is as provided here (zero for an21xx parts) and the EEPROM
- * type is set so that the microcontroller will boot from it.
- * 
+ * This function uploads the firmware from the given file into RAM.
+ * Stage == 0 means this is a single stage load (or the first of
+ * two stages).  Otherwise it's the second of two stages; the 
+ * caller having preloaded the second stage loader.
+ *
+ * The target processor is reset at the end of this upload.
+ */
+#if defined GC_HAVE_LIBUSB1
+extern int ezusb_load_ram(libusb_device_handle *device,
+	const char *path, int fx_type, int img_type, int stage);
+#else
+extern int ezusb_load_ram(usb_dev_handle *device,
+    const char *path, int fx_type, int img_type, int stage);
+#endif
+
+/*
+ * This function uploads the firmware from the given file into EEPROM.
+ * This uses the right CPUCS address to terminate the EEPROM load with
+ * a reset command where FX parts behave differently than FX2 ones.
+ * The configuration byte is as provided here (zero for an21xx parts)
+ * and the EEPROM type is set so that the microcontroller will boot
+ * from it.
+ *
  * The caller must have preloaded a second stage loader that knows
  * how to respond to the EEPROM write request.
  */
-extern int ezusb_load_eeprom (
-	usb_dev_handle	*dev,		/* usbfs device handle */
-	const char *path,	/* path to hexfile */
-	const char *type,	/* fx, fx2, an21 */
-	int config		/* config byte for fx/fx2; else zero */
-	);
+#if defined GC_HAVE_LIBUSB1
+extern int ezusb_load_eeprom(libusb_device_handle *device,
+	const char *path, int fx_type, int img_type, int config);
+#else
+extern int ezusb_load_eeprom(usb_dev_handle *device,
+    const char *path, int fx_type, int img_type, int config);
+#endif
 
-
-/* boolean flag, says whether to write extra messages to stderr */
+/* Verbosity level (default 1). Can be increased or decreased with options v/q  */
 extern int verbose;
 
+#ifdef __cplusplus
+}
+#endif
 
-#define USB_DIR_OUT                     0               /* to device */
-#define USB_DIR_IN                      0x80            /* to host */
-
-
-
-/*
- * $Log: ezusb.h,v $
- * Revision 1.1  2007/03/19 20:46:30  cfavi
- * fxload ported to use libusb
- *
- * Revision 1.3  2002/04/12 00:28:21  dbrownell
- * support "-t an21" to program EEPROMs for those microcontrollers
- *
- * Revision 1.2  2002/02/26 19:55:05  dbrownell
- * 2nd stage loader support
- *
- * Revision 1.1  2001/06/12 00:00:50  stevewilliams
- *  Added the fxload program.
- *  Rework root makefile and hotplug.spec to install in prefix
- *  location without need of spec file for install.
- *
- */
 #endif

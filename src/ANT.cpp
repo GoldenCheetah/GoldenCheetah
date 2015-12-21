@@ -244,9 +244,25 @@ void ANT::run()
     {
         // read more bytes from the device
         uint8_t byte;
-        if (rawRead(&byte, 1) > 0) receiveByte((unsigned char)byte);
-        else msleep(5);
-
+        int rc = rawRead(&byte, 1);
+        if (rc > 0)
+          receiveByte(byte);
+        else {
+#if defined GC_HAVE_LIBUSB
+          if (rc == LIBUSB_ERROR_NO_DEVICE) {
+            // Can happen when the USB stick is pulled.
+            stop();
+          } else if (rc == LIBUSB_ERROR_PIPE) {
+            // Endpoint halted.
+            restart();
+          } else {
+            // Typically a timeout (error -110).
+            msleep(5);
+          }
+#else
+          msleep(5);
+#endif
+        }
         //----------------------------------------------------------------------
         // LISTEN TO CONTROLLER FOR COMMANDS
         //----------------------------------------------------------------------
@@ -809,21 +825,24 @@ ANT::slotSearchComplete(int number) // search completed successfully
  *--------------------------------------------------------------------*/
 void
 ANT::sendMessage(ANTMessage m) {
-    static const unsigned char padding[5] = { '\0', '\0', '\0', '\0', '\0' };
 
-//fprintf(stderr, ">> send: ");
-//for(int i=0; i<m.length+3; i++) fprintf(stderr, "%02x ", m.data[i]);
-//fprintf(stderr, "\n");
-
+  //fprintf(stderr, ">> send: ");
+  //for(int i=0; i<m.length+3; i++) fprintf(stderr, "%02x ", m.data[i]);
+  //fprintf(stderr, "\n");
+  if (m.length > 12) {
     rawWrite((uint8_t*)m.data, m.length);
-
-    // this padding is important - do not remove it
-    // we need to be sure the message is at least 12 bytes
-    rawWrite((uint8_t*)padding, 5);
+  } else {
+    // Messages less than 12 bytes in length must be padded to a
+    // minimum of 12 bytes.
+    uint8_t msg[16];
+    memset(msg, 0, sizeof(msg));
+    memcpy(msg, m.data, m.length);
+    rawWrite(msg, 12);
+  }
 }
 
 void
-ANT::receiveByte(unsigned char byte) {
+ANT::receiveByte(uint8_t byte) {
 
     switch (state) {
         case ST_WAIT_FOR_SYNC:
@@ -1098,7 +1117,7 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
 
 #ifdef GC_HAVE_LIBUSB
     if (usbMode == USB2) {
-        return usb2->write((char *)bytes, size);
+        return usb2->write(bytes, size);
     }
 
     if (usbMode == USB1) {
@@ -1144,7 +1163,7 @@ int ANT::rawRead(uint8_t bytes[], int size)
 
 #ifdef GC_HAVE_LIBUSB
     if (usbMode == USB2) {
-        return usb2->read((char *)bytes, size);
+        return usb2->read(bytes, size);
     }
 #endif
     int i=0;
