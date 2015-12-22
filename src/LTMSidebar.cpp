@@ -862,6 +862,9 @@ LTMSidebar::autoFilterSelectionChanged()
     // assume nothing to do...
     isautofilter = false;
 
+    // Convert field names from Display to Internal (to work with translations)
+    SpecialFields sp;
+
     // are any auto filters applied?
     for (int i=1; i<filterSplitter->count(); i++) {
 
@@ -878,7 +881,7 @@ LTMSidebar::autoFilterSelectionChanged()
             }
 
             // what is the field?
-            QString fieldname = item->splitterHandle->title();
+            QString fieldname = sp.internalName(item->splitterHandle->title());
 
             // what values are highlighted
             QStringList values;
