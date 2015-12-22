@@ -394,6 +394,8 @@ static QString rankingString(int number)
 QString
 RideSummaryWindow::htmlSummary()
 {
+    RideMetricFactory &factory = RideMetricFactory::instance();
+
     QString summary("");
     QColor bgColor = ridesummary ? GColor(CPLOTBACKGROUND) : GColor(CTRENDPLOTBACKGROUND);
     //QColor fgColor = GCColor::invertColor(bgColor);
@@ -491,11 +493,19 @@ RideSummaryWindow::htmlSummary()
     // users determine the metrics to display
     QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
     if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
-    QStringList metricColumn = s.split(",");
+    QStringList metricColumn;
+    foreach(QString symbol, s.split(",")) {
+        if (factory.rideMetric(symbol) != NULL)
+            metricColumn << symbol;
+    }
 
     s = appsettings->value(this, GC_SETTINGS_BESTS_METRICS, GC_SETTINGS_BESTS_METRICS_DEFAULT).toString();
     if (s == "") s = GC_SETTINGS_BESTS_METRICS_DEFAULT;
-    QStringList bestsColumn = s.split(",");
+    QStringList bestsColumn;
+    foreach(QString symbol, s.split(",")) {
+        if (factory.rideMetric(symbol) != NULL)
+            bestsColumn << symbol;
+    }
 
     static const QStringList timeInZones = QStringList()
         << "time_in_zone_L1"
@@ -555,7 +565,6 @@ RideSummaryWindow::htmlSummary()
     // been edited. Otherwise we need to re-compute every time.
     // this is only for ride summary, when showing for a date range
     // we already have a summary metrics array
-    RideMetricFactory &factory = RideMetricFactory::instance();
 
     // get the PMC data
     PMCData *pmc;
@@ -1543,6 +1552,8 @@ RideSummaryWindow::getPDEstimates()
 QString
 RideSummaryWindow::htmlCompareSummary() const
 {
+    RideMetricFactory &factory = RideMetricFactory::instance();
+
     QString summary;
 
     QColor bgColor = ridesummary ? GColor(CPLOTBACKGROUND) : GColor(CTRENDPLOTBACKGROUND);
@@ -1595,11 +1606,19 @@ RideSummaryWindow::htmlCompareSummary() const
     // users determine the metrics to display
     QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
     if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
-    QStringList metricColumn = s.split(",");
+    QStringList metricColumn;
+    foreach(QString symbol, s.split(",")) {
+        if (factory.rideMetric(symbol) != NULL)
+            metricColumn << symbol;
+    }
 
     s = appsettings->value(this, GC_SETTINGS_BESTS_METRICS, GC_SETTINGS_BESTS_METRICS_DEFAULT).toString();
     if (s == "") s = GC_SETTINGS_BESTS_METRICS_DEFAULT;
-    QStringList bestsColumn = s.split(",");
+    QStringList bestsColumn;
+    foreach(QString symbol, s.split(",")) {
+        if (factory.rideMetric(symbol) != NULL)
+            bestsColumn << symbol;
+    }
 
     static const QStringList timeInZones = QStringList()
         << "time_in_zone_L1"
@@ -1644,7 +1663,6 @@ RideSummaryWindow::htmlCompareSummary() const
         //
         // intervals are already computed in rideitem
         QList<RideItem*> intervalMetrics;
-        RideMetricFactory &factory = RideMetricFactory::instance();
         for (int j=0; j<context->compareIntervals.count(); j++) 
             intervalMetrics << context->compareIntervals.at(j).rideItem;
 
@@ -1920,9 +1938,6 @@ RideSummaryWindow::htmlCompareSummary() const
         // LETS FORMAT THE HTML
         summary = GCColor::css(ridesummary);
         summary += "<center>";
-
-        // get metric details here ...
-        RideMetricFactory &factory = RideMetricFactory::instance();
 
         //
         // TOTALS, AVERAGES, MAX, METRICS
