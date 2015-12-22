@@ -209,7 +209,7 @@ RideCache::itemChanged()
 
 // add a new ride
 void
-RideCache::addRide(QString name, bool dosignal, bool planned, bool useTempActivities)
+RideCache::addRide(QString name, bool dosignal, bool useTempActivities, bool planned)
 {
     RideItem *prior = context->ride;
 
