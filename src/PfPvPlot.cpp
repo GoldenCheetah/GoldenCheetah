@@ -251,8 +251,6 @@ PfPvPlot::configChanged(qint32)
     pmax.setStyle(Qt::DashLine);
     pmaxCurve->setPen(pmax);
 
-    setCL(appsettings->value(this, GC_CRANKLENGTH).toDouble() / 1000.0);
-
     replot();
 }
 
