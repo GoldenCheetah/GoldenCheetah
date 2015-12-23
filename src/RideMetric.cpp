@@ -157,13 +157,18 @@ RideMetric::userMetricFingerprint(QList<UserMetricSettings> these)
 QHash<QString,RideMetricPtr>
 RideMetric::computeMetrics(RideItem *item, Specification spec, const QStringList &metrics)
 {
-    // this is our worklist
-    QStringList todo = metrics;
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+
+    // generate worklist from metrics we know
+    // bear in mind this can change as users add
+    // and remove user metrics
+    QStringList todo;
+    foreach(QString metric, metrics)
+        if (factory.haveMetric(metric))
+            todo << metric;
 
     // this is what we've completed as we go
     QHash<QString,RideMetric*> done;
-
-    const RideMetricFactory &factory = RideMetricFactory::instance();
 
     // resize the metric array in the interval if needed
     if (spec.interval() && spec.interval()->metrics().size() < factory.metricCount()) 
@@ -232,8 +237,10 @@ RideMetric::computeMetrics(RideItem *item, Specification spec, const QStringList
     // which is deleted when reference count 0 and goes out of scope
     QHash<QString,RideMetricPtr> result;
     foreach (QString symbol, metrics) {
-        result.insert(symbol, QSharedPointer<RideMetric>(done.value(symbol)));
-        done.remove(symbol);
+        if (factory.haveMetric(symbol)) {
+            result.insert(symbol, QSharedPointer<RideMetric>(done.value(symbol)));
+            done.remove(symbol);
+        }
     }
 
     // delete the cloned metrics, no memory leak here :)
