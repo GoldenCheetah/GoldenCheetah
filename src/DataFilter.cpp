@@ -1206,7 +1206,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                 }
 
                 // calling a user defined function, does it exist >=?
-                if (!df->functions.contains(leaf->function)) {
+                if (found == false && !df->functions.contains(leaf->function)) {
 
                     DataFiltererrors << QString(tr("unknown function %1")).arg(leaf->function);
                     leaf->inerror = true;
