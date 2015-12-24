@@ -37,6 +37,8 @@
 // interactions
 
 %}
+%option prefix="WithingsParser"
+%option never-interactive
 %option noyywrap
 %option nounput
 %option noinput

@@ -92,6 +92,8 @@ void JsonRideFilefree (void * ptr , yyscan_t /*scanner*/)
 #define YY_FATAL_ERROR(msg) qDebug()<<msg;
 
 %}
+%option prefix="JsonRideFile"
+%option never-interactive
 %option noyyalloc
 %option noyyrealloc
 %option noyyfree
