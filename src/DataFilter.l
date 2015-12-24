@@ -48,6 +48,8 @@ int DataFiltercolumn = 1;
 %option noinput
 %option 8bit
 %option yylineno
+%option prefix="DataFilter"
+%option never-interactive
 %%
 
 "="                                         DataFilterlval.op = EQ; return EQ;
