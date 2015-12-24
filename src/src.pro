@@ -13,8 +13,18 @@ QMAKE_INFO_PLIST = ./mac/Info.plist.app
 
 ## qwt and libz
 INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE} ../qtsolutions/json ../qtsolutions/qwtcurve
-LIBS += ../qwt/lib/libqwt.a
-LIBS += -lm $${LIBZ_LIBS}
+
+# path to qwt and libz libraries for MS or GCC toolchain
+# this is basic stuff and will need reworking completely
+# when all optional libs are included in MSVC builds
+*msvc2015 {
+    LIBS += "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64/Gdi32.lib"
+    LIBS += "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64/User32.lib"
+    LIBS += ../qwt/lib/qwt.lib
+} else {
+    LIBS += ../qwt/lib/libqwt.a
+    LIBS += -lm $${LIBZ_LIBS}
+}
 
 #
 # We support 4.8.4 or higher
