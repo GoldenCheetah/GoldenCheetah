@@ -15,9 +15,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
-#include <sys/time.h>
 #include <QObject>
+#ifndef Q_CC_MSVC
+#include <sys/time.h>
+#endif
 #include "ANTMessage.h"
 
 #ifndef ANTLOGGER_H

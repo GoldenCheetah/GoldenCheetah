@@ -141,7 +141,7 @@ FixHRSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0)
     int lastgood = -1;  // where did we last have decent HR data?
     for (int i=0; i<ride->dataPoints().count(); i++) {
       // If we have a non-zero HR that is not above the specified MAX
-      if(ride->dataPoints()[i]->hr > 0 and ride->dataPoints()[i]->hr <= max) {
+      if(ride->dataPoints()[i]->hr > 0 && ride->dataPoints()[i]->hr <= max) {
 	if (lastgood != -1 && (lastgood+1) != i) {
 	  // interpolate from last good to here
 	  double deltaHR = (ride->dataPoints()[i]->hr - ride->dataPoints()[lastgood]->hr) / double(i-lastgood);
