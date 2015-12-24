@@ -198,7 +198,13 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     headwindIndex = headings.indexOf("wind");
                     continue;
                 }
+
                 // right! we now have a record
+                // first replace spaces in quoted values as they break
+                // the way we find separators 
+                line.replace(QRegExp("\" +"), "\"");
+
+                // now split
                 QStringList values = line.split(sepPattern, QString::SkipEmptyParts);
 
                 // mmm... didn't get much data
