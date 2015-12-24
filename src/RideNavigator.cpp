@@ -1297,8 +1297,8 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     buttons->setSpacing(0);
     buttons->setContentsMargins(0,0,0,0);
 
-    QFont small;
-    small.setPointSize(8);
+    QFont smallFont;
+    smallFont.setPointSize(8);
 
     QList<QString> buttonNames = logicalHeadings;
     qSort(buttonNames.begin(), buttonNames.end(), insensitiveLessThan);
@@ -1314,7 +1314,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
 
         // setup button
         QPushButton *add = new QPushButton(column, this);
-        add->setFont(small);
+        add->setFont(smallFont);
         add->setContentsMargins(0,0,0,0);
         buttons->addWidget(add);
 

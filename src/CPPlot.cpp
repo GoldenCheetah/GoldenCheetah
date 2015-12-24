@@ -25,7 +25,6 @@
 #include "CPPlot.h"
 #include "RideCache.h"
 
-#include <unistd.h>
 #include <QDebug>
 #include <qwt_series_data.h>
 #include <qwt_legend.h>

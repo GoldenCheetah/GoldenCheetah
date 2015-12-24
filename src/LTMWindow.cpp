@@ -83,18 +83,18 @@ LTMWindow::LTMWindow(Context *context) :
     spanSlider->setLowerValue(0);
     spanSlider->setUpperValue(15);
 
-    QFont small;
-    small.setPointSize(6);
+    QFont smallFont;
+    smallFont.setPointSize(6);
 
     scrollLeft = new QPushButton("<", this);
-    scrollLeft->setFont(small);
+    scrollLeft->setFont(smallFont);
     scrollLeft->setAutoRepeat(true);
     scrollLeft->setFixedHeight(16);
     scrollLeft->setFixedWidth(16);
     scrollLeft->setContentsMargins(0,0,0,0);
 
     scrollRight = new QPushButton(">", this);
-    scrollRight->setFont(small);
+    scrollRight->setFont(smallFont);
     scrollRight->setAutoRepeat(true);
     scrollRight->setFixedHeight(16);
     scrollRight->setFixedWidth(16);
@@ -1154,9 +1154,9 @@ LTMWindow::dataTable(bool html)
             else summary += ", %1";
 
             QString name = settings.metrics[i].uname;
-            if (name == "Coggan Acute Training Load" or name == tr("Coggan Acute Training Load")) name = "ATL";
-            if (name == "Coggan Chronic Training Load" or name == tr("Coggan Chronic Training Load")) name = "CTL";
-            if (name == "Coggan Training Stress Balance" or name == tr("Coggan Training Stress Balance")) name = "TSB";
+            if (name == "Coggan Acute Training Load" || name == tr("Coggan Acute Training Load")) name = "ATL";
+            if (name == "Coggan Chronic Training Load" || name == tr("Coggan Chronic Training Load")) name = "CTL";
+            if (name == "Coggan Training Stress Balance" || name == tr("Coggan Training Stress Balance")) name = "TSB";
 
             summary = summary.arg(name);
         }

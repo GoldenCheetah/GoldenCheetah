@@ -31,7 +31,11 @@
 #include <QtXml/QtXml>
 #include <algorithm> // for std::lower_bound
 #include <assert.h>
+#ifdef Q_CC_MSVC
+#include <float.h>
+#else
 #include <cmath>
+#endif
 #include <qwt_spline.h>
 
 #ifdef GC_HAVE_SAMPLERATE
@@ -964,6 +968,34 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
 {
     // negative values are not good, make them zero
     // although alt, lat, lon, headwind, slope and temperature can be negative of course!
+#ifdef Q_CC_MSVC
+    if (!_finite(secs) || secs<0) secs=0;
+    if (!_finite(cad) || cad<0) cad=0;
+    if (!_finite(hr) || hr<0) hr=0;
+    if (!_finite(km) || km<0) km=0;
+    if (!_finite(kph) || kph<0) kph=0;
+    if (!_finite(nm) || nm<0) nm=0;
+    if (!_finite(watts) || watts<0) watts=0;
+    if (!_finite(interval) || interval<0) interval=0;
+    if (!_finite(lps) || lps<0) lps=0;
+    if (!_finite(rps) || rps<0) rps=0;
+    if (!_finite(lte) || lte<0) lte=0;
+    if (!_finite(rte) || rte<0) rte=0;
+    if (!_finite(lppb) || lppb<0) lppb=0;
+    if (!_finite(rppb) || rppb<0) rppb=0;
+    if (!_finite(lppe) || lppe<0) lppe=0;
+    if (!_finite(rppe) || rppe<0) rppe=0;
+    if (!_finite(lpppb) || lpppb<0) lpppb=0;
+    if (!_finite(rpppb) || rpppb<0) rpppb=0;
+    if (!_finite(lpppe) || lpppe<0) lpppe=0;
+    if (!_finite(rpppe) || rpppe<0) rpppe=0;
+    if (!_finite(smo2) || smo2<0) smo2=0;
+    if (!_finite(thb) || thb<0) thb=0;
+    if (!_finite(rvert) || rvert<0) rvert=0;
+    if (!_finite(rcad) || rcad<0) rcad=0;
+    if (!_finite(rcontact) || rcontact<0) rcontact=0;
+    if (!_finite(tcore) || tcore<0) tcore=0;
+#else
     if (!std::isfinite(secs) || secs<0) secs=0;
     if (!std::isfinite(cad) || cad<0) cad=0;
     if (!std::isfinite(hr) || hr<0) hr=0;
@@ -990,6 +1022,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     if (!std::isfinite(rcad) || rcad<0) rcad=0;
     if (!std::isfinite(rcontact) || rcontact<0) rcontact=0;
     if (!std::isfinite(tcore) || tcore<0) tcore=0;
+#endif
 
     // if bad time or distance ignore it if NOT the first sample
     if (dataPoints_.count() != 0 && secs == 0.00f && km == 0.00f) return;
