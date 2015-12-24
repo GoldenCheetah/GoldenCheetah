@@ -894,7 +894,7 @@ ANT::processMessage(void) {
 //fprintf(stderr, "\n");
 
     struct timeval timestamp;
-    gettimeofday (&timestamp, NULL);
+    get_timeofday (&timestamp);
     emit receivedAntMessage(m, timestamp);
 
     switch (rxMessage[ANT_OFFSET_ID]) {

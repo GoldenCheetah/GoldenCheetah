@@ -216,7 +216,7 @@ JouleDevice::download( const QDir &tmpdir,
                 tmp.write(systemResponse.dataArray());
                 tmp.write(response.dataArray());
 
-                int _try = 1;
+                int try_counter = 1;
                 while (page < 65535) {
                     if (JOULE_DEBUG) printf("page %d\n", page);
 
@@ -236,7 +236,7 @@ JouleDevice::download( const QDir &tmpdir,
                             tmp.write(response.dataArray());
                             success = true;
                         } else {
-                            if (_try == 3)
+                            if (try_counter == 3)
                                 return false;
                             else {
                                 JoulePacket request(READ_RIDE_DETAIL);
@@ -249,7 +249,7 @@ JouleDevice::download( const QDir &tmpdir,
                                 if (!request.write(dev, err)) return false;
 
                                 response = JoulePacket(PAGE_RIDE_DETAIL);
-                                _try ++;
+                                try_counter ++;
                             }
                         }
                     }
@@ -603,9 +603,13 @@ JoulePacket::read(CommPortPtr dev, QString &err)
     checksum += (uint8_t)(length >> 8);
     checksum += (uint8_t)(length & 0x00FF);
 
-
+#ifdef Q_CC_MSVC
+    char* buf = new char[length];
+    n = readOneByOne(dev, buf, length, err);
+#else
     char buf[length];
     n = readOneByOne(dev, &buf, length, err);
+#endif
 
     if (n <= 0) {
         err = (n < 0) ? (tr("read error: ") + err) : tr("read timeout");

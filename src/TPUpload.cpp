@@ -28,7 +28,11 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QLocale>
 
+#ifdef Q_CC_MSVC
+#include <QtZlib\zlib.h>
+#else
 #include <zlib.h>
+#endif
 
 //
 // Utility function to create a QByteArray of data in GZIP format

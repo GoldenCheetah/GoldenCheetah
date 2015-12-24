@@ -43,7 +43,9 @@
 //
 // Time
 //
+#ifndef Q_CC_MSVC
 #include <sys/time.h>
+#endif
 
 //
 // Serial i/o stuff
@@ -105,8 +107,24 @@ typedef struct ant_sensor_type {
 
 static inline double get_timestamp( void ) {
   struct timeval tv;
+#ifdef Q_CC_MSVC
+  QTime now = QTime::currentTime();
+  tv.tv_sec = now.second();
+  tv.tv_usec = now.msec();
+#else
   gettimeofday(&tv, NULL);
+#endif
   return tv.tv_sec * 1.0 + tv.tv_usec * 1.0e-6;
+}
+
+static inline void get_timeofday(struct timeval* tv) {
+#ifdef Q_CC_MSVC
+  QTime now = QTime::currentTime();
+  tv->tv_sec = now.second();
+  tv->tv_usec = now.msec();
+#else
+  gettimeofday(tv, NULL);
+#endif
 }
 
 

@@ -154,7 +154,7 @@ struct SyncFileReaderState
 
 
 
-            if (page_number == 1 || (page_number == 64010 and secs == 0.0)) {
+            if (page_number == 1 || (page_number == 64010 && secs == 0.0)) {
                 // 2. Training Summary data (60 bytes)";
                 read_bytes(39, &bytes_read, &sum);
 
@@ -170,7 +170,7 @@ struct SyncFileReaderState
                 read_bytes(20, &bytes_read, &sum); // Don't care
             }
 
-            if (page_number == 1 || (page_number == 64010 and secs == 0.0)) {
+            if (page_number == 1 || (page_number == 64010 && secs == 0.0)) {
                 // Section Start time and date data (12 byte)
 
                 int sec = read_bsd_byte(&bytes_read, &sum); // Section start time sec
