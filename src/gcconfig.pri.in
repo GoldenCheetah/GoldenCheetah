@@ -26,6 +26,11 @@
 # You may need to specify the full path if things don't work.
 #QMAKE_LEX  = flex
 #QMAKE_YACC = bison
+# If you're compiling with nmake and VC then you
+# will likely also use win_flex and win_bison
+# so uncomment below
+#QMAKE_LEX = win_flex
+#QMAKE_YACC = win_bison
 #win32 {
 #  QMAKE_YACC = bison --file-prefix=y -t
 #  QMAKE_MOVE = cmd /c move
