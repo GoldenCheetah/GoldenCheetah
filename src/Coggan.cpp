@@ -25,6 +25,7 @@
 #include "Specification.h"
 #include "Units.h"
 #include <cmath>
+#include <assert.h>
 #include <QApplication>
 
 

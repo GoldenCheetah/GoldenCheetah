@@ -24,7 +24,6 @@
 #include <QString>
 #include <QVector>
 #include <QSharedPointer>
-#include <assert.h>
 #include <cmath>
 #include <QDebug>
 #include <QList>
@@ -319,7 +318,7 @@ class RideMetricFactory {
         if (dependenciesChecked) return;
         foreach(const QString &dependee, dependencyMap.keys()) {
             foreach(const QString &dependency, *dependencyMap[dependee])
-                assert(metrics.contains(dependency));
+                qDebug()<<"metric dep error:"<<dependency;
         }
         const_cast<RideMetricFactory*>(this)->dependenciesChecked = true;
     }
@@ -349,7 +348,6 @@ class RideMetricFactory {
     }
 
     RideMetric *newMetric(const QString &symbol) const {
-        assert(metrics.contains(symbol));
         checkDependencies();
         return metrics.value(symbol)->clone();
     }
@@ -380,7 +378,7 @@ class RideMetricFactory {
 
     bool addMetric(const RideMetric &metric,
                    const QVector<QString> *deps = NULL) {
-        assert(!metrics.contains(metric.symbol()));
+        if(metrics.contains(metric.symbol())) return false;
         RideMetric *newMetric = metric.clone();
         newMetric->setIndex(metrics.count());
         metrics.insert(metric.symbol(), newMetric);
@@ -397,7 +395,7 @@ class RideMetricFactory {
     }
 
     const QVector<QString> &dependencies(const QString &symbol) const {
-        assert(metrics.contains(symbol));
+        if(!metrics.contains(symbol)) return noDeps;
         QVector<QString> *result = dependencyMap.value(symbol);
         return result ? *result : noDeps;
     }

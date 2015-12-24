@@ -26,6 +26,7 @@
 #include "PaceZones.h"
 
 #include <cmath>
+#include <assert.h>
 #include <QApplication>
 
 class PaceZoneTime : public RideMetric {

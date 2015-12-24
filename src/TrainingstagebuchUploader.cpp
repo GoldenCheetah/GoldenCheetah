@@ -24,6 +24,7 @@
 #include "Units.h"
 
 #include <stdio.h>
+#include <assert.h>
 
 // access to metrics
 #include "PwxRideFile.h"

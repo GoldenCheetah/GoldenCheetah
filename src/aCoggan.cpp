@@ -23,6 +23,7 @@
 #include "Specification.h"
 #include "Zones.h"
 #include <cmath>
+#include <assert.h>
 #include <QApplication>
 
 class aNP : public RideMetric {
