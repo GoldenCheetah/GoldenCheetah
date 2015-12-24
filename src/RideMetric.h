@@ -318,7 +318,8 @@ class RideMetricFactory {
         if (dependenciesChecked) return;
         foreach(const QString &dependee, dependencyMap.keys()) {
             foreach(const QString &dependency, *dependencyMap[dependee])
-                qDebug()<<"metric dep error:"<<dependency;
+                if (!metrics.contains(dependency))
+                    qDebug()<<"metric dep error:"<<dependency;
         }
         const_cast<RideMetricFactory*>(this)->dependenciesChecked = true;
     }
