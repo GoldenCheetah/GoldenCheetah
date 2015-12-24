@@ -25,6 +25,7 @@
 #include "Specification.h"
 #include "Settings.h"
 #include <cmath>
+#include <assert.h>
 #include <QApplication>
 
 class AverageWPK : public RideMetric {

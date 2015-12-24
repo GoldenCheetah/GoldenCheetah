@@ -39,6 +39,8 @@
 #include <zlib.h>
 #endif
 
+#include <assert.h>
+
 bool
 ShareDialogUploader::canUpload( QString &err )
 {

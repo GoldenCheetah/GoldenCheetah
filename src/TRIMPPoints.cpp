@@ -22,6 +22,8 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include <cmath>
+#include <assert.h>
+
 #include "Context.h"
 #include "Athlete.h"
 #include "Specification.h"

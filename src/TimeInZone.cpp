@@ -25,6 +25,7 @@
 #include "Zones.h"
 #include "BestIntervalDialog.h"
 #include <cmath>
+#include <assert.h>
 #include <QApplication>
 
 class ZoneTime : public RideMetric {

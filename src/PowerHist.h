@@ -31,6 +31,7 @@
 #include "Settings.h"
 #include "Colors.h"
 
+#include <assert.h>
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_zoomer.h>

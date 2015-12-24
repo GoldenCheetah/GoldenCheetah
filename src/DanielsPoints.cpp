@@ -23,6 +23,7 @@
 #include "Athlete.h"
 #include "Specification.h"
 #include <cmath>
+#include <assert.h>
 #include <QApplication>
 
 // The idea: Fit a curve to the points system in Table 2.2 of "Daniel's Running

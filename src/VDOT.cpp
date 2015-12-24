@@ -26,6 +26,7 @@
 #include "Athlete.h"
 #include "Specification.h"
 #include <cmath>
+#include <assert.h>
 #include <QApplication>
 
 // Daniels VDOT
