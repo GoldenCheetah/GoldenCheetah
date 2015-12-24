@@ -23,6 +23,8 @@
 #include <stdio.h>
 #if Q_CC_MSVC
 #include <io.h>
+#else
+#include <unistd.h>
 #endif
 #include <stdlib.h>
 #include <errno.h>
