@@ -33,7 +33,11 @@
 #include "RideMetric.h"
 #include "TcxRideFile.h"
 
+#ifdef Q_CC_MSVC
+#include <QtZlib/zlib.h>>
+#else
 #include <zlib.h>
+#endif
 
 bool
 ShareDialogUploader::canUpload( QString &err )

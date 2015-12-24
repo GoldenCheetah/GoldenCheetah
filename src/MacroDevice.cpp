@@ -389,8 +389,13 @@ MacroPacket::read(CommPortPtr dev, int len, QString &err)
     }
 
     if (MACRO_DEBUG) printf("reading %d from device\n", len);
-    char buf[len];
+#ifdef Q_CC_MSVC
+    char* buf = new char[len];
+    int n = dev->read(buf, len, err);
+#else
+    char buf [len];
     int n = dev->read(&buf, len, err);
+#endif
 
     if (n <= 0) {
         err = (n < 0) ? (tr("read error: ") + err) : tr("read timeout");
@@ -401,8 +406,12 @@ MacroPacket::read(CommPortPtr dev, int len, QString &err)
         return false;
     }
 
+#ifdef Q_CC_MSVC
     if (MACRO_DEBUG) printf("payload %s\n" ,cEscape(buf,n).toLatin1().constData());
     addToPayload(buf,n);
-
+#else
+    if (MACRO_DEBUG) printf("payload %s\n" ,cEscape(buf,n).toLatin1().constData());
+    addToPayload(buf,n);
+#endif
     return true;
 }

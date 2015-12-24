@@ -546,20 +546,41 @@ PfPvPlot::setData(RideItem *_rideItem)
                 double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
                 if (aepf <= 2500) { // > 2500 newtons is our out of bounds
+#if Q_CC_MSVC
+                    dataSet.insert(std::make_pair(aepf, cpv));
+#else
                     dataSet.insert(std::make_pair<double, double>(aepf, cpv));
+#endif
+
                     tot_cad += p1->cad;
                     tot_cad_points++;
 
                     // fill the dataSets for gearRatio display
                     if (p1->gear != 0) {
                         if (p1->gear > 0.0f && p1->gear <= 1.00f) {
+#if Q_CC_MSVC
+                            gearSet[0].insert(std::make_pair(aepf, cpv));
+#else
                             gearSet[0].insert(std::make_pair<double, double>(aepf, cpv));
+#endif
                         } else if (p1->gear > 1.00f && p1->gear <= 2.50f ) {
+#if Q_CC_MSVC
+                            gearSet[1].insert(std::make_pair(aepf, cpv));
+#else
                             gearSet[1].insert(std::make_pair<double, double>(aepf, cpv));
+#endif
                         } else if (p1->gear > 2.50f && p1->gear <= 4.00 ) {
-                            gearSet[2].insert(std::make_pair<double, double>(aepf, cpv));
+#if Q_CC_MSVC
+                            gearSet[2].insert(std::make_pair(aepf, cpv));
+#else
+                            gearSet[2].insert(std::make_pair(aepf, cpv));
+#endif
                         } else {  // > 4.0
+#if Q_CC_MSVC
+                            gearSet[3].insert(std::make_pair(aepf, cpv));
+#else
                             gearSet[3].insert(std::make_pair<double, double>(aepf, cpv));
+#endif
                         }
                     }
                  }
@@ -783,9 +804,17 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                         ++high;
                         if (p1->secs+ride->recIntSecs() > current->start && p1->secs< current->stop) {
                             if (mergeIntervals())
+#if Q_CC_MSVC
+                                dataSetInterval[0].insert(std::make_pair(aepf, cpv));
+#else
                                 dataSetInterval[0].insert(std::make_pair<double, double>(aepf, cpv));
+#endif
                             else
+#if Q_CC_MSVC
+                                dataSetInterval[high].insert(std::make_pair(aepf, cpv));
+#else
                                 dataSetInterval[high].insert(std::make_pair<double, double>(aepf, cpv));
+#endif
                         }
                     }
                 }
@@ -1309,10 +1338,17 @@ PfPvPlot::showCompareIntervals()
                     double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
                     if (mergeIntervals())
+#if Q_CC_MSVC
+                        dataSetInterval[0].insert(std::make_pair(aepf, cpv));
+#else
                         dataSetInterval[0].insert(std::make_pair<double, double>(aepf, cpv));
+#endif
                     else
+#if Q_CC_MSVC
+                        dataSetInterval[high].insert(std::make_pair(aepf, cpv));
+#else
                         dataSetInterval[high].insert(std::make_pair<double, double>(aepf, cpv));
-
+#endif
                     tot_cad += p1->cad;
                     tot_cad_points++;
                 }

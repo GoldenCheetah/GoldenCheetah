@@ -28,7 +28,13 @@
 #include <QtSql>
 #include <qwt_plot_curve.h>
 
-#define GCC_VERSION QString("%1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__)
+#ifdef Q_CC_GNU
+#define COMPILER_VERSION QString("GCC %1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__)
+#endif
+
+#ifdef Q_CC_MSVC
+#define COMPILER_VERSION QString("MSVC %1").arg(_MSC_VER)
+#endif
 
 #ifndef Q_OS_MAC
 #include "VideoWindow.h"
@@ -300,7 +306,7 @@ QString GcCrashDialog::versionHTML()
             )
             .arg(QT_VERSION_STR)
             .arg(QWT_VERSION_STR)
-            .arg(GCC_VERSION)
+            .arg(COMPILER_VERSION)
             .arg(srmio)
             .arg(oauth)
             .arg(d2xx)

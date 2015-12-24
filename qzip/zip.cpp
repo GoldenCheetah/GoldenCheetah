@@ -51,7 +51,12 @@
 #include <qdebug.h>
 #include <qdir.h>
 
+#ifdef Q_CC_MSVC
+#include <QtZlib\zlib.h>
+#else
 #include <zlib.h>
+#endif
+
 
 #if defined(Q_OS_WIN)
 #  undef S_IFREG
@@ -358,7 +363,7 @@ struct FileHeader
 };
 
 ZipReader::FileInfo::FileInfo()
-    : isDir(false), isFile(false), isSymLink(false), crc32(0), size(0)
+    : isDir(false), isFile(false), isSymLink(false), crc_32(0), size(0)
 {
 }
 
@@ -378,7 +383,7 @@ ZipReader::FileInfo& ZipReader::FileInfo::operator=(const FileInfo &other)
     isFile = other.isFile;
     isSymLink = other.isSymLink;
     permissions = other.permissions;
-    crc32 = other.crc32;
+    crc_32 = other.crc_32;
     size = other.size;
     lastModified = other.lastModified;
     return *this;
@@ -422,7 +427,7 @@ void QZipPrivate::fillFileInfo(int index, ZipReader::FileInfo &fileInfo) const
     fileInfo.isFile = S_ISREG(mode);
     fileInfo.isSymLink = S_ISLNK(mode);
     fileInfo.permissions = modeToPermissions(mode);
-    fileInfo.crc32 = readUInt(header.h.crc_32);
+    fileInfo.crc_32 = readUInt(header.h.crc_32);
     fileInfo.size = readUInt(header.h.uncompressed_size);
     fileInfo.lastModified = readMSDosDate(header.h.last_mod_file);
 }
