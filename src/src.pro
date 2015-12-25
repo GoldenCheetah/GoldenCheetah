@@ -1,36 +1,43 @@
-# To build, see the instructions in gcconfig.pri.in.
+###############################################################################
+#                                                                             #
+#              ***  SECTION ONE - CORE CONFIGURATION  ***                     #
+#                                                                             #
+#                                                                             #
+###############################################################################
 
-include( gcconfig.pri )
 
-#
-# What we are making and core dependencies
-#
+###==========================
+### IMPORT USER CONFIGURATION
+###==========================
+
+# You must configure your settings by copying from gcconfig.pri.in.
+# The file contains instructions on settings to make
+include(gcconfig.pri)
+
+# You can also define your own local source to add to build
+HEADERS += $${LOCALHEADERS}
+SOURCE += $${LOCALSOURCE}
+
+
+###=====================
+### GOLDENCHEETAH TARGET
+###=====================
+
 TEMPLATE = app
 TARGET = GoldenCheetah
 !isEmpty( APP_NAME ) { TARGET = $${APP_NAME} }
 DEPENDPATH += .
 QMAKE_INFO_PLIST = ./mac/Info.plist.app
-
-## qwt and libz
-INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE} ../qtsolutions/json ../qtsolutions/qwtcurve
-
-# path to qwt and libz libraries for MS or GCC toolchain
-# this is basic stuff and will need reworking completely
-# when all optional libs are included in MSVC builds
-*msvc2015 {
-    LIBS += "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64/Gdi32.lib"
-    LIBS += "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64/User32.lib"
-    LIBS += ../qwt/lib/qwt.lib
-} else {
-    LIBS += ../qwt/lib/libqwt.a
-    LIBS += -lm $${LIBZ_LIBS}
+CONFIG(debug, debug|release) {
+    QMAKE_CXXFLAGS += -DGC_DEBUG
 }
 
-#
-# We support 4.8.4 or higher
-#            5.2.0 or higher
-#
-## common modules
+
+###======================================================
+### QT MODULES [we officially support QT4.8.6+ or QT5.6+]
+###======================================================
+
+# always
 QT += xml sql network script svg concurrent
 
 lessThan(QT_MAJOR_VERSION, 5) {
@@ -47,23 +54,140 @@ lessThan(QT_MAJOR_VERSION, 5) {
     } else {
         QT += multimedia multimediawidgets
     }
-
-    ## QT5 can support complex JSON documents
-    SOURCES += Dropbox.cpp
-    HEADERS += Dropbox.h
-
-    ## Monark support needs QtSerialPort
-    SOURCES += Monark.cpp MonarkController.cpp MonarkConnection.cpp
-    HEADERS += Monark.h MonarkController.h MonarkConnection.h
 }
 
-# if we are building in debug mode
-# then set MACRO -DGC_DEBUG so we can
-# add / turnoff code for debugging purposes
-CONFIG(debug, debug|release) {
-    QMAKE_CXXFLAGS += -DGC_DEBUG
+
+###=======================================================================
+### DISTRIBUTED SOURCE [Snaffled in sources to avoid further dependencies]
+###=======================================================================
+
+# qwt, qxt, libz, json and qwtcurve
+INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE} ../qtsolutions/json ../qtsolutions/qwtcurve
+DEFINES += QXT_STATIC
+
+# local qtsoap handling
+include( ../qtsolutions/soap/qtsoap.pri )
+DEFINES += GC_HAVE_SOAP
+
+# path to qwt and libz libraries differs for MS or GNU toolchain
+*msvc2015 {
+    LIBS += ../qwt/lib/qwt.lib
+} else {
+    LIBS += ../qwt/lib/libqwt.a
+    LIBS += -lm $${LIBZ_LIBS}
 }
 
+
+###===============================
+### PLATFORM SPECIFIC DEPENDENCIES
+###===============================
+
+# Microsoft Visual Studion toolchain dependencies
+*msvc2015 {
+    LIBS += "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64/Gdi32.lib"
+    LIBS += "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64/User32.lib"
+}
+
+# icon if not on windows
+!win32 {
+    RC_FILE = images/gc.icns
+}
+
+# windows icon and some zlib
+win32 {
+
+    INCLUDEPATH += ./win32 $$[QT_INSTALL_PREFIX]/src/3rdparty/zlib
+    LIBS += -lws2_32
+    //QMAKE_LFLAGS = -Wl,--enable-runtime-pseudo-reloc \
+    //               -Wl,--script,win32/i386pe.x-no-rdata,--enable-auto-import
+    //QMAKE_CXXFLAGS += -fdata-sections
+    RC_FILE = windowsico.rc
+
+}
+
+# on mac we use native buttons and video, but have native fullscreen support
+macx {
+
+    LIBS    += -lobjc -framework IOKit -framework AppKit -framework QTKit
+    HEADERS +=  QtMacVideoWindow.h \
+                QtMacSegmentedButton.h \
+                QtMacButton.h
+
+    OBJECTIVE_SOURCES +=    QtMacVideoWindow.mm \
+                            QtMacSegmentedButton.mm \
+                            QtMacButton.mm
+}
+
+# not on max we need our own full screen support and segment control button
+!macx {
+
+    HEADERS += QTFullScreen.h
+    SOURCES += QTFullScreen.cpp
+
+
+    HEADERS += ../qtsolutions/segmentcontrol/qtsegmentcontrol.h
+    SOURCES += ../qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
+
+    # we now have videowindow, it will do nothing
+    HEADERS     += VideoWindow.h
+    SOURCES     += VideoWindow.cpp
+}
+
+
+###=================
+### LANGUAGE SUPPORT
+###=================
+
+TRANSLATIONS = translations/gc_fr.ts \
+               translations/gc_ja.ts \
+               translations/gc_it.ts \
+               translations/gc_pt-br.ts \
+               translations/gc_de.ts \
+               translations/gc_cs.ts \
+               translations/gc_es.ts \
+               translations/gc_pt.ts \
+               translations/gc_ru.ts \
+	       translations/gc_zh-tw.ts
+
+# need lrelease to generate qm files
+isEmpty(QMAKE_LRELEASE) {
+    win32:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\\lrelease.exe
+    unix:!macx {QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease-qt4 }
+    else:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+}
+
+# how to run lrelease
+isEmpty(TS_DIR):TS_DIR = translations
+TSQM.name = lrelease ${QMAKE_FILE_IN}
+TSQM.input = TRANSLATIONS
+TSQM.output = $$TS_DIR/${QMAKE_FILE_BASE}.qm
+TSQM.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN}
+TSQM.CONFIG = no_link
+QMAKE_EXTRA_COMPILERS += TSQM
+PRE_TARGETDEPS += compiler_TSQM_make_all
+
+
+###==========
+### RESOURCES
+###==========
+
+RESOURCES = application.qrc \
+            RideWindow.qrc
+
+
+
+###############################################################################
+#                                                                             #
+#         ***  SECTION TWO - OPTIONAL LIBRARIES AND FEATURES  ***             #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+
+
+###====================
+### OPTIONAL => KQOAUTH
+###====================
 
 # KQOAuth .pro in default creates different libs for release and debug
 unix:!macx {
@@ -77,6 +201,7 @@ unix:!macx {
     HEADERS     += TwitterDialog.h
 
 } else {
+
     !isEmpty( KQOAUTH_INSTALL ) {
         isEmpty( KQOAUTH_INCLUDE ) { KQOAUTH_INCLUDE += $${KQOAUTH_INSTALL}/src }
         isEmpty( KQOAUTH_LIBS ) {
@@ -92,9 +217,13 @@ unix:!macx {
 }
 
 
-!isEmpty( D2XX_INCLUDE ) {
+###=======================================================
+### OPTIONAL => D2XX FOR FTDI DRIVERS ON WINDOWS PLATFORMS
+###=======================================================
+
+!isEmpty(D2XX_INCLUDE) {
     INCLUDEPATH += $${D2XX_INCLUDE}
-    !isEmpty( D2XX_LIBS ) { LIBS += $${D2XX_LIBS} }
+    !isEmpty(D2XX_LIBS) { LIBS += $${D2XX_LIBS} }
     HEADERS     += D2XX.h
     SOURCES     += D2XX.cpp
     DEFINES     += GC_HAVE_D2XX
@@ -102,6 +231,11 @@ unix:!macx {
         LIBS    += -ldl
     }
 }
+
+
+###==================
+### OPTIONAL => SRMIO
+###==================
 
 !isEmpty( SRMIO_INSTALL ) {
     isEmpty( SRMIO_INCLUDE ) { SRMIO_INCLUDE = $${SRMIO_INSTALL}/include }
@@ -112,6 +246,11 @@ unix:!macx {
     SOURCES     += SrmDevice.cpp
     DEFINES     += GC_HAVE_SRMIO
 }
+
+
+###==================
+### OPTIONAL => QWT3D
+###==================
 
 !isEmpty( QWT3D_INSTALL ) {
     isEmpty( QWT3D_INCLUDE ) { QWT3D_INCLUDE = $${QWT3D_INSTALL}/include }
@@ -125,9 +264,14 @@ unix:!macx {
     SOURCES     += ModelPlot.cpp ModelWindow.cpp
 }
 
+
+###=====================================
+### OPTIONAL => GOOGLE KML IMPORT EXPORT
+###=====================================
+
 !isEmpty( KML_INSTALL) {
-    isEmpty( KML_INCLUDE ) { KML_INCLUDE = $${KML_INSTALL}/include }
-    isEmpty( KML_LIBS )    { 
+    isEmpty(KML_INCLUDE) { KML_INCLUDE = $${KML_INSTALL}/include }
+    isEmpty(KML_LIBS)    {
         KML_LIBS    = $${KML_INSTALL}/lib/libkmldom.a \
                       $${KML_INSTALL}/lib/libkmlconvenience.a \
                       $${KML_INSTALL}/lib/libkmlengine.a \
@@ -140,7 +284,12 @@ unix:!macx {
     HEADERS     += KmlRideFile.h
 }
 
-!isEmpty( ICAL_INSTALL ) {
+
+###=================
+### OPTIONAL => ICAL
+###=================
+
+!isEmpty(ICAL_INSTALL) {
     isEmpty( ICAL_INCLUDE ) { ICAL_INCLUDE = $${ICAL_INSTALL}/include }
     isEmpty( ICAL_LIBS )    { ICAL_LIBS    = $${ICAL_INSTALL}/lib/libical.a }
     INCLUDEPATH += $${ICAL_INCLUDE}
@@ -150,10 +299,14 @@ unix:!macx {
     SOURCES     += ICalendar.cpp DiaryWindow.cpp CalDAV.cpp
 }
 
-# are we supporting USB2 devices
-!isEmpty( LIBUSB_INSTALL ) {
-    isEmpty( LIBUSB_INCLUDE ) { LIBUSB_INCLUDE = $${LIBUSB_INSTALL}/include }
-    isEmpty( LIBUSB_LIBS )    {
+
+###===================
+### OPTIONAL => LIBUSB
+###===================
+
+!isEmpty(LIBUSB_INSTALL) {
+    isEmpty(LIBUSB_INCLUDE) { LIBUSB_INCLUDE = $${LIBUSB_INSTALL}/include }
+    isEmpty(LIBUSB_LIBS)    {
         unix  { LIBUSB_LIBS = $${LIBUSB_INSTALL}/lib/libusb.a }
         win32 { LIBUSB_LIBS = $${LIBUSB_INSTALL}/lib/gcc/libusb.a }
     }
@@ -164,15 +317,34 @@ unix:!macx {
     HEADERS     += LibUsb.h EzUsb.h Fortius.cpp FortiusController.h
 }
 
-# are we supporting video playback?
-# only on Linux and Windows, since we use QTKit on Mac
-!isEmpty( VLC_INSTALL ) {
+
+###===================================================
+### OPTIONAL => USBXPRESS [Windows only for ANT+ USB1]
+###===================================================
+
+# are we supporting USB1 devices on Windows?
+!isEmpty( USBXPRESS_INSTALL ) {
+    isEmpty( USBXPRESS_INCLUDE ) { USBXPRESS_INCLUDE = $${USBXPRESS_INSTALL} }
+    isEmpty( USBXPRESS_LIBS )    { USBXPRESS_LIBS    = $${USBXPRESS_INSTALL}/x86/SiUSBXp.lib }
+    INCLUDEPATH += $${USBXPRESS_INCLUDE}
+    LIBS        += $${USBXPRESS_LIBS}
+    DEFINES     += GC_HAVE_USBXPRESS
+    SOURCES += USBXpress.cpp
+    HEADERS += USBXpress.h
+}
+
+
+###=============================================================
+### OPTIONAL => VLC [Windows and Unix. OSX uses QuickTime Video]
+###=============================================================
+
+!isEmpty(VLC_INSTALL) {
     macx {
         # we do not use VLC on Mac we use Quicktime
         # so ignore this setting on a Mac build
     } else {
-        isEmpty( VLC_INCLUDE ) { VLC_INCLUDE = $${VLC_INSTALL}/include }
-        isEmpty( VLC_LIBS )    {
+        isEmpty(VLC_INCLUDE) { VLC_INCLUDE = $${VLC_INSTALL}/include }
+        isEmpty(VLC_LIBS)    {
             win32 {
                 VLC_LIBS = $${VLC_INSTALL}/lib/libvlc.dll.a \
     	                   $${VLC_INSTALL}/lib/libvlccore.dll.a
@@ -186,8 +358,12 @@ unix:!macx {
     }
 }
 
-# libsamplerate available ?
-!isEmpty( SAMPLERATE_INSTALL ) {
+
+###=======================
+### OPTIONAL => SAMPLERATE
+###=======================
+
+!isEmpty(SAMPLERATE_INSTALL) {
     isEmpty( SAMPLERATE_INCLUDE ) { SAMPLERATE_INCLUDE = $${SAMPLERATE_INSTALL}/include }
     isEmpty( SAMPLERATE_LIBS )    { SAMPLERATE_LIBS    = $${SAMPLERATE_INSTALL}/lib/libsamplerate.a }
     INCLUDEPATH += $${SAMPLERATE_INCLUDE}
@@ -195,115 +371,12 @@ unix:!macx {
     DEFINES     += GC_HAVE_SAMPLERATE
 }
 
-# FreeSearch replaces deprecated lucene
-HEADERS     += DataFilter.h SearchBox.h NamedSearch.h SearchFilterBox.h FreeSearch.h \
-    SportPlusHealthUploader.h
-SOURCES     += DataFilter.cpp SearchBox.cpp NamedSearch.cpp SearchFilterBox.cpp FreeSearch.cpp \
-    SportPlusHealthUploader.cpp
-YACCSOURCES += DataFilter.y
-LEXSOURCES  += DataFilter.l
 
-# Mac specific build for
-# Segmented mac style button
-# Video playback using Quicktime Framework
-# search box for title bar
-macx {
-    LIBS    += -lobjc -framework IOKit -framework AppKit -framework QTKit
-    HEADERS +=  QtMacVideoWindow.h \
-                QtMacSegmentedButton.h \
-                QtMacButton.h 
+###==================================
+### OPTIONAL => HTTP API WEB SERVICES
+###==================================
 
-    OBJECTIVE_SOURCES +=    QtMacVideoWindow.mm \
-                            QtMacSegmentedButton.mm \
-                            QtMacButton.mm 
-
-    # on a mac we need to install the Wahoo API for BTLE/Kickr support
-    # This requires **v3.0 (beta)** of the WF API which is not yet
-    # in general release 
-    !isEmpty(HAVE_WFAPI) {
-
-        DEFINES += GC_HAVE_WFAPI
-        LIBS += -framework WFConnector 
-        LIBS += -framework IOBluetooth -framework Foundation
-        LIBS += -lstdc++ -all_load
-
-        # We have an abstraction layer for the Wahoo Fitness API
-        # At present this only works on Mac -- since support for 
-        # BTLE on Linux and Windows is emerging and there is no
-        # Linux or Windows support for the WF API from Wahoo (yet)
-        HEADERS += WFApi.h Kickr.h KickrController.h
-        SOURCES += Kickr.cpp KickrController.cpp
-        HEADERS += BT40.h BT40Controller.h
-        SOURCES += BT40.cpp BT40Controller.cpp
-        OBJECTIVE_SOURCES += WFApi.mm
-
-    }
-
-} else {
-
-    # not a mac? then F12 to toggle full screen using
-    # standard QT showFullScreen / showNormal
-    HEADERS += QTFullScreen.h
-    SOURCES += QTFullScreen.cpp
-
-    #qt segmented control for toolbar (non-Mac)
-    HEADERS += ../qtsolutions/segmentcontrol/qtsegmentcontrol.h
-    SOURCES += ../qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
-
-    # we now have videowindow, it will do nothing
-    HEADERS     += VideoWindow.h
-    SOURCES     += VideoWindow.cpp
-}
-
-!win32 {
-    RC_FILE = images/gc.icns
-}
-
-win32 {
-
-    INCLUDEPATH += ./win32 $$[QT_INSTALL_PREFIX]/src/3rdparty/zlib
-    LIBS += -lws2_32
-    //QMAKE_LFLAGS = -Wl,--enable-runtime-pseudo-reloc \
-    //               -Wl,--script,win32/i386pe.x-no-rdata,--enable-auto-import
-    //QMAKE_CXXFLAGS += -fdata-sections
-    RC_FILE = windowsico.rc
-
-    # are we supporting USB1 devices on Windows?
-    !isEmpty( USBXPRESS_INSTALL ) {
-        isEmpty( USBXPRESS_INCLUDE ) { USBXPRESS_INCLUDE = $${USBXPRESS_INSTALL} }
-        isEmpty( USBXPRESS_LIBS )    { USBXPRESS_LIBS    = $${USBXPRESS_INSTALL}/x86/SiUSBXp.lib }
-        INCLUDEPATH += $${USBXPRESS_INCLUDE}
-        LIBS        += $${USBXPRESS_LIBS}
-        DEFINES     += GC_HAVE_USBXPRESS
-        SOURCES += USBXpress.cpp
-        HEADERS += USBXpress.h
-    }
-}
-
-# local qxt widgets - rather than add another dependency on libqxt
-DEFINES += QXT_STATIC
-SOURCES += ../qxt/src/qxtspanslider.cpp \
-           ../qxt/src/qxtstringspinbox.cpp
-
-HEADERS += ../qxt/src/qxtspanslider.h \
-           ../qxt/src/qxtspanslider_p.h \
-           ../qxt/src/qxtstringspinbox.h
-
-isEmpty( QTSOAP_INSTALL ) {
-    include( ../qtsolutions/soap/qtsoap.pri )
-} else {
-    include( $${QTSOAP_INSTALL} )
-}
-HEADERS += TPUpload.h TPUploadDialog.h TPDownload.h TPDownloadDialog.h
-SOURCES += TPUpload.cpp TPUploadDialog.cpp TPDownload.cpp TPDownloadDialog.cpp
-DEFINES += GC_HAVE_SOAP
-
-# gapped curve
-HEADERS += ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.h
-SOURCES +=  ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp
-
-# web server to provide web-services for external integration with R
-!isEmpty ( HTPATH ) {
+!isEmpty (HTPATH) {
 
     INCLUDEPATH += $$HTPATH
     DEPENDPATH += $$HTPATH
@@ -337,8 +410,12 @@ SOURCES +=  ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp
                 $$HTPATH/staticfilecontroller.cpp
 }
 
-# cloudDB features (APP_NAME and BASIC_AUTH must be defined) see gcconfig.pri.in
-equals ( CloudDB, active ) {
+
+###=====================================================
+### OPTIONAL => CLOUD DB [Google App Engine Integration]
+###=====================================================
+
+equals(CloudDB, active) {
 
     HEADERS += ChartExchange.h
     SOURCES += ChartExchange.cpp
@@ -346,14 +423,50 @@ equals ( CloudDB, active ) {
 }
 
 
-# qzipreader/qzipwriter always
-HEADERS += ../qzip/zipreader.h \
-           ../qzip/zipwriter.h
-SOURCES += ../qzip/zip.cpp
 
-HEADERS += $${LOCALHEADERS}
-SOURCE += $${LOCALSOURCE}
-HEADERS += \
+###############################################################################
+#                                                                             #
+#         ***  SECTION THREE - GOLDENCHEETAH SOURCE FILES  ***                #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+
+
+###===========================================
+### FEATURES ENABLED WHEN HAVE QT5 [or higher]
+###===========================================
+
+greaterThan(QT_MAJOR_VERSION, 4) {
+
+    # Features that only work with QT5 or higher
+    SOURCES += Dropbox.cpp
+    HEADERS += Dropbox.h
+    SOURCES += Monark.cpp MonarkController.cpp MonarkConnection.cpp
+    HEADERS += Monark.h MonarkController.h MonarkConnection.h
+}
+
+
+###=====================
+### LEX AND YACC SOURCES
+###=====================
+
+YACCSOURCES += DataFilter.y \
+               JsonRideFile.y \
+               WithingsParser.y \
+               RideDB.y
+
+LEXSOURCES  += DataFilter.l \
+               JsonRideFile.l \
+               WithingsParser.l \
+               RideDB.l
+
+
+###=========================================
+### HEADER FILES [scanned by qmake, for moc]
+###=========================================
+
+HEADERS  += \
         AboutDialog.h \
         AddDeviceWizard.h \
         AddIntervalDialog.h \
@@ -361,60 +474,62 @@ HEADERS += \
         AerolabWindow.h \
         AllPlot.h \
         AllPlotInterval.h \
-        AllPlotWindow.h \
         AllPlotSlopeCurve.h \
+        AllPlotWindow.h \
         AnalysisSidebar.h \
-        ANT.h \
         ANTChannel.h \
+        ANT.h \
+        ANTlocalController.h \
         ANTLogger.h \
         ANTMessage.h \
         ANTMessages.h \
-        ANTlocalController.h \
-        Athlete.h \
         AthleteBackup.h \
+        Athlete.h \
         BatchExportDialog.h \
         BestIntervalDialog.h \
-        BinRideFile.h \
         Bin2RideFile.h \
         BingMap.h \
+        BinRideFile.h \
         BlankState.h \
         CalendarDownload.h \
         ChartBar.h \
         ChartSettings.h \
         ChooseCyclistDialog.h \
-        Colors.h \
         ColorButton.h \
+        Colors.h \
         CommPort.h \
         CompareDateRange.h \
         CompareInterval.h \
         ComparePane.h \
-        Computrainer.h \
         Computrainer3dpFile.h \
+        ComputrainerController.h \
+        Computrainer.h \
         ConfigDialog.h \
         Context.h \
         CpPlotCurve.h \
         CPPlot.h \
         CriticalPowerWindow.h \
         CsvRideFile.h \
+        DataFilter.h \
         DataProcessor.h \
         DaysScaleDraw.h \
+        DeviceConfiguration.h \
         Device.h \
         DeviceTypes.h \
-        DeviceConfiguration.h \
         DialWindow.h \
         DiarySidebar.h \
-        DragBar.h \
         DownloadRideDialog.h \
-        ErgFile.h \
-        ErgDB.h \
+        DragBar.h \
         ErgDBDownloadDialog.h \
+        ErgDB.h \
+        ErgFile.h \
         ErgFilePlot.h \
         ExtendedCriticalPower.h \
         FileStore.h \
-        FitlogRideFile.h \
         FitlogParser.h \
-        FitRideFile.h \ 
-        GenerateHeatMapDialog.h \
+        FitlogRideFile.h \
+        FitRideFile.h \
+        FreeSearch.h \
         GcCalendarModel.h \
         GcCrashDialog.h \
         GcOverlayWidget.h \
@@ -426,18 +541,19 @@ HEADERS += \
         GcUpgrade.h \
         GcWindowLayout.h \
         GcWindowRegistry.h \
+        GenerateHeatMapDialog.h \
         GoldenCheetah.h \
         GoogleMapControl.h \
         GProgressDialog.h \
         GpxParser.h \
         GpxRideFile.h \
-        HelpWindow.h \
         HelpWhatsThis.h \
+        HelpWindow.h \
         HistogramWindow.h \
         HomeWindow.h \
-        HrZones.h \
         HrPwPlot.h \
         HrPwWindow.h \
+        HrZones.h \
         IndendPlotMarker.h \
         IntervalItem.h \
         IntervalSummaryWindow.h \
@@ -447,17 +563,18 @@ HEADERS += \
         LapsEditor.h \
         Library.h \
         LibraryParser.h \
+        LocalFileStore.h \
         LogTimeScaleDraw.h \
         LTMCanvasPicker.h \
         LTMChartParser.h \
         LTMOutliers.h \
         LTMPlot.h \
         LTMPopup.h \
-        LTMSidebar.h \
         LTMSettings.h \
+        LTMSidebar.h \
         LTMTool.h \
-        LTMTrend.h \
         LTMTrend2.h \
+        LTMTrend.h \
         LTMWindow.h \
         MacroDevice.h \
         MainWindow.h \
@@ -470,7 +587,7 @@ HEADERS += \
         MUPlot.h \
         MUPool.h \
         MUWidget.h \
-        LocalFileStore.h \
+        NamedSearch.h \
         NewCyclistDialog.h \
         NullController.h \
         OAuthDialog.h \
@@ -479,27 +596,34 @@ HEADERS += \
         PDModel.h \
         PfPvPlot.h \
         PfPvWindow.h \
+        PMCData.h \
         PolarRideFile.h \
         PowerHist.h \
         PowerTapDevice.h \
         PowerTapUtil.h \
         PwxRideFile.h \
+        ../qtsolutions/json/mvjson.h \
+        ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.h \
         QuarqParser.h \
         QuarqRideFile.h \
+        ../qxt/src/qxtspanslider.h \
+        ../qxt/src/qxtspanslider_p.h \
+        ../qxt/src/qxtstringspinbox.h \
+        ../qzip/zipreader.h \
+        ../qzip/zipwriter.h \
         RawRideFile.h \
-        RealtimeData.h \
-        RealtimePlotWindow.h \
         RealtimeController.h \
-        ReferenceLineDialog.h \
-        ComputrainerController.h \
+        RealtimeData.h \
         RealtimePlot.h \
+        RealtimePlotWindow.h \
+        ReferenceLineDialog.h \
         RideAutoImportConfig.h \
         RideCache.h \
         RideCacheModel.h \
         RideEditor.h \
-        RideFile.h \
         RideFileCache.h \
         RideFileCommand.h \
+        RideFile.h \
         RideFileTableModel.h \
         RideImportWizard.h \
         RideItem.h \
@@ -507,56 +631,62 @@ HEADERS += \
         RideMetric.h \
         RideNavigator.h \
         RideNavigatorProxy.h \
-        RideWindow.h \
-        SaveDialogs.h \
-        SmallPlot.h \
         RideSummaryWindow.h \
+        RideWindow.h \
         Route.h \
         RouteParser.h \
+        SaveDialogs.h \
         ScatterPlot.h \
         ScatterWindow.h \
+        SearchBox.h \
+        SearchFilterBox.h \
         Season.h \
         SeasonParser.h \
         Secrets.h \
         Serial.h \
         Settings.h \
         ShareDialog.h \
-        SpecialFields.h \
-        Specification.h \
-        SpinScanPlot.h \
-        SpinScanPolarPlot.h \
-        SpinScanPlotWindow.h \
-        SplitActivityWizard.h \
         SlfParser.h \
         SlfRideFile.h \
+        SmallPlot.h \
         SmfParser.h \
         SmfRideFile.h \
         SmlParser.h \
         SmlRideFile.h \
+        SpecialFields.h \
+        Specification.h \
+        SpinScanPlot.h \
+        SpinScanPlotWindow.h \
+        SpinScanPolarPlot.h \
+        SplitActivityWizard.h \
+        SportPlusHealthUploader.h \
         SrdRideFile.h \
         SrmRideFile.h \
         Statistic.h \
-        PMCData.h \
         SummaryWindow.h \
         SyncRideFile.h \
         Tab.h \
         TabView.h \
         TcxParser.h \
         TcxRideFile.h \
-        TxtRideFile.h \
         TimeUtils.h \
         ToolsDialog.h \
         ToolsRhoEstimator.h \
-        VDOTCalculator.h \
+        TPDownloadDialog.h \
+        TPDownload.h \
+        TPUploadDialog.h \
+        TPUpload.h \
         TrainDB.h \
-        TrainSidebar.h \
-        TreeMapWindow.h \
-        TreeMapPlot.h \
         TrainingstagebuchUploader.h \
+        TrainSidebar.h \
+        TreeMapPlot.h \
+        TreeMapWindow.h \
+        TxtRideFile.h \
         Units.h \
         UserData.h \
         UserMetricParser.h \
         UserMetricSettings.h \
+        VDOTCalculator.h \
         VeloHeroUploader.h \
         VideoLayoutParser.h \
         VideoSyncFile.h \
@@ -564,27 +694,21 @@ HEADERS += \
         WithingsDownload.h \
         WkoRideFile.h \
         WorkoutPlotWindow.h \
+        WorkoutWindow.h \
         WorkoutWizard.h \
         WPrime.h \
-        Zones.h \
         ZoneScaleDraw.h \
-        ../qtsolutions/json/mvjson.h
+        Zones.h
 
-LEXSOURCES  += JsonRideFile.l WithingsParser.l RideDB.l
-YACCSOURCES += JsonRideFile.y WithingsParser.y RideDB.y
 
-#-t turns on debug, use with caution
-#QMAKE_YACCFLAGS = -t -d
-
-# code that is pending later releases and not compiled in currently
-DEFERRES += RouteWindow.h \
-            RouteWindow.cpp \
-            RouteItem.h \
-            RouteItem.cpp
+###=============
+### SOURCE FILES
+###=============
 
 SOURCES += \
-        main.cpp \
+        aBikeScore.cpp \
         AboutDialog.cpp \
+        aCoggan.cpp \
         AddDeviceWizard.cpp \
         AddIntervalDialog.cpp \
         AerobicDecoupling.cpp \
@@ -592,50 +716,50 @@ SOURCES += \
         AerolabWindow.cpp \
         AllPlot.cpp \
         AllPlotInterval.cpp \
-        AllPlotWindow.cpp \
         AllPlotSlopeCurve.cpp \
+        AllPlotWindow.cpp \
         AnalysisSidebar.cpp \
-        ANT.cpp \
         ANTChannel.cpp \
+        ANT.cpp \
+        ANTlocalController.cpp \
         ANTLogger.cpp \
         ANTMessage.cpp \
-        ANTlocalController.cpp \
-        Athlete.cpp \
         AthleteBackup.cpp \
+        Athlete.cpp \
         BasicRideMetrics.cpp \
         BatchExportDialog.cpp \
         BestIntervalDialog.cpp \
         BikeScore.cpp \
-        aBikeScore.cpp \
-        BinRideFile.cpp \
         Bin2RideFile.cpp \
         BingMap.cpp \
+        BinRideFile.cpp \
         BlankState.cpp \
         CalendarDownload.cpp \
         ChartBar.cpp \
         ChartSettings.cpp \
         ChooseCyclistDialog.cpp \
         Coggan.cpp \
-        aCoggan.cpp \
-        Colors.cpp \
         ColorButton.cpp \
+        Colors.cpp \
         CommPort.cpp \
         CompareDateRange.cpp \
         CompareInterval.cpp \
         ComparePane.cpp \
-        Computrainer.cpp \
         Computrainer3dpFile.cpp \
+        ComputrainerController.cpp \
+        Computrainer.cpp \
         ConfigDialog.cpp \
         Context.cpp \
-        CpPlotCurve.cpp \
         CPPlot.cpp \
+        CpPlotCurve.cpp \
         CriticalPowerWindow.cpp \
         CsvRideFile.cpp \
         DanielsPoints.cpp \
+        DataFilter.cpp \
         DataProcessor.cpp \
+        DeviceConfiguration.cpp \
         Device.cpp \
         DeviceTypes.cpp \
-        DeviceConfiguration.cpp \
         DialWindow.cpp \
         DiarySidebar.cpp \
         DownloadRideDialog.cpp \
@@ -647,8 +771,8 @@ SOURCES += \
         ErgFilePlot.cpp \
         ExtendedCriticalPower.cpp \
         FileStore.cpp \
-        FitlogRideFile.cpp \
         FitlogParser.cpp \
+        FitlogRideFile.cpp \
         FitRideFile.cpp \
         FixDeriveDistance.cpp \
         FixDerivePower.cpp \
@@ -657,14 +781,14 @@ SOURCES += \
         FixFreewheeling.cpp \
         FixGaps.cpp \
         FixGPS.cpp \
+        FixHRSpikes.cpp \
         FixMoxy.cpp \
         FixPower.cpp \
         FixSmO2.cpp \
         FixSpeed.cpp \
         FixSpikes.cpp \
         FixTorque.cpp \
-        FixHRSpikes.cpp \
-        GenerateHeatMapDialog.cpp \
+        FreeSearch.cpp \
         GcCrashDialog.cpp \
         GcOverlayWidget.cpp \
         GcPane.cpp \
@@ -675,20 +799,21 @@ SOURCES += \
         GcUpgrade.cpp \
         GcWindowLayout.cpp \
         GcWindowRegistry.cpp \
+        GenerateHeatMapDialog.cpp \
         GoldenCheetah.cpp \
         GoogleMapControl.cpp \
         GOVSS.cpp \
         GProgressDialog.cpp \
         GpxParser.cpp \
         GpxRideFile.cpp \
-        HelpWindow.cpp \
         HelpWhatsThis.cpp \
+        HelpWindow.cpp \
         HistogramWindow.cpp \
         HomeWindow.cpp \
-        HrTimeInZone.cpp \
-        HrZones.cpp \
         HrPwPlot.cpp \
         HrPwWindow.cpp \
+        HrTimeInZone.cpp \
+        HrZones.cpp \
         IndendPlotMarker.cpp \
         IntervalItem.cpp \
         IntervalSummaryWindow.cpp \
@@ -698,6 +823,7 @@ SOURCES += \
         LeftRightBalance.cpp \
         Library.cpp \
         LibraryParser.cpp \
+        LocalFileStore.cpp \
         LogTimeScaleDraw.cpp \
         LTMCanvasPicker.cpp \
         LTMChartParser.cpp \
@@ -710,6 +836,7 @@ SOURCES += \
         LTMTrend.cpp \
         LTMWindow.cpp \
         MacroDevice.cpp \
+        main.cpp \
         MainWindow.cpp \
         ManualRideDialog.cpp \
         ManualRideFile.cpp \
@@ -719,7 +846,7 @@ SOURCES += \
         MoxyDevice.cpp \
         MUPlot.cpp \
         MUWidget.cpp \
-        LocalFileStore.cpp \
+        NamedSearch.cpp \
         NewCyclistDialog.cpp \
         NullController.cpp \
         OAuthDialog.cpp \
@@ -727,21 +854,26 @@ SOURCES += \
         PaceZones.cpp \
         Pages.cpp \
         PDModel.cpp \
-        PeakPower.cpp \
         PeakPace.cpp \
+        PeakPower.cpp \
         PfPvPlot.cpp \
         PfPvWindow.cpp \
+        PMCData.cpp \
         PolarRideFile.cpp \
         PowerHist.cpp \
         PowerTapDevice.cpp \
         PowerTapUtil.cpp \
         PwxRideFile.cpp \
+        ../qtsolutions/json/mvjson.cpp \
+        ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
         QuarqParser.cpp \
         QuarqRideFile.cpp \
+        ../qxt/src/qxtspanslider.cpp \
+        ../qxt/src/qxtstringspinbox.cpp \
+        ../qzip/zip.cpp \
         RawRideFile.cpp \
-        RealtimeData.cpp \
         RealtimeController.cpp \
-        ComputrainerController.cpp \
+        RealtimeData.cpp \
         RealtimePlot.cpp \
         RealtimePlotWindow.cpp \
         ReferenceLineDialog.cpp \
@@ -749,9 +881,9 @@ SOURCES += \
         RideCache.cpp \
         RideCacheModel.cpp \
         RideEditor.cpp \
-        RideFile.cpp \
         RideFileCache.cpp \
         RideFileCommand.cpp \
+        RideFile.cpp \
         RideFileTableModel.cpp \
         RideImportWizard.cpp \
         RideItem.cpp \
@@ -765,54 +897,60 @@ SOURCES += \
         SaveDialogs.cpp \
         ScatterPlot.cpp \
         ScatterWindow.cpp \
+        SearchBox.cpp \
+        SearchFilterBox.cpp \
         Season.cpp \
         SeasonParser.cpp \
         Serial.cpp \
         Settings.cpp \
         ShareDialog.cpp \
-        SmallPlot.cpp \
-        SpecialFields.cpp \
-        Specification.cpp \
-        SpinScanPlot.cpp \
-        SpinScanPolarPlot.cpp \
-        SpinScanPlotWindow.cpp \
-        SplitActivityWizard.cpp \
         SlfParser.cpp \
         SlfRideFile.cpp \
+        SmallPlot.cpp \
         SmfParser.cpp \
         SmfRideFile.cpp \
         SmlParser.cpp \
         SmlRideFile.cpp \
+        SpecialFields.cpp \
+        Specification.cpp \
+        SpinScanPlot.cpp \
+        SpinScanPlotWindow.cpp \
+        SpinScanPolarPlot.cpp \
+        SplitActivityWizard.cpp \
+        SportPlusHealthUploader.cpp \
         SrdRideFile.cpp \
         SrmRideFile.cpp \
         Statistic.cpp \
-        SustainMetric.cpp \
-        PMCData.cpp \
         SummaryWindow.cpp \
-        SyncRideFile.cpp \
+        SustainMetric.cpp \
         SwimScore.cpp \
+        SyncRideFile.cpp \
         Tab.cpp \
         TabView.cpp \
         TacxCafRideFile.cpp \
         TcxParser.cpp \
         TcxRideFile.cpp \
-        TxtRideFile.cpp \
         TimeInZone.cpp \
         TimeUtils.cpp \
         ToolsDialog.cpp \
         ToolsRhoEstimator.cpp \
-        VDOT.cpp \
-        VDOTCalculator.cpp \
+        TPDownload.cpp \
+        TPDownloadDialog.cpp \
+        TPUpload.cpp \
+        TPUploadDialog.cpp \
         TrainDB.cpp \
-        TrainSidebar.cpp \
-        TreeMapWindow.cpp \
-        TreeMapPlot.cpp \
         TrainingstagebuchUploader.cpp \
+        TrainSidebar.cpp \
+        TreeMapPlot.cpp \
+        TreeMapWindow.cpp \
         TRIMPPoints.cpp \
+        TxtRideFile.cpp \
         Units.cpp \
         UserData.cpp \
         UserMetric.cpp \
         UserMetricParser.cpp \
+        VDOTCalculator.cpp \
+        VDOT.cpp \
         VeloHeroUploader.cpp \
         VideoLayoutParser.cpp \
         VideoSyncFile.cpp \
@@ -821,43 +959,24 @@ SOURCES += \
         WithingsDownload.cpp \
         WkoRideFile.cpp \
         WorkoutPlotWindow.cpp \
+        WorkoutWindow.cpp \
         WorkoutWizard.cpp \
         WPrime.cpp \
-        Zones.cpp \
-        ../qtsolutions/json/mvjson.cpp
+        Zones.cpp
 
-RESOURCES = application.qrc \
-            RideWindow.qrc
 
-TRANSLATIONS = translations/gc_fr.ts \
-               translations/gc_ja.ts \
-               translations/gc_it.ts \
-               translations/gc_pt-br.ts \
-               translations/gc_de.ts \
-               translations/gc_cs.ts \
-               translations/gc_es.ts \
-               translations/gc_pt.ts \
-               translations/gc_ru.ts \
-	       translations/gc_zh-tw.ts
+###======================================
+### PENDING SOURCE FILES [not active yet]
+###======================================
 
-!isEmpty(TRANSLATIONS) {
+DEFERRES += RouteWindow.h \
+            RouteWindow.cpp \
+            RouteItem.h \
+            RouteItem.cpp
 
-   isEmpty(QMAKE_LRELEASE) {
-     win32:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\\lrelease.exe
-     unix:!macx {QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease-qt4 }
-     else:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
-   }
-
-   isEmpty(TS_DIR):TS_DIR = translations
-   TSQM.name = lrelease ${QMAKE_FILE_IN}
-   TSQM.input = TRANSLATIONS
-   TSQM.output = $$TS_DIR/${QMAKE_FILE_BASE}.qm
-   TSQM.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN}
-   TSQM.CONFIG = no_link
-   QMAKE_EXTRA_COMPILERS += TSQM
-   PRE_TARGETDEPS += compiler_TSQM_make_all
-
-} else:message(No translation files in project)
+###====================
+### MISCELLANEOUS FILES
+###====================
 
 OTHER_FILES += \
     web/Rider.js \
@@ -866,4 +985,3 @@ OTHER_FILES += \
     web/MapWindow.html \
     web/StreetViewWindow.html \
     web/Window.css
-
