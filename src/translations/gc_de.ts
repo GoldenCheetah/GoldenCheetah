@@ -36,11 +36,7 @@
     <message>
         <location filename="../AboutDialog.cpp" line="25"/>
         <source>About GoldenCheetah</source>
-        <translatorcomment>Über GoldenCheetah</translatorcomment>
-        <translation variants="yes">
-            <lengthvariant>Über GoldenCheetah</lengthvariant>
-            <lengthvariant></lengthvariant>
-        </translation>
+        <translation>Über GoldenCheetah</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cpp" line="36"/>
