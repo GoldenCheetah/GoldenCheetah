@@ -61,8 +61,7 @@ enum gcwinid {
         DateRangeSummary = 32,
         CriticalPowerSummary = 33,
         Distribution = 34,
-        RouteSegment = 35,
-        WorkoutWindow = 36
+        RouteSegment = 35
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;
