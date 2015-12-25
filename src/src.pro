@@ -694,7 +694,6 @@ HEADERS  += \
         WithingsDownload.h \
         WkoRideFile.h \
         WorkoutPlotWindow.h \
-        WorkoutWindow.h \
         WorkoutWizard.h \
         WPrime.h \
         ZoneScaleDraw.h \
@@ -959,7 +958,6 @@ SOURCES += \
         WithingsDownload.cpp \
         WkoRideFile.cpp \
         WorkoutPlotWindow.cpp \
-        WorkoutWindow.cpp \
         WorkoutWizard.cpp \
         WPrime.cpp \
         Zones.cpp
