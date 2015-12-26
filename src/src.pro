@@ -287,7 +287,7 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
     # we will work out the rest if you tell use where it is installed
     isEmpty(KML_INCLUDE) { KML_INCLUDE = $${KML_INSTALL}/include }
     isEmpty(KML_LIBS)    { KML_LIBS    = -L$${KML_INSTALL}/lib/ \
-                                         -lkmldom -l -lkmlconvenience -lkmlengine -lkmlbase
+                                         -lkmldom -lkmlconvenience -lkmlengine -lkmlbase
     }
 
     DEFINES     += GC_HAVE_KML
