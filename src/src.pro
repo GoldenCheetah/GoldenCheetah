@@ -92,9 +92,9 @@ LIBS += -L../qwt/lib -lqwt
 # windows icon and use QT zlib, not sure why different but keep for now
 win32 {
 
+    RC_FILE = windowsico.rc
     INCLUDEPATH += ./win32 $$[QT_INSTALL_PREFIX]/src/3rdparty/zlib
     LIBS += -lws2_32
-    RC_FILE = windowsico.rc
 
 } else {
 
@@ -103,9 +103,9 @@ win32 {
     LIBS += -lm $${LIBZ_LIBS}
 }
 
-# on mac we use native buttons and video, but have native fullscreen support
 macx {
 
+    # on mac we use native buttons and video, but have native fullscreen support
     LIBS    += -lobjc -framework IOKit -framework AppKit -framework QTKit
     HEADERS += \
             QtMacVideoWindow.h \
@@ -116,11 +116,10 @@ macx {
             QtMacVideoWindow.mm \
             QtMacSegmentedButton.mm \
             QtMacButton.mm
-}
 
-# not on max we need our own full screen support and segment control button
-!macx {
+} else {
 
+    # not on mac we need our own full screen support and segment control button
     HEADERS += QTFullScreen.h
     SOURCES += QTFullScreen.cpp
 
@@ -128,8 +127,8 @@ macx {
     SOURCES += ../qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
 
     # we now have videowindow, it will do nothing
-    HEADERS     += VideoWindow.h
-    SOURCES     += VideoWindow.cpp
+    HEADERS += VideoWindow.h
+    SOURCES += VideoWindow.cpp
 }
 
 
@@ -188,31 +187,33 @@ RESOURCES = application.qrc \
 ### OPTIONAL => KQOAUTH
 ###====================
 
-# KQOAuth .pro in default creates different libs for release and debug
 unix:!macx {
 
     # build from version in repo for Linux builds since
-    # kqoauth is not packaged for the Debian build
+    # kqoauth is not packaged for the Debian and this makes
+    # life much easier for the package maintainer
     INCLUDEPATH += ../kqoauth
     LIBS        += ../kqoauth/libkqoauth.a
     DEFINES     += GC_HAVE_KQOAUTH
-    SOURCES     += TwitterDialog.cpp
-    HEADERS     += TwitterDialog.h
 
 } else {
 
-    !isEmpty( KQOAUTH_INSTALL ) {
-        isEmpty( KQOAUTH_INCLUDE ) { KQOAUTH_INCLUDE += $${KQOAUTH_INSTALL}/src }
-        isEmpty( KQOAUTH_LIBS ) {
-            #KQOAUTH_LIBS = $${KQOAUTH_INSTALL}/lib/libkqoauth0.a
-            KQOAUTH_LIBS = -lkqoauth
-        }
+    !isEmpty(KQOAUTH_INSTALL) {
+
+        # we will work out the rest if you tell us where it is installed
+        isEmpty(KQOAUTH_INCLUDE) { KQOAUTH_INCLUDE = $${KQOAUTH_INSTALL}/src }
+        isEmpty(KQOAUTH_LIBS)    { KQOAUTH_LIBS    = -L$${KQOAUTH_INSTALL}/lib -lkqoauth }
+
         INCLUDEPATH += $${KQOAUTH_INCLUDE}
         LIBS        += $${KQOAUTH_LIBS}
         DEFINES     += GC_HAVE_KQOAUTH
+    }
+}
+
+# if we have it we can add twitter support
+contains(DEFINES, "GC_HAVE_KQOAUTH") {
         SOURCES     += TwitterDialog.cpp
         HEADERS     += TwitterDialog.h
-    }
 }
 
 
@@ -221,14 +222,15 @@ unix:!macx {
 ###=======================================================
 
 !isEmpty(D2XX_INCLUDE) {
+
+    DEFINES     += GC_HAVE_D2XX
     INCLUDEPATH += $${D2XX_INCLUDE}
+
     !isEmpty(D2XX_LIBS) { LIBS += $${D2XX_LIBS} }
+    unix                { LIBS += -ldl }
+
     HEADERS     += D2XX.h
     SOURCES     += D2XX.cpp
-    DEFINES     += GC_HAVE_D2XX
-    unix {
-        LIBS    += -ldl
-    }
 }
 
 
@@ -236,14 +238,19 @@ unix:!macx {
 ### OPTIONAL => SRMIO
 ###==================
 
-!isEmpty( SRMIO_INSTALL ) {
-    isEmpty( SRMIO_INCLUDE ) { SRMIO_INCLUDE = $${SRMIO_INSTALL}/include }
-    isEmpty( SRMIO_LIBS )    { SRMIO_LIBS    = $${SRMIO_INSTALL}/lib/libsrmio.a }
+!isEmpty(SRMIO_INSTALL) {
+
+    # we will work out the rest if you tell use where it is installed
+    isEmpty(SRMIO_INCLUDE) { SRMIO_INCLUDE = $${SRMIO_INSTALL}/include }
+    isEmpty(SRMIO_LIBS)    { SRMIO_LIBS    = -L$${SRMIO_INSTALL}/lib -lsrmio }
+
+    DEFINES     += GC_HAVE_SRMIO
     INCLUDEPATH += $${SRMIO_INCLUDE}
     LIBS        += $${SRMIO_LIBS}
+
+    # add support for srm downloads
     HEADERS     += SrmDevice.h
     SOURCES     += SrmDevice.cpp
-    DEFINES     += GC_HAVE_SRMIO
 }
 
 
@@ -251,14 +258,21 @@ unix:!macx {
 ### OPTIONAL => QWT3D
 ###==================
 
-!isEmpty( QWT3D_INSTALL ) {
-    isEmpty( QWT3D_INCLUDE ) { QWT3D_INCLUDE = $${QWT3D_INSTALL}/include }
-    isEmpty( QWT3D_LIBS )    { QWT3D_LIBS    = $${QWT3D_INSTALL}/lib/libqwtplot3d.a }
+!isEmpty(QWT3D_INSTALL) {
+
+    # we will work out the rest if you tell use where it is installed
+    isEmpty(QWT3D_INCLUDE) { QWT3D_INCLUDE = $${QWT3D_INSTALL}/include }
+    isEmpty(QWT3D_LIBS)    { QWT3D_LIBS    = -L$${QWT3D_INSTALL}/lib -lqwtplot3d }
+
+    DEFINES     += GC_HAVE_QWTPLOT3D
     INCLUDEPATH += $${QWT3D_INCLUDE}
     LIBS        += $${QWT3D_LIBS}
+
+    # additional dependencies for 3d
     unix:!macx { LIBS += -lGLU }
     QT          += opengl
-    DEFINES     += GC_HAVE_QWTPLOT3D
+
+    # add 3d plot
     HEADERS     += ModelPlot.h ModelWindow.h
     SOURCES     += ModelPlot.cpp ModelWindow.cpp
 }
@@ -268,17 +282,19 @@ unix:!macx {
 ### OPTIONAL => GOOGLE KML IMPORT EXPORT
 ###=====================================
 
-!isEmpty( KML_INSTALL) {
+!isEmpty(KML_INSTALL) {
+
+    # we will work out the rest if you tell use where it is installed
     isEmpty(KML_INCLUDE) { KML_INCLUDE = $${KML_INSTALL}/include }
-    isEmpty(KML_LIBS)    {
-        KML_LIBS    = $${KML_INSTALL}/lib/libkmldom.a \
-                      $${KML_INSTALL}/lib/libkmlconvenience.a \
-                      $${KML_INSTALL}/lib/libkmlengine.a \
-                      $${KML_INSTALL}/lib/libkmlbase.a
+    isEmpty(KML_LIBS)    { KML_LIBS    = -L$${KML_INSTALL}/lib/ \
+                                         -lkmldom -l -lkmlconvenience -lkmlengine -lkmlbase
     }
+
+    DEFINES     += GC_HAVE_KML
     INCLUDEPATH += $${KML_INCLUDE}  $${BOOST_INCLUDE}
     LIBS        += $${KML_LIBS}
-    DEFINES     += GC_HAVE_KML
+
+    # add kml file i/o
     SOURCES     += KmlRideFile.cpp
     HEADERS     += KmlRideFile.h
 }
@@ -289,11 +305,16 @@ unix:!macx {
 ###=================
 
 !isEmpty(ICAL_INSTALL) {
+
+    # we will work out the rest if you tell use where it is installed
     isEmpty( ICAL_INCLUDE ) { ICAL_INCLUDE = $${ICAL_INSTALL}/include }
-    isEmpty( ICAL_LIBS )    { ICAL_LIBS    = $${ICAL_INSTALL}/lib/libical.a }
+    isEmpty( ICAL_LIBS )    { ICAL_LIBS    = -L$${ICAL_INSTALL}/lib -lical }
+
+    DEFINES     += GC_HAVE_ICAL
     INCLUDEPATH += $${ICAL_INCLUDE}
     LIBS        += $${ICAL_LIBS}
-    DEFINES     += GC_HAVE_ICAL
+
+    # add caldav and diary functions
     HEADERS     += ICalendar.h DiaryWindow.h CalDAV.h
     SOURCES     += ICalendar.cpp DiaryWindow.cpp CalDAV.cpp
 }
@@ -304,14 +325,20 @@ unix:!macx {
 ###===================
 
 !isEmpty(LIBUSB_INSTALL) {
+
+    # we will work out the rest if you tell use where it is installed
     isEmpty(LIBUSB_INCLUDE) { LIBUSB_INCLUDE = $${LIBUSB_INSTALL}/include }
     isEmpty(LIBUSB_LIBS)    {
-        unix  { LIBUSB_LIBS = $${LIBUSB_INSTALL}/lib/libusb.a }
-        win32 { LIBUSB_LIBS = $${LIBUSB_INSTALL}/lib/gcc/libusb.a }
+        # needs fixing for msvc toolchain
+        unix  { LIBUSB_LIBS = -L$${LIBUSB_INSTALL}/lib -lusb }
+        win32 { LIBUSB_LIBS = -L$${LIBUSB_INSTALL}/lib/gcc -lusb }
     }
+
+    DEFINES     += GC_HAVE_LIBUSB
     INCLUDEPATH += $${LIBUSB_INCLUDE}
     LIBS        += $${LIBUSB_LIBS}
-    DEFINES     += GC_HAVE_LIBUSB
+
+    # lots of dependents
     SOURCES     += LibUsb.cpp EzUsb.c Fortius.cpp FortiusController.cpp
     HEADERS     += LibUsb.h EzUsb.h Fortius.cpp FortiusController.h
 }
@@ -323,11 +350,17 @@ unix:!macx {
 
 # are we supporting USB1 devices on Windows?
 !isEmpty( USBXPRESS_INSTALL ) {
+
+    # we will work out the rest if you tell use where it is installed
     isEmpty( USBXPRESS_INCLUDE ) { USBXPRESS_INCLUDE = $${USBXPRESS_INSTALL} }
+
+    # this is windows only !
     isEmpty( USBXPRESS_LIBS )    { USBXPRESS_LIBS    = $${USBXPRESS_INSTALL}/x86/SiUSBXp.lib }
+
+    DEFINES     += GC_HAVE_USBXPRESS
     INCLUDEPATH += $${USBXPRESS_INCLUDE}
     LIBS        += $${USBXPRESS_LIBS}
-    DEFINES     += GC_HAVE_USBXPRESS
+
     SOURCES += USBXpress.cpp
     HEADERS += USBXpress.h
 }
@@ -338,22 +371,17 @@ unix:!macx {
 ###=============================================================
 
 !isEmpty(VLC_INSTALL) {
-    macx {
-        # we do not use VLC on Mac we use Quicktime
-        # so ignore this setting on a Mac build
-    } else {
+
+    # not on a mac as they use quicktime video
+    !macx {
+
+        # we will work out the rest if you tell use where it is installed
         isEmpty(VLC_INCLUDE) { VLC_INCLUDE = $${VLC_INSTALL}/include }
-        isEmpty(VLC_LIBS)    {
-            win32 {
-                VLC_LIBS = $${VLC_INSTALL}/lib/libvlc.dll.a \
-                           $${VLC_INSTALL}/lib/libvlccore.dll.a
-            } else {
-                VLC_LIBS += -lvlc -lvlccore
-            }
-        }
+        isEmpty(VLC_LIBS)    { VLC_LIBS    = -L$${VLC_INSTALL}/lib -lvlc -lvlccore }
+
+        DEFINES     += GC_HAVE_VLC
         INCLUDEPATH += $${VLC_INCLUDE}
         LIBS        += $${VLC_LIBS}
-        DEFINES     += GC_HAVE_VLC
     }
 }
 
@@ -363,11 +391,14 @@ unix:!macx {
 ###=======================
 
 !isEmpty(SAMPLERATE_INSTALL) {
+
+    # we will work out the rest if you tell use where it is installed
     isEmpty( SAMPLERATE_INCLUDE ) { SAMPLERATE_INCLUDE = $${SAMPLERATE_INSTALL}/include }
-    isEmpty( SAMPLERATE_LIBS )    { SAMPLERATE_LIBS    = $${SAMPLERATE_INSTALL}/lib/libsamplerate.a }
+    isEmpty( SAMPLERATE_LIBS )    { SAMPLERATE_LIBS    = -L$${SAMPLERATE_INSTALL}/lib -lsamplerate }
+
+    DEFINES     += GC_HAVE_SAMPLERATE
     INCLUDEPATH += $${SAMPLERATE_INCLUDE}
     LIBS        += $${SAMPLERATE_LIBS}
-    DEFINES     += GC_HAVE_SAMPLERATE
 }
 
 
