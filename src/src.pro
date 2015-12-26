@@ -62,20 +62,21 @@ lessThan(QT_MAJOR_VERSION, 5) {
 ###=======================================================================
 
 # qwt, qxt, libz, json and qwtcurve
-INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE} ../qtsolutions/json ../qtsolutions/qwtcurve
+INCLUDEPATH += ../qwt/src ../qxt/src ../qtsolutions/json ../qtsolutions/qwtcurve
 DEFINES += QXT_STATIC
 
 # local qtsoap handling
 include( ../qtsolutions/soap/qtsoap.pri )
 DEFINES += GC_HAVE_SOAP
 
-# path to qwt and libz libraries differs for MS or GNU toolchain
-*msvc2015 {
-    LIBS += ../qwt/lib/qwt.lib
-} else {
-    LIBS += ../qwt/lib/libqwt.a
-    LIBS += -lm $${LIBZ_LIBS}
-}
+# to make sure we are toolchain neutral we NEVER refer to a lib
+# via file extensions .lib or .a in src.pro unless the section is
+# platform specific. Instead we use directives -Ldir and -llib
+#
+# TODO: THIS NEEDS TO BE APPLIED THROUGHOUT SRC.PRO (!) XXX
+#
+LIBS += -L../qwt/lib -lqwt
+
 
 
 ###===============================
@@ -88,34 +89,33 @@ DEFINES += GC_HAVE_SOAP
     LIBS += "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64/User32.lib"
 }
 
-# icon if not on windows
-!win32 {
-    RC_FILE = images/gc.icns
-}
-
-# windows icon and some zlib
+# windows icon and use QT zlib, not sure why different but keep for now
 win32 {
 
     INCLUDEPATH += ./win32 $$[QT_INSTALL_PREFIX]/src/3rdparty/zlib
     LIBS += -lws2_32
-    //QMAKE_LFLAGS = -Wl,--enable-runtime-pseudo-reloc \
-    //               -Wl,--script,win32/i386pe.x-no-rdata,--enable-auto-import
-    //QMAKE_CXXFLAGS += -fdata-sections
     RC_FILE = windowsico.rc
 
+} else {
+
+    RC_FILE = images/gc.icns
+    INCLUDEPATH += $${LIBZ_INCLUDE}
+    LIBS += -lm $${LIBZ_LIBS}
 }
 
 # on mac we use native buttons and video, but have native fullscreen support
 macx {
 
     LIBS    += -lobjc -framework IOKit -framework AppKit -framework QTKit
-    HEADERS +=  QtMacVideoWindow.h \
-                QtMacSegmentedButton.h \
-                QtMacButton.h
+    HEADERS += \
+            QtMacVideoWindow.h \
+            QtMacSegmentedButton.h \
+            QtMacButton.h
 
-    OBJECTIVE_SOURCES +=    QtMacVideoWindow.mm \
-                            QtMacSegmentedButton.mm \
-                            QtMacButton.mm
+    OBJECTIVE_SOURCES += \
+            QtMacVideoWindow.mm \
+            QtMacSegmentedButton.mm \
+            QtMacButton.mm
 }
 
 # not on max we need our own full screen support and segment control button
@@ -123,7 +123,6 @@ macx {
 
     HEADERS += QTFullScreen.h
     SOURCES += QTFullScreen.cpp
-
 
     HEADERS += ../qtsolutions/segmentcontrol/qtsegmentcontrol.h
     SOURCES += ../qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
@@ -147,7 +146,7 @@ TRANSLATIONS = translations/gc_fr.ts \
                translations/gc_es.ts \
                translations/gc_pt.ts \
                translations/gc_ru.ts \
-	       translations/gc_zh-tw.ts
+               translations/gc_zh-tw.ts
 
 # need lrelease to generate qm files
 isEmpty(QMAKE_LRELEASE) {
@@ -347,7 +346,7 @@ unix:!macx {
         isEmpty(VLC_LIBS)    {
             win32 {
                 VLC_LIBS = $${VLC_INSTALL}/lib/libvlc.dll.a \
-    	                   $${VLC_INSTALL}/lib/libvlccore.dll.a
+                           $${VLC_INSTALL}/lib/libvlccore.dll.a
             } else {
                 VLC_LIBS += -lvlc -lvlccore
             }
