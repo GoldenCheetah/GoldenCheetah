@@ -23,14 +23,12 @@ SOURCE += $${LOCALSOURCE}
 ### GOLDENCHEETAH TARGET
 ###=====================
 
+DEPENDPATH += .
 TEMPLATE = app
 TARGET = GoldenCheetah
-!isEmpty( APP_NAME ) { TARGET = $${APP_NAME} }
-DEPENDPATH += .
-QMAKE_INFO_PLIST = ./mac/Info.plist.app
-CONFIG(debug, debug|release) {
-    QMAKE_CXXFLAGS += -DGC_DEBUG
-}
+
+!isEmpty(APP_NAME) { TARGET = $${APP_NAME} }
+CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 
 
 ###======================================================
@@ -66,15 +64,12 @@ INCLUDEPATH += ../qwt/src ../qxt/src ../qtsolutions/json ../qtsolutions/qwtcurve
 DEFINES += QXT_STATIC
 
 # local qtsoap handling
-include( ../qtsolutions/soap/qtsoap.pri )
+include(../qtsolutions/soap/qtsoap.pri)
 DEFINES += GC_HAVE_SOAP
 
 # to make sure we are toolchain neutral we NEVER refer to a lib
 # via file extensions .lib or .a in src.pro unless the section is
 # platform specific. Instead we use directives -Ldir and -llib
-#
-# TODO: THIS NEEDS TO BE APPLIED THROUGHOUT SRC.PRO (!) XXX
-#
 LIBS += -L../qwt/lib -lqwt
 
 
@@ -104,6 +99,9 @@ win32 {
 }
 
 macx {
+
+    # we have our own plist
+    QMAKE_INFO_PLIST = ./mac/Info.plist.app
 
     # on mac we use native buttons and video, but have native fullscreen support
     LIBS    += -lobjc -framework IOKit -framework AppKit -framework QTKit
@@ -307,8 +305,8 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
 !isEmpty(ICAL_INSTALL) {
 
     # we will work out the rest if you tell use where it is installed
-    isEmpty( ICAL_INCLUDE ) { ICAL_INCLUDE = $${ICAL_INSTALL}/include }
-    isEmpty( ICAL_LIBS )    { ICAL_LIBS    = -L$${ICAL_INSTALL}/lib -lical }
+    isEmpty(ICAL_INCLUDE) { ICAL_INCLUDE = $${ICAL_INSTALL}/include }
+    isEmpty(ICAL_LIBS)    { ICAL_LIBS    = -L$${ICAL_INSTALL}/lib -lical }
 
     DEFINES     += GC_HAVE_ICAL
     INCLUDEPATH += $${ICAL_INCLUDE}
@@ -349,13 +347,13 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
 ###===================================================
 
 # are we supporting USB1 devices on Windows?
-!isEmpty( USBXPRESS_INSTALL ) {
+!isEmpty(USBXPRESS_INSTALL) {
 
     # we will work out the rest if you tell use where it is installed
-    isEmpty( USBXPRESS_INCLUDE ) { USBXPRESS_INCLUDE = $${USBXPRESS_INSTALL} }
+    isEmpty(USBXPRESS_INCLUDE) { USBXPRESS_INCLUDE = $${USBXPRESS_INSTALL} }
 
     # this is windows only !
-    isEmpty( USBXPRESS_LIBS )    { USBXPRESS_LIBS    = $${USBXPRESS_INSTALL}/x86/SiUSBXp.lib }
+    isEmpty(USBXPRESS_LIBS)    { USBXPRESS_LIBS    = $${USBXPRESS_INSTALL}/x86/SiUSBXp.lib }
 
     DEFINES     += GC_HAVE_USBXPRESS
     INCLUDEPATH += $${USBXPRESS_INCLUDE}
@@ -393,8 +391,8 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
 !isEmpty(SAMPLERATE_INSTALL) {
 
     # we will work out the rest if you tell use where it is installed
-    isEmpty( SAMPLERATE_INCLUDE ) { SAMPLERATE_INCLUDE = $${SAMPLERATE_INSTALL}/include }
-    isEmpty( SAMPLERATE_LIBS )    { SAMPLERATE_LIBS    = -L$${SAMPLERATE_INSTALL}/lib -lsamplerate }
+    isEmpty(SAMPLERATE_INCLUDE) { SAMPLERATE_INCLUDE = $${SAMPLERATE_INSTALL}/include }
+    isEmpty(SAMPLERATE_LIBS)    { SAMPLERATE_LIBS    = -L$${SAMPLERATE_INSTALL}/lib -lsamplerate }
 
     DEFINES     += GC_HAVE_SAMPLERATE
     INCLUDEPATH += $${SAMPLERATE_INCLUDE}
