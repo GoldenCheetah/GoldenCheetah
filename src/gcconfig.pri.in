@@ -18,6 +18,9 @@
 # then set the full path and filename here.
 #QMAKE_LRELEASE = /usr/bin/lrelease
 
+# MSVC needs the WINDOWS KIT libraries for the memory model you are building
+#WINKIT_INSTALL= "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
+
 # We use g++ on all platforms so switch on auto vectorization amongst other
 # things to speed up looping over ride file points
 #QMAKE_CXXFLAGS += -O3
@@ -211,8 +214,8 @@
 # then you should comment the line below, otherwise you
 # will need to have the compress libraries installed
 # separately. 
-LIBZ_INCLUDE =
-LIBZ_LIBS    = -lz
+#LIBZ_INCLUDE =
+#LIBZ_LIBS    = -lz
 
 macx {
     # Uncomment this line to build with OS X Tiger support on a Leopard system:

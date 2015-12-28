@@ -72,7 +72,10 @@ DEFINES += GC_HAVE_SOAP
 # platform specific. Instead we use directives -Ldir and -llib
 LIBS += -L../qwt/lib -lqwt
 
-
+# compress and math libs must be defined in gcconfig.pri
+# if they're not part of the QT include
+INCLUDEPATH += $${LIBZ_INCLUDE}
+LIBS += $${LIBZ_LIBS}
 
 ###===============================
 ### PLATFORM SPECIFIC DEPENDENCIES
@@ -80,22 +83,26 @@ LIBS += -L../qwt/lib -lqwt
 
 # Microsoft Visual Studion toolchain dependencies
 *msvc2015 {
-    LIBS += "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64/Gdi32.lib"
-    LIBS += "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64/User32.lib"
+
+    # we need windows kit 8.2 or higher with MSVC, offer default location
+    isEmpty(WINKIT_INSTALL) WINKIT_INSTALL= "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
+    LIBS += -L$${WINKIT_INSTALL} -lGdi32 -lUser32
+
+} else {
+    # gnu toolchain wants math libs
+    LIBS += -lm
 }
 
 # windows icon and use QT zlib, not sure why different but keep for now
 win32 {
 
     RC_FILE = windowsico.rc
-    INCLUDEPATH += ./win32 $$[QT_INSTALL_PREFIX]/src/3rdparty/zlib
+    INCLUDEPATH += ./win32 $${QT_INSTALL_PREFIX}/src/3rdparty/zlib
     LIBS += -lws2_32
 
 } else {
 
     RC_FILE = images/gc.icns
-    INCLUDEPATH += $${LIBZ_INCLUDE}
-    LIBS += -lm $${LIBZ_LIBS}
 }
 
 macx {
