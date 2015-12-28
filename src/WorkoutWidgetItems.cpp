@@ -113,18 +113,21 @@ void
 WWPoint::paint(QPainter *painter)
 {
     painter->setPen(Qt::NoPen);
-    painter->setBrush(GColor(CPOWER));
+
+    // transform
     QPoint center = workoutWidget()->transform(x,y);
 
-    painter->drawEllipse(QPointF(center.x(), center.y()), 2.0f, 2.0f);
-}
+    // highlight hovered
+    if (hover) {
+        painter->setBrush(Qt::gray);
+        painter->drawEllipse(QPointF(center.x(), center.y()), 10.0f, 10.0f);
+    }
 
-// locate me on the parent widget in paint coordinates
-QRectF
-WWPoint::bounding()
-{
-    //XXX fixme
-    return QRectF();
+    painter->setBrush(GColor(CPOWER));
+    painter->drawEllipse(QPointF(center.x(), center.y()), 3.0f, 3.0f);
+
+    // set bound so we can be moused over etc
+    bound = QRectF(QPointF(center.x()-3.0f, center.y()-3.0f),QPointF(center.x()+3.0f, center.y()+3.0f));
 }
 
 void
