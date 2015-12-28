@@ -59,7 +59,8 @@ class WWPoint : public WorkoutWidgetItem {
 
     public:
 
-        WWPoint(WorkoutWidget *w, double x, double y) : WorkoutWidgetItem(w), x(x), y(y) { w->addPoint(this); }
+        WWPoint(WorkoutWidget *w, double x, double y, bool append=true) : 
+                WorkoutWidgetItem(w), hover(false), selected(false), x(x), y(y) { if (append) w->addPoint(this); }
 
         // Reimplement in children
         int type() { return GCWW_POINT; }
@@ -67,12 +68,14 @@ class WWPoint : public WorkoutWidgetItem {
         void paint(QPainter *painter);
 
         // locate me on the parent widget in paint coordinates
-        QRectF bounding();
+        QRectF bounding() { return bound; }
+        bool hover;
+        bool selected;
 
         double x, y;
 
     private:
-
+        QRectF bound; // set when we paint
 };
 
 // draws a line between all the points

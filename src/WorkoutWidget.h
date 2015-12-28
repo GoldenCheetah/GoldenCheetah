@@ -28,6 +28,7 @@
 
 #include <QWidget>
 #include <QRect>
+#include <QPoint>
 
 class ErgFile;
 class WorkoutWidget;
@@ -113,7 +114,16 @@ class WorkoutWidget : public QWidget
 
     protected:
 
+        // interaction state
+        enum { none, drag } state;
+        WWPoint *dragging;
+
+        // interacting with points
+        bool movePoint(QPoint p);
+        bool createPoint(QPoint p);
+
         void paintEvent(QPaintEvent *);
+        bool eventFilter(QObject *obj, QEvent *event);
 
     private:
 

@@ -44,28 +44,185 @@ static const int SPACING = 2; // between labels and tics (if there are tics)
 static bool GRIDLINES = true;
 
 WorkoutWidget::WorkoutWidget(QWidget *parent, Context *context) :
-    QWidget(parent), ergFile(NULL), context(context)
+    QWidget(parent), ergFile(NULL), state(none), dragging(NULL), context(context)
 {
     maxX_=3600;
     maxY_=300;
+
+    // watch mouse events for user interaction
+    installEventFilter(this);
+    setMouseTracking(true);
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
     configChanged(CONFIG_APPEARANCE);
 }
 
+bool
+WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    // process as normal if not one of ours
+    if (obj != this) return false;
+
+    // where is the cursor
+    QPoint p = mapFromGlobal(QCursor::pos());
+
+    // is a repaint going to be needed?
+    bool updateNeeded=false;
+
+    //
+    // STATE MACHINE [no selection mode and no undo/redo yet]
+    //
+    //   EVENT              STATE       ACTION                  NEXT STATE
+    //   --------------     ------      ---------------         ----------
+    // 1 mouse move         none        hover/unhover           none
+    //                      drag        move point around       drag
+    //
+    // 2 mouse click        none        hovering select         drag
+    //                      none        not hovering create     drag
+    //
+    // 3 mouse release      drag        unselect                none
+    //
+
+    //
+    // 1 MOUSE MOVE
+    //
+    if (event->type() == QEvent::MouseMove) {
+
+
+        if (state == none) {
+
+            // if we're not in any particular state then just
+            // highlight for hover/unhover
+
+            // is the mouse on the canvas?
+            if (canvas().contains(p)) {
+
+                // unser/set hover/unhover state *IF NEED TO*
+                foreach(WWPoint *point, points_) {
+                    if (point->bounding().contains(p)) {
+                        if (!point->hover) {
+                            point->hover = true;
+                            updateNeeded=true;
+                        }
+                    } else {
+                        if (point->hover) {
+                            point->hover = false;
+                            updateNeeded=true;
+                        }
+                    }
+                }
+            }
+
+        } else if (state == drag) {
+
+            // we're dragging this point around, get on and
+            // do that, but apply constrains
+            if (dragging) updateNeeded = movePoint(p);
+            else {
+                // not possible?
+                state = none;
+                qDebug()<<"WW FSM: drag state dragging=NULL";
+            }
+        }
+    }
+
+    //
+    // 2 MOUSE PRESS
+    //
+    if (event->type() == QEvent::MouseButtonPress) {
+
+        if (state == none && canvas().contains(p)) {
+
+            // either select existing to drag
+            // or create a new one to drag
+            foreach(WWPoint *point, points_) {
+                if (point->bounding().contains(p)) {
+                        updateNeeded=true;
+                        dragging = point;
+                        state = drag;
+                        break;
+                }
+            }
+
+            // if state is still none, we aren't
+            // on top of a point, so create a new
+            // one
+            if (state == none) {
+                updateNeeded = createPoint(p);
+            }
+        }
+    }
+
+    //
+    // 3. MOUSE RELEASED
+    //
+    if (event->type() == QEvent::MouseButtonRelease) {
+        state = none;
+        dragging = NULL;
+        updateNeeded = true;
+    }
+
+
+    // ALL DONE
+
+    // trigger an update if one is needed
+    if (updateNeeded) update();
+
+    // return false - we are eavesdropping not processing.
+    return false;
+}
+
+bool
+WorkoutWidget::movePoint(QPoint p)
+{
+    // apply constraints!
+    // XXX not bothering right now!
+    QPointF to = reverseTransform(p.x(), p.y());
+    dragging->x = to.x();
+    dragging->y = to.y();
+    return true;
+}
+
+bool
+WorkoutWidget::createPoint(QPoint p)
+{
+    // add a point!
+    QPointF to = reverseTransform(p.x(), p.y());
+
+    // don't auto append, we are going to insert vvvvv
+    dragging = new WWPoint(this, to.x(), to.y(), false);
+    state = drag;
+
+    // add into the points
+    for(int i=0; i<points_.count(); i++) {
+        if (points_[i]->x > to.x()) {
+            points_.insert(i, dragging);
+            return true;
+        }
+    }
+
+    // after current
+    points_.append(dragging);
+    return true;
+}
+
 void 
 WorkoutWidget::ergFileSelected(ErgFile *ergFile)
 {
-    // we suport ERG but not MRC/CRS currently XXX fixme
+    // reset state
+    state = none;
+    dragging = NULL;
+
+    // wipe out points
+    foreach(WWPoint *point, points_) delete point;
+    points_.clear();
+
+    // we suport ERG but not MRC/CRS currently
     if (ergFile && ergFile->format == ERG) {
 
         maxX_=0;
         maxY_=300;
-
-        // wipe out points
-        foreach(WWPoint *point, points_) delete point;
-        points_.clear();
 
         // add points for this....
         foreach(ErgFilePoint point, ergFile->Points) {
@@ -293,5 +450,5 @@ WorkoutWidget::reverseTransform(int x, int y)
     double yratio = double(c.height()) / (maxY()-minY());
     double xratio = double(c.width()) / (maxX()-minX());
 
-    return QPoint(x / xratio, y / yratio);
+    return QPoint((x-c.x()) / xratio, (c.bottomLeft().y() - y) / yratio);
 }
