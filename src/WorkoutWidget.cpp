@@ -25,6 +25,9 @@
 #include "TimeUtils.h" // time_to_string()
 #include <QFontMetrics>
 
+#include <cmath>
+#include <float.h> // DBL_EPSILON
+
 // height and width of widgets
 static const double IHEIGHT = 10;
 static const double THEIGHT = 25;
@@ -173,6 +176,11 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     return false;
 }
 
+static bool doubles_equal(double a, double b)
+{
+    double errorB = b * DBL_EPSILON;
+    return (a >= b - errorB) && (a <= b + errorB);
+}
 bool
 WorkoutWidget::movePoint(QPoint p)
 {
@@ -225,7 +233,14 @@ WorkoutWidget::movePoint(QPoint p)
         }
     }
 
-    // XXX not bothering with y right now!
+    // we don't constrain y, but highlight points that align
+    foreach(WWPoint *point, points_) {
+        if (point == dragging) continue;
+        point->hover=false;
+        if (point->bounding().contains(QPoint(point->bounding().center().x(), p.y())))
+            if (doubles_equal(point->y, to.y()))
+                point->hover = true;
+    }
     dragging->y = to.y();
     return true;
 }
