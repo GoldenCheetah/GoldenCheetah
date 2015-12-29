@@ -44,6 +44,9 @@
 #endif
 
 // used by OAuthDialog.cpp and GoogleDrive.cpp for Google Drive
+#ifndef GC_GOOGLE_DRIVE_CLIENT_ID
+#define GC_GOOGLE_DRIVE_CLIENT_ID "__GC_GOOGLE_DRIVE_CLIENT_ID__"
+#endif
 #ifndef GC_GOOGLE_DRIVE_CLIENT_SECRET
 #define GC_GOOGLE_DRIVE_CLIENT_SECRET "__GC_GOOGLE_DRIVE_CLIENT_SECRET__"
 #endif
