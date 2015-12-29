@@ -19,6 +19,7 @@
 #include "GoogleDrive.h"
 
 #include "Athlete.h"
+#include "Secrets.h"
 #include "Settings.h"
 
 #include <stdio.h>
