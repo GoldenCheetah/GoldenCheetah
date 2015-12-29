@@ -293,11 +293,11 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
             double rif, cp;
             // carry on and calculate IF
-            if (context->athlete->zones()) {
+            if (context->athlete->zones(false)) {
 
                 // get cp for today
-                int zonerange = context->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
-                if (zonerange >= 0) cp = context->athlete->zones()->getCP(zonerange);
+                int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
+                if (zonerange >= 0) cp = context->athlete->zones(false)->getCP(zonerange);
                 else cp = 0;
 
             } else {
@@ -379,11 +379,11 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
             double rif, cp;
             // carry on and calculate IF
-            if (context->athlete->zones()) {
+            if (context->athlete->zones(false)) {
 
                 // get cp for today
-                int zonerange = context->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
-                if (zonerange >= 0) cp = context->athlete->zones()->getCP(zonerange);
+                int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
+                if (zonerange >= 0) cp = context->athlete->zones(false)->getCP(zonerange);
                 else cp = 0;
 
             } else {

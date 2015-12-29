@@ -43,7 +43,9 @@
 #define GC_GOOGLE_CALENDAR_CLIENT_ID      "426009671216-c588t1u6hafep30tfs7g0g1nuo72s8ko.apps.googleusercontent.com"
 
 //Strava / see also Athlete parameter
+#ifndef GC_STRAVA_CLIENT_ID
 #define GC_STRAVA_CLIENT_ID    "83" // client id
+#endif
 
 //Cycling Analytics / see also Athlete parameter
 #define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
@@ -164,6 +166,9 @@
 #define GC_DPDP_BIKEWEIGHT              "<global-general>dataprocess/fixderivepower/bikewheight"
 #define GC_DPDP_CRR                     "<global-general>dataprocess/fixderivepower/crr"
 #define GC_DPFV_MA                     "<global-general>dataprocess/fixspeed/ma"
+#define GC_CAD2SMO2                     "<global-general>dataprocess/fixmoxy/cad2smo2"
+#define GC_SPD2THB			"<global-general>dataprocess/fixmoxy/spd2thb"
+
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where
@@ -183,6 +188,7 @@
 // Athlete Specific Properties - Stored in /config subfolder of the related athlete
 // --------------------------------------------------------------------------------
 
+#define GC_ATHLETE_ID                   "<athlete-general>id"
 #define GC_VERSION_USED                 "<athlete-general>versionused"
 #define GC_SAFEEXIT                     "<athlete-general>safeexit"
 #define GC_UPGRADE_FOLDER_SUCCESS       "<athlete-general>upgradesuccess/folder"     // success tracking of folder upgrade stored on athlete level
@@ -211,6 +217,7 @@
 #define GC_CRANKLENGTH                  "<athlete-preferences>crankLength"
 #define GC_WHEELSIZE                    "<athlete-preferences>wheelsize"
 #define GC_USE_CP_FOR_FTP               "<athlete-preferences>cp/useforftp"                       // use CP for FTP
+#define GC_USE_CP_FOR_FTP_RUN           "<athlete-preferences>cp/useforftprun"                    // use CP for FTP
 #define GC_NETWORKFILESTORE_FOLDER      "<athlete-preferences>networkfilestore/folder"            // folder to sync with
 #define GC_AUTOBACKUP_FOLDER            "<athlete-preferences>autobackup/folder"
 #define GC_AUTOBACKUP_PERIOD            "<athlete-preferences>autobackup/period"                  // how often is the Athlete Folder backuped up / 0 == never

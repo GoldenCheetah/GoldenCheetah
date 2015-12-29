@@ -50,6 +50,7 @@ private:
     double      lastTime;
     double      time;
     double      lastDistance;
+    double      lastLength;
     double      lastLat, lastLon;
 
     double      alt;
@@ -62,7 +63,9 @@ private:
     double      distance;
     double      watts;
     bool        periodic;
+    bool        swimming;
     int         lap;
+    int         strokes;
 
     // header processing state
     bool header;

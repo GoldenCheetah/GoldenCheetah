@@ -82,15 +82,15 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
 // thread and is part of the GC architecture NOT related to the
 // hardware controller.
 //
-ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString cyclist) : QThread(parent), devConf(devConf)
+ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString athlete) : QThread(parent), devConf(devConf)
 {
     qRegisterMetaType<ANTMessage>("ANTMessage");
     qRegisterMetaType<uint16_t>("uint16_t");
     qRegisterMetaType<uint8_t>("uint8_t");
     qRegisterMetaType<struct timeval>("struct timeval");
 
-    //remember the cylist for wheelsize Settings
-    trainCyclist = cyclist;
+    //remember the athlete for wheelsize Settings
+    trainAthlete = athlete;
 
     // device status and settings
     Status=0;
@@ -199,7 +199,7 @@ void ANT::setWheelRpm(float x) {
     // devConf will be NULL if we are are running the add device wizard
     // we can default to the global setting
     if (devConf) telemetry.setSpeed(x * devConf->wheelSize / 1000 * 60 / 1000);
-    else telemetry.setSpeed(x * appsettings->cvalue(trainCyclist, GC_WHEELSIZE, 2100).toInt() / 1000 * 60 / 1000);
+    else telemetry.setSpeed(x * appsettings->cvalue(trainAthlete, GC_WHEELSIZE, 2100).toInt() / 1000 * 60 / 1000);
 }
 
 void ANT::setHb(double smo2, double thb)
@@ -311,6 +311,9 @@ void ANT::refreshFecGradient()
 
 void ANT::requestFecCapabilities()
 {
+    if (fecChannel == -1)
+        return;
+
     sendMessage(ANTMessage::fecRequestCapabilities(fecChannel));
 }
 
@@ -427,10 +430,20 @@ ANT::setup()
     // fixme: better synchronisation?
     msleep(500);
 
-    sendMessage(ANTMessage::resetSystem());
+    uint8_t attempts = 0;
+    do
+    {
+        ANT_Reset_Acknowledge = false;
+        sendMessage(ANTMessage::resetSystem());
 
-    // specs say wait 500ms after reset before sending any more host commands
-    msleep(500);
+        // specs say wait 500ms after reset before sending any more host commands
+        msleep(500);
+
+        if (!ANT_Reset_Acknowledge)
+            qDebug() << "ANT device reset was not acknowledged !...try again";
+//        else
+//            qDebug() << "ANT device reset successful !";
+    } while (!ANT_Reset_Acknowledge && attempts++<3);
 
     sendMessage(ANTMessage::setNetworkKey(1, key));
 
@@ -881,10 +894,13 @@ ANT::processMessage(void) {
 //fprintf(stderr, "\n");
 
     struct timeval timestamp;
-    gettimeofday (&timestamp, NULL);
+    get_timeofday (&timestamp);
     emit receivedAntMessage(m, timestamp);
 
     switch (rxMessage[ANT_OFFSET_ID]) {
+        case ANT_NOTIF_STARTUP:
+            ANT_Reset_Acknowledge = true;
+            break;
         case ANT_ACK_DATA:
         case ANT_BROADCAST_DATA:
         case ANT_CHANNEL_STATUS:

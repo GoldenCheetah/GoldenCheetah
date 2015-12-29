@@ -380,6 +380,38 @@ class BestsMetricsPage : public QWidget
 #endif
 };
 
+class CustomMetricsPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+    public:
+
+    CustomMetricsPage(QWidget *parent, Context *context);
+
+    public slots:
+
+        void refreshTable();
+        qint32 saveClicked();
+
+        void deleteClicked();
+        void addClicked();
+        void editClicked();
+
+    protected:
+        Context *context;
+
+        QPushButton *addButton,
+                    *deleteButton,
+                    *editButton;
+        QTreeWidget *table;
+        QList<UserMetricSettings> metrics;
+
+        struct {
+            quint16 crc;
+        } b4;
+};
+
 class IntervalMetricsPage : public QWidget
 {
     Q_OBJECT
@@ -685,7 +717,7 @@ class SchemePage : public QWidget
 
 
     public:
-        SchemePage(ZonePage *parent);
+        SchemePage(Zones *zones);
         ZoneScheme getScheme();
         qint32 saveClicked();
 
@@ -695,7 +727,7 @@ class SchemePage : public QWidget
         void renameClicked();
 
     private:
-        ZonePage *zonePage;
+        Zones *zones;
         QTreeWidget *scheme;
         QPushButton *addButton, *renameButton, *deleteButton;
 };
@@ -707,8 +739,13 @@ class CPPage : public QWidget
 
 
     public:
-        CPPage(ZonePage *parent);
+        CPPage(Context *context, Zones *zones, SchemePage *schemePage);
         QComboBox *useCPForFTPCombo;
+        qint32 saveClicked();
+
+    struct {
+        int cpforftp;
+    } b4;
 
     public slots:
         void addClicked();
@@ -731,7 +768,9 @@ class CPPage : public QWidget
         QDoubleSpinBox *wEdit;
         QDoubleSpinBox *pmaxEdit;
 
-        ZonePage *zonePage;
+        Context *context;
+        Zones *zones_;
+        SchemePage *schemePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
         QPushButton *addButton, *updateButton, *deleteButton;
@@ -747,28 +786,34 @@ class ZonePage : public QWidget
     public:
 
         ZonePage(Context *);
-        Context *context;
-
+        ~ZonePage();
         qint32 saveClicked();
-
-        //ZoneScheme scheme;
-        Zones zones;
-        quint16 b4Fingerprint; // how did it start ?
-
-        // Children talk to each other
-        SchemePage *schemePage;
-        CPPage *cpPage;
 
     public slots:
 
 
     protected:
 
-        bool changed;
+        Context *context;
 
         QTabWidget *tabs;
 
-        // local versions for modification
+    private:
+
+        static const int nSports = 2;
+
+        QLabel *sportLabel;
+        QComboBox *sportCombo;
+
+        //ZoneScheme scheme;
+        Zones *zones[nSports];
+        quint16 b4Fingerprint[nSports]; // how did it start ?
+        SchemePage *schemePage[nSports];
+        CPPage *cpPage[nSports];
+
+    private slots:
+        void changeSport(int i);
+
 };
 
 //

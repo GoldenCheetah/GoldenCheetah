@@ -626,18 +626,18 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     spanSlider->setLowerValue(0);
     spanSlider->setUpperValue(15);
 
-    QFont small;
-    small.setPointSize(6);
+    QFont smallFont;
+    smallFont.setPointSize(6);
 
     scrollLeft = new QPushButton("<", this);
-    scrollLeft->setFont(small);
+    scrollLeft->setFont(smallFont);
     scrollLeft->setAutoRepeat(true);
     scrollLeft->setFixedHeight(16);
     scrollLeft->setFixedWidth(16);
     scrollLeft->setContentsMargins(0,0,0,0);
 
     scrollRight = new QPushButton(">", this);
-    scrollRight->setFont(small);
+    scrollRight->setFont(smallFont);
     scrollRight->setAutoRepeat(true);
     scrollRight->setFixedHeight(16);
     scrollRight->setFixedWidth(16);
@@ -935,9 +935,9 @@ AllPlotWindow::configChanged(qint32 state)
         redrawStackPlot();
     }
 
-    // just force a replot if wbal changed
-    // and we are actually plotting wbal !
-    if (state & CONFIG_WBAL && showW->isChecked()) forceReplot();
+    // just force a replot if (a) units changed (e.g. temp, speed etc are now in different units
+    // or the wbal formula changed and we are actually plotting wbal !
+    if (state & CONFIG_UNITS || (state & CONFIG_WBAL && showW->isChecked())) forceReplot();
 }
 
 QString

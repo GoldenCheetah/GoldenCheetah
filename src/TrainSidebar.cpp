@@ -199,6 +199,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     workoutTree->setFrameStyle(QFrame::NoFrame);
     workoutTree->setAlternatingRowColors(false);
     workoutTree->setEditTriggers(QAbstractItemView::NoEditTriggers); // read-only
+    workoutTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
     workoutTree->expandAll();
     workoutTree->header()->setCascadingSectionResizes(true); // easier to resize this way
     workoutTree->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -307,7 +308,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     intensitySlider->setValue(100);
     slideLayout->addStretch();
     slideLayout->addWidget(intensitySlider);
-intensitySlider->hide(); //XXX!!! temporary
+    intensitySlider->hide(); // FIXME: XXX!!! temporary
 
 #ifdef Q_OS_MAC
 #if QT_VERSION > 0x5000
@@ -529,12 +530,27 @@ TrainSidebar::workoutPopup()
     menu.addAction(wizard);
     menu.addAction(scan);
 
+
     // we can delete too
-    QModelIndex current = workoutTree->currentIndex();
-    QModelIndex target = sortModel->mapToSource(current);
-    QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
-    if (QFileInfo(filename).exists()) {
+    int delNumber = 0;
+
+    QModelIndexList list = workoutTree->selectionModel()->selectedRows();
+    foreach (QModelIndex index, list)
+    {
+        QModelIndex target = sortModel->mapToSource(index);
+
+        QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
+        if (QFileInfo(filename).exists()) {
+            delNumber++;
+        }
+    }
+
+    if (delNumber > 0) {
         QAction *del = new QAction(tr("Delete selected Workout"), workoutTree);
+
+        if (delNumber > 1) {
+            del->setText(QString(tr("Delete %1 selected Workouts")).arg(delNumber));
+        }
         menu.addAction(del);
         connect(del, SIGNAL(triggered(void)), this, SLOT(deleteWorkouts(void)));
     }
@@ -678,10 +694,10 @@ TrainSidebar::configChanged(qint32)
     FTP=285; // default to 285 if zones are not set
     WPRIME = 20000;
 
-    int range = context->athlete->zones()->whichRange(QDate::currentDate());
+    int range = context->athlete->zones(false)->whichRange(QDate::currentDate());
     if (range != -1) {
-        FTP = context->athlete->zones()->getCP(range);
-        WPRIME = context->athlete->zones()->getWprime(range);
+        FTP = context->athlete->zones(false)->getCP(range);
+        WPRIME = context->athlete->zones(false)->getWprime(range);
     }
 }
 
@@ -902,16 +918,33 @@ TrainSidebar::removeInvalidVideoSync()
 void
 TrainSidebar::deleteWorkouts()
 {
-    QModelIndex current = workoutTree->currentIndex();
-    QModelIndex target = sortModel->mapToSource(current);
-    QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
+    QStringList nameList;
+    QModelIndexList list = workoutTree->selectionModel()->selectedRows();
+    foreach (QModelIndex index, list) {
+        QModelIndex target = sortModel->mapToSource(index);
+        QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
+        if (QFileInfo(filename).exists()) {
+            nameList.append(filename);
+        }
+    }
 
-    if (QFileInfo(filename).exists()) {
-
+    if (nameList.count()>0) {
         // are you sure?
         QMessageBox msgBox;
-        msgBox.setText(tr("Are you sure you want to delete this Workout?"));
-        msgBox.setInformativeText(filename);
+        if (nameList.count()==1) {
+            msgBox.setText(tr("Are you sure you want to delete this Workout?"));
+        }
+        else {
+            msgBox.setText(QString(tr("Are you sure you want to delete this %1 workouts?")).arg(nameList.count()));
+        }
+        QString info;
+        for (int i=0;i<nameList.count() && i<21;i++) {
+           info += nameList.at(i)+"\n";
+           if (i == 20) {
+               info += "...\n";
+           }
+        }
+        msgBox.setInformativeText(info);
         QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
         msgBox.setStandardButtons(QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Cancel);
@@ -920,12 +953,16 @@ TrainSidebar::deleteWorkouts()
 
         if(msgBox.clickedButton() != deleteButton) return;
 
-        // delete from disk
-        QFile(filename).remove();
-        // delete from DB
-        trainDB->startLUW();
-        trainDB->deleteWorkout(filename);
-        trainDB->endLUW();
+        foreach (QString filename, nameList) {
+            if (QFileInfo(filename).exists()) {
+                // delete from disk
+                QFile(filename).remove();
+                // delete from DB
+                trainDB->startLUW();
+                trainDB->deleteWorkout(filename);
+                trainDB->endLUW();
+            }
+        }
     }
 }
 

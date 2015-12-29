@@ -28,6 +28,8 @@
 #include "TimeUtils.h"
 #include <cmath>
 
+#define SMLdebug false // Lap Swimming debug
+
 SmlParser::SmlParser(RideFile* rideFile) : rideFile(rideFile)
 {
     cad = 0;
@@ -35,16 +37,19 @@ SmlParser::SmlParser(RideFile* rideFile) : rideFile(rideFile)
     distance = 0;
     lastDistance = 0;
     lastTime = 0;
+    lastLength = 0;
     lastLat = lastLon = 0;
     watts = 0;
     alt = 0;
     lon = 0;
     lat = 0;
     hr = 0;
-    temp = RideFile::NoTemp;
+    temp = RideFile::NA;
     periodic = false;
+    swimming = false;
     header = false;
     lap = 0;
+    strokes = 0;
 }
 
 bool
@@ -69,8 +74,9 @@ SmlParser::startElement(const QString&, const QString&,
         watts = 0;
         alt = 0;
         hr = 0;
-        temp = RideFile::NoTemp;
+        temp = RideFile::NA;
         periodic = false;
+        swimming = false;
     }
     return true;
 }
@@ -157,6 +163,11 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
     else if (qName == "SampleType")
     {
         periodic = (buffer == "periodic");
+        swimming = (buffer == "swimming");
+    }
+    else if (qName == "Type")
+    {
+        if (buffer == "Stroke") strokes++;
     }
 
 
@@ -219,17 +230,43 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
 
         // Record point on periodic samples only
         if (periodic && round(time) > round(lastTime)) {
-            rideFile->appendPoint(round(time), cad, hr, distance, speed, 0,
+            if (distance > lastDistance) lastDistance = distance;
+            rideFile->appendPoint(round(time), cad, hr, lastDistance, speed, 0,
                          watts, alt, lon, lat, 0, 0.0, temp, 0.0, 0.0,
                          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, lap);
             // update the "lasts"
             lastTime = time;
-            lastDistance = distance;
         }
 
         lastLon = lon;
         lastLat = lat;
+
+        // Update distance, speed and cadence for swimming lengths
+        if (swimming && distance > 0.0 && time > lastLength) {
+            if (SMLdebug) qDebug() << "Time" << time << "Distance" << distance << "lastLength" << lastLength << "lastDistance" << lastDistance;
+            if (distance > lastDistance) {
+                double deltaSecs = round(time) - lastLength;
+                double deltaDist = (distance - lastDistance) / deltaSecs;
+                double kph = 3600.0 * deltaDist;
+                double cad = 60 * strokes / deltaSecs;
+                for (int i = rideFile->timeIndex(lastLength);
+                     i>= 0 && i < rideFile->dataPoints().size() &&
+                     rideFile->dataPoints()[i]->secs <= round(time);
+                     ++i) {
+                    rideFile->dataPoints()[i]->kph = kph;
+                    rideFile->dataPoints()[i]->cad = cad;
+                    rideFile->dataPoints()[i]->km = lastDistance;
+                    lastDistance += deltaDist;
+                }
+                lastDistance = distance;
+                strokes = 0;
+                if (kph > 0.0) rideFile->setDataPresent(rideFile->kph, true);
+                if (cad > 0.0) rideFile->setDataPresent(rideFile->cad, true);
+                if (SMLdebug) qDebug() << "    kph" << kph;
+            }
+            lastLength = round(time);
+        }
     }
 
     return true;

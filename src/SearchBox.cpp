@@ -149,9 +149,10 @@ SearchBox::configChanged(qint32)
     SpecialFields sp;
 
     // start with just a list of functions
-    list = DataFilter::functions();
+    list = DataFilter::builtins();
 
     // add special functions (older code needs fixing !)
+    list << "config(cranklength)";
     list << "config(cp)";
     list << "config(w')";
     list << "config(pmax)";
@@ -185,6 +186,9 @@ SearchBox::configChanged(qint32)
     list << "best(xpower, 3600)";
     list << "best(vam, 3600)";
     list << "best(wpk, 3600)";
+    //list<<"RECINTSECS" is NOT added since its really only
+    //valid to use it when working on ride samples
+    list << "NA";
 
     // get sorted list
     QStringList names = context->tab->rideNavigator()->logicalHeadings;
@@ -311,7 +315,7 @@ void SearchBox::searchSubmit()
     // return hit / key pressed
     if (text() != "") {
         filtered = true;
-        mode == Search ? submitQuery(text()) : submitFilter(text());
+        mode == Search ? submitQuery(text()) : submitFilter(context, text());
     }
 }
 

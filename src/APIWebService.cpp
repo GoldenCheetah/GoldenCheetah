@@ -31,6 +31,7 @@
 #include "PaceZones.h"
 
 #include <QTemporaryFile>
+#include <QFile>
 
 void
 APIWebService::service(HttpRequest &request, HttpResponse &response)
@@ -62,6 +63,22 @@ void
 APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpResponse &response)
 {
 
+    // check we have an athlete and it is valid
+    if (paths.count() == 0) {
+
+        response.setStatus(404); // malformed URL
+        response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+        response.write("missing athlete.");
+        return;
+    } else {
+        QFile ridedb(home.absolutePath() + "/" + paths[0] + "/cache/rideDB.json");
+        if (!ridedb.exists()) {
+            response.setStatus(404); // malformed URL
+            response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+            response.write("unknown athlete " + paths[0].toLocal8Bit());
+            return;
+        }
+    }
     if (paths.count() == 1) {
 
         // LIST ACTIVITIES FOR ATHLETE

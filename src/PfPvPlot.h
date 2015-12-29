@@ -55,6 +55,8 @@ class PfPvPlot : public QwtPlot
         void setCAD(int cadence);
         double getCL();
         void setCL(double cranklen);
+        int getPMax();
+        void setPMax(int pmax);
         void recalc();
         void recalcCompare();
 
@@ -86,6 +88,7 @@ class PfPvPlot : public QwtPlot
         void changedCP( const QString& );
         void changedCAD( const QString& );
         void changedCL( const QString& );
+        void changedPMax( const QString& );
 
     protected:
 
@@ -100,12 +103,14 @@ class PfPvPlot : public QwtPlot
         QList <QwtPlotCurve *> intervalCurves;
         QList <QwtPlotMarker *> intervalMarkers;
         QwtPlotCurve *cpCurve;
+        QwtPlotCurve *pmaxCurve;
         QList <QwtPlotCurve *> zoneCurves;
         QList <PfPvPlotZoneLabel *> zoneLabels;
         QwtPlotMarker *mX;
         QwtPlotMarker *mY;
 
         int cp_;
+        int pmax_;
         int cad_;
         double cl_;
         bool shade_zones;    // whether to shade zones, added 27Apr2009 djconnel

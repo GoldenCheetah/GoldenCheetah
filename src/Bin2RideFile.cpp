@@ -158,7 +158,7 @@ struct Bin2FileReaderState
         int nm = 0;
         double kph = 0.0;
         int alt = 0;
-        double temp = RideFile::NoTemp;
+        double temp = RideFile::NA;
         double lat = 0.0;
         double lng = 0.0;
         double km = 0.0;
@@ -223,7 +223,7 @@ struct Bin2FileReaderState
             kph = kph/10.0;
 
         if (temp == 0x8000) //0x8000 = invalid
-            temp = RideFile::NoTemp;
+            temp = RideFile::NA;
         else if (temp > 0x7FFF) // Negative
             temp = (temp-0xFFFF)/10.0;
         else
@@ -295,6 +295,8 @@ struct Bin2FileReaderState
     void read_username(int *bytes_read = NULL, int *sum = NULL)
     {
         QString name = read_text(20, bytes_read, sum);
+        if (BIN2_DEBUG)
+            qDebug() << "User" << name;
         //deviceInfo += QString("User : %1\n").arg(name);
     }
 
@@ -305,6 +307,9 @@ struct Bin2FileReaderState
         int smartbelt_A = read_bytes(2, bytes_read, sum);
         int smartbelt_B = read_bytes(2, bytes_read, sum);
         int smartbelt_C = read_bytes(2, bytes_read, sum);
+
+        if (BIN2_DEBUG)
+            qDebug() << "Smartbelt" << smartbelt_A << smartbelt_B << smartbelt_C;
         deviceInfo += QString("Smartbelt %1-%2-%3\n").arg(smartbelt_A).arg(smartbelt_B).arg(smartbelt_C);
 
         read_bytes(42, bytes_read, sum);
@@ -343,6 +348,8 @@ struct Bin2FileReaderState
                 else
                     device_type_str = QString("ANT %1 Id").arg(device_type);
 
+                if (BIN2_DEBUG)
+                    qDebug() << "ANT" << device_type_str << id << text;
                 deviceInfo += QString("%1 %2 %3\n").arg(device_type_str).arg(id).arg(text);
             }
         }
@@ -351,6 +358,9 @@ struct Bin2FileReaderState
     // pages
     int read_summary_page()
     {
+        if (BIN2_DEBUG)
+            qDebug() << "read_summary_page()";
+
         int sum = 0;
         int bytes_read = 0;
 
@@ -363,6 +373,9 @@ struct Bin2FileReaderState
         {
             uint16_t length = read_bytes(2, &bytes_read, &sum);
             uint16_t page_number = read_bytes(2, &bytes_read, &sum); // Page #
+
+            if (BIN2_DEBUG)
+                qDebug() << "page_number" << page_number;
 
             if (page_number == 0) {
                 // Page #0
@@ -539,6 +552,9 @@ struct Bin2FileReaderState
 
     int read_version()
     {
+        if (BIN2_DEBUG)
+            qDebug() << "read_version()";
+
         int sum = 0;
         int bytes_read = 0;
 
@@ -547,7 +563,9 @@ struct Bin2FileReaderState
 
         if (header == START && command == UNIT_VERSION)
         {
-            read_bytes(2, &bytes_read, &sum); // length
+            int length = read_bytes(2, &bytes_read, &sum); // length
+            if (BIN2_DEBUG)
+                qDebug() << "length" << length;
 
             int major_version = read_bytes(1, &bytes_read, &sum);
             int minor_version = read_bytes(2, &bytes_read, &sum);
@@ -565,7 +583,6 @@ struct Bin2FileReaderState
                     jouleGPS = false;
             }
 
-
             if (jouleGPS_GPSPlus)
                 data_version = read_bytes(2, &bytes_read, &sum);
 
@@ -577,10 +594,13 @@ struct Bin2FileReaderState
             else
                 deviceInfo += "Joule";
 
+            if (BIN2_DEBUG)
+                qDebug() << "Version" << version;
+
             deviceInfo += QString(" Version %1\n").arg(version);
 
-
-
+            if (jouleGPS_GPSPlus && !jouleGPS)
+                read_bytes(5, &bytes_read, &sum);
 
             read_bytes(1, &bytes_read, &sum); // checksum
         }
@@ -589,16 +609,23 @@ struct Bin2FileReaderState
 
     int read_system_info()
     {
+        if (BIN2_DEBUG)
+            qDebug() << "read_system_info()";
+
         int sum = 0;
         int bytes_read = 0;
 
         uint16_t header = read_bytes(2, &bytes_read, &sum); // Always (0x10-0x02)
         uint16_t command = read_bytes(2, &bytes_read, &sum);
 
+        if (BIN2_DEBUG)
+            qDebug() << "header" << header << "command" << command;
 
         if (header == START && command == SYSTEM_INFO)
         {
-            read_bytes(2, &bytes_read, &sum); // length
+            int length = read_bytes(2, &bytes_read, &sum); // length
+            if (BIN2_DEBUG)
+                qDebug() << "length" << length;
 
             if (jouleGPS_GPSPlus)
                 read_bytes(52, &bytes_read, &sum);
@@ -612,6 +639,10 @@ struct Bin2FileReaderState
                 read_bytes(34, &bytes_read, &sum);
 
             read_bytes(1, &bytes_read, &sum); // checksum
+        } else
+        {
+            if (BIN2_DEBUG)
+                qDebug() << "unknown header or command";
         }
         return bytes_read;
     }

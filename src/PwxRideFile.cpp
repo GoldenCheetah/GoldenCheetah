@@ -248,7 +248,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
             // temp
             QDomElement temp = node.firstChildElement("temp");
             if (!temp.isNull()) add.temp = temp.text().toDouble();
-            else add.temp = RideFile::NoTemp;
+            else add.temp = RideFile::NA;
 
             // if there are data points && a time difference > 1sec && smartRecording processing is requested at all
             if ((!rideFile->dataPoints().empty()) && (add.secs > rtime + 1) && (isGarminSmartRecording.toInt() != 0)) {

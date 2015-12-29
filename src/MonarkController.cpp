@@ -71,7 +71,7 @@ MonarkController::discover(QString name)
 
 bool MonarkController::doesPush() { return false; }
 bool MonarkController::doesPull() { return true; }
-bool MonarkController::doesLoad() { return false; }
+bool MonarkController::doesLoad() { return true; }
 
 /*
  * gets called from the GUI to get updated telemetry.
@@ -82,6 +82,16 @@ bool MonarkController::doesLoad() { return false; }
 void
 MonarkController::getRealtimeData(RealtimeData &rtData)
 {
+    if (!m_monark->isConnected())
+    {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Cannot Connect to Monark"));
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+        parent->Stop(0);
+        return;
+    }
+
     rtData.setWatts(m_monark->power());
     rtData.setHr(m_monark->heartRate());
     rtData.setCadence(m_monark->cadence());
@@ -89,4 +99,7 @@ MonarkController::getRealtimeData(RealtimeData &rtData)
 
 void MonarkController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
 
-
+void MonarkController::setLoad(double load)
+{
+    m_monark->setLoad(load);
+}

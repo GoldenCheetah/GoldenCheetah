@@ -61,6 +61,10 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     context->athlete = this;
     cyclist = this->home->root().dirName();
 
+    // get id and set id all at one
+    id = QUuid(appsettings->cvalue(cyclist, GC_ATHLETE_ID, QUuid::createUuid().toString()).toString());
+    appsettings->setCValue(cyclist, GC_ATHLETE_ID, id.toString());
+
     // Recovering from a crash?
     if(!appsettings->cvalue(cyclist, GC_SAFEEXIT, true).toBool()) {
         GcCrashDialog *crashed = new GcCrashDialog(homeDir);
@@ -88,15 +92,17 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     }
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
-    // Power Zones
-    zones_ = new Zones;
-    QFile zonesFile(home->config().canonicalPath() + "/power.zones");
-    if (zonesFile.exists()) {
-        if (!zones_->read(zonesFile)) {
-            QMessageBox::critical(context->mainWindow, tr("Zones File Error"),
-				  zones_->errorString());
-        } else if (! zones_->warningString().isEmpty())
-            QMessageBox::warning(context->mainWindow, tr("Reading Zones File"), zones_->warningString());
+    // Power Zones for Bike & Run
+    for (int i=0; i < 2; i++) {
+        zones_[i] = new Zones(i>0);
+        QFile zonesFile(home->config().canonicalPath() + "/" + zones_[i]->fileName());
+        if (zonesFile.exists()) {
+            if (!zones_[i]->read(zonesFile)) {
+                QMessageBox::critical(context->mainWindow, tr("Zones File %1 Error").arg(zones_[i]->fileName()), zones_[i]->errorString());
+            } else if (! zones_[i]->warningString().isEmpty()) {
+                QMessageBox::warning(context->mainWindow, tr("Reading Zones File %1").arg(zones_[i]->fileName()), zones_[i]->warningString());
+            }
+        }
     }
 
     // Heartrate Zones
@@ -228,7 +234,7 @@ Athlete::~Athlete()
 
     delete rideMetadata_;
     delete colorEngine;
-    delete zones_;
+    for (int i=0; i<2; i++) delete zones_[i];
     delete hrzones_;
     for (int i=0; i<2; i++) delete pacezones_[i];
     delete autoImportConfig;
@@ -252,9 +258,9 @@ void Athlete::selectRideFile(QString fileName)
 }
 
 void
-Athlete::addRide(QString name, bool dosignal, bool useTempActivities)
+Athlete::addRide(QString name, bool dosignal, bool useTempActivities, bool planned)
 {
-    rideCache->addRide(name, dosignal, useTempActivities);
+    rideCache->addRide(name, dosignal, useTempActivities, planned);
 }
 
 void
@@ -378,7 +384,7 @@ AthleteDirectoryStructure::AthleteDirectoryStructure(const QDir home){
     athlete_temp = "temp";
     athlete_logs = "logs";
     athlete_quarantine = "quarantine";
-
+    athlete_planned = "planned";
 
 }
 
@@ -404,8 +410,7 @@ AthleteDirectoryStructure::createAllSubdirs() {
     myhome.mkdir(athlete_logs);
     myhome.mkdir(athlete_temp);
     myhome.mkdir(athlete_quarantine);
-
-
+    myhome.mkdir(athlete_planned);
 
 }
 
@@ -424,7 +429,8 @@ AthleteDirectoryStructure::subDirsExist() {
             workouts().exists() &&
             logs().exists() &&
             temp().exists() &&
-            quarantine().exists()
+            quarantine().exists()&&
+            planned().exists()
             );
 }
 
@@ -551,7 +557,7 @@ Athlete::getPMCFor(QString metricName, int stsdays, int ltsdays)
 }
 
 PMCData *
-Athlete::getPMCFor(Leaf *expr, DataFilter *df, int stsdays, int ltsdays)
+Athlete::getPMCFor(Leaf *expr, DataFilterRuntime *df, int stsdays, int ltsdays)
 {
     PMCData *returning = NULL;
 

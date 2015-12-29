@@ -19,6 +19,9 @@
 #include "RideMetric.h"
 #include "RideItem.h"
 #include "BestIntervalDialog.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "Specification.h"
 #include "Zones.h"
 #include <cmath>
 #include <QApplication>
@@ -43,50 +46,47 @@ class PeakPercent : public RideMetric {
 
     }
 
-     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P"); }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P"); }
 
-    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
-        if (ride->dataPoints().isEmpty() || !ride->areDataPresent()->watts) {
+        // no ride or no samples
+        if (!item->ride()->areDataPresent()->watts) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
-            // no data or no power data
-            setValue(0.0);
+        int ap = deps.value("average_power")->value(true);
+        int duration = deps.value("workout_time")->value(true);
+
+        if (duration>120) {
+
+            // get W' and CP parameters for 2 parameter model
+            double CP = 250;
+            double WPRIME = 22000;
+
+            if (item->context->athlete->zones(item->isRun)) {
+
+                // if range is -1 we need to fall back to a default value
+                CP = item->zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getCP(item->zoneRange) : 250;
+                WPRIME = item->zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getWprime(item->zoneRange) : 22000;
+
+                // did we override CP in metadata ?
+                int oCP = item->getText("CP","0").toInt();
+                if (oCP) CP=oCP;
+            }
+
+            // work out waht actual TTE is for this value
+            int joules = ap * duration;
+            double tc = (joules - WPRIME) / CP;
+            setValue(100.0f * tc / double(duration));
 
         } else {
-
-            int ap = deps.value("average_power")->value(true);
-            int duration = deps.value("workout_time")->value(true);
-
-            if (duration>120) {
-
-                // get W' and CP parameters for 2 parameter model
-                double CP = 250;
-                double WPRIME = 22000;
-
-                if (zones) {
-
-                    // if range is -1 we need to fall back to a default value
-                    CP = zoneRange >= 0 ? zones->getCP(zoneRange) : 250;
-                    WPRIME = zoneRange >= 0 ? zones->getWprime(zoneRange) : 22000;
-
-                    // did we override CP in metadata ?
-                    int oCP = ride->getTag("CP","0").toInt();
-                    if (oCP) CP=oCP;
-                }
-
-                // work out waht actual TTE is for this value
-                int joules = ap * duration;
-                double tc = (joules - WPRIME) / CP;
-                setValue(100.0f * tc / double(duration));
-
-            } else {
-                setValue(0); // not for < 2m
-            }
+            setValue(0); // not for < 2m
         }
     }
+
     RideMetric *clone() const { return new PeakPercent(*this); }
 };
 
@@ -117,47 +117,43 @@ class PowerZone : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P"); }
 
-    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
-        if (!zones || ride->dataPoints().isEmpty() || !ride->areDataPresent()->watts) {
-
-            // no data or no power data
-            setValue(0);
-
-        } else {
-
-            double ap = deps.value("average_power")->value(true);
-            double percent=0;
-
-            // if range is -1 we need to fall back to a default value
-            int zone = zoneRange >= 0 ? zones->whichZone(zoneRange, ap) + 1 : 0;
-
-            // ok, how far up  the zone was this?
-            if (zoneRange >= 0 && zone) {
-
-                // get zone info
-                QString name, description;
-                int low, high;
-                zones->zoneInfo(zoneRange, zone-1, name, description, low, high);
-
-                // use Pmax as upper bound, this is used
-                // for the limit of upper zone ALWAYS
-                if (high > zones->getPmax(zoneRange)) 
-                    high = zones->getPmax(zoneRange);
-
-                // how far in?
-                percent = double(ap-low) / double(high-low);
-
-                // avoid rounding up !
-                if (percent >0.9f && percent <1.00f) percent = 0.9f;
-            }
-
-            // we want 4.1 as zone, for 10% into zone 4
-            setValue(double(zone) + percent);
+        // no zones
+        if (!item->context->athlete->zones(item->isRun) || !item->ride()->areDataPresent()->watts) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double ap = deps.value("average_power")->value(true);
+        double percent=0;
+
+        // if range is -1 we need to fall back to a default value
+        int zone = item->zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->whichZone(item->zoneRange, ap) + 1 : 0;
+
+        // ok, how far up  the zone was this?
+        if (item->zoneRange >= 0 && zone) {
+
+            // get zone info
+            QString name, description;
+            int low, high;
+            item->context->athlete->zones(item->isRun)->zoneInfo(item->zoneRange, zone-1, name, description, low, high);
+
+            // use Pmax as upper bound, this is used
+            // for the limit of upper zone ALWAYS
+            if (high > item->context->athlete->zones(item->isRun)->getPmax(item->zoneRange)) 
+                high = item->context->athlete->zones(item->isRun)->getPmax(item->zoneRange);
+
+            // how far in?
+            percent = double(ap-low) / double(high-low);
+
+            // avoid rounding up !
+            if (percent >0.9f && percent <1.00f) percent = 0.9f;
+        }
+
+        // we want 4.1 as zone, for 10% into zone 4
+        setValue(double(zone) + percent);
     }
     RideMetric *clone() const { return new PowerZone(*this); }
 };
@@ -180,32 +176,34 @@ class FatigueIndex : public RideMetric {
         setImperialUnits(tr("%"));
 
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        if (ride->dataPoints().isEmpty() || !ride->areDataPresent()->watts) {
-            // no data
-            setValue(0.0);
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        } else {
-
-            // find peak and work from that
-            foreach(const RideFilePoint *point, ride->dataPoints()) {
-                if (point->watts > maxp && point->watts != 0) minp = maxp = point->watts;
-            }
-
-            // now find min after peak
-            bool hitpeak = false;
-            foreach(const RideFilePoint *point, ride->dataPoints()) {
-                if (hitpeak == false && point->watts >= maxp) hitpeak = true;
-                if (hitpeak == true && point->watts < minp && point->watts != 0) minp = point->watts;
-            }
-
-            if (minp > maxp) setValue(0.00); // minp wasn't changed, all zeroes?
-            else setValue(100 * ((maxp-minp)/maxp)); // as a percentage
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        // find peak and work from that
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->watts > maxp && point->watts != 0) minp = maxp = point->watts;
+        }
+
+        // now again and find peak
+        bool hitpeak = false;
+        it.toFront();
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (hitpeak == false && point->watts >= maxp) hitpeak = true;
+            if (hitpeak == true && point->watts < minp && point->watts != 0) minp = point->watts;
+        }
+
+        if (minp > maxp) setValue(0.00); // minp wasn't changed, all zeroes?
+        else setValue(100 * ((maxp-minp)/maxp)); // as a percentage
     }
     RideMetric *clone() const { return new FatigueIndex(*this); }
 };
@@ -229,27 +227,28 @@ class PacingIndex : public RideMetric {
         setImperialUnits(tr("%"));
 
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        if (ride->dataPoints().isEmpty() || !ride->areDataPresent()->watts) {
-            // no data
-            setValue(0.0);
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        } else {
-
-            // find peak and work from that
-            foreach(const RideFilePoint *point, ride->dataPoints()) {
-                if (point->watts > maxp && point->watts != 0) maxp = point->watts;
-                total += point->watts;
-                count++;
-            }
-
-            if (!count || !total) setValue(0.00); // minp wasn't changed, all zeroes?
-            else setValue(((total/count) / maxp) * 100.00f);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        // find peak and work from that
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            if (point->watts > maxp && point->watts != 0) maxp = point->watts;
+            total += point->watts;
+            count++;
+        }
+
+        if (!count || !total) setValue(0.00); // minp wasn't changed, all zeroes?
+        else setValue(((total/count) / maxp) * 100.00f);
     }
     RideMetric *clone() const { return new PacingIndex(*this); }
 };
@@ -266,19 +265,21 @@ class PeakPower : public RideMetric {
         setType(RideMetric::Peak);
     }
     void setSecs(double secs) { this->secs=secs; }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        if (!ride->dataPoints().isEmpty()) {
-            QList<BestIntervalDialog::BestInterval> results;
-            BestIntervalDialog::findBests(ride, secs, 1, results);
-            if (results.count() > 0 && results.first().avg < 3000) watts = results.first().avg;
-            else watts = 0.0;
-        } else {
-            watts = 0.0;
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        QList<BestIntervalDialog::BestInterval> results;
+        BestIntervalDialog::findBests(item->ride(), spec, secs, 1, results);
+        if (results.count() > 0 && results.first().avg < 3000) watts = results.first().avg;
+        else watts = 0.0;
+
         setValue(watts);
     }
     RideMetric *clone() const { return new PeakPower(*this); }
@@ -569,26 +570,36 @@ class PeakPowerHr : public RideMetric {
         setType(RideMetric::Peak);
     }
     void setSecs(double secs) { this->secs=secs; }
-    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
-                 const QHash<QString,RideMetric*> &, const Context *) {
 
-        if (!ride->dataPoints().isEmpty()){
-            QList<BestIntervalDialog::BestInterval> results;
-            BestIntervalDialog::findBests(ride, secs, 1, results);
-            if (results.count() > 0) {
-                double start = results.first().start;
-                double stop = results.first().stop;
-                int points = 0;
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-                foreach(const RideFilePoint *point, ride->dataPoints()) {
-                    if (point->secs >= start && point->secs < stop) {
-                        points++;
-                        hr = (point->hr + (points-1)*hr) / (points);
-                    }
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        // find peak power interval
+        QList<BestIntervalDialog::BestInterval> results;
+        BestIntervalDialog::findBests(item->ride(), spec, secs, 1, results);
+
+        // work out average hr during that interval
+        if (results.count() > 0) {
+
+            // start and stop is in seconds within the ride
+            double start = results.first().start;
+            double stop = results.first().stop;
+            int points = 0;
+
+            RideFileIterator it(item->ride(), spec);
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
+                if (point->secs >= start && point->secs < stop) {
+                    points++;
+                    hr = (point->hr + (points-1)*hr) / (points);
                 }
             }
-        } else {
-            hr = 0;
         }
 
         setValue(hr);

@@ -27,6 +27,7 @@
 
 class MonarkController : public RealtimeController
 {
+    Q_DECLARE_TR_FUNCTIONS(MonarkController)
 
 public:
     MonarkController (TrainSidebar *, DeviceConfiguration *);
@@ -45,6 +46,7 @@ public:
     void getRealtimeData(RealtimeData &rtData);
     void pushRealtimeData(RealtimeData &rtData);
     
+    void setLoad(double);
     void setMode(int) { return ; }
 };
 

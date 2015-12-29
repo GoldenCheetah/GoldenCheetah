@@ -25,20 +25,30 @@
 #include <QtEndian>
 #include <QDebug>
 #include <QTime>
-#include <stdio.h>
+#include <cstdio>
 #include <stdint.h>
 #include <time.h>
 #include <limits>
 #include <cmath>
-#define FIT_DEBUG false // debug traces
 
-#define RECORD_TYPE 20
+#define FIT_DEBUG     false // debug traces
+#define LAPSWIM_DEBUG false
+
+#ifndef MATHCONST_PI
+#define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
+#endif
+
+#define LAP_TYPE     19
+#define RECORD_TYPE  20
+#define SEGMENT_TYPE 142
 
 static int fitFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "fit", "Garmin FIT", new FitFileReader());
 
 static const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), Qt::UTC);
+
+static double bearing = 0; // used to compute headwind depending on wind/cyclist bearing difference
 
 struct FitField {
     int num;
@@ -94,27 +104,28 @@ struct FitFileReaderState
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
 
-
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
-        last_time(0), last_distance(0.00f), interval(0), calibration(0), devices(0), stopped(true), isLapSwim(false), pool_length(0.0),
+        last_time(0), last_distance(0.00f), interval(0), calibration(0),
+        devices(0), stopped(true), isLapSwim(false), pool_length(0.0),
         last_event_type(-1), last_event(-1), last_msg_type(-1)
-    {
-    }
+    {}
 
     struct TruncatedRead {};
 
-    void read_unknown( int size, int *count = NULL ){
+    void read_unknown( int size, int *count = NULL ) {
+#ifdef Q_CC_MSVC
+        char* c = new char[size+1];
+#else
         char c[size+1];
-
+#endif
         if (file.read(c, size ) != size)
             throw TruncatedRead();
         if (count)
             (*count) += size;
     }
 
-    fit_string_value read_text(int len, int *count = NULL)
-    {
+    fit_string_value read_text(int len, int *count = NULL) {
         char c;
         fit_string_value res = "";
         for (int i = 0; i < len; ++i) {
@@ -243,7 +254,12 @@ struct FitFileReaderState
         return i == 0x00000000 ? NA_VALUE : i;
     }
 
-    void decodeFileId(const FitDefinition &def, int, const std::vector<FitValue> values) {
+    void DumpFitValue(const FitValue& v) {
+        printf("type: %d %llx %llx %s\n", v.type, v.v, v.v2, v.s.c_str());
+    }    
+
+    void decodeFileId(const FitDefinition &def, int,
+                      const std::vector<FitValue>& values) {
         int i = 0;
         int manu = -1, prod = -1;
         foreach(const FitField &field, def.fields) {
@@ -255,6 +271,16 @@ struct FitFileReaderState
             switch (field.num) {
                 case 1: manu = value; break;
                 case 2: prod = value; break;
+
+                // other are ignored at present:
+                case 0: // file type:
+                    // 4:  activity log
+                    // 6:  Itinary
+                    // 34: segment
+                    break;
+                case 3: //serial number
+                case 4: //timestamp
+                case 5: //number
                 default: ; // do nothing
             }
         }
@@ -341,7 +367,8 @@ struct FitFileReaderState
         rideFile->setFileFormat("FIT (*.fit)");
     }
 
-    void decodeSession(const FitDefinition &def, int, const std::vector<FitValue> values) {
+    void decodeSession(const FitDefinition &def, int,
+                       const std::vector<FitValue>& values) {
         int i = 0;
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
@@ -365,11 +392,109 @@ struct FitFileReaderState
                         case 5: // swimming
                             rideFile->setTag("Sport","Swim");
                             break;
+/*
+                        // other sports are ignored at present:
+                        case 0:    // generic
+                        case 3:    // transition
+                        case 4:    // fitness_equipment
+                        case 6:    // basketball
+                        case 7:    // soccer
+                        case 8:    // tennis
+                        case 9:    // american_football
+                        case 10:    // training
+                        case 11:    // walking
+                        case 12:    // cross_country_skiing
+                        case 13:    // alpine_skiing
+                        case 14:    // snowboarding
+                        case 15:    // rowing
+                        case 16:    // mountaineering
+                        case 17:    // hiking
+                        case 18:    // multisport
+                        case 19:    // paddling
+                        case 254:    // all
+*/
+                    }
+                    break;
+                case 6: // sub sport (ignored at present)
+                    switch (value) {
+                        case 0:    // generic
+                        case 1:    // treadmill
+                        case 2:    // street
+                        case 3:    // trail
+                        case 4:    // track
+                        case 5:    // spin
+                        case 6:    // home trainer
+                        case 7:    // route
+                        case 8:    // mountain
+                        case 9:    // downhill
+                        case 10:    // recumbent
+                        case 11:    // cyclocross
+                        case 12:    // hand_cycling
+                        case 13:    // piste
+                        case 14:    // indoor_rowing
+                        case 15:    // elliptical
+                        case 254:    // all
+                        default:
+                            break;
                     }
                     break;
                 case 44: // pool_length
-                    pool_length = value/100000;
+                    pool_length = value / 100000.0;
+                    if (LAPSWIM_DEBUG) qDebug() << "Pool length" << pool_length;
                     break;
+
+                // other fields are ignored at present
+                case 253: //timestamp
+                case 254: //index
+                case 0:   //event
+                case 1:    /* event_type */
+                case 2:    /* start_time */
+                case 3:    /* start_position_lat */
+                case 4:    /* start_position_long */
+                case 7:    /* total elapsed time */
+                case 8:    /* total timer time */
+                case 9:    /* total distance */
+                case 10:    /* total_cycles */
+                case 11:    /* total calories */
+                case 13:    /* total fat calories */
+                case 14:    /* avg_speed */
+                case 15:    /* max_speed */
+                case 16:    /* avg_HR */
+                case 17:    /* max_HR */
+                case 18:    /* avg_cad */
+                case 19:    /* max_cad */
+                case 20:    /* avg_pwr */
+                case 21:    /* max_pwr */
+                case 22:    /* total ascent */
+                case 23:    /* total descent */
+                case 25:    /* first lap index */
+                case 26:    /* num lap */
+                case 29:    /* north-east lat = bounding box */
+                case 30:    /* north-east lon = bounding box */
+                case 31:    /* south west lat = bounding box */
+                case 32:    /* south west lon = bounding box */
+                case 34:    /* normalized power */
+                case 48:    /* total work (J) */
+                case 49:    /* avg altitude */
+                case 50:    /* max altitude */
+                case 52:    /* avg grade */
+                case 53:    /* avg positive grade */
+                case 54:    /* avg negative grade */
+                case 55:    /* max pos grade */
+                case 56:    /* max neg grade */
+                case 57:    /* avg temperature (Celsius. deg) */
+                case 58:    /* max temp */
+                case 59:    /* total_moving_time */
+                case 60:    /* avg_pos_vertical_speed (m/s) */
+                case 61:    /* avg_neg_vertical_speed */
+                case 62:    /* max_pos_vertical_speed */
+                case 63:    /* max neg_vertical_speed */
+                case 64:    /* min HR bpm */
+                case 69:    /* avg lap time */
+                case 70:    /* best lap index */
+                case 71:    /* min altitude */
+                case 92:    /* fractional avg cadence (rpm) */
+                case 93:    /* fractional max cadence */
                 default: ; // do nothing
             }
 
@@ -379,7 +504,8 @@ struct FitFileReaderState
         }
     }
 
-    void decodeDeviceInfo(const FitDefinition &def, int, const std::vector<FitValue> values) {
+    void decodeDeviceInfo(const FitDefinition &def, int,
+                          const std::vector<FitValue>& values) {
         int i = 0;
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
@@ -387,13 +513,34 @@ struct FitFileReaderState
             if( value == NA_VALUE )
                 continue;
 
+            switch (field.num) {
+
+                // all fields are ignored at present
+                case 253: //timestamp
+                case 3:   // serial number
+                case 2:   // manufacturer
+                case 4:   // product
+                case 5:   // software version
+                case 10:  // battery voltage
+                case 0:   // device index
+                case 1:   // ANT+ device type
+                          // details: 0x78 = HRM, 0x79 = Spd&Cad, 0x7A = Cad, 0x7B = Speed
+                case 6:   // hardware version
+                case 11:  // battery status
+                case 22:  // ANT network
+                case 25:  // source type
+                case 24:  // equipment ID
+                default: ; // do nothing
+            }
+
             if (FIT_DEBUG) {
                 printf("decodeDeviceInfo  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
             }
         }
     }
 
-    void decodeEvent(const FitDefinition &def, int, const std::vector<FitValue> values) {
+    void decodeEvent(const FitDefinition &def, int,
+                     const std::vector<FitValue>& values) {
         int time = -1;
         int event = -1;
         int event_type = -1;
@@ -415,48 +562,93 @@ struct FitFileReaderState
                     event_type = value; break;
                 case 2: // data16 field
                     data16 = value; break;
+
+                // additional values (ignored at present):
+                case 3: //data
+                case 4: // event group
                 default: ; // do nothing
             }
         }
-        if (event == 0) { // Timer event
-            switch (event_type) {
-                case 0: // start
-                    stopped = false;
-                    break;
-                case 1: // stop
-                    stopped = true;
-                    break;
-                case 2: // consecutive_depreciated
-                case 3: // marker
-                    break;
-                case 4: // stop all
-                    stopped = true;
-                    break;
-                case 5: // begin_depreciated
-                case 6: // end_depreciated
-                case 7: // end_all_depreciated
-                case 8: // stop_disable
-                    stopped = true;
-                    break;
-                case 9: // stop_disable_all
-                    stopped = true;
-                    break;
-                default:
-                    errors << QString("Unknown timer event type %1").arg(event_type);
-            }
-        }
-        else if (event == 36) { // Calibration event
-            int secs = (start_time==0?0:time-start_time);
-            switch (event_type) {
-                case 3: // marker
-                    ++calibration;
-                    rideFile->addCalibration(secs, data16, QString("Calibration %1 (%2)").arg(calibration).arg(data16));
-                    //qDebug() << "marker" << secs << data16;
-                    break;
-                default:
-                    errors << QString("Unknown calibration event type %1").arg(event_type);
-                    break;
-            }
+
+        switch (event) {
+            case 0: // Timer event
+                {
+                    switch (event_type) {
+                        case 0: // start
+                            stopped = false;
+                            break;
+                        case 1: // stop
+                            stopped = true;
+                            break;
+                        case 2: // consecutive_depreciated
+                        case 3: // marker
+                            break;
+                        case 4: // stop all
+                            stopped = true;
+                            break;
+                        case 5: // begin_depreciated
+                        case 6: // end_depreciated
+                        case 7: // end_all_depreciated
+                        case 8: // stop_disable
+                            stopped = true;
+                            break;
+                        case 9: // stop_disable_all
+                            stopped = true;
+                            break;
+                        default:
+                            errors << QString("Unknown timer event type %1").arg(event_type);
+                    }
+                }
+                break;
+
+            case 36: // Calibration event
+                {
+                    int secs = (start_time==0?0:time-start_time);
+                    switch (event_type) {
+                        case 3: // marker
+                            ++calibration;
+                            rideFile->addCalibration(secs, data16, QString("Calibration %1 (%2)").arg(calibration).arg(data16));
+                            //qDebug() << "marker" << secs << data16;
+                            break;
+                        default:
+                            errors << QString("Unknown calibration event type %1").arg(event_type);
+                            break;
+                    }
+                }
+                break;
+
+            case 3: /* workout */
+            case 4: /* workout_step */
+            case 5: /* power_down */
+            case 6: /* power_up */
+            case 7: /* off_course */
+            case 8: /* session */
+            case 9: /* lap */
+            case 10: /* course_point */
+            case 11: /* battery */
+            case 12: /* virtual_partner_pace */
+            case 13: /* hr_high_alert */
+            case 14: /* hr_low_alert */
+            case 15: /* speed_high_alert */
+            case 16: /* speed_low_alert */
+            case 17: /* cad_high_alert */
+            case 18: /* cad_low_alert */
+            case 19: /* power_high_alert */
+            case 20: /* power_low_alert */
+            case 21: /* recovery_hr */
+            case 22: /* battery_low */
+            case 23: /* time_duration_alert */
+            case 24: /* distance_duration_alert */
+            case 25: /* calorie_duration_alert */
+            case 26: /* activity */
+            case 27: /* fitness_equipment */
+            case 28: /* length */
+            case 32: /* user_marker */
+            case 33: /* sport_point */
+            case 42: /* front_gear_change */
+            case 43: /* rear_gear_change */
+
+            default: ;
         }
 
         if (FIT_DEBUG) {
@@ -466,7 +658,8 @@ struct FitFileReaderState
         last_event_type = event_type;
     }
 
-    void decodeLap(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+    void decodeLap(const FitDefinition &def, int time_offset,
+                   const std::vector<FitValue>& values) {
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
@@ -475,18 +668,65 @@ struct FitFileReaderState
         int i = 0;
         time_t this_start_time = 0;
         ++interval;
-        foreach(const FitField &field, def.fields) {
-            fit_value_t value = values[i++].v;
+        double total_elapsed_time = 0.0;
+        double total_distance = 0.0;
+        if (FIT_DEBUG)  {
+            printf( " FIT decode lap \n");
+        }
 
-            if( value == NA_VALUE )
+        foreach(const FitField &field, def.fields) {
+            const FitValue& value = values[i++];
+
+            if( value.v == NA_VALUE )
                 continue;
 
+            if (FIT_DEBUG) {
+                printf ("\tfield: num: %d ", field.num);
+                DumpFitValue(value);
+            }
+
             switch (field.num) {
-                case 253: time = value + qbase_time.toTime_t(); break;
-                case 2: this_start_time = value + qbase_time.toTime_t(); break;
+                case 253:
+                    time = value.v + qbase_time.toTime_t();
+                    break;
+                case 2:
+                    this_start_time = value.v + qbase_time.toTime_t();
+                    break;
+                case 7:
+                    total_elapsed_time = round(value.v / 1000.0);
+                    break;
+                case 9:
+                    total_distance = value.v / 100000.0;
+                    break;
+
+                // other data (ignored at present):
+                case 254: // lap nbr
+                case 3: // start_position_lat
+                case 4: // start_position_lon
+                case 5: // end_position_lat
+                case 6: // end_position_lon
+                case 8: // total_timer_time
+                case 10: // total_cycles
+                case 11: // total calories
+                case 12: // total fat calories
+                case 13: // avg_speed
+                case 14: // max_speed
+                case 15: // avg HR (bpm)
+                case 16: // Max HR
+                case 17: // AvCad
+                case 18: // MaxCad
+                case 21: // total ascent
+                case 22: // total descent
+                case 27: // north-east lat (bounding box)
+                case 28: // north-east lon
+                case 29: // south west lat
+                case 30: // south west lon
+                    break;
                 default: ; // ignore it
             }
         }
+        if (LAPSWIM_DEBUG) qDebug() << "Lap" << interval << this_start_time - start_time << total_elapsed_time
+                                    << time - this_start_time << total_distance;
         if (this_start_time == 0 || this_start_time-start_time < 0) {
             //errors << QString("lap %1 has invalid start time").arg(interval);
             this_start_time = start_time; // time was corrected after lap start
@@ -496,17 +736,26 @@ struct FitFileReaderState
                 return;
             }
         }
-        if (rideFile->dataPoints().count()) // no samples means no laps..
-            rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time, QString(QObject::tr("Lap %1")).arg(interval));
+        if (rideFile->dataPoints().count()) { // no samples means no laps..
+            if (isLapSwim && total_elapsed_time > 0.0) {
+                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time,
+                                      this_start_time - start_time + total_elapsed_time,
+                                      QObject::tr("Lap %1").arg(interval));
+            } else {
+                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time,
+                                      QObject::tr("Lap %1").arg(interval));
+            }
+        }
     }
 
-    void decodeRecord(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+    void decodeRecord(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
         if (isLapSwim) return; // We use the length message for Lap Swimming
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
         double alt = 0, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = 0;
-        double kph = 0, temperature = RideFile::NoTemp, watts = 0, slope = 0;
+        double kph = 0, temperature = RideFile::NA, watts = 0, slope = 0;
         double leftTorqueEff = 0, rightTorqueEff = 0, leftPedalSmooth = 0, rightPedalSmooth = 0;
 
         double leftPedalCenterOffset = 0;
@@ -625,7 +874,7 @@ struct FitFileReaderState
                 case 57: // SMO2
                         smO2= value/10.0f;
                         break;
-                case 61: // ? GPS Altitude ?
+                case 61: // ? GPS Altitude ? or atmospheric pressure ?
                         break;
                 case 66: // ??
                         break;
@@ -694,7 +943,22 @@ struct FitFileReaderState
         //    resistance, time_from_course, temperature );
         double secs = time - start_time;
         double nm = 0;
-        double headwind = 0.0;
+
+        // compute bearing in order to calculate headwind
+        if ((!rideFile->dataPoints().empty()) && (last_time != 0))
+        {
+            RideFilePoint *prevPoint = rideFile->dataPoints().back();
+            // ensure a movement occurred and valid lat/lon in order to compute cyclist direction
+            if (  (prevPoint->lat != lat || prevPoint->lon != lng )
+               && (prevPoint->lat != 0 || prevPoint->lon != 0 )
+               && (lat != 0 || lng != 0 ) )
+                        bearing = atan2(cos(lat)*sin(lng - prevPoint->lon),
+                                        cos(prevPoint->lat)*sin(lat)-sin(prevPoint->lat)*cos(lat)*cos(lng - prevPoint->lon));
+        }
+        // else keep previous bearing or 0 at beginning
+
+        double headwind = cos(bearing - rideFile->windHeading()) * rideFile->windSpeed() + kph;
+
         int interval = 0;
         // if there are data points && a time difference > 1sec && smartRecording processing is requested at all
         if ((!rideFile->dataPoints().empty()) && (last_time != 0) &&
@@ -799,7 +1063,8 @@ struct FitFileReaderState
         last_distance = km;
     }
 
-    void decodeLength(const FitDefinition &def, int time_offset, const std::vector<FitValue> values) {
+    void decodeLength(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
         if (!isLapSwim) {
             isLapSwim = true;
             // reset rideFile if not empty
@@ -808,9 +1073,10 @@ struct FitFileReaderState
                 last_time = 0;
                 last_distance = 0.00f;
                 interval = 0;
+                QString deviceType = rideFile->deviceType();
                 delete rideFile;
                 rideFile = new RideFile;
-                rideFile->setDeviceType("Garmin FIT");
+                rideFile->setDeviceType(deviceType);
                 rideFile->setRecIntSecs(1.0);
              }
         }
@@ -897,22 +1163,24 @@ struct FitFileReaderState
         if (pool_length == 0.0) {
             pool_length = kph*length_duration/3600;
             if (fabs(pool_length - 0.050) < 0.004) pool_length = 0.050;
+            else if (fabs(pool_length - 0.033) < 0.003) pool_length = 0.033;
             else if (fabs(pool_length - 0.025) < 0.002) pool_length = 0.025;
             else if (fabs(pool_length - 0.025*METERS_PER_YARD) < 0.002) pool_length = 0.025*METERS_PER_YARD;
             else if (fabs(pool_length - 0.020) < 0.002) pool_length = 0.020;
         }
 
         // another pool length or pause
-        km = last_distance + (kph > 0.0 ? pool_length : 0.0);
+        km = last_distance + (length_type ? pool_length : 0.0);
 
         if ((secs > last_time + 1) && (isGarminSmartRecording.toInt() != 0) && (secs - last_time < 10*GarminHWM.toInt())) {
             double deltaSecs = secs - last_time;
+            if (LAPSWIM_DEBUG) qDebug() << "Pause" << last_time+1 << deltaSecs;
             for (int i = 1; i <= deltaSecs; i++) {
                 rideFile->appendPoint(
                     last_time+i, 0.0, 0.0,
                     last_distance,
                     0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.0, RideFile::NoTemp,
+                    0.0, 0.0, RideFile::NA,
                     0.0, 0.0, 0.0,
                     0.0, 0.0,
                     0.0, 0.0,
@@ -924,21 +1192,21 @@ struct FitFileReaderState
             }
             last_time += deltaSecs;
         }
-        double deltaSecs = length_duration;
-        double deltaDist = km - last_distance;
 
         // only fill 10x the maximal smart recording gap defined
         // in preferences - we don't want to crash / stall on bad
         // or corrupt files
-        if ((isGarminSmartRecording.toInt() != 0) && deltaSecs > 0 && deltaSecs < 10*GarminHWM.toInt()) {
-
+        if ((isGarminSmartRecording.toInt() != 0) && length_duration > 0 && length_duration < 10*GarminHWM.toInt()) {
+            double deltaSecs = length_duration;
+            double deltaDist = km - last_distance;
+            kph = 3600.0 * deltaDist / deltaSecs;
+            if (LAPSWIM_DEBUG) qDebug() << "Length" << last_time+1 << deltaSecs << deltaDist << "type" << length_type;
             for (int i = 1; i <= deltaSecs; i++) {
-                double weight = i /deltaSecs;
                 rideFile->appendPoint(
-                    last_time + (deltaSecs * weight), cad, 0.0,
-                    last_distance + (deltaDist * weight),
+                    last_time + i, cad, 0.0,
+                    last_distance + (deltaDist * i/deltaSecs),
                     kph, 0.0, 0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.0, RideFile::NoTemp,
+                    0.0, 0.0, RideFile::NA,
                     0.0, 0.0, 0.0,
                     0.0, 0.0,
                     0.0, 0.0,
@@ -951,6 +1219,233 @@ struct FitFileReaderState
             last_time += deltaSecs;
             last_distance += deltaDist;
         }
+    }
+
+    /* weather broadcast as observed at weather station (undocumented) */
+    void decodeWeather(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
+        Q_UNUSED(time_offset);
+        int i = 0;
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+            if( value == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 253: // Timestamp
+                          // ignored
+                          break;
+                case 8:   // Weather station name
+                          // ignored
+                        break;
+                case 9:   // Weather observation timestamp
+                          // ignored
+                        break;
+                case 10: // Weather station latitude
+                         // ignored
+                        break;
+                case 11: // Weather station longitude
+                         // ignored
+                        break;
+                case 3:  // Wind heading (0deg=North)
+                        rideFile->setWindHeading(value / 180.0 * MATHCONST_PI);
+                        break;
+                case 4:  // Wind speed (mm/s)
+                        rideFile->setWindSpeed(value * 0.0036);
+                        break;
+                case 1:  // Temperature
+                         // ignored
+                        break;
+                case 7:  // Humidity
+                         // ignored at present
+                        break;
+                default: ; // ignore it
+            }
+        }
+    }
+
+    void decodeDeviceSettings(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
+        Q_UNUSED(time_offset);
+        int i = 0;
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+            if( value == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 0:  // Active timezone
+                         // ignored
+                        break;
+                case 1:  // UTC offset
+                         // ignored
+                        break;
+                case 5:  // timezone offset
+                         // ignored
+                        break;
+                default: ; // ignore it
+            }
+        }
+    }
+
+    void decodeSegment(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
+        time_t time = 0;
+        if (time_offset > 0)
+            time = last_time + time_offset;
+        else
+            time = last_time;
+
+        int i = 0;
+        time_t this_start_time = 0;
+        ++interval;
+        double total_elapsed_time = 0.0;
+        double total_distance = 0.0;
+
+        QString segment_name;
+        foreach(const FitField &field, def.fields) {
+            const FitValue& value = values[i++];
+
+            if( value.type != StringValue && value.v == NA_VALUE )
+                continue;
+
+            if (FIT_DEBUG) {
+                printf ("\tfield: num: %d ", field.num);
+                DumpFitValue(value);
+            }
+
+            switch (field.num) {
+                case 253: // Message timestamp
+                    time = value.v + qbase_time.toTime_t();
+                    break;
+                case 2:   // start timestamp ?
+                    this_start_time = value.v + qbase_time.toTime_t();
+                    break;
+                case 3:  // start latitude
+                         // ignored
+                        break;
+                case 4:  // start longitude
+                         // ignored
+                        break;
+                case 5:  // end latitude
+                         // ignored
+                        break;
+                case 6:  // end longitude
+                         // ignored
+                        break;
+                case 7:  // personal best (ms) ? segment elapsed time from this activity (ms) ?
+                         // => depends on file / device / version ?
+                         // FIXME: to be investigated/confirmed.
+                    total_elapsed_time = round(value.v / 1000.0);
+                    break;
+                case 8:  // challenger best (ms) ? segment total timer time from this activity (ms) ?
+                         // => depends on file / device / version ?
+                         // FIXME: to be investigated/confirmed.
+                         // ignored
+                        break;
+                case 9:  // leader best (ms) ? segment distance ? FIXME : to be investigated.
+                         // => depends on file / device / version ?
+                    total_distance = value.v / 100000.0;
+                    break;
+                case 10: // personal rank ? to be confirmed
+                         // ignored
+                        break;
+                case 25:  // north-east latitude (bounding box)
+                         // ignored
+                        break;
+                case 26:  // north-east longitude
+                         // ignored
+                        break;
+                case 27:  // south-west latitude
+                         // ignored
+                        break;
+                case 28:  // south-west longitude
+                         // ignored
+                        break;
+                case 29:  // Segment name
+                    segment_name = QString(value.s.c_str());
+                    if (FIT_DEBUG)  {
+                        printf("Found segment name: %s\n", segment_name.toStdString().c_str());
+                    }
+                    break;
+                case 33:  /* undocumented, ignored */  break;
+                case 71:  /* undocumented, ignored */  break;
+                case 75:  /* undocumented, ignored */  break;
+                case 76:  /* undocumented, ignored */  break;
+                case 77:  /* undocumented, ignored */  break;
+                case 78:  /* undocumented, ignored */  break;
+                case 79:  /* undocumented, ignored */  break;
+                case 80:  /* undocumented, ignored */  break;
+                case 254:  /* message counter idx, ignored */  break;
+                case 11:  /* undocumented, ignored */  break;
+                case 12:  /* undocumented, ignored */  break;
+                case 13:  /* undocumented, ignored */  break;
+                case 14:  /* undocumented, ignored */  break;
+                case 19:  /* undocumented, ignored */  break;
+                case 20:  /* undocumented, ignored */  break;
+                case 21:  /* total ascent ? ignored */  break;
+                case 22:  /* total descent ? ignored */  break;
+                case 30:  /* undocumented, ignored */  break;
+                case 31:  /* undocumented, ignored */  break;
+                case 69:  /* undocumented, ignored */  break;
+                case 70:  /* undocumented, ignored */  break;
+                case 72:  /* undocumented, ignored */  break;
+                case 0:  /* undocumented, ignored */  break;
+                case 1:  /* undocumented, ignored */  break;
+                case 15:  /* undocumented (HR?), ignored */  break;
+                case 16:  /* undocumented (HR?), ignored */  break;
+                case 17:  /* undocumented (cadence?), ignored */  break;
+                case 18:  /* undocumented (cadence?), ignored */  break;
+                case 23:  /* undocumented, ignored */  break;
+                case 24:  /* undocumented, ignored */  break;
+                case 32:  /* undocumented, ignored */  break;
+                case 58:  /* undocumented, ignored */  break;
+                case 59:  /* undocumented, ignored */  break;
+                case 60:  /* undocumented, ignored */  break;
+                case 61:  /* undocumented, ignored */  break;
+                case 62:  /* undocumented, ignored */  break;
+                case 63:  /* undocumented, ignored */  break;
+                case 64:  /* undocumented, ignored */  break;
+                case 65:  // Segment UID
+                         // ignored
+                        break;
+                case 66:  /* undocumented, ignored */  break;
+                case 67:  /* undocumented, ignored */  break;
+                case 68:  /* undocumented, ignored */  break;
+                case 73:  /* undocumented, ignored */  break;
+                case 74:  /* undocumented, ignored */  break;
+                case 81:  /* undocumented, ignored */  break;
+                case 82:  /* undocumented, ignored */  break;
+                default: ; // ignore it
+            }
+        }
+
+        if (LAPSWIM_DEBUG) qDebug() << "Lap" << interval << this_start_time - start_time << total_elapsed_time
+                                    << time - this_start_time << total_distance;
+        if (this_start_time == 0 || this_start_time-start_time < 0) {
+            //errors << QString("lap %1 has invalid start time").arg(interval);
+            this_start_time = start_time; // time was corrected after lap start
+
+            if (time == 0 || time-start_time < 0) {
+                errors << QString("lap %1 is ignored (invalid end time)").arg(interval);
+                return;
+            }
+        }
+        if (rideFile->dataPoints().count()) { // no samples means no laps..
+            if (segment_name == "") {
+                segment_name = QObject::tr("Lap %1").arg(interval);
+            }
+            if (isLapSwim && total_elapsed_time > 0.0) {
+                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time,
+                                      this_start_time - start_time + total_elapsed_time, segment_name);
+            } else {
+                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time,
+                                      segment_name);
+            }
+        }
+
     }
 
     int read_record(bool &stop, QStringList &errors) {
@@ -1042,8 +1537,11 @@ struct FitFileReaderState
                         break;
                     case 5: value.type = SingleValue; value.v = read_int32(def.is_big_endian, &count); size = 4;  break;
                     case 6: value.type = SingleValue; value.v = read_uint32(def.is_big_endian, &count); size = 4;  break;
-                    case 7: value.type = StringValue; value.s = read_text(field.size, &count); size = field.size; break;
-
+                    case 7:
+                        value.type = StringValue;
+                        value.s = read_text(field.size, &count);
+                        size = field.size;
+                        break;
 
                     //case 8: // FLOAT32
                     //case 9: // FLOAT64
@@ -1054,6 +1552,12 @@ struct FitFileReaderState
 
                     // we may need to add support for float, string + byte base types here
                     default:
+                        if (FIT_DEBUG)  {
+                            // TODO: Dump raw data.
+                            printf("unknown type: %d size: %d \n", field.type,
+                                   field.size);
+                                  
+                        }
                         read_unknown( field.size, &count );
                         value.type = SingleValue;
                         value.v = NA_VALUE;
@@ -1079,7 +1583,7 @@ struct FitFileReaderState
                     else if (value.type == DoubleValue)
                         printf( "value=%lld value2=%lld\n", value.v, value.v2 );
                     else if (value.type == StringValue)
-                        printf( "salue=%s\n",value.s.c_str() );
+                        printf( "value=%s\n", value.s.c_str() );
                 }
             }
             // Most of the record types in the FIT format aren't actually all
@@ -1089,35 +1593,84 @@ struct FitFileReaderState
             // shows up as manufacturer #65535, even though it should be #7.
             switch (def.global_msg_num) {
                 case 0:  decodeFileId(def, time_offset, values); break;
-                case 19: decodeLap(def, time_offset, values); break;
-                case RECORD_TYPE: decodeRecord(def, time_offset, values); break;
-                case 21: decodeEvent(def, time_offset, values); break;
-
-                case 23: //decodeDeviceInfo(def, time_offset, values); break; /* device info */
                 case 18: decodeSession(def, time_offset, values); break; /* session */
+                case LAP_TYPE: // #19
+                    decodeLap(def, time_offset, values);
+                    break;
+                case RECORD_TYPE: // #20
+                    decodeRecord(def, time_offset, values);
+                    break;
+                case 21: decodeEvent(def, time_offset, values); break;
+                case 23: //decodeDeviceInfo(def, time_offset, values); /* device info */
+                    break;
+                case 101:
+                    decodeLength(def, time_offset, values);
+                    break; /* lap swimming */
+                case 128: decodeWeather(def, time_offset, values); break; /* weather broadcast */
 
-                case 101: decodeLength(def, time_offset, values); break; /* lap swimming */
-
-                case 2: /* DEVICE_SETTINGS */
+                case 1: /* capabilities, device settings and timezone */ break;
+                case 2: decodeDeviceSettings(def, time_offset, values); break;
                 case 3: /* USER_PROFILE */
-                case 7: /* ZONES_TARGET12 */
+                case 4: /* hrm profile */
+                case 5: /* sdm profile */
+                case 6: /* bike profile */
+                case 7: /* ZONES_TARGET field#1 = MaxHR (bpm) */
                 case 8: /* HR_ZONE */
                 case 9: /* POWER_ZONE */
+                case 10: /* MET_ZONE */
                 case 12: /* SPORT */
                 case 13: /* unknown */
-                case 22: /* undocumented */
-                case 72: /* undocumented  - new for garmin 800*/
+                case 15: /* goal */
+                case 22: /* source (undocumented) = sensors used for records ; see details below: */
+                         /* #253: timestamp  /  #0: SPD/DIST  /  #1: SPD/DIST  /  #2: cadence  /  #4: HRM  /  #5: HRM */
+                case 26: /* workout */
+                case 27: /* workout step */
+                case 28: /* schedule */
+                case 29: /* location */
+                case 30: /* weight scale */
+                case 31: /* course */
+                case 32: /* course point */
+                case 33: /* totals */
                 case 34: /* activity */
-                case 49: /* file creator */
-                case 79: /* unknown */
+                case 35: /* software */
+                case 37: /* file capabilities */
+                case 38: /* message capabilities */
+                case 39: /* field capabilities */
+                case 49: /* file creator, software version ; see details below: */
+                         /* #0: software version / #1: hardware version */
+                case 51: /* blood pressure */
+                case 53: /* speed zone */
+                case 55: /* monitoring */
+                case 72: /* training file (undocumented) : new since garmin 800 */
+                case 78: /* hrv */
+                case 79: /* HR zone (undocumented) ; see details below: */
+                         /* #253: timestamp / #1: default Min HR / #2: default Max HR / #5: user Min HR / #6: user Max HR */
+                case 103: /* monitoring info */
                 case 104: /* battery */
+                case 105: /* pad */
+                case 106: /* salve device */
                 case 113: /* unknown */
+
                 case 125: /* unknown */
-                case 128: /* unknown */
+                case 131: /* cadence zone */
+
                 case 140: /* unknown */
                 case 141: /* unknown */
-                case 147: /* unknown */
-
+                    break;
+                case SEGMENT_TYPE: // #142
+                    decodeSegment(def, time_offset, values); /* segment data */
+                    break;
+                case 145: /* memo glob */
+                case 147: /* equipment (undocumented) = sensors presets (sensor name, wheel circumference, etc.)  ; see details below: */
+                          /* #0: equipment ID / #2: equipment name / #10: default wheel circ. value / #21: user wheel circ. value / #254: local eqt idx */
+                case 148: /* segment description & metadata (undocumented) ; see details below: */
+                          /* #0: segment name (string) / #1: segment UID (string) / #2: unknown, seems to be always 2 (enum) / #3: unknown, seems to be always 1 (enum)
+                           / #4: exporting_user_id ? =user ID from connect ? (uint32) / #6: unknown, seems to be always 0 */
+                case 149: /* segment leaderboard (undocumented) ; see details below: */
+                          /* #1: who (0=segment leader, 1=personal best, 2=connection, 3=group leader, 4=challenger, 5+=H) 
+                           / #3: ID of source garmin connect activity (uint32) ? OR ? timestamp ? / #4: time to finish (ms) / #254: message counter idx */
+                case 150: /* segment trackpoint (undocumented) ; see details below: */
+                          /* #1: latitude / #2: longitude / #3: distance from start point / #4: elevation / #5: timer since start (ms) / #6: message counter index */
                     break;
 
                 default:
@@ -1138,6 +1691,8 @@ struct FitFileReaderState
         // start
         rideFile = new RideFile;
         rideFile->setDeviceType("Garmin FIT");
+        rideFile->setWindHeading(0.0);
+        rideFile->setWindSpeed(0.0);
         rideFile->setRecIntSecs(1.0); // this is a terrible assumption!
         if (!file.open(QIODevice::ReadOnly)) {
             delete rideFile;

@@ -89,14 +89,6 @@ TrainDB::rebuildDB()
     createVideoSyncTable();
 }
 
-bool
-TrainDB::updateDefaultEntries() {
-
-    bool rc1 = createDefaultEntriesWorkout();
-    bool rc2 = createDefaultEntriesVideosync();
-    return rc1 && rc2;
-}
-
 
 bool TrainDB::createVideoTable()
 {
@@ -426,6 +418,7 @@ bool TrainDB::deleteVideoSync(QString pathname)
 
 bool TrainDB::importVideoSync(QString pathname, VideoSyncFile *videosyncFile)
 {
+    Q_UNUSED(videosyncFile) // not used at present
 	QSqlQuery query(db->database(sessionid));
     QDateTime timestamp = QDateTime::currentDateTime();
 
@@ -500,6 +493,27 @@ bool TrainDB::createDefaultEntriesWorkout()
     rc = query.exec(manualErg);
 
     QString manualCrs = QString("INSERT INTO workouts (filepath, filename) values (\"//2\", \"%1\");")
+            .arg(" " + tr("Manual Slope Mode")); // keep the SPACE separate so that translation cannot remove it
+    rc = query.exec(manualCrs);
+
+
+    return rc;
+}
+
+bool TrainDB::upgradeDefaultEntriesWorkout()
+{
+
+    // set texts starting with " " in upgrade - since due to same translation errors the " " was lost e.g. in German
+    QSqlQuery query(db->database(sessionid));
+    bool rc;
+
+    // adding a space at the front of string to make manual mode always
+    // appear first in a sorted list is a bit of a hack, but works ok
+    QString manualErg = QString("UPDATE workouts SET filename = \"%1\" WHERE filepath = \"//1\";")
+            .arg(" " + tr("Manual Erg Mode")); // keep the SPACE separate so that translation cannot remove it
+    rc = query.exec(manualErg);
+
+    QString manualCrs = QString("UPDATE workouts SET filename = \"%1\" WHERE filepath = \"//2\";")
             .arg(" " + tr("Manual Slope Mode")); // keep the SPACE separate so that translation cannot remove it
     rc = query.exec(manualCrs);
 

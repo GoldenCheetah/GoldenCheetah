@@ -45,18 +45,21 @@ public:
     quint32 cadence() {return m_cadence;}
     bool discover(QString portName);
 
+    void setLoad(double load);
+    bool isConnected();
 
 private:
-    MonarkConnection m_lt2;
+    MonarkConnection m_monarkConnection;
     quint32 m_heartRate;
     quint32 m_power;
     quint32 m_cadence;
-
+    bool m_isMonarkConnectionAlive;
 
 private slots:
     void newHeartRate(quint32);
     void newPower(quint32);
     void newCadence(quint32 cadence);
+    void onMonarkConnectionFinished();
 };
 
 #endif // _GC_Monark_h

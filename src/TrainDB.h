@@ -61,11 +61,11 @@ class TrainDB : public QObject
     bool importVideoSync(QString pathname, VideoSyncFile *videosyncFile);
     bool deleteVideoSync(QString pathname);
 
+    // for 3.3
+    bool upgradeDefaultEntriesWorkout();
+
     // drop and recreate tables
     void rebuildDB();
-
-    // update default entries in the tables
-    bool updateDefaultEntries();
 
     signals:
         void dataChanged();

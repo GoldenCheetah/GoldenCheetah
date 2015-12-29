@@ -33,6 +33,7 @@ class RideFileCache;
 class RideCache;
 class RideCacheModel;
 class IntervalItem;
+class IntervalSummaryWindow;
 class Context;
 class UserData;
 class ComparePane;
@@ -51,6 +52,7 @@ class RideItem : public QObject
         friend class ::RideCache;
         friend class ::RideCacheModel;
         friend class ::IntervalItem;
+        friend class ::IntervalSummaryWindow;
         friend class ::UserData;
         friend class ::ComparePane;
 
@@ -93,7 +95,7 @@ class RideItem : public QObject
         bool skipsave;    // on exit we don't save the state to force rebuild at startup
 
         // set from another, e.g. during load of rideDB.json
-        void setFrom(RideItem&);
+        void setFrom(RideItem&, bool temp=false);
 
         // record of any overrides, used by formula "isset" function
         QStringList overrides_;
@@ -124,13 +126,18 @@ class RideItem : public QObject
         QDateTime dateTime;
         QString present;
         QColor color;
+        bool planned;
         bool isRun,isSwim;
         bool samples; // has samples data
+
+        // which range to use?
+        int zoneRange, hrZoneRange, paceZoneRange;
 
         // context the item was updated to
         unsigned long fingerprint; // zones
         unsigned long metacrc, crc, timestamp; // file content
         int dbversion; // metric version
+        int udbversion; // user metric version
         double weight; // what weight was used ?
 
         // access to the cached data !
@@ -161,7 +168,7 @@ class RideItem : public QObject
         // create and destroy
         RideItem();
         RideItem(RideFile *ride, Context *context);
-        RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context);
+        RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context, bool planned);
         RideItem(RideFile *ride, QDateTime &dateTime, Context *context);
 
         ~RideItem();

@@ -18,8 +18,12 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "Specification.h"
 #include "Zones.h"
 #include <cmath>
+#include <assert.h>
 #include <QApplication>
 
 class aNP : public RideMetric {
@@ -41,14 +45,17 @@ class aNP : public RideMetric {
         setImperialUnits("watts");
         setPrecision(0);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        if(ride->recIntSecs() == 0) return;
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        int rollingwindowsize = 30 / ride->recIntSecs();
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || item->ride()->recIntSecs() == 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        int rollingwindowsize = 30 / item->ride()->recIntSecs();
 
         double total = 0;
         int count = 0;
@@ -62,14 +69,16 @@ class aNP : public RideMetric {
             int index = 0;
             double sum = 0;
 
+            RideFileIterator it(item->ride(), spec);
+
             // loop over the data and convert to a rolling
             // average for the given windowsize
-            for (int i=0; i<ride->dataPoints().size(); i++) {
+            for (int i=it.firstIndex(); i >=0 && i<=it.lastIndex(); i++) {
 
-                sum += ride->dataPoints()[i]->apower;
+                sum += item->ride()->dataPoints()[i]->apower;
                 sum -= rolling[index];
 
-                rolling[index] = ride->dataPoints()[i]->apower;
+                rolling[index] = item->ride()->dataPoints()[i]->apower;
 
                 total += pow(sum/rollingwindowsize,4); // raise rolling average to 4th power
                 count ++;
@@ -80,7 +89,7 @@ class aNP : public RideMetric {
         }
         if (count) {
             np = pow(total / (count), 0.25);
-            secs = count * ride->recIntSecs();
+            secs = count * item->ride()->recIntSecs();
         } else {
             np = secs = 0;
         }
@@ -88,7 +97,11 @@ class aNP : public RideMetric {
         setValue(np);
         setCount(secs);
     }
-    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+
+    bool isRelevantForRide(const RideItem *item) const { 
+        return item->present.contains("P") || (!item->isRun && !item->isSwim);
+    }
+
     RideMetric *clone() const { return new aNP(*this); }
 };
 
@@ -109,24 +122,25 @@ class aVI : public RideMetric {
         setType(RideMetric::Average);
         setPrecision(3);
     }
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-            assert(deps.contains("a_coggan_np"));
-            assert(deps.contains("average_power"));
-            aNP *np = dynamic_cast<aNP*>(deps.value("a_coggan_np"));
-            assert(np);
-            RideMetric *ap = dynamic_cast<RideMetric*>(deps.value("average_power"));
-            assert(ap);
-            vi = np->value(true) / ap->value(true);
-            secs = np->count();
 
-            setValue(vi);
-            setCount(secs);
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        assert(deps.contains("a_coggan_np"));
+        assert(deps.contains("average_power"));
+        aNP *np = dynamic_cast<aNP*>(deps.value("a_coggan_np"));
+        assert(np);
+        RideMetric *ap = dynamic_cast<RideMetric*>(deps.value("average_power"));
+        assert(ap);
+        vi = np->value(true) / ap->value(true);
+        secs = np->count();
+
+        setValue(vi);
+        setCount(secs);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem *item) const { 
+        return item->present.contains("P") || (!item->isRun && !item->isSwim);
+    }
     RideMetric *clone() const { return new aVI(*this); }
 };
 
@@ -147,24 +161,31 @@ class aIntensityFactor : public RideMetric {
         setType(RideMetric::Average);
         setPrecision(3);
     }
-    void compute(const RideFile *r, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-        if (zones && zoneRange >= 0) {
-            assert(deps.contains("a_coggan_np"));
-            aNP *np = dynamic_cast<aNP*>(deps.value("a_coggan_np"));
-            assert(np);
-            int cp = r->getTag("CP","0").toInt();
-            rif = np->value(true) / (cp ? cp : zones->getCP(zoneRange));
-            secs = np->count();
 
-            setValue(rif);
-            setCount(secs);
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        // no ride or no samples
+        if (item->zoneRange < 0 || item->context->athlete->zones(item->isRun) == NULL) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        assert(deps.contains("a_coggan_np"));
+        aNP *np = dynamic_cast<aNP*>(deps.value("a_coggan_np"));
+        assert(np);
+        int cp = item->getText("CP","0").toInt();
+        rif = np->value(true) / (cp ? cp : item->context->athlete->zones(item->isRun)->getCP(item->zoneRange));
+        secs = np->count();
+
+        setValue(rif);
+        setCount(secs);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem *item) const {
+        return item->present.contains("P") || (!item->isRun && !item->isSwim);
+    }
+
     RideMetric *clone() const { return new aIntensityFactor(*this); }
 };
 
@@ -183,12 +204,16 @@ class aTSS : public RideMetric {
         setName("aTSS");
         setType(RideMetric::Total);
     }
-    void compute(const RideFile *r, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-	    const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-	if (!zones || zoneRange < 0)
-	    return;
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        // no ride or no samples
+        if (item->zoneRange < 0 || item->context->athlete->zones(item->isRun) == NULL) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         assert(deps.contains("a_coggan_np"));
         assert(deps.contains("a_coggan_if"));
         aNP *np = dynamic_cast<aNP*>(deps.value("a_coggan_np"));
@@ -196,14 +221,17 @@ class aTSS : public RideMetric {
         assert(rif);
         double normWork = np->value(true) * np->count();
         double rawTSS = normWork * rif->value(true);
-        int cp = r->getTag("CP","0").toInt();
-        double workInAnHourAtCP = (cp ? cp : zones->getCP(zoneRange)) * 3600;
+        int cp = item->getText("CP","0").toInt();
+        double workInAnHourAtCP = (cp ? cp : item->context->athlete->zones(item->isRun)->getCP(item->zoneRange)) * 3600;
         score = rawTSS / workInAnHourAtCP * 100.0;
 
         setValue(score);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem *item) const {
+        return item->present.contains("P") || (!item->isRun && !item->isSwim);
+    }
+
     RideMetric *clone() const { return new aTSS(*this); }
 };
 
@@ -219,36 +247,38 @@ class aTSSPerHour : public RideMetric {
         setSymbol("a_coggan_tssperhour");
         setInternalName("aTSS per hour");
     }
+
     void initialize() {
         setName(tr("aTSS per hour"));
         setType(RideMetric::Average);
         setPrecision(0);
     }
-    void compute(const RideFile *, const Zones *, int ,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
 
-            // tss
-            assert(deps.contains("a_coggan_tss"));
-            aTSS *tss = dynamic_cast<aTSS*>(deps.value("a_coggan_tss"));
-            assert(tss);
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
-            // duration
-            assert(deps.contains("workout_time"));
-            RideMetric *duration = deps.value("workout_time");
-            assert(duration);
+        // tss
+        assert(deps.contains("a_coggan_tss"));
+        aTSS *tss = dynamic_cast<aTSS*>(deps.value("a_coggan_tss"));
+        assert(tss);
 
-            points = tss->value(true);
-            hours = duration->value(true) / 3600;
+        // duration
+        assert(deps.contains("workout_time"));
+        RideMetric *duration = deps.value("workout_time");
+        assert(duration);
 
-            // set
-            if (hours) setValue(points/hours);
-            else setValue(0);
-            setCount(hours);
+        points = tss->value(true);
+        hours = duration->value(true) / 3600;
+
+        // set
+        if (hours) setValue(points/hours);
+        else setValue(0);
+        setCount(hours);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem *item) const {
+        return item->present.contains("P") || (!item->isRun && !item->isSwim);
+    }
+
     RideMetric *clone() const { return new aTSSPerHour(*this); }
 };
 
@@ -271,10 +301,8 @@ class aEfficiencyFactor : public RideMetric {
         setPrecision(3);
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
         assert(deps.contains("a_coggan_np"));
         assert(deps.contains("average_hr"));
         aNP *np = dynamic_cast<aNP*>(deps.value("a_coggan_np"));
@@ -285,7 +313,11 @@ class aEfficiencyFactor : public RideMetric {
 
         setValue(ef);
     }
-    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+
+    bool isRelevantForRide(const RideItem *item) const {
+        return item->present.contains("P") || (!item->isRun && !item->isSwim);
+    }
+
     RideMetric *clone() const { return new aEfficiencyFactor(*this); }
 };
 

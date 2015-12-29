@@ -18,13 +18,15 @@
  */
 
 #include "RideMetric.h"
-
+#include "RideItem.h"
+#include "Specification.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "BestIntervalDialog.h"
 #include "PaceZones.h"
 
 #include <cmath>
+#include <assert.h>
 #include <QApplication>
 
 class PaceZoneTime : public RideMetric {
@@ -45,31 +47,36 @@ class PaceZoneTime : public RideMetric {
         setPrecision(0);
         setConversion(1.0);
     }
+
     bool isTime() const { return true; }
     void setLevel(int level) { this->level=level-1; } // zones start from zero not 1
-    void compute(const RideFile *ride, const Zones *, int ,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *context)
-    {
-        seconds = 0;
 
-        // pace only makes sense for running or swimming
-        if (ride->isRun() || ride->isSwim()) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-            const PaceZones *zone = context->athlete->paceZones(ride->isSwim());
-            int zoneRange = zone ? zone->whichRange(ride->startTime().date()) : -1;
-
-            // get zone ranges
-            if (zone && zoneRange >= 0) {
-                // iterate and compute
-                foreach(const RideFilePoint *point, ride->dataPoints()) {
-                    if (zone->whichZone(zoneRange, point->kph) == level)
-                        seconds += ride->recIntSecs();
-                }
-            }
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) &&
+            // pace only makes sense for running or swimming
+            !item->isRun && !item->isSwim) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
 
+        seconds = 0;
+
+        const PaceZones *zone = item->context->athlete->paceZones(item->isSwim);
+        int zoneRange = item->paceZoneRange;
+
+        // get zone ranges
+        if (zone && zoneRange >= 0) {
+            // iterate and compute
+            RideFileIterator it(item->ride(), spec);
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
+                if (zone->whichZone(zoneRange, point->kph) == level)
+                    seconds += item->ride()->recIntSecs();
+            }
+        }
         setValue(seconds);
     }
 
@@ -293,11 +300,8 @@ class PaceZonePTime1 : public RideMetric {
             setName(tr("P1 Percent in Pace Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+        void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_P1"));
             assert(deps.contains("workout_time"));
 
@@ -337,11 +341,8 @@ class PaceZonePTime2 : public RideMetric {
             setName(tr("P2 Percent in Pace Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+        void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_P2"));
             assert(deps.contains("workout_time"));
 
@@ -381,11 +382,8 @@ class PaceZonePTime3 : public RideMetric {
             setName(tr("P3 Percent in Pace Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+        void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_P3"));
             assert(deps.contains("workout_time"));
 
@@ -425,11 +423,8 @@ class PaceZonePTime4 : public RideMetric {
             setName(tr("P4 Percent in Pace Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+        void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_P4"));
             assert(deps.contains("workout_time"));
 
@@ -469,11 +464,8 @@ class PaceZonePTime5 : public RideMetric {
             setName(tr("P5 Percent in Pace Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+        void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_P5"));
             assert(deps.contains("workout_time"));
 
@@ -513,11 +505,8 @@ class PaceZonePTime6 : public RideMetric {
             setName(tr("P6 Percent in Pace Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+        void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_P6"));
             assert(deps.contains("workout_time"));
 
@@ -557,11 +546,8 @@ class PaceZonePTime7 : public RideMetric {
             setName(tr("P7 Percent in Pace Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+        void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_P7"));
             assert(deps.contains("workout_time"));
 
@@ -601,11 +587,8 @@ class PaceZonePTime8 : public RideMetric {
             setName(tr("P8 Percent in Pace Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+        void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_P8"));
             assert(deps.contains("workout_time"));
 
@@ -645,11 +628,8 @@ class PaceZonePTime9 : public RideMetric {
             setName(tr("P9 Percent in Pace Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+        void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_P9"));
             assert(deps.contains("workout_time"));
 
@@ -689,11 +669,8 @@ class PaceZonePTime10 : public RideMetric {
             setName(tr("P10 Percent in Pace Zone"));
         }
 
-        void compute(const RideFile *, const Zones *, int,
-                    const HrZones *, int,
-                    const QHash<QString,RideMetric*> &deps,
-                    const Context *)
-        {
+        void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
             assert(deps.contains("time_in_zone_P10"));
             assert(deps.contains("workout_time"));
 

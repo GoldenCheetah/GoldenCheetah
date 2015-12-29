@@ -69,6 +69,8 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
         if (sport == "Biking") rideFile->setTag("Sport", "Bike");
         else if (sport == "Running") rideFile->setTag("Sport", "Run");
         else if (sport == "Other") swim = MayBeSwim;
+        // start of last length for lap swimming
+        lastLength = 0.0;
 
     } else if (qName == "Lap") {
 
@@ -142,6 +144,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         // Lets derive Speed from Distance or vice-versa
         // If we have neither Speed nor Distance then we
         // add a point with 0 for speed and distance
+        double sample_dist = distance;
         if (speed == 0 || distance < 0) {
 
             // compute the elapsed time and distance traveled since the
@@ -182,7 +185,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
             // first point
             rideFile->appendPoint(secs, cadence, hr, distance, speed, torque,
-                                  power, alt, lon, lat, headwind, 0.0, RideFile::NoTemp, 0.0, 
+                                  power, alt, lon, lat, headwind, 0.0, RideFile::NA, 0.0, 
                                   0.0,0.0,0.0,0.0,0.0,0.0,
                                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                   0.0,rcad,0.0, // no running dynamics in the schema ?
@@ -211,7 +214,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
                 // no smart recording, or delta exceeds HW treshold, just insert the data
                 rideFile->appendPoint(secs, cadence, hr, distance, speed, torque, power,
-                                      alt, lon, lat, headwind, 0.0, RideFile::NoTemp, 0.0, 
+                                      alt, lon, lat, headwind, 0.0, RideFile::NA, 0.0, 
                                       0.0,0.0,0.0,0.0,
                                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                       0.0,0.0,
@@ -221,11 +224,29 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                       0.0, // tcore
                                       lap);
 
+                // Update distance and speed for swimming lengths
+                if (swim == Swim && sample_dist > 0.0 && secs > lastLength) {
+                    double deltaSecs = secs - lastLength;
+                    double deltaDist = (distance - last_distance) / deltaSecs;
+                    double kph = 3600.0 * deltaDist;
+                    for (int i = rideFile->timeIndex(lastLength);
+                         i>= 0 && i < rideFile->dataPoints().size() &&
+                         rideFile->dataPoints()[i]->secs <= secs;
+                         ++i) {
+                        rideFile->dataPoints()[i]->kph = kph;
+                        rideFile->dataPoints()[i]->km = last_distance;
+                        last_distance += deltaDist;
+                    }
+                    last_distance = distance;
+                    if (kph > 0.0) rideFile->setDataPresent(rideFile->kph, true);
+                    lastLength = secs;
+                }
+
             } else {
 
                 // smart recording is on and delta is less than GarminHWM seconds
                 // or it is pool swimming and we limit expansion for safety
-                for(int i = 1; i <= deltaSecs && i <= 10*GarminHWM.toInt(); i++) {
+                for(int i = 1; i <= deltaSecs && i <= 300*GarminHWM.toInt(); i++) {
                     double weight = i/ deltaSecs;
                     double kph = (swim == Swim) ? speed : prevPoint->kph + (deltaSpeed *weight);
                     // need to make sure speed goes to zero
@@ -247,7 +268,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                           badgps ? 0 : prevPoint->lat + (deltaLat * weight), // lat
                                           headwind, // headwind
                                           0.0,
-                                          RideFile::NoTemp,
+                                          RideFile::NA,
                                           0.0,
                                           0.0,0.0,0.0,0.0,
                                           0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -268,7 +289,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         // expand only if Smart Recording is enabled
         if (swim == Swim && distance == 0 && isGarminSmartRecording.toInt()) {
             // fill in the pause, partially if too long
-            for(int i = 1; i <= round(lapSecs) && i <= 10*GarminHWM.toInt(); i++)
+            for(int i = 1; i <= round(lapSecs) && i <= 300*GarminHWM.toInt(); i++)
                 rideFile->appendPoint(secs + i,
                                       0.0,
                                       0.0,
@@ -281,7 +302,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                       0.0, // lat
                                       0.0, // headwind
                                       0.0,
-                                      RideFile::NoTemp,
+                                      RideFile::NA,
                                       0.0,
                                       0.0,0.0,0.0,0.0,
                                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,

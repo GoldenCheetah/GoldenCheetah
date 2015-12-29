@@ -35,6 +35,7 @@ class RideItem;
 class RideMetric;
 class FieldDefinition;
 class DataFilter;
+class DataFilterRuntime;
 
 class Result {
     public:
@@ -58,15 +59,15 @@ class Leaf {
 
         Leaf(int loc, int leng) : type(none),op(0),series(NULL),dynamic(false),loc(loc),leng(leng),inerror(false) { }
 
-        // evaluate against a RideItem
-        Result eval(Context *context, DataFilter *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL);
+        // evaluate against a RideItem using its context
+        Result eval(DataFilterRuntime *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL);
 
         // tree traversal etc
         void print(Leaf *, int level);  // print leaf and all children
         void color(Leaf *, QTextDocument *);  // update the document to match
         bool isDynamic(Leaf *);
-        void validateFilter(DataFilter *, Leaf*); // validate
-        bool isNumber(DataFilter *df, Leaf *leaf);
+        void validateFilter(Context *context, DataFilterRuntime *, Leaf*); // validate
+        bool isNumber(DataFilterRuntime *df, Leaf *leaf);
         void clear(Leaf*);
         QString toString(); // return as string
         QString signature() { return toString(); }
@@ -74,7 +75,7 @@ class Leaf {
         enum { none, Float, Integer, String, Symbol, 
                Logical, Operation, BinaryOperation, UnaryOperation,
                Function, Conditional, Vector,
-               Parameters } type;
+               Parameters, Compound } type;
 
         union value {
             float f;
@@ -82,6 +83,7 @@ class Leaf {
             QString *s;
             QString *n;
             Leaf *l;
+            QList<Leaf *> *b;
         } lvalue, rvalue, cond;
 
         int op;
@@ -95,6 +97,40 @@ class Leaf {
         bool inerror;
 };
 
+class DataFilterRuntime {
+
+    // allocated for each thread to avoid race
+    // conditions when computing user metrics
+    // in a QConcurrent::map operation
+
+public:
+
+    // stack count (to stop recursion 'hanging'
+    int stack;
+
+    // needs to be reapplied as the ride selection changes
+    bool isdynamic;
+
+    // Lookup tables
+    QMap<QString,QString> lookupMap;
+    QMap<QString,bool> lookupType; // true if a number, false if a string
+
+    // map to adata series
+    QStringList dataSeriesSymbols;
+
+    // microcache for oft-repeated vector operations
+    QHash<QString, Result> snips;
+
+    // user defined symbols
+    QHash<QString, Result> symbols;
+
+    // user defined functions
+    QHash<QString, Leaf*> functions;
+
+    // pd models for estimates
+    QList <PDModel*>models;
+};
+
 class DataFilter : public QObject
 {
     Q_OBJECT
@@ -103,34 +139,26 @@ class DataFilter : public QObject
         DataFilter(QObject *parent, Context *context);
         DataFilter(QObject *parent, Context *context, QString formula);
 
+        // runtime passed by datafilter
+        DataFilterRuntime rt;
+
+        // get a signature for a datafilter
+        static QString fingerprint(QString &query);
+
         Context *context;
         QStringList &files() { return filenames; }
         QString signature() { return sig; }
         Leaf *root() { return treeRoot; }
 
-        // needs to be reapplied as the ride selection changes
-        bool isdynamic;
-
-        // used by Leaf
-        QMap<QString,QString> lookupMap;
-        QMap<QString,bool> lookupType; // true if a number, false if a string
-
-        // when used for formulas
-        Result evaluate(RideItem *rideItem, RideFilePoint *p = NULL);
+        // RideItem always available and supplies th context
+        Result evaluate(RideItem *rideItem, RideFilePoint *p);
         QStringList getErrors() { return errors; };
         void colorSyntax(QTextDocument *content, int pos);
 
-        static QStringList functions(); // return list of functions supported
-        QStringList dataSeriesSymbols;
-
-        // pd models for estimates
-        QList <PDModel*>models;
-
-        // microcache for oft-repeated vector operations
-        QHash<QString, Result> snips;
+        static QStringList builtins(); // return list of functions supported
 
     public slots:
-        QStringList parseFilter(QString query, QStringList *list=0);
+        QStringList parseFilter(Context *context, QString query, QStringList *list=0);
         QStringList check(QString query);
         void clearFilter();
         void configChanged(qint32);

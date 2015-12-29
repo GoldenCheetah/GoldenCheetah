@@ -19,6 +19,16 @@
 #include "Context.h"
 #include "Athlete.h"
 
+#include "RideMetric.h"
+#include "UserMetricSettings.h"
+#include "UserMetricParser.h"
+
+#include <QXmlInputSource>
+#include <QXmlSimpleReader>
+#include <QMutex>
+
+static QList<Context*> _contexts;
+
 Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
 {
     ride = NULL;
@@ -26,6 +36,14 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
     videosync = NULL;
     isfiltered = ishomefiltered = false;
     isCompareIntervals = isCompareDateRanges = false;
+
+    _contexts.append(this);
+}
+
+Context::~Context()
+{
+    int i=_contexts.indexOf(this);
+    if (i >= 0) _contexts.removeAt(i);
 }
 
 void 
@@ -69,6 +87,49 @@ Context::notifyConfigChanged(qint32 state)
     //if (state & CONFIG_APPEARANCE) qDebug()<<"Appearance config changed!";
     //if (state & CONFIG_NOTECOLOR) qDebug()<<"Note color config changed!";
     //if (state & CONFIG_FIELDS) qDebug()<<"Metadata config changed!";
+    if (state & CONFIG_USERMETRICS) userMetricsConfigChanged();
     configChanged(state);
 }
 
+void 
+Context::userMetricsConfigChanged()
+{
+    // read em in...
+    QString metrics = QString("%1/../usermetrics.xml").arg(athlete->home->root().absolutePath());
+    if (QFile(metrics).exists()) {
+
+        QFile metricfile(metrics);
+        QXmlInputSource source(&metricfile);
+        QXmlSimpleReader xmlReader;
+        UserMetricParser handler;
+
+        xmlReader.setContentHandler(&handler);
+        xmlReader.setErrorHandler(&handler);
+
+        // parse and get return values
+        xmlReader.parse(source);
+        _userMetrics = handler.getSettings();
+    }
+
+    // change the schema version
+    quint16 changed = RideMetric::userMetricFingerprint(_userMetrics);
+
+    if (UserMetricSchemaVersion != changed) {
+
+        // we'll fix it
+        UserMetricSchemaVersion = changed;
+
+        // update metric factory 
+        RideMetricFactory::instance().removeUserMetrics();
+    
+        // now add initial metrics -- what about multiple contexts (?) XXX
+        foreach(UserMetricSettings m, _userMetrics) {
+            RideMetricFactory::instance().addMetric(UserMetric(this, m));
+        }
+
+        // tell eveyone else to compute metrics...
+        foreach(Context *x, _contexts)
+            if (x != this)
+                x->notifyConfigChanged(CONFIG_USERMETRICS);
+    }
+}

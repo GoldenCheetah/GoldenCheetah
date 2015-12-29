@@ -9,7 +9,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleGetInfoString</key>
-	<string>3.3.0 (developer)</string>
+	<string>4.0.0 (developer)</string>
 	<key>CFBundleSignature</key>
 	<string>@TYPEINFO@</string>
 	<key>CFBundleExecutable</key>
@@ -19,6 +19,6 @@
 	<key>NSSupportsAutomaticGraphicsSwitching</key>
 	<true/>
 	<key>NOTE</key>
-	<string>3.3.0 pre-release</string>
+	<string>4.0.0 pre-release</string>
 </dict>
 </plist>

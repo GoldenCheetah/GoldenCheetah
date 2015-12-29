@@ -21,8 +21,12 @@
 // System includes
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
+#if Q_CC_MSVC
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
+#include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -92,7 +96,7 @@ RideFile *SrdFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
             km = w->dist_data[i];
 
             // add to ride
-            result->appendPoint(time, cad, hr, km, kph, nm, watts, alt, lon, lat, wind, 0.0, RideFile::NoTemp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
+            result->appendPoint(time, cad, hr, km, kph, nm, watts, alt, lon, lat, wind, 0.0, RideFile::NA, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
 
             // keep a track of time
             time += w->recording_interval;
@@ -836,11 +840,17 @@ static workout_t * read_workout ( char *filename, S710_Filter filter, S710_HRM_T
   unsigned char  buf[65536];
 
   if ( stat(filename,&sb) != -1 ) {
+#if Q_CC_MSVC
+    if ( (fd = _open(filename,O_RDONLY)) != -1 ) {
+      if ( sb.st_size < (int)sizeof(buf) ) {
+    if ( _read(fd,buf,sb.st_size) == sb.st_size ) {
+	  if ( buf[0] + (buf[1]<<8) == sb.st_size ) {
+#else
     if ( (fd = open(filename,O_RDONLY)) != -1 ) {
       if ( sb.st_size < (int)sizeof(buf) ) {
-	if ( read(fd,buf,sb.st_size) == sb.st_size ) {
-	  if ( buf[0] + (buf[1]<<8) == sb.st_size ) {
-
+    if ( read(fd,buf,sb.st_size) == sb.st_size ) {
+      if ( buf[0] + (buf[1]<<8) == sb.st_size ) {
+#endif
 	    /*
 	       if type == S710_HRM_AUTO, try to guess the "real" type.
 	       we do this using some heuristics that may or may not be
@@ -871,7 +881,11 @@ static workout_t * read_workout ( char *filename, S710_Filter filter, S710_HRM_T
 	fprintf(stderr,"%s: file size of %ld bytes is too big!\n",
 		filename,(long)sb.st_size);
       }
+#ifdef Q_CC_MSVC
+      _close(fd);
+#else
       close(fd);
+#endif
     } else {
       fprintf(stderr,"open(%s): %s\n",filename,strerror(errno));
     }

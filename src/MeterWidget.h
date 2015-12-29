@@ -44,6 +44,7 @@ class MeterWidget : public QWidget
     virtual QSize sizeHint() const;
     virtual QSize minimumSize() const;
     void    setColor(QColor  mainColor);
+    void    setBoundingRectVisibility(bool show, QColor  boundingRectColor = QColor(255,0,0,255));
 
     float Value, ValueMin, ValueMax;
     QString Text, AltText;
@@ -71,6 +72,9 @@ class MeterWidget : public QWidget
     QBrush m_AltBrush;
     QPen   m_OutlinePen;
     QPen   m_ScalePen;
+
+    bool    boundingRectVisibility;
+    QColor  boundingRectColor;
 
     friend class VideoLayoutParser;
 };

@@ -92,6 +92,8 @@ void JsonRideFilefree (void * ptr , yyscan_t /*scanner*/)
 #define YY_FATAL_ERROR(msg) qDebug()<<msg;
 
 %}
+%option prefix="JsonRideFile"
+%option never-interactive
 %option noyyalloc
 %option noyyrealloc
 %option noyyfree
@@ -161,7 +163,7 @@ void JsonRideFilefree (void * ptr , yyscan_t /*scanner*/)
 
 // Older versions of flex (prior to 2.5.9) do not have the destroy function
 // Or We're not using GNU flex then we also won't have a destroy function
-#if !defined(FLEX_SCANNER) || (YY_FLEX_SUBMINOR_VERSION < 9)
+#if !defined(FLEX_SCANNER) || (YY_FLEX_MINOR_VERSION < 6 && YY_FLEX_SUBMINOR_VERSION < 9)
 int JsonRideFilelex_destroy(void*) { return 0; }
 #endif
 

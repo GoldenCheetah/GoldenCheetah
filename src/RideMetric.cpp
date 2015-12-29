@@ -17,6 +17,10 @@
  */
 
 #include "RideMetric.h"
+#include "RideItem.h"
+#include "IntervalItem.h"
+#include "Specification.h"
+#include "UserMetricSettings.h"
 #include "TimeUtils.h"
 #include "Zones.h"
 #include "HrZones.h"
@@ -126,27 +130,69 @@
 // 120 3   Nov 2015 Mark Liversedge    Added Above CP time in W'bal zones
 // 121 3   Nov 2015 Mark Liversedge    Added Work in W'bal zones
 // 122 7   Nov 2015 Mark Liversedge    Added HR Zones 9 and 10
-
-int DBSchemaVersion = 122;
+// 123 19  Nov 2015 Mark Liversedge    Force recompute of TSS/IF after logic fix
+// 124 03  Dec 2015 Mark Liversedge    Min Temp
+// 125 08  Dec 2015 Ale Martinez       Support metrics in Calendar Text
+int DBSchemaVersion = 125;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
 
-QHash<QString,RideMetricPtr>
-RideMetric::computeMetrics(const Context *context, const RideFile *ride, const Zones *zones, const HrZones *hrZones,
-                           const QStringList &metrics)
-{
-    int zoneRange = zones->whichRange(ride->startTime().date());
-    int hrZoneRange = hrZones->whichRange(ride->startTime().date());
+// user defined metrics are loaded by the ridecache on startup
+// and then reloaded by ridecache if they change
+QList<UserMetricSettings> _userMetrics;
+quint16 UserMetricSchemaVersion = 0;
 
+quint16
+RideMetric::userMetricFingerprint(QList<UserMetricSettings> these)
+{
+    // run through loaded metrics and compute a fingerprint CRC
+    QByteArray fingers;
+    foreach(UserMetricSettings x, these)
+        fingers += x.fingerprint.toLocal8Bit();
+
+    return qChecksum(fingers.constData(), fingers.size());
+}
+
+QHash<QString,RideMetricPtr>
+RideMetric::computeMetrics(RideItem *item, Specification spec, const QStringList &metrics)
+{
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    QStringList todo = metrics;
+
+    // generate worklist from metrics we know
+    // bear in mind this can change as users add
+    // and remove user metrics
+    QStringList todo;
+    foreach(QString metric, metrics)
+        if (factory.haveMetric(metric))
+            todo << metric;
+
+    // this is what we've completed as we go
     QHash<QString,RideMetric*> done;
+
+    // resize the metric array in the interval if needed
+    if (spec.interval() && spec.interval()->metrics().size() < factory.metricCount()) 
+        spec.interval()->metrics().resize(factory.metricCount());
+
+    // resize the metric array in the interval if needed
+    if (!spec.interval() && item->metrics().size() < factory.metricCount())
+        item->metrics().resize(factory.metricCount());
+
+    // working through the todo list...
     while (!todo.isEmpty()) {
+
+        // next one to do
         QString symbol = todo.takeFirst();
+
+        // doesn't exist !
         if (!factory.haveMetric(symbol)) continue;
+
+        // does this one have any dependencies?
         const QVector<QString> &deps = factory.dependencies(symbol);
+
         bool ready = true;
+
+        // if the dependencies aren't done yet add to the end of the list
         foreach (QString dep, deps) {
             if (!done.contains(dep)) {
                 ready = false;
@@ -154,27 +200,54 @@ RideMetric::computeMetrics(const Context *context, const RideFile *ride, const Z
                     todo.append(dep);
             }
         }
+
+        // if all our depencies are computed we can do this one
         if (ready) {
+
+            // we clone so we can remain thread safe
+            // do not be tempted to change this (!)
             RideMetric *m = factory.newMetric(symbol);
             m->setValue(0.0);
             m->setCount(0);
-            m->compute(ride, zones, zoneRange, hrZones, hrZoneRange, done, context);
-            if (ride->metricOverrides.contains(symbol))
-                m->override(ride->metricOverrides.value(symbol));
+            m->compute(item, spec, done);
+
+            // override the computed value if set by user
+            if (item->ride() && item->ride()->metricOverrides.contains(symbol))
+                m->override(item->ride()->metricOverrides.value(symbol));
+
+            // all computed add to the return list
             done.insert(symbol, m);
-        }
-        else {
+
+            // put into value array too. user metrics will interrogate
+            // this for symbol values, rather than the metric pointer
+            if (spec.interval()) spec.interval()->metrics()[m->index()] = m->value();
+            else item->metrics()[m->index()] = m->value();
+
+
+        } else {
+
+            // we need to wait for our dependencies so add
+            // to the back of the list 
             if (!todo.contains(symbol))
                 todo.append(symbol);
         }
     }
+
+    // lets prepate the results using a shared pointer
+    // which is deleted when reference count 0 and goes out of scope
     QHash<QString,RideMetricPtr> result;
     foreach (QString symbol, metrics) {
-        result.insert(symbol, QSharedPointer<RideMetric>(done.value(symbol)));
-        done.remove(symbol);
+        if (factory.haveMetric(symbol)) {
+            result.insert(symbol, QSharedPointer<RideMetric>(done.value(symbol)));
+            done.remove(symbol);
+        }
     }
+
+    // delete the cloned metrics, no memory leak here :)
     foreach (QString symbol, done.keys())
         delete done.value(symbol);
+
+    // and we're done
     return result;
 }
 
@@ -182,5 +255,5 @@ QString
 RideMetric::toString(bool useMetricUnits) const
 {
     if (isTime()) return time_to_string(value(useMetricUnits));
-    return QString("%1").arg(value(useMetricUnits), 0, 'f', precision());
+    return QString("%1").arg(value(useMetricUnits), 0, 'f', this->precision());
 }

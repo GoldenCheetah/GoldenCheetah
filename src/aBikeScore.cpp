@@ -19,7 +19,11 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "Specification.h"
 #include "Zones.h"
+#include <assert.h>
 #include <cmath>
 #include <QApplication>
 
@@ -53,15 +57,21 @@ class aXPower : public RideMetric {
         setImperialUnits(tr("watts"));
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        RideFileIterator it(item->ride(), spec);
 
         static const double EPSILON = 0.1;
         static const double NEGLIGIBLE = 0.1;
 
-        double secsDelta = ride->recIntSecs();
+        double secsDelta = item->ride()->recIntSecs();
         double sampsPerWindow = 25.0 / secsDelta;
         double attenuation = sampsPerWindow / (sampsPerWindow + secsDelta);
         double sampleWeight = secsDelta / (sampsPerWindow + secsDelta);
@@ -72,7 +82,9 @@ class aXPower : public RideMetric {
         double total = 0.0;
         int count = 0;
 
-        foreach(const RideFilePoint *point, ride->dataPoints()) {
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             while ((weighted > NEGLIGIBLE)
                    && (point->secs > lastSecs + secsDelta + EPSILON)) {
                 weighted *= attenuation;
@@ -116,10 +128,8 @@ class aVariabilityIndex : public RideMetric {
         setPrecision(3);
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
         assert(deps.contains("a_skiba_xpower"));
         assert(deps.contains("average_power"));
         aXPower *xp = dynamic_cast<aXPower*>(deps.value("a_skiba_xpower"));
@@ -154,33 +164,20 @@ class aRelativeIntensity : public RideMetric {
         setImperialUnits(tr(""));
         setPrecision(3);
     }
-    void compute(const RideFile *r, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-        if (zones && zoneRange >= 0) {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        if (item->context->athlete->zones(item->isRun) && item->zoneRange >= 0) {
             assert(deps.contains("a_skiba_xpower"));
             aXPower *xp = dynamic_cast<aXPower*>(deps.value("a_skiba_xpower"));
             assert(xp);
-            int cp = r->getTag("CP","0").toInt();
-            reli = xp->value(true) / (cp ? cp : zones->getCP(zoneRange));
+            int cp = item->getText("CP","0").toInt();
+            reli = xp->value(true) / (cp ? cp : item->context->athlete->zones(item->isRun)->getCP(item->zoneRange));
             secs = xp->count();
         }
         setValue(reli);
         setCount(secs);
     }
-
-    // added djconnel: allow RI to be combined across rides
-    bool canAggregate() { return true; }
-    void aggregateWith(const RideMetric &other) {
-        assert(symbol() == other.symbol());
-	    const aRelativeIntensity &ap = dynamic_cast<const aRelativeIntensity&>(other);
-	    reli = secs * pow(reli, bikeScoreN) + ap.count() * pow(ap.value(true), bikeScoreN);
-	    secs += ap.count();
-	    reli = pow(reli / secs, 1.0 / bikeScoreN);
-        setValue(reli);
-    }
-    // end added djconnel
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new aRelativeIntensity(*this); }
@@ -203,12 +200,13 @@ class aBikeScore : public RideMetric {
         setImperialUnits("");
     }
 
-    void compute(const RideFile *r, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-	    const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-	    if (!zones || zoneRange < 0)
-	        return;
+   void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        if (!item->context->athlete->zones(item->isRun) || item->zoneRange < 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         assert(deps.contains("a_skiba_xpower"));
         assert(deps.contains("a_skiba_relative_intensity"));
@@ -217,8 +215,8 @@ class aBikeScore : public RideMetric {
         assert(ri);
         double normWork = xp->value(true) * xp->count();
         double rawBikeScore = normWork * ri->value(true);
-        int cp = r->getTag("CP","0").toInt();
-        double workInAnHourAtCP = (cp ? cp : zones->getCP(zoneRange)) * 3600;
+        int cp = item->getText("CP","0").toInt();
+        double workInAnHourAtCP = (cp ? cp : item->context->athlete->zones(item->isRun)->getCP(item->zoneRange)) * 3600;
         score = rawBikeScore / workInAnHourAtCP * 100.0;
 
         setValue(score);
@@ -247,10 +245,8 @@ class aResponseIndex : public RideMetric {
         setPrecision(3);
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
         assert(deps.contains("a_skiba_xpower"));
         assert(deps.contains("average_hr"));
         aXPower *xp = dynamic_cast<aXPower*>(deps.value("a_skiba_xpower"));
@@ -261,7 +257,10 @@ class aResponseIndex : public RideMetric {
 
         setValue(ri);
     }
-    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+
+    bool isRelevantForRide(const RideItem*ride) const { 
+        return ride->present.contains("P") || (!ride->isRun && !ride->isSwim);
+    }
     RideMetric *clone() const { return new aResponseIndex(*this); }
 };
 

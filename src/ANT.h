@@ -43,7 +43,9 @@
 //
 // Time
 //
+#ifndef Q_CC_MSVC
 #include <sys/time.h>
+#endif
 
 //
 // Serial i/o stuff
@@ -105,8 +107,24 @@ typedef struct ant_sensor_type {
 
 static inline double get_timestamp( void ) {
   struct timeval tv;
+#ifdef Q_CC_MSVC
+  QTime now = QTime::currentTime();
+  tv.tv_sec = now.second();
+  tv.tv_usec = now.msec();
+#else
   gettimeofday(&tv, NULL);
+#endif
   return tv.tv_sec * 1.0 + tv.tv_usec * 1.0e-6;
+}
+
+static inline void get_timeofday(struct timeval* tv) {
+#ifdef Q_CC_MSVC
+  QTime now = QTime::currentTime();
+  tv->tv_sec = now.second();
+  tv->tv_usec = now.msec();
+#else
+  gettimeofday(tv, NULL);
+#endif
 }
 
 
@@ -165,6 +183,7 @@ struct setChannelAtom {
 #define ANT_VERSION            0x3E
 #define ANT_CAPABILITIES       0x54
 #define ANT_SERIAL_NUMBER      0x61
+#define ANT_NOTIF_STARTUP      0x6F
 #define ANT_CW_INIT            0x53
 #define ANT_CW_TEST            0x48
 
@@ -287,6 +306,7 @@ struct setChannelAtom {
 #define FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE     0x19
 #define FITNESS_EQUIPMENT_TRAINER_TORQUE_PAGE       0x20
 #define FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE 0x36
+#define FITNESS_EQUIPMENT_REQUEST_DATA_PAGE         0x46
 #define FITNESS_EQUIPMENT_COMMAND_STATUS_PAGE       0x47
 
 #define FITNESS_EQUIPMENT_TYPE_GENERAL              0x10
@@ -335,7 +355,7 @@ class ANT : public QThread
 
 
 public:
-    ANT(QObject *parent = 0, DeviceConfiguration *dc=0, QString cyclist="");
+    ANT(QObject *parent = 0, DeviceConfiguration *dc=0, QString athlete="");
     ~ANT();
 
 signals:
@@ -530,6 +550,7 @@ private:
     QTime elapsedTime;
 #endif
 
+    bool ANT_Reset_Acknowledge;
     unsigned char rxMessage[ANT_MAX_MESSAGE_SIZE];
 
     // state machine whilst receiving bytes
@@ -560,8 +581,8 @@ private:
     int vortexID;
     int vortexChannel;
 
-    // cylist for wheelsize settings
-    QString trainCyclist;
+    // athlete for wheelsize settings, etc.
+    QString trainAthlete;
 };
 
 #include "ANTMessage.h"
