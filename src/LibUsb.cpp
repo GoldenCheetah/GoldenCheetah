@@ -21,7 +21,9 @@
 #include <QString>
 #include <QDebug>
 
+#ifndef Q_CC_MSVC
 #include <unistd.h>
+#endif
 #include "LibUsb.h"
 #include "Settings.h"
 #include "Context.h"
