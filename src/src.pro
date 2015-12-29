@@ -477,6 +477,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     # Features that only work with QT5 or higher
     SOURCES += Dropbox.cpp
     HEADERS += Dropbox.h
+    SOURCES += GoogleDrive.cpp
+    HEADERS += GoogleDrive.h
     SOURCES += Monark.cpp MonarkController.cpp MonarkConnection.cpp
     HEADERS += Monark.h MonarkController.h MonarkConnection.h
 }

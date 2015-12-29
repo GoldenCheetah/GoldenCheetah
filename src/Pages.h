@@ -215,14 +215,18 @@ class CredentialsPage : public QScrollArea
 #if QT_VERSION >= 0x050000
         void authoriseDropbox();
         void chooseDropboxFolder();
+        void authoriseGoogleDrive();        
+        void chooseGoogleDriveFolder();        
 #endif
         void authoriseStrava();
         void authoriseCyclingAnalytics();
         void authoriseGoogleCalendar();
-        void dvCALDAVTypeChanged(int);
+        void dvCALDAVTypeChanged(int);        
         void chooseLocalFileStoreFolder();
 
     private:
+        void authoriseGoogle(int site);
+        
         Context *context;
 
         QLineEdit *tpUser;
@@ -237,6 +241,11 @@ class CredentialsPage : public QScrollArea
         QPushButton *dropboxAuthorise;
         QPushButton *dropboxAuthorised, *dropboxBrowse;
         QLineEdit *dropboxFolder;
+        QPushButton *googleDriveAuthorise;
+        QPushButton *googleDriveAuthorised;
+        QPushButton *googleDriveBrowse;
+        QLineEdit *googleDriveFolder;
+        //QLineEdit *googleDrive;        
 #endif
 
         QComboBox *dvCALDAVType;

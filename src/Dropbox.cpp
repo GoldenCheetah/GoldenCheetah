@@ -184,7 +184,7 @@ bool
 Dropbox::readFile(QByteArray *data, QString remotename)
 {
     // this must be performed asyncronously and call made
-    // to notifyReadCompleted(QByteArray &data, QString remotename, QString message) when done
+    // to notifyReadComplete(QByteArray &data, QString remotename, QString message) when done
 
     // do we have a token ?
     QString token = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "").toString();

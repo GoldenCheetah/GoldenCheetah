@@ -58,6 +58,7 @@ public:
         DROPBOX,
         CYCLING_ANALYTICS,
         GOOGLE_CALENDAR,
+        GOOGLE_DRIVE,
     } OAuthSite;
 
     OAuthDialog(Context *context, OAuthSite site);
@@ -65,7 +66,6 @@ public:
     bool sslLibMissing() { return noSSLlib; }
 
 private slots:
-
     // Strava/Cyclinganalytics/Google
     void urlChanged(const QUrl& url);
     void loadFinished(bool ok);
@@ -90,11 +90,11 @@ private:
     QVBoxLayout *layout;
 
     // QUrl split into QUrlQuerty in QT5
-    #if QT_VERSION < 0x050000 || !defined(Q_OS_MAC)
+#if QT_VERSION < 0x050000 || !defined(Q_OS_MAC)
     QWebView *view;
-    #else
+#else
     QWebEngineView *view;
-    #endif
+#endif
 
     QNetworkAccessManager* manager;
 
