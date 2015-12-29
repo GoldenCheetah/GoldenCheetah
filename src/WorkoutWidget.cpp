@@ -18,6 +18,7 @@
 
 
 #include "WorkoutWidget.h"
+#include "WorkoutWindow.h"
 #include "WorkoutWidgetItems.h"
 
 #include "ErgFile.h"
@@ -46,8 +47,8 @@ static const int SPACING = 2; // between labels and tics (if there are tics)
 // grid lines (y only)
 static bool GRIDLINES = true;
 
-WorkoutWidget::WorkoutWidget(QWidget *parent, Context *context) :
-    QWidget(parent), ergFile(NULL), state(none), dragging(NULL), context(context)
+WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
+    QWidget(parent),  ergFile(NULL), state(none), dragging(NULL), parent(parent), context(context)
 {
     maxX_=3600;
     maxY_=300;
@@ -61,14 +62,26 @@ WorkoutWidget::WorkoutWidget(QWidget *parent, Context *context) :
     configChanged(CONFIG_APPEARANCE);
 }
 
+void
+WorkoutWidget::timeout()
+{
+    // into event filter (our state machine)
+    QEvent timer(QEvent::Timer);
+    eventFilter(this, &timer);
+}
+
 bool
 WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 {
+    // where were we when we did Create ?
+    static QPoint onCreate;
+
     // process as normal if not one of ours
     if (obj != this) return false;
 
     // where is the cursor
     QPoint p = mapFromGlobal(QCursor::pos());
+    QPointF v = reverseTransform(p.x(),p.y());
 
     // is a repaint going to be needed?
     bool updateNeeded=false;
@@ -81,17 +94,26 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     // 1 mouse move         none        hover/unhover           none
     //                      drag        move point around       drag
     //
-    // 2 mouse click        none        hovering select         drag
-    //                      none        not hovering create     drag
+    // 2 mouse click        none        hovering? select        drag
+    //                      none        not hovering? create    drag
     //
     // 3 mouse release      drag        unselect                none
     //
+    //
+    // 4 mouse timeout      drag        no move? click-hold     none
+    //                      drag        moved? ignore           drag
 
     //
     // 1 MOUSE MOVE
     //
     if (event->type() == QEvent::MouseMove) {
 
+        // forget the onCreate!
+        onCreate = QPoint(-1,-1);
+
+        // always update the x/y values in the toolbar
+        parent->xlabel->setText(time_to_string(v.x()));
+        parent->ylabel->setText(QString("%1w").arg(v.y()));
 
         if (state == none) {
 
@@ -153,6 +175,12 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
             // one
             if (state == none) {
                 updateNeeded = createPoint(p);
+
+                // but we may press and hold for a snip
+                // so lets set the timer and remember
+                // where we were
+                onCreate = p;
+                QTimer::singleShot(500, this, SLOT(timeout()));
             }
         }
     }
@@ -166,6 +194,15 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
         updateNeeded = true;
     }
 
+    //
+    // 4. MOUSE TIMEOUT [click and hold]
+    //
+    if (event->type() == QEvent::Timer) {
+        if (state == drag && onCreate == p) {
+
+            // TODO .. click and hold ..
+        }
+    }
 
     // ALL DONE
 
@@ -236,10 +273,9 @@ WorkoutWidget::movePoint(QPoint p)
     // we don't constrain y, but highlight points that align
     foreach(WWPoint *point, points_) {
         if (point == dragging) continue;
+
         point->hover=false;
-        if (point->bounding().contains(QPoint(point->bounding().center().x(), p.y())))
-            if (doubles_equal(point->y, to.y()))
-                point->hover = true;
+        if (doubles_equal(point->y, to.y())) point->hover = true;
     }
     dragging->y = to.y();
     return true;

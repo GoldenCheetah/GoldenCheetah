@@ -47,6 +47,8 @@ class WorkoutWindow : public GcWindow
 
         WorkoutWindow(Context *context);
 
+        QLabel *xlabel, *ylabel;
+
    public slots:
 
         // toolbar functions
