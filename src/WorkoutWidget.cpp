@@ -176,10 +176,56 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 bool
 WorkoutWidget::movePoint(QPoint p)
 {
-    // apply constraints!
-    // XXX not bothering right now!
-    QPointF to = reverseTransform(p.x(), p.y());
-    dragging->x = to.x();
+    int index = points_.indexOf(dragging); // XXX optimise this out on set drag state
+    QPoint f = transform(dragging->x, dragging->y); // current loc of point
+    QPointF to = reverseTransform(p.x(), p.y()); // watts/secs to move to
+
+    // boom .. we don't exist!
+    if (index == -1) return false;
+
+    // moving left
+    if (p.x() < f.x()) {
+
+        // we are constrained by another point?
+        if (index > 0) {
+
+            // get constraining point to the left
+            QPoint c = transform(points_[index-1]->x, points_[index-1]->y); // current loc of point
+
+            // not beyond just move, otherwise align to constraint
+            if (c.x() < p.x()) dragging->x = to.x();
+            else dragging->x = points_[index-1]->x;
+
+        } else {
+
+            // unconstrained
+            dragging->x = to.x();
+
+        }
+    }
+
+    // moving right
+    if (p.x() > f.x()) {
+
+        // we are constrained by another point?
+        if ((index+1) < points_.count()) {
+
+            // get constraining point to the right
+            QPoint c = transform(points_[index+1]->x, points_[index+1]->y); // current loc of point
+
+            // not beyond just move, otherwise align to constraint
+            if (c.x() > p.x()) dragging->x = to.x();
+            else dragging->x = points_[index+1]->x;
+
+        } else {
+
+            // unconstrained
+            dragging->x = to.x();
+
+        }
+    }
+
+    // XXX not bothering with y right now!
     dragging->y = to.y();
     return true;
 }
