@@ -79,7 +79,6 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
         urlstr.append("redirect_uri=https://goldencheetah.github.io/blank.html&");
         urlstr.append("response_type=code&");
         urlstr.append("force_reapprove=true");
-
     } else if (site == TWITTER) {
 
 #ifdef GC_HAVE_KQOAUTH
@@ -123,25 +122,33 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
         urlstr.append("approval_prompt=force");
 
     } else if (site == GOOGLE_CALENDAR) {
-
         // OAUTH 2.0 - Google flow for installed applications
         urlstr = QString("https://accounts.google.com/o/oauth2/auth?");
         urlstr.append("scope=https://www.googleapis.com/auth/calendar&");
         urlstr.append("redirect_uri=urn:ietf:wg:oauth:2.0:oob&");
         urlstr.append("response_type=code&");
         urlstr.append("client_id=").append(GC_GOOGLE_CALENDAR_CLIENT_ID);
+    } else if (site == GOOGLE_DRIVE) {
+        // OAUTH 2.0 - Google flow for installed applications
+        urlstr = QString("https://accounts.google.com/o/oauth2/auth?");
+        // We only request access to the application data folder, not all files.
+        urlstr.append("scope=https://www.googleapis.com/auth/drive.appfolder&");
+        urlstr.append("redirect_uri=urn:ietf:wg:oauth:2.0:oob&");
+        urlstr.append("response_type=code&");
+        urlstr.append("client_id=").append(GC_GOOGLE_DRIVE_CLIENT_ID);
     }
 
-    // different process to get the token for STRAVA, CYCLINGANALYTICS vs. TWITTER
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == GOOGLE_CALENDAR ) {
-
-
+    // different process to get the token for STRAVA, CYCLINGANALYTICS vs.
+    // TWITTER
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS ||
+        site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE) {
         url = QUrl(urlstr);
         view->setUrl(url);
-
         // connects
-        connect(view, SIGNAL(urlChanged(const QUrl&)), this, SLOT(urlChanged(const QUrl&)));
-        connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
+        connect(view, SIGNAL(urlChanged(const QUrl&)), this,
+                SLOT(urlChanged(const QUrl&)));
+        connect(view, SIGNAL(loadFinished(bool)), this,
+                SLOT(loadFinished(bool)));
     }
 }
 
@@ -283,8 +290,9 @@ void
 OAuthDialog::loadFinished(bool ok) {
 
     // GOOGLE OAUTH 2.0 sends the code as part of the title of the HTML page they re-direct too
-    if (site == GOOGLE_CALENDAR) {
-        if (ok && url.toString().startsWith("https://accounts.google.com/o/oauth2/auth")) {
+    if (site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE) {
+        if (ok && url.toString().startsWith(
+                "https://accounts.google.com/o/oauth2/auth")) {
 
             // retrieve the code from the HTML page title
             QString title = view->title();
@@ -297,9 +305,24 @@ OAuthDialog::loadFinished(bool ok) {
                 QUrl params;
 #endif
                 QString urlstr = "https://www.googleapis.com/oauth2/v3/token?";
-                params.addQueryItem("client_id", GC_GOOGLE_CALENDAR_CLIENT_ID);
+                if (site == GOOGLE_CALENDAR) {
+                    params.addQueryItem("client_id",
+                                        GC_GOOGLE_CALENDAR_CLIENT_ID);
+                } else {
+                    params.addQueryItem("client_id",
+                                        GC_GOOGLE_DRIVE_CLIENT_ID);
+                }
 #ifdef GC_GOOGLE_CALENDAR_CLIENT_SECRET
-                params.addQueryItem("client_secret", GC_GOOGLE_CALENDAR_CLIENT_SECRET);
+                if (site == GOOGLE_CALENDAR) {
+                    params.addQueryItem("client_secret",
+                                        GC_GOOGLE_CALENDAR_CLIENT_SECRET);
+                }
+#endif
+#ifdef GC_GOOGLE_DRIVE_CLIENT_SECRET
+                if (site == GOOGLE_DRIVE) {
+                    params.addQueryItem("client_secret",
+                                        GC_GOOGLE_DRIVE_CLIENT_SECRET);
+                }
 #endif
                 params.addQueryItem("code", code);
                 params.addQueryItem("redirect_uri", "urn:ietf:wg:oauth:2.0:oob");
@@ -311,80 +334,94 @@ OAuthDialog::loadFinished(bool ok) {
                 data=params.encodedQuery();
 #endif
 
-                // trade-in the temporary access code retrieved by the Call-Back URL for the finale token
+                // trade-in the temporary access code retrieved by the
+                // Call-Back URL for the finale token
                 QUrl url = QUrl(urlstr);
                 QNetworkRequest request = QNetworkRequest(url);
-                request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
+                request.setHeader(QNetworkRequest::ContentTypeHeader,
+                                  "application/x-www-form-urlencoded");
 
                 // not get the final token
                 manager = new QNetworkAccessManager(this);
-                connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
+                connect(manager, SIGNAL(finished(QNetworkReply*)), this,
+                        SLOT(networkRequestFinished(QNetworkReply*)));
                 manager->post(request, data);
-
             }
         }
     }
 }
 
-
-
 void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
 
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray payload = reply->readAll(); // JSON
-        QByteArray token_type;
-        int token_length;
-        if (site == GOOGLE_CALENDAR) {
-            token_type = "\"refresh_token\":";
-            token_length = 16;
-        } else {  // all other sites have permanent access token
-            token_type = "\"access_token\":";
-            token_length = 15;
+        QJsonParseError parseError;
+        QJsonDocument document = QJsonDocument::fromJson(payload, &parseError);
+        QString refresh_token;
+        QString access_token;
+        if (parseError.error == QJsonParseError::NoError) {
+            refresh_token = document.object()["refresh_token"].toString();
+            access_token = document.object()["access_token"].toString();
+        }
+        if (((site == GOOGLE_DRIVE || site == GOOGLE_CALENDAR) &&
+             refresh_token == "" ) || access_token == "") {
+            // Something failed.
+            QString error = QString(
+                tr("Error retrieving authoriation credentials"));
+            QMessageBox oautherr(QMessageBox::Critical,
+                                 tr("Authorization Error"), error);
+            oautherr.setDetailedText(error);
+            oautherr.exec();
+            return;
         }
 
-        // get the token
-        int at = payload.indexOf(token_type);
-        if (at >=0 ) {
-            int from = at + token_length; // first char after ":"
-            int next = payload.indexOf("\"", from);
-            from = next + 1;
-            int to = payload.indexOf("\"", from);
-            QString access_token = payload.mid(from, to-from);
-            if (site == DROPBOX) {
-                appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_TOKEN, access_token);
-                QString info = QString(tr("Dropbox authorization was successful."));
-                QMessageBox information(QMessageBox::Information, tr("Information"), info);
-                information.exec();
-            } else if (site == STRAVA) {
-                appsettings->setCValue(context->athlete->cyclist, GC_STRAVA_TOKEN, access_token);
-                QString info = QString(tr("Strava authorization was successful."));
-                QMessageBox information(QMessageBox::Information, tr("Information"), info);
-                information.exec();
-            } else if (site == CYCLING_ANALYTICS) {
-                appsettings->setCValue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, access_token);
-                QString info = QString(tr("Cycling Analytics authorization was successful."));
-                QMessageBox information(QMessageBox::Information, tr("Information"), info);
-                information.exec();
-            } else if (site == GOOGLE_CALENDAR) {
-                // remove the Google Page first
-                url = QUrl("http://www.goldencheetah.org");
-                view->setUrl(url);
-                appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_CALENDAR_REFRESH_TOKEN, access_token);
-                QString info = QString(tr("Google Calendar authorization was successful."));
-                QMessageBox information(QMessageBox::Information, tr("Information"), info);
-                information.exec();
-            }
+        if (site == DROPBOX) {
+            appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_TOKEN, access_token);
+            QString info = QString(tr("Dropbox authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
+        } else if (site == STRAVA) {
+            appsettings->setCValue(context->athlete->cyclist, GC_STRAVA_TOKEN, access_token);
+            QString info = QString(tr("Strava authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
+        } else if (site == CYCLING_ANALYTICS) {
+            appsettings->setCValue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, access_token);
+            QString info = QString(tr("Cycling Analytics authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
+        } else if (site == GOOGLE_CALENDAR) {
+            // remove the Google Page first
+            url = QUrl("http://www.goldencheetah.org");
+            view->setUrl(url);
+            appsettings->setCValue(
+                context->athlete->cyclist,
+                GC_GOOGLE_CALENDAR_REFRESH_TOKEN, refresh_token);
+            QString info = QString(
+                tr("Google Calendar authorization was successful."));
+            QMessageBox information(QMessageBox::Information,
+                                    tr("Information"), info);
+            information.exec();
+        } else if (site == GOOGLE_DRIVE) {
+            // remove the Google Page first
+            appsettings->setCValue(
+                context->athlete->cyclist,
+                GC_GOOGLE_DRIVE_REFRESH_TOKEN, refresh_token);
+            appsettings->setCValue(
+                context->athlete->cyclist,
+                GC_GOOGLE_DRIVE_ACCESS_TOKEN, access_token);
+            appsettings->setCValue(
+                context->athlete->cyclist,
+                GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH,
+                QDateTime::currentDateTime());
+            
+            QString info = QString(
+                tr("Google Drive authorization was successful."));
+            QMessageBox information(QMessageBox::Information,
+                                    tr("Information"), info);
+            information.exec();
         }
-
-    } else { // something failed
-
-        QString error = QString(tr("Error retrieving authoriation credentials"));
-        QMessageBox oautherr(QMessageBox::Critical, tr("Authorization Error"), error);
-        oautherr.setDetailedText(error);
-        oautherr.exec();
     }
-
     // job done, dialog can be closed
     accept();
-
 }
