@@ -31,6 +31,7 @@
 #include <QPoint>
 
 class ErgFile;
+class WorkoutWindow;
 class WorkoutWidget;
 class WWPoint;
 class WorkoutWidgetItem {
@@ -64,7 +65,7 @@ class WorkoutWidget : public QWidget
 
     public:
 
-        WorkoutWidget(QWidget *parent, Context *context);
+        WorkoutWidget(WorkoutWindow *parent, Context *context);
 
         // adding items and points
         void addItem(WorkoutWidgetItem*x) { children_.append(x); }
@@ -112,6 +113,9 @@ class WorkoutWidget : public QWidget
         // trap signals
         void configChanged(qint32);
 
+        // timeout on click timer
+        void timeout();
+
     protected:
 
         // interaction state
@@ -127,6 +131,7 @@ class WorkoutWidget : public QWidget
 
     private:
 
+        WorkoutWindow *parent;
         Context *context;
         QList<WorkoutWidgetItem*> children_;
 

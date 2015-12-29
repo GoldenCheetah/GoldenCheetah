@@ -25,6 +25,9 @@
 
 QString time_to_string(double secs)
 {
+    // negs are bad
+    if (secs<0) secs=0;
+
     QString result;
     unsigned rounded = static_cast<unsigned>(round(secs));
     bool needs_colon = false;

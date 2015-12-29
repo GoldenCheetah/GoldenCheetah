@@ -410,7 +410,7 @@ void ErgFile::parseComputrainer(QString p)
                         double watts = add.y;
                         double ftp = Ftp;
                         watts *= CP/ftp;
-                        add.y = add.val = watts;
+                        add.y = add.val = int(watts);
                     }
                     break;
                 case MRC:       // its a percent relative to CP (mrc file)
@@ -427,7 +427,7 @@ void ErgFile::parseComputrainer(QString p)
                 // we have a relative watts match
                 ErgFilePoint add;
                 add.x = relativeWatts.cap(1).toDouble() * 60000; // from mins to 1000ths of a second
-                add.val = add.y = (relativeWatts.cap(2).toDouble() /100.00) * CP;
+                add.val = add.y = int((relativeWatts.cap(2).toDouble() /100.00) * CP);
                 Points.append(add);
                 if (add.y > MaxWatts) MaxWatts=add.y;
 

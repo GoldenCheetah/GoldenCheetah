@@ -33,6 +33,15 @@ WorkoutWindow::WorkoutWindow(Context *context) :
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
+    // the workout scene
+    workout = new WorkoutWidget(this, context);
+
+    // add a scale
+    powerscale = new WWPowerScale(workout, context);
+
+    // add a line between the dots
+    line = new WWLine(workout);
+
     // setup the toolbar
     toolbar = new QToolBar(this);
     toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -75,21 +84,25 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     connect(selectAct, SIGNAL(triggered()), this, SLOT(selectMode()));
     toolbar->addAction(selectAct);
 
+    // stretch the labels to the right hand side
+    QWidget *empty = new QWidget(this);
+    empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    toolbar->addWidget(empty);
+
+
+    xlabel = new QLabel("00:00");
+    toolbar->addWidget(xlabel);
+
+    ylabel = new QLabel("150w");
+    toolbar->addWidget(ylabel);
+
 #if 0 // not yet!
     // get updates..
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
     telemetryUpdate(RealtimeData());
 #endif
 
-    // the workout scene
-    workout = new WorkoutWidget(this, context);
-
-    // add a scale
-    powerscale = new WWPowerScale(workout, context);
-
-    // add a line between the dots
-    line = new WWLine(workout);
-
+    // WATTS and Duration for the cursor
     layout->addWidget(toolbar);
     layout->addWidget(workout);
 
@@ -104,8 +117,16 @@ void
 WorkoutWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    QFontMetrics fm(workout->bigFont);
+    xlabel->setFont(workout->bigFont);
+    ylabel->setFont(workout->bigFont);
+    xlabel->setFixedWidth(fm.boundingRect(" 00:00:00 ").width());
+    ylabel->setFixedWidth(fm.boundingRect(" 1000w ").width());
+
     toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ").arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+    xlabel->setStyleSheet("color: darkGray;");
+    ylabel->setStyleSheet("color: darkGray;");
     repaint();
 }
 
