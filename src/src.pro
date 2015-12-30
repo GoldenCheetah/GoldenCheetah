@@ -70,7 +70,12 @@ DEFINES += GC_HAVE_SOAP
 # to make sure we are toolchain neutral we NEVER refer to a lib
 # via file extensions .lib or .a in src.pro unless the section is
 # platform specific. Instead we use directives -Ldir and -llib
+CONFIG(release, debug|release){
 LIBS += -L../qwt/lib -lqwt
+}
+CONFIG(debug, debug|release) {
+LIBS += -L../qwt/lib -lqwtd
+}
 
 # compress and math libs must be defined in gcconfig.pri
 # if they're not part of the QT include
