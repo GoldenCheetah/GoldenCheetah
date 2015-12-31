@@ -225,7 +225,11 @@ class CredentialsPage : public QScrollArea
         void chooseLocalFileStoreFolder();
 
     private:
-        void authoriseGoogle(int site);
+        enum GoogleType {
+            CALENDAR = 1,
+            DRIVE,
+        };
+        void authoriseGoogle(GoogleType type);
         
         Context *context;
 
