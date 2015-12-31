@@ -348,6 +348,9 @@ struct setChannelAtom {
 #define ANT_CONTROL_GENERIC_CMD_RESET               0x22
 #define ANT_CONTROL_GENERIC_CMD_LENGTH              0x23
 #define ANT_CONTROL_GENERIC_CMD_LAP                 0x24
+#define ANT_CONTROL_GENERIC_CMD_USER_1              0x8000
+#define ANT_CONTROL_GENERIC_CMD_USER_2              0x8001
+#define ANT_CONTROL_GENERIC_CMD_USER_3              0x8002
 
 //======================================================================
 // Worker thread
