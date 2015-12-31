@@ -245,7 +245,6 @@ class CredentialsPage : public QScrollArea
         QPushButton *googleDriveAuthorised;
         QPushButton *googleDriveBrowse;
         QLineEdit *googleDriveFolder;
-        //QLineEdit *googleDrive;        
 #endif
 
         QComboBox *dvCALDAVType;

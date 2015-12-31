@@ -28,29 +28,33 @@ class GoogleDrive : public FileStore {
 
     public:
         GoogleDrive(Context *context);
-        ~GoogleDrive();
+        virtual ~GoogleDrive();
 
-        QString name() { return (tr("Google Drive Cloud Storage")); }
+        virtual QString name() { return (tr("Google Drive Cloud Storage")); }
 
         // open/connect and close/disconnect
-        bool open(QStringList &errors);
-        bool close();
+        virtual bool open(QStringList &errors);
+        virtual bool close();
 
         // home directory
-        QString home();
+        virtual QString home();
 
         // write a file
-        bool writeFile(QByteArray &data, QString remotename);
+        virtual bool writeFile(QByteArray &data, QString remotename);
 
         // read a file
-        bool readFile(QByteArray *data, QString remotename);
+        virtual bool readFile(QByteArray *data, QString remotename);
 
         // create a folder
-        bool createFolder(QString path);
+        virtual bool createFolder(QString path);
 
         // dirent style api
-        FileStoreEntry *root() { return root_; }
-        QList<FileStoreEntry*> readdir(QString path, QStringList &errors);
+        virtual FileStoreEntry *root() { return root_; }
+        // Readdir reads the files from the remote side and updates root_dir_
+        // with a local cache. readdir will read ALL files and refresh
+        // everything.
+        virtual QList<FileStoreEntry*> readdir(
+            QString path, QStringList &errors);
 
     public slots:
 
@@ -62,32 +66,29 @@ class GoogleDrive : public FileStore {
         void writeFileCompleted();
 
     private:
+        struct FileInfo;
+        
         void MaybeRefreshCredentials();
-        QJsonArray GetFiles(const QString& remote_name, const QString& path,
-                            const QString& token);
-        // Returns the file id or an empty string if the file does not exist.
-        QString GetFileID(const QString& remote_name, const QString& path,
-                          const QString& token);
-        // Get the download url so we can fetch the file.
-        QString GetDownloadURL(const QString& remote_name, const QString& path,
-                               const QString& token);
+
         // Fetches a JSON document from the given URL.
         QJsonDocument FetchNextLink(const QString& url, const QString& token);
 
+        FileInfo* WalkFileInfo(const QString& path, bool foo);
+        
         static QNetworkRequest MakeRequestWithURL(
             const QString& url, const QString& token, const QString& args);
         static QNetworkRequest MakeRequest(
             const QString& token, const QString& args);
         // Make QString returns a "q" string usable for searches in Google
         // Drive.
-        static QString MakeQString(const QString& remote_name,
-                                   const QString& path);
+        static QString MakeQString();
 
         Context *context_;
         QNetworkAccessManager *nam_;
-        QNetworkReply *reply_;
         FileStoreEntry *root_;
-
+        QString root_directory_id_;
+        QScopedPointer<FileInfo> root_dir_;
+        
         QMap<QNetworkReply*, QByteArray*> buffers;
 };
 #endif  // GC_GOOGLE_DRIVE_H

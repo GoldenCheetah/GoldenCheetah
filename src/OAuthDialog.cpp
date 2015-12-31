@@ -23,6 +23,8 @@
 #include "Settings.h"
 #include "TimeUtils.h"
 
+#include <QJsonParseError>
+
 OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
     context(context), site(site)
 {
@@ -132,7 +134,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
         // OAUTH 2.0 - Google flow for installed applications
         urlstr = QString("https://accounts.google.com/o/oauth2/auth?");
         // We only request access to the application data folder, not all files.
-        urlstr.append("scope=https://www.googleapis.com/auth/drive.appfolder&");
+        urlstr.append("scope=https://www.googleapis.com/auth/drive.appdata&");
         urlstr.append("redirect_uri=urn:ietf:wg:oauth:2.0:oob&");
         urlstr.append("response_type=code&");
         urlstr.append("client_id=").append(GC_GOOGLE_DRIVE_CLIENT_ID);
@@ -312,18 +314,14 @@ OAuthDialog::loadFinished(bool ok) {
                     params.addQueryItem("client_id",
                                         GC_GOOGLE_DRIVE_CLIENT_ID);
                 }
-#ifdef GC_GOOGLE_CALENDAR_CLIENT_SECRET
                 if (site == GOOGLE_CALENDAR) {
                     params.addQueryItem("client_secret",
                                         GC_GOOGLE_CALENDAR_CLIENT_SECRET);
                 }
-#endif
-#ifdef GC_GOOGLE_DRIVE_CLIENT_SECRET
                 if (site == GOOGLE_DRIVE) {
                     params.addQueryItem("client_secret",
                                         GC_GOOGLE_DRIVE_CLIENT_SECRET);
                 }
-#endif
                 params.addQueryItem("code", code);
                 params.addQueryItem("redirect_uri", "urn:ietf:wg:oauth:2.0:oob");
                 params.addQueryItem("grant_type", "authorization_code");
