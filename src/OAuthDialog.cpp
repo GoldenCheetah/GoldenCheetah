@@ -23,7 +23,9 @@
 #include "Settings.h"
 #include "TimeUtils.h"
 
+#if QT_VERSION > 0x050000
 #include <QJsonParseError>
+#endif
 
 OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
     context(context), site(site)
