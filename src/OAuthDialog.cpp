@@ -349,21 +349,55 @@ OAuthDialog::loadFinished(bool ok) {
     }
 }
 
+static QString RawJsonStringGrab(const QByteArray& payload,
+                                 const QString& needle) {
+    // A RegExp based JSON string parser. Not the best, but it does the job.
+    QString regex =
+        // This matches the key.
+        "(" + needle + "|\"" + needle + "\"|'" + needle + "')"
+        // Matches the separator.
+        "[\\s]*:[\\s]*"
+        // matches the value.
+        "(\"\\S+\"|'\\S+')";
+    QRegExp q(regex);
+    if (!q.isValid()) {
+        // Somehow failed to build the regex.
+        return "";
+    }
+    int start = q.indexIn(payload);
+    int pos = q.pos(2);
+    if (start == -1 || pos == -1) {
+        // Failed to find the key or the value.
+        return "";
+    }
+    QString ret = payload.mid(pos, q.matchedLength() + start - pos);
+    // Remove " or ' from the value.
+    ret.remove(0, 1);
+    ret.remove(ret.size() - 1, 1);
+    return ret;
+}
+
 void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
 
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray payload = reply->readAll(); // JSON
-        QJsonParseError parseError;
-        QJsonDocument document = QJsonDocument::fromJson(payload, &parseError);
         QString refresh_token;
         QString access_token;
+#if QT_VERSION > 0x050000
+        QJsonParseError parseError;
+        QJsonDocument document = QJsonDocument::fromJson(payload, &parseError);
         if (parseError.error == QJsonParseError::NoError) {
             refresh_token = document.object()["refresh_token"].toString();
             access_token = document.object()["access_token"].toString();
         }
+#else
+        refresh_token = RawJsonStringGrab(payload, "refresh_token");
+        access_token = RawJsonStringGrab(payload, "access_token");
+#endif
         if (((site == GOOGLE_DRIVE || site == GOOGLE_CALENDAR) &&
              refresh_token == "" ) || access_token == "") {
             // Something failed.
+            // Only Google uses both refresh and access tokens.
             QString error = QString(
                 tr("Error retrieving authoriation credentials"));
             QMessageBox oautherr(QMessageBox::Critical,
@@ -374,7 +408,8 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
         }
 
         if (site == DROPBOX) {
-            appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_TOKEN, access_token);
+            appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_TOKEN,
+                                   access_token);
             QString info = QString(tr("Dropbox authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
@@ -412,7 +447,7 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
                 context->athlete->cyclist,
                 GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH,
                 QDateTime::currentDateTime());
-            
+
             QString info = QString(
                 tr("Google Drive authorization was successful."));
             QMessageBox information(QMessageBox::Information,
