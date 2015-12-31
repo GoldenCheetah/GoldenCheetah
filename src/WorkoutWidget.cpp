@@ -231,7 +231,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 #if QT_VERSION >= 0x050000
             updateNeeded = scale(w->angleDelta());
 #else
-            updateNeeded = scale(w->delta());
+            updateNeeded = scale(QPoint(0,w->delta()));
 #endif
             returning = true;
         }
