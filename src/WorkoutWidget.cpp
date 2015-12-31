@@ -228,7 +228,11 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
         // not for drag state, but everything else is fine
         if (state == none) {
             QWheelEvent *w = static_cast<QWheelEvent*>(event);
+#if QT_VERSION >= 0x050000
             updateNeeded = scale(w->angleDelta());
+#else
+            updateNeeded = scale(w->delta());
+#endif
             returning = true;
         }
 
