@@ -1039,7 +1039,7 @@ void ANTChannel::attemptTransition(int message_id)
         parent->sendMessage(ANTMessage::open(number));
         mi.initialise();
         if (is_master) {
-            qDebug()<<number<<"Starting timer..";
+            //qDebug()<<number<<"Starting timer..";
             emit broadcastTimerStart(number);
         }
         break;

@@ -29,6 +29,7 @@
 #include "VideoSyncFile.h"
 #include "ErgFilePlot.h"
 #include "GcSideBarItem.h"
+#include "RemoteControl.h"
 
 // standard stuff
 #include <QDir>
@@ -116,6 +117,8 @@ class TrainSidebar : public GcWindow
         int wattsTelemetry; // Power (and AltPower)
         int rpmTelemetry;   // Cadence
         int kphTelemetry;   // Speed (and Distance)
+
+        RemoteControl *remote;      // remote control settings
 
     signals:
 
