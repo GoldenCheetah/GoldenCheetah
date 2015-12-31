@@ -3,9 +3,10 @@ branches:
 language:
 - objective-c
 compiler:
-- clang
 - gcc
 env:
+  sudo: required
+  dist: precise
   matrix:
 ## Test 4.8 or 5.4.2
   - BRANCH=master QT=qt4 QT_PATH=qt
