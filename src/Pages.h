@@ -50,6 +50,7 @@
 #include "Season.h"
 #include "SeasonParser.h"
 #include "RideAutoImportConfig.h"
+#include "RemoteControl.h"
 
 class QGroupBox;
 class QHBoxLayout;
@@ -66,6 +67,8 @@ class FieldsPage;
 class Colors;
 class AboutRiderPage;
 class SeasonsPage;
+class DevicePage;
+class RemotePage;
 
 class GeneralPage : public QWidget
 {
@@ -314,7 +317,7 @@ class DevicePage : public QWidget
     G_OBJECT
 
     public:
-        DevicePage(QWidget *, Context *);
+        DevicePage(QWidget *parent, Context *context);
         qint32 saveClicked();
 
         QTableView *deviceList;
@@ -340,6 +343,21 @@ class DevicePage : public QWidget
         deviceModel *deviceListModel;
 
         QCheckBox   *multiCheck;
+};
+
+class RemotePage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+    public:
+        RemotePage(QWidget *parent, Context *context);
+        qint32 saveClicked();
+
+    private:
+        RemoteControl *remote;
+        Context       *context;
+        QTreeWidget   *fields;
 };
 
 class BestsMetricsPage : public QWidget
@@ -1071,6 +1089,5 @@ class IntervalsPage : public QWidget
 
     private slots:
 };
-
 
 #endif
