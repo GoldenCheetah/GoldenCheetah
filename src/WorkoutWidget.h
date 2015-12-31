@@ -29,6 +29,7 @@
 #include <QWidget>
 #include <QRect>
 #include <QPoint>
+#include <QVector>
 
 class ErgFile;
 class WorkoutWindow;
@@ -59,6 +60,25 @@ class WorkoutWidgetItem {
         WorkoutWidget *w;
 };
 
+// base for all commands that operate on a workout (e.g. create
+// point, drag point, delete etc etc used by redo/undo
+class WorkoutWidgetCommand
+{
+    public:
+
+        WorkoutWidgetCommand(WorkoutWidget *w); // will add to stack
+        virtual ~WorkoutWidgetCommand() {}
+
+        WorkoutWidget *workoutWidget() { return workoutWidget_; }
+
+        // need to reimplement these in subclass
+        virtual void undo() = 0;
+        virtual void redo() = 0;
+
+    private:
+        WorkoutWidget *workoutWidget_;
+};
+
 class WorkoutWidget : public QWidget
 {
     Q_OBJECT
@@ -72,10 +92,10 @@ class WorkoutWidget : public QWidget
         void addPoint(WWPoint*x) { points_.append(x); }
 
         // get list of my items
-        QList<WorkoutWidgetItem*> children() { return children_; }
+        QList<WorkoutWidgetItem*> &children() { return children_; }
 
         // get list of my items
-        QList<WWPoint*> points() { return points_; }
+        QList<WWPoint*> &points() { return points_; }
 
         // range for scales in plot units not draw units
         double maxX(); // e.g. max watts
@@ -116,6 +136,14 @@ class WorkoutWidget : public QWidget
         // timeout on click timer
         void timeout();
 
+        // if done mid stack, the stack is truncated
+        void addCommand(WorkoutWidgetCommand *cmd);
+
+        // redo / undo command by going
+        // up and down the stack
+        void redo();
+        void undo();
+
     protected:
 
         // interaction state
@@ -141,6 +169,14 @@ class WorkoutWidget : public QWidget
         QList<WWPoint*> points_;
 
         double maxX_, maxY_;
+
+        // command stack
+        QList<WorkoutWidgetCommand *> stack;
+        int stackptr;
+
+        // where were we when we changed state?
+        QPoint onCreate;
+        QPointF onDrag;
 };
 
 #endif // _GC_WorkoutWidget_h

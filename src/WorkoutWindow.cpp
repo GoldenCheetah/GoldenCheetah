@@ -64,12 +64,12 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // icon in that instance would be horrible
     QIcon undoIcon(":images/toolbar/undo.png");
     undoAct = new QAction(undoIcon, tr("Undo"), this);
-    connect(undoAct, SIGNAL(triggered()), this, SLOT(undo()));
+    connect(undoAct, SIGNAL(triggered()), workout, SLOT(undo()));
     toolbar->addAction(undoAct);
 
     QIcon redoIcon(":images/toolbar/redo.png");
     redoAct = new QAction(redoIcon, tr("Redo"), this);
-    connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
+    connect(redoAct, SIGNAL(triggered()), workout, SLOT(redo()));
     toolbar->addAction(redoAct);
     
     toolbar->addSeparator();
@@ -132,16 +132,6 @@ WorkoutWindow::configChanged(qint32)
 
 void
 WorkoutWindow::saveFile()
-{
-}
-
-void
-WorkoutWindow::undo()
-{
-}
-
-void
-WorkoutWindow::redo()
 {
 }
 

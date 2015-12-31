@@ -36,6 +36,9 @@
 #define GCWW_LINE   3
 #define GCWW_WSCALE 4 //W'bal
 
+//
+// ITEMS
+//
 class WWPowerScale : public WorkoutWidgetItem {
 
     public:
@@ -117,5 +120,35 @@ class WWLine : public WorkoutWidgetItem {
 
 };
 
+//
+// COMMANDS
+//
+class CreatePointCommand : public WorkoutWidgetCommand
+{
+    public:
+        CreatePointCommand(WorkoutWidget *w, double x, double y, int index);
+        void redo();
+        void undo();
+
+    private:
+
+        //state info
+        double x,y;
+        int index;
+};
+
+class MovePointCommand : public WorkoutWidgetCommand
+{
+    public:
+            MovePointCommand(WorkoutWidget *w, QPointF before, QPointF after, int index);
+        void redo();
+        void undo();
+
+    private:
+
+        //state info
+        QPointF before, after;
+        int index;
+};
 
 #endif // _GC_WorkoutWidgetItems_h

@@ -47,14 +47,15 @@ class WorkoutWindow : public GcWindow
 
         WorkoutWindow(Context *context);
 
+        // workout widget updates these
         QLabel *xlabel, *ylabel;
+        QAction *saveAct, *undoAct, *redoAct,
+                *drawAct, *selectAct;
 
    public slots:
 
         // toolbar functions
         void saveFile();
-        void undo();
-        void redo();
         void drawMode();
         void selectMode();
 
@@ -66,9 +67,6 @@ class WorkoutWindow : public GcWindow
         Context *context;
 
         QToolBar *toolbar;
-        QAction *saveAct, *undoAct, *redoAct,
-                *drawAct, *selectAct;
-
         WorkoutWidget *workout; // will become editor.
         WWPowerScale *powerscale;
         WWLine *line;
