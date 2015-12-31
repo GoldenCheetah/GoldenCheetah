@@ -933,18 +933,20 @@ void CredentialsPage::authoriseCyclingAnalytics()
 }
 
 void CredentialsPage::authoriseGoogleCalendar() {
-    authoriseGoogle(0);
+    authoriseGoogle(CALENDAR);
 }
 
+#if QT_VERSION >= 0x050000
 void CredentialsPage::authoriseGoogleDrive() {
-    authoriseGoogle(1);
+    authoriseGoogle(DRIVE);
 }
+#endif
 
-void CredentialsPage::authoriseGoogle(int site) {
+void CredentialsPage::authoriseGoogle(GoogleType type) {
     OAuthDialog *oauthDialog;
-    if (site == 0) {
+    if (type == CALENDAR) {
         oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_CALENDAR);
-    } else if (site == 1) {
+    } else if (type == DRIVE) {
         oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_DRIVE);
     } else {
             return;
