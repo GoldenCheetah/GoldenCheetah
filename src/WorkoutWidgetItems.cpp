@@ -234,3 +234,23 @@ MovePointCommand::redo()
     p->x = after.x();
     p->y = after.y();
 }
+
+ScaleCommand::ScaleCommand(WorkoutWidget *w, double up, double down, bool scaleup)
+  : WorkoutWidgetCommand(w), up(up), down(down), scaleup(scaleup) { }
+
+void
+ScaleCommand::undo()
+{
+    double factor = scaleup ? down : up;
+    foreach(WWPoint *p, workoutWidget()->points())
+        p->y *= factor;
+}
+
+void
+ScaleCommand::redo()
+{
+    double factor = scaleup ? up : down;
+    foreach(WWPoint *p, workoutWidget()->points())
+        p->y *= factor;
+}
+

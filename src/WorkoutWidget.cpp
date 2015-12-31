@@ -73,6 +73,9 @@ WorkoutWidget::timeout()
 bool
 WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 {
+    // we nearly always return false for filtering
+    // except wheel events (for example)
+    bool returning = false;
 
     // process as normal if not one of ours
     if (obj != this) return false;
@@ -99,7 +102,12 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     //
     //
     // 4 mouse timeout      drag        no move? click-hold     none
-    //                      drag        moved? ignore           drag
+    //   [not active yet]   drag        moved? ignore           drag
+    //
+    //
+    // 5 mouse wheel        none        rescale selectes/all    none
+    //   up and down        drag        ignore                  drag
+    //
 
     //
     // 1 MOUSE MOVE
@@ -212,13 +220,28 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
+    //
+    // 5. MOUSE WHEEL 
+    //
+    if (event->type() == QEvent::Wheel) {
+
+        // not for drag state, but everything else is fine
+        if (state == none) {
+            QWheelEvent *w = static_cast<QWheelEvent*>(event);
+            updateNeeded = scale(w->angleDelta());
+            returning = true;
+        }
+
+    }
+
     // ALL DONE
 
     // trigger an update if one is needed
     if (updateNeeded) update();
 
     // return false - we are eavesdropping not processing.
-    return false;
+    // except for wheel events which we steal
+    return returning;
 }
 
 static bool doubles_equal(double a, double b)
@@ -313,6 +336,24 @@ WorkoutWidget::createPoint(QPoint p)
     // after current
     points_.append(dragging);
     new CreatePointCommand(this, to.x(), to.y(), -1);
+    return true;
+}
+
+bool
+WorkoutWidget::scale(QPoint p)
+{
+    // scale selected (all at present) points
+    // up of y is positive, down 1% if y is negative
+    if (p.y() == 0) return false;
+
+    double factor = p.y() > 0 ? 1.01 : 0.99;
+
+    // scale
+    foreach (WWPoint *p, points_) p->y *= factor;
+
+    // register command
+    new ScaleCommand(this, 1.01, 0.99, p.y() > 0);
+
     return true;
 }
 

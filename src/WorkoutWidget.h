@@ -153,6 +153,7 @@ class WorkoutWidget : public QWidget
         // interacting with points
         bool movePoint(QPoint p);
         bool createPoint(QPoint p);
+        bool scale(QPoint p);
 
         void paintEvent(QPaintEvent *);
         bool eventFilter(QObject *obj, QEvent *event);

@@ -151,4 +151,16 @@ class MovePointCommand : public WorkoutWidgetCommand
         int index;
 };
 
+class ScaleCommand : public WorkoutWidgetCommand
+{
+    public:
+        ScaleCommand(WorkoutWidget *w, double up, double down, bool scaleup);
+
+        void redo();
+        void undo();
+
+    private:
+        double up, down;
+        bool scaleup;
+};
 #endif // _GC_WorkoutWidgetItems_h
