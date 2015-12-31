@@ -42,11 +42,6 @@
 //Google Calendar-CALDAV oauthkeys / see also Athlete parameter
 #define GC_GOOGLE_CALENDAR_CLIENT_ID      "426009671216-c588t1u6hafep30tfs7g0g1nuo72s8ko.apps.googleusercontent.com"
 
-// FIXME
-#ifndef GC_GOOGLE_CALENDAR_CLIENT_ID
-#define GC_GOOGLE_CALENDAR_CLIENT_ID      "426009671216-c588t1u6hafep30tfs7g0g1nuo72s8ko.apps.googleusercontent.com"
-#endif
-
 //Strava / see also Athlete parameter
 #ifndef GC_STRAVA_CLIENT_ID
 #define GC_STRAVA_CLIENT_ID    "83" // client id

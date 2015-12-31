@@ -20,6 +20,7 @@
 #define GC_FileStore_h
 
 #include <QList>
+#include <QMap>
 #include <QString>
 #include <QStringList>
 #include <QDateTime>
@@ -304,6 +305,8 @@ class FileStoreEntry
         unsigned long size;                 // my size
         QDateTime modified;                 // last modification date
 
+        // This is just file metadata written by the implementation.
+        //QMap<QString, QString> metadata;
         // THESE MEMBERS ARE MAINTAINED BY THE 
         // FILESTORE BASE IMPLEMENTATION
         FileStoreEntry *parent;             // parent directory, NULL for root.
