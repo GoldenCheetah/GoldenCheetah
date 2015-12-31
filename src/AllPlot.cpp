@@ -991,9 +991,10 @@ AllPlot::~AllPlot()
     compares.clear();
 
     // wipe the standard stuff
-    delete standard;
     if (tooltip) delete tooltip;
     if (_canvasPicker) delete _canvasPicker;
+    delete standard;
+
 }
 
 void
