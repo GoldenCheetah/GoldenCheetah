@@ -183,6 +183,9 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
             if (state == none) {
                 updateNeeded = createPoint(p);
 
+                // recompute metrics
+                recompute();
+
                 // but we may press and hold for a snip
                 // so lets set the timer and remember
                 // where we were
@@ -208,6 +211,9 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
         state = none;
         dragging = NULL;
         updateNeeded = true;
+
+        // recompute metrics
+        recompute();
     }
 
     //
@@ -221,7 +227,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     }
 
     //
-    // 5. MOUSE WHEEL 
+    // 5. MOUSE WHEEL
     //
     if (event->type() == QEvent::Wheel) {
 
@@ -235,6 +241,9 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 #endif
             returning = true;
         }
+
+        // will need to ..
+        recompute();
 
     }
 
@@ -322,24 +331,32 @@ WorkoutWidget::createPoint(QPoint p)
     // add a point!
     QPointF to = reverseTransform(p.x(), p.y());
 
-    // don't auto append, we are going to insert vvvvv
-    dragging = new WWPoint(this, to.x(), to.y(), false);
-    state = drag;
+    // don't auto append, we are going to insert     vvvvv
+    WWPoint *add = new WWPoint(this, to.x(), to.y(), false);
 
-    onDrag = QPointF(dragging->x, dragging->y); // yuk, this should be done in the FSM (eventFilter)
-                                                // action at a distance ... yuk XXX TIDY THIS XXX
+    onDrag = QPointF(add->x, add->y);      // yuk, this should be done in the FSM (eventFilter)
+                                           // action at a distance ... yuk XXX TIDY THIS XXX
     // add into the points
     for(int i=0; i<points_.count(); i++) {
         if (points_[i]->x > to.x()) {
-            points_.insert(i, dragging);
+            points_.insert(i, add);
             new CreatePointCommand(this, to.x(), to.y(), i);
+
+            // enter drag mode -- add command resets we
+            // are an edge case so handle it ourselves
+            state = drag;
+            dragging = add;
             return true;
         }
     }
 
     // after current
-    points_.append(dragging);
+    points_.append(add);
     new CreatePointCommand(this, to.x(), to.y(), -1);
+
+    // enter drag mode - edge case as above
+    state = drag;
+    dragging = add;
     return true;
 }
 
@@ -361,7 +378,7 @@ WorkoutWidget::scale(QPoint p)
     return true;
 }
 
-void 
+void
 WorkoutWidget::ergFileSelected(ErgFile *ergFile)
 {
     // reset state and stack
@@ -393,7 +410,157 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
 
         maxY_ *= 1.1f;
     }
+
+    // reset metrics etc
+    recompute();
+
+    // repaint
     repaint();
+}
+
+void
+WorkoutWidget::recompute()
+{
+    //QTime timer;
+    //timer.start();
+
+    int rnum=-1;
+    if (context->athlete->zones(false) == NULL ||
+        (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) {
+
+        // no cp or ftp set
+        parent->TSSlabel->setText("- TSS");
+        parent->IFlabel->setText("- IF");
+
+    }
+
+    // get CP/FTP to use in calculation
+    int CP = context->athlete->zones(false)->getCP(rnum);
+    int FTP = context->athlete->zones(false)->getFTP(rnum);
+    bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist,
+                        context->athlete->zones(false)->useCPforFTPSetting(), 0).toInt() == 0);
+    if (useCPForFTP) FTP=CP;
+
+    // compute the metrics based upon the data...
+    static const int SAMPLERATE=1000;// in ms
+    QVector<int> wattsArray;
+
+    // start from 0s
+    int lastsecs = 0;
+
+    // running time, in seconds
+    int time = 0;
+
+    // aggregating
+    int ssecs = 0;
+    int sjoules=0;
+
+    // resample the erg file into 1s samples
+    foreach(WWPoint *p, points_) {
+
+        // delta in ms
+        int dt = (p->x - lastsecs) * SAMPLERATE;
+        int watts = p->y;
+
+        //
+        // AGGREGATE INTO SAMPLES
+        //
+        while (dt > 0) {
+
+            // we keep track of how much time has been aggregated
+            // into sample, so 'need' is whats left to aggregate
+            // for the full sample
+            int need = SAMPLERATE - ssecs;
+
+            // aggregate
+            if (dt < need) {
+
+                // the entire sample read is less than we need
+                // so aggregate the whole lot and wait fore more
+                // data to be read. If there is no more data then
+                // this will be lost, we don't keep incomplete samples
+                ssecs += dt;
+                sjoules += dt * watts;
+                dt = 0;
+
+            } else {
+
+                // dt is more than we need to fill and entire sample
+                // so lets just take the fraction we need
+                dt -= need;
+
+                // accumulating time and distance
+                time += double(SAMPLERATE) / 1000.0f;
+
+                // averaging sample data
+                sjoules += need * watts;
+                sjoules /= double(SAMPLERATE);
+
+                // add to array
+                wattsArray.append(sjoules);
+
+                // the next sample
+                ssecs = 0;
+                sjoules = 0;
+            }
+        }
+        lastsecs = p->x;
+    }
+
+    //
+    // Now we have an array we can compute metrics from it
+    // we compute locally for speed rather than use the
+    // metric compute functions .. might change this if
+    // it can be done in a performant manner.
+    //
+    // The Workout Window has labels for TSS and IF.
+    double NP=0, TSS=0, IF=0;
+
+    // calculating NP
+    QVector<int> NProlling(30);
+    NProlling.fill(0,30);
+    double NPtotal=0;
+    double NPsum=0;
+    int NPindex=0;
+    int NPcount=0;
+
+    foreach(int watts, wattsArray) {
+
+        //
+        // Normalised Power
+        //
+
+        // sum last 30secs
+        NPsum += watts;
+        NPsum -= NProlling[NPindex];
+        NProlling[NPindex] = watts;
+
+        // running total and count
+        NPtotal += pow(NPsum/30,4); // raise rolling average to 4th power
+        NPcount ++;
+
+        // it moves up and down during the ride
+        if (NPcount > 30) {
+            NP = pow(double(NPtotal) / double(NPcount), 0.25f);
+        }
+
+        // move index on/round
+        NPindex = (NPindex >= 29) ? 0 : NPindex+1;
+    }
+
+    // IF.....
+    IF = double(NP) / double(FTP);
+
+    // TSS.....
+    double normWork = NP * NPcount;
+    double rawTSS = normWork * IF;
+    double workInAnHourAtCP = FTP * 3600;
+    TSS = rawTSS / workInAnHourAtCP * 100.0;
+
+    parent->IFlabel->setText(QString("%1 IF").arg(IF, 0, 'f', 2));
+    parent->TSSlabel->setText(QString("%1 TSS").arg(TSS, 0, 'f', 0));
+
+    //qDebug()<<"RECOMPUTE:"<<timer.elapsed()<<"ms"<<wattsArray.count()<<"samples";
 }
 
 void
@@ -463,7 +630,7 @@ WorkoutWidget::paintEvent(QPaintEvent*)
 
         if (XTICLENGTH) { // we can make the tics disappear
 
-            painter.drawLine(QPoint(x, bottom().topLeft().y()), 
+            painter.drawLine(QPoint(x, bottom().topLeft().y()),
                              QPoint(x, bottom().topLeft().y()+XTICLENGTH));
         }
 
@@ -471,7 +638,7 @@ WorkoutWidget::paintEvent(QPaintEvent*)
         QString label = time_to_string(i);
         QRect bound = fontMetrics.boundingRect(label);
         painter.drawText(QPoint(x - (bound.width() / 2),
-                                bottom().topLeft().y()+fontMetrics.ascent()+XTICLENGTH+(XTICLENGTH ? SPACING : 0)), 
+                                bottom().topLeft().y()+fontMetrics.ascent()+XTICLENGTH+(XTICLENGTH ? SPACING : 0)),
                                 label);
 
     }
@@ -620,7 +787,8 @@ WorkoutWidgetCommand::WorkoutWidgetCommand(WorkoutWidget *w) : workoutWidget_(w)
 }
 
 // add to the stack, don't execute since it was already executed
-// and this is a memento to enable undo / redo
+// and this is a memento to enable undo / redo - its a trigger
+// to recompute metrics though since the model has been changed
 void
 WorkoutWidget::addCommand(WorkoutWidgetCommand *cmd)
 {
@@ -660,6 +828,10 @@ WorkoutWidget::redo()
     if (stackptr > 0) parent->undoAct->setEnabled(true);
     if (stackptr >= stack.count()) parent->redoAct->setEnabled(false);
 
+    // recompute metrics
+    recompute();
+
+    // update
     update();
 }
 
@@ -677,5 +849,9 @@ WorkoutWidget::undo()
     if (stackptr <= 0) parent->undoAct->setEnabled(false);
     if (stackptr < stack.count()) parent->redoAct->setEnabled(true);
 
+    // recompute metrics
+    recompute();
+
+    // update
     update();
 }

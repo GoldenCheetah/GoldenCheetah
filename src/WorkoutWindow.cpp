@@ -96,6 +96,12 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     ylabel = new QLabel("150w");
     toolbar->addWidget(ylabel);
 
+    IFlabel = new QLabel("0 IF");
+    toolbar->addWidget(IFlabel);
+
+    TSSlabel = new QLabel("0 TSS");
+    toolbar->addWidget(TSSlabel);
+
 #if 0 // not yet!
     // get updates..
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
@@ -120,6 +126,10 @@ WorkoutWindow::configChanged(qint32)
     QFontMetrics fm(workout->bigFont);
     xlabel->setFont(workout->bigFont);
     ylabel->setFont(workout->bigFont);
+    IFlabel->setFont(workout->bigFont);
+    TSSlabel->setFont(workout->bigFont);
+    IFlabel->setFixedWidth(fm.boundingRect(" 0.85 IF ").width());
+    TSSlabel->setFixedWidth(fm.boundingRect(" 100 TSS ").width());
     xlabel->setFixedWidth(fm.boundingRect(" 00:00:00 ").width());
     ylabel->setFixedWidth(fm.boundingRect(" 1000w ").width());
 
@@ -127,6 +137,8 @@ WorkoutWindow::configChanged(qint32)
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
     xlabel->setStyleSheet("color: darkGray;");
     ylabel->setStyleSheet("color: darkGray;");
+    TSSlabel->setStyleSheet("color: darkGray;");
+    IFlabel->setStyleSheet("color: darkGray;");
     repaint();
 }
 
