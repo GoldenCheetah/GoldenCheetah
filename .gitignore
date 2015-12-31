@@ -4,7 +4,9 @@ Makefile
 *.so.*
 *.so
 *.a
-
+*~
+*.orig
+*.rej
 # old skool
 .svn
 *.pri
