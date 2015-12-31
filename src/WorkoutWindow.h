@@ -49,6 +49,8 @@ class WorkoutWindow : public GcWindow
 
         // workout widget updates these
         QLabel *xlabel, *ylabel;
+        QLabel *TSSlabel, *IFlabel;
+
         QAction *saveAct, *undoAct, *redoAct,
                 *drawAct, *selectAct;
 

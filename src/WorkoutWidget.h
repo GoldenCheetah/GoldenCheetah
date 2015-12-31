@@ -130,6 +130,9 @@ class WorkoutWidget : public QWidget
         // and erg file was selected
         void ergFileSelected(ErgFile *);
 
+        // recompute metrics etc
+        void recompute();
+
         // trap signals
         void configChanged(qint32);
 
