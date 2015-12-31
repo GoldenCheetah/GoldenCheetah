@@ -606,24 +606,6 @@ public slots:
     }
 };
 
-// SEE QT-BUG #14831 - when it is fixed this can be removed
-class BUGFIXQSortFilterProxyModel : public QSortFilterProxyModel
-{
-
-    public:
-
-    BUGFIXQSortFilterProxyModel(QWidget *p) : QSortFilterProxyModel(p) {}
-
-    bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
-        QVariant l = (left.model() ? left.model()->data(left, sortRole()) : QVariant());
-        QVariant r = (right.model() ? right.model()->data(right, sortRole()) : QVariant());
-        switch (l.userType()) {
-            case QVariant::Invalid: return (r.type() == QVariant::Invalid);
-            default: return QSortFilterProxyModel::lessThan(left, right);
-        }
-        return false;
-    }
-};
 
 class SearchFilter : public QSortFilterProxyModel
 {

@@ -40,7 +40,7 @@ class SearchFilter;
 class SearchFilterBox;
 class DiaryWindow;
 class DiarySidebar;
-class BUGFIXQSortFilterProxyModel;
+class QSortFilterProxyModel;
 class DataFilter;
 class GcMiniCalendar;
 class SearchBox;
@@ -161,7 +161,7 @@ class RideNavigator : public GcWindow
 
     protected:
         GroupByModel *groupByModel; // for group by
-        BUGFIXQSortFilterProxyModel *sortModel; // for sort/filter
+        QSortFilterProxyModel *sortModel; // for sort/filter
 
         // keep track of the headers
         QList<QString> logicalHeadings;
