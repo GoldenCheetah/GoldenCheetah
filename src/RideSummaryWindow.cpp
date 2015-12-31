@@ -876,48 +876,61 @@ RideSummaryWindow::htmlSummary()
 
     }
 
-    //
-    // Time In Pace Zones for Running and Swimming
-    //
     int numzones = 0;
     int range = -1;
+    int nActivities, nRides, nRuns, nSwims;
+    context->athlete->rideCache->getRideTypeCounts(specification, nActivities, nRides, nRuns, nSwims);
 
-    if (ridesummary && rideItem && (rideItem->isRun || rideItem->isSwim)) {
+    //
+    // Time In Pace Zones for Running and Swimming activities
+    // or summarising date range with homogeneous activities
+    //
+    if ((ridesummary && rideItem && (rideItem->isRun || rideItem->isSwim)) ||
+        (!ridesummary && ((nActivities==nRuns) || (nActivities==nSwims)))) {
 
-        if (context->athlete->paceZones(rideItem->isSwim)) {
+        if (ridesummary && rideItem && context->athlete->paceZones(rideItem->isSwim)) {
 
+            // get zones to use via ride for ridesummary
             range = context->athlete->paceZones(rideItem->isSwim)->whichRange(rideItem->dateTime.date());
             if (range > -1) {
-
                 numzones = context->athlete->paceZones(rideItem->isSwim)->numZones(range);
+            }
 
-                if (numzones > 0) {
+            // or for end of daterange plotted for daterange summary with
+        // homogeneous activites, use the corresponding Power Zones
+        } else if (!ridesummary && context->athlete->paceZones(nActivities==nSwims)) {
 
-                    // we have a valid range and it has at least one zone - lets go
-                    QVector<double> time_in_zone(numzones);
-                    for (int i = 0; i < numzones; ++i) {
-
-                        // if using metrics or data
-                        if (ridesummary) time_in_zone[i] = rideItem->getForSymbol(paceTimeInZones[i]);
-                        else { // *** THIS IS NOT RELEVANT YET -- NO SUMMARISING FOR SEASONS ***
-                            time_in_zone[i] = context->athlete->rideCache->getAggregate(paceTimeInZones[i], specification, useMetricUnits, true).toDouble();
-                        }
-                    }
-        
-                    summary += tr("<h3>Pace Zones</h3>");
-                    summary += context->athlete->paceZones(rideItem->isSwim)->summarize(range, time_in_zone, altColor); //aggregating
-                }
+            // get from end if period
+            range = context->athlete->paceZones(nActivities==nSwims)->whichRange(myDateRange.to);
+            if (range > -1) {
+                numzones = context->athlete->paceZones(nActivities==nSwims)->numZones(range);
             }
         }
 
+        if (range > -1 && numzones > 0) {
+
+            // we have a valid range and it has at least one zone - lets go
+            QVector<double> time_in_zone(numzones);
+            for (int i = 0; i < numzones; ++i) {
+
+                // if using metrics or data
+                if (ridesummary) {
+                    time_in_zone[i] = rideItem->getForSymbol(paceTimeInZones[i]);
+                } else {
+                    time_in_zone[i] = context->athlete->rideCache->getAggregate(paceTimeInZones[i], specification, useMetricUnits, true).toDouble();
+                }
+            }
+
+            summary += tr("<h3>Pace Zones</h3>");
+            if (ridesummary) summary += context->athlete->paceZones(rideItem->isSwim)->summarize(range, time_in_zone, altColor); //aggregating
+            else summary += context->athlete->paceZones(nActivities==nSwims)->summarize(range, time_in_zone, altColor); //aggregating  for date range
+        }
     }
 
     //
     // Time In Power Zones, when there is power data for a ride,
     // or summarising date range with homogeneous activities
     //
-    int nActivities, nRides, nRuns, nSwims;
-    context->athlete->rideCache->getRideTypeCounts(specification, nActivities, nRides, nRuns, nSwims);
     if ((ridesummary && rideItem && rideItem->present.contains("P")) ||
         (!ridesummary && ((nActivities==nRides) || (nActivities==nRuns)))) {
 
