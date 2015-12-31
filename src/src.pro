@@ -70,11 +70,19 @@ DEFINES += GC_HAVE_SOAP
 # to make sure we are toolchain neutral we NEVER refer to a lib
 # via file extensions .lib or .a in src.pro unless the section is
 # platform specific. Instead we use directives -Ldir and -llib
-CONFIG(release, debug|release){
-LIBS += -L../qwt/lib -lqwt
-}
-CONFIG(debug, debug|release) {
-LIBS += -L../qwt/lib -lqwtd
+win32 {
+
+    #QWT is configured to build 2 libs (release/debug) on win32 (see qwtbuild.pri)
+    CONFIG(release, debug|release){
+    LIBS += -L../qwt/lib -lqwt
+    }
+    CONFIG(debug, debug|release) {
+    LIBS += -L../qwt/lib -lqwtd
+    }
+
+} else {
+    #QWT is configured to build 1 lib for all other OS (see qwtbuild.pri)
+    LIBS += -L../qwt/lib -lqwt
 }
 
 # compress and math libs must be defined in gcconfig.pri
