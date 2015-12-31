@@ -35,7 +35,7 @@
 #include <QSharedPointer>
 
 #ifndef GOOGLE_DRIVE_DEBUG
-#define GOOGLE_DRIVE_DEBUG true //false
+#define GOOGLE_DRIVE_DEBUG false
 #endif
 #define printd(fmt, args...)                                            \
     do {                                                                \
