@@ -307,8 +307,12 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Preferences_Metrics#summary").arg(tr("Metrics shown in 'Summary'"));
     case Preferences_Metrics_Intervals:
         return text.arg("Preferences_Metrics#intervals").arg(tr("Metrics shown in 'Intervals'"));
-    case Preferences_TrainDevices:
-        return text.arg("Preferences_Train Devices").arg(tr("Train Devices"));
+    case Preferences_Training:
+        return text.arg("Preferences_Training").arg(tr("Training"));
+    case Preferences_Training_RemoteControls:
+        return text.arg("Preferences_Training_Remote Controls").arg(tr("Remote Controls"));
+    case Preferences_Training_TrainDevices:
+        return text.arg("Preferences_Training_Train Devices").arg(tr("Train Devices"));
 
     }
 
