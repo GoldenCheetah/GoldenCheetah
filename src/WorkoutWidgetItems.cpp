@@ -180,3 +180,57 @@ WWLine::paint(QPainter *painter)
         painter->fillPath(path, QBrush(linearGradient));
     }
 }
+
+//
+// COMMANDS
+//
+
+// Create a new point
+CreatePointCommand::CreatePointCommand(WorkoutWidget *w, double x, double y, int index)
+ : WorkoutWidgetCommand(w), x(x), y(y), index(index) { }
+
+// undo create point
+void
+CreatePointCommand::undo()
+{
+    // wipe it from the array
+    WWPoint *p = NULL;
+    if (index >= 0) p = workoutWidget()->points().takeAt(index);
+    else p = workoutWidget()->points().takeAt(workoutWidget()->points().count()-1);
+    delete p;
+}
+
+// do it again
+void
+CreatePointCommand::redo()
+{
+    // create a new WWPoint
+    WWPoint *p = new WWPoint(workoutWidget(), x,y, false);
+
+    // -1 means append
+    if (index < 0)
+        workoutWidget()->points().append(p);
+    else
+        workoutWidget()->points().insert(index, p);
+}
+
+MovePointCommand::MovePointCommand(WorkoutWidget *w, QPointF before, QPointF after, int index)
+ : WorkoutWidgetCommand(w), before(before), after(after), index(index) { }
+
+void
+MovePointCommand::undo()
+{
+    WWPoint *p = workoutWidget()->points()[index];
+
+    p->x = before.x();
+    p->y = before.y();
+}
+
+void
+MovePointCommand::redo()
+{
+    WWPoint *p = workoutWidget()->points()[index];
+
+    p->x = after.x();
+    p->y = after.y();
+}

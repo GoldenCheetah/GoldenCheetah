@@ -48,7 +48,7 @@ static const int SPACING = 2; // between labels and tics (if there are tics)
 static bool GRIDLINES = true;
 
 WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
-    QWidget(parent),  ergFile(NULL), state(none), dragging(NULL), parent(parent), context(context)
+    QWidget(parent),  ergFile(NULL), state(none), dragging(NULL), parent(parent), context(context), stackptr(0)
 {
     maxX_=3600;
     maxY_=300;
@@ -73,8 +73,6 @@ WorkoutWidget::timeout()
 bool
 WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 {
-    // where were we when we did Create ?
-    static QPoint onCreate;
 
     // process as normal if not one of ours
     if (obj != this) return false;
@@ -165,6 +163,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
                 if (point->bounding().contains(p)) {
                         updateNeeded=true;
                         dragging = point;
+                        onDrag = QPointF(dragging->x, dragging->y);
                         state = drag;
                         break;
                 }
@@ -189,6 +188,15 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     // 3. MOUSE RELEASED
     //
     if (event->type() == QEvent::MouseButtonRelease) {
+
+        if (state == drag && dragging) {
+
+            // create command to reflect the drag, but only
+            // if it actually moved!
+            if (dragging->x != onDrag.x() || dragging->y != onDrag.y())
+                new MovePointCommand(this, onDrag, QPointF(dragging->x, dragging->y), points_.indexOf(dragging));
+        }
+
         state = none;
         dragging = NULL;
         updateNeeded = true;
@@ -291,25 +299,35 @@ WorkoutWidget::createPoint(QPoint p)
     dragging = new WWPoint(this, to.x(), to.y(), false);
     state = drag;
 
+    onDrag = QPointF(dragging->x, dragging->y); // yuk, this should be done in the FSM (eventFilter)
+                                                // action at a distance ... yuk XXX TIDY THIS XXX
     // add into the points
     for(int i=0; i<points_.count(); i++) {
         if (points_[i]->x > to.x()) {
             points_.insert(i, dragging);
+            new CreatePointCommand(this, to.x(), to.y(), i);
             return true;
         }
     }
 
     // after current
     points_.append(dragging);
+    new CreatePointCommand(this, to.x(), to.y(), -1);
     return true;
 }
 
 void 
 WorkoutWidget::ergFileSelected(ErgFile *ergFile)
 {
-    // reset state
+    // reset state and stack
     state = none;
     dragging = NULL;
+    foreach (WorkoutWidgetCommand *p, stack) delete p;
+    stack.clear();
+    stackptr = 0;
+    parent->undoAct->setEnabled(false);
+    parent->redoAct->setEnabled(false);
+    //XXX consider refactoring this !!! XXX
 
     // wipe out points
     foreach(WWPoint *point, points_) delete point;
@@ -548,4 +566,71 @@ WorkoutWidget::reverseTransform(int x, int y)
     double xratio = double(c.width()) / (maxX()-minX());
 
     return QPoint((x-c.x()) / xratio, (c.bottomLeft().y() - y) / yratio);
+}
+
+WorkoutWidgetCommand::WorkoutWidgetCommand(WorkoutWidget *w) : workoutWidget_(w)
+{
+    // add us
+    w->addCommand(this);
+}
+
+// add to the stack, don't execute since it was already executed
+// and this is a memento to enable undo / redo
+void
+WorkoutWidget::addCommand(WorkoutWidgetCommand *cmd)
+{
+    // stop dragging
+    dragging = NULL;
+    state = none;
+
+    // truncate if needed
+    if (stack.count()) {
+        // wipe away commands we can no longer redo
+        while (stack.count() > stackptr) {
+            WorkoutWidgetCommand *p = stack.takeAt(stackptr);
+            delete p;
+        }
+    }
+
+    // add to stack
+    stack.append(cmd);
+    stackptr++;
+
+    // set undo enabled, redo disabled
+    parent->undoAct->setEnabled(true);
+    parent->redoAct->setEnabled(false);
+}
+
+void
+WorkoutWidget::redo()
+{
+    // stop dragging
+    dragging = NULL;
+    state = none;
+
+    // redo if we can
+    if (stackptr >= 0 && stackptr < stack.count()) stack[stackptr++]->redo();
+
+    // disable/enable buttons
+    if (stackptr > 0) parent->undoAct->setEnabled(true);
+    if (stackptr >= stack.count()) parent->redoAct->setEnabled(false);
+
+    update();
+}
+
+void
+WorkoutWidget::undo()
+{
+    // stop dragging
+    dragging = NULL;
+    state = none;
+
+    // run it
+    if (stackptr > 0) stack[--stackptr]->undo();
+
+    // disable/enable button
+    if (stackptr <= 0) parent->undoAct->setEnabled(false);
+    if (stackptr < stack.count()) parent->redoAct->setEnabled(true);
+
+    update();
 }
