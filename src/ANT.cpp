@@ -826,7 +826,7 @@ ANT::slotStartBroadcastTimer(int channel) // timer
     antChannel[channel]->channelTimer->setInterval(250); //ms
     antChannel[channel]->channelTimer->start();
 
-    qDebug()<<channel<<"timer id:" << antChannel[channel]->channelTimer->timerId();
+    //qDebug()<<channel<<"timer id:" << antChannel[channel]->channelTimer->timerId();
 }
 
 void
