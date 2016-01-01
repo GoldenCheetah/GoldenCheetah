@@ -89,7 +89,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     bool updateNeeded=false;
 
     //
-    // STATE MACHINE [no selection mode and no undo/redo yet]
+    // STATE MACHINE [no edit mode or selection mode yet]
     //
     //   EVENT              STATE       ACTION                  NEXT STATE
     //   --------------     ------      ---------------         ----------
@@ -453,70 +453,27 @@ WorkoutWidget::recompute()
     if (useCPForFTP) FTP=CP;
 
     // compute the metrics based upon the data...
-    static const int SAMPLERATE=1000;// in ms
     QVector<int> wattsArray;
 
-    // start from 0s
-    int lastsecs = 0;
-
-    // running time, in seconds
-    int time = 0;
-
-    // aggregating
-    int ssecs = 0;
-    int sjoules=0;
+    // running time and watts for interpolating
+    int ctime = 0;
+    double cwatts = 0;
 
     // resample the erg file into 1s samples
     foreach(WWPoint *p, points_) {
 
-        // delta in ms
-        int dt = (p->x - lastsecs) * SAMPLERATE;
-        int watts = p->y;
+        // ramprate per second
+        double ramp = double(p->y - cwatts) / double(p->x - ctime);
 
-        //
-        // AGGREGATE INTO SAMPLES
-        //
-        while (dt > 0) {
-
-            // we keep track of how much time has been aggregated
-            // into sample, so 'need' is whats left to aggregate
-            // for the full sample
-            int need = SAMPLERATE - ssecs;
-
-            // aggregate
-            if (dt < need) {
-
-                // the entire sample read is less than we need
-                // so aggregate the whole lot and wait fore more
-                // data to be read. If there is no more data then
-                // this will be lost, we don't keep incomplete samples
-                ssecs += dt;
-                sjoules += dt * watts;
-                dt = 0;
-
-            } else {
-
-                // dt is more than we need to fill and entire sample
-                // so lets just take the fraction we need
-                dt -= need;
-
-                // accumulating time and distance
-                time += double(SAMPLERATE) / 1000.0f;
-
-                // averaging sample data
-                sjoules += need * watts;
-                sjoules /= double(SAMPLERATE);
-
-                // add to array
-                wattsArray.append(sjoules);
-
-                // the next sample
-                ssecs = 0;
-                sjoules = 0;
-            }
+        while (ctime < p->x) {
+            cwatts += ramp;
+            ctime++;
+            wattsArray << int(cwatts);
         }
-        lastsecs = p->x;
+
+        cwatts = p->y;
     }
+
 
     //
     // COMPUTE KEY METRICS TSS/IF
