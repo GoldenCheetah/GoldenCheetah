@@ -137,8 +137,10 @@ WorkoutWindow::configChanged(qint32)
     xlabel->setFixedWidth(fm.boundingRect(" 00:00:00 ").width());
     ylabel->setFixedWidth(fm.boundingRect(" 1000w ").width());
 
-    toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ").arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+    toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ")
+                           .arg(GColor(CTRAINPLOTBACKGROUND).name())
+                           .arg(GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)).name()));
+
     xlabel->setStyleSheet("color: darkGray;");
     ylabel->setStyleSheet("color: darkGray;");
     TSSlabel->setStyleSheet("color: darkGray;");
