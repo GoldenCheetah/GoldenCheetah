@@ -20,6 +20,9 @@
 #include "RideMetric.h"
 #include "BestIntervalDialog.h"
 #include "RideItem.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "Specification.h"
 #include "Settings.h"
 #include "Units.h"
 #include <cmath>
@@ -51,19 +54,21 @@ class PeakPace : public RideMetric {
         return time_to_string(value(metric)*60);
     }
     void setSecs(double secs) { this->secs=secs; }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        if (ride->isRun() && !ride->dataPoints().isEmpty()) {
-            QList<BestIntervalDialog::BestInterval> results;
-            BestIntervalDialog::findBestsKPH(ride, secs, 1, results);
-            if (results.count() > 0 && results.first().avg > 0 && results.first().avg < 36) pace = 60.0 / results.first().avg;
-            else pace = 0.0;
-        } else {
-            pace = 0.0;
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->isRun) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        QList<BestIntervalDialog::BestInterval> results;
+        BestIntervalDialog::findBestsKPH(item->ride(), spec, secs, 1, results);
+        if (results.count() > 0 && results.first().avg > 0 && results.first().avg < 36) pace = 60.0 / results.first().avg;
+        else pace = 0.0;
+
         setValue(pace);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
@@ -362,19 +367,20 @@ class PeakPaceSwim : public RideMetric {
         return time_to_string(value(metric)*60);
     }
     void setSecs(double secs) { this->secs=secs; }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        if (ride->isSwim() && !ride->dataPoints().isEmpty()) {
-            QList<BestIntervalDialog::BestInterval> results;
-            BestIntervalDialog::findBestsKPH(ride, secs, 1, results);
-            if (results.count() > 0 && results.first().avg > 0 && results.first().avg < 9) pace = 6.0 / results.first().avg;
-            else pace = 0.0;
-        } else {
-            pace = 0.0;
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->isSwim) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        QList<BestIntervalDialog::BestInterval> results;
+        BestIntervalDialog::findBestsKPH(item->ride(), spec, secs, 1, results);
+        if (results.count() > 0 && results.first().avg > 0 && results.first().avg < 9) pace = 6.0 / results.first().avg;
+        else pace = 0.0;
         setValue(pace);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }

@@ -43,8 +43,10 @@ VideoWindow::VideoWindow(Context *context)  :
     //
     // USE VLC VIDEOPLAYER
     //
+#ifndef Q_CC_MSVC
 #if QT_VERSION >= 0x050000
 #warning "WARNING: Please ensure the VLC QT4 plugin (gui/libqt4_plugin) is NOT available as it will cause GC to crash."
+#endif
 #endif
 
     // config parameters to libvlc

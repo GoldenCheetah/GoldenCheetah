@@ -25,9 +25,13 @@
 #include "Tab.h"
 #include "RideNavigator.h"
 #include "HelpWhatsThis.h"
+
+#if GC_HAS_CLOUD_DB
+#include "ChartExchange.h"
+#endif
+
 #include <QApplication>
 #include <QtGui>
-
 
 // charts.xml support
 #include "LTMChartParser.h"
@@ -59,6 +63,9 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     mainLayout->setSpacing(0);
     setContentsMargins(0,0,0,0);
 
+    //----------------------------------------------------------------------------------------------------------
+    // Basic Settings (First TAB)
+    //----------------------------------------------------------------------------------------------------------
     basicsettings = new QWidget(this);
     HelpWhatsThis *basicHelp = new HelpWhatsThis(basicsettings);
     basicsettings->setWhatsThis(basicHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Basic));
@@ -73,22 +80,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
     basicsettingsLayout->addRow(new QLabel(tr("Filter")), searchBox);
     basicsettingsLayout->addRow(new QLabel(tr(""))); // spacing
-
-    // Basic Controls
-    basic = new QWidget(this);
-
-    basic->setContentsMargins(0,0,0,0);
-    HelpWhatsThis *presetHelp = new HelpWhatsThis(basic);
-    basic->setWhatsThis(presetHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Preset));
-    QVBoxLayout *basicLayout = new QVBoxLayout(basic);
-    basicLayout->setContentsMargins(0,0,0,0);
-    basicLayout->setSpacing(5);
-
-    QLabel *presetLabel = new QLabel(tr("Chart"));
-    QFont sameFont = presetLabel->font();
-#ifdef Q_OS_MAC // possibly needed on others too
-    sameFont.setPointSize(sameFont.pointSize() + 2);
-#endif
 
     dateSetting = new DateSettingsEdit(this);
     HelpWhatsThis *dateSettingHelp = new HelpWhatsThis(dateSetting);
@@ -138,9 +129,18 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     basicsettingsLayout->addRow(new QLabel(""), new QLabel());
     basicsettingsLayout->addRow(new QLabel(""), usePreset);
 
-    // controls
-    QGridLayout *presetLayout = new QGridLayout;
-    basicLayout->addLayout(presetLayout);
+    //----------------------------------------------------------------------------------------------------------
+    // Preset List (2nd TAB)
+    //----------------------------------------------------------------------------------------------------------
+
+    presets = new QWidget(this);
+
+    presets->setContentsMargins(20,20,20,20);
+    HelpWhatsThis *presetHelp = new HelpWhatsThis(presets);
+    presets->setWhatsThis(presetHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Preset));
+    QVBoxLayout *presetLayout = new QVBoxLayout(presets);
+    presetLayout->setContentsMargins(0,0,0,0);
+    presetLayout->setSpacing(5);
 
     charts = new QTreeWidget;
 #ifdef Q_OS_MAC
@@ -152,26 +152,32 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     charts->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     charts->setIndentation(0);
 
-    applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp (weird!?)
-    newButton = new QPushButton(tr("Add Current")); // connected in LTMWindow.cpp
-    connect(newButton, SIGNAL(clicked()), this, SLOT(addCurrent()));
-
-    QHBoxLayout *buttons = new QHBoxLayout;
-    buttons->addWidget(applyButton);
-    buttons->addStretch();
-    buttons->addWidget(newButton);
-    basicLayout->addLayout(buttons);
-
     presetLayout->addWidget(charts, 0,0);
 
-    // connect up slots
-    tabs = new QTabWidget(this);
-    mainLayout->addWidget(tabs);
-    tabs->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp (weird!?)
+    newButton = new QPushButton(tr("Add Current"));
+    connect(newButton, SIGNAL(clicked()), this, SLOT(addCurrent()));
+#ifdef GC_HAS_CLOUD_DB
+    sharedChartsDialogButton = new QPushButton(tr("Shared Charts"));
+    connect(sharedChartsDialogButton, SIGNAL(clicked()), this, SLOT(sharedChartsDialog()));
+#endif
+    QHBoxLayout *presetButtons = new QHBoxLayout;
+    presetButtons->addWidget(applyButton);
+    presetButtons->addStretch();
+#ifdef GC_HAS_CLOUD_DB
+    presetButtons->addWidget(sharedChartsDialogButton);
+    presetButtons->addStretch();
+#endif
+    presetButtons->addWidget(newButton);
 
-    basic->setContentsMargins(20,20,20,20);
+    presetLayout->addLayout(presetButtons);
 
-    // initialise the metrics catalogue and user selector
+
+
+    //----------------------------------------------------------------------------------------------------------
+    // initialise the metrics catalogue and user selector (for Custom Curves - 4th TAB)
+    //----------------------------------------------------------------------------------------------------------
+
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i = 0; i < factory.metricCount(); ++i) {
 
@@ -237,7 +243,10 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     // sort the list
     qSort(metrics);
 
-    // custom widget
+    //----------------------------------------------------------------------------------------------------------
+    // Custom Curves (4th TAB)
+    //----------------------------------------------------------------------------------------------------------
+
     custom = new QWidget(this);
     custom->setContentsMargins(20,20,20,20);
     HelpWhatsThis *curvesHelp = new HelpWhatsThis(custom);
@@ -299,8 +308,16 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     customButtons->addWidget(deleteCustomButton);
     customLayout->addLayout(customButtons);
 
+    //----------------------------------------------------------------------------------------------------------
+    // setup the Tabs
+    //----------------------------------------------------------------------------------------------------------
+
+    tabs = new QTabWidget(this);
+    mainLayout->addWidget(tabs);
+    tabs->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     tabs->addTab(basicsettings, tr("Basic"));
-    tabs->addTab(basic, tr("Preset"));
+    tabs->addTab(presets, tr("Preset"));
     tabs->addTab(custom, tr("Curves"));
 
     // switched between one or other
@@ -1009,6 +1026,51 @@ QList<MetricDetail> LTMTool::providePMmetrics() {
     cogganLTR.uunits = tr("Ramp");
     metrics.append(cogganLTR);
 
+    MetricDetail cogganExpectedCTL;
+    cogganExpectedCTL.type = METRIC_PM;
+    cogganExpectedCTL.symbol = "expected_coggan_ctl";
+    cogganExpectedCTL.metric = NULL; // not a factory metric
+    cogganExpectedCTL.penColor = QColor(Qt::blue);
+    cogganExpectedCTL.curveStyle = QwtPlotCurve::Dots;
+    cogganExpectedCTL.symbolStyle = QwtSymbol::NoSymbol;
+    cogganExpectedCTL.smooth = false;
+    cogganExpectedCTL.trendtype = 0;
+    cogganExpectedCTL.topN = 1;
+    cogganExpectedCTL.uname = cogganExpectedCTL.name = tr("Coggan Expected Chronic Training Load");
+    cogganExpectedCTL.units = "CTL";
+    cogganExpectedCTL.uunits = "CTL";
+    metrics.append(cogganExpectedCTL);
+
+    MetricDetail cogganExpectedATL;
+    cogganExpectedATL.type = METRIC_PM;
+    cogganExpectedATL.symbol = "expected_coggan_atl";
+    cogganExpectedATL.metric = NULL; // not a factory metric
+    cogganExpectedATL.penColor = QColor(Qt::magenta);
+    cogganExpectedATL.curveStyle = QwtPlotCurve::Dots;
+    cogganExpectedATL.symbolStyle = QwtSymbol::NoSymbol;
+    cogganExpectedATL.smooth = false;
+    cogganExpectedATL.trendtype = 0;
+    cogganExpectedATL.topN = 1;
+    cogganExpectedATL.uname = cogganExpectedATL.name = tr("Coggan Expected Acute Training Load");
+    cogganExpectedATL.units = "ATL";
+    cogganExpectedATL.uunits = "ATL";
+    metrics.append(cogganExpectedATL);
+
+    MetricDetail cogganExpectedTSB;
+    cogganExpectedTSB.type = METRIC_PM;
+    cogganExpectedTSB.symbol = "expected_coggan_tsb";
+    cogganExpectedTSB.metric = NULL; // not a factory metric
+    cogganExpectedTSB.penColor = QColor(Qt::yellow);
+    cogganExpectedTSB.curveStyle = QwtPlotCurve::Dots;
+    cogganExpectedTSB.symbolStyle = QwtSymbol::NoSymbol;
+    cogganExpectedTSB.smooth = false;
+    cogganExpectedTSB.trendtype = 0;
+    cogganExpectedTSB.topN = 1;
+    cogganExpectedTSB.uname = cogganExpectedTSB.name = tr("Coggan Expected Training Stress Balance");
+    cogganExpectedTSB.units = "TSB";
+    cogganExpectedTSB.uunits = "TSB";
+    metrics.append(cogganExpectedTSB);
+
     // TRIMP LTS
     MetricDetail trimpLTS;
     trimpLTS.type = METRIC_PM;
@@ -1178,7 +1240,7 @@ LTMTool::hideBasic()
 
         // resize etc
         tabs->updateGeometry();
-        basic->updateGeometry();
+        presets->updateGeometry();
         custom->updateGeometry();
 
         // choose curves tab
@@ -1203,6 +1265,7 @@ LTMTool::usePresetChanged()
     charts->setEnabled(!usePreset->isChecked());
     newButton->setEnabled(!usePreset->isChecked());
     applyButton->setEnabled(!usePreset->isChecked());
+
 }
 
 void
@@ -1221,6 +1284,7 @@ LTMTool::presetsChanged()
     if (context->athlete->presets.count())
         charts->setCurrentItem(charts->invisibleRootItem()->child(0));
 }
+
 
 void
 LTMTool::refreshCustomTable(int indexSelectedItem)
@@ -1434,6 +1498,25 @@ LTMTool::addCurrent()
     // tree will now be refreshed
     context->notifyPresetsChanged();
 }
+
+#ifdef GC_HAS_CLOUD_DB
+void
+LTMTool::sharedChartsDialog()
+{
+    ChartExchangeRetrieveDialog dialog;
+
+    dialog.setModal(true);
+
+    // selected choosen
+    int ret;
+    if ((ret=dialog.exec()) == QDialog::Accepted) {
+        LTMSettings s = dialog.getSelectedSettings();
+        context->athlete->presets.append(s);
+        context->notifyPresetsChanged();
+    }
+}
+#endif
+
 
 // set the estimateSelection based upon what is available
 void 
@@ -1702,7 +1785,6 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     formulaWidget = new QWidget(this);
     //formulaWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QVBoxLayout *formulaLayout = new QVBoxLayout(formulaWidget);
-    formulaLayout->addStretch();
 
     // courier font
     formulaEdit = new DataFilterEdit(this, context);
@@ -1724,7 +1806,6 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     ftype->addWidget(formulaType);
     ftype->addStretch();
     formulaLayout->addLayout(ftype);
-    formulaLayout->addStretch();
 
     // set to the value...
     if (metricDetail->formula == "") {
@@ -1746,7 +1827,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QStringList names = context->tab->rideNavigator()->logicalHeadings;
 
     // start with just a list of functions
-    list = DataFilter::functions();
+    list = DataFilter::builtins();
 
     // ridefile data series symbols
     list += RideFile::symbols();

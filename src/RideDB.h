@@ -37,8 +37,9 @@
 // 1.2      03 May 15  Mark Liversedge         added intervals, samples bool and metric <> 0
 // 1.3      27 Jun 15  Mark Liversedge         rationalised all the discovery intervals
 // 1.4       5 Sep 15  Mark Liversedge         overrides_ in RideItem
+// 1.5      15 Dec 15  Mark Liversedge         zone ranges added as part of metric compute() refactor
 
-#define RIDEDB_VERSION "1.4"
+#define RIDEDB_VERSION "1.5"
 
 class APIWebService;
 class HttpResponse;

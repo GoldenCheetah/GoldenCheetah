@@ -61,10 +61,11 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     searchFilter = new SearchFilter(this);
     searchFilter->setSourceModel(context->athlete->rideCache->model()); // filter out/in search results
 
+
     groupByModel = new GroupByModel(this);
     groupByModel->setSourceModel(searchFilter);
 
-    sortModel = new BUGFIXQSortFilterProxyModel(this);
+    sortModel = new QSortFilterProxyModel(this);
     sortModel->setSourceModel(groupByModel);
     sortModel->setDynamicSortFilter(true);
 
@@ -975,6 +976,10 @@ RideNavigator::setRide(RideItem*rideItem)
 void
 RideNavigator::selectionChanged(QItemSelection selected)
 {
+    if (selected.isEmpty()) {
+        return;
+    }
+
     QModelIndex ref = selected.indexes().first();
     QModelIndex fileIndex = tableView->model()->index(ref.row(), 3, ref.parent());
     QString filename = tableView->model()->data(fileIndex, Qt::DisplayRole).toString();
@@ -1292,8 +1297,8 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     buttons->setSpacing(0);
     buttons->setContentsMargins(0,0,0,0);
 
-    QFont small;
-    small.setPointSize(8);
+    QFont smallFont;
+    smallFont.setPointSize(8);
 
     QList<QString> buttonNames = logicalHeadings;
     qSort(buttonNames.begin(), buttonNames.end(), insensitiveLessThan);
@@ -1309,7 +1314,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
 
         // setup button
         QPushButton *add = new QPushButton(column, this);
-        add->setFont(small);
+        add->setFont(smallFont);
         add->setContentsMargins(0,0,0,0);
         buttons->addWidget(add);
 

@@ -32,6 +32,11 @@
 #include "Units.h" // for MILES_PER_KM
 #include "HelpWhatsThis.h"
 
+#ifdef GC_HAS_CLOUD_DB
+#include "ChartExchange.h"
+#include "GcUpgrade.h"
+#endif
+
 #include <QtGui>
 #include <QString>
 #include <QDebug>
@@ -78,18 +83,18 @@ LTMWindow::LTMWindow(Context *context) :
     spanSlider->setLowerValue(0);
     spanSlider->setUpperValue(15);
 
-    QFont small;
-    small.setPointSize(6);
+    QFont smallFont;
+    smallFont.setPointSize(6);
 
     scrollLeft = new QPushButton("<", this);
-    scrollLeft->setFont(small);
+    scrollLeft->setFont(smallFont);
     scrollLeft->setAutoRepeat(true);
     scrollLeft->setFixedHeight(16);
     scrollLeft->setFixedWidth(16);
     scrollLeft->setContentsMargins(0,0,0,0);
 
     scrollRight = new QPushButton(">", this);
-    scrollRight->setFont(small);
+    scrollRight->setFont(smallFont);
     scrollRight->setAutoRepeat(true);
     scrollRight->setFixedHeight(16);
     scrollRight->setFixedWidth(16);
@@ -213,7 +218,10 @@ LTMWindow::LTMWindow(Context *context) :
     addAction(exportData);
     QAction *exportConfig = new QAction(tr("Export Chart Configuration..."), this);
     addAction(exportConfig);
-
+#ifdef GC_HAS_CLOUD_DB
+    QAction *shareConfig = new QAction(tr("Share Chart Configuration..."), this);
+    addAction(shareConfig);
+#endif
     // the controls
     QWidget *c = new QWidget;
     c->setContentsMargins(0,0,0,0);
@@ -282,6 +290,9 @@ LTMWindow::LTMWindow(Context *context) :
     // custom menu item
     connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
     connect(exportConfig, SIGNAL(triggered()), this, SLOT(exportConfig()));
+#if GC_HAS_CLOUD_DB
+    connect(shareConfig, SIGNAL(triggered()), this, SLOT(shareConfig()));
+#endif
 
     // normal view
     connect(spanSlider, SIGNAL(lowerPositionChanged(int)), this, SLOT(spanSliderChanged()));
@@ -1143,9 +1154,9 @@ LTMWindow::dataTable(bool html)
             else summary += ", %1";
 
             QString name = settings.metrics[i].uname;
-            if (name == "Coggan Acute Training Load" or name == tr("Coggan Acute Training Load")) name = "ATL";
-            if (name == "Coggan Chronic Training Load" or name == tr("Coggan Chronic Training Load")) name = "CTL";
-            if (name == "Coggan Training Stress Balance" or name == tr("Coggan Training Stress Balance")) name = "TSB";
+            if (name == "Coggan Acute Training Load" || name == tr("Coggan Acute Training Load")) name = "ATL";
+            if (name == "Coggan Chronic Training Load" || name == tr("Coggan Chronic Training Load")) name = "CTL";
+            if (name == "Coggan Training Stress Balance" || name == tr("Coggan Training Stress Balance")) name = "TSB";
 
             summary = summary.arg(name);
         }
@@ -1253,6 +1264,48 @@ LTMWindow::exportConfig()
         LTMChartParser::serialize(filename, mine);
     }
 }
+
+#ifdef GC_HAS_CLOUD_DB
+void
+LTMWindow::shareConfig()
+{
+    // collect the config to export
+    QList<LTMSettings> mine;
+    mine << settings;
+    mine[0].title = mine[0].name = title();
+
+    ChartExchangeClient *c = new ChartExchangeClient();
+    ChartAPIv1 chart;
+    chart.Name = title();
+    int version = VERSION_LATEST;
+    chart.GcVersion =  QString::number(version);
+    LTMChartParser::serializeToQString(&chart.ChartXML, mine);
+    chart.ChartVersion = 1;
+    QPixmap picture;
+    menuButton->hide();
+#if QT_VERSION > 0x050000
+     picture = grab(geometry());
+#else
+    picture = QPixmap::grabWidget (this);
+#endif
+    QBuffer buffer(&chart.Image);
+    buffer.open(QIODevice::WriteOnly);
+    picture.save(&buffer, "JPG"); // writes pixmap into bytes in JPG format
+    buffer.close();
+
+    chart.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
+
+    // now asks for the user fields
+    ChartExchangePublishDialog* dialog = new ChartExchangePublishDialog(chart);
+    dialog->setModal(true);
+    int ret;
+    if ((ret=dialog->exec()) == QDialog::Accepted) {
+       chart = dialog->getData();
+       bool ok = c->postChart(chart);
+    }
+}
+#endif
+
 
 void
 LTMWindow::exportData()

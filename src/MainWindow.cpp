@@ -80,6 +80,7 @@
 #include "CalendarDownload.h"
 #if QT_VERSION > 0x050000
 #include "Dropbox.h"
+#include "GoogleDrive.h"
 #endif
 #include "LocalFileStore.h"
 #include "FileStore.h"
@@ -641,6 +642,11 @@ MainWindow::MainWindow(const QDir &home)
     shareMenu->addSeparator ();
     shareMenu->addAction(tr("Upload to &Dropbox"), this, SLOT(uploadDropbox()), tr("Ctrl+R"));
     shareMenu->addAction(tr("Synchronise Dropbox..."), this, SLOT(syncDropbox()), tr("Ctrl+O"));
+    shareMenu->addSeparator ();
+    shareMenu->addAction(tr("Upload to &GoogleDrive"), this,
+                         SLOT(uploadGoogleDrive()), tr(""));
+    shareMenu->addAction(tr("Synchronise GoogleDrive..."), this,
+                         SLOT(syncGoogleDrive()), tr("Ctrl+P"));
 #endif
 #ifdef GC_HAVE_SOAP
     shareMenu->addSeparator ();
@@ -954,7 +960,7 @@ MainWindow::toggleFullScreen()
 #ifdef Q_OS_MAC
     QRect screenSize = desktop->availableGeometry();
     if (screenSize.width() > frameGeometry().width() ||
-        screenSize.height() > frameGeometry().height()) 
+        screenSize.height() > frameGeometry().height())
         showFullScreen();
     else
         showNormal();
@@ -988,7 +994,7 @@ MainWindow::resizeEvent(QResizeEvent*)
            (head->isVisible())) // and it is visible
             head->hide();
 
-        // painting 
+        // painting
         head->updateGeometry();
         repaint();
     }
@@ -1000,7 +1006,7 @@ MainWindow::resizeEvent(QResizeEvent*)
 void
 MainWindow::showOptions()
 {
-    ConfigDialog *cd = new ConfigDialog(currentTab->context->athlete->home->root(), currentTab->context->athlete->zones_, currentTab->context);
+    ConfigDialog *cd = new ConfigDialog(currentTab->context->athlete->home->root(), currentTab->context);
 
     // move to the centre of the screen
     cd->move(geometry().center()-QPoint(cd->geometry().width()/2, cd->geometry().height()/2));
@@ -1474,7 +1480,7 @@ MainWindow::revertRide()
     currentTab->context->ride->ride(); // force re-load
 
     // in case reverted ride has different starttime
-    currentTab->context->ride->setStartTime(currentTab->context->ride->ride()->startTime()); 
+    currentTab->context->ride->setStartTime(currentTab->context->ride->ride()->startTime());
     currentTab->context->ride->ride()->emitReverted();
 
     // and notify everyone we changed which also has the side
@@ -1511,7 +1517,7 @@ MainWindow::deleteRide()
 {
     RideItem *_item = currentTab->context->ride;
 
-    if (_item==NULL) { 
+    if (_item==NULL) {
         QMessageBox::critical(this, tr("Delete Activity"), tr("No activity selected!"));
         return;
     }
@@ -1933,7 +1939,7 @@ MainWindow::exportMetrics()
 {
     // if the refresh process is running, try again when its completed
     if (currentTab->context->athlete->rideCache->isRunning()) {
-        QMessageBox::warning(this, tr("Refresh in Progress"), 
+        QMessageBox::warning(this, tr("Refresh in Progress"),
         "A metric refresh is currently running, please try again once that has completed.");
         return;
     }
@@ -2056,12 +2062,28 @@ MainWindow::uploadDropbox()
 void
 MainWindow::syncDropbox()
 {
-    // upload current ride, if we have one
     Dropbox db(currentTab->context);
     FileStoreSyncDialog upload(currentTab->context, &db);
     upload.exec();
 }
 
+void
+MainWindow::uploadGoogleDrive()
+{
+    // upload current ride, if we have one
+    if (currentTab->context->ride) {
+        GoogleDrive gd(currentTab->context);
+        FileStore::upload(this, &gd, currentTab->context->ride);
+    }
+}
+
+void
+MainWindow::syncGoogleDrive()
+{
+    GoogleDrive gd(currentTab->context);
+    FileStoreSyncDialog upload(currentTab->context, &gd);
+    upload.exec();
+}
 #endif
 
 /*----------------------------------------------------------------------
@@ -2257,4 +2279,3 @@ MainWindow::searchFocusOut()
 {
     searchBox->setFixedWidth(150);
 }
-

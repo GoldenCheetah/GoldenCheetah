@@ -307,7 +307,11 @@ typedef enum {
 typedef struct S710_Driver {
   S710_Driver_Type  type;
   S710_Mode         mode;
+#if Q_CC_MSVC
+  char              path[_MAX_PATH];
+#else
   char              path[PATH_MAX];
+#endif
   void             *data;
 } S710_Driver;
 

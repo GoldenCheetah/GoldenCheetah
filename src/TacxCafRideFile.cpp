@@ -186,7 +186,7 @@ struct RideFilePoint readSinglePoint(const QByteArray& record, const double& tim
     double speed = (relativeDistance - lastDistance) / recordingIntervalInSeconds;
 
     struct RideFilePoint point(timeInSeconds, cadence, heartRate, relativeDistance / 1000.0, speed * 3.6, 0.0, power, 
-                               0.0, 0.0, 0.0, 0.0, 0.0, RideFile::NoTemp,
+                               0.0, 0.0, 0.0, 0.0, 0.0, RideFile::NA,
                                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
 
@@ -211,7 +211,7 @@ bool readRideData(RideFile *rideFile, const QByteArray& block, const int nrOfRec
                               nextDataPoint.kph, nextDataPoint.nm,
                               nextDataPoint.watts, nextDataPoint.alt,
                               nextDataPoint.lon, nextDataPoint.lat,
-                              nextDataPoint.headwind, 0.0, RideFile::NoTemp, 0.0, 
+                              nextDataPoint.headwind, 0.0, RideFile::NA, 0.0, 
                               0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                               0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, nextDataPoint.interval);
     }

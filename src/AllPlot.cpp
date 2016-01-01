@@ -105,7 +105,7 @@ class AllPlotBackground: public QwtPlotItem
 
         if (parent->context->isCompareIntervals) {
 
-            zones = parent->context->athlete->zones();
+            zones = parent->context->athlete->zones(rideItem ? rideItem->isRun : false);
             if (!zones) return;
 
             // use first compare interval date
@@ -116,10 +116,10 @@ class AllPlotBackground: public QwtPlotItem
             if (zone_range == -1)
                 zone_range = zones->whichRange(QDate::currentDate());
 
-        } else if (rideItem && parent->context->athlete->zones()) {
+        } else if (rideItem && parent->context->athlete->zones(rideItem->isRun)) {
 
-            zones = parent->context->athlete->zones();
-            zone_range = parent->context->athlete->zones()->whichRange(rideItem->dateTime.date());
+            zones = parent->context->athlete->zones(rideItem->isRun);
+            zone_range = parent->context->athlete->zones(rideItem->isRun)->whichRange(rideItem->dateTime.date());
 
         } else {
 
@@ -176,7 +176,7 @@ class AllPlotZoneLabel: public QwtPlotItem
 
             if (parent->context->isCompareIntervals) {
 
-                zones = parent->context->athlete->zones();
+                zones = parent->context->athlete->zones(rideItem ? rideItem->isRun : false);
                 if (!zones) return;
 
                 // use first compare interval date
@@ -187,10 +187,10 @@ class AllPlotZoneLabel: public QwtPlotItem
                 if (zone_range == -1)
                     zone_range = zones->whichRange(QDate::currentDate());
 
-            } else if (rideItem && parent->context->athlete->zones()) {
+            } else if (rideItem && parent->context->athlete->zones(rideItem->isRun)) {
 
-                zones = parent->context->athlete->zones();
-                zone_range = parent->context->athlete->zones()->whichRange(rideItem->dateTime.date());
+                zones = parent->context->athlete->zones(rideItem->isRun);
+                zone_range = parent->context->athlete->zones(rideItem->isRun)->whichRange(rideItem->dateTime.date());
 
             } else {
 
@@ -991,9 +991,10 @@ AllPlot::~AllPlot()
     compares.clear();
 
     // wipe the standard stuff
-    delete standard;
     if (tooltip) delete tooltip;
     if (_canvasPicker) delete _canvasPicker;
+    delete standard;
+
 }
 
 void
@@ -1641,13 +1642,13 @@ void AllPlot::refreshZoneLabels()
     }
     zoneLabels.clear();
 
-    if (rideItem && context->athlete->zones()) {
+    if (rideItem && context->athlete->zones(rideItem->isRun)) {
 
-        int zone_range = context->athlete->zones()->whichRange(rideItem->dateTime.date());
+        int zone_range = context->athlete->zones(rideItem->isRun)->whichRange(rideItem->dateTime.date());
 
         // generate labels for existing zones
         if (zone_range >= 0) {
-            int num_zones = context->athlete->zones()->numZones(zone_range);
+            int num_zones = context->athlete->zones(rideItem->isRun)->numZones(zone_range);
             for (int z = 0; z < num_zones; z ++) {
                 AllPlotZoneLabel *label = new AllPlotZoneLabel(this, z);
                 label->attach(this);
@@ -1981,7 +1982,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 if (!objects->windArray.empty()) totalWind   += objects->windArray[i];
                 if (!objects->torqueArray.empty()) totalTorque   += objects->torqueArray[i];
                 if (!objects->tempArray.empty() ) {
-                    if (objects->tempArray[i] == RideFile::NoTemp) {
+                    if (objects->tempArray[i] == RideFile::NA) {
                         dp.temp = (i>0 && !list.empty()?list.back().temp:0.0);
                         totalTemp   += dp.temp;
                     }
@@ -2255,7 +2256,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothDistance.append(context->athlete->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
             objects->smoothAltitude.append(context->athlete->useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
             objects->smoothSlope.append(dp->slope);
-            if (dp->temp == RideFile::NoTemp && !objects->smoothTemp.empty())
+            if (dp->temp == RideFile::NA && !objects->smoothTemp.empty())
                 dp->temp = objects->smoothTemp.last();
             objects->smoothTemp.append(context->athlete->useMetricUnits ? dp->temp : dp->temp * FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE);
             objects->smoothWind.append(context->athlete->useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);

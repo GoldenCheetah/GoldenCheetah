@@ -19,6 +19,9 @@
 #include "RideMetric.h"
 #include "Zones.h"
 #include "RideItem.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "Specification.h"
 #include <cmath>
 #include <QApplication>
 
@@ -33,6 +36,7 @@ class LeftRightBalance : public RideMetric {
         setSymbol("left_right_balance");
         setInternalName("Left/Right Balance");
     }
+
     void initialize() {
         setName(tr("Left/Right Balance"));
         setMetricUnits(tr("%"));
@@ -41,14 +45,20 @@ class LeftRightBalance : public RideMetric {
         setPrecision(1);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         total = count = 0;
 
-        foreach (const RideFilePoint *point, ride->dataPoints())  {
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (point->cad && point->lrbalance > 0.0f) {
                 total += point->lrbalance;
                 ++count;

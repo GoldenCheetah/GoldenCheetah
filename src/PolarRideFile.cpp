@@ -318,7 +318,7 @@ this differently
 		      igpx += 1;
 		  }
 		
-		rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, lon, lat, 0.0, 0.0, RideFile::NoTemp, lrbalance, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
+		rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, lon, lat, 0.0, 0.0, RideFile::NA, lrbalance, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
 		// fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
 		if (recInterval==238){
 		  seconds += hrm / 1000.0;

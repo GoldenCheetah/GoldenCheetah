@@ -103,7 +103,7 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     QStringList names = context->tab->rideNavigator()->logicalHeadings;
 
     // start with just a list of functions
-    list = DataFilter::functions();
+    list = DataFilter::builtins();
 
     // ridefile data series symbols
     list += RideFile::symbols();
@@ -143,6 +143,8 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     list << "best(xpower, 3600)";
     list << "best(vam, 3600)";
     list << "best(wpk, 3600)";
+    list << "RECINTSECS";
+    list << "NA";
 
     qSort(names.begin(), names.end(), insensitiveLessThan);
 

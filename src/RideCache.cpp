@@ -36,24 +36,79 @@
 #include "unistd.h"
 #endif
 
+// we initialise the global user metrics
+#include "RideMetric.h"
+#include "UserMetricSettings.h"
+#include "UserMetricParser.h"
+#include <QXmlInputSource>
+#include <QXmlSimpleReader>
+
 // for sorting
 bool rideCacheGreaterThan(const RideItem *a, const RideItem *b) { return a->dateTime > b->dateTime; }
 bool rideCacheLessThan(const RideItem *a, const RideItem *b) { return a->dateTime < b->dateTime; }
 
 RideCache::RideCache(Context *context) : context(context)
 {
+    directory = context->athlete->home->activities();
+    plannedDirectory = context->athlete->home->planned();
+
     progress_ = 100;
     exiting = false;
+
+    // initial load of user defined metrics - do once we have an initial context
+    // but before we refresh or check metrics for the first time
+    if (UserMetricSchemaVersion == 0) {
+
+        QString metrics = QString("%1/../usermetrics.xml").arg(context->athlete->home->root().absolutePath());
+        if (QFile(metrics).exists()) {
+
+            QFile metricfile(metrics);
+            QXmlInputSource source(&metricfile);
+            QXmlSimpleReader xmlReader;
+            UserMetricParser handler;
+
+            xmlReader.setContentHandler(&handler);
+            xmlReader.setErrorHandler(&handler);
+
+            // parse and get return values
+            xmlReader.parse(source);
+            _userMetrics = handler.getSettings();
+
+            // reset schema version
+            UserMetricSchemaVersion = RideMetric::userMetricFingerprint(_userMetrics);
+
+            // now add initial metrics
+            foreach(UserMetricSettings m, _userMetrics) {
+                RideMetricFactory::instance().addMetric(UserMetric(context, m));
+            }
+        }
+    }
 
     // set the list
     // populate ride list
     RideItem *last = NULL;
-    QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home->activities()));
+    QStringListIterator i(RideFileFactory::instance().listRideFiles(directory));
     while (i.hasNext()) {
         QString name = i.next();
         QDateTime dt;
         if (RideFile::parseRideFileName(name, &dt)) {
-            last = new RideItem(context->athlete->home->activities().canonicalPath(), name, dt, context);
+            last = new RideItem(directory.canonicalPath(), name, dt, context, false);
+
+            connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
+            connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
+
+            rides_ << last;
+        }
+    }
+
+    // set the list
+    // populate the planned ride list
+    QStringListIterator j(RideFileFactory::instance().listRideFiles(plannedDirectory));
+    while (j.hasNext()) {
+        QString name = j.next();
+        QDateTime dt;
+        if (RideFile::parseRideFileName(name, &dt)) {
+            last = new RideItem(plannedDirectory.canonicalPath(), name, dt, context, true);
 
             connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
             connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
@@ -118,21 +173,13 @@ RideCache::configChanged(qint32 what)
     // if metadata changed then recompute diary text
     if (what & CONFIG_FIELDS) {
         foreach(RideItem *item, rides()) {
-
-            // Construct the summary text used on the calendar
-            QString calendarText;
-
-            foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) 
-                if (field.diary == true) 
-                    calendarText += field.calendarText(item->metadata_.value(field.name, ""));
-
-            item->metadata_.insert("Calendar Text", calendarText);
+            item->metadata_.insert("Calendar Text", context->athlete->rideMetadata()->calendarText(item));
         }
     }
 
     // if zones or weight has changed refresh metrics
     // will add more as they come
-    qint32 want = CONFIG_ATHLETE | CONFIG_ZONES | CONFIG_NOTECOLOR | CONFIG_DISCOVERY | CONFIG_GENERAL;
+    qint32 want = CONFIG_ATHLETE | CONFIG_ZONES | CONFIG_NOTECOLOR | CONFIG_DISCOVERY | CONFIG_GENERAL | CONFIG_USERMETRICS;
     if (what & want) {
 
         // restart !
@@ -162,7 +209,7 @@ RideCache::itemChanged()
 
 // add a new ride
 void
-RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
+RideCache::addRide(QString name, bool dosignal, bool useTempActivities, bool planned)
 {
     RideItem *prior = context->ride;
 
@@ -173,9 +220,11 @@ RideCache::addRide(QString name, bool dosignal, bool useTempActivities)
     // new ride item
     RideItem *last;
     if (useTempActivities)
-       last = new RideItem(context->athlete->home->tmpActivities().canonicalPath(), name, dt, context);
+       last = new RideItem(context->athlete->home->tmpActivities().canonicalPath(), name, dt, context, false);
+    else if (planned)
+       last = new RideItem(plannedDirectory.canonicalPath(), name, dt, context, planned);
     else
-       last = new RideItem(context->athlete->home->activities().canonicalPath(), name, dt, context);
+       last = new RideItem(directory.canonicalPath(), name, dt, context, planned);
 
     connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
     connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
@@ -258,7 +307,7 @@ RideCache::removeCurrentRide()
     // delete the file by renaming it
     QString strOldFileName = context->ride->fileName;
 
-    QFile file(context->athlete->home->activities().canonicalPath() + "/" + strOldFileName);
+    QFile file(directory.canonicalPath() + "/" + strOldFileName);
     // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
     QString strNewName = strOldFileName + ".bak";
 
@@ -454,12 +503,13 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
         bool aggZero = metric->aggregateZero();
 
         // set aggZero to false and value to zero if is temperature and -255
-        if (metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+        if (metric->symbol() == "average_temp" && value == RideFile::NA) {
             value = 0;
             aggZero = false;
         }
 
         switch (metric->type()) {
+        case RideMetric::RunningTotal:
         case RideMetric::Total:
             rvalue += value;
             break;

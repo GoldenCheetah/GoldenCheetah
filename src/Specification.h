@@ -23,7 +23,18 @@
 #include <QStringList>
 #include "TimeUtils.h"
 
+//
+// A 'specification' can be passed around to use as a filter.
+// It can be used om collections of ride items, or on ride samples.
+//
+// The same object it used, can be set with filters for either
+// but the pass() function should be passed either a ride item
+// or a ride point.
+//
 class RideItem;
+class RideFile;
+class IntervalItem;
+struct RideFilePoint;
 
 class FilterSet
 {
@@ -62,26 +73,55 @@ class FilterSet
         int count() { return filters_.count(); }
 };
 
+class RideFileIterator;
 class Specification
 {
+    friend class ::RideFileIterator;
     public:
         Specification(DateRange dr, FilterSet fs);
+        Specification(IntervalItem *it, double recintsecs);
         Specification();
 
         // does the rideitem pass the specification ?
         bool pass(RideItem*);
 
+        // does the ridepoint pass the specification ?
+        bool pass(RideFilePoint *p);
+
+        // would it yield no data points for this ride ?
+        bool isEmpty(RideFile *);
+
+        // non-null if exists
+        IntervalItem *interval() { return it; }
+
         // set criteria
         void setDateRange(DateRange dr);
         void setFilterSet(FilterSet fs);
+        void setIntervalItem(IntervalItem *it, double recintsecs);
+        void setRideItem(RideItem *ri);
+
         void addMatches(QStringList matches);
 
         DateRange dateRange() { return dr; }
         FilterSet filterSet() { return fs; }
         bool isFiltered() { return (fs.count() > 0); }
 
+        // just start/stop and item for now
+        // when working with samples
+        void print();
+
+    protected:
+        // when working with intervals secs start and end
+        // if no interval is set then they return -1 to indicate
+        // that the entire ride is in scope
+        double secsStart();
+        double secsEnd();
+
     private:
         DateRange dr;
         FilterSet fs;
+        IntervalItem *it;
+        double recintsecs;
+        RideItem *ri;
 };
 #endif

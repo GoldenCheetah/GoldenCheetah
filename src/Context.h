@@ -41,6 +41,7 @@
 #define CONFIG_ATHLETE           0x1        // includes default weight, height etc
 #define CONFIG_ZONES             0x2        // CP, FTP, useCPforFTP, zone config etc
 #define CONFIG_GENERAL           0x4        // includes default weight, w'bal formula, directories
+#define CONFIG_USERMETRICS       0x8        // user defined metrics
 #define CONFIG_APPEARANCE        0x10
 #define CONFIG_FIELDS            0x20       // metadata fields
 #define CONFIG_NOTECOLOR         0x40       // ride coloring from "notes" fields
@@ -69,6 +70,7 @@ class Context : public QObject
 
     public:
         Context(MainWindow *mainWindow);
+        ~Context();
 
         // mainwindow state
         int viewIndex;
@@ -126,6 +128,9 @@ class Context : public QObject
         void setFilter(QStringList&f) { filters=f; isfiltered=true; emit filterChanged(); }
         void clearFilter() { filters.clear(); isfiltered=false; emit filterChanged(); }
 
+        // user metrics - cascade
+        void notifyUserMetricsChanged() { emit userMetricsChanged(); }
+
         // realtime signals
         void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
         void notifyErgFileSelected(ErgFile *x) { workout=x; ergFileSelected(x); }
@@ -175,6 +180,12 @@ class Context : public QObject
         void notifyCompareDateRanges(bool state);
         void notifyCompareDateRangesChanged();
 
+    protected:
+
+        // we need to act since the user metric config changed
+        // and we need to notify other contexts !
+        void userMetricsConfigChanged();
+
     signals:
 
         // global filter changed
@@ -188,6 +199,8 @@ class Context : public QObject
         void presetsChanged();
         void presetSelected(int);
 
+        // user metrics
+        void userMetricsChanged();
 
         // refreshing stats
         void refreshStart();

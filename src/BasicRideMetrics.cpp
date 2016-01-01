@@ -25,6 +25,7 @@
 #include "Units.h"
 #include "Zones.h"
 #include "cmath"
+#include <assert.h>
 #include <algorithm>
 #include <QVector>
 #include <QApplication>
@@ -44,10 +45,7 @@ class RideCount : public RideMetric {
         setImperialUnits(tr(""));
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(1);
     }
     RideMetric *clone() const { return new RideCount(*this); }
@@ -68,26 +66,35 @@ class WorkoutTime : public RideMetric {
         setSymbol("workout_time");
         setInternalName("Duration");
     }
+
     bool isTime() const { return true; }
+
     void initialize() {
         setName(tr("Duration"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
-        if (!ride->dataPoints().isEmpty()) { 
-            seconds = ride->dataPoints().back()->secs -
-                      ride->dataPoints().front()->secs + ride->recIntSecs();
-        } else {
-            seconds = 0;
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        RideFileIterator it(item->ride(), spec);
+
+        // just subtract first timepoint from last timepoint
+        if (it.last() && it.first()) 
+            seconds = it.last()->secs - it.first()->secs + item->ride()->recIntSecs();
+        else seconds = RideFile::NA;
+
         setValue(seconds);
         
     }
+
     RideMetric *clone() const { return new WorkoutTime(*this); }
 };
 
@@ -107,30 +114,40 @@ class TimeRiding : public RideMetric {
         setSymbol("time_riding");
         setInternalName("Time Moving");
     }
+
     bool isTime() const { return true; }
+
     void initialize() {
         setName(tr("Time Moving"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         secsMovingOrPedaling = 0;
-        if (ride->areDataPresent()->kph || ride->areDataPresent()->cad ) {
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+        // must have speed and cadence
+        if (item->ride()->areDataPresent()->kph || item->ride()->areDataPresent()->cad ) {
+
+            // loop through and count
+            RideFileIterator it(item->ride(), spec);
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
                 if ((point->kph > 0.0) || (point->cad > 0.0))
-                    secsMovingOrPedaling += ride->recIntSecs();
+                    secsMovingOrPedaling += item->ride()->recIntSecs();
             }
         }
         setValue(secsMovingOrPedaling);
     }
-    void override(const QMap<QString,QString> &map) {
-        if (map.contains("value"))
-            secsMovingOrPedaling = map.value("value").toDouble();
-    }
+
     RideMetric *clone() const { return new TimeRiding(*this); }
 };
 
@@ -151,26 +168,38 @@ class TimeCarrying : public RideMetric {
         setSymbol("time_carrying");
         setInternalName("Time Carrying");
     }
+
     bool isTime() const { return true; }
+
     void initialize() {
         setName(tr("Time Carrying (Est)"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         secsCarrying = 0;
-        if (ride->areDataPresent()->kph) {
+
+        if (item->ride()->areDataPresent()->kph) {
 
             // hysteresis can be configured, we default to 3.0
             double hysteresis = appsettings->value(NULL, GC_ELEVATION_HYSTERESIS).toDouble();
             if (hysteresis <= 0.1) hysteresis = 3.00;
 
+            RideFileIterator it(item->ride(), spec);
             bool first = true;
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
+
                 // only consider pushing/carrying with elevation gain
                 if (first) {
                     first = false;
@@ -189,12 +218,13 @@ class TimeCarrying : public RideMetric {
                     (point->cad == 0.0) &&     // but no cadence
                     (point->watts == 0.0))     // and no power
 
-                    secsCarrying += ride->recIntSecs();
+                    secsCarrying += item->ride()->recIntSecs();
             }
         }
         setValue(secsCarrying);
 
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new TimeCarrying(*this); }
 };
@@ -216,6 +246,7 @@ class ElevationGainCarrying : public RideMetric {
         setSymbol("elevation_gain_carrying");
         setInternalName("Elevation Gain Carrying");
     }
+
     void initialize() {
         setName(tr("Elevation Gain Carrying (Est)"));
         setType(RideMetric::Total);
@@ -223,17 +254,27 @@ class ElevationGainCarrying : public RideMetric {
         setImperialUnits(tr("feet"));
         setConversion(FEET_PER_METER);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         // hysteresis can be configured, we default to 3.0
         double hysteresis = appsettings->value(NULL, GC_ELEVATION_HYSTERESIS).toDouble();
         if (hysteresis <= 0.1) hysteresis = 3.00;
 
         bool first = true;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+        RideFileIterator it(item->ride(), spec);
+
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (first) {
                 first = false;
                 prevalt = point->alt;
@@ -253,7 +294,9 @@ class ElevationGainCarrying : public RideMetric {
         }
         setValue(elegain);
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
+
     RideMetric *clone() const { return new ElevationGainCarrying(*this); }
 };
 
@@ -274,6 +317,7 @@ class TotalDistance : public RideMetric {
         setSymbol("total_distance");
         setInternalName("Distance");
     }
+
     void initialize() {
         setName(tr("Distance"));
         setType(RideMetric::Total);
@@ -282,20 +326,30 @@ class TotalDistance : public RideMetric {
         setPrecision(3);
         setConversion(MILES_PER_KM);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         // Note: The 'km' in each sample is the distance travelled by the
         // *end* of the sampling period.  The last term in this equation
         // accounts for the distance traveled *during* the first sample.
-        if (ride->dataPoints().count() > 1 && ride->areDataPresent()->km) {
+        if (item->ride()->areDataPresent()->km) {
 
-            km = ride->dataPoints().back()->km - ride->dataPoints().front()->km;
+            RideFileIterator it(item->ride(), spec);
 
-            if (ride->areDataPresent()->kph)
-                km += ride->dataPoints().front()->kph / 3600.0 * ride->recIntSecs();
+            // just subtract first from last
+            if (it.last() && it.first()) 
+                km = it.last()->km - it.first()->km;
+            else km = RideFile::NA;
+
+            if (km != RideFile::NA && item->ride()->areDataPresent()->kph)
+                km += it.first()->kph / 3600.0 * item->ride()->recIntSecs();
 
         } else {
 
@@ -341,10 +395,7 @@ class DistanceSwim : public RideMetric {
         setConversion(1.0/METERS_PER_YARD);
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         TotalDistance *distance = dynamic_cast<TotalDistance*>(deps.value("total_distance"));
 
@@ -382,6 +433,7 @@ class ClimbRating : public RideMetric {
         setSymbol("climb_rating");
         setInternalName("Climb Rating");
     }
+
     void initialize() {
         setName(tr("Climb Rating"));
         setMetricUnits(tr(""));
@@ -390,15 +442,12 @@ class ClimbRating : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         double rating = 0.0f;
         double distance = deps.value("total_distance")->value(true);
 
-        if (ride->areDataPresent()->alt) {
+        if (item->ride()->areDataPresent()->alt) {
 
             double ele = deps.value("elevation_gain")->value(true);
 
@@ -432,6 +481,7 @@ class AthleteWeight : public RideMetric {
         setSymbol("athlete_weight");
         setInternalName("Athlete Weight");
     }
+
     void initialize() {
         setName(tr("Athlete Weight"));
         setType(RideMetric::Average);
@@ -440,19 +490,17 @@ class AthleteWeight : public RideMetric {
         setPrecision(2);
         setConversion(LB_PER_KG);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *context) {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
         // withings first
-        double weight = context->athlete->getWithingsWeight(ride->startTime().date());
+        double weight = item->context->athlete->getWithingsWeight(item->dateTime.date());
 
         // from metadata
-        if (!weight) weight = ride->getTag("Weight", "0.0").toDouble();
+        if (!weight) weight = item->getText("Weight", "0.0").toDouble();
 
         // global options
-        if (!weight) weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
+        if (!weight) weight = appsettings->cvalue(item->context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
 
         // No weight default is weird, we'll set to 80kg
         if (weight <= 0.00) weight = 80.00;
@@ -479,6 +527,7 @@ class AthleteFat : public RideMetric {
         setSymbol("athlete_fat");
         setInternalName("Athlete Bodyfat");
     }
+
     void initialize() {
         setName(tr("Athlete Bodyfat"));
         setType(RideMetric::Average);
@@ -487,15 +536,13 @@ class AthleteFat : public RideMetric {
         setPrecision(2);
         setConversion(LB_PER_KG);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *context) {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
         WithingsReading here;
 
         // withings first
-        context->athlete->getWithings(ride->startTime().date(), here);
+        item->context->athlete->getWithings(item->dateTime.date(), here);
         setValue(here.fatkg);
     }
 
@@ -518,6 +565,7 @@ class AthleteLean : public RideMetric {
         setSymbol("athlete_lean");
         setInternalName("Athlete Lean Weight");
     }
+
     void initialize() {
         setName(tr("Athlete Lean Weight"));
         setType(RideMetric::Average);
@@ -526,15 +574,13 @@ class AthleteLean : public RideMetric {
         setPrecision(2);
         setConversion(LB_PER_KG);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *context) {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
         WithingsReading here;
 
         // withings first
-        context->athlete->getWithings(ride->startTime().date(), here);
+        item->context->athlete->getWithings(item->dateTime.date(), here);
         setValue(here.leankg);
     }
 
@@ -557,6 +603,7 @@ class AthleteFatP : public RideMetric {
         setSymbol("athlete_fat_percent");
         setInternalName("Athlete Bodyfat Percent");
     }
+
     void initialize() {
         setName(tr("Athlete Bodyfat Percent"));
         setType(RideMetric::Average);
@@ -564,15 +611,13 @@ class AthleteFatP : public RideMetric {
         setImperialUnits(tr("%"));
         setPrecision(1);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *context) {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
         WithingsReading here;
 
         // withings first
-        context->athlete->getWithings(ride->startTime().date(), here);
+        item->context->athlete->getWithings(item->dateTime.date(), here);
         setValue(here.fatpercent);
     }
 
@@ -597,6 +642,7 @@ class ElevationGain : public RideMetric {
         setSymbol("elevation_gain");
         setInternalName("Elevation Gain");
     }
+
     void initialize() {
         setName(tr("Elevation Gain"));
         setType(RideMetric::Total);
@@ -604,17 +650,26 @@ class ElevationGain : public RideMetric {
         setImperialUnits(tr("feet"));
         setConversion(FEET_PER_METER);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         // hysteresis can be configured, we default to 3.0
         double hysteresis = appsettings->value(NULL, GC_ELEVATION_HYSTERESIS).toDouble();
         if (hysteresis <= 0.1) hysteresis = 3.00;
 
         bool first = true;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+        RideFileIterator it(item->ride(), spec);
+
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (first) {
                 first = false;
                 prevalt = point->alt;
@@ -629,6 +684,7 @@ class ElevationGain : public RideMetric {
         }
         setValue(elegain);
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim; }
     RideMetric *clone() const { return new ElevationGain(*this); }
 };
@@ -650,6 +706,7 @@ class ElevationLoss : public RideMetric {
         setSymbol("elevation_loss");
         setInternalName("Elevation Loss");
     }
+
     void initialize() {
         setName(tr("Elevation Loss"));
         setType(RideMetric::Total);
@@ -657,17 +714,27 @@ class ElevationLoss : public RideMetric {
         setImperialUnits(tr("feet"));
         setConversion(FEET_PER_METER);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         // hysteresis can be configured, we default to 3.0
         double hysteresis = appsettings->value(NULL, GC_ELEVATION_HYSTERESIS).toDouble();
         if (hysteresis <= 0.1) hysteresis = 3.00;
 
         bool first = true;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (first) {
                 first = false;
                 prevalt = point->alt;
@@ -702,23 +769,34 @@ class TotalWork : public RideMetric {
         setSymbol("total_work");
         setInternalName("Work");
     }
+
     void initialize() {
         setName(tr("Work"));
         setMetricUnits(tr("kJ"));
         setImperialUnits(tr("kJ"));
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         joules = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (point->watts >= 0.0)
-                joules += point->watts * ride->recIntSecs();
+                joules += point->watts * item->ride()->recIntSecs();
         }
         setValue(joules/1000);
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new TotalWork(*this); }
 };
@@ -740,6 +818,7 @@ class AvgSpeed : public RideMetric {
         setSymbol("average_speed");
         setInternalName("Average Speed");
     }
+
     void initialize() {
         setName(tr("Average Speed"));
         setMetricUnits(tr("kph"));
@@ -749,19 +828,28 @@ class AvgSpeed : public RideMetric {
         setConversion(MILES_PER_KM);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &deps) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         assert(deps.contains("total_distance"));
         km = deps.value("total_distance")->value(true);
 
-        if (ride->areDataPresent()->kph) {
+        if (item->ride()->areDataPresent()->kph) {
 
             secsMoving = 0;
-            bool withz = ride->isSwim(); // average with zeros for swims
-            foreach (const RideFilePoint *point, ride->dataPoints())
-                if (withz || point->kph > 0.0) secsMoving += ride->recIntSecs();
+            bool withz = item->isSwim; // average with zeros for swims
+
+            RideFileIterator it(item->ride(), spec);
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
+                if (withz || point->kph > 0.0) secsMoving += item->ride()->recIntSecs();
+            }
 
             setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
 
@@ -775,14 +863,6 @@ class AvgSpeed : public RideMetric {
         }
     }
 
-    void aggregateWith(const RideMetric &other) {
-        assert(symbol() == other.symbol());
-        const AvgSpeed &as = dynamic_cast<const AvgSpeed&>(other);
-        secsMoving += as.secsMoving;
-        km += as.km;
-
-        setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
-    }
     RideMetric *clone() const { return new AvgSpeed(*this); }
 };
 
@@ -802,20 +882,25 @@ class Pace : public RideMetric {
         setSymbol("pace");
         setInternalName("Pace");
     }
+
     // Pace ordering is reversed
     bool isLowerBetter() const { return true; }
+
     // Overrides to use Pace units setting
     QString units(bool) const {
         bool metricRunPace = appsettings->value(NULL, GC_PACE, true).toBool();
         return RideMetric::units(metricRunPace);
     }
+
     double value(bool) const {
         bool metricRunPace = appsettings->value(NULL, GC_PACE, true).toBool();
         return RideMetric::value(metricRunPace);
     }
+
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60);
     }
+
     void initialize() {
         setName(tr("Pace"));
         setType(RideMetric::Average);
@@ -825,10 +910,7 @@ class Pace : public RideMetric {
         setConversion(KM_PER_MILE);
    }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         AvgSpeed *as = dynamic_cast<AvgSpeed*>(deps.value("average_speed"));
 
@@ -866,20 +948,25 @@ class PaceSwim : public RideMetric {
         setSymbol("pace_swim");
         setInternalName("Pace Swim");
     }
+
     // Swim Pace ordering is reversed
     bool isLowerBetter() const { return true; }
+
     // Overrides to use Swim Pace units setting
     QString units(bool) const {
         bool metricRunPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
         return RideMetric::units(metricRunPace);
     }
+
     double value(bool) const {
         bool metricRunPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
         return RideMetric::value(metricRunPace);
     }
+
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60);
     }
+
     void initialize() {
         setName(tr("Pace Swim"));
         setType(RideMetric::Average);
@@ -889,10 +976,7 @@ class PaceSwim : public RideMetric {
         setConversion(METERS_PER_YARD);
    }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         AvgSpeed *as = dynamic_cast<AvgSpeed*>(deps.value("average_speed"));
 
@@ -932,18 +1016,29 @@ struct AvgPower : public RideMetric {
         setSymbol("average_power");
         setInternalName("Average Power");
     }
+
     void initialize() {
         setName(tr("Average Power"));
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (item->ride() == NULL || !item->ride()->areDataPresent()->watts || item->ride()->dataPoints().count() == 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         total = count = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+    
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (point->watts >= 0.0) {
                 total += point->watts;
                 ++count;
@@ -952,6 +1047,7 @@ struct AvgPower : public RideMetric {
         setValue(count > 0 ? total / count : 0);
         setCount(count);
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new AvgPower(*this); }
 };
@@ -973,18 +1069,29 @@ struct AvgSmO2 : public RideMetric {
         setSymbol("average_smo2");
         setInternalName("Average SmO2");
     }
+
     void initialize() {
         setName(tr("Average SmO2"));
         setMetricUnits(tr("%"));
         setImperialUnits(tr("%"));
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (item->ride() == NULL || !item->ride()->areDataPresent()->smo2 || item->ride()->dataPoints().count() == 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         total = count = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (point->smo2 >= 0.0) {
                 total += point->smo2;
                 ++count;
@@ -1014,6 +1121,7 @@ struct AvgtHb : public RideMetric {
         setSymbol("average_tHb");
         setInternalName("Average tHb");
     }
+
     void initialize() {
         setName(tr("Average tHb"));
         setMetricUnits(tr("g/dL"));
@@ -1021,12 +1129,21 @@ struct AvgtHb : public RideMetric {
         setType(RideMetric::Average);
         setPrecision(2);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (item->ride() == NULL || !item->ride()->areDataPresent()->thb || item->ride()->dataPoints().count() == 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         total = count = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (point->thb >= 0.0) {
                 total += point->thb;
                 ++count;
@@ -1058,18 +1175,28 @@ struct AAvgPower : public RideMetric {
         setSymbol("average_apower");
         setInternalName("Average aPower");
     }
+
     void initialize() {
         setName(tr("Average aPower"));
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         total = count = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (point->apower >= 0.0) {
                 total += point->apower;
                 ++count;
@@ -1099,18 +1226,28 @@ struct NonZeroPower : public RideMetric {
         setSymbol("nonzero_power");
         setInternalName("Nonzero Average Power");
     }
+
     void initialize() {
         setName(tr("Nonzero Average Power"));
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (item->ride() == NULL || !item->ride()->areDataPresent()->watts || item->ride()->dataPoints().count() == 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         total = count = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (point->watts > 0.0) {
                 total += point->watts;
                 ++count;
@@ -1119,6 +1256,7 @@ struct NonZeroPower : public RideMetric {
         setValue(count > 0 ? total / count : 0);
         setCount(count);
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new NonZeroPower(*this); }
 };
@@ -1140,18 +1278,27 @@ struct AvgHeartRate : public RideMetric {
         setSymbol("average_hr");
         setInternalName("Average Heart Rate");
     }
+
     void initialize() {
         setName(tr("Average Heart Rate"));
         setMetricUnits(tr("bpm"));
         setImperialUnits(tr("bpm"));
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (item->ride() == NULL || !item->ride()->areDataPresent()->hr || item->ride()->dataPoints().count() == 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         total = count = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (point->hr > 0) {
                 total += point->hr;
                 ++count;
@@ -1182,18 +1329,29 @@ struct AvgCoreTemp : public RideMetric {
         setInternalName("Average Core Temperature");
         setPrecision(1);
     }
+
     void initialize() {
         setName(tr("Average Core Temperature"));
         setMetricUnits(tr("C"));
         setImperialUnits(tr("C"));
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         total = count = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (point->tcore > 0) {
                 total += point->tcore;
                 ++count;
@@ -1231,13 +1389,22 @@ struct HeartBeats : public RideMetric {
         setImperialUnits(tr("beats"));
         setType(RideMetric::Total);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         total = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
-            total += (point->hr / 60) * ride->recIntSecs();
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            total += (point->hr / 60) * item->ride()->recIntSecs();
         }
         setValue(total);
     }
@@ -1261,6 +1428,7 @@ class HrPw : public RideMetric {
         setSymbol("hrpw");
         setInternalName("HrPw Ratio");
     }
+
     void initialize() {
         setName(tr("HrPw Ratio"));
         setImperialUnits("");
@@ -1268,10 +1436,8 @@ class HrPw : public RideMetric {
         setPrecision(3);
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         AvgHeartRate *hr = dynamic_cast<AvgHeartRate*>(deps.value("average_hr"));
         AvgPower *pw = dynamic_cast<AvgPower*>(deps.value("average_power"));
@@ -1279,7 +1445,7 @@ class HrPw : public RideMetric {
         if (hr->value(true) > 100 && pw->value(true) > 100) { // ignore silly rides with low values
             setValue(pw->value(true) / hr->value(true));
         } else {
-            setValue(0);
+            setValue(RideFile::NIL);
         }
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
@@ -1308,6 +1474,7 @@ class Workbeat : public RideMetric {
         setSymbol("wb");
         setInternalName("Workbeat stress");
     }
+
     void initialize() {
         setName(tr("Workbeat stress"));
         setImperialUnits("");
@@ -1315,16 +1482,16 @@ class Workbeat : public RideMetric {
         setPrecision(0);
         setType(RideMetric::Total);
     }
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         TotalWork *work = dynamic_cast<TotalWork*>(deps.value("total_work"));
         HeartBeats *hb = dynamic_cast<HeartBeats*>(deps.value("heartbeats"));
 
+        // if either zero we get zero
         setValue((work->value() * hb->value()) / 100000.00f);
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new Workbeat(*this); }
 };
@@ -1351,6 +1518,7 @@ class WattsRPE : public RideMetric {
         setSymbol("wattsRPE");
         setInternalName("Watts:RPE Ratio");
     }
+
     void initialize() {
         setName(tr("Watts:RPE Ratio"));
         setImperialUnits("");
@@ -1358,14 +1526,12 @@ class WattsRPE : public RideMetric {
         setPrecision(3);
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         double ratio = 0.0f;
         AvgPower *pw = dynamic_cast<AvgPower*>(deps.value("average_power"));
-        double rpe = ride->getTag("RPE", "0").toDouble();
+        double rpe = item->getText("RPE", "0").toDouble();
 
         if (pw->value(true) > 100 && rpe > 0) { // ignore silly rides with low values
             ratio = pw->value(true) / rpe;
@@ -1397,6 +1563,7 @@ class APPercent : public RideMetric {
         setSymbol("ap_percent_max");
         setInternalName("Power Percent of Max");
     }
+
     void initialize() {
         setName(tr("Power Percent of Max"));
         setImperialUnits("");
@@ -1404,21 +1571,21 @@ class APPercent : public RideMetric {
         setPrecision(0);
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         double percent = 0.0f;
         AvgPower *pw = dynamic_cast<AvgPower*>(deps.value("average_power"));
 
-        if (pw->value(true) > 0.0f && zones && zoneRange >= 0) {
+        if (pw->value(true) > 0.0f && item->context->athlete->zones(item->isRun) && item->zoneRange >= 0) {
+
             // get Pmax
-            double pmax = zones->getPmax(zoneRange);
+            double pmax = item->context->athlete->zones(item->isRun)->getPmax(item->zoneRange);
             percent = pw->value(true)/pmax * 100;
         }
         setValue(percent);
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new APPercent(*this); }
 };
@@ -1445,6 +1612,7 @@ class HrNp : public RideMetric {
         setSymbol("hrnp");
         setInternalName("HrNp Ratio");
     }
+
     void initialize() {
         setName(tr("HrNp Ratio"));
         setImperialUnits("");
@@ -1452,10 +1620,8 @@ class HrNp : public RideMetric {
         setPrecision(3);
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         AvgHeartRate *hr = dynamic_cast<AvgHeartRate*>(deps.value("average_hr"));
         RideMetric *pw = dynamic_cast<RideMetric*>(deps.value("coggan_np"));
@@ -1466,6 +1632,7 @@ class HrNp : public RideMetric {
             setValue(0);
         }
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new HrNp(*this); }
 };
@@ -1495,18 +1662,28 @@ struct AvgCadence : public RideMetric {
         setSymbol("average_cad");
         setInternalName("Average Cadence");
     }
+
     void initialize() {
         setName(tr("Average Cadence"));
         setMetricUnits(tr("rpm"));
         setImperialUnits(tr("rpm"));
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         total = count = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (point->cad > 0) {
                 total += point->cad;
                 ++count;
@@ -1542,9 +1719,9 @@ struct AvgTemp : public RideMetric {
     // we DO aggregate zero, its -255 we ignore !
     bool aggregateZero() const { return true; }
 
-    // override to special case NoTemp
+    // override to special case NA
     QString toString(bool useMetricUnits) const {
-        if (value() == RideFile::NoTemp) return "-";
+        if (value() == RideFile::NA) return "-";
         return RideMetric::toString(useMetricUnits);
     }
 
@@ -1557,26 +1734,32 @@ struct AvgTemp : public RideMetric {
         setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        if (ride->areDataPresent()->temp) {
-            total = count = 0;
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-                if (point->temp != RideFile::NoTemp) {
-                    total += point->temp;
-                    ++count;
-                }
-            }
-            setValue(count > 0 ? total / count : count);
-            setCount(count);
-        } else {
-            setValue(RideFile::NoTemp);
-            setCount(1);
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (item->ride() == NULL || !item->ride()->areDataPresent()->temp || item->ride()->dataPoints().count() == 0) {
+            setValue(RideFile::NA);
+            setCount(0);
+            return;
         }
+
+        total = count = 0;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->temp != RideFile::NA) {
+                total += point->temp;
+                ++count;
+            }
+        }
+
+        setValue(count > 0 ? (total / count) : count);
+        setCount(count);
     }
+
     RideMetric *clone() const { return new AvgTemp(*this); }
 };
 
@@ -1594,17 +1777,26 @@ class MaxPower : public RideMetric {
         setSymbol("max_power");
         setInternalName("Max Power");
     }
+
     void initialize() {
         setName(tr("Max Power"));
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
         setType(RideMetric::Peak);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (point->watts >= max)
                 max = point->watts;
         }
@@ -1628,17 +1820,26 @@ class MaxSmO2 : public RideMetric {
         setSymbol("max_smo2");
         setInternalName("Max SmO2");
     }
+
     void initialize() {
         setName(tr("Max SmO2"));
         setMetricUnits(tr("%"));
         setImperialUnits(tr("%"));
         setType(RideMetric::Peak);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (point->smo2 >= max)
                 max = point->smo2;
         }
@@ -1662,6 +1863,7 @@ class MaxtHb : public RideMetric {
         setSymbol("max_tHb");
         setInternalName("Max tHb");
     }
+
     void initialize() {
         setName(tr("Max tHb"));
         setMetricUnits(tr("g/dL"));
@@ -1669,11 +1871,20 @@ class MaxtHb : public RideMetric {
         setType(RideMetric::Peak);
         setPrecision(2);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (point->thb >= max)
                 max = point->thb;
         }
@@ -1705,16 +1916,26 @@ class MinSmO2 : public RideMetric {
         setImperialUnits(tr("%"));
         setType(RideMetric::Peak);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (point->smo2 > 0 && point->smo2 >= min)
                 min = point->smo2;
         }
         setValue(min);
     }
+
     RideMetric *clone() const { return new MinSmO2(*this); }
 };
 
@@ -1730,6 +1951,7 @@ class MintHb : public RideMetric {
         setSymbol("min_tHb");
         setInternalName("Min tHb");
     }
+
     void initialize() {
         setName(tr("Min tHb"));
         setMetricUnits(tr("g/dL"));
@@ -1737,11 +1959,19 @@ class MintHb : public RideMetric {
         setType(RideMetric::Low);
         setPrecision(2);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (point->thb > 0 && point->thb >= min)
                 min = point->thb;
         }
@@ -1764,17 +1994,26 @@ class MaxHr : public RideMetric {
         setSymbol("max_heartrate");
         setInternalName("Max Heartrate");
     }
+
     void initialize() {
         setName(tr("Max Heartrate"));
         setMetricUnits(tr("bpm"));
         setImperialUnits(tr("bpm"));
         setType(RideMetric::Peak);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (point->hr >= max)
                 max = point->hr;
         }
@@ -1800,19 +2039,30 @@ class MinHr : public RideMetric {
         setSymbol("min_heartrate");
         setInternalName("Min Heartrate");
     }
+
     void initialize() {
         setName(tr("Min Heartrate"));
         setMetricUnits(tr("bpm"));
         setImperialUnits(tr("bpm"));
         setType(RideMetric::Peak);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         bool notset = true;
         min = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (point->hr > 0 && (notset || point->hr < min)) {
                 min = point->hr;
                 notset = false;
@@ -1841,17 +2091,27 @@ class MaxCT : public RideMetric {
         setInternalName("Max Core Temperature");
         setPrecision(1);
     }
+
     void initialize() {
         setName(tr("Max Core Temperature"));
         setMetricUnits(tr("C"));
         setImperialUnits(tr("C"));
         setType(RideMetric::Peak);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (point->tcore >= max)
                 max = point->tcore;
         }
@@ -1877,6 +2137,7 @@ class MaxSpeed : public RideMetric {
         setSymbol("max_speed");
         setInternalName("Max Speed");
     }
+
     void initialize() {
         setName(tr("Max Speed"));
         setMetricUnits(tr("kph"));
@@ -1886,26 +2147,29 @@ class MaxSpeed : public RideMetric {
         setConversion(MILES_PER_KM);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
-        double max = 0.0;
 
-        if (ride->areDataPresent()->kph) {
-            foreach (const RideFilePoint *point, ride->dataPoints())
-                if (point->kph > max) max = point->kph;
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
 
+        double max = 0.0;
+
+        if (item->ride()->areDataPresent()->kph) {
+
+            RideFileIterator it(item->ride(), spec);
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
+                    if (point->kph > max) max = point->kph;
+            }
+        }
         setValue(max);
     }
 
-    void aggregateWith(const RideMetric &other) {
-        assert(symbol() == other.symbol());
-        const MaxSpeed &ms = dynamic_cast<const MaxSpeed&>(other);
-
-        setValue(ms.value(true) > value(true) ? ms.value(true) : value(true));
-    }
     RideMetric *clone() const { return new MaxSpeed(*this); }
 };
 
@@ -1923,6 +2187,7 @@ class MaxCadence : public RideMetric {
         setSymbol("max_cadence");
         setInternalName("Max Cadence");
     }
+
     void initialize() {
         setName(tr("Max Cadence"));
         setMetricUnits(tr("rpm"));
@@ -1930,22 +2195,24 @@ class MaxCadence : public RideMetric {
         setType(RideMetric::Peak);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         double max = 0.0;
-        foreach (const RideFilePoint *point, ride->dataPoints())
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (point->cad > max) max = point->cad;
+        }
 
         setValue(max);
-    }
-
-    void aggregateWith(const RideMetric &other) {
-        assert(symbol() == other.symbol());
-        const MaxCadence &mc = dynamic_cast<const MaxCadence&>(other);
-
-        setValue(mc.value(true) > value(true) ? mc.value(true) : value(true));
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("C"); }
@@ -1967,6 +2234,7 @@ class MaxTemp : public RideMetric {
         setSymbol("max_temp");
         setInternalName("Max Temp");
     }
+
     void initialize() {
         setName(tr("Max Temp"));
         setMetricUnits(tr("C"));
@@ -1977,39 +2245,89 @@ class MaxTemp : public RideMetric {
         setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);
     }
 
-    // override to special case NoTemp
+    // override to special case NA
     QString toString(bool useMetricUnits) const {
-        if (value() == RideFile::NoTemp) return "-";
+        if (value() == RideFile::NA) return "-";
         return RideMetric::toString(useMetricUnits);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->temp) {
-            double max = 0.0;
-            foreach (const RideFilePoint *point, ride->dataPoints())
-                if (point->temp != RideFile::NoTemp && point->temp > max) max = point->temp;
-
-            setValue(max);
-        } else {
-            setValue(RideFile::NoTemp);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->temp) {
+            setValue(RideFile::NA);
+            setCount(0);
+            return;
         }
+
+        double max = RideFile::NA;
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->temp != RideFile::NA && point->temp > max) max = point->temp;
+        }
+
+        setValue(max);
     }
 
-    void aggregateWith(const RideMetric &other) {
-        assert(symbol() == other.symbol());
-        const MaxTemp &mc = dynamic_cast<const MaxTemp&>(other);
-
-        setValue(mc.value(true) > value(true) ? mc.value(true) : value(true));
-    }
     RideMetric *clone() const { return new MaxTemp(*this); }
 };
 
 static bool maxTempAdded =
     RideMetricFactory::instance().addMetric(MaxTemp());
+
+//////////////////////////////////////////////////////////////////////////////
+
+class MinTemp : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MinTemp)
+    public:
+
+    MinTemp()
+    {
+        setSymbol("min_temp");
+        setInternalName("Min Temp");
+    }
+
+    void initialize() {
+        setName(tr("Min Temp"));
+        setMetricUnits(tr("C"));
+        setImperialUnits(tr("F"));
+        setType(RideMetric::Peak);
+        setPrecision(1);
+        setConversion(FAHRENHEIT_PER_CENTIGRADE);
+        setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);
+    }
+
+    // override to special case NA
+    QString toString(bool useMetricUnits) const {
+        if (value() == RideFile::NA) return "-";
+        return RideMetric::toString(useMetricUnits);
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->temp) {
+            setValue(RideFile::NA);
+            setCount(0);
+            return;
+        }
+
+        double min = 10000;
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->temp != RideFile::NA && point->temp < min) min = point->temp;
+        }
+
+        setValue(min < 10000 ? min : (double)(RideFile::NA));
+    }
+
+    RideMetric *clone() const { return new MinTemp(*this); }
+};
+
+static bool minTempAdded =
+    RideMetricFactory::instance().addMetric(MinTemp());
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -2022,18 +2340,27 @@ class NinetyFivePercentHeartRate : public RideMetric {
         setSymbol("ninety_five_percent_hr");
         setInternalName("95% Heartrate");
     }
+
     void initialize() {
         setName(tr("95% Heartrate"));
         setMetricUnits(tr("bpm"));
         setImperialUnits(tr("bpm"));
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         QVector<double> hrs;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (point->hr >= 0.0)
                 hrs.append(point->hr);
         }
@@ -2061,16 +2388,15 @@ class VAM : public RideMetric {
         setSymbol("vam");
         setInternalName("VAM");
     }
+
     void initialize() {
         setName(tr("VAM"));
         setImperialUnits("");
         setMetricUnits("");
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         ElevationGain *el = dynamic_cast<ElevationGain*>(deps.value("elevation_gain"));
         WorkoutTime *wt = dynamic_cast<WorkoutTime*>(deps.value("workout_time"));
@@ -2102,21 +2428,22 @@ class EOA : public RideMetric {
         setSymbol("eoa");
         setInternalName("EOA");
     }
+
     void initialize() {
         setName(tr("Effect of Altitude"));
         setImperialUnits("%");
         setMetricUnits("%");
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         AAvgPower *aap = dynamic_cast<AAvgPower*>(deps.value("average_apower"));
         AvgPower *ap = dynamic_cast<AvgPower*>(deps.value("average_power"));
         setValue(((aap->value(true)-ap->value(true))/aap->value(true)) * 100.00f);
     }
+
+
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new EOA(*this); }
 };
@@ -2143,6 +2470,7 @@ class Gradient : public RideMetric {
         setSymbol("gradient");
         setInternalName("Gradient");
     }
+
     void initialize() {
         setName(tr("Gradient"));
         setImperialUnits("%");
@@ -2150,10 +2478,8 @@ class Gradient : public RideMetric {
         setPrecision(1);
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         ElevationGain *el = dynamic_cast<ElevationGain*>(deps.value("elevation_gain"));
         TotalDistance *td = dynamic_cast<TotalDistance*>(deps.value("total_distance"));
@@ -2162,6 +2488,7 @@ class Gradient : public RideMetric {
         } else
             setValue(0.0);
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim; }
     RideMetric *clone() const { return new Gradient(*this); }
 };
@@ -2190,6 +2517,7 @@ class MeanPowerVariance : public RideMetric {
         setSymbol("meanpowervariance");
         setInternalName("Average Power Variance");
     }
+
     void initialize() {
         setName(tr("Average Power Variance"));
         setImperialUnits("watts change");
@@ -2197,20 +2525,29 @@ class MeanPowerVariance : public RideMetric {
         setPrecision(2);
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        RideFileIterator it(item->ride(), spec);
 
         // Less than 30s don't bother
-        if (ride->dataPoints().count() < 30) {
+        if ((it.last()->secs - it.first()->secs) < 30) {
             setValue(0);
             topRank=0.00;
         } else {
 
             QVector<double> power;
             QVector<double> secs;
-            foreach (RideFilePoint *point, ride->dataPoints()) {
+
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
                 power.append(point->watts);
                 secs.append(point->secs);
             }
@@ -2220,7 +2557,11 @@ class MeanPowerVariance : public RideMetric {
             topRank = outliers.getYForRank(0);
         }
     }
-    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
+
+    bool isRelevantForRide(const RideItem *ride) const { 
+        return ride->present.contains("P") || (!ride->isSwim && !ride->isRun);
+    }
+
     RideMetric *clone() const { return new MeanPowerVariance(*this); }
 };
 
@@ -2243,6 +2584,7 @@ class MaxPowerVariance : public RideMetric {
         setSymbol("maxpowervariance");
         setInternalName("Max Power Variance");
     }
+
     void initialize() {
         setName(tr("Max Power Variance"));
         setImperialUnits("watts change");
@@ -2250,18 +2592,31 @@ class MaxPowerVariance : public RideMetric {
         setPrecision(2);
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &deps) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         MeanPowerVariance *mean = dynamic_cast<MeanPowerVariance*>(deps.value("meanpowervariance"));
-        if (ride->dataPoints().count() < 30)
+
+        RideFileIterator it(item->ride(), spec);
+
+        // Less than 30s don't bother
+        if ((it.last()->secs - it.first()->secs) < 30)
             setValue(0);
         else
             setValue(mean->topRank);
     }
-    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
+
+    bool isRelevantForRide(const RideItem *ride) const {
+        return ride->present.contains("P") || (!ride->isSwim && !ride->isRun);
+    }
+
     RideMetric *clone() const { return new MaxPowerVariance(*this); }
 };
 
@@ -2288,6 +2643,7 @@ class AvgLTE : public RideMetric {
         setSymbol("average_lte");
         setInternalName("Average Left Torque Effectiveness");
     }
+
     void initialize() {
         setName(tr("Average Left Torque Effectiveness"));
         setMetricUnits(tr("%"));
@@ -2296,31 +2652,31 @@ class AvgLTE : public RideMetric {
         setPrecision(1);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->lte) {
-
-            double total = 0.0f;
-            double samples = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->lte) {
-                    samples ++;
-                    total += point->lte;
-                }
-            }
-
-            if (total > 0.0f && samples > 0.0f) setValue(total / samples);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->lte) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double samples = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            if (point->lte) {
+                samples ++;
+                total += point->lte;
+            }
+        }
+
+        if (total > 0.0f && samples > 0.0f) setValue(total / samples);
+        else setValue(0.0);
+
     }
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLTE(*this); }
@@ -2339,6 +2695,7 @@ class AvgRTE : public RideMetric {
         setSymbol("average_rte");
         setInternalName("Average Right Torque Effectiveness");
     }
+
     void initialize() {
         setName(tr("Average Right Torque Effectiveness"));
         setMetricUnits(tr("%"));
@@ -2347,30 +2704,30 @@ class AvgRTE : public RideMetric {
         setPrecision(1);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->rte) {
-
-            double total = 0.0f;
-            double samples = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-                if (point->rte) {
-                    samples ++;
-                    total += point->rte;
-                }
-            }
-
-            if (total > 0.0f && samples > 0.0f) setValue(total / samples);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->rte) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double samples = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->rte) {
+                samples ++;
+                total += point->rte;
+            }
+        }
+
+        if (total > 0.0f && samples > 0.0f) setValue(total / samples);
+        else setValue(0.0);
+
     }
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRTE(*this); }
@@ -2389,6 +2746,7 @@ class AvgLPS : public RideMetric {
         setSymbol("average_lps");
         setInternalName("Average Left Pedal Smoothness");
     }
+
     void initialize() {
         setName(tr("Average Left Pedal Smoothness"));
         setMetricUnits(tr("%"));
@@ -2397,32 +2755,31 @@ class AvgLPS : public RideMetric {
         setPrecision(1);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->lps) {
-
-            double total = 0.0f;
-            double samples = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->lps) {
-                    samples ++;
-                    total += point->lps;
-                }
-            }
-
-            if (total > 0.0f && samples > 0.0f) setValue(total / samples);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->lps) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double samples = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->lps) {
+                samples ++;
+                total += point->lps;
+            }
+        }
+
+        if (total > 0.0f && samples > 0.0f) setValue(total / samples);
+        else setValue(0.0);
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPS(*this); }
 };
@@ -2440,6 +2797,7 @@ class AvgRPS : public RideMetric {
         setSymbol("average_rps");
         setInternalName("Average Right Pedal Smoothness");
     }
+
     void initialize() {
         setName(tr("Average Right Pedal Smoothness"));
         setMetricUnits(tr("%"));
@@ -2448,31 +2806,29 @@ class AvgRPS : public RideMetric {
         setPrecision(1);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->rps) {
-
-            double total = 0.0f;
-            double samples = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->rps) {
-                    samples ++;
-                    total += point->rps;
-                }
-            }
-
-            if (total > 0.0f && samples > 0.0f) setValue(total / samples);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->rps) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double samples = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->rps) {
+                samples ++;
+                total += point->rps;
+            }
+        }
+
+        if (total > 0.0f && samples > 0.0f) setValue(total / samples);
+        else setValue(0.0);
     }
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPS(*this); }
@@ -2491,6 +2847,7 @@ class AvgLPCO : public RideMetric {
         setSymbol("average_lpco");
         setInternalName("Average Left Pedal Center Offset");
     }
+
     void initialize() {
         setName(tr("Average Left Pedal Center Offset"));
         setMetricUnits(tr("mm"));
@@ -2500,32 +2857,31 @@ class AvgLPCO : public RideMetric {
         setConversion(INCH_PER_MM);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->lpco) {
-
-            double total = 0.0f;
-            double secs = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->cad) {
-                    secs += ride->recIntSecs();
-                    total += point->lpco;
-                }
-            }
-
-            if (secs > 0.0f) setValue(total / secs);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->lpco) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double secs = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->cad) {
+                secs += item->ride()->recIntSecs();
+                total += point->lpco;
+            }
+        }
+
+        if (secs > 0.0f) setValue(total / secs);
+        else setValue(0.0);
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPCO(*this); }
 };
@@ -2543,6 +2899,7 @@ class AvgRPCO : public RideMetric {
         setSymbol("average_rpco");
         setInternalName("Average Right Pedal Center Offset");
     }
+
     void initialize() {
         setName(tr("Average Right Pedal Center Offset"));
         setMetricUnits(tr("mm"));
@@ -2552,31 +2909,29 @@ class AvgRPCO : public RideMetric {
         setConversion(INCH_PER_MM);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->rpco) {
-
-            double total = 0.0f;
-            double secs = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->cad) {
-                    secs += ride->recIntSecs();
-                    total += point->rpco;
-                }
-            }
-
-            if (secs > 0.0f) setValue(total / secs);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->rpco) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double secs = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->cad) {
+                secs += item->ride()->recIntSecs();
+                total += point->rpco;
+            }
+        }
+
+        if (secs > 0.0f) setValue(total / secs);
+        else setValue(0.0);
     }
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPCO(*this); }
@@ -2595,6 +2950,7 @@ class AvgLPPB : public RideMetric {
         setSymbol("average_lppb");
         setInternalName("Average Left Power Phase Start");
     }
+
     void initialize() {
         setName(tr("Average Left Power Phase Start"));
         setMetricUnits(tr("°"));
@@ -2602,31 +2958,29 @@ class AvgLPPB : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->lppb) {
-
-            double total = 0.0f;
-            double secs = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->lppe>0) { // use for average if we have an end
-                    secs += ride->recIntSecs();
-                    total += point->lppb + (point->lppb>180?-360:0);
-                }
-            }
-
-            if (secs > 0.0f) setValue(total / secs);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->lppb) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double secs = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->lppe>0) { // use for average if we have an end
+                secs += item->ride()->recIntSecs();
+                total += point->lppb + (point->lppb>180?-360:0);
+            }
+        }
+
+        if (secs > 0.0f) setValue(total / secs);
+        else setValue(0.0);
     }
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPPB(*this); }
@@ -2645,6 +2999,7 @@ class AvgRPPB : public RideMetric {
         setSymbol("average_rppb");
         setInternalName("Average Right Power Phase Start");
     }
+
     void initialize() {
         setName(tr("Average Right Power Phase Start"));
         setMetricUnits(tr("°"));
@@ -2652,32 +3007,31 @@ class AvgRPPB : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->rppb) {
-
-            double total = 0.0f;
-            double secs = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->rppe>0) { // use for average if we have an end
-                    secs += ride->recIntSecs();
-                    total += point->rppb + (point->rppb>180?-360:0);
-                }
-            }
-
-            if (secs > 0.0f) setValue(total / secs);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->rppb) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double secs = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->rppe>0) { // use for average if we have an end
+                secs += item->ride()->recIntSecs();
+                total += point->rppb + (point->rppb>180?-360:0);
+            }
+        }
+
+        if (secs > 0.0f) setValue(total / secs);
+        else setValue(0.0);
     }
+
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPPB(*this); }
 };
@@ -2696,6 +3050,7 @@ class AvgLPPE : public RideMetric {
         setSymbol("average_lppe");
         setInternalName("Average Left Power Phase End");
     }
+
     void initialize() {
         setName(tr("Average Left Power Phase End"));
         setMetricUnits(tr("°"));
@@ -2703,31 +3058,29 @@ class AvgLPPE : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->lppe) { // end has to be > 0
-
-            double total = 0.0f;
-            double secs = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->lppe > 0) {
-                    secs += ride->recIntSecs();
-                    total += point->lppe;
-                }
-            }
-
-            if (secs > 0.0f) setValue(total / secs);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->lppe) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double secs = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->lppe > 0) {
+                secs += item->ride()->recIntSecs();
+                total += point->lppe;
+            }
+        }
+
+        if (secs > 0.0f) setValue(total / secs);
+        else setValue(0.0);
     }
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPPE(*this); }
@@ -2746,6 +3099,7 @@ class AvgRPPE : public RideMetric {
         setSymbol("average_rppe");
         setInternalName("Average Right Power Phase End");
     }
+
     void initialize() {
         setName(tr("Average Right Power Phase End"));
         setMetricUnits(tr("°"));
@@ -2753,31 +3107,30 @@ class AvgRPPE : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->rppe) {
-
-            double total = 0.0f;
-            double secs = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->rppe > 0) { // end has to be > 0
-                    secs += ride->recIntSecs();
-                    total += point->rppe;
-                }
-            }
-
-            if (secs > 0.0f) setValue(total / secs);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->rppe) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double secs = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            if (point->rppe > 0) { // end has to be > 0
+                secs += item->ride()->recIntSecs();
+                total += point->rppe;
+            }
+        }
+
+        if (secs > 0.0f) setValue(total / secs);
+        else setValue(0.0);
     }
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPPE(*this); }
@@ -2804,31 +3157,30 @@ class AvgLPPPB : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->lpppb) {
-
-            double total = 0.0f;
-            double secs = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->lpppe>0) { // use for average if we have an end
-                    secs += ride->recIntSecs();
-                    total += point->lpppb + (point->lpppb>180?-360:0);
-                }
-            }
-
-            if (secs > 0.0f) setValue(total / secs);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->lpppb) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double secs = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            if (point->lpppe>0) { // use for average if we have an end
+                secs += item->ride()->recIntSecs();
+                total += point->lpppb + (point->lpppb>180?-360:0);
+            }
+        }
+
+        if (secs > 0.0f) setValue(total / secs);
+        else setValue(0.0);
     }
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPPPB(*this); }
@@ -2847,6 +3199,7 @@ class AvgRPPPB : public RideMetric {
         setSymbol("average_rpppb");
         setInternalName("Average Right Peak Power Phase Start");
     }
+
     void initialize() {
         setName(tr("Average Right Peak Power Phase Start"));
         setMetricUnits(tr("°"));
@@ -2854,31 +3207,30 @@ class AvgRPPPB : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->rpppb) {
-
-            double total = 0.0f;
-            double secs = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->rpppe>0) { // use for average if we have an end
-                    secs += ride->recIntSecs();
-                    total += point->rpppb + (point->rpppb>180?-360:0);
-                }
-            }
-
-            if (secs > 0.0f) setValue(total / secs);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->rpppb) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double secs = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            if (point->rpppe>0) { // use for average if we have an end
+                secs += item->ride()->recIntSecs();
+                total += point->rpppb + (point->rpppb>180?-360:0);
+            }
+        }
+
+        if (secs > 0.0f) setValue(total / secs);
+        else setValue(0.0);
     }
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPPPB(*this); }
@@ -2898,6 +3250,7 @@ class AvgLPPPE : public RideMetric {
         setSymbol("average_lpppe");
         setInternalName("Average Left Peak Power Phase End");
     }
+
     void initialize() {
         setName(tr("Average Left Peak Power Phase End"));
         setMetricUnits(tr("°"));
@@ -2905,31 +3258,29 @@ class AvgLPPPE : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->lpppe) {
-
-            double total = 0.0f;
-            double secs = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->lpppe > 0) { // end has to be > 0
-                    secs += ride->recIntSecs();
-                    total += point->lpppe;
-                }
-            }
-
-            if (secs > 0.0f) setValue(total / secs);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->lppe) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double secs = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            if (point->lpppe > 0) { // end has to be > 0
+                secs += item->ride()->recIntSecs();
+                total += point->lpppe;
+            }
+        }
+
+        if (secs > 0.0f) setValue(total / secs);
+        else setValue(0.0);
     }
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgLPPPE(*this); }
@@ -2948,6 +3299,7 @@ class AvgRPPPE : public RideMetric {
         setSymbol("average_rpppe");
         setInternalName("Average Right Peak Power Phase End");
     }
+
     void initialize() {
         setName(tr("Average Right Peak Power Phase End"));
         setMetricUnits(tr("°"));
@@ -2955,31 +3307,30 @@ class AvgRPPPE : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        if (ride->areDataPresent()->rpppe) {
-
-            double total = 0.0f;
-            double secs = 0.0f;
-
-            foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-                if (point->rpppe > 0) { // end has to be > 0
-                    secs += ride->recIntSecs();
-                    total += point->rpppe;
-                }
-            }
-
-            if (secs > 0.0f) setValue(total / secs);
-            else setValue(0.0);
-
-        } else {
-
-            setValue(0.0);
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->rpppe) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        double total = 0.0f;
+        double secs = 0.0f;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            if (point->rpppe > 0) { // end has to be > 0
+                secs += item->ride()->recIntSecs();
+                total += point->rpppe;
+            }
+        }
+
+        if (secs > 0.0f) setValue(total / secs);
+        else setValue(0.0);
     }
     bool isRelevantForRide(const RideItem *ride) const { return !ride->isSwim && !ride->isRun; }
     RideMetric *clone() const { return new AvgRPPPE(*this); }
@@ -3000,6 +3351,7 @@ class AvgLPP : public RideMetric {
         setSymbol("average_lpp");
         setInternalName("Average Left Power Phase Length");
     }
+
     void initialize() {
         setName(tr("Average Left Power Phase Length"));
         setMetricUnits(tr("°"));
@@ -3007,10 +3359,7 @@ class AvgLPP : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         average_lppb = deps.value("average_lppb")->value(true);
         average_lppe = deps.value("average_lppe")->value(true);
@@ -3018,6 +3367,7 @@ class AvgLPP : public RideMetric {
         if (average_lppe>0)  {
 
             setValue(average_lppe-average_lppb);
+
         } else {
 
             setValue(0.0);
@@ -3044,6 +3394,7 @@ class AvgRPP : public RideMetric {
         setSymbol("average_rpp");
         setInternalName("Average Right Power Phase Length");
     }
+
     void initialize() {
         setName(tr("Average Right Power Phase Length"));
         setMetricUnits(tr("°"));
@@ -3051,10 +3402,7 @@ class AvgRPP : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         average_rppb = deps.value("average_rppb")->value(true);
         average_rppe = deps.value("average_rppe")->value(true);
@@ -3087,6 +3435,7 @@ class AvgLPPP : public RideMetric {
         setSymbol("average_lppp");
         setInternalName("Average Peak Left Power Phase Length");
     }
+
     void initialize() {
         setName(tr("Average Left Peak Power Phase Length"));
         setMetricUnits(tr("°"));
@@ -3094,10 +3443,7 @@ class AvgLPPP : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         average_lpppb = deps.value("average_lpppb")->value(true);
         average_lpppe = deps.value("average_lpppe")->value(true);
@@ -3105,6 +3451,7 @@ class AvgLPPP : public RideMetric {
         if (average_lpppe>0)  {
 
             setValue(average_lpppe-average_lpppb);
+
         } else {
 
             setValue(0.0);
@@ -3131,6 +3478,7 @@ class AvgRPPP : public RideMetric {
         setSymbol("average_rppp");
         setInternalName("Average Right Peak Power Phase Length");
     }
+
     void initialize() {
         setName(tr("Average Right Peak Power Phase Length"));
         setMetricUnits(tr("°"));
@@ -3138,10 +3486,7 @@ class AvgRPPP : public RideMetric {
         setPrecision(0);
     }
 
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         average_rpppb = deps.value("average_rpppb")->value(true);
         average_rpppe = deps.value("average_rpppe")->value(true);
@@ -3208,23 +3553,22 @@ struct TotalCalories : public RideMetric {
         setSymbol("total_kcalories");
         setInternalName("Calories");
     }
+
     void initialize() {
         setName(tr("Calories (HR)"));
         setMetricUnits(tr("kcal"));
         setImperialUnits(tr("kcal"));
         setType(RideMetric::Total);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *context) {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         average_hr = deps.value("average_hr")->value(true);
         athlete_weight = deps.value("athlete_weight")->value(true);
         duration = deps.value("time_riding")->value(true); // time_riding or workout_time ?
 
-        athlete_age = ride->startTime().date().year() - appsettings->cvalue(context->athlete->cyclist, GC_DOB).toDate().year();
-        bool male = appsettings->cvalue(context->athlete->cyclist, GC_SEX).toInt() == 0;
+        athlete_age = item->dateTime.date().year() - appsettings->cvalue(item->context->athlete->cyclist, GC_DOB).toDate().year();
+        bool male = appsettings->cvalue(item->context->athlete->cyclist, GC_SEX).toInt() == 0;
 
         double kcalories = 0.0;
 

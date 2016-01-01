@@ -51,6 +51,12 @@ void Zones::initializeZoneParameters()
         sizeof(initial_zone_default) /
         sizeof(initial_zone_default[0]);
 
+    if (run) {
+        fileName_ = "run-power.zones";
+    } else {
+        fileName_ = "power.zones";
+    }
+
     scheme.zone_default.clear();
     scheme.zone_default_is_pct.clear();
     scheme.zone_default_desc.clear();
@@ -153,13 +159,13 @@ bool Zones::read(QFile &file)
 
             // defaults are allowed only at the beginning of the file
             if (ranges.size()) {
-                err = "Zone defaults must be specified at head of power.zones file";
+                err = tr("Zone defaults must be specified at head of %1 file").arg(fileName_);
                 return false;
             }
 
             // only one set of defaults is allowed
             if (scheme.nzones_default) {
-                err = "Only one set of zone defaults may be specified in power.zones file";
+                err = tr("Only one set of zone defaults may be specified in %1 file").arg(fileName_);
                 return false;
             }
 
@@ -245,7 +251,7 @@ bool Zones::read(QFile &file)
         // check for FTP
         if (ftpx.indexIn(line, 0) != -1) {
             if (!in_range)
-                qDebug()<<"ignoring errant FTP= in power.zones";
+                qDebug()<<"ignoring errant FTP= in "<<fileName_;
             else {
                 ftp = ftpx.cap(1).toInt();
 
@@ -260,7 +266,7 @@ bool Zones::read(QFile &file)
         // check for w'
         if (wprimerx.indexIn(line, 0) != -1) {
             if (!in_range)
-                qDebug()<<"ignoring errant W'= in power.zones";
+                qDebug()<<"ignoring errant W'= in "<<fileName_;
             else {
                 wprime = wprimerx.cap(1).toInt();
 
@@ -278,7 +284,7 @@ bool Zones::read(QFile &file)
         // check for Pmax
         if (pmaxx.indexIn(line, 0) != -1) {
             if (!in_range)
-                qDebug()<<"ignoring errant Pmax= in power.zones";
+                qDebug()<<"ignoring errant Pmax= in "<<fileName_;
             else {
                 pmax = pmaxx.cap(1).toInt();
             }
@@ -454,7 +460,7 @@ next_line: {}
         if (ranges[nr].cp <= 0) {
 
             err = tr("CP must be greater than zero in zone "
-                     "range %1 of power.zones").arg(nr + 1);
+                     "range %1 of %2").arg(nr + 1).arg(fileName_);
             return false;
         }
 
@@ -850,7 +856,7 @@ void Zones::write(QDir home)
 #endif
     }
 
-    QFile file(home.canonicalPath() + "/power.zones");
+    QFile file(home.canonicalPath() + "/" + fileName_);
     if (file.open(QFile::WriteOnly)) {
 
         QTextStream stream(&file);
@@ -860,7 +866,7 @@ void Zones::write(QDir home)
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.setText(tr("Problem Saving Power Zones"));
-        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(home.canonicalPath() + "/power.zones"));
+        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(home.canonicalPath() + "/" + fileName_));
         msgBox.exec();
         return;
     }
@@ -1046,3 +1052,8 @@ Zones::getFingerprint(QDate forDate) const
     return qChecksum(ba, ba.length());
 }
 
+QString
+Zones::useCPforFTPSetting() const
+{
+    return run ? GC_USE_CP_FOR_FTP_RUN : GC_USE_CP_FOR_FTP;
+}

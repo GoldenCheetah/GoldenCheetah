@@ -129,6 +129,9 @@ static bool contains(const RideFile*ride, QList<IntervalItem*> intervals, int in
 
 QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &notincluding)
 {
+    // need a current rideitem
+    if (!context->currentRideItem()) return "";
+
     // We need to create a special ridefile just for the selected intervals
     // to calculate the aggregated metrics because intervals can OVERLAP!
     // so we can't just aggregate the pre-computed metrics as this will lead
@@ -210,13 +213,27 @@ QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &
     else
         s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
     QStringList intervalMetrics = s.split(",");
-
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    QHash<QString,RideMetricPtr> metrics =
-        RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), intervalMetrics);
 
-    QHash<QString,RideMetricPtr> notmetrics =
-        RideMetric::computeMetrics(context, &notf, context->athlete->zones(), context->athlete->hrZones(), intervalMetrics);
+    // build fake rideitem and compute metrics
+    RideItem *fake;
+    fake = new RideItem(&f, context);
+    fake->setFrom(*const_cast<RideItem*>(context->currentRideItem()), true); // this wipes ride_ so put back
+    fake->ride_ = &f;
+    fake->getWeight();
+    fake->intervals_.clear(); // don't accidentally wipe these!!!!
+    fake->samples = f.dataPoints().count() > 0;
+    QHash<QString,RideMetricPtr> metrics = RideMetric::computeMetrics(fake, Specification(), intervalMetrics);
+
+    // build fake for not in intervals
+    RideItem *notfake;
+    notfake = new RideItem(&notf, context);
+    notfake->setFrom(*const_cast<RideItem*>(context->currentRideItem()), true); // this wipes ride_ so put back
+    notfake->ride_ = &notf;
+    notfake->getWeight();
+    fake->intervals_.clear(); // don't accidentally wipe these!!!!
+    notfake->samples = notf.dataPoints().count() > 0;
+    QHash<QString,RideMetricPtr> notmetrics = RideMetric::computeMetrics(notfake, Specification(), intervalMetrics);
 
     // create temp interval item to use by interval summary
     IntervalItem temp;
@@ -239,7 +256,7 @@ QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &
 
     // set name
     temp.name = QString(tr("%1 selected intervals")).arg(intervals.count());
-    temp.rideItem_ = intervals.at(0)->rideItem_;
+    temp.rideItem_ = fake;
 
     QString returning = summary(&temp);
 
@@ -262,11 +279,21 @@ QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &
 
         // set name
         temp.name = QString(tr("Excluding %1 selected")).arg(intervals.count());
-        temp.rideItem_ = intervals.at(0)->rideItem_;
+        temp.rideItem_ = notfake;
 
         // use standard method from above
         notincluding = summary(&temp);
     }
+
+    // remove references temporary / fakes get wiped
+    temp.rideItem_ = NULL;
+
+    // zap references to real, and delete temporary ride item
+    fake->ride_ = NULL;
+    delete fake;
+    
+    notfake->ride_ = NULL;
+    delete notfake;
 
     return returning;
 }

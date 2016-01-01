@@ -87,6 +87,9 @@ class Zones : public QObject
 
     private:
 
+        // Sport
+        bool run;
+
         // Scheme
         bool defaults_from_user;
         ZoneScheme scheme;
@@ -95,12 +98,12 @@ class Zones : public QObject
         QList<ZoneRange> ranges;
 
         // utility
-        QString err, warning;
+        QString err, warning, fileName_;
         void setZonesFromCP(ZoneRange &range);
 
     public:
 
-        Zones() : defaults_from_user(false) {
+        Zones(bool run=false) : run(run), defaults_from_user(false) {
                 initializeZoneParameters();
         }
 
@@ -117,6 +120,9 @@ class Zones : public QObject
         // set zone parameters to either user-specified defaults
         // or to defaults using Coggan's coefficients
         void initializeZoneParameters();
+
+        // Sport
+        bool isRun() { return run; }
 
         //
         // Zone history - Ranges
@@ -155,6 +161,7 @@ class Zones : public QObject
         //
         bool read(QFile &file);
         void write(QDir home);
+        const QString &fileName() const { return fileName_; }
         const QString &errorString() const { return err; }
         const QString &warningString() const { return warning; }
 
@@ -206,6 +213,9 @@ class Zones : public QObject
         // can be more granular -- did the zone config for the date of
         // a particular ride change ?
         quint16 getFingerprint(QDate date) const;
+
+        // USE_CP_FOR_FTP setting differenciated by sport
+        QString useCPforFTPSetting() const;
 };
 
 QColor zoneColor(int zone, int num_zones);

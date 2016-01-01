@@ -20,13 +20,11 @@
 #include <QSettings>
 
 #include "Context.h"
-#include "Context.h"
 #include "Athlete.h"
 #include "ConfigDialog.h"
 #include "RideCache.h"
 #include "Pages.h"
 #include "Settings.h"
-#include "Zones.h"
 #include "HelpWhatsThis.h"
 
 #include "AddDeviceWizard.h"
@@ -34,8 +32,8 @@
 
 extern bool restarting; //its actually in main.cpp
 
-ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
-    home(_home), zones(_zones), context(context)
+ConfigDialog::ConfigDialog(QDir _home, Context *context) :
+    home(_home), context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
@@ -121,12 +119,12 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     pagesWidget = new QStackedWidget(this);
 
     // create those config pages
-    general = new GeneralConfig(_home, _zones, context);
+    general = new GeneralConfig(_home, context);
     HelpWhatsThis *generalHelp = new HelpWhatsThis(general);
     general->setWhatsThis(generalHelp->getWhatsThisText(HelpWhatsThis::Preferences_General));
     pagesWidget->addWidget(general);
 
-    athlete = new AthleteConfig(_home, _zones, context);
+    athlete = new AthleteConfig(_home, context);
     HelpWhatsThis *athleteHelp = new HelpWhatsThis(athlete);
     athlete->setWhatsThis(athleteHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About));
     pagesWidget->addWidget(athlete);
@@ -134,32 +132,32 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     // units change on general affects units used on entry in athlete pages
     connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->athletePhysPage, SLOT(unitChanged(int)));
 
-    password = new PasswordConfig(_home, _zones, context);
+    password = new PasswordConfig(_home, context);
     HelpWhatsThis *passwordHelp = new HelpWhatsThis(password);
     password->setWhatsThis(passwordHelp->getWhatsThisText(HelpWhatsThis::Preferences_Passwords));
     pagesWidget->addWidget(password);
 
-    appearance = new AppearanceConfig(_home, _zones, context);
+    appearance = new AppearanceConfig(_home, context);
     HelpWhatsThis *appearanceHelp = new HelpWhatsThis(appearance);
     appearance->setWhatsThis(appearanceHelp->getWhatsThisText(HelpWhatsThis::Preferences_Appearance));
     pagesWidget->addWidget(appearance);
 
-    data = new DataConfig(_home, _zones, context);
+    data = new DataConfig(_home, context);
     HelpWhatsThis *dataHelp = new HelpWhatsThis(data);
     data->setWhatsThis(dataHelp->getWhatsThisText(HelpWhatsThis::Preferences_DataFields));
     pagesWidget->addWidget(data);
 
-    metric = new MetricConfig(_home, _zones, context);
+    metric = new MetricConfig(_home, context);
     HelpWhatsThis *metricHelp = new HelpWhatsThis(metric);
     metric->setWhatsThis(metricHelp->getWhatsThisText(HelpWhatsThis::Preferences_Metrics));
     pagesWidget->addWidget(metric);
 
-    interval = new IntervalConfig(_home, _zones, context);
+    interval = new IntervalConfig(_home, context);
     HelpWhatsThis *intervalHelp = new HelpWhatsThis(interval);
     interval->setWhatsThis(intervalHelp->getWhatsThisText(HelpWhatsThis::Preferences_Intervals));
     pagesWidget->addWidget(interval);
 
-    train = new TrainConfig(_home, _zones, context);
+    train = new TrainConfig(_home, context);
     HelpWhatsThis *trainHelp = new HelpWhatsThis(train);
     train->setWhatsThis(trainHelp->getWhatsThisText(HelpWhatsThis::Preferences_Training));
     pagesWidget->addWidget(train);
@@ -280,8 +278,8 @@ void ConfigDialog::saveClicked()
 }
 
 // GENERAL CONFIG
-GeneralConfig::GeneralConfig(QDir home, Zones *zones, Context *context) :
-    home(home), zones(zones), context(context)
+GeneralConfig::GeneralConfig(QDir home, Context *context) :
+    home(home), context(context)
 {
     generalPage = new GeneralPage(context);
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -297,8 +295,8 @@ qint32 GeneralConfig::saveClicked()
 }
 
 // ATHLETE CONFIG
-AthleteConfig::AthleteConfig(QDir home, Zones *zones, Context *context) :
-    home(home), zones(zones), context(context)
+AthleteConfig::AthleteConfig(QDir home, Context *context) :
+    home(home), context(context)
 {
     // the widgets
     athletePage = new AboutRiderPage(this, context);
@@ -356,8 +354,8 @@ qint32 AthleteConfig::saveClicked()
 }
 
 // APPEARANCE CONFIG
-AppearanceConfig::AppearanceConfig(QDir home, Zones *zones, Context *context) :
-    home(home), zones(zones), context(context)
+AppearanceConfig::AppearanceConfig(QDir home, Context *context) :
+    home(home), context(context)
 {
     appearancePage = new ColorsPage(this);
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -373,8 +371,8 @@ qint32 AppearanceConfig::saveClicked()
 }
 
 // PASSWORD CONFIG
-PasswordConfig::PasswordConfig(QDir home, Zones *zones, Context *context) :
-    home(home), zones(zones), context(context)
+PasswordConfig::PasswordConfig(QDir home, Context *context) :
+    home(home), context(context)
 {
     passwordPage = new CredentialsPage(this, context);
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -390,8 +388,8 @@ qint32 PasswordConfig::saveClicked()
 }
 
 // METADATA CONFIG
-DataConfig::DataConfig(QDir home, Zones *zones, Context *context) :
-    home(home), zones(zones), context(context)
+DataConfig::DataConfig(QDir home, Context *context) :
+    home(home), context(context)
 {
     dataPage = new MetadataPage(context);
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -407,24 +405,25 @@ qint32 DataConfig::saveClicked()
 }
 
 // GENERAL CONFIG
-MetricConfig::MetricConfig(QDir home, Zones *zones, Context *context) :
-    home(home), zones(zones), context(context)
+MetricConfig::MetricConfig(QDir home, Context *context) :
+    home(home), context(context)
 {
     // the widgets
     bestsPage = new BestsMetricsPage(this);
     intervalsPage = new IntervalMetricsPage(this);
     summaryPage = new SummaryMetricsPage(this);
+    customPage = new CustomMetricsPage(this, context);
 
     setContentsMargins(0,0,0,0);
-    QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
 
     QTabWidget *tabs = new QTabWidget(this);
+    tabs->addTab(customPage, tr("Custom"));
     tabs->addTab(bestsPage, tr("Bests"));
     tabs->addTab(summaryPage, tr("Summary"));
     tabs->addTab(intervalsPage, tr("Intervals"));
-
     mainLayout->addWidget(tabs);
 }
 
@@ -435,12 +434,13 @@ qint32 MetricConfig::saveClicked()
     state |= bestsPage->saveClicked();
     state |= summaryPage->saveClicked();
     state |= intervalsPage->saveClicked();
+    state |= customPage->saveClicked();
 
     return state;
 }
 
-IntervalConfig::IntervalConfig(QDir home, Zones *zones, Context *context) :
-    home(home), zones(zones), context(context)
+IntervalConfig::IntervalConfig(QDir home, Context *context) :
+    home(home), context(context)
 {
     // the widgets
     intervalsPage = new IntervalsPage(context);
@@ -464,8 +464,8 @@ qint32 IntervalConfig::saveClicked()
 }
 
 // GENERAL CONFIG
-TrainConfig::TrainConfig(QDir home, Zones *zones, Context *context) :
-    home(home), zones(zones), context(context)
+TrainConfig::TrainConfig(QDir home, Context *context) :
+    home(home), context(context)
 {
 
     // the widgets

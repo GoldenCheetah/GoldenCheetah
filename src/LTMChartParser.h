@@ -32,6 +32,7 @@ class LTMChartParser : public QXmlDefaultHandler
 
 public:
     static void serialize(QString, QList<LTMSettings>);
+    static void serializeToQString(QString*, QList<LTMSettings>);
 
     // unmarshall
     bool startDocument();

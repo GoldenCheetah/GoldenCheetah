@@ -61,7 +61,7 @@ class ColorEngine;
 class AnalysisSidebar;
 class Tab;
 class Leaf;
-class DataFilter;
+class DataFilterRuntime;
 
 class Athlete : public QObject
 {
@@ -84,10 +84,10 @@ class Athlete : public QObject
         ColorEngine *colorEngine;
 
         // zones
-        const Zones *zones() const { return zones_; }
+        const Zones *zones(bool isRun) const { return zones_[isRun]; }
         const HrZones *hrZones() const { return hrzones_; }
-        const PaceZones *paceZones(bool isSwim=false) const { return pacezones_[isSwim]; }
-        Zones *zones_;
+        const PaceZones *paceZones(bool isSwim) const { return pacezones_[isSwim]; }
+        Zones *zones_[2];
         HrZones *hrzones_;
         PaceZones *pacezones_[2];
         void setCriticalPower(int cp);
@@ -105,7 +105,7 @@ class Athlete : public QObject
 
         // PMC Data
         PMCData *getPMCFor(QString metricName, int stsDays = -1, int ltsDays = -1); // no Specification used!
-        PMCData *getPMCFor(Leaf *expr, DataFilter *df, int stsDays = -1, int ltsDays = -1); // no Specification used!
+        PMCData *getPMCFor(Leaf *expr, DataFilterRuntime *df, int stsDays = -1, int ltsDays = -1); // no Specification used!
         QMap<QString, PMCData*> pmcData; // all the different PMC series
 
         // athlete measures
@@ -146,7 +146,7 @@ class Athlete : public QObject
 
         // ride collection
         void selectRideFile(QString);
-        void addRide(QString name, bool bSelect=true, bool useTempActivities=false);
+        void addRide(QString name, bool bSelect=true, bool useTempActivities=false, bool planned=false);
         void removeCurrentRide();
 
         // zones etc
@@ -190,6 +190,7 @@ class AthleteDirectoryStructure : public QObject {
             QDir logs() { return QDir(myhome.absolutePath()+"/"+athlete_logs);}
             QDir temp() { return QDir(myhome.absolutePath()+"/"+athlete_temp);}
             QDir quarantine() { return QDir(myhome.absolutePath()+"/"+athlete_quarantine);}
+            QDir planned() { return QDir(myhome.absolutePath()+"/"+athlete_planned);}
             QDir root() { return myhome; }
 
             // supporting functions to work with the subDirs
@@ -214,7 +215,7 @@ class AthleteDirectoryStructure : public QObject {
             QString athlete_logs;
             QString athlete_temp;
             QString athlete_quarantine;
-
+            QString athlete_planned;
 
 };
 

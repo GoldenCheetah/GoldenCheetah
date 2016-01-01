@@ -103,7 +103,9 @@
 // for vlc
 #include <stdio.h>
 #include <stdlib.h>
+#ifndef Q_CC_MSVC
 #include <unistd.h>
+#endif
 
 extern "C" {
 #include <vlc/vlc.h>

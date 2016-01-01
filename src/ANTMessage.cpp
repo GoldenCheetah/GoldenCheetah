@@ -1035,11 +1035,11 @@ ANTMessage ANTMessage::fecRequestCapabilities(const uint8_t channel)
 {
     // based on ANT+ Common Pages, Rev 2.4 p 14: 6.2  Common Data Page 70: Request Data Page
     return ANTMessage(9, ANT_ACK_DATA, channel,
-                      0x46,        // data page request
+                      FITNESS_EQUIPMENT_REQUEST_DATA_PAGE,        // data page request
                       0xFF, 0xFF,  // reserved
                       0xFF, 0xFF,  // descriptors
                       0x01,        // requested transmission response (1 time only)
-                      0x36,        // requested page
+                      FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE,        // requested page
                       0x01);       // request data page
 }
 
@@ -1047,7 +1047,7 @@ ANTMessage ANTMessage::fecRequestCommandStatus(const uint8_t channel, const uint
 {
     // based on ANT+ Common Pages, Rev 2.4 p 14: 6.2  Common Data Page 70: Request Data Page
     return ANTMessage(9, ANT_ACK_DATA, channel,
-                      0x46,        // data page request
+                      FITNESS_EQUIPMENT_REQUEST_DATA_PAGE,        // data page request
                       0xFF, 0xFF,  // reserved
                       0xFF, 0xFF,  // descriptors
                       0x01,        // requested transmission response (1 time only)

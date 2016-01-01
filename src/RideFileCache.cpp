@@ -151,9 +151,19 @@ RideFileCache::checkStale(Context *context, RideItem*item)
 {
     // check if we're stale ?
     // Get info for ride file and cache file
-    QString rideFileName = context->athlete->home->activities().canonicalPath() + "/" + item->fileName;
+    QString rideFileName;
+    if (item->planned)
+        rideFileName = context->athlete->home->planned().canonicalPath() + "/" + item->fileName;
+    else
+        rideFileName = context->athlete->home->activities().canonicalPath() + "/" + item->fileName;
+
     QFileInfo rideFileInfo(rideFileName);
-    QString cacheFileName = context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx";
+    QString cacheFileName;
+    if (item->planned)
+        cacheFileName = context->athlete->home->cache().canonicalPath() + "/planned/" + rideFileInfo.baseName() + ".cpx";
+    else
+        cacheFileName = context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx";
+
     QFileInfo cacheFileInfo(cacheFileName);
 
     // is it up-to-date?
@@ -1418,14 +1428,14 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     if (ride->isDataPresent(needSeries) == false) return;
 
     // get zones that apply, if any
-    int zoneRange = context->athlete->zones() ? context->athlete->zones()->whichRange(ride->startTime().date()) : -1;
+    int zoneRange = context->athlete->zones(ride->isRun()) ? context->athlete->zones(ride->isRun())->whichRange(ride->startTime().date()) : -1;
     int hrZoneRange = context->athlete->hrZones() ? context->athlete->hrZones()->whichRange(ride->startTime().date()) : -1;
     int paceZoneRange = context->athlete->paceZones(ride->isSwim()) ? context->athlete->paceZones(ride->isSwim())->whichRange(ride->startTime().date()) : -1;
 
-    if (zoneRange != -1) CP=context->athlete->zones()->getCP(zoneRange);
+    if (zoneRange != -1) CP=context->athlete->zones(ride->isRun())->getCP(zoneRange);
     else CP=0;
 
-    if (zoneRange != -1) WPRIME=context->athlete->zones()->getWprime(zoneRange);
+    if (zoneRange != -1) WPRIME=context->athlete->zones(ride->isRun())->getWprime(zoneRange);
     else WPRIME=0;
 
     if (hrZoneRange != -1) LTHR=context->athlete->hrZones()->getLT(hrZoneRange);
@@ -1484,7 +1494,7 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 
             // watts time in zone
             if (series == RideFile::watts && zoneRange != -1) {
-                int index = context->athlete->zones()->whichZone(zoneRange, dp->value(series));
+                int index = context->athlete->zones(ride->isRun())->whichZone(zoneRange, dp->value(series));
                 if (index >=0) wattsTimeInZone[index] += ride->recIntSecs();
             }
 

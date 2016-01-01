@@ -100,7 +100,7 @@ signals:
     void clearQuery();
 
     // db filter mode
-    void submitFilter(QString);
+    void submitFilter(Context*,QString);
     void clearFilter();
 
     // focus in/out

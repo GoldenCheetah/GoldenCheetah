@@ -67,7 +67,7 @@ public:
 
         if (parent->context->isCompareIntervals) {
 
-            zones = parent->context->athlete->zones();
+            zones = parent->context->athlete->zones(rideItem ? rideItem->isRun : false);
             if (!zones) return;
 
             // use first compare interval date
@@ -78,9 +78,9 @@ public:
             if (zone_range == -1)
                 zone_range = zones->whichRange(QDate::currentDate());
 
-        } else if (rideItem && parent->context->athlete->zones()) {
+        } else if (rideItem && parent->context->athlete->zones(rideItem->isRun)) {
 
-            zones = parent->context->athlete->zones();
+            zones = parent->context->athlete->zones(rideItem->isRun);
             zone_range = zones->whichRange(rideItem->dateTime.date());
 
         } else {
@@ -144,7 +144,7 @@ public:
 
 
 PfPvPlot::PfPvPlot(Context *context)
-    : rideItem (NULL), context(context), hover(NULL), cp_ (0), cad_ (85), cl_ (0.175), shade_zones(true)
+    : rideItem (NULL), context(context), hover(NULL), cp_ (0), pmax_(0), cad_ (85), cl_ (0.175), shade_zones(true)
 {
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
@@ -175,6 +175,10 @@ PfPvPlot::PfPvPlot(Context *context)
     cpCurve = new QwtPlotCurve();
     cpCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     cpCurve->attach(this);
+
+    pmaxCurve = new QwtPlotCurve();
+    pmaxCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    pmaxCurve->attach(this);
 
     curve = new QwtPlotCurve();
     curve->attach(this);
@@ -243,6 +247,9 @@ PfPvPlot::configChanged(qint32)
     cpCurve->setPen(cp);
 
     setCL(appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH).toDouble() / 1000.0);
+    QPen pmax = GColor(CCP);
+    pmax.setStyle(Qt::DashLine);
+    pmaxCurve->setPen(pmax);
 
     replot();
 }
@@ -290,7 +297,7 @@ PfPvPlot::refreshZoneItems()
 
     // set zones from ride or athlete and date of
     // first item in the compare set
-    const Zones *zones = context->athlete->zones();
+    const Zones *zones = context->athlete->zones(rideItem ? rideItem->isRun : false);
     int zone_range = -1;
 
     // comparing does zones for items selected not current ride
@@ -320,6 +327,7 @@ PfPvPlot::refreshZoneItems()
 
     if (zone_range >= 0) {
         setCP(zones->getCP(zone_range));
+        setPMax(zones->getPmax(zone_range));
 
         // populate the zone curves
         QList <int> zone_power = zones->getZoneLows(zone_range);
@@ -538,20 +546,41 @@ PfPvPlot::setData(RideItem *_rideItem)
                 double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
                 if (aepf <= 2500) { // > 2500 newtons is our out of bounds
+#if Q_CC_MSVC
+                    dataSet.insert(std::make_pair(aepf, cpv));
+#else
                     dataSet.insert(std::make_pair<double, double>(aepf, cpv));
+#endif
+
                     tot_cad += p1->cad;
                     tot_cad_points++;
 
                     // fill the dataSets for gearRatio display
                     if (p1->gear != 0) {
                         if (p1->gear > 0.0f && p1->gear <= 1.00f) {
+#if Q_CC_MSVC
+                            gearSet[0].insert(std::make_pair(aepf, cpv));
+#else
                             gearSet[0].insert(std::make_pair<double, double>(aepf, cpv));
+#endif
                         } else if (p1->gear > 1.00f && p1->gear <= 2.50f ) {
+#if Q_CC_MSVC
+                            gearSet[1].insert(std::make_pair(aepf, cpv));
+#else
                             gearSet[1].insert(std::make_pair<double, double>(aepf, cpv));
+#endif
                         } else if (p1->gear > 2.50f && p1->gear <= 4.00 ) {
-                            gearSet[2].insert(std::make_pair<double, double>(aepf, cpv));
+#if Q_CC_MSVC
+                            gearSet[2].insert(std::make_pair(aepf, cpv));
+#else
+                            gearSet[2].insert(std::make_pair(aepf, cpv));
+#endif
                         } else {  // > 4.0
+#if Q_CC_MSVC
+                            gearSet[3].insert(std::make_pair(aepf, cpv));
+#else
                             gearSet[3].insert(std::make_pair<double, double>(aepf, cpv));
+#endif
                         }
                     }
                  }
@@ -775,9 +804,17 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                         ++high;
                         if (p1->secs+ride->recIntSecs() > current->start && p1->secs< current->stop) {
                             if (mergeIntervals())
+#if Q_CC_MSVC
+                                dataSetInterval[0].insert(std::make_pair(aepf, cpv));
+#else
                                 dataSetInterval[0].insert(std::make_pair<double, double>(aepf, cpv));
+#endif
                             else
+#if Q_CC_MSVC
+                                dataSetInterval[high].insert(std::make_pair(aepf, cpv));
+#else
                                 dataSetInterval[high].insert(std::make_pair<double, double>(aepf, cpv));
+#endif
                         }
                     }
                 }
@@ -1149,6 +1186,21 @@ PfPvPlot::recalc()
         QwtArray<double> data;
         cpCurve->setSamples(data,data);
     }
+    if (pmax_) {
+
+        // reinitialise array
+        for (int i = 0; i < contour_xvalues.size(); i ++)
+            yvalues[i] = (cpv < pmax_ / 1e6) ?  1e6 : pmax_ / contour_xvalues[i];
+
+        // generate curve at a given power
+        pmaxCurve->setSamples(contour_xvalues, yvalues);
+
+    } else {
+
+        // an empty curve if no power (or zero power) is specified
+        QwtArray<double> data;
+        pmaxCurve->setSamples(data,data);
+    }
 }
 
 int
@@ -1192,6 +1244,21 @@ PfPvPlot::setCL(double cranklen)
     recalc();
     emit changedCL( QString("%1").arg(cranklen) );
 }
+
+int
+PfPvPlot::getPMax()
+{
+    return pmax_;
+}
+
+void
+PfPvPlot::setPMax(int pmax)
+{
+    pmax_ = pmax;
+    recalc();
+    emit changedPMax( QString("%1").arg(pmax) );
+}
+
 // process checkbox for zone shading
 void
 PfPvPlot::setShadeZones(bool value)
@@ -1271,10 +1338,17 @@ PfPvPlot::showCompareIntervals()
                     double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
                     if (mergeIntervals())
+#if Q_CC_MSVC
+                        dataSetInterval[0].insert(std::make_pair(aepf, cpv));
+#else
                         dataSetInterval[0].insert(std::make_pair<double, double>(aepf, cpv));
+#endif
                     else
+#if Q_CC_MSVC
+                        dataSetInterval[high].insert(std::make_pair(aepf, cpv));
+#else
                         dataSetInterval[high].insert(std::make_pair<double, double>(aepf, cpv));
-
+#endif
                     tot_cad += p1->cad;
                     tot_cad_points++;
                 }
