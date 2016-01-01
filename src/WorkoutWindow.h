@@ -37,7 +37,9 @@
 
 class WorkoutWidget;
 class WWPowerScale;
+class WWWBalScale;
 class WWLine;
+class WWWBLine;
 
 class WorkoutWindow : public GcWindow
 {
@@ -71,7 +73,9 @@ class WorkoutWindow : public GcWindow
         QToolBar *toolbar;
         WorkoutWidget *workout; // will become editor.
         WWPowerScale *powerscale;
+        WWWBalScale *wbalscale;
         WWLine *line;
+        WWWBLine *wbline;
         bool active;
 };
 
