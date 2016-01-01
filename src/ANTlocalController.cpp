@@ -40,6 +40,9 @@ ANTlocalController::ANTlocalController(TrainSidebar *parent, DeviceConfiguration
     // collecting R-R HRV data?
     connect(myANTlocal, SIGNAL(rrData(uint16_t, uint8_t, uint8_t)), this, SIGNAL(rrData(uint16_t, uint8_t, uint8_t)));
 
+    // connect slot receiving ANT remote control commands & translating to native
+    connect(myANTlocal, SIGNAL(antRemoteControl(uint16_t)), this, SLOT(antRemoteControl(uint16_t)));
+
     // Connect a logger
     connect(myANTlocal, SIGNAL(receivedAntMessage(const ANTMessage ,const timeval )), &logger, SLOT(logRawAntMessage(const ANTMessage ,const timeval)));
 }
@@ -139,3 +142,14 @@ ANTlocalController::getRealtimeData(RealtimeData &rtData)
 }
 
 void ANTlocalController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
+
+void ANTlocalController::antRemoteControl(uint16_t command)
+{
+    //qDebug() <<"AntlocalController::antRemoteControl()" << command;
+
+    // translate the ANT control code to a native command code
+    uint16_t nativeCmd = parent->remote->getNativeCmdId(command);
+
+    // pass native command code to train view
+    emit remoteControl(nativeCmd);
+}

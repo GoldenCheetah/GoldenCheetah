@@ -436,6 +436,9 @@ intensity->hide(); //XXX!!! temporary
     videosyncFile = NULL;
     calibrating = false;
 
+    // Remote control support
+    remote = new RemoteControl;
+
     // now the GUI is setup lets sort our control variables
     gui_timer = new QTimer(this);
     disk_timer = new QTimer(this);
@@ -627,6 +630,8 @@ TrainSidebar::videosyncPopup()
 void
 TrainSidebar::configChanged(qint32)
 {
+    //qDebug() << "TrainSidebar::configChanged()";
+
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 #if !defined GC_VIDEO_NONE
     mediaTree->setStyleSheet(GCColor::stylesheet());
@@ -675,6 +680,8 @@ TrainSidebar::configChanged(qint32)
             Devices[i].controller = new NullController(this, &Devices[i]);
         } else if (Devices.at(i).type == DEV_ANTLOCAL) {
             Devices[i].controller = new ANTlocalController(this, &Devices[i]);
+            // connect slot for receiving remote control commands
+            connect(Devices[i].controller, SIGNAL(remoteControl(uint16_t)), this, SLOT(remoteControl(uint16_t)));
 #ifdef GC_HAVE_WFAPI
         } else if (Devices.at(i).type == DEV_KICKR) {
             Devices[i].controller = new KickrController(this, &Devices[i]);
@@ -689,6 +696,9 @@ TrainSidebar::configChanged(qint32)
     // And select default workout to Ergo
     QModelIndex firstWorkout = sortModel->index(0, 0, QModelIndex());
     workoutTree->setCurrentIndex(firstWorkout);
+
+    // Re-read ANT remote control command mappings
+    remote->readConfig();
 
     // Athlete
     FTP=285; // default to 285 if zones are not set
@@ -2108,5 +2118,42 @@ TrainSidebar::selectWorkout(QString fullpath)
             workoutTree->setCurrentIndex(workoutTree->model()->index(i,0));
             break;
         }
+    }
+}
+
+// got a remote control command
+void
+TrainSidebar::remoteControl(uint16_t command)
+{
+    //qDebug() << "TrainSidebar::remoteControl()" << command;
+
+    switch(command){
+
+    case GC_REMOTE_CMD_START:
+        this->Start();
+        break;
+
+    case GC_REMOTE_CMD_STOP:
+        this->Stop();
+        break;
+
+    case GC_REMOTE_CMD_LAP:
+        this->newLap();
+        break;
+
+    case GC_REMOTE_CMD_HIGHER:
+        this->Higher();
+        break;
+
+    case GC_REMOTE_CMD_LOWER:
+        this->Lower();
+        break;
+
+    case GC_REMOTE_CMD_CALIBRATE:
+        this->Calibrate();
+        break;
+
+    default:
+        break;
     }
 }

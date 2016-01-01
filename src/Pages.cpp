@@ -1676,6 +1676,110 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
         return false;
 }
 
+//
+// Remote control page
+//
+RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
+{
+    remote = new RemoteControl;
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+
+    fields = new QTreeWidget;
+    fields->headerItem()->setText(0, tr("Action"));
+    fields->headerItem()->setText(1, tr("ANT+ Command"));
+    fields->setColumnWidth(0,100);
+    fields->setColumnWidth(1,200);
+    fields->setColumnCount(2);
+    fields->setSelectionMode(QAbstractItemView::SingleSelection);
+    fields->setIndentation(0);
+
+    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
+
+    mainLayout->addWidget(fields, 0,0);
+
+    // Load the native command list
+    QList <RemoteCmd> nativeCmds = remote->getNativeCmds();
+
+    // Load the ant command list
+    QList<RemoteCmd> antCmds = remote->getAntCmds();
+
+    // Load the remote control mappings
+    QList<CmdMap> cmdMaps = remote->getMappings();
+
+    // create a row for each native command
+    int index = 0;
+    foreach (RemoteCmd nativeCmd, nativeCmds) {
+
+        QComboBox *comboBox = new QComboBox(this);
+        comboBox->addItem("<unset>");
+
+        // populate the combo box with all possible ANT commands
+        foreach(RemoteCmd antCmd, antCmds) {
+            comboBox->addItem(antCmd.getCmdStr());
+        }
+
+        // is this native command mapped to an ANT command?
+        foreach(CmdMap cmdMapping, cmdMaps) {
+            if (cmdMapping.getNativeCmdId() == nativeCmd.getCmdId()) {
+                if (cmdMapping.getAntCmdId() != 0xFFFF) {
+                    //qDebug() << "ANT remote mapping found:" << cmdMapping.getNativeCmdId() << cmdMapping.getAntCmdId();
+
+                    int i=0;
+                    foreach(RemoteCmd antCmd, antCmds) {
+                        i++; // increment first to skip <unset>
+                        if (cmdMapping.getAntCmdId() == antCmd.getCmdId()) {
+                            // set the default entry for the combo box
+                            comboBox->setCurrentIndex(i);
+                        }
+                    }
+                }
+            }
+        }
+
+        QTreeWidgetItem *add = new QTreeWidgetItem;
+        fields->invisibleRootItem()->insertChild(index, add);
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+        add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
+        add->setText(0, nativeCmd.getDisplayStr());
+
+        add->setTextAlignment(1, Qt::AlignHCenter | Qt::AlignVCenter);
+        fields->setItemWidget(add, 1, comboBox);
+        index++;
+    }
+}
+
+qint32
+RemotePage::saveClicked()
+{
+    // Save the remote control code mappings...
+
+    //qDebug() << "RemotePage::saveClicked()";
+
+    // Load the ant command list
+    QList<RemoteCmd> antCmds = remote->getAntCmds();
+
+    // Load the remote control mappings
+    QList<CmdMap> cmdMaps = remote->getMappings();
+
+    for(int i=0; i < cmdMaps.size(); i++) {
+
+        QWidget *button = fields->itemWidget(fields->invisibleRootItem()->child(i),1);
+        int index = ((QComboBox*)button)->currentIndex();
+
+        if (index) {
+            cmdMaps[i].setAntCmdId(antCmds[index-1].getCmdId());
+
+        } else {
+            cmdMaps[i].setAntCmdId(0xFFFF); // no command
+        }
+    }
+
+    remote->writeConfig(cmdMaps);
+    return 0;
+}
+
 static void setSizes(QComboBox *p)
 {
 #ifdef Q_OS_MAC

@@ -24,6 +24,7 @@
 #include "ANTMessage.h"
 #include <QObject>
 #include <QTime>
+#include <QTimer>
 
 #define CHANNEL_TYPE_QUICK_SEARCH 0x10 // or'ed with current channel type
 /* after fast search, wait for slow search.  Otherwise, starting slow
@@ -159,6 +160,7 @@ class ANTChannel : public QObject {
         bool is_old_cinqo; // bool, set for cinqo needing separate control channel
         bool is_fec;
         bool is_alt; // is alternative channel for power
+        bool is_master; // is a master channel (for remote control)
 
         int search_type;
         int srm_offset;
@@ -195,6 +197,8 @@ class ANTChannel : public QObject {
         // search
         int isSearching();
 
+        QTimer *channelTimer; // timer for master channel broadcast events
+
         // Cinqo support
         void sendCinqoError();
         void sendCinqoSuccess();
@@ -204,15 +208,19 @@ class ANTChannel : public QObject {
         void setAlt(bool value) { is_alt = value; }
 
     signals:
-
         void channelInfo(int number, int device_number, int device_id); // we got a channel info message
         void dropInfo(int number, int dropped, int received);    // we dropped a packet
         void lostInfo(int number);    // we lost a connection
         void staleInfo(int number);   // the connection is stale
         void searchTimeout(int number); // search timed out
         void searchComplete(int number); // search completed successfully
+        void broadcastTimerStart(int number);
+        void broadcastTimerStop(int number);
 
         // signal instantly on data receipt for R-R data
         void rrData(uint16_t  measurementTime, uint8_t heartrateBeats, uint8_t instantHeartrate);
+
+        // signal for passing remote control commands
+        void antRemoteControl(uint16_t command);
 };
 #endif

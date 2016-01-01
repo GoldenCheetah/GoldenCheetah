@@ -145,6 +145,14 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString athlete) : QThre
 
         // R-R data
         connect(antChannel[i], SIGNAL(rrData(uint16_t, uint8_t, uint8_t)), this, SIGNAL(rrData(uint16_t, uint8_t, uint8_t)));
+
+        // timer for master channel broadcasts
+        connect(antChannel[i], SIGNAL(broadcastTimerStart(int)), this, SLOT(slotStartBroadcastTimer(int)));
+        connect(antChannel[i], SIGNAL(broadcastTimerStop(int)), this, SLOT(slotStopBroadcastTimer(int)));
+
+        // remote control
+        connect(antChannel[i], SIGNAL(antRemoteControl(uint16_t)), this, SIGNAL(antRemoteControl(uint16_t)));
+        antChannel[i]->channelTimer = new QTimer(this);
     }
 
     // on windows and linux we use libusb to read from USB2
@@ -804,6 +812,51 @@ ANT::slotSearchComplete(int number) // search completed successfully
     qDebug()<<"search completed on channel"<<number;
 }
 
+void
+ANT::slotStartBroadcastTimer(int channel) // timer
+{
+    if (channel < 0 || channel >= channels) return; // ignore out of bound
+
+    // master channel  only supported for ANT remote controls
+    if (channel != controlChannel) return;
+
+    //qDebug()<<"ANT::slotStartTimer req from channel "<<channel;
+
+    // connect the timer to the remote control event slot
+    connect(antChannel[channel]->channelTimer, SIGNAL(timeout()), this, SLOT(slotControlTimerEvent()), Qt::DirectConnection);
+
+    // start the broadcast timer..
+    antChannel[channel]->channelTimer->setInterval(250); //ms
+    antChannel[channel]->channelTimer->start();
+
+    //qDebug()<<channel<<"timer id:" << antChannel[channel]->channelTimer->timerId();
+}
+
+void
+ANT::slotStopBroadcastTimer(int channel) // timer
+{
+    if (channel < 0 || channel >= channels) return; // ignore out of bound
+
+    // master channel  only supported for ANT remote controls
+    if (channel != controlChannel) return;
+
+    //qDebug()<<"ANT::slotStopTimer req from channel "<<channel;
+
+    // stop the broadcast timer..
+    antChannel[channel]->channelTimer->stop();
+}
+
+void
+ANT::slotControlTimerEvent()
+{
+    // todo: interleave other required pages - see below for details
+    // ANT+ Managed Network Document – Controls Device Profile, Rev 2.0 Page 61
+    // Table 14-1. Required Data Elements for all ANT+ Controllable (i.e. Master) Devices
+
+    //qDebug()<<"Timer event...";
+    sendMessage(ANTMessage::controlDeviceAvailability(controlChannel));
+}
+
 /*----------------------------------------------------------------------
  * Message I/O
  *--------------------------------------------------------------------*/
@@ -1217,4 +1270,9 @@ void ANT::setVortexData(int channel, int id)
 void ANT::setFecChannel(int channel)
 {
     fecChannel = channel;
+}
+
+void ANT::setControlChannel(int channel)
+{
+    controlChannel = channel;
 }

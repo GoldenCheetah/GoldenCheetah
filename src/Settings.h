@@ -183,6 +183,12 @@
 #define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
 #define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
+#define GC_REMOTE_START                 "<global-trainmode>remote/start"
+#define GC_REMOTE_STOP                  "<global-trainmode>remote/stop"
+#define GC_REMOTE_LAP                   "<global-trainmode>remote/lap"
+#define GC_REMOTE_HIGHER                "<global-trainmode>remote/higher"
+#define GC_REMOTE_LOWER                 "<global-trainmode>remote/lower"
+#define GC_REMOTE_CALIBRATE             "<global-trainmode>remote/calibrate"
 
 // --------------------------------------------------------------------------------
 // Athlete Specific Properties - Stored in /config subfolder of the related athlete

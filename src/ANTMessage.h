@@ -83,6 +83,9 @@ class ANTMessage {
         static ANTMessage fecRequestCapabilities(const uint8_t channel);
         static ANTMessage fecRequestCommandStatus(const uint8_t channel, const uint8_t page);
 
+        // remote control
+        static ANTMessage controlDeviceAvailability(const uint8_t channel);
+
         // kickr command channel messages all sent as broadcast data
         // over the command channel as type 0x4E
         static ANTMessage kickrErgMode(const unsigned char channel, ushort usDeviceId, ushort usWatts, bool bSimSpeed);
@@ -169,6 +172,10 @@ class ANTMessage {
         double   fecSetWindResistanceAck;    //    0  /   1.86 kg/m
         int8_t   fecSetWindSpeedAck;         // -127  /   +127 km/h
         uint8_t  fecSetDraftingFactorAck;    //    0  /    100 %
+
+        // remote control
+        uint8_t  controlSeq;
+        uint16_t controlSerial, controlVendor, controlCmd;
 
     private:
         void init();

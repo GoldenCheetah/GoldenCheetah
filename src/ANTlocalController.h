@@ -22,6 +22,7 @@
 #include "ANT.h"
 #include "ANTLogger.h"
 #include "ConfigDialog.h"
+#include "RemoteControl.h"
 
 #include <QMessageBox>
 
@@ -74,10 +75,16 @@ signals:
     // made a special case to support HRV tool without complication
     void rrData(uint16_t  measurementTime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 
+    // signal for passing remote control commands to train view
+    void remoteControl(uint16_t command);
+
+public slots:
+    // slot for receiving & translating ANT remote control commands
+    void antRemoteControl(uint16_t command);
+
 private:
     QQueue<setChannelAtom> channelQueue;
     ANTLogger logger;
-
 
 };
 
