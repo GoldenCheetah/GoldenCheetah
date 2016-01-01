@@ -46,6 +46,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // paint the W'bal curve
     wbline = new WWWBLine(workout, context);
 
+    // selection tool
+    rect = new WWRect(workout);
+
     // setup the toolbar
     toolbar = new QToolBar(this);
     toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);

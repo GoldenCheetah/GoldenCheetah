@@ -40,6 +40,7 @@ class WWPowerScale;
 class WWWBalScale;
 class WWLine;
 class WWWBLine;
+class WWRect;
 
 class WorkoutWindow : public GcWindow
 {
@@ -76,6 +77,7 @@ class WorkoutWindow : public GcWindow
         WWWBalScale *wbalscale;
         WWLine *line;
         WWWBLine *wbline;
+        WWRect *rect;
         bool active;
 };
 

@@ -35,7 +35,8 @@
 #define GCWW_POINT     2
 #define GCWW_LINE      3
 #define GCWW_WBALSCALE 4 //W'bal
-#define GCWW_WBLINE    3
+#define GCWW_WBLINE    5
+#define GCWW_RECT      6 // selection rectangle
 
 //
 // ITEMS
@@ -84,7 +85,7 @@ class WWPoint : public WorkoutWidgetItem {
     public:
 
         WWPoint(WorkoutWidget *w, double x, double y, bool append=true) : 
-                WorkoutWidgetItem(w), hover(false), selected(false), x(x), y(y) { if (append) w->addPoint(this); }
+                WorkoutWidgetItem(w), hover(false), selected(false), selecting(false), x(x), y(y) { if (append) w->addPoint(this); }
 
         // Reimplement in children
         int type() { return GCWW_POINT; }
@@ -93,8 +94,10 @@ class WWPoint : public WorkoutWidgetItem {
 
         // locate me on the parent widget in paint coordinates
         QRectF bounding() { return bound; }
-        bool hover;
-        bool selected;
+
+        bool hover;     // mouse hovering
+        bool selected;  // has been selected
+        bool selecting; // in the process of being selected (rect tool)
 
         double x, y;
 
@@ -116,6 +119,26 @@ class WWLine : public WorkoutWidgetItem {
 
         // locate me on the parent widget in paint coordinates
         QRectF bounding() { return QRectF(); }
+
+    private:
+
+};
+
+// draws a selection rectangle
+class WWRect : public WorkoutWidgetItem {
+
+    public:
+
+        WWRect(WorkoutWidget *w) : WorkoutWidgetItem(w) { w->addItem(this); }
+
+        // Reimplement in children
+        int type() { return GCWW_RECT; }
+
+        void paint(QPainter *painter);
+
+        // locate me on the parent widget in paint coordinates
+        QRectF bounding() { return QRectF(workoutWidget()->onRect,
+                                          workoutWidget()->atRect); }
 
     private:
 

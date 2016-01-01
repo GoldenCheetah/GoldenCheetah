@@ -54,6 +54,8 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     maxX_=3600;
     maxY_=300;
 
+    onDrag = onCreate = onRect = atRect = QPointF(-1,-1);
+
     // watch mouse events for user interaction
     installEventFilter(this);
     setMouseTracking(true);
@@ -91,23 +93,34 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     //
     // STATE MACHINE [no edit mode or selection mode yet]
     //
-    //   EVENT              STATE       ACTION                  NEXT STATE
-    //   --------------     ------      ---------------         ----------
-    // 1 mouse move         none        hover/unhover           none
-    //                      drag        move point around       drag
+    //   EVENT              STATE       ACTION                              NEXT STATE
+    //   --------------     ------      ---------------                     ----------
+    // 1 mouse move         none        hover/unhover                       none
+    //                      drag        move point around                   drag
+    //                      rect        resize and scan for selections      rect
     //
-    // 2 mouse click        none        hovering? select        drag
-    //                      none        not hovering? create    drag
+    // 2 mouse click        none        hovering? drag point                drag
+    //   not shifted        none        not hovering? create                drag
     //
-    // 3 mouse release      drag        unselect                none
+    // 3 mouse release      drag        unselect                            none
+    //                      rect        none                                none
+    //
+    // 4 mouse timeout      drag        no move? click-hold                 none
+    //   [not active yet]   drag        moved? ignore                       drag
     //
     //
-    // 4 mouse timeout      drag        no move? click-hold     none
-    //   [not active yet]   drag        moved? ignore           drag
+    // 5 mouse wheel        none        rescale selectes/all                none
+    //   up and down        drag        ignore                              drag
     //
     //
-    // 5 mouse wheel        none        rescale selectes/all    none
-    //   up and down        drag        ignore                  drag
+    // 6 mouse click        none        hovering? select point              none
+    //   shifted            none        not hovering? begin select          rect
+    //
+    //
+    // 7 ESC key            any         clear selection                     unchanged
+    //
+    //
+    // 8 mouse enter        any         grab keyboard focus                 unchanged
     //
 
     //
@@ -161,42 +174,80 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
                 state = none;
                 qDebug()<<"WW FSM: drag state dragging=NULL";
             }
+
+        } else if (state == rect) {
+
+            // we're selecting via a rectangle
+            atRect = p;
+            updateNeeded=selectPoints(); // go and check / select
         }
     }
 
     //
-    // 2 MOUSE PRESS
+    // 2 AND 6 MOUSE PRESS
     //
     if (event->type() == QEvent::MouseButtonPress) {
+
+        // watch for shift when clicking
+        Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(event)->modifiers();
 
         if (state == none && canvas().contains(p)) {
 
             // either select existing to drag
             // or create a new one to drag
+            bool hover=false;
             foreach(WWPoint *point, points_) {
                 if (point->bounding().contains(p)) {
+
+                    //
+                    // HOVERING
+                    //
+
+                    // SHIFT-CLICK TO TOGGLE SELECT
+                    if (kmod & Qt::ShiftModifier) {
+                        point->selected = !point->selected;
+                        hover=true;
+                        updateNeeded=true;
+                    } else {
+
+                        // PLAIN CLICK TO DRAG
                         updateNeeded=true;
                         dragging = point;
+                        hover=true;
                         onDrag = QPointF(dragging->x, dragging->y);
                         state = drag;
-                        break;
+                        
+                    }
+                    break;
                 }
             }
 
-            // if state is still none, we aren't
-            // on top of a point, so create a new
-            // one
-            if (state == none) {
-                updateNeeded = createPoint(p);
+            // if state is still none and we're not hovering, 
+            // we aren't on top of a point, so create a new
+            // one or start select mode if shift is pressed
+            if (state == none && !hover) {
 
-                // recompute metrics
-                recompute();
+                // SHIFT RECTANGLE SELECT
+                if (kmod & Qt::ShiftModifier) {
 
-                // but we may press and hold for a snip
-                // so lets set the timer and remember
-                // where we were
-                onCreate = p;
-                QTimer::singleShot(500, this, SLOT(timeout()));
+                    // where are we
+                    atRect = onRect = p;
+                    state = rect;
+                    updateNeeded = true;
+ 
+                } else {
+                    // UNSHIFTED CREATE A POINT
+                    updateNeeded = createPoint(p);
+
+                    // recompute metrics
+                    recompute();
+
+                    // but we may press and hold for a snip
+                    // so lets set the timer and remember
+                    // where we were
+                    onCreate = p;
+                    QTimer::singleShot(500, this, SLOT(timeout()));
+                }
             }
         }
     }
@@ -206,20 +257,27 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     //
     if (event->type() == QEvent::MouseButtonRelease) {
 
+        // DRAGGING
         if (state == drag && dragging) {
 
             // create command to reflect the drag, but only
             // if it actually moved!
             if (dragging->x != onDrag.x() || dragging->y != onDrag.y())
                 new MovePointCommand(this, onDrag, QPointF(dragging->x, dragging->y), points_.indexOf(dragging));
+
+            // recompute metrics
+            recompute();
+        }
+
+        // SELECTING ENDS [so turn selecting -> selected]
+        if (state == rect) {
+            selectedPoints();
+            onRect = atRect = QPointF(-1,-1);
         }
 
         state = none;
         dragging = NULL;
         updateNeeded = true;
-
-        // recompute metrics
-        recompute();
     }
 
     //
@@ -250,7 +308,26 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 
         // will need to ..
         recompute();
+    }
 
+    //
+    // 6. ESC hit
+    //
+    if (event->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(event)->key() == Qt::Key_Escape) {
+
+       // does the same in ALL states
+        updateNeeded=selectClear();
+    }
+
+    //
+    // Mouse enters
+    //
+    if (event->type() == QEvent::Enter) {
+
+        // grab focus if we don't have it
+        if (!hasFocus()) {
+            setFocus(Qt::MouseFocusReason);
+        }
     }
 
     // ALL DONE
@@ -381,6 +458,45 @@ WorkoutWidget::scale(QPoint p)
     // register command
     new ScaleCommand(this, 1.01, 0.99, p.y() > 0);
 
+    return true;
+}
+
+bool
+WorkoutWidget::selectPoints()
+{
+    // if points are in rectangle then set selecting
+    // if they are not then unset selecting
+    QRectF rect(onRect,atRect);
+    foreach(WWPoint *p, points_) {
+        if (p->bounding().intersects(rect))
+            p->selecting = true;
+        else
+            p->selecting = false;
+    }
+    return true;
+}
+
+bool
+WorkoutWidget::selectedPoints()
+{
+    // any points marked as selecting are now selected
+    foreach(WWPoint *p, points_) {
+        if (p->selecting) {
+            p->selected=true;
+            p->selecting=false;
+        }
+    }
+    return true;
+}
+
+bool
+WorkoutWidget::selectClear()
+{
+    // clear all selection
+    foreach(WWPoint *p, points_) {
+        p->selected=false;
+        p->selecting=false;
+    }
     return true;
 }
 
