@@ -52,6 +52,7 @@
 #include "RealtimePlotWindow.h"
 #include "SpinScanPlotWindow.h"
 #include "WorkoutPlotWindow.h"
+#include "WorkoutWindow.h"
 #include "BingMap.h"
 // Not until v4.0
 //#include "RouteWindow.h"
@@ -100,6 +101,7 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("Map"), GcWindowTypes::MapWindow },
     { VIEW_TRAIN, tr("StreetView"), GcWindowTypes::StreetViewWindow },
     { VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
+    { VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
     { 0, "", GcWindowTypes::None }};
   // initialize the global registry
   GcWindows = GcWindowsInit;
@@ -203,6 +205,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::MapWindow: returning = new MapWindow(context); break;
     case GcWindowTypes::StreetViewWindow: returning = new StreetViewWindow(context); break;
     case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(context); break;
+    case GcWindowTypes::WorkoutWindow: returning = new WorkoutWindow(context); break;
 #if 0 // not till v4.0
     case GcWindowTypes::RouteSegment: returning = new RouteWindow(context); break;
 #else

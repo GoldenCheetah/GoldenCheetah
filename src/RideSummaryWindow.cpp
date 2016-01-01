@@ -394,6 +394,8 @@ static QString rankingString(int number)
 QString
 RideSummaryWindow::htmlSummary()
 {
+    RideMetricFactory &factory = RideMetricFactory::instance();
+
     QString summary("");
     QColor bgColor = ridesummary ? GColor(CPLOTBACKGROUND) : GColor(CTRENDPLOTBACKGROUND);
     //QColor fgColor = GCColor::invertColor(bgColor);
@@ -491,11 +493,19 @@ RideSummaryWindow::htmlSummary()
     // users determine the metrics to display
     QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
     if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
-    QStringList metricColumn = s.split(",");
+    QStringList metricColumn;
+    foreach(QString symbol, s.split(",")) {
+        if (factory.rideMetric(symbol) != NULL)
+            metricColumn << symbol;
+    }
 
     s = appsettings->value(this, GC_SETTINGS_BESTS_METRICS, GC_SETTINGS_BESTS_METRICS_DEFAULT).toString();
     if (s == "") s = GC_SETTINGS_BESTS_METRICS_DEFAULT;
-    QStringList bestsColumn = s.split(",");
+    QStringList bestsColumn;
+    foreach(QString symbol, s.split(",")) {
+        if (factory.rideMetric(symbol) != NULL)
+            bestsColumn << symbol;
+    }
 
     static const QStringList timeInZones = QStringList()
         << "time_in_zone_L1"
@@ -555,7 +565,6 @@ RideSummaryWindow::htmlSummary()
     // been edited. Otherwise we need to re-compute every time.
     // this is only for ride summary, when showing for a date range
     // we already have a summary metrics array
-    RideMetricFactory &factory = RideMetricFactory::instance();
 
     // get the PMC data
     PMCData *pmc;
@@ -731,7 +740,7 @@ RideSummaryWindow::htmlSummary()
 
                  // when summarising a ride temperature is -255 when not present, when aggregating its 0.0
                  if ((symbol == "average_temp" || symbol == "max_temp") && ridesummary 
-                     && rideItem->getForSymbol(symbol) == RideFile::NoTemp) {
+                     && rideItem->getForSymbol(symbol) == RideFile::NA) {
 
                     s = s.arg(ride->getTag("Temperature", "-"));
 
@@ -868,19 +877,19 @@ RideSummaryWindow::htmlSummary()
     }
 
     //
-    // Time In Zones for Running and Swimming
+    // Time In Pace Zones for Running and Swimming
     //
     int numzones = 0;
     int range = -1;
 
-    if (ridesummary && rideItem && rideItem->ride() && (rideItem->ride()->isRun() || rideItem->ride()->isSwim())) {
+    if (ridesummary && rideItem && (rideItem->isRun || rideItem->isSwim)) {
 
-        if (context->athlete->paceZones(rideItem->ride()->isSwim())) {
+        if (context->athlete->paceZones(rideItem->isSwim)) {
 
-            range = context->athlete->paceZones(rideItem->ride()->isSwim())->whichRange(rideItem->dateTime.date());
+            range = context->athlete->paceZones(rideItem->isSwim)->whichRange(rideItem->dateTime.date());
             if (range > -1) {
 
-                numzones = context->athlete->paceZones(rideItem->ride()->isSwim())->numZones(range);
+                numzones = context->athlete->paceZones(rideItem->isSwim)->numZones(range);
 
                 if (numzones > 0) {
 
@@ -896,26 +905,45 @@ RideSummaryWindow::htmlSummary()
                     }
         
                     summary += tr("<h3>Pace Zones</h3>");
-                    summary += context->athlete->paceZones(rideItem->ride()->isSwim())->summarize(range, time_in_zone, altColor); //aggregating
+                    summary += context->athlete->paceZones(rideItem->isSwim)->summarize(range, time_in_zone, altColor); //aggregating
                 }
             }
         }
 
-    } else {
+    }
 
-        if (ridesummary && rideItem && context->athlete->zones()) {
+    //
+    // Time In Power Zones, when there is power data for a ride,
+    // or summarising date range with homogeneous activities
+    //
+    int nActivities, nRides, nRuns, nSwims;
+    context->athlete->rideCache->getRideTypeCounts(specification, nActivities, nRides, nRuns, nSwims);
+    if ((ridesummary && rideItem && rideItem->present.contains("P")) ||
+        (!ridesummary && ((nActivities==nRides) || (nActivities==nRuns)))) {
+
+        // set to unknown just in case
+        range = -1;
+        int WPRIME=22000; // reasonable default
+
+        if (ridesummary && rideItem && context->athlete->zones(rideItem->isRun)) {
 
             // get zones to use via ride for ridesummary
-            range = context->athlete->zones()->whichRange(rideItem->dateTime.date());
-            if (range > -1) numzones = context->athlete->zones()->numZones(range);
+            range = context->athlete->zones(rideItem->isRun)->whichRange(rideItem->dateTime.date());
+            if (range > -1) {
+                numzones = context->athlete->zones(rideItem->isRun)->numZones(range);
+                WPRIME = context->athlete->zones(rideItem ? rideItem->isRun : false)->getWprime(range);
+            }
 
-        // or for end of daterange plotted for daterange summary
-        } else if (context->athlete->zones()) {
+        // or for end of daterange plotted for daterange summary with
+        // homogeneous activites, use the corresponding Power Zones
+        } else if (!ridesummary && context->athlete->zones(nActivities==nRuns)) {
 
             // get from end if period
-            range = context->athlete->zones()->whichRange(myDateRange.to);
-            if (range > -1) numzones = context->athlete->zones()->numZones(range);
-
+            range = context->athlete->zones(nActivities==nRuns)->whichRange(myDateRange.to);
+            if (range > -1) {
+                numzones = context->athlete->zones(nActivities==nRuns)->numZones(range);
+                WPRIME = context->athlete->zones(nActivities==nRuns)->getWprime(range);
+            }
         }
 
         // now we've monketed around with zone crap, lets display
@@ -930,10 +958,11 @@ RideSummaryWindow::htmlSummary()
                 else time_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZones[i], specification, useMetricUnits, true).toDouble();
             }
             summary += tr("<h3>Power Zones</h3>");
-            summary += context->athlete->zones()->summarize(range, time_in_zone, altColor); //aggregating
+
+            if (ridesummary) summary += context->athlete->zones(rideItem->isRun)->summarize(range, time_in_zone, altColor);
+            else summary += context->athlete->zones(nActivities==nRuns)->summarize(range, time_in_zone, altColor); //aggregating  for date range
 
             // W'bal Zones
-            int WPRIME = context->athlete->zones()->getWprime(range);
             QVector<double> wtime_in_zone(4);
             QVector<double> wwork_in_zone(4);
             QVector<double> wcptime_in_zone(4);
@@ -1527,6 +1556,8 @@ RideSummaryWindow::getPDEstimates()
 QString
 RideSummaryWindow::htmlCompareSummary() const
 {
+    RideMetricFactory &factory = RideMetricFactory::instance();
+
     QString summary;
 
     QColor bgColor = ridesummary ? GColor(CPLOTBACKGROUND) : GColor(CTRENDPLOTBACKGROUND);
@@ -1579,11 +1610,19 @@ RideSummaryWindow::htmlCompareSummary() const
     // users determine the metrics to display
     QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
     if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
-    QStringList metricColumn = s.split(",");
+    QStringList metricColumn;
+    foreach(QString symbol, s.split(",")) {
+        if (factory.rideMetric(symbol) != NULL)
+            metricColumn << symbol;
+    }
 
     s = appsettings->value(this, GC_SETTINGS_BESTS_METRICS, GC_SETTINGS_BESTS_METRICS_DEFAULT).toString();
     if (s == "") s = GC_SETTINGS_BESTS_METRICS_DEFAULT;
-    QStringList bestsColumn = s.split(",");
+    QStringList bestsColumn;
+    foreach(QString symbol, s.split(",")) {
+        if (factory.rideMetric(symbol) != NULL)
+            bestsColumn << symbol;
+    }
 
     static const QStringList timeInZones = QStringList()
         << "time_in_zone_L1"
@@ -1626,35 +1665,10 @@ RideSummaryWindow::htmlCompareSummary() const
         //
         // SUMMARISING INTERVALS SO ALWAYS COMPUTE METRICS ON DEMAND
         //
+        // intervals are already computed in rideitem
         QList<RideItem*> intervalMetrics;
-
-        QStringList worklist;
-        worklist += totalColumn;
-        worklist += averageColumn;
-        worklist += maximumColumn;
-        worklist += metricColumn;
-        worklist += timeInZones;
-        worklist += timeInZonesHR;
-        // computeMetrics expects unique keys, no duplicates
-        worklist.removeDuplicates();
-
-        // go calculate them then...
-        RideMetricFactory &factory = RideMetricFactory::instance();
-        for (int j=0; j<context->compareIntervals.count(); j++) {
-
-            RideItem *metrics = new RideItem;
-
-            // calculate using the source context of course!
-            QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(
-                                                     context->compareIntervals.at(j).sourceContext,
-                                                     context->compareIntervals.at(j).data,
-                                                     context->compareIntervals.at(j).sourceContext->athlete->zones(),
-                                                     context->compareIntervals.at(j).sourceContext->athlete->hrZones(), 
-                                                     worklist);
-
-            metrics->setFrom(computed);
-            intervalMetrics << metrics;
-        }
+        for (int j=0; j<context->compareIntervals.count(); j++) 
+            intervalMetrics << context->compareIntervals.at(j).rideItem;
 
         // LETS FORMAT THE HTML
         summary = GCColor::css(ridesummary);
@@ -1779,14 +1793,14 @@ RideSummaryWindow::htmlCompareSummary() const
         //
         // TIME IN POWER ZONES (we can't do w'bal compare at present)
         //
-        if (context->athlete->zones()) { // use my zones
+        if (context->athlete->zones(false)) { // use my zones
 
             // get from end if period
-            int rangeidx = context->athlete->zones()->whichRange(QDate::currentDate()); // use current zone names et al
+            int rangeidx = context->athlete->zones(false)->whichRange(QDate::currentDate()); // use current zone names et al
             if (rangeidx > -1) {
 
                 // get the list of zones
-                ZoneRange range = const_cast<Zones*>(context->athlete->zones())->getZoneRange(rangeidx);
+                ZoneRange range = const_cast<Zones*>(context->athlete->zones(false))->getZoneRange(rangeidx);
                 QList<ZoneInfo> zones = range.zones;
 
                 // we've got a range and a count of zones so all is well
@@ -1929,9 +1943,6 @@ RideSummaryWindow::htmlCompareSummary() const
         summary = GCColor::css(ridesummary);
         summary += "<center>";
 
-        // get metric details here ...
-        RideMetricFactory &factory = RideMetricFactory::instance();
-
         //
         // TOTALS, AVERAGES, MAX, METRICS
         //
@@ -2048,14 +2059,14 @@ RideSummaryWindow::htmlCompareSummary() const
         //
         // TIME IN POWER ZONES AND W'BAL ZONES
         //
-        if (context->athlete->zones()) { // use my zones
+        if (context->athlete->zones(false)) { // use my zones
 
             // get from end if period
-            int rangeidx = context->athlete->zones()->whichRange(QDate::currentDate()); // use current zone names et al
+            int rangeidx = context->athlete->zones(false)->whichRange(QDate::currentDate()); // use current zone names et al
             if (rangeidx > -1) {
 
                 // get the list of zones
-                ZoneRange range = const_cast<Zones*>(context->athlete->zones())->getZoneRange(rangeidx);
+                ZoneRange range = const_cast<Zones*>(context->athlete->zones(false))->getZoneRange(rangeidx);
                 QList<ZoneInfo> zones = range.zones;
 
                 // we've got a range and a count of zones so all is well

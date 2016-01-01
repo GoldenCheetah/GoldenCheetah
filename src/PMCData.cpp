@@ -64,7 +64,7 @@ PMCData::PMCData(Context *context, Specification spec, QString metricName, int s
     connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(invalidate()));
 }
 
-PMCData::PMCData(Context *context, Specification spec, Leaf *expr, DataFilter *df, int stsDays, int ltsDays) 
+PMCData::PMCData(Context *context, Specification spec, Leaf *expr, DataFilterRuntime *df, int stsDays, int ltsDays) 
     : context(context), specification_(spec), metricName_(""), stsDays_(stsDays), ltsDays_(ltsDays), isstale(true)
 {
     // get defaults if not passed
@@ -162,7 +162,18 @@ void PMCData::refresh()
         lts_.resize(days_);
         sts_.resize(days_);
         sb_.resize(days_+1); // for SB tomorrow!
-        rr_.resize(days_); // for SB tomorrow!
+        rr_.resize(days_);
+
+        planned_stress_.resize(days_);
+        planned_lts_.resize(days_);
+        planned_sts_.resize(days_);
+        planned_sb_.resize(days_+1); // for SB tomorrow!
+        planned_rr_.resize(days_);
+
+        expected_lts_.resize(days_);
+        expected_sts_.resize(days_);
+        expected_sb_.resize(days_+1); // for SB tomorrow!
+        expected_rr_.resize(days_);
 
     } else {
 
@@ -175,6 +186,18 @@ void PMCData::refresh()
         sts_.resize(0);
         sb_.resize(0);
         rr_.resize(0);
+
+        planned_stress_.resize(0);
+        planned_lts_.resize(0);
+        planned_sts_.resize(0);
+        planned_sb_.resize(0);
+        planned_rr_.resize(0);
+
+        expected_lts_.resize(0);
+        expected_sts_.resize(0);
+        expected_sb_.resize(0);
+        expected_rr_.resize(0);
+
 
         // give up
         return;
@@ -195,12 +218,26 @@ void PMCData::refresh()
     sb_.fill(0);
     rr_.fill(0);
 
+    planned_stress_.fill(0);
+    planned_lts_.fill(0);
+    planned_sts_.fill(0);
+    planned_sb_.fill(0);
+    planned_rr_.fill(0);
+
+    expected_lts_.fill(0);
+    expected_sts_.fill(0);
+    expected_sb_.fill(0);
+    expected_rr_.fill(0);
+
     // add the seeded values from seasons
     foreach(Season x, context->athlete->seasons->seasons) {
         if (x.getSeed()) {
             int offset = start_.daysTo(x.getStart());
             lts_[offset] = x.getSeed() * -1;
             sts_[offset] = x.getSeed() * -1;
+
+            planned_lts_[offset] = x.getSeed() * -1;
+            planned_sts_[offset] = x.getSeed() * -1;
         }
     }
 
@@ -216,11 +253,16 @@ void PMCData::refresh()
             // although metrics are cleansed, we check here because development
             // builds have a rideDB.json that has nan and inf values in it.
             double value = 0;;
-            if (fromDataFilter) value = expr->eval(context, df, expr, 0, item).number;
+            if (fromDataFilter) value = expr->eval(df, expr, 0, item).number;
             else value = item->getForSymbol(metricName_);
 
-            if (!std::isinf(value) && !std::isnan(value))
-                stress_[offset] += value;
+            if (!std::isinf(value) && !std::isnan(value)) {
+                if (item->planned)
+                    planned_stress_[offset] += value;
+                else
+                    stress_[offset] += value;
+                //qDebug()<<"stress_["<<offset<<"] :"<<stress_[offset];
+            }
         }
     }
 
@@ -231,6 +273,16 @@ void PMCData::refresh()
     double lastSTS=0.0f;
 
     double rollingStress=0;
+
+    double planned_lastLTS=0.0f;
+    double planned_lastSTS=0.0f;
+
+    double planned_rollingStress=0;
+
+    double expected_lastLTS=0.0f;
+    double expected_lastSTS=0.0f;
+
+    double expected_rollingStress=0;
 
     for(int day=0; day < days_; day++) {
 
@@ -245,7 +297,7 @@ void PMCData::refresh()
             if (day) lastSTS = sts_[day-1];
             sts_[day] = (stress_[day] * (1.0 - ste)) + (lastSTS * ste);
 
-        } else if (lts_[day]< 0|| sts_[day]<0) {
+        } else if (lts_[day]< 0 || sts_[day]<0) {
 
             lts_[day] *= -1;
             sts_[day] *= -1;
@@ -266,6 +318,113 @@ void PMCData::refresh()
         // We allow it to be shown today or tomorrow where
         // most (sane/thinking) folks usually show SB on the following day
         sb_[day+(sbToday ? 0 : 1)] =  lts_[day] - sts_[day];
+
+        // *******************
+        // ****  PLANNED  ****
+        // *******************
+
+        // not seeded
+        if (planned_lts_[day] >=0 || planned_sts_[day]>=0) {
+
+            // LTS
+            if (day) planned_lastLTS = planned_lts_[day-1];
+            planned_lts_[day] = (planned_stress_[day] * (1.0 - lte)) + (planned_lastLTS * lte);
+
+            // STS
+            if (day) planned_lastSTS = planned_sts_[day-1];
+            planned_sts_[day] = (planned_stress_[day] * (1.0 - ste)) + (planned_lastSTS * ste);
+
+        } else if (planned_lts_[day]< 0 || planned_sts_[day]<0) {
+
+            planned_lts_[day] *= -1;
+            planned_sts_[day] *= -1;
+        }
+
+        // rolling stress for STS days
+        if (day && day <= stsDays_) {
+            // just starting out
+            planned_rollingStress += planned_lts_[day] - planned_lts_[day-1];
+            planned_rr_[day] = planned_rollingStress;
+        } else if (day) {
+            planned_rollingStress += planned_lts_[day] - planned_lts_[day-1];
+            planned_rollingStress -= planned_lts_[day-stsDays_] - planned_lts_[day-stsDays_-1];
+            planned_rr_[day] = planned_rollingStress;
+        }
+
+        // SB (stress balance)  long term - short term
+        // We allow it to be shown today or tomorrow where
+        // most (sane/thinking) folks usually show SB on the following day
+        planned_sb_[day+(sbToday ? 0 : 1)] =  planned_lts_[day] - planned_sts_[day];
+
+        // ********************
+        // ****  EXPECTED  ****
+        // ********************
+
+        if (start_.addDays(day).daysTo(QDate::currentDate())<0) {
+            double lastLts = 0.0;
+            double lastSts = 0.0;
+            double ltsAtStsDays1 = 0.0;
+            double ltsAtStsDays2 = 0.0;
+
+            if (day) {
+                if (start_.addDays(day).daysTo(QDate::currentDate())<-1) {
+                    lastLts = expected_lts_[day-1];
+                    lastSts = expected_sts_[day-1];
+                } else {
+                    lastLts = lts_[day-1];
+                    lastSts = sts_[day-1];
+                }
+                if (day <= stsDays_) {
+                    if (start_.addDays(day).daysTo(QDate::currentDate())<-1-stsDays_) {
+                        ltsAtStsDays1 = expected_lts_[day-stsDays_-1];
+                    } else {
+                        ltsAtStsDays1 = lts_[day-stsDays_-1];
+                    }
+
+                    if (start_.addDays(day).daysTo(QDate::currentDate())<-stsDays_) {
+                        ltsAtStsDays2 = expected_lts_[day-stsDays_];
+                    } else {
+                        ltsAtStsDays2 = lts_[day-stsDays_];
+                    }
+                }
+            }
+
+            // not seeded
+            if (expected_lts_[day] >=0 || expected_sts_[day]>=0) {
+                // LTS
+                expected_lts_[day] = (planned_stress_[day] * (1.0 - lte)) + (lastLts * lte);
+
+                // STS
+                expected_sts_[day] = (planned_stress_[day] * (1.0 - ste)) + (lastSts * ste);
+
+            } else if (expected_lts_[day]< 0 || expected_sts_[day]<0) {
+                expected_lts_[day] *= -1;
+                expected_sts_[day] *= -1;
+            }
+
+            // rolling stress for STS days
+            if (day && day <= stsDays_) {
+                // just starting out
+                expected_rollingStress += expected_lts_[day] - lastLts;
+                expected_rr_[day] = expected_rollingStress;
+            } else if (day) {
+                expected_rollingStress += expected_lts_[day] - lastLts;
+                expected_rollingStress -= ltsAtStsDays2 - ltsAtStsDays1;
+                expected_rr_[day] = expected_rollingStress;
+            }
+
+            // SB (stress balance)  long term - short term
+            // We allow it to be shown today or tomorrow where
+            // most (sane/thinking) folks usually show SB on the following day
+            expected_sb_[day+(sbToday ? 0 : 1)] =  expected_lts_[day] - expected_sts_[day];
+        } else {
+            expected_lts_[day] = 0;
+            expected_sts_[day] = 0;
+            expected_sb_[day] = 0;
+            expected_rr_[day] = 0;
+
+        }
+
     }
 
     //qDebug()<<"refresh PMC in="<<timer.elapsed()<<"ms";
@@ -335,6 +494,96 @@ PMCData::rr(QDate date)
     int index=indexOf(date);
     if (index == -1) return 0.0f;
     else return rr_[index];
+}
+
+double
+PMCData::plannedLts(QDate date)
+{
+    refresh();
+
+    int index=indexOf(date);
+    if (index == -1) return 0.0f;
+    else return planned_lts_[index];
+}
+
+double
+PMCData::plannedSts(QDate date)
+{
+    refresh();
+
+    int index=indexOf(date);
+    if (index == -1) return 0.0f;
+    else return planned_sts_[index];
+}
+
+double
+PMCData::plannedStress(QDate date)
+{
+    refresh();
+
+    int index=indexOf(date);
+    if (index == -1) return 0.0f;
+    else return planned_stress_[index];
+}
+
+double
+PMCData::plannedSb(QDate date)
+{
+    refresh();
+
+    int index=indexOf(date);
+    if (index == -1) return 0.0f;
+    else return planned_sb_[index];
+}
+
+double
+PMCData::plannedRr(QDate date)
+{
+    refresh();
+
+    int index=indexOf(date);
+    if (index == -1) return 0.0f;
+    else return planned_rr_[index];
+}
+
+double
+PMCData::expectedLts(QDate date)
+{
+    refresh();
+
+    int index=indexOf(date);
+    if (index == -1) return 0.0f;
+    else return expected_lts_[index];
+}
+
+double
+PMCData::expectedSts(QDate date)
+{
+    refresh();
+
+    int index=indexOf(date);
+    if (index == -1) return 0.0f;
+    else return expected_sts_[index];
+}
+
+double
+PMCData::expectedSb(QDate date)
+{
+    refresh();
+
+    int index=indexOf(date);
+    if (index == -1) return 0.0f;
+    else return expected_sb_[index];
+}
+
+double
+PMCData::expectedRr(QDate date)
+{
+    refresh();
+
+    int index=indexOf(date);
+    if (index == -1) return 0.0f;
+    else return expected_rr_[index];
 }
 
 // rag reporting according to wattage type groupthink

@@ -2459,6 +2459,9 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;
 
+        // skip unavailable values
+        if (value == RideFile::NA) continue;
+
         // Special computed metrics (LTS/STS) have a null metric pointer
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
@@ -2477,7 +2480,7 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
         bool aggZero = metricDetail.metric ? metricDetail.metric->aggregateZero() : false;
 
         // set aggZero to false and value to zero if is temperature and -255
-        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NA) {
             value = 0;
             aggZero = false;
         }
@@ -2580,8 +2583,11 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;
 
+        // skip unavailable values
+        if (value == RideFile::NA) continue;
+
         // set aggZero to false and value to zero if is temperature and -255
-        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NA) {
             value = 0;
             aggZero = false;
         }
@@ -2702,11 +2708,14 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
         double value = 0;
 
         // PARSE + EVALUATE
-        Result res = parser.evaluate(ride);
+        Result res = parser.evaluate(ride, NULL);
         if (res.isNumber) value = res.number;
 
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;
+
+        // skip unavailable values
+        if (value == RideFile::NA) continue;
 
         // convert seconds to hours
         if (metricDetail.uunits == tr("seconds")) value /= 3600;
@@ -2829,8 +2838,11 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;
 
+        // skip unavailable values
+        if (value == RideFile::NA) continue;
+
         // set aggZero to false and value to zero if is temperature and -255
-        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NA) {
             value = 0;
             aggZero = false;
         }
@@ -3111,41 +3123,72 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
 
     // create a custom set of summary metric data!
     if (metricDetail.type == METRIC_PM) {
+        int valuesType = VALUES_CALCULATED;
 
-        if (metricDetail.symbol.startsWith("skiba")) {
+        QString symbol = metricDetail.symbol;
+        if (symbol.startsWith("planned_")) {
+            valuesType = VALUES_PLANNED;
+            symbol = symbol.right(symbol.length()-8);
+        } else if (symbol.startsWith("expected_")) {
+            valuesType = VALUES_EXPECTED;
+            symbol = symbol.right(symbol.length()-9);
+        }
+
+        if (symbol.startsWith("skiba")) {
             scoreType = "skiba_bike_score";
-        } else if (metricDetail.symbol.startsWith("antiss")) {
+        } else if (symbol.startsWith("antiss")) {
             scoreType = "antiss_score";
-        } else if (metricDetail.symbol.startsWith("atiss")) {
+        } else if (symbol.startsWith("atiss")) {
             scoreType = "atiss_score";
-        } else if (metricDetail.symbol.startsWith("coggan")) {
+        } else if (symbol.startsWith("coggan")) {
             scoreType = "coggan_tss";
-        } else if (metricDetail.symbol.startsWith("daniels")) {
+        } else if (symbol.startsWith("daniels")) {
             scoreType = "daniels_points";
-        } else if (metricDetail.symbol.startsWith("trimp")) {
+        } else if (symbol.startsWith("trimp")) {
             scoreType = "trimp_points";
-        } else if (metricDetail.symbol.startsWith("work")) {
+        } else if (symbol.startsWith("work")) {
             scoreType = "total_work";
-        } else if (metricDetail.symbol.startsWith("cp_")) {
+        } else if (symbol.startsWith("cp_")) {
             scoreType = "skiba_cp_exp";
-        } else if (metricDetail.symbol.startsWith("wprime")) {
+        } else if (symbol.startsWith("wprime")) {
             scoreType = "skiba_wprime_exp";
-        } else if (metricDetail.symbol.startsWith("distance")) {
+        } else if (symbol.startsWith("distance")) {
             scoreType = "total_distance";
-        } else if (metricDetail.symbol.startsWith("triscore")) {
+        } else if (symbol.startsWith("triscore")) {
             scoreType = "triscore";
         }
 
         stressType = STRESS_LTS; // if in doubt
-        if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl")) 
-            stressType = STRESS_LTS;
-        else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl")) 
-            stressType = STRESS_STS;
-        else if (metricDetail.symbol.endsWith("sb")) 
-            stressType = STRESS_SB;
-        else if (metricDetail.symbol.endsWith("lr")) 
-            stressType = STRESS_RR;
-
+        if (valuesType == VALUES_CALCULATED) {
+            if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl"))
+                stressType = STRESS_LTS;
+            else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl"))
+                stressType = STRESS_STS;
+            else if (metricDetail.symbol.endsWith("sb"))
+                stressType = STRESS_SB;
+            else if (metricDetail.symbol.endsWith("lr"))
+                stressType = STRESS_RR;
+        }
+        else if (valuesType == VALUES_PLANNED) {
+            if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl"))
+                stressType = STRESS_PLANNED_LTS;
+            else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl"))
+                stressType = STRESS_PLANNED_STS;
+            else if (metricDetail.symbol.endsWith("sb"))
+                stressType = STRESS_PLANNED_SB;
+            else if (metricDetail.symbol.endsWith("lr"))
+                stressType = STRESS_PLANNED_RR;
+        }
+        else if (valuesType == VALUES_EXPECTED) {
+            if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl"))
+                stressType = STRESS_EXPECTED_LTS;
+            else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl"))
+                stressType = STRESS_EXPECTED_STS;
+            else if (metricDetail.symbol.endsWith("sb"))
+                stressType = STRESS_EXPECTED_SB;
+            else if (metricDetail.symbol.endsWith("lr"))
+                stressType = STRESS_EXPECTED_RR;
+        }
     } else {
 
         scoreType = metricDetail.symbol; // just use the selected metric
@@ -3193,7 +3236,11 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
     unsigned long secondsPerGroupBy=0;
     bool wantZero = true;
 
+
     for (QDate date=settings->start.date(); date <= settings->end.date(); date = date.addDays(1)) {
+        bool plotData = true;
+        // past ?
+        bool past = date.daysTo(QDate::currentDate())>0;
 
         // day we are on
         int currentDay = groupForDate(date, settings->groupBy);
@@ -3214,12 +3261,44 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
         case STRESS_RR:
             value = pmcData->rr(date);
             break;
+        case STRESS_PLANNED_LTS:
+            value = pmcData->plannedLts(date);
+            break;
+        case STRESS_PLANNED_STS:
+            value = pmcData->plannedSts(date);
+            break;
+        case STRESS_PLANNED_SB:
+            value = pmcData->plannedSb(date);
+            break;
+        case STRESS_PLANNED_RR:
+            value = pmcData->plannedRr(date);
+            break;
+        case STRESS_EXPECTED_LTS:
+            value = pmcData->expectedLts(date);
+            if (past)
+                plotData = false;
+            break;
+        case STRESS_EXPECTED_STS:
+            value = pmcData->expectedSts(date);
+            if (past)
+                plotData = false;
+            break;
+        case STRESS_EXPECTED_SB:
+            value = pmcData->expectedSb(date);
+            if (past)
+                plotData = false;
+            break;
+        case STRESS_EXPECTED_RR:
+            value = pmcData->expectedRr(date);
+            if (past)
+                plotData = false;
+            break;
         default:
             value = 0;
             break;
         }
         
-        if (value || wantZero) {
+        if (plotData && (value || wantZero)) {
             unsigned long seconds = 1;
             if (currentDay > lastDay) {
                 if (lastDay && wantZero) {
@@ -3541,8 +3620,8 @@ class LTMPlotBackground: public QwtPlotItem
                       const QwtScaleMap &xMap, const QwtScaleMap &yMap,
                       const QRectF &rect) const
     {
-        const Zones *zones       = parent->parent->context->athlete->zones();
-        int zone_range_size     = parent->parent->context->athlete->zones()->getRangeSize();
+        const Zones *zones       = parent->parent->context->athlete->zones(false);
+        int zone_range_size     = parent->parent->context->athlete->zones(false)->getRangeSize();
 
         if (zone_range_size >= 0) { //parent->shadeZones() &&
             for (int i = 0; i < zone_range_size; i ++) {
@@ -3598,7 +3677,7 @@ class LTMPlotZoneLabel: public QwtPlotItem
             parent = _parent;
             zone_number = _zone_number;
 
-            const Zones *zones       = parent->parent->context->athlete->zones();
+            const Zones *zones       = parent->parent->context->athlete->zones(false);
             int zone_range     = zones->whichRange(settings->start.addDays((settings->end.date().toJulianDay()-settings->start.date().toJulianDay())/2).date());
 
             // which axis has watts?
@@ -3725,7 +3804,7 @@ void LTMPlot::refreshZoneLabels(QwtAxisId axisid)
     }
     if (axisid == QwtAxisId(-1,-1)) return; // our job is done - no zones to plot
 
-    const Zones *zones       = context->athlete->zones();
+    const Zones *zones       = context->athlete->zones(false);
 
     if (zones == NULL || zones->getRangeSize()==0) return; // no zones to plot
 

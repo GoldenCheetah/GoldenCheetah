@@ -158,6 +158,7 @@ class RideMetadata : public QWidget
         QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
         QList<FieldDefinition> getFields() { return fieldDefinitions; }
         QList<DefaultDefinition> getDefaults() { return defaultDefinitions; }
+        QString calendarText(RideItem *rideItem);
 
         QString getColorField() const { return colorfield; }
         void setColorField(QString x) { colorfield = x; }

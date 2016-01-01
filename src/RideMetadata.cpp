@@ -316,6 +316,27 @@ QVector<FormField *> RideMetadata::getFormFields()
     return formFields;
 }
 
+// Construct the summary text used on the calendar
+QString
+RideMetadata::calendarText(RideItem *rideItem)
+{
+    QString calendarText;
+
+    foreach (FieldDefinition field, getFields()) {
+        // "Weight" field is replace by "Athlete Weight" metric
+        QString fieldName = (field.name == "Weight") ? "Athlete Weight" :
+                                                       field.name;
+        QString value;
+        if (sp.isMetric(fieldName)) {
+            value = rideItem->getStringForSymbol(sp.rideMetric(fieldName)->symbol(), context->athlete->useMetricUnits);
+        } else {
+            value = rideItem->getText(fieldName, "");
+        }
+        calendarText += field.calendarText(value);
+    }
+
+    return calendarText;
+}
 
 /*----------------------------------------------------------------------
  * Forms (one per tab)
@@ -724,14 +745,6 @@ FormField::metadataFlush()
         }
     }
 
-    // Construct the summary text used on the calendar
-    QString calendarText;
-    foreach (FieldDefinition field, meta->getFields()) {
-        if (field.diary == true) {
-            calendarText += field.calendarText(ourRideItem->ride()->getTag(field.name, ""));
-        }
-    }
-    ourRideItem->ride()->setTag("Calendar Text", calendarText);
 }
 
 void
@@ -897,16 +910,6 @@ FormField::editFinished()
 
         // we actually edited it !
         setLinkedDefault(text);
-
-        // Construct the summary text used on the calendar
-        QString calendarText;
-        foreach (FieldDefinition field, meta->getFields()) {
-            if (field.diary == true) {
-                calendarText += QString("%1\n")
-                        .arg(ourRideItem->ride()->getTag(field.name, ""));
-            }
-        }
-        ourRideItem->ride()->setTag("Calendar Text", calendarText);
 
         // and update !
         ourRideItem->notifyRideMetadataChanged();
@@ -1157,18 +1160,20 @@ FieldDefinition::getCompleter(QObject *parent)
 QString
 FieldDefinition::calendarText(QString value)
 {
+    if (value.isEmpty() || diary != true) return QString();
+
     switch (type) {
-    case FIELD_INTEGER:
-    case FIELD_DOUBLE:
-    case FIELD_DATE:
-    case FIELD_TIME:
-    case FIELD_CHECKBOX:
-        return QString("%1: %2\n").arg(name).arg(value);
-    case FIELD_TEXT:
-    case FIELD_TEXTBOX:
-    case FIELD_SHORTTEXT:
-    default:
-        return QString("%1\n").arg(value);
+        case FIELD_INTEGER:
+        case FIELD_DOUBLE:
+        case FIELD_DATE:
+        case FIELD_TIME:
+        case FIELD_CHECKBOX:
+            return QString("%1: %2\n").arg(name).arg(value);
+        case FIELD_TEXT:
+        case FIELD_TEXTBOX:
+        case FIELD_SHORTTEXT:
+        default:
+            return QString("%1\n").arg(value);
     }
 }
 

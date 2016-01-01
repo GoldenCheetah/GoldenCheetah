@@ -308,7 +308,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     intensitySlider->setValue(100);
     slideLayout->addStretch();
     slideLayout->addWidget(intensitySlider);
-intensitySlider->hide(); //XXX!!! temporary
+    intensitySlider->hide(); // FIXME: XXX!!! temporary
 
 #ifdef Q_OS_MAC
 #if QT_VERSION > 0x5000
@@ -704,10 +704,10 @@ TrainSidebar::configChanged(qint32)
     FTP=285; // default to 285 if zones are not set
     WPRIME = 20000;
 
-    int range = context->athlete->zones()->whichRange(QDate::currentDate());
+    int range = context->athlete->zones(false)->whichRange(QDate::currentDate());
     if (range != -1) {
-        FTP = context->athlete->zones()->getCP(range);
-        WPRIME = context->athlete->zones()->getWprime(range);
+        FTP = context->athlete->zones(false)->getCP(range);
+        WPRIME = context->athlete->zones(false)->getWprime(range);
     }
 }
 

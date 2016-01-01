@@ -131,6 +131,7 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "metacrc") jc->item.metacrc = $3.toULongLong();
                                                                      else if ($1 == "timestamp") jc->item.timestamp = $3.toULongLong();
                                                                      else if ($1 == "dbversion") jc->item.dbversion = $3.toInt();
+                                                                     else if ($1 == "udbversion") jc->item.udbversion = $3.toInt();
                                                                      else if ($1 == "color") jc->item.color = QColor($3);
                                                                      else if ($1 == "isRun") jc->item.isRun = $3.toInt();
                                                                      else if ($1 == "isSwim") jc->item.isSwim = $3.toInt();
@@ -138,6 +139,9 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "overrides") jc->item.overrides_ = $3.split(",");
                                                                      else if ($1 == "weight") jc->item.weight = $3.toDouble();
                                                                      else if ($1 == "samples") jc->item.samples = $3.toInt() > 0 ? true : false;
+                                                                     else if ($1 == "zonerange") jc->item.zoneRange = $3.toInt();
+                                                                     else if ($1 == "hrzonerange") jc->item.hrZoneRange = $3.toInt();
+                                                                     else if ($1 == "pacezonerange") jc->item.paceZoneRange = $3.toInt();
                                                                      else if ($1 == "date") {
                                                                          QDateTime aslocal = QDateTime::fromString($3, DATETIME_FORMAT);
                                                                          QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), Qt::UTC);
@@ -234,8 +238,10 @@ void
 RideCache::load()
 {
     // only load if it exists !
-    QFile rideDB(QString("%1/rideDB.json").arg(context->athlete->home->cache().canonicalPath()));
+    QFile rideDB(QString("%1/%2").arg(context->athlete->home->cache().canonicalPath()).arg("rideDB.json"));
     if (rideDB.exists() && rideDB.open(QFile::ReadOnly)) {
+        QDir directory = context->athlete->home->activities();
+        QDir plannedDirectory = context->athlete->home->planned();
 
         // ok, lets read it in
         QTextStream stream(&rideDB);
@@ -254,7 +260,7 @@ RideCache::load()
         jc->old = false;
 
         // clean item
-        jc->item.path = context->athlete->home->activities().canonicalPath();
+        jc->item.path = directory.canonicalPath(); // TODO use plannedDirectory for planned
         jc->item.context = context;
         jc->item.isstale = jc->item.isdirty = jc->item.isedit = false;
 
@@ -308,7 +314,7 @@ void RideCache::save()
 {
 
     // now save data away
-    QFile rideDB(QString("%1/rideDB.json").arg(context->athlete->home->cache().canonicalPath()));
+    QFile rideDB(QString("%1/%2").arg(context->athlete->home->cache().canonicalPath()).arg("rideDB.json"));
     if (rideDB.open(QFile::WriteOnly)) {
 
         const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -345,11 +351,16 @@ void RideCache::save()
             stream << "\t\t\"metacrc\":\"" <<item->metacrc <<"\",\n";
             stream << "\t\t\"timestamp\":\"" <<item->timestamp <<"\",\n";
             stream << "\t\t\"dbversion\":\"" <<item->dbversion <<"\",\n";
+            stream << "\t\t\"udbversion\":\"" <<item->udbversion <<"\",\n";
             stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
             stream << "\t\t\"present\":\"" <<item->present <<"\",\n";
             stream << "\t\t\"isRun\":\"" <<item->isRun <<"\",\n";
             stream << "\t\t\"isSwim\":\"" <<item->isSwim <<"\",\n";
             stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
+
+            if (item->zoneRange >= 0) stream << "\t\t\"zonerange\":\"" <<item->zoneRange <<"\",\n";
+            if (item->hrZoneRange >= 0) stream << "\t\t\"hrzonerange\":\"" <<item->hrZoneRange <<"\",\n";
+            if (item->paceZoneRange >= 0) stream << "\t\t\"pacezonerange\":\"" <<item->paceZoneRange <<"\",\n";
 
             // if there are overrides, do share them
             if (item->overrides_.count()) stream << "\t\t\"overrides\":\"" <<item->overrides_.join(",") <<"\",\n";

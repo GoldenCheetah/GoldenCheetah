@@ -218,14 +218,22 @@ class CredentialsPage : public QScrollArea
 #if QT_VERSION >= 0x050000
         void authoriseDropbox();
         void chooseDropboxFolder();
+        void authoriseGoogleDrive();        
+        void chooseGoogleDriveFolder();        
 #endif
         void authoriseStrava();
         void authoriseCyclingAnalytics();
         void authoriseGoogleCalendar();
-        void dvCALDAVTypeChanged(int);
+        void dvCALDAVTypeChanged(int);        
         void chooseLocalFileStoreFolder();
 
     private:
+        enum GoogleType {
+            CALENDAR = 1,
+            DRIVE,
+        };
+        void authoriseGoogle(GoogleType type);
+        
         Context *context;
 
         QLineEdit *tpUser;
@@ -240,6 +248,10 @@ class CredentialsPage : public QScrollArea
         QPushButton *dropboxAuthorise;
         QPushButton *dropboxAuthorised, *dropboxBrowse;
         QLineEdit *dropboxFolder;
+        QPushButton *googleDriveAuthorise;
+        QPushButton *googleDriveAuthorised;
+        QPushButton *googleDriveBrowse;
+        QLineEdit *googleDriveFolder;
 #endif
 
         QComboBox *dvCALDAVType;
@@ -396,6 +408,38 @@ class BestsMetricsPage : public QWidget
         QPushButton *leftButton;
         QPushButton *rightButton;
 #endif
+};
+
+class CustomMetricsPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+    public:
+
+    CustomMetricsPage(QWidget *parent, Context *context);
+
+    public slots:
+
+        void refreshTable();
+        qint32 saveClicked();
+
+        void deleteClicked();
+        void addClicked();
+        void editClicked();
+
+    protected:
+        Context *context;
+
+        QPushButton *addButton,
+                    *deleteButton,
+                    *editButton;
+        QTreeWidget *table;
+        QList<UserMetricSettings> metrics;
+
+        struct {
+            quint16 crc;
+        } b4;
 };
 
 class IntervalMetricsPage : public QWidget
@@ -703,7 +747,7 @@ class SchemePage : public QWidget
 
 
     public:
-        SchemePage(ZonePage *parent);
+        SchemePage(Zones *zones);
         ZoneScheme getScheme();
         qint32 saveClicked();
 
@@ -713,7 +757,7 @@ class SchemePage : public QWidget
         void renameClicked();
 
     private:
-        ZonePage *zonePage;
+        Zones *zones;
         QTreeWidget *scheme;
         QPushButton *addButton, *renameButton, *deleteButton;
 };
@@ -725,7 +769,7 @@ class CPPage : public QWidget
 
 
     public:
-        CPPage(ZonePage *parent);
+        CPPage(Context *context, Zones *zones, SchemePage *schemePage);
         QComboBox *useCPForFTPCombo;
         qint32 saveClicked();
 
@@ -754,7 +798,9 @@ class CPPage : public QWidget
         QDoubleSpinBox *wEdit;
         QDoubleSpinBox *pmaxEdit;
 
-        ZonePage *zonePage;
+        Context *context;
+        Zones *zones_;
+        SchemePage *schemePage;
         QTreeWidget *ranges;
         QTreeWidget *zones;
         QPushButton *addButton, *updateButton, *deleteButton;
@@ -770,28 +816,34 @@ class ZonePage : public QWidget
     public:
 
         ZonePage(Context *);
-        Context *context;
-
+        ~ZonePage();
         qint32 saveClicked();
-
-        //ZoneScheme scheme;
-        Zones zones;
-        quint16 b4Fingerprint; // how did it start ?
-
-        // Children talk to each other
-        SchemePage *schemePage;
-        CPPage *cpPage;
 
     public slots:
 
 
     protected:
 
-        bool changed;
+        Context *context;
 
         QTabWidget *tabs;
 
-        // local versions for modification
+    private:
+
+        static const int nSports = 2;
+
+        QLabel *sportLabel;
+        QComboBox *sportCombo;
+
+        //ZoneScheme scheme;
+        Zones *zones[nSports];
+        quint16 b4Fingerprint[nSports]; // how did it start ?
+        SchemePage *schemePage[nSports];
+        CPPage *cpPage[nSports];
+
+    private slots:
+        void changeSport(int i);
+
 };
 
 //

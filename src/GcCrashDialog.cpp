@@ -28,7 +28,15 @@
 #include <QtSql>
 #include <qwt_plot_curve.h>
 
-#define GCC_VERSION QString("%1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__)
+#ifdef Q_CC_GNU
+#define COMPILER "GCC"
+#define COMPILER_VERSION QString("%1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__)
+#endif
+
+#ifdef Q_CC_MSVC
+#define COMPILER "MSVC"
+#define COMPILER_VERSION QString("%1").arg(_MSC_VER)
+#endif
 
 #ifndef Q_OS_MAC
 #include "VideoWindow.h"
@@ -282,25 +290,26 @@ QString GcCrashDialog::versionHTML()
             "<table>"
             "<tr><td colspan=\"2\">QT</td><td>%1</td></tr>"
             "<tr><td colspan=\"2\">QWT</td><td>%2</td></tr>"
-            "<tr><td colspan=\"2\">GCC</td><td>%3</td></tr>"
-            "<tr><td colspan=\"2\">SRMIO</td><td>%4</td></tr>"
-            "<tr><td colspan=\"2\">OAUTH</td><td>%5</td></tr>"
-            "<tr><td colspan=\"2\">D2XX</td><td>%6</td></tr>"
-            "<tr><td colspan=\"2\">QWTPLOT3D</td><td>%7</td></tr>"
-            "<tr><td colspan=\"2\">KML</td><td>%8</td></tr>"
-            "<tr><td colspan=\"2\">ICAL</td><td>%9</td></tr>"
-            "<tr><td colspan=\"2\">USBXPRESS</td><td>%10</td></tr>"
-            "<tr><td colspan=\"2\">LIBUSB</td><td>%11</td></tr>"
-            "<tr><td colspan=\"2\">Wahoo API</td><td>%12</td></tr>"
-            "<tr><td colspan=\"2\">VLC</td><td>%13</td></tr>"
-            "<tr><td colspan=\"2\">VIDEO</td><td>%14</td></tr>"
-            "<tr><td colspan=\"2\">SAMPLERATE</td><td>%15</td></tr>"
-            "<tr><td colspan=\"2\">SSL</td><td>%16</td></tr>"
+            "<tr><td colspan=\"2\">%3</td><td>%4</td></tr>"
+            "<tr><td colspan=\"2\">SRMIO</td><td>%5</td></tr>"
+            "<tr><td colspan=\"2\">OAUTH</td><td>%6</td></tr>"
+            "<tr><td colspan=\"2\">D2XX</td><td>%7</td></tr>"
+            "<tr><td colspan=\"2\">QWTPLOT3D</td><td>%8</td></tr>"
+            "<tr><td colspan=\"2\">KML</td><td>%9</td></tr>"
+            "<tr><td colspan=\"2\">ICAL</td><td>%10</td></tr>"
+            "<tr><td colspan=\"2\">USBXPRESS</td><td>%11</td></tr>"
+            "<tr><td colspan=\"2\">LIBUSB</td><td>%12</td></tr>"
+            "<tr><td colspan=\"2\">Wahoo API</td><td>%13</td></tr>"
+            "<tr><td colspan=\"2\">VLC</td><td>%14</td></tr>"
+            "<tr><td colspan=\"2\">VIDEO</td><td>%15</td></tr>"
+            "<tr><td colspan=\"2\">SAMPLERATE</td><td>%16</td></tr>"
+            "<tr><td colspan=\"2\">SSL</td><td>%17</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
             .arg(QWT_VERSION_STR)
-            .arg(GCC_VERSION)
+            .arg(COMPILER)
+            .arg(COMPILER_VERSION)
             .arg(srmio)
             .arg(oauth)
             .arg(d2xx)
@@ -447,8 +456,9 @@ GcCrashDialog::setHTML()
 
         // RESPECT PRIVACY
         // we do not disclose user names and passwords or key ids
-        if (key.endsWith("/user") || key.endsWith("/pass") || key.endsWith("/key") ||
-            key.endsWith("_token") || key.endsWith("_secret") || key.endsWith("googlecalid")) continue;
+        if (key.endsWith("/user") || key.endsWith("/pass") ||
+            key.endsWith("/key") || key.endsWith("_token") ||
+            key.endsWith("_secret") || key.endsWith("googlecalid")) continue;
 
         // we do not disclose personally identifiable information
         if (key.endsWith("dob") || key.endsWith("weight") ||

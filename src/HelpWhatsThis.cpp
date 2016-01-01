@@ -174,7 +174,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case ChartTrends_MetricTrends_Config_Basic:
         return text.arg("ChartTypes_Trends#basic-settings").arg(tr("Date range, data grouping settings which apply to a single chart"));
     case ChartTrends_MetricTrends_Config_Preset:
-        return text.arg("ChartTypes_Trends#presets").arg(tr("Prefined sets of curves which can be applied as chart definition, or as starting point for individual adjustments"));
+        return text.arg("ChartTypes_Trends#presets").arg(tr("Predefined sets of curves which can be applied as chart definition, or as starting point for individual adjustments"));
     case ChartTrends_MetricTrends_Config_Curves:
         return text.arg("ChartTypes_Trends#curves").arg(tr("Curves which are plotted for the specific chart - based on presets or individually added and modified here"));
     case ChartTrends_MetricTrends_Curves_Settings:

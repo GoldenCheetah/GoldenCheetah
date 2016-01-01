@@ -103,6 +103,7 @@ class PfPvWindow : public GcChartWindow
         void setQaCPFromLineEdit();
         void setQaCADFromLineEdit();
         void setQaCLFromLineEdit();
+        void setQaPMaxFromLineEdit();
         void setShadeZonesPfPvFromCheckBox();
         void setrShadeZonesPfPvFromCheckBox();
         void setMergeIntervalsPfPvFromCheckBox();
@@ -127,6 +128,7 @@ class PfPvWindow : public GcChartWindow
         QLineEdit *qaCPValue;
         QLineEdit *qaCadValue;
         QLineEdit *qaClValue;
+        QLineEdit *qaPMaxValue;
         RideItem *current;
 
     private:

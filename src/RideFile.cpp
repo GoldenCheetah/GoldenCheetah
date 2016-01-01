@@ -31,7 +31,11 @@
 #include <QtXml/QtXml>
 #include <algorithm> // for std::lower_bound
 #include <assert.h>
+#ifdef Q_CC_MSVC
+#include <float.h>
+#else
 #include <cmath>
+#endif
 #include <qwt_spline.h>
 
 #ifdef GC_HAVE_SAMPLERATE
@@ -614,17 +618,6 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
             notesFile.close();
         }
 
-        // Construct the summary text used on the calendar
-        QString calendarText;
-        if (context) { // will be null in standalone open
-            foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
-                if (field.diary == true && result->getTag(field.name, "") != "") {
-                    calendarText += field.calendarText(result->getTag(field.name, ""));
-                }
-            }
-        }
-        result->setTag("Calendar Text", calendarText);
-
         // set other "special" fields
         result->setTag("Filename", QFileInfo(file.fileName()).fileName());
         result->setTag("Device", result->deviceType());
@@ -747,7 +740,7 @@ void RideFile::updateMin(RideFilePoint* point)
        minPoint->headwind = point->headwind;
     if (point->slope<minPoint->slope)
        minPoint->slope = point->slope;
-    if (point->temp != NoTemp && point->temp<minPoint->temp)
+    if (point->temp != NA && point->temp<minPoint->temp)
        minPoint->temp = point->temp;
     if (minPoint->lte == 0 || point->lte<minPoint->lte)
        minPoint->lte = point->lte;
@@ -826,7 +819,7 @@ void RideFile::updateMax(RideFilePoint* point)
        maxPoint->headwind = point->headwind;
     if (point->slope>maxPoint->slope)
        maxPoint->slope = point->slope;
-    if (point->temp != NoTemp && point->temp>maxPoint->temp)
+    if (point->temp != NA && point->temp>maxPoint->temp)
        maxPoint->temp = point->temp;
     if (point->lte>maxPoint->lte)
        maxPoint->lte = point->lte;
@@ -893,7 +886,7 @@ void RideFile::updateAvg(RideFilePoint* point)
     totalPoint->lat += point->lat;
     totalPoint->headwind += point->headwind;
     totalPoint->slope += point->slope;
-    totalPoint->temp += point->temp == NoTemp ? 0 : point->temp;
+    totalPoint->temp += point->temp == NA ? 0 : point->temp;
     totalPoint->lte += point->lte;
     totalPoint->rte += point->rte;
     totalPoint->lps += point->lps;
@@ -919,7 +912,7 @@ void RideFile::updateAvg(RideFilePoint* point)
     totalPoint->tcore += point->tcore;
 
     ++totalCount;
-    if (point->temp != NoTemp) ++totalTemp;
+    if (point->temp != NA) ++totalTemp;
 
     // todo : division only for last after last point
     avgPoint->secs = totalPoint->secs/totalCount;
@@ -975,6 +968,34 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
 {
     // negative values are not good, make them zero
     // although alt, lat, lon, headwind, slope and temperature can be negative of course!
+#ifdef Q_CC_MSVC
+    if (!_finite(secs) || secs<0) secs=0;
+    if (!_finite(cad) || cad<0) cad=0;
+    if (!_finite(hr) || hr<0) hr=0;
+    if (!_finite(km) || km<0) km=0;
+    if (!_finite(kph) || kph<0) kph=0;
+    if (!_finite(nm) || nm<0) nm=0;
+    if (!_finite(watts) || watts<0) watts=0;
+    if (!_finite(interval) || interval<0) interval=0;
+    if (!_finite(lps) || lps<0) lps=0;
+    if (!_finite(rps) || rps<0) rps=0;
+    if (!_finite(lte) || lte<0) lte=0;
+    if (!_finite(rte) || rte<0) rte=0;
+    if (!_finite(lppb) || lppb<0) lppb=0;
+    if (!_finite(rppb) || rppb<0) rppb=0;
+    if (!_finite(lppe) || lppe<0) lppe=0;
+    if (!_finite(rppe) || rppe<0) rppe=0;
+    if (!_finite(lpppb) || lpppb<0) lpppb=0;
+    if (!_finite(rpppb) || rpppb<0) rpppb=0;
+    if (!_finite(lpppe) || lpppe<0) lpppe=0;
+    if (!_finite(rpppe) || rpppe<0) rpppe=0;
+    if (!_finite(smo2) || smo2<0) smo2=0;
+    if (!_finite(thb) || thb<0) thb=0;
+    if (!_finite(rvert) || rvert<0) rvert=0;
+    if (!_finite(rcad) || rcad<0) rcad=0;
+    if (!_finite(rcontact) || rcontact<0) rcontact=0;
+    if (!_finite(tcore) || tcore<0) tcore=0;
+#else
     if (!std::isfinite(secs) || secs<0) secs=0;
     if (!std::isfinite(cad) || cad<0) cad=0;
     if (!std::isfinite(hr) || hr<0) hr=0;
@@ -1001,6 +1022,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     if (!std::isfinite(rcad) || rcad<0) rcad=0;
     if (!std::isfinite(rcontact) || rcontact<0) rcontact=0;
     if (!std::isfinite(tcore) || tcore<0) tcore=0;
+#endif
 
     // if bad time or distance ignore it if NOT the first sample
     if (dataPoints_.count() != 0 && secs == 0.00f && km == 0.00f) return;
@@ -1034,7 +1056,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.lat      |= (lat != 0);
     dataPresent.headwind |= (headwind != 0);
     dataPresent.slope    |= (slope != 0);
-    dataPresent.temp     |= (temp != NoTemp);
+    dataPresent.temp     |= (temp != NA);
     dataPresent.lrbalance|= (lrbalance != 0);
     dataPresent.lte      |= (lte != 0);
     dataPresent.rte      |= (rte != 0);
@@ -1348,7 +1370,7 @@ RideFile::getPointValue(int index, SeriesType series) const
 QVariant
 RideFile::getPointFromValue(double value, SeriesType series) const
 {
-    if (series==RideFile::temp && value == RideFile::NoTemp)
+    if (series==RideFile::temp && value == RideFile::NA)
         return "";
     else if (series==RideFile::wattsKg)
         return "";
@@ -1739,10 +1761,10 @@ RideFile::recalculateDerivedSeries(bool force)
     double anTISS = 0.0f;
 
     // set WPrime and CP
-    if (context->athlete->zones()) {
-        int zoneRange = context->athlete->zones()->whichRange(startTime().date());
-        CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 0;
-        //WPRIME = zoneRange >= 0 ? context->athlete->zones()->getWprime(zoneRange) : 0;
+    if (context->athlete->zones(isRun())) {
+        int zoneRange = context->athlete->zones(isRun())->whichRange(startTime().date());
+        CP = zoneRange >= 0 ? context->athlete->zones(isRun())->getCP(zoneRange) : 0;
+        //WPRIME = zoneRange >= 0 ? context->athlete->zones(isRun())->getWprime(zoneRange) : 0;
 
         // did we override CP in metadata / metrics ?
         int oCP = getTag("CP","0").toInt();
@@ -2648,4 +2670,88 @@ RideFile::symbolForSeries(SeriesType series)
             return seriesSymbolTable[i].symbol;
 
     return "";
+}
+
+// Iterator
+RideFileIterator::RideFileIterator(RideFile *f, Specification spec)
+    : f(f)
+{
+    // index, start and stop are set to -1
+    // if they are out of bounds or f is NULL
+    if (f != NULL) {
+
+        // ok, so lets work out the begin and end index
+        double startsecs = spec.secsStart();
+        if (startsecs < 0) start = 0;
+        else start = f->timeIndex(startsecs);
+
+        // check!
+        if (start >= f->dataPoints().count()) start = -1;
+
+        // ok, so lets work out the begin and end index
+        double stopsecs = spec.secsEnd();
+        if (stopsecs < 0) stop = f->dataPoints().count()-1;
+        else stop = f->timeIndex(stopsecs)-1;
+
+        // check!
+        if (stop >= f->dataPoints().count()) stop = -1;
+
+    } else {
+
+        // nothing doing
+        start = stop = -1;
+    }
+
+    // move to front by default
+    index = start;
+}
+
+void
+RideFileIterator::toFront()
+{
+    index = start;
+}
+
+void
+RideFileIterator::toBack()
+{
+    index = stop;
+}
+
+struct RideFilePoint *
+RideFileIterator::first()
+{
+    return start >= 0 ? f->dataPoints()[start] : NULL; // efficient since dataPoints() returns a reference
+}
+
+struct RideFilePoint *
+RideFileIterator::last()
+{
+    return stop >= 0 ? f->dataPoints()[stop] : NULL; // efficient since dataPoints() returns a reference
+}
+
+bool
+RideFileIterator::hasNext() const
+{
+    return (index >= 0 && index <= stop);
+}
+
+bool
+RideFileIterator::hasPrevious() const
+{
+    return (index >= 0 && index >= start);
+}
+
+struct RideFilePoint *
+RideFileIterator::next()
+{
+    if (index >= 0 && index <= stop) return f->dataPoints()[index++];
+    else return NULL;
+}
+
+struct RideFilePoint *
+RideFileIterator::previous()
+{
+    if (index >= 0 && index >= start) return f->dataPoints()[index--];
+    else return NULL;
 }

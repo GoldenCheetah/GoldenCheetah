@@ -40,13 +40,14 @@ class SearchFilter;
 class SearchFilterBox;
 class DiaryWindow;
 class DiarySidebar;
-class BUGFIXQSortFilterProxyModel;
+class QSortFilterProxyModel;
 class DataFilter;
 class GcMiniCalendar;
 class SearchBox;
 class RideTreeView;
 class EditMetricDetailDialog;
 class EditUserDataDialog;
+class EditUserMetricDialog;
 
 //
 // The RideNavigator
@@ -75,6 +76,7 @@ class RideNavigator : public GcWindow
     friend class ::SearchBox;
     friend class ::EditMetricDetailDialog;
     friend class ::EditUserDataDialog;
+    friend class ::EditUserMetricDialog;
 
     public:
         RideNavigator(Context *, bool mainwindow = false);
@@ -159,7 +161,7 @@ class RideNavigator : public GcWindow
 
     protected:
         GroupByModel *groupByModel; // for group by
-        BUGFIXQSortFilterProxyModel *sortModel; // for sort/filter
+        QSortFilterProxyModel *sortModel; // for sort/filter
 
         // keep track of the headers
         QList<QString> logicalHeadings;

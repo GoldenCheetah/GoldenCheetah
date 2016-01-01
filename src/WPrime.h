@@ -48,6 +48,7 @@ class WPrime {
         // recalc from ride selected or workout selected in train mode
         void setRide(RideFile *ride);
         void setErg(ErgFile *erg);
+        void setWatts(Context *context, QVector<int>&watts, int CP, int WPRIME);
 
         RideFile *ride() { return rideFile; }
 

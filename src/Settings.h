@@ -131,8 +131,8 @@
 #define GC_SETTINGS_INTERVAL_METRICS    "<global-general>rideSummaryWindow/intervalMetrics"
 #define GC_TABBAR                       "<global-general>show/tabbar"                        // show tabbar
 #define GC_WBALFORM                     "<global-general>wbal/formula"                       // wbal formula to use
-#define GC_BIKESCOREDAYS	            "<global-general>bikeScoreDays"
-#define GC_BIKESCOREMODE	            "<global-general>bikeScoreMode"
+#define GC_BIKESCOREDAYS                    "<global-general>bikeScoreDays"
+#define GC_BIKESCOREMODE                    "<global-general>bikeScoreMode"
 #define GC_WARNCONVERT                  "<global-general>warnconvert"
 #define GC_WARNEXIT                     "<global-general>warnexit"
 #define GC_HIST_BIN_WIDTH               "<global-general>histogamWindow/binWidth"
@@ -166,6 +166,9 @@
 #define GC_DPDP_BIKEWEIGHT              "<global-general>dataprocess/fixderivepower/bikewheight"
 #define GC_DPDP_CRR                     "<global-general>dataprocess/fixderivepower/crr"
 #define GC_DPFV_MA                     "<global-general>dataprocess/fixspeed/ma"
+#define GC_CAD2SMO2                     "<global-general>dataprocess/fixmoxy/cad2smo2"
+#define GC_SPD2THB			"<global-general>dataprocess/fixmoxy/spd2thb"
+
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where
@@ -215,11 +218,12 @@
 #define GC_AVATAR                       "<athlete-preferences>avatar"
 #define GC_DISCOVERY                    "<athlete-preferences>intervals/discovery"   // intervals to discover
 #define GC_SB_TODAY                     "<athlete-preferences>PMshowSBtoday"
-#define GC_LTS_DAYS		                "<athlete-preferences>LTSdays"
-#define GC_STS_DAYS		                "<athlete-preferences>STSdays"
+#define GC_LTS_DAYS                             "<athlete-preferences>LTSdays"
+#define GC_STS_DAYS                             "<athlete-preferences>STSdays"
 #define GC_CRANKLENGTH                  "<athlete-preferences>crankLength"
 #define GC_WHEELSIZE                    "<athlete-preferences>wheelsize"
 #define GC_USE_CP_FOR_FTP               "<athlete-preferences>cp/useforftp"                       // use CP for FTP
+#define GC_USE_CP_FOR_FTP_RUN           "<athlete-preferences>cp/useforftprun"                    // use CP for FTP
 #define GC_NETWORKFILESTORE_FOLDER      "<athlete-preferences>networkfilestore/folder"            // folder to sync with
 #define GC_AUTOBACKUP_FOLDER            "<athlete-preferences>autobackup/folder"
 #define GC_AUTOBACKUP_PERIOD            "<athlete-preferences>autobackup/period"                  // how often is the Athlete Folder backuped up / 0 == never
@@ -257,9 +261,15 @@
 #define GC_DVPASS                       "<athlete-private>dv/pass"
 #define GC_DVCALDAVTYPE                 "<athlete-private>dv/type"
 #define GC_DVGOOGLE_CALID               "<athlete-private>dv/googlecalid"
+#define GC_DVGOOGLE_DRIVE               "<athlete-private>dv/googledrive"
 //Twitter oauth keys
 #define GC_DROPBOX_TOKEN                "<athlete-private>dropbox/token"
 #define GC_DROPBOX_FOLDER               "<athlete-private>dropbox/folder"
+#define GC_GOOGLE_DRIVE_ACCESS_TOKEN   "<athlete-private>google-drive/access_token"
+#define GC_GOOGLE_DRIVE_REFRESH_TOKEN   "<athlete-private>google-drive/refresh_token"
+#define GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH "<athlete-private>google-drive/last_access_token_refresh"
+
+#define GC_GOOGLE_DRIVE_FOLDER          "<athlete-private>google-drive/folder"
 #define GC_TWITTER_TOKEN                "<athlete-private>twitter_token"
 #define GC_TWITTER_SECRET               "<athlete-private>twitter_secret"
 //Google Calendar-CALDAV oauthkeys

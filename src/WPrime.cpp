@@ -171,10 +171,10 @@ WPrime::setRide(RideFile *input)
     // Get CP
     CP = 250; // default
     WPRIME = 20000;
-    if (input->context->athlete->zones()) {
-        int zoneRange = input->context->athlete->zones()->whichRange(input->startTime().date());
-        CP = zoneRange >= 0 ? input->context->athlete->zones()->getCP(zoneRange) : 0;
-        WPRIME = zoneRange >= 0 ? input->context->athlete->zones()->getWprime(zoneRange) : 0;
+    if (input->context->athlete->zones(input->isRun())) {
+        int zoneRange = input->context->athlete->zones(input->isRun())->whichRange(input->startTime().date());
+        CP = zoneRange >= 0 ? input->context->athlete->zones(input->isRun())->getCP(zoneRange) : 0;
+        WPRIME = zoneRange >= 0 ? input->context->athlete->zones(input->isRun())->getWprime(zoneRange) : 0;
 
         // did we override CP in metadata / metrics ?
         int oCP = input->getTag("CP","0").toInt();
@@ -361,6 +361,105 @@ WPrime::setRide(RideFile *input)
 }
 
 void
+WPrime::setWatts(Context *context, QVector<int>&wattsArray, int CP, int WPRIME)
+{
+    bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
+
+    QTime time; // for profiling performance of the code
+    time.start();
+
+    // reset from previous
+    values.resize(0); // the memory is kept for next time so this is efficient
+    xvalues.resize(0);
+    minY = maxY = WPRIME;
+
+    if (integral) {
+
+        last = wattsArray.count();
+        values.resize(last);
+        xvalues.resize(last);
+
+        // input array contains the actual W' expenditure
+        // and will also contain non-zero values
+        double totalBelowCP=0;
+        double countBelowCP=0;
+        QVector<int> powerValues(last+1);
+        EXP = 0;
+        for (int i=0; i<last; i++) {
+
+            // get watts at point in time
+            int value = wattsArray[i];
+
+            powerValues[i] = value > CP ? value-CP : 0;
+
+            if (value < CP) {
+                totalBelowCP += value;
+                countBelowCP++;
+            } else EXP += value; // total expenditure above CP
+        }
+
+        TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
+
+        // lets run forward from 0s to end of ride
+        values.resize(last+1);
+        xvalues.resize(last+1);
+
+        QVector<double> myvalues(last+1);
+
+        WPrimeIntegrator a(powerValues, 0, last, TAU);
+
+        a.start();
+        a.wait();
+
+        // sum values
+        for (int t=0; t<=last; t++) {
+            values[t] = a.output[t];
+            xvalues[t] = t * 1000.00f;
+        }
+
+        // now subtract WPRIME and work out minimum etc
+        for(int t=0; t <= last; t++) {
+            double value = WPRIME - values[t];
+            values[t] = value;
+
+            if (value > maxY) maxY = value;
+            if (value < minY) minY = value;
+        }
+
+    } else {
+
+        // how many points ?
+        last = wattsArray.count();
+        values.resize(last);
+        xvalues.resize(last);
+
+        // input array contains the actual W' expenditure
+        // and will also contain non-zero values
+        double W = WPRIME;
+        for (int i=0; i<last; i++) {
+
+            // get watts at point in time
+            int value = wattsArray[i];
+
+            if(value < CP) {
+                W  = W + (CP-value)*(WPRIME-W)/WPRIME;
+            } else {
+                W  = W + (CP-value);
+            }
+
+            if (W > maxY) maxY = W;
+            if (W < minY) minY = W;
+
+            values[i] = W;
+            xvalues[i] = i*1000;
+        }
+    }
+
+    if (minY < -30000) minY = 0; // the data is definitely out of bounds!
+                                 // so lets not exacerbate the problem - truncate
+}
+
+void
 WPrime::setErg(ErgFile *input)
 {
     bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
@@ -376,10 +475,10 @@ WPrime::setErg(ErgFile *input)
     CP = 250; // defaults
     WPRIME = 20000;
 
-    if (input->context->athlete->zones()) {
-        int zoneRange = input->context->athlete->zones()->whichRange(QDate::currentDate());
-        CP = zoneRange >= 0 ? input->context->athlete->zones()->getCP(zoneRange) : 250;
-        WPRIME = zoneRange >= 0 ? input->context->athlete->zones()->getWprime(zoneRange) : 20000;
+    if (input->context->athlete->zones(false)) {
+        int zoneRange = input->context->athlete->zones(false)->whichRange(QDate::currentDate());
+        CP = zoneRange >= 0 ? input->context->athlete->zones(false)->getCP(zoneRange) : 250;
+        WPRIME = zoneRange >= 0 ? input->context->athlete->zones(false)->getWprime(zoneRange) : 20000;
     }
 
     // no data or no power data then forget it.
@@ -643,15 +742,14 @@ class MinWPrime : public RideMetric {
         setImperialUnits(tr("kJ"));
         setPrecision(1);
     }
-    void compute(const RideFile *r, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        setValue(const_cast<RideFile*>(r)->wprimeData()->minY / 1000.00f);
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+        if (item->ride() && item->ride()->wprimeData())
+            setValue(item->ride()->wprimeData()->minY / 1000.00f);
+        else
+            setValue(0.0);
     }
 
-    bool canAggregate() { return false; }
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new MinWPrime(*this); }
 };
@@ -673,15 +771,14 @@ class MaxWPrime : public RideMetric {
         setImperialUnits(tr("%"));
         setPrecision(0);
     }
-    void compute(const RideFile *r, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        setValue(const_cast<RideFile*>(r)->wprimeData()->maxE());
+        if (item->ride() && item->ride()->wprimeData())
+            setValue(item->ride()->wprimeData()->maxE());
+        else
+            setValue(0.0);
     }
 
-    bool canAggregate() { return false; }
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new MaxWPrime(*this); }
 };
@@ -703,15 +800,14 @@ class MaxMatch : public RideMetric {
         setImperialUnits(tr("kJ"));
         setPrecision(1);
     }
-    void compute(const RideFile *r, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        setValue(const_cast<RideFile*>(r)->wprimeData()->maxMatch()/1000.00f);
+        if (item->ride() && item->ride()->wprimeData())
+            setValue(item->ride()->wprimeData()->maxMatch()/1000.00f);
+        else
+            setValue(0.0);
     }
 
-    bool canAggregate() { return false; }
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new MaxMatch(*this); }
 };
@@ -731,19 +827,18 @@ class Matches : public RideMetric {
         setType(RideMetric::Total);
         setPrecision(0);
     }
-    void compute(const RideFile *r, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
         int matches=0;
-        foreach(Match m, const_cast<RideFile*>(r)->wprimeData()->matches) {
-            if (m.cost > 2000) matches++; // 2kj is minimum size
+        if (item->ride() && item->ride()->wprimeData()) {
+            foreach(Match m, item->ride()->wprimeData()->matches) {
+                if (m.cost > 2000) matches++; // 2kj is minimum size
+            }
         }
         setValue(matches);
     }
 
-    bool canAggregate() { return false; }
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new Matches(*this); }
 };
@@ -765,12 +860,13 @@ class WPrimeTau : public RideMetric {
         setImperialUnits(tr(""));
         setPrecision(0);
     }
-    void compute(const RideFile *r, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        setValue(const_cast<RideFile*>(r)->wprimeData()->TAU);
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+
+        if (item->ride() && item->ride()->wprimeData())
+            setValue(item->ride()->wprimeData()->TAU);
+        else
+            setValue(0.0);
     }
 
     bool canAggregate() { return false; }
@@ -795,27 +891,28 @@ class WPrimeExp : public RideMetric {
         setImperialUnits(tr("kJ"));
         setPrecision(0);
     }
-    void compute(const RideFile *r, const Zones *zones, int zonerange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        int cp = r->getTag("CP","0").toInt();
-        if (!cp && zones && zonerange >=0) cp = zones->getCP(zonerange);
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        int cp = item->getText("CP","0").toInt();
+        if (!cp && item->context->athlete->zones(item->isRun) && item->zoneRange >=0) 
+            cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
 
         double total = 0;
         double secs = 0;
-        foreach(const RideFilePoint *point, r->dataPoints()) {
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (cp && point->watts > cp)  {
-                total += r->recIntSecs() * (point->watts - cp);
-                secs += r->recIntSecs();
+                total += item->ride()->recIntSecs() * (point->watts - cp);
+                secs += item->ride()->recIntSecs();
             }
         }
         setValue(total/1000.00f);
         setCount(secs);
     }
 
-    bool canAggregate() { return false; }
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new WPrimeExp(*this); }
 };
@@ -837,27 +934,28 @@ class WPrimeWatts : public RideMetric {
         setImperialUnits(tr("watts"));
         setPrecision(0);
     }
-    void compute(const RideFile *r, const Zones *zones, int zonerange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        int cp = r->getTag("CP","0").toInt();
-        if (!cp && zones && zonerange >=0) cp = zones->getCP(zonerange);
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        int cp = item->getText("CP","0").toInt();
+        if (!cp && item->context->athlete->zones(item->isRun) && item->zoneRange >=0) 
+            cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
 
         double total = 0;
         double secs = 0;
-        foreach(const RideFilePoint *point, r->dataPoints()) {
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (cp && point->watts > cp)  {
-                total += r->recIntSecs() * (point->watts - cp);
+                total += item->ride()->recIntSecs() * (point->watts - cp);
             }
-            secs += r->recIntSecs();
+            secs += item->ride()->recIntSecs();
         }
         setValue(total/secs);
         setCount(secs);
     }
 
-    bool canAggregate() { return false; }
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new WPrimeWatts(*this); }
 };
@@ -879,30 +977,37 @@ class CPExp : public RideMetric {
         setImperialUnits(tr("kJ"));
         setPrecision(0);
     }
-    void compute(const RideFile *r, const Zones *zones, int zonerange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        int cp = r->getTag("CP","0").toInt();
-        if (!cp && zones && zonerange >=0) cp = zones->getCP(zonerange);
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        int cp = item->getText("CP","0").toInt();
+        if (!cp && item->context->athlete->zones(item->isRun) && item->zoneRange >=0)
+            cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
 
         double total = 0;
         double secs = 0;
-        foreach(const RideFilePoint *point, r->dataPoints()) {
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
             if (cp && point->watts >=0) {
                 if (point->watts > cp) 
-                    total += r->recIntSecs() * cp;
+                    total += item->ride()->recIntSecs() * cp;
                 else 
-                    total += r->recIntSecs() * point->watts;
-                secs += r->recIntSecs();
+                    total += item->ride()->recIntSecs() * point->watts;
+                secs += item->ride()->recIntSecs();
             }
         }
         setValue(total/1000.00f);
         setCount(secs);
     }
 
-    bool canAggregate() { return false; }
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new CPExp(*this); }
 };
@@ -925,22 +1030,18 @@ class WZoneTime : public RideMetric {
     }
     bool isTime() const { return true; }
     void setLevel(int level) { this->level=level-1; } // zones start from zero not 1
-    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *)
-    {
 
-        double WPRIME = zoneRange >= 0 ? zones->getWprime(zoneRange) : 20000;
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+
+        double WPRIME = item->zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getWprime(item->zoneRange) : 20000;
 
         // 4 zones
         QVector<double> tiz(4);
         tiz.fill(0.0f);
 
-        RideFile *cride = const_cast<RideFile*>(ride);
-        if (cride->wprimeData() && cride->wprimeData()->ydata().count()) {
+        if (item->ride()->wprimeData() && item->ride()->wprimeData()->ydata().count()) {
 
-            foreach(int value, cride->wprimeData()->ydata()) {
+            foreach(int value, item->ride()->wprimeData()->ydata()) {
 
                 // percent is PERCENT OF W' USED
                 double percent = 100.0f - ((double (value) / WPRIME) * 100.0f);
@@ -958,8 +1059,6 @@ class WZoneTime : public RideMetric {
         setValue(tiz[level]);
     }
 
-    bool canAggregate() { return false; }
-    void aggregateWith(const RideMetric &) {}
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new WZoneTime(*this); }
 };
@@ -1055,34 +1154,30 @@ class WCPZoneTime : public RideMetric {
     }
     bool isTime() const { return true; }
     void setLevel(int level) { this->level=level-1; } // zones start from zero not 1
-    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *)
-    {
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
         double WPRIME = 20000;
-        if (zones && zoneRange > 0) {
-            WPRIME = zones->getWprime(zoneRange);
+        if (item->context->athlete->zones(item->isRun) && item->zoneRange > 0) {
+            WPRIME = item->context->athlete->zones(item->isRun)->getWprime(item->zoneRange);
         }
 
         // did we override CP in metadata / metrics ?
-        int oW = ride->getTag("W'","0").toInt();
+        int oW = item->getText("W'","0").toInt();
         if (oW) WPRIME=oW;
 
         // 4 zones
         QVector<double> tiz(4);
         tiz.fill(0.0f);
 
-        RideFile *cride = const_cast<RideFile*>(ride);
         int i=0;
-        if (cride->wprimeData() && cride->wprimeData()->ydata().count()) {
+        if (item->ride()->wprimeData() && item->ride()->wprimeData()->ydata().count()) {
 
             // get the power values
-            foreach(int value, cride->wprimeData()->ydata()) {
+            foreach(int value, item->ride()->wprimeData()->ydata()) {
 
                 // skip if below CP
-                if (cride->wprimeData()->powerValues[i++] <= 0) continue;
+                if (item->ride()->wprimeData()->powerValues[i++] <= 0) continue;
 
                 // percent is PERCENT OF W' USED
                 double percent = 100.0f - ((double (value) / WPRIME) * 100.0f);
@@ -1100,8 +1195,6 @@ class WCPZoneTime : public RideMetric {
         setValue(tiz[level]);
     }
 
-    bool canAggregate() { return false; }
-    void aggregateWith(const RideMetric &) {}
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new WCPZoneTime(*this); }
 };
@@ -1197,26 +1290,22 @@ class WZoneWork : public RideMetric {
     }
     bool isTime() const { return false; }
     void setLevel(int level) { this->level=level-1; } // zones start from zero not 1
-    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *)
-    {
 
-        double WPRIME = zoneRange >= 0 ? zones->getWprime(zoneRange) : 20000;
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+
+        double WPRIME = item->zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getWprime(item->zoneRange) : 20000;
 
         // 4 zones
         QVector<double> tiz(4);
         tiz.fill(0.0f);
 
-        RideFile *cride = const_cast<RideFile*>(ride);
-        if (cride->wprimeData() && cride->wprimeData()->ydata().count()) {
+        if (item->ride()->wprimeData() && item->ride()->wprimeData()->ydata().count()) {
 
             int i=0;
-            foreach(int value, cride->wprimeData()->ydata()) {
+            foreach(int value, item->ride()->wprimeData()->ydata()) {
 
                 // watts is joules when in 1s intervals
-                double kj = cride->wprimeData()->smoothArray[i++]/1000.0f;
+                double kj = item->ride()->wprimeData()->smoothArray[i++]/1000.0f;
 
                 // percent is PERCENT OF W' USED
                 double percent = 100.0f - ((double (value) / WPRIME) * 100.0f);
@@ -1233,8 +1322,6 @@ class WZoneWork : public RideMetric {
         setValue(tiz[level]);
     }
 
-    bool canAggregate() { return false; }
-    void aggregateWith(const RideMetric &) {}
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
     RideMetric *clone() const { return new WZoneWork(*this); }
 };

@@ -138,6 +138,8 @@ class CPPlot : public QwtPlot
         //QStringList filterForSeason(QStringList cpints, QDate startDate, QDate endDate);
         void setAxisTitle(int axis, QString label);
         void refreshReferenceLines(RideItem*);
+        QString kphToString(double kph);
+        QString kmToString(double km);
 
         // Models and Extended Models
         int model, modelVariant;

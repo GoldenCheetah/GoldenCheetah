@@ -82,15 +82,15 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
 // thread and is part of the GC architecture NOT related to the
 // hardware controller.
 //
-ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString cyclist) : QThread(parent), devConf(devConf)
+ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString athlete) : QThread(parent), devConf(devConf)
 {
     qRegisterMetaType<ANTMessage>("ANTMessage");
     qRegisterMetaType<uint16_t>("uint16_t");
     qRegisterMetaType<uint8_t>("uint8_t");
     qRegisterMetaType<struct timeval>("struct timeval");
 
-    //remember the cylist for wheelsize Settings
-    trainCyclist = cyclist;
+    //remember the athlete for wheelsize Settings
+    trainAthlete = athlete;
 
     // device status and settings
     Status=0;
@@ -207,7 +207,7 @@ void ANT::setWheelRpm(float x) {
     // devConf will be NULL if we are are running the add device wizard
     // we can default to the global setting
     if (devConf) telemetry.setSpeed(x * devConf->wheelSize / 1000 * 60 / 1000);
-    else telemetry.setSpeed(x * appsettings->cvalue(trainCyclist, GC_WHEELSIZE, 2100).toInt() / 1000 * 60 / 1000);
+    else telemetry.setSpeed(x * appsettings->cvalue(trainAthlete, GC_WHEELSIZE, 2100).toInt() / 1000 * 60 / 1000);
 }
 
 void ANT::setHb(double smo2, double thb)
@@ -319,6 +319,9 @@ void ANT::refreshFecGradient()
 
 void ANT::requestFecCapabilities()
 {
+    if (fecChannel == -1)
+        return;
+
     sendMessage(ANTMessage::fecRequestCapabilities(fecChannel));
 }
 
@@ -944,7 +947,7 @@ ANT::processMessage(void) {
 //fprintf(stderr, "\n");
 
     struct timeval timestamp;
-    gettimeofday (&timestamp, NULL);
+    get_timeofday (&timestamp);
     emit receivedAntMessage(m, timestamp);
 
     switch (rxMessage[ANT_OFFSET_ID]) {

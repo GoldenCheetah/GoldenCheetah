@@ -30,6 +30,7 @@
 
 class RideItem;
 class RideCache;
+class Specification;
 class IntervalItem;
 class WPrime;
 class RideFile;
@@ -200,7 +201,10 @@ class RideFile : public QObject // QObject to emit signals
                           wbal, tcore,
                           none }; // none must ALWAYS be last
 
-        enum specialValues { NoTemp = -255 };
+        // NA = Not Applicable - i.e Temperature no recorded value
+        // NIL = Not available, but still set to zero for compatibility
+        //       We should consider looking at code to handle NIL / NA 
+        enum specialValues { NA = -255, NIL = 0 };
         typedef enum seriestype SeriesType;
         static SeriesType lastSeriesType() { return none; }
 
@@ -465,6 +469,32 @@ struct RideFilePoint
     // get the value via the series type rather than access direct to the values
     double value(RideFile::SeriesType series) const;
     void setValue(RideFile::SeriesType series, double value);
+};
+
+class RideFileIterator {
+
+    public:
+
+        RideFileIterator(RideFile *, Specification);
+
+        void toFront();
+        void toBack();
+
+        struct RideFilePoint *first();
+        struct RideFilePoint *last();
+
+        int firstIndex() { return start; }
+        int lastIndex() { return stop; }
+
+        bool hasNext() const;
+        bool hasPrevious() const;
+
+        struct RideFilePoint *next();
+        struct RideFilePoint *previous();
+
+    private:
+        RideFile *f;
+        int start, stop, index;
 };
 
 struct RideFileReader {

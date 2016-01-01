@@ -22,7 +22,11 @@
 #include "RideFileCache.h"
 #include "VDOTCalculator.h"
 #include "RideItem.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "Specification.h"
 #include <cmath>
+#include <assert.h>
 #include <QApplication>
 
 // Daniels VDOT
@@ -45,20 +49,17 @@ class VDOT : public RideMetric {
         setPrecision(1);
     }
 
-    void compute(const RideFile* ride, const Zones*, int,
-                 const HrZones*, int,
-                 const QHash<QString,RideMetric*>&,
-                 const Context*)
-    {
-        if (!ride->isRun()) {
-            setValue(0.0);
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+
+        // not a run
+        if (!item->isRun) {
+            setValue(RideFile::NIL);
             setCount(0);
             return;
         }
 
-        // unconst naughty boy, get mean-max data
-        RideFile *uride = const_cast<RideFile*>(ride);
-        RideFileCache rfc(uride);
+        // build a cache -- VDOT does not work with intervals !
+        RideFileCache rfc(item->ride());
 
         // search for max VDOT from 4 min to 4 hr
         vdot = 0.0;
@@ -108,17 +109,16 @@ class TPace : public RideMetric {
         setPrecision(1);
         setConversion(KM_PER_MILE);
     }
-    void compute(const RideFile* ride, const Zones*, int,
-                 const HrZones*, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context*) {
-        // TPace only makes sense for running
-        if (!ride->isRun()) {
-            setValue(0.0);
+
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        // not a run
+        if (!item->isRun) {
+            setValue(RideFile::NIL);
             setCount(0);
             return;
         }
-
         assert(deps.contains("VDOT"));
         VDOT *vdot = dynamic_cast<VDOT*>(deps.value("VDOT"));
         assert(vdot);

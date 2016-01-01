@@ -770,7 +770,13 @@ QString Aerolab::estimateCdACrr(RideItem *rideItem)
         if(( dataPresent->alt || constantAlt )  && dataPresent->watts) {
             double dt = ride->recIntSecs();
             int npoints = ride->dataPoints().size();
+#ifdef Q_CC_MSVC
+            double* X1 = new double[npoints];
+            double* X2 = new double[npoints];
+            double* Egain = new double[npoints];
+#else
             double X1[npoints], X2[npoints], Egain[npoints];
+#endif
             int nSeg = -1;
             double altInit = 0, vInit = 0;
             /* For each segment, defined between points with alt != 0,
@@ -855,7 +861,7 @@ QString Aerolab::estimateCdACrr(RideItem *rideItem)
                     // round and update if the values are in Aerolab's range
                     double cda = floor(10000 * (A22 * B1 - A12 * B2) / det + 0.5) / 10000;
                     double crr = floor(1000000 * (A11 * B2 - A21 * B1) / det + 0.5) / 1000000;
-                    if (cda >= 0.001 and cda <= 1.0 and crr >= 0.0001 and crr <= 0.1) {
+                    if (cda >= 0.001 && cda <= 1.0 && crr >= 0.0001 && crr <= 0.1) {
                         this->cda = cda;
                         this->crr = crr;
                         errMsg = ""; // No error

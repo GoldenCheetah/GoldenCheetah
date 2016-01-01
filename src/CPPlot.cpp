@@ -25,7 +25,6 @@
 #include "CPPlot.h"
 #include "RideCache.h"
 
-#include <unistd.h>
 #include <QDebug>
 #include <qwt_series_data.h>
 #include <qwt_legend.h>
@@ -579,7 +578,7 @@ CPPlot::plotModel()
                 //DPrime
                 cpw->wprimeTitle->setText(tr("D'"));
                 if (pdModel->hasWPrime()) {
-                    cpw->wprimeValue->setText(QString(tr("%1 km")).arg(pdModel->WPrime() / 1000.0, 0, 'f', 3));
+                    cpw->wprimeValue->setText(kmToString(pdModel->WPrime()/1000.0));
                     cpw->wprimeRank->setText(QString(tr("%1 %2"))
                                     .arg(pdModel->WPrime()/(metricPace ? 1.0 : METERS_PER_YARD), 0, 'f', 0)
                                     .arg(metricPace ? tr("m") : tr("yd")));
@@ -590,13 +589,13 @@ CPPlot::plotModel()
 
                 //CV
                 cpw->cpTitle->setText(tr("CV"));
-                cpw->cpValue->setText(QString(tr("%1 kph")).arg(pdModel->CP(), 0, 'f', 1));
+                cpw->cpValue->setText(kphToString(pdModel->CP()));
                 cpw->cpRank->setText(zones ? zones->kphToPaceString(pdModel->CP(), metricPace) : "n/a");
 
                 //FTP
                 cpw->ftpTitle->setText(tr("FTV"));
                 if (pdModel->hasFTP()) {
-                    cpw->ftpValue->setText(QString(tr("%1 kph")).arg(pdModel->FTP(), 0, 'f', 1));
+                    cpw->ftpValue->setText(kphToString(pdModel->FTP()));
                     cpw->ftpRank->setText(zones ? zones->kphToPaceString(pdModel->FTP(), metricPace) : "n/a");
 
                 } else {
@@ -608,7 +607,7 @@ CPPlot::plotModel()
                 // V-MAX
                 cpw->pmaxTitle->setText(tr("Vmax"));
                 if (pdModel->hasPMax()) {
-                    cpw->pmaxValue->setText(QString(tr("%1 kph")).arg(pdModel->PMax(), 0, 'f', 1));
+                    cpw->pmaxValue->setText(kphToString(pdModel->PMax()));
                     cpw->pmaxRank->setText(zones ? zones->kphToPaceString(pdModel->PMax(), metricPace) : "n/a");
 
                 } else  {
@@ -1037,7 +1036,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
             // set zones from shading CP
             QList <int> power_zone;
-            int n_zones = context->athlete->zones()->lowsFromCP(&power_zone, (int) int(shadingCP));
+            int n_zones = context->athlete->zones(isRun)->lowsFromCP(&power_zone, (int) int(shadingCP));
 
             // now run through each zone and create a curve
             int high = maxNonZero - 1;
@@ -1092,7 +1091,7 @@ CPPlot::plotBests(RideItem *rideItem)
                 // now the labels
                 if (shadeMode && (criticalSeries != CriticalPowerWindow::work || work[high] > 100.0)) {
 
-                    QwtText text(context->athlete->zones()->getDefaultZoneName(zone));
+                    QwtText text(context->athlete->zones(isRun)->getDefaultZoneName(zone));
                     text.setFont(QFont("Helvetica", 20, QFont::Bold));
                     color.setAlpha(255);
                     text.setColor(color);
@@ -1637,7 +1636,8 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
             units2 = "J"; // Joule
         else if (criticalSeries == CriticalPowerWindow::kph)
-            units2 = tr("kph"); // yAxis doesn't obey units settings yet, remove when fixed
+            // yAxis doesn't obey units settings yet, remove when fixed
+            units2 = tr("kph %1 mph").arg(yvalue*MILES_PER_KM, 0, 'f', RideFile::decimalsFor(rideSeries));
         else
             units2 = RideFile::unitName(rideSeries, context);
 
@@ -1656,10 +1656,12 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         if (curve == heatCurve) units2 = QString(tr("Activities"));
 
         // for speed series add pace with units according to settings
-        if (criticalSeries == CriticalPowerWindow::kph && (isRun || isSwim)) {
-            const PaceZones *zones = context->athlete->paceZones(isSwim);
-            bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), true).toBool() : true;
-            paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace)).arg(zones->paceUnits(metricPace));
+        if (criticalSeries == CriticalPowerWindow::kph) {
+            if (isRun || isSwim) {
+                const PaceZones *zones = context->athlete->paceZones(isSwim);
+                bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), true).toBool() : true;
+                paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace)).arg(zones->paceUnits(metricPace));
+            }
             double km = yvalue*xvalue/60.0; // distance in km
             if (isSwim) {
                 paceStr += tr("\n%1 m %2 yd").arg(1000*km, 0, 'f', 0)
@@ -2549,4 +2551,24 @@ CPPlot::plotCache(QVector<double> vector, QColor intervalColor)
 
     intervalCurves.append(curve);
     zoomer->setZoomBase(false);
+}
+
+QString
+CPPlot::kphToString(double kph)
+{
+    if (context->athlete->useMetricUnits) {
+        return tr("%1 kph").arg(kph, 0, 'f', 1);
+    } else {
+        return tr("%1 mph").arg(kph*MILES_PER_KM, 0, 'f', 1);
+    }
+}
+
+QString
+CPPlot::kmToString(double km)
+{
+    if (context->athlete->useMetricUnits) {
+        return tr("%1 km").arg(km, 0, 'f', 3);
+    } else {
+        return tr("%1 mi").arg(km*MILES_PER_KM, 0, 'f', 3);
+    }
 }

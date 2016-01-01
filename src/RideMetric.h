@@ -24,13 +24,12 @@
 #include <QString>
 #include <QVector>
 #include <QSharedPointer>
-#include <assert.h>
 #include <cmath>
 #include <QDebug>
+#include <QList>
 
 #include "RideFile.h"
-
-extern int DBSchemaVersion; // moved from old DBAccess
+#include "UserMetricSettings.h"
 
 class Zones;
 class HrZones;
@@ -38,6 +37,14 @@ class Context;
 class RideMetric;
 class RideFile;
 class RideItem;
+class DataFilter;
+class DataFilterRuntime;
+class Leaf;
+
+// keep track of schema changes
+extern int DBSchemaVersion;
+extern QList<UserMetricSettings> _userMetrics;
+extern quint16 UserMetricSchemaVersion;
 
 typedef QSharedPointer<RideMetric> RideMetricPtr;
 
@@ -51,7 +58,6 @@ public:
 
     RideMetric() {
         // some sensible defaults
-        aggregate_ = true;
         conversion_ = 1.0;
         conversionSum_ = 0.0;
         precision_ = 0;
@@ -61,6 +67,9 @@ public:
         index_ = -1;
     }
     virtual ~RideMetric() {}
+
+    // is this a user defined one?
+    virtual bool isUser() const { return false; }
 
     // need an index for offset into array, each metric
     // now has a numeric identifier from 0 - metricCount
@@ -116,11 +125,7 @@ public:
     virtual double conversionSum() const { return conversionSum_; }
 
     // Compute the ride metric from a file.
-    virtual void compute(const RideFile *ride,
-                         const Zones *zones, int zoneRange,
-                         const HrZones *hrzones, int hrzoneRange,
-                         const QHash<QString,RideMetric*> &deps,
-                         const Context *context = 0) = 0;
+    virtual void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &deps) = 0;
 
     // is a time value, ie. render as hh:mm:ss
     virtual bool isTime() const { return false; }
@@ -160,13 +165,19 @@ public:
             break;
         }
     }
-    virtual bool canAggregate() { return aggregate_; }
 
-    virtual RideMetric *clone() const = 0;
+    // because we compute metrics in a map/reduce operation using
+    // multiple threads the metric object is cloned to ensure
+    // no conflict, but the clone operation can dereference
+    // members from source and reference count them to be space efficient
+    virtual RideMetric *clone() const { return NULL; }
 
     static QHash<QString,RideMetricPtr>
-    computeMetrics(const Context *context, const RideFile *ride, const Zones *zones, const HrZones *hrZones,
-                   const QStringList &metrics);
+    computeMetrics(RideItem *item, Specification spec, const QStringList &metrics);
+
+    // generate a CRC based upon the user metric settings
+    // using the currently loaded _userMetrics
+    static quint16 userMetricFingerprint(QList<UserMetricSettings> these);
 
     // Initialisers for derived classes to setup basic data
     void setValue(double x) { value_ = x; }
@@ -180,10 +191,8 @@ public:
     void setInternalName(QString x) { internalName_ = x; }
     void setSymbol(QString x) { symbol_ = x; }
     void setType(MetricType x) { type_ = x; }
-    void setAggregate(bool x) { aggregate_ = x; }
 
-    private:
-        bool    aggregate_;
+    protected:
         double  value_,
                 count_, // used when averaging
                 conversion_,
@@ -193,6 +202,101 @@ public:
         QString metricUnits_, imperialUnits_;
         QString name_, symbol_, internalName_;
         MetricType type_;
+};
+
+
+//
+// The interface between a UserMetric and the codebase
+// for working with ride metrics.
+//
+class UserMetric: public RideMetric {
+
+public:
+
+    UserMetric(Context *context, UserMetricSettings settings);
+    UserMetric(const UserMetric *from);
+    ~UserMetric();
+
+    // is this a user defined one?
+    bool isUser() const { return true; }
+
+    // did we clone (i.e. datafilter doesn't belong to us)
+    bool isClone() const { return clone_; }
+
+    void initialize();
+
+    QString symbol() const;
+
+    // A short string suitable for showing to the user in the ride
+    // summaries, configuration dialogs, etc.  It should be translated
+    // using tr().
+    QString name() const; 
+    QString internalName() const; 
+
+    // Long term metrics charts
+    RideMetric::MetricType type() const; 
+
+    // units
+    QString units(bool metric) const; 
+
+    // Factor to multiple value to convert from metric to imperial
+    double conversion() const;
+    // And sum for example Fahrenheit from CentigradE
+    double conversionSum() const;
+
+    // How many digits after the decimal we should show when displaying the
+    // value of a UserRideMetric.
+    int precision() const; 
+
+    // Get the value and apply conversion if needed
+    double value(bool metric) const;
+
+    // The internal value of this ride metric, useful to cache and then setValue.
+    double value() const;
+
+    // for averages the count of items included in the average
+    double count() const; 
+
+    // when aggregating averages, should we include zeroes ? no by default
+    bool aggregateZero() const; 
+
+    // is this metric relevant
+    bool isRelevantForRide(const RideItem *) const; 
+
+    // Compute the ride metric from a file.
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &deps);
+
+    // is a time value, ie. render as hh:mm:ss
+    bool isTime() const;
+
+    RideMetric *clone() const; 
+
+    // WE DO NOT REIMPLEMENT THE STANDARD toString() METHOD
+    // virtual QString toString(bool useMetricUnits) const;
+
+    // WE DO NOT REIMPLEMENT THE STANDARD isLowerBetter() METHOD
+    // virtual bool isLowerBetter() const { return type_ == Low ? true : false; }
+
+    private:
+
+        // all attributes and methods are implemented in the
+        // usermetric class (which uses a datafilter and has
+        // utility classes for editing, save/load config etc).
+        UserMetricSettings settings;
+
+        // and we compile into this for runtime
+        DataFilter *program;
+        Leaf *root;
+
+        // functions, to save lots of lookups
+        Leaf *finit, *frelevant, *fsample, *fvalue, *fcount;
+
+        // our runtime
+        DataFilterRuntime *rt;
+
+        // true if we are a clone
+        bool clone_;
+
 };
 
 class RideMetricFactory {
@@ -214,7 +318,8 @@ class RideMetricFactory {
         if (dependenciesChecked) return;
         foreach(const QString &dependee, dependencyMap.keys()) {
             foreach(const QString &dependency, *dependencyMap[dependee])
-                assert(metrics.contains(dependency));
+                if (!metrics.contains(dependency))
+                    qDebug()<<"metric dep error:"<<dependency;
         }
         const_cast<RideMetricFactory*>(this)->dependenciesChecked = true;
     }
@@ -244,14 +349,37 @@ class RideMetricFactory {
     }
 
     RideMetric *newMetric(const QString &symbol) const {
-        assert(metrics.contains(symbol));
         checkDependencies();
         return metrics.value(symbol)->clone();
     }
 
+    // clear out user metrics, we're readding them
+    void removeUserMetrics() {
+        int firstUser=-1;
+        for(int i=0; i<metricNames.count(); i++) {
+            RideMetric *m = metrics.value(metricNames[i], NULL);
+            if (m && m->isUser()) {
+                firstUser=i;
+                break;
+            }
+        }
+
+        // now delete
+        if (firstUser >0) {
+            while (firstUser < metricNames.count()) {
+                QString current = metricNames.at(firstUser);
+
+                metrics.remove(current);
+                dependencyMap.remove(current);
+                metricNames.takeAt(firstUser);
+                metricTypes.remove(firstUser);
+            }
+        }
+    }
+
     bool addMetric(const RideMetric &metric,
                    const QVector<QString> *deps = NULL) {
-        assert(!metrics.contains(metric.symbol()));
+        if(metrics.contains(metric.symbol())) return false;
         RideMetric *newMetric = metric.clone();
         newMetric->setIndex(metrics.count());
         metrics.insert(metric.symbol(), newMetric);
@@ -268,7 +396,7 @@ class RideMetricFactory {
     }
 
     const QVector<QString> &dependencies(const QString &symbol) const {
-        assert(metrics.contains(symbol));
+        if(!metrics.contains(symbol)) return noDeps;
         QVector<QString> *result = dependencyMap.value(symbol);
         return result ? *result : noDeps;
     }

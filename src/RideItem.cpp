@@ -45,23 +45,23 @@
 RideItem::RideItem() 
     : 
     ride_(NULL), fileCache_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
-    color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) {
+    color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
     ride_(ride), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
-    color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) 
+    color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
-RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context) 
+RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context, bool planned)
     :
-    ride_(NULL), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), skipsave(false), path(path), 
-    fileName(fileName), dateTime(dateTime), color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), fingerprint(0), 
-    metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) 
+    ride_(NULL), fileCache_(NULL), context(context), planned(planned), isdirty(false), isstale(true), isedit(false), skipsave(false), path(path),
+    fileName(fileName), dateTime(dateTime), color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), 
+    metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -71,14 +71,14 @@ RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context 
 RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
     :
     ride_(ride), fileCache_(NULL), context(context), isdirty(true), isstale(true), isedit(false), skipsave(false), dateTime(dateTime),
-    fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0)
+    zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0)
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 // clone a ride item
 void
-RideItem::setFrom(RideItem&here) // used when loading cache/rideDB.json
+RideItem::setFrom(RideItem&here, bool temp) // used when loading cache/rideDB.json
 {
     ride_ = NULL;
     fileCache_ = NULL;
@@ -86,20 +86,29 @@ RideItem::setFrom(RideItem&here) // used when loading cache/rideDB.json
 	metadata_ = here.metadata_;
 	errors_ = here.errors_;
     intervals_ = here.intervals_;
-    foreach(IntervalItem *p, intervals_) p->rideItem_ = this;
+
+    // don't update the interval pointers if this is a 
+    // temporary "fake" rideitem.
+    if (!temp) foreach(IntervalItem *p, intervals_) p->rideItem_ = this;
+
 	context = here.context;
 	isdirty = here.isdirty;
     isstale = here.isstale;
 	isedit = here.isedit;
 	skipsave = here.skipsave;
-	path = here.path;
+    if (planned == false)
+        path = here.path;
 	fileName = here.fileName;
 	dateTime = here.dateTime;
+    zoneRange = here.zoneRange;
+    hrZoneRange = here.hrZoneRange;
+    paceZoneRange = here.paceZoneRange;
 	fingerprint = here.fingerprint;
 	metacrc = here.metacrc;
     crc = here.crc;
 	timestamp = here.timestamp;
 	dbversion = here.dbversion;
+	udbversion = here.udbversion;
 	color = here.color;
 	present = here.present;
     isRun = here.isRun;
@@ -437,7 +446,7 @@ RideItem::checkStale()
     color = context->athlete->colorEngine->colorFor(getText(context->athlete->rideMetadata()->getColorField(), ""));
 
     // upgraded metrics
-    if (dbversion != DBSchemaVersion) {
+    if (udbversion != UserMetricSchemaVersion || dbversion != DBSchemaVersion) {
 
         isstale = true;
 
@@ -462,10 +471,9 @@ RideItem::checkStale()
             // metrics for older rides !
 
             // get the new zone configuration fingerprint that applies for the ride date
-            unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
-                        + (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, 0).toInt() ? 1 : 0)
-                        + static_cast<unsigned long>(context->athlete->paceZones(false)->getFingerprint(dateTime.date()))
-                        + static_cast<unsigned long>(context->athlete->paceZones(true)->getFingerprint(dateTime.date()))
+            unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones(isRun)->getFingerprint(dateTime.date()))
+                        + (appsettings->cvalue(context->athlete->cyclist, context->athlete->zones(isRun)->useCPforFTPSetting(), 0).toInt() ? 1 : 0)
+                        + static_cast<unsigned long>(context->athlete->paceZones(isSwim)->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->routes->getFingerprint())
                         + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 57).toInt(); // 57 does not include search for PEAKS
@@ -551,20 +559,31 @@ RideItem::refresh()
         present = f->getTag("Data", "");
         samples = f->dataPoints().count() > 0;
 
+        // zone ranges
+        if (context->athlete->zones(isRun)) zoneRange = context->athlete->zones(isRun)->whichRange(dateTime.date());
+        else zoneRange = -1;
+
+        if (context->athlete->hrZones()) hrZoneRange = context->athlete->hrZones()->whichRange(dateTime.date());
+        else hrZoneRange = -1;
+
+        if (context->athlete->paceZones(isSwim)) paceZoneRange = context->athlete->paceZones(isSwim)->whichRange(dateTime.date());
+        else paceZoneRange = -1;
+
         // refresh metrics etc
         const RideMetricFactory &factory = RideMetricFactory::instance();
-        QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(context, f, context->athlete->zones(), 
-                                               context->athlete->hrZones(), factory.allMetrics());
-
 
         // ressize and initialize so we can store metric values at
         // RideMetric::index offsets into the metrics_ qvector
         metrics_.fill(0, factory.metricCount());
 
+        // we compute all with not specification (not an interval)
+        QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(this, Specification(), factory.allMetrics());
+
         // snaffle away all the computed values into the array
         QHashIterator<QString, RideMetricPtr> i(computed);
         while (i.hasNext()) {
             i.next();
+            //DEBUG if (i.value()->isUser()) qDebug()<<dateTime.date()<<i.value()->symbol()<<i.value()->value();
             metrics_[i.value()->index()] = i.value()->value();
         }
 
@@ -577,15 +596,15 @@ RideItem::refresh()
         updateIntervals();
 
         // update fingerprints etc, crc done above
-        fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
-                    + (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, 0).toInt() ? 1 : 0)
-                    + static_cast<unsigned long>(context->athlete->paceZones(false)->getFingerprint(dateTime.date()))
-                    + static_cast<unsigned long>(context->athlete->paceZones(true)->getFingerprint(dateTime.date()))
+        fingerprint = static_cast<unsigned long>(context->athlete->zones(isRun)->getFingerprint(dateTime.date()))
+                    + (appsettings->cvalue(context->athlete->cyclist, context->athlete->zones(isRun)->useCPforFTPSetting(), 0).toInt() ? 1 : 0)
+                    + static_cast<unsigned long>(context->athlete->paceZones(isSwim)->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->routes->getFingerprint()) +
                     + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 57).toInt(); // 57 does not include search for PEAKS
 
         dbversion = DBSchemaVersion;
+        udbversion = UserMetricSchemaVersion;
         timestamp = QDateTime::currentDateTime().toTime_t();
 
         // RideFile cache needs refreshing possibly
@@ -593,6 +612,9 @@ RideItem::refresh()
 
         // we now match
         metacrc = metaCRC();
+
+        // Construct the summary text used on the calendar
+        metadata_.insert("Calendar Text", context->athlete->rideMetadata()->calendarText(this));
 
         // close if we opened it
         if (doclose) {
@@ -651,9 +673,9 @@ RideItem::getWeight(int type)
 double
 RideItem::getForSymbol(QString name, bool useMetricUnits)
 {
-    if (metrics_.size()) {
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    if (metrics_.size() && metrics_.size() == factory.metricCount()) {
         // return the precomputed metric value
-        const RideMetricFactory &factory = RideMetricFactory::instance();
         const RideMetric *m = factory.rideMetric(name);
         if (m) {
             if (useMetricUnits) return metrics_[m->index()];
@@ -672,9 +694,10 @@ RideItem::getStringForSymbol(QString name, bool useMetricUnits)
 {
     QString returning("-");
 
-    if (metrics_.size()) {
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    if (metrics_.size() && metrics_.size() == factory.metricCount()) {
+
         // return the precomputed metric value
-        const RideMetricFactory &factory = RideMetricFactory::instance();
         const RideMetric *m = factory.rideMetric(name);
         if (m) {
 
@@ -720,16 +743,14 @@ RideItem::updateIntervals()
     double CP = 0;
     double WPRIME = 0;
     double PMAX = 0;
-    int zoneRange;
     bool zoneok = false;
 
-    if (context->athlete->zones()) {
+    if (context->athlete->zones(isRun)) {
 
         // if range is -1 we need to fall back to a default value
-        zoneRange = context->athlete->zones()->whichRange(dateTime.date());
-        CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 0;
-        WPRIME = zoneRange >= 0 ? context->athlete->zones()->getWprime(zoneRange) : 0;
-        PMAX = zoneRange >= 0 ? context->athlete->zones()->getPmax(zoneRange) : 0;
+        CP = zoneRange >= 0 ? context->athlete->zones(isRun)->getCP(zoneRange) : 0;
+        WPRIME = zoneRange >= 0 ? context->athlete->zones(isRun)->getWprime(zoneRange) : 0;
+        PMAX = zoneRange >= 0 ? context->athlete->zones(isRun)->getPmax(zoneRange) : 0;
 
         // did we override CP in metadata ?
         int oCP = getText("CP","0").toInt();
@@ -739,7 +760,7 @@ RideItem::updateIntervals()
         if (oW) WPRIME=oW;
         if (oPMAX) PMAX=oPMAX;
 
-        if (zoneRange >= 0 && context->athlete->zones()) zoneok=true;
+        if (zoneRange >= 0 && context->athlete->zones(isRun)) zoneok=true;
     }
 
     // USER / DEVICE INTERVALS
@@ -823,7 +844,7 @@ RideItem::updateIntervals()
 
             // go hunting for best peak
             QList<BestIntervalDialog::BestInterval> results;
-            BestIntervalDialog::findBests(f, durations[i], 1, results);
+            BestIntervalDialog::findBests(f, Specification(), durations[i], 1, results);
 
             // did we get one ?
             if (results.count() > 0 && results[0].avg > 0 && results[0].stop > 0) {
@@ -857,7 +878,7 @@ RideItem::updateIntervals()
 
             // go hunting for best peak
             QList<BestIntervalDialog::BestInterval> results;
-            BestIntervalDialog::findBestsKPH(f, durations[i], 1, results);
+            BestIntervalDialog::findBestsKPH(f, Specification(), durations[i], 1, results);
 
             // did we get one ?
             if (results.count() > 0 && results[0].avg > 0 && results[0].stop > 0) {
@@ -1010,7 +1031,7 @@ RideItem::updateIntervals()
                         tte.duration = t;
                         tte.joules = integrated_series[i+t]-integrated_series[i];
                         tte.quality = tc / double(t);
-                        tte.zone = zoneok ? context->athlete->zones()->whichZone(zoneRange, tte.joules/tte.duration) : 1;
+                        tte.zone = zoneok ? context->athlete->zones(isRun)->whichZone(zoneRange, tte.joules/tte.duration) : 1;
 
                     } else {
 
@@ -1021,7 +1042,7 @@ RideItem::updateIntervals()
                             tte.duration = t;
                             tte.joules = integrated_series[i+t]-integrated_series[i];
                             tte.quality = thisquality;
-                            tte.zone = zoneok ? context->athlete->zones()->whichZone(zoneRange, tte.joules/tte.duration) : 1;
+                            tte.zone = zoneok ? context->athlete->zones(isRun)->whichZone(zoneRange, tte.joules/tte.duration) : 1;
                         }
 
                     }
@@ -1142,7 +1163,7 @@ RideItem::updateIntervals()
         foreach(effort x, candidates[i]) {
 
             IntervalItem *intervalItem=NULL;
-            int zone = zoneok ? 1 + context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration) : 1;
+            int zone = zoneok ? 1 + context->athlete->zones(isRun)->whichZone(zoneRange, x.joules/x.duration) : 1;
 
             if (x.quality >= 1.0f) {
                 intervalItem = new IntervalItem(this, 
@@ -1171,7 +1192,7 @@ RideItem::updateIntervals()
 
             IntervalItem *intervalItem=NULL;
 
-            int zone = zoneok ? 1 + context->athlete->zones()->whichZone(zoneRange, x.joules/x.duration) : 1;
+            int zone = zoneok ? 1 + context->athlete->zones(isRun)->whichZone(zoneRange, x.joules/x.duration) : 1;
             intervalItem = new IntervalItem(this,
                                             QString(tr("L%3 SPRINT of %1 secs (%2 watts)")).arg(x.duration).arg(x.joules/x.duration).arg(zone),
                                             x.start, x.start+x.duration,
@@ -1348,7 +1369,7 @@ RideItem::updateIntervals()
                 // which zone was this match ?
                 double ap = intervalItem->getForSymbol("average_power");
                 double duration = intervalItem->getForSymbol("workout_time");
-                int zone = zoneok ? 1 + context->athlete->zones()->whichZone(zoneRange, ap) : 1;
+                int zone = zoneok ? 1 + context->athlete->zones(isRun)->whichZone(zoneRange, ap) : 1;
 
                 intervalItem->name = QString(tr("L%1 %5 %2 (%3w %4 kJ)"))
                                                  .arg(zone)
@@ -1414,7 +1435,7 @@ QList<IntervalItem*> RideItem::intervalsSelected() const
 {
     QList<IntervalItem*> returning;
     foreach(IntervalItem *p, intervals_) {
-        if (p->selected) returning << p;
+        if (p && p->selected) returning << p;
     }
     return returning;
 }
@@ -1423,7 +1444,7 @@ QList<IntervalItem*> RideItem::intervalsSelected(RideFileInterval::intervaltype 
 {
     QList<IntervalItem*> returning;
     foreach(IntervalItem *p, intervals_) {
-        if (p->selected && p->type==type) returning << p;
+        if (p && p->selected && p->type==type) returning << p;
     }
     return returning;
 }
@@ -1432,7 +1453,7 @@ QList<IntervalItem*> RideItem::intervals(RideFileInterval::intervaltype type) co
 {
     QList<IntervalItem*> returning;
     foreach(IntervalItem *p, intervals_) {
-        if (p->type == type) returning << p;
+        if (p && p->type == type) returning << p;
     }
     return returning;
 }

@@ -19,6 +19,7 @@
 #include "RideMetric.h"
 #include <QApplication>
 #include "RideItem.h"
+#include "Specification.h"
 
 // This metric computes aerobic decoupling percentage as described
 // by Joe Friel:
@@ -50,6 +51,7 @@ class AerobicDecoupling : public RideMetric {
         setSymbol("aerobic_decoupling");
         setInternalName("Aerobic Decoupling");
     }
+
     void initialize() {
         setName(tr("Aerobic Decoupling"));
         setType(RideMetric::Average);
@@ -57,28 +59,44 @@ class AerobicDecoupling : public RideMetric {
         setImperialUnits(tr("%"));
         setPrecision(1);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &){
+
+        // how many samples .. to find half way
+        RideFileIterator it(item->ride(), spec);
+        int start = it.firstIndex();
+        int stop = it.lastIndex();
+        if (start < 0 || stop < 0) {
+
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+
+        } 
+
+        // first hald vs second half
         double firstHalfPower = 0.0, secondHalfPower = 0.0;
         double firstHalfSpeed = 0.0, secondHalfSpeed = 0.0;
         double firstHalfHR = 0.0, secondHalfHR = 0.0;
-        int halfway = ride->dataPoints().size() / 2;
+        int halfway = (stop-start) / 2;
         int count = 0;
         int firstHalfCount = 0;
         int secondHalfCount = 0;
         percent = 0;
-        foreach(const RideFilePoint *point, ride->dataPoints()) {
+        while(it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
             if (count++ < halfway) {
+
                 if (point->hr > 0) {
                     firstHalfPower += point->watts;
                     firstHalfSpeed += point->kph;
                     firstHalfHR += point->hr;
                     ++firstHalfCount;
                 }
-            }
-            else {
+
+            } else {
+
                 if (point->hr > 0) {
                     secondHalfPower += point->watts;
                     secondHalfSpeed += point->kph;
@@ -87,8 +105,9 @@ class AerobicDecoupling : public RideMetric {
                 }
             }
         }
+
         if (((firstHalfPower > 0) && (secondHalfPower > 0)) ||
-            (ride->isRun() && (firstHalfSpeed > 0) && (secondHalfSpeed > 0))) {
+            (item->isRun && (firstHalfSpeed > 0) && (secondHalfSpeed > 0))) {
             firstHalfPower /= firstHalfCount;
             firstHalfSpeed /= firstHalfCount;
             secondHalfPower /= secondHalfCount;
@@ -103,7 +122,7 @@ class AerobicDecoupling : public RideMetric {
             // should be :
             double firstHalfRatio = firstHalfPower / firstHalfHR;
             double secondHalfRatio = secondHalfPower / secondHalfHR;
-            if (ride->isRun()) {
+            if (item->isRun) {
                 firstHalfRatio = firstHalfSpeed / firstHalfHR;
                 secondHalfRatio = secondHalfSpeed / secondHalfHR;
             }
@@ -112,7 +131,9 @@ class AerobicDecoupling : public RideMetric {
         setValue(percent);
     }
 
-    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("H") && (ride->present.contains("P") || (ride->isRun && ride->present.contains("S"))); }
+    bool isRelevantForRide(const RideItem *ride) const { 
+        return ride->present.contains("H") && (ride->present.contains("P") || (ride->isRun && ride->present.contains("S"))); 
+    }
 
     RideMetric *clone() const { return new AerobicDecoupling(*this); }
 };

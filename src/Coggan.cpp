@@ -21,8 +21,11 @@
 #include "RideItem.h"
 #include "Zones.h"
 #include "Settings.h"
+#include "Athlete.h"
+#include "Specification.h"
 #include "Units.h"
 #include <cmath>
+#include <assert.h>
 #include <QApplication>
 
 
@@ -45,14 +48,17 @@ class NP : public RideMetric {
         setImperialUnits("watts");
         setPrecision(0);
     }
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &,
-                 const Context *) {
 
-        if(ride->recIntSecs() == 0) return;
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
-        int rollingwindowsize = 30 / ride->recIntSecs();
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) || item->ride()->recIntSecs() == 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        int rollingwindowsize = 30 / item->ride()->recIntSecs();
 
         double total = 0;
         int count = 0;
@@ -68,12 +74,14 @@ class NP : public RideMetric {
 
             // loop over the data and convert to a rolling
             // average for the given windowsize
-            for (int i=0; i<ride->dataPoints().size(); i++) {
+            RideFileIterator it(item->ride(), spec);
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
 
-                sum += ride->dataPoints()[i]->watts;
+                sum += point->watts;
                 sum -= rolling[index];
 
-                rolling[index] = ride->dataPoints()[i]->watts;
+                rolling[index] = point->watts;
 
                 total += pow(sum/rollingwindowsize,4); // raise rolling average to 4th power
                 count ++;
@@ -84,7 +92,7 @@ class NP : public RideMetric {
         }
         if (count) {
             np = pow(total / (count), 0.25);
-            secs = count * ride->recIntSecs();
+            secs = count * item->ride()->recIntSecs();
         } else {
             np = secs = 0;
         }
@@ -92,6 +100,7 @@ class NP : public RideMetric {
         setValue(np);
         setCount(secs);
     }
+
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new NP(*this); }
 };
@@ -108,26 +117,26 @@ class VI : public RideMetric {
         setSymbol("coggam_variability_index");
         setInternalName("VI");
     }
+
     void initialize() {
         setName("VI");
         setType(RideMetric::Average);
         setPrecision(3);
     }
-    void compute(const RideFile *, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
-            assert(deps.contains("coggan_np"));
-            assert(deps.contains("average_power"));
-            NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
-            assert(np);
-            RideMetric *ap = dynamic_cast<RideMetric*>(deps.value("average_power"));
-            assert(ap);
-            vi = np->value(true) / ap->value(true);
-            secs = np->count();
 
-            setValue(vi);
-            setCount(secs);
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        assert(deps.contains("coggan_np"));
+        assert(deps.contains("average_power"));
+        NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
+        assert(np);
+        RideMetric *ap = dynamic_cast<RideMetric*>(deps.value("average_power"));
+        assert(ap);
+        vi = np->value(true) / ap->value(true);
+        secs = np->count();
+
+        setValue(vi);
+        setCount(secs);
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
@@ -146,38 +155,43 @@ class IntensityFactor : public RideMetric {
         setSymbol("coggan_if");
         setInternalName("IF");
     }
+
     void initialize() {
         setName("IF");
         setType(RideMetric::Average);
         setPrecision(3);
     }
-    void compute(const RideFile *r, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *context) {
-        if (zones && zoneRange >= 0) {
-            assert(deps.contains("coggan_np"));
-            NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
-            assert(np);
 
-            int ftp = r->getTag("FTP","0").toInt();
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
-            bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, 0).toInt() == 0);
-
-            if (useCPForFTP) {
-                int cp = r->getTag("CP","0").toInt();
-                if (cp == 0)
-                    cp = zones->getCP(zoneRange);
-
-                ftp = cp;
-            }
-
-            rif = np->value(true) / (ftp ? ftp : zones->getFTP(zoneRange));
-            secs = np->count();
-
-            setValue(rif);
-            setCount(secs);
+        // no zones
+        if (!item->context->athlete->zones(item->isRun) || item->zoneRange < 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
         }
+
+        assert(deps.contains("coggan_np"));
+        NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
+        assert(np);
+
+        int ftp = item->getText("FTP","0").toInt();
+
+        bool useCPForFTP = (appsettings->cvalue(item->context->athlete->cyclist, item->context->athlete->zones(item->isRun)->useCPforFTPSetting(), 0).toInt() == 0);
+
+        if (useCPForFTP) {
+            int cp = item->getText("CP","0").toInt();
+            if (cp == 0)
+                cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
+
+            ftp = cp;
+        }
+
+        rif = np->value(true) / (ftp ? ftp : item->context->athlete->zones(item->isRun)->getFTP(item->zoneRange));
+        secs = np->count();
+
+        setValue(rif);
+        setCount(secs);
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
@@ -195,16 +209,21 @@ class TSS : public RideMetric {
         setSymbol("coggan_tss");
         setInternalName("TSS");
     }
+
     void initialize() {
         setName("TSS");
         setType(RideMetric::Total);
     }
-    void compute(const RideFile *r, const Zones *zones, int zoneRange,
-                 const HrZones *, int,
-	    const QHash<QString,RideMetric*> &deps,
-                 const Context *context) {
-	if (!zones || zoneRange < 0)
-	    return;
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        // no zones
+        if (!item->context->athlete->zones(item->isRun) || item->zoneRange < 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
         assert(deps.contains("coggan_np"));
         assert(deps.contains("coggan_if"));
         NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
@@ -213,19 +232,19 @@ class TSS : public RideMetric {
         double normWork = np->value(true) * np->count();
         double rawTSS = normWork * rif->value(true);
 
-        int ftp = r->getTag("FTP","0").toInt();
+        int ftp = item->getText("FTP","0").toInt();
 
-        bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist, GC_USE_CP_FOR_FTP, 0).toInt() == 0);
+        bool useCPForFTP = (appsettings->cvalue(item->context->athlete->cyclist, item->context->athlete->zones(item->isRun)->useCPforFTPSetting(), 0).toInt() == 0);
 
         if (useCPForFTP) {
-            int cp = r->getTag("CP","0").toInt();
+            int cp = item->getText("CP","0").toInt();
             if (cp == 0)
-                cp = zones->getCP(zoneRange);
+                cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
 
             ftp = cp;
         }
 
-        double workInAnHourAtCP = (ftp ? ftp : zones->getFTP(zoneRange)) * 3600;
+        double workInAnHourAtCP = (ftp ? ftp : item->context->athlete->zones(item->isRun)->getFTP(item->zoneRange)) * 3600;
         score = rawTSS / workInAnHourAtCP * 100.0;
 
         setValue(score);
@@ -247,33 +266,33 @@ class TSSPerHour : public RideMetric {
         setSymbol("coggan_tssperhour");
         setInternalName("TSS per hour");
     }
+
     void initialize() {
         setName(tr("TSS per hour"));
         setType(RideMetric::Average);
         setPrecision(0);
     }
-    void compute(const RideFile *, const Zones *, int ,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
 
-            // tss
-            assert(deps.contains("coggan_tss"));
-            TSS *tss = dynamic_cast<TSS*>(deps.value("coggan_tss"));
-            assert(tss);
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
-            // duration
-            assert(deps.contains("workout_time"));
-            RideMetric *duration = deps.value("workout_time");
-            assert(duration);
 
-            points = tss->value(true);
-            hours = duration->value(true) / 3600;
+        // tss
+        assert(deps.contains("coggan_tss"));
+        TSS *tss = dynamic_cast<TSS*>(deps.value("coggan_tss"));
+        assert(tss);
 
-            // set
-            if (hours) setValue(points/hours);
-            else setValue(0);
-            setCount(hours);
+        // duration
+        assert(deps.contains("workout_time"));
+        RideMetric *duration = deps.value("workout_time");
+        assert(duration);
+
+        points = tss->value(true);
+        hours = duration->value(true) / 3600;
+
+        // set
+        if (hours) setValue(points/hours);
+        else setValue(0);
+        setCount(hours);
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
@@ -292,6 +311,7 @@ class EfficiencyFactor : public RideMetric {
         setSymbol("friel_efficiency_factor");
         setInternalName("Efficiency Factor");
     }
+
     void initialize() {
         setName(tr("Efficiency Factor"));
         setType(RideMetric::Average);
@@ -300,14 +320,12 @@ class EfficiencyFactor : public RideMetric {
         setPrecision(3);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
-                 const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps,
-                 const Context *) {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+
         assert(deps.contains("coggan_np"));
         assert(deps.contains("xPace"));
         assert(deps.contains("average_hr"));
-        if (ride->isRun()) {
+        if (item->isRun) {
             RideMetric *xPace = dynamic_cast<RideMetric*>(deps.value("xPace"));
             assert(xPace);
             ef = xPace->value(true) > 0 ? ((1000.0/METERS_PER_YARD) / xPace->value(true)) : 0.0;
