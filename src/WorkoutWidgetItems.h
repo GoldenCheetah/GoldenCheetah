@@ -206,4 +206,25 @@ class ScaleCommand : public WorkoutWidgetCommand
         double up, down;
         bool scaleup;
 };
+
+struct PointMemento {
+
+    public:
+        PointMemento(double x, double y, int index) : x(x), y(y), index(index) {}
+        double x,y;
+        int index;
+};
+
+class DeleteWPointsCommand : public WorkoutWidgetCommand
+{
+    public:
+
+        DeleteWPointsCommand(WorkoutWidget*w, QList<PointMemento>points);
+
+        void redo();
+        void undo();
+
+    private:
+        QList<PointMemento> points;
+};
 #endif // _GC_WorkoutWidgetItems_h

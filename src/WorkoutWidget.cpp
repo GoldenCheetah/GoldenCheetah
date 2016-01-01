@@ -117,10 +117,13 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     //   shifted            none        not hovering? begin select          rect
     //
     //
-    // 7 ESC key            any         clear selection                     unchanged
+    // 7 key press          any         ESC clear selection                 unchanged
+    //                      any         ^Z undo, ^Y redo                    unchanged
     //
     //
     // 8 mouse enter        any         grab keyboard focus                 unchanged
+    //
+    //
     //
 
     //
@@ -311,12 +314,39 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     }
 
     //
-    // 6. ESC hit
+    // 6. KEYPRESS
     //
-    if (event->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(event)->key() == Qt::Key_Escape) {
+    if (event->type() == QEvent::KeyPress) {
 
-       // does the same in ALL states
-        updateNeeded=selectClear();
+        // we care about cmd / ctrl
+        Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(event)->modifiers();
+        bool ctrl = (kmod & Qt::ControlModifier) != 0;
+
+        switch(static_cast<QKeyEvent*>(event)->key()) {
+
+        case Qt::Key_Escape:
+            updateNeeded=selectClear();
+            break;
+
+        case Qt::Key_Y:
+            if (ctrl) {
+                redo();
+                updateNeeded=true;
+            }
+            break;
+
+        case Qt::Key_Z:
+            if (ctrl) {
+                undo();
+                updateNeeded=true;
+            }
+            break;
+
+        case Qt::Key_Delete:
+            // delete!
+            updateNeeded=deleteSelected();
+            break;
+        }
     }
 
     //
@@ -457,6 +487,29 @@ WorkoutWidget::scale(QPoint p)
 
     // register command
     new ScaleCommand(this, 1.01, 0.99, p.y() > 0);
+
+    return true;
+}
+
+bool
+WorkoutWidget::deleteSelected()
+{
+    // get a work list for the command then delete them backwards
+    QList<PointMemento> list;
+    for(int i=0; i<points_.count(); i++) {
+        WWPoint *p = points_[i];
+        if (p->selected) list << PointMemento(p->x, p->y, i);
+    }
+
+    // run the command instead of duplicating here :)
+    for (int j=list.count()-1; j>=0; j--) {
+        PointMemento m = list[j];
+        WWPoint *rm = points_.takeAt(m.index);
+        delete rm;
+    }
+
+    // create a command on stack
+    new DeleteWPointsCommand(this, list);
 
     return true;
 }

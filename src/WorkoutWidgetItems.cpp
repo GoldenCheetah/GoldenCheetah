@@ -387,3 +387,26 @@ ScaleCommand::redo()
         p->y *= factor;
 }
 
+DeleteWPointsCommand::DeleteWPointsCommand(WorkoutWidget*w, QList<PointMemento>points)
+  : WorkoutWidgetCommand(w), points(points) { }
+
+void 
+DeleteWPointsCommand::redo()
+{
+    // delete backward
+    for (int i=points.count()-1; i>=0; i--) {
+        PointMemento m = points[i];
+        WWPoint *rm = workoutWidget()->points().takeAt(m.index);
+        delete rm;
+    }
+}
+
+void
+DeleteWPointsCommand::undo()
+{
+    // add forward
+    foreach(PointMemento m, points) {
+        WWPoint *add = new WWPoint(workoutWidget(), m.x, m.y, false);
+        workoutWidget()->points().insert(m.index, add);
+    }
+}

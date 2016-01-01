@@ -172,6 +172,10 @@ class WorkoutWidget : public QWidget
         bool createPoint(QPoint p);
         bool scale(QPoint p);
 
+        // deleting
+        bool deleteSelected();
+
+        // selecting
         bool selectPoints(); // mark for selection with rect tool
         bool selectedPoints(); // make selected at end rect tool
         bool selectClear(); // clear all selections
