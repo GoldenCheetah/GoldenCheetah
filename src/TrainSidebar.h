@@ -29,6 +29,7 @@
 #include "VideoSyncFile.h"
 #include "ErgFilePlot.h"
 #include "GcSideBarItem.h"
+#include "RemoteControl.h"
 
 // standard stuff
 #include <QDir>
@@ -117,6 +118,8 @@ class TrainSidebar : public GcWindow
         int rpmTelemetry;   // Cadence
         int kphTelemetry;   // Speed (and Distance)
 
+        RemoteControl *remote;      // remote control settings
+
     signals:
 
         void deviceSelected();
@@ -177,6 +180,9 @@ class TrainSidebar : public GcWindow
 
         // User adjusted intensity
         void adjustIntensity();     // Intensity of workout user adjusted
+
+        // slot for receiving remote control commands
+        void remoteControl(uint16_t);
 
     protected:
 

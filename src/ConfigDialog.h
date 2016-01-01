@@ -152,13 +152,13 @@ class MetricConfig : public QWidget
         CustomMetricsPage *customPage;
 };
 
-// DEVICE PAGE
-class DeviceConfig : public QWidget
+// TRAIN PAGE
+class TrainConfig : public QWidget
 {
     Q_OBJECT
 
     public:
-        DeviceConfig(QDir home, Context *context);
+        TrainConfig(QDir home, Context *context);
 
     public slots:
         qint32 saveClicked();
@@ -168,9 +168,10 @@ class DeviceConfig : public QWidget
         Context *context;
 
         DevicePage *devicePage;
+        RemotePage *remotePage;
 };
 
-// INTERCAL PAGE
+// INTERVAL PAGE
 class IntervalConfig : public QWidget
 {
     Q_OBJECT
@@ -218,6 +219,6 @@ class ConfigDialog : public QMainWindow
         DataConfig *data;
         MetricConfig *metric;
         IntervalConfig *interval;
-        DeviceConfig *device;
+        TrainConfig *train;
 };
 #endif

@@ -187,6 +187,9 @@ struct setChannelAtom {
 #define ANT_CW_INIT            0x53
 #define ANT_CW_TEST            0x48
 
+#define ANT_TX_TYPE_SLAVE      0x00
+#define ANT_TX_TYPE_MASTER     0x05 // typical tx type for master device, see ANT Message Protocol and Usage doc
+
 #define TRANSITION_START       0x00 // start of transition when opening
 
 // ANT message structure.
@@ -344,6 +347,30 @@ struct setChannelAtom {
 #define ANT_MANUFACTURER_ID_PAGE                    0x50
 #define ANT_PRODUCT_INFO_PAGE                       0x51
 
+// ANT remote controls
+#define ANT_CONTROL_DEVICE_AVAILABILITY_PAGE        0x02
+#define ANT_CONTROL_GENERIC_CMD_PAGE                0x49
+
+#define ANT_CONTROL_DEVICE_SUPPORT_AUDIO            0x01
+#define ANT_CONTROL_DEVICE_SUPPORT_KEYPAD           0x08
+#define ANT_CONTROL_DEVICE_SUPPORT_GENERIC          0x10
+#define ANT_CONTROL_DEVICE_SUPPORT_VIDEO            0x20
+#define ANT_CONTROL_DEVICE_SUPPORT_BURST            0x40
+
+#define ANT_CONTROL_GENERIC_CMD_MENU_UP             0x00
+#define ANT_CONTROL_GENERIC_CMD_MENU_DOWN           0x01
+#define ANT_CONTROL_GENERIC_CMD_MENU_SELECT         0x02
+#define ANT_CONTROL_GENERIC_CMD_MENU_BACK           0x03
+#define ANT_CONTROL_GENERIC_CMD_HOME                0x04
+#define ANT_CONTROL_GENERIC_CMD_START               0x20
+#define ANT_CONTROL_GENERIC_CMD_STOP                0x21
+#define ANT_CONTROL_GENERIC_CMD_RESET               0x22
+#define ANT_CONTROL_GENERIC_CMD_LENGTH              0x23
+#define ANT_CONTROL_GENERIC_CMD_LAP                 0x24
+#define ANT_CONTROL_GENERIC_CMD_USER_1              0x8000
+#define ANT_CONTROL_GENERIC_CMD_USER_2              0x8001
+#define ANT_CONTROL_GENERIC_CMD_USER_3              0x8002
+
 //======================================================================
 // Worker thread
 //======================================================================
@@ -368,6 +395,9 @@ signals:
     // signal instantly on data receipt for R-R data
     // made a special case to support HRV tool without complication
     void rrData(uint16_t  measurementTime, uint8_t heartrateBeats, uint8_t instantHeartrate);
+
+    // signal for passing remote control commands
+    void antRemoteControl(uint16_t command);
 
     void receivedAntMessage(const ANTMessage message, const struct timeval timestamp);
 
@@ -397,6 +427,10 @@ public slots:
     void staleInfo(int number);   // info is now stale
     void slotSearchTimeout(int number); // search timed out
     void slotSearchComplete(int number); // search completed successfully
+
+    void slotStartBroadcastTimer(int number);
+    void slotStopBroadcastTimer(int number);
+    void slotControlTimerEvent();
 
     // get telemetry
     void getRealtimeData(RealtimeData &);             // return current realtime data
@@ -509,6 +543,8 @@ public:
     void setVortexData(int channel, int id);
     void refreshVortexLoad();
 
+    void setControlChannel(int channel);
+
     void setTrainerStatusAvailable(bool status) { telemetry.setTrainerStatusAvailable(status); }
     void setTrainerCalibRequired(bool status) { telemetry.setTrainerCalibRequired(status); }
     void setTrainerConfigRequired(bool status) { telemetry.setTrainerConfigRequired(status); }
@@ -580,6 +616,9 @@ private:
     // tacx vortex (we'll probably want to abstract this out cf. kickr)
     int vortexID;
     int vortexChannel;
+
+    // remote control data
+    int controlChannel;
 
     // athlete for wheelsize settings, etc.
     QString trainAthlete;
