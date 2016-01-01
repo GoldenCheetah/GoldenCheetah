@@ -37,6 +37,15 @@
 #ifndef GOOGLE_DRIVE_DEBUG
 #define GOOGLE_DRIVE_DEBUG false
 #endif
+#ifdef Q_CC_MSVC
+#define printd(fmt, ...) do {                                 \
+    if (GOOGLE_DRIVE_DEBUG) {                                 \
+        printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
+               __FUNCTION__, __VA_ARGS__);                    \
+        fflush(stdout);                                       \
+    }                                                         \
+} while(0)
+#else
 #define printd(fmt, args...)                                            \
     do {                                                                \
         if (GOOGLE_DRIVE_DEBUG) {                                       \
@@ -45,6 +54,7 @@
             fflush(stdout);                                             \
         }                                                               \
     } while(0)
+#endif
 
 namespace {
     static const QString kGoogleApiBaseAddr = "https://www.googleapis.com";
