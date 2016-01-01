@@ -131,6 +131,11 @@ class WorkoutWidget : public QWidget
         QPen markerPen;
         QPen gridPen;
 
+        // where were we when we changed state?
+        QPointF onCreate;   // select a point
+        QPointF onDrag;    // drag a point
+        QPointF onRect, atRect;    // rectangle select tool, top left, bottom right
+
    public slots:
 
         // and erg file was selected
@@ -155,14 +160,21 @@ class WorkoutWidget : public QWidget
 
     protected:
 
-        // interaction state
-        enum { none, drag } state;
+        // interaction state;
+        // none - initial state
+        // drag - dragging a point around
+        // rect - rectangle select tool active
+        enum { none, drag, rect } state;
         WWPoint *dragging;
 
         // interacting with points
         bool movePoint(QPoint p);
         bool createPoint(QPoint p);
         bool scale(QPoint p);
+
+        bool selectPoints(); // mark for selection with rect tool
+        bool selectedPoints(); // make selected at end rect tool
+        bool selectClear(); // clear all selections
 
         void paintEvent(QPaintEvent *);
         bool eventFilter(QObject *obj, QEvent *event);
@@ -183,10 +195,6 @@ class WorkoutWidget : public QWidget
         // command stack
         QList<WorkoutWidgetCommand *> stack;
         int stackptr;
-
-        // where were we when we changed state?
-        QPoint onCreate;
-        QPointF onDrag;
 
         // for computing W'bal
         WPrime wpBal;

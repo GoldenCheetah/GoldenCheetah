@@ -175,12 +175,19 @@ WWPoint::paint(QPainter *painter)
     // transform
     QPoint center = workoutWidget()->transform(x,y);
 
+    // selected!
+    if (selecting || selected) {
+        painter->setBrush(Qt::red); 
+        painter->drawEllipse(QPointF(center.x(), center.y()), 12.0f, 12.0f);
+    }
+
     // highlight hovered
     if (hover) {
-        painter->setBrush(Qt::gray);
+        painter->setBrush(Qt::gray); 
         painter->drawEllipse(QPointF(center.x(), center.y()), 10.0f, 10.0f);
     }
 
+    // draw point
     painter->setBrush(GColor(CPOWER));
     painter->drawEllipse(QPointF(center.x(), center.y()), 3.0f, 3.0f);
 
@@ -236,6 +243,24 @@ WWLine::paint(QPainter *painter)
             linearGradient.setSpread(QGradient::PadSpread);
 
         painter->fillPath(path, QBrush(linearGradient));
+    }
+}
+
+void
+WWRect::paint(QPainter *painter)
+{
+    QPointF onRect = workoutWidget()->onRect;
+    QPointF atRect = workoutWidget()->atRect;
+
+    // draw a selection rectangle
+    if (onRect != QPointF(-1,-1) && atRect != QPointF(-1,-1) && onRect != atRect) {
+
+        // thin ?
+        QPen linePen(GColor(CPLOTMARKER));
+        linePen.setWidth(1);
+        painter->setPen(linePen);
+
+        painter->drawRect(QRectF(onRect,atRect));
     }
 }
 
