@@ -361,6 +361,105 @@ WPrime::setRide(RideFile *input)
 }
 
 void
+WPrime::setWatts(Context *context, QVector<int>&wattsArray, int CP, int WPRIME)
+{
+    bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
+
+    QTime time; // for profiling performance of the code
+    time.start();
+
+    // reset from previous
+    values.resize(0); // the memory is kept for next time so this is efficient
+    xvalues.resize(0);
+    minY = maxY = WPRIME;
+
+    if (integral) {
+
+        last = wattsArray.count();
+        values.resize(last);
+        xvalues.resize(last);
+
+        // input array contains the actual W' expenditure
+        // and will also contain non-zero values
+        double totalBelowCP=0;
+        double countBelowCP=0;
+        QVector<int> powerValues(last+1);
+        EXP = 0;
+        for (int i=0; i<last; i++) {
+
+            // get watts at point in time
+            int value = wattsArray[i];
+
+            powerValues[i] = value > CP ? value-CP : 0;
+
+            if (value < CP) {
+                totalBelowCP += value;
+                countBelowCP++;
+            } else EXP += value; // total expenditure above CP
+        }
+
+        TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
+
+        // lets run forward from 0s to end of ride
+        values.resize(last+1);
+        xvalues.resize(last+1);
+
+        QVector<double> myvalues(last+1);
+
+        WPrimeIntegrator a(powerValues, 0, last, TAU);
+
+        a.start();
+        a.wait();
+
+        // sum values
+        for (int t=0; t<=last; t++) {
+            values[t] = a.output[t];
+            xvalues[t] = t * 1000.00f;
+        }
+
+        // now subtract WPRIME and work out minimum etc
+        for(int t=0; t <= last; t++) {
+            double value = WPRIME - values[t];
+            values[t] = value;
+
+            if (value > maxY) maxY = value;
+            if (value < minY) minY = value;
+        }
+
+    } else {
+
+        // how many points ?
+        last = wattsArray.count();
+        values.resize(last);
+        xvalues.resize(last);
+
+        // input array contains the actual W' expenditure
+        // and will also contain non-zero values
+        double W = WPRIME;
+        for (int i=0; i<last; i++) {
+
+            // get watts at point in time
+            int value = wattsArray[i];
+
+            if(value < CP) {
+                W  = W + (CP-value)*(WPRIME-W)/WPRIME;
+            } else {
+                W  = W + (CP-value);
+            }
+
+            if (W > maxY) maxY = W;
+            if (W < minY) minY = W;
+
+            values[i] = W;
+            xvalues[i] = i*1000;
+        }
+    }
+
+    if (minY < -30000) minY = 0; // the data is definitely out of bounds!
+                                 // so lets not exacerbate the problem - truncate
+}
+
+void
 WPrime::setErg(ErgFile *input)
 {
     bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");

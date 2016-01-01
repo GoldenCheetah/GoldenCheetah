@@ -21,6 +21,9 @@
 #include "GoldenCheetah.h"
 
 #include "Context.h"
+#include "Athlete.h"
+
+#include "WPrime.h"
 
 #include "Settings.h"
 #include "Units.h"
@@ -96,6 +99,9 @@ class WorkoutWidget : public QWidget
 
         // get list of my items
         QList<WWPoint*> &points() { return points_; }
+
+        // get WPrime values
+        WPrime &wprime() { return wpBal; }
 
         // range for scales in plot units not draw units
         double maxX(); // e.g. max watts
@@ -181,6 +187,9 @@ class WorkoutWidget : public QWidget
         // where were we when we changed state?
         QPoint onCreate;
         QPointF onDrag;
+
+        // for computing W'bal
+        WPrime wpBal;
 };
 
 #endif // _GC_WorkoutWidget_h

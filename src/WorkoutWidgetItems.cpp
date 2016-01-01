@@ -25,8 +25,9 @@
 #include <QDebug>
 
 static int POWERSCALEWIDTH = 5;
+static int WBALSCALEWIDTH = 5;
 static bool GRIDLINES = true;
-static int SPACING = 2;
+static int SPACING = 4;
 
 WWPowerScale::WWPowerScale(WorkoutWidget *w, Context *c) : WorkoutWidgetItem(w), context(c)
 {
@@ -109,6 +110,63 @@ WWPowerScale::paint(QPainter *painter)
     }
 }
 
+WWWBalScale::WWWBalScale(WorkoutWidget *w, Context *c) : WorkoutWidgetItem(w), context(c)
+{
+    w->addItem(this);
+}
+
+void
+WWWBalScale::paint(QPainter *painter)
+{
+    int rnum = -1;
+
+    // CP etc are not available so draw nothing
+    if (context->athlete->zones(false) == NULL || (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) return;
+
+    // lets get the zones, CP and PMAX
+    int WPRIME = context->athlete->zones(false)->getWprime(rnum);
+
+    QFontMetrics fontMetrics(workoutWidget()->markerFont);
+    QFontMetrics bfontMetrics(workoutWidget()->bigFont);
+
+    // wprime zones are simply 25% 50% 75% 100%
+    for(int i=0; i<4; i++) {
+
+        // scale height
+        int height = workoutWidget()->canvas().height();
+
+        // bounding rect for zone color
+        QPointF tl = workoutWidget()->right().topLeft();
+        QRect bound(QPoint(tl.x(), tl.y() + (i * (height/4))), 
+                    QPoint(tl.x()+WBALSCALEWIDTH, tl.y() + ((i+1) * (height/4))));
+
+        // draw rect
+        QColor wbal = GColor(CWBAL);
+        wbal.setAlpha((255/4) * (i+1));
+        painter->fillRect(bound, QBrush(wbal));
+
+        // HIGH LABEL % (100,75,50,25)
+
+        // percent labels for high only - but skip the last zone its off to infinity..
+        QString label = QString("%1%").arg(100-(i*25));
+        QRect textBound = fontMetrics.boundingRect(label);
+        painter->setFont(workoutWidget()->markerFont);
+        painter->setPen(workoutWidget()->markerPen);
+
+        painter->drawText(QPoint(tl.x()+SPACING+POWERSCALEWIDTH,
+                                 tl.y() + (i * (height/4)) +(fontMetrics.ascent()/2)),
+                                 label);
+
+        // absolute labels for high WPRIME - (i*WPRIME/4)
+        label = QString("%1 kJ").arg(double((WPRIME - (i*(WPRIME/4)))/1000.00f), 0, 'f', 1);
+        textBound = fontMetrics.boundingRect(label);
+
+        painter->drawText(QPoint(tl.x()-SPACING-textBound.width(),
+                                 tl.y() + (i * (height/4)) +(fontMetrics.ascent()/2)),
+                                 label);
+
+    }
+}
 void
 WWPoint::paint(QPainter *painter)
 {
@@ -178,6 +236,52 @@ WWLine::paint(QPainter *painter)
             linearGradient.setSpread(QGradient::PadSpread);
 
         painter->fillPath(path, QBrush(linearGradient));
+    }
+}
+
+//W'bal curve paint
+void
+WWWBLine::paint(QPainter *painter)
+{
+    int rnum = -1;
+
+    // CP etc are not available so draw nothing
+    if (context->athlete->zones(false) == NULL || (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) return;
+
+    // lets get the zones, CP and PMAX
+    int WPRIME = context->athlete->zones(false)->getWprime(rnum);
+
+    // thin ?
+    QPen linePen(GColor(CWBAL));
+    linePen.setWidth(1);
+    painter->setPen(linePen);
+
+    // top left origin
+    QPointF tl = workoutWidget()->canvas().topLeft();
+
+    // pixels per WPRIME value
+    double ratio = workoutWidget()->canvas().height() / WPRIME;
+
+    // join the dots 
+    QPointF last(tl.x(),tl.y());
+
+    // run through the wpBal values...
+    int secs=0;
+    foreach(double y, workoutWidget()->wprime().ydata()) {
+
+        // next second
+        secs++;
+
+        // this dot...
+        if (y < 0) y=0;
+
+        // x and y pixel location
+        double px = workoutWidget()->transform(secs,0).x();
+        double py = tl.y() + ((WPRIME-y) * ratio);
+
+        QPointF dot(px,py);
+        painter->drawLine(last, dot);
+        last = dot;
     }
 }
 

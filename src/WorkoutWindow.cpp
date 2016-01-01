@@ -36,11 +36,15 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // the workout scene
     workout = new WorkoutWidget(this, context);
 
-    // add a scale
+    // add the power and W'bal scale
     powerscale = new WWPowerScale(workout, context);
+    wbalscale = new WWWBalScale(workout, context);
 
     // add a line between the dots
     line = new WWLine(workout);
+
+    // paint the W'bal curve
+    wbline = new WWWBLine(workout, context);
 
     // setup the toolbar
     toolbar = new QToolBar(this);

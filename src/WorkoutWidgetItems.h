@@ -31,10 +31,11 @@
 #include <QRect>
 
 // types
-#define GCWW_SCALE  1
-#define GCWW_POINT  2
-#define GCWW_LINE   3
-#define GCWW_WSCALE 4 //W'bal
+#define GCWW_SCALE     1
+#define GCWW_POINT     2
+#define GCWW_LINE      3
+#define GCWW_WBALSCALE 4 //W'bal
+#define GCWW_WBLINE    3
 
 //
 // ITEMS
@@ -58,14 +59,14 @@ class WWPowerScale : public WorkoutWidgetItem {
         Context *context; // for athlete zones etc
 };
 
-class WWBalScale : public WorkoutWidgetItem {
+class WWWBalScale : public WorkoutWidgetItem {
 
     public:
 
-        WWBalScale(WorkoutWidget *w, Context *c);
+        WWWBalScale(WorkoutWidget *w, Context *c);
 
         // Reimplement in children
-        int type() { return GCWW_WSCALE; }
+        int type() { return GCWW_WBALSCALE; }
 
         void paint(QPainter *painter);
 
@@ -118,6 +119,25 @@ class WWLine : public WorkoutWidgetItem {
 
     private:
 
+};
+
+// draws the W'bal curve
+class WWWBLine : public WorkoutWidgetItem {
+
+    public:
+
+        WWWBLine(WorkoutWidget *w, Context *context) : WorkoutWidgetItem(w), context(context) { w->addItem(this); }
+
+        // Reimplement in children
+        int type() { return GCWW_WBLINE; }
+
+        void paint(QPainter *painter);
+
+        // locate me on the parent widget in paint coordinates
+        QRectF bounding() { return QRectF(); }
+
+    private:
+        Context *context;
 };
 
 //

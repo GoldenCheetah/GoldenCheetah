@@ -21,6 +21,7 @@
 #include "WorkoutWindow.h"
 #include "WorkoutWidgetItems.h"
 
+#include "WPrime.h"
 #include "ErgFile.h"
 
 #include "TimeUtils.h" // time_to_string()
@@ -149,8 +150,13 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 
             // we're dragging this point around, get on and
             // do that, but apply constrains
-            if (dragging) updateNeeded = movePoint(p);
-            else {
+            if (dragging) {
+                updateNeeded = movePoint(p);
+
+                // this may possibly be too expensive
+                // on slower hardware?
+                recompute();
+            } else {
                 // not possible?
                 state = none;
                 qDebug()<<"WW FSM: drag state dragging=NULL";
@@ -434,7 +440,12 @@ WorkoutWidget::recompute()
 
     }
 
+    //
+    // PREPARE DATA
+    //
+
     // get CP/FTP to use in calculation
+    int WPRIME = context->athlete->zones(false)->getWprime(rnum);
     int CP = context->athlete->zones(false)->getCP(rnum);
     int FTP = context->athlete->zones(false)->getFTP(rnum);
     bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist,
@@ -508,11 +519,9 @@ WorkoutWidget::recompute()
     }
 
     //
-    // Now we have an array we can compute metrics from it
-    // we compute locally for speed rather than use the
-    // metric compute functions .. might change this if
-    // it can be done in a performant manner.
+    // COMPUTE KEY METRICS TSS/IF
     //
+
     // The Workout Window has labels for TSS and IF.
     double NP=0, TSS=0, IF=0;
 
@@ -560,6 +569,11 @@ WorkoutWidget::recompute()
     parent->IFlabel->setText(QString("%1 IF").arg(IF, 0, 'f', 2));
     parent->TSSlabel->setText(QString("%1 TSS").arg(TSS, 0, 'f', 0));
 
+    //
+    // COMPUTE W'BAL
+    //
+    wpBal.setWatts(context, wattsArray, CP, WPRIME);
+
     //qDebug()<<"RECOMPUTE:"<<timer.elapsed()<<"ms"<<wattsArray.count()<<"samples";
 }
 
@@ -594,7 +608,7 @@ WorkoutWidget::paintEvent(QPaintEvent*)
     painter.setRenderHint(QPainter::Antialiasing, true);
 
     // just for debug for now
-    //painter.setPen(QPen(QColor(255,255,255,30)));
+    //DEBUG painter.setPen(QPen(QColor(255,255,255,30)));
     //DEBUG painter.drawRect(left());
     //DEBUG painter.drawRect(right());
     //DEBUG painter.drawRect(top());
