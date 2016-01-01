@@ -1060,7 +1060,7 @@ void ANTChannel::attemptTransition(int message_id)
         status = Closed;
         //qDebug()<<"** CHANNEL"<<number<<"NOW CLOSED **";
         if (is_master) {
-            qDebug()<<number<<"Stopping timer..";
+            //qDebug()<<number<<"Stopping timer..";
             emit broadcastTimerStop(number);
         }
         break;
