@@ -175,21 +175,25 @@ WWPoint::paint(QPainter *painter)
     // transform
     QPoint center = workoutWidget()->transform(x,y);
 
-    // selected!
-    if (selecting || selected) {
-        painter->setBrush(Qt::red); 
-        painter->drawEllipse(QPointF(center.x(), center.y()), 12.0f, 12.0f);
-    }
-
     // highlight hovered
     if (hover) {
         painter->setBrush(Qt::gray); 
         painter->drawEllipse(QPointF(center.x(), center.y()), 10.0f, 10.0f);
     }
 
-    // draw point
-    painter->setBrush(GColor(CPOWER));
-    painter->drawEllipse(QPointF(center.x(), center.y()), 3.0f, 3.0f);
+    // selected!
+    if (selecting || selected) {
+
+        // selected change color
+        painter->setBrush(Qt::red); 
+        painter->drawEllipse(QPointF(center.x(), center.y()), 3.0f, 3.0f);
+
+    } else {
+
+        // draw point
+        painter->setBrush(GColor(CPOWER));
+        painter->drawEllipse(QPointF(center.x(), center.y()), 3.0f, 3.0f);
+    }
 
     // set bound so we can be moused over etc
     bound = QRectF(QPointF(center.x()-3.0f, center.y()-3.0f),QPointF(center.x()+3.0f, center.y()+3.0f));
