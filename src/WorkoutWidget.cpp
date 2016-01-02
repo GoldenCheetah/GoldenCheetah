@@ -46,6 +46,9 @@ static const int YTICS = 10;
 
 static const int SPACING = 2; // between labels and tics (if there are tics)
 
+static const int XMOVE = 5; // how many to move X when cursoring
+static const int YMOVE = 1; // how many to move Y when cursoring
+
 // grid lines (y only)
 static bool GRIDLINES = true;
 
@@ -120,6 +123,8 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     //
     // 7 key press          any         ESC clear selection                 unchanged
     //                      any         ^Z undo, ^Y redo                    unchanged
+    //                      any         cursors move selected               unchanged
+    //                      any         DEL delete selected                 unchanged
     //
     //
     // 8 mouse enter        any         grab keyboard focus                 unchanged
@@ -322,8 +327,16 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
         // we care about cmd / ctrl
         Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(event)->modifiers();
         bool ctrl = (kmod & Qt::ControlModifier) != 0;
+        int key;
 
-        switch(static_cast<QKeyEvent*>(event)->key()) {
+        switch((key=static_cast<QKeyEvent*>(event)->key())) {
+
+        case Qt::Key_Up:
+        case Qt::Key_Down:
+        case Qt::Key_Left:
+        case Qt::Key_Right:
+            updateNeeded=movePoints(key,kmod);
+            break;
 
         case Qt::Key_Escape:
             updateNeeded=selectClear();
@@ -348,6 +361,9 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
             updateNeeded=deleteSelected();
             break;
         }
+
+        // we moved / deleted etc, so redo metrics et al
+        if (updateNeeded) recompute();
     }
 
     //
@@ -376,6 +392,109 @@ static bool doubles_equal(double a, double b)
     double errorB = b * DBL_EPSILON;
     return (a >= b - errorB) && (a <= b + errorB);
 }
+
+// move the selected points in he direction of the cursor key
+// constrained to the limits of the points not selected
+bool
+WorkoutWidget::movePoints(int key, Qt::KeyboardModifiers kmod)
+{
+    Q_UNUSED(kmod); // perhaps in the future...
+
+    // apply constraints, don't move if we are constrained
+    // by moving off the scale or create a workout that is
+    // invalid (e.g. time goes backwards
+    bool constrained = false;
+
+    for(int index=0; index < points_.count(); index++) {
+
+        WWPoint *p = points_[index];
+
+        // going left
+        if (key == Qt::Key_Left) {
+
+            // look at prev
+            WWPoint *prev = index ? points_[index-1] : NULL;
+
+            // hit the start of the workout
+            if (p->selected && (p->x-XMOVE) < 0) { constrained=true; break; }
+
+            // hit the previous unselected
+            if (p->selected && prev && !prev->selected && prev->x > (p->x-XMOVE)) {
+                constrained=true; break;
+            }
+        }
+
+        // going right
+        if (key == Qt::Key_Right) {
+
+            // look at next
+            WWPoint *next = index+1 < points_.count() ? points_[index+1] : NULL;
+
+            // hit the end of the workout
+            if (p->selected && (p->x+XMOVE) > maxX()) { constrained=true; break; }
+
+            // hit the next unselected
+            if (p->selected && next && !next->selected && next->x < (p->x+XMOVE)) {
+                constrained=true; break;
+            }
+        }
+
+        // going down
+        if (key == Qt::Key_Down) {
+
+            // hit zero
+            if (p->selected && (p->y-YMOVE) < 0) { constrained=true; break; }
+        }
+    }
+
+    // no dice, skip update we changed nothing
+    if (constrained) return false;
+
+    // create command as we go
+    QList<PointMemento> before, after;
+
+    // visit every point and move if it is selected
+    for(int index=0; index < points_.count(); index++) {
+
+        WWPoint *p = points_[index];
+
+        // just selected ones
+        if (p->selected == false) continue;
+
+        // add before
+        before << PointMemento(p->x, p->y, index);
+
+        switch(key) {
+
+        case Qt::Key_Up:
+            p->y += YMOVE;
+            break;
+
+        case Qt::Key_Down:
+            p->y -= YMOVE;
+            break;
+
+        case Qt::Key_Left:
+            p->x -= XMOVE;
+            break;
+
+        case Qt::Key_Right:
+            p->x += XMOVE;
+            break;
+        }
+
+        // add after
+        after << PointMemento(p->x, p->y, index);
+    }
+
+    if (before.count()) {
+        new MovePointsCommand(this, before, after);
+        return true;
+    }
+
+    return false;
+}
+
 bool
 WorkoutWidget::movePoint(QPoint p)
 {
