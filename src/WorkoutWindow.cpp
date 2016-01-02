@@ -22,7 +22,7 @@
 #include "WorkoutWidgetItems.h"
 
 WorkoutWindow::WorkoutWindow(Context *context) :
-    GcWindow(context), context(context), active(false)
+    GcWindow(context), draw(true), context(context), active(false)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
@@ -159,10 +159,12 @@ WorkoutWindow::saveFile()
 void
 WorkoutWindow::drawMode()
 {
+    draw = true;
 }
 
 void
 WorkoutWindow::selectMode()
 {
+    draw = false;
 }
 

@@ -200,6 +200,9 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
         // watch for shift when clicking
         Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(event)->modifiers();
 
+        // if not in draw mode add shift to select
+        if (parent->draw == false) kmod |= Qt::ShiftModifier;
+
         if (state == none && canvas().contains(p)) {
 
             // either select existing to drag
