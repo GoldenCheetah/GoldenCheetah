@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 #
-# Dump timestamps & formatted 12 byte ANT messages from a GC antlog2.bin file;
+# Dump timestamps & formatted 12 byte ANT messages from a GC antlog.raw file;
 #
 # data[0]    sync byte - always 0xA4
 # data[1]    message length
