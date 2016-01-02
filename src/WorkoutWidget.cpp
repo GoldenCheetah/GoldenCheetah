@@ -23,6 +23,7 @@
 
 #include "WPrime.h"
 #include "ErgFile.h"
+#include "RideFileCache.h"
 
 #include "TimeUtils.h" // time_to_string()
 #include <QFontMetrics>
@@ -700,6 +701,11 @@ WorkoutWidget::recompute()
     //
     wpBal.setWatts(context, wattsArray, CP, WPRIME);
 
+    //
+    // MEAN MAX [works but need to think about UI]
+    //
+    //QVector<int>mmpArray;
+    //RideFileCache::fastSearch(wattsArray, mmpArray);
     //qDebug()<<"RECOMPUTE:"<<timer.elapsed()<<"ms"<<wattsArray.count()<<"samples";
 }
 
