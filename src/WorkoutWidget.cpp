@@ -99,7 +99,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     //
     //   EVENT              STATE       ACTION                              NEXT STATE
     //   --------------     ------      ---------------                     ----------
-    // 1 mouse move         none        hover/unhover                       none
+    // 1 mouse move         none        hover/unhover point/block           none
     //                      drag        move point around                   drag
     //                      rect        resize and scan for selections      rect
     //
@@ -148,6 +148,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 
             // if we're not in any particular state then just
             // highlight for hover/unhover
+            updateNeeded = setBlockCursor();
 
             // is the mouse on the canvas?
             if (canvas().contains(p)) {
@@ -157,10 +158,12 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
                     if (point->bounding().contains(p)) {
                         if (!point->hover) {
                             point->hover = true;
+                            updateNeeded=true;
                         }
                     } else {
                         if (point->hover) {
                             point->hover = false;
+                            updateNeeded=true;
                         }
                     }
                 }
@@ -171,7 +174,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
             // we're dragging this point around, get on and
             // do that, but apply constrains
             if (dragging) {
-                movePoint(p);
+                updateNeeded = movePoint(p);
 
                 // this may possibly be too expensive
                 // on slower hardware?
@@ -186,11 +189,8 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 
             // we're selecting via a rectangle
             atRect = p;
-            selectPoints(); // go and check / select
+            updateNeeded = selectPoints(); // go and check / select
         }
-
-        // always repaint...
-        repaint();
     }
 
     //
@@ -388,6 +388,64 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 
     // return false - we are eavesdropping not processing.
     // except for wheel events which we steal
+    return returning;
+}
+
+bool
+WorkoutWidget::setBlockCursor()
+{
+    // where is the mouse?
+    QPoint c = mapFromGlobal(QCursor::pos());
+
+    // not on canvas?
+    if (!canvas().contains(c)) {
+        if (cursorBlock != QPainterPath()) {
+            cursorBlock = QPainterPath();
+            return true;
+        }
+        return false;
+    }
+
+    bool returning=false;
+    QPointF last(0,0);
+
+    foreach(WWPoint *p, points_) {
+
+        // might be better to always use float?
+        QPoint center = transform(p->x,p->y);
+        QPointF dot(center.x(), center.y());
+
+        // cursor in ?
+        if (last.x() > 0 && c.x() > last.x() && c.x() < dot.x() && dot.x() > last.x()) {
+
+            // found the cursor, but is it in the block?
+            QPointF begin(last.x(), canvas().bottom());
+            QPainterPath block(begin);
+            block.lineTo(last);
+            block.lineTo(dot);
+            block.lineTo(dot.x(),begin.y());
+            block.lineTo(begin);
+
+            // is it inside?
+            if (block.contains(c)) {
+
+                // if different then update and want a repaint
+                if (cursorBlock != block) {
+                    cursorBlock = block;
+                    returning = true;
+                }
+            } else if (cursorBlock != QPainterPath()) {
+
+                // not inside but not set to null
+                cursorBlock = QPainterPath();
+                returning = true;
+            }
+            break;
+        }
+
+        // moving on
+        last = dot;
+    }
     return returning;
 }
 

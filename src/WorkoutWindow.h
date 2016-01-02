@@ -41,6 +41,7 @@ class WWWBalScale;
 class WWLine;
 class WWWBLine;
 class WWRect;
+class WWBlockCursor;
 
 class WorkoutWindow : public GcWindow
 {
@@ -80,6 +81,7 @@ class WorkoutWindow : public GcWindow
         WWLine *line;
         WWWBLine *wbline;
         WWRect *rect;
+        WWBlockCursor *bcursor;
         bool active;
 };
 

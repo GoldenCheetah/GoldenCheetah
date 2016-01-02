@@ -37,6 +37,7 @@
 #define GCWW_WBALSCALE 4 //W'bal
 #define GCWW_WBLINE    5
 #define GCWW_RECT      6 // selection rectangle
+#define GCWW_BCURSOR   7 // interval "block" cursor
 
 //
 // ITEMS
@@ -142,6 +143,23 @@ class WWRect : public WorkoutWidgetItem {
 
     private:
 
+};
+
+class WWBlockCursor : public WorkoutWidgetItem {
+
+    public:
+
+        WWBlockCursor(WorkoutWidget *w) : WorkoutWidgetItem(w) { w->addItem(this); }
+
+        // Reimplement in children
+        int type() { return GCWW_BCURSOR; }
+
+        void paint(QPainter *painter);
+
+        // locate me on the parent widget in paint coordinates
+        QRectF bounding() { return workoutWidget()->cursorBlock.boundingRect(); }
+
+    private:
 };
 
 // draws the W'bal curve

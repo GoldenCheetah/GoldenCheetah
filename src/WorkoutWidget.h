@@ -33,6 +33,7 @@
 #include <QRect>
 #include <QPoint>
 #include <QVector>
+#include <QPainterPath>
 
 class ErgFile;
 class WorkoutWindow;
@@ -136,6 +137,9 @@ class WorkoutWidget : public QWidget
         QPointF onDrag;    // drag a point
         QPointF onRect, atRect;    // rectangle select tool, top left, bottom right
 
+        // the block the cursor is hovering in
+        QPainterPath cursorBlock;
+
    public slots:
 
         // and erg file was selected
@@ -180,6 +184,9 @@ class WorkoutWidget : public QWidget
         bool selectPoints(); // mark for selection with rect tool
         bool selectedPoints(); // make selected at end rect tool
         bool selectClear(); // clear all selections
+
+        // working with blocks
+        bool setBlockCursor();
 
         void paintEvent(QPaintEvent *);
         bool eventFilter(QObject *obj, QEvent *event);
