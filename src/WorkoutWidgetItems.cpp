@@ -271,7 +271,7 @@ WWLine::paint(QPainter *painter)
             painter->fillPath(path, QBrush(linearGradient));
     }
 
-    if (foundCursor) {
+    if (foundCursor && cursorBlock.contains(c)) {
             QColor brush_color1 = GColor(CPLOTMARKER);
             brush_color1.setAlpha(240);
             QColor brush_color2 = GColor(CPLOTMARKER);
