@@ -259,6 +259,7 @@ class MergeAdjust : public QWizardPage
         QxtSpanSlider *spanSlider;
 
         QSlider *adjustSlider;
+        QLabel *offsetLabel;
         QPushButton *reset;
 
         int offset1, offset2;
