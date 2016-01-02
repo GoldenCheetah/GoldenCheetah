@@ -277,17 +277,20 @@ WWBlockCursor::paint(QPainter *painter)
     if (workoutWidget()->state == WorkoutWidget::none &&
         workoutWidget()->cursorBlock != QPainterPath()) {
 
-        QColor brush_color1 = GColor(CPLOTMARKER);
-        brush_color1.setAlpha(240);
-        QColor brush_color2 = GColor(CPLOTMARKER);
-        brush_color2.setAlpha(128);
+        QColor darken = Qt::black;
+        darken.setAlpha(125);
+        painter->fillPath(workoutWidget()->cursorBlock, QBrush(darken));
 
-        QLinearGradient linearGradient(0, 0, 0, workoutWidget()->transform(0,0).y());
-        linearGradient.setColorAt(0.0, brush_color1);
-        linearGradient.setColorAt(1.0, brush_color2);
-        linearGradient.setSpread(QGradient::PadSpread);
+        // cursor block duration text
+        QFontMetrics fontMetrics(workoutWidget()->bigFont);
+        QRect textBound = fontMetrics.boundingRect(workoutWidget()->cursorBlockText);
+        painter->setFont(workoutWidget()->bigFont);
+        painter->setPen(GColor(CPLOTMARKER));
 
-        painter->fillPath(workoutWidget()->cursorBlock, QBrush(linearGradient));
+        QPointF where(workoutWidget()->cursorBlock.boundingRect().center().x()-(textBound.width()/2), 
+                      workoutWidget()->cursorBlock.boundingRect().bottom()-10); 
+
+        painter->drawText(where, workoutWidget()->cursorBlockText);
     }
 }
 
