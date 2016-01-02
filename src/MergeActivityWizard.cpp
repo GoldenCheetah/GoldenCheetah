@@ -680,6 +680,9 @@ MergeChoose::MergeChoose(MergeActivityWizard *parent) : QWizardPage(parent), wiz
         add->setText(2, rideItem->dateTime.toString("hh:mm:ss"));
     }
 
+    // Sort by date descending
+    files->invisibleRootItem()->sortChildren(0, Qt::DescendingOrder);
+
     layout->addWidget(files);
     connect(files, SIGNAL(itemSelectionChanged()), this, SLOT(selected()));
 }
