@@ -28,7 +28,7 @@ ANTLogger::open()
 {
     if (isLogging) return;
 
-    antlog.setFileName("antlog.bin");
+    antlog.setFileName("antlog2.bin");
     antlog.open(QIODevice::WriteOnly | QIODevice::Truncate);
     isLogging=true;
 }
@@ -44,9 +44,16 @@ ANTLogger::close()
 
 void ANTLogger::logRawAntMessage(const ANTMessage message, const struct timeval timestamp)
 {
-    Q_UNUSED(timestamp); // not used at present
     if (isLogging) {
         QDataStream out(&antlog);
+
+        uint64_t millis = (timestamp.tv_sec * (uint64_t)1000) + (timestamp.tv_usec / 1000);
+
+        for (int i=0; i<8; i++) {
+            uint8_t c = (millis & 0xFF);
+            out << c;
+            millis = millis >> 8;
+        }
 
         for (int i=0; i<ANT_MAX_MESSAGE_SIZE; i++)
             out<<message.data[i];
