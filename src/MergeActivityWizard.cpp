@@ -932,11 +932,13 @@ MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     layout->addStretch();
 
     QLabel *adjust = new QLabel(tr("Adjust:"));
+    offsetLabel = new QLabel("--");
     adjustSlider = new QSlider(Qt::Horizontal, this);
     reset = new QPushButton(tr("Reset"));
 
     QHBoxLayout *hl = new QHBoxLayout;
     hl->addWidget(adjust);
+    hl->addWidget(offsetLabel);
     hl->addWidget(adjustSlider);
     hl->addWidget(reset);
     layout->addLayout(hl);
@@ -990,6 +992,8 @@ MergeAdjust::initializePage()
 void 
 MergeAdjust::offsetChanged()
 {
+    offsetLabel->setText(QString("%1 secs").arg(adjustSlider->value() * -1));
+
     if (adjustSlider->value() < 0) {
         wizard->offset1 = adjustSlider->value() * -1;
         wizard->offset2 = 0;
