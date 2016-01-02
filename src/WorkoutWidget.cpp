@@ -641,6 +641,13 @@ WorkoutWidget::selectPoints()
     // if they are not then unset selecting
     QRectF rect(onRect,atRect);
     foreach(WWPoint *p, points_) {
+
+        // experiment with deselecting when using a 
+        // rect selection tool since more often than
+        // not I keep forgetting points are highlighted
+        // XXX maybe a keyboard modifier in the future ?
+        p->selected=false;
+
         if (p->bounding().intersects(rect))
             p->selecting = true;
         else
