@@ -49,6 +49,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // selection tool
     rect = new WWRect(workout);
 
+    // block cursos
+    bcursor = new WWBlockCursor(workout);
+
     // setup the toolbar
     toolbar = new QToolBar(this);
     toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
