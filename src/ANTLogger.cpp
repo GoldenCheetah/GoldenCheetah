@@ -28,7 +28,7 @@ ANTLogger::open()
 {
     if (isLogging) return;
 
-    antlog.setFileName("antlog2.bin");
+    antlog.setFileName("antlog.raw");
     antlog.open(QIODevice::WriteOnly | QIODevice::Truncate);
     isLogging=true;
 }
