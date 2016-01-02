@@ -1415,8 +1415,12 @@ MeanMaxComputer::run()
 void RideFileCache::fastSearch(QVector<int>&input, QVector<int>&ride_bests)
 {
     // use the raw C structure to reduce overhead and on stack
-    // to avoid memory management conflicts with QT
+    // Although with MSVC we have no choice, sadly.
+#ifdef Q_CC_MSVC
+    data_t *dataseries_i = new data_t[input.count()+1];
+#else
     data_t dataseries_i[input.count()+1];
+#endif
     data_t acc=0;
 
     // resize output
@@ -1451,6 +1455,9 @@ void RideFileCache::fastSearch(QVector<int>&input, QVector<int>&ride_bests)
         else if (i<7200) i += 120;
         else i += 300;
     }
+#ifdef Q_CC_MSVC
+    delete dataseries_i;
+#endif
 
     // since we minimise the search space over
     // longer durations we need to fill in the gaps
