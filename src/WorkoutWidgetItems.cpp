@@ -202,6 +202,9 @@ WWPoint::paint(QPainter *painter)
 void
 WWLine::paint(QPainter *painter)
 {
+    // cursor (we pain the block the cursor is in
+    QPoint c = workoutWidget()->mapFromGlobal(QCursor::pos());
+
     // thin ?
     QPen linePen(GColor(CPOWER));
     linePen.setWidth(1);
@@ -209,10 +212,12 @@ WWLine::paint(QPainter *painter)
 
     QPoint origin = workoutWidget()->transform(0,0);
     QPainterPath path(QPointF(origin.x(), origin.y()));
+    QPainterPath cursorBlock;
 
     // join the dots and make a path as you go
     QPointF last(0,0);
 
+    bool foundCursor=false;
     foreach(WWPoint *p, workoutWidget()->points()) {
 
         // might be better to always use float?
@@ -220,9 +225,26 @@ WWLine::paint(QPainter *painter)
         QPointF dot(center.x(), center.y());
 
         // path...
-        
         if (last.x() && last.y()) painter->drawLine(last, dot);
         path.lineTo(dot);
+
+        // cursor in ?
+        if (last.x() > 0 && !foundCursor && c.x() > last.x() && c.x() < dot.x() && dot.x() > last.x()) {
+
+            // we found it then
+            foundCursor = true;
+
+            // found the cursor
+            QPointF begin(last.x(), workoutWidget()->canvas().bottom());
+            QPainterPath block(begin);
+            block.lineTo(last);
+            block.lineTo(dot);
+            block.lineTo(dot.x(),begin.y());
+            block.lineTo(begin);
+            cursorBlock = block;
+        }
+
+        // moving on
         last = dot;
     }
 
@@ -246,8 +268,23 @@ WWLine::paint(QPainter *painter)
             linearGradient.setColorAt(1.0, brush_color2);
             linearGradient.setSpread(QGradient::PadSpread);
 
-        painter->fillPath(path, QBrush(linearGradient));
+            painter->fillPath(path, QBrush(linearGradient));
     }
+
+    if (foundCursor) {
+            QColor brush_color1 = GColor(CPLOTMARKER);
+            brush_color1.setAlpha(240);
+            QColor brush_color2 = GColor(CPLOTMARKER);
+            brush_color2.setAlpha(128);
+
+            QLinearGradient linearGradient(0, 0, 0, workoutWidget()->transform(0,0).y());
+            linearGradient.setColorAt(0.0, brush_color1);
+            linearGradient.setColorAt(1.0, brush_color2);
+            linearGradient.setSpread(QGradient::PadSpread);
+
+            painter->fillPath(cursorBlock, QBrush(linearGradient));
+    }
+
 }
 
 void
