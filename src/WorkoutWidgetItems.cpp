@@ -273,8 +273,9 @@ WWRect::paint(QPainter *painter)
 void
 WWBlockCursor::paint(QPainter *painter)
 {
-    // is the block cursor valid?
-    if (workoutWidget()->cursorBlock != QPainterPath()) {
+    // are we busy resizing and stuff and is the block cursor valid?
+    if (workoutWidget()->state == WorkoutWidget::none &&
+        workoutWidget()->cursorBlock != QPainterPath()) {
 
         QColor brush_color1 = GColor(CPLOTMARKER);
         brush_color1.setAlpha(240);

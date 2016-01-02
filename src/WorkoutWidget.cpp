@@ -53,7 +53,7 @@ static const int YMOVE = 1; // how many to move Y when cursoring
 static bool GRIDLINES = true;
 
 WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
-    QWidget(parent),  ergFile(NULL), state(none), dragging(NULL), parent(parent), context(context), stackptr(0)
+    QWidget(parent),  state(none), ergFile(NULL), dragging(NULL), parent(parent), context(context), stackptr(0)
 {
     maxX_=3600;
     maxY_=300;
@@ -384,7 +384,15 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     // ALL DONE
 
     // trigger an update if one is needed
-    if (updateNeeded) update();
+    if (updateNeeded) {
+
+        // the cursor may now hover over a block or point
+        // but don't interfere whilst state processing
+        if (state == none) setBlockCursor();
+
+        // repaint
+        update();
+    }
 
     // return false - we are eavesdropping not processing.
     // except for wheel events which we steal
