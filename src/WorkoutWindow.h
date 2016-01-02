@@ -57,6 +57,8 @@ class WorkoutWindow : public GcWindow
         QAction *saveAct, *undoAct, *redoAct,
                 *drawAct, *selectAct;
 
+        bool draw; // draw or select mode?
+
    public slots:
 
         // toolbar functions
