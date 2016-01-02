@@ -133,7 +133,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     //
 
     //
-    // 1 MOUSE MOVE
+    // 1 MOUSE MOVE [we always repaint]
     //
     if (event->type() == QEvent::MouseMove) {
 
@@ -157,12 +157,10 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
                     if (point->bounding().contains(p)) {
                         if (!point->hover) {
                             point->hover = true;
-                            updateNeeded=true;
                         }
                     } else {
                         if (point->hover) {
                             point->hover = false;
-                            updateNeeded=true;
                         }
                     }
                 }
@@ -173,7 +171,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
             // we're dragging this point around, get on and
             // do that, but apply constrains
             if (dragging) {
-                updateNeeded = movePoint(p);
+                movePoint(p);
 
                 // this may possibly be too expensive
                 // on slower hardware?
@@ -188,8 +186,11 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 
             // we're selecting via a rectangle
             atRect = p;
-            updateNeeded=selectPoints(); // go and check / select
+            selectPoints(); // go and check / select
         }
+
+        // always repaint...
+        repaint();
     }
 
     //
