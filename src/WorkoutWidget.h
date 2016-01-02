@@ -91,6 +91,12 @@ class WorkoutWidget : public QWidget
 
         WorkoutWidget(WorkoutWindow *parent, Context *context);
 
+        // interaction state;
+        // none - initial state
+        // drag - dragging a point around
+        // rect - rectangle select tool active
+        enum { none, drag, rect } state;
+
         // adding items and points
         void addItem(WorkoutWidgetItem*x) { children_.append(x); }
         void addPoint(WWPoint*x) { points_.append(x); }
@@ -164,11 +170,6 @@ class WorkoutWidget : public QWidget
 
     protected:
 
-        // interaction state;
-        // none - initial state
-        // drag - dragging a point around
-        // rect - rectangle select tool active
-        enum { none, drag, rect } state;
         WWPoint *dragging;
 
         // interacting with points
