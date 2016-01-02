@@ -171,6 +171,7 @@ class WorkoutWidget : public QWidget
         bool movePoint(QPoint p);
         bool createPoint(QPoint p);
         bool scale(QPoint p);
+        bool movePoints(int, Qt::KeyboardModifiers);
 
         // deleting
         bool deleteSelected();

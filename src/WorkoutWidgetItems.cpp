@@ -347,6 +347,29 @@ CreatePointCommand::redo()
         workoutWidget()->points().insert(index, p);
 }
 
+MovePointsCommand::MovePointsCommand(WorkoutWidget *w, QList<PointMemento> before, QList<PointMemento> after)
+ : WorkoutWidgetCommand(w), before(before), after(after) { }
+
+void
+MovePointsCommand::undo()
+{
+    foreach(PointMemento m, before) {
+        WWPoint *p = workoutWidget()->points()[m.index];
+        p->x = m.x;
+        p->y = m.y;
+    }
+}
+
+void
+MovePointsCommand::redo()
+{
+    foreach(PointMemento m, after) {
+        WWPoint *p = workoutWidget()->points()[m.index];
+        p->x = m.x;
+        p->y = m.y;
+    }
+}
+
 MovePointCommand::MovePointCommand(WorkoutWidget *w, QPointF before, QPointF after, int index)
  : WorkoutWidgetCommand(w), before(before), after(after), index(index) { }
 

@@ -166,6 +166,16 @@ class WWWBLine : public WorkoutWidgetItem {
 //
 // COMMANDS
 //
+
+// mementos before and after used by commands
+struct PointMemento {
+
+    public:
+        PointMemento(double x, double y, int index) : x(x), y(y), index(index) {}
+        double x,y;
+        int index;
+};
+
 class CreatePointCommand : public WorkoutWidgetCommand
 {
     public:
@@ -183,7 +193,7 @@ class CreatePointCommand : public WorkoutWidgetCommand
 class MovePointCommand : public WorkoutWidgetCommand
 {
     public:
-            MovePointCommand(WorkoutWidget *w, QPointF before, QPointF after, int index);
+        MovePointCommand(WorkoutWidget *w, QPointF before, QPointF after, int index);
         void redo();
         void undo();
 
@@ -192,6 +202,18 @@ class MovePointCommand : public WorkoutWidgetCommand
         //state info
         QPointF before, after;
         int index;
+};
+
+class MovePointsCommand : public WorkoutWidgetCommand
+{
+    public:
+        MovePointsCommand(WorkoutWidget *w, QList<PointMemento> before, QList<PointMemento> after);
+        void redo();
+        void undo();
+
+    private:
+
+        QList<PointMemento> before, after;
 };
 
 class ScaleCommand : public WorkoutWidgetCommand
@@ -205,14 +227,6 @@ class ScaleCommand : public WorkoutWidgetCommand
     private:
         double up, down;
         bool scaleup;
-};
-
-struct PointMemento {
-
-    public:
-        PointMemento(double x, double y, int index) : x(x), y(y), index(index) {}
-        double x,y;
-        int index;
 };
 
 class DeleteWPointsCommand : public WorkoutWidgetCommand
