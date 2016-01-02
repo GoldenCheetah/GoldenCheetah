@@ -1068,8 +1068,8 @@ void RideFileCache::RideFileCache::compute()
 
 */
 
-data_t *
-MeanMaxComputer::integrate_series(cpintdata &data)
+static data_t *
+integrate_series(cpintdata &data)
 {
     // would be better to do pure QT and use QVector -- but no memory leak
     data_t *integrated= (data_t *)malloc(sizeof(data_t)*(data.points.size()+1)); 
@@ -1085,8 +1085,8 @@ MeanMaxComputer::integrate_series(cpintdata &data)
     return integrated;
 }
 
-data_t
-MeanMaxComputer::partial_max_mean(data_t *dataseries_i, int start, int end, int length, int *offset)
+static data_t
+partial_max_mean(data_t *dataseries_i, int start, int end, int length, int *offset)
 {
     int i=0;
     data_t candidate=0;
@@ -1106,8 +1106,8 @@ MeanMaxComputer::partial_max_mean(data_t *dataseries_i, int start, int end, int 
 }
 
 
-data_t
-MeanMaxComputer::divided_max_mean(data_t *dataseries_i, int datalength, int length, int *offset)
+static data_t
+divided_max_mean(data_t *dataseries_i, int datalength, int length, int *offset)
 {
     int shift=length;
 
@@ -1406,6 +1406,58 @@ MeanMaxComputer::run()
         // convert from double to long, preserving the
         // precision by applying a multiplier
         array[i] = ride_bests[i]; // * decimals; -- we did that earlier
+    }
+}
+
+// self-contained static routine to perform the fast search algorithm
+// on a single series of data, using ints only assuming data is in 1s 
+// intervals with no data issues.
+void RideFileCache::fastSearch(QVector<int>&input, QVector<int>&ride_bests)
+{
+    // use the raw C structure to reduce overhead and on stack
+    // to avoid memory management conflicts with QT
+    data_t dataseries_i[input.count()+1];
+    data_t acc=0;
+
+    // resize output
+    ride_bests.resize(input.count()+1);
+
+    // aggregate here, instead of using utility function
+    int j=0;
+    for (; j<input.count(); j++) {
+        dataseries_i[j]=acc;
+        acc+=input[j];
+    }
+    dataseries_i[j]=acc;
+
+    // run the algorithm
+    for (int i=1; i<input.count();) {
+
+        int offset;
+        data_t c=divided_max_mean(dataseries_i,input.count(),i,&offset);
+
+        // snaffle it away
+        int sec = i;
+        data_t val = c / (data_t)i;
+
+        // save away
+        ride_bests[sec] = val;
+
+        // increments to limit search scope
+        if (i<120) i++;
+        else if (i<600) i+= 2;
+        else if (i<1200) i += 5;
+        else if (i<3600) i += 20;
+        else if (i<7200) i += 120;
+        else i += 300;
+    }
+
+    // since we minimise the search space over
+    // longer durations we need to fill in the gaps
+    int last=0;
+    for (int i=ride_bests.size()-1; i; i--) {
+        if (ride_bests[i] == 0) ride_bests[i]=last;
+        else last = ride_bests[i];
     }
 }
 
