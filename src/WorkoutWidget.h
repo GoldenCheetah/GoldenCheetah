@@ -145,6 +145,7 @@ class WorkoutWidget : public QWidget
 
         // the block the cursor is hovering in
         QPainterPath cursorBlock;
+        QString cursorBlockText;
 
    public slots:
 
