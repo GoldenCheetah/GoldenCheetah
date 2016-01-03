@@ -271,6 +271,7 @@
 #define GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH "<athlete-private>google-drive/last_access_token_refresh"
 
 #define GC_GOOGLE_DRIVE_FOLDER          "<athlete-private>google-drive/folder"
+#define GC_GOOGLE_DRIVE_FOLDER_ID       "<athlete-private>google-drive/folder_id"
 #define GC_TWITTER_TOKEN                "<athlete-private>twitter_token"
 #define GC_TWITTER_SECRET               "<athlete-private>twitter_secret"
 //Google Calendar-CALDAV oauthkeys

@@ -422,6 +422,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     QLabel *googleDriveLabel = new QLabel(tr("Google Drive"));
     googleDriveLabel->setFont(current);
     googleDriveFolder = new QLineEdit(this);
+    googleDriveFolder->setReadOnly(true);
     googleDriveFolder->setText(
         appsettings->cvalue(context->athlete->cyclist,
                             GC_GOOGLE_DRIVE_FOLDER, "").toString());
@@ -450,10 +451,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     }
     QComboBox *google_drive_scope = new QComboBox;
     int item = 0;
-    const QString scope = 
-        appsettings->cvalue(
-            context->athlete->cyclist,
-            GC_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata").toString();
+    const QString scope = GoogleDrive::GetScope(context);
     google_drive_scope->setEditable(false);
     google_drive_scope->insertItem(item++, "drive.appdata");
     google_drive_scope->insertItem(item++, "drive.file");
@@ -477,7 +475,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     connect(googleDriveAuthorise, SIGNAL(clicked()), this,
             SLOT(authoriseGoogleDrive()));
 
-    QLabel *googleDriveAuthLabel = new QLabel(tr("Authorise"));    
+    QLabel *googleDriveAuthLabel = new QLabel(tr("Authorise"));
     grid->addWidget(googleDriveAuthLabel, ++row, 0);
     grid->addLayout(gdauthlayout, row, 1);  // No stretch.
     // Selecting the athlete folder in GoogleDrive
@@ -883,12 +881,12 @@ void CredentialsPage::chooseGoogleDriveFolder()
         err.exec();
         return;
     }
-
     // did the user type something ?
     QString path = googleDriveFolder->text();
     if (path == "") {
         path = appsettings->cvalue(
             context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER, "/").toString();
+        // At this point there just might be a google drive instance around?
     }
     FileStoreDialog dialog(this, &google_drive, tr("Choose Athlete Directory"),
                            path, true);
@@ -896,7 +894,11 @@ void CredentialsPage::chooseGoogleDriveFolder()
 
     // did we actually select something?
     if (ret == QDialog::Accepted) {
-        googleDriveFolder->setText(dialog.pathnameSelected());
+        path = dialog.pathnameSelected();
+        googleDriveFolder->setText(path);
+        QString id = google_drive.GetFileId(path);
+        appsettings->setCValue(context->athlete->cyclist,
+                               GC_GOOGLE_DRIVE_FOLDER_ID, id);
     }
 }
 
