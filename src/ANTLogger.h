@@ -33,7 +33,7 @@ public:
 signals:
 
 public slots:
-    void logRawAntMessage(const ANTMessage message, const struct timeval timestamp);
+    void logRawAntMessage(const unsigned char RS, const ANTMessage message, const struct timeval timestamp);
     void open();
     void close();
 
