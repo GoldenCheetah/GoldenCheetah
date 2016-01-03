@@ -373,6 +373,41 @@ CreatePointCommand::redo()
         workoutWidget()->points().insert(index, p);
 }
 
+// create a block
+CreateBlockCommand::CreateBlockCommand(WorkoutWidget *w, QList<PointMemento>&points)
+   : WorkoutWidgetCommand(w), points(points) { }
+
+// undo create block
+void
+CreateBlockCommand::undo()
+{
+    // delete the points in reverse
+    for (int i=points.count()-1; i>=0; i--) {
+        WWPoint *p = NULL;
+        if (points[i].index >= 0) p = workoutWidget()->points().takeAt(points[i].index);
+        else p = workoutWidget()->points().takeAt(workoutWidget()->points().count()-1);
+        delete p;
+    }
+}
+
+// do it again
+void
+CreateBlockCommand::redo()
+{
+    // add the points forward
+    foreach(PointMemento m, points) {
+
+        // create a new WWPoint
+        WWPoint *p = new WWPoint(workoutWidget(), m.x,m.y, false);
+
+        // -1 means append
+        if (m.index < 0)
+            workoutWidget()->points().append(p);
+        else
+            workoutWidget()->points().insert(m.index, p);
+        }
+}
+
 MovePointsCommand::MovePointsCommand(WorkoutWidget *w, QList<PointMemento> before, QList<PointMemento> after)
  : WorkoutWidgetCommand(w), before(before), after(after) { }
 

@@ -208,6 +208,20 @@ class CreatePointCommand : public WorkoutWidgetCommand
         int index;
 };
 
+class CreateBlockCommand : public WorkoutWidgetCommand
+{
+    public:
+        CreateBlockCommand(WorkoutWidget *w, QList<PointMemento>&points);
+        void redo();
+        void undo();
+
+    private:
+
+        //state info
+        QList<PointMemento> points;
+};
+
+
 class MovePointCommand : public WorkoutWidgetCommand
 {
     public:
