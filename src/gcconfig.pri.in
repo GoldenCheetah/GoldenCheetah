@@ -262,3 +262,13 @@ DEFINES += GC_VIDEO_NONE             # dont add any video playback support
 #DEFINES += GC_VIDEO_QUICKTIME        # mac only and the default
 #DEFINES += GC_VIDEO_QT5              # use QT5 qvideowidget if QT > 5.2.1
 #DEFINES += GC_VIDEO_VLC               # use VideoLan library needs VLC_INSTALL defined above
+
+
+# Using the GoldenCheetah/CloudDB feature (with a private CloudDB instance)
+# requires that you have a running instance of CloudDB on Google App Engine
+# (for details on CloudDB please check the documentation here: https://github.com/GoldenCheetah/CloudDB
+#DEFINES +=GC_CLOUD_DB_BASIC_AUTH=
+#DEFINES +=GC_CLOUD_DB_APP_NAME=
+#CloudDB = active
+
+
