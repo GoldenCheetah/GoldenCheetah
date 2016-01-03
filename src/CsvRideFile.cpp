@@ -149,6 +149,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp periCSV("mm-dd,hh:mm:ss,SmO2 Live,SmO2 Averaged,THb,Target Power,Heart Rate,Speed,Power,Cadence");
     QRegExp freemotionCSV("Stages Data", Qt::CaseInsensitive);
     QRegExp cpexportCSV("seconds, value,[ model,]* date", Qt::CaseInsensitive);
+    QRegExp rowproCSV("Date,Comment,Password,ID,Version,RowfileId,Rowfile_Id", Qt::CaseInsensitive);
 
 
     int recInterval = 1;
@@ -304,7 +305,15 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     ++lineno;
                     continue;
                }
-               else {  // default
+                else if(rowproCSV.indexIn(line) != -1) {
+                     csvType = rowpro;
+                     rideFile->setDeviceType("RowPro");
+                     rideFile->setFileFormat("RowPro CSV (csv)");
+                     unitsHeader = 10;
+                     ++lineno;
+                     continue;
+                }
+                else {  // default
                     csvType = generic;
                     rideFile->setDeviceType("Unknow");
                     rideFile->setFileFormat("Generic CSV (csv)");
@@ -354,6 +363,9 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
                 }
             }
+            if (csvType == rowpro && lineno == 8) {
+                startTime = QDateTime::fromString(line.section(',', 0, 0), "dd/MM/yyyy H:mm:ss");
+            }
             if (lineno == unitsHeader && (csvType == generic || csvType == bsx)) {
                 QRegExp timeHeaderSecs("( )*(secs|sec|time|timestamp)( )*", Qt::CaseInsensitive);
                 //QRegExp timeHeaderMins("( )*(min|minutes)( )*", Qt::CaseInsensitive);
@@ -390,7 +402,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
                 }
             }
-            else if (lineno == unitsHeader && csvType != moxy && csvType != peripedal) {
+            else if (lineno == unitsHeader && csvType != moxy && csvType != peripedal && csvType != rowpro) {
                 if (metricUnits.indexIn(line) != -1)
                     metric = true;
                 else if (englishUnits.indexIn(line) != -1)
@@ -742,6 +754,28 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     //qDebug() << seconds << avgwatts << precSecs << precWatts << ":" <<watts << "->" << precAvg;
                     precSecs = seconds;
                     //precWatts = avgwatts;
+                } else if (csvType == rowpro) {
+                    // RowPro CSV type "Time,Distance,Pace,Watts,Cals,SPM,HR,DutyCycle,Rowfile_Id"
+                    //                  0   , 1      , 2  , 3   , 4  , 5 , 6, 7       , 8
+                    // Time is milliseconds
+                    // Distance in meters
+                    // Pace is seconds per meter
+
+                    // Skip the summary at the end of the file
+                    if (line == "Type,Time,Distance,AvgPace,AvgWatts,Cals,SPM,EndHR,Rowfile_Id,AvgHR") {
+                        unitsHeader = lineno + 1000;
+                        continue;
+                    }
+                    seconds = line.section(',', 0, 0).toDouble() / 1000;
+                    minutes = seconds / 60.0f;
+                    km = line.section(',', 1, 1).toDouble() / 1000;
+                    double pace = line.section(',', 2, 2).toDouble();
+                    if (pace > 0 ) {
+                        kph = 3.6 / pace;
+                    }
+                    watts = line.section(',', 3, 3).toDouble();
+                    cad = line.section(',', 5, 5).toDouble();
+                    hr = line.section(',', 6, 6).toDouble();
 
                } else {
                     if (secsIndex > -1) {
@@ -881,6 +915,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             }
         }
     }
+
+    if (csvType == rowpro) rideFile->setTag("Sport","Row");
 
     // did we actually read any samples?
     if (rideFile->dataPoints().count() > 0) {
