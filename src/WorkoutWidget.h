@@ -95,7 +95,8 @@ class WorkoutWidget : public QWidget
         // none - initial state
         // drag - dragging a point around
         // rect - rectangle select tool active
-        enum { none, drag, rect } state;
+        // create - clicked to create
+        enum { none, create, drag, rect } state;
 
         // adding items and points
         void addItem(WorkoutWidgetItem*x) { children_.append(x); }
@@ -188,6 +189,7 @@ class WorkoutWidget : public QWidget
         bool selectClear(); // clear all selections
 
         // working with blocks
+        bool createBlock(QPoint p);
         bool setBlockCursor();
 
         void paintEvent(QPaintEvent *);
