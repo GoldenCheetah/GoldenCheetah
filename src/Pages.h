@@ -218,13 +218,14 @@ class CredentialsPage : public QScrollArea
 #if QT_VERSION >= 0x050000
         void authoriseDropbox();
         void chooseDropboxFolder();
-        void authoriseGoogleDrive();        
-        void chooseGoogleDriveFolder();        
+        void authoriseGoogleDrive();
+        void chooseGoogleDriveFolder();
+        void chooseGoogleDriveAuthScope(const QString& scope);
 #endif
         void authoriseStrava();
         void authoriseCyclingAnalytics();
         void authoriseGoogleCalendar();
-        void dvCALDAVTypeChanged(int);        
+        void dvCALDAVTypeChanged(int);
         void chooseLocalFileStoreFolder();
 
     private:
@@ -233,7 +234,7 @@ class CredentialsPage : public QScrollArea
             DRIVE,
         };
         void authoriseGoogle(GoogleType type);
-        
+
         Context *context;
 
         QLineEdit *tpUser;

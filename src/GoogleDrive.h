@@ -56,6 +56,12 @@ class GoogleDrive : public FileStore {
         virtual QList<FileStoreEntry*> readdir(
             QString path, QStringList &errors);
 
+        static QString GetScope(Context* context);
+
+        // Returns the fild id or "" if no file was found, uses the local
+        // cache to determine file id.
+        QString GetFileId(const QString& path);
+        
     public slots:
 
         // getting data
@@ -74,15 +80,18 @@ class GoogleDrive : public FileStore {
         QJsonDocument FetchNextLink(const QString& url, const QString& token);
 
         FileInfo* WalkFileInfo(const QString& path, bool foo);
-        
+
+        FileInfo* BuildDirectoriesForAthleteDirectory(const QString& path);
+            
         static QNetworkRequest MakeRequestWithURL(
             const QString& url, const QString& token, const QString& args);
         static QNetworkRequest MakeRequest(
             const QString& token, const QString& args);
         // Make QString returns a "q" string usable for searches in Google
         // Drive.
-        static QString MakeQString();
-
+        static QString MakeQString(const QString& parent);
+        QString GetRootDirId();
+        
         Context *context_;
         QNetworkAccessManager *nam_;
         FileStoreEntry *root_;

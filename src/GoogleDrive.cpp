@@ -34,7 +34,9 @@
 #include <QJsonValue>
 #include <QSharedPointer>
 
+
 #ifndef GOOGLE_DRIVE_DEBUG
+// TODO(gille): This should be a command line flag.
 #define GOOGLE_DRIVE_DEBUG false
 #endif
 #ifdef Q_CC_MSVC
@@ -62,6 +64,8 @@ namespace {
     static const QString kDirectoryMimeType =
         "application/vnd.google-apps.folder";
     static const QString kMetadataMimeType = "application/json";
+    // This is an integer but written as a string.
+    static const QString kMaxResults = "10000";
 };
 
 struct GoogleDrive::FileInfo {
@@ -69,7 +73,7 @@ struct GoogleDrive::FileInfo {
     QString id;  // This is the unique identifier.
     QString parent; // id of the parent.
     QString download_url;
-    
+
     QDateTime modified;
     int size;
     bool is_dir;
@@ -105,6 +109,11 @@ bool GoogleDrive::open(QStringList &errors) {
     root_->isDir = true;
     root_->size = 0;
 
+    FileInfo* new_root = new FileInfo;
+    new_root->name = "/";
+    new_root->id = GetRootDirId();
+    root_dir_.reset(new_root);
+    
     return true;
 }
 
@@ -115,6 +124,7 @@ bool GoogleDrive::close() {
 
 // home dire
 QString GoogleDrive::home() {
+    // TODO(gille): is this cheap or expensive, it's trivial to cache.
     return appsettings->cvalue(
         context_->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER, "").toString();
 }
@@ -159,31 +169,32 @@ bool GoogleDrive::createFolder(QString path) {
     // TODO(gille): This only supports directories in the root. Fix that.
     QStringList parts = path.split("/", QString::SkipEmptyParts);
     QString dir_name = parts.back();
-    QString parent_id;
-    if (parts.size() == 1) {
-        // We're creating in the root.
-        parent_id = "appdata";
-    } else {
-        FileInfo* parent = WalkFileInfo(path, true);
-        if (parent == NULL) {
-            // This shouldn't happen...
-            return false;
-        }
-        parent_id = parent->id;
+    FileInfo* parent_fi = WalkFileInfo(path, true);
+    if (parent_fi == NULL) {
+        // This shouldn't happen...
+        return false;
     }
-    
+
     QNetworkRequest request = MakeRequestWithURL(
         "/drive/v2/files", token, "");
 
     request.setRawHeader("Content-Type", kMetadataMimeType.toLatin1());
     //QString("multipart/mixed; boundary=\"" + boundary + "\"").toLatin1());
     printd("Creating directory %s\n", path.toStdString().c_str());
-    QString requestBody =
-        "{ title: \"" + dir_name + "\", " +
-        "  parents: [{\"id\": \"" + parent_id + "\"}], " +
-        "  mimeType: \"" + kDirectoryMimeType + "\" " +
-        "}" +
-        "\r\n";
+
+    QJsonObject json_request;
+    json_request.insert("title", QJsonValue(dir_name));
+    json_request.insert("mimeType", QJsonValue(kDirectoryMimeType));
+
+    if (parent_fi->id != "") {//FIXME
+        QJsonArray array;
+        QJsonObject parent;
+        parent.insert("id", parent_fi->id);
+        array.append(parent);
+        json_request.insert("parents", array);
+    }
+
+    QString requestBody = QJsonDocument(json_request).toJson() + "\r\n";;
     printd("Creating: %s\n", requestBody.toStdString().c_str());
 
     // post the file
@@ -233,19 +244,25 @@ GoogleDrive::FileInfo* GoogleDrive::WalkFileInfo(const QString& path,
     }
     return target;
 }
-    
+
 QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
     // Ugh. Listing files in Google Drive is "different".
     // There can be many files with the same name, directories are just metadata
     // so we just list everything and then we turn it into a normal structure
     // locally.
-    
+
+    // Note, if we call readdir on "/" we nuke all and any caches we have.
+    // This is to try and keep life "easier".
+
     printd("readdir %s\n", path.toStdString().c_str());
     // First we need to find out the folder id.
     // Then we can list the actual folder.
 
     QList<FileStoreEntry*> returning;
-
+    // Trim some / if necssary.
+    while (*path.end() == '/' && path.size() > 1) {
+        path = path.remove(path.size() - 1, 1);
+    }
     // do we have a token?
     MaybeRefreshCredentials();
     QString token = appsettings->cvalue(
@@ -255,8 +272,27 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
         errors << tr("You must authorise with GoogleDrive first");
         return returning;
     }
-    QNetworkRequest request = MakeRequest(token, MakeQString() +
-                                          QString("&maxResults=1000"));
+
+    FileInfo* parent_fi = WalkFileInfo(path, false);
+    if (parent_fi == NULL) {
+        // This can happen.. If it does we kind of have to walk our way up
+        // here even though it'll be slow and painful.
+        // We could store the directory id and find it that way... 
+
+        // Ok. Lets try to fake it out. Who knows maybe it'll work.
+        // TODO(gille): Handle an empty response/404 below?
+        if (path == home()) {
+            parent_fi = BuildDirectoriesForAthleteDirectory(path);
+        }
+            errors << tr("No such directory");
+        return returning;
+
+
+            }
+
+    QNetworkRequest request = MakeRequest(
+        token, MakeQString(parent_fi->id) +
+        QString("&maxResults=" + kMaxResults));
     QNetworkReply *reply = nam_->get(request);
 
     // blocking request
@@ -270,7 +306,7 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
         printd("Got error %d %s\n", reply->error(), r.data());
         // Return an error?
         return returning;
-    }    
+    }
     printd("reply: %s\n", r.data());
     QJsonParseError parseError;
     QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
@@ -311,10 +347,15 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
         }
         QSharedPointer<FileInfo> fi(new FileInfo);
         fi->name = file["title"].toString();
-        fi->id = file["id"].toString(); 
-        QJsonArray parents = file["parents"].toArray();        
+        fi->id = file["id"].toString();
+        QJsonArray parents = file["parents"].toArray();
         // First parent is best parent!
         fi->parent = parents.at(0).toObject()["id"].toString();
+        if (fi->parent == "") {
+            // NOTE(gille): This doesn't really happen since folders in the
+            // root belong to a specific id. But I'd rather be safe than sorry.
+            fi->parent = GetRootDirId();
+        }
         it = file.find("mimeType");
         if (it != file.end() && it->toString() == kDirectoryMimeType) {
             fi->is_dir = true;
@@ -329,30 +370,25 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
         fi->download_url = file["downloadUrl"].toString();
         file_by_id[fi->id] = fi;
     }
-    // Ok. We now have all valid files. Build the tree.
-
-    // TODO(gille): We assume that if we can't find the parent it means the
-    // parent is the root folder, we should probably store the id of the root
-    // folder.
-    QScopedPointer<FileInfo> new_root(new FileInfo);
-    new_root->name = "/";
+    // Ok. We now have all valid files. Build the tree. We only rebuild the part
+    // that we updated.
+    FileInfo* new_root;
+    if (path == "/") {
+        new_root = new FileInfo;
+        new_root->name = "/";
+        new_root->id = GetRootDirId();
+        root_dir_.reset(new_root);
+    } else {
+        new_root = parent_fi;
+        new_root->children.clear();
+    }
+    
+    // We know they're all where they should be right?
     for (std::map<QString, QSharedPointer<FileInfo> >::iterator it =
              file_by_id.begin();
          it != file_by_id.end(); ++it) {
-        std::map<QString, QSharedPointer<FileInfo> >::iterator parent =
-            file_by_id.find(it->second->parent);
-        printd("entry: %s has parent: %s\n",
-               it->second->name.toStdString().c_str(),
-               it->second->parent.toStdString().c_str());
-        if (parent == file_by_id.end()) {
-            printd("Entry: %s goes in the root\n",
-                   it->second->name.toStdString().c_str());
-            new_root->children[it->second->name] = it->second;
-        } else {
-            parent->second->children[it->second->name] = it->second;
-        }
+        new_root->children[it->second->name] = it->second;
     }
-    root_dir_.reset(new_root.take());
 
     // Ok. It's now in a nice format. Lets walk so we can return what the
     // other layers expect.
@@ -363,7 +399,7 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
     for (std::map<QString, QSharedPointer<FileInfo> >::iterator it =
              target->children.begin();
          it != target->children.end(); ++it) {
-        FileStoreEntry *add = newFileStoreEntry();        
+        FileStoreEntry *add = newFileStoreEntry();
         // Google Drive just stores the file name.
         add->name = it->second->name;
         printd("Returning entry: %s\n", add->name.toStdString().c_str());
@@ -391,7 +427,7 @@ bool GoogleDrive::readFile(QByteArray *data, QString remote_name) {
         return false;
     }
 
-    // Before this is done we know we have called readdir so we have the id.    
+    // Before this is done we know we have called readdir so we have the id.
     FileInfo* fi = WalkFileInfo(home() + "/" + remote_name, false);
     // TODO(gille): Is it worth doing readdir if this fails?
     if (fi == NULL) {
@@ -404,7 +440,7 @@ bool GoogleDrive::readFile(QByteArray *data, QString remote_name) {
         "Authorization", (QString("Bearer %1").arg(token)).toLatin1());
     // Get the file.
     QNetworkReply *reply = nam_->get(request);
-    // remember the file. 
+    // remember the file.
     mapReply(reply, remote_name);
     buffers.insert(reply, data);
     // catch finished signal
@@ -413,9 +449,16 @@ bool GoogleDrive::readFile(QByteArray *data, QString remote_name) {
     return true;
 }
 
-QString GoogleDrive::MakeQString() {
-    QString q = QString("q=") + QUrl::toPercentEncoding(
-        "trashed+=+false+", "+");
+// I suspect this is a bug in readdir.
+QString GoogleDrive::MakeQString(const QString& parent) {
+    QString q;
+    if (parent == "") {
+        q = QString("q=") + QUrl::toPercentEncoding(
+            "trashed+=+false+AND+'root'+IN+parents", "+");
+    } else {
+        q = QString("q=") + QUrl::toPercentEncoding(
+            "trashed+=+false+AND+'" + parent + "'+IN+parents", "+");
+    }
     return q;
 }
 
@@ -444,7 +487,7 @@ QJsonDocument GoogleDrive::FetchNextLink(
     if (parseError.error != QJsonParseError::NoError) {
         return empty_doc; // Just return an empty document.
     }
-    return document;    
+    return document;
 }
 
 bool GoogleDrive::writeFile(QByteArray &data, QString remote_name) {
@@ -460,17 +503,12 @@ bool GoogleDrive::writeFile(QByteArray &data, QString remote_name) {
     if (token == "") {
         return false;
     }
-    QString parent_id;
     QString path = home();
-    if (path == "/" || path == "") {
-        parent_id = "appdata";
-    } else {
-        FileInfo* fi = WalkFileInfo(path, false);
-        if (fi == NULL) {
-            return false;
-        }
-        parent_id = fi->id;
+    FileInfo* parent_fi = WalkFileInfo(path, false);
+    if (parent_fi == NULL) {
+        return false;
     }
+
     // GoogleDrive is a bit special, more than one file can have the same name
     // so we need to check their ID and make sure they are unique.
     FileInfo* fi = WalkFileInfo(path + "/" + remote_name, false);
@@ -496,7 +534,7 @@ bool GoogleDrive::writeFile(QByteArray &data, QString remote_name) {
         "Content-Type: " + kMetadataMimeType + "\r\n\r\n" +
         "{ title: \"" + remote_name + "\", " +
         "  parents: [" +
-        "    {\"id\": \"" + parent_id + "\"} " +
+        "    {\"id\": \"" + parent_fi->id + "\"} " +
         "  ] " +
         "}" +
         delimiter +
@@ -617,4 +655,61 @@ void GoogleDrive::MaybeRefreshCredentials() {
             GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH,
             now.toString());
     }
+}
+
+QString GoogleDrive::GetScope(Context* context) {
+    return appsettings->cvalue(
+        context->athlete->cyclist,
+        GC_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata").toString();
+}
+
+QString GoogleDrive::GetRootDirId() {
+    if (GetScope(context_) == "drive.appdata") {
+        return "appdata";
+    } else {
+        return "root";
+    }        
+}    
+
+QString GoogleDrive::GetFileId(const QString& path) {
+    FileInfo* fi = WalkFileInfo(path, false);
+    if (fi == NULL) {
+        return "";
+    }
+    return fi->id;
+}
+
+GoogleDrive::FileInfo* GoogleDrive::BuildDirectoriesForAthleteDirectory(
+    const QString& path) {
+    // Because Google Drive is a little bit "different" we can't just read
+    // "/foo/bar/baz, we need to know the id's of both foo and bar to find
+    // baz.
+
+    const QString id = appsettings->cvalue(
+        context_->athlete->cyclist,
+        GC_GOOGLE_DRIVE_FOLDER_ID, "").toString();
+    if (id == "") {
+        return NULL;
+    }
+        
+    QStringList parts = path.split("/", QString::SkipEmptyParts);
+    FileInfo *fi = root_dir_.data();
+
+    for (QStringList::iterator it = parts.begin(); it != parts.end(); ++it) {
+        std::map<QString, QSharedPointer<FileInfo> >::iterator next = 
+            fi->children.find(*it);
+        if (next == fi->children.end()) {
+            QSharedPointer<FileInfo> next_fi(new FileInfo);
+            next_fi->name = *it;
+            next_fi->id = " INVALID ";
+            next_fi->parent = " INVALID ";
+            fi->children[*it] = next_fi;
+            fi = next_fi.data();
+        } else {
+            fi = next->second.data();
+        }        
+    }
+    // Overwrite the final directory.
+    fi->id = id;
+    return fi;
 }
