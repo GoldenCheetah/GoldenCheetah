@@ -817,6 +817,8 @@ WorkoutWidget::createBlock(QPoint p)
                 }
             }
 
+            if (prev == -1 || next == -1) return false;
+
             // it will be as wide as the distance from the nearest
             // point divided by 1.5 (1width space, 1width / 2 for centre)
             int left = (to.x() - points_[prev]->x);
