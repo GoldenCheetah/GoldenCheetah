@@ -1422,6 +1422,7 @@ LTMPlot::setCompareData(LTMSettings *set)
         // we need to do this for each date range as they are dependant
         // on the metrics chosen and can't be pre-cached
         settings->specification.setDateRange(DateRange(cd.start, cd.end));
+        settings->specification.setFilterSet(cd.specification.filterSet());
 
         // bests...
         QList<RideBest> herebests;
