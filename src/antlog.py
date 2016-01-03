@@ -15,13 +15,17 @@ import os
 import struct
 
 file = open(sys.argv[1], 'rb')
-for line in range(0, os.path.getsize(sys.argv[1]), 20):
+for line in range(0, os.path.getsize(sys.argv[1]), 21):
+
+  data = file.read(1)
+  RS = data[0];
 
   data = file.read(8)
   timestamp = struct.unpack('L', data)[0]
 
   data = file.read(12)
-  print str(timestamp) + ': ' \
+  print str(timestamp) + ' - ' \
+      + RS  + ': ' \
       + '0x' + (data[0]).encode('hex').upper()  + ', ' \
       + '0x' + (data[1]).encode('hex').upper()  + ', ' \
       + '0x' + (data[2]).encode('hex').upper()  + ', ' \
