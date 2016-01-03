@@ -42,10 +42,12 @@ ANTLogger::close()
     isLogging=false;
 }
 
-void ANTLogger::logRawAntMessage(const ANTMessage message, const struct timeval timestamp)
+void ANTLogger::logRawAntMessage(const unsigned char RS, const ANTMessage message, const struct timeval timestamp)
 {
     if (isLogging) {
         QDataStream out(&antlog);
+
+        out << RS;
 
         uint64_t millis = (timestamp.tv_sec * (uint64_t)1000) + (timestamp.tv_usec / 1000);
 

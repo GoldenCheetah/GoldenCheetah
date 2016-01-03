@@ -44,7 +44,8 @@ ANTlocalController::ANTlocalController(TrainSidebar *parent, DeviceConfiguration
     connect(myANTlocal, SIGNAL(antRemoteControl(uint16_t)), this, SLOT(antRemoteControl(uint16_t)));
 
     // Connect a logger
-    connect(myANTlocal, SIGNAL(receivedAntMessage(const ANTMessage ,const timeval )), &logger, SLOT(logRawAntMessage(const ANTMessage ,const timeval)));
+    connect(myANTlocal, SIGNAL(receivedAntMessage(const unsigned char, const ANTMessage ,const timeval )), &logger, SLOT(logRawAntMessage(const unsigned char, const ANTMessage ,const timeval)));
+    connect(myANTlocal, SIGNAL(sentAntMessage(const unsigned char, const ANTMessage ,const timeval )), &logger, SLOT(logRawAntMessage(const unsigned char, const ANTMessage ,const timeval)));
 }
 
 void
