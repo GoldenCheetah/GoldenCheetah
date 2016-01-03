@@ -426,9 +426,7 @@ FileStoreDialog::createFolderClicked()
 {
     FolderNameDialog dialog(this);
     int ret = dialog.exec();
-    printf("CREATE\n");
     if (ret == QDialog::Accepted && dialog.name() != "") {
-        printf("CREATE22\n");
         // go and create it !
         store->createFolder(pathname + "/" + dialog.name());
 
