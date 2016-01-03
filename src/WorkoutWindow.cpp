@@ -36,6 +36,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // the workout scene
     workout = new WorkoutWidget(this, context);
 
+    // paint the W'bal curve
+    mmp = new WWMMPCurve(workout);
+
     // add the power and W'bal scale
     powerscale = new WWPowerScale(workout, context);
     wbalscale = new WWWBalScale(workout, context);

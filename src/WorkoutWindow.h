@@ -43,6 +43,7 @@ class WWWBLine;
 class WWRect;
 class WWBlockCursor;
 class WWBlockSelection;
+class WWMMPCurve;
 
 class WorkoutWindow : public GcWindow
 {
@@ -85,6 +86,7 @@ class WorkoutWindow : public GcWindow
         WWRect *rect;
         WWBlockCursor *bcursor;
         WWBlockSelection *brect;
+        WWMMPCurve *mmp;
         bool active;
 };
 
