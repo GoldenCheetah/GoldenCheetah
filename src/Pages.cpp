@@ -376,7 +376,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     connect(twitterAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTwitter()));
 #endif
-    
+
 #if QT_VERSION >= 0x050000 // only in QT5 or higher
     //
     // Authorising Dropbox via an OAuthDialog...
@@ -425,7 +425,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     googleDriveFolder->setText(
         appsettings->cvalue(context->athlete->cyclist,
                             GC_GOOGLE_DRIVE_FOLDER, "").toString());
-    QLabel *googleDriveAuthLabel = new QLabel(tr("Authorise"));
 
     googleDriveAuthorise = new QPushButton(tr("Authorise"), this);
     googleDriveAuthorised = new QPushButton(this);
@@ -436,27 +435,60 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     googleDriveAuthorised->setFixedWidth(16);
 
     grid->addWidget(googleDriveLabel, ++row, 0);
-    grid->addWidget(googleDriveAuthLabel, ++row, 0);
-    grid->addWidget(googleDriveAuthorise, row, 1,
-                    Qt::AlignLeft | Qt::AlignVCenter);
+
+    QHBoxLayout *gdauthlayout = new QHBoxLayout;
+    //grid->addWidget(googleDriveAuthorise, row, 1,
+    //Qt::AlignLeft | Qt::AlignVCenter);
+    gdauthlayout->addWidget(googleDriveAuthorise);
     if (appsettings->cvalue(context->athlete->cyclist,
                             GC_GOOGLE_DRIVE_REFRESH_TOKEN, "") != "") {
-        grid->addWidget(googleDriveAuthorised, row, 2,
-                        Qt::AlignLeft | Qt::AlignVCenter);
+        //grid->addWidget(googleDriveAuthorised, row, 2,
+        //Qt::AlignLeft | Qt::AlignVCenter);
+        gdauthlayout->addWidget(googleDriveAuthorised);
     } else {
         googleDriveAuthorised->hide(); // if no token no show
     }
+    QComboBox *google_drive_scope = new QComboBox;
+    int item = 0;
+    const QString scope = 
+        appsettings->cvalue(
+            context->athlete->cyclist,
+            GC_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata").toString();
+    google_drive_scope->setEditable(false);
+    google_drive_scope->insertItem(item++, "drive.appdata");
+    google_drive_scope->insertItem(item++, "drive.file");
+    google_drive_scope->insertItem(item++, "drive");
+    if (scope == "drive.appdata") {
+        google_drive_scope->setCurrentIndex(0);
+    } else if (scope == "drive.file") {
+        google_drive_scope->setCurrentIndex(1);
+    } else if (scope == "drive") {
+        google_drive_scope->setCurrentIndex(2);
+    } else {
+        google_drive_scope->setCurrentIndex(0);
+        // re-write default.
+        appsettings->setCValue(
+            context->athlete->cyclist,
+            GC_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata");
+    }
+    connect(google_drive_scope, SIGNAL(currentIndexChanged(const QString&)),
+            this, SLOT(chooseGoogleDriveAuthScope(const QString&)));
+    gdauthlayout->addWidget(google_drive_scope);
     connect(googleDriveAuthorise, SIGNAL(clicked()), this,
             SLOT(authoriseGoogleDrive()));
-    //
+
+    QLabel *googleDriveAuthLabel = new QLabel(tr("Authorise"));    
+    grid->addWidget(googleDriveAuthLabel, ++row, 0);
+    grid->addLayout(gdauthlayout, row, 1);  // No stretch.
     // Selecting the athlete folder in GoogleDrive
-    QLabel *googleDriveFolderLabel = new QLabel(tr("Athlete Folder"));
     googleDriveBrowse = new QPushButton(tr("Browse"));
     connect(googleDriveBrowse, SIGNAL(clicked()), this,
             SLOT(chooseGoogleDriveFolder()));
     QHBoxLayout *gdfchoose = new QHBoxLayout;
     gdfchoose->addWidget(googleDriveFolder);
     gdfchoose->addWidget(googleDriveBrowse);
+
+    QLabel *googleDriveFolderLabel = new QLabel(tr("Athlete Folder"));
     grid->addWidget(googleDriveFolderLabel, ++row, 0);
     grid->addLayout(gdfchoose, row, 1);
 #endif
@@ -662,7 +694,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
 #if QT_VERSION >= 0x050000 // only in QT5 or higher
 #endif
-    
+
     grid->addWidget(dv, ++row, 0);
 
     grid->addWidget(dvTypeLabel, ++row, 0);
@@ -837,7 +869,6 @@ void CredentialsPage::chooseDropboxFolder()
     if (ret == QDialog::Accepted) dropboxFolder->setText(dialog.pathnameSelected());
 }
 
-
 void CredentialsPage::chooseGoogleDriveFolder()
 {
     GoogleDrive google_drive(context);
@@ -867,6 +898,16 @@ void CredentialsPage::chooseGoogleDriveFolder()
     if (ret == QDialog::Accepted) {
         googleDriveFolder->setText(dialog.pathnameSelected());
     }
+}
+
+void CredentialsPage::chooseGoogleDriveAuthScope(const QString& scope) {
+    appsettings->setCValue(context->athlete->cyclist,
+                           GC_GOOGLE_DRIVE_AUTH_SCOPE, scope);
+    // Clear out now invalid access tokens.
+    appsettings->setCValue(context->athlete->cyclist,
+                           GC_GOOGLE_DRIVE_ACCESS_TOKEN, "");
+    appsettings->setCValue(context->athlete->cyclist,
+                           GC_GOOGLE_DRIVE_REFRESH_TOKEN, "");
 }
 #endif
 
@@ -2731,7 +2772,7 @@ CustomMetricsPage::editClicked()
     QTreeWidgetItem *item = table->selectedItems().first();
     int row = table->invisibleRootItem()->indexOfChild(item);
 
-    // edit it 
+    // edit it
     UserMetricSettings here = metrics[row];
 
     EditUserMetricDialog editor(context, here);

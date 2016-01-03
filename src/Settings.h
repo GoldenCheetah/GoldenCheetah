@@ -265,6 +265,7 @@
 //Twitter oauth keys
 #define GC_DROPBOX_TOKEN                "<athlete-private>dropbox/token"
 #define GC_DROPBOX_FOLDER               "<athlete-private>dropbox/folder"
+#define GC_GOOGLE_DRIVE_AUTH_SCOPE      "<athlete-private>google-drive/auth_scope"
 #define GC_GOOGLE_DRIVE_ACCESS_TOKEN   "<athlete-private>google-drive/access_token"
 #define GC_GOOGLE_DRIVE_REFRESH_TOKEN   "<athlete-private>google-drive/refresh_token"
 #define GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH "<athlete-private>google-drive/last_access_token_refresh"
