@@ -31,10 +31,17 @@
 #include <QRect>
 
 // types
-#define GCWW_SCALE  1
-#define GCWW_POINT  2
-#define GCWW_LINE   3
+#define GCWW_SCALE     1
+#define GCWW_POINT     2
+#define GCWW_LINE      3
+#define GCWW_WBALSCALE 4 //W'bal
+#define GCWW_WBLINE    5
+#define GCWW_RECT      6 // selection rectangle
+#define GCWW_BCURSOR   7 // interval "block" cursor
 
+//
+// ITEMS
+//
 class WWPowerScale : public WorkoutWidgetItem {
 
     public:
@@ -54,13 +61,32 @@ class WWPowerScale : public WorkoutWidgetItem {
         Context *context; // for athlete zones etc
 };
 
+class WWWBalScale : public WorkoutWidgetItem {
+
+    public:
+
+        WWWBalScale(WorkoutWidget *w, Context *c);
+
+        // Reimplement in children
+        int type() { return GCWW_WBALSCALE; }
+
+        void paint(QPainter *painter);
+
+        // locate me on the parent widget in paint coordinates
+        QRectF bounding() { return workoutWidget()->right(); }
+
+    private:
+
+        Context *context; // for athlete zones etc
+};
+
 // is a point, can be manipulated ...
 class WWPoint : public WorkoutWidgetItem {
 
     public:
 
         WWPoint(WorkoutWidget *w, double x, double y, bool append=true) : 
-                WorkoutWidgetItem(w), hover(false), selected(false), x(x), y(y) { if (append) w->addPoint(this); }
+                WorkoutWidgetItem(w), hover(false), selected(false), selecting(false), x(x), y(y) { if (append) w->addPoint(this); }
 
         // Reimplement in children
         int type() { return GCWW_POINT; }
@@ -69,8 +95,10 @@ class WWPoint : public WorkoutWidgetItem {
 
         // locate me on the parent widget in paint coordinates
         QRectF bounding() { return bound; }
-        bool hover;
-        bool selected;
+
+        bool hover;     // mouse hovering
+        bool selected;  // has been selected
+        bool selecting; // in the process of being selected (rect tool)
 
         double x, y;
 
@@ -97,5 +125,138 @@ class WWLine : public WorkoutWidgetItem {
 
 };
 
+// draws a selection rectangle
+class WWRect : public WorkoutWidgetItem {
 
+    public:
+
+        WWRect(WorkoutWidget *w) : WorkoutWidgetItem(w) { w->addItem(this); }
+
+        // Reimplement in children
+        int type() { return GCWW_RECT; }
+
+        void paint(QPainter *painter);
+
+        // locate me on the parent widget in paint coordinates
+        QRectF bounding() { return QRectF(workoutWidget()->onRect,
+                                          workoutWidget()->atRect); }
+
+    private:
+
+};
+
+class WWBlockCursor : public WorkoutWidgetItem {
+
+    public:
+
+        WWBlockCursor(WorkoutWidget *w) : WorkoutWidgetItem(w) { w->addItem(this); }
+
+        // Reimplement in children
+        int type() { return GCWW_BCURSOR; }
+
+        void paint(QPainter *painter);
+
+        // locate me on the parent widget in paint coordinates
+        QRectF bounding() { return workoutWidget()->cursorBlock.boundingRect(); }
+
+    private:
+};
+
+// draws the W'bal curve
+class WWWBLine : public WorkoutWidgetItem {
+
+    public:
+
+        WWWBLine(WorkoutWidget *w, Context *context) : WorkoutWidgetItem(w), context(context) { w->addItem(this); }
+
+        // Reimplement in children
+        int type() { return GCWW_WBLINE; }
+
+        void paint(QPainter *painter);
+
+        // locate me on the parent widget in paint coordinates
+        QRectF bounding() { return QRectF(); }
+
+    private:
+        Context *context;
+};
+
+//
+// COMMANDS
+//
+
+// mementos before and after used by commands
+struct PointMemento {
+
+    public:
+        PointMemento(double x, double y, int index) : x(x), y(y), index(index) {}
+        double x,y;
+        int index;
+};
+
+class CreatePointCommand : public WorkoutWidgetCommand
+{
+    public:
+        CreatePointCommand(WorkoutWidget *w, double x, double y, int index);
+        void redo();
+        void undo();
+
+    private:
+
+        //state info
+        double x,y;
+        int index;
+};
+
+class MovePointCommand : public WorkoutWidgetCommand
+{
+    public:
+        MovePointCommand(WorkoutWidget *w, QPointF before, QPointF after, int index);
+        void redo();
+        void undo();
+
+    private:
+
+        //state info
+        QPointF before, after;
+        int index;
+};
+
+class MovePointsCommand : public WorkoutWidgetCommand
+{
+    public:
+        MovePointsCommand(WorkoutWidget *w, QList<PointMemento> before, QList<PointMemento> after);
+        void redo();
+        void undo();
+
+    private:
+
+        QList<PointMemento> before, after;
+};
+
+class ScaleCommand : public WorkoutWidgetCommand
+{
+    public:
+        ScaleCommand(WorkoutWidget *w, double up, double down, bool scaleup);
+
+        void redo();
+        void undo();
+
+    private:
+        double up, down;
+        bool scaleup;
+};
+
+class DeleteWPointsCommand : public WorkoutWidgetCommand
+{
+    public:
+
+        DeleteWPointsCommand(WorkoutWidget*w, QList<PointMemento>points);
+
+        void redo();
+        void undo();
+
+    private:
+        QList<PointMemento> points;
+};
 #endif // _GC_WorkoutWidgetItems_h

@@ -131,8 +131,8 @@
 #define GC_SETTINGS_INTERVAL_METRICS    "<global-general>rideSummaryWindow/intervalMetrics"
 #define GC_TABBAR                       "<global-general>show/tabbar"                        // show tabbar
 #define GC_WBALFORM                     "<global-general>wbal/formula"                       // wbal formula to use
-#define GC_BIKESCOREDAYS	            "<global-general>bikeScoreDays"
-#define GC_BIKESCOREMODE	            "<global-general>bikeScoreMode"
+#define GC_BIKESCOREDAYS                    "<global-general>bikeScoreDays"
+#define GC_BIKESCOREMODE                    "<global-general>bikeScoreMode"
 #define GC_WARNCONVERT                  "<global-general>warnconvert"
 #define GC_WARNEXIT                     "<global-general>warnexit"
 #define GC_HIST_BIN_WIDTH               "<global-general>histogamWindow/binWidth"
@@ -183,6 +183,12 @@
 #define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
 #define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
+#define GC_REMOTE_START                 "<global-trainmode>remote/start"
+#define GC_REMOTE_STOP                  "<global-trainmode>remote/stop"
+#define GC_REMOTE_LAP                   "<global-trainmode>remote/lap"
+#define GC_REMOTE_HIGHER                "<global-trainmode>remote/higher"
+#define GC_REMOTE_LOWER                 "<global-trainmode>remote/lower"
+#define GC_REMOTE_CALIBRATE             "<global-trainmode>remote/calibrate"
 
 // --------------------------------------------------------------------------------
 // Athlete Specific Properties - Stored in /config subfolder of the related athlete
@@ -212,8 +218,8 @@
 #define GC_AVATAR                       "<athlete-preferences>avatar"
 #define GC_DISCOVERY                    "<athlete-preferences>intervals/discovery"   // intervals to discover
 #define GC_SB_TODAY                     "<athlete-preferences>PMshowSBtoday"
-#define GC_LTS_DAYS		                "<athlete-preferences>LTSdays"
-#define GC_STS_DAYS		                "<athlete-preferences>STSdays"
+#define GC_LTS_DAYS                             "<athlete-preferences>LTSdays"
+#define GC_STS_DAYS                             "<athlete-preferences>STSdays"
 #define GC_CRANKLENGTH                  "<athlete-preferences>crankLength"
 #define GC_WHEELSIZE                    "<athlete-preferences>wheelsize"
 #define GC_USE_CP_FOR_FTP               "<athlete-preferences>cp/useforftp"                       // use CP for FTP
@@ -255,9 +261,15 @@
 #define GC_DVPASS                       "<athlete-private>dv/pass"
 #define GC_DVCALDAVTYPE                 "<athlete-private>dv/type"
 #define GC_DVGOOGLE_CALID               "<athlete-private>dv/googlecalid"
+#define GC_DVGOOGLE_DRIVE               "<athlete-private>dv/googledrive"
 //Twitter oauth keys
 #define GC_DROPBOX_TOKEN                "<athlete-private>dropbox/token"
 #define GC_DROPBOX_FOLDER               "<athlete-private>dropbox/folder"
+#define GC_GOOGLE_DRIVE_ACCESS_TOKEN   "<athlete-private>google-drive/access_token"
+#define GC_GOOGLE_DRIVE_REFRESH_TOKEN   "<athlete-private>google-drive/refresh_token"
+#define GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH "<athlete-private>google-drive/last_access_token_refresh"
+
+#define GC_GOOGLE_DRIVE_FOLDER          "<athlete-private>google-drive/folder"
 #define GC_TWITTER_TOKEN                "<athlete-private>twitter_token"
 #define GC_TWITTER_SECRET               "<athlete-private>twitter_secret"
 //Google Calendar-CALDAV oauthkeys

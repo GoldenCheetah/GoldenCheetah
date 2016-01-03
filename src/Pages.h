@@ -50,6 +50,7 @@
 #include "Season.h"
 #include "SeasonParser.h"
 #include "RideAutoImportConfig.h"
+#include "RemoteControl.h"
 
 class QGroupBox;
 class QHBoxLayout;
@@ -66,6 +67,8 @@ class FieldsPage;
 class Colors;
 class AboutRiderPage;
 class SeasonsPage;
+class DevicePage;
+class RemotePage;
 
 class GeneralPage : public QWidget
 {
@@ -215,14 +218,22 @@ class CredentialsPage : public QScrollArea
 #if QT_VERSION >= 0x050000
         void authoriseDropbox();
         void chooseDropboxFolder();
+        void authoriseGoogleDrive();        
+        void chooseGoogleDriveFolder();        
 #endif
         void authoriseStrava();
         void authoriseCyclingAnalytics();
         void authoriseGoogleCalendar();
-        void dvCALDAVTypeChanged(int);
+        void dvCALDAVTypeChanged(int);        
         void chooseLocalFileStoreFolder();
 
     private:
+        enum GoogleType {
+            CALENDAR = 1,
+            DRIVE,
+        };
+        void authoriseGoogle(GoogleType type);
+        
         Context *context;
 
         QLineEdit *tpUser;
@@ -237,6 +248,10 @@ class CredentialsPage : public QScrollArea
         QPushButton *dropboxAuthorise;
         QPushButton *dropboxAuthorised, *dropboxBrowse;
         QLineEdit *dropboxFolder;
+        QPushButton *googleDriveAuthorise;
+        QPushButton *googleDriveAuthorised;
+        QPushButton *googleDriveBrowse;
+        QLineEdit *googleDriveFolder;
 #endif
 
         QComboBox *dvCALDAVType;
@@ -314,7 +329,7 @@ class DevicePage : public QWidget
     G_OBJECT
 
     public:
-        DevicePage(QWidget *, Context *);
+        DevicePage(QWidget *parent, Context *context);
         qint32 saveClicked();
 
         QTableView *deviceList;
@@ -340,6 +355,21 @@ class DevicePage : public QWidget
         deviceModel *deviceListModel;
 
         QCheckBox   *multiCheck;
+};
+
+class RemotePage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+    public:
+        RemotePage(QWidget *parent, Context *context);
+        qint32 saveClicked();
+
+    private:
+        RemoteControl *remote;
+        Context       *context;
+        QTreeWidget   *fields;
 };
 
 class BestsMetricsPage : public QWidget
@@ -1111,6 +1141,5 @@ class IntervalsPage : public QWidget
 
     private slots:
 };
-
 
 #endif

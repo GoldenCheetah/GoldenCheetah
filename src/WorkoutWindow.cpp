@@ -22,7 +22,7 @@
 #include "WorkoutWidgetItems.h"
 
 WorkoutWindow::WorkoutWindow(Context *context) :
-    GcWindow(context), context(context), active(false)
+    GcWindow(context), draw(true), context(context), active(false)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
@@ -32,6 +32,25 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+    // the workout scene
+    workout = new WorkoutWidget(this, context);
+
+    // add the power and W'bal scale
+    powerscale = new WWPowerScale(workout, context);
+    wbalscale = new WWWBalScale(workout, context);
+
+    // add a line between the dots
+    line = new WWLine(workout);
+
+    // block cursos
+    bcursor = new WWBlockCursor(workout);
+
+    // paint the W'bal curve
+    wbline = new WWWBLine(workout, context);
+
+    // selection tool
+    rect = new WWRect(workout);
 
     // setup the toolbar
     toolbar = new QToolBar(this);
@@ -55,12 +74,12 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // icon in that instance would be horrible
     QIcon undoIcon(":images/toolbar/undo.png");
     undoAct = new QAction(undoIcon, tr("Undo"), this);
-    connect(undoAct, SIGNAL(triggered()), this, SLOT(undo()));
+    connect(undoAct, SIGNAL(triggered()), workout, SLOT(undo()));
     toolbar->addAction(undoAct);
 
     QIcon redoIcon(":images/toolbar/redo.png");
     redoAct = new QAction(redoIcon, tr("Redo"), this);
-    connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
+    connect(redoAct, SIGNAL(triggered()), workout, SLOT(redo()));
     toolbar->addAction(redoAct);
     
     toolbar->addSeparator();
@@ -75,21 +94,31 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     connect(selectAct, SIGNAL(triggered()), this, SLOT(selectMode()));
     toolbar->addAction(selectAct);
 
+    // stretch the labels to the right hand side
+    QWidget *empty = new QWidget(this);
+    empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    toolbar->addWidget(empty);
+
+
+    xlabel = new QLabel("00:00");
+    toolbar->addWidget(xlabel);
+
+    ylabel = new QLabel("150w");
+    toolbar->addWidget(ylabel);
+
+    IFlabel = new QLabel("0 IF");
+    toolbar->addWidget(IFlabel);
+
+    TSSlabel = new QLabel("0 TSS");
+    toolbar->addWidget(TSSlabel);
+
 #if 0 // not yet!
     // get updates..
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
     telemetryUpdate(RealtimeData());
 #endif
 
-    // the workout scene
-    workout = new WorkoutWidget(this, context);
-
-    // add a scale
-    powerscale = new WWPowerScale(workout, context);
-
-    // add a line between the dots
-    line = new WWLine(workout);
-
+    // WATTS and Duration for the cursor
     layout->addWidget(toolbar);
     layout->addWidget(workout);
 
@@ -104,8 +133,24 @@ void
 WorkoutWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
-    toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ").arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+    QFontMetrics fm(workout->bigFont);
+    xlabel->setFont(workout->bigFont);
+    ylabel->setFont(workout->bigFont);
+    IFlabel->setFont(workout->bigFont);
+    TSSlabel->setFont(workout->bigFont);
+    IFlabel->setFixedWidth(fm.boundingRect(" 0.85 IF ").width());
+    TSSlabel->setFixedWidth(fm.boundingRect(" 100 TSS ").width());
+    xlabel->setFixedWidth(fm.boundingRect(" 00:00:00 ").width());
+    ylabel->setFixedWidth(fm.boundingRect(" 1000w ").width());
+
+    toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ")
+                           .arg(GColor(CTRAINPLOTBACKGROUND).name())
+                           .arg(GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)).name()));
+
+    xlabel->setStyleSheet("color: darkGray;");
+    ylabel->setStyleSheet("color: darkGray;");
+    TSSlabel->setStyleSheet("color: darkGray;");
+    IFlabel->setStyleSheet("color: darkGray;");
     repaint();
 }
 
@@ -115,22 +160,14 @@ WorkoutWindow::saveFile()
 }
 
 void
-WorkoutWindow::undo()
-{
-}
-
-void
-WorkoutWindow::redo()
-{
-}
-
-void
 WorkoutWindow::drawMode()
 {
+    draw = true;
 }
 
 void
 WorkoutWindow::selectMode()
 {
+    draw = false;
 }
 

@@ -70,7 +70,20 @@ DEFINES += GC_HAVE_SOAP
 # to make sure we are toolchain neutral we NEVER refer to a lib
 # via file extensions .lib or .a in src.pro unless the section is
 # platform specific. Instead we use directives -Ldir and -llib
-LIBS += -L../qwt/lib -lqwt
+win32 {
+
+    #QWT is configured to build 2 libs (release/debug) on win32 (see qwtbuild.pri)
+    CONFIG(release, debug|release){
+    LIBS += -L../qwt/lib -lqwt
+    }
+    CONFIG(debug, debug|release) {
+    LIBS += -L../qwt/lib -lqwtd
+    }
+
+} else {
+    #QWT is configured to build 1 lib for all other OS (see qwtbuild.pri)
+    LIBS += -L../qwt/lib -lqwt
+}
 
 # compress and math libs must be defined in gcconfig.pri
 # if they're not part of the QT include
@@ -477,6 +490,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     # Features that only work with QT5 or higher
     SOURCES += Dropbox.cpp
     HEADERS += Dropbox.h
+    SOURCES += GoogleDrive.cpp
+    HEADERS += GoogleDrive.h
     SOURCES += Monark.cpp MonarkController.cpp MonarkConnection.cpp
     HEADERS += Monark.h MonarkController.h MonarkConnection.h
 }
@@ -652,6 +667,7 @@ HEADERS  += \
         RealtimePlot.h \
         RealtimePlotWindow.h \
         ReferenceLineDialog.h \
+        RemoteControl.h \
         RideAutoImportConfig.h \
         RideCache.h \
         RideCacheModel.h \
@@ -914,6 +930,7 @@ SOURCES += \
         RealtimePlot.cpp \
         RealtimePlotWindow.cpp \
         ReferenceLineDialog.cpp \
+        RemoteControl.cpp \
         RideAutoImportConfig.cpp \
         RideCache.cpp \
         RideCacheModel.cpp \

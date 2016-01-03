@@ -171,6 +171,9 @@ class RideFileCache
         static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QDate from, QDate to);
         static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QString filename);
 
+        // Fast standalone search reads input and outputs into ride_bests
+        static void fastSearch(QVector<int>&input, QVector<int>&ride_bests);
+
         // used by the API - get MM for any series for an activity or date range
         static QVector<float> meanMaxFor(QString cachFilename, RideFile::SeriesType series);
         static QVector<float> meanMaxFor(QString cacheDir, RideFile::SeriesType series, QDate from, QDate to);
@@ -401,11 +404,6 @@ class MeanMaxComputer : public QThread
         void run();
 
     private:
-
-        // Mark Rages' algorithm for fast find of mean max
-        data_t *integrate_series(cpintdata &data);
-        data_t partial_max_mean(data_t *dataseries_i, int start, int end, int length, int *offset);
-        data_t divided_max_mean(data_t *dataseries_i, int datalength, int length, int *offset);
 
         RideFile *ride;
         QVector<float> &array;

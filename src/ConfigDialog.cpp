@@ -105,7 +105,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     iconMapper->setMapping(added, 6);
 
 
-    added =head->addAction(devicesIcon, tr("Train Devices"));
+    added =head->addAction(devicesIcon, tr("Training"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 7);
 
@@ -157,10 +157,10 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     interval->setWhatsThis(intervalHelp->getWhatsThisText(HelpWhatsThis::Preferences_Intervals));
     pagesWidget->addWidget(interval);
 
-    device = new DeviceConfig(_home, context);
-    HelpWhatsThis *deviceHelp = new HelpWhatsThis(device);
-    device->setWhatsThis(deviceHelp->getWhatsThisText(HelpWhatsThis::Preferences_TrainDevices));
-    pagesWidget->addWidget(device);
+    train = new TrainConfig(_home, context);
+    HelpWhatsThis *trainHelp = new HelpWhatsThis(train);
+    train->setWhatsThis(trainHelp->getWhatsThisText(HelpWhatsThis::Preferences_Training));
+    pagesWidget->addWidget(train);
 
     closeButton = new QPushButton(tr("Close"));
     saveButton = new QPushButton(tr("Save"));
@@ -224,7 +224,7 @@ void ConfigDialog::saveClicked()
     changed |= password->saveClicked();
     changed |= metric->saveClicked();
     changed |= data->saveClicked();
-    changed |= device->saveClicked();
+    changed |= train->saveClicked();
     changed |= interval->saveClicked();
 
     hide();
@@ -464,18 +464,32 @@ qint32 IntervalConfig::saveClicked()
 }
 
 // GENERAL CONFIG
-DeviceConfig::DeviceConfig(QDir home, Context *context) :
+TrainConfig::TrainConfig(QDir home, Context *context) :
     home(home), context(context)
 {
-    devicePage = new DevicePage(this, context);
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(devicePage);
 
-    layout->setSpacing(0);
+    // the widgets
+    devicePage = new DevicePage(this, context);
+    remotePage = new RemotePage(this, context);
+
     setContentsMargins(0,0,0,0);
+    QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    QTabWidget *tabs = new QTabWidget(this);
+    tabs->addTab(devicePage, tr("Train Devices"));
+    tabs->addTab(remotePage, tr("Remote Controls"));
+
+    mainLayout->addWidget(tabs);
 }
 
-qint32 DeviceConfig::saveClicked()
+qint32 TrainConfig::saveClicked()
 {
-    return devicePage->saveClicked();
+    qint32 state = 0;
+
+    state |= devicePage->saveClicked();
+    state |= remotePage->saveClicked();
+
+    return state;
 }

@@ -21,6 +21,9 @@
 #include "GoldenCheetah.h"
 
 #include "Context.h"
+#include "Athlete.h"
+
+#include "WPrime.h"
 
 #include "Settings.h"
 #include "Units.h"
@@ -29,8 +32,11 @@
 #include <QWidget>
 #include <QRect>
 #include <QPoint>
+#include <QVector>
+#include <QPainterPath>
 
 class ErgFile;
+class WorkoutWindow;
 class WorkoutWidget;
 class WWPoint;
 class WorkoutWidgetItem {
@@ -58,23 +64,51 @@ class WorkoutWidgetItem {
         WorkoutWidget *w;
 };
 
+// base for all commands that operate on a workout (e.g. create
+// point, drag point, delete etc etc used by redo/undo
+class WorkoutWidgetCommand
+{
+    public:
+
+        WorkoutWidgetCommand(WorkoutWidget *w); // will add to stack
+        virtual ~WorkoutWidgetCommand() {}
+
+        WorkoutWidget *workoutWidget() { return workoutWidget_; }
+
+        // need to reimplement these in subclass
+        virtual void undo() = 0;
+        virtual void redo() = 0;
+
+    private:
+        WorkoutWidget *workoutWidget_;
+};
+
 class WorkoutWidget : public QWidget
 {
     Q_OBJECT
 
     public:
 
-        WorkoutWidget(QWidget *parent, Context *context);
+        WorkoutWidget(WorkoutWindow *parent, Context *context);
+
+        // interaction state;
+        // none - initial state
+        // drag - dragging a point around
+        // rect - rectangle select tool active
+        enum { none, drag, rect } state;
 
         // adding items and points
         void addItem(WorkoutWidgetItem*x) { children_.append(x); }
         void addPoint(WWPoint*x) { points_.append(x); }
 
         // get list of my items
-        QList<WorkoutWidgetItem*> children() { return children_; }
+        QList<WorkoutWidgetItem*> &children() { return children_; }
 
         // get list of my items
-        QList<WWPoint*> points() { return points_; }
+        QList<WWPoint*> &points() { return points_; }
+
+        // get WPrime values
+        WPrime &wprime() { return wpBal; }
 
         // range for scales in plot units not draw units
         double maxX(); // e.g. max watts
@@ -104,29 +138,64 @@ class WorkoutWidget : public QWidget
         QPen markerPen;
         QPen gridPen;
 
+        // where were we when we changed state?
+        QPointF onCreate;   // select a point
+        QPointF onDrag;    // drag a point
+        QPointF onRect, atRect;    // rectangle select tool, top left, bottom right
+
+        // the block the cursor is hovering in
+        QPainterPath cursorBlock;
+        QString cursorBlockText;
+
    public slots:
 
         // and erg file was selected
         void ergFileSelected(ErgFile *);
 
+        // recompute metrics etc
+        void recompute();
+
         // trap signals
         void configChanged(qint32);
 
+        // timeout on click timer
+        void timeout();
+
+        // if done mid stack, the stack is truncated
+        void addCommand(WorkoutWidgetCommand *cmd);
+
+        // redo / undo command by going
+        // up and down the stack
+        void redo();
+        void undo();
+
     protected:
 
-        // interaction state
-        enum { none, drag } state;
         WWPoint *dragging;
 
         // interacting with points
         bool movePoint(QPoint p);
         bool createPoint(QPoint p);
+        bool scale(QPoint p);
+        bool movePoints(int, Qt::KeyboardModifiers);
+
+        // deleting
+        bool deleteSelected();
+
+        // selecting
+        bool selectPoints(); // mark for selection with rect tool
+        bool selectedPoints(); // make selected at end rect tool
+        bool selectClear(); // clear all selections
+
+        // working with blocks
+        bool setBlockCursor();
 
         void paintEvent(QPaintEvent *);
         bool eventFilter(QObject *obj, QEvent *event);
 
     private:
 
+        WorkoutWindow *parent;
         Context *context;
         QList<WorkoutWidgetItem*> children_;
 
@@ -136,6 +205,13 @@ class WorkoutWidget : public QWidget
         QList<WWPoint*> points_;
 
         double maxX_, maxY_;
+
+        // command stack
+        QList<WorkoutWidgetCommand *> stack;
+        int stackptr;
+
+        // for computing W'bal
+        WPrime wpBal;
 };
 
 #endif // _GC_WorkoutWidget_h

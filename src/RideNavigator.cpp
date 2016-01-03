@@ -65,7 +65,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     groupByModel = new GroupByModel(this);
     groupByModel->setSourceModel(searchFilter);
 
-    sortModel = new BUGFIXQSortFilterProxyModel(this);
+    sortModel = new QSortFilterProxyModel(this);
     sortModel->setSourceModel(groupByModel);
     sortModel->setDynamicSortFilter(true);
 

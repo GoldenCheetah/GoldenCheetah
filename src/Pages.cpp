@@ -39,6 +39,7 @@
 #include "HelpWhatsThis.h"
 #if QT_VERSION >= 0x050000
 #include "Dropbox.h"
+#include "GoogleDrive.h"
 #endif
 #include "LocalFileStore.h"
 
@@ -72,7 +73,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     langCombo->addItem(tr("Czech"));
     langCombo->addItem(tr("Spanish"));
     langCombo->addItem(tr("Portugese"));
-	langCombo->addItem(tr("Chinese (Traditional)"));
+    langCombo->addItem(tr("Chinese (Traditional)"));
 
     // Default to system locale
     QVariant lang = appsettings->value(this, GC_LANG, QLocale::system().name());
@@ -87,7 +88,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     else if(lang.toString().startsWith("cs")) langCombo->setCurrentIndex(7);
     else if(lang.toString().startsWith("es")) langCombo->setCurrentIndex(8);
     else if(lang.toString().startsWith("pt")) langCombo->setCurrentIndex(9);
-	else if (lang.toString().startsWith("zh-tw")) langCombo->setCurrentIndex(10);
+    else if (lang.toString().startsWith("zh-tw")) langCombo->setCurrentIndex(10);
     else langCombo->setCurrentIndex(0);
 
     configLayout->addWidget(langLabel, 0,0, Qt::AlignRight);
@@ -133,7 +134,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     QLabel *hystlabel = new QLabel(tr("Elevation hysteresis (meters):"));
     hystedit = new QLineEdit(elevationHysteresis.toString(),this);
     hystedit->setInputMask("9.00");
-    
+
     configLayout->addWidget(hystlabel, 4,0, Qt::AlignRight);
     configLayout->addWidget(hystedit, 4,1, Qt::AlignLeft);
 
@@ -375,7 +376,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     connect(twitterAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTwitter()));
 #endif
-
+    
 #if QT_VERSION >= 0x050000 // only in QT5 or higher
     //
     // Authorising Dropbox via an OAuthDialog...
@@ -398,7 +399,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(dropauthLabel, ++row, 0);
     grid->addWidget(dropboxAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
     if (appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "")!="")
-        grid->addWidget(dropboxAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+        grid->addWidget(dropboxAuthorised, row, 2, Qt::AlignLeft | Qt::AlignVCenter);
     else
         dropboxAuthorised->hide(); // if no token no show
 
@@ -417,6 +418,47 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(dropfolderLabel, ++row, 0);
     grid->addLayout(dfchoose, row, 1);
     //grid->addWidget(twpinLabel, ++row, 0);
+
+    QLabel *googleDriveLabel = new QLabel(tr("Google Drive"));
+    googleDriveLabel->setFont(current);
+    googleDriveFolder = new QLineEdit(this);
+    googleDriveFolder->setText(
+        appsettings->cvalue(context->athlete->cyclist,
+                            GC_GOOGLE_DRIVE_FOLDER, "").toString());
+    QLabel *googleDriveAuthLabel = new QLabel(tr("Authorise"));
+
+    googleDriveAuthorise = new QPushButton(tr("Authorise"), this);
+    googleDriveAuthorised = new QPushButton(this);
+    googleDriveAuthorised->setContentsMargins(0, 0, 0, 0);
+    googleDriveAuthorised->setIcon(passwords.scaled(16, 16));
+    googleDriveAuthorised->setIconSize(QSize(16, 16));
+    googleDriveAuthorised->setFixedHeight(16);
+    googleDriveAuthorised->setFixedWidth(16);
+
+    grid->addWidget(googleDriveLabel, ++row, 0);
+    grid->addWidget(googleDriveAuthLabel, ++row, 0);
+    grid->addWidget(googleDriveAuthorise, row, 1,
+                    Qt::AlignLeft | Qt::AlignVCenter);
+    if (appsettings->cvalue(context->athlete->cyclist,
+                            GC_GOOGLE_DRIVE_REFRESH_TOKEN, "") != "") {
+        grid->addWidget(googleDriveAuthorised, row, 2,
+                        Qt::AlignLeft | Qt::AlignVCenter);
+    } else {
+        googleDriveAuthorised->hide(); // if no token no show
+    }
+    connect(googleDriveAuthorise, SIGNAL(clicked()), this,
+            SLOT(authoriseGoogleDrive()));
+    //
+    // Selecting the athlete folder in GoogleDrive
+    QLabel *googleDriveFolderLabel = new QLabel(tr("Athlete Folder"));
+    googleDriveBrowse = new QPushButton(tr("Browse"));
+    connect(googleDriveBrowse, SIGNAL(clicked()), this,
+            SLOT(chooseGoogleDriveFolder()));
+    QHBoxLayout *gdfchoose = new QHBoxLayout;
+    gdfchoose->addWidget(googleDriveFolder);
+    gdfchoose->addWidget(googleDriveBrowse);
+    grid->addWidget(googleDriveFolderLabel, ++row, 0);
+    grid->addLayout(gdfchoose, row, 1);
 #endif
 
     //////////////////////////////////////////////////
@@ -589,7 +631,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     QLabel *dvuserLabel = new QLabel(tr("CalDAV User Id"));
     QLabel *dvpassLabel = new QLabel(tr("CalDAV Password"));
     QLabel *dvTypeLabel = new QLabel(tr("Calendar Type"));
-    QLabel *dvGoogleLabel = new QLabel(tr("Google CalID"));
+    QLabel *dvGoogleCalendarLabel = new QLabel(tr("Google CalID"));
 
     dvURL = new QLineEdit(this);
     QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
@@ -604,12 +646,13 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     dvPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_DVPASS, "").toString());
 
     dvGoogleCalid = new QLineEdit(this);
-    dvGoogleCalid->setText(appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "").toString());
+    dvGoogleCalid->setText(
+        appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "")
+        .toString());
 
     QLabel *googleCalendarAuthLabel = new QLabel(tr("Google Calendar"));
 
     googleCalendarAuthorise = new QPushButton(tr("Authorise"), this);
-
     googleCalendarAuthorised = new QPushButton(this);
     googleCalendarAuthorised->setContentsMargins(0,0,0,0);
     googleCalendarAuthorised->setIcon(passwords.scaled(16,16));
@@ -617,6 +660,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     googleCalendarAuthorised->setFixedHeight(16);
     googleCalendarAuthorised->setFixedWidth(16);
 
+#if QT_VERSION >= 0x050000 // only in QT5 or higher
+#endif
+    
     grid->addWidget(dv, ++row, 0);
 
     grid->addWidget(dvTypeLabel, ++row, 0);
@@ -631,17 +677,21 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(dvpassLabel, ++row, 0);
     grid->addWidget(dvPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(dvGoogleLabel, ++row, 0);
+    grid->addWidget(dvGoogleCalendarLabel, ++row, 0);
     grid->addWidget(dvGoogleCalid, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     grid->addWidget(googleCalendarAuthLabel, ++row, 0);
     grid->addWidget(googleCalendarAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    if (appsettings->cvalue(context->athlete->cyclist, GC_GOOGLE_CALENDAR_REFRESH_TOKEN, "")!="")
-        grid->addWidget(googleCalendarAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    else
+    if (appsettings->cvalue(context->athlete->cyclist,
+                            GC_GOOGLE_CALENDAR_REFRESH_TOKEN, "") != "") {
+        grid->addWidget(googleCalendarAuthorised, row, 1,
+                        Qt::AlignLeft | Qt::AlignVCenter);
+    } else {
         googleCalendarAuthorised->hide(); // if no token no show
+    }
+    connect(googleCalendarAuthorise, SIGNAL(clicked()), this,
+                SLOT(authoriseGoogleCalendar()));
 
-    connect(googleCalendarAuthorise, SIGNAL(clicked()), this, SLOT(authoriseGoogleCalendar()));
     connect (dvCALDAVType, SIGNAL(currentIndexChanged(int)), this, SLOT(dvCALDAVTypeChanged(int)));
 
     // activate/deactivate the input fields according to the type selected
@@ -776,13 +826,47 @@ void CredentialsPage::chooseDropboxFolder()
 
     // did the user type something ?
     QString path = dropboxFolder->text();
-    if (path == "") path = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER, "/").toString();
-
+    if (path == "") {
+        path = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER,
+                                   "/").toString();
+    }
     FileStoreDialog dialog(this, &dropbox, tr("Choose Athlete Directory"), path, true);
     int ret = dialog.exec();
 
     // did we actually select something?
     if (ret == QDialog::Accepted) dropboxFolder->setText(dialog.pathnameSelected());
+}
+
+
+void CredentialsPage::chooseGoogleDriveFolder()
+{
+    GoogleDrive google_drive(context);
+
+    // open the connection
+    QStringList errors;
+    if (google_drive.open(errors) == false) {
+        QMessageBox err;
+        err.setText(tr("Google Drive Connection Failed"));
+        err.setDetailedText(errors.join("\n\n"));
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
+    // did the user type something ?
+    QString path = googleDriveFolder->text();
+    if (path == "") {
+        path = appsettings->cvalue(
+            context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER, "/").toString();
+    }
+    FileStoreDialog dialog(this, &google_drive, tr("Choose Athlete Directory"),
+                           path, true);
+    int ret = dialog.exec();
+
+    // did we actually select something?
+    if (ret == QDialog::Accepted) {
+        googleDriveFolder->setText(dialog.pathnameSelected());
+    }
 }
 #endif
 
@@ -848,9 +932,25 @@ void CredentialsPage::authoriseCyclingAnalytics()
     }
 }
 
-void CredentialsPage::authoriseGoogleCalendar()
-{
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_CALENDAR);
+void CredentialsPage::authoriseGoogleCalendar() {
+    authoriseGoogle(CALENDAR);
+}
+
+#if QT_VERSION >= 0x050000
+void CredentialsPage::authoriseGoogleDrive() {
+    authoriseGoogle(DRIVE);
+}
+#endif
+
+void CredentialsPage::authoriseGoogle(GoogleType type) {
+    OAuthDialog *oauthDialog;
+    if (type == CALENDAR) {
+        oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_CALENDAR);
+    } else if (type == DRIVE) {
+        oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_DRIVE);
+    } else {
+            return;
+    }
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {
@@ -906,6 +1006,8 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
 #if QT_VERSION >= 0x050000 // only in QT5 or higher
     appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_FOLDER, dropboxFolder->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER,
+                           googleDriveFolder->text());
 #endif
     appsettings->setCValue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, networkFileStoreFolder->text());
 
@@ -1574,6 +1676,110 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
         return false;
 }
 
+//
+// Remote control page
+//
+RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
+{
+    remote = new RemoteControl;
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+
+    fields = new QTreeWidget;
+    fields->headerItem()->setText(0, tr("Action"));
+    fields->headerItem()->setText(1, tr("ANT+ Command"));
+    fields->setColumnWidth(0,100);
+    fields->setColumnWidth(1,200);
+    fields->setColumnCount(2);
+    fields->setSelectionMode(QAbstractItemView::SingleSelection);
+    fields->setIndentation(0);
+
+    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
+
+    mainLayout->addWidget(fields, 0,0);
+
+    // Load the native command list
+    QList <RemoteCmd> nativeCmds = remote->getNativeCmds();
+
+    // Load the ant command list
+    QList<RemoteCmd> antCmds = remote->getAntCmds();
+
+    // Load the remote control mappings
+    QList<CmdMap> cmdMaps = remote->getMappings();
+
+    // create a row for each native command
+    int index = 0;
+    foreach (RemoteCmd nativeCmd, nativeCmds) {
+
+        QComboBox *comboBox = new QComboBox(this);
+        comboBox->addItem("<unset>");
+
+        // populate the combo box with all possible ANT commands
+        foreach(RemoteCmd antCmd, antCmds) {
+            comboBox->addItem(antCmd.getCmdStr());
+        }
+
+        // is this native command mapped to an ANT command?
+        foreach(CmdMap cmdMapping, cmdMaps) {
+            if (cmdMapping.getNativeCmdId() == nativeCmd.getCmdId()) {
+                if (cmdMapping.getAntCmdId() != 0xFFFF) {
+                    //qDebug() << "ANT remote mapping found:" << cmdMapping.getNativeCmdId() << cmdMapping.getAntCmdId();
+
+                    int i=0;
+                    foreach(RemoteCmd antCmd, antCmds) {
+                        i++; // increment first to skip <unset>
+                        if (cmdMapping.getAntCmdId() == antCmd.getCmdId()) {
+                            // set the default entry for the combo box
+                            comboBox->setCurrentIndex(i);
+                        }
+                    }
+                }
+            }
+        }
+
+        QTreeWidgetItem *add = new QTreeWidgetItem;
+        fields->invisibleRootItem()->insertChild(index, add);
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+        add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
+        add->setText(0, nativeCmd.getDisplayStr());
+
+        add->setTextAlignment(1, Qt::AlignHCenter | Qt::AlignVCenter);
+        fields->setItemWidget(add, 1, comboBox);
+        index++;
+    }
+}
+
+qint32
+RemotePage::saveClicked()
+{
+    // Save the remote control code mappings...
+
+    //qDebug() << "RemotePage::saveClicked()";
+
+    // Load the ant command list
+    QList<RemoteCmd> antCmds = remote->getAntCmds();
+
+    // Load the remote control mappings
+    QList<CmdMap> cmdMaps = remote->getMappings();
+
+    for(int i=0; i < cmdMaps.size(); i++) {
+
+        QWidget *button = fields->itemWidget(fields->invisibleRootItem()->child(i),1);
+        int index = ((QComboBox*)button)->currentIndex();
+
+        if (index) {
+            cmdMaps[i].setAntCmdId(antCmds[index-1].getCmdId());
+
+        } else {
+            cmdMaps[i].setAntCmdId(0xFFFF); // no command
+        }
+    }
+
+    remote->writeConfig(cmdMaps);
+    return 0;
+}
+
 static void setSizes(QComboBox *p)
 {
 #ifdef Q_OS_MAC
@@ -1828,7 +2034,7 @@ ColorsPage::applyThemeClicked()
 
         // now get the theme selected
         ColorTheme theme = GCColor::themes().themes[index];
-        
+
         // reset to base
         colorSet = GCColor::defaultColorSet();
 
@@ -1856,13 +2062,13 @@ ColorsPage::applyThemeClicked()
             case CPLOTMARKER:
                 color = theme.colors[2]; // accent color
                 break;
- 
+
             case CPLOTSELECT:
             case CPLOTTRACKER:
             case CINTERVALHIGHLIGHTER:
                 color = theme.colors[3]; // select color
                 break;
-                
+
 
             case CPLOTGRID: // grid doesn't have a theme color
                             // we make it barely distinguishable from background
@@ -2940,7 +3146,7 @@ KeywordsPage::pageSelected()
     // load in texts from metadata
     fieldChooser->clear();
 
-    // get the current fields definitions 
+    // get the current fields definitions
     QList<FieldDefinition> fromFieldsPage;
     parent->fieldsPage->getDefinitions(fromFieldsPage);
     foreach(FieldDefinition x, fromFieldsPage) {
@@ -3326,7 +3532,7 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
         DataProcessorConfig *config = i.value()->processorConfig(this);
         config->readConfig();
 
-        processorTree->setItemWidget(add, 2, config);       
+        processorTree->setItemWidget(add, 2, config);
 
     }
     processorTree->setColumnHidden(3, true);
@@ -4561,7 +4767,7 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
     addButton->setFixedSize(20,20);
     updateButton->setFixedSize(60,20);
     deleteButton->setFixedSize(20,20);
-#else  
+#else
     updateButton->setText(tr("Update"));
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
@@ -6095,7 +6301,7 @@ AutoImportPage::deleteClicked()
 }
 
 qint32
-AutoImportPage::saveClicked() 
+AutoImportPage::saveClicked()
 {
 
     rules.clear();
@@ -6189,7 +6395,7 @@ IntervalsPage::saveClicked()
 
     // now update discovery !
     for(int i=0; i< checkBoxes.count(); i++)
-        if (checkBoxes[i]->isChecked()) 
+        if (checkBoxes[i]->isChecked())
             discovery += RideFileInterval::intervalTypeBits(static_cast<RideFileInterval::IntervalType>(i+user+1));
 
     // new value returned

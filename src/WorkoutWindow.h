@@ -37,7 +37,11 @@
 
 class WorkoutWidget;
 class WWPowerScale;
+class WWWBalScale;
 class WWLine;
+class WWWBLine;
+class WWRect;
+class WWBlockCursor;
 
 class WorkoutWindow : public GcWindow
 {
@@ -47,12 +51,19 @@ class WorkoutWindow : public GcWindow
 
         WorkoutWindow(Context *context);
 
+        // workout widget updates these
+        QLabel *xlabel, *ylabel;
+        QLabel *TSSlabel, *IFlabel;
+
+        QAction *saveAct, *undoAct, *redoAct,
+                *drawAct, *selectAct;
+
+        bool draw; // draw or select mode?
+
    public slots:
 
         // toolbar functions
         void saveFile();
-        void undo();
-        void redo();
         void drawMode();
         void selectMode();
 
@@ -64,12 +75,13 @@ class WorkoutWindow : public GcWindow
         Context *context;
 
         QToolBar *toolbar;
-        QAction *saveAct, *undoAct, *redoAct,
-                *drawAct, *selectAct;
-
         WorkoutWidget *workout; // will become editor.
         WWPowerScale *powerscale;
+        WWWBalScale *wbalscale;
         WWLine *line;
+        WWWBLine *wbline;
+        WWRect *rect;
+        WWBlockCursor *bcursor;
         bool active;
 };
 

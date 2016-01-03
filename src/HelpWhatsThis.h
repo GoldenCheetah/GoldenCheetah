@@ -160,7 +160,9 @@ Q_OBJECT
                  Preferences_Metrics_Summary,
                  Preferences_Metrics_Intervals,
 
-                 Preferences_TrainDevices,
+                 Preferences_Training,
+                 Preferences_Training_RemoteControls,
+                 Preferences_Training_TrainDevices,
 
                  };
 
