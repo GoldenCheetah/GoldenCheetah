@@ -1028,8 +1028,9 @@ WorkoutWidget::recompute()
                         context->athlete->zones(false)->useCPforFTPSetting(), 0).toInt() == 0);
     if (useCPForFTP) FTP=CP;
 
-    // compute the metrics based upon the data...
-    QVector<int> wattsArray;
+    // truncate
+    wattsArray.resize(0);
+    mmpArray.resize(0);
 
     // running time and watts for interpolating
     int ctime = 0;
@@ -1110,8 +1111,7 @@ WorkoutWidget::recompute()
     //
     // MEAN MAX [works but need to think about UI]
     //
-    //QVector<int>mmpArray;
-    //RideFileCache::fastSearch(wattsArray, mmpArray);
+    RideFileCache::fastSearch(wattsArray, mmpArray);
     //qDebug()<<"RECOMPUTE:"<<timer.elapsed()<<"ms"<<wattsArray.count()<<"samples";
 }
 
@@ -1411,17 +1411,17 @@ WorkoutWidget::undo()
 void
 WorkoutWidget::cut()
 {
-qDebug()<<"cut";
+//qDebug()<<"cut";
 }
 
 void 
 WorkoutWidget::copy()
 {
-qDebug()<<"copy";
+//qDebug()<<"copy";
 }
 
 void
 WorkoutWidget::paste()
 {
-qDebug()<<"paste";
+//qDebug()<<"paste";
 }

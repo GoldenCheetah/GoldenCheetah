@@ -126,6 +126,10 @@ class WorkoutWidget : public QWidget
         // ergFile being edited
         ErgFile *ergFile;
 
+        // CP data
+        QVector<int> wattsArray;
+        QVector<int>mmpArray;
+
         // get regions for items to paint in
         QRectF left();
         QRectF right();

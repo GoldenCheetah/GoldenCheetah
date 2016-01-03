@@ -297,7 +297,7 @@ WWBlockCursor::paint(QPainter *painter)
 void
 WWBlockSelection::paint(QPainter *painter)
 {
-    qDebug()<<"select cursor paint";
+    //XXX TODO qDebug()<<"select cursor paint";
 }
 
 // locate me on the parent widget in paint coordinates
@@ -350,6 +350,40 @@ WWWBLine::paint(QPainter *painter)
         QPointF dot(px,py);
         painter->drawLine(last, dot);
         last = dot;
+    }
+}
+
+//MMP Curve
+void
+WWMMPCurve::paint(QPainter *painter)
+{
+    // thin ?
+    QPen linePen(GColor(CCP));
+    linePen.setWidth(0.5);
+    painter->setPen(linePen);
+
+    // top left origin
+    QPointF tl = workoutWidget()->canvas().topLeft();
+
+    // join the dots 
+    QPointF last(-1,-1);
+
+    // run through the wpBal values...
+    int secs=0;
+    foreach(int watts, workoutWidget()->mmpArray) {
+
+        // skip zero
+        if (watts == 0) { secs++; continue; }
+
+        // x and y pixel location
+        QPointF point = workoutWidget()->transform(secs,watts);
+
+        if (last.x() >= 0) painter->drawLine(last, point);
+
+        // move on
+        last = point;
+        secs++;
+
     }
 }
 

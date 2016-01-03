@@ -39,6 +39,7 @@
 #define GCWW_RECT      6 // selection rectangle
 #define GCWW_BCURSOR   7 // interval "block" cursor
 #define GCWW_BRECT     8 // block selection
+#define GCWW_MMPCURVE  9
 
 //
 // ITEMS
@@ -79,6 +80,22 @@ class WWWBalScale : public WorkoutWidgetItem {
     private:
 
         Context *context; // for athlete zones etc
+};
+
+class WWMMPCurve : public WorkoutWidgetItem {
+
+    public:
+
+        WWMMPCurve(WorkoutWidget *w) : WorkoutWidgetItem(w) { w->addItem(this); }
+
+        // Reimplement in children
+        int type() { return GCWW_MMPCURVE; }
+
+        void paint(QPainter *painter);
+
+        // locate me on the parent widget in paint coordinates
+        QRectF bounding() { return workoutWidget()->canvas(); }
+
 };
 
 // is a point, can be manipulated ...
