@@ -308,6 +308,10 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
                                          -lkmldom -lkmlconvenience -lkmlengine -lkmlbase
     }
 
+    # on MS VS the linker wants /LTCG for libkmldom due to
+    # "MSIL .netmodule or module compiled with /GL found"
+    *msvc2015 { QMAKE_LFLAGS +=  /LTCG }
+
     DEFINES     += GC_HAVE_KML
     INCLUDEPATH += $${KML_INCLUDE}  $${BOOST_INCLUDE}
     LIBS        += $${KML_LIBS}
