@@ -399,7 +399,8 @@ signals:
     // signal for passing remote control commands
     void antRemoteControl(uint16_t command);
 
-    void receivedAntMessage(const ANTMessage message, const struct timeval timestamp);
+    void receivedAntMessage(const unsigned char RS, const ANTMessage message, const struct timeval timestamp);
+    void sentAntMessage(const unsigned char RS, const ANTMessage message, const struct timeval timestamp);
 
 public slots:
 

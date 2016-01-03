@@ -868,6 +868,11 @@ ANT::sendMessage(ANTMessage m) {
 //for(int i=0; i<m.length+3; i++) fprintf(stderr, "%02x ", m.data[i]);
 //fprintf(stderr, "\n");
 
+    struct timeval timestamp;
+    gettimeofday(&timestamp, NULL);
+    unsigned char RS='S';
+    emit sentAntMessage(RS, m, timestamp);
+
     rawWrite((uint8_t*)m.data, m.length);
 
     // this padding is important - do not remove it
@@ -948,7 +953,8 @@ ANT::processMessage(void) {
 
     struct timeval timestamp;
     get_timeofday (&timestamp);
-    emit receivedAntMessage(m, timestamp);
+    unsigned char RS = 'R';
+    emit receivedAntMessage(RS, m, timestamp);
 
     switch (rxMessage[ANT_OFFSET_ID]) {
         case ANT_NOTIF_STARTUP:
