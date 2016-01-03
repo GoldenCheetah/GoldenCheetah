@@ -24,6 +24,8 @@
 #include "TimeUtils.h"
 
 #if QT_VERSION > 0x050000
+#include "GoogleDrive.h"
+
 #include <QJsonParseError>
 #endif
 
@@ -132,14 +134,17 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
         urlstr.append("redirect_uri=urn:ietf:wg:oauth:2.0:oob&");
         urlstr.append("response_type=code&");
         urlstr.append("client_id=").append(GC_GOOGLE_CALENDAR_CLIENT_ID);
+#if QT_VERSION >= 0x050000
     } else if (site == GOOGLE_DRIVE) {
+        const QString scope = GoogleDrive::GetScope(context);
         // OAUTH 2.0 - Google flow for installed applications
         urlstr = QString("https://accounts.google.com/o/oauth2/auth?");
         // We only request access to the application data folder, not all files.
-        urlstr.append("scope=https://www.googleapis.com/auth/drive.appdata&");
+        urlstr.append("scope=https://www.googleapis.com/auth/" + scope + "&");
         urlstr.append("redirect_uri=urn:ietf:wg:oauth:2.0:oob&");
         urlstr.append("response_type=code&");
         urlstr.append("client_id=").append(GC_GOOGLE_DRIVE_CLIENT_ID);
+#endif
     }
 
     // different process to get the token for STRAVA, CYCLINGANALYTICS vs.
