@@ -1407,3 +1407,21 @@ WorkoutWidget::undo()
     // update
     update();
 }
+
+void
+WorkoutWidget::cut()
+{
+qDebug()<<"cut";
+}
+
+void 
+WorkoutWidget::copy()
+{
+qDebug()<<"copy";
+}
+
+void
+WorkoutWidget::paste()
+{
+qDebug()<<"paste";
+}

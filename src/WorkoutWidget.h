@@ -170,6 +170,11 @@ class WorkoutWidget : public QWidget
         void redo();
         void undo();
 
+        // working with the clipboard
+        void cut();
+        void copy();
+        void paste();
+
     protected:
 
         WWPoint *dragging;

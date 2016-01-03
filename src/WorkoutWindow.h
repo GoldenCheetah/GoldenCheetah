@@ -42,6 +42,7 @@ class WWLine;
 class WWWBLine;
 class WWRect;
 class WWBlockCursor;
+class WWBlockSelection;
 
 class WorkoutWindow : public GcWindow
 {
@@ -56,7 +57,8 @@ class WorkoutWindow : public GcWindow
         QLabel *TSSlabel, *IFlabel;
 
         QAction *saveAct, *undoAct, *redoAct,
-                *drawAct, *selectAct;
+                *drawAct, *selectAct,
+                *cutAct, *copyAct, *pasteAct;
 
         bool draw; // draw or select mode?
 
@@ -82,6 +84,7 @@ class WorkoutWindow : public GcWindow
         WWWBLine *wbline;
         WWRect *rect;
         WWBlockCursor *bcursor;
+        WWBlockSelection *brect;
         bool active;
 };
 

@@ -294,6 +294,19 @@ WWBlockCursor::paint(QPainter *painter)
     }
 }
 
+void
+WWBlockSelection::paint(QPainter *painter)
+{
+    qDebug()<<"select cursor paint";
+}
+
+// locate me on the parent widget in paint coordinates
+QRectF 
+WWBlockSelection::bounding()
+{
+    return QRectF();
+}
+
 //W'bal curve paint
 void
 WWWBLine::paint(QPainter *painter)
