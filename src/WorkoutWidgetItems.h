@@ -40,6 +40,7 @@
 #define GCWW_BCURSOR   7 // interval "block" cursor
 #define GCWW_BRECT     8 // block selection
 #define GCWW_MMPCURVE  9
+#define GCWW_SGUIDE    10 // smart guides appear as we drag
 
 //
 // ITEMS
@@ -163,6 +164,25 @@ class WWRect : public WorkoutWidgetItem {
 
 };
 
+// flash up guide lines when things align when the user is creating
+// moving or dragging points or blocks around
+class WWSmartGuide : public WorkoutWidgetItem {
+
+    public: 
+
+        WWSmartGuide(WorkoutWidget *w) : WorkoutWidgetItem(w) { w->addItem(this); }
+
+        // Reimplement in children
+        int type() { return GCWW_SGUIDE; }
+
+        void paint(QPainter *painter);
+
+        // locate me on the parent widget in paint coordinates
+        // should not be selectable (!!)
+        QRectF bounding() { return QRectF(); }
+};
+
+// highlight as we hover over blocks
 class WWBlockCursor : public WorkoutWidgetItem {
 
     public:

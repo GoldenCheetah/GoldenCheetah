@@ -44,6 +44,7 @@ class WWRect;
 class WWBlockCursor;
 class WWBlockSelection;
 class WWMMPCurve;
+class WWSmartGuide;
 
 class WorkoutWindow : public GcWindow
 {
@@ -87,6 +88,7 @@ class WorkoutWindow : public GcWindow
         WWBlockCursor *bcursor;
         WWBlockSelection *brect;
         WWMMPCurve *mmp;
+        WWSmartGuide *guide;
         bool active;
 };
 
