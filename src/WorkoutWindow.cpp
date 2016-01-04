@@ -58,6 +58,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // selection tool
     rect = new WWRect(workout);
 
+    // guides always on top!
+    guide = new WWSmartGuide(workout);
+
     // setup the toolbar
     toolbar = new QToolBar(this);
     toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);

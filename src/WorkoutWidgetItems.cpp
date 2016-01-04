@@ -393,6 +393,126 @@ WWMMPCurve::paint(QPainter *painter)
     }
 }
 
+void
+WWSmartGuide::paint(QPainter *painter)
+{
+    QPointF tl(-1,-1);
+    QPointF br(-1,-1);
+
+    // get the boundary of the selection
+    int selected=0;
+    foreach(WWPoint *p, workoutWidget()->points()) {
+
+        // don't show guides whilst selecting, too noisy
+        if (!p->selected) continue;
+
+        selected++;
+
+        // top left
+        if (tl.x() == -1 || tl.x() > p->x) tl.setX(p->x);
+        if (tl.y() == -1 || tl.y() < p->y) tl.setY(p->y);
+
+        // bottom right
+        if (br.x() == -1 || br.x() < p->x) br.setX(p->x);
+        if (br.y() == -1 || br.y() > p->y) br.setY(p->y);
+    }
+
+    // set the boundary
+    QRectF boundary (workoutWidget()->transform(tl.x(), tl.y()),
+                     workoutWidget()->transform(br.x(), br.y()));
+
+    if (selected > 0) {
+
+        // for now just paint the boundary tics on the x-axis
+        QPen linePen(GColor(CPLOTMARKER));
+        linePen.setWidthF(0);
+        painter->setPen(linePen);
+
+        QRectF bottom = workoutWidget()->bottom();
+
+        // top line width indicators
+        painter->drawLine(boundary.bottomLeft().x(), workoutWidget()->bottom().y(), 
+                          boundary.bottomLeft().x(), workoutWidget()->bottom().y()+bottom.height());
+
+        painter->drawLine(boundary.bottomRight().x(), bottom.y(), 
+                          boundary.bottomRight().x(), bottom.y()+bottom.height());
+
+        // now the text - but only if we have a gap!
+        if (br.x() > tl.x()) {
+            QFontMetrics fontMetrics(workoutWidget()->markerFont);
+            painter->setFont(workoutWidget()->markerFont);
+
+            // paint time at very bottom of bottom in the middle
+            // of the elongated tic marks
+            QString text = time_to_string(br.x()-tl.x());
+            QRect bound = fontMetrics.boundingRect(text);
+            QPoint here(boundary.center().x()-(bound.width()/2), bottom.bottom());
+
+            painter->drawText(here, text);
+        }
+
+        // find next and previous points, so we can mark them too
+        // this is useful when shifting left and right
+        int prev=-1, next=-1;
+        for(int i=0; i < workoutWidget()->points().count(); i++) {
+            WWPoint *p = workoutWidget()->points()[i];
+            if (p->x < tl.x()) prev=i; // to left
+            if (p->x > br.x()) {
+                next=i;
+                break;
+            }
+        }
+
+        // in seconds
+        int left = prev >= 0 ? workoutWidget()->points()[prev]->x : 0;
+        int right = next >= 0 ? workoutWidget()->points()[next]->x : workoutWidget()->maxX();
+
+        // in plot coordinates
+        QPointF leftpx = workoutWidget()->transform(left,0);
+        QPointF rightpx = workoutWidget()->transform(right,0);
+        leftpx.setY(bottom.y());
+        rightpx.setY(bottom.y());
+
+        // left indicator
+        painter->drawLine(leftpx, leftpx + QPointF(0, bottom.height()));
+        painter->drawLine(rightpx, rightpx + QPointF(0, bottom.height()));
+
+        // now the left text - but only if we have a gap!
+        if (left < tl.x()) {
+            QFontMetrics fontMetrics(workoutWidget()->markerFont);
+            painter->setFont(workoutWidget()->markerFont);
+
+            // paint time at very bottom of bottom in the middle
+            // of the elongated tic marks
+            QString text = time_to_string(tl.x() - left);
+            QRect bound = fontMetrics.boundingRect(text);
+            QPointF here(leftpx.x() + ((boundary.left() - leftpx.x())/2) - (bound.width()/2), bottom.bottom());
+
+            painter->drawText(here, text);
+        }
+
+        // now the right text - but only if we have a gap!
+        if (right > br.x()) {
+            QFontMetrics fontMetrics(workoutWidget()->markerFont);
+            painter->setFont(workoutWidget()->markerFont);
+
+            // paint time at very bottom of bottom in the middle
+            // of the elongated tic marks
+            QString text = time_to_string(right - br.x());
+            QRect bound = fontMetrics.boundingRect(text);
+            QPointF here(boundary.right() + ((rightpx.x()-boundary.right())/2) - (bound.width()/2), bottom.bottom());
+            painter->drawText(here, text);
+        }
+
+#if 0 // doesn't add much
+        // side line width indicators
+        painter->drawLine(boundary.topLeft()-QPointF(10,0), boundary.topLeft()-QPointF(30,0));
+        painter->drawLine(boundary.bottomLeft()-QPointF(10,0), boundary.bottomLeft()-QPointF(30,0));
+        painter->drawLine(boundary.bottomLeft()-QPointF(20,0), boundary.topLeft()-QPointF(20,0));
+#endif
+    }
+}
+
 //
 // COMMANDS
 //
