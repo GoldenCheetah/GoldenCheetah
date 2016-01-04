@@ -289,9 +289,16 @@ WWBlockCursor::paint(QPainter *painter)
         painter->setPen(GColor(CPLOTMARKER));
 
         QPointF where(workoutWidget()->cursorBlock.boundingRect().center().x()-(textBound.width()/2), 
-                      workoutWidget()->cursorBlock.boundingRect().bottom()-10); 
+                      workoutWidget()->cursorBlock.boundingRect().bottom()-10); //XXX 10 is hardcoded space from bottom
 
         painter->drawText(where, workoutWidget()->cursorBlockText);
+
+        QRect textBound2 = fontMetrics.boundingRect(workoutWidget()->cursorBlockText2);
+        QPointF where2(workoutWidget()->cursorBlock.boundingRect().center().x()-(textBound2.width()/2), 
+                      where.y()-textBound.height());  //XXX 4 is hardcoded space between labels
+
+        painter->drawText(where2, workoutWidget()->cursorBlockText2);
+
     }
 }
 
