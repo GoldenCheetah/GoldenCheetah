@@ -416,6 +416,12 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
             updateNeeded=selectClear();
             break;
 
+        case Qt::Key_A:
+            if (ctrl) {
+                updateNeeded=selectAll();
+            }
+            break;
+
         case Qt::Key_Y:
             if (ctrl) {
                 redo();
@@ -957,6 +963,20 @@ WorkoutWidget::deleteSelected()
     new DeleteWPointsCommand(this, list);
 
     return true;
+}
+
+bool
+WorkoutWidget::selectAll()
+{
+    bool selected=false;
+
+    foreach(WWPoint *p, points_) {
+
+        // if not selected, select it
+        if (p->selected==false) 
+            p->selected=selected=true;
+    }
+    return selected;
 }
 
 bool
