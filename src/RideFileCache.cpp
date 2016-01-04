@@ -308,7 +308,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
     // look at all the rides
     foreach (RideItem *item, context->athlete->rideCache->rides()) {
 
-        if (item->dateTime.date() < from || item->dateTime.date() > to) continue; // not one we want
+        if (item->dateTime.date() < from || item->dateTime.date() > to || item->isRun) continue; // not one we want
 
         // get the power data
         if (first == true) {
