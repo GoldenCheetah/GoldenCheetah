@@ -863,13 +863,17 @@ WorkoutWidget::createBlock(QPoint p)
             for(int i=0; i < points_.count(); i++) {
                 WWPoint *p = points_[i];
                 if (p->x < to.x()) prev=i; // to left
-                if (p->x > to.x()) {
+                if (p->x >= to.x()) {
                     next=i;
                     break;
                 }
             }
 
-            if (prev == -1 || next == -1) return false;
+            // not between?
+            if (prev == -1 || next == -1 || prev == next)  return false;
+
+            // directly below?
+            if (points_[prev]->x == to.x() || points_[next]->x == to.x()) return false;
 
             // it will be as wide as the distance from the nearest
             // point divided by 1.5 (1width space, 1width / 2 for centre)
