@@ -299,7 +299,7 @@ static long countForMeanMax(RideFileCacheHeader head, RideFile::SeriesType serie
     return 0;
 }
 
-QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &wpk, QDate from, QDate to)
+QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &wpk, QDate from, QDate to, bool wantruns)
 {
     QVector<float> returning;
     QVector<float> returningwpk;
@@ -309,6 +309,8 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
     foreach (RideItem *item, context->athlete->rideCache->rides()) {
 
         if (item->dateTime.date() < from || item->dateTime.date() > to) continue; // not one we want
+
+        if (item->isRun && !wantruns) continue; // they don't want runs
 
         // get the power data
         if (first == true) {

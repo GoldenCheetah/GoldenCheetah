@@ -679,7 +679,8 @@ RideCache::refreshCPModelMetrics()
     // what dates have any power data ?
     foreach(RideItem *item, rides()) {
 
-        if (item->present.contains("P")) {
+        // has power, but not running
+        if (item->present.contains("P") && !item->isRun) {
 
             // no date set
             if (from == QDate()) from = item->dateTime.date();
@@ -727,7 +728,9 @@ RideCache::refreshCPModelMetrics()
 
         // months is a rolling 3 months sets of bests
         QVector<float> wpk; // for getting the wpk values
-        bests.addBests(RideFileCache::meanMaxPowerFor(context, wpk, begin, end));
+
+        // don't include RUNS ..................................................vvvvv
+        bests.addBests(RideFileCache::meanMaxPowerFor(context, wpk, begin, end, false));
         bestsWPK.addBests(wpk);
 
         // we now have the data
