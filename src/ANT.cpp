@@ -869,7 +869,7 @@ ANT::sendMessage(ANTMessage m) {
 //fprintf(stderr, "\n");
 
     struct timeval timestamp;
-    gettimeofday(&timestamp, NULL);
+    get_timeofday (&timestamp);
     unsigned char RS='S';
     emit sentAntMessage(RS, m, timestamp);
 
