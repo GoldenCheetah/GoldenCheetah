@@ -221,15 +221,6 @@ class WWWBLine : public WorkoutWidgetItem {
 // COMMANDS
 //
 
-// mementos before and after used by commands
-struct PointMemento {
-
-    public:
-        PointMemento(double x, double y, int index) : x(x), y(y), index(index) {}
-        double x,y;
-        int index;
-};
-
 class CreatePointCommand : public WorkoutWidgetCommand
 {
     public:

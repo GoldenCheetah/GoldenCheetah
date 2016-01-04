@@ -39,6 +39,17 @@ class ErgFile;
 class WorkoutWindow;
 class WorkoutWidget;
 class WWPoint;
+
+// memento represent a point, used to save state before/after commands
+// or whilst in the process of creating things like blocks
+struct PointMemento {
+
+    public:
+        PointMemento(double x, double y, int index) : x(x), y(y), index(index) {}
+        double x,y;
+        int index;
+};
+
 class WorkoutWidgetItem {
 
     public:
@@ -94,9 +105,10 @@ class WorkoutWidget : public QWidget
         // interaction state;
         // none - initial state
         // drag - dragging a point around
+        // dragblock - dragging a block aroung
         // rect - rectangle select tool active
         // create - clicked to create
-        enum { none, create, drag, rect } state;
+        enum { none, create, drag, dragblock, rect } state;
 
         // adding items and points
         void addItem(WorkoutWidgetItem*x) { children_.append(x); }
@@ -147,6 +159,9 @@ class WorkoutWidget : public QWidget
         QPointF onCreate;   // select a point
         QPointF onDrag;    // drag a point
         QPointF onRect, atRect;    // rectangle select tool, top left, bottom right
+
+        // the points that make up the block thats being created
+        QList<PointMemento> cr8block;
 
         // the block the cursor is hovering in
         QPainterPath cursorBlock;
@@ -199,6 +214,7 @@ class WorkoutWidget : public QWidget
 
         // working with blocks
         bool createBlock(QPoint p);
+        bool moveBlock(QPoint p);
         bool setBlockCursor();
 
         void paintEvent(QPaintEvent *);

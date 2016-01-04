@@ -94,6 +94,7 @@ WorkoutWidget::timeout()
 // - --------------     ------      ---------------                     ----------
 // 1 mouse move         none        hover/unhover point/block           none
 //                      drag        move point around                   drag
+//                      dragblock   move block around                   dragblock
 //                      rect        resize and scan for selections      rect
 //                      create      add point and move it               drag
 //
@@ -103,8 +104,9 @@ WorkoutWidget::timeout()
 // 3 mouse release      drag        unselect                            none
 //                      rect        none                                none
 //                      create      create point                        none
+//                      dragblock   create block                        none
 //
-// 4 mouse timeout      create      create block                        none
+// 4 mouse timeout      create      create block                        dragblock
 //                      drag        ignore                              drag
 //
 //
@@ -212,6 +214,14 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
             }
 
         // STATE: RECT
+        } else if (state == dragblock) {
+
+            // move it
+            updateNeeded = moveBlock(p);
+
+            // we moved the block
+            recompute();
+
         } else if (state == rect) {
 
             // we're selecting via a rectangle
@@ -310,6 +320,14 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
             recompute();
         }
 
+        // STATE: DRAG BLOCK
+        if (state == dragblock && cr8block.count()) {
+            new CreateBlockCommand(this, cr8block);
+
+            // now recompute
+            recompute();
+        }
+
         // STATE: RECT
         if (state == rect) {
             selectedPoints();
@@ -347,8 +365,8 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
             // recompute metrics
             recompute();
 
-            // reset state
-            state = none;
+            // set state to dragblock
+            state = dragblock;
         }
 
     }
@@ -719,11 +737,36 @@ WorkoutWidget::createPoint(QPoint p)
 }
 
 bool
+WorkoutWidget::moveBlock(QPoint p)
+{
+    // we are drag creating blocks
+    // Remove any that might be there
+    // delete the points in reverse
+    for (int i=cr8block.count()-1; i>=0; i--) {
+        WWPoint *p = NULL;
+        if (cr8block[i].index >= 0) p = points_.takeAt(cr8block[i].index);
+        else p = points_.takeAt(points_.count()-1);
+        delete p;
+    }
+
+    // stop these cr8block
+    cr8block.clear();
+
+    // now create again
+    createBlock(p);
+
+    // refresh
+    return true;
+}
+
+bool
 WorkoutWidget::createBlock(QPoint p)
 {
+    // just in case
+    cr8block.clear();
+
     // if between points we INSERT, if at the end
     // we APPEND
-    QList<PointMemento> list; // keep track of what we add
     WWPoint *add;
 
     // add a point!
@@ -736,10 +779,10 @@ WorkoutWidget::createBlock(QPoint p)
         // Empty workout so create a single block starting from x=0
         //
         add = new WWPoint(this, 0, to.y());
-        list << PointMemento(add->x, add->y, -1);
+        cr8block << PointMemento(add->x, add->y, -1);
 
         add = new WWPoint(this, to.x(), to.y());
-        list << PointMemento(add->x, add->y, -1);
+        cr8block << PointMemento(add->x, add->y, -1);
 
     } else {
 
@@ -781,9 +824,9 @@ WorkoutWidget::createBlock(QPoint p)
                 case notvert:
                     // not vert just add 2 points
                     add = new WWPoint(this, last->x, to.y());
-                    list << PointMemento(add->x, add->y, -1);
+                    cr8block << PointMemento(add->x, add->y, -1);
                     add = new WWPoint(this, to.x(), to.y());
-                    list << PointMemento(add->x, add->y, -1);
+                    cr8block << PointMemento(add->x, add->y, -1);
                     break;
 
                 default:
@@ -792,9 +835,9 @@ WorkoutWidget::createBlock(QPoint p)
                     // add a right angle, since that is
                     // consistent to what they have
                     add = new WWPoint(this, to.x(), last->y);
-                    list << PointMemento(add->x, add->y, -1);
+                    cr8block << PointMemento(add->x, add->y, -1);
                     add = new WWPoint(this, to.x(), to.y());
-                    list << PointMemento(add->x, add->y, -1);
+                    cr8block << PointMemento(add->x, add->y, -1);
 
                     break;
             }
@@ -842,32 +885,31 @@ WorkoutWidget::createBlock(QPoint p)
             add = new WWPoint(this, to.x()-(width/2), 
                                     points_[prev]->y + (lwidth * ratio),
                                     false);
-            list << PointMemento(add->x, add->y, index);
+            cr8block << PointMemento(add->x, add->y, index);
             points_.insert(index++, add);
 
             // top left
             add = new WWPoint(this, to.x()-(width/2), to.y(), false);
-            list << PointMemento(add->x, add->y, index);
+            cr8block << PointMemento(add->x, add->y, index);
             points_.insert(index++, add);
 
             // top right
             add = new WWPoint(this, to.x()+(width/2), to.y(), false);
-            list << PointMemento(add->x, add->y, index);
+            cr8block << PointMemento(add->x, add->y, index);
             points_.insert(index++, add);
 
             // bottom right
             add = new WWPoint(this, to.x()+(width/2), 
                                     points_[prev]->y + (rwidth * ratio),
                                     false);
-            list << PointMemento(add->x, add->y, index);
+            cr8block << PointMemento(add->x, add->y, index);
             points_.insert(index++, add);
 
         }
     }
 
     // did we create any
-    if (list.count()) {
-        new CreateBlockCommand(this, list);
+    if (cr8block.count()) {
         return true;
     }
     return false;

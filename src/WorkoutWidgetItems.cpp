@@ -45,6 +45,7 @@ WWPowerScale::paint(QPainter *painter)
     // lets get the zones, CP and PMAX
     int CP = context->athlete->zones(false)->getCP(rnum);
     int Pmax = context->athlete->zones(false)->getPmax(rnum);
+    Q_UNUSED(Pmax); // for now ........
     int numZones = context->athlete->zones(false)->numZones(rnum);
 
     QFontMetrics fontMetrics(workoutWidget()->markerFont);
@@ -298,6 +299,7 @@ void
 WWBlockSelection::paint(QPainter *painter)
 {
     //XXX TODO qDebug()<<"select cursor paint";
+    Q_UNUSED(painter);
 }
 
 // locate me on the parent widget in paint coordinates
@@ -361,9 +363,6 @@ WWMMPCurve::paint(QPainter *painter)
     QPen linePen(GColor(CCP));
     linePen.setWidth(0.5);
     painter->setPen(linePen);
-
-    // top left origin
-    QPointF tl = workoutWidget()->canvas().topLeft();
 
     // join the dots 
     QPointF last(-1,-1);
