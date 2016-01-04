@@ -622,7 +622,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                static float last_measured_rpm;
                uint16_t time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
                uint16_t revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
-               if (time) {
+               if (time && revs) {
+                   // note: revs!=0 ensure that data are valid (some trainers simulates sensor event by computing fake timestamp)
                    rpm = 1024*60*revs / time;
                    last_measured_rpm = rpm;
                    lastMessageTimestamp = QTime::currentTime();
@@ -646,7 +647,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                // cadence first...
                uint16_t time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
                uint16_t revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
-               if (time) {
+               if (time && revs) {
+                   // note: revs!=0 ensure that data are valid (some trainers simulates sensor event by computing fake timestamp)
                    rpm = 1024*60*revs / time;
                    last_measured_rpm = rpm;
 
@@ -666,7 +668,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                // now speed ...
                time = antMessage.wheelMeasurementTime - lastMessage.wheelMeasurementTime;
                revs = antMessage.wheelRevolutions - lastMessage.wheelRevolutions;
-               if (time) {
+               if (time && revs) {
+                   // note: revs!=0 ensure that data are valid (some trainers simulates sensor event by computing fake timestamp)
                    rpm = 1024*60*revs / time;
                    if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
                    else parent->setWheelRpm(rpm);
@@ -689,7 +692,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                float rpm;
                uint16_t time = antMessage.wheelMeasurementTime - lastMessage.wheelMeasurementTime;
                uint16_t revs = antMessage.wheelRevolutions - lastMessage.wheelRevolutions;
-               if (time) {
+               if (time && revs) {
+                   // note: revs!=0 ensure that data are valid (some trainers simulates sensor event by computing fake timestamp)
                    rpm = 1024*60*revs / time;
                    lastMessageTimestamp = QTime::currentTime();
                } else {
