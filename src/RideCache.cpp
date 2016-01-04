@@ -679,7 +679,7 @@ RideCache::refreshCPModelMetrics()
     // what dates have any power data ?
     foreach(RideItem *item, rides()) {
 
-        if (item->present.contains("P")) {
+        if (item->present.contains("P") && !item->isRun) {
 
             // no date set
             if (from == QDate()) from = item->dateTime.date();
