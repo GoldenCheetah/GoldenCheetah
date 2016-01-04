@@ -487,6 +487,7 @@ WorkoutWidget::setBlockCursor()
     bool returning=false;
     QPointF last(0,0);
     int lastx=0;
+    int lasty=0;
 
     foreach(WWPoint *p, points_) {
 
@@ -512,6 +513,7 @@ WorkoutWidget::setBlockCursor()
                 if (cursorBlock != block) {
                     cursorBlock = block;
                     cursorBlockText = time_to_string(p->x - lastx);
+                    cursorBlockText2= QString("%1w").arg(double(lasty + ((p->y-lasty)/2)), 0, 'f', 0);
                     returning = true;
                 }
             } else if (cursorBlock != QPainterPath()) {
@@ -526,6 +528,7 @@ WorkoutWidget::setBlockCursor()
         // moving on
         last = dot;
         lastx = p->x;
+        lasty = p->y;
     }
     return returning;
 }
