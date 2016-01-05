@@ -400,6 +400,13 @@ WWSmartGuide::paint(QPainter *painter)
     QPointF br(-1,-1);
     int selected=0;
 
+    //
+    // FIND SCOPE TO MARK GUDIES FOR
+    // 
+    // Currently we add guides when items are selected
+    // or you are dragging a block or point around
+    //
+
     // If not dragging points or blocks just mark any selected items
     if (workoutWidget()->state == WorkoutWidget::none) {
 
@@ -455,6 +462,13 @@ WWSmartGuide::paint(QPainter *painter)
     QRectF boundary (workoutWidget()->transform(tl.x(), tl.y()),
                      workoutWidget()->transform(br.x(), br.y()));
 
+
+    QFontMetrics fontMetrics(workoutWidget()->markerFont);
+    painter->setFont(workoutWidget()->markerFont);
+
+    //
+    // X-AXIS GUIDES
+    //
     if (selected > 0) {
 
         // for now just paint the boundary tics on the x-axis
@@ -473,8 +487,6 @@ WWSmartGuide::paint(QPainter *painter)
 
         // now the text - but only if we have a gap!
         if (br.x() > tl.x()) {
-            QFontMetrics fontMetrics(workoutWidget()->markerFont);
-            painter->setFont(workoutWidget()->markerFont);
 
             // paint time at very bottom of bottom in the middle
             // of the elongated tic marks
@@ -513,8 +525,6 @@ WWSmartGuide::paint(QPainter *painter)
 
         // now the left text - but only if we have a gap!
         if (left < tl.x()) {
-            QFontMetrics fontMetrics(workoutWidget()->markerFont);
-            painter->setFont(workoutWidget()->markerFont);
 
             // paint time at very bottom of bottom in the middle
             // of the elongated tic marks
@@ -527,8 +537,6 @@ WWSmartGuide::paint(QPainter *painter)
 
         // now the right text - but only if we have a gap!
         if (right > br.x()) {
-            QFontMetrics fontMetrics(workoutWidget()->markerFont);
-            painter->setFont(workoutWidget()->markerFont);
 
             // paint time at very bottom of bottom in the middle
             // of the elongated tic marks
@@ -544,6 +552,38 @@ WWSmartGuide::paint(QPainter *painter)
         painter->drawLine(boundary.bottomLeft()-QPointF(10,0), boundary.bottomLeft()-QPointF(30,0));
         painter->drawLine(boundary.bottomLeft()-QPointF(20,0), boundary.topLeft()-QPointF(20,0));
 #endif
+    }
+
+    //
+    // Y-AXIS GUIDES
+    //
+    if (selected > 0) {
+
+        // for now just paint the boundary tics on the y-axis
+        QPen linePen(GColor(CPLOTMARKER));
+        linePen.setWidthF(0);
+        painter->setPen(linePen);
+
+        // top line width indicators
+        painter->drawLine(workoutWidget()->left().left(), boundary.topRight().y(),
+                          workoutWidget()->left().right(), boundary.topRight().y());
+
+        painter->drawLine(workoutWidget()->left().left(), boundary.bottomLeft().y(),
+                          workoutWidget()->left().right(), boundary.bottomLeft().y());
+
+
+        // now the texts
+        // paint the bottom value
+        QString text = QString("%1w").arg(double(tl.y()), 0, 'f', 0);
+        QRect bound = fontMetrics.boundingRect(text);
+        painter->drawText(workoutWidget()->left().left(), boundary.top()-SPACING, text);
+        if (br.y() < tl.y()) {
+
+            // paint the bottom value UNDERNEATH the line, just in case they are really close!
+            text = QString("%1w").arg(double(br.y()), 0, 'f', 0);
+            bound = fontMetrics.boundingRect(text);
+            painter->drawText(workoutWidget()->left().left(), boundary.bottom()+SPACING+fontMetrics.ascent(), text);
+        }
     }
 }
 
