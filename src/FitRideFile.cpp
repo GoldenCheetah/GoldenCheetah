@@ -114,12 +114,7 @@ struct FitFileReaderState
     struct TruncatedRead {};
 
     void read_unknown( int size, int *count = NULL ) {
-#ifdef Q_CC_MSVC
-        char* c = new char[size+1];
-#else
-        char c[size+1];
-#endif
-        if (file.read(c, size ) != size)
+        if (!file.seek(file.pos() + size))
             throw TruncatedRead();
         if (count)
             (*count) += size;
