@@ -35,7 +35,7 @@
 static const double IHEIGHT = 10;
 static const double THEIGHT = 25;
 static const double BHEIGHT = 35;
-static const double LWIDTH = 55;
+static const double LWIDTH = 65;
 static const double RWIDTH = 35;
 
 // axis tic marks
@@ -1298,9 +1298,8 @@ WorkoutWidget::paintEvent(QPaintEvent*)
             painter.setPen(markerPen);
 
             QString label = QString("%1w").arg(i);
-            QRect bound = fontMetrics.boundingRect(label);
             painter.drawText(QPoint(canvas().left()+SPACING,
-                                    y+bound.height()), // we use ascent not height to line up numbers
+                                    y+(fontMetrics.ascent()/2)), // we use ascent not height to line up numbers
                                     label);
 
 #if 0       // ONLY SHOW GRIDLINES FROM POWERSCALE
