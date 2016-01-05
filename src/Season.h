@@ -31,6 +31,8 @@
 
 #include "Context.h"
 
+class Phase;
+
 class SeasonEvent
 {
     public:
@@ -44,12 +46,13 @@ class Season
 {
     Q_DECLARE_TR_FUNCTIONS(Season)
 
-	public:
+    public:
         static QList<QString> types;
         enum SeasonType { season=0, cycle=1, adhoc=2, temporary=3 };
         //typedef enum seasontype SeasonType;
 
-		Season();
+        Season();
+
         QDate getStart();
         QDate getEnd();
         int getSeed() { return _seed; }
@@ -71,20 +74,25 @@ class Season
         void setId(QUuid x) { _id = x; }
         QVector<int> &load() { return _load; }
 
-
+        int type;
         QDate start; // first day of the season
         QDate end; // last day of the season
+
+        QString name; // name, typically users name them by year e.g. "2011 Season"
+
+        QVector<int> _load; // array of daily planned load
+
+        QList<Phase> phases;
+        QList<SeasonEvent> events;
+
+    protected:
+
         int _days; // how many days in this season?
         int _seed;
         int _low; // low point for SB .. default to -50
         int _ramp; // max ramp rate for CTL we want to see
         QUuid _id; // unique id
 
-        QString name; // name, typically users name them by year e.g. "2011 Season"
-        int type;
-
-        QVector<int> _load; // array of daily planned load
-        QList<SeasonEvent> events;
 };
 
 class EditSeasonDialog : public QDialog
@@ -179,5 +187,42 @@ class SeasonTreeView : public QTreeWidget
 
 };
 
+class Phase : public Season
+{
+    Q_DECLARE_TR_FUNCTIONS(Phase)
+
+    public:
+        static QList<QString> types;
+        enum PhaseType { phase=100, prep=101, base=102, build=103, peak=104, camp=120 };
+
+        Phase();
+        Phase(QString _name, QDate _start, QDate _end);
+
+};
+
+class EditPhaseDialog : public QDialog
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        EditPhaseDialog(Context *, Phase *);
+
+    public slots:
+        void applyClicked();
+        void cancelClicked();
+
+    private:
+        Context *context;
+        Phase *phase;
+
+        QPushButton *applyButton, *cancelButton;
+        QLineEdit *nameEdit;
+        QComboBox *typeEdit;
+        QDateEdit *fromEdit, *toEdit;
+        QDoubleSpinBox *seedEdit;
+        QDoubleSpinBox *lowEdit;
+};
 
 #endif /* SEASON_H_ */

@@ -43,6 +43,9 @@ protected:
     QDate seasonDateToDate(QString);
     Season season;
     QList<Season> seasons;
+
+    bool isPhase;
+    Phase phase;
     int loadcount;
     QString dateString;
 

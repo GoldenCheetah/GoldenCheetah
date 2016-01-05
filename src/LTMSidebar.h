@@ -71,6 +71,8 @@ class LTMSidebar : public QWidget
         void deleteEvent();
         void addEvent();
 
+        void addPhase();
+
         // working with preset charts
         void presetsChanged();
         void presetSelectionChanged();
