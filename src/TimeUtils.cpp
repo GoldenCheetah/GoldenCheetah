@@ -29,19 +29,22 @@ QString time_to_string(double secs)
     if (secs<0) secs=0;
 
     QString result;
-    unsigned rounded = static_cast<unsigned>(round(secs));
-    bool needs_colon = false;
-    if (rounded >= 3600) {
-        result += QString("%1").arg(rounded / 3600);
-        rounded %= 3600;
-        needs_colon = true;
-    }
-    if (needs_colon)
+    if (secs < 60) result = QString("%1").arg(secs); // special case for < 60s
+    else{
+        unsigned rounded = static_cast<unsigned>(round(secs));
+        bool needs_colon = false;
+        if (rounded >= 3600) {
+            result += QString("%1").arg(rounded / 3600);
+            rounded %= 3600;
+            needs_colon = true;
+        }
+        if (needs_colon)
+            result += ":";
+        result += QString("%1").arg(rounded / 60, 2, 10, QLatin1Char('0'));
+        rounded %= 60;
         result += ":";
-    result += QString("%1").arg(rounded / 60, 2, 10, QLatin1Char('0'));
-    rounded %= 60;
-    result += ":";
-    result += QString("%1").arg(rounded, 2, 10, QLatin1Char('0'));
+        result += QString("%1").arg(rounded, 2, 10, QLatin1Char('0'));
+    }
     return result;
 }
 
