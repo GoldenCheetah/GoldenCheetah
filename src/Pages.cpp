@@ -6052,7 +6052,7 @@ SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), c
         // to
         add->setText(3, season.end.toString(tr("ddd MMM d, yyyy")));
         // guid -- hidden
-        add->setText(4, season._id.toString());
+        add->setText(4, season.id().toString());
 
     }
     seasons->setCurrentItem(seasons->invisibleRootItem()->child(0));
@@ -6185,7 +6185,7 @@ SeasonsPage::saveClicked()
         array[i].setType(Season::types.indexOf(item->text(1)));
         array[i].setStart(QDate::fromString(item->text(2), "ddd MMM d, yyyy"));
         array[i].setEnd(QDate::fromString(item->text(3), "ddd MMM d, yyyy"));
-        array[i]._id = QUuid(item->text(4));
+        array[i].setId(QUuid(item->text(4)));
     }
 
     // write to disk

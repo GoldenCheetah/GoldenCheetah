@@ -34,24 +34,45 @@ bool SeasonParser::startDocument()
 
 bool SeasonParser::endElement( const QString&, const QString&, const QString &qName )
 {
-    if(qName == "name")
-        season.setName(buffer.trimmed());
-    else if(qName == "startdate")
-        season.setStart(seasonDateToDate(buffer.trimmed()));
-    else if(qName == "enddate")
-        season.setEnd(seasonDateToDate(buffer.trimmed()));
-    else if (qName == "type")
-        season.setType(buffer.trimmed().toInt());
-    else if (qName == "id")
-        season.setId(QUuid(buffer.trimmed()));
-    else if (qName == "load") {
+    if(qName == "name") {
+        if (isPhase)
+            phase.setName(buffer.trimmed());
+        else
+            season.setName(buffer.trimmed());
+    } else if(qName == "startdate") {
+        if (isPhase)
+            phase.setStart(seasonDateToDate(buffer.trimmed()));
+        else
+            season.setStart(seasonDateToDate(buffer.trimmed()));
+    } else if(qName == "enddate") {
+        if (isPhase)
+            phase.setEnd(seasonDateToDate(buffer.trimmed()));
+        else
+            season.setEnd(seasonDateToDate(buffer.trimmed()));
+    } else if (qName == "type") {
+        if (isPhase)
+            phase.setType(buffer.trimmed().toInt());
+        else
+            season.setType(buffer.trimmed().toInt());
+    } else if (qName == "id") {
+        if (isPhase)
+            phase.setId(QUuid(buffer.trimmed()));
+        else
+            season.setId(QUuid(buffer.trimmed()));
+    } else if (qName == "load") {
         season.load().resize(loadcount+1);
         season.load()[loadcount] = buffer.trimmed().toInt();
         loadcount++;
     } else if (qName == "low") {
-        season.setLow(buffer.trimmed().toInt());
+        if (isPhase)
+            phase.setLow(buffer.trimmed().toInt());
+        else
+            season.setLow(buffer.trimmed().toInt());
     } else if (qName == "seed") {
-        season.setSeed(buffer.trimmed().toInt());
+        if (isPhase)
+            phase.setSeed(buffer.trimmed().toInt());
+        else
+            season.setSeed(buffer.trimmed().toInt());
     } else if (qName == "event") {
 
         season.events.append(SeasonEvent(unquote(buffer.trimmed()), seasonDateToDate(dateString)));
@@ -75,7 +96,11 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
 
             seasons.append(season);
         }
+    } else if(qName == "phase") {
+        season.phases.append(phase);
+        isPhase = false;
     }
+
     return true;
 }
 
@@ -85,6 +110,12 @@ bool SeasonParser::startElement( const QString&, const QString&, const QString &
     if(name == "season") {
         season = Season();
         loadcount = 0;
+        isPhase = false;
+    }
+
+    if(name == "phase") {
+        phase = Phase();
+        isPhase = true;
     }
 
     if (name == "event") {
@@ -170,17 +201,40 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
                   "\t\t<id>%5</id>\n"
                   "\t\t<seed>%6</seed>\n"
                   "\t\t<low>%7</low>\n") .arg(season.getName())
-                                           .arg(season.getStart().toString("yyyy-MM-dd"))
-                                           .arg(season.getEnd().toString("yyyy-MM-dd"))
-                                           .arg(season.getType())
-                                           .arg(season.id().toString())
-                                           .arg(season.getSeed())
-                                           .arg(season.getLow());
+                                         .arg(season.getStart().toString("yyyy-MM-dd"))
+                                         .arg(season.getEnd().toString("yyyy-MM-dd"))
+                                         .arg(season.getType())
+                                         .arg(season.id().toString())
+                                         .arg(season.getSeed())
+                                         .arg(season.getLow());
                                     
 
             // load profile
             for (int i=9; i<season.load().count(); i++)
                 out <<QString("\t<load>%1</load>\n").arg(season.load()[i]);
+
+
+            // Phases
+            foreach (Phase phase, season.phases) {
+
+                // main attributes
+                out<<QString("\t\t<phase>\n"
+                      "\t\t\t<name>%1</name>\n"
+                      "\t\t\t<startdate>%2</startdate>\n"
+                      "\t\t\t<enddate>%3</enddate>\n"
+                      "\t\t\t<type>%4</type>\n"
+                      "\t\t\t<id>%5</id>\n"
+                      "\t\t\t<seed>%6</seed>\n"
+                      "\t\t\t<low>%7</low>\n"
+                      "\t\t</phase>\n") .arg(phase.getName())
+                                             .arg(phase.getStart().toString("yyyy-MM-dd"))
+                                             .arg(phase.getEnd().toString("yyyy-MM-dd"))
+                                             .arg(phase.getType())
+                                             .arg(phase.id().toString())
+                                             .arg(phase.getSeed())
+                                             .arg(phase.getLow());
+            }
+
 
             foreach(SeasonEvent x, season.events) {
 

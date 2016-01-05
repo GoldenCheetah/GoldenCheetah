@@ -88,7 +88,7 @@ void Season::setType(int _type)
 
 bool Season::LessThanForStarts(const Season &a, const Season &b)
 {
-	return a.start.toJulianDay() < b.start.toJulianDay();
+    return a.start.toJulianDay() < b.start.toJulianDay();
 }
 
 /*----------------------------------------------------------------------
@@ -131,7 +131,7 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
     seedEdit->setWrapping(true);
     seedEdit->setAlignment(Qt::AlignLeft);
     seedEdit->setValue(season->getSeed());
-    
+
     lowEdit = new QDoubleSpinBox(this);
     lowEdit->setDecimals(0);
     lowEdit->setRange(-500, 0);
@@ -139,7 +139,7 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
     lowEdit->setWrapping(true);
     lowEdit->setAlignment(Qt::AlignLeft);
     lowEdit->setValue(season->getLow());
-    
+
 
     grid->addWidget(name, 0,0);
     grid->addWidget(nameEdit, 0,1);
@@ -417,7 +417,7 @@ Seasons::writeSeasons()
     seasonsChanged(); // signal!
 }
 
-Season 
+Season
 Seasons::seasonFor(QDate date)
 {
     foreach(Season season, seasons)
@@ -450,19 +450,19 @@ SeasonTreeView::dropEvent(QDropEvent* event)
 {
     // get the list of the items that are about to be dropped
     QTreeWidgetItem* item = selectedItems()[0];
- 
+
     // row we started on
     int idx1 = indexFromItem(item).row();
- 
+
     // don't move temp 'system generated' date ranges!
     if (context->athlete->seasons->seasons[idx1].type != Season::temporary) {
 
         // the default implementation takes care of the actual move inside the tree
         QTreeWidget::dropEvent(event);
- 
+
         // moved to !
         int idx2 = indexFromItem(item).row();
- 
+
         // notify subscribers in some useful way
         Q_EMIT itemMoved(item, idx1, idx2);
 
@@ -472,7 +472,7 @@ SeasonTreeView::dropEvent(QDropEvent* event)
     }
 }
 
-QStringList 
+QStringList
 SeasonTreeView::mimeTypes() const
 {
     QStringList returning;
@@ -491,23 +491,170 @@ SeasonTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
     QDataStream stream(&rawData, QIODevice::WriteOnly);
     stream.setVersion(QDataStream::Qt_4_6);
 
-    // pack data 
+    // pack data
     stream << (quint64)(context); // where did this come from?
     stream << items.count();
     foreach (QTreeWidgetItem *p, items) {
+        int seasonIdx = -1;
+        int phaseIdx = -1;
 
-        // get the season this is for
-        int index = p->treeWidget()->invisibleRootItem()->indexOfChild(p);
+        if (p->type() >= Season::season && p->type() < Phase::phase) {
+            // get the season this is for
+            seasonIdx = p->treeWidget()->invisibleRootItem()->indexOfChild(p);
+        } else if (p->type() >= Phase::phase) {
+            // get the season this is for
+            seasonIdx = p->treeWidget()->invisibleRootItem()->indexOfChild(p->parent());
+            phaseIdx = p->parent()->indexOfChild(p);
+        }
 
         // season[index] ...
-        stream << context->athlete->seasons->seasons[index].name; // name
-        stream << context->athlete->seasons->seasons[index].start;
-        stream << context->athlete->seasons->seasons[index].end;
-        stream << (quint64)context->athlete->seasons->seasons[index]._days;
+        if (phaseIdx > -1) {
+            stream << context->athlete->seasons->seasons[seasonIdx].name + "/" + context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].name; // name
+            stream << context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].start;
+            stream << context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].end;
+            stream << (quint64)context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].days();
+        } else {
+            stream << context->athlete->seasons->seasons[seasonIdx].name; // name
+            stream << context->athlete->seasons->seasons[seasonIdx].start;
+            stream << context->athlete->seasons->seasons[seasonIdx].end;
+            stream << (quint64)context->athlete->seasons->seasons[seasonIdx].days();
+        }
 
     }
 
     // and return as mime data
     returning->setData("application/x-gc-seasons", rawData);
     return returning;
+}
+
+static QList<QString> _setPhaseTypes()
+{
+    QList<QString> returning;
+    returning << "Phase"
+              << "Prep"
+              << "Base"
+              << "Build"
+              << "Peak"
+              << "Camp";
+    return returning;
+}
+
+QList<QString> Phase::types = _setPhaseTypes();
+
+Phase::Phase() : Season()
+{
+    type = phase;  // by default phase are of type phase
+    _id = QUuid::createUuid(); // in case it isn't set yet
+    _seed = 0;
+    _low = -50;
+}
+
+Phase::Phase(QString _name, QDate _start, QDate _end) : Season()
+{
+    type = phase;  // by default phase are of type phase
+    name = _name;
+    start = _start;
+    end = _end;
+    _id = QUuid::createUuid(); // in case it isn't set yet
+    _seed = 0;
+    _low = -50;
+}
+
+/*----------------------------------------------------------------------
+ * EDIT PHASE DIALOG
+ *--------------------------------------------------------------------*/
+EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase) :
+    QDialog(context->mainWindow, Qt::Dialog), context(context), phase(phase)
+{
+    setWindowTitle(tr("Edit Date Range"));
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+
+    // Grid
+    QGridLayout *grid = new QGridLayout;
+    QLabel *name = new QLabel(tr("Name"));
+    QLabel *type = new QLabel(tr("Type"));
+    QLabel *from = new QLabel(tr("From"));
+    QLabel *to = new QLabel(tr("To"));
+    QLabel *seed = new QLabel(tr("Starting LTS"));
+    QLabel *low  = new QLabel(tr("Lowest SB"));
+
+    nameEdit = new QLineEdit(this);
+    nameEdit->setText(phase->getName());
+
+    typeEdit = new QComboBox;
+    typeEdit->addItem(tr("Phase"), Phase::phase);
+    typeEdit->addItem(tr("Prep"),  Phase::prep);
+    typeEdit->addItem(tr("Base"),  Phase::base);
+    typeEdit->addItem(tr("Build"), Phase::build);
+    typeEdit->addItem(tr("Camp"), Phase::build);
+    typeEdit->setCurrentIndex(typeEdit->findData(phase->getType()));
+
+    fromEdit = new QDateEdit(this);
+    fromEdit->setDate(phase->getStart());
+
+    toEdit = new QDateEdit(this);
+    toEdit->setDate(phase->getEnd());
+
+    seedEdit = new QDoubleSpinBox(this);
+    seedEdit->setDecimals(0);
+    seedEdit->setRange(0.0, 300.0);
+    seedEdit->setSingleStep(1.0);
+    seedEdit->setWrapping(true);
+    seedEdit->setAlignment(Qt::AlignLeft);
+    seedEdit->setValue(phase->getSeed());
+
+    lowEdit = new QDoubleSpinBox(this);
+    lowEdit->setDecimals(0);
+    lowEdit->setRange(-500, 0);
+    lowEdit->setSingleStep(1.0);
+    lowEdit->setWrapping(true);
+    lowEdit->setAlignment(Qt::AlignLeft);
+    lowEdit->setValue(phase->getLow());
+
+
+    grid->addWidget(name, 0,0);
+    grid->addWidget(nameEdit, 0,1);
+    grid->addWidget(type, 1,0);
+    grid->addWidget(typeEdit, 1,1);
+    grid->addWidget(from, 2,0);
+    grid->addWidget(fromEdit, 2,1);
+    grid->addWidget(to, 3,0);
+    grid->addWidget(toEdit, 3,1);
+    grid->addWidget(seed, 4,0);
+    grid->addWidget(seedEdit, 4,1);
+    grid->addWidget(low, 5,0);
+    grid->addWidget(lowEdit, 5,1);
+
+    mainLayout->addLayout(grid);
+
+    // Buttons
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addStretch();
+    applyButton = new QPushButton(tr("&OK"), this);
+    cancelButton = new QPushButton(tr("&Cancel"), this);
+    buttonLayout->addWidget(cancelButton);
+    buttonLayout->addWidget(applyButton);
+    mainLayout->addLayout(buttonLayout);
+
+    // connect up slots
+    connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+}
+
+void
+EditPhaseDialog::applyClicked()
+{
+    // get the values back
+    phase->setName(nameEdit->text());
+    phase->setType(typeEdit->itemData(typeEdit->currentIndex()).toInt());
+    phase->setStart(fromEdit->date());
+    phase->setEnd(toEdit->date());
+    phase->setSeed(seedEdit->value());
+    phase->setLow(lowEdit->value());
+    accept();
+}
+void
+EditPhaseDialog::cancelClicked()
+{
+    reject();
 }

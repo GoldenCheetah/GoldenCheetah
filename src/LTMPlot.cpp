@@ -3743,7 +3743,7 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
         qSort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
         foreach (Season s, tmpSeasons) {
 
-            if (s.type != Season::temporary && s.name != settings->title && s.getStart() >= from && s.getStart() <= to) {
+            if (s.type != Season::temporary && s.getName() != settings->title && s.getStart() >= from && s.getStart() <= to) {
                 QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
                 markers.append(mrk);
                 mrk->attach(this);
