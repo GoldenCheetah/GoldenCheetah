@@ -398,23 +398,57 @@ WWSmartGuide::paint(QPainter *painter)
 {
     QPointF tl(-1,-1);
     QPointF br(-1,-1);
-
-    // get the boundary of the selection
     int selected=0;
-    foreach(WWPoint *p, workoutWidget()->points()) {
 
-        // don't show guides whilst selecting, too noisy
-        if (!p->selected) continue;
+    // If not dragging points or blocks just mark any selected items
+    if (workoutWidget()->state == WorkoutWidget::none) {
 
-        selected++;
+        // get the boundary of the current selection
+        foreach(WWPoint *p, workoutWidget()->points()) {
 
-        // top left
-        if (tl.x() == -1 || tl.x() > p->x) tl.setX(p->x);
-        if (tl.y() == -1 || tl.y() < p->y) tl.setY(p->y);
+            // don't show guides whilst selecting, too noisy
+            if (!p->selected) continue;
 
-        // bottom right
-        if (br.x() == -1 || br.x() < p->x) br.setX(p->x);
-        if (br.y() == -1 || br.y() > p->y) br.setY(p->y);
+            selected++;
+
+            // top left
+            if (tl.x() == -1 || tl.x() > p->x) tl.setX(p->x);
+            if (tl.y() == -1 || tl.y() < p->y) tl.setY(p->y);
+
+            // bottom right
+            if (br.x() == -1 || br.x() < p->x) br.setX(p->x);
+            if (br.y() == -1 || br.y() > p->y) br.setY(p->y);
+        }
+    }
+
+    // if dragging a block mark it
+    if (workoutWidget()->state == WorkoutWidget::dragblock) {
+   
+        foreach(PointMemento m, workoutWidget()->cr8block) {
+
+            // how many points
+            selected ++;
+
+            // top left
+            if (tl.x() == -1 || tl.x() > m.x) tl.setX(m.x);
+            if (tl.y() == -1 || tl.y() < m.y) tl.setY(m.y);
+
+            // bottom right
+            if (br.x() == -1 || br.x() < m.x) br.setX(m.x);
+            if (br.y() == -1 || br.y() > m.y) br.setY(m.y);
+        }
+    }
+
+    // if dragging a point mark that
+    if (workoutWidget()->state == WorkoutWidget::drag && workoutWidget()->dragging) {
+
+        // how many points
+        selected=1;
+
+        tl.setX(workoutWidget()->dragging->x);
+        br.setX(workoutWidget()->dragging->x);
+        tl.setY(workoutWidget()->dragging->y);
+        br.setY(workoutWidget()->dragging->y);
     }
 
     // set the boundary

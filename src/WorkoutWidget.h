@@ -167,6 +167,9 @@ class WorkoutWidget : public QWidget
         QPainterPath cursorBlock;
         QString cursorBlockText, cursorBlockText2;
 
+        // the point we are currently dragging
+        WWPoint *dragging;
+
    public slots:
 
         // and erg file was selected
@@ -195,8 +198,6 @@ class WorkoutWidget : public QWidget
         void paste();
 
     protected:
-
-        WWPoint *dragging;
 
         // interacting with points
         bool movePoint(QPoint p);
