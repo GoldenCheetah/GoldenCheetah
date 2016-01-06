@@ -213,9 +213,6 @@ class WWBlockSelection : public WorkoutWidgetItem {
 
         // locate me on the parent widget in paint coordinates
         QRectF bounding();
-
-    private:
-        Context *context;
 };
 
 // draws the W'bal curve
