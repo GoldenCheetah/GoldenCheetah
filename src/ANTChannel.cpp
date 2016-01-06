@@ -866,6 +866,7 @@ void ANTChannel::ackEvent(unsigned char *ant_message)
                     emit antRemoteControl(controlCmd);
 
                 lastControlSeq = controlSeq;
+                value = controlCmd;
                 break;
             }
         }
