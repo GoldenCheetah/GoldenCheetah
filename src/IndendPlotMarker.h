@@ -71,7 +71,7 @@ public:
 
     virtual void draw( QPainter *p,
         const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-        const QRectF & ) ;
+        const QRectF & ) const;
 
 protected:
     virtual void drawLabel( QPainter *,
