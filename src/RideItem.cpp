@@ -823,7 +823,7 @@ RideItem::updateIntervals()
                                                       standardColor(count++),
                                                       RideFileInterval::USER);
         intervalItem->rideInterval = interval;
-        intervalItem->refresh();        // XXX will get called in constructore when refactor
+        intervalItem->refresh();        // XXX will get called in constructor when refactor
         intervals_ << intervalItem;
 
         //qDebug()<<"interval:"<<interval.name<<interval.start<<interval.stop<<"f:"<<begin->secs<<end->secs;
