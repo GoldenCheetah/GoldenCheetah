@@ -75,7 +75,9 @@ static float readFloatFromByteArray(const QByteArray& block);
 
 static const int TACX_CAF_FILE_FINGERPRINT = 3000;
 static const int TACX_HEADER_BLOCK_SIZE = 8;
+#if notyet
 static const int TACX_BLOCK_INFO_HEADER_SIZE = 12;
+#endif
 static const int TACX_RIDE_DATA_BLOCK_SIZE = 10;
 
 // Block fingerprints

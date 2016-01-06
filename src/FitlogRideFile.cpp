@@ -84,6 +84,7 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
     //metadata.setAttribute("Modified", "");
     activity.appendChild(metadata);
 
+#if 0 //XXX REFACTOR COMPUTE METRICS
     const char *metrics[] = {
         "total_distance",
         "workout_time",
@@ -97,8 +98,7 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
         "max_power",
         NULL
     };
-
-#if 0 //XXX REFACTOR COMPUTE METRICS
+    
     QStringList worklist = QStringList();
     for (int i=0; metrics[i];i++) worklist << metrics[i];
 

@@ -2278,6 +2278,7 @@ RideSummaryWindow::htmlCompareSummary() const
                     int idx=0;
                     for (int i=0; i<WPrime::zoneCount(); i++) {
 
+#if 0 // See bug #1305
                         // above cp W'bal time in zone
                         int cptimeZone = dr.context->athlete->rideCache->getAggregate(timeInZonesCPWBAL[idx], dr.specification,
                                                                                  context->athlete->useMetricUnits, true).toDouble();
@@ -2285,6 +2286,7 @@ RideSummaryWindow::htmlCompareSummary() const
                         int cpdt = cptimeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZonesCPWBAL[idx],
                                                                         context->compareDateRanges[0].specification,
                                                                         context->athlete->useMetricUnits, true).toDouble();
+#endif // See bug #1305
 
                         // all W'bal time in zone
                         int timeZone = dr.context->athlete->rideCache->getAggregate(timeInZonesWBAL[idx], dr.specification,
