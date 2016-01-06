@@ -23,6 +23,8 @@
 #include <algorithm>
 #include <QVector>
 
+#include <cmath>
+
 // Config widget used by the Preferences/Options config panes
 class FixSpeed;
 class FixSpeedConfig : public DataProcessorConfig
@@ -152,7 +154,7 @@ FixSpeed::postProcess(RideFile *ride, DataProcessorConfig *config=0)
         index = (index >= rollingwindowsize-1) ? 0 : index+1;
 
         // If different enough, update
-        if (abs(kph - p->kph) > 10e-6) {
+        if (std::abs(kph - p->kph) > 10e-6) {
             // ok, lets start a luw if not already changed
             if (!changed) {
                 changed = true;
