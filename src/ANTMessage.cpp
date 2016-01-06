@@ -778,7 +778,13 @@ ANTMessage ANTMessage::unassignChannel(const unsigned char channel)
     return ANTMessage(1, ANT_UNASSIGN_CHANNEL, channel);
 }
 
-ANTMessage ANTMessage::setSearchTimeout(const unsigned char channel,
+ANTMessage ANTMessage::setLPSearchTimeout(const unsigned char channel,
+                                        const unsigned char timeout)
+{
+    return ANTMessage(2, ANT_LP_SEARCH_TIMEOUT, channel, timeout);
+}
+
+ANTMessage ANTMessage::setHPSearchTimeout(const unsigned char channel,
                                         const unsigned char timeout)
 {
     return ANTMessage(2, ANT_SEARCH_TIMEOUT, channel, timeout);
