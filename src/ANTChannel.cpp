@@ -177,7 +177,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
     // we should reimplement this via ANTMessage at some point
     unsigned char *message=ant_message+2;
 
-    //qDebug()<<number<<"channel event:"<< ANTMessage::channelEventMessage(*(message+1));
+    //qDebug()<<number<<"channel event:"<< ANTMessage::channelEventMessage(*(message+3));
     if (MESSAGE_IS_RESPONSE_NO_ERROR(message)) {
 
         //qDebug()<<number<<"channel event response no error";
@@ -187,7 +187,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
 
         //qDebug()<<number<<"channel event channel closed";
         if (status != Closing) {
-            //qDebug()<<"we got closed!! re-open !!";
+            //qDebug()<<number<<"we got closed!! re-open !!";
             status = Opening;
             attemptTransition(TRANSITION_START);
         } else {
@@ -236,7 +236,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
 
         //this cannot possibly be correct >> exit(-10);
 
-    } else if (MESSAGE_IS_EVENT_TRANSFER_TX_COMPLETED(message)) {
+    } else if (MESSAGE_IS_EVENT_TRANSFER_TX_COMPLETED(message) || MESSAGE_IS_EVENT_TX(message)) {
 
         // do nothing
 
@@ -244,7 +244,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
 
         // usually a response event, so lets get a debug going
         //qDebug()<<number<<"channel event other ....."<<QString("0x%1 0x%2 %3 %4")
-        //.arg(message[0], 1, 16).arg(message[1], 1, 16).arg(message[2]).arg(ANTMessage::channelEventMessage(message[2]));
+        //.arg(message[0], 1, 16).arg(message[1], 1, 16).arg(message[2]).arg(ANTMessage::channelEventMessage(message[3]));
     }
 }
 
