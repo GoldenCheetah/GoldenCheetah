@@ -814,11 +814,12 @@ RideItem::updateIntervals()
         if (interval->start >= interval->stop) continue;
 
         // create a new interval item
+        const int seq = count; // if passed directly, it could be incremented BEFORE being evaluated for the sequence arg as arg eval order is undefined
         IntervalItem *intervalItem = new IntervalItem(this, interval->name, 
                                                       interval->start, interval->stop, 
                                                       f->timeToDistance(interval->start),
                                                       f->timeToDistance(interval->stop),
-                                                      count,
+                                                      seq,
                                                       standardColor(count++),
                                                       RideFileInterval::USER);
         intervalItem->rideInterval = interval;
