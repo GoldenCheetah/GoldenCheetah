@@ -842,6 +842,10 @@ ANT::slotStopBroadcastTimer(int channel) // timer
 
     //qDebug()<<"ANT::slotStopTimer req from channel "<<channel;
 
+    // disconnect the slot, else we duplicate signals on subsequent sessions
+    disconnect(antChannel[channel]->channelTimer, SIGNAL(timeout()), this, SLOT(slotControlTimerEvent()));
+
+
     // stop the broadcast timer..
     antChannel[channel]->channelTimer->stop();
 }

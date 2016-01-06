@@ -121,6 +121,11 @@ void ANTChannel::close()
     emit lostInfo(number);
     lastMessage = ANTMessage();
 
+    if (is_master) {
+        //qDebug()<<number<<"Stopping timer..";
+        emit broadcastTimerStop(number);
+    }
+
     // lets shutdown
     qDebug()<<"** CLOSING CHANNEL"<<number<<"**";
     status = Closing;
@@ -1059,10 +1064,6 @@ void ANTChannel::attemptTransition(int message_id)
         //qDebug()<<number<<"TRANSITION from closed";
         status = Closed;
         //qDebug()<<"** CHANNEL"<<number<<"NOW CLOSED **";
-        if (is_master) {
-            //qDebug()<<number<<"Stopping timer..";
-            emit broadcastTimerStop(number);
-        }
         break;
 
     default:
