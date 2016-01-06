@@ -2464,7 +2464,7 @@ LTMTool::setFilter(QStringList files)
 } 
 
 DataFilterEdit::DataFilterEdit(QWidget *parent, Context *context)
-: QTextEdit(parent), context(context), c(0)
+: QTextEdit(parent), c(0), context(context)
 {
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(checkErrors()));
 }
