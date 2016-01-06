@@ -16,6 +16,14 @@ Makefile
 .DS_Store
 profile
 
+# qmake Xcode generator side-effects
+*.xcodeproj
+xcshareddata/
+*.xcworkspace
+*.pbxproj
+*.mak
+*.build/
+
 moc_*
 moc/
 obj/
