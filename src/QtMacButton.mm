@@ -176,7 +176,7 @@ public:
                 break;
         }
 
-        [nsButton setBezelStyle:bezelStyle];
+        [nsButton setBezelStyle:static_cast<NSBezelStyle>(bezelStyle)];
         [nsButton setState:false ];
     }
 
