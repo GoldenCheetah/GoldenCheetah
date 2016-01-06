@@ -48,8 +48,10 @@ class ANTMessage {
                                         const unsigned char network);
         static ANTMessage boostSignal(const unsigned char channel);
         static ANTMessage unassignChannel(const unsigned char channel);
-        static ANTMessage setSearchTimeout(const unsigned char channel,
-                                           const unsigned char timeout);
+        static ANTMessage setLPSearchTimeout(const unsigned char channel,
+                                             const unsigned char timeout);
+        static ANTMessage setHPSearchTimeout(const unsigned char channel,
+                                             const unsigned char timeout);
         static ANTMessage requestMessage(const unsigned char channel,
                                          const unsigned char request);
         static ANTMessage setChannelID(const unsigned char channel,
