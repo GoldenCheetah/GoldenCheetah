@@ -1014,7 +1014,7 @@ void ANTChannel::attemptTransition(int message_id)
     case ANT_CHANNEL_ID:
         //qDebug()<<number<<"TRANSITION from channel id";
         //qDebug()<<number<<"**** adjust timeout";
-        if (channel_type & CHANNEL_TYPE_QUICK_SEARCH) {
+        if (channel_type_flags & CHANNEL_TYPE_QUICK_SEARCH) {
             parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_scan/2.5)));
         } else {
             parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_lost/2.5)));
