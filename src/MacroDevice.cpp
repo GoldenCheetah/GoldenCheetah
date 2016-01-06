@@ -399,19 +399,23 @@ MacroPacket::read(CommPortPtr dev, int len, QString &err)
 
     if (n <= 0) {
         err = (n < 0) ? (tr("read error: ") + err) : tr("read timeout");
+#ifdef Q_CC_MSVC
+        delete[] buf;
+#endif
         return false;
     } else if (n < len) {
         err += QString(tr(", read only %1 bytes instead of: %2"))
             .arg(n).arg(len);
+#ifdef Q_CC_MSVC
+        delete[] buf;
+#endif
         return false;
     }
 
+    if (MACRO_DEBUG) printf("payload %s\n" ,cEscape(buf,n).toLatin1().constData());
+    addToPayload(buf,n);
 #ifdef Q_CC_MSVC
-    if (MACRO_DEBUG) printf("payload %s\n" ,cEscape(buf,n).toLatin1().constData());
-    addToPayload(buf,n);
-#else
-    if (MACRO_DEBUG) printf("payload %s\n" ,cEscape(buf,n).toLatin1().constData());
-    addToPayload(buf,n);
+    delete[] buf;
 #endif
     return true;
 }
