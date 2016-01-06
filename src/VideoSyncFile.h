@@ -100,10 +100,6 @@ class VideoSyncFile
         // Metrics for this workout
 
         Context *context;
-
-    private:
-        int &mode;
-        int nomode;
 };
 
 #endif
