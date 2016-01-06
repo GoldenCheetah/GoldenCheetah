@@ -2358,7 +2358,7 @@ RideFile::resample(double newRecIntSecs, int interpolate)
 // 1.26s sampling or higher to 1s sampling when merging data.
 //
 RideFile *
-RideFile::resample(double newRecIntSecs, int interpolate)
+RideFile::resample(double newRecIntSecs, int /*interpolate*/)
 {
 
     // resample if interval has changed

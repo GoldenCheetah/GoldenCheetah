@@ -344,8 +344,6 @@ void AbsWattagePage::updateMetrics()
     plot->replot();
 
     // calculate bike score, xpower
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    const RideMetric *rm = factory.rideMetric("skiba_xpower");
     QStringList metrics;
     metrics.append("time_riding");
     metrics.append("total_work");
@@ -354,6 +352,8 @@ void AbsWattagePage::updateMetrics()
     metrics.append("skiba_xpower");
 
 #if 0 //XXX REFACTOR METRICS
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    const RideMetric *rm = factory.rideMetric("skiba_xpower");
     QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(false),hackContext->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
 #endif
@@ -480,9 +480,6 @@ void RelWattagePage::updateMetrics()
     plot->replot();
 
     // calculate bike score, xpower
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    const RideMetric *rm = factory.rideMetric("skiba_xpower");
-
     QStringList metrics;
     metrics.append("time_riding");
     metrics.append("total_work");
@@ -490,6 +487,8 @@ void RelWattagePage::updateMetrics()
     metrics.append("skiba_bike_score");
     metrics.append("skiba_xpower");
 #if 0 //XXX REFACTOR METRICS
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    const RideMetric *rm = factory.rideMetric("skiba_xpower");
     QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(false),hackContext->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
 #endif

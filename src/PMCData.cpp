@@ -279,8 +279,10 @@ void PMCData::refresh()
 
     double planned_rollingStress=0;
 
+#if notyet
     double expected_lastLTS=0.0f;
     double expected_lastSTS=0.0f;
+#endif
 
     double expected_rollingStress=0;
 

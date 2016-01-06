@@ -109,6 +109,7 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     QStringList worklist = QStringList();
     for (int i=0; metrics[i];i++) worklist << metrics[i];
 
+    Q_UNUSED(context);
 #if 0 //XXX REFACTOR COMPUTE METRICS
     QHash<QString, RideMetricPtr> computed; 
     if (context) { // can't do this standalone
