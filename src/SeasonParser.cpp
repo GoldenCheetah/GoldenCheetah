@@ -193,8 +193,29 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
         if (season.getType() != Season::temporary) {
 
             // main attributes
-            out<<QString("\t<season>\n"
-                  "\t\t<name>%1</name>\n"
+            out<<QString("\t<season>\n");
+
+            // Phases
+            foreach (Phase phase, season.phases) {
+                out<<QString("\t\t<phase>\n"
+                      "\t\t\t<name>%1</name>\n"
+                      "\t\t\t<startdate>%2</startdate>\n"
+                      "\t\t\t<enddate>%3</enddate>\n"
+                      "\t\t\t<type>%4</type>\n"
+                      "\t\t\t<id>%5</id>\n"
+                      "\t\t\t<seed>%6</seed>\n"
+                      "\t\t\t<low>%7</low>\n"
+                      "\t\t</phase>\n") .arg(phase.getName())
+                                             .arg(phase.getStart().toString("yyyy-MM-dd"))
+                                             .arg(phase.getEnd().toString("yyyy-MM-dd"))
+                                             .arg(phase.getType())
+                                             .arg(phase.id().toString())
+                                             .arg(phase.getSeed())
+                                             .arg(phase.getLow());
+            }
+
+            // season infos
+            out<<QString("\t\t<name>%1</name>\n"
                   "\t\t<startdate>%2</startdate>\n"
                   "\t\t<enddate>%3</enddate>\n"
                   "\t\t<type>%4</type>\n"
@@ -213,27 +234,6 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
             for (int i=9; i<season.load().count(); i++)
                 out <<QString("\t<load>%1</load>\n").arg(season.load()[i]);
 
-
-            // Phases
-            foreach (Phase phase, season.phases) {
-
-                // main attributes
-                out<<QString("\t\t<phase>\n"
-                      "\t\t\t<name>%1</name>\n"
-                      "\t\t\t<startdate>%2</startdate>\n"
-                      "\t\t\t<enddate>%3</enddate>\n"
-                      "\t\t\t<type>%4</type>\n"
-                      "\t\t\t<id>%5</id>\n"
-                      "\t\t\t<seed>%6</seed>\n"
-                      "\t\t\t<low>%7</low>\n"
-                      "\t\t</phase>\n") .arg(phase.getName())
-                                             .arg(phase.getStart().toString("yyyy-MM-dd"))
-                                             .arg(phase.getEnd().toString("yyyy-MM-dd"))
-                                             .arg(phase.getType())
-                                             .arg(phase.id().toString())
-                                             .arg(phase.getSeed())
-                                             .arg(phase.getLow());
-            }
 
 
             foreach(SeasonEvent x, season.events) {
