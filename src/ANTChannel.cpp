@@ -905,7 +905,7 @@ void ANTChannel::channelId(unsigned char *ant_message) {
     // if we were searching,
     if (channel_type_flags&CHANNEL_TYPE_QUICK_SEARCH) {
         //qDebug()<<number<<"change timeout setting";
-        parent->sendMessage(ANTMessage::setHPSearchTimeout(number, (int)(timeout_lost/2.5)));
+        parent->sendMessage(ANTMessage::setLPSearchTimeout(number, (int)(timeout_lost/2.5)));
     }
     channel_type_flags &= ~CHANNEL_TYPE_QUICK_SEARCH;
 }
@@ -1014,10 +1014,14 @@ void ANTChannel::attemptTransition(int message_id)
     case ANT_CHANNEL_ID:
         //qDebug()<<number<<"TRANSITION from channel id";
         //qDebug()<<number<<"**** adjust timeout";
+
+        // Disable high priority searching - for better coexistence with other channels
+        parent->sendMessage(ANTMessage::setHPSearchTimeout(number, 0));
+
         if (channel_type_flags & CHANNEL_TYPE_QUICK_SEARCH) {
-            parent->sendMessage(ANTMessage::setHPSearchTimeout(number, (int)(timeout_scan/2.5)));
+            parent->sendMessage(ANTMessage::setLPSearchTimeout(number, (int)(timeout_scan/2.5)));
         } else {
-            parent->sendMessage(ANTMessage::setHPSearchTimeout(number, (int)(timeout_lost/2.5)));
+            parent->sendMessage(ANTMessage::setLPSearchTimeout(number, (int)(timeout_lost/2.5)));
         }
         break;
 
