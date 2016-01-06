@@ -121,6 +121,11 @@ void ANTChannel::close()
     emit lostInfo(number);
     lastMessage = ANTMessage();
 
+    if (is_master) {
+        //qDebug()<<number<<"Stopping timer..";
+        emit broadcastTimerStop(number);
+    }
+
     // lets shutdown
     qDebug()<<"** CLOSING CHANNEL"<<number<<"**";
     status = Closing;
@@ -177,7 +182,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
     // we should reimplement this via ANTMessage at some point
     unsigned char *message=ant_message+2;
 
-    //qDebug()<<number<<"channel event:"<< ANTMessage::channelEventMessage(*(message+1));
+    //qDebug()<<number<<"channel event:"<< ANTMessage::channelEventMessage(*(message+3));
     if (MESSAGE_IS_RESPONSE_NO_ERROR(message)) {
 
         //qDebug()<<number<<"channel event response no error";
@@ -187,7 +192,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
 
         //qDebug()<<number<<"channel event channel closed";
         if (status != Closing) {
-            //qDebug()<<"we got closed!! re-open !!";
+            //qDebug()<<number<<"we got closed!! re-open !!";
             status = Opening;
             attemptTransition(TRANSITION_START);
         } else {
@@ -236,7 +241,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
 
         //this cannot possibly be correct >> exit(-10);
 
-    } else if (MESSAGE_IS_EVENT_TRANSFER_TX_COMPLETED(message)) {
+    } else if (MESSAGE_IS_EVENT_TRANSFER_TX_COMPLETED(message) || MESSAGE_IS_EVENT_TX(message)) {
 
         // do nothing
 
@@ -244,7 +249,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
 
         // usually a response event, so lets get a debug going
         //qDebug()<<number<<"channel event other ....."<<QString("0x%1 0x%2 %3 %4")
-        //.arg(message[0], 1, 16).arg(message[1], 1, 16).arg(message[2]).arg(ANTMessage::channelEventMessage(message[2]));
+        //.arg(message[0], 1, 16).arg(message[1], 1, 16).arg(message[2]).arg(ANTMessage::channelEventMessage(message[3]));
     }
 }
 
@@ -861,6 +866,7 @@ void ANTChannel::ackEvent(unsigned char *ant_message)
                     emit antRemoteControl(controlCmd);
 
                 lastControlSeq = controlSeq;
+                value = controlCmd;
                 break;
             }
         }
@@ -899,7 +905,7 @@ void ANTChannel::channelId(unsigned char *ant_message) {
     // if we were searching,
     if (channel_type_flags&CHANNEL_TYPE_QUICK_SEARCH) {
         //qDebug()<<number<<"change timeout setting";
-        parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_lost/2.5)));
+        parent->sendMessage(ANTMessage::setLPSearchTimeout(number, (int)(timeout_lost/2.5)));
     }
     channel_type_flags &= ~CHANNEL_TYPE_QUICK_SEARCH;
 }
@@ -1008,10 +1014,14 @@ void ANTChannel::attemptTransition(int message_id)
     case ANT_CHANNEL_ID:
         //qDebug()<<number<<"TRANSITION from channel id";
         //qDebug()<<number<<"**** adjust timeout";
-        if (channel_type & CHANNEL_TYPE_QUICK_SEARCH) {
-            parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_scan/2.5)));
+
+        // Disable high priority searching - for better coexistence with other channels
+        parent->sendMessage(ANTMessage::setHPSearchTimeout(number, 0));
+
+        if (channel_type_flags & CHANNEL_TYPE_QUICK_SEARCH) {
+            parent->sendMessage(ANTMessage::setLPSearchTimeout(number, (int)(timeout_scan/2.5)));
         } else {
-            parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_lost/2.5)));
+            parent->sendMessage(ANTMessage::setLPSearchTimeout(number, (int)(timeout_lost/2.5)));
         }
         break;
 
@@ -1059,10 +1069,6 @@ void ANTChannel::attemptTransition(int message_id)
         //qDebug()<<number<<"TRANSITION from closed";
         status = Closed;
         //qDebug()<<"** CHANNEL"<<number<<"NOW CLOSED **";
-        if (is_master) {
-            //qDebug()<<number<<"Stopping timer..";
-            emit broadcastTimerStop(number);
-        }
         break;
 
     default:

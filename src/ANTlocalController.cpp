@@ -148,9 +148,12 @@ void ANTlocalController::antRemoteControl(uint16_t command)
 {
     //qDebug() <<"AntlocalController::antRemoteControl()" << command;
 
-    // translate the ANT control code to a native command code
-    uint16_t nativeCmd = parent->remote->getNativeCmdId(command);
+    // When called from pairing dialog the parent is null, do nothing..
+    if (parent) {
+        // translate the ANT control code to a native command code
+        uint16_t nativeCmd = parent->remote->getNativeCmdId(command);
 
-    // pass native command code to train view
-    emit remoteControl(nativeCmd);
+        // pass native command code to train view
+        emit remoteControl(nativeCmd);
+    }
 }
