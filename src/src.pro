@@ -30,6 +30,17 @@ TARGET = GoldenCheetah
 !isEmpty(APP_NAME) { TARGET = $${APP_NAME} }
 CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 
+greaterThan(QT_MAJOR_VERSION, 4) {
+    CONFIG += c++11
+} else:!*msvc2015 {
+    # gcc 4.7+ only
+    QMAKE_CXXFLAGS += -std=c++11
+    if (macx) {
+        # 10.7+ only
+        QMAKE_CXXFLAGS += -stdlib=libc++
+        QMAKE_LFLAGS += -stdlib=libc++
+    }
+}
 
 ###======================================================
 ### QT MODULES [we officially support QT4.8.6+ or QT5.6+]

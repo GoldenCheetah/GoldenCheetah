@@ -32,12 +32,12 @@ before_install:
 - curl -O http://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.2.2.dmg
 - git clone --depth 1 https://github.com/sintegrial/qwtplot3d.git qwtplot3d
 - cd qwtplot3d
-- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
+- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS+=-stdlib=libc++ QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field QMAKE_LFLAGS+=-stdlib=libc++
 - CC=clang CXX=clang++ make -j2
 - cd ..
 - git clone --branch 0.98 https://github.com/kypeli/kQOAuth.git kQOAuth-0.98
 - cd kQOAuth-0.98
-- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
+- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS+=-stdlib=libc++ QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field QMAKE_LFLAGS+=-stdlib=libc++
 - CC=clang CXX=clang++ make -j2 qmake_all
 - CC=clang CXX=clang++ sudo make install
 - cd ..
