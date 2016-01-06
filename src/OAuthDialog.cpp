@@ -356,6 +356,7 @@ OAuthDialog::loadFinished(bool ok) {
     }
 }
 
+#if QT_VERSION < 0x050000
 static QString RawJsonStringGrab(const QByteArray& payload,
                                  const QString& needle) {
     // A RegExp based JSON string parser. Not the best, but it does the job.
@@ -383,6 +384,7 @@ static QString RawJsonStringGrab(const QByteArray& payload,
     ret.remove(ret.size() - 1, 1);
     return ret;
 }
+#endif
 
 void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
 
