@@ -470,7 +470,7 @@ next_line: {}
 
                 } else if ((nz < ranges[nr].zones.size() - 1) && (ranges[nr].zones[nz].hi != ranges[nr].zones[nz + 1].lo)) {
 
-                    if (abs(ranges[nr].zones[nz].hi - ranges[nr].zones[nz + 1].lo) > 4) {
+                    if (std::abs(ranges[nr].zones[nz].hi - ranges[nr].zones[nz + 1].lo) > 4.0) {
 
                         append_to_warning(tr("Range %1: matching top of zone %2 "
                                              "(%3) to bottom of zone %4 (%5).\n").
