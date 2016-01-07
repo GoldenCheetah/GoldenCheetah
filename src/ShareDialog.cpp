@@ -235,6 +235,9 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     powerChk = new QCheckBox(tr("Power"));
     cadenceChk = new QCheckBox(tr("Cadence"));
     heartrateChk = new QCheckBox(tr("Heartrate"));
+    privateChk = new QCheckBox(tr("Private"));
+    commuteChk = new QCheckBox(tr("Commute"));
+    trainerChk = new QCheckBox(tr("Trainer"));
 
     const RideFileDataPresent *dataPresent = ride->ride()->areDataPresent();
     altitudeChk->setEnabled(dataPresent->alt);
@@ -252,9 +255,13 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     vbox3->addWidget(altitudeChk,0,1);
     vbox3->addWidget(cadenceChk,1,0);
     vbox3->addWidget(heartrateChk,1,1);
+    vbox3->addWidget(privateChk, 0, 2);
+    vbox3->addWidget(commuteChk, 1, 2);
+    vbox3->addWidget(trainerChk, 0, 3);
 
     groupBox3->setLayout(vbox3);
     mainLayout->addWidget(groupBox3);
+
 
     // show progress
     QVBoxLayout *progressLayout = new QVBoxLayout;
@@ -466,7 +473,8 @@ void
 StravaUploader::requestUploadStrava()
 {
     parent->progressLabel->setText(tr("Upload activity to Strava..."));
-    parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+    parent->progressBar->setValue(
+        parent->progressBar->value() + 10 / parent->shareSiteCount);
 
     int year = ride->fileName.left(4).toInt();
     int month = ride->fileName.mid(5,2).toInt();
@@ -481,8 +489,10 @@ StravaUploader::requestUploadStrava()
 
     // trap network response from access manager
     networkManager->disconnect();
-    connect(networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadStravaFinished(QNetworkReply*)));
-    connect(networkManager, SIGNAL(finished(QNetworkReply *)), eventLoop, SLOT(quit()));
+    connect(networkManager, SIGNAL(finished(QNetworkReply*)), this,
+            SLOT(requestUploadStravaFinished(QNetworkReply*)));
+    connect(networkManager, SIGNAL(finished(QNetworkReply *)), eventLoop,
+            SLOT(quit()));
 
     TcxFileReader reader;
 
@@ -490,9 +500,15 @@ StravaUploader::requestUploadStrava()
     QNetworkRequest request = QNetworkRequest(url);
 
     //QString boundary = QString::number(qrand() * (90000000000) / (RAND_MAX + 1) + 10000000000, 16);
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(qrand()).toString() +
+        QVariant(qrand()).toString() + QVariant(qrand()).toString();
 
-    QByteArray file = reader.toByteArray(context, ride->ride(), parent->altitudeChk->isChecked(), parent->powerChk->isChecked(), parent->heartrateChk->isChecked(), parent->cadenceChk->isChecked());
+    QByteArray file = zCompress(reader.toByteArray(
+                                    context, ride->ride(),
+                                    parent->altitudeChk->isChecked(),
+                                    parent->powerChk->isChecked(),
+                                    parent->heartrateChk->isChecked(),
+                                    parent->cadenceChk->isChecked()));
 
     // MULTIPART *****************
 
@@ -500,11 +516,13 @@ StravaUploader::requestUploadStrava()
     multiPart->setBoundary(boundary.toLatin1());
 
     QHttpPart accessTokenPart;
-    accessTokenPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"access_token\""));
+    accessTokenPart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                              QVariant("form-data; name=\"access_token\""));
     accessTokenPart.setBody(token.toLatin1());
 
     QHttpPart activityTypePart;
-    activityTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"activity_type\""));
+    activityTypePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                               QVariant("form-data; name=\"activity_type\""));
     if (ride->isRun)
       activityTypePart.setBody("run");
     else if (ride->isSwim)
@@ -518,21 +536,30 @@ StravaUploader::requestUploadStrava()
 
     QHttpPart dataTypePart;
     dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data_type\""));
-    dataTypePart.setBody("tcx");
+    dataTypePart.setBody("tcx.gz");
 
     QHttpPart externalIdPart;
     externalIdPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"external_id\""));
     externalIdPart.setBody("Ride");
 
     QHttpPart privatePart;
-    privatePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"private\""));
-    privatePart.setBody("TRUE");
+    privatePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                          QVariant("form-data; name=\"private\""));
+    privatePart.setBody(parent->privateChk->isChecked() ? "1" : "0");
+
+    QHttpPart commutePart;
+    commutePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                          QVariant("form-data; name=\"commute\""));
+    commutePart.setBody(parent->commuteChk->isChecked() ? "1" : "0");
+    QHttpPart trainerPart;
+    trainerPart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                          QVariant("form-data; name=\"trainer\""));
+    trainerPart.setBody(parent->trainerChk->isChecked() ? "1" : "0");
 
     QHttpPart filePart;
     filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/xml"));
-    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\"file.tcx\"; type=\"text/xml\""));
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\"file.tcx.gz\"; type=\"text/xml\""));
     filePart.setBody(file);
-
 
     multiPart->append(accessTokenPart);
     multiPart->append(activityTypePart);
@@ -540,8 +567,9 @@ StravaUploader::requestUploadStrava()
     multiPart->append(dataTypePart);
     multiPart->append(externalIdPart);
     multiPart->append(privatePart);
+    multiPart->append(commutePart);
+    multiPart->append(trainerPart);
     multiPart->append(filePart);
-
     networkManager->post(request, multiPart);
 
     parent->progressBar->setValue(parent->progressBar->value()+30/parent->shareSiteCount);
