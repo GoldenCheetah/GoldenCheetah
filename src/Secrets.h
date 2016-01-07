@@ -63,8 +63,15 @@
 #define GC_DROPBOX_CLIENT_SECRET "__GC_DROPBOX_CLIENT_SECRET__"
 #endif
 
+//Strava / see also Athlete parameter, default value.
+#ifndef GC_STRAVA_CLIENT_ID
+#define GC_STRAVA_CLIENT_ID    "83" // client id
+#endif
+
+
 #ifndef GC_STRAVA_CLIENT_SECRET
 #define GC_STRAVA_CLIENT_SECRET "__GC_STRAVA_CLIENT_SECRET__"
+#define GC_STRAVA_NO_CLIENT
 #endif
 
 #ifndef GC_CYCLINGANALYTICS_CLIENT_SECRET
