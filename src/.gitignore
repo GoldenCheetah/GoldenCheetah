@@ -19,6 +19,10 @@ qrc_application.cpp
 qrc_RideWindow.cpp
 .qmake.stash
 
+#coverity
+cov-int/*
+GoldenCheetah.tgz
+
 # ignore other object files
 *.o
 
