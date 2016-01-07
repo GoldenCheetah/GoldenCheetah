@@ -10,6 +10,8 @@ INSTALL-MAC     For building on Apple OS X
 
 [![Build Status](https://travis-ci.org/GoldenCheetah/GoldenCheetah.svg?branch=master)](https://travis-ci.org/GoldenCheetah/GoldenCheetah)
 
+[![Coverity Status](https://scan.coverity.com/projects/7503/badge.svg)](https://scan.coverity.com/projects/goldencheetah-goldencheetah)
+
 Alternatively official builds are available from http://www.goldencheetah.org
 
 whilst latest developer builds are available from http://goldencheetah.stand2surf.net
