@@ -33,24 +33,26 @@
 #include <memory>
 #include <utility>
 
-#define FIT_DEBUG     false // debug traces
-#define LAPSWIM_DEBUG false
+namespace {
+constexpr bool FIT_DEBUG = false; // debug traces
+constexpr bool LAPSWIM_DEBUG = false;
 
 #ifndef MATHCONST_PI
-#define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
+constexpr auto MATHCONST_PI = 3.141592653589793238462643383279502884L;
 #endif
 
-#define LAP_TYPE     19
-#define RECORD_TYPE  20
-#define SEGMENT_TYPE 142
+constexpr int LAP_TYPE = 19;
+constexpr int RECORD_TYPE = 20;
+constexpr int SEGMENT_TYPE = 142;
 
-static int fitFileReaderRegistered =
+int fitFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "fit", "Garmin FIT", new FitFileReader());
 
-static const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), Qt::UTC);
+const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), Qt::UTC);
 
-static double bearing = 0; // used to compute headwind depending on wind/cyclist bearing difference
+double bearing = 0; // used to compute headwind depending on wind/cyclist bearing difference
+}
 
 struct FitField {
     int num;
@@ -117,14 +119,14 @@ struct FitFileReaderState
 
     struct TruncatedRead {};
 
-    void read_unknown( int size, int *count = NULL ) {
+    void read_unknown( int size, int *count = nullptr ) {
         if (!file.seek(file.pos() + size))
             throw TruncatedRead();
         if (count)
             (*count) += size;
     }
 
-    fit_string_value read_text(int len, int *count = NULL) {
+    fit_string_value read_text(int len, int *count = nullptr) {
         char c;
         fit_string_value res = "";
         for (int i = 0; i < len; ++i) {
@@ -139,7 +141,7 @@ struct FitFileReaderState
         return res;
     }
 
-    fit_value_t read_int8(int *count = NULL) {
+    fit_value_t read_int8(int *count = nullptr) {
         qint8 i;
         if (file.read(reinterpret_cast<char*>( &i), 1) != 1)
             throw TruncatedRead();
@@ -149,7 +151,7 @@ struct FitFileReaderState
         return i == 0x7f ? NA_VALUE : i;
     }
 
-    fit_value_t read_uint8(int *count = NULL) {
+    fit_value_t read_uint8(int *count = nullptr) {
         quint8 i;
         if (file.read(reinterpret_cast<char*>( &i), 1) != 1)
             throw TruncatedRead();
@@ -159,7 +161,7 @@ struct FitFileReaderState
         return i == 0xff ? NA_VALUE : i;
     }
 
-    fit_value_t read_uint8z(int *count = NULL) {
+    fit_value_t read_uint8z(int *count = nullptr) {
         quint8 i;
         if (file.read(reinterpret_cast<char*>( &i), 1) != 1)
             throw TruncatedRead();
@@ -169,7 +171,7 @@ struct FitFileReaderState
         return i == 0x00 ? NA_VALUE : i;
     }
 
-    fit_value_t read_int16(bool is_big_endian, int *count = NULL) {
+    fit_value_t read_int16(bool is_big_endian, int *count = nullptr) {
         qint16 i;
         if (file.read(reinterpret_cast<char*>(&i), 2) != 2)
             throw TruncatedRead();
@@ -183,7 +185,7 @@ struct FitFileReaderState
         return i == 0x7fff ? NA_VALUE : i;
     }
 
-    fit_value_t read_uint16(bool is_big_endian, int *count = NULL) {
+    fit_value_t read_uint16(bool is_big_endian, int *count = nullptr) {
         quint16 i;
         if (file.read(reinterpret_cast<char*>(&i), 2) != 2)
             throw TruncatedRead();
@@ -197,7 +199,7 @@ struct FitFileReaderState
         return i == 0xffff ? NA_VALUE : i;
     }
 
-    fit_value_t read_uint16z(bool is_big_endian, int *count = NULL) {
+    fit_value_t read_uint16z(bool is_big_endian, int *count = nullptr) {
         quint16 i;
         if (file.read(reinterpret_cast<char*>(&i), 2) != 2)
             throw TruncatedRead();
@@ -211,7 +213,7 @@ struct FitFileReaderState
         return i == 0x0000 ? NA_VALUE : i;
     }
 
-    fit_value_t read_int32(bool is_big_endian, int *count = NULL) {
+    fit_value_t read_int32(bool is_big_endian, int *count = nullptr) {
         qint32 i;
         if (file.read(reinterpret_cast<char*>(&i), 4) != 4)
             throw TruncatedRead();
@@ -225,7 +227,7 @@ struct FitFileReaderState
         return i == 0x7fffffff ? NA_VALUE : i;
     }
 
-    fit_value_t read_uint32(bool is_big_endian, int *count = NULL) {
+    fit_value_t read_uint32(bool is_big_endian, int *count = nullptr) {
         quint32 i;
         if (file.read(reinterpret_cast<char*>(&i), 4) != 4)
             throw TruncatedRead();
@@ -239,7 +241,7 @@ struct FitFileReaderState
         return i == 0xffffffff ? NA_VALUE : i;
     }
 
-    fit_value_t read_uint32z(bool is_big_endian, int *count = NULL) {
+    fit_value_t read_uint32z(bool is_big_endian, int *count = nullptr) {
         quint32 i;
         if (file.read(reinterpret_cast<char*>(&i), 4) != 4)
             throw TruncatedRead();
@@ -1682,8 +1684,8 @@ struct FitFileReaderState
     RideFilePtr run() {
 
         // get the Smart Recording parameters
-        isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
-        GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
+        isGarminSmartRecording = appsettings->value(nullptr, GC_GARMIN_SMARTRECORD,Qt::Checked);
+        GarminHWM = appsettings->value(nullptr, GC_GARMIN_HWMARK);
         if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
 
         // start
