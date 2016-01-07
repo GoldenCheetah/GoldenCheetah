@@ -42,6 +42,7 @@
 #include "GoogleDrive.h"
 #endif
 #include "LocalFileStore.h"
+#include "Secrets.h"
 
 //
 // Main Config Page - tabs for each sub-page
@@ -522,7 +523,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     stravaAuthorise = new QPushButton(tr("Authorise"), this);
 
-#ifndef GC_STRAVA_CLIENT_SECRET
+#ifdef GC_STRAVA_NO_CLIENT
     stravaAuthorise->setEnabled(false);
 #endif
 

@@ -236,6 +236,9 @@ public:
     QCheckBox *powerChk;
     QCheckBox *cadenceChk;
     QCheckBox *heartrateChk;
+    QCheckBox *privateChk;
+    QCheckBox *commuteChk;
+    QCheckBox *trainerChk;
 
     int shareSiteCount;
 signals:
