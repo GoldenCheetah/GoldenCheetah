@@ -235,6 +235,9 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     powerChk = new QCheckBox(tr("Power"));
     cadenceChk = new QCheckBox(tr("Cadence"));
     heartrateChk = new QCheckBox(tr("Heartrate"));
+    privateChk = new QCheckBox(tr("Private"));
+    commuteChk = new QCheckBox(tr("Commute"));
+    trainerChk = new QCheckBox(tr("Trainer"));
 
     const RideFileDataPresent *dataPresent = ride->ride()->areDataPresent();
     altitudeChk->setEnabled(dataPresent->alt);
@@ -252,9 +255,13 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     vbox3->addWidget(altitudeChk,0,1);
     vbox3->addWidget(cadenceChk,1,0);
     vbox3->addWidget(heartrateChk,1,1);
+    vbox3->addWidget(privateChk, 0, 2);
+    vbox3->addWidget(commuteChk, 1, 2);
+    vbox3->addWidget(trainerChk, 0, 3);
 
     groupBox3->setLayout(vbox3);
     mainLayout->addWidget(groupBox3);
+
 
     // show progress
     QVBoxLayout *progressLayout = new QVBoxLayout;
@@ -535,9 +542,19 @@ StravaUploader::requestUploadStrava()
     externalIdPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"external_id\""));
     externalIdPart.setBody("Ride");
 
+    QHttpPart privatePart;
     privatePart.setHeader(QNetworkRequest::ContentDispositionHeader,
                           QVariant("form-data; name=\"private\""));
-    privatePart.setBody("TRUE");
+    privatePart.setBody(parent->privateChk->isChecked() ? "1" : "0");
+
+    QHttpPart commutePart;
+    commutePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                          QVariant("form-data; name=\"commute\""));
+    commutePart.setBody(parent->commuteChk->isChecked() ? "1" : "0");
+    QHttpPart trainerPart;
+    trainerPart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                          QVariant("form-data; name=\"trainer\""));
+    trainerPart.setBody(parent->trainerChk->isChecked() ? "1" : "0");
 
     QHttpPart filePart;
     filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/xml"));
@@ -550,8 +567,9 @@ StravaUploader::requestUploadStrava()
     multiPart->append(dataTypePart);
     multiPart->append(externalIdPart);
     multiPart->append(privatePart);
+    multiPart->append(commutePart);
+    multiPart->append(trainerPart);
     multiPart->append(filePart);
-
     networkManager->post(request, multiPart);
 
     parent->progressBar->setValue(parent->progressBar->value()+30/parent->shareSiteCount);
