@@ -780,6 +780,7 @@ WorkoutWidget::createBlock(QPoint p)
 
     // add a point!
     QPointF to = reverseTransform(p.x(), p.y());
+    QList<WWPoint *> adding;
 
     // nothing there yet, create first flat block
     if (points_.count() == 0) {
@@ -788,9 +789,11 @@ WorkoutWidget::createBlock(QPoint p)
         // Empty workout so create a single block starting from x=0
         //
         add = new WWPoint(this, 0, to.y());
+        adding << add;
         cr8block << PointMemento(add->x, add->y, -1);
 
         add = new WWPoint(this, to.x(), to.y());
+        adding << add;
         cr8block << PointMemento(add->x, add->y, -1);
 
     } else {
@@ -833,8 +836,10 @@ WorkoutWidget::createBlock(QPoint p)
                 case notvert:
                     // not vert just add 2 points
                     add = new WWPoint(this, last->x, to.y());
+                    adding << add;
                     cr8block << PointMemento(add->x, add->y, -1);
                     add = new WWPoint(this, to.x(), to.y());
+                    adding << add;
                     cr8block << PointMemento(add->x, add->y, -1);
                     break;
 
@@ -844,8 +849,10 @@ WorkoutWidget::createBlock(QPoint p)
                     // add a right angle, since that is
                     // consistent to what they have
                     add = new WWPoint(this, to.x(), last->y);
+                    adding << add;
                     cr8block << PointMemento(add->x, add->y, -1);
                     add = new WWPoint(this, to.x(), to.y());
+                    adding << add;
                     cr8block << PointMemento(add->x, add->y, -1);
 
                     break;
@@ -898,16 +905,19 @@ WorkoutWidget::createBlock(QPoint p)
             add = new WWPoint(this, to.x()-(width/2), 
                                     points_[prev]->y + (lwidth * ratio),
                                     false);
+            adding << add;
             cr8block << PointMemento(add->x, add->y, index);
             points_.insert(index++, add);
 
             // top left
             add = new WWPoint(this, to.x()-(width/2), to.y(), false);
+            adding << add;
             cr8block << PointMemento(add->x, add->y, index);
             points_.insert(index++, add);
 
             // top right
             add = new WWPoint(this, to.x()+(width/2), to.y(), false);
+            adding << add;
             cr8block << PointMemento(add->x, add->y, index);
             points_.insert(index++, add);
 
@@ -915,6 +925,7 @@ WorkoutWidget::createBlock(QPoint p)
             add = new WWPoint(this, to.x()+(width/2), 
                                     points_[prev]->y + (rwidth * ratio),
                                     false);
+            adding << add;
             cr8block << PointMemento(add->x, add->y, index);
             points_.insert(index++, add);
 
@@ -923,6 +934,14 @@ WorkoutWidget::createBlock(QPoint p)
 
     // did we create any
     if (cr8block.count()) {
+
+        // highlight were we align.
+        foreach(WWPoint *point, points_) {
+            if (adding.contains(point)) continue;
+
+            point->hover=false;
+            if (doubles_equal(point->y, to.y())) point->hover = true;
+        }
         return true;
     }
     return false;
