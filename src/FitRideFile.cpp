@@ -30,6 +30,8 @@
 #include <time.h>
 #include <limits>
 #include <cmath>
+#include <memory>
+#include <utility>
 
 #define FIT_DEBUG     false // debug traces
 #define LAPSWIM_DEBUG false
@@ -82,11 +84,13 @@ struct FitValue
     fit_string_value s;
 };
 
+using RideFilePtr = std::unique_ptr<RideFile>;
+
 struct FitFileReaderState
 {
     QFile &file;
     QStringList &errors;
-    RideFile *rideFile;
+    RideFilePtr rideFile;
     time_t start_time;
     time_t last_time;
     double last_distance;
@@ -105,7 +109,7 @@ struct FitFileReaderState
     QVariant GarminHWM;
 
     FitFileReaderState(QFile &file, QStringList &errors) :
-        file(file), errors(errors), rideFile(NULL), start_time(0),
+        file(file), errors(errors), rideFile(), start_time(0),
         last_time(0), last_distance(0.00f), interval(0), calibration(0),
         devices(0), stopped(true), isLapSwim(false), pool_length(0.0),
         last_event_type(-1), last_event(-1), last_msg_type(-1)
@@ -1069,8 +1073,7 @@ struct FitFileReaderState
                 last_distance = 0.00f;
                 interval = 0;
                 QString deviceType = rideFile->deviceType();
-                delete rideFile;
-                rideFile = new RideFile;
+                rideFile.reset(new RideFile);
                 rideFile->setDeviceType(deviceType);
                 rideFile->setRecIntSecs(1.0);
              }
@@ -1676,7 +1679,7 @@ struct FitFileReaderState
         return count;
     }
 
-    RideFile * run() {
+    RideFilePtr run() {
 
         // get the Smart Recording parameters
         isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
@@ -1684,15 +1687,15 @@ struct FitFileReaderState
         if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
 
         // start
-        rideFile = new RideFile;
+        rideFile.reset(new RideFile);
         rideFile->setDeviceType("Garmin FIT");
         rideFile->setWindHeading(0.0);
         rideFile->setWindSpeed(0.0);
         rideFile->setRecIntSecs(1.0); // this is a terrible assumption!
         if (!file.open(QIODevice::ReadOnly)) {
-            delete rideFile;
-            return NULL;
+            return nullptr;
         }
+        std::unique_ptr<QFile, void(*)(QFile*)> closeFile(&file, [](QFile* f) {f->close();} );
 
         int data_size = 0;
         try {
@@ -1701,9 +1704,7 @@ struct FitFileReaderState
             int header_size = read_uint8();
             if (header_size != 12 && header_size != 14) {
                 errors << QString("bad header size: %1").arg(header_size);
-                file.close();
-                delete rideFile;
-                return NULL;
+                return nullptr;
             }
             int protocol_version = read_uint8();
             (void) protocol_version;
@@ -1717,16 +1718,12 @@ struct FitFileReaderState
             char fit_str[5];
             if (file.read(fit_str, 4) != 4) {
                 errors << "truncated header";
-                file.close();
-                delete rideFile;
-                return NULL;
+                return nullptr;
             }
             fit_str[4] = '\0';
             if (strcmp(fit_str, ".FIT") != 0) {
                 errors << QString("bad header, expected \".FIT\" but got \"%1\"").arg(fit_str);
-                file.close();
-                delete rideFile;
-                return NULL;
+                return nullptr;
             }
 
             // read the rest of the header
@@ -1734,7 +1731,7 @@ struct FitFileReaderState
 
         } catch (TruncatedRead &e) {
             errors << "truncated file body";
-            return NULL;
+            return nullptr;
         }
 
         int bytes_read = 0;
@@ -1746,15 +1743,11 @@ struct FitFileReaderState
         }
         catch (TruncatedRead &e) {
             errors << "truncated file body";
-            //file.close();
-            //delete rideFile;
-            //return NULL;
+            //return nullptr;
             truncated = true;
         }
         if (stop) {
-            file.close();
-            delete rideFile;
-            return NULL;
+            return nullptr;
         }
         else {
             if (!truncated) {
@@ -1764,7 +1757,7 @@ struct FitFileReaderState
                 }
                 catch (TruncatedRead &e) {
                     errors << "truncated file body";
-                    return NULL;
+                    return nullptr;
                 }
             }
 
@@ -1775,17 +1768,15 @@ struct FitFileReaderState
             foreach(int num, unknown_base_type)
                 qDebug() << QString("FitRideFile: unknown base type %1; skipped").arg(num);
 
-            file.close();
-
-            return rideFile;
+            return std::move(rideFile);
         }
     }
 };
 
 RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
-    QSharedPointer<FitFileReaderState> state(new FitFileReaderState(file, errors));
-    return state->run();
+    auto state = std::unique_ptr<FitFileReaderState>(new FitFileReaderState(file, errors));
+    return state->run().release(); // ideally we'd return the unique_ptr itself, but that would require a lot more work
 }
 
 // vi:expandtab tabstop=4 shiftwidth=4
