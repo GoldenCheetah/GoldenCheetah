@@ -1198,6 +1198,8 @@ WorkoutWidget::recompute()
     int ctime = 0;
     double cwatts = 0;
 
+    double maxy=0;
+
     // resample the erg file into 1s samples
     foreach(WWPoint *p, points_) {
 
@@ -1211,8 +1213,12 @@ WorkoutWidget::recompute()
         }
 
         cwatts = p->y;
+        if (cwatts > maxy) maxy=cwatts;
     }
 
+    // rescale the yaxis
+    if (maxY_ > (maxy*2)) maxY_ = maxy *1.5; // too big
+    if (maxY_ < maxy) maxY_ = maxy *1.5; // too small
 
     //
     // COMPUTE KEY METRICS TSS/IF
