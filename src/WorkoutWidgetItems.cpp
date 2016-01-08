@@ -274,6 +274,9 @@ WWRect::paint(QPainter *painter)
 void
 WWBlockCursor::paint(QPainter *painter)
 {
+    // if were in a selection block don't draw a cursos
+    if (workoutWidget()->selectionBlock.contains(workoutWidget()->mapFromGlobal(QCursor::pos()))) return;
+    
     // are we busy resizing and stuff and is the block cursor valid?
     if (workoutWidget()->state == WorkoutWidget::none &&
         workoutWidget()->cursorBlock != QPainterPath()) {
@@ -305,8 +308,36 @@ WWBlockCursor::paint(QPainter *painter)
 void
 WWBlockSelection::paint(QPainter *painter)
 {
-    //XXX TODO qDebug()<<"select cursor paint";
-    Q_UNUSED(painter);
+    // draw the block selection
+    if (workoutWidget()->selectionBlock == QPainterPath()) return;
+
+    // set pen
+    painter->setPen(GColor(CPLOTMARKER));
+
+    // now draw the path
+    painter->drawPath(workoutWidget()->selectionBlock);
+
+    // and fill it
+    QColor darken = Qt::red;
+    darken.setAlpha(125);
+    painter->fillPath(workoutWidget()->selectionBlock, QBrush(darken));
+
+    // cursor block duration text
+    QFontMetrics fontMetrics(workoutWidget()->bigFont);
+    QRect textBound = fontMetrics.boundingRect(workoutWidget()->selectionBlockText);
+    painter->setFont(workoutWidget()->bigFont);
+    painter->setPen(GColor(CPLOTMARKER));
+
+    QPointF where(workoutWidget()->selectionBlock.boundingRect().center().x()-(textBound.width()/2), 
+                  workoutWidget()->selectionBlock.boundingRect().bottom()-10); //XXX 10 is hardcoded space from bottom
+
+    painter->drawText(where, workoutWidget()->selectionBlockText);
+
+    QRect textBound2 = fontMetrics.boundingRect(workoutWidget()->selectionBlockText2);
+    QPointF where2(workoutWidget()->selectionBlock.boundingRect().center().x()-(textBound2.width()/2), 
+                  where.y()-textBound.height());  //XXX 4 is hardcoded space between labels
+
+    painter->drawText(where2, workoutWidget()->selectionBlockText2);
 }
 
 // locate me on the parent widget in paint coordinates
