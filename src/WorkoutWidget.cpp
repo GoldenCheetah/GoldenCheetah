@@ -481,6 +481,65 @@ WorkoutWidget::setBlockCursor()
     // where is the mouse?
     QPoint c = mapFromGlobal(QCursor::pos());
 
+    //
+    // SELECTION BLOCK - block created by selecting points
+    //
+
+    // lets set the selection block first, coz if the cursor
+    // first and last index of selected items
+    int begin=-1, end=-1;
+    for(int i=0; i<points_.count(); i++) {
+        if (points_[i]->selected) {
+            if (begin == -1) begin = i;
+            end = i;
+        }
+    }
+
+    // if we need a path, lets create one
+    if (begin >=0 && end >= 0 && points_[begin]->x < points_[end]->x) {
+
+        // accumalate joules and time
+        double joules=0;
+        double secs=0;
+
+        // create a painterpath for all the selected blocks
+        QPointF firstp = transform(points_[begin]->x, 0);
+        QPainterPath block(firstp); // origin
+        for (int i=begin; i <= end; i++) {
+
+            // accumalate
+            if (i != begin) {
+                double duration = points_[i]->x - points_[i-1]->x;
+                joules += (points_[i]->y + points_[i-1]->y) / 2 * duration;
+                secs += duration;
+            }
+
+            QPointF here = transform(points_[i]->x, points_[i]->y);
+            block.lineTo(here);
+        }
+
+        // and back again
+        QPointF lastp = transform(points_[end]->x, 0);
+        block.lineTo(lastp);
+        block.lineTo(firstp);
+
+        // done
+        selectionBlock = block;
+
+        // average power
+        selectionBlockText2 = QString("%1w").arg(joules/secs, 0, 'f', 0);
+        selectionBlockText = time_to_string(secs);
+
+    } else {
+
+        selectionBlock = QPainterPath();
+        selectionBlockText = selectionBlockText2 = "";
+    }
+
+    //
+    // CURSOR BLOCK -- HOVER BLOCK AS WE MOVE MOUSE
+    //
+
     // not on canvas?
     if (!canvas().contains(c)) {
         if (cursorBlock != QPainterPath()) {
@@ -1059,6 +1118,8 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
     stackptr = 0;
     parent->undoAct->setEnabled(false);
     parent->redoAct->setEnabled(false);
+    cursorBlock = selectionBlock = QPainterPath();
+    cursorBlockText = selectionBlockText = cursorBlockText2 = selectionBlockText2 = "";
     //XXX consider refactoring this !!! XXX
 
     // wipe out points

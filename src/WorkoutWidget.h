@@ -167,6 +167,10 @@ class WorkoutWidget : public QWidget
         QPainterPath cursorBlock;
         QString cursorBlockText, cursorBlockText2;
 
+        // the block area created by the current selections
+        QPainterPath selectionBlock;
+        QString selectionBlockText, selectionBlockText2;
+
         // the point we are currently dragging
         WWPoint *dragging;
 
