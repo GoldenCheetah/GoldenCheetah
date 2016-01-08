@@ -109,6 +109,18 @@ WWPowerScale::paint(QPainter *painter)
                                     name);
         }
     }
+
+    // CP !
+    QPen cppen(GColor(CPLOTMARKER));
+    cppen.setStyle(Qt::DashLine);
+    painter->setPen(cppen);
+
+    double CPy = workoutWidget()->transform(0, CP).y();
+
+    // zone high
+    painter->drawLine(QPoint(workoutWidget()->canvas().x(), CPy), 
+                      QPoint(workoutWidget()->canvas().x()+workoutWidget()->canvas().width(), CPy));
+
 }
 
 WWWBalScale::WWWBalScale(WorkoutWidget *w, Context *c) : WorkoutWidgetItem(w), context(c)
