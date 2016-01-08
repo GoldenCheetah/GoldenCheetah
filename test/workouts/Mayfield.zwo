@@ -1,0 +1,26 @@
+<workout_file>
+
+  <name>Jon's Short Mix</name>
+  <description>This is the short workout often used at Zwift during the development of the workout feature. If you want to get a solid hour of effort in 30 minutes or less, this is a fun one to do.</description>
+  <category>Less than an hour to burn</category>
+  <categoryIndex>1</categoryIndex>
+
+  <workout>
+    <Warmup Duration="300" Text="text" PowerLow="0.3" PowerHigh="0.7" />
+
+    <IntervalsT Repeat="2" OnDuration="60" OffDuration="30" PowerOnLow="1.4" PowerOnHigh="1.6" PowerOffLow="0.5" PowerOffHigh="0.8" />
+
+    <SteadyState Duration="120" PowerLow="0.6" PowerHigh="0.9" />
+    <SteadyState Duration="10" PowerLow ="3.0" PowerHigh="3.0" />
+    <SteadyState Duration="60" PowerLow="0.6" PowerHigh="0.9" />
+    <SteadyState Duration="10" PowerLow ="3.0" PowerHigh="3.0" />
+    <SteadyState Duration="60" PowerLow="0.6" PowerHigh="0.9" />
+    <SteadyState Duration="10" PowerLow ="3.0" PowerHigh="3.0" />
+
+    <SteadyState Duration="240" PowerLow="0.5" PowerHigh="0.7" />
+    <SteadyState Duration="600" PowerLow="0.88" PowerHigh="0.9" />
+
+    <Cooldown Duration="180" PowerLow="0.7" PowerHigh="0.3" />
+  </workout>
+
+</workout_file>
