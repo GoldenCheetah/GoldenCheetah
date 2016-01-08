@@ -127,6 +127,9 @@ WorkoutWidget::timeout()
 //
 // 8 mouse enter        any         grab keyboard focus                 unchanged
 //
+// 9 screen resize      any         recalculate geometry objects        unchanged
+//                                  e.g. selection/cursor Block
+//
 
 bool
 WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
@@ -456,6 +459,16 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
             setFocus(Qt::MouseFocusReason);
         }
     }
+
+    //
+    // 9. RESIZE EVENT
+    //
+    if (event->type() == QEvent::Resize) {
+
+        // we need to update!
+        updateNeeded = true;
+    }
+
 
     // ALL DONE
 
