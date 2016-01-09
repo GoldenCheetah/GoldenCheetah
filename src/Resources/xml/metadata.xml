@@ -55,6 +55,13 @@
 		</field>
 		<field>
 			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"SubSport"</fieldname>
+			<fieldtype>2</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>1</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
 			<fieldname>"Weight"</fieldname>
 			<fieldtype>4</fieldtype>
 			<fieldvalues>""</fieldvalues>
