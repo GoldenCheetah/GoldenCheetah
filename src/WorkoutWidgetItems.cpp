@@ -69,7 +69,7 @@ WWPowerScale::paint(QPainter *painter)
         int ymid = (yhigh + ylow) / 2;
 
         // bounding rect for zone color
-        QRect bound(QPoint(workoutWidget()->left().topRight().x()-POWERSCALEWIDTH, yhigh), 
+        QRect bound(QPoint(workoutWidget()->left().topRight().x()-POWERSCALEWIDTH, yhigh),
                     QPoint(workoutWidget()->left().topRight().x(), ylow));
 
         // draw rect
@@ -97,7 +97,7 @@ WWPowerScale::paint(QPainter *painter)
             painter->setPen(QPen(color));
 
             // zone high
-            painter->drawLine(QPoint(workoutWidget()->canvas().x(), yhigh), 
+            painter->drawLine(QPoint(workoutWidget()->canvas().x(), yhigh),
                              QPoint(workoutWidget()->canvas().x()+workoutWidget()->canvas().width(), yhigh));
 
             // ZONE LABELS MID CANVAS AND FEINT
@@ -118,7 +118,7 @@ WWPowerScale::paint(QPainter *painter)
     double CPy = workoutWidget()->transform(0, CP).y();
 
     // zone high
-    painter->drawLine(QPoint(workoutWidget()->canvas().x(), CPy), 
+    painter->drawLine(QPoint(workoutWidget()->canvas().x(), CPy),
                       QPoint(workoutWidget()->canvas().x()+workoutWidget()->canvas().width(), CPy));
 
 }
@@ -150,7 +150,7 @@ WWWBalScale::paint(QPainter *painter)
 
         // bounding rect for zone color
         QPointF tl = workoutWidget()->right().topLeft();
-        QRect bound(QPoint(tl.x(), tl.y() + (i * (height/4))), 
+        QRect bound(QPoint(tl.x(), tl.y() + (i * (height/4))),
                     QPoint(tl.x()+WBALSCALEWIDTH, tl.y() + ((i+1) * (height/4))));
 
         // draw rect
@@ -190,7 +190,7 @@ WWPoint::paint(QPainter *painter)
 
     // highlight hovered
     if (hover) {
-        painter->setBrush(Qt::gray); 
+        painter->setBrush(Qt::gray);
         painter->drawEllipse(QPointF(center.x(), center.y()), 10.0f, 10.0f);
     }
 
@@ -198,7 +198,7 @@ WWPoint::paint(QPainter *painter)
     if (selecting || selected) {
 
         // selected change color
-        painter->setBrush(Qt::red); 
+        painter->setBrush(Qt::red);
         painter->drawEllipse(QPointF(center.x(), center.y()), 3.0f, 3.0f);
 
     } else {
@@ -288,7 +288,7 @@ WWBlockCursor::paint(QPainter *painter)
 {
     // if were in a selection block don't draw a cursos
     if (workoutWidget()->selectionBlock.contains(workoutWidget()->mapFromGlobal(QCursor::pos()))) return;
-    
+
     // are we busy resizing and stuff and is the block cursor valid?
     if (workoutWidget()->state == WorkoutWidget::none &&
         workoutWidget()->cursorBlock != QPainterPath()) {
@@ -303,13 +303,13 @@ WWBlockCursor::paint(QPainter *painter)
         painter->setFont(workoutWidget()->bigFont);
         painter->setPen(GColor(CPLOTMARKER));
 
-        QPointF where(workoutWidget()->cursorBlock.boundingRect().center().x()-(textBound.width()/2), 
+        QPointF where(workoutWidget()->cursorBlock.boundingRect().center().x()-(textBound.width()/2),
                       workoutWidget()->cursorBlock.boundingRect().bottom()-10); //XXX 10 is hardcoded space from bottom
 
         painter->drawText(where, workoutWidget()->cursorBlockText);
 
         QRect textBound2 = fontMetrics.boundingRect(workoutWidget()->cursorBlockText2);
-        QPointF where2(workoutWidget()->cursorBlock.boundingRect().center().x()-(textBound2.width()/2), 
+        QPointF where2(workoutWidget()->cursorBlock.boundingRect().center().x()-(textBound2.width()/2),
                       where.y()-textBound.height());  //XXX 4 is hardcoded space between labels
 
         painter->drawText(where2, workoutWidget()->cursorBlockText2);
@@ -340,20 +340,20 @@ WWBlockSelection::paint(QPainter *painter)
     painter->setFont(workoutWidget()->bigFont);
     painter->setPen(GColor(CPLOTMARKER));
 
-    QPointF where(workoutWidget()->selectionBlock.boundingRect().center().x()-(textBound.width()/2), 
+    QPointF where(workoutWidget()->selectionBlock.boundingRect().center().x()-(textBound.width()/2),
                   workoutWidget()->selectionBlock.boundingRect().bottom()-10); //XXX 10 is hardcoded space from bottom
 
     painter->drawText(where, workoutWidget()->selectionBlockText);
 
     QRect textBound2 = fontMetrics.boundingRect(workoutWidget()->selectionBlockText2);
-    QPointF where2(workoutWidget()->selectionBlock.boundingRect().center().x()-(textBound2.width()/2), 
+    QPointF where2(workoutWidget()->selectionBlock.boundingRect().center().x()-(textBound2.width()/2),
                   where.y()-textBound.height());  //XXX 4 is hardcoded space between labels
 
     painter->drawText(where2, workoutWidget()->selectionBlockText2);
 }
 
 // locate me on the parent widget in paint coordinates
-QRectF 
+QRectF
 WWBlockSelection::bounding()
 {
     return QRectF();
@@ -382,7 +382,7 @@ WWWBLine::paint(QPainter *painter)
     // pixels per WPRIME value
     double ratio = workoutWidget()->canvas().height() / WPRIME;
 
-    // join the dots 
+    // join the dots
     QPointF last(tl.x(),tl.y());
 
     // run through the wpBal values...
@@ -414,7 +414,7 @@ WWMMPCurve::paint(QPainter *painter)
     linePen.setWidth(0.5);
     painter->setPen(linePen);
 
-    // join the dots 
+    // join the dots
     QPointF last(-1,-1);
 
     // run through the wpBal values...
@@ -445,7 +445,7 @@ WWSmartGuide::paint(QPainter *painter)
 
     //
     // FIND SCOPE TO MARK GUDIES FOR
-    // 
+    //
     // Currently we add guides when items are selected
     // or you are dragging a block or point around
     //
@@ -473,7 +473,7 @@ WWSmartGuide::paint(QPainter *painter)
 
     // if dragging a block mark it
     if (workoutWidget()->state == WorkoutWidget::dragblock) {
-   
+
         foreach(PointMemento m, workoutWidget()->cr8block) {
 
             // how many points
@@ -522,10 +522,10 @@ WWSmartGuide::paint(QPainter *painter)
         QRectF bottom = workoutWidget()->bottom();
 
         // top line width indicators
-        painter->drawLine(boundary.bottomLeft().x(), workoutWidget()->bottom().y(), 
+        painter->drawLine(boundary.bottomLeft().x(), workoutWidget()->bottom().y(),
                           boundary.bottomLeft().x(), workoutWidget()->bottom().y()+bottom.height());
 
-        painter->drawLine(boundary.bottomRight().x(), bottom.y(), 
+        painter->drawLine(boundary.bottomRight().x(), bottom.y(),
                           boundary.bottomRight().x(), bottom.y()+bottom.height());
 
         // now the text - but only if we have a gap!
@@ -764,7 +764,7 @@ ScaleCommand::redo()
 DeleteWPointsCommand::DeleteWPointsCommand(WorkoutWidget*w, QList<PointMemento>points)
   : WorkoutWidgetCommand(w), points(points) { }
 
-void 
+void
 DeleteWPointsCommand::redo()
 {
     // delete backward
@@ -782,5 +782,48 @@ DeleteWPointsCommand::undo()
     foreach(PointMemento m, points) {
         WWPoint *add = new WWPoint(workoutWidget(), m.x, m.y, false);
         workoutWidget()->points().insert(m.index, add);
+    }
+}
+
+CutCommand::CutCommand(WorkoutWidget*w, QList<PointMemento>copyIndexes, QList<PointMemento> deleteIndexes, double shift)
+  : WorkoutWidgetCommand(w), copyIndexes(copyIndexes), deleteIndexes(deleteIndexes), shift(shift) { }
+
+void
+CutCommand::redo()
+{
+    // delete again
+    int last = -1;
+    foreach (PointMemento m, deleteIndexes) {
+        WWPoint *remove = workoutWidget()->points().takeAt(m.index);
+        delete remove;
+        last = m.index;
+    }
+
+    // shift in
+    for (int i=last; i<workoutWidget()->points().count(); i++) {
+        workoutWidget()->points()[i]->x -= shift;
+    }
+
+    // update clipboard
+    workoutWidget()->clipboard = copyIndexes;
+}
+
+void
+CutCommand::undo()
+{
+    // undelete
+    int last=-1;
+    // re-add backwards
+    for (int i=deleteIndexes.count()-1; i >=0; i--) {
+
+        PointMemento m = deleteIndexes[i];
+        WWPoint *add = new WWPoint(workoutWidget(), m.x, m.y, false);
+        workoutWidget()->points().insert(m.index, add);
+        last = m.index;
+    }
+
+    // shift out
+    for (int i=last+1; i<workoutWidget()->points().count(); i++) {
+        workoutWidget()->points()[i]->x += shift;
     }
 }

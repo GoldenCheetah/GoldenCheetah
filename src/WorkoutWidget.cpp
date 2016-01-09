@@ -56,7 +56,7 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     QWidget(parent),  state(none), ergFile(NULL), dragging(NULL), parent(parent), context(context), stackptr(0)
 {
     maxX_=3600;
-    maxY_=300;
+    maxY_=400;
 
     onDrag = onCreate = onRect = atRect = QPointF(-1,-1);
 
@@ -272,13 +272,13 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
                         hover=true;
                         onDrag = QPointF(dragging->x, dragging->y);
                         state = drag;
-                        
+
                     }
                     break;
                 }
             }
 
-            // if state is still none and we're not hovering, 
+            // if state is still none and we're not hovering,
             // we aren't on top of a point, so create a new
             // one or start select mode if shift is pressed
             if (state == none && !hover) {
@@ -290,7 +290,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
                     atRect = onRect = p;
                     state = rect;
                     updateNeeded = true;
- 
+
                 } else {
 
                     // UNSHIFTED CREATE A POINT
@@ -543,10 +543,16 @@ WorkoutWidget::setBlockCursor()
         selectionBlockText2 = QString("%1w").arg(joules/secs, 0, 'f', 0);
         selectionBlockText = time_to_string(secs);
 
+        parent->copyAct->setEnabled(true);
+        parent->cutAct->setEnabled(true);
+
     } else {
 
         selectionBlock = QPainterPath();
         selectionBlockText = selectionBlockText2 = "";
+
+        parent->copyAct->setEnabled(false);
+        parent->cutAct->setEnabled(false);
     }
 
     //
@@ -974,7 +980,7 @@ WorkoutWidget::createBlock(QPoint p)
             double rwidth = to.x() + (width/2) - points_[prev]->x;
 
             // bottom left
-            add = new WWPoint(this, to.x()-(width/2), 
+            add = new WWPoint(this, to.x()-(width/2),
                                     points_[prev]->y + (lwidth * ratio),
                                     false);
             adding << add;
@@ -994,7 +1000,7 @@ WorkoutWidget::createBlock(QPoint p)
             points_.insert(index++, add);
 
             // bottom right
-            add = new WWPoint(this, to.x()+(width/2), 
+            add = new WWPoint(this, to.x()+(width/2),
                                     points_[prev]->y + (rwidth * ratio),
                                     false);
             adding << add;
@@ -1068,7 +1074,7 @@ WorkoutWidget::selectAll()
     foreach(WWPoint *p, points_) {
 
         // if not selected, select it
-        if (p->selected==false) 
+        if (p->selected==false)
             p->selected=selected=true;
     }
     return selected;
@@ -1082,7 +1088,7 @@ WorkoutWidget::selectPoints()
     QRectF rect(onRect,atRect);
     foreach(WWPoint *p, points_) {
 
-        // experiment with deselecting when using a 
+        // experiment with deselecting when using a
         // rect selection tool since more often than
         // not I keep forgetting points are highlighted
         // XXX maybe a keyboard modifier in the future ?
@@ -1143,7 +1149,7 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
     if (ergFile && ergFile->format == ERG) {
 
         maxX_=0;
-        maxY_=300;
+        maxY_=400;
 
         // add points for this....
         foreach(ErgFilePoint point, ergFile->Points) {
@@ -1167,6 +1173,11 @@ WorkoutWidget::recompute()
 {
     //QTime timer;
     //timer.start();
+
+    //
+    // As data changes so must the selection/cursor
+    //
+    setBlockCursor();
 
     int rnum=-1;
     if (context->athlete->zones(false) == NULL ||
@@ -1217,7 +1228,7 @@ WorkoutWidget::recompute()
     }
 
     // rescale the yaxis
-    if (maxY_ > (maxy*2)) maxY_ = maxy *1.5; // too big
+    if (maxY_ > (maxy*2) && maxY_ > 400) maxY_ = maxy *1.5; // too big
     if (maxY_ < maxy) maxY_ = maxy *1.5; // too small
 
     //
@@ -1575,20 +1586,160 @@ WorkoutWidget::undo()
     update();
 }
 
+// if no block is highlighted return false, otherwise true
+bool
+WorkoutWidget::getBlockSelected(QList<int>&copyIndexes,
+                                QList<int>&deleteIndexes,
+                                double &shift)
+{
+    // from first to last selected these are in scope
+    int begin=-1, end=-1;
+    for(int i=0; i<points_.count(); i++) {
+        if (points_[i]->selected) {
+            if (begin == -1) begin = i;
+            end = i;
+        }
+    }
+
+    // make sure there is some kind of selection
+    if (begin == -1 || end == -1 || begin == end || end < begin) return false;
+
+    // trim unwanted points from the front
+    int blockStarts=-1, blockFinishes=-1;
+
+    // j loops through the indexes of the points in scope
+    for(int index=begin; index<=end; index++) {
+
+        // index of this, next and previous points
+        int next = index < end ? index+1 : -1;
+
+        // we got to block end
+        if (next != -1 && points_[next]->x > points_[index]->x) {
+            blockStarts = index;
+            break;
+        }
+    }
+
+    // j loops back through the indexes of the points in scope
+    for(int index=end; index>=begin; index--) {
+
+        // index of this, next and previous points
+        int prev = index > begin ? (index-1) : - 1;
+
+        // we got to block end
+        if (prev != -1 && points_[prev]->x < points_[index]->x) {
+            blockFinishes = index;
+            break;
+        }
+    }
+
+    if (blockStarts == -1 || blockFinishes == -1 || blockStarts > blockFinishes) return false;
+
+    // what is the shift required to move points
+    // to the right across in a cut operation
+    shift = points_[blockFinishes]->x - points_[blockStarts]->x;
+
+    // what are the indexes we will put into the
+    // buffer in a copy operation
+    for(int i=blockStarts; i<=blockFinishes; i++)
+        copyIndexes << i;
+
+    // what are the indexes we would delete in
+    // a cut operation - for now same as copy
+    // but should really get rid of duplicate
+    // points esp. when multiple points for the
+    // same point in time XXX fix this later XXX
+    // as a result of shifting this happens a
+    // fair amount ............
+    deleteIndexes = copyIndexes;
+
+    // do we have something ?
+    if (copyIndexes.count() > 1) return true;
+
+    return false;
+}
+
 void
 WorkoutWidget::cut()
 {
-//qDebug()<<"cut";
+    QList<PointMemento>d,c;
+
+    QList<int> copyIndexes, deleteIndexes;
+    double shift=0;
+
+    // work out what we're doing
+    if (!getBlockSelected(copyIndexes, deleteIndexes, shift)) return;
+
+    // we cut and paste BLOCKS, not POINTS
+    // so this means we have to only get points
+    // that are part of the block we are cutting
+    // and also shift the points to the right
+    // across to the left to account for the
+    // blocks we removed.
+
+    // since copy also needs to do this we have
+    // the following utility
+
+    // copy points
+    foreach(int index, copyIndexes) {
+        WWPoint *p = points_[index];
+        c << PointMemento(p->x, p->y, index);
+    }
+    clipboard = c;
+
+    // delete backwards
+    int last=-1;
+    for(int i=deleteIndexes.count()-1; i>=0; i--) {
+        WWPoint *take = points_.takeAt(deleteIndexes[i]);
+        d << PointMemento(take->x, take->y, deleteIndexes[i]);
+        delete take;
+        last = deleteIndexes[i];
+    }
+
+    // now shift the rest
+    for(int i=last; i >0 && i<points_.count(); i++) {
+        points_[i]->x -= shift;
+    }
+
+    // add the cut command
+    new CutCommand(this, c, d, shift);
+
+    // refresh
+    recompute();
+
+    // update the display
+    update();
 }
 
-void 
+void
 WorkoutWidget::copy()
 {
-//qDebug()<<"copy";
+    QList<PointMemento>d,c;
+
+    // to use getBlockSelected
+    QList<int> copyIndexes, deleteIndexes;
+    double shift=0;
+
+    // work out what we're doing
+    if (!getBlockSelected(copyIndexes, deleteIndexes, shift)) return;
+
+    // copy points
+    foreach(int index, copyIndexes) {
+        WWPoint *p = points_[index];
+        c << PointMemento(p->x, p->y, index);
+    }
+    clipboard = c;
 }
 
 void
 WorkoutWidget::paste()
 {
-//qDebug()<<"paste";
+
+    //XXX todo
+
+    // refresh
+    recompute();
+
+    // update the display
+    update();
 }
