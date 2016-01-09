@@ -33,7 +33,7 @@
 #include "HelpWhatsThis.h"
 
 #ifdef GC_HAS_CLOUD_DB
-#include "ChartExchange.h"
+#include "CloudDBChart.h"
 #include "GcUpgrade.h"
 #endif
 
@@ -219,7 +219,7 @@ LTMWindow::LTMWindow(Context *context) :
     QAction *exportConfig = new QAction(tr("Export Chart Configuration..."), this);
     addAction(exportConfig);
 #ifdef GC_HAS_CLOUD_DB
-    QAction *shareConfig = new QAction(tr("Share Chart Configuration..."), this);
+    QAction *shareConfig = new QAction(tr("Export Chart Configuration to CloudDB..."), this);
     addAction(shareConfig);
 #endif
     // the controls
@@ -1274,17 +1274,16 @@ LTMWindow::shareConfig()
     mine << settings;
     mine[0].title = mine[0].name = title();
 
-    ChartExchangeClient *c = new ChartExchangeClient();
+    CloudDBChartClient *c = new CloudDBChartClient();
     ChartAPIv1 chart;
     chart.Name = title();
     int version = VERSION_LATEST;
     chart.GcVersion =  QString::number(version);
     LTMChartParser::serializeToQString(&chart.ChartXML, mine);
-    chart.ChartVersion = 1;
     QPixmap picture;
     menuButton->hide();
 #if QT_VERSION > 0x050000
-     picture = grab(geometry());
+    picture = grab(geometry());
 #else
     picture = QPixmap::grabWidget (this);
 #endif
@@ -1296,7 +1295,7 @@ LTMWindow::shareConfig()
     chart.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
 
     // now asks for the user fields
-    ChartExchangePublishDialog* dialog = new ChartExchangePublishDialog(chart);
+    CloudDBChartPublishDialog* dialog = new CloudDBChartPublishDialog(chart);
     dialog->setModal(true);
     int ret;
     if ((ret=dialog->exec()) == QDialog::Accepted) {
