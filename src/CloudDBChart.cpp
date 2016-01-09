@@ -414,7 +414,6 @@ CloudDBChartImportDialog::CloudDBChartImportDialog() {
 
    connect(addAndCloseButton, SIGNAL(clicked()), this, SLOT(addAndCloseClicked()));
    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
-   connect(tableWidget, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(addAndCloseClicked(QTableWidgetItem*)));
 
    QHBoxLayout *buttonLayout = new QHBoxLayout;
    buttonLayout->addWidget(addAndCloseButton);
