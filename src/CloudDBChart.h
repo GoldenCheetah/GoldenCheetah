@@ -16,13 +16,15 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef CHARTEXCHANGE_H
-#define CHARTEXCHANGE_H
+#ifndef CLOUDDBCHART_H
+#define CLOUDDBCHART_H
 
 #include "LTMSettings.h"
+#include "Settings.h"
 
 #include <QObject>
 #include <QNetworkAccessManager>
+#include <QNetworkDiskCache>
 #include <QSslSocket>
 #include <QUuid>
 #include <QUrl>
@@ -39,35 +41,37 @@ struct ChartAPIv1 {
     QString Language;
     QString GcVersion;
     QString ChartXML;
-    int     ChartVersion;
     QByteArray Image;
-    int     StatusId;
     QDateTime LastChanged;
     QString CreatorId;
     QString CreatorNick;
     QString CreatorEmail;
     bool    Curated;
+    bool    Deleted;
 };
 
-enum ChartStatus {
-    ChartCreated = 0,
-    ChartUpdated = 1,
-    ChartDeleted = 2,
-    ChartCurated = 3
+struct ChartAPIHeaderV1 {
+    quint64 Id;
+    QString Name;
+    QString GcVersion;
+    QDateTime LastChanged;
+    bool    Curated;
+    bool    Deleted;
 };
 
-class ChartExchangeClient : public QObject
+
+class CloudDBChartClient : public QObject
 {
     Q_OBJECT
 
 public:
 
-    ChartExchangeClient();
-    ~ChartExchangeClient();
+    CloudDBChartClient();
+    ~CloudDBChartClient();
 
     bool postChart(ChartAPIv1 chart);
-    ChartAPIv1 getChartByID(qint64 id);
-    QList<ChartAPIv1> *getChartsByDate(QDateTime changedAfter);
+    bool getChartByID(qint64 , ChartAPIv1*);
+    bool getAllChartHeader(QList<ChartAPIHeaderV1>*);
 
     bool sslLibMissing() { return noSSLlib; }
 
@@ -80,68 +84,94 @@ private:
     bool noSSLlib;
 
     QNetworkAccessManager* g_nam;
+    QNetworkDiskCache* g_cache;
     QNetworkReply *g_reply;
 
     QString  g_chart_url_base;
+    QString  g_chart_url_header;
     QVariant g_header_content_type;
     QByteArray g_header_basic_auth;
 
-    static bool unmarshallAPIv1(QByteArray json, QList<ChartAPIv1>* charts);
-    static void unmarshallAPIv1Object(QJsonObject* object, ChartAPIv1* chart);
+    static bool unmarshallAPIv1(QByteArray , QList<ChartAPIv1>* );
+    static void unmarshallAPIv1Object(QJsonObject* , ChartAPIv1* );
 
+    static bool unmarshallAPIHeaderV1(QByteArray , QList<ChartAPIHeaderV1>* );
+    static void unmarshallAPIHeaderV1Object(QJsonObject* , ChartAPIHeaderV1* chart);
 
 };
 
-struct ChartExchangePresets {
+struct ChartImportUIStructure {
     QString name;
     QString description;
+    QString creatorNick;
     QPixmap image;
     LTMSettings ltmSettings;
 };
 
-class ChartExchangeRetrieveDialog : public QDialog
+class CloudDBChartImportDialog : public QDialog
 {
     Q_OBJECT
 
 public:
 
-    ChartExchangeRetrieveDialog();
-    ~ChartExchangeRetrieveDialog();
+    CloudDBChartImportDialog();
+    ~CloudDBChartImportDialog();
 
-    LTMSettings getSelectedSettings() {return selected; }
+    void initialize();
+    LTMSettings getSelectedSettings() {return g_selected; }
 
 private slots:
 
-    void selectedClicked();
-    void cancelClicked();
+    void addAndCloseClicked();
+    void closeClicked();
+    void resetToStartClicked();
+    void nextSetClicked();
+    void prevSetClicked();
+    void curatedToggled(bool);
 
 
 private:
 
-    LTMSettings selected;
+    LTMSettings g_selected;
 
-    ChartExchangeClient* client;
-    QList<ChartExchangePresets> *allPresets;
+    CloudDBChartClient* g_client;
+    QList<ChartImportUIStructure> *g_currentPresets;
+    int g_currentIndex;
+    int g_stepSize;
+    QList<ChartAPIHeaderV1>* g_currentHeaderList;
+    QList<ChartAPIHeaderV1>* g_fullHeaderList;
+    bool g_filterActive;
 
+
+    // UI elements
+    QLabel *showing;
+    QString showingTextTemplate;
+    QPushButton *resetToStart;
+    QPushButton *nextSet;
+    QPushButton *prevSet;
+    QCheckBox *curatedOnly;
+    QLabel *filterLabel;
+    QLineEdit *filter;
     QTableWidget *tableWidget;
-    QPushButton *selectButton, *cancelButton;
+    QPushButton *addAndCloseButton, *closeButton;
 
     // helper methods
-    QList<ChartExchangePresets> *getAllSharedPresets(); //just for testing the logic - not the final method
-    void getData();
-
+    void getCurrentPresets(int, int);
+    void updateDialogWithCurrentPresets();
+    void applyFilterAndCurated(bool, QString);
+    QString encodeHTML ( const QString& );
 
 };
 
 
-class ChartExchangePublishDialog : public QDialog
+class CloudDBChartPublishDialog : public QDialog
 {
     Q_OBJECT
 
 public:
 
-    ChartExchangePublishDialog(ChartAPIv1 data);
-    ~ChartExchangePublishDialog();
+    CloudDBChartPublishDialog(ChartAPIv1 data);
+    ~CloudDBChartPublishDialog();
 
     ChartAPIv1 getData() { return data; }
 
@@ -167,4 +197,4 @@ private:
 };
 
 
-#endif // CHARTEXCHANGE_H
+#endif // CLOUDDBCHART_H
