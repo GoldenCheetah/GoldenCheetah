@@ -120,9 +120,6 @@ class LTMTool : public QWidget
         void usePresetChanged(); // we changed the checkbox
 
         void addCurrent();
-#ifdef GC_HAS_CLOUD_DB
-        void sharedChartsDialog();
-#endif
 
     private:
 

@@ -29,6 +29,10 @@
 
 #include "SearchFilterBox.h"
 
+#ifdef GC_HAS_CLOUD_DB
+#include "CloudDBChart.h"
+#endif
+
 #include <QDir>
 #include <QtGui>
 
@@ -87,6 +91,10 @@ class LTMSidebar : public QWidget
         void exportPreset();
         void importPreset();
 
+#ifdef GC_HAS_CLOUD_DB
+        void importCloudDBPreset();
+#endif
+
         void filterTreeWidgetSelectionChanged();
         void resetFilters(); // rebuild the seasons list if it changes
         void filterPopup();
@@ -140,6 +148,11 @@ class LTMSidebar : public QWidget
         // filter state
         bool isqueryfilter, isautofilter;
         QStringList autoFilterFiles, queryFilterFiles;
+
+#ifdef GC_HAS_CLOUD_DB
+        CloudDBChartImportDialog cdbChartImportDialog;
+#endif
+
 };
 
 #endif // _GC_LTMSidebar_h
