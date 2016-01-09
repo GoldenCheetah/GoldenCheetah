@@ -104,7 +104,7 @@ class WWPoint : public WorkoutWidgetItem {
 
     public:
 
-        WWPoint(WorkoutWidget *w, double x, double y, bool append=true) : 
+        WWPoint(WorkoutWidget *w, double x, double y, bool append=true) :
                 WorkoutWidgetItem(w), hover(false), selected(false), selecting(false), x(x), y(y) { if (append) w->addPoint(this); }
 
         // Reimplement in children
@@ -168,7 +168,7 @@ class WWRect : public WorkoutWidgetItem {
 // moving or dragging points or blocks around
 class WWSmartGuide : public WorkoutWidgetItem {
 
-    public: 
+    public:
 
         WWSmartGuide(WorkoutWidget *w) : WorkoutWidgetItem(w) { w->addItem(this); }
 
@@ -320,4 +320,19 @@ class DeleteWPointsCommand : public WorkoutWidgetCommand
     private:
         QList<PointMemento> points;
 };
+
+class CutCommand : public WorkoutWidgetCommand
+{
+    public:
+
+        CutCommand(WorkoutWidget*w, QList<PointMemento> copyIndexes, QList<PointMemento> deleteIndexes, double shift);
+
+        void redo();
+        void undo();
+
+    private:
+        QList<PointMemento> copyIndexes, deleteIndexes;
+        double shift;
+};
+
 #endif // _GC_WorkoutWidgetItems_h

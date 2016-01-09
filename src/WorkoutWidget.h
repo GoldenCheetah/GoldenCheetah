@@ -174,6 +174,9 @@ class WorkoutWidget : public QWidget
         // the point we are currently dragging
         WWPoint *dragging;
 
+        // copy/paste buffer
+        QList<PointMemento> clipboard;
+
    public slots:
 
         // and erg file was selected
@@ -223,6 +226,11 @@ class WorkoutWidget : public QWidget
         bool moveBlock(QPoint p);
         bool setBlockCursor();
 
+        // when a block is selected its quite complex to
+        // determine what to do in a copy/cut operation
+        bool getBlockSelected(QList<int>&copy, QList<int>&del, double &shift);
+
+        // integrating with the QT event loop
         void paintEvent(QPaintEvent *);
         bool eventFilter(QObject *obj, QEvent *event);
 
