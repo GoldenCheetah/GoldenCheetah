@@ -106,9 +106,6 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
     connect(g_reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
-    // lets block until signal received
-    loop.exec();
-
     if (g_reply->error() != QNetworkReply::NoError) {
 
         QVariant statusCode = g_reply->attribute( QNetworkRequest::HttpStatusCodeAttribute );
@@ -665,7 +662,7 @@ CloudDBChartImportDialog::encodeHTML ( const QString& encodeMe )
 //------------------------------------------------------------------------------------------------------------
 
 
-CloudDBChartPublishDialog::CloudDBChartPublishDialog(ChartAPIv1 data) : data(data) {
+CloudDBChartPublishDialog::CloudDBChartPublishDialog(ChartAPIv1 data, QString athlete) : data(data), athlete(athlete) {
 
    QLabel *chartName = new QLabel(tr("Chart Name"));
    name = new QLineEdit();
@@ -673,8 +670,29 @@ CloudDBChartPublishDialog::CloudDBChartPublishDialog(ChartAPIv1 data) : data(dat
 
    QLabel *nickLabel = new QLabel(tr("Nickname"));
    nickName = new QLineEdit();
+   nickName->setMaxLength(40); // reasonable for displayo
+   nickName->setText(appsettings->cvalue(athlete, GC_CLOUDDB_NICKNAME, "").toString());
+   // regexp: validate / only chars and 0-9 - at least 5 chars long
+   QRegExp nick_rx("^[a-zA-Z0-9_]{5,40}$");
+   QValidator *nick_validator = new QRegExpValidator(nick_rx, this);
+   nickName->setValidator(nick_validator);
+   nickNameOk = !nickName->text().isEmpty(); // nickname from properties is ok when loaded
+
+   connect(nickName, SIGNAL(textChanged(QString)), this, SLOT(nickNameTextChanged(QString)));
+   connect(nickName, SIGNAL(editingFinished()), this, SLOT(nickNameEditingFinished()));
+
    QLabel *emailLabel = new QLabel(tr("E-Mail"));
    email = new QLineEdit();
+   email->setMaxLength(100);
+   email->setText(appsettings->cvalue(athlete, GC_CLOUDDB_EMAIL, "").toString());
+   // regexp: simple e-mail validation / also allow long domain types
+   QRegExp email_rx("^.+@[a-zA-Z_]+\\.[a-zA-Z]{2,10}$");
+   QValidator *email_validator = new QRegExpValidator(email_rx, this);
+   email->setValidator(email_validator);
+   emailOk = !nickName->text().isEmpty(); // email from properties is ok when loaded
+
+   connect(email, SIGNAL(textChanged(QString)), this, SLOT(emailTextChanged(QString)));
+   connect(email, SIGNAL(editingFinished()), this, SLOT(emailEditingFinished()));
 
    QLabel* gcVersionLabel = new QLabel(tr("Version Details"));
    QString versionString = VERSION_STRING;
@@ -682,7 +700,6 @@ CloudDBChartPublishDialog::CloudDBChartPublishDialog(ChartAPIv1 data) : data(dat
    gcVersionString = new QLabel(versionString);
    QLabel* creatorIdLabel = new QLabel(tr("Creator UUid"));
    creatorId = new QLabel(data.CreatorId);
-
 
    QGridLayout *detailsLayout = new QGridLayout;
    detailsLayout->addWidget(chartName, 0, 0, Qt::AlignLeft);
@@ -711,7 +728,6 @@ CloudDBChartPublishDialog::CloudDBChartPublishDialog(ChartAPIv1 data) : data(dat
    cancelButton = new QPushButton(tr("Cancel"), this);
 
    publishButton->setEnabled(true);
-   cancelButton->setEnabled(true);
 
    connect(publishButton, SIGNAL(clicked()), this, SLOT(publishClicked()));
    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
@@ -727,6 +743,8 @@ CloudDBChartPublishDialog::CloudDBChartPublishDialog(ChartAPIv1 data) : data(dat
    mainLayout->addWidget(image);
    mainLayout->addLayout(buttonLayout);
 
+   setLayout(mainLayout);
+
 
 }
 
@@ -734,16 +752,29 @@ CloudDBChartPublishDialog::~CloudDBChartPublishDialog() {
 
 }
 
-
 void
 CloudDBChartPublishDialog::publishClicked() {
+
+    // check data consistency
+    if (nickName->text().isEmpty() || !nickNameOk) {
+        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a nickname !")));
+        return;
+    }
+    if (email->text().isEmpty() || !emailOk) {
+        QMessageBox::warning(0, tr("Export Chart to ClouDB"), QString(tr("Please enter a valid e-mail address !")));
+        return;
+    }
+
+    if (QMessageBox::question(0, tr("CloudDB"), QString(tr("Do you want to publish this chart definition to CloudDB"))) != QMessageBox::Yes) return;
 
     data.Name = name->text();
     data.Description = description->toPlainText();
     data.CreatorEmail = email->text();
     data.CreatorNick = nickName->text();
-    accept();
 
+    appsettings->setCValue(athlete, GC_CLOUDDB_NICKNAME, data.CreatorNick);
+    appsettings->setCValue(athlete, GC_CLOUDDB_EMAIL, data.CreatorEmail);
+    accept();
 }
 
 
@@ -751,6 +782,39 @@ void
 CloudDBChartPublishDialog::cancelClicked()  {
     reject();
 }
+
+void
+CloudDBChartPublishDialog::nickNameTextChanged(QString text)  {
+
+    if (text.isEmpty()) {
+        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a nickname !")));
+    } else {
+        nickNameOk = false;
+    }
+}
+
+void
+CloudDBChartPublishDialog::nickNameEditingFinished()  {
+    // validator check passed
+    nickNameOk = true;
+}
+
+void
+CloudDBChartPublishDialog::emailTextChanged(QString text)  {
+
+    if (text.isEmpty()) {
+        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a valid e-mail address !")));
+    } else {
+        emailOk = false;
+    }
+}
+
+void
+CloudDBChartPublishDialog::emailEditingFinished()  {
+    // validator check passed
+    emailOk = true;
+}
+
 
 
 
