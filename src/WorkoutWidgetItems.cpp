@@ -846,6 +846,15 @@ void PasteCommand::undo()
             workoutWidget()->points()[i]->x -= shift;
         }
     }
+
+    // reduce maxX if needed, never less than an hour
+    if (workoutWidget()->points().count() && workoutWidget()->points().last()->x < workoutWidget()->maxX() &&
+        workoutWidget()->maxX()>3600) {
+        if (workoutWidget()->points().last()->x<3600)
+            workoutWidget()->setMaxX(3600);
+        else
+            workoutWidget()->setMaxX(workoutWidget()->points().last()->x);
+    }
 }
 
 void PasteCommand::redo()
