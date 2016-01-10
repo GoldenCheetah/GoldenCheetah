@@ -33,6 +33,7 @@
 #include "HelpWhatsThis.h"
 
 #ifdef GC_HAS_CLOUD_DB
+#include "CloudDBCommon.h"
 #include "CloudDBChart.h"
 #include "GcUpgrade.h"
 #endif
@@ -1269,6 +1270,15 @@ LTMWindow::exportConfig()
 void
 LTMWindow::shareConfig()
 {
+    // check for CloudDB T&C acceptance
+    if (!(appsettings->cvalue(context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
+       acceptDialog.setModal(true);
+       if (acceptDialog.exec() == QDialog::Rejected) {
+          return;
+       };
+    }
+
     // collect the config to export
     QList<LTMSettings> mine;
     mine << settings;
