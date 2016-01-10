@@ -469,8 +469,10 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
 
 equals(CloudDB, active) {
 
-    HEADERS += CloudDBChart.h
-    SOURCES += CloudDBChart.cpp
+    HEADERS += CloudDBChart.h \
+               CloudDBCommon.h
+    SOURCES += CloudDBChart.cpp \
+               CloudDBCommon.cpp
     DEFINES += GC_HAS_CLOUD_DB
 }
 

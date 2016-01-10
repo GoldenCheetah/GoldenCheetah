@@ -524,6 +524,7 @@ CloudDBChartImportDialog::updateDialogWithCurrentPresets()
         QTableWidgetItem *newPxItem = new QTableWidgetItem("");
         newPxItem->setData(Qt::DecorationRole, QVariant(preset.image.scaled(chartImageWidth, chartImageHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
         newPxItem->setSizeHint(QSize(chartImageWidth, chartImageHeight));
+        newPxItem->setFlags(newPxItem->flags() & ~Qt::ItemIsEditable);
         tableWidget->setItem(i, 0, newPxItem);
         tableWidget->item(i,0)->setBackgroundColor(Qt::darkGray);
         tableWidget->setRowHeight(i, chartImageHeight+20);
@@ -537,7 +538,6 @@ CloudDBChartImportDialog::updateDialogWithCurrentPresets()
         formattedText->setHtml(cellText);
         formattedText->setReadOnly(true);
         tableWidget->setCellWidget(i,1, formattedText);
-
     }
 }
 

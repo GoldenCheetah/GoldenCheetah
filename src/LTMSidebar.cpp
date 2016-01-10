@@ -33,6 +33,7 @@
 #include "LTMChartParser.h" // for LTMChartParser::serialize && ChartTreeView
 
 #ifdef GC_HAS_CLOUD_DB
+#include "CloudDBCommon.h"
 #include "CloudDBChart.h"
 #include "GcUpgrade.h"
 #endif
@@ -1726,12 +1727,17 @@ LTMSidebar::importPreset()
 void
 LTMSidebar::importCloudDBPreset()
 {
+    if (!(appsettings->cvalue(context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
+       acceptDialog.setModal(true);
+       if (acceptDialog.exec() == QDialog::Rejected) {
+          return;
+       };
+    }
+
     cdbChartImportDialog.initialize();
     cdbChartImportDialog.setModal(true);
-
-    // selected choosen
-    int ret;
-    if ((ret=cdbChartImportDialog.exec()) == QDialog::Accepted) {
+    if (cdbChartImportDialog.exec() == QDialog::Accepted) {
         LTMSettings s = cdbChartImportDialog.getSelectedSettings();
         // now append to the QList and QTreeWidget
         context->athlete->presets += s;
