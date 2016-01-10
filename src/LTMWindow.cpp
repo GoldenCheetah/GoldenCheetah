@@ -1284,7 +1284,6 @@ LTMWindow::shareConfig()
     mine << settings;
     mine[0].title = mine[0].name = title();
 
-    CloudDBChartClient *c = new CloudDBChartClient();
     ChartAPIv1 chart;
     chart.Name = title();
     int version = VERSION_LATEST;
@@ -1305,12 +1304,13 @@ LTMWindow::shareConfig()
     chart.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
 
     // now asks for the user fields
-    CloudDBChartPublishDialog* dialog = new CloudDBChartPublishDialog(chart);
-    dialog->setModal(true);
-    int ret;
-    if ((ret=dialog->exec()) == QDialog::Accepted) {
-       chart = dialog->getData();
-       bool ok = c->postChart(chart);
+    CloudDBChartPublishDialog dialog(chart, context->athlete->cyclist);
+    dialog.setModal(true);
+    if (dialog.exec() == QDialog::Accepted) {
+       CloudDBChartClient c;
+       if (!c.postChart(dialog.getChart())) {
+           QMessageBox::warning(0, tr("CloudDB"), QString(tr("Export to CloudDB not successful"))) ;
+       }
     }
 }
 #endif

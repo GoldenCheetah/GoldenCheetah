@@ -170,26 +170,34 @@ class CloudDBChartPublishDialog : public QDialog
 
 public:
 
-    CloudDBChartPublishDialog(ChartAPIv1 data);
+    CloudDBChartPublishDialog(ChartAPIv1 data, QString athlete);
     ~CloudDBChartPublishDialog();
 
-    ChartAPIv1 getData() { return data; }
+    ChartAPIv1 getChart() { return data; }
 
 private slots:
     void publishClicked();
     void cancelClicked();
 
+    void nickNameTextChanged(QString);
+    void nickNameEditingFinished();
+    void emailTextChanged(QString);
+    void emailEditingFinished();
+
 
 private:
 
     ChartAPIv1 data;
+    QString athlete;
 
     QPushButton *publishButton, *cancelButton;
     QLineEdit *name;
     QLabel *image;
     QTextEdit *description;
     QLineEdit *nickName;
+    bool nickNameOk;
     QLineEdit *email;
+    bool emailOk;
     //QComboBox *language;
     QLabel *gcVersionString;
     QLabel *creatorId;
