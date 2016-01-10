@@ -335,4 +335,19 @@ class CutCommand : public WorkoutWidgetCommand
         double shift;
 };
 
+class PasteCommand : public WorkoutWidgetCommand
+{
+    public:
+
+        PasteCommand(WorkoutWidget*w, int here, double offset, double shift, QList<PointMemento> points);
+
+        void redo();
+        void undo();
+
+    private:
+        int here;
+        double offset, shift;
+        QList<PointMemento> points;
+};
+
 #endif // _GC_WorkoutWidgetItems_h

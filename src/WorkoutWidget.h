@@ -125,6 +125,7 @@ class WorkoutWidget : public QWidget
 
         // range for scales in plot units not draw units
         double maxX(); // e.g. max watts
+        void setMaxX(double x) { maxX_ = x; }
         double maxY(); // e.g. max seconds
         double minX() { return 0.0f; } // might change later
         double minY() { return 0.0f; } // might change later
@@ -175,6 +176,7 @@ class WorkoutWidget : public QWidget
         WWPoint *dragging;
 
         // copy/paste buffer
+        void setClipboard(QList<PointMemento>&);
         QList<PointMemento> clipboard;
 
    public slots:

@@ -419,6 +419,24 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
             updateNeeded=selectClear();
             break;
 
+        case Qt::Key_C:
+            if (ctrl) {
+                copy();
+            }
+            break;
+
+        case Qt::Key_V:
+            if (ctrl) {
+                paste();
+            }
+            break;
+
+        case Qt::Key_X:
+            if (ctrl) {
+                cut();
+            }
+            break;
+
         case Qt::Key_A:
             if (ctrl) {
                 updateNeeded=selectAll();
@@ -1230,6 +1248,7 @@ WorkoutWidget::recompute()
     // rescale the yaxis
     if (maxY_ > (maxy*2) && maxY_ > 400) maxY_ = maxy *1.5; // too big
     if (maxY_ < maxy) maxY_ = maxy *1.5; // too small
+    if (maxy == 0) maxY_ = 400;
 
     //
     // COMPUTE KEY METRICS TSS/IF
@@ -1685,7 +1704,7 @@ WorkoutWidget::cut()
         WWPoint *p = points_[index];
         c << PointMemento(p->x, p->y, index);
     }
-    clipboard = c;
+    setClipboard(c);
 
     // delete backwards
     int last=-1;
@@ -1728,14 +1747,78 @@ WorkoutWidget::copy()
         WWPoint *p = points_[index];
         c << PointMemento(p->x, p->y, index);
     }
+    setClipboard(c);
+}
+
+void
+WorkoutWidget::setClipboard(QList<PointMemento>&c)
+{
+    // always offset from zero
+    // for both time and indexes
+    double offset=0;
+    for(int i=0; i<c.count(); i++) {
+        if (i==0) offset=c[i].x;
+        c[i].x -= offset; // time starts from zero
+        c[i].index = i;   // indexes start from zero
+    }
+
+    // store it and set the action button
     clipboard = c;
+    parent->pasteAct->setEnabled(c.count() > 0);
 }
 
 void
 WorkoutWidget::paste()
 {
+    // empty clipboard, nothing to do
+    if (clipboard.count() == 0) return;
 
-    //XXX todo
+    // ok, so where to paste?
+    int here=-1;
+    int offset= points_.count() ? points_.last()->x : 0;
+
+    // search for a selected point
+    for(int i=points_.count()-1; i>=0; i--) {
+        if (points_[i]->selected) {
+            offset=points_[i]->x;
+            here=i+1;
+            break;
+        }
+    }
+
+    // if its the last point append!
+    if (here >= (points_.count())) here = -1;
+
+    double shift=0;
+    if (here != -1) {
+
+        // need to shift everyone across to make space
+        shift = clipboard.last().x;
+
+        for(int i=here; i<points_.count(); i++) {
+            points_[i]->x += shift;
+        }
+    }
+
+    // here is either the index to append after
+    // or we add to the end of the workout
+    foreach(PointMemento m, clipboard) {
+
+        if (here == -1) {
+            new WWPoint(this, m.x+offset, m.y);
+        } else {
+
+            WWPoint *add = new WWPoint(this, m.x+offset, m.y, false);
+            points_.insert(here + m.index, add);
+        }
+    }
+
+    // increase maxX ?
+    if (points_.count() && points_.last()->x > maxX_)
+        maxX_ = points_.last()->x;
+
+    // paste command
+    new PasteCommand(this, here, offset, shift, clipboard);
 
     // refresh
     recompute();

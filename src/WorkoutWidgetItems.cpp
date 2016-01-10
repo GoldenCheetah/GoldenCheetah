@@ -805,7 +805,7 @@ CutCommand::redo()
     }
 
     // update clipboard
-    workoutWidget()->clipboard = copyIndexes;
+    workoutWidget()->setClipboard(copyIndexes);
 }
 
 void
@@ -826,4 +826,52 @@ CutCommand::undo()
     for (int i=last+1; i<workoutWidget()->points().count(); i++) {
         workoutWidget()->points()[i]->x += shift;
     }
+}
+
+PasteCommand::PasteCommand(WorkoutWidget*w, int here, double offset, double shift, QList<PointMemento> points)
+  : WorkoutWidgetCommand(w), here(here), offset(offset), shift(shift), points(points) {}
+
+
+void PasteCommand::undo()
+{
+    // remove the added points
+    for(int i=points.count(); i>0; i--) {
+        WWPoint *take = workoutWidget()->points().takeAt(here == -1 ? (workoutWidget()->points().count()-1) : here);
+        delete take;
+    }
+
+    // unshift
+    if (here != -1) {
+        for(int i=here; i<workoutWidget()->points().count(); i++) {
+            workoutWidget()->points()[i]->x -= shift;
+        }
+    }
+}
+
+void PasteCommand::redo()
+{
+    // if its the last point append!
+    if (here != -1) {
+        for(int i=here; i<workoutWidget()->points().count(); i++) {
+            workoutWidget()->points()[i]->x += shift;
+        }
+    }
+
+    // here is either the index to append after
+    // or we add to the end of the workout
+    foreach(PointMemento m, points) {
+
+        if (here == -1) {
+            new WWPoint(workoutWidget(), m.x+offset, m.y);
+        } else {
+
+            WWPoint *add = new WWPoint(workoutWidget(), m.x+offset, m.y, false);
+            workoutWidget()->points().insert(here + m.index, add);
+        }
+    }
+
+    // increase maxX if needed?
+    if (workoutWidget()->points().count() && workoutWidget()->points().last()->x > workoutWidget()->maxX())
+        workoutWidget()->setMaxX(workoutWidget()->points().last()->x);
+
 }
