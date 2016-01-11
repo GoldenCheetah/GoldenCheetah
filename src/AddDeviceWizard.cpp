@@ -1172,6 +1172,7 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem(tr("Power - Elite Arion Mag (0)"));                               // 52
     virtualPower->addItem(tr("Power - Elite Arion Mag (1)"));                               // 53
     virtualPower->addItem(tr("Power - Elite Arion Mag (2)"));                               // 54
+    virtualPower->addItem(tr("Power - Blackburn Tech Fluid"));                              // 55
 
     //
     // Wheel size
