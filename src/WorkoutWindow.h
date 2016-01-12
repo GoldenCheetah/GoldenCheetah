@@ -38,6 +38,7 @@
 class WorkoutWidget;
 class WWPowerScale;
 class WWWBalScale;
+class WWTTE;
 class WWLine;
 class WWWBLine;
 class WWRect;
@@ -82,6 +83,7 @@ class WorkoutWindow : public GcWindow
         WorkoutWidget *workout; // will become editor.
         WWPowerScale *powerscale;
         WWWBalScale *wbalscale;
+        WWTTE *tte;
         WWLine *line;
         WWWBLine *wbline;
         WWRect *rect;

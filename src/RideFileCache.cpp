@@ -1414,7 +1414,7 @@ MeanMaxComputer::run()
 // self-contained static routine to perform the fast search algorithm
 // on a single series of data, using ints only assuming data is in 1s 
 // intervals with no data issues.
-void RideFileCache::fastSearch(QVector<int>&input, QVector<int>&ride_bests)
+void RideFileCache::fastSearch(QVector<int>&input, QVector<int>&ride_bests, QVector<int>&ride_offsets)
 {
     // use the raw C structure to reduce overhead and on stack
     // Although with MSVC we have no choice, sadly.
@@ -1427,6 +1427,7 @@ void RideFileCache::fastSearch(QVector<int>&input, QVector<int>&ride_bests)
 
     // resize output
     ride_bests.resize(input.count()+1);
+    ride_offsets.resize(input.count()+1);
 
     // aggregate here, instead of using utility function
     int j=0;
@@ -1443,11 +1444,11 @@ void RideFileCache::fastSearch(QVector<int>&input, QVector<int>&ride_bests)
         data_t c=divided_max_mean(dataseries_i,input.count(),i,&offset);
 
         // snaffle it away
-        int sec = i;
         data_t val = c / (data_t)i;
 
         // save away
-        ride_bests[sec] = val;
+        ride_bests[i] = val;
+        ride_offsets[i] = offset;
 
         // increments to limit search scope
         if (i<120) i++;

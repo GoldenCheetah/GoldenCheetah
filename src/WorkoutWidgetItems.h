@@ -41,6 +41,7 @@
 #define GCWW_BRECT     8 // block selection
 #define GCWW_MMPCURVE  9
 #define GCWW_SGUIDE    10 // smart guides appear as we drag
+#define GCWW_TTE       11 // highlight impossible sections
 
 //
 // ITEMS
@@ -81,6 +82,20 @@ class WWWBalScale : public WorkoutWidgetItem {
     private:
 
         Context *context; // for athlete zones etc
+};
+
+// mark regions of workout that are not possible
+class WWTTE : public WorkoutWidgetItem {
+
+    public :
+        WWTTE(WorkoutWidget *w) : WorkoutWidgetItem(w) { w->addItem(this); }
+
+        int type() { return GCWW_TTE; }
+
+        void paint(QPainter *painter);
+
+        // locate me
+        QRectF bounding() { return workoutWidget()->bottomgap(); }
 };
 
 class WWMMPCurve : public WorkoutWidgetItem {
