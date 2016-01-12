@@ -507,6 +507,13 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
+    case 55: // Blackburn Tech Fluid
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(6.758241758241894 - 1.9995004995004955 * v + 0.24165834165834146 * pow(v, 2));
+        }
+        break;
+
     default : // unknown - do nothing
         break;
     }
