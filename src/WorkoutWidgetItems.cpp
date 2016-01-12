@@ -187,6 +187,11 @@ WWTTE::paint(QPainter *painter)
 {
     QRectF gap = workoutWidget()->bottomgap();
 
+    // if no efforts/TTE found then its green by default
+    // but just way too colorful for my eyes
+    //XXX QRectF all(gap.left(), gap.top(), gap.width(), 2);
+    //XXX painter->fillRect(all, QBrush(Qt::green));
+
     foreach(WWEffort m, workoutWidget()->efforts) {
 
         // top left of rectangle
@@ -197,7 +202,10 @@ WWTTE::paint(QPainter *painter)
         br.setY(gap.top()+2); // thin line
 
         // paint a red rectange
-        painter->fillRect(QRect(tl,br), QBrush(Qt::red));
+        if (m.quality >= 1.00f)
+            painter->fillRect(QRect(tl,br), QBrush(Qt::red));
+        else
+            painter->fillRect(QRect(tl,br), QBrush(QColor(255,152,0)));
     }
 }
 

@@ -1327,53 +1327,57 @@ WorkoutWidget::recompute()
     // clear what we found last time
     efforts.clear();
 
-    // keep track of last found
-    WWEffort tte; tte.start = tte.duration = 0;
+    for (int j=0; j<2; j++) {
 
-    for (int i=0; i<secs; i++) {
+        // 2 iterations:- 85% sustained, then 100% or higher
+        WWEffort tte; tte.start = tte.duration = 0;
 
-        // start out at 30 minutes and drop back to
-        // 2 minutes, anything shorter and we are done
-        int t = (secs-i-1) > 3600 ? 3600 : secs-i-1;
+        for (int i=0; i<secs; i++) {
 
-        while (t > 120) {
+            // start out at 30 minutes and drop back to
+            // 2 minutes, anything shorter and we are done
+            int t = (secs-i-1) > 3600 ? 3600 : secs-i-1;
 
-            // calculate the TTE for the joules in the interval
-            // starting at i seconds with duration t
-            // This takes the monod equation p(t) = W'/t + CP and
-            // solves for t, but the added complication of also
-            // accounting for the fact it is expressed in joules
-            // So take Joules = (W'/t + CP) * t and solving that
-            // for t gives t = (Joules - W') / CP
-            double tc = ((integrated[i+t]-integrated[i]) - WPRIME) / CP;
-            // NOTE FOR ABOVE: it is looking at accumulation AFTER this point
-            //                 not FROM this point, so we are looking 1s ahead of i
-            //                 which is why the interval is registered as starting
-            //                 at i+1 in the code below
+            while (t > 120) {
 
-            // this is either a TTE or impossible!
-            if (tc >= t) {
+                // calculate the TTE for the joules in the interval
+                // starting at i seconds with duration t
+                // This takes the monod equation p(t) = W'/t + CP and
+                // solves for t, but the added complication of also
+                // accounting for the fact it is expressed in joules
+                // So take Joules = (W'/t + CP) * t and solving that
+                // for t gives t = (Joules - W') / CP
+                double tc = ((integrated[i+t]-integrated[i]) - WPRIME) / CP;
+                // NOTE FOR ABOVE: it is looking at accumulation AFTER this point
+                //                 not FROM this point, so we are looking 1s ahead of i
+                //                 which is why the interval is registered as starting
+                //                 at i+1 in the code below
 
-                if (tte.start > (i+1) || (tte.duration+tte.start) < (i+t)) {
+                // this is either a TTE or getting very close
+                if (tc >= (j ? t : (t*0.85))) {
 
-                    tte.start = i + 1; // see NOTE above
-                    tte.duration = t;
-                    tte.joules = integrated[i+t]-integrated[i];
-                    tte.quality = tc / double(t);
+                    if (tte.start > (i+1) || (tte.duration+tte.start) < (i+t)) {
 
-                    // add
-                    efforts << tte;
+                        tte.start = i + 1; // see NOTE above
+                        tte.duration = t;
+                        tte.joules = integrated[i+t]-integrated[i];
+                        tte.quality = tc / double(t);
+
+                        // add 100 or more on second round
+                        // quick way of doing overlapping
+                        if ((j && tc >= t) || (!j && tc < t)) efforts << tte;
+                    }
+
+
+                    // move on shorter/harder are just as bad
+                    t=0;
+
+                } else {
+
+                    t = tc;
+                    if (t<120)
+                        t=120;
                 }
-
-
-                // move on shorter/harder are just as bad
-                t=0;
-
-            } else {
-
-                t = tc;
-                if (t<120)
-                    t=120;
             }
         }
     }
