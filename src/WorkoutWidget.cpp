@@ -1309,8 +1309,74 @@ WorkoutWidget::recompute()
     //
     // MEAN MAX [works but need to think about UI]
     //
-    RideFileCache::fastSearch(wattsArray, mmpArray);
+    RideFileCache::fastSearch(wattsArray, mmpArray, mmpOffsets);
     //qDebug()<<"RECOMPUTE:"<<timer.elapsed()<<"ms"<<wattsArray.count()<<"samples";
+
+    //
+    // SEARCH FOR IMPOSSIBLE TTE SECTIONS
+    //
+    QVector<long> integrated;
+    integrated.resize(wattsArray.size());
+    long rt=0;
+    int secs=wattsArray.size();
+    for(int i=0; i<wattsArray.size(); i++) {
+        rt += wattsArray[i];
+        integrated[i] = rt;
+    }
+
+    // clear what we found last time
+    efforts.clear();
+
+    // keep track of last found
+    WWEffort tte; tte.start = tte.duration = 0;
+
+    for (int i=0; i<secs; i++) {
+
+        // start out at 30 minutes and drop back to
+        // 2 minutes, anything shorter and we are done
+        int t = (secs-i-1) > 3600 ? 3600 : secs-i-1;
+
+        while (t > 120) {
+
+            // calculate the TTE for the joules in the interval
+            // starting at i seconds with duration t
+            // This takes the monod equation p(t) = W'/t + CP and
+            // solves for t, but the added complication of also
+            // accounting for the fact it is expressed in joules
+            // So take Joules = (W'/t + CP) * t and solving that
+            // for t gives t = (Joules - W') / CP
+            double tc = ((integrated[i+t]-integrated[i]) - WPRIME) / CP;
+            // NOTE FOR ABOVE: it is looking at accumulation AFTER this point
+            //                 not FROM this point, so we are looking 1s ahead of i
+            //                 which is why the interval is registered as starting
+            //                 at i+1 in the code below
+
+            // this is either a TTE or impossible!
+            if (tc >= t) {
+
+                if (tte.start > (i+1) || (tte.duration+tte.start) < (i+t)) {
+
+                    tte.start = i + 1; // see NOTE above
+                    tte.duration = t;
+                    tte.joules = integrated[i+t]-integrated[i];
+                    tte.quality = tc / double(t);
+
+                    // add
+                    efforts << tte;
+                }
+
+
+                // move on shorter/harder are just as bad
+                t=0;
+
+            } else {
+
+                t = tc;
+                if (t<120)
+                    t=120;
+            }
+        }
+    }
 }
 
 void
@@ -1469,6 +1535,13 @@ WorkoutWidget::bottom()
 {
     QRect all = geometry();
     return QRectF(LWIDTH, all.height() - BHEIGHT, all.width() - LWIDTH - RWIDTH, BHEIGHT);
+}
+
+QRectF
+WorkoutWidget::bottomgap()
+{
+    QRect all = geometry();
+    return QRectF(LWIDTH, all.height() - (IHEIGHT+BHEIGHT), all.width() - LWIDTH - RWIDTH, IHEIGHT);
 }
 
 QRectF

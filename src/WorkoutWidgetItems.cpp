@@ -180,6 +180,28 @@ WWWBalScale::paint(QPainter *painter)
 
     }
 }
+
+// the warning bar at bottom for TTE efforts
+void
+WWTTE::paint(QPainter *painter)
+{
+    QRectF gap = workoutWidget()->bottomgap();
+
+    foreach(WWEffort m, workoutWidget()->efforts) {
+
+        // top left of rectangle
+        QPoint tl = workoutWidget()->transform(m.start, 0);
+        tl.setY(gap.top());
+
+        QPoint br = workoutWidget()->transform(m.start + m.duration, 0);
+        br.setY(gap.top()+2); // thin line
+
+        // paint a red rectange
+        painter->fillRect(QRect(tl,br), QBrush(Qt::red));
+    }
+}
+
+// a dot
 void
 WWPoint::paint(QPainter *painter)
 {

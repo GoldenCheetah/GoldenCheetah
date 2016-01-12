@@ -94,6 +94,13 @@ class WorkoutWidgetCommand
         WorkoutWidget *workoutWidget_;
 };
 
+// TTE efforts
+struct WWEffort {
+    int start, duration, joules;
+    int zone;
+    double quality;
+};
+
 class WorkoutWidget : public QWidget
 {
     Q_OBJECT
@@ -141,12 +148,14 @@ class WorkoutWidget : public QWidget
 
         // CP data
         QVector<int> wattsArray;
-        QVector<int>mmpArray;
+        QVector<int> mmpArray, mmpOffsets;
+        QList<WWEffort> efforts;
 
         // get regions for items to paint in
         QRectF left();
         QRectF right();
         QRectF bottom();
+        QRectF bottomgap();
         QRectF top();
         QRectF canvas();
 
@@ -256,5 +265,6 @@ class WorkoutWidget : public QWidget
         // for computing W'bal
         WPrime wpBal;
 };
+
 
 #endif // _GC_WorkoutWidget_h

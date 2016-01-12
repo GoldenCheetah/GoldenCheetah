@@ -39,9 +39,12 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // paint the W'bal curve
     mmp = new WWMMPCurve(workout);
 
-    // add the power and W'bal scale
+    // add the power, W'bal scale
     powerscale = new WWPowerScale(workout, context);
     wbalscale = new WWWBalScale(workout, context);
+
+    // tte warning bar at bottom
+    tte = new WWTTE(workout);
 
     // add a line between the dots
     line = new WWLine(workout);
