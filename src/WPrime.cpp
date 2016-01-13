@@ -53,10 +53,12 @@
 #include "Units.h" // for MILES_PER_KM
 #include "Settings.h" // for GC_WBALFORM
 
+#if notyet
 const double WprimeMultConst = 1.0;
 const int WPrimeDecayPeriod = 1800; // 1 hour, tried infinite but costly and limited value
                                     //         on long rides anyway
 const double E = 2.71828183;
+#endif
 
 const int WprimeMatchSmoothing = 25; // 25 sec smoothing looking for matches
 const int WprimeMatchMinJoules = 100; 

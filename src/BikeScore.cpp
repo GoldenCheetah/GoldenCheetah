@@ -27,8 +27,6 @@
 #include <assert.h>
 #include <QApplication>
 
-const double  bikeScoreN   = 4.0;
-
 // NOTE: This code follows the description of xPower, Relative Intensity, and
 // BikeScore in "Analysis of Power Output and Training Stress in Cyclists: The
 // Development of the BikeScore(TM) Algorithm", page 5, by Phil Skiba:

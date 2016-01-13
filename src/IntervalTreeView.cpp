@@ -160,7 +160,6 @@ IntervalColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         // extract the state of item
         bool hover = option.state & QStyle::State_MouseOver;
         bool selected = option.state & QStyle::State_Selected;
-        bool focus = option.state & QStyle::State_HasFocus;
 
         QTreeWidgetItem *item = tree->itemFromIndexPublic(index);
         QVariant v =  item->data(0, Qt::UserRole+1);

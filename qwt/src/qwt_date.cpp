@@ -160,36 +160,7 @@ static inline QDateTime qwtToTimeSpec(
     }
 
     return dt.toTimeSpec( spec );
-}
-
-static inline double qwtToJulianDay( int year, int month, int day )
-{
-    // code from QDate but using doubles to avoid overflows
-    // for large values
-
-    const int m1 = ( month - 14 ) / 12;
-    const int m2 = ( 367 * ( month - 2 - 12 * m1 ) ) / 12;
-    const double y1 = ::floor( ( 4900.0 + year + m1 ) / 100 );
-
-    return ::floor( ( 1461.0 * ( year + 4800 + m1 ) ) / 4 ) + m2
-            - ::floor( ( 3 * y1 ) / 4 ) + day - 32075;
-}
-
-static inline qint64 qwtFloorDiv64( qint64 a, int b )
-{
-    if ( a < 0 )
-        a -= b - 1;
-
-    return a / b;
-}
-
-static inline qint64 qwtFloorDiv( int a, int b )
-{
-    if ( a < 0 )
-        a -= b - 1;
-        
-    return a / b;
-}   
+} 
 
 static inline QDate qwtToDate( int year, int month = 1, int day = 1 )
 {
@@ -313,7 +284,7 @@ QDateTime QwtDate::ceil( const QDateTime &dateTime, IntervalType intervalType )
         {
             qwtFloorTime( QwtDate::Second, dt );
             if ( dt < dateTime )
-                dt.addSecs( 1 );
+                dt = dt.addSecs( 1 );
 
             break;
         }
@@ -321,7 +292,7 @@ QDateTime QwtDate::ceil( const QDateTime &dateTime, IntervalType intervalType )
         {
             qwtFloorTime( QwtDate::Minute, dt );
             if ( dt < dateTime )
-                dt.addSecs( 60 );
+                dt = dt.addSecs( 60 );
 
             break;
         }
@@ -329,7 +300,7 @@ QDateTime QwtDate::ceil( const QDateTime &dateTime, IntervalType intervalType )
         {
             qwtFloorTime( QwtDate::Hour, dt );
             if ( dt < dateTime )
-                dt.addSecs( 3600 );
+                dt = dt.addSecs( 3600 );
 
             break;
         }
@@ -362,7 +333,7 @@ QDateTime QwtDate::ceil( const QDateTime &dateTime, IntervalType intervalType )
                 dateTime.date().month() ) );
 
             if ( dt < dateTime )
-                dt.addMonths( 1 );
+                dt = dt.addMonths( 1 );
 
             break;
         }
