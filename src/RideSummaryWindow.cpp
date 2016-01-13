@@ -1882,7 +1882,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         if (counter) summary += QString("<td align=\"center\">%1%2</td>")
                                                 .arg(dt>0 ? "+" : "-")
-                                                .arg(time_to_string(fabs(dt)));
+                                       .arg(time_to_string(std::abs(dt)));
 
                         else summary += "<td></td>";
                         summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
@@ -1955,7 +1955,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         if (counter) summary += QString("<td align=\"center\">%1%2</td>")
                                                 .arg(dt>0 ? "+" : "-")
-                                                .arg(time_to_string(fabs(dt)));
+                                       .arg(time_to_string(std::abs(dt)));
 
                         else summary += "<td></td>";
 
@@ -2029,7 +2029,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         if (counter) summary += QString("<td align=\"center\">%1%2</td>")
                                                 .arg(dt>0 ? "+" : "-")
-                                                .arg(time_to_string(fabs(dt)));
+                                       .arg(time_to_string(std::abs(dt)));
 
                         else summary += "<td></td>";
                         summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
@@ -2235,7 +2235,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         if (counter) summary += QString("<td align=\"center\">%1%2</td>")
                                                 .arg(dt>0 ? "+" : "-")
-                                                .arg(time_to_string(fabs(dt)));
+                                       .arg(time_to_string(std::abs(dt)));
 
                         else summary += "<td></td>";
                         summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
@@ -2301,7 +2301,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         if (counter) summary += QString("<td align=\"center\">%1%2</td>")
                                                 .arg(dt>0 ? "+" : "-")
-                                                .arg(time_to_string(fabs(dt)));
+                                       .arg(time_to_string(std::abs(dt)));
 
                         else summary += "<td></td>";
                         summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
@@ -2373,7 +2373,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         if (counter) summary += QString("<td align=\"center\">%1%2</td>")
                                                 .arg(dt>0 ? "+" : "-")
-                                                .arg(time_to_string(fabs(dt)));
+                                       .arg(time_to_string(std::abs(dt)));
 
                         else summary += "<td></td>";
                         summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
@@ -2447,7 +2447,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         if (counter) summary += QString("<td align=\"center\">%1%2</td>")
                                                 .arg(dt>0 ? "+" : "-")
-                                                .arg(time_to_string(fabs(dt)));
+                                       .arg(time_to_string(std::abs(dt)));
 
                         else summary += "<td></td>";
                         summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
