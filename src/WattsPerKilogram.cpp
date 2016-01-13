@@ -293,7 +293,7 @@ class Vo2max : public RideMetric {
         setImperialUnits(tr("ml/min/kg"));
     }
 
-    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+  void compute(RideItem */*item*/, Specification, const QHash<QString,RideMetric*> &deps) {
 
         PeakWPK5m *wpk5m = dynamic_cast<PeakWPK5m*>(deps.value("5m_peak_wpk"));
 

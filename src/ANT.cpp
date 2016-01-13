@@ -1132,11 +1132,11 @@ int ANT::openPort()
     return 0;
 }
 
-int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
+int ANT::rawWrite(uint8_t */*bytes*/, int /*size*/) // unix!!
 {
+#ifdef WIN32
     int rc=0;
 
-#ifdef WIN32
 #ifdef GC_HAVE_LIBUSB
     switch (usbMode) {
 #ifdef GC_HAVE_USBXPRESS
