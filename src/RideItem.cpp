@@ -59,7 +59,7 @@ RideItem::RideItem(RideFile *ride, Context *context)
 
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context, bool planned)
     :
-    ride_(NULL), fileCache_(NULL), context(context), planned(planned), isdirty(false), isstale(true), isedit(false), skipsave(false), path(path),
+    ride_(NULL), fileCache_(NULL), context(context), isdirty(false), planned(planned), isstale(true), isedit(false), skipsave(false), path(path),
     fileName(fileName), dateTime(dateTime), color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), 
     metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) 
 {
