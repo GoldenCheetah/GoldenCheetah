@@ -354,6 +354,7 @@ void ErgFile::parseComputrainer(QString p)
 
                 add.x = lapmarker.cap(1).toDouble() * 60000; // from mins to 1000ths of a second
                 add.LapNum = ++lapcounter;
+                add.selected =false;
                 add.name = lapmarker.cap(2).simplified();
                 Laps.append(add);
 
@@ -363,6 +364,7 @@ void ErgFile::parseComputrainer(QString p)
 
                 add.x = rdist;
                 add.LapNum = ++lapcounter;
+                add.selected =false;
                 add.name = lapmarker.cap(2).simplified();
                 Laps.append(add);
 
