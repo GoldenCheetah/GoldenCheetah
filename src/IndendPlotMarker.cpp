@@ -176,7 +176,7 @@ QwtIndPlotMarker::~QwtIndPlotMarker()
   */
 void QwtIndPlotMarker::draw( QPainter *painter,
         const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-        const QRectF &canvasRect ) //const
+        const QRectF &canvasRect ) const
 {
     const QPointF pos( xMap.transform( this->xValue() ),
             yMap.transform( this->yValue() ) );
