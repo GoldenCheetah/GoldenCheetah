@@ -46,6 +46,7 @@ class WWBlockCursor;
 class WWBlockSelection;
 class WWMMPCurve;
 class WWSmartGuide;
+class WWLap;
 
 class WorkoutWindow : public GcWindow
 {
@@ -59,7 +60,8 @@ class WorkoutWindow : public GcWindow
         QLabel *xlabel, *ylabel;
         QLabel *TSSlabel, *IFlabel;
 
-        QAction *saveAct, *undoAct, *redoAct,
+        QAction *saveAct, *propertiesAct,
+                *undoAct, *redoAct,
                 *drawAct, *selectAct,
                 *cutAct, *copyAct, *pasteAct;
 
@@ -69,6 +71,7 @@ class WorkoutWindow : public GcWindow
 
         // toolbar functions
         void saveFile();
+        void properties();
         void drawMode();
         void selectMode();
 
@@ -81,6 +84,7 @@ class WorkoutWindow : public GcWindow
 
         QToolBar *toolbar;
         WorkoutWidget *workout; // will become editor.
+
         WWPowerScale *powerscale;
         WWWBalScale *wbalscale;
         WWTTE *tte;
@@ -91,6 +95,8 @@ class WorkoutWindow : public GcWindow
         WWBlockSelection *brect;
         WWMMPCurve *mmp;
         WWSmartGuide *guide;
+        WWLap *lap;
+
         bool active;
 };
 

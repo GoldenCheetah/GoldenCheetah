@@ -43,6 +43,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     powerscale = new WWPowerScale(workout, context);
     wbalscale = new WWWBalScale(workout, context);
 
+    // lap markers
+    lap = new WWLap(workout);
+
     // tte warning bar at bottom
     tte = new WWTTE(workout);
 
@@ -74,6 +77,11 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     saveAct = new QAction(saveIcon, tr("Save"), this);
     connect(saveAct, SIGNAL(triggered()), this, SLOT(saveFile()));
     toolbar->addAction(saveAct);
+
+    QIcon propertiesIcon(":images/toolbar/properties.png");
+    propertiesAct = new QAction(propertiesIcon, tr("Properties"), this);
+    connect(propertiesAct, SIGNAL(triggered()), this, SLOT(properties()));
+    toolbar->addAction(propertiesAct);
 
     toolbar->addSeparator();
 
@@ -192,6 +200,13 @@ WorkoutWindow::configChanged(qint32)
 void
 WorkoutWindow::saveFile()
 {
+    qDebug()<<"SAVE ASKED FOR";
+}
+
+void
+WorkoutWindow::properties()
+{
+    // metadata etc -- needs a dialog
 }
 
 void

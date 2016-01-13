@@ -42,6 +42,7 @@
 #define GCWW_MMPCURVE  9
 #define GCWW_SGUIDE    10 // smart guides appear as we drag
 #define GCWW_TTE       11 // highlight impossible sections
+#define GCWW_LAP       12 // lap markers
 
 //
 // ITEMS
@@ -112,6 +113,23 @@ class WWMMPCurve : public WorkoutWidgetItem {
         // locate me on the parent widget in paint coordinates
         QRectF bounding() { return workoutWidget()->canvas(); }
 
+};
+
+// lap marker at top 
+class WWLap : public WorkoutWidgetItem {
+    public:
+
+        WWLap(WorkoutWidget *w) : WorkoutWidgetItem(w) { w->addItem(this); }
+
+        // Reimplement in children
+        int type() { return GCWW_LAP; }
+
+        void paint(QPainter *painter);
+
+        // locate me on the parent widget in paint coordinates
+        QRectF bounding() { return workoutWidget()->top(); }
+
+    private:
 };
 
 // is a point, can be manipulated ...

@@ -127,6 +127,9 @@ class WorkoutWidget : public QWidget
         // get list of my items
         QList<WWPoint*> &points() { return points_; }
 
+        // lap markers
+        QList<ErgFileLap> &laps() { return laps_; }
+
         // get WPrime values
         WPrime &wprime() { return wpBal; }
 
@@ -237,6 +240,9 @@ class WorkoutWidget : public QWidget
         bool moveBlock(QPoint p);
         bool setBlockCursor();
 
+        // working with laps
+        bool setLapState(); // as mouse moves
+
         // when a block is selected its quite complex to
         // determine what to do in a copy/cut operation
         bool getBlockSelected(QList<int>&copy, QList<int>&del, double &shift);
@@ -255,6 +261,9 @@ class WorkoutWidget : public QWidget
         // and code simpler, it helps when moving them around
         // as don't have to keep searching through all objects
         QList<WWPoint*> points_;
+
+        // the lap definitions
+        QList<ErgFileLap>   laps_;      // interval markers in the file
 
         double maxX_, maxY_;
 

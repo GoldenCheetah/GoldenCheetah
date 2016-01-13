@@ -33,7 +33,7 @@
 
 // height and width of widgets
 static const double IHEIGHT = 10;
-static const double THEIGHT = 25;
+static const double THEIGHT = 35;
 static const double BHEIGHT = 35;
 static const double LWIDTH = 65;
 static const double RWIDTH = 35;
@@ -93,6 +93,7 @@ WorkoutWidget::timeout()
 // # EVENT              STATE       ACTION                              NEXT STATE
 // - --------------     ------      ---------------                     ----------
 // 1 mouse move         none        hover/unhover point/block           none
+//                      none        hover/unhover lap marker            none
 //                      drag        move point around                   drag
 //                      dragblock   move block around                   dragblock
 //                      rect        resize and scan for selections      rect
@@ -185,6 +186,10 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
                     }
                 }
             }
+
+            // set lap marker state if needed, but don't
+            // lost the updateNeeded state if already true
+            updateNeeded= updateNeeded || setLapState();
 
         // STATE: CREATE
         } else if (state == create) {
@@ -503,6 +508,50 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 
     // return false - we are eavesdropping not processing.
     // except for wheel events which we steal
+    return returning;
+}
+
+bool
+WorkoutWidget::setLapState()
+{
+    // by default nothing to do
+    bool returning = false;
+
+    // have laps been hovered/unhovered?
+    if (laps_.count()==0) return false;
+
+    // where is the cursor
+    QPoint p = mapFromGlobal(QCursor::pos());
+    int x = reverseTransform(p.x(),0).x();
+
+    bool intop = top().contains(p);
+
+    // run through lap markers..
+    for(int i=0; i<laps_.count(); i++) {
+
+        if (!intop) {
+
+            // unselect regardless as cursor not there, notify if needed
+            if (laps_[i].selected == true) returning = true;
+            laps_[i].selected = false;
+
+        } else {
+            // we need to work out if the cursor is for us
+            if ((x > (laps_[i].x/1000.00f)) && (i == (laps_.count()-1) || x < (laps_[i+1].x/1000.00f))) { // cursor to right
+
+                // select and notify it changed
+                if (!laps_[i].selected) returning=true;
+                laps_[i].selected = true;
+
+            } else {
+
+                // nope, so deselect and notify if changed
+                if (laps_[i].selected) returning=true;
+                laps_[i].selected = false;
+            }
+        }
+    }
+
     return returning;
 }
 
@@ -1153,6 +1202,7 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
     foreach (WorkoutWidgetCommand *p, stack) delete p;
     stack.clear();
     stackptr = 0;
+    parent->saveAct->setEnabled(false);
     parent->undoAct->setEnabled(false);
     parent->redoAct->setEnabled(false);
     cursorBlock = selectionBlock = QPainterPath();
@@ -1168,6 +1218,9 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
 
         maxX_=0;
         maxY_=400;
+
+        // get laps
+        laps_ = ergFile->Laps;
 
         // add points for this....
         foreach(ErgFilePoint point, ergFile->Points) {
@@ -1636,6 +1689,7 @@ WorkoutWidget::addCommand(WorkoutWidgetCommand *cmd)
     stackptr++;
 
     // set undo enabled, redo disabled
+    parent->saveAct->setEnabled(true);
     parent->undoAct->setEnabled(true);
     parent->redoAct->setEnabled(false);
 }
@@ -1651,7 +1705,10 @@ WorkoutWidget::redo()
     if (stackptr >= 0 && stackptr < stack.count()) stack[stackptr++]->redo();
 
     // disable/enable buttons
-    if (stackptr > 0) parent->undoAct->setEnabled(true);
+    if (stackptr > 0) {
+        parent->undoAct->setEnabled(true);
+        parent->saveAct->setEnabled(true);
+    }
     if (stackptr >= stack.count()) parent->redoAct->setEnabled(false);
 
     // recompute metrics
@@ -1672,7 +1729,10 @@ WorkoutWidget::undo()
     if (stackptr > 0) stack[--stackptr]->undo();
 
     // disable/enable button
-    if (stackptr <= 0) parent->undoAct->setEnabled(false);
+    if (stackptr <= 0) {
+        parent->saveAct->setEnabled(false);
+        parent->undoAct->setEnabled(false);
+    }
     if (stackptr < stack.count()) parent->redoAct->setEnabled(true);
 
     // recompute metrics

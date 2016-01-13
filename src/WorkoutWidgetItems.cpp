@@ -209,6 +209,38 @@ WWTTE::paint(QPainter *painter)
     }
 }
 
+// lap markers
+void
+WWLap::paint(QPainter *painter)
+{
+    if (workoutWidget()->laps().count() == 0) return;
+
+    QRectF top = workoutWidget()->top();
+
+    QFontMetrics fontMetrics(workoutWidget()->bigFont);
+    painter->setFont(workoutWidget()->bigFont);
+    painter->setPen(GColor(CPLOTMARKER));
+
+    for(int i=0; i<workoutWidget()->laps().count(); i++) {
+
+        QString name = QString("%1").arg(workoutWidget()->laps()[i].LapNum);
+
+        // where to paint?
+        QPointF here = workoutWidget()->transform(workoutWidget()->laps()[i].x/1000.0f, 0);
+        here.setY(top.top() + fontMetrics.height());
+
+        // hover over show full length markers
+        if (workoutWidget()->laps()[i].selected ||
+            (i>0 && workoutWidget()->laps()[i-1].selected))
+            painter->drawLine(QPointF(here.x(), top.top()), QPointF(here.x(), workoutWidget()->canvas().bottom()));
+        else
+            painter->drawLine(QPointF(here.x(), top.top()), QPointF(here.x(), top.bottom()));
+
+        // and the text
+        painter->drawText(here, name);
+    }
+}
+
 // a dot
 void
 WWPoint::paint(QPainter *painter)
