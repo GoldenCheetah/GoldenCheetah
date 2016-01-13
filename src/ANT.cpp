@@ -1134,6 +1134,11 @@ int ANT::openPort()
 
 int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
 {
+#if !GC_HAVE_LIBUSB
+    Q_UNUSED(bytes);
+    Q_UNUSED(size);
+#endif
+
     int rc=0;
 
 #ifdef WIN32
@@ -1179,7 +1184,7 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
     }
 #endif
 #endif
-    return -1;
+    return rc=-1;
 
 }
 

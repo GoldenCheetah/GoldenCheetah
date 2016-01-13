@@ -33,9 +33,8 @@
 #include <assert.h>
 #ifdef Q_CC_MSVC
 #include <float.h>
-#else
-#include <cmath>
 #endif
+#include <cmath>
 #include <qwt_spline.h>
 
 #ifdef GC_HAVE_SAMPLERATE
@@ -2015,8 +2014,8 @@ RideFile::recalculateDerivedSeries(bool force)
             current = dataPoints_[i]->gear;
             if (i<dataPoints_.count()-1) next = dataPoints_[i+1]->gear; else next = 0.0f;
             // if there is a big jump to current in relation to last-next consider this a outlier
-            double diff1 = abs(last-next);
-            double diff2 = abs(last-current);
+            double diff1 = std::abs(last-next);
+            double diff2 = std::abs(last-current);
             if ((diff1 < 0.01f) || (diff2 >= (diff1+0.5f))){
                 // single outlier (no shift up/down in 2 seconds
                 dataPoints_[i]->gear = (last>next) ? last : next;
@@ -2358,7 +2357,7 @@ RideFile::resample(double newRecIntSecs, int interpolate)
 // 1.26s sampling or higher to 1s sampling when merging data.
 //
 RideFile *
-RideFile::resample(double newRecIntSecs, int interpolate)
+RideFile::resample(double newRecIntSecs, int /*interpolate*/)
 {
 
     // resample if interval has changed
