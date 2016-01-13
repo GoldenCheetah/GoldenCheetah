@@ -164,11 +164,11 @@ class RideFile : public QObject // QObject to emit signals
 
         // file format writers have more access
         friend class RideFileFactory;
-        friend class FitlogFileReader;
-        friend class GcFileReader;
+        friend struct FitlogFileReader;
+        friend struct GcFileReader;
         friend class TcxFileReader;
-        friend class PwxFileReader;
-        friend class JsonFileReader;
+        friend struct PwxFileReader;
+        friend struct JsonFileReader;
         friend class ManualRideDialog;
         friend class PolarFileReader;
         // split and mergers
