@@ -82,4 +82,10 @@ static const  QList<QString> cloudDBLangs = { QObject::tr("English"), QObject::t
 
 static const QString cloudDBTimeFormat = "yyyy-MM-ddTHH:mm:ssZ";
 
+// enums for common use
+
+// APPEngine Reponses
+enum CloudDBResponse { Ok = 200, Forbidden = 403, OverQuota = 503, Others = 999 };
+
+
 #endif // CLOUDDBCORE_H

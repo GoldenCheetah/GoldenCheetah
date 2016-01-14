@@ -1735,13 +1735,14 @@ LTMSidebar::importCloudDBPreset()
        };
     }
 
-    cdbChartImportDialog.initialize();
-    cdbChartImportDialog.setModal(true);
-    if (cdbChartImportDialog.exec() == QDialog::Accepted) {
-        LTMSettings s = cdbChartImportDialog.getSelectedSettings();
-        // now append to the QList and QTreeWidget
-        context->athlete->presets += s;
-        context->notifyPresetsChanged();
+    if (cdbChartImportDialog.initialize(context->athlete->cyclist)) {
+        cdbChartImportDialog.setModal(true);
+        if (cdbChartImportDialog.exec() == QDialog::Accepted) {
+            LTMSettings s = cdbChartImportDialog.getSelectedSettings();
+            // now append to the QList and QTreeWidget
+            context->athlete->presets += s;
+            context->notifyPresetsChanged();
+        }
     }
 }
 #endif

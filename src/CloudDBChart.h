@@ -21,6 +21,7 @@
 
 #include "LTMSettings.h"
 #include "Settings.h"
+#include "CloudDBCommon.h"
 
 #include <QObject>
 #include <QNetworkAccessManager>
@@ -34,31 +35,26 @@
 // API Structure V1 (flattened) must be in sync with the Structure used for the V1
 // but uses the correct QT datatypes
 
-struct ChartAPIv1 {
+
+typedef struct {
     quint64 Id;
     QString Name;
     QString Description;
     QString Language;
     QString GcVersion;
-    QString ChartXML;
-    QByteArray Image;
     QDateTime LastChanged;
     QString CreatorId;
+    bool    Curated;
+    bool    Deleted;
+} ChartAPIHeaderV1;
+
+
+struct ChartAPIv1 {
+    ChartAPIHeaderV1 header;
+    QString ChartXML;
+    QByteArray Image;
     QString CreatorNick;
     QString CreatorEmail;
-    bool    Curated;
-    bool    Deleted;
-};
-
-struct ChartAPIHeaderV1 {
-    quint64 Id;
-    QString Name;
-    QString Description;
-    QString Language;
-    QString GcVersion;
-    QDateTime LastChanged;
-    bool    Curated;
-    bool    Deleted;
 };
 
 
@@ -71,9 +67,9 @@ public:
     CloudDBChartClient();
     ~CloudDBChartClient();
 
-    bool postChart(ChartAPIv1 chart);
-    bool getChartByID(qint64 , ChartAPIv1*);
-    bool getAllChartHeader(QList<ChartAPIHeaderV1>*);
+    CloudDBResponse postChart(ChartAPIv1 );
+    CloudDBResponse getChartByID(qint64 , ChartAPIv1*);
+    CloudDBResponse getAllChartHeader(QList<ChartAPIHeaderV1>*);
 
     bool sslLibMissing() { return noSSLlib; }
 
@@ -107,6 +103,8 @@ private:
     static bool unmarshallAPIHeaderV1(QByteArray , QList<ChartAPIHeaderV1>* );
     static void unmarshallAPIHeaderV1Object(QJsonObject* , ChartAPIHeaderV1* chart);
 
+    CloudDBResponse processReplyStatusCodes(QNetworkReply *);
+
 };
 
 struct ChartImportUIStructure {
@@ -117,6 +115,7 @@ struct ChartImportUIStructure {
     QDateTime createdAt;
     QPixmap image;
     LTMSettings ltmSettings;
+    bool createdByMe;
 };
 
 class CloudDBChartImportDialog : public QDialog
@@ -128,8 +127,11 @@ public:
     CloudDBChartImportDialog();
     ~CloudDBChartImportDialog();
 
-    void initialize();
+    bool initialize(QString);
     LTMSettings getSelectedSettings() {return g_selected; }
+
+    // re-implemented
+    void closeEvent(QCloseEvent* event);
 
 private slots:
 
@@ -139,9 +141,10 @@ private slots:
     void nextSetClicked();
     void prevSetClicked();
     void curatedToggled(bool);
+    void ownChartsToggled(bool);
     void toggleFilterApply();
     void languageFilterChanged(int);
-    void filterEditingFinished();
+    void textFilterEditingFinished();
 
 private:
 
@@ -153,7 +156,9 @@ private:
     int g_stepSize;
     QList<ChartAPIHeaderV1>* g_currentHeaderList;
     QList<ChartAPIHeaderV1>* g_fullHeaderList;
-    bool g_filterActive;
+    bool g_textFilterActive;
+    QString g_currentAthleteId;
+    bool g_networkrequestactive;
 
     // UI elements
     QLabel *showing;
@@ -162,15 +167,16 @@ private:
     QPushButton *nextSet;
     QPushButton *prevSet;
     QCheckBox *curatedOnly;
+    QCheckBox *ownChartsOnly;
     QComboBox *langCombo;
-    QLineEdit *filter;
-    QPushButton *filterApply;
+    QLineEdit *textFilter;
+    QPushButton *textFilterApply;
     QTableWidget *tableWidget;
     QPushButton *addAndCloseButton, *closeButton;
 
     // helper methods
     void getCurrentPresets(int, int);
-    void applyFilterAndCurated();
+    void applyAllFilters();
     QString encodeHTML ( const QString& );
 
 };

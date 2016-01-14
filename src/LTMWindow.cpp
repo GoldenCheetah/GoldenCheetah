@@ -1272,11 +1272,11 @@ LTMWindow::shareConfig()
 {
     // check for CloudDB T&C acceptance
     if (!(appsettings->cvalue(context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
-       CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
-       acceptDialog.setModal(true);
-       if (acceptDialog.exec() == QDialog::Rejected) {
-          return;
-       };
+        CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
+        acceptDialog.setModal(true);
+        if (acceptDialog.exec() == QDialog::Rejected) {
+            return;
+        };
     }
 
     // collect the config to export
@@ -1285,9 +1285,9 @@ LTMWindow::shareConfig()
     mine[0].title = mine[0].name = title();
 
     ChartAPIv1 chart;
-    chart.Name = title();
+    chart.header.Name = title();
     int version = VERSION_LATEST;
-    chart.GcVersion =  QString::number(version);
+    chart.header.GcVersion =  QString::number(version);
     LTMChartParser::serializeToQString(&chart.ChartXML, mine);
     QPixmap picture;
     menuButton->hide();
@@ -1301,19 +1301,27 @@ LTMWindow::shareConfig()
     picture.save(&buffer, "JPG"); // writes pixmap into bytes in JPG format
     buffer.close();
 
-    chart.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
-    chart.Curated = false;
-    chart.Deleted = false;
+    chart.header.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
+    chart.header.Curated = false;
+    chart.header.Deleted = false;
 
     // now complete the chart with for the user manually added fields
     CloudDBChartPublishDialog dialog(chart, context->athlete->cyclist);
     dialog.setModal(true);
     if (dialog.exec() == QDialog::Accepted) {
-       CloudDBChartClient c;
-       if (!c.postChart(dialog.getChart())) {
-           QMessageBox::warning(0, tr("CloudDB"), QString(tr("Export to CloudDB not successful"))) ;
-       }
-       CloudDBDataStatus::setChartHeaderStale(true);
+        CloudDBChartClient c;
+        CloudDBResponse r = c.postChart(dialog.getChart());
+        if (r == CloudDBResponse::Ok) {
+            CloudDBDataStatus::setChartHeaderStale(true); }
+        else {
+            switch(r) {
+            case CloudDBResponse::OverQuota:
+                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
+                break;
+            default:
+                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with export to CloudDB - please try again later")));
+            }
+        }
     }
 }
 #endif
