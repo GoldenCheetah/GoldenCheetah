@@ -72,28 +72,28 @@ CloudDBChartClient::~CloudDBChartClient() {
 }
 
 
-bool
+CloudDBResponse
 CloudDBChartClient::postChart(ChartAPIv1 chart) {
 
     // check if Athlete ID is filled
 
-    if (chart.CreatorId.isEmpty()) return false;
+    if (chart.header.CreatorId.isEmpty()) return CloudDBResponse::Others;
 
     // default where it may be necessary
-    if (chart.Language.isEmpty()) chart.Language = "en";
+    if (chart.header.Language.isEmpty()) chart.header.Language = "en";
 
     // first create the JSON object
     // only a subset of fields is required for POST
     QJsonObject json;
-    json.insert("name", QJsonValue(chart.Name));
-    json.insert("description", chart.Description);
-    json.insert("language", chart.Language);
-    json.insert("gcversion", chart.GcVersion);
+    json.insert("name", QJsonValue(chart.header.Name));
+    json.insert("description", chart.header.Description);
+    json.insert("language", chart.header.Language);
+    json.insert("gcversion", chart.header.GcVersion);
     json.insert("chartxml", chart.ChartXML);
     QString image;
     image.append(chart.Image.toBase64());
     json.insert("image", image);
-    json.insert("creatorid", chart.CreatorId);
+    json.insert("creatorid", chart.header.CreatorId);
     json.insert("creatornick", chart.CreatorNick);
     json.insert("creatoremail", chart.CreatorEmail);
     QJsonDocument document;
@@ -113,21 +113,16 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
 
     if (g_reply->error() != QNetworkReply::NoError) {
 
-        QVariant statusCode = g_reply->attribute( QNetworkRequest::HttpStatusCodeAttribute );
-        if ( !statusCode.isValid() ) {
-            QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem uploading the chart - please try again later")));
-        } else {
+        return processReplyStatusCodes(g_reply);
 
-            QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem uploading the chart - Error Code: %1").arg(statusCode.toInt())));
-        }
-        return false;
     };
 
-    return true;
+    return CloudDBResponse::Ok;
 
 }
 
-bool CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
+CloudDBResponse
+CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
 
     QNetworkRequest request;
     request.setUrl(QUrl(g_chart_url_base+QString::number(id, 10)));
@@ -155,17 +150,11 @@ bool CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
 
         if (g_reply->error() != QNetworkReply::NoError) {
 
-            QVariant statusCode = g_reply->attribute( QNetworkRequest::HttpStatusCodeAttribute );
-            if ( !statusCode.isValid() ) {
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading chart details - please try again later")));
-            } else {
+            return processReplyStatusCodes(g_reply);
 
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading chart details - Error Code: %1").arg(statusCode.toInt())));
-            }
-            return false;
         };
 
-    };
+    }
     QByteArray result = g_reply->readAll();
     QList<ChartAPIv1>* charts = new QList<ChartAPIv1>;
     unmarshallAPIv1(result, charts);
@@ -173,13 +162,14 @@ bool CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
         *chart = charts->value(0);
         charts->clear();
         delete charts;
-        return true;
+        CloudDBResponse::Ok;
     }
     delete charts;
-    return false;
+    return CloudDBResponse::Others;
 }
 
-bool CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
+CloudDBResponse
+CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
 
     QDateTime selectAfter;
 
@@ -201,6 +191,7 @@ bool CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader)
     url.setQuery(query);
     QNetworkRequest request;
     request.setUrl(url);
+    request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysNetwork);
     request.setHeader(QNetworkRequest::ContentTypeHeader, g_header_content_type);
     request.setRawHeader("Authorization", g_header_basic_auth);
     g_reply = g_nam->get(request);
@@ -211,14 +202,7 @@ bool CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader)
     loop.exec();
 
     if (g_reply->error() != QNetworkReply::NoError) {
-
-        QVariant statusCode = g_reply->attribute( QNetworkRequest::HttpStatusCodeAttribute );
-        if ( !statusCode.isValid() ) {
-           QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem retrieving chart list - please try again later")));
-        } else {
-           QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem retrieving chart list - Error Code: %1").arg(QString::number(statusCode.toInt()))));
-        }
-        return false;
+        return processReplyStatusCodes(g_reply);
     };
 
     // result (List of Headers and Updated Ids)
@@ -256,7 +240,7 @@ bool CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader)
     // store cache for next time
     writeHeaderCache(chartHeader);
 
-    return true;
+    return CloudDBResponse::Ok;
 }
 
 
@@ -296,16 +280,16 @@ CloudDBChartClient::writeHeaderCache(QList<ChartAPIHeaderV1>* header) {
    // track a version to be able change data structure
    out << header_magic_string;
    out << header_cache_version;
-   for (int i = 0; i < header->size(); i++)
-   {
-       out << header->at(i).Name;
-       out << header->at(i).LastChanged;
-       out << header->at(i).Language;
-       out << header->at(i).Id;
-       out << header->at(i).GcVersion;
-       out << header->at(i).Description;
-       out << header->at(i).Deleted;
-       out << header->at(i).Curated;
+   foreach (ChartAPIHeaderV1 h, *header) {
+       out << h.Id;
+       out << h.Name;
+       out << h.Description;
+       out << h.Language;
+       out << h.GcVersion;
+       out << h.LastChanged;
+       out << h.CreatorId;
+       out << h.Deleted;
+       out << h.Curated;
    }
    file.close();
    return true;
@@ -337,12 +321,13 @@ CloudDBChartClient::readHeaderCache(QList<ChartAPIHeaderV1>* header) {
     }
     ChartAPIHeaderV1 h;
     while (!in.atEnd()) {
-        in >> h.Name;
-        in >> h.LastChanged;
-        in >> h.Language;
         in >> h.Id;
-        in >> h.GcVersion;
+        in >> h.Name;
         in >> h.Description;
+        in >> h.Language;
+        in >> h.GcVersion;
+        in >> h.LastChanged;
+        in >> h.CreatorId;
         in >> h.Deleted;
         in >> h.Curated;
         header->append(h);
@@ -390,22 +375,22 @@ CloudDBChartClient::unmarshallAPIv1(QByteArray json, QList<ChartAPIv1> *charts) 
 void
 CloudDBChartClient::unmarshallAPIv1Object(QJsonObject* object, ChartAPIv1* chart) {
 
-    chart->Id = object->value("id").toDouble();
-    chart->Name = object->value("name").toString();
-    chart->Description = object->value("description").toString();
-    chart->Language = object->value("language").toString();
-    chart->GcVersion = object->value("gcversion").toString();
+    chart->header.Id = object->value("id").toDouble();
+    chart->header.Name = object->value("name").toString();
+    chart->header.Description = object->value("description").toString();
+    chart->header.Language = object->value("language").toString();
+    chart->header.GcVersion = object->value("gcversion").toString();
+    chart->header.LastChanged = QDateTime::fromString(object->value("lastChange").toString(), cloudDBTimeFormat);
+    chart->header.CreatorId = object->value("creatorId").toString();
+    chart->header.Curated = object->value("curated").toBool();
+    chart->header.Deleted = object->value("deleted").toBool();
     chart->ChartXML = object->value("chartxml").toString();
     QString imageString = object->value("image").toString();
     QByteArray ba;
     ba.append(imageString);
     chart->Image = QByteArray::fromBase64(ba);
-    chart->LastChanged = QDateTime::fromString(object->value("lastChange").toString(), cloudDBTimeFormat);
-    chart->CreatorId = object->value("creatorId").toString();
     chart->CreatorNick = object->value("creatorNick").toString();
     chart->CreatorEmail = object->value("creatorEmail").toString();
-    chart->Curated = object->value("curated").toBool();
-    chart->Deleted = object->value("deleted").toBool();
 
 }
 
@@ -452,8 +437,43 @@ CloudDBChartClient::unmarshallAPIHeaderV1Object(QJsonObject* object, ChartAPIHea
     chartHeader->Language = object->value("language").toString();
     chartHeader->GcVersion = object->value("gcversion").toString();
     chartHeader->LastChanged = QDateTime::fromString(object->value("lastChange").toString(), cloudDBTimeFormat);
+    chartHeader->CreatorId = object->value("creatorId").toString();
     chartHeader->Curated = object->value("curated").toBool();
     chartHeader->Deleted = object->value("deleted").toBool();
+
+}
+
+CloudDBResponse
+CloudDBChartClient::processReplyStatusCodes(QNetworkReply *reply) {
+
+    // PROBLEM - the replies provided are in some of our case not
+    // the real HTTP replies - so we do some interpretation to
+    // get proper responses to the user
+    // main objective is to differentiate "Over Quota" from other problems
+    if (reply->error() == QNetworkReply::ServiceUnavailableError) {
+
+        // check for "Over Quota" - checking the body GAE is providing with 2 keywords
+        // which should even work when the response text is slighly changed.
+        QByteArray body = g_reply->readAll();
+        if (body.contains("503") && (body.contains("Quota"))) {
+            return CloudDBResponse::OverQuota;
+        }
+    }
+
+    // and here how it should work / jus interpreting what was send through HTTP
+    QVariant statusCode = g_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    if ( !statusCode.isValid() ) {
+        return CloudDBResponse::Others;
+    }
+    int code = statusCode.toInt();
+    switch (code) {
+    case CloudDBResponse::Forbidden :
+    case CloudDBResponse::OverQuota :
+        return static_cast<CloudDBResponse>(statusCode.toInt());
+    default:
+        return CloudDBResponse::Others;
+    }
+    return CloudDBResponse::Others;
 
 }
 
@@ -473,7 +493,8 @@ CloudDBChartImportDialog::CloudDBChartImportDialog() {
    g_currentHeaderList = new QList<ChartAPIHeaderV1>;
    g_fullHeaderList = new QList<ChartAPIHeaderV1>;
    g_currentPresets = new QList<ChartImportUIStructure>;
-   g_filterActive = true; // we always start with "curated" only
+   g_textFilterActive = true; // we always start with "curated" only
+   g_networkrequestactive = false; // don't allow Dialog to close while we are retrieving data
 
    g_stepSize = 10;
 
@@ -498,37 +519,41 @@ CloudDBChartImportDialog::CloudDBChartImportDialog() {
    showingLayout->addWidget(prevSet);
    showingLayout->addWidget(nextSet);
 
-   curatedOnly = new QCheckBox(tr("Curated Only"));
+   curatedOnly = new QCheckBox(tr("Curated"));
    curatedOnly->setChecked(true);
 
    connect(curatedOnly, SIGNAL(toggled(bool)), this, SLOT(curatedToggled(bool)));
 
-   QLabel* langLabel = new QLabel(tr("Language"));
+   ownChartsOnly = new QCheckBox(tr("My Charts"));
+   ownChartsOnly->setChecked(false);
+
+   connect(ownChartsOnly, SIGNAL(toggled(bool)), this, SLOT(ownChartsToggled(bool)));
+
    langCombo = new QComboBox();
    langCombo->addItem(tr("Any Language"));
    foreach (QString lang, cloudDBLangs) {
        langCombo->addItem(lang);
    }
 
-   filterApply = new QPushButton(tr("Search Keyword"));
-   filterApply->setFixedWidth(180); // To allow proper translation
-   filter = new QLineEdit; 
-   g_filterActive = false;
+   textFilterApply = new QPushButton(tr("Search Keyword"));
+   textFilterApply->setFixedWidth(180); // To allow proper translation
+   textFilter = new QLineEdit;
+   g_textFilterActive = false;
 
-   connect(filter, SIGNAL(editingFinished()), this, SLOT(filterEditingFinished()));
+   connect(textFilter, SIGNAL(editingFinished()), this, SLOT(textFilterEditingFinished()));
    connect(langCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(languageFilterChanged(int)));
-   connect(filterApply, SIGNAL(clicked()), this, SLOT(toggleFilterApply()));
+   connect(textFilterApply, SIGNAL(clicked()), this, SLOT(toggleFilterApplypply()));
 
    QHBoxLayout *filterLayout = new QHBoxLayout;
    filterLayout->addWidget(curatedOnly);
+   filterLayout->addWidget(ownChartsOnly);
    filterLayout->addStretch();
-   filterLayout->addWidget(langLabel);
    filterLayout->addWidget(langCombo);
    filterLayout->addStretch();
-   filterLayout->addWidget(filterApply);
-   filterLayout->addWidget(filter);
+   filterLayout->addWidget(textFilterApply);
+   filterLayout->addWidget(textFilter);
 
-   filter->setVisible(true);
+   textFilter->setVisible(true);
 
    tableWidget = new QTableWidget(0, 2);
    tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -577,22 +602,46 @@ CloudDBChartImportDialog::~CloudDBChartImportDialog() {
     delete g_currentPresets;
 }
 
+// block DialogWindow close while networkrequest is processed
 void
-CloudDBChartImportDialog::initialize() {
+CloudDBChartImportDialog::closeEvent(QCloseEvent* event) {
+
+     if (g_networkrequestactive) {
+         event->ignore();
+         return;
+     }
+     QDialog::closeEvent(event);
+}
+
+bool
+CloudDBChartImportDialog::initialize(QString athlete) {
 
     if (CloudDBDataStatus::isStaleChartHeader()) {
         g_fullHeaderList->clear();
         g_currentHeaderList->clear();
         g_currentIndex = 0;
         g_stepSize = 10;
-        if (!g_client->getAllChartHeader(g_fullHeaderList)) {
-            QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading the charts - please try again later")));
-            return;
+        g_networkrequestactive = true;
+        CloudDBResponse response = g_client->getAllChartHeader(g_fullHeaderList);
+        if (response != CloudDBResponse::Ok) {
+            switch (response) {
+            case CloudDBResponse::OverQuota:
+                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
+                break;
+            default:
+                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading the charts - please try again later")));
+            }
+            g_networkrequestactive = false;
+            return false;
         }
+
+        g_networkrequestactive = false;
         CloudDBDataStatus::setChartHeaderStale(false);
-        // we always start with curated Only and no Filter
-        applyFilterAndCurated();
+        // we always start with curated Only / All Charts / and no Filter
+        applyAllFilters();
     }
+    g_currentAthleteId = appsettings->cvalue(athlete, GC_ATHLETE_ID, "").toString();
+    return true;
 }
 
 void
@@ -608,15 +657,18 @@ CloudDBChartImportDialog::getCurrentPresets(int index, int count) {
     // now get the presets
     g_currentPresets->clear();
     ChartAPIv1* chart = new ChartAPIv1;
-    for (int i = index; i< index+count && i<g_currentHeaderList->count(); i++) {
-        if (g_client->getChartByID(g_currentHeaderList->at(i).Id, chart)) {
+    g_networkrequestactive = true;
+    bool noError = true;
+    CloudDBResponse response;
+    for (int i = index; i< index+count && i<g_currentHeaderList->count() && noError; i++) {
+        response = g_client->getChartByID(g_currentHeaderList->at(i).Id, chart);
+        if (response == CloudDBResponse::Ok) {
 
             ChartImportUIStructure preset;
-            preset.name = chart->Name;
-            preset.description = chart->Description;
-            preset.language = chart->Language;
-            preset.creatorNick = chart->CreatorNick;
-            preset.createdAt = chart->LastChanged;
+            preset.name = chart->header.Name;
+            preset.description = chart->header.Description;
+            preset.language = chart->header.Language;
+            preset.createdAt = chart->header.LastChanged;
             preset.image.loadFromData(chart->Image,"JPG");
             QXmlInputSource source;
             source.setData(chart->ChartXML);
@@ -626,10 +678,20 @@ CloudDBChartImportDialog::getCurrentPresets(int index, int count) {
             xmlReader.setErrorHandler(&handler);
             xmlReader.parse( source );
             preset.ltmSettings = handler.getSettings().at(0); //only one LTMSettings Object is stored
-
+            preset.creatorNick = chart->CreatorNick;
             g_currentPresets->append(preset);
+        } else {
+            switch (response) {
+            case CloudDBResponse::OverQuota:
+                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
+                break;
+            default:
+                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading the charts - please try again later")));
+            }
+            noError = false;
         }
     }
+    g_networkrequestactive = false;
     delete chart;
 
     // update table with current list
@@ -736,59 +798,69 @@ CloudDBChartImportDialog::prevSetClicked()  {
 
 void
 CloudDBChartImportDialog::curatedToggled(bool)  {
-   applyFilterAndCurated();
+   applyAllFilters();
+}
+
+void
+CloudDBChartImportDialog::ownChartsToggled(bool)  {
+   applyAllFilters();
 }
 
 void
 CloudDBChartImportDialog::toggleFilterApply()  {
-    if (g_filterActive) {
-        g_filterActive = false;
-        filterApply->setText(tr("Search Keyword"));
-        applyFilterAndCurated();
+    if (g_textFilterActive) {
+        g_textFilterActive = false;
+        textFilterApply->setText(tr("Search Keyword"));
+        applyAllFilters();
     } else {
-        g_filterActive = true;
-        filterApply->setText(tr("Reset Search"));
-        applyFilterAndCurated();
+        g_textFilterActive = true;
+        textFilterApply->setText(tr("Reset Search"));
+        applyAllFilters();
     }
 }
 
 void
 CloudDBChartImportDialog::languageFilterChanged(int) {
-    applyFilterAndCurated();
+    applyAllFilters();
 }
 
 
 void
-CloudDBChartImportDialog::applyFilterAndCurated() {
+CloudDBChartImportDialog::applyAllFilters() {
 
     QStringList searchList;
     g_currentHeaderList->clear();
-    if (!filter->text().isEmpty()) {
+    if (!textFilter->text().isEmpty()) {
         // split by any whitespace
-        searchList = filter->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
+        searchList = textFilter->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
     }
-    for (int i = 0; i< g_fullHeaderList->size(); i++) {
+    foreach (ChartAPIHeaderV1 chart, *g_fullHeaderList) {
 
         // check curated first
         if (!curatedOnly->isChecked() ||
-                (curatedOnly->isChecked() && g_fullHeaderList->at(i).Curated)) {
+                (curatedOnly->isChecked() && chart.Curated)) {
 
-            // then check language (observe that we have an additional entry "all" in the combo !
-            if (langCombo->currentIndex() == 0 ||
-                    (langCombo->currentIndex() > 0 && cloudDBLangsIds[langCombo->currentIndex()-1] == g_fullHeaderList->at(i).Language )) {
+            //check own chart only
+            if (!ownChartsOnly->isChecked() ||
+                    (ownChartsOnly->isChecked() && chart.CreatorId == g_currentAthleteId)) {
 
-                // at last check text filter
-                if (g_filterActive) {
-                    // search with filter Keywords
-                    QString chartInfo = g_fullHeaderList->at(i).Name + " " + g_fullHeaderList->at(i).Description;
-                    foreach (QString search, searchList) {
-                        if (chartInfo.contains(search, Qt::CaseInsensitive)) {
-                            g_currentHeaderList->append(g_fullHeaderList->at(i));
-                            break;
+                // then check language (observe that we have an additional entry "all" in the combo !
+                if (langCombo->currentIndex() == 0 ||
+                        (langCombo->currentIndex() > 0 && cloudDBLangsIds[langCombo->currentIndex()-1] == chart.Language )) {
+
+                    // at last check text filter
+                    if (g_textFilterActive) {
+                        // search with filter Keywords
+                        QString chartInfo = chart.Name + " " + chart.Description;
+                        foreach (QString search, searchList) {
+                            if (chartInfo.contains(search, Qt::CaseInsensitive)) {
+                                g_currentHeaderList->append(chart);
+                                break;
+                            }
                         }
+                    } else {
+                        g_currentHeaderList->append(chart);
                     }
-                } else {
-                    g_currentHeaderList->append(g_fullHeaderList->at(i));
                 }
             }
         }
@@ -801,9 +873,9 @@ CloudDBChartImportDialog::applyFilterAndCurated() {
 }
 
 
-void CloudDBChartImportDialog::filterEditingFinished() {
-    if (g_filterActive) {
-        applyFilterAndCurated();
+void CloudDBChartImportDialog::textFilterEditingFinished() {
+    if (g_textFilterActive) {
+        applyAllFilters();
     }
 }
 
@@ -896,10 +968,10 @@ CloudDBChartPublishDialog::CloudDBChartPublishDialog(ChartAPIv1 data, QString at
 
    QLabel* gcVersionLabel = new QLabel(tr("Version Details"));
    QString versionString = VERSION_STRING;
-   versionString.append(" : " + data.GcVersion);
+   versionString.append(" : " + data.header.GcVersion);
    gcVersionString = new QLabel(versionString);
    QLabel* creatorIdLabel = new QLabel(tr("Creator UUid"));
-   creatorId = new QLabel(data.CreatorId);
+   creatorId = new QLabel(data.header.CreatorId);
 
    QGridLayout *detailsLayout = new QGridLayout;
    detailsLayout->addWidget(chartName, 0, 0, Qt::AlignLeft);
@@ -980,11 +1052,11 @@ CloudDBChartPublishDialog::publishClicked() {
 
     if (QMessageBox::question(0, tr("CloudDB"), QString(tr("Do you want to publish this chart definition to CloudDB"))) != QMessageBox::Yes) return;
 
-    data.Name = name->text();
-    data.Description = description->toPlainText();
+    data.header.Name = name->text();
+    data.header.Description = description->toPlainText();
     data.CreatorEmail = email->text();
     data.CreatorNick = nickName->text();
-    data.Language = cloudDBLangsIds.at(langCombo->currentIndex());
+    data.header.Language = cloudDBLangsIds.at(langCombo->currentIndex());
 
     appsettings->setCValue(athlete, GC_CLOUDDB_NICKNAME, data.CreatorNick);
     appsettings->setCValue(athlete, GC_CLOUDDB_EMAIL, data.CreatorEmail);
