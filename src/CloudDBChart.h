@@ -53,6 +53,8 @@ struct ChartAPIv1 {
 struct ChartAPIHeaderV1 {
     quint64 Id;
     QString Name;
+    QString Description;
+    QString Language;
     QString GcVersion;
     QDateTime LastChanged;
     bool    Curated;
@@ -86,11 +88,18 @@ private:
     QNetworkAccessManager* g_nam;
     QNetworkDiskCache* g_cache;
     QNetworkReply *g_reply;
+    QString g_cacheDir;
+
+    const int header_magic_string = 987654321;
+    const int header_cache_version = 1;
 
     QString  g_chart_url_base;
     QString  g_chart_url_header;
     QVariant g_header_content_type;
     QByteArray g_header_basic_auth;
+
+    bool writeHeaderCache(QList<ChartAPIHeaderV1>*);
+    bool readHeaderCache(QList<ChartAPIHeaderV1>*);
 
     static bool unmarshallAPIv1(QByteArray , QList<ChartAPIv1>* );
     static void unmarshallAPIv1Object(QJsonObject* , ChartAPIv1* );
@@ -104,6 +113,8 @@ struct ChartImportUIStructure {
     QString name;
     QString description;
     QString creatorNick;
+    QString language;
+    QDateTime createdAt;
     QPixmap image;
     LTMSettings ltmSettings;
 };
@@ -128,7 +139,9 @@ private slots:
     void nextSetClicked();
     void prevSetClicked();
     void curatedToggled(bool);
-
+    void toggleFilterApply();
+    void languageFilterChanged(int);
+    void filterEditingFinished();
 
 private:
 
@@ -142,7 +155,6 @@ private:
     QList<ChartAPIHeaderV1>* g_fullHeaderList;
     bool g_filterActive;
 
-
     // UI elements
     QLabel *showing;
     QString showingTextTemplate;
@@ -150,15 +162,15 @@ private:
     QPushButton *nextSet;
     QPushButton *prevSet;
     QCheckBox *curatedOnly;
-    QLabel *filterLabel;
+    QComboBox *langCombo;
     QLineEdit *filter;
+    QPushButton *filterApply;
     QTableWidget *tableWidget;
     QPushButton *addAndCloseButton, *closeButton;
 
     // helper methods
     void getCurrentPresets(int, int);
-    void updateDialogWithCurrentPresets();
-    void applyFilterAndCurated(bool, QString);
+    void applyFilterAndCurated();
     QString encodeHTML ( const QString& );
 
 };
@@ -179,11 +191,12 @@ private slots:
     void publishClicked();
     void cancelClicked();
 
+    void nameTextChanged(QString);
+    void nameEditingFinished();
     void nickNameTextChanged(QString);
     void nickNameEditingFinished();
     void emailTextChanged(QString);
     void emailEditingFinished();
-
 
 private:
 
@@ -191,13 +204,24 @@ private:
     QString athlete;
 
     QPushButton *publishButton, *cancelButton;
+
     QLineEdit *name;
+    QString nameDefault;
+    bool nameOk;
+
+    QComboBox *langCombo;
+
     QLabel *image;
+
     QTextEdit *description;
+    QString descriptionDefault;
+
     QLineEdit *nickName;
     bool nickNameOk;
+
     QLineEdit *email;
     bool emailOk;
+
     //QComboBox *language;
     QLabel *gcVersionString;
     QLabel *creatorId;

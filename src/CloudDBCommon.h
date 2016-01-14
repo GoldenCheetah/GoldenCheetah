@@ -26,7 +26,8 @@
 #include <QScrollArea>
 
 
-// Central Classes related to CloudDB
+// Central Classes and Constants related to CloudDB
+
 
 // -------------------------------------------------------
 // Dialog to show T&C for the use of CloudDB offering,
@@ -55,5 +56,30 @@ class CloudDBAcceptConditionsDialog : public QDialog
 
 };
 
+class CloudDBDataStatus
+{
+
+public:
+
+    static void setChartHeaderStale(bool b) {chartHeaderStatusStale = b;}
+    static bool isStaleChartHeader() {return chartHeaderStatusStale;}
+
+private:
+
+    static bool chartHeaderStatusStale;
+
+};
+
+// Languages explicitely support to store artifacts == UI Languages
+
+static const  QList<QString> cloudDBLangsIds = {
+    "en", "fr", "ja", "pt-br", "it", "de", "ru", "cs", "es", "pt", "zh-tw", "xx"
+};
+
+static const  QList<QString> cloudDBLangs = { QObject::tr("English"), QObject::tr("French") , QObject::tr("Japanese"), QObject::tr("Portugese (Brazil)"),
+                                        QObject::tr("Italian"), QObject::tr("German"), QObject::tr("Russian"), QObject::tr("Czech"), QObject::tr("Spanish"),
+                                        QObject::tr("Portugese"), QObject::tr("Chinese (Traditional)"), QObject::tr("Other") };
+
+static const QString cloudDBTimeFormat = "yyyy-MM-ddTHH:mm:ssZ";
 
 #endif // CLOUDDBCORE_H

@@ -540,7 +540,7 @@ GcUpgrade::upgrade(const QDir &home)
             }
         }
         errorCount += fail;
-        upgradeLog->append(QString(tr("%1 media and workout files moved to subdirectory: \%2 - %3 failed"))
+        upgradeLog->append(QString(tr("%1 media and workout files moved to subdirectory: \\%2 - %3 failed"))
                   .arg(QString::number(ok)).arg(newHome.workouts().dirName()).arg(QString::number(fail)),2);
 
         // the conversion of all activities to .json is done in "lateUpgrade" - since the prerequisites
