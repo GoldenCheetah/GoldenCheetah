@@ -19,8 +19,7 @@
 #include "CloudDBCommon.h"
 #include "Settings.h"
 
-
- CloudDBAcceptConditionsDialog::CloudDBAcceptConditionsDialog(QString athlete) : athlete(athlete)
+CloudDBAcceptConditionsDialog::CloudDBAcceptConditionsDialog(QString athlete) : athlete(athlete)
 {
 
     setWindowTitle(QString(tr("GoldenCheetah CloudDB - Terms and Conditions")));
@@ -136,6 +135,11 @@ void CloudDBAcceptConditionsDialog::rejectConditions() {
 
     reject();
 }
+
+
+// Initialize static member for CloudDBDataStatus
+bool CloudDBDataStatus::chartHeaderStatusStale = true;
+
 
 
 

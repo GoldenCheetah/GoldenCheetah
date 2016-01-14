@@ -17,6 +17,7 @@
  */
 
 #include "CloudDBChart.h"
+#include "CloudDBCommon.h"
 #include "LTMChartParser.h"
 #include "GcUpgrade.h"
 
@@ -38,7 +39,8 @@ CloudDBChartClient::CloudDBChartClient()
     g_cache = new QNetworkDiskCache(this);
     QDir cacheDir(QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).at(0));
     cacheDir.cdUp();
-    g_cache->setCacheDirectory(QString(cacheDir.absolutePath()+"/GoldenCheetahCloudDB"));
+    g_cacheDir = QString(cacheDir.absolutePath()+"/GoldenCheetahCloudDB");
+    g_cache->setCacheDirectory(g_cacheDir);
     QStorageInfo storageInfo(cacheDir.absolutePath());
     // cache shall be 100 MB - that fits for approx. 1000 charts
     // but we reserve only if there 5 time the space avaiable, if not the default is used
@@ -76,6 +78,9 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
     // check if Athlete ID is filled
 
     if (chart.CreatorId.isEmpty()) return false;
+
+    // default where it may be necessary
+    if (chart.Language.isEmpty()) chart.Language = "en";
 
     // first create the JSON object
     // only a subset of fields is required for POST
@@ -124,11 +129,8 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
 
 bool CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
 
-    QString u = g_chart_url_base;
-    u.append(QString::number(id, 10));
-    QUrl url = QUrl(u);
     QNetworkRequest request;
-    request.setUrl(url);
+    request.setUrl(QUrl(g_chart_url_base+QString::number(id, 10)));
     request.setHeader(QNetworkRequest::ContentTypeHeader, g_header_content_type);
     request.setRawHeader("Authorization", g_header_basic_auth);
     // first try to read from Cache / since Prefer Cache does not work properly - force it !
@@ -179,8 +181,24 @@ bool CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
 
 bool CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
 
-    QString u = g_chart_url_header;
-    QUrl url(u);
+    QDateTime selectAfter;
+
+    // first check the cache
+    chartHeader->clear();
+    readHeaderCache(chartHeader);
+    if (chartHeader->size()>0) {
+        // header are selected from CloudDB sorted - so the first one is always the newest one
+        selectAfter = chartHeader->at(0).LastChanged.addSecs(1); // DB has Microseconds - we not - so round up to next full second
+    } else {
+        // we do not have charts before 2000 :-)
+        selectAfter = QDateTime(QDate(2000,01,01));
+    }
+
+    // now get the missing data
+    QUrlQuery query;
+    query.addQueryItem("dateFrom", selectAfter.toString(cloudDBTimeFormat));
+    QUrl url(g_chart_url_header);
+    url.setQuery(query);
     QNetworkRequest request;
     request.setUrl(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, g_header_content_type);
@@ -203,12 +221,42 @@ bool CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader)
         return false;
     };
 
-    // result
+    // result (List of Headers and Updated Ids)
+    QList<ChartAPIHeaderV1> *latestHeader = new QList<ChartAPIHeaderV1>;
     QByteArray result = g_reply->readAll();
-    unmarshallAPIHeaderV1(result, chartHeader);
+    unmarshallAPIHeaderV1(result, latestHeader);
+    QList<quint64> updatedIds;
+    foreach (ChartAPIHeaderV1 latest, *latestHeader) {
+        updatedIds.append(latest.Id);
+    }
+
+    //now merge cache data with selected data
+
+    //first remove duplicate entries from cache which have recently changed/updated on CloudDB
+    QMutableListIterator<ChartAPIHeaderV1> it(*chartHeader);
+    while (it.hasNext()) {
+        quint64 id = it.next().Id;
+        if (updatedIds.contains(id) ) {
+            // remove from both caches (Chart and ChartHeader)
+            g_cache->remove(QUrl(g_chart_url_base+QString::number(id, 10)));
+            it.remove();
+        }
+    }
+
+    //now we have the lastet chart header so add the in the correct sequence / but don't add deleted ones
+    ChartAPIHeaderV1 chart;
+    while (!latestHeader->isEmpty()) {
+        chart = latestHeader->takeLast();
+        if (!chart.Deleted) {
+            chartHeader->insert(0, chart);
+        }
+    }
+    delete latestHeader;
+
+    // store cache for next time
+    writeHeaderCache(chartHeader);
 
     return true;
-
 }
 
 
@@ -229,6 +277,81 @@ CloudDBChartClient::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
 }
 
 // Internal Methods
+
+
+bool
+CloudDBChartClient::writeHeaderCache(QList<ChartAPIHeaderV1>* header) {
+
+   // make sure the subdir exists
+   QDir cacheDir (g_cacheDir);
+   if (cacheDir.exists()) {
+       cacheDir.mkdir("header");
+   } else {
+       return false;
+   }
+   QFile file(g_cacheDir+"/header/cache.dat");
+   if (!file.open(QIODevice::WriteOnly)) return false;
+   QDataStream out(&file);
+   out.setVersion(QDataStream::Qt_5_6);
+   // track a version to be able change data structure
+   out << header_magic_string;
+   out << header_cache_version;
+   for (int i = 0; i < header->size(); i++)
+   {
+       out << header->at(i).Name;
+       out << header->at(i).LastChanged;
+       out << header->at(i).Language;
+       out << header->at(i).Id;
+       out << header->at(i).GcVersion;
+       out << header->at(i).Description;
+       out << header->at(i).Deleted;
+       out << header->at(i).Curated;
+   }
+   file.close();
+   return true;
+}
+
+
+bool
+CloudDBChartClient::readHeaderCache(QList<ChartAPIHeaderV1>* header) {
+
+    QFile file(g_cacheDir+"/header/cache.dat");
+    if (!file.open(QIODevice::ReadOnly)) return false;
+    QDataStream in(&file);
+    // track a version to be able change data structure
+    int magic_string;
+    int version;
+
+    in >> magic_string;
+    if (magic_string != header_magic_string) {
+        // wrong file format / close and exit
+        file.close();
+        return false;
+    }
+
+    in >> version;
+    if (version != header_cache_version) {
+       // change of version, delete old cach
+       file.remove();
+       return false;
+    }
+    ChartAPIHeaderV1 h;
+    while (!in.atEnd()) {
+        in >> h.Name;
+        in >> h.LastChanged;
+        in >> h.Language;
+        in >> h.Id;
+        in >> h.GcVersion;
+        in >> h.Description;
+        in >> h.Deleted;
+        in >> h.Curated;
+        header->append(h);
+    }
+    file.close();
+    return true;
+
+
+}
 
 bool
 CloudDBChartClient::unmarshallAPIv1(QByteArray json, QList<ChartAPIv1> *charts) {
@@ -277,7 +400,7 @@ CloudDBChartClient::unmarshallAPIv1Object(QJsonObject* object, ChartAPIv1* chart
     QByteArray ba;
     ba.append(imageString);
     chart->Image = QByteArray::fromBase64(ba);
-    chart->LastChanged = QDateTime::fromString(object->value("lastChange").toString(), "yyyy-MM-ddTHH:mm:ssZ");
+    chart->LastChanged = QDateTime::fromString(object->value("lastChange").toString(), cloudDBTimeFormat);
     chart->CreatorId = object->value("creatorId").toString();
     chart->CreatorNick = object->value("creatorNick").toString();
     chart->CreatorEmail = object->value("creatorEmail").toString();
@@ -325,8 +448,10 @@ CloudDBChartClient::unmarshallAPIHeaderV1Object(QJsonObject* object, ChartAPIHea
 
     chartHeader->Id = object->value("id").toDouble();
     chartHeader->Name = object->value("name").toString();
+    chartHeader->Description = object->value("description").toString();
+    chartHeader->Language = object->value("language").toString();
     chartHeader->GcVersion = object->value("gcversion").toString();
-    chartHeader->LastChanged = QDateTime::fromString(object->value("lastChange").toString(), "yyyy-MM-ddTHH:mm:ssZ");
+    chartHeader->LastChanged = QDateTime::fromString(object->value("lastChange").toString(), cloudDBTimeFormat);
     chartHeader->Curated = object->value("curated").toBool();
     chartHeader->Deleted = object->value("deleted").toBool();
 
@@ -353,7 +478,7 @@ CloudDBChartImportDialog::CloudDBChartImportDialog() {
    g_stepSize = 10;
 
    showing = new QLabel;
-   showingTextTemplate = tr("Showing %1 to %2 of %3 charts");
+   showingTextTemplate = tr("Showing %1 to %2 of %3 charts / Total on CloudDB %4");
    resetToStart = new QPushButton(tr("First"));
    nextSet = new QPushButton(tr("Next %1").arg(QString::number(g_stepSize)));
    prevSet = new QPushButton(tr("Prev %1").arg(QString::number(g_stepSize)));
@@ -375,20 +500,35 @@ CloudDBChartImportDialog::CloudDBChartImportDialog() {
 
    curatedOnly = new QCheckBox(tr("Curated Only"));
    curatedOnly->setChecked(true);
-   filterLabel = new QLabel(tr("Filter"));
-   filter = new QLineEdit;
 
    connect(curatedOnly, SIGNAL(toggled(bool)), this, SLOT(curatedToggled(bool)));
+
+   QLabel* langLabel = new QLabel(tr("Language"));
+   langCombo = new QComboBox();
+   langCombo->addItem(tr("Any Language"));
+   foreach (QString lang, cloudDBLangs) {
+       langCombo->addItem(lang);
+   }
+
+   filterApply = new QPushButton(tr("Search Keyword"));
+   filterApply->setFixedWidth(180); // To allow proper translation
+   filter = new QLineEdit; 
+   g_filterActive = false;
+
+   connect(filter, SIGNAL(editingFinished()), this, SLOT(filterEditingFinished()));
+   connect(langCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(languageFilterChanged(int)));
+   connect(filterApply, SIGNAL(clicked()), this, SLOT(toggleFilterApply()));
 
    QHBoxLayout *filterLayout = new QHBoxLayout;
    filterLayout->addWidget(curatedOnly);
    filterLayout->addStretch();
-   filterLayout->addWidget(filterLabel);
+   filterLayout->addWidget(langLabel);
+   filterLayout->addWidget(langCombo);
+   filterLayout->addStretch();
+   filterLayout->addWidget(filterApply);
    filterLayout->addWidget(filter);
 
-   // TODO add Filtering
-   filterLabel->setVisible(false);
-   filter->setVisible(false);
+   filter->setVisible(true);
 
    tableWidget = new QTableWidget(0, 2);
    tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -439,18 +579,19 @@ CloudDBChartImportDialog::~CloudDBChartImportDialog() {
 
 void
 CloudDBChartImportDialog::initialize() {
-    if (g_currentHeaderList->isEmpty()) {
+
+    if (CloudDBDataStatus::isStaleChartHeader()) {
+        g_fullHeaderList->clear();
+        g_currentHeaderList->clear();
+        g_currentIndex = 0;
+        g_stepSize = 10;
         if (!g_client->getAllChartHeader(g_fullHeaderList)) {
             QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading the charts - please try again later")));
             return;
         }
-        g_currentIndex = 0;
-        g_stepSize = 10;
+        CloudDBDataStatus::setChartHeaderStale(false);
         // we always start with curated Only and no Filter
-        applyFilterAndCurated(curatedOnly->isChecked(), "");
-        // get the Charts Header from CloudDB first
-        getCurrentPresets(g_currentIndex, g_stepSize);
-        updateDialogWithCurrentPresets();
+        applyFilterAndCurated();
     }
 }
 
@@ -473,7 +614,9 @@ CloudDBChartImportDialog::getCurrentPresets(int index, int count) {
             ChartImportUIStructure preset;
             preset.name = chart->Name;
             preset.description = chart->Description;
+            preset.language = chart->Language;
             preset.creatorNick = chart->CreatorNick;
+            preset.createdAt = chart->LastChanged;
             preset.image.loadFromData(chart->Image,"JPG");
             QXmlInputSource source;
             source.setData(chart->ChartXML);
@@ -488,31 +631,18 @@ CloudDBChartImportDialog::getCurrentPresets(int index, int count) {
         }
     }
     delete chart;
-    // enable UI again
-    resetToStart->setEnabled(true);
-    nextSet->setEnabled(true);
-    prevSet->setEnabled(true);
-    closeButton->setEnabled(true);
-    addAndCloseButton->setEnabled(true);
 
-}
-
-
-
-void
-CloudDBChartImportDialog::updateDialogWithCurrentPresets()
-{
-    // clean current
+    // update table with current list
     tableWidget->clearContents();
     tableWidget->setRowCount(0);
 
-    int lastIndex = g_currentIndex+g_stepSize;
-    if (lastIndex > g_currentHeaderList->size()) { lastIndex = g_currentHeaderList->size(); }
-
+    int chartCount = (g_currentHeaderList->size() == 0) ? 0 : g_currentIndex+1;
+    int lastIndex = (g_currentIndex+g_stepSize > g_currentHeaderList->size()) ? g_currentHeaderList->size() : g_currentIndex+g_stepSize;
     showing->setText(QString(showingTextTemplate)
-                     .arg(QString::number(g_currentIndex+1))
+                     .arg(QString::number(chartCount))
                      .arg(QString::number(lastIndex))
-                     .arg(QString::number(g_currentHeaderList->size())));
+                     .arg(QString::number(g_currentHeaderList->size()))
+                     .arg(QString::number(g_fullHeaderList->size())));
 
     for (int i = 0; i< g_currentPresets->size(); i++ ) {
         tableWidget->insertRow(i);
@@ -526,8 +656,9 @@ CloudDBChartImportDialog::updateDialogWithCurrentPresets()
         tableWidget->item(i,0)->setBackgroundColor(Qt::darkGray);
         tableWidget->setRowHeight(i, chartImageHeight+20);
 
-        QString cellText = QString(tr("<center><b><big><b>%1</b><br><i>Creator %2</i></big></center><br>%3"))
+        QString cellText = QString(tr("<h3>%1</h3><h4>Created At: %2 - Creator: %3</h4>%4"))
                 .arg(encodeHTML(preset.name))
+                .arg(preset.createdAt.date().toString(Qt::ISODate))
                 .arg(encodeHTML(preset.creatorNick))
                 .arg(encodeHTML(preset.description));
 
@@ -536,7 +667,17 @@ CloudDBChartImportDialog::updateDialogWithCurrentPresets()
         formattedText->setReadOnly(true);
         tableWidget->setCellWidget(i,1, formattedText);
     }
+
+
+    // enable UI again
+    resetToStart->setEnabled(true);
+    nextSet->setEnabled(true);
+    prevSet->setEnabled(true);
+    closeButton->setEnabled(true);
+    addAndCloseButton->setEnabled(true);
+
 }
+
 
 void
 CloudDBChartImportDialog::addAndCloseClicked() {
@@ -569,7 +710,6 @@ CloudDBChartImportDialog::resetToStartClicked()  {
 
     g_currentIndex = 0;
     getCurrentPresets(g_currentIndex, g_stepSize);
-    updateDialogWithCurrentPresets();
 
 }
 
@@ -582,7 +722,6 @@ CloudDBChartImportDialog::nextSetClicked()  {
     }
     if (g_currentIndex < 0) g_currentIndex = 0;
     getCurrentPresets(g_currentIndex, g_stepSize);
-    updateDialogWithCurrentPresets();
 
 }
 
@@ -592,35 +731,81 @@ CloudDBChartImportDialog::prevSetClicked()  {
     g_currentIndex -= g_stepSize;
     if (g_currentIndex < 0) g_currentIndex = 0;
     getCurrentPresets(g_currentIndex, g_stepSize);
-    updateDialogWithCurrentPresets();
 
 }
 
 void
-CloudDBChartImportDialog::curatedToggled(bool checked)  {
-   applyFilterAndCurated(checked, "");
-   getCurrentPresets(g_currentIndex, g_stepSize);
-   updateDialogWithCurrentPresets();
+CloudDBChartImportDialog::curatedToggled(bool)  {
+   applyFilterAndCurated();
 }
 
 void
-CloudDBChartImportDialog::applyFilterAndCurated(bool curated, QString filter) {
-
-    g_currentHeaderList->clear();
-    if (curated) {
-        for (int i = 0; i< g_fullHeaderList->size(); i++) {
-            if (g_fullHeaderList->at(i).Curated) {
-                g_currentHeaderList->append(g_fullHeaderList->at(i));
-            }
-        }
+CloudDBChartImportDialog::toggleFilterApply()  {
+    if (g_filterActive) {
+        g_filterActive = false;
+        filterApply->setText(tr("Search Keyword"));
+        applyFilterAndCurated();
     } else {
-        for (int i = 0; i< g_fullHeaderList->size(); i++) {
-           g_currentHeaderList->append(g_fullHeaderList->at(i));
+        g_filterActive = true;
+        filterApply->setText(tr("Reset Search"));
+        applyFilterAndCurated();
+    }
+}
+
+void
+CloudDBChartImportDialog::languageFilterChanged(int) {
+    applyFilterAndCurated();
+}
+
+
+void
+CloudDBChartImportDialog::applyFilterAndCurated() {
+
+    QStringList searchList;
+    g_currentHeaderList->clear();
+    if (!filter->text().isEmpty()) {
+        // split by any whitespace
+        searchList = filter->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
+    }
+    for (int i = 0; i< g_fullHeaderList->size(); i++) {
+
+        // check curated first
+        if (!curatedOnly->isChecked() ||
+                (curatedOnly->isChecked() && g_fullHeaderList->at(i).Curated)) {
+
+            // then check language (observe that we have an additional entry "all" in the combo !
+            if (langCombo->currentIndex() == 0 ||
+                    (langCombo->currentIndex() > 0 && cloudDBLangsIds[langCombo->currentIndex()-1] == g_fullHeaderList->at(i).Language )) {
+
+                // at last check text filter
+                if (g_filterActive) {
+                    // search with filter Keywords
+                    QString chartInfo = g_fullHeaderList->at(i).Name + " " + g_fullHeaderList->at(i).Description;
+                    foreach (QString search, searchList) {
+                        if (chartInfo.contains(search, Qt::CaseInsensitive)) {
+                            g_currentHeaderList->append(g_fullHeaderList->at(i));
+                            break;
+                        }
+                    }
+                } else {
+                    g_currentHeaderList->append(g_fullHeaderList->at(i));
+                }
+            }
         }
     }
     g_currentIndex = 0;
+
+    // now get the data
+    getCurrentPresets(g_currentIndex, g_stepSize);
+
 }
 
+
+void CloudDBChartImportDialog::filterEditingFinished() {
+    if (g_filterActive) {
+        applyFilterAndCurated();
+    }
+}
 
 QString
 CloudDBChartImportDialog::encodeHTML ( const QString& encodeMe )
@@ -666,14 +851,29 @@ CloudDBChartPublishDialog::CloudDBChartPublishDialog(ChartAPIv1 data, QString at
 
    QLabel *chartName = new QLabel(tr("Chart Name"));
    name = new QLineEdit();
-   name->setText(tr("<Chart Name>"));
+   nameDefault = tr("<Chart Name>");
+   name->setMaxLength(50);
+   name->setText(nameDefault);
+   QRegExp name_rx("^.{5,50}$");
+   QValidator *name_validator = new QRegExpValidator(name_rx, this);
+   name->setValidator(name_validator);
+   nameOk = false;
+
+   QLabel* langLabel = new QLabel(tr("Language"));
+   langCombo = new QComboBox();
+   foreach (QString lang, cloudDBLangs) {
+       langCombo->addItem(lang);
+   }
+
+   connect(name, SIGNAL(textChanged(QString)), this, SLOT(nameTextChanged(QString)));
+   connect(name, SIGNAL(editingFinished()), this, SLOT(nameEditingFinished()));
 
    QLabel *nickLabel = new QLabel(tr("Nickname"));
    nickName = new QLineEdit();
-   nickName->setMaxLength(40); // reasonable for displayo
+   nickName->setMaxLength(50); // reasonable for displayo
    nickName->setText(appsettings->cvalue(athlete, GC_CLOUDDB_NICKNAME, "").toString());
    // regexp: validate / only chars and 0-9 - at least 5 chars long
-   QRegExp nick_rx("^[a-zA-Z0-9_]{5,40}$");
+   QRegExp nick_rx("^[a-zA-Z0-9_]{5,50}$");
    QValidator *nick_validator = new QRegExpValidator(nick_rx, this);
    nickName->setValidator(nick_validator);
    nickNameOk = !nickName->text().isEmpty(); // nickname from properties is ok when loaded
@@ -703,7 +903,9 @@ CloudDBChartPublishDialog::CloudDBChartPublishDialog(ChartAPIv1 data, QString at
 
    QGridLayout *detailsLayout = new QGridLayout;
    detailsLayout->addWidget(chartName, 0, 0, Qt::AlignLeft);
-   detailsLayout->addWidget(name, 0, 1, 1, 3);
+   detailsLayout->addWidget(name, 0, 1);
+   detailsLayout->addWidget(langLabel, 0, 2, Qt::AlignLeft);
+   detailsLayout->addWidget(langCombo, 0, 3, Qt::AlignLeft);
 
    detailsLayout->addWidget(nickLabel, 1, 0, Qt::AlignLeft);
    detailsLayout->addWidget(nickName, 1, 1);
@@ -717,7 +919,8 @@ CloudDBChartPublishDialog::CloudDBChartPublishDialog(ChartAPIv1 data, QString at
 
    description = new QTextEdit();
    description->setAcceptRichText(false);
-   description->setText(tr("<Enter the description of the chart here>"));
+   descriptionDefault = tr("<Enter the description of the chart here>");
+   description->setText(descriptionDefault);
 
    QPixmap *chartImage = new QPixmap();
    chartImage->loadFromData(data.Image);
@@ -745,7 +948,6 @@ CloudDBChartPublishDialog::CloudDBChartPublishDialog(ChartAPIv1 data, QString at
 
    setLayout(mainLayout);
 
-
 }
 
 CloudDBChartPublishDialog::~CloudDBChartPublishDialog() {
@@ -756,12 +958,23 @@ void
 CloudDBChartPublishDialog::publishClicked() {
 
     // check data consistency
+
+    if (name->text().isEmpty() || name->text() == nameDefault || !nameOk) {
+        QMessageBox::warning(0, tr("Export Chart to ClouDB"), QString(tr("Please enter a valid chart name!")));
+        return;
+    }
+
     if (nickName->text().isEmpty() || !nickNameOk) {
-        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a nickname !")));
+        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a nickname!")));
         return;
     }
     if (email->text().isEmpty() || !emailOk) {
-        QMessageBox::warning(0, tr("Export Chart to ClouDB"), QString(tr("Please enter a valid e-mail address !")));
+        QMessageBox::warning(0, tr("Export Chart to ClouDB"), QString(tr("Please enter a valid e-mail address!")));
+        return;
+    }
+
+    if (description->toPlainText().isEmpty() || description->toPlainText() == descriptionDefault) {
+        QMessageBox::warning(0, tr("Export Chart to ClouDB"), QString(tr("Please enter a sensible chart description!")));
         return;
     }
 
@@ -771,6 +984,7 @@ CloudDBChartPublishDialog::publishClicked() {
     data.Description = description->toPlainText();
     data.CreatorEmail = email->text();
     data.CreatorNick = nickName->text();
+    data.Language = cloudDBLangsIds.at(langCombo->currentIndex());
 
     appsettings->setCValue(athlete, GC_CLOUDDB_NICKNAME, data.CreatorNick);
     appsettings->setCValue(athlete, GC_CLOUDDB_EMAIL, data.CreatorEmail);
@@ -787,7 +1001,7 @@ void
 CloudDBChartPublishDialog::nickNameTextChanged(QString text)  {
 
     if (text.isEmpty()) {
-        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a nickname !")));
+        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a nickname!")));
     } else {
         nickNameOk = false;
     }
@@ -803,7 +1017,7 @@ void
 CloudDBChartPublishDialog::emailTextChanged(QString text)  {
 
     if (text.isEmpty()) {
-        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a valid e-mail address !")));
+        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a valid e-mail address!")));
     } else {
         emailOk = false;
     }
@@ -814,6 +1028,23 @@ CloudDBChartPublishDialog::emailEditingFinished()  {
     // validator check passed
     emailOk = true;
 }
+
+void
+CloudDBChartPublishDialog::nameTextChanged(QString text)  {
+
+    if (text.isEmpty()) {
+        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a chart name!")));
+    } else {
+        nameOk = false;
+    }
+}
+
+void
+CloudDBChartPublishDialog::nameEditingFinished()  {
+    // validator check passed
+    nameOk = true;
+}
+
 
 
 

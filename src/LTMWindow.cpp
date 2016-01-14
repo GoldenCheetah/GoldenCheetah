@@ -1302,8 +1302,10 @@ LTMWindow::shareConfig()
     buffer.close();
 
     chart.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
+    chart.Curated = false;
+    chart.Deleted = false;
 
-    // now asks for the user fields
+    // now complete the chart with for the user manually added fields
     CloudDBChartPublishDialog dialog(chart, context->athlete->cyclist);
     dialog.setModal(true);
     if (dialog.exec() == QDialog::Accepted) {
@@ -1311,6 +1313,7 @@ LTMWindow::shareConfig()
        if (!c.postChart(dialog.getChart())) {
            QMessageBox::warning(0, tr("CloudDB"), QString(tr("Export to CloudDB not successful"))) ;
        }
+       CloudDBDataStatus::setChartHeaderStale(true);
     }
 }
 #endif
