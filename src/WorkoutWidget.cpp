@@ -351,6 +351,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
             recompute();
         }
 
+        foreach(WWPoint *point, points_) point->hover=false;
         state = none;
         dragging = NULL;
         updateNeeded = true;
