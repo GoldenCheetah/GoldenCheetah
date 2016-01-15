@@ -50,7 +50,7 @@ typedef struct {
 
 
 struct ChartAPIv1 {
-    ChartAPIHeaderV1 header;
+    ChartAPIHeaderV1 Header;
     QString ChartXML;
     QByteArray Image;
     QString CreatorNick;
@@ -142,7 +142,7 @@ private slots:
     void prevSetClicked();
     void curatedToggled(bool);
     void ownChartsToggled(bool);
-    void toggleFilterApply();
+    void toggleTextFilterApply();
     void languageFilterChanged(int);
     void textFilterEditingFinished();
 
