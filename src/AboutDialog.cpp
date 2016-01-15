@@ -142,6 +142,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Gareth Coco");
     contributors.append("Greg Lonnon");
     contributors.append("Ilja Booij");
+    contributors.append("Irvin Sirotić");
     contributors.append("Jaime Jofre");
     contributors.append("Jamie Kimberley");
     contributors.append("Jan de Visser");
