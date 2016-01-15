@@ -1285,9 +1285,9 @@ LTMWindow::shareConfig()
     mine[0].title = mine[0].name = title();
 
     ChartAPIv1 chart;
-    chart.header.Name = title();
+    chart.Header.Name = title();
     int version = VERSION_LATEST;
-    chart.header.GcVersion =  QString::number(version);
+    chart.Header.GcVersion =  QString::number(version);
     LTMChartParser::serializeToQString(&chart.ChartXML, mine);
     QPixmap picture;
     menuButton->hide();
@@ -1301,9 +1301,9 @@ LTMWindow::shareConfig()
     picture.save(&buffer, "JPG"); // writes pixmap into bytes in JPG format
     buffer.close();
 
-    chart.header.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
-    chart.header.Curated = false;
-    chart.header.Deleted = false;
+    chart.Header.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
+    chart.Header.Curated = false;
+    chart.Header.Deleted = false;
 
     // now complete the chart with for the user manually added fields
     CloudDBChartPublishDialog dialog(chart, context->athlete->cyclist);
