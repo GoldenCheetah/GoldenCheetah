@@ -229,12 +229,21 @@ WWLap::paint(QPainter *painter)
         QPointF here = workoutWidget()->transform(workoutWidget()->laps()[i].x/1000.0f, 0);
         here.setY(top.top() + fontMetrics.height());
 
+        // end ..
+        int end = workoutWidget()->maxX();
+        if (i < workoutWidget()->laps().count()-1) end=workoutWidget()->laps()[i+1].x/1000.f;
+        double endx = workoutWidget()->transform(end,0).x();
+
+        // red rectangle for selected intervals
+        if (workoutWidget()->laps()[i].selected) {
+            QColor color(255,0,0,64); // lighten whatever it is
+            painter->fillRect(QRectF(here.x(), top.top(), endx - here.x(), 
+                                    top.height()+workoutWidget()->canvas().height()), 
+                                    QBrush(color));
+        }
+
         // hover over show full length markers
-        if (workoutWidget()->laps()[i].selected ||
-            (i>0 && workoutWidget()->laps()[i-1].selected))
-            painter->drawLine(QPointF(here.x(), top.top()), QPointF(here.x(), workoutWidget()->canvas().bottom()));
-        else
-            painter->drawLine(QPointF(here.x(), top.top()), QPointF(here.x(), top.bottom()));
+        painter->drawLine(QPointF(here.x(), top.top()), QPointF(here.x(), top.bottom()));
 
         // and the text
         painter->drawText(here, name);
