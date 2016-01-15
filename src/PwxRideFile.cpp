@@ -220,6 +220,15 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
                 //       the TP upload web-service happy with zero values
                 if (add.watts == 1) add.watts = 0.0;
             } else add.watts = 0.0;
+            // lrbalance
+            QDomElement lrbalance = node.firstChildElement("pwrright");
+            if (!lrbalance.isNull()) {
+                if (add.watts == 0) {
+                   add.lrbalance = 50.0;
+                } else {
+                    add.lrbalance =(add.watts-lrbalance.text().toDouble())/add.watts*100.0;
+                }
+            } else add.lrbalance = 0.0;
             // torq
             QDomElement torq = node.firstChildElement("torq");
             if (!torq.isNull()) add.nm = torq.text().toDouble();
@@ -830,6 +839,14 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
                 text = doc.createTextNode(QString("%1").arg(watts));
                 pwr.appendChild(text);
                 sample.appendChild(pwr);
+            }
+            // lrbalance
+            if (ride->areDataPresent()->lrbalance) {
+                int rwatts = point->watts ? (point->watts - (point->watts * (point->lrbalance/100))) : 0;
+                QDomElement lrbalance = doc.createElement("pwrright");
+                text = doc.createTextNode(QString("%1").arg(rwatts));
+                lrbalance.appendChild(text);
+                sample.appendChild(lrbalance);
             }
             // torq
             if (ride->areDataPresent()->nm) {
