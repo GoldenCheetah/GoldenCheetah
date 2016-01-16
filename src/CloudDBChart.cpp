@@ -119,7 +119,7 @@ int CloudDBChartClient::postChart(ChartAPIv1 chart) {
 
     };
 
-    return CloudDBCommon::APIresponseOk;
+    return CloudDBCommon::APIresponseCreated;
 
 }
 
@@ -302,6 +302,7 @@ CloudDBChartClient::readHeaderCache(QList<ChartAPIHeaderV1>* header) {
     QFile file(g_cacheDir+"/header/cache.dat");
     if (!file.open(QIODevice::ReadOnly)) return false;
     QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_4_6);
     // track a version to be able change data structure
     int magic_string;
     int version;

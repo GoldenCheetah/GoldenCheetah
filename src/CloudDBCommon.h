@@ -80,6 +80,7 @@ public:
     static QList<QString> cloudDBLangs;
     static QString cloudDBTimeFormat;
     static const int APIresponseOk = 200;
+    static const int APIresponseCreated = 201;
     static const int APIresponseForbidden = 403;
     static const int APIresponseOverQuota = 503;
     static const int APIresponseOthers = 999;
