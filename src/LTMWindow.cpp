@@ -1310,16 +1310,16 @@ LTMWindow::shareConfig()
     dialog.setModal(true);
     if (dialog.exec() == QDialog::Accepted) {
         CloudDBChartClient c;
-        CloudDBResponse r = c.postChart(dialog.getChart());
-        if (r == CloudDBResponse::Ok) {
+        int r = c.postChart(dialog.getChart());
+        if (r == CloudDBCommon::APIresponseOk) {
             CloudDBDataStatus::setChartHeaderStale(true); }
         else {
             switch(r) {
-            case CloudDBResponse::OverQuota:
+            case CloudDBCommon::APIresponseOverQuota:
                 QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
                 break;
             default:
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with export to CloudDB - please try again later")));
+                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with export to CloudDB - please try again later.")));
             }
         }
     }
