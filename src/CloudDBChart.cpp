@@ -72,12 +72,11 @@ CloudDBChartClient::~CloudDBChartClient() {
 }
 
 
-CloudDBResponse
-CloudDBChartClient::postChart(ChartAPIv1 chart) {
+int CloudDBChartClient::postChart(ChartAPIv1 chart) {
 
     // check if Athlete ID is filled
 
-    if (chart.Header.CreatorId.isEmpty()) return CloudDBResponse::Others;
+    if (chart.Header.CreatorId.isEmpty()) return CloudDBCommon::APIresponseOthers;
 
     // default where it may be necessary
     if (chart.Header.Language.isEmpty()) chart.Header.Language = "en";
@@ -120,11 +119,11 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
 
     };
 
-    return CloudDBResponse::Ok;
+    return CloudDBCommon::APIresponseCreated;
 
 }
 
-CloudDBResponse
+int
 CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
 
     QNetworkRequest request;
@@ -164,14 +163,13 @@ CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
         *chart = charts->value(0);
         charts->clear();
         delete charts;
-        return CloudDBResponse::Ok;
+        return CloudDBCommon::APIresponseOk;
     }
     delete charts;
-    return CloudDBResponse::Others;
+    return CloudDBCommon::APIresponseOthers;
 }
 
-CloudDBResponse
-CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
+int CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
 
     QDateTime selectAfter;
 
@@ -188,7 +186,7 @@ CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
 
     // now get the missing data
     QUrlQuery query;
-    query.addQueryItem("dateFrom", selectAfter.toString(cloudDBTimeFormat));
+    query.addQueryItem("dateFrom", selectAfter.toString(CloudDBCommon::cloudDBTimeFormat));
     QUrl url(g_chart_url_header);
     url.setQuery(query);
     QNetworkRequest request;
@@ -242,7 +240,7 @@ CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
     // store cache for next time
     writeHeaderCache(chartHeader);
 
-    return CloudDBResponse::Ok;
+    return CloudDBCommon::APIresponseOk;
 }
 
 
@@ -278,7 +276,7 @@ CloudDBChartClient::writeHeaderCache(QList<ChartAPIHeaderV1>* header) {
    QFile file(g_cacheDir+"/header/cache.dat");
    if (!file.open(QIODevice::WriteOnly)) return false;
    QDataStream out(&file);
-   out.setVersion(QDataStream::Qt_5_6);
+   out.setVersion(QDataStream::Qt_4_6);
    // track a version to be able change data structure
    out << header_magic_string;
    out << header_cache_version;
@@ -304,6 +302,7 @@ CloudDBChartClient::readHeaderCache(QList<ChartAPIHeaderV1>* header) {
     QFile file(g_cacheDir+"/header/cache.dat");
     if (!file.open(QIODevice::ReadOnly)) return false;
     QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_4_6);
     // track a version to be able change data structure
     int magic_string;
     int version;
@@ -435,15 +434,14 @@ CloudDBChartClient::unmarshallAPIHeaderV1Object(QJsonObject* object, ChartAPIHea
     chartHeader->Description = object->value("description").toString();
     chartHeader->Language = object->value("language").toString();
     chartHeader->GcVersion = object->value("gcversion").toString();
-    chartHeader->LastChanged = QDateTime::fromString(object->value("lastChange").toString(), cloudDBTimeFormat);
+    chartHeader->LastChanged = QDateTime::fromString(object->value("lastChange").toString(), CloudDBCommon::cloudDBTimeFormat);
     chartHeader->CreatorId = object->value("creatorId").toString();
     chartHeader->Curated = object->value("curated").toBool();
     chartHeader->Deleted = object->value("deleted").toBool();
 
 }
 
-CloudDBResponse
-CloudDBChartClient::processReplyStatusCodes(QNetworkReply *reply) {
+int CloudDBChartClient::processReplyStatusCodes(QNetworkReply *reply) {
 
     // PROBLEM - the replies provided are in some of our case not
     // the real HTTP replies - so we do some interpretation to
@@ -455,24 +453,24 @@ CloudDBChartClient::processReplyStatusCodes(QNetworkReply *reply) {
         // which should even work when the response text is slighly changed.
         QByteArray body = g_reply->readAll();
         if (body.contains("503") && (body.contains("Quota"))) {
-            return CloudDBResponse::OverQuota;
+            return CloudDBCommon::APIresponseOverQuota;
         }
     }
 
     // and here how it should work / jus interpreting what was send through HTTP
     QVariant statusCode = g_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
     if ( !statusCode.isValid() ) {
-        return CloudDBResponse::Others;
+        return CloudDBCommon::APIresponseOthers;
     }
     int code = statusCode.toInt();
     switch (code) {
-    case CloudDBResponse::Forbidden :
-    case CloudDBResponse::OverQuota :
-        return static_cast<CloudDBResponse>(code);
+    case CloudDBCommon::APIresponseForbidden :
+    case CloudDBCommon::APIresponseOverQuota :
+        return code;
     default:
-        return CloudDBResponse::Others;
+        return CloudDBCommon::APIresponseOthers;
     }
-    return CloudDBResponse::Others;
+    return CloudDBCommon::APIresponseOthers;
 
 }
 
@@ -530,7 +528,7 @@ CloudDBChartImportDialog::CloudDBChartImportDialog() {
 
    langCombo = new QComboBox();
    langCombo->addItem(tr("Any Language"));
-   foreach (QString lang, cloudDBLangs) {
+   foreach (QString lang, CloudDBCommon::cloudDBLangs) {
        langCombo->addItem(lang);
    }
 
@@ -621,10 +619,10 @@ CloudDBChartImportDialog::initialize(QString athlete) {
         g_currentIndex = 0;
         g_stepSize = 10;
         g_networkrequestactive = true;
-        CloudDBResponse response = g_client->getAllChartHeader(g_fullHeaderList);
-        if (response != CloudDBResponse::Ok) {
+        int response = g_client->getAllChartHeader(g_fullHeaderList);
+        if (response != CloudDBCommon::APIresponseOk) {
             switch (response) {
-            case CloudDBResponse::OverQuota:
+            case CloudDBCommon::APIresponseOverQuota:
                 QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
                 break;
             default:
@@ -658,10 +656,10 @@ CloudDBChartImportDialog::getCurrentPresets(int index, int count) {
     ChartAPIv1* chart = new ChartAPIv1;
     g_networkrequestactive = true;
     bool noError = true;
-    CloudDBResponse response;
+    int response;
     for (int i = index; i< index+count && i<g_currentHeaderList->count() && noError; i++) {
         response = g_client->getChartByID(g_currentHeaderList->at(i).Id, chart);
-        if (response == CloudDBResponse::Ok) {
+        if (response == CloudDBCommon::APIresponseOk) {
 
             ChartImportUIStructure preset;
             preset.name = chart->Header.Name;
@@ -681,7 +679,7 @@ CloudDBChartImportDialog::getCurrentPresets(int index, int count) {
             g_currentPresets->append(preset);
         } else {
             switch (response) {
-            case CloudDBResponse::OverQuota:
+            case CloudDBCommon::APIresponseOverQuota:
                 QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
                 break;
             default:
@@ -845,7 +843,7 @@ CloudDBChartImportDialog::applyAllFilters() {
 
                 // then check language (observe that we have an additional entry "all" in the combo !
                 if (langCombo->currentIndex() == 0 ||
-                        (langCombo->currentIndex() > 0 && cloudDBLangsIds[langCombo->currentIndex()-1] == chart.Language )) {
+                        (langCombo->currentIndex() > 0 && CloudDBCommon::cloudDBLangsIds[langCombo->currentIndex()-1] == chart.Language )) {
 
                     // at last check text filter
                     if (g_textFilterActive) {
@@ -932,7 +930,7 @@ CloudDBChartPublishDialog::CloudDBChartPublishDialog(ChartAPIv1 data, QString at
 
    QLabel* langLabel = new QLabel(tr("Language"));
    langCombo = new QComboBox();
-   foreach (QString lang, cloudDBLangs) {
+   foreach (QString lang, CloudDBCommon::cloudDBLangs) {
        langCombo->addItem(lang);
    }
 
@@ -1055,7 +1053,7 @@ CloudDBChartPublishDialog::publishClicked() {
     data.Header.Description = description->toPlainText();
     data.CreatorEmail = email->text();
     data.CreatorNick = nickName->text();
-    data.Header.Language = cloudDBLangsIds.at(langCombo->currentIndex());
+    data.Header.Language = CloudDBCommon::cloudDBLangsIds.at(langCombo->currentIndex());
 
     appsettings->setCValue(athlete, GC_CLOUDDB_NICKNAME, data.CreatorNick);
     appsettings->setCValue(athlete, GC_CLOUDDB_EMAIL, data.CreatorEmail);
