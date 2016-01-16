@@ -32,6 +32,7 @@
 #include <QEventLoop>
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
+#include <QDesktopWidget>
 
 CloudDBChartClient::CloudDBChartClient()
 {
@@ -564,6 +565,8 @@ CloudDBChartImportDialog::CloudDBChartImportDialog() {
    // the preview shall have a dedicated size
    tableWidget->setColumnWidth(0, chartImageWidth);
 
+   connect(tableWidget, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(cellDoubleClicked(int,int)));
+
    addAndCloseButton = new QPushButton(tr("Add selected chart to library"));
    closeButton = new QPushButton(tr("Close without selection"));
 
@@ -666,7 +669,7 @@ CloudDBChartImportDialog::getCurrentPresets(int index, int count) {
             preset.description = chart->Header.Description;
             preset.language = chart->Header.Language;
             preset.createdAt = chart->Header.LastChanged;
-            preset.image.loadFromData(chart->Image,"JPG");
+            preset.image.loadFromData(chart->Image);
             QXmlInputSource source;
             source.setData(chart->ChartXML);
             QXmlSimpleReader xmlReader;
@@ -876,6 +879,34 @@ void CloudDBChartImportDialog::textFilterEditingFinished() {
     }
 }
 
+void CloudDBChartImportDialog::cellDoubleClicked(int row, int /*column */) {
+    ChartAPIv1* chart = new ChartAPIv1;
+    if (row >= 0 && row < g_currentHeaderList->size() ) {
+        g_networkrequestactive = true;
+        bool noError = true;
+        int response;
+        response = g_client->getChartByID(g_currentHeaderList->at(row).Id, chart);
+        if (response == CloudDBCommon::APIresponseOk) {
+            CloudDBChartShowPictureDialog showImage(chart->Image);
+            showImage.exec();
+
+        } else {
+            switch (response) {
+            case CloudDBCommon::APIresponseOverQuota:
+                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
+                break;
+            default:
+                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading the charts - please try again later")));
+            }
+            noError = false;
+        }
+    }
+    g_networkrequestactive = false;
+    delete chart;
+
+}
+
+
 QString
 CloudDBChartImportDialog::encodeHTML ( const QString& encodeMe )
 {
@@ -910,6 +941,55 @@ CloudDBChartImportDialog::encodeHTML ( const QString& encodeMe )
 
     return temp;
 }
+
+CloudDBChartShowPictureDialog::CloudDBChartShowPictureDialog(QByteArray imageData) : imageData(imageData) {
+
+    QRect rec = QApplication::desktop()->screenGeometry();
+    imageLabel = new QLabel();
+    imageLabel->setMinimumSize(150,100);
+    chartImage.loadFromData(imageData);
+    QSize size = chartImage.size();
+    int w = rec.width()/2;
+    int h = (qreal)size.width()*w/size.height();
+    imageLabel->setPixmap(chartImage.scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+    okButton = new QPushButton(tr("Ok"));
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addStretch();
+    buttonLayout->addWidget(okButton);
+
+    connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(imageLabel);
+    layout->addLayout(buttonLayout);
+
+    setLayout(layout);
+
+}
+
+CloudDBChartShowPictureDialog::~CloudDBChartShowPictureDialog() {
+    delete imageLabel;
+    delete okButton;
+}
+
+void
+CloudDBChartShowPictureDialog::okClicked() {
+    accept();
+}
+
+
+void
+CloudDBChartShowPictureDialog::resizeEvent(QResizeEvent *) {
+
+    int w = imageLabel->width();
+    int h = imageLabel->height();
+
+    // set a scaled pixmap to a w x h window keeping its aspect ratio
+    imageLabel->setPixmap(chartImage.scaled(w,h,Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+}
+
 
 //------------------------------------------------------------------------------------------------------------
 //  Dialog for publishing Chart Details
