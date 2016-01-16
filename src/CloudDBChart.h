@@ -21,6 +21,7 @@
 
 #include "LTMSettings.h"
 #include "Settings.h"
+#include "CloudDBCommon.h"
 
 #include <QObject>
 #include <QNetworkAccessManager>
@@ -34,29 +35,26 @@
 // API Structure V1 (flattened) must be in sync with the Structure used for the V1
 // but uses the correct QT datatypes
 
-struct ChartAPIv1 {
+
+typedef struct {
     quint64 Id;
     QString Name;
     QString Description;
     QString Language;
     QString GcVersion;
-    QString ChartXML;
-    QByteArray Image;
     QDateTime LastChanged;
     QString CreatorId;
+    bool    Curated;
+    bool    Deleted;
+} ChartAPIHeaderV1;
+
+
+struct ChartAPIv1 {
+    ChartAPIHeaderV1 Header;
+    QString ChartXML;
+    QByteArray Image;
     QString CreatorNick;
     QString CreatorEmail;
-    bool    Curated;
-    bool    Deleted;
-};
-
-struct ChartAPIHeaderV1 {
-    quint64 Id;
-    QString Name;
-    QString GcVersion;
-    QDateTime LastChanged;
-    bool    Curated;
-    bool    Deleted;
 };
 
 
@@ -69,9 +67,9 @@ public:
     CloudDBChartClient();
     ~CloudDBChartClient();
 
-    bool postChart(ChartAPIv1 chart);
-    bool getChartByID(qint64 , ChartAPIv1*);
-    bool getAllChartHeader(QList<ChartAPIHeaderV1>*);
+    CloudDBResponse postChart(ChartAPIv1 );
+    CloudDBResponse getChartByID(qint64 , ChartAPIv1*);
+    CloudDBResponse getAllChartHeader(QList<ChartAPIHeaderV1>*);
 
     bool sslLibMissing() { return noSSLlib; }
 
@@ -86,11 +84,18 @@ private:
     QNetworkAccessManager* g_nam;
     QNetworkDiskCache* g_cache;
     QNetworkReply *g_reply;
+    QString g_cacheDir;
+
+    const int header_magic_string = 987654321;
+    const int header_cache_version = 1;
 
     QString  g_chart_url_base;
     QString  g_chart_url_header;
     QVariant g_header_content_type;
     QByteArray g_header_basic_auth;
+
+    bool writeHeaderCache(QList<ChartAPIHeaderV1>*);
+    bool readHeaderCache(QList<ChartAPIHeaderV1>*);
 
     static bool unmarshallAPIv1(QByteArray , QList<ChartAPIv1>* );
     static void unmarshallAPIv1Object(QJsonObject* , ChartAPIv1* );
@@ -98,14 +103,19 @@ private:
     static bool unmarshallAPIHeaderV1(QByteArray , QList<ChartAPIHeaderV1>* );
     static void unmarshallAPIHeaderV1Object(QJsonObject* , ChartAPIHeaderV1* chart);
 
+    CloudDBResponse processReplyStatusCodes(QNetworkReply *);
+
 };
 
 struct ChartImportUIStructure {
     QString name;
     QString description;
     QString creatorNick;
+    QString language;
+    QDateTime createdAt;
     QPixmap image;
     LTMSettings ltmSettings;
+    bool createdByMe;
 };
 
 class CloudDBChartImportDialog : public QDialog
@@ -117,8 +127,11 @@ public:
     CloudDBChartImportDialog();
     ~CloudDBChartImportDialog();
 
-    void initialize();
+    bool initialize(QString);
     LTMSettings getSelectedSettings() {return g_selected; }
+
+    // re-implemented
+    void closeEvent(QCloseEvent* event);
 
 private slots:
 
@@ -128,7 +141,10 @@ private slots:
     void nextSetClicked();
     void prevSetClicked();
     void curatedToggled(bool);
-
+    void ownChartsToggled(bool);
+    void toggleTextFilterApply();
+    void languageFilterChanged(int);
+    void textFilterEditingFinished();
 
 private:
 
@@ -140,8 +156,9 @@ private:
     int g_stepSize;
     QList<ChartAPIHeaderV1>* g_currentHeaderList;
     QList<ChartAPIHeaderV1>* g_fullHeaderList;
-    bool g_filterActive;
-
+    bool g_textFilterActive;
+    QString g_currentAthleteId;
+    bool g_networkrequestactive;
 
     // UI elements
     QLabel *showing;
@@ -150,15 +167,16 @@ private:
     QPushButton *nextSet;
     QPushButton *prevSet;
     QCheckBox *curatedOnly;
-    QLabel *filterLabel;
-    QLineEdit *filter;
+    QCheckBox *ownChartsOnly;
+    QComboBox *langCombo;
+    QLineEdit *textFilter;
+    QPushButton *textFilterApply;
     QTableWidget *tableWidget;
     QPushButton *addAndCloseButton, *closeButton;
 
     // helper methods
     void getCurrentPresets(int, int);
-    void updateDialogWithCurrentPresets();
-    void applyFilterAndCurated(bool, QString);
+    void applyAllFilters();
     QString encodeHTML ( const QString& );
 
 };
@@ -170,26 +188,46 @@ class CloudDBChartPublishDialog : public QDialog
 
 public:
 
-    CloudDBChartPublishDialog(ChartAPIv1 data);
+    CloudDBChartPublishDialog(ChartAPIv1 data, QString athlete);
     ~CloudDBChartPublishDialog();
 
-    ChartAPIv1 getData() { return data; }
+    ChartAPIv1 getChart() { return data; }
 
 private slots:
     void publishClicked();
     void cancelClicked();
 
+    void nameTextChanged(QString);
+    void nameEditingFinished();
+    void nickNameTextChanged(QString);
+    void nickNameEditingFinished();
+    void emailTextChanged(QString);
+    void emailEditingFinished();
 
 private:
 
     ChartAPIv1 data;
+    QString athlete;
 
     QPushButton *publishButton, *cancelButton;
+
     QLineEdit *name;
+    QString nameDefault;
+    bool nameOk;
+
+    QComboBox *langCombo;
+
     QLabel *image;
+
     QTextEdit *description;
+    QString descriptionDefault;
+
     QLineEdit *nickName;
+    bool nickNameOk;
+
     QLineEdit *email;
+    bool emailOk;
+
     //QComboBox *language;
     QLabel *gcVersionString;
     QLabel *creatorId;
