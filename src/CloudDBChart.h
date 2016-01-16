@@ -67,9 +67,9 @@ public:
     CloudDBChartClient();
     ~CloudDBChartClient();
 
-    CloudDBResponse postChart(ChartAPIv1 );
-    CloudDBResponse getChartByID(qint64 , ChartAPIv1*);
-    CloudDBResponse getAllChartHeader(QList<ChartAPIHeaderV1>*);
+    int postChart(ChartAPIv1 );
+    int getChartByID(qint64 , ChartAPIv1*);
+    int getAllChartHeader(QList<ChartAPIHeaderV1>*);
 
     bool sslLibMissing() { return noSSLlib; }
 
@@ -86,8 +86,8 @@ private:
     QNetworkReply *g_reply;
     QString g_cacheDir;
 
-    const int header_magic_string = 987654321;
-    const int header_cache_version = 1;
+    static const int header_magic_string = 987654321;
+    static const int header_cache_version = 1;
 
     QString  g_chart_url_base;
     QString  g_chart_url_header;
@@ -103,7 +103,7 @@ private:
     static bool unmarshallAPIHeaderV1(QByteArray , QList<ChartAPIHeaderV1>* );
     static void unmarshallAPIHeaderV1Object(QJsonObject* , ChartAPIHeaderV1* chart);
 
-    CloudDBResponse processReplyStatusCodes(QNetworkReply *);
+    int processReplyStatusCodes(QNetworkReply *);
 
 };
 

@@ -136,9 +136,23 @@ void CloudDBAcceptConditionsDialog::rejectConditions() {
     reject();
 }
 
+// Initialize static members of CloudDBCommon
+QList<QString> CloudDBCommon::cloudDBLangsIds = QList<QString>() << "en" << "fr" << "ja" << "pt-br" << "it" << "de" << "ru" << "cs" << "es" << "pt" << "zh-tw" << "xx";
+
+QList<QString> CloudDBCommon::cloudDBLangs = QList<QString>() << QObject::tr("English") << QObject::tr("French") << QObject::tr("Japanese") << QObject::tr("Portugese (Brazil)") <<
+                                             QObject::tr("Italian") << QObject::tr("German") << QObject::tr("Russian") << QObject::tr("Czech") <<
+                                             QObject::tr("Spanish") << QObject::tr("Portugese") << QObject::tr("Chinese (Traditional)") << QObject::tr("Other");
+
+QString CloudDBCommon::cloudDBTimeFormat = "yyyy-MM-ddTHH:mm:ssZ";
+
+
 
 // Initialize static member for CloudDBDataStatus
 bool CloudDBDataStatus::chartHeaderStatusStale = true;
+
+
+
+
 
 
 

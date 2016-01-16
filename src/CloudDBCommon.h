@@ -70,22 +70,23 @@ private:
 
 };
 
-// Languages explicitely support to store artifacts == UI Languages
 
-static const  QList<QString> cloudDBLangsIds = {
-    "en", "fr", "ja", "pt-br", "it", "de", "ru", "cs", "es", "pt", "zh-tw", "xx"
+class CloudDBCommon
+{
+public:
+
+    // Languages explicitely supported to store artifacts == UI Languages
+    static QList<QString> cloudDBLangsIds;
+    static QList<QString> cloudDBLangs;
+    static QString cloudDBTimeFormat;
+    static const int APIresponseOk = 200;
+    static const int APIresponseCreated = 201;
+    static const int APIresponseForbidden = 403;
+    static const int APIresponseOverQuota = 503;
+    static const int APIresponseOthers = 999;
+
 };
 
-static const  QList<QString> cloudDBLangs = { QObject::tr("English"), QObject::tr("French") , QObject::tr("Japanese"), QObject::tr("Portugese (Brazil)"),
-                                        QObject::tr("Italian"), QObject::tr("German"), QObject::tr("Russian"), QObject::tr("Czech"), QObject::tr("Spanish"),
-                                        QObject::tr("Portugese"), QObject::tr("Chinese (Traditional)"), QObject::tr("Other") };
-
-static const QString cloudDBTimeFormat = "yyyy-MM-ddTHH:mm:ssZ";
-
-// enums for common use
-
-// APPEngine Reponses
-enum CloudDBResponse { Ok = 200, Forbidden = 403, OverQuota = 503, Others = 999 };
 
 
 #endif // CLOUDDBCORE_H
