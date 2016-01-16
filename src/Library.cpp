@@ -394,7 +394,7 @@ void
 LibrarySearchDialog::setWidgets()
 {
     if (searching) {
-        setFixedHeight(200);
+        setFixedHeight(250);
         searchButton->hide();
         cancelButton->setText(tr("Abort Search"));
         searchPathTable->hide();
