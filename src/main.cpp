@@ -87,6 +87,7 @@ void myMessageOutput(QtMsgType type, const char *msg)
 #endif
      //in this function, you can write the message to any stream!
      switch (type) {
+     default: // QtInfoMsg from 5.5 would arrive here
      case QtDebugMsg:
          fprintf(stderr, "Debug: %s\n", msg);
          break;
