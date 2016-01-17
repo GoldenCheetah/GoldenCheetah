@@ -18,8 +18,10 @@
 
 #include "CloudDBChart.h"
 #include "CloudDBCommon.h"
+
 #include "LTMChartParser.h"
 #include "GcUpgrade.h"
+#include "Secrets.h"
 
 #include <QtGlobal>
 #include <QNetworkRequest>
