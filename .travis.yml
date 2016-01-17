@@ -57,6 +57,7 @@ before_script:
   src/gcconfig.pri
 - sed -i "" "s|#\(QMAKE_CXXFLAGS\).*|\1_RELEASE += -mmacosx-version-min=10.7 -arch
   x86_64|" src/gcconfig.pri
+- sed -i "" "s|^#CloudDB|CloudDB|" src/gcconfig.pri
 - sed -i "" "s|^#LIBZ|LIBZ|" src/gcconfig.pri
 - sed -i "" "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
 - sed -i "" "s|#\(D2XX_INCLUDE =.*\)|\1 ../D2XX|" src/gcconfig.pri
