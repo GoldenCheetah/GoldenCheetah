@@ -1361,7 +1361,7 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
     } else {
 
         // not supported
-        ergFile = NULL;
+        this->ergFile = NULL;
     }
 
     // reset metrics etc
