@@ -135,10 +135,6 @@ WorkoutWidget::timeout()
 bool
 WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 {
-    // we nearly always return false for filtering
-    // except wheel events (for example)
-    bool returning = false;
-
     // process as normal if not one of ours
     if (obj != this) return false;
 
@@ -148,6 +144,9 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 
     // is a repaint going to be needed?
     bool updateNeeded=false;
+
+    // are we filtering out the event? (e.g. keyboard / scroll)
+    bool filterNeeded=false;
 
     //
     // 1 MOUSE MOVE [we always repaint]
@@ -393,7 +392,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 #else
             updateNeeded = scale(QPoint(0,w->delta()));
 #endif
-            returning = true;
+            filterNeeded = true;
         }
 
         // will need to ..
@@ -418,33 +417,39 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
         case Qt::Key_Down:
         case Qt::Key_Left:
         case Qt::Key_Right:
+            filterNeeded = true; // we grab all key events
             updateNeeded=movePoints(key,kmod);
             break;
 
         case Qt::Key_Escape:
+            filterNeeded = true; // we grab all key events
             updateNeeded=selectClear();
             break;
 
         case Qt::Key_C:
             if (ctrl) {
+                filterNeeded = true; // we grab all key events
                 copy();
             }
             break;
 
         case Qt::Key_V:
             if (ctrl) {
+                filterNeeded = true; // we grab all key events
                 paste();
             }
             break;
 
         case Qt::Key_X:
             if (ctrl) {
+                filterNeeded = true; // we grab all key events
                 cut();
             }
             break;
 
         case Qt::Key_A:
             if (ctrl) {
+                filterNeeded = true; // we grab all key events
                 updateNeeded=selectAll();
             }
             break;
@@ -452,6 +457,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
         case Qt::Key_Y:
             if (ctrl) {
                 redo();
+                filterNeeded = true; // we grab all key events
                 updateNeeded=true;
             }
             break;
@@ -459,12 +465,14 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
         case Qt::Key_Z:
             if (ctrl) {
                 undo();
+                filterNeeded = true; // we grab all key events
                 updateNeeded=true;
             }
             break;
 
         case Qt::Key_Delete:
             // delete!
+            filterNeeded = true; // we grab all key events
             updateNeeded=deleteSelected();
             break;
         }
@@ -509,7 +517,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
 
     // return false - we are eavesdropping not processing.
     // except for wheel events which we steal
-    return returning;
+    return filterNeeded;
 }
 
 bool
