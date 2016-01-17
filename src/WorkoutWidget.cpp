@@ -105,10 +105,15 @@ WorkoutWidget::start()
 
     // if we have edited the erg we need to update the in-memory points
     if (ergFile && stack.count()) {
+
+        // replace all the points
         ergFile->Points.clear();
         foreach(WWPoint *p, points_) {
             ergFile->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
         }
+
+        // force any other plots to take the changes
+        context->notifyErgFileSelected(ergFile);
     }
 
     // clear previous data
