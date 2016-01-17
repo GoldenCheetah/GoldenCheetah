@@ -1298,7 +1298,7 @@ LTMWindow::shareConfig()
 #endif
     QBuffer buffer(&chart.Image);
     buffer.open(QIODevice::WriteOnly);
-    picture.save(&buffer, "JPG"); // writes pixmap into bytes in JPG format
+    picture.save(&buffer, "PNG"); // writes pixmap into bytes in PNG format (a bit larger than JPG - but much better in Quality when importing)
     buffer.close();
 
     chart.Header.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();

@@ -145,6 +145,7 @@ private slots:
     void toggleTextFilterApply();
     void languageFilterChanged(int);
     void textFilterEditingFinished();
+    void cellDoubleClicked(int, int);
 
 private:
 
@@ -178,6 +179,31 @@ private:
     void getCurrentPresets(int, int);
     void applyAllFilters();
     QString encodeHTML ( const QString& );
+
+};
+
+class CloudDBChartShowPictureDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+
+    CloudDBChartShowPictureDialog(QByteArray imageData);
+    ~CloudDBChartShowPictureDialog();
+
+public slots:
+    void resizeEvent(QResizeEvent *);
+
+private slots:
+    void okClicked();
+
+
+private:
+
+    QByteArray imageData;
+    QPixmap chartImage;
+    QLabel *imageLabel;
+    QPushButton *okButton;
 
 };
 
