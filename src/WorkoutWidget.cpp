@@ -103,6 +103,14 @@ WorkoutWidget::start()
 {
     recording_ = true;
 
+    // if we have edited the erg we need to update the in-memory points
+    if (ergFile && stack.count()) {
+        ergFile->Points.clear();
+        foreach(WWPoint *p, points_) {
+            ergFile->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
+        }
+    }
+
     // clear previous data
     wbal.clear();
     watts.clear();
@@ -1326,6 +1334,8 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
     // we suport ERG but not MRC/CRS currently
     if (ergFile && ergFile->format == ERG) {
 
+        this->ergFile = ergFile;
+
         maxX_=0;
         maxY_=400;
 
@@ -1340,6 +1350,11 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
         }
 
         maxY_ *= 1.1f;
+
+    } else {
+
+        // not supported
+        ergFile = NULL;
     }
 
     // reset metrics etc
