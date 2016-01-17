@@ -155,6 +155,7 @@ class WorkoutWidget : public QWidget
         QList<WWEffort> efforts;
 
         // get regions for items to paint in
+        void adjustLayout(); // sets margins etc
         QRectF left();
         QRectF right();
         QRectF bottom();
@@ -273,6 +274,21 @@ class WorkoutWidget : public QWidget
 
         // for computing W'bal
         WPrime wpBal;
+
+        // sizing
+        double IHEIGHT;
+        double THEIGHT;
+        double BHEIGHT;
+        double LWIDTH;
+        double RWIDTH;
+        int XTICLENGTH;
+        int YTICLENGTH;
+        int XTICS;
+        int YTICS;
+        int SPACING;
+        int XMOVE;
+        int YMOVE;
+        bool GRIDLINES;
 };
 
 

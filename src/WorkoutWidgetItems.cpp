@@ -29,6 +29,8 @@ static int WBALSCALEWIDTH = 5;
 static bool GRIDLINES = true;
 static int SPACING = 4;
 
+static int MINTOOLHEIGHT = 350; // don't do lots of decoration on "mini" view
+
 WWPowerScale::WWPowerScale(WorkoutWidget *w, Context *c) : WorkoutWidgetItem(w), context(c)
 {
     w->addItem(this);
@@ -37,6 +39,9 @@ WWPowerScale::WWPowerScale(WorkoutWidget *w, Context *c) : WorkoutWidgetItem(w),
 void
 WWPowerScale::paint(QPainter *painter)
 {
+    // if too small paint nothing
+    if (workoutWidget()->height() < MINTOOLHEIGHT) return;
+
     int rnum = -1;
 
     // CP etc are not available so draw nothing
@@ -131,6 +136,9 @@ WWWBalScale::WWWBalScale(WorkoutWidget *w, Context *c) : WorkoutWidgetItem(w), c
 void
 WWWBalScale::paint(QPainter *painter)
 {
+    // if too small paint nothing
+    if (workoutWidget()->height() < MINTOOLHEIGHT) return;
+
     int rnum = -1;
 
     // CP etc are not available so draw nothing
@@ -254,6 +262,9 @@ WWLap::paint(QPainter *painter)
 void
 WWPoint::paint(QPainter *painter)
 {
+    // if too small paint nothing
+    if (workoutWidget()->height() < MINTOOLHEIGHT) return;
+
     painter->setPen(Qt::NoPen);
 
     // transform
@@ -510,6 +521,9 @@ WWMMPCurve::paint(QPainter *painter)
 void
 WWSmartGuide::paint(QPainter *painter)
 {
+    // if too small paint nothing
+    if (workoutWidget()->height() < MINTOOLHEIGHT) return;
+
     QPointF tl(-1,-1);
     QPointF br(-1,-1);
     int selected=0;

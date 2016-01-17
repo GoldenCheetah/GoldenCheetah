@@ -21,8 +21,10 @@
 #include "WorkoutWidget.h"
 #include "WorkoutWidgetItems.h"
 
+static int MINTOOLHEIGHT = 350; // smaller than this, lose the toolbar
+
 WorkoutWindow::WorkoutWindow(Context *context) :
-    GcWindow(context), draw(true), context(context), active(false)
+    GcWindow(context), draw(true), context(context), active(false), recording(false)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
@@ -170,6 +172,18 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     undoAct->setEnabled(false);
     redoAct->setEnabled(false);
     configChanged(CONFIG_APPEARANCE);
+
+    // watch for erg run/stop
+    connect(context, SIGNAL(start()), this, SLOT(start()));
+    connect(context, SIGNAL(stop()), this, SLOT(stop()));
+}
+
+void
+WorkoutWindow::resizeEvent(QResizeEvent *)
+{
+    // show or hide toolbar if big enough
+    if (!recording && height() > MINTOOLHEIGHT) toolbar->show();
+    else toolbar->hide();
 }
 
 void
@@ -225,3 +239,17 @@ WorkoutWindow::selectMode()
     selectAct->setEnabled(false);
 }
 
+
+void
+WorkoutWindow::start()
+{
+    recording = true;
+    toolbar->hide();
+}
+
+void
+WorkoutWindow::stop()
+{
+    recording = false;
+    if (height() > MINTOOLHEIGHT) toolbar->show();
+}
