@@ -78,6 +78,13 @@ class WorkoutWindow : public GcWindow
         // trap signals
         void configChanged(qint32);
 
+        // start/stop running
+        void stop();
+        void start();
+
+        // show hide toolbar if too small
+        void resizeEvent(QResizeEvent * event);
+
     private:
 
         Context *context;
@@ -98,6 +105,7 @@ class WorkoutWindow : public GcWindow
         WWLap *lap;
 
         bool active;
+        bool recording;
 };
 
 #endif // _GC_WorkoutWindow_h

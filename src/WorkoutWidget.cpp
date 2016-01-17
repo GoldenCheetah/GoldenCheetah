@@ -31,26 +31,46 @@
 #include <cmath>
 #include <float.h> // DBL_EPSILON
 
-// height and width of widgets
-static const double IHEIGHT = 10;
-static const double THEIGHT = 35;
-static const double BHEIGHT = 35;
-static const double LWIDTH = 65;
-static const double RWIDTH = 35;
+static int MINTOOLHEIGHT = 350; // minimum size for a full editor
 
-// axis tic marks
-static const int XTICLENGTH = 3;
-static const int YTICLENGTH = 0;
-static const int XTICS = 20;
-static const int YTICS = 10;
+void WorkoutWidget::adjustLayout()
+{
+    // adjust all the settings based upon current size
+    if (height() > MINTOOLHEIGHT) {
 
-static const int SPACING = 2; // between labels and tics (if there are tics)
+        // big, can edit and all widgets shown
+        IHEIGHT = 10;
+        THEIGHT = 35;
+        BHEIGHT = 35;
+        LWIDTH = 65;
+        RWIDTH = 35;
+        XTICLENGTH = 3;
+        YTICLENGTH = 0;
+        XTICS = 20;
+        YTICS = 10;
+        SPACING = 2; // between labels and tics (if there are tics)
+        XMOVE = 5; // how many to move X when cursoring
+        YMOVE = 1; // how many to move Y when cursoring
+        GRIDLINES = true;
 
-static const int XMOVE = 5; // how many to move X when cursoring
-static const int YMOVE = 1; // how many to move Y when cursoring
+    } else {
 
-// grid lines (y only)
-static bool GRIDLINES = true;
+        // mini mode
+        IHEIGHT = 0;
+        THEIGHT = 0;
+        BHEIGHT = 20;
+        LWIDTH = 10;
+        RWIDTH = 10;
+        XTICLENGTH = 3;
+        YTICLENGTH = 0;
+        XTICS = 20;
+        YTICS = 5;
+        SPACING = 2; // between labels and tics (if there are tics)
+        XMOVE = 5; // how many to move X when cursoring
+        YMOVE = 1; // how many to move Y when cursoring
+        GRIDLINES = false;
+    }
+}
 
 WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     QWidget(parent),  state(none), ergFile(NULL), dragging(NULL), parent(parent), context(context), stackptr(0)
@@ -61,6 +81,7 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     onDrag = onCreate = onRect = atRect = QPointF(-1,-1);
 
     // watch mouse events for user interaction
+    adjustLayout();
     installEventFilter(this);
     setMouseTracking(true);
 
@@ -497,7 +518,8 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     //
     if (event->type() == QEvent::Resize) {
 
-        // we need to update!
+        // we need to adjust layout and repaint
+        adjustLayout(); 
         updateNeeded = true;
     }
 
