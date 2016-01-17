@@ -18,9 +18,10 @@
 
  #include "ANTLogger.h"
 
-ANTLogger::ANTLogger(QObject *parent) : QObject(parent)
+ANTLogger::ANTLogger(QObject *parent, QString directory) : QObject(parent)
 {
     isLogging=false;
+    fullpath = directory + "/antlog.raw";
 }
 
 void
@@ -28,7 +29,9 @@ ANTLogger::open()
 {
     if (isLogging) return;
 
-    antlog.setFileName("antlog.raw");
+    qDebug() << "antlog path:" << fullpath;
+    antlog.setFileName(fullpath);
+
     antlog.open(QIODevice::WriteOnly | QIODevice::Truncate);
     isLogging=true;
 }
