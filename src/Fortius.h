@@ -74,6 +74,8 @@
 #define DEFAULT_CALIBRATION  0.00
 #define DEFAULT_SCALING      1.00
 
+#define FT_USB_TIMEOUT      500
+
 class Fortius : public QThread
 {
 
