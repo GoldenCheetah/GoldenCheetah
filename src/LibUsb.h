@@ -58,7 +58,9 @@ public:
     int open();
     void close();
     int read(char *buf, int bytes);
+	int read(char *buf, int bytes, int timeout);
     int write(char *buf, int bytes);
+	int write(char *buf, int bytes, int timeout);
     bool find();
 private:
 

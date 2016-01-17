@@ -108,6 +108,11 @@ void LibUsb::close()
 
 int LibUsb::read(char *buf, int bytes)
 {
+	return this->read(buf, bytes, 125);
+}
+
+int LibUsb::read(char *buf, int bytes, int timeout)
+{
     // check it isn't closed already
     if (!device) return -1;
 
@@ -134,7 +139,7 @@ int LibUsb::read(char *buf, int bytes)
     readBufSize = 0;
     readBufIndex = 0;
 
-    int rc = usb_bulk_read(device, readEndpoint, readBuf, 64, 125);
+    int rc = usb_bulk_read(device, readEndpoint, readBuf, 64, timeout);
     if (rc < 0)
     {
         // don't report timeouts - lots of noise so commented out
@@ -163,6 +168,11 @@ int LibUsb::read(char *buf, int bytes)
 
 int LibUsb::write(char *buf, int bytes)
 {
+	return this->write(buf, bytes, 125);
+}
+
+int LibUsb::write(char *buf, int bytes, int timeout)
+{
 
     // check it isn't closed
     if (!device) return -1;
@@ -174,7 +184,7 @@ int LibUsb::write(char *buf, int bytes)
         // we use a non-interrupted write on Linux/Mac since the interrupt
         // write block size is incorrectly implemented in the version of
         // libusb we build with. It is no less efficient.
-        rc = usb_bulk_write(device, writeEndpoint, buf, bytes, 125);
+        rc = usb_bulk_write(device, writeEndpoint, buf, bytes, timeout);
     }
 
     if (rc < 0)

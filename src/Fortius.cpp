@@ -372,7 +372,19 @@ void Fortius::run()
 
         if (isDeviceOpen == true) {
 
+			int rc = sendRunCommand(pedalSensor) ;
+			if (rc < 0) {
+				qDebug() << "usb write error " << rc;
+				// send failed - ouch!
+				closePort(); // need to release that file handle!!
+				quit(4);
+        		return; // couldn't write to the device
+			}
+			
             int actualLength = readMessage();
+			if (actualLength < 0) {
+				qDebug() << "usb read error " << actualLength;
+			}
             if (actualLength >= 24) {
 
                 //----------------------------------------------------------------
@@ -405,12 +417,15 @@ void Fortius::run()
                 // UNUSED curDistance = buf[28] | (buf[29] << 8) | (buf[30] << 16) | (buf[31] << 24);
 
                 // cadence - confirmed correct
+				//qDebug() << "raw cadence " << buf[44];
                 curCadence = buf[44];
-
+				
                 // speed
+				//qDebug() << "raw speed " << buf[32];
                 curSpeed = 1.3f * (double)(qFromLittleEndian<quint16>(&buf[32])) / (3.6f * 100.00f);
-
+				
                 // power - changed scale from 10 to 13, seems correct in erg mode, slope mode needs work
+				//qDebug() << "raw power " << buf[38];
                 curPower = qFromLittleEndian<qint16>(&buf[38])/13;
                 if (curPower < 0.0) curPower = 0.0;  // brake power can be -ve when coasting. 
                 
@@ -425,6 +440,7 @@ void Fortius::run()
                 curPower *= powerScaleFactor; // apply scale factor
                 
                 // heartrate - confirmed correct
+				//qDebug() << "raw heartrate " << buf[12];
                 curHeartRate = buf[12];
 
                 // update public fields
@@ -472,18 +488,6 @@ void Fortius::run()
             timer.restart();
         }
 
-        //----------------------------------------------------------------
-        // KEEP THE FORTIUS CONNECTION ALIVE
-        //----------------------------------------------------------------
-        if (isDeviceOpen == true) {
-
-            if (sendRunCommand(pedalSensor) < 0) {
-                // send failed - ouch!
-                closePort(); // need to release that file handle!!
-                quit(4);
-                return; // couldn't write to the device
-            }
-        }
         
         // The controller updates faster than the brake. Setting this to a low value (<50ms) increases the frequency of controller
         // only packages (24byte).
@@ -501,20 +505,26 @@ void Fortius::run()
  * ---------------------------------------------------------------------- */
 int Fortius::sendOpenCommand()
 {
+
     uint8_t open_command[] = {0x02,0x00,0x00,0x00};
     
-    return rawWrite(open_command, 4);
+    int retCode = rawWrite(open_command, 4);
+	//qDebug() << "usb status " << retCode;
+	return retCode;
 }
 
 int Fortius::sendCloseCommand()
 {
     uint8_t close_command[] = {0x01,0x08,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x52,0x10,0x04};
     
-    return rawWrite(close_command, 12);
+    int retCode = rawWrite(close_command, 12);
+	//qDebug() << "usb status " << retCode;
+	return retCode;
 }
 
 int Fortius::sendRunCommand(int16_t pedalSensor)
 {
+	int retCode = 0;
     pvars.lock();
     int mode = this->mode;
     int16_t gradient = (int16_t)this->gradient;
@@ -525,12 +535,14 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
     
     if (mode == FT_ERGOMODE)
     {
+		//qDebug() << "send load " << load;
+		
         qToLittleEndian<int16_t>(13 * load, &ERGO_Command[4]);
         ERGO_Command[6] = pedalSensor;
         
         qToLittleEndian<int16_t>(130 * brakeCalibrationFactor + 1040, &ERGO_Command[10]);
                 
-        return rawWrite(ERGO_Command, 12);
+        retCode = rawWrite(ERGO_Command, 12);
     }
     else if (mode == FT_SSMODE)
     {
@@ -543,11 +555,11 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
         
         qToLittleEndian<int16_t>(130 * brakeCalibrationFactor + 1040, &SLOPE_Command[10]);
         
-        return rawWrite(SLOPE_Command, 12);
+        retCode = rawWrite(SLOPE_Command, 12);
     }
     else if (mode == FT_IDLE)
     {
-        return sendOpenCommand();
+        retCode = sendOpenCommand();
     }
     else if (mode == FT_CALIBRATE)
     {
@@ -555,8 +567,9 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
         // to be calculated by observing the brake power and speed after calibration starts (i.e. it's not returned
         // by the brake).
     }
-    
-    return 0;
+
+	//qDebug() << "usb status " << retCode;
+    return retCode;
 }
 
 /* ----------------------------------------------------------------------
@@ -575,6 +588,7 @@ int Fortius::readMessage()
     int rc;
 
     rc = rawRead(buf, 64);
+	//qDebug() << "usb status " << rc;
     return rc;
 }
 
@@ -586,23 +600,29 @@ int Fortius::closePort()
 
 bool Fortius::find()
 {
-    return usb2->find();
+	int rc;
+    rc = usb2->find();
+	//qDebug() << "usb status " << rc;
+    return rc;
 }
 
 int Fortius::openPort()
 {
+	int rc;
     // on windows we try on USB2 then on USB1 then fail...
-    return usb2->open();
+    rc = usb2->open();
+	//qDebug() << "usb status " << rc;
+    return rc;
 }
 
 int Fortius::rawWrite(uint8_t *bytes, int size) // unix!!
 {
-    return usb2->write((char *)bytes, size);
+    return usb2->write((char *)bytes, size, FT_USB_TIMEOUT);
 }
 
 int Fortius::rawRead(uint8_t bytes[], int size)
 {
-    return usb2->read((char *)bytes, size);
+    return usb2->read((char *)bytes, size, FT_USB_TIMEOUT);
 }
 
 // check to see of there is a port at the device specified
