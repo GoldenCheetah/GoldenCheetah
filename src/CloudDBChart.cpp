@@ -885,7 +885,7 @@ void CloudDBChartImportDialog::cellDoubleClicked(int row, int /*column */) {
     ChartAPIv1* chart = new ChartAPIv1;
     if (row >= 0 && row < g_currentHeaderList->size() ) {
         g_networkrequestactive = true;
-        bool noError = true;
+        //bool noError = true;
         int response;
         response = g_client->getChartByID(g_currentHeaderList->at(row).Id, chart);
         if (response == CloudDBCommon::APIresponseOk) {
@@ -900,7 +900,7 @@ void CloudDBChartImportDialog::cellDoubleClicked(int row, int /*column */) {
             default:
                 QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading the charts - please try again later")));
             }
-            noError = false;
+            //noError = false;
         }
     }
     g_networkrequestactive = false;
