@@ -467,13 +467,34 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
 ### OPTIONAL => CLOUD DB [Google App Engine Integration]
 ###=====================================================
 
+##----------------------------------------------##
+## CloudDB is only supported on QT5.5 or higher ##
+##----------------------------------------------##
+
+notsupported = "INFO: CloudDB requires version QT >= 5.5, no support for"
+notsupported += $${QT_VERSION}
+
 equals(CloudDB, active) {
 
-    HEADERS += CloudDBChart.h \
-               CloudDBCommon.h
-    SOURCES += CloudDBChart.cpp \
-               CloudDBCommon.cpp
-    DEFINES += GC_HAS_CLOUD_DB
+    greaterThan(QT_MAJOR_VERSION, 4) {
+
+        greaterThan(QT_MINOR_VERSION, 4) {
+
+            HEADERS += CloudDBChart.h CloudDBCommon.h
+            SOURCES += CloudDBChart.cpp CloudDBCommon.cpp
+            DEFINES += GC_HAS_CLOUD_DB
+
+        } else {
+
+            # QT5 but not 5.5 or higher
+            message($$notsupported)
+        }
+
+    } else {
+
+        # QT4 not supported
+        message($$notsupported)
+    }
 }
 
 
