@@ -78,5 +78,13 @@
 #define GC_CYCLINGANALYTICS_CLIENT_SECRET "__GC_CYCLINGANALYTICS_CLIENT_SECRET__"
 #endif
 
+// CloudDB auth and app name
+#ifndef GC_CLOUD_DB_BASIC_AUTH
+#define GC_CLOUD_DB_BASIC_AUTH "__GC_CLOUD_DB_BASIC_AUTH__"
+#endif
+
+#ifndef GC_CLOUD_DB_APP_NAME
+#define GC_CLOUD_DB_APP_NAME "__GC_CLOUD_DB_APP_NAME__"
+#endif
 
 #endif
