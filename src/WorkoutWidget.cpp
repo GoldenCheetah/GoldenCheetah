@@ -108,8 +108,10 @@ WorkoutWidget::start()
 
         // replace all the points
         ergFile->Points.clear();
+        ergFile->Duration = 0;
         foreach(WWPoint *p, points_) {
             ergFile->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
+            ergFile->Duration = p->x * 1000; // whatever the last is
         }
 
         // force any other plots to take the changes
@@ -1619,9 +1621,12 @@ WorkoutWidget::paintEvent(QPaintEvent*)
     if (XTICLENGTH) painter.drawLine(bottom().topLeft(), bottom().topRight()); //X
 
     // start with 5 min tics and get longer and longer
-    int tsecs = 5 * 60; // 5 minute tics
+    int tsecs = 1 * 60; // 1 minute tics
     int xrange = maxX() - minX();
-    while (double(xrange) / double(tsecs) > XTICS) tsecs *= 2;
+    while (double(xrange) / double(tsecs) > XTICS && tsecs < xrange) {
+        if (tsecs==120) tsecs = 300; 
+        else tsecs *= 2;
+    }
 
     // now paint them
     for(int i=minX(); i<=maxX(); i += tsecs) {
