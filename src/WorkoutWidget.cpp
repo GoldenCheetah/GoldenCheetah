@@ -23,7 +23,9 @@
 
 #include "WPrime.h"
 #include "ErgFile.h"
+#include "RideFile.h"
 #include "RideFileCache.h"
+#include "RealtimeData.h"
 
 #include "TimeUtils.h" // time_to_string()
 #include <QFontMetrics>
@@ -73,10 +75,15 @@ void WorkoutWidget::adjustLayout()
 }
 
 WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
-    QWidget(parent),  state(none), ergFile(NULL), dragging(NULL), parent(parent), context(context), stackptr(0)
+    QWidget(parent),  state(none), ergFile(NULL), dragging(NULL), parent(parent), context(context), stackptr(0), recording_(false)
 {
     maxX_=3600;
     maxY_=400;
+
+    // when plotting telemetry these are maxY for those series
+    cadenceMax = 200; // make it line up between power and hr
+    hrMax = 220;
+    speedMax = 50;
 
     onDrag = onCreate = onRect = atRect = QPointF(-1,-1);
 
@@ -87,7 +94,79 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
+    connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
     configChanged(CONFIG_APPEARANCE);
+}
+
+void
+WorkoutWidget::start()
+{
+    recording_ = true;
+
+    // clear previous data
+    wbal.clear();
+    watts.clear();
+    hr.clear();
+    speed.clear();
+    cadence.clear();
+
+    // and resampling data
+    count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum =0;
+
+    // set initial 
+    cadenceMax = 200;
+    hrMax = 220;
+    speedMax = 50;
+
+    // replot
+    update();
+}
+
+void
+WorkoutWidget::stop()
+{
+    recording_ = false;
+    update();
+}
+
+void 
+WorkoutWidget::telemetryUpdate(RealtimeData rt)
+{
+    // only plot when recording
+    if (!recording_) return;
+
+    wbalSum += rt.getWbal();
+    wattsSum += rt.getWatts();
+    hrSum += rt.getHr();
+    cadenceSum += rt.getCadence();
+    speedSum += rt.getSpeed();
+
+    count++;
+
+    // did we get 5 samples (5hz refresh rate) ?
+    if (count == 5) {
+        int b = wbalSum / 5.0f;
+        wbal << b;
+        int w = wattsSum / 5.0f;
+        watts << w;
+        int h = hrSum / 5.0f;
+        hr << h;
+        double s = speedSum / 5.0f;
+        speed << s;
+        int c = cadenceSum / 5.0f;
+        cadence << c;
+
+        // clear for next time
+        count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum =0;
+
+        // do we need to increase maxes?
+        if (c > cadenceMax) cadenceMax=c;
+        if (s > speedMax) speedMax=s;
+        if (h > hrMax) hrMax=h;
+
+        // replot
+        update();
+    }
 }
 
 void
@@ -1664,16 +1743,48 @@ WorkoutWidget::maxY()
 
 // transform from plot to painter co-ordinate
 QPoint
-WorkoutWidget::transform(double seconds, double watts)
+WorkoutWidget::transform(double seconds, double watts, RideFile::SeriesType s)
 {
     // from plot coords to painter coords on the canvas
     QRectF c = canvas();
 
-    // ratio of pixels to plot units
-    double yratio = double(c.height()) / (maxY()-minY());
-    double xratio = double(c.width()) / (maxX()-minX());
+    switch (s) {
 
-    return QPoint(c.x() + (seconds * xratio), c.bottomLeft().y() - (watts * yratio));
+    default:
+    case RideFile::watts:
+        {
+        // ratio of pixels to plot units
+        double yratio = double(c.height()) / (maxY()-minY());
+        double xratio = double(c.width()) / (maxX()-minX());
+
+        return QPoint(c.x() + (seconds * xratio), c.bottomLeft().y() - (watts * yratio));
+        }
+
+    case RideFile::hr:
+        {
+        // ratio of pixels to plot units
+        double yratio = double(c.height()) / double(hrMax);
+        double xratio = double(c.width()) / (maxX()-minX());
+
+        return QPoint(c.x() + (seconds * xratio), c.bottomLeft().y() - (watts * yratio));
+        }
+    case RideFile::cad:
+        {
+        // ratio of pixels to plot units
+        double yratio = double(c.height()) / double(cadenceMax);
+        double xratio = double(c.width()) / (maxX()-minX());
+
+        return QPoint(c.x() + (seconds * xratio), c.bottomLeft().y() - (watts * yratio));
+        }
+    case RideFile::kph:
+        {
+        // ratio of pixels to plot units
+        double yratio = double(c.height()) / double(speedMax);
+        double xratio = double(c.width()) / (maxX()-minX());
+
+        return QPoint(c.x() + (seconds * xratio), c.bottomLeft().y() - (watts * yratio));
+        }
+    }
 }
 
 // transform from painter to plot co-ordinate

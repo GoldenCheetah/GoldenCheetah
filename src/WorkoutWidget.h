@@ -25,6 +25,7 @@
 
 #include "WPrime.h"
 
+#include "RideFile.h"
 #include "Settings.h"
 #include "Units.h"
 #include "Colors.h"
@@ -39,6 +40,7 @@ class ErgFile;
 class WorkoutWindow;
 class WorkoutWidget;
 class WWPoint;
+class RealtimeData;
 
 // memento represent a point, used to save state before/after commands
 // or whilst in the process of creating things like blocks
@@ -109,6 +111,14 @@ class WorkoutWidget : public QWidget
 
         WorkoutWidget(WorkoutWindow *parent, Context *context);
 
+        // recording state
+        bool recording() { return recording_; }
+        QList<int> wbal; // 1s samples [joules]
+        QList<int> watts; // 1s samples [watts]
+        QList<int> hr; // 1s samples [bpm]
+        QList<double> speed; // 1s samples [km/h]
+        QList<int> cadence; // 1s samples [rpm]
+
         // interaction state;
         // none - initial state
         // drag - dragging a point around
@@ -141,7 +151,7 @@ class WorkoutWidget : public QWidget
         double minY() { return 0.0f; } // might change later
 
         // transform from plot to painter co-ordinate
-        QPoint transform(double x, double y);
+        QPoint transform(double x, double y, RideFile::SeriesType s=RideFile::watts);
 
         // transform from painter to plot co-ordinate
         QPointF reverseTransform(int, int);
@@ -193,6 +203,11 @@ class WorkoutWidget : public QWidget
         QList<PointMemento> clipboard;
 
    public slots:
+
+        // recording / editing
+        void start();
+        void stop();
+        void telemetryUpdate(RealtimeData rtData);
 
         // and erg file was selected
         void ergFileSelected(ErgFile *);
@@ -289,6 +304,21 @@ class WorkoutWidget : public QWidget
         int XMOVE;
         int YMOVE;
         bool GRIDLINES;
+
+        bool recording_;
+
+        // axis
+        int cadenceMax;
+        int hrMax;
+        double speedMax;
+
+        // resampling
+        double wbalSum;
+        double wattsSum;
+        double cadenceSum;
+        double speedSum;
+        double hrSum;
+        int count;
 };
 
 

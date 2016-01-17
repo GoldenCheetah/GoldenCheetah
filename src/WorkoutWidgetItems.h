@@ -43,6 +43,8 @@
 #define GCWW_SGUIDE    10 // smart guides appear as we drag
 #define GCWW_TTE       11 // highlight impossible sections
 #define GCWW_LAP       12 // lap markers
+#define GCWW_NOW       13 // now marker
+#define GCWW_TELEMETRY 14 // now marker
 
 //
 // ITEMS
@@ -177,6 +179,26 @@ class WWLine : public WorkoutWidgetItem {
 
 };
 
+// draws all the telemetry
+class WWTelemetry : public WorkoutWidgetItem {
+
+    public:
+
+        WWTelemetry(WorkoutWidget *w, Context *c) : WorkoutWidgetItem(w), context(c) { w->addItem(this); }
+
+        // Reimplement in children
+        int type() { return GCWW_TELEMETRY; }
+
+        void paint(QPainter *painter);
+
+        // locate me on the parent widget in paint coordinates
+        QRectF bounding() { return QRectF(); }
+
+    private:
+        Context *context;
+
+};
+
 // draws a selection rectangle
 class WWRect : public WorkoutWidgetItem {
 
@@ -257,6 +279,25 @@ class WWWBLine : public WorkoutWidgetItem {
 
         // Reimplement in children
         int type() { return GCWW_WBLINE; }
+
+        void paint(QPainter *painter);
+
+        // locate me on the parent widget in paint coordinates
+        QRectF bounding() { return QRectF(); }
+
+    private:
+        Context *context;
+};
+
+// draws the NOW bar when recording
+class WWNow : public WorkoutWidgetItem {
+
+    public:
+
+        WWNow(WorkoutWidget *w, Context *context) : WorkoutWidgetItem(w), context(context) { w->addItem(this); }
+
+        // Reimplement in children
+        int type() { return GCWW_NOW; }
 
         void paint(QPainter *painter);
 

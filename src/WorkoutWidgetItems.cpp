@@ -193,6 +193,9 @@ WWWBalScale::paint(QPainter *painter)
 void
 WWTTE::paint(QPainter *painter)
 {
+    // don't show when recording
+    if (workoutWidget()->recording()) return;
+
     QRectF gap = workoutWidget()->bottomgap();
 
     // if no efforts/TTE found then its green by default
@@ -262,6 +265,9 @@ WWLap::paint(QPainter *painter)
 void
 WWPoint::paint(QPainter *painter)
 {
+    // don't show when recording
+    if (workoutWidget()->recording()) return;
+
     // if too small paint nothing
     if (workoutWidget()->height() < MINTOOLHEIGHT) return;
 
@@ -298,7 +304,7 @@ void
 WWLine::paint(QPainter *painter)
 {
     // thin ?
-    QPen linePen(GColor(CPOWER));
+    QPen linePen(workoutWidget()->recording() ? QColor(Qt::blue) : GColor(CPOWER));
     linePen.setWidth(1);
     painter->setPen(linePen);
 
@@ -347,8 +353,144 @@ WWLine::paint(QPainter *painter)
 }
 
 void
+WWTelemetry::paint(QPainter *painter)
+{
+    // only when recording
+    if (!workoutWidget()->recording()) return;
+
+    // Draw POWER
+    QPen linePen(GColor(CPOWER));
+    linePen.setWidth(1);
+    painter->setPen(linePen);
+
+    int secs=0; QPointF last;
+    foreach(int watts, workoutWidget()->watts) {
+
+        if (!secs) last = workoutWidget()->transform(secs, watts);
+        else {
+
+            // join the dots
+            QPointF here = workoutWidget()->transform(secs, watts);
+            painter->drawLine(last, here);
+            last = here;
+        }
+
+        secs++;
+    }
+
+    // Draw HR
+    QPen hlinePen(GColor(CHEARTRATE));
+    hlinePen.setWidth(1);
+    painter->setPen(hlinePen);
+
+    secs=0;
+    foreach(int hr, workoutWidget()->hr) {
+
+        if (!secs) last = workoutWidget()->transform(secs, hr, RideFile::hr);
+        else {
+
+            // join the dots
+            QPointF here = workoutWidget()->transform(secs, hr, RideFile::hr);
+            painter->drawLine(last, here);
+            last = here;
+        }
+
+        secs++;
+    }
+    // Draw Speed
+    QPen slinePen(GColor(CSPEED));
+    slinePen.setWidth(1);
+    painter->setPen(slinePen);
+
+    secs=0;
+    foreach(double speed, workoutWidget()->speed) {
+
+        if (!secs) last = workoutWidget()->transform(secs, speed, RideFile::kph);
+        else {
+
+            // join the dots
+            QPointF here = workoutWidget()->transform(secs, speed, RideFile::kph);
+            painter->drawLine(last, here);
+            last = here;
+        }
+
+        secs++;
+    }
+    // Draw Cadence
+    QPen clinePen(GColor(CCADENCE));
+    clinePen.setWidth(1);
+    painter->setPen(clinePen);
+
+    secs=0;
+    foreach(int cad, workoutWidget()->cadence) {
+
+        if (!secs) last = workoutWidget()->transform(secs, cad, RideFile::cad);
+        else {
+
+            // join the dots
+            QPointF here = workoutWidget()->transform(secs, cad, RideFile::cad);
+            painter->drawLine(last, here);
+            last = here;
+        }
+
+        secs++;
+    }
+
+    //
+    // W'bal last, if not zones return
+    //
+
+    // lets get the zones, CP and PMAX, if none we're done
+    int rnum = -1;
+
+    // CP etc are not available so draw nothing
+    if (context->athlete->zones(false) == NULL || 
+       (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) return;
+
+    // lets get the zones, CP and PMAX
+    int WPRIME = context->athlete->zones(false)->getWprime(rnum);
+
+    // full color
+    QColor color = GColor(CWBAL);
+    QPen wlinePen(color);
+    wlinePen.setWidth(1);
+    painter->setPen(wlinePen);
+
+    // top left origin
+    QPointF tl = workoutWidget()->canvas().topLeft();
+
+    // pixels per WPRIME value
+    double ratio = workoutWidget()->canvas().height() / WPRIME;
+
+    // join the dots
+    last = QPointF(tl.x(),tl.y());
+
+    // run through the wpBal values...
+    secs=0;
+    foreach(int b , workoutWidget()->wbal) {
+
+        // next second
+        secs++;
+
+        // this dot...
+        if (b < 0) b=0;
+
+        // x and y pixel location
+        double px = workoutWidget()->transform(secs,0).x();
+        double py = tl.y() + ((WPRIME-b) * ratio);
+
+        QPointF dot(px,py);
+        painter->drawLine(last, dot);
+        last = dot;
+    }
+}
+
+void
 WWRect::paint(QPainter *painter)
 {
+    // don't show when recording
+    if (workoutWidget()->recording()) return;
+
     QPointF onRect = workoutWidget()->onRect;
     QPointF atRect = workoutWidget()->atRect;
 
@@ -368,6 +510,9 @@ WWRect::paint(QPainter *painter)
 void
 WWBlockCursor::paint(QPainter *painter)
 {
+    // don't show when recording
+    if (workoutWidget()->recording()) return;
+
     // if were in a selection block don't draw a cursos
     if (workoutWidget()->selectionBlock.contains(workoutWidget()->mapFromGlobal(QCursor::pos()))) return;
 
@@ -402,6 +547,9 @@ WWBlockCursor::paint(QPainter *painter)
 void
 WWBlockSelection::paint(QPainter *painter)
 {
+    // don't show when recording
+    if (workoutWidget()->recording()) return;
+
     // draw the block selection
     if (workoutWidget()->selectionBlock == QPainterPath()) return;
 
@@ -453,8 +601,13 @@ WWWBLine::paint(QPainter *painter)
     // lets get the zones, CP and PMAX
     int WPRIME = context->athlete->zones(false)->getWprime(rnum);
 
-    // thin ?
-    QPen linePen(GColor(CWBAL));
+    // should be translucent if recording, as will be "overwritten"
+    // by the actual W'bal value
+    QColor color = GColor(CWBAL);
+    if (workoutWidget()->recording()) color.setAlpha(64);
+
+    // set pen
+    QPen linePen(color);
     linePen.setWidth(1);
     painter->setPen(linePen);
 
@@ -491,6 +644,9 @@ WWWBLine::paint(QPainter *painter)
 void
 WWMMPCurve::paint(QPainter *painter)
 {
+    // don't show when recording
+    if (workoutWidget()->recording()) return;
+
     // thin ?
     QPen linePen(GColor(CCP));
     linePen.setWidth(0.5);
@@ -521,6 +677,9 @@ WWMMPCurve::paint(QPainter *painter)
 void
 WWSmartGuide::paint(QPainter *painter)
 {
+    // don't show when recording
+    if (workoutWidget()->recording()) return;
+
     // if too small paint nothing
     if (workoutWidget()->height() < MINTOOLHEIGHT) return;
 
@@ -713,6 +872,24 @@ WWSmartGuide::paint(QPainter *painter)
             painter->drawText(workoutWidget()->left().left(), boundary.bottom()+SPACING+fontMetrics.ascent(), text);
         }
     }
+}
+
+void
+WWNow::paint(QPainter *painter)
+{
+    // only when recording
+    if (!workoutWidget()->recording()) return;
+
+    // get now
+    int px = workoutWidget()->transform(context->getNow()/1000.0f,0).x();
+
+    QPen linePen(GColor(CPLOTMARKER));
+    linePen.setWidthF(2);
+    painter->setPen(linePen);
+
+    // horizontal bar
+    painter->drawLine(px, workoutWidget()->canvas().top(), px, workoutWidget()->canvas().bottom());
+                      
 }
 
 //
