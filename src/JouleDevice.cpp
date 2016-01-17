@@ -613,10 +613,16 @@ JoulePacket::read(CommPortPtr dev, QString &err)
 
     if (n <= 0) {
         err = (n < 0) ? (tr("read error: ") + err) : tr("read timeout");
+#ifdef Q_CC_MSVC
+        delete[] buf;
+#endif
         return false;
     } else if (n < length) {
         err += QString(tr(", read only %1 bytes instead of: %2"))
             .arg(n).arg(length);
+#ifdef Q_CC_MSVC
+        delete[] buf;
+#endif
         return false;
     }
 
@@ -625,6 +631,9 @@ JoulePacket::read(CommPortPtr dev, QString &err)
 
     char _checksum;
     n = readOneByOne(dev, &_checksum, 1, err);
+#ifdef Q_CC_MSVC
+    delete[] buf;
+#endif
     if (n <= 0) {
         err = (n < 0) ? (tr("read checksum error: ") + err) : tr("read timeout");
         return false;

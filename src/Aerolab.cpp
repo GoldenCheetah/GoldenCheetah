@@ -874,6 +874,11 @@ QString Aerolab::estimateCdACrr(RideItem *rideItem)
             } else {
                 errMsg = tr("At least two segments must be defined");
             }
+#ifdef Q_CC_MSVC
+            delete[] X1;
+            delete[] X2;
+            delete[] Egain;
+#endif
         } else {
             errMsg = tr("Altitude and Power data must be present");
         }
