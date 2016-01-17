@@ -28,7 +28,7 @@ class ANTLogger : public QObject
 {
     Q_OBJECT
 public:
-    explicit ANTLogger(QObject *parent = 0);
+    explicit ANTLogger(QObject *parent = 0, QString path = "");
 
 signals:
 
@@ -38,10 +38,10 @@ public slots:
     void close();
 
 private:
-    // antlog.bin ant message stream
+    // antlog.raw ant message stream
+    QString fullpath;
     QFile antlog;
     bool isLogging;
-
 };
 
 #endif // ANTLOGGER_H

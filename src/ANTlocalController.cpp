@@ -27,12 +27,19 @@ ANTlocalController::ANTlocalController(TrainSidebar *parent, DeviceConfiguration
 {
     // for Device Pairing the controller is called with parent = NULL
     QString cyclist;
+    QString athletePath;
+
     if (parent) {
         cyclist = parent->context->athlete->cyclist;
+        athletePath = parent->context->athlete->home->root().canonicalPath();
     } else {
         cyclist = QString();
+        athletePath = QDir::tempPath();
     }
+
     myANTlocal = new ANT (parent, dc, cyclist);
+    logger = new ANTLogger(this, athletePath);
+
     connect(myANTlocal, SIGNAL(foundDevice(int,int,int)), this, SIGNAL(foundDevice(int,int,int)));
     connect(myANTlocal, SIGNAL(lostDevice(int)), this, SIGNAL(lostDevice(int)));
     connect(myANTlocal, SIGNAL(searchTimeout(int)), this, SIGNAL(searchTimeout(int)));
@@ -44,8 +51,8 @@ ANTlocalController::ANTlocalController(TrainSidebar *parent, DeviceConfiguration
     connect(myANTlocal, SIGNAL(antRemoteControl(uint16_t)), this, SLOT(antRemoteControl(uint16_t)));
 
     // Connect a logger
-    connect(myANTlocal, SIGNAL(receivedAntMessage(const unsigned char, const ANTMessage ,const timeval )), &logger, SLOT(logRawAntMessage(const unsigned char, const ANTMessage ,const timeval)));
-    connect(myANTlocal, SIGNAL(sentAntMessage(const unsigned char, const ANTMessage ,const timeval )), &logger, SLOT(logRawAntMessage(const unsigned char, const ANTMessage ,const timeval)));
+    connect(myANTlocal, SIGNAL(receivedAntMessage(const unsigned char, const ANTMessage ,const timeval )), logger, SLOT(logRawAntMessage(const unsigned char, const ANTMessage ,const timeval)));
+    connect(myANTlocal, SIGNAL(sentAntMessage(const unsigned char, const ANTMessage ,const timeval )), logger, SLOT(logRawAntMessage(const unsigned char, const ANTMessage ,const timeval)));
 }
 
 void
@@ -57,7 +64,7 @@ ANTlocalController::setDevice(QString device)
 int
 ANTlocalController::start()
 {
-    logger.open();
+    logger->open();
     myANTlocal->start();
     myANTlocal->setup();
     return 0;
@@ -82,7 +89,7 @@ int
 ANTlocalController::stop()
 {
     int rc =  myANTlocal->stop();
-    logger.close();
+    logger->close();
     return rc;
 }
 
@@ -134,7 +141,7 @@ ANTlocalController::getRealtimeData(RealtimeData &rtData)
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         parent->Stop(1);
-        logger.close();
+        logger->close();
         return;
     }
     // get latest telemetry

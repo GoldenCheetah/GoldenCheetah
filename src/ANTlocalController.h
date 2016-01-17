@@ -84,7 +84,7 @@ public slots:
 
 private:
     QQueue<setChannelAtom> channelQueue;
-    ANTLogger logger;
+    ANTLogger *logger;
 
 };
 
