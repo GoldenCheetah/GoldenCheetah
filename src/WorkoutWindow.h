@@ -47,6 +47,8 @@ class WWBlockSelection;
 class WWMMPCurve;
 class WWSmartGuide;
 class WWLap;
+class WWNow;
+class WWTelemetry;
 
 class WorkoutWindow : public GcWindow
 {
@@ -103,6 +105,8 @@ class WorkoutWindow : public GcWindow
         WWMMPCurve *mmp;
         WWSmartGuide *guide;
         WWLap *lap;
+        WWNow *now;
+        WWTelemetry *telemetry;
 
         bool active;
         bool recording;

@@ -69,6 +69,10 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // guides always on top!
     guide = new WWSmartGuide(workout);
 
+    // recording ...
+    now = new WWNow(workout, context);
+    telemetry = new WWTelemetry(workout, context);
+
     // setup the toolbar
     toolbar = new QToolBar(this);
     toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -245,6 +249,7 @@ WorkoutWindow::start()
 {
     recording = true;
     toolbar->hide();
+    workout->start();
 }
 
 void
@@ -252,4 +257,5 @@ WorkoutWindow::stop()
 {
     recording = false;
     if (height() > MINTOOLHEIGHT) toolbar->show();
+    workout->stop();
 }
