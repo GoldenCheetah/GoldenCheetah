@@ -48,6 +48,7 @@ class ErgFilePoint
     public:
 
         ErgFilePoint() : x(0), y(0), val(0) {}
+        ErgFilePoint(double x, double y, double val) : x(x), y(y), val(val) {}
 
         double x;     // x axis - time in msecs or distance in meters
         double y;     // y axis - load in watts or altitude
