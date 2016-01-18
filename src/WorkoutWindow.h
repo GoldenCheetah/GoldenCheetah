@@ -24,6 +24,7 @@
 #include <QToolBar> // for Q_PROPERTY
 #include <QObject> // for Q_PROPERTY
 #include <QLineEdit>
+#include <QTextEdit>
 #include <QCheckBox>
 #include <QLabel>
 
@@ -57,6 +58,9 @@ class WorkoutWindow : public GcWindow
     public:
 
         WorkoutWindow(Context *context);
+
+        // edit the definition
+        QTextEdit *code;
 
         // workout widget updates these
         QLabel *xlabel, *ylabel;
