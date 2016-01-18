@@ -376,7 +376,7 @@ void PMCData::refresh()
                     lastLts = lts_[day-1];
                     lastSts = sts_[day-1];
                 }
-                if (day <= stsDays_) {
+                if (day > stsDays_) {
                     if (start_.addDays(day).daysTo(QDate::currentDate())<-1-stsDays_) {
                         ltsAtStsDays1 = expected_lts_[day-stsDays_-1];
                     } else {
