@@ -87,6 +87,7 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     speedMax = 50;
 
     onDrag = onCreate = onRect = atRect = QPointF(-1,-1);
+    qwkactive = false;
 
     // watch mouse events for user interaction
     adjustLayout();
@@ -815,6 +816,8 @@ WorkoutWidget::setBlockCursor()
     //
     if (!parent->code->isHidden()) {
 
+        qwkactive = true;
+
         // which line we hovering on?
         if (hoveri > -1) {
 
@@ -855,11 +858,17 @@ WorkoutWidget::setBlockCursor()
                         cursor.setPosition(indexin + codeStrings[i].length(), QTextCursor::KeepAnchor);
                         cursor.selectionEnd();
                         cursor.setCharFormat(highlight);
+
+                        // move the visible cursor and make visible
+                        parent->code->setTextCursor(cursor);
+                        parent->code->ensureCursorVisible();
                         break;
                 }
                 indexin += codeStrings[i].length()+1;
             }
         }
+
+        qwkactive = false;
     }
 
     return returning;
@@ -1624,7 +1633,9 @@ WorkoutWidget::recompute()
     }
 
     // set the properties
-    parent->code->setText(qwkcode());
+    qwkactive = true;
+    parent->code->document()->setPlainText(qwkcode());
+    qwkactive = false;
 }
 
 // as 1m or 60s etc
@@ -1766,6 +1777,40 @@ WorkoutWidget::qwkcode()
 
     // still not optimised to 4x ..
     return codeStrings.join("\n");
+}
+
+void
+WorkoutWidget::fromQwkcode(QString code)
+{
+    if (qwkactive == true) return;
+#if 0 //XXX WIP
+    // load in from a qwkcode
+    qDebug()<<"QWKCODE:"<<code;
+    return;
+
+    // clear points etc
+    state = none;
+    dragging = NULL;
+    cursorBlock = selectionBlock = QPainterPath();
+    cursorBlockText = selectionBlockText = cursorBlockText2 = selectionBlockText2 = "";
+    
+
+    // wipe out points NEED TO THINK ABOUT REDO!!!
+    foreach(WWPoint *point, points_) delete point;
+    points_.clear();
+
+    // patterns
+    QRegExp count("^\([0-9]+\)x.*"); // has a counter at front
+    QRegExp recovery(".*r\(.*\)");   // gas recovery time
+    int index=0;
+    foreach(QString line, code.split("\n")) {
+
+    }
+
+    // recompute etc
+    //recompute();
+    update();
+#endif
 }
 
 void

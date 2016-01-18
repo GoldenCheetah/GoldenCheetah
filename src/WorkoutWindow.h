@@ -24,7 +24,7 @@
 #include <QToolBar> // for Q_PROPERTY
 #include <QObject> // for Q_PROPERTY
 #include <QLineEdit>
-#include <QTextEdit>
+#include <QPlainTextEdit>
 #include <QCheckBox>
 #include <QLabel>
 
@@ -60,7 +60,7 @@ class WorkoutWindow : public GcWindow
         WorkoutWindow(Context *context);
 
         // edit the definition
-        QTextEdit *code;
+        QPlainTextEdit *code;
 
         // workout widget updates these
         QLabel *xlabel, *ylabel;
@@ -80,6 +80,9 @@ class WorkoutWindow : public GcWindow
         void properties();
         void drawMode();
         void selectMode();
+
+        // qwkcode edited!
+        void qwkcodeChanged();
 
         // trap signals
         void configChanged(qint32);

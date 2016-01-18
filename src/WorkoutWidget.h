@@ -215,6 +215,9 @@ class WorkoutWidget : public QWidget
         // and erg file was selected
         void ergFileSelected(ErgFile *);
 
+        // qwkcode edited
+        void fromQwkcode(QString);
+
         // recompute metrics etc
         void recompute();
 
@@ -282,6 +285,7 @@ class WorkoutWidget : public QWidget
         QList<WWPoint*> points_;
 
         // mapping the qwkcode text to the points
+        bool qwkactive; // we're editing it, not the user
         QStringList codeStrings;
         QList<int> codePoints; // index into points_ for each line
 

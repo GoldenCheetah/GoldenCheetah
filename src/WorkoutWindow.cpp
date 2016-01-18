@@ -169,8 +169,7 @@ WorkoutWindow::WorkoutWindow(Context *context) :
 #endif
 
     // editing the code...
-    code = new QTextEdit(this);
-    code->setFixedWidth(250);
+    code = new QPlainTextEdit(this);
     code->hide();
 
     // WATTS and Duration for the cursor
@@ -188,6 +187,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // watch for erg run/stop
     connect(context, SIGNAL(start()), this, SLOT(start()));
     connect(context, SIGNAL(stop()), this, SLOT(stop()));
+
+    // text changed
+    connect(code, SIGNAL(textChanged()), this, SLOT(qwkcodeChanged()));
 }
 
 void
@@ -220,6 +222,11 @@ WorkoutWindow::configChanged(qint32)
     ylabel->setStyleSheet("color: darkGray;");
     TSSlabel->setStyleSheet("color: darkGray;");
     IFlabel->setStyleSheet("color: darkGray;");
+
+    // maximum of 20 characters per line ?
+    QFont f;
+    QFontMetrics ff(f);
+    code->setFixedWidth(ff.width("99x999s@999r999s@999-999"));
 
     // text edit colors
     QPalette palette;
@@ -254,6 +261,12 @@ WorkoutWindow::properties()
 {
     // metadata etc -- needs a dialog
     code->setHidden(!code->isHidden());
+}
+
+void
+WorkoutWindow::qwkcodeChanged()
+{
+    workout->fromQwkcode(code->document()->toPlainText());
 }
 
 void
