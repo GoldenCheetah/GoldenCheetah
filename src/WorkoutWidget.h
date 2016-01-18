@@ -281,6 +281,10 @@ class WorkoutWidget : public QWidget
         // as don't have to keep searching through all objects
         QList<WWPoint*> points_;
 
+        // mapping the qwkcode text to the points
+        QStringList codeStrings;
+        QList<int> codePoints; // index into points_ for each line
+
         // the lap definitions
         QList<ErgFileLap>   laps_;      // interval markers in the file
 
