@@ -821,19 +821,18 @@ WorkoutWidget::setBlockCursor()
         // which line we hovering on?
         if (hoveri > -1) {
 
-            QTextCharFormat normal;
-            QTextCharFormat highlight;
-            QColor d(127,127,127,200);
-            highlight.setBackground(d);
-
+            // cursor to work with the document text
             QTextCursor cursor(parent->code->document());
 
-            // set all black
+            // highlighting block
+            QTextBlockFormat normal;
+            QTextBlockFormat highlight = cursor.blockFormat();
+            highlight.setBackground(QBrush(QColor(127,127,127,127)));
+
+            // set all normal before highlighting current hover
             cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
-            cursor.selectionStart();
             cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
-            cursor.selectionEnd();
-            cursor.setCharFormat(normal);
+            cursor.setBlockFormat(normal);
 
             // look for line of code that includes the point we are
             // hovering over so we can highlight it in the text edit
@@ -848,16 +847,12 @@ WorkoutWidget::setBlockCursor()
                         // we have found the line in coreStrings that we
                         // are hovering on and should now set it to be
                         // highlighted
-                        // codeString[i] is the line we are hovering....
-                        // text highlighting :)
-                        //parent->code->setText(codeStrings.join("\n")); //XXX fix me
 
-                        // lets color it red, its a literal.
+                        // lets color it as a gray block
                         cursor.setPosition(indexin, QTextCursor::MoveAnchor);
-                        cursor.selectionStart();
                         cursor.setPosition(indexin + codeStrings[i].length(), QTextCursor::KeepAnchor);
-                        cursor.selectionEnd();
-                        cursor.setCharFormat(highlight);
+                        cursor.setBlockFormat(highlight);
+                        cursor.clearSelection();
 
                         // move the visible cursor and make visible
                         parent->code->setTextCursor(cursor);
