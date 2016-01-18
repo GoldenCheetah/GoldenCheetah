@@ -489,7 +489,7 @@ AddSearch::cleanupPage()
 }
 
 // Fortius Firmware
-AddFirmware::AddFirmware(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent)
+AddFirmware::AddFirmware(AddDeviceWizard *parent) : QWizardPage(parent), parent(parent)
 {
     setTitle(tr("Select Firmware"));
     setSubTitle(tr("Select Firmware for Tacx Fortius"));
@@ -559,15 +559,15 @@ AddFirmware::validatePage()
     if (copy->isChecked()) {
 
         QString fileName = QFileInfo(filePath).fileName();
-        QString targetFileName = QFileInfo(context->athlete->home->root().canonicalPath() + "/../").canonicalPath() + "/" + fileName;
+        QString targetFilePath = QFileInfo(parent->context->athlete->home->root().canonicalPath() + "/../").canonicalPath() + "/" + fileName;
 
         // check not the same thing!
-        if(QFileInfo(fileName).canonicalPath() != QFileInfo(targetFileName).canonicalPath()) {
+        if(QFileInfo(filePath).canonicalPath() != QFileInfo(targetFilePath).canonicalPath()) {
             // if the current file exists, wipe it
-            if (QFile(targetFileName).exists()) QFile(targetFileName).remove();
-            QFile(filePath).copy(targetFileName);
+            if (QFile(targetFilePath).exists()) QFile(targetFilePath).remove();
+            QFile(filePath).copy(targetFilePath);
         }
-        name->setText(targetFileName);
+        name->setText(targetFilePath);
     }
     appsettings->setValue(FORTIUS_FIRMWARE, name->text());
     return true;
