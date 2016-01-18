@@ -765,6 +765,7 @@ WorkoutWidget::setBlockCursor()
     QPointF last(0,0);
     int lastx=0;
     int lasty=0;
+    int hoveri=-1;
 
     foreach(WWPoint *p, points_) {
 
@@ -787,6 +788,7 @@ WorkoutWidget::setBlockCursor()
             if (block.contains(c)) {
 
                 // if different then update and want a repaint
+                hoveri=points_.indexOf(p);
                 if (cursorBlock != block) {
                     cursorBlock = block;
                     cursorBlockText = time_to_string(p->x - lastx);
@@ -807,6 +809,59 @@ WorkoutWidget::setBlockCursor()
         lastx = p->x;
         lasty = p->y;
     }
+
+    //
+    // QWKCODE TEXT
+    //
+    if (!parent->code->isHidden()) {
+
+        // which line we hovering on?
+        if (hoveri > -1) {
+
+            QTextCharFormat normal;
+            QTextCharFormat highlight;
+            QColor d(127,127,127,200);
+            highlight.setBackground(d);
+
+            QTextCursor cursor(parent->code->document());
+
+            // set all black
+            cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+            cursor.selectionStart();
+            cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+            cursor.selectionEnd();
+            cursor.setCharFormat(normal);
+
+            // look for line of code that includes the point we are
+            // hovering over so we can highlight it in the text edit
+            int indexin=0;
+            for (int i=0; i<codePoints.count();i++) {
+
+                // if between or at end this is the line we're hovering on
+                if ((hoveri >= codePoints[i]) && 
+                        (((i<codePoints.count()-1) && hoveri < codePoints[i+1]) 
+                        || (i==codePoints.count()-1))) {
+
+                        // we have found the line in coreStrings that we
+                        // are hovering on and should now set it to be
+                        // highlighted
+                        // codeString[i] is the line we are hovering....
+                        // text highlighting :)
+                        //parent->code->setText(codeStrings.join("\n")); //XXX fix me
+
+                        // lets color it red, its a literal.
+                        cursor.setPosition(indexin, QTextCursor::MoveAnchor);
+                        cursor.selectionStart();
+                        cursor.setPosition(indexin + codeStrings[i].length(), QTextCursor::KeepAnchor);
+                        cursor.selectionEnd();
+                        cursor.setCharFormat(highlight);
+                        break;
+                }
+                indexin += codeStrings[i].length()+1;
+            }
+        }
+    }
+
     return returning;
 }
 
@@ -1582,7 +1637,7 @@ static QString qduration(int t)
 QString
 WorkoutWidget::qwkcode()
 {
-    QStringList codes;
+    codeStrings.clear();
 
     int rnum=-1;
     int CP=250; // default if none set
@@ -1622,12 +1677,15 @@ WorkoutWidget::qwkcode()
     // just loop through for now doing xx@yy and optionally add rxx
     if (points_.count() == 1) {
         // just a single point?
-        codes << QString("%1@%2").arg(qduration(points_[0]->x)).arg(points_[0]->y, 0, 'f', 0);
+        codeStrings << QString("%1@%2").arg(qduration(points_[0]->x)).arg(points_[0]->y, 0, 'f', 0);
+        codePoints<<0;
     }
 
     // don't do recovery just yet
     QStringList blocks;
+    QList<int> blockp; //map to index
     QList<double>aps;
+
     for (int i=0; i< (points_.count()-1); i++) {
 
         QString section;
@@ -1655,6 +1713,7 @@ WorkoutWidget::qwkcode()
         }
 
         blocks << section;
+        blockp << i;
         aps << ap;
     }
 
@@ -1662,8 +1721,10 @@ WorkoutWidget::qwkcode()
     // blocks followed by recovery so we can join them together as
     // an effort followed by recovery
     QStringList sections;
+    QList<int> sectionp;
     for(int i=0; i<blocks.count(); i++) {
         QString section = blocks[i];
+        sectionp << blockp[i];
 
         // if we were above recovery and next is below recovery we have
         // an effort followed by some recovery so join together
@@ -1679,6 +1740,7 @@ WorkoutWidget::qwkcode()
     // we now run through the sections looking
     // for repeats and adding Nx .. when there
     // are 2 or more repeated blocks
+    codePoints.clear();
     for(int i=0; i<sections.count();) {
 
         // count dupes
@@ -1691,14 +1753,19 @@ WorkoutWidget::qwkcode()
         }
 
         // multiple or no ..
-        if (count > 1) codes << QString("%1x%2").arg(count).arg(sections[i]);
-        else codes << sections[i];
+        if (count > 1) {
+            codeStrings << QString("%1x%2").arg(count).arg(sections[i]);
+            codePoints << sectionp[i];
+        } else {
+            codeStrings << sections[i];
+            codePoints << sectionp[i];
+        }
 
         i += count;
     }
 
     // still not optimised to 4x ..
-    return codes.join("\n");
+    return codeStrings.join("\n");
 }
 
 void
