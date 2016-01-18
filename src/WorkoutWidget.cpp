@@ -1698,7 +1698,7 @@ WorkoutWidget::qwkcode()
     }
 
     // still not optimised to 4x ..
-    return codes.join('\n');
+    return codes.join("\n");
 }
 
 void
