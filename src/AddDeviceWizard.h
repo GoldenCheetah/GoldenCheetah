@@ -144,8 +144,8 @@ class AddFirmware : public QWizardPage
         QLabel *help;
         QLabel *file;
         QLineEdit *name;
-        Context *context;
-        AddDeviceWizard *wizard;
+        //Context *context;
+        AddDeviceWizard *parent;
 };
 
 class AddPair : public QWizardPage
