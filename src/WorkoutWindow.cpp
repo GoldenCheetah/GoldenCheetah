@@ -31,7 +31,8 @@ WorkoutWindow::WorkoutWindow(Context *context) :
 
     setControls(NULL);
 
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    QVBoxLayout *main = new QVBoxLayout(this);
+    QHBoxLayout *layout = new QHBoxLayout;
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
@@ -167,9 +168,16 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     telemetryUpdate(RealtimeData());
 #endif
 
+    // editing the code...
+    code = new QTextEdit(this);
+    code->setFixedWidth(250);
+    code->hide();
+
     // WATTS and Duration for the cursor
-    layout->addWidget(toolbar);
+    main->addWidget(toolbar);
     layout->addWidget(workout);
+    layout->addWidget(code);
+    main->addLayout(layout);
 
     // make it look right
     saveAct->setEnabled(false);
@@ -212,6 +220,26 @@ WorkoutWindow::configChanged(qint32)
     ylabel->setStyleSheet("color: darkGray;");
     TSSlabel->setStyleSheet("color: darkGray;");
     IFlabel->setStyleSheet("color: darkGray;");
+
+    // text edit colors
+    QPalette palette;
+    palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
+    palette.setColor(QPalette::Background, GColor(CTRAINPLOTBACKGROUND));
+
+    // only change base if moved away from white plots
+    // which is a Mac thing
+#ifndef Q_OS_MAC
+    if (GColor(CTRAINPLOTBACKGROUND) != Qt::white)
+#endif
+    {
+        //palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CTRAINPLOTBACKGROUND)));
+        palette.setColor(QPalette::Base, GColor(CTRAINPLOTBACKGROUND));
+        palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
+    }
+
+    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
+    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
+    code->setPalette(palette);
     repaint();
 }
 
@@ -225,6 +253,7 @@ void
 WorkoutWindow::properties()
 {
     // metadata etc -- needs a dialog
+    code->setHidden(!code->isHidden());
 }
 
 void
@@ -249,6 +278,7 @@ WorkoutWindow::start()
 {
     recording = true;
     toolbar->hide();
+    code->hide();
     workout->start();
 }
 

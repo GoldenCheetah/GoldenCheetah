@@ -111,7 +111,10 @@ class WorkoutWidget : public QWidget
 
         WorkoutWidget(WorkoutWindow *parent, Context *context);
 
-        // recording state
+        // qwkode string
+        QString qwkcode();
+
+        // when recording we collect telemetry and plot it
         bool recording() { return recording_; }
         QList<int> wbal; // 1s samples [joules]
         QList<int> watts; // 1s samples [watts]
@@ -291,28 +294,28 @@ class WorkoutWidget : public QWidget
         WPrime wpBal;
 
         // sizing
-        double IHEIGHT;
-        double THEIGHT;
-        double BHEIGHT;
-        double LWIDTH;
-        double RWIDTH;
-        int XTICLENGTH;
-        int YTICLENGTH;
-        int XTICS;
-        int YTICS;
-        int SPACING;
-        int XMOVE;
-        int YMOVE;
-        bool GRIDLINES;
+        double IHEIGHT;         // interval gap at bottom (used for TTE warning)
+        double THEIGHT;         // top section height (lap markers)
+        double BHEIGHT;         // height of bottom (x-axis)
+        double LWIDTH;          // width of left (Watts y-axis)
+        double RWIDTH;          // width of right (W'bal y-axis)
+        int XTICLENGTH;         // ticlength of x-axis
+        int YTICLENGTH;         // ticlength of y-axis (0 = no tics)
+        int XTICS;              // max number of tics
+        int YTICS;              // max number of tics
+        int SPACING;            // space between axis and labels
+        int XMOVE;              // how far to move X with cursor keys
+        int YMOVE;              // how far to move Y with cursor keys
+        bool GRIDLINES;         // show gridlines ? (e.g. hide in minimode)
 
         bool recording_;
 
-        // axis
+        // axis scaling
         int cadenceMax;
         int hrMax;
         double speedMax;
 
-        // resampling
+        // resampling when recording
         double wbalSum;
         double wattsSum;
         double cadenceSum;
@@ -320,6 +323,5 @@ class WorkoutWidget : public QWidget
         double hrSum;
         int count;
 };
-
 
 #endif // _GC_WorkoutWidget_h

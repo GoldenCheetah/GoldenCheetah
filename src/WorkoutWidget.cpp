@@ -34,6 +34,7 @@
 #include <float.h> // DBL_EPSILON
 
 static int MINTOOLHEIGHT = 350; // minimum size for a full editor
+static int RECOVERY = 70; // anything below 70% of CP is a recovery effort
 
 void WorkoutWidget::adjustLayout()
 {
@@ -1566,6 +1567,138 @@ WorkoutWidget::recompute()
             }
         }
     }
+
+    // set the properties
+    parent->code->setText(qwkcode());
+}
+
+// as 1m or 60s etc
+static QString qduration(int t)
+{
+    if (t%60 == 0) return QString("%1m").arg(t/60);
+    else return QString("%1s").arg(t);
+}
+
+QString
+WorkoutWidget::qwkcode()
+{
+    QStringList codes;
+
+    int rnum=-1;
+    int CP=250; // default if none set
+    if (context->athlete->zones(false) != NULL &&
+        (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) != -1) {
+        CP = context->athlete->zones(false)->getCP(rnum); // get actual value
+
+    }
+
+    // convert the points to a string that can be edited
+    // it is a list of sections separated by commas
+    // of the form
+    //
+    //       N - repeat N times
+    //     ttt - duration N[ms]
+    //    @iii - watts
+    //    @iii-ppp - from iii to ppp watts
+    //    rttt - recovery for ttt
+    //    @rrr - recovery watts
+    //    @rrr-sss - from rrr to sss watts
+    //
+    //    e.g.
+    //    4x10@300r3m@200  - 4 time 10 mins at 300W followed by 3m at 200w
+    //    5x30s@450r30s    - 5 times 30seconds at 450w followed by 30s at 'recovery'
+    //    20m@100-400       - 20 minutes going from 100w to 400w
+    //
+    //
+    //    A complete workout example;XXX
+    //    3m@65,1@100r3@65,5x5@105r3@65,10@65XXX
+    //XXX
+    //    Which decodes as a "classic" 5x5 vo2max workout:XXX
+    //    1) 3minute at 65% of CP to warm upXXX
+    //    2) 1minute at CP followed by 3 mins recovery at 65% of CP to blow away the cobwebsXXX
+    //    3) 5 sets of 5 minutes at 105% of CP with 3 minutes recovery at 65% of CPXXX
+    //    4) 10minutes at 65% of CP to cool downXXX
+
+    // just loop through for now doing xx@yy and optionally add rxx
+    if (points_.count() == 1) {
+        // just a single point?
+        codes << QString("%1@%2").arg(qduration(points_[0]->x)).arg(points_[0]->y, 0, 'f', 0);
+    }
+
+    // don't do recovery just yet
+    QStringList blocks;
+    QList<double>aps;
+    for (int i=0; i< (points_.count()-1); i++) {
+
+        QString section;
+        double ap=0;
+
+        // how long is this section ?
+        int duration = points_[i+1]->x - points_[i]->x;
+
+        // if duration is 0 its a rise, so move on 1
+        if (duration <=0) continue;
+
+        // is it a level or a rise?
+        if (doubles_equal(points_[i+1]->y, points_[i]->y)) {
+
+            // its a block
+            section = QString("%1@%2").arg(qduration(duration)).arg(points_[i]->y, 0, 'f', 0);
+            ap = points_[i]->y / CP * 100.0f;
+
+        } else {
+            // its a rise
+            section = QString("%1@%2-%3").arg(qduration(duration))
+                                         .arg(points_[i]->y, 0, 'f', 0)
+                                         .arg(points_[i+1]->y, 0, 'f', 0);
+            ap = ((points_[i]->y + points_[i+1]->y) / 2) / CP * 100.0f;
+        }
+
+        blocks << section;
+        aps << ap;
+    }
+
+    // one code per block with not optimisation, so we now look for
+    // blocks followed by recovery so we can join them together as
+    // an effort followed by recovery
+    QStringList sections;
+    for(int i=0; i<blocks.count(); i++) {
+        QString section = blocks[i];
+
+        // if we were above recovery and next is below recovery we have
+        // an effort followed by some recovery so join together
+        if ((i < aps.count() -1) && aps[i] > RECOVERY && aps[i+1]<aps[i] && aps[i+1] < RECOVERY) {
+            section += "r" + blocks[i+1];
+            i++;
+        }
+        sections << section;
+    }
+
+    // ok, we could probably do this in one loop
+    // above, but just to keep this maintainable
+    // we now run through the sections looking
+    // for repeats and adding Nx .. when there
+    // are 2 or more repeated blocks
+    for(int i=0; i<sections.count();) {
+
+        // count dupes
+        int count=1;
+        for(int j=i+1; j<sections.count(); j++) {
+            if (sections[j] == sections[i])
+                count++;
+            else
+                break; // stop when end of matches
+        }
+
+        // multiple or no ..
+        if (count > 1) codes << QString("%1x%2").arg(count).arg(sections[i]);
+        else codes << sections[i];
+
+        i += count;
+    }
+
+    // still not optimised to 4x ..
+    return codes.join('\n');
 }
 
 void
