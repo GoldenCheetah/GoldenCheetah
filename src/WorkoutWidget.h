@@ -221,7 +221,7 @@ class WorkoutWidget : public QWidget
         void fromQwkcode(QString);
 
         // recompute metrics etc
-        void recompute();
+        void recompute(bool editing=false);
 
         // trap signals
         void configChanged(qint32);

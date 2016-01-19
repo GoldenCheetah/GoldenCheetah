@@ -28,7 +28,9 @@
 #include "RealtimeData.h"
 
 #include "TimeUtils.h" // time_to_string()
+
 #include <QFontMetrics>
+#include <QRegExp>
 
 #include <cmath>
 #include <float.h> // DBL_EPSILON
@@ -1418,7 +1420,7 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
 }
 
 void
-WorkoutWidget::recompute()
+WorkoutWidget::recompute(bool editing)
 {
     //QTime timer;
     //timer.start();
@@ -1613,10 +1615,12 @@ WorkoutWidget::recompute()
         }
     }
 
-    // set the properties
-    qwkactive = true;
-    parent->code->document()->setPlainText(qwkcode());
-    qwkactive = false;
+    // set the properties if not editing
+    if (!editing) {
+        qwkactive = true;
+        parent->code->document()->setPlainText(qwkcode());
+        qwkactive = false;
+    }
 }
 
 // as 1m or 60s etc
@@ -1657,10 +1661,11 @@ WorkoutWidget::qwkcode()
     //    20m@100-400       - 20 minutes going from 100w to 400w
     //
     //
-    //    A complete workout example;XXX
-    //    3m@65,1@100r3@65,5x5@105r3@65,10@65XXX
-    //XXX
-    //    Which decodes as a "classic" 5x5 vo2max workout:XXX
+    //    XXX COME AND FIX THIS EXAMPLE XXX
+    //    A complete workout example;
+    //    3m@65,1@100r3@65,5x5@105r3@65,10@65
+    //
+    //    Which decodes as a "classic" 5x5 vo2max workout:
     //    1) 3minute at 65% of CP to warm upXXX
     //    2) 1minute at CP followed by 3 mins recovery at 65% of CP to blow away the cobwebsXXX
     //    3) 5 sets of 5 minutes at 105% of CP with 3 minutes recovery at 65% of CPXXX
@@ -1764,10 +1769,6 @@ void
 WorkoutWidget::fromQwkcode(QString code)
 {
     if (qwkactive == true) return;
-#if 0 //XXX WIP
-    // load in from a qwkcode
-    qDebug()<<"QWKCODE:"<<code;
-    return;
 
     // clear points etc
     state = none;
@@ -1775,23 +1776,145 @@ WorkoutWidget::fromQwkcode(QString code)
     cursorBlock = selectionBlock = QPainterPath();
     cursorBlockText = selectionBlockText = cursorBlockText2 = selectionBlockText2 = "";
     
-
-    // wipe out points NEED TO THINK ABOUT REDO!!!
+    // wipe out points NEED TO COME BACK FOR REDO!!! XXX TODO XXX
     foreach(WWPoint *point, points_) delete point;
     points_.clear();
 
-    // patterns
-    QRegExp count("^\([0-9]+\)x.*"); // has a counter at front
-    QRegExp recovery(".*r\(.*\)");   // gas recovery time
-    int index=0;
+    // keep a track of current load and time
+    int secs = 0;
+    int watts= 0;
+
     foreach(QString line, code.split("\n")) {
 
+        //
+        // QWKCODE syntax
+        //
+        // A line can be (using [] to express optionality
+        //
+        // [Nx]t1@w1[-w2][rt2@w3[-w4]]
+        //
+        // Where Nx      - Repeat N times
+        //       t1@w1   - Time t1 at Watts w1
+        //       -w2     - Optionally Time t from watts w1 to w2
+        //
+        //       rt2@w3  - Optional recovery time t2 at watts w3
+        //       -w4     - Optionally recover from time t2 watts w3 to watts w4
+        //
+        //       time t2/t2 can be expressed as a number and may
+        //       optionally be followed by m or s for minutes or seconds
+        //       if no units specified defaults to minutes
+        QRegExp qwk("([0-9]+x)?([0-9]+[ms]?)@([0-9]+)(-[0-9]+)?(r([0-9]+[ms]?)@([0-9]+)(-[0-9]+)?)?");
+
+        // REGEXP capture texts
+        //
+        // 0 - The entire line
+        // 1 - Count with trailing x e.g. "4x"
+        // 2 - Duration with trailing units (optional) e.g. "10m"
+        // 3 - Watts without units e.g. "120"
+        // 4 - Watts rise to with leading minus e.g. "-150"
+        // 5 - The entire recovery string (optional)
+        // 6 - Recovery Duration with trailing units (optional) e.g. "3m"
+        // 7 - Recovery watts without units e.g. "70"
+        // 8 - Recovert rise to with leading minus e.g. "-100"
+        //
+        // Obviously if not present then the captured text will be blank
+        // but we always get 9 captured texts.
+
+        // need a full match, we ignore malformed entries
+        if (qwk.exactMatch(line.trimmed())) {
+
+            // extract the values to use when adding
+            int count, t1, t2, w1, w2, w3, w4;
+
+            // initialise
+            count = 1;
+            t1 = t2 = w1 = w2 = w3 = w4 = -1;
+
+            // repeat ?
+            if (qwk.cap(1) != "") count=qwk.cap(1).mid(0, qwk.cap(1).length()-1).toInt();
+
+            // duration t1
+            if (qwk.cap(2) != "") {
+
+                // minutes
+                if (qwk.cap(2).endsWith("m")) {
+                    t1=qwk.cap(2).mid(0, qwk.cap(2).length()-1).toInt();
+                    t1 *= 60;
+
+                // seconds
+                } else if (qwk.cap(2).endsWith("s")) {
+                    t1=qwk.cap(2).mid(0, qwk.cap(2).length()-1).toInt();
+
+                // default minutes
+                } else {
+                    t1=qwk.cap(2).toInt();
+                    t1 *= 60;
+                }
+            }
+
+            // w1
+            if (qwk.cap(3) != "") w1 = qwk.cap(3).toInt();
+            // w2
+            if (qwk.cap(4) != "") w2 = -1 * qwk.cap(4).toInt();
+
+            // duration t2
+            if (qwk.cap(6) != "") {
+
+                // minutes
+                if (qwk.cap(6).endsWith("m")) {
+                    t2=qwk.cap(6).mid(0, qwk.cap(6).length()-1).toInt();
+                    t2 *= 60;
+
+                // seconds
+                } else if (qwk.cap(6).endsWith("s")) {
+                    t2=qwk.cap(6).mid(0, qwk.cap(6).length()-1).toInt();
+
+                // default minutes
+                } else {
+                    t2=qwk.cap(6).toInt();
+                    t2 *= 60;
+                }
+            }
+
+            // w3
+            if (qwk.cap(7) != "") w3 = qwk.cap(7).toInt();
+            // w4
+            if (qwk.cap(8) != "") w4 = -1 * qwk.cap(8).toInt();
+
+            //DEBUGqDebug()<<"PARSE:" << qwk.cap(0) <<"count:"<<count<<"EFFORT:"<<t1<<w1<<w2<<"RECOVERY:"<<t2<<w3<<w4;
+
+            //
+            // SET THE POINTS TO MATCH QWKCODE
+            //
+            for(int i=0; i<count; i++) {
+
+                // EFFORT
+                // add a point for starting watts if not already there
+                if (w1 != watts) new WWPoint(this, secs, w1);
+
+                // end of block
+                secs += t1;
+                watts = w2 > 0 ? w2 : w1;
+                new WWPoint(this, secs, watts);
+
+                // RECOVERY
+                if (t2 > 0) {
+                    if (w3 != watts) new WWPoint(this, secs, w3);
+
+                    // end of recovery block
+                    secs += t2;
+                    watts = w4 >0 ? w4 : w3;
+                    new WWPoint(this,secs,watts);
+                }
+            }
+        }
     }
 
-    // recompute etc
-    //recompute();
+    // recompute but critically don't redo qwkcode
+    recompute(true);
+
+    // repaint
     update();
-#endif
 }
 
 void
