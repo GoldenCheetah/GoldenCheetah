@@ -824,16 +824,6 @@ WorkoutWidget::setBlockCursor()
             // cursor to work with the document text
             QTextCursor cursor(parent->code->document());
 
-            // highlighting block
-            QTextBlockFormat normal;
-            QTextBlockFormat highlight = cursor.blockFormat();
-            highlight.setBackground(QBrush(QColor(127,127,127,127)));
-
-            // set all normal before highlighting current hover
-            cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
-            cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
-            cursor.setBlockFormat(normal);
-
             // look for line of code that includes the point we are
             // hovering over so we can highlight it in the text edit
             int indexin=0;
@@ -845,13 +835,9 @@ WorkoutWidget::setBlockCursor()
                         || (i==codePoints.count()-1))) {
 
                         // we have found the line in coreStrings that we
-                        // are hovering on and should now set it to be
-                        // highlighted
-
-                        // lets color it as a gray block
+                        // move cursor, the line will be highlighted by the editor
                         cursor.setPosition(indexin, QTextCursor::MoveAnchor);
                         cursor.setPosition(indexin + codeStrings[i].length(), QTextCursor::KeepAnchor);
-                        cursor.setBlockFormat(highlight);
                         cursor.clearSelection();
 
                         // move the visible cursor and make visible
