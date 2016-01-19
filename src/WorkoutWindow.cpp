@@ -190,6 +190,7 @@ WorkoutWindow::WorkoutWindow(Context *context) :
 
     // text changed
     connect(code, SIGNAL(textChanged()), this, SLOT(qwkcodeChanged()));
+    connect(code, SIGNAL(cursorPositionChanged()), workout, SLOT(hoverQwkcode()));
 }
 
 void
@@ -226,7 +227,7 @@ WorkoutWindow::configChanged(qint32)
     // maximum of 20 characters per line ?
     QFont f;
     QFontMetrics ff(f);
-    code->setFixedWidth(ff.width("99x999s@999r999s@999-999"));
+    code->setFixedWidth(ff.width("99x999s@999-999r999s@999-999"));
 
     // text edit colors
     QPalette palette;

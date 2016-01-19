@@ -1782,6 +1782,68 @@ WorkoutWidget::qwkcode()
 }
 
 void
+WorkoutWidget::hoverQwkcode()
+{
+    if (qwkactive == true) return;
+
+    // create a COPY of the cursor
+    QTextCursor cursor = parent->code->textCursor();
+    cursor.movePosition(QTextCursor::StartOfLine);
+
+    int line = 0;
+    while(cursor.positionInBlock()>0) {
+        cursor.movePosition(QTextCursor::Up);
+        line++;
+    }
+    QTextBlock tblock = cursor.block().previous();
+
+    while(tblock.isValid()) {
+        line += tblock.lineCount();
+        tblock = tblock.previous();
+    }
+
+    if (line >= codePoints.count()) return;
+
+    // from point to point needs highlighting
+    int from= codePoints[line];
+    int to= line+1 >= codePoints.count() ? points_.count()-1 : codePoints[line+1]-1;
+
+    // shared point, usually on a rise
+    if (from==to) to=from+1;
+
+    // lets highlight where the cursor is
+    QPointF begin= transform(points_[from]->x, 0);
+    QPointF last = begin;
+    QPainterPath block(begin);
+
+    double sumJoules=0;
+    double sumTime=0;
+
+    for (int i=from; i<=to; i++) {
+
+        if (i>from) {
+            int time= points_[i]->x - points_[i-1]->x;
+            sumTime += time;
+            sumJoules += time * ((points_[i]->y + points_[i-1]->y)/2);
+        }
+        last= transform(points_[i]->x, points_[i]->y);
+        block.lineTo(last);
+    }
+    block.lineTo(last.x(), begin.y());
+    block.lineTo(begin);
+
+    // not already highlighted?
+    if (cursorBlock != block) {
+        cursorBlock = block;
+
+        // text
+        cursorBlockText = time_to_string(sumTime);
+        cursorBlockText2= QString("%1w").arg(sumJoules/sumTime, 0, 'f', 0);
+        update();
+    }
+}
+
+void
 WorkoutWidget::fromQwkcode(QString code)
 {
     if (qwkactive == true) return;
