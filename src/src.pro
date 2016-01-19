@@ -572,6 +572,7 @@ HEADERS  += \
         ChartBar.h \
         ChartSettings.h \
         ChooseCyclistDialog.h \
+        ../qtsolutions/codeeditor/codeeditor.h \
         ColorButton.h \
         Colors.h \
         CommPort.h \
@@ -818,6 +819,7 @@ SOURCES += \
         ChartBar.cpp \
         ChartSettings.cpp \
         ChooseCyclistDialog.cpp \
+        ../qtsolutions/codeeditor/codeeditor.cpp \
         Coggan.cpp \
         ColorButton.cpp \
         Colors.cpp \

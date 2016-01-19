@@ -169,7 +169,7 @@ WorkoutWindow::WorkoutWindow(Context *context) :
 #endif
 
     // editing the code...
-    code = new QPlainTextEdit(this);
+    code = new CodeEditor(this);
     code->hide();
 
     // WATTS and Duration for the cursor
