@@ -36,6 +36,8 @@
 #include "Units.h"
 #include "Colors.h"
 
+#include "../qtsolutions/codeeditor/codeeditor.h"
+
 class WorkoutWidget;
 class WWPowerScale;
 class WWWBalScale;
@@ -60,7 +62,7 @@ class WorkoutWindow : public GcWindow
         WorkoutWindow(Context *context);
 
         // edit the definition
-        QPlainTextEdit *code;
+        CodeEditor *code;
 
         // workout widget updates these
         QLabel *xlabel, *ylabel;

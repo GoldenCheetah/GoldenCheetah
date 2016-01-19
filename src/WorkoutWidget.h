@@ -36,6 +36,8 @@
 #include <QVector>
 #include <QPainterPath>
 
+#include "../qtsolutions/codeeditor/codeeditor.h"
+
 class ErgFile;
 class WorkoutWindow;
 class WorkoutWidget;
