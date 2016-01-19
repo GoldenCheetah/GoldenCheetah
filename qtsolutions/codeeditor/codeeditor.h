@@ -65,7 +65,7 @@ public:
     void setColors(QColor bg, QColor fg) { lineAreaColor = bg; lineAreaText = fg; }
 
 protected:
-    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    void resizeEvent(QResizeEvent *event);
 
 private slots:
     void updateLineNumberAreaWidth(int newBlockCount);
@@ -85,12 +85,12 @@ public:
         codeEditor = editor;
     }
 
-    QSize sizeHint() const Q_DECL_OVERRIDE {
+    QSize sizeHint() const {
         return QSize(codeEditor->lineNumberAreaWidth(), 0);
     }
 
 protected:
-    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE {
+    void paintEvent(QPaintEvent *event) {
         codeEditor->lineNumberAreaPaintEvent(event);
     }
 
