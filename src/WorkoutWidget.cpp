@@ -1799,6 +1799,11 @@ WorkoutWidget::fromQwkcode(QString code)
     // keep a track of current load and time
     int secs = 0;
     int watts= 0;
+    int index=0;
+
+    // save away
+    codePoints.clear();
+    codeStrings = code.split("\n");
 
     foreach(QString line, code.split("\n")) {
 
@@ -1838,6 +1843,8 @@ WorkoutWidget::fromQwkcode(QString code)
 
         // need a full match, we ignore malformed entries
         if (qwk.exactMatch(line.trimmed())) {
+
+            codePoints << index;
 
             // extract the values to use when adding
             int count, t1, t2, w1, w2, w3, w4;
@@ -1906,20 +1913,28 @@ WorkoutWidget::fromQwkcode(QString code)
 
                 // EFFORT
                 // add a point for starting watts if not already there
-                if (w1 != watts) new WWPoint(this, secs, w1);
+                if (w1 != watts) {
+                    index++;
+                    new WWPoint(this, secs, w1);
+                }
 
                 // end of block
                 secs += t1;
                 watts = w2 > 0 ? w2 : w1;
+                index++;
                 new WWPoint(this, secs, watts);
 
                 // RECOVERY
                 if (t2 > 0) {
-                    if (w3 != watts) new WWPoint(this, secs, w3);
+                    if (w3 != watts) {
+                        index++;
+                        new WWPoint(this, secs, w3);
+                    }
 
                     // end of recovery block
                     secs += t2;
                     watts = w4 >0 ? w4 : w3;
+                    index++;
                     new WWPoint(this,secs,watts);
                 }
             }
