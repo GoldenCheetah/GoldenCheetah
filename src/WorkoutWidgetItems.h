@@ -154,7 +154,7 @@ class WWPoint : public WorkoutWidgetItem {
         bool selected;  // has been selected
         bool selecting; // in the process of being selected (rect tool)
 
-        double x, y;
+        int x, y;
 
     private:
         QRectF bound; // set when we paint
