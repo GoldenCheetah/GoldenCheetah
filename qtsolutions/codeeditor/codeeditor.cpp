@@ -38,7 +38,10 @@
 **
 ****************************************************************************/
 
-#include <QtWidgets>
+#include <QWidget>
+#include <QPlainTextEdit>
+#include <QTextBlock>
+#include <QPainter>
 
 #include "codeeditor.h"
 
@@ -50,10 +53,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     //we manage highlighting within GC, this is not required.
-    //connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
 
     updateLineNumberAreaWidth(0);
-    //highlightCurrentLine();
+    highlightCurrentLine();
 
     lineAreaColor=QColor(Qt::darkGray);
     lineAreaText=QColor(Qt::white);
@@ -114,9 +117,7 @@ void CodeEditor::highlightCurrentLine()
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
-        QColor lineColor = QColor(Qt::yellow).lighter(160);
-
-        selection.format.setBackground(lineColor);
+        selection.format.setBackground(lineAreaColor);
         selection.format.setProperty(QTextFormat::FullWidthSelection, true);
         selection.cursor = textCursor();
         selection.cursor.clearSelection();
