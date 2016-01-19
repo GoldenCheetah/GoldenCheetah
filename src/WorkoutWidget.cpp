@@ -1674,7 +1674,7 @@ WorkoutWidget::qwkcode()
     // just loop through for now doing xx@yy and optionally add rxx
     if (points_.count() == 1) {
         // just a single point?
-        codeStrings << QString("%1@%2").arg(qduration(points_[0]->x)).arg(points_[0]->y, 0, 'f', 0);
+        codeStrings << QString("%1@%2").arg(qduration(points_[0]->x)).arg(points_[0]->y);
         codePoints<<0;
     }
 
@@ -1692,20 +1692,36 @@ WorkoutWidget::qwkcode()
         int duration = points_[i+1]->x - points_[i]->x;
 
         // if duration is 0 its a rise, so move on 1
-        if (duration <=0) continue;
+        if (duration <=0) {
+
+            // we need to keep duplicate time points
+            // for round trip - these are ones that are
+            // between points at the same point in time
+            if (i==0 || points_[i]->x - points_[i-1]->x <= 0) {
+
+                // its a block
+                section = QString("0@%1-%2").arg(points_[i]->y).arg(points_[i+1]->y);
+                ap = points_[i]->y / CP * 100.0f;
+
+            } else {
+
+                // skip!
+                continue;
+            }
+        }
 
         // is it a level or a rise?
         if (doubles_equal(points_[i+1]->y, points_[i]->y)) {
 
             // its a block
-            section = QString("%1@%2").arg(qduration(duration)).arg(points_[i]->y, 0, 'f', 0);
+            section = QString("%1@%2").arg(qduration(duration)).arg(points_[i]->y);
             ap = points_[i]->y / CP * 100.0f;
 
         } else {
             // its a rise
             section = QString("%1@%2-%3").arg(qduration(duration))
-                                         .arg(points_[i]->y, 0, 'f', 0)
-                                         .arg(points_[i+1]->y, 0, 'f', 0);
+                                         .arg(points_[i]->y)
+                                         .arg(points_[i+1]->y);
             ap = ((points_[i]->y + points_[i+1]->y) / 2) / CP * 100.0f;
         }
 
@@ -1725,7 +1741,7 @@ WorkoutWidget::qwkcode()
 
         // if we were above recovery and next is below recovery we have
         // an effort followed by some recovery so join together
-        if ((i < aps.count() -1) && aps[i] > RECOVERY && aps[i+1]<aps[i] && aps[i+1] < RECOVERY) {
+        if ((i < aps.count() -1) && aps[i] > RECOVERY && aps[i+1]<aps[i] && aps[i+1] < RECOVERY && !blocks[i+1].startsWith("0@")) {
             section += "r" + blocks[i+1];
             i++;
         }
