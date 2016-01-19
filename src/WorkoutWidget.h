@@ -220,6 +220,9 @@ class WorkoutWidget : public QWidget
         // qwkcode edited
         void fromQwkcode(QString);
 
+        // user is cursoring through the qwkcode
+        void hoverQwkcode();
+
         // recompute metrics etc
         void recompute(bool editing=false);
 
