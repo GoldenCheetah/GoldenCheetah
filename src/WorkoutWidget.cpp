@@ -838,9 +838,7 @@ WorkoutWidget::setBlockCursor()
 
                         // we have found the line in coreStrings that we
                         // move cursor, the line will be highlighted by the editor
-                        cursor.setPosition(indexin, QTextCursor::MoveAnchor);
-                        cursor.setPosition(indexin + codeStrings[i].length(), QTextCursor::KeepAnchor);
-                        cursor.clearSelection();
+                        cursor.setPosition(indexin + codeStrings[i].length(), QTextCursor::MoveAnchor);
 
                         // move the visible cursor and make visible
                         parent->code->setTextCursor(cursor);
@@ -1786,21 +1784,8 @@ WorkoutWidget::hoverQwkcode()
 {
     if (qwkactive == true) return;
 
-    // create a COPY of the cursor
-    QTextCursor cursor = parent->code->textCursor();
-    cursor.movePosition(QTextCursor::StartOfLine);
-
-    int line = 0;
-    while(cursor.positionInBlock()>0) {
-        cursor.movePosition(QTextCursor::Up);
-        line++;
-    }
-    QTextBlock tblock = cursor.block().previous();
-
-    while(tblock.isValid()) {
-        line += tblock.lineCount();
-        tblock = tblock.previous();
-    }
+    // what line we on then?
+    int line = parent->code->document()->toPlainText().mid(0, parent->code->textCursor().position()).count('\n');
 
     // bounds check
     if (line >= codePoints.count()) return;
