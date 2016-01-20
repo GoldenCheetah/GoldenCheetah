@@ -1802,6 +1802,7 @@ WorkoutWidget::hoverQwkcode()
         tblock = tblock.previous();
     }
 
+    // bounds check
     if (line >= codePoints.count()) return;
 
     // from point to point needs highlighting
@@ -1810,6 +1811,9 @@ WorkoutWidget::hoverQwkcode()
 
     // shared point, usually on a rise
     if (from==to) to=from+1;
+
+    // if not in bound - maybe deleting in editor (?)
+    if (from <0 || from >=points_.count() || to <0 || to >= points_.count()) return;
 
     // lets highlight where the cursor is
     QPointF begin= transform(points_[from]->x, 0);
