@@ -26,6 +26,9 @@
 #include "TrainDB.h"
 #include "ComparePane.h"
 
+#include <QDesktopWidget>
+extern QDesktopWidget *desktop;
+
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_ANALYSIS)
 {
     analSidebar = new AnalysisSidebar(context);
@@ -195,6 +198,10 @@ TrainView::TrainView(Context *context, QStackedWidget *controls) : TabView(conte
     m->addWidget(trainTool->getToolbarButtons());
     trainTool->getToolbarButtons()->show();
     p->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
+
+    // put at bottom of screen
+    QRect screenSize = desktop->availableGeometry();
+    p->move((screenSize.width()/2) - 180, screenSize.height() - 70);
     p->hide();
 
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(onSelectionChanged()));
