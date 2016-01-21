@@ -379,6 +379,9 @@ void ErgFile::parseComputrainer(QString p)
                 QRegExp pname("^DESCRIPTION *", Qt::CaseInsensitive);
                 if (pname.exactMatch(settings.cap(1))) Name = settings.cap(2);
 
+                QRegExp iname("^ERGDBID *", Qt::CaseInsensitive);
+                if (iname.exactMatch(settings.cap(1))) ErgDBId = settings.cap(2);
+
                 QRegExp sname("^SOURCE *", Qt::CaseInsensitive);
                 if (sname.exactMatch(settings.cap(1))) Source = settings.cap(2);
 
@@ -500,6 +503,188 @@ void ErgFile::parseComputrainer(QString p)
     } else {
         valid = false;
     }
+}
+
+bool
+ErgFile::save(QStringList &errors)
+{
+    // save the file including changes
+    // XXX TODO we don't support writing pgmf or CRS just yet...
+    if (filename.endsWith("pgmf") || format == CRS) {
+        errors << QString(QObject::tr("Unsupported file format"));
+        return false;
+    }
+
+    // type
+    QString typestring("UNKNOWN");
+    if (format==ERG) typestring = "ERG";
+    if (format==MRC) typestring = "MRC";
+    if (format==CRS) typestring = "CRS";
+
+    // get CP so we can scale back etc
+    int CP=0;
+    if (context->athlete->zones(false)) {
+        int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
+        if (zonerange >= 0) CP = context->athlete->zones(false)->getCP(zonerange);
+    }
+
+    // MRC and ERG formats are ok
+
+    //
+    // ERG file
+    //
+    if (typestring == "ERG" && format == ERG) {
+
+        // open the file etc
+        QFile f(filename);
+        if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text) == false) {
+            errors << "Unable to open file for writing.";
+            return false;
+        }
+
+        // setup output stream to file
+        QTextStream out(&f);
+        out.setCodec("UTF-8");
+
+        // write the header
+        //
+        // An example header:
+        //
+        // [COURSE HEADER]
+        // FTP=300
+        // SOURCE=ErgDB
+        // ERGDBID=455
+        // VERSION=2
+        // UNITS=ENGLISH
+        // DESCRIPTION=Weston Loop
+        // FILE NAME=weston
+        // MINUTES  WATTS
+        // [END COURSE HEADER]
+        out << "[COURSE HEADER]\n";
+        if (Ftp) out <<"FTP="<<QString("%1").arg(Ftp)<<"\n";
+        if (Source != "") out<<"SOURCE="<<Source<<"\n";
+        if (ErgDBId != "") out<<"ERGDBID="<<ErgDBId<<"\n";
+        if (Version != "") out<<"VERSION="<<Version<<"\n";
+        if (Units != "") out<<"UNITS="<<Units<<"\n";
+        if (Name != "") out<<"DESCRIPTION="<<Name<<"\n";
+        if (Filename != "") out<<"FILENAME="<<Filename<<"\n";
+        out << "MINUTES WATTS\n";
+        out << "[END COURSE HEADER]\n";
+
+        //
+        // Write the line items
+        //
+        // IMPORTANT: if FTP is set then the contents
+        //            were scaled to local FTP when read
+        //            so need to be scaled back to FTP=xxx
+        //            when writing out.
+        out << "[COURSE DATA]\n";
+
+        bool first=true;
+        foreach(ErgFilePoint p, Points) {
+
+            // output
+            int watts = p.y;
+            double minutes = double(p.x) / (1000.0f*60.0f);
+
+            // we scale back if needed
+            if (Ftp && CP) watts = (double(p.y)/CP) * Ftp;
+
+            if (first) {
+                first=false;
+
+                // doesn't start at 0!
+                if (p.x > 0) {
+                    out <<QString("%1    %2\n").arg(0.0f, 0, 'f', 2).arg(watts);
+                }
+            }
+
+            // output in minutes and watts
+            out <<QString("%1    %2\n").arg(minutes, 0, 'f', 2).arg(watts);
+        }
+
+        out << "[END COURSE DATA]\n";
+        f.close();
+
+    }
+
+    //
+    // MRC
+    //
+    if (typestring == "MRC" && format == MRC) {
+
+        // open the file etc
+        QFile f(filename);
+        if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text) == false) {
+            errors << "Unable to open file for writing.";
+            return false;
+        }
+
+        // setup output stream to file
+        QTextStream out(&f);
+        out.setCodec("UTF-8");
+
+        // write the header
+        //
+        // An example header:
+        //
+        // [COURSE HEADER]
+        // FTP=300
+        // SOURCE=ErgDB
+        // ERGDBID=455
+        // VERSION=2
+        // UNITS=ENGLISH
+        // DESCRIPTION=Weston Loop
+        // FILE NAME=weston
+        // MINUTES  WATTS
+        // [END COURSE HEADER]
+        out << "[COURSE HEADER]\n";
+        if (Source != "") out<<"SOURCE="<<Source<<"\n";
+        if (ErgDBId != "") out<<"ERGDBID="<<ErgDBId<<"\n";
+        if (Version != "") out<<"VERSION="<<Version<<"\n";
+        if (Units != "") out<<"UNITS="<<Units<<"\n";
+        if (Name != "") out<<"DESCRIPTION="<<Name<<"\n";
+        if (Filename != "") out<<"FILENAME="<<Filename<<"\n";
+        out << "MINUTES PERCENT\n";
+        out << "[END COURSE HEADER]\n";
+
+        //
+        // Write the line items
+        //
+        // IMPORTANT: if FTP is set then the contents
+        //            were scaled to local FTP when read
+        //            so need to be scaled back to FTP=xxx
+        //            when writing out.
+        out << "[COURSE DATA]\n";
+
+        bool first=true;
+        foreach(ErgFilePoint p, Points) {
+
+            // output watts as a percent of CP
+            double watts = p.y;
+            double minutes = double(p.x) / (1000.0f*60.0f);
+
+            // we scale back if needed
+            if (CP) watts = (double(p.y)/CP) * 100.0f;
+
+            if (first) {
+                first=false;
+
+                // doesn't start at 0!
+                if (p.x > 0) {
+                    out <<QString("%1    %2\n").arg(0.0f, 0, 'f', 2).arg(watts, 0, 'f', 0);
+                }
+            }
+
+            // output in minutes and watts percent with no precision
+            out <<QString("%1    %2\n").arg(minutes, 0, 'f', 2).arg(watts, 0, 'f', 0);
+        }
+
+        out << "[END COURSE DATA]\n";
+        f.close();
+
+    }
+    return true;
 }
 
 ErgFile::~ErgFile()

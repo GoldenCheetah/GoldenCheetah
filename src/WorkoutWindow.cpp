@@ -182,7 +182,6 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     saveAct->setEnabled(false);
     undoAct->setEnabled(false);
     redoAct->setEnabled(false);
-    configChanged(CONFIG_APPEARANCE);
 
     // watch for erg run/stop
     connect(context, SIGNAL(start()), this, SLOT(start()));
@@ -191,6 +190,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // text changed
     connect(code, SIGNAL(textChanged()), this, SLOT(qwkcodeChanged()));
     connect(code, SIGNAL(cursorPositionChanged()), workout, SLOT(hoverQwkcode()));
+
+    // set the widgets etc
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
@@ -227,7 +229,7 @@ WorkoutWindow::configChanged(qint32)
     // maximum of 20 characters per line ?
     QFont f;
     QFontMetrics ff(f);
-    code->setFixedWidth(ff.width("99x999s@999-999r999s@999-999"));
+    code->setFixedWidth(ff.boundingRect("99x999s@999-999r999s@999-999").width()+20);
 
     // text edit colors
     QPalette palette;
@@ -254,7 +256,7 @@ WorkoutWindow::configChanged(qint32)
 void
 WorkoutWindow::saveFile()
 {
-    qDebug()<<"SAVE ASKED FOR";
+    workout->save();
 }
 
 void
