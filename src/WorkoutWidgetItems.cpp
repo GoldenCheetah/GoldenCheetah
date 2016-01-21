@@ -1146,3 +1146,18 @@ void PasteCommand::redo()
         workoutWidget()->setMaxX(workoutWidget()->points().last()->x);
 
 }
+
+QWKCommand::QWKCommand(WorkoutWidget *w, QString before, QString after)
+  : WorkoutWidgetCommand(w), before(before), after(after) {}
+
+void
+QWKCommand::redo()
+{
+    workoutWidget()->apply(after);
+}
+
+void
+QWKCommand::undo()
+{
+    workoutWidget()->apply(before);
+}
