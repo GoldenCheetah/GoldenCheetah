@@ -1898,6 +1898,25 @@ WorkoutWidget::fromQwkcode(QString code)
 {
     if (qwkactive == true) return;
 
+    // what it look like before?
+    QString before=qwkcode();
+
+    // apply ..
+    apply(code);
+
+    QString after=qwkcode();
+
+    // did anything materially change?
+    if (after != before) {
+        new QWKCommand(this, before, after);
+    }
+}
+
+
+void
+WorkoutWidget::apply(QString code)
+{
+
     // clear points etc
     state = none;
     dragging = NULL;
@@ -2052,7 +2071,6 @@ WorkoutWidget::fromQwkcode(QString code)
             }
         }
     }
-
     // recompute but critically don't redo qwkcode
     recompute(true);
 

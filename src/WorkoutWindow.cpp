@@ -170,6 +170,8 @@ WorkoutWindow::WorkoutWindow(Context *context) :
 
     // editing the code...
     code = new CodeEditor(this);
+    code->setContextMenuPolicy(Qt::NoContextMenu); // no context menu
+    code->installEventFilter(this); // filter the undo/redo stuff
     code->hide();
 
     // WATTS and Duration for the cursor
@@ -251,6 +253,43 @@ WorkoutWindow::configChanged(qint32)
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
     code->setPalette(palette);
     repaint();
+}
+
+bool
+WorkoutWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    bool returning=false;
+
+    // we only filter out keyboard shortcuts for undo redo etc
+    // in the qwkcode editor, anything else is of no interest.
+    if (obj != code) return returning;
+
+    if (event->type() == QEvent::KeyPress) {
+
+        // we care about cmd / ctrl
+        Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(event)->modifiers();
+        bool ctrl = (kmod & Qt::ControlModifier) != 0;
+
+        switch(static_cast<QKeyEvent*>(event)->key()) {
+
+        case Qt::Key_Y:
+            if (ctrl) {
+                workout->redo();
+                returning = true; // we grab all key events
+            }
+            break;
+
+        case Qt::Key_Z:
+            if (ctrl) {
+                workout->undo();
+                returning=true;
+            }
+            break;
+
+        }
+
+    }
+    return returning;
 }
 
 void

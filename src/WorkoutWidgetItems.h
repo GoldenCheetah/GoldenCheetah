@@ -421,4 +421,17 @@ class PasteCommand : public WorkoutWidgetCommand
         QList<PointMemento> points;
 };
 
+class QWKCommand : public WorkoutWidgetCommand
+{
+    public:
+
+        QWKCommand(WorkoutWidget *w, QString before, QString after);
+
+        void redo();
+        void undo();
+
+    private:
+        QString before, after;
+};
+
 #endif // _GC_WorkoutWidgetItems_h

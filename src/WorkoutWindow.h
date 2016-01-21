@@ -96,6 +96,9 @@ class WorkoutWindow : public GcWindow
         // show hide toolbar if too small
         void resizeEvent(QResizeEvent * event);
 
+    protected:
+        bool eventFilter(QObject *obj, QEvent *event);
+
     private:
 
         Context *context;

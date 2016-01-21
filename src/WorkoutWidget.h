@@ -222,6 +222,7 @@ class WorkoutWidget : public QWidget
 
         // qwkcode edited
         void fromQwkcode(QString);
+        void apply(QString);
 
         // user is cursoring through the qwkcode
         void hoverQwkcode();
