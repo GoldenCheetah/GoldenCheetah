@@ -29,6 +29,7 @@
 
 #include "TimeUtils.h" // time_to_string()
 
+#include <QMessageBox>
 #include <QFontMetrics>
 #include <QRegExp>
 
@@ -1385,7 +1386,7 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
     points_.clear();
 
     // we suport ERG but not MRC/CRS currently
-    if (ergFile && ergFile->format == ERG) {
+    if (ergFile && (ergFile->format == MRC || ergFile->format == ERG)) {
 
         this->ergFile = ergFile;
 
@@ -1415,6 +1416,66 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
 
     // repaint
     repaint();
+}
+
+void
+WorkoutWidget::save()
+{
+    // if nothing doing don't save
+    if (stackptr <= 0) return;
+
+    // no ergfile?
+    if (ergFile == NULL) {
+        //XXX nothing for now - will need Save as...
+        return;
+    }
+
+    //
+    // IN CORE
+    //
+    // replace all the points - they are scaled to local CP
+    // so do not need to be scaled back, that happens when
+    // they are read/written to file on disk
+    ergFile->Points.clear();
+    ergFile->Duration = 0;
+    foreach(WWPoint *p, points_) {
+        ergFile->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
+        ergFile->Duration = p->x * 1000; // whatever the last is
+    }
+
+    // force any other plots to take the changes
+    context->notifyErgFileSelected(ergFile);
+
+    //
+    // SAVE
+    //
+    QStringList errors;
+    if (ergFile->save(errors) == false) {
+
+        // save failed :(
+        //
+        // likely caused by unsupported format
+        QMessageBox msgBox;
+        msgBox.setText(tr("File save failed."));
+        msgBox.setInformativeText(errors.join("."));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+
+    } else {
+
+        // if it succeeds then reset stuff
+        foreach (WorkoutWidgetCommand *p, stack) delete p;
+        stack.clear();
+        stackptr = 0;
+        parent->saveAct->setEnabled(false);
+        parent->undoAct->setEnabled(false);
+        parent->redoAct->setEnabled(false);
+
+    }
+
+    return;
 }
 
 void

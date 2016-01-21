@@ -217,6 +217,9 @@ class WorkoutWidget : public QWidget
         // and erg file was selected
         void ergFileSelected(ErgFile *);
 
+        // save or save as (when erfile is NULL)
+        void save();
+
         // qwkcode edited
         void fromQwkcode(QString);
 

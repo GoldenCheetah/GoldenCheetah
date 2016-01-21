@@ -73,6 +73,8 @@ class ErgFile
 
         ~ErgFile();             // delete the contents
 
+        bool save(QStringList &errors); // save back, with changes
+
         static ErgFile *fromContent(QString, Context *); // read from memory
         static bool isWorkout(QString); // is this a supported workout?
 
@@ -91,6 +93,7 @@ class ErgFile
                 Filename,       // filename from inside file
                 filename,       // filename on disk
                 Name,           // description in file
+                ErgDBId,        // if downloaded from ergdb
                 Source;         // where did this come from
                 
         long    Duration;       // Duration of this workout in msecs
