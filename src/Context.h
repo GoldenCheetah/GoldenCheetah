@@ -26,6 +26,10 @@
 #include "CompareDateRange.h" // what intervals are being compared?
 #include "RideFile.h"
 
+#ifdef GC_HAS_CLOUD_DB
+#include "CloudDBChart.h"
+#endif
+
 // when config changes we need to notify widgets what changed
 // but there is so much config these days we need to be a little
 // more specific, not too specific since we would have a million
@@ -107,6 +111,11 @@ class Context : public QObject
 
         bool isCompareDateRanges;
         QList<CompareDateRange> compareDateRanges;
+
+#ifdef GC_HAS_CLOUD_DB
+        // CloudDB - common data
+        CloudDBChartListDialog *cdbChartListDialog;
+#endif
 
     public slots:
 

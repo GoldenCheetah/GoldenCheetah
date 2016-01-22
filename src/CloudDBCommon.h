@@ -79,11 +79,14 @@ public:
     static QList<QString> cloudDBLangsIds;
     static QList<QString> cloudDBLangs;
     static QString cloudDBTimeFormat;
-    static const int APIresponseOk = 200;
+    static const int APIresponseOk = 200; // also used in case of 204 (No Content)
     static const int APIresponseCreated = 201;
     static const int APIresponseForbidden = 403;
     static const int APIresponseOverQuota = 503;
     static const int APIresponseOthers = 999;
+
+    enum userRole { UserImport, UserEdit, CuratorEdit };
+    typedef enum userRole UserRole;
 
 };
 
