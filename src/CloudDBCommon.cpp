@@ -23,7 +23,7 @@ CloudDBAcceptConditionsDialog::CloudDBAcceptConditionsDialog(QString athlete) : 
 {
 
     setWindowTitle(QString(tr("GoldenCheetah CloudDB - Terms and Conditions")));
-    this->setMinimumWidth(550);
+    setMinimumWidth(550);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 

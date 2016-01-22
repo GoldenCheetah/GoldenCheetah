@@ -29,6 +29,9 @@
 #include "RideItem.h"
 #include "TimeUtils.h"
 #include "DragBar.h"
+#ifdef GC_HAS_CLOUD_DB
+#include "CloudDBChart.h"
+#endif
 
 #ifdef Q_OS_MAC
 // What versions are supported by this SDK?
@@ -45,6 +48,7 @@ class QtSegmentControl;
 class SaveSingleDialogWidget;
 class ChooseCyclistDialog;
 class SearchFilterBox;
+
 
 class MainWindow;
 class Athlete;
@@ -208,6 +212,11 @@ class MainWindow : public QMainWindow
         // autoload rides from athlete specific directory (preferences)
         void ridesAutoImport();
 
+#ifdef GC_HAS_CLOUD_DB
+        // CloudDB actions
+        void cloudDBuserEditChart();
+        void cloudDBcuratorEditChart();
+#endif
         // save and restore state to context
         void saveGCState(Context *);
         void restoreGCState(Context *);
