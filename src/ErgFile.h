@@ -29,6 +29,7 @@
 #include <QStringList>
 #include <QFile>
 #include <QTextStream>
+#include <QTextEdit>
 #include <QRegExp>
 #include "Zones.h"      // For zones ... see below vvvv
 
@@ -54,6 +55,16 @@ class ErgFilePoint
         double y;     // y axis - load in watts or altitude
 
         double val;   // the value to send to the device (watts/gradient)
+};
+
+class ErgFileSection
+{
+    public:
+        ErgFileSection() : duration(0), start(0), end(0) {}
+        ErgFileSection(int duration, int start, int end) : duration(duration), start(start), end(end) {}
+
+        int duration;
+        double start, end;
 };
 
 class ErgFileText
@@ -102,13 +113,19 @@ class ErgFile
         double gradientAt(long, int&);      // return the gradient value for the passed meter
         int nextLap(long);      // return the msecs value for the next Lap marker
 
+        // turn the ergfile into a series of sections rather
+        // than a list of points
+        QList<ErgFileSection> Sections();
+
         QString Version,        // version number / identifer
                 Units,          // units used
                 Filename,       // filename from inside file
                 filename,       // filename on disk
                 Name,           // description in file
+                Description,    // long narrative for workout
                 ErgDBId,        // if downloaded from ergdb
                 Source;         // where did this come from
+        QStringList Tags;       // tagged strings
                 
         long    Duration;       // Duration of this workout in msecs
         int     Ftp;            // FTP this file was targetted at
@@ -120,6 +137,7 @@ class ErgFile
 
         QList<ErgFilePoint> Points;    // points in workout
         QList<ErgFileLap>   Laps;      // interval markers in the file
+        QList<ErgFileText>  Texts;     // texts to display
 
         void calculateMetrics(); // calculate NP value for ErgFile
 

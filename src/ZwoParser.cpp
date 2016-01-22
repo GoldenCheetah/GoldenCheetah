@@ -70,6 +70,12 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
         int from = 100.0 * PowerLow;
         int to = 100.0 * PowerHigh;
 
+        // some kind of old kludge, should be flat, but isn't always
+        if (qName == "SteadyState") {
+            int ap = (from+to) / 2;
+            from = to = ap;
+        }
+
         if (qName == "Freeride") {
             if (watts == 0) from = to = 70;
             else from = to = watts; // whatever we were just doing keep doing it
