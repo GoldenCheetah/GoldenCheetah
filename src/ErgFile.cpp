@@ -48,7 +48,7 @@ bool ErgFile::isWorkout(QString name)
     }
     return false;
 }
-ErgFile::ErgFile(QString filename, int &mode, Context *context) : 
+ErgFile::ErgFile(QString filename, int &mode, Context *context) :
     filename(filename), context(context), mode(mode)
 {
     if (context->athlete->zones(false)) {
@@ -84,7 +84,7 @@ void ErgFile::reload()
     if (filename.endsWith(".pgmf", Qt::CaseInsensitive)) parseTacx();
     else if (filename.endsWith(".zwo", Qt::CaseInsensitive)) parseZwift();
     else parseComputrainer();
-    
+
 }
 
 void ErgFile::parseZwift()
@@ -112,6 +112,13 @@ void ErgFile::parseZwift()
     xmlReader.setErrorHandler(&handler);
     xmlReader.parse(source);
 
+    // save the metadata into our fields
+    // we lose category and category index (for now)
+    Name=handler.name;
+    Description=handler.description;
+    Source=handler.author;
+    Tags=handler.tags;
+
     // extract contents into ErgFile....
     // each watts value is in percent terms so apply CP
     // and put into out format
@@ -119,7 +126,11 @@ void ErgFile::parseZwift()
         double watts = p.y * CP / 100.0;
         Points << ErgFilePoint(p.x, watts, watts);
     }
-    valid = true;
+
+    // texts
+    Texts = handler.texts;
+
+    if (Points.count()) valid = true;
 }
 
 void ErgFile::parseTacx()
@@ -245,7 +256,7 @@ void ErgFile::parseTacx()
                         if (sizeof(program) != input.readRawData((char*)&program, sizeof(program))) {
                             happy = false;
                             break;
-                        } 
+                        }
 
                         ErgFilePoint add;
 
@@ -433,7 +444,7 @@ void ErgFile::parseComputrainer(QString p)
                     Units = settings.cap(2);
                     // UNITS can be ENGLISH or METRIC (miles/km)
                     QRegExp penglish(" ENGLISH$", Qt::CaseInsensitive);
-                    if (penglish.exactMatch(Units)) { // Units <> METRIC 
+                    if (penglish.exactMatch(Units)) { // Units <> METRIC
                       //qDebug("Setting conversion to ENGLISH");
                       bIsMetric = false;
                     }
@@ -548,12 +559,53 @@ void ErgFile::parseComputrainer(QString p)
     }
 }
 
+// convert points to set of sections
+QList<ErgFileSection>
+ErgFile::Sections()
+{
+    QList<ErgFileSection> returning;
+
+    int secs=0;
+    for(int i=0; i<Points.count(); i++) {
+
+        // add a section from 0 to here if not starting at zero
+        if (i==0 && Points[i].x > 0) {
+            returning << ErgFileSection(Points[i].x, Points[i].y, Points[i].y);
+        }
+
+        // first section
+        if (i+1 < Points.count() && Points[i+1].x > Points[i].x) {
+            returning << ErgFileSection(Points[i+1].x-secs, Points[i].y, Points[i+1].y);
+            secs= Points[i+1].x;
+        }
+    }
+    return returning;
+}
+
+// when writing xml...
+static QString xmlprotect(QString string)
+{
+    QTextEdit trademark("&#8482;"); // process html encoding of(TM)
+    QString tm = trademark.toPlainText();
+
+    QString s = string;
+    s.replace( tm, "&#8482;" );
+    s.replace( "&", "&amp;" );
+    s.replace( ">", "&gt;" );
+    s.replace( "<", "&lt;" );
+    s.replace( "\"", "&quot;" );
+    s.replace( "\'", "&apos;" );
+    s.replace( "\n", "\\n" );
+    s.replace( "\r", "\\r" );
+    return s;
+}
+
 bool
 ErgFile::save(QStringList &errors)
 {
     // save the file including changes
     // XXX TODO we don't support writing pgmf or CRS just yet...
-    if (filename.endsWith("pgmf") || format == CRS) {
+    if (filename.endsWith("pgmf", Qt::CaseInsensitive) || format == CRS) {
         errors << QString(QObject::tr("Unsupported file format"));
         return false;
     }
@@ -563,6 +615,7 @@ ErgFile::save(QStringList &errors)
     if (format==ERG) typestring = "ERG";
     if (format==MRC) typestring = "MRC";
     if (format==CRS) typestring = "CRS";
+    if (filename.endsWith("zwo", Qt::CaseInsensitive)) typestring="ZWO";
 
     // get CP so we can scale back etc
     int CP=0;
@@ -726,6 +779,106 @@ ErgFile::save(QStringList &errors)
         out << "[END COURSE DATA]\n";
         f.close();
 
+    }
+
+    if (typestring == "ZWO" && format == ERG) {
+
+        // open the file etc
+        QFile f(filename);
+        if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text) == false) {
+            errors << "Unable to open file for writing.";
+            return false;
+        }
+
+        // setup output stream to file
+        QTextStream out(&f);
+        out.setCodec("UTF-8");
+
+        out << "<workout_file>\n";
+
+        // metadata at top
+        if (Name != "") out << "    <name>"<<xmlprotect(Name)<<"</name>\n";
+        if (Source != "") out << "    <author>"<<xmlprotect(Source)<<"</author>\n";
+        if (Description != "") out << "    <description>"<<xmlprotect(Description)<<"</description>\n";
+        if (Tags.count()) {
+            out << "    <tags>\n";
+            foreach(QString tag, Tags)
+                out << "        <tag>"<<xmlprotect(tag)<<"</tag>\n";
+            out << "    </tags>\n";
+        }
+
+        // workout
+        // We can write three types of sections
+        // a) Warmup where power rises
+        // b) SteadyState where power is constant
+        // c) Cooldown where port drops
+        // d) IntervalsT where intervals are repeated (N x effort then recovery)
+        //
+        // we do not write the fifth kind of section since we don't support them
+        // e) Freeride where the user can do whatever they please...
+        //
+        // interspersed with the data will be texts that are displayed
+        //
+        // alll watts are factors to apply to CP - where 1.0 is CP 0.5 is 50%.
+        // the data in memory has been scaled to CP so we need to divide it by
+        // CP to get the values to write to disk
+
+        // lets work in sections not points
+        // this means we work with duration/power rather than
+        // individual points, which is how the ZWO file is constructed
+
+        out << "    <workout>\n";
+        QList<ErgFileSection> sections = Sections();
+        for(int i=0; i<sections.count(); i++) {
+
+            // are there repeated sections of efforts and recovery?
+            int count=0;
+            for(int j=2; (i+j+1) < sections.count(); j += 2) {
+                if (sections[i].duration == sections[i+j].duration &&
+                    sections[i].start == sections[i+j].start &&
+                    sections[i].end == sections[i+j].end &&
+                    sections[i+1].duration == sections[i+j+1].duration &&
+                    sections[i+1].start == sections[i+j+1].start &&
+                    sections[i+1].end == sections[i+j+1].end) {
+                    count++;
+                } else {
+                    break;
+                }
+            }
+
+            if (count) {
+
+                // not including this one there are a number of repeats, so we need to output
+                // an IntervalsT element to repeat on/off intervals
+                out << "        <IntervalsT Repeat=\""<<(count+1)<<"\" "
+                    << "OnDuration=\"" << sections[i].duration/1000 << "\" "
+                    << "OffDuration=\"" << sections[i+1].duration/1000 << "\" "
+                    << "PowerOnLow=\"" << sections[i].start/CP << "\" "
+                    << "PowerOnHigh=\"" << sections[i].end/CP << "\" "
+                    << "PowerOffLow=\"" << sections[i+1].start/CP << "\" "
+                    << "PowerOffHigh=\"" << sections[i+1].end/CP << "\" />\n";
+
+                // skip on, bearing in mind the main loop increases i by 1
+                i += 1 + (count*2);
+
+            } else {
+
+                QString tag;
+
+                // just a section, but is it SteadyState, Warmup or Cooldown
+                if (sections[i].start == sections[i].end) tag = "SteadyState";
+                else if (sections[i].start >  sections[i].end) tag = "Cooldown";
+                else if (sections[i].start <  sections[i].end) tag = "Warmup";
+
+                out << "        <" << tag << " Duration=\""<<sections[i].duration/1000 << "\" "
+                                  << "PowerLow=\"" <<sections[i].start/CP << "\" "
+                                  << "PowerHigh=\"" <<sections[i].end/CP << "\" />\n";
+
+            }
+        }
+        out << "    </workout>\n";
+        out << "</workout_file>\n";
+        f.close();
     }
     return true;
 }
