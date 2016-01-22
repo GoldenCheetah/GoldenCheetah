@@ -56,6 +56,17 @@ class ErgFilePoint
         double val;   // the value to send to the device (watts/gradient)
 };
 
+class ErgFileText
+{
+    public:
+        ErgFileText() : x(0), pos(0), text("") {}
+        ErgFileText(double x, int pos, QString text) : x(x), pos(pos), text(text) {}
+
+        double x;
+        int pos;
+        QString text;
+};
+
 class ErgFileLap
 {
     public:
@@ -79,8 +90,11 @@ class ErgFile
         static bool isWorkout(QString); // is this a supported workout?
 
         void reload();          // reload after messed about
+
         void parseComputrainer(QString p = ""); // its an erg,crs or mrc file
         void parseTacx();         // its a pgmf file
+        void parseZwift();         // its a zwo file (zwift xml)
+
         bool isValid();         // is the file valid or not?
         double Cp;
         int format;             // ERG, CRS or MRC currently supported

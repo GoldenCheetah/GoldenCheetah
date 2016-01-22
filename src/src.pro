@@ -779,7 +779,8 @@ HEADERS  += \
         WorkoutWizard.h \
         WPrime.h \
         ZoneScaleDraw.h \
-        Zones.h
+        Zones.h \
+        ZwoParser.h
 
 
 ###=============
@@ -1047,7 +1048,8 @@ SOURCES += \
         WorkoutWindow.cpp \
         WorkoutWizard.cpp \
         WPrime.cpp \
-        Zones.cpp
+        Zones.cpp \
+        ZwoParser.cpp
 
 
 ###======================================
