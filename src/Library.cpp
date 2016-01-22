@@ -258,7 +258,7 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
 
     searcher = NULL;
 
-    findWorkouts = new QCheckBox(tr("Workout files (.erg, .mrc etc)"), this);
+    findWorkouts = new QCheckBox(tr("Workout files (.erg, .mrc, .zwo etc)"), this);
     findWorkouts->setChecked(true);
     findMedia = new QCheckBox(tr("Video files (.mp4, .avi etc)"), this);
     findMedia->setChecked(true);

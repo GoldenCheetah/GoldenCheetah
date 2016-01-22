@@ -19,6 +19,12 @@
 #include "ErgFile.h"
 #include "Athlete.h"
 
+// Zwift XML handing
+#include "ZwoParser.h"
+#include <QFile>
+#include <QXmlInputSource>
+#include <QXmlSimpleReader>
+
 #include <stdint.h>
 #include "Units.h"
 
@@ -30,6 +36,7 @@ static bool setSupported()
     ::supported << ".mrc";
     ::supported << ".crs";
     ::supported << ".pgmf";
+    ::supported << ".zwo";
     return true;
 }
 static bool isinit = setSupported();
@@ -75,8 +82,44 @@ void ErgFile::reload()
     // which parser to call? NOTE: we should look at moving to an ergfile factory
     // like we do with ride files if we end up with lots of different formats
     if (filename.endsWith(".pgmf", Qt::CaseInsensitive)) parseTacx();
+    else if (filename.endsWith(".zwo", Qt::CaseInsensitive)) parseZwift();
     else parseComputrainer();
     
+}
+
+void ErgFile::parseZwift()
+{
+    // Initialise
+    Version = "";
+    Units = "";
+    Filename = "";
+    Name = "";
+    Duration = -1;
+    Ftp = 0;            // FTP this file was targetted at
+    MaxWatts = 0;       // maxWatts in this ergfile (scaling)
+    valid = false;             // did it parse ok?
+    rightPoint = leftPoint = 0;
+    format = ERG; // default to couse until we know
+    Points.clear();
+    Laps.clear();
+
+    // parse the file
+    QFile zwo(filename);
+    QXmlInputSource source(&zwo);
+    QXmlSimpleReader xmlReader;
+    ZwoParser handler;
+    xmlReader.setContentHandler(&handler);
+    xmlReader.setErrorHandler(&handler);
+    xmlReader.parse(source);
+
+    // extract contents into ErgFile....
+    // each watts value is in percent terms so apply CP
+    // and put into out format
+    foreach(ErgFilePoint p, handler.points) {
+        double watts = p.y * CP / 100.0;
+        Points << ErgFilePoint(p.x, watts, watts);
+    }
+    valid = true;
 }
 
 void ErgFile::parseTacx()
