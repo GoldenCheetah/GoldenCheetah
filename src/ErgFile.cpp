@@ -663,7 +663,7 @@ ErgFile::save(QStringList &errors)
         if (Version != "") out<<"VERSION="<<Version<<"\n";
         if (Units != "") out<<"UNITS="<<Units<<"\n";
         if (Name != "") out<<"DESCRIPTION="<<Name<<"\n";
-        if (Filename != "") out<<"FILENAME="<<Filename<<"\n";
+        if (Filename != "") out<<"FILE NAME="<<Filename<<"\n";
         out << "MINUTES WATTS\n";
         out << "[END COURSE HEADER]\n";
 
@@ -740,7 +740,7 @@ ErgFile::save(QStringList &errors)
         if (Version != "") out<<"VERSION="<<Version<<"\n";
         if (Units != "") out<<"UNITS="<<Units<<"\n";
         if (Name != "") out<<"DESCRIPTION="<<Name<<"\n";
-        if (Filename != "") out<<"FILENAME="<<Filename<<"\n";
+        if (Filename != "") out<<"FILE NAME="<<Filename<<"\n";
         out << "MINUTES PERCENT\n";
         out << "[END COURSE HEADER]\n";
 
