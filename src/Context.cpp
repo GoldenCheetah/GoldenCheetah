@@ -37,6 +37,10 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
     isfiltered = ishomefiltered = false;
     isCompareIntervals = isCompareDateRanges = false;
 
+#ifdef GC_HAS_CLOUD_DB
+    cdbChartListDialog = NULL;
+#endif
+
     _contexts.append(this);
 }
 

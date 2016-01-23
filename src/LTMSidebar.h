@@ -30,6 +30,7 @@
 #include "SearchFilterBox.h"
 
 #ifdef GC_HAS_CLOUD_DB
+#include "CloudDBCommon.h"
 #include "CloudDBChart.h"
 #endif
 
@@ -148,10 +149,6 @@ class LTMSidebar : public QWidget
         // filter state
         bool isqueryfilter, isautofilter;
         QStringList autoFilterFiles, queryFilterFiles;
-
-#ifdef GC_HAS_CLOUD_DB
-        CloudDBChartImportDialog cdbChartImportDialog;
-#endif
 
 };
 
