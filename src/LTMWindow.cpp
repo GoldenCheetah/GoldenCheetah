@@ -1306,8 +1306,7 @@ LTMWindow::shareConfig()
     chart.Header.Deleted = false;
 
     // now complete the chart with for the user manually added fields
-    CloudDBChartPublishDialog dialog(chart, context->athlete->cyclist);
-    dialog.setModal(true);
+    CloudDBChartObjectDialog dialog(chart, context->athlete->cyclist);
     if (dialog.exec() == QDialog::Accepted) {
         CloudDBChartClient c;
         int r = c.postChart(dialog.getChart());

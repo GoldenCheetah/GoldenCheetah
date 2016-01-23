@@ -110,6 +110,13 @@
 #include "WFApi.h"
 #endif
 
+// CloudDB
+#ifdef GC_HAS_CLOUD_DB
+#include "CloudDBCommon.h"
+#include "CloudDBChart.h"
+#endif
+
+
 // We keep track of all theopen mainwindows
 QList<MainWindow *> mainwindows;
 QDesktopWidget *desktop = NULL;
@@ -678,6 +685,13 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), tr (""));
 
+#ifdef GC_HAS_CLOUD_DB
+    // CloudDB options
+    optionsMenu->addSeparator();
+    QMenu *cloudDBMenu = optionsMenu->addMenu(tr("CloudDB Charts"));
+    cloudDBMenu->addAction(tr("Maintain my contributions"), this, SLOT(cloudDBuserEditChart()));
+    cloudDBMenu->addAction(tr("Curate user contributions"), this, SLOT(cloudDBcuratorEditChart()));
+#endif
     HelpWhatsThis *optionsMenuHelp = new HelpWhatsThis(optionsMenu);
     optionsMenu->setWhatsThis(optionsMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Tools));
 
@@ -2279,3 +2293,41 @@ MainWindow::searchFocusOut()
 {
     searchBox->setFixedWidth(150);
 }
+
+#ifdef GC_HAS_CLOUD_DB
+void
+MainWindow::cloudDBuserEditChart()
+{
+    if (!(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(currentTab->context->athlete->cyclist);
+       acceptDialog.setModal(true);
+       if (acceptDialog.exec() == QDialog::Rejected) {
+          return;
+       };
+    }
+
+    if (currentTab->context->cdbChartListDialog == NULL) {
+        currentTab->context->cdbChartListDialog = new CloudDBChartListDialog();
+    }
+
+    // force refresh in prepare to allways get the latest data here
+    if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::UserEdit)) {
+        currentTab->context->cdbChartListDialog->exec(); // no action when closed
+    }
+}
+
+void
+MainWindow::cloudDBcuratorEditChart()
+{
+    if (currentTab->context->cdbChartListDialog == NULL) {
+        currentTab->context->cdbChartListDialog = new CloudDBChartListDialog();
+    }
+
+    // force refresh in prepare to allways get the latest data here
+    if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
+        currentTab->context->cdbChartListDialog->exec(); // no action when closed
+    }
+}
+
+#endif
+
