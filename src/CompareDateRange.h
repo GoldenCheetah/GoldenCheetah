@@ -35,6 +35,7 @@ class CompareDateRange
         ~CompareDateRange();
 
         Context *context;
+        QStringList filters;
         QString name;
         QColor color;
         Specification specification;
