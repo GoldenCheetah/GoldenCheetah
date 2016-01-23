@@ -96,6 +96,11 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
         hr = 0.0;
         lat = 0.0;
         lon = 0.0;
+        lrbalance = 0.0;
+        lte = 0.0;
+        rte = 0.0;
+        lps = 0.0;
+        rps = 0.0;
         badgps = false;
         //alt = 0.0; // TCX from FIT files have not alt point for each trackpoint
         distance = -1;  // nh - we set this to -1 so we can detect if there was a distance in the trackpoint.
@@ -120,6 +125,11 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
     else if (qName == "RunCadence" || qName.endsWith( ":RunCadence")) { rcad = buffer.toDouble(); } //TCX Extension Fields may use a namespace prefix
     else if (qName == "Value") { hr = buffer.toDouble(); }
     else if (qName == "Cadence") { cadence = buffer.toDouble(); }
+    else if (qName == "PedalPower") { lrbalance = buffer.toDouble(); }
+    else if (qName == "TorqueEffLeft") { lte = buffer.toDouble(); }
+    else if (qName == "TorqueEffRight") { rte = buffer.toDouble(); }
+    else if (qName == "PedalSmoothLeft") { lps = buffer.toDouble(); }
+    else if (qName == "PedalSmoothRight") { rps = buffer.toDouble(); }
     else if (qName == "AltitudeMeters") {
         // on Suunto TCX files there are lots of 0 values between valid ones, skip these
         if (buffer.toDouble() != 0) {
@@ -185,8 +195,9 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
             // first point
             rideFile->appendPoint(secs, cadence, hr, distance, speed, torque,
-                                  power, alt, lon, lat, headwind, 0.0, RideFile::NA, 0.0, 
-                                  0.0,0.0,0.0,0.0,0.0,0.0,
+                                  power, alt, lon, lat, headwind, 0.0, RideFile::NA, lrbalance,
+                                  lte,rte,lps,rps,
+                                  0.0,0.0,
                                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                   0.0,rcad,0.0, // no running dynamics in the schema ?
                                   0.0, //tcore
@@ -207,6 +218,11 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             double deltaLon = lon - prevPoint->lon;
             double deltaLat = lat - prevPoint->lat;
             double deltarcad = rcad - prevPoint->rcad;
+            double deltaLrbalance = lrbalance - prevPoint->lrbalance;
+            double deltaLte = lte - prevPoint->lte;
+            double deltaRte = rte - prevPoint->rte;
+            double deltaLps = lps - prevPoint->lps;
+            double deltaRps = rps - prevPoint->rps;
 
             if (prevPoint->lat == 0 && prevPoint->lon == 0) badgps = true;
             // Smart Recording High Water Mark.
@@ -214,8 +230,8 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
                 // no smart recording, or delta exceeds HW treshold, just insert the data
                 rideFile->appendPoint(secs, cadence, hr, distance, speed, torque, power,
-                                      alt, lon, lat, headwind, 0.0, RideFile::NA, 0.0, 
-                                      0.0,0.0,0.0,0.0,
+                                      alt, lon, lat, headwind, 0.0, RideFile::NA, lrbalance,
+                                      lte,rte,lps,rps,
                                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                       0.0,0.0,
                                       0.0, // vertical oscillation
@@ -267,10 +283,13 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                           badgps ? 0 : prevPoint->lon + (deltaLon * weight), // lon
                                           badgps ? 0 : prevPoint->lat + (deltaLat * weight), // lat
                                           headwind, // headwind
-                                          0.0,
+                                          0.0, // slope
                                           RideFile::NA,
-                                          0.0,
-                                          0.0,0.0,0.0,0.0,
+                                          prevPoint->lrbalance + (deltaLrbalance * weight),
+                                          prevPoint->lte + (deltaLte * weight),
+                                          prevPoint->rte + (deltaRte * weight),
+                                          prevPoint->lps + (deltaLps * weight),
+                                          prevPoint->rps + (deltaRps * weight),
                                           0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                           0.0,0.0,
                                           0.0, // vertical oscillation
@@ -303,8 +322,8 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                       0.0, // headwind
                                       0.0,
                                       RideFile::NA,
-                                      0.0,
-                                      0.0,0.0,0.0,0.0,
+                                      0.0, // rlbalance
+                                      0.0,0.0,0.0,0.0, // lte, rte, lps, rps
                                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                       0.0,0.0,
                                       0.0, // vertical oscillation

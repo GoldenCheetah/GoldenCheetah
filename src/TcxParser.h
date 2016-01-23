@@ -70,6 +70,11 @@ private:
     double lat;
     double lon;
     double headwind;
+    double lrbalance;
+    double lte;
+    double rte;
+    double lps;
+    double rps;
     double secs;
     bool   badgps;
 };
