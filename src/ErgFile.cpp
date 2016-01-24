@@ -125,12 +125,22 @@ void ErgFile::parseZwift()
     foreach(ErgFilePoint p, handler.points) {
         double watts = p.y * CP / 100.0;
         Points << ErgFilePoint(p.x, watts, watts);
+        if (watts > MaxWatts) MaxWatts = watts;
+        Duration = p.x;
     }
 
     // texts
     Texts = handler.texts;
 
-    if (Points.count()) valid = true;
+    if (Points.count()) {
+        valid = true;
+        Duration = Points.last().x;      // last is the end point in msecs
+        leftPoint = 0;
+        rightPoint = 1;
+
+        // calculate climbing etc
+        calculateMetrics();
+    }
 }
 
 void ErgFile::parseTacx()
