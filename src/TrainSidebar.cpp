@@ -243,12 +243,13 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     toolbuttons->addWidget(cnct);
 
     QIcon rewIcon(":images/oxygen/rewind.png");
-    QPushButton *rewind = new QPushButton(rewIcon, "", this);
+    rewind = new QPushButton(rewIcon, "", this);
     rewind->setFocusPolicy(Qt::NoFocus);
     rewind->setIconSize(QSize(64,64));
     rewind->setAutoFillBackground(false);
     rewind->setAutoDefault(false);
     rewind->setFlat(true);
+    rewind->setEnabled(false);
     rewind->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     rewind->setAutoRepeat(true);
     rewind->setAutoRepeatDelay(200);
@@ -258,17 +259,18 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     toolbuttons->addWidget(rewind);
 
     QIcon stopIcon(":images/oxygen/stop.png");
-    QPushButton *stop = new QPushButton(stopIcon, "", this);
-    stop->setFocusPolicy(Qt::NoFocus);
-    stop->setIconSize(QSize(64,64));
-    stop->setAutoFillBackground(false);
-    stop->setAutoDefault(false);
-    stop->setFlat(true);
-    stop->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    stopbtn = new QPushButton(stopIcon, "", this);
+    stopbtn->setFocusPolicy(Qt::NoFocus);
+    stopbtn->setIconSize(QSize(64,64));
+    stopbtn->setAutoFillBackground(false);
+    stopbtn->setAutoDefault(false);
+    stopbtn->setFlat(true);
+    stopbtn->setEnabled(false);
+    stopbtn->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
 #if QT_VERSION > 0x050400
-    stop->setShortcut(Qt::Key_MediaStop);
+    stopbtn->setShortcut(Qt::Key_MediaStop);
 #endif
-    toolbuttons->addWidget(stop);
+    toolbuttons->addWidget(stopbtn);
 
     QIcon playIcon(":images/oxygen/play.png");
     play = new QPushButton(playIcon, "", this);
@@ -277,17 +279,19 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     play->setAutoFillBackground(false);
     play->setAutoDefault(false);
     play->setFlat(true);
+    play->setEnabled(false);
     play->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     play->setShortcut(Qt::Key_MediaTogglePlayPause);
     toolbuttons->addWidget(play);
 
     QIcon fwdIcon(":images/oxygen/ffwd.png");
-    QPushButton *forward = new QPushButton(fwdIcon, "", this);
+    forward = new QPushButton(fwdIcon, "", this);
     forward->setFocusPolicy(Qt::NoFocus);
     forward->setIconSize(QSize(64,64));
     forward->setAutoFillBackground(false);
     forward->setAutoDefault(false);
     forward->setFlat(true);
+    forward->setEnabled(false);
     forward->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     forward->setAutoRepeat(true);
     forward->setAutoRepeatDelay(200);
@@ -295,14 +299,16 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     forward->setShortcut(Qt::Key_MediaNext);
 #endif
     toolbuttons->addWidget(forward);
+    forward->setEnabled(false);
 
     QIcon lapIcon(":images/oxygen/lap.png");
-    QPushButton *lap = new QPushButton(lapIcon, "", this);
+    lap = new QPushButton(lapIcon, "", this);
     lap->setFocusPolicy(Qt::NoFocus);
     lap->setIconSize(QSize(64,64));
     lap->setAutoFillBackground(false);
     lap->setAutoDefault(false);
     lap->setFlat(true);
+    lap->setEnabled(false);
     lap->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
 #if QT_VERSION > 0x050400
     lap->setShortcut(Qt::Key_0);
@@ -332,7 +338,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QStyle *macstyler = QStyleFactory::create("Cleanlooks");
 #endif
     play->setStyle(macstyler);
-    stop->setStyle(macstyler);
+    stopbtn->setStyle(macstyler);
     rewind->setStyle(macstyler);
     forward->setStyle(macstyler);
     lap->setStyle(macstyler);
@@ -368,7 +374,7 @@ intensity->hide(); //XXX!!! temporary
 
     connect(cnct, SIGNAL(clicked()), this, SLOT(toggleConnect()));
     connect(play, SIGNAL(clicked()), this, SLOT(Start()));
-    connect(stop, SIGNAL(clicked()), this, SLOT(Stop()));
+    connect(stopbtn, SIGNAL(clicked()), this, SLOT(Stop()));
     connect(forward, SIGNAL(clicked()), this, SLOT(FFwd()));
     connect(rewind, SIGNAL(clicked()), this, SLOT(Rewind()));
     connect(lap, SIGNAL(clicked()), this, SLOT(newLap()));
@@ -470,6 +476,8 @@ intensity->hide(); //XXX!!! temporary
     status = 0;
     status |= RT_MODE_ERGO;         // ergo mode by default
     mode = ERG;
+
+    setButtonStates();
 
     displayWorkoutLap = displayLap = 0;
     pwrcount = 0;
@@ -1094,6 +1102,7 @@ void TrainSidebar::Start()       // when start button is pressed
         session_time.start();
         lap_time.start();
         status &=~RT_PAUSED;
+        setButtonStates();
         //foreach(int dev, activeDevices) Devices[dev].controller->restart();
         //gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
@@ -1118,6 +1127,7 @@ void TrainSidebar::Start()       // when start button is pressed
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
         status |=RT_PAUSED;
+        setButtonStates();
         //foreach(int dev, activeDevices) Devices[dev].controller->pause();
         //gui_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
@@ -1168,6 +1178,7 @@ void TrainSidebar::Start()       // when start button is pressed
 
         // we're away!
         status |=RT_RUNNING;
+        setButtonStates();
 
         load_period.restart();
         session_time.start();
@@ -1226,6 +1237,7 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
         session_time.start();
         lap_time.start();
         status &=~RT_PAUSED;
+        setButtonStates();
         foreach(int dev, activeDevices) Devices[dev].controller->restart();
         gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
@@ -1246,6 +1258,7 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
         lap_elapsed_msec += lap_time.elapsed();
         foreach(int dev, activeDevices) Devices[dev].controller->pause();
         status |=RT_PAUSED;
+        setButtonStates();
         gui_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
@@ -1267,6 +1280,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     if ((status&RT_RUNNING) == 0) return;
 
     status &= ~(RT_RUNNING|RT_PAUSED);
+    setButtonStates();
 
     // Stop users from selecting different devices
     // media or workouts whilst a workout is in progress
@@ -1404,6 +1418,7 @@ void TrainSidebar::Connect()
 
     foreach(int dev, activeDevices) Devices[dev].controller->start();
     status |= RT_CONNECTED;
+    setButtonStates();
     cnct->setIcon(connectedIcon);
     gui_timer->start(REFRESHRATE);
 }
@@ -1420,6 +1435,7 @@ void TrainSidebar::Disconnect()
 
     foreach(int dev, activeDevices) Devices[dev].controller->stop();
     status &=~RT_CONNECTED;
+    setButtonStates();
 
     cnct->setIcon(disconnectedIcon);
     gui_timer->stop();
@@ -2259,6 +2275,54 @@ TrainSidebar::viewChanged(int index)
         if ((status&RT_CONNECTED) && (status&RT_RUNNING) == 0) {
             Disconnect();
         }
+    }
+
+}
+
+void TrainSidebar::setButtonStates()
+{
+    // not yet connected
+    if ((status&RT_CONNECTED) == 0) {
+        cnct->setEnabled(true);
+        play->setEnabled(false);
+        stopbtn->setEnabled(false);
+        forward->setEnabled(false);
+        rewind->setEnabled(false);
+        lap->setEnabled(false);
+        return;
+    }
+
+    // connected, but not running
+    if ((status&RT_CONNECTED) && ((status&RT_RUNNING) == 0)) {
+        cnct->setEnabled(true);
+        play->setEnabled(true);
+        stopbtn->setEnabled(false);
+        forward->setEnabled(false);
+        rewind->setEnabled(false);
+        lap->setEnabled(false);
+        return;
+    }
+
+    // paused - important to check for paused before running
+    if (status&RT_PAUSED) {
+        cnct->setEnabled(false);
+        play->setEnabled(true);
+        stopbtn->setEnabled(true);
+        forward->setEnabled(false);
+        rewind->setEnabled(false);
+        lap->setEnabled(false);
+        return;
+    }
+
+    // running
+    if (status&RT_RUNNING) {
+        cnct->setEnabled(false);
+        play->setEnabled(true);
+        stopbtn->setEnabled(true);
+        forward->setEnabled(true);
+        rewind->setEnabled(true);
+        lap->setEnabled(true);
+        return;
     }
 
 }

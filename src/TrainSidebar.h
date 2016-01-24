@@ -113,6 +113,7 @@ class TrainSidebar : public GcWindow
 
         // get the panel
         QWidget *getToolbarButtons() { return toolbarButtons; }
+        void setButtonStates();
 
         // where to get telemetry from Device.at(x)
         int bpmTelemetry;   // Heartrate
@@ -221,7 +222,7 @@ class TrainSidebar : public GcWindow
         QTreeWidgetItem *media;
 
         // Panel buttons
-        QPushButton *play;
+        QPushButton *play, *rewind, *stopbtn, *forward, *lap;
         QPushButton *cnct;
         QLabel *stress, *intensity;
         QSlider *intensitySlider;
