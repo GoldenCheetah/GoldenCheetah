@@ -299,42 +299,53 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
                     alt *= METERS_PER_FOOT;
                 }
 
-		if (recInterval==238){
-		  hr = 60000.0/hrm;
-		} else {
-		  hr = hrm;
-		}
-		
-		if (haveGPX && (igpx<ngpx))
-		  {
-		    p = gpxresult->dataPoints()[igpx];
-		    // Use previous value if GPS is momentarely
-		    // lost. Should have option for interpolating.
-		    if (p->lat!=0.0 && p->lon!=0.0){
-		      lat = p->lat;
-		      lon = p->lon;
-		      // Must check if current HRM speed is zero while
-		      // we have GPX speed
-		      if (kph==0.0 && p->kph>1.0)
-			{
-			  kph = p->kph;
-			  distance += kph/60/60*recInterval;
-			  km = distance;
-			}
-		    }
-		    if (seconds>=p->secs)
-		      igpx += 1;
-		  }
-		
-        rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, lon, lat, 0.0, 0.0,
-                              RideFile::NA, lrbalance,
-                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
-		// fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
-		if (recInterval==238){
-		  seconds += hrm / 1000.0;
-		} else {
-		  seconds += recInterval;
-		}
+                if (recInterval==238){
+                    hr = 60000.0/hrm;
+                } else {
+                    hr = hrm;
+                }
+
+                if (haveGPX && gpxresult && (igpx<ngpx)) {
+
+                    p = gpxresult->dataPoints()[igpx];
+
+                    // Use previous value if GPS is momentarely
+                    // lost. Should have option for interpolating.
+                    if (p->lat!=0.0 && p->lon!=0.0) {
+
+                        lat = p->lat;
+                        lon = p->lon;
+
+                        // Must check if current HRM speed is zero while
+                        // we have GPX speed
+                        if (kph==0.0 && p->kph>1.0) {
+
+                            kph = p->kph;
+                            distance += kph/60/60*recInterval;
+                            km = distance;
+                        }
+                    }
+
+                    if (seconds>=p->secs) igpx += 1;
+                }
+
+                rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, lon, lat,
+                                      0.0, 0.0,
+                                      RideFile::NA, lrbalance,
+                                      0.0, 0.0, 0.0, 0.0,
+                                      0.0, 0.0,
+                                      0.0, 0.0, 0.0, 0.0,
+                                      0.0, 0.0, 0.0, 0.0,
+                                      0.0, 0.0,
+                                      0.0, 0.0, 0.0, 0.0,
+                                      interval);
+
+                // fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
+                if (recInterval==238) {
+                    seconds += hrm / 1000.0;
+                } else {
+                    seconds += recInterval;
+                }
             }
 
             ++lineno;
