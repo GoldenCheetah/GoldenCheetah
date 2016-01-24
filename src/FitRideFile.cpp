@@ -1202,15 +1202,15 @@ struct FitFileReaderState
                     last_time + i, cad, 0.0,
                     last_distance + (deltaDist * i/deltaSecs),
                     kph, 0.0, 0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.0, RideFile::NA,
-                    0.0, 0.0, 0.0,
                     0.0, 0.0,
+                    RideFile::NA,RideFile::NA,
+                    0.0, 0.0,0.0, 0.0,
                     0.0, 0.0,
+                    0.0, 0.0,0.0, 0.0,
+                    0.0, 0.0,0.0, 0.0,
                     0.0, 0.0,
-                    0.0, 0.0,
-                    0.0, 0.0,
-                    0.0, 0.0,
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
+                    0.0, 0.0, 0.0, 0.0,
+                    0);
             }
             last_time += deltaSecs;
             last_distance += deltaDist;
