@@ -191,7 +191,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
     } else if (MESSAGE_IS_EVENT_CHANNEL_CLOSED(message)) {
 
         //qDebug()<<number<<"channel event channel closed";
-        if (status != Closing) {
+        if ((status != Closing) && (status != Closed)) {
             //qDebug()<<number<<"we got closed!! re-open !!";
             status = Opening;
             attemptTransition(TRANSITION_START);
