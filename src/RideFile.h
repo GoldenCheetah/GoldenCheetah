@@ -430,7 +430,7 @@ struct RideFilePoint
     RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0), nm(0.0), 
                       watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), 
                       slope(0.0), temp(-255.0),
-                      lrbalance(0),
+                      lrbalance(-255.0),
                       lte(0.0), rte(0.0), lps(0.0), rps(0.0),
                       lpco(0.0), rpco(0.0),
                       lppb(0.0), rppb(0.0), lppe(0.0), rppe(0.0),

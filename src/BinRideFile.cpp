@@ -406,7 +406,7 @@ struct BinFileReaderState
         double secs = 0, alt = 0, cad = 0, km = 0, grade = 0, hr = 0;
         double nm = 0, kph = 0, watts = 0;
         double temperature = RideFile::NA;
-        double lrbalance = 0.0;
+        double lrbalance = RideFile::NA;
 
         foreach(const BinField &field, def.fields) {
             if (!global_format_identifiers.contains(field.id)) {

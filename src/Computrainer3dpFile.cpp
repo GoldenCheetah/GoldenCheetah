@@ -296,7 +296,7 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
                 // so now we can add to the ride
                 rideFile->appendPoint(sample.secs, sample.cad, sample.hr, sample.km, 
                                       sample.kph, 0.0, sample.watts, sample.alt, 0.0, 0.0, 
-                                      0.0, 0.0, RideFile::NA, 0.0, 
+                                      0.0, 0.0, RideFile::NA, RideFile::NA,
                                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                       0.0, 0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0,0.0,0.0, 0);
 

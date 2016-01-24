@@ -228,7 +228,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
                 } else {
                     add.lrbalance =(add.watts-lrbalance.text().toDouble())/add.watts*100.0;
                 }
-            } else add.lrbalance = 0.0;
+            } else add.lrbalance = RideFile::NA;
             // torq
             QDomElement torq = node.firstChildElement("torq");
             if (!torq.isNull()) add.nm = torq.text().toDouble();

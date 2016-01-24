@@ -125,7 +125,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors, QList
 		rideFile->appendPoint(minutes * 60.0, cad, hr, km,
                                       kph, nm, watts, alt,
                                       0.0, 0.0, 0.0, 0.0,
-                                      RideFile::NA, 0.0, 
+                                      RideFile::NA, RideFile::NA,
                                       0.0, 0.0, 0.0, 0.0,
                                       0.0, 0.0, // pedal platform offset
                                       0.0, 0.0, 0.0, 0.0, //pedal power phase
