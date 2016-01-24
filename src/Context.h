@@ -105,6 +105,10 @@ class Context : public QObject
         QStringList filters; // searchBox filters
         QStringList homeFilters; // homewindow sidebar filters
 
+        // train mode state
+        bool isRunning;
+        bool isPaused;
+
         // comparing things
         bool isCompareIntervals;
         QList<CompareInterval> compareIntervals;
@@ -139,6 +143,9 @@ class Context : public QObject
 
         // user metrics - cascade
         void notifyUserMetricsChanged() { emit userMetricsChanged(); }
+
+        // view changed
+        void setIndex(int i) { viewIndex = i; emit viewChanged(i); }
 
         // realtime signals
         void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
@@ -210,6 +217,9 @@ class Context : public QObject
 
         // user metrics
         void userMetricsChanged();
+
+        // view changed
+        void viewChanged(int);
 
         // refreshing stats
         void refreshStart();

@@ -141,6 +141,7 @@ ANTlocalController::getRealtimeData(RealtimeData &rtData)
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         parent->Stop(1);
+        parent->Disconnect();
         logger->close();
         return;
     }
