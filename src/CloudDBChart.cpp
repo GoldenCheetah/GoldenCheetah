@@ -637,7 +637,7 @@ CloudDBChartClient::setupNetworkCache() {
 static const int chartImageWidth = 320;
 static const int chartImageHeight = 240;
 
-CloudDBChartListDialog::CloudDBChartListDialog()
+CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
 {
    g_client = new CloudDBChartClient();
    g_currentHeaderList = new QList<ChartAPIHeaderV1>;
@@ -1134,14 +1134,14 @@ CloudDBChartListDialog::deleteUserEdit(){
             // remove deleted chart from both lists
             QMutableListIterator<ChartAPIHeaderV1> it1(*g_currentHeaderList);
             while (it1.hasNext()) {
-                if (it1.next().Id = id) {
+                if (it1.next().Id == id) {
                     it1.remove();
                     break; // there is just one equal entry
                 }
             }
             QMutableListIterator<ChartAPIHeaderV1> it2(*g_fullHeaderList);
             while (it2.hasNext()) {
-                if (it2.next().Id = id) {
+                if (it2.next().Id == id) {
                     it2.remove();
                     break; // there is just one equal entry
                 }
