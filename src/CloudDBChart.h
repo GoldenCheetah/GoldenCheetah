@@ -168,7 +168,7 @@ private:
 
     // general
 
-    const int const_stepSize = 5;
+    const int const_stepSize;
 
     CloudDBChartClient* g_client;
     QList<ChartWorkingStructure> *g_currentPresets;
