@@ -424,7 +424,8 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
                     // so lets set the timer and remember
                     // where we were
                     onCreate = p;
-                    QTimer::singleShot(500, this, SLOT(timeout()));
+                    timer.stop(); // cancel any previous timeout
+                    timer.singleShot(500, this, SLOT(timeout()));
                 }
             }
         }

@@ -35,6 +35,7 @@
 #include <QPoint>
 #include <QVector>
 #include <QPainterPath>
+#include <QTimer>
 
 #include "../qtsolutions/codeeditor/codeeditor.h"
 
@@ -287,6 +288,7 @@ class WorkoutWidget : public QWidget
         WorkoutWindow *parent;
         Context *context;
         QList<WorkoutWidgetItem*> children_;
+        QTimer timer; // for click timeouts
 
         // we keep these separate to make the maintenance
         // and code simpler, it helps when moving them around
