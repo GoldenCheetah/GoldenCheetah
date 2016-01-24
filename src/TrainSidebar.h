@@ -57,6 +57,7 @@
 #define RT_RECORDING    0x0400        // is recording to disk
 #define RT_WORKOUT      0x0800        // is running a workout
 #define RT_STREAMING    0x1000        // is streaming to a remote peer
+#define RT_CONNECTED    0x2000        // is connected to devices
 
 // msecs constants for timers
 #define REFRESHRATE    200 // screen refresh in milliseconds
@@ -162,6 +163,8 @@ class TrainSidebar : public GcWindow
         void Start();       // when start button is pressed
         void Pause();       // when Paude is pressed
         void Stop(int status=0);        // when controller wants to stop
+        void Connect();     // connect to train devices
+        void Disconnect();  // disconnect train devices
 
         void Calibrate();   // toggle calibration mode
         void FFwd();        // jump forward when in a workout

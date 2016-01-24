@@ -1105,22 +1105,13 @@ void TrainSidebar::Start()       // when start button is pressed
 
     } else {
 
+        if ((status&RT_CONNECTED) == 0) {
+            // connect sensors before proceeding
+            Connect();
+        }
+
         // Stop users from selecting different devices
         // media or workouts whilst a workout is in progress
-
-        // if we have selected multiple devices lets
-        // configure the series we collect from each one
-        if (deviceTree->selectedItems().count() > 1) {
-            MultiDeviceDialog *multisetup = new MultiDeviceDialog(context, this);
-            if (multisetup->exec() == false) {
-                return;
-            }
-        } else if (deviceTree->selectedItems().count() == 1) {
-            bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry =
-            deviceTree->selectedItems().first()->type();
-        } else {
-            return;
-        }
 
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
@@ -1144,8 +1135,6 @@ void TrainSidebar::Start()       // when start button is pressed
             status &= ~RT_MODE_ERGO;
             foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_SPIN);
         }
-
-        foreach(int dev, devices()) Devices[dev].controller->start();
 
         // tell the world
         context->notifyStart();
@@ -1262,7 +1251,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     deviceTree->setEnabled(true);
 
     // wipe connection
-    foreach(int dev, devices()) Devices[dev].controller->stop();
+    Disconnect();
 
     gui_timer->stop();
     calibrating = false;
@@ -1349,6 +1338,40 @@ void TrainSidebar::updateData(RealtimeData &rtData)
     displayRPS = rtData.getRPS();
     // Gradient not supported
     return;
+}
+
+void TrainSidebar::Connect()
+{
+    //todo: will want to disconnect/reconnect each time there is a device change..
+
+
+    qDebug() << "TrainSidebar::Connect()";
+
+    // if we have selected multiple devices lets
+    // configure the series we collect from each one
+    if (deviceTree->selectedItems().count() > 1) {
+        MultiDeviceDialog *multisetup = new MultiDeviceDialog(context, this);
+        if (multisetup->exec() == false) {
+            return;
+        }
+    } else if (deviceTree->selectedItems().count() == 1) {
+        bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry =
+        deviceTree->selectedItems().first()->type();
+    } else {
+        return;
+    }
+
+    foreach(int dev, devices()) Devices[dev].controller->start();
+    status |= RT_CONNECTED;
+}
+
+void TrainSidebar::Disconnect()
+{
+    // don't disconnect if running
+    if (status&RT_RUNNING) return;
+
+    foreach(int dev, devices()) Devices[dev].controller->stop();
+    status &=~RT_CONNECTED;
 }
 
 //----------------------------------------------------------------------
