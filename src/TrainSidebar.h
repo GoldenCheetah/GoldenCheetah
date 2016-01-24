@@ -113,6 +113,9 @@ class TrainSidebar : public GcWindow
 
         // get the panel
         QWidget *getToolbarButtons() { return toolbarButtons; }
+
+        void setStatusFlags(int flags);   // helpers that update context etc when changing state
+        void clearStatusFlags(int flags);
         void setButtonStates();
 
         // where to get telemetry from Device.at(x)
@@ -154,7 +157,6 @@ class TrainSidebar : public GcWindow
         void removeInvalidWorkout();
 
         void viewChanged(int index);
-
 
     public slots:
         void configChanged(qint32);

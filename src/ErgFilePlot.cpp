@@ -460,6 +460,9 @@ ErgFilePlot::setNow(long /*msecs*/)
 void
 ErgFilePlot::performancePlot(RealtimeData rtdata)
 {
+    // don't update this plot if we are not running or are paused
+    //if ((!context->isRunning) || (!context->isPaused)) return;
+
     // we got some data
     // x is plotted in meters or micro-seconds
     double x = bydist ? (rtdata.getDistance() * 1000) : rtdata.getMsecs();

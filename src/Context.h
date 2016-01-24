@@ -105,6 +105,10 @@ class Context : public QObject
         QStringList filters; // searchBox filters
         QStringList homeFilters; // homewindow sidebar filters
 
+        // train mode state
+        bool isRunning;
+        bool isPaused;
+
         // comparing things
         bool isCompareIntervals;
         QList<CompareInterval> compareIntervals;
