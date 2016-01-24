@@ -17,6 +17,7 @@
  */
 
 #include "CloudDBCurator.h"
+#include "Secrets.h"
 
 #include <QJsonParseError>
 #include <QJsonObject>
