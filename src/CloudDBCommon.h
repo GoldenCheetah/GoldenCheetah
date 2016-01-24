@@ -75,6 +75,8 @@ class CloudDBCommon
 {
 public:
 
+    static bool addCuratorFeatures;
+
     // Languages explicitely supported to store artifacts == UI Languages
     static QList<QString> cloudDBLangsIds;
     static QList<QString> cloudDBLangs;
@@ -88,8 +90,8 @@ public:
     enum userRole { UserImport, UserEdit, CuratorEdit };
     typedef enum userRole UserRole;
 
+
 };
 
 
-
-#endif // CLOUDDBCORE_H
+#endif // CLOUDDBCOMMON_H

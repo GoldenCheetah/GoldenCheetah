@@ -114,6 +114,7 @@
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBCommon.h"
 #include "CloudDBChart.h"
+#include "CloudDBCurator.h"
 #endif
 
 
@@ -688,9 +689,14 @@ MainWindow::MainWindow(const QDir &home)
 #ifdef GC_HAS_CLOUD_DB
     // CloudDB options
     optionsMenu->addSeparator();
-    QMenu *cloudDBMenu = optionsMenu->addMenu(tr("CloudDB Charts"));
-    cloudDBMenu->addAction(tr("Maintain my contributions"), this, SLOT(cloudDBuserEditChart()));
-    cloudDBMenu->addAction(tr("Curate user contributions"), this, SLOT(cloudDBcuratorEditChart()));
+    QMenu *cloudDBMenu = optionsMenu->addMenu(tr("CloudDB Contributions"));
+    cloudDBMenu->addAction(tr("Maintain charts"), this, SLOT(cloudDBuserEditChart()));
+
+    if (CloudDBCommon::addCuratorFeatures) {
+        QMenu *cloudDBCurator = optionsMenu->addMenu(tr("CloudDB Curator"));
+        cloudDBCurator->addAction(tr("Curate charts"), this, SLOT(cloudDBcuratorEditChart()));
+    }
+
 #endif
     HelpWhatsThis *optionsMenuHelp = new HelpWhatsThis(optionsMenu);
     optionsMenu->setWhatsThis(optionsMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Tools));
@@ -2319,13 +2325,21 @@ MainWindow::cloudDBuserEditChart()
 void
 MainWindow::cloudDBcuratorEditChart()
 {
-    if (currentTab->context->cdbChartListDialog == NULL) {
-        currentTab->context->cdbChartListDialog = new CloudDBChartListDialog();
-    }
+    // first check if the user is a curator
+    CloudDBCuratorClient *curatorClient = new CloudDBCuratorClient;
+    if (curatorClient->isCurator(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_ATHLETE_ID, "" ).toString())) {
 
-    // force refresh in prepare to allways get the latest data here
-    if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
-        currentTab->context->cdbChartListDialog->exec(); // no action when closed
+        if (currentTab->context->cdbChartListDialog == NULL) {
+            currentTab->context->cdbChartListDialog = new CloudDBChartListDialog();
+        }
+
+        // force refresh in prepare to allways get the latest data here
+        if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
+            currentTab->context->cdbChartListDialog->exec(); // no action when closed
+        }
+    } else {
+        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Current athlete is not registered as curator - please contact the GoldenCheetah team")));
+
     }
 }
 
