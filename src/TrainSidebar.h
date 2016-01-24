@@ -150,6 +150,8 @@ class TrainSidebar : public GcWindow
         void removeInvalidVideoSync();
         void removeInvalidWorkout();
 
+        void viewChanged(int index);
+
 
     public slots:
         void configChanged(qint32);

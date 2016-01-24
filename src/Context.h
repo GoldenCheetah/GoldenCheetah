@@ -140,6 +140,9 @@ class Context : public QObject
         // user metrics - cascade
         void notifyUserMetricsChanged() { emit userMetricsChanged(); }
 
+        // view changed
+        void setIndex(int i) { viewIndex = i; emit viewChanged(i); }
+
         // realtime signals
         void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
         void notifyErgFileSelected(ErgFile *x) { workout=x; ergFileSelected(x); }
@@ -210,6 +213,9 @@ class Context : public QObject
 
         // user metrics
         void userMetricsChanged();
+
+        // view changed
+        void viewChanged(int);
 
         // refreshing stats
         void refreshStart();

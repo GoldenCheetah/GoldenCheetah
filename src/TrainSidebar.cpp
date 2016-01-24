@@ -357,6 +357,7 @@ intensity->hide(); //XXX!!! temporary
     connect(rewind, SIGNAL(clicked()), this, SLOT(Rewind()));
     connect(lap, SIGNAL(clicked()), this, SLOT(newLap()));
     connect(context, SIGNAL(newLap()), this, SLOT(resetLapTimer()));
+    connect(context, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
     connect(intensitySlider, SIGNAL(valueChanged(int)), this, SLOT(adjustIntensity()));
 
     // not used but kept in case re-instated in the future
@@ -2156,4 +2157,11 @@ TrainSidebar::remoteControl(uint16_t command)
     default:
         break;
     }
+}
+
+// the selected view has changed for this athlete
+void
+TrainSidebar::viewChanged(int index)
+{
+    //qDebug() << "view has changed to:" << index;
 }
