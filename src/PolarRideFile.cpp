@@ -67,13 +67,13 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
     assert(dot >= 0);
     QFile gpxfile(suffix.left(dot)+".gpx");
     haveGPX = gpxfile.exists();
-    
+
     if (haveGPX) {
         GpxFileReader reader;
         gpxresult = reader.openRideFile(gpxfile,errors,rideList);
         ngpx = gpxresult->dataPoints().count();
     }
-      
+
     if (!file.open(QFile::ReadOnly)) {
         errors << ("Could not open ride file: \""
                    + file.fileName() + "\"");
@@ -171,25 +171,30 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
                         balance = true;
                     //if (smode.length()>4 && smode.at(5)=='1') pedaling_index = true;
 
-/*
-It appears that the Polar CS600 exports its data alays in metric when downloaded from the
-polar software even when English units are displayed on the unit..  It also never sets
-this bit low in the .hrm file.  This will have to get changed if other software downloads
-this differently
-*/
+                    //
+                    // It appears that the Polar CS600 exports its data alays in metric when downloaded from the
+                    // polar software even when English units are displayed on the unit..  It also never sets
+                    // this bit low in the .hrm file.  This will have to get changed if other software downloads
+                    // this differently
+                    //
 
                     if (smode.length()>6 && smode.at(7)=='1')
                         metric = false;
 
                 } else if (line.contains("Interval=")) {
+
                     recInterval = line.remove(0,9).toInt();
-		    if (recInterval==238){
-		        /* This R-R data */
-		        rideFile->setRecIntSecs(1);
-		    }
-		    else {
-		      rideFile->setRecIntSecs(recInterval);
-		    }
+
+                    if (recInterval==238) {
+
+                        /* This R-R data */
+                        rideFile->setRecIntSecs(1);
+
+                    } else {
+
+                        rideFile->setRecIntSecs(recInterval);
+                    }
+
                 } else if (line.contains("Date=")) {
                     line.remove(0,5);
                     date= QDate(line.left(4).toInt(),
@@ -202,21 +207,24 @@ this differently
                                             line.mid(3,2).toInt(),
                                             line.mid(6,2).toInt()));
                     rideFile->setStartTime(datetime);
-		} else if (line.contains("StartDelay=")){
-		  StartDelay = line.remove(0,11).toInt();
-		  if (recInterval==238){
-		    seconds = StartDelay/1000.0;
-		  }
-		  else{
-		    seconds = recInterval;
-		  }
-		}
 
-            }
-            else if (section == "[Note]"){
+                } else if (line.contains("StartDelay=")) {
+
+                    StartDelay = line.remove(0,11).toInt();
+
+                    if (recInterval==238) {
+                        seconds = StartDelay/1000.0;
+                    } else {
+                        seconds = recInterval;
+                    }
+                }
+
+            } else if (section == "[Note]") {
+
                 note.append(line);
-            }
-            else if (section == "[IntTimes]"){
+
+            } else if (section == "[IntTimes]") {
+
                 double int_seconds = line.left(2).toInt()*60*60+line.mid(3,2).toInt()*60+line.mid(6,3).toFloat();
                 intervals.append(int_seconds);
 
@@ -232,19 +240,20 @@ this differently
                    if (version>1.05)
                       li+=2;
                 }
-            }
-            else if (section == "[HRData]"){
-	        double nm=0,kph=0,watts=0,km=0,cad=0,hr=0,alt=0,hrm=0;
+
+            } else if (section == "[HRData]") {
+
+                double nm=0,kph=0,watts=0,km=0,cad=0,hr=0,alt=0,hrm=0;
                 double lrbalance=0;
 
-		int i=0;
-		hrm = line.section('\t', i, i).toDouble();
+                int i=0;
+                hrm = line.section('\t', i, i).toDouble();
                 i++;
 
                 if (speed) {
                     kph = line.section('\t', i, i).toDouble()/10;
-		    distance += kph/60/60*recInterval;
-		    km = distance;
+                    distance += kph/60/60*recInterval;
+                    km = distance;
                     i++;
                 }
                 if (cadence) {
@@ -290,43 +299,50 @@ this differently
                     alt *= METERS_PER_FOOT;
                 }
 
-		if (recInterval==238){
-		  hr = 60000.0/hrm;
-		} else {
-		  hr = hrm;
-		}
-		
-		if (haveGPX && gpxresult && (igpx<ngpx))
-		  {
-		    p = gpxresult->dataPoints()[igpx];
-		    // Use previous value if GPS is momentarely
-		    // lost. Should have option for interpolating.
-		    if (p->lat!=0.0 && p->lon!=0.0){
-		      lat = p->lat;
-		      lon = p->lon;
-		      // Must check if current HRM speed is zero while
-		      // we have GPX speed
-		      if (kph==0.0 && p->kph>1.0)
-			{
-			  kph = p->kph;
-			  distance += kph/60/60*recInterval;
-			  km = distance;
-			}
-		    }
-		    if (seconds>=p->secs)
-		      igpx += 1;
-		  }
-		
-		rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, lon, lat, 0.0, 0.0, RideFile::NA, lrbalance, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
-		// fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
-		if (recInterval==238){
-		  seconds += hrm / 1000.0;
-		} else {
-		  seconds += recInterval;
-		}
+                if (recInterval==238){
+                    hr = 60000.0/hrm;
+                } else {
+                    hr = hrm;
+                }
+
+                if (haveGPX && gpxresult && (igpx<ngpx)) {
+
+                    p = gpxresult->dataPoints()[igpx];
+
+                    // Use previous value if GPS is momentarely
+                    // lost. Should have option for interpolating.
+                    if (p->lat!=0.0 && p->lon!=0.0) {
+
+                        lat = p->lat;
+                        lon = p->lon;
+
+                        // Must check if current HRM speed is zero while
+                        // we have GPX speed
+                        if (kph==0.0 && p->kph>1.0) {
+
+                            kph = p->kph;
+                            distance += kph/60/60*recInterval;
+                            km = distance;
+                        }
+                    }
+
+                    if (seconds>=p->secs) igpx += 1;
+                }
+
+                rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, lon, lat,
+                                      0.0, 0.0, RideFile::NA, lrbalance, 0.0, 0.0, 0.0, 0.0,
+                                      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                      0.0, 0.0, 0.0, 0.0, 0.0, interval);
+
+                // fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
+                if (recInterval==238) {
+                    seconds += hrm / 1000.0;
+                } else {
+                    seconds += recInterval;
+                }
             }
 
-        ++lineno;
+            ++lineno;
         }
     }
 
