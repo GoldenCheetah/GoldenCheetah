@@ -659,6 +659,9 @@ TrainSidebar::configChanged(qint32)
 
     // DEVICES
 
+    // Disconnect any running telemetry before manipulating device list
+    Disconnect();
+
     // zap whats there
     QList<QTreeWidgetItem *> devices = deviceTree->invisibleRootItem()->takeChildren();
     for (int i=0; i<devices.count(); i++) delete devices.at(i);
