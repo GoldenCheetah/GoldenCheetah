@@ -39,8 +39,9 @@
 CloudDBChartClient::CloudDBChartClient()
 {
     g_nam = new QNetworkAccessManager(this);
-    setupNetworkCache();
-    g_nam->setCache(g_cache);
+    QDir cacheDir(QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).at(0));
+    cacheDir.cdUp();
+    g_cacheDir = QString(cacheDir.absolutePath()+"/GoldenCheetahCloudDB");
 
     // general handling for sslErrors
     connect(g_nam, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this,
@@ -114,7 +115,15 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
 
     }
 
-    return CloudDBCommon::APIresponseCreated;
+   QByteArray result = g_reply->readAll();
+   result.replace(QByteArray("\""), QByteArray(""));
+   qint64 id = result.toLongLong();
+   if (id > 0) {
+     chart.Header.Id = id;
+     writeChartCache(&chart);
+   }
+
+   return CloudDBCommon::APIresponseCreated;
 
 }
 
@@ -165,27 +174,24 @@ CloudDBChartClient::putChart(ChartAPIv1 chart) {
 
     }
 
+    // update cache
+    writeChartCache(&chart);
     return CloudDBCommon::APIresponseOk;
 
 }
 
 
 int
-CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart, bool noCache) {
+CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
 
+    // read from Cache first
+    if (readChartCache(id, chart)) return CloudDBCommon::APIresponseOk;
+
+    // now from GAE
     QNetworkRequest request;
     request.setUrl(QUrl(g_chart_url_base+QString::number(id, 10)));
     request.setHeader(QNetworkRequest::ContentTypeHeader, g_header_content_type);
     request.setRawHeader("Authorization", g_header_basic_auth);
-    // first call either from cache or always network
-    if (noCache) {
-        request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysNetwork);
-        request.setAttribute(QNetworkRequest::CacheSaveControlAttribute, true);
-    } else {
-        // try to read from Cache / since Prefer Cache does not work properly - force it !
-        request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
-    }
-
     g_reply = g_nam->get(request);
 
     // blocking request
@@ -195,22 +201,10 @@ CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart, bool noCache) {
 
     if (g_reply->error() != QNetworkReply::NoError) {
 
-        // first call was cached / so now without
-        if (!noCache) {
-            // not in cache - so read from CloudDB
-            request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysNetwork);
-            g_reply = g_nam->get(request);
+        return processReplyStatusCodes(g_reply);
 
-            // blocking request
-            QEventLoop loop;
-            connect(g_reply, SIGNAL(finished()), &loop, SLOT(quit()));
-            loop.exec();
-        }
-
-        if (g_reply->error() != QNetworkReply::NoError) {
-            return processReplyStatusCodes(g_reply);
-        }
     }
+    // call successfull
     QByteArray result = g_reply->readAll();
     QList<ChartAPIv1>* charts = new QList<ChartAPIv1>;
     unmarshallAPIv1(result, charts);
@@ -218,9 +212,11 @@ CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart, bool noCache) {
         *chart = charts->value(0);
         charts->clear();
         delete charts;
+        writeChartCache(chart);
         return CloudDBCommon::APIresponseOk;
     }
     delete charts;
+
     return CloudDBCommon::APIresponseOthers;
 }
 
@@ -244,6 +240,7 @@ CloudDBChartClient::deleteChartByID(qint64 id) {
 
     }
 
+    deleteChartCache(id);
     return CloudDBCommon::APIresponseOk;
 }
 
@@ -271,6 +268,7 @@ CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
 
     }
 
+    deleteChartCache(id);
     return CloudDBCommon::APIresponseOk;
 }
 
@@ -351,7 +349,7 @@ CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
         }
     }
 
-    //now we have the missing (new and updated) chart header so add the in the correct sequence / but don't add deleted ones
+    //now we have the missing (new and updated) chart header so add the in the correct sequence
     while (!newHeader->isEmpty()) {
         chartHeader->insert(0, newHeader->takeFirst());
 
@@ -361,22 +359,16 @@ CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
     // remove Deleted Entries from Cache
     QMutableListIterator<ChartAPIHeaderV1> it2(*chartHeader);
     while (it2.hasNext()) {
-        if (it2.next().Deleted) it2.remove();
+        if (it2.next().Deleted) {
+            it2.remove();
+            deleteChartCache(it.next().Id);
+        }
     }
 
     // store cache for next time
     writeHeaderCache(chartHeader);
 
     return CloudDBCommon::APIresponseOk;
-}
-
-void
-CloudDBChartClient::updateChartInCache(qint64 id) {
-
-    ChartAPIv1* chart = new ChartAPIv1;
-    getChartByID(id, chart, true);
-    delete chart;
-    // no error handling here
 }
 
 
@@ -403,7 +395,7 @@ bool
 CloudDBChartClient::writeHeaderCache(QList<ChartAPIHeaderV1>* header) {
 
    // make sure the subdir exists
-   QDir cacheDir (g_cacheDir);
+   QDir cacheDir(g_cacheDir);
    if (cacheDir.exists()) {
        cacheDir.mkdir("header");
    } else {
@@ -472,6 +464,98 @@ CloudDBChartClient::readHeaderCache(QList<ChartAPIHeaderV1>* header) {
     file.close();
     return true;
 
+}
+
+bool
+CloudDBChartClient::writeChartCache(ChartAPIv1 * chart) {
+
+    // make sure the subdir exists
+    QDir cacheDir(g_cacheDir);
+    if (cacheDir.exists()) {
+        cacheDir.mkdir("charts");
+    } else {
+        return false;
+    }
+    QFile file(g_cacheDir+"/charts/"+QString::number(chart->Header.Id)+".dat");
+    if (file.exists()) {
+       // overwrite data
+       file.resize(0);
+    }
+
+    if (!file.open(QIODevice::WriteOnly)) return false;
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_4_6);
+    // track a version to be able change data structure
+    out << chart_magic_string;
+    out << chart_cache_version;
+    out << chart->Header.LastChanged; // start
+    out << chart->Header.CreatorId;
+    out << chart->Header.Curated;
+    out << chart->Header.Deleted;
+    out << chart->Header.Description;
+    out << chart->Header.GcVersion;
+    out << chart->Header.Id;
+    out << chart->Header.Language;
+    out << chart->Header.Name;
+    out << chart->ChartXML;
+    out << chart->CreatorEmail;
+    out << chart->CreatorNick;
+    out << chart->Image;
+
+    file.close();
+    return true;
+}
+
+bool CloudDBChartClient::readChartCache(qint64 id, ChartAPIv1 *chart) {
+
+    QFile file(g_cacheDir+"/charts/"+QString::number(id)+".dat");
+    if (!file.open(QIODevice::ReadOnly)) return false;
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_4_6);
+    // track a version to be able change data structure
+    int magic_string;
+    int version;
+
+    in >> magic_string;
+    if (magic_string != chart_magic_string) {
+        // wrong file format / close and exit
+        file.close();
+        return false;
+    }
+
+    in >> version;
+    if (version != chart_cache_version) {
+       // change of version, delete old cache entry
+       file.remove();
+       return false;
+    }
+
+    in >> chart->Header.LastChanged; // start
+    in >> chart->Header.CreatorId;
+    in >> chart->Header.Curated;
+    in >> chart->Header.Deleted;
+    in >> chart->Header.Description;
+    in >> chart->Header.GcVersion;
+    in >> chart->Header.Id;
+    in >> chart->Header.Language;
+    in >> chart->Header.Name;
+    in >> chart->ChartXML;
+    in >> chart->CreatorEmail;
+    in >> chart->CreatorNick;
+    in >> chart->Image;
+
+    file.close();
+    return true;
+
+}
+
+void
+CloudDBChartClient::deleteChartCache(qint64 id) {
+
+    QFile file(g_cacheDir+"/charts/"+QString::number(id)+".dat");
+    if (file.exists()) {
+       file.remove();
+    }
 
 }
 
@@ -609,22 +693,6 @@ CloudDBChartClient::processReplyStatusCodes(QNetworkReply *reply) {
     }
     return CloudDBCommon::APIresponseOthers;
 
-}
-
-void
-CloudDBChartClient::setupNetworkCache() {
-    g_cache = new QNetworkDiskCache(this);
-    QDir cacheDir(QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).at(0));
-    cacheDir.cdUp();
-    g_cacheDir = QString(cacheDir.absolutePath()+"/GoldenCheetahCloudDB");
-    g_cache->setCacheDirectory(g_cacheDir);
-    QStorageInfo storageInfo(cacheDir.absolutePath());
-    // cache shall be 100 MB - that fits for approx. 1000 charts
-    // but we reserve only if there 5 time the space avaiable, if not the default is used
-    qint64 cacheSize = 104857600; // cache shall be 100 MB - that fits for approx. 1000 charts / bu
-    if (storageInfo.bytesAvailable() > 5* cacheSize) {
-       g_cache->setMaximumCacheSize(cacheSize);
-    }
 }
 
 
@@ -779,7 +847,6 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    mainLayout->addLayout(buttonUserEditLayout);
    mainLayout->addLayout(buttonCuratorEditLayout);
 
-   setWindowTitle(tr("Select a Chart"));
    setMinimumHeight(500);
    setMinimumWidth(700);
    setLayout(mainLayout);
@@ -819,6 +886,8 @@ CloudDBChartListDialog::prepareData(QString athlete, CloudDBCommon::UserRole rol
         ownChartsOnly->setChecked(false);
         curationStateCombo->setCurrentIndex(2); // start with uncurated
         setWindowTitle(tr("Curator chart maintenance - Curate, Edit or Delete Charts"));
+    } else {
+        setWindowTitle(tr("Select a Chart"));
     }
 
     if (CloudDBDataStatus::isStaleChartHeader()) {
@@ -859,7 +928,7 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
     bool noError = true;
     int response;
     for (int i = index; i< index+count && i<g_currentHeaderList->count() && noError; i++) {
-        response = g_client->getChartByID(g_currentHeaderList->at(i).Id, chart, true); // TODO get Cache working
+        response = g_client->getChartByID(g_currentHeaderList->at(i).Id, chart); // TODO get Cache working
         if (response == CloudDBCommon::APIresponseOk) {
 
             ChartWorkingStructure preset;
