@@ -34,6 +34,9 @@
 #include "httplistener.h"
 #include "httprequesthandler.h"
 #endif
+#ifdef GC_HAS_CLOUD_DB
+#include "CloudDBCommon.h"
+#endif
 
 #include <signal.h>
 
@@ -170,7 +173,13 @@ main(int argc, char *argv[])
 #else
             debug = true;
 #endif
-
+        } else if (arg == "--clouddbcurator") {
+#ifdef GC_HAS_CLOUD_DB
+            CloudDBCommon::addCuratorFeatures = true;
+#else
+            fprintf(stderr, "CloudDB support not compiled in, exiting.\n");
+            exit(1);
+#endif
         } else {
 
             // not switches !

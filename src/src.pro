@@ -480,8 +480,8 @@ equals(CloudDB, active) {
 
         greaterThan(QT_MINOR_VERSION, 4) {
 
-            HEADERS += CloudDBChart.h CloudDBCommon.h
-            SOURCES += CloudDBChart.cpp CloudDBCommon.cpp
+            HEADERS += CloudDBChart.h CloudDBCommon.h CloudDBCurator.h
+            SOURCES += CloudDBChart.cpp CloudDBCommon.cpp CloudDBCurator.cpp
             DEFINES += GC_HAS_CLOUD_DB
 
         } else {
