@@ -95,7 +95,7 @@ QDateTime convertToLocalTime(QString timestamp)
     //see http://www.w3schools.com/Schema/schema_dtypes_date.asp
     //for more on this date format
 
-    if (timestamp[timestamp.size()-1].toLower()=='z') {
+    if (timestamp.size()>=1 && timestamp[static_cast<unsigned int>(timestamp.size())-1].toLower()=='z') {
 
         // Z at end indicates the time is in fact UTC
         QDateTime datetime = QDateTime::fromString(timestamp, Qt::ISODate);
@@ -103,7 +103,8 @@ QDateTime convertToLocalTime(QString timestamp)
         datetime=datetime.toLocalTime();
         return datetime;
 
-    } else if (timestamp.size()>=20 && (timestamp[timestamp.size()-6]=='+' || timestamp[timestamp.size()-6]=='-')) {
+    } else if (timestamp.size()>=20 && (timestamp[static_cast<unsigned int>(timestamp.size())-6]=='+' 
+                                    || timestamp[static_cast<unsigned int>(timestamp.size())-6]=='-')) {
 
         // contains timezone offset in hours
         return QDateTime::fromString(timestamp, Qt::ISODate);
