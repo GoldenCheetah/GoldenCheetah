@@ -54,13 +54,9 @@ class FixDerivePowerConfig : public DataProcessorConfig
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_EstimatePowerValues));
 
-            layoutV = new QVBoxLayout(this);
-            layout = new QHBoxLayout();
-            windLayout = new QHBoxLayout();
+            layout = new QHBoxLayout(this);
 
             layout->setContentsMargins(0,0,0,0);
-            layoutV->setContentsMargins(0,0,0,0);
-            windLayout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
 
             bikeWeightLabel = new QLabel(tr("Bike Weight (kg)"));
@@ -96,17 +92,13 @@ class FixDerivePowerConfig : public DataProcessorConfig
             layout->addWidget(bikeWeight);
             layout->addWidget(crrLabel);
             layout->addWidget(crr);
-            windLayout->addWidget(windSpeedLabel);
-            windLayout->addWidget(windSpeed);
-            windLayout->addWidget(windHeadingLabel);
-            windLayout->addWidget(windHeading);
-
-            layoutV->addLayout(layout);
-            layoutV->addLayout(windLayout);
+            layout->addWidget(windSpeedLabel);
+            layout->addWidget(windSpeed);
+            layout->addWidget(windHeadingLabel);
+            layout->addWidget(windHeading);
 
             layout->addStretch();
-            layoutV->addStretch();
-            windLayout->addStretch();
+
         }
 
         //~FixDerivePowerConfig() {} // deliberately not declared since Qt will delete
