@@ -69,7 +69,7 @@ public:
 
     int postChart(ChartAPIv1 chart);
     int putChart(ChartAPIv1 chart);
-    int getChartByID(qint64 id, ChartAPIv1 *chart, bool noCache = false);
+    int getChartByID(qint64 id, ChartAPIv1 *chart);
     int deleteChartByID(qint64 id);
     int curateChartByID(qint64 id, bool newStatus);
     int getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader);
@@ -86,12 +86,14 @@ private:
     bool noSSLlib;
 
     QNetworkAccessManager* g_nam;
-    QNetworkDiskCache* g_cache;
     QNetworkReply *g_reply;
     QString g_cacheDir;
 
     static const int header_magic_string = 987654321;
     static const int header_cache_version = 1;
+
+    static const int chart_magic_string = 1029384756;
+    static const int chart_cache_version = 1;
 
     QString  g_chart_url_base;
     QString  g_chart_url_header;
@@ -101,6 +103,9 @@ private:
 
     bool writeHeaderCache(QList<ChartAPIHeaderV1>*);
     bool readHeaderCache(QList<ChartAPIHeaderV1>*);
+    bool writeChartCache(ChartAPIv1 *);
+    bool readChartCache(qint64 id, ChartAPIv1 *chart);
+    void deleteChartCache(qint64 id);
 
     static bool unmarshallAPIv1(QByteArray , QList<ChartAPIv1>* );
     static void unmarshallAPIv1Object(QJsonObject* , ChartAPIv1* );
@@ -109,7 +114,6 @@ private:
     static void unmarshallAPIHeaderV1Object(QJsonObject* , ChartAPIHeaderV1* chart);
 
     int processReplyStatusCodes(QNetworkReply *);
-    void setupNetworkCache();
 
 };
 
