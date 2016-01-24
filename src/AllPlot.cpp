@@ -2262,11 +2262,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothWind.append(context->athlete->useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);
             objects->smoothTorque.append(dp->nm);
 
-<<<<<<< HEAD
-            if (dp->lrbalance == 0) {
-=======
             if (dp->lrbalance == RideFile::NA || (dp->lrbalance == 0)) {
->>>>>>> 7683f97... LeftRighBalance: (1/2) default with NA Value for new file
                 objects->smoothBalanceL.append(50);
                 objects->smoothBalanceR.append(50);
             }
