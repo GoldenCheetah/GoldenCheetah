@@ -734,6 +734,8 @@ TrainSidebar::configChanged(qint32)
 void
 TrainSidebar::deviceTreeWidgetSelectionChanged()
 {
+    //qDebug() << "TrainSidebar::deviceTreeWidgetSelectionChanged()";
+
     bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
     deviceSelected();
 }
@@ -830,14 +832,14 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
         status &= ~RT_MODE_SPIN;
 
         // update every active device
-        foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_ERGO);
+        foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_ERGO);
 
     } else { // SLOPE MODE
         status |= RT_MODE_SPIN;
         status &= ~RT_MODE_ERGO;
 
         // update every active device
-        foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_SPIN);
+        foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_SPIN);
     }
 }
 
@@ -1084,7 +1086,7 @@ void TrainSidebar::Start()       // when start button is pressed
         session_time.start();
         lap_time.start();
         status &=~RT_PAUSED;
-        //foreach(int dev, devices()) Devices[dev].controller->restart();
+        //foreach(int dev, activeDevices) Devices[dev].controller->restart();
         //gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
@@ -1108,7 +1110,7 @@ void TrainSidebar::Start()       // when start button is pressed
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
         status |=RT_PAUSED;
-        //foreach(int dev, devices()) Devices[dev].controller->pause();
+        //foreach(int dev, activeDevices) Devices[dev].controller->pause();
         //gui_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
@@ -1146,11 +1148,11 @@ void TrainSidebar::Start()       // when start button is pressed
         if (mode == ERG || mode == MRC) {
             status |= RT_MODE_ERGO;
             status &= ~RT_MODE_SPIN;
-            foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_ERGO);
+            foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_ERGO);
         } else { // SLOPE MODE
             status |= RT_MODE_SPIN;
             status &= ~RT_MODE_ERGO;
-            foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_SPIN);
+            foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_SPIN);
         }
 
         // tell the world
@@ -1216,7 +1218,7 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
         session_time.start();
         lap_time.start();
         status &=~RT_PAUSED;
-        foreach(int dev, devices()) Devices[dev].controller->restart();
+        foreach(int dev, activeDevices) Devices[dev].controller->restart();
         gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
@@ -1234,7 +1236,7 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
-        foreach(int dev, devices()) Devices[dev].controller->pause();
+        foreach(int dev, activeDevices) Devices[dev].controller->pause();
         status |=RT_PAUSED;
         gui_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
@@ -1385,9 +1387,10 @@ void TrainSidebar::Connect()
         return;
     }
 
-    foreach(int dev, devices()) Devices[dev].controller->start();
-    status |= RT_CONNECTED;
+    activeDevices = devices();
 
+    foreach(int dev, activeDevices) Devices[dev].controller->start();
+    status |= RT_CONNECTED;
     cnct->setIcon(connectedIcon);
     gui_timer->start(REFRESHRATE);
 }
@@ -1402,7 +1405,7 @@ void TrainSidebar::Disconnect()
 
     qDebug() << "disconnecting..";
 
-    foreach(int dev, devices()) Devices[dev].controller->stop();
+    foreach(int dev, activeDevices) Devices[dev].controller->stop();
     status &=~RT_CONNECTED;
 
     cnct->setIcon(disconnectedIcon);
@@ -1431,7 +1434,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
     // get latest telemetry from devices
     if ((status&RT_RUNNING) || (status&RT_CONNECTED)) {
         if(calibrating) {
-            foreach(int dev, devices()) { // Do for Computrainers only.  Need to check with other devices
+            foreach(int dev, activeDevices) { // Do for Computrainers only.  Need to check with other devices
                 RealtimeData local = rtData;
                 if (Devices[dev].type == DEV_CT)
                   Devices[dev].controller->getRealtimeData(local); // See if the F3 button has been pressed
@@ -1443,7 +1446,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             rtData.setSlope(slope); // always set load..
 
             // fetch the right data from each device...
-            foreach(int dev, devices()) {
+            foreach(int dev, activeDevices) {
 
                 RealtimeData local = rtData;
                 Devices[dev].controller->getRealtimeData(local);
@@ -1712,7 +1715,7 @@ void TrainSidebar::loadUpdate()
         if (load == -100) {
             Stop(DEVICE_OK);
         } else {
-            foreach(int dev, devices()) Devices[dev].controller->setLoad(load);
+            foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
             context->notifySetNow(load_msecs);
         }
     } else {
@@ -1728,7 +1731,7 @@ void TrainSidebar::loadUpdate()
         if (slope == -100) {
             Stop(DEVICE_OK);
         } else {
-            foreach(int dev, devices()) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
             context->notifySetNow(displayWorkoutDistance * 1000);
         }
     }
@@ -1753,13 +1756,13 @@ void TrainSidebar::Calibrate()
         // back to ergo/slope mode and restore load/gradient
         if (status&RT_MODE_ERGO) {
 
-            foreach(int dev, devices()) {
+            foreach(int dev, activeDevices) {
                 Devices[dev].controller->setMode(RT_MODE_ERGO);
                 Devices[dev].controller->setLoad(load);
             }
         } else {
 
-            foreach(int dev, devices()) {
+            foreach(int dev, activeDevices) {
                 Devices[dev].controller->setMode(RT_MODE_SPIN);
                 Devices[dev].controller->setGradient(slope);
             }
@@ -1789,7 +1792,7 @@ void TrainSidebar::Calibrate()
         context->notifyPause(); // get video started again, amongst other things
 
         // only do this for computrainers!
-        foreach(int dev, devices())
+        foreach(int dev, activeDevices)
             if (Devices[dev].type == DEV_CT)
                 Devices[dev].controller->setMode(RT_MODE_CALIBRATE);
     }
@@ -1865,9 +1868,9 @@ void TrainSidebar::Higher()
         if (slope >15) slope = 15;
 
         if (status&RT_MODE_ERGO)
-            foreach(int dev, devices()) Devices[dev].controller->setLoad(load);
+            foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
         else
-            foreach(int dev, devices()) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
 }
 
@@ -1889,9 +1892,9 @@ void TrainSidebar::Lower()
         if (slope <-10) slope = -10;
 
         if (status&RT_MODE_ERGO)
-            foreach(int dev, devices()) Devices[dev].controller->setLoad(load);
+            foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
         else
-            foreach(int dev, devices()) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
 }
 

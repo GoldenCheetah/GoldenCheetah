@@ -230,6 +230,7 @@ class TrainSidebar : public GcWindow
         int WPRIME; // current W'
 
         QList<DeviceConfiguration> Devices;
+        QList<int> activeDevices;
 
         // updated with a RealtimeData object either from
         // update() - from a push device (quarqd ANT+)
