@@ -738,6 +738,11 @@ TrainSidebar::deviceTreeWidgetSelectionChanged()
 
     bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
     deviceSelected();
+
+    if (status&RT_CONNECTED)
+        Disconnect(); // disconnect first
+
+    Connect(); // re-connect
 }
 
 int
@@ -1365,7 +1370,12 @@ void TrainSidebar::toggleConnect()
 
 void TrainSidebar::Connect()
 {
-    //todo: will want to disconnect/reconnect each time there is a device change..
+    //qDebug() << "current tab:" << context->tab->currentView();
+
+    // only try and connect if we are in train view..
+    // fixme: these values are hard-coded throughout
+    if (!(context->tab->currentView() == 3)) return;
+
     if (status&RT_CONNECTED) return; // already connected
 
     static QIcon connectedIcon(":images/oxygen/power-on.png");
@@ -2234,4 +2244,18 @@ void
 TrainSidebar::viewChanged(int index)
 {
     //qDebug() << "view has changed to:" << index;
+
+    // fixme: value hard-coded throughout
+    if (index == 3) {
+        //train view
+        if ((status&RT_CONNECTED) == 0) {
+            Connect();
+        }
+    } else {
+        // other view
+        if ((status&RT_CONNECTED) && (status&RT_RUNNING) == 0) {
+            Disconnect();
+        }
+    }
+
 }

@@ -30,6 +30,7 @@
 #include "ErgFilePlot.h"
 #include "GcSideBarItem.h"
 #include "RemoteControl.h"
+#include "Tab.h"
 
 // standard stuff
 #include <QDir>
