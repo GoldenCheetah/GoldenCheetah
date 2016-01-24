@@ -974,8 +974,6 @@ void ANTChannel::attemptTransition(int message_id)
     device_id=st->device_id;
     setId();
 
-    qDebug()<<number<<"type="<<channel_type<<"device type="<<device_id<<"freq="<<st->frequency;
-
     // update state
     state=message_id;
 
@@ -984,6 +982,8 @@ void ANTChannel::attemptTransition(int message_id)
 
     case TRANSITION_START:
         //qDebug()<<number<<"TRANSITION start";
+
+        qDebug()<<number<<"type="<<channel_type<<"device type="<<device_id<<"freq="<<st->frequency;
 
         // unassign regardless of status
         parent->sendMessage(ANTMessage::unassignChannel(number)); // unassign whatever we had before
