@@ -961,7 +961,6 @@ ComparePane::dropEvent(QDropEvent *event)
             add.checked = true;                     // UPDATE COMPARE INTERVAL
             add.context = context;                  // UPDATE COMPARE INTERVAL
             add.sourceContext = sourceContext;      // UPDATE COMPARE INTERVAL
-            add.filters = context->filters;         // UPDATE COMPARE INTERVAL
 
             stream >> add.name;
             stream >> add.start;
