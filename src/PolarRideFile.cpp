@@ -60,7 +60,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
     int recInterval = 1;
 
     // Read Polar GPX file (if exist with same name as hrm file).
-    RideFile *gpxresult;
+    RideFile *gpxresult=NULL;
     RideFilePoint *p;
     QString suffix = file.fileName();
     int dot = suffix.lastIndexOf(".");
@@ -68,12 +68,11 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
     QFile gpxfile(suffix.left(dot)+".gpx");
     haveGPX = gpxfile.exists();
     
-    if (haveGPX)
-      {
-	GpxFileReader reader;
-	gpxresult = reader.openRideFile(gpxfile,errors,rideList);
-	ngpx = gpxresult->dataPoints().count();
-      }
+    if (haveGPX) {
+        GpxFileReader reader;
+        gpxresult = reader.openRideFile(gpxfile,errors,rideList);
+        ngpx = gpxresult->dataPoints().count();
+    }
       
     if (!file.open(QFile::ReadOnly)) {
         errors << ("Could not open ride file: \""
@@ -297,7 +296,7 @@ this differently
 		  hr = hrm;
 		}
 		
-		if (haveGPX && (igpx<ngpx))
+		if (haveGPX && gpxresult && (igpx<ngpx))
 		  {
 		    p = gpxresult->dataPoints()[igpx];
 		    // Use previous value if GPS is momentarely
