@@ -1076,14 +1076,16 @@ void TrainSidebar::Start()       // when start button is pressed
 
     if (status&RT_PAUSED) {
 
+        qDebug() << "unpause...";
+
         // UN PAUSE!
         play->setIcon(pauseIcon);
 
         session_time.start();
         lap_time.start();
         status &=~RT_PAUSED;
-        foreach(int dev, devices()) Devices[dev].controller->restart();
-        gui_timer->start(REFRESHRATE);
+        //foreach(int dev, devices()) Devices[dev].controller->restart();
+        //gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
@@ -1098,14 +1100,16 @@ void TrainSidebar::Start()       // when start button is pressed
 
     } else if (status&RT_RUNNING) {
 
+        qDebug() << "pause...";
+
         // Pause!
         play->setIcon(playIcon);
 
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
-        foreach(int dev, devices()) Devices[dev].controller->pause();
         status |=RT_PAUSED;
-        gui_timer->stop();
+        //foreach(int dev, devices()) Devices[dev].controller->pause();
+        //gui_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
         load_msecs += load_period.restart();
@@ -1119,12 +1123,9 @@ void TrainSidebar::Start()       // when start button is pressed
         // tell the world
         context->notifyPause();
 
-    } else {
+    } else if (status&RT_CONNECTED) {
 
-        if ((status&RT_CONNECTED) == 0) {
-            // connect sensors before proceeding
-            Connect();
-        }
+        qDebug() << "start...";
 
         // Stop users from selecting different devices
         // media or workouts whilst a workout is in progress
@@ -1266,10 +1267,6 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     workoutTree->setEnabled(true);
     deviceTree->setEnabled(true);
 
-    // wipe connection
-    Disconnect();
-
-    gui_timer->stop();
     calibrating = false;
 
     load = 0;
@@ -1367,11 +1364,12 @@ void TrainSidebar::toggleConnect()
 void TrainSidebar::Connect()
 {
     //todo: will want to disconnect/reconnect each time there is a device change..
+    if (status&RT_CONNECTED) return; // already connected
 
     static QIcon connectedIcon(":images/oxygen/power-on.png");
     static QIcon disconnectedIcon(":images/oxygen/power-off.png");
 
-    qDebug() << "TrainSidebar::Connect()";
+    qDebug() << "connecting..";
 
     // if we have selected multiple devices lets
     // configure the series we collect from each one
@@ -1389,21 +1387,26 @@ void TrainSidebar::Connect()
 
     foreach(int dev, devices()) Devices[dev].controller->start();
     status |= RT_CONNECTED;
+
     cnct->setIcon(connectedIcon);
+    gui_timer->start(REFRESHRATE);
 }
 
 void TrainSidebar::Disconnect()
 {
-    // don't disconnect if running
-    if (status&RT_RUNNING) return;
+    // don't try to disconnect if running or not connected
+    if ((status&RT_RUNNING) || ((status&RT_CONNECTED) == 0)) return;
+
+    static QIcon connectedIcon(":images/oxygen/power-on.png");
+    static QIcon disconnectedIcon(":images/oxygen/power-off.png");
+
+    qDebug() << "disconnecting..";
 
     foreach(int dev, devices()) Devices[dev].controller->stop();
     status &=~RT_CONNECTED;
 
-    static QIcon connectedIcon(":images/oxygen/power-on.png");
-    static QIcon disconnectedIcon(":images/oxygen/power-off.png");
     cnct->setIcon(disconnectedIcon);
-
+    gui_timer->stop();
 }
 
 //----------------------------------------------------------------------
@@ -1426,7 +1429,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 #endif
 
     // get latest telemetry from devices
-    if (status&RT_RUNNING) {
+    if ((status&RT_RUNNING) || (status&RT_CONNECTED)) {
         if(calibrating) {
             foreach(int dev, devices()) { // Do for Computrainers only.  Need to check with other devices
                 RealtimeData local = rtData;
@@ -1490,35 +1493,42 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 }
             }
 
-            // Distance assumes current speed for the last second. from km/h to km/sec
-            displayDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
+            // only update time & distance if actively running (not just connected, and not running but paused)
+            if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0)) {
+                // Distance assumes current speed for the last second. from km/h to km/sec
+                displayDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
 
-            if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile()))
-            {
-                displayWorkoutDistance = context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset;
-                // TODO : graphs to be shown at seek position
+                if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile()))
+                {
+                    displayWorkoutDistance = context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset;
+                    // TODO : graphs to be shown at seek position
+                }
+                else
+                    displayWorkoutDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
+                rtData.setDistance(displayDistance);
+
+                // time
+                total_msecs = session_elapsed_msec + session_time.elapsed();
+                lap_msecs = lap_elapsed_msec + lap_time.elapsed();
+
+                rtData.setMsecs(total_msecs);
+                rtData.setLapMsecs(lap_msecs);
+
+                long lapTimeRemaining;
+                if (ergFile) lapTimeRemaining = ergFile->nextLap(load_msecs) - load_msecs;
+                else lapTimeRemaining = 0;
+
+                if(lapTimeRemaining < 0) {
+                        if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
+                        if(lapTimeRemaining < 0)
+                            lapTimeRemaining = 0;
+                }
+                rtData.setLapMsecsRemaining(lapTimeRemaining);
+            } else {
+                rtData.setDistance(displayDistance);
+                rtData.setMsecs(session_elapsed_msec);
+                rtData.setLapMsecs(lap_elapsed_msec);
             }
-            else
-                displayWorkoutDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
-            rtData.setDistance(displayDistance);
-
-            // time
-            total_msecs = session_elapsed_msec + session_time.elapsed();
-            lap_msecs = lap_elapsed_msec + lap_time.elapsed();
-
-            rtData.setMsecs(total_msecs);
-            rtData.setLapMsecs(lap_msecs);
-
-            long lapTimeRemaining;
-            if (ergFile) lapTimeRemaining = ergFile->nextLap(load_msecs) - load_msecs;
-            else lapTimeRemaining = 0;
-
-            if(lapTimeRemaining < 0) {
-                    if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
-                    if(lapTimeRemaining < 0)
-                        lapTimeRemaining = 0;
-            }
-            rtData.setLapMsecsRemaining(lapTimeRemaining);
 
             // local stuff ...
             displayPower = rtData.getWatts();
@@ -1598,7 +1608,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 // can be called from the controller - when user presses "Lap" button
 void TrainSidebar::newLap()
 {
-    if ((status&RT_RUNNING) == RT_RUNNING) {
+    qDebug() << "running:" << (status&RT_RUNNING) << "paused:" << (status&RT_PAUSED);
+
+    if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0)) {
         displayLap++;
 
         pwrcount  = 0;
@@ -1786,7 +1798,7 @@ void TrainSidebar::Calibrate()
 
 void TrainSidebar::FFwd()
 {
-    if ((status&RT_RUNNING) == 0) return;
+    if (((status&RT_RUNNING) == 0) || (status&RT_PAUSED)) return;
 
     if (status&RT_MODE_ERGO) {
         load_msecs += 10000; // jump forward 10 seconds
@@ -1801,7 +1813,7 @@ void TrainSidebar::FFwd()
 
 void TrainSidebar::Rewind()
 {
-    if ((status&RT_RUNNING) == 0) return;
+    if (((status&RT_RUNNING) == 0) || (status&RT_PAUSED)) return;
 
     if (status&RT_MODE_ERGO) {
         load_msecs -=10000; // jump back 10 seconds
@@ -1822,7 +1834,7 @@ void TrainSidebar::Rewind()
 // jump to next Lap marker (if there is one?)
 void TrainSidebar::FFwdLap()
 {
-    if ((status&RT_RUNNING) == 0) return;
+    if (((status&RT_RUNNING) == 0) || (status&RT_PAUSED)) return;
 
     double lapmarker;
 
@@ -1839,7 +1851,7 @@ void TrainSidebar::FFwdLap()
 // higher load/gradient
 void TrainSidebar::Higher()
 {
-    if ((status&RT_RUNNING) == 0) return;
+    if ((status&RT_CONNECTED) == 0) return;
 
     if (context->currentErgFile()) {
         // adjust the workout IF
@@ -1862,7 +1874,7 @@ void TrainSidebar::Higher()
 // higher load/gradient
 void TrainSidebar::Lower()
 {
-    if ((status&RT_RUNNING) == 0) return;
+    if ((status&RT_CONNECTED) == 0) return;
 
     if (context->currentErgFile()) {
         // adjust the workout IF
