@@ -113,11 +113,15 @@ QuarqParser::endElement( const QString&, const QString&, const QString& qName)
     // flush one last data point
     if (qName == "Qollector") {
       rideFile->appendPoint(seconds_from_start, cad, hr, km,
-                            kph, nm, watts, 0, 0.0, 0.0, 0.0, 0.0, RideFile::NA, 
+                            kph, nm, watts, 0, 0.0, 0.0, 0.0, 0.0,
+                            RideFile::NA, RideFile::NA,
                             0.0,0.0,0.0,0.0,
                             0.0,0.0,
                             0.0,0.0,0.0,0.0,
-                            0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, 0);
+                            0.0,0.0,0.0,0.0,
+                            0.0,0.0,
+                            0.0,0.0,0.0,0.0,
+                            0);
     }
 
     return true;

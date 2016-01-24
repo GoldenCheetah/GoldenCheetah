@@ -429,7 +429,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 bool ok;
                 double lat = 0.0, lon = 0.0;
                 double headwind = 0.0;
-                double lrbalance = 0.0;
+                double lrbalance = RideFile::NA;
                 double lte = 0.0, rte = 0.0;
                 double lps = 0.0, rps = 0.0;
                 double smo2 = 0.0, thb = 0.0;

@@ -71,7 +71,7 @@ time_cb(struct tm *, time_t since_epoch, void *context)
     state->rideFile->appendPoint(secs, 0.0, 0.0,
                                  state->last_miles * KM_PER_MILE, 0.0,
                                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                 RideFile::NA, 0.0,
+                                 RideFile::NA, RideFile::NA,
                                  0.0, 0.0, 0.0, 0.0,
                                  0.0,0.0,
                                  0.0, 0.0, 0.0, 0.0,

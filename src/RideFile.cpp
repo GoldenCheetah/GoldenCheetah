@@ -1088,7 +1088,8 @@ void RideFile::appendPoint(const RideFilePoint &point)
 {
     appendPoint(point.secs,point.cad,point.hr,point.km,point.kph,
                 point.nm,point.watts,point.alt,point.lon,point.lat,
-                point.headwind, point.slope, point.temp, point.lrbalance,
+                point.headwind, point.slope,
+                point.temp, point.lrbalance,
                 point.lte, point.rte, point.lps, point.rps,
                 point.lpco, point.rpco,
                 point.lppb, point.rppb, point.lppe, point.rppe,
@@ -1369,7 +1370,7 @@ RideFile::getPointValue(int index, SeriesType series) const
 QVariant
 RideFile::getPointFromValue(double value, SeriesType series) const
 {
-    if (series==RideFile::temp && value == RideFile::NA)
+    if ((series==RideFile::temp || series==RideFile::lrbalance) && value == RideFile::NA)
         return "";
     else if (series==RideFile::wattsKg)
         return "";

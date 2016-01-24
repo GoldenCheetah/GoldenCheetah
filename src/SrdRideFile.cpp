@@ -96,7 +96,15 @@ RideFile *SrdFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
             km = w->dist_data[i];
 
             // add to ride
-            result->appendPoint(time, cad, hr, km, kph, nm, watts, alt, lon, lat, wind, 0.0, RideFile::NA, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
+            result->appendPoint(time, cad, hr, km, kph, nm, watts, alt, lon, lat, wind, 0.0,
+                                RideFile::NA, RideFile::NA,
+                                0.0, 0.0, 0.0, 0.0,
+                                0.0, 0.0,
+                                0.0, 0.0, 0.0, 0.0,
+                                0.0, 0.0, 0.0, 0.0,
+                                0.0, 0.0,
+                                0.0, 0.0, 0.0, 0.0,
+                                0);
 
             // keep a track of time
             time += w->recording_interval;

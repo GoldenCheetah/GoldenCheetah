@@ -150,7 +150,7 @@ LapsEditor::okClicked()
                     km += kph/3600.0;
                     dataPoints_.append(new RideFilePoint(secs, 0.0, 0.0, km, kph,                                     0.0, 0.0, 0.0, 0.0, 0.0,
                                                          0.0, 0.0,
-                                                         RideFile::NA, 0.0,
+                                                         RideFile::NA, RideFile::NA,
                                                          0.0, 0.0, 0.0, 0.0,
                                                          0.0, 0.0,
                                                          0.0, 0.0, 0.0, 0.0,

@@ -96,7 +96,7 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
         hr = 0.0;
         lat = 0.0;
         lon = 0.0;
-        lrbalance = 0.0;
+        lrbalance = RideFile::NA;
         lte = 0.0;
         rte = 0.0;
         lps = 0.0;
@@ -195,7 +195,8 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
             // first point
             rideFile->appendPoint(secs, cadence, hr, distance, speed, torque,
-                                  power, alt, lon, lat, headwind, 0.0, RideFile::NA, lrbalance,
+                                  power, alt, lon, lat, headwind, 0.0,
+                                  RideFile::NA, lrbalance,
                                   lte,rte,lps,rps,
                                   0.0,0.0,
                                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,

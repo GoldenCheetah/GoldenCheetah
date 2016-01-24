@@ -292,9 +292,15 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         // so now we can add to the ride
                         rideFile->appendPoint(sample.secs, sample.cad, sample.hr, sample.km, 
                                               sample.kph, 0.0, sample.watts, 0.0, 0.0, 0.0, 
-                                              sample.headwind, 0.0, RideFile::NA, 0.0, 
-                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-                                              0.0, 0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0,0.0,0.0, 0);
+                                              sample.headwind, 0.0,
+                                              RideFile::NA, RideFile::NA,
+                                              0.0,0.0,0.0,0.0,
+                                              0.0,0.0,
+                                              0.0,0.0,0.0,0.0,
+                                              0.0,0.0,0.0,0.0,
+                                              0.0,0.0,
+                                              0.0,0.0,0.0,0.0,
+                                              0);
 
                         // reset back to zero so we can aggregate
                         // the next sample
