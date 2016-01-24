@@ -227,6 +227,21 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     toolbuttons->setContentsMargins(0,0,0,0);
     toolbuttons->addStretch();
 
+    QIcon cnctIcon(":images/oxygen/power-off.png");
+    cnct = new QPushButton(cnctIcon, "", this);
+    cnct->setFocusPolicy(Qt::NoFocus);
+    cnct->setIconSize(QSize(64,64));
+    cnct->setAutoFillBackground(false);
+    cnct->setAutoDefault(false);
+    cnct->setFlat(true);
+    cnct->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    cnct->setAutoRepeat(true);
+    cnct->setAutoRepeatDelay(200);
+#if QT_VERSION > 0x050400
+    cnct->setShortcut(Qt::Key_MediaPrevious);
+#endif
+    toolbuttons->addWidget(cnct);
+
     QIcon rewIcon(":images/oxygen/rewind.png");
     QPushButton *rewind = new QPushButton(rewIcon, "", this);
     rewind->setFocusPolicy(Qt::NoFocus);
@@ -351,6 +366,7 @@ intensity->hide(); //XXX!!! temporary
     toolbarButtons->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     toolbarButtons->setLayout(toolallbuttons);
 
+    connect(cnct, SIGNAL(clicked()), this, SLOT(toggleConnect()));
     connect(play, SIGNAL(clicked()), this, SLOT(Start()));
     connect(stop, SIGNAL(clicked()), this, SLOT(Stop()));
     connect(forward, SIGNAL(clicked()), this, SLOT(FFwd()));
@@ -1340,10 +1356,20 @@ void TrainSidebar::updateData(RealtimeData &rtData)
     return;
 }
 
+void TrainSidebar::toggleConnect()
+{
+    if (status&RT_CONNECTED)
+        Disconnect();
+    else
+        Connect();
+}
+
 void TrainSidebar::Connect()
 {
     //todo: will want to disconnect/reconnect each time there is a device change..
 
+    static QIcon connectedIcon(":images/oxygen/power-on.png");
+    static QIcon disconnectedIcon(":images/oxygen/power-off.png");
 
     qDebug() << "TrainSidebar::Connect()";
 
@@ -1363,6 +1389,7 @@ void TrainSidebar::Connect()
 
     foreach(int dev, devices()) Devices[dev].controller->start();
     status |= RT_CONNECTED;
+    cnct->setIcon(connectedIcon);
 }
 
 void TrainSidebar::Disconnect()
@@ -1372,6 +1399,11 @@ void TrainSidebar::Disconnect()
 
     foreach(int dev, devices()) Devices[dev].controller->stop();
     status &=~RT_CONNECTED;
+
+    static QIcon connectedIcon(":images/oxygen/power-on.png");
+    static QIcon disconnectedIcon(":images/oxygen/power-off.png");
+    cnct->setIcon(disconnectedIcon);
+
 }
 
 //----------------------------------------------------------------------

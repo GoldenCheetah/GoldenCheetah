@@ -165,6 +165,7 @@ class TrainSidebar : public GcWindow
         void Stop(int status=0);        // when controller wants to stop
         void Connect();     // connect to train devices
         void Disconnect();  // disconnect train devices
+        void toggleConnect();
 
         void Calibrate();   // toggle calibration mode
         void FFwd();        // jump forward when in a workout
@@ -220,6 +221,7 @@ class TrainSidebar : public GcWindow
 
         // Panel buttons
         QPushButton *play;
+        QPushButton *cnct;
         QLabel *stress, *intensity;
         QSlider *intensitySlider;
         int lastAppliedIntensity;// remember how we scaled last time
