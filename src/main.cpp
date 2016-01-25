@@ -34,6 +34,9 @@
 #include "httplistener.h"
 #include "httprequesthandler.h"
 #endif
+#ifdef GC_HAS_CLOUD_DB
+#include "CloudDBCommon.h"
+#endif
 
 #include <signal.h>
 
@@ -151,6 +154,9 @@ main(int argc, char *argv[])
 #else
             fprintf(stderr, "--debug             to direct diagnostic messages to the terminal instead of goldencheetah.log\n");
 #endif
+#ifdef GC_HAS_CLOUD_DB
+            fprintf(stderr, "--clouddbcurator    to add CloudDB curator specific functions to the menus\n");
+#endif
             fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
 
@@ -170,7 +176,13 @@ main(int argc, char *argv[])
 #else
             debug = true;
 #endif
-
+        } else if (arg == "--clouddbcurator") {
+#ifdef GC_HAS_CLOUD_DB
+            CloudDBCommon::addCuratorFeatures = true;
+#else
+            fprintf(stderr, "CloudDB support not compiled in, exiting.\n");
+            exit(1);
+#endif
         } else {
 
             // not switches !

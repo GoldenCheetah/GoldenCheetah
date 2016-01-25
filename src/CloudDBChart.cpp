@@ -303,7 +303,6 @@ CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
         url.setQuery(query);
         QNetworkRequest request;
         request.setUrl(url);
-        request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysNetwork);
         request.setHeader(QNetworkRequest::ContentTypeHeader, g_header_content_type);
         request.setRawHeader("Authorization", g_header_basic_auth);
         g_reply = g_nam->get(request);
