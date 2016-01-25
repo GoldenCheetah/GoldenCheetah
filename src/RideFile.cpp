@@ -1056,7 +1056,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.headwind |= (headwind != 0);
     dataPresent.slope    |= (slope != 0);
     dataPresent.temp     |= (temp != NA);
-    dataPresent.lrbalance|= (lrbalance != 0);
+    dataPresent.lrbalance|= (lrbalance != 0 && lrbalance != NA);
     dataPresent.lte      |= (lte != 0);
     dataPresent.rte      |= (rte != 0);
     dataPresent.lps      |= (lps != 0);
