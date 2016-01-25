@@ -22,6 +22,8 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
+#include "Secrets.h"
+
 
 struct CuratorAPIv1 {
     qint64  Id;
