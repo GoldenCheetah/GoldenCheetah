@@ -38,7 +38,7 @@ class ReferenceLineDialog : public QDialog
 
 
     public:
-        ReferenceLineDialog(AllPlot *parent, Context *context, bool allowDelete=false);
+        ReferenceLineDialog(AllPlot *parent, Context *context, RideFile::SeriesType, bool allowDelete=false);
 
         void setValueForAxis(double value, int axis);
 
@@ -50,6 +50,7 @@ class ReferenceLineDialog : public QDialog
     private:
         AllPlot *parent;
         Context *context;
+        RideFile::SeriesType serie;
         bool allowDelete;
 
         QLineEdit *refValue;

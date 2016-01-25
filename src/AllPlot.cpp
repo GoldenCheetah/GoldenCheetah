@@ -2623,7 +2623,7 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
         yaxis.append(referencePoint->watts);
     } else if (referencePoint->hr != 0)  {
         referenceLine = new QwtPlotCurve(tr("Heart Rate Ref"));
-        referenceLine->setYAxis(yLeft);
+        referenceLine->setYAxis(QwtAxisId(QwtAxis::yLeft,1));
         QPen hrPen = QPen(GColor(CHEARTRATE));
         hrPen.setWidth(1);
         hrPen.setStyle(Qt::DashLine);
@@ -7048,25 +7048,56 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 
         if (axis>-1 && event->type() == QEvent::MouseButtonDblClick) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
-            confirmTmpReference(invTransform(axis, m->y()),axis, true); // do show delete stuff
+            confirmTmpReference(invTransform(axis, m->y()),axis, RideFile::watts, true); // do show delete stuff
             return false;
         }
         if (axis>-1 && event->type() == QEvent::MouseMove) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
-            plotTmpReference(axis, m->x()-axisWidget(axis)->width(), m->y());
+            plotTmpReference(axis, m->x()-axisWidget(axis)->width(), m->y(), RideFile::watts);
             return false;
         }
         if (axis>-1 && event->type() == QEvent::MouseButtonRelease) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
             if (m->x()>axisWidget(axis)->width()) {
-                confirmTmpReference(invTransform(axis, m->y()),axis,false); // don't show delete stuff
+                confirmTmpReference(invTransform(axis, m->y()),axis, RideFile::watts, false); // don't show delete stuff
                 return false;
             } else  if (standard->tmpReferenceLines.count()) {
-                plotTmpReference(axis, 0, 0); //unplot
+                plotTmpReference(axis, 0, 0, RideFile::watts); //unplot
                 return true;
             }
         }
     }
+
+    if ((showHr && scope == RideFile::none) || scope == RideFile::hr) {
+
+        QwtAxisId axis = NULL;
+        if (obj == axisWidget(QwtAxisId(QwtAxis::yLeft, 1)))
+            axis=QwtAxisId(yLeft,1);
+
+        if (axis != NULL && event->type() == QEvent::MouseButtonDblClick) {
+            QMouseEvent *m = static_cast<QMouseEvent*>(event);
+            confirmTmpReference(invTransform(axis, m->y()),axis.id, RideFile::hr, true); // do show delete stuff
+            return false;
+        }
+        if (axis != NULL && event->type() == QEvent::MouseMove) {
+            QMouseEvent *m = static_cast<QMouseEvent*>(event);
+            plotTmpReference(axis, m->x()-axisWidget(axis)->width(), m->y(), RideFile::hr);
+            return false;
+        }
+        if (axis != NULL && event->type() == QEvent::MouseButtonRelease) {
+            QMouseEvent *m = static_cast<QMouseEvent*>(event);
+            if (m->x()>axisWidget(axis)->width()) {
+                confirmTmpReference(invTransform(axis, m->y()),axis.id, RideFile::hr, false); // don't show delete stuff
+                return false;
+            } else  if (standard->tmpReferenceLines.count()) {
+                plotTmpReference(axis.id, 0, 0, RideFile::hr); //unplot
+                return true;
+            }
+        }
+    }
+
+
+
 
     // is it for other objects ?
     QList<QObject*> axes;
@@ -7145,7 +7176,7 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 }
 
 void
-AllPlot::plotTmpReference(int axis, int x, int y)
+AllPlot::plotTmpReference(QwtAxisId axis, int x, int y, RideFile::SeriesType serie)
 {
     // only if on allplotwindow
     if (window==NULL) return;
@@ -7160,7 +7191,11 @@ AllPlot::plotTmpReference(int axis, int x, int y)
     if (x>0) {
 
         RideFilePoint *referencePoint = new RideFilePoint();
-        referencePoint->watts = invTransform(axis, y);
+
+        if (serie == RideFile::watts)
+            referencePoint->watts = invTransform(axis, y);
+        if (serie == RideFile::hr)
+            referencePoint->hr = invTransform(axis, y);
 
         foreach(QwtPlotCurve *curve, standard->tmpReferenceLines) {
             if (curve) {
@@ -7273,12 +7308,12 @@ AllPlot::refreshReferenceLinesForAllPlots()
 }
 
 void
-AllPlot::confirmTmpReference(double value, int axis, bool allowDelete)
+AllPlot::confirmTmpReference(double value, int axis, RideFile::SeriesType serie, bool allowDelete)
 {
     // not supported in compare mode
     if (window == NULL || context->isCompareIntervals) return;
 
-    ReferenceLineDialog *p = new ReferenceLineDialog(this, context, allowDelete);
+    ReferenceLineDialog *p = new ReferenceLineDialog(this, context, serie, allowDelete);
     p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
     p->setValueForAxis(value, axis);
     p->move(QCursor::pos()-QPoint(40,40));

@@ -587,8 +587,8 @@ class AllPlot : public QwtPlot
         void setXTitle();
         void setHighlightIntervals(bool);
 
-        void plotTmpReference(int axis, int x, int y);
-        void confirmTmpReference(double value, int axis, bool allowDelete);
+        void plotTmpReference(QwtAxisId axis, int x, int y, RideFile::SeriesType serie);
+        void confirmTmpReference(double value, int axis, RideFile::SeriesType serie, bool allowDelete);
         QwtPlotCurve* plotReferenceLine(const RideFilePoint *referencePoint);
 
         virtual void replot();

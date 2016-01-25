@@ -21,8 +21,8 @@
 #include "Context.h"
 #include "RideItem.h"
 
-ReferenceLineDialog::ReferenceLineDialog(AllPlot *parent, Context *context, bool allowDelete) :
-    parent(parent), context(context), allowDelete(allowDelete), axis(-1)
+ReferenceLineDialog::ReferenceLineDialog(AllPlot *parent, Context *context, RideFile::SeriesType serie, bool allowDelete) :
+    parent(parent), context(context), serie(serie), allowDelete(allowDelete), axis(-1)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::Tool);
@@ -36,7 +36,10 @@ ReferenceLineDialog::ReferenceLineDialog(AllPlot *parent, Context *context, bool
     refLabel->setText(tr("Reference:"));
     refValue = new QLineEdit();
     refUnit = new QLabel();
-    refUnit->setText(tr("Watts"));
+    if (serie == RideFile::watts)
+        refUnit->setText(tr("Watts"));
+    else if (serie == RideFile::hr)
+        refUnit->setText(tr("BPM"));
     refValue->setFixedWidth(50);
     referenceValueLayout->addWidget(refLabel);
     referenceValueLayout->addWidget(refValue);
@@ -112,7 +115,7 @@ ReferenceLineDialog::deleteRef()
 
         // plot needs to refresh markers
         parent->refreshReferenceLinesForAllPlots();
-        parent->plotTmpReference(axis, 0, 0); //unplot
+        parent->plotTmpReference(axis, 0, 0, RideFile::watts); //unplot
     }
 }
 
@@ -128,19 +131,24 @@ void
 ReferenceLineDialog::addClicked()
 {
     RideFilePoint *refPoint = new RideFilePoint();
-    refPoint->watts = refValue->text().toDouble();
+
+    if (serie == RideFile::watts)
+        refPoint->watts = refValue->text().toDouble();
+    else if (serie == RideFile::hr)
+        refPoint->hr = refValue->text().toDouble();
+
     context->rideItem()->ride()->appendReference(*refPoint);
     context->rideItem()->setDirty(true);
 
     parent->refreshReferenceLinesForAllPlots();
-    parent->plotTmpReference(axis, 0, 0); //unplot
+    parent->plotTmpReference(axis, 0, 0, RideFile::watts); //unplot
     done(1);
 }
 
 void
 ReferenceLineDialog::closed()
 {
-    parent->plotTmpReference(axis, 0, 0); //unplot
+    parent->plotTmpReference(axis, 0, 0, RideFile::watts); //unplot
 }
 
 void
@@ -157,14 +165,24 @@ ReferenceLineDialog::refreshTable()
 
         foreach(RideFilePoint *rp, context->rideItem()->ride()->referencePoints()) {
 
-            // watts only at this point
+            // watts and hr only at this point
             QTableWidgetItem *t = new QTableWidgetItem();
-            t->setText(tr("Power"));
+
+            if (rp->watts > 0)
+                t->setText(tr("Power"));
+            else if (rp->hr > 0)
+                t->setText(tr("Heart Rate"));
+
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             refsTable->setItem(i,0,t);
 
             t = new QTableWidgetItem();
-            t->setText(QString("%1").arg(rp->watts));
+
+            if (rp->watts > 0)
+                t->setText(QString("%1").arg(rp->watts));
+            else if (rp->hr > 0)
+               t->setText(QString("%1").arg(rp->hr));
+
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             refsTable->setItem(i,1,t);
 
