@@ -33,6 +33,10 @@
 #include <QStyleFactory>
 #include <QScrollBar>
 
+#include <QEvent>
+#include <QInputEvent>
+#include <QKeyEvent>
+
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
 #include "ComputrainerController.h"
@@ -350,6 +354,7 @@ intensity->hide(); //XXX!!! temporary
     toolbarButtons->setAutoFillBackground(false);
     toolbarButtons->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     toolbarButtons->setLayout(toolallbuttons);
+    toolbarButtons->installEventFilter(this);
 
     connect(play, SIGNAL(clicked()), this, SLOT(Start()));
     connect(stop, SIGNAL(clicked()), this, SLOT(Stop()));
@@ -473,6 +478,10 @@ intensity->hide(); //XXX!!! temporary
     configChanged(CONFIG_APPEARANCE | CONFIG_DEVICES | CONFIG_ZONES); // will reset the workout tree
     setLabels();
 
+    // capture keyboard events so we can control during
+    // a workout using basic keyboard controls
+    context->mainWindow->installEventFilter(this);
+
 #ifndef Q_OS_MAC
     toolbarButtons->hide();
 #endif
@@ -567,6 +576,49 @@ TrainSidebar::workoutPopup()
     // execute the menu
     menu.exec(trainSplitter->mapToGlobal(QPoint(workoutItem->pos().x()+workoutItem->width()-20,
                                            workoutItem->pos().y())));
+}
+
+bool
+TrainSidebar::eventFilter(QObject *, QEvent *event)
+{
+    // only when we are recording !
+    if (status & RT_RECORDING) {
+
+        if (event->type() == QEvent::KeyPress) {
+
+            // we care about cmd / ctrl
+            Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(event)->modifiers();
+            bool ctrl = (kmod & Qt::ControlModifier) != 0;
+            Q_UNUSED(ctrl);
+
+            // what was pressed
+            int key =static_cast<QKeyEvent*>(event)->key();
+
+            //
+            // We can process the keyboard event here
+            // and call any training method
+            //
+            // KEY        FUNCTION
+            //            Start() - will pause/unpause if running 
+            //            Stop() - will end workout
+            //            Pause() - pause only
+            //            UnPause() - unpause
+            //            FFwd() - nip forward
+            //            Rewind() - nip back
+            //            newLap() - new lap marker
+            //
+            switch(key) {
+
+                //XXX TODO
+
+                default:
+                break;
+
+            }
+            return true; // we listen to 'em all
+        }
+    }
+    return false;
 }
 
 void

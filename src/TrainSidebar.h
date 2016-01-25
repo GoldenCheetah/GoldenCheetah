@@ -188,6 +188,9 @@ class TrainSidebar : public GcWindow
 
         friend class ::MultiDeviceDialog;
 
+        // watch keyboard events.
+        bool eventFilter(QObject *object, QEvent *e);
+
         GcSplitter   *trainSplitter;
         GcSplitterItem *deviceItem,
                        *workoutItem,
