@@ -145,10 +145,14 @@ QList<QString> CloudDBCommon::cloudDBLangs = QList<QString>() << QObject::tr("En
 
 QString CloudDBCommon::cloudDBTimeFormat = "yyyy-MM-ddTHH:mm:ssZ";
 
+bool CloudDBCommon::addCuratorFeatures = false;
 
 
 // Initialize static member for CloudDBDataStatus
 bool CloudDBDataStatus::chartHeaderStatusStale = true;
+
+
+
 
 
 
