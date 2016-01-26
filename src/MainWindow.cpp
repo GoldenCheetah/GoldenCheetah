@@ -1898,9 +1898,8 @@ MainWindow::saveGCState(Context *context)
     context->showToolbar = true;
 #endif
     context->searchText = searchBox->text();
-    context->viewIndex = scopebar->selected();
     context->style = styleAction->isChecked();
-    context->viewIndex = scopebar->selected();
+    context->setIndex(scopebar->selected());
 }
 
 void

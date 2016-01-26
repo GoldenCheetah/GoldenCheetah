@@ -30,6 +30,7 @@
 #include "ErgFilePlot.h"
 #include "GcSideBarItem.h"
 #include "RemoteControl.h"
+#include "Tab.h"
 
 // standard stuff
 #include <QDir>
@@ -57,6 +58,7 @@
 #define RT_RECORDING    0x0400        // is recording to disk
 #define RT_WORKOUT      0x0800        // is running a workout
 #define RT_STREAMING    0x1000        // is streaming to a remote peer
+#define RT_CONNECTED    0x2000        // is connected to devices
 
 // msecs constants for timers
 #define REFRESHRATE    200 // screen refresh in milliseconds
@@ -112,6 +114,10 @@ class TrainSidebar : public GcWindow
         // get the panel
         QWidget *getToolbarButtons() { return toolbarButtons; }
 
+        void setStatusFlags(int flags);   // helpers that update context etc when changing state
+        void clearStatusFlags(int flags);
+        void setButtonStates();
+
         // where to get telemetry from Device.at(x)
         int bpmTelemetry;   // Heartrate
         int wattsTelemetry; // Power (and AltPower)
@@ -150,6 +156,7 @@ class TrainSidebar : public GcWindow
         void removeInvalidVideoSync();
         void removeInvalidWorkout();
 
+        void viewChanged(int index);
 
     public slots:
         void configChanged(qint32);
@@ -160,6 +167,9 @@ class TrainSidebar : public GcWindow
         void Start();       // when start button is pressed
         void Pause();       // when Paude is pressed
         void Stop(int status=0);        // when controller wants to stop
+        void Connect();     // connect to train devices
+        void Disconnect();  // disconnect train devices
+        void toggleConnect();
 
         void Calibrate();   // toggle calibration mode
         void FFwd();        // jump forward when in a workout
@@ -217,7 +227,8 @@ class TrainSidebar : public GcWindow
         QTreeWidgetItem *media;
 
         // Panel buttons
-        QPushButton *play;
+        QPushButton *play, *rewind, *stopbtn, *forward, *lap;
+        QPushButton *cnct;
         QLabel *stress, *intensity;
         QSlider *intensitySlider;
         int lastAppliedIntensity;// remember how we scaled last time
@@ -226,6 +237,7 @@ class TrainSidebar : public GcWindow
         int WPRIME; // current W'
 
         QList<DeviceConfiguration> Devices;
+        QList<int> activeDevices;
 
         // updated with a RealtimeData object either from
         // update() - from a push device (quarqd ANT+)

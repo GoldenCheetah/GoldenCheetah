@@ -172,6 +172,7 @@ Tab::selectView(int index)
     views->setCurrentIndex(index);
     view(index)->setSelected(true);
     masterControls->setCurrentIndex(index);
+    context->setIndex(index);
 }
 
 void
