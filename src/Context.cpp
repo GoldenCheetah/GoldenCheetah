@@ -36,6 +36,7 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
     videosync = NULL;
     isfiltered = ishomefiltered = false;
     isCompareIntervals = isCompareDateRanges = false;
+    isRunning = isPaused = false;
 
 #ifdef GC_HAS_CLOUD_DB
     cdbChartListDialog = NULL;

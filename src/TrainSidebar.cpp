@@ -231,13 +231,29 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     toolbuttons->setContentsMargins(0,0,0,0);
     toolbuttons->addStretch();
 
+    QIcon cnctIcon(":images/oxygen/power-off.png");
+    cnct = new QPushButton(cnctIcon, "", this);
+    cnct->setFocusPolicy(Qt::NoFocus);
+    cnct->setIconSize(QSize(64,64));
+    cnct->setAutoFillBackground(false);
+    cnct->setAutoDefault(false);
+    cnct->setFlat(true);
+    cnct->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    cnct->setAutoRepeat(true);
+    cnct->setAutoRepeatDelay(200);
+#if QT_VERSION > 0x050400
+    cnct->setShortcut(Qt::Key_MediaPrevious);
+#endif
+    toolbuttons->addWidget(cnct);
+
     QIcon rewIcon(":images/oxygen/rewind.png");
-    QPushButton *rewind = new QPushButton(rewIcon, "", this);
+    rewind = new QPushButton(rewIcon, "", this);
     rewind->setFocusPolicy(Qt::NoFocus);
     rewind->setIconSize(QSize(64,64));
     rewind->setAutoFillBackground(false);
     rewind->setAutoDefault(false);
     rewind->setFlat(true);
+    rewind->setEnabled(false);
     rewind->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     rewind->setAutoRepeat(true);
     rewind->setAutoRepeatDelay(200);
@@ -247,17 +263,18 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     toolbuttons->addWidget(rewind);
 
     QIcon stopIcon(":images/oxygen/stop.png");
-    QPushButton *stop = new QPushButton(stopIcon, "", this);
-    stop->setFocusPolicy(Qt::NoFocus);
-    stop->setIconSize(QSize(64,64));
-    stop->setAutoFillBackground(false);
-    stop->setAutoDefault(false);
-    stop->setFlat(true);
-    stop->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    stopbtn = new QPushButton(stopIcon, "", this);
+    stopbtn->setFocusPolicy(Qt::NoFocus);
+    stopbtn->setIconSize(QSize(64,64));
+    stopbtn->setAutoFillBackground(false);
+    stopbtn->setAutoDefault(false);
+    stopbtn->setFlat(true);
+    stopbtn->setEnabled(false);
+    stopbtn->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
 #if QT_VERSION > 0x050400
-    stop->setShortcut(Qt::Key_MediaStop);
+    stopbtn->setShortcut(Qt::Key_MediaStop);
 #endif
-    toolbuttons->addWidget(stop);
+    toolbuttons->addWidget(stopbtn);
 
     QIcon playIcon(":images/oxygen/play.png");
     play = new QPushButton(playIcon, "", this);
@@ -266,17 +283,19 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     play->setAutoFillBackground(false);
     play->setAutoDefault(false);
     play->setFlat(true);
+    play->setEnabled(false);
     play->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     play->setShortcut(Qt::Key_MediaTogglePlayPause);
     toolbuttons->addWidget(play);
 
     QIcon fwdIcon(":images/oxygen/ffwd.png");
-    QPushButton *forward = new QPushButton(fwdIcon, "", this);
+    forward = new QPushButton(fwdIcon, "", this);
     forward->setFocusPolicy(Qt::NoFocus);
     forward->setIconSize(QSize(64,64));
     forward->setAutoFillBackground(false);
     forward->setAutoDefault(false);
     forward->setFlat(true);
+    forward->setEnabled(false);
     forward->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     forward->setAutoRepeat(true);
     forward->setAutoRepeatDelay(200);
@@ -284,14 +303,16 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     forward->setShortcut(Qt::Key_MediaNext);
 #endif
     toolbuttons->addWidget(forward);
+    forward->setEnabled(false);
 
     QIcon lapIcon(":images/oxygen/lap.png");
-    QPushButton *lap = new QPushButton(lapIcon, "", this);
+    lap = new QPushButton(lapIcon, "", this);
     lap->setFocusPolicy(Qt::NoFocus);
     lap->setIconSize(QSize(64,64));
     lap->setAutoFillBackground(false);
     lap->setAutoDefault(false);
     lap->setFlat(true);
+    lap->setEnabled(false);
     lap->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
 #if QT_VERSION > 0x050400
     lap->setShortcut(Qt::Key_0);
@@ -321,7 +342,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QStyle *macstyler = QStyleFactory::create("Cleanlooks");
 #endif
     play->setStyle(macstyler);
-    stop->setStyle(macstyler);
+    stopbtn->setStyle(macstyler);
     rewind->setStyle(macstyler);
     forward->setStyle(macstyler);
     lap->setStyle(macstyler);
@@ -356,12 +377,14 @@ intensity->hide(); //XXX!!! temporary
     toolbarButtons->setLayout(toolallbuttons);
     toolbarButtons->installEventFilter(this);
 
+    connect(cnct, SIGNAL(clicked()), this, SLOT(toggleConnect()));
     connect(play, SIGNAL(clicked()), this, SLOT(Start()));
-    connect(stop, SIGNAL(clicked()), this, SLOT(Stop()));
+    connect(stopbtn, SIGNAL(clicked()), this, SLOT(Stop()));
     connect(forward, SIGNAL(clicked()), this, SLOT(FFwd()));
     connect(rewind, SIGNAL(clicked()), this, SLOT(Rewind()));
     connect(lap, SIGNAL(clicked()), this, SLOT(newLap()));
     connect(context, SIGNAL(newLap()), this, SLOT(resetLapTimer()));
+    connect(context, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
     connect(intensitySlider, SIGNAL(valueChanged(int)), this, SLOT(adjustIntensity()));
 
     // not used but kept in case re-instated in the future
@@ -456,7 +479,7 @@ intensity->hide(); //XXX!!! temporary
 
     recordFile = NULL;
     status = 0;
-    status |= RT_MODE_ERGO;         // ergo mode by default
+    setStatusFlags(RT_MODE_ERGO);         // ergo mode by default
     mode = ERG;
 
     displayWorkoutLap = displayLap = 0;
@@ -694,6 +717,9 @@ TrainSidebar::configChanged(qint32)
 
     // DEVICES
 
+    // Disconnect any running telemetry before manipulating device list
+    Disconnect();
+
     // zap whats there
     QList<QTreeWidgetItem *> devices = deviceTree->invisibleRootItem()->takeChildren();
     for (int i=0; i<devices.count(); i++) delete devices.at(i);
@@ -769,8 +795,15 @@ TrainSidebar::configChanged(qint32)
 void
 TrainSidebar::deviceTreeWidgetSelectionChanged()
 {
+    //qDebug() << "TrainSidebar::deviceTreeWidgetSelectionChanged()";
+
     bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
     deviceSelected();
+
+    if (status&RT_CONNECTED)
+        Disconnect(); // disconnect first
+
+    Connect(); // re-connect
 }
 
 int
@@ -823,21 +856,21 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
         context->notifyErgFileSelected(NULL);
         mode = ERG;
         setLabels();
-        status &= ~RT_WORKOUT;
+        clearStatusFlags(RT_WORKOUT);
         //ergPlot->setVisible(false);
     } else if (index == 1) {
         // slope mode
         context->notifyErgFileSelected(NULL);
         mode = CRS;
         setLabels();
-        status &= ~RT_WORKOUT;
+        clearStatusFlags(RT_WORKOUT);
         //ergPlot->setVisible(false);
     } else {
         // workout mode
         ergFile = new ErgFile(filename, mode, context);
         if (ergFile->isValid()) {
 
-            status |= RT_WORKOUT;
+            setStatusFlags(RT_WORKOUT);
 
             // success! we have a load file
             // setup the course profile in the
@@ -854,25 +887,25 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
             context->notifyErgFileSelected(NULL);
             removeInvalidWorkout();
             mode = ERG;
-            status &= ~RT_WORKOUT;
+            clearStatusFlags(RT_WORKOUT);
             setLabels();
         }
     }
 
     // set the device to the right mode
     if (mode == ERG || mode == MRC) {
-        status |= RT_MODE_ERGO;
-        status &= ~RT_MODE_SPIN;
+        setStatusFlags(RT_MODE_ERGO);
+        clearStatusFlags(RT_MODE_SPIN);
 
         // update every active device
-        foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_ERGO);
+        foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_ERGO);
 
     } else { // SLOPE MODE
-        status |= RT_MODE_SPIN;
-        status &= ~RT_MODE_ERGO;
+        setStatusFlags(RT_MODE_SPIN);
+        clearStatusFlags(RT_MODE_ERGO);
 
         // update every active device
-        foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_SPIN);
+        foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_SPIN);
     }
 }
 
@@ -1111,14 +1144,16 @@ void TrainSidebar::Start()       // when start button is pressed
 
     if (status&RT_PAUSED) {
 
+        qDebug() << "unpause...";
+
         // UN PAUSE!
         play->setIcon(pauseIcon);
 
         session_time.start();
         lap_time.start();
-        status &=~RT_PAUSED;
-        foreach(int dev, devices()) Devices[dev].controller->restart();
-        gui_timer->start(REFRESHRATE);
+        clearStatusFlags(RT_PAUSED);
+        //foreach(int dev, activeDevices) Devices[dev].controller->restart();
+        //gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
@@ -1133,14 +1168,16 @@ void TrainSidebar::Start()       // when start button is pressed
 
     } else if (status&RT_RUNNING) {
 
+        qDebug() << "pause...";
+
         // Pause!
         play->setIcon(playIcon);
 
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
-        foreach(int dev, devices()) Devices[dev].controller->pause();
-        status |=RT_PAUSED;
-        gui_timer->stop();
+        setStatusFlags(RT_PAUSED);
+        //foreach(int dev, activeDevices) Devices[dev].controller->pause();
+        //gui_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
         load_msecs += load_period.restart();
@@ -1154,24 +1191,12 @@ void TrainSidebar::Start()       // when start button is pressed
         // tell the world
         context->notifyPause();
 
-    } else {
+    } else if (status&RT_CONNECTED) {
+
+        qDebug() << "start...";
 
         // Stop users from selecting different devices
         // media or workouts whilst a workout is in progress
-
-        // if we have selected multiple devices lets
-        // configure the series we collect from each one
-        if (deviceTree->selectedItems().count() > 1) {
-            MultiDeviceDialog *multisetup = new MultiDeviceDialog(context, this);
-            if (multisetup->exec() == false) {
-                return;
-            }
-        } else if (deviceTree->selectedItems().count() == 1) {
-            bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry =
-            deviceTree->selectedItems().first()->type();
-        } else {
-            return;
-        }
 
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
@@ -1187,22 +1212,20 @@ void TrainSidebar::Start()       // when start button is pressed
         slope = 0.0;
 
         if (mode == ERG || mode == MRC) {
-            status |= RT_MODE_ERGO;
-            status &= ~RT_MODE_SPIN;
-            foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_ERGO);
+            setStatusFlags(RT_MODE_ERGO);
+            clearStatusFlags(RT_MODE_SPIN);
+            foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_ERGO);
         } else { // SLOPE MODE
-            status |= RT_MODE_SPIN;
-            status &= ~RT_MODE_ERGO;
-            foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_SPIN);
+            setStatusFlags(RT_MODE_SPIN);
+            clearStatusFlags(RT_MODE_ERGO);
+            foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_SPIN);
         }
-
-        foreach(int dev, devices()) Devices[dev].controller->start();
 
         // tell the world
         context->notifyStart();
 
         // we're away!
-        status |=RT_RUNNING;
+        setStatusFlags(RT_RUNNING);
 
         load_period.restart();
         session_time.start();
@@ -1218,7 +1241,7 @@ void TrainSidebar::Start()       // when start button is pressed
         }
 
         if (recordSelector->isChecked()) {
-            status |= RT_RECORDING;
+            setStatusFlags(RT_RECORDING);
         }
 
         if (status & RT_RECORDING) {
@@ -1235,7 +1258,7 @@ void TrainSidebar::Start()       // when start button is pressed
             if (recordFile) delete recordFile;
             recordFile = new QFile(fulltarget);
             if (!recordFile->open(QFile::WriteOnly | QFile::Truncate)) {
-                status &= ~RT_RECORDING;
+                clearStatusFlags(RT_RECORDING);
             } else {
 
                 // CSV File header
@@ -1260,8 +1283,8 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 
         session_time.start();
         lap_time.start();
-        status &=~RT_PAUSED;
-        foreach(int dev, devices()) Devices[dev].controller->restart();
+        clearStatusFlags(RT_PAUSED);
+        foreach(int dev, activeDevices) Devices[dev].controller->restart();
         gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
@@ -1279,8 +1302,8 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
-        foreach(int dev, devices()) Devices[dev].controller->pause();
-        status |=RT_PAUSED;
+        foreach(int dev, activeDevices) Devices[dev].controller->pause();
+        setStatusFlags(RT_PAUSED);
         gui_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
@@ -1301,7 +1324,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 {
     if ((status&RT_RUNNING) == 0) return;
 
-    status &= ~(RT_RUNNING|RT_PAUSED);
+    clearStatusFlags(RT_RUNNING|RT_PAUSED);
 
     // Stop users from selecting different devices
     // media or workouts whilst a workout is in progress
@@ -1312,10 +1335,6 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     workoutTree->setEnabled(true);
     deviceTree->setEnabled(true);
 
-    // wipe connection
-    foreach(int dev, devices()) Devices[dev].controller->stop();
-
-    gui_timer->stop();
     calibrating = false;
 
     load = 0;
@@ -1402,6 +1421,68 @@ void TrainSidebar::updateData(RealtimeData &rtData)
     return;
 }
 
+void TrainSidebar::toggleConnect()
+{
+    if (status&RT_CONNECTED)
+        Disconnect();
+    else
+        Connect();
+}
+
+void TrainSidebar::Connect()
+{
+    //qDebug() << "current tab:" << context->tab->currentView();
+
+    // only try and connect if we are in train view..
+    // fixme: these values are hard-coded throughout
+    if (!(context->tab->currentView() == 3)) return;
+
+    if (status&RT_CONNECTED) return; // already connected
+
+    static QIcon connectedIcon(":images/oxygen/power-on.png");
+    static QIcon disconnectedIcon(":images/oxygen/power-off.png");
+
+    qDebug() << "connecting..";
+
+    // if we have selected multiple devices lets
+    // configure the series we collect from each one
+    if (deviceTree->selectedItems().count() > 1) {
+        MultiDeviceDialog *multisetup = new MultiDeviceDialog(context, this);
+        if (multisetup->exec() == false) {
+            return;
+        }
+    } else if (deviceTree->selectedItems().count() == 1) {
+        bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry =
+        deviceTree->selectedItems().first()->type();
+    } else {
+        return;
+    }
+
+    activeDevices = devices();
+
+    foreach(int dev, activeDevices) Devices[dev].controller->start();
+    setStatusFlags(RT_CONNECTED);
+    cnct->setIcon(connectedIcon);
+    gui_timer->start(REFRESHRATE);
+}
+
+void TrainSidebar::Disconnect()
+{
+    // don't try to disconnect if running or not connected
+    if ((status&RT_RUNNING) || ((status&RT_CONNECTED) == 0)) return;
+
+    static QIcon connectedIcon(":images/oxygen/power-on.png");
+    static QIcon disconnectedIcon(":images/oxygen/power-off.png");
+
+    qDebug() << "disconnecting..";
+
+    foreach(int dev, activeDevices) Devices[dev].controller->stop();
+    clearStatusFlags(RT_CONNECTED);
+
+    cnct->setIcon(disconnectedIcon);
+    gui_timer->stop();
+}
+
 //----------------------------------------------------------------------
 // SCREEN UPDATE FUNCTIONS
 //----------------------------------------------------------------------
@@ -1422,9 +1503,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 #endif
 
     // get latest telemetry from devices
-    if (status&RT_RUNNING) {
+    if ((status&RT_RUNNING) || (status&RT_CONNECTED)) {
         if(calibrating) {
-            foreach(int dev, devices()) { // Do for Computrainers only.  Need to check with other devices
+            foreach(int dev, activeDevices) { // Do for Computrainers only.  Need to check with other devices
                 RealtimeData local = rtData;
                 if (Devices[dev].type == DEV_CT)
                   Devices[dev].controller->getRealtimeData(local); // See if the F3 button has been pressed
@@ -1436,7 +1517,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             rtData.setSlope(slope); // always set load..
 
             // fetch the right data from each device...
-            foreach(int dev, devices()) {
+            foreach(int dev, activeDevices) {
 
                 RealtimeData local = rtData;
                 Devices[dev].controller->getRealtimeData(local);
@@ -1486,35 +1567,42 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 }
             }
 
-            // Distance assumes current speed for the last second. from km/h to km/sec
-            displayDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
+            // only update time & distance if actively running (not just connected, and not running but paused)
+            if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0)) {
+                // Distance assumes current speed for the last second. from km/h to km/sec
+                displayDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
 
-            if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile()))
-            {
-                displayWorkoutDistance = context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset;
-                // TODO : graphs to be shown at seek position
+                if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile()))
+                {
+                    displayWorkoutDistance = context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset;
+                    // TODO : graphs to be shown at seek position
+                }
+                else
+                    displayWorkoutDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
+                rtData.setDistance(displayDistance);
+
+                // time
+                total_msecs = session_elapsed_msec + session_time.elapsed();
+                lap_msecs = lap_elapsed_msec + lap_time.elapsed();
+
+                rtData.setMsecs(total_msecs);
+                rtData.setLapMsecs(lap_msecs);
+
+                long lapTimeRemaining;
+                if (ergFile) lapTimeRemaining = ergFile->nextLap(load_msecs) - load_msecs;
+                else lapTimeRemaining = 0;
+
+                if(lapTimeRemaining < 0) {
+                        if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
+                        if(lapTimeRemaining < 0)
+                            lapTimeRemaining = 0;
+                }
+                rtData.setLapMsecsRemaining(lapTimeRemaining);
+            } else {
+                rtData.setDistance(displayDistance);
+                rtData.setMsecs(session_elapsed_msec);
+                rtData.setLapMsecs(lap_elapsed_msec);
             }
-            else
-                displayWorkoutDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
-            rtData.setDistance(displayDistance);
-
-            // time
-            total_msecs = session_elapsed_msec + session_time.elapsed();
-            lap_msecs = lap_elapsed_msec + lap_time.elapsed();
-
-            rtData.setMsecs(total_msecs);
-            rtData.setLapMsecs(lap_msecs);
-
-            long lapTimeRemaining;
-            if (ergFile) lapTimeRemaining = ergFile->nextLap(load_msecs) - load_msecs;
-            else lapTimeRemaining = 0;
-
-            if(lapTimeRemaining < 0) {
-                    if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
-                    if(lapTimeRemaining < 0)
-                        lapTimeRemaining = 0;
-            }
-            rtData.setLapMsecsRemaining(lapTimeRemaining);
 
             // local stuff ...
             displayPower = rtData.getWatts();
@@ -1594,7 +1682,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 // can be called from the controller - when user presses "Lap" button
 void TrainSidebar::newLap()
 {
-    if ((status&RT_RUNNING) == RT_RUNNING) {
+    qDebug() << "running:" << (status&RT_RUNNING) << "paused:" << (status&RT_PAUSED);
+
+    if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0)) {
         displayLap++;
 
         pwrcount  = 0;
@@ -1696,7 +1786,7 @@ void TrainSidebar::loadUpdate()
         if (load == -100) {
             Stop(DEVICE_OK);
         } else {
-            foreach(int dev, devices()) Devices[dev].controller->setLoad(load);
+            foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
             context->notifySetNow(load_msecs);
         }
     } else {
@@ -1712,7 +1802,7 @@ void TrainSidebar::loadUpdate()
         if (slope == -100) {
             Stop(DEVICE_OK);
         } else {
-            foreach(int dev, devices()) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
             context->notifySetNow(displayWorkoutDistance * 1000);
         }
     }
@@ -1737,13 +1827,13 @@ void TrainSidebar::Calibrate()
         // back to ergo/slope mode and restore load/gradient
         if (status&RT_MODE_ERGO) {
 
-            foreach(int dev, devices()) {
+            foreach(int dev, activeDevices) {
                 Devices[dev].controller->setMode(RT_MODE_ERGO);
                 Devices[dev].controller->setLoad(load);
             }
         } else {
 
-            foreach(int dev, devices()) {
+            foreach(int dev, activeDevices) {
                 Devices[dev].controller->setMode(RT_MODE_SPIN);
                 Devices[dev].controller->setGradient(slope);
             }
@@ -1773,7 +1863,7 @@ void TrainSidebar::Calibrate()
         context->notifyPause(); // get video started again, amongst other things
 
         // only do this for computrainers!
-        foreach(int dev, devices())
+        foreach(int dev, activeDevices)
             if (Devices[dev].type == DEV_CT)
                 Devices[dev].controller->setMode(RT_MODE_CALIBRATE);
     }
@@ -1782,7 +1872,7 @@ void TrainSidebar::Calibrate()
 
 void TrainSidebar::FFwd()
 {
-    if ((status&RT_RUNNING) == 0) return;
+    if (((status&RT_RUNNING) == 0) || (status&RT_PAUSED)) return;
 
     if (status&RT_MODE_ERGO) {
         load_msecs += 10000; // jump forward 10 seconds
@@ -1797,7 +1887,7 @@ void TrainSidebar::FFwd()
 
 void TrainSidebar::Rewind()
 {
-    if ((status&RT_RUNNING) == 0) return;
+    if (((status&RT_RUNNING) == 0) || (status&RT_PAUSED)) return;
 
     if (status&RT_MODE_ERGO) {
         load_msecs -=10000; // jump back 10 seconds
@@ -1818,7 +1908,7 @@ void TrainSidebar::Rewind()
 // jump to next Lap marker (if there is one?)
 void TrainSidebar::FFwdLap()
 {
-    if ((status&RT_RUNNING) == 0) return;
+    if (((status&RT_RUNNING) == 0) || (status&RT_PAUSED)) return;
 
     double lapmarker;
 
@@ -1835,7 +1925,7 @@ void TrainSidebar::FFwdLap()
 // higher load/gradient
 void TrainSidebar::Higher()
 {
-    if ((status&RT_RUNNING) == 0) return;
+    if ((status&RT_CONNECTED) == 0) return;
 
     if (context->currentErgFile()) {
         // adjust the workout IF
@@ -1849,16 +1939,16 @@ void TrainSidebar::Higher()
         if (slope >15) slope = 15;
 
         if (status&RT_MODE_ERGO)
-            foreach(int dev, devices()) Devices[dev].controller->setLoad(load);
+            foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
         else
-            foreach(int dev, devices()) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
 }
 
 // higher load/gradient
 void TrainSidebar::Lower()
 {
-    if ((status&RT_RUNNING) == 0) return;
+    if ((status&RT_CONNECTED) == 0) return;
 
     if (context->currentErgFile()) {
         // adjust the workout IF
@@ -1873,9 +1963,9 @@ void TrainSidebar::Lower()
         if (slope <-10) slope = -10;
 
         if (status&RT_MODE_ERGO)
-            foreach(int dev, devices()) Devices[dev].controller->setLoad(load);
+            foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
         else
-            foreach(int dev, devices()) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
 }
 
@@ -2208,4 +2298,89 @@ TrainSidebar::remoteControl(uint16_t command)
     default:
         break;
     }
+}
+
+// the selected view has changed for this athlete
+void
+TrainSidebar::viewChanged(int index)
+{
+    //qDebug() << "view has changed to:" << index;
+
+    // fixme: value hard-coded throughout
+    if (index == 3) {
+        //train view
+        if ((status&RT_CONNECTED) == 0) {
+            Connect();
+        }
+    } else {
+        // other view
+        if ((status&RT_CONNECTED) && (status&RT_RUNNING) == 0) {
+            Disconnect();
+        }
+    }
+
+}
+
+void TrainSidebar::setButtonStates()
+{
+    // not yet connected
+    if ((status&RT_CONNECTED) == 0) {
+        cnct->setEnabled(true);
+        play->setEnabled(false);
+        stopbtn->setEnabled(false);
+        forward->setEnabled(false);
+        rewind->setEnabled(false);
+        lap->setEnabled(false);
+        return;
+    }
+
+    // connected, but not running
+    if ((status&RT_CONNECTED) && ((status&RT_RUNNING) == 0)) {
+        cnct->setEnabled(true);
+        play->setEnabled(true);
+        stopbtn->setEnabled(false);
+        forward->setEnabled(false);
+        rewind->setEnabled(false);
+        lap->setEnabled(false);
+        return;
+    }
+
+    // paused - important to check for paused before running
+    if (status&RT_PAUSED) {
+        cnct->setEnabled(false);
+        play->setEnabled(true);
+        stopbtn->setEnabled(true);
+        forward->setEnabled(false);
+        rewind->setEnabled(false);
+        lap->setEnabled(false);
+        return;
+    }
+
+    // running
+    if (status&RT_RUNNING) {
+        cnct->setEnabled(false);
+        play->setEnabled(true);
+        stopbtn->setEnabled(true);
+        forward->setEnabled(true);
+        rewind->setEnabled(true);
+        lap->setEnabled(true);
+        return;
+    }
+
+}
+
+void TrainSidebar::setStatusFlags(int flags)
+{
+    status |= flags;
+    setButtonStates();
+    context->isRunning = (status&RT_RUNNING);
+    context->isPaused  = (status&RT_PAUSED);
+}
+
+void TrainSidebar::clearStatusFlags(int flags)
+{
+    status &=~flags;
+    setButtonStates();
+    context->isRunning = (status&RT_RUNNING);
+    context->isPaused  = (status&RT_PAUSED);
 }
