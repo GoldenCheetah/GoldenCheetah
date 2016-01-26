@@ -2574,9 +2574,9 @@ AllPlot::refreshReferenceLines()
     // not supported in compare mode
     if (context->isCompareIntervals) return;
 
-    // only on power based charts
-    if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && scope != RideFile::anTISS &&
-        scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
+    // power or hr
+    if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && scope != RideFile::hr &&
+        scope != RideFile::anTISS && scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
 
     foreach(QwtPlotCurve *referenceLine, standard->referenceLines) {
         curveColors->remove(referenceLine);
@@ -2599,9 +2599,12 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
     // not supported in compare mode
     if (context->isCompareIntervals) return NULL;
 
-    // only on power based charts
-    if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && scope != RideFile::anTISS &&
-        scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return NULL;
+    // power on power plots
+    if (referencePoint->watts != 0 && scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && 
+        scope != RideFile::anTISS && scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return NULL;
+
+    // hr on hr plots
+    if (referencePoint->hr !=0 && scope != RideFile::none && scope != RideFile::hr) return NULL;
 
     QwtPlotCurve *referenceLine = NULL;
 
@@ -2623,7 +2626,8 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
         yaxis.append(referencePoint->watts);
     } else if (referencePoint->hr != 0)  {
         referenceLine = new QwtPlotCurve(tr("Heart Rate Ref"));
-        referenceLine->setYAxis(QwtAxisId(QwtAxis::yLeft,1));
+        if (scope == RideFile::none) referenceLine->setYAxis(QwtAxisId(QwtAxis::yLeft,1));
+        else if (scope == RideFile::hr) referenceLine->setYAxis(QwtAxisId(QwtAxis::yLeft));
         QPen hrPen = QPen(GColor(CHEARTRATE));
         hrPen.setWidth(1);
         hrPen.setStyle(Qt::DashLine);
@@ -7070,21 +7074,25 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 
     if ((showHr && scope == RideFile::none) || scope == RideFile::hr) {
 
-        QwtAxisId axis = NULL;
-        if (obj == axisWidget(QwtAxisId(QwtAxis::yLeft, 1)))
-            axis=QwtAxisId(yLeft,1);
+        QwtAxisId axis(-1,-1);
 
-        if (axis != NULL && event->type() == QEvent::MouseButtonDblClick) {
+        // is it an HR Axis?
+        if (scope == RideFile::none && obj == axisWidget(QwtAxisId(QwtAxis::yLeft, 1)))
+            axis=QwtAxisId(QwtAxis::yLeft,1);
+        else if (scope == RideFile::hr && obj == axisWidget(QwtAxisId(QwtAxis::yLeft)))
+            axis=QwtAxisId(QwtAxis::yLeft);
+
+        if (axis != QwtAxisId(-1,-1) && event->type() == QEvent::MouseButtonDblClick) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
             confirmTmpReference(invTransform(axis, m->y()),axis.id, RideFile::hr, true); // do show delete stuff
             return false;
         }
-        if (axis != NULL && event->type() == QEvent::MouseMove) {
+        if (axis != QwtAxisId(-1,-1) && event->type() == QEvent::MouseMove) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
             plotTmpReference(axis, m->x()-axisWidget(axis)->width(), m->y(), RideFile::hr);
             return false;
         }
-        if (axis != NULL && event->type() == QEvent::MouseButtonRelease) {
+        if (axis != QwtAxisId(-1,-1) && event->type() == QEvent::MouseButtonRelease) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
             if (m->x()>axisWidget(axis)->width()) {
                 confirmTmpReference(invTransform(axis, m->y()),axis.id, RideFile::hr, false); // don't show delete stuff
@@ -7095,9 +7103,6 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
             }
         }
     }
-
-
-
 
     // is it for other objects ?
     QList<QObject*> axes;
@@ -7184,9 +7189,12 @@ AllPlot::plotTmpReference(QwtAxisId axis, int x, int y, RideFile::SeriesType ser
     // not supported in compare mode
     if (context->isCompareIntervals) return;
 
-    // only on power based charts
-    if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && scope != RideFile::anTISS &&
-        scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
+    // power on power plots
+    if (serie == RideFile::watts && scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && 
+        scope != RideFile::anTISS && scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
+
+    // hr on hr plots
+    if (serie == RideFile::hr && scope != RideFile::none && scope != RideFile::hr) return;
 
     if (x>0) {
 
