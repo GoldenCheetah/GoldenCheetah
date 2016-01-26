@@ -561,6 +561,9 @@ ANT::stop()
     Status = 0; // Terminate it!
     pvars.unlock();
 
+    //short wait before returning, resolves intermittent USB error if device restarted immediately
+    msleep(125);
+
     return 0;
 }
 
