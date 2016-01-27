@@ -47,6 +47,7 @@
 #include "TrainDB.h"
 #include "GcUpgrade.h"
 #include "HelpWhatsThis.h"
+#include "CsvRideFile.h"
 
 // DIALOGS / DOWNLOADS / UPLOADS
 #include "AboutDialog.h"
@@ -1419,6 +1420,8 @@ MainWindow::exportRide()
     // what format?
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList allFormats;
+    allFormats << "Export all data (*.csv)";
+    allFormats << "Export W' balance (*.csv)";
     foreach(QString suffix, rff.writeSuffixes())
         allFormats << QString("%1 (*.%2)").arg(rff.description(suffix)).arg(suffix);
 
@@ -1434,7 +1437,20 @@ MainWindow::exportRide()
 
     QFile file(fileName);
     RideFile *currentRide = currentTab->context->ride ? currentTab->context->ride->ride() : NULL;
-    bool result = RideFileFactory::instance().writeRideFile(currentTab->context, currentRide, file, getSuffix.cap(1));
+    bool result;
+
+    int idx = allFormats.indexOf(getSuffix.cap(0));
+    if (idx>1) {
+        result = RideFileFactory::instance().writeRideFile(currentTab->context, currentRide, file, getSuffix.cap(1));
+    }
+    else if (idx==0){
+        CsvFileReader writer;
+        result = writer.writeRideFile(currentTab->context, currentRide, file, CsvFileReader::gc);
+    }
+    else if (idx==1){
+        CsvFileReader writer;
+        result = writer.writeRideFile(currentTab->context, currentRide, file, CsvFileReader::wprime);
+    }
 
     if (result == false) {
         QMessageBox oops(QMessageBox::Critical, tr("Export Failed"),

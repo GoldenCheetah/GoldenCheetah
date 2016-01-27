@@ -20,6 +20,12 @@
 
 #include "CsvRideFile.h"
 #include "Units.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "Zones.h"
+#include "WPrime.h"
+#include "Settings.h"
+
 #include <QRegExp>
 #include <QTextStream>
 #include <QVector>
@@ -1030,6 +1036,23 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvTy
             out << point->interval;
             out << ",";
             out << point->alt;
+            out << "\n";
+        }
+    }
+    else if (format == wprime) {
+        WPrime *wp = ((RideFile*)ride)->wprimeData();
+        bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
+
+        // Infos
+        out << "CP=" << wp->CP << ",WPRIME=" << wp->WPRIME << ",TAU=" << wp->TAU << ",model=" << (integral?"integral":"differential") <<"\n";
+
+        // CSV File header
+        out << "secs,w'bal\n";
+
+        for (int i=0;i<wp->xdata(false).count();i++) {
+            out << wp->xdata(false).at(i)*60;
+            out << ",";
+            out << wp->ydata().at(i);
             out << "\n";
         }
     }
