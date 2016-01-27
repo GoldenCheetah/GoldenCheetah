@@ -69,6 +69,13 @@ class LeftRightBalance : public RideMetric {
         setCount(count);
     }
 
+    QString toString(bool useMetricUnits) const
+    {
+        double v1 = value(useMetricUnits);
+        double v2 = 100-v1;
+        return QString("%1-%2").arg(v1, 0, 'f', this->precision()).arg(v2, 0, 'f', this->precision());
+    }
+
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("V"); }
 
     RideMetric *clone() const { return new LeftRightBalance(*this); }
