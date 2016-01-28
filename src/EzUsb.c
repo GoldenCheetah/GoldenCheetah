@@ -106,6 +106,16 @@ static inline int ctrl_msg (
     size_t				length
 ) {
 
+#ifdef WIN32
+    // the variable "verbose" which triggers the call to 'crtl_msg' is
+    // never set within GoldenCheetah. Since the call to usb_control_msg
+    // is asking the linker to include "libusb0.dll" - which - depending
+    // on the PC may or may not exist (causing GoldenCheetah not to start).
+    // To avoid such problem the use of "libusb0.dll" functions is de-activated
+    // completely for WIN32. Not limiting functionality but the least invasive
+    // way to allow GoldenCheetah to start without "libusb0.dll" existing.
+    return -1;
+#else
     return usb_control_msg(device, 
 			   (int)requestType,
 			   (int)request,
@@ -114,6 +124,7 @@ static inline int ctrl_msg (
 			   (char*)data,
 			   (int)length,
 			   10000);
+#endif
 }
 
 
