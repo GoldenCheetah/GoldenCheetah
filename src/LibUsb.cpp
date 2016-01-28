@@ -35,15 +35,51 @@ LibUsb::LibUsb(int type) : type(type)
     readBufIndex = 0;
     readBufSize = 0;
 
+#ifdef WIN32
+    QLibrary lib("libusb0");
+    if (!lib.isLoaded()) {
+        if(!lib.load()) {
+            libNotInstalled = true;
+            return;
+        }
+    }
+    libNotInstalled = false;
+
+    // get the Functions for all used signatures
+
+    usb_init = PrototypeVoid(lib.resolve("usb_init"));
+    usb_set_debug = PrototypeVoid_Int(lib.resolve("usb_set_debug"));
+    usb_find_busses = PrototypeVoid(lib.resolve("usb_find_busses"));
+    usb_find_devices = PrototypeVoid(lib.resolve("usb_find_devices"));
+    usb_clear_halt = PrototypeInt_Handle_Int(lib.resolve("usb_clear_halt"));
+    usb_close = PrototypeInt_Handle(lib.resolve("usb_close"));
+    usb_bulk_read = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_read"));
+    usb_bulk_write = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_write"));
+    usb_get_busses = PrototypeBus(lib.resolve("usb_get_busses"));
+    usb_open = PrototypeHandle_Device(lib.resolve("usb_open"));
+    usb_set_configuration = PrototypeInt_Handle_Int(lib.resolve("usb_set_configuration"));
+    usb_claim_interface = PrototypeInt_Handle_Int(lib.resolve("usb_claim_interface"));
+    usb_release_interface = PrototypeInt_Handle_Int(lib.resolve("usb_release_interface"));
+    usb_interrupt_write = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_interrupt_write"));
+    usb_set_altinterface = PrototypeInt_Handle_Int(lib.resolve("usb_set_altinterface"));
+    usb_strerror = PrototypeChar_Void(lib.resolve("usb_strerror"));
+
+#endif
+
     // Initialize the library.
     usb_init();
     usb_set_debug(0);
     usb_find_busses();
     usb_find_devices();
+
 }
 
 int LibUsb::open()
 {
+
+#ifdef WIN32
+    if (libNotInstalled) return -1;
+#endif
     // reset counters
     intf = NULL;
     readBufIndex = 0;
@@ -77,6 +113,10 @@ int LibUsb::open()
 
 bool LibUsb::find()
 {
+#ifdef WIN32
+    if (libNotInstalled) return false;
+#endif
+
     usb_set_debug(0);
     usb_find_busses();
     usb_find_devices();
@@ -95,6 +135,9 @@ bool LibUsb::find()
 
 void LibUsb::close()
 {
+#ifdef WIN32
+    if (libNotInstalled) return;
+#endif
     if (device) {
         // stop any further write attempts whilst we close down
         usb_dev_handle *p = device;
@@ -108,11 +151,17 @@ void LibUsb::close()
 
 int LibUsb::read(char *buf, int bytes)
 {
+#ifdef WIN32
+    if (libNotInstalled) return -1;
+#endif
 	return this->read(buf, bytes, 125);
 }
 
 int LibUsb::read(char *buf, int bytes, int timeout)
 {
+#ifdef WIN32
+    if (libNotInstalled) return -1;
+#endif
     // check it isn't closed already
     if (!device) return -1;
 
@@ -168,11 +217,17 @@ int LibUsb::read(char *buf, int bytes, int timeout)
 
 int LibUsb::write(char *buf, int bytes)
 {
+#ifdef WIN32
+    if (libNotInstalled) return -1;
+#endif
 	return this->write(buf, bytes, 125);
 }
 
 int LibUsb::write(char *buf, int bytes, int timeout)
 {
+#ifdef WIN32
+    if (libNotInstalled) return -1;
+#endif
 
     // check it isn't closed
     if (!device) return -1;
@@ -200,6 +255,9 @@ int LibUsb::write(char *buf, int bytes, int timeout)
 
 bool LibUsb::findFortius()
 {
+#ifdef WIN32
+    if (libNotInstalled) return false;
+#endif
     struct usb_bus* bus;
     struct usb_device* dev;
 
@@ -258,6 +316,10 @@ bool LibUsb::findFortius()
 //      stage is to control two stage loading, we load in a single stage
 struct usb_dev_handle* LibUsb::OpenFortius()
 {
+
+#ifdef WIN32
+    if (libNotInstalled) return NULL;
+#endif
     struct usb_bus* bus;
     struct usb_device* dev;
     struct usb_dev_handle* udev;
@@ -362,6 +424,11 @@ struct usb_dev_handle* LibUsb::OpenFortius()
 
 bool LibUsb::findAntStick()
 {
+
+#ifdef WIN32
+    if (libNotInstalled) return false;
+#endif
+
     struct usb_bus* bus;
     struct usb_device* dev;
     bool found = false;
@@ -380,6 +447,9 @@ bool LibUsb::findAntStick()
 
 struct usb_dev_handle* LibUsb::OpenAntStick()
 {
+#ifdef WIN32
+    if (libNotInstalled) return NULL;
+#endif
     struct usb_bus* bus;
     struct usb_device* dev;
     struct usb_dev_handle* udev;
@@ -455,6 +525,9 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
 
 struct usb_interface_descriptor* LibUsb::usb_find_interface(struct usb_config_descriptor* config_descriptor)
 {
+#ifdef WIN32
+    if (libNotInstalled) return NULL;
+#endif
 
     struct usb_interface_descriptor* intf;
 
