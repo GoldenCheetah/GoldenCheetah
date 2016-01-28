@@ -1047,10 +1047,12 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvTy
         out << "CP=" << wp->CP << ",WPRIME=" << wp->WPRIME << ",TAU=" << wp->TAU << ",model=" << (integral?"integral":"differential") <<"\n";
 
         // CSV File header
-        out << "secs,w'bal\n";
+        out << "secs,watts,w'bal\n";
 
         for (int i=0;i<wp->xdata(false).count();i++) {
             out << wp->xdata(false).at(i)*60;
+            out << ",";
+            out << wp->smoothArray.at(i);
             out << ",";
             out << wp->ydata().at(i);
             out << "\n";
