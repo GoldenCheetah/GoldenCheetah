@@ -82,6 +82,37 @@ private:
     int readBufSize;
 
     int type;
+
+#ifdef WIN32
+    bool libNotInstalled;
+    typedef void (*PrototypeVoid)();
+    typedef char* (*PrototypeChar_Void)();
+    typedef void (*PrototypeVoid_Int)(int);
+    typedef int (*PrototypeInt_Handle)(usb_dev_handle*);
+    typedef int (*PrototypeInt_Handle_Int)(usb_dev_handle*, unsigned int);
+    typedef int (*PrototypeInt_Handle_Int_Char_Int_Int)(usb_dev_handle*, int, char*, int, int);
+    typedef struct usb_bus* (*PrototypeBus) (void);
+    typedef usb_dev_handle* (*PrototypeHandle_Device) (struct usb_device *dev);
+
+
+    PrototypeVoid usb_init;
+    PrototypeVoid_Int usb_set_debug;
+    PrototypeVoid usb_find_busses;
+    PrototypeVoid usb_find_devices;
+    PrototypeInt_Handle_Int usb_clear_halt;
+    PrototypeInt_Handle_Int usb_release_interface;
+    PrototypeInt_Handle usb_close;
+    PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_read;
+    PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_write;
+    PrototypeBus usb_get_busses;
+    PrototypeHandle_Device usb_open;
+    PrototypeInt_Handle_Int usb_set_configuration;
+    PrototypeInt_Handle_Int usb_claim_interface;
+    PrototypeInt_Handle_Int_Char_Int_Int usb_interrupt_write;
+    PrototypeInt_Handle_Int usb_set_altinterface;
+    PrototypeChar_Void usb_strerror;
+
+#endif
 };
 #endif
 #endif // gc_LibUsb_h
