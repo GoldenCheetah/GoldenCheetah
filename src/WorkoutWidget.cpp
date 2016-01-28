@@ -58,6 +58,7 @@ void WorkoutWidget::adjustLayout()
         XMOVE = 5; // how many to move X when cursoring
         YMOVE = 1; // how many to move Y when cursoring
         GRIDLINES = true;
+        LOG = false;
 
     } else {
 
@@ -75,6 +76,7 @@ void WorkoutWidget::adjustLayout()
         XMOVE = 5; // how many to move X when cursoring
         YMOVE = 1; // how many to move Y when cursoring
         GRIDLINES = false;
+        LOG = false;
     }
 }
 
@@ -133,7 +135,7 @@ WorkoutWidget::start()
     // and resampling data
     count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum =0;
 
-    // set initial 
+    // set initial
     cadenceMax = 200;
     hrMax = 220;
     speedMax = 50;
@@ -149,7 +151,7 @@ WorkoutWidget::stop()
     update();
 }
 
-void 
+void
 WorkoutWidget::telemetryUpdate(RealtimeData rt)
 {
     // only plot when recording
@@ -619,7 +621,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::Resize) {
 
         // we need to adjust layout and repaint
-        adjustLayout(); 
+        adjustLayout();
         updateNeeded = true;
     }
 
@@ -834,8 +836,8 @@ WorkoutWidget::setBlockCursor()
             for (int i=0; i<codePoints.count();i++) {
 
                 // if between or at end this is the line we're hovering on
-                if ((hoveri >= codePoints[i]) && 
-                        (((i<codePoints.count()-1) && hoveri < codePoints[i+1]) 
+                if ((hoveri >= codePoints[i]) &&
+                        (((i<codePoints.count()-1) && hoveri < codePoints[i+1])
                         || (i==codePoints.count()-1))) {
 
                         // we have found the line in coreStrings that we
@@ -1923,7 +1925,7 @@ WorkoutWidget::apply(QString code)
     dragging = NULL;
     cursorBlock = selectionBlock = QPainterPath();
     cursorBlockText = selectionBlockText = cursorBlockText2 = selectionBlockText2 = "";
-    
+
     // wipe out points NEED TO COME BACK FOR REDO!!! XXX TODO XXX
     foreach(WWPoint *point, points_) delete point;
     points_.clear();
@@ -2100,9 +2102,36 @@ WorkoutWidget::configChanged(qint32)
     repaint();
 }
 
+struct tick_info_t {
+    double x;
+    char *label;
+};
+
+static tick_info_t tick_info[] = {
+    {         1,   (char*)"1s" },
+    {         5,   (char*)"5s" },
+    {        15,   (char*)"15s" },
+    {        30,   (char*)"30s" },
+    {        60,   (char*)"1m" },
+    {       120,   (char*)"2m" },
+    {       180,   (char*)"3m" },
+    {       240,   (char*)"4m" },
+    {       300,   (char*)"5m" },
+    {       600,   (char*)"10m" },
+    {       720,   (char*)"12m" },
+    {      1200,   (char*)"20m" },
+    {      1800,   (char*)"30m" },
+    {      3600,   (char*)"1h" },
+    {      7200,   (char*)"2h" },
+    {     10800,   (char*)"3h" },
+    {     18000,   (char*)"5h" },
+    {        -1,   (char*)NULL }
+};
 void
 WorkoutWidget::paintEvent(QPaintEvent*)
 {
+    QRectF c = canvas();
+
     QPainter painter(this);
     painter.save();
 
@@ -2135,7 +2164,7 @@ WorkoutWidget::paintEvent(QPaintEvent*)
     int tsecs = 1 * 60; // 1 minute tics
     int xrange = maxX() - minX();
     while (double(xrange) / double(tsecs) > XTICS && tsecs < xrange) {
-        if (tsecs==120) tsecs = 300; 
+        if (tsecs==120) tsecs = 300;
         else tsecs *= 2;
     }
 
@@ -2216,6 +2245,26 @@ WorkoutWidget::paintEvent(QPaintEvent*)
     // now paint the points
     foreach(WorkoutWidgetItem*x, points_) x->paint(&painter);
 
+    // MMP uses a log scale
+    if (LOG) {
+
+        // paint tics for log scale on the canvas
+        QPen power(GColor(CPOWER));
+        painter.setPen(power);
+
+        // typical durations
+        for(int i=0; tick_info[i].x > 0 && tick_info[i].x < maxX(); i++) {
+            int x=logX(tick_info[i].x);
+            painter.drawLine(QPoint(x,c.top()), QPoint(x,c.top()+XTICLENGTH));
+
+            QString label = tick_info[i].label;
+            QRect bound = fontMetrics.boundingRect(label);
+            painter.drawText(QPoint(x - (bound.width() / 2),
+                                    c.top()+fontMetrics.ascent()+XTICLENGTH+(XTICLENGTH ? SPACING : 0)),
+                                    label);
+        }
+    }
+
     painter.restore();
 }
 
@@ -2275,6 +2324,16 @@ double
 WorkoutWidget::maxY()
 {
     return maxY_;
+}
+
+int
+WorkoutWidget::logX(double t)
+{
+    QRectF c = canvas();
+
+    // transform to logX coordinates for time t
+    double xratio = double(c.width()) / double(log(maxX())-(minX() > 0 ? log(minX()) : 0));
+    return c.x() + (xratio * log(t));
 }
 
 // transform from plot to painter co-ordinate

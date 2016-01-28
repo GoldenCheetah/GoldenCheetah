@@ -159,6 +159,10 @@ class WorkoutWidget : public QWidget
         // transform from plot to painter co-ordinate
         QPoint transform(double x, double y, RideFile::SeriesType s=RideFile::watts);
 
+        // for log(x) scale
+        int logX(double t);
+        bool logScale() { return LOG; }
+
         // transform from painter to plot co-ordinate
         QPointF reverseTransform(int, int);
 
@@ -326,6 +330,7 @@ class WorkoutWidget : public QWidget
         int XMOVE;              // how far to move X with cursor keys
         int YMOVE;              // how far to move Y with cursor keys
         bool GRIDLINES;         // show gridlines ? (e.g. hide in minimode)
+        bool LOG;               // use log x scale (always false, for now)
 
         bool recording_;
 
