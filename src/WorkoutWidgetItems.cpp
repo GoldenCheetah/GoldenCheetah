@@ -665,6 +665,9 @@ WWMMPCurve::paint(QPainter *painter)
         // x and y pixel location
         QPointF point = workoutWidget()->transform(secs,watts);
 
+        // use a log scale?
+        if (workoutWidget()->logScale()) point.setX(workoutWidget()->logX(secs));
+
         if (last.x() >= 0) painter->drawLine(last, point);
 
         // move on
