@@ -78,6 +78,7 @@ class NullController;
 class RealtimePlot;
 class RealtimeData;
 class MultiDeviceDialog;
+class TrainIntensityAdjustment;
 
 class TrainSidebar : public GcWindow
 {
@@ -111,12 +112,8 @@ class TrainSidebar : public GcWindow
         // this
         QTabWidget  *trainTabs;
 
-        // get the panel
-        QWidget *getToolbarButtons() { return toolbarButtons; }
-
         void setStatusFlags(int flags);   // helpers that update context etc when changing state
         void clearStatusFlags(int flags);
-        void setButtonStates();
 
         // where to get telemetry from Device.at(x)
         int bpmTelemetry;   // Heartrate
@@ -125,6 +122,7 @@ class TrainSidebar : public GcWindow
         int kphTelemetry;   // Speed (and Distance)
 
         RemoteControl *remote;      // remote control settings
+        int currentStatus() {return status;}
 
     signals:
 
@@ -132,6 +130,8 @@ class TrainSidebar : public GcWindow
         void start();
         void pause();
         void stop();
+        void intensityChanged(int value);
+        void statusChanged(int status);
 
     private slots:
         void deviceTreeWidgetSelectionChanged();
@@ -189,7 +189,7 @@ class TrainSidebar : public GcWindow
         void warnnoConfig();
 
         // User adjusted intensity
-        void adjustIntensity();     // Intensity of workout user adjusted
+        void adjustIntensity(int value);     // Intensity of workout user adjusted
 
         // slot for receiving remote control commands
         void remoteControl(uint16_t);
@@ -206,8 +206,6 @@ class TrainSidebar : public GcWindow
                        *workoutItem,
                        *videosyncItem,
                        *mediaItem;
-
-        QWidget *toolbarButtons;
 
         QSqlTableModel *videoModel;
         QSqlTableModel *videosyncModel;
@@ -226,11 +224,6 @@ class TrainSidebar : public GcWindow
         QTreeWidgetItem *videosync;
         QTreeWidgetItem *media;
 
-        // Panel buttons
-        QPushButton *play, *rewind, *stopbtn, *forward, *lap;
-        QPushButton *cnct;
-        QLabel *stress, *intensity;
-        QSlider *intensitySlider;
         int lastAppliedIntensity;// remember how we scaled last time
 
         int FTP; // current FTP / CP

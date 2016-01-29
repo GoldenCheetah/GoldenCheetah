@@ -269,6 +269,4 @@ public slots:
     void colorChanged(QColor);
 };
 
-
-
 #endif

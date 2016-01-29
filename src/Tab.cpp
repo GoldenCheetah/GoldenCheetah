@@ -129,9 +129,9 @@ Tab::close()
  * MainWindow integration with Tab / TabView (mostly pass through)
  *****************************************************************************/
 
-void Tab::setShowBottom(bool x) { view(currentView())->setShowBottom(x); }
-bool Tab::isShowBottom() { return view(currentView())->isShowBottom(); }
 bool Tab::hasBottom() { return view(currentView())->hasBottom(); }
+bool Tab::isBottomRequested() { return view(currentView())->isBottomRequested(); }
+void Tab::setBottomRequested(bool x) { view(currentView())->setBottomRequested(x); }
 void Tab::setSidebarEnabled(bool x) { view(currentView())->setSidebarEnabled(x); }
 bool Tab::isSidebarEnabled() { return view(currentView())->sidebarEnabled(); }
 void Tab::toggleSidebar() { view(currentView())->setSidebarEnabled(!view(currentView())->sidebarEnabled()); }
