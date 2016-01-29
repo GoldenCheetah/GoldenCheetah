@@ -131,6 +131,7 @@ MainWindow::MainWindow(const QDir &home)
     setAttribute(Qt::WA_DeleteOnClose);
     mainwindows.append(this);  // add us to the list of open windows
     init = false;
+    if (desktop == NULL) desktop = QApplication::desktop();
 #ifdef Q_OS_MAC
     head = NULL; // early resize event causes a crash
 #endif
@@ -156,7 +157,6 @@ MainWindow::MainWindow(const QDir &home)
         QNetworkProxy::setApplicationProxy(listOfProxies.first());
     }
 
-    if (desktop == NULL) desktop = QApplication::desktop();
     static const QIcon hideIcon(":images/toolbar/main/hideside.png");
     static const QIcon rhideIcon(":images/toolbar/main/hiderside.png");
     static const QIcon showIcon(":images/toolbar/main/showside.png");
