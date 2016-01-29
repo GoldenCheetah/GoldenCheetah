@@ -632,6 +632,7 @@ HEADERS  += \
         HrPwPlot.h \
         HrPwWindow.h \
         HrZones.h \
+        IdleTimer.h \
         IndendPlotMarker.h \
         IntervalItem.h \
         IntervalSummaryWindow.h \
@@ -757,6 +758,7 @@ HEADERS  += \
         TPUpload.h \
         TrainDB.h \
         TrainingstagebuchUploader.h \
+        TrainIntensityAdjustment.h \
         TrainSidebar.h \
         TreeMapPlot.h \
         TreeMapWindow.h \
@@ -897,6 +899,7 @@ SOURCES += \
         HrPwWindow.cpp \
         HrTimeInZone.cpp \
         HrZones.cpp \
+        IdleTimer.cpp \
         IndendPlotMarker.cpp \
         IntervalItem.cpp \
         IntervalSummaryWindow.cpp \
@@ -1024,6 +1027,7 @@ SOURCES += \
         TPUploadDialog.cpp \
         TrainDB.cpp \
         TrainingstagebuchUploader.cpp \
+        TrainIntensityAdjustment.cpp \
         TrainSidebar.cpp \
         TreeMapPlot.cpp \
         TreeMapWindow.cpp \

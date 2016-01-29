@@ -220,172 +220,8 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     workoutTree->verticalScrollBar()->setStyle(xde);
 #endif
 
-    // TOOLBAR BUTTONS ETC
-    QHBoxLayout *toolallbuttons=new QHBoxLayout; // on toolbar
-    toolallbuttons->setSpacing(0);
-    toolallbuttons->setContentsMargins(0,0,0,0);
-
-    QHBoxLayout *toolbuttons = new QHBoxLayout;
-    toolallbuttons->addLayout(toolbuttons);
-    toolbuttons->setSpacing(0);
-    toolbuttons->setContentsMargins(0,0,0,0);
-    toolbuttons->addStretch();
-
-    QIcon cnctIcon(":images/oxygen/power-off.png");
-    cnct = new QPushButton(cnctIcon, "", this);
-    cnct->setFocusPolicy(Qt::NoFocus);
-    cnct->setIconSize(QSize(64,64));
-    cnct->setAutoFillBackground(false);
-    cnct->setAutoDefault(false);
-    cnct->setFlat(true);
-    cnct->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-    cnct->setAutoRepeat(true);
-    cnct->setAutoRepeatDelay(200);
-#if QT_VERSION > 0x050400
-    cnct->setShortcut(Qt::Key_MediaPrevious);
-#endif
-    toolbuttons->addWidget(cnct);
-
-    QIcon rewIcon(":images/oxygen/rewind.png");
-    rewind = new QPushButton(rewIcon, "", this);
-    rewind->setFocusPolicy(Qt::NoFocus);
-    rewind->setIconSize(QSize(64,64));
-    rewind->setAutoFillBackground(false);
-    rewind->setAutoDefault(false);
-    rewind->setFlat(true);
-    rewind->setEnabled(false);
-    rewind->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-    rewind->setAutoRepeat(true);
-    rewind->setAutoRepeatDelay(200);
-#if QT_VERSION > 0x050400
-    rewind->setShortcut(Qt::Key_MediaPrevious);
-#endif
-    toolbuttons->addWidget(rewind);
-
-    QIcon stopIcon(":images/oxygen/stop.png");
-    stopbtn = new QPushButton(stopIcon, "", this);
-    stopbtn->setFocusPolicy(Qt::NoFocus);
-    stopbtn->setIconSize(QSize(64,64));
-    stopbtn->setAutoFillBackground(false);
-    stopbtn->setAutoDefault(false);
-    stopbtn->setFlat(true);
-    stopbtn->setEnabled(false);
-    stopbtn->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-#if QT_VERSION > 0x050400
-    stopbtn->setShortcut(Qt::Key_MediaStop);
-#endif
-    toolbuttons->addWidget(stopbtn);
-
-    QIcon playIcon(":images/oxygen/play.png");
-    play = new QPushButton(playIcon, "", this);
-    play->setFocusPolicy(Qt::NoFocus);
-    play->setIconSize(QSize(64,64));
-    play->setAutoFillBackground(false);
-    play->setAutoDefault(false);
-    play->setFlat(true);
-    play->setEnabled(false);
-    play->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-    play->setShortcut(Qt::Key_MediaTogglePlayPause);
-    toolbuttons->addWidget(play);
-
-    QIcon fwdIcon(":images/oxygen/ffwd.png");
-    forward = new QPushButton(fwdIcon, "", this);
-    forward->setFocusPolicy(Qt::NoFocus);
-    forward->setIconSize(QSize(64,64));
-    forward->setAutoFillBackground(false);
-    forward->setAutoDefault(false);
-    forward->setFlat(true);
-    forward->setEnabled(false);
-    forward->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-    forward->setAutoRepeat(true);
-    forward->setAutoRepeatDelay(200);
-#if QT_VERSION > 0x050400
-    forward->setShortcut(Qt::Key_MediaNext);
-#endif
-    toolbuttons->addWidget(forward);
-    forward->setEnabled(false);
-
-    QIcon lapIcon(":images/oxygen/lap.png");
-    lap = new QPushButton(lapIcon, "", this);
-    lap->setFocusPolicy(Qt::NoFocus);
-    lap->setIconSize(QSize(64,64));
-    lap->setAutoFillBackground(false);
-    lap->setAutoDefault(false);
-    lap->setFlat(true);
-    lap->setEnabled(false);
-    lap->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-#if QT_VERSION > 0x050400
-    lap->setShortcut(Qt::Key_0);
-#endif
-    toolbuttons->addWidget(lap);
-    toolbuttons->addStretch();
-
-    QHBoxLayout *slideLayout = new QHBoxLayout;
-    slideLayout->setSpacing(0);
-    slideLayout->setContentsMargins(0,0,0,0);
-    toolallbuttons->addLayout(slideLayout);
-
-    intensitySlider = new QSlider(Qt::Horizontal, this);
-    intensitySlider->setAutoFillBackground(false);
-    intensitySlider->setFocusPolicy(Qt::NoFocus);
-    intensitySlider->setMinimum(75);
-    intensitySlider->setMaximum(125);
-    intensitySlider->setValue(100);
-    slideLayout->addStretch();
-    slideLayout->addWidget(intensitySlider);
-    intensitySlider->hide(); // FIXME: XXX!!! temporary
-
-#ifdef Q_OS_MAC
-#if QT_VERSION > 0x5000
-    QStyle *macstyler = QStyleFactory::create("fusion");
-#else
-    QStyle *macstyler = QStyleFactory::create("Cleanlooks");
-#endif
-    play->setStyle(macstyler);
-    stopbtn->setStyle(macstyler);
-    rewind->setStyle(macstyler);
-    forward->setStyle(macstyler);
-    lap->setStyle(macstyler);
-#endif
-
-    QPalette pal;
-    stress = new QLabel(this);
-    stress->setAutoFillBackground(false);
-    stress->setFixedWidth(100);
-    stress->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-    pal.setColor(stress->foregroundRole(), Qt::white);
-    stress->setPalette(pal);
-stress->hide(); //XXX!!! temporary
-
-    intensity = new QLabel(this);
-    intensity->setAutoFillBackground(false);
-    intensity->setFixedWidth(100);
-    intensity->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-    pal.setColor(intensity->foregroundRole(), Qt::white);
-    intensity->setPalette(pal);
-intensity->hide(); //XXX!!! temporary
-
-    slideLayout->addWidget(stress, Qt::AlignVCenter|Qt::AlignCenter);
-    slideLayout->addWidget(intensity, Qt::AlignVCenter|Qt::AlignCenter);
-    slideLayout->addStretch();
-
-    toolbarButtons = new QWidget(this);
-    toolbarButtons->setContentsMargins(0,0,0,0);
-    toolbarButtons->setFocusPolicy(Qt::NoFocus);
-    toolbarButtons->setAutoFillBackground(false);
-    toolbarButtons->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-    toolbarButtons->setLayout(toolallbuttons);
-    toolbarButtons->installEventFilter(this);
-
-    connect(cnct, SIGNAL(clicked()), this, SLOT(toggleConnect()));
-    connect(play, SIGNAL(clicked()), this, SLOT(Start()));
-    connect(stopbtn, SIGNAL(clicked()), this, SLOT(Stop()));
-    connect(forward, SIGNAL(clicked()), this, SLOT(FFwd()));
-    connect(rewind, SIGNAL(clicked()), this, SLOT(Rewind()));
-    connect(lap, SIGNAL(clicked()), this, SLOT(newLap()));
     connect(context, SIGNAL(newLap()), this, SLOT(resetLapTimer()));
     connect(context, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
-    connect(intensitySlider, SIGNAL(valueChanged(int)), this, SLOT(adjustIntensity()));
 
     // not used but kept in case re-instated in the future
     recordSelector = new QCheckBox(this);
@@ -506,7 +342,7 @@ intensity->hide(); //XXX!!! temporary
     context->mainWindow->installEventFilter(this);
 
 #ifndef Q_OS_MAC
-    toolbarButtons->hide();
+    //toolbarButtons->hide();
 #endif
 
 }
@@ -876,8 +712,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
             // setup the course profile in the
             // display!
             context->notifyErgFileSelected(ergFile);
-            intensitySlider->setValue(100);
-            lastAppliedIntensity = 100;
+            adjustIntensity(100);
             setLabels();
         } else {
 
@@ -1139,16 +974,11 @@ TrainSidebar::videosyncTreeWidgetSelectionChanged()
 
 void TrainSidebar::Start()       // when start button is pressed
 {
-    static QIcon playIcon(":images/oxygen/play.png");
-    static QIcon pauseIcon(":images/oxygen/pause.png");
-
     if (status&RT_PAUSED) {
 
         qDebug() << "unpause...";
 
         // UN PAUSE!
-        play->setIcon(pauseIcon);
-
         session_time.start();
         lap_time.start();
         clearStatusFlags(RT_PAUSED);
@@ -1171,8 +1001,6 @@ void TrainSidebar::Start()       // when start button is pressed
         qDebug() << "pause...";
 
         // Pause!
-        play->setIcon(playIcon);
-
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
         setStatusFlags(RT_PAUSED);
@@ -1206,8 +1034,6 @@ void TrainSidebar::Start()       // when start button is pressed
         deviceTree->setEnabled(false);
 
         // START!
-        play->setIcon(pauseIcon);
-
         load = 100;
         slope = 0.0;
 
@@ -1226,6 +1052,9 @@ void TrainSidebar::Start()       // when start button is pressed
 
         // we're away!
         setStatusFlags(RT_RUNNING);
+
+        // tell the world
+        context->notifyStart();
 
         load_period.restart();
         session_time.start();
@@ -1371,14 +1200,11 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     }
 
     // get back to normal after it may have been adusted by the user
-    lastAppliedIntensity=100;
-    intensitySlider->setValue(100);
+    //lastAppliedIntensity=100;
+    adjustIntensity(100);
     if (context->currentErgFile()) context->currentErgFile()->reload();
     context->notifySetNow(load_msecs);
 
-    // reset the play button
-    QIcon playIcon(":images/oxygen/play.png");
-    play->setIcon(playIcon);
 
     // tell the world
     context->notifyStop();
@@ -1439,9 +1265,6 @@ void TrainSidebar::Connect()
 
     if (status&RT_CONNECTED) return; // already connected
 
-    static QIcon connectedIcon(":images/oxygen/power-on.png");
-    static QIcon disconnectedIcon(":images/oxygen/power-off.png");
-
     qDebug() << "connecting..";
 
     // if we have selected multiple devices lets
@@ -1462,7 +1285,6 @@ void TrainSidebar::Connect()
 
     foreach(int dev, activeDevices) Devices[dev].controller->start();
     setStatusFlags(RT_CONNECTED);
-    cnct->setIcon(connectedIcon);
     gui_timer->start(REFRESHRATE);
 }
 
@@ -1479,7 +1301,6 @@ void TrainSidebar::Disconnect()
     foreach(int dev, activeDevices) Devices[dev].controller->stop();
     clearStatusFlags(RT_CONNECTED);
 
-    cnct->setIcon(disconnectedIcon);
     gui_timer->stop();
 }
 
@@ -1929,7 +1750,7 @@ void TrainSidebar::Higher()
 
     if (context->currentErgFile()) {
         // adjust the workout IF
-        intensitySlider->setValue(intensitySlider->value()+5);
+        adjustIntensity(lastAppliedIntensity+5);
 
     } else {
         if (status&RT_MODE_ERGO) load += 5;
@@ -1945,14 +1766,14 @@ void TrainSidebar::Higher()
     }
 }
 
-// higher load/gradient
+// lower load/gradient
 void TrainSidebar::Lower()
 {
     if ((status&RT_CONNECTED) == 0) return;
 
     if (context->currentErgFile()) {
         // adjust the workout IF
-        intensitySlider->setValue(intensitySlider->value()-5);
+        adjustIntensity(lastAppliedIntensity-5);
 
     } else {
 
@@ -1971,9 +1792,8 @@ void TrainSidebar::Lower()
 
 void TrainSidebar::setLabels()
 {
+    /* should this be kept, or removed? Currently these are always hidden.
     if (context->currentErgFile()) {
-
-        //intensitySlider->show();//XXX!!! temporary
 
         if (context->currentErgFile()->format == CRS) {
 
@@ -1987,27 +1807,31 @@ void TrainSidebar::setLabels()
         }
 
     } else {
-
-        intensitySlider->hide();
         stress->setText("");
         intensity->setText("");
     }
+    */
 }
 
-void TrainSidebar::adjustIntensity()
+void TrainSidebar::adjustIntensity(int value)
 {
+    if (value == lastAppliedIntensity)
+    {
+        return;
+    }
+
     if (!context->currentErgFile()) return; // no workout selected
 
     // block signals temporarily
     context->mainWindow->blockSignals(true);
 
     // work through the ergFile from NOW
-    // adjusting back from last intensity setting
+    // adjusting back from last setting
     // and increasing to new intensity setting
 
     double from = double(lastAppliedIntensity) / 100.00;
-    double to = double(intensitySlider->value()) / 100.00;
-    lastAppliedIntensity = intensitySlider->value();
+    double to = double(value) / 100.00;
+    lastAppliedIntensity = value;
 
     long starttime = context->getNow();
 
@@ -2063,6 +1887,8 @@ void TrainSidebar::adjustIntensity()
 
     // force replot
     context->notifySetNow(context->getNow());
+
+    emit intensityChanged(lastAppliedIntensity);
 }
 
 MultiDeviceDialog::MultiDeviceDialog(Context *, TrainSidebar *traintool) : traintool(traintool)
@@ -2321,66 +2147,20 @@ TrainSidebar::viewChanged(int index)
 
 }
 
-void TrainSidebar::setButtonStates()
-{
-    // not yet connected
-    if ((status&RT_CONNECTED) == 0) {
-        cnct->setEnabled(true);
-        play->setEnabled(false);
-        stopbtn->setEnabled(false);
-        forward->setEnabled(false);
-        rewind->setEnabled(false);
-        lap->setEnabled(false);
-        return;
-    }
-
-    // connected, but not running
-    if ((status&RT_CONNECTED) && ((status&RT_RUNNING) == 0)) {
-        cnct->setEnabled(true);
-        play->setEnabled(true);
-        stopbtn->setEnabled(false);
-        forward->setEnabled(false);
-        rewind->setEnabled(false);
-        lap->setEnabled(false);
-        return;
-    }
-
-    // paused - important to check for paused before running
-    if (status&RT_PAUSED) {
-        cnct->setEnabled(false);
-        play->setEnabled(true);
-        stopbtn->setEnabled(true);
-        forward->setEnabled(false);
-        rewind->setEnabled(false);
-        lap->setEnabled(false);
-        return;
-    }
-
-    // running
-    if (status&RT_RUNNING) {
-        cnct->setEnabled(false);
-        play->setEnabled(true);
-        stopbtn->setEnabled(true);
-        forward->setEnabled(true);
-        rewind->setEnabled(true);
-        lap->setEnabled(true);
-        return;
-    }
-
-}
-
 void TrainSidebar::setStatusFlags(int flags)
 {
     status |= flags;
-    setButtonStates();
     context->isRunning = (status&RT_RUNNING);
     context->isPaused  = (status&RT_PAUSED);
+
+    emit statusChanged(status);
 }
 
 void TrainSidebar::clearStatusFlags(int flags)
 {
     status &=~flags;
-    setButtonStates();
     context->isRunning = (status&RT_RUNNING);
     context->isPaused  = (status&RT_PAUSED);
+
+    emit statusChanged(status);
 }
