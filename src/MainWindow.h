@@ -216,6 +216,7 @@ class MainWindow : public QMainWindow
         // CloudDB actions
         void cloudDBuserEditChart();
         void cloudDBcuratorEditChart();
+        void cloudDBshowStatus();
 #endif
         // save and restore state to context
         void saveGCState(Context *);

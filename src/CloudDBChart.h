@@ -98,8 +98,6 @@ private:
     QString  g_chart_url_base;
     QString  g_chart_url_header;
     QString  g_chartcuration_url_base;
-    QVariant g_header_content_type;
-    QByteArray g_header_basic_auth;
 
     bool writeHeaderCache(QList<ChartAPIHeaderV1>*);
     bool readHeaderCache(QList<ChartAPIHeaderV1>*);

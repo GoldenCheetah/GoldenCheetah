@@ -77,6 +77,10 @@ public:
 
     static bool addCuratorFeatures;
 
+    static QString cloudDBBaseURL;
+    static QVariant cloudDBContentType;
+    static QByteArray cloudDBBasicAuth;
+
     // Languages explicitely supported to store artifacts == UI Languages
     static QList<QString> cloudDBLangsIds;
     static QList<QString> cloudDBLangs;
