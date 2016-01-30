@@ -17,7 +17,7 @@
  */
 
 #include "CloudDBCurator.h"
-#include "Secrets.h"
+#include "CloudDBCommon.h"
 
 #include <QJsonParseError>
 #include <QJsonObject>
@@ -35,10 +35,7 @@ CloudDBCuratorClient::CloudDBCuratorClient()
 
     // common definitions used
 
-    g_curator_url_base = QString("https://%1.appspot.com/v1/curator").arg(GC_CLOUD_DB_APP_NAME);
-    g_header_content_type = QVariant("application/json");
-    g_header_basic_auth = "Basic ";
-    g_header_basic_auth.append(GC_CLOUD_DB_BASIC_AUTH);
+    g_curator_url_base = CloudDBCommon::cloudDBBaseURL + QString("curator");
 
 }
 CloudDBCuratorClient::~CloudDBCuratorClient() {
@@ -54,8 +51,8 @@ CloudDBCuratorClient::isCurator(QString uuid) {
     url.setQuery(query);
     QNetworkRequest request;
     request.setUrl(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, g_header_content_type);
-    request.setRawHeader("Authorization", g_header_basic_auth);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
+    request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
     g_reply = g_nam->get(request);
 
     // blocking request

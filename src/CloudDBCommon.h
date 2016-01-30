@@ -21,6 +21,8 @@
 
 #include "LTMSettings.h"
 #include "Settings.h"
+#include "Secrets.h"
+
 
 #include <QObject>
 #include <QScrollArea>
@@ -76,6 +78,10 @@ class CloudDBCommon
 public:
 
     static bool addCuratorFeatures;
+
+    static QString cloudDBBaseURL;
+    static QVariant cloudDBContentType;
+    static QByteArray cloudDBBasicAuth;
 
     // Languages explicitely supported to store artifacts == UI Languages
     static QList<QString> cloudDBLangsIds;
