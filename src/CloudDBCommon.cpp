@@ -137,6 +137,11 @@ void CloudDBAcceptConditionsDialog::rejectConditions() {
 }
 
 // Initialize static members of CloudDBCommon
+
+QString CloudDBCommon::cloudDBBaseURL = QString("https://%1.appspot.com/v1/").arg(GC_CLOUD_DB_APP_NAME);
+QVariant  CloudDBCommon::cloudDBContentType = QVariant("application/json");
+QByteArray CloudDBCommon::cloudDBBasicAuth = "Basic " + QByteArray(GC_CLOUD_DB_BASIC_AUTH) ;
+
 QList<QString> CloudDBCommon::cloudDBLangsIds = QList<QString>() << "en" << "fr" << "ja" << "pt-br" << "it" << "de" << "ru" << "cs" << "es" << "pt" << "zh-tw" << "xx";
 
 QList<QString> CloudDBCommon::cloudDBLangs = QList<QString>() << QObject::tr("English") << QObject::tr("French") << QObject::tr("Japanese") << QObject::tr("Portugese (Brazil)") <<
@@ -146,7 +151,6 @@ QList<QString> CloudDBCommon::cloudDBLangs = QList<QString>() << QObject::tr("En
 QString CloudDBCommon::cloudDBTimeFormat = "yyyy-MM-ddTHH:mm:ssZ";
 
 bool CloudDBCommon::addCuratorFeatures = false;
-
 
 // Initialize static member for CloudDBDataStatus
 bool CloudDBDataStatus::chartHeaderStatusStale = true;

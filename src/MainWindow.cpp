@@ -116,6 +116,7 @@
 #include "CloudDBCommon.h"
 #include "CloudDBChart.h"
 #include "CloudDBCurator.h"
+#include "CloudDBStatus.h"
 #endif
 
 
@@ -690,6 +691,7 @@ MainWindow::MainWindow(const QDir &home)
 #ifdef GC_HAS_CLOUD_DB
     // CloudDB options
     optionsMenu->addSeparator();
+    optionsMenu->addAction(tr("CloudDB Status..."), this, SLOT(cloudDBshowStatus()));
     QMenu *cloudDBMenu = optionsMenu->addMenu(tr("CloudDB Contributions"));
     cloudDBMenu->addAction(tr("Maintain charts"), this, SLOT(cloudDBuserEditChart()));
 
@@ -2361,6 +2363,13 @@ MainWindow::cloudDBcuratorEditChart()
 
     }
 }
+
+void
+MainWindow::cloudDBshowStatus() {
+
+    CloudDBStatusClient::displayCloudDBStatus();
+}
+
 
 #endif
 

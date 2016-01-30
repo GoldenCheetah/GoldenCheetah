@@ -16,43 +16,49 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef CLOUDDBCURATOR_H
-#define CLOUDDBCURATOR_H
+#ifndef CLOUDDBSTATUS_H
+#define CLOUDDBSTATUS_H
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QPushButton>
 
-struct CuratorAPIv1 {
+struct StatusAPIGetV1 {
     qint64  Id;
-    QString CuratorId;
-    QString Nickname;
-    QString Email;
+    int Status;
+    QDateTime changeDate;
+};
+
+struct StatusAPIGetTextV1 {
+    qint64  Id;
+    QString Text;
 };
 
 
-class CloudDBCuratorClient : public QObject
+class CloudDBStatusClient : public QObject
 {
     Q_OBJECT
 
 public:
 
-    CloudDBCuratorClient();
-    ~CloudDBCuratorClient();
+    CloudDBStatusClient();
+    ~CloudDBStatusClient();
 
-    bool isCurator(QString uuid);
+    static StatusAPIGetV1 getCurrentStatus();
+    static QString getCurrentStatusText(qint64 id);
+
+    static int CloudDBStatus_Ok;
+    static int CloudDBStatus_PartialFailure;
+    static int CloudDBStatus_Stopped;
+
+    static void displayCloudDBStatus();
 
 private:
 
-    QNetworkAccessManager* g_nam;
-    QNetworkReply *g_reply;
-
-    QString  g_curator_url_base;
-
-    static bool unmarshallAPIv1(QByteArray , QList<CuratorAPIv1>* );
-    static void unmarshallAPIv1Object(QJsonObject* , CuratorAPIv1* );
+    static bool unmarshallAPIGetV1(QByteArray , StatusAPIGetV1* );
+    static bool unmarshallAPIGetTextV1(QByteArray , StatusAPIGetTextV1* );
 
 };
 
 
-
-#endif // CLOUDDBCORE_H
+#endif // CLOUDDBSTATUS_H
