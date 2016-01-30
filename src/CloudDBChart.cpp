@@ -49,16 +49,11 @@ CloudDBChartClient::CloudDBChartClient()
 
     // common definitions used
 
-    g_chart_url_base = g_chart_url_header = g_chartcuration_url_base = QString("https://%1.appspot.com").arg(GC_CLOUD_DB_APP_NAME);
+    g_chart_url_base = g_chart_url_header = g_chartcuration_url_base = CloudDBCommon::cloudDBBaseURL.arg(GC_CLOUD_DB_APP_NAME);
 
-    g_chart_url_base.append("/v1/chart/");
-    g_chart_url_header.append("/v1/chartheader");
-    g_chartcuration_url_base.append("/v1/chartcuration/");
-
-    g_header_content_type = QVariant("application/json");
-
-    g_header_basic_auth = "Basic ";
-    g_header_basic_auth.append(GC_CLOUD_DB_BASIC_AUTH);
+    g_chart_url_base.append("chart/");
+    g_chart_url_header.append("chartheader");
+    g_chartcuration_url_base.append("chartcuration/");
 
 }
 CloudDBChartClient::~CloudDBChartClient() {
@@ -99,8 +94,8 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
     QUrl url = QUrl(g_chart_url_base);
     QNetworkRequest request;
     request.setUrl(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, g_header_content_type);
-    request.setRawHeader("Authorization", g_header_basic_auth);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
+    request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
     request.setAttribute(QNetworkRequest::CacheSaveControlAttribute, true);
     g_reply = g_nam->post(request, document.toJson());
 
@@ -159,8 +154,8 @@ CloudDBChartClient::putChart(ChartAPIv1 chart) {
     QUrl url = QUrl(g_chart_url_base);
     QNetworkRequest request;
     request.setUrl(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, g_header_content_type);
-    request.setRawHeader("Authorization", g_header_basic_auth);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
+    request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
     g_reply = g_nam->put(request, document.toJson());
 
     // blocking request
@@ -190,8 +185,8 @@ CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
     // now from GAE
     QNetworkRequest request;
     request.setUrl(QUrl(g_chart_url_base+QString::number(id, 10)));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, g_header_content_type);
-    request.setRawHeader("Authorization", g_header_basic_auth);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
+    request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
     g_reply = g_nam->get(request);
 
     // blocking request
@@ -225,8 +220,8 @@ CloudDBChartClient::deleteChartByID(qint64 id) {
 
     QNetworkRequest request;
     request.setUrl(QUrl(g_chart_url_base+QString::number(id, 10)));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, g_header_content_type);
-    request.setRawHeader("Authorization", g_header_basic_auth);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
+    request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
     g_reply = g_nam->deleteResource(request);
 
     // blocking request
@@ -253,8 +248,8 @@ CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
     url.setQuery(query);
     QNetworkRequest request;
     request.setUrl(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, g_header_content_type);
-    request.setRawHeader("Authorization", g_header_basic_auth);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
+    request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
     g_reply = g_nam->put(request, "{ \"id\": \"dummy\"");
 
     // blocking request
@@ -303,8 +298,8 @@ CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
         url.setQuery(query);
         QNetworkRequest request;
         request.setUrl(url);
-        request.setHeader(QNetworkRequest::ContentTypeHeader, g_header_content_type);
-        request.setRawHeader("Authorization", g_header_basic_auth);
+        request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
+        request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
         g_reply = g_nam->get(request);
 
         // blocking request
