@@ -21,7 +21,6 @@
 
 #include "LTMChartParser.h"
 #include "GcUpgrade.h"
-#include "Secrets.h"
 
 #include <QtGlobal>
 #include <QNetworkRequest>
@@ -49,7 +48,7 @@ CloudDBChartClient::CloudDBChartClient()
 
     // common definitions used
 
-    g_chart_url_base = g_chart_url_header = g_chartcuration_url_base = CloudDBCommon::cloudDBBaseURL.arg(GC_CLOUD_DB_APP_NAME);
+    g_chart_url_base = g_chart_url_header = g_chartcuration_url_base = CloudDBCommon::cloudDBBaseURL;
 
     g_chart_url_base.append("chart/");
     g_chart_url_header.append("chartheader");
@@ -354,8 +353,8 @@ CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
     QMutableListIterator<ChartAPIHeaderV1> it2(*chartHeader);
     while (it2.hasNext()) {
         if (it2.next().Deleted) {
+            deleteChartCache(it2.next().Id);
             it2.remove();
-            deleteChartCache(it.next().Id);
         }
     }
 

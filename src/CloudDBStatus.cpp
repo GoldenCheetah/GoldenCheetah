@@ -35,11 +35,12 @@ int CloudDBStatusClient::CloudDBStatus_PartialFailure = 20;
 int CloudDBStatusClient::CloudDBStatus_Stopped = 30;
 
 
-CloudDBStatusClient::CloudDBStatusClient()
-{
-
+CloudDBStatusClient::CloudDBStatusClient() {
+    // only static members
 }
 CloudDBStatusClient::~CloudDBStatusClient() {
+    // only static members
+
 }
 
 

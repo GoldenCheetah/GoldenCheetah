@@ -21,6 +21,8 @@
 
 #include "LTMSettings.h"
 #include "Settings.h"
+#include "Secrets.h"
+
 
 #include <QObject>
 #include <QScrollArea>
