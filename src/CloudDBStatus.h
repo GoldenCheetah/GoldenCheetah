@@ -23,9 +23,6 @@
 #include <QNetworkReply>
 #include <QPushButton>
 
-#include "Secrets.h"
-
-
 struct StatusAPIGetV1 {
     qint64  Id;
     int Status;

@@ -18,7 +18,6 @@
 
 #include "CloudDBCurator.h"
 #include "CloudDBCommon.h"
-#include "Secrets.h"
 
 #include <QJsonParseError>
 #include <QJsonObject>
@@ -36,7 +35,7 @@ CloudDBCuratorClient::CloudDBCuratorClient()
 
     // common definitions used
 
-    g_curator_url_base = (CloudDBCommon::cloudDBBaseURL + QString("curator")).arg(GC_CLOUD_DB_APP_NAME);
+    g_curator_url_base = CloudDBCommon::cloudDBBaseURL + QString("curator");
 
 }
 CloudDBCuratorClient::~CloudDBCuratorClient() {
