@@ -1484,6 +1484,9 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
     deviceList->setEditTriggers(QAbstractItemView::NoEditTriggers);
     deviceList->setSelectionMode(QAbstractItemView::SingleSelection);
 
+    autoConnect = new QCheckBox(tr("Auto-connect devices in Train View"), this);
+    autoConnect->setChecked(appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool());
+
     multiCheck = new QCheckBox(tr("Allow multiple devices in Train View"), this);
     multiCheck->setChecked(appsettings->value(this, TRAIN_MULTI, false).toBool());
 
@@ -1491,6 +1494,7 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
     QHBoxLayout *bottom = new QHBoxLayout;
     bottom->setSpacing(2);
     bottom->addWidget(multiCheck);
+    bottom->addWidget(autoConnect);
     bottom->addStretch();
     bottom->addWidget(addButton);
     bottom->addWidget(delButton);
@@ -1508,6 +1512,7 @@ DevicePage::saveClicked()
     DeviceConfigurations all;
     all.writeConfig(deviceListModel->Configuration);
     appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
+    appsettings->setValue(TRAIN_AUTOCONNECT, autoConnect->isChecked());
 
     return 0;
 }

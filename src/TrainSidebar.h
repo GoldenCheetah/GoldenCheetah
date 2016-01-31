@@ -271,6 +271,8 @@ class TrainSidebar : public GcWindow
                     *load_timer,    // change the load on the device
                     *disk_timer;    // write to .CSV file
 
+        bool autoConnect;
+
     public:
         int mode;
         // everyone else wants this

@@ -356,6 +356,7 @@ class DevicePage : public QWidget
         deviceModel *deviceListModel;
 
         QCheckBox   *multiCheck;
+        QCheckBox   *autoConnect;
 };
 
 class RemotePage : public QWidget
