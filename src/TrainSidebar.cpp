@@ -74,6 +74,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     //c->setContentsMargins(0,0,0,0); // bit of space is useful
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
+    autoConnect = false;
 
     cl->setSpacing(0);
     cl->setContentsMargins(0,0,0,0);
@@ -705,7 +706,8 @@ TrainSidebar::videosyncPopup()
 void
 TrainSidebar::configChanged(qint32)
 {
-    //qDebug() << "TrainSidebar::configChanged()";
+    // auto connect is off by default
+    autoConnect = appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool();
 
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 #if !defined GC_VIDEO_NONE
@@ -800,10 +802,8 @@ TrainSidebar::deviceTreeWidgetSelectionChanged()
     bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
     deviceSelected();
 
-    if (status&RT_CONNECTED)
-        Disconnect(); // disconnect first
-
-    Connect(); // re-connect
+    if (status&RT_CONNECTED) Disconnect(); // disconnect first
+    if (autoConnect) Connect(); // re-connect
 }
 
 int
@@ -2300,11 +2300,12 @@ TrainSidebar::remoteControl(uint16_t command)
     }
 }
 
-// the selected view has changed for this athlete
+// connect/disconnect automatically when view changes
 void
 TrainSidebar::viewChanged(int index)
 {
     //qDebug() << "view has changed to:" << index;
+    if (!autoConnect) return;
 
     // fixme: value hard-coded throughout
     if (index == 3) {

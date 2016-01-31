@@ -178,6 +178,7 @@
 #define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
 #define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
+#define TRAIN_AUTOCONNECT               "<global-trainmode>train/autoconnect"
 #define GC_REMOTE_START                 "<global-trainmode>remote/start"
 #define GC_REMOTE_STOP                  "<global-trainmode>remote/stop"
 #define GC_REMOTE_LAP                   "<global-trainmode>remote/lap"
