@@ -16,20 +16,20 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_TrainIntensityAdjustment_h
-#define _GC_TrainIntensityAdjustment_h
+#ifndef _GC_TrainBottom_h
+#define _GC_TrainBottom_h
 
 #include <QWidget>
 
 class TrainSidebar;
 class QPushButton;
 
-class TrainIntensityAdjustment : public QWidget
+class TrainBottom : public QWidget
 {
     Q_OBJECT
 
 public:
-    TrainIntensityAdjustment(TrainSidebar * trainSidebar, QWidget *parent = 0);
+    TrainBottom(TrainSidebar * trainSidebar, QWidget *parent = 0);
 private:
     TrainSidebar *m_trainSidebar;
     QPushButton *m_playButton, *m_rewindButton, *m_stopButton, *m_forwardButton;
@@ -44,4 +44,4 @@ signals:
     void autoHideChanged(bool enabled);
 };
 
-#endif // _GC_TrainIntensityAdjustment_h
+#endif // _GC_TrainBottom_h
