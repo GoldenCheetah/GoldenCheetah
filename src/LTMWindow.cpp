@@ -1309,17 +1309,8 @@ LTMWindow::shareConfig()
     CloudDBChartObjectDialog dialog(chart, context->athlete->cyclist);
     if (dialog.exec() == QDialog::Accepted) {
         CloudDBChartClient c;
-        int r = c.postChart(dialog.getChart());
-        if (r == CloudDBCommon::APIresponseCreated) {
-            CloudDBDataStatus::setChartHeaderStale(true); }
-        else {
-            switch(r) {
-            case CloudDBCommon::APIresponseOverQuota:
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
-                break;
-            default:
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with export to CloudDB - please try again later.")));
-            }
+        if (c.postChart(dialog.getChart())) {
+            CloudDBDataStatus::setChartHeaderStale(true);
         }
     }
 }
