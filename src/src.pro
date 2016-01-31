@@ -110,8 +110,8 @@ LIBS += $${LIBZ_LIBS}
 win32 {
 
     RC_FILE = windowsico.rc
-#    INCLUDEPATH += ./win32 $${QT_INSTALL_PREFIX}/src/3rdparty/zlib
-#    LIBS += -lws2_32
+    INCLUDEPATH += ./win32 $${QT_INSTALL_PREFIX}/src/3rdparty/zlib
+    LIBS += -lws2_32
 
 } else {
 

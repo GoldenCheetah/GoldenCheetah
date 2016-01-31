@@ -18,6 +18,7 @@
 
 #include "CloudDBChart.h"
 #include "CloudDBCommon.h"
+#include "CloudDBStatus.h"
 
 #include "LTMChartParser.h"
 #include "GcUpgrade.h"
@@ -60,7 +61,7 @@ CloudDBChartClient::~CloudDBChartClient() {
 }
 
 
-int
+bool
 CloudDBChartClient::postChart(ChartAPIv1 chart) {
 
     // check if Athlete ID is filled
@@ -105,7 +106,8 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
 
     if (g_reply->error() != QNetworkReply::NoError) {
 
-        return processReplyStatusCodes(g_reply);
+        processReplyStatusCodes(g_reply);
+        return false;
 
     }
 
@@ -117,11 +119,11 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
      writeChartCache(&chart);
    }
 
-   return CloudDBCommon::APIresponseCreated;
+   return true;
 
 }
 
-int
+bool
 CloudDBChartClient::putChart(ChartAPIv1 chart) {
 
     // we assume all field are filled properly / not further check or modification
@@ -164,18 +166,19 @@ CloudDBChartClient::putChart(ChartAPIv1 chart) {
 
     if (g_reply->error() != QNetworkReply::NoError) {
 
-        return processReplyStatusCodes(g_reply);
+        processReplyStatusCodes(g_reply);
+        return false;
 
     }
 
     // update cache
     writeChartCache(&chart);
-    return CloudDBCommon::APIresponseOk;
+    return true;
 
 }
 
 
-int
+bool
 CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
 
     // read from Cache first
@@ -195,7 +198,8 @@ CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
 
     if (g_reply->error() != QNetworkReply::NoError) {
 
-        return processReplyStatusCodes(g_reply);
+        processReplyStatusCodes(g_reply);
+        return false;
 
     }
     // call successfull
@@ -211,10 +215,10 @@ CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
     }
     delete charts;
 
-    return CloudDBCommon::APIresponseOthers;
+    return true;
 }
 
-int
+bool
 CloudDBChartClient::deleteChartByID(qint64 id) {
 
     QNetworkRequest request;
@@ -230,15 +234,16 @@ CloudDBChartClient::deleteChartByID(qint64 id) {
 
     if (g_reply->error() != QNetworkReply::NoError) {
 
-        return processReplyStatusCodes(g_reply);
+        processReplyStatusCodes(g_reply);
+        return false;
 
     }
 
     deleteChartCache(id);
-    return CloudDBCommon::APIresponseOk;
+    return true;
 }
 
-int
+bool
 CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
 
     QUrlQuery query;
@@ -258,16 +263,17 @@ CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
 
     if (g_reply->error() != QNetworkReply::NoError) {
 
-        return processReplyStatusCodes(g_reply);
+        processReplyStatusCodes(g_reply);
+        return false;
 
     }
 
     deleteChartCache(id);
-    return CloudDBCommon::APIresponseOk;
+    return true;
 }
 
 
-int
+bool
 CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
 
     QDateTime selectAfter;
@@ -307,7 +313,8 @@ CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
         loop.exec();
 
         if (g_reply->error() != QNetworkReply::NoError) {
-            return processReplyStatusCodes(g_reply);
+            processReplyStatusCodes(g_reply);
+            return false;
         };
 
         QByteArray result = g_reply->readAll();
@@ -361,7 +368,7 @@ CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
     // store cache for next time
     writeHeaderCache(chartHeader);
 
-    return CloudDBCommon::APIresponseOk;
+    return true;
 }
 
 
@@ -654,7 +661,7 @@ CloudDBChartClient::unmarshallAPIHeaderV1Object(QJsonObject* object, ChartAPIHea
 
 }
 
-int
+void
 CloudDBChartClient::processReplyStatusCodes(QNetworkReply *reply) {
 
     // PROBLEM - the replies provided are in some of our case not
@@ -667,24 +674,32 @@ CloudDBChartClient::processReplyStatusCodes(QNetworkReply *reply) {
         // which should even work when the response text is slighly changed.
         QByteArray body = g_reply->readAll();
         if (body.contains("503") && (body.contains("Quota"))) {
-            return CloudDBCommon::APIresponseOverQuota;
+            QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
+            return;
         }
     }
 
     // and here how it should work / jus interpreting what was send through HTTP
     QVariant statusCode = g_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
     if ( !statusCode.isValid() ) {
-        return CloudDBCommon::APIresponseOthers;
+        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with CloudDB - please try again later.")));
+        return;
     }
     int code = statusCode.toInt();
     switch (code) {
     case CloudDBCommon::APIresponseForbidden :
+        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Authorization problem with CloudDB - please try again later.")));
+        break;
     case CloudDBCommon::APIresponseOverQuota :
-        return code;
+        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
+        break;
+    case CloudDBCommon::APIresponseServiceProblem :
+        CloudDBStatusClient::displayCloudDBStatus();
+        break;
     default:
-        return CloudDBCommon::APIresponseOthers;
+        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with CloudDB - response code: %1 - please try again later."))
+                             .arg(QString::number(code, 10)));
     }
-    return CloudDBCommon::APIresponseOthers;
 
 }
 
@@ -919,10 +934,8 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
     ChartAPIv1* chart = new ChartAPIv1;
     g_networkrequestactive = true;
     bool noError = true;
-    int response;
     for (int i = index; i< index+count && i<g_currentHeaderList->count() && noError; i++) {
-        response = g_client->getChartByID(g_currentHeaderList->at(i).Id, chart); // TODO get Cache working
-        if (response == CloudDBCommon::APIresponseOk) {
+        if (g_client->getChartByID(g_currentHeaderList->at(i).Id, chart)) {
 
             ChartWorkingStructure preset;
             preset.id = chart->Header.Id;
@@ -948,13 +961,6 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
             preset.creatorNick = chart->CreatorNick;
             g_currentPresets->append(preset);
         } else {
-            switch (response) {
-            case CloudDBCommon::APIresponseOverQuota:
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
-                break;
-            default:
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading the charts - please try again later")));
-            }
             noError = false;
         }
     }
@@ -1066,15 +1072,7 @@ CloudDBChartListDialog::refreshStaleChartHeader() {
     g_currentHeaderList->clear();
     g_currentIndex = 0;
     g_networkrequestactive = true;
-    int response = g_client->getAllChartHeader(g_fullHeaderList);
-    if (response != CloudDBCommon::APIresponseOk) {
-        switch (response) {
-        case CloudDBCommon::APIresponseOverQuota:
-            QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
-            break;
-        default:
-            QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading the charts - please try again later")));
-        }
+    if (!g_client->getAllChartHeader(g_fullHeaderList)) {
         g_networkrequestactive = false;
         return false;
     }
@@ -1153,8 +1151,7 @@ CloudDBChartListDialog::curateCuratorEdit() {
         QTableWidgetItem* s = tableWidget->selectedItems().at(0);
         if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
             qint64 id = g_currentPresets->at(s->row()).id;
-            if (g_client->curateChartByID(id, true) != CloudDBCommon::APIresponseOk) {
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem curating the chart - please try again later")));
+            if (!g_client->curateChartByID(id, true)) {
                 return;
             }
             // refresh header buffer
@@ -1186,8 +1183,7 @@ CloudDBChartListDialog::deleteUserEdit(){
         QTableWidgetItem* s = tableWidget->selectedItems().at(0);
         if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
             qint64 id = g_currentPresets->at(s->row()).id;
-            if (g_client->deleteChartByID(id) != CloudDBCommon::APIresponseOk) {
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem deleting the chart - please try again later")));
+            if (!g_client->deleteChartByID(id)) {
                 return;
             }
             // set stale for subsequent list dialog calls
@@ -1227,25 +1223,16 @@ CloudDBChartListDialog::editUserEdit(){
         if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
             qint64 id = g_currentPresets->at(s->row()).id;
             ChartAPIv1 chart;
-            if (g_client->getChartByID(id, &chart) != CloudDBCommon::APIresponseOk) {
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading the chart - please try again later")));
+            if (!g_client->getChartByID(id, &chart)) {
                 return;
             }
 
             // now complete the chart with for the user manually added fields
             CloudDBChartObjectDialog dialog(chart, "", true);
             if (dialog.exec() == QDialog::Accepted) {
-                int r = g_client->putChart(dialog.getChart());
-                if (r == CloudDBCommon::APIresponseOk) {
+                if (g_client->putChart(dialog.getChart())) {
                     refreshStaleChartHeader();
                 } else {
-                    switch(r) {
-                    case CloudDBCommon::APIresponseOverQuota:
-                        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
-                        break;
-                    default:
-                        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with export to CloudDB - please try again later.")));
-                    }
                     return;
                 }
             }
@@ -1351,25 +1338,14 @@ CloudDBChartListDialog::cellDoubleClicked(int row, int /*column */) {
     ChartAPIv1* chart = new ChartAPIv1;
     if (row >= 0 && row < g_currentHeaderList->size() ) {
         g_networkrequestactive = true;
-        int response;
-        response = g_client->getChartByID(g_currentHeaderList->at(row).Id, chart);
-        if (response == CloudDBCommon::APIresponseOk) {
+        if (g_client->getChartByID(g_currentHeaderList->at(row).Id, chart)) {
             CloudDBChartShowPictureDialog showImage(chart->Image);
             showImage.exec();
 
-        } else {
-            switch (response) {
-            case CloudDBCommon::APIresponseOverQuota:
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
-                break;
-            default:
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading the charts - please try again later")));
-            }
         }
     }
     g_networkrequestactive = false;
     delete chart;
-
 }
 
 

@@ -67,12 +67,12 @@ public:
     CloudDBChartClient();
     ~CloudDBChartClient();
 
-    int postChart(ChartAPIv1 chart);
-    int putChart(ChartAPIv1 chart);
-    int getChartByID(qint64 id, ChartAPIv1 *chart);
-    int deleteChartByID(qint64 id);
-    int curateChartByID(qint64 id, bool newStatus);
-    int getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader);
+    bool postChart(ChartAPIv1 chart);
+    bool putChart(ChartAPIv1 chart);
+    bool getChartByID(qint64 id, ChartAPIv1 *chart);
+    bool deleteChartByID(qint64 id);
+    bool curateChartByID(qint64 id, bool newStatus);
+    bool getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader);
 
     void updateChartInCache(qint64 id);
     bool sslLibMissing() { return noSSLlib; }
@@ -111,7 +111,7 @@ private:
     static bool unmarshallAPIHeaderV1(QByteArray , QList<ChartAPIHeaderV1>* );
     static void unmarshallAPIHeaderV1Object(QJsonObject* , ChartAPIHeaderV1* chart);
 
-    int processReplyStatusCodes(QNetworkReply *);
+    void processReplyStatusCodes(QNetworkReply *);
 
 };
 

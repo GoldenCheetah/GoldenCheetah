@@ -90,6 +90,7 @@ public:
     static const int APIresponseOk = 200; // also used in case of 204 (No Content)
     static const int APIresponseCreated = 201;
     static const int APIresponseForbidden = 403;
+    static const int APIresponseServiceProblem = 422; // CloudDB response if Status <> 10 (Ok)
     static const int APIresponseOverQuota = 503;
     static const int APIresponseOthers = 999;
 
