@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "TrainIntensityAdjustment.h"
+#include "TrainBottom.h"
 #include "TrainSidebar.h"
 
 #include <QHBoxLayout>
@@ -24,7 +24,7 @@
 #include <QSlider>
 #include <QCheckBox>
 
-TrainIntensityAdjustment::TrainIntensityAdjustment(TrainSidebar *trainSidebar, QWidget *parent) :
+TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     QWidget(parent),
     m_trainSidebar(trainSidebar)
 {
@@ -197,7 +197,7 @@ TrainIntensityAdjustment::TrainIntensityAdjustment(TrainSidebar *trainSidebar, Q
     this->installEventFilter(trainSidebar);
 }
 
-void TrainIntensityAdjustment::updatePlayButtonIcon()
+void TrainBottom::updatePlayButtonIcon()
 {
     static QIcon playIcon(":images/oxygen/play.png");
     static QIcon pauseIcon(":images/oxygen/pause.png");
@@ -216,13 +216,13 @@ void TrainIntensityAdjustment::updatePlayButtonIcon()
     }
 }
 
-void TrainIntensityAdjustment::autoHideCheckboxChanged(int state)
+void TrainBottom::autoHideCheckboxChanged(int state)
 {
     emit autoHideChanged(state == Qt::Checked);
 }
 
 
-void TrainIntensityAdjustment::statusChanged(int status)
+void TrainBottom::statusChanged(int status)
 {
     static QIcon connectedIcon(":images/oxygen/power-on.png");
     static QIcon disconnectedIcon(":images/oxygen/power-off.png");

@@ -78,7 +78,7 @@ class NullController;
 class RealtimePlot;
 class RealtimeData;
 class MultiDeviceDialog;
-class TrainIntensityAdjustment;
+class TrainBottom;
 
 class TrainSidebar : public GcWindow
 {
