@@ -272,6 +272,7 @@ class TrainSidebar : public GcWindow
                     *disk_timer;    // write to .CSV file
 
         bool autoConnect;
+        bool pendingConfigChange;
 
     public:
         int mode;
