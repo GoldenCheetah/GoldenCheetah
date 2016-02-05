@@ -777,6 +777,9 @@ ExtendedModel::deriveExtCPParameters()
         // bounds check, don't go on for ever
         if (iteration++ > max_loops) break;
 
+        // clear last point used
+        map.clear();
+
         // record the previous version of tau, for convergence
         etau_prev = etau;
         paa_prev = paa;
@@ -787,11 +790,22 @@ ExtendedModel::deriveExtCPParameters()
         // estimate cp, given tau
         int i;
         ecp = 0;
+        bool changed=false;
+        double val = 0;
+        int index=0;
         for (i = i5; i <= i6; i++) {
             double ecpn = (data[i] - paa * (1.20-0.20*exp(-1*(i/60.0))) * exp(paa_dec*(i/60.0))) / (1-exp(tau_del*i/60.0)) / (1-exp(ecp_del*i/60.0)) / (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) / ( 1 + etau/(i/60.0));
 
-            if (ecp < ecpn)
+            if (ecp < ecpn) {
                 ecp = ecpn;
+                val = data[i];
+                index=i;
+                changed=true;
+            }
+        }
+        if (changed) {
+            map.insert(index,val);
+            //qDebug()<<iteration<<"eCP Resolving: cp="<<ecp<<"tau="<<etau<<"p[i]"<<val;
         }
 
 
@@ -801,47 +815,87 @@ ExtendedModel::deriveExtCPParameters()
 
         // estimate etau, given ecp
         etau = etau_min;
+        changed=false;
+        val = 0;
         for (i = i3; i <= i4; i++) {
             double etaun = ((data[i] - paa * (1.20-0.20*exp(-1*(i/60.0))) * exp(paa_dec*(i/60.0))) / ecp / (1-exp(tau_del*i/60.0)) / (1-exp(ecp_del*i/60.0)) / (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) - 1) * (i/60.0);
 
-            if (etau < etaun)
+            if (etau < etaun) {
                 etau = etaun;
+                val=data[i];
+                index=i;
+                changed=true;
+            }
+        }
+        if (changed) {
+            map.insert(index,val);
+            //qDebug()<<iteration<<"eCP Resolving: tau="<<etau<<"CP="<<ecp<<"p[i]"<<val;
         }
 
         // estimate paa_dec
         paa_dec = paa_dec_min;
+        changed=false;
+        val=0;
         for (i = i1; i <= i2; i++) {
             double paa_decn = log((data[i] - ecp * (1-exp(tau_del*i/60.0)) * (1-exp(ecp_del*i/60.0)) * (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) * ( 1 + etau/(i/60.0)) ) / paa / (1.20-0.20*exp(-1*(i/60.0))) ) / (i/60.0);
 
             if (paa_dec < paa_decn && paa_decn < paa_dec_max) {
                 paa_dec = paa_decn;
+                changed=true;
+                val=data[i];
+                index=i;
             }
+        }
+        if(changed) {
+            //qDebug()<<iteration<<"eCP Resolving: paa_dec="<<paa_dec<<"CP="<<ecp<<"p[i]"<<val;
+            map.insert(index,val);
         }
 
         paa = paa_min;
         double _avg_paa = 0.0;
         int count=1;
-        for (i = 2; i <= 8; i++) {
+        changed=false;
+        val=0;
+        for (i = 1; i <= 8; i++) {
             double paan = (data[i] - ecp * (1-exp(tau_del*i/60.0)) * (1-exp(ecp_del*i/60.0)) * (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) * ( 1 + etau/(i/60.0))) / exp(paa_dec*(i/60.0)) / (1.20-0.20*exp(-1*(i/60.0)));
             _avg_paa = (double)((count-1)*_avg_paa+paan)/count;
 
-            if (paa < paan)
+            if (paa < paan) {
                 paa = paan;
+                changed=true;
+                val=data[i];
+                index=i;
+            }
             count++;
         }
+        if (changed) {
+            map.insert(index,val);
+            //qDebug()<<iteration<<"eCP Resolving: paa="<<paa<<"CP="<<ecp<<"p[i]"<<val;
+        }
+
         if (_avg_paa<0.95*paa) {
             paa = _avg_paa;
         }
 
 
         ecp_dec = ecp_dec_min;
+        changed=false;
+        val=0;
         for (i = i7; i <= i8; i=i+120) {
             double ecp_decn = ((data[i] - paa * (1.20-0.20*exp(-1*(i/60.0))) * exp(paa_dec*(i/60.0))) / ecp / (1-exp(tau_del*i/60.0)) / (1-exp(ecp_del*i/60.0)) / ( 1 + etau/(i/60.0)) -1 ) / exp(ecp_dec_del/(i / 60.0));
 
             if (ecp_decn > 0) ecp_decn = 0;
 
-            if (ecp_dec < ecp_decn)
+            if (ecp_dec < ecp_decn) {
                 ecp_dec = ecp_decn;
+                changed=true;
+                val=data[i];
+                index=i;
+            }
+        }
+        if (changed) {
+            //qDebug()<<iteration<<"eCP Resolving: ecp_dec="<<ecp_dec<<"CP="<<ecp<<"p[i]"<<val;
+            map.insert(index,val);
         }
 
 
@@ -873,6 +927,20 @@ ExtendedModel::deriveExtCPParameters()
 
     qDebug() <<"eCP(5.3) " << "pmax" << pMax << "mmp60" << mmp60;
 #endif
+}
+
+QList<QPointF> 
+PDModel::cherries()
+{
+    QList<QPointF> returning;
+
+    QMapIterator<int,double> it(map);
+    it.toFront();
+    while(it.hasNext()) {
+        it.next();
+        returning << QPointF(it.key(), it.value());
+    }
+    return returning;
 }
 
 void MultiModel::loadParameters(QList<double>&here)
