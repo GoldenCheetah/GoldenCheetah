@@ -215,6 +215,8 @@ PDModel::deriveCPParameters(int model)
         // where model is non-zero (CP2 is nonzero)
         if (model) t0 = tau / (data[1] / cp - 1) - 1 / 60.0;
 
+        //qDebug()<<"CONVERGING:"<<iteration<<"t0="<<t0<<"tau="<<tau<<"cp="<<cp;
+
     } while ((fabs(tau - tau_prev) > tau_delta_max) || (fabs(t0 - t0_prev) > t0_delta_max));
 }
 
@@ -225,10 +227,10 @@ PDModel::deriveCPParameters(int model)
 CP2Model::CP2Model(Context *context) :
     PDModel(context)
 {
-    // set default intervals to search CP 2-20
-    anI1=100;
-    anI2=120;
-    aeI1=1000;
+    // set default intervals to search CP 2-3 mins and 7-20 mins
+    anI1=120;
+    anI2=200;
+    aeI1=420;
     aeI2=1200;
 
     connect (this, SIGNAL(dataChanged()), this, SLOT(onDataChanged()));
@@ -804,7 +806,9 @@ ExtendedModel::deriveExtCPParameters()
         ecp_del_prev = ecp_del;
         ecp_dec_prev = ecp_dec;
 
-        // estimate cp, given tau
+        // 
+        // Solve for CP [asymptote]
+        //
         int i;
         ecp = 0;
         bool changed=false;
@@ -830,7 +834,9 @@ ExtendedModel::deriveExtCPParameters()
         if (ecp == 0.0)
             return;
 
-        // estimate etau, given ecp
+        //
+        // SOLVE FOR TAU [curvature constant]
+        //
         etau = etau_min;
         changed=false;
         val = 0;
@@ -849,7 +855,10 @@ ExtendedModel::deriveExtCPParameters()
             //qDebug()<<iteration<<"eCP Resolving: tau="<<etau<<"CP="<<ecp<<"p[i]"<<val;
         }
 
-        // estimate paa_dec
+
+        //
+        // SOLVE FOR PAA_DEC [decay rate for ATP-PCr energy system]
+        //
         paa_dec = paa_dec_min;
         changed=false;
         val=0;
@@ -868,6 +877,9 @@ ExtendedModel::deriveExtCPParameters()
             map.insert(index,val);
         }
 
+        //
+        // SOLVE FOR PAA [max power]
+        //
         paa = paa_min;
         double _avg_paa = 0.0;
         int count=1;
@@ -895,6 +907,9 @@ ExtendedModel::deriveExtCPParameters()
         }
 
 
+        //
+        // SOLVE FOR ECP_DEC [Fatigue rate; CHO, Motivation, Hydration etc]
+        //
         ecp_dec = ecp_dec_min;
         changed=false;
         val=0;
