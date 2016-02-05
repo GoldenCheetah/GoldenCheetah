@@ -166,6 +166,9 @@ PDModel::deriveCPParameters(int model)
     int iteration = 0;
     do {
 
+        // clear cherries
+        map.clear();
+
         // bounds check, don't go on for ever
         if (iteration++ > max_loops) break;
 
@@ -176,11 +179,19 @@ PDModel::deriveCPParameters(int model)
         // estimate cp, given tau
         int i;
         cp = 0;
+        bool changed=false;
+        int index=0;
+        double value=0;
         for (i = i3; i < i4; i++) {
             double cpn = data[i] / (1 + tau / (t0 + i / 60.0));
-            if (cp < cpn)
+            if (cp < cpn) {
                 cp = cpn;
+                index=i; value=data[i];
+                changed=true;
+            }
         }
+        if(changed) map.insert(index,value);
+
 
         // if cp = 0; no valid data; give up
         if (cp == 0.0)
@@ -188,11 +199,17 @@ PDModel::deriveCPParameters(int model)
 
         // estimate tau, given cp
         tau = tau_min;
+        changed=false;
         for (i = i1; i <= i2; i++) {
             double taun = (data[i] / cp - 1) * (i / 60.0 + t0) - t0;
-            if (tau < taun)
+            if (tau < taun) {
+                changed=true;
+                index=i;
+                value=data[i];
                 tau = taun;
+            }
         }
+        if (changed) map.insert(index,value);
 
         // estimate t0 - but only for veloclinic/3parm cp
         // where model is non-zero (CP2 is nonzero)
