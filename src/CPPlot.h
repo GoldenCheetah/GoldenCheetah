@@ -191,6 +191,7 @@ class CPPlot : public QwtPlot
         // other plot objects
         QList<QwtPlotMarker*> referenceLines;
         QList<QwtPlotMarker*> allZoneLabels;
+        QList<QwtPlotMarker*> cherries;
 
         LogTimeScaleDraw *ltsd;
         QwtScaleDraw *sd;

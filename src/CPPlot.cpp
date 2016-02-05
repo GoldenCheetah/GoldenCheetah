@@ -387,6 +387,11 @@ CPPlot::initModel()
 void
 CPPlot::plotModel()
 {
+
+    // wipe any temporary model markers
+    foreach(QwtPlotMarker *p, cherries) delete p;
+    cherries.clear();
+
     // first lets clear any curves we shouldn't be displaying
     // no model curve if not power !
     if (model == 0 || (rideSeries != RideFile::watts && rideSeries != RideFile::wattsKg && rideSeries != RideFile::kph)) {
@@ -445,6 +450,22 @@ CPPlot::plotModel()
             else
                 modelCurve->setData(pdModel);
 
+            // plot cherries if there are any
+            foreach(QPointF cherry, pdModel->cherries()) {
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setBrush(QBrush(GColor(CPLOTMARKER)));
+                sym->setPen(QPen(GColor(CPLOTMARKER)));
+                sym->setStyle(QwtSymbol::XCross);
+                sym->setSize(6);
+
+                QwtPlotMarker *cherryp = new QwtPlotMarker();
+                cherryp->setSymbol(sym);
+                cherryp->setValue(cherry.x()/60.00f, cherry.y());
+
+                // and attach
+                cherryp->attach(this);
+                cherries << cherryp;
+            }
 
             // curve cosmetics
             QPen pen(GColor(CCP));
