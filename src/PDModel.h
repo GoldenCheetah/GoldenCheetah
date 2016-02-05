@@ -108,12 +108,17 @@ class PDModel : public QObject, public QwtSyntheticPointData
 
         bool inverseTime;
 
-    protected:
-
         // using data from setData() and intervals from setIntervals()
         // this is the old function from CPPlot to extract the best points
         // in the data series to calculate cp, tau and t0.
         void deriveCPParameters(int model); 
+
+        // we identify peak efforts when modelling
+        // lets make these available, currently only
+        // available with the extended CP model
+        QList<QPointF> cherries();
+
+    protected:
 
     signals:
 
@@ -135,6 +140,9 @@ class PDModel : public QObject, public QwtSyntheticPointData
 
         // mean max power data set by setData
         QVector<double> data;
+
+        // map of points used; secs, watts
+        QMap<int,double> map;
 
         bool minutes;
 };
