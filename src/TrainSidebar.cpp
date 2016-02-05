@@ -440,7 +440,9 @@ intensity->hide(); //XXX!!! temporary
     // get rid of annoying focus rectangle for sidebar components
 #if !defined GC_VIDEO_NONE
     mediaTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#if defined GC_HAVE_VLC // not on OSX at present
     videosyncTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
 #endif
     workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
     deviceTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
