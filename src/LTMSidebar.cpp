@@ -419,8 +419,10 @@ LTMSidebar::resetSeasons()
     int i;
     int j;
     for (i=allDateRanges->childCount(); i > 0; i--) {
-        for (j=allDateRanges->takeChild(0)->childCount(); j > 0; j--) {
-            delete allDateRanges->takeChild(0)->takeChild(0);
+        if (allDateRanges->takeChild(0)) {
+            for (j=allDateRanges->takeChild(0)->childCount(); j > 0; j--) {
+                delete allDateRanges->takeChild(0)->takeChild(0);
+            }
         }
         delete allDateRanges->takeChild(0);
     }
