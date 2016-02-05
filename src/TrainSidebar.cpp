@@ -618,10 +618,14 @@ TrainSidebar::eventFilter(QObject *, QEvent *event)
 {
     // do not allow to close the Window when active
     if (event->type() == QEvent::Close) {
-        if (gui_timer->isActive()) {
+        if (status & RT_RUNNING) {
             QMessageBox::warning(this, tr("Train mode active"), tr("Please stop the train mode before closing the window or application."));
             event->ignore();
             return true;
+        } else if (gui_timer->isActive()) {
+            // we just disconnecting before allowing the window to close
+            Disconnect();
+            return false;
         }
     }
 
