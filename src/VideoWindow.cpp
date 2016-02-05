@@ -484,16 +484,17 @@ void VideoWindow::mediaSelected(QString filename)
 
     if (filename.endsWith("/DVD") || (filename != "" && QFile(filename).exists())) {
 
+        // properly encode the filename as URL (with all special characters)
+        filename =  QUrl::toPercentEncoding(filename, "/\\", "");
 #ifdef Q_OS_LINUX
-        QString fileURL = "file://" + filename.replace(" ","%20").replace("\\", "/");
+        QString fileURL = "file://" + filename.replace("\\", "/");
 #else
         // A Windows "c:\xyz\abc def.avi" filename should become file:///c:/xyz/abc%20def.avi
-        QString fileURL = "file:///" + filename.replace(" ","%20").replace("\\", "/");
-#endif
+        QString fileURL = "file:///" + filename.replace("\\", "/");
+#endif       
         //qDebug()<<"file url="<<fileURL;
-
         /* open media */
-        m = libvlc_media_new_location(inst, filename.endsWith("/DVD") ? "dvd://" : fileURL.toLatin1());
+        m = libvlc_media_new_location(inst, filename.endsWith("/DVD") ? "dvd://" : fileURL.toLocal8Bit());
 
         /* set the media to playback */
         if (m) libvlc_media_player_set_media (mp, m);
