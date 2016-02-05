@@ -123,7 +123,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 #endif
 
 
-
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
     videosyncModel = new QSqlTableModel(this, trainDB->connection());
     videosyncModel->setTable("videosyncs");
     videosyncModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
@@ -163,7 +163,9 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     videosyncTree->verticalScrollBar()->setStyle(cdevideosync);
 #endif
 
-#endif
+#endif //GC_HAVE_VLC
+
+#endif //GC_VIDEO_NONE
 
     deviceTree = new QTreeWidget;
     deviceTree->setFrameStyle(QFrame::NoFrame);
@@ -423,13 +425,15 @@ intensity->hide(); //XXX!!! temporary
     mediaItem->addWidget(mediaTree);
     trainSplitter->addWidget(mediaItem);
 
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
     videosyncItem = new GcSplitterItem(tr("VideoSync"), iconFromPNG(":images/sidebar/sync.png"), this);
     QAction *moreVideoSyncAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     videosyncItem->addAction(moreVideoSyncAct);
     connect(moreVideoSyncAct, SIGNAL(triggered(void)), this, SLOT(videosyncPopup(void)));
     videosyncItem->addWidget(videosyncTree);
     trainSplitter->addWidget(videosyncItem);
-#endif
+#endif //GC_HAVE_VLC
+#endif //GC_VIDEO_NONE
     trainSplitter->prepare(context->athlete->cyclist, "train");
 
 #ifdef Q_OS_MAC
@@ -450,10 +454,12 @@ intensity->hide(); //XXX!!! temporary
     connect(mediaTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
                             this, SLOT(mediaTreeWidgetSelectionChanged()));
     connect(context, SIGNAL(selectMedia(QString)), this, SLOT(selectVideo(QString)));
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
     connect(videosyncTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
                             this, SLOT(videosyncTreeWidgetSelectionChanged()));
     connect(context, SIGNAL(selectVideoSync(QString)), this, SLOT(selectVideoSync(QString)));
-#endif
+#endif //GC_HAVE_VLC
+#endif //GC_VIDEO_NONE
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(selectWorkout(QString)), this, SLOT(selectWorkout(QString)));
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
@@ -522,13 +528,16 @@ TrainSidebar::refresh()
     row = mediaTree->currentIndex().row();
     QString videoPath = mediaTree->model()->data(mediaTree->model()->index(row,0)).toString();
 
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
     // refresh data
     videoModel->select();
     while (videoModel->canFetchMore(QModelIndex())) videoModel->fetchMore(QModelIndex());
+#endif
 
     // restore selection
     selectVideo(videoPath);
 
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
     // remember selection
     row = videosyncTree->currentIndex().row();
     QString videosyncPath = videosyncTree->model()->data(videosyncTree->model()->index(row,0)).toString();
@@ -539,7 +548,9 @@ TrainSidebar::refresh()
 
     // restore selection
     selectVideoSync(videosyncPath);
-#endif
+#endif // GC_HAVE_VLC
+
+#endif // GC_VIDEO_NONE
 
     row = workoutTree->currentIndex().row();
     QString workoutPath = workoutTree->model()->data(workoutTree->model()->index(row,0)).toString();
@@ -712,7 +723,9 @@ TrainSidebar::configChanged(qint32)
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 #if !defined GC_VIDEO_NONE
     mediaTree->setStyleSheet(GCColor::stylesheet());
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
     videosyncTree->setStyleSheet(GCColor::stylesheet());
+#endif
 #endif
     workoutTree->setStyleSheet(GCColor::stylesheet());
     deviceTree->setStyleSheet(GCColor::stylesheet());
@@ -1160,7 +1173,9 @@ void TrainSidebar::Start()       // when start button is pressed
 
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
         videosyncTree->setEnabled(false);
+#endif
 #endif
 
         // tell the world
@@ -1185,7 +1200,9 @@ void TrainSidebar::Start()       // when start button is pressed
 #if !defined GC_VIDEO_NONE
         // enable media tree so we can change movie - mid workout
         mediaTree->setEnabled(true);
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
         videosyncTree->setEnabled(true);
+#endif
 #endif
 
         // tell the world
@@ -1200,7 +1217,9 @@ void TrainSidebar::Start()       // when start button is pressed
 
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
         videosyncTree->setEnabled(false);
+#endif
 #endif
         workoutTree->setEnabled(false);
         deviceTree->setEnabled(false);
@@ -1292,7 +1311,9 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
         videosyncTree->setEnabled(false);
+#endif
 #endif
 
         // tell the world
@@ -1312,7 +1333,9 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
         // enable media tree so we can change movie
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(true);
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
         videosyncTree->setEnabled(true);
+#endif
 #endif
 
         // tell the world
@@ -1330,7 +1353,9 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     // media or workouts whilst a workout is in progress
 #if !defined GC_VIDEO_NONE
     mediaTree->setEnabled(true);
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
     videosyncTree->setEnabled(true);
+#endif
 #endif
     workoutTree->setEnabled(true);
     deviceTree->setEnabled(true);
