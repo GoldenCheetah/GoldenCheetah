@@ -979,5 +979,7 @@ ScatterPlot::skipValues(double xv, double yv, ScatterSettings *settings) {
     // LR Balance : if skip 0% skip also 100%
     if ((settings->x == MODEL_LRBALANCE && settings->ignore && xv == 100) || (settings->y == MODEL_LRBALANCE && settings->ignore && yv == 100)) return true;
 
+    if ((settings->x == MODEL_LRBALANCE && xv == RideFile::NA) || (settings->y == MODEL_LRBALANCE && yv == RideFile::NA)) return true;
+
     return false;
 }
