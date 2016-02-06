@@ -55,6 +55,7 @@ class Athlete;
 class Context;
 class Tab;
 
+
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 extern QDesktopWidget *desktop;         // how many screens / res etc
 extern QString gcroot;                  // root directory for gc
@@ -72,6 +73,10 @@ class MainWindow : public QMainWindow
         void byebye() { close(); } // go bye bye for a restart
         bool init; // if constructor has completed set to true
 
+        // when loading athlete
+        QLabel *progress;
+        int loading;
+
     protected:
 
         // used by ChooseCyclistDialog to see which athletes
@@ -84,6 +89,11 @@ class MainWindow : public QMainWindow
         virtual void closeEvent(QCloseEvent*);
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);
+
+        // working with splash screens
+        QWidget *splash;
+        void setSplash(bool first=false);
+        void clearSplash();
 
     public slots:
 

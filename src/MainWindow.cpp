@@ -28,6 +28,7 @@
 #include <QTabBar>
 #include <QStyleFactory>
 #include <QRect>
+#include <QSplashScreen>
 
 // DATA STRUCTURES
 #include "MainWindow.h"
@@ -137,10 +138,20 @@ MainWindow::MainWindow(const QDir &home)
     head = NULL; // early resize event causes a crash
 #endif
 
+    // create a splash to keep user informed on first load
+    // first one in middle of display, not middle of window
+    setSplash(true);
+
     // bootstrap
     Context *context = new Context(this);
     context->athlete = new Athlete(context, home);
     currentTab = new Tab(context);
+
+    // get rid of splash when currentTab is shown
+    clearSplash();
+
+    // and stop updating it
+    splash = NULL;
 
     setWindowIcon(QIcon(":images/gc.png"));
     setWindowTitle(context->athlete->home->root().dirName());
@@ -816,6 +827,52 @@ MainWindow::MainWindow(const QDir &home)
 /*----------------------------------------------------------------------
  * GUI
  *--------------------------------------------------------------------*/
+
+void
+MainWindow::setSplash(bool first)
+{
+    // new frameless widget
+    splash = new QWidget(NULL);
+
+    // modal dialog with no parent so we set it up as a 'splash'
+    // because QSplashScreen doesn't seem to work (!!)
+    splash->setAttribute(Qt::WA_DeleteOnClose);
+#if QT_VERSION < 0x050200
+    setAttribute(Qt::WA_PaintOnScreen); // not needed in Qt 5.2 and up
+#endif
+    splash->setWindowFlags(splash->windowFlags() | Qt::FramelessWindowHint);
+#ifdef Q_OS_LINUX
+    splash->setWindowFlags(splash->windowFlags() | Qt::X11BypassWindowManagerHint);
+#endif
+
+    // put widgets on it
+    progress = new QLabel(splash);
+    progress->setAlignment(Qt::AlignCenter);
+    QHBoxLayout *l = new QHBoxLayout(splash);
+    l->addWidget(progress);
+
+    // lets go
+    splash->setFixedSize(100,50);
+
+    if (first) {
+        // middle of screen
+        splash->move(desktop->availableGeometry().center()-QPoint(50, 25));
+    } else {
+        // middle of mainwindow is appropriate
+        splash->move(geometry().center()-QPoint(50, 25));
+    }
+    splash->show();
+
+    // reset the splash counter
+    loading=1;
+}
+
+void
+MainWindow::clearSplash()
+{
+    progress = NULL;
+    splash->close();
+}
 
 void
 MainWindow::toggleSidebar()
@@ -1655,12 +1712,18 @@ MainWindow::openTab(QString name)
 
     setUpdatesEnabled(false);
 
+    // splash screen - progress whilst loading tab
+    setSplash();
+
     // bootstrap
     Context *context = new Context(this);
     context->athlete = new Athlete(context, home);
 
     // now open up a new tab
     currentTab = new Tab(context);
+
+    // clear splash - progress whilst loading tab
+    clearSplash();
 
     // first tab
     tabs.insert(currentTab->context->athlete->home->root().dirName(), currentTab);

@@ -18,7 +18,7 @@
  */
 
 #include "RideDB.h"
-
+#include "Tab.h"
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
 #endif
@@ -88,6 +88,17 @@ ride: '{' rideelement_list '}'                                  {
                                                                             if (i->fileName == jc->item.fileName) {
 
                                                                                 found = true;
+
+                                                                                // progress update
+                                                                                if (jc->context->mainWindow->progress) {
+
+                                                                                    // percentage progress
+                                                                                    QString m = QString("%1%")
+                                                                                    .arg(double(jc->context->mainWindow->loading++) /
+                                                                                         double(jc->cache->rides().count()) * 100.0f, 0, 'f', 0);
+                                                                                    jc->context->mainWindow->progress->setText(m);
+                                                                                    QApplication::processEvents();
+                                                                                }
 
                                                                                 // update from our loaded value
                                                                                 i->setFrom(jc->item);
@@ -240,6 +251,7 @@ RideCache::load()
     // only load if it exists !
     QFile rideDB(QString("%1/%2").arg(context->athlete->home->cache().canonicalPath()).arg("rideDB.json"));
     if (rideDB.exists() && rideDB.open(QFile::ReadOnly)) {
+
         QDir directory = context->athlete->home->activities();
         QDir plannedDirectory = context->athlete->home->planned();
 
@@ -255,6 +267,7 @@ RideCache::load()
 
         // create scanner context for reentrant parsing
         RideDBContext *jc = new RideDBContext;
+        jc->context = context;
         jc->cache = this;
         jc->api = NULL;
         jc->old = false;
