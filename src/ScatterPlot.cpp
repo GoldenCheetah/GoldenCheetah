@@ -88,7 +88,7 @@ pointType(const RideFilePoint *point, int type, int side, bool metric, double cr
         case MODEL_SLOPE : return point->slope;
         case MODEL_TEMP : return point->temp;
 
-        case MODEL_LRBALANCE : return !side ? point->lrbalance : (100 - point->lrbalance);
+        case MODEL_LRBALANCE : return !side || point->lrbalance == RideFile::NA  ? point->lrbalance : (100 - point->lrbalance);
         case MODEL_TE : return side ? point->rte : point->lte;
         case MODEL_PS : return side ? point->rps : point->lps;
 
