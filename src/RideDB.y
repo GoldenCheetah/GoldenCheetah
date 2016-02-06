@@ -18,7 +18,6 @@
  */
 
 #include "RideDB.h"
-#include "Tab.h"
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
 #endif

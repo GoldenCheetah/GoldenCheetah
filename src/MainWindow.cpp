@@ -28,7 +28,6 @@
 #include <QTabBar>
 #include <QStyleFactory>
 #include <QRect>
-#include <QSplashScreen>
 
 // DATA STRUCTURES
 #include "MainWindow.h"
@@ -149,9 +148,6 @@ MainWindow::MainWindow(const QDir &home)
 
     // get rid of splash when currentTab is shown
     clearSplash();
-
-    // and stop updating it
-    splash = NULL;
 
     setWindowIcon(QIcon(":images/gc.png"));
     setWindowTitle(context->athlete->home->root().dirName());
