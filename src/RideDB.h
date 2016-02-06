@@ -50,6 +50,7 @@ struct RideDBContext {
 
     // either reading a cache or providing an api ...
     RideCache *cache;
+    Context *context;
 
     // api parms
     APIWebService *api;

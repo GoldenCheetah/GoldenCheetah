@@ -54,6 +54,7 @@ RideCache::RideCache(Context *context) : context(context)
 
     progress_ = 100;
     exiting = false;
+    splash = NULL;
 
     // initial load of user defined metrics - do once we have an initial context
     // but before we refresh or check metrics for the first time

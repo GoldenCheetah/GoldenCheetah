@@ -27,6 +27,7 @@
 
 #include <QVector>
 #include <QThread>
+#include <QSplashScreen>
 
 #include <QFuture>
 #include <QFutureWatcher>
@@ -93,6 +94,10 @@ class RideCache : public QObject
 
         // PD Model refreshing (temporary move)
         void refreshCPModelMetrics();
+
+        // splashscreen - only when loading
+        QSplashScreen *splash;
+        int loading; // progress
 
     public slots:
 
