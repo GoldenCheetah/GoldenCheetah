@@ -393,7 +393,7 @@ intensity->hide(); //XXX!!! temporary
     // not used but kept in case re-instated in the future
     recordSelector = new QCheckBox(this);
     recordSelector->setText(tr("Save workout data"));
-    recordSelector->setChecked(Qt::Checked);
+    recordSelector->setChecked(true);
     recordSelector->hide(); // we don't let users change this for now
 
     trainSplitter = new GcSplitter(Qt::Vertical);
@@ -618,6 +618,19 @@ TrainSidebar::workoutPopup()
 bool
 TrainSidebar::eventFilter(QObject *, QEvent *event)
 {
+    // do not allow to close the Window when active
+    if (event->type() == QEvent::Close) {
+        if (status & RT_RUNNING) {
+            QMessageBox::warning(this, tr("Train mode active"), tr("Please stop the train mode before closing the window or application."));
+            event->ignore();
+            return true;
+        } else if (gui_timer->isActive()) {
+            // we just disconnecting before allowing the window to close
+            Disconnect();
+            return false;
+        }
+    }
+
     // only when we are recording !
     if (status & RT_RECORDING) {
 
@@ -1736,7 +1749,7 @@ void TrainSidebar::nextDisplayMode()
 
 void TrainSidebar::warnnoConfig()
 {
-    QMessageBox::warning(this, tr("No Devices Configured"), "Please configure a device in Preferences.");
+    QMessageBox::warning(this, tr("No Devices Configured"), tr("Please configure a device in Preferences."));
 }
 
 //----------------------------------------------------------------------
