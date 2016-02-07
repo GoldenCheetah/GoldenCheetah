@@ -340,42 +340,64 @@ CPPlot::initModel()
 
     #if GC_HAVE_MODEL_LABS
     if (bestsCache->meanMaxArray(rideSeries).count()>0) {
-        // Test
+
+        // Get an eCP Model
         ExtendedCriticalPower *ecp = new ExtendedCriticalPower(context);
 
-        TestModel model = ecp->deriveExtendedCP_6_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-        QwtPlotCurve* plot = ecp->getPlotCurveForExtendedCP_6_3(model);
-        plot->attach(this);
-        modelCurves.append(plot);
+        TestModel model;
+        QwtPlotCurve* curve;            Q_UNUSED(curve);
+        QwtPlotIntervalCurve* icurve;   Q_UNUSED(icurve);
+        CpPlotCurve *qcurve;            Q_UNUSED(qcurve);
 
+        //
+        // Version 6.3 of Model
+        //
+        //model = ecp->deriveExtendedCP_6_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+
+        // model curve
+        //curve = ecp->getPlotCurveForExtendedCP_6_3(model);
+        //curve->attach(this);
+        //modelCurves.append(curve);
+
+        //
+        // Current 5.3 Version of Model
+        //
         model = ecp->deriveExtendedCP_5_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-        //plot = ecp->getPlotCurveForExtendedCP_5_3(model);
-        //plot->attach(this);
-        //modelCurves.append(plot);
 
-        /*QwtPlotIntervalCurve* plot2 = ecp->getPlotCurveForExtendedCP_5_3_CP(model, true, true);
-        plot2->attach(this);
-        modelIntCurves.append(plot2);
+        // model curve
+        //curve = ecp->getPlotCurveForExtendedCP_5_3(model);
+        //curve->attach(this);
+        //modelCurves.append(curve);
 
-        plot2 = ecp->getPlotCurveForExtendedCP_5_3_WPrime(model, true, true);
-        plot2->attach(this);
-        modelIntCurves.append(plot2);
+        // Aerobic eneryg
+        icurve = ecp->getPlotCurveForExtendedCP_5_3_CP(model, true, true);
+        icurve->attach(this);
+        modelIntCurves.append(icurve);
 
-        plot2 = ecp->getPlotCurveForExtendedCP_5_3_WSecond(model, true, true);
-        plot2->attach(this);
-        modelIntCurves.append(plot2);*/
+        // ATP/PCr
+        icurve = ecp->getPlotCurveForExtendedCP_5_3_WPrime(model, true, true);
+        icurve->attach(this);
+        modelIntCurves.append(icurve);
 
-        plot = ecp->getPlotCurveFor10secRollingAverage(bestsCache, rideSeries);
-        plot->attach(this);
-        modelCurves.append(plot);
+        // Anaerobic
+        icurve = ecp->getPlotCurveForExtendedCP_5_3_WSecond(model, true, true);
+        icurve->attach(this);
+        modelIntCurves.append(icurve);
 
-        CpPlotCurve *plot3 = ecp->getPlotCurveForQualityPoint(bestsCache, rideSeries);
-        plot3->attach(this);
-        modelCPCurves.append(plot3);
+        // 10s rolling average curve
+        //curve = ecp->getPlotCurveFor10secRollingAverage(bestsCache, rideSeries);
+        //curve->attach(this);
+        //modelCurves.append(curve);
 
-        plot = ecp->getPlotCurveForDerived(bestsCache, rideSeries);
-        plot->attach(this);
-        modelCurves.append(plot);
+        // plot quality 
+        //qcurve = ecp->getPlotCurveForQualityPoint(bestsCache, rideSeries);
+        //qcurve->attach(this);
+        //modelCPCurves.append(qcurve);
+
+        // Derived
+        //curve = ecp->getPlotCurveForDerived(bestsCache, rideSeries);
+        //curve->attach(this);
+        //modelCurves.append(curve);
     }
     #endif
 
