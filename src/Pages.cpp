@@ -2660,6 +2660,7 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(table);
+    connect(table, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(doubleClicked(QTreeWidgetItem*, int)));
 
     editButton = new QPushButton(tr("Edit"));
     addButton = new QPushButton(tr("+"));
@@ -2760,7 +2761,7 @@ CustomMetricsPage::addClicked()
     count { seconds; }\n\
 }";
 
-    EditUserMetricDialog editor(context, here);
+    EditUserMetricDialog editor(this, context, here);
     if (editor.exec() == QDialog::Accepted) {
 
         // add to the list
@@ -2778,12 +2779,23 @@ CustomMetricsPage::editClicked()
 
     // which one?
     QTreeWidgetItem *item = table->selectedItems().first();
+
+    doubleClicked(item, 0);
+}
+
+void
+CustomMetricsPage::doubleClicked(QTreeWidgetItem *item, int)
+{
+    // nothing selected
+    if (item == NULL) return;
+
+    // find row
     int row = table->invisibleRootItem()->indexOfChild(item);
 
     // edit it
     UserMetricSettings here = metrics[row];
 
-    EditUserMetricDialog editor(context, here);
+    EditUserMetricDialog editor(this, context, here);
     if (editor.exec() == QDialog::Accepted) {
 
         // add to the list
@@ -2792,7 +2804,6 @@ CustomMetricsPage::editClicked()
 
     }
 }
-
 
 qint32
 CustomMetricsPage::saveClicked()
