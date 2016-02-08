@@ -110,9 +110,11 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
 #ifdef Q_OS_MAC
     setFixedHeight(fs.height()+7);
     scrollArea->setFixedHeight(fs.height()+7);
+    buttonBar->setFixedHeight(fs.height()+7);
 #else
     setFixedHeight(fs.height()+4);
     scrollArea->setFixedHeight(fs.height()+4);
+    buttonBar->setFixedHeight(fs.height()+4);
 #endif
 
     signalMapper = new QSignalMapper(this); // maps each option
@@ -141,6 +143,7 @@ ChartBar::configChanged(qint32)
     QFontMetrics fs(buttonFont);
     setFixedHeight(fs.height()+4);
     scrollArea->setFixedHeight(fs.height()+4);
+    buttonBar->setFixedHeight(fs.height()+4);
     foreach(GcScopeButton *b, buttons) {
     	int width = fs.width(b->text);
     	b->setFont(buttonFont);
