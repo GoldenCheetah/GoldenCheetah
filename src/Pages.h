@@ -429,6 +429,7 @@ class CustomMetricsPage : public QWidget
         void deleteClicked();
         void addClicked();
         void editClicked();
+        void doubleClicked(QTreeWidgetItem *item, int column);
 
     protected:
         Context *context;
