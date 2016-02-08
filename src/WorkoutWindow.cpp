@@ -30,6 +30,7 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     setControls(NULL);
+    ergFile = NULL;
 
     QVBoxLayout *main = new QVBoxLayout(this);
     QHBoxLayout *layout = new QHBoxLayout;
@@ -80,15 +81,20 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     toolbar->setFloatable(true);
     toolbar->setIconSize(QSize(18,18));
 
+    QIcon newIcon(":images/toolbar/new doc.png");
+    newAct = new QAction(newIcon, tr("New"), this);
+    connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
+    toolbar->addAction(newAct);
+
     QIcon saveIcon(":images/toolbar/save.png");
     saveAct = new QAction(saveIcon, tr("Save"), this);
     connect(saveAct, SIGNAL(triggered()), this, SLOT(saveFile()));
     toolbar->addAction(saveAct);
 
-    QIcon propertiesIcon(":images/toolbar/properties.png");
-    propertiesAct = new QAction(propertiesIcon, tr("Properties"), this);
-    connect(propertiesAct, SIGNAL(triggered()), this, SLOT(properties()));
-    toolbar->addAction(propertiesAct);
+    QIcon saveAsIcon(":images/toolbar/saveas.png");
+    saveAsAct = new QAction(saveAsIcon, tr("Save As"), this);
+    connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
+    toolbar->addAction(saveAsAct);
 
     toolbar->addSeparator();
 
@@ -144,6 +150,13 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     toolbar->addAction(pasteAct);
     connect(pasteAct, SIGNAL(triggered()), workout, SLOT(paste()));
 
+    toolbar->addSeparator();
+
+    QIcon propertiesIcon(":images/toolbar/properties.png");
+    propertiesAct = new QAction(propertiesIcon, tr("Properties"), this);
+    connect(propertiesAct, SIGNAL(triggered()), this, SLOT(properties()));
+    toolbar->addAction(propertiesAct);
+
     // stretch the labels to the right hand side
     QWidget *empty = new QWidget(this);
     empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
@@ -184,6 +197,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     saveAct->setEnabled(false);
     undoAct->setEnabled(false);
     redoAct->setEnabled(false);
+
+    // watch for erg file selection
+    connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
 
     // watch for erg run/stop
     connect(context, SIGNAL(start()), this, SLOT(start()));
@@ -293,9 +309,94 @@ WorkoutWindow::eventFilter(QObject *obj, QEvent *event)
 }
 
 void
+WorkoutWindow::ergFileSelected(ErgFile*f)
+{
+    if (active) return;
+
+    if (workout->isDirty()) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("You have unsaved changes to a workout."));
+        msgBox.setInformativeText(tr("Do you want to save them?"));
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+
+        // save first, otherwise changes lost
+        if(msgBox.clickedButton() == msgBox.button(QMessageBox::Yes)) {
+            active = true;
+            saveFile();
+            active = false;
+        }
+    }
+
+    // just get on with it.
+    ergFile = f;
+    workout->ergFileSelected(f);
+}
+
+void
+WorkoutWindow::newFile()
+{
+    // new blank file clear points .. texts .. metadata etc
+    ergFileSelected(NULL);
+}
+
+void
+WorkoutWindow::saveAs()
+{
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Workout File"),
+                                                    appsettings->value(this, GC_WORKOUTDIR, "").toString(),
+                                                    "New Workout.erg (*.erg)");
+
+    // if they didn't select, give up.
+    if (filename.isEmpty()) {
+        return;
+    }
+
+    // New ergfile will be created almost empty
+    ErgFile *newergFile = new ErgFile(context);
+
+    // we need to set sensible defaults for
+    // all the metadata in the file.
+    newergFile->Version = "2.0";
+    newergFile->Units = "";
+    newergFile->Filename = QFileInfo(filename).fileName();
+    newergFile->filename = filename;
+    newergFile->Name = "New Workout";
+    newergFile->Ftp = newergFile->CP;
+    newergFile->valid = true;
+    newergFile->format = ERG; // default to couse until we know
+
+    // if we're save as from an existing keep all the data
+    // EXCEPT filename, which has just been changed!
+    if (ergFile) newergFile->setFrom(ergFile);
+
+    // Update with whatever is currently in editor
+    workout->updateErgFile(newergFile);
+
+    // select new workout
+    workout->ergFileSelected(newergFile);
+
+    // write file
+    workout->save();
+
+    // add to collection with new name, a single new file
+    Library::importFiles(context, QStringList(filename));
+}
+
+void
 WorkoutWindow::saveFile()
 {
-    workout->save();
+    // if ergFile is null we need to save as, with the current
+    // edit state being held by the workout editor
+    // otherwise just write it to disk straight away as its
+    // an existing ergFile we just need to write to
+    if (ergFile) workout->save();
+    else saveAs();
+
+    // force any other plots to take the changes
+    context->notifyErgFileSelected(ergFile);
 }
 
 void

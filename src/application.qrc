@@ -26,6 +26,7 @@
         <file>images/toolbar/clear.png</file>
         <file>images/toolbar/edit.png</file>
         <file>images/toolbar/select.png</file>
+        <file>images/toolbar/new doc.png</file>
         <file>images/toolbar/properties.png</file>
         <file>images/toolbar/search.png</file>
         <file>images/toolbar/search3.png</file>
@@ -108,6 +109,7 @@
         <file>images/oxygen/open.png</file>
         <file>images/toolbar/close-icon.png</file>
         <file>images/toolbar/save.png</file>
+        <file>images/toolbar/saveas.png</file>
         <file>images/toolbar/splash green.png</file>
         <file>images/toolbar/cut.png</file>
         <file>images/toolbar/copy.png</file>

@@ -107,7 +107,7 @@ Library::importFiles(Context *context, QStringList files)
 
         // if it is a workout we parse it to check
         if (ErgFile::isWorkout(file)) {
-            int mode;
+            int mode=0;
             ErgFile *p = new ErgFile(file, mode, context);
             if (p->isValid()) workouts << file;
             delete p;
@@ -202,15 +202,14 @@ Library::importFiles(Context *context, QStringList files)
 
             // set target filename
             targetWorkout = workoutDir + "/" + QFileInfo(source).fileName();
-
-            if (!source.copy(targetWorkout)) {
+            if (targetWorkout != QFileInfo(source).absoluteFilePath() && !source.copy(targetWorkout)) {
 
                 QMessageBox::warning(NULL, tr("Copy Workout Failed"),
                     QString(tr("%1 already exists in workout library: %2")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
             }
 
             // still add it, it may noit have been scanned...
-            int mode;
+            int mode=0;
             ErgFile file(targetWorkout, mode, context);
             trainDB->importWorkout(targetWorkout, &file);
 
@@ -612,7 +611,7 @@ LibrarySearchDialog::updateDB()
 
     // workouts
     foreach(QString ergFile, workoutsFound) {
-        int mode;
+        int mode=0;
         ErgFile file(ergFile, mode, context);
         if (file.isValid()) {
             trainDB->importWorkout(ergFile, &file);
@@ -626,7 +625,7 @@ LibrarySearchDialog::updateDB()
 
     // videosyncs
     foreach(QString videosync, videosyncsFound) {
-        int mode;
+        int mode=0;
         VideoSyncFile file(videosync, mode, context);
         trainDB->importVideoSync(videosync, &file);
     }
@@ -647,7 +646,7 @@ LibrarySearchDialog::updateDB()
 
             // is a videosync?
             if (VideoSyncFile::isVideoSync(r)) {
-                int mode;
+                int mode=0;
                 VideoSyncFile file(r, mode, context);
                 if (file.isValid()) {
                     trainDB->importVideoSync(r, &file);
@@ -656,7 +655,7 @@ LibrarySearchDialog::updateDB()
 
             // is a workout?
             if (ErgFile::isWorkout(r)) {
-                int mode;
+                int mode=0;
                 ErgFile file(r, mode, context);
                 if (file.isValid()) {
                     trainDB->importWorkout(r, &file);
@@ -746,14 +745,14 @@ WorkoutImportDialog::WorkoutImportDialog(Context *context, QStringList files) :
 
         // if it is a workout we parse it to check
         if (ErgFile::isWorkout(file)) {
-            int mode;
+            int mode=0;
             ErgFile *p = new ErgFile(file, mode, context);
             if (p->isValid()) workouts << file;
             delete p;
         }
         // if it is a videosync we parse it to check
         if (VideoSyncFile::isVideoSync(file)) {
-            int mode;
+            int mode=0;
             VideoSyncFile *p = new VideoSyncFile(file, mode, context);
             if (p->isValid()) videosyncs << file;
             delete p;
@@ -856,7 +855,7 @@ WorkoutImportDialog::import()
         if (!QFile(workout).exists()) continue;
 
         // cannot read or not valid
-        int mode;
+        int mode=0;
         ErgFile file(workout, mode, context);
         if (!file.isValid()) continue;
 
@@ -892,7 +891,7 @@ WorkoutImportDialog::import()
         if (!QFile(videosync).exists()) continue;
 
         // cannot read or not valid
-        int mode;
+        int mode=0;
         VideoSyncFile file(videosync, mode, context);
         if (!file.isValid()) continue;
 

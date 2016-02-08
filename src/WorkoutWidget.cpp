@@ -100,9 +100,24 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     setMouseTracking(true);
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
-    connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
     configChanged(CONFIG_APPEARANCE);
+}
+
+void
+WorkoutWidget::updateErgFile(ErgFile *f)
+{
+    // update f with current values etc
+    // just the points FOR NOW
+    f->Points.clear();
+    f->Duration = 0;
+    foreach(WWPoint *p, points_) {
+        f->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
+        f->Duration = p->x * 1000; // whatever the last is
+    }
+
+    // update METADATA too
+    // XXX missing!
 }
 
 void
@@ -113,16 +128,10 @@ WorkoutWidget::start()
     // if we have edited the erg we need to update the in-memory points
     if (ergFile && stack.count()) {
 
-        // replace all the points
-        ergFile->Points.clear();
-        ergFile->Duration = 0;
-        foreach(WWPoint *p, points_) {
-            ergFile->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
-            ergFile->Duration = p->x * 1000; // whatever the last is
-        }
+        updateErgFile(ergFile);
 
         // force any other plots to take the changes
-        context->notifyErgFileSelected(ergFile);
+        context->notifyErgFileSelected(ergFile); //XXX does this really belong here?
     }
 
     // clear previous data
@@ -1424,12 +1433,10 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
 void
 WorkoutWidget::save()
 {
-    // if nothing doing don't save
-    if (stackptr <= 0) return;
+    // we always save if we can, regardless of if its needed or not
 
     // no ergfile?
     if (ergFile == NULL) {
-        //XXX nothing for now - will need Save as...
         return;
     }
 
@@ -1445,9 +1452,6 @@ WorkoutWidget::save()
         ergFile->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
         ergFile->Duration = p->x * 1000; // whatever the last is
     }
-
-    // force any other plots to take the changes
-    context->notifyErgFileSelected(ergFile);
 
     //
     // SAVE
