@@ -175,6 +175,9 @@ public:
     static QHash<QString,RideMetricPtr>
     computeMetrics(RideItem *item, Specification spec, const QStringList &metrics);
 
+    // get the value for metric m from precomputed values stored at p
+    static double getForSymbol(QString m, const QHash<QString,RideMetric*> *p);
+
     // generate a CRC based upon the user metric settings
     // using the currently loaded _userMetrics
     static quint16 userMetricFingerprint(QList<UserMetricSettings> these);

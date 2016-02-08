@@ -1,5 +1,4 @@
 /*
-    return new UserMetric(this);
  * Copyright (c) 2015 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -182,7 +181,7 @@ UserMetric::isRelevantForRide(const RideItem *item) const
 
 // Compute the ride metric from a file.
 void
-UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &)
+UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &c)
 {
     QTime timer;
     timer.start();
@@ -196,7 +195,7 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
 
     //qDebug()<<"INIT";
     // always init first
-    if (finit) root->eval(rt, finit, 0, const_cast<RideItem*>(item), NULL);
+    if (finit) root->eval(rt, finit, 0, const_cast<RideItem*>(item), NULL, &c);
 
     //qDebug()<<"CHECK";
     // can it provide a value and is it relevant ?
@@ -213,22 +212,22 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
 
         while(it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            root->eval(rt, fsample, 0, const_cast<RideItem*>(item), point);
+            root->eval(rt, fsample, 0, const_cast<RideItem*>(item), point, &c);
         }
     }
 
     //qDebug()<<"VALUE";
     // value ?
     if (fvalue) {
-        Result v = root->eval(rt, fvalue, 0, const_cast<RideItem*>(item), NULL);
+        Result v = root->eval(rt, fvalue, 0, const_cast<RideItem*>(item), NULL, &c);
         setValue(v.number);
     }
 
     //qDebug()<<"COUNT";
     // count?
     if (fcount) {
-        Result c = root->eval(rt, fcount, 0, const_cast<RideItem*>(item), NULL);
-        setCount(c.number);
+        Result n = root->eval(rt, fcount, 0, const_cast<RideItem*>(item), NULL, &c);
+        setCount(n.number);
     }
 
     //qDebug()<<symbol()<<index_<<value_<<"ELAPSED="<<timer.elapsed()<<"ms";

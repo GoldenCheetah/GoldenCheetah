@@ -251,6 +251,19 @@ RideMetric::computeMetrics(RideItem *item, Specification spec, const QStringList
     return result;
 }
 
+double 
+RideMetric::getForSymbol(QString symbol, const QHash<QString,RideMetric*> *p)
+{
+    if (p == NULL ) return RideFile::NIL;
+
+    RideMetric *m=p->value(symbol, NULL);
+
+    if (m == NULL) return RideFile::NIL;
+
+    // ok, lets get the value
+    return m->value();
+}
+
 QString 
 RideMetric::toString(bool useMetricUnits) const
 {
