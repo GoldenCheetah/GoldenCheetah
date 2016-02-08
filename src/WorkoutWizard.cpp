@@ -572,7 +572,7 @@ void GradientPage::updateMetrics()
     QVector<QPair<QString,QString> > data;
     we->rawData(data);
 
-    int totalDistance = 0;
+    double totalDistance = 0;
     double gain = 0;
     int elevation = 0;
     // create rideFile
@@ -614,13 +614,11 @@ void GradientPage::SaveWorkout()
     SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("DISTANCE GRADE WIND"));
     QVector<QPair<QString, QString> > rawData;
     we->rawData(rawData);
-    double currentX = 0;
     stream << "[COURSE DATA]" << endl;
     QPair<QString, QString > p;
     foreach (p,rawData)
     {
-        currentX += p.first.toDouble();
-        stream << currentX << " " << p.second << " 0" << endl;
+        stream << p.first << " " << p.second << " 0" << endl;
     }
     stream << "[END COURSE DATA]" << endl;
     f.close();
