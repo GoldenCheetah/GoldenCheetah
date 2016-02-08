@@ -637,11 +637,21 @@ double
 ExtendedModel::y(double t) const
 {
     // don't start at zero !
-    if (t == 0)
-        qDebug() << "ExtendedModel t=0 !!";
+    if (t == 0) qDebug() << "ExtendedModel t=0 !!";
 
     if (!minutes) t /= 60.00f;
-    return paa*(1.20-0.20*exp(-1*double(t)))*exp(paa_dec*(double(t))) + ecp * (1-exp(tau_del*double(t))) * (1-exp(ecp_del*double(t))) * (1+ecp_dec*exp(ecp_dec_del/double(t))) * ( 1 + etau/(double(t)));
+
+    // ATP/PCr in muscles
+    double immediate = paa*(1.20-0.20*exp(-1*t))*exp(paa_dec*(t));
+
+    // anaerobic glycolysis
+    double nonoxidative  = ecp * (1-exp(tau_del*t)) * (1-exp(ecp_del*t)) * (1+ecp_dec*exp(ecp_dec_del/t)) * (etau/(t));
+
+    // aerobic glycolysis and lipolysis
+    double oxidative  = ecp * (1-exp(tau_del*t)) * (1-exp(ecp_del*t)) * (1+ecp_dec*exp(ecp_dec_del/t)) * (1);
+
+    // sum of all for time t
+    return immediate + nonoxidative + oxidative;
 }
 
 // 2 parameter model can calculate these
