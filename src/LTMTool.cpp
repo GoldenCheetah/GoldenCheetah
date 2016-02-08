@@ -1805,6 +1805,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // add special functions (older code needs fixing !)
     list << "config(cranklength)";
     list << "config(cp)";
+    list << "config(ftp)";
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";

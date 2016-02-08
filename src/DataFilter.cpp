@@ -1027,7 +1027,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             // is the symbol valid?
             QRegExp bestValidSymbols("^(apower|power|hr|cadence|speed|torque|vam|xpower|np|wpk)$", Qt::CaseInsensitive);
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
-            QRegExp configValidSymbols("^(cranklength|cp|w\\'|pmax|cv|d\\'|scv|sd\\'|height|weight|lthr|maxhr|rhr|units)$", Qt::CaseInsensitive);
+            QRegExp configValidSymbols("^(cranklength|cp|ftp|w\\'|pmax|cv|d\\'|scv|sd\\'|height|weight|lthr|maxhr|rhr|units)$", Qt::CaseInsensitive);
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
 
@@ -1632,6 +1632,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             // Get CP and W' estimates for date of ride
             //
             double CP = 0;
+            double FTP = 0;
             double WPRIME = 0;
             double PMAX = 0;
             int zoneRange;
@@ -1640,9 +1641,16 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
                 // if range is -1 we need to fall back to a default value
                 zoneRange = m->context->athlete->zones(m->isRun)->whichRange(m->dateTime.date());
-                CP = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getCP(zoneRange) : 0;
+                FTP = CP = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getCP(zoneRange) : 0;
                 WPRIME = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getWprime(zoneRange) : 0;
                 PMAX = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getPmax(zoneRange) : 0;
+
+                // use CP for FTP, or is it configured separately
+                bool useCPForFTP = (appsettings->cvalue(m->context->athlete->cyclist, 
+                                    m->context->athlete->zones(m->isRun)->useCPforFTPSetting(), 0).toInt() == 0);
+                if (zoneRange >= 0 && !useCPForFTP) {
+                    FTP = m->context->athlete->zones(m->isRun)->getFTP(zoneRange);
+                }
 
                 // did we override CP in metadata ?
                 int oCP = m->getText("CP","0").toInt();
@@ -1694,6 +1702,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
             if (symbol == "cp") {
                 return Result(CP);
+            }
+            if (symbol == "ftp") {
+                return Result(FTP);
             }
             if (symbol == "w'") {
                 return Result(WPRIME);
