@@ -86,7 +86,7 @@ class EditUserMetricDialog : public QDialog {
 
     public:
 
-        EditUserMetricDialog(Context *context, UserMetricSettings &here);
+        EditUserMetricDialog(QWidget *parent, Context *context, UserMetricSettings &here);
 
     public slots:
 
