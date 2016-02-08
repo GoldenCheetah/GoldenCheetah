@@ -181,7 +181,7 @@ UserMetric::isRelevantForRide(const RideItem *item) const
 
 // Compute the ride metric from a file.
 void
-UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &c)
+UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &pc)
 {
     QTime timer;
     timer.start();
@@ -193,9 +193,14 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
         return;
     }
 
+    // if there are no precomputed metrics then just use the values for the rideitem
+    // this is a specific use case when testing a user metric in preferences
+    const QHash<QString, RideMetric*> *c = NULL;
+    if (pc.count()) c=&pc;
+
     //qDebug()<<"INIT";
     // always init first
-    if (finit) root->eval(rt, finit, 0, const_cast<RideItem*>(item), NULL, &c);
+    if (finit) root->eval(rt, finit, 0, const_cast<RideItem*>(item), NULL, c);
 
     //qDebug()<<"CHECK";
     // can it provide a value and is it relevant ?
@@ -212,21 +217,21 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
 
         while(it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            root->eval(rt, fsample, 0, const_cast<RideItem*>(item), point, &c);
+            root->eval(rt, fsample, 0, const_cast<RideItem*>(item), point, c);
         }
     }
 
     //qDebug()<<"VALUE";
     // value ?
     if (fvalue) {
-        Result v = root->eval(rt, fvalue, 0, const_cast<RideItem*>(item), NULL, &c);
+        Result v = root->eval(rt, fvalue, 0, const_cast<RideItem*>(item), NULL, c);
         setValue(v.number);
     }
 
     //qDebug()<<"COUNT";
     // count?
     if (fcount) {
-        Result n = root->eval(rt, fcount, 0, const_cast<RideItem*>(item), NULL, &c);
+        Result n = root->eval(rt, fcount, 0, const_cast<RideItem*>(item), NULL, c);
         setCount(n.number);
     }
 
