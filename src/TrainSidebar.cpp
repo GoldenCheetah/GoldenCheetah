@@ -866,14 +866,18 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     QModelIndex target = sortModel->mapToSource(current);
     QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
 
-    // wip away the current selected workout
-    if (ergFile) {
-        delete ergFile;
-        ergFile = NULL;
-    }
+    // wip away the current selected workout once we've told everyone
+    // since they might be editing it and want to save changes first (!!)
+    ErgFile *prior = ergFile;
 
     if (filename == "") {
+
+        // an empty workout
         context->notifyErgFileSelected(NULL);
+
+        // clean last
+        if (prior) delete prior;
+
         return;
     }
 
@@ -882,6 +886,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     if (index == 0) {
         // ergo mode
         context->notifyErgFileSelected(NULL);
+        ergFile=NULL;
         mode = ERG;
         setLabels();
         clearStatusFlags(RT_WORKOUT);
@@ -889,6 +894,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     } else if (index == 1) {
         // slope mode
         context->notifyErgFileSelected(NULL);
+        ergFile=NULL;
         mode = CRS;
         setLabels();
         clearStatusFlags(RT_WORKOUT);
@@ -896,6 +902,8 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     } else {
         // workout mode
         ergFile = new ErgFile(filename, mode, context);
+        mode = ergFile->mode;
+
         if (ergFile->isValid()) {
 
             setStatusFlags(RT_WORKOUT);
@@ -935,6 +943,10 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
         // update every active device
         foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_SPIN);
     }
+
+    // clean last
+    if (prior) delete prior;
+
 }
 
 QStringList

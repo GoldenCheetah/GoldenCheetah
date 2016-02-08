@@ -90,11 +90,12 @@ class ErgFileLap
 class ErgFile
 {
     public:
-        ErgFile(QString, int&, Context *context);       // constructor uses filename
+        ErgFile(QString, int, Context *context);       // constructor uses filename
         ErgFile(Context *context); // no filename, going to use a string
 
         ~ErgFile();             // delete the contents
 
+        void setFrom(ErgFile *f); // clone an existing workout
         bool save(QStringList &errors); // save back, with changes
 
         static ErgFile *fromContent(QString, Context *); // read from memory
@@ -131,6 +132,7 @@ class ErgFile
         int     Ftp;            // FTP this file was targetted at
         int     MaxWatts;       // maxWatts in this ergfile (scaling)
         bool valid;             // did it parse ok?
+        int mode;
 
 
         int leftPoint, rightPoint;            // current points we are between
@@ -151,7 +153,6 @@ class ErgFile
         Context *context;
 
     private:
-        int &mode;
         int nomode;
 };
 

@@ -117,6 +117,12 @@ class WorkoutWidget : public QWidget
         // qwkode string
         QString qwkcode();
 
+        // do we need to save?
+        bool isDirty() { return stack.count() > 0; }
+
+        // update f with current edited content
+        void updateErgFile(ErgFile *f);
+
         // when recording we collect telemetry and plot it
         bool recording() { return recording_; }
         QList<int> wbal; // 1s samples [joules]

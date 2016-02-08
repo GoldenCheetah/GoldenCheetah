@@ -48,7 +48,7 @@ bool ErgFile::isWorkout(QString name)
     }
     return false;
 }
-ErgFile::ErgFile(QString filename, int &mode, Context *context) :
+ErgFile::ErgFile(QString filename, int mode, Context *context) :
     filename(filename), context(context), mode(mode)
 {
     if (context->athlete->zones(false)) {
@@ -67,6 +67,21 @@ ErgFile::ErgFile(Context *context) : context(context), mode(nomode)
         CP = 300;
     }
     filename ="";
+}
+
+void
+ErgFile::setFrom(ErgFile *f)
+{
+    // don't rename it !
+    QString filename=this->filename;
+    QString Filename=this->filename;
+
+    // take a copy
+    *this = *f;
+
+    // keep filename
+    this->filename = filename;
+    this->Filename = Filename;
 }
 
 ErgFile *

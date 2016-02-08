@@ -27,10 +27,11 @@
 #include <QPlainTextEdit>
 #include <QCheckBox>
 #include <QLabel>
-
+#include <QFileDialog>
 
 #include "Context.h"
 #include "RideFile.h" // for data series types
+#include "Library.h"  // workout library
 
 #include "Settings.h"
 #include "Units.h"
@@ -61,6 +62,9 @@ class WorkoutWindow : public GcWindow
 
         WorkoutWindow(Context *context);
 
+        // the ergfile we are editing
+        ErgFile *ergFile;
+
         // edit the definition
         CodeEditor *code;
 
@@ -68,7 +72,8 @@ class WorkoutWindow : public GcWindow
         QLabel *xlabel, *ylabel;
         QLabel *TSSlabel, *IFlabel;
 
-        QAction *saveAct, *propertiesAct,
+        QAction *newAct, *saveAsAct,
+                *saveAct, *propertiesAct,
                 *undoAct, *redoAct,
                 *drawAct, *selectAct,
                 *cutAct, *copyAct, *pasteAct;
@@ -78,10 +83,15 @@ class WorkoutWindow : public GcWindow
    public slots:
 
         // toolbar functions
+        void newFile();
         void saveFile();
+        void saveAs();
         void properties();
         void drawMode();
         void selectMode();
+
+        // and erg file was selected
+        void ergFileSelected(ErgFile *);
 
         // qwkcode edited!
         void qwkcodeChanged();
