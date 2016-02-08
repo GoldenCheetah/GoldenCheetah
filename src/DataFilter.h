@@ -60,7 +60,15 @@ class Leaf {
         Leaf(int loc, int leng) : type(none),op(0),series(NULL),dynamic(false),loc(loc),leng(leng),inerror(false) { }
 
         // evaluate against a RideItem using its context
-        Result eval(DataFilterRuntime *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL);
+        //
+        // Used in the following contexts;
+        //
+        // LTM chart - using symbols from RideItem *m
+        // Ride Plot - using symbols from RideItem *m
+        // Search/Filter - using symbols from RideItem *m
+        // User Metric - using symbols from QHash<..>
+        //
+        Result eval(DataFilterRuntime *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL);
 
         // tree traversal etc
         void print(Leaf *, int level);  // print leaf and all children
