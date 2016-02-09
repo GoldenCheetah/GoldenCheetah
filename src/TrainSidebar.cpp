@@ -490,6 +490,7 @@ intensity->hide(); //XXX!!! temporary
     status = 0;
     setStatusFlags(RT_MODE_ERGO);         // ergo mode by default
     mode = ERG;
+    pendingConfigChange = false;
 
     displayWorkoutLap = displayLap = 0;
     pwrcount = 0;
@@ -732,6 +733,12 @@ TrainSidebar::videosyncPopup()
 void
 TrainSidebar::configChanged(qint32)
 {
+    // do not refresh if workout running, defer to end of workout
+    if (status&RT_RUNNING) {
+        pendingConfigChange = true;
+        return;
+    }
+
     // auto connect is off by default
     autoConnect = appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool();
 
@@ -1434,6 +1441,12 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 
     // tell the world
     context->notifyStop();
+
+    // if a config change was requested while workout was running, action it now
+    if (pendingConfigChange) {
+        pendingConfigChange = false;
+        configChanged(CONFIG_APPEARANCE | CONFIG_DEVICES | CONFIG_ZONES);
+    }
 
     // Re-enable gui elements
     // reset counters etc
