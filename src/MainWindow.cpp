@@ -1063,20 +1063,21 @@ MainWindow::resizeEvent(QResizeEvent*)
 #if (defined Q_OS_MAC) && (QT_VERSION >= 0x50201)
     if (head) {
         QRect screenSize = desktop->availableGeometry();
-        if ((screenSize.width() > frameGeometry().width() || screenSize.height() > frameGeometry().height()) && // not fullscreen
-           (!head->isVisible() && showhideToolbar->isChecked())) // not visible and we want it
-            head->show();
-        else if ((screenSize.width() == frameGeometry().width() || screenSize.height() == frameGeometry().height()) && // fullscreen
-           (head->isVisible())) // and it is visible
+        if ((screenSize.width() == frameGeometry().width() || screenSize.height() == frameGeometry().height()) && // fullscreen
+           (head->isVisible())) {// and it is visible
             head->hide();
+            head->updateGeometry();
+            head->show();
+            head->updateGeometry();
+        }
 
         // painting
-        head->updateGeometry();
-        repaint();
+        head->repaint();
     }
 #endif
-    appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
-    appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
+
+    //appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
+    //appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
 }
 
 void

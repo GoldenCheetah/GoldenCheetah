@@ -25,9 +25,6 @@
 #include <QHBoxLayout>
 
 class Context;
-#ifdef Q_OS_MAC
-class QtMacButton;
-#else
 class GcScopeButton : public QWidget
 {
     Q_OBJECT
@@ -56,7 +53,6 @@ class GcScopeButton : public QWidget
         bool red;
 };
 
-#endif
 class GcLabel;
 class GcScopeBar : public QWidget
 {
@@ -101,11 +97,7 @@ private:
     Context *context;
     QHBoxLayout *layout;
     GcLabel *searchLabel;
-#ifdef Q_OS_MAC
-    QtMacButton *home, *diary, *anal, *train, *interval;
-#else
     GcScopeButton *home, *diary, *anal, *train, *interval;
-#endif
     bool state;
 };
 

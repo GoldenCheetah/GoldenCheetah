@@ -37,10 +37,6 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     searchLabel->setFixedHeight(20);
     searchLabel->setHighlighted(true);
     QFont font;
-
-    font.setPointSize(10);
-    font.setWeight(QFont::Black);
-    searchLabel->setFont(font);
     layout->addWidget(searchLabel);
     searchLabel->hide();
 
@@ -49,23 +45,13 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(setCompare()));
     connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(setCompare()));
 
-    // Mac uses QtMacButton - recessed etc
-#ifdef Q_OS_MAC
-    home = new QtMacButton(this, QtMacButton::Recessed);
-#ifdef GC_HAVE_ICAL
-    diary = new QtMacButton(this, QtMacButton::Recessed);
-#endif
-    anal = new QtMacButton(this, QtMacButton::Recessed);
-    train = new QtMacButton(this, QtMacButton::Recessed);
-#else
-    // Windows / Linux uses GcScopeButton - pushbutton
+    //We always use QT widgets now
     home = new GcScopeButton(this);
 #ifdef GC_HAVE_ICAL
     diary = new GcScopeButton(this);
 #endif
     anal = new GcScopeButton(this);
     train = new GcScopeButton(this);
-#endif
 
     // now set the text for each one
     home->setText(tr("Trends"));
@@ -86,7 +72,6 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
 #endif
 
     anal->setText(tr("Activities"));
-    anal->setWidth(70);
     anal->setChecked(true);
     layout->addWidget(anal);
     connect(anal, SIGNAL(clicked(bool)), this, SLOT(clickedAnal()));
@@ -101,36 +86,12 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     HelpWhatsThis *helpTrain = new HelpWhatsThis(train);
     train->setWhatsThis(helpTrain->getWhatsThisText(HelpWhatsThis::ScopeBar_Train));
 
-
-    //layout->addWidget(traintool); //XXX!!! eek
-
-    // we now need to adjust the buttons according to their text size
-    // this is particularly bad for German's who, as a nation, must
-    // suffer from RSI from typing and writing more than any other nation ;)
-    QFontMetrics fontMetric(font);
-    int width = fontMetric.width(tr("Trends"));
-    home->setWidth(width+30);
-
-    width = fontMetric.width(tr("Activities"));
-    anal->setWidth(width+30);
-
-    width = fontMetric.width(tr("Train"));
-    train->setWidth(width+30);
-
-#ifdef GC_HAVE_ICAL
-    width = fontMetric.width(tr("Diary"));
-    diary->setWidth(width+30);
-#endif
     configChanged(255);
 }
 
 void
 GcScopeBar::configChanged(qint32 reason)
 {
-#ifdef Q_OS_MAC // need to work on this separately
-    return;
-#endif
-
     if ((reason & CONFIG_APPEARANCE) == 0) return;
 
     QFont font; // default
@@ -142,18 +103,33 @@ GcScopeBar::configChanged(qint32 reason)
     // set font sizes
     font.setWeight(QFont::Black);
     searchLabel->setFont(font);
+    searchLabel->setFixedHeight(fm.height() + 7);
 
     // Windows / Linux uses GcScopeButton - pushbutton
-    home->setFixedHeight(fm.height() + 4);
+    home->setFixedHeight(fm.height() + 7);
     home->setFont(font);
 #ifdef GC_HAVE_ICAL
-    diary->setFixedHeight(fm.height() + 4);
+    diary->setFixedHeight(fm.height() + 7);
     diary->setFont(font);
 #endif
-    anal->setFixedHeight(fm.height() + 4);
+    anal->setFixedHeight(fm.height() + 7);
     anal->setFont(font);
-    train->setFixedHeight(fm.height() + 4);
+    train->setFixedHeight(fm.height() + 7);
     train->setFont(font);
+
+    int width = fm.width(tr("Trends"));
+    home->setWidth(width+30);
+
+    width = fm.width(tr("Activities"));
+    anal->setWidth(width+30);
+
+    width = fm.width(tr("Train"));
+    train->setWidth(width+30);
+
+#ifdef GC_HAVE_ICAL
+    width = fm.width(tr("Diary"));
+    diary->setWidth(width+30);
+#endif
 }
 
 void
@@ -162,22 +138,18 @@ GcScopeBar::setHighlighted()
     if (context->isfiltered) {
         searchLabel->setHighlighted(true);
         searchLabel->show();
-#ifndef Q_OS_MAC
         home->setHighlighted(true);
         anal->setHighlighted(true);
 #ifdef GC_HAVE_ICAL
         diary->setHighlighted(true);
 #endif
-#endif
     } else {
         searchLabel->setHighlighted(false);
         searchLabel->hide();
-#ifndef Q_OS_MAC
         home->setHighlighted(false);
         anal->setHighlighted(false);
 #ifdef GC_HAVE_ICAL
         diary->setHighlighted(false);
-#endif
 #endif
     }
 }
@@ -185,11 +157,9 @@ GcScopeBar::setHighlighted()
 void
 GcScopeBar::setCompare()
 {
-#ifndef Q_OS_MAC
     home->setRed(context->isCompareDateRanges);
     anal->setRed(context->isCompareIntervals);
     repaint();
-#endif
 }
 
 void
@@ -341,7 +311,6 @@ GcScopeBar::setSelected(int index)
 #endif
 }
 
-#ifndef Q_OS_MAC
 GcScopeButton::GcScopeButton(QWidget *parent) : QWidget(parent)
 {
     setFixedHeight(20);
@@ -440,4 +409,3 @@ GcScopeButton::event(QEvent *e)
     if (e->type() == QEvent::MouseButtonPress && underMouse()) emit clicked(checked);
     return QWidget::event(e);
 }
-#endif
