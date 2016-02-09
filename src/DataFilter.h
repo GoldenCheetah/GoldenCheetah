@@ -66,7 +66,7 @@ class Leaf {
         // LTM chart - using symbols from RideItem *m
         // Ride Plot - using symbols from RideItem *m
         // Search/Filter - using symbols from RideItem *m
-        // User Metric - using symbols from QHash<..>
+        // User Metric - using symbols from QHash<..> (RideItem + Interval)
         //
         Result eval(DataFilterRuntime *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL);
 

@@ -155,12 +155,26 @@ class WorkoutWidget : public QWidget
         // get WPrime values
         WPrime &wprime() { return wpBal; }
 
-        // range for scales in plot units not draw units
-        double maxX(); // e.g. max watts
-        void setMaxX(double x) { maxX_ = x; }
-        double maxY(); // e.g. max seconds
-        double minX() { return 0.0f; } // might change later
+        // Workout Range (0-max only)
+        double maxWX() { return maxWX_; }
+        void setMaxWX(double x) { maxWX_ = x; }
+        double minWX() { return 0.0f; } // might change later
+
+        // View Range (can be offset from zero)
+        double maxVX() { return maxVX_; }
+        double minVX() { return minVX_; }
+
+        void setMaxVX(double x) { maxVX_ = x; }
+        void setMinVX(double x) { minVX_ = x; }
+
+        // we don't zoom/scroll the Y axis
+        double maxY() { return maxY_; }
         double minY() { return 0.0f; } // might change later
+
+        // zoom in / zoom out / zoom to fit
+        void zoomIn();
+        void zoomOut();
+        void zoomFit();
 
         // transform from plot to painter co-ordinate
         QPoint transform(double x, double y, RideFile::SeriesType s=RideFile::watts);
@@ -260,6 +274,9 @@ class WorkoutWidget : public QWidget
         void copy();
         void paste();
 
+        // hate this function !
+        bool setBlockCursor();
+
     protected:
 
         // interacting with points
@@ -280,7 +297,6 @@ class WorkoutWidget : public QWidget
         // working with blocks
         bool createBlock(QPoint p);
         bool moveBlock(QPoint p);
-        bool setBlockCursor();
 
         // working with laps
         bool setLapState(); // as mouse moves
@@ -313,7 +329,14 @@ class WorkoutWidget : public QWidget
         // the lap definitions
         QList<ErgFileLap>   laps_;      // interval markers in the file
 
-        double maxX_, maxY_;
+        // Workout starts at 0 ends at maxWX_
+        double maxWX_;
+
+        // View starts at minVX_ ends at maxVX_
+        double minVX_, maxVX_;
+
+        // Y-axis always 0-maxY_ - no zoom or scroll
+        double maxY_;
 
         // command stack
         QList<WorkoutWidgetCommand *> stack;

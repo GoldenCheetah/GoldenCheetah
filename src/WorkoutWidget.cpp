@@ -39,6 +39,10 @@
 static int MINTOOLHEIGHT = 350; // minimum size for a full editor
 static int RECOVERY = 70; // anything below 70% of CP is a recovery effort
 
+static double MAXZOOM = 3.0f;
+static double MINZOOM = 0.2f;
+static double ZOOMSTEP = 0.05f;
+
 void WorkoutWidget::adjustLayout()
 {
     // adjust all the settings based upon current size
@@ -83,7 +87,7 @@ void WorkoutWidget::adjustLayout()
 WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     QWidget(parent),  state(none), ergFile(NULL), dragging(NULL), parent(parent), context(context), stackptr(0), recording_(false)
 {
-    maxX_=3600;
+    maxWX_=3600;
     maxY_=400;
 
     // when plotting telemetry these are maxY for those series
@@ -912,7 +916,7 @@ WorkoutWidget::movePoints(int key, Qt::KeyboardModifiers kmod)
             WWPoint *next = index+1 < points_.count() ? points_[index+1] : NULL;
 
             // hit the end of the workout
-            if (p->selected && (p->x+XMOVE) > maxX()) { constrained=true; break; }
+            if (p->selected && (p->x+XMOVE) > maxWX()) { constrained=true; break; }
 
             // hit the next unselected
             if (p->selected && next && !next->selected && next->x < (p->x+XMOVE)) {
@@ -1402,7 +1406,8 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
 
         this->ergFile = ergFile;
 
-        maxX_=0;
+        minVX_=0;
+        maxVX_=maxWX_=0;
         maxY_=400;
 
         // get laps
@@ -1411,7 +1416,10 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
         // add points for this....
         foreach(ErgFilePoint point, ergFile->Points) {
             WWPoint *add = new WWPoint(this, point.x / 1000.0f, point.y); // in ms
-            if (add->x > maxX_) maxX_ = add->x;
+
+            // increase view and workout maxes to match workout loaded
+            // as we goo these just increase to the last point
+            if (add->x > maxWX_) maxVX_ = maxWX_ = add->x;
             if (add->y > maxY_) maxY_ = add->y;
         }
 
@@ -2166,14 +2174,14 @@ WorkoutWidget::paintEvent(QPaintEvent*)
 
     // start with 5 min tics and get longer and longer
     int tsecs = 1 * 60; // 1 minute tics
-    int xrange = maxX() - minX();
+    int xrange = maxVX() - minVX();
     while (double(xrange) / double(tsecs) > XTICS && tsecs < xrange) {
         if (tsecs==120) tsecs = 300;
         else tsecs *= 2;
     }
 
     // now paint them
-    for(int i=minX(); i<=maxX(); i += tsecs) {
+    for(int i=minVX(); i<=maxVX(); i += tsecs) {
 
         painter.setPen(markerPen);
 
@@ -2257,7 +2265,7 @@ WorkoutWidget::paintEvent(QPaintEvent*)
         painter.setPen(power);
 
         // typical durations
-        for(int i=0; tick_info[i].x > 0 && tick_info[i].x < maxX(); i++) {
+        for(int i=0; tick_info[i].x > 0 && tick_info[i].x < maxVX(); i++) {
             int x=logX(tick_info[i].x);
             painter.drawLine(QPoint(x,c.top()), QPoint(x,c.top()+XTICLENGTH));
 
@@ -2318,26 +2326,17 @@ WorkoutWidgetItem::WorkoutWidgetItem(WorkoutWidget *w) : w(w)
 {
 }
 
-double
-WorkoutWidget::maxX()
-{
-    return maxX_;
-}
-
-double
-WorkoutWidget::maxY()
-{
-    return maxY_;
-}
 
 int
 WorkoutWidget::logX(double t)
 {
-    QRectF c = canvas();
+    //QRectF c = canvas();
 
     // transform to logX coordinates for time t
-    double xratio = double(c.width()) / double(log(maxX())-(minX() > 0 ? log(minX()) : 0));
-    return c.x() + (xratio * log(t));
+    // XXX needs fixing to scale for zoom XXX //
+    //double xratio = double(c.width()) / double(log(maxX())-(minX() > 0 ? log(minX()) : 0));
+    //return c.x() + (xratio * log(t));
+    return t;
 }
 
 // transform from plot to painter co-ordinate
@@ -2347,43 +2346,42 @@ WorkoutWidget::transform(double seconds, double watts, RideFile::SeriesType s)
     // from plot coords to painter coords on the canvas
     QRectF c = canvas();
 
+    double xratio = double(c.width()) / (maxVX()-minVX());
+    double yratio = 1.0f;
+
     switch (s) {
 
     default:
     case RideFile::watts:
         {
         // ratio of pixels to plot units
-        double yratio = double(c.height()) / (maxY()-minY());
-        double xratio = double(c.width()) / (maxX()-minX());
-
-        return QPoint(c.x() + (seconds * xratio), c.bottomLeft().y() - (watts * yratio));
+        yratio = double(c.height()) / (maxY()-minY());
         }
+        break;
 
     case RideFile::hr:
         {
         // ratio of pixels to plot units
-        double yratio = double(c.height()) / double(hrMax);
-        double xratio = double(c.width()) / (maxX()-minX());
-
-        return QPoint(c.x() + (seconds * xratio), c.bottomLeft().y() - (watts * yratio));
+        yratio = double(c.height()) / double(hrMax);
         }
+        break;
+
     case RideFile::cad:
         {
         // ratio of pixels to plot units
-        double yratio = double(c.height()) / double(cadenceMax);
-        double xratio = double(c.width()) / (maxX()-minX());
-
-        return QPoint(c.x() + (seconds * xratio), c.bottomLeft().y() - (watts * yratio));
+        yratio = double(c.height()) / double(cadenceMax);
         }
+        break;
+
     case RideFile::kph:
         {
         // ratio of pixels to plot units
-        double yratio = double(c.height()) / double(speedMax);
-        double xratio = double(c.width()) / (maxX()-minX());
-
-        return QPoint(c.x() + (seconds * xratio), c.bottomLeft().y() - (watts * yratio));
+        yratio = double(c.height()) / double(speedMax);
         }
+        break;
+
     }
+    return QPoint(c.x() - (minVX() * xratio) + (seconds * xratio), c.bottomLeft().y() - (watts * yratio));
 }
 
 // transform from painter to plot co-ordinate
@@ -2395,9 +2393,102 @@ WorkoutWidget::reverseTransform(int x, int y)
 
     // ratio of pixels to plot units
     double yratio = double(c.height()) / (maxY()-minY());
-    double xratio = double(c.width()) / (maxX()-minX());
+    double xratio = double(c.width()) / (maxVX()-minVX());
 
-    return QPoint((x-c.x()) / xratio, (c.bottomLeft().y() - y) / yratio);
+    return QPoint( (x-c.x()+(minVX() * xratio)) / xratio, (c.bottomLeft().y() - y) / yratio);
+}
+
+void
+WorkoutWidget::zoomOut()
+{
+    // when we zoom in the view displays progressively
+    // smaller amount of time -- so reduce the diff
+    // between minVX and maxVX but never allow minVX to
+    // go negative
+
+    double vmid = (minVX_ + maxVX_) / 2.0f;
+    double vwidth = maxVX_ - minVX_;
+
+    // ratio of view to workout
+    double zratio = vwidth / maxWX_;
+
+    if (zratio >= MAXZOOM) zratio = MAXZOOM;
+    else if (zratio < MINZOOM) zratio = MINZOOM;
+    else zratio += ZOOMSTEP;
+
+    // now apply the zoom ratio
+    vwidth = zratio * maxWX_;
+    minVX_ = vmid - (vwidth/2.0f);
+    maxVX_ = vmid + (vwidth/2.0f);
+
+    // don't go negative!
+    if (minVX_ < 0) {
+        maxVX_ -= minVX_; // - - = +
+        minVX_ = 0;
+    }
+
+    // more likely we zoom out and cannot
+    // see the workout anymore so make sure
+    // its to the left!
+    if (vwidth >= maxWX()) {
+        maxVX_ -= minVX_;
+        minVX_ = 0;
+    }
+
+    // hmm. this is irritating.. maybe fix?
+    setBlockCursor();
+
+    // draw!
+    repaint();
+}
+
+void
+WorkoutWidget::zoomIn()
+{
+
+    // when we zoom in the view displays progressively
+    // larger amount of time -- so increase diff between
+    // minVX and maxVX but never allow minVX to go negative!
+    // go negative
+
+    double vmid = (minVX_ + maxVX_) / 2.0f;
+    double vwidth = maxVX_ - minVX_;
+
+    // ratio of view to workout
+    double zratio = vwidth / maxWX_;
+
+    if (zratio > MAXZOOM) zratio = MAXZOOM;
+    else if (zratio <= MINZOOM) zratio = MINZOOM;
+    else zratio -= ZOOMSTEP;
+
+    // now apply the zoom ratio
+    vwidth = zratio * maxWX_;
+    minVX_ = vmid - (vwidth/2.0f);
+    maxVX_ = vmid + (vwidth/2.0f);
+
+    // don't go negative!
+    if (minVX_ < 0) {
+        maxVX_ -= minVX_; // - - = +
+        minVX_ = 0;
+    }
+
+    // left align when no scroller
+    if (vwidth >= maxWX()) {
+        maxVX_ -= minVX_;
+        minVX_ = 0;
+    }
+
+    // that pesky block cursor
+    setBlockCursor();
+
+    // draw!
+    repaint();
+}
+
+void
+WorkoutWidget::zoomFit()
+{
+    //XXX not implemented yet
 }
 
 WorkoutWidgetCommand::WorkoutWidgetCommand(WorkoutWidget *w) : workoutWidget_(w)
@@ -2692,8 +2783,9 @@ WorkoutWidget::paste()
     }
 
     // increase maxX ?
-    if (points_.count() && points_.last()->x > maxX_)
-        maxX_ = points_.last()->x;
+    if (points_.count() && points_.last()->x > maxWX_) {
+        maxWX_ = points_.last()->x;
+    }
 
     // paste command
     new PasteCommand(this, here, offset, shift, clipboard);
