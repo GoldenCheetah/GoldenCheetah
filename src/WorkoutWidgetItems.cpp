@@ -42,6 +42,12 @@ WWPowerScale::paint(QPainter *painter)
     // if too small paint nothing
     if (workoutWidget()->height() < MINTOOLHEIGHT) return;
 
+    // fill transparent to deminish "over painted" curves
+    // that are shown in borders to give sense of scroll
+    QColor deminish(GColor(CTRAINPLOTBACKGROUND));
+    deminish.setAlpha(175);
+    painter->fillRect(workoutWidget()->left(), deminish);
+
     int rnum = -1;
 
     // CP etc are not available so draw nothing
@@ -138,6 +144,12 @@ WWWBalScale::paint(QPainter *painter)
 {
     // if too small paint nothing
     if (workoutWidget()->height() < MINTOOLHEIGHT) return;
+
+    // fill transparent to deminish "over painted" curves
+    // that are shown in borders to give sense of scroll
+    QColor deminish(GColor(CTRAINPLOTBACKGROUND));
+    deminish.setAlpha(175);
+    painter->fillRect(workoutWidget()->right(), deminish);
 
     int rnum = -1;
 
@@ -241,7 +253,7 @@ WWLap::paint(QPainter *painter)
         here.setY(top.top() + fontMetrics.height());
 
         // end ..
-        int end = workoutWidget()->maxX();
+        int end = workoutWidget()->maxWX();
         if (i < workoutWidget()->laps().count()-1) end=workoutWidget()->laps()[i+1].x/1000.f;
         double endx = workoutWidget()->transform(end,0).x();
 
@@ -265,16 +277,16 @@ WWLap::paint(QPainter *painter)
 void
 WWPoint::paint(QPainter *painter)
 {
-    // don't show when recording
-    if (workoutWidget()->recording()) return;
+    // transform
+    QPoint center = workoutWidget()->transform(x,y);
+
+    // don't show when recording, or not on main canvas
+    if (!workoutWidget()->canvas().contains(center) || workoutWidget()->recording()) return;
 
     // if too small paint nothing
     if (workoutWidget()->height() < MINTOOLHEIGHT) return;
 
     painter->setPen(Qt::NoPen);
-
-    // transform
-    QPoint center = workoutWidget()->transform(x,y);
 
     // highlight hovered
     if (hover) {
@@ -801,7 +813,7 @@ WWSmartGuide::paint(QPainter *painter)
 
         // in seconds
         int left = prev >= 0 ? workoutWidget()->points()[prev]->x : 0;
-        int right = next >= 0 ? workoutWidget()->points()[next]->x : workoutWidget()->maxX();
+        int right = next >= 0 ? workoutWidget()->points()[next]->x : workoutWidget()->maxWX();
 
         // in plot coordinates
         QPointF leftpx = workoutWidget()->transform(left,0);
@@ -1112,13 +1124,13 @@ void PasteCommand::undo()
         }
     }
 
-    // reduce maxX if needed, never less than an hour
-    if (workoutWidget()->points().count() && workoutWidget()->points().last()->x < workoutWidget()->maxX() &&
-        workoutWidget()->maxX()>3600) {
+    // reduce maxWX if needed, never less than an hour
+    if (workoutWidget()->points().count() && workoutWidget()->points().last()->x < workoutWidget()->maxWX() &&
+        workoutWidget()->maxWX()>3600) {
         if (workoutWidget()->points().last()->x<3600)
-            workoutWidget()->setMaxX(3600);
+            workoutWidget()->setMaxWX(3600);
         else
-            workoutWidget()->setMaxX(workoutWidget()->points().last()->x);
+            workoutWidget()->setMaxWX(workoutWidget()->points().last()->x);
     }
 }
 
@@ -1144,9 +1156,9 @@ void PasteCommand::redo()
         }
     }
 
-    // increase maxX if needed?
-    if (workoutWidget()->points().count() && workoutWidget()->points().last()->x > workoutWidget()->maxX())
-        workoutWidget()->setMaxX(workoutWidget()->points().last()->x);
+    // increase maxWX if needed?
+    if (workoutWidget()->points().count() && workoutWidget()->points().last()->x > workoutWidget()->maxWX())
+        workoutWidget()->setMaxWX(workoutWidget()->points().last()->x);
 
 }
 

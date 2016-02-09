@@ -34,24 +34,15 @@ WorkoutWindow::WorkoutWindow(Context *context) :
 
     QVBoxLayout *main = new QVBoxLayout(this);
     QHBoxLayout *layout = new QHBoxLayout;
+    QVBoxLayout *editor = new QVBoxLayout;
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // the workout scene
     workout = new WorkoutWidget(this, context);
 
-    // paint the W'bal curve
+    // paint the TTE curve
     mmp = new WWMMPCurve(workout);
-
-    // add the power, W'bal scale
-    powerscale = new WWPowerScale(workout, context);
-    wbalscale = new WWWBalScale(workout, context);
-
-    // lap markers
-    lap = new WWLap(workout);
-
-    // tte warning bar at bottom
-    tte = new WWTTE(workout);
 
     // add a line between the dots
     line = new WWLine(workout);
@@ -65,6 +56,16 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // paint the W'bal curve
     wbline = new WWWBLine(workout, context);
 
+    // add the power, W'bal scale
+    powerscale = new WWPowerScale(workout, context);
+    wbalscale = new WWWBalScale(workout, context);
+
+    // lap markers
+    lap = new WWLap(workout);
+
+    // tte warning bar at bottom
+    tte = new WWTTE(workout);
+
     // selection tool
     rect = new WWRect(workout);
 
@@ -74,6 +75,10 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // recording ...
     now = new WWNow(workout, context);
     telemetry = new WWTelemetry(workout, context);
+
+    // scroller, hidden until needed
+    scroll = new QScrollBar(Qt::Horizontal, this);
+    scroll->hide();
 
     // setup the toolbar
     toolbar = new QToolBar(this);
@@ -157,6 +162,16 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     connect(propertiesAct, SIGNAL(triggered()), this, SLOT(properties()));
     toolbar->addAction(propertiesAct);
 
+    QIcon zoomInIcon(":images/toolbar/zoom in.png");
+    zoomInAct = new QAction(zoomInIcon, tr("Zoom In"), this);
+    connect(zoomInAct, SIGNAL(triggered()), this, SLOT(zoomIn()));
+    toolbar->addAction(zoomInAct);
+
+    QIcon zoomOutIcon(":images/toolbar/zoom out.png");
+    zoomOutAct = new QAction(zoomOutIcon, tr("Zoom Out"), this);
+    connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(zoomOut()));
+    toolbar->addAction(zoomOutAct);
+
     // stretch the labels to the right hand side
     QWidget *empty = new QWidget(this);
     empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
@@ -189,7 +204,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
 
     // WATTS and Duration for the cursor
     main->addWidget(toolbar);
-    layout->addWidget(workout);
+    editor->addWidget(workout);
+    editor->addWidget(scroll);
+    layout->addLayout(editor);
     layout->addWidget(code);
     main->addLayout(layout);
 
@@ -208,6 +225,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // text changed
     connect(code, SIGNAL(textChanged()), this, SLOT(qwkcodeChanged()));
     connect(code, SIGNAL(cursorPositionChanged()), workout, SLOT(hoverQwkcode()));
+
+    // scrollbar
+    connect(scroll, SIGNAL(sliderMoved(int)), this, SLOT(scrollMoved()));
 
     // set the widgets etc
     configChanged(CONFIG_APPEARANCE);
@@ -234,6 +254,11 @@ WorkoutWindow::configChanged(qint32)
     TSSlabel->setFixedWidth(fm.boundingRect(" 100 TSS ").width());
     xlabel->setFixedWidth(fm.boundingRect(" 00:00:00 ").width());
     ylabel->setFixedWidth(fm.boundingRect(" 1000w ").width());
+
+    // we don't style scrollers on a mac
+#ifndef Q_OS_MAC
+    scroll->setStyleSheet(TabView::ourStyleSheet());
+#endif
 
     toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ")
                            .arg(GColor(CTRAINPLOTBACKGROUND).name())
@@ -309,6 +334,60 @@ WorkoutWindow::eventFilter(QObject *obj, QEvent *event)
 }
 
 void
+WorkoutWindow::zoomIn()
+{
+    workout->zoomIn();
+    setScroller();
+}
+
+void
+WorkoutWindow::zoomOut()
+{
+    workout->zoomOut();
+    setScroller();
+}
+
+void
+WorkoutWindow::setScroller()
+{
+    // do we even need it ?
+    double vwidth = workout->maxVX() - workout->minVX();
+    if (vwidth >= workout->maxWX()) {
+        // it needs to be hidden, the view fits
+        scroll->hide();
+    } else {
+        // we need it, so set to right place
+        scroll->setMinimum(0);
+        scroll->setMaximum(workout->maxWX() - vwidth);
+        scroll->setPageStep(vwidth);
+        scroll->setValue(workout->minVX());
+
+        // and show
+        scroll->show();
+    }
+}
+
+void
+WorkoutWindow::scrollMoved()
+{
+    // is it visible!?
+    if (!scroll->isVisible()) return;
+
+    // just move the view as needed
+    double minVX = scroll->value();
+
+    // now set the view
+    workout->setMinVX(minVX);
+    workout->setMaxVX(minVX + scroll->pageStep());
+
+    // bleck
+    workout->setBlockCursor();
+
+    // repaint
+    workout->update();
+}
+
+void
 WorkoutWindow::ergFileSelected(ErgFile*f)
 {
     if (active) return;
@@ -333,6 +412,9 @@ WorkoutWindow::ergFileSelected(ErgFile*f)
     // just get on with it.
     ergFile = f;
     workout->ergFileSelected(f);
+
+    // almost certainly hides it on load
+    setScroller();
 }
 
 void

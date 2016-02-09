@@ -116,6 +116,8 @@
         <file>images/toolbar/paste.png</file>
         <file>images/toolbar/undo.png</file>
         <file>images/toolbar/redo.png</file>
+        <file>images/toolbar/zoom in.png</file>
+        <file>images/toolbar/zoom out.png</file>
         <file>images/toolbar/back_alt.png</file>
         <file>images/toolbar/forward_alt.png</file>
         <file>images/toolbar/popbutton.png</file>

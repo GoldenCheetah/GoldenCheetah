@@ -28,10 +28,13 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QFileDialog>
+#include <QScrollBar>
+#include <QMessageBox>
 
 #include "Context.h"
 #include "RideFile.h" // for data series types
 #include "Library.h"  // workout library
+#include "TabView.h"  // stylesheet for scroller
 
 #include "Settings.h"
 #include "Units.h"
@@ -76,7 +79,8 @@ class WorkoutWindow : public GcWindow
                 *saveAct, *propertiesAct,
                 *undoAct, *redoAct,
                 *drawAct, *selectAct,
-                *cutAct, *copyAct, *pasteAct;
+                *cutAct, *copyAct, *pasteAct,
+                *zoomInAct, *zoomOutAct;
 
         bool draw; // draw or select mode?
 
@@ -89,6 +93,16 @@ class WorkoutWindow : public GcWindow
         void properties();
         void drawMode();
         void selectMode();
+
+        // zooming and scrolling
+        void zoomIn();
+        void zoomOut();
+
+        // set scrollbar min/max/page
+        void setScroller();
+
+        // user moved scrollbar
+        void scrollMoved();
 
         // and erg file was selected
         void ergFileSelected(ErgFile *);
@@ -115,6 +129,7 @@ class WorkoutWindow : public GcWindow
 
         QToolBar *toolbar;
         WorkoutWidget *workout; // will become editor.
+        QScrollBar *scroll;     // for controlling the position
 
         WWPowerScale *powerscale;
         WWWBalScale *wbalscale;
