@@ -44,6 +44,7 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     layout->addWidget(searchLabel);
     searchLabel->hide();
 
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(filterChanged()), this, SLOT(setHighlighted()));
     connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(setCompare()));
     connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(setCompare()));
@@ -120,6 +121,39 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     width = fontMetric.width(tr("Diary"));
     diary->setWidth(width+30);
 #endif
+    configChanged(255);
+}
+
+void
+GcScopeBar::configChanged(qint32 reason)
+{
+#ifdef Q_OS_MAC // need to work on this separately
+    return;
+#endif
+
+    if ((reason & CONFIG_APPEARANCE) == 0) return;
+
+    QFont font; // default
+    QFontMetrics fm(font);
+
+    // we need to be the right height
+    setFixedHeight(fm.height() + 7);
+
+    // set font sizes
+    font.setWeight(QFont::Black);
+    searchLabel->setFont(font);
+
+    // Windows / Linux uses GcScopeButton - pushbutton
+    home->setFixedHeight(fm.height() + 4);
+    home->setFont(font);
+#ifdef GC_HAVE_ICAL
+    diary->setFixedHeight(fm.height() + 4);
+    diary->setFont(font);
+#endif
+    anal->setFixedHeight(fm.height() + 4);
+    anal->setFont(font);
+    train->setFixedHeight(fm.height() + 4);
+    train->setFont(font);
 }
 
 void
