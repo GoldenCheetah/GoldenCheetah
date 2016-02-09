@@ -84,7 +84,7 @@ public slots:
     void setContext(Context *c) { context = c; }
 
     void addWidget(QWidget*);
-
+    void configChanged(qint32);
 
 signals:
     void selectHome();
