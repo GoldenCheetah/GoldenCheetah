@@ -6928,12 +6928,12 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <location filename="../FileStore.cpp" line="205"/>
         <location filename="../FileStore.cpp" line="407"/>
         <source>Folder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Папка</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="212"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Название</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="213"/>
@@ -6948,17 +6948,17 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../FileStore.cpp" line="229"/>
         <source>Create Folder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Создать папку</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="230"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Отмена</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="231"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Открыть</translation>
     </message>
 </context>
 <context>
@@ -6966,17 +6966,17 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../FileStore.cpp" line="465"/>
         <source>Synchronise </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Синхронизировать </translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="473"/>
         <source>Sync with </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Синхронизировать с </translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="474"/>
         <source>Unable to connect, check your configuration in preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Невозможно подключиться, проверьте установки в настройках.</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="493"/>
@@ -7029,7 +7029,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../FileStore.cpp" line="531"/>
         <source>Workout Id</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Id Тренировки</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="532"/>
@@ -7067,7 +7067,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <location filename="../FileStore.cpp" line="560"/>
         <location filename="../FileStore.cpp" line="599"/>
         <source>Duration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Длительность</translation>
     </message>
     <message>
         <location filename="../FileStore.cpp" line="561"/>
