@@ -35,6 +35,7 @@
 #include <QPoint>
 #include <QVector>
 #include <QPainterPath>
+#include <QPropertyAnimation>
 #include <QTimer>
 
 #include "../qtsolutions/codeeditor/codeeditor.h"
@@ -110,6 +111,9 @@ class WorkoutWidget : public QWidget
 {
     Q_OBJECT
 
+    // we use this property purely to perform animations when zooming
+    Q_PROPERTY(QPointF vwidth READ getVWidth WRITE setVWidth USER false)
+
     public:
 
         WorkoutWidget(WorkoutWindow *parent, Context *context);
@@ -172,9 +176,17 @@ class WorkoutWidget : public QWidget
         double minY() { return 0.0f; } // might change later
 
         // zoom in / zoom out / zoom to fit
-        void zoomIn();
-        void zoomOut();
+        QPointF zoomIn();
+        QPointF zoomOut();
         void zoomFit();
+
+        // setting/getting view via properties when animating zoom
+        QPointF getVWidth() const { return QPointF(minVX_, maxVX_); }
+        void setVWidth(QPointF f) { 
+            minVX_=f.x(); maxVX_=f.y(); 
+            setBlockCursor();
+            repaint();
+        }
 
         // transform from plot to painter co-ordinate
         QPoint transform(double x, double y, RideFile::SeriesType s=RideFile::watts);
