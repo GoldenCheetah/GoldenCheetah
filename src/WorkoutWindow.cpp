@@ -332,22 +332,23 @@ WorkoutWindow::eventFilter(QObject *obj, QEvent *event)
 void
 WorkoutWindow::zoomIn()
 {
-    workout->zoomIn();
-    setScroller();
+    setScroller(workout->zoomIn());
 }
 
 void
 WorkoutWindow::zoomOut()
 {
-    workout->zoomOut();
-    setScroller();
+    setScroller(workout->zoomOut());
 }
 
 void
-WorkoutWindow::setScroller()
+WorkoutWindow::setScroller(QPointF v)
 {
+    double minVX=v.x();
+    double maxVX=v.y();
+
     // do we even need it ?
-    double vwidth = workout->maxVX() - workout->minVX();
+    double vwidth = maxVX - minVX;
     if (vwidth >= workout->maxWX()) {
         // it needs to be hidden, the view fits
         scroll->hide();
@@ -356,7 +357,7 @@ WorkoutWindow::setScroller()
         scroll->setMinimum(0);
         scroll->setMaximum(workout->maxWX() - vwidth);
         scroll->setPageStep(vwidth);
-        scroll->setValue(workout->minVX());
+        scroll->setValue(minVX);
 
         // and show
         scroll->show();
@@ -410,7 +411,7 @@ WorkoutWindow::ergFileSelected(ErgFile*f)
     workout->ergFileSelected(f);
 
     // almost certainly hides it on load
-    setScroller();
+    setScroller(QPointF(workout->minVX(), workout->maxVX()));
 }
 
 void

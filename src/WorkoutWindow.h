@@ -30,6 +30,7 @@
 #include <QFileDialog>
 #include <QScrollBar>
 #include <QMessageBox>
+#include <QPointF>
 
 #include "Context.h"
 #include "RideFile.h" // for data series types
@@ -99,7 +100,8 @@ class WorkoutWindow : public GcWindow
         void zoomOut();
 
         // set scrollbar min/max/page
-        void setScroller();
+        // via min/max view encoded in QPointF
+        void setScroller(QPointF);
 
         // user moved scrollbar
         void scrollMoved();

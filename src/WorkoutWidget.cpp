@@ -41,7 +41,7 @@ static int RECOVERY = 70; // anything below 70% of CP is a recovery effort
 
 static double MAXZOOM = 3.0f;
 static double MINZOOM = 0.2f;
-static double ZOOMSTEP = 0.05f;
+static double ZOOMSTEP = 0.1f;
 
 void WorkoutWidget::adjustLayout()
 {
@@ -2398,16 +2398,18 @@ WorkoutWidget::reverseTransform(int x, int y)
     return QPoint( (x-c.x()+(minVX() * xratio)) / xratio, (c.bottomLeft().y() - y) / yratio);
 }
 
-void
+QPointF
 WorkoutWidget::zoomOut()
 {
     // when we zoom in the view displays progressively
-    // smaller amount of time -- so reduce the diff
-    // between minVX and maxVX but never allow minVX to
+    // larger amount of time -- so increase diff between
+    // minVX and maxVX but never allow minVX to go negative!
     // go negative
 
     double vmid = (minVX_ + maxVX_) / 2.0f;
     double vwidth = maxVX_ - minVX_;
+    double nminVX_ = minVX_;
+    double nmaxVX_ = maxVX_;
 
     // ratio of view to workout
     double zratio = vwidth / maxWX_;
@@ -2418,34 +2420,33 @@ WorkoutWidget::zoomOut()
 
     // now apply the zoom ratio
     vwidth = zratio * maxWX_;
-    minVX_ = vmid - (vwidth/2.0f);
-    maxVX_ = vmid + (vwidth/2.0f);
+    nminVX_ = vmid - (vwidth/2.0f);
+    nmaxVX_ = vmid + (vwidth/2.0f);
 
     // don't go negative!
-    if (minVX_ < 0) {
-        maxVX_ -= minVX_; // - - = +
-        minVX_ = 0;
+    if (nminVX_ < 0) {
+        nmaxVX_ -= nminVX_; // - - = +
+        nminVX_ = 0;
     }
 
-    // more likely we zoom out and cannot
-    // see the workout anymore so make sure
-    // its to the left!
+    // left align when no scroller
     if (vwidth >= maxWX()) {
-        maxVX_ -= minVX_;
-        minVX_ = 0;
+        nmaxVX_ -= nminVX_;
+        nminVX_ = 0;
     }
 
-    // hmm. this is irritating.. maybe fix?
-    setBlockCursor();
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "vwidth");
+    animation->setDuration(200);
+    animation->setStartValue(QPointF(minVX_,maxVX_));
+    animation->setEndValue(QPointF(nminVX_,nmaxVX_));
+    animation->start();
 
-    // draw!
-    repaint();
+    return QPointF(nminVX_,nmaxVX_);
 }
 
-void
+QPointF
 WorkoutWidget::zoomIn()
 {
-
     // when we zoom in the view displays progressively
     // larger amount of time -- so increase diff between
     // minVX and maxVX but never allow minVX to go negative!
@@ -2453,6 +2454,8 @@ WorkoutWidget::zoomIn()
 
     double vmid = (minVX_ + maxVX_) / 2.0f;
     double vwidth = maxVX_ - minVX_;
+    double nminVX_ = minVX_;
+    double nmaxVX_ = maxVX_;
 
     // ratio of view to workout
     double zratio = vwidth / maxWX_;
@@ -2463,26 +2466,28 @@ WorkoutWidget::zoomIn()
 
     // now apply the zoom ratio
     vwidth = zratio * maxWX_;
-    minVX_ = vmid - (vwidth/2.0f);
-    maxVX_ = vmid + (vwidth/2.0f);
+    nminVX_ = vmid - (vwidth/2.0f);
+    nmaxVX_ = vmid + (vwidth/2.0f);
 
     // don't go negative!
-    if (minVX_ < 0) {
-        maxVX_ -= minVX_; // - - = +
-        minVX_ = 0;
+    if (nminVX_ < 0) {
+        nmaxVX_ -= nminVX_; // - - = +
+        nminVX_ = 0;
     }
 
     // left align when no scroller
     if (vwidth >= maxWX()) {
-        maxVX_ -= minVX_;
-        minVX_ = 0;
+        nmaxVX_ -= nminVX_;
+        nminVX_ = 0;
     }
 
-    // that pesky block cursor
-    setBlockCursor();
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "vwidth");
+    animation->setDuration(200);
+    animation->setStartValue(QPointF(minVX_,maxVX_));
+    animation->setEndValue(QPointF(nminVX_,nmaxVX_));
+    animation->start();
 
-    // draw!
-    repaint();
+    return QPointF(nminVX_,nmaxVX_);
 }
 
 void
