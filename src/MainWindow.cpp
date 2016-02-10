@@ -833,9 +833,6 @@ MainWindow::setSplash(bool first)
     // modal dialog with no parent so we set it up as a 'splash'
     // because QSplashScreen doesn't seem to work (!!)
     splash->setAttribute(Qt::WA_DeleteOnClose);
-#if QT_VERSION < 0x050200
-    setAttribute(Qt::WA_PaintOnScreen); // not needed in Qt 5.2 and up
-#endif
     splash->setWindowFlags(splash->windowFlags() | Qt::FramelessWindowHint);
 #ifdef Q_OS_LINUX
     splash->setWindowFlags(splash->windowFlags() | Qt::X11BypassWindowManagerHint);
