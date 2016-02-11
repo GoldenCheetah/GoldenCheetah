@@ -87,7 +87,8 @@ void WorkoutWidget::adjustLayout()
 WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     QWidget(parent),  state(none), ergFile(NULL), dragging(NULL), parent(parent), context(context), stackptr(0), recording_(false)
 {
-    maxWX_=3600;
+    minVX_=0;
+    maxVX_=maxWX_=3600;
     maxY_=400;
 
     // when plotting telemetry these are maxY for those series
@@ -1429,6 +1430,10 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
 
         // not supported
         this->ergFile = NULL;
+
+        minVX_=0;
+        maxVX_=maxWX_=3600;
+        maxY_=400;
     }
 
     // reset metrics etc

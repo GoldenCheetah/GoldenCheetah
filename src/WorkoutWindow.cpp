@@ -286,6 +286,10 @@ WorkoutWindow::configChanged(qint32)
         palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
     }
 
+#ifndef Q_OS_MAC // the scrollers appear when needed on Mac, we'll keep that
+    code->setStyleSheet(TabView::ourStyleSheet());
+#endif
+
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
     code->setPalette(palette);
