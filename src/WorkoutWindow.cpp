@@ -56,6 +56,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     // paint the W'bal curve
     wbline = new WWWBLine(workout, context);
 
+    // telemetry
+    telemetry = new WWTelemetry(workout, context);
+
     // add the power, W'bal scale
     powerscale = new WWPowerScale(workout, context);
     wbalscale = new WWWBalScale(workout, context);
@@ -74,7 +77,6 @@ WorkoutWindow::WorkoutWindow(Context *context) :
 
     // recording ...
     now = new WWNow(workout, context);
-    telemetry = new WWTelemetry(workout, context);
 
     // scroller, hidden until needed
     scroll = new QScrollBar(Qt::Horizontal, this);
@@ -516,6 +518,7 @@ void
 WorkoutWindow::start()
 {
     recording = true;
+    scroll->hide();
     toolbar->hide();
     code->hide();
     workout->start();
