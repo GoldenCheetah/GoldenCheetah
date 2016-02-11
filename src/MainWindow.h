@@ -243,6 +243,7 @@ class MainWindow : public QMainWindow
 #ifndef Q_OS_MAC
         QTFullScreen *fullScreen;
 #endif
+        QPropertyAnimation *anim;
 
         SearchFilterBox *searchBox;
 
