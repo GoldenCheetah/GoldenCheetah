@@ -180,6 +180,9 @@ class WorkoutWidget : public QWidget
         QPointF zoomOut();
         void zoomFit();
 
+        // will try and place in the centre if possible
+        void ensureVisible(double x);
+
         // setting/getting view via properties when animating zoom
         QPointF getVWidth() const { return QPointF(minVX_, maxVX_); }
         void setVWidth(QPointF f) { 
@@ -249,6 +252,7 @@ class WorkoutWidget : public QWidget
         // recording / editing
         void start();
         void stop();
+        void setNow(long);
         void telemetryUpdate(RealtimeData rtData);
 
         // and erg file was selected

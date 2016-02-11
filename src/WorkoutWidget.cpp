@@ -106,6 +106,7 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
+    connect(context, SIGNAL(setNow(long)), this, SLOT(setNow(long)));
     configChanged(CONFIG_APPEARANCE);
 }
 
@@ -163,6 +164,12 @@ WorkoutWidget::stop()
 {
     recording_ = false;
     update();
+}
+
+void
+WorkoutWidget::setNow(long x)
+{
+    ensureVisible(x/1000);
 }
 
 void
@@ -1881,6 +1888,10 @@ WorkoutWidget::hoverQwkcode()
     // if not in bound - maybe deleting in editor (?)
     if (from <0 || from >=points_.count() || to <0 || to >= points_.count()) return;
 
+    // scroll to point if not visible - before any transforms
+    ensureVisible((points_[from]->x + points_[to]->x) / 2.0f);
+    parent->setScroller(QPointF(minVX_, maxVX_));
+
     // lets highlight where the cursor is
     QPointF begin= transform(points_[from]->x, 0);
     QPointF last = begin;
@@ -1911,6 +1922,7 @@ WorkoutWidget::hoverQwkcode()
         cursorBlockText2= QString("%1w").arg(sumJoules/sumTime, 0, 'f', 0);
         update();
     }
+
 }
 
 void
@@ -2401,6 +2413,39 @@ WorkoutWidget::reverseTransform(int x, int y)
     double xratio = double(c.width()) / (maxVX()-minVX());
 
     return QPoint( (x-c.x()+(minVX() * xratio)) / xratio, (c.bottomLeft().y() - y) / yratio);
+}
+
+void
+WorkoutWidget::ensureVisible(double x)
+{
+    double vwidth=maxVX_ - minVX_;
+
+    // is it in range?
+    if (x > maxWX_) return;
+
+    // we're not zoomed in?
+    if (vwidth >= maxWX_ && maxVX_ >= maxWX_) return;
+
+    // center on it, even if it is visible
+    double nminVX_ = x - (vwidth/2.0f);
+    double nmaxVX_ = x + (vwidth/2.0f);
+
+    // don't go negative!
+    if (nminVX_ < 0) {
+        nmaxVX_ -= nminVX_; // - - = +
+        nminVX_ = 0;
+    }
+
+    // don't go beyond end of workout
+    // (remember we ARE zoomed in)
+    if (nmaxVX_ > maxWX_) {
+        nmaxVX_ = maxWX_;
+        nminVX_ = nmaxVX_ - vwidth;
+    }
+
+    // apply
+    maxVX_ = nmaxVX_;
+    minVX_ = nminVX_;
 }
 
 QPointF
