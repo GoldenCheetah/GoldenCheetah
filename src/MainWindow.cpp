@@ -377,7 +377,10 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(new Spacer(this));
     head->addWidget(viewsel);
 
+    // SearchBox and its animator
     searchBox = new SearchFilterBox(this,context,false);
+    anim = new QPropertyAnimation(searchBox, "xwidth", this);
+
 #if QT_VERSION > 0x50000
     QStyle *toolStyle = QStyleFactory::create("fusion");
 #else
@@ -509,6 +512,8 @@ MainWindow::MainWindow(const QDir &home)
 
     // add a search box on far right, but with a little space too
     searchBox = new SearchFilterBox(this,context,false);
+    anim = new QPropertyAnimation(searchBox, "xwidth", this);
+
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(150);
     head->addWidget(searchBox);
@@ -1337,6 +1342,12 @@ MainWindow::setToolButtons()
     case 3:
         index = 2; // train
     }
+#endif
+#ifdef Q_OS_MAC // bizarre issue with searchbox focus on tab voew change
+    anim->stop();
+    searchBox->clearFocus();
+    searchFocusOut();
+    scopebar->setFocus(Qt::TabFocusReason);
 #endif
     scopebar->setSelected(index);
 }
@@ -2364,17 +2375,19 @@ MainWindow::ridesAutoImport() {
 void
 MainWindow::searchFocusIn()
 {
-    QPropertyAnimation *anim = new QPropertyAnimation(searchBox, "xwidth", this);
-    anim->setDuration(300);
-    anim->setEasingCurve(QEasingCurve::InOutQuad);
-    anim->setStartValue(searchBox->width());
-    anim->setEndValue(350);
-    anim->start(QPropertyAnimation::DeleteWhenStopped);
+    if (searchBox->searchbox->hasFocus()) {
+        anim->setDuration(300);
+        anim->setEasingCurve(QEasingCurve::InOutQuad);
+        anim->setStartValue(searchBox->width());
+        anim->setEndValue(350);
+        anim->start();
+    }
 }
 
 void
 MainWindow::searchFocusOut()
 {
+    anim->stop();
     searchBox->setFixedWidth(150);
 }
 
