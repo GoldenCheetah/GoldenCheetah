@@ -99,6 +99,7 @@ void GCColor::setupColors()
         { tr("Normalised Power"), "CNPOWER", Qt::magenta },
         { tr("Skiba xPower"), "CXPOWER", Qt::magenta },
         { tr("Altitude Power"), "CAPOWER", Qt::magenta },
+        { tr("Train Target Power"), "CTPOWER", Qt::blue },
         { tr("Critical Power"), "COLORCP", Qt::cyan },
         { tr("Cadence"), "COLORCADENCE", QColor(0,204,204) },
         { tr("Altitude"), "COLORALTITUTDE", QColor(Qt::gray) },
