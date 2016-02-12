@@ -316,7 +316,7 @@ void
 WWLine::paint(QPainter *painter)
 {
     // thin ?
-    QPen linePen(workoutWidget()->recording() ? QColor(Qt::blue) : GColor(CPOWER));
+    QPen linePen(workoutWidget()->recording() ? GColor(CTPOWER) : GColor(CPOWER));
     linePen.setWidth(1);
     painter->setPen(linePen);
 
@@ -350,9 +350,9 @@ WWLine::paint(QPainter *painter)
         // now fill
         painter->setPen(Qt::NoPen);
 
-            QColor brush_color1 = QColor(Qt::blue);
+            QColor brush_color1 = QColor(GColor(CTPOWER));
             brush_color1.setAlpha(200);
-            QColor brush_color2 = QColor(Qt::blue);
+            QColor brush_color2 = QColor(GColor(CTPOWER));
             brush_color2.setAlpha(64);
 
             QLinearGradient linearGradient(0, 0, 0, workoutWidget()->transform(0,0).y());

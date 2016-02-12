@@ -159,10 +159,10 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     LodCurve->setYAxis(QwtPlot::yLeft);
 
     // load curve is blue for time and grey for gradient
-    QColor brush_color = QColor(Qt::blue);
+    QColor brush_color = QColor(GColor(CTPOWER));
     brush_color.setAlpha(64);
     LodCurve->setBrush(brush_color);   // fill below the line
-    QPen Lodpen = QPen(Qt::blue, 1.0);
+    QPen Lodpen = QPen(GColor(CTPOWER), 1.0);
     LodCurve->setPen(Lodpen);
 
     wbalCurvePredict = new QwtPlotCurve("W'bal Predict");
@@ -330,9 +330,9 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
         } else {
 
-            QColor brush_color1 = QColor(Qt::blue);
+            QColor brush_color1 = QColor(GColor(CTPOWER));
             brush_color1.setAlpha(200);
-            QColor brush_color2 = QColor(Qt::blue);
+            QColor brush_color2 = QColor(GColor(CTPOWER));
             brush_color2.setAlpha(64);
 
             QLinearGradient linearGradient(0, 0, 0, height());
@@ -341,7 +341,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
             linearGradient.setSpread(QGradient::PadSpread);
 
             LodCurve->setBrush(linearGradient);   // fill below the line
-            QPen Lodpen = QPen(Qt::blue, 1.0);
+            QPen Lodpen = QPen(GColor(CTPOWER), 1.0);
             LodCurve->setPen(Lodpen);
 
         }
