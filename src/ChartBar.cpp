@@ -25,6 +25,11 @@
 
 #include <QFontMetrics>
 
+#ifdef Q_OS_MAC
+static int spacing_=7;
+#else
+static int spacing_=4;
+#endif
 ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(context)
 {
     // left / right scroller icon
@@ -107,15 +112,9 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     //connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
 
     QFontMetrics fs(buttonFont);
-#ifdef Q_OS_MAC
-    setFixedHeight(fs.height()+7);
-    scrollArea->setFixedHeight(fs.height()+7);
-    buttonBar->setFixedHeight(fs.height()+7);
-#else
-    setFixedHeight(fs.height()+4);
-    scrollArea->setFixedHeight(fs.height()+4);
-    buttonBar->setFixedHeight(fs.height()+4);
-#endif
+    setFixedHeight(fs.height()+spacing_);
+    scrollArea->setFixedHeight(fs.height()+spacing_);
+    buttonBar->setFixedHeight(fs.height()+spacing_);
 
     signalMapper = new QSignalMapper(this); // maps each option
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
@@ -138,29 +137,23 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
 void
 ChartBar::configChanged(qint32)
 {
-#ifndef Q_OS_MAC
     buttonFont = QFont();
     QFontMetrics fs(buttonFont);
-    setFixedHeight(fs.height()+4);
-    scrollArea->setFixedHeight(fs.height()+4);
-    buttonBar->setFixedHeight(fs.height()+4);
+    setFixedHeight(fs.height()+spacing_);
+    scrollArea->setFixedHeight(fs.height()+spacing_);
+    buttonBar->setFixedHeight(fs.height()+spacing_);
     foreach(GcScopeButton *b, buttons) {
     	int width = fs.width(b->text);
     	b->setFont(buttonFont);
     	b->setFixedWidth(width+20);
     	b->setFixedHeight(fs.height()+2);
     }
-#endif
 }
 
 void
 ChartBar::addWidget(QString title)
 {
-#ifdef Q_OS_MAC
-    QtMacButton *newbutton = new QtMacButton(this, QtMacButton::Recessed);
-#else
     GcScopeButton *newbutton = new GcScopeButton(this);
-#endif
     newbutton->setText(title);
     newbutton->setFont(buttonFont);
 
@@ -214,11 +207,7 @@ ChartBar::tidy()
 {
     // resize to button widths + 2px spacing
     int width = 2;
-#ifdef Q_OS_MAC
-    foreach (QtMacButton *button, buttons) {
-#else
     foreach (GcScopeButton *button, buttons) {
-#endif
         width += button->geometry().width() + 2;
     }
     buttonBar->setMinimumWidth(width);
@@ -277,11 +266,7 @@ ChartBar::scrollLeft()
 void
 ChartBar::clear()
 {
-#ifdef Q_OS_MAC
-    foreach(QtMacButton *button, buttons) {
-#else
     foreach(GcScopeButton *button, buttons) {
-#endif
         layout->removeWidget(button);
         delete button;
     }
