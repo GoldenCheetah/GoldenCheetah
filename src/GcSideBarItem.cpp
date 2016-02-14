@@ -20,6 +20,12 @@
 #include "DiaryWindow.h"
 #include "DiarySidebar.h"
 
+// fixed width stuff, easier to set globally
+// since progating across widgets we don't create
+// or own is REALLY painful
+static int bigHandle = 23;
+static int smallHandle = 18;
+
 // creates an icon in the apple style of gray emboss
 QIcon iconFromPNG(QString filename, bool emboss)
 {
@@ -63,7 +69,7 @@ GcSplitter::GcSplitter(Qt::Orientation orientation, QWidget *parent) : QWidget(p
     control = new GcSplitterControl(this);
 
     splitter = new GcSubSplitter(orientation, control, this);
-    splitter->setHandleWidth(23);
+    splitter->setHandleWidth(bigHandle);
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0,0,0,0);
     splitter->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -270,10 +276,6 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
     Q_UNUSED(orientation);
 
     setContentsMargins(0,0,0,0);
-    if (metal)
-        setFixedHeight(23);
-    else
-        setFixedHeight(18);
 
     gcSplitter = (GcSubSplitter*)parent;
 
@@ -285,14 +287,23 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
     titleLabel->setXOff(0);
     titleLabel->setChrome(true);
 
+    // set handle size according to font metric
     QFont font;
+    QFontMetrics fm(font);
+    bigHandle = fm.height() + 5;
+    smallHandle = fm.height() + 2;
+
+    // use the sizes as set
+    if (metal) setFixedHeight(bigHandle);
+    else setFixedHeight(smallHandle);
+
 #ifdef Q_OS_MAC
-    titleLabel->setFixedHeight(16);
+    //titleLabel->setFixedHeight(16);
     titleLabel->setYOff(1);
-    font.setPointSize(11);
+    //font.setPointSize(11);
 #else
     titleLabel->setYOff(1);
-    font.setPointSize(10);
+    //font.setPointSize(10);
 #endif
     font.setWeight(QFont::Black);
     titleLabel->setFont(font);
@@ -314,7 +325,7 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
 QSize
 GcSplitterHandle::sizeHint() const
 {
-    return QSize(200, metal ? 23 :18);
+    return QSize(200, metal ? bigHandle :smallHandle);
 }
 
 GcSubSplitter*
@@ -366,8 +377,8 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, QColor(Qt::white));
 
-    QLinearGradient active = GCColor::linearGradient(metal ? 23 : 18, true, !metal);
-    QLinearGradient inactive = GCColor::linearGradient(metal ? 23 : 18, false, !metal);
+    QLinearGradient active = GCColor::linearGradient(height(), true, !metal);
+    QLinearGradient inactive = GCColor::linearGradient(height(), false, !metal);
 
     painter.fillRect(all, isActiveWindow() ? active : inactive);
 
