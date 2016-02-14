@@ -1707,6 +1707,9 @@ WorkoutWidget::recompute(bool editing)
         parent->code->document()->setPlainText(qwkcode());
         qwkactive = false;
     }
+
+    // update scrollbar e.g. when pasting and workout gets longer
+    parent->setScroller(QPointF(minVX_,maxVX_));
 }
 
 // as 1m or 60s etc
