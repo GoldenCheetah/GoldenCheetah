@@ -29,11 +29,7 @@
 #include <QEvent>
 
 class Context;
-#ifdef Q_OS_MAC
-class QtMacButton;
-#else
 class GcScopeButton;
-#endif
 class GcLabel;
 class ButtonBar;
 
@@ -79,11 +75,7 @@ private:
     QHBoxLayout *layout;
 
     QFont buttonFont;
-#ifdef Q_OS_MAC
-    QVector<QtMacButton*> buttons;
-#else
     QVector<GcScopeButton*> buttons;
-#endif
     QSignalMapper *signalMapper;
 
     QMenu *barMenu, *chartMenu;
