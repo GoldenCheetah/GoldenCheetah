@@ -457,7 +457,7 @@ GcCrashDialog::setHTML()
         // RESPECT PRIVACY
         // we do not disclose user names and passwords or key ids
         if (key.endsWith("/user") || key.endsWith("/pass") ||
-            key.endsWith("/key") || key.endsWith("_token") ||
+            key.endsWith("/key") || key.endsWith("token") ||
             key.endsWith("_secret") || key.endsWith("googlecalid")) continue;
 
         // we do not disclose personally identifiable information
