@@ -2182,7 +2182,15 @@ MainWindow::uploadGoogleDrive()
     // upload current ride, if we have one
     if (currentTab->context->ride) {
         GoogleDrive gd(currentTab->context);
-        FileStore::upload(this, &gd, currentTab->context->ride);
+        QStringList errors;        
+        if (gd.open(errors) && errors.empty()) {
+            // NOTE(gille): GoogleDrive is a little "wonky". We need to read
+            // the directory before we can upload to it. It's just how it is..
+            gd.readdir(gd.home(), errors);
+            if (errors.empty()) {
+                FileStore::upload(this, &gd, currentTab->context->ride);
+            }
+        } // TODO(gille): How to bail properly?
     }
 }
 
