@@ -20,7 +20,15 @@
 #define GC_GOOGLE_DRIVE_H
 
 #include "FileStore.h"
+
+#include <QBuffer>
+#include <QMap>
+#include <QMutex>
 #include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QScopedPointer>
+#include <QSharedPointer>
+#include <QString>
 
 class GoogleDrive : public FileStore {
 
@@ -61,7 +69,7 @@ class GoogleDrive : public FileStore {
         // Returns the fild id or "" if no file was found, uses the local
         // cache to determine file id.
         QString GetFileId(const QString& path);
-        
+
     public slots:
 
         // getting data
@@ -73,7 +81,7 @@ class GoogleDrive : public FileStore {
 
     private:
         struct FileInfo;
-        
+
         void MaybeRefreshCredentials();
 
         // Fetches a JSON document from the given URL.
@@ -82,7 +90,7 @@ class GoogleDrive : public FileStore {
         FileInfo* WalkFileInfo(const QString& path, bool foo);
 
         FileInfo* BuildDirectoriesForAthleteDirectory(const QString& path);
-            
+
         static QNetworkRequest MakeRequestWithURL(
             const QString& url, const QString& token, const QString& args);
         static QNetworkRequest MakeRequest(
@@ -91,13 +99,16 @@ class GoogleDrive : public FileStore {
         // Drive.
         static QString MakeQString(const QString& parent);
         QString GetRootDirId();
-        
+
         Context *context_;
         QNetworkAccessManager *nam_;
         FileStoreEntry *root_;
         QString root_directory_id_;
         QScopedPointer<FileInfo> root_dir_;
-        
-        QMap<QNetworkReply*, QByteArray*> buffers;
+
+        QMap<QNetworkReply*, QByteArray*> buffers_;
+        QMap<QNetworkReply*, QSharedPointer<QBuffer> > patch_buffers_;
+        QMutex mu_;
 };
+
 #endif  // GC_GOOGLE_DRIVE_H
