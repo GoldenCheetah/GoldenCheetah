@@ -179,7 +179,7 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
             break;
         }
 
-        // now get the files with their full names      
+        // now get the files with their full names
         QFileInfoList fileInfos = importDir->entryInfoList(allFormats, QDir::Files, QDir::NoSort);
         if (!fileInfos.isEmpty()) {
             int j = 0;
@@ -441,27 +441,26 @@ RideImportWizard::process()
         // get fullpath name for processing
         QFileInfo thisfile(filenames[i]);
 
-        if (thisfile.exists() && thisfile.isFile() && thisfile.isReadable()) {
-
+        if (!thisfile.exists()) {
+            tableWidget->item(i,5)->setText(tr("Error - File does not exit."));
+        } else if (!thisfile.isFile()) {
+            tableWidget->item(i,5)->setText(tr("Error - Not a file."));
+        } else if (!thisfile.isReadable()) {
+            tableWidget->item(i,5)->setText(
+                tr("Error - File is not readable."));
+        } else {
             // is it one we understand ?
             QStringList suffixList = RideFileFactory::instance().suffixes();
             QRegExp suffixes(QString("^(%1)$").arg(suffixList.join("|")));
             suffixes.setCaseSensitivity(Qt::CaseInsensitive);
-
             if (suffixes.exactMatch(thisfile.suffix())) {
-
                 // Woot. We know how to parse this baby
                 tableWidget->item(i,5)->setText(tr("Queued"));
-
             } else {
-                tableWidget->item(i,5)->setText(tr("Error - Unknown file type"));
+                tableWidget->item(i,5)->setText(
+                    tr("Error - Unknown file type"));
             }
-
-        } else {
-            //  Cannot open
-            tableWidget->item(i,5)->setText(tr("Error - Not a valid file"));
         }
-
         progressBar->setValue(progressBar->value()+1);
 
     }
@@ -486,16 +485,19 @@ RideImportWizard::process()
               tableWidget->setCurrentCell(i,5);
               QApplication::processEvents();
 
-              if (aborted) { done(0); return 0; }
+              if (aborted) {
+                  done(0);
+                  return 0;
+              }              
               this->repaint();
               QApplication::processEvents();
 
               QList<RideFile*> rides;
-              RideFile *ride = RideFileFactory::instance().openRideFile(context, thisfile, errors, &rides);
+              RideFile *ride = RideFileFactory::instance().openRideFile(
+                  context, thisfile, errors, &rides);
 
               // is this an archive of files?
-              if (rides.count() > 1) {
-
+              if (rides.count() > 1) {                  
                  int here = i;
 
                  // remove current filename from state arrays and tableview
@@ -522,7 +524,7 @@ RideImportWizard::process()
                      reader.writeRideFile(context, extracted, target);
                      deleteMe.append(fulltarget);
                      delete extracted;
-                     
+
                      // now add each temporary file ...
                      filenames.insert(here, fulltarget);
                      blanks.insert(here, true); // by default editable
@@ -579,7 +581,7 @@ RideImportWizard::process()
 
                  // then go back one and re-parse from there
                  rides.clear();
-   
+
                  i--;
                  goto next; // buttugly I know, but count em across 100,000 lines of code
 
@@ -645,7 +647,7 @@ RideImportWizard::process()
                    delete ride;
                } else {
                    // nope - can't handle this file
-                   tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(" ")));
+                   tableWidget->item(i,5)->setText(tr("Error - :::") + errors.join(tr(" ")));
                }
         }
         progressBar->setValue(progressBar->value()+1);
@@ -1262,4 +1264,3 @@ void RideDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
         model->setData(index, value, Qt::DisplayRole);
     }
 }
-
