@@ -18,29 +18,27 @@
 
 #include "GoogleDrive.h"
 
-#include "Athlete.h"
-#include "Secrets.h"
-#include "Settings.h"
-
 #include <stdio.h>
 
 #include <set>
 #include <string>
+
+#include "Athlete.h"
+#include "Secrets.h"
+#include "Settings.h"
 
 #include <QByteArray>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonValue>
-#include <QSharedPointer>
-
 
 #ifndef GOOGLE_DRIVE_DEBUG
 // TODO(gille): This should be a command line flag.
 #define GOOGLE_DRIVE_DEBUG false
 #endif
 #ifdef Q_CC_MSVC
-#define printd(fmt, ...) do {                                 \
+#define printd(fmt, ...) do {                                                \
     if (GOOGLE_DRIVE_DEBUG) {                                 \
         printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
                __FUNCTION__, __VA_ARGS__);                    \
@@ -84,6 +82,7 @@ struct GoogleDrive::FileInfo {
 
 GoogleDrive::GoogleDrive(Context *context)
     : FileStore(context), context_(context), root_(NULL) {
+    printd("GoogleDrive::GoogleDrive\n");
     nam_ = new QNetworkAccessManager(this);
     root_ = NULL;
 }
@@ -113,7 +112,7 @@ bool GoogleDrive::open(QStringList &errors) {
     new_root->name = "/";
     new_root->id = GetRootDirId();
     root_dir_.reset(new_root);
-    
+
     return true;
 }
 
@@ -124,7 +123,6 @@ bool GoogleDrive::close() {
 
 // home dire
 QString GoogleDrive::home() {
-    // TODO(gille): is this cheap or expensive, it's trivial to cache.
     return appsettings->cvalue(
         context_->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER, "").toString();
 }
@@ -146,7 +144,7 @@ QNetworkRequest GoogleDrive::MakeRequestWithURL(
 
 QNetworkRequest GoogleDrive::MakeRequest(
     const QString& token, const QString& args) {
-    return MakeRequestWithURL("/drive/v2/files", token, args);
+    return MakeRequestWithURL("/drive/v3/files", token, args);
 }
 
 bool GoogleDrive::createFolder(QString path) {
@@ -176,14 +174,14 @@ bool GoogleDrive::createFolder(QString path) {
     }
 
     QNetworkRequest request = MakeRequestWithURL(
-        "/drive/v2/files", token, "");
+        "/drive/v3/files", token, "");
 
     request.setRawHeader("Content-Type", kMetadataMimeType.toLatin1());
     //QString("multipart/mixed; boundary=\"" + boundary + "\"").toLatin1());
     printd("Creating directory %s\n", path.toStdString().c_str());
 
     QJsonObject json_request;
-    json_request.insert("title", QJsonValue(dir_name));
+    json_request.insert("name", QJsonValue(dir_name));
     json_request.insert("mimeType", QJsonValue(kDirectoryMimeType));
 
     if (parent_fi->id != "") {//FIXME
@@ -277,18 +275,20 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
     if (parent_fi == NULL) {
         // This can happen.. If it does we kind of have to walk our way up
         // here even though it'll be slow and painful.
-        // We could store the directory id and find it that way... 
+        // We could store the directory id and find it that way...
 
         // Ok. Lets try to fake it out. Who knows maybe it'll work.
         // TODO(gille): Handle an empty response/404 below?
         if (path == home()) {
+            printd("Build path for home directory.\n");
             parent_fi = BuildDirectoriesForAthleteDirectory(path);
         }
-            errors << tr("No such directory");
-        return returning;
-
-
-            }
+        if (parent_fi == NULL) {
+            errors << tr("No such directory, try setting a new location in "
+                         "options.");
+            return returning;
+        }
+    }
 
     QNetworkRequest request = MakeRequest(
         token, MakeQString(parent_fi->id) +
@@ -313,18 +313,18 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
 
     // If there's an error just give up.
     if (parseError.error != QJsonParseError::NoError) {
+        printd("json parse error: ....\n"); // FIXME
         return returning;
     }
 
-    QJsonArray contents = document.object()["items"].toArray();
-
+    QJsonArray contents = document.object()["files"].toArray();
     // Fetch more files as long as there are more files.
     QString next_link = document.object()["nextLink"].toString();
     while (next_link != "") {
         printd("Fetching nextLink!\n");
         document = FetchNextLink(next_link, token);
         // Append items;
-        QJsonArray tmp = document.object()["items"].toArray();
+        QJsonArray tmp = document.object()["files"].toArray();
         for (int i = 0; i < tmp.size(); i++ ) {
             contents.push_back(tmp.at(i));
         }
@@ -346,7 +346,7 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
             continue;
         }
         QSharedPointer<FileInfo> fi(new FileInfo);
-        fi->name = file["title"].toString();
+        fi->name = file["name"].toString();
         fi->id = file["id"].toString();
         QJsonArray parents = file["parents"].toArray();
         // First parent is best parent!
@@ -378,11 +378,13 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
         new_root->name = "/";
         new_root->id = GetRootDirId();
         root_dir_.reset(new_root);
+        printd("Creating new root.\n");
     } else {
         new_root = parent_fi;
         new_root->children.clear();
+        printd("Appending to old root.\n");
     }
-    
+
     // We know they're all where they should be right?
     for (std::map<QString, QSharedPointer<FileInfo> >::iterator it =
              file_by_id.begin();
@@ -394,6 +396,7 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
     // other layers expect.
     FileInfo* target = WalkFileInfo(path, false);
     if (target == NULL) {
+        printd("Unable to walk the paths.\n");
         return returning;
     }
     for (std::map<QString, QSharedPointer<FileInfo> >::iterator it =
@@ -409,6 +412,7 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
         returning << add;
     }
     // all good!
+    printd("returning %d entries.\n", returning.size());
     return returning;
 }
 
@@ -442,7 +446,7 @@ bool GoogleDrive::readFile(QByteArray *data, QString remote_name) {
     QNetworkReply *reply = nam_->get(request);
     // remember the file.
     mapReply(reply, remote_name);
-    buffers.insert(reply, data);
+    buffers_.insert(reply, data);
     // catch finished signal
     connect(reply, SIGNAL(finished()), this, SLOT(readFileCompleted()));
     connect(reply, SIGNAL(readyRead()), this, SLOT(readyRead()));
@@ -515,12 +519,13 @@ bool GoogleDrive::writeFile(QByteArray &data, QString remote_name) {
 
     QNetworkRequest request;
     if (fi == NULL) {
+        // This means we will post the file further down.
         request = MakeRequestWithURL(
-            "/upload/drive/v2/files", token, "uploadType=multipart");
+            "/upload/drive/v3/files", token, "uploadType=multipart");
     } else {
         // This file is known, just overwrite the old one.
         request = MakeRequestWithURL(
-            "/upload/drive/v2/files/" + fi->id, token, "uploadType=multipart");
+            "/upload/drive/v3/files/" + fi->id, token, "uploadType=multipart");
     }
     QString boundary = "------------------------------------";
     QString delimiter = "\r\n--" + boundary + "\r\n";
@@ -529,34 +534,50 @@ bool GoogleDrive::writeFile(QByteArray &data, QString remote_name) {
         QString("multipart/mixed; boundary=\"" + boundary + "\"").toLatin1());
     QString base64data = data.toBase64();
     printd("Uploading file %s\n", remote_name.toStdString().c_str());
+    printd("Using parent id: %s\n", parent_fi->id.toStdString().c_str());
+
     QString multipartRequestBody =
         delimiter +
         "Content-Type: " + kMetadataMimeType + "\r\n\r\n" +
-        "{ title: \"" + remote_name + "\", " +
-        "  parents: [" +
-        "    {\"id\": \"" + parent_fi->id + "\"} " +
-        "  ] " +
+        "{ name: \"" + remote_name + "\" ";
+    if (fi == NULL) {
+        // NOTE(gille): Parents is only valid on upload.
+        multipartRequestBody += 
+            "  ,parents: [ \"" + parent_fi->id + "\"  ] ";
+    }
+    multipartRequestBody += 
         "}" +
         delimiter +
         "Content-Type: " + kFileMimeType + "\r\n" +
         "Content-Transfer-Encoding: base64\r\n\r\n" +
         base64data +
         "\r\n--" + boundary + "--";
-    printd("Uploading %s\n", multipartRequestBody.toStdString().c_str());
 
     // post the file
     QNetworkReply *reply;
     if (fi == NULL) {
+        printd("Posting the file\n");
         reply = nam_->post(request, multipartRequestBody.toLatin1());
     } else {
-        reply = nam_->put(request, multipartRequestBody.toLatin1());
-    }
+        printd("Patching the file\n");
+        // Ugh, QT doesn't support Patch and we need it to upload files.
+        // So we get to handle this all on our own.
+        QSharedPointer<QBuffer> buffer(new QBuffer());
+        buffer->open(QBuffer::ReadWrite);
+        buffer->write(multipartRequestBody.toLatin1());
+        buffer->seek(0);
+        reply = nam_->sendCustomRequest(request, "PATCH", buffer.data());
 
-    // catch finished signal
-    connect(reply, SIGNAL(finished()), this, SLOT(writeFileCompleted()));
+        mu_.lock();
+        patch_buffers_[reply] = buffer;
+        mu_.unlock();
+    }
 
     // remember
     mapReply(reply, remote_name);
+
+    // catch finished signal
+    connect(reply, SIGNAL(finished()), this, SLOT(writeFileCompleted()));
     return true;
 }
 
@@ -565,6 +586,17 @@ void GoogleDrive::writeFileCompleted() {
     QByteArray r = reply->readAll();
     printd("QNetworkReply: %d\n", reply->error());
     printd("write file: %s\n", r.data());
+
+    // Erase the data buffer if there is one.
+    
+    mu_.lock();
+    QMap<QNetworkReply*, QSharedPointer<QBuffer> >::iterator it =
+        patch_buffers_.find(reply);
+    if (it != patch_buffers_.end()) {
+        patch_buffers_.erase(it);
+    }
+    mu_.unlock();
+    
     if (reply->error() == QNetworkReply::NoError) {
         notifyWriteComplete(
             replyName(static_cast<QNetworkReply*>(QObject::sender())),
@@ -578,12 +610,12 @@ void GoogleDrive::writeFileCompleted() {
 
 void GoogleDrive::readyRead() {
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
-    buffers.value(reply)->append(reply->readAll());
+    buffers_.value(reply)->append(reply->readAll());
 }
 
 void GoogleDrive::readFileCompleted() {
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
-    notifyReadComplete(buffers.value(reply), replyName(reply),
+    notifyReadComplete(buffers_.value(reply), replyName(reply),
                        tr("Completed."));
 }
 
@@ -606,6 +638,7 @@ void GoogleDrive::MaybeRefreshCredentials() {
            now.toString().toStdString().c_str());
     if (now > last_refresh) { // This is true if the refresh is older than 45
         // minutes.
+        printd("Refreshing credentials.\n");
         QNetworkRequest request(kGoogleApiBaseAddr + "/oauth2/v3/token");
         request.setRawHeader("Content-Type",
                              "application/x-www-form-urlencoded");
@@ -654,6 +687,8 @@ void GoogleDrive::MaybeRefreshCredentials() {
             context_->athlete->cyclist,
             GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH,
             now.toString());
+    } else {
+        printd("Credentials are still good, not refreshing.\n");
     }
 }
 
@@ -668,8 +703,8 @@ QString GoogleDrive::GetRootDirId() {
         return "appdata";
     } else {
         return "root";
-    }        
-}    
+    }
+}
 
 QString GoogleDrive::GetFileId(const QString& path) {
     FileInfo* fi = WalkFileInfo(path, false);
@@ -684,19 +719,21 @@ GoogleDrive::FileInfo* GoogleDrive::BuildDirectoriesForAthleteDirectory(
     // Because Google Drive is a little bit "different" we can't just read
     // "/foo/bar/baz, we need to know the id's of both foo and bar to find
     // baz.
-
     const QString id = appsettings->cvalue(
         context_->athlete->cyclist,
         GC_GOOGLE_DRIVE_FOLDER_ID, "").toString();
     if (id == "") {
+        // TODO(gille): Maybe we should actually find this dir if this happens
+        // however this is a weird configuration error, that (tm)
+        // should not happen.
         return NULL;
     }
-        
+    printd("GC_GOOGLE_DRIVE_FOLDER_ID: %s\n", id.toStdString().c_str());
     QStringList parts = path.split("/", QString::SkipEmptyParts);
     FileInfo *fi = root_dir_.data();
 
     for (QStringList::iterator it = parts.begin(); it != parts.end(); ++it) {
-        std::map<QString, QSharedPointer<FileInfo> >::iterator next = 
+        std::map<QString, QSharedPointer<FileInfo> >::iterator next =
             fi->children.find(*it);
         if (next == fi->children.end()) {
             QSharedPointer<FileInfo> next_fi(new FileInfo);
@@ -707,9 +744,9 @@ GoogleDrive::FileInfo* GoogleDrive::BuildDirectoriesForAthleteDirectory(
             fi = next_fi.data();
         } else {
             fi = next->second.data();
-        }        
+        }
     }
-    // Overwrite the final directory.
+    // Overwrite the final directory id with the right one.
     fi->id = id;
     return fi;
 }
