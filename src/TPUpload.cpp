@@ -98,7 +98,7 @@ TPUpload::upload(Context *context, const RideFile *ride)
 
     // setup the soap message
     current = QtSoapMessage();
-    http.setHost("www.trainingpeaks.com");
+    http.setHost("www.trainingpeaks.com", true);
     http.setAction("http://www.trainingpeaks.com/TPWebServices/ImportFileForUser");
     current.setMethod("ImportFileForUser", "http://www.trainingpeaks.com/TPWebServices/");
     current.addMethodArgument("username", "", appsettings->cvalue(context->athlete->cyclist, GC_TPUSER).toString());
@@ -118,7 +118,7 @@ void TPUpload::getResponse(const QtSoapMessage &message)
     QString result;
 
     if (message.isFault()) {
-	    result = tr("Error:") + qPrintable(message.faultString().toString());
+            result = tr("Error:") + qPrintable(message.faultString().toString());
     } else {
         // SOAP call succeeded, but was the file accepted?
         if (message.returnValue().toString() == "true") result = tr("Upload successful");
