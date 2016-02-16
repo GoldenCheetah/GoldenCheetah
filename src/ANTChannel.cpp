@@ -343,6 +343,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
         product_id=MANUFACTURER_MODEL_NUMBER_ID(message);
         checkCinqo();
 
+    } else if (MESSAGE_IS_BATTERY_VOLTAGE(message)) {
+        // todo: push battery status up to train view when we have a means to display notifications
     }
     else {
         telemetry = true;
