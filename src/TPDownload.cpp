@@ -26,10 +26,10 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QLocale>
 
-static QString tptypestrings[]= { "SharedFree", "CoachedFree", "SelfCoachedPremium",
-                                  "SharedSelfCoachedPremium", "CoachedPremium",
-                                  "SharedCoachedPremium"
-                                };
+static const QString tptypestrings[]= {
+    "SharedFree", "CoachedFree", "SelfCoachedPremium",
+    "SharedSelfCoachedPremium", "CoachedPremium", "SharedCoachedPremium"
+};
 //
 // Get athletes available for download
 //
@@ -44,15 +44,18 @@ void
 TPAthlete::list(int type, QString user, QString pass)
 {
     // if currently downloading fail!
-    if (waiting == true) return;
+    if (waiting == true) {
+        return;
+    }
 
     // setup the soap message
-    http.setHost("www.trainingpeaks.com");
+    http.setHost("www.trainingpeaks.com", true);
     http.setAction("http://www.trainingpeaks.com/TPWebServices/GetAccessibleAthletes");
     current.setMethod("GetAccessibleAthletes", "http://www.trainingpeaks.com/TPWebServices/");
     current.addMethodArgument("username", "", user);
     current.addMethodArgument("password", "", pass);
-    current.addMethodArgument("types", "", tptypestrings[type].toLatin1().constData());
+    current.addMethodArgument("types", "",
+                              tptypestrings[type].toLatin1().constData());
 
     // do it!
     waiting = true;
@@ -123,7 +126,7 @@ TPWorkout::list(int id, QDate from, QDate to, QString user, QString pass)
     current = QtSoapMessage(); // reset
 
     // setup the soap message
-    http.setHost("www.trainingpeaks.com");
+    http.setHost("www.trainingpeaks.com", true);
     http.setAction("http://www.trainingpeaks.com/TPWebServices/GetWorkoutsForAccessibleAthlete");
     current.setMethod("GetWorkoutsForAccessibleAthlete", "http://www.trainingpeaks.com/TPWebServices/");
     current.addMethodArgument("username", "", user);
@@ -197,7 +200,7 @@ TPDownload::download(QString cyclist, int personId, int workoutId)
     current = QtSoapMessage();
 
     // setup the soap message
-    http.setHost("www.trainingpeaks.com");
+    http.setHost("www.trainingpeaks.com", true);
     http.setAction("http://www.trainingpeaks.com/TPWebServices/GetExtendedWorkoutsForAccessibleAthlete");
     current.setMethod("GetExtendedWorkoutsForAccessibleAthlete", "http://www.trainingpeaks.com/TPWebServices/");
     current.addMethodArgument("username", "", appsettings->cvalue(cyclist, GC_TPUSER).toString());
