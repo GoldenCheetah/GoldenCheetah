@@ -25,7 +25,7 @@
 #include "BlankState.h"
 #include "TrainDB.h"
 #include "ComparePane.h"
-#include "TrainIntensityAdjustment.h"
+#include "TrainBottom.h"
 
 #include <QDesktopWidget>
 extern QDesktopWidget *desktop;
@@ -194,12 +194,12 @@ TrainView::TrainView(Context *context, QStackedWidget *controls) : TabView(conte
     setPage(t);
     setBlank(b);
 
-    trainIntensity = new TrainIntensityAdjustment(trainTool, this);
-    setBottom(trainIntensity);
+    trainBottom = new TrainBottom(trainTool, this);
+    setBottom(trainBottom);
     setHideBottomOnIdle(false);
 
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(onSelectionChanged()));
-    connect(trainIntensity, SIGNAL(autoHideChanged(bool)), this, SLOT(onAutoHideChanged(bool)));
+    connect(trainBottom, SIGNAL(autoHideChanged(bool)), this, SLOT(onAutoHideChanged(bool)));
 }
 
 void TrainView::onAutoHideChanged(bool enabled)

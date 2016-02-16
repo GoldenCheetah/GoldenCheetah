@@ -86,7 +86,7 @@ class TrainView : public TabView
     private:
 
         TrainSidebar *trainTool;
-        TrainBottom *trainIntensity;
+        TrainBottom *trainBottom;
 
 private slots:
         void onAutoHideChanged(bool enabled);
