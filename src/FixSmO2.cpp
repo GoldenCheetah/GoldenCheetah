@@ -86,7 +86,7 @@ static bool fixSmO2Added = DataProcessorFactory::instance().registerProcessor(QS
 bool
 FixSmO2::postProcess(RideFile *ride, DataProcessorConfig *config=0)
 {
-        Q_UNUSED(config);
+    Q_UNUSED(config);
     // does this ride have power?
     if (ride->areDataPresent()->watts == false) return false;
 
@@ -144,11 +144,13 @@ FixSmO2::postProcess(RideFile *ride, DataProcessorConfig *config=0)
             if (nb > 0)
                 left = left / nb;
         }
-        if (pos < (ride->dataPoints().count()-2))  {
+        if (pos < (ride->dataPoints().count()))  {
             int nb = 0;
-            for (int j=1; j<4; j++) {
-                if (ride->dataPoints()[pos+j]->smo2>0 && ride->dataPoints()[pos+j]->smo2<100) {
-                    right = ride->dataPoints()[pos+j]->smo2;
+            for (int j = 1; j < 4 && pos + j < ride->dataPoints().count();
+                 j++) {
+                if (ride->dataPoints()[pos + j]->smo2 > 0 &&
+                    ride->dataPoints()[pos + j]->smo2 < 100) {
+                    right = ride->dataPoints()[pos + j]->smo2;
                     nb++;
                 }
             }
