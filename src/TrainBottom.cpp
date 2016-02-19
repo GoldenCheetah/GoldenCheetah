@@ -30,10 +30,13 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
 {
     QHBoxLayout *intensityControlLayout = new QHBoxLayout();
 
-    QIcon upIcon(":images/oxygen/up-arrow-bw.png");
+    QVBoxLayout *levelbuttons = new QVBoxLayout;
+    intensityControlLayout->addLayout(levelbuttons);
+
+    QIcon upIcon(":images/oxygen/go-up.png");
     QPushButton *loadUp = new QPushButton(upIcon, "", this);
     loadUp->setFocusPolicy(Qt::NoFocus);
-    loadUp->setIconSize(QSize(64,64));
+    loadUp->setIconSize(QSize(32,32));
     loadUp->setAutoFillBackground(false);
     loadUp->setAutoDefault(false);
     loadUp->setFlat(true);
@@ -43,11 +46,12 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     loadUp->setShortcut(Qt::Key_Plus);
 #endif
     loadUp->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    levelbuttons->addWidget(loadUp);
 
-    QIcon downIcon(":images/oxygen/down-arrow-bw.png");
+    QIcon downIcon(":images/oxygen/go-down.png");
     QPushButton *loadDown = new QPushButton(downIcon, "", this);
     loadDown->setFocusPolicy(Qt::NoFocus);
-    loadDown->setIconSize(QSize(64,64));
+    loadDown->setIconSize(QSize(32,32));
     loadDown->setAutoFillBackground(false);
     loadDown->setAutoDefault(false);
     loadDown->setFlat(true);
@@ -57,6 +61,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     loadDown->setShortcut(Qt::Key_Minus);
 #endif
     loadDown->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;"); 
+    levelbuttons->addWidget(loadDown);
 
     QSlider *intensitySlider = new QSlider(Qt::Vertical, this);
     intensitySlider->setAutoFillBackground(false);
@@ -65,8 +70,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     intensitySlider->setMaximum(125);
     intensitySlider->setValue(100);
 
-    intensityControlLayout->addWidget(loadDown);
-    intensityControlLayout->addWidget(loadUp);
     intensityControlLayout->addWidget(intensitySlider);
     intensityControlLayout->addStretch();
 

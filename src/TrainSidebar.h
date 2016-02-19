@@ -52,6 +52,7 @@
 #define RT_MODE_SPIN        0x0002        // spinscan like modes
 #define RT_MODE_SLOPE       0x0002        // same as spinscan but not so CT specific
 #define RT_MODE_CALIBRATE   0x0004        // calibrate
+#define RT_MODE_LEVEL       0x0008        // fixed resistence mode
 
 #define RT_RUNNING      0x0100        // is running now
 #define RT_PAUSED       0x0200        // is paused
@@ -240,6 +241,7 @@ class TrainSidebar : public GcWindow
         double displayDistance, displayWorkoutDistance;
         long load;
         double slope;
+        long level;
         int displayLap;            // user increment for Lap
         int displayWorkoutLap;     // which Lap in the workout are we at?
 

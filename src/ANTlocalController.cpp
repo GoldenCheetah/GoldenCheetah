@@ -121,6 +121,11 @@ ANTlocalController::setGradient(double x) {
 }
 
 void
+ANTlocalController::setLevel(int x) {
+    myANTlocal->setLevel(x);
+}
+
+void
 ANTlocalController::setMode(int mode) {
     myANTlocal->setMode(mode);
 }

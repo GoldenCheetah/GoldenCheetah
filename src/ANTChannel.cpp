@@ -711,6 +711,102 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            }
            break;
 
+           //QUBO Digital
+           case CHANNEL_TYPE_QUBO_DIGITAL:
+           {
+               static int quboRefreshCounter = 1;
+
+               parent->setQuboChannel(number);
+
+               if ((quboRefreshCounter++ % 10) == 0)
+               {
+                   if  (parent->modeERGO())
+                       parent->refreshQuboLoad();
+                   else if (parent->modeSLOPE())
+                       parent->refreshQuboGradient();
+                   else if (parent->modeLevel())
+                       parent->refreshQuboLevel();
+               }
+
+               if (antMessage.quboSpeed > 0)
+               {
+                   parent->setSpeed(antMessage.quboSpeed);
+                   value = antMessage.quboSpeed;
+
+                   int minPower = 0.039*(value*value)+3.91*value-9;  // Power if we were at level 1
+                   int maxPower = 0.207*(value*value)+16.1*value-76; // Power if we were at level 16
+
+                   parent->setTrainerPowerRange(minPower,maxPower);
+               }
+               else
+               {
+                   parent->setSpeed(0);
+               }
+
+               if (antMessage.quboCadence)
+               {
+                   parent->setSecondaryCadence(antMessage.quboCadence);
+                   value2 = antMessage.quboCadence;
+               }
+               else
+               {
+                   parent->setSecondaryCadence(0);
+               }
+
+               const double factors[17][3] = {
+                   0,0,0,
+                   0.039,3.91, -9,
+                   0.051,3.91, -10,
+                   0.069,3.59, -5,
+                   0.072,4.58, -13,
+                   0.075,5.95, -23,
+                   0.066,7.86, -37,
+                   0.071,9.71, -48,
+                   0.067,11.77,-63,
+                   0.063,14.11,-78,
+                   0.091,14.91,-78,
+                   0.099,16.45,-88,
+                   0.118,16.86,-86,
+                   0.124,18.04,-92,
+                   0.145,18.13,-89,
+                   0.179,17.35,-82,
+                   0.207,16.1, -76 };
+
+               // Calculate virtual power if we have a level set.
+               if (parent->modeLevel()) {
+                   int level = parent->getLevel();
+                   double speed = antMessage.quboSpeed;
+                   float power = factors[level][0] * pow(speed,2) + factors[level][1] * speed + factors[level][2];
+
+                   is_alt ? parent->setAltWatts(power):parent->setWatts(power);
+               } else {
+                   // determine trainer level setting to figure out power
+                   int level;
+                   double speed = antMessage.quboSpeed;
+                   double load = parent->getLoad();
+                   float power=0,prev=999;
+                   if (speed > 0)
+                   {
+                       int minPower = 0.039*(speed*speed)+3.91*speed-9;  // Power if we were at level 1
+                       int maxPower = 0.207*(speed*speed)+16.1*speed-76; // Power if we were at level 16
+
+                       for (level=1; level <= 16; ++level)
+                       {
+                           // get power at level
+                           power = factors[level][0] * pow(speed,2) + factors[level][1] * speed + factors[level][2];
+                           if (power > load)
+                               break;
+                       }
+
+                       //unable to match power level
+                       if ((level==17) || (power > load && level == 1))
+                           power = 0;
+                   }
+                   is_alt ? parent->setAltWatts(power):parent->setWatts(power);
+               }
+            }
+            break;
+
             //moxy
             case CHANNEL_TYPE_MOXY:
             {
@@ -735,6 +831,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                        parent->refreshFecLoad();
                    else if (parent->modeSLOPE())
                         parent->refreshFecGradient();
+                   else if (parent->modeLevel())
+                       parent->refreshFecLevel();
                }
 
                if (antMessage.data_page == FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE)
