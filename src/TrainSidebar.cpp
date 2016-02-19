@@ -80,6 +80,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     cl->setContentsMargins(0,0,0,0);
 
     // don't set the source for telemetry
+    lastAppliedIntensity = 100;
     bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
 
 #if !defined GC_VIDEO_NONE
