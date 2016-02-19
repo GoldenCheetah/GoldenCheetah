@@ -63,10 +63,14 @@ SpecialFields::SpecialFields()
 
     // now add all the metric fields (for metric overrides)
     const RideMetricFactory &factory = RideMetricFactory::instance();
+
+    QTextEdit processHTML;
+    QTextEdit processHTMLinternal;
+
     for (int i=0; i<factory.metricCount(); i++) {
         const RideMetric *add = factory.rideMetric(factory.metricName(i));
-        QTextEdit processHTML(add->name());
-        QTextEdit processHTMLinternal(add->internalName());
+        processHTML.setText(add->name());
+        processHTMLinternal.setText(add->internalName());
         // add->internalName() used for compatibility win metadata.xml, could be replaced by factory.metricName(i) or add->symbol()
         namesmap.insert(processHTMLinternal.toPlainText(), processHTML.toPlainText());
         metricmap.insert(processHTMLinternal.toPlainText(), add);
