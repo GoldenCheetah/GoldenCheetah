@@ -2614,6 +2614,7 @@ static struct {
 	{ "ALTITUDE", RideFile::alt },
 	{ "LON", RideFile::lon },
 	{ "LAT", RideFile::lat },
+	{ "NP", RideFile::NP },
 	{ "HEADWIND", RideFile::headwind },
 	{ "SLOPE", RideFile::slope },
 	{ "TEMPERATURE", RideFile::temp },
