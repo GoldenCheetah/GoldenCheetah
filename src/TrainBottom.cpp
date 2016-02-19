@@ -171,6 +171,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
 
 
     QHBoxLayout *allControlsLayout = new QHBoxLayout();
+    allControlsLayout->addStretch();
     allControlsLayout->addLayout(toolbuttons);
     allControlsLayout->addLayout(intensityControlLayout);
 
