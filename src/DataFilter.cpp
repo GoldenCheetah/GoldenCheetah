@@ -2215,6 +2215,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         QString rename;
         QString symbol = *(leaf->lvalue.n);
 
+        // ride series name when running through sample override metrics etc
+        if (p && (lhsisNumber = df->dataSeriesSymbols.contains(*(leaf->lvalue.n))) == true) {
+
+            // its a ride series symbol !
+            return Result(p->value(RideFile::seriesForSymbol((*(leaf->lvalue.n)))));
+        }
+
         // user defined symbols override all others !
         if (df->symbols.contains(symbol)) return Result(df->symbols.value(symbol));
 
@@ -2282,12 +2289,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             lhsisNumber = true;
 
             //qDebug()<<"symbol" << *(lvalue.n) << "is" << lhsdouble << "via" << rename;
-        } else if ((lhsisNumber = df->dataSeriesSymbols.contains(*(leaf->lvalue.n))) == true) {
-
-            // its a ride series symbol !
-            if (p) return Result(p->value(RideFile::seriesForSymbol((*(leaf->lvalue.n)))));
-            else return Result(0); 
-
         } else {
             // string symbol will evaluate to zero as unary expression
             lhsstring = m->getText(rename=df->lookupMap.value(symbol,""), "");
