@@ -174,6 +174,8 @@ class VideoWindow : public GcWindow
         void telemetryUpdate(RealtimeData rtd);
         void seekPlayback(long ms);
         void mediaSelected(QString filename);
+        void detachPlayer();
+        void attachPlayer();
 
     protected:
 
@@ -183,9 +185,11 @@ class VideoWindow : public GcWindow
         int curPosition;
         RideFilePoint rfp;
         float currentVideoRate;
-
+        QSize curSize;
         // passed from Context *
         Context *context;
+        QAction *detachAction;
+        QAction *attachAction;
 
         bool m_MediaChanged;
 

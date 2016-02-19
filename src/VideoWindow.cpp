@@ -145,6 +145,12 @@ VideoWindow::VideoWindow(Context *context)  :
     layout->addWidget(wd);
 #endif
 
+    detachAction = menu->addAction(tr("Detach"), this, SLOT(detachPlayer()));
+    attachAction = menu->addAction(tr("Attach"), this, SLOT(attachPlayer()));
+
+    attachAction->setEnabled(false);
+    detachAction->setEnabled(true);
+
     if (init) {
         // get updates..
         connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
@@ -186,6 +192,51 @@ VideoWindow::~VideoWindow()
     delete mp;
     delete wd;
 #endif
+}
+
+void VideoWindow::detachPlayer()
+{
+    attachAction->setEnabled(true);
+    detachAction->setEnabled(false);
+
+#ifdef GC_VIDEO_VLC
+    QWidget *wd=x11Container;
+#elif WIN32
+    QWidget *wd=container;
+#elif GC_VIDEO_QT5
+    QWidget *wd=wd;
+#endif
+
+    QPoint pos = wd->pos();
+    QLayout *l = layout();
+
+    curSize = wd->size();
+    l->removeWidget(wd);
+
+    wd->setWindowFlags(Qt::Tool|Qt::CustomizeWindowHint|Qt::WindowMinMaxButtonsHint);
+    wd->move(pos);
+    wd->resize(curSize);
+    wd->show();
+
+    setFixedSize(QSize(100,48));
+}
+void VideoWindow::attachPlayer()
+{
+    attachAction->setEnabled(false);
+    detachAction->setEnabled(true);
+
+#ifdef GC_VIDEO_VLC
+    QWidget *wd=x11Container;
+#elif WIN32
+    QWidget *wd=container;
+#elif GC_VIDEO_QT5
+    QWidget *wd=wd;
+#endif
+
+    QLayout *l = layout();
+    wd->setWindowFlags(Qt::Widget);
+    l->addWidget(wd);
+    setFixedSize(curSize);
 }
 
 void VideoWindow::resizeEvent(QResizeEvent * )
