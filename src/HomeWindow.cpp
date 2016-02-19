@@ -1136,8 +1136,8 @@ GcWindowDialog::exec()
 // is easier to follow and modify... for now.
 static QString xmlprotect(QString string)
 {
-    QTextEdit trademark("&#8482;"); // process html encoding of(TM)
-    QString tm = trademark.toPlainText();
+    // get local TM character code
+    static QString tm = QTextEdit("&#8482;").toPlainText();
 
     QString s = string;
     s.replace( tm, "&#8482;" );
@@ -1152,8 +1152,7 @@ static QString xmlprotect(QString string)
 static QString unprotect(QString buffer)
 {
     // get local TM character code
-    QTextEdit trademark("&#8482;"); // process html encoding of(TM)
-    QString tm = trademark.toPlainText();
+    static QString tm = QTextEdit("&#8482;").toPlainText();
 
     // remove quotes
     QString s = buffer.trimmed();

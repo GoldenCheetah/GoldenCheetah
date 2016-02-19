@@ -731,7 +731,27 @@ class AllPlot : public QwtPlot
         QFont labelFont;
 
         void setAltSlopePlotStyle (AllPlotSlopeCurve *curve);
-        static void nextStep( int& step );
+        static inline void nextStep( int& step ) {
+            if (step >= 5000)
+            {
+                step += 1000;
+            } else if( step < 50 )
+            {
+                step += 10;
+            }
+            else if( step == 50 )
+            {
+                step = 100;
+            }
+            else if( step >= 100 && step < 1000 )
+            {
+                step += 100;
+            }
+            else //if( step >= 1000 && step < 5000)
+            {
+                step += 500;
+            }
+        }
 
 };
 
