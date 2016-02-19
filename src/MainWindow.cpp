@@ -890,14 +890,14 @@ MainWindow::showSidebar(bool want)
 void
 MainWindow::toggleLowbar()
 {
-    if (currentTab->hasBottom()) currentTab->setShowBottom(!currentTab->isShowBottom());
+    if (currentTab->hasBottom()) currentTab->setBottomRequested(!currentTab->isBottomRequested());
     setToolButtons();
 }
 
 void
 MainWindow::showLowbar(bool want)
 {
-    if (currentTab->hasBottom()) currentTab->setShowBottom(want);
+    if (currentTab->hasBottom()) currentTab->setBottomRequested(want);
     showhideLowbar->setChecked(want);
     setToolButtons();
 }
@@ -1302,7 +1302,7 @@ void
 MainWindow::setToolButtons()
 {
     int select = currentTab->isTiled() ? 1 : 0;
-    int lowselected = currentTab->isShowBottom() ? 1 : 0;
+    int lowselected = currentTab->isBottomRequested() ? 1 : 0;
 
     styleAction->setChecked(select);
     showhideLowbar->setChecked(lowselected);
