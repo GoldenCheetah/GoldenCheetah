@@ -15,7 +15,8 @@
 include(gcconfig.pri)
 
 # You can also define your own local source to add to build
-HEADERS += $${LOCALHEADERS}
+HEADERS += $${LOCALHEADERS} \
+    TrainBottom.h
 SOURCE += $${LOCALSOURCE}
 
 
@@ -634,6 +635,7 @@ HEADERS  += \
         HrPwPlot.h \
         HrPwWindow.h \
         HrZones.h \
+        IdleTimer.h \
         IndendPlotMarker.h \
         IntervalItem.h \
         IntervalSummaryWindow.h \
@@ -899,6 +901,7 @@ SOURCES += \
         HrPwWindow.cpp \
         HrTimeInZone.cpp \
         HrZones.cpp \
+        IdleTimer.cpp \
         IndendPlotMarker.cpp \
         IntervalItem.cpp \
         IntervalSummaryWindow.cpp \
@@ -1051,7 +1054,8 @@ SOURCES += \
         WorkoutWizard.cpp \
         WPrime.cpp \
         Zones.cpp \
-        ZwoParser.cpp
+        ZwoParser.cpp \
+    TrainBottom.cpp
 
 
 ###======================================

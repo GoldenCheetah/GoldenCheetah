@@ -25,6 +25,7 @@ class AnalysisSidebar;
 class IntervalSidebar;
 class QDialog;
 class RideNavigator;
+class TrainBottom;
 
 class AnalysisView : public TabView
 {
@@ -85,8 +86,10 @@ class TrainView : public TabView
     private:
 
         TrainSidebar *trainTool;
-        QDialog *p;
+        TrainBottom *trainBottom;
 
+private slots:
+        void onAutoHideChanged(bool enabled);
 };
 
 class HomeView : public TabView

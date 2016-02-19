@@ -68,9 +68,9 @@ class Tab: public QWidget
         bool isSidebarEnabled();
 
         // bottom
-        void setShowBottom(bool);
-        bool isShowBottom();
         bool hasBottom();
+        bool isBottomRequested();
+        void setBottomRequested(bool x);
 
         // layout
         void resetLayout();

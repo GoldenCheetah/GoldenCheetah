@@ -154,5 +154,7 @@
         <file>images/sidebar/movie.png</file>
         <file>images/sidebar/power.png</file>
         <file>images/sidebar/sync.png</file>
+        <file>images/oxygen/up-arrow-bw.png</file>
+        <file>images/oxygen/down-arrow-bw.png</file>
     </qresource>
 </RCC>

@@ -25,6 +25,7 @@
 #include "BlankState.h"
 #include "TrainDB.h"
 #include "ComparePane.h"
+#include "TrainBottom.h"
 
 #include <QDesktopWidget>
 extern QDesktopWidget *desktop;
@@ -193,18 +194,17 @@ TrainView::TrainView(Context *context, QStackedWidget *controls) : TabView(conte
     setPage(t);
     setBlank(b);
 
-    p = new QDialog(NULL);
-    QVBoxLayout *m = new QVBoxLayout(p);
-    m->addWidget(trainTool->getToolbarButtons());
-    trainTool->getToolbarButtons()->show();
-    p->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
-
-    // put at bottom of screen
-    QRect screenSize = desktop->availableGeometry();
-    p->move((screenSize.width()/2) - 180, screenSize.height() - 70);
-    p->hide();
+    trainBottom = new TrainBottom(trainTool, this);
+    setBottom(trainBottom);
+    setHideBottomOnIdle(false);
 
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(onSelectionChanged()));
+    connect(trainBottom, SIGNAL(autoHideChanged(bool)), this, SLOT(onAutoHideChanged(bool)));
+}
+
+void TrainView::onAutoHideChanged(bool enabled)
+{
+    setHideBottomOnIdle(enabled);
 }
 
 TrainView::~TrainView()
@@ -215,7 +215,6 @@ void
 TrainView::close()
 {
     trainTool->Stop();
-    p->close();
 }
 
 bool
@@ -229,8 +228,6 @@ void
 TrainView::onSelectionChanged()
 {
     if (isSelected()) {
-        p->show();
-    } else {
-        p->hide();
+        setBottomRequested(true);
     }
 }
