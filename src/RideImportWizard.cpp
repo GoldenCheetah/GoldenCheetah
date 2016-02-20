@@ -660,7 +660,6 @@ RideImportWizard::process()
     //         Actually allow us to edit date on ANY ride, we
     //         make sure that the ride date/time is set from
     //         the filename and never from the ride data
-    phaseLabel->setText(tr("Step 3 of 4: Confirm Date and Time"));
 
     int needdates=0;
     for (int i=0; i<filenames.count(); i++) {
@@ -675,6 +674,14 @@ RideImportWizard::process()
         progressBar->setValue(progressBar->value()+1);
         progressBar->repaint();
    }
+
+   // lets make the text more helpful!
+   if (needdates) {
+     phaseLabel->setText(QString(tr("Step 3 of 4: %1 ride(s) are missing the date and time.")).arg(needdates));
+   } else {
+     phaseLabel->setText(tr("Step 3 of 4: Change Date/Time or Save to continue."));
+   }
+
    // get it on top to save / correct missing dates
    if (autoImportStealth && needdates > 0) {
        // leave the stealth mode
@@ -700,6 +707,7 @@ RideImportWizard::process()
       // without user intervention
 
       abortButton->setDisabled(false);
+      activateSave();
       if (autoImportStealth) abortClicked();  // simulate "Save" by User
 
    } else {
@@ -909,30 +917,6 @@ RideImportWizard::abortClicked()
     }
 
     // Process "SAVE"
-
-    // SAVE STEP 1 - Check if there are any dates needed and not yet defined
-    int needdates=0;
-    for (int i=0; i<filenames.count(); i++) {
-
-        QTableWidgetItem *t = tableWidget->item(i,5);
-        if (t->text().startsWith(tr("Error"))) continue;
-        // date needed?
-        t = tableWidget->item(i,1);
-        if (t->text() == "") {
-            needdates++;
-        }
-        t->setFlags(t->flags() | (Qt::ItemIsEditable));
-
-        // time needed?
-        t = tableWidget->item(i,2);
-        if (t->text() == "") {
-            needdates++;
-        }
-        t->setFlags(t->flags() | (Qt::ItemIsEditable));
-    }
-
-    if (needdates) return; // no dice dude, we need those dates filled in!
-
 
     // SAVE STEP 2 - set the labels and make the text un-editable
     phaseLabel->setText(tr("Step 4 of 4: Save to Library"));
