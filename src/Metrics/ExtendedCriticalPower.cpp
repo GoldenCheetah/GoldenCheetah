@@ -244,7 +244,9 @@ ExtendedCriticalPower::deriveExtendedCP_2_3_Parameters(RideFileCache *bests, Rid
              (fabs(model.ecp_dec - ecp_dec_prev) > ecp_dec_delta_max)
             );
 
-    //qDebug() << iteration << "iterations";
+
+    qDebug() << iteration << "iterations";
+    verifyMin(model.paa, paa_min, model.paa_dec, paa_dec_min, model.ecp_dec, ecp_dec_min, model.etau, etau_min);
 
     model.pMax = model.paa*exp(model.paa_dec*(1/60.0)) + model.ecp * (1-exp(model.ecp_del*(1/60.0))) * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 + model.etau/(1/60.0));
     model.mmp60 = model.paa*exp(model.paa_dec*(60.0)) + model.ecp * (1-exp(model.ecp_del*60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/(60.0))) * ( 1 + model.etau/(60.0));
@@ -521,7 +523,8 @@ ExtendedCriticalPower::deriveExtendedCP_4_3_Parameters(bool usebest, RideFileCac
              (fabs(model.ecp_dec - ecp_dec_prev) > ecp_dec_delta_max)
             );
 
-    //qDebug() << iteration << "iterations";
+    qDebug() << iteration << "iterations";
+    verifyMin(model.paa, paa_min, model.paa_dec, paa_dec_min, model.ecp_dec, ecp_dec_min, model.etau, etau_min);
 
     model.pMax = model.paa*(2.0-exp(-1*(1/60.0)))*exp(model.paa_dec*(1/60.0)) + model.ecp * (1-exp(model.ecp_del*(1/60.0))) * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 + model.etau/(1/60.0));
     model.mmp60 = model.paa*(2.0-exp(-1*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1-exp(model.ecp_del*60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 + model.etau/(60.0));
@@ -843,6 +846,7 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCac
 {
     TestModel model;
     model.version = "eCP v5.3";
+    qDebug() << model.version;
 
     // bounds on anaerobic interval in minutes
     const double t1 = sanI1 / 60.0;
@@ -1080,6 +1084,7 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCac
             );
 
     qDebug() << iteration << "iterations";
+    verifyMin(model.paa, paa_min, model.paa_dec, paa_dec_min, model.ecp_dec, ecp_dec_min, model.etau, etau_min);
 
     model.pMax = model.paa*(1.20-0.20*exp(-1*(1/60.0)))*exp(model.paa_dec*(1/60.0)) + model.ecp * (1-exp(model.tau_del*(1/60.0))) * (1-exp(model.ecp_del*(1/60.0))) * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 + model.etau/(1/60.0));
     model.mmp60 = model.paa*(1.20-0.20*exp(-1*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1-exp(model.tau_del*(60.0))) * (1-exp(model.ecp_del*60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 + model.etau/(60.0));
@@ -1220,7 +1225,7 @@ ExtendedCriticalPower::getPlotLevelForExtendedCP_5_3(TestModel model)
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(TestModel model, bool stacked, bool inversed)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(TestModel model, bool stacked, bool inversed, int balance)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1233,8 +1238,8 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(TestModel model, bo
         double x = (double) i / (extendedCurve2_points - 1);
         double t = pow(tmax, x) * pow(tmin, 1-x);
 
-        double power_wsecond = model.paa*(1.20-0.20*exp(-1*t))*exp(model.paa_dec*(t));
-        double power_wprime = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( model.etau/(t) );
+        double power_wsecond = model.paa * (1.20-0.20*exp(-1*t))*exp(model.paa_dec*(t));
+        double power_wprime = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( balance/100.0 * model.etau/(t) );
         double power_cp = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( 1 );
 
 
@@ -1265,7 +1270,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(TestModel model, bo
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(TestModel model, bool stacked, bool inversed)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(TestModel model, bool stacked, bool inversed, int balance)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1279,7 +1284,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(TestModel model, boo
         double t = pow(tmax, x) * pow(tmin, 1-x);
 
         double power_wsecond = model.paa*(1.20-0.20*exp(-1*t))*exp(model.paa_dec*(t));
-        double power_wprime = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( model.etau/(t) );
+        double power_wprime = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( balance/100.0 * model.etau/(t) );
         double power_cp = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( 1 );
 
         extended_cp_curve_power[i] = QwtIntervalSample(t, (stacked?(inversed?power_cp:power_wsecond):0), (stacked?(inversed?power_wprime + power_cp: power_wprime + power_wsecond):power_wprime));
@@ -1364,6 +1369,7 @@ ExtendedCriticalPower::deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCac
 {
     TestModel model;
     model.version = "eCP v6.3";
+    qDebug() << model.version;
 
     // bounds on anaerobic interval in minutes
     const double t1 = sanI1 / 60.0;
@@ -1474,6 +1480,7 @@ ExtendedCriticalPower::deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCac
 
     // loop to convergence
     int iteration = 0;
+    qDebug() << "start iteration";
     do {
         if (iteration ++ > max_loops) {
             qDebug()<<"Maximum number of loops exceeded in ecp2 model";
@@ -1598,7 +1605,8 @@ ExtendedCriticalPower::deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCac
              (fabs(model.ecp_dec - ecp_dec_prev) > ecp_dec_delta_max)
             );
 
-    //qDebug() << iteration << "iterations";
+    qDebug() << iteration << "iterations";
+    verifyMin(model.paa, paa_min, model.paa_dec, paa_dec_min, model.ecp_dec, ecp_dec_min, model.etau, etau_min);
 
     model.pMax = model.paa*(1.10-(1.10-1)*exp(-8*(1/60.0)))*exp(model.paa_dec*(1/60.0)) + model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 * (1-exp(model.ecp_del*(1/60.0))) + pow((1-exp(model.tau_del*(1/60.0))),2) * model.etau/(1/60.0));
     model.mmp60 = model.paa*(1.10-(1.10-1)*exp(-8*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 * (1-exp(model.ecp_del*60.0)) + pow((1-exp(model.tau_del*(60.0))),2) * model.etau/(60.0));
@@ -2024,11 +2032,335 @@ ExtendedCriticalPower::deriveDanVeloclinicCP_Parameters(bool usebest, RideFileCa
     model.pMax = model.paa*(1.10-(1.10-1)*exp(-8*(1/60.0)))*exp(model.paa_dec*(1/60.0)) + model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 * (1-exp(model.ecp_del*(1/60.0))) + pow((1-exp(model.tau_del*(1/60.0))),2) * model.etau/(1/60.0));
     model.mmp60 = model.paa*(1.10-(1.10-1)*exp(-8*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 * (1-exp(model.ecp_del*60.0)) + pow((1-exp(model.tau_del*(60.0))),2) * model.etau/(60.0));
 
-    qDebug() <<"eCP(6.3) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec << "ecp_dec_del" << model.ecp_dec_del;
-    qDebug() <<"eCP(6.3) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
+    qDebug() <<"eCP(DanVeloclinic) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec << "ecp_dec_del" << model.ecp_dec_del;
+    qDebug() <<"eCP(DanVeloclinic) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
 
     return model;
 }
+
+TestModel
+ExtendedCriticalPower::deriveExtendedCP_7_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2)
+{
+    TestModel model;
+    model.version = "eCP v7.3";
+    qDebug() << model.version;
+
+    // bounds on anaerobic interval in minutes
+    const double t1 = sanI1 / 60.0;
+    const double t2 = sanI2 / 60.0;
+
+    // bounds on anaerobic interval in minutes
+    const double t3 = anI1 / 60.0;
+    const double t4 = anI2 / 60.0;
+
+    // bounds on aerobic interval in minutes
+    const double t5 = aeI1 / 60.0;
+    const double t6 = aeI2 / 60.0;
+
+    // bounds on long aerobic interval in minutes
+    const double t7 = laeI1 / 60.0;
+    const double t8 = laeI2 / 60.0;
+
+    // bounds of these time values in the data
+    int i1, i2, i3, i4, i5, i6, i7, i8;
+
+    // find the indexes associated with the bounds
+    // the first point must be at least the minimum for the anaerobic interval, or quit
+    for (i1 = 0; i1 < 60 * t1; i1++)
+        if (i1 + 1 >= bests->meanMaxArray(series).size())
+            return model;
+    // the second point is the maximum point suitable for anaerobicly dominated efforts.
+    for (i2 = i1; i2 + 1 <= 60 * t2; i2++)
+        if (i2 + 1 >= bests->meanMaxArray(series).size())
+            return model;
+
+    // the third point is the beginning of the minimum duration for aerobic efforts
+    for (i3 = i2; i3 < 60 * t3; i3++)
+        if (i3 + 1 >= bests->meanMaxArray(series).size())
+            return model;
+    for (i4 = i3; i4 + 1 <= 60 * t4; i4++)
+        if (i4 + 1 >= bests->meanMaxArray(series).size())
+            break;
+
+    // the fifth point is the beginning of the minimum duration for aerobic efforts
+    for (i5 = i4; i5 < 60 * t5; i5++)
+        if (i5 + 1 >= bests->meanMaxArray(series).size())
+            return model;
+    for (i6 = i5; i6 + 1 <= 60 * t6; i6++)
+        if (i6 + 1 >= bests->meanMaxArray(series).size())
+            break;
+
+    // the first point must be at least the minimum for the anaerobic interval, or quit
+    for (i7 = i6; i7 < 60 * t7; i7++)
+        if (i7 + 1 >= bests->meanMaxArray(series).size())
+            return model;
+    // the second point is the maximum point suitable for anaerobicly dominated efforts.
+    for (i8 = i7; i8 + 1 <= 60 * t8; i8++)
+        if (i8 + 1 >= bests->meanMaxArray(series).size())
+            break;
+
+    bool withoutEd = false;
+
+    // initial estimate of tau
+    if (model.paa == 0)
+        model.paa = 300;
+
+    if (model.etau == 0)
+        model.etau = 1;
+
+    if (model.ecp == 0)
+        model.ecp = 300;
+
+    if (model.paa_dec == 0)
+        model.paa_dec = -2;
+
+    if (model.ecp_del == 0)
+        model.ecp_del = -0.9;
+
+    if (model.tau_del == 0)
+        model.tau_del = -4.8; // -4.8
+
+    if (model.ecp_dec == 0)
+        model.ecp_dec = -1;
+
+    if (model.ecp_dec_del == 0)
+        model.ecp_dec_del = -180;
+
+    model.paa_pow = 1.05; //1.05
+
+    // lower bound on tau
+    const double paa_min = 100;
+    //const double paa_max = 2000;
+    const double etau_min = 0.5;
+    const double paa_dec_max = -0.25;
+    const double paa_dec_min = -3;
+    const double ecp_dec_min = -5; // Long
+
+
+
+    // convergence delta for tau
+    //const double ecp_delta_max = 1e-4;
+    const double etau_delta_max = 1e-4;
+    const double paa_delta_max = 1e-2;
+    const double paa_dec_delta_max = 1e-4;
+    const double ecp_del_delta_max = 1e-4;
+    const double ecp_dec_delta_max  = 1e-8;
+
+    // previous loop value of tau and t0
+    double etau_prev;
+    double paa_prev;
+    double paa_dec_prev;
+    double ecp_del_prev;
+    double ecp_dec_prev;
+
+    // maximum number of loops
+    const int max_loops = 100;
+
+    // loop to convergence
+    int iteration = 0;
+
+    qDebug() << "start iteration";
+    do {
+        if (iteration ++ > max_loops) {
+            qDebug()<<"Maximum number of loops exceeded in ecp2 model";
+            break;
+        }
+
+        // record the previous version of tau, for convergence
+        etau_prev = model.etau;
+        paa_prev = model.paa;
+        paa_dec_prev = model.paa_dec;
+        ecp_del_prev = model.ecp_del;
+        ecp_dec_prev = model.ecp_dec;
+
+        if (withoutEd)
+            model.ecp_dec = 0;
+
+        // P = paa* exp(paa_dec*(x/60)^z) + ecp * (1-exp(tau_del*x/60)) * (1-exp(ecp_del*x/60)) * (1+ecp_dec*exp(-180/x/60) (1 + etau/(x/60))
+        // bests->meanMaxArray(series)[i] = paa*exp(paa_dec*(i/60.0)^z)  + ecp * (1-exp(tau_del*x/60)) * (1-exp(ecp*i/60.0)) * (1+2d*exp(180/i/60.0)) * ( 1 + etau/(i/60.0));
+
+        // estimate ecp
+        int i;
+
+        model.ecp = 0;
+        double _avg_ecp = 0.0;
+        int count=1;
+        for (i = i5; i <= i6; i++) {
+            double ecpn = (bests->meanMaxArray(series)[i] - model.paa * exp(model.paa_dec*pow(i/60.0, model.paa_pow))) / (1-exp(model.tau_del*i/60.0)) / (1-exp(model.ecp_del*i/60.0)) / (1+model.ecp_dec*exp(model.ecp_dec_del/(i/60.0))) / ( 1 + model.etau/(i/60.0));
+            _avg_ecp = (double)((count-1)*_avg_ecp+ecpn)/count;
+
+            if (model.ecp < ecpn)
+                model.ecp = ecpn;
+
+            count++;
+        }
+        //qDebug() << "estimate ecp" << model.ecp;
+        if (!usebest) {
+            model.ecp = _avg_ecp;
+        }
+
+        // if ecp = 0; no valid data; give up
+        if (model.ecp == 0.0)
+            return model;
+
+        // estimate etau
+        model.etau = etau_min;
+        double _avg_etau = 0.0;
+        count=1;
+        for (i = i3; i <= i4; i++) {
+            double etaun = ((bests->meanMaxArray(series)[i] - model.paa * exp(model.paa_dec*pow(i/60.0, model.paa_pow))) /model. ecp / (1-exp(model.tau_del*i/60.0)) / (1-exp(model.ecp_del*i/60.0)) / (1+model.ecp_dec*exp(model.ecp_dec_del/(i/60.0))) - 1) * (i/60.0);
+            _avg_etau = (double)((count-1)*_avg_etau+etaun)/count;
+
+            if (model.etau < etaun)
+                model.etau = etaun;
+            count++;
+        }
+        //qDebug() << "estimate etau" << model.etau;
+        if (!usebest) {
+            model.etau = _avg_etau;
+        }
+
+
+
+        model.paa_dec = paa_dec_min;
+        double _avg_paa_dec = 0.0;
+        count=1;
+        for (i = i1; i <= i2; i++) {
+            double paa_decn = log((bests->meanMaxArray(series)[i] - model.ecp * (1-exp(model.tau_del*i/60.0)) * (1-exp(model.ecp_del*i/60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/(i/60.0))) * ( 1 + model.etau/(i/60.0)) ) / model.paa ) / pow(i/60.0, model.paa_pow);
+            _avg_paa_dec = (double)((count-1)*_avg_paa_dec+paa_decn)/count;
+
+            if (model.paa_dec < paa_decn && paa_decn < paa_dec_max) {
+                model.paa_dec = paa_decn;
+            }
+            count++;
+        }
+        //qDebug() << "estimate paa_dec" << model.paa_dec;
+        if (!usebest) {
+            model.paa_dec = _avg_paa_dec;
+        }
+
+        model.paa = paa_min;
+        double _avg_paa = 0.0;
+        count=1;
+        for (i = 2; i <= 8; i++) {
+            double paan = (bests->meanMaxArray(series)[i] - model.ecp * (1-exp(model.tau_del*i/60.0)) * (1-exp(model.ecp_del*i/60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/(i/60.0))) * ( 1 + model.etau/(i/60.0))) / exp(model.paa_dec*pow(i/60.0, model.paa_pow));
+            _avg_paa = (double)((count-1)*_avg_paa+paan)/count;
+
+            //qDebug() << "   estimate paan" << paan;
+            if (model.paa < paan)
+                model.paa = paan;
+            count++;
+        }
+        //qDebug() << "estimate paa" << model.paa;
+        if (!usebest  || _avg_paa<0.95*model.paa) {
+            model.paa = _avg_paa;
+        }
+
+        if (!withoutEd) {
+            model.ecp_dec = ecp_dec_min;
+            double _avg_ecp_dec = 0.0;
+            count=1;
+            for (i = i7; i <= i8; i=i+120) {
+                double ecp_decn = ((bests->meanMaxArray(series)[i] - model.paa * exp(model.paa_dec*pow(i/60.0, model.paa_pow))) / model.ecp / (1-exp(model.tau_del*i/60.0)) / (1-exp(model.ecp_del*i/60.0)) / ( 1 + model.etau/(i/60.0)) -1 ) / exp(model.ecp_dec_del/(i / 60.0));
+                _avg_ecp_dec = (double)((count-1)*_avg_ecp_dec+ecp_decn)/count;
+
+                if (ecp_decn > 0)
+                    ecp_decn = 0;
+
+                if (model.ecp_dec < ecp_decn)
+                    model.ecp_dec = ecp_decn;
+                count++;
+            }
+            //qDebug() << "estimate ecp_dec" << model.ecp_dec;
+            if (!usebest) {
+                model.ecp_dec = _avg_ecp_dec;
+            }
+
+        }
+    } while ((fabs(model.etau - etau_prev) > etau_delta_max) ||
+             (fabs(model.paa - paa_prev) > paa_delta_max)  ||
+             (fabs(model.paa_dec - paa_dec_prev) > paa_dec_delta_max)  ||
+             (fabs(model.ecp_del - ecp_del_prev) > ecp_del_delta_max)  ||
+             (fabs(model.ecp_dec - ecp_dec_prev) > ecp_dec_delta_max)
+            );
+
+    qDebug() << iteration << "iterations";
+
+    verifyMin(model.paa, paa_min, model.paa_dec, paa_dec_min, model.ecp_dec, ecp_dec_min, model.etau, etau_min);
+
+    model.pMax = model.paa*exp(model.paa_dec*pow(1/60.0, model.paa_pow)) + model.ecp * (1-exp(model.tau_del*(1/60.0))) * (1-exp(model.ecp_del*(1/60.0))) * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 + model.etau/(1/60.0));
+    model.mmp60 = model.paa*exp(model.paa_dec*pow(60.0, model.paa_pow)) + model.ecp * (1-exp(model.tau_del*(60.0))) * (1-exp(model.ecp_del*60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 + model.etau/(60.0));
+
+    qDebug() <<"-> eCP(7.3) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec << "ecp_dec_del" << model.ecp_dec_del;
+    qDebug() <<"-> eCP(7.3) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
+
+    return model;
+}
+
+QwtPlotCurve*
+ExtendedCriticalPower::getPlotCurveForExtendedCP_7_3(TestModel model)
+{
+    const int extendedCurve2_points = 1000;
+
+    QVector<double> extended_cp_curve2_power(extendedCurve2_points);
+    QVector<double> extended_cp_curve2_time(extendedCurve2_points);
+    double tmin = 1.0/60;
+    double tmax = 600;
+
+    for (int i = 0; i < extendedCurve2_points; i ++) {
+        double x = (double) i / (extendedCurve2_points - 1);
+        double t = pow(tmax, x) * pow(tmin, 1-x);
+        extended_cp_curve2_time[i] = t;
+        extended_cp_curve2_power[i] = model.paa*exp(model.paa_dec*(pow(t, model.paa_pow))) + model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( 1 + model.etau/(t));
+    }
+
+    QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_7_3");
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
+        extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
+    QPen e2pen(Qt::yellow); // Qt::cyan GColor(CCP)
+    e2pen.setWidth(1);
+    e2pen.setStyle(Qt::DashLine);
+    extendedCPCurve2->setPen(e2pen);
+    extendedCPCurve2->setSamples(extended_cp_curve2_time.data(), extended_cp_curve2_power.data(), extendedCurve2_points);
+
+    return extendedCPCurve2;
+}
+
+QwtPlotCurve*
+ExtendedCriticalPower::getPlotCurveForExtendedCP_7_3_balance(TestModel model, int depletion)
+{
+    const int extendedCurve2_points = 1000;
+
+    QVector<double> extended_cp_curve2_power(extendedCurve2_points);
+    QVector<double> extended_cp_curve2_time(extendedCurve2_points);
+    double tmin = 1.0/60;
+    double tmax = 600;
+
+    for (int i = 0; i < extendedCurve2_points; i ++) {
+        double x = (double) i / (extendedCurve2_points - 1);
+        double t = pow(tmax, x) * pow(tmin, 1-x);
+        extended_cp_curve2_time[i] = t;
+        double d = ((model.paa-1.3*model.ecp) * depletion/100.0 + 1.3*model.ecp) / model.paa;
+        qDebug() << depletion << d << d * model.paa << model.ecp;
+        // (100.0-depletion)/100.0*(model.tau_del/model.paa_dec)
+        double value = d*model.paa*exp(model.paa_dec*(pow(t, model.paa_pow))) + model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( 1 + (depletion/100.0)*model.etau/(t));
+
+        extended_cp_curve2_power[i] = value;
+        //extended_cp_curve2_power[i] = (value<model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) ? model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/t)): value);
+    }
+
+    QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve(QString("eCP_7_3 (%1%)").arg(depletion));
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
+        extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
+    QPen e2pen(Qt::yellow); // Qt::cyan GColor(CCP)
+    e2pen.setWidth(1);
+    e2pen.setStyle(Qt::DashDotDotLine);
+    extendedCPCurve2->setPen(e2pen);
+    extendedCPCurve2->setSamples(extended_cp_curve2_time.data(), extended_cp_curve2_power.data(), extendedCurve2_points);
+
+    return extendedCPCurve2;
+}
+
 
 QwtPlotCurve*
 ExtendedCriticalPower::getPlotCurveFor10secRollingAverage(RideFileCache *bests, RideFile::SeriesType series) {
@@ -2189,4 +2521,16 @@ ExtendedCriticalPower::getPlotCurveForDerived(RideFileCache *bests, RideFile::Se
     curve->setSamples(time.data(), smoothed.data(), smoothed.count());
 
     return curve;
+}
+
+void
+ExtendedCriticalPower::verifyMin(double paa, double paa_min, double paa_dec, double paa_dec_min, double ecp_dec, double ecp_dec_min, double etau, double etau_min) {
+    if (paa == paa_min)
+        qDebug() <<"paa=paa_min";
+    if (paa_dec == paa_dec_min)
+        qDebug() <<"paa_dec=paa_dec_min";
+    if (ecp_dec == ecp_dec_min)
+        qDebug() <<"ecp_dec=ecp_dec_min";
+    if (etau == etau_min)
+        qDebug() <<"etau_dec=etau_dec_min";
 }

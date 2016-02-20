@@ -39,12 +39,12 @@ class TestModel // : public PDModel
         TestModel()  :
             version(""),
             paa(0), paa_dec(0), ecp(0), etau(0), ecp_del(0), tau_del(0), ecp_dec(0), ecp_dec_del(0),
-            pMax(0), mmp60(0) {}
+            pMax(0), mmp60(0), paa_pow(1) {}
 
         QString version;
 
         // Parameters ecp
-        double paa, paa_dec, ecp, etau, ecp_del, tau_del, ecp_dec, ecp_dec_del;
+        double paa, paa_dec, ecp, etau, ecp_del, tau_del, ecp_dec, ecp_dec_del, paa_pow;
 
         // Parameters dan
         double p1, t1, p2, t2, a2;
@@ -136,8 +136,8 @@ class ExtendedCriticalPower
         QwtPlotCurve* getPlotLevelForExtendedCP_5_3(TestModel athleteModeleCP2);
 
         // Contributions
-        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WSecond(TestModel athleteModeleCP2, bool stacked, bool inversed);
-        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WPrime(TestModel athleteModeleCP2, bool stacked, bool inversed);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WSecond(TestModel athleteModeleCP2, bool stacked, bool inversed, int balance);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WPrime(TestModel athleteModeleCP2, bool stacked, bool inversed, int balance);
         QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_CP(TestModel athleteModeleCP2, bool stacked, bool inversed);
 
         // Extended CP Model version 6
@@ -149,16 +149,25 @@ class ExtendedCriticalPower
         QwtPlotIntervalCurve* getPlotCurveForExtendedCP_6_3_WPrime(TestModel athleteModeleCP2, bool stacked);
         QwtPlotIntervalCurve* getPlotCurveForExtendedCP_6_3_CP(TestModel athleteModeleCP2, bool stacked);
 
+        // Extended CP Model version 7
+        TestModel deriveExtendedCP_7_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_7_3(TestModel athleteModeleCP2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_7_3_balance(TestModel athleteModeleCP2, int depletion);
+
+
         // Marker for Model
         QwtPlotMarker* getPlotMarkerForExtendedCP(TestModel athleteModeleCP2);
 
         // Dan-Veloclinic Model
         TestModel deriveDanVeloclinicCP_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
 
-        //
+        // Test curves
         QwtPlotCurve* getPlotCurveFor10secRollingAverage(RideFileCache *bests, RideFile::SeriesType series);
         CpPlotCurve* getPlotCurveForQualityPoint(RideFileCache *bests, RideFile::SeriesType series);
         QwtPlotCurve* getPlotCurveForDerived(RideFileCache *bests, RideFile::SeriesType series);
+
+        // Tools
+        void verifyMin(double paa, double paa_min, double paa_dec, double paa_dec_min, double ecp_dec, double ecp_dec_min, double etau, double etau_min);
 
     private:
         Context *context;
