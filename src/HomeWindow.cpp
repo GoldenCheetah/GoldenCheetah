@@ -28,6 +28,7 @@
 #include "GcUpgrade.h" // for VERSION_CONFIG_PREFIX url to -layout.xml
 #include "LTMSettings.h" // for special case of edit LTM settings
 #include "ChartBar.h"
+#include "Utils.h"
 
 #include <QDesktopWidget>
 #include <QStyle>
@@ -1123,50 +1124,13 @@ GcWindowDialog::exec()
 
     } else {
         *here = NULL;
-    } 
+    }
     return 0;
 }
 
 /*----------------------------------------------------------------------
  * Save and restore state (xxxx-layout.xml)
  *--------------------------------------------------------------------*/
-// static helper to protect special xml characters
-// ideally we would use XMLwriter to do this but
-// the file format is trivial and this implementation
-// is easier to follow and modify... for now.
-static QString xmlprotect(QString string)
-{
-    // get local TM character code
-    static QString tm = QTextEdit("&#8482;").toPlainText();
-
-    QString s = string;
-    s.replace( tm, "&#8482;" );
-    s.replace( "&", "&amp;" );
-    s.replace( ">", "&gt;" );
-    s.replace( "<", "&lt;" );
-    s.replace( "\"", "&quot;" );
-    s.replace( "\'", "&apos;" );
-    return s;
-}
-
-static QString unprotect(QString buffer)
-{
-    // get local TM character code
-    static QString tm = QTextEdit("&#8482;").toPlainText();
-
-    // remove quotes
-    QString s = buffer.trimmed();
-
-    // replace html (TM) with local TM character
-    s.replace( "&#8482;", tm );
-
-    // html special chars are automatically handled
-    // NOTE: other special characters will not work
-    // cross-platform but will work locally, so not a biggie
-    // i.e. if the default charts.xml has a special character
-    // in it it should be added here
-    return s;
-}
 
 void
 HomeWindow::saveState()
@@ -1198,22 +1162,22 @@ HomeWindow::saveState()
         GcWinID type = chart->property("type").value<GcWinID>();
 
         out<<"\t<chart id=\""<<static_cast<int>(type)<<"\" "
-           <<"name=\""<<xmlprotect(chart->property("instanceName").toString())<<"\" "
-           <<"title=\""<<xmlprotect(chart->property("title").toString())<<"\" >\n";
+           <<"name=\""<<Utils::xmlprotect(chart->property("instanceName").toString())<<"\" "
+           <<"title=\""<<Utils::xmlprotect(chart->property("title").toString())<<"\" >\n";
 
         // iterate over chart properties
         const QMetaObject *m = chart->metaObject();
         for (int i=0; i<m->propertyCount(); i++) {
             QMetaProperty p = m->property(i);
             if (p.isUser(chart)) {
-               out<<"\t\t<property name=\""<<xmlprotect(p.name())<<"\" "
+               out<<"\t\t<property name=\""<<Utils::xmlprotect(p.name())<<"\" "
                   <<"type=\""<<p.typeName()<<"\" "
                   <<"value=\"";
 
                 if (QString(p.typeName()) == "int") out<<p.read(chart).toInt();
                 if (QString(p.typeName()) == "double") out<<p.read(chart).toDouble();
                 if (QString(p.typeName()) == "QDate") out<<p.read(chart).toDate().toString();
-                if (QString(p.typeName()) == "QString") out<<xmlprotect(p.read(chart).toString());
+                if (QString(p.typeName()) == "QString") out<<Utils::xmlprotect(p.read(chart).toString());
                 if (QString(p.typeName()) == "bool") out<<p.read(chart).toBool();
                 if (QString(p.typeName()) == "LTMSettings") {
                     QByteArray marshall;
@@ -1383,7 +1347,7 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
     if (name == "layout") {
         for(int i=0; i<attrs.count(); i++) {
             if (attrs.qName(i) == "style") {
-                style = unprotect(attrs.value(i)).toInt();
+                style = Utils::unprotect(attrs.value(i)).toInt();
             }
         }
     }
@@ -1394,9 +1358,9 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
 
         // get attributes
         for(int i=0; i<attrs.count(); i++) {
-            if (attrs.qName(i) == "name") name = unprotect(attrs.value(i));
-            if (attrs.qName(i) == "title") title = unprotect(attrs.value(i));
-            if (attrs.qName(i) == "id")  typeStr = unprotect(attrs.value(i));
+            if (attrs.qName(i) == "name") name = Utils::unprotect(attrs.value(i));
+            if (attrs.qName(i) == "title") title = Utils::unprotect(attrs.value(i));
+            if (attrs.qName(i) == "id")  typeStr = Utils::unprotect(attrs.value(i));
         }
 
         // new chart
@@ -1412,9 +1376,9 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
 
         // get attributes
         for(int i=0; i<attrs.count(); i++) {
-            if (attrs.qName(i) == "name") name = unprotect(attrs.value(i));
-            if (attrs.qName(i) == "value") value = unprotect(attrs.value(i));
-            if (attrs.qName(i) == "type")  type = unprotect(attrs.value(i));
+            if (attrs.qName(i) == "name") name = Utils::unprotect(attrs.value(i));
+            if (attrs.qName(i) == "value") value = Utils::unprotect(attrs.value(i));
+            if (attrs.qName(i) == "type")  type = Utils::unprotect(attrs.value(i));
         }
 
         // set the chart property

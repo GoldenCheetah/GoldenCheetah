@@ -43,6 +43,7 @@
 #endif
 #include "LocalFileStore.h"
 #include "Secrets.h"
+#include "Utils.h"
 
 //
 // Main Config Page - tabs for each sub-page
@@ -2325,8 +2326,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
         if (selectedMetrics.contains(symbol))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QTextEdit name(m->name()); // process html encoding of(TM)
-        QListWidgetItem *item = new QListWidgetItem(name.toPlainText());
+        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
         item->setData(Qt::UserRole, symbol);
         availList->addItem(item);
     }
@@ -2334,8 +2334,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
         if (!factory.haveMetric(symbol))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QTextEdit name(m->name());  // process html encoding of(TM)
-        QListWidgetItem *item = new QListWidgetItem(name.toPlainText());
+        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
         item->setData(Qt::UserRole, symbol);
         selectedList->addItem(item);
     }
@@ -2522,8 +2521,7 @@ BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
         if (selectedMetrics.contains(symbol))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QTextEdit name(m->name()); //  process html encoding of(TM)
-        QListWidgetItem *item = new QListWidgetItem(name.toPlainText());
+        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
         item->setData(Qt::UserRole, symbol);
         availList->addItem(item);
     }
@@ -2531,8 +2529,7 @@ BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
         if (!factory.haveMetric(symbol))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QTextEdit name(m->name()); //  process html encoding of(TM)
-        QListWidgetItem *item = new QListWidgetItem(name.toPlainText());
+        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
         item->setData(Qt::UserRole, symbol);
         selectedList->addItem(item);
     }
@@ -2898,8 +2895,7 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
         if (selectedMetrics.contains(symbol))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QTextEdit name(m->name()); //  process html encoding of(TM)
-        QListWidgetItem *item = new QListWidgetItem(name.toPlainText());
+        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
         item->setData(Qt::UserRole, symbol);
         availList->addItem(item);
     }
@@ -2907,8 +2903,7 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
         if (!factory.haveMetric(symbol))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QTextEdit name(m->name()); //  process html encoding of(TM)
-        QListWidgetItem *item = new QListWidgetItem(name.toPlainText());
+        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
         item->setData(Qt::UserRole, symbol);
         selectedList->addItem(item);
     }

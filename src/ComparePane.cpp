@@ -30,6 +30,7 @@
 #include "TimeUtils.h"
 #include "Units.h"
 #include "Zones.h"
+#include "Utils.h"
 
 #include <QCheckBox>
 #include <QFormLayout>
@@ -228,9 +229,10 @@ ComparePane::refreshTable()
                 // check for both original and translated
                 if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
                     units = m->units(context->athlete->useMetricUnits);
-                QTextEdit name(m->name()); // process html encoding of(TM)
-                if (units != "") list << QString("%1 (%2)").arg(name.toPlainText()).arg(units);
-                else list << QString("%1").arg(name.toPlainText());
+
+                QString name( Utils::unprotect(m->name()));
+                if (units != "") list << QString("%1 (%2)").arg(name).arg(units);
+                else list << QString("%1").arg(name);
             }
         }
 
@@ -396,9 +398,9 @@ ComparePane::refreshTable()
                 QString units;
                 if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
                     units = m->units(context->athlete->useMetricUnits);
-                QTextEdit name(m->name()); // process html encoding of(TM)
-                if (units != "") list << QString("%1 (%2)").arg(name.toPlainText()).arg(units);
-                else list << QString("%1").arg(name.toPlainText());
+                QString name( Utils::unprotect(m->name()));
+                if (units != "") list << QString("%1 (%2)").arg(name).arg(units);
+                else list << QString("%1").arg(name);
             }
         }
 

@@ -769,6 +769,7 @@ HEADERS  += \
         UserData.h \
         UserMetricParser.h \
         UserMetricSettings.h \
+        Utils.h \
         VDOTCalculator.h \
         VeloHeroUploader.h \
         VideoLayoutParser.h \
@@ -1055,7 +1056,8 @@ SOURCES += \
         WPrime.cpp \
         Zones.cpp \
         ZwoParser.cpp \
-    TrainBottom.cpp
+        TrainBottom.cpp \
+        Utils.cpp
 
 
 ###======================================

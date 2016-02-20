@@ -22,6 +22,7 @@
 #include "Specification.h"
 #include "RideCache.h"
 #include "RideFileCache.h" // for RideBest
+#include "Utils.h"
 
 LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(context)
 {
@@ -126,8 +127,8 @@ LTMPopup::setData(Specification spec, const RideMetric *metric, QString title)
     rides->setHorizontalHeaderItem(0,h);
 
     // value & process html encoding of(TM)
-    QTextEdit name(metric->name());
-    h = new QTableWidgetItem(name.toPlainText(), QTableWidgetItem::Type);
+    QString name(Utils::unprotect(metric->name()));
+    h = new QTableWidgetItem(name, QTableWidgetItem::Type);
 
     rides->setHorizontalHeaderItem(1,h);
 
