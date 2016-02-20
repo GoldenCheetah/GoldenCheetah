@@ -30,6 +30,7 @@
 #include "Units.h"
 #include "TabView.h"
 #include "HelpWhatsThis.h"
+#include "Utils.h"
 
 #include <QXmlDefaultHandler>
 #include <QtGui>
@@ -1196,22 +1197,6 @@ KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
  * Read / Write metadata.xml file
  *--------------------------------------------------------------------*/
 
-// static helper to protect special xml characters
-// ideally we would use XMLwriter to do this but
-// the file format is trivial and this implementation
-// is easier to follow and modify... for now.
-static QString xmlprotect(QString string)
-{
-    QString s = string;
-    s.replace( QChar( 0x2122), "&#8482;" );
-    s.replace( "&", "&amp;" );
-    s.replace( ">", "&gt;" );
-    s.replace( "<", "&lt;" );
-    s.replace( "\"", "&quot;" );
-    s.replace( "\'", "&apos;" );
-    return s;
-}
-
 void
 RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinitions, QList<FieldDefinition>fieldDefinitions, QString colorfield, QList<DefaultDefinition>defaultDefinitions)
 {
@@ -1232,7 +1217,7 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     // begin document
     out << "<metadata>\n";
 
-    out << QString("<colorfield>\"%1\"</colorfield>").arg(xmlprotect(colorfield));
+    out << QString("<colorfield>\"%1\"</colorfield>").arg(Utils::xmlprotect(colorfield));
     //
     // First we write out the keywords
     //
@@ -1241,14 +1226,14 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     foreach (KeywordDefinition keyword, keywordDefinitions) {
         // chart name
         out<<QString("\t\t<keyword>\n");
-        out<<QString("\t\t\t<keywordname>\"%1\"</keywordname>\n").arg(xmlprotect(keyword.name));
+        out<<QString("\t\t\t<keywordname>\"%1\"</keywordname>\n").arg(Utils::xmlprotect(keyword.name));
         out<<QString("\t\t\t<keywordcolor red=\"%1\" green=\"%3\" blue=\"%4\"></keywordcolor>\n")
                         .arg(keyword.color.red())
                         .arg(keyword.color.green())
                         .arg(keyword.color.blue());
 
         foreach (QString token, keyword.tokens)
-            out<<QString("\t\t\t<keywordtoken>\"%1\"</keywordtoken>\n").arg(xmlprotect(token));
+            out<<QString("\t\t\t<keywordtoken>\"%1\"</keywordtoken>\n").arg(Utils::xmlprotect(token));
 
         out<<QString("\t\t</keyword>\n");
     }
@@ -1262,10 +1247,10 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     foreach (FieldDefinition field, fieldDefinitions) {
         // chart name
         out<<QString("\t\t<field>\n");
-        out<<QString("\t\t\t<fieldtab>\"%1\"</fieldtab>\n").arg(xmlprotect(field.tab));
-        out<<QString("\t\t\t<fieldname>\"%1\"</fieldname>\n").arg(xmlprotect(field.name));
+        out<<QString("\t\t\t<fieldtab>\"%1\"</fieldtab>\n").arg(Utils::xmlprotect(field.tab));
+        out<<QString("\t\t\t<fieldname>\"%1\"</fieldname>\n").arg(Utils::xmlprotect(field.name));
         out<<QString("\t\t\t<fieldtype>%1</fieldtype>\n").arg(field.type);
-        out<<QString("\t\t\t<fieldvalues>\"%1\"</fieldvalues>\n").arg(xmlprotect(field.values.join(",")));
+        out<<QString("\t\t\t<fieldvalues>\"%1\"</fieldvalues>\n").arg(Utils::xmlprotect(field.values.join(",")));
         out<<QString("\t\t\t<fielddiary>%1</fielddiary>\n").arg(field.diary ? 1 : 0);
         out<<QString("\t\t</field>\n");
     }
@@ -1279,10 +1264,10 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     foreach (DefaultDefinition adefault, defaultDefinitions) {
         // chart name
         out<<QString("\t\t<default>\n");
-        out<<QString("\t\t\t<defaultfield>\"%1\"</defaultfield>\n").arg(xmlprotect(adefault.field));
-        out<<QString("\t\t\t<defaultvalue>\"%1\"</defaultvalue>\n").arg(xmlprotect(adefault.value));
-        out<<QString("\t\t\t<defaultlinkedfield>\"%1\"</defaultlinkedfield>\n").arg(xmlprotect(adefault.linkedField));
-        out<<QString("\t\t\t<defaultlinkedvalue>\"%1\"</defaultlinkedvalue>\n").arg(xmlprotect(adefault.linkedValue));
+        out<<QString("\t\t\t<defaultfield>\"%1\"</defaultfield>\n").arg(Utils::xmlprotect(adefault.field));
+        out<<QString("\t\t\t<defaultvalue>\"%1\"</defaultvalue>\n").arg(Utils::xmlprotect(adefault.value));
+        out<<QString("\t\t\t<defaultlinkedfield>\"%1\"</defaultlinkedfield>\n").arg(Utils::xmlprotect(adefault.linkedField));
+        out<<QString("\t\t\t<defaultlinkedvalue>\"%1\"</defaultlinkedvalue>\n").arg(Utils::xmlprotect(adefault.linkedValue));
         out<<QString("\t\t</default>\n");
     }
     out <<"\t</defaults>\n";
@@ -1293,24 +1278,6 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
 
     // close file
     file.close();
-}
-
-static QString unprotect(QString buffer)
-{
-    // remove quotes
-    QString t = buffer.trimmed();
-    QString s = t.mid(1,t.length()-2);
-
-    // replace html (TM) with local TM character
-    s.replace( "&#8482;", QChar( 0x2122) );
-
-
-    // html special chars are automatically handled
-    // other special characters will not work
-    // cross-platform but will work locally, so not a biggie
-    // i.e. if the default charts.xml has a special character
-    // in it it should be added here
-    return s;
 }
 
 void
@@ -1389,26 +1356,26 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
     //
     // Single Attribute elements
     //
-    if(qName == "keywordname") keyword.name = unprotect(buffer);
-    else if(qName == "keywordtoken") keyword.tokens << unprotect(buffer);
+    if(qName == "keywordname") keyword.name = Utils::unprotect(buffer);
+    else if(qName == "keywordtoken") keyword.tokens << Utils::unprotect(buffer);
     else if(qName == "keywordcolor") {
             // the r,g,b values are in red="xx",green="xx" and blue="xx" attributes
             // of this element and captured in startelement below
             keyword.color = QColor(red,green,blue);
     }
-    else if(qName == "fieldtab") field.tab = unprotect(buffer);
-    else if(qName == "fieldname") field.name =  unprotect(buffer);
+    else if(qName == "fieldtab") field.tab = Utils::unprotect(buffer);
+    else if(qName == "fieldname") field.name =  Utils::unprotect(buffer);
     else if(qName == "fieldtype") {
         field.type = buffer.trimmed().toInt();
         if (field.tab != "" && field.type < 3 && field.name != "Filename" &&
             field.name != "Change History") field.diary = true; // default!
     } else if(qName == "fieldvalues") {
-        field.values = unprotect(buffer).split(",", QString::SkipEmptyParts);
+        field.values = Utils::unprotect(buffer).split(",", QString::SkipEmptyParts);
     } else if (qName == "fielddiary") field.diary = (buffer.trimmed().toInt() != 0);
-    else if(qName == "defaultfield") adefault.field =  unprotect(buffer);
-    else if(qName == "defaultvalue") adefault.value =  unprotect(buffer);
-    else if(qName == "defaultlinkedfield") adefault.linkedField =  unprotect(buffer);
-    else if(qName == "defaultlinkedvalue") adefault.linkedValue =  unprotect(buffer);
+    else if(qName == "defaultfield") adefault.field =  Utils::unprotect(buffer);
+    else if(qName == "defaultvalue") adefault.value =  Utils::unprotect(buffer);
+    else if(qName == "defaultlinkedfield") adefault.linkedField =  Utils::unprotect(buffer);
+    else if(qName == "defaultlinkedvalue") adefault.linkedValue =  Utils::unprotect(buffer);
 
     //
     // Complex Elements
@@ -1418,7 +1385,7 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
     else if (qName == "field") // <field></field> block
         fieldDefinitions.append(field);
     else if (qName == "colorfield")
-        colorfield = unprotect(buffer);
+        colorfield = Utils::unprotect(buffer);
     else if (qName == "default") // <default></default> block
         defaultDefinitions.append(adefault);
 

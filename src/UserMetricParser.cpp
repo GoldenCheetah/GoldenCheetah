@@ -19,6 +19,7 @@
 #include "UserMetricParser.h"
 #include "UserMetricSettings.h"
 #include "Context.h"
+#include "Utils.h"
 
 #include <QDate>
 #include <QDebug>
@@ -88,25 +89,6 @@ bool UserMetricParser::endDocument()
     return true;
 }
 
-// static helper to protect special xml characters
-// ideally we would use XMLwriter to do this but
-// the file format is trivial and this implementation
-// is easier to follow and modify... for now.
-static QString xmlprotect(QString string)
-{
-    QTextEdit trademark("&#8482;"); // process html encoding of(TM)
-    QString tm = trademark.toPlainText();
-
-    QString s = string;
-    s.replace( tm, "&#8482;" );
-    s.replace( "&", "&amp;" );
-    s.replace( ">", "&gt;" );
-    s.replace( "<", "&lt;" );
-    s.replace( "\"", "&quot;" );
-    s.replace( "\'", "&apos;" );
-    return s;
-}
-
 //
 // Write out the charts.xml file
 //
@@ -138,22 +120,22 @@ UserMetricParser::serialize(QString filename, QList<UserMetricSettings> metrics)
     foreach (UserMetricSettings metric, metrics) {
 
         // symbol
-        out <<"\t<usermetric symbol=\"" << xmlprotect(metric.symbol) <<"\" ";
+        out <<"\t<usermetric symbol=\"" << Utils::xmlprotect(metric.symbol) <<"\" ";
 
-        out <<"name=\"" << xmlprotect(metric.name) << "\" ";
-        out <<"description=\"" << xmlprotect(metric.description) << "\" ";
-        out <<"unitsMetric=\"" << xmlprotect(metric.unitsMetric) << "\" ";
-        out <<"unitsImperial=\"" << xmlprotect(metric.unitsImperial) << "\" ";
+        out <<"name=\"" << Utils::xmlprotect(metric.name) << "\" ";
+        out <<"description=\"" << Utils::xmlprotect(metric.description) << "\" ";
+        out <<"unitsMetric=\"" << Utils::xmlprotect(metric.unitsMetric) << "\" ";
+        out <<"unitsImperial=\"" << Utils::xmlprotect(metric.unitsImperial) << "\" ";
         out <<"aggzero=\"" << (metric.aggzero ? 1 : 0) << "\" ";
         out <<"istime=\"" << (metric.istime ? 1 : 0) << "\" ";
         out <<"precision=\"" << metric.precision << "\" ";
         out <<"type=\"" << metric.type << "\" ";
         out <<"conversion=\"" << metric.conversion << "\" ";
         out <<"conversionSum=\"" << metric.conversionSum << "\" ";
-        out <<"fingerprint=\"" << xmlprotect(metric.fingerprint) << "\" ";
+        out <<"fingerprint=\"" << Utils::xmlprotect(metric.fingerprint) << "\" ";
 
         out << ">\n";
-        out << xmlprotect(metric.program);
+        out << Utils::xmlprotect(metric.program);
         out << "\n</usermetric>\n";
     }
 

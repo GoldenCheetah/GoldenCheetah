@@ -31,6 +31,7 @@
 #include "Colors.h"
 #include "IndendPlotMarker.h"
 #include "DataFilter.h" // formulas
+#include "Utils.h"
 
 #include "PMCData.h" // for LTS/STS calculation
 #include "Zones.h"
@@ -3521,8 +3522,7 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
 
                 // BikeScore, RI and Daniels Points have no units
                 if (units == "" && metric != NULL) {
-                    QTextEdit processHTML(factory.rideMetric(c.key())->name());
-                    units  = processHTML.toPlainText();
+                    units  = Utils::unprotect(factory.rideMetric(c.key())->name());
                 }
                 break;
             }

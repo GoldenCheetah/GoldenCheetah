@@ -90,7 +90,7 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
 
 static bool insensitiveLessThan(const QString &a, const QString &b)
 {
-    return a.toLower() < b.toLower();
+    return (QString::compare(a,b,Qt::CaseInsensitive)<0);
 }
 
 void
