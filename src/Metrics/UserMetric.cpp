@@ -101,6 +101,12 @@ UserMetric::internalName() const
     return settings.name;
 }
 
+QString
+UserMetric::description() const
+{
+    return settings.description;
+}
+
 RideMetric::MetricType
 UserMetric::type() const
 {
