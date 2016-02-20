@@ -350,14 +350,41 @@ CPPlot::initModel()
         CpPlotCurve *qcurve;            Q_UNUSED(qcurve);
 
         //
-        // Version 6.3 of Model
+        // Version 7.3 of Model
         //
-        //model = ecp->deriveExtendedCP_6_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+        model = ecp->deriveExtendedCP_7_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
 
         // model curve
-        //curve = ecp->getPlotCurveForExtendedCP_6_3(model);
-        //curve->attach(this);
-        //modelCurves.append(curve);
+        curve = ecp->getPlotCurveForExtendedCP_7_3(model);
+        curve->attach(this);
+        modelCurves.append(curve);
+
+
+        /*curve = ecp->getPlotCurveForExtendedCP_7_3_balance(model, 75);
+        curve->attach(this);
+        modelCurves.append(curve);
+
+        curve = ecp->getPlotCurveForExtendedCP_7_3_balance(model, 50);
+        curve->attach(this);
+        modelCurves.append(curve);
+
+        curve = ecp->getPlotCurveForExtendedCP_7_3_balance(model, 25);
+        curve->attach(this);
+        modelCurves.append(curve);
+
+        curve = ecp->getPlotCurveForExtendedCP_7_3_balance(model, 0);
+        curve->attach(this);
+        modelCurves.append(curve);*/
+
+        //
+        // Version 6.3 of Model
+        //
+        model = ecp->deriveExtendedCP_6_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+
+        // model curve
+        curve = ecp->getPlotCurveForExtendedCP_6_3(model);
+        curve->attach(this);
+        modelCurves.append(curve);
 
         //
         // Current 5.3 Version of Model
@@ -365,24 +392,24 @@ CPPlot::initModel()
         model = ecp->deriveExtendedCP_5_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
 
         // model curve
-        //curve = ecp->getPlotCurveForExtendedCP_5_3(model);
-        //curve->attach(this);
-        //modelCurves.append(curve);
+        curve = ecp->getPlotCurveForExtendedCP_5_3(model);
+        curve->attach(this);
+        modelCurves.append(curve);
 
         // Aerobic eneryg
-        icurve = ecp->getPlotCurveForExtendedCP_5_3_CP(model, true, true);
-        icurve->attach(this);
-        modelIntCurves.append(icurve);
-
-        // ATP/PCr
-        icurve = ecp->getPlotCurveForExtendedCP_5_3_WPrime(model, true, true);
-        icurve->attach(this);
-        modelIntCurves.append(icurve);
+        //icurve = ecp->getPlotCurveForExtendedCP_5_3_CP(model, true, true);
+        //icurve->attach(this);
+        //modelIntCurves.append(icurve);
 
         // Anaerobic
-        icurve = ecp->getPlotCurveForExtendedCP_5_3_WSecond(model, true, true);
-        icurve->attach(this);
-        modelIntCurves.append(icurve);
+        //icurve = ecp->getPlotCurveForExtendedCP_5_3_WPrime(model, true, true, 25);
+        //icurve->attach(this);
+        //modelIntCurves.append(icurve);
+
+        // ATP/PCr
+        //icurve = ecp->getPlotCurveForExtendedCP_5_3_WSecond(model, true, true, 25);
+        //icurve->attach(this);
+        //modelIntCurves.append(icurve);
 
         // 10s rolling average curve
         //curve = ecp->getPlotCurveFor10secRollingAverage(bestsCache, rideSeries);
