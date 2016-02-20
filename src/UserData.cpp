@@ -21,6 +21,7 @@
 #include "RideNavigator.h"
 #include "Tab.h"
 #include "HelpWhatsThis.h"
+#include "Utils.h"
 
 #include <QTextEdit> // for parsing trademark symbols (!)
 
@@ -255,65 +256,23 @@ EditUserDataDialog::setButtonIcon(QColor color)
     seriesColor->setFixedWidth(34);
 }
 
-//
-// XML settings; read, write, parse, protect
-//
-static QString xmlprotect(QString string)
-{
-    QTextEdit trademark("&#8482;"); // process html encoding of(TM)
-    QString tm = trademark.toPlainText();
-
-    QString s = string;
-    s.replace( tm, "&#8482;" );
-    s.replace( "&", "&amp;" );
-    s.replace( ">", "&gt;" );
-    s.replace( "<", "&lt;" );
-    s.replace( "\"", "&quot;" );
-    s.replace( "\'", "&apos;" );
-    s.replace( "\n", "\\n" );
-    s.replace( "\r", "\\r" );
-    return s;
-}
-
-static QString unprotect(QString buffer)
-{
-    // get local TM character code
-    QTextEdit trademark("&#8482;"); // process html encoding of(TM)
-    QString tm = trademark.toPlainText();
-
-    // remove quotes
-    QString s = buffer.trimmed();
-
-    // replace html (TM) with local TM character
-    s.replace( "&#8482;", tm );
-
-    s.replace( "\\n", "\n" );
-    s.replace( "\\r", "\r" );
-    // html special chars are automatically handled
-    // NOTE: other special characters will not work
-    // cross-platform but will work locally, so not a biggie
-    // i.e. if the default charts.xml has a special character
-    // in it it should be added here
-    return s;
-}
-
 // output a snippet
-QString 
+QString
 UserData::settings() const
 {
     QString returning;
-    returning = "<userdata name=\"" + xmlprotect(name) + "\" units=\"" +  xmlprotect(units)+ "\"";
+    returning = "<userdata name=\"" + Utils::xmlprotect(name) + "\" units=\"" +  Utils::xmlprotect(units)+ "\"";
     returning += " color=\""+ color.name() + "\">";
-    returning += xmlprotect(formula);
+    returning += Utils::xmlprotect(formula);
     returning += "</userdata>";
 
-    // xml snippet 
+    // xml snippet
     return returning;
 
 }
 
 // read in a snippet
-void 
+void
 UserData::setSettings(QString settings)
 {
     // need to parse the user data xml snipper
@@ -344,8 +303,8 @@ bool UserDataParser::startElement( const QString&, const QString&, const QString
     for(int i=0; i<attrs.count(); i++) {
         // only 3 attributes for now
         if (attrs.qName(i) == "color") here->color = QColor(attrs.value(i));
-        if (attrs.qName(i) == "name")  here->name  = unprotect(attrs.value(i));
-        if (attrs.qName(i) == "units") here->units = unprotect(attrs.value(i));
+        if (attrs.qName(i) == "name")  here->name  = Utils::unprotect(attrs.value(i));
+        if (attrs.qName(i) == "units") here->units = Utils::unprotect(attrs.value(i));
     }
     return true;
 }
@@ -353,17 +312,17 @@ bool UserDataParser::startElement( const QString&, const QString&, const QString
 bool UserDataParser::endElement( const QString&, const QString&, const QString &) { return true; }
 bool UserDataParser::characters( const QString&chrs) { here->formula += chrs; return true; }
 bool UserDataParser::startDocument() { here->formula.clear(); return true; }
-bool UserDataParser::endDocument() { here->formula = unprotect(here->formula); return true; }
+bool UserDataParser::endDocument() { here->formula = Utils::unprotect(here->formula); return true; }
 
 // set / get the current ride item
-RideItem* 
+RideItem*
 UserData::getRideItem() const
 {
     return rideItem;
 }
 
 // set ride item and therefore set the data
-void 
+void
 UserData::setRideItem(RideItem*m)
 {
     rideItem = m;

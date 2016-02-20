@@ -20,6 +20,8 @@
 #include "HistogramWindow.h"
 #include "Specification.h"
 #include "HelpWhatsThis.h"
+#include "Utils.h"
+
 
 // predefined deltas for each series
 static const double wattsDelta = 1.0;
@@ -180,8 +182,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
 
             const RideMetric *m = factory.rideMetric(factory.metricName(i));
 
-            QTextEdit processHTML(m->name()); // process html encoding of(TM)
-            QString processed = processHTML.toPlainText();
+            QString processed(Utils::unprotect(m->name()));
 
             QTreeWidgetItem *add;
             add = new QTreeWidgetItem(distMetricTree->invisibleRootItem());

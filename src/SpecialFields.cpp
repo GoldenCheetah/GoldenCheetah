@@ -18,6 +18,7 @@
 
 #include "SpecialFields.h"
 #include "RideMetric.h"
+#include "Utils.h"
 
 #include <QTextEdit>
 
@@ -64,16 +65,14 @@ SpecialFields::SpecialFields()
     // now add all the metric fields (for metric overrides)
     const RideMetricFactory &factory = RideMetricFactory::instance();
 
-    QTextEdit processHTML;
-    QTextEdit processHTMLinternal;
-
     for (int i=0; i<factory.metricCount(); i++) {
         const RideMetric *add = factory.rideMetric(factory.metricName(i));
-        processHTML.setText(add->name());
-        processHTMLinternal.setText(add->internalName());
+
+        QString name(Utils::unprotect(add->name()));
+        QString internal(Utils::unprotect(add->internalName()));
         // add->internalName() used for compatibility win metadata.xml, could be replaced by factory.metricName(i) or add->symbol()
-        namesmap.insert(processHTMLinternal.toPlainText(), processHTML.toPlainText());
-        metricmap.insert(processHTMLinternal.toPlainText(), add);
+        namesmap.insert(internal, name);
+        metricmap.insert(internal, add);
     }
 
     model_ = new QStringListModel;
