@@ -33,6 +33,7 @@
 #include "Colors.h"
 #include "WPrime.h"
 #include "IndendPlotMarker.h"
+#include "Utils.h"
 
 #include <qwt_plot_curve.h>
 #include <qwt_plot_canvas.h>
@@ -2753,7 +2754,9 @@ AllPlot::setYMax()
         if (axisHeight) {
             QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
             int labelWidth = labelWidthMetric.width( (maxY > 1000) ? " 8,888 " : " 888 " );
-            while( ( qCeil(maxY / step) * labelWidth ) > axisHeight ) nextStep(step);
+
+            if (axisHeight > labelWidth*2) //Avoid insane iterations
+                while( ( qCeil(maxY / step) * labelWidth ) > axisHeight ) nextStep(step);
         }
 
         QwtValueList xytick[QwtScaleDiv::NTickTypes];
@@ -2823,7 +2826,9 @@ AllPlot::setYMax()
             QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
             int labelWidth = labelWidthMetric.width( "888 " );
             ymax *= 1.05;
-            while((qCeil(ymax / step) * labelWidth) > axisHeight) nextStep(step);
+
+            if (axisHeight>labelWidth*2) //Avoid insane iterations
+                while((qCeil(ymax / step) * labelWidth) > axisHeight) nextStep(step);
         }
 
         QwtValueList xytick[QwtScaleDiv::NTickTypes];
@@ -2940,7 +2945,9 @@ AllPlot::setYMax()
             QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yRight) );
             int labelWidth = labelWidthMetric.width( "888 " );
             ymax *= 1.05;
-            while((qCeil(ymax / step) * labelWidth) > axisHeight) nextStep(step);
+
+            if (axisHeight>labelWidth*2) //Avoid insane iterations
+                while((qCeil(ymax / step) * labelWidth) > axisHeight) nextStep(step);
         }
 
         QwtValueList xytick[QwtScaleDiv::NTickTypes];
@@ -2993,7 +3000,9 @@ AllPlot::setYMax()
         if (axisHeight) {
             QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
             int labelWidth = labelWidthMetric.width( (ymax > 1000) ? " 8888 " : " 888 " );
-            while( ( qCeil( (ymax - ymin ) / step) * labelWidth ) > axisHeight ) nextStep(step);
+
+            if (axisHeight>labelWidth*2) //Avoid insane iterations
+                while( ( qCeil( (ymax - ymin ) / step) * labelWidth ) > axisHeight ) nextStep(step);
         }
 
         QwtValueList xytick[QwtScaleDiv::NTickTypes];

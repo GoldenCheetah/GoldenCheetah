@@ -25,6 +25,7 @@
 #include "Tab.h"
 #include "RideNavigator.h"
 #include "HelpWhatsThis.h"
+#include "Utils.h"
 
 #include <QApplication>
 #include <QtGui>
@@ -184,8 +185,8 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
         adds.smooth = false;
         adds.trendtype = 0;
         adds.topN = 1; // show top 1 by default always
-        QTextEdit processHTML(adds.metric->name()); // process html encoding of(TM)
-        adds.name   = processHTML.toPlainText();
+
+        adds.name   = Utils::unprotect(adds.metric->name());
 
         // set default for the user overiddable fields
         adds.uname  = adds.name;

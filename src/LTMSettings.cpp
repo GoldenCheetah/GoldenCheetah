@@ -21,6 +21,7 @@
 #include "LTMTool.h"
 #include "Context.h"
 #include "LTMChartParser.h"
+#include "Utils.h"
 
 #include <QtGui>
 #include <qwt_plot.h>
@@ -148,11 +149,11 @@ LTMSettings::translateMetrics(bool useMetricUnits)
         const RideMetric *m = factory.rideMetric(metrics[j].symbol);
         if (m) {
             // set name, units only if there was a description before
-            QTextEdit processHTMLname(m->name());
+            QString name(Utils::unprotect(m->name()));
             // uname is replaced only if it matches english name
             if (metrics[j].uname == m->internalName())
-                metrics[j].uname = processHTMLname.toPlainText();
-            metrics[j].name = processHTMLname.toPlainText();
+                metrics[j].uname = name;
+            metrics[j].name = name;
             // uunits is replaced only if it matches unit,
             // ir units are not saved it don't translate uunits
             if (metrics[j].uunits == metrics[j].units)

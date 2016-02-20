@@ -20,6 +20,7 @@
 #include "LTMSettings.h"
 #include "LTMTool.h"
 #include "Athlete.h"
+#include "Utils.h"
 
 #include <QDate>
 #include <QDebug>
@@ -73,25 +74,6 @@ bool LTMChartParser::endDocument()
     return true;
 }
 
-// static helper to protect special xml characters
-// ideally we would use XMLwriter to do this but
-// the file format is trivial and this implementation
-// is easier to follow and modify... for now.
-static QString xmlprotect(QString string)
-{
-    QTextEdit trademark("&#8482;"); // process html encoding of(TM)
-    QString tm = trademark.toPlainText();
-
-    QString s = string;
-    s.replace( tm, "&#8482;" );
-    s.replace( "&", "&amp;" );
-    s.replace( ">", "&gt;" );
-    s.replace( "<", "&lt;" );
-    s.replace( "\"", "&quot;" );
-    s.replace( "\'", "&apos;" );
-    return s;
-}
-
 //
 // Write out the charts.xml file
 //
@@ -122,7 +104,7 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
     // write out to file
     foreach (LTMSettings chart, charts) {
 
-        out <<"\t<chart name=\"" << xmlprotect(chart.name) <<"\">\"";
+        out <<"\t<chart name=\"" << Utils::xmlprotect(chart.name) <<"\">\"";
         // chart name
         QByteArray marshall;
         QDataStream s(&marshall, QIODevice::WriteOnly);
@@ -152,7 +134,7 @@ LTMChartParser::serializeToQString(QString* string, QList<LTMSettings> charts)
     // write out to file
     foreach (LTMSettings chart, charts) {
 
-        out <<"\t<chart name=\"" << xmlprotect(chart.name) <<"\">\"";
+        out <<"\t<chart name=\"" << Utils::xmlprotect(chart.name) <<"\">\"";
         // chart name
         QByteArray marshall;
         QDataStream s(&marshall, QIODevice::WriteOnly);
