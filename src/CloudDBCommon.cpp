@@ -331,9 +331,9 @@ CloudDBHeader::writeHeaderCache(QList<CommonAPIHeaderV1>* header, CloudDBHeaderT
        return false;
    }
    QString fileName;
-   if (headerType == CloudDBHeaderType::Chart) {
+   if (headerType == CloudDB_Chart) {
        fileName = "h_charts.dat";
-   } else if (headerType == CloudDBHeaderType::UserMetric) {
+   } else if (headerType == CloudDB_UserMetric) {
        fileName = "h_usermetrics.dat";
    } else {
        return false;
@@ -366,9 +366,9 @@ bool
 CloudDBHeader::readHeaderCache(QList<CommonAPIHeaderV1>* header, CloudDBHeaderType headerType, QString cache_Dir) {
 
     QString fileName;
-    if (headerType == CloudDBHeaderType::Chart) {
+    if (headerType == CloudDB_Chart) {
         fileName = "h_charts.dat";
-    } else if (headerType == CloudDBHeaderType::UserMetric) {
+    } else if (headerType == CloudDB_UserMetric) {
         fileName = "h_usermetrics.dat";
     } else {
         return false;
