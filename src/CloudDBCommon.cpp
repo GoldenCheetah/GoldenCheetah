@@ -17,7 +17,12 @@
  */
 
 #include "CloudDBCommon.h"
+#include "CloudDBStatus.h"
 #include "Settings.h"
+
+#include <QLabel>
+#include <QMessageBox>
+
 
 CloudDBAcceptConditionsDialog::CloudDBAcceptConditionsDialog(QString athlete) : athlete(athlete)
 {
@@ -153,7 +158,355 @@ QString CloudDBCommon::cloudDBTimeFormat = "yyyy-MM-ddTHH:mm:ssZ";
 bool CloudDBCommon::addCuratorFeatures = false;
 
 // Initialize static member for CloudDBDataStatus
-bool CloudDBDataStatus::chartHeaderStatusStale = true;
+bool CloudDBHeader::chartHeaderStatusStale = true;
+bool CloudDBHeader::userMetricHeaderStatusStale = true;
+
+// Common (static) methods
+
+
+void
+CloudDBCommon::prepareRequest(QNetworkRequest &request, QString urlString, QUrlQuery *query) {
+
+    QUrl url(urlString);
+    if (query) {
+        url.setQuery(query->query());
+    }
+    request.setUrl(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
+    request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
+}
+
+bool
+CloudDBCommon::replyReceivedAndOk(QNetworkReply *reply) {
+
+    // blocking request
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    if (reply->error() != QNetworkReply::NoError) {
+
+        CloudDBCommon::processReplyStatusCodes(reply);
+        return false;
+
+    }
+    return true;
+}
+
+void
+CloudDBCommon::processReplyStatusCodes(QNetworkReply *reply) {
+
+    // PROBLEM - the replies provided are in some of our case not
+    // the real HTTP replies - so we do some interpretation to
+    // get proper responses to the user
+    // main objective is to differentiate "Over Quota" from other problems
+    if (reply->error() == QNetworkReply::ServiceUnavailableError) {
+
+        // check for "Over Quota" - checking the body GAE is providing with 2 keywords
+        // which should even work when the response text is slighly changed.
+        QByteArray body = reply->readAll();
+        if (body.contains("503") && (body.contains("Quota"))) {
+            QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
+            return;
+        }
+    }
+
+    // and here how it should work / jus interpreting what was send through HTTP
+    QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    if ( !statusCode.isValid() ) {
+        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with CloudDB - please try again later.")));
+        return;
+    }
+    int code = statusCode.toInt();
+    switch (code) {
+    case CloudDBCommon::APIresponseForbidden :
+        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Authorization problem with CloudDB - please try again later.")));
+        break;
+    case CloudDBCommon::APIresponseOverQuota :
+        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
+        break;
+    case CloudDBCommon::APIresponseServiceProblem :
+        CloudDBStatusClient::displayCloudDBStatus();
+        break;
+    default:
+        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with CloudDB - response code: %1 - please try again later."))
+                             .arg(QString::number(code, 10)));
+    }
+
+}
+
+bool
+CloudDBCommon::unmarshallAPIHeaderV1(QByteArray json, QList<CommonAPIHeaderV1> *charts) {
+
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(json, &parseError);
+
+    // all these things should not happen and we have not valid object to return
+    if (parseError.error != QJsonParseError::NoError || document.isEmpty() || document.isNull()) {
+        return false;
+    }
+
+    // do we have a single object or an array ?
+    if (document.isObject()) {
+        CommonAPIHeaderV1 chartHeader;
+        QJsonObject object = document.object();
+        QJsonObject header = object["header"].toObject();
+        unmarshallAPIHeaderV1Object(&header, &chartHeader);
+        charts->append(chartHeader);
+
+    } else if (document.isArray()) {
+        QJsonArray array(document.array());
+        for (int i = 0; i< array.size(); i++) {
+            QJsonValue value = array.at(i);
+            if (value.isObject()) {
+                CommonAPIHeaderV1 chartHeader;
+                QJsonObject object = value.toObject();
+                QJsonObject header = object["header"].toObject();
+                unmarshallAPIHeaderV1Object(&header, &chartHeader);
+                charts->append(chartHeader);
+            }
+        }
+    }
+
+    return true;
+}
+
+void
+CloudDBCommon::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
+{
+    QString errorString = "";
+    foreach (const QSslError e, errors ) {
+        if (!errorString.isEmpty())
+            errorString += ", ";
+        errorString += e.errorString();
+    }
+    QMessageBox::warning(NULL, tr("HTTP"), tr("SSL error(s) has occurred: %1").arg(errorString));
+    reply->ignoreSslErrors();
+}
+
+
+void
+CloudDBCommon::unmarshallAPIHeaderV1Object(QJsonObject* object, CommonAPIHeaderV1* chartHeader) {
+
+    chartHeader->Id = object->value("id").toDouble();
+    chartHeader->Key = object->value("key").toString();
+    chartHeader->Name = object->value("name").toString();
+    chartHeader->Description = object->value("description").toString();
+    chartHeader->Language = object->value("language").toString();
+    chartHeader->GcVersion = object->value("gcversion").toString();
+    chartHeader->LastChanged = QDateTime::fromString(object->value("lastChange").toString(), CloudDBCommon::cloudDBTimeFormat);
+    chartHeader->CreatorId = object->value("creatorId").toString();
+    chartHeader->Curated = object->value("curated").toBool();
+    chartHeader->Deleted = object->value("deleted").toBool();
+
+}
+
+void
+CloudDBCommon::marshallAPIHeaderV1Object(QJsonObject& json_header, CommonAPIHeaderV1& header) {
+
+    json_header["id"] = header.Id;
+    json_header["key"] = header.Key;
+    json_header["name"] = header.Name;
+    json_header["description"] = header.Description;
+    json_header["gcversion"] = header.GcVersion;
+    json_header["lastChange"] = header.LastChanged.toString(CloudDBCommon::cloudDBTimeFormat);
+    json_header["creatorid"] = header.CreatorId;
+    json_header["language"] = header.Language;
+    json_header["curated"] = header.Curated;
+    json_header["deleted"] = header.Deleted;
+
+}
+
+
+
+
+bool
+CloudDBHeader::writeHeaderCache(QList<CommonAPIHeaderV1>* header, CloudDBHeaderType headerType, QString cache_Dir) {
+
+   // make sure the subdir exists
+   QDir cacheDir(cache_Dir);
+   if (cacheDir.exists()) {
+       cacheDir.mkdir("header");
+   } else {
+       return false;
+   }
+   QString fileName;
+   if (headerType == CloudDBHeaderType::Chart) {
+       fileName = "h_charts.dat";
+   } else if (headerType == CloudDBHeaderType::UserMetric) {
+       fileName = "h_usermetrics.dat";
+   } else {
+       return false;
+   }
+
+   QFile file(cache_Dir+"/header/"+fileName);
+   if (!file.open(QIODevice::WriteOnly)) return false;
+   QDataStream out(&file);
+   out.setVersion(QDataStream::Qt_4_6);
+   // track a version to be able change data structure
+   out << header_magic_string;
+   out << header_cache_version;
+   foreach (CommonAPIHeaderV1 h, *header) {
+       out << h.Id;
+       out << h.Key;
+       out << h.Name;
+       out << h.Description;
+       out << h.Language;
+       out << h.GcVersion;
+       out << h.LastChanged;
+       out << h.CreatorId;
+       out << h.Deleted;
+       out << h.Curated;
+   }
+   file.close();
+   return true;
+}
+
+bool
+CloudDBHeader::readHeaderCache(QList<CommonAPIHeaderV1>* header, CloudDBHeaderType headerType, QString cache_Dir) {
+
+    QString fileName;
+    if (headerType == CloudDBHeaderType::Chart) {
+        fileName = "h_charts.dat";
+    } else if (headerType == CloudDBHeaderType::UserMetric) {
+        fileName = "h_usermetrics.dat";
+    } else {
+        return false;
+    }
+    QFile file(cache_Dir+"/header/"+fileName);
+    if (!file.open(QIODevice::ReadOnly)) return false;
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_4_6);
+    // track a version to be able change data structure
+    int magic_string;
+    int version;
+
+    in >> magic_string;
+    if (magic_string != header_magic_string) {
+        // wrong file format detected / delete old cache close and exit
+        // cache will be re-written based data loaded from CloudDB
+        file.remove();
+        return false;
+    }
+
+    in >> version;
+    if (version != header_cache_version) {
+       // change of version, delete old cache and exit
+       file.remove();
+       return false;
+    }
+    CommonAPIHeaderV1 h;
+    while (!in.atEnd()) {
+        in >> h.Id;
+        in >> h.Key;
+        in >> h.Name;
+        in >> h.Description;
+        in >> h.Language;
+        in >> h.GcVersion;
+        in >> h.LastChanged;
+        in >> h.CreatorId;
+        in >> h.Deleted;
+        in >> h.Curated;
+        header->append(h);
+    }
+    file.close();
+    return true;
+
+}
+
+bool
+CloudDBHeader::getAllCachedHeader(QList<CommonAPIHeaderV1> *objectHeader, CloudDBHeaderType type, QString cache_Dir,
+                                  QString url, QNetworkAccessManager* nam, QNetworkReply* reply) {
+
+    QDateTime selectAfter;
+
+    // first check the cache
+    objectHeader->clear();
+    CloudDBHeader::readHeaderCache(objectHeader, type, cache_Dir);
+    if (objectHeader->size()>0) {
+        // header are selected from CloudDB sorted - so the first one is always the newest one
+        selectAfter = objectHeader->at(0).LastChanged.addSecs(1); // DB has Microseconds - we not - so round up to next full second
+    } else {
+        // we do not have charts before 2000 :-)
+        selectAfter = QDateTime(QDate(2000,01,01));
+    }
+
+    // now get the missing headers (in bulks of xxx - since GAE is not nicely handling high single call volumes)
+
+    QList<quint64> updatedIds;
+    QList<QString> updatedStringIds;
+    QList<CommonAPIHeaderV1> *retrievedHeader = new QList<CommonAPIHeaderV1>;
+    QList<CommonAPIHeaderV1> *newHeader = new QList<CommonAPIHeaderV1>;
+
+    do {
+
+        QUrlQuery query;
+        query.addQueryItem("dateFrom", selectAfter.toString(CloudDBCommon::cloudDBTimeFormat));
+        QNetworkRequest request;
+        CloudDBCommon::prepareRequest(request, url, &query);
+
+        reply = nam->get(request);
+
+        // wait for reply (synchronously) and process error codes as necessary
+        if (!CloudDBCommon::replyReceivedAndOk(reply)) return false;
+
+        QByteArray result = reply->readAll();
+        retrievedHeader->clear();
+        CloudDBCommon::unmarshallAPIHeaderV1(result, retrievedHeader);
+        foreach (CommonAPIHeaderV1 retrieved, *retrievedHeader) {
+            // consider the retrieval order from CloudDB - the oldest header is in first position
+            if (retrieved.Id > 0) {
+                updatedIds.append(retrieved.Id);
+            }
+            if (!retrieved.Key.isEmpty()) {
+                updatedStringIds.append(retrieved.Key);
+
+            }
+            newHeader->append(retrieved);
+        }
+
+        // youngest header is the last in the list
+        if (retrievedHeader->size() > 0) {
+            selectAfter = retrievedHeader->last().LastChanged.addSecs(1);
+        }
+        // NOTE - the headerSize "200" MUST BE IN SYNC WITH CLOUDDB get.limit(200)
+        // by adding it here one additional call to CloudDB for the last get can be avoided
+
+    } while (retrievedHeader->size() >= 200);
+
+    delete retrievedHeader;
+
+    //now merge cache data with selected data
+
+    //first remove duplicate entries from cache which have recently changed/updated on CloudDB
+    QMutableListIterator<CommonAPIHeaderV1> it(*objectHeader);
+    while (it.hasNext()) {
+        CommonAPIHeaderV1 header = it.next();
+        if (header.Id > 0 && updatedIds.contains(header.Id) ||
+            header.Key.size() > 0 && updatedStringIds.contains(header.Key)) {
+            // update cache (Header Cache)
+            it.remove();
+        }
+    }
+
+    //now we have the missing (new and updated) chart header so add the in the correct sequence
+    while (!newHeader->isEmpty()) {
+        objectHeader->insert(0, newHeader->takeFirst());
+
+    }
+    delete newHeader;
+
+    // store cache for next time
+    CloudDBHeader::writeHeaderCache(objectHeader, type, cache_Dir);
+
+    return true;
+}
+
+
+
+
+
+
 
 
 

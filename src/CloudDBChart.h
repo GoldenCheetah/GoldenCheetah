@@ -32,25 +32,11 @@
 #include <QTableWidget>
 
 
-// API Structure V1 (flattened) must be in sync with the Structure used for the V1
+// API Structure V1 must be in sync with the Structure used for the V1 on CloudDB
 // but uses the correct QT datatypes
 
-
-typedef struct {
-    qint64 Id;
-    QString Name;
-    QString Description;
-    QString Language;
-    QString GcVersion;
-    QDateTime LastChanged;
-    QString CreatorId;
-    bool    Curated;
-    bool    Deleted;
-} ChartAPIHeaderV1;
-
-
 struct ChartAPIv1 {
-    ChartAPIHeaderV1 Header;
+    CommonAPIHeaderV1 Header;
     QString ChartXML;
     QByteArray Image;
     QString CreatorNick;
@@ -72,7 +58,7 @@ public:
     bool getChartByID(qint64 id, ChartAPIv1 *chart);
     bool deleteChartByID(qint64 id);
     bool curateChartByID(qint64 id, bool newStatus);
-    bool getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader);
+    bool getAllChartHeader(QList<CommonAPIHeaderV1>* header);
 
     void updateChartInCache(qint64 id);
     bool sslLibMissing() { return noSSLlib; }
@@ -89,9 +75,6 @@ private:
     QNetworkReply *g_reply;
     QString g_cacheDir;
 
-    static const int header_magic_string = 987654321;
-    static const int header_cache_version = 1;
-
     static const int chart_magic_string = 1029384756;
     static const int chart_cache_version = 1;
 
@@ -99,19 +82,13 @@ private:
     QString  g_chart_url_header;
     QString  g_chartcuration_url_base;
 
-    bool writeHeaderCache(QList<ChartAPIHeaderV1>*);
-    bool readHeaderCache(QList<ChartAPIHeaderV1>*);
     bool writeChartCache(ChartAPIv1 *);
     bool readChartCache(qint64 id, ChartAPIv1 *chart);
     void deleteChartCache(qint64 id);
+    void cleanChartCache(QList<CommonAPIHeaderV1> *objectHeader);
 
     static bool unmarshallAPIv1(QByteArray , QList<ChartAPIv1>* );
     static void unmarshallAPIv1Object(QJsonObject* , ChartAPIv1* );
-
-    static bool unmarshallAPIHeaderV1(QByteArray , QList<ChartAPIHeaderV1>* );
-    static void unmarshallAPIHeaderV1Object(QJsonObject* , ChartAPIHeaderV1* chart);
-
-    void processReplyStatusCodes(QNetworkReply *);
 
 };
 
@@ -175,8 +152,8 @@ private:
     CloudDBChartClient* g_client;
     QList<ChartWorkingStructure> *g_currentPresets;
     int g_currentIndex;
-    QList<ChartAPIHeaderV1>* g_currentHeaderList;
-    QList<ChartAPIHeaderV1>* g_fullHeaderList;
+    QList<CommonAPIHeaderV1>* g_currentHeaderList;
+    QList<CommonAPIHeaderV1>* g_fullHeaderList;
     bool g_textFilterActive;
     QString g_currentAthleteId;
     bool g_networkrequestactive;
