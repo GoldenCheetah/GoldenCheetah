@@ -1310,7 +1310,7 @@ LTMWindow::shareConfig()
     if (dialog.exec() == QDialog::Accepted) {
         CloudDBChartClient c;
         if (c.postChart(dialog.getChart())) {
-            CloudDBDataStatus::setChartHeaderStale(true);
+            CloudDBHeader::setChartHeaderStale(true);
         }
     }
 }

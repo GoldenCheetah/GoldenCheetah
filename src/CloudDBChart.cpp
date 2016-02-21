@@ -31,7 +31,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QEventLoop>
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 #include <QDesktopWidget>
@@ -74,11 +73,7 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
     // first create the JSON object
     // only a subset of fields is required for POST
     QJsonObject json_header;
-    json_header["name"] = chart.Header.Name;
-    json_header["description"] = chart.Header.Description;
-    json_header["language"] = chart.Header.Language;
-    json_header["gcversion"] = chart.Header.GcVersion;
-    json_header["creatorid"] = chart.Header.CreatorId;
+    CloudDBCommon::marshallAPIHeaderV1Object(json_header, chart.Header);
 
     QJsonObject json;
     json["header"] = json_header;
@@ -91,35 +86,22 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
     QJsonDocument document;
     document.setObject(json);
 
-    QUrl url = QUrl(g_chart_url_base);
     QNetworkRequest request;
-    request.setUrl(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
-    request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
-    request.setAttribute(QNetworkRequest::CacheSaveControlAttribute, true);
+    CloudDBCommon::prepareRequest(request, g_chart_url_base);
     g_reply = g_nam->post(request, document.toJson());
 
-    // blocking request
-    QEventLoop loop;
-    connect(g_reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
+    // wait for reply (synchronously) and process error codes as necessary
+    if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
 
-    if (g_reply->error() != QNetworkReply::NoError) {
-
-        processReplyStatusCodes(g_reply);
-        return false;
-
+    QByteArray result = g_reply->readAll();
+    result.replace(QByteArray("\""), QByteArray(""));
+    qint64 id = result.toLongLong();
+    if (id > 0) {
+        chart.Header.Id = id;
+        writeChartCache(&chart);
     }
 
-   QByteArray result = g_reply->readAll();
-   result.replace(QByteArray("\""), QByteArray(""));
-   qint64 id = result.toLongLong();
-   if (id > 0) {
-     chart.Header.Id = id;
-     writeChartCache(&chart);
-   }
-
-   return true;
+    return true;
 
 }
 
@@ -130,16 +112,7 @@ CloudDBChartClient::putChart(ChartAPIv1 chart) {
 
     // first create the JSON object / all fields are required for PUT / only LastChanged i
     QJsonObject json_header;
-    json_header["id"] = chart.Header.Id;
-    json_header["name"] = chart.Header.Name;
-    json_header["description"] = chart.Header.Description;
-    json_header["gcversion"] = chart.Header.GcVersion;
-    json_header["lastChange"] = chart.Header.LastChanged.toString(CloudDBCommon::cloudDBTimeFormat);
-    json_header["creatorid"] = chart.Header.CreatorId;
-    json_header["language"] = chart.Header.Language;
-    json_header["curated"] = chart.Header.Curated;
-    json_header["deleted"] = chart.Header.Deleted;
-
+    CloudDBCommon::marshallAPIHeaderV1Object(json_header, chart.Header);
 
     QJsonObject json;
     json["header"] = json_header;
@@ -152,24 +125,12 @@ CloudDBChartClient::putChart(ChartAPIv1 chart) {
     QJsonDocument document;
     document.setObject(json);
 
-    QUrl url = QUrl(g_chart_url_base);
     QNetworkRequest request;
-    request.setUrl(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
-    request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
+    CloudDBCommon::prepareRequest(request, g_chart_url_base);
     g_reply = g_nam->put(request, document.toJson());
 
-    // blocking request
-    QEventLoop loop;
-    connect(g_reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
-
-    if (g_reply->error() != QNetworkReply::NoError) {
-
-        processReplyStatusCodes(g_reply);
-        return false;
-
-    }
+    // wait for reply (synchronously) and process error codes as necessary
+    if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
 
     // update cache
     writeChartCache(&chart);
@@ -186,87 +147,55 @@ CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
 
     // now from GAE
     QNetworkRequest request;
-    request.setUrl(QUrl(g_chart_url_base+QString::number(id, 10)));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
-    request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
+    CloudDBCommon::prepareRequest(request, g_chart_url_base+QString::number(id, 10));
     g_reply = g_nam->get(request);
 
-    // blocking request
-    QEventLoop loop;
-    connect(g_reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
+    // wait for reply (synchronously) and process error codes as necessary
+    if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
 
-    if (g_reply->error() != QNetworkReply::NoError) {
-
-        processReplyStatusCodes(g_reply);
-        return false;
-
-    }
     // call successfull
     QByteArray result = g_reply->readAll();
     QList<ChartAPIv1>* charts = new QList<ChartAPIv1>;
     unmarshallAPIv1(result, charts);
     if (charts->size() > 0) {
         *chart = charts->value(0);
+        writeChartCache(chart);
         charts->clear();
         delete charts;
-        writeChartCache(chart);
-        return CloudDBCommon::APIresponseOk;
+        return true;
     }
     delete charts;
-
-    return true;
+    return false;
 }
 
 bool
 CloudDBChartClient::deleteChartByID(qint64 id) {
 
     QNetworkRequest request;
-    request.setUrl(QUrl(g_chart_url_base+QString::number(id, 10)));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
-    request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
+    CloudDBCommon::prepareRequest(request, g_chart_url_base+QString::number(id, 10));
     g_reply = g_nam->deleteResource(request);
 
-    // blocking request
-    QEventLoop loop;
-    connect(g_reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
-
-    if (g_reply->error() != QNetworkReply::NoError) {
-
-        processReplyStatusCodes(g_reply);
-        return false;
-
-    }
+    // wait for reply (synchronously) and process error codes as necessary
+    if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
 
     deleteChartCache(id);
     return true;
 }
+
 
 bool
 CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
 
     QUrlQuery query;
     query.addQueryItem("newStatus", (newStatus ? "true": "false"));
-    QUrl url(g_chartcuration_url_base+QString::number(id, 10));
-    url.setQuery(query);
     QNetworkRequest request;
-    request.setUrl(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
-    request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
+    CloudDBCommon::prepareRequest(request, g_chartcuration_url_base+QString::number(id, 10), &query);
+
+    // add a payload to "PUT" even though it's not processed
     g_reply = g_nam->put(request, "{ \"id\": \"dummy\"");
 
-    // blocking request
-    QEventLoop loop;
-    connect(g_reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
-
-    if (g_reply->error() != QNetworkReply::NoError) {
-
-        processReplyStatusCodes(g_reply);
-        return false;
-
-    }
+    // wait for reply (synchronously) and process error codes as necessary
+    if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
 
     deleteChartCache(id);
     return true;
@@ -274,101 +203,12 @@ CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
 
 
 bool
-CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
-
-    QDateTime selectAfter;
-
-    // first check the cache
-    chartHeader->clear();
-    readHeaderCache(chartHeader);
-    if (chartHeader->size()>0) {
-        // header are selected from CloudDB sorted - so the first one is always the newest one
-        selectAfter = chartHeader->at(0).LastChanged.addSecs(1); // DB has Microseconds - we not - so round up to next full second
-    } else {
-        // we do not have charts before 2000 :-)
-        selectAfter = QDateTime(QDate(2000,01,01));
+CloudDBChartClient::getAllChartHeader(QList<CommonAPIHeaderV1>* header) {
+    bool request_ok = CloudDBHeader::getAllCachedHeader(header, CloudDBHeader::CloudDB_Chart, g_cacheDir, g_chart_url_header, g_nam, g_reply);
+    if (request_ok && header->size()>0) {
+        cleanChartCache(header);
     }
-
-    // now get the missing headers (in bulks of xxx - since GAE is not nicely handling high single call volumes)
-
-    QList<quint64> updatedIds;
-    QList<ChartAPIHeaderV1> *retrievedHeader = new QList<ChartAPIHeaderV1>;
-    QList<ChartAPIHeaderV1> *newHeader = new QList<ChartAPIHeaderV1>;
-
-    do {
-
-        QUrlQuery query;
-        query.addQueryItem("dateFrom", selectAfter.toString(CloudDBCommon::cloudDBTimeFormat));
-        QUrl url(g_chart_url_header);
-        url.setQuery(query);
-        QNetworkRequest request;
-        request.setUrl(url);
-        request.setHeader(QNetworkRequest::ContentTypeHeader, CloudDBCommon::cloudDBContentType);
-        request.setRawHeader("Authorization", CloudDBCommon::cloudDBBasicAuth);
-        g_reply = g_nam->get(request);
-
-        // blocking request
-        QEventLoop loop;
-        connect(g_reply, SIGNAL(finished()), &loop, SLOT(quit()));
-        loop.exec();
-
-        if (g_reply->error() != QNetworkReply::NoError) {
-            processReplyStatusCodes(g_reply);
-            return false;
-        };
-
-        QByteArray result = g_reply->readAll();
-        retrievedHeader->clear();
-        unmarshallAPIHeaderV1(result, retrievedHeader);
-        foreach (ChartAPIHeaderV1 retrieved, *retrievedHeader) {
-            // consider the retrieval order from CloudDB - the oldest header is in first position
-            updatedIds.append(retrieved.Id);
-            newHeader->append(retrieved);
-        }
-
-        // youngest header is the last in the list
-        if (retrievedHeader->size() > 0) {
-            selectAfter = retrievedHeader->last().LastChanged.addSecs(1);
-        }
-        // NOTE - the headerSize "200" MUST BE IN SYNC WITH CLOUDDB get.limit(200)
-        // by adding it here one additional call to CloudDB for the last get can be avoided
-
-    } while (retrievedHeader->size() >= 200);
-
-    delete retrievedHeader;
-
-    //now merge cache data with selected data
-
-    //first remove duplicate entries from cache which have recently changed/updated on CloudDB
-    QMutableListIterator<ChartAPIHeaderV1> it(*chartHeader);
-    while (it.hasNext()) {
-        quint64 id = it.next().Id;
-        if (updatedIds.contains(id) ) {
-            // update caches (Chart and ChartHeader)
-            it.remove();
-        }
-    }
-
-    //now we have the missing (new and updated) chart header so add the in the correct sequence
-    while (!newHeader->isEmpty()) {
-        chartHeader->insert(0, newHeader->takeFirst());
-
-    }
-    delete newHeader;
-
-    // remove Deleted Entries from Cache
-    QMutableListIterator<ChartAPIHeaderV1> it2(*chartHeader);
-    while (it2.hasNext()) {
-        if (it2.next().Deleted) {
-            deleteChartCache(it2.next().Id);
-            it2.remove();
-        }
-    }
-
-    // store cache for next time
-    writeHeaderCache(chartHeader);
-
-    return true;
+    return request_ok;
 }
 
 
@@ -378,93 +218,11 @@ CloudDBChartClient::getAllChartHeader(QList<ChartAPIHeaderV1> *chartHeader) {
 void
 CloudDBChartClient::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
 {
-    QString errorString = "";
-    foreach (const QSslError e, errors ) {
-        if (!errorString.isEmpty())
-            errorString += ", ";
-        errorString += e.errorString();
-    }
-    QMessageBox::warning(NULL, tr("HTTP"), tr("SSL error(s) has occurred: %1").arg(errorString));
-    reply->ignoreSslErrors();
+    CloudDBCommon::sslErrors(reply, errors);
 }
 
 // Internal Methods
 
-
-bool
-CloudDBChartClient::writeHeaderCache(QList<ChartAPIHeaderV1>* header) {
-
-   // make sure the subdir exists
-   QDir cacheDir(g_cacheDir);
-   if (cacheDir.exists()) {
-       cacheDir.mkdir("header");
-   } else {
-       return false;
-   }
-   QFile file(g_cacheDir+"/header/cache.dat");
-   if (!file.open(QIODevice::WriteOnly)) return false;
-   QDataStream out(&file);
-   out.setVersion(QDataStream::Qt_4_6);
-   // track a version to be able change data structure
-   out << header_magic_string;
-   out << header_cache_version;
-   foreach (ChartAPIHeaderV1 h, *header) {
-       out << h.Id;
-       out << h.Name;
-       out << h.Description;
-       out << h.Language;
-       out << h.GcVersion;
-       out << h.LastChanged;
-       out << h.CreatorId;
-       out << h.Deleted;
-       out << h.Curated;
-   }
-   file.close();
-   return true;
-}
-
-
-bool
-CloudDBChartClient::readHeaderCache(QList<ChartAPIHeaderV1>* header) {
-
-    QFile file(g_cacheDir+"/header/cache.dat");
-    if (!file.open(QIODevice::ReadOnly)) return false;
-    QDataStream in(&file);
-    in.setVersion(QDataStream::Qt_4_6);
-    // track a version to be able change data structure
-    int magic_string;
-    int version;
-
-    in >> magic_string;
-    if (magic_string != header_magic_string) {
-        // wrong file format / close and exit
-        file.close();
-        return false;
-    }
-
-    in >> version;
-    if (version != header_cache_version) {
-       // change of version, delete old cach
-       file.remove();
-       return false;
-    }
-    ChartAPIHeaderV1 h;
-    while (!in.atEnd()) {
-        in >> h.Id;
-        in >> h.Name;
-        in >> h.Description;
-        in >> h.Language;
-        in >> h.GcVersion;
-        in >> h.LastChanged;
-        in >> h.CreatorId;
-        in >> h.Deleted;
-        in >> h.Curated;
-        header->append(h);
-    }
-    file.close();
-    return true;
-
-}
 
 bool
 CloudDBChartClient::writeChartCache(ChartAPIv1 * chart) {
@@ -505,6 +263,8 @@ CloudDBChartClient::writeChartCache(ChartAPIv1 * chart) {
     file.close();
     return true;
 }
+
+
 
 bool CloudDBChartClient::readChartCache(qint64 id, ChartAPIv1 *chart) {
 
@@ -559,6 +319,26 @@ CloudDBChartClient::deleteChartCache(qint64 id) {
 
 }
 
+void
+CloudDBChartClient::cleanChartCache(QList<CommonAPIHeaderV1> *objectHeader) {
+    // remove Deleted Entries from Cache
+    int deleted = 0;
+    QMutableListIterator<CommonAPIHeaderV1> it(*objectHeader);
+    while (it.hasNext()) {
+        CommonAPIHeaderV1 header = it.next();
+        if (header.Deleted) {
+            deleteChartCache(header.Id);
+            it.remove();
+            deleted ++;
+        }
+    }
+    if (deleted > 0) {
+        // store cache for next time
+        CloudDBHeader::writeHeaderCache(objectHeader, CloudDBHeader::CloudDB_Chart, g_cacheDir);
+    }
+
+}
+
 bool
 CloudDBChartClient::unmarshallAPIv1(QByteArray json, QList<ChartAPIv1> *charts) {
 
@@ -576,7 +356,7 @@ CloudDBChartClient::unmarshallAPIv1(QByteArray json, QList<ChartAPIv1> *charts) 
         QJsonObject object = document.object();
         unmarshallAPIv1Object(&object, &chart);
         QJsonObject header = object["header"].toObject();
-        unmarshallAPIHeaderV1Object(&header, &chart.Header);
+        CloudDBCommon::unmarshallAPIHeaderV1Object(&header, &chart.Header);
         charts->append(chart);
 
     } else if (document.isArray()) {
@@ -588,7 +368,7 @@ CloudDBChartClient::unmarshallAPIv1(QByteArray json, QList<ChartAPIv1> *charts) 
                 QJsonObject object = value.toObject();
                 unmarshallAPIv1Object(&object, &chart);
                 QJsonObject header = object["header"].toObject();
-                unmarshallAPIHeaderV1Object(&header, &chart.Header);
+                CloudDBCommon::unmarshallAPIHeaderV1Object(&header, &chart.Header);
                 charts->append(chart);
             }
         }
@@ -610,98 +390,6 @@ CloudDBChartClient::unmarshallAPIv1Object(QJsonObject* object, ChartAPIv1* chart
 
 }
 
-bool
-CloudDBChartClient::unmarshallAPIHeaderV1(QByteArray json, QList<ChartAPIHeaderV1> *charts) {
-
-    QJsonParseError parseError;
-    QJsonDocument document = QJsonDocument::fromJson(json, &parseError);
-
-    // all these things should not happen and we have not valid object to return
-    if (parseError.error != QJsonParseError::NoError || document.isEmpty() || document.isNull()) {
-        return false;
-    }
-
-    // do we have a single object or an array ?
-    if (document.isObject()) {
-        ChartAPIHeaderV1 chartHeader;
-        QJsonObject object = document.object();
-        QJsonObject header = object["header"].toObject();
-        unmarshallAPIHeaderV1Object(&header, &chartHeader);
-        charts->append(chartHeader);
-
-    } else if (document.isArray()) {
-        QJsonArray array(document.array());
-        for (int i = 0; i< array.size(); i++) {
-            QJsonValue value = array.at(i);
-            if (value.isObject()) {
-                ChartAPIHeaderV1 chartHeader;
-                QJsonObject object = value.toObject();
-                QJsonObject header = object["header"].toObject();
-                unmarshallAPIHeaderV1Object(&header, &chartHeader);
-                charts->append(chartHeader);
-            }
-        }
-    }
-
-    return true;
-}
-
-void
-CloudDBChartClient::unmarshallAPIHeaderV1Object(QJsonObject* object, ChartAPIHeaderV1* chartHeader) {
-
-    chartHeader->Id = object->value("id").toDouble();
-    chartHeader->Name = object->value("name").toString();
-    chartHeader->Description = object->value("description").toString();
-    chartHeader->Language = object->value("language").toString();
-    chartHeader->GcVersion = object->value("gcversion").toString();
-    chartHeader->LastChanged = QDateTime::fromString(object->value("lastChange").toString(), CloudDBCommon::cloudDBTimeFormat);
-    chartHeader->CreatorId = object->value("creatorId").toString();
-    chartHeader->Curated = object->value("curated").toBool();
-    chartHeader->Deleted = object->value("deleted").toBool();
-
-}
-
-void
-CloudDBChartClient::processReplyStatusCodes(QNetworkReply *reply) {
-
-    // PROBLEM - the replies provided are in some of our case not
-    // the real HTTP replies - so we do some interpretation to
-    // get proper responses to the user
-    // main objective is to differentiate "Over Quota" from other problems
-    if (reply->error() == QNetworkReply::ServiceUnavailableError) {
-
-        // check for "Over Quota" - checking the body GAE is providing with 2 keywords
-        // which should even work when the response text is slighly changed.
-        QByteArray body = g_reply->readAll();
-        if (body.contains("503") && (body.contains("Quota"))) {
-            QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
-            return;
-        }
-    }
-
-    // and here how it should work / jus interpreting what was send through HTTP
-    QVariant statusCode = g_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
-    if ( !statusCode.isValid() ) {
-        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with CloudDB - please try again later.")));
-        return;
-    }
-    int code = statusCode.toInt();
-    switch (code) {
-    case CloudDBCommon::APIresponseForbidden :
-        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Authorization problem with CloudDB - please try again later.")));
-        break;
-    case CloudDBCommon::APIresponseOverQuota :
-        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Usage has exceeded the free quota - please try again later.")));
-        break;
-    case CloudDBCommon::APIresponseServiceProblem :
-        CloudDBStatusClient::displayCloudDBStatus();
-        break;
-    default:
-        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with CloudDB - response code: %1 - please try again later."))
-                             .arg(QString::number(code, 10)));
-    }
-
-}
 
 
 
@@ -716,8 +404,8 @@ static const int chartImageHeight = 240;
 CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
 {
    g_client = new CloudDBChartClient();
-   g_currentHeaderList = new QList<ChartAPIHeaderV1>;
-   g_fullHeaderList = new QList<ChartAPIHeaderV1>;
+   g_currentHeaderList = new QList<CommonAPIHeaderV1>;
+   g_fullHeaderList = new QList<CommonAPIHeaderV1>;
    g_currentPresets = new QList<ChartWorkingStructure>;
    g_textFilterActive = false;
    g_networkrequestactive = false; // don't allow Dialog to close while we are retrieving data
@@ -898,9 +586,9 @@ CloudDBChartListDialog::prepareData(QString athlete, CloudDBCommon::UserRole rol
         setWindowTitle(tr("Select a Chart"));
     }
 
-    if (CloudDBDataStatus::isStaleChartHeader()) {
+    if (CloudDBHeader::isStaleChartHeader()) {
         if (!refreshStaleChartHeader()) return false;
-        CloudDBDataStatus::setChartHeaderStale(false);
+        CloudDBHeader::setChartHeaderStale(false);
     }
     g_currentAthleteId = appsettings->cvalue(athlete, GC_ATHLETE_ID, "").toString();
     applyAllFilters();
@@ -1187,17 +875,17 @@ CloudDBChartListDialog::deleteUserEdit(){
                 return;
             }
             // set stale for subsequent list dialog calls
-            CloudDBDataStatus::setChartHeaderStale(true);
+            CloudDBHeader::setChartHeaderStale(true);
 
             // remove deleted chart from both lists
-            QMutableListIterator<ChartAPIHeaderV1> it1(*g_currentHeaderList);
+            QMutableListIterator<CommonAPIHeaderV1> it1(*g_currentHeaderList);
             while (it1.hasNext()) {
                 if (it1.next().Id == id) {
                     it1.remove();
                     break; // there is just one equal entry
                 }
             }
-            QMutableListIterator<ChartAPIHeaderV1> it2(*g_fullHeaderList);
+            QMutableListIterator<CommonAPIHeaderV1> it2(*g_fullHeaderList);
             while (it2.hasNext()) {
                 if (it2.next().Id == id) {
                     it2.remove();
@@ -1282,7 +970,7 @@ CloudDBChartListDialog::applyAllFilters() {
         // split by any whitespace
         searchList = textFilter->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
     }
-    foreach (ChartAPIHeaderV1 chart, *g_fullHeaderList) {
+    foreach (CommonAPIHeaderV1 chart, *g_fullHeaderList) {
 
         // list does not contain any deleted chart id's
 
