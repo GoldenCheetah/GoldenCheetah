@@ -1744,11 +1744,16 @@ void TrainSidebar::Calibrate()
                 Devices[dev].controller->setMode(RT_MODE_ERGO);
                 Devices[dev].controller->setLoad(load);
             }
-        } else {
+        } else if (status&RT_MODE_SLOPE) {
 
             foreach(int dev, activeDevices) {
-                Devices[dev].controller->setMode(RT_MODE_SPIN);
+                Devices[dev].controller->setMode(RT_MODE_SLOPE);
                 Devices[dev].controller->setGradient(slope);
+            }
+        } else if (status&RT_MODE_LEVEL) {
+            foreach(int dev, activeDevices) {
+                Devices[dev].controller->setMode(RT_MODE_LEVEL);
+                Devices[dev].controller->setLevel(level);
             }
         }
 

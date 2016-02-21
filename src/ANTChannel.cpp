@@ -787,9 +787,6 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    float power=0,prev=999;
                    if (speed > 0)
                    {
-                       int minPower = 0.039*(speed*speed)+3.91*speed-9;  // Power if we were at level 1
-                       int maxPower = 0.207*(speed*speed)+16.1*speed-76; // Power if we were at level 16
-
                        for (level=1; level <= 16; ++level)
                        {
                            // get power at level
@@ -797,10 +794,6 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                            if (power > load)
                                break;
                        }
-
-                       //unable to match power level
-                       if ((level==17) || (power > load && level == 1))
-                           power = 0;
                    }
                    is_alt ? parent->setAltWatts(power):parent->setWatts(power);
                }

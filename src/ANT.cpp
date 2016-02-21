@@ -413,6 +413,7 @@ void ANT::refreshQuboGradient()
 
     // Calculate target power from slope, weight and speed
     load = 0.00145*pow(speed,3)+0.127*pow(speed,2)+speed*(-0.37+gradient*(0.027*weight));
+    telemetry.setLoad(load); //push load back up
 
     if (load < 0) load=0;
     if (load > 990) load=990;
