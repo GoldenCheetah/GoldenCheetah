@@ -121,7 +121,7 @@ class CloudDBHeader
 
 public:
 
-    enum headerType { Chart, UserMetric };
+    enum headerType { CloudDB_Chart, CloudDB_UserMetric };
     typedef enum headerType CloudDBHeaderType;
 
     static bool writeHeaderCache(QList<CommonAPIHeaderV1>*, CloudDBHeaderType headerType, QString cache_Dir );
@@ -138,7 +138,7 @@ public:
 
 private:
 
-    static const int header_magic_string = 9876543210;
+    static const int header_magic_string = 1253346430;
     static const int header_cache_version = 1;
 
     static bool chartHeaderStatusStale;

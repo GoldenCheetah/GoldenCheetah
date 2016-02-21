@@ -204,7 +204,7 @@ CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
 
 bool
 CloudDBChartClient::getAllChartHeader(QList<CommonAPIHeaderV1>* header) {
-    bool request_ok = CloudDBHeader::getAllCachedHeader(header, CloudDBHeader::Chart, g_cacheDir, g_chart_url_header, g_nam, g_reply);
+    bool request_ok = CloudDBHeader::getAllCachedHeader(header, CloudDBHeader::CloudDB_Chart, g_cacheDir, g_chart_url_header, g_nam, g_reply);
     if (request_ok && header->size()>0) {
         cleanChartCache(header);
     }
@@ -334,7 +334,7 @@ CloudDBChartClient::cleanChartCache(QList<CommonAPIHeaderV1> *objectHeader) {
     }
     if (deleted > 0) {
         // store cache for next time
-        CloudDBHeader::writeHeaderCache(objectHeader, CloudDBHeader::Chart, g_cacheDir);
+        CloudDBHeader::writeHeaderCache(objectHeader, CloudDBHeader::CloudDB_Chart, g_cacheDir);
     }
 
 }
