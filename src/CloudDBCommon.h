@@ -19,63 +19,50 @@
 #ifndef CLOUDDBCOMMON_H
 #define CLOUDDBCOMMON_H
 
-#include "LTMSettings.h"
 #include "Settings.h"
 #include "Secrets.h"
 
 
 #include <QObject>
 #include <QScrollArea>
+#include <QDialog>
+#include <QNetworkReply>
 
 
 // Central Classes and Constants related to CloudDB
 
+// API Structure V1 must be in sync with the Structure used for the V1 on CloudDB
+// but uses the correct QT datatypes
 
-// -------------------------------------------------------
-// Dialog to show T&C for the use of CloudDB offering,
-// and accepting those before executing any CloudDB
-// functions.
-// -------------------------------------------------------
+typedef struct {
+    qint64 Id;
+    QString Key;
+    QString Name;
+    QString Description;
+    QString Language;
+    QString GcVersion;
+    QDateTime LastChanged;
+    QString CreatorId;
+    bool    Curated;
+    bool    Deleted;
+} CommonAPIHeaderV1;
 
-class CloudDBAcceptConditionsDialog : public QDialog
+
+class CloudDBCommon : public QObject
 {
     Q_OBJECT
 
-    public:
-        CloudDBAcceptConditionsDialog(QString athlete);
-
-    private slots:
-        void acceptConditions();
-        void rejectConditions();
-
-    private:
-
-        QString athlete;
-
-        QScrollArea *scrollText;
-        QPushButton *proceedButton;
-        QPushButton *abortButton;
-
-};
-
-class CloudDBDataStatus
-{
-
 public:
 
-    static void setChartHeaderStale(bool b) {chartHeaderStatusStale = b;}
-    static bool isStaleChartHeader() {return chartHeaderStatusStale;}
+    static void prepareRequest(QNetworkRequest &request, QString urlString, QUrlQuery *query = NULL);
+    static void processReplyStatusCodes(QNetworkReply *reply);
+    static bool replyReceivedAndOk(QNetworkReply *reply);
 
-private:
+    static void sslErrors(QNetworkReply* reply ,QList<QSslError> errors);
 
-    static bool chartHeaderStatusStale;
-
-};
-
-
-class CloudDBCommon
-{
-public:
+    static bool unmarshallAPIHeaderV1(QByteArray , QList<CommonAPIHeaderV1>* );
+    static void unmarshallAPIHeaderV1Object(QJsonObject* , CommonAPIHeaderV1* chart);
+    static void marshallAPIHeaderV1Object(QJsonObject&, CommonAPIHeaderV1 &header);
 
     static bool addCuratorFeatures;
 
@@ -90,6 +77,7 @@ public:
     static const int APIresponseOk = 200; // also used in case of 204 (No Content)
     static const int APIresponseCreated = 201;
     static const int APIresponseForbidden = 403;
+    static const int APIresponseConflict = 409;
     static const int APIresponseServiceProblem = 422; // CloudDB response if Status <> 10 (Ok)
     static const int APIresponseOverQuota = 503;
     static const int APIresponseOthers = 999;
@@ -99,6 +87,66 @@ public:
 
 
 };
+
+
+// -------------------------------------------------------
+// Dialog to show T&C for the use of CloudDB offering,
+// and accepting those before executing any CloudDB
+// functions.
+// -------------------------------------------------------
+
+class CloudDBAcceptConditionsDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    CloudDBAcceptConditionsDialog(QString athlete);
+
+private slots:
+    void acceptConditions();
+    void rejectConditions();
+
+private:
+
+    QString athlete;
+
+    QScrollArea *scrollText;
+    QPushButton *proceedButton;
+    QPushButton *abortButton;
+
+};
+
+class CloudDBHeader
+{
+
+public:
+
+    enum headerType { Chart, UserMetric };
+    typedef enum headerType CloudDBHeaderType;
+
+    static bool writeHeaderCache(QList<CommonAPIHeaderV1>*, CloudDBHeaderType headerType, QString cache_Dir );
+    static bool readHeaderCache(QList<CommonAPIHeaderV1>*, CloudDBHeaderType headerType, QString cache_Dir );
+    static bool getAllCachedHeader(QList<CommonAPIHeaderV1> *objectHeader, CloudDBHeaderType type, QString cache_Dir, QString url,
+                                      QNetworkAccessManager *nam, QNetworkReply *reply);
+
+
+    static void setChartHeaderStale(bool b) {chartHeaderStatusStale = b;}
+    static bool isStaleChartHeader() {return chartHeaderStatusStale;}
+
+    static void setUserMetricHeaderStale(bool b) {userMetricHeaderStatusStale = b;}
+    static bool isStaleUserMetricHeader() {return userMetricHeaderStatusStale;}
+
+private:
+
+    static const int header_magic_string = 9876543210;
+    static const int header_cache_version = 1;
+
+    static bool chartHeaderStatusStale;
+    static bool userMetricHeaderStatusStale;
+
+};
+
+
 
 
 #endif // CLOUDDBCOMMON_H

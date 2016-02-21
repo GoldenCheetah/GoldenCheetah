@@ -98,6 +98,28 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
     QTextStream out(&file);
     out.setCodec("UTF-8");
 
+    serializeToQTextStream(out, charts);
+
+    // close file
+    file.close();
+}
+
+void
+LTMChartParser::serializeToQString(QString* string, QList<LTMSettings> charts)
+{
+    QTextStream out(string);
+    out.setCodec("UTF-8");
+
+    serializeToQTextStream(out, charts);
+
+    // write all to out
+    out.flush();
+
+}
+
+void
+LTMChartParser::serializeToQTextStream(QTextStream& out, QList<LTMSettings>& charts)
+{
     // begin document
     out << QString("<charts version=\"%1\">\n").arg(LTM_VERSION_NUMBER);
 
@@ -115,39 +137,6 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
 
     // end document
     out << "</charts>\n";
-
-    // close file
-    file.close();
-}
-
-void
-LTMChartParser::serializeToQString(QString* string, QList<LTMSettings> charts)
-{
-    // difference to "serialize" is that it does not contain any /n newlines
-
-    QTextStream out(string);
-    out.setCodec("UTF-8");
-
-    // begin document
-    out << QString("<charts version=\"%1\">").arg(LTM_VERSION_NUMBER);
-
-    // write out to file
-    foreach (LTMSettings chart, charts) {
-
-        out <<"\t<chart name=\"" << Utils::xmlprotect(chart.name) <<"\">\"";
-        // chart name
-        QByteArray marshall;
-        QDataStream s(&marshall, QIODevice::WriteOnly);
-        s << chart;
-        out<<marshall.toBase64();
-        out<<"\"</chart>";
-    }
-
-    // end document
-    out << "</charts>";
-
-    // write all to out
-    out.flush();
 
 }
 
