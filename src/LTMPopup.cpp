@@ -120,17 +120,22 @@ LTMPopup::setData(Specification spec, const RideMetric *metric, QString title)
     selected.clear();
 
     // set headings
-    rides->setColumnCount(2);
+    rides->setColumnCount(3);
 
     // when
     QTableWidgetItem *h = new QTableWidgetItem(tr("Date & Time"), QTableWidgetItem::Type);
     rides->setHorizontalHeaderItem(0,h);
 
+    // keywords
+    h = new QTableWidgetItem(tr("Keywords"), QTableWidgetItem::Type);
+    h->setTextAlignment(Qt::AlignLeft);
+    rides->setHorizontalHeaderItem(1,h);
+
     // value & process html encoding of(TM)
     QString name(Utils::unprotect(metric->name()));
     h = new QTableWidgetItem(name, QTableWidgetItem::Type);
 
-    rides->setHorizontalHeaderItem(1,h);
+    rides->setHorizontalHeaderItem(2,h);
 
     // now add rows to the table for each entry
     foreach(RideItem *item, context->athlete->rideCache->rides()) {
@@ -148,6 +153,11 @@ LTMPopup::setData(Specification spec, const RideMetric *metric, QString title)
         rides->setItem(count, 0, t);
         rides->setRowHeight(count, 14);
 
+        QTableWidgetItem *k = new QTableWidgetItem(item->getText("Keywords", ""));
+        k->setFlags(k->flags() & (~Qt::ItemIsEditable));
+        k->setTextAlignment(Qt::AlignLeft);
+        rides->setItem(count, 1, k);
+
         // metrics
         double d = item->getForSymbol(metric->symbol());
         const_cast<RideMetric *>(metric)->setValue(d);
@@ -156,7 +166,7 @@ LTMPopup::setData(Specification spec, const RideMetric *metric, QString title)
         h = new QTableWidgetItem(value,QTableWidgetItem::Type);
         h->setFlags(t->flags() & (~Qt::ItemIsEditable));
         h->setTextAlignment(Qt::AlignHCenter);
-        rides->setItem(count, 1, h);
+        rides->setItem(count, 2, h);
 
         count++;
     }
@@ -241,12 +251,18 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
     selected.clear();
 
     // set headings
-    rides->setColumnCount(1);
+    rides->setColumnCount(2);
     QTableWidgetItem *h = new QTableWidgetItem(tr("Date & Time"), QTableWidgetItem::Type);
     rides->setHorizontalHeaderItem(0,h);
+
+    // Keywords
+    h = new QTableWidgetItem(tr("Keywords"), QTableWidgetItem::Type);
+    h->setTextAlignment(Qt::AlignLeft);
+    rides->setHorizontalHeaderItem(1,h);
+
     bool nonRideMetrics = false; // a non Ride specific metrics is shown on the Chart
     // collect the header texts (to know the number of columns)
-    int column = 1;
+    int column = 2;
     QList<QString> headerList;
     foreach(MetricDetail d, settings.metrics) {
          // only add columns for ride related metrics (DB, META and BEST)
@@ -259,9 +275,9 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
          }
     }
     // set the header texts of relevant columns exist
-    if (column > 1) {
+    if (column > 2) {
         rides->setColumnCount(column);
-        int i = 1;
+        int i = 2;
         foreach (QString header, headerList) {
             h = new QTableWidgetItem(header,QTableWidgetItem::Type);
             rides->setHorizontalHeaderItem(i++,h);
@@ -293,8 +309,13 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
              rides->setItem(count, 0, t);
              rides->setRowHeight(count, 14);
 
+             QTableWidgetItem *k = new QTableWidgetItem(item->getText("Keywords", ""));
+             k->setFlags(k->flags() & (~Qt::ItemIsEditable));
+             k->setTextAlignment(Qt::AlignLeft);
+             rides->setItem(count, 1, k);
+
              // the column data has to be determined depending on the metrics type
-             int column = 1;
+             int column = 2;
              // per selected Ride find values for each Metrics
              foreach(MetricDetail d, settings.metrics) {
                  QString value;
