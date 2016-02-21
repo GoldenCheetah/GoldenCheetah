@@ -15,8 +15,7 @@
 include(gcconfig.pri)
 
 # You can also define your own local source to add to build
-HEADERS += $${LOCALHEADERS} \
-    TrainBottom.h
+HEADERS += $${LOCALHEADERS}
 SOURCE += $${LOCALSOURCE}
 
 
@@ -760,6 +759,7 @@ HEADERS  += \
         TPUploadDialog.h \
         TPUpload.h \
         TrainDB.h \
+        TrainBottom.h \
         TrainingstagebuchUploader.h \
         TrainSidebar.h \
         TreeMapPlot.h \
@@ -1028,6 +1028,7 @@ SOURCES += \
         TPDownloadDialog.cpp \
         TPUpload.cpp \
         TPUploadDialog.cpp \
+        TrainBottom.cpp \
         TrainDB.cpp \
         TrainingstagebuchUploader.cpp \
         TrainSidebar.cpp \
@@ -1039,6 +1040,7 @@ SOURCES += \
         UserData.cpp \
         UserMetric.cpp \
         UserMetricParser.cpp \
+        Utils.cpp \
         VDOTCalculator.cpp \
         VDOT.cpp \
         VeloHeroUploader.cpp \
@@ -1055,9 +1057,7 @@ SOURCES += \
         WorkoutWizard.cpp \
         WPrime.cpp \
         Zones.cpp \
-        ZwoParser.cpp \
-        TrainBottom.cpp \
-        Utils.cpp
+        ZwoParser.cpp
 
 
 ###======================================
