@@ -412,41 +412,11 @@ MainWindow::MainWindow(const QDir &home)
     metal.setColor(QPalette::Button, QColor(215,215,215));
 
     // get those icons
-    importIcon = iconFromPNG(":images/mac/download.png");
-    composeIcon = iconFromPNG(":images/mac/compose.png");
-    intervalIcon = iconFromPNG(":images/mac/stop.png");
-    splitIcon = iconFromPNG(":images/mac/split.png");
-    deleteIcon = iconFromPNG(":images/mac/trash.png");
     sidebarIcon = iconFromPNG(":images/mac/sidebar.png");
     lowbarIcon = iconFromPNG(":images/mac/lowbar.png");
     tabbedIcon = iconFromPNG(":images/mac/tabbed.png");
     tiledIcon = iconFromPNG(":images/mac/tiled.png");
     QSize isize(19,19);
-
-    Spacer *spacerl = new Spacer(this);
-    spacerl->setFixedWidth(5);
-
-    import = new QPushButton(this);
-    import->setIcon(importIcon);
-    import->setIconSize(isize);
-    import->setFixedHeight(24);
-    import->setStyle(toolStyle);
-    import->setToolTip(tr("Download from Device"));
-    import->setPalette(metal);
-    HelpWhatsThis *helpImport = new HelpWhatsThis(import);
-    import->setWhatsThis(helpImport->getWhatsThisText(HelpWhatsThis::ToolBar_Download));
-    connect(import, SIGNAL(clicked(bool)), this, SLOT(downloadRide()));
-
-    compose = new QPushButton(this);
-    compose->setIcon(composeIcon);
-    compose->setIconSize(isize);
-    compose->setFixedHeight(24);
-    compose->setStyle(toolStyle);
-    compose->setToolTip(tr("Create Manual Activity"));
-    compose->setPalette(metal);
-    connect(compose, SIGNAL(clicked(bool)), this, SLOT(manualRide()));
-    HelpWhatsThis *helpCompose = new HelpWhatsThis(compose);
-    compose->setWhatsThis(helpCompose->getWhatsThisText(HelpWhatsThis::ToolBar_Manual));
 
     lowbar = new QPushButton(this);
     lowbar->setIcon(lowbarIcon);
@@ -470,21 +440,6 @@ MainWindow::MainWindow(const QDir &home)
     HelpWhatsThis *helpSideBar = new HelpWhatsThis(sidebar);
     sidebar->setWhatsThis(helpSideBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleSidebar));
 
-    actbuttons = new QtSegmentControl(this);
-    actbuttons->setStyle(toolStyle);
-    actbuttons->setIconSize(isize);
-    actbuttons->setCount(3);
-    actbuttons->setSegmentIcon(0, intervalIcon);
-    actbuttons->setSegmentIcon(1, splitIcon);
-    actbuttons->setSegmentIcon(2, deleteIcon);
-    actbuttons->setSelectionBehavior(QtSegmentControl::SelectNone); //wince. spelling. ugh
-    actbuttons->setFixedHeight(24);
-    actbuttons->setSegmentToolTip(0, tr("Find Intervals..."));
-    actbuttons->setSegmentToolTip(1, tr("Split Activity..."));
-    actbuttons->setSegmentToolTip(2, tr("Delete Activity"));
-    actbuttons->setPalette(metal);
-    connect(actbuttons, SIGNAL(segmentSelected(int)), this, SLOT(actionClicked(int)));
-
     styleSelector = new QtSegmentControl(this);
     styleSelector->setStyle(toolStyle);
     styleSelector->setIconSize(isize);
@@ -498,11 +453,7 @@ MainWindow::MainWindow(const QDir &home)
     styleSelector->setPalette(metal);
     connect(styleSelector, SIGNAL(segmentSelected(int)), this, SLOT(setStyleFromSegment(int))); //avoid toggle infinitely
 
-    head->addWidget(spacerl);
-    head->addWidget(import);
-    head->addWidget(compose);
-    head->addWidget(actbuttons);
-
+    head->addWidget(new Spacer(this));
     head->addStretch();
     head->addWidget(scopebar);
     head->addStretch();
@@ -2387,7 +2338,7 @@ MainWindow::searchFocusIn()
         anim->setDuration(300);
         anim->setEasingCurve(QEasingCurve::InOutQuad);
         anim->setStartValue(searchBox->width());
-        anim->setEndValue(350);
+        anim->setEndValue(500);
         anim->start();
     }
 }

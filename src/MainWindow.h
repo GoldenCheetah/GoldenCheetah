@@ -254,13 +254,12 @@ class MainWindow : public QMainWindow
         QToolBar *head;
 #else
         // Not on Mac so use other types
-        QPushButton *import, *compose, *sidebar, *lowbar;
-        QtSegmentControl *actbuttons, *styleSelector;
+        QPushButton *sidebar, *lowbar;
+        QtSegmentControl *styleSelector;
         GcToolBar *head;
 
         // the icons
-        QIcon importIcon, composeIcon, intervalIcon, splitIcon,
-              deleteIcon, sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
+        QIcon sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
 #endif
         // tab bar (that supports swtitching on drag and drop)
         DragBar *tabbar;
