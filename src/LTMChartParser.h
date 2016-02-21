@@ -48,6 +48,9 @@ protected:
     MetricDetail metric;
     int red, green, blue;
     QList<LTMSettings> settings;
+
+private:
+    static void serializeToQTextStream(QTextStream&, QList<LTMSettings>& );
 };
 
 class ChartTreeView : public QTreeWidget
