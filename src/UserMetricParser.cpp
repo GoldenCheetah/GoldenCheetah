@@ -44,7 +44,7 @@ bool UserMetricParser::endElement( const QString&, const QString&, const QString
     if(qName == "usermetric") {
 
         // get the contents
-        add.program = buffer.mid(1,buffer.length()-2);
+        add.program = Utils::unprotect(buffer.mid(1,buffer.length()-2));
 
         // add to the list
         settings << add;
@@ -61,18 +61,18 @@ bool UserMetricParser::startElement( const QString&, const QString&, const QStri
 
     // basic settings for the metric are in the element attributes
     for(int i=0; i<attrs.count(); i++) {
-        if (attrs.qName(i) == "symbol") add.symbol=attrs.value(i);
-        if (attrs.qName(i) == "name") add.name=attrs.value(i);
-        if (attrs.qName(i) == "description") add.description=attrs.value(i);
-        if (attrs.qName(i) == "precision") add.precision=attrs.value(i).toInt();
-        if (attrs.qName(i) == "aggzero") add.aggzero=attrs.value(i).toInt();
-        if (attrs.qName(i) == "istime") add.istime=attrs.value(i).toInt();
-        if (attrs.qName(i) == "type") add.type=attrs.value(i).toInt();
-        if (attrs.qName(i) == "unitsMetric") add.unitsMetric=attrs.value(i);
-        if (attrs.qName(i) == "unitsImperial") add.unitsImperial=attrs.value(i);
-        if (attrs.qName(i) == "conversion") add.conversion=attrs.value(i).toDouble();
-        if (attrs.qName(i) == "conversionSum") add.conversionSum=attrs.value(i).toDouble();
-        if (attrs.qName(i) == "fingerprint") add.fingerprint=attrs.value(i);
+        if (attrs.qName(i) == "symbol") add.symbol=Utils::unprotect(attrs.value(i));
+        if (attrs.qName(i) == "name") add.name=Utils::unprotect(attrs.value(i));
+        if (attrs.qName(i) == "description") add.description=Utils::unprotect(attrs.value(i));
+        if (attrs.qName(i) == "precision") add.precision=Utils::unprotect(attrs.value(i)).toInt();
+        if (attrs.qName(i) == "aggzero") add.aggzero=Utils::unprotect(attrs.value(i)).toInt();
+        if (attrs.qName(i) == "istime") add.istime=Utils::unprotect(attrs.value(i)).toInt();
+        if (attrs.qName(i) == "type") add.type=Utils::unprotect(attrs.value(i)).toInt();
+        if (attrs.qName(i) == "unitsMetric") add.unitsMetric=Utils::unprotect(attrs.value(i));
+        if (attrs.qName(i) == "unitsImperial") add.unitsImperial=Utils::unprotect(attrs.value(i));
+        if (attrs.qName(i) == "conversion") add.conversion=Utils::unprotect(attrs.value(i)).toDouble();
+        if (attrs.qName(i) == "conversionSum") add.conversionSum=Utils::unprotect(attrs.value(i)).toDouble();
+        if (attrs.qName(i) == "fingerprint") add.fingerprint=Utils::unprotect(attrs.value(i));
     }
 
     return true;
