@@ -461,7 +461,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         } else if (rtData.mode == CRS){
             value = rtData.getSlope();
             valueLabel->setText(QString("%1%").arg(value, 0, 'f', 1));
-        } else if (rtData.mode == CRS){
+        } else if (rtData.mode == LEV){
             value = rtData.getLevel();
             valueLabel->setText(QString("%1").arg(value));
         }
