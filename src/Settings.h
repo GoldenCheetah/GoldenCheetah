@@ -185,6 +185,9 @@
 #define GC_REMOTE_HIGHER                "<global-trainmode>remote/higher"
 #define GC_REMOTE_LOWER                 "<global-trainmode>remote/lower"
 #define GC_REMOTE_CALIBRATE             "<global-trainmode>remote/calibrate"
+#define GC_DEV_LEVELS                   "<global-trainmode>levels/levels"
+#define GC_DEV_MINLEVEL                 "<global-trainmode>levels/minlevel"
+#define GC_DEV_LEVELSTEP                "<global-trainmode>levels/levelstep"
 
 // --------------------------------------------------------------------------------
 // Athlete Specific Properties - Stored in /config subfolder of the related athlete

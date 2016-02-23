@@ -88,6 +88,10 @@ void RealtimeData::setLoad(double load)
 {
     this->load = load;
 }
+void RealtimeData::setLevel(int level)
+{
+    this->level = level;
+}
 void RealtimeData::setMsecs(long x)
 {
     this->msecs = x;
@@ -181,6 +185,10 @@ double RealtimeData::getSlope() const
 double RealtimeData::getLoad() const
 {
     return load;
+}
+int RealtimeData::getLevel() const
+{
+    return level;
 }
 long RealtimeData::getMsecs() const
 {

@@ -485,6 +485,7 @@ bool TrainDB::createDefaultEntriesWorkout()
     // remove existing entries - just in case
     query.exec("DELETE FROM workouts where filepath = \"//1\"");
     query.exec("DELETE FROM workouts where filepath = \"//2\"");
+    query.exec("DELETE FROM workouts where filepath = \"//3\"");
 
     // adding a space at the front of string to make manual mode always
     // appear first in a sorted list is a bit of a hack, but works ok
@@ -495,6 +496,10 @@ bool TrainDB::createDefaultEntriesWorkout()
     QString manualCrs = QString("INSERT INTO workouts (filepath, filename) values (\"//2\", \"%1\");")
             .arg(" " + tr("Manual Slope Mode")); // keep the SPACE separate so that translation cannot remove it
     rc = query.exec(manualCrs);
+
+    QString manualLev = QString("INSERT INTO workouts (filepath, filename) values (\"//3\", \"%1\");")
+            .arg(" " + tr("Manual Level Mode")); // keep the SPACE separate so that translation cannot remove it
+    rc = query.exec(manualLev);
 
 
     return rc;
@@ -516,6 +521,10 @@ bool TrainDB::upgradeDefaultEntriesWorkout()
     QString manualCrs = QString("UPDATE workouts SET filename = \"%1\" WHERE filepath = \"//2\";")
             .arg(" " + tr("Manual Slope Mode")); // keep the SPACE separate so that translation cannot remove it
     rc = query.exec(manualCrs);
+
+    QString manualLev = QString("UPDATE workouts SET filename = \"%1\" WHERE filepath = \"//3\";")
+            .arg(" " + tr("Manual Level Mode")); // keep the SPACE separate so that translation cannot remove it
+    rc = query.exec(manualLev);
 
 
     return rc;
