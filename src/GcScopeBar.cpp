@@ -101,7 +101,9 @@ GcScopeBar::configChanged(qint32 reason)
     setFixedHeight(fm.height() + 7);
 
     // set font sizes
-    font.setWeight(QFont::Black);
+#ifndef Q_OS_MAC
+    font.setWeight(QFont::Bold);
+#endif
     searchLabel->setFont(font);
     searchLabel->setFixedHeight(fm.height() + 7);
 

@@ -304,8 +304,8 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
 #else
     titleLabel->setYOff(1);
     //font.setPointSize(10);
+    font.setWeight(QFont::Bold);
 #endif
-    font.setWeight(QFont::Black);
     titleLabel->setFont(font);
 
     titleLayout->addSpacing(10);
