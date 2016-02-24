@@ -266,56 +266,12 @@ MainWindow::MainWindow(const QDir &home)
     head->setContentsMargins(20,0,20,0);
     head->setFloatable(false);
     head->setMovable(false);
-
-    // widgets
-    QWidget *macAnalButtons = new QWidget(this);
-    macAnalButtons->setContentsMargins(20,5,20,0);
-
 #else
     setUnifiedTitleAndToolBarOnMac(true);
     head = addToolBar(context->athlete->cyclist);
     head->setContentsMargins(0,0,0,0);
-
-    // widgets
-    QWidget *macAnalButtons = new QWidget(this);
-    macAnalButtons->setContentsMargins(0,0,20,0);
-
 #endif
 
-    // lhs buttons
-    QHBoxLayout *lb = new QHBoxLayout(macAnalButtons);
-    lb->setContentsMargins(0,0,10,8);
-    lb->setSpacing(0);
-    import = new QtMacButton(this, QtMacButton::TexturedRounded);
-    QPixmap *importImg = new QPixmap(":images/mac/download.png");
-    import->setImage(importImg);
-    import->setToolTip("Download");
-    HelpWhatsThis *helpImport = new HelpWhatsThis(import);
-    import->setWhatsThis(helpImport->getWhatsThisText(HelpWhatsThis::ToolBar_Download));
-    lb->addWidget(import);
-    lb->addWidget(new Spacer(this));
-
-    compose = new QtMacButton(this, QtMacButton::TexturedRounded);
-    QPixmap *composeImg = new QPixmap(":images/mac/compose.png");
-    compose->setImage(composeImg);
-    compose->setToolTip("Create");
-    lb->addWidget(compose);
-    HelpWhatsThis *helpCompose = new HelpWhatsThis(compose);
-    compose->setWhatsThis(helpCompose->getWhatsThisText(HelpWhatsThis::ToolBar_Manual));
-
-    // connect to actions
-    connect(import, SIGNAL(clicked(bool)), this, SLOT(downloadRide()));
-    connect(compose, SIGNAL(clicked(bool)), this, SLOT(manualRide()));
-
-    lb->addWidget(new Spacer(this));
-
-    // activity actions .. peaks, split, delete
-    QWidget *acts = new QWidget(this);
-    acts->setContentsMargins(0,0,0,0);
-    QHBoxLayout *pp = new QHBoxLayout(acts);
-    pp->setContentsMargins(0,0,0,0);
-    pp->setContentsMargins(0,0,0,0);
-    pp->setSpacing(5);
     sidebar = new QtMacButton(this, QtMacButton::TexturedRounded);
     QPixmap *sidebarImg = new QPixmap(":images/mac/sidebar.png");
     sidebar->setImage(sidebarImg);
@@ -336,18 +292,6 @@ MainWindow::MainWindow(const QDir &home)
     HelpWhatsThis *helpLowBar = new HelpWhatsThis(lowbar);
     lowbar->setWhatsThis(helpLowBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleComparePane));
 
-    actbuttons = new QtMacSegmentedButton(3, acts);
-    actbuttons->setWidth(115);
-    actbuttons->setNoSelect();
-    actbuttons->setImage(0, new QPixmap(":images/mac/stop.png"));
-    actbuttons->setImage(1, new QPixmap(":images/mac/split.png"));
-    actbuttons->setImage(2, new QPixmap(":images/mac/trash.png"));
-    pp->addWidget(actbuttons);
-    lb->addWidget(acts);
-    connect(actbuttons, SIGNAL(clicked(int,bool)), this, SLOT(actionClicked(int)));
-
-    lb->addWidget(new Spacer(this));
-
     QWidget *viewsel = new QWidget(this);
     viewsel->setContentsMargins(0,0,0,0);
     QHBoxLayout *pq = new QHBoxLayout(viewsel);
@@ -358,7 +302,6 @@ MainWindow::MainWindow(const QDir &home)
     ps->setSpacing (2); // low and sidebar button close together
     ps->addWidget(sidebar);
     ps->addWidget(lowbar);
-    ps->addStretch();
     pq->addLayout(ps);
 
     styleSelector = new QtMacSegmentedButton(2, viewsel);
@@ -371,7 +314,7 @@ MainWindow::MainWindow(const QDir &home)
     connect(styleSelector, SIGNAL(clicked(int,bool)), this, SLOT(toggleStyle()));
 
     // setup Mac thetoolbar
-    head->addWidget(macAnalButtons);
+    head->addWidget(new Spacer(this));
     head->addWidget(new Spacer(this));
     head->addWidget(scopebar);
     head->addWidget(new Spacer(this));
