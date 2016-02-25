@@ -8,6 +8,14 @@
 #CONFIG += debug
 #CONFIG += release
 
+# put output into a separate dir
+# to keep main directory clear
+#DESTDIR = .
+#OBJECTS_DIR = ./.obj
+#MOC_DIR = ./.moc
+#RCC_DIR = ./.rcc
+#UI_DIR = ./.ui
+
 # If you want a console window to appear on Windows machines
 # then uncomment the following two lines.
 #CONFIG += console

@@ -54,6 +54,11 @@ lessThan(QT_MAJOR_VERSION, 5) {
     }
 }
 
+###=======================================================================
+### Directory Structure - Split into subdirs to be more manageable
+###=======================================================================
+INCLUDEPATH += ./ANT ./Train ./FileIO ./Cloud ./Charts ./Metrics ./Gui ./Core
+
 
 ###=======================================================================
 ### DISTRIBUTED SOURCE [Snaffled in sources to avoid further dependencies]
@@ -109,7 +114,7 @@ LIBS += $${LIBZ_LIBS}
 # windows icon and use QT zlib, not sure why different but keep for now
 win32 {
 
-    RC_FILE = windowsico.rc
+    RC_FILE = win32/windowsico.rc
     INCLUDEPATH += ./win32 $${QT_INSTALL_PREFIX}/src/3rdparty/zlib
     LIBS += -lws2_32
 
@@ -126,27 +131,27 @@ macx {
     # on mac we use native buttons and video, but have native fullscreen support
     LIBS    += -lobjc -framework IOKit -framework AppKit -framework QTKit
     HEADERS += \
-            QtMacVideoWindow.h \
-            QtMacSegmentedButton.h \
-            QtMacButton.h
+            Gui/QtMacVideoWindow.h \
+            Gui/QtMacSegmentedButton.h \
+            Gui/QtMacButton.h
 
     OBJECTIVE_SOURCES += \
-            QtMacVideoWindow.mm \
-            QtMacSegmentedButton.mm \
-            QtMacButton.mm
+            Gui/QtMacVideoWindow.mm \
+            Gui/QtMacSegmentedButton.mm \
+            Gui/QtMacButton.mm
 
 } else {
 
     # not on mac we need our own full screen support and segment control button
-    HEADERS += QTFullScreen.h
-    SOURCES += QTFullScreen.cpp
+    HEADERS += Gui/QTFullScreen.h
+    SOURCES += Gui/QTFullScreen.cpp
 
     HEADERS += ../qtsolutions/segmentcontrol/qtsegmentcontrol.h
     SOURCES += ../qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
 
     # we now have videowindow, it will do nothing
-    HEADERS += VideoWindow.h
-    SOURCES += VideoWindow.cpp
+    HEADERS += Train/VideoWindow.h
+    SOURCES += Train/VideoWindow.cpp
 }
 
 
@@ -154,16 +159,16 @@ macx {
 ### LANGUAGE SUPPORT
 ###=================
 
-TRANSLATIONS = translations/gc_fr.ts \
-               translations/gc_ja.ts \
-               translations/gc_it.ts \
-               translations/gc_pt-br.ts \
-               translations/gc_de.ts \
-               translations/gc_cs.ts \
-               translations/gc_es.ts \
-               translations/gc_pt.ts \
-               translations/gc_ru.ts \
-               translations/gc_zh-tw.ts
+TRANSLATIONS = Resources/translations/gc_fr.ts \
+               Resources/translations/gc_ja.ts \
+               Resources/translations/gc_it.ts \
+               Resources/translations/gc_pt-br.ts \
+               Resources/translations/gc_de.ts \
+               Resources/translations/gc_cs.ts \
+               Resources/translations/gc_es.ts \
+               Resources/translations/gc_pt.ts \
+               Resources/translations/gc_ru.ts \
+               Resources/translations/gc_zh-tw.ts
 
 # need lrelease to generate qm files
 isEmpty(QMAKE_LRELEASE) {
@@ -173,7 +178,7 @@ isEmpty(QMAKE_LRELEASE) {
 }
 
 # how to run lrelease
-isEmpty(TS_DIR):TS_DIR = translations
+isEmpty(TS_DIR):TS_DIR = Resources/translations
 TSQM.name = lrelease ${QMAKE_FILE_IN}
 TSQM.input = TRANSLATIONS
 TSQM.output = $$TS_DIR/${QMAKE_FILE_BASE}.qm
@@ -187,8 +192,7 @@ PRE_TARGETDEPS += compiler_TSQM_make_all
 ### RESOURCES
 ###==========
 
-RESOURCES = application.qrc \
-            RideWindow.qrc
+RESOURCES = Resources/application.qrc Resources/RideWindow.qrc
 
 
 
@@ -230,8 +234,8 @@ unix:!macx {
 
 # if we have it we can add twitter support
 contains(DEFINES, "GC_HAVE_KQOAUTH") {
-        SOURCES     += TwitterDialog.cpp
-        HEADERS     += TwitterDialog.h
+        SOURCES     += Cloud/TwitterDialog.cpp
+        HEADERS     += Cloud/TwitterDialog.h
 }
 
 
@@ -267,8 +271,8 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
     LIBS        += $${SRMIO_LIBS}
 
     # add support for srm downloads
-    HEADERS     += SrmDevice.h
-    SOURCES     += SrmDevice.cpp
+    HEADERS     += FileIO/SrmDevice.h
+    SOURCES     += FileIO/SrmDevice.cpp
 }
 
 
@@ -291,8 +295,8 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
     QT          += opengl
 
     # add 3d plot
-    HEADERS     += ModelPlot.h ModelWindow.h
-    SOURCES     += ModelPlot.cpp ModelWindow.cpp
+    HEADERS     += Charts/ModelPlot.h Charts/ModelWindow.h
+    SOURCES     += Charts/ModelPlot.cpp Charts/ModelWindow.cpp
 }
 
 
@@ -317,8 +321,8 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
     LIBS        += $${KML_LIBS}
 
     # add kml file i/o
-    SOURCES     += KmlRideFile.cpp
-    HEADERS     += KmlRideFile.h
+    SOURCES     += FileIO/KmlRideFile.cpp
+    HEADERS     += FileIO/KmlRideFile.h
 }
 
 
@@ -337,8 +341,8 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
     LIBS        += $${ICAL_LIBS}
 
     # add caldav and diary functions
-    HEADERS     += ICalendar.h DiaryWindow.h CalDAV.h
-    SOURCES     += ICalendar.cpp DiaryWindow.cpp CalDAV.cpp
+    HEADERS     += Core/ICalendar.h Charts/DiaryWindow.h Cloud/CalDAV.h
+    SOURCES     += Core/ICalendar.cpp Charts/DiaryWindow.cpp Cloud/CalDAV.cpp
 }
 
 
@@ -361,8 +365,8 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
     LIBS        += $${LIBUSB_LIBS}
 
     # lots of dependents
-    SOURCES     += LibUsb.cpp EzUsb.c Fortius.cpp FortiusController.cpp
-    HEADERS     += LibUsb.h EzUsb.h Fortius.cpp FortiusController.h
+    SOURCES     += Train/LibUsb.cpp Train/EzUsb.c Train/Fortius.cpp Train/FortiusController.cpp
+    HEADERS     += Train/LibUsb.h Train/EzUsb.h Train/Fortius.cpp Train/FortiusController.h
 }
 
 
@@ -383,8 +387,8 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
     INCLUDEPATH += $${USBXPRESS_INCLUDE}
     LIBS        += $${USBXPRESS_LIBS}
 
-    SOURCES += USBXpress.cpp
-    HEADERS += USBXpress.h
+    SOURCES += Train/USBXpress.cpp
+    HEADERS += Train/USBXpress.h
 }
 
 
@@ -435,8 +439,8 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
 
     DEFINES += GC_WANT_HTTP
 
-    HEADERS +=  APIWebService.h
-    SOURCES +=  APIWebService.cpp
+    HEADERS +=  Core/APIWebService.h
+    SOURCES +=  Core/APIWebService.cpp
 
     HEADERS +=  $$HTPATH/httpglobal.h \
                 $$HTPATH/httplistener.h \
@@ -480,10 +484,10 @@ equals(CloudDB, active) {
 
         greaterThan(QT_MINOR_VERSION, 4) {
 
-            HEADERS += CloudDBChart.h CloudDBCommon.h \
-                       CloudDBCurator.h CloudDBStatus.h
-            SOURCES += CloudDBChart.cpp CloudDBCommon.cpp \
-                       CloudDBCurator.cpp CloudDBStatus.cpp
+            HEADERS += Cloud/CloudDBChart.h Cloud/CloudDBCommon.h \
+                       Cloud/CloudDBCurator.h Cloud/CloudDBStatus.h
+            SOURCES += Cloud/CloudDBChart.cpp Cloud/CloudDBCommon.cpp \
+                       Cloud/CloudDBCurator.cpp Cloud/CloudDBStatus.cpp
             DEFINES += GC_HAS_CLOUD_DB
 
         } else {
@@ -517,12 +521,12 @@ equals(CloudDB, active) {
 greaterThan(QT_MAJOR_VERSION, 4) {
 
     # Features that only work with QT5 or higher
-    SOURCES += Dropbox.cpp
-    HEADERS += Dropbox.h
-    SOURCES += GoogleDrive.cpp
-    HEADERS += GoogleDrive.h
-    SOURCES += Monark.cpp MonarkController.cpp MonarkConnection.cpp
-    HEADERS += Monark.h MonarkController.h MonarkConnection.h
+    SOURCES += Cloud/Dropbox.cpp
+    HEADERS += Cloud/Dropbox.h
+    SOURCES += Cloud/GoogleDrive.cpp
+    HEADERS += Cloud/GoogleDrive.h
+    SOURCES += Train/Monark.cpp Train/MonarkController.cpp Train/MonarkConnection.cpp
+    HEADERS += Train/Monark.h Train/MonarkController.h Train/MonarkConnection.h
 }
 
 
@@ -530,553 +534,176 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 ### LEX AND YACC SOURCES
 ###=====================
 
-YACCSOURCES += DataFilter.y \
-               JsonRideFile.y \
-               WithingsParser.y \
-               RideDB.y
+YACCSOURCES += Core/DataFilter.y \
+               FileIO/JsonRideFile.y \
+               Cloud/WithingsParser.y \
+               Core/RideDB.y
 
-LEXSOURCES  += DataFilter.l \
-               JsonRideFile.l \
-               WithingsParser.l \
-               RideDB.l
+LEXSOURCES  += Core/DataFilter.l \
+               FileIO/JsonRideFile.l \
+               Cloud/WithingsParser.l \
+               Core/RideDB.l
 
 
 ###=========================================
 ### HEADER FILES [scanned by qmake, for moc]
 ###=========================================
 
-HEADERS  += \
-        AboutDialog.h \
-        AddDeviceWizard.h \
-        AddIntervalDialog.h \
-        Aerolab.h \
-        AerolabWindow.h \
-        AllPlot.h \
-        AllPlotInterval.h \
-        AllPlotSlopeCurve.h \
-        AllPlotWindow.h \
-        AnalysisSidebar.h \
-        ANTChannel.h \
-        ANT.h \
-        ANTlocalController.h \
-        ANTLogger.h \
-        ANTMessage.h \
-        ANTMessages.h \
-        AthleteBackup.h \
-        Athlete.h \
-        BatchExportDialog.h \
-        BestIntervalDialog.h \
-        Bin2RideFile.h \
-        BingMap.h \
-        BinRideFile.h \
-        BlankState.h \
-        CalendarDownload.h \
-        ChartBar.h \
-        ChartSettings.h \
-        ChooseCyclistDialog.h \
-        ../qtsolutions/codeeditor/codeeditor.h \
-        ColorButton.h \
-        Colors.h \
-        CommPort.h \
-        CompareDateRange.h \
-        CompareInterval.h \
-        ComparePane.h \
-        Computrainer3dpFile.h \
-        ComputrainerController.h \
-        Computrainer.h \
-        ConfigDialog.h \
-        Context.h \
-        CpPlotCurve.h \
-        CPPlot.h \
-        CriticalPowerWindow.h \
-        CsvRideFile.h \
-        DataFilter.h \
-        DataProcessor.h \
-        DaysScaleDraw.h \
-        DeviceConfiguration.h \
-        Device.h \
-        DeviceTypes.h \
-        DialWindow.h \
-        DiarySidebar.h \
-        DownloadRideDialog.h \
-        DragBar.h \
-        ErgDBDownloadDialog.h \
-        ErgDB.h \
-        ErgFile.h \
-        ErgFilePlot.h \
-        ExtendedCriticalPower.h \
-        FileStore.h \
-        FitlogParser.h \
-        FitlogRideFile.h \
-        FitRideFile.h \
-        FreeSearch.h \
-        GcCalendarModel.h \
-        GcCrashDialog.h \
-        GcOverlayWidget.h \
-        GcPane.h \
-        GcRideFile.h \
-        GcScopeBar.h \
-        GcSideBarItem.h \
-        GcToolBar.h \
-        GcUpgrade.h \
-        GcWindowLayout.h \
-        GcWindowRegistry.h \
-        GenerateHeatMapDialog.h \
-        GoldenCheetah.h \
-        GoogleMapControl.h \
-        GProgressDialog.h \
-        GpxParser.h \
-        GpxRideFile.h \
-        HelpWhatsThis.h \
-        HelpWindow.h \
-        HistogramWindow.h \
-        HomeWindow.h \
-        HrPwPlot.h \
-        HrPwWindow.h \
-        HrZones.h \
-        IdleTimer.h \
-        IndendPlotMarker.h \
-        IntervalItem.h \
-        IntervalSummaryWindow.h \
-        IntervalTreeView.h \
-        JouleDevice.h \
-        JsonRideFile.h \
-        LapsEditor.h \
-        Library.h \
-        LibraryParser.h \
-        LocalFileStore.h \
-        LogTimeScaleDraw.h \
-        LTMCanvasPicker.h \
-        LTMChartParser.h \
-        LTMOutliers.h \
-        LTMPlot.h \
-        LTMPopup.h \
-        LTMSettings.h \
-        LTMSidebar.h \
-        LTMTool.h \
-        LTMTrend2.h \
-        LTMTrend.h \
-        LTMWindow.h \
-        MacroDevice.h \
-        MainWindow.h \
-        ManualRideDialog.h \
-        ManualRideFile.h \
-        MergeActivityWizard.h \
-        MetadataWindow.h \
-        MeterWidget.h \
-        MoxyDevice.h \
-        MUPlot.h \
-        MUPool.h \
-        MUWidget.h \
-        NamedSearch.h \
-        NewCyclistDialog.h \
-        NullController.h \
-        OAuthDialog.h \
-        PaceZones.h \
-        Pages.h \
-        PDModel.h \
-        PfPvPlot.h \
-        PfPvWindow.h \
-        PMCData.h \
-        PolarRideFile.h \
-        PowerHist.h \
-        PowerTapDevice.h \
-        PowerTapUtil.h \
-        PwxRideFile.h \
-        ../qtsolutions/json/mvjson.h \
-        ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.h \
-        QuarqParser.h \
-        QuarqRideFile.h \
-        ../qxt/src/qxtspanslider.h \
-        ../qxt/src/qxtspanslider_p.h \
-        ../qxt/src/qxtstringspinbox.h \
-        ../qzip/zipreader.h \
-        ../qzip/zipwriter.h \
-        RawRideFile.h \
-        RealtimeController.h \
-        RealtimeData.h \
-        RealtimePlot.h \
-        RealtimePlotWindow.h \
-        ReferenceLineDialog.h \
-        RemoteControl.h \
-        RideAutoImportConfig.h \
-        RideCache.h \
-        RideCacheModel.h \
-        RideEditor.h \
-        RideFileCache.h \
-        RideFileCommand.h \
-        RideFile.h \
-        RideFileTableModel.h \
-        RideImportWizard.h \
-        RideItem.h \
-        RideMetadata.h \
-        RideMetric.h \
-        RideNavigator.h \
-        RideNavigatorProxy.h \
-        RideSummaryWindow.h \
-        RideWindow.h \
-        Route.h \
-        RouteParser.h \
-        SaveDialogs.h \
-        ScatterPlot.h \
-        ScatterWindow.h \
-        SearchBox.h \
-        SearchFilterBox.h \
-        Season.h \
-        SeasonParser.h \
-        Secrets.h \
-        Serial.h \
-        Settings.h \
-        ShareDialog.h \
-        SlfParser.h \
-        SlfRideFile.h \
-        SmallPlot.h \
-        SmfParser.h \
-        SmfRideFile.h \
-        SmlParser.h \
-        SmlRideFile.h \
-        SpecialFields.h \
-        Specification.h \
-        SpinScanPlot.h \
-        SpinScanPlotWindow.h \
-        SpinScanPolarPlot.h \
-        SplitActivityWizard.h \
-        SportPlusHealthUploader.h \
-        SrdRideFile.h \
-        SrmRideFile.h \
-        Statistic.h \
-        SummaryWindow.h \
-        SyncRideFile.h \
-        Tab.h \
-        TabView.h \
-        TcxParser.h \
-        TcxRideFile.h \
-        TimeUtils.h \
-        ToolsDialog.h \
-        ToolsRhoEstimator.h \
-        TPDownloadDialog.h \
-        TPDownload.h \
-        TPUploadDialog.h \
-        TPUpload.h \
-        TrainDB.h \
-        TrainBottom.h \
-        TrainingstagebuchUploader.h \
-        TrainSidebar.h \
-        TreeMapPlot.h \
-        TreeMapWindow.h \
-        TxtRideFile.h \
-        Units.h \
-        UserData.h \
-        UserMetricParser.h \
-        UserMetricSettings.h \
-        Utils.h \
-        VDOTCalculator.h \
-        VeloHeroUploader.h \
-        VideoLayoutParser.h \
-        VideoSyncFile.h \
-        Views.h \
-        WithingsDownload.h \
-        WkoRideFile.h \
-        WorkoutPlotWindow.h \
-        WorkoutWidget.h \
-        WorkoutWidgetItems.h \
-        WorkoutWindow.h \
-        WorkoutWizard.h \
-        WPrime.h \
-        ZoneScaleDraw.h \
-        Zones.h \
-        ZwoParser.h
+# ANT+
+HEADERS  += ANT/ANTChannel.h ANT/ANT.h ANT/ANTlocalController.h ANT/ANTLogger.h ANT/ANTMessage.h ANT/ANTMessages.h
+
+# Charts and associated widgets
+HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPlotInterval.h Charts/AllPlotSlopeCurve.h \
+           Charts/AllPlotWindow.h Charts/BingMap.h Charts/BlankState.h Charts/ChartBar.h Charts/ChartSettings.h \
+           Charts/CpPlotCurve.h Charts/CPPlot.h Charts/CriticalPowerWindow.h Charts/DaysScaleDraw.h Charts/GcOverlayWidget.h \
+           Charts/GcPane.h Charts/GoldenCheetah.h Charts/GoogleMapControl.h Charts/HistogramWindow.h Charts/HomeWindow.h \
+           Charts/HrPwPlot.h Charts/HrPwWindow.h Charts/IndendPlotMarker.h Charts/IntervalSummaryWindow.h Charts/LogTimeScaleDraw.h \
+           Charts/LTMCanvasPicker.h Charts/LTMChartParser.h Charts/LTMOutliers.h Charts/LTMPlot.h Charts/LTMPopup.h \
+           Charts/LTMSettings.h Charts/LTMSidebar.h Charts/LTMTool.h Charts/LTMTrend2.h Charts/LTMTrend.h Charts/LTMWindow.h \
+           Charts/MetadataWindow.h Charts/MUPlot.h Charts/MUPool.h Charts/MUWidget.h Charts/PfPvPlot.h Charts/PfPvWindow.h \
+           Charts/PowerHist.h Charts/ReferenceLineDialog.h Charts/RideEditor.h Charts/RideSummaryWindow.h Charts/RideWindow.h \
+           Charts/ScatterPlot.h Charts/ScatterWindow.h Charts/SmallPlot.h Charts/SummaryWindow.h Charts/TreeMapPlot.h \
+           Charts/TreeMapWindow.h Charts/ZoneScaleDraw.h
+
+# cloud services
+HEADERS += Cloud/CalendarDownload.h Cloud/FileStore.h Cloud/LocalFileStore.h Cloud/OAuthDialog.h Cloud/ShareDialog.h \
+           Cloud/SportPlusHealthUploader.h Cloud/TPDownloadDialog.h Cloud/TPDownload.h Cloud/TPUploadDialog.h Cloud/TPUpload.h \
+           Cloud/TrainingstagebuchUploader.h Cloud/VeloHeroUploader.h Cloud/WithingsDownload.h 
+# core data 
+HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
+           Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideItem.h Core/Route.h Core/RouteParser.h \
+           Core/Season.h Core/SeasonParser.h Core/Secrets.h Core/Settings.h Core/Specification.h Core/TimeUtils.h \
+           Core/Units.h Core/UserData.h Core/Utils.h
+
+# device and file IO or edit
+HEADERS += FileIO/AthleteBackup.h FileIO/BatchExportDialog.h FileIO/Bin2RideFile.h FileIO/BinRideFile.h FileIO/CommPort.h \
+           FileIO/Computrainer3dpFile.h FileIO/CsvRideFile.h FileIO/DataProcessor.h FileIO/Device.h FileIO/DownloadRideDialog.h \
+           FileIO/FitlogParser.h FileIO/FitlogRideFile.h FileIO/FitRideFile.h FileIO/GcRideFile.h FileIO/GpxParser.h \
+           FileIO/GpxRideFile.h FileIO/JouleDevice.h FileIO/JsonRideFile.h FileIO/LapsEditor.h FileIO/MacroDevice.h \
+           FileIO/ManualRideDialog.h FileIO/ManualRideFile.h FileIO/MergeActivityWizard.h FileIO/MoxyDevice.h FileIO/PolarRideFile.h \
+           FileIO/PowerTapDevice.h FileIO/PowerTapUtil.h FileIO/PwxRideFile.h FileIO/QuarqParser.h FileIO/QuarqRideFile.h \
+           FileIO/RawRideFile.h FileIO/RideAutoImportConfig.h FileIO/RideCache.h FileIO/RideCacheModel.h FileIO/RideFileCache.h \
+           FileIO/RideFileCommand.h FileIO/RideFile.h FileIO/RideFileTableModel.h FileIO/RideImportWizard.h FileIO/Serial.h \
+           FileIO/SlfParser.h FileIO/SlfRideFile.h FileIO/SmfParser.h FileIO/SmfRideFile.h FileIO/SmlParser.h FileIO/SmlRideFile.h \
+           FileIO/SplitActivityWizard.h FileIO/SrdRideFile.h FileIO/SrmRideFile.h FileIO/SyncRideFile.h FileIO/TcxParser.h \
+           FileIO/TcxRideFile.h FileIO/TxtRideFile.h FileIO/WkoRideFile.h
+
+# GUI components
+HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/ChooseCyclistDialog.h Gui/ColorButton.h \
+           Gui/Colors.h Gui/CompareDateRange.h Gui/CompareInterval.h Gui/ComparePane.h Gui/ConfigDialog.h Gui/DiarySidebar.h \
+           Gui/DragBar.h Gui/GcCrashDialog.h Gui/GcScopeBar.h Gui/GcSideBarItem.h Gui/GcToolBar.h Gui/GcWindowLayout.h \
+           Gui/GcWindowRegistry.h Gui/GenerateHeatMapDialog.h Gui/GProgressDialog.h Gui/HelpWhatsThis.h Gui/HelpWindow.h \
+           Gui/IntervalTreeView.h Gui/MainWindow.h Gui/NewCyclistDialog.h Gui/Pages.h Gui/RideNavigator.h Gui/RideNavigatorProxy.h \
+           Gui/SaveDialogs.h Gui/SearchBox.h Gui/SearchFilterBox.h Gui/Tab.h Gui/TabView.h Gui/ToolsDialog.h Gui/ToolsRhoEstimator.h \
+           Gui/Views.h
+
+# metrics and models
+HEADERS += Metrics/BestIntervalDialog.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h Metrics/PDModel.h \
+           Metrics/PMCData.h Metrics/RideMetadata.h Metrics/RideMetric.h Metrics/SpecialFields.h Metrics/Statistic.h \
+           Metrics/UserMetricParser.h Metrics/UserMetricSettings.h Metrics/VDOTCalculator.h Metrics/WPrime.h Metrics/Zones.h
+
+# contrib
+HEADERS += ../qtsolutions/codeeditor/codeeditor.h ../qtsolutions/json/mvjson.h ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.h \
+           ../qxt/src/qxtspanslider.h ../qxt/src/qxtspanslider_p.h ../qxt/src/qxtstringspinbox.h ../qzip/zipreader.h \
+           ../qzip/zipwriter.h
+
+# Train View
+HEADERS += Train/AddDeviceWizard.h Train/ComputrainerController.h Train/Computrainer.h Train/DeviceConfiguration.h \
+           Train/DeviceTypes.h Train/DialWindow.h Train/ErgDBDownloadDialog.h Train/ErgDB.h Train/ErgFile.h Train/ErgFilePlot.h \
+           Train/Library.h Train/LibraryParser.h Train/MeterWidget.h Train/NullController.h Train/RealtimeController.h \
+           Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
+           Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
+           Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WorkoutWidget.h Train/WorkoutWidgetItems.h \
+           Train/WorkoutWindow.h Train/WorkoutWizard.h Train/ZwoParser.h
 
 
 ###=============
 ### SOURCE FILES
 ###=============
 
-SOURCES += \
-        aBikeScore.cpp \
-        AboutDialog.cpp \
-        aCoggan.cpp \
-        AddDeviceWizard.cpp \
-        AddIntervalDialog.cpp \
-        AerobicDecoupling.cpp \
-        Aerolab.cpp \
-        AerolabWindow.cpp \
-        AllPlot.cpp \
-        AllPlotInterval.cpp \
-        AllPlotSlopeCurve.cpp \
-        AllPlotWindow.cpp \
-        AnalysisSidebar.cpp \
-        ANTChannel.cpp \
-        ANT.cpp \
-        ANTlocalController.cpp \
-        ANTLogger.cpp \
-        ANTMessage.cpp \
-        AthleteBackup.cpp \
-        Athlete.cpp \
-        BasicRideMetrics.cpp \
-        BatchExportDialog.cpp \
-        BestIntervalDialog.cpp \
-        BikeScore.cpp \
-        Bin2RideFile.cpp \
-        BingMap.cpp \
-        BinRideFile.cpp \
-        BlankState.cpp \
-        CalendarDownload.cpp \
-        ChartBar.cpp \
-        ChartSettings.cpp \
-        ChooseCyclistDialog.cpp \
-        ../qtsolutions/codeeditor/codeeditor.cpp \
-        Coggan.cpp \
-        ColorButton.cpp \
-        Colors.cpp \
-        CommPort.cpp \
-        CompareDateRange.cpp \
-        CompareInterval.cpp \
-        ComparePane.cpp \
-        Computrainer3dpFile.cpp \
-        ComputrainerController.cpp \
-        Computrainer.cpp \
-        ConfigDialog.cpp \
-        Context.cpp \
-        CPPlot.cpp \
-        CpPlotCurve.cpp \
-        CriticalPowerWindow.cpp \
-        CsvRideFile.cpp \
-        DanielsPoints.cpp \
-        DataFilter.cpp \
-        DataProcessor.cpp \
-        DeviceConfiguration.cpp \
-        Device.cpp \
-        DeviceTypes.cpp \
-        DialWindow.cpp \
-        DiarySidebar.cpp \
-        DownloadRideDialog.cpp \
-        DragBar.cpp \
-        EditUserMetricDialog.cpp \
-        ErgDB.cpp \
-        ErgDBDownloadDialog.cpp \
-        ErgFile.cpp \
-        ErgFilePlot.cpp \
-        ExtendedCriticalPower.cpp \
-        FileStore.cpp \
-        FitlogParser.cpp \
-        FitlogRideFile.cpp \
-        FitRideFile.cpp \
-        FixDeriveDistance.cpp \
-        FixDerivePower.cpp \
-        FixDeriveTorque.cpp \
-        FixElevation.cpp \
-        FixFreewheeling.cpp \
-        FixGaps.cpp \
-        FixGPS.cpp \
-        FixHRSpikes.cpp \
-        FixMoxy.cpp \
-        FixPower.cpp \
-        FixSmO2.cpp \
-        FixSpeed.cpp \
-        FixSpikes.cpp \
-        FixTorque.cpp \
-        FreeSearch.cpp \
-        GcCrashDialog.cpp \
-        GcOverlayWidget.cpp \
-        GcPane.cpp \
-        GcRideFile.cpp \
-        GcScopeBar.cpp \
-        GcSideBarItem.cpp \
-        GcToolBar.cpp \
-        GcUpgrade.cpp \
-        GcWindowLayout.cpp \
-        GcWindowRegistry.cpp \
-        GenerateHeatMapDialog.cpp \
-        GoldenCheetah.cpp \
-        GoogleMapControl.cpp \
-        GOVSS.cpp \
-        GProgressDialog.cpp \
-        GpxParser.cpp \
-        GpxRideFile.cpp \
-        HelpWhatsThis.cpp \
-        HelpWindow.cpp \
-        HistogramWindow.cpp \
-        HomeWindow.cpp \
-        HrPwPlot.cpp \
-        HrPwWindow.cpp \
-        HrTimeInZone.cpp \
-        HrZones.cpp \
-        IdleTimer.cpp \
-        IndendPlotMarker.cpp \
-        IntervalItem.cpp \
-        IntervalSummaryWindow.cpp \
-        IntervalTreeView.cpp \
-        JouleDevice.cpp \
-        LapsEditor.cpp \
-        LeftRightBalance.cpp \
-        Library.cpp \
-        LibraryParser.cpp \
-        LocalFileStore.cpp \
-        LogTimeScaleDraw.cpp \
-        LTMCanvasPicker.cpp \
-        LTMChartParser.cpp \
-        LTMOutliers.cpp \
-        LTMPlot.cpp \
-        LTMPopup.cpp \
-        LTMSettings.cpp \
-        LTMSidebar.cpp \
-        LTMTool.cpp \
-        LTMTrend.cpp \
-        LTMWindow.cpp \
-        MacroDevice.cpp \
-        main.cpp \
-        MainWindow.cpp \
-        ManualRideDialog.cpp \
-        ManualRideFile.cpp \
-        MergeActivityWizard.cpp \
-        MetadataWindow.cpp \
-        MeterWidget.cpp \
-        MoxyDevice.cpp \
-        MUPlot.cpp \
-        MUWidget.cpp \
-        NamedSearch.cpp \
-        NewCyclistDialog.cpp \
-        NullController.cpp \
-        OAuthDialog.cpp \
-        PaceTimeInZone.cpp \
-        PaceZones.cpp \
-        Pages.cpp \
-        PDModel.cpp \
-        PeakPace.cpp \
-        PeakPower.cpp \
-        PfPvPlot.cpp \
-        PfPvWindow.cpp \
-        PMCData.cpp \
-        PolarRideFile.cpp \
-        PowerHist.cpp \
-        PowerTapDevice.cpp \
-        PowerTapUtil.cpp \
-        PwxRideFile.cpp \
-        ../qtsolutions/json/mvjson.cpp \
-        ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
-        QuarqParser.cpp \
-        QuarqRideFile.cpp \
-        ../qxt/src/qxtspanslider.cpp \
-        ../qxt/src/qxtstringspinbox.cpp \
-        ../qzip/zip.cpp \
-        RawRideFile.cpp \
-        RealtimeController.cpp \
-        RealtimeData.cpp \
-        RealtimePlot.cpp \
-        RealtimePlotWindow.cpp \
-        ReferenceLineDialog.cpp \
-        RemoteControl.cpp \
-        RideAutoImportConfig.cpp \
-        RideCache.cpp \
-        RideCacheModel.cpp \
-        RideEditor.cpp \
-        RideFileCache.cpp \
-        RideFileCommand.cpp \
-        RideFile.cpp \
-        RideFileTableModel.cpp \
-        RideImportWizard.cpp \
-        RideItem.cpp \
-        RideMetadata.cpp \
-        RideMetric.cpp \
-        RideNavigator.cpp \
-        RideSummaryWindow.cpp \
-        RideWindow.cpp \
-        Route.cpp \
-        RouteParser.cpp \
-        SaveDialogs.cpp \
-        ScatterPlot.cpp \
-        ScatterWindow.cpp \
-        SearchBox.cpp \
-        SearchFilterBox.cpp \
-        Season.cpp \
-        SeasonParser.cpp \
-        Serial.cpp \
-        Settings.cpp \
-        ShareDialog.cpp \
-        SlfParser.cpp \
-        SlfRideFile.cpp \
-        SmallPlot.cpp \
-        SmfParser.cpp \
-        SmfRideFile.cpp \
-        SmlParser.cpp \
-        SmlRideFile.cpp \
-        SpecialFields.cpp \
-        Specification.cpp \
-        SpinScanPlot.cpp \
-        SpinScanPlotWindow.cpp \
-        SpinScanPolarPlot.cpp \
-        SplitActivityWizard.cpp \
-        SportPlusHealthUploader.cpp \
-        SrdRideFile.cpp \
-        SrmRideFile.cpp \
-        Statistic.cpp \
-        SummaryWindow.cpp \
-        SustainMetric.cpp \
-        SwimScore.cpp \
-        SyncRideFile.cpp \
-        Tab.cpp \
-        TabView.cpp \
-        TacxCafRideFile.cpp \
-        TcxParser.cpp \
-        TcxRideFile.cpp \
-        TimeInZone.cpp \
-        TimeUtils.cpp \
-        ToolsDialog.cpp \
-        ToolsRhoEstimator.cpp \
-        TPDownload.cpp \
-        TPDownloadDialog.cpp \
-        TPUpload.cpp \
-        TPUploadDialog.cpp \
-        TrainBottom.cpp \
-        TrainDB.cpp \
-        TrainingstagebuchUploader.cpp \
-        TrainSidebar.cpp \
-        TreeMapPlot.cpp \
-        TreeMapWindow.cpp \
-        TRIMPPoints.cpp \
-        TxtRideFile.cpp \
-        Units.cpp \
-        UserData.cpp \
-        UserMetric.cpp \
-        UserMetricParser.cpp \
-        Utils.cpp \
-        VDOTCalculator.cpp \
-        VDOT.cpp \
-        VeloHeroUploader.cpp \
-        VideoLayoutParser.cpp \
-        VideoSyncFile.cpp \
-        Views.cpp \
-        WattsPerKilogram.cpp \
-        WithingsDownload.cpp \
-        WkoRideFile.cpp \
-        WorkoutWidget.cpp \
-        WorkoutWidgetItems.cpp \
-        WorkoutPlotWindow.cpp \
-        WorkoutWindow.cpp \
-        WorkoutWizard.cpp \
-        WPrime.cpp \
-        Zones.cpp \
-        ZwoParser.cpp
+## ANT+ 
+SOURCES += ANT/ANTChannel.cpp ANT/ANT.cpp ANT/ANTlocalController.cpp ANT/ANTLogger.cpp ANT/ANTMessage.cpp
+
+## Charts and related
+SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts/AllPlotInterval.cpp Charts/AllPlotSlopeCurve.cpp \
+           Charts/AllPlotWindow.cpp Charts/BingMap.cpp Charts/BlankState.cpp Charts/ChartBar.cpp Charts/ChartSettings.cpp \
+           Charts/CPPlot.cpp Charts/CpPlotCurve.cpp Charts/CriticalPowerWindow.cpp Charts/GcOverlayWidget.cpp Charts/GcPane.cpp \
+           Charts/GoldenCheetah.cpp Charts/GoogleMapControl.cpp Charts/HistogramWindow.cpp Charts/HomeWindow.cpp Charts/HrPwPlot.cpp \
+           Charts/HrPwWindow.cpp Charts/IndendPlotMarker.cpp Charts/IntervalSummaryWindow.cpp Charts/LogTimeScaleDraw.cpp \
+           Charts/LTMCanvasPicker.cpp Charts/LTMChartParser.cpp Charts/LTMOutliers.cpp Charts/LTMPlot.cpp Charts/LTMPopup.cpp \
+           Charts/LTMSettings.cpp Charts/LTMSidebar.cpp Charts/LTMTool.cpp Charts/LTMTrend.cpp Charts/LTMWindow.cpp \
+           Charts/MetadataWindow.cpp Charts/MUPlot.cpp Charts/MUWidget.cpp Charts/PfPvPlot.cpp Charts/PfPvWindow.cpp \
+           Charts/PowerHist.cpp Charts/ReferenceLineDialog.cpp Charts/RideEditor.cpp Charts/RideSummaryWindow.cpp Charts/RideWindow.cpp \
+           Charts/ScatterPlot.cpp Charts/ScatterWindow.cpp Charts/SmallPlot.cpp Charts/SummaryWindow.cpp Charts/TreeMapPlot.cpp \
+           Charts/TreeMapWindow.cpp
+
+## Cloud Services / Web resources
+SOURCES += Cloud/CalendarDownload.cpp Cloud/FileStore.cpp Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp Cloud/ShareDialog.cpp \
+           Cloud/SportPlusHealthUploader.cpp Cloud/TPDownload.cpp Cloud/TPDownloadDialog.cpp Cloud/TPUpload.cpp Cloud/TPUploadDialog.cpp \
+           Cloud/TrainingstagebuchUploader.cpp Cloud/VeloHeroUploader.cpp Cloud/WithingsDownload.cpp 
+
+## Core Data Structures
+SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch.cpp Core/GcUpgrade.cpp Core/IdleTimer.cpp \
+           Core/IntervalItem.cpp Core/main.cpp Core/NamedSearch.cpp Core/RideItem.cpp Core/Route.cpp Core/RouteParser.cpp \
+           Core/Season.cpp Core/SeasonParser.cpp Core/Settings.cpp Core/Specification.cpp Core/TimeUtils.cpp Core/Units.cpp \
+           Core/UserData.cpp Core/Utils.cpp 
+
+## File and Device IO and Editing
+SOURCES += FileIO/AthleteBackup.cpp FileIO/BatchExportDialog.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp FileIO/CommPort.cpp \
+           FileIO/Computrainer3dpFile.cpp FileIO/CsvRideFile.cpp FileIO/DataProcessor.cpp FileIO/Device.cpp FileIO/DownloadRideDialog.cpp \
+           FileIO/FitlogParser.cpp FileIO/FitlogRideFile.cpp FileIO/FitRideFile.cpp FileIO/FixDeriveDistance.cpp FileIO/FixDerivePower.cpp \
+           FileIO/FixDeriveTorque.cpp FileIO/FixElevation.cpp FileIO/FixFreewheeling.cpp FileIO/FixGaps.cpp FileIO/FixGPS.cpp \
+           FileIO/FixHRSpikes.cpp FileIO/FixMoxy.cpp FileIO/FixPower.cpp FileIO/FixSmO2.cpp FileIO/FixSpeed.cpp FileIO/FixSpikes.cpp \
+           FileIO/FixTorque.cpp FileIO/GcRideFile.cpp FileIO/GpxParser.cpp FileIO/GpxRideFile.cpp FileIO/JouleDevice.cpp FileIO/LapsEditor.cpp \
+           FileIO/MacroDevice.cpp FileIO/ManualRideDialog.cpp FileIO/ManualRideFile.cpp FileIO/MergeActivityWizard.cpp FileIO/MoxyDevice.cpp \
+           FileIO/PolarRideFile.cpp FileIO/PowerTapDevice.cpp FileIO/PowerTapUtil.cpp FileIO/PwxRideFile.cpp FileIO/QuarqParser.cpp \
+           FileIO/QuarqRideFile.cpp FileIO/RawRideFile.cpp FileIO/RideAutoImportConfig.cpp FileIO/RideCache.cpp FileIO/RideCacheModel.cpp \
+           FileIO/RideFileCache.cpp FileIO/RideFileCommand.cpp FileIO/RideFile.cpp FileIO/RideFileTableModel.cpp FileIO/RideImportWizard.cpp \
+           FileIO/Serial.cpp FileIO/SlfParser.cpp FileIO/SlfRideFile.cpp FileIO/SmfParser.cpp FileIO/SmfRideFile.cpp FileIO/SmlParser.cpp \
+           FileIO/SmlRideFile.cpp FileIO/SplitActivityWizard.cpp FileIO/SrdRideFile.cpp FileIO/SrmRideFile.cpp FileIO/SyncRideFile.cpp \
+           FileIO/TacxCafRideFile.cpp FileIO/TcxParser.cpp FileIO/TcxRideFile.cpp FileIO/TxtRideFile.cpp FileIO/WkoRideFile.cpp
+
+## GUI Elements and Dialogs
+SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp Gui/ChooseCyclistDialog.cpp Gui/ColorButton.cpp \
+           Gui/Colors.cpp Gui/CompareDateRange.cpp Gui/CompareInterval.cpp Gui/ComparePane.cpp Gui/ConfigDialog.cpp Gui/DiarySidebar.cpp \
+           Gui/DragBar.cpp Gui/GcCrashDialog.cpp Gui/GcScopeBar.cpp Gui/GcSideBarItem.cpp Gui/GcToolBar.cpp Gui/GcWindowLayout.cpp \
+           Gui/GcWindowRegistry.cpp Gui/GenerateHeatMapDialog.cpp Gui/GProgressDialog.cpp Gui/HelpWhatsThis.cpp Gui/HelpWindow.cpp \
+           Gui/IntervalTreeView.cpp Gui/MainWindow.cpp Gui/NewCyclistDialog.cpp Gui/Pages.cpp Gui/RideNavigator.cpp Gui/SaveDialogs.cpp \
+           Gui/SearchBox.cpp Gui/SearchFilterBox.cpp Gui/Tab.cpp Gui/TabView.cpp Gui/ToolsDialog.cpp Gui/ToolsRhoEstimator.cpp Gui/Views.cpp
+
+## Models and Metrics
+SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.cpp Metrics/BasicRideMetrics.cpp Metrics/BestIntervalDialog.cpp \
+           Metrics/BikeScore.cpp Metrics/Coggan.cpp Metrics/DanielsPoints.cpp Metrics/EditUserMetricDialog.cpp Metrics/ExtendedCriticalPower.cpp \
+           Metrics/GOVSS.cpp Metrics/HrTimeInZone.cpp Metrics/HrZones.cpp Metrics/LeftRightBalance.cpp Metrics/PaceTimeInZone.cpp \
+           Metrics/PaceZones.cpp Metrics/PDModel.cpp Metrics/PeakPace.cpp Metrics/PeakPower.cpp Metrics/PMCData.cpp Metrics/RideMetadata.cpp \
+           Metrics/RideMetric.cpp Metrics/SpecialFields.cpp Metrics/Statistic.cpp Metrics/SustainMetric.cpp Metrics/SwimScore.cpp \
+           Metrics/TimeInZone.cpp Metrics/TRIMPPoints.cpp Metrics/UserMetric.cpp Metrics/UserMetricParser.cpp Metrics/VDOTCalculator.cpp \
+           Metrics/VDOT.cpp Metrics/WattsPerKilogram.cpp Metrics/WPrime.cpp Metrics/Zones.cpp
+
+## Contributed solutions
+SOURCES += ../qtsolutions/codeeditor/codeeditor.cpp ../qtsolutions/json/mvjson.cpp ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
+           ../qxt/src/qxtspanslider.cpp ../qxt/src/qxtstringspinbox.cpp ../qzip/zip.cpp
+
+## Train View Components
+SOURCES += Train/AddDeviceWizard.cpp Train/ComputrainerController.cpp Train/Computrainer.cpp Train/DeviceConfiguration.cpp \
+           Train/DeviceTypes.cpp Train/DialWindow.cpp Train/ErgDB.cpp Train/ErgDBDownloadDialog.cpp Train/ErgFile.cpp Train/ErgFilePlot.cpp \
+           Train/Library.cpp Train/LibraryParser.cpp Train/MeterWidget.cpp Train/NullController.cpp Train/RealtimeController.cpp \
+           Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
+           Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
+           Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WorkoutWidget.cpp Train/WorkoutWidgetItems.cpp \
+           Train/WorkoutWindow.cpp Train/WorkoutWizard.cpp Train/ZwoParser.cpp
 
 
 ###======================================
 ### PENDING SOURCE FILES [not active yet]
 ###======================================
 
-DEFERRES += RouteWindow.h \
-            RouteWindow.cpp \
-            RouteItem.h \
-            RouteItem.cpp
+DEFERRES += Core/RouteWindow.h Core/RouteWindow.cpp Core/RouteItem.h Core/RouteItem.cpp
 
 ###====================
 ### MISCELLANEOUS FILES
 ###====================
 
-OTHER_FILES += \
-    web/Rider.js \
-    web/ride.js \
-    web/jquery-1.6.4.min.js \
-    web/MapWindow.html \
-    web/StreetViewWindow.html \
-    web/Window.css
+OTHER_FILES += Resources/web/Rider.js Resources/web/ride.js Resources/web/jquery-1.6.4.min.js \
+               Resources/web/MapWindow.html Resources/web/StreetViewWindow.html Resources/web/Window.css
+
