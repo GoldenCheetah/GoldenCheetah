@@ -120,7 +120,7 @@ win32 {
 
 } else {
 
-    RC_FILE = images/gc.icns
+    RC_FILE = Resources/images/gc.icns
 }
 
 macx {
@@ -251,8 +251,8 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
     !isEmpty(D2XX_LIBS) { LIBS += $${D2XX_LIBS} }
     unix                { LIBS += -ldl }
 
-    HEADERS     += D2XX.h
-    SOURCES     += D2XX.cpp
+    HEADERS     += FileIO/D2XX.h
+    SOURCES     += FileIO/D2XX.cpp
 }
 
 
