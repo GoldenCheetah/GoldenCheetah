@@ -6,6 +6,9 @@ Info.plist
 *.xcodeproj
 gcconfig.pri
 
+# QtCreator
+src.pro.user
+
 # old skool
 .svn
 
