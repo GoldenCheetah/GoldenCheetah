@@ -249,8 +249,8 @@ class MainWindow : public QMainWindow
 
 #ifdef Q_OS_MAC
         // Mac Native Support
-        QtMacButton *import, *compose, *sidebar, *lowbar;
-        QtMacSegmentedButton *actbuttons, *styleSelector;
+        QtMacButton *sidebar, *lowbar;
+        QtMacSegmentedButton *styleSelector;
         QToolBar *head;
 #else
         // Not on Mac so use other types
