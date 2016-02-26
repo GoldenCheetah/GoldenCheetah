@@ -1134,9 +1134,10 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem(tr("Power - Elite Supercrono Powermag"));                         // 14
     virtualPower->addItem(tr("Power - Elite Turbo Muin (2013)"));                           // 15
     virtualPower->addItem(tr("Power - Elite Qubo Power Fluid"));                            // 16
-    virtualPower->addItem(tr("Power - Cyclops Magneto Pro (Road)"));                        // 17
+    virtualPower->addItem(tr("Power - Elite Qubo Digital"));                                // 17
     virtualPower->addItem(tr("Power - Elite Arion Mag"));                                   // 18
-    virtualPower->addItem(tr("Power - Blackburn Tech Fluid"));                              // 19
+    virtualPower->addItem(tr("Power - Cyclops Magneto Pro (Road)"));                        // 19
+    virtualPower->addItem(tr("Power - Blackburn Tech Fluid"));                              // 20
 
     //
     // Wheel size
@@ -1261,6 +1262,11 @@ AddFinal::validatePage()
             break;
         case 14: //Elite Supercrono Powermag
             add.levels=8;
+            add.levelstep=1;
+            add.levelstart=1;
+            break;
+        case 17: //Elite Qubo Digital
+            add.levels=16;
             add.levelstep=1;
             add.levelstart=1;
             break;

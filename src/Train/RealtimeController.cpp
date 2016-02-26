@@ -264,11 +264,29 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         rtData.setWatts(4.31746 * V - 2.59259e-002 * pow(V, 2) + 9.41799e-003 * pow(V, 3));
         }
         break;
-    case 17: // CYCLOPS MAGNETO PRO (ROAD)
+
+    case 17: // ELITE Qubo Digital
         {
-        double V = rtData.getSpeed();
-        //     Watts = 6.0f + (-0.93 * speed) + (0.275 * speed^2) + (-0.00175 * speed^3)
-        rtData.setWatts(6.0f + (-0.93f * V) + (0.275f * pow(V, 2)) + (-0.00175f * pow(V, 3)));
+        double pol[16][3]={
+            0.039,3.91,-9,
+            0.051,3.91,-10,
+            0.069,3.59,-5,
+            0.072,4.58,-13,
+            0.075,5.95,-23,
+            0.066,7.86,-37,
+            0.071,9.71,-48,
+            0.067,11.77,-63,
+            0.063,14.11,-78,
+            0.091,14.91,-78,
+            0.099,16.45,-88,
+            0.118,16.86,-86,
+            0.124,18.04,-92,
+            0.145,18.13,-89,
+            0.179,17.35,-82,
+            0.207,16.1,-76
+        };
+        double v = rtData.getSpeed();
+        rtData.setWatts(pol[level][0]*pow(V,2) + (pol[level][1]*V) + pol[level][2]);
         }
         break;
 
@@ -284,7 +302,15 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
-    case 19: // Blackburn Tech Fluid
+    case 19: // CYCLOPS MAGNETO PRO (ROAD)
+        {
+        double V = rtData.getSpeed();
+        //     Watts = 6.0f + (-0.93 * speed) + (0.275 * speed^2) + (-0.00175 * speed^3)
+        rtData.setWatts(6.0f + (-0.93f * V) + (0.275f * pow(V, 2)) + (-0.00175f * pow(V, 3)));
+        }
+        break;
+
+    case 20: // Blackburn Tech Fluid
         {
         double v = rtData.getSpeed();
         rtData.setWatts(6.758241758241894 - 1.9995004995004955 * v + 0.24165834165834146 * pow(v, 2));
