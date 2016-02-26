@@ -286,7 +286,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
             0.207,16.1,-76
         };
         double v = rtData.getSpeed();
-        rtData.setWatts(pol[level][0]*pow(V,2) + (pol[level][1]*V) + pol[level][2]);
+        rtData.setWatts(pol[level][0]*pow(v,2) + (pol[level][1]*v) + pol[level][2]);
         }
         break;
 
