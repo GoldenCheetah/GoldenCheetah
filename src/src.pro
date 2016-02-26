@@ -16,7 +16,7 @@ include(gcconfig.pri)
 
 # You can also define your own local source to add to build
 HEADERS += $${LOCALHEADERS}
-SOURCE += $${LOCALSOURCE}
+SOURCES += $${LOCALSOURCE}
 
 
 ###=====================
