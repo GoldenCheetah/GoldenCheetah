@@ -161,6 +161,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Keith Reynolds");
     contributors.append("Ken Sallot");
     contributors.append("Leif Warland");
+    contributors.append("Lucas Garoto");
     contributors.append("Luke NRG");
     contributors.append("Magnus Gille");
     contributors.append("Marc Boudreau");

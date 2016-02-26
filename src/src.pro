@@ -16,7 +16,7 @@ include(gcconfig.pri)
 
 # You can also define your own local source to add to build
 HEADERS += $${LOCALHEADERS}
-SOURCE += $${LOCALSOURCE}
+SOURCES += $${LOCALSOURCE}
 
 
 ###=====================
@@ -114,8 +114,8 @@ LIBS += $${LIBZ_LIBS}
 # windows icon and use QT zlib, not sure why different but keep for now
 win32 {
 
-    RC_FILE = win32/windowsico.rc
-    INCLUDEPATH += ./win32 $${QT_INSTALL_PREFIX}/src/3rdparty/zlib
+    RC_FILE = Resources/win32/windowsico.rc
+    INCLUDEPATH += Resources/win32 $${QT_INSTALL_PREFIX}/src/3rdparty/zlib
     LIBS += -lws2_32
 
 } else {
@@ -126,7 +126,7 @@ win32 {
 macx {
 
     # we have our own plist
-    QMAKE_INFO_PLIST = ./mac/Info.plist.app
+    QMAKE_INFO_PLIST = ./Resources/mac/Info.plist.app
 
     # on mac we use native buttons and video, but have native fullscreen support
     LIBS    += -lobjc -framework IOKit -framework AppKit -framework QTKit
@@ -559,7 +559,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
            Charts/GcPane.h Charts/GoldenCheetah.h Charts/GoogleMapControl.h Charts/HistogramWindow.h Charts/HomeWindow.h \
            Charts/HrPwPlot.h Charts/HrPwWindow.h Charts/IndendPlotMarker.h Charts/IntervalSummaryWindow.h Charts/LogTimeScaleDraw.h \
            Charts/LTMCanvasPicker.h Charts/LTMChartParser.h Charts/LTMOutliers.h Charts/LTMPlot.h Charts/LTMPopup.h \
-           Charts/LTMSettings.h Charts/LTMSidebar.h Charts/LTMTool.h Charts/LTMTrend2.h Charts/LTMTrend.h Charts/LTMWindow.h \
+           Charts/LTMSettings.h Charts/LTMTool.h Charts/LTMTrend2.h Charts/LTMTrend.h Charts/LTMWindow.h \
            Charts/MetadataWindow.h Charts/MUPlot.h Charts/MUPool.h Charts/MUWidget.h Charts/PfPvPlot.h Charts/PfPvWindow.h \
            Charts/PowerHist.h Charts/ReferenceLineDialog.h Charts/RideEditor.h Charts/RideSummaryWindow.h Charts/RideWindow.h \
            Charts/ScatterPlot.h Charts/ScatterWindow.h Charts/SmallPlot.h Charts/SummaryWindow.h Charts/TreeMapPlot.h \
@@ -576,16 +576,16 @@ HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Cor
            Core/Units.h Core/UserData.h Core/Utils.h
 
 # device and file IO or edit
-HEADERS += FileIO/AthleteBackup.h FileIO/BatchExportDialog.h FileIO/Bin2RideFile.h FileIO/BinRideFile.h FileIO/CommPort.h \
-           FileIO/Computrainer3dpFile.h FileIO/CsvRideFile.h FileIO/DataProcessor.h FileIO/Device.h FileIO/DownloadRideDialog.h \
+HEADERS += FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h FileIO/BinRideFile.h FileIO/CommPort.h \
+           FileIO/Computrainer3dpFile.h FileIO/CsvRideFile.h FileIO/DataProcessor.h FileIO/Device.h  \
            FileIO/FitlogParser.h FileIO/FitlogRideFile.h FileIO/FitRideFile.h FileIO/GcRideFile.h FileIO/GpxParser.h \
            FileIO/GpxRideFile.h FileIO/JouleDevice.h FileIO/JsonRideFile.h FileIO/LapsEditor.h FileIO/MacroDevice.h \
-           FileIO/ManualRideDialog.h FileIO/ManualRideFile.h FileIO/MergeActivityWizard.h FileIO/MoxyDevice.h FileIO/PolarRideFile.h \
+           FileIO/ManualRideFile.h FileIO/MoxyDevice.h FileIO/PolarRideFile.h \
            FileIO/PowerTapDevice.h FileIO/PowerTapUtil.h FileIO/PwxRideFile.h FileIO/QuarqParser.h FileIO/QuarqRideFile.h \
            FileIO/RawRideFile.h FileIO/RideAutoImportConfig.h FileIO/RideFileCache.h \
-           FileIO/RideFileCommand.h FileIO/RideFile.h FileIO/RideFileTableModel.h FileIO/RideImportWizard.h FileIO/Serial.h \
+           FileIO/RideFileCommand.h FileIO/RideFile.h FileIO/RideFileTableModel.h  FileIO/Serial.h \
            FileIO/SlfParser.h FileIO/SlfRideFile.h FileIO/SmfParser.h FileIO/SmfRideFile.h FileIO/SmlParser.h FileIO/SmlRideFile.h \
-           FileIO/SplitActivityWizard.h FileIO/SrdRideFile.h FileIO/SrmRideFile.h FileIO/SyncRideFile.h FileIO/TcxParser.h \
+           FileIO/SrdRideFile.h FileIO/SrmRideFile.h FileIO/SyncRideFile.h FileIO/TcxParser.h \
            FileIO/TcxRideFile.h FileIO/TxtRideFile.h FileIO/WkoRideFile.h
 
 # GUI components
@@ -593,12 +593,13 @@ HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/C
            Gui/Colors.h Gui/CompareDateRange.h Gui/CompareInterval.h Gui/ComparePane.h Gui/ConfigDialog.h Gui/DiarySidebar.h \
            Gui/DragBar.h Gui/GcCrashDialog.h Gui/GcScopeBar.h Gui/GcSideBarItem.h Gui/GcToolBar.h Gui/GcWindowLayout.h \
            Gui/GcWindowRegistry.h Gui/GenerateHeatMapDialog.h Gui/GProgressDialog.h Gui/HelpWhatsThis.h Gui/HelpWindow.h \
-           Gui/IntervalTreeView.h Gui/MainWindow.h Gui/NewCyclistDialog.h Gui/Pages.h Gui/RideNavigator.h Gui/RideNavigatorProxy.h \
+           Gui/IntervalTreeView.h Gui/LTMSidebar.h Gui/MainWindow.h Gui/NewCyclistDialog.h Gui/Pages.h Gui/RideNavigator.h Gui/RideNavigatorProxy.h \
            Gui/SaveDialogs.h Gui/SearchBox.h Gui/SearchFilterBox.h Gui/Tab.h Gui/TabView.h Gui/ToolsDialog.h Gui/ToolsRhoEstimator.h \
-           Gui/Views.h
+           Gui/Views.h Gui/BatchExportDialog.h Gui/DownloadRideDialog.h Gui/ManualRideDialog.h Gui/BestIntervalDialog.h \
+           Gui/MergeActivityWizard.h Gui/RideImportWizard.h Gui/SplitActivityWizard.h
 
 # metrics and models
-HEADERS += Metrics/BestIntervalDialog.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h Metrics/PDModel.h \
+HEADERS += Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h Metrics/PDModel.h \
            Metrics/PMCData.h Metrics/RideMetadata.h Metrics/RideMetric.h Metrics/SpecialFields.h Metrics/Statistic.h \
            Metrics/UserMetricParser.h Metrics/UserMetricSettings.h Metrics/VDOTCalculator.h Metrics/WPrime.h Metrics/Zones.h
 
@@ -631,7 +632,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
            Charts/GoldenCheetah.cpp Charts/GoogleMapControl.cpp Charts/HistogramWindow.cpp Charts/HomeWindow.cpp Charts/HrPwPlot.cpp \
            Charts/HrPwWindow.cpp Charts/IndendPlotMarker.cpp Charts/IntervalSummaryWindow.cpp Charts/LogTimeScaleDraw.cpp \
            Charts/LTMCanvasPicker.cpp Charts/LTMChartParser.cpp Charts/LTMOutliers.cpp Charts/LTMPlot.cpp Charts/LTMPopup.cpp \
-           Charts/LTMSettings.cpp Charts/LTMSidebar.cpp Charts/LTMTool.cpp Charts/LTMTrend.cpp Charts/LTMWindow.cpp \
+           Charts/LTMSettings.cpp Charts/LTMTool.cpp Charts/LTMTrend.cpp Charts/LTMWindow.cpp \
            Charts/MetadataWindow.cpp Charts/MUPlot.cpp Charts/MUWidget.cpp Charts/PfPvPlot.cpp Charts/PfPvWindow.cpp \
            Charts/PowerHist.cpp Charts/ReferenceLineDialog.cpp Charts/RideEditor.cpp Charts/RideSummaryWindow.cpp Charts/RideWindow.cpp \
            Charts/ScatterPlot.cpp Charts/ScatterWindow.cpp Charts/SmallPlot.cpp Charts/SummaryWindow.cpp Charts/TreeMapPlot.cpp \
@@ -649,18 +650,18 @@ SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch
            Core/TimeUtils.cpp Core/Units.cpp Core/UserData.cpp Core/Utils.cpp 
 
 ## File and Device IO and Editing
-SOURCES += FileIO/AthleteBackup.cpp FileIO/BatchExportDialog.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp FileIO/CommPort.cpp \
-           FileIO/Computrainer3dpFile.cpp FileIO/CsvRideFile.cpp FileIO/DataProcessor.cpp FileIO/Device.cpp FileIO/DownloadRideDialog.cpp \
+SOURCES += FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp FileIO/CommPort.cpp \
+           FileIO/Computrainer3dpFile.cpp FileIO/CsvRideFile.cpp FileIO/DataProcessor.cpp FileIO/Device.cpp \
            FileIO/FitlogParser.cpp FileIO/FitlogRideFile.cpp FileIO/FitRideFile.cpp FileIO/FixDeriveDistance.cpp FileIO/FixDerivePower.cpp \
            FileIO/FixDeriveTorque.cpp FileIO/FixElevation.cpp FileIO/FixFreewheeling.cpp FileIO/FixGaps.cpp FileIO/FixGPS.cpp \
            FileIO/FixHRSpikes.cpp FileIO/FixMoxy.cpp FileIO/FixPower.cpp FileIO/FixSmO2.cpp FileIO/FixSpeed.cpp FileIO/FixSpikes.cpp \
            FileIO/FixTorque.cpp FileIO/GcRideFile.cpp FileIO/GpxParser.cpp FileIO/GpxRideFile.cpp FileIO/JouleDevice.cpp FileIO/LapsEditor.cpp \
-           FileIO/MacroDevice.cpp FileIO/ManualRideDialog.cpp FileIO/ManualRideFile.cpp FileIO/MergeActivityWizard.cpp FileIO/MoxyDevice.cpp \
+           FileIO/MacroDevice.cpp FileIO/ManualRideFile.cpp FileIO/MoxyDevice.cpp \
            FileIO/PolarRideFile.cpp FileIO/PowerTapDevice.cpp FileIO/PowerTapUtil.cpp FileIO/PwxRideFile.cpp FileIO/QuarqParser.cpp \
            FileIO/QuarqRideFile.cpp FileIO/RawRideFile.cpp FileIO/RideAutoImportConfig.cpp \
-           FileIO/RideFileCache.cpp FileIO/RideFileCommand.cpp FileIO/RideFile.cpp FileIO/RideFileTableModel.cpp FileIO/RideImportWizard.cpp \
+           FileIO/RideFileCache.cpp FileIO/RideFileCommand.cpp FileIO/RideFile.cpp FileIO/RideFileTableModel.cpp \
            FileIO/Serial.cpp FileIO/SlfParser.cpp FileIO/SlfRideFile.cpp FileIO/SmfParser.cpp FileIO/SmfRideFile.cpp FileIO/SmlParser.cpp \
-           FileIO/SmlRideFile.cpp FileIO/SplitActivityWizard.cpp FileIO/SrdRideFile.cpp FileIO/SrmRideFile.cpp FileIO/SyncRideFile.cpp \
+           FileIO/SmlRideFile.cpp FileIO/SrdRideFile.cpp FileIO/SrmRideFile.cpp FileIO/SyncRideFile.cpp \
            FileIO/TacxCafRideFile.cpp FileIO/TcxParser.cpp FileIO/TcxRideFile.cpp FileIO/TxtRideFile.cpp FileIO/WkoRideFile.cpp
 
 ## GUI Elements and Dialogs
@@ -668,12 +669,14 @@ SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp
            Gui/Colors.cpp Gui/CompareDateRange.cpp Gui/CompareInterval.cpp Gui/ComparePane.cpp Gui/ConfigDialog.cpp Gui/DiarySidebar.cpp \
            Gui/DragBar.cpp Gui/GcCrashDialog.cpp Gui/GcScopeBar.cpp Gui/GcSideBarItem.cpp Gui/GcToolBar.cpp Gui/GcWindowLayout.cpp \
            Gui/GcWindowRegistry.cpp Gui/GenerateHeatMapDialog.cpp Gui/GProgressDialog.cpp Gui/HelpWhatsThis.cpp Gui/HelpWindow.cpp \
-           Gui/IntervalTreeView.cpp Gui/MainWindow.cpp Gui/NewCyclistDialog.cpp Gui/Pages.cpp Gui/RideNavigator.cpp Gui/SaveDialogs.cpp \
-           Gui/SearchBox.cpp Gui/SearchFilterBox.cpp Gui/Tab.cpp Gui/TabView.cpp Gui/ToolsDialog.cpp Gui/ToolsRhoEstimator.cpp Gui/Views.cpp
+           Gui/IntervalTreeView.cpp Gui/LTMSidebar.cpp Gui/MainWindow.cpp Gui/NewCyclistDialog.cpp Gui/Pages.cpp Gui/RideNavigator.cpp Gui/SaveDialogs.cpp \
+           Gui/SearchBox.cpp Gui/SearchFilterBox.cpp Gui/Tab.cpp Gui/TabView.cpp Gui/ToolsDialog.cpp Gui/ToolsRhoEstimator.cpp Gui/Views.cpp \
+           Gui/BatchExportDialog.cpp Gui/DownloadRideDialog.cpp Gui/ManualRideDialog.cpp Gui/BestIntervalDialog.cpp Gui/EditUserMetricDialog.cpp \
+           Gui/MergeActivityWizard.cpp Gui/RideImportWizard.cpp Gui/SplitActivityWizard.cpp
 
 ## Models and Metrics
-SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.cpp Metrics/BasicRideMetrics.cpp Metrics/BestIntervalDialog.cpp \
-           Metrics/BikeScore.cpp Metrics/Coggan.cpp Metrics/DanielsPoints.cpp Metrics/EditUserMetricDialog.cpp Metrics/ExtendedCriticalPower.cpp \
+SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.cpp Metrics/BasicRideMetrics.cpp  \
+           Metrics/BikeScore.cpp Metrics/Coggan.cpp Metrics/DanielsPoints.cpp Metrics/ExtendedCriticalPower.cpp \
            Metrics/GOVSS.cpp Metrics/HrTimeInZone.cpp Metrics/HrZones.cpp Metrics/LeftRightBalance.cpp Metrics/PaceTimeInZone.cpp \
            Metrics/PaceZones.cpp Metrics/PDModel.cpp Metrics/PeakPace.cpp Metrics/PeakPower.cpp Metrics/PMCData.cpp Metrics/RideMetadata.cpp \
            Metrics/RideMetric.cpp Metrics/SpecialFields.cpp Metrics/Statistic.cpp Metrics/SustainMetric.cpp Metrics/SwimScore.cpp \

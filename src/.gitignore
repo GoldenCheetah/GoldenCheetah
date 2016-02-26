@@ -8,6 +8,7 @@ gcconfig.pri
 
 # QtCreator
 src.pro.user
+*.autosave
 
 # old skool
 .svn
