@@ -64,6 +64,10 @@
 #include <QStyleFactory>
 #endif
 
+#ifdef WIN32
+#include "Windows.h"
+#endif
+
 #include <cmath> // isnan and isinf
 #include "TrainDB.h"
 #include "Library.h"
@@ -1075,9 +1079,13 @@ void TrainSidebar::Start()       // when start button is pressed
 
         qDebug() << "start...";
 
+#ifdef WIN32
+        // disable the screen saver on Windows
+        SetThreadExecutionState(ES_DISPLAY_REQUIRED | ES_CONTINUOUS);
+#endif
+
         // Stop users from selecting different devices
         // media or workouts whilst a workout is in progress
-
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
 #ifdef GC_HAVE_VLC  // RLV currently only support for VLC
@@ -1210,6 +1218,11 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 {
     if ((status&RT_RUNNING) == 0) return;
+
+    // re-enable the screen saver on Windows
+#ifdef WIN32
+    SetThreadExecutionState(ES_CONTINUOUS);
+#endif
 
     clearStatusFlags(RT_RUNNING|RT_PAUSED);
 
