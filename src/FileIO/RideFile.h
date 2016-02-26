@@ -191,6 +191,8 @@ class RideFile : public QObject // QObject to emit signals
         // the max gap to interpolate also passed as a parameter
         RideFile *resample(double recIntSecs, int interpolate=30);
 
+        enum filetype { unknown=0, swim, run };
+
         // Working with DATASERIES
         enum seriestype { secs=0, cad, cadd, hr, hrd, km, kph, kphd, nm, nmd, watts, wattsd,
                           alt, lon, lat, headwind, slope, temp, interval, NP, xPower, 
@@ -392,6 +394,7 @@ class RideFile : public QObject // QObject to emit signals
         void updateAvg(RideFilePoint* point);
 
         bool dstale; // is derived data up to date?
+        mutable filetype filetype_; // swim or run?
 
         // data required to compute headwind based on weather broadcast
         double windSpeed_, windHeading_;

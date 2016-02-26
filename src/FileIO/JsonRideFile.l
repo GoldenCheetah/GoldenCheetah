@@ -36,6 +36,7 @@
 // interactions
 #define YYSTYPE QString
 
+// fromUtf8 is the default behaviour for the char* QString constructor on Qt5
 #if QT_VERSION < 0x050000
 #define QSTRINGUTF8(x) QString::fromUtf8(x)
 #else

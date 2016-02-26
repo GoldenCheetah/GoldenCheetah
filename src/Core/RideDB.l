@@ -40,6 +40,7 @@
 static QString unprotect(char *string)
 {
     // sending UTF-8 to FLEX demands symetric conversion back to QString
+    // fromUtf8 is the default behaviour for the char* QString constructor on Qt5
 #if QT_VERSION < 0x050000
     QString s = QString::fromUtf8(string);
 #else
