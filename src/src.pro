@@ -114,8 +114,8 @@ LIBS += $${LIBZ_LIBS}
 # windows icon and use QT zlib, not sure why different but keep for now
 win32 {
 
-    RC_FILE = win32/windowsico.rc
-    INCLUDEPATH += ./win32 $${QT_INSTALL_PREFIX}/src/3rdparty/zlib
+    RC_FILE = Resources/win32/windowsico.rc
+    INCLUDEPATH += Resources/win32 $${QT_INSTALL_PREFIX}/src/3rdparty/zlib
     LIBS += -lws2_32
 
 } else {
