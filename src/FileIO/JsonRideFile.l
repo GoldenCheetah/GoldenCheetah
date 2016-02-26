@@ -36,11 +36,21 @@
 // interactions
 #define YYSTYPE QString
 
+#if QT_VERSION < 0x050000
+#define QSTRINGUTF8(x) QString::fromUtf8(x)
+#else
+#define QSTRINGUTF8(x) QString(x)
+#endif
+
 // Un-Escape special characters (JSON compliance)
 static QString unprotect(char *string)
 {
     // sending UTF-8 to FLEX demands symetric conversion back to QString
+#if QT_VERSION < 0x050000
     QString string2 = QString::fromUtf8(string);
+#else
+    QString string2(string);
+#endif
 
     // this is a lexer string so it will be enclosed
     // in quotes. Lets strip those first
@@ -152,10 +162,9 @@ void JsonRideFilefree (void * ptr , yyscan_t /*scanner*/)
 \"RCON\"            return RCON;
 \"RVERT\"           return RVERT;
 \"RCAD\"            return RCAD;
-[-+]?[0-9]+                     { *yylval = QString::fromUtf8(yytext); return JS_INTEGER; }
-[-+]?[0-9]+e-[0-9]+             { *yylval = QString::fromUtf8(yytext); return JS_FLOAT;   }
-[-+]?[0-9]+\.[-+e0-9]*          { *yylval = QString::fromUtf8(yytext); return JS_FLOAT;   }
-
+[-+]?[0-9]+                     { *yylval = QSTRINGUTF8(yytext); return JS_INTEGER; }
+[-+]?[0-9]+e-[0-9]+             { *yylval = QSTRINGUTF8(yytext); return JS_FLOAT;   }
+[-+]?[0-9]+\.[-+e0-9]*          { *yylval = QSTRINGUTF8(yytext); return JS_FLOAT;   }
 \"([^\"]|\\\")*\"               { *yylval = unprotect(yytext); return JS_STRING;  } /* contains non-quotes or escaped-quotes */
 [ \n\t\r]                       ;               /* we just ignore whitespace */
 .                               return yytext[0]; /* any other character, typically :, { or } */

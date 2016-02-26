@@ -151,15 +151,20 @@ RideFile::isRun() const
 {
     // for now we just look at Sport and if there are any
     // running specific data series in the data
-    return (getTag("Sport", "") == "Run" || getTag("Sport", "") == tr("Run")) ||
-           (areDataPresent()->rvert || areDataPresent()->rcad || areDataPresent()->rcontact);
+
+    // we call this *a lot* and it doesn't change once we have the file, so only lookup once.
+    static bool isrun = (getTag("Sport", "") == "Run" || getTag("Sport", "") == tr("Run")) ||
+            (areDataPresent()->rvert || areDataPresent()->rcad || areDataPresent()->rcontact);
+    return isrun;
 }
 
 bool
 RideFile::isSwim() const
 {
     // for now we just look at Sport
-    return (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim"));
+    // we call this *a lot* and it doesn't change once we have the file, so only lookup once.
+    static bool isswim = (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim"));
+    return isswim;
 }
 
 QString

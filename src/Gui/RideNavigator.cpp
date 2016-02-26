@@ -265,8 +265,10 @@ RideNavigator::resetView()
 
     // add metrics to the map
     const RideMetricFactory &factory = RideMetricFactory::instance();
+    QTextEdit convertor;
     for (int i=0; i<factory.metricCount(); i++) {
-        QString converted = QTextEdit(factory.rideMetric(factory.metricName(i))->name()).toPlainText();
+        convertor.setText(factory.rideMetric(factory.metricName(i))->name());
+        QString converted = convertor.toPlainText();
 
         // from sql column name to friendly metric name
         nameMap.insert(QString("%1").arg(factory.metricName(i)), converted);
