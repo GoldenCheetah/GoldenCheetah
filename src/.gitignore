@@ -10,6 +10,9 @@ gcconfig.pri
 src.pro.user
 *.autosave
 
+# MSVC2015
+*.opt
+
 # old skool
 .svn
 
