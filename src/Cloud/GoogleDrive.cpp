@@ -63,7 +63,7 @@ namespace {
         "application/vnd.google-apps.folder";
     static const QString kMetadataMimeType = "application/json";
     // This is an integer but written as a string.
-    static const QString kMaxResults = "10000";
+    static const QString kMaxResults = "1000";
 };
 
 struct GoogleDrive::FileInfo {
@@ -289,10 +289,10 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
             return returning;
         }
     }
-
     QNetworkRequest request = MakeRequest(
         token, MakeQString(parent_fi->id) +
-        QString("&maxResults=" + kMaxResults));
+        QString("&pageSize=" + kMaxResults + "&fields=nextPageToken,files(explicitlyTrashed,fileExtension,id,kind,mimeType,modifiedTime,name,properties,size,trashed)"));
+    QString url = request.url().toString();
     QNetworkReply *reply = nam_->get(request);
 
     // blocking request
@@ -319,16 +319,16 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
 
     QJsonArray contents = document.object()["files"].toArray();
     // Fetch more files as long as there are more files.
-    QString next_link = document.object()["nextLink"].toString();
-    while (next_link != "") {
-        printd("Fetching nextLink!\n");
-        document = FetchNextLink(next_link, token);
+    QString next_page_token = document.object()["nextPageToken"].toString();
+    while (next_page_token != "") {
+        printd("Fetching next page!\n");
+        document = FetchNextLink(url + "&pageToken=" + next_page_token, token);
         // Append items;
         QJsonArray tmp = document.object()["files"].toArray();
         for (int i = 0; i < tmp.size(); i++ ) {
             contents.push_back(tmp.at(i));
         }
-        next_link = document.object()["nextLink"].toString();
+        next_page_token = document.object()["nextPageToken"].toString();
     }
     // Ok. We have reeeived all the files.
     // Technically we could cache this, but if we do we need to figure out
@@ -367,7 +367,9 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
         fi->modified = QDateTime::fromString(
             file["modifiedDate"].toString().mid(0,25),
             "ddd, dd MMM yyyy hh:mm:ss");
-        fi->download_url = file["downloadUrl"].toString();
+        fi->download_url = QString(
+            "https://www.googleapis.com/drive/v3/files/" + fi->id +
+            "?alt=media");
         file_by_id[fi->id] = fi;
     }
     // Ok. We now have all valid files. Build the tree. We only rebuild the part
@@ -438,7 +440,9 @@ bool GoogleDrive::readFile(QByteArray *data, QString remote_name) {
         printd("Trying to download files that don't exist?\n");
         return false;
     }
-
+    printd("Trying to download: %s from %s\n",
+           remote_name.toStdString().c_str(),
+           fi->download_url.toStdString().c_str());
     QNetworkRequest request(fi->download_url);
     request.setRawHeader(
         "Authorization", (QString("Bearer %1").arg(token)).toLatin1());
@@ -453,7 +457,6 @@ bool GoogleDrive::readFile(QByteArray *data, QString remote_name) {
     return true;
 }
 
-// I suspect this is a bug in readdir.
 QString GoogleDrive::MakeQString(const QString& parent) {
     QString q;
     if (parent == "") {
@@ -617,6 +620,7 @@ void GoogleDrive::readFileCompleted() {
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
     notifyReadComplete(buffers_.value(reply), replyName(reply),
                        tr("Completed."));
+    // erase from buffer?
 }
 
 void GoogleDrive::MaybeRefreshCredentials() {
