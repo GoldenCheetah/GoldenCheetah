@@ -156,5 +156,7 @@
         <file>images/sidebar/sync.png</file>
         <file>images/oxygen/up-arrow-bw.png</file>
         <file>images/oxygen/down-arrow-bw.png</file>
+        <file>images/oxygen/go-up.png</file>
+        <file>images/oxygen/go-down.png</file>
     </qresource>
 </RCC>

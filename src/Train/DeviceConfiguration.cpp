@@ -37,6 +37,7 @@ DeviceConfiguration::DeviceConfiguration()
     wheelSize=2100;
     postProcess=0;
     controller=NULL;
+    levels=levelstart=levelstep=0;
 }
 
 
@@ -116,6 +117,19 @@ DeviceConfigurations::readConfig()
             configVal = appsettings->value(NULL, configStr);
             Entry.postProcess = configVal.toInt();
 
+            configStr = QString("%1%2").arg(GC_DEV_LEVELS).arg(i+1);
+            configVal = appsettings->value(NULL, configStr);
+            Entry.levels = configVal.toInt();
+
+            configStr = QString("%1%2").arg(GC_DEV_MINLEVEL).arg(i+1);
+            configVal = appsettings->value(NULL, configStr);
+            Entry.levelstart = configVal.toInt();
+
+            configStr = QString("%1%2").arg(GC_DEV_LEVELSTEP).arg(i+1);
+            configVal = appsettings->value(NULL, configStr);
+            Entry.levelstep = configVal.toInt();
+
+
             Entries.append(Entry);
     }
     return Entries;
@@ -158,6 +172,17 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
         // virtual post Process...
         configStr = QString("%1%2").arg(GC_DEV_VIRTUAL).arg(i+1);
         appsettings->setValue(configStr, Configuration.at(i).postProcess);
+
+        // resistance level settings
+        configStr = QString("%1%2").arg(GC_DEV_LEVELS).arg(i+1);
+        appsettings->setValue(configStr, Configuration.at(i).levels);
+
+        configStr = QString("%1%2").arg(GC_DEV_MINLEVEL).arg(i+1);
+        appsettings->setValue(configStr, Configuration.at(i).levelstart);
+
+        configStr = QString("%1%2").arg(GC_DEV_LEVELSTEP).arg(i+1);
+        appsettings->setValue(configStr, Configuration.at(i).levelstep);
+
     }
 
 }

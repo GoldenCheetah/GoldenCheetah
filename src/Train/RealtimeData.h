@@ -67,6 +67,7 @@ public:
     void setCadence(double aCadence);
     void setLoad(double load);
     void setSlope(double slope);
+    void setLevel(int level);
     void setMsecs(long);
     void setLapMsecs(long);
     void setLapMsecsRemaining(long);
@@ -102,6 +103,7 @@ public:
     double getCadence() const;
     double getLoad() const;
     double getSlope() const;
+    int getLevel() const;
     long getMsecs() const;
     long getLapMsecs() const;
     double getDistance() const;
@@ -136,6 +138,7 @@ private:
     double cadence;      // in rpm
     double smo2, thb;
     double lte, rte, lps, rps; // torque efficiency and pedal smoothness
+    int level;
 
     // derived data
     double distance;

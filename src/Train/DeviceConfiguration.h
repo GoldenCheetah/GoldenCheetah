@@ -41,6 +41,10 @@ class DeviceConfiguration
     int  wheelSize;             // set wheel size for each device
     int  postProcess;           // virtualChannel
 
+    int  levels;                // Does this device have set levels
+    int  levelstep;             // What's the level stepping
+    int  levelstart;            // starting from.
+
     RealtimeController *controller; // can be used to allocate controller for this device
                                     // although a bit odd, it makes synchronising the config
                                     // with runtime allocation a bit simpler in traintool

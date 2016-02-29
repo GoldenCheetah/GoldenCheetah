@@ -28,12 +28,51 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     QWidget(parent),
     m_trainSidebar(trainSidebar)
 {
-    QHBoxLayout *intensityControlLayout = new QHBoxLayout();
+    levelbuttons = new QVBoxLayout;
+    levelbuttons->setSpacing(0);
+    levelbuttons->setContentsMargins(0,0,0,0);
 
+    QIcon lupIcon(":images/oxygen/go-up.png");
+    QPushButton *levUp = new QPushButton(lupIcon, "", this);
+    levUp->setFocusPolicy(Qt::NoFocus);
+    levUp->setIconSize(QSize(32,32));
+    levUp->setAutoFillBackground(false);
+    levUp->setAutoDefault(false);
+    levUp->setFlat(true);
+#if QT_VERSION > 0x050400
+    levUp->setShortcut(Qt::Key_Up);
+#endif
+    levUp->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    levelbuttons->addWidget(levUp);
+
+    levLabel = new QLabel("-",this);
+    levLabel->setAlignment(Qt::AlignCenter);
+    levelbuttons->addWidget(levLabel);
+
+    QIcon ldownIcon(":images/oxygen/go-down.png");
+    QPushButton *levDown = new QPushButton(ldownIcon, "", this);
+    levDown->setFocusPolicy(Qt::NoFocus);
+    levDown->setIconSize(QSize(32,32));
+    levDown->setAutoFillBackground(false);
+    levDown->setAutoDefault(false);
+    levDown->setFlat(true);
+#if QT_VERSION > 0x050400
+    levDown->setShortcut(Qt::Key_Down);
+#endif
+    levDown->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    levelbuttons->addWidget(levDown);
+
+    connect(levUp, SIGNAL(clicked()), m_trainSidebar, SLOT(LevHigher()));
+    connect(levDown, SIGNAL(clicked()), m_trainSidebar, SLOT(LevLower()));
+    connect(m_trainSidebar, SIGNAL(levelChanged(QString)), levLabel, SLOT(setText(QString)));
+
+    QHBoxLayout *intensityControlLayout = new QHBoxLayout();
+    QVBoxLayout *intensbuttons = new QVBoxLayout;
+    intensityControlLayout->addLayout(intensbuttons);
     QIcon upIcon(":images/oxygen/up-arrow-bw.png");
     QPushButton *loadUp = new QPushButton(upIcon, "", this);
     loadUp->setFocusPolicy(Qt::NoFocus);
-    loadUp->setIconSize(QSize(64,64));
+    loadUp->setIconSize(QSize(32,32));
     loadUp->setAutoFillBackground(false);
     loadUp->setAutoDefault(false);
     loadUp->setFlat(true);
@@ -43,11 +82,12 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     loadUp->setShortcut(Qt::Key_Plus);
 #endif
     loadUp->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    intensbuttons->addWidget(loadUp);
 
     QIcon downIcon(":images/oxygen/down-arrow-bw.png");
     QPushButton *loadDown = new QPushButton(downIcon, "", this);
     loadDown->setFocusPolicy(Qt::NoFocus);
-    loadDown->setIconSize(QSize(64,64));
+    loadDown->setIconSize(QSize(32,32));
     loadDown->setAutoFillBackground(false);
     loadDown->setAutoDefault(false);
     loadDown->setFlat(true);
@@ -57,6 +97,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     loadDown->setShortcut(Qt::Key_Minus);
 #endif
     loadDown->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;"); 
+    intensbuttons->addWidget(loadDown);
 
     QSlider *intensitySlider = new QSlider(Qt::Vertical, this);
     intensitySlider->setAutoFillBackground(false);
@@ -65,8 +106,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     intensitySlider->setMaximum(125);
     intensitySlider->setValue(100);
 
-    intensityControlLayout->addWidget(loadDown);
-    intensityControlLayout->addWidget(loadUp);
     intensityControlLayout->addWidget(intensitySlider);
     intensityControlLayout->addStretch();
 
@@ -169,11 +208,17 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     QCheckBox *hideOnIdle = new QCheckBox(tr("Auto Hide"), this);
     intensityControlLayout->addWidget(hideOnIdle);
 
+    levelwidget = new QWidget(this);
+    levelwidget->setLayout(levelbuttons);
+    toolbuttons->addWidget(levelwidget);
 
     QHBoxLayout *allControlsLayout = new QHBoxLayout();
     allControlsLayout->addStretch();
     allControlsLayout->addLayout(toolbuttons);
+    //allControlsLayout->addLayout(levelwidget);
     allControlsLayout->addLayout(intensityControlLayout);
+
+    levelwidget->setVisible(false);
 
     connect(m_playButton, SIGNAL(clicked()), m_trainSidebar, SLOT(Start()));
     connect(m_rewindButton, SIGNAL(clicked()), m_trainSidebar, SLOT(Rewind()));
@@ -187,6 +232,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     connect(hideOnIdle, SIGNAL(stateChanged(int)), this, SLOT(autoHideCheckboxChanged(int)));
     connect(m_trainSidebar, SIGNAL(statusChanged(int)), this, SLOT(statusChanged(int)));
     connect(m_connectButton, SIGNAL(clicked()), m_trainSidebar, SLOT(toggleConnect()));
+    connect(m_trainSidebar, SIGNAL(enableLevels(bool)),this, SLOT(enableLevels(bool)));
 
     this->setContentsMargins(0,0,0,0);
     this->setFocusPolicy(Qt::NoFocus);
@@ -222,6 +268,12 @@ void TrainBottom::autoHideCheckboxChanged(int state)
     emit autoHideChanged(state == Qt::Checked);
 }
 
+// Activate or disable the level controls
+void TrainBottom::enableLevels(bool enable)
+{
+    levelwidget->setVisible(enable);
+    levelwidget->adjustSize();
+}
 
 void TrainBottom::statusChanged(int status)
 {

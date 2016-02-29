@@ -23,6 +23,8 @@
 
 class TrainSidebar;
 class QPushButton;
+class QLabel;
+class QVBoxLayout;
 
 class TrainBottom : public QWidget
 {
@@ -34,11 +36,15 @@ private:
     TrainSidebar *m_trainSidebar;
     QPushButton *m_playButton, *m_rewindButton, *m_stopButton, *m_forwardButton;
     QPushButton *m_lapButton, *m_connectButton;
+    QLabel *levLabel;
+    QWidget *levelwidget;
+    QVBoxLayout *levelbuttons;
 
 private slots:
     void updatePlayButtonIcon();
     void autoHideCheckboxChanged(int state);
     void statusChanged(int status);
+    void enableLevels(bool enable);
 
 signals:
     void autoHideChanged(bool enabled);

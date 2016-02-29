@@ -43,6 +43,7 @@
 #define ERG     1
 #define MRC     2
 #define CRS     3
+#define LEV     4
 
 class ErgFilePoint
 {

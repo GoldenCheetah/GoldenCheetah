@@ -59,6 +59,7 @@ public:
     // only relevant for Computrainer like devices
     virtual void setLoad(double) { return; }
     virtual void setGradient(double) { return; }
+    virtual void setLevel(int) { return; }
     virtual void setMode(int) { return; }
 
     // post process, based upon device configuration
