@@ -205,7 +205,9 @@ class MainWindow : public QMainWindow
 #if QT_VERSION > 0x050000
         void uploadDropbox();
         void syncDropbox();
+#endif
 
+#if QT_VERSION >= 0x050400
         void uploadGoogleDrive();
         void syncGoogleDrive();
 #endif

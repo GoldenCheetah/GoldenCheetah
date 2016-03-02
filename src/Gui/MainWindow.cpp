@@ -81,6 +81,8 @@
 #include "CalendarDownload.h"
 #if QT_VERSION > 0x050000
 #include "Dropbox.h"
+#endif
+#if QT_VERSION >= 0x050400
 #include "GoogleDrive.h"
 #endif
 #include "LocalFileStore.h"
@@ -558,11 +560,11 @@ MainWindow::MainWindow(const QDir &home)
     shareMenu->addSeparator ();
     shareMenu->addAction(tr("Upload to &Dropbox"), this, SLOT(uploadDropbox()), tr("Ctrl+R"));
     shareMenu->addAction(tr("Synchronise Dropbox..."), this, SLOT(syncDropbox()), tr("Ctrl+O"));
+#endif
+#if QT_VERSION > 0x050400
     shareMenu->addSeparator ();
-    shareMenu->addAction(tr("Upload to &GoogleDrive"), this,
-                         SLOT(uploadGoogleDrive()), tr(""));
-    shareMenu->addAction(tr("Synchronise GoogleDrive..."), this,
-                         SLOT(syncGoogleDrive()), tr("Ctrl+P"));
+    shareMenu->addAction(tr("Upload to &GoogleDrive"), this, SLOT(uploadGoogleDrive()), tr(""));
+    shareMenu->addAction(tr("Synchronise GoogleDrive..."), this, SLOT(syncGoogleDrive()), tr("Ctrl+P"));
 #endif
 #ifdef GC_HAVE_SOAP
     shareMenu->addSeparator ();
@@ -2069,7 +2071,9 @@ MainWindow::syncDropbox()
     FileStoreSyncDialog upload(currentTab->context, &db);
     upload.exec();
 }
+#endif
 
+#if QT_VERSION > 0x050400
 void
 MainWindow::uploadGoogleDrive()
 {

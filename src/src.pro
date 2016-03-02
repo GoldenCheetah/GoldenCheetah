@@ -519,13 +519,17 @@ equals(CloudDB, active) {
 
 greaterThan(QT_MAJOR_VERSION, 4) {
 
-    # Features that only work with QT5 or higher
+    # Features that only work with QT5.0 or higher
     SOURCES += Cloud/Dropbox.cpp
     HEADERS += Cloud/Dropbox.h
-    SOURCES += Cloud/GoogleDrive.cpp
-    HEADERS += Cloud/GoogleDrive.h
     SOURCES += Train/Monark.cpp Train/MonarkController.cpp Train/MonarkConnection.cpp
     HEADERS += Train/Monark.h Train/MonarkController.h Train/MonarkConnection.h
+
+    # GoogleDrive needs QT5.4 or higher
+    greaterThan(QT_MINOR_VERSION, 3) {
+        SOURCES += Cloud/GoogleDrive.cpp
+        HEADERS += Cloud/GoogleDrive.h
+    }
 }
 
 
