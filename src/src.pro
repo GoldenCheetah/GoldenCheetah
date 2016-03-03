@@ -36,7 +36,7 @@ CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 ###======================================================
 
 # always
-QT += xml sql network script svg concurrent
+QT += xml sql network svg concurrent
 
 lessThan(QT_MAJOR_VERSION, 5) {
 
