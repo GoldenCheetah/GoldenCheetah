@@ -231,7 +231,7 @@ GoogleDrive::FileInfo* GoogleDrive::WalkFileInfo(const QString& path,
         if (child == target->children.end()) {
             // Directory doesn't exist!
             printd("Bailing, because I couldn't find: %s in %s\n",
-                   it->toStdString().c_str(),
+                   (*it).toStdString().c_str(),
                    target->name.toStdString().c_str());
             if (foo) {
                 return target;
@@ -338,11 +338,11 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
         QJsonObject file = contents.at(i).toObject();
         // Some paranoia.
         QJsonObject::iterator it = file.find("trashed");
-        if (it != file.end() && it->toString() == "true") {
+        if (it != file.end() && (*it).toString() == "true") {
             continue;
         }
         it = file.find("explicitlyTrashed");
-        if (it != file.end() && it->toString() == "true") {
+        if (it != file.end() && (*it).toString() == "true") {
             continue;
         }
         QSharedPointer<FileInfo> fi(new FileInfo);
@@ -357,7 +357,7 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
             fi->parent = GetRootDirId();
         }
         it = file.find("mimeType");
-        if (it != file.end() && it->toString() == kDirectoryMimeType) {
+        if (it != file.end() && (*it).toString() == kDirectoryMimeType) {
             fi->is_dir = true;
         } else {
             fi->is_dir = false;
