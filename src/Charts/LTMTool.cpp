@@ -1904,6 +1904,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
         QTreeWidgetItem *add;
         add = new QTreeWidgetItem(metricTree->invisibleRootItem(), METRIC_TYPE);
         add->setText(0, metric.name);
+        if (metric.metric != NULL) add->setToolTip(0, metric.metric->description());
     }
     metricTree->expandItem(metricTree->invisibleRootItem());
 
