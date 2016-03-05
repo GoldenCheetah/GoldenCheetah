@@ -70,6 +70,7 @@ class XPowerSwim : public RideMetric {
         setType(RideMetric::Average);
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
+        setDescription(tr("Swimming power normalized for variations in speed as defined by Dr. Skiba in the SwimScore algorithm"));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -158,6 +159,7 @@ class XPaceSwim : public RideMetric {
         setImperialUnits(tr("min/100yd"));
         setPrecision(1);
         setConversion(METERS_PER_YARD);
+        setDescription(tr("Normalized Swim Pace in min/100m or min/100yd, defined as the constant pace which requires the same xPowerSwim"));
     }
 
 
@@ -205,6 +207,7 @@ class STP : public RideMetric {
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
         setPrecision(0);
+        setDescription(tr("Swimming Threshold Power based on Swimming Critical Velocity, used for SwimScore calculation"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
@@ -257,6 +260,7 @@ class SRI : public RideMetric {
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setPrecision(2);
+        setDescription(tr("Swimming Relative Intensity, used for SwimScore calculation, defined as xPowerSwim/STP"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -299,6 +303,7 @@ class SwimScore : public RideMetric {
     void initialize() {
         setName("SwimScore");
         setType(RideMetric::Total);
+        setDescription(tr("SwimScore swimming stress metric as defined by Dr. Skiba"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -372,6 +377,7 @@ class TriScore : public RideMetric {
     void initialize() {
         setName("TriScore");
         setType(RideMetric::Total);
+        setDescription(tr("TriScore combined stress metric based on Dr. Skiba stress metrics, defined as BikeScore for cycling, GOVSS for running and SwimScore for swimming"));
     }
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
