@@ -49,6 +49,7 @@ extern quint16 UserMetricSchemaVersion;
 typedef QSharedPointer<RideMetric> RideMetricPtr;
 
 class RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(RideMetric)
 
 public:
 
@@ -91,6 +92,10 @@ public:
 
     // English name used in metadata.xml for compatibility
     virtual QString internalName() const { return internalName_; }
+
+    // A description explaining metrics details to be shown in tooltips,
+    // it should be translated using tr()
+    virtual QString description() const { return description_.isEmpty() ? name() + " - " + tr("No description available, see Glossary in User Guide") : description_; }
 
     // What type of metric is this?
     // Drives the way metrics combined over a day or week in the
@@ -192,6 +197,7 @@ public:
     void setImperialUnits(QString x) { imperialUnits_ = x; }
     void setName(QString x) { name_ = x; }
     void setInternalName(QString x) { internalName_ = x; }
+    void setDescription(QString x) { description_ = x; }
     void setSymbol(QString x) { symbol_ = x; }
     void setType(MetricType x) { type_ = x; }
 
@@ -203,7 +209,7 @@ public:
                 precision_;
 
         QString metricUnits_, imperialUnits_;
-        QString name_, symbol_, internalName_;
+        QString name_, symbol_, internalName_, description_;
         MetricType type_;
 };
 
@@ -230,11 +236,9 @@ public:
 
     QString symbol() const;
 
-    // A short string suitable for showing to the user in the ride
-    // summaries, configuration dialogs, etc.  It should be translated
-    // using tr().
     QString name() const; 
     QString internalName() const; 
+    QString description() const;
 
     // Long term metrics charts
     RideMetric::MetricType type() const; 

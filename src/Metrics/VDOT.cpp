@@ -47,6 +47,7 @@ class VDOT : public RideMetric {
         setImperialUnits(tr("ml/min/kg"));
         setType(RideMetric::Peak);
         setPrecision(1);
+        setDescription(tr("Daniels' VDOT computed from best average pace for durations from 4 min 4 hr"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
@@ -108,6 +109,7 @@ class TPace : public RideMetric {
         setImperialUnits(tr("min/mile"));
         setPrecision(1);
         setConversion(KM_PER_MILE);
+        setDescription(tr("Daniels' TPace, computed as 90%vVDOT from VDOT metric, in min/km or min/mile"));
     }
 
 

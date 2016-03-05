@@ -77,6 +77,7 @@ class LNP : public RideMetric {
         setMetricUnits("watts");
         setImperialUnits("watts");
         setPrecision(0);
+        setDescription(tr("Lactate Normalized Power as defined by Dr. Skiba in GOVSS algorithm"));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -199,6 +200,7 @@ class XPace : public RideMetric {
         setImperialUnits(tr("min/mile"));
         setPrecision(1);
         setConversion(KM_PER_MILE);
+        setDescription(tr("Normalized pace in min/km or min/mile, defined as the constant pace in flat surface which requires the same LNP"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -261,6 +263,7 @@ class RTP : public RideMetric {
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
         setPrecision(0);
+        setDescription(tr("Run Threshold Power, computed from Critical Velocity using the GOVSS related algorithm"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
@@ -315,6 +318,7 @@ class IWF : public RideMetric {
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setPrecision(2);
+        setDescription(tr("Intensity Weigthting Factor, part of GOVSS calculation, defined as LNP/RTP"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -358,6 +362,7 @@ class GOVSS : public RideMetric {
     void initialize() {
         setName("GOVSS");
         setType(RideMetric::Total);
+        setDescription(tr("Gravity Ordered Velocity Stress Score, the TSS like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration"));
     }
 
 

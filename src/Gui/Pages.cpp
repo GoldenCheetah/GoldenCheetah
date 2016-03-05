@@ -2334,6 +2334,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
         item->setData(Qt::UserRole, symbol);
+        item->setToolTip(m->description());
         availList->addItem(item);
     }
     foreach (QString symbol, selectedMetrics) {
@@ -2342,6 +2343,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
         item->setData(Qt::UserRole, symbol);
+        item->setToolTip(m->description());
         selectedList->addItem(item);
     }
 
@@ -2529,6 +2531,7 @@ BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
         item->setData(Qt::UserRole, symbol);
+        item->setToolTip(m->description());
         availList->addItem(item);
     }
     foreach (QString symbol, selectedMetrics) {
@@ -2537,6 +2540,7 @@ BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
         item->setData(Qt::UserRole, symbol);
+        item->setToolTip(m->description());
         selectedList->addItem(item);
     }
 
@@ -2697,7 +2701,9 @@ CustomMetricsPage::refreshTable()
 
         QTreeWidgetItem *add = new QTreeWidgetItem(table->invisibleRootItem());
         add->setText(0, m.symbol);
+        add->setToolTip(0, m.description);
         add->setText(1, m.name);
+        add->setToolTip(1, m.description);
     }
 }
 
@@ -2903,6 +2909,7 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
         item->setData(Qt::UserRole, symbol);
+        item->setToolTip(m->description());
         availList->addItem(item);
     }
     foreach (QString symbol, selectedMetrics) {
@@ -2911,6 +2918,7 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
         item->setData(Qt::UserRole, symbol);
+        item->setToolTip(m->description());
         selectedList->addItem(item);
     }
 
