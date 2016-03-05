@@ -7050,7 +7050,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="430"/>
         <source>MMMM yyyy</source>
-        <translation type="unfinished">mese-anno</translation>
+        <translation>MMMM yyyy</translation>
     </message>
 </context>
 <context>
@@ -10001,42 +10001,42 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="510"/>
         <source>Mon</source>
-        <translation type="unfinished">Lunedi&apos;</translation>
+        <translation>Lun</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="519"/>
         <source>Tue</source>
-        <translation type="unfinished">Martedi&apos;</translation>
+        <translation>Mar</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="528"/>
         <source>Wed</source>
-        <translation type="unfinished">Mercoledi&apos;</translation>
+        <translation>Mer</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="537"/>
         <source>Thu</source>
-        <translation type="unfinished">Giovedi&apos;</translation>
+        <translation>Gio</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="546"/>
         <source>Fri</source>
-        <translation type="unfinished">Venerdi&apos;</translation>
+        <translation>Ven</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="555"/>
         <source>Sat</source>
-        <translation type="unfinished">Sabato</translation>
+        <translation>Sab</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="564"/>
         <source>Sun</source>
-        <translation type="unfinished">Domenica</translation>
+        <translation>Dom</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="818"/>
         <source>MMMM yyyy</source>
-        <translation type="unfinished">mese-anno</translation>
+        <translation>MMMM yyyy</translation>
     </message>
 </context>
 <context>
@@ -13907,7 +13907,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="202"/>
         <source>MMMM yyyy</source>
-        <translation type="unfinished">mese-anno</translation>
+        <translation>MMMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="208"/>
