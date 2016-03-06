@@ -45,7 +45,10 @@ VideoWindow::VideoWindow(Context *context)  :
     //
 #ifndef Q_CC_MSVC
 #if QT_VERSION >= 0x050000
-#warning "WARNING: Please ensure the VLC QT4 plugin (gui/libqt4_plugin) is NOT available as it will cause GC to crash."
+// we no longer warn here since it is a runtime issue, on some Ubuntu platforms
+// the VLC plugin cache is out of date and needs refreshing with the command:
+// $ sudo /usr/lib/vlc/vlc-cache-gen -f /usr/lib/vlc/plugins/
+// #warning "WARNING: Please ensure the VLC QT4 plugin (gui/libqt4_plugin) is NOT available as it will cause GC to crash."
 #endif
 #endif
 
