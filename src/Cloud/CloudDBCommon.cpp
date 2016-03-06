@@ -482,8 +482,8 @@ CloudDBHeader::getAllCachedHeader(QList<CommonAPIHeaderV1> *objectHeader, CloudD
     QMutableListIterator<CommonAPIHeaderV1> it(*objectHeader);
     while (it.hasNext()) {
         CommonAPIHeaderV1 header = it.next();
-        if (header.Id > 0 && updatedIds.contains(header.Id) ||
-            header.Key.size() > 0 && updatedStringIds.contains(header.Key)) {
+        if ((header.Id > 0 && updatedIds.contains(header.Id)) ||
+            (header.Key.size() > 0 && updatedStringIds.contains(header.Key))) {
             // update cache (Header Cache)
             it.remove();
         }

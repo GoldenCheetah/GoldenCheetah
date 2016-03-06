@@ -50,7 +50,7 @@ bool ErgFile::isWorkout(QString name)
     return false;
 }
 ErgFile::ErgFile(QString filename, int mode, Context *context) :
-    filename(filename), context(context), mode(mode)
+    filename(filename), mode(mode), context(context)
 {
     if (context->athlete->zones(false)) {
         int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
@@ -59,7 +59,7 @@ ErgFile::ErgFile(QString filename, int mode, Context *context) :
     reload();
 }
 
-ErgFile::ErgFile(Context *context) : context(context), mode(nomode)
+ErgFile::ErgFile(Context *context) : mode(nomode), context(context)
 {
     if (context->athlete->zones(false)) {
         int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
