@@ -526,6 +526,7 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
             if (p->watts > 0) out << " \"WATTS\":" << QString("%1").arg(p->watts);
             if (p->cad > 0) out << " \"CAD\":" << QString("%1").arg(p->cad);
             if (p->hr > 0) out << " \"HR\":"  << QString("%1").arg(p->hr);
+            if (p->secs > 0) out << " \"SECS\":" << QString("%1").arg(p->secs);
 
             // sample points in here!
             out << " }";

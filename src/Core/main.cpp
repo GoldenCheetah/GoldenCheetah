@@ -218,8 +218,8 @@ main(int argc, char *argv[])
 
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
-    IdleEventFilter idleFilter;
-    application->installEventFilter(&idleFilter);
+    //XXXIdleEventFilter idleFilter;
+    //XXXapplication->installEventFilter(&idleFilter);
 
 #ifdef Q_OS_MAC
     // get an autorelease pool setup
