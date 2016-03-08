@@ -133,7 +133,9 @@
 // 123 19  Nov 2015 Mark Liversedge    Force recompute of TSS/IF after logic fix
 // 124 03  Dec 2015 Mark Liversedge    Min Temp
 // 125 08  Dec 2015 Ale Martinez       Support metrics in Calendar Text
-int DBSchemaVersion = 125;
+// 126 08  Mar 2016 Mark Liversedge    Added count of To Exhaustions
+
+int DBSchemaVersion = 126;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
