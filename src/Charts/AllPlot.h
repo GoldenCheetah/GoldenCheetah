@@ -377,9 +377,14 @@ class AllPlotObject : public QObject
     QwtPlotMarker curveTitle;
     QwtPlotMarker *allMarker1;
     QwtPlotMarker *allMarker2;
+
     // reference lines
     QVector<QwtPlotCurve*> referenceLines;
     QVector<QwtPlotCurve*> tmpReferenceLines;
+
+    // points of exhaustion
+    QVector<QwtPlotMarker*> exhaustionLines;
+    QVector<QwtPlotMarker*> tmpExhaustionLines;
 
     QwtPlotCurve *wattsCurve;
     QwtPlotCurve *slopeCurve;
@@ -577,6 +582,8 @@ class AllPlot : public QwtPlot
         void refreshCalibrationMarkers();
         void refreshReferenceLines();
         void refreshReferenceLinesForAllPlots();
+        void refreshExhaustions();
+        void refreshExhaustionsForAllPlots();
         void setAxisTitle(QwtAxisId axis, QString label);
 
         // refresh data / plot parameters
@@ -590,6 +597,12 @@ class AllPlot : public QwtPlot
         void plotTmpReference(QwtAxisId axis, int x, int y, RideFile::SeriesType serie);
         void confirmTmpReference(double value, int axis, RideFile::SeriesType serie, bool allowDelete);
         QwtPlotCurve* plotReferenceLine(const RideFilePoint *referencePoint);
+
+        // marking part of a ride where athlete rode to exhaustion
+        // user can confirm exact point and name to point
+        void plotTmpExhaustion(double secs);
+        QwtPlotMarker* plotExhaustionLine(double secs);
+        void confirmTmpExhaustion(double secs, bool allowDelete=false);
 
         virtual void replot();
 

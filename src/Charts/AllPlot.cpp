@@ -23,6 +23,7 @@
 #include "AllPlotWindow.h"
 #include "AllPlotSlopeCurve.h"
 #include "ReferenceLineDialog.h"
+#include "ExhaustionDialog.h"
 #include "RideFile.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
@@ -943,6 +944,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     setAxisMaxMinor(xBottom, 0);
     enableAxis(xBottom, true);
     setAxisVisible(xBottom, true);
+    axisWidget(QwtAxisId(QwtAxis::xBottom))->installEventFilter(this);
 
     // highlighter
     ScaleScaleDraw *sd = new ScaleScaleDraw;
@@ -2467,6 +2469,7 @@ AllPlot::recalc(AllPlotObject *objects)
 
     if (!context->isCompareIntervals) {
         refreshReferenceLines();
+        refreshExhaustions();
         refreshIntervalMarkers();
         refreshCalibrationMarkers();
         refreshZoneLabels();
@@ -2590,6 +2593,28 @@ AllPlot::refreshReferenceLines()
         foreach(const RideFilePoint *referencePoint, rideItem->ride()->referencePoints()) {
             QwtPlotCurve *referenceLine = plotReferenceLine(referencePoint);
             if (referenceLine) standard->referenceLines.append(referenceLine);
+        }
+    }
+}
+
+void
+AllPlot::refreshExhaustions()
+{
+    // not supported in compare mode
+    if (context->isCompareIntervals) return;
+
+    foreach(QwtPlotMarker *marker, standard->exhaustionLines) {
+        marker->detach();
+        delete marker;
+    }
+    standard->exhaustionLines.clear();
+
+    if (rideItem && rideItem->ride()) {
+        foreach(const RideFilePoint *referencePoint, rideItem->ride()->referencePoints()) {
+            if (referencePoint->secs) {
+                QwtPlotMarker *marker = plotExhaustionLine(referencePoint->secs);
+                if (marker) standard->exhaustionLines.append(marker);
+            }
         }
     }
 }
@@ -3508,6 +3533,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     setAxisVisible(xBottom, true);
 
     refreshReferenceLines();
+    refreshExhaustions();
     refreshIntervalMarkers();
     refreshCalibrationMarkers();
     refreshZoneLabels();
@@ -4177,6 +4203,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         refreshIntervalMarkers();
         refreshCalibrationMarkers();
         refreshReferenceLines();
+        refreshExhaustions();
 
 #if 0
         refreshZoneLabels();
@@ -4892,6 +4919,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     refreshIntervalMarkers();
     refreshCalibrationMarkers();
     refreshReferenceLines();
+    refreshExhaustions();
 
     // always draw against yLeft in series mode
     intervalHighlighterCurve->setYAxis(yLeft);
@@ -7025,26 +7053,26 @@ bool
 AllPlot::eventFilter(QObject *obj, QEvent *event)
 {
 
-    // if power is going on we worry about reference lines
-    // otherwise not so much ..
+    // REFERENCE LINE FOR POWER
     if ((showPowerState<2 && scope == RideFile::none) || scope == RideFile::watts || scope == RideFile::aTISS || 
         scope == RideFile::anTISS || scope == RideFile::NP || scope == RideFile::aPower || scope == RideFile::xPower) {
 
+        // which axis ?
         int axis = -1;
-        if (obj == axisWidget(QwtPlot::yLeft))
-            axis=QwtPlot::yLeft;
+        if (obj == axisWidget(QwtPlot::yLeft)) axis=QwtPlot::yLeft;
+        else if (obj == axisWidget(QwtPlot::xBottom)) axis=QwtPlot::xBottom;
 
-        if (axis>-1 && event->type() == QEvent::MouseButtonDblClick) {
+        if (axis == QwtPlot::yLeft && event->type() == QEvent::MouseButtonDblClick) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
             confirmTmpReference(invTransform(axis, m->y()),axis, RideFile::watts, true); // do show delete stuff
             return false;
         }
-        if (axis>-1 && event->type() == QEvent::MouseMove) {
+        if (axis == QwtPlot::yLeft && event->type() == QEvent::MouseMove) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
             plotTmpReference(axis, m->x()-axisWidget(axis)->width(), m->y(), RideFile::watts);
             return false;
         }
-        if (axis>-1 && event->type() == QEvent::MouseButtonRelease) {
+        if (axis == QwtPlot::yLeft && event->type() == QEvent::MouseButtonRelease) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
             if (m->x()>axisWidget(axis)->width()) {
                 confirmTmpReference(invTransform(axis, m->y()),axis, RideFile::watts, false); // don't show delete stuff
@@ -7056,15 +7084,14 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
+    // REFERENCE LINE FOR POWER
     if ((showHr && scope == RideFile::none) || scope == RideFile::hr) {
 
         QwtAxisId axis(-1,-1);
 
         // is it an HR Axis?
-        if (scope == RideFile::none && obj == axisWidget(QwtAxisId(QwtAxis::yLeft, 1)))
-            axis=QwtAxisId(QwtAxis::yLeft,1);
-        else if (scope == RideFile::hr && obj == axisWidget(QwtAxisId(QwtAxis::yLeft)))
-            axis=QwtAxisId(QwtAxis::yLeft);
+        if (scope == RideFile::none && obj == axisWidget(QwtAxisId(QwtAxis::yLeft, 1))) axis=QwtAxisId(QwtAxis::yLeft,1);
+        else if (scope == RideFile::hr && obj == axisWidget(QwtAxisId(QwtAxis::yLeft))) axis=QwtAxisId(QwtAxis::yLeft);
 
         if (axis != QwtAxisId(-1,-1) && event->type() == QEvent::MouseButtonDblClick) {
             QMouseEvent *m = static_cast<QMouseEvent*>(event);
@@ -7086,6 +7113,36 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
                 return true;
             }
         }
+    }
+
+    // TO EXHAUSTION REFERENCE (INTERVAL TYPE "EXHAUSTION")
+    if (obj == axisWidget(QwtPlot::xBottom)) {
+
+        // if the user clicks whilst on the axis then moves the cursor
+        // we will get the mouse move events as that happens, which
+        // means we don't need to trap mouse click events -- since we
+        // don't get mouse move events until the mouse is pressed (!)
+        QMouseEvent *m = static_cast<QMouseEvent*>(event);
+
+        if (m->type() == QEvent::MouseMove) {
+
+            // plot a temporary marker
+            plotTmpExhaustion(m->x());
+            return true;
+
+        } else if (m->type() == QEvent::MouseButtonRelease) {
+
+            // confirm and add to references + intervals
+            confirmTmpExhaustion(m->x());
+            return true;
+
+        } else if (m->type() == QEvent::MouseButtonDblClick) {
+
+            confirmTmpExhaustion(m->x(), true); // do show delete stuff
+            return false;
+        }
+
+        return false;
     }
 
     // is it for other objects ?
@@ -7162,6 +7219,112 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::Leave) context->notifyIntervalHover(NULL);
 
     return false;
+}
+
+void
+AllPlot::plotTmpExhaustion(double mx)
+{
+    // we need to have a ride to work with
+    if (!rideItem || !rideItem->ride()) return;
+
+    double px = invTransform(QwtAxisId(QwtPlot::xBottom), mx);
+    double secs = -1;
+
+    if (bydist == true) secs = rideItem->ride()->distanceToTime(px);
+    else secs = px * 60.00f;
+
+    if (secs > 0) {
+
+        foreach(QwtPlotMarker *marker, standard->tmpExhaustionLines) {
+            if (marker) {
+                //curveColors->remove(curve); // ignored if not already there
+                marker->detach();
+                delete marker;
+            }
+        }
+        standard->tmpExhaustionLines.clear();
+
+        // only plot if they are relevant to the plot.
+        QwtPlotMarker *exhaustionLine = window->allPlot->plotExhaustionLine(secs);
+        if (exhaustionLine) {
+            standard->tmpExhaustionLines.append(exhaustionLine);
+            window->allPlot->replot();
+        }
+
+        // now do the series plots
+        foreach(AllPlot *plot, window->seriesPlots) {
+            plot->replot();
+            foreach(QwtPlotMarker *marker, plot->standard->tmpExhaustionLines) {
+                if (marker) {
+                    marker->detach();
+                    delete marker;
+                }
+            }
+            plot->standard->tmpExhaustionLines.clear();
+        }
+        foreach(AllPlot *plot, window->seriesPlots) {
+            QwtPlotMarker *exhaustionLine = plot->plotExhaustionLine(secs);
+            if (exhaustionLine) {
+                plot->standard->tmpExhaustionLines.append(exhaustionLine);
+                plot->replot();
+            }
+        }
+
+        // now the stack plots
+        foreach(AllPlot *plot, window->allPlots) {
+            plot->replot();
+            foreach(QwtPlotMarker *marker, plot->standard->tmpExhaustionLines) {
+                if (marker) {
+                    marker->detach();
+                    delete marker;
+                }
+            }
+            plot->standard->tmpExhaustionLines.clear();
+        }
+        foreach(AllPlot *plot, window->allPlots) {
+            QwtPlotMarker *marker = plot->plotExhaustionLine(secs);
+            if (marker) {
+                plot->standard->tmpExhaustionLines.append(marker);
+                plot->replot();
+            }
+        }
+    }
+}
+
+void
+AllPlot::confirmTmpExhaustion(double mx, bool allowDelete)
+{
+    // not supported in compare mode
+    if (window == NULL || context->isCompareIntervals) return;
+
+    // we need to have a ride to work with
+    if (!rideItem || !rideItem->ride()) return;
+
+    double px = invTransform(QwtAxisId(QwtPlot::xBottom), mx);
+    double secs = -1;
+
+    if (bydist == true) secs = rideItem->ride()->distanceToTime(px);
+    else secs = px * 60.00f;
+    ExhaustionDialog *p = new ExhaustionDialog(this, context, allowDelete);
+    p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
+    p->setValue(secs);
+    p->move(QCursor::pos()-QPoint(40,40));
+    p->exec();
+}
+
+QwtPlotMarker*
+AllPlot::plotExhaustionLine(double secs)
+{
+    // not supported in compare mode
+    if (secs <= 0 || context->isCompareIntervals) return NULL;
+
+    QwtPlotMarker *marker = new QwtPlotMarker(""); //name is TODO
+    marker->setLinePen(QPen(GColor(CWBAL),5.0f));
+    marker->setLineStyle(QwtPlotMarker::VLine);
+    marker->setXValue(bydist ? rideItem->ride()->timeToDistance(secs) : secs/60.0f);
+    marker->setZ(-15); // to the back
+    marker->attach(this);
+    return marker;
 }
 
 void
@@ -7296,6 +7459,21 @@ AllPlot::refreshReferenceLinesForAllPlots()
     }
     foreach(AllPlot *plot, window->seriesPlots) {
         plot->refreshReferenceLines();
+    }
+}
+
+void
+AllPlot::refreshExhaustionsForAllPlots()
+{
+    // not supported in compare mode
+    if (window == NULL || context->isCompareIntervals) return;
+
+    window->allPlot->refreshExhaustions();
+    foreach(AllPlot *plot, window->allPlots) {
+        plot->refreshExhaustions();
+    }
+    foreach(AllPlot *plot, window->seriesPlots) {
+        plot->refreshExhaustions();
     }
 }
 
