@@ -1650,7 +1650,7 @@ void RideFile::removeExhaustion(int index)
     for(int k=0; k<referencePoints_.count(); k++) {
         if (referencePoints_[k]->secs > 0) {
             if (++i == index) {
-                referencePoints_.removeAt(k);
+                referencePoints_.remove(k);
                 return;
             }
         }
