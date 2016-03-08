@@ -20,6 +20,7 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "RideItem.h"
+#include "TimeUtils.h" // time_to_string
 
 ExhaustionDialog::ExhaustionDialog(AllPlot *parent, Context *context, double secs, bool allowDelete) :
     parent(parent), context(context), secs(secs), allowDelete(allowDelete)
@@ -57,7 +58,7 @@ ExhaustionDialog::ExhaustionDialog(AllPlot *parent, Context *context, double sec
 #ifdef Q_OS_MAX
     refsTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
-    refsTable->setColumnCount(2);
+    refsTable->setColumnCount(1);
     refsTable->horizontalHeader()->setStretchLastSection(true);
     refsTable->setSortingEnabled(false);
     refsTable->verticalHeader()->hide();
@@ -96,7 +97,7 @@ ExhaustionDialog::ExhaustionDialog(AllPlot *parent, Context *context, double sec
 void
 ExhaustionDialog::deleteRef()
 {
-#if 0
+
     // delete the ref that is highlighted
     QList<QTableWidgetItem*> selections = refsTable->selectedItems();
 
@@ -106,7 +107,7 @@ ExhaustionDialog::deleteRef()
         int index = refsTable->row(which);
 
         // wipe
-        context->rideItem()->ride()->removeReference(index);
+        context->rideItem()->ride()->removeExhaustion(index);
         context->rideItem()->setDirty(true);
 
         refreshTable();
@@ -115,7 +116,7 @@ ExhaustionDialog::deleteRef()
         parent->refreshExhaustionsForAllPlots();
         parent->plotTmpExhaustion(0); //unplot
     }
-#endif
+
 }
 
 void
@@ -158,20 +159,28 @@ ExhaustionDialog::refreshTable()
     QStringList header;
     header << tr("Time");
     refsTable->setHorizontalHeaderLabels(header);
-    refsTable->setRowCount(context->rideItem()->ride()->referencePoints().count());
 
-    foreach(RideFilePoint *rp, context->rideItem()->ride()->referencePoints()) {
+    foreach(RideFilePoint *rp, context->rideItem()->ride()->referencePoints())
+        if (rp->secs > 0) i++;
 
-        // time at which we hit task failure / exhaustion
-        QTableWidgetItem *t = new QTableWidgetItem();
+    if (i>0) {
 
-        if (rp->secs > 0) {
+        refsTable->setRowCount(i);
 
-            t = new QTableWidgetItem();
-            t->setText(QString("%1").arg(rp->secs));
-            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        i=0; // start again
+        foreach(RideFilePoint *rp, context->rideItem()->ride()->referencePoints()) {
 
-            refsTable->setItem(i++,1,t);
+            if (rp->secs > 0) {
+
+                // time at which we hit task failure / exhaustion
+                QTableWidgetItem *t = new QTableWidgetItem();
+
+                t = new QTableWidgetItem();
+                t->setText(QString("%1").arg(time_to_string(rp->secs)));
+                t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+
+                refsTable->setItem(i++,0,t);
+            }
         }
     }
 }

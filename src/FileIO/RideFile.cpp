@@ -1641,6 +1641,22 @@ void RideFile::removeReference(int index)
     referencePoints_.remove(index);
 }
 
+void RideFile::removeExhaustion(int index)
+{
+    if (index < 0) return;
+
+    // wipe the index'th exhaustion point in the ride
+    int i=-1;
+    for(int k=0; k<referencePoints_.count(); k++) {
+        if (referencePoints_[k]->secs > 0) {
+            if (++i == index) {
+                referencePoints_.removeAt(k);
+                return;
+            }
+        }
+    }
+}
+
 bool
 RideFile::parseRideFileName(const QString &name, QDateTime *dt)
 {
