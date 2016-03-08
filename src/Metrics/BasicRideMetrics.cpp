@@ -56,6 +56,40 @@ static bool countAdded =
     RideMetricFactory::instance().addMetric(RideCount());
 
 //////////////////////////////////////////////////////////////////////////////
+
+
+class ToExhaustion : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ToExhaustion)
+    public:
+
+    ToExhaustion()
+    {
+        setSymbol("ride_te");
+        setInternalName("To Exhaustion");
+    }
+    void initialize() {
+        setName(tr("To Exhaustion"));
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setDescription(tr("Count of exhaustion points marked by the user in an activity"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+        int c=0;
+        if (item && item->ride()) {
+            foreach(RideFilePoint *rp, item->ride()->referencePoints()) {
+                if (rp->secs > 0) c++;
+            }
+        }
+        setValue(c);
+    }
+    RideMetric *clone() const { return new ToExhaustion(*this); }
+};
+
+static bool teAdded =
+    RideMetricFactory::instance().addMetric(ToExhaustion());
+
+//////////////////////////////////////////////////////////////////////////////
 class WorkoutTime : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(WorkoutTime)
     double seconds;
