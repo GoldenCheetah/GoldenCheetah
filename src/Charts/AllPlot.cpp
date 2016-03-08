@@ -7124,22 +7124,33 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
         // don't get mouse move events until the mouse is pressed (!)
         QMouseEvent *m = static_cast<QMouseEvent*>(event);
 
-        if (m->type() == QEvent::MouseMove) {
+        if (event->type() == QEvent::MouseButtonDblClick) {
+
+            confirmTmpExhaustion(m->x(), true); // do show delete stuff
+            return false;
+
+        } else if (event->type() == QEvent::MouseMove) {
 
             // plot a temporary marker
             plotTmpExhaustion(m->x());
             return true;
 
-        } else if (m->type() == QEvent::MouseButtonRelease) {
+        } else if (event->type() == QEvent::MouseButtonRelease) {
 
-            // confirm and add to references + intervals
-            confirmTmpExhaustion(m->x());
-            return true;
+            // only respond if we are on the plot, which is above so
+            // therefore has a y-value that is negative
+            if (m->y() < 0) {
 
-        } else if (m->type() == QEvent::MouseButtonDblClick) {
+                // confirm and add to references + intervals
+                confirmTmpExhaustion(m->x());
+                return true;
 
-            confirmTmpExhaustion(m->x(), true); // do show delete stuff
-            return false;
+            } else {
+
+                // unplot when released on axis (must release on the chart area)
+                plotTmpExhaustion(0);
+                return true;
+            }
         }
 
         return false;
@@ -7233,16 +7244,43 @@ AllPlot::plotTmpExhaustion(double mx)
     if (bydist == true) secs = rideItem->ride()->distanceToTime(px);
     else secs = px * 60.00f;
 
-    if (secs > 0) {
+    //
+    // clear whatever is there
+    //
+    foreach(QwtPlotMarker *marker, standard->tmpExhaustionLines) {
+        if (marker) {
+            //curveColors->remove(curve); // ignored if not already there
+            marker->detach();
+            delete marker;
+        }
+    }
+    standard->tmpExhaustionLines.clear();
 
-        foreach(QwtPlotMarker *marker, standard->tmpExhaustionLines) {
+    foreach(AllPlot *plot, window->seriesPlots) {
+        plot->replot();
+        foreach(QwtPlotMarker *marker, plot->standard->tmpExhaustionLines) {
             if (marker) {
-                //curveColors->remove(curve); // ignored if not already there
                 marker->detach();
                 delete marker;
             }
         }
-        standard->tmpExhaustionLines.clear();
+        plot->standard->tmpExhaustionLines.clear();
+    }
+    foreach(AllPlot *plot, window->allPlots) {
+        plot->replot();
+        foreach(QwtPlotMarker *marker, plot->standard->tmpExhaustionLines) {
+            if (marker) {
+                marker->detach();
+                delete marker;
+            }
+        }
+        plot->standard->tmpExhaustionLines.clear();
+    }
+
+    //
+    // add a new one if its valid
+    //
+    if (secs > 0) {
 
         // only plot if they are relevant to the plot.
         QwtPlotMarker *exhaustionLine = window->allPlot->plotExhaustionLine(secs);
@@ -7251,17 +7289,6 @@ AllPlot::plotTmpExhaustion(double mx)
             window->allPlot->replot();
         }
 
-        // now do the series plots
-        foreach(AllPlot *plot, window->seriesPlots) {
-            plot->replot();
-            foreach(QwtPlotMarker *marker, plot->standard->tmpExhaustionLines) {
-                if (marker) {
-                    marker->detach();
-                    delete marker;
-                }
-            }
-            plot->standard->tmpExhaustionLines.clear();
-        }
         foreach(AllPlot *plot, window->seriesPlots) {
             QwtPlotMarker *exhaustionLine = plot->plotExhaustionLine(secs);
             if (exhaustionLine) {
@@ -7270,17 +7297,6 @@ AllPlot::plotTmpExhaustion(double mx)
             }
         }
 
-        // now the stack plots
-        foreach(AllPlot *plot, window->allPlots) {
-            plot->replot();
-            foreach(QwtPlotMarker *marker, plot->standard->tmpExhaustionLines) {
-                if (marker) {
-                    marker->detach();
-                    delete marker;
-                }
-            }
-            plot->standard->tmpExhaustionLines.clear();
-        }
         foreach(AllPlot *plot, window->allPlots) {
             QwtPlotMarker *marker = plot->plotExhaustionLine(secs);
             if (marker) {
@@ -7305,7 +7321,7 @@ AllPlot::confirmTmpExhaustion(double mx, bool allowDelete)
 
     if (bydist == true) secs = rideItem->ride()->distanceToTime(px);
     else secs = px * 60.00f;
-    ExhaustionDialog *p = new ExhaustionDialog(this, context, allowDelete);
+    ExhaustionDialog *p = new ExhaustionDialog(this, context, secs, allowDelete);
     p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
     p->setValue(secs);
     p->move(QCursor::pos()-QPoint(40,40));
