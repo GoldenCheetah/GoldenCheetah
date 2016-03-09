@@ -53,6 +53,7 @@ class aXPower : public RideMetric {
         setType(RideMetric::Average);
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
+        setDescription(tr("Altitude Adjusted xPower is an estimate of the power that you could have maintained for the same physiological 'cost' if your power output had been perfectly constant at altitude, similar to aNP."));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -124,6 +125,7 @@ class aVariabilityIndex : public RideMetric {
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setPrecision(3);
+        setDescription(tr("Skiba Altitude Adjusted Variability Index is the ratio between axPower and Average aPower."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -161,6 +163,7 @@ class aRelativeIntensity : public RideMetric {
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setPrecision(3);
+        setDescription(tr("Altitude Adjusted Relative Intensity is the ratio between axPower and the Critical Power (CP) configured in Power Zones, similar to aIF."));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -196,6 +199,7 @@ class aBikeScore : public RideMetric {
         setName("aBikeScore");  // Don't translate as many places have special coding for the "TM" sign
         setMetricUnits("");
         setImperialUnits("");
+        setDescription(tr("Skiba's altitude adjusted stress score taking into account both the intensity and the duration of the training session plus the altitude effect, similar to aTSS it can be computed as 100 * hours * (aPower Relative Intensity)^2"));
     }
 
    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -241,6 +245,7 @@ class aResponseIndex : public RideMetric {
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setPrecision(3);
+        setDescription(tr("The ratio between axPower and Average HR, similar to aPower Efficiency Factor"));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
