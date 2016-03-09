@@ -16,12 +16,12 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "ToolsDialog.h"
+#include "EstimateCPDialog.h"
 #include "HelpWhatsThis.h"
 #include "Settings.h"
 
 QHBoxLayout*
-ToolsDialog::setupMinsSecs(QDoubleSpinBoxPtr &minsSpinBox,
+EstimateCPDialog::setupMinsSecs(QDoubleSpinBoxPtr &minsSpinBox,
                            QDoubleSpinBoxPtr &secsSpinBox,
                            QDoubleSpinBoxPtr &wattsSpinBox,
                            double maxMin, double defaultMin)
@@ -55,7 +55,7 @@ ToolsDialog::setupMinsSecs(QDoubleSpinBoxPtr &minsSpinBox,
     return result;
 }
 
-ToolsDialog::ToolsDialog(QWidget *parent) : QDialog(parent)
+EstimateCPDialog::EstimateCPDialog(QWidget *parent) : QDialog(parent)
 {
     setWindowTitle(tr("Critical Power Estimator"));
 
@@ -130,7 +130,7 @@ ToolsDialog::ToolsDialog(QWidget *parent) : QDialog(parent)
 }
 
 void
-ToolsDialog::changeSport()
+EstimateCPDialog::changeSport()
 {
     QString rnSuffix = appsettings->value(this, GC_PACE, true).toBool() ? tr(" km") : tr(" mi");
     QString swSuffix = appsettings->value(this, GC_SWIMPACE, true).toBool() ? tr(" m") : tr(" yd");
@@ -166,12 +166,12 @@ ToolsDialog::changeSport()
     txtWP->clear();
 }
 
-void ToolsDialog::on_btnOK_clicked()
+void EstimateCPDialog::on_btnOK_clicked()
 {
     accept();
 }
 
-void ToolsDialog::on_btnCalculate_clicked()
+void EstimateCPDialog::on_btnCalculate_clicked()
 {
     bool metricRnPace = appsettings->value(this, GC_PACE, true).toBool();
     bool metricSwPace = appsettings->value(this, GC_PACE, true).toBool();

@@ -56,7 +56,7 @@
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
 #include "RideImportWizard.h"
-#include "ToolsDialog.h"
+#include "EstimateCPDialog.h"
 #include "ToolsRhoEstimator.h"
 #include "VDOTCalculator.h"
 #include "SplitActivityWizard.h"
@@ -529,6 +529,7 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("Split &activity..."), this, SLOT(splitRide()));
     rideMenu->addAction(tr("Combine activities..."), this, SLOT(mergeRide()));
     rideMenu->addSeparator ();
+    rideMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), tr (""));
 
     HelpWhatsThis *helpRideMenu = new HelpWhatsThis(rideMenu);
     rideMenu->setWhatsThis(helpRideMenu->getWhatsThisText(HelpWhatsThis::MenuBar_Activity));
@@ -575,7 +576,6 @@ MainWindow::MainWindow(const QDir &home)
 
     // TOOLS MENU
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
-    optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()));
     optionsMenu->addAction(tr("CP and W' Estimator..."), this, SLOT(showTools()));
     optionsMenu->addAction(tr("Air Density (Rho) Estimator..."), this, SLOT(showRhoEstimator()));
     optionsMenu->addAction(tr("VDOT and T-Pace Calculator..."), this, SLOT(showVDOTCalculator()));
@@ -591,8 +591,6 @@ MainWindow::MainWindow(const QDir &home)
 
     optionsMenu->addAction(tr("Create Heat Map..."), this, SLOT(generateHeatMap()), tr(""));
     optionsMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
-    optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), tr (""));
 
 #ifdef GC_HAS_CLOUD_DB
     // CloudDB options
@@ -607,6 +605,12 @@ MainWindow::MainWindow(const QDir &home)
     }
 
 #endif
+#ifndef Q_OS_MAC
+    optionsMenu->addSeparator();
+#endif
+    // options are always at the end of the tools menu
+    optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()));
+
     HelpWhatsThis *optionsMenuHelp = new HelpWhatsThis(optionsMenu);
     optionsMenu->setWhatsThis(optionsMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Tools));
 
@@ -1078,7 +1082,7 @@ MainWindow::aboutDialog()
 
 void MainWindow::showTools()
 {
-   ToolsDialog *td = new ToolsDialog();
+   EstimateCPDialog *td = new EstimateCPDialog();
    td->show();
 }
 
