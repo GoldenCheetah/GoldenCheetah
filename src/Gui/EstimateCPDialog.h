@@ -25,14 +25,14 @@
 
 typedef QDoubleSpinBox* QDoubleSpinBoxPtr;
 
-class ToolsDialog : public QDialog
+class EstimateCPDialog : public QDialog
 {
         Q_OBJECT
         G_OBJECT
 
 
     public:
-        ToolsDialog(QWidget *parent = 0);
+        EstimateCPDialog(QWidget *parent = 0);
 
     private:
         QComboBox *sportCombo;
