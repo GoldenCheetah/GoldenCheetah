@@ -44,6 +44,7 @@ class aNP : public RideMetric {
         setMetricUnits("watts");
         setImperialUnits("watts");
         setPrecision(0);
+        setDescription(tr("Altitude Adjusted Normalized Power is an estimate of the power that you could have maintained for the same physiological 'cost' if your power output had been perfectly constant accounting for altitude."));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -121,6 +122,7 @@ class aVI : public RideMetric {
         setName("aVI");
         setType(RideMetric::Average);
         setPrecision(3);
+        setDescription(tr("Altitude Adjusted Variability Index is the ratio between aNP and Average aPower."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -160,6 +162,7 @@ class aIntensityFactor : public RideMetric {
         setName("aIF");
         setType(RideMetric::Average);
         setPrecision(3);
+        setDescription(tr("Altitude Adjusted Intensity Factor is the ratio between aNP and the Critical Power (CP) configured in Power Zones."));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -203,6 +206,7 @@ class aTSS : public RideMetric {
     void initialize() {
         setName("aTSS");
         setType(RideMetric::Total);
+        setDescription(tr("Altitude Adjusted Training Stress Score takes into account both the intensity and the duration of the training session plus the altitude effect, it can be computed as 100 * hours * aIF^2"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -252,6 +256,7 @@ class aTSSPerHour : public RideMetric {
         setName(tr("aTSS per hour"));
         setType(RideMetric::Average);
         setPrecision(0);
+        setDescription(tr("Altitude Adjusted Training Stress Score divided by Duration in hours"));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -299,6 +304,7 @@ class aEfficiencyFactor : public RideMetric {
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setPrecision(3);
+        setDescription(tr("The ratio between aNP and Average HR"));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
