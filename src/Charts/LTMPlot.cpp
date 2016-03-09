@@ -498,9 +498,7 @@ LTMPlot::setData(LTMSettings *set)
             current->setPen(QPen(Qt::NoPen));
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
-            QwtSymbol *sym = new QwtSymbol;
-            sym->setStyle(QwtSymbol::NoSymbol);
-            current->setSymbol(sym);
+            current->setSymbol(NULL);
 
             // fudge for date ranges, not for time of day graph
             // and fudge qwt'S lack of a decent bar chart
@@ -879,25 +877,30 @@ LTMPlot::setData(LTMSettings *set)
 
             // QMap orders the list so start at the top and work
             // backwards for topN
-            QMapIterator<double, int> i(sortedList);
-            i.toBack();
             int counter = 0;
-            while (i.hasPrevious() && counter < metricDetail.topN) {
-                i.previous();
-                if (ydata[i.value()]) {
-                    hxdata[counter] = xdata[i.value()] + middle;
-                    hydata[counter] = ydata[i.value()];
-                    counter++;
+            QMapIterator<double, int> i(sortedList);
+            if (metricDetail.topN) {
+                i.toBack();
+                while (i.hasPrevious() && counter < metricDetail.topN) {
+                    i.previous();
+                    if (ydata[i.value()]) {
+                        hxdata[counter] = xdata[i.value()] + middle;
+                        hydata[counter] = ydata[i.value()];
+                        counter++;
+                    }
                 }
             }
-            i.toFront();
-            counter = 0; // and forwards for bottomN
-            while (i.hasNext() && counter < metricDetail.lowestN) {
-                i.next();
-                if (ydata[i.value()]) {
-                    hxdata[metricDetail.topN + counter] = xdata[i.value()] + middle;
-                    hydata[metricDetail.topN + counter] = ydata[i.value()];
-                    counter++;
+
+            if (metricDetail.lowestN) {
+                i.toFront();
+                counter = 0; // and forwards for bottomN
+                while (i.hasNext() && counter < metricDetail.lowestN) {
+                    i.next();
+                    if (ydata[i.value()]) {
+                        hxdata[metricDetail.topN + counter] = xdata[i.value()] + middle;
+                        hydata[metricDetail.topN + counter] = ydata[i.value()];
+                        counter++;
+                    }
                 }
             }
 
@@ -936,6 +939,7 @@ LTMPlot::setData(LTMSettings *set)
             sym->setBrush(lighter);
 
             top->setSymbol(sym);
+qDebug()<<"TOP N"<<counter<<"hidden="<<metricDetail.hidden;
             top->setSamples(hxdata.data(),hydata.data(), counter);
             top->setBaseline(0);
             top->setYAxis(axisid);
@@ -1015,9 +1019,7 @@ LTMPlot::setData(LTMSettings *set)
             current->setPen(QPen(Qt::NoPen));
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
-            QwtSymbol *sym = new QwtSymbol;
-            sym->setStyle(QwtSymbol::NoSymbol);
-            current->setSymbol(sym);
+            current->setSymbol(NULL);
 
             // fudge for date ranges, not for time of day graph
             // fudge qwt'S lack of a decent bar chart
@@ -1085,12 +1087,16 @@ LTMPlot::setData(LTMSettings *set)
 
         } else if (metricDetail.curveStyle == QwtPlotCurve::Dots) {
 
-            QwtSymbol *sym = new QwtSymbol;
-            sym->setSize(6);
-            sym->setStyle(metricDetail.symbolStyle);
-            sym->setPen(QPen(metricDetail.penColor));
-            sym->setBrush(QBrush(metricDetail.penColor));
-            current->setSymbol(sym);
+            if (metricDetail.symbolStyle != QwtSymbol::NoSymbol) {
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setSize(6);
+                sym->setStyle(metricDetail.symbolStyle);
+                sym->setPen(QPen(metricDetail.penColor));
+                sym->setBrush(QBrush(metricDetail.penColor));
+                current->setSymbol(sym);
+            } else {
+                current->setStyle(QwtPlotCurve::NoCurve);
+            }
 
         } else if (metricDetail.curveStyle == QwtPlotCurve::Sticks) {
 
@@ -1616,9 +1622,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                 current->setPen(QPen(Qt::NoPen));
                 current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
-                QwtSymbol *sym = new QwtSymbol;
-                sym->setStyle(QwtSymbol::NoSymbol);
-                current->setSymbol(sym);
+                current->setSymbol(NULL);
 
                 // fudge for date ranges, not for time of day graph
                 // and fudge qwt'S lack of a decent bar chart
@@ -1986,24 +1990,30 @@ LTMPlot::setCompareData(LTMSettings *set)
                 // QMap orders the list so start at the top and work
                 // backwards for topN
                 QMapIterator<double, int> i(sortedList);
-                i.toBack();
+
                 int counter = 0;
-                while (i.hasPrevious() && counter < metricDetail.topN) {
-                    i.previous();
-                    if (ydata[i.value()]) {
-                        hxdata[counter] = xdata[i.value()] + middle;
-                        hydata[counter] = ydata[i.value()];
-                        counter++;
+                if (metricDetail.topN) {
+                    i.toBack();
+                    while (i.hasPrevious() && counter < metricDetail.topN) {
+                        i.previous();
+                        if (ydata[i.value()]) {
+                            hxdata[counter] = xdata[i.value()] + middle;
+                            hydata[counter] = ydata[i.value()];
+                            counter++;
+                        }
                     }
                 }
-                i.toFront();
-                counter = 0; // and backwards for bottomN
-                while (i.hasNext() && counter < metricDetail.lowestN) {
-                    i.next();
-                    if (ydata[i.value()]) {
-                        hxdata[metricDetail.topN + counter] = xdata[i.value()] + middle;
-                        hydata[metricDetail.topN + counter] = ydata[i.value()];
-                        counter++;
+
+                if (metricDetail.lowestN) {
+                    i.toFront();
+                    counter = 0; // and backwards for bottomN
+                    while (i.hasNext() && counter < metricDetail.lowestN) {
+                        i.next();
+                        if (ydata[i.value()]) {
+                            hxdata[metricDetail.topN + counter] = xdata[i.value()] + middle;
+                            hydata[metricDetail.topN + counter] = ydata[i.value()];
+                            counter++;
+                        }
                     }
                 }
 
@@ -2113,9 +2123,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                 current->setPen(QPen(Qt::NoPen));
                 current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
-                QwtSymbol *sym = new QwtSymbol;
-                sym->setStyle(QwtSymbol::NoSymbol);
-                current->setSymbol(sym);
+                current->setSymbol(NULL);
 
                 // fudge for date ranges, not for time of day graph
                 // fudge qwt'S lack of a decent bar chart
@@ -2183,12 +2191,16 @@ LTMPlot::setCompareData(LTMSettings *set)
 
             } else if (metricDetail.curveStyle == QwtPlotCurve::Dots) {
 
-                QwtSymbol *sym = new QwtSymbol;
-                sym->setSize(6);
-                sym->setStyle(metricDetail.symbolStyle);
-                sym->setPen(QPen(cd.color));
-                sym->setBrush(QBrush(cd.color));
-                current->setSymbol(sym);
+                if (metricDetail.symbolStyle != QwtSymbol::NoSymbol) {
+                    QwtSymbol *sym = new QwtSymbol;
+                    sym->setSize(6);
+                    sym->setStyle(metricDetail.symbolStyle);
+                    sym->setPen(QPen(cd.color));
+                    sym->setBrush(QBrush(cd.color));
+                    current->setSymbol(sym);
+                } else {
+                    current->setStyle(QwtPlotCurve::NoCurve);
+                }
 
             } else if (metricDetail.curveStyle == QwtPlotCurve::Sticks) {
 
