@@ -939,7 +939,6 @@ LTMPlot::setData(LTMSettings *set)
             sym->setBrush(lighter);
 
             top->setSymbol(sym);
-qDebug()<<"TOP N"<<counter<<"hidden="<<metricDetail.hidden;
             top->setSamples(hxdata.data(),hydata.data(), counter);
             top->setBaseline(0);
             top->setYAxis(axisid);
