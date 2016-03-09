@@ -31,7 +31,7 @@ LTMOutliers::LTMOutliers(double *xdata, double *ydata, int count, int windowsize
     int pos=0;
 
     // initial samples from point 0 to windowsize
-    for (; pos < windowsize; ++pos) {
+    for (; pos < windowsize && pos < count; ++pos) {
 
         // we could either use a deviation of zero
         // or base it on what we have so far...
