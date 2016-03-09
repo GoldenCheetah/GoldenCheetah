@@ -47,6 +47,7 @@ class NP : public RideMetric {
         setMetricUnits("watts");
         setImperialUnits("watts");
         setPrecision(0);
+        setDescription(tr("Normalized Power is an estimate of the power that you could have maintained for the same physiological 'cost' if your power output had been perfectly constant."));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -122,6 +123,7 @@ class VI : public RideMetric {
         setName("VI");
         setType(RideMetric::Average);
         setPrecision(3);
+        setDescription(tr("Variability Index is the ratio between NP and Average Power."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -160,6 +162,7 @@ class IntensityFactor : public RideMetric {
         setName("IF");
         setType(RideMetric::Average);
         setPrecision(3);
+        setDescription(tr("Intensity Factor is the ratio between NP and the Functional Threshold Power (FTP) configured in Power Zones."));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -213,6 +216,7 @@ class TSS : public RideMetric {
     void initialize() {
         setName("TSS");
         setType(RideMetric::Total);
+        setDescription(tr("Training Stress Score takes into account both the intensity and the duration of the training session, it can be computed as 100 * hours * IF^2"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -271,6 +275,7 @@ class TSSPerHour : public RideMetric {
         setName(tr("TSS per hour"));
         setType(RideMetric::Average);
         setPrecision(0);
+        setDescription(tr("Training Stress Score divided by Duration in hours"));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -318,6 +323,7 @@ class EfficiencyFactor : public RideMetric {
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setPrecision(3);
+        setDescription(tr("The ratio between NP and Average HR for Cycling and xPace (in yd/min) and Average HR for Running"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
