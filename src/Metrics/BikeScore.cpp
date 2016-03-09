@@ -54,6 +54,7 @@ class XPower : public RideMetric {
         setType(RideMetric::Average);
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
+        setDescription(tr("xPower is an estimate of the power that you could have maintained for the same physiological 'cost' if your power output had been perfectly constant, similar to NP."));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -125,6 +126,7 @@ class VariabilityIndex : public RideMetric {
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setPrecision(3);
+        setDescription(tr("Skiba Variability Index is the ratio between xPower and Average Power."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -163,6 +165,7 @@ class RelativeIntensity : public RideMetric {
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setPrecision(3);
+        setDescription(tr("Relative Intensity is the ratio between xPower and the Critical Power (CP) configured in Power Zones, similar to IF."));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -200,6 +203,7 @@ class CriticalPower : public RideMetric {
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setPrecision(0);
+        setDescription(tr("Critical Power (CP) configured in Power Zones."));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
@@ -234,6 +238,7 @@ class aTISS : public RideMetric {
         setName(tr("Aerobic TISS"));
         setMetricUnits("");
         setImperialUnits("");
+        setDescription(tr("Aerobic Training Impact Scoring System. It's a metric to quantify the training strain or response on the aerobic system"));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -288,6 +293,7 @@ class anTISS : public RideMetric {
         setName(tr("Anaerobic TISS"));
         setMetricUnits("");
         setImperialUnits("");
+        setDescription(tr("Anaerobic Training Impact Scoring System. It's a metric to quantify the training strain or response on the anaerobic system"));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -344,6 +350,7 @@ class dTISS : public RideMetric {
         setName(tr("TISS Aerobicity"));
         setMetricUnits("Percent");
         setImperialUnits("Percent");
+        setDescription(tr("TISS Aerobicity is a percentage of Aerobic TISS of the total TISS"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -380,6 +387,7 @@ class BikeScore : public RideMetric {
         setName("BikeScore&#8482;");  // Don't translate as many places have special coding for the "TM" sign
         setMetricUnits("");
         setImperialUnits("");
+        setDescription(tr("Skiba's stress score taking into account both the intensity and the duration of the training session, similar to TSS it can be computed as 100 * hours * (Relative Intensity)^2"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -427,6 +435,7 @@ class ResponseIndex : public RideMetric {
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setPrecision(3);
+        setDescription(tr("The ratio between xPower and Average HR, similar to Efficiency Factor"));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
