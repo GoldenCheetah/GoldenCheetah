@@ -43,6 +43,7 @@ class LeftRightBalance : public RideMetric {
         setImperialUnits(tr("%"));
         setType(RideMetric::Average);
         setPrecision(1);
+        setDescription(tr("Left/Right Balance shows the proportion of power coming from each pedal."));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
