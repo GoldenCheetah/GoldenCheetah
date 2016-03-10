@@ -621,6 +621,7 @@ class PeakPowerHr1m : public PeakPowerHr {
             setName(tr("1 min Peak Power HR"));
             setMetricUnits(tr("bpm"));
             setImperialUnits(tr("bpm"));
+            setDescription(tr("Average Heart Rate for 1 min Peak Power interval"));
         }
         RideMetric *clone() const { return new PeakPowerHr1m(*this); }
 };
@@ -639,6 +640,7 @@ class PeakPowerHr5m : public PeakPowerHr {
             setName(tr("5 min Peak Power HR"));
             setMetricUnits(tr("bpm"));
             setImperialUnits(tr("bpm"));
+            setDescription(tr("Average Heart Rate for 5 min Peak Power interval"));
         }
         RideMetric *clone() const { return new PeakPowerHr5m(*this); }
 };
@@ -657,6 +659,7 @@ class PeakPowerHr10m : public PeakPowerHr {
             setName(tr("10 min Peak Power HR"));
             setMetricUnits(tr("bpm"));
             setImperialUnits(tr("bpm"));
+            setDescription(tr("Average Heart Rate for 10 min Peak Power interval"));
         }
         RideMetric *clone() const { return new PeakPowerHr10m(*this); }
 };
@@ -675,6 +678,7 @@ class PeakPowerHr20m : public PeakPowerHr {
             setName(tr("20 min Peak Power HR"));
             setMetricUnits(tr("bpm"));
             setImperialUnits(tr("bpm"));
+            setDescription(tr("Average Heart Rate for 20 min Peak Power interval"));
         }
         RideMetric *clone() const { return new PeakPowerHr20m(*this); }
 };
@@ -693,6 +697,7 @@ class PeakPowerHr30m : public PeakPowerHr {
             setName(tr("30 min Peak Power HR"));
             setMetricUnits(tr("bpm"));
             setImperialUnits(tr("bpm"));
+            setDescription(tr("Average Heart Rate for 30 min Peak Power interval"));
         }
         RideMetric *clone() const { return new PeakPowerHr30m(*this); }
 };
@@ -712,6 +717,7 @@ class PeakPowerHr60m : public PeakPowerHr {
             setName(tr("60 min Peak Power HR"));
             setMetricUnits(tr("bpm"));
             setImperialUnits(tr("bpm"));
+            setDescription(tr("Average Heart Rate for 60 min Peak Power interval"));
         }
         RideMetric *clone() const { return new PeakPowerHr60m(*this); }
 };
