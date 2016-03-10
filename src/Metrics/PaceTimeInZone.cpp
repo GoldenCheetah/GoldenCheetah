@@ -100,6 +100,7 @@ class PaceZoneTime1 : public PaceZoneTime {
             setName(tr("P1 Time in Pace Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Pace Zone 1."));
         }
         RideMetric *clone() const { return new PaceZoneTime1(*this); }
 };
@@ -119,6 +120,7 @@ class PaceZoneTime2 : public PaceZoneTime {
             setName(tr("P2 Time in Pace Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Pace Zone 2."));
         }
         RideMetric *clone() const { return new PaceZoneTime2(*this); }
 };
@@ -138,6 +140,7 @@ class PaceZoneTime3 : public PaceZoneTime {
             setName(tr("P3 Time in Pace Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Pace Zone 3."));
         }
         RideMetric *clone() const { return new PaceZoneTime3(*this); }
 };
@@ -159,6 +162,7 @@ class PaceZoneTime4 : public PaceZoneTime {
             setName(tr("P4 Time in Pace Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Pace Zone 4."));
         }
         RideMetric *clone() const { return new PaceZoneTime4(*this); }
 };
@@ -178,6 +182,7 @@ class PaceZoneTime5 : public PaceZoneTime {
             setName(tr("P5 Time in Pace Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Pace Zone 5."));
         }
         RideMetric *clone() const { return new PaceZoneTime5(*this); }
 };
@@ -197,6 +202,7 @@ class PaceZoneTime6 : public PaceZoneTime {
             setName(tr("P6 Time in Pace Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Pace Zone 6."));
         }
         RideMetric *clone() const { return new PaceZoneTime6(*this); }
 };
@@ -216,6 +222,7 @@ class PaceZoneTime7 : public PaceZoneTime {
             setName(tr("P7 Time in Pace Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Pace Zone 7."));
         }
         RideMetric *clone() const { return new PaceZoneTime7(*this); }
 };
@@ -235,6 +242,7 @@ class PaceZoneTime8 : public PaceZoneTime {
             setName(tr("P8 Time in Pace Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Pace Zone 8."));
         }
         RideMetric *clone() const { return new PaceZoneTime8(*this); }
 };
@@ -254,6 +262,7 @@ class PaceZoneTime9 : public PaceZoneTime {
             setName(tr("P9 Time in Pace Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Pace Zone 9."));
         }
         RideMetric *clone() const { return new PaceZoneTime9(*this); }
 };
@@ -273,6 +282,7 @@ class PaceZoneTime10 : public PaceZoneTime {
             setName(tr("P10 Time in Pace Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Pace Zone 10."));
         }
         RideMetric *clone() const { return new PaceZoneTime10(*this); }
 };
@@ -298,6 +308,7 @@ class PaceZonePTime1 : public RideMetric {
         void initialize ()
         {
             setName(tr("P1 Percent in Pace Zone"));
+            setDescription(tr("Percent of Time in Pace Zone 1."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -339,6 +350,7 @@ class PaceZonePTime2 : public RideMetric {
         void initialize ()
         {
             setName(tr("P2 Percent in Pace Zone"));
+            setDescription(tr("Percent of Time in Pace Zone 2."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -380,6 +392,7 @@ class PaceZonePTime3 : public RideMetric {
         void initialize ()
         {
             setName(tr("P3 Percent in Pace Zone"));
+            setDescription(tr("Percent of Time in Pace Zone 3."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -421,6 +434,7 @@ class PaceZonePTime4 : public RideMetric {
         void initialize ()
         {
             setName(tr("P4 Percent in Pace Zone"));
+            setDescription(tr("Percent of Time in Pace Zone 4."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -462,6 +476,7 @@ class PaceZonePTime5 : public RideMetric {
         void initialize ()
         {
             setName(tr("P5 Percent in Pace Zone"));
+            setDescription(tr("Percent of Time in Pace Zone 5."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -503,6 +518,7 @@ class PaceZonePTime6 : public RideMetric {
         void initialize ()
         {
             setName(tr("P6 Percent in Pace Zone"));
+            setDescription(tr("Percent of Time in Pace Zone 6."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -544,6 +560,7 @@ class PaceZonePTime7 : public RideMetric {
         void initialize ()
         {
             setName(tr("P7 Percent in Pace Zone"));
+            setDescription(tr("Percent of Time in Pace Zone 7."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -585,6 +602,7 @@ class PaceZonePTime8 : public RideMetric {
         void initialize ()
         {
             setName(tr("P8 Percent in Pace Zone"));
+            setDescription(tr("Percent of Time in Pace Zone 8."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -626,6 +644,7 @@ class PaceZonePTime9 : public RideMetric {
         void initialize ()
         {
             setName(tr("P9 Percent in Pace Zone"));
+            setDescription(tr("Percent of Time in Pace Zone 9."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -667,6 +686,7 @@ class PaceZonePTime10 : public RideMetric {
         void initialize ()
         {
             setName(tr("P10 Percent in Pace Zone"));
+            setDescription(tr("Percent of Time in Pace Zone 10."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
