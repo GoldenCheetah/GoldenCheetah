@@ -801,6 +801,16 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    // Note : fecMaxResistance information available but not used
                    fecCapabilities = antMessage.fecCapabilities;
                    qDebug() << "Capabilities received from ANT FEC Device:" << fecCapabilities;
+               } else if (antMessage.data_page == FITNESS_EQUIPMENT_STATIONARY_SPECIFIC_PAGE)
+               {
+                   if (antMessage.fecInstantPower != 0xFFFF)
+                       is_alt ? parent->setAltWatts(antMessage.fecInstantPower) : parent->setWatts(antMessage.fecInstantPower);
+                   if (antMessage.fecCadence != 0xFF)
+                       parent->setSecondaryCadence(antMessage.fecCadence);
+                   parent->setTrainerStatusAvailable(true);
+
+                   parent->setTrainerReady(antMessage.fecState==FITNESS_EQUIPMENT_READY);
+                   parent->setTrainerRunning(antMessage.fecState==FITNESS_EQUIPMENT_IN_USE);
                }
                break;
            }
