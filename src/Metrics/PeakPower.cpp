@@ -39,11 +39,14 @@ class PeakPercent : public RideMetric {
         setType(RideMetric::Average);
         setSymbol("peak_percent");
         setInternalName("MMP Percentage");
+    }
+    void initialize ()
+    {
         setName(tr("MMP Percentage"));
         setMetricUnits(tr("%"));
         setPrecision(1); // e.g. 99.9%
         setImperialUnits(tr("%"));
-
+        setDescription(tr("Average Power as Percent of Mean Maximal Power for Duration."));
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P"); }
@@ -103,11 +106,14 @@ class PowerZone : public RideMetric {
         setType(RideMetric::Average);
         setSymbol("power_zone");
         setInternalName("Power Zone");
+    }
+    void initialize ()
+    {
         setName(tr("Power Zone"));
         setMetricUnits(tr(""));
         setPrecision(1); // e.g. 99.9%
         setImperialUnits(tr(""));
-
+        setDescription(tr("Power Zone fractional number determined from Average Power."));
     }
 
     //QString toString(bool useMetricUnits) const {
@@ -170,11 +176,14 @@ class FatigueIndex : public RideMetric {
         setType(RideMetric::Average);
         setSymbol("power_fatigue_index");
         setInternalName("Fatigue Index");
+    }
+    void initialize ()
+    {
         setName(tr("Fatigue Index"));
         setMetricUnits(tr("%"));
         setPrecision(1); // e.g. 99.9%
         setImperialUnits(tr("%"));
-
+        setDescription(tr("Fatigue Index is power decay from Max Power to Min Power as a percent of Max Power."));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -221,11 +230,14 @@ class PacingIndex : public RideMetric {
         setType(RideMetric::Average);
         setSymbol("power_pacing_index");
         setInternalName("Pacing Index");
+    }
+    void initialize ()
+    {
         setName(tr("Pacing Index"));
         setMetricUnits(tr("%"));
         setPrecision(1); // e.g. 99.9%
         setImperialUnits(tr("%"));
-
+        setDescription(tr("Pacing Index is Average Power as a percent of Maximal Power"));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
