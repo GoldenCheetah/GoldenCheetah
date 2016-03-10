@@ -46,8 +46,9 @@
 #define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
 
 // Dropbox id
+#ifndef GC_DROPBOX_CLIENT_ID
 #define GC_DROPBOX_CLIENT_ID "753fbblhri06ah3"
-
+#endif
 
 /*
  *  GoldenCheetah Properties are stored in different locations, depending on the prefix defined in the property name. The following different prefixes are supported
