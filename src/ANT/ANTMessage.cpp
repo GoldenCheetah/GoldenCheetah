@@ -549,6 +549,14 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                      fecState = (message[11] & 0xF0) >> 4;
                      break;
 
+                case FITNESS_EQUIPMENT_STATIONARY_SPECIFIC_PAGE:
+                    //based on "ANT+ Device Profile Fitness Equipment" rev 4.1 p 58: 6.6.3 Data page 0x15 - Specific stationary bike data
+                    fecCadence = message[8];
+                    fecInstantPower = message[9];
+                    fecInstantPower |= message[10] << 8;
+                    fecState = (message[11] & 0xF0) >> 4;
+                    break;
+
                 case FITNESS_EQUIPMENT_TRAINER_TORQUE_PAGE:
                      //based on "ANT+ Device Profile Fitness Equipment" rev 4.1 p 61: 6.6.8 Data page 0x20 - Specific trainer torque data
                      fecPage0x20EventCount = message[5];
