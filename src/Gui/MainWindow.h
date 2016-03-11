@@ -163,8 +163,7 @@ class MainWindow : public QMainWindow
         void showLowbar(bool want);
 
         // Analysis View
-        void showEstimateCP();
-        void showSolveCP();
+        void showTools();
         void showRhoEstimator();
         void showVDOTCalculator();
 
