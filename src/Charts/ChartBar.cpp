@@ -26,7 +26,7 @@
 #include <QFontMetrics>
 
 #ifdef Q_OS_MAC
-static int spacing_=7;
+static int spacing_=4;
 #else
 static int spacing_=4;
 #endif
@@ -45,7 +45,6 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
 
     // buttonBar Widget
     buttonBar = new ButtonBar(this);
-    buttonBar->setFixedHeight(23);
     buttonBar->setContentsMargins(0,0,0,0);
 
     QHBoxLayout *vlayout = new QHBoxLayout(buttonBar); 
@@ -66,7 +65,14 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     scrollArea->setContentsMargins(0,0,0,0);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    QFontMetrics fs(buttonFont);
+    setFixedHeight(fs.height()+spacing_);
+    scrollArea->setFixedHeight(fs.height()+spacing_);
+    buttonBar->setFixedHeight(fs.height()+spacing_);
+
     scrollArea->setWidget(buttonBar);
+
     // scroll area turns it on .. we turn it off!
     buttonBar->setAutoFillBackground(false);
 
@@ -110,11 +116,6 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     menuButton->setFocusPolicy(Qt::NoFocus);
     mlayout->addWidget(menuButton);
     //connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
-
-    QFontMetrics fs(buttonFont);
-    setFixedHeight(fs.height()+spacing_);
-    scrollArea->setFixedHeight(fs.height()+spacing_);
-    buttonBar->setFixedHeight(fs.height()+spacing_);
 
     signalMapper = new QSignalMapper(this); // maps each option
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
