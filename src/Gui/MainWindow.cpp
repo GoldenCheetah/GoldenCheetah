@@ -57,7 +57,6 @@
 #include "ManualRideDialog.h"
 #include "RideImportWizard.h"
 #include "EstimateCPDialog.h"
-#include "SolveCPDialog.h"
 #include "ToolsRhoEstimator.h"
 #include "VDOTCalculator.h"
 #include "SplitActivityWizard.h"
@@ -577,8 +576,7 @@ MainWindow::MainWindow(const QDir &home)
 
     // TOOLS MENU
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
-    optionsMenu->addAction(tr("CP and W' Estimator..."), this, SLOT(showEstimateCP()));
-    optionsMenu->addAction(tr("CP and W' Solver..."), this, SLOT(showSolveCP()));
+    optionsMenu->addAction(tr("CP and W' Estimator..."), this, SLOT(showTools()));
     optionsMenu->addAction(tr("Air Density (Rho) Estimator..."), this, SLOT(showRhoEstimator()));
     optionsMenu->addAction(tr("VDOT and T-Pace Calculator..."), this, SLOT(showVDOTCalculator()));
 
@@ -1082,13 +1080,7 @@ MainWindow::aboutDialog()
     ad->exec();
 }
 
-void MainWindow::showSolveCP()
-{
-   SolveCPDialog *td = new SolveCPDialog(this, currentTab->context);
-   td->show();
-}
-
-void MainWindow::showEstimateCP()
+void MainWindow::showTools()
 {
    EstimateCPDialog *td = new EstimateCPDialog();
    td->show();
