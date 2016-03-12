@@ -58,6 +58,7 @@ class DanielsPoints : public RideMetric {
         setMetricUnits("");
         setImperialUnits("");
         setType(RideMetric::Total);
+        setDescription(tr("Daniels Points adapted for cycling using power instead of pace and assuming VO2max-power=1.2*CP, normalized to assign 100 points to 1 hour at CP."));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -128,6 +129,7 @@ class DanielsEquivalentPower : public RideMetric {
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
         setType(RideMetric::Average);
+        setDescription(tr("Daniels EqP is the constant power which would produce equivalent Daniels Points."));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {

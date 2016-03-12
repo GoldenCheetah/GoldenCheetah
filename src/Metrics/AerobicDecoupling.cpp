@@ -58,6 +58,7 @@ class AerobicDecoupling : public RideMetric {
         setMetricUnits(tr("%"));
         setImperialUnits(tr("%"));
         setPrecision(1);
+        setDescription(tr("Aerobic decoupling is a measure of how much heart rate rises or how much power/pace falls off during the course of a long ride/run."));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &){

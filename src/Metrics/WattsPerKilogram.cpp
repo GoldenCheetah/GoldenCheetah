@@ -44,6 +44,7 @@ class AverageWPK : public RideMetric {
         setMetricUnits(tr("w/kg"));
         setImperialUnits(tr("w/kg"));
         setPrecision(2);
+        setDescription(tr("Average Power relative to Athlete Weight."));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -108,6 +109,7 @@ class CPWPK : public PeakWPK {
         }
         void initialize () {
             setName(tr("60 min Peak WPK"));
+            setDescription(tr("60 min Peak Power relative to Athlete Weight."));
         }
         RideMetric *clone() const { return new CPWPK(*this); }
 };
@@ -123,6 +125,7 @@ class PeakWPK1s : public PeakWPK {
         }
         void initialize () {
             setName(tr("1 sec Peak WPK"));
+            setDescription(tr("1 sec Peak Power relative to Athlete Weight."));
         }
         RideMetric *clone() const { return new PeakWPK1s(*this); }
 };
@@ -138,6 +141,7 @@ class PeakWPK5s : public PeakWPK {
         }
         void initialize () {
             setName(tr("5 sec Peak WPK"));
+            setDescription(tr("5 sec Peak Power relative to Athlete Weight."));
         }
         RideMetric *clone() const { return new PeakWPK5s(*this); }
 };
@@ -153,6 +157,7 @@ class PeakWPK10s : public PeakWPK {
         }
         void initialize () {
             setName(tr("10 sec Peak WPK"));
+            setDescription(tr("10 sec Peak Power relative to Athlete Weight."));
         }
         RideMetric *clone() const { return new PeakWPK10s(*this); }
 };
@@ -168,6 +173,7 @@ class PeakWPK15s : public PeakWPK {
         }
         void initialize () {
             setName(tr("15 sec Peak WPK"));
+            setDescription(tr("15 sec Peak Power relative to Athlete Weight."));
         }
         RideMetric *clone() const { return new PeakWPK15s(*this); }
 };
@@ -183,6 +189,7 @@ class PeakWPK20s : public PeakWPK {
         }
         void initialize () {
             setName(tr("20 sec Peak WPK"));
+            setDescription(tr("20 sec Peak Power relative to Athlete Weight."));
         }
         RideMetric *clone() const { return new PeakWPK20s(*this); }
 };
@@ -198,6 +205,7 @@ class PeakWPK30s : public PeakWPK {
         }
         void initialize () {
             setName(tr("30 sec Peak WPK"));
+            setDescription(tr("30 sec Peak Power relative to Athlete Weight."));
         }
         RideMetric *clone() const { return new PeakWPK30s(*this); }
 };
@@ -213,6 +221,7 @@ class PeakWPK1m : public PeakWPK {
         }
         void initialize () {
             setName(tr("1 min Peak WPK"));
+            setDescription(tr("1 min Peak Power relative to Athlete Weight."));
         }
         RideMetric *clone() const { return new PeakWPK1m(*this); }
 };
@@ -228,6 +237,7 @@ class PeakWPK5m : public PeakWPK {
         }
         void initialize () {
             setName(tr("5 min Peak WPK"));
+            setDescription(tr("5 min Peak Power relative to Athlete Weight."));
         }
         RideMetric *clone() const { return new PeakWPK5m(*this); }
 };
@@ -243,6 +253,7 @@ class PeakWPK10m : public PeakWPK {
         }
         void initialize () {
             setName(tr("10 min Peak WPK"));
+            setDescription(tr("10 min Peak Power relative to Athlete Weight."));
         }
         RideMetric *clone() const { return new PeakWPK10m(*this); }
 };
@@ -258,6 +269,7 @@ class PeakWPK20m : public PeakWPK {
         }
         void initialize () {
             setName(tr("20 min Peak WPK"));
+            setDescription(tr("20 min Peak Power relative to Athlete Weight."));
         }
         RideMetric *clone() const { return new PeakWPK20m(*this); }
 };
@@ -273,6 +285,7 @@ class PeakWPK30m : public PeakWPK {
         }
         void initialize () {
             setName(tr("30 min Peak WPK"));
+            setDescription(tr("30 min Peak Power relative to Athlete Weight."));
         }
         RideMetric *clone() const { return new PeakWPK30m(*this); }
 };
@@ -291,6 +304,7 @@ class Vo2max : public RideMetric {
         setType(RideMetric::Peak);
         setMetricUnits(tr("ml/min/kg"));
         setImperialUnits(tr("ml/min/kg"));
+        setDescription(tr("Estimated VO2max from 5 min Peak Power relative to Athlete Weight using new ACSM formula: 10.8 * Watts / KG + 7 (3.5 per leg)."));
     }
 
     void compute(RideItem* /*item*/, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -327,6 +341,7 @@ class EtimatedAverageWPK_DrF : public RideMetric {
         setMetricUnits(tr("w/kg"));
         setImperialUnits(tr("w/kg"));
         setPrecision(2);
+        setDescription(tr("Estimated Average Power relative to Athlete Weight using Dr Ferrari formula based on VAM for gradient higher than or equal to 7%: VAM / (2 + (gradient/10)) / 100"));
     }
 
     void compute(RideItem* /*item*/, Specification, const QHash<QString,RideMetric*> &deps) {
