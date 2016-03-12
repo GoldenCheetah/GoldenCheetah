@@ -25,6 +25,8 @@
 #include "RideCache.h"
 #include "RideItem.h"
 
+#include "CPSolver.h"
+
 #include <QFont>
 #include <QFontMetrics>
 
@@ -37,6 +39,8 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     //
     // Widget creation
     //
+    solver = new CPSolver(context);
+
     QFont bolden;
     bolden.setWeight(QFont::Bold);
 
@@ -191,6 +195,10 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     // Connect the dots
     //
     connect(selectCheckBox, SIGNAL(stateChanged(int)), this, SLOT(selectAll()));
+    connect(solve, SIGNAL(clicked()), this, SLOT(solveClicked()));
+    connect(close, SIGNAL(clicked()), this, SLOT(closeClicked()));
+    connect(solver, SIGNAL(current(int,WBParms,double)), this, SLOT(current(int,WBParms,double)));
+    connect(solver, SIGNAL(newBest(int,WBParms,double)), this, SLOT(newBest(int,WBParms,double)));
 
     //
     // Prepare
@@ -254,12 +262,70 @@ SolveCPDialog::selectAll()
 }
 
 void
+SolveCPDialog::newBest(int k,WBParms p,double sum)
+{
+    bitLabel->setText(QString("%1").arg(k));
+    bcpLabel->setText(QString("%1").arg(p.CP));
+    bwLabel->setText(QString("%1").arg(p.W));
+    btLabel->setText(QString("%1").arg(p.TAU));
+    bsumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
+
+    QApplication::processEvents();
+}
+
+
+void
+SolveCPDialog::current(int k,WBParms p,double sum)
+{
+    citLabel->setText(QString("%1").arg(k));
+    ccpLabel->setText(QString("%1").arg(p.CP));
+    cwLabel->setText(QString("%1").arg(p.W));
+    ctLabel->setText(QString("%1").arg(p.TAU));
+    csumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
+
+    QApplication::processEvents();
+}
+
+
+void
 SolveCPDialog::solveClicked()
 {
+    if (solve->text() == tr("Stop")) {
+        solve->setText(tr("Solve"));
+        solver->stop();
+        return;
+    }
+
+    // loop through the table and collect the rides to solve
+    QList<RideItem*> solveme;
+
+    // get the rides selected
+    for(int i=0; i<dataTable->invisibleRootItem()->childCount(); i++) {
+
+        QTreeWidgetItem *it = dataTable->invisibleRootItem()->child(i);
+
+
+        // is it selected?
+        if (static_cast<QCheckBox*>(dataTable->itemWidget(it, 0))->isChecked())
+            solveme << static_cast<RideItem*>(it->data(0, Qt::UserRole).value<void *>());
+    }
+
+    // if we got something to solve then kick it off
+    if (solveme.count()) {
+
+        // reset and reinitialise before kicking off
+        solver->reset();
+        solver->setData(solveme);
+        solve->setText(tr("Stop"));
+        solver->start();
+    }
+    return;
 }
 
 void
 SolveCPDialog::closeClicked()
 {
+    solver->stop();// in case its still running!
+    accept();
 }
 
