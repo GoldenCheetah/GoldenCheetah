@@ -261,6 +261,8 @@ SolveCPDialog::selectAll()
     }
 }
 
+static int _count=0;
+
 void
 SolveCPDialog::newBest(int k,WBParms p,double sum)
 {
@@ -283,7 +285,7 @@ SolveCPDialog::current(int k,WBParms p,double sum)
     ctLabel->setText(QString("%1").arg(p.TAU));
     csumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
 
-    QApplication::processEvents();
+    if (!(_count++%50))  QApplication::processEvents();
 }
 
 
