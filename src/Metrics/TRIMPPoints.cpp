@@ -55,6 +55,7 @@ class TRIMPPoints : public RideMetric {
         setMetricUnits("");
         setImperialUnits("");
         setType(RideMetric::Total);
+        setDescription(tr("Training Impulse according to Morton/Banister with Green et al coefficient."));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -121,6 +122,7 @@ public:
         setMetricUnits("");
         setImperialUnits("");
         setType(RideMetric::Total);
+        setDescription(tr("TRIMP Points normalized to assign 100 points to 1 hour at threshold heart rate."));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -183,6 +185,7 @@ public:
         setMetricUnits("");
         setImperialUnits("");
         setType(RideMetric::Total);
+        setDescription(tr("Training Impulse with time in zones weighted according to coefficients defined in Heart Rate Zones."));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -323,6 +326,7 @@ class SessionRPE : public RideMetric {
         setMetricUnits("");
         setImperialUnits("");
         setType(RideMetric::Total);
+        setDescription(tr("Session RPE is the product of RPE * minutes, where RPE is the rate of perceived exercion (10 point modified borg scale) and minutes is Time Moving if available or Duration otherwise."));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {

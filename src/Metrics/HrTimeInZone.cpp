@@ -95,6 +95,7 @@ public:
         setName(tr("H1 Time in Zone"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Heart Rate Zone 1."));
     }
     RideMetric *clone() const { return new HrZoneTime1(*this); }
 };
@@ -114,6 +115,7 @@ public:
         setName(tr("H2 Time in Zone"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Heart Rate Zone 2."));
     }
     RideMetric *clone() const { return new HrZoneTime2(*this); }
 };
@@ -133,6 +135,7 @@ public:
         setName(tr("H3 Time in Zone"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Heart Rate Zone 3."));
     }
     RideMetric *clone() const { return new HrZoneTime3(*this); }
 };
@@ -152,6 +155,7 @@ public:
         setName(tr("H4 Time in Zone"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Heart Rate Zone 4."));
     }
     RideMetric *clone() const { return new HrZoneTime4(*this); }
 };
@@ -171,6 +175,7 @@ public:
         setName(tr("H5 Time in Zone"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Heart Rate Zone 5."));
     }
     RideMetric *clone() const { return new HrZoneTime5(*this); }
 };
@@ -190,6 +195,7 @@ public:
         setName(tr("H6 Time in Zone"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Heart Rate Zone 6."));
     }
     RideMetric *clone() const { return new HrZoneTime6(*this); }
 };
@@ -209,6 +215,7 @@ public:
         setName(tr("H7 Time in Zone"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Heart Rate Zone 7."));
     }
     RideMetric *clone() const { return new HrZoneTime7(*this); }
 };
@@ -228,6 +235,7 @@ public:
         setName(tr("H8 Time in Zone"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Heart Rate Zone 8."));
     }
     RideMetric *clone() const { return new HrZoneTime8(*this); }
 };
@@ -247,6 +255,7 @@ public:
         setName(tr("H9 Time in Zone"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Heart Rate Zone 9."));
     }
     RideMetric *clone() const { return new HrZoneTime9(*this); }
 };
@@ -265,6 +274,7 @@ public:
         setName(tr("H10 Time in Zone"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Heart Rate Zone 10."));
     }
     RideMetric *clone() const { return new HrZoneTime10(*this); }
 };
@@ -290,6 +300,7 @@ class HrZonePTime1 : public RideMetric {
         void initialize ()
         {
             setName(tr("H1 Percent in Zone"));
+            setDescription(tr("Percent of Time in Heart Rate Zone 1."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -331,6 +342,7 @@ class HrZonePTime2 : public RideMetric {
         void initialize ()
         {
             setName(tr("H2 Percent in Zone"));
+            setDescription(tr("Percent of Time in Heart Rate Zone 2."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -372,6 +384,7 @@ class HrZonePTime3 : public RideMetric {
         void initialize ()
         {
             setName(tr("H3 Percent in Zone"));
+            setDescription(tr("Percent of Time in Heart Rate Zone 3."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -413,6 +426,7 @@ class HrZonePTime4 : public RideMetric {
         void initialize ()
         {
             setName(tr("H4 Percent in Zone"));
+            setDescription(tr("Percent of Time in Heart Rate Zone 4."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -454,6 +468,7 @@ class HrZonePTime5 : public RideMetric {
         void initialize ()
         {
             setName(tr("H5 Percent in Zone"));
+            setDescription(tr("Percent of Time in Heart Rate Zone 5."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -495,6 +510,7 @@ class HrZonePTime6 : public RideMetric {
         void initialize ()
         {
             setName(tr("H6 Percent in Zone"));
+            setDescription(tr("Percent of Time in Heart Rate Zone 6."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -536,6 +552,7 @@ class HrZonePTime7 : public RideMetric {
         void initialize ()
         {
             setName(tr("H7 Percent in Zone"));
+            setDescription(tr("Percent of Time in Heart Rate Zone 7."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -577,6 +594,7 @@ class HrZonePTime8 : public RideMetric {
         void initialize ()
         {
             setName(tr("H8 Percent in Zone"));
+            setDescription(tr("Percent of Time in Heart Rate Zone 8."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -617,6 +635,7 @@ class HrZonePTime9 : public RideMetric {
         void initialize ()
         {
             setName(tr("H9 Percent in Zone"));
+            setDescription(tr("Percent of Time in Heart Rate Zone 9."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -657,6 +676,7 @@ class HrZonePTime10 : public RideMetric {
         void initialize ()
         {
             setName(tr("H10 Percent in Zone"));
+            setDescription(tr("Percent of Time in Heart Rate Zone 10."));
         }
 
         void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {

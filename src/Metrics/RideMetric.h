@@ -95,7 +95,7 @@ public:
 
     // A description explaining metrics details to be shown in tooltips,
     // it should be translated using tr()
-    virtual QString description() const { return description_.isEmpty() ? name() + " - " + tr("No description available, see Glossary in User Guide") : description_; }
+    virtual QString description() const { return description_.isEmpty() ? name() : description_; }
 
     // What type of metric is this?
     // Drives the way metrics combined over a day or week in the

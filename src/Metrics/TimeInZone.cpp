@@ -91,6 +91,7 @@ class ZoneTime1 : public ZoneTime {
             setName(tr("L1 Time in Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Power Zone 1."));
         }
         RideMetric *clone() const { return new ZoneTime1(*this); }
 };
@@ -110,6 +111,7 @@ class ZoneTime2 : public ZoneTime {
             setName(tr("L2 Time in Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Power Zone 2."));
         }
         RideMetric *clone() const { return new ZoneTime2(*this); }
 };
@@ -129,6 +131,7 @@ class ZoneTime3 : public ZoneTime {
             setName(tr("L3 Time in Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Power Zone 3."));
         }
         RideMetric *clone() const { return new ZoneTime3(*this); }
 };
@@ -150,6 +153,7 @@ class ZoneTime4 : public ZoneTime {
             setName(tr("L4 Time in Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Power Zone 4."));
         }
         RideMetric *clone() const { return new ZoneTime4(*this); }
 };
@@ -169,6 +173,7 @@ class ZoneTime5 : public ZoneTime {
             setName(tr("L5 Time in Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Power Zone 5."));
         }
         RideMetric *clone() const { return new ZoneTime5(*this); }
 };
@@ -188,6 +193,7 @@ class ZoneTime6 : public ZoneTime {
             setName(tr("L6 Time in Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Power Zone 6."));
         }
         RideMetric *clone() const { return new ZoneTime6(*this); }
 };
@@ -207,6 +213,7 @@ class ZoneTime7 : public ZoneTime {
             setName(tr("L7 Time in Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Power Zone 7."));
         }
         RideMetric *clone() const { return new ZoneTime7(*this); }
 };
@@ -226,6 +233,7 @@ class ZoneTime8 : public ZoneTime {
             setName(tr("L8 Time in Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Power Zone 8."));
         }
         RideMetric *clone() const { return new ZoneTime8(*this); }
 };
@@ -245,6 +253,7 @@ class ZoneTime9 : public ZoneTime {
             setName(tr("L9 Time in Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Power Zone 9."));
         }
         RideMetric *clone() const { return new ZoneTime9(*this); }
 };
@@ -264,6 +273,7 @@ class ZoneTime10 : public ZoneTime {
             setName(tr("L10 Time in Zone"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
+            setDescription(tr("Time in Power Zone 10."));
         }
         RideMetric *clone() const { return new ZoneTime10(*this); }
 };
@@ -289,6 +299,7 @@ class ZonePTime1 : public RideMetric {
         void initialize ()
         {
             setName(tr("L1 Percent in Zone"));
+            setDescription(tr("Percent of Time in Power Zone 1."));
         }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -328,6 +339,7 @@ class ZonePTime2 : public RideMetric {
         void initialize ()
         {
             setName(tr("L2 Percent in Zone"));
+            setDescription(tr("Percent of Time in Power Zone 2."));
         }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -367,6 +379,7 @@ class ZonePTime3 : public RideMetric {
         void initialize ()
         {
             setName(tr("L3 Percent in Zone"));
+            setDescription(tr("Percent of Time in Power Zone 3."));
         }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -406,6 +419,7 @@ class ZonePTime4 : public RideMetric {
         void initialize ()
         {
             setName(tr("L4 Percent in Zone"));
+            setDescription(tr("Percent of Time in Power Zone 4."));
         }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -445,6 +459,7 @@ class ZonePTime5 : public RideMetric {
         void initialize ()
         {
             setName(tr("L5 Percent in Zone"));
+            setDescription(tr("Percent of Time in Power Zone 5."));
         }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -484,6 +499,7 @@ class ZonePTime6 : public RideMetric {
         void initialize ()
         {
             setName(tr("L6 Percent in Zone"));
+            setDescription(tr("Percent of Time in Power Zone 6."));
         }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -523,6 +539,7 @@ class ZonePTime7 : public RideMetric {
         void initialize ()
         {
             setName(tr("L7 Percent in Zone"));
+            setDescription(tr("Percent of Time in Power Zone 7."));
         }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -562,6 +579,7 @@ class ZonePTime8 : public RideMetric {
         void initialize ()
         {
             setName(tr("L8 Percent in Zone"));
+            setDescription(tr("Percent of Time in Power Zone 8."));
         }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -601,6 +619,7 @@ class ZonePTime9 : public RideMetric {
         void initialize ()
         {
             setName(tr("L9 Percent in Zone"));
+            setDescription(tr("Percent of Time in Power Zone 9."));
         }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -640,6 +659,7 @@ class ZonePTime10 : public RideMetric {
         void initialize ()
         {
             setName(tr("L10 Percent in Zone"));
+            setDescription(tr("Percent of Time in Power Zone 10."));
         }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {

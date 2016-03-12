@@ -46,6 +46,7 @@ class L1Sustain : public RideMetric {
         setName(tr("L1 Sustained Time"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Sustained Time in Power Zone 1, based on (sustained) EFFORT intervals."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
@@ -71,6 +72,7 @@ class L2Sustain : public RideMetric {
         setName(tr("L2 Sustained Time"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Sustained Time in Power Zone 2, based on (sustained) EFFORT intervals."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
@@ -94,6 +96,7 @@ class L3Sustain : public RideMetric {
         setName(tr("L3 Sustained Time"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Sustained Time in Power Zone 3, based on (sustained) EFFORT intervals."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
@@ -117,6 +120,7 @@ class L4Sustain : public RideMetric {
         setName(tr("L4 Sustained Time"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Sustained Time in Power Zone 4, based on (sustained) EFFORT intervals."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
@@ -140,6 +144,7 @@ class L5Sustain : public RideMetric {
         setName(tr("L5 Sustained Time"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Sustained Time in Power Zone 5, based on (sustained) EFFORT intervals."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
@@ -163,6 +168,7 @@ class L6Sustain : public RideMetric {
         setName(tr("L6 Sustained Time"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Sustained Time in Power Zone 6, based on (sustained) EFFORT intervals."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
@@ -186,6 +192,7 @@ class L7Sustain : public RideMetric {
         setName(tr("L7 Sustained Time"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Sustained Time in Power Zone 7, based on (sustained) EFFORT intervals."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
@@ -209,6 +216,7 @@ class L8Sustain : public RideMetric {
         setName(tr("L8 Sustained Time"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Sustained Time in Power Zone 8, based on (sustained) EFFORT intervals."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
@@ -232,6 +240,7 @@ class L9Sustain : public RideMetric {
         setName(tr("L9 Sustained Time"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Sustained Time in Power Zone 9, based on (sustained) EFFORT intervals."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
@@ -255,6 +264,7 @@ class L10Sustain : public RideMetric {
         setName(tr("L10 Sustained Time"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
+        setDescription(tr("Sustained Time in Power Zone 10, based on (sustained) EFFORT intervals."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
