@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include "GoldenCheetah.h"
+#include "CPSolver.h"
 
 #include <QDialog>
 #include <QLabel>
@@ -60,8 +61,14 @@ class SolveCPDialog : public QDialog
 
     private slots:
 
+        // updates from solver
+        void newBest(int,WBParms,double);
+        void current(int,WBParms,double);
+
         void selectAll();
         void solveClicked();
         void closeClicked();
-};
 
+    private:
+        CPSolver *solver;
+};

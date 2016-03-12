@@ -742,7 +742,7 @@ class MinWPrime : public RideMetric {
         setType(RideMetric::Low);
         setMetricUnits(tr("kJ"));
         setImperialUnits(tr("kJ"));
-        setPrecision(1);
+        setPrecision(2);
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {

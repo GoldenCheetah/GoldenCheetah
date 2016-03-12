@@ -598,7 +598,7 @@ HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/C
            Gui/MergeActivityWizard.h Gui/RideImportWizard.h Gui/SplitActivityWizard.h
 
 # metrics and models
-HEADERS += Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h Metrics/PDModel.h \
+HEADERS += Metrics/CPSolver.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h Metrics/PDModel.h \
            Metrics/PMCData.h Metrics/RideMetadata.h Metrics/RideMetric.h Metrics/SpecialFields.h Metrics/Statistic.h \
            Metrics/UserMetricParser.h Metrics/UserMetricSettings.h Metrics/VDOTCalculator.h Metrics/WPrime.h Metrics/Zones.h
 
@@ -675,7 +675,7 @@ SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp
 
 ## Models and Metrics
 SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.cpp Metrics/BasicRideMetrics.cpp  \
-           Metrics/BikeScore.cpp Metrics/Coggan.cpp Metrics/DanielsPoints.cpp Metrics/ExtendedCriticalPower.cpp \
+           Metrics/BikeScore.cpp Metrics/Coggan.cpp Metrics/CPSolver.cpp Metrics/DanielsPoints.cpp Metrics/ExtendedCriticalPower.cpp \
            Metrics/GOVSS.cpp Metrics/HrTimeInZone.cpp Metrics/HrZones.cpp Metrics/LeftRightBalance.cpp Metrics/PaceTimeInZone.cpp \
            Metrics/PaceZones.cpp Metrics/PDModel.cpp Metrics/PeakPace.cpp Metrics/PeakPower.cpp Metrics/PMCData.cpp Metrics/RideMetadata.cpp \
            Metrics/RideMetric.cpp Metrics/SpecialFields.cpp Metrics/Statistic.cpp Metrics/SustainMetric.cpp Metrics/SwimScore.cpp \
