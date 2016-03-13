@@ -23,6 +23,7 @@
 CPSolver::CPSolver(Context *context)
    : context(context)
 {
+    integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
 }
 
 // set the data to solve
@@ -95,12 +96,21 @@ CPSolver::compute(QVector<int> &ride, WBParms parms)
     double wpbal=parms.W;
     foreach(int watts, ride) {
 
-        // as per Dave Waterworth's formulation
-        I += exp(((double)(t) / parms.TAU)) * (watts > parms.CP ? watts-parms.CP : 0);
-        wpbal = parms.W - (exp(-((double)(t) / parms.TAU)) * I);
+        if (integral) {
+
+            // INTEGRAL
+            I += exp(((double)(t) / parms.TAU)) * (watts > parms.CP ? watts-parms.CP : 0);
+            wpbal = parms.W - (exp(-((double)(t) / parms.TAU)) * I);
+
+        } else {
+
+            // DIFFERENTIAL
+            wpbal  += watts < parms.CP ? ((parms.CP-watts)*(wpbal-parms.W)/wpbal) : (parms.CP-watts);
+        }
 
         t++;
     }
+
     //qDebug()<<"w'bal at exhaustion:"<<wpbal<<"t="<<t;
     return wpbal;
 }

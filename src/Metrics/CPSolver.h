@@ -82,6 +82,7 @@ class CPSolver : public QObject {
 
         // who we for ?
         Context *context;
+        bool integral;
 
         // an array of power data leading up to each exhaust point
         QList<QVector<int> > data;

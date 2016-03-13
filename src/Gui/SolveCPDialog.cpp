@@ -281,7 +281,11 @@ SolveCPDialog::current(int k,WBParms p,double sum)
     ccpLabel->setText(QString("%1").arg(p.CP));
     cwLabel->setText(QString("%1").arg(p.W));
     ctLabel->setText(QString("%1").arg(p.TAU));
-    csumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
+
+    if (sum > 100)
+        csumLabel->setText("> 100kJ");
+    else
+        csumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
 
     if (!(k++%50) || k == 99999)  QApplication::processEvents();
 }
