@@ -41,6 +41,21 @@ public:
     double wpbal; // the result (used to pass back)
 };
 
+class CPSolverConstraints {
+    public:
+    CPSolverConstraints() : cpf(100), cpto(500), wf(5000), wto(50000), tf(300), tto(700) { check(); }
+    CPSolverConstraints(int cpf, int cpto, int wf, int wto, int tf, int tto) :
+    cpf(cpf), cpto(cpto), wf(wf), wto(wto), tf(tf), tto(tto) { check(); }
+    int cpf, cpto, wf, wto, tf, tto;
+
+    // swap if malformed
+    void check() {
+        if (cpf > cpto) { int t=cpto; cpto=cpf; cpf=t; }
+        if (wf > wto) { int t=wto; wto=wf; wf=t; }
+        if (tf > tto) { int t=tto; tto=tf; tf=t; }
+    }
+};
+
 class CPSolver : public QObject {
 
     Q_OBJECT
@@ -52,7 +67,7 @@ class CPSolver : public QObject {
         CPSolver(Context *);
 
         // set the data to solve
-        void setData(QList<RideItem*>);
+        void setData(CPSolverConstraints constraints, QList<RideItem*>);
 
         // compute the cost, using the settings passed
         double cost(WBParms parms);
@@ -84,6 +99,7 @@ class CPSolver : public QObject {
 
         // who we for ?
         Context *context;
+        CPSolverConstraints constraints;
         bool integral;
 
         // an array of power data leading up to each exhaust point

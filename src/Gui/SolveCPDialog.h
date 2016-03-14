@@ -23,6 +23,7 @@
 #include <QCheckBox>
 #include <QWidget>
 #include <QTreeWidget>
+#include <QDoubleSpinBox>
 
 class Context;
 class SolveCPDialog : public QDialog
@@ -37,7 +38,14 @@ class SolveCPDialog : public QDialog
     private:
 
         // General labels
-        QLabel *dataLabel, *progressLabel, *bestLabel, *currentLabel;
+        QLabel *inputsLabel, *progressLabel, *bestLabel, *currentLabel;
+
+        // constraints
+        QLabel *parmLabelCP, *parmLabelW, *parmLabelTAU;
+        QLabel *dashCP, *dashW, *dashTAU;
+        QDoubleSpinBox *fromCP, *toCP,
+                       *fromW, *toW,
+                       *fromTAU, *toTAU;
 
         // data side of the dialog
         QCheckBox *selectCheckBox;

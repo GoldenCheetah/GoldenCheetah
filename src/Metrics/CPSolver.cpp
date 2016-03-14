@@ -28,9 +28,10 @@ CPSolver::CPSolver(Context *context)
 
 // set the data to solve
 void
-CPSolver::setData(QList<RideItem*> rides)
+CPSolver::setData(CPSolverConstraints constraints, QList<RideItem*> rides)
 {
     // remember the rides
+    this->constraints=constraints;
     this->rides=rides;
 
     // set the vectors!
@@ -132,18 +133,27 @@ CPSolver::neighbour(WBParms p, int k, int kmax)
 
     // range from where we are now from hi to lo
     // value range (e.g. 400 is range of CP between 100-500)
-    int CPrange = 3 + (400 * factor);
-    int Wrange = 101 + (45000 * factor);
-    int TAUrange = 3 + (400 * factor);
+    int CPrange = 3 + ((constraints.cpto - constraints.cpf) * factor);
+    int Wrange = 101 + ((constraints.wto - constraints.wf) * factor);
+    int TAUrange = 3 + ((constraints.tto - constraints.tf) * factor);
+    int it=0;
 
     do {
         returning.CP = p.CP + (rand()%CPrange - (CPrange/2));
         returning.W = p.W + (rand()%Wrange - (Wrange/2));
         returning.TAU = p.TAU + (rand()%TAUrange - (TAUrange/2));
 
-    } while (returning.CP < 100 || returning.CP > 500 ||
-             returning.W > 50000 || returning.W < 5000 ||
-             returning.TAU < 300 || returning.TAU > 700);
+    } while (it++ < 3 && (returning.CP < constraints.cpf || returning.CP > constraints.cpto ||
+                          returning.W > constraints.cpto || returning.W < constraints.cpf ||
+                          returning.TAU < constraints.tf || returning.TAU > constraints.tto));
+
+    // if we failed to randomise just check bounds
+    if (returning.CP > constraints.cpto) returning.CP = constraints.cpto;
+    if (returning.CP < constraints.cpf) returning.CP = constraints.cpf;
+    if (returning.W > constraints.wto) returning.W = constraints.wto;
+    if (returning.W < constraints.wf) returning.W = constraints.wf;
+    if (returning.TAU > constraints.tto) returning.TAU = constraints.tto;
+    if (returning.TAU < constraints.tf) returning.TAU = constraints.tf;
 
     return returning;
 }
@@ -162,9 +172,9 @@ CPSolver::start()
     if (data.count() == 0 || rides.count() == 0) return;
 
     // set starting conditions at maximals
-    s0.CP =   500;
-    s0.W =  50000;
-    s0.TAU =  700;
+    s0.CP =   constraints.cpto;
+    s0.W =    constraints.wto;
+    s0.TAU =  constraints.tto;
 
     QTime p;
     p.start();
