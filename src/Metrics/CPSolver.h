@@ -62,8 +62,8 @@ class CPSolver : public QObject {
 
     public:
 
-        // create a PMC data series for the athlete
-        // for ALL date ranges
+        // as simulated annealing algorithm to solve W', CP and tau
+        // from a collection of exhaustion points within a ride
         CPSolver(Context *);
 
         // set the data to solve
