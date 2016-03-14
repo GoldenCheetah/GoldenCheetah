@@ -171,6 +171,9 @@ CPSolver::start()
     // set starting conditions from first ride
     if (data.count() == 0 || rides.count() == 0) return;
 
+    // to flag when to stop
+    halt = false;
+
     // set starting conditions at maximals
     s0.CP =   constraints.cpto;
     s0.W =    constraints.wto;
@@ -191,7 +194,7 @@ CPSolver::start()
     int kmax = 100000;
 
     // give up when we're on it or run out of loops
-    while (/*E > 0.1f &&*/ k < kmax) {
+    while (halt == false && k < kmax) {
 
         WBParms snew = neighbour(s, k, kmax);
         double Enew = cost(snew);
@@ -219,6 +222,7 @@ CPSolver::start()
 
         // don't run forever
         k++;
+
     }
     emit newBest(0, sbest,Ebest);
 }
@@ -244,4 +248,5 @@ CPSolver::pause()
 void
 CPSolver::stop()
 {
+    halt = true;
 }
