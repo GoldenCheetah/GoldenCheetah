@@ -60,7 +60,9 @@ class CPSolver : public QObject {
         // compute ending W'bal for the exhaustion series
         double compute(QVector<int> &ride, WBParms parms);
 
-        WBParms neighbour(WBParms);
+        WBParms neighbour(WBParms, int k, int kmax);
+        double probability(double,double,double);
+        double temperature(double);
 
         // get a 1s power array from the data
         QVector<int> power1s(RideFile *f, double secs);

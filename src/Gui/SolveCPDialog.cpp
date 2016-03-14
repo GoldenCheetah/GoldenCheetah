@@ -204,13 +204,12 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     // Prepare
     //
     QStringList headers;
-    headers << " " << "Date" << "Min W'bal" << "Solved";
-    dataTable->setColumnCount(4);
+    headers << " " << "Date" << "Min W'bal";
+    dataTable->setColumnCount(3);
     dataTable->setHeaderLabels(headers);
     dataTable->headerItem()->setTextAlignment(0, Qt::AlignLeft);
     dataTable->headerItem()->setTextAlignment(1, Qt::AlignHCenter);
     dataTable->headerItem()->setTextAlignment(2, Qt::AlignHCenter);
-    dataTable->headerItem()->setTextAlignment(3, Qt::AlignHCenter);
 
     // get a list
     foreach(RideItem *item, context->athlete->rideCache->rides()) {
@@ -227,12 +226,10 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
         QTreeWidgetItem *t = new QTreeWidgetItem(dataTable);
         t->setText(1, item->dateTime.date().toString("dd MMM yy"));
         t->setText(2, item->getStringForSymbol("skiba_wprime_low"));
-        t->setText(3, "-");
 
         t->setTextAlignment(0, Qt::AlignLeft);
         t->setTextAlignment(1, Qt::AlignHCenter);
         t->setTextAlignment(2, Qt::AlignHCenter);
-        t->setTextAlignment(3, Qt::AlignHCenter);
 
         // remember which rideitem this is for
         t->setData(0, Qt::UserRole, qVariantFromValue(static_cast<void*>(item)));
@@ -245,7 +242,6 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     dataTable->setColumnWidth(0,50);
     dataTable->resizeColumnToContents(1);
     dataTable->resizeColumnToContents(2);
-    dataTable->resizeColumnToContents(3);
 #ifdef Q_OS_MAC
     dataTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -268,7 +264,10 @@ SolveCPDialog::newBest(int k,WBParms p,double sum)
     bcpLabel->setText(QString("%1").arg(p.CP));
     bwLabel->setText(QString("%1").arg(p.W));
     btLabel->setText(QString("%1").arg(p.TAU));
-    bsumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
+    if (sum > 100)
+        bsumLabel->setText("> 100kJ");
+    else
+        bsumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
 
     QApplication::processEvents();
 }
@@ -287,7 +286,7 @@ SolveCPDialog::current(int k,WBParms p,double sum)
     else
         csumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
 
-    if (!(k++%50) || k == 99999)  QApplication::processEvents();
+    if (!(k++%200) || k == 99999)  QApplication::processEvents();
 }
 
 

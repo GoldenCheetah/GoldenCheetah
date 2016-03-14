@@ -78,12 +78,12 @@ CPSolver::cost(WBParms parms)
     // since it will make a copy of the contents which has
     // a significant performance impact
     double sumwb2=0;
-    for(int i=0; i<data.count();i++)  sumwb2 += pow(compute(data[i], parms)/1000.0f,2);
+    for(int i=0; i<data.count();i++)  sumwb2 += pow(compute(data[i], parms),2);
 
     //qDebug()<<"cost="<<QString("%1").arg(sumwb2, 0, 'g', 7);
 
     // what we got
-    return sumwb2;
+    return sumwb2 /1000.0f;
 }
 
 double
@@ -117,24 +117,34 @@ CPSolver::compute(QVector<int> &ride, WBParms parms)
 
 // get us a neighbour
 WBParms
-CPSolver::neighbour(WBParms p)
+CPSolver::neighbour(WBParms p, int k, int kmax)
 {
     WBParms returning;
 
-    returning.CP = p.CP + (rand()%3 + (-1));
-    returning.W = p.W + (rand()%201 + (-100));
-    returning.TAU = p.TAU + (rand()%31 + (-15));
+    // a crucial aspect of the simulated annealling algorithm is that
+    // we search a wide space for solutions as we start searching, but
+    // as time passes we look in a much smaller range; i.e. we distribute
+    // across the search space up front, but hone in as we get nearer the end
 
-    // set some bounds to physiologically plausible values
-    // i.e. limit the search space !
-    if (returning.CP < 100) returning.CP=100;
-    if (returning.CP > 450) returning.CP=450;
-    if (returning.W > 50000) returning.W = 50000;
-    if (returning.W < 5000) returning.W = 5000;
-    if (returning.TAU < 400) returning.TAU = 600;
-    if (returning.TAU > 600) returning.TAU = 400;
+    // wild ass guesses at the beginning down to very closest neighbours
+    // start at 150% and drop down to 1%
+    double factor = (double(kmax - k) / (double(kmax)));
 
-    //qDebug()<<"X:"<<p.CP<<p.W<<p.TAU<<"neighbour:"<<returning.CP<<returning.W<<returning.TAU;
+    // range from where we are now from hi to lo
+    // value range (e.g. 400 is range of CP between 100-500)
+    int CPrange = 3 + (400 * factor);
+    int Wrange = 101 + (45000 * factor);
+    int TAUrange = 3 + (400 * factor);
+
+    do {
+        returning.CP = p.CP + (rand()%CPrange - (CPrange/2));
+        returning.W = p.W + (rand()%Wrange - (Wrange/2));
+        returning.TAU = p.TAU + (rand()%TAUrange - (TAUrange/2));
+
+    } while (returning.CP < 100 || returning.CP > 500 ||
+             returning.W > 50000 || returning.W < 5000 ||
+             returning.TAU < 300 || returning.TAU > 700);
+
     return returning;
 }
 
@@ -151,10 +161,10 @@ CPSolver::start()
     // set starting conditions from first ride
     if (data.count() == 0 || rides.count() == 0) return;
 
-    // get starting conditions from first ride
-    s0.CP =  rides[0]->ride()->wprimeData()->CP;
-    s0.W =  rides[0]->ride()->wprimeData()->WPRIME;
-    s0.TAU =  300; // this is where the magic happens
+    // set starting conditions at maximals
+    s0.CP =   500;
+    s0.W =  50000;
+    s0.TAU =  700;
 
     QTime p;
     p.start();
@@ -168,41 +178,52 @@ CPSolver::start()
 
     // 10,000 iterations at most
     int k=0;
-    int N=0;
     int kmax = 100000;
 
     // give up when we're on it or run out of loops
     while (/*E > 0.1f &&*/ k < kmax) {
 
-        WBParms snew = neighbour(s);
+        WBParms snew = neighbour(s, k, kmax);
         double Enew = cost(snew);
 
         // progress update
         emit current(k, snew,Enew);
 
-        // move here, randomly pick one thats worse
-        if (Enew < E || (rand()%100 == 1))  s = snew;
+        // probability - always 1 if better, but randomly accept higher
+        double random = double(rand()%101)/100.00f;
+        double temp = temperature(double(k)/double(kmax));
+        double prob = probability(E,Enew,temp);
 
-        // is it better than our very best?
-        if (Enew < Ebest) {
-            Ebest = Enew;
-            sbest = s;
-            emit newBest(k, sbest,Ebest);
-            //qDebug()<<k<<"new best"<<Ebest <<s.CP<<s.W<<s.TAU;
+        if (prob > random) {
+            s = snew;
+            E = Enew;
         }
 
-        // time to switch to new space?
-        if (++N%10000 == 0) {
-            s = sbest;
-            s.TAU = 300 + (rand()%300);
-            E = cost(s);
-            //qDebug()<<k<<"reset to"<<E <<s.CP<<s.W<<s.TAU;
+        // is it better than our very best?
+        if (E < Ebest) {
+            Ebest = E;
+            sbest = s;
+            emit newBest(k, sbest, Ebest);
+            //qDebug()<<k<<"new best"<<Ebest <<s.CP<<s.W<<s.TAU;
         }
 
         // don't run forever
         k++;
     }
     emit newBest(0, sbest,Ebest);
+}
+
+double
+CPSolver::temperature(double alpha)
+{
+    return (1.0-(0.02*alpha));
+}
+
+double
+CPSolver::probability(double sold, double snew, double temperature)
+{
+    if(snew < sold ) return 1.0;
+    return(exp((sold - snew)/temperature));
 }
 
 void
