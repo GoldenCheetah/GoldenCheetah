@@ -34,7 +34,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
 {
     setWindowTitle(tr("Critical Power Solver"));
     setAttribute(Qt::WA_DeleteOnClose);
-    setMinimumSize(QSize(730, 370));
+    setMinimumSize(QSize(800, 400));
 
     //
     // Widget creation
@@ -44,10 +44,49 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     QFont bolden;
     bolden.setWeight(QFont::Bold);
 
-    dataLabel = new QLabel(tr("Activity Selection"), this);
-    dataLabel->setAlignment(Qt::AlignHCenter);
-    dataLabel->setFont(bolden);
+    inputsLabel = new QLabel(tr("Solver Constraints"), this);
+    inputsLabel->setAlignment(Qt::AlignHCenter);
+    inputsLabel->setFont(bolden);
     selectCheckBox = new QCheckBox(tr("Select/Deselect All"), this);
+
+    // constraints
+    parmLabelCP = new QLabel(tr("CP"), this);
+    parmLabelW = new QLabel(tr("W'"), this);
+    parmLabelTAU = new QLabel(tr("Tau"), this);
+
+    dashCP = new QLabel("-");
+    dashW = new QLabel("-");
+    dashTAU = new QLabel("-");
+
+    fromCP = new QDoubleSpinBox(this); fromCP->setDecimals(0);
+    fromCP->setMinimum(0);
+    fromCP->setMaximum(1000);
+    fromCP->setValue(100);
+
+    toCP = new QDoubleSpinBox(this); toCP->setDecimals(0);
+    toCP->setMinimum(0);
+    toCP->setMaximum(1000);
+    toCP->setValue(500);
+
+    fromW = new QDoubleSpinBox(this); fromW->setDecimals(0);
+    fromW->setMinimum(0);
+    fromW->setMaximum(80000);
+    fromW->setValue(5000);
+
+    toW = new QDoubleSpinBox(this); toW->setDecimals(0);
+    toW->setMinimum(0);
+    toW->setMaximum(80000);
+    toW->setValue(50000);
+
+    fromTAU = new QDoubleSpinBox(this); fromTAU->setDecimals(0);
+    fromTAU->setMinimum(0);
+    fromTAU->setMaximum(1000);
+    fromTAU->setValue(300);
+
+    toTAU = new QDoubleSpinBox(this); toTAU->setDecimals(0);
+    toTAU->setMinimum(0);
+    toTAU->setMaximum(1000);
+    toTAU->setValue(700);
 
     // list all the activities that contain exhaustion points
     dataTable = new QTreeWidget(this);
@@ -83,6 +122,18 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     // fix the label heights and alignment
     QFont def;
     QFontMetrics fm(def);
+    parmLabelCP->setFixedHeight(fm.height());
+    parmLabelW->setFixedHeight(fm.height());
+    parmLabelTAU->setFixedHeight(fm.height());
+    parmLabelCP->setFixedWidth(fm.boundingRect("XXXX").width());
+    parmLabelW->setFixedWidth(fm.boundingRect("XXXX").width());
+    parmLabelTAU->setFixedWidth(fm.boundingRect("XXXX").width());
+    dashCP->setFixedHeight(fm.height());
+    dashTAU->setFixedHeight(fm.height());
+    dashW->setFixedHeight(fm.height());
+    dashCP->setFixedWidth(fm.boundingRect(" - ").width());
+    dashW->setFixedWidth(fm.boundingRect(" - ").width());
+    dashTAU->setFixedWidth(fm.boundingRect(" - ").width());
     currentLabel->setFixedHeight(fm.height());
     bestLabel->setFixedHeight(fm.height());
     itLabel->setFixedHeight(fm.height());
@@ -148,14 +199,30 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
 
     // data on left, progress on the right
     QVBoxLayout *dataLayout = new QVBoxLayout;
+    QGridLayout *constraintsLayout = new QGridLayout;
     QVBoxLayout *progressLayout = new QVBoxLayout;
     mainLayout->addLayout(dataLayout);
     mainLayout->addLayout(progressLayout);
     mainLayout->setStretchFactor(dataLayout,10);
     mainLayout->setStretchFactor(progressLayout,15);
 
+    // conatraints
+    constraintsLayout->addWidget(parmLabelCP, 0,0);
+    constraintsLayout->addWidget(fromCP, 0,1);
+    constraintsLayout->addWidget(dashCP, 0,2);
+    constraintsLayout->addWidget(toCP, 0,3);
+    constraintsLayout->addWidget(parmLabelW, 1,0);
+    constraintsLayout->addWidget(fromW, 1,1);
+    constraintsLayout->addWidget(dashW, 1,2);
+    constraintsLayout->addWidget(toW, 1,3);
+    constraintsLayout->addWidget(parmLabelTAU, 2,0);
+    constraintsLayout->addWidget(fromTAU, 2,1);
+    constraintsLayout->addWidget(dashTAU, 2,2);
+    constraintsLayout->addWidget(toTAU, 2,3);
+
     // data layout on left
-    dataLayout->addWidget(dataLabel);
+    dataLayout->addWidget(inputsLabel);
+    dataLayout->addLayout(constraintsLayout);
     dataLayout->addWidget(selectCheckBox);
     dataLayout->addWidget(dataTable);
 
@@ -318,7 +385,10 @@ SolveCPDialog::solveClicked()
 
         // reset and reinitialise before kicking off
         solver->reset();
-        solver->setData(solveme);
+        CPSolverConstraints constraints (fromCP->value(), toCP->value(), fromW->value(), toW->value(),
+                                         fromTAU->value(), toTAU->value());
+
+        solver->setData(constraints, solveme);
         solve->setText(tr("Stop"));
         solver->start();
     }
