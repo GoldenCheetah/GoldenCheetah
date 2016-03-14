@@ -108,6 +108,9 @@ class CPSolver : public QObject {
 
         // annealling parms
         WBParms s0, sbest;
+
+        // to signal we need to stop
+        bool halt;
 };
 
 #endif
