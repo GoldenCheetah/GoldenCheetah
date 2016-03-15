@@ -26,7 +26,9 @@
 #include "RideItem.h"
 
 #include "CPSolver.h"
+#include "SolverDisplay.h"
 
+#include <QSplitter>
 #include <QFont>
 #include <QFontMetrics>
 
@@ -104,6 +106,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
 
     // list all the activities that contain exhaustion points
     dataTable = new QTreeWidget(this);
+    dataTable->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 
     progressLabel = new QLabel(tr("Progress"), this);
     progressLabel->setAlignment(Qt::AlignHCenter);
@@ -136,6 +139,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     // fix the label heights and alignment
     QFont def;
     QFontMetrics fm(def);
+    progressLabel->setFixedHeight(fm.height());
     parmLabelCP->setFixedHeight(fm.height());
     parmLabelW->setFixedHeight(fm.height());
     parmLabelTAU->setFixedHeight(fm.height());
@@ -193,7 +197,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     bsumLabel->setText("-");
 
     // visualise
-    solverDisplay = new QWidget(this);
+    solverDisplay = new SolverDisplay(this, context);
     solverDisplay->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     solverDisplay->setBackgroundRole(QPalette::Light);
 
@@ -205,20 +209,23 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     //
 
     // main widget with buttons at the bottom
-    QVBoxLayout *fullLayout = new QVBoxLayout(this);
-    QHBoxLayout *mainLayout = new QHBoxLayout;
+    QVBoxLayout *fullLayout = new QVBoxLayout;
+    QSplitter *mainSplitter = new QSplitter(Qt::Horizontal, this);
     QHBoxLayout *buttonLayout = new QHBoxLayout;
-    fullLayout->addLayout(mainLayout);
+    fullLayout->addWidget(mainSplitter);
     fullLayout->addLayout(buttonLayout);
 
+    QWidget *data = new QWidget(this);
+    QWidget *progress = new QWidget(this);
+
     // data on left, progress on the right
-    QVBoxLayout *dataLayout = new QVBoxLayout;
+    QVBoxLayout *dataLayout = new QVBoxLayout(data);
     QGridLayout *constraintsLayout = new QGridLayout;
-    QVBoxLayout *progressLayout = new QVBoxLayout;
-    mainLayout->addLayout(dataLayout);
-    mainLayout->addLayout(progressLayout);
-    mainLayout->setStretchFactor(dataLayout,10);
-    mainLayout->setStretchFactor(progressLayout,15);
+    QVBoxLayout *progressLayout = new QVBoxLayout(progress);
+    mainSplitter->addWidget(data);
+    mainSplitter->addWidget(progress);
+    mainSplitter->setStretchFactor(0, 30);
+    mainSplitter->setStretchFactor(1, 70);
 
     // conatraints
     constraintsLayout->addWidget(parmLabelCP, 0,0);
@@ -241,10 +248,14 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     dataLayout->addWidget(dataTable);
 
     // progress layout, labels then progress viz
-    progressLayout->addWidget(progressLabel);
     QGridLayout *gridLayout = new QGridLayout;
+    progressLayout->addWidget(progressLabel);
     progressLayout->addLayout(gridLayout);
     progressLayout->addWidget(solverDisplay);
+    progressLayout->setSpacing(0);
+    progressLayout->setStretchFactor(gridLayout, 0);
+    progressLayout->setStretchFactor(progressLabel, 0);
+    progressLayout->setStretchFactor(solverDisplay, 1);
 
     // all the labels...
     gridLayout->addWidget(itLabel, 0, 1);
@@ -326,6 +337,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
 #ifdef Q_OS_MAC
     dataTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
+    setLayout(fullLayout);
 }
 
 void
@@ -365,6 +377,9 @@ SolveCPDialog::current(int k,WBParms p,double sum)
     if (sum > 100) csumLabel->setText("> 100kJ");
     else csumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
 
+    // visualise new point
+    solverDisplay->addPoint(SolverPoint(p.CP, p.W, sum));
+
     if (!(k++%200) || k == 99999)  QApplication::processEvents();
 }
 
@@ -397,10 +412,13 @@ SolveCPDialog::solveClicked()
 
         // reset and reinitialise before kicking off
         solver->reset();
+        solverDisplay->reset();
+
         double factor = integral ? 1 : 100;
         CPSolverConstraints constraints (fromCP->value(), toCP->value(), fromW->value(), toW->value(),
                                          fromTAU->value() * factor, toTAU->value() * factor);
 
+        solverDisplay->setConstraints(constraints);
         solver->setData(constraints, solveme);
         solve->setText(tr("Stop"));
         solver->start();

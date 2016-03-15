@@ -26,6 +26,7 @@
 #include <QDoubleSpinBox>
 
 class Context;
+class SolverDisplay;
 class SolveCPDialog : public QDialog
 {
     Q_OBJECT
@@ -60,7 +61,7 @@ class SolveCPDialog : public QDialog
         QLabel *bitLabel, *bcpLabel, *bwLabel, *btLabel, *bsumLabel;
 
         // visualise
-        QWidget *solverDisplay; // need to create a custom widget for this
+        SolverDisplay *solverDisplay; // need to create a custom widget for this
 
         QPushButton *solve, *close;
 
