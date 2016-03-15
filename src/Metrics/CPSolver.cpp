@@ -139,9 +139,12 @@ CPSolver::neighbour(WBParms p, int k, int kmax)
     int TAUrange = 3 + ((constraints.tto - constraints.tf) * factor);
     int it=0;
 
+    // scale rand() to our range (32767 is typical for RAND_MAX)
+    double f = double(Wrange) / double(RAND_MAX);
+
     do {
         returning.CP = p.CP + (rand()%CPrange - (CPrange/2));
-        returning.W = p.W + (rand()%Wrange - (Wrange/2));
+        returning.W = p.W + (int(double(rand())*f)%Wrange - (Wrange/2));
         returning.TAU = p.TAU + (rand()%TAUrange - (TAUrange/2));
 
     } while (it++ < 3 && (returning.CP < constraints.cpf || returning.CP > constraints.cpto ||
@@ -226,6 +229,7 @@ CPSolver::start()
 
     }
     emit newBest(0, sbest,Ebest);
+    //qDebug()<<"TOOK"<<p.elapsed();
 }
 
 double
