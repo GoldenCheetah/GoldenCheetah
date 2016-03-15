@@ -181,6 +181,8 @@ WPrime::setRide(RideFile *input)
         // did we override CP in metadata / metrics ?
         int oCP = input->getTag("CP","0").toInt();
         if (oCP) CP=oCP;
+        int oT = input->getTag("Tau","0").toInt();
+        if (oT) TAU=oT;
         int oW = input->getTag("W'","0").toInt();
         if (oW) WPRIME=oW;
     }
@@ -205,12 +207,15 @@ WPrime::setRide(RideFile *input)
         } else EXP += value; // total expenditure above CP
     }
 
-    if (countBelowCP > 0)
-        TAU = 546.00f * exp(-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
-    else
-        TAU = 546.00f * exp(-0.01*(CP)) + 316.00f;
+    // Tau can be set in the ridefile metadata
+    if (!TAU) {
+        if (countBelowCP > 0)
+            TAU = 546.00f * exp(-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
+        else
+            TAU = 546.00f * exp(-0.01*(CP)) + 316.00f;
 
-    TAU = int(TAU); // round it down
+        TAU = int(TAU); // round it down
+    }
 
     // STEP 2: ITERATE OVER DATA TO CREATE W' DATA SERIES
 
