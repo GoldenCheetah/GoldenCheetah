@@ -105,8 +105,9 @@ CPSolver::compute(QVector<int> &ride, WBParms parms)
 
         } else {
 
+
             // DIFFERENTIAL
-            wpbal  += watts < parms.CP ? ((parms.CP-watts)*(wpbal-parms.W)/wpbal) : (parms.CP-watts);
+            wpbal  += watts < parms.CP ? ((double(parms.TAU)/100.0f) * (parms.W - wpbal)/parms.W * (parms.CP - watts) ) : (parms.CP-watts);
         }
 
         t++;

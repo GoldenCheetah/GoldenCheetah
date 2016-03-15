@@ -79,4 +79,5 @@ class SolveCPDialog : public QDialog
 
     private:
         CPSolver *solver;
+        bool integral;
 };
