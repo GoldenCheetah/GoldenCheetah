@@ -204,6 +204,7 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
     case DEV_CT : wizard->controller = new ComputrainerController(NULL, NULL); break;
 #if QT_VERSION >= 0x050000
     case DEV_MONARK : wizard->controller = new MonarkController(NULL, NULL); break;
+    case DEV_KETTLER : wizard->controller = new KettlerController(NULL, NULL); break;
 #endif
 #ifdef GC_HAVE_LIBUSB
     case DEV_FORTIUS : wizard->controller = new FortiusController(NULL, NULL); break;
@@ -458,6 +459,7 @@ AddSearch::nextId() const
         case DEV_KICKR :
         case DEV_CT : return 60; break; // confirm and add 
         case DEV_MONARK : return 60; break; // confirm and add
+        case DEV_KETTLER : return 60; break; // confirm and add
         case DEV_FORTIUS : return 30; break; // confirm and add 
         }
     }
