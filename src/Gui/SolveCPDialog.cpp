@@ -36,6 +36,9 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     setAttribute(Qt::WA_DeleteOnClose);
     setMinimumSize(QSize(800, 400));
 
+    // are we integral or differential ?
+    integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
+
     //
     // Widget creation
     //
@@ -52,7 +55,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     // constraints
     parmLabelCP = new QLabel(tr("CP"), this);
     parmLabelW = new QLabel(tr("W'"), this);
-    parmLabelTAU = new QLabel(tr("Tau"), this);
+    parmLabelTAU = new QLabel(integral ? tr("Tau") : tr("R"), this);
 
     dashCP = new QLabel("-");
     dashW = new QLabel("-");
@@ -78,15 +81,26 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     toW->setMaximum(80000);
     toW->setValue(50000);
 
-    fromTAU = new QDoubleSpinBox(this); fromTAU->setDecimals(0);
-    fromTAU->setMinimum(0);
-    fromTAU->setMaximum(1000);
-    fromTAU->setValue(300);
+    if (integral) {
+        fromTAU = new QDoubleSpinBox(this); fromTAU->setDecimals(0);
+        fromTAU->setMinimum(0);
+        fromTAU->setMaximum(1000);
+        fromTAU->setValue(300);
+        toTAU = new QDoubleSpinBox(this); toTAU->setDecimals(0);
+        toTAU->setMinimum(0);
+        toTAU->setMaximum(1000);
+        toTAU->setValue(700);
+    } else {
+        fromTAU = new QDoubleSpinBox(this); fromTAU->setDecimals(2);
+        fromTAU->setMinimum(0);
+        fromTAU->setMaximum(5);
+        fromTAU->setValue(0.5);
+        toTAU = new QDoubleSpinBox(this); toTAU->setDecimals(2);
+        toTAU->setMinimum(0);
+        toTAU->setMaximum(5);
+        toTAU->setValue(3.0);
+    }
 
-    toTAU = new QDoubleSpinBox(this); toTAU->setDecimals(0);
-    toTAU->setMinimum(0);
-    toTAU->setMaximum(1000);
-    toTAU->setValue(700);
 
     // list all the activities that contain exhaustion points
     dataTable = new QTreeWidget(this);
@@ -99,7 +113,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     itLabel = new QLabel(tr("Iteration"));
     cpLabel = new QLabel(tr("CP"));
     wLabel = new QLabel(tr("W'"));
-    tLabel = new QLabel(tr("tau"));
+    tLabel = new QLabel(integral ? tr("tau") : tr("R"));
     sumLabel = new QLabel("ΣW'bal²");
 
     currentLabel = new QLabel(tr("Current"));
@@ -330,11 +344,10 @@ SolveCPDialog::newBest(int k,WBParms p,double sum)
     bitLabel->setText(QString("%1").arg(k));
     bcpLabel->setText(QString("%1").arg(p.CP));
     bwLabel->setText(QString("%1").arg(p.W));
-    btLabel->setText(QString("%1").arg(p.TAU));
-    if (sum > 100)
-        bsumLabel->setText("> 100kJ");
-    else
-        bsumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
+    if (integral) btLabel->setText(QString("%1").arg(p.TAU));
+    else btLabel->setText(QString("%1").arg(double(p.TAU)/100.0f, 0, 'f', 2));
+    if (sum > 100) bsumLabel->setText("> 100kJ");
+    else bsumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
 
     QApplication::processEvents();
 }
@@ -346,12 +359,11 @@ SolveCPDialog::current(int k,WBParms p,double sum)
     citLabel->setText(QString("%1").arg(k));
     ccpLabel->setText(QString("%1").arg(p.CP));
     cwLabel->setText(QString("%1").arg(p.W));
-    ctLabel->setText(QString("%1").arg(p.TAU));
+    if (integral) ctLabel->setText(QString("%1").arg(p.TAU));
+    else ctLabel->setText(QString("%1").arg(double(p.TAU)/100.0f, 0, 'f', 2));
 
-    if (sum > 100)
-        csumLabel->setText("> 100kJ");
-    else
-        csumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
+    if (sum > 100) csumLabel->setText("> 100kJ");
+    else csumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
 
     if (!(k++%200) || k == 99999)  QApplication::processEvents();
 }
@@ -385,8 +397,9 @@ SolveCPDialog::solveClicked()
 
         // reset and reinitialise before kicking off
         solver->reset();
+        double factor = integral ? 1 : 100;
         CPSolverConstraints constraints (fromCP->value(), toCP->value(), fromW->value(), toW->value(),
-                                         fromTAU->value(), toTAU->value());
+                                         fromTAU->value() * factor, toTAU->value() * factor);
 
         solver->setData(constraints, solveme);
         solve->setText(tr("Stop"));
