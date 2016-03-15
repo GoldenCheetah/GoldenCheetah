@@ -37,6 +37,7 @@
 #define DEV_KICKR      0x1000   // Wahoo Kickr
 #define DEV_BT40       0x2000   // Wahoo Kickr
 #define DEV_MONARK     0x4000   // Monark USB
+#define DEV_KETTLER    0x8000   // Kettler Serial
 
 #define DEV_QUARQ      0x01     // ants use id:hostname:port
 #define DEV_SERIAL     0x02     // use filename COMx or /dev/cuxxxx
