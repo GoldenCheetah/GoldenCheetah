@@ -31,7 +31,10 @@ SolverDisplay::addPoint(SolverPoint p)
     else if (p.z > 5)  points[2] << p;
     else  points[3] << p;
 
-    if (count++%1000 == 0) repaint();
+    if (count++%1000 == 0) {
+        //qDebug()<<"HQS="<<points[3].count();
+        repaint();
+    }
 }
 
 void
@@ -92,6 +95,22 @@ SolverDisplay::paintEvent(QPaintEvent *)
         if (p.y < sy) sy=p.y;
     }
     }
+
+    // configured zone, with 10% added for good measure
+    QRectF c;
+
+    // now convert the points of the rectangle to pixels
+    c.setX(((double(constraints.ccpf)*0.9f) - constraints.cpf) * xratio);
+    c.setY(geometry().height() - (((double(constraints.cwf)*0.9f) - constraints.wf) * yratio));
+
+    // width
+    c.setWidth(((double(constraints.ccpto)*1.1f)-(double(constraints.ccpf)*0.9f)) * xratio);
+    c.setHeight(((double(constraints.cwto) *1.1f) - (double(constraints.cwf)*0.9f)) * yratio);
+
+    painter.setBrush(Qt::NoBrush);
+    painter.setPen(Qt::red);
+    painter.drawRect(c);
+
     painter.restore();
     //qDebug()<<"max W'="<<my<<"small W'="<<sy;
 }
