@@ -71,7 +71,7 @@ SolverDisplay::paintEvent(QPaintEvent *)
 
     double my=0;
     double sy=50000;
-    for (int i=0; i<4; i++) {
+    for (int i=1; i<4; i++) {
     foreach(SolverPoint p, points[i]) {
 
         double px = (p.x - constraints.cpf) * xratio;
