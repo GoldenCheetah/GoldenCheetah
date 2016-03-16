@@ -252,7 +252,6 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     progressLayout->addWidget(progressLabel);
     progressLayout->addLayout(gridLayout);
     progressLayout->addWidget(solverDisplay);
-    progressLayout->setSpacing(0);
     progressLayout->setStretchFactor(gridLayout, 0);
     progressLayout->setStretchFactor(progressLabel, 0);
     progressLayout->setStretchFactor(solverDisplay, 1);
