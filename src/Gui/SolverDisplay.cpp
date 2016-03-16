@@ -20,20 +20,25 @@
 
 SolverDisplay::SolverDisplay(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    points.resize(4);
 }
 
 void
 SolverDisplay::addPoint(SolverPoint p)
 {
-    points << p;
+    if (p.z > 100) points[0] << p;
+    else if (p.z > 15) points[1] << p;
+    else if (p.z > 5)  points[2] << p;
+    else  points[3] << p;
 
-    if (points.count()%1000 == 0) repaint();
+    if (count++%1000 == 0) repaint();
 }
 
 void
 SolverDisplay::reset()
 {
-    points.clear();
+    for(int i=0; i<4; i++) points[i].clear();
+    count=0;
     repaint();
 }
 
@@ -63,18 +68,29 @@ SolverDisplay::paintEvent(QPaintEvent *)
 
     double my=0;
     double sy=50000;
-    foreach(SolverPoint p, points) {
+    for (int i=0; i<4; i++) {
+    foreach(SolverPoint p, points[i]) {
 
         double px = (p.x - constraints.cpf) * xratio;
         double py = geometry().height() - (p.y - constraints.wf) * yratio;
+        int size = 1;
+        QColor bcolor;
 
-        QColor bcolor(127,127,127,64);
+        switch(i) {
+        default:
+        case 0:  { bcolor = QColor(0xed,0xf8,0xe9); size = 1; } break;
+        case 1:  { bcolor = QColor(0xba,0xe4,0xb3); size = 2; } break;
+        case 2:  { bcolor = QColor(0x74,0xc4,0x76); size = 3; } break;
+        case 3:  { bcolor = QColor(0x23,0x8b,0x45); size = 5; } break;
+        }
+
         painter.setBrush(bcolor);
         painter.setPen(Qt::NoPen);
-        painter.drawEllipse(QPointF(px,py), 2,2);
+        painter.drawEllipse(QPointF(px,py), size,size);
 
         if (p.y > my) my=p.y;
         if (p.y < sy) sy=p.y;
+    }
     }
     painter.restore();
     //qDebug()<<"max W'="<<my<<"small W'="<<sy;

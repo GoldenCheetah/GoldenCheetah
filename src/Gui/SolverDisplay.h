@@ -23,6 +23,8 @@
 #include <QWidget>
 #include <QDialog>
 #include <QLabel>
+#include <QVector>
+#include <QList>
 
 #include "Context.h"
 #include "CPSolver.h"
@@ -51,8 +53,9 @@ class SolverDisplay : public QWidget
 
     private:
         Context *context;
-        QList<SolverPoint> points;
+        QVector<QList<SolverPoint> > points;
         CPSolverConstraints constraints;
+        long count;
 };
 
 #endif
