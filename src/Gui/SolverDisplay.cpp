@@ -61,8 +61,12 @@ SolverDisplay::paintEvent(QPaintEvent *)
 
     // use antialiasing when drawing
     painter.setRenderHint(QPainter::Antialiasing, true);
-
     painter.fillRect(QRectF(0,0, geometry().width(), geometry().height()), QBrush(Qt::white));
+
+    QPen pen(Qt::darkGray);
+    pen.setWidthF(1.0f);
+    painter.setPen(pen);
+    painter.drawRect(QRectF(0,0, geometry().width(), geometry().height()));
 
     // paint a dot for each x and y based upon
     // a scale for the size of the chart
