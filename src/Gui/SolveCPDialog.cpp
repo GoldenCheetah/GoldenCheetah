@@ -378,7 +378,7 @@ SolveCPDialog::current(int k,WBParms p,double sum)
     else csumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
 
     // visualise new point
-    solverDisplay->addPoint(SolverPoint(p.CP, p.W, sum));
+    solverDisplay->addPoint(SolverPoint(p.CP, p.W, sum, p.TAU));
 
     if (!(k++%200) || k == 99999)  QApplication::processEvents();
 }

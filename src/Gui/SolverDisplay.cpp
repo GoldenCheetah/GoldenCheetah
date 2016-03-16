@@ -84,7 +84,17 @@ SolverDisplay::paintEvent(QPaintEvent *)
         case 0:  { bcolor = QColor(0xed,0xf8,0xe9); size = 1; } break;
         case 1:  { bcolor = QColor(0xba,0xe4,0xb3); size = 2; } break;
         case 2:  { bcolor = QColor(0x74,0xc4,0x76); size = 3; } break;
-        case 3:  { bcolor = QColor(0x23,0x8b,0x45); size = 5; } break;
+        case 3:  {
+                    if (p.t < 80) bcolor=QColor(255,0,0); // diff low
+                    else if (p.t < 150) bcolor = QColor(0x23,0x8b,0x45); // diff mid
+                    else if (p.t < 300) bcolor = QColor(0,0,255); // diff high
+                    else if (p.t < 433)  bcolor=QColor(255,0,0); // integral low
+                    else if (p.t < 566) bcolor = QColor(0x23,0x8b,0x45); // integral mid
+                    else if (p.t <= 700) bcolor = QColor(0,0,255); // integral high
+
+                    size=5;
+                 }
+                 break;
         }
 
         painter.setBrush(bcolor);
