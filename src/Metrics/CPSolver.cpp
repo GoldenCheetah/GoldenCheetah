@@ -83,8 +83,8 @@ CPSolver::cost(WBParms parms)
 
     //qDebug()<<"cost="<<QString("%1").arg(sumwb2, 0, 'g', 7);
 
-    // what we got
-    return sumwb2 /1000.0f;
+    // what we got - normalise to number of fits
+    return (sumwb2/data.count()) /1000.0f;
 }
 
 double
@@ -113,8 +113,11 @@ CPSolver::compute(QVector<int> &ride, WBParms parms)
         t++;
     }
 
-    //qDebug()<<"w'bal at exhaustion:"<<wpbal<<"t="<<t;
-    return wpbal;
+    // we solve for W'bal=500 as it is not possible to completely
+    // exhaust W', 500 is the point at which most athletes will
+    // fail to continue, on average.
+    // See: http://www.ncbi.nlm.nih.gov/pubmed/24509723
+    return wpbal - 500;
 }
 
 // get us a neighbour
