@@ -31,9 +31,10 @@
 
 struct SolverPoint {
     public:
-    SolverPoint(int x, int y, double z) : x(x), y(y), z(z) {}
+    SolverPoint(int x, int y, double z, int t) : x(x), y(y), z(z), t(t) {}
     int x,y;
     double z;
+    int t;
 };
 
 class SolverDisplay : public QWidget
