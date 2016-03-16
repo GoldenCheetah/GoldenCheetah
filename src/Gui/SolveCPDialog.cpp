@@ -396,15 +396,35 @@ SolveCPDialog::solveClicked()
     // loop through the table and collect the rides to solve
     QList<RideItem*> solveme;
 
+    int mincp=0, maxcp=0, minw=0, maxw=0;
+
     // get the rides selected
     for(int i=0; i<dataTable->invisibleRootItem()->childCount(); i++) {
 
         QTreeWidgetItem *it = dataTable->invisibleRootItem()->child(i);
+        RideItem *item = NULL;
 
 
         // is it selected?
         if (static_cast<QCheckBox*>(dataTable->itemWidget(it, 0))->isChecked())
-            solveme << static_cast<RideItem*>(it->data(0, Qt::UserRole).value<void *>());
+            item = static_cast<RideItem*>(it->data(0, Qt::UserRole).value<void *>());
+
+        if (item && item->context->athlete->zones(item->isRun)) {
+
+            // get CP etc
+            int zoneRange = item->context->athlete->zones(item->isRun)->whichRange(item->dateTime.date());
+            int CP = zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getCP(zoneRange) : 0;
+            int WPRIME = zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getWprime(zoneRange) : 0;
+
+            if (!mincp || CP < mincp) mincp = CP;
+            if (!maxcp || CP > maxcp) maxcp = CP;
+            if (!minw  || WPRIME < minw) minw = WPRIME;
+            if (!minw  || WPRIME > maxw) maxw = WPRIME;
+
+            // get the cp and w' as configured for the ride for the
+            // config constraints (red box on visualisation)
+            solveme << item;
+        }
     }
 
     // if we got something to solve then kick it off
@@ -417,6 +437,9 @@ SolveCPDialog::solveClicked()
         double factor = integral ? 1 : 100;
         CPSolverConstraints constraints (fromCP->value(), toCP->value(), fromW->value(), toW->value(),
                                          fromTAU->value() * factor, toTAU->value() * factor);
+
+        // configured values
+        constraints.setConfig(mincp,maxcp,minw, maxw);
 
         solverDisplay->setConstraints(constraints);
         solver->setData(constraints, solveme);
