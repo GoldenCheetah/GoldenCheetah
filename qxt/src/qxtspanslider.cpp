@@ -29,6 +29,7 @@
 #include <QApplication>
 #include <QStylePainter>
 #include <QStyleOptionSlider>
+#include <QTime>
 
 QxtSpanSliderPrivate::QxtSpanSliderPrivate() :
         lower(0),
@@ -622,6 +623,16 @@ void QxtSpanSlider::mousePressEvent(QMouseEvent* event)
  */
 void QxtSpanSlider::mouseMoveEvent(QMouseEvent* event)
 {
+    // hack for uncompressed mouse events
+#if defined(Q_OS_LINUX) && (QT_VERSION > 0x050000) && (QT_VERSION < 0x050600)
+    static QTime p;
+    if (p.elapsed() > 0 && p.elapsed() < 100) {
+        event->ignore();
+        return;
+    }
+    p.start();
+#endif
+
     if (qxt_d().lowerPressed != QStyle::SC_SliderHandle && qxt_d().upperPressed != QStyle::SC_SliderHandle)
     {
         event->ignore();
