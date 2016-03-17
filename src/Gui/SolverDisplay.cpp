@@ -116,7 +116,7 @@ SolverDisplay::paintEvent(QPaintEvent *)
 
     // now convert the points of the rectangle to pixels
     c.setX(((double(constraints.ccpf)*0.9f) - constraints.cpf) * xratio);
-    c.setY(geometry().height() - (((double(constraints.cwf)*0.9f) - constraints.wf) * yratio));
+    c.setY(geometry().height() - ((double(constraints.cwto)*1.1f) - constraints.wf) * yratio);
 
     // width
     c.setWidth(((double(constraints.ccpto)*1.1f)-(double(constraints.ccpf)*0.9f)) * xratio);
