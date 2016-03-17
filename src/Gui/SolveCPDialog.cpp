@@ -200,6 +200,8 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     solverDisplay = new SolverDisplay(this, context);
     solverDisplay->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     solverDisplay->setBackgroundRole(QPalette::Light);
+    solverDisplay->setMouseTracking(true);
+    solverDisplay->installEventFilter(this);
 
     solve = new QPushButton(tr("Solve"));
     close = new QPushButton(tr("Close"));
@@ -343,6 +345,27 @@ SolveCPDialog::~SolveCPDialog()
 {
     delete solverDisplay;
     delete solver;
+}
+
+bool
+SolveCPDialog::eventFilter(QObject *o, QEvent *e)
+{
+    // this is a hack related to mouse event compression
+    // and is not required after QT5.6, but does no harm
+    // and reduces processing overhead anyway.
+    static QTime t;
+    static int gc__last = 0;
+
+    if (e->type()==QEvent::Paint) return false;
+
+    // if not solving then update cursor as we move around
+    if ((gc__last != QMouseEvent::MouseMove || t.elapsed() > 100) && o == solverDisplay && solve->text() == tr("Solve")
+        && solverDisplay->underMouse() && e->type() == QMouseEvent::MouseMove) {
+        t.start();
+        solverDisplay->repaint();
+    }
+    gc__last = e->type();
+    return false;
 }
 
 void

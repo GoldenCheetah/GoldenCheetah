@@ -38,6 +38,7 @@ class SolveCPDialog : public QDialog
         SolveCPDialog(QWidget *parent, Context *);
         ~SolveCPDialog();
 
+        bool eventFilter(QObject *o, QEvent *e);
         QSize sizeHint() const { return QSize(800,550); }
 
     private:

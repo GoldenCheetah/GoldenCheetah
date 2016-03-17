@@ -125,6 +125,34 @@ SolverDisplay::paintEvent(QPaintEvent *)
     painter.setPen(Qt::red);
     painter.drawRect(c);
 
+    // mouse position
+    if (underMouse() && count > 0) {
+
+        // where is the mouse?
+        QPoint p = mapFromGlobal(QCursor::pos());
+
+        double cp = (double(p.x()) / xratio) + constraints.cpf;
+        double w = ((double(height()-p.y()) / yratio) + constraints.wf) / 1000.0f;
+
+        // W' and CP co-ordinates in top right
+        QString label = QString("CP %1 \nW' %2").arg(cp,0,'f',0).arg(w,0,'f',1);
+
+        // top right and 5px gap
+        QFont font;
+        QFontMetrics fm(font);
+        QRect t = fm.boundingRect(label);
+
+        QRect s;
+        s.setY(geometry().height() - t.height());
+        s.setX(5);
+        s.setWidth(t.width());
+        s.setHeight(t.height());
+
+        painter.setFont(font);
+        painter.setPen(QPen(Qt::darkGray));
+        painter.drawText(s,label);
+    }
+
     painter.restore();
     //qDebug()<<"max W'="<<my<<"small W'="<<sy;
 }
