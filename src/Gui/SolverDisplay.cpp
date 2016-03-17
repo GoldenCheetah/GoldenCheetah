@@ -136,7 +136,7 @@ SolverDisplay::paintEvent(QPaintEvent *)
         double w = ((double(height()-p.y()) / yratio) + constraints.wf) / 1000.0f;
 
         // W' and CP co-ordinates in top right
-        QString label = QString("CP %1 \nW' %2").arg(cp,0,'f',0).arg(w,0,'f',1);
+        QString label = QString("CP %1 W' %2").arg(cp,0,'f',0).arg(w,0,'f',1);
 
         // top right and 5px gap
         QFont font;
@@ -144,9 +144,9 @@ SolverDisplay::paintEvent(QPaintEvent *)
         QRect t = fm.boundingRect(label);
 
         QRect s;
-        s.setY(geometry().height() - t.height());
+        s.setY(geometry().height() - (t.height()+5));
         s.setX(5);
-        s.setWidth(t.width());
+        s.setWidth(width()-10);
         s.setHeight(t.height());
 
         painter.setFont(font);
