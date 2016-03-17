@@ -34,7 +34,11 @@ class SolveCPDialog : public QDialog
 
 
     public:
+
         SolveCPDialog(QWidget *parent, Context *);
+        ~SolveCPDialog();
+
+        QSize sizeHint() const { return QSize(800,550); }
 
     private:
 
@@ -73,6 +77,7 @@ class SolveCPDialog : public QDialog
         // updates from solver
         void newBest(int,WBParms,double);
         void current(int,WBParms,double);
+        void end();
 
         void selectAll();
         void solveClicked();
