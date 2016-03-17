@@ -468,6 +468,11 @@ Athlete::getWithings(QDate date, WithingsReading &here)
 
     // loop
     foreach(WithingsReading x, withings_) {
+
+        // we only look for weight readings at present
+        // some readings may not include this so skip them
+        if (x.weightkg <= 0) continue;
+
         if (x.when.date() <= date) here = x;
         if (x.when.date() > date) break;
     }
