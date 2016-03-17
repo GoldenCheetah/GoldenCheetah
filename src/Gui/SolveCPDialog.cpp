@@ -339,6 +339,12 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     setLayout(fullLayout);
 }
 
+SolveCPDialog::~SolveCPDialog()
+{
+    delete solverDisplay;
+    delete solver;
+}
+
 void
 SolveCPDialog::selectAll()
 {
@@ -360,6 +366,10 @@ SolveCPDialog::newBest(int k,WBParms p,double sum)
     if (sum > 100) bsumLabel->setText("> 100kJ");
     else bsumLabel->setText(QString("%1").arg(sum, 0, 'f', 3));
 
+    // is this the end?
+    if (k == 0) {
+        end();
+    }
     QApplication::processEvents();
 }
 
@@ -382,13 +392,18 @@ SolveCPDialog::current(int k,WBParms p,double sum)
     if (!(k++%200) || k == 99999)  QApplication::processEvents();
 }
 
+void
+SolveCPDialog::end()
+{
+    solve->setText(tr("Solve"));
+    solver->stop();
+}
 
 void
 SolveCPDialog::solveClicked()
 {
     if (solve->text() == tr("Stop")) {
-        solve->setText(tr("Solve"));
-        solver->stop();
+        end();
         return;
     }
 
@@ -451,7 +466,8 @@ SolveCPDialog::solveClicked()
 void
 SolveCPDialog::closeClicked()
 {
-    solver->stop();// in case its still running!
+    end();
+    QApplication::processEvents();
     accept();
 }
 

@@ -206,8 +206,8 @@ CPSolver::start()
         WBParms snew = neighbour(s, k, kmax);
         double Enew = cost(snew);
 
-        // progress update
-        emit current(k, snew,Enew);
+        // progress update k=0 means stop so we offset by one
+        emit current(k+1, snew,Enew);
 
         // probability - always 1 if better, but randomly accept higher
         double random = double(rand()%101)/100.00f;
@@ -223,7 +223,9 @@ CPSolver::start()
         if (E < Ebest) {
             Ebest = E;
             sbest = s;
-            emit newBest(k, sbest, Ebest);
+
+            // k of zero means stop so we offset by one
+            emit newBest(k+1, sbest, Ebest);
             //qDebug()<<k<<"new best"<<Ebest <<s.CP<<s.W<<s.TAU;
         }
 
@@ -231,6 +233,8 @@ CPSolver::start()
         k++;
 
     }
+
+    // k of zero means stop
     emit newBest(0, sbest,Ebest);
     //qDebug()<<"TOOK"<<p.elapsed();
 }
