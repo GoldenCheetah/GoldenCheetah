@@ -21,6 +21,7 @@
 SolverDisplay::SolverDisplay(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
     points.resize(4);
+    count=0;
 }
 
 void
