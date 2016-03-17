@@ -150,6 +150,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Jan de Visser");
     contributors.append("Jim Ley");
     contributors.append("J&#246;rn Rischm&#252;ller");
+    contributors.append("Johan Martensson");
     contributors.append("John Ehrlinger");
     contributors.append("Jon Beverley");
     contributors.append("Jon Escombe");
