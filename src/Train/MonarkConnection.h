@@ -33,13 +33,15 @@ public:
     void setPollInterval(int interval);
     int pollInterval();
     void setSerialPort(const QString serialPortName);
-    void configurePort(QSerialPort * serialPort);
+    static void configurePort(QSerialPort * serialPort);
+    static bool discover(QString portName);
 
 public slots:
     void requestAll();
     void requestPower();
     void requestPulse();
     void requestCadence();
+    int readConfiguredLoad();
     void identifyModel();
     void setLoad(unsigned int load);
     void setKp(double kp);
@@ -53,7 +55,6 @@ private:
     QTimer *m_timer;
     QByteArray readAnswer(int timeoutMs = -1);
     QMutex m_mutex;
-    bool m_canControlPower;
     unsigned int m_load;
     unsigned int m_loadToWrite;
     double m_kp;
@@ -61,6 +62,8 @@ private:
     bool m_shouldWriteLoad;
     bool m_shouldWriteKp;
     enum MonarkType { MONARK_UNKNOWN, MONARK_LT2, MONARK_LC, MONARK_LC_NOVO } m_type;
+    bool canDoLoad();
+    bool canDoKp();
 
 signals:
     void pulse(quint32);
