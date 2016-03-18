@@ -386,7 +386,7 @@ expr:
         | SUBTRACT expr %prec MULTIPLY          { $$ = new Leaf(@1.first_column, @2.last_column);
                                                   $$->type = Leaf::UnaryOperation;
                                                   $$->lvalue.l = $2;
-                                                  $$->op = $1;
+                                                  $$->op = '-';
                                                   $$->rvalue.l = NULL;
                                                 }
         | BEST '(' symbol ',' lexpr ')'         { $$ = new Leaf(@1.first_column, @6.last_column); $$->type = Leaf::Function;
