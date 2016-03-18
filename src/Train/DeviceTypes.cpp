@@ -60,6 +60,9 @@ DeviceTypes::DeviceTypes()
       { DEV_MONARK,       DEV_SERIAL,  (char *) "Monark LTx/LCx",true,    false,
         tr("Monark USB device ") ,
         ":images/devices/monark_lt2.png"                                        },
+      { DEV_KETTLER,       DEV_SERIAL,  (char *) "Kettler Ergo Bike",true,    false,
+        tr("Kettler serial device ") ,
+        ":images/devices/kettler_ex1.png"                                        },
 #endif
 #ifdef GC_HAVE_LIBUSB
       { DEV_FORTIUS,  DEV_LIBUSB,  (char *) "Tacx Fortius",          true,    false,

@@ -34,6 +34,7 @@
 #include "ComputrainerController.h"
 #if QT_VERSION >= 0x050000
 #include "MonarkController.h"
+#include "KettlerController.h"
 #endif
 #include "ANTlocalController.h"
 #include "ANTChannel.h"
