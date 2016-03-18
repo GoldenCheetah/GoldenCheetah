@@ -124,6 +124,11 @@ void Monark::setLoad(double load)
     m_monarkConnection.setLoad((unsigned int)load);
 }
 
+void Monark::setKp(double kp)
+{
+    m_monarkConnection.setKp(kp);
+}
+
 bool Monark::isConnected()
 {
     return m_isMonarkConnectionAlive;
