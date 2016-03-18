@@ -42,6 +42,7 @@ public slots:
     void requestCadence();
     void identifyModel();
     void setLoad(unsigned int load);
+    void setKp(double kp);
 
 private:
     QString m_serialPortName;
@@ -55,7 +56,11 @@ private:
     bool m_canControlPower;
     unsigned int m_load;
     unsigned int m_loadToWrite;
+    double m_kp;
+    double m_kpToWrite;
     bool m_shouldWriteLoad;
+    bool m_shouldWriteKp;
+    enum MonarkType { MONARK_UNKNOWN, MONARK_LT2, MONARK_LC, MONARK_LC_NOVO } m_type;
 
 signals:
     void pulse(quint32);

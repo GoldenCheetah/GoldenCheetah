@@ -103,3 +103,9 @@ void MonarkController::setLoad(double load)
 {
     m_monark->setLoad(load);
 }
+
+void MonarkController::setGradient(double gradient)
+{
+    // Repurpose gradient as kp for Monarks
+    m_monark->setKp(gradient);
+}

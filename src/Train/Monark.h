@@ -46,6 +46,7 @@ public:
     bool discover(QString portName);
 
     void setLoad(double load);
+    void setKp(double kp);
     bool isConnected();
 
 private:

@@ -28,7 +28,11 @@ MonarkConnection::MonarkConnection() :
     m_canControlPower(false),
     m_load(0),
     m_loadToWrite(0),
-    m_shouldWriteLoad(false)
+    m_kp(0),
+    m_kpToWrite(0),
+    m_shouldWriteLoad(false),
+    m_shouldWriteKp(false),
+    m_type(MONARK_UNKNOWN)
 {
 }
 
@@ -143,6 +147,19 @@ void MonarkConnection::requestAll()
         QByteArray data = m_serial->readAll();
     }
 
+    if ((m_kpToWrite != m_kp) && m_type == MONARK_LC_NOVO)
+    {
+        QString cmd = QString("kp %1\r").arg(QString::number(m_kpToWrite, 'f', 1 ));
+        m_serial->write(cmd.toStdString().c_str());
+        if (!m_serial->waitForBytesWritten(500))
+        {
+            // failure to write to device, bail out
+            this->exit(-1);
+        }
+        m_kp = m_kpToWrite;
+        QByteArray data = m_serial->readAll();
+    }
+
     m_mutex.unlock();
 }
 
@@ -216,9 +233,11 @@ void MonarkConnection::identifyModel()
 
     if (m_id.toLower().startsWith("lc"))
     {
+        m_type = MONARK_LC;
         m_canControlPower = true;
         setLoad(100);
     } else if (m_id.toLower().startsWith("novo") && servo != "manual") {
+        m_type = MONARK_LC_NOVO;
         m_canControlPower = true;
         setLoad(100);
     }
@@ -229,6 +248,18 @@ void MonarkConnection::setLoad(unsigned int load)
 {
     m_loadToWrite = load;
     m_shouldWriteLoad = true;
+}
+
+void MonarkConnection::setKp(double kp)
+{
+    if (kp < 0)
+        kp = 0;
+
+    if (kp > 7)
+        kp = 7;
+
+    m_kpToWrite = kp;
+    m_shouldWriteKp = true;
 }
 
 /*
