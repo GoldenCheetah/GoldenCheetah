@@ -91,6 +91,7 @@ class EditUserDataDialog : public QDialog
 
     public:
         EditUserDataDialog(Context *, UserData *);
+        QSize sizeHint() const { return QSize(800,550); }
 
     public slots:
         void colorClicked();
