@@ -207,6 +207,9 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
         if (s > speedMax) speedMax=s;
         if (h > hrMax) hrMax=h;
 
+        // Do we need to increase plot x-axis max? (add 15 min at a time)
+        if (cadence.size() > maxVX_) setMaxVX(maxVX_ + 900);
+
         // replot
         update();
     }
