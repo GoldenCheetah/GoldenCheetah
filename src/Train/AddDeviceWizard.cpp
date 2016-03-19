@@ -43,9 +43,6 @@ AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow
     setWindowModality(Qt::NonModal); // avoid blocking WFAPI calls for kickr
     setAttribute(Qt::WA_DeleteOnClose);
 
-    setFixedHeight(530);
-    setFixedWidth(550);
-
     // title
     setWindowTitle(tr("Add Device Wizard"));
     scanner = new DeviceScanner(this);

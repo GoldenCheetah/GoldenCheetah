@@ -56,6 +56,7 @@ class AddDeviceWizard : public QWizard
 
 public:
     AddDeviceWizard(Context *context);
+    QSize sizeHint() const { return QSize(600,650); }
 
     Context *context;
     bool done; // have we finished?
