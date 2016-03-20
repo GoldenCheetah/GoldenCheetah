@@ -494,6 +494,16 @@ PfPvPlot::refreshIntervalMarkers()
     }
 }
 
+// XXX use of make_pair is shitty since we have QT containers
+// but rather than refactor here we just fixup for c++11 and
+// MSVC syntax. The pfpv plot will go when we introduce the
+// new scatter plot in v4 (hopefully)
+#if __cplusplus >= 201103L
+#define MAKEPAIR pair
+#else
+#define MAKEPAIR make_pair
+#endif
+
 void
 PfPvPlot::setData(RideItem *_rideItem)
 {
@@ -549,7 +559,7 @@ PfPvPlot::setData(RideItem *_rideItem)
 #if Q_CC_MSVC
                     dataSet.insert(std::make_pair(aepf, cpv));
 #else
-                    dataSet.insert(std::make_pair<double, double>(aepf, cpv));
+                    dataSet.insert(std::MAKEPAIR<double, double>(aepf, cpv));
 #endif
 
                     tot_cad += p1->cad;
@@ -561,13 +571,13 @@ PfPvPlot::setData(RideItem *_rideItem)
 #if Q_CC_MSVC
                             gearSet[0].insert(std::make_pair(aepf, cpv));
 #else
-                            gearSet[0].insert(std::make_pair<double, double>(aepf, cpv));
+                            gearSet[0].insert(std::MAKEPAIR<double, double>(aepf, cpv));
 #endif
                         } else if (p1->gear > 1.00f && p1->gear <= 2.50f ) {
 #if Q_CC_MSVC
                             gearSet[1].insert(std::make_pair(aepf, cpv));
 #else
-                            gearSet[1].insert(std::make_pair<double, double>(aepf, cpv));
+                            gearSet[1].insert(std::MAKEPAIR<double, double>(aepf, cpv));
 #endif
                         } else if (p1->gear > 2.50f && p1->gear <= 4.00 ) {
 #if Q_CC_MSVC
@@ -579,7 +589,7 @@ PfPvPlot::setData(RideItem *_rideItem)
 #if Q_CC_MSVC
                             gearSet[3].insert(std::make_pair(aepf, cpv));
 #else
-                            gearSet[3].insert(std::make_pair<double, double>(aepf, cpv));
+                            gearSet[3].insert(std::MAKEPAIR<double, double>(aepf, cpv));
 #endif
                         }
                     }
@@ -807,13 +817,13 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
 #if Q_CC_MSVC
                                 dataSetInterval[0].insert(std::make_pair(aepf, cpv));
 #else
-                                dataSetInterval[0].insert(std::make_pair<double, double>(aepf, cpv));
+                                dataSetInterval[0].insert(std::MAKEPAIR<double, double>(aepf, cpv));
 #endif
                             else
 #if Q_CC_MSVC
                                 dataSetInterval[high].insert(std::make_pair(aepf, cpv));
 #else
-                                dataSetInterval[high].insert(std::make_pair<double, double>(aepf, cpv));
+                                dataSetInterval[high].insert(std::MAKEPAIR<double, double>(aepf, cpv));
 #endif
                         }
                     }
@@ -1341,13 +1351,13 @@ PfPvPlot::showCompareIntervals()
 #if Q_CC_MSVC
                         dataSetInterval[0].insert(std::make_pair(aepf, cpv));
 #else
-                        dataSetInterval[0].insert(std::make_pair<double, double>(aepf, cpv));
+                        dataSetInterval[0].insert(std::MAKEPAIR<double, double>(aepf, cpv));
 #endif
                     else
 #if Q_CC_MSVC
                         dataSetInterval[high].insert(std::make_pair(aepf, cpv));
 #else
-                        dataSetInterval[high].insert(std::make_pair<double, double>(aepf, cpv));
+                        dataSetInterval[high].insert(std::MAKEPAIR<double, double>(aepf, cpv));
 #endif
                     tot_cad += p1->cad;
                     tot_cad_points++;

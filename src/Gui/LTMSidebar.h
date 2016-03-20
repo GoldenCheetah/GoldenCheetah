@@ -37,7 +37,13 @@
 #include <QDir>
 #include <QtGui>
 
-class QWebView;
+#ifdef NOWEBKIT
+#include <QWebEngineView>
+#else
+#include <QWebView>
+#include <QWebFrame>
+#endif
+
 class LTMSidebar : public QWidget
 {
     Q_OBJECT
@@ -141,7 +147,11 @@ class LTMSidebar : public QWidget
         QMenu *autoFilterMenu;
         QList<bool> autoFilterState;
 
+#ifdef NOWEBKIT
+        QWebEngineView *summary;
+#else
         QWebView *summary;
+#endif
 
         GcSplitter *splitter;
         GcSubSplitter *filterSplitter;

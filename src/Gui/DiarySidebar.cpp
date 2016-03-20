@@ -30,9 +30,6 @@
 #include "Settings.h"
 #include "HelpWhatsThis.h"
 
-#include <QWebSettings>
-#include <QWebFrame>
-
 //********************************************************************************
 // CALENDAR SIDEBAR (DiarySidebar)
 //********************************************************************************
@@ -103,16 +100,29 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     h->addStretch();
     slayout->addLayout(h);
 
+    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
+
+#ifdef NOWEBKIT
+    // WebEngine
+    summary = new QWebEngineView(this);
+    summary->setContentsMargins(0,0,0,0);
+    summary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    summary->setAcceptDrops(false);
+    summary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize());
+    summary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
+    summary->page()->view()->setContentsMargins(0,0,0,0);
+    //XXX WEBENGINE XXX summary->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
+#else
     summary = new QWebView(this);
     summary->setContentsMargins(0,0,0,0);
     summary->page()->view()->setContentsMargins(0,0,0,0);
     summary->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
     summary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     summary->setAcceptDrops(false);
-
-    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
     summary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize());
     summary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
+#endif
+
     slayout->addWidget(summary);
     slayout->addStretch();
 
@@ -416,7 +426,11 @@ DiarySidebar::setSummary()
                                "</html>");
 
         // set webview contents
+#ifdef NOWEBKIT
+        summary->page()->setHtml(summaryText);
+#else
         summary->page()->mainFrame()->setHtml(summaryText);
+#endif
     }
 
     // we always tell everyone the date range changed

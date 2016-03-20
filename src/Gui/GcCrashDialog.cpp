@@ -20,7 +20,6 @@
 #include "Settings.h"
 #include "GcUpgrade.h"
 #include <QtGui>
-#include <QWebFrame>
 #include <QDateTime>
 #include <QSslSocket>
 
@@ -126,15 +125,25 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
     toprow->addWidget(header);
     layout->addLayout(toprow);
 
+    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
+
+#ifdef NOWEBKIT
+    report = new QWebEngineView(this);
+    report->setContentsMargins(0,0,0,0);
+    report->page()->view()->setContentsMargins(0,0,0,0);
+    report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    report->setAcceptDrops(false);
+    report->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
+    report->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
+#else
     report = new QWebView(this);
     report->setContentsMargins(0,0,0,0);
     report->page()->view()->setContentsMargins(0,0,0,0);
     report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     report->setAcceptDrops(false);
-
-    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
     report->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
     report->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
+#endif
 
     layout->addWidget(report);
 
@@ -479,8 +488,11 @@ GcCrashDialog::setHTML()
     }
     text += "</table></center>";
 
-
-	report->page()->mainFrame()->setHtml(text);
+#ifdef NOWEBKIT
+    report->page()->setHtml(text);
+#else
+    report->page()->mainFrame()->setHtml(text);
+#endif
 }
 
 void
@@ -497,7 +509,11 @@ GcCrashDialog::saveAs()
     if (file.open(QIODevice::WriteOnly)) {
 
         // write the texts
+#ifdef NOWEBKIT
+        //TODO WEBENGINE out << report->page()->mainFrame()->toPlainText();
+#else
         out << report->page()->mainFrame()->toPlainText();
+#endif
 
     }
     file.close();

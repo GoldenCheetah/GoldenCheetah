@@ -27,7 +27,6 @@
 #ifdef GC_HAVE_ICAL
 #include "DiaryWindow.h"
 #endif
-#include "GoogleMapControl.h"
 #include "HistogramWindow.h"
 #include "LTMWindow.h"
 #ifdef GC_HAVE_QWTPLOT3D
@@ -47,13 +46,16 @@
 #include "SummaryWindow.h"
 #include "MetadataWindow.h"
 #include "TreeMapWindow.h"
-#include "RideWindow.h"
 #include "DialWindow.h"
 #include "RealtimePlotWindow.h"
 #include "SpinScanPlotWindow.h"
 #include "WorkoutPlotWindow.h"
 #include "WorkoutWindow.h"
+#ifndef NOWEBKIT
 #include "BingMap.h"
+#include "RideWindow.h"
+#include "GoogleMapControl.h"
+#endif
 // Not until v4.0
 //#include "RouteWindow.h"
 
@@ -155,7 +157,6 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 #else
     case GcWindowTypes::Diary: returning = new GcWindow(); break;
 #endif
-    case GcWindowTypes::GoogleMap: returning = new GoogleMapControl(context); break;
     case GcWindowTypes::Histogram: returning = new HistogramWindow(context); break;
     case GcWindowTypes::Distribution: returning = new HistogramWindow(context, true); break;
     case GcWindowTypes::PerformanceManager: 
@@ -201,9 +202,19 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::RealtimePlot: returning = new RealtimePlotWindow(context); break;
     case GcWindowTypes::SpinScanPlot: returning = new SpinScanPlotWindow(context); break;
     case GcWindowTypes::WorkoutPlot: returning = new WorkoutPlotWindow(context); break;
+#ifdef NOWEBKIT
+    case GcWindowTypes::BingMap:
+    case GcWindowTypes::GoogleMap:
+    case GcWindowTypes::MapWindow:
+    case GcWindowTypes::StreetViewWindow:
+        returning = new GcWindow(); break;
+        break;
+#else
     case GcWindowTypes::BingMap: returning = new BingMap(context); break;
+    case GcWindowTypes::GoogleMap: returning = new GoogleMapControl(context); break;
     case GcWindowTypes::MapWindow: returning = new MapWindow(context); break;
     case GcWindowTypes::StreetViewWindow: returning = new StreetViewWindow(context); break;
+#endif
     case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(context); break;
     case GcWindowTypes::WorkoutWindow: returning = new WorkoutWindow(context); break;
 #if 0 // not till v4.0

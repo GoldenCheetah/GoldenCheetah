@@ -22,7 +22,12 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#ifdef NOWEBKIT
+#include <QWebEngineView>
+#include <QWebEngineSettings>
+#else
 #include <QWebView>
+#endif
 
 #include "Context.h"
 #include "Athlete.h"
@@ -195,7 +200,11 @@ class DiarySidebar : public QWidget // not a GcWindow - belongs on sidebar
                        *summaryItem;
 
         QComboBox *summarySelect;
+#ifdef NOWEBKIT
+        QWebEngineView *summary;
+#else
         QWebView *summary;
+#endif
         QWidget *summaryWidget;
         QDate from, to;
 };

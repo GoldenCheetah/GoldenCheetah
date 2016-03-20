@@ -22,7 +22,15 @@
 #include "RideMetadata.h"
 #include "Athlete.h"
 #include <QString>
+
+#ifdef NOWEBKIT
+#include <QWebEngineView>
+#include <QWebEngineSettings>
+#else
 #include <QWebView>
+#include <QWebFrame>
+#include <QWebSettings>
+#endif
 
 
 // Build ID History
@@ -98,7 +106,12 @@ class GcUpgradeLogDialog : public QDialog
         void linkClickedSlot( QUrl );
 
     private:
+
+#ifdef NOWEBKIT
+        QWebEngineView *report;
+#else
         QWebView *report;
+#endif
         AthleteDirectoryStructure home;
         QString reportText;
         QPushButton *proceedButton;

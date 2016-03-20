@@ -23,8 +23,15 @@
 #include "Context.h"
 
 #include <QWidget>
+
+#ifdef NOWEBKIT
+#include <QWebEngineView>
+#include <QWebEngineSettings>
+#else
 #include <QWebView>
 #include <QWebFrame>
+#endif
+
 #include <QFormLayout>
 #if QT_VERSION >= 0x050000
 #include <QtConcurrent>
@@ -119,7 +126,11 @@ class RideSummaryWindow : public GcChartWindow
         QString htmlCompareSummary() const; // comparing intervals or seasons
 
         Context *context;
+#ifdef NOWEBKIT
+        QWebEngineView *rideSummary;
+#else
         QWebView *rideSummary;
+#endif
 
         RideItem *_connected;
         bool ridesummary; // do we summarise ride or daterange?

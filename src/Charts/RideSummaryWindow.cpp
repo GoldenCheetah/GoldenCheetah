@@ -86,7 +86,13 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     QVBoxLayout *vlayout = new QVBoxLayout;
     vlayout->setSpacing(0);
     vlayout->setContentsMargins(10,10,10,10);
+
+ #ifdef NOWEBKIT
+    rideSummary = new QWebEngineView(this);
+ #else
     rideSummary = new QWebView(this);
+ #endif
+
     rideSummary->setContentsMargins(0,0,0,0);
     rideSummary->page()->view()->setContentsMargins(0,0,0,0);
     rideSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -149,13 +155,21 @@ RideSummaryWindow::configChanged(qint32)
     defaultFont.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
     defaultFont.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
 
+#ifdef NOWEBKIT
+#ifdef Q_OS_MAC
+    rideSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
+#else
+    rideSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+2);
+#endif
+    rideSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
+#else
 #ifdef Q_OS_MAC
     rideSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
 #else
     rideSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+2);
 #endif
     rideSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-
+#endif
 
     force = true;
     refresh();
@@ -199,9 +213,14 @@ RideSummaryWindow::modelProgress(int year, int month)
 
         string = QString(tr("<h3>Modeling<br>%1</h3>")).arg(year);
     }
+
+#ifdef NOWEBKIT
+    rideSummary->page()->runJavaScript(
+        QString("var div = document.getElementById(\"modhead\"); div.innerHTML = '%1'; ").arg(string));;
+#else
     rideSummary->page()->mainFrame()->evaluateJavaScript(
         QString("var div = document.getElementById(\"modhead\"); div.innerHTML = '%1'; ").arg(string));;
-
+#endif
 }
 
 void
@@ -325,14 +344,23 @@ RideSummaryWindow::refresh()
                 setSubTitle(tr("Compare")); // fallback to this
             }
         }
+
+#ifdef NOWEBKIT
+        rideSummary->page()->setHtml(htmlCompareSummary());
+#else
         rideSummary->page()->mainFrame()->setHtml(htmlCompareSummary());
+#endif
 
     } else { // NOT COMPARE MODE - NORMAL MODE
 
         // if we're summarising a ride but have no ride to summarise
         if (ridesummary && !myRideItem) {
             setSubTitle(tr("Summary"));
-	        rideSummary->page()->mainFrame()->setHtml(GCColor::css(ridesummary));
+#ifdef NOWEBKIT
+            rideSummary->page()->setHtml(GCColor::css(ridesummary));
+#else
+            rideSummary->page()->mainFrame()->setHtml(GCColor::css(ridesummary));
+#endif
             return;
         }
 
@@ -356,7 +384,12 @@ RideSummaryWindow::refresh()
             fs.addFilter(context->ishomefiltered, context->homeFilters);
             specification.setFilterSet(fs);
         }
+
+#ifdef NOWEBKIT
+        rideSummary->page()->setHtml(htmlSummary());
+#else
         rideSummary->page()->mainFrame()->setHtml(htmlSummary());
+#endif
 
         setUpdatesEnabled(true); // ready to update now
     }

@@ -39,8 +39,6 @@
 #endif
 
 #include <QApplication>
-#include <QWebView>
-#include <QWebFrame>
 #include <QScrollBar>
 #include <QtGui>
 #include <QStyle>
@@ -225,21 +223,33 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
     GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), iconFromPNG(":images/sidebar/dashboard.png"), this);
 
+    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
+
+#ifdef NOWEBKIT
+    summary = new QWebEngineView(this);
+    summary->setContentsMargins(0,0,0,0);
+    summary->page()->view()->setContentsMargins(0,0,0,0);
+    //XXX WEBENGINEsummary->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
+    summary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    summary->setAcceptDrops(false);
+    summary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize());
+    summary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
+#else
     summary = new QWebView(this);
     summary->setContentsMargins(0,0,0,0);
     summary->page()->view()->setContentsMargins(0,0,0,0);
     summary->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
     summary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     summary->setAcceptDrops(false);
+    summary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize());
+    summary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
+#endif
 
     summaryWidget->addWidget(summary);
 
     HelpWhatsThis *helpSummary = new HelpWhatsThis(summary);
     summary->setWhatsThis(helpSummary->getWhatsThisText(HelpWhatsThis::SideBarTrendsView_Summary));
 
-    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
-    summary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize());
-    summary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
     splitter->addWidget(summaryWidget);
 
     mainLayout->addWidget(splitter);
@@ -1503,7 +1513,11 @@ LTMSidebar::setSummary(DateRange dateRange)
                                "</html>");
 
         // set webview contents
+#ifdef NOWEBKIT
+        summary->page()->setHtml(summaryText);
+#else
         summary->page()->mainFrame()->setHtml(summaryText);
+#endif
 
     }
 }
