@@ -27,6 +27,7 @@
 #include <QWebEngineSettings>
 #else
 #include <QWebView>
+#include <QWebFrame>
 #endif
 
 #include "Context.h"
