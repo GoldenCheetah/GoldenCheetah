@@ -250,8 +250,8 @@ HrPwPlot::recalc()
     }
     rideTimeSecs = rideTimeSecs-delay;
 
-    double rpente = hrPwWindow->pente(delayWatts, delayHr, delayWatts.size());
-    double rordonnee = hrPwWindow->ordonnee(delayWatts, delayHr, delayWatts.size());
+    double rslope = hrPwWindow->slope(delayWatts, delayHr, delayWatts.size());
+    double rintercept = hrPwWindow->intercept(delayWatts, delayHr, delayWatts.size());
     double maxr = hrPwWindow->corr(delayWatts, delayHr, delayWatts.size());
 
     // ----- limit plotted points ---
@@ -307,16 +307,16 @@ HrPwPlot::recalc()
 
     QString labelp;
 
-    labelp.setNum(rpente, 'f', 3);
+    labelp.setNum(rslope, 'f', 3);
     QString labelo;
-    labelo.setNum(rordonnee, 'f', 1);
+    labelo.setNum(rintercept, 'f', 1);
 
     QString labelr;
     labelr.setNum(maxr, 'f', 3);
     QString labeldelay;
     labeldelay.setNum(delay);
 
-    int power150 =  (int)floor((150-rordonnee)/rpente);
+    int power150 =  (int)floor((150-rintercept)/rslope);
     QString labelpower150;
     labelpower150.setNum(power150);
 
@@ -328,21 +328,21 @@ HrPwPlot::recalc()
     r_mrk1->setLineStyle(QwtPlotMarker::VLine);
     r_mrk1->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
     r_mrk1->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
-    double moyennewatt = hrPwWindow->moyenne(clipWatts, clipWatts.size());
-    r_mrk1->setValue(moyennewatt, 0.0);
+    double averagewatt = hrPwWindow->average(clipWatts, clipWatts.size());
+    r_mrk1->setValue(averagewatt, 0.0);
     r_mrk1->setLabel(textr);
 
     r_mrk2->setValue(0,0);
     r_mrk2->setLineStyle(QwtPlotMarker::HLine);
     r_mrk2->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
     r_mrk2->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
-    double moyennehr = hrPwWindow->moyenne(clipHr,  clipHr.size());
-    r_mrk2->setValue(0.0,moyennehr);
+    double averagehr = hrPwWindow->average(clipHr,  clipHr.size());
+    r_mrk2->setValue(0.0,averagehr);
 
     addWattStepCurve(clipWatts, clipWatts.size());
     addHrStepCurve(clipHr, clipHr.size());
 
-    addRegLinCurve(rpente, rordonnee);
+    addRegLinCurve(rslope, rintercept);
 
     setJoinLine(joinLine);
     replot();
@@ -452,13 +452,13 @@ HrPwPlot::addHrStepCurve(QVector<double> &finalHr, int nbpoints)
 }
 
 void
-HrPwPlot::addRegLinCurve( double rpente, double rordonnee)
+HrPwPlot::addRegLinCurve( double rslope, double rintercept)
 {
     double regWatts[]     = {0, 0};
     double regHr[]        = {0, 500};
 
-    regWatts[0] = regHr[0]*rpente+rordonnee;
-    regWatts[1] = regHr[1]*rpente+rordonnee;
+    regWatts[0] = regHr[0]*rslope+rintercept;
+    regWatts[1] = regHr[1]*rslope+rintercept;
 
     regCurve->setSamples(regHr, regWatts, 2);
 }

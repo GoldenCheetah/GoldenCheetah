@@ -104,7 +104,7 @@ class HrPwPlot : public QwtPlot
 
         void addWattStepCurve(QVector<double> &finalWatts, int nbpoints);
         void addHrStepCurve(QVector<double> &finalHr, int nbpoints);
-        void addRegLinCurve(double rpente, double rordonnee);
+        void addRegLinCurve(double rslope, double rintercept);
 
     private:
 

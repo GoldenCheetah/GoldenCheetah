@@ -11,6 +11,7 @@ Makefile
 .svn
 *.pri
 *.prl
+*.swp
 
 # osx noise
 .DS_Store
