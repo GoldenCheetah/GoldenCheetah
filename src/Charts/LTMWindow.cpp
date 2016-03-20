@@ -41,8 +41,6 @@
 #include <QtGui>
 #include <QString>
 #include <QDebug>
-#include <QWebView>
-#include <QWebFrame>
 #include <QStyle>
 #include <QStyleFactory>
 
@@ -142,15 +140,18 @@ LTMWindow::LTMWindow(Context *context) :
     plotArea->setPalette(palette);
 
     // the data table
+    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
+#ifdef NOWEBKIT
+    dataSummary = new QWebEngineView(this);
+#else
     dataSummary = new QWebView(this);
+#endif
+    dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
+    dataSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
     dataSummary->setContentsMargins(0,0,0,0);
     dataSummary->page()->view()->setContentsMargins(0,0,0,0);
     dataSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     dataSummary->setAcceptDrops(false);
-
-    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
-    dataSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
-    dataSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
 
     // compare plot page
     compareplotsWidget = new QWidget(this);
@@ -1032,14 +1033,20 @@ class GroupedData {
 void
 LTMWindow::refreshDataTable()
 {
+#ifndef NOWEBKIT
     // clear to force refresh
-	dataSummary->page()->mainFrame()->setHtml("");
+    dataSummary->page()->mainFrame()->setHtml("");
+#endif
 
     // get string
     QString summary = dataTable(true);
 
     // now set it
-	dataSummary->page()->mainFrame()->setHtml(summary);
+#ifdef NOWEBKIT
+    dataSummary->page()->setHtml(summary);
+#else
+    dataSummary->page()->mainFrame()->setHtml(summary);
+#endif
 }
 
 // for storing curve data without using a curve

@@ -28,17 +28,19 @@
 #include <QWidget>
 #include <QStackedLayout>
 #include <QUrl>
+#include <QSslSocket>
+#ifndef NOWEBKIT
 #include <QtWebKit>
 #include <QWebView>
 #include <QWebFrame>
-#include <QSslSocket>
+#endif
 
 // QUrl split into QUrlQuerty in QT5
 #if QT_VERSION > 0x050000
 #include <QUrlQuery>
 #endif
-// QWebEngine
-#if QT_VERSION > 0x050000 && defined(Q_OS_MAC)
+// QWebEngine if on Mac, -or- we don't have webkit
+#if defined(NOWEBKIT) || ((QT_VERSION > 0x050000) && defined(Q_OS_MAC))
 #include <QWebEngineHistory>
 #include <QWebEngineHistoryItem>
 #include <QWebEnginePage>
@@ -90,10 +92,10 @@ private:
     QVBoxLayout *layout;
 
     // QUrl split into QUrlQuerty in QT5
-#if QT_VERSION < 0x050000 || !defined(Q_OS_MAC)
-    QWebView *view;
-#else
+#if defined(NOWEBKIT) || ((QT_VERSION > 0x050000) || defined(Q_OS_MAC))
     QWebEngineView *view;
+#else
+    QWebView *view;
 #endif
 
     QNetworkAccessManager* manager;

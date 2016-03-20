@@ -54,10 +54,10 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
     setLayout(layout);
 
 
-    #if QT_VERSION < 0x050000 || !defined(Q_OS_MAC)
-    view = new QWebView();
-    #else
+    #if defined(NOWEBKIT) || (QT_VERSION > 0x050000 || defined(Q_OS_MAC))
     view = new QWebEngineView();
+    #else
+    view = new QWebView();
     #endif
 
     view->setContentsMargins(0,0,0,0);

@@ -21,7 +21,12 @@
 
 #include <QDialog>
 #include <QDir>
+#ifdef NOWEBKIT
+#include <QWebEngineView>
+#else
 #include <QWebView>
+#include <QWebFrame>
+#endif
 #include <QFileDialog>
 
 #include "Athlete.h"
@@ -40,7 +45,11 @@ class GcCrashDialog : public QDialog
         void saveAs();
 
     private:
+#ifdef NOWEBKIT
+        QWebEngineView *report;
+#else
         QWebView *report;
+#endif
         bool newFilesInQuarantine;
         QStringList files;
 };
