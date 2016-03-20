@@ -368,38 +368,38 @@ HrPwWindow::findDelay(QVector<double> &wattsArray, QVector<double> &hrArray, int
 }
 
 /**************************************/
-/* Fichier CPP de la librairie reglin */
-/* Réalisé par GONNELLA Stéphane      */
+/* CPP file of reglin libary          */
+/* Created by GONNELLA Stéphane       */
 /**************************************/
 
 
-/* Déclaratin globale des variables */
+/* Global declaration of variables */
 
 
 /*********************/
-/* Fonctions de test */
+/* Test methods */
 /*********************/
 
-/* Fonction de test de présence d'un zéro */
+/* Test for zero in values */
 
-int HrPwWindow::test_zero(QVector<double> &tab,int n)
+int HrPwWindow::test_zero(QVector<double> &array,int n)
 {
         for(int i=0;i<n;i++)
         {
-                if(tab[i]==0)
+                if(array[i]==0)
                 { return i;}
         }
 
         return -1;
 }
 
-/* Fonction de test de présence d'un négatif */
+/* Test for negative values */
 
-int HrPwWindow::test_negatif(QVector<double> &tab,int n)
+int HrPwWindow::test_negative(QVector<double> &array,int n)
 {
         for(int i=0;i<n;i++)
         {
-                if(tab[i]<0)
+                if(array[i]<0)
                 { return i;}
         }
 
@@ -407,10 +407,10 @@ int HrPwWindow::test_negatif(QVector<double> &tab,int n)
 }
 
 /*********************************/
-/* Fonctions de valeurs absolues */
+/* Methods for absolute values*/
 /*********************************/
 
-/*fonction qui retourne la valeur absolue*/
+/* Method that returns the absolute value*/
 
 double HrPwWindow::val_abs(double x)
 {
@@ -418,267 +418,267 @@ double HrPwWindow::val_abs(double x)
 	else {return x;}
 }
 /********************************/
-/* Fonction de recherche du max */
+/* Methods to search max values */
 /********************************/
 
-/* Fonction qui retourne celui qui est le max */
+/* Method that returns the max vlaue*/
 
 int HrPwWindow::rmax(QVector<double> &r)
 {
         double temp=0;
-        int ajust=0;
+        int iter=0;
 
         for(int i=0;i<5;i++)
         {
                 if(r[i]>temp)
                 {
                      temp=r[i];
-                     ajust = i+1;
+                     iter = i+1;
                 }
         }
 
-        return ajust;
+        return iter;
 }
 
 /**********************/
-/* Fonctions de somme */
+/* Summation methods */
 /**********************/
 
-/* Fonction de somme d'éléments d'un tableau d'entier */
+/* Summation method for array of integers */
 
-int HrPwWindow::somme(QVector<int> &tab,int n)
+int HrPwWindow::sum(QVector<int> &array,int n)
 {
-	int somme=0;
+	int sum=0;
 
 	for (int i=0;i<n;i++)
 	{
-	 somme=((tab[i])+(somme));
+	 sum=((array[i])+(sum));
    	}
 
-	return(somme);
+	return(sum);
 }
 
-/* Fonction de somme d'éléments d'un tableau de réel*/
+/* Summation method for array of doubles */
 
-double HrPwWindow::somme(QVector<double> &tab,int n)
+double HrPwWindow::sum(QVector<double> &array,int n)
 {
-	double somme=0;
+	double sum=0;
 
 	for (int i=0;i<n;i++)
 	{
-	 somme=((tab[i])+(somme));
+	 sum=((array[i])+(sum));
    	}
 
-	return(somme);
+	return(sum);
 }
 
 /**********************************/
-/* Fonctions de calcul de moyenne */
+/* Methods for calculation of averages */
 /**********************************/
 
-/* Fonction de calcul de moyenne d'éléments d'un tableau d'entier */
+/* Method that calculates average for array of integers */
 
-double HrPwWindow::moyenne(QVector<int> &tab,int n)
+double HrPwWindow::average(QVector<int> &array,int n)
 {
-	double moyenne = double(somme(tab,n))/n;
+	double average = double(sum(array,n))/n;
 
-	return (moyenne);
+	return (average);
 }
 
-/* Fonction de calcul de moyenne d'éléments d'un tableau de réel */
+/* Method that calculates average for array of doubles */
 
-double HrPwWindow::moyenne(QVector<double> &tab,int n)
+double HrPwWindow::average(QVector<double> &array,int n)
 {
-	double moyenne = somme(tab,n)/n;
+	double average = sum(array,n)/n;
 
-	return (moyenne);
+	return (average);
 }
 
-/* Fonction de calcul de moyenne d'elements d'un tableau de réel(2) */
+/* Method that calculates average for array of doubles(2) */
 
-double HrPwWindow::moyenne2(double somme,int n)
+double HrPwWindow::average2(double sum,int n)
 {
-	double moyenne = somme/n;
+	double average = sum/n;
 
-	return (moyenne);
+	return (average);
 }
 
 /***********************/
-/* Fonction de produit */
+/* Multiplication methods */
 /***********************/
 
-/* Fonction de calcul du produit d'éléments de deux tableau ligne par ligne */
+/* Method for element-wise multiplication of two arrays */
 
-void HrPwWindow::produittab(QVector<double> &tab1,QVector<double> &tab2,int n)
+void HrPwWindow::arrayproduct(QVector<double> &array1,QVector<double> &array2,int n)
 {
-    tab_temp.resize(n);   //Réservation de l'espace mémoire
+    array_temp.resize(n);   //Réservation de l'espace mémoire
 
 	for (int i=0;i<n;i++)
 	{
-		tab_temp[i]=(tab1[i]*tab2[i]);
+		array_temp[i]=(array1[i]*array2[i]);
 	}
 }
 
 /***************************************/
-/* Fonctions de changement de variable */
+/* Method to change variables */
 /***************************************/
 
-/* Fonctions de calcul du ln des éléments d'un tableau de réel */
+/* Method to calculate the natural logarithm of an array of doubles element-wise */
 
-void HrPwWindow::lntab(QVector<double> &tab,QVector<double> &tabTemp,int n)
+void HrPwWindow::lnarray(QVector<double> &array,QVector<double> &arrayTemp,int n)
 {
-    tab_temp.resize(n);   //Réservation de l'espace mémoire
+    array_temp.resize(n);   //Réservation de l'espace mémoire
 
 	for (int i=0;i<n;i++)
 	{
-		tabTemp[i]=(log(tab[i]));
+		arrayTemp[i]=(log(array[i]));
 	}
 }
 
-/* Fonctions de calcul du log base 10 des éléments d'un tableau de réel */
+/* Method to calculate the base 10 logarithm of an array of doubles element-wise */
 
-void HrPwWindow::logtab(QVector<double> &tab,QVector<double> &tabTemp,int n)
+
+void HrPwWindow::logarray(QVector<double> &array,QVector<double> &arrayTemp,int n)
 {
-    tab_temp.resize(n);   //Réservation de l'espace mémoire
+    array_temp.resize(n);   //Réservation de l'espace mémoire
 
 	for (int i=0;i<n;i++)
 	{
-		tabTemp[i]=(log10(tab[i]));
+		arrayTemp[i]=(log10(array[i]));
 	}
 }
 
-/* Fonction d'inverstion des élements d'un tableau de réel */
+/* Method to calculate the inverse (1/x) of an array of doubles element-wise */
 
-void HrPwWindow::invtab(QVector<double> &tab,QVector<double> &tabTemp,int n)
+void HrPwWindow::invarray(QVector<double> &array,QVector<double> &arrayTemp,int n)
 {
-    tab_temp.resize(n);   //Réservation de l'espace mémoire
+    array_temp.resize(n);   //Réservation de l'espace mémoire
 
 	for (int i=0;i<n;i++)
 	{
-		tabTemp[i]=(1/tab[i]);
+		arrayTemp[i]=(1/array[i]);
 	}
 }
 
 /********************/
-/* Autres fonctions */
+/* Other methods */
 /********************/
 
-/* Fonction de calcul des écarts à la moyenne */
+/* Method to calculate the deviation from the average */
 
-void HrPwWindow::ecart_a_moyenne(QVector<double> &tab,double Moyenne,int n)
+void HrPwWindow::deviation_from_average(QVector<double> &array,double Average,int n)
 {
-    tab_temp.resize(n);   //Réservation de l'espace mémoire
+    array_temp.resize(n);   //Réservation de l'espace mémoire
 
 	for (int i=0;i<n;i++)
 	{
-		tab_temp[i]=(tab[i] - Moyenne);
+		array_temp[i]=(array[i] - Average);
 	}
 }
 
 /****************************/
-/* Fonctions de statistique */
+/* Statistical methods */
 /****************************/
 
-/* Fonction de calcul de la covariance */
+/* Method to calculate covariance */
 
 double HrPwWindow::covariance(QVector<double> &Xi, QVector<double> &Yi,int n)
 {
 	double cov;
 
-	produittab(Xi,Yi,n);
-	cov = moyenne(tab_temp,n) - ( moyenne(Xi,n) * moyenne(Yi,n) );
+	arrayproduct(Xi,Yi,n);
+	cov = average(array_temp,n) - ( average(Xi,n) * average(Yi,n) );
 
 	return (cov);
 }
 
-/* Fonction de calcul de la somme des carrés des écarts a la moyenne */
+/* Method to calculate variance */
 
 double HrPwWindow::variance(QVector<double> &val,int n)
 {
 	double sce;
 
-	produittab(val,val,n);
-	sce = moyenne(tab_temp,n) - ( moyenne(val,n) * moyenne(val,n));
+	arrayproduct(val,val,n);
+	sce = average(array_temp,n) - ( average(val,n) * average(val,n));
 
   	return (sce);
 }
 
-/* Fonction de calcul de l'écart-type */
+/* Method to calculate the standard deviation */
 
-double HrPwWindow::ecarttype(QVector<double> &val,int n)
+double HrPwWindow::standarddeviation(QVector<double> &val,int n)
 {
-	double ect= sqrt(variance(val,n));
+	double sd= sqrt(variance(val,n));
 
-	return (ect);
+	return (sd);
 }
 /******************************************************/
-/* Fonctions pour le calcul de la régression linéaire */
-/* par la méthode des moindres carré                  */
+/* Methods to calculate a linear regression model using the method of least squares */
 /******************************************************/
 
-/* Fonction de clacul de la pente (a) */
+/* Method to calculate the slope of the linear regression model */
 
-double HrPwWindow::pente(QVector<double> &Xi,QVector<double> &Yi,int n)
+double HrPwWindow::slope(QVector<double> &Xi,QVector<double> &Yi,int n)
 {
 	double a = covariance(Xi,Yi,n)/variance(Xi,n);
 
 	return (a);
 }
 
-/* Fonction de clacul de l'ordonnée a l'origine (b) */
+/* Method to calculate the intercept of the linear regression model */
 
-double HrPwWindow::ordonnee(QVector<double> &Xi,QVector<double> &Yi,int n)
+double HrPwWindow::intercept(QVector<double> &Xi,QVector<double> &Yi,int n)
 {
-	double b = moyenne(Yi,n) - ( pente(Xi,Yi,n) * moyenne(Xi,n) );
+	double b = average(Yi,n) - ( slope(Xi,Yi,n) * average(Xi,n) );
 
 	return (b);
 }
 
-/* Fonction de calcul du coef de corrélation (r) */
+/* Method to calculate the correlation coefficient */
 
 double HrPwWindow::corr(QVector<double> &Xi, QVector<double> &Yi,int n)
 {
-	double r = covariance(Xi,Yi,n)/(ecarttype(Xi,n)*ecarttype(Yi,n));
-        //double r=pente(Xi,Yi,n)*pente(Xi,Yi,n)*(variance(Xi,n)/variance(Yi,n));
+	double r = covariance(Xi,Yi,n)/(standarddeviation(Xi,n)*standarddeviation(Yi,n));
+        //double r=slope(Xi,Yi,n)*slope(Xi,Yi,n)*(variance(Xi,n)/variance(Yi,n));
 	return (r);
 }
 
-/* Fonction de détermination du meilleur ajustement */
+/* Method to calculate the best fit */
 
-int HrPwWindow::ajustement(QVector<double> &Xi,QVector<double> &Yi,int n)
+int HrPwWindow::fit(QVector<double> &Xi,QVector<double> &Yi,int n)
 {
         QVector<double> r(5),lnXi(100),lnYi(100),logXi(100),logYi(100),invXi(100);
 
-        //corrélation pour linéaire
+        //Linear correlation
 
         r[0]=val_abs(corr(Xi,Yi,n));
 
-        //corrélation pour exponetielle
+        //Exponential correlation
 
-        lntab(Yi,lnYi,n);
+        lnarray(Yi,lnYi,n);
         r[1]=val_abs(corr(Xi,lnYi,n));
 
-        //corrélation pour puissance
+        //Power correlation
 
-        logtab(Xi,logXi,n);
-        logtab(Yi,logYi,n);
+        logarray(Xi,logXi,n);
+        logarray(Yi,logYi,n);
         r[2]=val_abs(corr(logXi,logYi,n));
 
-        //corrélation pour inverse
+        //Inverse correlation
 
-        invtab(Xi,invXi,n);
+        invarray(Xi,invXi,n);
         r[3]=val_abs(corr(invXi,Yi,n));
 
-        //corrélation pour logarithmique
+        //Logarithmic correlation
 
-        lntab(Xi,lnXi,n);
+        lnarray(Xi,lnXi,n);
         r[4]=val_abs(corr(lnXi,Yi,n));
 
-        //Test du meilleur ajustement
+        //Best fit test
 
         return rmax(r);
 }
 
 /*****************************/
-/* Fin du fichier reglin.cpp */
+/* End of CPP library reglin */
 /*****************************/
