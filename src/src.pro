@@ -662,7 +662,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 # Bing/Google Map temporarily disabled if we don't have WebKit
 # This will be resolved shortly
 !contains(DEFINES, NOWEBKIT) {
-    HEADERS += Charts/BingMap.cpp Charts/GoogleMapControl.cpp Charts/RideWindow.cpp
+    SOURCES += Charts/BingMap.cpp Charts/GoogleMapControl.cpp Charts/RideWindow.cpp
 }
 
 ## Cloud Services / Web resources
