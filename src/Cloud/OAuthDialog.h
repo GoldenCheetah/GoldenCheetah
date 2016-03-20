@@ -92,7 +92,7 @@ private:
     QVBoxLayout *layout;
 
     // QUrl split into QUrlQuerty in QT5
-#if defined(NOWEBKIT) || ((QT_VERSION > 0x050000) || defined(Q_OS_MAC))
+#if defined(NOWEBKIT) || ((QT_VERSION > 0x050000) && defined(Q_OS_MAC))
     QWebEngineView *view;
 #else
     QWebView *view;
