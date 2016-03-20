@@ -35,10 +35,10 @@ class Statistic
 
         double minX, maxX, minY, maxY; // for the data set we have
 
-        double pente(QVector<double> &Xi,QVector<double> &Yi,int n);
-        double ordonnee(QVector<double> &Xi,QVector<double> &Yi,int n);
+        double slope(QVector<double> &Xi,QVector<double> &Yi,int n);
+        double intercept(QVector<double> &Xi,QVector<double> &Yi,int n);
         double corr(QVector<double> &Xi, QVector<double> &Yi,int n);
-        double moyenne(QVector<double> &Xi,int n);
+        double average(QVector<double> &Xi,int n);
 
     protected:
         long points;
@@ -50,25 +50,25 @@ class Statistic
 
     private:
         // Maths functions used by the plots
-        QVector<double> tab_temp; //Déclaration d'un tableau temporaire
+        QVector<double> array_temp; //Déclaration d'un tableau temporaire
 
-        int test_zero(QVector<double> &tab,int n);
-        int test_negatif(QVector<double> &tab,int n);
-        void logtab(QVector<double> &tab,QVector<double> &tabTemp,int n);
-        void lntab(QVector<double> &tab,QVector<double> &tabTemp,int n);
-        void invtab(QVector<double> &tab,QVector<double> &tabTemp,int n);
-        int ajustement(QVector<double> &Xi,QVector<double> &Yi,int n);
-        double moyenne(QVector<int> &tab,int n);
-        double moyenne2(double somme,int n);
+        int test_zero(QVector<double> &array,int n);
+        int test_negative(QVector<double> &array,int n);
+        void logarray(QVector<double> &array,QVector<double> &arrayTemp,int n);
+        void lnarray(QVector<double> &array,QVector<double> &arrayTemp,int n);
+        void invarray(QVector<double> &array,QVector<double> &arrayTemp,int n);
+        int fit(QVector<double> &Xi,QVector<double> &Yi,int n);
+        double average(QVector<int> &array,int n);
+        double average2(double sum,int n);
         double val_abs(double x);
         int rmax(QVector<double> &r);
-        int somme(QVector<int> &tab,int n);
-        double somme(QVector<double> &tab,int n);
-        void produittab(QVector<double> &tab1,QVector<double> &tab2,int n);
-        void ecart_a_moyenne(QVector<double> &tab,double Moyenne,int n);
+        int sum(QVector<int> &array,int n);
+        double sum(QVector<double> &array,int n);
+        void arrayproduct(QVector<double> &array1,QVector<double> &array2,int n);
+        void deviation_from_average(QVector<double> &array,double Average,int n);
         double covariance(QVector<double> &Xi, QVector<double> &Yi,int n);
         double variance(QVector<double> &val,int n);
-        double ecarttype(QVector<double> &val,int n);
+        double standarddeviation(QVector<double> &val,int n);
 
 };
 
