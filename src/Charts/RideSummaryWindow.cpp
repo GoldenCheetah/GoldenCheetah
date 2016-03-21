@@ -52,6 +52,9 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
      GcChartWindow(context), context(context), ridesummary(ridesummary), useCustom(false), useToToday(false), filtered(false), bestsCache(NULL), force(false)
 {
     setRideItem(NULL);
+    _connected=NULL;
+    justloaded=false;
+    firstload=true;
 
     // allow user to select date range if in summary mode
     dateSetting = new DateSettingsEdit(this);
@@ -107,9 +110,10 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     if (ridesummary) {
 
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideItemChanged()));
+        connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
+
         connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(refresh()));
         connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(refresh()));
-        connect(context, SIGNAL(intervalsChanged()), this, SLOT(refresh()));
         connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareChanged()));
         connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareChanged()));
 
@@ -243,8 +247,12 @@ RideSummaryWindow::rideSelected()
 void
 RideSummaryWindow::rideItemChanged()
 {
-    // disconnect from previous
-    static QPointer<RideItem> _connected = NULL;
+    // did it really change ?
+    if (!firstload && _connected == myRideItem) return;
+
+    // ignore intervals changed if not set?
+    justloaded = true;
+
     if (_connected) {
         disconnect(_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
     }
@@ -257,6 +265,17 @@ RideSummaryWindow::rideItemChanged()
     } else {
         setIsBlank(true);
     }
+}
+
+void
+RideSummaryWindow::intervalsChanged()
+{
+    // ignore if just loaded the ride
+    if (justloaded) {
+        justloaded = false;
+        return;
+    }
+    refresh();
 }
 
 void
@@ -282,7 +301,8 @@ RideSummaryWindow::refresh(QDate past)
 void
 RideSummaryWindow::refresh()
 {
-    if (!amVisible()) return; // only if you can see me!
+    if ((firstload && myRideItem==NULL) || !amVisible()) return; // only if you can see me!
+    firstload = false;
 
     if (isCompare()) { // COMPARE MODE
 

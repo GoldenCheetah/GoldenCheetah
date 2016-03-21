@@ -37,11 +37,10 @@
 #include <QtConcurrent>
 #endif
 
+#include <QPointer>
 #include "RideFileCache.h"
 #include "ExtendedCriticalPower.h"
-
 #include "SearchFilterBox.h"
-
 #include "Specification.h"
 
 class RideSummaryWindow : public GcChartWindow
@@ -98,6 +97,7 @@ class RideSummaryWindow : public GcChartWindow
         void dateRangeChanged(DateRange);
         void rideItemChanged();
         void metadataChanged();
+        void intervalsChanged();
 
         // date settings
         void useCustomRange(DateRange);
@@ -133,6 +133,8 @@ class RideSummaryWindow : public GcChartWindow
 #endif
 
         RideItem *_connected;
+        bool justloaded;
+        bool firstload;
         bool ridesummary; // do we summarise ride or daterange?
 
         Specification specification;
