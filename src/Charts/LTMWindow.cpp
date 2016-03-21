@@ -1054,6 +1054,7 @@ LTMWindow::refreshDataTable()
 // for storing curve data without using a curve
 class TableCurveData {
     public:
+        TableCurveData() { n=0; x.resize(0); y.resize(0); }
         QVector<double> x,y;
         int n;
 };
