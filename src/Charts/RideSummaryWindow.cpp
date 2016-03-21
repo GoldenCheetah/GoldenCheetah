@@ -200,7 +200,7 @@ void
 RideSummaryWindow::modelProgress(int year, int month)
 {
     // ignore if not visible!
-    if (!amVisible()) return;
+    if (!firstload || !amVisible()) return;
 
     QString string;
 
@@ -301,7 +301,7 @@ RideSummaryWindow::refresh(QDate past)
 void
 RideSummaryWindow::refresh()
 {
-    if ((firstload && myRideItem==NULL) || !amVisible()) return; // only if you can see me!
+    if ((ridesummary && firstload && myRideItem==NULL) || !amVisible()) return; // only if you can see me!
     firstload = false;
 
     if (isCompare()) { // COMPARE MODE
