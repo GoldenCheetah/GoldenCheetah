@@ -38,6 +38,10 @@
 #include "GcUpgrade.h"
 #endif
 
+#ifdef NOWEBKIT
+#include <QWebEngineSettings>
+#endif
+
 #include <QtGui>
 #include <QString>
 #include <QDebug>
