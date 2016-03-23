@@ -21,8 +21,15 @@
 #include "GoldenCheetah.h"
 
 #include <QWidget>
+
+#ifdef NOWEBKIT
+#include <QWebEnginePage>
+#include <QWebEngineView>
+#else
 #include <QWebFrame>
 #include <QWebView>
+#endif
+
 #include <QDialog>
 #include <string>
 #include <iostream>
@@ -77,7 +84,7 @@ class BingMap : public GcChartWindow
 
     public:
         BingMap(Context *);
-        virtual ~BingMap() {}
+        ~BingMap();
         bool first;
 
     public slots:
@@ -91,7 +98,13 @@ class BingMap : public GcChartWindow
     private:
         Context *context;
         QVBoxLayout *layout;
+
+#ifdef NOWEBKIT
+        QWebEngineView *view;
+#else
         QWebView *view;
+#endif
+
         BWebBridge *webBridge;
         BingMap();  // default ctor
         int range;
