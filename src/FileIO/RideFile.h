@@ -100,15 +100,13 @@ class RideFileInterval
                             PEAKPACE,               // Peak Pace
                             EFFORT,                 // Sustained effort
                             ROUTE,                  // GPS Route
-                            CLIMB,                  // Hills and Cols
-
-                            EXHAUSTION,             // A user marked point of exhaustion (stored in references)
+                            CLIMB                   // Hills and Cols
 
                                                     // ADD NEW ONES HERE AND UPDATE last() below
 
                            } types;
 
-        static enum intervaltype last() { return EXHAUSTION; } // update to last above!
+        static enum intervaltype last() { return CLIMB; } // update to last above!
 
         typedef enum intervaltype IntervalType;
         static QString typeDescription(IntervalType);                  // return a string to represent the type
