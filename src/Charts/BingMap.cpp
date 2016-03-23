@@ -30,6 +30,10 @@
 #include "TimeUtils.h"
 #include "HelpWhatsThis.h"
 
+#ifdef NOWEBKIT
+#include <QtWebChannel>
+#endif
+
 #include <QDebug>
 
 BingMap::BingMap(Context *context) : GcChartWindow(context), context(context), range(-1), current(NULL)
@@ -42,7 +46,12 @@ BingMap::BingMap(Context *context) : GcChartWindow(context), context(context), r
     layout->setContentsMargins(2,0,2,2);
     setChartLayout(layout);
 
+#ifdef NOWEBKIT
+    view = new QWebEngineView(this);
+#else
     view = new QWebView();
+#endif
+
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -53,9 +62,26 @@ BingMap::BingMap(Context *context) : GcChartWindow(context), context(context), r
     view->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Map));
 
     webBridge = new BWebBridge(context, this);
+#ifdef NOWEBKIT
+    // file: MyWebEngineView.cpp, MyWebEngineView extends QWebEngineView
+    QWebChannel *channel = new QWebChannel(view->page());
+
+    // set the web channel to be used by the page
+    // see http://doc.qt.io/qt-5/qwebenginepage.html#setWebChannel
+    view->page()->setWebChannel(channel);
+
+    // register QObjects to be exposed to JavaScript
+    channel->registerObject(QStringLiteral("webBridge"), webBridge);
+
+    // now you can call page()->runJavaScript(...) etc
+    // you DON'T need to call runJavaScript with qwebchannel.js, see the html file below
+
+#endif
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
+#ifndef NOWEBKIT
     connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(updateFrame()));
+#endif
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
@@ -65,6 +91,11 @@ BingMap::BingMap(Context *context) : GcChartWindow(context), context(context), r
 
     // get the colors setup for first run
     configChanged(CONFIG_APPEARANCE);
+}
+
+BingMap::~BingMap()
+{
+    delete webBridge;
 }
 
 void
@@ -102,7 +133,12 @@ BingMap::rideSelected()
 void BingMap::loadRide()
 {
     createHtml();
+
+#ifdef NOWEBKIT
+    view->page()->setHtml(currentPage);
+#else
     view->page()->mainFrame()->setHtml(currentPage);
+#endif
 }
 
 void BingMap::updateFrame()
@@ -114,7 +150,9 @@ void BingMap::updateFrame()
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
 
+#ifndef NOWEBKIT
     view->page()->mainFrame()->addToJavaScriptWindowObject("webBridge", webBridge);
+#endif
 }
 
 void BingMap::createHtml()
@@ -157,6 +195,25 @@ void BingMap::createHtml()
     "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>\n"
     "<script type=\"text/javascript\" src=\"http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0\"></script>\n");
 
+#ifdef NOWEBKIT
+    currentPage += QString("<script type=\"text/javascript\" src=\"qrc:///qtwebchannel/qwebchannel.js\"></script>\n");
+#endif
+
+    currentPage += QString("<script type=\"text/javascript\"> \n"
+    "var webBridge; \n"
+    "document.addEventListener(\"DOMContentLoaded\", function () { \n"
+#ifdef NOWEBKIT
+    "<!-- it's a good idea to initialize webchannel after DOM ready, if the code is going to manipulate the DOM -->\n"
+    "   new QWebChannel(qt.webChannelTransport, function (channel) { \n"
+    "       webBridge = channel.objects.webBridge; \n"
+    "       initialize(); \n"
+    "   }); \n"
+#else
+    "   initialize(); \n"
+#endif
+    "}); \n"
+    "</script>");
+
     // colors
     currentPage += QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE>")
                                           .arg(bgColor.name()).arg(fgColor.name());
@@ -173,6 +230,17 @@ void BingMap::createHtml()
     // b) allow local manipulation. This makes the UI
     // considerably more 'snappy'
     "function drawRoute() {\n"
+#ifdef NOWEBKIT
+    // load the GPS co-ordinates
+    "   webBridge.getLatLons(0, drawRouteForLatLons);\n"
+#else
+    // load the GPS co-ordinates
+    "    var latlons = webBridge.getLatLons(0);\n" // interval "0" is the entire route
+    "   drawRouteForLatLons(latlons);\n"
+#endif
+    "}\n"
+    "\n"
+    "function drawRouteForLatLons(latlons) {\n"
 
     // route will be drawn with these options
     "    var routeOptionsYellow = {\n"
@@ -181,9 +249,6 @@ void BingMap::createHtml()
     "        strokeDashArray: '5 0',\n"
     "        zIndex: -2\n"
     "    };\n"
-
-    // load the GPS co-ordinates
-    "    var latlons = webBridge.getLatLons(0);\n" // interval "0" is the entire route
 
     // create the route path
     "    var route = new Array();\n"
@@ -200,13 +265,15 @@ void BingMap::createHtml()
     "}\n"
 
     "function drawIntervals() { \n"
-    // intervals will be drawn with these options
-    "    var polyOptions = {\n"
-    "        strokeColor: new Microsoft.Maps.Color(100, 0, 0, 255),\n"
-    "        strokeThickness: 5,\n"
-    "        strokeDashArray: '5 0',\n"
-    "        zIndex: -1\n"
-    "    };\n"
+    // how many to draw?
+#ifdef NOWEBKIT
+    "   webBridge.intervalCount(drawIntervalsCount);\n"
+#else
+    "   drawIntervalsCount(webBridge.intervalCount());\n"
+#endif
+    "}\n"
+
+    "function drawIntervalsCount(intervals) { \n"
 
     // remove previous intervals highlighted
     "    j= intervalList.length;\n"
@@ -217,28 +284,38 @@ void BingMap::createHtml()
     "    }\n"
 
     // how many to draw?
-    "    var intervals = webBridge.intervalCount();\n"
-    "    while (intervals > 0) {\n"
-    "        var latlons = webBridge.getLatLons(intervals);\n"
-
-            // create the route path
-    "        var route = new Array();\n"
-    "        var j=0;\n"
-    "        while (j < latlons.length) { \n"
-    "            route.push(new Microsoft.Maps.Location(latlons[j],latlons[j+1]));\n"
-    "            j += 2;\n"
-    "        }\n"
-
-             // create the route Polyline
-    "        var intervalHighlighter = new Microsoft.Maps.Polyline(route, polyOptions);\n"
-    "        map.entities.push(intervalHighlighter);\n"
-    "        intervalList.push(intervalHighlighter);\n"
-
-    "        intervals--;\n"
-    "    }\n"
+    "   while (intervals > 0) {\n"
+#ifdef NOWEBKIT
+    "       webBridge.getLatLons(intervals, drawInterval);\n"
+#else
+    "       drawInterval(webBridge.getLatLons(intervals));\n"
+#endif
+    "       intervals--;\n"
+    "   }\n"
     "}\n"
 
+    "function drawInterval(latlons) { \n"
+    // intervals will be drawn with these options
+    "    var polyOptions = {\n"
+    "        strokeColor: new Microsoft.Maps.Color(100, 0, 0, 255),\n"
+    "        strokeThickness: 5,\n"
+    "        strokeDashArray: '5 0',\n"
+    "        zIndex: -1\n"
+    "    };\n"
 
+    // create the route path
+    "   var route = new Array();\n"
+    "   var j=0;\n"
+    "   while (j < latlons.length) { \n"
+    "        route.push(new Microsoft.Maps.Location(latlons[j],latlons[j+1]));\n"
+    "        j += 2;\n"
+    "    }\n"
+
+    // create the route Polyline
+    "    var intervalHighlighter = new Microsoft.Maps.Polyline(route, polyOptions);\n"
+    "    map.entities.push(intervalHighlighter);\n"
+    "    intervalList.push(intervalHighlighter);\n"
+    "}\n"
 
     // initialise function called when map loaded
     "function initialize() {\n"
@@ -282,7 +359,7 @@ void BingMap::createHtml()
 
     // the main page is rather trivial
     currentPage += QString("</head>\n"
-    "<body onload=\"initialize()\">\n"
+    "<body\">\n"
     "<div id=\"map_canvas\"></div>\n"
     "</body>\n"
     "</html>\n");
@@ -344,7 +421,12 @@ BingMap::drawShadedRoute()
                             "}\n").arg(color.red())
                                   .arg(color.green())
                                   .arg(color.blue());
+
+        #ifdef NOWEBKIT
+            view->page()->runJavaScript(code);
+        #else
             view->page()->mainFrame()->evaluateJavaScript(code);
+        #endif
         }
     }
 }
@@ -394,7 +476,11 @@ BingMap::createMarkers()
                    "map.entities.push(pushpin); }"
                    ).arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
 
+    #ifdef NOWEBKIT
+        view->page()->runJavaScript(code);
+    #else
         view->page()->mainFrame()->evaluateJavaScript(code);
+    #endif
 
     } else {
         // start / finish markers
@@ -403,14 +489,24 @@ BingMap::createMarkers()
                    "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);"
                    "map.entities.push(pushpin); }"
                    ).arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
+
+    #ifdef NOWEBKIT
+        view->page()->runJavaScript(code);
+    #else
         view->page()->mainFrame()->evaluateJavaScript(code);
+    #endif
 
         code = QString("{ var latlng = new Microsoft.Maps.Location(%1,%2); " 
                    "var pushpinOptions = { icon: 'qrc:images/maps/finish.png', height: 37, width: 32 };"
                    "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);"
                    "map.entities.push(pushpin); }"
                    ).arg(points[points.count()-1]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[points.count()-1]->lon,0,'g',GPS_COORD_TO_STRING);
+
+    #ifdef NOWEBKIT
+        view->page()->runJavaScript(code);
+    #else
         view->page()->mainFrame()->evaluateJavaScript(code);
+    #endif
     }
 
     //
@@ -455,7 +551,12 @@ BingMap::createMarkers()
                    "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);"
                    "map.entities.push(pushpin); }"
                     ).arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
+
+            #ifdef NOWEBKIT
+                view->page()->runJavaScript(code);
+            #else
                 view->page()->mainFrame()->evaluateJavaScript(code);
+            #endif
                 stoptime=0;
             }
             stoplat=stoplon=stoptime=0;
@@ -476,7 +577,8 @@ BingMap::createMarkers()
                    "var pushpinOptions = { };\n"
                    "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);\n"
                    "map.entities.push(pushpin);\n"
-                   "pushpin.cm1001_er_etr.dom.setAttribute('title', '%3');\n"
+                   "if (pushpin.cm1001_er_etr) pushpin.cm1001_er_etr.dom.setAttribute('title', '%3');\n"
+                   "if (pushpin.cm1002_er_etr) pushpin.cm1002_er_etr.dom.setAttribute('title', '%3');\n"
                    "pushpinClick= Microsoft.Maps.Events.addHandler(pushpin, 'click', function(event) { webBridge.toggleInterval(%4); });\n"
                    " }")
                    .arg(myRideItem->ride()->dataPoints()[offset]->lat,0,'g',GPS_COORD_TO_STRING)
@@ -484,7 +586,11 @@ BingMap::createMarkers()
                    .arg(x->name)
                    .arg(interval);
 
+    #ifdef NOWEBKIT
+        view->page()->runJavaScript(code);
+    #else
         view->page()->mainFrame()->evaluateJavaScript(code);
+    #endif
         interval++;
     }
 
@@ -531,7 +637,12 @@ void BingMap::zoomInterval(IntervalItem *which)
                     .arg(minLon,0,'g',GPS_COORD_TO_STRING)
                     .arg(maxLat,0,'g',GPS_COORD_TO_STRING)
                     .arg(maxLon,0,'g',GPS_COORD_TO_STRING);
+
+#ifdef NOWEBKIT
+    view->page()->runJavaScript(code);
+#else
     view->page()->mainFrame()->evaluateJavaScript(code);
+#endif
 }
 
 // quick diag, used to debug code only
@@ -605,11 +716,11 @@ void
 BWebBridge::toggleInterval(int x)
 {
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
-    if (x < 0 || rideItem->intervals().count() >= x) return;
+    if (x < 0 || rideItem->intervals().count() <= x) return;
 
-//XXX WHEN DECIDED HOW TO SELECT/UNSELECT INTERVALS
-#if 0
-    IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(x));
-    if (current) current->setSelected(!current->isSelected());
-#endif
+    IntervalItem *current = rideItem->intervals().at(x);
+    if (current) {
+        current->selected = !current->selected;
+        context->notifyIntervalItemSelectionChanged(current);
+    }
 }
