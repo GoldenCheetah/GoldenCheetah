@@ -167,6 +167,8 @@ FixSmO2::postProcess(RideFile *ride, DataProcessorConfig *config=0)
     }
     ride->command->endLUW();
 
+    delete outliers;
+
     if (spikes) return true;
     else return false;
 }

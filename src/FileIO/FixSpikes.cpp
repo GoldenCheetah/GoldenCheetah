@@ -197,6 +197,8 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0)
     }
     ride->command->endLUW();
 
+    delete outliers;
+
     ride->setTag("Spikes", QString("%1").arg(spikes));
     ride->setTag("Spike Time", QString("%1").arg(spiketime));
 
