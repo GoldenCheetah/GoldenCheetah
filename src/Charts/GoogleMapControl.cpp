@@ -94,9 +94,7 @@ GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), c
     // connects
     //
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-#ifdef NOWEBKIT
-    connect(view->page(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(updateFrame()));
-#else
+#ifndef NOWEBKIT
     connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(updateFrame()));
 #endif
 
@@ -186,9 +184,7 @@ void GoogleMapControl::updateFrame()
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
 
-#ifdef NOWEBKIT
-    //view->page()->addToJavaScriptWindowObject("webBridge", webBridge);
-#else
+#ifndef NOWEBKIT
     view->page()->mainFrame()->addToJavaScriptWindowObject("webBridge", webBridge);
 #endif
 
@@ -236,7 +232,7 @@ void GoogleMapControl::createHtml()
     "   body { height: 100%; margin: 0; padding: 0 }\n"
     "   #map-canvas { height: 100% }\n"
     "</style>\n"
-    "<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=AIzaSyASrk4JoJOzESQguDwjk8aq9nQXsrUUskM&sensor=false\"></script> \n");
+    "<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=AIzaSyASrk4JoJOzESQguDwjk8aq9nQXsrUUskM\"></script> \n");
 
 #ifdef NOWEBKIT
     currentPage += QString("<script type=\"text/javascript\" src=\"qrc:///qtwebchannel/qwebchannel.js\"></script>\n");
