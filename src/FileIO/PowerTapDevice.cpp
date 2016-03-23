@@ -324,6 +324,19 @@ PowerTapDevice::download( const QDir &tmpdir,
         return false;
     }
 
+    // hack for CERVO bug dates > 2016 set the year to 2000 (!)
+    if (file.startTime.date().year() == 2000) {
+
+        // its in the past... so set year to this
+        QDate date(QDate::currentDate().year(), file.startTime.date().month(), file.startTime.date().day());
+
+        // is that a future date?
+        if (date > QDate::currentDate()) date = date.addYears(-1);
+
+        // now update for file, if its valid otherwise keep as it is
+        if(date.isValid()) file.startTime.setDate(date);
+    }
+
     files << file;
     return true;
 }
