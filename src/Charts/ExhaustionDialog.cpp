@@ -174,8 +174,6 @@ ExhaustionDialog::refreshTable()
 
                 // time at which we hit task failure / exhaustion
                 QTableWidgetItem *t = new QTableWidgetItem();
-
-                t = new QTableWidgetItem();
                 t->setText(QString("%1").arg(time_to_string(rp->secs)));
                 t->setFlags(t->flags() & (~Qt::ItemIsEditable));
 
