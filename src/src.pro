@@ -52,7 +52,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
     ## with WebEngine now that WebKit is deprecated in QT 5.6
     ## It brings in a LOT of dependencies !
     contains(DEFINES, NOWEBKIT) {
-        QT += webengine webenginecore webenginewidgets positioning
+        QT += webengine webenginecore webenginewidgets webchannel positioning
         CONFIG += c++11
 
     } else {
@@ -571,7 +571,7 @@ HEADERS  += ANT/ANTChannel.h ANT/ANT.h ANT/ANTlocalController.h ANT/ANTLogger.h 
 HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPlotInterval.h Charts/AllPlotSlopeCurve.h \
            Charts/AllPlotWindow.h Charts/BlankState.h Charts/ChartBar.h Charts/ChartSettings.h \
            Charts/CpPlotCurve.h Charts/CPPlot.h Charts/CriticalPowerWindow.h Charts/DaysScaleDraw.h Charts/ExhaustionDialog.h Charts/GcOverlayWidget.h \
-           Charts/GcPane.h Charts/GoldenCheetah.h Charts/HistogramWindow.h Charts/HomeWindow.h \
+           Charts/GcPane.h Charts/GoldenCheetah.h Charts/GoogleMapControl.h Charts/HistogramWindow.h Charts/HomeWindow.h \
            Charts/HrPwPlot.h Charts/HrPwWindow.h Charts/IndendPlotMarker.h Charts/IntervalSummaryWindow.h Charts/LogTimeScaleDraw.h \
            Charts/LTMCanvasPicker.h Charts/LTMChartParser.h Charts/LTMOutliers.h Charts/LTMPlot.h Charts/LTMPopup.h \
            Charts/LTMSettings.h Charts/LTMTool.h Charts/LTMTrend2.h Charts/LTMTrend.h Charts/LTMWindow.h \
@@ -583,7 +583,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 # Bing/Google Map temporarily disabled if we don't have WebKit
 # This will be resolved shortly
 !contains(DEFINES, NOWEBKIT) {
-    HEADERS += Charts/BingMap.h Charts/GoogleMapControl.h Charts/RideWindow.h
+    HEADERS += Charts/BingMap.h  Charts/RideWindow.h
 }
 
 # cloud services
@@ -650,7 +650,7 @@ SOURCES += ANT/ANTChannel.cpp ANT/ANT.cpp ANT/ANTlocalController.cpp ANT/ANTLogg
 SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts/AllPlotInterval.cpp Charts/AllPlotSlopeCurve.cpp \
            Charts/AllPlotWindow.cpp Charts/BlankState.cpp Charts/ChartBar.cpp Charts/ChartSettings.cpp \
            Charts/CPPlot.cpp Charts/CpPlotCurve.cpp Charts/CriticalPowerWindow.cpp Charts/ExhaustionDialog.cpp Charts/GcOverlayWidget.cpp Charts/GcPane.cpp \
-           Charts/GoldenCheetah.cpp Charts/HistogramWindow.cpp Charts/HomeWindow.cpp Charts/HrPwPlot.cpp \
+           Charts/GoldenCheetah.cpp Charts/GoogleMapControl.cpp Charts/HistogramWindow.cpp Charts/HomeWindow.cpp Charts/HrPwPlot.cpp \
            Charts/HrPwWindow.cpp Charts/IndendPlotMarker.cpp Charts/IntervalSummaryWindow.cpp Charts/LogTimeScaleDraw.cpp \
            Charts/LTMCanvasPicker.cpp Charts/LTMChartParser.cpp Charts/LTMOutliers.cpp Charts/LTMPlot.cpp Charts/LTMPopup.cpp \
            Charts/LTMSettings.cpp Charts/LTMTool.cpp Charts/LTMTrend.cpp Charts/LTMWindow.cpp \
@@ -662,7 +662,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 # Bing/Google Map temporarily disabled if we don't have WebKit
 # This will be resolved shortly
 !contains(DEFINES, NOWEBKIT) {
-    SOURCES += Charts/BingMap.cpp Charts/GoogleMapControl.cpp Charts/RideWindow.cpp
+    SOURCES += Charts/BingMap.cpp Charts/RideWindow.cpp
 }
 
 ## Cloud Services / Web resources

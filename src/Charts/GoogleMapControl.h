@@ -21,11 +21,7 @@
 #include "GoldenCheetah.h"
 
 #include <QWidget>
-#include <QtWebKit>
 #include <QDialog>
-#include <QWebPage>
-#include <QWebView>
-#include <QWebFrame>
 
 #include <string>
 #include <iostream>
@@ -34,6 +30,18 @@
 #include "RideFile.h"
 #include "IntervalItem.h"
 #include "Context.h"
+
+#include <QDialog>
+
+#ifdef NOWEBKIT
+#include <QWebEnginePage>
+#include <QWebEngineView>
+#else
+#include <QtWebKit>
+#include <QWebPage>
+#include <QWebView>
+#include <QWebFrame>
+#endif
 
 class QMouseEvent;
 class RideItem;
@@ -46,6 +54,11 @@ class IntervalSummaryWindow;
 
 // trick the maps api into ignoring gestures by
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
+#ifdef NOWEBKIT
+class myWebPage : public QWebEnginePage
+{
+};
+#else
 class myWebPage : public QWebPage
 {
 #if 0
@@ -54,6 +67,7 @@ class myWebPage : public QWebPage
     }
 #endif
 };
+#endif
 
 class WebBridge : public QObject
 {
@@ -121,8 +135,15 @@ class GoogleMapControl : public GcChartWindow
     private:
         Context *context;
         QVBoxLayout *layout;
+
+#ifdef NOWEBKIT
+        QWebEngineView *view;
+#else
         QWebView *view;
+#endif
+
         WebBridge *webBridge;
+
         GoogleMapControl();  // default ctor
         int range;
         int rideCP; // rider's CP
