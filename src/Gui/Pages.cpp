@@ -526,10 +526,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     stravaAuthorise = new QPushButton(tr("Authorise"), this);
 
-#ifdef GC_STRAVA_NO_CLIENT
-    stravaAuthorise->setEnabled(false);
-#endif
-
     stravaAuthorised = new QPushButton(this);
     stravaAuthorised->setContentsMargins(0,0,0,0);
     stravaAuthorised->setIcon(passwords.scaled(16,16));
