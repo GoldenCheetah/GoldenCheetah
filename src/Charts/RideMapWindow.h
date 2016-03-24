@@ -1,0 +1,186 @@
+/*
+ * Copyright (c) 2009 Greg Lonnon (greg.lonnon@gmail.com)
+ *               2011 Mark Liversedge (liversedge@gmail.com)
+ *               2016 Damien Grauser (Damien.Grauser@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#ifndef _GC_RideMapWindow_h
+#define _GC_RideMapWindow_h
+#include "GoldenCheetah.h"
+
+#include <QWidget>
+#include <QDialog>
+
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include "RideFile.h"
+#include "IntervalItem.h"
+#include "Context.h"
+
+#include <QDialog>
+
+#ifdef NOWEBKIT
+#include <QWebEnginePage>
+#include <QWebEngineView>
+#else
+#include <QtWebKit>
+#include <QWebPage>
+#include <QWebView>
+#include <QWebFrame>
+#endif
+
+class QMouseEvent;
+class RideItem;
+class Context;
+class QColor;
+class QVBoxLayout;
+class QTabWidget;
+class RideMapWindow;
+class IntervalSummaryWindow;
+
+// trick the maps api into ignoring gestures by
+// pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
+#ifdef NOWEBKIT
+class mapWebPage : public QWebEnginePage
+{
+};
+#else
+class mapWebPage : public QWebPage
+{
+#if 0
+    virtual QString userAgentForUrl(const QUrl&) const {
+        return "Mozilla/5.0";
+    }
+#endif
+};
+#endif
+
+class MapWebBridge : public QObject
+{
+    Q_OBJECT
+
+    private:
+        Context *context;
+        RideMapWindow *mw;
+
+        RideFilePoint* point;
+        int selection;
+
+        QList<RideFilePoint*> searchPoint(double lat, double lng);
+
+    public:
+        MapWebBridge(Context *context, RideMapWindow *mw) : context(context), mw(mw), selection(0) {}
+
+    public slots:
+        Q_INVOKABLE void call(int count);
+
+        // drawing basic route, and interval polylines
+        Q_INVOKABLE int intervalCount();
+        Q_INVOKABLE QVariantList getLatLons(int i); // get array of latitudes for highlighted n
+
+        // once map and basic route is loaded
+        // this slot is called to draw additional
+        // overlays e.g. shaded route, markers
+        Q_INVOKABLE void drawOverlays();
+
+        // display/toggle interval on map
+        Q_INVOKABLE void toggleInterval(int);
+        Q_INVOKABLE void hoverInterval(int);
+        Q_INVOKABLE void clearHover();
+        Q_INVOKABLE void hoverPath(double lat, double lng);
+        Q_INVOKABLE void clickPath(double lat, double lng);
+        Q_INVOKABLE void mouseup();
+
+        void intervalsChanged() { emit drawIntervals(); }
+
+    signals:
+        void drawIntervals();
+};
+
+class RideMapWindow : public GcChartWindow
+{
+    Q_OBJECT
+    G_OBJECT
+
+    // properties can be saved/restored/set by the layout manager
+
+    Q_PROPERTY(int maptype READ mapType WRITE setMapType USER true)
+
+    public:
+        typedef enum {
+            GOOGLE,
+            BING,
+        } MapType;
+
+        RideMapWindow(Context *, int mapType);
+        ~RideMapWindow();
+        bool first;
+
+        QComboBox *mapCombo;
+
+        // set/get properties
+        int mapType() const { return mapCombo->currentIndex(); }
+        void setMapType(int x) { mapCombo->setCurrentIndex(x); }
+
+    public slots:
+        void mapTypeSelected(int x);
+
+        void forceReplot();
+        void rideSelected();
+        void createMarkers();
+        void drawShadedRoute();
+        void zoomInterval(IntervalItem*);
+        void configChanged(qint32);
+
+        void drawTempInterval(IntervalItem *current);
+        void clearTempInterval();
+
+    private:
+        Context *context;
+        QVBoxLayout *layout;
+
+#ifdef NOWEBKIT
+        QWebEngineView *view;
+#else
+        QWebView *view;
+#endif
+
+        MapWebBridge *webBridge;
+
+        RideMapWindow();  // default ctor
+        int range;
+        int rideCP; // rider's CP
+        QString currentPage;
+        RideItem *current;
+        bool firstShow;
+        IntervalSummaryWindow *overlayIntervals;
+
+        QColor GetColor(int watts);
+        void createHtml();
+
+    private slots:
+        void loadRide();
+        void updateFrame();
+
+    protected:
+        bool event(QEvent *event);
+        bool stale;
+};
+
+#endif

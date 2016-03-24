@@ -54,8 +54,9 @@
 #ifndef NOWEBKIT
 #include "RideWindow.h"
 #endif
-#include "BingMap.h"
 #include "GoogleMapControl.h"
+#include "BingMap.h"
+#include "RideMapWindow.h"
 // Not until v4.0
 //#include "RouteWindow.h"
 
@@ -71,7 +72,7 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[31] = {
+  static GcWindowRegistry GcWindowsInit[30] = {
     // name                     GcWinID
     { VIEW_HOME|VIEW_DIARY, tr("Metric Trends"),GcWindowTypes::LTM },
     { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
@@ -88,8 +89,8 @@ GcWindowRegistry::initialize()
     { VIEW_HOME|VIEW_DIARY, tr("Distribution"),GcWindowTypes::Distribution },
     { VIEW_ANALYSIS, tr("Pedal Force vs Velocity"),GcWindowTypes::PfPv },
     { VIEW_ANALYSIS, tr("Heartrate vs Power"),GcWindowTypes::HrPw },
-    { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Google Map"),GcWindowTypes::GoogleMap },
-    { VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
+    { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Map"),GcWindowTypes::RideMapWindow },
+    //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
     { VIEW_ANALYSIS, tr("2d Plot"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("3d Plot"),GcWindowTypes::Model },
     { VIEW_ANALYSIS, tr("Aerolab Chung Analysis"),GcWindowTypes::Aerolab },
@@ -146,6 +147,7 @@ GcWindow *
 GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 {
     GcWindow *returning = NULL;
+    int idx;
 
     switch(id) {
     case GcWindowTypes::Aerolab: returning = new AerolabWindow(context); break;
@@ -212,7 +214,10 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::StreetViewWindow: returning = new StreetViewWindow(context); break;
 #endif
     case GcWindowTypes::GoogleMap: returning = new GoogleMapControl(context); break;
-    case GcWindowTypes::BingMap: returning = new BingMap(context); break;
+    case GcWindowTypes::BingMap: returning = new BingMap(context); break; 
+    //case GcWindowTypes::GoogleMap: returning = new RideMapWindow(context, RideMapWindow::GOOGLE); break; // new GoogleMapControl(context);
+    //case GcWindowTypes::BingMap: returning = new RideMapWindow(context, RideMapWindow::BING); break; //returning = new BingMap(context);
+    case GcWindowTypes::RideMapWindow: returning = new RideMapWindow(context, RideMapWindow::BING); break;
 
     case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(context); break;
     case GcWindowTypes::WorkoutWindow: returning = new WorkoutWindow(context); break;

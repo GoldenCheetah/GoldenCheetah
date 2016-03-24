@@ -72,10 +72,6 @@ BingMap::BingMap(Context *context) : GcChartWindow(context), context(context), r
 
     // register QObjects to be exposed to JavaScript
     channel->registerObject(QStringLiteral("webBridge"), webBridge);
-
-    // now you can call page()->runJavaScript(...) etc
-    // you DON'T need to call runJavaScript with qwebchannel.js, see the html file below
-
 #endif
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
