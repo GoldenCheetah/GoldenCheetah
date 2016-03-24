@@ -440,8 +440,10 @@ RideImportWizard::process()
 
         // get fullpath name for processing
         QFileInfo thisfile(filenames[i]);
-
-        if (thisfile.exists() && thisfile.isFile() && thisfile.isReadable()) {
+        if (!thisfile.exists())  tableWidget->item(i,5)->setText(tr("Error - File does not exit."));
+        else if (!thisfile.isFile())  tableWidget->item(i,5)->setText(tr("Error - Not a file."));
+        else if (!thisfile.isReadable())  tableWidget->item(i,5)->setText(tr("Error - File is not readable."));
+        else {
 
             // is it one we understand ?
             QStringList suffixList = RideFileFactory::instance().suffixes();
@@ -456,12 +458,7 @@ RideImportWizard::process()
             } else {
                 tableWidget->item(i,5)->setText(tr("Error - Unknown file type"));
             }
-
-        } else {
-            //  Cannot open
-            tableWidget->item(i,5)->setText(tr("Error - Not a valid file"));
         }
-
         progressBar->setValue(progressBar->value()+1);
 
     }
@@ -592,7 +589,7 @@ RideImportWizard::process()
                    if (errors.isEmpty())
                        tableWidget->item(i,5)->setText(tr("Validated"));
                    else {
-                       tableWidget->item(i,5)->setText(tr("Warning - ") + errors.join(tr(" ")));
+                       tableWidget->item(i,5)->setText(tr("Warning - ") + errors.join(tr(";")));
                    }
 
                    // Set Date and Time
@@ -645,7 +642,7 @@ RideImportWizard::process()
                    delete ride;
                } else {
                    // nope - can't handle this file
-                   tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(" ")));
+                   tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(";")));
                }
         }
         progressBar->setValue(progressBar->value()+1);
