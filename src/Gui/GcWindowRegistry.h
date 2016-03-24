@@ -62,7 +62,8 @@ enum gcwinid {
         CriticalPowerSummary = 33,
         Distribution = 34,
         RouteSegment = 35,
-        WorkoutWindow = 36
+        WorkoutWindow = 36,
+        RideMapWindow = 37
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;

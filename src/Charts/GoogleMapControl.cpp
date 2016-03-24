@@ -80,10 +80,6 @@ GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), c
 
     // register QObjects to be exposed to JavaScript
     channel->registerObject(QStringLiteral("webBridge"), webBridge);
-
-    // now you can call page()->runJavaScript(...) etc
-    // you DON'T need to call runJavaScript with qwebchannel.js, see the html file below
-
 #endif
 
     // put a helper on the screen for mouse over intervals...
