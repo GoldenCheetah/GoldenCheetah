@@ -2923,7 +2923,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
                                               QVector<double>&x,QVector<double>&y,int&n, bool)
 {
     // lets refresh the model data if we don't have any
-    if (context->athlete->PDEstimates.count() == 0) context->athlete->rideCache->refreshCPModelMetrics(); 
+    if (context->athlete->getPDEstimates().count() == 0) context->athlete->rideCache->refreshCPModelMetrics();
 
     // resize the curve array to maximum possible size (even if we don't need it)
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
@@ -2944,8 +2944,8 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
     int firstPeriod = groupForDate(settings->start.date(), settings->groupBy);
 
     // get first PDEstimate / fillup X/Y with missing time range
-    if (!context->athlete->PDEstimates.isEmpty()) {
-      PDEstimate firstEst = context->athlete->PDEstimates.first();
+    if (!context->athlete->getPDEstimates().isEmpty()) {
+      PDEstimate firstEst = context->athlete->getPDEstimates().first();
       if ((settings->start.date() < firstEst.from) &&
           (settings->end.date() > firstEst.from)){
         int timeforward = groupForDate(firstEst.from, settings->groupBy)
@@ -2959,7 +2959,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
     }
 
     // loop through all the estimate data
-    foreach(PDEstimate est, context->athlete->PDEstimates) {
+    foreach(PDEstimate est, context->athlete->getPDEstimates()) {
 
         // wpk skip for now
         if (est.wpk != metricDetail.wpk) continue;
@@ -3107,7 +3107,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
     }
 
     // just check if we had data at all
-    if (!context->athlete->PDEstimates.isEmpty()) {
+    if (!context->athlete->getPDEstimates().isEmpty()) {
         // add the last average value to the output
         switch(settings->groupBy) {
 

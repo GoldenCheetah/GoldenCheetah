@@ -93,8 +93,9 @@ class Athlete : public QObject
         void setCriticalPower(int cp);
 
         // Data
+        QMutex lock;
         Seasons *seasons;
-        QList<PDEstimate> PDEstimates;
+        QList<PDEstimate> PDEstimates_;
         Routes *routes;
         QList<RideFileCache*> cpxCache;
         RideCache *rideCache;
@@ -102,6 +103,7 @@ class Athlete : public QObject
 
         // Estimates
         PDEstimate getPDEstimateFor(QDate, QString model, bool wpk);
+        QList<PDEstimate> getPDEstimates();
 
         // PMC Data
         PMCData *getPMCFor(QString metricName, int stsDays = -1, int ltsDays = -1); // no Specification used!

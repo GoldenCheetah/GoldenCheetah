@@ -53,6 +53,7 @@ RideCache::RideCache(Context *context) : context(context)
     plannedDirectory = context->athlete->home->planned();
 
     progress_ = 100;
+    refreshingEstimates = false;
     exiting = false;
 
     // initial load of user defined metrics - do once we have an initial context
@@ -660,6 +661,13 @@ class RollingBests {
 void
 RideCache::refreshCPModelMetrics()
 {
+    // we're refreshing, so away
+    if (refreshingEstimates == true) return;
+
+    // need to lock
+    refreshingEstimates = true;
+    context->athlete->lock.lock();
+
     // this needs to be done once all the other metrics
     // Calculate a *monthly* estimate of CP, W' etc using
     // bests data from the previous 12 weeks
@@ -667,7 +675,7 @@ RideCache::refreshCPModelMetrics()
     RollingBests bestsWPK(12);
 
     // clear any previous calculations
-    context->athlete->PDEstimates.clear(); 
+    context->athlete->PDEstimates_.clear();
 
     // we do this by aggregating power data into bests
     // for each month, and having a rolling set of 3 aggregates
@@ -696,7 +704,9 @@ RideCache::refreshCPModelMetrics()
 
     // if we don't have 2 rides or more then skip this but add a blank estimate
     if (from == to || to == QDate()) {
-        context->athlete->PDEstimates << PDEstimate();
+        context->athlete->PDEstimates_ << PDEstimate();
+        context->athlete->lock.unlock();
+        refreshingEstimates = false;
         return;
     }
 
@@ -755,7 +765,7 @@ RideCache::refreshCPModelMetrics()
 
             // so long as the important model derived values are sensible ...
             if (add.WPrime > 1000 && add.CP > 100) 
-                context->athlete->PDEstimates << add;
+                context->athlete->PDEstimates_ << add;
 
             //qDebug()<<add.to<<add.from<<model->code()<< "W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
 
@@ -778,7 +788,7 @@ RideCache::refreshCPModelMetrics()
                 (!model->hasCP() || add.CP > 1.0f) &&
                 (!model->hasPMax() || add.PMax > 1.0f) &&
                 (!model->hasFTP() || add.FTP > 1.0f))
-                context->athlete->PDEstimates << add;
+                context->athlete->PDEstimates_ << add;
 
             //qDebug()<<add.from<<model->code()<< "KG W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
         }
@@ -788,9 +798,13 @@ RideCache::refreshCPModelMetrics()
     }
 
     // add a dummy entry if we have no estimates to stop constantly trying to refresh
-    if (context->athlete->PDEstimates.count() == 0) {
-        context->athlete->PDEstimates << PDEstimate();
+    if (context->athlete->PDEstimates_.count() == 0) {
+        context->athlete->PDEstimates_ << PDEstimate();
     }
+
+    // unlock
+    context->athlete->lock.unlock();
+    refreshingEstimates = false;
 
     emit modelProgress(0, 0); // all done
 }

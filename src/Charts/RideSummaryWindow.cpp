@@ -200,7 +200,7 @@ void
 RideSummaryWindow::modelProgress(int year, int month)
 {
     // ignore if not visible!
-    if (!firstload || !amVisible()) return;
+    if (firstload || !amVisible()) return;
 
     QString string;
 
@@ -819,7 +819,7 @@ RideSummaryWindow::htmlSummary()
     }
 
     // get the PDEStimates for this athlete
-    if (context->athlete->PDEstimates.count() == 0) {
+    if (context->athlete->getPDEstimates().count() == 0) {
 
         // ugh .. refresh in background
         WPrimeStringWPK = CPStringWPK = FTPStringWPK = PMaxStringWPK = 
@@ -1533,7 +1533,7 @@ RideSummaryWindow::getPDEstimates()
 {
     bool ping = false;
     // refresh if needed
-    if (context->athlete->PDEstimates.count() == 0) {
+    if (context->athlete->getPDEstimates().count() == 0) {
         ping = true;
         context->athlete->rideCache->refreshCPModelMetrics(); //true = bg ...
     }
@@ -1550,7 +1550,7 @@ RideSummaryWindow::getPDEstimates()
                lowPMax=0, highPMax=0;
 
         // loop through and get ...
-        foreach(PDEstimate est, context->athlete->PDEstimates) {
+        foreach(PDEstimate est, context->athlete->getPDEstimates()) {
 
             // filter is set above
             if (est.wpk != wpk) continue;
