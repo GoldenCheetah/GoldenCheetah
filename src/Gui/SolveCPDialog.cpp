@@ -96,11 +96,11 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
         fromTAU = new QDoubleSpinBox(this); fromTAU->setDecimals(2);
         fromTAU->setMinimum(0);
         fromTAU->setMaximum(5);
-        fromTAU->setValue(0.5);
+        fromTAU->setValue(0.2);
         toTAU = new QDoubleSpinBox(this); toTAU->setDecimals(2);
         toTAU->setMinimum(0);
         toTAU->setMaximum(5);
-        toTAU->setValue(3.0);
+        toTAU->setValue(1.0);
     }
 
 
