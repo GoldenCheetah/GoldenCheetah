@@ -669,9 +669,9 @@ BWebBridge::getLatLons(int i)
     if (rideItem == NULL) return latlons;
 
     // valid highlighted interval ?
-    if (i < 0 || i > rideItem->intervalsSelected().count()) {
+    if (rideItem && i > 0 && rideItem->intervalsSelected().count() >= i) {
 
-        IntervalItem *current = rideItem->intervalsSelected().at(i);
+        IntervalItem *current = rideItem->intervalsSelected().at(i-1);
 
         // so this one is the interval we need.. lets
         // snaffle up the points in this section
