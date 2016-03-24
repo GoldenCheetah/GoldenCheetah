@@ -132,6 +132,7 @@ class RideCache : public QObject
         QVector<RideItem*> rides_, reverse_, delete_;
         RideCacheModel *model_;
         bool exiting;
+        bool refreshingEstimates;
 	    double progress_; // percent
 
         QFuture<void> future;

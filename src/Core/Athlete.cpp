@@ -446,6 +446,20 @@ AthleteDirectoryStructure::upgradedDirectoriesHaveData() {
 
 }
 
+QList<PDEstimate>
+Athlete::getPDEstimates()
+{
+    QList<PDEstimate> returning;
+
+    // access is via mutex because its updated in another thread
+    if (lock.tryLock(100)) {
+        returning = PDEstimates_;
+        lock.unlock();
+    }
+    return returning;
+}
+
+
 // working with withings data
 void 
 Athlete::setWithings(QList<WithingsReading>&x)
@@ -584,7 +598,7 @@ PDEstimate
 Athlete::getPDEstimateFor(QDate date, QString model, bool wpk)
 {
     // whats the estimate for this date
-    foreach(PDEstimate est, PDEstimates) {
+    foreach(PDEstimate est, PDEstimates_) {
         if (est.model == model && est.wpk == wpk && est.from <= date && est.to >= date)
             return est;
     }
