@@ -178,11 +178,34 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
                                 .arg(foreground.name());
             valueLabel->setStyleSheet(sh);
 
-        } else if (series == RealtimeData::Watts && rtData.getLoad() <= 0) {
-
-            // reset if load is zero, we've ended the workout
-            seriesChanged();
         }
+    }
+
+    int minPower, maxPower;
+    rtData.getTrainerPowerRange(minPower,maxPower);
+
+    if (series == RealtimeData::Speed && rtData.mode == ERG && rtData.getLoad() > 0 &&
+            minPower>0 && maxPower>0) {
+        // are we on a trainer with a power speed range?
+        QColor color = GColor(CTRAINPLOTBACKGROUND);
+        QColor foreground = GColor(CSPEED);
+
+        //Determine if the requested load is within the power range of the turbo at
+        //this speed.
+        if (rtData.getLoad() < minPower) { //underpower, i.e. overspeed
+            color = QColor(Qt::red);
+            foreground = QColor(Qt::white);
+        } else if (rtData.getLoad() > maxPower) { //overpower, i.e. underspeed
+            color = QColor(Qt::blue);
+            foreground = QColor(Qt::white);
+        }
+
+        // set color
+        setProperty("color", background);
+        QString sh = QString("QLabel { background: %1; color: %2; }")
+                .arg(color.name())
+                .arg(foreground.name());
+        valueLabel->setStyleSheet(sh);
     }
 
     if( isNewLap &&
@@ -458,10 +481,13 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         if (rtData.mode == ERG || rtData.mode == MRC) {
             value = rtData.getLoad();
             valueLabel->setText(QString("%1").arg(round(value)));
-        } else {
+        } else if (rtData.mode == CRS){
             value = rtData.getSlope();
             valueLabel->setText(QString("%1%").arg(value, 0, 'f', 1));
+        } else if (rtData.mode == LEV){
+            valueLabel->setText(QString("%1").arg(rtData.getLevel()));
         }
+
         break;
 
     case RealtimeData::SmO2:

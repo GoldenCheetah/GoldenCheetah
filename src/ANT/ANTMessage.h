@@ -77,6 +77,11 @@ class ANTMessage {
         static ANTMessage tacxVortexSetCalibrationValue(const uint8_t channel, const uint16_t vortexId, const uint8_t calibrationValue);
         static ANTMessage tacxVortexSetPower(const uint8_t channel, const uint16_t vortexId, const uint16_t power);
 
+        // QUBO digital control messages
+        static ANTMessage quboSetResistance(const uint8_t channel, const uint8_t resistance);
+        static ANTMessage quboSetTargetPower(const uint8_t channel, const uint16_t targetPower);
+        static ANTMessage quboSetGradient(const uint8_t channel, const float gradient);
+
         // fitness equipment control messages
         static ANTMessage fecSetResistance(const uint8_t channel, const uint8_t resistance);
         static ANTMessage fecSetTargetPower(const uint8_t channel, const uint16_t targetPower);
@@ -174,6 +179,10 @@ class ANTMessage {
         double   fecSetWindResistanceAck;    //    0  /   1.86 kg/m
         int8_t   fecSetWindSpeedAck;         // -127  /   +127 km/h
         uint8_t  fecSetDraftingFactorAck;    //    0  /    100 %
+
+        // qubo digital
+        uint16_t quboCadence;
+        double   quboSpeed;
 
         // remote control
         uint8_t  controlSeq;

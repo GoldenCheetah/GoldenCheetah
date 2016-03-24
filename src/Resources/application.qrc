@@ -108,6 +108,8 @@
         <file>images/oxygen/lap.png</file>
         <file>images/oxygen/save.png</file>
         <file>images/oxygen/open.png</file>
+        <file>images/oxygen/go-up.png</file>
+        <file>images/oxygen/go-down.png</file>
         <file>images/toolbar/close-icon.png</file>
         <file>images/toolbar/save.png</file>
         <file>images/toolbar/saveas.png</file>

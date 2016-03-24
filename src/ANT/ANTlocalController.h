@@ -65,6 +65,7 @@ public:
     void setLoad(double);
     void setGradient(double);
     void setMode(int);
+    void setLevel(int);
 
 signals:
     void foundDevice(int channel, int device_number, int device_id); // channelInfo

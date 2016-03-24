@@ -685,7 +685,7 @@ AddPair::initializePage()
 
     // defaults
     static const int index4[4] = { 1,2,3,5 };
-    static const int index8[8] = { 1,2,3,4,5,6,9,0 };
+    static const int index8[8] = { 1,2,3,4,5,6,9,10 };
     const int *index = channels == 4 ? index4 : index8;
 
     // how many devices we got then?
@@ -814,6 +814,11 @@ AddPair::getChannelValues()
                 .arg(dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue(i), 0, 'f', 1) // tHb
                 .arg(dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue2(i), 0, 'f', 1)); // SmO2
 
+            } else if (p->itemData(p->currentIndex()) == ANTChannel::CHANNEL_TYPE_QUBO_DIGITAL) {
+
+                dynamic_cast<QLabel *>(channelWidget->itemWidget(item,2))->setText(QString("%1 %2")
+                 .arg(dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue(i),0,'f',1) //speed
+                .arg((int)dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue2(i))); // cad
             } else {
             dynamic_cast<QLabel *>(channelWidget->itemWidget(item,2))->setText(QString("%1")
                 .arg((int)dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue(i)));

@@ -509,6 +509,21 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 wheelRevolutions =  message[10] + (message[11]<<8);
                 break;
 
+            case ANTChannel::CHANNEL_TYPE_QUBO_DIGITAL:
+                channel=message[3];
+
+                quboSpeed = 0.1f * (message[4] & 0xf)+
+                               1 * (message[4] >> 4)+
+                              10 * (message[5] >> 4)+
+                             100 * (message[5] & 0xf);
+
+                quboCadence = 1 * (message[8] >> 4)+
+                             10 * (message[9] >> 4)+
+                            100 * (message[9] & 0xf);
+
+//              dist = (message[6]<<1) + (message[4]<<7); //distance?
+                break;
+
             case ANTChannel::CHANNEL_TYPE_MOXY:
                 channel = message[3];
                 utcTimeRequired = message[6] & 0x01;
@@ -767,6 +782,8 @@ void ANTMessage::init()
     fecPowerOverLimits = fecState = fecHRSource = 0;
     fecDistanceCapability = fecSpeedIsVirtual = false;
     fecEqtType = 0;
+    quboSpeed = 0;
+    quboCadence = 0.0;
 }
 
 ANTMessage ANTMessage::resetSystem()
@@ -1018,6 +1035,17 @@ ANTMessage ANTMessage::fecSetResistance(const uint8_t channel, const uint8_t res
                       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, resistance);
 }
 
+ANTMessage ANTMessage::quboSetResistance(const uint8_t channel, const uint8_t resistance) // 0-200% -> 0-16
+{
+//    int levelValue = resistance * 16 / 200;
+    int levelValue = resistance;
+    if (levelValue < 1) levelValue = 1;
+    if (levelValue > 16) levelValue = 16;
+
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      0xFF, 0xFF, (uint8_t)levelValue, 0, 0, 0, 0, 1 );
+}
+
 ANTMessage ANTMessage::fecSetTargetPower(const uint8_t channel, const uint16_t targetPower)
 {
     // unit is 0.25W, but targetPower are full watts and theres no trainer with that precision anyway
@@ -1025,6 +1053,15 @@ ANTMessage ANTMessage::fecSetTargetPower(const uint8_t channel, const uint16_t t
     return ANTMessage(9, ANT_ACK_DATA, channel,
                       FITNESS_EQUIPMENT_TARGET_POWER_ID,
                       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, (uint8_t)(powerValue & 0xFF), (uint8_t)(powerValue >> 8));
+}
+
+ANTMessage ANTMessage::quboSetTargetPower(const uint8_t channel, const uint16_t targetPower) // power in 1W
+{
+    uint16_t powerValue = targetPower>990?990:targetPower;
+
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      (uint8_t)(powerValue & 0xFF), (uint8_t)(powerValue >> 8),
+                      0, 0, 0, 0, 0, 1 );
 }
 
 ANTMessage ANTMessage::fecSetWindResistance(const uint8_t channel, const double windResistance, const uint8_t windSpeed, const uint8_t draftingFactor)

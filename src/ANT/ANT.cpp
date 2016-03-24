@@ -69,6 +69,8 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
                 ANT_TACX_VORTEX_FREQUENCY, DEFAULT_NETWORK_NUMBER, "Tacx Vortex Smart", 'v', ":images/IconPower.png" },
   { true, ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT, ANT_SPORT_FITNESS_EQUIPMENT_PERIOD, ANT_SPORT_FITNESS_EQUIPMENT_TYPE,
                 ANT_FITNESS_EQUIPMENT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Fitness Equipment Control (FE-C)", 'f', ":images/IconPower.png" },
+  { true, ANTChannel::CHANNEL_TYPE_QUBO_DIGITAL, ANT_SPORT_QUBO_PERIOD, ANT_SPORT_SandC_TYPE,
+                ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Elite QUBO Digital", 'q', ":images/IconPower.png" },
   { false, ANTChannel::CHANNEL_TYPE_GUARD, 0, 0, 0, 0, "", '\0', "" }
 };
 
@@ -107,6 +109,8 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString athlete) : QThre
     vortexID = vortexChannel = -1;
 
     fecChannel = -1;
+
+    quboChannel = -1;
 
     // current and desired modes/load/gradients
     // set so first time through current != desired
@@ -184,12 +188,17 @@ void ANT::setBaud(int x)
 
 bool ANT::modeERGO(void) const
 {
-    return mode==RT_MODE_ERGO; 
+    return mode==RT_MODE_ERGO;
 }
 
 bool ANT::modeSLOPE(void) const
 {
     return mode==RT_MODE_SLOPE;
+}
+
+bool ANT::modeLevel(void) const
+{
+    return mode==RT_MODE_LEVEL;
 }
 
 double ANT::channelValue2(int channel)
@@ -297,6 +306,41 @@ ANT::setLoad(double load)
     {
         sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
     }
+
+    // if we have a qubo digital trainer set the target power
+    if (quboChannel != -1)
+    {
+        sendMessage(ANTMessage::quboSetTargetPower(quboChannel, (int)load));
+    }
+}
+
+void ANT::setLevel(int level)
+{
+    if (this->level == level) return;
+    this->level = level;
+
+    if ((fecChannel != -1) && (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_RESIST_MODE_CAPABILITY))
+    {
+        //convert 0-16 to 0-200 - TODO retrieve bounds for each
+        int feclevel = level*200/16;
+        sendMessage(ANTMessage::fecSetResistance(fecChannel, (int)feclevel));
+    }
+
+    if (quboChannel != -1)
+    {
+        // 0-16
+        sendMessage(ANTMessage::quboSetResistance(quboChannel, (int)level));
+    }
+}
+
+int ANT::getLevel() const
+{
+    return level;
+}
+
+double ANT::getLoad() const
+{
+    return load;
 }
 
 void ANT::refreshFecLoad()
@@ -317,6 +361,15 @@ void ANT::refreshFecGradient()
         sendMessage(ANTMessage::fecSetTrackResistance(fecChannel, gradient, currentRollingResistance));
 }
 
+void ANT::refreshFecLevel()
+{
+    if (fecChannel == -1)
+        return;
+
+    if (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_RESIST_MODE_CAPABILITY)
+        sendMessage(ANTMessage::fecSetResistance(fecChannel, level));
+}
+
 void ANT::requestFecCapabilities()
 {
     if (fecChannel == -1)
@@ -331,6 +384,41 @@ void ANT::refreshVortexLoad()
         return;
 
     sendMessage(ANTMessage::tacxVortexSetPower(vortexChannel, vortexID, (int)load));
+}
+
+void ANT::refreshQuboLoad()
+{
+    if (quboChannel == -1)
+        return;
+
+    sendMessage(ANTMessage::quboSetTargetPower(quboChannel, (int)load));
+}
+
+void ANT::refreshQuboLevel()
+{
+    if (quboChannel == -1)
+        return;
+
+    sendMessage(ANTMessage::quboSetResistance(quboChannel, (int)level));
+}
+
+// Would this work better using qubo levels rather than target power?
+void ANT::refreshQuboGradient()
+{
+    if (quboChannel == -1)
+        return;
+
+    double speed = telemetry.getSpeed();
+    double weight = appsettings->cvalue(trainAthlete, GC_WEIGHT, 0.0).toDouble();
+
+    // Calculate target power from slope, weight and speed
+    load = 0.00145*pow(speed,3)+0.127*pow(speed,2)+speed*(-0.37+gradient*(0.027*weight));
+    telemetry.setLoad(load); //push load back up
+
+    if (load < 0) load=0;
+    if (load > 990) load=990;
+
+    sendMessage(ANTMessage::quboSetTargetPower(quboChannel, (int)load));
 }
 
 void
@@ -353,6 +441,10 @@ ANT::setGradient(double gradient)
         // TODO : obtain acknowledge / confirm value using fecRequestCommandStatus
         // TODO : if trainer does not have simulation capabilities, use power mode & let GC calculate
         //        the desired load based on gradient, wind, rolling resistance...
+    }
+
+    if (quboChannel != -1) {
+        refreshQuboGradient();
     }
 }
 
@@ -482,6 +574,7 @@ ANT::setup()
                 addDevice(0, ANTChannel::CHANNEL_TYPE_SandC, 4);
                 addDevice(0, ANTChannel::CHANNEL_TYPE_MOXY, 5);
                 addDevice(0, ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT, 6);
+                addDevice(0, ANTChannel::CHANNEL_TYPE_QUBO_DIGITAL, 7);
             }
         }
     }
@@ -586,6 +679,7 @@ ANT::getRealtimeData(RealtimeData &rtData)
     rtData.mode = mode;
     rtData.setLoad(load);
     rtData.setSlope(gradient);
+    rtData.setLevel(level);
 }
 
 /*======================================================================
@@ -1288,6 +1382,11 @@ void ANT::setVortexData(int channel, int id)
 void ANT::setFecChannel(int channel)
 {
     fecChannel = channel;
+}
+
+void ANT::setQuboChannel(int channel)
+{
+    quboChannel = channel;
 }
 
 void ANT::setControlChannel(int channel)

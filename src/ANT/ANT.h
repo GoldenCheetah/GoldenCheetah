@@ -242,6 +242,7 @@ struct setChannelAtom {
 #define ANT_SPORT_FITNESS_EQUIPMENT_PERIOD 8192
 #define ANT_FAST_QUARQ_PERIOD (8182/16)
 #define ANT_QUARQ_PERIOD (8182*4)
+#define ANT_SPORT_QUBO_PERIOD 16172
 
 #define ANT_SPORT_HR_TYPE 0x78
 #define ANT_SPORT_POWER_TYPE 11
@@ -440,8 +441,11 @@ public slots:
     // kickr command loading - only ANT device we know about to do this so not generic
     void setLoad(double);
     void setGradient(double);
+    void setLevel(int);
     void setMode(int);
     void kickrCommand();
+    int getLevel() const;
+    double getLoad() const;
 
 public:
 
@@ -484,6 +488,7 @@ public:
 
     bool modeERGO(void) const;
     bool modeSLOPE(void) const;
+    bool modeLevel(void) const;
 
     // channels update our telemetry
     double channelValue(int channel);
@@ -540,7 +545,13 @@ public:
     void setFecChannel(int channel);
     void refreshFecLoad();
     void refreshFecGradient();
+    void refreshFecLevel();
     void requestFecCapabilities();
+
+    void setQuboChannel(int channel);
+    void refreshQuboLoad();
+    void refreshQuboLevel();
+    void refreshQuboGradient();
 
     void setVortexData(int channel, int id);
     void refreshVortexLoad();
@@ -553,6 +564,7 @@ public:
     void setTrainerBrakeFault(bool status) { telemetry.setTrainerBrakeFault(status); }
     void setTrainerReady(bool status) { telemetry.setTrainerReady(status); }
     void setTrainerRunning(bool status) { telemetry.setTrainerRunning(status); }
+    void setTrainerPowerRange(int min, int max) { telemetry.setTrainerPowerRange(min,max);}
 
 private:
 
@@ -607,6 +619,7 @@ private:
     double currentGradient, gradient;
     double currentRollingResistance, rollingResistance;
     int currentMode, mode;
+    int currentLevel, level;
 
     // now kickr specific
     int kickrDeviceID;
@@ -618,6 +631,9 @@ private:
     // tacx vortex (we'll probably want to abstract this out cf. kickr)
     int vortexID;
     int vortexChannel;
+
+    // Qubo digital data
+    int quboChannel;
 
     // remote control data
     int controlChannel;
