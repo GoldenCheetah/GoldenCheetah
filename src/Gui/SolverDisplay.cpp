@@ -90,8 +90,8 @@ SolverDisplay::paintEvent(QPaintEvent *)
         case 1:  { bcolor = QColor(0xba,0xe4,0xb3); size = 2; } break;
         case 2:  { bcolor = QColor(0x74,0xc4,0x76); size = 3; } break;
         case 3:  {
-                    if (p.t < 80) bcolor=QColor(255,0,0); // diff low
-                    else if (p.t < 150) bcolor = QColor(0x23,0x8b,0x45); // diff mid
+                    if (p.t < 40) bcolor=QColor(255,0,0); // diff low
+                    else if (p.t < 60) bcolor = QColor(0x23,0x8b,0x45); // diff mid
                     else if (p.t < 300) bcolor = QColor(0,0,255); // diff high
                     else if (p.t < 433)  bcolor=QColor(255,0,0); // integral low
                     else if (p.t < 566) bcolor = QColor(0x23,0x8b,0x45); // integral mid
