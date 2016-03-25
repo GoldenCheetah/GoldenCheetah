@@ -124,6 +124,7 @@ class RideMapWindow : public GcChartWindow
 
     public:
         typedef enum {
+            OSM,
             GOOGLE,
             BING,
         } MapType;
