@@ -27,7 +27,7 @@ SolverDisplay::SolverDisplay(QWidget *parent, Context *context) : QWidget(parent
 void
 SolverDisplay::addPoint(SolverPoint p)
 {
-    if (p.z > 100) points[0] << p;
+    if (p.z > 100) ;//points[0] << p; // disabled since we don't plot
     else if (p.z > 50) points[1] << p;
     else if (p.z > 5) points[2] << p;
     else if (p.z > 1)  points[3] << p;

@@ -262,3 +262,107 @@ CPSolver::stop()
 {
     halt = true;
 }
+
+// Metric of best 'R' for first exhaustion point in a ride
+// if there are no exhaustion points we set to NA
+
+class BestR : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(BestR);
+
+    public:
+
+    BestR()
+    {
+        setSymbol("cpsolver_best_r");
+        setInternalName("Exhaustion Best R");
+    }
+    void initialize() {
+        setName(tr("Exhaustion Best R"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("R"));
+        setImperialUnits(tr("R"));
+        setPrecision(2);
+        setDescription(tr("Best value for R in differential model for exhaustion point."));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+        // does it even have an exhaustion point?
+        double returning = RideFile::NA;
+
+        // don't do for intervals or null rides or rides with not exhaustion points!
+        if (spec.interval() == NULL && item && item->ride() && item->ride()->referencePoints().count()) {
+
+            // find first and compute for it
+            foreach(RideFilePoint *p, item->ride()->referencePoints()) {
+
+                if (p->secs) {
+
+                    double CP = 250;
+                    double W = 20000;
+
+                    // set from the ride
+                    if (item->context->athlete->zones(item->isRun)) {
+                        int zoneRange = item->context->athlete->zones(item->isRun)->whichRange(item->dateTime.date());
+                        CP = zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getCP(zoneRange) : 0;
+                        W = zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getWprime(zoneRange) : 0;
+
+                        // did we override CP in metadata / metrics ?
+                        int oCP = item->getText("CP","0").toInt();
+                        if (oCP) CP=oCP;
+                        int oW = item->getText("W'","0").toInt();
+                        if (oW) W=oW;
+                    }
+
+                    double bestR=0;
+                    double bestW=0;
+                    bool first=true;
+
+                    // set to 1s recording
+                    RideFile *f = item->ride()->resample(1,0);
+
+                    for(double r=0.2; r<0.9; r += 0.001) {
+
+                        double wpbal=W;
+
+                        // loop through and count
+                        RideFileIterator it(item->ride(), spec);
+                        while (it.hasNext()) {
+                            struct RideFilePoint *point = it.next();
+
+                            // iterate for this point
+                            wpbal  += point->watts < CP ? (r * (W - wpbal)/W * (CP - point->watts)) : (CP-point->watts);
+                            if (point->secs > p->secs) break;
+                        }
+                        if (first || fabs(wpbal-double(500.0f))<bestW) {
+                            first = false;
+                            bestR = r;
+                            bestW = fabs(wpbal-500.0f);
+                        }
+                    }
+
+                    // set it and we're done
+                    delete f;
+
+                    // if not really in the ball park ignore
+                    if (bestW < 2000) setValue(bestR);
+                    else setValue(RideFile::NIL);
+
+                    return;
+                }
+            }
+        }
+        setValue(returning);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const {
+        return ride->present.contains("P");
+    }
+    RideMetric *clone() const { return new BestR(*this); }
+};
+
+static bool addMetrics() {
+    RideMetricFactory::instance().addMetric(BestR());
+    return true;
+}
+
+static bool added = addMetrics();
