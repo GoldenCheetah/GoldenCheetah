@@ -61,6 +61,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     // map choice
     mapCombo= new QComboBox(this);
+    mapCombo->addItem(tr("OpenStreetMap"));
     mapCombo->addItem(tr("Google"));
     mapCombo->addItem(tr("Bing"));
 
@@ -260,7 +261,7 @@ void RideMapWindow::createHtml()
     "   #map-canvas { height: 100% }\n"
     "</style>\n");
 
-    if (mapCombo->currentIndex() == GOOGLE) {
+    if (mapCombo->currentIndex() == GOOGLE || mapCombo->currentIndex() == OSM) {
         // Load Google Map v3 API
         currentPage += QString("<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=AIzaSyASrk4JoJOzESQguDwjk8aq9nQXsrUUskM\"></script> \n");
     } else if (mapCombo->currentIndex() == BING) {
@@ -315,7 +316,7 @@ void RideMapWindow::createHtml()
     "}\n"
     "\n");
 
-    if (mapCombo->currentIndex() == GOOGLE) {
+    if (mapCombo->currentIndex() == GOOGLE || mapCombo->currentIndex() == OSM){
         currentPage += QString("function drawRouteForLatLons(latlons) {\n"
             // route will be drawn with these options
             "    var routeOptionsYellow = {\n"
@@ -397,7 +398,7 @@ void RideMapWindow::createHtml()
     "   }\n"
     "}\n");
 
-    if (mapCombo->currentIndex() == GOOGLE) {
+    if (mapCombo->currentIndex() == GOOGLE || mapCombo->currentIndex() == OSM) {
         currentPage += QString("function drawInterval(latlons) { \n"
             // intervals will be drawn with these options
             "   var polyOptions = {\n"
@@ -418,30 +419,79 @@ void RideMapWindow::createHtml()
             "}\n"
 
             // initialise function called when map loaded
-            "function initialize() {\n"
+            "function initialize() {\n");
 
-            // TERRAIN style map please and make it draggable
-            // note that because QT webkit offers touch/gesture
-            // support the Google API only supports dragging
-            // via gestures - this is alrady registered as a bug
-            // with the google map team
-            "    var controlOptions = {\n"
-            "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
-            "    };\n"
-            "    var myOptions = {\n"
-            "      draggable: true,\n"
-            "      mapTypeId: google.maps.MapTypeId.TERRAIN,\n"
-            "      tilt: 45,\n"
-            "      streetViewControl: false,\n"
-            "    };\n"
+        if (mapCombo->currentIndex() == GOOGLE) {
+            currentPage += QString(""
+                // TERRAIN style map please and make it draggable
+                // note that because QT webkit offers touch/gesture
+                // support the Google API only supports dragging
+                // via gestures - this is alrady registered as a bug
+                // with the google map team
+                "    var controlOptions = {\n"
+                "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
+                "    };\n"
+                "    var myOptions = {\n"
+                "      draggable: true,\n"
+                "      mapTypeId: google.maps.MapTypeId.TERRAIN,\n"
+                "      tilt: 45,\n"
+                "      streetViewControl: false,\n"
+                "    };\n");
+        } else if (mapCombo->currentIndex() == OSM) {
+            currentPage += QString(""
+                // TERRAIN style map please and make it draggable
+                // note that because QT webkit offers touch/gesture
+                // support the Google API only supports dragging
+                // via gestures - this is alrady registered as a bug
+                // with the google map team
+                "    var controlOptions = {\n"
+                "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
+                "    };\n"
+                "    var myOptions = {\n"
+                "      draggable: true,\n"
+                "      mapTypeId: \"OSM\",\n"
+                "      mapTypeControl: false,\n"
+                "      streetViewControl: false,\n"
+                "      tilt: 45,\n"
+                "    };\n");
+        }
 
-            // setup the map, and fit to contain the limits of the route
-            "    map = new google.maps.Map(document.getElementById('map-canvas'), myOptions);\n"
-            "    var sw = new google.maps.LatLng(%1,%2);\n"  // .ARG 1, 2
-            "    var ne = new google.maps.LatLng(%3,%4);\n"  // .ARG 3, 4
-            "    var bounds = new google.maps.LatLngBounds(sw,ne);\n"
-            "    map.fitBounds(bounds);\n"
+        currentPage += QString(""
+           // setup the map, and fit to contain the limits of the route
+           "    map = new google.maps.Map(document.getElementById('map-canvas'), myOptions);\n"
+           "    var sw = new google.maps.LatLng(%1,%2);\n"  // .ARG 1, 2
+           "    var ne = new google.maps.LatLng(%3,%4);\n"  // .ARG 3, 4
+           "    var bounds = new google.maps.LatLngBounds(sw,ne);\n"
+           "    map.fitBounds(bounds);\n").arg(minLat,0,'g',GPS_COORD_TO_STRING).
+                arg(minLon,0,'g',GPS_COORD_TO_STRING).
+                arg(maxLat,0,'g',GPS_COORD_TO_STRING).
+                arg(maxLon,0,'g',GPS_COORD_TO_STRING);
 
+
+        if (mapCombo->currentIndex() == OSM) {
+            currentPage += QString(""
+                "    map.mapTypes.set(\"OSM\", new google.maps.ImageMapType({\n"
+                "    getTileUrl: function(coord, zoom) {\n"
+                // "Wrap" x (logitude) at 180th meridian properly
+                // NB: Don't touch coord.x because coord param is by reference, and changing its x property breakes something in Google's lib
+                "    var tilesPerGlobe = 1 << zoom; \n"
+                "    var x = coord.x % tilesPerGlobe; \n"
+                "       if (x < 0) { \n"
+                "           x = tilesPerGlobe+x; \n"
+                "       } \n"
+                        // Wrap y (latitude) in a like manner if you want to enable vertical infinite scroll
+
+                "       return \"http://tile.openstreetmap.org/\" + zoom + \"/\" + x + \"/\" + coord.y + \".png\"; \n"
+                "    }, \n"
+                "    tileSize: new google.maps.Size(256, 256), \n"
+                "    name: \"OpenStreetMap\", \n"
+                "    maxZoom: 18 \n"
+                "    }));\n");
+        }
+
+
+
+        currentPage += QString(""
             // add the bike layer, useful in some areas, but coverage
             // is limited, US gets best coverage at this point (Summer 2011)
             "    var bikeLayer = new google.maps.BicyclingLayer();\n"
@@ -469,10 +519,8 @@ void RideMapWindow::createHtml()
 
 
             "}\n"
-            "</script>\n").arg(minLat,0,'g',GPS_COORD_TO_STRING).
-                    arg(minLon,0,'g',GPS_COORD_TO_STRING).
-                    arg(maxLat,0,'g',GPS_COORD_TO_STRING).
-                    arg(maxLon,0,'g',GPS_COORD_TO_STRING);
+            "</script>\n");
+
         // the main page is rather trivial
         currentPage += QString("</head>\n"
 
@@ -573,7 +621,7 @@ RideMapWindow::drawShadedRoute()
     QString code;
 
     foreach(RideFilePoint *rfp, myRideItem->ride()->dataPoints()) {
-        if (mapCombo->currentIndex() == GOOGLE) {
+        if (mapCombo->currentIndex() == GOOGLE || mapCombo->currentIndex() == OSM) {
             if (count == 0) {
                 code = QString("{\nvar polyline = new google.maps.Polyline();\n"
                        "   polyline.setMap(map);\n"
@@ -611,7 +659,7 @@ RideMapWindow::drawShadedRoute()
             // add tooltip junk
             count = rwatts = rtime = 0;
 
-            if (mapCombo->currentIndex() == GOOGLE) {
+            if (mapCombo->currentIndex() == GOOGLE || mapCombo->currentIndex() == OSM) {
                 // color the polyline
                 code += QString("var polyOptions = {\n"
                                 "    strokeColor: '%1',\n"
@@ -745,7 +793,7 @@ RideMapWindow::createMarkers()
                                 points[points.count()-1]->lon) < 100 ? true : false;
 
     if (loop) {
-        if (mapCombo->currentIndex() == GOOGLE) {
+        if (mapCombo->currentIndex() == GOOGLE || mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new google.maps.LatLng(%1,%2);"
                        "var image = new google.maps.MarkerImage('qrc:images/maps/loop.png');"
                        "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
@@ -764,7 +812,7 @@ RideMapWindow::createMarkers()
     #endif
     } else {
         // start / finish markers
-        if (mapCombo->currentIndex() == GOOGLE) {
+        if (mapCombo->currentIndex() == GOOGLE || mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new google.maps.LatLng(%1,%2);"
                        "var image = new google.maps.MarkerImage('qrc:images/maps/cycling.png');"
                        "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
@@ -782,7 +830,7 @@ RideMapWindow::createMarkers()
         view->page()->mainFrame()->evaluateJavaScript(code);
     #endif
 
-        if (mapCombo->currentIndex() == GOOGLE) {
+        if (mapCombo->currentIndex() == GOOGLE || mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new google.maps.LatLng(%1,%2);"
                        "var image = new google.maps.MarkerImage('qrc:images/maps/finish.png');"
                        "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
@@ -839,7 +887,7 @@ RideMapWindow::createMarkers()
                 lastlat = stoplat;
                 lastlon = stoplon;
 
-                if (mapCombo->currentIndex() == GOOGLE) {
+                if (mapCombo->currentIndex() == GOOGLE || mapCombo->currentIndex() == OSM) {
                     code = QString(
                         "{ var latlng = new google.maps.LatLng(%1,%2);"
                         "var image = new google.maps.MarkerImage('qrc:images/maps/cycling_feed.png');"
@@ -876,7 +924,7 @@ RideMapWindow::createMarkers()
 
         int offset = myRideItem->ride()->intervalBeginSecs(x->start);
 
-        if (mapCombo->currentIndex() == GOOGLE) {
+        if (mapCombo->currentIndex() == GOOGLE || mapCombo->currentIndex() == OSM) {
             code = QString(
                 "{"
                 "   var latlng = new google.maps.LatLng(%1,%2);"
@@ -951,7 +999,7 @@ void RideMapWindow::zoomInterval(IntervalItem *which)
     // now zoom to interval
     QString code;
 
-    if (mapCombo->currentIndex() == GOOGLE) {
+    if (mapCombo->currentIndex() == GOOGLE || mapCombo->currentIndex() == OSM) {
         code= QString("{ var southwest = new google.maps.LatLng(%1, %2);\n"
                                "var northeast = new google.maps.LatLng(%3, %4);\n"
                                "var bounds = new google.maps.LatLngBounds(southwest, northeast);\n"
