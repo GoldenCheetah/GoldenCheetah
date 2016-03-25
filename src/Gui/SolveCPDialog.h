@@ -68,7 +68,7 @@ class SolveCPDialog : public QDialog
         // visualise
         SolverDisplay *solverDisplay; // need to create a custom widget for this
 
-        QPushButton *solve, *close;
+        QPushButton *solve, *clear, *close;
 
         Context *context;
         QList<RideItem*> items;
@@ -83,6 +83,7 @@ class SolveCPDialog : public QDialog
         void selectAll();
         void solveClicked();
         void closeClicked();
+        void clearClicked();
 
     private:
         CPSolver *solver;
