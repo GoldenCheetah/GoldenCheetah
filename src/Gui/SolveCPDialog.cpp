@@ -205,6 +205,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
 
     solve = new QPushButton(tr("Solve"));
     close = new QPushButton(tr("Close"));
+    clear = new QPushButton(tr("Clear"));
 
     //
     // Layout the widget
@@ -282,6 +283,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     // buttons
     buttonLayout->addStretch();
     buttonLayout->addWidget(solve);
+    buttonLayout->addWidget(clear);
     buttonLayout->addWidget(close);
 
     //
@@ -290,6 +292,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
     connect(selectCheckBox, SIGNAL(stateChanged(int)), this, SLOT(selectAll()));
     connect(solve, SIGNAL(clicked()), this, SLOT(solveClicked()));
     connect(close, SIGNAL(clicked()), this, SLOT(closeClicked()));
+    connect(clear, SIGNAL(clicked()), this, SLOT(clearClicked()));
     connect(solver, SIGNAL(current(int,WBParms,double)), this, SLOT(current(int,WBParms,double)));
     connect(solver, SIGNAL(newBest(int,WBParms,double)), this, SLOT(newBest(int,WBParms,double)));
 
@@ -469,7 +472,6 @@ SolveCPDialog::solveClicked()
 
         // reset and reinitialise before kicking off
         solver->reset();
-        solverDisplay->reset();
 
         double factor = integral ? 1 : 100;
         CPSolverConstraints constraints (fromCP->value(), toCP->value(), fromW->value(), toW->value(),
@@ -487,10 +489,17 @@ SolveCPDialog::solveClicked()
 }
 
 void
+SolveCPDialog::clearClicked()
+{
+    solver->reset();
+    solverDisplay->reset();
+    solverDisplay->repaint();
+}
+
+void
 SolveCPDialog::closeClicked()
 {
     end();
     QApplication::processEvents();
     accept();
 }
-

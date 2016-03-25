@@ -20,7 +20,7 @@
 
 SolverDisplay::SolverDisplay(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
-    points.resize(4);
+    points.resize(5);
     count=0;
 }
 
@@ -28,9 +28,10 @@ void
 SolverDisplay::addPoint(SolverPoint p)
 {
     if (p.z > 100) points[0] << p;
-    else if (p.z > 15) points[1] << p;
-    else if (p.z > 5)  points[2] << p;
-    else  points[3] << p;
+    else if (p.z > 50) points[1] << p;
+    else if (p.z > 5) points[2] << p;
+    else if (p.z > 1)  points[3] << p;
+    else  points[4] << p;
 
     if (count++%1000 == 0) {
         //qDebug()<<"HQS="<<points[3].count();
@@ -41,7 +42,7 @@ SolverDisplay::addPoint(SolverPoint p)
 void
 SolverDisplay::reset()
 {
-    for(int i=0; i<4; i++) points[i].clear();
+    for(int i=0; i<5; i++) points[i].clear();
     count=0;
     repaint();
 }
@@ -76,7 +77,7 @@ SolverDisplay::paintEvent(QPaintEvent *)
 
     double my=0;
     double sy=50000;
-    for (int i=1; i<4; i++) {
+    for (int i=1; i<5; i++) {
     foreach(SolverPoint p, points[i]) {
 
         double px = (p.x - constraints.cpf) * xratio;
@@ -87,9 +88,10 @@ SolverDisplay::paintEvent(QPaintEvent *)
         switch(i) {
         default:
         case 0:  { bcolor = QColor(0xed,0xf8,0xe9); size = 1; } break;
-        case 1:  { bcolor = QColor(0xba,0xe4,0xb3); size = 2; } break;
-        case 2:  { bcolor = QColor(0x74,0xc4,0x76); size = 3; } break;
-        case 3:  {
+        case 1:  { bcolor = QColor(0xed,0xf8,0xe9); size = 1; } break;
+        case 2:  { bcolor = QColor(0xba,0xe4,0xb3); size = 2; } break;
+        case 3:  { bcolor = QColor(0x74,0xc4,0x76); size = 2; } break;
+        case 4:  {
                     if (p.t < 40) bcolor=QColor(255,0,0); // diff low
                     else if (p.t < 60) bcolor = QColor(0x23,0x8b,0x45); // diff mid
                     else if (p.t < 300) bcolor = QColor(0,0,255); // diff high
@@ -97,7 +99,7 @@ SolverDisplay::paintEvent(QPaintEvent *)
                     else if (p.t < 566) bcolor = QColor(0x23,0x8b,0x45); // integral mid
                     else if (p.t <= 700) bcolor = QColor(0,0,255); // integral high
 
-                    size=5;
+                    size=3;
                  }
                  break;
         }
