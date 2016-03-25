@@ -134,8 +134,9 @@
 // 124 03  Dec 2015 Mark Liversedge    Min Temp
 // 125 08  Dec 2015 Ale Martinez       Support metrics in Calendar Text
 // 126 08  Mar 2016 Mark Liversedge    Added count of To Exhaustions
+// 127 25  Mar 2016 Mark Liversedge    Best R metric for Exhaustion Points
 
-int DBSchemaVersion = 126;
+int DBSchemaVersion = 127;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
