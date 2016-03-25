@@ -39,7 +39,7 @@ class TestModel // : public PDModel
         TestModel()  :
             version(""),
             paa(0), paa_dec(0), ecp(0), etau(0), ecp_del(0), tau_del(0), ecp_dec(0), ecp_dec_del(0),
-            pMax(0), mmp60(0), paa_pow(1) {}
+            paa_pow(1), pMax(0), mmp60(0) {}
 
         QString version;
 
