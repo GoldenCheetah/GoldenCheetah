@@ -3798,6 +3798,25 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
             }
         }//end foreach season
     }
+
+    // Add marker for today when the date range goes to the future
+    QDate today = QDate::currentDate();
+    if (today > from && today < to) {
+        QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
+        markers.append(mrk);
+        mrk->attach(this);
+        mrk->setLineStyle(QwtIndPlotMarker::VLine);
+        mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+        mrk->setLinePen(QPen(color, 0, Qt::DotLine));
+        mrk->setValue(double(groupForDate(today, groupby)) - baseday,0);
+        if (first) {
+            QwtText text(tr("Today"));
+            text.setFont(QFont("Helvetica", 10, QFont::Bold));
+            text.setColor(Qt::red);
+            mrk->setLabel(text);
+        }
+    }
+
     return;
 }
 
