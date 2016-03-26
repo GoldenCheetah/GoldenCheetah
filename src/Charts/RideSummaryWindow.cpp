@@ -220,10 +220,10 @@ RideSummaryWindow::modelProgress(int year, int month)
 
 #ifdef NOWEBKIT
     rideSummary->page()->runJavaScript(
-        QString("var div = document.getElementById(\"modhead\"); div.innerHTML = '%1'; ").arg(string));;
+        QString("var div = document.getElementById(\"modhead\"); if (div != null) div.innerHTML = '%1'; ").arg(string));;
 #else
     rideSummary->page()->mainFrame()->evaluateJavaScript(
-        QString("var div = document.getElementById(\"modhead\"); div.innerHTML = '%1'; ").arg(string));;
+        QString("var div = document.getElementById(\"modhead\"); if (div != null) div.innerHTML = '%1'; ").arg(string));;
 #endif
 }
 
