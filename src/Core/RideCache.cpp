@@ -308,7 +308,7 @@ RideCache::removeCurrentRide()
     // delete the file by renaming it
     QString strOldFileName = context->ride->fileName;
 
-    QFile file(directory.canonicalPath() + "/" + strOldFileName);
+    QFile file((context->ride->planned ? plannedDirectory : directory).canonicalPath() + "/" + strOldFileName);
     // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
     QString strNewName = strOldFileName + ".bak";
 
