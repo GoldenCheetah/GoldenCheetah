@@ -92,15 +92,15 @@ win32 {
 
     #QWT is configured to build 2 libs (release/debug) on win32 (see qwtbuild.pri)
     CONFIG(release, debug|release){
-    LIBS += -L../qwt/lib -lqwt
+    LIBS += -L$${PWD}/../qwt/lib -lqwt
     }
     CONFIG(debug, debug|release) {
-    LIBS += -L../qwt/lib -lqwtd
+    LIBS += -L$${PWD}/../qwt/lib -lqwtd
     }
 
 } else {
     #QWT is configured to build 1 lib for all other OS (see qwtbuild.pri)
-    LIBS += -L../qwt/lib -lqwt
+    LIBS += -L$${PWD}/../qwt/lib -lqwt
 }
 
 # compress and math libs must be defined in gcconfig.pri
@@ -192,7 +192,7 @@ isEmpty(QMAKE_LRELEASE) {
 }
 
 # how to run lrelease
-isEmpty(TS_DIR):TS_DIR = Resources/translations
+isEmpty(TS_DIR):TS_DIR = $${PWD}/Resources/translations
 TSQM.name = lrelease ${QMAKE_FILE_IN}
 TSQM.input = TRANSLATIONS
 TSQM.output = $$TS_DIR/${QMAKE_FILE_BASE}.qm
@@ -205,7 +205,7 @@ QMAKE_EXTRA_COMPILERS += TSQM
 ### RESOURCES
 ###==========
 
-RESOURCES = Resources/application.qrc Resources/RideWindow.qrc
+RESOURCES = $${PWD}/Resources/application.qrc $${PWD}/Resources/RideWindow.qrc
 
 
 
@@ -227,8 +227,8 @@ unix:!macx {
     # build from version in repo for Linux builds since
     # kqoauth is not packaged for the Debian and this makes
     # life much easier for the package maintainer
-    INCLUDEPATH += ../kqoauth
-    LIBS        += ../kqoauth/libkqoauth.a
+    INCLUDEPATH += $${PWD}/../kqoauth
+    LIBS        += $${PWD}/../kqoauth/libkqoauth.a
     DEFINES     += GC_HAVE_KQOAUTH
 
 } else {

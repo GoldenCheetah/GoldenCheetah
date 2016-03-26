@@ -19,7 +19,7 @@ QWT_OUT_ROOT = $${OUT_PWD}/..
 TEMPLATE          = lib
 TARGET            = $$qwtLibraryTarget(qwt)
 
-DESTDIR           = $${QWT_OUT_ROOT}/lib
+DESTDIR           = $${PWD}/../lib
 
 contains(QWT_CONFIG, QwtDll) {
 
