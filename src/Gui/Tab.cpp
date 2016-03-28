@@ -92,7 +92,16 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
     connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
 
     // selects the latest ride in the list:
-    if (context->athlete->rideCache->rides().count() != 0) 
+    // first skipping those in the future
+    QDateTime now = QDateTime::currentDateTime();
+    for (int i=context->athlete->rideCache->rides().count(); i>0; --i) {
+        if (context->athlete->rideCache->rides()[i-1]->dateTime <= now) {
+            context->athlete->selectRideFile(context->athlete->rideCache->rides()[i-1]->fileName);
+            break;
+        }
+    }
+    // otherwise just the latest
+    if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) 
         context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
 }
 
