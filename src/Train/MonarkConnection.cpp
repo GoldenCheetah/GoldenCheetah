@@ -25,10 +25,16 @@ MonarkConnection::MonarkConnection() :
     m_serial(0),
     m_pollInterval(1000),
     m_timer(0),
-    m_canControlPower(false),
     m_load(0),
     m_loadToWrite(0),
-    m_shouldWriteLoad(false)
+    m_kp(0),
+    m_kpToWrite(0),
+    m_shouldWriteLoad(false),
+    m_shouldWriteKp(false),
+    m_type(MONARK_UNKNOWN),
+    m_power(0),
+    m_cadence(0),
+    m_pulse(0)
 {
 }
 
@@ -130,7 +136,7 @@ void MonarkConnection::requestAll()
     requestPulse();
     requestCadence();
 
-    if ((m_loadToWrite != m_load) && m_canControlPower)
+    if ((m_loadToWrite != m_load) && canDoLoad())
     {
         QString cmd = QString("power %1\r").arg(m_loadToWrite);
         m_serial->write(cmd.toStdString().c_str());
@@ -140,6 +146,19 @@ void MonarkConnection::requestAll()
             this->exit(-1);
         }
         m_load = m_loadToWrite;
+        QByteArray data = m_serial->readAll();
+    }
+
+    if ((m_kpToWrite != m_kp) && canDoKp())
+    {
+        QString cmd = QString("kp %1\r").arg(QString::number(m_kpToWrite, 'f', 1 ));
+        m_serial->write(cmd.toStdString().c_str());
+        if (!m_serial->waitForBytesWritten(500))
+        {
+            // failure to write to device, bail out
+            this->exit(-1);
+        }
+        m_kp = m_kpToWrite;
         QByteArray data = m_serial->readAll();
     }
 
@@ -155,8 +174,10 @@ void MonarkConnection::requestPower()
         this->exit(-1);
     }
     QByteArray data = readAnswer(500);
-    quint32 p = data.toInt();
-    emit power(p);
+    m_readMutex.lock();
+    m_power = data.toInt();
+    m_readMutex.unlock();
+    emit power(m_power);
 }
 
 void MonarkConnection::requestPulse()
@@ -168,8 +189,10 @@ void MonarkConnection::requestPulse()
         this->exit(-1);
     }
     QByteArray data = readAnswer(500);
-    quint32 p = data.toInt();
-    emit pulse(p);
+    m_readMutex.lock();
+    m_pulse = data.toInt();
+    m_readMutex.unlock();
+    emit pulse(m_pulse);
 }
 
 void MonarkConnection::requestCadence()
@@ -181,8 +204,24 @@ void MonarkConnection::requestCadence()
         this->exit(-1);
     }
     QByteArray data = readAnswer(500);
-    quint32 c = data.toInt();
-    emit cadence(c);
+    m_readMutex.lock();
+    m_cadence = data.toInt();
+    m_readMutex.unlock();
+    emit cadence(m_cadence);
+}
+
+int MonarkConnection::readConfiguredLoad()
+{
+    m_serial->write("B\r");
+    if (!m_serial->waitForBytesWritten(500))
+    {
+        // failure to write to device, bail out
+        this->exit(-1);
+    }
+    QByteArray data = readAnswer(500);
+    data.remove(0,1);
+    qDebug() << "Current configure load: " << data.toInt();
+    return data.toInt();
 }
 
 void MonarkConnection::identifyModel()
@@ -216,10 +255,10 @@ void MonarkConnection::identifyModel()
 
     if (m_id.toLower().startsWith("lc"))
     {
-        m_canControlPower = true;
+        m_type = MONARK_LC;
         setLoad(100);
     } else if (m_id.toLower().startsWith("novo") && servo != "manual") {
-        m_canControlPower = true;
+        m_type = MONARK_LC_NOVO;
         setLoad(100);
     }
 
@@ -229,6 +268,18 @@ void MonarkConnection::setLoad(unsigned int load)
 {
     m_loadToWrite = load;
     m_shouldWriteLoad = true;
+}
+
+void MonarkConnection::setKp(double kp)
+{
+    if (kp < 0)
+        kp = 0;
+
+    if (kp > 7)
+        kp = 7;
+
+    m_kpToWrite = kp;
+    m_shouldWriteKp = true;
 }
 
 /*
@@ -249,4 +300,109 @@ void MonarkConnection::configurePort(QSerialPort *serialPort)
     // Send empty \r after configuring port, otherwise first command might not
     // be interpreted correctly
     serialPort->write("\r");
+}
+
+bool MonarkConnection::canDoLoad()
+{
+    bool result = false;
+
+    switch (m_type)
+    {
+    case MONARK_LC: // fall through
+    case MONARK_LC_NOVO:
+        result = true;
+        break;
+    case MONARK_LT2: // fall through
+    default:
+        result = false;
+        break;
+    }
+
+    return result;
+}
+
+bool MonarkConnection::canDoKp()
+{
+    bool result = false;
+
+    switch (m_type)
+    {
+    case MONARK_LC_NOVO:
+        result = true;
+        break;
+    case MONARK_LC: // fall through
+    case MONARK_LT2: // fall through
+    default:
+        result = false;
+        break;
+    }
+
+    return result;
+}
+
+/**
+ * This functions takes a serial port and tries if it can find a Monark bike connected
+ * to it.
+ */
+bool MonarkConnection::discover(QString portName)
+{
+    bool found = false;
+    QSerialPort sp;
+
+    sp.setPortName(portName);
+
+    if (sp.open(QSerialPort::ReadWrite))
+    {
+        configurePort(&sp);
+
+        // Discard any existing data
+        QByteArray data = sp.readAll();
+
+        // Read id from bike
+        sp.write("id\r");
+        sp.waitForBytesWritten(-1);
+
+        QByteArray id;
+        do
+        {
+            bool readyToRead = sp.waitForReadyRead(1000);
+            if (readyToRead)
+            {
+                id.append(sp.readAll());
+            } else {
+                id.append('\r');
+            }
+        } while ((id.indexOf('\r') == -1));
+
+        id.replace("\r", "\0");
+
+        // Should check for all bike ids known to use this protocol
+        if (QString(id).toLower().contains("lt") ||
+            QString(id).toLower().contains("lc") ||
+            QString(id).toLower().contains("novo")) {
+            found = true;
+        }
+    }
+
+    sp.close();
+
+    return found;
+}
+
+quint32 MonarkConnection::power()
+{
+    QMutexLocker mlock(&m_readMutex);
+    return m_power;
+}
+
+quint32 MonarkConnection::cadence()
+{
+    QMutexLocker mlock(&m_readMutex);
+    return m_cadence;
+}
+
+quint32 MonarkConnection::pulse()
+{
+    QMutexLocker mlock(&m_readMutex);
+    return m_pulse;
 }

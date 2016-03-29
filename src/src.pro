@@ -538,8 +538,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Cloud/Dropbox.h
     SOURCES += Cloud/GoogleDrive.cpp
     HEADERS += Cloud/GoogleDrive.h
-    SOURCES += Train/Monark.cpp Train/MonarkController.cpp Train/MonarkConnection.cpp
-    HEADERS += Train/Monark.h Train/MonarkController.h Train/MonarkConnection.h
+    SOURCES += Train/MonarkController.cpp Train/MonarkConnection.cpp
+    HEADERS += Train/MonarkController.h Train/MonarkConnection.h
     SOURCES += Train/Kettler.cpp Train/KettlerController.cpp Train/KettlerConnection.cpp
     HEADERS += Train/Kettler.h Train/KettlerController.h Train/KettlerConnection.h
 }
