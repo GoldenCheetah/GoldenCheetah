@@ -484,6 +484,10 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         }
         break;
 
+    case RealtimeData::Slope:
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
+        break;
+
     default:
         valueLabel->setText(QString("%1").arg(round(displayValue)));
         break;
@@ -536,6 +540,7 @@ void DialWindow::seriesChanged()
     case RealtimeData::IF:
     case RealtimeData::VI:
     case RealtimeData::SkibaVI:
+    case RealtimeData::Slope:
     case RealtimeData::None:
             foreground = GColor(CDIAL);
             break;
