@@ -35,6 +35,9 @@ public:
     void setSerialPort(const QString serialPortName);
     static void configurePort(QSerialPort * serialPort);
     static bool discover(QString portName);
+    quint32 power();
+    quint32 cadence();
+    quint32 pulse();
 
 public slots:
     void requestAll();
@@ -55,6 +58,7 @@ private:
     QTimer *m_timer;
     QByteArray readAnswer(int timeoutMs = -1);
     QMutex m_mutex;
+    QMutex m_readMutex;
     unsigned int m_load;
     unsigned int m_loadToWrite;
     double m_kp;
@@ -64,6 +68,9 @@ private:
     enum MonarkType { MONARK_UNKNOWN, MONARK_LT2, MONARK_LC, MONARK_LC_NOVO } m_type;
     bool canDoLoad();
     bool canDoKp();
+    quint32 m_power;
+    quint32 m_cadence;
+    quint32 m_pulse;
 
 signals:
     void pulse(quint32);
