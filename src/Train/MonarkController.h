@@ -18,7 +18,7 @@
 #include "GoldenCheetah.h"
 
 #include "RealtimeController.h"
-#include "Monark.h"
+#include "MonarkConnection.h"
 
 // Abstract base class for Realtime device controllers
 
@@ -32,7 +32,7 @@ class MonarkController : public RealtimeController
 public:
     MonarkController (TrainSidebar *, DeviceConfiguration *);
 
-    Monark *m_monark;               // the device itself
+    MonarkConnection *m_monark;               // the device itself
 
     int start();
     int restart();                              // restart after paused

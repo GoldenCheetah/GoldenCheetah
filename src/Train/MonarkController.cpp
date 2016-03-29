@@ -18,7 +18,7 @@
  */
 
 #include "MonarkController.h"
-#include "Monark.h"
+#include "MonarkConnection.h"
 #include "RealtimeData.h"
 
 #include <QMessageBox>
@@ -26,7 +26,8 @@
 
 MonarkController::MonarkController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
-    m_monark = new Monark(this, dc ? dc->portSpec : "");
+    m_monark = new MonarkConnection();
+    m_monark->setSerialPort(dc ? dc->portSpec : "");
 }
 
 bool MonarkController::find()
@@ -37,14 +38,15 @@ bool MonarkController::find()
 int
 MonarkController::start()
 {
-    return m_monark->start();
+    m_monark->start();
+    return 0;
 }
 
 
 int
 MonarkController::restart()
 {
-    return m_monark->restart();
+    return 0;
 }
 
 
@@ -58,7 +60,7 @@ MonarkController::pause()
 int
 MonarkController::stop()
 {
-    return m_monark->stop();
+    return 0;
 }
 
 
@@ -82,18 +84,19 @@ bool MonarkController::doesLoad() { return true; }
 void
 MonarkController::getRealtimeData(RealtimeData &rtData)
 {
-    if (!m_monark->isConnected())
+    if (m_monark->isFinished())
     {
         QMessageBox msgBox;
         msgBox.setText(tr("Cannot Connect to Monark"));
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         parent->Stop(0);
+        parent->Disconnect();
         return;
     }
 
     rtData.setWatts(m_monark->power());
-    rtData.setHr(m_monark->heartRate());
+    rtData.setHr(m_monark->pulse());
     rtData.setCadence(m_monark->cadence());
 }
 

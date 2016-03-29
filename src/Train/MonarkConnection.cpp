@@ -31,7 +31,10 @@ MonarkConnection::MonarkConnection() :
     m_kpToWrite(0),
     m_shouldWriteLoad(false),
     m_shouldWriteKp(false),
-    m_type(MONARK_UNKNOWN)
+    m_type(MONARK_UNKNOWN),
+    m_power(0),
+    m_cadence(0),
+    m_pulse(0)
 {
 }
 
@@ -171,8 +174,10 @@ void MonarkConnection::requestPower()
         this->exit(-1);
     }
     QByteArray data = readAnswer(500);
-    quint32 p = data.toInt();
-    emit power(p);
+    m_readMutex.lock();
+    m_power = data.toInt();
+    m_readMutex.unlock();
+    emit power(m_power);
 }
 
 void MonarkConnection::requestPulse()
@@ -184,8 +189,10 @@ void MonarkConnection::requestPulse()
         this->exit(-1);
     }
     QByteArray data = readAnswer(500);
-    quint32 p = data.toInt();
-    emit pulse(p);
+    m_readMutex.lock();
+    m_pulse = data.toInt();
+    m_readMutex.unlock();
+    emit pulse(m_pulse);
 }
 
 void MonarkConnection::requestCadence()
@@ -197,8 +204,10 @@ void MonarkConnection::requestCadence()
         this->exit(-1);
     }
     QByteArray data = readAnswer(500);
-    quint32 c = data.toInt();
-    emit cadence(c);
+    m_readMutex.lock();
+    m_cadence = data.toInt();
+    m_readMutex.unlock();
+    emit cadence(m_cadence);
 }
 
 int MonarkConnection::readConfiguredLoad()
@@ -378,4 +387,22 @@ bool MonarkConnection::discover(QString portName)
     sp.close();
 
     return found;
+}
+
+quint32 MonarkConnection::power()
+{
+    QMutexLocker mlock(&m_readMutex);
+    return m_power;
+}
+
+quint32 MonarkConnection::cadence()
+{
+    QMutexLocker mlock(&m_readMutex);
+    return m_cadence;
+}
+
+quint32 MonarkConnection::pulse()
+{
+    QMutexLocker mlock(&m_readMutex);
+    return m_pulse;
 }
