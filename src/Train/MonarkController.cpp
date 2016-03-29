@@ -98,6 +98,7 @@ MonarkController::getRealtimeData(RealtimeData &rtData)
     rtData.setWatts(m_monark->power());
     rtData.setHr(m_monark->pulse());
     rtData.setCadence(m_monark->cadence());
+    rtData.setSlope(m_monark->kp());
 }
 
 void MonarkController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
