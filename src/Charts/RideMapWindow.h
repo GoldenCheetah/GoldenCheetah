@@ -134,6 +134,7 @@ class RideMapWindow : public GcChartWindow
         bool first;
 
         QComboBox *mapCombo;
+        QCheckBox *showMarkersCk;
 
         // set/get properties
         int mapType() const { return mapCombo->currentIndex(); }
@@ -141,6 +142,7 @@ class RideMapWindow : public GcChartWindow
 
     public slots:
         void mapTypeSelected(int x);
+        void showMarkersChanged(int value);
 
         void forceReplot();
         void rideSelected();
