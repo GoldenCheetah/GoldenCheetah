@@ -67,9 +67,13 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     mapCombo->setCurrentIndex(mapType);
 
+    showMarkersCk = new QCheckBox(tr("Show markers"));
+
     cl->addRow(new QLabel(tr("Map")), mapCombo);
+    cl->addRow(new QLabel(tr("")), showMarkersCk);
 
     connect(mapCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(mapTypeSelected(int)));
+    connect(showMarkersCk, SIGNAL(stateChanged(int)), this, SLOT(showMarkersChanged(int)));
 
     setControls(settingsWidget);
 
@@ -138,6 +142,12 @@ void
 RideMapWindow::mapTypeSelected(int x)
 {
     setMapType(x);
+    forceReplot();
+}
+
+void
+RideMapWindow::showMarkersChanged(int value)
+{
     forceReplot();
 }
 
@@ -369,7 +379,6 @@ void RideMapWindow::createHtml()
               "}\n");
     }
 
-
     currentPage += QString("function drawIntervals() { \n"
     // how many to draw?
 #ifdef NOWEBKIT
@@ -489,14 +498,15 @@ void RideMapWindow::createHtml()
                 "    }));\n");
         }
 
-
+        if (mapCombo->currentIndex() == GOOGLE) {
+            currentPage += QString(""
+                // add the bike layer, useful in some areas, but coverage
+                // is limited, US gets best coverage at this point (Summer 2011)
+                "    var bikeLayer = new google.maps.BicyclingLayer();\n"
+                "    bikeLayer.setMap(map);\n");
+        }
 
         currentPage += QString(""
-            // add the bike layer, useful in some areas, but coverage
-            // is limited, US gets best coverage at this point (Summer 2011)
-            "    var bikeLayer = new google.maps.BicyclingLayer();\n"
-            "    bikeLayer.setMap(map);\n"
-
             // initialise local variables
             "    markerList = new Array();\n"
             "    intervalList = new Array();\n"
@@ -507,7 +517,6 @@ void RideMapWindow::createHtml()
             // to the map server and makes the UI pretty snappy
             "    drawRoute();\n"
             "    drawIntervals();\n"
-
             // catch signals to redraw intervals
             "    webBridge.drawIntervals.connect(drawIntervals);\n"
 
@@ -780,6 +789,8 @@ static double distanceBetween(double fromLat, double fromLon, double toLat, doub
 void
 RideMapWindow::createMarkers()
 {
+    if (!showMarkersCk->checkState())
+        return;
     QString code;
 
     //
