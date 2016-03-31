@@ -34,6 +34,8 @@ GC_COMPONENTS=C:\etc\github\GC_Libs_VC
 
 CONFIG += release
 
+DEFINES += NOWEBKIT
+
 # To compile translation you need QT tool - lrelease
 # If it is not found using he defaults in src/src.pro
 # then set the full path and filename here.
