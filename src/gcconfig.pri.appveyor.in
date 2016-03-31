@@ -1,0 +1,116 @@
+APP_NAME = GoldenCheetah
+
+#############################################################################
+### MSVC2015 - BUILD VERSION QT 5.6.0 
+### GCCONFIG.PRI for 32 Bit Release Build
+### assumptions:
+### -- GC_LIB_VC directory is present (with the given structure)
+### -- QT 5.6.0 pre-build for GC is available under path
+###    -- C:\Qt\Qt5.6.0-GC\msvc2015_32
+###
+### -- included dependencies
+###    kqoauth
+###    qwtplot3d
+###    kml
+###    ical
+###    usbexpress
+###    usb2
+###    vlc
+###    libsamplerate
+###
+### Run GC:
+###    Subfolder GC_Libs_VC\GoldenCheetah32
+###    contains are libraries relevant to run GoldenCheetah (current state)
+###    copy the .exe to this folder and run from there (then no path,...) needs to adjusted
+###
+###    (it may be the case that the VC-Redistributables are missing - please let me know
+###     to add this in the documentation)
+##############################################################################
+
+
+# Path to the libraries
+#GC_COMPONENTS=<add the path to GC_Libs_VC - including \GC_Libs_VC>
+GC_COMPONENTS=C:\etc\github\GC_Libs_VC
+
+CONFIG += release
+
+# To compile translation you need QT tool - lrelease
+# If it is not found using he defaults in src/src.pro
+# then set the full path and filename here.
+QMAKE_LRELEASE = %QTDIR%\bin\lrelease
+
+# MSVC needs the WINDOWS KIT libraries for the memory model you are building
+#WINKIT_INSTALL= "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x86"
+
+# Let us know where flex and bison are installed.
+# You may need to specify the full path if things don't work.
+# For Windows we use win_flex/win_bison - which is available here: http://sourceforge.net/projects/winflexbison/
+CONFIG += lex
+CONFIG += yacc
+
+QMAKE_LEX  = win_flex --wincompat
+QMAKE_YACC = win_bison --file-prefix=y -t
+
+# Make sure that LEX/YACC is executed first (to allow multi-core compilation)
+lex.CONFIG += target_predeps
+yacc_impl.CONFIG += target_predeps
+yacc_decl.CONFIG += target_predeps
+
+################## KQOAUTH
+
+#KQOAUTH_INSTALL = $${GC_COMPONENTS}\20_QT_Based\qKOAuth\Release\32bit
+#KQOAUTH_INCLUDE = $${GC_COMPONENTS}\20_QT_Based\qKOAuth\include
+#KQOAUTH_LIBS =   -L$${GC_COMPONENTS}\20_QT_Based\qKOAuth\Release\32Bit\lib -lkqoauth0
+
+
+################## QWTPlot3D
+
+#QWT3D_INSTALL = $${GC_COMPONENTS}\20_QT_Based\QwtPlot3d\Release\32Bit
+#QWT3D_INCLUDE = $${GC_COMPONENTS}\20_QT_Based\QwtPlot3d\include
+#QWT3D_LIBS    = -L$${GC_COMPONENTS}\20_QT_Based\QwtPlot3d\Release\32Bit\lib -lqwtplot3d -lopengl32 -lglu32
+
+################## KMLLIB && BOOST for KML
+
+#KML_INSTALL = $${GC_COMPONENTS}\30_MSVC\libkml32
+#KML_LIBS = -L$${GC_COMPONENTS}\30_MSVC\libkml32\lib-release -llibkmldom -llibkmlconvenience -llibkmlengine -llibkmlbase
+
+#BOOST_INCLUDE = $${GC_COMPONENTS}\30_MSVC\libkml32\third_party\expat.win32 $${GC_COMPONENTS}\30_MSVC\libkml32\third_party\boost_1_34_1
+
+################## ICAL/CALDAV
+
+#ICAL_INSTALL = $${GC_COMPONENTS}\30_MSVC\libical32
+#ICAL_INCLUDE = $${GC_COMPONENTS}\30_MSVC\libical32\include
+#ICAL_LIBS    = -L$${GC_COMPONENTS}\30_MSVC\libical32\lib-release -llibical-static
+
+################## USB1 stick for Train View on Windows
+
+#USBXPRESS_INSTALL = $${GC_COMPONENTS}\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host
+#USBXPRESS_INCLUDE = $${GC_COMPONENTS}\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host
+#USBXPRESS_LIBS    = -L$${GC_COMPONENTS}\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x86 -lSiUSBXp
+
+################## USB2 sticks in Train View on Linux or Windows
+
+#LIBUSB_INSTALL = $${GC_COMPONENTS}\10_Precompiled_DLL\libusb-win32-bin-1.2.6.0
+#LIBUSB_INCLUDE = $${GC_COMPONENTS}\10_Precompiled_DLL\libusb-win32-bin-1.2.6.0\include
+#LIBUSB_LIBS    = -L$${GC_COMPONENTS}\10_Precompiled_DLL\libusb-win32-bin-1.2.6.0\lib\msvc -llibusb
+
+#################### Resampling / Libsamplerate
+
+
+#SAMPLERATE_INSTALL = $${GC_COMPONENTS}\30_MSVC\libsamplerate32
+#SAMPLERATE_INCLUDE = $${GC_COMPONENTS}\30_MSVC\libsamplerate32\include
+#SAMPLERATE_LIBS = -L$${GC_COMPONENTS}\30_MSVC\libsamplerate32\lib -llibsamplerate-0
+
+
+################## Video Playback by VLC (which is better regarding supported formats than QT5 Video on Windows)
+
+#VLC_INSTALL = $${GC_COMPONENTS}\10_Precompiled_DLL\VLC\win32
+#VLC_LIBS    = -L$${GC_COMPONENTS}\10_Precompiled_DLL\VLC\win32\lib\ -llibvlc -llibvlccore
+
+################## uncomment below for R integration via webservices
+#HTPATH = ../httpserver
+
+################## Choose Video support (on Windows only VLC for now)
+
+DEFINES += GC_VIDEO_NONE
+#DEFINES += GC_VIDEO_VLC
