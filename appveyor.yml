@@ -23,3 +23,9 @@ install:
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc2015
 - nmake
+
+notifications:
+- provider: GitHubPullRequest
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
