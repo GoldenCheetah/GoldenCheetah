@@ -1,0 +1,31 @@
+version: 1.0.{build}
+image: Visual Studio 2015
+clone_depth: 1
+init:
+# Setup QT 5.6.0 - 64Bit
+- set QTDIR=C:\Qt\5.6\msvc2015_64
+- set PATH=%QTDIR%\bin;%PATH%
+
+# Setup MSVC - VS 2015
+
+- CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+
+# Get the libraries
+
+- ps: Start-FileDownload 'https://github.com/Joern-R/gc-ci-libs/releases/download/0.0.1/gc-ci-libs.zip' -Filename 'c:/gc-ci-libs.zip'
+- 7z x c:/gc-ci-libs.zip -oC:\libs
+
+install:
+- choco install winflexbison
+- copy qwt\qwtconfig.pri.in qwt\qwtconfig.pri
+- copy c:\libs\gcconfig64-Release.appveyor.pri src\gcconfig.pri
+
+build_script:
+- qmake.exe build.pro -r -spec win32-msvc2015
+- nmake
+
+notifications:
+- provider: GitHubPullRequest
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
