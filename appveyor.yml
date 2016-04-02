@@ -1,4 +1,4 @@
-version: {build}
+version: ci.{build}
 image: Visual Studio 2015
 clone_depth: 1
 init:
