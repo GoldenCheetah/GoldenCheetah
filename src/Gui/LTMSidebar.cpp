@@ -429,12 +429,17 @@ LTMSidebar::resetSeasons()
     int i;
     int j;
     for (i=allDateRanges->childCount(); i > 0; i--) {
-        if (allDateRanges->takeChild(0)) {
-            for (j=allDateRanges->takeChild(0)->childCount(); j > 0; j--) {
-                delete allDateRanges->takeChild(0)->takeChild(0);
+
+        // take this child
+        QTreeWidgetItem *child = allDateRanges->takeChild(0);
+
+        // if we have children wipe them first
+        if (child && child->childCount()) {
+            for (j=child->childCount(); j > 0; j--) {
+                delete child->takeChild(0);
             }
         }
-        delete allDateRanges->takeChild(0);
+        delete child;
     }
 
     // by default choose last 3 months not first one, since the first one is all dates
