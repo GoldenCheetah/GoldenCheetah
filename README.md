@@ -8,7 +8,9 @@ INSTALL-LINUX   For building on Ubuntu Linux
 INSTALL-MAC     For building on Apple OS X
 
 
-[![Build Status](https://travis-ci.org/GoldenCheetah/GoldenCheetah.svg?branch=master)](https://travis-ci.org/GoldenCheetah/GoldenCheetah)
+OSX: [![Build Status](https://travis-ci.org/GoldenCheetah/GoldenCheetah.svg?branch=master)](https://travis-ci.org/GoldenCheetah/GoldenCheetah)
+
+Windows: [![Build status](https://ci.appveyor.com/api/projects/status/vln30mtcd559fooj?svg=true)](https://ci.appveyor.com/project/Joern-R/goldencheetah-hby9w)
 
 [![Coverity Status](https://scan.coverity.com/projects/7503/badge.svg)](https://scan.coverity.com/projects/goldencheetah-goldencheetah)
 
