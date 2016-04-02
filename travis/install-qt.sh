@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "QT=>" "$QT" "<="
 if [ "$QT" = "qt5" ]
 then
   pwd
