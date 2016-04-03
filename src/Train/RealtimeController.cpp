@@ -514,6 +514,76 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
+    case 56: // TACX SIRIUS LEVEL 1
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(3.23874687 * v - 20.64808196);
+        }
+        break;
+
+    case 57: // TACX SIRIUS LEVEL 2
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(4.30606133 * v - 27.25589246);
+        }
+        break;
+
+    case 58: // TACX SIRIUS LEVEL 3
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(5.44879778 * v - 36.57159131);
+        }
+        break;
+
+    case 59: // TACX SIRIUS LEVEL 4
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(6.48525956 * v - 40.48616615);
+        }
+        break;
+
+    case 60: // TACX SIRIUS LEVEL 5
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(7.60643338 * v - 48.35481582);
+        }
+        break;
+
+    case 61: // TACX SIRIUS LEVEL 6
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(8.73140257 * v - 58.57819586);
+        }
+        break;
+
+    case 62: // TACX SIRIUS LEVEL 7
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(9.73079724 * v - 59.61416463);
+        }
+        break;
+
+    case 63: // TACX SIRIUS LEVEL 8
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(10.94228338 * v - 73.08258491);
+        }
+        break;
+
+    case 64: // TACX SIRIUS LEVEL 9
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(11.99373782 * v - 77.88781457);
+        }
+        break;
+
+    case 65: // TACX SIRIUS LEVEL 10
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(13.09580164 * v - 85.38477516);
+        }
+        break;
+
     default : // unknown - do nothing
         break;
     }

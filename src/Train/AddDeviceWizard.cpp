@@ -1172,6 +1172,16 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem(tr("Power - Elite Arion Mag (1)"));                               // 53
     virtualPower->addItem(tr("Power - Elite Arion Mag (2)"));                               // 54
     virtualPower->addItem(tr("Power - Blackburn Tech Fluid"));                              // 55
+    virtualPower->addItem(tr("Power - Tacx Sirius (1)"));                                   // 56
+    virtualPower->addItem(tr("Power - Tacx Sirius (2)"));                                   // 57
+    virtualPower->addItem(tr("Power - Tacx Sirius (3)"));                                   // 58
+    virtualPower->addItem(tr("Power - Tacx Sirius (4)"));                                   // 59    
+    virtualPower->addItem(tr("Power - Tacx Sirius (5)"));                                   // 60
+    virtualPower->addItem(tr("Power - Tacx Sirius (6)"));                                   // 61
+    virtualPower->addItem(tr("Power - Tacx Sirius (7)"));                                   // 62
+    virtualPower->addItem(tr("Power - Tacx Sirius (8)"));                                   // 63
+    virtualPower->addItem(tr("Power - Tacx Sirius (9)"));                                   // 64
+    virtualPower->addItem(tr("Power - Tacx Sirius (10)"));                                  // 65
 
     //
     // Wheel size
