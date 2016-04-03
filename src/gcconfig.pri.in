@@ -8,6 +8,9 @@
 #CONFIG += debug
 #CONFIG += release
 
+# Uncomment when WebKit is not available (e.g. QT >= 5.6)
+#DEFINES += NOWEBKIT
+
 # put output into a separate dir
 # to keep main directory clear
 #DESTDIR = .
