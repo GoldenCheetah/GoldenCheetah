@@ -43,6 +43,12 @@ lessThan(QT_MAJOR_VERSION, 5) {
     ## QT4 specific modules
     QT += webkit
 
+    ## NOWEBKIT is only supported in QT5
+    contains(DEFINES, NOWEBKIT) {
+        message("Info: NOWEBKIT is only supported on QT > 5")
+        DEFINES -= NOWEBKIT
+    }
+
 } else {
 
     ## QT5 modules we use
