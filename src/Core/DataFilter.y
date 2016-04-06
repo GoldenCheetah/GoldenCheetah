@@ -442,11 +442,17 @@ expr:
  */
 symbol:
 
-        SYMBOL                                  { $$ = new Leaf(@1.first_column, @1.last_column);
-                                                  $$->type = Leaf::Symbol;
-                                                  if (QString(DataFiltertext) == "BikeScore") $$->lvalue.n = new QString("BikeScore&#8482;");
-                                                  else $$->lvalue.n = new QString(DataFiltertext);
-                                                }
+        '$' SYMBOL                                { $$ = new Leaf(@1.first_column, @2.last_column);
+                                                    $$->type = Leaf::Symbol;
+                                                    $$->op = 1; // prompted variable (from user)
+                                                    $$->lvalue.n = new QString(DataFiltertext);
+                                                  }
+        | SYMBOL                                  { $$ = new Leaf(@1.first_column, @1.last_column);
+                                                    $$->type = Leaf::Symbol;
+                                                    $$->op = 0; // metric or builtin reference
+                                                    if (QString(DataFiltertext) == "BikeScore") $$->lvalue.n = new QString("BikeScore&#8482;");
+                                                    else $$->lvalue.n = new QString(DataFiltertext);
+                                                  }
         ;
 
 /*
