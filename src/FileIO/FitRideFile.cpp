@@ -310,7 +310,7 @@ struct FitFileReaderState
                 case 1903: rideFile->setDeviceType("Garmin FR15"); break;
                 case 1967: rideFile->setDeviceType("Garmin Fenix2"); break;
                 case 2050: case 2188: case 2189: rideFile->setDeviceType("Garmin Fenix3"); break;
-                case 2067: rideFile->setDeviceType("Garmin Edge 520"); break;
+                case 2067: case 2260: rideFile->setDeviceType("Garmin Edge 520"); break;
                 case 2147: rideFile->setDeviceType("Garmin Edge 25"); break;
                 case 2153: rideFile->setDeviceType("Garmin FR225"); break;
                 case 2238: rideFile->setDeviceType("Garmin Edge 20"); break;
