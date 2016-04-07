@@ -108,9 +108,9 @@ typedef struct ant_sensor_type {
 static inline double get_timestamp( void ) {
   struct timeval tv;
 #ifdef Q_CC_MSVC
-  QTime now = QTime::currentTime();
-  tv.tv_sec = now.second();
-  tv.tv_usec = now.msec();
+  QDateTime now = QDateTime::currentDateTime();
+  tv.tv_sec = now.toMSecsSinceEpoch() / 1000;
+  tv.tv_usec = (now.toMSecsSinceEpoch() % 1000) * 1000;
 #else
   gettimeofday(&tv, NULL);
 #endif
@@ -119,9 +119,9 @@ static inline double get_timestamp( void ) {
 
 static inline void get_timeofday(struct timeval* tv) {
 #ifdef Q_CC_MSVC
-  QTime now = QTime::currentTime();
-  tv->tv_sec = now.second();
-  tv->tv_usec = now.msec();
+  QDateTime now = QDateTime::currentDateTime();
+  tv->tv_sec = now.toMSecsSinceEpoch() / 1000;
+  tv->tv_usec = (now.toMSecsSinceEpoch() % 1000) * 1000;
 #else
   gettimeofday(tv, NULL);
 #endif
