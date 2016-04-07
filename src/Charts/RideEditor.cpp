@@ -1754,6 +1754,8 @@ FindDialog::FindDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
     resultsTable->setColumnCount(4);
     resultsTable->setColumnHidden(3, true);
     resultsTable->setSortingEnabled(true);
+    resultsTable->horizontalHeader()->setStretchLastSection(true);
+
     QStringList header;
     header << "Time" << "Column" << "Value";
     resultsTable->setHorizontalHeaderLabels(header);
@@ -1761,6 +1763,15 @@ FindDialog::FindDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
     resultsTable->setShowGrid(false);
     resultsTable->setSelectionMode(QAbstractItemView::SingleSelection);
     resultsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    // hidden unless we find something
+    replaceButton = new QPushButton(tr("Replace"));
+    replaceAllButton = new QPushButton(tr("Replace All"));
+    replaceSpinBox = new QDoubleSpinBox(this);
+    replaceSpinBox->setMinimum(-9999999);
+    replaceSpinBox->setMaximum(9999999);
+    replaceSpinBox->setDecimals(5);
+    replaceSpinBox->setSingleStep(0.00001);
 
     // layout the widget
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -1786,6 +1797,13 @@ FindDialog::FindDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
 
     mainLayout->addWidget(resultsTable);
 
+    // replace stuff
+    QGridLayout *replaceLayout = new QGridLayout;
+    replaceLayout->addWidget(replaceSpinBox, 0,0);
+    replaceLayout->addWidget(replaceButton, 0, 1);
+    replaceLayout->addWidget(replaceAllButton, 1,1);
+    mainLayout->addLayout(replaceLayout);
+
     QHBoxLayout *closer = new QHBoxLayout;
     closer->addStretch();
     closer->addWidget(clearButton);
@@ -1796,6 +1814,8 @@ FindDialog::FindDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
     connect(type, SIGNAL(currentIndexChanged(int)), this, SLOT(typeChanged(int)));
     connect(findButton, SIGNAL(clicked()), this, SLOT(find()));
     connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
+    connect(replaceButton, SIGNAL(clicked()), this, SLOT(replace()));
+    connect(replaceAllButton, SIGNAL(clicked()), this, SLOT(replaceAll()));
     connect(resultsTable, SIGNAL(itemSelectionChanged()), this, SLOT(selection()));
 
     // refresh when data changes...
@@ -1807,6 +1827,70 @@ FindDialog::FindDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
 FindDialog::~FindDialog()
 {
 }
+
+void
+FindDialog::replace()
+{
+    // do we have something to work with?
+    if (resultsTable->selectedItems().count() > 0) {
+
+        int row;
+        RideFile::SeriesType series;
+        unxsstring(resultsTable->item(resultsTable->currentRow(), 3)->text(), row, series);
+
+        // set to be visible regardless of what else happenned
+        rideEditor->table->setCurrentIndex(rideEditor->model->index(row,rideEditor->model->columnFor(series)));
+
+        // set the value
+        rideEditor->ride->ride()->command->setPointValue(row, series, replaceSpinBox->value());
+
+        // notify it changed
+        dataChanged();
+    }
+}
+
+void
+FindDialog::replaceAll()
+{
+
+    // set a LUW and make all changes, then a dialog when done
+    if(resultsTable->rowCount() > 0) {
+
+        // keep count of changes made
+        int count=0;
+
+        // group for undo/redo
+        rideEditor->ride->ride()->command->startLUW("Replace All");
+
+        // loop through results setting to the pointvalue
+        for(int idx=0; idx < resultsTable->rowCount(); idx++) {
+
+            int row;
+            RideFile::SeriesType series;
+            unxsstring(resultsTable->item(idx, 3)->text(), row, series);
+
+            // set the value
+            rideEditor->ride->ride()->command->setPointValue(row, series, replaceSpinBox->value());
+
+            // counter
+            count++;
+        }
+
+        // done on LUW
+        rideEditor->ride->ride()->command->endLUW();
+
+        // changed
+        dataChanged();
+
+        // tell user
+        if (count > 0) {
+            QMessageBox info(QMessageBox::Information, tr("Replace All"),
+                            QString(tr("Replaced %1 values")).arg(count));
+            info.exec();
+        }
+    }
+}
+
 
 void
 FindDialog::typeChanged(int index)
@@ -1979,6 +2063,9 @@ FindDialog::dataChanged()
     QStringList header;
     header << "Time" << "Column" << "Value";
     resultsTable->setHorizontalHeaderLabels(header);
+
+    // select the first one we found
+    if (counter)  resultsTable->selectRow(0);
 }
 
 void
