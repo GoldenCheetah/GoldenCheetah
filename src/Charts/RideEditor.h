@@ -245,6 +245,8 @@ class FindDialog : public QWidget
 
     private slots:
         void find();
+        void replace();
+        void replaceAll();
         void clear();
         void selection();
         void typeChanged(int);
@@ -263,6 +265,11 @@ class FindDialog : public QWidget
         QGridLayout *chans;
         QList<QCheckBox*> channels;
         QPushButton *findButton, *clearButton;
+
+        // when replacing the found values
+        QPushButton *replaceButton, *replaceAllButton;
+        QDoubleSpinBox *replaceSpinBox;
+
         QTableWidget *resultsTable;
 
         void clearResultsTable();
