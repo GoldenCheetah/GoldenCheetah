@@ -41,6 +41,12 @@
 #include "CloudDBCommon.h"
 #endif
 
+// R is not multithreaded, has a single instance that we setup at startup.
+#ifdef GC_WANT_R
+#include <RInside.h>
+RInside *gc_RInside;
+#endif
+
 #include <signal.h>
 
 // redirect errors to `home'/goldencheetah.log
@@ -216,6 +222,13 @@ main(int argc, char *argv[])
         // https://bugreports.qt-project.org/browse/QTBUG-32789
         QFont::insertSubstitution("LucidaGrande", "Lucida Grande");
     }
+#endif
+
+#ifdef GC_WANT_R
+    // create the singleton in the main thread
+    // will be shared by all athletes and all charts (!!)
+    RInside R(argc,argv);
+    gc_RInside = &R;
 #endif
 
     // create the application -- only ever ONE regardless of restarts

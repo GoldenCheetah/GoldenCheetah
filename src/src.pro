@@ -259,6 +259,8 @@ contains(DEFINES, "GC_WANT_R") {
     ## compiler etc settings used in default make rules
     QMAKE_CXXFLAGS +=       $$RCPPWARNING $$RCPPFLAGS $$RCPPINCL $$RINSIDEINCL
     QMAKE_LFLAGS +=         $$RLDFLAGS $$RBLAS $$RLAPACK $$RCPPLIBS $$RINSIDELIBS
+
+    LIBS += -lR -lRInside
 }
 
 ###====================
