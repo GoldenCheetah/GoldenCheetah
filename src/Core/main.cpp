@@ -40,32 +40,8 @@
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBCommon.h"
 #endif
-
-// R is not multithreaded, has a single instance that we setup at startup.
-#ifdef GC_WANT_R
-#include <RInside.h>
-RInside *gc_RInside;
-#endif
-
 #include <signal.h>
 
-// redirect errors to `home'/goldencheetah.log
-// sadly, no equivalent on Windows
-#ifndef WIN32
-#include "stdio.h"
-#include "unistd.h"
-void nostderr(QString dir)
-{
-    // redirect stderr to a file
-    QFile *fp = new QFile(QString("%1/goldencheetah.log").arg(dir));
-    if (fp->open(QIODevice::WriteOnly|QIODevice::Truncate) == true) {
-        close(2);
-        if(dup(fp->handle()) == -1) fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
-    } else {
-        fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
-    }
-}
-#endif
 
 #ifdef Q_OS_MAC
 #include "QtMacSegmentedButton.h" // for cocoa initialiser
@@ -79,16 +55,54 @@ void nostderr(QString dir)
 #include <QStandardPaths>
 #endif
 
+//
+// bootstrap state
+//
 bool restarting = false;
+static bool nogui;
+static int gc_opened=0;
 
-// root directory shared by all
+//
+// global application
+//
 QString gcroot;
-
 QApplication *application;
-
-bool nogui;
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
+HttpListener *listener = NULL;
+#endif
+// R is not multithreaded, has a single instance that we setup at startup.
+#ifdef GC_WANT_R
+#include <RInside.h>
+RInside *gc_RInside;
+#endif
+
+//
+// Trap signals / termination
+//
+void terminate(int code)
+{
+#ifdef GC_WANT_HTTP
+    if (listener) listener->close();
+#endif
+
+    // tidy up static stuff (our globals) that are not tied
+    // to a mainwindow instance (which will be deleted on close)
+    delete appsettings;
+    application->exit();
+
+    // because QT starts a bunch of threads (e.g. reading XcbEvents)
+    // calling exit() during startup is a no-no. So we go nuclear and
+    // exit without calling the static destructors via _Exit(), unless we did
+    // actually open an athlete and start-up proper with app->exec().
+    if (gc_opened) exit(code);
+    else _Exit(code);
+}
+
+//
+// redirect logging
+//
+#ifdef GC_WANT_HTTP
 #if QT_VERSION > 0x50000
 void myMessageOutput(QtMsgType type, const QMessageLogContext &, const QString &string)
  {
@@ -115,14 +129,40 @@ void myMessageOutput(QtMsgType type, const char *msg)
      }
  }
 
-HttpListener *listener;
-void sigabort(int)
+void sigabort(int x)
 {
-    qDebug()<<""; // newline
-    application->exit();
+    terminate(x);
 }
 #endif
 
+// redirect errors to `home'/goldencheetah.log
+// sadly, no equivalent on Windows
+#ifndef WIN32
+#include "stdio.h"
+#include "unistd.h"
+void nostderr(QString dir)
+{
+    // redirect stderr to a file
+    QFile *fp = new QFile(QString("%1/goldencheetah.log").arg(dir));
+    if (fp->open(QIODevice::WriteOnly|QIODevice::Truncate) == true) {
+        close(2);
+        if(dup(fp->handle()) == -1) fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
+    } else {
+        fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
+    }
+}
+#endif
+
+//
+// By default will open last athlete, but will also provide
+// a dialog to select an athlete if not found, and then upgrade
+// the athlete one selected before opening a mainwindow
+//
+// It will also respawn mainwindows when restarting for changes
+// to application settings (athlete folder, language)
+//
+// Also creates singleton instances prior to application launching
+//
 int
 main(int argc, char *argv[])
 {
@@ -455,7 +495,7 @@ main(int argc, char *argv[])
                 listener->close();
 
                 // and done
-                exit(0);
+                terminate(0);
             }
         }
 #endif
@@ -475,11 +515,12 @@ main(int argc, char *argv[])
                         MainWindow *mainWindow = new MainWindow(home);
                         mainWindow->show();
                         mainWindow->ridesAutoImport();
+                        gc_opened++;
                         home.cdUp();
                         anyOpened = true;
                     } else {
                         delete trainDB;
-                        return ret;
+                        terminate(0);
                     }
                 }
             }
@@ -495,7 +536,7 @@ main(int argc, char *argv[])
             // choose cancel?
             if ((ret=d.exec()) != QDialog::Accepted) {
                 delete trainDB;
-                return ret;
+                terminate(0);
             }
 
             // chosen, so lets get the choice..
@@ -503,7 +544,7 @@ main(int argc, char *argv[])
             home.cd(d.choice());
             if (!home.exists()) {
                 delete trainDB;
-                exit(0);
+                terminate(0);
             }
 
             appsettings->initializeQSettingsAthlete(homeDir, d.choice());
@@ -513,9 +554,10 @@ main(int argc, char *argv[])
                 MainWindow *mainWindow = new MainWindow(home);
                 mainWindow->show();
                 mainWindow->ridesAutoImport();
+                gc_opened++;
             } else {
                 delete trainDB;
-                return ret;
+                terminate(0);
             }
         }
 
