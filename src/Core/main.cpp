@@ -77,8 +77,8 @@ HttpListener *listener = NULL;
 #include <RChart.h> // for RCallback
 RInside *gc_RInside;
 RCallbacks *gc_RCallbacks;
-QString gc_RVersion;
 #endif
+QString gc_RVersion;
 
 //
 // Trap signals / termination
