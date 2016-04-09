@@ -31,6 +31,9 @@
 
 #include "Athlete.h"
 
+// declared in main.cpp
+extern QString gc_RVersion;
+
 class GcCrashDialog : public QDialog
 {
     Q_OBJECT

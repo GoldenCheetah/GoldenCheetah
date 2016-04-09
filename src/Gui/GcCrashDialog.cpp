@@ -313,6 +313,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">VIDEO</td><td>%15</td></tr>"
             "<tr><td colspan=\"2\">SAMPLERATE</td><td>%16</td></tr>"
             "<tr><td colspan=\"2\">SSL</td><td>%17</td></tr>"
+            "<tr><td colspan=\"2\">R</td><td>%18</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -340,6 +341,7 @@ QString GcCrashDialog::versionHTML()
 #endif
             .arg(src)
             .arg(QSslSocket::supportsSsl() ? "yes" : "none")
+            .arg(gc_RVersion)
 
             ;
 

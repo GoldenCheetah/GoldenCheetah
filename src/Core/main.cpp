@@ -74,7 +74,10 @@ HttpListener *listener = NULL;
 // R is not multithreaded, has a single instance that we setup at startup.
 #ifdef GC_WANT_R
 #include <RInside.h>
+#include <RChart.h> // for RCallback
 RInside *gc_RInside;
+RCallbacks *gc_RCallbacks;
+QString gc_RVersion;
 #endif
 
 //
@@ -269,6 +272,25 @@ main(int argc, char *argv[])
     // will be shared by all athletes and all charts (!!)
     RInside R(argc,argv);
     gc_RInside = &R;
+#if !defined(RINSIDE_CALLBACKS)
+#error "GC_WANT_R: RInside must have callbacks enabled (see inst/RInsideConfig.h)"
+#else
+    gc_RCallbacks = new RCallbacks;
+    gc_RInside->set_callbacks(gc_RCallbacks);
+
+    // lets get the version early for the about dialog
+    gc_RInside->parseEvalNT("print(R.version.string)");
+    QStringList &version = gc_RCallbacks->getConsoleOutput();
+    if (version.count() == 3) {
+        QRegExp exp("^.*\([0-9]+\.[0-9]+\.[0-9]+\).*$");
+        if (exp.exactMatch(version[1])) gc_RVersion = exp.cap(1);
+        else gc_RVersion = version[1];
+    }
+    version.clear();
+
+#endif
+#else
+    gc_RVersion = "none";
 #endif
 
     // create the application -- only ever ONE regardless of restarts
