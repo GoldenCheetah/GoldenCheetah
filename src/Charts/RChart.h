@@ -24,6 +24,10 @@
 #include <QDebug>
 #include <string.h>
 
+#include "GoldenCheetah.h"
+#include "Context.h"
+#include "Athlete.h"
+
 class RCallbacks : public Callbacks {
     public:
         // see inst/includes/Callbacks.h for a list of all overrideable methods
@@ -46,4 +50,15 @@ class RCallbacks : public Callbacks {
     private:
         QStringList strings;
 };
+
+class RChart : public GcChartWindow {
+
+    public:
+        RChart(Context *context);
+
+    private:
+        Context *context;
+};
+
+
 #endif

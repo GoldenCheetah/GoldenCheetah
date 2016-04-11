@@ -57,6 +57,9 @@
 #include "GoogleMapControl.h"
 #include "BingMap.h"
 #include "RideMapWindow.h"
+#ifdef GC_WANT_R
+#include "RChart.h"
+#endif
 // Not until v4.0
 //#include "RouteWindow.h"
 
@@ -90,6 +93,7 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("Pedal Force vs Velocity"),GcWindowTypes::PfPv },
     { VIEW_ANALYSIS, tr("Heartrate vs Power"),GcWindowTypes::HrPw },
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Map"),GcWindowTypes::RideMapWindow },
+    { VIEW_ANALYSIS|VIEW_HOME, tr("R Console"),GcWindowTypes::RConsole },
     //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
     { VIEW_ANALYSIS, tr("2d Plot"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("3d Plot"),GcWindowTypes::Model },
@@ -160,6 +164,11 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::Diary: returning = new GcWindow(); break;
 #endif
     case GcWindowTypes::Histogram: returning = new HistogramWindow(context); break;
+#ifdef GC_WANT_R
+    case GcWindowTypes::RConsole: returning = new RChart(context); break;
+#else
+    case GcWindowTypes::RConsole: returning = new GcWindow(); break;
+#endif
     case GcWindowTypes::Distribution: returning = new HistogramWindow(context, true); break;
     case GcWindowTypes::PerformanceManager: 
             {
