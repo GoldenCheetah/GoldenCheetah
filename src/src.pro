@@ -261,6 +261,7 @@ contains(DEFINES, "GC_WANT_R") {
     LIBS +=         		$$RLDFLAGS $$RBLAS $$RLAPACK $$RCPPLIBS $$RINSIDELIBS
 
     HEADERS += Charts/RChart.h
+    SOURCES += Charts/RChart.cpp
 
 }
 
