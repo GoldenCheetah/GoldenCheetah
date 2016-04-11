@@ -288,6 +288,9 @@ main(int argc, char *argv[])
     }
     version.clear();
 
+    // set all the standard "GC" object
+    R["GC.version"] = VERSION_STRING;
+    R["GC.build"] = VERSION_LATEST;
 #endif
 #else
     gc_RVersion = "none";
@@ -416,6 +419,9 @@ main(int argc, char *argv[])
         // initialise the trainDB
         trainDB = new TrainDB(home);
 
+#ifdef GC_WANT_R
+        R["GC.home"] = home.absolutePath().toStdString();
+#endif
         // lets do what the command line says ...
         QVariant lastOpened;
         if(args.count() == 2) { // $ ./GoldenCheetah Mark -or- ./GoldenCheetah --server ~/athletedir

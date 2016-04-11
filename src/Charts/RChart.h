@@ -22,12 +22,26 @@
 #include <RInside.h>
 #include <QString>
 #include <QDebug>
+#include <QColor>
+#include <QTextEdit>
+#include <QScrollBar>
+#include <QSplitter>
 #include <string.h>
 
 #include "GoldenCheetah.h"
 #include "Context.h"
 #include "Athlete.h"
 
+class RInside;
+class RCallbacks;
+class QString;
+
+extern RInside *gc_RInside;
+extern RCallbacks *gc_RCallbacks;
+extern QString gc_RVersion;
+
+// global singleton catches output from R interpreter
+// first come first served on output
 class RCallbacks : public Callbacks {
     public:
         // see inst/includes/Callbacks.h for a list of all overrideable methods
@@ -51,10 +65,49 @@ class RCallbacks : public Callbacks {
         QStringList strings;
 };
 
+// a console widget to type commands and display response
+class RConsole : public QTextEdit {
+
+    Q_OBJECT
+
+signals:
+    void getData(const QByteArray &data);
+
+public slots:
+    void configChanged(qint32);
+
+public:
+    explicit RConsole(Context *context, QWidget *parent = 0);
+
+    void putData(QString data);
+    void putData(QColor color, QString data);
+    void setLocalEchoEnabled(bool set);
+
+    // return the current "line" of text
+    QString currentLine();
+
+protected:
+    virtual void keyPressEvent(QKeyEvent *e);
+    virtual void mousePressEvent(QMouseEvent *e);
+    virtual void mouseDoubleClickEvent(QMouseEvent *e);
+    virtual void contextMenuEvent(QContextMenuEvent *e);
+
+private:
+    Context *context;
+    bool localEchoEnabled;
+};
+
+// the chart
 class RChart : public GcChartWindow {
+
+    Q_OBJECT
 
     public:
         RChart(Context *context);
+
+    protected:
+        QSplitter *splitter;
+        RConsole *console;
 
     private:
         Context *context;
