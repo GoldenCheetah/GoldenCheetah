@@ -100,6 +100,8 @@ void RConsole::keyPressEvent(QKeyEvent *e)
         if (line != "") {
             // lets run it
             //qDebug()<<"RUN:" << line;
+            (*gc_RInside)["GC.athlete"] = context->athlete->cyclist.toStdString();
+            (*gc_RInside)["GC.athlete.home"] = context->athlete->home->root().absolutePath().toStdString();
 
             try {
                 SEXP ret = gc_RInside->parseEval(line.toStdString());
