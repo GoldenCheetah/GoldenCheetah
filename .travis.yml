@@ -17,6 +17,9 @@ env:
   - secure: rb/MKPHEK8yOK5uYpXq2o+MQ7h65ft+c/xE9XmLFk1jLnK0oxe6+KeoSFlQ0n5UwLSsHrytMXVaUHex6EEt0TheXFlohi7BcNFWRWXr+wLucuaPjMnU49VErrSigjJ5VW/rcR7fORmnDwn5y06r3Rer9SC1hImCxf/pqF8hFZps=
   - secure: FXJzm98lwbc1R2eh9/CvVReVRHEPLDm+sCRjiV9HJgeCveIUauLasp9Skamz0c6OKLmkjLY8JERPT491ZgCG8YcQ9x1bM8HGbmRqnn9xSUxINIRzVmyTiLMBoT/ibHHeFjFpyiGfukOAkHwMNNsrSrbaekhiJuekaXo7iTwYQB0=
 before_install:
+## try early just to check, can delete later
+- git clone https://github.com/eddelbuettel/rinside.git RInside
+- sed -i "s|// #define|#define|" RInside/inst/include/RInsideConfig.h
 - date
 - brew update
 - sh travis/install-qt.sh
@@ -53,7 +56,7 @@ before_install:
 - mkdir temp
 - cd temp
 - git clone https://github.com/eddelbuettel/rinside.git RInside
-- sed -i "" 's|// #define|#define|' RInside/inst/include/RInsideConfig.h
+- sed -i "s|// #define|#define|" RInside/inst/include/RInsideConfig.h
 - R CMD INSTALL RInside
 - cd ..
 - rm -rf temp
