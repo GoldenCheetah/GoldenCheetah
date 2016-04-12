@@ -71,6 +71,10 @@
 #include <samplerate.h>
 #endif
 
+#ifdef GC_WANT_R
+#include "RTool.h"
+#endif
+
 GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
 {
     setAttribute(Qt::WA_DeleteOnClose, true); // caller must delete me, once they've extracted the name
@@ -341,7 +345,11 @@ QString GcCrashDialog::versionHTML()
 #endif
             .arg(src)
             .arg(QSslSocket::supportsSsl() ? "yes" : "none")
-            .arg(gc_RVersion)
+#ifdef GC_WANT_R
+            .arg(rtool->version)
+#else
+            .arg("none")
+#endif
 
             ;
 
