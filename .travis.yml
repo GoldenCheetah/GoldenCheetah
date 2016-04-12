@@ -19,7 +19,7 @@ env:
 before_install:
 ## try early just to check, can delete later
 - git clone https://github.com/eddelbuettel/rinside.git RInside
-- sed -i "s|\/\/\ #define|#define|" RInside/inst/include/RInsideConfig.h
+- sed -i "s|\/\/\ \#define|\#define|" RInside/inst/include/RInsideConfig.h
 - date
 - brew update
 - sh travis/install-qt.sh
@@ -56,7 +56,7 @@ before_install:
 - mkdir temp
 - cd temp
 - git clone https://github.com/eddelbuettel/rinside.git RInside
-- sed -i "s|\/\/\ #define|#define|" RInside/inst/include/RInsideConfig.h
+- sed -i "s|\/\/\ \#define|\#define|" RInside/inst/include/RInsideConfig.h
 - R CMD INSTALL RInside
 - cd ..
 - rm -rf temp
