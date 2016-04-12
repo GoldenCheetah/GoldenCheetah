@@ -18,8 +18,6 @@ env:
   - secure: FXJzm98lwbc1R2eh9/CvVReVRHEPLDm+sCRjiV9HJgeCveIUauLasp9Skamz0c6OKLmkjLY8JERPT491ZgCG8YcQ9x1bM8HGbmRqnn9xSUxINIRzVmyTiLMBoT/ibHHeFjFpyiGfukOAkHwMNNsrSrbaekhiJuekaXo7iTwYQB0=
 before_install:
 ## try early just to check, can delete later
-- git clone https://github.com/eddelbuettel/rinside.git RInside
-- sed -i "" "s|\/\/\ \#define|\#define|" RInside/inst/include/RInsideConfig.h
 - date
 - brew update
 - sh travis/install-qt.sh
