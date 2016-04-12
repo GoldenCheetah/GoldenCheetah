@@ -19,6 +19,9 @@
 #include "RTool.h"
 #include "GcUpgrade.h"
 
+#include "RideItem.h"
+#include "RideFile.h"
+
 // If no callbacks we won't play
 #if !defined(RINSIDE_CALLBACKS)
 #error "GC_WANT_R: RInside must have callbacks enabled (see inst/RInsideConfig.h)"
@@ -67,14 +70,29 @@ RTool::activity()
     Rcpp::DataFrame d;
 
     // access via global as this is a static function
-    if(rtool->context) {
+    if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
 
-        // this is dummy whilst we refactor - next commit will add
-        // a dataframe containing all the ride data
-        Rcpp::NumericVector power(1);
-        power[0] = 300;
-        d["power"] = power;
+        RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
+        int points = f->dataPoints().count();
 
+        // run through each data series adding to the frame, if the
+        // series does not exist we set all values to NA
+        for(int i=0; i < static_cast<int>(RideFile::none); i++) {
+
+            // what series we working with?
+            RideFile::SeriesType series = static_cast<RideFile::SeriesType>(i);
+
+            // set a vector
+            Rcpp::NumericVector vector(points);
+            for(int j=0; j<points; j++) {
+                if (f->isDataPresent(series)) {
+                    vector[j] = f->dataPoints()[j]->value(series);
+                } else {
+                    vector[j] = NA_REAL;
+                }
+            }
+            d[RideFile::seriesName(series).toStdString()] = vector;
+        }
     }
     return d;
 }

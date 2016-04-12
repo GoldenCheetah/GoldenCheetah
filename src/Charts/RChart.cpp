@@ -28,7 +28,7 @@ RConsole::RConsole(Context *context, QWidget *parent)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setFrameStyle(QFrame::NoFrame);
-    document()->setMaximumBlockCount(1024);
+    document()->setMaximumBlockCount(10240);
     putData(GColor(CPLOTMARKER), QString(tr("R Console (%1)").arg(rtool->version)));
     putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "\n> ");
 
