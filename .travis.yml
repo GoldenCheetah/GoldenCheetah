@@ -27,6 +27,7 @@ before_install:
 - brew install libsamplerate
 - brew tap homebrew/science
 - brew install r
+- cat install-packages.Rout
 ## Disable KML for now
 ##- brew install --HEAD travis/libkml.rb
 - sudo chmod -R +w /usr/local
@@ -43,6 +44,12 @@ before_install:
 - CC=clang CXX=clang++ sudo make install
 - cd ..
 - hdiutil mount D2XX1.2.2.dmg
+##- install R packages we need
+- cd util
+- R CMD BATCH install-packages.R
+- cat install-packages.R
+- cd ..
+##-
 before_script:
 - mkdir D2XX
 - cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib D2XX
