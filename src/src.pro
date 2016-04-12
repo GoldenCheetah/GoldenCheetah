@@ -260,8 +260,8 @@ contains(DEFINES, "GC_WANT_R") {
     QMAKE_CXXFLAGS +=       $$RCPPWARNING $$RCPPFLAGS $$RCPPINCL $$RINSIDEINCL
     LIBS +=         		$$RLDFLAGS $$RBLAS $$RLAPACK $$RCPPLIBS $$RINSIDELIBS
 
-    HEADERS += Charts/RChart.h
-    SOURCES += Charts/RChart.cpp
+    HEADERS += Charts/RChart.h Charts/RTool.h
+    SOURCES += Charts/RChart.cpp Charts/RTool.cpp
 
 }
 

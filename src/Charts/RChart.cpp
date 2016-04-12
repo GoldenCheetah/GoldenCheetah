@@ -16,12 +16,11 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "RTool.h"
 #include "RChart.h"
 
 #include "Colors.h"
 #include "TabView.h"
-
-extern QString gc_RVersion;
 
 RConsole::RConsole(Context *context, QWidget *parent)
     : QTextEdit(parent)
@@ -30,11 +29,7 @@ RConsole::RConsole(Context *context, QWidget *parent)
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setFrameStyle(QFrame::NoFrame);
     document()->setMaximumBlockCount(1024);
-    QPalette p = palette();
-    p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
-    p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    setPalette(p);
-    putData(GColor(CPLOTMARKER), QString(tr("R Console (%1)").arg(gc_RVersion)));
+    putData(GColor(CPLOTMARKER), QString(tr("R Console (%1)").arg(rtool->version)));
     putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "\n> ");
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -45,6 +40,12 @@ RConsole::RConsole(Context *context, QWidget *parent)
 void
 RConsole::configChanged(qint32)
 {
+    QFont courier("Courier", QFont().pointSize());
+    setFont(courier);
+    QPalette p = palette();
+    p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
+    p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    setPalette(p);
     setStyleSheet(TabView::ourStyleSheet());
 }
 
@@ -100,34 +101,41 @@ void RConsole::keyPressEvent(QKeyEvent *e)
         if (line != "") {
             // lets run it
             //qDebug()<<"RUN:" << line;
-            (*gc_RInside)["GC.athlete"] = context->athlete->cyclist.toStdString();
-            (*gc_RInside)["GC.athlete.home"] = context->athlete->home->root().absolutePath().toStdString();
+
+            // set the context for the call - used by all the
+            // R functions to access the athlete data/model etc
+            rtool->context = context;
+            (*rtool->R)["GC.athlete"] = context->athlete->cyclist.toStdString();
+            (*rtool->R)["GC.athlete.home"] = context->athlete->home->root().absolutePath().toStdString();
 
             try {
-                SEXP ret = gc_RInside->parseEval(line.toStdString());
+                SEXP ret = rtool->R->parseEval(line.toStdString());
 
                 // if this isn't an assignment then print the result
                 if(!line.contains("<-")) Rcpp::print(ret);
 
-                QStringList &response = gc_RCallbacks->getConsoleOutput();
+                QStringList &response = rtool->callbacks->getConsoleOutput();
                 putData(GColor(CPLOTMARKER), response.join(""));
                 response.clear();
 
             } catch(std::exception& ex) {
 
                 putData(QColor(Qt::red), QString("%1\n").arg(QString(ex.what())));
-                QStringList &response = gc_RCallbacks->getConsoleOutput();
+                QStringList &response = rtool->callbacks->getConsoleOutput();
                 putData(QColor(Qt::red), response.join(""));
                 response.clear();
 
             } catch(...) {
 
                 putData(QColor(Qt::red), "error: general exception.\n");
-                QStringList &response = gc_RCallbacks->getConsoleOutput();
+                QStringList &response = rtool->callbacks->getConsoleOutput();
                 putData(QColor(Qt::red), response.join(""));
                 response.clear();
 
             }
+
+            // clear context
+            rtool->context = NULL;
 
         }
 
@@ -180,8 +188,13 @@ RChart::RChart(Context *context) : GcChartWindow(context)
 
     console = new RConsole(context, this);
     splitter->addWidget(console);
-    QWidget *widget = new QWidget(this);
-    widget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    splitter->addWidget(new QWidget);
+    QWidget *surface = new QSvgWidget(this);
+    surface->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    splitter->addWidget(surface);
+
+    QPalette p = palette();
+    p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
+    p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    surface->setPalette(p);
 }
 

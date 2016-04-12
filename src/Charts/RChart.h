@@ -26,6 +26,7 @@
 #include <QTextEdit>
 #include <QScrollBar>
 #include <QSplitter>
+#include <QSvgWidget>
 #include <string.h>
 
 #include "GoldenCheetah.h"
@@ -39,6 +40,7 @@ class QString;
 extern RInside *gc_RInside;
 extern RCallbacks *gc_RCallbacks;
 extern QString gc_RVersion;
+extern Context *gc_RContext;
 
 // global singleton catches output from R interpreter
 // first come first served on output
@@ -108,6 +110,7 @@ class RChart : public GcChartWindow {
     protected:
         QSplitter *splitter;
         RConsole *console;
+        QSvgWidget *surface;
 
     private:
         Context *context;

@@ -71,14 +71,13 @@ QApplication *application;
 #include "APIWebService.h"
 HttpListener *listener = NULL;
 #endif
+
 // R is not multithreaded, has a single instance that we setup at startup.
 #ifdef GC_WANT_R
-#include <RInside.h>
-#include <RChart.h> // for RCallback
-RInside *gc_RInside;
-RCallbacks *gc_RCallbacks;
+#include <RTool.h>
+// All R Runtime elements encapsulated in RTool
+RTool *rtool;
 #endif
-QString gc_RVersion;
 
 //
 // Trap signals / termination
@@ -270,30 +269,7 @@ main(int argc, char *argv[])
 #ifdef GC_WANT_R
     // create the singleton in the main thread
     // will be shared by all athletes and all charts (!!)
-    RInside R(argc,argv);
-    gc_RInside = &R;
-#if !defined(RINSIDE_CALLBACKS)
-#error "GC_WANT_R: RInside must have callbacks enabled (see inst/RInsideConfig.h)"
-#else
-    gc_RCallbacks = new RCallbacks;
-    gc_RInside->set_callbacks(gc_RCallbacks);
-
-    // lets get the version early for the about dialog
-    gc_RInside->parseEvalNT("print(R.version.string)");
-    QStringList &version = gc_RCallbacks->getConsoleOutput();
-    if (version.count() == 3) {
-        QRegExp exp("^.*\([0-9]+\.[0-9]+\.[0-9]+\).*$");
-        if (exp.exactMatch(version[1])) gc_RVersion = exp.cap(1);
-        else gc_RVersion = version[1];
-    }
-    version.clear();
-
-    // set all the standard "GC" object
-    R["GC.version"] = VERSION_STRING;
-    R["GC.build"] = VERSION_LATEST;
-#endif
-#else
-    gc_RVersion = "none";
+    rtool = new RTool(argc,argv);
 #endif
 
     // create the application -- only ever ONE regardless of restarts
@@ -420,7 +396,7 @@ main(int argc, char *argv[])
         trainDB = new TrainDB(home);
 
 #ifdef GC_WANT_R
-        R["GC.home"] = home.absolutePath().toStdString();
+        (*(rtool->R))["GC.home"] = home.absolutePath().toStdString();
 #endif
         // lets do what the command line says ...
         QVariant lastOpened;
