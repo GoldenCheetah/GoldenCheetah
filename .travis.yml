@@ -25,7 +25,7 @@ before_install:
 - brew install libusb libusb-compat
 - brew install srmio
 - brew install libsamplerate
-## experiment to see if we need to brew tap homebrew/science first
+- brew tap homebrew/science
 - brew install r
 ## Disable KML for now
 ##- brew install --HEAD travis/libkml.rb
