@@ -880,13 +880,6 @@ class AvgSpeed : public RideMetric {
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &deps) {
 
-        // no ride or no samples
-        if (spec.isEmpty(item->ride())) {
-            setValue(RideFile::NIL);
-            setCount(0);
-            return;
-        }
-
         assert(deps.contains("total_distance"));
         km = deps.value("total_distance")->value(true);
 
