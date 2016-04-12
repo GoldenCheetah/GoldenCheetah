@@ -87,6 +87,10 @@ public:
 
     // return the current "line" of text
     QString currentLine();
+    void setCurrentLine(QString);
+
+    QStringList history;
+    int hpos;
 
 protected:
     virtual void keyPressEvent(QKeyEvent *e);

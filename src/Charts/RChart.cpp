@@ -34,6 +34,9 @@ RConsole::RConsole(Context *context, QWidget *parent)
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
+    // history position
+    hpos=0;
+
     configChanged(0);
 }
 
@@ -75,7 +78,17 @@ void RConsole::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key()) {
     case Qt::Key_Up:
+        if (hpos) {
+            hpos--;
+            setCurrentLine(history[hpos]);
+        }
+        break;
+
     case Qt::Key_Down:
+        if (hpos < history.count()-1) {
+            hpos++;
+            setCurrentLine(history[hpos]);
+        }
         break;
 
     // you can always go to the right
@@ -99,6 +112,10 @@ void RConsole::keyPressEvent(QKeyEvent *e)
         putData("\n");
 
         if (line != "") {
+
+            history << line;
+            hpos = history.count();
+
             // lets run it
             //qDebug()<<"RUN:" << line;
 
@@ -148,6 +165,20 @@ void RConsole::keyPressEvent(QKeyEvent *e)
         if (localEchoEnabled) QTextEdit::keyPressEvent(e);
         emit getData(e->text().toLocal8Bit());
     }
+
+    // if we edit or anything reset the history position
+    if (e->key()!= Qt::Key_Up && e->key()!=Qt::Key_Down) hpos = history.count();
+}
+
+void
+RConsole::setCurrentLine(QString p)
+{
+    QTextCursor select = textCursor();
+
+    select.select(QTextCursor::LineUnderCursor);
+    select.removeSelectedText();
+    putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "> ");
+    putData(p);
 }
 
 QString
