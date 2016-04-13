@@ -105,6 +105,10 @@ void RConsole::keyPressEvent(QKeyEvent *e)
     case Qt::Key_Enter:
     case Qt::Key_Return:
     {
+        QTextCursor move = textCursor();
+        move.movePosition(QTextCursor::End);
+        setTextCursor(move);
+
         QString line = currentLine();
         if (line.length() > 1) line = line.mid(2, line.length()-2);
         else line = "";
