@@ -70,7 +70,6 @@ lessThan(QT_MAJOR_VERSION, 5) {
 
         ## need mac extras and clang++ needs to know which stdlib to link with
         QT += macextras webengine webenginecore webenginewidgets positioning
-        LIBS += -stdlib=libc++
 
     } else {
         QT += multimedia multimediawidgets
