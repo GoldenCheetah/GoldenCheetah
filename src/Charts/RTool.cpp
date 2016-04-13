@@ -72,15 +72,26 @@ RTool::activity()
     // access via global as this is a static function
     if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
 
+        // get the ride
         RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
+        f->recalculateDerivedSeries();
         int points = f->dataPoints().count();
 
-        // run through each data series adding to the frame, if the
+        // add in actual time in POSIXct format (via Rcpp::Datetime)
+        Rcpp::DatetimeVector time(points);
+        for(int k=0; k<points; k++)
+            time[k] = Rcpp::Datetime(f->startTime().addSecs(f->dataPoints()[k]->secs).toTime_t());
+        d["time"] = time;
+
+        // now run through each data series adding to the frame, if the
         // series does not exist we set all values to NA
         for(int i=0; i < static_cast<int>(RideFile::none); i++) {
 
             // what series we working with?
             RideFile::SeriesType series = static_cast<RideFile::SeriesType>(i);
+
+            // lets not add lots of NA for the more obscure data series
+            if (i > 15 && !f->isDataPresent(series)) continue;
 
             // set a vector
             Rcpp::NumericVector vector(points);
@@ -95,6 +106,7 @@ RTool::activity()
             // use the compatability 'name' to work with e.g. R package trackeR
             d[RideFile::seriesName(series, true).toStdString()] = vector;
         }
+
     }
     return d;
 }
