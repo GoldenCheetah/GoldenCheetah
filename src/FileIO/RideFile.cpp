@@ -162,62 +162,121 @@ RideFile::isSwim() const
     return (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim"));
 }
 
+// compatibility means used in e.g. R so no spaces in names
+// and use naming convention e.g. trackeR R package
 QString
-RideFile::seriesName(SeriesType series)
+RideFile::seriesName(SeriesType series, bool compat)
 {
-    switch (series) {
-    case RideFile::secs: return QString(tr("Time"));
-    case RideFile::cad: return QString(tr("Cadence"));
-    case RideFile::hr: return QString(tr("Heartrate"));
-    case RideFile::km: return QString(tr("Distance"));
-    case RideFile::kph: return QString(tr("Speed"));
-    case RideFile::kphd: return QString(tr("Acceleration"));
-    case RideFile::wattsd: return QString(tr("Power %1").arg(deltaChar));
-    case RideFile::cadd: return QString(tr("Cadence %1").arg(deltaChar));
-    case RideFile::nmd: return QString(tr("Torque %1").arg(deltaChar));
-    case RideFile::hrd: return QString(tr("Heartrate %1").arg(deltaChar));
-    case RideFile::nm: return QString(tr("Torque"));
-    case RideFile::watts: return QString(tr("Power"));
-    case RideFile::xPower: return QString(tr("xPower"));
-    case RideFile::aPower: return QString(tr("aPower"));
-    case RideFile::aTISS: return QString(tr("aTISS"));
-    case RideFile::anTISS: return QString(tr("anTISS"));
-    case RideFile::NP: return QString(tr("Normalized Power"));
-    case RideFile::alt: return QString(tr("Altitude"));
-    case RideFile::lon: return QString(tr("Longitude"));
-    case RideFile::lat: return QString(tr("Latitude"));
-    case RideFile::headwind: return QString(tr("Headwind"));
-    case RideFile::slope: return QString(tr("Slope"));
-    case RideFile::temp: return QString(tr("Temperature"));
-    case RideFile::lrbalance: return QString(tr("Left/Right Balance"));
-    case RideFile::lte: return QString(tr("Left Torque Efficiency"));
-    case RideFile::rte: return QString(tr("Right Torque Efficiency"));
-    case RideFile::lps: return QString(tr("Left Pedal Smoothness"));
-    case RideFile::rps: return QString(tr("Right Pedal Smoothness"));
-    case RideFile::lpco: return QString(tr("Left Platform Center Offset"));
-    case RideFile::rpco: return QString(tr("Right Platform Center Offset"));
-    case RideFile::lppb: return QString(tr("Left Power Phase Start"));
-    case RideFile::rppb: return QString(tr("Right Power Phase Start"));
-    case RideFile::lppe: return QString(tr("Left Power Phase End"));
-    case RideFile::rppe: return QString(tr("Right Power Phase End"));
-    case RideFile::lpppb: return QString(tr("Left Peak Power Phase Start"));
-    case RideFile::rpppb: return QString(tr("Right Peak Power Phase Start"));
-    case RideFile::lpppe: return QString(tr("Left Peak Power Phase End"));
-    case RideFile::rpppe: return QString(tr("Right Peak Power Phase End"));
-    case RideFile::interval: return QString(tr("Interval"));
-    case RideFile::vam: return QString(tr("VAM"));
-    case RideFile::wattsKg: return QString(tr("Watts per Kilogram"));
-    case RideFile::wprime: return QString(tr("W' balance"));
-    case RideFile::smo2: return QString(tr("SmO2"));
-    case RideFile::thb: return QString(tr("THb"));
-    case RideFile::o2hb: return QString(tr("O2Hb"));
-    case RideFile::hhb: return QString(tr("HHb"));
-    case RideFile::rvert: return QString(tr("Vertical Oscillation"));
-    case RideFile::rcad: return QString(tr("Run Cadence"));
-    case RideFile::rcontact: return QString(tr("GCT"));
-    case RideFile::gear: return QString(tr("Gear Ratio"));
-    case RideFile::wbal: return QString(tr("W' Consumed"));
-    default: return QString(tr("Unknown"));
+    if (compat) {
+        switch (series) {
+        case RideFile::secs: return QString(tr("time"));
+        case RideFile::cad: return QString(tr("cadence"));
+        case RideFile::hr: return QString(tr("heart.rate"));
+        case RideFile::km: return QString(tr("distance"));
+        case RideFile::kph: return QString(tr("speed"));
+        case RideFile::kphd: return QString(tr("acceleration"));
+        case RideFile::wattsd: return QString(tr("powerd"));
+        case RideFile::cadd: return QString(tr("cadenced"));
+        case RideFile::nmd: return QString(tr("torqued"));
+        case RideFile::hrd: return QString(tr("heart.rated"));
+        case RideFile::nm: return QString(tr("torque"));
+        case RideFile::watts: return QString(tr("power"));
+        case RideFile::xPower: return QString(tr("xpower"));
+        case RideFile::aPower: return QString(tr("apower"));
+        case RideFile::aTISS: return QString(tr("atiss"));
+        case RideFile::anTISS: return QString(tr("antiss"));
+        case RideFile::NP: return QString(tr("NP"));
+        case RideFile::alt: return QString(tr("altitude"));
+        case RideFile::lon: return QString(tr("longitude"));
+        case RideFile::lat: return QString(tr("latitude"));
+        case RideFile::headwind: return QString(tr("headwind"));
+        case RideFile::slope: return QString(tr("slope"));
+        case RideFile::temp: return QString(tr("temperature"));
+        case RideFile::lrbalance: return QString(tr("lrbalance"));
+        case RideFile::lte: return QString(tr("lte"));
+        case RideFile::rte: return QString(tr("rte"));
+        case RideFile::lps: return QString(tr("lps"));
+        case RideFile::rps: return QString(tr("rps"));
+        case RideFile::lpco: return QString(tr("lpco"));
+        case RideFile::rpco: return QString(tr("rpco"));
+        case RideFile::lppb: return QString(tr("lppb"));
+        case RideFile::rppb: return QString(tr("rppb"));
+        case RideFile::lppe: return QString(tr("lppe"));
+        case RideFile::rppe: return QString(tr("rppe"));
+        case RideFile::lpppb: return QString(tr("lpppb"));
+        case RideFile::rpppb: return QString(tr("rpppb"));
+        case RideFile::lpppe: return QString(tr("lpppe"));
+        case RideFile::rpppe: return QString(tr("rpppe"));
+        case RideFile::interval: return QString(tr("interval"));
+        case RideFile::vam: return QString(tr("vam"));
+        case RideFile::wattsKg: return QString(tr("wpk"));
+        case RideFile::wbal:
+        case RideFile::wprime: return QString(tr("wbal"));
+        case RideFile::smo2: return QString(tr("smo2"));
+        case RideFile::thb: return QString(tr("thb"));
+        case RideFile::o2hb: return QString(tr("o2hb"));
+        case RideFile::hhb: return QString(tr("hhb"));
+        case RideFile::rvert: return QString(tr("rvert"));
+        case RideFile::rcad: return QString(tr("rcad"));
+        case RideFile::rcontact: return QString(tr("gct"));
+        case RideFile::gear: return QString(tr("gearratio"));
+        default: return QString(tr("unknown"));
+        }
+    } else {
+        switch (series) {
+        case RideFile::secs: return QString(tr("Time"));
+        case RideFile::cad: return QString(tr("Cadence"));
+        case RideFile::hr: return QString(tr("Heartrate"));
+        case RideFile::km: return QString(tr("Distance"));
+        case RideFile::kph: return QString(tr("Speed"));
+        case RideFile::kphd: return QString(tr("Acceleration"));
+        case RideFile::wattsd: return QString(tr("Power %1").arg(deltaChar));
+        case RideFile::cadd: return QString(tr("Cadence %1").arg(deltaChar));
+        case RideFile::nmd: return QString(tr("Torque %1").arg(deltaChar));
+        case RideFile::hrd: return QString(tr("Heartrate %1").arg(deltaChar));
+        case RideFile::nm: return QString(tr("Torque"));
+        case RideFile::watts: return QString(tr("Power"));
+        case RideFile::xPower: return QString(tr("xPower"));
+        case RideFile::aPower: return QString(tr("aPower"));
+        case RideFile::aTISS: return QString(tr("aTISS"));
+        case RideFile::anTISS: return QString(tr("anTISS"));
+        case RideFile::NP: return QString(tr("Normalized Power"));
+        case RideFile::alt: return QString(tr("Altitude"));
+        case RideFile::lon: return QString(tr("Longitude"));
+        case RideFile::lat: return QString(tr("Latitude"));
+        case RideFile::headwind: return QString(tr("Headwind"));
+        case RideFile::slope: return QString(tr("Slope"));
+        case RideFile::temp: return QString(tr("Temperature"));
+        case RideFile::lrbalance: return QString(tr("Left/Right Balance"));
+        case RideFile::lte: return QString(tr("Left Torque Efficiency"));
+        case RideFile::rte: return QString(tr("Right Torque Efficiency"));
+        case RideFile::lps: return QString(tr("Left Pedal Smoothness"));
+        case RideFile::rps: return QString(tr("Right Pedal Smoothness"));
+        case RideFile::lpco: return QString(tr("Left Platform Center Offset"));
+        case RideFile::rpco: return QString(tr("Right Platform Center Offset"));
+        case RideFile::lppb: return QString(tr("Left Power Phase Start"));
+        case RideFile::rppb: return QString(tr("Right Power Phase Start"));
+        case RideFile::lppe: return QString(tr("Left Power Phase End"));
+        case RideFile::rppe: return QString(tr("Right Power Phase End"));
+        case RideFile::lpppb: return QString(tr("Left Peak Power Phase Start"));
+        case RideFile::rpppb: return QString(tr("Right Peak Power Phase Start"));
+        case RideFile::lpppe: return QString(tr("Left Peak Power Phase End"));
+        case RideFile::rpppe: return QString(tr("Right Peak Power Phase End"));
+        case RideFile::interval: return QString(tr("Interval"));
+        case RideFile::vam: return QString(tr("VAM"));
+        case RideFile::wattsKg: return QString(tr("Watts per Kilogram"));
+        case RideFile::wprime: return QString(tr("W' balance"));
+        case RideFile::smo2: return QString(tr("SmO2"));
+        case RideFile::thb: return QString(tr("THb"));
+        case RideFile::o2hb: return QString(tr("O2Hb"));
+        case RideFile::hhb: return QString(tr("HHb"));
+        case RideFile::rvert: return QString(tr("Vertical Oscillation"));
+        case RideFile::rcad: return QString(tr("Run Cadence"));
+        case RideFile::rcontact: return QString(tr("GCT"));
+        case RideFile::gear: return QString(tr("Gear Ratio"));
+        case RideFile::wbal: return QString(tr("W' Consumed"));
+        default: return QString(tr("Unknown"));
+        }
     }
 }
 

@@ -213,7 +213,7 @@ class RideFile : public QObject // QObject to emit signals
         static SeriesType seriesForSymbol(QString symbol); // get series for symbol
         static QString symbolForSeries(SeriesType);
 
-        static QString seriesName(SeriesType);
+        static QString seriesName(SeriesType, bool compat=false);
         static QString unitName(SeriesType, Context *context);
         static int decimalsFor(SeriesType series);
         static double maximumFor(SeriesType series);

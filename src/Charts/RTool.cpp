@@ -91,7 +91,9 @@ RTool::activity()
                     vector[j] = NA_REAL;
                 }
             }
-            d[RideFile::seriesName(series).toStdString()] = vector;
+
+            // use the compatability 'name' to work with e.g. R package trackeR
+            d[RideFile::seriesName(series, true).toStdString()] = vector;
         }
     }
     return d;
