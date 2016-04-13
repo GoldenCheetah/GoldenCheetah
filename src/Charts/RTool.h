@@ -32,6 +32,7 @@ class RTool {
         Context *context;
 
         static Rcpp::DataFrame activity();
+        static Rcpp::DatetimeVector activities();
 };
 
 extern RTool *rtool;

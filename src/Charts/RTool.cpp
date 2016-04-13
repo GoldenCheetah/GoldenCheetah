@@ -19,6 +19,7 @@
 #include "RTool.h"
 #include "GcUpgrade.h"
 
+#include "RideCache.h"
 #include "RideItem.h"
 #include "RideFile.h"
 
@@ -50,6 +51,7 @@ RTool::RTool(int argc, char**argv)
     (*R)["GC.build"] = VERSION_LATEST;
 
     // Access into the GC data
+    (*R)["GC.activities"] = Rcpp::InternalFunction(RTool::activities);
     (*R)["GC.activity"] = Rcpp::InternalFunction(RTool::activity);
 
     // TBD
@@ -62,6 +64,26 @@ RTool::RTool(int argc, char**argv)
     // the following are already set in RChart on a per call basis
     // "GC.athlete" "GC.athlete.home"
 
+}
+
+Rcpp::DatetimeVector
+RTool::activities()
+{
+
+    if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
+
+        // allocate
+        Rcpp::DatetimeVector l(rtool->context->athlete->rideCache->count());
+
+        // fill
+        int i=0;
+        foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+            l[i++] = Rcpp::Datetime(item->dateTime.toTime_t());
+        }
+
+        return l;
+    }
+    return Rcpp::DatetimeVector(0);
 }
 
 Rcpp::DataFrame
