@@ -169,7 +169,7 @@ RideFile::seriesName(SeriesType series, bool compat)
 {
     if (compat) {
         switch (series) {
-        case RideFile::secs: return QString(tr("time"));
+        case RideFile::secs: return QString(tr("seconds"));
         case RideFile::cad: return QString(tr("cadence"));
         case RideFile::hr: return QString(tr("heart.rate"));
         case RideFile::km: return QString(tr("distance"));
@@ -1212,11 +1212,16 @@ RideFile::isDataPresent(SeriesType series)
 {
     switch (series) {
         case secs : return dataPresent.secs; break;
+        case cadd :
         case cad : return dataPresent.cad; break;
+        case hrd :
         case hr : return dataPresent.hr; break;
         case km : return dataPresent.km; break;
+        case kphd :
         case kph : return dataPresent.kph; break;
+        case nmd :
         case nm : return dataPresent.nm; break;
+        case wattsd :
         case watts : return dataPresent.watts; break;
         case aPower : return dataPresent.apower; break;
         case aTISS : return dataPresent.atiss; break;
