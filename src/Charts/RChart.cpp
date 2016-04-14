@@ -139,7 +139,8 @@ void RConsole::keyPressEvent(QKeyEvent *e)
                 SEXP ret = rtool->R->parseEval(line.toStdString());
 
                 // if this isn't an assignment then print the result
-                if(!Rf_isNull(ret) && !line.contains("<-")) Rcpp::print(ret);
+                // bit hacky, there must be a better way!
+                if(!Rf_isNull(ret) && !line.contains("<-") && !line.contains("print")) Rcpp::print(ret);
 
                 QStringList &response = rtool->callbacks->getConsoleOutput();
                 putData(GColor(CPLOTMARKER), response.join(""));
