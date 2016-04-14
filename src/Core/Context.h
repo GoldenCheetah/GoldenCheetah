@@ -190,6 +190,7 @@ class Context : public QObject
         void notifyRefreshEnd() { emit refreshEnd(); }
         void notifyRefreshUpdate(QDate date) { emit refreshUpdate(date); }
 
+        void notifyRMessage(QString x) { emit rMessage(x); }
         void notifyCompareIntervals(bool state);
         void notifyCompareIntervalsChanged();
 
@@ -260,6 +261,9 @@ class Context : public QObject
         void unpause();
         void pause();
         void stop();
+
+        // R messages
+        void rMessage(QString);
 
         // comparing things
         void compareIntervalsStateChanged(bool);

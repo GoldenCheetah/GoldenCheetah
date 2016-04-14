@@ -33,6 +33,7 @@ RConsole::RConsole(Context *context, QWidget *parent)
     putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "\n> ");
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(rMessage(QString)), this, SLOT(rMessage(QString)));
 
     // history position
     hpos=0;
@@ -52,6 +53,11 @@ RConsole::configChanged(qint32)
     setStyleSheet(TabView::ourStyleSheet());
 }
 
+void
+RConsole::rMessage(QString x)
+{
+    putData(GColor(CPLOTMARKER), x);
+}
 
 void RConsole::putData(QColor color, QString string)
 {
@@ -133,7 +139,7 @@ void RConsole::keyPressEvent(QKeyEvent *e)
                 SEXP ret = rtool->R->parseEval(line.toStdString());
 
                 // if this isn't an assignment then print the result
-                if(!line.contains("<-")) Rcpp::print(ret);
+                if(!Rf_isNull(ret) && !line.contains("<-")) Rcpp::print(ret);
 
                 QStringList &response = rtool->callbacks->getConsoleOutput();
                 putData(GColor(CPLOTMARKER), response.join(""));
@@ -216,20 +222,24 @@ RChart::RChart(Context *context) : GcChartWindow(context)
     mainLayout->setContentsMargins(2,0,2,2);
     setChartLayout(mainLayout);
 
-    splitter = new QSplitter(Qt::Horizontal, this);
-    splitter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    splitter->setHandleWidth(1);
-    mainLayout->addWidget(splitter);
+    // if we failed to startup the RInside properly
+    // then disable the RConsole altogether.
+    if (rtool->R) {
+        splitter = new QSplitter(Qt::Horizontal, this);
+        splitter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+        splitter->setHandleWidth(1);
+        mainLayout->addWidget(splitter);
 
-    console = new RConsole(context, this);
-    splitter->addWidget(console);
-    QWidget *surface = new QSvgWidget(this);
-    surface->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    splitter->addWidget(surface);
+        console = new RConsole(context, this);
+        splitter->addWidget(console);
+        QWidget *surface = new QSvgWidget(this);
+        surface->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+        splitter->addWidget(surface);
 
-    QPalette p = palette();
-    p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
-    p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    surface->setPalette(p);
+        QPalette p = palette();
+        p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
+        p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        surface->setPalette(p);
+    }
 }
 

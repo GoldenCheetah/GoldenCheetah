@@ -33,39 +33,6 @@
 #include "Context.h"
 #include "Athlete.h"
 
-class RInside;
-class RCallbacks;
-class QString;
-
-extern RInside *gc_RInside;
-extern RCallbacks *gc_RCallbacks;
-extern QString gc_RVersion;
-extern Context *gc_RContext;
-
-// global singleton catches output from R interpreter
-// first come first served on output
-class RCallbacks : public Callbacks {
-    public:
-        // see inst/includes/Callbacks.h for a list of all overrideable methods
-        virtual void WriteConsole(const std::string& line, int type) {
-            //qDebug()<<"Console>>" <<type<< QString::fromStdString(line);
-            strings << QString::fromStdString(line);
-        };
-
-        virtual void ShowMessage(const char* message) {
-            //qDebug()<<"M:" << QString(message);
-            strings << QString(message);
-        }
-
-        virtual bool has_ShowMessage() { return true; }
-        virtual bool has_WriteConsole() { return true; }
-
-        QStringList &getConsoleOutput() {
-            return strings;
-        }
-    private:
-        QStringList strings;
-};
 
 // a console widget to type commands and display response
 class RConsole : public QTextEdit {
@@ -77,6 +44,7 @@ signals:
 
 public slots:
     void configChanged(qint32);
+    void rMessage(QString);
 
 public:
     explicit RConsole(Context *context, QWidget *parent = 0);
