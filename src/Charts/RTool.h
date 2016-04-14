@@ -21,6 +21,7 @@
 
 #ifndef _GC_RTool_h
 
+class RCallbacks;
 class RTool {
 
     public:
@@ -35,5 +36,34 @@ class RTool {
         static Rcpp::DatetimeVector activities();
 };
 
+// there is a global instance created in main
 extern RTool *rtool;
+
+// global singleton catches output from R interpreter
+// first come first served on output
+class RCallbacks : public Callbacks {
+
+    public:
+        // see inst/includes/Callbacks.h for a list of all overrideable methods
+        virtual void WriteConsole(const std::string& line, int type) {
+            //qDebug()<<"Console>>" <<type<< QString::fromStdString(line);
+            if (rtool && rtool->context) rtool->context->notifyRMessage(QString::fromStdString(line));
+            else strings << QString::fromStdString(line);
+        };
+
+        //virtual void ShowMessage(const char* message) {
+            //qDebug()<<"M:" << QString(message);
+            //strings << QString(message);
+        //}
+
+        //virtual bool has_ShowMessage() { return true; }
+        virtual bool has_WriteConsole() { return true; }
+
+        QStringList &getConsoleOutput() {
+            return strings;
+        }
+    private:
+        QStringList strings;
+};
+
 #endif

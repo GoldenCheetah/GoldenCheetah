@@ -31,39 +31,58 @@
 RTool::RTool(int argc, char**argv)
 {
     // setup the R runtime elements
-    R = new RInside(argc,argv);
-    callbacks = new RCallbacks;
-    R->set_callbacks(callbacks);
+    bool failed = false;
+    try {
 
-    // lets get the version early for the about dialog
-    R->parseEvalNT("print(R.version.string)");
-    QStringList &strings = callbacks->getConsoleOutput();
-    if (strings.count() == 3) {
-        QRegExp exp("^.*([0-9]+\\.[0-9]+\\.[0-9]+).*$");
-        if (exp.exactMatch(strings[1])) version = exp.cap(1);
-        else version = strings[1];
+        R = new RInside(argc,argv);
+        callbacks = new RCallbacks;
+        R->set_callbacks(callbacks);
+
+        // lets get the version early for the about dialog
+        R->parseEvalNT("print(R.version.string)");
+        QStringList &strings = callbacks->getConsoleOutput();
+        if (strings.count() == 3) {
+            QRegExp exp("^.*([0-9]+\\.[0-9]+\\.[0-9]+).*$");
+            if (exp.exactMatch(strings[1])) version = exp.cap(1);
+            else version = strings[1];
+        }
+        strings.clear();
+
+        // set the "GC" object and methods
+        context = NULL;
+        (*R)["GC.version"] = VERSION_STRING;
+        (*R)["GC.build"] = VERSION_LATEST;
+
+        // Access into the GC data
+        (*R)["GC.activities"] = Rcpp::InternalFunction(RTool::activities);
+        (*R)["GC.activity"] = Rcpp::InternalFunction(RTool::activity);
+
+        // TBD
+        // GC.metrics     - list of activities and their metrics
+        // GC.activity    - single activity and its data series
+        // GC.seasons     - configured seasons
+        // GC.season      - currently selected season
+        // GC.config      - configuration (zones, units etc)
+
+        // the following are already set in RChart on a per call basis
+        // "GC.athlete" "GC.athlete.home"
+
+    } catch(std::exception& ex) {
+
+        qDebug()<<"RInside error:"  << ex.what();
+        failed = true;
+
+    } catch(...) {
+
+        failed = true;
     }
-    strings.clear();
 
-    // set the "GC" object and methods
-    context = NULL;
-    (*R)["GC.version"] = VERSION_STRING;
-    (*R)["GC.build"] = VERSION_LATEST;
-
-    // Access into the GC data
-    (*R)["GC.activities"] = Rcpp::InternalFunction(RTool::activities);
-    (*R)["GC.activity"] = Rcpp::InternalFunction(RTool::activity);
-
-    // TBD
-    // GC.metrics     - list of activities and their metrics
-    // GC.activity    - single activity and its data series
-    // GC.seasons     - configured seasons
-    // GC.season      - currently selected season
-    // GC.config      - configuration (zones, units etc)
-
-    // the following are already set in RChart on a per call basis
-    // "GC.athlete" "GC.athlete.home"
-
+    // ack, disable R runtime
+    if (failed) {
+        qDebug() << "RInside/Rcpp failed to start, RConsole disabled.";
+        version = "none";
+        R = NULL;
+    }
 }
 
 Rcpp::DatetimeVector
