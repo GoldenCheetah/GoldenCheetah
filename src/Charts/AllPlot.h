@@ -510,6 +510,7 @@ class AllPlotObject : public QObject
     QVector<double> smoothHrD;
     QVector<double> smoothCad;
     QVector<double> smoothTime;
+    QVector<double> smoothTimeOfDay;
     QVector<double> smoothDistance;
     QVector<double> smoothAltitude;
     QVector<double> smoothSlope;
@@ -722,7 +723,10 @@ class AllPlot : public QwtPlot
         // array / smooth state
         int smooth;
         bool bydist;
+        bool bytimeofday;
         bool fill;
+
+        int timeoffset;
 
         // scope of plot (none means all, or just for a specific series
         RideFile::SeriesType scope;
