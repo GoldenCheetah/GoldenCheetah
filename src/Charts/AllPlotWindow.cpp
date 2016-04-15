@@ -432,6 +432,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     comboDistance = new QComboBox(this);
     comboDistance->addItem(tr("Time"));
     comboDistance->addItem(tr("Distance"));
+    comboDistance->addItem(tr("Time of day"));
     mainControls->addRow(new QLabel(tr("X Axis")), comboDistance);
 
     QLabel *smoothLabel = new QLabel(tr("Smooth"), this);
@@ -1646,6 +1647,7 @@ AllPlotWindow::redrawFullPlot()
     static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
     fullPlot->standard->grid->enableY(false);
 
+
     // use the ride to decide
     if (fullPlot->bydist)
         fullPlot->setAxisScale(QwtPlot::xBottom,
@@ -1653,7 +1655,7 @@ AllPlotWindow::redrawFullPlot()
         ride->ride()->dataPoints().last()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM));
     else
         fullPlot->setAxisScale(QwtPlot::xBottom, ride->ride()->dataPoints().first()->secs/60,
-                                                ride->ride()->dataPoints().last()->secs/60);
+                                                 ride->ride()->dataPoints().last()->secs/60);
 
     fullPlot->replot();
 }
@@ -3315,20 +3317,20 @@ AllPlotWindow::setPaintBrush(int value)
 void
 AllPlotWindow::setByDistance(int value)
 {
-    if (value <0 || value >1 || active == true) return;
+    if (value <0 || value >2 || active == true) return;
 
     active = true;
     comboDistance->setCurrentIndex(value);
 
     // compare mode is self contained
     if (isCompare()) {
-        fullPlot->bydist = value;
+        fullPlot->bydist = (value == 1);
         compareChanged();
         active = false;
         return;
     }
 
-    fullPlot->setByDistance(value);
+    fullPlot->setByDistance(value);// == 1 ? 1 : 0);
     intervalPlot->setByDistance(value);
     allPlot->setByDistance(value);
 
