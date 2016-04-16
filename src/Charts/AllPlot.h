@@ -510,7 +510,6 @@ class AllPlotObject : public QObject
     QVector<double> smoothHrD;
     QVector<double> smoothCad;
     QVector<double> smoothTime;
-    QVector<double> smoothTimeOfDay;
     QVector<double> smoothDistance;
     QVector<double> smoothAltitude;
     QVector<double> smoothSlope;
