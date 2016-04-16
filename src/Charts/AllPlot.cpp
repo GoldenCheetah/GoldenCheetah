@@ -1886,7 +1886,6 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothHrD.resize(rideTimeSecs + 1);
         objects->smoothCad.resize(rideTimeSecs + 1);
         objects->smoothTime.resize(rideTimeSecs + 1);
-        //objects->smoothTimeOfDay.resize(rideTimeSecs + 1);
         objects->smoothDistance.resize(rideTimeSecs + 1);
         objects->smoothAltitude.resize(rideTimeSecs + 1);
         objects->smoothSlope.resize(rideTimeSecs + 1);
@@ -2191,9 +2190,6 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothGear[secs] = currentGearRatio;
             objects->smoothDistance[secs] = totalDist;
             objects->smoothTime[secs]  =  secs / 60.0;
-
-            //objects->smoothTimeOfDay[secs]  =  timeoffset + secs / 60.0;
-
         }
 
     } else {
@@ -2224,7 +2220,6 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothHrD.resize(0);
         objects->smoothCad.resize(0);
         objects->smoothTime.resize(0);
-        //objects->smoothTimeOfDay.resize(0);
         objects->smoothDistance.resize(0);
         objects->smoothAltitude.resize(0);
         objects->smoothSlope.resize(0);
@@ -2272,7 +2267,6 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothHrD.append(dp->hrd);
             objects->smoothCad.append(dp->cad);
             objects->smoothTime.append(dp->secs/60);
-            //objects->smoothTimeOfDay.append(timeoffset  + dp->secs/60);
             objects->smoothDistance.append(context->athlete->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
             objects->smoothAltitude.append(context->athlete->useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
             objects->smoothSlope.append(dp->slope);
@@ -2313,7 +2307,6 @@ AllPlot::recalc(AllPlotObject *objects)
         }
     }
 
-    //QVector<double> &xaxis = bydist ? objects->smoothDistance : bytimeofday ?  objects->smoothTimeOfDay : objects->smoothTime;
     QVector<double> &xaxis = bydist ? objects->smoothDistance : objects->smoothTime;
     int startingIndex = qMin(smooth, xaxis.count());
     int totalPoints = xaxis.count() - startingIndex;
@@ -2542,10 +2535,7 @@ AllPlot::refreshIntervalMarkers()
             }
 
             if (!bydist) {
-                //if (!bytimeofday)
-                    mrk->setValue(interval->start / 60.0, 0.0);
-                /*else
-                    mrk->setValue(timeoffset + interval->start / 60.0, 0.0);*/
+                mrk->setValue(interval->start / 60.0, 0.0);
             } else
                 mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
                                 interval->startKM, 0.0);
@@ -3146,7 +3136,6 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     double *smoothX = &plot->standard->smoothXP[startidx];
     double *smoothL = &plot->standard->smoothAP[startidx];
     double *smoothT = &plot->standard->smoothTime[startidx];
-    //double *smoothTD = &plot->standard->smoothTimeOfDay[startidx];
     double *smoothHR = &plot->standard->smoothHr[startidx];
     double *smoothTCORE = &plot->standard->smoothTcore[startidx];
     double *smoothS = &plot->standard->smoothSpeed[startidx];
@@ -3182,7 +3171,6 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     QwtIntervalSample *smoothRS = &plot->standard->smoothRelSpeed[startidx];
 
     double *xaxis = bydist ? smoothD : smoothT;
-    //double *xaxis = bydist ? smoothD : bytimeofday ? smoothTD : smoothT;
 
     // attach appropriate curves
     //if (this->legend()) this->legend()->hide();
@@ -5058,7 +5046,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
 
     // NOW SET OUR CURVES USING THEIR DATA ...
     QVector<double> &xaxis = referencePlot->bydist ? object->smoothDistance : object->smoothTime;
-    //QVector<double> &xaxis = referencePlot->bydist ? object->smoothDistance : referencePlot->bytimeofday ? object->smoothTimeOfDay : object->smoothTime;
+
     int totalPoints = xaxis.count();
 
     //W' curve set to whatever data we have
