@@ -3330,7 +3330,7 @@ AllPlotWindow::setByDistance(int value)
         return;
     }
 
-    fullPlot->setByDistance(value);// == 1 ? 1 : 0);
+    fullPlot->setByDistance(value);
     intervalPlot->setByDistance(value);
     allPlot->setByDistance(value);
 

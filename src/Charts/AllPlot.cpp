@@ -259,14 +259,14 @@ class TimeScaleDraw: public ScaleScaleDraw
 
     public:
 
-    TimeScaleDraw(bool *bydist) : ScaleScaleDraw(), bydist(bydist) {}
+    TimeScaleDraw(bool *bydist, int *timeoffset) : ScaleScaleDraw(), bydist(bydist), timeoffset(timeoffset) {}
 
     virtual QwtText label(double v) const
     {
         if (*bydist) {
             return QString("%1").arg(v);
         } else {
-            QTime t = QTime(0,0,0,0).addSecs((v)*60.00);
+            QTime t = QTime(0,0,0,0).addSecs((*timeoffset+v)*60.00);
             if (scaleMap().sDist() > 5)
                 return t.toString("hh:mm");
             return t.toString("hh:mm:ss");
@@ -274,6 +274,7 @@ class TimeScaleDraw: public ScaleScaleDraw
     }
     private:
     bool *bydist;
+    int *timeoffset;
 
 };
 
@@ -1434,7 +1435,7 @@ AllPlot::configChanged(qint32 what)
         setPalette(pal);
 
         // tick draw
-        TimeScaleDraw *tsd = new TimeScaleDraw(&this->bydist) ;
+        TimeScaleDraw *tsd = new TimeScaleDraw(&this->bydist, &timeoffset) ;
         tsd->setTickLength(QwtScaleDiv::MajorTick, 3);
         setAxisScaleDraw(QwtPlot::xBottom, tsd);
         pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
@@ -1805,6 +1806,8 @@ AllPlot::recalc(AllPlotObject *objects)
     // Offset for timeOfDay
     if (context->isCompareIntervals)
         timeoffset = 0;
+    else if (!bytimeofday)
+        timeoffset = 0;
     else
         timeoffset = rideItem->ride()->startTime().time().msecsSinceStartOfDay() / 1000 / 60.0;
 
@@ -1883,7 +1886,7 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothHrD.resize(rideTimeSecs + 1);
         objects->smoothCad.resize(rideTimeSecs + 1);
         objects->smoothTime.resize(rideTimeSecs + 1);
-        objects->smoothTimeOfDay.resize(rideTimeSecs + 1);
+        //objects->smoothTimeOfDay.resize(rideTimeSecs + 1);
         objects->smoothDistance.resize(rideTimeSecs + 1);
         objects->smoothAltitude.resize(rideTimeSecs + 1);
         objects->smoothSlope.resize(rideTimeSecs + 1);
@@ -2189,7 +2192,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothDistance[secs] = totalDist;
             objects->smoothTime[secs]  =  secs / 60.0;
 
-            objects->smoothTimeOfDay[secs]  =  timeoffset + secs / 60.0;
+            //objects->smoothTimeOfDay[secs]  =  timeoffset + secs / 60.0;
 
         }
 
@@ -2221,7 +2224,7 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothHrD.resize(0);
         objects->smoothCad.resize(0);
         objects->smoothTime.resize(0);
-        objects->smoothTimeOfDay.resize(0);
+        //objects->smoothTimeOfDay.resize(0);
         objects->smoothDistance.resize(0);
         objects->smoothAltitude.resize(0);
         objects->smoothSlope.resize(0);
@@ -2269,7 +2272,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothHrD.append(dp->hrd);
             objects->smoothCad.append(dp->cad);
             objects->smoothTime.append(dp->secs/60);
-            objects->smoothTimeOfDay.append(timeoffset  + dp->secs/60);
+            //objects->smoothTimeOfDay.append(timeoffset  + dp->secs/60);
             objects->smoothDistance.append(context->athlete->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
             objects->smoothAltitude.append(context->athlete->useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
             objects->smoothSlope.append(dp->slope);
@@ -2310,8 +2313,8 @@ AllPlot::recalc(AllPlotObject *objects)
         }
     }
 
-    QVector<double> &xaxis = bydist ? objects->smoothDistance : bytimeofday ?  objects->smoothTimeOfDay : objects->smoothTime;
-    //QVector<double> &xaxis = bydist ? objects->smoothDistance : objects->smoothTime;
+    //QVector<double> &xaxis = bydist ? objects->smoothDistance : bytimeofday ?  objects->smoothTimeOfDay : objects->smoothTime;
+    QVector<double> &xaxis = bydist ? objects->smoothDistance : objects->smoothTime;
     int startingIndex = qMin(smooth, xaxis.count());
     int totalPoints = xaxis.count() - startingIndex;
 
@@ -2539,10 +2542,10 @@ AllPlot::refreshIntervalMarkers()
             }
 
             if (!bydist) {
-                if (!bytimeofday)
+                //if (!bytimeofday)
                     mrk->setValue(interval->start / 60.0, 0.0);
-                else
-                    mrk->setValue(timeoffset + interval->start / 60.0, 0.0);
+                /*else
+                    mrk->setValue(timeoffset + interval->start / 60.0, 0.0);*/
             } else
                 mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
                                 interval->startKM, 0.0);
@@ -3143,7 +3146,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     double *smoothX = &plot->standard->smoothXP[startidx];
     double *smoothL = &plot->standard->smoothAP[startidx];
     double *smoothT = &plot->standard->smoothTime[startidx];
-    double *smoothTD = &plot->standard->smoothTimeOfDay[startidx];
+    //double *smoothTD = &plot->standard->smoothTimeOfDay[startidx];
     double *smoothHR = &plot->standard->smoothHr[startidx];
     double *smoothTCORE = &plot->standard->smoothTcore[startidx];
     double *smoothS = &plot->standard->smoothSpeed[startidx];
@@ -3178,7 +3181,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     QwtIntervalSample *smoothRS = &plot->standard->smoothRelSpeed[startidx];
 
-    double *xaxis = bydist ? smoothD : bytimeofday ? smoothTD : smoothT;
+    double *xaxis = bydist ? smoothD : smoothT;
+    //double *xaxis = bydist ? smoothD : bytimeofday ? smoothTD : smoothT;
 
     // attach appropriate curves
     //if (this->legend()) this->legend()->hide();
@@ -5053,7 +5057,8 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->intervalHoverCurve->setVisible(false);
 
     // NOW SET OUR CURVES USING THEIR DATA ...
-    QVector<double> &xaxis = referencePlot->bydist ? object->smoothDistance : referencePlot->bytimeofday ? object->smoothTimeOfDay : object->smoothTime;
+    QVector<double> &xaxis = referencePlot->bydist ? object->smoothDistance : object->smoothTime;
+    //QVector<double> &xaxis = referencePlot->bydist ? object->smoothDistance : referencePlot->bytimeofday ? object->smoothTimeOfDay : object->smoothTime;
     int totalPoints = xaxis.count();
 
     //W' curve set to whatever data we have
