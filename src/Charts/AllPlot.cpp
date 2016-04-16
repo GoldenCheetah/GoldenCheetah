@@ -1809,8 +1809,7 @@ AllPlot::recalc(AllPlotObject *objects)
     else if (!bytimeofday)
         timeoffset = 0;
     else
-        timeoffset = rideItem->ride()->startTime().time().msecsSinceStartOfDay() / 1000 / 60.0;
-
+        timeoffset = QTime(0, 0).secsTo(rideItem->ride()->startTime().time()) / 60.0;
 
     if (applysmooth > 0) {
 
