@@ -97,7 +97,7 @@ RTool::activities()
         // fill
         int i=0;
         foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
-            l[i++] = Rcpp::Datetime(item->dateTime.toTime_t());
+            l[i++] = Rcpp::Datetime(item->dateTime.toUTC().toTime_t());
         }
 
         return l;
@@ -121,7 +121,7 @@ RTool::activity()
         // add in actual time in POSIXct format (via Rcpp::Datetime)
         Rcpp::DatetimeVector time(points);
         for(int k=0; k<points; k++)
-            time[k] = Rcpp::Datetime(f->startTime().addSecs(f->dataPoints()[k]->secs).toTime_t());
+            time[k] = Rcpp::Datetime(f->startTime().addSecs(f->dataPoints()[k]->secs).toUTC().toTime_t());
         d["time"] = time;
 
         // now run through each data series adding to the frame, if the
@@ -138,7 +138,10 @@ RTool::activity()
             Rcpp::NumericVector vector(points);
             for(int j=0; j<points; j++) {
                 if (f->isDataPresent(series)) {
-                    vector[j] = f->dataPoints()[j]->value(series);
+                    if (f->dataPoints()[j]->value(series) == 0 && (series == RideFile::lat || series == RideFile::lon))
+                        vector[j] = NA_REAL;
+                    else
+                        vector[j] = f->dataPoints()[j]->value(series);
                 } else {
                     vector[j] = NA_REAL;
                 }
@@ -149,5 +152,9 @@ RTool::activity()
         }
 
     }
-    return d;
+
+    // d is basically a list, this is about the only way to really
+    // return a valid data.frame
+    Rcpp::DataFrame returning(d);
+    return returning;
 }
