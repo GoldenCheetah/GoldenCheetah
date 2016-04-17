@@ -17,7 +17,7 @@
  */
 
 #include "RTool.h"
-#include "RGraphics.h"
+#include "RGraphicsDevice.h"
 #include "GcUpgrade.h"
 
 #include "RideCache.h"
