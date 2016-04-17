@@ -17,6 +17,7 @@
  */
 
 #include "RTool.h"
+#include "RGraphics.h"
 #include "GcUpgrade.h"
 
 #include "RideCache.h"
@@ -37,6 +38,7 @@ RTool::RTool(int argc, char**argv)
         R = new RInside(argc,argv);
         callbacks = new RCallbacks;
         R->set_callbacks(callbacks);
+        dev = new RGraphicsDevice();
 
         // lets get the version early for the about dialog
         R->parseEvalNT("print(R.version.string)");
