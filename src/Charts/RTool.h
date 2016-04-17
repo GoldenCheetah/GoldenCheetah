@@ -22,15 +22,19 @@
 #ifndef _GC_RTool_h
 
 class RCallbacks;
+class RGraphicsDevice;
+
 class RTool {
 
     public:
         RTool(int argc, char **argv);
 
         RInside *R;
-        QString version;
         RCallbacks *callbacks;
+        RGraphicsDevice *dev;
+
         Context *context;
+        QString version;
 
         static Rcpp::DataFrame activity();
         static Rcpp::DatetimeVector activities();
