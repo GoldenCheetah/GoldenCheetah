@@ -24,7 +24,7 @@ install:
 
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc2015
-- call "%ChocolateyInstall%/lib/jom/content/jom -j 2"
+- C:\ProgramData\chocolatey\lib\jom\tools\jom -j 2
 
 #notifications:
 #- provider: GitHubPullRequest
