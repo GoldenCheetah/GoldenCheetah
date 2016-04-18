@@ -1804,9 +1804,7 @@ AllPlot::recalc(AllPlotObject *objects)
     utotals.fill(0);
 
     // Offset for timeOfDay
-    if (context->isCompareIntervals)
-        timeoffset = 0;
-    else if (!bytimeofday)
+    if (context->isCompareIntervals || !bytimeofday)
         timeoffset = 0;
     else
         timeoffset = QTime(0, 0).secsTo(rideItem->ride()->startTime().time()) / 60.0;
@@ -6879,7 +6877,7 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         if (bydist) {
             xstring = QString("%1").arg(xvalue);
         } else {
-            QTime t = QTime(0,0,0).addSecs(xvalue*60.00);
+            QTime t = QTime(0,0,0).addSecs((timeoffset+xvalue)*60.00);
             xstring = t.toString("hh:mm:ss");
         }
 
