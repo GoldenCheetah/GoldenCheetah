@@ -42,7 +42,7 @@ void RGraphicsDevice::NewPage(const pGEcontext gc, pDevDesc dev)
    //XXXs_graphicsDeviceEvents.onNewPage(previousPageSnapshot);
 }
 
-Rboolean RGraphicsDevice::NewFrameConfirm(pDevDesc dd)
+Rboolean RGraphicsDevice::NewFrameConfirm_(pDevDesc dd)
 {
     qDebug()<<"RGD: NewPageConfirm";
    // returning false causes the default implementation (printing a prompt
@@ -67,10 +67,10 @@ void RGraphicsDevice::Mode(int mode, pDevDesc dev)
 void RGraphicsDevice::Size(double *left, double *right, double *bottom, double *top, pDevDesc dev)
 {
     qDebug()<<"RGD: Size";
-   *left = 0.0;
-   *right = 500; //XXXs_width;
-   *bottom = 500; //XXXs_height;
-   *top = 0.0;
+   *left = 0.0f;
+   *right = 500.0f; //XXXs_width;
+   *bottom = 0.0f; //XXXs_height;
+   *top = 500.0f;
 }
 
 void RGraphicsDevice::Clip(double x0, double x1, double y0, double y1, pDevDesc dev)
@@ -204,26 +204,25 @@ void RGraphicsDevice::Deactivate(pDevDesc dev)
 void RGraphicsDevice::Close(pDevDesc dev)
 {
     qDebug()<<"RGD: Close";
-#if 0
-   if (s_pGEDevDesc != NULL)
-   {
+
+   if (rtool->dev->gcGEDevDesc != NULL) {
+
       // destroy device specific struct
-      DeviceContext* pDC = (DeviceContext*)s_pGEDevDesc->dev->deviceSpecific;
+      //XXXDeviceContext* pDC = (DeviceContext*)s_pGEDevDesc->dev->deviceSpecific;
       //XXXqDebughandler::destroy(pDC);
 
       // explicitly free and then null out the dev pointer of the GEDevDesc
       // This is to avoid incompatabilities between the heap we are compiled with
       // and the heap R is compiled with (we observed this to a problem with
       // 64-bit R)
-      std::free(s_pGEDevDesc->dev);
-      s_pGEDevDesc->dev = NULL;
+      std::free(rtool->dev->gcGEDevDesc->dev);
+      rtool->dev->gcGEDevDesc->dev = NULL;
 
       // set GDDevDesc to NULL so we don't reference it again
-      s_pGEDevDesc = NULL;
+      rtool->dev->gcGEDevDesc = NULL;
    }
 
-   s_graphicsDeviceEvents.onClosed();
-#endif
+   //XXXs_graphicsDeviceEvents.onClosed();
 }
 
 void RGraphicsDevice::OnExit(pDevDesc dd)
@@ -314,12 +313,15 @@ SEXP RGraphicsDevice::GCdisplay()
 SEXP RGraphicsDevice::createGD()
 {
     qDebug()<<"RGD: createGD";
+
+#if 0
    // error if there is already an RStudio device
    if (gcGEDevDesc) {
 
-      qDebug()<<"R: multiple graphics devices not supported.";
+      Rf_warning("multiple GoldenCheetah graphics devices not supported.");
       return R_NilValue;
    }
+#endif
 
     // error if not a version 9 graphics system
     if (::R_GE_getVersion() < 9) {
@@ -336,35 +338,35 @@ SEXP RGraphicsDevice::createGD()
       pDevDesc pDev = (DevDesc *) std::calloc(1, sizeof(DevDesc));
 
       // device functions
-      pDev->activate = Activate;
-      pDev->deactivate = Deactivate;
-      pDev->size = Size;
-      pDev->clip = Clip;
-      pDev->rect = Rect;
-      pDev->path = Path;
-      pDev->raster = Raster;
-      pDev->cap = Cap;
-      pDev->circle = Circle;
-      pDev->line = Line;
-      pDev->polyline = Polyline;
-      pDev->polygon = Polygon;
-      pDev->locator = Locator;
-      pDev->mode = Mode;
-      pDev->metricInfo = MetricInfo;
-      pDev->strWidth = StrWidth;
-      pDev->strWidthUTF8 = StrWidthUTF8;
-      pDev->text = Text;
-      pDev->textUTF8 = TextUTF8;
+      pDev->activate = RGraphicsDevice::Activate;
+      pDev->deactivate = RGraphicsDevice::Deactivate;
+      pDev->size = RGraphicsDevice::Size;
+      pDev->clip = RGraphicsDevice::Clip;
+      pDev->rect = RGraphicsDevice::Rect;
+      pDev->path = RGraphicsDevice::Path;
+      pDev->raster = RGraphicsDevice::Raster;
+      pDev->cap = NULL;
+      pDev->circle = RGraphicsDevice::Circle;
+      pDev->line = RGraphicsDevice::Line;
+      pDev->polyline = RGraphicsDevice::Polyline;
+      pDev->polygon = RGraphicsDevice::Polygon;
+      pDev->locator = RGraphicsDevice::Locator;
+      pDev->mode = RGraphicsDevice::Mode;
+      pDev->metricInfo = RGraphicsDevice::MetricInfo;
+      pDev->strWidth = RGraphicsDevice::StrWidth;
+      pDev->strWidthUTF8 = RGraphicsDevice::StrWidthUTF8;
+      pDev->text = RGraphicsDevice::Text;
+      pDev->textUTF8 = RGraphicsDevice::TextUTF8;
       pDev->hasTextUTF8 = TRUE;
       pDev->wantSymbolUTF8 = TRUE;
       pDev->useRotatedTextInContour = FALSE;
-      pDev->newPage = NewPage;
-      pDev->close = Close;
-      pDev->newFrameConfirm = NewFrameConfirm;
-      pDev->onExit = OnExit;
+      pDev->newPage = RGraphicsDevice::NewPage;
+      pDev->close = RGraphicsDevice::Close;
+      pDev->newFrameConfirm = RGraphicsDevice::NewFrameConfirm_;
+      pDev->onExit = RGraphicsDevice::OnExit;
       pDev->eventEnv = R_NilValue;
       pDev->eventHelper = NULL;
-      pDev->holdflush = HoldFlush;
+      pDev->holdflush = RGraphicsDevice::HoldFlush;
 
       // capabilities flags
       pDev->haveTransparency = 2;
@@ -377,8 +379,8 @@ SEXP RGraphicsDevice::createGD()
       pDev->deviceSpecific = NULL;
 
       // device attributes
-      //XXXhandler::setSize(pDev);
-      //XXXhandler::setDeviceAttributes(pDev);
+      setSize(pDev);
+      setDeviceAttributes(pDev);
 
       // notify handler we are about to add (enables shadow device
       // to close itself so it doesn't show up in the dev.list()
@@ -590,43 +592,99 @@ bool RGraphicsDevice::initialize()
    return true;
 }
 
+void RGraphicsDevice::setDeviceAttributes(pDevDesc pDev)
+{
+    double pointsize = 12;
+    double xoff=0, yoff=0, width=7, height=7;
 
+    pDev->startps = pointsize;
+    pDev->startfont = 1;
+    pDev->startlty = 0;
+    //pDev->startfill = setbg;
+    //pDev->startcol = setfg;
+    pDev->startgamma = 1;
+
+    pDev->left = 72 * xoff;			/* left */
+    pDev->right = 72 * (xoff + width);	/* right */
+    pDev->bottom = 72 * yoff;			/* bottom */
+    pDev->top = 72 * (yoff + height);	        /* top */
+
+    pDev->clipLeft = pDev->left; pDev->clipRight = pDev->right;
+    pDev->clipBottom = pDev->bottom; pDev->clipTop = pDev->top;
+
+    pDev->cra[0] = 0.9 * pointsize;
+    pDev->cra[1] = 1.2 * pointsize;
+
+    /* Character Addressing Offsets */
+    /* These offsets should center a single */
+    /* plotting character over the plotting point. */
+    /* Pure guesswork and eyeballing ... */
+
+    pDev->xCharOffset =  0.4900;
+    pDev->yCharOffset =  0.3333;
+    pDev->yLineBias = 0.2;
+
+    /* Inches per Raster Unit */
+    /* We use points (72 dots per inch) */
+
+    pDev->ipr[0] = 1.0/72.0;
+    pDev->ipr[1] = 1.0/72.0;
+
+   // no support for qt events yet
+   pDev->canGenMouseDown = FALSE;
+   pDev->canGenMouseMove = FALSE;
+   pDev->canGenMouseUp = FALSE;
+   pDev->canGenKeybd = FALSE;
+   pDev->gettingEvent = FALSE;
+
+}
+
+void RGraphicsDevice::setSize(pDevDesc pDev)
+{
+    pDev->left = 0;
+    pDev->right = 500;
+    pDev->top = 500;
+    pDev->bottom = 0;
+}
+
+// below get called when the window resizes
 void RGraphicsDevice::setSize(int width, int height, double devicePixelRatio)
 {
 #if 0
    // only set if the values have changed (prevents unnecessary plot
    // invalidations from occuring)
-   if ( width != s_width || height != s_height || devicePixelRatio != s_devicePixelRatio)
-   {
+   if ( width != s_width || height != s_height || devicePixelRatio != s_devicePixelRatio) {
       s_width = width;
       s_height = height;
       s_devicePixelRatio = devicePixelRatio;
 
       // if there is a device active sync its size
-      if (s_pGEDevDesc != NULL)
-         resizeGraphicsDevice();
+      if (gcGEDevDesc != NULL) resizeGraphicsDevice();
    }
 #endif
 }
 
 int RGraphicsDevice::getWidth()
 {
-   return 500; //XXXs_width;
+   return 500; //s_width;
 }
 
 int RGraphicsDevice::getHeight()
 {
-   return 500; //XXXs_height;
+   return 500; //s_height;
 }
 
 double RGraphicsDevice::devicePixelRatio()
 {
-   return 1; //XXXs_devicePixelRatio;
+   return 1.0f; //s_devicePixelRatio;
 }
 
 void RGraphicsDevice::close()
 {
-   //XXX if (s_pGEDevDesc != NULL) Rf_killDevice(Rf_ndevNumber(s_pGEDevDesc->dev));
+    if (gcGEDevDesc != NULL) {
+        Rf_killDevice(Rf_ndevNumber(gcGEDevDesc->dev));
+        gcGEDevDesc=NULL;
+    }
 }
 
 
