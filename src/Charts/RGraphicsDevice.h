@@ -56,7 +56,7 @@ class RGraphicsDevice {
 
         // R Graphic Device API methods
         static void NewPage(const pGEcontext gc, pDevDesc dev);
-        static Rboolean NewFrameConfirm(pDevDesc dd);
+        static Rboolean NewFrameConfirm_(pDevDesc dd); // name clashes with #define !!!
         static void Mode(int mode, pDevDesc dev);
         static void Size(double *left, double *right, double *bottom, double *top, pDevDesc dev);
         static void Clip(double x0, double x1, double y0, double y1, pDevDesc dev);
@@ -105,6 +105,8 @@ class RGraphicsDevice {
         void deviceToUser(double* x, double* y);
         void deviceToNDC(double* x, double* y);
         void setSize(int width, int height, double devicePixelRatio);
+        void setSize(pDevDesc pDev);
+        void setDeviceAttributes(pDevDesc pDev);
         int getWidth();
         int getHeight();
         double devicePixelRatio();
