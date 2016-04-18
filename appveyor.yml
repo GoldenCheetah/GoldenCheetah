@@ -18,12 +18,13 @@ init:
 
 install:
 - choco install winflexbison
+- choco install jom
 - copy qwt\qwtconfig.pri.in qwt\qwtconfig.pri
 - copy c:\libs\gcconfig64-Release.appveyor.pri src\gcconfig.pri
 
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc2015
-- nmake
+- jom -j 2
 
 #notifications:
 #- provider: GitHubPullRequest
