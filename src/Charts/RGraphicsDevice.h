@@ -50,49 +50,55 @@ class RGraphicsDevice {
         RGraphicsDevice();
         ~RGraphicsDevice();
 
+        // exported as R methods
+        static SEXP GCdisplay(); // R> GC.display()
+        static SEXP GCactivate(); // R> GC.activate()
+
         // R Graphic Device API methods
-        void NewPage(const pGEcontext gc, pDevDesc dev);
-        Rboolean NewFrameConfirm(pDevDesc dd);
-        void Mode(int mode, pDevDesc dev);
-        void Size(double *left, double *right, double *bottom, double *top, pDevDesc dev);
-        void Clip(double x0, double x1, double y0, double y1, pDevDesc dev);
-        void Rect(double x0, double y0, double x1, double y1, const pGEcontext gc, pDevDesc dev);
-        void Path(double *x, double *y, int npoly, int *nper, Rboolean winding, const pGEcontext gc, pDevDesc dd);
-        void Raster(unsigned int *raster,int w, int h, double x, double y, double width, double height, double rot, Rboolean interpolate, const pGEcontext gc, pDevDesc dd);
-        SEXP Cap(pDevDesc dd);
-        void Circle(double x, double y, double r, const pGEcontext gc, pDevDesc dev);
-        void Line(double x1, double y1, double x2, double y2, const pGEcontext gc, pDevDesc dev);
-        void Polyline(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev);
-        void Polygon(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev);
-        void MetricInfo(int c, const pGEcontext gc, double* ascent, double* descent, double* width, pDevDesc dev);
-        double StrWidth(const char *str, const pGEcontext gc, pDevDesc dev);
-        double StrWidthUTF8(const char *str, const pGEcontext gc, pDevDesc dev);
-        void Text(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc dev);
-        void TextUTF8(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc dev);
-        void Activate(pDevDesc dev);
-        void Deactivate(pDevDesc dev);
-        void Close(pDevDesc dev);
-        void OnExit(pDevDesc dd);
-        int HoldFlush(pDevDesc dd, int level);
+        static void NewPage(const pGEcontext gc, pDevDesc dev);
+        static Rboolean NewFrameConfirm(pDevDesc dd);
+        static void Mode(int mode, pDevDesc dev);
+        static void Size(double *left, double *right, double *bottom, double *top, pDevDesc dev);
+        static void Clip(double x0, double x1, double y0, double y1, pDevDesc dev);
+        static void Rect(double x0, double y0, double x1, double y1, const pGEcontext gc, pDevDesc dev);
+        static void Path(double *x, double *y, int npoly, int *nper, Rboolean winding, const pGEcontext gc, pDevDesc dd);
+        static void Raster(unsigned int *raster,int w, int h, double x, double y, double width, double height, double rot, Rboolean interpolate, const pGEcontext gc, pDevDesc dd);
+        static SEXP Cap(pDevDesc dd);
+        static void Circle(double x, double y, double r, const pGEcontext gc, pDevDesc dev);
+        static void Line(double x1, double y1, double x2, double y2, const pGEcontext gc, pDevDesc dev);
+        static void Polyline(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev);
+        static void Polygon(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev);
+        static void MetricInfo(int c, const pGEcontext gc, double* ascent, double* descent, double* width, pDevDesc dev);
+        static double StrWidth(const char *str, const pGEcontext gc, pDevDesc dev);
+        static double StrWidthUTF8(const char *str, const pGEcontext gc, pDevDesc dev);
+        static void Text(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc dev);
+        static void TextUTF8(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc dev);
+        static void Activate(pDevDesc dev);
+        static void Deactivate(pDevDesc dev);
+        static void Close(pDevDesc dev);
+        static Rboolean Locator(double *x, double *y, pDevDesc dev);
+        static void OnExit(pDevDesc dd);
+        static int HoldFlush(pDevDesc dd, int level);
 
         // event handling (?)
         void onBeforeExecute();
         void resyncDisplayList();
         void resizeGraphicsDevice();
-        SEXP rs_activateGD();
         void copyToActiveDevice();
         std::string imageFileExtension();
         void close();
-        //Error makeActive();
-        //Rboolean Locator(double *x, double *y, pDevDesc dev);
         //DisplaySize displaySize();
         //Error saveSnapshot(const core::FilePath& snapshotFile,const core::FilePath& imageFile);
         //Error restoreSnapshot(const core::FilePath& snapshotFile);
 
-        // utility functions (?)
-        bool initialize();
+        // Device Creation and activation
         SEXP createGD();
+        SEXP activateGD();
+        bool initialize();
         bool isActive();
+        bool makeActive();
+
+        // utility functions
         double grconvert(double val, const std::string& type, const std::string& from, const std::string& to);
         double grconvertX(double x, const std::string& from, const std::string& to);
         double grconvertY(double y, const std::string& from, const std::string& to);
@@ -102,4 +108,7 @@ class RGraphicsDevice {
         int getWidth();
         int getHeight();
         double devicePixelRatio();
+
+        // our graphics device
+        pGEDevDesc gcGEDevDesc;
 };

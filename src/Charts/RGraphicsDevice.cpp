@@ -16,18 +16,24 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "RTool.h"
 #include "RGraphicsDevice.h"
 
 const char * const gcDevice = "GoldenCheetahGD";
 
 RGraphicsDevice::RGraphicsDevice ()
 {
+    // first time through
+    gcGEDevDesc = NULL;
+
     // instantiate.............
-    //XXX qDebug()<<"R: instantiate graphics device...";
+    createGD();
+    initialize();
 }
 
 void RGraphicsDevice::NewPage(const pGEcontext gc, pDevDesc dev)
 {
+    qDebug()<<"RGD: NewPage";
    // delegate
    //XXXqDebughandler::newPage(gc, dev);
 
@@ -38,15 +44,17 @@ void RGraphicsDevice::NewPage(const pGEcontext gc, pDevDesc dev)
 
 Rboolean RGraphicsDevice::NewFrameConfirm(pDevDesc dd)
 {
+    qDebug()<<"RGD: NewPageConfirm";
    // returning false causes the default implementation (printing a prompt
    // of "Hit <Return> to see next plot:" to the console) to be used. this
    // seems ideal compared to any custom UI we could produce so we leave it be
-   return FALSE;
+   return TRUE;
 }
 
 
 void RGraphicsDevice::Mode(int mode, pDevDesc dev)
 {
+    qDebug()<<"RGD: Mode";
    // 0 = stop drawing
    // 1 = start drawing
    // 2 = input active
@@ -58,6 +66,7 @@ void RGraphicsDevice::Mode(int mode, pDevDesc dev)
 
 void RGraphicsDevice::Size(double *left, double *right, double *bottom, double *top, pDevDesc dev)
 {
+    qDebug()<<"RGD: Size";
    *left = 0.0;
    *right = 500; //XXXs_width;
    *bottom = 500; //XXXs_height;
@@ -66,79 +75,94 @@ void RGraphicsDevice::Size(double *left, double *right, double *bottom, double *
 
 void RGraphicsDevice::Clip(double x0, double x1, double y0, double y1, pDevDesc dev)
 {
+    qDebug()<<"RGD: Clip";
    //XXXqDebughandler::clip(x0, x1, y0, y1, dev);
 }
 
 
 void RGraphicsDevice::Rect(double x0, double y0, double x1, double y1, const pGEcontext gc, pDevDesc dev)
 {
+    qDebug()<<"RGD: Rect";
    //XXXqDebughandler::rect(x0, y0, x1, y1, gc, dev);
 }
 
 void RGraphicsDevice::Path(double *x, double *y, int npoly, int *nper, Rboolean winding, const pGEcontext gc, pDevDesc dd)
 {
+    qDebug()<<"RGD: Path";
    //XXXqDebughandler::path(x, y, npoly, nper, winding, gc, dd);
 }
 
 void RGraphicsDevice::Raster(unsigned int *raster, int w, int h, double x, double y, double width,
                              double height, double rot, Rboolean interpolate, const pGEcontext gc, pDevDesc dd)
 {
+    qDebug()<<"RGD: Raster";
    //XXXqDebughandler::raster(raster, w, h, x, y, width, height, rot, interpolate, gc, dd);
 }
 
 SEXP RGraphicsDevice::Cap(pDevDesc dd)
 {
+    qDebug()<<"RGD: Cap";
    return 0;//XXXqDebughandler::cap(dd);
 }
 
 void RGraphicsDevice::Circle(double x, double y, double r, const pGEcontext gc, pDevDesc dev)
 {
+    qDebug()<<"RGD: Circle";
    //XXXqDebughandler::circle(x, y, r, gc, dev);
 }
 
 void RGraphicsDevice::Line(double x1, double y1, double x2, double y2, const pGEcontext gc, pDevDesc dev)
 {
+    qDebug()<<"RGD: Line";
    //XXXqDebughandler::line(x1, y1, x2, y2, gc, dev);
 }
 
 void RGraphicsDevice::Polyline(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev)
 {
+    qDebug()<<"RGD: PolyLine";
    //XXXqDebughandler::polyline(n, x, y, gc, dev);
 }
 
 void RGraphicsDevice::Polygon(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev)
 {
+    qDebug()<<"RGD: Polygon";
    //XXXqDebughandler::polygon(n, x, y, gc, dev);
 }
 
 void RGraphicsDevice::MetricInfo(int c, const pGEcontext gc, double* ascent, double* descent, double* width, pDevDesc dev)
 {
+    qDebug()<<"RGD: MetricInfo";
    //XXXqDebughandler::metricInfo(c, gc, ascent, descent, width, dev);
 }
 
 double RGraphicsDevice::StrWidth(const char *str, const pGEcontext gc, pDevDesc dev)
 {
+    qDebug()<<"RGD: StrWidth";
    return 0; //XXXqDebughandler::strWidth(str, gc, dev);
 }
 
 double RGraphicsDevice::StrWidthUTF8(const char *str, const pGEcontext gc, pDevDesc dev)
 {
+    qDebug()<<"RGD: StrWidthUTF8";
    return 0; //XXXqDebughandler::strWidth(str, gc, dev);
 }
 
 void RGraphicsDevice::Text(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc dev)
 {
+    qDebug()<<"RGD: Text";
    //XXXqDebughandler::text(x, y, str, rot, hadj, gc, dev);
 }
 
 void RGraphicsDevice::TextUTF8(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc dev)
 {
+    qDebug()<<"RGD: TextUTF8";
    //XXXqDebughandler::text(x, y, str, rot, hadj, gc, dev);
 }
 
-#if 0
 Rboolean RGraphicsDevice::Locator(double *x, double *y, pDevDesc dev)
 {
+    qDebug()<<"RGD: Locator";
+#if 0
    if (s_locatorFunction)
    {
       s_graphicsDeviceEvents.onDrawing();
@@ -163,19 +187,23 @@ Rboolean RGraphicsDevice::Locator(double *x, double *y, pDevDesc dev)
    {
       return FALSE;
    }
-}
 #endif
+    return FALSE;
+}
 
 void RGraphicsDevice::Activate(pDevDesc dev)
 {
+    qDebug()<<"RGD: Activate";
 }
 
 void RGraphicsDevice::Deactivate(pDevDesc dev)
 {
+    qDebug()<<"RGD: De-Activate";
 }
 
 void RGraphicsDevice::Close(pDevDesc dev)
 {
+    qDebug()<<"RGD: Close";
 #if 0
    if (s_pGEDevDesc != NULL)
    {
@@ -200,6 +228,7 @@ void RGraphicsDevice::Close(pDevDesc dev)
 
 void RGraphicsDevice::OnExit(pDevDesc dd)
 {
+    qDebug()<<"RGD: OnExit";
    // NOTE: this may be called at various times including during error
    // handling (jump_to_top_ex). therefore, do not place any process or device
    // final termination code here (even though the name of the function
@@ -208,6 +237,7 @@ void RGraphicsDevice::OnExit(pDevDesc dd)
 
 int RGraphicsDevice::HoldFlush(pDevDesc dd, int level)
 {
+    qDebug()<<"RGD: HoldFlush";
    // NOTE: holdflush does not apply to bitmap devices since they are
    // already "buffered" via the fact that they only do expensive operations
    // (write to file) on dev.off. We could in theory use dev.flush as
@@ -223,6 +253,7 @@ int RGraphicsDevice::HoldFlush(pDevDesc dd, int level)
 
 void RGraphicsDevice::resyncDisplayList()
 {
+    qDebug()<<"RGD: resyncDisplayList";
 #if 0
    // get pointers to device desc and cairo data
    pDevDesc pDev = s_pGEDevDesc->dev;
@@ -266,6 +297,7 @@ void RGraphicsDevice::resyncDisplayList()
 
 void RGraphicsDevice::resizeGraphicsDevice()
 {
+    qDebug()<<"RGD: resizeGraphicsDevice";
    // resync display list
    resyncDisplayList();
 
@@ -273,153 +305,129 @@ void RGraphicsDevice::resizeGraphicsDevice()
    //XXXs_graphicsDeviceEvents.onResized();
 }
 
+SEXP RGraphicsDevice::GCdisplay()
+{
+    return rtool->dev->createGD();
+}
+
 // routine which creates device
 SEXP RGraphicsDevice::createGD()
 {
-#if 0
+    qDebug()<<"RGD: createGD";
    // error if there is already an RStudio device
-   if (s_pGEDevDesc != NULL)
-   {
-      if (!r::session::utils::isServerMode())
-      {
-         Error error = r::exec::executeString(".rs.newDesktopGraphicsDevice()");
-         if (error)
-         {
-            std::string msg = error.summary();
-            r::isCodeExecutionError(error, &msg);
-            Rf_warning(("Error creating graphics device: " + msg).c_str());
-         }
-      }
-      else
-      {
-         Rf_warning("Only one RStudio graphics device is permitted");
-      }
+   if (gcGEDevDesc) {
+
+      qDebug()<<"R: multiple graphics devices not supported.";
       return R_NilValue;
    }
 
+    // error if not a version 9 graphics system
+    if (::R_GE_getVersion() < 9) {
+
+      qDebug()<<"R: only support v9 or higher graphics systems, this is"<<::R_GE_getVersion();
+      return R_NilValue;
+    }
 
    R_CheckDeviceAvailable();
 
    BEGIN_SUSPEND_INTERRUPTS
    {
-      // initialize v9 structure
-      DevDescVersion9 devDesc;
+      // define device
+      pDevDesc pDev = (DevDesc *) std::calloc(1, sizeof(DevDesc));
 
       // device functions
-      devDesc.activate = GD_Activate;
-      devDesc.deactivate = GD_Deactivate;
-      devDesc.size = GD_Size;
-      devDesc.clip = GD_Clip;
-      devDesc.rect = GD_Rect;
-      devDesc.path = GD_Path;
-      devDesc.raster = GD_Raster;
-      devDesc.cap = GD_Cap;
-      devDesc.circle = GD_Circle;
-      devDesc.line = GD_Line;
-      devDesc.polyline = GD_Polyline;
-      devDesc.polygon = GD_Polygon;
-      devDesc.locator = GD_Locator;
-      devDesc.mode = GD_Mode;
-      devDesc.metricInfo = GD_MetricInfo;
-      devDesc.strWidth = GD_StrWidth;
-      devDesc.strWidthUTF8 = GD_StrWidthUTF8;
-      devDesc.text = GD_Text;
-      devDesc.textUTF8 = GD_TextUTF8;
-      devDesc.hasTextUTF8 = TRUE;
-      devDesc.wantSymbolUTF8 = TRUE;
-      devDesc.useRotatedTextInContour = FALSE;
-      devDesc.newPage = GD_NewPage;
-      devDesc.close = GD_Close;
-      devDesc.newFrameConfirm = GD_NewFrameConfirm;
-      devDesc.onExit = GD_OnExit;
-      devDesc.eventEnv = R_NilValue;
-      devDesc.eventHelper = NULL;
-      devDesc.holdflush = GD_HoldFlush;
+      pDev->activate = Activate;
+      pDev->deactivate = Deactivate;
+      pDev->size = Size;
+      pDev->clip = Clip;
+      pDev->rect = Rect;
+      pDev->path = Path;
+      pDev->raster = Raster;
+      pDev->cap = Cap;
+      pDev->circle = Circle;
+      pDev->line = Line;
+      pDev->polyline = Polyline;
+      pDev->polygon = Polygon;
+      pDev->locator = Locator;
+      pDev->mode = Mode;
+      pDev->metricInfo = MetricInfo;
+      pDev->strWidth = StrWidth;
+      pDev->strWidthUTF8 = StrWidthUTF8;
+      pDev->text = Text;
+      pDev->textUTF8 = TextUTF8;
+      pDev->hasTextUTF8 = TRUE;
+      pDev->wantSymbolUTF8 = TRUE;
+      pDev->useRotatedTextInContour = FALSE;
+      pDev->newPage = NewPage;
+      pDev->close = Close;
+      pDev->newFrameConfirm = NewFrameConfirm;
+      pDev->onExit = OnExit;
+      pDev->eventEnv = R_NilValue;
+      pDev->eventHelper = NULL;
+      pDev->holdflush = HoldFlush;
 
       // capabilities flags
-      devDesc.haveTransparency = 2;
-      devDesc.haveTransparentBg = 2;
-      devDesc.haveRaster = 2;
-      devDesc.haveCapture = 1;
-      devDesc.haveLocator = 2;
+      pDev->haveTransparency = 2;
+      pDev->haveTransparentBg = 2;
+      pDev->haveRaster = 2;
+      pDev->haveCapture = 1;
+      pDev->haveLocator = 2;
 
-      // allocate device
-      pDevDesc pDev = handler::dev_desc::allocate(devDesc);
-
-      // allocate and initialize context
-      DeviceContext* pDC = handler::allocate(pDev);
-      if (!handler::initialize(s_width, s_height, s_devicePixelRatio, pDC))
-      {
-         handler::destroy(pDC);
-
-         // leak the pDev on purpose because we don't have
-         // access to R's heap/free function
-
-         Rf_error("Unable to start RStudio device");
-      }
-
-      // set device specific context
-      pDev->deviceSpecific = pDC;
+      //XXX todo - not sure what we might need
+      pDev->deviceSpecific = NULL;
 
       // device attributes
-      handler::setSize(pDev);
-      handler::setDeviceAttributes(pDev);
+      //XXXhandler::setSize(pDev);
+      //XXXhandler::setDeviceAttributes(pDev);
 
       // notify handler we are about to add (enables shadow device
       // to close itself so it doesn't show up in the dev.list()
       // in front of us
-      handler::onBeforeAddDevice(pDC);
+      //XXXhandler::onBeforeAddDevice(pDC);
 
       // associate with device description and add it
-      s_pGEDevDesc = GEcreateDevDesc(pDev);
-      GEaddDevice2(s_pGEDevDesc, kRStudioDevice);
+      gcGEDevDesc = GEcreateDevDesc(pDev);
+      GEaddDevice2(gcGEDevDesc, gcDevice);
 
       // notify handler we have added (so it can regenerate its context)
-      handler::onAfterAddDevice(pDC);
+      //XXXhandler::onAfterAddDevice(pDC);
 
       // make us active
-      Rf_selectDevice(Rf_ndevNumber(s_pGEDevDesc->dev));
+      Rf_selectDevice(Rf_ndevNumber(gcGEDevDesc->dev));
    }
    END_SUSPEND_INTERRUPTS;
-#endif
    return R_NilValue;
 }
 
 // ensure that our device is created and active (required for snapshot
 // creation/restoration)
-#if 0
-Error RGraphicsDevice::makeActive()
+bool RGraphicsDevice::makeActive()
 {
-   // don't make active if our graphics version is incompatible
-   if (!graphics::validateRequirements())
-      return Error(graphics::errc::IncompatibleGraphicsEngine, ERROR_LOCATION);
-
    // make sure we have been created
-   if (s_pGEDevDesc == NULL)
-   {
-      SEXP ignoredSEXP;
-      Error error = r::exec::executeSafely<SEXP>(boost::bind(createGD),
-                                                 &ignoredSEXP);
-      if (error)
-         return error;
-   }
+   if (gcGEDevDesc == NULL) return false;
 
    // select us
-   Rf_selectDevice(Rf_ndevNumber(s_pGEDevDesc->dev));
+   Rf_selectDevice(Rf_ndevNumber(gcGEDevDesc->dev));
 
-   return Success();
+   return true;
 }
-#endif
 
 bool RGraphicsDevice::isActive()
 {
-   return 0; //XXXs_pGEDevDesc != NULL && Rf_ndevNumber(s_pGEDevDesc->dev) == Rf_curDevice();
+    qDebug()<<"RGD: isActive";
+   return gcGEDevDesc != NULL && Rf_ndevNumber(gcGEDevDesc->dev) == Rf_curDevice();
 }
 
-SEXP RGraphicsDevice::rs_activateGD()
+SEXP RGraphicsDevice::GCactivate()
 {
-   //XXXError error = makeActive();
-   //XXXif (error) LOG_ERROR(error);
+    return rtool->dev->activateGD();
+}
+
+SEXP RGraphicsDevice::activateGD()
+{
+    qDebug()<<"RGD: activate";
+   bool success = makeActive();
+   if (!success) qDebug()<<"make active failed";
    return R_NilValue;
 }
 
@@ -453,12 +461,14 @@ double RGraphicsDevice::grconvertY(double y, const std::string& from, const std:
 
 void RGraphicsDevice::deviceToUser(double* x, double* y)
 {
+    qDebug()<<"RGD: deviceToUser";
    *x = grconvertX(*x, "device", "user");
    *y = grconvertY(*y, "device", "user");
 }
 
 void RGraphicsDevice::deviceToNDC(double* x, double* y)
 {
+    qDebug()<<"RGD: deviceToNDC";
    *x = grconvertX(*x, "device", "ndc");
    *y = grconvertY(*y, "device", "ndc");
 }
@@ -558,40 +568,26 @@ bool RGraphicsDevice::initialize()
    // set size
    setSize(kDefaultWidth, kDefaultHeight, kDefaultDevicePixelRatio);
 
-   // check for an incompatible graphics version before fully initializing.
-   std::string message;
-   if (graphics::validateRequirements(&message))
-   {
-      // register device creation routine
-      R_CallMethodDef createGDMethodDef ;
-      createGDMethodDef.name = "rs_createGD" ;
-      createGDMethodDef.fun = (DL_FUNC) createGD ;
-      createGDMethodDef.numArgs = 0;
-      r::routines::addCallMethod(createGDMethodDef);
-
-      // regsiter device activiation routine
-      R_CallMethodDef activateGDMethodDef ;
-      activateGDMethodDef.name = "rs_activateGD" ;
-      activateGDMethodDef.fun = (DL_FUNC) rs_activateGD ;
-      activateGDMethodDef.numArgs = 0;
-      r::routines::addCallMethod(activateGDMethodDef);
-
-      // initialize
-      return r::exec::RFunction(".rs.initGraphicsDevice").call();
-   }
-   else
-   {
-      // if there is one then print a warning and return Success. This allows
-      // users to continue using the product while still being made aware of the
-      // fact that their graphics engine is incompatible
-      r::exec::warning(message);
-
-      // success with warning
-      return Success();
-   }
 #endif
-//added
-    return false;
+
+   // register device creation routine
+    (*(rtool->R))["GC.display"] = Rcpp::InternalFunction(GCdisplay);
+   //XXXR_CallMethodDef createGDMethodDef ;
+   //XXXcreateGDMethodDef.name = "GC.display" ;
+   //XXXcreateGDMethodDef.fun = (DL_FUNC) this->createGD ;
+   //XXXcreateGDMethodDef.numArgs = 0;
+   //XXXr::routines::addCallMethod(createGDMethodDef);
+
+   // regsiter device activiation routine
+    (*(rtool->R))["GC.activate"] = Rcpp::InternalFunction(GCactivate);
+   //XXXR_CallMethodDef activateGDMethodDef ;
+   //XXXactivateGDMethodDef.name = "GC.activate" ;
+   //XXXactivateGDMethodDef.fun = (DL_FUNC) this->activateGD ;
+   //XXXactivateGDMethodDef.numArgs = 0;
+   //XXXr::routines::addCallMethod(activateGDMethodDef);
+
+   //XXXreturn r::exec::RFunction(".rs.initGraphicsDevice").call();
+   return true;
 }
 
 

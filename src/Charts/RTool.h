@@ -38,6 +38,8 @@ class RTool {
 
         static Rcpp::DataFrame activity();
         static Rcpp::DatetimeVector activities();
+
+        bool starting;
 };
 
 // there is a global instance created in main
@@ -51,7 +53,7 @@ class RCallbacks : public Callbacks {
         // see inst/includes/Callbacks.h for a list of all overrideable methods
         virtual void WriteConsole(const std::string& line, int type) {
             //qDebug()<<"Console>>" <<type<< QString::fromStdString(line);
-            if (rtool && rtool->context) rtool->context->notifyRMessage(QString::fromStdString(line));
+            if (rtool && rtool->context && !rtool->starting) rtool->context->notifyRMessage(QString::fromStdString(line));
             else strings << QString::fromStdString(line);
         };
 

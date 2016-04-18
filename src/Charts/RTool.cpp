@@ -33,7 +33,12 @@ RTool::RTool(int argc, char**argv)
 {
     // setup the R runtime elements
     bool failed = false;
+    starting = true;
+
     try {
+
+        // yikes, self referenced during construction (!)
+        rtool = this;
 
         R = new RInside(argc,argv);
         callbacks = new RCallbacks;
@@ -85,6 +90,7 @@ RTool::RTool(int argc, char**argv)
         version = "none";
         R = NULL;
     }
+    starting = false;
 }
 
 Rcpp::DatetimeVector

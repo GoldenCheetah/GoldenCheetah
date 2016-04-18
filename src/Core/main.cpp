@@ -76,7 +76,7 @@ HttpListener *listener = NULL;
 #ifdef GC_WANT_R
 #include <RTool.h>
 // All R Runtime elements encapsulated in RTool
-RTool *rtool;
+RTool *rtool = NULL;
 #endif
 
 //
