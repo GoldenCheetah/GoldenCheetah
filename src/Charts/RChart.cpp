@@ -22,6 +22,9 @@
 #include "Colors.h"
 #include "TabView.h"
 
+// unique identifier for each chart
+static int id=0;
+
 RConsole::RConsole(Context *context, QWidget *parent)
     : QTextEdit(parent)
     , context(context), localEchoEnabled(true)
@@ -37,6 +40,9 @@ RConsole::RConsole(Context *context, QWidget *parent)
 
     // history position
     hpos=0;
+
+    // set unique runtimeid name
+    chartid = QString("gc%1").arg(id++);
 
     configChanged(0);
 }
@@ -136,6 +142,10 @@ void RConsole::keyPressEvent(QKeyEvent *e)
             (*rtool->R)["GC.athlete.home"] = context->athlete->home->root().absolutePath().toStdString();
 
             try {
+
+                // replace $$ with chart identifier (to avoid shared data)
+                line = line.replace("$$", chartid);
+
                 SEXP ret = rtool->R->parseEval(line.toStdString());
 
                 // if this isn't an assignment then print the result
