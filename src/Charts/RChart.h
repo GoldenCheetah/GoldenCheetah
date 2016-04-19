@@ -59,6 +59,7 @@ public:
 
     QStringList history;
     int hpos;
+    QString chartid;
 
 protected:
     virtual void keyPressEvent(QKeyEvent *e);
