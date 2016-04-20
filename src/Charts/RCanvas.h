@@ -23,6 +23,9 @@
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 #include <QGraphicsEllipseItem>
+#include <QGraphicsPolygonItem>
+#include <QPolygonF>
+#include <QVector>
 #include <QWheelEvent>
 
 class Context;
@@ -43,7 +46,9 @@ class RCanvas : public QGraphicsView {
         void circle(double x, double y, double r, QPen, QBrush);
         void line(double x1, double y1, double x2, double y2, QPen);
         void polyline(int n, double *x, double *y, QPen);
+        void polygon(int n, double *x, double *y, QPen, QBrush);
         void rectangle(double x0, double y0, double x1, double y1,QPen,QBrush);
+        void text(double x, double y, QString s, double rot, double hadj, QPen p, QFont f);
 
     protected:
         QGraphicsScene *scene;

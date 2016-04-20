@@ -62,7 +62,6 @@ class RGraphicsDevice {
         static void Rect(double x0, double y0, double x1, double y1, const pGEcontext gc, pDevDesc dev);
         static void Path(double *x, double *y, int npoly, int *nper, Rboolean winding, const pGEcontext gc, pDevDesc dd);
         static void Raster(unsigned int *raster,int w, int h, double x, double y, double width, double height, double rot, Rboolean interpolate, const pGEcontext gc, pDevDesc dd);
-        static SEXP Cap(pDevDesc dd);
         static void Circle(double x, double y, double r, const pGEcontext gc, pDevDesc dev);
         static void Line(double x1, double y1, double x2, double y2, const pGEcontext gc, pDevDesc dev);
         static void Polyline(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev);
