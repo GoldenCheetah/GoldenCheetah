@@ -57,6 +57,7 @@ RTool::RTool(int argc, char**argv)
 
         // set the "GC" object and methods
         context = NULL;
+        canvas = NULL;
         (*R)["GC.version"] = VERSION_STRING;
         (*R)["GC.build"] = VERSION_LATEST;
 

@@ -26,13 +26,14 @@
 #include <QTextEdit>
 #include <QScrollBar>
 #include <QSplitter>
-#include <QSvgWidget>
 #include <string.h>
 
 #include "GoldenCheetah.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RCanvas.h"
 
+class RChart;
 
 // a console widget to type commands and display response
 class RConsole : public QTextEdit {
@@ -47,7 +48,7 @@ public slots:
     void rMessage(QString);
 
 public:
-    explicit RConsole(Context *context, QWidget *parent = 0);
+    explicit RConsole(Context *context, RChart *parent = 0);
 
     void putData(QString data);
     void putData(QColor color, QString data);
@@ -70,6 +71,7 @@ protected:
 private:
     Context *context;
     bool localEchoEnabled;
+    RChart *parent;
 };
 
 // the chart
@@ -80,10 +82,12 @@ class RChart : public GcChartWindow {
     public:
         RChart(Context *context);
 
+        // receives all the events
+        RCanvas *canvas;
+
     protected:
         QSplitter *splitter;
         RConsole *console;
-        QSvgWidget *surface;
 
     private:
         Context *context;

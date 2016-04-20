@@ -263,9 +263,9 @@ contains(DEFINES, "GC_WANT_R") {
     QMAKE_CXXFLAGS +=       $$RCPPWARNING $$RCPPFLAGS $$RCPPINCL $$RINSIDEINCL
     LIBS +=         		$$RLDFLAGS $$RBLAS $$RLAPACK $$RCPPLIBS $$RINSIDELIBS
 
-    ## Chart, Tool (R api), Grahics (R device bridge to QWidget)
-    HEADERS += Charts/RChart.h Charts/RTool.h Charts/RGraphicsDevice.h
-    SOURCES += Charts/RChart.cpp Charts/RTool.cpp Charts/RGraphicsDevice.cpp
+    ## Chart, Tool (R api), Grahics (R GraphicDevice and Qt canvas widget)
+    HEADERS += Charts/RChart.h Charts/RTool.h Charts/RGraphicsDevice.h Charts/RCanvas.h
+    SOURCES += Charts/RChart.cpp Charts/RTool.cpp Charts/RGraphicsDevice.cpp Charts/RCanvas.cpp
 
 }
 

@@ -25,9 +25,9 @@
 // unique identifier for each chart
 static int id=0;
 
-RConsole::RConsole(Context *context, QWidget *parent)
+RConsole::RConsole(Context *context, RChart *parent)
     : QTextEdit(parent)
-    , context(context), localEchoEnabled(true)
+    , context(context), localEchoEnabled(true), parent(parent)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setFrameStyle(QFrame::NoFrame);
@@ -138,6 +138,8 @@ void RConsole::keyPressEvent(QKeyEvent *e)
             // set the context for the call - used by all the
             // R functions to access the athlete data/model etc
             rtool->context = context;
+            rtool->canvas = parent->canvas;
+
             (*rtool->R)["GC.athlete"] = context->athlete->cyclist.toStdString();
             (*rtool->R)["GC.athlete.home"] = context->athlete->home->root().absolutePath().toStdString();
 
@@ -174,7 +176,7 @@ void RConsole::keyPressEvent(QKeyEvent *e)
 
             // clear context
             rtool->context = NULL;
-
+            rtool->canvas = NULL;
         }
 
         // next prompt
@@ -243,14 +245,11 @@ RChart::RChart(Context *context) : GcChartWindow(context)
 
         console = new RConsole(context, this);
         splitter->addWidget(console);
-        QWidget *surface = new QSvgWidget(this);
-        surface->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-        splitter->addWidget(surface);
 
-        QPalette p = palette();
-        p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
-        p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-        surface->setPalette(p);
+
+        canvas = new RCanvas(context, this);
+        canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+        splitter->addWidget(canvas);
     }
 }
 

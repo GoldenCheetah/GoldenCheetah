@@ -33,6 +33,10 @@ class RTool {
         RCallbacks *callbacks;
         RGraphicsDevice *dev;
 
+        // the canvas to plot on, it may be null
+        // if no canvas is active
+        RCanvas *canvas;
+
         Context *context;
         QString version;
 

@@ -52,7 +52,6 @@ class RGraphicsDevice {
 
         // exported as R methods
         static SEXP GCdisplay(); // R> GC.display()
-        static SEXP GCactivate(); // R> GC.activate()
 
         // R Graphic Device API methods
         static void NewPage(const pGEcontext gc, pDevDesc dev);
@@ -76,7 +75,6 @@ class RGraphicsDevice {
         static void Activate(pDevDesc dev);
         static void Deactivate(pDevDesc dev);
         static void Close(pDevDesc dev);
-        static Rboolean Locator(double *x, double *y, pDevDesc dev);
         static void OnExit(pDevDesc dd);
         static int HoldFlush(pDevDesc dd, int level);
 
@@ -95,6 +93,7 @@ class RGraphicsDevice {
         SEXP createGD();
         SEXP activateGD();
         bool initialize();
+        void setDeviceAttributes(pDevDesc pDev);
         bool isActive();
         bool makeActive();
 
@@ -104,9 +103,10 @@ class RGraphicsDevice {
         double grconvertY(double y, const std::string& from, const std::string& to);
         void deviceToUser(double* x, double* y);
         void deviceToNDC(double* x, double* y);
+
+        // resizing the display
         void setSize(int width, int height, double devicePixelRatio);
         void setSize(pDevDesc pDev);
-        void setDeviceAttributes(pDevDesc pDev);
         int getWidth();
         int getHeight();
         double devicePixelRatio();
