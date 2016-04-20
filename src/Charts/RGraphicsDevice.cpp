@@ -32,8 +32,15 @@ RGraphicsDevice::RGraphicsDevice ()
     // set the inital graphics device to GC
     createGD();
 
-    // add GC.display() to create a new device
+    // once only initialisation
     initialize();
+}
+
+bool RGraphicsDevice::initialize()
+{
+    // register device creation routine
+    (*(rtool->R))["GC.display"] = Rcpp::InternalFunction(GCdisplay);
+    return true;
 }
 
 void RGraphicsDevice::NewPage(const pGEcontext gc, pDevDesc dev)
@@ -43,10 +50,10 @@ void RGraphicsDevice::NewPage(const pGEcontext gc, pDevDesc dev)
     //XXXqDebughandler::newPage(gc, dev);
 
     // fire event (pass previousPageSnapshot)
-    if (!rtool || !rtool->dev || !rtool->dev->gcGEDevDesc) return;
+    if (!rtool || !rtool->canvas) return;
 
     // replay snapshot
-    //SEXP previousPageSnapshot = rtool->dev->gcGEDevDesc->savedSnapshot;
+    rtool->canvas->newPage();
 }
 
 Rboolean RGraphicsDevice::NewFrameConfirm_(pDevDesc dd)
@@ -89,8 +96,8 @@ void RGraphicsDevice::Clip(double x0, double x1, double y0, double y1, pDevDesc 
 
 void RGraphicsDevice::Rect(double x0, double y0, double x1, double y1, const pGEcontext gc, pDevDesc dev)
 {
-    qDebug()<<"RGD: Rect";
-    //XXXqDebughandler::rect(x0, y0, x1, y1, gc, dev);
+    //XXX todo honour colors
+    if (rtool && rtool->canvas) rtool->canvas->rectangle(x0,y0,x1,y1,QPen(Qt::white),QBrush(Qt::NoBrush));
 }
 
 void RGraphicsDevice::Path(double *x, double *y, int npoly, int *nper, Rboolean winding, const pGEcontext gc, pDevDesc dd)
@@ -114,21 +121,20 @@ SEXP RGraphicsDevice::Cap(pDevDesc dd)
 
 void RGraphicsDevice::Circle(double x, double y, double r, const pGEcontext gc, pDevDesc dev)
 {
-    qDebug()<<"RGD: Circle";
-    //XXXqDebughandler::circle(x, y, r, gc, dev);
+    //XXX todo honour colors
+    if (rtool && rtool->canvas) rtool->canvas->circle(x,y,r,QPen(Qt::white),QBrush(Qt::NoBrush));
 }
 
 void RGraphicsDevice::Line(double x1, double y1, double x2, double y2, const pGEcontext gc, pDevDesc dev)
 {
-    qDebug()<<"RGD: Line";
-    //XXXqDebughandler::line(x1, y1, x2, y2, gc, dev);
+    //XXX todo honour colors
+    if (rtool && rtool->canvas) rtool->canvas->line(x1,y1,x2,y2,QPen(Qt::white));
 }
 
 void RGraphicsDevice::Polyline(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev)
 {
-    qDebug()<<"RGD: PolyLine"<<n;
-    for(int i=0; i<n; i++) qDebug()<<i<<":"<<x[i]<<y[i];
-    //XXXqDebughandler::polyline(n, x, y, gc, dev);
+    //XXX todo honour colors
+    if (rtool && rtool->canvas && n > 1) rtool->canvas->polyline(n,x,y,QPen(Qt::white));
 }
 
 void RGraphicsDevice::Polygon(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev)
@@ -175,38 +181,6 @@ void RGraphicsDevice::TextUTF8(double x, double y, const char *str, double rot, 
 {
     qDebug()<<"RGD: TextUTF8"<<str;
     //XXXqDebughandler::text(x, y, str, rot, hadj, gc, dev);
-}
-
-Rboolean RGraphicsDevice::Locator(double *x, double *y, pDevDesc dev)
-{
-    qDebug()<<"RGD: Locator";
-#if 0
-   if (s_locatorFunction)
-   {
-      s_graphicsDeviceEvents.onDrawing();
-
-      if(s_locatorFunction(x,y))
-      {
-         // if our graphics device went away while we were waiting
-         // for locator input then we need to return false
-
-         if (s_pGEDevDesc != NULL)
-            return TRUE;
-         else
-            return FALSE;
-      }
-      else
-      {
-         s_graphicsDeviceEvents.onDrawing();
-         return FALSE;
-      }
-   }
-   else
-   {
-      return FALSE;
-   }
-#endif
-    return FALSE;
 }
 
 void RGraphicsDevice::Activate(pDevDesc dev)
@@ -359,7 +333,7 @@ SEXP RGraphicsDevice::createGD()
         pDev->line = RGraphicsDevice::Line;
         pDev->polyline = RGraphicsDevice::Polyline;
         pDev->polygon = RGraphicsDevice::Polygon;
-        pDev->locator = RGraphicsDevice::Locator;
+        pDev->locator = NULL;
         pDev->mode = RGraphicsDevice::Mode;
         pDev->metricInfo = RGraphicsDevice::MetricInfo;
         pDev->strWidth = RGraphicsDevice::StrWidth;
@@ -382,7 +356,7 @@ SEXP RGraphicsDevice::createGD()
         pDev->haveTransparentBg = 2;
         pDev->haveRaster = 2;
         pDev->haveCapture = 1;
-        pDev->haveLocator = 2;
+        pDev->haveLocator = 0;
 
         //XXX todo - not sure what we might need
         pDev->deviceSpecific = NULL;
@@ -430,10 +404,6 @@ bool RGraphicsDevice::isActive()
     return gcGEDevDesc != NULL && Rf_ndevNumber(gcGEDevDesc->dev) == Rf_curDevice();
 }
 
-SEXP RGraphicsDevice::GCactivate()
-{
-    return rtool->dev->activateGD();
-}
 
 SEXP RGraphicsDevice::activateGD()
 {
@@ -442,13 +412,6 @@ SEXP RGraphicsDevice::activateGD()
     if (!success) qDebug()<<"make active failed";
     return R_NilValue;
 }
-
-#if 0
-DisplaySize RGraphicsDevice::displaySize()
-{
-   return DisplaySize(s_width, s_height);
-}
-#endif
 
 double RGraphicsDevice::grconvert(double val, const std::string& type, const std::string& from, const std::string& to)
 {
@@ -545,47 +508,6 @@ void RGraphicsDevice::onBeforeExecute()
 const int kDefaultWidth = 500;
 const int kDefaultHeight = 500;
 const double kDefaultDevicePixelRatio = 1.0;
-
-bool RGraphicsDevice::initialize()
-{
-#if 0
-   // initialize shadow handler
-   //XXXX ???? r::session::graphics::handler::installShadowHandler();
-
-   // save reference to locator function
-   //XXX don't want this ???? s_locatorFunction = locatorFunction;
-
-   // device conversion functions
-   UnitConversionFunctions convert;
-   convert.deviceToUser = deviceToUser;
-   convert.deviceToNDC = deviceToNDC;
-
-   // create plot manager (provide functions & events)
-   GraphicsDeviceFunctions graphicsDevice;
-   graphicsDevice.isActive = isActive;
-   graphicsDevice.displaySize = displaySize;
-   graphicsDevice.convert = convert;
-   graphicsDevice.saveSnapshot = saveSnapshot;
-   graphicsDevice.restoreSnapshot = restoreSnapshot;
-   graphicsDevice.copyToActiveDevice = copyToActiveDevice;
-   graphicsDevice.imageFileExtension = imageFileExtension;
-   graphicsDevice.close = close;
-   graphicsDevice.onBeforeExecute = onBeforeExecute;
-   Error error = plotManager().initialize(graphicsPath,
-                                          graphicsDevice,
-                                          &s_graphicsDeviceEvents);
-   if (error)
-      return error;
-
-   // set size
-   setSize(kDefaultWidth, kDefaultHeight, kDefaultDevicePixelRatio);
-
-#endif
-
-    // register device creation routine
-    (*(rtool->R))["GC.display"] = Rcpp::InternalFunction(GCdisplay);
-    return true;
-}
 
 void RGraphicsDevice::setDeviceAttributes(pDevDesc pDev)
 {
