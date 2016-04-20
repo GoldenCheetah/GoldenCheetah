@@ -23,6 +23,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 #include <QGraphicsEllipseItem>
+#include <QWheelEvent>
 
 class Context;
 
@@ -46,6 +47,7 @@ class RCanvas : public QGraphicsView {
 
     protected:
         QGraphicsScene *scene;
+        void wheelEvent(QWheelEvent *event);
 
     private:
         QWidget *parent;
