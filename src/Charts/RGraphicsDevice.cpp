@@ -24,6 +24,44 @@
 
 const char * const gcDevice = "GoldenCheetahGD";
 
+// return a QColor from an R color spec
+static inline QColor qColor(int col) { return QColor(R_RED(col),R_GREEN(col),R_BLUE(col),R_ALPHA(col)); }
+
+// get fg, bg, pen, brush from the gc
+struct par {
+    QColor fg,bg;
+    QPen p;
+    QBrush b;
+};
+
+static struct par parContext(pGEcontext c)
+{
+    struct par returning;
+
+    returning.bg = qColor(c->fill);
+    returning.fg = qColor(c->col);
+
+    returning.p.setColor(returning.fg);
+    returning.p.setWidthF(c->lwd);
+
+    // line style
+    switch(c->lty) {
+    case LTY_BLANK: returning.p.setStyle(Qt::NoPen); break;
+    default:
+    case LTY_SOLID: returning.p.setStyle(Qt::SolidLine); break;
+    case LTY_DASHED: returning.p.setStyle(Qt::DashLine); break;
+    case LTY_DOTTED: returning.p.setStyle(Qt::DotLine); break;
+    case LTY_DOTDASH: returning.p.setStyle(Qt::DashDotLine); break;
+    case LTY_LONGDASH: returning.p.setStyle(Qt::DashLine); break;
+    case LTY_TWODASH: returning.p.setStyle(Qt::DashLine); break;
+    }
+
+    returning.b.setColor(returning.bg);
+    returning.b.setStyle(Qt::SolidPattern);
+
+    return returning;
+}
+
 RGraphicsDevice::RGraphicsDevice ()
 {
     // first time through
@@ -45,20 +83,15 @@ bool RGraphicsDevice::initialize()
 
 void RGraphicsDevice::NewPage(const pGEcontext gc, pDevDesc dev)
 {
-    qDebug()<<"RGD: NewPage";
-    // delegate
-    //XXXqDebughandler::newPage(gc, dev);
-
     // fire event (pass previousPageSnapshot)
     if (!rtool || !rtool->canvas) return;
 
-    // replay snapshot
+    // clear the scene
     rtool->canvas->newPage();
 }
 
 Rboolean RGraphicsDevice::NewFrameConfirm_(pDevDesc dd)
 {
-    qDebug()<<"RGD: NewPageConfirm";
     // returning false causes the default implementation (printing a prompt
     // of "Hit <Return> to see next plot:" to the console) to be used. this
     // seems ideal compared to any custom UI we could produce so we leave it be
@@ -68,19 +101,13 @@ Rboolean RGraphicsDevice::NewFrameConfirm_(pDevDesc dd)
 
 void RGraphicsDevice::Mode(int mode, pDevDesc dev)
 {
-    qDebug()<<"RGD: Mode"<<mode;
     // 0 = stop drawing
     // 1 = start drawing
     // 2 = input active
-
-    //XXXqDebughandler::mode(mode, dev);
-
-    //XXXs_graphicsDeviceEvents.onDrawing();
 }
 
 void RGraphicsDevice::Size(double *left, double *right, double *bottom, double *top, pDevDesc dev)
 {
-    qDebug()<<"RGD: Size";
     *left = 0.0f;
     *right = 500.0f; //XXXs_width;
     *bottom = 0.0f; //XXXs_height;
@@ -89,63 +116,53 @@ void RGraphicsDevice::Size(double *left, double *right, double *bottom, double *
 
 void RGraphicsDevice::Clip(double x0, double x1, double y0, double y1, pDevDesc dev)
 {
-    qDebug()<<"RGD: Clip";
-    //XXXqDebughandler::clip(x0, x1, y0, y1, dev);
+    //qDebug()<<"RGD: Clip";
 }
 
 
 void RGraphicsDevice::Rect(double x0, double y0, double x1, double y1, const pGEcontext gc, pDevDesc dev)
 {
-    //XXX todo honour colors
-    if (rtool && rtool->canvas) rtool->canvas->rectangle(x0,y0,x1,y1,QPen(Qt::white),QBrush(Qt::NoBrush));
+    struct par p = parContext(gc);
+    if (rtool && rtool->canvas) rtool->canvas->rectangle(x0,y0,x1,y1,p.p,p.b);
 }
 
 void RGraphicsDevice::Path(double *x, double *y, int npoly, int *nper, Rboolean winding, const pGEcontext gc, pDevDesc dd)
 {
     qDebug()<<"RGD: Path";
-    //XXXqDebughandler::path(x, y, npoly, nper, winding, gc, dd);
 }
 
 void RGraphicsDevice::Raster(unsigned int *raster, int w, int h, double x, double y, double width,
                              double height, double rot, Rboolean interpolate, const pGEcontext gc, pDevDesc dd)
 {
     qDebug()<<"RGD: Raster";
-    //XXXqDebughandler::raster(raster, w, h, x, y, width, height, rot, interpolate, gc, dd);
-}
-
-SEXP RGraphicsDevice::Cap(pDevDesc dd)
-{
-    qDebug()<<"RGD: Cap";
-    return 0;//XXXqDebughandler::cap(dd);
 }
 
 void RGraphicsDevice::Circle(double x, double y, double r, const pGEcontext gc, pDevDesc dev)
 {
-    //XXX todo honour colors
-    if (rtool && rtool->canvas) rtool->canvas->circle(x,y,r,QPen(Qt::white),QBrush(Qt::NoBrush));
+    struct par p = parContext(gc);
+    if (rtool && rtool->canvas) rtool->canvas->circle(x,y,r,p.p,p.b);
 }
 
 void RGraphicsDevice::Line(double x1, double y1, double x2, double y2, const pGEcontext gc, pDevDesc dev)
 {
-    //XXX todo honour colors
-    if (rtool && rtool->canvas) rtool->canvas->line(x1,y1,x2,y2,QPen(Qt::white));
+    struct par p = parContext(gc);
+    if (rtool && rtool->canvas) rtool->canvas->line(x1,y1,x2,y2,p.p);
 }
 
 void RGraphicsDevice::Polyline(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev)
 {
-    //XXX todo honour colors
-    if (rtool && rtool->canvas && n > 1) rtool->canvas->polyline(n,x,y,QPen(Qt::white));
+    struct par p = parContext(gc);
+    if (rtool && rtool->canvas && n > 1) rtool->canvas->polyline(n,x,y,p.p);
 }
 
 void RGraphicsDevice::Polygon(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev)
 {
-    qDebug()<<"RGD: Polygon"<<n;
-    //XXXqDebughandler::polygon(n, x, y, gc, dev);
+    struct par p = parContext(gc);
+    if (rtool && rtool->canvas) rtool->canvas->polygon(n,x,y,p.p,p.b);
 }
 
 void RGraphicsDevice::MetricInfo(int c, const pGEcontext gc, double* ascent, double* descent, double* width, pDevDesc dev)
 {
-    qDebug()<<"RGD: MetricInfo";
     QFont def;
     QFontMetricsF fm(def);
     *ascent = fm.ascent();
@@ -157,7 +174,6 @@ void RGraphicsDevice::MetricInfo(int c, const pGEcontext gc, double* ascent, dou
 
 double RGraphicsDevice::StrWidth(const char *str, const pGEcontext gc, pDevDesc dev)
 {
-    qDebug()<<"RGD: StrWidth"<<str;
     QFont def;
     QFontMetricsF fm(def);
     return fm.boundingRect(QString(str)).width();
@@ -165,7 +181,6 @@ double RGraphicsDevice::StrWidth(const char *str, const pGEcontext gc, pDevDesc 
 
 double RGraphicsDevice::StrWidthUTF8(const char *str, const pGEcontext gc, pDevDesc dev)
 {
-    qDebug()<<"RGD: StrWidthUTF8"<<str;
     QFont def;
     QFontMetricsF fm(def);
     return fm.boundingRect(QString(str)).width();
@@ -173,35 +188,35 @@ double RGraphicsDevice::StrWidthUTF8(const char *str, const pGEcontext gc, pDevD
 
 void RGraphicsDevice::Text(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc dev)
 {
-    qDebug()<<"RGD: Text"<<str;
-    //XXXqDebughandler::text(x, y, str, rot, hadj, gc, dev);
+    // fonts too
+    struct par p = parContext(gc);
+    QFont f;
+    f.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    f.setPointSize(gc->ps);
+    if (rtool && rtool->canvas) rtool->canvas->text(x,y,QString(str), rot, hadj, p.p, f);
 }
 
 void RGraphicsDevice::TextUTF8(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc dev)
 {
-    qDebug()<<"RGD: TextUTF8"<<str;
-    //XXXqDebughandler::text(x, y, str, rot, hadj, gc, dev);
+    // fonts too
+    struct par p = parContext(gc);
+    QFont f;
+    f.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    f.setPointSize(gc->ps);
+    if (rtool && rtool->canvas) rtool->canvas->text(x,y,QString(str), rot, hadj, p.p, f);
 }
 
 void RGraphicsDevice::Activate(pDevDesc dev)
 {
-    qDebug()<<"RGD: Activate";
 }
 
 void RGraphicsDevice::Deactivate(pDevDesc dev)
 {
-    qDebug()<<"RGD: De-Activate";
 }
 
 void RGraphicsDevice::Close(pDevDesc dev)
 {
-    qDebug()<<"RGD: Close";
-
     if (rtool->dev->gcGEDevDesc != NULL) {
-
-        // destroy device specific struct
-        //XXXDeviceContext* pDC = (DeviceContext*)s_pGEDevDesc->dev->deviceSpecific;
-        //XXXqDebughandler::destroy(pDC);
 
         // explicitly free and then null out the dev pointer of the GEDevDesc
         // This is to avoid incompatabilities between the heap we are compiled with
@@ -213,13 +228,10 @@ void RGraphicsDevice::Close(pDevDesc dev)
         // set GDDevDesc to NULL so we don't reference it again
         rtool->dev->gcGEDevDesc = NULL;
     }
-
-    //XXXs_graphicsDeviceEvents.onClosed();
 }
 
 void RGraphicsDevice::OnExit(pDevDesc dd)
 {
-    qDebug()<<"RGD: OnExit";
     // NOTE: this may be called at various times including during error
     // handling (jump_to_top_ex). therefore, do not place any process or device
     // final termination code here (even though the name of the function
@@ -228,7 +240,6 @@ void RGraphicsDevice::OnExit(pDevDesc dd)
 
 int RGraphicsDevice::HoldFlush(pDevDesc dd, int level)
 {
-    qDebug()<<"RGD: HoldFlush";
     // NOTE: holdflush does not apply to bitmap devices since they are
     // already "buffered" via the fact that they only do expensive operations
     // (write to file) on dev.off. We could in theory use dev.flush as
@@ -244,7 +255,6 @@ int RGraphicsDevice::HoldFlush(pDevDesc dd, int level)
 
 void RGraphicsDevice::resyncDisplayList()
 {
-    qDebug()<<"RGD: resyncDisplayList";
 #if 0
    // get pointers to device desc and cairo data
    pDevDesc pDev = s_pGEDevDesc->dev;
@@ -288,7 +298,6 @@ void RGraphicsDevice::resyncDisplayList()
 
 void RGraphicsDevice::resizeGraphicsDevice()
 {
-    qDebug()<<"RGD: resizeGraphicsDevice";
     // resync display list
     resyncDisplayList();
 
@@ -304,12 +313,10 @@ SEXP RGraphicsDevice::GCdisplay()
 // routine which creates device
 SEXP RGraphicsDevice::createGD()
 {
-    qDebug()<<"RGD: createGD";
+    // error if not a version 7 graphics system
+    if (::R_GE_getVersion() < 7) {
 
-    // error if not a version 9 graphics system
-    if (::R_GE_getVersion() < 9) {
-
-      qDebug()<<"R: only support v9 or higher graphics systems, this is"<<::R_GE_getVersion();
+      qDebug()<<"R: only support v7 or higher graphics systems, this is"<<::R_GE_getVersion();
       return R_NilValue;
     }
 
@@ -400,14 +407,12 @@ bool RGraphicsDevice::makeActive()
 
 bool RGraphicsDevice::isActive()
 {
-    qDebug()<<"RGD: isActive";
     return gcGEDevDesc != NULL && Rf_ndevNumber(gcGEDevDesc->dev) == Rf_curDevice();
 }
 
 
 SEXP RGraphicsDevice::activateGD()
 {
-    qDebug()<<"RGD: activate";
     bool success = makeActive();
     if (!success) qDebug()<<"make active failed";
     return R_NilValue;
@@ -436,14 +441,12 @@ double RGraphicsDevice::grconvertY(double y, const std::string& from, const std:
 
 void RGraphicsDevice::deviceToUser(double* x, double* y)
 {
-    qDebug()<<"RGD: deviceToUser";
     *x = grconvertX(*x, "device", "user");
     *y = grconvertY(*y, "device", "user");
 }
 
 void RGraphicsDevice::deviceToNDC(double* x, double* y)
 {
-    qDebug()<<"RGD: deviceToNDC";
     *x = grconvertX(*x, "device", "ndc");
     *y = grconvertY(*y, "device", "ndc");
 }

@@ -111,10 +111,43 @@ RCanvas::polyline(int n, double *x, double *y, QPen p)
 }
 
 void
+RCanvas::polygon(int n, double *x, double *y, QPen p, QBrush b)
+{
+    QVector<QPointF> points(n);
+
+    // create a line per path
+    for(int i=0; i<n;i++)  points[i] = QPointF(x[i],y[i]);
+
+    QGraphicsPolygonItem *g= new QGraphicsPolygonItem(QPolygonF(points),0);
+    g->setPen(p);
+    g->setBrush(b);
+    scene->addItem(g);
+}
+
+void
 RCanvas::rectangle(double x0, double y0, double x1, double y1,QPen p, QBrush b)
 {
     QGraphicsRectItem *r=new QGraphicsRectItem(x0,y0,x1-x0,y1-y0);
     r->setPen(p);
     r->setBrush(b);
     scene->addItem(r);
+}
+
+void
+RCanvas::text(double x, double y, QString s, double rot, double hadj, QPen p, QFont f)
+{
+    QGraphicsTextItem *t = new QGraphicsTextItem(s);
+    t->setFlag(QGraphicsItem::ItemIgnoresTransformations);
+    t->setFont(f);
+    t->setPos(0,0);
+    t->setRotation(rot);
+
+    // add to group
+    QList<QGraphicsItem*> texts;
+    texts<<t;
+    QGraphicsItemGroup *grp = scene->createItemGroup(texts);
+
+    // add height too
+    QFontMetrics fm(f);
+    grp->setPos(x,y+fm.height());
 }
