@@ -57,8 +57,9 @@ class RCallbacks : public Callbacks {
         // see inst/includes/Callbacks.h for a list of all overrideable methods
         virtual void WriteConsole(const std::string& line, int type) {
             //qDebug()<<"Console>>" <<type<< QString::fromStdString(line);
-            if (rtool && rtool->context && !rtool->starting) rtool->context->notifyRMessage(QString::fromStdString(line));
-            else strings << QString::fromStdString(line);
+            //if (rtool && rtool->context && !rtool->starting) rtool->context->notifyRMessage(QString::fromStdString(line));
+            //else strings << QString::fromStdString(line);
+            strings << QString::fromStdString(line);
         };
 
         //virtual void ShowMessage(const char* message) {
