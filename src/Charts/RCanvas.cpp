@@ -36,6 +36,9 @@ RCanvas::RCanvas(Context *context, QWidget *parent) : QGraphicsView(parent), con
     // of top left. x axis is fine though.
     scale(1,-1);
 
+    // turn on antialiasing too
+    setRenderHint(QPainter::Antialiasing, true);
+
     // set colors etc
     configChanged(CONFIG_APPEARANCE);
 
@@ -141,6 +144,7 @@ RCanvas::text(double x, double y, QString s, double rot, double hadj, QPen p, QF
     t->setFont(f);
     t->setPos(0,0);
     t->setRotation(rot);
+    t->setDefaultTextColor(p.color());
 
     // add to group
     QList<QGraphicsItem*> texts;
