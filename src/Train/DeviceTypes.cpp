@@ -42,7 +42,7 @@ DeviceTypes::DeviceTypes()
         "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick") ,
         ":images/devices/garminusb.png" },
 #endif
-#if 0 //!!! Deferred until v3.1 or as an update to v3.0 when Wahoo support ANT+
+#ifdef QT_BLUETOOTH_LIB
       { DEV_BT40,    DEV_BTLE,     (char *) "Bluetooth 4.0", true,   false,
         tr("Bluetooth Low Energy devices such as KK Inride, Stages PM, Blue HR and Blue SC"),
         ":images/devices/btle.png" },
