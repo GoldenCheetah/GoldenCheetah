@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2016 Arto Jantunen (viiru@iki.fi)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -20,8 +21,9 @@
 #include "RealtimeController.h"
 #include "DeviceConfiguration.h"
 #include "ConfigDialog.h"
-
-#include "BT40.h"
+#include <QBluetoothLocalDevice>
+#include <QBluetoothDeviceDiscoveryAgent>
+#include <QBluetoothDeviceInfo>
 
 #ifndef _GC_BT40Controller_h
 #define _GC_BT40Controller_h 1
@@ -33,8 +35,6 @@ class BT40Controller : public RealtimeController
 public:
     BT40Controller (TrainSidebar *parent =0, DeviceConfiguration *dc =0);
     ~BT40Controller();
-
-    BT40 *myBT40;               // the device itself
 
     int start();
     int restart();                              // restart after paused
@@ -50,16 +50,15 @@ public:
     void getRealtimeData(RealtimeData &rtData);
     void pushRealtimeData(RealtimeData &rtData);
 
-    void setLoad(double x) { myBT40->setLoad(x); }
-    void setGradient(double x) { myBT40->setGradient(x); }
-    void setMode(int x) { myBT40->setMode(x); }
-
-    QString id() { return myBT40->id(); }
-
-signals:
-    void foundDevice(QString uuid, int type);
+private slots:
+    void addDevice(const QBluetoothDeviceInfo&);
+    void scanFinished();
+    void deviceScanError(QBluetoothDeviceDiscoveryAgent::Error);
 
 private:
+    QBluetoothDeviceDiscoveryAgent *discoveryAgent;
+    QBluetoothLocalDevice* localDevice;
+    RealtimeData telemetry;
     
 };
 
