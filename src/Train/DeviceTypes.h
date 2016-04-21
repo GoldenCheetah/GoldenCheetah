@@ -34,8 +34,7 @@
 #define DEV_GSERVER    0x0100   // NOT IMPLEMENTED IN THIS RELEASE XXX
 #define DEV_GCLIENT    0x0200   // NOT IMPLEMENTED IN THIS RELEASE XXX
 #define DEV_FORTIUS    0x0800   // Tacx Fortius
-#define DEV_KICKR      0x1000   // Wahoo Kickr
-#define DEV_BT40       0x2000   // Wahoo Kickr
+#define DEV_BT40       0x2000   // QT Bluetooth support
 #define DEV_MONARK     0x4000   // Monark USB
 #define DEV_KETTLER    0x8000   // Kettler Serial
 

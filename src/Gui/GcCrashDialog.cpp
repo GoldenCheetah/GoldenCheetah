@@ -63,10 +63,6 @@
 #include "kqoauthmanager.h"
 #endif
 
-#ifdef GC_HAVE_WFAPI
-#include "WFApi.h"
-#endif
-
 #ifdef GC_HAVE_SAMPLERATE
 #include <samplerate.h>
 #endif
@@ -266,12 +262,6 @@ QString GcCrashDialog::versionHTML()
     vlc = "yes";
     #endif
 
-    #ifdef GC_HAVE_WFAPI
-    QString wfapi = WFApi::getInstance()->apiVersion();
-    #else
-    QString wfapi = QString("none");
-    #endif
-
     #ifdef GC_HAVE_SAMPLERATE
     QString src = QString(src_get_version()).mid(14,6);
     #else
@@ -332,7 +322,6 @@ QString GcCrashDialog::versionHTML()
             .arg(ical)
             .arg(usbxpress)
             .arg(libusb)
-            .arg(wfapi)
             .arg(vlc)
 #if defined GC_VIDEO_QUICKTIME
             .arg("quicktime")
