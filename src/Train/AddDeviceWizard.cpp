@@ -153,12 +153,6 @@ DeviceScanner::run()
     active = true;
     bool result = false;
 
-#ifdef GC_HAVE_WFAPI
-    void *pool;
-    // get an autorelease pool for this thread!
-    if (wizard->deviceTypes.Supported[wizard->current].connector == DEV_BTLE) pool = WFApi::getInstance()->getPool();
-#endif
-
     for (int i=0; active && !result && i<10; i++) { // search for longer
 
         // better to wait a while, esp. if its just a USB device
@@ -170,10 +164,6 @@ DeviceScanner::run()
         result = quickScan(false);
     }
     if (active) emit finished(result); // only signal if we weren't aborted!
-
-#ifdef GC_HAVE_WFAPI
-    WFApi::getInstance()->freePool(pool);
-#endif
 }
 
 void
@@ -208,8 +198,7 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
 #endif
     case DEV_NULL : wizard->controller = new NullController(NULL, NULL); break;
     case DEV_ANTLOCAL : wizard->controller = new ANTlocalController(NULL, NULL); break;
-#ifdef GC_HAVE_WFAPI
-    case DEV_KICKR : wizard->controller = new KickrController(NULL, NULL); break;
+#ifdef QT_BLUETOOTH_LIB
     case DEV_BT40 : wizard->controller = new BT40Controller(NULL, NULL); break;
 #endif
 
@@ -259,12 +248,6 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
         }
 
     } while (!isfound && deep && count++ < 2);
-
-#ifdef GC_HAVE_WFAPI
-    // save away the device UUID, so we can choose it when connecting.
-    if (isfound && wizard->deviceTypes.Supported[wizard->current].connector == DEV_BTLE) 
-        wizard->portSpec = ((KickrController*)(wizard->controller))->id();
-#endif
 
     return isfound;
 
@@ -453,7 +436,6 @@ AddSearch::nextId() const
         case DEV_ANTLOCAL : return 50; break; // pair 
         case DEV_BT40 : return 55; break; // pair BT devices
         default:
-        case DEV_KICKR :
         case DEV_CT : return 60; break; // confirm and add 
         case DEV_MONARK : return 60; break; // confirm and add
         case DEV_KETTLER : return 60; break; // confirm and add
@@ -887,10 +869,6 @@ AddPairBTLE::cleanupPage()
 void
 AddPairBTLE::initializePage()
 {
-#ifdef GC_HAVE_WFAPI
-qDebug()<<"found this many devices:"<<WFApi::getInstance()->deviceCount();
-#endif
-
     // setup the controller and start it off so we can
     // manipulate it
     if (wizard->controller) delete wizard->controller;
