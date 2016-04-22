@@ -28,9 +28,6 @@
 #include "HomeWindow.h"
 #include "GcSideBarItem.h"
 #include "GcWindowRegistry.h"
-#ifdef Q_OS_MAC
-#include "QtMacButton.h"
-#endif
 
 class Tab;
 class ViewSplitter;
@@ -179,17 +176,6 @@ protected:
     }
     int handleWidth() { return 23; };
 
-#ifdef Q_OS_MAC
-    QtMacButton *newclear() {
-        if (clearbutton) delete clearbutton; // we only need one!
-        clearbutton = new QtMacButton(tr("Clear"), this);
-//      clearbutton->setFixedWidth(60); // no fixed length to allow translation
-        clearbutton->setFixedHeight(20);
-        clearbutton->setFocusPolicy(Qt::NoFocus);
-        connect(clearbutton, SIGNAL(clicked()), this, SLOT(clearClicked()));
-        return clearbutton;
-    }
-#else
     QPushButton *newclear() {
         if (clearbutton) delete clearbutton; // we only need one!
         clearbutton = new QPushButton(tr("Clear"), this);
@@ -200,20 +186,7 @@ protected:
 
         return clearbutton;
     }
-#endif
 
-#ifdef Q_OS_MAC
-    QtMacButton *newtoggle() {
-        if (toggle) delete toggle; // we only need one!
-        toggle = new QtMacButton(tr("OFF"), this);
-//      toggle->setFixedWidth(40);    // no fixed length to allow translation
-        toggle->setFixedHeight(20);
-        toggle->setFocusPolicy(Qt::NoFocus);
-        connect(toggle, SIGNAL(clicked()), this, SLOT(toggled()));
-
-        return toggle;
-    }
-#else
     QPushButton *newtoggle() {
         if (toggle) delete toggle; // we only need one!
         toggle = new QPushButton(tr("OFF"), this);
@@ -226,7 +199,7 @@ protected:
 
         return toggle;
     }
-#endif
+
     virtual void dragEnterEvent(QDragEnterEvent *event) {
 
         // we handle intervals or seasons
@@ -312,11 +285,7 @@ private:
     QString name;
     TabView *tabView;
     bool showForDrag;
-#ifdef Q_OS_MAC
-    QtMacButton *toggle, *clearbutton;
-#else
     QPushButton *toggle, *clearbutton;
-#endif
 };
 
 #endif // _GC_TabView_h
