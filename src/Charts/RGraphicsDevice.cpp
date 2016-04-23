@@ -19,6 +19,7 @@
 #include "RTool.h"
 #include "RGraphicsDevice.h"
 
+#include "Colors.h"
 #include <QFont>
 #include <QFontMetricsF>
 
@@ -387,8 +388,14 @@ SEXP RGraphicsDevice::createGD()
 
         // make us active
         Rf_selectDevice(Rf_ndevNumber(gcGEDevDesc->dev));
+
     }
     END_SUSPEND_INTERRUPTS;
+
+    // set colors
+    rtool->configChanged();
+
+    // done
     return R_NilValue;
 }
 
@@ -520,8 +527,12 @@ void RGraphicsDevice::setDeviceAttributes(pDevDesc pDev)
     pDev->startps = pointsize;
     pDev->startfont = 1;
     pDev->startlty = 0;
-    pDev->startfill = R_RGB(255,255,255);
-    pDev->startcol = R_RGB(0,0,0);
+
+    QColor bg=GColor(CPLOTBACKGROUND);
+    QColor fg=GCColor::invertColor(GColor(CPLOTBACKGROUND));
+
+    pDev->startfill = R_RGB(bg.red(),bg.green(),bg.blue());
+    pDev->startcol = R_RGB(fg.red(),fg.green(),fg.blue());
     pDev->startgamma = 1;
 
     pDev->left = 72 * xoff;			/* left */

@@ -28,6 +28,7 @@ class RTool {
 
     public:
         RTool(int argc, char **argv);
+        void  configChanged();
 
         RInside *R;
         RCallbacks *callbacks;
