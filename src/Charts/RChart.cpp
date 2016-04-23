@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "R.h"
 #include "RTool.h"
 #include "RChart.h"
 
@@ -148,11 +149,16 @@ void RConsole::keyPressEvent(QKeyEvent *e)
                 // replace $$ with chart identifier (to avoid shared data)
                 line = line.replace("$$", chartid);
 
-                SEXP ret = rtool->R->parseEval(line.toStdString());
+                // we always get an array of strings
+                // so only print it out if its actually been set
+                SEXP ret = NULL;
+
+                int rc = rtool->R->parseEval(line.toStdString(), ret);
 
                 // if this isn't an assignment then print the result
                 // bit hacky, there must be a better way!
-                if(!Rf_isNull(ret) && !line.contains("<-") && !line.contains("print")) Rcpp::print(ret);
+                if(rc == 0 && ret != NULL && !line.contains("<-") && !line.contains("print"))
+                    Rcpp::print(ret);
 
                 QStringList &response = rtool->callbacks->getConsoleOutput();
                 putData(GColor(CPLOTMARKER), response.join(""));
