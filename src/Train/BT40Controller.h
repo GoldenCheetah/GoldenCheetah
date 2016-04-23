@@ -24,6 +24,7 @@
 #include <QBluetoothLocalDevice>
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QBluetoothDeviceInfo>
+#include "BT40Device.h"
 
 #ifndef _GC_BT40Controller_h
 #define _GC_BT40Controller_h 1
@@ -59,6 +60,7 @@ private:
     QBluetoothDeviceDiscoveryAgent *discoveryAgent;
     QBluetoothLocalDevice* localDevice;
     RealtimeData telemetry;
+    QList<BT40Device*> devices;
     
 };
 
