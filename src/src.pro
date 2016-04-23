@@ -233,8 +233,16 @@ RESOURCES = $${PWD}/Resources/application.qrc $${PWD}/Resources/RideWindow.qrc
 
 contains(DEFINES, "GC_WANT_R") {
 
-    # not platform dependant at this point, but have
-    # only just started developing on Linux
+    # RInside and Rcpp do not support MS VC sadly
+    win32 {
+        message("WARNING: GC_WANT_R is not supported on Windows, as MS compiler is not supported".)
+        message("WARNING: Ignoring GC_WANT_R and not building with R support enabled")
+        DEFINES -= "GC_WANT_R"
+
+    } else {
+
+    # Only supports Linux and OSX until RInside and Rcpp support MSVC
+    # This is not likely to be very soon, they are heavily dependant on GCC
     # see: http://dirk.eddelbuettel.com/blog/2011/03/25/#rinside_and_qt
 
     R_HOME =                $$system(R RHOME)
@@ -266,7 +274,7 @@ contains(DEFINES, "GC_WANT_R") {
     ## Chart, Tool (R api), Grahics (R GraphicDevice and Qt canvas widget)
     HEADERS += Charts/RChart.h Charts/RTool.h Charts/RGraphicsDevice.h Charts/RCanvas.h
     SOURCES += Charts/RChart.cpp Charts/RTool.cpp Charts/RGraphicsDevice.cpp Charts/RCanvas.cpp
-
+    }
 }
 
 ###====================
