@@ -348,7 +348,11 @@ QString GcCrashDialog::versionHTML()
 #ifdef GC_WANT_R
             .arg(rtool->version)
 #else
+#ifdef WIN32
+            .arg("unsupported")
+#else
             .arg("none")
+#endif
 #endif
 
             ;
