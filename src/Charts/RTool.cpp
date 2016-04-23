@@ -23,6 +23,7 @@
 #include "RideCache.h"
 #include "RideItem.h"
 #include "RideFile.h"
+#include "Colors.h"
 
 // If no callbacks we won't play
 #if !defined(RINSIDE_CALLBACKS)
@@ -75,6 +76,8 @@ RTool::RTool(int argc, char**argv)
         // the following are already set in RChart on a per call basis
         // "GC.athlete" "GC.athlete.home"
 
+        configChanged();
+
     } catch(std::exception& ex) {
 
         qDebug()<<"RInside error:"  << ex.what();
@@ -92,6 +95,25 @@ RTool::RTool(int argc, char**argv)
         R = NULL;
     }
     starting = false;
+}
+
+void
+RTool::configChanged()
+{
+    // update global R appearances
+    QString parCommand=QString("par(bg=\"%1\", "
+                               "    col=\"%2\", "
+                               "    fg=\"%2\", "
+                               "    col.main=\"%2\", "
+                               "    col.sub=\"%3\", "
+                               "    col.lab=\"%3\", "
+                               "    col.axis=\"%3\")"
+                            ).arg(GColor(CPLOTBACKGROUND).name())
+                             .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
+                             .arg(GColor(CPLOTMARKER).name());
+
+    // fire and forget, don't care if it fails or not !!
+    rtool->R->parseEvalQNT(parCommand.toStdString());
 }
 
 Rcpp::DatetimeVector
