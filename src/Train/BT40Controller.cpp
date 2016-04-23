@@ -71,6 +71,9 @@ BT40Controller::pause()
 int
 BT40Controller::stop()
 {
+    foreach (BT40Device* const &device, devices) {
+	device->disconnectDevice();
+    }
     return 0;
 }
 
@@ -110,7 +113,9 @@ void
 BT40Controller::addDevice(const QBluetoothDeviceInfo &info)
 {
     if (info.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration) {
-        qDebug() << "Found device" << info.name() << info.coreConfigurations();
+	BT40Device* dev = new BT40Device(this, info);
+	devices.append(dev);
+	dev->connectDevice();
     }
 }
 
