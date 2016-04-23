@@ -24,6 +24,7 @@
 #include "RideItem.h"
 #include "RideFile.h"
 #include "Colors.h"
+#include "RideMetric.h"
 
 // If no callbacks we won't play
 #if !defined(RINSIDE_CALLBACKS)
@@ -65,6 +66,9 @@ RTool::RTool(int argc, char**argv)
         // Access into the GC data
         (*R)["GC.activities"] = Rcpp::InternalFunction(RTool::activities);
         (*R)["GC.activity"] = Rcpp::InternalFunction(RTool::activity);
+
+        // All metrics
+        (*R)["GC.metrics"] = Rcpp::InternalFunction(RTool::metrics);
 
         // TBD
         // GC.metrics     - list of activities and their metrics
@@ -134,6 +138,51 @@ RTool::activities()
         return l;
     }
     return Rcpp::DatetimeVector(0);
+}
+
+Rcpp::DataFrame
+RTool::metrics()
+{
+    Rcpp::DataFrame d;
+
+    if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
+
+        // allocate
+        Rcpp::DatetimeVector l(rtool->context->athlete->rideCache->count());
+
+        // with date first
+        int i=0;
+        foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+            l[i++] = Rcpp::Datetime(item->dateTime.toUTC().toTime_t());
+        }
+        // use the compatability 'name' to work with e.g. R package trackeR
+        d["time"] = l;
+
+        // now add a vector for every metric
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        for(int i=0; i<factory.metricCount();i++) {
+
+            Rcpp::NumericVector m(rtool->context->athlete->rideCache->rides().count());
+            QString symbol = factory.metricName(i);
+            const RideMetric *metric = factory.rideMetric(symbol);
+            QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+            bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+
+            int index=0;
+            foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+                m[index++] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
+                                                + (useMetricUnits ? 0.0f : metric->conversionSum());
+            }
+
+            // use the compatability 'name' to work with e.g. R package trackeR
+            d[name.toStdString()] = m;
+        }
+    }
+
+    // d is basically a list, this is about the only way to really
+    // return a valid data.frame
+    Rcpp::DataFrame returning(d);
+    return returning;
 }
 
 Rcpp::DataFrame

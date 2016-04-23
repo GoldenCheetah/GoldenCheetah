@@ -43,6 +43,7 @@ class RTool {
 
         static Rcpp::DataFrame activity();
         static Rcpp::DatetimeVector activities();
+        static Rcpp::DataFrame metrics();
 
         bool starting;
 };
