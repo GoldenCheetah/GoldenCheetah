@@ -20,6 +20,8 @@
 #include <QDebug>
 #include "BT40Controller.h"
 
+QList<QBluetoothUuid> BT40Device::supportedServiceUuids = QList<QBluetoothUuid>();
+
 BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(parent), m_currentDevice(devinfo)
 
 {
@@ -67,7 +69,20 @@ void BT40Device::deviceDisconnected() {
 }
 
 void BT40Device::serviceDiscovered(QBluetoothUuid uuid) {
-    qDebug() << "Discovered service" << uuid << "for device" << m_currentDevice.name();
+    if (supportedServiceUuids.contains(uuid)) {
+	qDebug() << "Discovering details for service" << uuid << "for device" << m_currentDevice.name();
+	QLowEnergyService *service = m_control->createServiceObject(uuid, this);
+	connect(service, SIGNAL(stateChanged(QLowEnergyService::ServiceState)),
+		this, SLOT(serviceStateChanged(QLowEnergyService::ServiceState)));
+	connect(service, SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)),
+		this, SLOT(updateValue(QLowEnergyCharacteristic,QByteArray)));
+	connect(service, SIGNAL(descriptorWritten(QLowEnergyDescriptor,QByteArray)),
+		this, SLOT(confirmedDescriptorWrite(QLowEnergyDescriptor,QByteArray)));
+	connect(service, SIGNAL(error(QLowEnergyService::ServiceError)),
+		this, SLOT(serviceError(QLowEnergyService::ServiceError)));
+	service->discoverDetails();
+	m_services.append(service);
+    }
 }
 
 void BT40Device::serviceScanDone()
@@ -78,6 +93,21 @@ void BT40Device::serviceScanDone()
 void BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
 {
     qDebug() << "service state changed" << s << "for device" << m_currentDevice.name();
+    if (s == QLowEnergyService::ServiceDiscovered) {
+       foreach (QLowEnergyService* const &service, m_services) {
+           if (service->state() == s) {
+               QLowEnergyCharacteristic characteristic;
+               if (characteristic.isValid()) {
+                   const QLowEnergyDescriptor notificationDesc = characteristic.descriptor(
+                       QBluetoothUuid::ClientCharacteristicConfiguration);
+                   if (notificationDesc.isValid()) {
+                       service->writeDescriptor(notificationDesc,
+                                                QByteArray::fromHex("0100"));
+                   }
+               }
+           }
+       }
+    }
 }
 
 void BT40Device::updateValue(const QLowEnergyCharacteristic &c,

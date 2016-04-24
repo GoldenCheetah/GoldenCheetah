@@ -50,6 +50,8 @@ private:
     QObject *parent;
     QBluetoothDeviceInfo m_currentDevice;
     QLowEnergyController *m_control;
+    static QList<QBluetoothUuid> supportedServiceUuids;
+    QList<QLowEnergyService*> m_services;
 };
 
 #endif
