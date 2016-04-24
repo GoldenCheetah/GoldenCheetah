@@ -20,7 +20,8 @@
 #include <QDebug>
 #include "BT40Controller.h"
 
-QList<QBluetoothUuid> BT40Device::supportedServiceUuids = QList<QBluetoothUuid>();
+QList<QBluetoothUuid> BT40Device::supportedServiceUuids = QList<QBluetoothUuid>()
+    << QBluetoothUuid(QBluetoothUuid::HeartRate);
 
 BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(parent), m_currentDevice(devinfo)
 
@@ -97,6 +98,10 @@ void BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
        foreach (QLowEnergyService* const &service, m_services) {
            if (service->state() == s) {
                QLowEnergyCharacteristic characteristic;
+	       if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::HeartRate)) {
+		   characteristic = service->characteristic(
+		       QBluetoothUuid(QBluetoothUuid::HeartRateMeasurement));
+	       }
                if (characteristic.isValid()) {
                    const QLowEnergyDescriptor notificationDesc = characteristic.descriptor(
                        QBluetoothUuid::ClientCharacteristicConfiguration);
@@ -113,6 +118,24 @@ void BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
 void BT40Device::updateValue(const QLowEnergyCharacteristic &c,
 			     const QByteArray &value)
 {
+    QDataStream ds(value);
+    ds.setByteOrder(QDataStream::LittleEndian); // Bluetooth data is always LE
+    if (c.uuid() == QBluetoothUuid(QBluetoothUuid::HeartRateMeasurement)) {
+	quint8 flags;
+	ds >> flags;
+	float hr;
+	if (flags & 0x1) { // HR 16 bit? otherwise 8 bit
+	    quint16 heartRate;
+	    ds >> heartRate;
+	    hr = (float) heartRate;
+	}
+	else {
+	    quint8 heartRate;
+	    ds >> heartRate;
+	    hr = (float) heartRate;
+	}
+	dynamic_cast<BT40Controller*>(parent)->setBPM(hr);
+    }
 }
 
 void BT40Device::serviceError(QLowEnergyService::ServiceError e)
