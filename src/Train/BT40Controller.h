@@ -50,6 +50,9 @@ public:
     bool doesPush(), doesPull(), doesLoad();
     void getRealtimeData(RealtimeData &rtData);
     void pushRealtimeData(RealtimeData &rtData);
+    void setBPM(float x) {
+	telemetry.setHr(x);
+    }
 
 private slots:
     void addDevice(const QBluetoothDeviceInfo&);
