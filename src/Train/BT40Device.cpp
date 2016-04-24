@@ -22,7 +22,8 @@
 
 QList<QBluetoothUuid> BT40Device::supportedServiceUuids = QList<QBluetoothUuid>()
     << QBluetoothUuid(QBluetoothUuid::HeartRate)
-       << QBluetoothUuid(QBluetoothUuid::CyclingPower);
+       << QBluetoothUuid(QBluetoothUuid::CyclingPower)
+	  << QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence);
 
 BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(parent), m_currentDevice(devinfo)
 
@@ -38,6 +39,10 @@ BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(p
 	    this, SLOT(serviceDiscovered(QBluetoothUuid)));
     connect(m_control, SIGNAL(discoveryFinished()),
 	    this, SLOT(serviceScanDone()));
+    prevWheelTime = 0;
+    prevWheelRevs = 0;
+    prevCrankTime = 0;
+    prevCrankRevs = 0;
 }
 
 BT40Device::~BT40Device() {
@@ -107,6 +112,10 @@ void BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
 		   characteristic = service->characteristic(
 		       QBluetoothUuid(QBluetoothUuid::CyclingPowerMeasurement));
 	       }
+	       else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence)) {
+		   characteristic = service->characteristic(
+		       QBluetoothUuid(QBluetoothUuid::CSCMeasurement));
+	       }
                if (characteristic.isValid()) {
                    const QLowEnergyDescriptor notificationDesc = characteristic.descriptor(
                        QBluetoothUuid::ClientCharacteristicConfiguration);
@@ -149,6 +158,16 @@ void BT40Device::updateValue(const QLowEnergyCharacteristic &c,
 	double power = (double) tmp_pwr;
 	dynamic_cast<BT40Controller*>(parent)->setWatts(power);
     }
+    else if (c.uuid() == QBluetoothUuid(QBluetoothUuid::CSCMeasurement)) {
+	quint8 flags;
+	ds >> flags;
+	if (flags & 0x1) { // Wheel Revolution Data Present
+	    getWheelRpm(ds);
+	}
+	if (flags & 0x2) { // Crank Revolution Data Present
+	    getCadence(ds);
+	}
+    }
 }
 
 void BT40Device::serviceError(QLowEnergyService::ServiceError e)
@@ -173,4 +192,36 @@ void BT40Device::confirmedDescriptorWrite(const QLowEnergyDescriptor &d,
 	qWarning() << "disabled BTLE notifications" << "for device" << m_currentDevice.name();;
 	this->disconnectDevice();
     }
+}
+
+void BT40Device::getCadence(QDataStream& ds) {
+    quint16 cur_revs;
+    quint16 cur_time;
+    ds >> cur_revs;
+    ds >> cur_time;
+    double rpm = 0.0;
+    quint16 time = cur_time - prevCrankTime;
+    quint16 revs = cur_revs - prevCrankRevs;
+    if (time) {
+	rpm = 1024*60*revs / time;
+    }
+    prevCrankRevs = cur_revs;
+    prevCrankTime = cur_time;
+    dynamic_cast<BT40Controller*>(parent)->setCadence(rpm);
+}
+
+void BT40Device::getWheelRpm(QDataStream& ds) {
+    quint32 wheelrevs;
+    quint16 wheeltime;
+    ds >> wheelrevs;
+    ds >> wheeltime;
+    double rpm = 0.0;
+    quint16 time = wheeltime - prevWheelTime;
+    quint32 revs = wheelrevs - prevWheelRevs;
+    if (time) {
+	rpm = 1024*60*revs / time;
+    }
+    prevWheelRevs = wheelrevs;
+    prevWheelTime = wheeltime;
+    dynamic_cast<BT40Controller*>(parent)->setWheelRpm(rpm);
 }
