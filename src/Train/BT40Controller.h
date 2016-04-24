@@ -56,6 +56,10 @@ public:
     void setWatts(double watts) {
 	telemetry.setWatts(watts);
     }
+    void setWheelRpm(double wrpm);
+    void setCadence(double cadence) {
+	telemetry.setCadence(cadence);
+    }
 
 private slots:
     void addDevice(const QBluetoothDeviceInfo&);
@@ -67,7 +71,7 @@ private:
     QBluetoothLocalDevice* localDevice;
     RealtimeData telemetry;
     QList<BT40Device*> devices;
-    
+    DeviceConfiguration* localDc;
 };
 
 #endif // _GC_BT40Controller_h

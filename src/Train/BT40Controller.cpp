@@ -25,6 +25,7 @@ BT40Controller::BT40Controller(TrainSidebar *parent, DeviceConfiguration *dc) : 
 {
     localDevice = new QBluetoothLocalDevice(this);
     discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
+    localDc = dc;
     connect(discoveryAgent, SIGNAL(deviceDiscovered(const QBluetoothDeviceInfo&)),
 	    this, SLOT(addDevice(const QBluetoothDeviceInfo&)));
     connect(discoveryAgent, SIGNAL(error(QBluetoothDeviceDiscoveryAgent::Error)),
@@ -131,4 +132,14 @@ void
 BT40Controller::deviceScanError(QBluetoothDeviceDiscoveryAgent::Error error)
 {
     qWarning() << "Error while scanning BT devices:" << error;
+}
+
+
+void
+BT40Controller::setWheelRpm(double wrpm) {
+    telemetry.setWheelRpm(wrpm);
+    int wheel;
+    if (localDc) wheel = localDc->wheelSize;
+    else wheel = 2100;
+    telemetry.setSpeed(wrpm * wheel / 1000 * 60 / 1000);
 }
