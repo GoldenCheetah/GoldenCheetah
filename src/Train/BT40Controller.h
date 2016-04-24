@@ -53,6 +53,9 @@ public:
     void setBPM(float x) {
 	telemetry.setHr(x);
     }
+    void setWatts(double watts) {
+	telemetry.setWatts(watts);
+    }
 
 private slots:
     void addDevice(const QBluetoothDeviceInfo&);

@@ -21,7 +21,8 @@
 #include "BT40Controller.h"
 
 QList<QBluetoothUuid> BT40Device::supportedServiceUuids = QList<QBluetoothUuid>()
-    << QBluetoothUuid(QBluetoothUuid::HeartRate);
+    << QBluetoothUuid(QBluetoothUuid::HeartRate)
+       << QBluetoothUuid(QBluetoothUuid::CyclingPower);
 
 BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(parent), m_currentDevice(devinfo)
 
@@ -102,6 +103,10 @@ void BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
 		   characteristic = service->characteristic(
 		       QBluetoothUuid(QBluetoothUuid::HeartRateMeasurement));
 	       }
+	       else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingPower)) {
+		   characteristic = service->characteristic(
+		       QBluetoothUuid(QBluetoothUuid::CyclingPowerMeasurement));
+	       }
                if (characteristic.isValid()) {
                    const QLowEnergyDescriptor notificationDesc = characteristic.descriptor(
                        QBluetoothUuid::ClientCharacteristicConfiguration);
@@ -135,6 +140,14 @@ void BT40Device::updateValue(const QLowEnergyCharacteristic &c,
 	    hr = (float) heartRate;
 	}
 	dynamic_cast<BT40Controller*>(parent)->setBPM(hr);
+    }
+    else if (c.uuid() == QBluetoothUuid(QBluetoothUuid::CyclingPowerMeasurement)) {
+	quint16 flags;
+	ds >> flags;
+	qint16 tmp_pwr;
+	ds >> tmp_pwr;
+	double power = (double) tmp_pwr;
+	dynamic_cast<BT40Controller*>(parent)->setWatts(power);
     }
 }
 
