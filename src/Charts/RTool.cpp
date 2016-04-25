@@ -59,30 +59,32 @@ RTool::RTool(int argc, char**argv)
 
         // load the dynamix library and create function wrapper
         // we should put this into a source file (.R)
-        R->parseEvalNT(".First <- function() {\n"
+        R->parseEvalNT(QString(".First <- function() {\n"
                        "    dyn.load(\"RGoldenCheetah.so\")\n"
                        "}\n"
-                       "GC.display <- function() { .C(\"GC.display\") }\n");
+                       "GC.display <- function() { .C(\"GC.display\") }\n"
+                       "GC.version <- function() {\n"
+                       "    return(\"%1\")\n"
+                       "}\n"
+                       "GC.build <- function() {\n"
+                       "    return(%2)\n"
+                       "}\n")
+                       .arg(VERSION_STRING)
+                       .arg(VERSION_LATEST).toStdString());
+
         strings.clear();
 
         // set the "GC" object and methods
         context = NULL;
         canvas = NULL;
-        (*R)["GC.version"] = VERSION_STRING;
-        (*R)["GC.build"] = VERSION_LATEST;
 
         // Access into the GC data
         (*R)["GC.activities"] = Rcpp::InternalFunction(RTool::activities);
         (*R)["GC.activity"] = Rcpp::InternalFunction(RTool::activity);
-
-        // All metrics
         (*R)["GC.metrics"] = Rcpp::InternalFunction(RTool::metrics);
 
         // TBD
-        // GC.metrics     - list of activities and their metrics
-        // GC.activity    - single activity and its data series
         // GC.seasons     - configured seasons
-        // GC.season      - currently selected season
         // GC.config      - configuration (zones, units etc)
 
         // the following are already set in RChart on a per call basis
