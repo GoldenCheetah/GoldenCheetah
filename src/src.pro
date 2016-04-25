@@ -74,11 +74,6 @@ lessThan(QT_MAJOR_VERSION, 5) {
     } else {
         QT += multimedia multimediawidgets
     }
-    greaterThan(QT_MINOR_VERSION, 3) {
-        QT += bluetooth
-        HEADERS += Train/BT40Controller.h Train/BT40Device.h
-        SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
-    }
 }
 
 ###=======================================================================
@@ -621,6 +616,13 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Train/MonarkController.h Train/MonarkConnection.h
     SOURCES += Train/Kettler.cpp Train/KettlerController.cpp Train/KettlerConnection.cpp
     HEADERS += Train/Kettler.h Train/KettlerController.h Train/KettlerConnection.h
+
+    # bluetooth in QT5.4 or higher
+    greaterThan(QT_MINOR_VERSION, 3) {
+        QT += bluetooth
+        HEADERS += Train/BT40Controller.h Train/BT40Device.h
+        SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
+    }
 }
 
 
