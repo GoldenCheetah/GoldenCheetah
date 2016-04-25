@@ -46,8 +46,8 @@
 #endif
 #include "ANTlocalController.h"
 #include "NullController.h"
-#ifdef GC_HAVE_WFAPI
-#include "KickrController.h"
+#ifdef QT_BLUETOOTH_LIB
+#include "BT40Controller.h"
 #endif
 #ifdef GC_HAVE_LIBUSB
 #include "FortiusController.h"
@@ -641,9 +641,9 @@ TrainSidebar::configChanged(qint32)
             Devices[i].controller = new ANTlocalController(this, &Devices[i]);
             // connect slot for receiving remote control commands
             connect(Devices[i].controller, SIGNAL(remoteControl(uint16_t)), this, SLOT(remoteControl(uint16_t)));
-#ifdef GC_HAVE_WFAPI
-        } else if (Devices.at(i).type == DEV_KICKR) {
-            Devices[i].controller = new KickrController(this, &Devices[i]);
+#ifdef QT_BLUETOOTH_LIB
+        } else if (Devices.at(i).type == DEV_BT40) {
+            Devices[i].controller = new BT40Controller(this, &Devices[i]);
 #endif
         }
     }
