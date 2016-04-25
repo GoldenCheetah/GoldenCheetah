@@ -294,11 +294,15 @@ contains(DEFINES, "GC_WANT_R") {
     rshlib.input = SOURCE_RSHLIBS
     rshlib.dependency_type = TYPE_C
     rshlib.CONFIG += no_link
-    rshlib.variable_out = QMAKE_BUNDLE_DATA; # need the so copied into the OSX bundle
     unix { rshlib.output = $${OUT_PWD}/${QMAKE_FILE_BASE}.so }
     win32 { rshlib.output = $${OUT_PWD}/${QMAKE_FILE_BASE}.dll }
     rshlib.commands = $$R_HOME/bin/R CMD SHLIB ${QMAKE_FILE_IN} && $${QMAKE_COPY} ${QMAKE_FILE_PATH}/${QMAKE_FILE_OUT} $${OUT_PWD}
     QMAKE_EXTRA_COMPILERS += rshlib
+
+    ## post link on OSX we need to copy the so file
+    macx {
+        QMAKE_POST_LINK += $${QMAKE_COPY} $${OUT_PWD}/RGoldenCheetah.so $${OUT_PWD}/GoldenCheetah.app/Contents/MacOS
+    }
 
     ## R bootstrap dynamic libraries, used to register C methods
     ## to avoid RInside/Rccp
