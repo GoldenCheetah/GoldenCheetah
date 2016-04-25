@@ -1,6 +1,4 @@
 // R API is C
-extern "C" {
-
 #include <R.h>
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
@@ -16,7 +14,7 @@ static SEXP (*fn[1])();
 
 // if we haven't been initialised don't even try
 // to dereference the function pointers !!
-static bool initialised = false;
+static int initialised = 0;
 
 // not it is static and will call GC once the symbol table
 // has been initialised.
@@ -34,9 +32,9 @@ SEXP GCinitialiseFunctions(SEXP (*functions[1])())
 
     // initialise all the function pointers
     for(int i=0; i<1; i++) fn[i] = functions[i];
-    initialised = true;
+    initialised = 1;
 
-    return SEXP(0);
+    return 0;
 }
 
 // this function is called by R when the dynamic library
@@ -54,13 +52,6 @@ R_init_RGoldenCheetah(DllInfo *info)
 {
     //fprintf(stderr, "RGoldenCheetah init is called!\n");
 
-    // initialise the function table
-    R_CallMethodDef callMethods[]  = {
-        { "GCinitialiseFunctions", (DL_FUNC) &GCinitialiseFunctions, 0 },
-        { "GC.display", (DL_FUNC) &GCdisplay, 0 },
-        { NULL, NULL, 0 }
-    };
-
     // initialise the parameter table
     R_CMethodDef cMethods[] = {
         { "GCinitialiseFunctions", (DL_FUNC) &GCinitialiseFunctions, 0 },
@@ -73,6 +64,4 @@ R_init_RGoldenCheetah(DllInfo *info)
 
     // make the initialiseFunctions callable from C
     R_RegisterCCallable("RGoldenCheetah", "GCinitialiseFunctions", (DL_FUNC)&GCinitialiseFunctions);
-}
-
 }

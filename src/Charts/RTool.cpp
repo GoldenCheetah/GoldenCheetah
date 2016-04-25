@@ -111,13 +111,28 @@ RTool::RTool(int argc, char**argv)
     starting = false;
 }
 
+extern "C" {
+int assigndl(SEXP (**p)(SEXP(*[])()), DL_FUNC x)
+{
+    *p = (SEXP(*)(SEXP(*[])()))(*x);
+    return 0;
+}
+};
+
 void
 RTool::registerRoutines()
 {
     // the dynamic libray is loaded so we should be able to find
     // the initialisation function now
 
-    SEXP (*p)(SEXP(*[])()) = R_GetCCallable("RGoldenCheetah", "GCinitialiseFunctions");
+    // get the value
+    DL_FUNC dd = R_GetCCallable("RGoldenCheetah", "GCinitialiseFunctions");
+
+    // change signature
+    SEXP (*p)(SEXP(*[])());
+
+    // cast
+    assigndl(&p, dd);
 
     // array of all the function pointers (just 1 for now)
     SEXP (*fn[1])() = { &RGraphicsDevice::GCdisplay };
