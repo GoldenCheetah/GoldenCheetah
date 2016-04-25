@@ -57,6 +57,14 @@ RTool::RTool(int argc, char**argv)
         }
         strings.clear();
 
+        // load the dynamix library and create function wrapper
+        // we should put this into a source file (.R)
+        R->parseEvalNT(".First <- function() {\n"
+                       "    dyn.load(\"RGoldenCheetah.so\")\n"
+                       "}\n"
+                       "GC.display <- function() { .C(\"GC.display\") }\n");
+        strings.clear();
+
         // set the "GC" object and methods
         context = NULL;
         canvas = NULL;
@@ -99,6 +107,21 @@ RTool::RTool(int argc, char**argv)
         R = NULL;
     }
     starting = false;
+}
+
+void
+RTool::registerRoutines()
+{
+    // the dynamic libray is loaded so we should be able to find
+    // the initialisation function now
+
+    SEXP (*p)(SEXP(*[])()) = R_GetCCallable("RGoldenCheetah", "GCinitialiseFunctions");
+
+    // array of all the function pointers (just 1 for now)
+    SEXP (*fn[1])() = { &RGraphicsDevice::GCdisplay };
+
+    // dereference and call, if not found all is lost ....
+    if (p) *p(fn);
 }
 
 void

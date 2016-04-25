@@ -70,16 +70,6 @@ RGraphicsDevice::RGraphicsDevice ()
 
     // set the inital graphics device to GC
     createGD();
-
-    // once only initialisation
-    initialize();
-}
-
-bool RGraphicsDevice::initialize()
-{
-    // register device creation routine
-    (*(rtool->R))["GC.display"] = Rcpp::InternalFunction(GCdisplay);
-    return true;
 }
 
 void RGraphicsDevice::NewPage(const pGEcontext gc, pDevDesc dev)
@@ -308,6 +298,7 @@ void RGraphicsDevice::resizeGraphicsDevice()
 
 SEXP RGraphicsDevice::GCdisplay()
 {
+    //qDebug()<<"Graphics Device IS called!\n";
     return rtool->dev->createGD();
 }
 

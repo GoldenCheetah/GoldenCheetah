@@ -270,6 +270,12 @@ main(int argc, char *argv[])
     // create the singleton in the main thread
     // will be shared by all athletes and all charts (!!)
     rtool = new RTool(argc,argv);
+
+    // and run the .First function
+    rtool->R->parseEvalQNT(".First()");
+
+    // now map functions once the DLL is loaded
+    rtool->registerRoutines();
 #endif
 
     // create the application -- only ever ONE regardless of restarts
