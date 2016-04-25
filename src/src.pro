@@ -209,7 +209,6 @@ TSQM.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm $$TS_DIR/${QMAKE_FILE_BASE
 TSQM.CONFIG = no_link target_predeps
 QMAKE_EXTRA_COMPILERS += TSQM
 
-
 ###==========
 ### RESOURCES
 ###==========
@@ -233,7 +232,7 @@ RESOURCES = $${PWD}/Resources/application.qrc $${PWD}/Resources/RideWindow.qrc
 
 contains(DEFINES, "GC_WANT_R") {
 
-    # RInside and Rcpp do not support MS VC sadly
+    # RInside and Rcpp do not support MS VC sadly, but we're working on it!!
     win32 {
         message("WARNING: GC_WANT_R is not supported on Windows, as MS compiler is not supported".)
         message("WARNING: Ignoring GC_WANT_R and not building with R support enabled")
@@ -274,6 +273,22 @@ contains(DEFINES, "GC_WANT_R") {
     ## Chart, Tool (R api), Grahics (R GraphicDevice and Qt canvas widget)
     HEADERS += Charts/RChart.h Charts/RTool.h Charts/RGraphicsDevice.h Charts/RCanvas.h
     SOURCES += Charts/RChart.cpp Charts/RTool.cpp Charts/RGraphicsDevice.cpp Charts/RCanvas.cpp
+
+    # how to build an R shlib from source, listed in SOURCE_RSHLIBS below
+    # we only have one for now, but could possibly add more. This is to
+    # use the public R API and avoid using RInside and Rcpp
+    rshlib.name = rshlib
+    rshlib.input = SOURCE_RSHLIBS
+    rshlib.dependency_type = TYPE_C
+    unix { rshlib.output = $${OUT_PWD}/${QMAKE_FILE_BASE}.so }
+    macx { rshlib.output = $${OUT_PWD}/${QMAKE_FILE_BASE}.dylib }
+    win32 { rshlib.output = $${OUT_PWD}/${QMAKE_FILE_BASE}.dll }
+    rshlib.commands = $$R_HOME/bin/R CMD SHLIB ${QMAKE_FILE_IN} && $${QMAKE_COPY} ${QMAKE_FILE_PATH}/${QMAKE_FILE_OUT} $${OUT_PWD}
+    QMAKE_EXTRA_COMPILERS += rshlib
+
+    ## R bootstrap dynamic libraries, used to register C methods
+    ## to avoid RInside/Rccp
+    SOURCE_RSHLIBS = R/RGoldenCheetah.cpp
     }
 }
 
