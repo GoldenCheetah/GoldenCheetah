@@ -46,6 +46,10 @@ class RTool {
         static Rcpp::DataFrame metrics();
 
         bool starting;
+
+        // to link GC.xxx() functions to the routine
+        // stubs in the RGoldenCheetah DLL/SO/DYLIB
+        void registerRoutines();
 };
 
 // there is a global instance created in main
