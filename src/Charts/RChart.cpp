@@ -161,7 +161,7 @@ void RConsole::keyPressEvent(QKeyEvent *e)
                 // if this isn't an assignment then print the result
                 // bit hacky, there must be a better way!
                 if(rc == 0 && ret != NULL && !Rf_isNull(ret) && !line.contains("<-") && !line.contains("print"))
-                    Rcpp::print(ret);
+                    Rf_PrintValue(ret);
 
                 QStringList &response = rtool->callbacks->getConsoleOutput();
                 putData(GColor(CPLOTMARKER), response.join(""));
