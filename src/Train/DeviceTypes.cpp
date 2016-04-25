@@ -42,15 +42,10 @@ DeviceTypes::DeviceTypes()
         "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick") ,
         ":images/devices/garminusb.png" },
 #endif
-#ifdef GC_HAVE_WFAPI
-#if 0 //!!! Deferred until v3.1 or as an update to v3.0 when Wahoo support ANT+
+#ifdef QT_BLUETOOTH_LIB
       { DEV_BT40,    DEV_BTLE,     (char *) "Bluetooth 4.0", true,   false,
         tr("Bluetooth Low Energy devices such as KK Inride, Stages PM, Blue HR and Blue SC"),
         ":images/devices/btle.png" },
-#endif
-      { DEV_KICKR,    DEV_BTLE,     (char *) "Wahoo Kickr", true,   false,
-        tr("The Wahoo Fitness Kickr cycling trainer via its Bluetooth smart interface. "),
-        ":images/devices/kickr.png" },
 #endif
       { DEV_CT,       DEV_SERIAL,  (char *) "Racermate Computrainer",true,    false,
         tr("Racermate Computrainer Lab or Pro bike trainer with the handlebar controller "

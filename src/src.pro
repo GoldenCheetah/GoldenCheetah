@@ -74,6 +74,11 @@ lessThan(QT_MAJOR_VERSION, 5) {
     } else {
         QT += multimedia multimediawidgets
     }
+    greaterThan(QT_MINOR_VERSION, 3) {
+        QT += bluetooth
+        HEADERS += Train/BT40Controller.h Train/BT40Device.h
+        SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
+    }
 }
 
 ###=======================================================================

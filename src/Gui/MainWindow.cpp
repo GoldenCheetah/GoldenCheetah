@@ -108,10 +108,6 @@
 // LTM CHART DRAG/DROP PARSE
 #include "LTMChartParser.h"
 
-#ifdef GC_HAVE_WFAPI
-#include "WFApi.h"
-#endif
-
 // CloudDB
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBCommon.h"
@@ -155,10 +151,6 @@ MainWindow::MainWindow(const QDir &home)
     setContentsMargins(0,0,0,0);
     setAcceptDrops(true);
 
-    #ifdef GC_HAVE_WFAPI
-    WFApi *w = WFApi::getInstance(); // ensure created on main thread
-    w->apiVersion();//shutup compiler
-    #endif
     Library::initialise(context->athlete->home->root());
     QNetworkProxyQuery npq(QUrl("http://www.google.com"));
     QList<QNetworkProxy> listOfProxies = QNetworkProxyFactory::systemProxyForQuery(npq);

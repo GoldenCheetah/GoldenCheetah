@@ -24,8 +24,7 @@
 #include "DeviceTypes.h"
 #include "Serial.h"
 #include "RealtimeController.h"
-#ifdef GC_HAVE_WFAPI
-#include "KickrController.h"
+#ifdef QT_BLUETOOTH_LIB
 #include "BT40Controller.h"
 #endif
 #ifdef GC_HAVE_LIBUSB

@@ -244,9 +244,6 @@ macx {
     # Uncomment this line if you have SDK 10.7 or higher
     #DEFINES += GC_HAVE_LION
 
-    # Uncomment this line if you have the Mac OSX Wahoo API installed (Kickr)
-    #HAVE_WFAPI = true
-
     #uncomment below if you are running on the 10.9 developer preview
     #INCLUDEPATH += /Library/Developer/CommandLineTools/SDKs/MacOSX10.9.sdk/usr/include/ 
 }

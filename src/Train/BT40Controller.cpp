@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2013 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2016 Arto Jantunen (viiru@iki.fi)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -22,14 +23,20 @@
 
 BT40Controller::BT40Controller(TrainSidebar *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
-    myBT40 = new BT40(parent, dc);
-    connect(myBT40, SIGNAL(foundDevice(QString,int)), this, SIGNAL(foundDevice(QString,int)));
+    localDevice = new QBluetoothLocalDevice(this);
+    discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
+    localDc = dc;
+    connect(discoveryAgent, SIGNAL(deviceDiscovered(const QBluetoothDeviceInfo&)),
+	    this, SLOT(addDevice(const QBluetoothDeviceInfo&)));
+    connect(discoveryAgent, SIGNAL(error(QBluetoothDeviceDiscoveryAgent::Error)),
+	    this, SLOT(deviceScanError(QBluetoothDeviceDiscoveryAgent::Error)));
+    connect(discoveryAgent, SIGNAL(finished()), this, SLOT(scanFinished()));
 }
 
 BT40Controller::~BT40Controller()
 {
-    myBT40->stop();
-    myBT40->deleteLater();
+    delete localDevice;
+    delete discoveryAgent;
 }
 
 void
@@ -41,7 +48,9 @@ BT40Controller::setDevice(QString)
 int
 BT40Controller::start()
 {
-    myBT40->start();
+    if (localDevice->isValid()) {
+        discoveryAgent->start();
+    }
     return 0;
 }
 
@@ -49,33 +58,36 @@ BT40Controller::start()
 int
 BT40Controller::restart()
 {
-    return myBT40->restart();
+    return 0;
 }
 
 
 int
 BT40Controller::pause()
 {
-    return myBT40->pause();
+    return 0;
 }
 
 
 int
 BT40Controller::stop()
 {
-    return myBT40->stop();
+    foreach (BT40Device* const &device, devices) {
+	device->disconnectDevice();
+    }
+    return 0;
 }
 
 bool
 BT40Controller::find()
 {
-    return myBT40->find();
+    return localDevice->isValid();
 }
 
 bool
 BT40Controller::discover(QString name)
 {
-    return myBT40->discover(name);
+    return true;
 }
 
 
@@ -92,18 +104,42 @@ bool BT40Controller::doesLoad() { return true; }
 void
 BT40Controller::getRealtimeData(RealtimeData &rtData)
 {
-    if(!myBT40->isRunning())
-    {
-        QMessageBox msgBox;
-        msgBox.setText(tr("Cannot Connect to BT40"));
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.exec();
-        parent->Stop(1);
-        return;
-    }
-    // get latest telemetry
-    myBT40->getRealtimeData(rtData);
+    rtData = telemetry;
     processRealtimeData(rtData);
 }
 
 void BT40Controller::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
+
+void
+BT40Controller::addDevice(const QBluetoothDeviceInfo &info)
+{
+    if (info.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration) {
+	BT40Device* dev = new BT40Device(this, info);
+	devices.append(dev);
+	dev->connectDevice();
+    }
+}
+
+
+void
+BT40Controller::scanFinished()
+{
+    qDebug() << "BT scan finished";
+}
+
+
+void
+BT40Controller::deviceScanError(QBluetoothDeviceDiscoveryAgent::Error error)
+{
+    qWarning() << "Error while scanning BT devices:" << error;
+}
+
+
+void
+BT40Controller::setWheelRpm(double wrpm) {
+    telemetry.setWheelRpm(wrpm);
+    int wheel;
+    if (localDc) wheel = localDc->wheelSize;
+    else wheel = 2100;
+    telemetry.setSpeed(wrpm * wheel / 1000 * 60 / 1000);
+}
