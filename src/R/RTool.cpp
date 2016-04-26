@@ -67,6 +67,7 @@ RTool::RTool(int argc, char**argv)
                        "GC.display <- function() { .Call(\"GC.display\") }\n"
                        "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
                        "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
+                       "GC.activities <- function() { .Call(\"GC.activities\") }\n"
                        "GC.version <- function() {\n"
                        "    return(\"%1\")\n"
                        "}\n"
@@ -83,7 +84,6 @@ RTool::RTool(int argc, char**argv)
         canvas = NULL;
 
         // Access into the GC data
-        (*R)["GC.activities"] = Rcpp::InternalFunction(RTool::activities);
         (*R)["GC.activity"] = Rcpp::InternalFunction(RTool::activity);
         (*R)["GC.metrics"] = Rcpp::InternalFunction(RTool::metrics);
 
@@ -140,9 +140,10 @@ RTool::registerRoutines()
     assigndl(&p, dd);
 
     // array of all the function pointers (just 1 for now)
-    SEXP (*fn[3])() = { &RGraphicsDevice::GCdisplay,
+    SEXP (*fn[4])() = { &RGraphicsDevice::GCdisplay,
                         &RTool::athlete,
-                        &RTool::athleteHome };
+                        &RTool::athleteHome,
+                        &RTool::activities, };
 
     // dereference and call, if not found all is lost ....
     if (p) *p(fn);
@@ -197,24 +198,37 @@ RTool::athlete()
 
 
 
-Rcpp::DatetimeVector
+SEXP
 RTool::activities()
 {
+    SEXP dates=NULL;
+    SEXP clas;
 
     if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
 
-        // allocate
-        Rcpp::DatetimeVector l(rtool->context->athlete->rideCache->count());
+        // allocate space for a vector of dates
+        PROTECT(dates=Rf_allocVector(REALSXP, rtool->context->athlete->rideCache->count()));
 
-        // fill
+        // fill with values for date and class
         int i=0;
         foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
-            l[i++] = Rcpp::Datetime(item->dateTime.toUTC().toTime_t());
+            REAL(dates)[i++] = item->dateTime.toUTC().toTime_t();
+
         }
 
-        return l;
+        // POSIXct class
+        PROTECT(clas=Rf_allocVector(STRSXP, 2));
+        SET_STRING_ELT(clas, 0, Rf_mkChar("POSIXct"));
+        SET_STRING_ELT(clas, 1, Rf_mkChar("POSIXt"));
+        Rf_classgets(dates,clas);
+
+        // we use "UTC" for all timezone
+        Rf_setAttrib(dates, Rf_install("tzone"), Rf_mkString("UTC"));
+
+        UNPROTECT(2);
     }
-    return Rcpp::DatetimeVector(0);
+
+    return dates;
 }
 
 Rcpp::DataFrame

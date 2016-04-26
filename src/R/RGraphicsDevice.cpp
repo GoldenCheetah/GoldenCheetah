@@ -19,7 +19,9 @@
 #include "RTool.h"
 #include "RGraphicsDevice.h"
 
+#include "Settings.h"
 #include "Colors.h"
+
 #include <QFont>
 #include <QFontMetricsF>
 
