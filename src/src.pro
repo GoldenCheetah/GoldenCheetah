@@ -272,20 +272,7 @@ contains(DEFINES, "GC_WANT_R") {
 
     ## Chart, Tool (R api), Grahics (R GraphicDevice and Qt canvas widget)
     HEADERS += Charts/RChart.h Charts/RTool.h Charts/RGraphicsDevice.h Charts/RCanvas.h
-    SOURCES += Charts/RChart.cpp Charts/RGraphicsDevice.cpp Charts/RCanvas.cpp
-
-    ## To get past a rather nasty cast in RTool.cpp we need to compile with -fpermissive
-    ## but we will only do that for the single file, since its nasty
-    dodgy.name = dodgy
-    dodgy.input = SOURCES_DODGY
-    dodgy.dependency_type = TYPE_C
-    dodgy.variable_out = OBJECTS
-    dodgy.output = ${QMAKE_VAR_OBJECTS_DIR}${QMAKE_FILE_IN_BASE}$${first(QMAKE_EXT_OBJ)}
-    dodgy.commands = $${QMAKE_CXX} $(CXXFLAGS) -fpermissive $(INCPATH) -c ${QMAKE_FILE_IN} -o ${QMAKE_FILE_OUT} # Note the -fpermissive
-    QMAKE_EXTRA_COMPILERS += dodgy
-
-    ## contains a cast to function pointer from DL_FUNC
-    SOURCES_DODGY = Charts/RTool.cpp
+    SOURCES += Charts/RChart.cpp Charts/RTool.cpp Charts/RGraphicsDevice.cpp Charts/RCanvas.cpp
 
     # how to build an R shlib from source, listed in SOURCE_RSHLIBS below
     # we only have one for now, but could possibly add more. This is to
