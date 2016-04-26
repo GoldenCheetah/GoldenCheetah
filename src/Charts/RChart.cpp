@@ -144,9 +144,6 @@ void RConsole::keyPressEvent(QKeyEvent *e)
             rtool->context = context;
             rtool->canvas = parent->canvas;
 
-            (*rtool->R)["GC.athlete"] = context->athlete->cyclist.toStdString();
-            (*rtool->R)["GC.athlete.home"] = context->athlete->home->root().absolutePath().toStdString();
-
             try {
 
                 // replace $$ with chart identifier (to avoid shared data)

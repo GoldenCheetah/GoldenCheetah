@@ -41,6 +41,8 @@ class RTool {
         Context *context;
         QString version;
 
+        static SEXP athlete();
+        static SEXP athleteHome();
         static Rcpp::DataFrame activity();
         static Rcpp::DatetimeVector activities();
         static Rcpp::DataFrame metrics();

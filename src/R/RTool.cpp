@@ -26,6 +26,8 @@
 #include "Colors.h"
 #include "RideMetric.h"
 
+#include "Rdefines.h"
+
 // If no callbacks we won't play
 #if !defined(RINSIDE_CALLBACKS)
 #error "GC_WANT_R: RInside must have callbacks enabled (see inst/RInsideConfig.h)"
@@ -62,7 +64,9 @@ RTool::RTool(int argc, char**argv)
         R->parseEvalNT(QString(".First <- function() {\n"
                        "    dyn.load(\"RGoldenCheetah.so\")\n"
                        "}\n"
-                       "GC.display <- function() { .C(\"GC.display\") }\n"
+                       "GC.display <- function() { .Call(\"GC.display\") }\n"
+                       "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
+                       "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
                        "GC.version <- function() {\n"
                        "    return(\"%1\")\n"
                        "}\n"
@@ -117,6 +121,7 @@ int assigndl(SEXP (**p)(SEXP(*[])()), DL_FUNC x)
     *p = (SEXP(*)(SEXP(*[])()))(*x);
     return 0;
 }
+
 };
 
 void
@@ -135,7 +140,9 @@ RTool::registerRoutines()
     assigndl(&p, dd);
 
     // array of all the function pointers (just 1 for now)
-    SEXP (*fn[1])() = { &RGraphicsDevice::GCdisplay };
+    SEXP (*fn[3])() = { &RGraphicsDevice::GCdisplay,
+                        &RTool::athlete,
+                        &RTool::athleteHome };
 
     // dereference and call, if not found all is lost ....
     if (p) *p(fn);
@@ -159,6 +166,36 @@ RTool::configChanged()
     // fire and forget, don't care if it fails or not !!
     rtool->R->parseEvalQNT(parCommand.toStdString());
 }
+
+SEXP
+RTool::athleteHome()
+{
+    QString returning = ".";
+    if (rtool->context) returning = rtool->context->athlete->home->root().absolutePath();
+
+    // convert to R type and return, yuck.
+    SEXP ans;
+    PROTECT(ans=Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(ans, 0, Rf_mkChar(returning.toLatin1().constData()));
+    UNPROTECT(1);
+    return ans;
+}
+
+SEXP
+RTool::athlete()
+{
+    QString returning = "none";
+    if (rtool->context) returning = rtool->context->athlete->cyclist;
+
+    // convert to R type and return, yuck.
+    SEXP ans;
+    PROTECT(ans=Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(ans, 0, Rf_mkChar(returning.toLatin1().constData()));
+    UNPROTECT(1);
+    return ans;
+}
+
+
 
 Rcpp::DatetimeVector
 RTool::activities()
