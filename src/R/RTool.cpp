@@ -69,6 +69,7 @@ RTool::RTool(int argc, char**argv)
                        "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
                        "GC.activities <- function() { .Call(\"GC.activities\") }\n"
                        "GC.activity <- function() { .Call(\"GC.activity\") }\n"
+                       "GC.metrics <- function() { .Call(\"GC.metrics\") }\n"
                        "GC.version <- function() {\n"
                        "    return(\"%1\")\n"
                        "}\n"
@@ -83,10 +84,6 @@ RTool::RTool(int argc, char**argv)
         // set the "GC" object and methods
         context = NULL;
         canvas = NULL;
-
-        // Access into the GC data
-        (*R)["GC.activity"] = Rcpp::InternalFunction(RTool::activity);
-        (*R)["GC.metrics"] = Rcpp::InternalFunction(RTool::metrics);
 
         // TBD
         // GC.seasons     - configured seasons
@@ -141,11 +138,12 @@ RTool::registerRoutines()
     assigndl(&p, dd);
 
     // array of all the function pointers (just 1 for now)
-    SEXP (*fn[5])() = { &RGraphicsDevice::GCdisplay,
+    SEXP (*fn[6])() = { &RGraphicsDevice::GCdisplay,
                         &RTool::athlete,
                         &RTool::athleteHome,
                         &RTool::activities,
-                        &RTool::activity };
+                        &RTool::activity,
+                        &RTool::metrics };
 
     // dereference and call, if not found all is lost ....
     if (p) *p(fn);
@@ -233,29 +231,59 @@ RTool::activities()
     return dates;
 }
 
-Rcpp::DataFrame
+SEXP
 RTool::metrics()
 {
-    Rcpp::DataFrame d;
+    SEXP ans=NULL;
 
     if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
 
-        // allocate
-        Rcpp::DatetimeVector l(rtool->context->athlete->rideCache->count());
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        int rides = rtool->context->athlete->rideCache->count();
+        int metrics = factory.metricCount();
 
-        // with date first
-        int i=0;
-        foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
-            l[i++] = Rcpp::Datetime(item->dateTime.toUTC().toTime_t());
-        }
-        // use the compatability 'name' to work with e.g. R package trackeR
-        d["time"] = l;
+        // get a listAllocated
+        PROTECT(ans=Rf_allocList(metrics+1));
+
+        SEXP names;
+        PROTECT(names = Rf_allocVector(STRSXP, metrics+1));
+
+        // next name, nextS is next metric
+        int next=0;
+        SEXP nextS = ans;
+
+        // add in actual time in POSIXct format
+        SEXP time;
+        PROTECT(time=Rf_allocVector(REALSXP, rides));
+
+        // fill with values for date and class
+        for(int k=0; k<rides; k++)
+            REAL(time)[k] = rtool->context->athlete->rideCache->rides()[k]->dateTime.toUTC().toTime_t();
+
+        // POSIXct class
+        SEXP clas;
+        PROTECT(clas=Rf_allocVector(STRSXP, 2));
+        SET_STRING_ELT(clas, 0, Rf_mkChar("POSIXct"));
+        SET_STRING_ELT(clas, 1, Rf_mkChar("POSIXt"));
+        Rf_classgets(time,clas);
+
+        // we use "UTC" for all timezone
+        Rf_setAttrib(time, Rf_install("tzone"), Rf_mkString("UTC"));
+
+        // add to the data.frame and give it a name
+        SETCAR(nextS, time); nextS=CDR(nextS);
+        SET_STRING_ELT(names, next++, Rf_mkChar("time"));
+
+        // time + clas, but not ans!
+        UNPROTECT(2);
 
         // now add a vector for every metric
-        const RideMetricFactory &factory = RideMetricFactory::instance();
         for(int i=0; i<factory.metricCount();i++) {
 
-            Rcpp::NumericVector m(rtool->context->athlete->rideCache->rides().count());
+            // set a vector
+            SEXP m;
+            PROTECT(m=Rf_allocVector(REALSXP, rides));
+
             QString symbol = factory.metricName(i);
             const RideMetric *metric = factory.rideMetric(symbol);
             QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
@@ -263,26 +291,39 @@ RTool::metrics()
 
             int index=0;
             foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
-                m[index++] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
-                                                + (useMetricUnits ? 0.0f : metric->conversionSum());
+                REAL(m)[index++] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
+                                                     + (useMetricUnits ? 0.0f : metric->conversionSum());
             }
 
-            // use the compatability 'name' to work with e.g. R package trackeR
-            d[name.toStdString()] = m;
+            // add to the list
+            SETCAR(nextS, m);
+            nextS = CDR(nextS);
+
+            // give it a name
+            SET_STRING_ELT(names, next, Rf_mkChar(name.toLatin1().constData()));
+
+            next++;
+
+            // vector
+            UNPROTECT(1);
         }
+
+        // turn the list into a data frame + set column names
+        Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+        Rf_namesgets(ans, names);
+
+        // ans + names
+        UNPROTECT(2);
     }
 
-    // d is basically a list, this is about the only way to really
-    // return a valid data.frame
-    Rcpp::DataFrame returning(d);
-    return returning;
+    return ans;
 }
 
 SEXP
 RTool::activity()
 {
     // a dataframe to return
-    SEXP ans;
+    SEXP ans=NULL;
 
     // access via global as this is a static function
     if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
@@ -353,7 +394,6 @@ RTool::activity()
 
             // lets not add lots of NA for the more obscure data series
             if (i > 15 && !f->isDataPresent(series)) continue;
-
 
             // set a vector
             SEXP vector;
