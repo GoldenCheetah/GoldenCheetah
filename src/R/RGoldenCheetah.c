@@ -10,7 +10,7 @@
 //
 // for this test we only have one function
 // GC.display() to make sure the concept works
-static SEXP (*fn[1])();
+static SEXP (*fn[3])();
 
 // if we haven't been initialised don't even try
 // to dereference the function pointers !!
@@ -26,12 +26,24 @@ SEXP GCdisplay()
     else return NULL;
 }
 
+SEXP GCathlete()
+{
+    if (initialised) return fn[1]();
+    else return NULL;
+}
+
+SEXP GCathleteHome()
+{
+    if (initialised) return fn[2]();
+    else return NULL;
+}
+
 SEXP GCinitialiseFunctions(SEXP (*functions[1])())
 {
     //fprintf(stderr, "RGoldenCheetah initialise functions\n");
 
     // initialise all the function pointers
-    for(int i=0; i<1; i++) fn[i] = functions[i];
+    for(int i=0; i<3; i++) fn[i] = functions[i];
     initialised = 1;
 
     return 0;
@@ -56,11 +68,20 @@ R_init_RGoldenCheetah(DllInfo *info)
     R_CMethodDef cMethods[] = {
         { "GCinitialiseFunctions", (DL_FUNC) &GCinitialiseFunctions, 0 },
         { "GC.display", (DL_FUNC) &GCdisplay, 0 },
+        { "GC.athlete", (DL_FUNC) &GCathlete, 0 },
+        { "GC.athlete.home", (DL_FUNC) &GCathleteHome, 0 },
+        { NULL, NULL, 0 }
+    };
+    R_CallMethodDef callMethods[] = {
+        { "GCinitialiseFunctions", (DL_FUNC) &GCinitialiseFunctions, 0 },
+        { "GC.display", (DL_FUNC) &GCdisplay, 0 },
+        { "GC.athlete", (DL_FUNC) &GCathlete, 0 },
+        { "GC.athlete.home", (DL_FUNC) &GCathleteHome, 0 },
         { NULL, NULL, 0 }
     };
 
     // set them up
-    R_registerRoutines(info, cMethods, NULL, NULL, NULL);
+    R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
 
     // make the initialiseFunctions callable from C
     R_RegisterCCallable("RGoldenCheetah", "GCinitialiseFunctions", (DL_FUNC)&GCinitialiseFunctions);
