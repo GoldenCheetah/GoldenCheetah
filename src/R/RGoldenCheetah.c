@@ -10,7 +10,7 @@
 //
 // for this test we only have one function
 // GC.display() to make sure the concept works
-static SEXP (*fn[5])();
+static SEXP (*fn[6])();
 
 // if we haven't been initialised don't even try
 // to dereference the function pointers !!
@@ -22,13 +22,14 @@ SEXP GCathlete() { if (initialised) return fn[1](); else return NULL; }
 SEXP GCathleteHome() { if (initialised) return fn[2](); else return NULL; }
 SEXP GCactivities() { if (initialised) return fn[3](); else return NULL; }
 SEXP GCactivity() { if (initialised) return fn[4](); else return NULL; }
+SEXP GCmetrics() { if (initialised) return fn[5](); else return NULL; }
 
 SEXP GCinitialiseFunctions(SEXP (*functions[1])())
 {
     //fprintf(stderr, "RGoldenCheetah initialise functions\n");
 
     // initialise all the function pointers
-    for(int i=0; i<5; i++) fn[i] = functions[i];
+    for(int i=0; i<6; i++) fn[i] = functions[i];
     initialised = 1;
 
     return 0;
@@ -56,7 +57,8 @@ R_init_RGoldenCheetah(DllInfo *info)
         { "GC.athlete", (DL_FUNC) &GCathlete, 0 },
         { "GC.athlete.home", (DL_FUNC) &GCathleteHome, 0 },
         { "GC.activities", (DL_FUNC) &GCactivities, 0 },
-        { "GC.activity", (DL_FUNC) &GCactivities, 0 },
+        { "GC.activity", (DL_FUNC) &GCactivity, 0 },
+        { "GC.metrics", (DL_FUNC) &GCmetrics, 0 },
         { NULL, NULL, 0 }
     };
     R_CallMethodDef callMethods[] = {
@@ -65,7 +67,8 @@ R_init_RGoldenCheetah(DllInfo *info)
         { "GC.athlete", (DL_FUNC) &GCathlete, 0 },
         { "GC.athlete.home", (DL_FUNC) &GCathleteHome, 0 },
         { "GC.activities", (DL_FUNC) &GCactivities, 0 },
-        { "GC.activity", (DL_FUNC) &GCactivities, 0 },
+        { "GC.activity", (DL_FUNC) &GCactivity, 0 },
+        { "GC.metrics", (DL_FUNC) &GCmetrics, 0 },
         { NULL, NULL, 0 }
     };
 
