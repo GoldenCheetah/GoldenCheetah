@@ -79,7 +79,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 ###=======================================================================
 ### Directory Structure - Split into subdirs to be more manageable
 ###=======================================================================
-INCLUDEPATH += ./ANT ./Train ./FileIO ./Cloud ./Charts ./Metrics ./Gui ./Core
+INCLUDEPATH += ./ANT ./Train ./FileIO ./Cloud ./Charts ./Metrics ./Gui ./Core ./R
 
 
 ###=======================================================================
@@ -270,9 +270,13 @@ contains(DEFINES, "GC_WANT_R") {
     QMAKE_CXXFLAGS +=       $$RCPPWARNING $$RCPPFLAGS $$RCPPINCL $$RINSIDEINCL
     LIBS +=         		$$RLDFLAGS $$RBLAS $$RLAPACK $$RCPPLIBS $$RINSIDELIBS
 
-    ## Chart, Tool (R api), Grahics (R GraphicDevice and Qt canvas widget)
-    HEADERS += Charts/RChart.h Charts/RTool.h Charts/RGraphicsDevice.h Charts/RCanvas.h
-    SOURCES += Charts/RChart.cpp Charts/RTool.cpp Charts/RGraphicsDevice.cpp Charts/RCanvas.cpp
+    ## R integration
+    HEADERS += R/RTool.h R/RGraphicsDevice.h
+    SOURCES += R/RTool.cpp R/RGraphicsDevice.cpp
+
+    ## R based charts
+    HEADERS += Charts/RChart.h Charts/RCanvas.h
+    SOURCES += Charts/RChart.cpp Charts/RCanvas.cpp
 
     # how to build an R shlib from source, listed in SOURCE_RSHLIBS below
     # we only have one for now, but could possibly add more. This is to
@@ -280,7 +284,7 @@ contains(DEFINES, "GC_WANT_R") {
     rshlib.name = rshlib
     rshlib.input = SOURCE_RSHLIBS
     rshlib.dependency_type = TYPE_C
-    rshlib.CONFIG += no_link
+    macx { rshlib.CONFIG += no_link }
     unix { rshlib.output = $${OUT_PWD}/${QMAKE_FILE_BASE}.so }
     win32 { rshlib.output = $${OUT_PWD}/${QMAKE_FILE_BASE}.dll }
     rshlib.commands = $$R_HOME/bin/R CMD SHLIB ${QMAKE_FILE_IN} && $${QMAKE_COPY} ${QMAKE_FILE_PATH}/${QMAKE_FILE_OUT} $${OUT_PWD}
