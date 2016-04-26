@@ -44,7 +44,7 @@ class RTool {
         static SEXP athlete();
         static SEXP athleteHome();
         static SEXP activities();
-        static Rcpp::DataFrame activity();
+        static SEXP activity();
         static Rcpp::DataFrame metrics();
 
         bool starting;

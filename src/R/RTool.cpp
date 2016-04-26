@@ -68,6 +68,7 @@ RTool::RTool(int argc, char**argv)
                        "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
                        "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
                        "GC.activities <- function() { .Call(\"GC.activities\") }\n"
+                       "GC.activity <- function() { .Call(\"GC.activity\") }\n"
                        "GC.version <- function() {\n"
                        "    return(\"%1\")\n"
                        "}\n"
@@ -140,10 +141,11 @@ RTool::registerRoutines()
     assigndl(&p, dd);
 
     // array of all the function pointers (just 1 for now)
-    SEXP (*fn[4])() = { &RGraphicsDevice::GCdisplay,
+    SEXP (*fn[5])() = { &RGraphicsDevice::GCdisplay,
                         &RTool::athlete,
                         &RTool::athleteHome,
-                        &RTool::activities, };
+                        &RTool::activities,
+                        &RTool::activity };
 
     // dereference and call, if not found all is lost ....
     if (p) *p(fn);
@@ -276,10 +278,11 @@ RTool::metrics()
     return returning;
 }
 
-Rcpp::DataFrame
+SEXP
 RTool::activity()
 {
-    Rcpp::DataFrame d;
+    // a dataframe to return
+    SEXP ans;
 
     // access via global as this is a static function
     if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
@@ -289,14 +292,60 @@ RTool::activity()
         f->recalculateDerivedSeries();
         int points = f->dataPoints().count();
 
-        // add in actual time in POSIXct format (via Rcpp::Datetime)
-        Rcpp::DatetimeVector time(points);
-        for(int k=0; k<points; k++)
-            time[k] = Rcpp::Datetime(f->startTime().addSecs(f->dataPoints()[k]->secs).toUTC().toTime_t());
-        d["time"] = time;
+        // how many series?
+        int seriescount=0;
+        for(int i=0; i<static_cast<int>(RideFile::none); i++) {
+            RideFile::SeriesType series = static_cast<RideFile::SeriesType>(i);
+            if (i > 15 && !f->isDataPresent(series)) continue;
+            seriescount++;
+        }
 
-        // now run through each data series adding to the frame, if the
-        // series does not exist we set all values to NA
+        // if we have any series we will continue and add a 'time' series
+        if (seriescount) seriescount++;
+        else return ans; // nowt to return
+
+        // we return a list of series vectors
+        PROTECT(ans = Rf_allocList(seriescount));
+
+        // we collect the names as we go
+        SEXP names;
+        PROTECT(names = Rf_allocVector(STRSXP, seriescount)); // names attribute (column names)
+        int next=0;
+        SEXP nextS = ans;
+
+        //
+        // Now we need to add vectors to the ans list...
+        //
+
+        // TIME
+
+        // add in actual time in POSIXct format
+        SEXP time;
+        PROTECT(time=Rf_allocVector(REALSXP, points));
+
+        // fill with values for date and class
+        for(int k=0; k<points; k++) REAL(time)[k] = f->startTime().addSecs(f->dataPoints()[k]->secs).toUTC().toTime_t();
+
+        // POSIXct class
+        SEXP clas;
+        PROTECT(clas=Rf_allocVector(STRSXP, 2));
+        SET_STRING_ELT(clas, 0, Rf_mkChar("POSIXct"));
+        SET_STRING_ELT(clas, 1, Rf_mkChar("POSIXt"));
+        Rf_classgets(time,clas);
+
+        // we use "UTC" for all timezone
+        Rf_setAttrib(time, Rf_install("tzone"), Rf_mkString("UTC"));
+
+        // add to the data.frame and give it a name
+        SETCAR(nextS, time); nextS=CDR(nextS);
+        SET_STRING_ELT(names, next++, Rf_mkChar("time"));
+
+        // time + clas, but not ans!
+        UNPROTECT(2);
+
+        // add to the end
+
+        // PRESENT SERIES
         for(int i=0; i < static_cast<int>(RideFile::none); i++) {
 
             // what series we working with?
@@ -305,27 +354,43 @@ RTool::activity()
             // lets not add lots of NA for the more obscure data series
             if (i > 15 && !f->isDataPresent(series)) continue;
 
+
             // set a vector
-            Rcpp::NumericVector vector(points);
+            SEXP vector;
+            PROTECT(vector=Rf_allocVector(REALSXP, points));
+
             for(int j=0; j<points; j++) {
                 if (f->isDataPresent(series)) {
                     if (f->dataPoints()[j]->value(series) == 0 && (series == RideFile::lat || series == RideFile::lon))
-                        vector[j] = NA_REAL;
+                        REAL(vector)[j] = NA_REAL;
                     else
-                        vector[j] = f->dataPoints()[j]->value(series);
+                        REAL(vector)[j] = f->dataPoints()[j]->value(series);
                 } else {
-                    vector[j] = NA_REAL;
+                    REAL(vector)[j] = NA_REAL;
                 }
             }
 
-            // use the compatability 'name' to work with e.g. R package trackeR
-            d[RideFile::seriesName(series, true).toStdString()] = vector;
+            // add to the list
+            SETCAR(nextS, vector);
+            nextS = CDR(nextS);
+
+            // give it a name
+            SET_STRING_ELT(names, next, Rf_mkChar(f->seriesName(series, true).toLatin1().constData()));
+
+            next++;
+
+            // vector
+            UNPROTECT(1);
         }
 
+        // turn the list into a data frame + set column names
+        Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+        Rf_namesgets(ans, names);
+
+        // ans + names
+        UNPROTECT(2);
     }
 
-    // d is basically a list, this is about the only way to really
-    // return a valid data.frame
-    Rcpp::DataFrame returning(d);
-    return returning;
+    // NULL if nothing to return
+    return ans;
 }
