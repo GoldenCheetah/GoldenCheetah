@@ -49,6 +49,32 @@ RTool::RTool(int argc, char**argv)
         R->set_callbacks(callbacks);
         dev = new RGraphicsDevice();
 
+        // register our functions
+
+        // initialise the parameter table
+        R_CMethodDef cMethods[] = {
+            { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 ,0, 0 },
+            { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 ,0, 0 },
+            { "GC.athlete.home", (DL_FUNC) &RTool::athleteHome, 0 ,0, 0 },
+            { "GC.activities", (DL_FUNC) &RTool::activities, 0 ,0, 0 },
+            { "GC.activity", (DL_FUNC) &RTool::activity, 0 ,0, 0 },
+            { "GC.metrics", (DL_FUNC) &RTool::metrics, 0 ,0, 0 },
+            { NULL, NULL, 0, 0, 0 }
+        };
+        R_CallMethodDef callMethods[] = {
+            { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 },
+            { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 },
+            { "GC.athlete.home", (DL_FUNC) &RTool::athleteHome, 0 },
+            { "GC.activities", (DL_FUNC) &RTool::activities, 0 },
+            { "GC.activity", (DL_FUNC) &RTool::activity, 0 },
+            { "GC.metrics", (DL_FUNC) &RTool::metrics, 0 },
+            { NULL, NULL, 0 }
+        };
+
+        // set them up
+        DllInfo *info = R_getEmbeddingDllInfo();
+        R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
+
         // lets get the version early for the about dialog
         R->parseEvalNT("print(R.version.string)");
         QStringList &strings = callbacks->getConsoleOutput();
@@ -61,21 +87,18 @@ RTool::RTool(int argc, char**argv)
 
         // load the dynamix library and create function wrapper
         // we should put this into a source file (.R)
-        R->parseEvalNT(QString(".First <- function() {\n"
-                       "    dyn.load(\"RGoldenCheetah.so\")\n"
-                       "}\n"
-                       "GC.display <- function() { .Call(\"GC.display\") }\n"
-                       "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
-                       "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
-                       "GC.activities <- function() { .Call(\"GC.activities\") }\n"
-                       "GC.activity <- function() { .Call(\"GC.activity\") }\n"
-                       "GC.metrics <- function() { .Call(\"GC.metrics\") }\n"
-                       "GC.version <- function() {\n"
-                       "    return(\"%1\")\n"
-                       "}\n"
-                       "GC.build <- function() {\n"
-                       "    return(%2)\n"
-                       "}\n")
+        R->parseEvalNT(QString("GC.display <- function() { .Call(\"GC.display\") }\n"
+                               "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
+                               "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
+                               "GC.activities <- function() { .Call(\"GC.activities\") }\n"
+                               "GC.activity <- function() { .Call(\"GC.activity\") }\n"
+                               "GC.metrics <- function() { .Call(\"GC.metrics\") }\n"
+                               "GC.version <- function() {\n"
+                               "    return(\"%1\")\n"
+                               "}\n"
+                               "GC.build <- function() {\n"
+                               "    return(%2)\n"
+                               "}\n")
                        .arg(VERSION_STRING)
                        .arg(VERSION_LATEST).toStdString());
 
@@ -111,42 +134,6 @@ RTool::RTool(int argc, char**argv)
         R = NULL;
     }
     starting = false;
-}
-
-extern "C" {
-int assigndl(SEXP (**p)(SEXP(*[])()), DL_FUNC x)
-{
-    *p = (SEXP(*)(SEXP(*[])()))(*x);
-    return 0;
-}
-
-};
-
-void
-RTool::registerRoutines()
-{
-    // the dynamic libray is loaded so we should be able to find
-    // the initialisation function now
-
-    // get the value
-    DL_FUNC dd = R_GetCCallable("RGoldenCheetah", "GCinitialiseFunctions");
-
-    // change signature
-    SEXP (*p)(SEXP(*[])());
-
-    // cast
-    assigndl(&p, dd);
-
-    // array of all the function pointers (just 1 for now)
-    SEXP (*fn[6])() = { &RGraphicsDevice::GCdisplay,
-                        &RTool::athlete,
-                        &RTool::athleteHome,
-                        &RTool::activities,
-                        &RTool::activity,
-                        &RTool::metrics };
-
-    // dereference and call, if not found all is lost ....
-    if (p) *p(fn);
 }
 
 void

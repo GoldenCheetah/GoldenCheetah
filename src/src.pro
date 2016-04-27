@@ -278,27 +278,6 @@ contains(DEFINES, "GC_WANT_R") {
     HEADERS += Charts/RChart.h Charts/RCanvas.h
     SOURCES += Charts/RChart.cpp Charts/RCanvas.cpp
 
-    # how to build an R shlib from source, listed in SOURCE_RSHLIBS below
-    # we only have one for now, but could possibly add more. This is to
-    # use the public R API and avoid using RInside and Rcpp
-    rshlib.name = rshlib
-    rshlib.input = SOURCE_RSHLIBS
-    rshlib.dependency_type = TYPE_C
-    macx { rshlib.CONFIG += no_link }
-    unix { rshlib.output = $${OUT_PWD}/${QMAKE_FILE_BASE}.so }
-    win32 { rshlib.output = $${OUT_PWD}/${QMAKE_FILE_BASE}.dll }
-    rshlib.commands = $$R_HOME/bin/R CMD SHLIB ${QMAKE_FILE_IN} && $${QMAKE_COPY} ${QMAKE_FILE_PATH}/${QMAKE_FILE_OUT} $${OUT_PWD}
-    QMAKE_EXTRA_COMPILERS += rshlib
-
-    ## post link on OSX we need to copy the so file
-    macx {
-        QMAKE_POST_LINK += $${QMAKE_COPY} $${OUT_PWD}/RGoldenCheetah.so $${OUT_PWD}/GoldenCheetah.app/Contents/MacOS
-    }
-
-    ## R bootstrap dynamic libraries, used to register C methods
-    ## to avoid RInside/Rccp
-    SOURCE_RSHLIBS = R/RGoldenCheetah.c
-
     }
 }
 
