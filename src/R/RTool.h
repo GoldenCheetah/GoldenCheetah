@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <RChart.h>
+#include "RChart.h"
 #include "Context.h"
 
 #ifndef _GC_RTool_h
@@ -30,7 +30,7 @@ class RTool {
         RTool(int argc, char **argv);
         void  configChanged();
 
-        RInside *R;
+        REmbed *R;
         RCallbacks *callbacks;
         RGraphicsDevice *dev;
 
@@ -55,7 +55,10 @@ extern RTool *rtool;
 
 // global singleton catches output from R interpreter
 // first come first served on output
-class RCallbacks : public Callbacks {
+
+//XXX at this point this is not being used.
+//XXX last effort of refactoring out RInside and Rcpp
+class RCallbacks {
 
     public:
         // see inst/includes/Callbacks.h for a list of all overrideable methods
