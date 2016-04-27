@@ -28,11 +28,6 @@
 
 #include "Rdefines.h"
 
-// If no callbacks we won't play
-#if !defined(RINSIDE_CALLBACKS)
-#error "GC_WANT_R: RInside must have callbacks enabled (see inst/RInsideConfig.h)"
-#endif
-
 RTool::RTool(int argc, char**argv)
 {
     // setup the R runtime elements
@@ -44,9 +39,9 @@ RTool::RTool(int argc, char**argv)
         // yikes, self referenced during construction (!)
         rtool = this;
 
-        R = new RInside(argc,argv);
+        R = new REmbed(argc,argv);
         callbacks = new RCallbacks;
-        R->set_callbacks(callbacks);
+        //R->set_callbacks(callbacks);
         dev = new RGraphicsDevice();
 
         // register our functions
@@ -100,7 +95,7 @@ RTool::RTool(int argc, char**argv)
                                "    return(%2)\n"
                                "}\n")
                        .arg(VERSION_STRING)
-                       .arg(VERSION_LATEST).toStdString());
+                       .arg(VERSION_LATEST));
 
         strings.clear();
 
@@ -119,7 +114,7 @@ RTool::RTool(int argc, char**argv)
 
     } catch(std::exception& ex) {
 
-        qDebug()<<"RInside error:"  << ex.what();
+        qDebug()<<"Parse error:"  << ex.what();
         failed = true;
 
     } catch(...) {
@@ -129,7 +124,7 @@ RTool::RTool(int argc, char**argv)
 
     // ack, disable R runtime
     if (failed) {
-        qDebug() << "RInside/Rcpp failed to start, RConsole disabled.";
+        qDebug() << "R Embed failed to start, RConsole disabled.";
         version = "none";
         R = NULL;
     }
@@ -152,7 +147,7 @@ RTool::configChanged()
                              .arg(GColor(CPLOTMARKER).name());
 
     // fire and forget, don't care if it fails or not !!
-    rtool->R->parseEvalQNT(parCommand.toStdString());
+    rtool->R->parseEvalNT(parCommand);
 }
 
 SEXP

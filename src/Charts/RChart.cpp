@@ -153,7 +153,7 @@ void RConsole::keyPressEvent(QKeyEvent *e)
                 // so only print it out if its actually been set
                 SEXP ret = NULL;
 
-                int rc = rtool->R->parseEval(line.toStdString(), ret);
+                int rc = rtool->R->parseEval(line, ret);
 
                 // if this isn't an assignment then print the result
                 // bit hacky, there must be a better way!
@@ -241,7 +241,7 @@ RChart::RChart(Context *context) : GcChartWindow(context)
     mainLayout->setContentsMargins(2,0,2,2);
     setChartLayout(mainLayout);
 
-    // if we failed to startup the RInside properly
+    // if we failed to startup embedded R properly
     // then disable the RConsole altogether.
     if (rtool->R) {
         splitter = new QSplitter(Qt::Horizontal, this);
