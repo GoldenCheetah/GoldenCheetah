@@ -252,27 +252,17 @@ contains(DEFINES, "GC_WANT_R") {
     RBLAS =                 $$system($$R_HOME/bin/R CMD config BLAS_LIBS)
     RLAPACK =               $$system($$R_HOME/bin/R CMD config LAPACK_LIBS)
 
-    ## if you need to set an rpath to R itself, also uncomment
-    #RRPATH =               -Wl,-rpath,$$R_HOME/lib
-
-    ## include headers and libraries for Rcpp interface classes
-    RCPPINCL =              $$system($$R_HOME/bin/Rscript -e \'Rcpp:::CxxFlags\(\)\')
-    RCPPLIBS =              $$system($$R_HOME/bin/Rscript -e \'Rcpp:::LdFlags\(\)\')
-
     ## for some reason when building with Qt we get this each time
     ## so we turn unused parameter warnings off
-    RCPPWARNING =           -Wno-unused-parameter 
-    ## include headers and libraries for RInside embedding classes
-    RINSIDEINCL =           $$system($$R_HOME/bin/Rscript -e \'RInside:::CxxFlags\(\)\')
-    RINSIDELIBS =           $$system($$R_HOME/bin/Rscript -e \'RInside:::LdFlags\(\)\')
+    RCPPWARNING =           -Wno-unused-parameter
 
     ## compiler etc settings used in default make rules
-    QMAKE_CXXFLAGS +=       $$RCPPWARNING $$RCPPFLAGS $$RCPPINCL $$RINSIDEINCL
-    LIBS +=         		$$RLDFLAGS $$RBLAS $$RLAPACK $$RCPPLIBS $$RINSIDELIBS
+    QMAKE_CXXFLAGS +=       $$RCPPWARNING $$RCPPFLAGS
+    LIBS +=         		$$RLDFLAGS $$RBLAS $$RLAPACK
 
     ## R integration
-    HEADERS += R/RTool.h R/RGraphicsDevice.h
-    SOURCES += R/RTool.cpp R/RGraphicsDevice.cpp
+    HEADERS += R/REmbed.h R/RTool.h R/RGraphicsDevice.h
+    SOURCES += R/REmbed.cpp R/RTool.cpp R/RGraphicsDevice.cpp
 
     ## R based charts
     HEADERS += Charts/RChart.h Charts/RCanvas.h

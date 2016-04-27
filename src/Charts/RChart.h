@@ -19,7 +19,7 @@
 #ifndef _GC_RChart_h
 #define _GC_RChart_h 1
 
-#include <RInside.h>
+#include <REmbed.h>
 #include <QString>
 #include <QDebug>
 #include <QColor>
