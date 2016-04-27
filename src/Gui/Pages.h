@@ -85,6 +85,7 @@ class GeneralPage : public QWidget
     public slots:
         void browseWorkoutDir();
         void browseAthleteDir();
+        void browseRDir();
 
     private:
         Context *context;
@@ -100,12 +101,15 @@ class GeneralPage : public QWidget
         QLineEdit *hystedit;
         QLineEdit *athleteDirectory;
         QLineEdit *workoutDirectory;
+        QLineEdit *rDirectory;
         QPushButton *workoutBrowseButton;
         QPushButton *athleteBrowseButton;
+        QPushButton *rBrowseButton;
 
         QLabel *langLabel;
         QLabel *warningLabel;
         QLabel *workoutLabel;
+        QLabel *rLabel;
         QLabel *athleteLabel;
 
         struct {
