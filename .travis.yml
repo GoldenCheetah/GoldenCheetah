@@ -44,21 +44,6 @@ before_install:
 - CC=clang CXX=clang++ sudo make install
 - cd ..
 - hdiutil mount D2XX1.2.2.dmg
-##- install R packages we need
-# Rcpp
-- cd util
-- R CMD BATCH install-packages.R
-- cat install-packages.Rout
-- cd ..
-# RInside (with Callbacks enabled)
-- mkdir temp
-- cd temp
-- git clone https://github.com/eddelbuettel/rinside.git RInside
-- sed -i "" "s|\/\/\ \#define|\#define|" RInside/inst/include/RInsideConfig.h
-- R CMD INSTALL RInside
-- cd ..
-- rm -rf temp
-##-
 before_script:
 - mkdir D2XX
 - cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib D2XX
@@ -101,7 +86,7 @@ before_script:
 - sed -i "" "s|\(DEFINES += GC_VIDEO_NONE.*\)|#\1 |" src/gcconfig.pri
 - sed -i "" "s|#\(DEFINES += GC_VIDEO_QUICKTIME.*\)|\1 |" src/gcconfig.pri
 ##Issues with c++11 and stdlib on travis and dependencies (e.g. plot3d)
-##- sed -i "" "s|#\(DEFINES += GC_WANT_R.*\)|\1 |" src/gcconfig.pri
+- sed -i "" "s|#\(DEFINES += GC_WANT_R.*\)|\1 |" src/gcconfig.pri
 - echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
 - sed -i "" "s/__GC_GOOGLE_CALENDAR_CLIENT_SECRET__/"$GC_GOOGLE_CALENDAR_CLIENT_SECRET"/" src/Core/Secrets.h
 - sed -i "" "s/__GC_STRAVA_CLIENT_SECRET__/"$GC_STRAVA_CLIENT_SECRET"/" src/Core/Secrets.h
