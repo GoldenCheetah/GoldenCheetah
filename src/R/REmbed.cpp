@@ -24,6 +24,7 @@
 
 #include "REmbed.h"
 #include "Settings.h"
+#include <stdexcept>
 
 static const char *name = "GoldenCheetah";
 
