@@ -21,17 +21,18 @@
 
 #ifndef _GC_RTool_h
 
-class RCallbacks;
 class RGraphicsDevice;
+class RTool;
+extern RTool *rtool;
 
 class RTool {
+
 
     public:
         RTool(int argc, char **argv);
         void  configChanged();
 
         REmbed *R;
-        RCallbacks *callbacks;
         RGraphicsDevice *dev;
 
         // the canvas to plot on, it may be null
@@ -48,40 +49,21 @@ class RTool {
         static SEXP metrics();
 
         bool starting;
+
+        // handling console output from the R runtime
+        static void R_Suicide(const char *) {}
+        static void R_ShowMessage(const char *text) { rtool->messages << QString(text); }
+        static int R_ReadConsole(const char *, unsigned char *, int, int) { return 0; }
+        static void R_WriteConsole(const char *text, int) { rtool->messages << QString(text); }
+        static void R_WriteConsoleEx(const char *text, int, int) { rtool->messages << QString(text); }
+        static void R_ResetConsole() { }
+        static void R_FlushConsole() { }
+        static void R_ClearerrConsole() { }
+
+        QStringList messages;
 };
 
 // there is a global instance created in main
 extern RTool *rtool;
-
-// global singleton catches output from R interpreter
-// first come first served on output
-
-//XXX at this point this is not being used.
-//XXX last effort of refactoring out RInside and Rcpp
-class RCallbacks {
-
-    public:
-        // see inst/includes/Callbacks.h for a list of all overrideable methods
-        virtual void WriteConsole(const std::string& line, int type) {
-            //qDebug()<<"Console>>" <<type<< QString::fromStdString(line);
-            //if (rtool && rtool->context && !rtool->starting) rtool->context->notifyRMessage(QString::fromStdString(line));
-            //else strings << QString::fromStdString(line);
-            strings << QString::fromStdString(line);
-        };
-
-        //virtual void ShowMessage(const char* message) {
-            //qDebug()<<"M:" << QString(message);
-            //strings << QString(message);
-        //}
-
-        //virtual bool has_ShowMessage() { return true; }
-        virtual bool has_WriteConsole() { return true; }
-
-        QStringList &getConsoleOutput() {
-            return strings;
-        }
-    private:
-        QStringList strings;
-};
 
 #endif
