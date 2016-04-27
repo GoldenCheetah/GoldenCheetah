@@ -302,12 +302,11 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">ICAL</td><td>%10</td></tr>"
             "<tr><td colspan=\"2\">USBXPRESS</td><td>%11</td></tr>"
             "<tr><td colspan=\"2\">LIBUSB</td><td>%12</td></tr>"
-            "<tr><td colspan=\"2\">Wahoo API</td><td>%13</td></tr>"
-            "<tr><td colspan=\"2\">VLC</td><td>%14</td></tr>"
-            "<tr><td colspan=\"2\">VIDEO</td><td>%15</td></tr>"
-            "<tr><td colspan=\"2\">SAMPLERATE</td><td>%16</td></tr>"
-            "<tr><td colspan=\"2\">SSL</td><td>%17</td></tr>"
-            "<tr><td colspan=\"2\">R</td><td>%18</td></tr>"
+            "<tr><td colspan=\"2\">VLC</td><td>%13</td></tr>"
+            "<tr><td colspan=\"2\">VIDEO</td><td>%14</td></tr>"
+            "<tr><td colspan=\"2\">SAMPLERATE</td><td>%15</td></tr>"
+            "<tr><td colspan=\"2\">SSL</td><td>%16</td></tr>"
+            "<tr><td colspan=\"2\">R</td><td>%17</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)

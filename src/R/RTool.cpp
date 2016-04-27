@@ -27,6 +27,7 @@
 #include "RideMetric.h"
 
 #include "Rdefines.h"
+#include "Rversion.h"
 
 // message i/o from to R
 #define R_INTERFACE_PTRS
@@ -85,14 +86,7 @@ RTool::RTool(int argc, char**argv)
         R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
 
         // lets get the version early for the about dialog
-        R->parseEvalNT("print(R.version.string)");
-        QStringList strings = rtool->messages;
-        if (strings.count() == 3) {
-            QRegExp exp("^.*([0-9]+\\.[0-9]+\\.[0-9]+).*$");
-            if (exp.exactMatch(strings[1])) version = exp.cap(1);
-            else version = strings[1];
-        }
-        rtool->messages.clear();
+        version = QString("%1.%2").arg(R_MAJOR).arg(R_MINOR);
 
         // load the dynamix library and create function wrapper
         // we should put this into a source file (.R)
@@ -111,7 +105,7 @@ RTool::RTool(int argc, char**argv)
                        .arg(VERSION_STRING)
                        .arg(VERSION_LATEST));
 
-        strings.clear();
+        rtool->messages.clear();
 
         // set the "GC" object and methods
         context = NULL;
