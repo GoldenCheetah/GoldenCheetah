@@ -395,9 +395,6 @@ main(int argc, char *argv[])
         // initialise the trainDB
         trainDB = new TrainDB(home);
 
-#ifdef GC_WANT_R
-        (*(rtool->R))["GC.home"] = home.absolutePath().toStdString();
-#endif
         // lets do what the command line says ...
         QVariant lastOpened;
         if(args.count() == 2) { // $ ./GoldenCheetah Mark -or- ./GoldenCheetah --server ~/athletedir

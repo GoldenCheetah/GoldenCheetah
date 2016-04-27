@@ -63,7 +63,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     //
     // Language Selection
     //
-    langLabel = new QLabel(tr("Language:"));
+    langLabel = new QLabel(tr("Language"));
     langCombo = new QComboBox();
     langCombo->addItem(tr("English"));
     langCombo->addItem(tr("French"));
@@ -122,7 +122,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     // by default, set the threshold to 25 seconds
     if (garminHWMark.isNull() || garminHWMark.toInt() == 0) garminHWMark.setValue(25);
-    QLabel *garminHWLabel = new QLabel(tr("Smart Recording Threshold (secs):"));
+    QLabel *garminHWLabel = new QLabel(tr("Smart Recording Threshold (secs)"));
     garminHWMarkedit = new QLineEdit(garminHWMark.toString(),this);
     garminHWMarkedit->setInputMask("009");
 
@@ -135,7 +135,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     if (elevationHysteresis.isNull() || elevationHysteresis.toFloat() == 0.0)
        elevationHysteresis.setValue(3.0);  // default is 1 meter
 
-    QLabel *hystlabel = new QLabel(tr("Elevation hysteresis (meters):"));
+    QLabel *hystlabel = new QLabel(tr("Elevation hysteresis (meters)"));
     hystedit = new QLineEdit(elevationHysteresis.toString(),this);
     hystedit->setInputMask("9.00");
 
@@ -144,7 +144,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
 
     // wbal formula preference
-    QLabel *wbalFormLabel = new QLabel(tr("W' bal formula:"));
+    QLabel *wbalFormLabel = new QLabel(tr("W' bal formula"));
     wbalForm = new QComboBox(this);
     wbalForm->addItem(tr("Differential"));
     wbalForm->addItem(tr("Integral"));
@@ -176,7 +176,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     // Athlete directory (home of athletes)
     //
     QVariant athleteDir = appsettings->value(this, GC_HOMEDIR);
-    athleteLabel = new QLabel(tr("Athlete Library:"));
+    athleteLabel = new QLabel(tr("Athlete Library"));
     athleteDirectory = new QLineEdit;
     athleteDirectory->setText(athleteDir.toString() == "0" ? "" : athleteDir.toString());
     athleteWAS = athleteDirectory->text(); // remember what we started with ...
@@ -195,7 +195,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR, "");
     // fix old bug..
     if (workoutDir == "0") workoutDir = "";
-    workoutLabel = new QLabel(tr("Workout and VideoSync Library:"));
+    workoutLabel = new QLabel(tr("Workout and VideoSync Library"));
     workoutDirectory = new QLineEdit;
     workoutDirectory->setText(workoutDir.toString());
     workoutBrowseButton = new QPushButton(tr("Browse"));
@@ -206,6 +206,26 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(workoutBrowseButton, 8 + offset,2);
 
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
+    offset++;
+
+    //
+    // R Home directory
+    //
+    QVariant rDir = appsettings->value(this, GC_R_HOME, "");
+    // fix old bug..
+    if (rDir == "0") rDir = "";
+    rLabel = new QLabel(tr("R Installation Directory"));
+    rDirectory = new QLineEdit;
+    rDirectory->setText(rDir.toString());
+    rBrowseButton = new QPushButton(tr("Browse"));
+    rBrowseButton->setFixedWidth(120);
+
+    configLayout->addWidget(rLabel, 8 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(rDirectory, 8 + offset,1);
+    configLayout->addWidget(rBrowseButton, 8 + offset,2);
+    offset++;
+
+    connect(rBrowseButton, SIGNAL(clicked()), this, SLOT(browseRDir()));
 
     // save away initial values
     b4.unit = unitCombo->currentIndex();
@@ -237,6 +257,7 @@ GeneralPage::saveClicked()
     // Directories
     appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
     appsettings->setValue(GC_HOMEDIR, athleteDirectory->text());
+    appsettings->setValue(GC_R_HOME, rDirectory->text());
 
     // Elevation
     appsettings->setValue(GC_ELEVATION_HYSTERESIS, hystedit->text());
@@ -274,6 +295,16 @@ GeneralPage::saveClicked()
         state += CONFIG_UNITS;
 
     return state;
+}
+
+void
+GeneralPage::browseRDir()
+{
+    QString currentDir = rDirectory->text();
+    if (!QDir(currentDir).exists()) currentDir = "";
+    QString dir = QFileDialog::getExistingDirectory(this, tr("R Installation (R_HOME)"),
+                            currentDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (dir != "") rDirectory->setText(dir);  //only overwrite current dir, if a new was selected
 }
 
 void
@@ -6433,7 +6464,7 @@ IntervalsPage::IntervalsPage(Context *context) : context(context)
     mainLayout->addLayout(layout);
     mainLayout->addStretch();
 
-    QLabel *heading = new QLabel(tr("Enable interval auto-discovery:"));
+    QLabel *heading = new QLabel(tr("Enable interval auto-discovery"));
     heading->setFixedHeight(QFontMetrics(heading->font()).height() + 4);
 
     int row = 0;

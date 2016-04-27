@@ -115,6 +115,9 @@
 // Colors/Chrome - see special treatment sections (also stored in <system>)
 #define GC_CHROME                       "<system>chrome" // mac or flat only so far
 
+// Location of R Installation
+#define GC_R_HOME                       "<system>r_home"
+
 
 
 // --------------------------------------------------------------------
