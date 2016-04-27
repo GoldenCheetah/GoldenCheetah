@@ -53,6 +53,8 @@ class REmbed {
 
     bool verbose;
     bool interactive;
+
+    bool loaded;
 };
 
 #endif

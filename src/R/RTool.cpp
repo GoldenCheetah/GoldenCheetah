@@ -36,15 +36,23 @@
 RTool::RTool(int argc, char**argv)
 {
     // setup the R runtime elements
-    bool failed = false;
+    failed = false;
     starting = true;
 
     try {
 
+        // initialise
+        R = new REmbed(argc,argv);
+
+        // failed to load
+        if (R->loaded == false) {
+            failed=true;
+            return;
+        }
+
         // yikes, self referenced during construction (!)
         rtool = this;
 
-        R = new REmbed(argc,argv);
         dev = new RGraphicsDevice();
 
         // capture all output and input to our methods

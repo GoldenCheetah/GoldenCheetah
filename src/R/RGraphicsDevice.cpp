@@ -215,7 +215,7 @@ void RGraphicsDevice::Close(pDevDesc dev)
         // This is to avoid incompatabilities between the heap we are compiled with
         // and the heap R is compiled with (we observed this to a problem with
         // 64-bit R)
-        std::free(rtool->dev->gcGEDevDesc->dev);
+        free(rtool->dev->gcGEDevDesc->dev);
         rtool->dev->gcGEDevDesc->dev = NULL;
 
         // set GDDevDesc to NULL so we don't reference it again
@@ -319,7 +319,7 @@ SEXP RGraphicsDevice::createGD()
     BEGIN_SUSPEND_INTERRUPTS
     {
         // define device
-        pDevDesc pDev = (DevDesc *) std::calloc(1, sizeof(DevDesc));
+        pDevDesc pDev = (DevDesc *) calloc(1, sizeof(DevDesc));
 
         // device functions
         pDev->activate = RGraphicsDevice::Activate;
