@@ -49,6 +49,7 @@ class RTool {
         static SEXP metrics();
 
         bool starting;
+        bool failed;
 
         // handling console output from the R runtime
         static void R_Suicide(const char *) {}

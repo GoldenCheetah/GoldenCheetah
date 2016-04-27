@@ -240,7 +240,7 @@ RChart::RChart(Context *context) : GcChartWindow(context)
 
     // if we failed to startup embedded R properly
     // then disable the RConsole altogether.
-    if (rtool->R) {
+    if (rtool) {
         splitter = new QSplitter(Qt::Horizontal, this);
         splitter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         splitter->setHandleWidth(1);

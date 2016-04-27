@@ -69,6 +69,7 @@
 
 #ifdef GC_WANT_R
 #include "RTool.h"
+#include "Rversion.h"
 #endif
 
 GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
@@ -334,7 +335,7 @@ QString GcCrashDialog::versionHTML()
             .arg(src)
             .arg(QSslSocket::supportsSsl() ? "yes" : "none")
 #ifdef GC_WANT_R
-            .arg(rtool->version)
+            .arg(QString("%1.%2").arg(R_MAJOR).arg(R_MINOR))
 #else
 #ifdef WIN32
             .arg("unsupported")

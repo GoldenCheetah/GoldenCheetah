@@ -38,6 +38,7 @@ REmbed::~REmbed()
 REmbed::REmbed(const int argc, const char* const argv[], const bool verbose, const bool interactive) :
     verbose(verbose), interactive(interactive)
 {
+    loaded = false;
 
     // we need to tell embedded R where to work
     QString envR_HOME(getenv("R_HOME"));
@@ -63,6 +64,7 @@ REmbed::REmbed(const int argc, const char* const argv[], const bool verbose, con
     Rst.R_Interactive = (Rboolean) interactive;       // sets interactive() to eval to false
     R_SetParams(&Rst);
 
+    loaded = true;
 }
 
 // this is a non-throwing version returning an error code
