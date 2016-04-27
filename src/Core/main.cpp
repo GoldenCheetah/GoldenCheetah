@@ -270,6 +270,7 @@ main(int argc, char *argv[])
     // create the singleton in the main thread
     // will be shared by all athletes and all charts (!!)
     rtool = new RTool(argc,argv);
+    if (rtool->failed == true) rtool=NULL;
 #endif
 
     // create the application -- only ever ONE regardless of restarts
