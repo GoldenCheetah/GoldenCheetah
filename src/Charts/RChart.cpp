@@ -160,23 +160,20 @@ void RConsole::keyPressEvent(QKeyEvent *e)
                 if(rc == 0 && ret != NULL && !Rf_isNull(ret) && !line.contains("<-") && !line.contains("print"))
                     Rf_PrintValue(ret);
 
-                QStringList &response = rtool->callbacks->getConsoleOutput();
-                putData(GColor(CPLOTMARKER), response.join(""));
-                response.clear();
+                putData(GColor(CPLOTMARKER), rtool->messages.join(""));
+                rtool->messages.clear();
 
             } catch(std::exception& ex) {
 
                 putData(QColor(Qt::red), QString("%1\n").arg(QString(ex.what())));
-                QStringList &response = rtool->callbacks->getConsoleOutput();
-                putData(QColor(Qt::red), response.join(""));
-                response.clear();
+                putData(QColor(Qt::red), rtool->messages.join(""));
+                rtool->messages.clear();
 
             } catch(...) {
 
                 putData(QColor(Qt::red), "error: general exception.\n");
-                QStringList &response = rtool->callbacks->getConsoleOutput();
-                putData(QColor(Qt::red), response.join(""));
-                response.clear();
+                putData(QColor(Qt::red), rtool->messages.join(""));
+                rtool->messages.clear();
 
             }
 

@@ -28,6 +28,10 @@
 
 #include "Rdefines.h"
 
+// message i/o from to R
+#define R_INTERFACE_PTRS
+#include <Rinterface.h>
+
 RTool::RTool(int argc, char**argv)
 {
     // setup the R runtime elements
@@ -40,13 +44,23 @@ RTool::RTool(int argc, char**argv)
         rtool = this;
 
         R = new REmbed(argc,argv);
-        callbacks = new RCallbacks;
-        //R->set_callbacks(callbacks);
         dev = new RGraphicsDevice();
 
-        // register our functions
+        // capture all output and input to our methods
+        ptr_R_Suicide = &RTool::R_Suicide;
+        ptr_R_ShowMessage = &RTool::R_ShowMessage;
+        ptr_R_ReadConsole = &RTool::R_ReadConsole;
+        ptr_R_WriteConsole = &RTool::R_WriteConsole;
+        ptr_R_WriteConsoleEx = &RTool::R_WriteConsoleEx;
+        ptr_R_ResetConsole = &RTool::R_ResetConsole;
+        ptr_R_FlushConsole = &RTool::R_FlushConsole;
+        ptr_R_ClearerrConsole = &RTool::R_ClearerrConsole;
 
-        // initialise the parameter table
+        // turn off stderr io
+        R_Outputfile = NULL;
+        R_Consolefile = NULL;
+
+        // register our functions
         R_CMethodDef cMethods[] = {
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 ,0, 0 },
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 ,0, 0 },
@@ -72,13 +86,13 @@ RTool::RTool(int argc, char**argv)
 
         // lets get the version early for the about dialog
         R->parseEvalNT("print(R.version.string)");
-        QStringList &strings = callbacks->getConsoleOutput();
+        QStringList strings = rtool->messages;
         if (strings.count() == 3) {
             QRegExp exp("^.*([0-9]+\\.[0-9]+\\.[0-9]+).*$");
             if (exp.exactMatch(strings[1])) version = exp.cap(1);
             else version = strings[1];
         }
-        strings.clear();
+        rtool->messages.clear();
 
         // load the dynamix library and create function wrapper
         // we should put this into a source file (.R)
