@@ -26,7 +26,7 @@
 #include "Colors.h"
 #include "RideMetric.h"
 
-#include "Rdefines.h"
+#include "Rinternals.h"
 #include "Rversion.h"
 
 // message i/o from to R
