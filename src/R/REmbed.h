@@ -23,7 +23,15 @@
 #define R_NO_REMAP // don't map length(x) -> Rf_length for older code base
 #include <R.h>
 #include <Rinternals.h>
-#include <R_ext/Boolean.h> // R wants to define TRUE/FALSE as enums for type Rboolean (!!)
+
+// get rid of #define TRUE/FALSE if QT4 has defined them
+// since they clash with Rboolean enums
+#ifdef TRUE
+#undef TRUE
+#endif
+#ifdef FALSE
+#undef FALSE
+#endif
 
 // specific to embedding
 #include <Rembedded.h>
