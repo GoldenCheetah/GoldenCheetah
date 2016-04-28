@@ -88,7 +88,7 @@ Rboolean RGraphicsDevice::NewFrameConfirm_(pDevDesc dd)
     // returning false causes the default implementation (printing a prompt
     // of "Hit <Return> to see next plot:" to the console) to be used. this
     // seems ideal compared to any custom UI we could produce so we leave it be
-    return TRUE;
+    return Rboolean::TRUE;
 }
 
 
@@ -361,7 +361,7 @@ SEXP RGraphicsDevice::createGD()
 
         //XXX todo - not sure what we might need
         pDev->deviceSpecific = NULL;
-        pDev->displayListOn = FALSE;
+        pDev->displayListOn = Rboolean::FALSE;
 
         // device attributes
         setSize(pDev);
@@ -555,11 +555,11 @@ void RGraphicsDevice::setDeviceAttributes(pDevDesc pDev)
     pDev->ipr[1] = 1.0/72.0;
 
     // no support for qt events yet
-    pDev->canGenMouseDown = FALSE;
-    pDev->canGenMouseMove = FALSE;
-    pDev->canGenMouseUp = FALSE;
-    pDev->canGenKeybd = FALSE;
-    pDev->gettingEvent = FALSE;
+    pDev->canGenMouseDown = Rboolean::FALSE;
+    pDev->canGenMouseMove = Rboolean::FALSE;
+    pDev->canGenMouseUp = Rboolean::FALSE;
+    pDev->canGenKeybd = Rboolean::FALSE;
+    pDev->gettingEvent = Rboolean::FALSE;
 
 }
 
