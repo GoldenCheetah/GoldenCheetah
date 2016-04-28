@@ -24,15 +24,6 @@
 #include <R.h>
 #include <Rinternals.h>
 
-// get rid of #define TRUE/FALSE if QT4 has defined them
-// since they clash with Rboolean enums
-#ifdef TRUE
-#undef TRUE
-#endif
-#ifdef FALSE
-#undef FALSE
-#endif
-
 // specific to embedding
 #include <Rembedded.h>
 #include <R_ext/Parse.h>

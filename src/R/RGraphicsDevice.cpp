@@ -25,6 +25,15 @@
 #include <QFont>
 #include <QFontMetricsF>
 
+// get rid of #define TRUE/FALSE if QT4 has defined them
+// since they clash with Rboolean enums
+#ifdef TRUE
+#undef TRUE
+#endif
+#ifdef FALSE
+#undef FALSE
+#endif
+
 const char * const gcDevice = "GoldenCheetahGD";
 
 // return a QColor from an R color spec
