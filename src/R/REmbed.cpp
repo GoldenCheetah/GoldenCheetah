@@ -23,6 +23,7 @@
  */
 
 #include "REmbed.h"
+#include "RTool.h"
 #include "Settings.h"
 #include <stdexcept>
 
@@ -50,6 +51,18 @@ REmbed::~REmbed()
     Rf_endEmbeddedR(0);
 }
 
+// Windows API defines Read and Write Console macros
+// You think they'd realise by now that generic terms
+// should be avoided. But no, blissfully unaware that
+// there are millions of lines of code out there they
+// can wantanly break. Fuckwits.
+#ifdef WIN32
+#ifdef ReadConsole
+#undef ReadConsole
+#undef WriteConsole
+#endif
+#endif
+
 REmbed::REmbed(const bool verbose, const bool interactive) : verbose(verbose), interactive(interactive)
 {
     loaded = false;
@@ -75,9 +88,20 @@ REmbed::REmbed(const bool verbose, const bool interactive) : verbose(verbose), i
 
     structRstart Rst;
     R_DefParams(&Rst);
+#ifdef WIN32
+    Rst.rhome = getenv("R_HOME");
+    Rst.home = getRUser();
+    Rst.CharacterMode = LinkDLL;
+    Rst.ReadConsole = &RTool::R_ReadConsoleWin;
+    Rst.WriteConsole = &RTool::R_WriteConsole;
+    Rst.WriteConsoleEx = &RTool::R_WriteConsoleEx;
+    Rst.CallBack = &RTool::R_Callback;
+    Rst.ShowMessage = &RTool::R_ShowMessage;
+    Rst.YesNoCancel = &RTool::R_YesNoCancel;
+    Rst.Busy = &RTool::R_Busy;
+#endif
     Rst.R_Interactive = (Rboolean) interactive;       // sets interactive() to eval to false
     R_SetParams(&Rst);
-
     loaded = true;
 }
 

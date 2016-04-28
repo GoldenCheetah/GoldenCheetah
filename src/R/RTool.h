@@ -54,12 +54,18 @@ class RTool {
         // handling console output from the R runtime
         static void R_Suicide(const char *) {}
         static void R_ShowMessage(const char *text) { rtool->messages << QString(text); }
+        // yep. Windows and Unix definitions in RStartup/Rinterface are different
+        //      the R codebase is a mess.
         static int R_ReadConsole(const char *, unsigned char *, int, int) { return 0; }
+        static int R_ReadConsoleWin(const char *, char *, int, int) { return 0; }
         static void R_WriteConsole(const char *text, int) { rtool->messages << QString(text); }
         static void R_WriteConsoleEx(const char *text, int, int) { rtool->messages << QString(text); }
         static void R_ResetConsole() { }
         static void R_FlushConsole() { }
         static void R_ClearerrConsole() { }
+        static void R_Busy(int) { }
+        static void R_Callback() { }
+        static int  R_YesNoCancel(const char *) { return 0; }
 
         QStringList messages;
 };

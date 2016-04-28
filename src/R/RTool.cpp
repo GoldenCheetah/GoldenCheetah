@@ -43,6 +43,9 @@ RTool::RTool(int argc, char**argv)
 
     try {
 
+        // yikes, self referenced during construction (!)
+        rtool = this;
+
         // initialise
         R = new REmbed(argc,argv);
 
@@ -51,11 +54,6 @@ RTool::RTool(int argc, char**argv)
             failed=true;
             return;
         }
-
-        // yikes, self referenced during construction (!)
-        rtool = this;
-
-        dev = new RGraphicsDevice();
 
         // capture all output and input to our methods
 #ifndef WIN32
@@ -67,11 +65,14 @@ RTool::RTool(int argc, char**argv)
         ptr_R_ResetConsole = &RTool::R_ResetConsole;
         ptr_R_FlushConsole = &RTool::R_FlushConsole;
         ptr_R_ClearerrConsole = &RTool::R_ClearerrConsole;
+        ptr_R_Busy = &RTool::R_Busy;
 
         // turn off stderr io
         R_Outputfile = NULL;
         R_Consolefile = NULL;
 #endif
+
+        dev = new RGraphicsDevice();
 
         // register our functions
         R_CMethodDef cMethods[] = {
