@@ -30,6 +30,13 @@
 #include <R_ext/Rdynload.h>
 #include <R_ext/RStartup.h>
 
+// names clash between R and Win8.1 Kit
+//#ifdef WIN32
+//#undef ERROR
+//#undef Realloc
+//#undef Free
+//#endif
+
 #include <QString>
 #include <QStringList>
 
@@ -38,7 +45,7 @@ class REmbed {
 
     public:
     
-    REmbed(const int argc, const char* const argv[], const bool verbose=false, const bool interactive=false);
+    REmbed(const bool verbose=false, const bool interactive=false);
     ~REmbed();
 
     // modelled on equivalents for RInside to help transition

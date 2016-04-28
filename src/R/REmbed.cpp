@@ -28,6 +28,20 @@
 
 static const char *name = "GoldenCheetah";
 
+// no setenv on windows
+#if WIN32
+int setenv(const char *name, const char *value, int overwrite)
+{
+    int errcode = 0;
+    if(!overwrite) {
+        size_t envsize = 0;
+        errcode = getenv_s(&envsize, NULL, 0, name);
+        if(errcode || envsize) return errcode;
+    }
+    return _putenv_s(name, value);
+}
+#endif
+
 REmbed::~REmbed()
 {
     R_dot_Last();
@@ -36,8 +50,7 @@ REmbed::~REmbed()
     Rf_endEmbeddedR(0);
 }
 
-REmbed::REmbed(const int argc, const char* const argv[], const bool verbose, const bool interactive) :
-    verbose(verbose), interactive(interactive)
+REmbed::REmbed(const bool verbose, const bool interactive) : verbose(verbose), interactive(interactive)
 {
     loaded = false;
 
