@@ -232,33 +232,34 @@ RESOURCES = $${PWD}/Resources/application.qrc $${PWD}/Resources/RideWindow.qrc
 
 contains(DEFINES, "GC_WANT_R") {
 
-    # RInside and Rcpp do not support MS VC sadly, but we're working on it!!
-    win32 {
-        message("WARNING: GC_WANT_R is not supported on Windows, as MS compiler is not supported".)
-        message("WARNING: Ignoring GC_WANT_R and not building with R support enabled")
-        DEFINES -= "GC_WANT_R"
-
-    } else {
-
     # Only supports Linux and OSX until RInside and Rcpp support MSVC
     # This is not likely to be very soon, they are heavily dependant on GCC
     # see: http://dirk.eddelbuettel.com/blog/2011/03/25/#rinside_and_qt
+    isEmpty(R_HOME){ R_HOME = $$system(R RHOME) }
 
-    R_HOME =                $$system(R RHOME)
-
-    ## include headers and libraries for R 
+    ## include headers and libraries for R
     RCPPFLAGS =             $$system($$R_HOME/bin/R CMD config --cppflags)
-    RLDFLAGS =              $$system($$R_HOME/bin/R CMD config --ldflags)
-    RBLAS =                 $$system($$R_HOME/bin/R CMD config BLAS_LIBS)
-    RLAPACK =               $$system($$R_HOME/bin/R CMD config LAPACK_LIBS)
+    win32 {
 
-    ## for some reason when building with Qt we get this each time
-    ## so we turn unused parameter warnings off
-    RCPPWARNING =           -Wno-unused-parameter
+        ##  only on 64 bit for now (needs fixup for 32 bit)
+        LIBS += $$R_HOME/bin/x64/R.lib
+
+    } else {
+
+        RLDFLAGS =              $$system($$R_HOME/bin/R CMD config --ldflags)
+        RBLAS =                 $$system($$R_HOME/bin/R CMD config BLAS_LIBS)
+        RLAPACK =               $$system($$R_HOME/bin/R CMD config LAPACK_LIBS)
+        LIBS +=         		$$RLDFLAGS $$RBLAS $$RLAPACK
+    }
 
     ## compiler etc settings used in default make rules
     QMAKE_CXXFLAGS +=       $$RCPPWARNING $$RCPPFLAGS
-    LIBS +=         		$$RLDFLAGS $$RBLAS $$RLAPACK
+
+    ## R has lots of compatibility headers for S and legacy R code
+    ## we don't want that -- our code is shiny and new.
+    ## Plus it tends to break lots of things anyway.
+    win32 { DEFINES += Win32 }
+    DEFINES += STRICT_R_HEADERS
 
     ## R integration
     HEADERS += R/REmbed.h R/RTool.h R/RGraphicsDevice.h
@@ -267,8 +268,6 @@ contains(DEFINES, "GC_WANT_R") {
     ## R based charts
     HEADERS += Charts/RChart.h Charts/RCanvas.h
     SOURCES += Charts/RChart.cpp Charts/RCanvas.cpp
-
-    }
 }
 
 ###====================
