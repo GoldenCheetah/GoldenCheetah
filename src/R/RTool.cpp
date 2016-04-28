@@ -30,8 +30,10 @@
 #include "Rversion.h"
 
 // message i/o from to R
+#ifndef WIN32
 #define R_INTERFACE_PTRS
 #include <Rinterface.h>
+#endif
 
 RTool::RTool(int argc, char**argv)
 {
@@ -56,6 +58,7 @@ RTool::RTool(int argc, char**argv)
         dev = new RGraphicsDevice();
 
         // capture all output and input to our methods
+#ifndef WIN32
         ptr_R_Suicide = &RTool::R_Suicide;
         ptr_R_ShowMessage = &RTool::R_ShowMessage;
         ptr_R_ReadConsole = &RTool::R_ReadConsole;
@@ -68,6 +71,7 @@ RTool::RTool(int argc, char**argv)
         // turn off stderr io
         R_Outputfile = NULL;
         R_Consolefile = NULL;
+#endif
 
         // register our functions
         R_CMethodDef cMethods[] = {
