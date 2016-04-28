@@ -23,6 +23,7 @@
 #define R_NO_REMAP // don't map length(x) -> Rf_length for older code base
 #include <R.h>
 #include <Rinternals.h>
+#include <R_ext/Boolean.h> // R wants to define TRUE/FALSE as enums for type Rboolean (!!)
 
 // specific to embedding
 #include <Rembedded.h>
