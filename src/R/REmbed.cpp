@@ -81,7 +81,7 @@ REmbed::REmbed(const bool verbose, const bool interactive) : verbose(verbose), i
 
     // fire up R
     const char *R_argv[] = {name, "--gui=none", "--no-save",
-                            "--no-readline", /*"--silent",*/ "--vanilla", "--slave"};
+                            "--no-readline", "--silent", "--vanilla", "--slave"};
     int R_argc = sizeof(R_argv) / sizeof(R_argv[0]);
     Rf_initEmbeddedR(R_argc, (char**)R_argv);
     R_ReplDLLinit();                    // this is to populate the repl console buffers
