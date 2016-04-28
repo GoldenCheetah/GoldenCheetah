@@ -35,7 +35,7 @@
 #include <Rinterface.h>
 #endif
 
-RTool::RTool(int argc, char**argv)
+RTool::RTool()
 {
     // setup the R runtime elements
     failed = false;
@@ -47,7 +47,7 @@ RTool::RTool(int argc, char**argv)
         rtool = this;
 
         // initialise
-        R = new REmbed(argc,argv);
+        R = new REmbed();
 
         // failed to load
         if (R->loaded == false) {
