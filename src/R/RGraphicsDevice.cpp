@@ -341,9 +341,9 @@ SEXP RGraphicsDevice::createGD()
         pDev->strWidthUTF8 = RGraphicsDevice::StrWidthUTF8;
         pDev->text = RGraphicsDevice::Text;
         pDev->textUTF8 = RGraphicsDevice::TextUTF8;
-        pDev->hasTextUTF8 = TRUE;
-        pDev->wantSymbolUTF8 = TRUE;
-        pDev->useRotatedTextInContour = FALSE;
+        pDev->hasTextUTF8 = Rboolean::TRUE;
+        pDev->wantSymbolUTF8 = Rboolean::TRUE;
+        pDev->useRotatedTextInContour = Rboolean::FALSE;
         pDev->newPage = RGraphicsDevice::NewPage;
         pDev->close = RGraphicsDevice::Close;
         pDev->newFrameConfirm = RGraphicsDevice::NewFrameConfirm_;
