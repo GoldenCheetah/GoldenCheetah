@@ -29,7 +29,7 @@ class RTool {
 
 
     public:
-        RTool(int argc, char **argv);
+        RTool();
         void  configChanged();
 
         REmbed *R;

@@ -269,7 +269,7 @@ main(int argc, char *argv[])
 #ifdef GC_WANT_R
     // create the singleton in the main thread
     // will be shared by all athletes and all charts (!!)
-    rtool = new RTool(argc,argv);
+    rtool = new RTool();
     if (rtool->failed == true) rtool=NULL;
 #endif
 
