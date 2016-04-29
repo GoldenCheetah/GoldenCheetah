@@ -118,6 +118,30 @@ void RConsole::keyPressEvent(QKeyEvent *e)
         if (textCursor().position() - textCursor().block().position() > 2) QTextEdit::keyPressEvent(e);
         break;
 
+    case Qt::Key_C:
+        {
+            Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(e)->modifiers();
+            bool ctrl = (kmod & Qt::ControlModifier) != 0;
+
+            if (ctrl) {
+                // ^C needs to clear program and go to next line
+                rtool->R->program.clear();
+
+                QTextCursor move = textCursor();
+                move.movePosition(QTextCursor::End);
+                setTextCursor(move);
+
+                // new prompt
+                putData("\n");
+                putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "> ");
+
+            } else {
+                // normal C just do the usual
+                if (localEchoEnabled) QTextEdit::keyPressEvent(e);
+            }
+        }
+        break;
+
     case Qt::Key_Enter:
     case Qt::Key_Return:
     {
@@ -182,8 +206,11 @@ void RConsole::keyPressEvent(QKeyEvent *e)
             rtool->canvas = NULL;
         }
 
-        // next prompt
-        putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "> ");
+        // prompt ">" for new command and ">>" for a continuation line
+        if (rtool->R->program.count()==0)
+            putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "> ");
+        else
+            putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), ">>");
     }
     break;
 
