@@ -19,6 +19,7 @@
 #include "R.h"
 #include "RTool.h"
 #include "RChart.h"
+#include "RSyntax.h"
 
 #include "Colors.h"
 #include "TabView.h"
@@ -285,6 +286,9 @@ RChart::RChart(Context *context) : GcChartWindow(context), context(context)
         script->setPalette(p);
         script->setStyleSheet(TabView::ourStyleSheet());
 
+        // syntax highlighter
+        RSyntax syntax(script->document());
+
         leftsplitter->addWidget(script);
         console = new RConsole(context, this);
         leftsplitter->addWidget(console);
@@ -319,7 +323,10 @@ RChart::getScript() const
 void
 RChart::setScript(QString string)
 {
-    if (rtool && script) script->setText(string);
+    if (rtool && script) {
+        script->setText(string);
+        new RSyntax(script->document());
+    }
     text = string;
 }
 
