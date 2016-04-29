@@ -287,7 +287,13 @@ RChart::RChart(Context *context) : GcChartWindow(context), context(context)
         script->setStyleSheet(TabView::ourStyleSheet());
 
         // syntax highlighter
-        RSyntax syntax(script->document());
+        setScript("## R script will run on selection.\n"
+                  "##\n"
+                  "## GC.activity()\n"
+                  "## GC.metrics()\n"
+                  "##\n"
+                  "## Get the current ride or date range.\n"
+                  "##\n");
 
         leftsplitter->addWidget(script);
         console = new RConsole(context, this);
@@ -375,6 +381,10 @@ RChart::runScript()
             // clear
             canvas->newPage();
         }
+
+        // if the program expects more we clear it, otherwise
+        // weird things can happen!
+        rtool->R->program.clear();
 
         // clear context
         rtool->context = NULL;

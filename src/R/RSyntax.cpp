@@ -96,17 +96,19 @@ RSyntax::RSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     }
 
     // operators
+    operatorFormat.setForeground(QColor(255,204,000));
     //operatorFormat.setForeground(Qt::darkCyan);
     //operatorFormat.setFontWeight(QFont::Bold);
-    //QStringList operatorPatterns;
+    QStringList operatorPatterns;
 
     //operatorPatterns << "[\\&\\$\\@\\|\\:\\~\\{\\}\\(\\)!]" << "==" << "!=";
+    operatorPatterns << "[\\&\\@\\|\\:\\~!<>=]" << "==" << "!=";
 
-    //foreach (QString pattern, operatorPatterns) {
-    //rule.pattern = QRegExp(pattern);
-    //rule.format = operatorFormat;
-    //highlightingRules.append(rule);
-    //}
+    foreach (QString pattern, operatorPatterns) {
+        rule.pattern = QRegExp(pattern);
+        rule.format = operatorFormat;
+        highlightingRules.append(rule);
+    }
 
     // namespace: anything followed by ::
     //namespaceFormat.setForeground(Qt::magenta);
