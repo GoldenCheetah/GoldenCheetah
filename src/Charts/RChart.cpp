@@ -256,7 +256,7 @@ void RConsole::contextMenuEvent(QContextMenuEvent *e)
     Q_UNUSED(e)
 }
 
-RChart::RChart(Context *context) : GcChartWindow(context)
+RChart::RChart(Context *context) : GcChartWindow(context), context(context)
 {
     setControls(NULL);
 
@@ -268,18 +268,109 @@ RChart::RChart(Context *context) : GcChartWindow(context)
     // if we failed to startup embedded R properly
     // then disable the RConsole altogether.
     if (rtool) {
+
+        leftsplitter = new QSplitter(Qt::Vertical, this);
+        leftsplitter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+        leftsplitter->setHandleWidth(1);
+
+        // LHS
+        script = new  QTextEdit(this);
+        script->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+        script->setFrameStyle(QFrame::NoFrame);
+        QFont courier("Courier", QFont().pointSize());
+        script->setFont(courier);
+        QPalette p = palette();
+        p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
+        p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        script->setPalette(p);
+        script->setStyleSheet(TabView::ourStyleSheet());
+
+        leftsplitter->addWidget(script);
+        console = new RConsole(context, this);
+        leftsplitter->addWidget(console);
+
         splitter = new QSplitter(Qt::Horizontal, this);
         splitter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         splitter->setHandleWidth(1);
         mainLayout->addWidget(splitter);
 
-        console = new RConsole(context, this);
-        splitter->addWidget(console);
-
+        splitter->addWidget(leftsplitter);
 
         canvas = new RCanvas(context, this);
         canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         splitter->addWidget(canvas);
+
+        connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript()));
+    } else {
+
+        // not starting
+        script = NULL;
+        console = NULL;
+        canvas = NULL;
     }
 }
 
+QString
+RChart::getScript() const
+{
+    if (rtool && script) return script->toPlainText();
+    else return text;
+}
+void
+RChart::setScript(QString string)
+{
+    if (rtool && script) script->setText(string);
+    text = string;
+}
+
+
+void
+RChart::runScript()
+{
+    if (script->toPlainText() != "") {
+
+        // run it !!
+        rtool->context = context;
+        rtool->canvas = canvas;
+
+        QString line = script->toPlainText();
+
+        try {
+
+            // replace $$ with chart identifier (to avoid shared data)
+            line = line.replace("$$", console->chartid);
+
+            // run it
+            rtool->R->parseEval(line);
+
+            // output on console
+            if (rtool->messages.count()) {
+                console->putData("\n");
+                console->putData(GColor(CPLOTMARKER), rtool->messages.join(""));
+                rtool->messages.clear();
+            }
+
+        } catch(std::exception& ex) {
+
+            console->putData(QColor(Qt::red), QString("\n%1\n").arg(QString(ex.what())));
+            console->putData(QColor(Qt::red), rtool->messages.join(""));
+            rtool->messages.clear();
+
+            // clear
+            canvas->newPage();
+
+        } catch(...) {
+
+            console->putData(QColor(Qt::red), "\nerror: general exception.\n");
+            console->putData(QColor(Qt::red), rtool->messages.join(""));
+            rtool->messages.clear();
+
+            // clear
+            canvas->newPage();
+        }
+
+        // clear context
+        rtool->context = NULL;
+        rtool->canvas = NULL;
+    }
+}

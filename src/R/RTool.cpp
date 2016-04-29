@@ -319,9 +319,13 @@ RTool::metrics()
 
         // ans + names
         UNPROTECT(2);
+
+        // return it
+        return ans;
     }
 
-    return ans;
+    // fail
+    return Rf_allocVector(INTSXP, 0);
 }
 
 SEXP
@@ -348,7 +352,7 @@ RTool::activity()
 
         // if we have any series we will continue and add a 'time' series
         if (seriescount) seriescount++;
-        else return ans; // nowt to return
+        else return Rf_allocVector(INTSXP, 0);
 
         // we return a list of series vectors
         PROTECT(ans = Rf_allocList(seriescount));
@@ -434,8 +438,11 @@ RTool::activity()
 
         // ans + names
         UNPROTECT(2);
+
+        // return a valid result
+        return ans;
     }
 
     // NULL if nothing to return
-    return ans;
+    return Rf_allocVector(INTSXP, 0);
 }
