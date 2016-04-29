@@ -103,7 +103,8 @@ RTool::RTool()
 
         // load the dynamix library and create function wrapper
         // we should put this into a source file (.R)
-        R->parseEvalNT(QString("GC.display <- function() { .Call(\"GC.display\") }\n"
+        R->parseEvalNT(QString("options(\"repos\"=\"%3\")\n"
+                               "GC.display <- function() { .Call(\"GC.display\") }\n"
                                "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
                                "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
                                "GC.activities <- function() { .Call(\"GC.activities\") }\n"
@@ -116,7 +117,8 @@ RTool::RTool()
                                "    return(%2)\n"
                                "}\n")
                        .arg(VERSION_STRING)
-                       .arg(VERSION_LATEST));
+                       .arg(VERSION_LATEST)
+                       .arg("https://cloud.r-project.org/"));
 
         rtool->messages.clear();
 
