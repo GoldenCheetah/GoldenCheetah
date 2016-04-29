@@ -268,6 +268,9 @@ contains(DEFINES, "GC_WANT_R") {
     ## R based charts
     HEADERS += Charts/RChart.h Charts/RCanvas.h
     SOURCES += Charts/RChart.cpp Charts/RCanvas.cpp
+
+    ## For hardware accelerated scene rendering
+    QT += opengl
 }
 
 ###====================
