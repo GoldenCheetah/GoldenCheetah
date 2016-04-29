@@ -178,7 +178,9 @@ main(int argc, char *argv[])
     // and only keep non-switch args in the args string list
     QStringList sargs, args;
     for (int i=0; i<argc; i++) sargs << argv[i];
-
+#ifdef GC_WANT_R
+    bool noR=false;
+#endif
 #ifdef GC_DEBUG
     bool debug = true;
 #else
@@ -198,7 +200,7 @@ main(int argc, char *argv[])
             fprintf(stderr, "GoldenCheetah %s (%d)\nusage: GoldenCheetah [[directory] athlete]\n\n", VERSION_STRING, VERSION_LATEST);
             fprintf(stderr, "--help or --version to print this message and exit\n");
 #ifdef GC_WANT_HTTP
-            fprintf(stderr, "--server to run as an API server\n");
+            fprintf(stderr, "--server            to run as an API server\n");
 #endif
 #ifdef GC_DEBUG
             fprintf(stderr, "--debug             to turn on redirection of messages to goldencheetah.log [debug build]\n");
@@ -207,6 +209,9 @@ main(int argc, char *argv[])
 #endif
 #ifdef GC_HAS_CLOUD_DB
             fprintf(stderr, "--clouddbcurator    to add CloudDB curator specific functions to the menus\n");
+#endif
+#ifdef GC_WANT_R
+            fprintf(stderr, "--no-r              to disable R startup\n");
 #endif
             fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
@@ -219,6 +224,11 @@ main(int argc, char *argv[])
                 exit(1);
 #endif
 
+#ifdef GC_WANT_R
+        } else if (arg == "--no-r") {
+
+            noR = true;
+#endif
         } else if (arg == "--debug") {
 
 #ifdef GC_DEBUG
@@ -269,8 +279,12 @@ main(int argc, char *argv[])
 #ifdef GC_WANT_R
     // create the singleton in the main thread
     // will be shared by all athletes and all charts (!!)
-    rtool = new RTool();
-    if (rtool->failed == true) rtool=NULL;
+    if (noR) {
+        rtool = NULL;
+    } else {
+        rtool = new RTool();
+        if (rtool->failed == true) rtool=NULL;
+    }
 #endif
 
     // create the application -- only ever ONE regardless of restarts
