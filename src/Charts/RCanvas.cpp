@@ -29,9 +29,9 @@ RCanvas::RCanvas(Context *context, QWidget *parent) : QGraphicsView(parent), con
     // no frame, its ugly
     setFrameStyle(QFrame::NoFrame);
 
-    // use OpenGL rendering for better performance
-    setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DirectRendering)));
-    setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+    // use OpenGL rendering for better performance -- disabled till configurable in settings
+    //setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DirectRendering)));
+    //setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
 
     // add a scene
     scene = new QGraphicsScene(this);

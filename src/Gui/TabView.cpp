@@ -180,6 +180,8 @@ TabView::ourStyleSheet()
            "    min-height: 0px;"
            ""
            "}"
+           "QScrollBar::sub-page:vertical { background: %1; }"
+           "QScrollBar::add-page:vertical { background: %1; }"
            "QScrollBar::add-line:vertical {"
            "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
            "    stop: 0  rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));"
