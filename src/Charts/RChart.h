@@ -79,18 +79,29 @@ class RChart : public GcChartWindow {
 
     Q_OBJECT
 
+    Q_PROPERTY(QString script READ getScript WRITE setScript USER true)
+
     public:
         RChart(Context *context);
 
         // receives all the events
+        QTextEdit *script;
+        RConsole *console;
         RCanvas *canvas;
+
+        QString getScript() const;
+        void setScript(QString);
+
+    public slots:
+        void runScript();
 
     protected:
         QSplitter *splitter;
-        RConsole *console;
+        QSplitter *leftsplitter;
 
     private:
         Context *context;
+        QString text; // if Rtool not alive
 };
 
 
