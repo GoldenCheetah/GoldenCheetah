@@ -262,8 +262,8 @@ contains(DEFINES, "GC_WANT_R") {
     DEFINES += STRICT_R_HEADERS
 
     ## R integration
-    HEADERS += R/REmbed.h R/RTool.h R/RGraphicsDevice.h
-    SOURCES += R/REmbed.cpp R/RTool.cpp R/RGraphicsDevice.cpp
+    HEADERS += R/REmbed.h R/RTool.h R/RGraphicsDevice.h R/RSyntax.h
+    SOURCES += R/REmbed.cpp R/RTool.cpp R/RGraphicsDevice.cpp R/RSyntax.cpp
 
     ## R based charts
     HEADERS += Charts/RChart.h Charts/RCanvas.h
