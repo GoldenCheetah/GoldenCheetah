@@ -46,7 +46,7 @@ class RTool {
         static SEXP athleteHome();
         static SEXP activities();
         static SEXP activity();
-        static SEXP metrics();
+        static SEXP metrics(SEXP);
 
         bool starting;
         bool failed;

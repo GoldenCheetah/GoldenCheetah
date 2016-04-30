@@ -64,7 +64,8 @@ enum gcwinid {
         RouteSegment = 35,
         WorkoutWindow = 36,
         RideMapWindow = 37,
-        RConsole = 38
+        RConsole = 38,
+        RConsoleSeason = 39
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;
