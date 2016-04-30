@@ -132,6 +132,11 @@ void MonarkConnection::requestAll()
     if (! m_mutex.tryLock())
         return;
 
+    // Discard any previous data, useful if e.g a restart of the bike caused us to get
+    // out of sync
+    QByteArray data = m_serial->readAll();
+    Q_UNUSED(data)
+
     requestPower();
     requestPulse();
     requestCadence();
