@@ -85,8 +85,8 @@
 #define VERSION31_BUILD VERSION31_UPG
 
 // these three will change until we release
-#define VERSION_LATEST 3940
-#define VERSION_STRING "V4.0 DEV"
+#define VERSION_LATEST 3941
+#define VERSION_STRING "V4.0 DEV1604"
 
 // default config for this release is available and maintained here:
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/4.0"
