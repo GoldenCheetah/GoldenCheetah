@@ -238,14 +238,15 @@ contains(DEFINES, "GC_WANT_R") {
     isEmpty(R_HOME){ R_HOME = $$system(R RHOME) }
 
     ## include headers and libraries for R
-    RCPPFLAGS =             $$system($$R_HOME/bin/R CMD config --cppflags)
     win32 {
 
         ##  only on 64 bit for now (needs fixup for 32 bit)
         LIBS += $$R_HOME/bin/x64/R.lib
+        RCPPFLAGS = -I$$R_HOME/include
 
     } else {
 
+        RCPPFLAGS =             $$system($$R_HOME/bin/R CMD config --cppflags)
         RLDFLAGS =              $$system($$R_HOME/bin/R CMD config --ldflags)
         RBLAS =                 $$system($$R_HOME/bin/R CMD config BLAS_LIBS)
         RLAPACK =               $$system($$R_HOME/bin/R CMD config LAPACK_LIBS)
