@@ -90,7 +90,10 @@ RTool::RTool()
             { "GC.athlete.home", (DL_FUNC) &RTool::athleteHome, 0 },
             { "GC.activities", (DL_FUNC) &RTool::activities, 0 },
             { "GC.activity", (DL_FUNC) &RTool::activity, 0 },
-            { "GC.metrics", (DL_FUNC) &RTool::metrics, 0 },
+
+            // metrics is passed a Rboolean for "all":
+            // TRUE -> return all metrics, FALSE -> apply date range selection
+            { "GC.metrics", (DL_FUNC) &RTool::metrics, 1 },
             { NULL, NULL, 0 }
         };
 
@@ -109,7 +112,7 @@ RTool::RTool()
                                "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
                                "GC.activities <- function() { .Call(\"GC.activities\") }\n"
                                "GC.activity <- function() { .Call(\"GC.activity\") }\n"
-                               "GC.metrics <- function() { .Call(\"GC.metrics\") }\n"
+                               "GC.metrics <- function(all=FALSE) { .Call(\"GC.metrics\", all) }\n"
                                "GC.version <- function() {\n"
                                "    return(\"%1\")\n"
                                "}\n"
@@ -237,15 +240,32 @@ RTool::activities()
 }
 
 SEXP
-RTool::metrics()
+RTool::metrics(SEXP pAll)
 {
+    // return value
     SEXP ans=NULL;
+
+    // p1 - all=TRUE|FALSE - return all metrics or just within
+    //                       the currently selected date range
+    pAll = Rf_coerceVector(pAll, LGLSXP);
+    bool all = LOGICAL(pAll)[0];
 
     if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
 
         const RideMetricFactory &factory = RideMetricFactory::instance();
         int rides = rtool->context->athlete->rideCache->count();
         int metrics = factory.metricCount();
+
+        // how many rides to return if we're limiting to the
+        // currently selected date range ?
+        DateRange range = rtool->context->currentDateRange();
+        if (!all) {
+            // we need to count rides that are in range...
+            rides = 0;
+            foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+                if (range.pass(ride->dateTime.date())) rides++;
+            }
+        }
 
         // get a listAllocated
         PROTECT(ans=Rf_allocList(metrics+1));
@@ -261,9 +281,12 @@ RTool::metrics()
         SEXP time;
         PROTECT(time=Rf_allocVector(REALSXP, rides));
 
-        // fill with values for date and class
-        for(int k=0; k<rides; k++)
-            REAL(time)[k] = rtool->context->athlete->rideCache->rides()[k]->dateTime.toUTC().toTime_t();
+        // fill with values for date and class if its one we need to return
+        int k=0;
+        foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+            if (all || range.pass(ride->dateTime.date()))
+                REAL(time)[k] = ride->dateTime.toUTC().toTime_t();
+        }
 
         // POSIXct class
         SEXP clas;
@@ -296,8 +319,10 @@ RTool::metrics()
 
             int index=0;
             foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
-                REAL(m)[index++] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
-                                                     + (useMetricUnits ? 0.0f : metric->conversionSum());
+                if (all || range.pass(item->dateTime.date())) {
+                    REAL(m)[index++] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
+                                                          + (useMetricUnits ? 0.0f : metric->conversionSum());
+                }
             }
 
             // add to the list
