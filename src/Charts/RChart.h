@@ -82,7 +82,7 @@ class RChart : public GcChartWindow {
     Q_PROPERTY(QString script READ getScript WRITE setScript USER true)
 
     public:
-        RChart(Context *context);
+        RChart(Context *context, bool ridesummary);
 
         // receives all the events
         QTextEdit *script;
@@ -102,6 +102,7 @@ class RChart : public GcChartWindow {
     private:
         Context *context;
         QString text; // if Rtool not alive
+        bool ridesummary;
 };
 
 

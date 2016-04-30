@@ -75,7 +75,7 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[30] = {
+  static GcWindowRegistry GcWindowsInit[31] = {
     // name                     GcWinID
     { VIEW_HOME|VIEW_DIARY, tr("Metric Trends"),GcWindowTypes::LTM },
     { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
@@ -93,7 +93,8 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("Pedal Force vs Velocity"),GcWindowTypes::PfPv },
     { VIEW_ANALYSIS, tr("Heartrate vs Power"),GcWindowTypes::HrPw },
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Map"),GcWindowTypes::RideMapWindow },
-    { VIEW_ANALYSIS|VIEW_HOME, tr("R Console"),GcWindowTypes::RConsole },
+    { VIEW_ANALYSIS, tr("R Chart"),GcWindowTypes::RConsole },
+    { VIEW_HOME, tr("R Chart "),GcWindowTypes::RConsoleSeason },
     //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
     { VIEW_ANALYSIS, tr("2d Plot"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("3d Plot"),GcWindowTypes::Model },
@@ -165,9 +166,11 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 #endif
     case GcWindowTypes::Histogram: returning = new HistogramWindow(context); break;
 #ifdef GC_WANT_R
-    case GcWindowTypes::RConsole: returning = new RChart(context); break;
+    case GcWindowTypes::RConsole: returning = new RChart(context, true); break;
+    case GcWindowTypes::RConsoleSeason: returning = new RChart(context, false); break;
 #else
     case GcWindowTypes::RConsole: returning = new GcWindow(); break;
+    case GcWindowTypes::RConsoleSeason: returning = new GcWindow(); break;
 #endif
     case GcWindowTypes::Distribution: returning = new HistogramWindow(context, true); break;
     case GcWindowTypes::PerformanceManager: 

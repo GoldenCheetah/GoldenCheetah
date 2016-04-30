@@ -257,7 +257,7 @@ void RConsole::contextMenuEvent(QContextMenuEvent *e)
     Q_UNUSED(e)
 }
 
-RChart::RChart(Context *context) : GcChartWindow(context), context(context)
+RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), context(context), ridesummary(ridesummary)
 {
     setControls(NULL);
 
@@ -290,9 +290,9 @@ RChart::RChart(Context *context) : GcChartWindow(context), context(context)
         setScript("## R script will run on selection.\n"
                   "##\n"
                   "## GC.activity()\n"
-                  "## GC.metrics()\n"
+                  "## GC.metrics(all=FALSE)\n"
                   "##\n"
-                  "## Get the current ride or date range.\n"
+                  "## Get the current ride or metrics\n"
                   "##\n");
 
         leftsplitter->addWidget(script);
@@ -310,7 +310,12 @@ RChart::RChart(Context *context) : GcChartWindow(context), context(context)
         canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         splitter->addWidget(canvas);
 
-        connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript()));
+        if (ridesummary) {
+            connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript()));
+        } else {
+            connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(runScript()));
+        }
+
     } else {
 
         // not starting
