@@ -45,7 +45,7 @@ class RTool {
         static SEXP athlete();
         static SEXP athleteHome();
         static SEXP activities();
-        static SEXP activity();
+        static SEXP activity(SEXP);
         static SEXP metrics(SEXP);
 
         bool starting;
@@ -68,6 +68,11 @@ class RTool {
         static int  R_YesNoCancel(const char *) { return 0; }
 
         QStringList messages;
+
+    protected:
+
+        // return a dataframe for the ride passed
+        SEXP dfForActivity(RideFile *f);
 };
 
 // there is a global instance created in main
