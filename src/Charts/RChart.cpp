@@ -312,6 +312,11 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
 
         if (ridesummary) {
             connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript()));
+
+            // refresh when comparing
+            connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(runScript()));
+            connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(runScript()));
+
         } else {
             connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(runScript()));
         }
