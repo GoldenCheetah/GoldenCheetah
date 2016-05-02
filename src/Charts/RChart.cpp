@@ -290,7 +290,8 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
         setScript("## R script will run on selection.\n"
                   "##\n"
                   "## GC.activity(compare=FALSE)\n"
-                  "## GC.metrics(all=FALSE)\n"
+                  "## GC.metrics(all=FALSE,\n"
+                  "##            compare=FALSE)\n"
                   "##\n"
                   "## Get the current ride or metrics\n"
                   "##\n");
