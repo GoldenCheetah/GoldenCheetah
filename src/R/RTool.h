@@ -45,8 +45,8 @@ class RTool {
         static SEXP athlete();
         static SEXP athleteHome();
         static SEXP activities();
-        static SEXP activity(SEXP);
-        static SEXP metrics(SEXP);
+        static SEXP activity(SEXP all);
+        static SEXP metrics(SEXP all, SEXP compare);
 
         bool starting;
         bool failed;
@@ -73,6 +73,7 @@ class RTool {
 
         // return a dataframe for the ride passed
         SEXP dfForActivity(RideFile *f);
+        SEXP dfForDateRange(bool all, DateRange range);
 };
 
 // there is a global instance created in main

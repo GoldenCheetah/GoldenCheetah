@@ -97,7 +97,9 @@ RTool::RTool()
 
             // metrics is passed a Rboolean for "all":
             // TRUE -> return all metrics, FALSE -> apply date range selection
-            { "GC.metrics", (DL_FUNC) &RTool::metrics, 1 },
+            // and a Rboolean for "compare"
+            // TRUE -> return a list of compares, FALSE -> return metrics for current date range
+            { "GC.metrics", (DL_FUNC) &RTool::metrics, 2 },
             { NULL, NULL, 0 }
         };
 
@@ -116,13 +118,9 @@ RTool::RTool()
                                "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
                                "GC.activities <- function() { .Call(\"GC.activities\") }\n"
                                "GC.activity <- function(compare=FALSE) { .Call(\"GC.activity\", compare) }\n"
-                               "GC.metrics <- function(all=FALSE) { .Call(\"GC.metrics\", all) }\n"
-                               "GC.version <- function() {\n"
-                               "    return(\"%1\")\n"
-                               "}\n"
-                               "GC.build <- function() {\n"
-                               "    return(%2)\n"
-                               "}\n")
+                               "GC.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.metrics\", all, compare) }\n"
+                               "GC.version <- function() { return(\"%1\") }\n"
+                               "GC.build <- function() { return(%2) }\n")
                        .arg(VERSION_STRING)
                        .arg(VERSION_LATEST)
                        .arg("https://cloud.r-project.org/"));
@@ -244,113 +242,221 @@ RTool::activities()
 }
 
 SEXP
-RTool::metrics(SEXP pAll)
+RTool::dfForDateRange(bool all, DateRange range)
 {
-    // return value
-    SEXP ans=NULL;
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    int rides = rtool->context->athlete->rideCache->count();
+    int metrics = factory.metricCount();
 
+    // how many rides to return if we're limiting to the
+    // currently selected date range ?
+    if (!all) {
+        // we need to count rides that are in range...
+        rides = 0;
+        foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+            if (range.pass(ride->dateTime.date())) rides++;
+        }
+    }
+
+    // get a listAllocated
+    SEXP ans;
+    PROTECT(ans=Rf_allocList(metrics+1));
+
+    SEXP names;
+    PROTECT(names = Rf_allocVector(STRSXP, metrics+1));
+
+    // next name, nextS is next metric
+    int next=0;
+    SEXP nextS = ans;
+
+    // add in actual time in POSIXct format
+    SEXP time;
+    PROTECT(time=Rf_allocVector(REALSXP, rides));
+
+    // fill with values for date and class if its one we need to return
+    int k=0;
+    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+        if (all || range.pass(ride->dateTime.date()))
+            REAL(time)[k] = ride->dateTime.toUTC().toTime_t();
+    }
+
+    // POSIXct class
+    SEXP clas;
+    PROTECT(clas=Rf_allocVector(STRSXP, 2));
+    SET_STRING_ELT(clas, 0, Rf_mkChar("POSIXct"));
+    SET_STRING_ELT(clas, 1, Rf_mkChar("POSIXt"));
+    Rf_classgets(time,clas);
+
+    // we use "UTC" for all timezone
+    Rf_setAttrib(time, Rf_install("tzone"), Rf_mkString("UTC"));
+
+    // add to the data.frame and give it a name
+    SETCAR(nextS, time); nextS=CDR(nextS);
+    SET_STRING_ELT(names, next++, Rf_mkChar("time"));
+
+    // time + clas, but not ans!
+    UNPROTECT(2);
+
+    // now add a vector for every metric
+    for(int i=0; i<factory.metricCount();i++) {
+
+        // set a vector
+        SEXP m;
+        PROTECT(m=Rf_allocVector(REALSXP, rides));
+
+        QString symbol = factory.metricName(i);
+        const RideMetric *metric = factory.rideMetric(symbol);
+        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+
+        int index=0;
+        foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+            if (all || range.pass(item->dateTime.date())) {
+                REAL(m)[index++] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
+                                                      + (useMetricUnits ? 0.0f : metric->conversionSum());
+            }
+        }
+
+        // add to the list
+        SETCAR(nextS, m);
+        nextS = CDR(nextS);
+
+        // give it a name
+        SET_STRING_ELT(names, next, Rf_mkChar(name.toLatin1().constData()));
+
+        next++;
+
+        // vector
+        UNPROTECT(1);
+    }
+
+    // turn the list into a data frame + set column names
+    Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+    Rf_namesgets(ans, names);
+
+    // ans + names
+    UNPROTECT(2);
+
+    // return it
+    return ans;
+}
+
+SEXP
+RTool::metrics(SEXP pAll, SEXP pCompare)
+{
     // p1 - all=TRUE|FALSE - return all metrics or just within
     //                       the currently selected date range
     pAll = Rf_coerceVector(pAll, LGLSXP);
     bool all = LOGICAL(pAll)[0];
 
-    if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
+    // p2 - all=TRUE|FALSE - return list of compares (or current if not active)
+    pCompare = Rf_coerceVector(pCompare, LGLSXP);
+    bool compare = LOGICAL(pCompare)[0];
 
-        const RideMetricFactory &factory = RideMetricFactory::instance();
-        int rides = rtool->context->athlete->rideCache->count();
-        int metrics = factory.metricCount();
+    // want a list of compares not a dataframe
+    if (compare && rtool->context) {
 
-        // how many rides to return if we're limiting to the
-        // currently selected date range ?
-        DateRange range = rtool->context->currentDateRange();
-        if (!all) {
-            // we need to count rides that are in range...
-            rides = 0;
-            foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
-                if (range.pass(ride->dateTime.date())) rides++;
-            }
-        }
+        // only return compares if its actually active
+        if (rtool->context->isCompareDateRanges) {
 
-        // get a listAllocated
-        PROTECT(ans=Rf_allocList(metrics+1));
+            // how many to return?
+            int count=0;
+            foreach(CompareDateRange p, rtool->context->compareDateRanges) if (p.isChecked()) count++;
 
-        SEXP names;
-        PROTECT(names = Rf_allocVector(STRSXP, metrics+1));
+            // cool we can return a list of intervals to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, count));
 
-        // next name, nextS is next metric
-        int next=0;
-        SEXP nextS = ans;
+            // start at the front
+            SEXP nextS = list;
 
-        // add in actual time in POSIXct format
-        SEXP time;
-        PROTECT(time=Rf_allocVector(REALSXP, rides));
+            // a named list with data.frame 'metrics' and color 'color'
+            SEXP namedlist;
 
-        // fill with values for date and class if its one we need to return
-        int k=0;
-        foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
-            if (all || range.pass(ride->dateTime.date()))
-                REAL(time)[k] = ride->dateTime.toUTC().toTime_t();
-        }
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("metrics"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
 
-        // POSIXct class
-        SEXP clas;
-        PROTECT(clas=Rf_allocVector(STRSXP, 2));
-        SET_STRING_ELT(clas, 0, Rf_mkChar("POSIXct"));
-        SET_STRING_ELT(clas, 1, Rf_mkChar("POSIXt"));
-        Rf_classgets(time,clas);
+            // create a data.frame for each and add to list
+            foreach(CompareDateRange p, rtool->context->compareDateRanges) {
+                if (p.isChecked()) {
 
-        // we use "UTC" for all timezone
-        Rf_setAttrib(time, Rf_install("tzone"), Rf_mkString("UTC"));
+                    // create a named list
+                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+                    SEXP offset = namedlist;
 
-        // add to the data.frame and give it a name
-        SETCAR(nextS, time); nextS=CDR(nextS);
-        SET_STRING_ELT(names, next++, Rf_mkChar("time"));
+                    // add the ride
+                    SEXP df = rtool->dfForDateRange(all, DateRange(p.start, p.end));
+                    SETCAR(offset, df);
+                    offset=CDR(offset);
 
-        // time + clas, but not ans!
-        UNPROTECT(2);
+                    // add the color
+                    SEXP color;
+                    PROTECT(color=Rf_allocVector(STRSXP, 1));
+                    SET_STRING_ELT(color, 0, Rf_mkChar(p.color.name().toLatin1().constData()));
+                    SETCAR(offset, color);
 
-        // now add a vector for every metric
-        for(int i=0; i<factory.metricCount();i++) {
+                    // name them
+                    Rf_namesgets(namedlist, names);
 
-            // set a vector
-            SEXP m;
-            PROTECT(m=Rf_allocVector(REALSXP, rides));
+                    // add to back and move on
+                    SETCAR(nextS, namedlist);
+                    nextS=CDR(nextS);
 
-            QString symbol = factory.metricName(i);
-            const RideMetric *metric = factory.rideMetric(symbol);
-            QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
-            bool useMetricUnits = rtool->context->athlete->useMetricUnits;
-
-            int index=0;
-            foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
-                if (all || range.pass(item->dateTime.date())) {
-                    REAL(m)[index++] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
-                                                          + (useMetricUnits ? 0.0f : metric->conversionSum());
+                    UNPROTECT(2);
                 }
             }
+            UNPROTECT(2); // list and names
 
-            // add to the list
-            SETCAR(nextS, m);
-            nextS = CDR(nextS);
+            return list;
 
-            // give it a name
-            SET_STRING_ELT(names, next, Rf_mkChar(name.toLatin1().constData()));
+        } else { // compare isn't active...
 
-            next++;
+            // otherwise return the current metrics in a compare list
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, 1));
 
-            // vector
-            UNPROTECT(1);
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("metrics"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // named list of metrics and color
+            SEXP namedlist;
+            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+            SEXP offset = namedlist;
+
+            // add the metrics
+            DateRange range = rtool->context->currentDateRange();
+            SEXP df = rtool->dfForDateRange(all, range);
+            SETCAR(offset, df);
+            offset=CDR(offset);
+
+            // add the color
+            SEXP color;
+            PROTECT(color=Rf_allocVector(STRSXP, 1));
+            SET_STRING_ELT(color, 0, Rf_mkChar("#FF00FF"));
+            SETCAR(offset, color);
+
+            // name them
+            Rf_namesgets(namedlist, names);
+
+            // add to back and move on
+            SETCAR(list, namedlist);
+            UNPROTECT(4);
+
+            return list;
         }
 
-        // turn the list into a data frame + set column names
-        Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
-        Rf_namesgets(ans, names);
+    } else if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
 
-        // ans + names
-        UNPROTECT(2);
+        // just a datafram of metrics
+        DateRange range = rtool->context->currentDateRange();
+        return rtool->dfForDateRange(all, range);
 
-        // return it
-        return ans;
     }
 
     // fail
