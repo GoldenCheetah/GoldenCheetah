@@ -320,6 +320,10 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
 
         } else {
             connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(runScript()));
+
+            // refresh when comparing
+            connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(runScript()));
+            connect(context, SIGNAL(compareDateRangesChanged()), this, SLOT(runScript()));
         }
 
     } else {
