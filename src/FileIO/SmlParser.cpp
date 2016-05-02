@@ -269,6 +269,23 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
         }
     }
 
+    else if (qName == "Data" && !rideFile->isDataPresent(rideFile->hr))
+    {   // R-R data and no HR in samples: backfill using EWMA filtered R-R
+        double secs = 0.0;
+        double ewmaRR = -1.0;
+        const double ewmaTC = 5.0;
+        foreach (QString strRR, buffer.split(" ")) {
+            double rr = strRR.toDouble() / 1000.0;
+            if (ewmaRR < 0.0) ewmaRR = rr;
+            else ewmaRR += (rr - ewmaRR)/ewmaTC;
+            if (secs + rr >= trunc(secs) + 1.0) {
+                rideFile->setPointValue(rideFile->timeIndex(secs), rideFile->hr, round(60.0/ ewmaRR));
+            }
+            secs += rr;
+        }
+        if (ewmaRR >= 0.0) rideFile->setDataPresent(rideFile->hr, true);
+    }
+
     return true;
 }
 
