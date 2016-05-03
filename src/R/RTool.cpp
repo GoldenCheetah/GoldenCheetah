@@ -26,6 +26,8 @@
 #include "Colors.h"
 #include "RideMetric.h"
 
+#include "PMCData.h"
+
 #include "Rinternals.h"
 #include "Rversion.h"
 
@@ -82,6 +84,7 @@ RTool::RTool()
             { "GC.activities", (DL_FUNC) &RTool::activities, 0 ,0, 0 },
             { "GC.activity", (DL_FUNC) &RTool::activity, 0 ,0, 0 },
             { "GC.metrics", (DL_FUNC) &RTool::metrics, 0 ,0, 0 },
+            { "GC.pmc", (DL_FUNC) &RTool::pmc, 0 ,0, 0 },
             { NULL, NULL, 0, 0, 0 }
         };
         R_CallMethodDef callMethods[] = {
@@ -100,6 +103,9 @@ RTool::RTool()
             // and a Rboolean for "compare"
             // TRUE -> return a list of compares, FALSE -> return metrics for current date range
             { "GC.metrics", (DL_FUNC) &RTool::metrics, 2 },
+
+            // return a data.frame of pmc series (all=FALSE, metric="TSS")
+            { "GC.pmc", (DL_FUNC) &RTool::pmc, 2 },
             { NULL, NULL, 0 }
         };
 
@@ -119,6 +125,7 @@ RTool::RTool()
                                "GC.activities <- function() { .Call(\"GC.activities\") }\n"
                                "GC.activity <- function(compare=FALSE) { .Call(\"GC.activity\", compare) }\n"
                                "GC.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.metrics\", all, compare) }\n"
+                               "GC.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.pmc\", all, metric) }\n"
                                "GC.version <- function() { return(\"%1\") }\n"
                                "GC.build <- function() { return(%2) }\n")
                        .arg(VERSION_STRING)
@@ -260,24 +267,45 @@ RTool::dfForDateRange(bool all, DateRange range)
 
     // get a listAllocated
     SEXP ans;
-    PROTECT(ans=Rf_allocList(metrics+1));
-
     SEXP names;
-    PROTECT(names = Rf_allocVector(STRSXP, metrics+1));
+
+    // +2 is for date and datetime
+    PROTECT(ans=Rf_allocList(metrics+2));
+    PROTECT(names = Rf_allocVector(STRSXP, metrics+2));
 
     // next name, nextS is next metric
     int next=0;
     SEXP nextS = ans;
 
-    // add in actual time in POSIXct format
+    // DATE
+    SEXP date;
+    PROTECT(date=Rf_allocVector(INTSXP, rides));
+
+    int k=0;
+    QDate d1970(1970,01,01);
+    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+        if (all || range.pass(ride->dateTime.date()))
+            INTEGER(date)[k++] = d1970.daysTo(ride->dateTime.date());
+    }
+
+    SEXP dclas;
+    PROTECT(dclas=Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(dclas, 0, Rf_mkChar("Date"));
+    Rf_classgets(date,dclas);
+
+    // add to the data.frame and give it a name
+    SETCAR(nextS, date); nextS=CDR(nextS);
+    SET_STRING_ELT(names, next++, Rf_mkChar("date"));
+
+    // TIME
     SEXP time;
     PROTECT(time=Rf_allocVector(REALSXP, rides));
 
     // fill with values for date and class if its one we need to return
-    int k=0;
+    k=0;
     foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
         if (all || range.pass(ride->dateTime.date()))
-            REAL(time)[k] = ride->dateTime.toUTC().toTime_t();
+            REAL(time)[k++] = ride->dateTime.toUTC().toTime_t();
     }
 
     // POSIXct class
@@ -295,7 +323,7 @@ RTool::dfForDateRange(bool all, DateRange range)
     SET_STRING_ELT(names, next++, Rf_mkChar("time"));
 
     // time + clas, but not ans!
-    UNPROTECT(2);
+    UNPROTECT(4);
 
     // now add a vector for every metric
     for(int i=0; i<factory.metricCount();i++) {
@@ -307,6 +335,9 @@ RTool::dfForDateRange(bool all, DateRange range)
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
         QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        name = name.replace(" ","_");
+        name = name.replace("'","_");
+
         bool useMetricUnits = rtool->context->athlete->useMetricUnits;
 
         int index=0;
@@ -695,6 +726,140 @@ RTool::activity(SEXP pCompare)
             ans = rtool->dfForActivity(f);
             return ans;
         }
+    }
+
+    // nothing to return
+    return Rf_allocVector(INTSXP, 0);
+}
+
+SEXP
+RTool::pmc(SEXP pAll, SEXP pMetric)
+{
+    // parse parameters
+    // p1 - all=TRUE|FALSE - return all metrics or just within
+    //                       the currently selected date range
+    pAll = Rf_coerceVector(pAll, LGLSXP);
+    bool all = LOGICAL(pAll)[0];
+
+    // get the currently selected date range
+    DateRange range(rtool->context->currentDateRange());
+
+    // p2 - all=TRUE|FALSE - return list of compares (or current if not active)
+    pMetric = Rf_coerceVector(pMetric, STRSXP);
+    QString metric (CHAR(STRING_ELT(pMetric,0)));
+
+    // return a dataframe with PMC data for all or the current season
+    // XXX uses the default half-life
+    if (rtool->context) {
+
+        // convert the name to a symbol, if not found just leave as it is
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        for (int i=0; i<factory.metricCount(); i++) {
+            QString symbol = factory.metricName(i);
+            QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+            name.replace(" ","_");
+
+            if (name == metric) {
+                metric = symbol;
+                break;
+            }
+        }
+
+        // create the data
+        PMCData pmcData(rtool->context, Specification(), metric);
+
+        // how many entries ?
+        QDate d1970(1970,01,01);
+
+        // not unsigned coz date could be configured < 1970 (!)
+        int from =d1970.daysTo(range.from);
+        int to =d1970.daysTo(range.to);
+        unsigned int size = all ? pmcData.days() : (to - from + 1);
+
+        // returning a dataframe with
+        // date, lts, sts, sb, rr
+        SEXP ans, names;
+
+        // date, stress, lts, sts, sb, rr
+        PROTECT(ans=Rf_allocList(6));
+        SEXP nextS = ans;
+
+        // set ther names
+        PROTECT(names = Rf_allocVector(STRSXP, 6));
+        SET_STRING_ELT(names, 0, Rf_mkChar("date"));
+        SET_STRING_ELT(names, 1, Rf_mkChar("stress"));
+        SET_STRING_ELT(names, 2, Rf_mkChar("lts"));
+        SET_STRING_ELT(names, 3, Rf_mkChar("sts"));
+        SET_STRING_ELT(names, 4, Rf_mkChar("sb"));
+        SET_STRING_ELT(names, 5, Rf_mkChar("rr"));
+
+        // DATE - 1 a day from start
+        SEXP date;
+        PROTECT(date=Rf_allocVector(INTSXP, size));
+        unsigned int start = d1970.daysTo(all ? pmcData.start() : range.from);
+        for(unsigned int k=0; k<size; k++) INTEGER(date)[k] = start + k;
+
+        SEXP dclas;
+        PROTECT(dclas=Rf_allocVector(STRSXP, 1));
+        SET_STRING_ELT(dclas, 0, Rf_mkChar("Date"));
+        Rf_classgets(date,dclas);
+
+        // add to the data.frame
+        SETCAR(nextS, date); nextS=CDR(nextS);
+
+        // PMC DATA
+
+        SEXP stress, lts, sts, sb, rr;
+        PROTECT(stress=Rf_allocVector(REALSXP, size));
+        PROTECT(lts=Rf_allocVector(REALSXP, size));
+        PROTECT(sts=Rf_allocVector(REALSXP, size));
+        PROTECT(sb=Rf_allocVector(REALSXP, size));
+        PROTECT(rr=Rf_allocVector(REALSXP, size));
+
+            int index=0;
+        if (all) {
+
+            // just copy
+            for(unsigned int k=0; k<size; k++)  REAL(stress)[k] = pmcData.stress()[k];
+            for(unsigned int k=0; k<size; k++)  REAL(lts)[k] = pmcData.lts()[k];
+            for(unsigned int k=0; k<size; k++)  REAL(sts)[k] = pmcData.sts()[k];
+            for(unsigned int k=0; k<size; k++)  REAL(sb)[k] = pmcData.sb()[k];
+            for(unsigned int k=0; k<size; k++)  REAL(rr)[k] = pmcData.rr()[k];
+
+        } else {
+
+            int day = d1970.daysTo(pmcData.start());
+            for(int k=0; k < pmcData.days(); k++) {
+
+                // day today
+                if (day >= from && day <= to) {
+
+                    REAL(stress)[index] = pmcData.stress()[k];
+                    REAL(lts)[index] = pmcData.lts()[k];
+                    REAL(sts)[index] = pmcData.sts()[k];
+                    REAL(sb)[index] = pmcData.sb()[k];
+                    REAL(rr)[index] = pmcData.rr()[k];
+                    index++;
+                }
+                day++;
+            }
+        }
+
+        // add to the list
+        SETCAR(nextS, stress); nextS = CDR(nextS);
+        SETCAR(nextS, lts); nextS = CDR(nextS);
+        SETCAR(nextS, sts); nextS = CDR(nextS);
+        SETCAR(nextS, sb); nextS = CDR(nextS);
+        SETCAR(nextS, rr); nextS = CDR(nextS);
+
+        // turn the list into a data frame + set column names
+        Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+        Rf_namesgets(ans, names);
+
+        UNPROTECT(9);
+
+        // return it
+        return ans;
     }
 
     // nothing to return

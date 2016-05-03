@@ -54,9 +54,13 @@ class DateRange : QObject
             if (date >= from && date <= to) return true;
             return false;
         }
+        bool isValid() { return valid; }
 
     signals:
         void changed(QDate from, QDate to);
+
+    protected:
+        bool valid;
 };
 Q_DECLARE_METATYPE(DateRange)
 
