@@ -33,6 +33,7 @@ RConsole::RConsole(Context *context, RChart *parent)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setFrameStyle(QFrame::NoFrame);
+    setAcceptRichText(false);
     document()->setMaximumBlockCount(10240);
     putData(GColor(CPLOTMARKER), QString(tr("R Console (%1)").arg(rtool->version)));
     putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "\n> ");
@@ -278,6 +279,7 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
         script = new  QTextEdit(this);
         script->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         script->setFrameStyle(QFrame::NoFrame);
+        script->setAcceptRichText(false);
         QFont courier("Courier", QFont().pointSize());
         script->setFont(courier);
         QPalette p = palette();
