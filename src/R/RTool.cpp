@@ -267,11 +267,19 @@ RTool::dfForDateRange(bool all, DateRange range)
 
     // get a listAllocated
     SEXP ans;
-    SEXP names;
+    SEXP names; // column names
+    SEXP rownames; // row names (numeric)
 
     // +2 is for date and datetime
     PROTECT(ans=Rf_allocList(metrics+2));
     PROTECT(names = Rf_allocVector(STRSXP, metrics+2));
+
+    // we have to give a name to each row
+    PROTECT(rownames = Rf_allocVector(STRSXP, rides));
+    for(int i=0; i<rides; i++) {
+        QString rownumber=QString("%1").arg(i+1);
+        SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
+    }
 
     // next name, nextS is next metric
     int next=0;
@@ -363,10 +371,11 @@ RTool::dfForDateRange(bool all, DateRange range)
 
     // turn the list into a data frame + set column names
     Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+    Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
     Rf_namesgets(ans, names);
 
     // ans + names
-    UNPROTECT(2);
+    UNPROTECT(3);
 
     // return it
     return ans;
@@ -592,12 +601,21 @@ RTool::dfForActivity(RideFile *f)
         UNPROTECT(1);
     }
 
+    // add rownames
+    SEXP rownames;
+    PROTECT(rownames = Rf_allocVector(STRSXP, points));
+    for(int i=0; i<points; i++) {
+        QString rownumber=QString("%1").arg(i+1);
+        SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
+    }
+
     // turn the list into a data frame + set column names
+    Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
     Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
     Rf_namesgets(ans, names);
 
-    // ans + names
-    UNPROTECT(2);
+    // ans + names + rownames
+    UNPROTECT(3);
 
     // return a valid result
     return ans;
@@ -852,11 +870,19 @@ RTool::pmc(SEXP pAll, SEXP pMetric)
         SETCAR(nextS, sb); nextS = CDR(nextS);
         SETCAR(nextS, rr); nextS = CDR(nextS);
 
+        SEXP rownames;
+        PROTECT(rownames = Rf_allocVector(STRSXP, size));
+        for(unsigned int i=0; i<size; i++) {
+            QString rownumber=QString("%1").arg(i+1);
+            SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
+        }
+
         // turn the list into a data frame + set column names
         Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+        Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
         Rf_namesgets(ans, names);
 
-        UNPROTECT(9);
+        UNPROTECT(10);
 
         // return it
         return ans;
