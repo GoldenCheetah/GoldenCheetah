@@ -282,9 +282,9 @@ RTool::dfForDateRange(bool all, DateRange range)
     SEXP names; // column names
     SEXP rownames; // row names (numeric)
 
-    // +2 is for date and datetime
-    PROTECT(ans=Rf_allocList(metrics+meta+2));
-    PROTECT(names = Rf_allocVector(STRSXP, metrics+meta+2));
+    // +3 is for date and datetime and color
+    PROTECT(ans=Rf_allocList(metrics+meta+3));
+    PROTECT(names = Rf_allocVector(STRSXP, metrics+meta+3));
 
     // we have to give a name to each row
     PROTECT(rownames = Rf_allocVector(STRSXP, rides));
@@ -415,6 +415,30 @@ RTool::dfForDateRange(bool all, DateRange range)
         // vector
         UNPROTECT(1);
     }
+
+    // add Color
+    SEXP color;
+    PROTECT(color=Rf_allocVector(STRSXP, rides));
+
+    int index=0;
+    foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+        if (all || range.pass(item->dateTime.date())) {
+
+            // apply item color, remembering that 1,1,1 means use default (reverse in this case)
+            if (item->color == QColor(1,1,1,1))
+                SET_STRING_ELT(color, index++, Rf_mkChar(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name().toLatin1().constData()));
+            else
+                SET_STRING_ELT(color, index++, Rf_mkChar(item->color.name().toLatin1().constData()));
+        }
+    }
+
+    // add to the list and name it
+    SETCAR(nextS, color);
+    nextS = CDR(nextS);
+    SET_STRING_ELT(names, next, Rf_mkChar("color"));
+    next++;
+
+    UNPROTECT(1);
 
     // turn the list into a data frame + set column names
     Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
