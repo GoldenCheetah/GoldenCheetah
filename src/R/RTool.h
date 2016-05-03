@@ -47,6 +47,7 @@ class RTool {
         static SEXP activities();
         static SEXP activity(SEXP all);
         static SEXP metrics(SEXP all, SEXP compare);
+        static SEXP pmc(SEXP all, SEXP metric);
 
         bool starting;
         bool failed;

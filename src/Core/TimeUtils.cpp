@@ -123,6 +123,7 @@ DateRange::DateRange(QDate from, QDate to, QString name) : QObject()
     this->from=from;
     this->to=to;
     this->name=name;
+    valid = from.isValid() && to.isValid();
 }
 
 DateRange::DateRange(const DateRange &other) : QObject()
@@ -130,6 +131,7 @@ DateRange::DateRange(const DateRange &other) : QObject()
     from=other.from;
     to=other.to;
     name=other.name;
+    valid = from.isValid() && to.isValid();
 }
 
 DateRange& DateRange::operator=(const DateRange &other)
@@ -137,6 +139,7 @@ DateRange& DateRange::operator=(const DateRange &other)
     from=other.from;
     to=other.to;
     name=other.name;
+    valid = from.isValid() && to.isValid();
     emit changed(from, to);
 
     return *this;
