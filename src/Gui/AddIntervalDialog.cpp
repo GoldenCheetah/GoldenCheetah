@@ -73,6 +73,11 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
     methodButtonGroup->addButton(methodFirst);
     methodRadios->addWidget(methodFirst);
 
+    methodHeartRate = new QRadioButton(tr("Heart rate"));
+    methodHeartRate->setChecked(false);
+    methodButtonGroup->addButton(methodHeartRate);
+    methodRadios->addWidget(methodHeartRate);
+
     intervalPeakPowerWidget = new QWidget();
     intervalPeakPowerTypeLayout = new QHBoxLayout;
     intervalPeakPowerTypeLayout->addStretch();
@@ -250,6 +255,7 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
     connect(methodBestPower, SIGNAL(clicked()), this, SLOT(methodBestPowerClicked()));
     connect(methodWPrime, SIGNAL(clicked()), this, SLOT(methodWPrimeClicked()));
     connect(methodClimb, SIGNAL(clicked()), this, SLOT(methodClimbClicked()));
+    connect(methodHeartRate, SIGNAL(clicked()), this, SLOT(methodHeartRateClicked()));
     connect(peakPowerStandard, SIGNAL(clicked()), this, SLOT(peakPowerStandardClicked()));
     connect(peakPowerCustom, SIGNAL(clicked()), this, SLOT(peakPowerCustomClicked()));
     connect(typeTime, SIGNAL(clicked()), this, SLOT(typeTimeClicked()));
@@ -321,6 +327,22 @@ AddIntervalDialog::methodClimbClicked()
     intervalTimeWidget->hide();
     intervalCountWidget->hide();
     intervalWPrimeWidget->hide();
+}
+
+void
+AddIntervalDialog::methodHeartRateClicked()
+{
+    // clear the table
+    clearResultsTable(resultsTable);
+
+    intervalClimbWidget->hide();
+    intervalPeakPowerWidget->hide();
+    intervalTypeWidget->hide();
+    intervalDistanceWidget->hide();
+    intervalWPrimeWidget->hide();
+
+    intervalTimeWidget->show();
+    intervalCountWidget->show();
 }
 
 void
@@ -445,7 +467,7 @@ AddIntervalDialog::createClicked()
     if (methodBestPower->isChecked()) {
 
         if (peakPowerStandard->isChecked())
-            findPeakPowerStandard(ride, results);
+            findPeakPowerStandard(context, ride, results);
         else {
 
             // bad window size?
@@ -454,11 +476,25 @@ AddIntervalDialog::createClicked()
                 return;
             }
 
-            findBests(byTime, ride, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "");
+            findBests(context, byTime, ride, RideFile::watts, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "");
         }
 
 
     } 
+
+    // FIND PEAKS
+    if (methodHeartRate->isChecked()) {
+
+        // bad window size?
+        if (windowSizeSecs == 0.0) {
+            QMessageBox::critical(this, tr("Bad Interval Length"), tr("Interval length must be greater than zero!"));
+            return;
+        }
+
+        findBests(context, byTime, ride, RideFile::hr, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "");
+
+    }
+
 
     // FIND BY TIME OR DISTANCE
     if (methodFirst->isChecked()) {
@@ -723,30 +759,30 @@ AddIntervalDialog::findFirsts(bool typeTime, const RideFile *ride, double window
 }
 
 void
-AddIntervalDialog::findPeakPowerStandard(const RideFile *ride, QList<AddedInterval> &results)
+AddIntervalDialog::findPeakPowerStandard(Context *context, const RideFile *ride, QList<AddedInterval> &results)
 {
-    findBests(true, ride, 5, 1, results, tr("Peak 5s"));
-    findBests(true, ride, 10, 1, results, tr("Peak 10s"));
-    findBests(true, ride, 20, 1, results, tr("Peak 20s"));
-    findBests(true, ride, 30, 1, results, tr("Peak 30s"));
-    findBests(true, ride, 60, 1, results, tr("Peak 1min"));
-    findBests(true, ride, 120, 1, results, tr("Peak 2min"));
-    findBests(true, ride, 300, 1, results, tr("Peak 5min"));
-    findBests(true, ride, 600, 1, results, tr("Peak 10min"));
-    findBests(true, ride, 1200, 1, results, tr("Peak 20min"));
-    findBests(true, ride, 1800, 1, results, tr("Peak 30min"));
-    findBests(true, ride, 3600, 1, results, tr("Peak 60min"));
+    findBests(context, true, ride, RideFile::watts, 5, 1, results, tr("Peak 5s"));
+    findBests(context, true, ride, RideFile::watts, 10, 1, results, tr("Peak 10s"));
+    findBests(context, true, ride, RideFile::watts, 20, 1, results, tr("Peak 20s"));
+    findBests(context, true, ride, RideFile::watts, 30, 1, results, tr("Peak 30s"));
+    findBests(context, true, ride, RideFile::watts, 60, 1, results, tr("Peak 1min"));
+    findBests(context, true, ride, RideFile::watts, 120, 1, results, tr("Peak 2min"));
+    findBests(context, true, ride, RideFile::watts, 300, 1, results, tr("Peak 5min"));
+    findBests(context, true, ride, RideFile::watts, 600, 1, results, tr("Peak 10min"));
+    findBests(context, true, ride, RideFile::watts, 1200, 1, results, tr("Peak 20min"));
+    findBests(context, true, ride, RideFile::watts, 1800, 1, results, tr("Peak 30min"));
+    findBests(context, true, ride, RideFile::watts, 3600, 1, results, tr("Peak 60min"));
 }
 
 void
-AddIntervalDialog::findBests(bool typeTime, const RideFile *ride, double windowSize,
+AddIntervalDialog::findBests(Context *context, bool typeTime, const RideFile *ride, RideFile::SeriesType series,  double windowSize,
                               int maxIntervals, QList<AddedInterval> &results, QString prefix)
 {
     QList<AddedInterval> bests;
     QList<AddedInterval> _results;
 
     double secsDelta = ride->recIntSecs();
-    double totalWatts = 0.0;
+    double total = 0.0;
     QList<const RideFilePoint*> window;
 
     // ride is shorter than the window size!
@@ -758,11 +794,11 @@ AddIntervalDialog::findBests(bool typeTime, const RideFile *ride, double windowS
         // Discard points until interval duration is < windowSizeSecs + secsDelta.
         while ((typeTime && !window.empty() && intervalDuration(window.first(), point, ride) >= windowSize + secsDelta) ||
                (!typeTime && window.length()>1 && intervalDistance(window.at(1), point, ride) >= windowSize)) {
-            totalWatts -= window.first()->watts;
+            total -= window.first()->value(series);
             window.takeFirst();
         }
         // Add points until interval duration or distance is >= windowSize.
-        totalWatts += point->watts;
+        total += point->value(series);
         window.append(point);
         double duration = intervalDuration(window.first(), window.last(), ride);
         double distance = intervalDistance(window.first(), window.last(), ride);
@@ -771,7 +807,7 @@ AddIntervalDialog::findBests(bool typeTime, const RideFile *ride, double windowS
             (!typeTime && distance >= windowSize)) {
             double start = window.first()->secs;
             double stop = window.last()->secs; //start + duration;
-            double avg = totalWatts * secsDelta / duration;
+            double avg = total * secsDelta / duration;
             bests.append(AddedInterval(start, stop, avg));
         }
     }
@@ -839,8 +875,8 @@ AddIntervalDialog::findBests(bool typeTime, const RideFile *ride, double windowS
                     }
                 }
             }
-            name += " (%4w)";
-            name = name.arg(round(candidate.avg));
+            name += " (%4%5)";
+            name = name.arg(round(candidate.avg)).arg(ride->unitName(series, context));
             candidate.name = name;
             name = "";
             _results.append(candidate);
