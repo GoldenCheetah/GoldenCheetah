@@ -25,7 +25,7 @@
 #include "RideFile.h"
 #include "Colors.h"
 #include "RideMetric.h"
-
+#include "RideMetadata.h"
 #include "PMCData.h"
 
 #include "Rinternals.h"
@@ -255,6 +255,18 @@ RTool::dfForDateRange(bool all, DateRange range)
     int rides = rtool->context->athlete->rideCache->count();
     int metrics = factory.metricCount();
 
+    // count the number of meta fields to add
+    int meta = 0;
+    if (rtool->context && rtool->context->athlete->rideMetadata()) {
+
+        // count active fields
+        foreach(FieldDefinition def, rtool->context->athlete->rideMetadata()->getFields()) {
+            if (def.name != "" && def.tab != "" && !rtool->context->specialFields.isSpecial(def.name) &&
+                !rtool->context->specialFields.isMetric(def.name))
+                meta++;
+        }
+    }
+
     // how many rides to return if we're limiting to the
     // currently selected date range ?
     if (!all) {
@@ -271,8 +283,8 @@ RTool::dfForDateRange(bool all, DateRange range)
     SEXP rownames; // row names (numeric)
 
     // +2 is for date and datetime
-    PROTECT(ans=Rf_allocList(metrics+2));
-    PROTECT(names = Rf_allocVector(STRSXP, metrics+2));
+    PROTECT(ans=Rf_allocList(metrics+meta+2));
+    PROTECT(names = Rf_allocVector(STRSXP, metrics+meta+2));
 
     // we have to give a name to each row
     PROTECT(rownames = Rf_allocVector(STRSXP, rides));
@@ -333,7 +345,9 @@ RTool::dfForDateRange(bool all, DateRange range)
     // time + clas, but not ans!
     UNPROTECT(4);
 
-    // now add a vector for every metric
+    //
+    // METRICS
+    //
     for(int i=0; i<factory.metricCount();i++) {
 
         // set a vector
@@ -362,6 +376,39 @@ RTool::dfForDateRange(bool all, DateRange range)
 
         // give it a name
         SET_STRING_ELT(names, next, Rf_mkChar(name.toLatin1().constData()));
+
+        next++;
+
+        // vector
+        UNPROTECT(1);
+    }
+
+    //
+    // META
+    //
+    foreach(FieldDefinition field, rtool->context->athlete->rideMetadata()->getFields()) {
+
+        // don't add incomplete meta definitions or metric override fields
+        if (field.name == "" || field.tab == "" || rtool->context->specialFields.isSpecial(field.name) ||
+            rtool->context->specialFields.isMetric(field.name)) continue;
+
+        // Create a string vector
+        SEXP m;
+        PROTECT(m=Rf_allocVector(STRSXP, rides));
+
+        int index=0;
+        foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+            if (all || range.pass(item->dateTime.date())) {
+                SET_STRING_ELT(m, index++, Rf_mkChar(item->getText(field.name, "").toLatin1().constData()));
+            }
+        }
+
+        // add to the list
+        SETCAR(nextS, m);
+        nextS = CDR(nextS);
+
+        // give it a name
+        SET_STRING_ELT(names, next, Rf_mkChar(field.name.replace(" ","_").toLatin1().constData()));
 
         next++;
 
