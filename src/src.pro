@@ -599,8 +599,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     SOURCES += Train/Kettler.cpp Train/KettlerController.cpp Train/KettlerConnection.cpp
     HEADERS += Train/Kettler.h Train/KettlerController.h Train/KettlerConnection.h
 
-    # bluetooth in QT5.4 or higher
-    greaterThan(QT_MINOR_VERSION, 3) {
+    # bluetooth in QT5.5 or higher(5.4 was only a tech preview)
+    greaterThan(QT_MINOR_VERSION, 4) {
         QT += bluetooth
         HEADERS += Train/BT40Controller.h Train/BT40Device.h
         SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
