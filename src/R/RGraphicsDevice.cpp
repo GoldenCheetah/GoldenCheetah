@@ -83,7 +83,7 @@ RGraphicsDevice::RGraphicsDevice ()
     createGD();
 }
 
-void RGraphicsDevice::NewPage(const pGEcontext gc, pDevDesc dev)
+void RGraphicsDevice::NewPage(const pGEcontext, pDevDesc)
 {
     // fire event (pass previousPageSnapshot)
     if (!rtool || !rtool->canvas) return;
@@ -92,7 +92,7 @@ void RGraphicsDevice::NewPage(const pGEcontext gc, pDevDesc dev)
     rtool->canvas->newPage();
 }
 
-Rboolean RGraphicsDevice::NewFrameConfirm_(pDevDesc dd)
+Rboolean RGraphicsDevice::NewFrameConfirm_(pDevDesc)
 {
     // returning false causes the default implementation (printing a prompt
     // of "Hit <Return> to see next plot:" to the console) to be used. this
@@ -101,14 +101,14 @@ Rboolean RGraphicsDevice::NewFrameConfirm_(pDevDesc dd)
 }
 
 
-void RGraphicsDevice::Mode(int mode, pDevDesc dev)
+void RGraphicsDevice::Mode(int, pDevDesc)
 {
     // 0 = stop drawing
     // 1 = start drawing
     // 2 = input active
 }
 
-void RGraphicsDevice::Size(double *left, double *right, double *bottom, double *top, pDevDesc dev)
+void RGraphicsDevice::Size(double *left, double *right, double *bottom, double *top, pDevDesc)
 {
     *left = 0.0f;
     *right = 500.0f; //XXXs_width;
@@ -116,54 +116,54 @@ void RGraphicsDevice::Size(double *left, double *right, double *bottom, double *
     *top = 500.0f;
 }
 
-void RGraphicsDevice::Clip(double x0, double x1, double y0, double y1, pDevDesc dev)
+void RGraphicsDevice::Clip(double , double , double , double , pDevDesc)
 {
     //qDebug()<<"RGD: Clip";
 }
 
 
-void RGraphicsDevice::Rect(double x0, double y0, double x1, double y1, const pGEcontext gc, pDevDesc dev)
+void RGraphicsDevice::Rect(double x0, double y0, double x1, double y1, const pGEcontext gc, pDevDesc)
 {
     struct par p = parContext(gc);
     if (rtool && rtool->canvas) rtool->canvas->rectangle(x0,y0,x1,y1,p.p,p.b);
 }
 
-void RGraphicsDevice::Path(double *x, double *y, int npoly, int *nper, Rboolean winding, const pGEcontext gc, pDevDesc dd)
+void RGraphicsDevice::Path(double *, double *, int , int *, Rboolean, const pGEcontext, pDevDesc)
 {
     qDebug()<<"RGD: Path";
 }
 
-void RGraphicsDevice::Raster(unsigned int *raster, int w, int h, double x, double y, double width,
-                             double height, double rot, Rboolean interpolate, const pGEcontext gc, pDevDesc dd)
+void RGraphicsDevice::Raster(unsigned int *, int , int , double , double , double ,
+                             double , double , Rboolean , const pGEcontext , pDevDesc )
 {
     qDebug()<<"RGD: Raster";
 }
 
-void RGraphicsDevice::Circle(double x, double y, double r, const pGEcontext gc, pDevDesc dev)
+void RGraphicsDevice::Circle(double x, double y, double r, const pGEcontext gc, pDevDesc)
 {
     struct par p = parContext(gc);
     if (rtool && rtool->canvas) rtool->canvas->circle(x,y,r,p.p,p.b);
 }
 
-void RGraphicsDevice::Line(double x1, double y1, double x2, double y2, const pGEcontext gc, pDevDesc dev)
+void RGraphicsDevice::Line(double x1, double y1, double x2, double y2, const pGEcontext gc, pDevDesc)
 {
     struct par p = parContext(gc);
     if (rtool && rtool->canvas) rtool->canvas->line(x1,y1,x2,y2,p.p);
 }
 
-void RGraphicsDevice::Polyline(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev)
+void RGraphicsDevice::Polyline(int n, double *x, double *y, const pGEcontext gc, pDevDesc)
 {
     struct par p = parContext(gc);
     if (rtool && rtool->canvas && n > 1) rtool->canvas->polyline(n,x,y,p.p);
 }
 
-void RGraphicsDevice::Polygon(int n, double *x, double *y, const pGEcontext gc, pDevDesc dev)
+void RGraphicsDevice::Polygon(int n, double *x, double *y, const pGEcontext gc, pDevDesc)
 {
     struct par p = parContext(gc);
     if (rtool && rtool->canvas) rtool->canvas->polygon(n,x,y,p.p,p.b);
 }
 
-void RGraphicsDevice::MetricInfo(int c, const pGEcontext gc, double* ascent, double* descent, double* width, pDevDesc dev)
+void RGraphicsDevice::MetricInfo(int, const pGEcontext, double* ascent, double* descent, double* width, pDevDesc)
 {
     QFont def;
     QFontMetricsF fm(def);
@@ -174,21 +174,21 @@ void RGraphicsDevice::MetricInfo(int c, const pGEcontext gc, double* ascent, dou
     return;
 }
 
-double RGraphicsDevice::StrWidth(const char *str, const pGEcontext gc, pDevDesc dev)
+double RGraphicsDevice::StrWidth(const char *str, const pGEcontext, pDevDesc)
 {
     QFont def;
     QFontMetricsF fm(def);
     return fm.boundingRect(QString(str)).width();
 }
 
-double RGraphicsDevice::StrWidthUTF8(const char *str, const pGEcontext gc, pDevDesc dev)
+double RGraphicsDevice::StrWidthUTF8(const char *str, const pGEcontext, pDevDesc)
 {
     QFont def;
     QFontMetricsF fm(def);
     return fm.boundingRect(QString(str)).width();
 }
 
-void RGraphicsDevice::Text(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc dev)
+void RGraphicsDevice::Text(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc)
 {
     // fonts too
     struct par p = parContext(gc);
@@ -198,7 +198,7 @@ void RGraphicsDevice::Text(double x, double y, const char *str, double rot, doub
     if (rtool && rtool->canvas) rtool->canvas->text(x,y,QString(str), rot, hadj, p.p, f);
 }
 
-void RGraphicsDevice::TextUTF8(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc dev)
+void RGraphicsDevice::TextUTF8(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc)
 {
     // fonts too
     struct par p = parContext(gc);
@@ -208,15 +208,15 @@ void RGraphicsDevice::TextUTF8(double x, double y, const char *str, double rot, 
     if (rtool && rtool->canvas) rtool->canvas->text(x,y,QString(str), rot, hadj, p.p, f);
 }
 
-void RGraphicsDevice::Activate(pDevDesc dev)
+void RGraphicsDevice::Activate(pDevDesc)
 {
 }
 
-void RGraphicsDevice::Deactivate(pDevDesc dev)
+void RGraphicsDevice::Deactivate(pDevDesc)
 {
 }
 
-void RGraphicsDevice::Close(pDevDesc dev)
+void RGraphicsDevice::Close(pDevDesc)
 {
     if (rtool->dev->gcGEDevDesc != NULL) {
 
@@ -232,7 +232,7 @@ void RGraphicsDevice::Close(pDevDesc dev)
     }
 }
 
-void RGraphicsDevice::OnExit(pDevDesc dd)
+void RGraphicsDevice::OnExit(pDevDesc)
 {
     // NOTE: this may be called at various times including during error
     // handling (jump_to_top_ex). therefore, do not place any process or device
@@ -240,7 +240,7 @@ void RGraphicsDevice::OnExit(pDevDesc dd)
     // suggests you might want to do this!)
 }
 
-int RGraphicsDevice::HoldFlush(pDevDesc dd, int level)
+int RGraphicsDevice::HoldFlush(pDevDesc, int)
 {
     // NOTE: holdflush does not apply to bitmap devices since they are
     // already "buffered" via the fact that they only do expensive operations
@@ -427,7 +427,7 @@ SEXP RGraphicsDevice::activateGD()
     return R_NilValue;
 }
 
-double RGraphicsDevice::grconvert(double val, const std::string& type, const std::string& from, const std::string& to)
+double RGraphicsDevice::grconvert(double val, const std::string& , const std::string& , const std::string& )
 {
     //XXXr::exec::RFunction grconvFunc("graphics:::grconvert" + type, val, from, to);
     double convertedVal = val; // default in case of error
@@ -581,7 +581,7 @@ void RGraphicsDevice::setSize(pDevDesc pDev)
 }
 
 // below get called when the window resizes
-void RGraphicsDevice::setSize(int width, int height, double devicePixelRatio)
+void RGraphicsDevice::setSize(int , int , double )
 {
 #if 0
    // only set if the values have changed (prevents unnecessary plot
