@@ -826,8 +826,10 @@ AddIntervalDialog::findBests(Context *context, bool typeTime, const RideFile *ri
         if (!overlaps) {
             QString name = prefix;
             if (prefix == "") {
-                // Best hr should really be Peak HR, but keep Best for other series
-                name = (series == RideFile::hr) ? tr("Peak %2%3 #%1") : tr("Best %2%3 #%1");
+                name = tr("%1 %3%4 #%2");
+
+                name = name.arg("Peak");
+
                 name = name.arg(_results.count()+1);
                 if (typeTime)  {
                     // best n mins
