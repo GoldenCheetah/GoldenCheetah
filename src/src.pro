@@ -240,9 +240,18 @@ contains(DEFINES, "GC_WANT_R") {
     ## include headers and libraries for R
     win32 {
 
-        ##  only on 64 bit for now (needs fixup for 32 bit)
-        LIBS += $$R_HOME/bin/x64/R.lib
+        ##  both 32 and 64 bit
         RCPPFLAGS = -I$$R_HOME/include
+
+        # 64 Bit Build
+        contains(QMAKE_TARGET.arch, x86_64):{
+          LIBS += $$R_HOME/bin/x64/R.lib
+        }
+
+        # 32 Bit Build
+        !contains(QMAKE_TARGET.arch, x86_64):{
+           LIBS += $$R_HOME/bin/i386/R.lib
+        }
 
     } else {
 
