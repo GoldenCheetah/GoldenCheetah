@@ -45,9 +45,10 @@ class RTool {
         static SEXP athlete();
         static SEXP athleteHome();
         static SEXP activities();
-        static SEXP activity(SEXP all);
+        static SEXP activity(SEXP compare);
         static SEXP metrics(SEXP all, SEXP compare);
         static SEXP pmc(SEXP all, SEXP metric);
+        static SEXP activityMeanmax(SEXP compare);
 
         bool starting;
         bool failed;
@@ -74,6 +75,7 @@ class RTool {
 
         // return a dataframe for the ride passed
         SEXP dfForActivity(RideFile *f);
+        SEXP dfForActivityMeanmax(const RideItem *i);
         SEXP dfForDateRange(bool all, DateRange range);
 };
 

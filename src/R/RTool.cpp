@@ -23,6 +23,7 @@
 #include "RideCache.h"
 #include "RideItem.h"
 #include "RideFile.h"
+#include "RideFileCache.h"
 #include "Colors.h"
 #include "RideMetric.h"
 #include "RideMetadata.h"
@@ -83,6 +84,7 @@ RTool::RTool()
             { "GC.athlete.home", (DL_FUNC) &RTool::athleteHome, 0 ,0, 0 },
             { "GC.activities", (DL_FUNC) &RTool::activities, 0 ,0, 0 },
             { "GC.activity", (DL_FUNC) &RTool::activity, 0 ,0, 0 },
+            { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0 ,0, 0 },
             { "GC.metrics", (DL_FUNC) &RTool::metrics, 0 ,0, 0 },
             { "GC.pmc", (DL_FUNC) &RTool::pmc, 0 ,0, 0 },
             { NULL, NULL, 0, 0, 0 }
@@ -97,6 +99,7 @@ RTool::RTool()
             // currently in the compare pane if compare is enabled or
             // just a 1 item list with the current ride
             { "GC.activity", (DL_FUNC) &RTool::activity, 1 },
+            { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 1 },
 
             // metrics is passed a Rboolean for "all":
             // TRUE -> return all metrics, FALSE -> apply date range selection
@@ -124,6 +127,7 @@ RTool::RTool()
                                "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
                                "GC.activities <- function() { .Call(\"GC.activities\") }\n"
                                "GC.activity <- function(compare=FALSE) { .Call(\"GC.activity\", compare) }\n"
+                               "GC.activity.meanmax <- function(compare=FALSE) { .Call(\"GC.activity.meanmax\", compare) }\n"
                                "GC.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.metrics\", all, compare) }\n"
                                "GC.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.pmc\", all, metric) }\n"
                                "GC.version <- function() { return(\"%1\") }\n"
@@ -813,6 +817,209 @@ RTool::activity(SEXP pCompare)
 
             // get as a data frame
             ans = rtool->dfForActivity(f);
+            return ans;
+        }
+    }
+
+    // nothing to return
+    return Rf_allocVector(INTSXP, 0);
+}
+
+SEXP
+RTool::dfForActivityMeanmax(const RideItem *i)
+{
+    // how many series and how big are they?
+    unsigned int seriescount=0, size=0;
+
+    // get the meanmax array
+    RideFileCache *cache = const_cast<RideItem*>(i)->fileCache();
+    if (cache != NULL) {
+        // how many points in the ridefilecache and how many series to return
+        foreach(RideFile::SeriesType series, cache->meanMaxList()) {
+            QVector <double> values = cache->meanMaxArray(series);
+            if (values.count()) {
+                size = values.count();
+                seriescount++;
+            }
+        }
+    }
+
+    // we return a list of series vectors
+    SEXP ans;
+    PROTECT(ans = Rf_allocList(seriescount));
+
+    // we collect the names as we go
+    SEXP names;
+    PROTECT(names = Rf_allocVector(STRSXP, seriescount)); // names attribute (column names)
+    int next=0;
+    SEXP nextS = ans;
+
+    //
+    // Now we need to add vectors to the ans list...
+    //
+
+    foreach(RideFile::SeriesType series, cache->meanMaxList()) {
+
+        QVector <double> values = cache->meanMaxArray(series);
+
+        // don't add empty ones
+        if (values.count()==0) continue;
+
+
+        // set a vector
+        SEXP vector;
+        PROTECT(vector=Rf_allocVector(REALSXP, size));
+
+        for(unsigned int j=0; j<size; j++) REAL(vector)[j] = values[j];
+
+        // add to the list
+        SETCAR(nextS, vector);
+        nextS = CDR(nextS);
+
+        // give it a name
+        SET_STRING_ELT(names, next, Rf_mkChar(RideFile::seriesName(series, true).toLatin1().constData()));
+
+        next++;
+
+        // vector
+        UNPROTECT(1);
+    }
+
+    // add rownames
+    SEXP rownames;
+    PROTECT(rownames = Rf_allocVector(STRSXP, size));
+    for(unsigned int i=0; i<size; i++) {
+        QString rownumber=QString("%1").arg(i+1);
+        SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
+    }
+
+    // turn the list into a data frame + set column names
+    Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
+    Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+    Rf_namesgets(ans, names);
+
+    // ans + names + rownames
+    UNPROTECT(3);
+
+    // return a valid result
+    return ans;
+}
+
+SEXP
+RTool::activityMeanmax(SEXP pCompare)
+{
+    // a dataframe to return
+    SEXP ans=NULL;
+
+    // p1 - compare=TRUE|FALSE - return list of compare rides if active, or just current
+    pCompare = Rf_coerceVector(pCompare, LGLSXP);
+    bool compare = LOGICAL(pCompare)[0];
+
+    // return a list
+    if (compare && rtool->context) {
+
+
+        if (rtool->context->isCompareIntervals) {
+
+            // how many to return?
+            int count=0;
+            foreach(CompareInterval p, rtool->context->compareIntervals) if (p.isChecked()) count++;
+
+            // cool we can return a list of intervals to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, count));
+
+            // start at the front
+            SEXP nextS = list;
+
+            // a named list with data.frame 'activity' and color 'color'
+            SEXP namedlist;
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("meanmax"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // create a data.frame for each and add to list
+            foreach(CompareInterval p, rtool->context->compareIntervals) {
+                if (p.isChecked()) {
+
+                    // create a named list
+                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+                    SEXP offset = namedlist;
+
+                    // add the ride
+                    SEXP df = rtool->dfForActivityMeanmax(p.rideItem);
+                    SETCAR(offset, df);
+                    offset=CDR(offset);
+
+                    // add the color
+                    SEXP color;
+                    PROTECT(color=Rf_allocVector(STRSXP, 1));
+                    SET_STRING_ELT(color, 0, Rf_mkChar(p.color.name().toLatin1().constData()));
+                    SETCAR(offset, color);
+
+                    // name them
+                    Rf_namesgets(namedlist, names);
+
+                    // add to back and move on
+                    SETCAR(nextS, namedlist);
+                    nextS=CDR(nextS);
+
+                    UNPROTECT(2);
+                }
+            }
+            UNPROTECT(2); // list and names
+
+            return list;
+
+        } else if(rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+
+            // just return a list of one ride
+            // cool we can return a list of intervals to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, 1));
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("meanmax"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // named list of activity and color
+            SEXP namedlist;
+            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+            SEXP offset = namedlist;
+
+            // add the ride
+            SEXP df = rtool->dfForActivityMeanmax(rtool->context->currentRideItem());
+            SETCAR(offset, df);
+            offset=CDR(offset);
+
+            // add the color
+            SEXP color;
+            PROTECT(color=Rf_allocVector(STRSXP, 1));
+            SET_STRING_ELT(color, 0, Rf_mkChar("#FF00FF"));
+            SETCAR(offset, color);
+
+            // name them
+            Rf_namesgets(namedlist, names);
+
+            // add to back and move on
+            SETCAR(list, namedlist);
+            UNPROTECT(4);
+
+            return list;
+        }
+
+    } else if (!compare) { // not compare, so just return a dataframe
+
+        // access via global as this is a static function
+        if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+
+            // get as a data frame
+            ans = rtool->dfForActivityMeanmax(rtool->context->currentRideItem());
             return ans;
         }
     }

@@ -201,6 +201,7 @@ class RideFileCache
         static RideFileCache *createCacheFor(RideFile*);
 
         // get data
+        static QList<RideFile::SeriesType> meanMaxList(); // list of types available as meanmax arrays
         QVector<double> &meanMaxArray(RideFile::SeriesType); // return meanmax array for the given series
         QVector<QDate> &meanMaxDates(RideFile::SeriesType series); // the dates of the bests
         QVector<double> &distributionArray(RideFile::SeriesType); // return distribution array for the given series
