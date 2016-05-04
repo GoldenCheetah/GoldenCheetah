@@ -661,6 +661,24 @@ RideFileCache::meanMaxDates(RideFile::SeriesType series)
     }
 }
 
+QList<RideFile::SeriesType> RideFileCache::meanMaxList()
+{
+        QList<RideFile::SeriesType> list;
+        list << RideFile::watts
+             << RideFile::wattsKg
+             << RideFile::nm
+             << RideFile::hr
+             << RideFile::cad
+             << RideFile::kph
+             << RideFile::vam
+             << RideFile::NP
+             << RideFile::aPower
+             << RideFile::xPower
+             ;
+
+    return list;
+}
+
 QVector<double> &
 RideFileCache::meanMaxArray(RideFile::SeriesType series)
 {
