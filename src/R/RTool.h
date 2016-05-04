@@ -49,6 +49,7 @@ class RTool {
         static SEXP metrics(SEXP all, SEXP compare);
         static SEXP pmc(SEXP all, SEXP metric);
         static SEXP activityMeanmax(SEXP compare);
+        static SEXP activityWBal();
 
         bool starting;
         bool failed;
