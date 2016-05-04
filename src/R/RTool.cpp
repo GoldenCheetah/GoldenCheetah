@@ -102,7 +102,7 @@ RTool::RTool()
             // just a 1 item list with the current ride
             { "GC.activity", (DL_FUNC) &RTool::activity, 1 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 1 },
-            { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0 },
+            { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 1 },
 
             // metrics is passed a Rboolean for "all":
             // TRUE -> return all metrics, FALSE -> apply date range selection
@@ -131,7 +131,7 @@ RTool::RTool()
                                "GC.activities <- function() { .Call(\"GC.activities\") }\n"
                                "GC.activity <- function(compare=FALSE) { .Call(\"GC.activity\", compare) }\n"
                                "GC.activity.meanmax <- function(compare=FALSE) { .Call(\"GC.activity.meanmax\", compare) }\n"
-                               "GC.activity.wbal <- function() { .Call(\"GC.activity.wbal\") }\n"
+                               "GC.activity.wbal <- function(compare=FALSE) { .Call(\"GC.activity.wbal\", compare) }\n"
                                "GC.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.metrics\", all, compare) }\n"
                                "GC.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.pmc\", all, metric) }\n"
                                "GC.version <- function() { return(\"%1\") }\n"
@@ -1175,13 +1175,141 @@ RTool::pmc(SEXP pAll, SEXP pMetric)
 }
 
 SEXP
-RTool::activityWBal()
+RTool::activityWBal(SEXP pCompare)
+{
+    SEXP ans=NULL;
+
+    // p1 - compare=TRUE|FALSE - return list of compare rides if active, or just current
+    pCompare = Rf_coerceVector(pCompare, LGLSXP);
+    bool compare = LOGICAL(pCompare)[0];
+
+    // return a list
+    if (compare && rtool->context) {
+
+
+        if (rtool->context->isCompareIntervals) {
+
+            // how many to return?
+            int count=0;
+            foreach(CompareInterval p, rtool->context->compareIntervals) if (p.isChecked()) count++;
+
+            // cool we can return a list of intervals to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, count));
+
+            // start at the front
+            SEXP nextS = list;
+
+            // a named list with data.frame 'activity' and color 'color'
+            SEXP namedlist;
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("activity"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // create a data.frame for each and add to list
+            foreach(CompareInterval p, rtool->context->compareIntervals) {
+                if (p.isChecked()) {
+
+                    // create a named list
+                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+                    SEXP offset = namedlist;
+
+                    // add the ride
+                    SEXP df = rtool->dfForActivityWBal(p.rideItem->ride());
+                    SETCAR(offset, df);
+                    offset=CDR(offset);
+
+                    // add the color
+                    SEXP color;
+                    PROTECT(color=Rf_allocVector(STRSXP, 1));
+                    SET_STRING_ELT(color, 0, Rf_mkChar(p.color.name().toLatin1().constData()));
+                    SETCAR(offset, color);
+
+                    // name them
+                    Rf_namesgets(namedlist, names);
+
+                    // add to back and move on
+                    SETCAR(nextS, namedlist);
+                    nextS=CDR(nextS);
+
+                    UNPROTECT(2);
+                }
+            }
+            UNPROTECT(2); // list and names
+
+            return list;
+
+        } else if(rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+
+            // just return a list of one ride
+            // cool we can return a list of intervals to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, 1));
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("activity"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // named list of activity and color
+            SEXP namedlist;
+            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+            SEXP offset = namedlist;
+
+            // add the ride
+            RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
+            f->recalculateDerivedSeries();
+            SEXP df = rtool->dfForActivityWBal(f);
+            SETCAR(offset, df);
+            offset=CDR(offset);
+
+            // add the color
+            SEXP color;
+            PROTECT(color=Rf_allocVector(STRSXP, 1));
+            SET_STRING_ELT(color, 0, Rf_mkChar("#FF00FF"));
+            SETCAR(offset, color);
+
+            // name them
+            Rf_namesgets(namedlist, names);
+
+            // add to back and move on
+            SETCAR(list, namedlist);
+            UNPROTECT(4);
+
+            return list;
+        }
+
+    } else if (!compare) { // not compare, so just return a dataframe
+
+        // access via global as this is a static function
+        if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+
+            // get the ride
+            RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
+            f->recalculateDerivedSeries();
+
+            // get as a data frame
+            ans = rtool->dfForActivityWBal(f);
+            return ans;
+        }
+    }
+
+    // nothing to return
+    return Rf_allocVector(INTSXP, 0);
+}
+
+SEXP
+RTool::dfForActivityWBal(RideFile*f)
 {
     // return a data frame with wpbal in 1s samples
-    if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+    if(f && f->wprimeData()) {
 
         // get as a data frame
-        WPrime *w = const_cast<RideItem*>(rtool->context->currentRideItem())->ride()->wprimeData();
+        WPrime *w = f->wprimeData();
 
         if (w && w->ydata().count() >0) {
 
