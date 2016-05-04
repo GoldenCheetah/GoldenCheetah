@@ -28,6 +28,7 @@
 #include "RideMetric.h"
 #include "RideMetadata.h"
 #include "PMCData.h"
+#include "WPrime.h"
 
 #include "Rinternals.h"
 #include "Rversion.h"
@@ -85,6 +86,7 @@ RTool::RTool()
             { "GC.activities", (DL_FUNC) &RTool::activities, 0 ,0, 0 },
             { "GC.activity", (DL_FUNC) &RTool::activity, 0 ,0, 0 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0 ,0, 0 },
+            { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0 ,0, 0 },
             { "GC.metrics", (DL_FUNC) &RTool::metrics, 0 ,0, 0 },
             { "GC.pmc", (DL_FUNC) &RTool::pmc, 0 ,0, 0 },
             { NULL, NULL, 0, 0, 0 }
@@ -100,6 +102,7 @@ RTool::RTool()
             // just a 1 item list with the current ride
             { "GC.activity", (DL_FUNC) &RTool::activity, 1 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 1 },
+            { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0 },
 
             // metrics is passed a Rboolean for "all":
             // TRUE -> return all metrics, FALSE -> apply date range selection
@@ -128,6 +131,7 @@ RTool::RTool()
                                "GC.activities <- function() { .Call(\"GC.activities\") }\n"
                                "GC.activity <- function(compare=FALSE) { .Call(\"GC.activity\", compare) }\n"
                                "GC.activity.meanmax <- function(compare=FALSE) { .Call(\"GC.activity.meanmax\", compare) }\n"
+                               "GC.activity.wbal <- function() { .Call(\"GC.activity.wbal\") }\n"
                                "GC.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.metrics\", all, compare) }\n"
                                "GC.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.pmc\", all, metric) }\n"
                                "GC.version <- function() { return(\"%1\") }\n"
@@ -1164,6 +1168,34 @@ RTool::pmc(SEXP pAll, SEXP pMetric)
 
         // return it
         return ans;
+    }
+
+    // nothing to return
+    return Rf_allocVector(INTSXP, 0);
+}
+
+SEXP
+RTool::activityWBal()
+{
+    // return a data frame with wpbal in 1s samples
+    if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+
+        // get as a data frame
+        WPrime *w = const_cast<RideItem*>(rtool->context->currentRideItem())->ride()->wprimeData();
+
+        if (w && w->ydata().count() >0) {
+
+                // construct a vector
+                SEXP ans;
+                PROTECT(ans=Rf_allocVector(REALSXP, w->ydata().count()));
+
+                // add values
+                for(int i=0; i<w->ydata().count(); i++) REAL(ans)[i] = w->ydata()[i];
+
+                UNPROTECT(1);
+
+                return ans;
+        }
     }
 
     // nothing to return
