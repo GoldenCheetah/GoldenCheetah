@@ -433,9 +433,16 @@ RTool::dfForDateRange(bool all, DateRange range)
         if (all || range.pass(item->dateTime.date())) {
 
             // apply item color, remembering that 1,1,1 means use default (reverse in this case)
-            if (item->color == QColor(1,1,1,1))
-                SET_STRING_ELT(color, index++, Rf_mkChar(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name().toLatin1().constData()));
-            else
+            if (item->color == QColor(1,1,1,1)) {
+
+                // use the inverted color, not plot marker as that hideous
+                QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+
+                // white is jarring on a dark background!
+                if (col==QColor(Qt::white)) col=QColor(127,127,127);
+
+                SET_STRING_ELT(color, index++, Rf_mkChar(col.name().toLatin1().constData()));
+            } else
                 SET_STRING_ELT(color, index++, Rf_mkChar(item->color.name().toLatin1().constData()));
         }
     }
