@@ -825,17 +825,19 @@ AddIntervalDialog::findFirsts(bool typeTime, const RideFile *ride, double window
 void
 AddIntervalDialog::findPeakPowerStandard(Context *context, const RideFile *ride, QList<AddedInterval> &results)
 {
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 5, 1, results, "", tr("Peak 5s"));
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 10, 1, results, "", tr("Peak 10s"));
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 20, 1, results, "", tr("Peak 20s"));
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 30, 1, results, "", tr("Peak 30s"));
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 60, 1, results, "", tr("Peak 1min"));
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 120, 1, results, "", tr("Peak 2min"));
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 300, 1, results, "", tr("Peak 5min"));
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 600, 1, results, "", tr("Peak 10min"));
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 1200, 1, results, "", tr("Peak 20min"));
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 1800, 1, results, "", tr("Peak 30min"));
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 3600, 1, results, "", tr("Peak 60min"));
+    QString prefix = tr("Peak");
+
+    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 5, 1, results, prefix, "");
+    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 10, 1, results, prefix, "");
+    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 20, 1, results, prefix, "");
+    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 30, 1, results, prefix, "");
+    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 60, 1, results, prefix, "");
+    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 120, 1, results, prefix, "");
+    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 300, 1, results, prefix, "");
+    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 600, 1, results, prefix, "");
+    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 1200, 1, results, prefix, "");
+    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 1800, 1, results, prefix, "");
+    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 3600, 1, results, prefix, "");
 }
 
 void
@@ -891,14 +893,18 @@ AddIntervalDialog::findPeaks(Context *context, bool typeTime, const RideFile *ri
         if (!overlaps) {
             QString name = overideName;
             if (overideName == "") {
-                name = tr("%1 %3%4 #%2");
+                name = tr("%1 %3%4 %2");
 
                 if (prefixe == "")
                     name = name.arg(tr("Peak"));
                 else
                     name = name.arg(prefixe);
 
-                name = name.arg(_results.count()+1);
+                if (maxIntervals>1)
+                    name = name.arg(QString("#%1").arg(_results.count()+1));
+                else
+                    name = name.arg("");
+
                 if (typeTime)  {
                     // best n mins
                     if (windowSize < 60) {
