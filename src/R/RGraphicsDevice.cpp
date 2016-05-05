@@ -44,6 +44,7 @@ struct par {
     QColor fg,bg;
     QPen p;
     QBrush b;
+    QFont f;
 };
 
 static struct par parContext(pGEcontext c)
@@ -70,6 +71,8 @@ static struct par parContext(pGEcontext c)
 
     returning.b.setColor(returning.bg);
     returning.b.setStyle(Qt::SolidPattern);
+
+    returning.f.setPointSizeF(c->ps*c->cex);
 
     return returning;
 }
@@ -163,10 +166,10 @@ void RGraphicsDevice::Polygon(int n, double *x, double *y, const pGEcontext gc, 
     if (rtool && rtool->canvas) rtool->canvas->polygon(n,x,y,p.p,p.b);
 }
 
-void RGraphicsDevice::MetricInfo(int, const pGEcontext, double* ascent, double* descent, double* width, pDevDesc)
+void RGraphicsDevice::MetricInfo(int, const pGEcontext gc, double* ascent, double* descent, double* width, pDevDesc)
 {
-    QFont def;
-    QFontMetricsF fm(def);
+    struct par p = parContext(gc);
+    QFontMetricsF fm(p.f);
     *ascent = fm.ascent();
     *descent = fm.descent();
     *width = fm.averageCharWidth();
@@ -174,17 +177,17 @@ void RGraphicsDevice::MetricInfo(int, const pGEcontext, double* ascent, double* 
     return;
 }
 
-double RGraphicsDevice::StrWidth(const char *str, const pGEcontext, pDevDesc)
+double RGraphicsDevice::StrWidth(const char *str, const pGEcontext gc, pDevDesc)
 {
-    QFont def;
-    QFontMetricsF fm(def);
+    struct par p = parContext(gc);
+    QFontMetricsF fm(p.f);
     return fm.boundingRect(QString(str)).width();
 }
 
-double RGraphicsDevice::StrWidthUTF8(const char *str, const pGEcontext, pDevDesc)
+double RGraphicsDevice::StrWidthUTF8(const char *str, const pGEcontext gc, pDevDesc)
 {
-    QFont def;
-    QFontMetricsF fm(def);
+    struct par p = parContext(gc);
+    QFontMetricsF fm(p.f);
     return fm.boundingRect(QString(str)).width();
 }
 
@@ -192,20 +195,14 @@ void RGraphicsDevice::Text(double x, double y, const char *str, double rot, doub
 {
     // fonts too
     struct par p = parContext(gc);
-    QFont f;
-    f.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
-    f.setPointSize(gc->ps);
-    if (rtool && rtool->canvas) rtool->canvas->text(x,y,QString(str), rot, hadj, p.p, f);
+    if (rtool && rtool->canvas) rtool->canvas->text(x,y,QString(str), rot, hadj, p.p, p.f);
 }
 
 void RGraphicsDevice::TextUTF8(double x, double y, const char *str, double rot, double hadj, const pGEcontext gc, pDevDesc)
 {
     // fonts too
     struct par p = parContext(gc);
-    QFont f;
-    f.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
-    f.setPointSize(gc->ps);
-    if (rtool && rtool->canvas) rtool->canvas->text(x,y,QString(str), rot, hadj, p.p, f);
+    if (rtool && rtool->canvas) rtool->canvas->text(x,y,QString(str), rot, hadj, p.p, p.f);
 }
 
 void RGraphicsDevice::Activate(pDevDesc)
