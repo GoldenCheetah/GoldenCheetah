@@ -202,11 +202,14 @@ class RideFile : public QObject // QObject to emit signals
                           wbal, tcore,
                           none }; // none must ALWAYS be last
 
+        enum conversion { original, pace };
+
         // NA = Not Applicable - i.e Temperature no recorded value
         // NIL = Not available, but still set to zero for compatibility
         //       We should consider looking at code to handle NIL / NA 
         enum specialValues { NA = -255, NIL = 0 };
         typedef enum seriestype SeriesType;
+        typedef enum conversion Conversion;
         static SeriesType lastSeriesType() { return none; }
 
         static QStringList symbols(); // get a list of symbols for each series to use in a formula
@@ -215,6 +218,8 @@ class RideFile : public QObject // QObject to emit signals
 
         static QString seriesName(SeriesType, bool compat=false);
         static QString unitName(SeriesType, Context *context);
+        static QString formatValueWithUnit(double value, SeriesType series, Conversion conversion, Context *context, bool isSwim);
+
         static int decimalsFor(SeriesType series);
         static double maximumFor(SeriesType series);
         static double minimumFor(SeriesType series);

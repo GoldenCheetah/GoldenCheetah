@@ -398,6 +398,17 @@ RideFile::unitName(SeriesType series, Context *context)
     }
 }
 
+QString
+RideFile::formatValueWithUnit(double value, SeriesType series, Conversion conversion, Context *context, bool isSwim)
+{
+    bool useMetricUnits = context->athlete->useMetricUnits;
+
+    if (series == RideFile::kph && conversion == RideFile::pace)
+        return kphToPace(value, useMetricUnits, isSwim);
+    else
+        return QString("%1%2").arg(value).arg(unitName(series, context));
+}
+
 void
 RideFile::clearIntervals()
 {
