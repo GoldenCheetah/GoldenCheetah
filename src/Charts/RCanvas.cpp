@@ -90,7 +90,7 @@ RCanvas::newPage()
 void
 RCanvas::circle(double x, double y, double r, QPen p, QBrush b)
 {
-    QGraphicsEllipseItem *c=new QGraphicsEllipseItem(x,y,r+r,r+r);
+    QGraphicsEllipseItem *c=new QGraphicsEllipseItem(x-r,y-r,r+r,r+r);
     c->setPen(p);
     c->setBrush(b);
     scene->addItem(c);
@@ -145,7 +145,7 @@ RCanvas::rectangle(double x0, double y0, double x1, double y1,QPen p, QBrush b)
 }
 
 void
-RCanvas::text(double x, double y, QString s, double rot, double hadj, QPen p, QFont f)
+RCanvas::text(double x, double y, QString s, double rot, double , QPen p, QFont f)
 {
     QGraphicsTextItem *t = new QGraphicsTextItem(s);
     t->setFlag(QGraphicsItem::ItemIgnoresTransformations);
