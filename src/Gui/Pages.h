@@ -85,7 +85,9 @@ class GeneralPage : public QWidget
     public slots:
         void browseWorkoutDir();
         void browseAthleteDir();
+#ifdef GC_WANT_R
         void browseRDir();
+#endif
 
     private:
         Context *context;
@@ -101,15 +103,18 @@ class GeneralPage : public QWidget
         QLineEdit *hystedit;
         QLineEdit *athleteDirectory;
         QLineEdit *workoutDirectory;
-        QLineEdit *rDirectory;
         QPushButton *workoutBrowseButton;
         QPushButton *athleteBrowseButton;
+
+#ifdef GC_WANT_R
         QPushButton *rBrowseButton;
+        QLineEdit *rDirectory;
+        QLabel *rLabel;
+#endif
 
         QLabel *langLabel;
         QLabel *warningLabel;
         QLabel *workoutLabel;
-        QLabel *rLabel;
         QLabel *athleteLabel;
 
         struct {
