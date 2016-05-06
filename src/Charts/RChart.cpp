@@ -300,6 +300,7 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
 
         leftsplitter->addWidget(script);
         console = new RConsole(context, this);
+        console->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         leftsplitter->addWidget(console);
 
         splitter = new QSplitter(Qt::Horizontal, this);
@@ -312,6 +313,11 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
         canvas = new RCanvas(context, this);
         canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         splitter->addWidget(canvas);
+
+        // make splitter reasonable
+        QList<int> sizes;
+        sizes << 300 << 500;
+        splitter->setSizes(sizes);
 
         if (ridesummary) {
             connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript()));
@@ -332,6 +338,7 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
 
         // not starting
         script = NULL;
+        splitter = NULL;
         console = NULL;
         canvas = NULL;
     }
@@ -351,6 +358,21 @@ RChart::setScript(QString string)
         new RSyntax(script->document());
     }
     text = string;
+}
+
+QString
+RChart::getState() const
+{
+    //XXX FIXME
+    //if (rtool && splitter)  return QString(splitter->saveState());
+    //else return "";
+}
+
+void
+RChart::setState(QString b)
+{
+    //XXX FIXME
+    //if (rtool && splitter && b != "") splitter->restoreState(QByteArray(b.toLatin1()));
 }
 
 
