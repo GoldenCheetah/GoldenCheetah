@@ -50,9 +50,12 @@ class RTool {
         static SEXP pmc(SEXP all, SEXP metric);
         static SEXP activityMeanmax(SEXP compare);
         static SEXP activityWBal(SEXP compare);
+        static SEXP pageSize(SEXP width, SEXP height);
 
         bool starting;
         bool failed;
+
+        int width, height;
 
         // handling console output from the R runtime
         static void R_Suicide(const char *) {}
@@ -71,6 +74,7 @@ class RTool {
         static int  R_YesNoCancel(const char *) { return 0; }
 
         QStringList messages;
+
 
     protected:
 

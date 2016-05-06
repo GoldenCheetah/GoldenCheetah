@@ -50,6 +50,9 @@ RTool::RTool()
         // yikes, self referenced during construction (!)
         rtool = this;
 
+        // set default width and height
+        width = height = 500;
+
         // initialise
         R = new REmbed();
 
@@ -81,6 +84,7 @@ RTool::RTool()
         // register our functions
         R_CMethodDef cMethods[] = {
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 ,0, 0 },
+            { "GC.page", (DL_FUNC) &RTool::pageSize, 0 ,0, 0 },
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 ,0, 0 },
             { "GC.athlete.home", (DL_FUNC) &RTool::athleteHome, 0 ,0, 0 },
             { "GC.activities", (DL_FUNC) &RTool::activities, 0 ,0, 0 },
@@ -93,6 +97,7 @@ RTool::RTool()
         };
         R_CallMethodDef callMethods[] = {
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 },
+            { "GC.page", (DL_FUNC) &RTool::pageSize, 2 },
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 },
             { "GC.athlete.home", (DL_FUNC) &RTool::athleteHome, 0 },
             { "GC.activities", (DL_FUNC) &RTool::activities, 0 },
@@ -126,6 +131,7 @@ RTool::RTool()
         // we should put this into a source file (.R)
         R->parseEvalNT(QString("options(\"repos\"=\"%3\")\n"
                                "GC.display <- function() { .Call(\"GC.display\") }\n"
+                               "GC.page <- function(width=500, height=500) { .Call(\"GC.page\", width, height) }\n"
                                "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
                                "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
                                "GC.activities <- function() { .Call(\"GC.activities\") }\n"
@@ -221,7 +227,18 @@ RTool::athlete()
     return ans;
 }
 
+SEXP
+RTool::pageSize(SEXP width, SEXP height)
+{
+    width = Rf_coerceVector(width, INTSXP);
+    rtool->width = INTEGER(width)[0];
 
+    height = Rf_coerceVector(height, INTSXP);
+    rtool->height = INTEGER(height)[0];
+
+    // fail
+    return Rf_allocVector(INTSXP, 0);
+}
 
 SEXP
 RTool::activities()

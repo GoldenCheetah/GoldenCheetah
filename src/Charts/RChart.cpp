@@ -386,6 +386,9 @@ RChart::runScript()
         rtool->context = context;
         rtool->canvas = canvas;
 
+        // set default page size
+        rtool->width = rtool->height = 500;
+
         QString line = script->toPlainText();
 
         try {
