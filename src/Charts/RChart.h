@@ -26,6 +26,7 @@
 #include <QTextEdit>
 #include <QScrollBar>
 #include <QSplitter>
+#include <QByteArray>
 #include <string.h>
 
 #include "GoldenCheetah.h"
@@ -80,6 +81,7 @@ class RChart : public GcChartWindow {
     Q_OBJECT
 
     Q_PROPERTY(QString script READ getScript WRITE setScript USER true)
+    Q_PROPERTY(QString state READ getState WRITE setState USER true)
 
     public:
         RChart(Context *context, bool ridesummary);
@@ -91,6 +93,9 @@ class RChart : public GcChartWindow {
 
         QString getScript() const;
         void setScript(QString);
+
+        QString getState() const;
+        void setState(QString);
 
     public slots:
         void runScript();
