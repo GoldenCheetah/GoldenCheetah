@@ -366,10 +366,11 @@ RChart::getState() const
     //XXX FIXME
     //if (rtool && splitter)  return QString(splitter->saveState());
     //else return "";
+    return "";
 }
 
 void
-RChart::setState(QString b)
+RChart::setState(QString)
 {
     //XXX FIXME
     //if (rtool && splitter && b != "") splitter->restoreState(QByteArray(b.toLatin1()));
