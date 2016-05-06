@@ -152,7 +152,6 @@ GcWindow *
 GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 {
     GcWindow *returning = NULL;
-    int idx;
 
     switch(id) {
     case GcWindowTypes::Aerolab: returning = new AerolabWindow(context); break;
