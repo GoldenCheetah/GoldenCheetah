@@ -208,6 +208,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
     offset++;
 
+#ifdef GC_WANT_R
     //
     // R Home directory
     //
@@ -226,6 +227,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     offset++;
 
     connect(rBrowseButton, SIGNAL(clicked()), this, SLOT(browseRDir()));
+#endif
 
     // save away initial values
     b4.unit = unitCombo->currentIndex();
@@ -257,7 +259,9 @@ GeneralPage::saveClicked()
     // Directories
     appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
     appsettings->setValue(GC_HOMEDIR, athleteDirectory->text());
+#ifdef GC_WANT_R
     appsettings->setValue(GC_R_HOME, rDirectory->text());
+#endif
 
     // Elevation
     appsettings->setValue(GC_ELEVATION_HYSTERESIS, hystedit->text());
@@ -297,6 +301,7 @@ GeneralPage::saveClicked()
     return state;
 }
 
+#ifdef GC_WANT_R
 void
 GeneralPage::browseRDir()
 {
@@ -306,6 +311,7 @@ GeneralPage::browseRDir()
                             currentDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     if (dir != "") rDirectory->setText(dir);  //only overwrite current dir, if a new was selected
 }
+#endif
 
 void
 GeneralPage::browseWorkoutDir()

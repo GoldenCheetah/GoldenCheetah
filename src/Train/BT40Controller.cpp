@@ -85,7 +85,7 @@ BT40Controller::find()
 }
 
 bool
-BT40Controller::discover(QString name)
+BT40Controller::discover(QString)
 {
     return true;
 }
