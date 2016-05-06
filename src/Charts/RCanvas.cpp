@@ -24,6 +24,27 @@
 
 #include <QGLWidget>
 
+//
+//
+// NOTE:                       X/Y CO-ORDINATES
+//
+//         R co-ordinates place the origin in the bottom-left as one would
+//         expect when plotting. QGraphicsScene places the origin in the
+//         top-left as one would expect when painting.
+//
+//         As a result the y co-ordinates need to be transformed from R
+//         to painter co-ordinates -- we DO NOT do this with a global
+//         world co-ordinate transformation -- this is because whilst it
+//         flips co-ordinates it also flips text (!)
+//
+//         We transform y co-ordinates in the primitive functions that
+//         draw circles, lines etc.
+//
+//         We also need to adjust text co-ordinates since they use painting
+//         conventions (top-left of text) but don't use painting co-ordinates
+//
+//
+
 RCanvas::RCanvas(Context *context, QWidget *parent) : QGraphicsView(parent), context(context)
 {
     // no frame, its ugly
@@ -38,11 +59,6 @@ RCanvas::RCanvas(Context *context, QWidget *parent) : QGraphicsView(parent), con
     // add a scene
     scene = new QGraphicsScene(this);
     this->setScene(scene);
-
-    // flip horizontal as y-co-ordinates place the
-    // origin in the bottom left, not screen co-ords
-    // of top left. x axis is fine though.
-    //scale(1,-1);
 
     // turn on antialiasing too
     setRenderHint(QPainter::Antialiasing, true);
