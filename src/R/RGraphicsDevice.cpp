@@ -86,13 +86,19 @@ RGraphicsDevice::RGraphicsDevice ()
     createGD();
 }
 
-void RGraphicsDevice::NewPage(const pGEcontext, pDevDesc)
+void RGraphicsDevice::NewPage(const pGEcontext, pDevDesc pDev)
 {
     // fire event (pass previousPageSnapshot)
     if (!rtool || !rtool->canvas) return;
 
     // clear the scene
     rtool->canvas->newPage();
+
+    // set the page size to user preference
+    pDev->left = 0;
+    pDev->right = rtool->width;
+    pDev->bottom = 0;
+    pDev->top = rtool->height;
 }
 
 Rboolean RGraphicsDevice::NewFrameConfirm_(pDevDesc)
@@ -114,9 +120,9 @@ void RGraphicsDevice::Mode(int, pDevDesc)
 void RGraphicsDevice::Size(double *left, double *right, double *bottom, double *top, pDevDesc)
 {
     *left = 0.0f;
-    *right = 500.0f; //XXXs_width;
+    *right = rtool->width;
     *bottom = 0.0f; //XXXs_height;
-    *top = 500.0f;
+    *top = rtool->height;
 }
 
 void RGraphicsDevice::Clip(double , double , double , double , pDevDesc)
@@ -514,10 +520,6 @@ void RGraphicsDevice::onBeforeExecute()
 #endif
 }
 
-const int kDefaultWidth = 500;
-const int kDefaultHeight = 500;
-const double kDefaultDevicePixelRatio = 1.0;
-
 void RGraphicsDevice::setDeviceAttributes(pDevDesc pDev)
 {
     double pointsize = 12;
@@ -572,8 +574,8 @@ void RGraphicsDevice::setDeviceAttributes(pDevDesc pDev)
 void RGraphicsDevice::setSize(pDevDesc pDev)
 {
     pDev->left = 0;
-    pDev->right = 500;
-    pDev->top = 500;
+    pDev->right = rtool->width;
+    pDev->top = rtool->height;
     pDev->bottom = 0;
 }
 
@@ -596,12 +598,12 @@ void RGraphicsDevice::setSize(int , int , double )
 
 int RGraphicsDevice::getWidth()
 {
-    return 500; //s_width;
+    return rtool->width;
 }
 
 int RGraphicsDevice::getHeight()
 {
-    return 500; //s_height;
+    return rtool->height;
 }
 
 double RGraphicsDevice::devicePixelRatio()
