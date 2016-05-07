@@ -57,6 +57,7 @@ class RTool {
         // seasons
         static SEXP season(SEXP all, SEXP compare);
         static SEXP metrics(SEXP all, SEXP compare);
+        static SEXP seasonMeanmax(SEXP all, SEXP compare);
         static SEXP pmc(SEXP all, SEXP metric);
 
         bool starting;
@@ -90,6 +91,8 @@ class RTool {
         SEXP dfForActivityWBal(RideFile *f);            // returns w' bal series for an activity
         SEXP dfForActivityMeanmax(const RideItem *i);   // returns mean maximals for an activity
         SEXP dfForDateRange(bool all, DateRange range); // returns metrics and metadata for a season
+        SEXP dfForDateRangeMeanmax(bool all, DateRange range); // returns the meanmax for a season
+        SEXP dfForRideFileCache(RideFileCache *p);      // returns meanmax for a cache
 };
 
 // there is a global instance created in main
