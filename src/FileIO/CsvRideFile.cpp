@@ -177,6 +177,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     int wattsIndex=-1;
     int smo2Index=-1;
     int hrIndex=-1;
+    int kphIndex = -1;   // BSX: running speed when using a footpod
 
     double precAvg=0.0;
     //double precWatts=0.0;
@@ -380,6 +381,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 QRegExp wattsHeader("( )*(watts|power)( )*", Qt::CaseInsensitive);
                 QRegExp smo2Header("( )*(smo2)( )*", Qt::CaseInsensitive);
                 QRegExp hrHeader("( )*(hr|heart_rate)( )*", Qt::CaseInsensitive);
+		QRegExp kphHeader("( )*(speed)( )*", Qt::CaseInsensitive); // running speed measured using a footpod is referred to as "speed"
                 QStringList headers = line.split(",");
 
                 QStringListIterator i(headers);
@@ -407,6 +409,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         smo2Index = headers.indexOf(header);
                         if (csvType == bsx)
                             smo2Index++;
+                    }
+                    if (kphHeader.indexIn(header) != -1)  {  // running speed when using a footpod
+                        kphIndex = headers.indexOf(header);
+                        if (csvType == bsx)
+                            kphIndex++;
                     }
                 }
             }
@@ -654,6 +661,13 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
                     if (smo2Index > -1) {
                         smo2 = line.section(',', smo2Index, smo2Index).toDouble();
+                    }
+                    if (kphIndex > -1) {
+// Up to now it's not handled that BSX might give speed in imperial units. We assume that they give speed in metric units (m/s).
+                        kph = line.section(',', kphIndex, kphIndex).toDouble() * 3.6f; // running speed is given in m/s, convert to km/h
+                        if (!metric) {
+                           kph *= KM_PER_MILE;
+                        }
                     }
                 }
                else if(csvType == motoactv) {
