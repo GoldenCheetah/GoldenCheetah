@@ -95,6 +95,7 @@ RTool::RTool()
             { "GC.season", (DL_FUNC) &RTool::season, 0 ,0, 0 },
             { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0 ,0, 0 },
             { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 0 ,0, 0 },
+            { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 0 ,0, 0 },
             { NULL, NULL, 0, 0, 0 }
         };
         R_CallMethodDef callMethods[] = {
@@ -116,6 +117,7 @@ RTool::RTool()
             // all=FALSE, compare=FALSE
             { "GC.season", (DL_FUNC) &RTool::season, 2 },
             { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 2 },
+            { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 2 },
             // return a data.frame of pmc series (all=FALSE, metric="TSS")
             { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 2 },
             { NULL, NULL, 0 }
@@ -145,6 +147,7 @@ RTool::RTool()
                                "GC.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
                                "GC.season.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season.metrics\", all, compare) }\n"
                                "GC.season.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
+                               "GC.season.meanmax <- function(all=FALSE,compare=FALSE) { .Call(\"GC.season.meanmax\", all, compare) }\n"
                                "GC.version <- function() { return(\"%1\") }\n"
                                "GC.build <- function() { return(%2) }\n")
                        .arg(VERSION_STRING)
@@ -156,13 +159,6 @@ RTool::RTool()
         // set the "GC" object and methods
         context = NULL;
         canvas = NULL;
-
-        // TBD
-        // GC.seasons     - configured seasons
-        // GC.config      - configuration (zones, units etc)
-
-        // the following are already set in RChart on a per call basis
-        // "GC.athlete" "GC.athlete.home"
 
         configChanged();
 
@@ -961,20 +957,47 @@ RTool::activity(SEXP pCompare)
 SEXP
 RTool::dfForActivityMeanmax(const RideItem *i)
 {
+    return dfForRideFileCache(const_cast<RideItem*>(i)->fileCache());
+
+}
+
+SEXP
+RTool::dfForDateRangeMeanmax(bool all, DateRange range)
+{
+    // construct the date range and then get a ridefilecache
+    if (all) range = DateRange(QDate(1900,01,01), QDate(2100,01,01));
+
+    // RideFileCache for a date range with no filtering etc
+    RideFileCache cache(rtool->context, range.from, range.to, false, QStringList(), false, NULL);
+
+    return dfForRideFileCache(&cache);
+
+    // nothing to return
+    return Rf_allocVector(INTSXP, 0);
+}
+
+
+SEXP
+RTool::dfForRideFileCache(RideFileCache *cache)
+{
     // how many series and how big are they?
     unsigned int seriescount=0, size=0;
 
     // get the meanmax array
-    RideFileCache *cache = const_cast<RideItem*>(i)->fileCache();
     if (cache != NULL) {
         // how many points in the ridefilecache and how many series to return
         foreach(RideFile::SeriesType series, cache->meanMaxList()) {
             QVector <double> values = cache->meanMaxArray(series);
             if (values.count()) {
-                size = values.count();
+                if (static_cast<unsigned int>(values.count()) > size) size = values.count();
                 seriescount++;
             }
         }
+
+    } else {
+
+        // fail
+        return Rf_allocVector(INTSXP, 0);
     }
 
     // we return a list of series vectors
@@ -1003,7 +1026,11 @@ RTool::dfForActivityMeanmax(const RideItem *i)
         SEXP vector;
         PROTECT(vector=Rf_allocVector(REALSXP, size));
 
-        for(unsigned int j=0; j<size; j++) REAL(vector)[j] = values[j];
+        // will have different sizes e.g. when a daterange
+        // since longest ride with e.g. power may be different
+        // to longest ride with heartrate
+        for(unsigned int j=0; j<size; j++)
+            REAL(vector)[j] = j < static_cast<unsigned int>(values.count()) ? values[j] : 0.0f;
 
         // add to the list
         SETCAR(nextS, vector);
@@ -1037,6 +1064,129 @@ RTool::dfForActivityMeanmax(const RideItem *i)
     // return a valid result
     return ans;
 }
+
+SEXP
+RTool::seasonMeanmax(SEXP pAll, SEXP pCompare)
+{
+    // p1 - all=TRUE|FALSE - return all metrics or just within
+    //                       the currently selected date range
+    pAll = Rf_coerceVector(pAll, LGLSXP);
+    bool all = LOGICAL(pAll)[0];
+
+    // p2 - all=TRUE|FALSE - return list of compares (or current if not active)
+    pCompare = Rf_coerceVector(pCompare, LGLSXP);
+    bool compare = LOGICAL(pCompare)[0];
+
+    // want a list of compares not a dataframe
+    if (compare && rtool->context) {
+
+        // only return compares if its actually active
+        if (rtool->context->isCompareDateRanges) {
+
+            // how many to return?
+            int count=0;
+            foreach(CompareDateRange p, rtool->context->compareDateRanges) if (p.isChecked()) count++;
+
+            // cool we can return a list of meanaxes to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, count));
+
+            // start at the front
+            SEXP nextS = list;
+
+            // a named list with data.frame 'metrics' and color 'color'
+            SEXP namedlist;
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("meanmax"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // create a data.frame for each and add to list
+            foreach(CompareDateRange p, rtool->context->compareDateRanges) {
+                if (p.isChecked()) {
+
+                    // create a named list
+                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+                    SEXP offset = namedlist;
+
+                    // add the ride
+                    SEXP df = rtool->dfForDateRangeMeanmax(all, DateRange(p.start, p.end));
+                    SETCAR(offset, df);
+                    offset=CDR(offset);
+
+                    // add the color
+                    SEXP color;
+                    PROTECT(color=Rf_allocVector(STRSXP, 1));
+                    SET_STRING_ELT(color, 0, Rf_mkChar(p.color.name().toLatin1().constData()));
+                    SETCAR(offset, color);
+
+                    // name them
+                    Rf_namesgets(namedlist, names);
+
+                    // add to back and move on
+                    SETCAR(nextS, namedlist);
+                    nextS=CDR(nextS);
+
+                    UNPROTECT(2);
+                }
+            }
+            UNPROTECT(2); // list and names
+
+            return list;
+
+        } else { // compare isn't active...
+
+            // otherwise return the current season meanmax in a compare list
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, 1));
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("meanmax"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // named list of metrics and color
+            SEXP namedlist;
+            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+            SEXP offset = namedlist;
+
+            // add the meanmaxes
+            DateRange range = rtool->context->currentDateRange();
+            SEXP df = rtool->dfForDateRangeMeanmax(all, range);
+            SETCAR(offset, df);
+            offset=CDR(offset);
+
+            // add the color
+            SEXP color;
+            PROTECT(color=Rf_allocVector(STRSXP, 1));
+            SET_STRING_ELT(color, 0, Rf_mkChar("#FF00FF"));
+            SETCAR(offset, color);
+
+            // name them
+            Rf_namesgets(namedlist, names);
+
+            // add to back and move on
+            SETCAR(list, namedlist);
+            UNPROTECT(4);
+
+            return list;
+        }
+
+    } else if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
+
+        // just a datafram of meanmax
+        DateRange range = rtool->context->currentDateRange();
+        return rtool->dfForDateRangeMeanmax(all, range);
+
+    }
+
+    // fail
+    return Rf_allocVector(INTSXP, 0);
+}
+
 
 SEXP
 RTool::activityMeanmax(SEXP pCompare)
