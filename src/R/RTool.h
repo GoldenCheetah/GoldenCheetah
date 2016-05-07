@@ -42,15 +42,22 @@ class RTool {
         Context *context;
         QString version;
 
+        static SEXP pageSize(SEXP width, SEXP height);
+
+        // athlete
         static SEXP athlete();
         static SEXP athleteHome();
+
+        // activities
         static SEXP activities();
         static SEXP activity(SEXP compare);
-        static SEXP metrics(SEXP all, SEXP compare);
-        static SEXP pmc(SEXP all, SEXP metric);
         static SEXP activityMeanmax(SEXP compare);
         static SEXP activityWBal(SEXP compare);
-        static SEXP pageSize(SEXP width, SEXP height);
+
+        // seasons
+        static SEXP season(SEXP all, SEXP compare);
+        static SEXP metrics(SEXP all, SEXP compare);
+        static SEXP pmc(SEXP all, SEXP metric);
 
         bool starting;
         bool failed;
@@ -79,10 +86,10 @@ class RTool {
     protected:
 
         // return a dataframe for the ride passed
-        SEXP dfForActivity(RideFile *f);
-        SEXP dfForActivityWBal(RideFile *f);
-        SEXP dfForActivityMeanmax(const RideItem *i);
-        SEXP dfForDateRange(bool all, DateRange range);
+        SEXP dfForActivity(RideFile *f);                // returns date series for an activity
+        SEXP dfForActivityWBal(RideFile *f);            // returns w' bal series for an activity
+        SEXP dfForActivityMeanmax(const RideItem *i);   // returns mean maximals for an activity
+        SEXP dfForDateRange(bool all, DateRange range); // returns metrics and metadata for a season
 };
 
 // there is a global instance created in main

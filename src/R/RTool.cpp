@@ -29,6 +29,7 @@
 #include "RideMetadata.h"
 #include "PMCData.h"
 #include "WPrime.h"
+#include "Season.h"
 
 #include "Rinternals.h"
 #include "Rversion.h"
@@ -91,32 +92,32 @@ RTool::RTool()
             { "GC.activity", (DL_FUNC) &RTool::activity, 0 ,0, 0 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0 ,0, 0 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0 ,0, 0 },
-            { "GC.metrics", (DL_FUNC) &RTool::metrics, 0 ,0, 0 },
-            { "GC.pmc", (DL_FUNC) &RTool::pmc, 0 ,0, 0 },
+            { "GC.season", (DL_FUNC) &RTool::season, 0 ,0, 0 },
+            { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0 ,0, 0 },
+            { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 0 ,0, 0 },
             { NULL, NULL, 0, 0, 0 }
         };
         R_CallMethodDef callMethods[] = {
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 },
             { "GC.page", (DL_FUNC) &RTool::pageSize, 2 },
+
+            // athlete
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 },
             { "GC.athlete.home", (DL_FUNC) &RTool::athleteHome, 0 },
-            { "GC.activities", (DL_FUNC) &RTool::activities, 0 },
 
             // if activity is passed compare=TRUE it returns a list of rides
             // currently in the compare pane if compare is enabled or
             // just a 1 item list with the current ride
+            { "GC.activities", (DL_FUNC) &RTool::activities, 0 },
             { "GC.activity", (DL_FUNC) &RTool::activity, 1 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 1 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 1 },
 
-            // metrics is passed a Rboolean for "all":
-            // TRUE -> return all metrics, FALSE -> apply date range selection
-            // and a Rboolean for "compare"
-            // TRUE -> return a list of compares, FALSE -> return metrics for current date range
-            { "GC.metrics", (DL_FUNC) &RTool::metrics, 2 },
-
+            // all=FALSE, compare=FALSE
+            { "GC.season", (DL_FUNC) &RTool::season, 2 },
+            { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 2 },
             // return a data.frame of pmc series (all=FALSE, metric="TSS")
-            { "GC.pmc", (DL_FUNC) &RTool::pmc, 2 },
+            { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 2 },
             { NULL, NULL, 0 }
         };
 
@@ -138,8 +139,12 @@ RTool::RTool()
                                "GC.activity <- function(compare=FALSE) { .Call(\"GC.activity\", compare) }\n"
                                "GC.activity.meanmax <- function(compare=FALSE) { .Call(\"GC.activity.meanmax\", compare) }\n"
                                "GC.activity.wbal <- function(compare=FALSE) { .Call(\"GC.activity.wbal\", compare) }\n"
-                               "GC.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.metrics\", all, compare) }\n"
-                               "GC.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.pmc\", all, metric) }\n"
+                               "GC.season <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season\", all, compare) }\n"
+                               // these 2 added for backward compatibility, may be deprecated
+                               "GC.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season.metrics\", all, compare) }\n"
+                               "GC.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
+                               "GC.season.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season.metrics\", all, compare) }\n"
+                               "GC.season.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
                                "GC.version <- function() { return(\"%1\") }\n"
                                "GC.build <- function() { return(%2) }\n")
                        .arg(VERSION_STRING)
@@ -482,6 +487,106 @@ RTool::dfForDateRange(bool all, DateRange range)
 
     // return it
     return ans;
+}
+
+
+// returns a data frame of season info
+SEXP
+RTool::season(SEXP pAll, SEXP pCompare)
+{
+    // p1 - all=TRUE|FALSE - return all metrics or just within
+    //                       the currently selected date range
+    pAll = Rf_coerceVector(pAll, LGLSXP);
+    bool all = LOGICAL(pAll)[0];
+
+    // p2 - all=TRUE|FALSE - return list of compares (or current if not active)
+    pCompare = Rf_coerceVector(pCompare, LGLSXP);
+    bool compare = LOGICAL(pCompare)[0];
+
+    // data frame for season: color, name, start, end
+    // XXX TODO type needs adding, but we need to unpick the
+    //          phase/season object model first, will do later
+    SEXP df;
+    PROTECT(df=Rf_allocList(4));
+
+    // names
+    SEXP names;
+    PROTECT(names=Rf_allocVector(STRSXP, 4));
+    SET_STRING_ELT(names, 0, Rf_mkChar("name"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("start"));
+    SET_STRING_ELT(names, 2, Rf_mkChar("end"));
+    SET_STRING_ELT(names, 3, Rf_mkChar("color"));
+
+    // worklist of date ranges to return
+    // XXX TODO use a Season worklist one the phase/season
+    //          object model is fixed
+    QList<DateRange> worklist;
+
+    if (compare) {
+        // return a list, even if just one
+        if (rtool->context->isCompareDateRanges) {
+            foreach(CompareDateRange p, rtool->context->compareDateRanges)
+                worklist << DateRange(p.start, p.end, p.name, p.color);
+        } else {
+            // if compare not active just return current selection
+            worklist << rtool->context->currentDateRange();
+        }
+
+    } else if (all) {
+        // list all seasons
+        foreach(Season season, rtool->context->athlete->seasons->seasons) {
+            worklist << DateRange(season.start, season.end, season.name, QColor(127,127,127));
+        }
+
+    } else {
+
+        // just the currently selected season please
+        worklist << rtool->context->currentDateRange();
+    }
+
+    SEXP rownames, start, end, name, color;
+    PROTECT(start=Rf_allocVector(INTSXP, worklist.count()));
+    PROTECT(end=Rf_allocVector(INTSXP, worklist.count()));
+    PROTECT(name=Rf_allocVector(STRSXP, worklist.count()));
+    PROTECT(color=Rf_allocVector(STRSXP, worklist.count()));
+    PROTECT(rownames = Rf_allocVector(STRSXP, worklist.count()));
+
+    int index=0;
+    QDate d1970(1970,1,1);
+
+    foreach(DateRange p, worklist){
+
+        INTEGER(start) [index] = d1970.daysTo(p.from);
+        INTEGER(end) [index] = d1970.daysTo(p.to);
+        SET_STRING_ELT(name, index, Rf_mkChar(p.name.toLatin1().constData()));
+        SET_STRING_ELT(color, index, Rf_mkChar(p.color.name().toLatin1().constData()));
+        QString rownumber=QString("%1").arg(index+1);
+        SET_STRING_ELT(rownames, index, Rf_mkChar(rownumber.toLatin1().constData()));
+
+        index++;
+    }
+
+    SEXP dclas;
+    PROTECT(dclas=Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(dclas, 0, Rf_mkChar("Date"));
+    Rf_classgets(start,dclas);
+    Rf_classgets(end,dclas);
+
+    SEXP next=df;
+    SETCAR(next, name); next=CDR(next);
+    SETCAR(next, start); next=CDR(next);
+    SETCAR(next, end); next=CDR(next);
+    SETCAR(next, color); next=CDR(next);
+
+    // list into a data.frame
+    Rf_namesgets(df, names);
+    Rf_setAttrib(df, R_RowNamesSymbol, rownames);
+    Rf_setAttrib(df, R_ClassSymbol, Rf_mkString("data.frame"));
+
+    UNPROTECT(8); // df + names
+
+    // fail
+    return df;
 }
 
 SEXP
