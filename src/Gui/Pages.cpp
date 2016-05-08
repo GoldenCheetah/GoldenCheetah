@@ -4671,7 +4671,7 @@ HrZonePage::saveClicked()
 
     // reread HR zones
     QFile hrzonesFile(context->athlete->home->config().canonicalPath() + "/hr.zones");
-    context->athlete->hrzones_->read(hrzonesFile);
+    context->athlete->hrzones_[0]->read(hrzonesFile);
 
     // did we change ?
     if (zones.getFingerprint() != b4Fingerprint) return CONFIG_ZONES;
