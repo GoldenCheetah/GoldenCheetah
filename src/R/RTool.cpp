@@ -97,6 +97,7 @@ RTool::RTool()
             { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0 ,0, 0 },
             { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 0 ,0, 0 },
             { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 0 ,0, 0 },
+            { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 0 ,0, 0 },
             { NULL, NULL, 0, 0, 0 }
         };
         R_CallMethodDef callMethods[] = {
@@ -120,6 +121,7 @@ RTool::RTool()
             { "GC.season", (DL_FUNC) &RTool::season, 2 },
             { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 2 },
             { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 2 },
+            { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 3 },
             // return a data.frame of pmc series (all=FALSE, metric="TSS")
             { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 2 },
             { NULL, NULL, 0 }
@@ -135,22 +137,39 @@ RTool::RTool()
         // load the dynamix library and create function wrapper
         // we should put this into a source file (.R)
         R->parseEvalNT(QString("options(\"repos\"=\"%3\")\n"
+
+                                // graphics device
                                "GC.display <- function() { .Call(\"GC.display\") }\n"
                                "GC.page <- function(width=500, height=500) { .Call(\"GC.page\", width, height) }\n"
+
+                               // athlete
                                "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
                                "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
+
+                               // activity
                                "GC.activities <- function() { .Call(\"GC.activities\") }\n"
                                "GC.activity <- function(compare=FALSE) { .Call(\"GC.activity\", compare) }\n"
                                "GC.activity.metrics <- function(compare=FALSE) { .Call(\"GC.activity.metrics\", compare) }\n"
                                "GC.activity.meanmax <- function(compare=FALSE) { .Call(\"GC.activity.meanmax\", compare) }\n"
                                "GC.activity.wbal <- function(compare=FALSE) { .Call(\"GC.activity.wbal\", compare) }\n"
+
+                               // season
                                "GC.season <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season\", all, compare) }\n"
-                               // these 2 added for backward compatibility, may be deprecated
-                               "GC.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season.metrics\", all, compare) }\n"
-                               "GC.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
                                "GC.season.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season.metrics\", all, compare) }\n"
                                "GC.season.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
                                "GC.season.meanmax <- function(all=FALSE,compare=FALSE) { .Call(\"GC.season.meanmax\", all, compare) }\n"
+                               // find peaks does a few validation checks on the R side
+                               "GC.season.peaks <- function(all=FALSE, series, duration) {\n"
+                               "   if (missing(series)) stop(\"series must be specified.\")\n"
+                               "   if (missing(duration)) stop(\"duration must be specified.\")\n"
+                               "   if (!is.numeric(duration)) stop(\"duration must be numeric.\")\n"
+                               "   .Call(\"GC.season.peaks\", all, series, duration)"
+                               "}\n"
+                               // these 2 added for backward compatibility, may be deprecated
+                               "GC.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season.metrics\", all, compare) }\n"
+                               "GC.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
+
+                               // version and build
                                "GC.version <- function() { return(\"%1\") }\n"
                                "GC.build <- function() { return(%2) }\n")
                        .arg(VERSION_STRING)
@@ -1242,6 +1261,141 @@ RTool::dfForRideFileCache(RideFileCache *cache)
 
     // return a valid result
     return ans;
+}
+
+SEXP
+RTool::seasonPeaks(SEXP pAll, SEXP pSeries, SEXP pDuration)
+{
+    // check parameters !
+    pAll = Rf_coerceVector(pAll, LGLSXP);
+    bool all = LOGICAL(pAll)[0];
+
+    // get the date range
+    DateRange range = rtool->context->currentDateRange();
+
+    // lets get a Map of names to series
+    QMap<QString, RideFile::SeriesType> snames;
+    foreach(RideFile::SeriesType s, RideFileCache::meanMaxList()) {
+        snames.insert(RideFile::seriesName(s, true), s);
+    }
+
+    // extract as QStrings
+    QList<RideFile::SeriesType> series;
+    pSeries = Rf_coerceVector(pSeries, STRSXP);
+    for(int i=0; i <Rf_length(pSeries); i++) {
+        QString name = CHAR(STRING_ELT(pSeries, i));
+        RideFile::SeriesType stype;
+        if ((stype=snames.value(name, RideFile::none)) == RideFile::none) {
+
+            Rf_error("Invalid mean maximal series passed to GC.season.peaks.");
+            return Rf_allocVector(INTSXP, 0);
+
+        } else {
+            series << stype;
+        }
+    }
+
+    // extract as integers
+    QList<int>durations;
+    pDuration = Rf_coerceVector(pDuration, REALSXP);
+    for(int i=0; i<Rf_length(pDuration); i++) {
+        durations << REAL(pDuration)[i];
+    }
+
+    // so how many vectors in the frame ? +1 is the datetime of the peak
+    int listsize=series.count() * durations.count() + 1;
+    SEXP df;
+    PROTECT(df=Rf_allocList(listsize));
+    SEXP nextS=df;
+
+    // and each one needs a name
+    SEXP names;
+    PROTECT(names=Rf_allocVector(STRSXP, listsize));
+    SET_STRING_ELT(names, 0, Rf_mkChar("time"));
+    int next=1;
+
+    // how many rides ?
+    int size=0;
+    foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+        // do we want this one ?
+        if (all || range.pass(item->dateTime.date()))  size++;
+    }
+
+    // dates first
+    SEXP dates;
+    PROTECT(dates=Rf_allocVector(REALSXP, size));
+
+    // fill with values for date and class
+    int i=0;
+    foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+        if (all || range.pass(item->dateTime.date())) {
+            REAL(dates)[i++] = item->dateTime.toUTC().toTime_t();
+        }
+    }
+
+    // POSIXct class
+    SEXP clas;
+    PROTECT(clas=Rf_allocVector(STRSXP, 2));
+    SET_STRING_ELT(clas, 0, Rf_mkChar("POSIXct"));
+    SET_STRING_ELT(clas, 1, Rf_mkChar("POSIXt"));
+    Rf_classgets(dates,clas);
+    Rf_setAttrib(dates, Rf_install("tzone"), Rf_mkString("UTC"));
+
+    SETCAR(nextS, dates);
+    nextS=CDR(nextS);
+
+    foreach(RideFile::SeriesType pseries, series) {
+
+        foreach(int pduration, durations) {
+
+            // create a vector
+            SEXP vector;
+            PROTECT(vector=Rf_allocVector(REALSXP, size));
+
+            // give it a name
+            QString name = QString("peak_%1_%2").arg(RideFile::seriesName(pseries, true)).arg(pduration);
+            SET_STRING_ELT(names, next++, Rf_mkChar(name.toLatin1().constData()));
+
+            // fill with values
+            // get the value for the series and duration requested, although this is called
+            int index=0;
+            foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+
+                // do we want this one ?
+                if (all || range.pass(item->dateTime.date())) {
+
+                    // for each series/duration independently its pretty quick since it lseeks to
+                    // the actual value, so /should't/ be too expensive.........
+                    REAL(vector)[index++] = RideFileCache::best(item->context, item->fileName, pseries, pduration);
+                }
+            }
+
+            // add named vector to the list
+            SETCAR(nextS, vector);
+            nextS=CDR(nextS);
+
+            UNPROTECT(1);
+
+        }
+    }
+
+    // set names + data.frame
+    SEXP rownames;
+    PROTECT(rownames = Rf_allocVector(STRSXP, size));
+    for(int i=0; i<size; i++) {
+        QString rownumber=QString("%1").arg(i+1);
+        SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
+    }
+
+    // turn the list into a data frame + set column names
+    Rf_setAttrib(df, R_ClassSymbol, Rf_mkString("data.frame"));
+    Rf_setAttrib(df, R_RowNamesSymbol, rownames);
+    Rf_namesgets(df, names);
+
+
+    // df + names + dates + clas + rownames
+    UNPROTECT(5);
+    return df;
 }
 
 SEXP
