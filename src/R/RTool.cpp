@@ -121,7 +121,7 @@ RTool::RTool()
             { "GC.season", (DL_FUNC) &RTool::season, 2 },
             { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 2 },
             { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 2 },
-            { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 3 },
+            { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 4 },
             // return a data.frame of pmc series (all=FALSE, metric="TSS")
             { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 2 },
             { NULL, NULL, 0 }
@@ -159,11 +159,11 @@ RTool::RTool()
                                "GC.season.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
                                "GC.season.meanmax <- function(all=FALSE,compare=FALSE) { .Call(\"GC.season.meanmax\", all, compare) }\n"
                                // find peaks does a few validation checks on the R side
-                               "GC.season.peaks <- function(all=FALSE, series, duration) {\n"
+                               "GC.season.peaks <- function(all=FALSE, compare=FALSE, series, duration) {\n"
                                "   if (missing(series)) stop(\"series must be specified.\")\n"
                                "   if (missing(duration)) stop(\"duration must be specified.\")\n"
                                "   if (!is.numeric(duration)) stop(\"duration must be numeric.\")\n"
-                               "   .Call(\"GC.season.peaks\", all, series, duration)"
+                               "   .Call(\"GC.season.peaks\", all, compare, series, duration)"
                                "}\n"
                                // these 2 added for backward compatibility, may be deprecated
                                "GC.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season.metrics\", all, compare) }\n"
@@ -1264,14 +1264,14 @@ RTool::dfForRideFileCache(RideFileCache *cache)
 }
 
 SEXP
-RTool::seasonPeaks(SEXP pAll, SEXP pSeries, SEXP pDuration)
+RTool::seasonPeaks(SEXP pAll, SEXP pCompare, SEXP pSeries, SEXP pDuration)
 {
     // check parameters !
     pAll = Rf_coerceVector(pAll, LGLSXP);
     bool all = LOGICAL(pAll)[0];
 
-    // get the date range
-    DateRange range = rtool->context->currentDateRange();
+    pCompare = Rf_coerceVector(pCompare, LGLSXP);
+    bool compare = LOGICAL(pCompare)[0];
 
     // lets get a Map of names to series
     QMap<QString, RideFile::SeriesType> snames;
@@ -1302,6 +1302,119 @@ RTool::seasonPeaks(SEXP pAll, SEXP pSeries, SEXP pDuration)
         durations << REAL(pDuration)[i];
     }
 
+    // want a list of compares not a dataframe
+    if (compare && rtool->context) {
+
+        // only return compares if its actually active
+        if (rtool->context->isCompareDateRanges) {
+
+            // how many to return?
+            int count=0;
+            foreach(CompareDateRange p, rtool->context->compareDateRanges) if (p.isChecked()) count++;
+
+            // cool we can return a list of intervals to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, count));
+
+            // start at the front
+            SEXP nextS = list;
+
+            // a named list with data.frame 'metrics' and color 'color'
+            SEXP namedlist;
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("peaks"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // create a data.frame for each and add to list
+            foreach(CompareDateRange p, rtool->context->compareDateRanges) {
+                if (p.isChecked()) {
+
+                    // create a named list
+                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+                    SEXP offset = namedlist;
+
+                    // add the ride
+                    SEXP df = rtool->dfForDateRangePeaks(all, DateRange(p.start, p.end), series, durations);
+                    SETCAR(offset, df);
+                    offset=CDR(offset);
+
+                    // add the color
+                    SEXP color;
+                    PROTECT(color=Rf_allocVector(STRSXP, 1));
+                    SET_STRING_ELT(color, 0, Rf_mkChar(p.color.name().toLatin1().constData()));
+                    SETCAR(offset, color);
+
+                    // name them
+                    Rf_namesgets(namedlist, names);
+
+                    // add to back and move on
+                    SETCAR(nextS, namedlist);
+                    nextS=CDR(nextS);
+
+                    UNPROTECT(2);
+                }
+            }
+            UNPROTECT(2); // list and names
+
+            return list;
+
+        } else { // compare isn't active...
+
+            // otherwise return the current metrics in a compare list
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, 1));
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("peaks"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // named list of metrics and color
+            SEXP namedlist;
+            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+            SEXP offset = namedlist;
+
+            // add the metrics
+            DateRange range = rtool->context->currentDateRange();
+            SEXP df = rtool->dfForDateRangePeaks(all, range, series, durations);
+            SETCAR(offset, df);
+            offset=CDR(offset);
+
+            // add the color
+            SEXP color;
+            PROTECT(color=Rf_allocVector(STRSXP, 1));
+            SET_STRING_ELT(color, 0, Rf_mkChar("#FF00FF"));
+            SETCAR(offset, color);
+
+            // name them
+            Rf_namesgets(namedlist, names);
+
+            // add to back and move on
+            SETCAR(list, namedlist);
+            UNPROTECT(4);
+
+            return list;
+        }
+
+    } else if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
+
+        // just a datafram of metrics
+        DateRange range = rtool->context->currentDateRange();
+        return rtool->dfForDateRangePeaks(all, range, series, durations);
+
+    }
+
+    // fail
+    return Rf_allocVector(INTSXP, 0);
+}
+
+SEXP
+RTool::dfForDateRangePeaks(bool all, DateRange range, QList<RideFile::SeriesType> series, QList<int> durations)
+{
     // so how many vectors in the frame ? +1 is the datetime of the peak
     int listsize=series.count() * durations.count() + 1;
     SEXP df;
