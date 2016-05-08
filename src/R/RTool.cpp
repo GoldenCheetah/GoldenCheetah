@@ -90,6 +90,7 @@ RTool::RTool()
             { "GC.athlete.home", (DL_FUNC) &RTool::athleteHome, 0 ,0, 0 },
             { "GC.activities", (DL_FUNC) &RTool::activities, 0 ,0, 0 },
             { "GC.activity", (DL_FUNC) &RTool::activity, 0 ,0, 0 },
+            { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0 ,0, 0 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0 ,0, 0 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0 ,0, 0 },
             { "GC.season", (DL_FUNC) &RTool::season, 0 ,0, 0 },
@@ -111,6 +112,7 @@ RTool::RTool()
             // just a 1 item list with the current ride
             { "GC.activities", (DL_FUNC) &RTool::activities, 0 },
             { "GC.activity", (DL_FUNC) &RTool::activity, 1 },
+            { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 1 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 1 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 1 },
 
@@ -139,6 +141,7 @@ RTool::RTool()
                                "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
                                "GC.activities <- function() { .Call(\"GC.activities\") }\n"
                                "GC.activity <- function(compare=FALSE) { .Call(\"GC.activity\", compare) }\n"
+                               "GC.activity.metrics <- function(compare=FALSE) { .Call(\"GC.activity.metrics\", compare) }\n"
                                "GC.activity.meanmax <- function(compare=FALSE) { .Call(\"GC.activity.meanmax\", compare) }\n"
                                "GC.activity.wbal <- function(compare=FALSE) { .Call(\"GC.activity.wbal\", compare) }\n"
                                "GC.season <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season\", all, compare) }\n"
@@ -272,6 +275,182 @@ RTool::activities()
     }
 
     return dates;
+}
+
+SEXP
+RTool::dfForRideItem(const RideItem *ri)
+{
+    RideItem *item = const_cast<RideItem*>(ri);
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    int rides = rtool->context->athlete->rideCache->count();
+    int metrics = factory.metricCount();
+
+    // count the number of meta fields to add
+    int meta = 0;
+    if (rtool->context && rtool->context->athlete->rideMetadata()) {
+
+        // count active fields
+        foreach(FieldDefinition def, rtool->context->athlete->rideMetadata()->getFields()) {
+            if (def.name != "" && def.tab != "" && !rtool->context->specialFields.isSpecial(def.name) &&
+                !rtool->context->specialFields.isMetric(def.name))
+                meta++;
+        }
+    }
+
+    // just this ride !
+    rides = 1;
+
+    // get a listAllocated
+    SEXP ans;
+    SEXP names; // column names
+    SEXP rownames; // row names (numeric)
+
+    // +3 is for date and datetime and color
+    PROTECT(ans=Rf_allocList(metrics+meta+3));
+    PROTECT(names = Rf_allocVector(STRSXP, metrics+meta+3));
+
+    // we have to give a name to each row
+    PROTECT(rownames = Rf_allocVector(STRSXP, rides));
+    for(int i=0; i<rides; i++) {
+        QString rownumber=QString("%1").arg(i+1);
+        SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
+    }
+
+    // next name, nextS is next metric
+    int next=0;
+    SEXP nextS = ans;
+
+    // DATE
+    SEXP date;
+    PROTECT(date=Rf_allocVector(INTSXP, rides));
+    QDate d1970(1970,01,01);
+    INTEGER(date)[0] = d1970.daysTo(item->dateTime.date());
+
+    SEXP dclas;
+    PROTECT(dclas=Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(dclas, 0, Rf_mkChar("Date"));
+    Rf_classgets(date,dclas);
+
+    // add to the data.frame and give it a name
+    SETCAR(nextS, date); nextS=CDR(nextS);
+    SET_STRING_ELT(names, next++, Rf_mkChar("date"));
+
+    // TIME
+    SEXP time;
+    PROTECT(time=Rf_allocVector(REALSXP, rides));
+    REAL(time)[0] = item->dateTime.toUTC().toTime_t();
+
+    // POSIXct class
+    SEXP clas;
+    PROTECT(clas=Rf_allocVector(STRSXP, 2));
+    SET_STRING_ELT(clas, 0, Rf_mkChar("POSIXct"));
+    SET_STRING_ELT(clas, 1, Rf_mkChar("POSIXt"));
+    Rf_classgets(time,clas);
+
+    // we use "UTC" for all timezone
+    Rf_setAttrib(time, Rf_install("tzone"), Rf_mkString("UTC"));
+
+    // add to the data.frame and give it a name
+    SETCAR(nextS, time); nextS=CDR(nextS);
+    SET_STRING_ELT(names, next++, Rf_mkChar("time"));
+
+    // time + clas, but not ans!
+    UNPROTECT(4);
+
+    //
+    // METRICS
+    //
+    for(int i=0; i<factory.metricCount();i++) {
+
+        // set a vector
+        SEXP m;
+        PROTECT(m=Rf_allocVector(REALSXP, rides));
+
+        QString symbol = factory.metricName(i);
+        const RideMetric *metric = factory.rideMetric(symbol);
+        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        name = name.replace(" ","_");
+        name = name.replace("'","_");
+
+        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+        REAL(m)[0] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum());
+
+        // add to the list
+        SETCAR(nextS, m);
+        nextS = CDR(nextS);
+
+        // give it a name
+        SET_STRING_ELT(names, next, Rf_mkChar(name.toLatin1().constData()));
+
+        next++;
+
+        // vector
+        UNPROTECT(1);
+    }
+
+    //
+    // META
+    //
+    foreach(FieldDefinition field, rtool->context->athlete->rideMetadata()->getFields()) {
+
+        // don't add incomplete meta definitions or metric override fields
+        if (field.name == "" || field.tab == "" || rtool->context->specialFields.isSpecial(field.name) ||
+            rtool->context->specialFields.isMetric(field.name)) continue;
+
+        // Create a string vector
+        SEXP m;
+        PROTECT(m=Rf_allocVector(STRSXP, rides));
+        SET_STRING_ELT(m, 0, Rf_mkChar(item->getText(field.name, "").toLatin1().constData()));
+
+        // add to the list
+        SETCAR(nextS, m);
+        nextS = CDR(nextS);
+
+        // give it a name
+        SET_STRING_ELT(names, next, Rf_mkChar(field.name.replace(" ","_").toLatin1().constData()));
+
+        next++;
+
+        // vector
+        UNPROTECT(1);
+    }
+
+    // add Color
+    SEXP color;
+    PROTECT(color=Rf_allocVector(STRSXP, rides));
+
+    // apply item color, remembering that 1,1,1 means use default (reverse in this case)
+    if (item->color == QColor(1,1,1,1)) {
+
+        // use the inverted color, not plot marker as that hideous
+        QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+
+        // white is jarring on a dark background!
+        if (col==QColor(Qt::white)) col=QColor(127,127,127);
+
+        SET_STRING_ELT(color, 0, Rf_mkChar(col.name().toLatin1().constData()));
+    } else
+        SET_STRING_ELT(color, 0, Rf_mkChar(item->color.name().toLatin1().constData()));
+
+    // add to the list and name it
+    SETCAR(nextS, color);
+    nextS = CDR(nextS);
+    SET_STRING_ELT(names, next, Rf_mkChar("color"));
+    next++;
+
+    UNPROTECT(1);
+
+    // turn the list into a data frame + set column names
+    Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+    Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
+    Rf_namesgets(ans, names);
+
+    // ans + names
+    UNPROTECT(3);
+
+    // return it
+    return ans;
 }
 
 SEXP
@@ -1303,6 +1482,129 @@ RTool::activityMeanmax(SEXP pCompare)
 
             // get as a data frame
             ans = rtool->dfForActivityMeanmax(rtool->context->currentRideItem());
+            return ans;
+        }
+    }
+
+    // nothing to return
+    return Rf_allocVector(INTSXP, 0);
+}
+
+SEXP
+RTool::activityMetrics(SEXP pCompare)
+{
+    // a dataframe to return
+    SEXP ans=NULL;
+
+    // p1 - compare=TRUE|FALSE - return list of compare rides if active, or just current
+    pCompare = Rf_coerceVector(pCompare, LGLSXP);
+    bool compare = LOGICAL(pCompare)[0];
+
+    // return a list
+    if (compare && rtool->context) {
+
+
+        if (rtool->context->isCompareIntervals) {
+
+            // how many to return?
+            int count=0;
+            foreach(CompareInterval p, rtool->context->compareIntervals) if (p.isChecked()) count++;
+
+            // cool we can return a list of intervals to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, count));
+
+            // start at the front
+            SEXP nextS = list;
+
+            // a named list with data.frame 'activity' and color 'color'
+            SEXP namedlist;
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("metrics"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // create a data.frame for each and add to list
+            foreach(CompareInterval p, rtool->context->compareIntervals) {
+                if (p.isChecked()) {
+
+                    // create a named list
+                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+                    SEXP offset = namedlist;
+
+                    // add the ride
+                    SEXP df = rtool->dfForRideItem(p.rideItem);
+                    SETCAR(offset, df);
+                    offset=CDR(offset);
+
+                    // add the color
+                    SEXP color;
+                    PROTECT(color=Rf_allocVector(STRSXP, 1));
+                    SET_STRING_ELT(color, 0, Rf_mkChar(p.color.name().toLatin1().constData()));
+                    SETCAR(offset, color);
+
+                    // name them
+                    Rf_namesgets(namedlist, names);
+
+                    // add to back and move on
+                    SETCAR(nextS, namedlist);
+                    nextS=CDR(nextS);
+
+                    UNPROTECT(2);
+                }
+            }
+            UNPROTECT(2); // list and names
+
+            return list;
+
+        } else if(rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+
+            // just return a list of one ride
+            // cool we can return a list of intervals to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, 1));
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("metrics"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // named list of activity and color
+            SEXP namedlist;
+            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+            SEXP offset = namedlist;
+
+            // add the ride
+            SEXP df = rtool->dfForRideItem(rtool->context->currentRideItem());
+            SETCAR(offset, df);
+            offset=CDR(offset);
+
+            // add the color
+            SEXP color;
+            PROTECT(color=Rf_allocVector(STRSXP, 1));
+            SET_STRING_ELT(color, 0, Rf_mkChar("#FF00FF"));
+            SETCAR(offset, color);
+
+            // name them
+            Rf_namesgets(namedlist, names);
+
+            // add to back and move on
+            SETCAR(list, namedlist);
+            UNPROTECT(4);
+
+            return list;
+        }
+
+    } else if (!compare) { // not compare, so just return a dataframe
+
+        // access via global as this is a static function
+        if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+
+            // get as a data frame
+            ans = rtool->dfForRideItem(rtool->context->currentRideItem());
             return ans;
         }
     }
