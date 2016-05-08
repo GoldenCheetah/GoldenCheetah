@@ -59,7 +59,7 @@ class RTool {
         static SEXP season(SEXP all, SEXP compare);
         static SEXP metrics(SEXP all, SEXP compare);
         static SEXP seasonMeanmax(SEXP all, SEXP compare);
-        static SEXP seasonPeaks(SEXP all, SEXP series, SEXP duration);
+        static SEXP seasonPeaks(SEXP all, SEXP compare, SEXP series, SEXP duration);
         static SEXP pmc(SEXP all, SEXP metric);
 
         bool starting;
@@ -95,6 +95,7 @@ class RTool {
         SEXP dfForRideItem(const RideItem *i);                // returns metrics and meradata for an activity
         SEXP dfForDateRange(bool all, DateRange range); // returns metrics and metadata for a season
         SEXP dfForDateRangeMeanmax(bool all, DateRange range); // returns the meanmax for a season
+        SEXP dfForDateRangePeaks(bool all, DateRange range, QList<RideFile::SeriesType> series, QList<int> durations);
         SEXP dfForRideFileCache(RideFileCache *p);      // returns meanmax for a cache
 };
 
