@@ -105,15 +105,17 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
         }
     }
 
-    // Heartrate Zones
-    hrzones_ = new HrZones;
-    QFile hrzonesFile(home->config().canonicalPath() + "/hr.zones");
-    if (hrzonesFile.exists()) {
-        if (!hrzones_->read(hrzonesFile)) {
-            QMessageBox::critical(context->mainWindow, tr("HR Zones File Error"),
-				  hrzones_->errorString());
-        } else if (! hrzones_->warningString().isEmpty())
-            QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File"), hrzones_->warningString());
+    // Heartrate Zones for Bike & Run
+    for (int i=0; i < 2; i++) {
+        hrzones_[i] = new HrZones(i>0);
+        QFile hrzonesFile(home->config().canonicalPath() + "/" + hrzones_[i]->fileName());
+        if (hrzonesFile.exists()) {
+            if (!hrzones_[i]->read(hrzonesFile)) {
+                QMessageBox::critical(context->mainWindow, tr("HR Zones File %1 Error").arg(hrzones_[i]->fileName()), hrzones_[i]->errorString());
+            } else if (! hrzones_[i]->warningString().isEmpty()) {
+                QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File %1").arg(hrzones_[i]->fileName()), hrzones_[i]->warningString());
+            }
+        }
     }
 
     // Pace Zones for Run & Swim
@@ -235,7 +237,7 @@ Athlete::~Athlete()
     delete rideMetadata_;
     delete colorEngine;
     for (int i=0; i<2; i++) delete zones_[i];
-    delete hrzones_;
+    for (int i=0; i<2; i++) delete hrzones_[i];
     for (int i=0; i<2; i++) delete pacezones_[i];
     delete autoImportConfig;
     delete autoImport;
