@@ -63,12 +63,12 @@ public:
         seconds = 0;
 
         // get zone ranges
-        if (item->context->athlete->hrZones() && item->hrZoneRange >= 0 && item->ride()->areDataPresent()->hr) {
+        if (item->context->athlete->hrZones(item->isRun) && item->hrZoneRange >= 0 && item->ride()->areDataPresent()->hr) {
             // iterate and compute
             RideFileIterator it(item->ride(), spec);
             while (it.hasNext()) {
                 struct RideFilePoint *point = it.next();
-                if (item->context->athlete->hrZones()->whichZone(item->hrZoneRange, point->hr) == level)
+                if (item->context->athlete->hrZones(item->isRun)->whichZone(item->hrZoneRange, point->hr) == level)
                     seconds += item->ride()->recIntSecs();
             }
         }
