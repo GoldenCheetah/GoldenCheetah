@@ -468,7 +468,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const HrZones *zones = parent->context->athlete->hrZones();
+	const HrZones *zones = parent->context->athlete->hrZones(rideItem->isRun);
         int zone_range = -1;
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
@@ -519,7 +519,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const HrZones *zones = parent->context->athlete->hrZones();
+	const HrZones *zones = parent->context->athlete->hrZones(rideItem->isRun);
         int zone_range = -1;
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 

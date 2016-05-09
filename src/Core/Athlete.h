@@ -85,10 +85,10 @@ class Athlete : public QObject
 
         // zones
         const Zones *zones(bool isRun) const { return zones_[isRun]; }
-        const HrZones *hrZones() const { return hrzones_; }
+        const HrZones *hrZones(bool isRun) const { return hrzones_[isRun]; }
         const PaceZones *paceZones(bool isSwim) const { return pacezones_[isSwim]; }
         Zones *zones_[2];
-        HrZones *hrzones_;
+        HrZones *hrzones_[2];
         PaceZones *pacezones_[2];
         void setCriticalPower(int cp);
 
