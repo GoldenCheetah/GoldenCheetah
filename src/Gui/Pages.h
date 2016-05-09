@@ -867,20 +867,20 @@ class HrSchemePage : public QWidget
     G_OBJECT
 
 
-public:
-    HrSchemePage(HrZonePage *parent);
-    HrZoneScheme getScheme();
-    qint32 saveClicked();
+    public:
+        HrSchemePage(HrZones *hrZones);
+        HrZoneScheme getScheme();
+        qint32 saveClicked();
 
     public slots:
-    void addClicked();
-    void deleteClicked();
-    void renameClicked();
+        void addClicked();
+        void deleteClicked();
+        void renameClicked();
 
-private:
-    HrZonePage *zonePage;
-    QTreeWidget *scheme;
-    QPushButton *addButton, *renameButton, *deleteButton;
+    private:
+        HrZones *hrZones;
+        QTreeWidget *scheme;
+        QPushButton *addButton, *renameButton, *deleteButton;
 };
 
 
@@ -890,33 +890,35 @@ class LTPage : public QWidget
     G_OBJECT
 
 
-public:
-    LTPage(HrZonePage *parent);
+    public:
+        LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage);
 
     public slots:
-    void addClicked();
-    void editClicked();
-    void deleteClicked();
-    void defaultClicked();
-    void rangeEdited();
-    void rangeSelectionChanged();
-    void addZoneClicked();
-    void deleteZoneClicked();
-    void zonesChanged();
+        void addClicked();
+        void editClicked();
+        void deleteClicked();
+        void defaultClicked();
+        void rangeEdited();
+        void rangeSelectionChanged();
+        void addZoneClicked();
+        void deleteZoneClicked();
+        void zonesChanged();
 
-private:
-    bool active;
+    private:
+        bool active;
 
-    QDateEdit *dateEdit;
-    QDoubleSpinBox *ltEdit;
-    QDoubleSpinBox *restHrEdit;
-    QDoubleSpinBox *maxHrEdit;
+        QDateEdit *dateEdit;
+        QDoubleSpinBox *ltEdit;
+        QDoubleSpinBox *restHrEdit;
+        QDoubleSpinBox *maxHrEdit;
 
-    HrZonePage  *zonePage;
-    QTreeWidget *ranges;
-    QTreeWidget *zones;
-    QPushButton *addButton, *updateButton, *deleteButton;
-    QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
+        Context *context;
+        HrZones *hrZones;
+        HrSchemePage *schemePage;
+        QTreeWidget *ranges;
+        QTreeWidget *zones;
+        QPushButton *addButton, *updateButton, *deleteButton;
+        QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
 };
 
 class HrZonePage : public QWidget
@@ -925,30 +927,37 @@ class HrZonePage : public QWidget
     G_OBJECT
 
 
-public:
+    public:
 
-    HrZonePage(Context *);
-    qint32 saveClicked();
-
-    //ZoneScheme scheme;
-    HrZones zones;
-    quint16 b4Fingerprint; // how did it start ?
-
-    // Children talk to each other
-    HrSchemePage *schemePage;
-    LTPage *ltPage;
+        HrZonePage(Context *);
+        ~HrZonePage();
+        qint32 saveClicked();
 
     public slots:
 
 
-protected:
+    protected:
 
-    Context *context;
-    bool changed;
+        Context *context;
 
-    QTabWidget *tabs;
+        QTabWidget *tabs;
 
-    // local versions for modification
+    private:
+
+        static const int nSports = 2;
+
+        QLabel *sportLabel;
+        QComboBox *sportCombo;
+
+        HrZones *hrZones[nSports];
+        quint16 b4Fingerprint[nSports]; // how did it start ?
+        HrSchemePage *schemePage[nSports];
+        LTPage *ltPage[nSports];
+
+    private slots:
+        
+        void changeSport(int i);
+
 };
 
 //

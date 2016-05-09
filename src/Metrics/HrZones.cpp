@@ -53,6 +53,12 @@ void HrZones::initializeZoneParameters()
     sizeof(initial_zone_default) /
     sizeof(initial_zone_default[0]);
 
+    if (run) {
+        fileName_ = "run-hr.zones";
+    } else {
+        fileName_ = "hr.zones";
+    }
+
     scheme.zone_default.clear();
     scheme.zone_default_is_pct.clear();
     scheme.zone_default_desc.clear();
@@ -102,7 +108,7 @@ bool HrZones::read(QFile &file)
 
     // read using text mode takes care of end-lines
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        err = "can't open file";
+        err = tr("can't open %1 file").arg(fileName_);
         return false;
     }
     QTextStream fileStream(&file);
@@ -173,13 +179,13 @@ bool HrZones::read(QFile &file)
 
             // defaults are allowed only at the beginning of the file
             if (ranges.size()) {
-                err = "HR Zone defaults must be specified at head of hr.zones file";
+                err = tr("HR Zone defaults must be specified at head of %1 file").arg(fileName_);
                 return false;
             }
 
             // only one set of defaults is allowed
             if (scheme.nzones_default) {
-                err = "Only one set of zone defaults may be specified in hr.zones file";
+                err = tr("Only one set of zone defaults may be specified in %1 file").arg(fileName_);
                 return false;
             }
 
@@ -375,7 +381,7 @@ bool HrZones::read(QFile &file)
         }
 
         if (ranges[nr].lt <= 0) {
-            err = tr("LT must be greater than zero in zone range %1 of hr.zones").arg(nr + 1);
+            err = tr("LT must be greater than zero in zone range %1 of %2").arg(nr + 1).arg(fileName_);
             return false;
         }
 
@@ -697,7 +703,7 @@ void HrZones::write(QDir home)
     }
     }
 
-    QFile file(home.canonicalPath() + "/hr.zones");
+    QFile file(home.canonicalPath() + "/" + fileName_);
     if (file.open(QFile::WriteOnly))
     {
         QTextStream stream(&file);
@@ -707,7 +713,7 @@ void HrZones::write(QDir home)
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.setText(tr("Problem Saving Heartrate Zones"));
-        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(home.canonicalPath() + "/hr.zones"));
+        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(home.canonicalPath() + "/" + fileName_));
         msgBox.exec();
         return;
     }
