@@ -30,12 +30,8 @@
 #include <R_ext/Rdynload.h>
 #include <R_ext/RStartup.h>
 
-// names clash between R and Win8.1 Kit
-//#ifdef WIN32
-//#undef ERROR
-//#undef Realloc
-//#undef Free
-//#endif
+// remap R functions to use our QLibrary
+#include <RLibrary.h>
 
 #include <QString>
 #include <QStringList>
