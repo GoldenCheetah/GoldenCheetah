@@ -380,6 +380,9 @@ RChart::setState(QString)
 void
 RChart::runScript()
 {
+    // don't run until we can be seen!
+    if (!isVisible()) return;
+
     if (script->toPlainText() != "") {
 
         // run it !!
