@@ -38,9 +38,6 @@
 #include <QWaitCondition>
 #include <QMessageBox>
 
-
-
-
 // drag and drop passes urls ... convert to a list of files and call main constructor
 RideImportWizard::RideImportWizard(QList<QUrl> *urls, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
