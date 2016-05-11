@@ -36,6 +36,31 @@ extern void NORET GC_Rf_error(const char *, ...);
 extern void NORET GC_Rf_warning(const char *, ...);
 extern void GC_Rf_PrintValue(SEXP);
 extern DllInfo *GC_R_getEmbeddingDllInfo(void);
+extern int GC_R_registerRoutines(DllInfo *info, const R_CMethodDef * const croutines,
+                          const R_CallMethodDef * const callRoutines,
+                          const R_FortranMethodDef * const fortranRoutines,
+                          const R_ExternalMethodDef * const externalRoutines);
+#ifndef WIN32
+extern void (*GC_ptr_R_Suicide)(const char *);
+extern void (*GC_ptr_R_ShowMessage)(const char *);
+extern int  (*GC_ptr_R_ReadConsole)(const char *, unsigned char *, int, int);
+extern void (*GC_ptr_R_WriteConsole)(const char *, int);
+extern void (*GC_ptr_R_WriteConsoleEx)(const char *, int, int);
+extern void (*GC_ptr_R_ResetConsole)(void);
+extern void (*GC_ptr_R_FlushConsole)(void);
+extern void (*GC_ptr_R_ClearerrConsole)(void);
+extern void (*GC_ptr_R_Busy)(int);
+extern void (*GC_ptr_R_CleanUp)(SA_TYPE, int, int);
+extern int  (*GC_ptr_R_ChooseFile)(int, char *, int);
+extern int  (*GC_ptr_R_EditFile)(const char *);
+extern void (*GC_ptr_R_loadhistory)(SEXP, SEXP, SEXP, SEXP);
+extern void (*GC_ptr_R_savehistory)(SEXP, SEXP, SEXP, SEXP);
+extern void (*GC_ptr_R_addhistory)(SEXP, SEXP, SEXP, SEXP);
+extern int  (*GC_ptr_R_EditFiles)(int, const char **, const char **, const char *);
+extern void (*GC_ptr_R_ProcessEvents)();
+#endif
+extern FILE * GC_R_Outputfile;
+extern FILE * GC_R_Consolefile;
 
 // R Data
 extern SEXP GC_Rf_allocVector(SEXPTYPE, R_xlen_t);
@@ -62,10 +87,26 @@ extern SEXP GC_Rf_setAttrib(SEXP, SEXP, SEXP);
 extern Rboolean (GC_Rf_isNull)(SEXP s);
 const char *(GC_R_CHAR)(SEXP x);
 
+// Graphics Device
+#ifdef R_RGB // only redo graphics device if its included
+extern pGEDevDesc GC_GEcreateDevDesc(pDevDesc dev);
+extern void GC_GEaddDevice2(pGEDevDesc, const char *);
+extern void GC_Rf_onintr(void);
+extern int GC_R_GE_getVersion(void);
+extern void GC_R_CheckDeviceAvailable(void);
+extern Rboolean GC_R_interrupts_suspended;
+extern int GC_R_interrupts_pending;
+#endif
+
 // globals
 extern SEXP GC_R_GlobalEnv, GC_R_NilValue,
             GC_R_RowNamesSymbol, GC_R_ClassSymbol;
 extern double GC_R_NaReal;
+
+
+//
+// Map R functions to GC proxy to access QLibrary versions
+//
 
 // embedding
 #define R_dot_Last                  GC_R_dot_Last
@@ -82,7 +123,27 @@ extern double GC_R_NaReal;
 #define Rf_warning                  GC_Rf_warning
 #define Rf_PrintValue               GC_Rf_PrintValue
 #define R_getEmbeddingDllInfo       GC_R_getEmbeddingDllInfo
-
+#define ptr_R_Suicide               GC_ptr_R_Suicide
+#define ptr_R_ShowMessage           GC_ptr_R_ShowMessage
+#define ptr_R_ReadConsole           GC_ptr_R_ReadConsole
+#define ptr_R_WriteConsole          GC_ptr_R_WriteConsole
+#define ptr_R_WriteConsoleEx        GC_ptr_R_WriteConsoleEx
+#define ptr_R_ResetConsole          GC_ptr_R_ResetConsole
+#define ptr_R_FlushConsole          GC_ptr_R_FlushConsole
+#define ptr_R_ClearerrConsole       GC_ptr_R_ClearerrConsole
+#define ptr_R_Busy                  GC_ptr_R_Busy
+#define ptr_R_CleanUp               GC_ptr_R_CleanUp
+#define ptr_R_ShowFiles             GC_ptr_R_ShowFiles
+#define ptr_R_ChooseFile            GC_ptr_R_ChooseFile
+#define ptr_R_EditFile              GC_ptr_R_EditFile
+#define ptr_R_loadhistory           GC_ptr_R_loadhistory
+#define ptr_R_savehistory           GC_ptr_R_savehistory
+#define ptr_R_addhistory            GC_ptr_R_addhistory
+#define ptr_R_EditFiles             GC_ptr_R_EditFiles
+#define ptr_R_ProcessEvents         GC_ptr_R_ProcessEvents
+#define R_registerRoutines          GC_R_registerRoutines
+#define R_Consolefile               GC_R_Consolefile
+#define R_Outputfile                GC_R_Outputfile
 
 // data wrangling and manipulation
 #define Rf_allocVector              GC_Rf_allocVector
@@ -109,6 +170,15 @@ extern double GC_R_NaReal;
 #define INTEGER                     GC_INTEGER
 #define LOGICAL                     GC_LOGICAL
 #define R_CHAR                      GC_R_CHAR
+
+// Graphics device
+#define GEcreateDevDesc             GC_GEcreateDevDesc
+#define GEaddDevice2                GC_GEaddDevice2
+#define Rf_onintr                   GC_Rf_onintr
+#define R_GE_getVersion             GC_R_GE_getVersion
+#define R_CheckDeviceAvailable      GC_R_CheckDeviceAvailable
+#define R_interrupts_suspended      GC_R_interrupts_suspended
+#define R_interrupts_pending        GC_R_interrupts_pending
 
 // globals
 #define R_GlobalEnv                 GC_R_GlobalEnv

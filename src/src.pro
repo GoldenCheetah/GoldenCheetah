@@ -257,6 +257,7 @@ contains(DEFINES, "GC_WANT_R") {
 
         RCPPFLAGS =             $$system($$R_HOME/bin/R CMD config --cppflags)
         RLDFLAGS =              $$system($$R_HOME/bin/R CMD config --ldflags)
+        contains(DEFINES, "GC_WANT_R_DYNAMIC") { RLDFLAGS -= -lR }
         RBLAS =                 $$system($$R_HOME/bin/R CMD config BLAS_LIBS)
         RLAPACK =               $$system($$R_HOME/bin/R CMD config LAPACK_LIBS)
         LIBS +=         		$$RLDFLAGS $$RBLAS $$RLAPACK
@@ -281,6 +282,7 @@ contains(DEFINES, "GC_WANT_R") {
 
     ## For hardware accelerated scene rendering
     QT += opengl
+
 }
 
 ###====================
