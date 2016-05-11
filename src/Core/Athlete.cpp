@@ -102,6 +102,11 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
             } else if (! zones_[i]->warningString().isEmpty()) {
                 QMessageBox::warning(context->mainWindow, tr("Reading Zones File %1").arg(zones_[i]->fileName()), zones_[i]->warningString());
             }
+        } else if (i == 1) { // No running Power zones
+            // Start with Cycling Power zones for backward compatibilty
+            QFile zonesFile(home->config().canonicalPath() + "/" + zones_[0]->fileName());
+            // Load without error/warning report to avoid repetition
+            if (zonesFile.exists()) zones_[i]->read(zonesFile);
         }
     }
 
