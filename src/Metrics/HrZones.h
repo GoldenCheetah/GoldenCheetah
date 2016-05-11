@@ -88,6 +88,9 @@ class HrZones : public QObject
 
     private:
 
+        // Sport
+        bool run;
+
         // Scheme
         bool defaults_from_user;
         HrZoneScheme scheme;
@@ -96,12 +99,12 @@ class HrZones : public QObject
         QList<HrZoneRange> ranges;
 
         // utility
-        QString err, warning;
+        QString err, warning, fileName_;
         void setHrZonesFromLT(HrZoneRange &range);
 
     public:
 
-        HrZones() : defaults_from_user(false) {
+        HrZones(bool run=false) : run(run), defaults_from_user(false) {
                 initializeZoneParameters();
         }
 
@@ -118,6 +121,9 @@ class HrZones : public QObject
         // set zone parameters to either user-specified defaults
         // or to defaults using Coggan's coefficients
         void initializeZoneParameters();
+
+        // Sport
+        bool isRun() { return run; }
 
         //
         // Zone history - Ranges
@@ -162,6 +168,7 @@ class HrZones : public QObject
         //
         bool read(QFile &file);
         void write(QDir home);
+        const QString &fileName() const { return fileName_; }
         const QString &errorString() const { return err; }
         const QString &warningString() const { return warning; }
 

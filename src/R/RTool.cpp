@@ -31,15 +31,6 @@
 #include "WPrime.h"
 #include "Season.h"
 
-#include "Rinternals.h"
-#include "Rversion.h"
-
-// message i/o from to R
-#ifndef WIN32
-#define R_INTERFACE_PTRS
-#include <Rinterface.h>
-#endif
-
 RTool::RTool()
 {
     // setup the R runtime elements

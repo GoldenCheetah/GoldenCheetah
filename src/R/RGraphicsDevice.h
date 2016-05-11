@@ -24,14 +24,7 @@
 // across as a proxy and not offering any advanced capabilities
 //
 
-extern "C" {
-#include <Rinternals.h>
-
-#include <R_ext/Boolean.h>
-#include "R_ext/GraphicsEngine.h"
-#include "R_ext/GraphicsDevice.h"
-
-}
+#include "REmbed.h"
 
 #include <stdlib.h>
 #include <QDebug>
@@ -90,11 +83,11 @@ class RGraphicsDevice {
 
         // Device Creation and activation
         SEXP createGD();
-        SEXP activateGD();
         bool initialize();
         void setDeviceAttributes(pDevDesc pDev);
-        bool isActive();
-        bool makeActive();
+        //bool isActive();
+        //bool makeActive();
+        //SEXP activateGD();
 
         // utility functions
         double grconvert(double val, const std::string& type, const std::string& from, const std::string& to);

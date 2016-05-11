@@ -1663,19 +1663,19 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             //
             // LTHR, MaxHR, RHR
             //
-            int hrZoneRange = m->context->athlete->hrZones() ?
-                              m->context->athlete->hrZones()->whichRange(m->dateTime.date())
+            int hrZoneRange = m->context->athlete->hrZones(m->isRun) ?
+                              m->context->athlete->hrZones(m->isRun)->whichRange(m->dateTime.date())
                               : -1;
 
-            int LTHR = hrZoneRange != -1 ?  m->context->athlete->hrZones()->getLT(hrZoneRange) : 0;
-            int RHR = hrZoneRange != -1 ?  m->context->athlete->hrZones()->getRestHr(hrZoneRange) : 0;
-            int MaxHR = hrZoneRange != -1 ?  m->context->athlete->hrZones()->getMaxHr(hrZoneRange) : 0;
+            int LTHR = hrZoneRange != -1 ?  m->context->athlete->hrZones(m->isRun)->getLT(hrZoneRange) : 0;
+            int RHR = hrZoneRange != -1 ?  m->context->athlete->hrZones(m->isRun)->getRestHr(hrZoneRange) : 0;
+            int MaxHR = hrZoneRange != -1 ?  m->context->athlete->hrZones(m->isRun)->getMaxHr(hrZoneRange) : 0;
 
             //
             // CV' D'
             //
-            int paceZoneRange = m->context->athlete->paceZones(false) ?
-                                m->context->athlete->paceZones(false)->whichRange(m->dateTime.date()) :
+            int paceZoneRange = m->context->athlete->paceZones(m->isSwim) ?
+                                m->context->athlete->paceZones(m->isSwim)->whichRange(m->dateTime.date()) :
                                 -1;
 
             double CV = (paceZoneRange != -1) ? m->context->athlete->paceZones(false)->getCV(paceZoneRange) : 0.0;

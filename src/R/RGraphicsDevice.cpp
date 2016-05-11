@@ -17,6 +17,8 @@
  */
 
 #include "RTool.h"
+
+// graphics device
 #include "RGraphicsDevice.h"
 
 #include "Settings.h"
@@ -404,6 +406,7 @@ SEXP RGraphicsDevice::createGD()
     return R_NilValue;
 }
 
+#if 0
 // ensure that our device is created and active (required for snapshot
 // creation/restoration)
 bool RGraphicsDevice::makeActive()
@@ -421,14 +424,16 @@ bool RGraphicsDevice::isActive()
 {
     return gcGEDevDesc != NULL && Rf_ndevNumber(gcGEDevDesc->dev) == Rf_curDevice();
 }
+#endif
 
-
+#if 0
 SEXP RGraphicsDevice::activateGD()
 {
     bool success = makeActive();
     if (!success) qDebug()<<"make active failed";
     return R_NilValue;
 }
+#endif
 
 double RGraphicsDevice::grconvert(double val, const std::string& , const std::string& , const std::string& )
 {
