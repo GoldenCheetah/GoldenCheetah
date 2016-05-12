@@ -146,7 +146,7 @@ RideMapWindow::mapTypeSelected(int x)
 }
 
 void
-RideMapWindow::showMarkersChanged(int value)
+RideMapWindow::showMarkersChanged(int /* unused_value */)
 {
     forceReplot();
 }

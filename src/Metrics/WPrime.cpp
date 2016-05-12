@@ -482,14 +482,14 @@ WPrime::setErg(ErgFile *input)
     CP = 250; // defaults
     WPRIME = 20000;
 
-    if (input->context->athlete->zones(false)) {
-        int zoneRange = input->context->athlete->zones(false)->whichRange(QDate::currentDate());
-        CP = zoneRange >= 0 ? input->context->athlete->zones(false)->getCP(zoneRange) : 250;
-        WPRIME = zoneRange >= 0 ? input->context->athlete->zones(false)->getWprime(zoneRange) : 20000;
+    if (input->GetContext()->athlete->zones(false)) {
+        int zoneRange = input->GetContext()->athlete->zones(false)->whichRange(QDate::currentDate());
+        CP = zoneRange >= 0 ? input->GetContext()->athlete->zones(false)->getCP(zoneRange) : 250;
+        WPRIME = zoneRange >= 0 ? input->GetContext()->athlete->zones(false)->getWprime(zoneRange) : 20000;
     }
 
     // no data or no power data then forget it.
-    bool bydist = (input->format == CRS) ? true : false;
+    bool bydist = (input->GetFormat() == ErgFile::ErgFileFormat::CrsFormat) ? true : false;
     if (!input->isValid() || bydist) {
         return; // needs to be a valid erg file...
     }
@@ -498,7 +498,7 @@ WPrime::setErg(ErgFile *input)
 
     if (integral) {
 
-        last = input->Duration / 1000; 
+        last = input->GetDuration() / 1000;
         values.resize(last);
         xvalues.resize(last);
 
@@ -522,7 +522,7 @@ WPrime::setErg(ErgFile *input)
             } else EXP += value; // total expenditure above CP
         }
 
-        TAU = appsettings->cvalue(input->context->athlete->cyclist, GC_WBALTAU, 300).toInt();
+        TAU = appsettings->cvalue(input->GetContext()->athlete->cyclist, GC_WBALTAU, 300).toInt();
 
         // lets run forward from 0s to end of ride
         values.resize(last+1);
@@ -553,7 +553,7 @@ WPrime::setErg(ErgFile *input)
     } else {
 
         // how many points ?
-        last = input->Duration / 1000; 
+        last = input->GetDuration() / 1000;
         values.resize(last);
         xvalues.resize(last);
 
