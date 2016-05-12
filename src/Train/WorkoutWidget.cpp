@@ -1413,7 +1413,7 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
     points_.clear();
 
     // we suport ERG but not MRC/CRS currently
-    if (ergFile && (ergFile->format == MRC || ergFile->format == ERG)) {
+    if (ergFile && (ergFile->format == MrcFormat || ergFile->format == ErgFormat)) {
 
         this->ergFile = ergFile;
 

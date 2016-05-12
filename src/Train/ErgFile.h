@@ -32,11 +32,18 @@
 #include <QTextEdit>
 #include <QRegExp>
 #include "Zones.h"      // For zones ... see below vvvv
+#include "ErgFileEnums.h"
 
 class ErgFilePoint
 {
     friend class ErgFile;
-    public:
+    friend class ErgFileData;
+    friend class ErgFilePlot;
+    friend class TrainSidebar;
+    friend class WorkoutPlotWindow;
+    friend class WorkoutWidget;
+
+public:
 
         ErgFilePoint() : x(0), y(0), val(0) {}
         ErgFilePoint(double x, double y, double val) : x(x), y(y), val(val) {}
@@ -50,6 +57,8 @@ class ErgFilePoint
 class ErgFileSection
 {
     friend class ErgFile;
+    friend class ErgFileData;
+    friend class ErgFilePlot;
     public:
         ErgFileSection() : duration(0), start(0), end(0) {}
         ErgFileSection(int duration, int start, int end) : duration(duration), start(start), end(end) {}
@@ -62,6 +71,8 @@ class ErgFileSection
 class ErgFileText
 {
     friend class ErgFile;
+    friend class ErgFileData;
+    friend class ErgFilePlot;
     public:
         ErgFileText() : x(0), pos(0), text("") {}
         ErgFileText(double x, int pos, QString text) : x(x), pos(pos), text(text) {}
@@ -75,6 +86,10 @@ class ErgFileText
 class ErgFileLap
 {
     friend class ErgFile;
+    friend class ErgFileData;
+    friend class ErgFilePlot;
+    friend class WorkoutWidget;
+
     protected:
         long x;     // when does this LAP marker occur? (time in msecs or distance in meters
         int LapNum;     // from 1 - n
@@ -84,30 +99,20 @@ class ErgFileLap
 
 class ErgFile
 {
-    public:
 
-        enum ErgSection {
-            NomanslandSection,
-            SettingsSection,
-            DataSection,
-            EndSection
-        };
-        
-        enum ErgMode {
-            ERG,
-            MRC,
-            CRS,
-            
-            NOMODESET = 99
-        };
-        
-        enum class ErgFileFormat : unsigned int {
-            ErgFormat,
-            CrsFormat,
-            MrcFormat
-        };
+    /** these are offenders to not using public accessors and should change */
+    friend class ErgFilePlot;
+    friend class ErgFileData;
+    friend class NowData;
+    friend class TrainDB;
+    friend class TrainSidebar;
+    friend class WorkoutPlotWindow;
+    friend class WorkoutWidget;
+    friend class WorkoutWindow;
+
+    public:
     
-        ErgFile(QString filename, enum ErgMode mode, Context *context); // constructor uses filename
+        ErgFile(QString filenameOnDisk, ErgFileMode mode, Context *context); // constructor uses filename
         ErgFile(Context *context); // no filename, going to use a string
 
         virtual ~ErgFile();             // delete the contents
@@ -135,13 +140,13 @@ class ErgFile
 
         void calculateMetrics(); // calculate NP value for ErgFile
         long GetDuration() const;
-        enum ErgFileFormat GetFormat();
+        ErgFileFormat GetFormat();
         Context* GetContext();
         
     private:
         double Cp;
-        enum ErgFileFormat format;             // ERG, CRS or MRC currently supported
-        enum ErgMode mode;
+        ErgFileFormat format;             // ERG, CRS or MRC currently supported
+        ErgFileMode mode;
         long    Duration;       // Duration of this workout in msecs
         int     Ftp;            // FTP this file was targetted at
         int     MaxWatts;       // maxWatts in this ergfile (scaling)
@@ -154,13 +159,13 @@ class ErgFile
         QList<ErgFileLap>   Laps;      // interval markers in the file
         QList<ErgFileText>  Texts;     // texts to display
         QString Version,        // version number / identifer
-        Units,          // units used
-        Filename,       // filename from inside file
-        filename,       // filename on disk
-        Name,           // description in file
-        Description,    // long narrative for workout
-        ErgDBId,        // if downloaded from ergdb
-        Source;         // where did this come from
+            Units,          // units used
+            filenameInsideFile,       // filename from inside file
+            filenameOnDisk,       // filename on disk
+            Name,           // description in file
+            Description,    // long narrative for workout
+            ErgDBId,        // if downloaded from ergdb
+            Source;         // where did this come from
         QStringList Tags;       // tagged strings
 
         // Metrics for this workout
@@ -172,8 +177,6 @@ class ErgFile
     
     protected:
         Context *context;
-    
-    
 };
 
 #endif

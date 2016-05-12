@@ -25,13 +25,16 @@
 #include <QString>
 #include <QApplication>
 
+#include "ErgFileEnums.h"
+
+
 class RealtimeData
 {
     Q_DECLARE_TR_FUNCTIONS(RealtimeData)
 
 public:
 
-    int mode;
+    ErgFileMode mode;
 
     // abstract to dataseries
     enum dataseries { None=0, Time, LapTime, Distance, Lap,

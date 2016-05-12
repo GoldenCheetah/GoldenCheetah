@@ -66,8 +66,11 @@ class VideoSyncCourseInfo
 
 class VideoSyncFile
 {
+    friend class VideoWindow;
+    friend class TrainSidebar;
+
     public:
-        VideoSyncFile(QString, int&, Context *context);       // constructor uses filename
+        VideoSyncFile(QString, Context *context);       // constructor uses filename
         VideoSyncFile(Context *context); // no filename, going to use a string
 
         ~VideoSyncFile();             // delete the contents
@@ -77,7 +80,7 @@ class VideoSyncFile
         void reload();          // reload after messed about
         void parseRLV();         // its a rlv file
         bool isValid();         // is the file valid or not?
-
+    private:
         double VideoFrameRate;
 
         int format;             // RLV or GPX currently supported

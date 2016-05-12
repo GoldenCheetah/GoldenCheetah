@@ -52,6 +52,8 @@
 #include "RideItem.h"
 #include "Units.h" // for MILES_PER_KM
 #include "Settings.h" // for GC_WBALFORM
+#include "ErgFile.h"
+#include "ErgFileEnums.h"
 
 #if notyet
 const double WprimeMultConst = 1.0;
@@ -489,7 +491,7 @@ WPrime::setErg(ErgFile *input)
     }
 
     // no data or no power data then forget it.
-    bool bydist = (input->GetFormat() == ErgFile::ErgFileFormat::CrsFormat) ? true : false;
+    bool bydist = (input->GetFormat() == CrsFormat) ? true : false;
     if (!input->isValid() || bydist) {
         return; // needs to be a valid erg file...
     }

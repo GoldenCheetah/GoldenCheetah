@@ -331,7 +331,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     recordFile = NULL;
     status = 0;
     setStatusFlags(RT_MODE_ERGO);         // ergo mode by default
-    mode = ERG;
+    mode = ErgMode;
     pendingConfigChange = false;
 
     displayWorkoutLap = displayLap = 0;
@@ -738,7 +738,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
         // ergo mode
         context->notifyErgFileSelected(NULL);
         ergFile=NULL;
-        mode = ERG;
+        mode = ErgMode;
         setLabels();
         clearStatusFlags(RT_WORKOUT);
         //ergPlot->setVisible(false);
@@ -746,7 +746,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
         // slope mode
         context->notifyErgFileSelected(NULL);
         ergFile=NULL;
-        mode = CRS;
+        mode = CrsMode;
         setLabels();
         clearStatusFlags(RT_WORKOUT);
         //ergPlot->setVisible(false);
@@ -772,14 +772,14 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
             ergFile = NULL;
             context->notifyErgFileSelected(NULL);
             removeInvalidWorkout();
-            mode = ERG;
+            mode = ErgMode;
             clearStatusFlags(RT_WORKOUT);
             setLabels();
         }
     }
 
     // set the device to the right mode
-    if (mode == ERG || mode == MRC) {
+    if (mode == ErgMode || mode == MrcMode) {
         setStatusFlags(RT_MODE_ERGO);
         clearStatusFlags(RT_MODE_SPIN);
 
@@ -1011,7 +1011,7 @@ TrainSidebar::videosyncTreeWidgetSelectionChanged()
         // None menu entry
         context->notifyVideoSyncFileSelected(NULL);
     } else {
-        videosyncFile = new VideoSyncFile(filename, mode, context);
+        videosyncFile = new VideoSyncFile(filename, context);
         if (videosyncFile->isValid()) {
             context->notifyVideoSyncFileSelected(videosyncFile);
         } else {
@@ -1102,7 +1102,7 @@ void TrainSidebar::Start()       // when start button is pressed
         load = 100;
         slope = 0.0;
 
-        if (mode == ERG || mode == MRC) {
+        if (mode == ErgMode || mode == MrcMode) {
             setStatusFlags(RT_MODE_ERGO);
             clearStatusFlags(RT_MODE_SPIN);
             foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_ERGO);
@@ -1934,7 +1934,7 @@ void TrainSidebar::adjustIntensity(int value)
                     add.val = last.val / from * to;
 
                     // recalibrate altitude if gradient changing
-                    if (context->currentErgFile()->format == CRS) add.y = last.y + ((add.x-last.x) * (add.val/100));
+                    if (context->currentErgFile()->format == CrsFormat) add.y = last.y + ((add.x-last.x) * (add.val/100));
                     else add.y = add.val;
 
                     context->currentErgFile()->Points.insert(i, add);
@@ -1950,7 +1950,7 @@ void TrainSidebar::adjustIntensity(int value)
 
             // recalibrate altitude if in CRS mode
             p->val = p->val / from * to;
-            if (context->currentErgFile()->format == CRS) {
+            if (context->currentErgFile()->format == CrsFormat) {
                 if (i) p->y = last.y + ((p->x-last.x) * (last.val/100));
             }
             else p->y = p->val;

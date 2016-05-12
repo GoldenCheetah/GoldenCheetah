@@ -26,6 +26,7 @@
 #include "DeviceConfiguration.h"
 #include "DeviceTypes.h"
 #include "ErgFile.h"
+#include "ErgFileEnums.h"
 #include "VideoSyncFile.h"
 #include "ErgFilePlot.h"
 #include "GcSideBarItem.h"
@@ -268,7 +269,7 @@ class TrainSidebar : public GcWindow
         bool pendingConfigChange;
 
     public:
-        int mode;
+        ErgFileMode mode;
         // everyone else wants this
         QCheckBox   *recordSelector;
         QSharedPointer<QFileSystemWatcher> watcher;

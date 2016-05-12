@@ -159,7 +159,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         }
 
         // if we have a target load and erg mode then red background if not on target...
-        if (series == RealtimeData::Watts && (rtData.mode == ERG || rtData.mode == MRC) && rtData.getLoad() > 0) {
+        if (series == RealtimeData::Watts && (rtData.mode == ErgMode || rtData.mode == MrcMode) && rtData.getLoad() > 0) {
 
             // background for power, if we have a target load
             double load=rtData.getLoad();
@@ -455,7 +455,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::Load:
-        if (rtData.mode == ERG || rtData.mode == MRC) {
+        if (rtData.mode == ErgMode || rtData.mode == MrcMode) {
             value = rtData.getLoad();
             valueLabel->setText(QString("%1").arg(round(value)));
         } else {

@@ -18,6 +18,7 @@
  */
 
 #include "RealtimeData.h"
+#include "ErgFile.h"
 
 #include <QtDebug>
 

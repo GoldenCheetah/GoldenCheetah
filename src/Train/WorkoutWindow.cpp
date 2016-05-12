@@ -446,12 +446,12 @@ WorkoutWindow::saveAs()
     // all the metadata in the file.
     newergFile->Version = "2.0";
     newergFile->Units = "";
-    newergFile->Filename = QFileInfo(filename).fileName();
-    newergFile->filename = filename;
+    newergFile->filenameInsideFile = QFileInfo(filename).fileName();
+    newergFile->filenameOnDisk = filename;
     newergFile->Name = "New Workout";
     newergFile->Ftp = newergFile->CP;
     newergFile->valid = true;
-    newergFile->format = ERG; // default to couse until we know
+    newergFile->format = ErgFormat; // default to couse until we know
 
     // if we're save as from an existing keep all the data
     // EXCEPT filename, which has just been changed!
