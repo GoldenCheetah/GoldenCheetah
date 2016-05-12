@@ -89,6 +89,7 @@ class ErgFileLap
     friend class ErgFileData;
     friend class ErgFilePlot;
     friend class WorkoutWidget;
+    friend class WWLap;
 
     protected:
         long x;     // when does this LAP marker occur? (time in msecs or distance in meters
@@ -109,6 +110,7 @@ class ErgFile
     friend class WorkoutPlotWindow;
     friend class WorkoutWidget;
     friend class WorkoutWindow;
+    friend class WorkoutWidgetItems;
 
     public:
     

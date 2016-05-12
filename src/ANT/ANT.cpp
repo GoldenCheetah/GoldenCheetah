@@ -110,7 +110,7 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString athlete) : QThre
 
     // current and desired modes/load/gradients
     // set so first time through current != desired
-    currentMode = 0;
+    currentMode = NoMode;
     mode = RT_MODE_ERGO;
     currentLoad = 0;
     load = 100; // always set to something
@@ -359,9 +359,6 @@ ANT::setGradient(double gradient)
 void
 ANT::setMode(int mode)
 {
-    if (this->mode == mode) return;
-
-    // mode changed
     this->mode = mode;
 }
 
@@ -373,24 +370,6 @@ ANT::kickrCommand()
 
     // mode changed ?
     if (currentMode != mode) {
-
-        switch(mode) {
-        case RT_MODE_ERGO : // do nothing, just start sending ergo commands below
-            {
-            }
-           break;
-
-        case RT_MODE_SPIN : // need to setup for "sim" mode, so sending lots of
-                            // config to overcome the default values
-            {
-            }
-            break;
-
-        case RT_MODE_CALIBRATE : // ??? maybe ???
-            //qDebug()<<"A: setup calib mode";
-            break;
-        }
-
         currentMode = mode;
         currentLoad = load;
         currentGradient = gradient;
@@ -583,7 +562,7 @@ void
 ANT::getRealtimeData(RealtimeData &rtData)
 {
     rtData = telemetry;
-    rtData.mode = mode;
+    rtData.mode = (ErgFileMode)mode;
     rtData.setLoad(load);
     rtData.setSlope(gradient);
 }

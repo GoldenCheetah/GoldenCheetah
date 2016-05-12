@@ -20,6 +20,12 @@
 #include "DialWindow.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "Zones.h" // for data series types
+#include "RideFile.h" // for data series types
+#include "ErgFile.h" // for workout modes
+#include "Settings.h" // for realtimedata structure
+#include "Units.h" // for realtimedata structure
+#include "Colors.h" // for realtimedata structure
 
 DialWindow::DialWindow(Context *context) :
     GcWindow(context), context(context), average(1), isNewLap(false)
