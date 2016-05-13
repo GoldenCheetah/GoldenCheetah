@@ -36,6 +36,7 @@
 #include <R_ext/Parse.h>
 #include <R_ext/Rdynload.h>
 #include <R_ext/RStartup.h>
+#include <R_ext/Error.h>
 
 #include <R_ext/Boolean.h>
 #include "R_ext/GraphicsEngine.h"
@@ -43,8 +44,6 @@
 
 // remap
 #include "RLibrary.h"
-// remap R functions to use our QLibrary
-#include <RLibrary.h>
 
 #include <QString>
 #include <QStringList>

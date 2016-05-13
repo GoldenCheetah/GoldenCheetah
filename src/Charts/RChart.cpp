@@ -16,7 +16,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "R.h"
 #include "RTool.h"
 #include "RChart.h"
 #include "RSyntax.h"

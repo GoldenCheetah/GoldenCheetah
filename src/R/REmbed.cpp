@@ -67,6 +67,11 @@ REmbed::REmbed(const bool verbose, const bool interactive) : verbose(verbose), i
 {
     loaded = false;
 
+#ifdef GC_WANT_R_DYNAMIC
+    RLibrary rlib;
+    if (!rlib.load()) return;
+#endif
+
     // we need to tell embedded R where to work
     QString envR_HOME(getenv("R_HOME"));
     QString configR_HOME = appsettings->value(NULL,GC_R_HOME,"").toString();
@@ -145,7 +150,7 @@ int REmbed::parseEval(QString line, SEXP & ans) {
         return 1;
         break;
     case PARSE_ERROR:
-        if (verbose) Rf_warning("Parse Error: \"%s\"\n", line.toStdString().c_str());
+        if (verbose) Rf_error("Parse Error: \"%s\"\n", line.toStdString().c_str());
         UNPROTECT(2);
         program.clear();
         return 1;
