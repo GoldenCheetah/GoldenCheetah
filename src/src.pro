@@ -255,16 +255,23 @@ contains(DEFINES, "GC_WANT_R") {
 
     } else {
 
-        RCPPFLAGS =             $$system($$R_HOME/bin/R CMD config --cppflags)
-        RLDFLAGS =              $$system($$R_HOME/bin/R CMD config --ldflags)
-        contains(DEFINES, "GC_WANT_R_DYNAMIC") { RLDFLAGS -= -lR }
-        RBLAS =                 $$system($$R_HOME/bin/R CMD config BLAS_LIBS)
-        RLAPACK =               $$system($$R_HOME/bin/R CMD config LAPACK_LIBS)
-        LIBS +=         		$$RLDFLAGS $$RBLAS $$RLAPACK
+        contains(DEFINES, "GC_WANT_R_DYNAMIC") {
+
+            # don't link libs, we load dynamically at runtime
+            RCPPFLAGS =             -I$$R_HOME/include
+
+        } else {
+
+            RCPPFLAGS =             $$system($$R_HOME/bin/R CMD config --cppflags)
+            RLDFLAGS =              $$system($$R_HOME/bin/R CMD config --ldflags)
+            RBLAS =                 $$system($$R_HOME/bin/R CMD config BLAS_LIBS)
+            RLAPACK =               $$system($$R_HOME/bin/R CMD config LAPACK_LIBS)
+            LIBS +=         		$$RLDFLAGS $$RBLAS $$RLAPACK
+        }
     }
 
     ## compiler etc settings used in default make rules
-    QMAKE_CXXFLAGS +=       $$RCPPWARNING $$RCPPFLAGS
+    QMAKE_CXXFLAGS +=       $$RCPPFLAGS
 
     ## R has lots of compatibility headers for S and legacy R code
     ## we don't want that -- our code is shiny and new.
