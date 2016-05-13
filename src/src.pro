@@ -258,7 +258,7 @@ contains(DEFINES, "GC_WANT_R") {
         contains(DEFINES, "GC_WANT_R_DYNAMIC") {
 
             # don't link libs, we load dynamically at runtime
-            RCPPFLAGS =             -I$$R_HOME/include
+            RCPPFLAGS =             $$system($$R_HOME/bin/R CMD config --cppflags)
 
         } else {
 
