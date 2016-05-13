@@ -101,6 +101,8 @@ struct FitFileReaderState
     int last_event_type;
     int last_event;
     int last_msg_type;
+    double frac_time; // to carry sub-second length time in pool swimming
+    double last_lap_end; // to align laps for drill mode in pool swimming
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
 
@@ -108,7 +110,8 @@ struct FitFileReaderState
         file(file), errors(errors), rideFile(NULL), start_time(0),
         last_time(0), last_distance(0.00f), interval(0), calibration(0),
         devices(0), stopped(true), isLapSwim(false), pool_length(0.0),
-        last_event_type(-1), last_event(-1), last_msg_type(-1)
+        last_event_type(-1), last_event(-1), last_msg_type(-1), frac_time(0.0),
+        last_lap_end(0.0)
     {}
 
     struct TruncatedRead {};
@@ -436,7 +439,8 @@ struct FitFileReaderState
                     break;
                 case 44: // pool_length
                     pool_length = value / 100000.0;
-                    if (LAPSWIM_DEBUG) qDebug() << "Pool length" << pool_length;
+                    rideFile->setTag("Pool Length", // in meters
+                                      QString("%1").arg(pool_length*1000.0));
                     break;
 
                 // other fields are ignored at present
@@ -663,7 +667,6 @@ struct FitFileReaderState
             time = last_time;
         int i = 0;
         time_t this_start_time = 0;
-        ++interval;
         double total_elapsed_time = 0.0;
         double total_distance = 0.0;
         if (FIT_DEBUG)  {
@@ -689,7 +692,7 @@ struct FitFileReaderState
                     this_start_time = value.v + qbase_time.toTime_t();
                     break;
                 case 7:
-                    total_elapsed_time = round(value.v / 1000.0);
+                    total_elapsed_time = value.v / 1000.0;
                     break;
                 case 9:
                     total_distance = value.v / 100000.0;
@@ -721,8 +724,8 @@ struct FitFileReaderState
                 default: ; // ignore it
             }
         }
-        if (LAPSWIM_DEBUG) qDebug() << "Lap" << interval << this_start_time - start_time << total_elapsed_time
-                                    << time - this_start_time << total_distance;
+        // don't count pauses for lap swimming
+        if (!isLapSwim || total_distance > 0) ++interval;
         if (this_start_time == 0 || this_start_time-start_time < 0) {
             //errors << QString("lap %1 has invalid start time").arg(interval);
             this_start_time = start_time; // time was corrected after lap start
@@ -734,9 +737,15 @@ struct FitFileReaderState
         }
         if (rideFile->dataPoints().count()) { // no samples means no laps..
             if (isLapSwim && total_elapsed_time > 0.0) {
-                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time,
-                                      this_start_time - start_time + total_elapsed_time,
+                if (last_lap_end == 0.0)
+                    last_lap_end = this_start_time - start_time - 1;
+                if (LAPSWIM_DEBUG) qDebug() << (total_distance > 0 ? "Lap" : "Rest") << interval << this_start_time - start_time << time - this_start_time << "+" << last_lap_end << total_elapsed_time << total_distance;
+                if (total_distance > 0) // skip pauses to avoid cluttering
+                    rideFile->addInterval(RideFileInterval::DEVICE,
+                                      round(last_lap_end),
+                                      last_lap_end + total_elapsed_time,
                                       QObject::tr("Lap %1").arg(interval));
+                last_lap_end += total_elapsed_time;
             } else {
                 rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time,
                                       QObject::tr("Lap %1").arg(interval));
@@ -1106,7 +1115,7 @@ struct FitFileReaderState
                             time = last_time;
                         break;
                 case 3: // total elapsed time
-                        length_duration = value / 1000;
+                        length_duration = value / 1000.0;
                         break;
                 case 4: // total timer time
                         if (FIT_DEBUG) qDebug() << " total_timer_time:" << value;
@@ -1149,6 +1158,13 @@ struct FitFileReaderState
             QDateTime t;
             t.setTime_t(start_time);
             rideFile->setStartTime(t);
+            rideFile->appendPoint(0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                  0, 0, 0, RideFile::NA,
+                                  0, 0, 0, 0, 0,
+                                  0, 0,
+                                  0, 0, 0, 0,
+                                  0, 0, 0, 0,
+                                  0, 0, 0, 0, 0, 0.0, 0);
         }
 
         double secs = time - start_time;
@@ -1168,7 +1184,13 @@ struct FitFileReaderState
         // another pool length or pause
         km = last_distance + (length_type ? pool_length : 0.0);
 
-        if ((secs > last_time + 1) && (isGarminSmartRecording.toInt() != 0) && (secs - last_time < 10*GarminHWM.toInt())) {
+        // Adjust length duration using fractional carry
+        length_duration += frac_time;
+        frac_time = modf(length_duration, &length_duration);
+
+        // No rest lengths for Garmin F910XT, add pause time
+        if ((rideFile->deviceType() == "Garmin FR910XT") &&
+            (secs > last_time + 1) && (isGarminSmartRecording.toInt() != 0) && (secs - last_time < 100*GarminHWM.toInt())) {
             double deltaSecs = secs - last_time;
             if (LAPSWIM_DEBUG) qDebug() << "Pause" << last_time+1 << deltaSecs;
             for (int i = 1; i <= deltaSecs; i++) {
@@ -1189,10 +1211,10 @@ struct FitFileReaderState
             last_time += deltaSecs;
         }
 
-        // only fill 10x the maximal smart recording gap defined
+        // only fill 100x the maximal smart recording gap defined
         // in preferences - we don't want to crash / stall on bad
         // or corrupt files
-        if ((isGarminSmartRecording.toInt() != 0) && length_duration > 0 && length_duration < 10*GarminHWM.toInt()) {
+        if ((isGarminSmartRecording.toInt() != 0) && length_duration > 0 && length_duration < 100*GarminHWM.toInt()) {
             double deltaSecs = length_duration;
             double deltaDist = km - last_distance;
             kph = 3600.0 * deltaDist / deltaSecs;
