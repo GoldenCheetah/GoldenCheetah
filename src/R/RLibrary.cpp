@@ -17,6 +17,7 @@
  */
 
 #ifdef GC_WANT_R_DYNAMIC
+#define R_NO_REMAP
 #include <R.h>
 #include <Rinternals.h>
 #include <R_ext/RStartup.h>
@@ -25,82 +26,348 @@
 #include <R_ext/GraphicsEngine.h>
 #include <R_ext/GraphicsDevice.h>
 
+#include "RLibrary.h"
+#include "Settings.h"
+
+#include <QLibrary>
+#include <QFile>
+
+//
+// FUNCTION SIGNATURES
+//
+// Typdefs for each of the functions to get the right signature to
+// cast from the (*void)() signature returned by QLibrary::resolve()
+//
 // R Embedding methods
-void GC_R_dot_Last(void){ }
-void GC_R_RunExitFinalizers(void){ }
-void GC_R_CleanTempDir(void){ }
-int  GC_Rf_initEmbeddedR(int argc, char *argv[]){ }
-void GC_Rf_endEmbeddedR(int fatal){ }
-void GC_R_ReplDLLinit(void){ }
-void GC_R_DefParams(Rstart){ }
-void GC_R_SetParams(Rstart){ }
-SEXP GC_R_tryEval(SEXP, SEXP, int *){ }
-void NORET GC_Rf_error(const char *, ...){ }
-void NORET GC_Rf_warning(const char *, ...){ }
-void GC_Rf_PrintValue(SEXP) { }
-DllInfo *GC_R_getEmbeddingDllInfo(void) { }
-int GC_R_registerRoutines(DllInfo *info, const R_CMethodDef * const croutines,
-                          const R_CallMethodDef * const callRoutines,
-                          const R_FortranMethodDef * const fortranRoutines,
-                          const R_ExternalMethodDef * const externalRoutines) { }
+typedef void (*Prot_GC_R_dot_Last)(void);
+typedef void (*Prot_GC_R_RunExitFinalizers)(void);
+typedef void (*Prot_GC_R_CleanTempDir)(void);
+typedef int  (*Prot_GC_Rf_initEmbeddedR)(int argc, char *argv[]);
+typedef void (*Prot_GC_Rf_endEmbeddedR)(int fatal);
+typedef void (*Prot_GC_R_ReplDLLinit)(void);
+typedef void (*Prot_GC_R_DefParams)(Rstart);
+typedef void (*Prot_GC_R_SetParams)(Rstart);
+typedef SEXP (*Prot_GC_R_tryEval)(SEXP, SEXP, int *);
+typedef void (*Prot_GC_Rf_PrintValue)(SEXP);
+typedef DllInfo *(*Prot_GC_R_getEmbeddingDllInfo)(void);
+typedef int (*Prot_GC_R_registerRoutines)(DllInfo *info, const R_CMethodDef * const croutines, const R_CallMethodDef * const callRoutines, const R_FortranMethodDef * const fortranRoutines, const R_ExternalMethodDef * const externalRoutines);
 #ifndef WIN32
-void (*GC_ptr_R_Suicide)(const char *);
-void (*GC_ptr_R_ShowMessage)(const char *);
-int  (*GC_ptr_R_ReadConsole)(const char *, unsigned char *, int, int);
-void (*GC_ptr_R_WriteConsole)(const char *, int);
-void (*GC_ptr_R_WriteConsoleEx)(const char *, int, int);
-void (*GC_ptr_R_ResetConsole)(void);
-void (*GC_ptr_R_FlushConsole)(void);
-void (*GC_ptr_R_ClearerrConsole)(void);
-void (*GC_ptr_R_Busy)(int);
-void (*GC_ptr_R_CleanUp)(SA_TYPE, int, int);
-int  (*GC_ptr_R_ChooseFile)(int, char *, int);
-int  (*GC_ptr_R_EditFile)(const char *);
-void (*GC_ptr_R_loadhistory)(SEXP, SEXP, SEXP, SEXP);
-void (*GC_ptr_R_savehistory)(SEXP, SEXP, SEXP, SEXP);
-void (*GC_ptr_R_addhistory)(SEXP, SEXP, SEXP, SEXP);
-int  (*GC_ptr_R_EditFiles)(int, const char **, const char **, const char *);
-void (*GC_ptr_R_ProcessEvents)();
+typedef void (*(*Prot_GC_ptr_R_Suicide))(const char *);
+typedef void (*(*Prot_GC_ptr_R_ShowMessage))(const char *);
+typedef int  (*(*Prot_GC_ptr_R_ReadConsole))(const char *, unsigned char *, int, int);
+typedef void (*(*Prot_GC_ptr_R_WriteConsole))(const char *, int);
+typedef void (*(*Prot_GC_ptr_R_WriteConsoleEx))(const char *, int, int);
+typedef void (*(*Prot_GC_ptr_R_ResetConsole))(void);
+typedef void (*(*Prot_GC_ptr_R_FlushConsole))(void);
+typedef void (*(*Prot_GC_ptr_R_ClearerrConsole))(void);
+typedef void (*(*Prot_GC_ptr_R_Busy))(int);
 #endif
-FILE * GC_R_Outputfile;
-FILE * GC_R_Consolefile;
 
 // R data
-SEXP GC_Rf_allocVector(SEXPTYPE, R_xlen_t){ }
-SEXP GC_Rf_allocList(int){ }
-void GC_Rf_unprotect(int){ }
-SEXP GC_Rf_protect(SEXP){ }
-SEXP GC_SETCAR(SEXP x, SEXP y){ }
-SEXP (GC_CDR)(SEXP e){ }
-void GC_SET_STRING_ELT(SEXP x, R_xlen_t i, SEXP v){ }
-SEXP (GC_VECTOR_ELT)(SEXP x, R_xlen_t i){ }
-SEXP GC_Rf_mkChar(const char *){ }
-SEXP GC_Rf_mkString(const char *){ }
-SEXP GC_Rf_namesgets(SEXP, SEXP){ }
-SEXP GC_Rf_classgets(SEXP, SEXP){ }
-R_len_t GC_Rf_length(SEXP){ }
-SEXP (GC_STRING_ELT)(SEXP x, R_xlen_t i){ }
-SEXP GC_Rf_coerceVector(SEXP, SEXPTYPE){ }
-SEXP GC_R_ParseVector(SEXP, int, ParseStatus *, SEXP){ }
-double *(GC_REAL)(SEXP x){ }
-int *(GC_INTEGER)(SEXP x){ }
-int *(GC_LOGICAL)(SEXP x){ }
-SEXP GC_Rf_install(const char *){ }
-SEXP GC_Rf_setAttrib(SEXP, SEXP, SEXP) { }
-Rboolean (GC_Rf_isNull)(SEXP s) { }
-char *(GC_R_CHAR)(SEXP x) { }
+typedef SEXP (*Prot_GC_Rf_allocVector)(SEXPTYPE, R_xlen_t);
+typedef SEXP (*Prot_GC_Rf_allocList)(int);
+typedef void (*Prot_GC_Rf_unprotect)(int);
+typedef SEXP (*Prot_GC_Rf_protect)(SEXP);
+typedef SEXP (*Prot_GC_SETCAR)(SEXP x, SEXP y);
+typedef SEXP ((*Prot_GC_CDR))(SEXP e);
+typedef void (*Prot_GC_SET_STRING_ELT)(SEXP x, R_xlen_t i, SEXP v);
+typedef SEXP ((*Prot_GC_VECTOR_ELT))(SEXP x, R_xlen_t i);
+typedef SEXP (*Prot_GC_Rf_mkChar)(const char *);
+typedef SEXP (*Prot_GC_Rf_mkString)(const char *);
+typedef SEXP (*Prot_GC_Rf_namesgets)(SEXP, SEXP);
+typedef SEXP (*Prot_GC_Rf_classgets)(SEXP, SEXP);
+typedef R_len_t (*Prot_GC_Rf_length)(SEXP);
+typedef SEXP ((*Prot_GC_STRING_ELT))(SEXP x, R_xlen_t i);
+typedef SEXP (*Prot_GC_Rf_coerceVector)(SEXP, SEXPTYPE);
+typedef SEXP (*Prot_GC_R_ParseVector)(SEXP, int, ParseStatus *, SEXP);
+typedef double *((*Prot_GC_REAL))(SEXP x);
+typedef int *((*Prot_GC_INTEGER))(SEXP x);
+typedef int *((*Prot_GC_LOGICAL))(SEXP x);
+typedef SEXP (*Prot_GC_Rf_install)(const char *);
+typedef SEXP (*Prot_GC_Rf_setAttrib)(SEXP, SEXP, SEXP);
+typedef Rboolean ((*Prot_GC_Rf_isNull))(SEXP s);
+typedef char *((*Prot_GC_R_CHAR))(SEXP x);
 
 // Graphics Device
-pGEDevDesc GC_GEcreateDevDesc(pDevDesc dev) { }
-void GC_GEaddDevice2(pGEDevDesc, const char *) { }
-void GC_Rf_onintr(void) { }
-int GC_R_GE_getVersion(void) { }
-void GC_R_CheckDeviceAvailable(void) { }
+typedef pGEDevDesc (*Prot_GC_GEcreateDevDesc)(pDevDesc dev);
+typedef void (*Prot_GC_GEaddDevice2)(pGEDevDesc, const char *);
+typedef void (*Prot_GC_Rf_onintr)(void);
+typedef int (*Prot_GC_Rf_selectDevice)(int);
+typedef void (*Prot_GC_Rf_killDevice)(int);
+typedef int (*Prot_GC_Rf_ndevNumber)(pDevDesc);
+typedef int (*Prot_GC_R_GE_getVersion)(void);
+typedef void (*Prot_GC_R_CheckDeviceAvailable)(void);
+
+//
+// FUNCTION POINTERS
+//
+// The actual function pointers. These are set once the
+// library is loaded, and are de-referenced by the proxy
+// methods at the bottom of this source file
+//
+// R Embedding methods
+Prot_GC_R_dot_Last ptr_GC_R_dot_Last;
+Prot_GC_R_RunExitFinalizers ptr_GC_R_RunExitFinalizers;
+Prot_GC_R_CleanTempDir ptr_GC_R_CleanTempDir;
+Prot_GC_Rf_initEmbeddedR ptr_GC_Rf_initEmbeddedR;
+Prot_GC_Rf_endEmbeddedR ptr_GC_Rf_endEmbeddedR;
+Prot_GC_R_ReplDLLinit ptr_GC_R_ReplDLLinit;
+Prot_GC_R_DefParams ptr_GC_R_DefParams;
+Prot_GC_R_SetParams ptr_GC_R_SetParams;
+Prot_GC_R_tryEval ptr_GC_R_tryEval;
+Prot_GC_Rf_error ptr_GC_Rf_error;
+Prot_GC_Rf_warning ptr_GC_Rf_warning;
+Prot_GC_Rf_PrintValue ptr_GC_Rf_PrintValue;
+Prot_GC_R_getEmbeddingDllInfo ptr_GC_R_getEmbeddingDllInfo;
+Prot_GC_R_registerRoutines ptr_GC_R_registerRoutines;
+#ifndef WIN32
+Prot_GC_ptr_R_Suicide ptr_GC_ptr_R_Suicide;
+Prot_GC_ptr_R_ShowMessage ptr_GC_ptr_R_ShowMessage;
+Prot_GC_ptr_R_ReadConsole ptr_GC_ptr_R_ReadConsole;
+Prot_GC_ptr_R_WriteConsole ptr_GC_ptr_R_WriteConsole;
+Prot_GC_ptr_R_WriteConsoleEx ptr_GC_ptr_R_WriteConsoleEx;
+Prot_GC_ptr_R_ResetConsole ptr_GC_ptr_R_ResetConsole;
+Prot_GC_ptr_R_FlushConsole ptr_GC_ptr_R_FlushConsole;
+Prot_GC_ptr_R_ClearerrConsole ptr_GC_ptr_R_ClearerrConsole;
+Prot_GC_ptr_R_Busy ptr_GC_ptr_R_Busy;
+#endif
+
+// R data
+Prot_GC_Rf_allocVector ptr_GC_Rf_allocVector;
+Prot_GC_Rf_allocList ptr_GC_Rf_allocList;
+Prot_GC_Rf_unprotect ptr_GC_Rf_unprotect;
+Prot_GC_Rf_protect ptr_GC_Rf_protect;
+Prot_GC_SETCAR ptr_GC_SETCAR;
+Prot_GC_CDR ptr_GC_CDR;
+Prot_GC_SET_STRING_ELT ptr_GC_SET_STRING_ELT;
+Prot_GC_VECTOR_ELT ptr_GC_VECTOR_ELT;
+Prot_GC_Rf_mkChar ptr_GC_Rf_mkChar;
+Prot_GC_Rf_mkString ptr_GC_Rf_mkString;
+Prot_GC_Rf_namesgets ptr_GC_Rf_namesgets;
+Prot_GC_Rf_classgets ptr_GC_Rf_classgets;
+Prot_GC_Rf_length ptr_GC_Rf_length;
+Prot_GC_STRING_ELT ptr_GC_STRING_ELT;
+Prot_GC_Rf_coerceVector ptr_GC_Rf_coerceVector;
+Prot_GC_R_ParseVector ptr_GC_R_ParseVector;
+Prot_GC_REAL ptr_GC_REAL;
+Prot_GC_INTEGER ptr_GC_INTEGER;
+Prot_GC_LOGICAL ptr_GC_LOGICAL;
+Prot_GC_Rf_install ptr_GC_Rf_install;
+Prot_GC_Rf_setAttrib ptr_GC_Rf_setAttrib;
+Prot_GC_Rf_isNull ptr_GC_Rf_isNull;
+Prot_GC_R_CHAR ptr_GC_R_CHAR;
+
+// Graphics Device
+Prot_GC_GEcreateDevDesc ptr_GC_GEcreateDevDesc;
+Prot_GC_GEaddDevice2 ptr_GC_GEaddDevice2;
+Prot_GC_Rf_onintr ptr_GC_Rf_onintr;
+Prot_GC_Rf_selectDevice ptr_GC_Rf_selectDevice;
+Prot_GC_Rf_ndevNumber ptr_GC_Rf_ndevNumber;
+Prot_GC_Rf_killDevice ptr_GC_Rf_killDevice;
+Prot_GC_R_GE_getVersion ptr_GC_R_GE_getVersion;
+Prot_GC_R_CheckDeviceAvailable ptr_GC_R_CheckDeviceAvailable;
+
+//
+// ENTRY POINTS USED FROM GC CODEBASE
+//
+// These proxy methods will call the resolved functions once the
+// dynamic libraries have been loaded. Below you will find the
+// typdef and actual pointers that are set via QLibrary::resolve()
+//
+
+// R Embedding methods
+void GC_R_dot_Last(void) { (*ptr_GC_R_dot_Last)(); }
+void GC_R_RunExitFinalizers(void) { (*ptr_GC_R_RunExitFinalizers)(); }
+void GC_R_CleanTempDir(void) { (*ptr_GC_R_CleanTempDir)(); }
+int  GC_Rf_initEmbeddedR(int argc, char *argv[]) { return (*ptr_GC_Rf_initEmbeddedR)(argc,argv); }
+void GC_Rf_endEmbeddedR(int fatal) { (*ptr_GC_Rf_endEmbeddedR)(fatal); }
+void GC_R_ReplDLLinit(void) { (*ptr_GC_R_ReplDLLinit)(); }
+void GC_R_DefParams(Rstart x) { (*ptr_GC_R_DefParams)(x); }
+void GC_R_SetParams(Rstart x) { (*ptr_GC_R_SetParams)(x); }
+SEXP GC_R_tryEval(SEXP a, SEXP b, int *c) { return (*ptr_GC_R_tryEval)(a,b,c); }
+void GC_Rf_error(const char *, ...) { } //XXX how to pass ... ?
+void GC_Rf_warning(const char *, ...) { }
+void GC_Rf_PrintValue(SEXP x) { (*ptr_GC_Rf_PrintValue)(x); }
+DllInfo *GC_R_getEmbeddingDllInfo(void) { return (*ptr_GC_R_getEmbeddingDllInfo)(); }
+int GC_R_registerRoutines(DllInfo *a, const R_CMethodDef * const b, const R_CallMethodDef * const c, const R_FortranMethodDef * const d, const R_ExternalMethodDef * const e)
+                          { return (*ptr_GC_R_registerRoutines)(a,b,c,d,e); }
+// R data
+SEXP GC_Rf_allocVector(SEXPTYPE a, R_xlen_t b) { return (*ptr_GC_Rf_allocVector)(a,b); }
+SEXP GC_Rf_allocList(int x) { return (*ptr_GC_Rf_allocList)(x); }
+void GC_Rf_unprotect(int x) { (*ptr_GC_Rf_unprotect)(x); }
+SEXP GC_Rf_protect(SEXP x) { return (*ptr_GC_Rf_protect)(x); }
+SEXP GC_SETCAR(SEXP x, SEXP y) { return (*ptr_GC_SETCAR)(x,y); }
+SEXP (GC_CDR)(SEXP e) { return (*ptr_GC_CDR)(e); }
+void GC_SET_STRING_ELT(SEXP x, R_xlen_t i, SEXP v) { (*ptr_GC_SET_STRING_ELT)(x,i,v); }
+SEXP (GC_VECTOR_ELT)(SEXP x, R_xlen_t i) { return (*ptr_GC_VECTOR_ELT)(x,i); }
+SEXP GC_Rf_mkChar(const char *a) { return (*ptr_GC_Rf_mkChar)(a); }
+SEXP GC_Rf_mkString(const char *b) { return (*ptr_GC_Rf_mkString)(b); }
+SEXP GC_Rf_namesgets(SEXP a, SEXP b) { return (*ptr_GC_Rf_namesgets)(a, b); }
+SEXP GC_Rf_classgets(SEXP a, SEXP b) { return (*ptr_GC_Rf_classgets)(a,b); }
+R_len_t GC_Rf_length(SEXP a) { return (*ptr_GC_Rf_length)(a); }
+SEXP (GC_STRING_ELT)(SEXP x, R_xlen_t i) { return (*ptr_GC_STRING_ELT)(x,i); }
+SEXP GC_Rf_coerceVector(SEXP a, SEXPTYPE b) { return (*ptr_GC_Rf_coerceVector)(a,b); }
+SEXP GC_R_ParseVector(SEXP a, int b, ParseStatus *c, SEXP d) { return (*ptr_GC_R_ParseVector)(a,b,c,d); }
+double *(GC_REAL)(SEXP x) { return (*ptr_GC_REAL)(x); }
+int *(GC_INTEGER)(SEXP x) { return (*ptr_GC_INTEGER)(x); }
+int *(GC_LOGICAL)(SEXP x) { return (*ptr_GC_LOGICAL)(x); }
+SEXP GC_Rf_install(const char *a) { return (*ptr_GC_Rf_install)(a); }
+SEXP GC_Rf_setAttrib(SEXP a, SEXP b, SEXP c) { return (*ptr_GC_Rf_setAttrib)(a,b,c); }
+Rboolean (GC_Rf_isNull)(SEXP s) { return (*ptr_GC_Rf_isNull)(s); }
+const char *(GC_R_CHAR)(SEXP x) { return (*ptr_GC_R_CHAR)(x); }
+
+// Graphics Device
+pGEDevDesc GC_GEcreateDevDesc(pDevDesc dev) { return (*ptr_GC_GEcreateDevDesc)(dev); }
+void GC_GEaddDevice2(pGEDevDesc a, const char *b) { (*ptr_GC_GEaddDevice2)(a,b); }
+void GC_Rf_onintr(void) { (*ptr_GC_Rf_onintr)(); }
+int GC_R_GE_getVersion(void) { return (*ptr_GC_R_GE_getVersion)(); }
+void GC_R_CheckDeviceAvailable(void) { (*ptr_GC_R_CheckDeviceAvailable)(); }
+int GC_Rf_selectDevice(int x) { return (*ptr_GC_Rf_selectDevice)(x); }
+void GC_Rf_killDevice(int x) { (*ptr_GC_Rf_killDevice)(x);}
+int GC_Rf_ndevNumber(pDevDesc x) { return (*ptr_GC_Rf_ndevNumber)(x); }
 Rboolean GC_R_interrupts_suspended;
 int GC_R_interrupts_pending;
 
 // globals
-SEXP GC_R_GlobalEnv, GC_R_NilValue,
-     GC_R_RowNamesSymbol, GC_R_ClassSymbol;
-double GC_R_NaReal;
+SEXP *pGC_R_GlobalEnv, *pGC_R_NilValue,
+     *pGC_R_RowNamesSymbol, *pGC_R_ClassSymbol;
+double *pGC_R_NaReal;
+FILE ** pGC_R_Outputfile;
+FILE ** pGC_R_Consolefile;
+
+
+//
+// Dynamic Loader
+//
+//
+RLibrary::RLibrary()
+{
+    loaded=false;
+    libR = NULL;
+}
+
+QFunctionPointer
+RLibrary::resolve(const char *symbol)
+{
+    QFunctionPointer returning = libR->resolve(symbol);
+    if (returning) return returning;
+    else {
+        qDebug()<<"libR: failed to resolve:" << symbol;
+        loaded = false;
+        return NULL;
+    }
+}
+
+bool
+RLibrary::load()
+{
+    // get location from environment or config
+    QString name, home(getenv("R_HOME"));
+    if (home == "") home =  appsettings->value(NULL,GC_R_HOME,"").toString();
+
+    // PLATFORM SPECIFIC PATH AND NAME
+#ifdef Q_OS_LINUX
+    // use the standard location
+    if (home == "") home = "/usr/lib/R";
+    name = "lib/libR.so";
+#endif
+#ifdef WIN32
+    if (home == "") home = "/Program Files/R/";
+    name = "bin/R.dll";
+#endif
+#ifdef Q_OS_MAC
+    if (home == "") home= "/Library/Frameworks/R.framework/Resources";
+    name += "lib/libR.dylib";
+#endif
+
+    // see if it exists at expected location
+    QString full = QString("%1/%2").arg(home).arg(name);
+    if (QFile(full).exists()) {
+        libR = new QLibrary(full);
+        loaded = libR->load();
+        qDebug()<<"trying to dynload:"<<full<<"result:"<<loaded;
+    } else {
+        qDebug()<<"couldn't locate"<<full;
+    }
+
+    if (!loaded) return loaded;
+
+    // ok, now its loaded we need to set all the function pointers
+    ptr_GC_Rf_initEmbeddedR = Prot_GC_Rf_initEmbeddedR(resolve("Rf_initEmbeddedR"));
+    ptr_GC_R_dot_Last = Prot_GC_R_dot_Last(resolve("R_dot_Last"));
+    ptr_GC_R_RunExitFinalizers = Prot_GC_R_RunExitFinalizers(resolve("R_RunExitFinalizers"));
+    ptr_GC_R_CleanTempDir = Prot_GC_R_CleanTempDir(resolve("R_CleanTempDir"));
+    ptr_GC_Rf_endEmbeddedR = Prot_GC_Rf_endEmbeddedR(resolve("Rf_endEmbeddedR"));
+    ptr_GC_R_ReplDLLinit = Prot_GC_R_ReplDLLinit(resolve("R_ReplDLLinit"));
+    ptr_GC_R_DefParams = Prot_GC_R_DefParams(resolve("R_DefParams"));
+    ptr_GC_R_SetParams = Prot_GC_R_SetParams(resolve("R_SetParams"));
+    ptr_GC_R_tryEval = Prot_GC_R_tryEval(resolve("R_tryEval"));
+    ptr_GC_Rf_error = Prot_GC_Rf_error(resolve("Rf_error"));
+    ptr_GC_Rf_warning = Prot_GC_Rf_warning(resolve("Rf_warning"));
+    ptr_GC_Rf_PrintValue = Prot_GC_Rf_PrintValue(resolve("Rf_PrintValue"));
+    ptr_GC_R_getEmbeddingDllInfo = Prot_GC_R_getEmbeddingDllInfo(resolve("R_getEmbeddingDllInfo"));
+    ptr_GC_R_registerRoutines = Prot_GC_R_registerRoutines(resolve("R_registerRoutines"));
+
+    // R data
+    ptr_GC_Rf_allocVector = Prot_GC_Rf_allocVector(resolve("Rf_allocVector"));
+    ptr_GC_Rf_allocList = Prot_GC_Rf_allocList(resolve("Rf_allocList"));
+    ptr_GC_Rf_unprotect = Prot_GC_Rf_unprotect(resolve("Rf_unprotect"));
+    ptr_GC_Rf_protect = Prot_GC_Rf_protect(resolve("Rf_protect"));
+    ptr_GC_SETCAR = Prot_GC_SETCAR(resolve("SETCAR"));
+    ptr_GC_CDR = Prot_GC_CDR(resolve("CDR"));
+    ptr_GC_SET_STRING_ELT = Prot_GC_SET_STRING_ELT(resolve("SET_STRING_ELT"));
+    ptr_GC_VECTOR_ELT = Prot_GC_VECTOR_ELT(resolve("VECTOR_ELT"));
+    ptr_GC_Rf_mkChar = Prot_GC_Rf_mkChar(resolve("Rf_mkChar"));
+    ptr_GC_Rf_mkString = Prot_GC_Rf_mkString(resolve("Rf_mkString"));
+    ptr_GC_Rf_namesgets = Prot_GC_Rf_namesgets(resolve("Rf_namesgets"));
+    ptr_GC_Rf_classgets = Prot_GC_Rf_classgets(resolve("Rf_classgets"));
+    ptr_GC_Rf_length = Prot_GC_Rf_length(resolve("Rf_length"));
+    ptr_GC_STRING_ELT = Prot_GC_STRING_ELT(resolve("STRING_ELT"));
+    ptr_GC_Rf_coerceVector = Prot_GC_Rf_coerceVector(resolve("Rf_coerceVector"));
+    ptr_GC_R_ParseVector = Prot_GC_R_ParseVector(resolve("R_ParseVector"));
+    ptr_GC_REAL = Prot_GC_REAL(resolve("REAL"));
+    ptr_GC_INTEGER = Prot_GC_INTEGER(resolve("INTEGER"));
+    ptr_GC_LOGICAL = Prot_GC_LOGICAL(resolve("LOGICAL"));
+    ptr_GC_Rf_install = Prot_GC_Rf_install(resolve("Rf_install"));
+    ptr_GC_Rf_setAttrib = Prot_GC_Rf_setAttrib(resolve("Rf_setAttrib"));
+    ptr_GC_Rf_isNull = Prot_GC_Rf_isNull(resolve("Rf_isNull"));
+    ptr_GC_R_CHAR = Prot_GC_R_CHAR(resolve("R_CHAR"));
+
+    // Graphics Device
+    ptr_GC_GEcreateDevDesc = Prot_GC_GEcreateDevDesc(resolve("GEcreateDevDesc"));
+    ptr_GC_GEaddDevice2 = Prot_GC_GEaddDevice2(resolve("GEaddDevice2"));
+    ptr_GC_Rf_onintr = Prot_GC_Rf_onintr(resolve("Rf_onintr"));
+    ptr_GC_Rf_selectDevice = Prot_GC_Rf_selectDevice(resolve("Rf_selectDevice"));
+    ptr_GC_Rf_ndevNumber = Prot_GC_Rf_ndevNumber(resolve("Rf_ndevNumber"));
+    ptr_GC_Rf_killDevice = Prot_GC_Rf_killDevice(resolve("Rf_killDevice"));
+    ptr_GC_R_GE_getVersion = Prot_GC_R_GE_getVersion(resolve("R_GE_getVersion"));
+    ptr_GC_R_CheckDeviceAvailable = Prot_GC_R_CheckDeviceAvailable(resolve("R_CheckDeviceAvailable"));
+
+    // set the globals
+    //loaded = false; // not resolved yet!!
+
+    // lets try and find a symbol (not a function)
+    pGC_R_NilValue = (SEXP*)(resolve("R_NilValue"));
+    pGC_R_RowNamesSymbol = (SEXP*)(resolve("R_RowNamesSymbol"));
+    pGC_R_ClassSymbol = (SEXP*)(resolve("R_ClassSymbol"));
+    pGC_R_GlobalEnv = (SEXP*)(resolve("R_GlobalEnv"));
+    pGC_R_NaReal = (double*)(resolve("R_NaReal"));
+    pGC_R_Consolefile = (FILE**)(resolve("R_Consolefile"));
+    pGC_R_Outputfile = (FILE**)(resolve("R_Outputfile"));
+
+    #ifndef WIN32
+    ptr_GC_ptr_R_Suicide = Prot_GC_ptr_R_Suicide(resolve("ptr_R_Suicide"));
+    ptr_GC_ptr_R_ShowMessage = Prot_GC_ptr_R_ShowMessage(resolve("ptr_R_ShowMessage"));
+    ptr_GC_ptr_R_ReadConsole = Prot_GC_ptr_R_ReadConsole(resolve("ptr_R_ReadConsole"));
+    ptr_GC_ptr_R_WriteConsole = Prot_GC_ptr_R_WriteConsole(resolve("ptr_R_WriteConsole"));
+    ptr_GC_ptr_R_WriteConsoleEx = Prot_GC_ptr_R_WriteConsoleEx(resolve("ptr_R_WriteConsoleEx"));
+    ptr_GC_ptr_R_ResetConsole = Prot_GC_ptr_R_ResetConsole(resolve("ptr_R_ResetConsole"));
+    ptr_GC_ptr_R_FlushConsole = Prot_GC_ptr_R_FlushConsole(resolve("ptr_R_FlushConsole"));
+    ptr_GC_ptr_R_ClearerrConsole = Prot_GC_ptr_R_ClearerrConsole(resolve("ptr_R_ClearerrConsole"));
+    ptr_GC_ptr_R_Busy = Prot_GC_ptr_R_Busy(resolve("ptr_R_Busy"));
+    #endif
+    // did it work -- resolve sets to false if symbols won't load
+    return loaded;
+}
+
 #endif
