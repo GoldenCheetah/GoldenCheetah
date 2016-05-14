@@ -22,7 +22,7 @@
 // QFunctionPointer typedef introduced in QT5
 #include <QtGlobal>
 #if QT_VERSION < 0x050000
-typedef void (*QFunctionPointer)();
+typedef void *QFunctionPointer;
 #endif
 
 class QStringList;
