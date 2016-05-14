@@ -122,8 +122,17 @@ RTool::RTool()
         DllInfo *info = R_getEmbeddingDllInfo();
         R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
 
-        // lets get the version early for the about dialog
-        version = QString("%1.%2").arg(R_MAJOR).arg(R_MINOR);
+        // reinstate R method for getting version since we are
+        // dynamically loading now, so the version may not be
+        // the same as the version we built with.
+        R->parseEvalNT("print(R.version.string)");
+        QStringList strings = rtool->messages;
+        if (strings.count() == 3) {
+            QRegExp exp("^.*([0-9]+\\.[0-9]+\\.[0-9]+).*$");
+            if (exp.exactMatch(strings[1])) version = exp.cap(1);
+            else version = strings[1];
+        }
+        rtool->messages.clear();
 
         // load the dynamix library and create function wrapper
         // we should put this into a source file (.R)
