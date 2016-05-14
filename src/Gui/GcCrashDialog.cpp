@@ -335,7 +335,7 @@ QString GcCrashDialog::versionHTML()
             .arg(src)
             .arg(QSslSocket::supportsSsl() ? "yes" : "none")
 #ifdef GC_WANT_R
-            .arg(QString("%1.%2").arg(R_MAJOR).arg(R_MINOR))
+            .arg(QString("%1 [%2.%3]").arg(rtool ? rtool->version : QString("none")).arg(R_MAJOR).arg(R_MINOR))
 #else
 #ifdef WIN32
             .arg("unsupported")
