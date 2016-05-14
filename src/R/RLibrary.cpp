@@ -293,7 +293,10 @@ RLibrary::load()
         loaded = libR->load();
     }
 
-    if (!loaded) return loaded;
+    if (!loaded) {
+        qDebug()<<"R shared library load failed:"<<libR->errorString();
+        return loaded;
+    }
 
     // ok, now its loaded we need to set all the function pointers
     ptr_GC_Rf_initEmbeddedR = Prot_GC_Rf_initEmbeddedR(resolve("Rf_initEmbeddedR"));
