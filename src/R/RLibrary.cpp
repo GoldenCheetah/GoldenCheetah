@@ -261,6 +261,20 @@ RLibrary::resolve(const char *symbol)
     }
 }
 
+// by default any dependant libs will be loaded only if they
+// are in the relevant search path. R libs are rarely in this
+// path, so we update it just whilst we load the libs
+#ifdef WIN32
+const char *gcSearchPath = "PATH";
+const char *gcSearchSep = ";";
+// its in REmbed.h, but we don't want to include it here
+extern int setenv(QString name,  QString value, bool overwrite);
+#else
+const char *gcSearchPath = "LD_LIBRARY_PATH";
+const char *gcSearchSep = ":";
+#endif
+
+
 bool
 RLibrary::load()
 {
@@ -286,9 +300,22 @@ RLibrary::load()
     name += "lib/libR.dylib";
 #endif
 
-    // see if it exists at expected location
+    // load if its found
     QString full = QString("%1/%2").arg(home).arg(name);
     if (QFile(full).exists()) {
+
+        // we need to make sure the dependants are loaded so update
+        // LD_LIBRARY_PATH or PATH so they can be found - this only
+        // affects us, it is not retained outside our process scope.
+        QString search = getenv(gcSearchPath);
+        QString dir = QFileInfo(QFile(full)).absolutePath();
+        if (search != "") search = dir + gcSearchSep + search;
+        else search = dir;
+        setenv(gcSearchPath, search.toLatin1().constData(), true);
+
+        //qDebug()<<"setenv"<<gcSearchPath<<search;
+
+        // Now load the library
         libR = new QLibrary(full);
         loaded = libR->load();
     }

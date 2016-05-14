@@ -29,6 +29,9 @@
 #ifndef WIN32
 #define R_INTERFACE_PTRS
 #include <Rinterface.h>
+#else
+// no setenv on Windows
+extern int setenv(QString name,  QString value, bool overwrite);
 #endif
 
 // specific to embedding
