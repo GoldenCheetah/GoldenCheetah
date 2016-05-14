@@ -29,9 +29,6 @@
 #ifndef WIN32
 #define R_INTERFACE_PTRS
 #include <Rinterface.h>
-#else
-// no setenv on Windows
-extern int setenv(QString name,  QString value, bool overwrite);
 #endif
 
 // specific to embedding
@@ -50,6 +47,11 @@ extern int setenv(QString name,  QString value, bool overwrite);
 
 #include <QString>
 #include <QStringList>
+
+// no setenv on Windows
+#ifdef WIN32
+extern int setenv(QString name,  QString value, bool overwrite);
+#endif
 
 // a plain C++ class, no QObject stuff
 class REmbed {
