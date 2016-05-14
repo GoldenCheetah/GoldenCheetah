@@ -79,6 +79,13 @@ extern void (*(*ptr_GC_ptr_R_ResetConsole))(void);
 extern void (*(*ptr_GC_ptr_R_FlushConsole))(void);
 extern void (*(*ptr_GC_ptr_R_ClearerrConsole))(void);
 extern void (*(*ptr_GC_ptr_R_Busy))(int);
+#else
+typedef char *(*Prot_GC_getDLLVersion)(void);
+typedef char *(*Prot_GC_getRUser)(void);
+typedef char *(*Prot_GC_get_R_HOME)(void);
+extern Prot_GC_getDLLVersion ptr_GC_getDLLVersion;
+extern Prot_GC_getRUser ptr_GC_getRUser;
+extern Prot_GC_get_R_HOME ptr_GC_get_R_HOME;
 #endif
 
 // R Data
@@ -160,6 +167,11 @@ extern double *pGC_R_NaReal;          // XXX TODO NaReal value
 #define ptr_R_ClearerrConsole       (*ptr_GC_ptr_R_ClearerrConsole)
 #define ptr_R_Busy                  (*ptr_GC_ptr_R_Busy)
 #define R_registerRoutines          GC_R_registerRoutines
+#ifdef WIN32
+#define getDLLVersion				(*ptr_GC_getDLLVersion)
+#define getRUser                    (*ptr_GC_getRUser)
+#define get_R_HOME                  (*ptr_GC_get_R_HOME)
+#endif
 
 // data wrangling and manipulation
 #define Rf_allocVector              GC_Rf_allocVector

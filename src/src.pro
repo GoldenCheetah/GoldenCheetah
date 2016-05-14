@@ -243,14 +243,17 @@ contains(DEFINES, "GC_WANT_R") {
         ##  both 32 and 64 bit
         RCPPFLAGS = -I$$R_HOME/include
 
-        # 64 Bit Build
-        contains(QMAKE_TARGET.arch, x86_64):{
-          LIBS += $$R_HOME/bin/x64/R.lib
-        }
+        !contains(DEFINES, "GC_WANT_R_DYNAMIC") {
 
-        # 32 Bit Build
-        !contains(QMAKE_TARGET.arch, x86_64):{
-           LIBS += $$R_HOME/bin/i386/R.lib
+            # 64 Bit Build
+            contains(QMAKE_TARGET.arch, x86_64):{
+                LIBS += $$R_HOME/bin/x64/R.lib
+            }
+
+            # 32 Bit Build
+            !contains(QMAKE_TARGET.arch, x86_64):{
+                LIBS += $$R_HOME/bin/i386/R.lib
+            }
         }
 
     } else {

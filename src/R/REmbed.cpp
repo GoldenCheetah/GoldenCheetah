@@ -83,7 +83,6 @@ REmbed::REmbed(const bool verbose, const bool interactive) : verbose(verbose), i
             setenv("R_HOME", configR_HOME.toLatin1().constData(), 1);
         }
     }
-
     // fire up R
     const char *R_argv[] = {name, "--gui=none", "--no-save",
                             "--no-readline", "--silent", "--vanilla", "--slave"};
