@@ -18,7 +18,6 @@
 
 #ifndef GC_R_Library_H
 #define GC_R_Library_H
-#ifdef GC_WANT_R_DYNAMIC
 
 #include <QtGlobal> // for QFunctionPointer typedef
 
@@ -217,5 +216,4 @@ extern double *pGC_R_NaReal;          // XXX TODO NaReal value
 #define R_ClassSymbol               (*pGC_R_ClassSymbol)
 #define R_Consolefile               (*pGC_R_Consolefile)
 #define R_Outputfile                (*pGC_R_Outputfile)
-#endif
 #endif
