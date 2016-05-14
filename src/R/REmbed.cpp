@@ -67,10 +67,9 @@ REmbed::REmbed(const bool verbose, const bool interactive) : verbose(verbose), i
 {
     loaded = false;
 
-#ifdef GC_WANT_R_DYNAMIC
+    // need to load the library
     RLibrary rlib;
     if (!rlib.load()) return;
-#endif
 
     // we need to tell embedded R where to work
     QString envR_HOME(getenv("R_HOME"));

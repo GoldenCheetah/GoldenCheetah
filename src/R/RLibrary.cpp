@@ -16,7 +16,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifdef GC_WANT_R_DYNAMIC
 #define R_NO_REMAP
 #include <R.h>
 #include <Rinternals.h>
@@ -292,9 +291,6 @@ RLibrary::load()
     if (QFile(full).exists()) {
         libR = new QLibrary(full);
         loaded = libR->load();
-        qDebug()<<"trying to dynload:"<<full<<"result:"<<loaded;
-    } else {
-        qDebug()<<"couldn't locate"<<full;
     }
 
     if (!loaded) return loaded;
@@ -381,5 +377,3 @@ RLibrary::load()
     // did it work -- resolve sets to false if symbols won't load
     return loaded;
 }
-
-#endif

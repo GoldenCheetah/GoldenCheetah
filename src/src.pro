@@ -238,48 +238,11 @@ contains(DEFINES, "GC_WANT_R") {
     isEmpty(R_HOME){ R_HOME = $$system(R RHOME) }
 
     ## include headers and libraries for R
-    win32 {
+    win32  { QMAKE_CXXFLAGS += -I$$R_HOME/include
+             DEFINES += Win32 }
+    else   { QMAKE_CXXFLAGS += $$system($$R_HOME/bin/R CMD config --cppflags) }
 
-        ##  both 32 and 64 bit
-        RCPPFLAGS = -I$$R_HOME/include
-
-        !contains(DEFINES, "GC_WANT_R_DYNAMIC") {
-
-            # 64 Bit Build
-            contains(QMAKE_TARGET.arch, x86_64):{
-                LIBS += $$R_HOME/bin/x64/R.lib
-            }
-
-            # 32 Bit Build
-            !contains(QMAKE_TARGET.arch, x86_64):{
-                LIBS += $$R_HOME/bin/i386/R.lib
-            }
-        }
-
-    } else {
-
-        contains(DEFINES, "GC_WANT_R_DYNAMIC") {
-
-            # don't link libs, we load dynamically at runtime
-            RCPPFLAGS =             $$system($$R_HOME/bin/R CMD config --cppflags)
-
-        } else {
-
-            RCPPFLAGS =             $$system($$R_HOME/bin/R CMD config --cppflags)
-            RLDFLAGS =              $$system($$R_HOME/bin/R CMD config --ldflags)
-            RBLAS =                 $$system($$R_HOME/bin/R CMD config BLAS_LIBS)
-            RLAPACK =               $$system($$R_HOME/bin/R CMD config LAPACK_LIBS)
-            LIBS +=         		$$RLDFLAGS $$RBLAS $$RLAPACK
-        }
-    }
-
-    ## compiler etc settings used in default make rules
-    QMAKE_CXXFLAGS +=       $$RCPPFLAGS
-
-    ## R has lots of compatibility headers for S and legacy R code
-    ## we don't want that -- our code is shiny and new.
-    ## Plus it tends to break lots of things anyway.
-    win32 { DEFINES += Win32 }
+    ## R has lots of compatibility headers for S and legacy R code we don't want
     DEFINES += STRICT_R_HEADERS
 
     ## R integration
@@ -292,7 +255,6 @@ contains(DEFINES, "GC_WANT_R") {
 
     ## For hardware accelerated scene rendering
     QT += opengl
-
 }
 
 ###====================
