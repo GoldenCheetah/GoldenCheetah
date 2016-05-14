@@ -31,15 +31,17 @@ static const char *name = "GoldenCheetah";
 
 // no setenv on windows
 #if WIN32
-int setenv(const char *name, const char *value, int overwrite)
+int setenv(QString name, QString value, bool overwrite)
 {
     int errcode = 0;
     if(!overwrite) {
         size_t envsize = 0;
-        errcode = getenv_s(&envsize, NULL, 0, name);
+        errcode = getenv_s(&envsize, NULL, 0, name.toLatin1().constData());
         if(errcode || envsize) return errcode;
     }
-    return _putenv_s(name, value);
+
+    // make the update
+    return _putenv_s(name.toLatin1().constData(), value.toLatin1().constData());
 }
 #endif
 
@@ -79,7 +81,7 @@ REmbed::REmbed(const bool verbose, const bool interactive) : verbose(verbose), i
             qDebug()<<"R HOME not set, R disabled";
             return;
         } else {
-            setenv("R_HOME", configR_HOME.toLatin1().constData(), 1);
+            setenv("R_HOME", configR_HOME.toLatin1().constData(), true);
         }
     }
     // fire up R
