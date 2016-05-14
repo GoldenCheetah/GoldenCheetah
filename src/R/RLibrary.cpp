@@ -130,6 +130,10 @@ Prot_GC_ptr_R_ResetConsole ptr_GC_ptr_R_ResetConsole;
 Prot_GC_ptr_R_FlushConsole ptr_GC_ptr_R_FlushConsole;
 Prot_GC_ptr_R_ClearerrConsole ptr_GC_ptr_R_ClearerrConsole;
 Prot_GC_ptr_R_Busy ptr_GC_ptr_R_Busy;
+#else
+Prot_GC_getDLLVersion ptr_GC_getDLLVersion;
+Prot_GC_getRUser ptr_GC_getRUser;
+Prot_GC_get_R_HOME ptr_GC_get_R_HOME;
 #endif
 
 // R data
@@ -272,8 +276,11 @@ RLibrary::load()
     name = "lib/libR.so";
 #endif
 #ifdef WIN32
-    if (home == "") home = "/Program Files/R/";
-    name = "bin/R.dll";
+#if defined(_M_X64) || defined (WIN64)
+    name = QString("bin/x64/R.dll");
+#else
+    name = QString("bin/i386/R.dll");
+#endif
 #endif
 #ifdef Q_OS_MAC
     if (home == "") home= "/Library/Frameworks/R.framework/Resources";
@@ -365,7 +372,12 @@ RLibrary::load()
     ptr_GC_ptr_R_FlushConsole = Prot_GC_ptr_R_FlushConsole(resolve("ptr_R_FlushConsole"));
     ptr_GC_ptr_R_ClearerrConsole = Prot_GC_ptr_R_ClearerrConsole(resolve("ptr_R_ClearerrConsole"));
     ptr_GC_ptr_R_Busy = Prot_GC_ptr_R_Busy(resolve("ptr_R_Busy"));
+    #else
+    ptr_GC_getDLLVersion = Prot_GC_getDLLVersion(resolve("getDLLVersion"));
+    ptr_GC_getRUser = Prot_GC_getRUser(resolve("getRUser"));
+    ptr_GC_get_R_HOME = Prot_GC_get_R_HOME(resolve("get_R_HOME"));
     #endif
+
     // did it work -- resolve sets to false if symbols won't load
     return loaded;
 }
