@@ -19,7 +19,11 @@
 #ifndef GC_R_Library_H
 #define GC_R_Library_H
 
-#include <QtGlobal> // for QFunctionPointer typedef
+// QFunctionPointer typedef introduced in QT5
+#include <QtGlobal>
+#if QT_VERSION < 0x050000
+typedef void (*QFunctionPointer)();
+#endif
 
 class QStringList;
 class QString;
