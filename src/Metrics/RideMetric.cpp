@@ -135,8 +135,9 @@
 // 125 08  Dec 2015 Ale Martinez       Support metrics in Calendar Text
 // 126 08  Mar 2016 Mark Liversedge    Added count of To Exhaustions
 // 127 25  Mar 2016 Mark Liversedge    Best R metric for Exhaustion Points
+// 128 15  May 2016 Mark Liversedge    Add ActivityCRC so R scripts can use when caching
 
-int DBSchemaVersion = 127;
+int DBSchemaVersion = 128;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
