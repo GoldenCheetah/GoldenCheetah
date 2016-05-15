@@ -3700,3 +3700,47 @@ static bool totalCaloriesAdded = addTotalCalories();
 
 
 ///////////////////////////////////////////////////////////////////////////////
+
+
+struct ActivityCRC : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ActivityCRC)
+
+    private:
+    long int CRC;
+
+    public:
+
+    ActivityCRC()
+    {
+        setSymbol("activity_crc");
+        setInternalName("Checksum");
+    }
+
+    void initialize() {
+        setName(tr("Checksum"));
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setType(RideMetric::Total);
+        setDescription(tr("A checksum for the activity, can be used to trigger cache refresh in R scripts."));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+
+        setValue(item->crc + item->metacrc + item->dateTime.toMSecsSinceEpoch());
+    }
+
+    bool isRelevantForRide(const RideItem *) const { return true; }
+
+    RideMetric *clone() const { return new ActivityCRC(*this); }
+};
+
+static bool addActivityCRC() {
+    QVector<QString> deps;
+    RideMetricFactory::instance().addMetric(ActivityCRC(), &deps);
+    return true;
+}
+
+static bool ActivityCRCAdded = addActivityCRC();
+
+
+///////////////////////////////////////////////////////////////////////////////
