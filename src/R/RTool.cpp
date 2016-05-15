@@ -78,7 +78,6 @@ RTool::RTool()
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 ,0, 0 },
             { "GC.page", (DL_FUNC) &RTool::pageSize, 0 ,0, 0 },
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 ,0, 0 },
-            { "GC.athlete.home", (DL_FUNC) &RTool::athleteHome, 0 ,0, 0 },
             { "GC.activities", (DL_FUNC) &RTool::activities, 0 ,0, 0 },
             { "GC.activity", (DL_FUNC) &RTool::activity, 0 ,0, 0 },
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0 ,0, 0 },
@@ -97,7 +96,6 @@ RTool::RTool()
 
             // athlete
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 },
-            { "GC.athlete.home", (DL_FUNC) &RTool::athleteHome, 0 },
 
             // if activity is passed compare=TRUE it returns a list of rides
             // currently in the compare pane if compare is enabled or
@@ -144,7 +142,6 @@ RTool::RTool()
 
                                // athlete
                                "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
-                               "GC.athlete.home <- function() { .Call(\"GC.athlete.home\") }\n"
 
                                // activity
                                "GC.activities <- function() { .Call(\"GC.activities\") }\n"
@@ -223,30 +220,73 @@ RTool::configChanged()
 }
 
 SEXP
-RTool::athleteHome()
-{
-    QString returning = ".";
-    if (rtool->context) returning = rtool->context->athlete->home->root().absolutePath();
-
-    // convert to R type and return, yuck.
-    SEXP ans;
-    PROTECT(ans=Rf_allocVector(STRSXP, 1));
-    SET_STRING_ELT(ans, 0, Rf_mkChar(returning.toLatin1().constData()));
-    UNPROTECT(1);
-    return ans;
-}
-
-SEXP
 RTool::athlete()
 {
-    QString returning = "none";
-    if (rtool->context) returning = rtool->context->athlete->cyclist;
+    if (rtool == NULL || rtool->context == NULL)   return Rf_allocVector(INTSXP, 0);
 
-    // convert to R type and return, yuck.
-    SEXP ans;
-    PROTECT(ans=Rf_allocVector(STRSXP, 1));
-    SET_STRING_ELT(ans, 0, Rf_mkChar(returning.toLatin1().constData()));
+    // name, home, dob, height, weight, gender
+    SEXP ans, names;
+    PROTECT(ans=Rf_allocList(6));
+    PROTECT(names=Rf_allocVector(STRSXP, 6));
+
+    // next and nextS
+    SEXP item;
+    int next=0;
+    SEXP nextS = ans;
+
+    // NAME
+    PROTECT(item=Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(item, 0, Rf_mkChar(rtool->context->athlete->cyclist.toLatin1().constData()));
+    SETCAR(nextS, item); nextS=CDR(nextS);
+    SET_STRING_ELT(names, next++, Rf_mkChar("name"));
     UNPROTECT(1);
+
+    // HOME
+    PROTECT(item=Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(item, 0, Rf_mkChar(rtool->context->athlete->home->root().absolutePath().toLatin1().constData()));
+    SETCAR(nextS, item); nextS=CDR(nextS);
+    SET_STRING_ELT(names, next++, Rf_mkChar("home"));
+    UNPROTECT(1);
+
+    // DOB
+    PROTECT(item=Rf_allocVector(INTSXP, 1));
+    QDate d1970(1970,01,01);
+    INTEGER(item)[0] = d1970.daysTo(appsettings->cvalue(rtool->context->athlete->cyclist, GC_DOB).toDate());
+    SEXP dclas;
+    PROTECT(dclas=Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(dclas, 0, Rf_mkChar("Date"));
+    Rf_classgets(item,dclas);
+    SETCAR(nextS, item); nextS=CDR(nextS);
+    SET_STRING_ELT(names, next++, Rf_mkChar("dob"));
+    UNPROTECT(2);
+
+    // WEIGHT
+    PROTECT(item=Rf_allocVector(REALSXP, 1));
+    REAL(item)[0] = appsettings->cvalue(rtool->context->athlete->cyclist, GC_WEIGHT).toDouble();
+    SETCAR(nextS, item); nextS=CDR(nextS);
+    SET_STRING_ELT(names, next++, Rf_mkChar("weight"));
+    UNPROTECT(1);
+
+    // HEIGHT
+    PROTECT(item=Rf_allocVector(REALSXP, 1));
+    REAL(item)[0] = appsettings->cvalue(rtool->context->athlete->cyclist, GC_HEIGHT).toDouble();
+    SETCAR(nextS, item); nextS=CDR(nextS);
+    SET_STRING_ELT(names, next++, Rf_mkChar("height"));
+    UNPROTECT(1);
+
+    // GENDER
+    int isfemale = appsettings->cvalue(rtool->context->athlete->cyclist, GC_SEX).toInt();
+    PROTECT(item=Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(item, 0, isfemale ? Rf_mkChar("female") : Rf_mkChar("male"));
+    SETCAR(nextS, item); nextS=CDR(nextS);
+    SET_STRING_ELT(names, next++, Rf_mkChar("gender"));
+    UNPROTECT(1);
+
+    // set the names
+    Rf_namesgets(ans, names);
+
+    // ans + names
+    UNPROTECT(2);
     return ans;
 }
 
