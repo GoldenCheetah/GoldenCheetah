@@ -114,6 +114,10 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
             else if (buffer.contains("Swimming", Qt::CaseInsensitive))
                 rideFile->setTag("Sport", "Swim");
         }
+        else if (qName == "PoolLength")
+        {
+            rideFile->setTag("Pool Length", buffer);
+        }
         return true;
     }
     else if (qName == "Lap")
