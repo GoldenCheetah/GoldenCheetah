@@ -46,7 +46,6 @@ class RTool {
 
         // athlete
         static SEXP athlete();
-        static SEXP athleteHome();
 
         // activities
         static SEXP activities();
