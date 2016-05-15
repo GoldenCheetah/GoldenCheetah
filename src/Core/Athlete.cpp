@@ -102,6 +102,11 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
             } else if (! zones_[i]->warningString().isEmpty()) {
                 QMessageBox::warning(context->mainWindow, tr("Reading Zones File %1").arg(zones_[i]->fileName()), zones_[i]->warningString());
             }
+        } else if (i == 1) { // No running Power zones
+            // Start with Cycling Power zones for backward compatibilty
+            QFile zonesFile(home->config().canonicalPath() + "/" + zones_[0]->fileName());
+            // Load without error/warning report to avoid repetition
+            if (zonesFile.exists()) zones_[i]->read(zonesFile);
         }
     }
 
@@ -115,6 +120,11 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
             } else if (! hrzones_[i]->warningString().isEmpty()) {
                 QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File %1").arg(hrzones_[i]->fileName()), hrzones_[i]->warningString());
             }
+        } else if (i == 1) { // No running HR zones
+            // Start with Cycling HR zones for backward compatibilty
+            QFile hrzonesFile(home->config().canonicalPath() + "/" + hrzones_[0]->fileName());
+            // Load without error/warning report to avoid repetition
+            if (hrzonesFile.exists()) hrzones_[i]->read(hrzonesFile);
         }
     }
 
