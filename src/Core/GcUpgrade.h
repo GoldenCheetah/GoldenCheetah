@@ -71,6 +71,8 @@
 // 3904 - V3.3 RC3
 // 3933 - V3.3 RELEASE (November 29 2015)
 // 3940 - V4.0 DEVELOPMENT STARTS
+// 3941 - V4.0 DEV BUILD 1604
+// 3942 - V4.0 DEV BUILD 1605
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -85,8 +87,8 @@
 #define VERSION31_BUILD VERSION31_UPG
 
 // these three will change until we release
-#define VERSION_LATEST 3941
-#define VERSION_STRING "V4.0 DEV1604"
+#define VERSION_LATEST 3942
+#define VERSION_STRING "V4.0 DEV1605"
 
 // default config for this release is available and maintained here:
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/4.0"
