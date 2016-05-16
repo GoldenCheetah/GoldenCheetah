@@ -25,7 +25,7 @@
 typedef void *QFunctionPointer;
 #endif
 
-class QStringList;
+#include <QStringList>
 class QString;
 class QLibrary;
 class RLibrary {
@@ -43,6 +43,7 @@ class RLibrary {
 
         // it loaded successfully ?
         bool loaded;
+        QStringList errors;
 
         // the library as loaded
         QLibrary *libR;

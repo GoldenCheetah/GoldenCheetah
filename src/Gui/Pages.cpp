@@ -171,6 +171,13 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     startHttp->setChecked(appsettings->value(NULL, GC_START_HTTP, true).toBool());
     configLayout->addWidget(startHttp, 7,1, Qt::AlignLeft);
 #endif
+#ifdef GC_WANT_R
+    embedR = new QCheckBox(tr("Enable R"), this);
+    embedR->setChecked(appsettings->value(NULL, GC_EMBED_R, true).toBool());
+    configLayout->addWidget(embedR, 7+offset,1, Qt::AlignLeft);
+    offset += 1;
+    connect(embedR, SIGNAL(stateChanged(int)), this, SLOT(embedRchanged(int)));
+#endif
 
     //
     // Athlete directory (home of athletes)
@@ -239,6 +246,13 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 #endif
 }
 
+void
+GeneralPage::embedRchanged(int state)
+{
+    rBrowseButton->setVisible(state);
+    rDirectory->setVisible(state);
+    rLabel->setVisible(state);
+}
 
 qint32
 GeneralPage::saveClicked()
@@ -278,6 +292,9 @@ GeneralPage::saveClicked()
 #ifdef GC_WANT_HTTP
     // start http
     appsettings->setValue(GC_START_HTTP, startHttp->isChecked());
+#endif
+#ifdef GC_WANT_R
+    appsettings->setValue(GC_EMBED_R, embedR->isChecked());
 #endif
 
     qint32 state=0;
