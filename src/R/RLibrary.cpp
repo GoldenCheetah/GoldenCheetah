@@ -255,7 +255,7 @@ RLibrary::resolve(const char *symbol)
     QFunctionPointer returning = libR->resolve(symbol);
     if (returning) return returning;
     else {
-        qDebug()<<"libR: failed to resolve:" << symbol;
+        errors << QString("R lib: failed to resolve symbol: '%1'").arg(symbol);
         loaded = false;
         return NULL;
     }
@@ -278,9 +278,21 @@ const char *gcSearchSep = ":";
 bool
 RLibrary::load()
 {
-    // get location from environment or config
-    QString name, home(getenv("R_HOME"));
-    if (home == "") home =  appsettings->value(NULL,GC_R_HOME,"").toString();
+    // if there were any from last time, clear them
+    errors.clear();
+
+    // get location from environment or config - try config then environment
+    // since user may override the value in configuration
+    QString name, home =  appsettings->value(NULL,GC_R_HOME,"").toString();
+    if (home == "") home = getenv("R_HOME");
+
+    // if home still blanks
+    bool sethome = false;
+    if (home == "") {
+        errors << "R_HOME has not been configured in options or the system environment"
+                  " so we looked in the common places to find the R install.\n\n";
+        sethome = true;
+    }
 
     // PLATFORM SPECIFIC PATH AND NAME
 #ifdef Q_OS_LINUX
@@ -289,6 +301,7 @@ RLibrary::load()
     name = "lib/libR.so";
 #endif
 #ifdef WIN32
+//XXX we should try and get the install directory from the registry...
 #if defined(_M_X64) || defined (WIN64)
     name = QString("bin/x64/R.dll");
 #else
@@ -304,6 +317,8 @@ RLibrary::load()
     QString full = QString("%1/%2").arg(home).arg(name);
     if (QFile(full).exists()) {
 
+        errors << QString("The R library was found at '%1'\n").arg(full);
+
         // we need to make sure the dependants are loaded so update
         // LD_LIBRARY_PATH or PATH so they can be found - this only
         // affects us, it is not retained outside our process scope.
@@ -318,10 +333,13 @@ RLibrary::load()
         // Now load the library
         libR = new QLibrary(full);
         loaded = libR->load();
+    } else {
+        errors << "We failed to find the R shared libraries.";
     }
 
     if (!loaded) {
-        qDebug()<<"R shared library load failed:"<<libR->errorString();
+        errors <<"The dynamic library load failed:";
+        errors <<libR->errorString();
         return loaded;
     }
 
@@ -405,5 +423,12 @@ RLibrary::load()
     #endif
 
     // did it work -- resolve sets to false if symbols won't load
+    if (loaded && sethome) {
+        // we searched for it and found it, so lets set R_HOME to what we found
+        // it only affects this process and means users can get away with not
+        // configuring where R is installed if its in a standard place.
+        // sadly, there is no standard place on windows
+        setenv("R_HOME", home.toLatin1().constData(), true);
+    }
     return loaded;
 }

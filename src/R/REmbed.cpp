@@ -27,6 +27,8 @@
 #include "Settings.h"
 #include <stdexcept>
 
+#include <QMessageBox>
+
 static const char *name = "GoldenCheetah";
 
 // no setenv on windows
@@ -71,7 +73,13 @@ REmbed::REmbed(const bool verbose, const bool interactive) : verbose(verbose), i
 
     // need to load the library
     RLibrary rlib;
-    if (!rlib.load()) return;
+    if (!rlib.load()) {
+        QMessageBox msg(QMessageBox::Critical,
+                    "Failed to load R library",
+                    rlib.errors.join("\n"));
+        msg.exec();
+        return;
+    }
 
     // we need to tell embedded R where to work
     QString envR_HOME(getenv("R_HOME"));

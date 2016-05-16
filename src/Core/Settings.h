@@ -88,6 +88,7 @@
 
 #define GC_HOMEDIR                      "<system>homedirectory"
 #define GC_START_HTTP                   "<system>starthttp"
+#define GC_EMBED_R                      "<system>embedR"
 
 #define GC_SETTINGS_LAST                "<system>mainwindow/lastOpened"
 #define GC_SETTINGS_MAIN_GEOM           "<system>mainwindow/geometry"

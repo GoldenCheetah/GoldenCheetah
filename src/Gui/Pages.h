@@ -87,6 +87,7 @@ class GeneralPage : public QWidget
         void browseAthleteDir();
 #ifdef GC_WANT_R
         void browseRDir();
+        void embedRchanged(int);
 #endif
 
     private:
@@ -98,6 +99,9 @@ class GeneralPage : public QWidget
         QCheckBox *warnOnExit;
 #ifdef GC_WANT_HTTP
         QCheckBox *startHttp;
+#endif
+#ifdef GC_WANT_R
+        QCheckBox *embedR;
 #endif
         QLineEdit *garminHWMarkedit;
         QLineEdit *hystedit;

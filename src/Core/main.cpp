@@ -277,14 +277,7 @@ main(int argc, char *argv[])
 #endif
 
 #ifdef GC_WANT_R
-    // create the singleton in the main thread
-    // will be shared by all athletes and all charts (!!)
-    if (noR) {
-        rtool = NULL;
-    } else {
-        rtool = new RTool();
-        if (rtool->failed == true) rtool=NULL;
-    }
+    rtool = NULL;
 #endif
 
     // create the application -- only ever ONE regardless of restarts
@@ -317,6 +310,18 @@ main(int argc, char *argv[])
         // lets not restart endlessly
         restarting = false;
 
+        // we reload R if we are restarting to get that, but
+        // only if it failed
+#ifdef GC_WANT_R
+        // create the singleton in the main thread
+        // will be shared by all athletes and all charts (!!)
+        if (noR) {
+            rtool = NULL;
+        } else if (rtool == NULL && appsettings->value(NULL, GC_EMBED_R, true).toBool()) {
+            rtool = new RTool();
+            if (rtool->failed == true) rtool=NULL;
+        }
+#endif
         //this is the path within the current directory where GC will look for
         //files to allow USB stick support
         QString localLibraryPath="Library/GoldenCheetah";
