@@ -246,6 +246,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 #endif
 }
 
+#ifdef GC_WANT_R
 void
 GeneralPage::embedRchanged(int state)
 {
@@ -253,6 +254,7 @@ GeneralPage::embedRchanged(int state)
     rDirectory->setVisible(state);
     rLabel->setVisible(state);
 }
+#endif
 
 qint32
 GeneralPage::saveClicked()
