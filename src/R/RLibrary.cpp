@@ -301,7 +301,10 @@ RLibrary::load()
     name = "lib/libR.so";
 #endif
 #ifdef WIN32
-//XXX we should try and get the install directory from the registry...
+    if (home == "") {
+        QSettings reg("HKEY_LOCAL_MACHINE\\SOFTWARE\\R-core\\R", QSettings::NativeFormat);
+        home = reg.value("InstallPath", "").toString();
+    }
 #if defined(_M_X64) || defined (WIN64)
     name = QString("bin/x64/R.dll");
 #else
@@ -312,6 +315,8 @@ RLibrary::load()
     if (home == "") home= "/Library/Frameworks/R.framework/Resources";
     name += "lib/libR.dylib";
 #endif
+
+    loaded = false;
 
     // load if its found
     QString full = QString("%1/%2").arg(home).arg(name);
@@ -333,13 +338,15 @@ RLibrary::load()
         // Now load the library
         libR = new QLibrary(full);
         loaded = libR->load();
+
+        // snaffle away errors
+        errors <<libR->errorString();
     } else {
         errors << "We failed to find the R shared libraries.";
     }
 
     if (!loaded) {
-        errors <<"The dynamic library load failed:";
-        errors <<libR->errorString();
+        errors <<"The dynamic library load failed.";
         return loaded;
     }
 
