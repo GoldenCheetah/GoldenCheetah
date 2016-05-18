@@ -677,6 +677,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     static_cast<QwtPlotCanvas*>(intervalPlot->canvas())->setBorderRadius(0);
     intervalPlot->setContentsMargins(0,0,0,0);
 
+    connect(allPlot, SIGNAL(resized()), this, SLOT(allPlotResized()));
+
     // tooltip on hover over point
     /*intervalPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxis::yLeft,
                                QwtPicker::VLineRubberBand,
@@ -3934,4 +3936,15 @@ AllPlotWindow::addPickers(AllPlot *_allPlot)
     connect(_allPlot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), _allPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(_allPlot->tooltip, SIGNAL(moved(const QPoint &)), this, SLOT(plotPickerMoved(const QPoint &)));
     connect(_allPlot->tooltip, SIGNAL(appended(const QPoint &)), this, SLOT(plotPickerSelected(const QPoint &)));
+}
+
+void
+AllPlotWindow::allPlotResized()
+{
+    QwtPlotCanvas *allPlotCanvas = static_cast<QwtPlotCanvas *>(allPlot->canvas());
+    QwtScaleWidget *xAxis = allPlot->axisWidget(QwtAxisId(QwtPlot::xBottom));
+    QwtScaleDraw *xAxisScaleDraw = xAxis->scaleDraw();
+    int left = xAxis->x() + xAxisScaleDraw->pos().x() - 3;
+    int right = allPlot->width() - allPlotCanvas->width() - allPlotCanvas->x() + 1;
+    intervalPlot->setContentsMargins(left, 0, right, 0);
 }

@@ -660,6 +660,9 @@ class AllPlot : public QwtPlot
         void pointHover(QwtPlotCurve*, int);
         void intervalHover(IntervalItem *h);
 
+    signals:
+        void resized();
+
     protected:
 
         friend class ::AllPlotBackground;
