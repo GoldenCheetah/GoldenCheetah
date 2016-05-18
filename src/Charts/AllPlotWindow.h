@@ -418,6 +418,7 @@ class AllPlotWindow : public GcChartWindow
         void addPickers(AllPlot *allPlot2);
         void plotPickerMoved(const QPoint &);
         void plotPickerSelected(const QPoint &);
+        void allPlotResized();
 };
 
 #endif // _GC_AllPlotWindow_h
