@@ -1195,11 +1195,20 @@ RTool::activity(SEXP datetime, SEXP pCompare)
 
             }
 
+            // we have to give a name to each row
+            SEXP rownames;
+            PROTECT(rownames = Rf_allocVector(STRSXP, activities.count()));
+            for(int i=0; i<activities.count(); i++) {
+                QString rownumber=QString("%1").arg(i+1);
+                SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
+            }
+
             // turn the list into a data frame + set column names
             Rf_setAttrib(list, R_ClassSymbol, Rf_mkString("data.frame"));
+            Rf_setAttrib(list, R_RowNamesSymbol, rownames);
             Rf_namesgets(list, names);
 
-            UNPROTECT(2); // list and names and rownames
+            UNPROTECT(3); // list and names and rownames
 
             return list;
 
