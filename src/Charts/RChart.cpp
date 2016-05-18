@@ -333,6 +333,10 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
             connect(context, SIGNAL(compareDateRangesChanged()), this, SLOT(runScript()));
         }
 
+        // we apply BOTH filters, so update when either change
+        connect(context, SIGNAL(filterChanged()), this, SLOT(runScript()));
+        connect(context, SIGNAL(homeFilterChanged()), this, SLOT(runScript()));
+
     } else {
 
         // not starting

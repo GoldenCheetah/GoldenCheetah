@@ -30,6 +30,7 @@
 #include "PMCData.h"
 #include "WPrime.h"
 #include "Season.h"
+#include "Specification.h"
 
 RTool::RTool()
 {
@@ -311,12 +312,33 @@ RTool::activities()
 
     if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
 
+        // apply any global filters
+        Specification specification;
+        FilterSet fs;
+        fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
+        fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
+        specification.setFilterSet(fs);
+
+        // how many pass?
+        int count=0;
+        foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+
+            // apply filters
+            if (!specification.pass(item)) continue;
+            count++;
+        }
+
         // allocate space for a vector of dates
-        PROTECT(dates=Rf_allocVector(REALSXP, rtool->context->athlete->rideCache->count()));
+        PROTECT(dates=Rf_allocVector(REALSXP, count));
 
         // fill with values for date and class
         int i=0;
         foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+
+            // apply filters
+            if (!specification.pass(item)) continue;
+
+            // add to the list
             REAL(dates)[i++] = item->dateTime.toUTC().toTime_t();
 
         }
@@ -533,12 +555,19 @@ RTool::dfForDateRange(bool all, DateRange range)
 
     // how many rides to return if we're limiting to the
     // currently selected date range ?
-    if (!all) {
-        // we need to count rides that are in range...
-        rides = 0;
-        foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
-            if (range.pass(ride->dateTime.date())) rides++;
-        }
+
+    // apply any global filters
+    Specification specification;
+    FilterSet fs;
+    fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
+    fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
+    specification.setFilterSet(fs);
+
+    // we need to count rides that are in range...
+    rides = 0;
+    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+        if (!specification.pass(ride)) continue;
+        if (all || range.pass(ride->dateTime.date())) rides++;
     }
 
     // get a listAllocated
@@ -568,6 +597,7 @@ RTool::dfForDateRange(bool all, DateRange range)
     int k=0;
     QDate d1970(1970,01,01);
     foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+        if (!specification.pass(ride)) continue;
         if (all || range.pass(ride->dateTime.date()))
             INTEGER(date)[k++] = d1970.daysTo(ride->dateTime.date());
     }
@@ -588,6 +618,7 @@ RTool::dfForDateRange(bool all, DateRange range)
     // fill with values for date and class if its one we need to return
     k=0;
     foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+        if (!specification.pass(ride)) continue;
         if (all || range.pass(ride->dateTime.date()))
             REAL(time)[k++] = ride->dateTime.toUTC().toTime_t();
     }
@@ -628,6 +659,7 @@ RTool::dfForDateRange(bool all, DateRange range)
 
         int index=0;
         foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+            if (!specification.pass(item)) continue;
             if (all || range.pass(item->dateTime.date())) {
                 REAL(m)[index++] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
                                                       + (useMetricUnits ? 0.0f : metric->conversionSum());
@@ -662,6 +694,7 @@ RTool::dfForDateRange(bool all, DateRange range)
 
         int index=0;
         foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+            if (!specification.pass(item)) continue;
             if (all || range.pass(item->dateTime.date())) {
                 SET_STRING_ELT(m, index++, Rf_mkChar(item->getText(field.name, "").toLatin1().constData()));
             }
@@ -686,6 +719,7 @@ RTool::dfForDateRange(bool all, DateRange range)
 
     int index=0;
     foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+        if (!specification.pass(item)) continue;
         if (all || range.pass(item->dateTime.date())) {
 
             // apply item color, remembering that 1,1,1 means use default (reverse in this case)
@@ -1468,11 +1502,23 @@ RTool::dfForDateRangePeaks(bool all, DateRange range, QList<RideFile::SeriesType
     int next=1;
 
     // how many rides ?
+    Specification specification;
+    FilterSet fs;
+    fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
+    fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
+    specification.setFilterSet(fs);
+
+    // how many pass?
     int size=0;
     foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+
+        // apply filters
+        if (!specification.pass(item)) continue;
+
         // do we want this one ?
         if (all || range.pass(item->dateTime.date()))  size++;
     }
+
 
     // dates first
     SEXP dates;
@@ -1481,6 +1527,9 @@ RTool::dfForDateRangePeaks(bool all, DateRange range, QList<RideFile::SeriesType
     // fill with values for date and class
     int i=0;
     foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+        // apply filters
+        if (!specification.pass(item)) continue;
+
         if (all || range.pass(item->dateTime.date())) {
             REAL(dates)[i++] = item->dateTime.toUTC().toTime_t();
         }
@@ -1513,6 +1562,9 @@ RTool::dfForDateRangePeaks(bool all, DateRange range, QList<RideFile::SeriesType
             // get the value for the series and duration requested, although this is called
             int index=0;
             foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+
+                // apply filters
+                if (!specification.pass(item)) continue;
 
                 // do we want this one ?
                 if (all || range.pass(item->dateTime.date())) {
