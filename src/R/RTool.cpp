@@ -30,6 +30,7 @@
 #include "PMCData.h"
 #include "WPrime.h"
 #include "Season.h"
+#include "DataFilter.h"
 #include "Specification.h"
 
 RTool::RTool()
@@ -101,7 +102,7 @@ RTool::RTool()
             // if activity is passed compare=TRUE it returns a list of rides
             // currently in the compare pane if compare is enabled or
             // just a 1 item list with the current ride
-            { "GC.activities", (DL_FUNC) &RTool::activities, 0 },
+            { "GC.activities", (DL_FUNC) &RTool::activities, 1 },
             { "GC.activity", (DL_FUNC) &RTool::activity, 1 },
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 1 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 1 },
@@ -145,7 +146,7 @@ RTool::RTool()
                                "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
 
                                // activity
-                               "GC.activities <- function() { .Call(\"GC.activities\") }\n"
+                               "GC.activities <- function(filter=\"\") { .Call(\"GC.activities\", filter) }\n"
                                "GC.activity <- function(compare=FALSE) { .Call(\"GC.activity\", compare) }\n"
                                "GC.activity.metrics <- function(compare=FALSE) { .Call(\"GC.activity.metrics\", compare) }\n"
                                "GC.activity.meanmax <- function(compare=FALSE) { .Call(\"GC.activity.meanmax\", compare) }\n"
@@ -305,19 +306,37 @@ RTool::pageSize(SEXP width, SEXP height)
 }
 
 SEXP
-RTool::activities()
+RTool::activities(SEXP filter)
 {
     SEXP dates=NULL;
     SEXP clas;
 
+
     if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
 
+        // filters
         // apply any global filters
         Specification specification;
         FilterSet fs;
         fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
         fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
+
+        // did call contain any filters?
+        PROTECT(filter=Rf_coerceVector(filter, STRSXP));
+        for(int i=0; i<Rf_length(filter); i++) {
+
+            // if not empty write a filter
+            QString f(CHAR(STRING_ELT(filter,i)));
+            if (f != "") {
+
+                DataFilter dataFilter(rtool->canvas, rtool->context);
+                QStringList files;
+                dataFilter.parseFilter(rtool->context, f, &files);
+                fs.addFilter(true, files);
+            }
+        }
         specification.setFilterSet(fs);
+        UNPROTECT(1);
 
         // how many pass?
         int count=0;
