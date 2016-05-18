@@ -391,6 +391,9 @@ RChart::runScript()
         // set default page size
         rtool->width = rtool->height = 500;
 
+        // 1x1 default plotting, don't get hangover from other plots
+        rtool->R->parseEvalQNT("par(mfrow=c(1,1))");
+
         QString line = script->toPlainText();
 
         try {
