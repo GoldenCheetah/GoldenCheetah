@@ -103,7 +103,7 @@ RTool::RTool()
             // currently in the compare pane if compare is enabled or
             // just a 1 item list with the current ride
             { "GC.activities", (DL_FUNC) &RTool::activities, 1 },
-            { "GC.activity", (DL_FUNC) &RTool::activity, 1 },
+            { "GC.activity", (DL_FUNC) &RTool::activity, 2 },
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 1 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 1 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 1 },
@@ -147,7 +147,7 @@ RTool::RTool()
 
                                // activity
                                "GC.activities <- function(filter=\"\") { .Call(\"GC.activities\", filter) }\n"
-                               "GC.activity <- function(compare=FALSE) { .Call(\"GC.activity\", compare) }\n"
+                               "GC.activity <- function(activity=0, compare=FALSE) { .Call(\"GC.activity\", activity, compare) }\n"
                                "GC.activity.metrics <- function(compare=FALSE) { .Call(\"GC.activity.metrics\", compare) }\n"
                                "GC.activity.meanmax <- function(compare=FALSE) { .Call(\"GC.activity.meanmax\", compare) }\n"
                                "GC.activity.wbal <- function(compare=FALSE) { .Call(\"GC.activity.wbal\", compare) }\n"
@@ -1116,19 +1116,94 @@ RTool::dfForActivity(RideFile *f)
     return ans;
 }
 
+QList<RideItem *>
+RTool::activitiesFor(SEXP datetime)
+{
+    QList<RideItem*> returning;
+
+    PROTECT(datetime=Rf_coerceVector(datetime, INTSXP));
+
+    for(int i=0; i<Rf_length(datetime); i++) {
+
+        long dt = INTEGER(datetime)[i];
+        if (dt==0) continue;
+
+        // we need to find this one !
+        QDateTime asdt = QDateTime::fromTime_t(dt);
+
+        foreach(RideItem*item, rtool->context->athlete->rideCache->rides()) {
+            if (item->dateTime.toUTC() == asdt.toUTC()) {
+                returning << const_cast<RideItem*>(item);
+                break;
+            }
+        }
+    }
+    UNPROTECT(1);
+
+    // return a list of activities to process
+    return returning;
+}
+
 SEXP
-RTool::activity(SEXP pCompare)
+RTool::activity(SEXP datetime, SEXP pCompare)
 {
     // a dataframe to return
     SEXP ans=NULL;
+
 
     // p1 - compare=TRUE|FALSE - return list of compare rides if active, or just current
     pCompare = Rf_coerceVector(pCompare, LGLSXP);
     bool compare = LOGICAL(pCompare)[0];
 
-    // return a list
-    if (compare && rtool->context) {
+    // get a list of activitie to return - user specified ALWAYS gets a list
+    // even if they only provided a single date to process
+    bool userlist = false;
+    QList<RideItem*>activities = rtool->activitiesFor(datetime);
+    if (activities.count()) userlist=true; // use compare mode code to create a list of rides
 
+    // user requested specific activities?
+    if (userlist) {
+
+            // cool we can return a list of intervals to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(LISTSXP, activities.count()));
+
+            // start at the front
+            SEXP nextS = list;
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, activities.count()));
+
+            // create a data.frame for each and add to list
+            int index=0;
+            foreach(RideItem *item, activities) {
+
+                // give it a name
+                SET_STRING_ELT(names, index, Rf_mkChar(QString("%1").arg(index+1).toLatin1().constData()));
+                index++;
+
+                // we open, if it wasn't open we also close
+                // to make sure we don't exhause memory
+                bool close = (item->isOpen() == false);
+                SEXP df = rtool->dfForActivity(item->ride());
+                if (close) item->close();
+
+                // add to back and move on
+                SETCAR(nextS, df);
+                nextS=CDR(nextS);
+
+            }
+
+            // turn the list into a data frame + set column names
+            Rf_setAttrib(list, R_ClassSymbol, Rf_mkString("data.frame"));
+            Rf_namesgets(list, names);
+
+            UNPROTECT(2); // list and names and rownames
+
+            return list;
+
+    } else if (compare && rtool->context) {
 
         if (rtool->context->isCompareIntervals) {
 
@@ -1185,7 +1260,7 @@ RTool::activity(SEXP pCompare)
 
             return list;
 
-        } else if(rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+        } else if (rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
 
             // just return a list of one ride
             // cool we can return a list of intervals to compare
@@ -1229,7 +1304,7 @@ RTool::activity(SEXP pCompare)
     } else if (!compare) { // not compare, so just return a dataframe
 
         // access via global as this is a static function
-        if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+        if(rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
 
             // get the ride
             RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
