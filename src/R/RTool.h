@@ -48,7 +48,7 @@ class RTool {
         static SEXP athlete();
 
         // activities
-        static SEXP activities();
+        static SEXP activities(SEXP filter);
         static SEXP activity(SEXP compare);
         static SEXP activityMeanmax(SEXP compare);
         static SEXP activityWBal(SEXP compare);
