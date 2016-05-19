@@ -135,6 +135,48 @@ RideFile::computeFileCRC(QString filename)
     return qChecksum(&data[0], file.size());
 }
 
+void
+RideFile::updateDataTag()
+{
+    QString flags;
+
+    if (areDataPresent()->secs) flags += 'T'; // time
+    else flags += '-';
+    if (areDataPresent()->km) flags += 'D'; // distance
+    else flags += '-';
+    if (areDataPresent()->kph) flags += 'S'; // speed
+    else flags += '-';
+    if (areDataPresent()->watts) flags += 'P'; // Power
+    else flags += '-';
+    if (areDataPresent()->hr) flags += 'H'; // Heartrate
+    else flags += '-';
+    if (areDataPresent()->cad) flags += 'C'; // cadence
+    else flags += '-';
+    if (areDataPresent()->nm) flags += 'N'; // Torque
+    else flags += '-';
+    if (areDataPresent()->alt) flags += 'A'; // Altitude
+    else flags += '-';
+    if (areDataPresent()->lat ||
+        areDataPresent()->lon ) flags += 'G'; // GPS
+    else flags += '-';
+    if (areDataPresent()->slope) flags += 'L'; // Slope
+    else flags += '-';
+    if (areDataPresent()->headwind) flags += 'W'; // Windspeed
+    else flags += '-';
+    if (areDataPresent()->temp) flags += 'E'; // Temperature
+    else flags += '-';
+    if (areDataPresent()->lrbalance) flags += 'V'; // V for "Vector" aka lr pedal data
+    else flags += '-';
+    if (areDataPresent()->smo2 ||
+        areDataPresent()->thb) flags += 'O'; // Moxy O2/Haemoglobin
+    else flags += '-';
+    if (areDataPresent()->rcontact ||
+        areDataPresent()->rvert ||
+        areDataPresent()->rcontact) flags += 'R'; // R is for running dynamics
+    else flags += '-';
+    setTag("Data", flags);
+}
+
 WPrime *
 RideFile::wprimeData()
 {
@@ -722,43 +764,7 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         if (context) result->recalculateDerivedSeries();
 
         // what data is present - after processor in case 'derived' or adjusted
-        QString flags;
-
-        if (result->areDataPresent()->secs) flags += 'T'; // time
-        else flags += '-';
-        if (result->areDataPresent()->km) flags += 'D'; // distance
-        else flags += '-';
-        if (result->areDataPresent()->kph) flags += 'S'; // speed
-        else flags += '-';
-        if (result->areDataPresent()->watts) flags += 'P'; // Power
-        else flags += '-';
-        if (result->areDataPresent()->hr) flags += 'H'; // Heartrate
-        else flags += '-';
-        if (result->areDataPresent()->cad) flags += 'C'; // cadence
-        else flags += '-';
-        if (result->areDataPresent()->nm) flags += 'N'; // Torque
-        else flags += '-';
-        if (result->areDataPresent()->alt) flags += 'A'; // Altitude
-        else flags += '-';
-        if (result->areDataPresent()->lat ||
-            result->areDataPresent()->lon ) flags += 'G'; // GPS
-        else flags += '-';
-        if (result->areDataPresent()->slope) flags += 'L'; // Slope
-        else flags += '-';
-        if (result->areDataPresent()->headwind) flags += 'W'; // Windspeed
-        else flags += '-';
-        if (result->areDataPresent()->temp) flags += 'E'; // Temperature
-        else flags += '-';
-        if (result->areDataPresent()->lrbalance) flags += 'V'; // V for "Vector" aka lr pedal data
-        else flags += '-';
-        if (result->areDataPresent()->smo2 ||
-            result->areDataPresent()->thb) flags += 'O'; // Moxy O2/Haemoglobin
-        else flags += '-';
-        if (result->areDataPresent()->rcontact ||
-            result->areDataPresent()->rvert ||
-            result->areDataPresent()->rcontact) flags += 'R'; // R is for running dynamics
-        else flags += '-';
-        result->setTag("Data", flags);
+        result->updateDataTag();
 
         //foreach(RideFile::seriestype x, result->arePresent()) qDebug()<<"present="<<x;
 
@@ -1217,6 +1223,7 @@ RideFile::setDataPresent(SeriesType series, bool value)
         default:
         case none : break;
     }
+    updateDataTag();
 }
 
 bool
