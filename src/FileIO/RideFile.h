@@ -180,6 +180,7 @@ class RideFile : public QObject // QObject to emit signals
 
         // utility
         static unsigned int computeFileCRC(QString); 
+        void updateDataTag();
 
         // Constructor / Destructor
         RideFile();
