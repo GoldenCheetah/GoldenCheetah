@@ -7069,6 +7069,9 @@ AllPlot::intervalHover(IntervalItem *chosen)
 bool
 AllPlot::eventFilter(QObject *obj, QEvent *event)
 {
+    if (event->type() == QEvent::Resize) {
+        emit resized();
+    }
 
     // REFERENCE LINE FOR POWER
     if ((showPowerState<2 && scope == RideFile::none) || scope == RideFile::watts || scope == RideFile::aTISS || 
