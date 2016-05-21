@@ -50,7 +50,7 @@ RCanvas::RCanvas(Context *context, QWidget *parent) : QGraphicsView(parent), con
     // no frame, its ugly
     setFrameStyle(QFrame::NoFrame);
 
-#ifndef WIN32 // not on windows for now
+#ifdef Q_OS_LINUX // mac and windows both have issues. sigh.
     setViewport(new QGLWidget( QGLFormat(QGL::SampleBuffers)));
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 #endif
