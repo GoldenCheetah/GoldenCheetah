@@ -1408,6 +1408,11 @@ MeanMaxComputer::run()
     // future if some fancy new algorithm arrives
     //
 
+    // XXX seems we can end up with 0 at the end ?
+    // XXX don't know why, so, for now, just clean that
+    while (ride_bests.size() && ride_bests[ride_bests.size()-1] == 0)
+        ride_bests.resize(ride_bests.size()-1);
+
     double last = 0;
 
     // only care about first 3 minutes MAX for delta series
@@ -1419,13 +1424,16 @@ MeanMaxComputer::run()
         array.resize(ride_bests.count());
     }
 
-    for (int i=ride_bests.size()-1; i; i--) {
-        if (ride_bests[i] == 0) ride_bests[i]=last;
-        else last = ride_bests[i];
+    // bounds check, it might be empty!
+    if (ride_bests.size()) {
+        for (int i=ride_bests.size()-1; i; i--) {
+            if (ride_bests[i] == 0) ride_bests[i]=last;
+            else last = ride_bests[i];
 
-        // convert from double to long, preserving the
-        // precision by applying a multiplier
-        array[i] = ride_bests[i]; // * decimals; -- we did that earlier
+            // convert from double to long, preserving the
+            // precision by applying a multiplier
+            array[i] = ride_bests[i]; // * decimals; -- we did that earlier
+        }
     }
 }
 

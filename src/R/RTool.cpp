@@ -1402,13 +1402,12 @@ RTool::dfForRideFileCache(RideFileCache *cache)
 
         // set a vector
         SEXP vector;
-        PROTECT(vector=Rf_allocVector(REALSXP, size));
+        PROTECT(vector=Rf_allocVector(REALSXP, values.count()));
 
         // will have different sizes e.g. when a daterange
         // since longest ride with e.g. power may be different
         // to longest ride with heartrate
-        for(unsigned int j=0; j<size; j++)
-            REAL(vector)[j] = j < static_cast<unsigned int>(values.count()) ? values[j] : 0.0f;
+        for(int j=0; j<values.count(); j++) REAL(vector)[j] = values[j];
 
         // add to the list
         SETCAR(nextS, vector);
@@ -1433,7 +1432,7 @@ RTool::dfForRideFileCache(RideFileCache *cache)
 
     // turn the list into a data frame + set column names
     Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
-    Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+    //Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
     Rf_namesgets(ans, names);
 
     // ans + names + rownames
