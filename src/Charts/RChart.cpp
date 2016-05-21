@@ -270,6 +270,17 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
     // then disable the RConsole altogether.
     if (rtool) {
 
+        // reveal controls
+        QHBoxLayout *rev = new QHBoxLayout();
+        showCon = new QCheckBox(tr("Show Console"), this);
+        showCon->setChecked(true);
+
+        rev->addStretch();
+        rev->addWidget(showCon);
+        rev->addStretch();
+
+        setRevealLayout(rev);
+
         leftsplitter = new QSplitter(Qt::Vertical, this);
         leftsplitter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         leftsplitter->setHandleWidth(1);
@@ -337,6 +348,13 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
         connect(context, SIGNAL(filterChanged()), this, SLOT(runScript()));
         connect(context, SIGNAL(homeFilterChanged()), this, SLOT(runScript()));
 
+        // reveal controls
+        connect(showCon, SIGNAL(stateChanged(int)), this, SLOT(showConChanged(int)));
+
+        // config changes
+        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+        configChanged(CONFIG_APPEARANCE);
+
     } else {
 
         // not starting
@@ -344,7 +362,36 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
         splitter = NULL;
         console = NULL;
         canvas = NULL;
+        showCon = NULL;
+        leftsplitter = NULL;
     }
+}
+
+void
+RChart::configChanged(qint32)
+{
+    if (!ridesummary) setProperty("color", GColor(CTRENDPLOTBACKGROUND));
+    else setProperty("color", GColor(CPLOTBACKGROUND));
+
+    // tinted palette for headings etc
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    setPalette(palette);
+}
+
+void
+RChart::setConsole(bool show)
+{
+    if (showCon) showCon->setChecked(show);
+}
+
+void
+RChart::showConChanged(int state)
+{
+    if (leftsplitter) leftsplitter->setVisible(state);
 }
 
 QString
