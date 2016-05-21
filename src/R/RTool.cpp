@@ -170,7 +170,8 @@ RTool::RTool()
 
                                // version and build
                                "GC.version <- function() { return(\"%1\") }\n"
-                               "GC.build <- function() { return(%2) }\n")
+                               "GC.build <- function() { return(%2) }\n"
+                               "par.default <- par()\n")
                        .arg(VERSION_STRING)
                        .arg(VERSION_LATEST)
                        .arg("https://cloud.r-project.org/"));
@@ -206,13 +207,15 @@ void
 RTool::configChanged()
 {
     // update global R appearances
-    QString parCommand=QString("par(bg=\"%1\", "
+    QString parCommand=QString("par(par.default)\n"
+                               "par(bg=\"%1\", "
                                "    col=\"%2\", "
                                "    fg=\"%2\", "
                                "    col.main=\"%2\", "
                                "    col.sub=\"%3\", "
                                "    col.lab=\"%3\", "
-                               "    col.axis=\"%3\")"
+                               "    col.axis=\"%3\")\n"
+                               "par.gc <- par()\n"
                             ).arg(GColor(CPLOTBACKGROUND).name())
                              .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
                              .arg(GColor(CPLOTMARKER).name());
