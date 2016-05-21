@@ -25,6 +25,7 @@
 #include <QColor>
 #include <QTextEdit>
 #include <QScrollBar>
+#include <QCheckBox>
 #include <QSplitter>
 #include <QByteArray>
 #include <string.h>
