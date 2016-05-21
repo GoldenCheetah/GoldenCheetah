@@ -82,14 +82,22 @@ class RChart : public GcChartWindow {
 
     Q_PROPERTY(QString script READ getScript WRITE setScript USER true)
     Q_PROPERTY(QString state READ getState WRITE setState USER true)
+    Q_PROPERTY(bool showConsole READ showConsole WRITE setConsole USER true)
 
     public:
         RChart(Context *context, bool ridesummary);
+
+        // reveal
+        bool hasReveal() { return true; }
+        QCheckBox *showCon;
 
         // receives all the events
         QTextEdit *script;
         RConsole *console;
         RCanvas *canvas;
+
+        bool showConsole() const { return (showCon ? showCon->isChecked() : true); }
+        void setConsole(bool);
 
         QString getScript() const;
         void setScript(QString);
@@ -98,6 +106,8 @@ class RChart : public GcChartWindow {
         void setState(QString);
 
     public slots:
+        void configChanged(qint32);
+        void showConChanged(int state);
         void runScript();
 
     protected:
