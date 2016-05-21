@@ -50,6 +50,11 @@ RCanvas::RCanvas(Context *context, QWidget *parent) : QGraphicsView(parent), con
     // no frame, its ugly
     setFrameStyle(QFrame::NoFrame);
 
+#ifndef WIN32 // not on windows for now
+    setViewport(new QGLWidget( QGLFormat(QGL::SampleBuffers)));
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+#endif
+
     // add a scene
     scene = new QGraphicsScene(this);
     this->setScene(scene);
