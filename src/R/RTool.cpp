@@ -110,9 +110,9 @@ RTool::RTool()
 
             // all=FALSE, compare=FALSE
             { "GC.season", (DL_FUNC) &RTool::season, 2 },
-            { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 2 },
-            { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 2 },
-            { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 4 },
+            { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 3 },
+            { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 3 },
+            { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 5 },
             // return a data.frame of pmc series (all=FALSE, metric="TSS")
             { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 2 },
             { NULL, NULL, 0 }
@@ -154,18 +154,18 @@ RTool::RTool()
 
                                // season
                                "GC.season <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season\", all, compare) }\n"
-                               "GC.season.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season.metrics\", all, compare) }\n"
+                               "GC.season.metrics <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.metrics\", all, filter, compare) }\n"
                                "GC.season.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
-                               "GC.season.meanmax <- function(all=FALSE,compare=FALSE) { .Call(\"GC.season.meanmax\", all, compare) }\n"
+                               "GC.season.meanmax <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.meanmax\", all, filter, compare) }\n"
                                // find peaks does a few validation checks on the R side
-                               "GC.season.peaks <- function(all=FALSE, compare=FALSE, series, duration) {\n"
+                               "GC.season.peaks <- function(all=FALSE, filter=\"\", compare=FALSE, series, duration) {\n"
                                "   if (missing(series)) stop(\"series must be specified.\")\n"
                                "   if (missing(duration)) stop(\"duration must be specified.\")\n"
                                "   if (!is.numeric(duration)) stop(\"duration must be numeric.\")\n"
-                               "   .Call(\"GC.season.peaks\", all, compare, series, duration)"
+                               "   .Call(\"GC.season.peaks\", all, filter, compare, series, duration)"
                                "}\n"
                                // these 2 added for backward compatibility, may be deprecated
-                               "GC.metrics <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season.metrics\", all, compare) }\n"
+                               "GC.metrics <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.metrics\", all, filter, compare) }\n"
                                "GC.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
 
                                // version and build
@@ -557,7 +557,7 @@ RTool::dfForRideItem(const RideItem *ri)
 }
 
 SEXP
-RTool::dfForDateRange(bool all, DateRange range)
+RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 {
     const RideMetricFactory &factory = RideMetricFactory::instance();
     int rides = rtool->context->athlete->rideCache->count();
@@ -584,6 +584,23 @@ RTool::dfForDateRange(bool all, DateRange range)
     fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
     fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
     specification.setFilterSet(fs);
+
+    // did call contain any filters?
+    PROTECT(filter=Rf_coerceVector(filter, STRSXP));
+    for(int i=0; i<Rf_length(filter); i++) {
+
+        // if not empty write a filter
+        QString f(CHAR(STRING_ELT(filter,i)));
+        if (f != "") {
+
+            DataFilter dataFilter(rtool->canvas, rtool->context);
+            QStringList files;
+            dataFilter.parseFilter(rtool->context, f, &files);
+            fs.addFilter(true, files);
+        }
+    }
+    specification.setFilterSet(fs);
+    UNPROTECT(1);
 
     // we need to count rides that are in range...
     rides = 0;
@@ -880,7 +897,7 @@ RTool::season(SEXP pAll, SEXP pCompare)
 }
 
 SEXP
-RTool::metrics(SEXP pAll, SEXP pCompare)
+RTool::metrics(SEXP pAll, SEXP pFilter, SEXP pCompare)
 {
     // p1 - all=TRUE|FALSE - return all metrics or just within
     //                       the currently selected date range
@@ -926,7 +943,7 @@ RTool::metrics(SEXP pAll, SEXP pCompare)
                     SEXP offset = namedlist;
 
                     // add the ride
-                    SEXP df = rtool->dfForDateRange(all, DateRange(p.start, p.end));
+                    SEXP df = rtool->dfForDateRange(all, DateRange(p.start, p.end), pFilter);
                     SETCAR(offset, df);
                     offset=CDR(offset);
 
@@ -969,7 +986,7 @@ RTool::metrics(SEXP pAll, SEXP pCompare)
 
             // add the metrics
             DateRange range = rtool->context->currentDateRange();
-            SEXP df = rtool->dfForDateRange(all, range);
+            SEXP df = rtool->dfForDateRange(all, range, pFilter);
             SETCAR(offset, df);
             offset=CDR(offset);
 
@@ -993,7 +1010,7 @@ RTool::metrics(SEXP pAll, SEXP pCompare)
 
         // just a datafram of metrics
         DateRange range = rtool->context->currentDateRange();
-        return rtool->dfForDateRange(all, range);
+        return rtool->dfForDateRange(all, range, pFilter);
 
     }
 
@@ -1340,13 +1357,32 @@ RTool::dfForActivityMeanmax(const RideItem *i)
 }
 
 SEXP
-RTool::dfForDateRangeMeanmax(bool all, DateRange range)
+RTool::dfForDateRangeMeanmax(bool all, DateRange range, SEXP filter)
 {
     // construct the date range and then get a ridefilecache
     if (all) range = DateRange(QDate(1900,01,01), QDate(2100,01,01));
 
-    // RideFileCache for a date range with no filtering etc
-    RideFileCache cache(rtool->context, range.from, range.to, false, QStringList(), false, NULL);
+    // did call contain any filters?
+    QStringList filelist;
+    bool filt=false;
+    PROTECT(filter=Rf_coerceVector(filter, STRSXP));
+    for(int i=0; i<Rf_length(filter); i++) {
+
+        // if not empty write a filter
+        QString f(CHAR(STRING_ELT(filter,i)));
+        if (f != "") {
+
+            DataFilter dataFilter(rtool->canvas, rtool->context);
+            QStringList files;
+            dataFilter.parseFilter(rtool->context, f, &files);
+            filelist << files;
+            filt=true;
+        }
+    }
+    UNPROTECT(1);
+
+    // RideFileCache for a date range with our filters (if any)
+    RideFileCache cache(rtool->context, range.from, range.to, filt, filelist, false, NULL);
 
     return dfForRideFileCache(&cache);
 
@@ -1443,7 +1479,7 @@ RTool::dfForRideFileCache(RideFileCache *cache)
 }
 
 SEXP
-RTool::seasonPeaks(SEXP pAll, SEXP pCompare, SEXP pSeries, SEXP pDuration)
+RTool::seasonPeaks(SEXP pAll, SEXP pFilter, SEXP pCompare, SEXP pSeries, SEXP pDuration)
 {
     // check parameters !
     pAll = Rf_coerceVector(pAll, LGLSXP);
@@ -1516,7 +1552,7 @@ RTool::seasonPeaks(SEXP pAll, SEXP pCompare, SEXP pSeries, SEXP pDuration)
                     SEXP offset = namedlist;
 
                     // add the ride
-                    SEXP df = rtool->dfForDateRangePeaks(all, DateRange(p.start, p.end), series, durations);
+                    SEXP df = rtool->dfForDateRangePeaks(all, DateRange(p.start, p.end), pFilter, series, durations);
                     SETCAR(offset, df);
                     offset=CDR(offset);
 
@@ -1559,7 +1595,7 @@ RTool::seasonPeaks(SEXP pAll, SEXP pCompare, SEXP pSeries, SEXP pDuration)
 
             // add the metrics
             DateRange range = rtool->context->currentDateRange();
-            SEXP df = rtool->dfForDateRangePeaks(all, range, series, durations);
+            SEXP df = rtool->dfForDateRangePeaks(all, range, pFilter, series, durations);
             SETCAR(offset, df);
             offset=CDR(offset);
 
@@ -1583,7 +1619,7 @@ RTool::seasonPeaks(SEXP pAll, SEXP pCompare, SEXP pSeries, SEXP pDuration)
 
         // just a datafram of metrics
         DateRange range = rtool->context->currentDateRange();
-        return rtool->dfForDateRangePeaks(all, range, series, durations);
+        return rtool->dfForDateRangePeaks(all, range, pFilter, series, durations);
 
     }
 
@@ -1592,7 +1628,7 @@ RTool::seasonPeaks(SEXP pAll, SEXP pCompare, SEXP pSeries, SEXP pDuration)
 }
 
 SEXP
-RTool::dfForDateRangePeaks(bool all, DateRange range, QList<RideFile::SeriesType> series, QList<int> durations)
+RTool::dfForDateRangePeaks(bool all, DateRange range, SEXP filter, QList<RideFile::SeriesType> series, QList<int> durations)
 {
     // so how many vectors in the frame ? +1 is the datetime of the peak
     int listsize=series.count() * durations.count() + 1;
@@ -1612,6 +1648,23 @@ RTool::dfForDateRangePeaks(bool all, DateRange range, QList<RideFile::SeriesType
     fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
     fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
     specification.setFilterSet(fs);
+
+    // did call contain any filters?
+    PROTECT(filter=Rf_coerceVector(filter, STRSXP));
+    for(int i=0; i<Rf_length(filter); i++) {
+
+        // if not empty write a filter
+        QString f(CHAR(STRING_ELT(filter,i)));
+        if (f != "") {
+
+            DataFilter dataFilter(rtool->canvas, rtool->context);
+            QStringList files;
+            dataFilter.parseFilter(rtool->context, f, &files);
+            fs.addFilter(true, files);
+        }
+    }
+    specification.setFilterSet(fs);
+    UNPROTECT(1);
 
     // how many pass?
     int size=0;
@@ -1709,7 +1762,7 @@ RTool::dfForDateRangePeaks(bool all, DateRange range, QList<RideFile::SeriesType
 }
 
 SEXP
-RTool::seasonMeanmax(SEXP pAll, SEXP pCompare)
+RTool::seasonMeanmax(SEXP pAll, SEXP pFilter, SEXP pCompare)
 {
     // p1 - all=TRUE|FALSE - return all metrics or just within
     //                       the currently selected date range
@@ -1755,7 +1808,7 @@ RTool::seasonMeanmax(SEXP pAll, SEXP pCompare)
                     SEXP offset = namedlist;
 
                     // add the ride
-                    SEXP df = rtool->dfForDateRangeMeanmax(all, DateRange(p.start, p.end));
+                    SEXP df = rtool->dfForDateRangeMeanmax(all, DateRange(p.start, p.end), pFilter);
                     SETCAR(offset, df);
                     offset=CDR(offset);
 
@@ -1798,7 +1851,7 @@ RTool::seasonMeanmax(SEXP pAll, SEXP pCompare)
 
             // add the meanmaxes
             DateRange range = rtool->context->currentDateRange();
-            SEXP df = rtool->dfForDateRangeMeanmax(all, range);
+            SEXP df = rtool->dfForDateRangeMeanmax(all, range, pFilter);
             SETCAR(offset, df);
             offset=CDR(offset);
 
@@ -1822,7 +1875,7 @@ RTool::seasonMeanmax(SEXP pAll, SEXP pCompare)
 
         // just a datafram of meanmax
         DateRange range = rtool->context->currentDateRange();
-        return rtool->dfForDateRangeMeanmax(all, range);
+        return rtool->dfForDateRangeMeanmax(all, range, pFilter);
 
     }
 

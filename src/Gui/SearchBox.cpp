@@ -472,6 +472,9 @@ void SearchBox::insertCompletion(const QString& completion)
 
     QString t = text();
 
+    // blank!!
+    if (t.length()==0) return;
+
     QChar last = t[t.length()-1];
 
     if (last.isLetterOrNumber()) {
