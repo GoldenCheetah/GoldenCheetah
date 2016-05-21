@@ -33,7 +33,7 @@ RConsole::RConsole(Context *context, RChart *parent)
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setFrameStyle(QFrame::NoFrame);
     setAcceptRichText(false);
-    document()->setMaximumBlockCount(10240);
+    document()->setMaximumBlockCount(512); // lets not get carried away!
     putData(GColor(CPLOTMARKER), QString(tr("R Console (%1)").arg(rtool->version)));
     putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "\n> ");
 
