@@ -46,7 +46,7 @@ class RTool {
 
         // athlete
         static SEXP athlete();
-        static SEXP zones();
+        static SEXP zones(SEXP date, SEXP sport);
 
         // activities
         static SEXP activities(SEXP filter);
