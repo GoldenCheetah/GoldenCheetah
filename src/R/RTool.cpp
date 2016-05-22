@@ -32,6 +32,9 @@
 #include "Season.h"
 #include "DataFilter.h"
 #include "Specification.h"
+#include "Zones.h"
+#include "HrZones.h"
+#include "PaceZones.h"
 
 RTool::RTool()
 {
@@ -80,6 +83,7 @@ RTool::RTool()
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 ,0, 0 },
             { "GC.page", (DL_FUNC) &RTool::pageSize, 0 ,0, 0 },
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 ,0, 0 },
+            { "GC.athlete.zones", (DL_FUNC) &RTool::zones, 0 ,0, 0 },
             { "GC.activities", (DL_FUNC) &RTool::activities, 0 ,0, 0 },
             { "GC.activity", (DL_FUNC) &RTool::activity, 0 ,0, 0 },
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0 ,0, 0 },
@@ -98,6 +102,7 @@ RTool::RTool()
 
             // athlete
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 },
+            { "GC.athlete.zones", (DL_FUNC) &RTool::zones, 0 },
 
             // if activity is passed compare=TRUE it returns a list of rides
             // currently in the compare pane if compare is enabled or
@@ -144,6 +149,7 @@ RTool::RTool()
 
                                // athlete
                                "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
+                               "GC.athlete.zones <- function() { .Call(\"GC.athlete.zones\") }\n"
 
                                // activity
                                "GC.activities <- function(filter=\"\") { .Call(\"GC.activities\", filter) }\n"
@@ -293,6 +299,291 @@ RTool::athlete()
     // ans + names
     UNPROTECT(2);
     return ans;
+}
+
+// one entry per sport per date for hr/power/pace
+class gcZoneConfig {
+    public:
+    gcZoneConfig(QString sport) : sport(sport), date(QDate(01,01,01)), cp(0), wprime(0), pmax(0), ftp(0),lthr(0),rhr(0),hrmax(0),cv(0) {}
+    bool operator<(gcZoneConfig rhs) const { return date < rhs.date; }
+    QString sport;
+    QDate date;
+    int cp, wprime, pmax,ftp,lthr,rhr,hrmax,cv;
+};
+
+SEXP
+RTool::zones()
+{
+    // return a dataframe with
+    // date, sport, cp, w', pmax, ftp, lthr, rhr, hrmax, cv
+
+    // need non-null context
+    if (!rtool || !rtool->context)  return Rf_allocVector(INTSXP, 0);
+
+    // COLLECT ALL THE CONFIG TOGETHER
+    QList<gcZoneConfig> config;
+
+    // BIKE POWER
+    if (rtool->context->athlete->zones(false)) {
+
+        for (int range=0; range < rtool->context->athlete->zones(false)->getRangeSize(); range++) {
+
+            // run through the bike zones
+            gcZoneConfig c("bike");
+
+            c.date =  rtool->context->athlete->zones(false)->getStartDate(range);
+            c.cp = rtool->context->athlete->zones(false)->getCP(range);
+            c.wprime = rtool->context->athlete->zones(false)->getWprime(range);
+            c.pmax = rtool->context->athlete->zones(false)->getPmax(range);
+            c.ftp = rtool->context->athlete->zones(false)->getFTP(range);
+
+            config << c;
+        }
+    }
+
+    // RUN POWER
+    if (rtool->context->athlete->zones(false)) {
+
+        // run through the bike zones
+        for (int range=0; range < rtool->context->athlete->zones(true)->getRangeSize(); range++) {
+
+            // run through the bike zones
+            gcZoneConfig c("run");
+
+            c.date =  rtool->context->athlete->zones(true)->getStartDate(range);
+            c.cp = rtool->context->athlete->zones(true)->getCP(range);
+            c.wprime = rtool->context->athlete->zones(true)->getWprime(range);
+            c.pmax = rtool->context->athlete->zones(true)->getPmax(range);
+            c.ftp = rtool->context->athlete->zones(true)->getFTP(range);
+
+            config << c;
+        }
+    }
+
+    // BIKE HR
+    if (rtool->context->athlete->hrZones(false)) {
+
+        for (int range=0; range < rtool->context->athlete->hrZones(false)->getRangeSize(); range++) {
+
+            gcZoneConfig c("bike");
+            c.date =  rtool->context->athlete->hrZones(false)->getStartDate(range);
+            c.lthr =  rtool->context->athlete->hrZones(false)->getLT(range);
+            c.rhr =  rtool->context->athlete->hrZones(false)->getRestHr(range);
+            c.hrmax =  rtool->context->athlete->hrZones(false)->getMaxHr(range);
+
+            config << c;
+        }
+    }
+
+    // RUN HR
+    if (rtool->context->athlete->hrZones(true)) {
+
+        for (int range=0; range < rtool->context->athlete->hrZones(true)->getRangeSize(); range++) {
+
+            gcZoneConfig c("run");
+            c.date =  rtool->context->athlete->hrZones(true)->getStartDate(range);
+            c.lthr =  rtool->context->athlete->hrZones(true)->getLT(range);
+            c.rhr =  rtool->context->athlete->hrZones(true)->getRestHr(range);
+            c.hrmax =  rtool->context->athlete->hrZones(true)->getMaxHr(range);
+
+            config << c;
+        }
+    }
+
+    // RUN PACE
+    if (rtool->context->athlete->paceZones(false)) {
+
+        for (int range=0; range < rtool->context->athlete->paceZones(false)->getRangeSize(); range++) {
+
+            gcZoneConfig c("run");
+            c.date =  rtool->context->athlete->paceZones(false)->getStartDate(range);
+            c.cv =  rtool->context->athlete->paceZones(false)->getCV(range);
+
+            config << c;
+        }
+    }
+
+    // SWIM PACE
+    if (rtool->context->athlete->paceZones(true)) {
+
+        for (int range=0; range < rtool->context->athlete->paceZones(true)->getRangeSize(); range++) {
+
+            gcZoneConfig c("swim");
+            c.date =  rtool->context->athlete->paceZones(true)->getStartDate(range);
+            c.cv =  rtool->context->athlete->paceZones(true)->getCV(range);
+
+            config << c;
+        }
+    }
+
+    // no config ?
+    if (config.count() == 0) return Rf_allocVector(INTSXP, 0);
+
+    // COMPRESS CONFIG TOGETHER BY SPORT
+    QList<gcZoneConfig> compressed;
+    qSort(config);
+
+    // all will have date zero
+    gcZoneConfig lastRun("run"), lastBike("bike"), lastSwim("swim");
+
+    foreach(gcZoneConfig x, config) {
+
+        // BIKE
+        if (x.sport == "bike") {
+
+            // new date so save what we have collected
+            if (x.date > lastBike.date) {
+
+                if (lastBike.date > QDate(01,01,01))  compressed << lastBike;
+                lastBike.date = x.date;
+            }
+
+            // merge new values
+            if (x.date == lastBike.date) {
+                // merge with prior
+                if (x.cp) lastBike.cp = x.cp;
+                if (x.wprime) lastBike.wprime = x.wprime;
+                if (x.pmax) lastBike.pmax = x.pmax;
+                if (x.ftp) lastBike.ftp = x.ftp;
+                if (x.lthr) lastBike.lthr = x.lthr;
+                if (x.rhr) lastBike.rhr = x.rhr;
+                if (x.hrmax) lastBike.hrmax = x.hrmax;
+            }
+        }
+
+        // RUN
+        if (x.sport == "run") {
+
+            // new date so save what we have collected
+            if (x.date > lastRun.date) {
+                // add last
+                if (lastRun.date > QDate(01,01,01)) compressed << lastRun;
+                lastRun.date = x.date;
+            }
+
+            // merge new values
+            if (x.date == lastRun.date) {
+                // merge with prior
+                if (x.cp) lastRun.cp = x.cp;
+                if (x.wprime) lastRun.wprime = x.wprime;
+                if (x.pmax) lastRun.pmax = x.pmax;
+                if (x.ftp) lastRun.ftp = x.ftp;
+                if (x.lthr) lastRun.lthr = x.lthr;
+                if (x.rhr) lastRun.rhr = x.rhr;
+                if (x.hrmax) lastRun.hrmax = x.hrmax;
+                if (x.cv) lastRun.cv = x.cv;
+            }
+        }
+
+        // SWIM
+        if (x.sport == "swim") {
+
+            // new date so save what we have collected
+            if (x.date > lastSwim.date) {
+                // add last
+                if (lastSwim.date > QDate(01,01,01)) compressed << lastSwim;
+                lastSwim.date = x.date;
+            }
+
+            // merge new values
+            if (x.date == lastSwim.date) {
+                // merge with prior
+                if (x.cv) lastSwim.cv = x.cv;
+            }
+        }
+    }
+    if (lastBike.date > QDate(01,01,01)) compressed << lastBike;
+    if (lastRun.date > QDate(01,01,01)) compressed << lastRun;
+    if (lastSwim.date > QDate(01,01,01)) compressed << lastSwim;
+
+    // now use the new compressed ones
+    config = compressed;
+    qSort(config);
+    int size = config.count();
+
+    // CREATE A DATAFRAME OF CONFIG
+    SEXP ans;
+    PROTECT(ans = Rf_allocList(10));
+
+    // 10 columns, size rows
+    SEXP date;
+    SEXP sport;
+    SEXP cp, wprime, pmax,ftp,lthr,rhr,hrmax,cv;
+    SEXP rownames;
+
+    PROTECT(date=Rf_allocVector(INTSXP, size));
+    PROTECT(sport=Rf_allocVector(STRSXP, size));
+    PROTECT(cp=Rf_allocVector(INTSXP, size));
+    PROTECT(wprime=Rf_allocVector(INTSXP, size));
+    PROTECT(pmax=Rf_allocVector(INTSXP, size));
+    PROTECT(ftp=Rf_allocVector(INTSXP, size));
+    PROTECT(lthr=Rf_allocVector(INTSXP, size));
+    PROTECT(rhr=Rf_allocVector(INTSXP, size));
+    PROTECT(hrmax=Rf_allocVector(INTSXP, size));
+    PROTECT(cv=Rf_allocVector(INTSXP, size));
+    PROTECT(rownames=Rf_allocVector(STRSXP, size));
+
+    SEXP dclas;
+    PROTECT(dclas=Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(dclas, 0, Rf_mkChar("Date"));
+    Rf_classgets(date,dclas);
+
+    int index=0;
+    QDate d1970(1970,01,01);
+    foreach(gcZoneConfig x, config) {
+
+        // update the arrays
+        INTEGER(date)[index] = d1970.daysTo(x.date);
+        SET_STRING_ELT(sport, index, Rf_mkChar(x.sport.toLatin1().constData()));
+        SET_STRING_ELT(rownames, index, Rf_mkChar(QString("%1").arg(index+1).toLatin1().constData()));
+        INTEGER(cp)[index] = x.cp;
+        INTEGER(wprime)[index] = x.wprime;
+        INTEGER(pmax)[index] = x.pmax;
+        INTEGER(ftp)[index] = x.ftp;
+        INTEGER(lthr)[index] = x.lthr;
+        INTEGER(rhr)[index] = x.rhr;
+        INTEGER(hrmax)[index] = x.hrmax;
+        INTEGER(cv)[index] = x.cv;
+
+        index++;
+    }
+
+    // add to frame
+    SEXP nextS=ans;
+    SETCAR(nextS, date); nextS=CDR(nextS);
+    SETCAR(nextS, sport); nextS=CDR(nextS);
+    SETCAR(nextS, cp); nextS=CDR(nextS);
+    SETCAR(nextS, wprime); nextS=CDR(nextS);
+    SETCAR(nextS, pmax); nextS=CDR(nextS);
+    SETCAR(nextS, ftp); nextS=CDR(nextS);
+    SETCAR(nextS, lthr); nextS=CDR(nextS);
+    SETCAR(nextS, rhr); nextS=CDR(nextS);
+    SETCAR(nextS, hrmax); nextS=CDR(nextS);
+    SETCAR(nextS, cv); nextS=CDR(nextS);
+
+    // turn into a data.frame, name class etc
+    SEXP names;
+    PROTECT(names = Rf_allocVector(STRSXP, 10));
+    SET_STRING_ELT(names, 0, Rf_mkChar("date"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("sport"));
+    SET_STRING_ELT(names, 2, Rf_mkChar("cp"));
+    SET_STRING_ELT(names, 3, Rf_mkChar("wprime"));
+    SET_STRING_ELT(names, 4, Rf_mkChar("pmax"));
+    SET_STRING_ELT(names, 5, Rf_mkChar("ftp"));
+    SET_STRING_ELT(names, 6, Rf_mkChar("lthr"));
+    SET_STRING_ELT(names, 7, Rf_mkChar("rhr"));
+    SET_STRING_ELT(names, 8, Rf_mkChar("hrmax"));
+    SET_STRING_ELT(names, 9, Rf_mkChar("cv"));
+
+    Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+    Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
+    Rf_namesgets(ans, names);
+
+    UNPROTECT(14);
+
+    // fail
+    return ans;
+
 }
 
 SEXP
