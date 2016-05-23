@@ -51,6 +51,9 @@ class RCanvas : public QGraphicsView {
         void text(double x, double y, QString s, double rot, double hadj, QPen p, QFont f);
 
     protected:
+        virtual void dragMoveEvent(QDragMoveEvent *) {} // do nothing, to override QGraphicsView version
+        virtual void dragEnterEvent(QDragEnterEvent *) {}
+        virtual void dropEvent(QDropEvent *) {}
         QGraphicsScene *scene;
         void wheelEvent(QWheelEvent *event);
 
