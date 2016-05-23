@@ -1279,11 +1279,16 @@ MainWindow::dropEvent(QDropEvent *event)
     // is this a chart file ?
     QStringList filenames;
     QList<LTMSettings> imported;
+    QStringList list;
     for(int i=0; i<urls.count(); i++) {
 
         QString filename = QFileInfo(urls.value(i).toLocalFile()).absoluteFilePath();
 
-        if (filename.endsWith(".xml", Qt::CaseInsensitive)) {
+        if (filename.endsWith(".gchart", Qt::CaseInsensitive)) {
+            // add to the list of charts to import
+            list << filename;
+
+        } else if (filename.endsWith(".xml", Qt::CaseInsensitive)) {
 
             QFile chartsFile(filename);
 
@@ -1313,7 +1318,7 @@ MainWindow::dropEvent(QDropEvent *event)
         currentTab->context->notifyPresetsChanged();
 
         // tell the user
-        QMessageBox::information(this, tr("Chart Import"), QString(tr("Imported %1 charts")).arg(imported.count()));
+        QMessageBox::information(this, tr("Chart Import"), QString(tr("Imported %1 metric charts")).arg(imported.count()));
 
         // switch to trend view if we aren't on it
         selectHome();
@@ -1322,6 +1327,8 @@ MainWindow::dropEvent(QDropEvent *event)
         currentTab->context->notifyPresetSelected(currentTab->context->athlete->presets.count()-1);
     }
 
+    // are there any .gcharts to import?
+    if (list.count())  importCharts(list);
 
     // if there is anything left, process based upon view...
     if (filenames.count()) {
@@ -1338,6 +1345,25 @@ MainWindow::dropEvent(QDropEvent *event)
     }
     return;
 }
+
+void
+MainWindow::importCharts(QStringList list)
+{
+    QList<QMap<QString,QString> > charts;
+
+    // parse charts into property pairs
+    foreach(QString filename, list) {
+        charts << GcChartWindow::chartProperties(filename);
+    }
+
+    // we now have properties for the charts
+    // and should add them to the view they
+    // belong to. XXX in next commit
+    for(int i=0; i<charts.count(); i++) {
+        qDebug()<<"name="<<charts[i].value("title","");
+    }
+}
+
 
 /*----------------------------------------------------------------------
  * Ride Library Functions

@@ -23,6 +23,7 @@
 #include "Colors.h"
 #include "Settings.h"
 #include "Utils.h"
+#include "mvjson.h"
 #include "LTMSettings.h"
 
 #include <QDebug>
@@ -947,4 +948,68 @@ GcChartWindow::saveChart()
 
     // all done
     outfile.close();
+}
+
+QList<QMap<QString,QString> >
+GcChartWindow::chartProperties(QString filename)
+{
+    QList<QMap<QString,QString> > returning;
+
+    // open the file into a string
+    QString contents;
+    QFile file(filename);
+    if (file.exists() && file.open(QFile::ReadOnly | QFile::Text)) {
+
+        // read in the whole thing
+        QTextStream in(&file);
+        // GC .JSON is stored in UTF-8 with BOM(Byte order mark) for identification
+        in.setCodec ("UTF-8");
+        contents = in.readAll();
+        file.close();
+    }
+
+    // empty?
+    if (contents == "") return returning;
+
+    // parse via MVJson to avoid QT5 dependency
+    MVJSONReader json(string(contents.toLatin1()));
+
+    if (json.root && json.root->hasField("CHART")) {
+
+        MVJSONValue *chart = json.root->getField("CHART");
+        if (chart->valueType == MVJSON_TYPE::MVJSON_TYPE_OBJECT) {
+
+            // ok lets get all the details from it!
+            MVJSONNode *c = chart->objValue;
+            QString type, view;
+            QMap<QString, QString> m;
+
+            // top level - type and view
+            if (c->hasField("TYPE")) type=QString::fromStdString(c->getFieldString("TYPE"));
+            if (c->hasField("VIEW")) view=QString::fromStdString(c->getFieldString("VIEW"));
+            if (type =="" || view=="") return returning;
+
+            m.insert("TYPE", type);
+            m.insert("VIEW", view);
+
+            // run through the properties
+            bool hadproperties;
+            if (c->hasField("PROPERTIES") && c->getField("PROPERTIES")->valueType == MVJSON_TYPE::MVJSON_TYPE_OBJECT) {
+                MVJSONNode *p = c->getField("PROPERTIES")->objValue;
+
+                // get a vector of the values
+               for (std::vector<MVJSONValue*>::iterator item = p->values.begin() ; item != p->values.end(); ++item) {
+                    QString name = QString::fromStdString((*item)->name);
+                    QString value = QString::fromStdString((*item)->stringValue);
+                    m.insert(name,value);
+                    hadproperties=true;
+               }
+            }
+
+            // if we got something reasonable lets return it
+            if (hadproperties) returning << m;
+        }
+    }
+
+    return returning;
 }

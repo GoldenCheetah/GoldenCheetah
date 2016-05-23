@@ -108,6 +108,9 @@ class MainWindow : public QMainWindow
         void support();
         void actionClicked(int);
 
+        // chart importing
+        void importCharts(QStringList);
+
         // search box gets and loses focus - make big/small
         void searchFocusIn();
         void searchFocusOut();
