@@ -1575,3 +1575,107 @@ HomeWindow::presetSelected(int n)
         }
     }
 }
+
+/*--------------------------------------------------------------------------------
+ *  Import Chart Dialog - select/deselect charts before importing them
+ * -----------------------------------------------------------------------------*/
+ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QString> >list, QWidget *parent) : QDialog(parent), context(context), list(list)
+{
+    setWindowFlags(windowFlags());
+    setWindowTitle(tr("Import Charts"));
+    setWindowModality(Qt::ApplicationModal);
+    setMinimumWidth(450);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    table = new QTableWidget(this);
+    cancel = new QPushButton(tr("Cancel"), this);
+    import = new QPushButton(tr("Import"), this);
+
+    // set table
+#ifdef Q_OS_MAC
+    table->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+    table->setRowCount(list.count());
+    table->setColumnCount(3);
+    QStringList headings;
+    headings<<"";
+    headings<<"View";
+    headings<<"Title";
+    table->setHorizontalHeaderLabels(headings);
+    table->setSortingEnabled(false);
+    table->verticalHeader()->hide();
+    table->setShowGrid(false);
+    table->setSelectionMode(QAbstractItemView::NoSelection);
+    table->horizontalHeader()->setStretchLastSection(true);
+    table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+
+    // Populate the list of named searches
+    for(int i=0; i<list.count(); i++) {
+
+        // select XXX fix widget...
+        QCheckBox *c = new QCheckBox(this);
+        c->setChecked(true);
+        table->setCellWidget(i, 0, c);
+
+        QString view = list[i].value("VIEW");
+#ifdef GC_HAVE_ICAL
+        // diary not available!
+        if (view == "diary")  view = "home";
+#endif
+        // View
+        QTableWidgetItem *t = new QTableWidgetItem;
+        t->setText(view);
+        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        table->setItem(i, 1, t);
+
+        // title
+        t = new QTableWidgetItem;
+        t->setText(list[i].value("title"));
+        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        table->setItem(i, 2, t);
+
+    }
+
+    layout->addWidget(table);
+    layout->addStretch();
+
+    QHBoxLayout *buttons = new QHBoxLayout;
+    buttons->addStretch();
+    buttons->addWidget(import);
+    buttons->addWidget(cancel);
+    layout->addLayout(buttons);
+
+    connect(import, SIGNAL(clicked(bool)), this, SLOT(importClicked()));
+    connect(cancel, SIGNAL(clicked(bool)), this, SLOT(cancelClicked()));
+}
+
+void
+ImportChartDialog::importClicked()
+{
+    // do stuff
+    for(int i=0; i<list.count(); i++) {
+
+        // is it checked?
+        if (static_cast<QCheckBox*>(table->cellWidget(i,0))->isChecked()) {
+
+            // import this one !
+            QString view = table->item(i,1)->text();
+
+            int x=0;
+            if (view == "home")  { x=0; context->mainWindow->selectHome(); }
+            if (view == "analysis")  { x=1; context->mainWindow->selectAnalysis(); }
+            if (view == "diary")  { x=2; context->mainWindow->selectDiary(); }
+            if (view == "train")  { x=3; context->mainWindow->selectTrain(); }
+
+            // add to the currently selected tab and select=false
+            context->mainWindow->athleteTab()->view(x)->importChart(list[i], false);
+        }
+    }
+    accept();
+}
+
+void
+ImportChartDialog::cancelClicked()
+{
+    accept();
+}

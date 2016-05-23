@@ -77,6 +77,9 @@ class MainWindow : public QMainWindow
         QLabel *progress;
         int loading;
 
+        // currently selected tab
+        Tab *athleteTab() { return currentTab; }
+
     protected:
 
         // used by ChooseCyclistDialog to see which athletes
@@ -130,7 +133,6 @@ class MainWindow : public QMainWindow
         bool closeTab();       // close current, might not if the user
                                // changes mind if there are unsaved changes.
         void removeTab(Tab*);  // remove without question
-
         void switchTab(int index); // for switching between one tab and another
 
         // Athlete Backup
