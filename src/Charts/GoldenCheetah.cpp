@@ -977,7 +977,7 @@ GcChartWindow::chartProperties(QString filename)
     if (json.root && json.root->hasField("CHART")) {
 
         MVJSONValue *chart = json.root->getField("CHART");
-        if (chart->valueType == MVJSON_TYPE::MVJSON_TYPE_OBJECT) {
+        if (chart->valueType == MVJSON_TYPE_OBJECT) {
 
             // ok lets get all the details from it!
             MVJSONNode *c = chart->objValue;
@@ -994,7 +994,7 @@ GcChartWindow::chartProperties(QString filename)
 
             // run through the properties
             bool hadproperties;
-            if (c->hasField("PROPERTIES") && c->getField("PROPERTIES")->valueType == MVJSON_TYPE::MVJSON_TYPE_OBJECT) {
+            if (c->hasField("PROPERTIES") && c->getField("PROPERTIES")->valueType == MVJSON_TYPE_OBJECT) {
                 MVJSONNode *p = c->getField("PROPERTIES")->objValue;
 
                 // get a vector of the values
