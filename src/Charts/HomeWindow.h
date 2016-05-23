@@ -54,6 +54,7 @@ class HomeWindow : public GcWindow
         ~HomeWindow();
 
         void resetLayout();
+        void importChart(QMap<QString,QString> properties, bool select);
 
         void setStyle(int style) { styleChanged(style); }
         int currentStyle;

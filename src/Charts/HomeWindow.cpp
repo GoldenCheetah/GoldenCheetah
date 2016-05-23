@@ -198,6 +198,81 @@ HomeWindow::addChartFromMenu(QAction*action)
 }
 
 void
+HomeWindow::importChart(QMap<QString,QString>properties, bool select)
+{
+    // turn off updates whilst we do this...
+    setUpdatesEnabled(false);
+
+    // what type?
+    GcWinID type = static_cast<GcWinID>(properties.value("TYPE","1").toInt());
+
+    GcWindow *chart = GcWindowRegistry::newGcWindow(type, context);
+
+    // bad chart file !
+    if (chart == NULL) {
+        setUpdatesEnabled(true);
+
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(tr("Unable to process chart file"));
+        msgBox.setInformativeText(QString(tr("Bad chart type (%1).")).arg(static_cast<int>(type)));
+        msgBox.exec();
+        return;
+    }
+
+    // hide it before doing anything!
+    chart->hide();
+
+    // metaobject describes properties
+    const QMetaObject *m = chart->metaObject();
+
+    // set all the properties
+    chart->setProperty("view", name);
+
+    // each of the user properties
+    QMapIterator<QString,QString> prop(properties);
+    prop.toFront();
+    while(prop.hasNext()) {
+        prop.next();
+        if (prop.key() == "VIEW" || prop.key()=="TYPE") continue;
+
+        // ok, we have a property
+        for (int i=0; i<m->propertyCount(); i++) {
+            QMetaProperty p = m->property(i);
+            if (p.name() == prop.key()) {
+
+                // ok we have a winner, how to format it?
+                if (QString(p.typeName()) == "int") chart->setProperty(prop.key().toLatin1(), prop.value().toInt());
+                if (QString(p.typeName()) == "double") chart->setProperty(prop.key().toLatin1(), prop.value().toDouble());
+                if (QString(p.typeName()) == "QDate") chart->setProperty(prop.key().toLatin1(), QDate::fromString(prop.value()));
+                if (QString(p.typeName()) == "QString") chart->setProperty(prop.key().toLatin1(), Utils::jsonunprotect(prop.value()));
+                if (QString(p.typeName()) == "bool") chart->setProperty(prop.key().toLatin1(), prop.value().toInt());
+                if (QString(p.typeName()) == "LTMSettings") {
+                    QByteArray base64(prop.value().toLatin1());
+                    QByteArray unmarshall = QByteArray::fromBase64(base64);
+                    QDataStream s(&unmarshall, QIODevice::ReadOnly);
+                    LTMSettings x;
+                    s >> x;
+                    chart->setProperty(prop.key().toLatin1(), QVariant().fromValue<LTMSettings>(x));
+                }
+            }
+        }
+    }
+
+    // now set managed properties etc
+    addChart(chart);
+
+    // set to whatever we have selected
+    RideItem *notconst = (RideItem*)context->currentRideItem();
+    chart->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
+    chart->setProperty("dateRange", property("dateRange"));
+
+    if (select && charts.count())  tabSelected(charts.count()-1);
+
+    setUpdatesEnabled(true);
+}
+
+void
 HomeWindow::configChanged(qint32)
 {
     // update scroll bar

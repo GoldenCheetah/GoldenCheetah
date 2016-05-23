@@ -17,6 +17,7 @@
  */
 
 #include <QTextEdit>
+#include <QDebug>
 
 namespace Utils
 {
@@ -38,6 +39,8 @@ QString xmlprotect(const QString &string)
     return s;
 }
 
+// BEWARE: this function is tide closely to RideFile parsing
+//           DO NOT CHANGE IT UNLESS YOU KNOW WHAT YOU ARE DOING
 QString unprotect(const QString &buffer)
 {
     // get local TM character code
@@ -65,6 +68,41 @@ QString unprotect(const QString &buffer)
     // in it it should be added here
     return s;
 }
+
+// when reading/writing json lets use our own methods
+// Escape special characters (JSON compliance)
+QString jsonprotect(const QString &string)
+{
+    QString s = string;
+    s.replace("\\", "\\\\"); // backslash
+    s.replace("\"", "\\\""); // quote
+    s.replace("\t", "\\t");  // tab
+    s.replace("\n", "\\n");  // newline
+    s.replace("\r", "\\r");  // carriage-return
+    s.replace("\b", "\\b");  // backspace
+    s.replace("\f", "\\f");  // formfeed
+    s.replace("/", "\\/");   // solidus
+
+    // add a trailing space to avoid conflicting with GC special tokens
+    s += " ";
+
+    return s;
+}
+
+QString jsonunprotect(const QString &string)
+{
+    QString s = string;
+    s.replace("\\\"", "\""); // quote
+    s.replace("\\t", "\t");  // tab
+    s.replace("\\n", "\n");  // newline
+    s.replace("\\r", "\r");  // carriage-return
+    s.replace("\\b", "\b");  // backspace
+    s.replace("\\f", "\f");  // formfeed
+    s.replace("\\/", "/");   // solidus
+    s.replace("\\\\", "\\"); // backslash
+    return s;
+}
+
 
 };
 
