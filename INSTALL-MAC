@@ -114,13 +114,13 @@ need to be downloaded and installed from their website. Alternatively, you
 can intall qt via macports (http://www.macports.org) as described in section 
 1.5.1. 
 
-As of today, the latest stable release is 4.7.4, we need 4.7 or higher so
+As of today, the latest stable release is 5.6.0, we need 4.7 or higher so
 go ahead and download the offline installer - it has everything you need
 but is about 1.3GB. Please make sure you download the installer for Mac
 OS X 10.6 or later, 64-bit.
 
-The url for QT downloads is: http://qt.nokia.com/downloads and whilst the
-offline installer is only 12mb it will still call back and download the
+The url for QT downloads is: https://www.qt.io/download-open-source/#section-2 and 
+whilst the offline installer is only 12mb it will still call back and download the
 required objects as you install, I think it is better to get it all in
 one hit (and you can save it to reinstall on another computer or if you
 want to rebuild/reinstall for any other reason).
@@ -141,9 +141,9 @@ Read and accept the license agreement and then continue and install.
 
 We need to make sure that a program called qmake is installed in a directory where
 it can be found. So, we need to create a link from what we just installed in the
-user programs folder. For QT SDK1.1 (4.7.4) we need to:
+user programs folder. For QT SDK (5.6) we need to:
 
-$ sudo ln -s ~/QtSDK/Desktop/Qt/474/gcc/bin/qmake /usr/bin/qmake
+$ sudo ln -s ~/Qt5.6.0/5.6/clang_64/bin/qmake /usr/local/bin/qmake
 
 1.5.1 Install via Mac Ports
 ---------------------------
