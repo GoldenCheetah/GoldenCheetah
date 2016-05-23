@@ -24213,7 +24213,7 @@ yyyy</translation>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="742"/>
         <source>Remove Column</source>
-        <translation>Renommer la colonne</translation>
+        <translation type="unfinished">Supprimer la colonne</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="747"/>
