@@ -86,6 +86,8 @@ class TabView : public QWidget
 
         int viewType() { return type; }
 
+        void importChart(QMap<QString,QString>properties, bool select) { page_->importChart(properties, select); }
+
     signals:
 
         void sidebarClosed(); // the user dragged the sidebar closed.

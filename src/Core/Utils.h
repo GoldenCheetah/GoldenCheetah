@@ -25,6 +25,8 @@ namespace Utils
 {
     QString xmlprotect(const QString &string);
     QString unprotect(const QString &buffer);
+    QString jsonprotect(const QString &buffer);
+    QString jsonunprotect(const QString &buffer);
 };
 
 
