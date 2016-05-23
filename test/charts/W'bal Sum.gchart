@@ -1,0 +1,19 @@
+{
+	"CHART":{
+		"VERSION":"1",
+		"VIEW":"analysis",
+		"TYPE":"38",
+		"PROPERTIES":{
+			"title":"W'bal Sum ",
+			"subtitle":" ",
+			"widthFactor":"2",
+			"heightFactor":"2",
+			"style":"0",
+			"resizable":"0",
+			"script":"## Get Wbal data \nGC.page(height=600,width=800)\npar(bty=\"n\")\n\nwbal <- GC.activity.wbal(compare=FALSE)\nwbal <- as.vector(wbal, mode = \"any\")\n\nconfig <- GC.athlete.zones(sport=\"bike\",\n          date=GC.activity.metrics()$date)\n\n## Set W'\nW <- config$wprime[1]\n\n## Calc the sustained Wbal deficit\ncwbal <- cumsum((W-wbal)\/3600)\n\n## Get your activity\nact <- GC.activity()\n\n## Extract your ride power data \nP <- act$power\n\n## Set CP\nCP <- config$cp[1]\n\n## Calc the cumulative Wbal cycled\ndwbal <- P - CP\n\ndwbal[dwbal < 0] <- 0\n\ncdwbal <- cumsum(dwbal)\n\nmxw <- max(cwbal)\n\n## plot the results\n\nplot(cwbal, ylim= c(0, max(cwbal)), \n     main=\"\", col=\"cyan\",\n     type=\"l\", lwd=\"2\", xlab='seconds')\ngrid(col=\"#404040\", lty=\"solid\")\nlines(cdwbal\/10, col='red')\n\nlegend(\"topleft\", c(\"Load Joules*Hours\", \"Cycled Joules\/10\"), inset = .05, lwd=c(2.5,2.5), bty=\"n\", col=c('white', 'red')) \n\ntext(length(cwbal)\/2,mxw\/10,paste(\"TSS=\",round(GC.activity.metrics()$TSS,0), \"cwb kJ=\", round(mxw\/1000,1)) ) ",
+			"state":" ",
+			"showConsole":"0",
+			"__LAST__":"1",
+		}
+	}
+}
