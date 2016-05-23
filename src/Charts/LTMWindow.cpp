@@ -224,8 +224,6 @@ LTMWindow::LTMWindow(Context *context) :
     // controls since the menu is SET from setControls
     QAction *exportData = new QAction(tr("Export Chart Data..."), this);
     addAction(exportData);
-    QAction *exportConfig = new QAction(tr("Export Chart Configuration..."), this);
-    addAction(exportConfig);
 #ifdef GC_HAS_CLOUD_DB
     QAction *shareConfig = new QAction(tr("Export Chart Configuration to CloudDB..."), this);
     addAction(shareConfig);
@@ -297,7 +295,6 @@ LTMWindow::LTMWindow(Context *context) :
 
     // custom menu item
     connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
-    connect(exportConfig, SIGNAL(triggered()), this, SLOT(exportConfig()));
 #if GC_HAS_CLOUD_DB
     connect(shareConfig, SIGNAL(triggered()), this, SLOT(shareConfig()));
 #endif
