@@ -1,0 +1,19 @@
+{
+	"CHART":{
+		"VERSION":"1",
+		"VIEW":"analysis",
+		"TYPE":"38",
+		"PROPERTIES":{
+			"title":"Interval Discovery ",
+			"subtitle":" ",
+			"widthFactor":"2",
+			"heightFactor":"2",
+			"style":"0",
+			"resizable":"0",
+			"script":"## Interval Discovery\n\n## plots time series to wide thin\nGC.page(width=1000,height=600)\npar(mar=c(6,6,6,6))\n\nrequire(changepoint)\n\n## Get your activity\ny <- GC.activity()$power\n\n# create a time series\n$$myts <- ts(y, start=c(1), \n         end=c(length(y)), frequency= 1)\n\n## Discover your intervals, \n## change the ?pen.value? to adjust \n## the penalty separating intervals\n$$disc <- cpt.mean($$myts,\n                 penalty=\"Manual\",\n                 pen.value=\"60000*log(n)\",\n                 method=\"PELT\")\n## Do a happy dance that you can now do this right in GC!\n\nplot($$disc, xlab=\"seconds\",\n     ylab=\"watts\", \n     main=\"Interval Discovery\", \n     ylim=c(0, max(y)*1.1),\n     cpt.col=\"gold\", cpt.width=5,\n     col=\"#303030\")\n\nabline(h=225,slope=0,col=\"darkgrey\")\n\n## second series - w'bal\n#par(new=TRUE)\n#wb <- GC.activity.wbal()\n#plot(x=seq(1,length(wb),1), y=wb, \n#     xaxt=\"n\", yaxt=\"n\",\n#     xlab=\"\", ylab=\"\",\n#     ylim=c(0,20000),\n#     type=\"l\", lwd=4, col=\"darkred\")\n#axis(4)\n#mtext(\"W'bal\",side=4, line=3)\n\n ",
+			"state":" ",
+			"showConsole":"0",
+			"__LAST__":"1",
+		}
+	}
+}
