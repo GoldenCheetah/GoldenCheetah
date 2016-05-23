@@ -1607,7 +1607,7 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
     table->setShowGrid(false);
     table->setSelectionMode(QAbstractItemView::NoSelection);
     table->horizontalHeader()->setStretchLastSection(true);
-#ifdef QT_VERSION > 0x050200
+#if QT_VERSION > 0x050200
     table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 #endif
 
