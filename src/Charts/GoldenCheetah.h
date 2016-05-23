@@ -253,6 +253,10 @@ private:
 public:
     GcChartWindow(Context *context);
 
+    // parse a .gchart file and return a list of charts expressed
+    // as a property list in a QMap1
+    static QList<QMap<QString,QString> > chartProperties(QString filename);
+
     QWidget *mainWidget() { return _mainWidget; }
     GcOverlayWidget *helperWidget() { return overlayWidget; }
 
