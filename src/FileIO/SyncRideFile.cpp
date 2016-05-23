@@ -68,9 +68,10 @@ struct SyncFileReaderState
         return (0xff & c) - (int(c/16)*6);
     }
 
-    int read_bytes(int len, int *count = NULL, int *sum = NULL) {
+    int read_bytes(int len, int *count = NULL, int *sum = NULL, bool issigned = false) {
         char c;
         int res = 0;
+
         for (int i = 0; i < len; ++i) {
             if (file.read(&c, 1) != 1)
                 throw TruncatedRead();
@@ -79,8 +80,12 @@ struct SyncFileReaderState
             if (count)
                 *count += 1;
 
-            res += pow(256,i) * (0xff & c);
+            res += pow(256,i) * (0xff & (unsigned) c) ;
+
+            if (issigned && i == len-1)
+                res = res - (0x80 & (unsigned) c) * 2 ;
         }
+
         return res;
     }
 
@@ -110,10 +115,10 @@ struct SyncFileReaderState
 
         // Graph data (12 bytes)
 
-        temp = read_bytes(2, count, sum) / 100; // Temperature * 100 (in degree C)
+        temp = read_bytes(2, count, sum, true) / 100; // Temperature * 100 (in degree C) (signed)
 
         alt = read_bytes(2, count, sum); //Alti (in m)
-        grade = read_bytes(1, count, sum); // Gradient %
+        grade = read_bytes(1, count, sum, true); // Gradient % (signed)
         cad = read_bytes(1, count, sum); // Cadence
         kph = read_bytes(2, count, sum)/10.0; // Speed * 10 (in Km/h)
         hr = read_bytes(1, count, sum); // Heart Rate
