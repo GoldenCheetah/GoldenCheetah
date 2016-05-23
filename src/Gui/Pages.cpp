@@ -3905,6 +3905,11 @@ ZonePage::saveClicked()
         // re-read Zones in case it changed
         QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->zones_[i]->fileName());
         context->athlete->zones_[i]->read(zonesFile);
+        if (i == 1 && context->athlete->zones_[i]->getRangeSize() == 0) { // No running Power zones
+            // Start with Cycling Power zones for backward compatibilty
+            QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->zones_[0]->fileName());
+            if (zonesFile.exists()) context->athlete->zones_[i]->read(zonesFile);
+        }
 
         // use CP for FTP?
         appsettings->setCValue(context->athlete->cyclist, zones[i]->useCPforFTPSetting(), cpPage[i]->useCPForFTPCombo->currentIndex());
@@ -4725,6 +4730,11 @@ HrZonePage::saveClicked()
         // reread HR zones
         QFile hrzonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->hrzones_[i]->fileName());
         context->athlete->hrzones_[i]->read(hrzonesFile);
+        if (i == 1 && context->athlete->hrzones_[i]->getRangeSize() == 0) { // No running HR zones
+            // Start with Cycling HR zones for backward compatibilty
+            QFile hrzonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->hrzones_[0]->fileName());
+            if (hrzonesFile.exists()) context->athlete->hrzones_[i]->read(hrzonesFile);
+        }
 
         // did we change ?
         if (hrZones[i]->getFingerprint() != b4Fingerprint[i])
