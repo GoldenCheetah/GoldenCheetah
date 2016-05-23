@@ -1,0 +1,19 @@
+{
+	"CHART":{
+		"VERSION":"1",
+		"VIEW":"home",
+		"TYPE":"39",
+		"PROPERTIES":{
+			"title":"CP\/W' ",
+			"subtitle":" ",
+			"widthFactor":"2",
+			"heightFactor":"2",
+			"style":"0",
+			"resizable":"0",
+			"script":"## classic CP\/W' estimate using\n## submaximal data in a coggan style\nGC.page(width=800,height=600)\n\n\ncompares <- GC.season.meanmax(compare=TRUE)\n\n\nplot(type=\"n\", x=c(0,0), y=c(0,0), \n     ylim=c(0, 600), xlim=c(0, 1800),\n      xlab=\"Time (seconds)\",\n      ylab=\"Energy (kJ)\",\n      main=\"\")\n\n\ngrid(lty=\"solid\", col=\"#404040\")\n\n\ncount <- 0\n\nfor (compare in compares) {\n\n    count <- count + 1\n\n    ## use no more than 30 mins\n    power <- head(compare$meanmax$power, n=1800)\n\n\n    secs <- seq(1,length(power),1)\n    joules <- power * secs\n\n\n    ## now take off first 2 mins\n    secs <- tail(secs, length(secs)-120)\n    joules <- tail(joules, length(joules)-120)\n\n\n    # plot xy\n    points(y=joules\/1000, x=secs, pch=20, col=compare$color)\n\n\n    #linear regression\n    lm <- lm(joules\/1000~secs)\n    abline(lm)\n\n\n    ## CP'\n    text(200,600-(count*30),paste(\"CP (Watts)=\",\n         round(lm$coefficients[[2]]*1000,0)),\n         col=compare$color)\n\n\n    ## W'\n    text(500,600-(count*30),paste(\"W' (kJ)=\",\n         round(lm$coefficients[[1]],2)),\n         col=compare$color)\n\n    #fit rank\n    text(750,600-(count*30),paste(\"Rank=\",\n         round(lm$rank,3)),\n         col=compare$color)\n\n    #R squared\n    text(1000,600-(count*30),paste(\"R2=\",\n         round(summary(lm)$r.squared,3)),\n         col=compare$color)\n\n\n\n\n}\n ",
+			"state":" ",
+			"showConsole":"0",
+			"__LAST__":"1",
+		}
+	}
+}
