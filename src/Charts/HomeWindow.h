@@ -31,6 +31,7 @@
 #include <QLabel>
 #include <QDialog>
 #include <QTreeWidget>
+#include <QTableWidget>
 #include <QCheckBox>
 #include <QStackedWidget>
 
