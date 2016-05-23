@@ -266,6 +266,7 @@ public:
 public slots:
     void hideRevealControls();
     void saveImage();
+    void saveChart();
     void colorChanged(QColor);
 };
 

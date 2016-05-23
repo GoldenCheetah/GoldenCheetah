@@ -22,6 +22,8 @@
 #include "Context.h"
 #include "Colors.h"
 #include "Settings.h"
+#include "Utils.h"
+#include "LTMSettings.h"
 
 #include <QDebug>
 #include <QColor>
@@ -46,7 +48,6 @@ void GcWindow::setControls(QWidget *x)
     emit controlsChanged(_controls);
 
     if (x != NULL) {
-        menu->clear();
         menu->addAction(tr("All Chart Settings"), this, SIGNAL(showControls()));
 
         // add any other actions
@@ -803,10 +804,9 @@ GcChartWindow::setControls(QWidget *x)
 {
     GcWindow::setControls(x);
 
+    menu->clear();
     if (x != NULL) {
-        menu->clear();
-        menu->addAction(tr("All Chart Settings"), this, SIGNAL(showControls()));
-        menu->addAction(tr("Export Chart Image..."), this, SLOT(saveImage()));
+        menu->addAction(tr("Chart Settings..."), this, SIGNAL(showControls()));
         // add any other actions
         if (actions.count()) {
             if (actions.count() > 1) menu->addSeparator();
@@ -817,8 +817,10 @@ GcChartWindow::setControls(QWidget *x)
 
             if (actions.count() > 1) menu->addSeparator();
         }
-        menu->addAction(tr("Remove Chart"), this, SLOT(_closeWindow()));
     }
+    menu->addAction(tr("Export Chart ..."), this, SLOT(saveChart()));
+    menu->addAction(tr("Export Chart Image..."), this, SLOT(saveImage()));
+    menu->addAction(tr("Remove Chart"), this, SLOT(_closeWindow()));
 }
 
 void
@@ -879,4 +881,70 @@ void GcChartWindow:: saveImage()
 #endif
         picture.save(fileName);
     }
+}
+
+// version of the .gchart format being used
+static int gcChartVersion = 1;
+
+void
+GcChartWindow::saveChart()
+{
+    // iterate over chart properties
+    const QMetaObject *m = metaObject();
+
+    // where to save it?
+    QString suffix; // what was selected?
+    QString filename = QFileDialog::getSaveFileName(this, tr("Export Chart"),
+                       QDir::homePath()+"/"+ property("title").toString() + ".gchart",
+                       ("*.gchart;;"), &suffix);
+
+    if (filename.length() == 0) return;
+
+    QFile outfile(filename);
+    if (!outfile.open(QFile::WriteOnly)) {
+        QMessageBox oops(QMessageBox::Critical, tr("Export Failed"),
+                         tr("Failed to export chart, please check permissions"));
+        oops.exec();
+        return;
+    }
+
+    // lets go to it
+    QTextStream out(&outfile);
+    out.setCodec ("UTF-8");
+
+    out <<"{\n\t\"CHART\":{\n";
+    out <<"\t\t\"VERSION\":\"" << QString("%1").arg(gcChartVersion) << "\",\n";
+    out <<"\t\t\"VIEW\":\"" << property("view").toString()<<"\",\n";
+    out <<"\t\t\"TYPE\":\"" << QString("%1").arg(static_cast<int>(type())) << "\",\n";
+
+    // PROPERTIES
+    out <<"\t\t\"PROPERTIES\":{\n";
+
+    for (int i=0; i<m->propertyCount(); i++) {
+        QMetaProperty p = m->property(i);
+        if (p.isUser(this)) {
+            if (QString(p.typeName()) == "int")      out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toInt()<<"\",\n";
+            if (QString(p.typeName()) == "double")   out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toDouble()<<"\",\n";
+            if (QString(p.typeName()) == "QDate")    out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toDate().toString()<<"\",\n";
+            if (QString(p.typeName()) == "QString")  out<<"\t\t\t\""<<p.name()<<"\":\""<<Utils::xmlprotect(p.read(this).toString())<<"\",\n";
+            if (QString(p.typeName()) == "bool")     out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toBool()<<"\",\n";
+            if (QString(p.typeName()) == "LTMSettings") {
+                QByteArray marshall;
+                QDataStream s(&marshall, QIODevice::WriteOnly);
+                LTMSettings x = p.read(this).value<LTMSettings>();
+                s << x;
+                out<<"\t\t\t\""<<p.name()<<"\":\""<<marshall.toBase64()<<"\",\n";
+            }
+        }
+    }
+
+    // a last unused property, just to make it well formed json
+    // regardless of how many properties we ever have
+    out <<"\t\t\t\"__LAST__\":\"1\",\n";
+
+    // end here, only one chart
+    out<<"\t\t}\n\t}\n}";
+
+    // all done
+    outfile.close();
 }

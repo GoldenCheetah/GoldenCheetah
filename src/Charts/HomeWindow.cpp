@@ -533,6 +533,7 @@ HomeWindow::addChart(GcWindow* newone)
         newone->installEventFilter(this);
 
         RideItem *notconst = (RideItem*)context->currentRideItem();
+        newone->setProperty("view", name);
         newone->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
         newone->setProperty("dateRange", property("dateRange"));
         newone->setProperty("style", currentStyle);
