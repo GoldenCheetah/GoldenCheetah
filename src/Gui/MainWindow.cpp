@@ -1389,10 +1389,9 @@ MainWindow::importCharts(QStringList list)
 
     } else {
 
-        // XXX needs a dialog box to confirm/select
-        for(int i=0; i<charts.count(); i++) {
-            qDebug()<<"name="<<charts[i].value("title","");
-        }
+        // run an import dialog
+        ImportChartDialog importer(currentTab->context, charts, this);
+        importer.exec();
     }
 }
 

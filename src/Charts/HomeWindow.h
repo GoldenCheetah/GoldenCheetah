@@ -30,6 +30,7 @@
 #include <QMessageBox>
 #include <QLabel>
 #include <QDialog>
+#include <QTreeWidget>
 #include <QCheckBox>
 #include <QStackedWidget>
 
@@ -196,4 +197,26 @@ protected:
     GcWindow *chart;
 
 };
+
+class ImportChartDialog : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        ImportChartDialog(Context *context, QList<QMap<QString,QString> >list, QWidget *parent);
+
+    protected:
+        QTableWidget *table;
+        QPushButton *import, *cancel;
+
+    public slots:
+        void importClicked();
+        void cancelClicked();
+
+    private:
+        Context *context;
+        QList<QMap<QString,QString> >list;
+
+};
+
 #endif // _GC_HomeWindow_h
