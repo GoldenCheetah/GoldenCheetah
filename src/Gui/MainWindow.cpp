@@ -1356,43 +1356,9 @@ MainWindow::importCharts(QStringList list)
         charts << GcChartWindow::chartProperties(filename);
     }
 
-    if (list.count() == 1) {
-
-        // just add it and be done
-        QString view = charts[0].value("VIEW", "");
-        if (view == "") {
-
-            // parse error
-            QMessageBox oops(QMessageBox::Critical, tr("Chart Parse Failed"),
-                         tr("Failed to parse chart."));
-            oops.exec();
-            return;
-
-        }
-
-#ifdef GC_HAVE_ICAL
-        // diary not available!
-        if (view == "diary") {
-            charts[0].insert("VIEW", "home");
-            view = "home";
-        }
-#endif
-
-        int x=0;
-        if (view == "home")  { x=0; selectHome(); }
-        if (view == "analysis")  { x=1; selectAnalysis(); }
-        if (view == "diary")  { x=2; selectDiary(); }
-        if (view == "train")  { x=3; selectTrain(); }
-
-        // add to the currently selected tab and select=true
-        currentTab->view(x)->importChart(charts[0], true);
-
-    } else {
-
-        // run an import dialog
-        ImportChartDialog importer(currentTab->context, charts, this);
-        importer.exec();
-    }
+    // And import them with a dialog to select location
+    ImportChartDialog importer(currentTab->context, charts, this);
+    importer.exec();
 }
 
 

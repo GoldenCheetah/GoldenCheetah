@@ -1595,6 +1595,7 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
 #ifdef Q_OS_MAC
     table->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
+    table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     table->setRowCount(list.count());
     table->setColumnCount(3);
     QStringList headings;
@@ -1620,15 +1621,46 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
         table->setCellWidget(i, 0, c);
 
         QString view = list[i].value("VIEW");
-#ifdef GC_HAVE_ICAL
+
+        // convert to user name for view from here, since
+        // they won't recognise the names used internally
+        // as they need to be translated too
+        if (view == "diary") view = tr("Diary");
+        if (view == "home") view = tr("Trends");
+        if (view == "analysis") view = tr("Activities");
+        if (view == "train") view = tr("Train");
+
+        QTableWidgetItem *t;
+#ifndef GC_HAVE_ICAL
         // diary not available!
-        if (view == "diary")  view = "home";
-#endif
+        if (view == tr("Diary"))  view = tr("Trends");
         // View
-        QTableWidgetItem *t = new QTableWidgetItem;
+        t = new QTableWidgetItem;
         t->setText(view);
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         table->setItem(i, 1, t);
+
+#else
+        // we should be able to select trend/diary
+        if (view == tr("Diary") || view == tr("Trends")) {
+
+            QComboBox *com = new QComboBox(this);
+            com->addItem(tr("Diary"));
+            com->addItem(tr("Trends"));
+            table->setCellWidget(i,1,com);
+            if (view == tr("Diary")) com->setCurrentIndex(0);
+            else com->setCurrentIndex(1);
+
+        } else {
+
+            // View
+            t = new QTableWidgetItem;
+            t->setText(view);
+            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+            table->setItem(i, 1, t);
+
+        }
+#endif
 
         // title
         t = new QTableWidgetItem;
@@ -1639,7 +1671,6 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
     }
 
     layout->addWidget(table);
-    layout->addStretch();
 
     QHBoxLayout *buttons = new QHBoxLayout;
     buttons->addStretch();
@@ -1660,17 +1691,31 @@ ImportChartDialog::importClicked()
         // is it checked?
         if (static_cast<QCheckBox*>(table->cellWidget(i,0))->isChecked()) {
 
-            // import this one !
-            QString view = table->item(i,1)->text();
+            // where we putting it?
+            QString view;
+
+            // is there a combo box?
+            QComboBox *com = static_cast<QComboBox*>(table->cellWidget(i,1));
+            if (com) {
+                switch(com->currentIndex()) {
+
+                    case 0 : view = tr("Diary"); break;
+
+                    default:
+                    case 1 : view = tr("Trends"); break;
+                }
+            } else {
+                view = table->item(i,1)->text();
+            }
 
             int x=0;
-            if (view == "home")  { x=0; context->mainWindow->selectHome(); }
-            if (view == "analysis")  { x=1; context->mainWindow->selectAnalysis(); }
-            if (view == "diary")  { x=2; context->mainWindow->selectDiary(); }
-            if (view == "train")  { x=3; context->mainWindow->selectTrain(); }
+            if (view == tr("Trends"))      { x=0; context->mainWindow->selectHome(); }
+            if (view == tr("Activities"))  { x=1; context->mainWindow->selectAnalysis(); }
+            if (view == tr("Diary"))       { x=2; context->mainWindow->selectDiary(); }
+            if (view == tr("Train"))       { x=3; context->mainWindow->selectTrain(); }
 
-            // add to the currently selected tab and select=false
-            context->mainWindow->athleteTab()->view(x)->importChart(list[i], false);
+            // add to the currently selected tab and select if only adding one chart
+            context->mainWindow->athleteTab()->view(x)->importChart(list[i], (list.count()==1));
         }
     }
     accept();

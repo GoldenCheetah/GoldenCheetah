@@ -55,6 +55,9 @@ RCanvas::RCanvas(Context *context, QWidget *parent) : QGraphicsView(parent), con
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 #endif
 
+    // allow to click and drag
+    setDragMode(QGraphicsView::ScrollHandDrag);
+
     // add a scene
     scene = new QGraphicsScene(this);
     this->setScene(scene);
