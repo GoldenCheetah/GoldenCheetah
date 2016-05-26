@@ -250,12 +250,17 @@ private:
     GcOverlayWidget *overlayWidget;
     bool wantOverlay;
 
+    // handle Chart Serialissation
+    void serializeChartToQTextStream(QTextStream& out);
+
+
 public:
     GcChartWindow(Context *context);
 
-    // parse a .gchart file and return a list of charts expressed
+    // parse a .gchart file / or string and return a list of charts expressed
     // as a property list in a QMap1
-    static QList<QMap<QString,QString> > chartProperties(QString filename);
+    static QList<QMap<QString,QString> > chartPropertiesFromFile(QString filename);
+    static QList<QMap<QString,QString> > chartPropertiesFromString(QString contents);
 
     QWidget *mainWidget() { return _mainWidget; }
     GcOverlayWidget *helperWidget() { return overlayWidget; }
@@ -271,6 +276,9 @@ public slots:
     void hideRevealControls();
     void saveImage();
     void saveChart();
+#ifdef GC_HAS_CLOUD_DB
+    void exportChartToCloudDB();
+#endif
     void colorChanged(QColor);
 };
 

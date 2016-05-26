@@ -32,12 +32,6 @@
 #include "Units.h" // for MILES_PER_KM
 #include "HelpWhatsThis.h"
 
-#ifdef GC_HAS_CLOUD_DB
-#include "CloudDBCommon.h"
-#include "CloudDBChart.h"
-#include "GcUpgrade.h"
-#endif
-
 #ifdef NOWEBKIT
 #include <QWebEngineSettings>
 #endif
@@ -224,10 +218,7 @@ LTMWindow::LTMWindow(Context *context) :
     // controls since the menu is SET from setControls
     QAction *exportData = new QAction(tr("Export Chart Data..."), this);
     addAction(exportData);
-#ifdef GC_HAS_CLOUD_DB
-    QAction *shareConfig = new QAction(tr("Export Chart Configuration to CloudDB..."), this);
-    addAction(shareConfig);
-#endif
+
     // the controls
     QWidget *c = new QWidget;
     c->setContentsMargins(0,0,0,0);
@@ -295,9 +286,6 @@ LTMWindow::LTMWindow(Context *context) :
 
     // custom menu item
     connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
-#if GC_HAS_CLOUD_DB
-    connect(shareConfig, SIGNAL(triggered()), this, SLOT(shareConfig()));
-#endif
 
     // normal view
     connect(spanSlider, SIGNAL(lowerPositionChanged(int)), this, SLOT(spanSliderChanged()));
@@ -1276,56 +1264,6 @@ LTMWindow::exportConfig()
         LTMChartParser::serialize(filename, mine);
     }
 }
-
-#ifdef GC_HAS_CLOUD_DB
-void
-LTMWindow::shareConfig()
-{
-    // check for CloudDB T&C acceptance
-    if (!(appsettings->cvalue(context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
-        CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
-        acceptDialog.setModal(true);
-        if (acceptDialog.exec() == QDialog::Rejected) {
-            return;
-        };
-    }
-
-    // collect the config to export
-    QList<LTMSettings> mine;
-    mine << settings;
-    mine[0].title = mine[0].name = title();
-
-    ChartAPIv1 chart;
-    chart.Header.Name = title();
-    int version = VERSION_LATEST;
-    chart.Header.GcVersion =  QString::number(version);
-    LTMChartParser::serializeToQString(&chart.ChartXML, mine);
-    QPixmap picture;
-    menuButton->hide();
-#if QT_VERSION > 0x050000
-    picture = grab(geometry());
-#else
-    picture = QPixmap::grabWidget (this);
-#endif
-    QBuffer buffer(&chart.Image);
-    buffer.open(QIODevice::WriteOnly);
-    picture.save(&buffer, "PNG"); // writes pixmap into bytes in PNG format (a bit larger than JPG - but much better in Quality when importing)
-    buffer.close();
-
-    chart.Header.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
-    chart.Header.Curated = false;
-    chart.Header.Deleted = false;
-
-    // now complete the chart with for the user manually added fields
-    CloudDBChartObjectDialog dialog(chart, context->athlete->cyclist);
-    if (dialog.exec() == QDialog::Accepted) {
-        CloudDBChartClient c;
-        if (c.postChart(dialog.getChart())) {
-            CloudDBHeader::setChartHeaderStale(true);
-        }
-    }
-}
-#endif
 
 
 void

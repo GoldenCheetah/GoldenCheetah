@@ -26,6 +26,12 @@
 #include "mvjson.h"
 #include "LTMSettings.h"
 
+#ifdef GC_HAS_CLOUD_DB
+#include "CloudDBChart.h"
+#include "CloudDBCommon.h"
+#include "GcUpgrade.h"
+#endif
+
 #include <QDebug>
 #include <QColor>
 #include <QLabel>
@@ -820,6 +826,9 @@ GcChartWindow::setControls(QWidget *x)
         }
     }
     menu->addAction(tr("Export Chart ..."), this, SLOT(saveChart()));
+#ifdef GC_HAS_CLOUD_DB
+    menu->addAction(tr("Export Chart to CloudDB..."), this, SLOT(exportChartToCloudDB()));
+#endif
     menu->addAction(tr("Export Chart Image..."), this, SLOT(saveImage()));
     menu->addAction(tr("Remove Chart"), this, SLOT(_closeWindow()));
 }
@@ -890,8 +899,6 @@ static int gcChartVersion = 1;
 void
 GcChartWindow::saveChart()
 {
-    // iterate over chart properties
-    const QMetaObject *m = metaObject();
 
     // where to save it?
     QString suffix; // what was selected?
@@ -912,6 +919,18 @@ GcChartWindow::saveChart()
     // lets go to it
     QTextStream out(&outfile);
     out.setCodec ("UTF-8");
+
+    serializeChartToQTextStream(out);
+
+    // all done
+    outfile.close();
+}
+
+void
+GcChartWindow::serializeChartToQTextStream(QTextStream& out) {
+
+    // iterate over chart properties
+    const QMetaObject *m = metaObject();
 
     out <<"{\n\t\"CHART\":{\n";
     out <<"\t\t\"VERSION\":\"" << QString("%1").arg(gcChartVersion) << "\",\n";
@@ -946,12 +965,12 @@ GcChartWindow::saveChart()
     // end here, only one chart
     out<<"\t\t}\n\t}\n}";
 
-    // all done
-    outfile.close();
+
 }
 
+
 QList<QMap<QString,QString> >
-GcChartWindow::chartProperties(QString filename)
+GcChartWindow::chartPropertiesFromFile(QString filename)
 {
     QList<QMap<QString,QString> > returning;
 
@@ -970,6 +989,15 @@ GcChartWindow::chartProperties(QString filename)
 
     // empty?
     if (contents == "") return returning;
+
+    return chartPropertiesFromString(contents);
+
+}
+
+QList<QMap<QString,QString> >
+GcChartWindow::chartPropertiesFromString(QString contents) {
+
+    QList<QMap<QString,QString> > returning;
 
     // parse via MVJson to avoid QT5 dependency
     MVJSONReader json(string(contents.toLatin1()));
@@ -1012,4 +1040,68 @@ GcChartWindow::chartProperties(QString filename)
     }
 
     return returning;
+
 }
+
+
+
+#if GC_HAS_CLOUD_DB
+void
+GcChartWindow::exportChartToCloudDB()
+{
+
+    // check for CloudDB T&C acceptance
+    if (!(appsettings->cvalue(context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+        CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
+        acceptDialog.setModal(true);
+        if (acceptDialog.exec() == QDialog::Rejected) {
+            return;
+        };
+    }
+
+    ChartAPIv1 chart;
+    chart.Header.Name = title();
+    int version = VERSION_LATEST;
+    chart.Header.GcVersion =  QString::number(version);
+    // get the gchart - definition json
+    QTextStream out(&chart.ChartDef);
+    out.setCodec ("UTF-8");
+    serializeChartToQTextStream(out);
+    out.flush();
+    // get Type and View from properties
+    QList<QMap<QString,QString> > chartProperties;
+    chartProperties = chartPropertiesFromString(chart.ChartDef);
+    QMap<QString,QString> element;
+    for (int i = 0; i < chartProperties.size(); i++ ) {
+        element = chartProperties.at(i);
+        if (element.contains("TYPE")) {
+            chart.ChartType = element.value("TYPE");
+        }
+        if (element.contains("VIEW")) {
+            chart.ChartView = element.value("VIEW");
+        }
+    }
+
+    QPixmap picture;
+    menuButton->hide();
+    picture = grab(geometry());
+
+    QBuffer buffer(&chart.Image);
+    buffer.open(QIODevice::WriteOnly);
+    picture.save(&buffer, "PNG"); // writes pixmap into bytes in PNG format (a bit larger than JPG - but much better in Quality when importing)
+    buffer.close();
+
+    chart.Header.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
+    chart.Header.Curated = false;
+    chart.Header.Deleted = false;
+
+    // now complete the chart with for the user manually added fields
+    CloudDBChartObjectDialog dialog(chart, context->athlete->cyclist);
+    if (dialog.exec() == QDialog::Accepted) {
+        CloudDBChartClient c;
+        if (c.postChart(dialog.getChart())) {
+            CloudDBHeader::setChartHeaderStale(true);
+        }
+    }
+}
+#endif
