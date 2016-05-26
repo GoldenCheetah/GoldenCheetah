@@ -1621,7 +1621,8 @@ RTool::activity(SEXP datetime, SEXP pCompare)
             }
 
             // turn the list into a data frame + set column names
-            Rf_setAttrib(list, R_ClassSymbol, Rf_mkString("data.frame"));
+            //XXX Do not create a dataframe of dataframes, R doesn't like these
+            //XXX Rf_setAttrib(list, R_ClassSymbol, Rf_mkString("data.frame"));
             Rf_setAttrib(list, R_RowNamesSymbol, rownames);
             Rf_namesgets(list, names);
 
