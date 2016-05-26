@@ -68,8 +68,10 @@ typedef SEXP (*Prot_GC_Rf_allocList)(int);
 typedef void (*Prot_GC_Rf_unprotect)(int);
 typedef SEXP (*Prot_GC_Rf_protect)(SEXP);
 typedef SEXP (*Prot_GC_SETCAR)(SEXP x, SEXP y);
+typedef void (*Prot_GC_SET_TYPEOF)(SEXP x, int);
 typedef SEXP ((*Prot_GC_CDR))(SEXP e);
 typedef void (*Prot_GC_SET_STRING_ELT)(SEXP x, R_xlen_t i, SEXP v);
+typedef SEXP (*Prot_GC_SET_VECTOR_ELT)(SEXP x, R_xlen_t i, SEXP v);
 typedef SEXP ((*Prot_GC_VECTOR_ELT))(SEXP x, R_xlen_t i);
 typedef SEXP (*Prot_GC_Rf_mkChar)(const char *);
 typedef SEXP (*Prot_GC_Rf_mkString)(const char *);
@@ -141,8 +143,10 @@ Prot_GC_Rf_allocList ptr_GC_Rf_allocList;
 Prot_GC_Rf_unprotect ptr_GC_Rf_unprotect;
 Prot_GC_Rf_protect ptr_GC_Rf_protect;
 Prot_GC_SETCAR ptr_GC_SETCAR;
+Prot_GC_SET_TYPEOF ptr_GC_SET_TYPEOF;
 Prot_GC_CDR ptr_GC_CDR;
 Prot_GC_SET_STRING_ELT ptr_GC_SET_STRING_ELT;
+Prot_GC_SET_VECTOR_ELT ptr_GC_SET_VECTOR_ELT;
 Prot_GC_VECTOR_ELT ptr_GC_VECTOR_ELT;
 Prot_GC_Rf_mkChar ptr_GC_Rf_mkChar;
 Prot_GC_Rf_mkString ptr_GC_Rf_mkString;
@@ -200,8 +204,10 @@ SEXP GC_Rf_allocList(int x) { return (*ptr_GC_Rf_allocList)(x); }
 void GC_Rf_unprotect(int x) { (*ptr_GC_Rf_unprotect)(x); }
 SEXP GC_Rf_protect(SEXP x) { return (*ptr_GC_Rf_protect)(x); }
 SEXP GC_SETCAR(SEXP x, SEXP y) { return (*ptr_GC_SETCAR)(x,y); }
+void GC_SET_TYPEOF(SEXP x, int y) { return (*ptr_GC_SET_TYPEOF)(x,y); }
 SEXP (GC_CDR)(SEXP e) { return (*ptr_GC_CDR)(e); }
 void GC_SET_STRING_ELT(SEXP x, R_xlen_t i, SEXP v) { (*ptr_GC_SET_STRING_ELT)(x,i,v); }
+SEXP GC_SET_VECTOR_ELT(SEXP x, R_xlen_t i, SEXP v) { return (*ptr_GC_SET_VECTOR_ELT)(x,i,v); }
 SEXP (GC_VECTOR_ELT)(SEXP x, R_xlen_t i) { return (*ptr_GC_VECTOR_ELT)(x,i); }
 SEXP GC_Rf_mkChar(const char *a) { return (*ptr_GC_Rf_mkChar)(a); }
 SEXP GC_Rf_mkString(const char *b) { return (*ptr_GC_Rf_mkString)(b); }
@@ -372,8 +378,10 @@ RLibrary::load()
     ptr_GC_Rf_unprotect = Prot_GC_Rf_unprotect(resolve("Rf_unprotect"));
     ptr_GC_Rf_protect = Prot_GC_Rf_protect(resolve("Rf_protect"));
     ptr_GC_SETCAR = Prot_GC_SETCAR(resolve("SETCAR"));
+    ptr_GC_SET_TYPEOF = Prot_GC_SET_TYPEOF(resolve("SET_TYPEOF"));
     ptr_GC_CDR = Prot_GC_CDR(resolve("CDR"));
     ptr_GC_SET_STRING_ELT = Prot_GC_SET_STRING_ELT(resolve("SET_STRING_ELT"));
+    ptr_GC_SET_VECTOR_ELT = Prot_GC_SET_VECTOR_ELT(resolve("SET_VECTOR_ELT"));
     ptr_GC_VECTOR_ELT = Prot_GC_VECTOR_ELT(resolve("VECTOR_ELT"));
     ptr_GC_Rf_mkChar = Prot_GC_Rf_mkChar(resolve("Rf_mkChar"));
     ptr_GC_Rf_mkString = Prot_GC_Rf_mkString(resolve("Rf_mkString"));
