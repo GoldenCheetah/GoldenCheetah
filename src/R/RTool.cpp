@@ -237,25 +237,24 @@ RTool::athlete()
 
     // name, home, dob, height, weight, gender
     SEXP ans, names;
-    PROTECT(ans=Rf_allocList(6));
+    PROTECT(ans=Rf_allocVector(VECSXP, 6));
     PROTECT(names=Rf_allocVector(STRSXP, 6));
 
     // next and nextS
     SEXP item;
     int next=0;
-    SEXP nextS = ans;
 
     // NAME
     PROTECT(item=Rf_allocVector(STRSXP, 1));
     SET_STRING_ELT(item, 0, Rf_mkChar(rtool->context->athlete->cyclist.toLatin1().constData()));
-    SETCAR(nextS, item); nextS=CDR(nextS);
+    SET_VECTOR_ELT(ans, next, item);
     SET_STRING_ELT(names, next++, Rf_mkChar("name"));
     UNPROTECT(1);
 
     // HOME
     PROTECT(item=Rf_allocVector(STRSXP, 1));
     SET_STRING_ELT(item, 0, Rf_mkChar(rtool->context->athlete->home->root().absolutePath().toLatin1().constData()));
-    SETCAR(nextS, item); nextS=CDR(nextS);
+    SET_VECTOR_ELT(ans, next, item);
     SET_STRING_ELT(names, next++, Rf_mkChar("home"));
     UNPROTECT(1);
 
@@ -267,21 +266,21 @@ RTool::athlete()
     PROTECT(dclas=Rf_allocVector(STRSXP, 1));
     SET_STRING_ELT(dclas, 0, Rf_mkChar("Date"));
     Rf_classgets(item,dclas);
-    SETCAR(nextS, item); nextS=CDR(nextS);
+    SET_VECTOR_ELT(ans, next, item);
     SET_STRING_ELT(names, next++, Rf_mkChar("dob"));
     UNPROTECT(2);
 
     // WEIGHT
     PROTECT(item=Rf_allocVector(REALSXP, 1));
     REAL(item)[0] = appsettings->cvalue(rtool->context->athlete->cyclist, GC_WEIGHT).toDouble();
-    SETCAR(nextS, item); nextS=CDR(nextS);
+    SET_VECTOR_ELT(ans, next, item);
     SET_STRING_ELT(names, next++, Rf_mkChar("weight"));
     UNPROTECT(1);
 
     // HEIGHT
     PROTECT(item=Rf_allocVector(REALSXP, 1));
     REAL(item)[0] = appsettings->cvalue(rtool->context->athlete->cyclist, GC_HEIGHT).toDouble();
-    SETCAR(nextS, item); nextS=CDR(nextS);
+    SET_VECTOR_ELT(ans, next, item);
     SET_STRING_ELT(names, next++, Rf_mkChar("height"));
     UNPROTECT(1);
 
@@ -289,7 +288,7 @@ RTool::athlete()
     int isfemale = appsettings->cvalue(rtool->context->athlete->cyclist, GC_SEX).toInt();
     PROTECT(item=Rf_allocVector(STRSXP, 1));
     SET_STRING_ELT(item, 0, isfemale ? Rf_mkChar("female") : Rf_mkChar("male"));
-    SETCAR(nextS, item); nextS=CDR(nextS);
+    SET_VECTOR_ELT(ans, next, item);
     SET_STRING_ELT(names, next++, Rf_mkChar("gender"));
     UNPROTECT(1);
 
@@ -610,7 +609,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
 
     // CREATE A DATAFRAME OF CONFIG
     SEXP ans;
-    PROTECT(ans = Rf_allocList(10));
+    PROTECT(ans = Rf_allocVector(VECSXP, 10));
 
     // 10 columns, size rows
     SEXP date;
@@ -655,17 +654,16 @@ RTool::zones(SEXP pDate, SEXP pSport)
     }
 
     // add to frame
-    SEXP nextS=ans;
-    SETCAR(nextS, date); nextS=CDR(nextS);
-    SETCAR(nextS, sport); nextS=CDR(nextS);
-    SETCAR(nextS, cp); nextS=CDR(nextS);
-    SETCAR(nextS, wprime); nextS=CDR(nextS);
-    SETCAR(nextS, pmax); nextS=CDR(nextS);
-    SETCAR(nextS, ftp); nextS=CDR(nextS);
-    SETCAR(nextS, lthr); nextS=CDR(nextS);
-    SETCAR(nextS, rhr); nextS=CDR(nextS);
-    SETCAR(nextS, hrmax); nextS=CDR(nextS);
-    SETCAR(nextS, cv); nextS=CDR(nextS);
+    SET_VECTOR_ELT(ans, 0, date);
+    SET_VECTOR_ELT(ans, 1, sport);
+    SET_VECTOR_ELT(ans, 2, cp);
+    SET_VECTOR_ELT(ans, 3, wprime);
+    SET_VECTOR_ELT(ans, 4, pmax);
+    SET_VECTOR_ELT(ans, 5, ftp);
+    SET_VECTOR_ELT(ans, 6, lthr);
+    SET_VECTOR_ELT(ans, 7, rhr);
+    SET_VECTOR_ELT(ans, 8, hrmax);
+    SET_VECTOR_ELT(ans, 9, cv);
 
     // turn into a data.frame, name class etc
     SEXP names;
@@ -807,7 +805,7 @@ RTool::dfForRideItem(const RideItem *ri)
     SEXP rownames; // row names (numeric)
 
     // +3 is for date and datetime and color
-    PROTECT(ans=Rf_allocList(metrics+meta+3));
+    PROTECT(ans=Rf_allocVector(VECSXP, metrics+meta+3));
     PROTECT(names = Rf_allocVector(STRSXP, metrics+meta+3));
 
     // we have to give a name to each row
@@ -819,7 +817,6 @@ RTool::dfForRideItem(const RideItem *ri)
 
     // next name, nextS is next metric
     int next=0;
-    SEXP nextS = ans;
 
     // DATE
     SEXP date;
@@ -833,7 +830,7 @@ RTool::dfForRideItem(const RideItem *ri)
     Rf_classgets(date,dclas);
 
     // add to the data.frame and give it a name
-    SETCAR(nextS, date); nextS=CDR(nextS);
+    SET_VECTOR_ELT(ans, next, date);
     SET_STRING_ELT(names, next++, Rf_mkChar("date"));
 
     // TIME
@@ -852,7 +849,7 @@ RTool::dfForRideItem(const RideItem *ri)
     Rf_setAttrib(time, Rf_install("tzone"), Rf_mkString("UTC"));
 
     // add to the data.frame and give it a name
-    SETCAR(nextS, time); nextS=CDR(nextS);
+    SET_VECTOR_ELT(ans, next, time);
     SET_STRING_ELT(names, next++, Rf_mkChar("time"));
 
     // time + clas, but not ans!
@@ -877,8 +874,7 @@ RTool::dfForRideItem(const RideItem *ri)
         REAL(m)[0] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum());
 
         // add to the list
-        SETCAR(nextS, m);
-        nextS = CDR(nextS);
+        SET_VECTOR_ELT(ans, next, m);
 
         // give it a name
         SET_STRING_ELT(names, next, Rf_mkChar(name.toLatin1().constData()));
@@ -904,8 +900,7 @@ RTool::dfForRideItem(const RideItem *ri)
         SET_STRING_ELT(m, 0, Rf_mkChar(item->getText(field.name, "").toLatin1().constData()));
 
         // add to the list
-        SETCAR(nextS, m);
-        nextS = CDR(nextS);
+        SET_VECTOR_ELT(ans, next, m);
 
         // give it a name
         SET_STRING_ELT(names, next, Rf_mkChar(field.name.replace(" ","_").toLatin1().constData()));
@@ -934,8 +929,7 @@ RTool::dfForRideItem(const RideItem *ri)
         SET_STRING_ELT(color, 0, Rf_mkChar(item->color.name().toLatin1().constData()));
 
     // add to the list and name it
-    SETCAR(nextS, color);
-    nextS = CDR(nextS);
+    SET_VECTOR_ELT(ans, next, color);
     SET_STRING_ELT(names, next, Rf_mkChar("color"));
     next++;
 
@@ -1012,7 +1006,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     SEXP rownames; // row names (numeric)
 
     // +3 is for date and datetime and color
-    PROTECT(ans=Rf_allocList(metrics+meta+3));
+    PROTECT(ans=Rf_allocVector(VECSXP, metrics+meta+3));
     PROTECT(names = Rf_allocVector(STRSXP, metrics+meta+3));
 
     // we have to give a name to each row
@@ -1022,9 +1016,8 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
         SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
     }
 
-    // next name, nextS is next metric
+    // next name
     int next=0;
-    SEXP nextS = ans;
 
     // DATE
     SEXP date;
@@ -1044,7 +1037,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     Rf_classgets(date,dclas);
 
     // add to the data.frame and give it a name
-    SETCAR(nextS, date); nextS=CDR(nextS);
+    SET_VECTOR_ELT(ans, next, date);
     SET_STRING_ELT(names, next++, Rf_mkChar("date"));
 
     // TIME
@@ -1070,7 +1063,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     Rf_setAttrib(time, Rf_install("tzone"), Rf_mkString("UTC"));
 
     // add to the data.frame and give it a name
-    SETCAR(nextS, time); nextS=CDR(nextS);
+    SET_VECTOR_ELT(ans, next, time);
     SET_STRING_ELT(names, next++, Rf_mkChar("time"));
 
     // time + clas, but not ans!
@@ -1103,8 +1096,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
         }
 
         // add to the list
-        SETCAR(nextS, m);
-        nextS = CDR(nextS);
+        SET_VECTOR_ELT(ans, next, m);
 
         // give it a name
         SET_STRING_ELT(names, next, Rf_mkChar(name.toLatin1().constData()));
@@ -1137,8 +1129,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
         }
 
         // add to the list
-        SETCAR(nextS, m);
-        nextS = CDR(nextS);
+        SET_VECTOR_ELT(ans, next, m);
 
         // give it a name
         SET_STRING_ELT(names, next, Rf_mkChar(field.name.replace(" ","_").toLatin1().constData()));
@@ -1174,8 +1165,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     }
 
     // add to the list and name it
-    SETCAR(nextS, color);
-    nextS = CDR(nextS);
+    SET_VECTOR_ELT(ans, next, color);
     SET_STRING_ELT(names, next, Rf_mkChar("color"));
     next++;
 
@@ -1211,7 +1201,7 @@ RTool::season(SEXP pAll, SEXP pCompare)
     // XXX TODO type needs adding, but we need to unpick the
     //          phase/season object model first, will do later
     SEXP df;
-    PROTECT(df=Rf_allocList(4));
+    PROTECT(df=Rf_allocVector(VECSXP, 4));
 
     // names
     SEXP names;
@@ -1276,11 +1266,10 @@ RTool::season(SEXP pAll, SEXP pCompare)
     Rf_classgets(start,dclas);
     Rf_classgets(end,dclas);
 
-    SEXP next=df;
-    SETCAR(next, name); next=CDR(next);
-    SETCAR(next, start); next=CDR(next);
-    SETCAR(next, end); next=CDR(next);
-    SETCAR(next, color); next=CDR(next);
+    SET_VECTOR_ELT(df, 0, name);
+    SET_VECTOR_ELT(df, 1, start);
+    SET_VECTOR_ELT(df, 2, end);
+    SET_VECTOR_ELT(df, 3, color);
 
     // list into a data.frame
     Rf_namesgets(df, names);
@@ -1317,10 +1306,8 @@ RTool::metrics(SEXP pAll, SEXP pFilter, SEXP pCompare)
 
             // cool we can return a list of intervals to compare
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, count));
-
-            // start at the front
-            SEXP nextS = list;
+            PROTECT(list=Rf_allocVector(VECSXP, count));
+            int index=0;
 
             // a named list with data.frame 'metrics' and color 'color'
             SEXP namedlist;
@@ -1336,26 +1323,23 @@ RTool::metrics(SEXP pAll, SEXP pFilter, SEXP pCompare)
                 if (p.isChecked()) {
 
                     // create a named list
-                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
-                    SEXP offset = namedlist;
+                    PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
                     // add the ride
                     SEXP df = rtool->dfForDateRange(all, DateRange(p.start, p.end), pFilter);
-                    SETCAR(offset, df);
-                    offset=CDR(offset);
+                    SET_VECTOR_ELT(namedlist, 0, df);
 
                     // add the color
                     SEXP color;
                     PROTECT(color=Rf_allocVector(STRSXP, 1));
                     SET_STRING_ELT(color, 0, Rf_mkChar(p.color.name().toLatin1().constData()));
-                    SETCAR(offset, color);
+                    SET_VECTOR_ELT(namedlist, 1, color);
 
                     // name them
                     Rf_namesgets(namedlist, names);
 
                     // add to back and move on
-                    SETCAR(nextS, namedlist);
-                    nextS=CDR(nextS);
+                    SET_VECTOR_ELT(list, index++, namedlist);
 
                     UNPROTECT(2);
                 }
@@ -1368,7 +1352,7 @@ RTool::metrics(SEXP pAll, SEXP pFilter, SEXP pCompare)
 
             // otherwise return the current metrics in a compare list
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, 1));
+            PROTECT(list=Rf_allocVector(VECSXP, 1));
 
             // names
             SEXP names;
@@ -1378,26 +1362,24 @@ RTool::metrics(SEXP pAll, SEXP pFilter, SEXP pCompare)
 
             // named list of metrics and color
             SEXP namedlist;
-            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
-            SEXP offset = namedlist;
+            PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
             // add the metrics
             DateRange range = rtool->context->currentDateRange();
             SEXP df = rtool->dfForDateRange(all, range, pFilter);
-            SETCAR(offset, df);
-            offset=CDR(offset);
+            SET_VECTOR_ELT(namedlist, 0, df);
 
             // add the color
             SEXP color;
             PROTECT(color=Rf_allocVector(STRSXP, 1));
             SET_STRING_ELT(color, 0, Rf_mkChar("#FF00FF"));
-            SETCAR(offset, color);
+            SET_VECTOR_ELT(namedlist, 1, color);
 
             // name them
             Rf_namesgets(namedlist, names);
 
             // add to back and move on
-            SETCAR(list, namedlist);
+            SET_VECTOR_ELT(list, 0, namedlist);
             UNPROTECT(4);
 
             return list;
@@ -1436,13 +1418,12 @@ RTool::dfForActivity(RideFile *f)
     else return Rf_allocVector(INTSXP, 0);
 
     // we return a list of series vectors
-    PROTECT(ans = Rf_allocList(seriescount));
+    PROTECT(ans = Rf_allocVector(VECSXP, seriescount));
 
     // we collect the names as we go
     SEXP names;
     PROTECT(names = Rf_allocVector(STRSXP, seriescount)); // names attribute (column names)
     int next=0;
-    SEXP nextS = ans;
 
     //
     // Now we need to add vectors to the ans list...
@@ -1468,7 +1449,7 @@ RTool::dfForActivity(RideFile *f)
     Rf_setAttrib(time, Rf_install("tzone"), Rf_mkString("UTC"));
 
     // add to the data.frame and give it a name
-    SETCAR(nextS, time); nextS=CDR(nextS);
+    SET_VECTOR_ELT(ans, next, time);
     SET_STRING_ELT(names, next++, Rf_mkChar("time"));
 
     // time + clas, but not ans!
@@ -1501,8 +1482,7 @@ RTool::dfForActivity(RideFile *f)
         }
 
         // add to the list
-        SETCAR(nextS, vector);
-        nextS = CDR(nextS);
+        SET_VECTOR_ELT(ans, next, vector);
 
         // give it a name
         SET_STRING_ELT(names, next, Rf_mkChar(f->seriesName(series, true).toLatin1().constData()));
@@ -1564,10 +1544,6 @@ RTool::activitiesFor(SEXP datetime)
 SEXP
 RTool::activity(SEXP datetime, SEXP pCompare)
 {
-    // a dataframe to return
-    SEXP ans=NULL;
-
-
     // p1 - compare=TRUE|FALSE - return list of compare rides if active, or just current
     pCompare = Rf_coerceVector(pCompare, LGLSXP);
     bool compare = LOGICAL(pCompare)[0];
@@ -1583,10 +1559,7 @@ RTool::activity(SEXP datetime, SEXP pCompare)
 
             // cool we can return a list of intervals to compare
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, activities.count()));
-
-            // start at the front
-            SEXP nextS = list;
+            PROTECT(list=Rf_allocVector(VECSXP, activities.count()));
 
             // names
             SEXP names;
@@ -1598,7 +1571,6 @@ RTool::activity(SEXP datetime, SEXP pCompare)
 
                 // give it a name
                 SET_STRING_ELT(names, index, Rf_mkChar(QString("%1").arg(index+1).toLatin1().constData()));
-                index++;
 
                 // we open, if it wasn't open we also close
                 // to make sure we don't exhause memory
@@ -1607,9 +1579,9 @@ RTool::activity(SEXP datetime, SEXP pCompare)
                 if (close) item->close();
 
                 // add to back and move on
-                SETCAR(nextS, df);
-                nextS=CDR(nextS);
+                SET_VECTOR_ELT(list, index, df);
 
+                index++;
             }
 
             // we have to give a name to each row
@@ -1640,10 +1612,8 @@ RTool::activity(SEXP datetime, SEXP pCompare)
 
             // cool we can return a list of intervals to compare
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, count));
-
-            // start at the front
-            SEXP nextS = list;
+            PROTECT(list=Rf_allocVector(VECSXP, count));
+            int index=0;
 
             // a named list with data.frame 'activity' and color 'color'
             SEXP namedlist;
@@ -1659,26 +1629,23 @@ RTool::activity(SEXP datetime, SEXP pCompare)
                 if (p.isChecked()) {
 
                     // create a named list
-                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
-                    SEXP offset = namedlist;
+                    PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
                     // add the ride
                     SEXP df = rtool->dfForActivity(p.rideItem->ride());
-                    SETCAR(offset, df);
-                    offset=CDR(offset);
+                    SET_VECTOR_ELT(namedlist, 0, df);
 
                     // add the color
                     SEXP color;
                     PROTECT(color=Rf_allocVector(STRSXP, 1));
                     SET_STRING_ELT(color, 0, Rf_mkChar(p.color.name().toLatin1().constData()));
-                    SETCAR(offset, color);
+                    SET_VECTOR_ELT(namedlist, 1, color);
 
                     // name them
                     Rf_namesgets(namedlist, names);
 
                     // add to back and move on
-                    SETCAR(nextS, namedlist);
-                    nextS=CDR(nextS);
+                    SET_VECTOR_ELT(list, index++, namedlist);
 
                     UNPROTECT(2);
                 }
@@ -1692,7 +1659,7 @@ RTool::activity(SEXP datetime, SEXP pCompare)
             // just return a list of one ride
             // cool we can return a list of intervals to compare
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, 1));
+            PROTECT(list=Rf_allocVector(VECSXP, 1));
 
             // names
             SEXP names;
@@ -1702,27 +1669,25 @@ RTool::activity(SEXP datetime, SEXP pCompare)
 
             // named list of activity and color
             SEXP namedlist;
-            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
-            SEXP offset = namedlist;
+            PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
             // add the ride
             RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
             f->recalculateDerivedSeries();
             SEXP df = rtool->dfForActivity(f);
-            SETCAR(offset, df);
-            offset=CDR(offset);
+            SET_VECTOR_ELT(namedlist, 0, df);
 
             // add the color
             SEXP color;
             PROTECT(color=Rf_allocVector(STRSXP, 1));
             SET_STRING_ELT(color, 0, Rf_mkChar("#FF00FF"));
-            SETCAR(offset, color);
+            SET_VECTOR_ELT(namedlist, 1, color);
 
             // name them
             Rf_namesgets(namedlist, names);
 
             // add to back and move on
-            SETCAR(list, namedlist);
+            SET_VECTOR_ELT(list, 0, namedlist);
             UNPROTECT(4);
 
             return list;
@@ -1738,7 +1703,7 @@ RTool::activity(SEXP datetime, SEXP pCompare)
             f->recalculateDerivedSeries();
 
             // get as a data frame
-            ans = rtool->dfForActivity(f);
+            SEXP ans = rtool->dfForActivity(f);
             return ans;
         }
     }
@@ -1927,7 +1892,7 @@ RTool::seasonPeaks(SEXP pAll, SEXP pFilter, SEXP pCompare, SEXP pSeries, SEXP pD
 
             // cool we can return a list of intervals to compare
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, count));
+            PROTECT(list=Rf_allocList(count));
 
             // start at the front
             SEXP nextS = list;
@@ -1946,7 +1911,7 @@ RTool::seasonPeaks(SEXP pAll, SEXP pFilter, SEXP pCompare, SEXP pSeries, SEXP pD
                 if (p.isChecked()) {
 
                     // create a named list
-                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+                    PROTECT(namedlist=Rf_allocList(2));
                     SEXP offset = namedlist;
 
                     // add the ride
@@ -1978,7 +1943,7 @@ RTool::seasonPeaks(SEXP pAll, SEXP pFilter, SEXP pCompare, SEXP pSeries, SEXP pD
 
             // otherwise return the current metrics in a compare list
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, 1));
+            PROTECT(list=Rf_allocList(1));
 
             // names
             SEXP names;
@@ -1988,7 +1953,7 @@ RTool::seasonPeaks(SEXP pAll, SEXP pFilter, SEXP pCompare, SEXP pSeries, SEXP pD
 
             // named list of metrics and color
             SEXP namedlist;
-            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+            PROTECT(namedlist=Rf_allocList(2));
             SEXP offset = namedlist;
 
             // add the metrics
@@ -2183,7 +2148,7 @@ RTool::seasonMeanmax(SEXP pAll, SEXP pFilter, SEXP pCompare)
 
             // cool we can return a list of meanaxes to compare
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, count));
+            PROTECT(list=Rf_allocList(count));
 
             // start at the front
             SEXP nextS = list;
@@ -2202,7 +2167,7 @@ RTool::seasonMeanmax(SEXP pAll, SEXP pFilter, SEXP pCompare)
                 if (p.isChecked()) {
 
                     // create a named list
-                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+                    PROTECT(namedlist=Rf_allocList(2));
                     SEXP offset = namedlist;
 
                     // add the ride
@@ -2234,7 +2199,7 @@ RTool::seasonMeanmax(SEXP pAll, SEXP pFilter, SEXP pCompare)
 
             // otherwise return the current season meanmax in a compare list
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, 1));
+            PROTECT(list=Rf_allocList(1));
 
             // names
             SEXP names;
@@ -2244,7 +2209,7 @@ RTool::seasonMeanmax(SEXP pAll, SEXP pFilter, SEXP pCompare)
 
             // named list of metrics and color
             SEXP namedlist;
-            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+            PROTECT(namedlist=Rf_allocList(2));
             SEXP offset = namedlist;
 
             // add the meanmaxes
@@ -2304,7 +2269,7 @@ RTool::activityMeanmax(SEXP pCompare)
 
             // cool we can return a list of intervals to compare
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, count));
+            PROTECT(list=Rf_allocList(count));
 
             // start at the front
             SEXP nextS = list;
@@ -2323,7 +2288,7 @@ RTool::activityMeanmax(SEXP pCompare)
                 if (p.isChecked()) {
 
                     // create a named list
-                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+                    PROTECT(namedlist=Rf_allocList(2));
                     SEXP offset = namedlist;
 
                     // add the ride
@@ -2356,7 +2321,7 @@ RTool::activityMeanmax(SEXP pCompare)
             // just return a list of one ride
             // cool we can return a list of intervals to compare
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, 1));
+            PROTECT(list=Rf_allocList(1));
 
             // names
             SEXP names;
@@ -2366,7 +2331,7 @@ RTool::activityMeanmax(SEXP pCompare)
 
             // named list of activity and color
             SEXP namedlist;
-            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+            PROTECT(namedlist=Rf_allocList(2));
             SEXP offset = namedlist;
 
             // add the ride
@@ -2427,7 +2392,7 @@ RTool::activityMetrics(SEXP pCompare)
 
             // cool we can return a list of intervals to compare
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, count));
+            PROTECT(list=Rf_allocList(count));
 
             // start at the front
             SEXP nextS = list;
@@ -2446,7 +2411,7 @@ RTool::activityMetrics(SEXP pCompare)
                 if (p.isChecked()) {
 
                     // create a named list
-                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+                    PROTECT(namedlist=Rf_allocList(2));
                     SEXP offset = namedlist;
 
                     // add the ride
@@ -2479,7 +2444,7 @@ RTool::activityMetrics(SEXP pCompare)
             // just return a list of one ride
             // cool we can return a list of intervals to compare
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, 1));
+            PROTECT(list=Rf_allocList(1));
 
             // names
             SEXP names;
@@ -2489,7 +2454,7 @@ RTool::activityMetrics(SEXP pCompare)
 
             // named list of activity and color
             SEXP namedlist;
-            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+            PROTECT(namedlist=Rf_allocList(2));
             SEXP offset = namedlist;
 
             // add the ride
@@ -2691,7 +2656,7 @@ RTool::activityWBal(SEXP pCompare)
 
             // cool we can return a list of intervals to compare
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, count));
+            PROTECT(list=Rf_allocList(count));
 
             // start at the front
             SEXP nextS = list;
@@ -2710,7 +2675,7 @@ RTool::activityWBal(SEXP pCompare)
                 if (p.isChecked()) {
 
                     // create a named list
-                    PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+                    PROTECT(namedlist=Rf_allocList(2));
                     SEXP offset = namedlist;
 
                     // add the ride
@@ -2743,7 +2708,7 @@ RTool::activityWBal(SEXP pCompare)
             // just return a list of one ride
             // cool we can return a list of intervals to compare
             SEXP list;
-            PROTECT(list=Rf_allocVector(LISTSXP, 1));
+            PROTECT(list=Rf_allocList(1));
 
             // names
             SEXP names;
@@ -2753,7 +2718,7 @@ RTool::activityWBal(SEXP pCompare)
 
             // named list of activity and color
             SEXP namedlist;
-            PROTECT(namedlist=Rf_allocVector(LISTSXP, 2));
+            PROTECT(namedlist=Rf_allocList(2));
             SEXP offset = namedlist;
 
             // add the ride

@@ -98,8 +98,10 @@ extern SEXP GC_Rf_allocList(int);
 extern void GC_Rf_unprotect(int);
 extern SEXP GC_Rf_protect(SEXP);
 extern SEXP GC_SETCAR(SEXP x, SEXP y);
+extern void GC_SET_TYPEOF(SEXP x, int);
 extern SEXP (GC_CDR)(SEXP e);
 extern void GC_SET_STRING_ELT(SEXP x, R_xlen_t i, SEXP v);
+extern SEXP GC_SET_VECTOR_ELT(SEXP x, R_xlen_t i, SEXP v);
 extern SEXP (GC_VECTOR_ELT)(SEXP x, R_xlen_t i);
 extern SEXP GC_Rf_mkChar(const char *);
 extern SEXP GC_Rf_mkString(const char *);
@@ -194,6 +196,8 @@ extern double *pGC_R_NaReal;          // XXX TODO NaReal value
 #define SETCAR                      GC_SETCAR
 #define CDR                         GC_CDR
 #define SET_STRING_ELT              GC_SET_STRING_ELT
+#define SET_VECTOR_ELT              GC_SET_VECTOR_ELT
+#define SET_TYPEOF                  GC_SET_TYPEOF
 #define STRING_ELT                  GC_STRING_ELT
 #define VECTOR_ELT                  GC_VECTOR_ELT
 #define REAL                        GC_REAL
