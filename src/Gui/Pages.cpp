@@ -1205,14 +1205,20 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     // Wheel size
     //
     QLabel *wheelSizeLabel = new QLabel(tr("Wheelsize"), this);
+
+    int rimSizeIdx = appsettings->cvalue(context->athlete->cyclist, GC_RIMSIZEIDX, 0).toInt();
+    int tireSizeIdx = appsettings->cvalue(context->athlete->cyclist, GC_TIRESIZEIDX, 0).toInt();
     int wheelSize = appsettings->cvalue(context->athlete->cyclist, GC_WHEELSIZE, 2100).toInt();
 
     rimSizeCombo = new QComboBox();
     rimSizeCombo->addItems(WheelSize::RIM_SIZES);
+    if(rimSizeIdx < 0 || rimSizeIdx >= WheelSize::RIM_SIZES.count()) rimSizeIdx = 0;
+    rimSizeCombo->setCurrentIndex(rimSizeIdx);
 
     tireSizeCombo = new QComboBox();
     tireSizeCombo->addItems(WheelSize::TIRE_SIZES);
-
+    if(tireSizeIdx < 0 || tireSizeIdx >= WheelSize::TIRE_SIZES.count()) tireSizeIdx = 0;
+    tireSizeCombo->setCurrentIndex(tireSizeIdx);
 
     wheelSizeEdit = new QLineEdit(QString("%1").arg(wheelSize),this);
     wheelSizeEdit->setInputMask("0000");
@@ -1362,6 +1368,8 @@ AboutRiderPage::saveClicked()
     avatar.save(context->athlete->home->config().canonicalPath() + "/" + "avatar.png", "PNG");
 
     appsettings->setCValue(context->athlete->cyclist, GC_CRANKLENGTH, crankLengthCombo->currentText());
+    appsettings->setCValue(context->athlete->cyclist, GC_RIMSIZEIDX, rimSizeCombo->currentIndex());
+    appsettings->setCValue(context->athlete->cyclist, GC_TIRESIZEIDX, tireSizeCombo->currentIndex());
     appsettings->setCValue(context->athlete->cyclist, GC_WHEELSIZE, wheelSizeEdit->text().toInt());
 
     // Auto Backup

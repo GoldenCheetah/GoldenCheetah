@@ -224,6 +224,8 @@
 #define GC_LTS_DAYS                             "<athlete-preferences>LTSdays"
 #define GC_STS_DAYS                             "<athlete-preferences>STSdays"
 #define GC_CRANKLENGTH                  "<athlete-preferences>crankLength"
+#define GC_RIMSIZEIDX                   "<athlete-preferences>rimsizeidx"
+#define GC_TIRESIZEIDX                  "<athlete-preferences>tiresizeidx"
 #define GC_WHEELSIZE                    "<athlete-preferences>wheelsize"
 #define GC_USE_CP_FOR_FTP               "<athlete-preferences>cp/useforftp"                       // use CP for FTP
 #define GC_USE_CP_FOR_FTP_RUN           "<athlete-preferences>cp/useforftprun"                    // use CP for FTP
