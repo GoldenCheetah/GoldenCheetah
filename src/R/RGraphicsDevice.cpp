@@ -330,74 +330,70 @@ SEXP RGraphicsDevice::createGD()
 
     R_CheckDeviceAvailable();
 
-    BEGIN_SUSPEND_INTERRUPTS
-    {
-        // define device
-        pDevDesc pDev = (DevDesc *) calloc(1, sizeof(DevDesc));
+    // define device
+    pDevDesc pDev = (DevDesc *) calloc(1, sizeof(DevDesc));
 
-        // device functions
-        pDev->activate = RGraphicsDevice::Activate;
-        pDev->deactivate = RGraphicsDevice::Deactivate;
-        pDev->size = RGraphicsDevice::Size;
-        pDev->clip = RGraphicsDevice::Clip;
-        pDev->rect = RGraphicsDevice::Rect;
-        pDev->path = RGraphicsDevice::Path;
-        pDev->raster = RGraphicsDevice::Raster;
-        pDev->cap = NULL;
-        pDev->circle = RGraphicsDevice::Circle;
-        pDev->line = RGraphicsDevice::Line;
-        pDev->polyline = RGraphicsDevice::Polyline;
-        pDev->polygon = RGraphicsDevice::Polygon;
-        pDev->locator = NULL;
-        pDev->mode = RGraphicsDevice::Mode;
-        pDev->metricInfo = RGraphicsDevice::MetricInfo;
-        pDev->strWidth = RGraphicsDevice::StrWidth;
-        pDev->strWidthUTF8 = RGraphicsDevice::StrWidthUTF8;
-        pDev->text = RGraphicsDevice::Text;
-        pDev->textUTF8 = RGraphicsDevice::TextUTF8;
-        pDev->hasTextUTF8 = TRUE;
-        pDev->wantSymbolUTF8 = TRUE;
-        pDev->useRotatedTextInContour = FALSE;
-        pDev->newPage = RGraphicsDevice::NewPage;
-        pDev->close = RGraphicsDevice::Close;
-        pDev->newFrameConfirm = RGraphicsDevice::NewFrameConfirm_;
-        pDev->onExit = RGraphicsDevice::OnExit;
-        pDev->eventEnv = R_NilValue;
-        pDev->eventHelper = NULL;
-        pDev->holdflush = NULL;
+    // device functions
+    pDev->activate = RGraphicsDevice::Activate;
+    pDev->deactivate = RGraphicsDevice::Deactivate;
+    pDev->size = RGraphicsDevice::Size;
+    pDev->clip = RGraphicsDevice::Clip;
+    pDev->rect = RGraphicsDevice::Rect;
+    pDev->path = RGraphicsDevice::Path;
+    pDev->raster = RGraphicsDevice::Raster;
+    pDev->cap = NULL;
+    pDev->circle = RGraphicsDevice::Circle;
+    pDev->line = RGraphicsDevice::Line;
+    pDev->polyline = RGraphicsDevice::Polyline;
+    pDev->polygon = RGraphicsDevice::Polygon;
+    pDev->locator = NULL;
+    pDev->mode = RGraphicsDevice::Mode;
+    pDev->metricInfo = RGraphicsDevice::MetricInfo;
+    pDev->strWidth = RGraphicsDevice::StrWidth;
+    pDev->strWidthUTF8 = RGraphicsDevice::StrWidthUTF8;
+    pDev->text = RGraphicsDevice::Text;
+    pDev->textUTF8 = RGraphicsDevice::TextUTF8;
+    pDev->hasTextUTF8 = TRUE;
+    pDev->wantSymbolUTF8 = TRUE;
+    pDev->useRotatedTextInContour = FALSE;
+    pDev->newPage = RGraphicsDevice::NewPage;
+    pDev->close = RGraphicsDevice::Close;
+    pDev->newFrameConfirm = RGraphicsDevice::NewFrameConfirm_;
+    pDev->onExit = RGraphicsDevice::OnExit;
+    pDev->eventEnv = R_NilValue;
+    pDev->eventHelper = NULL;
+    pDev->holdflush = NULL;
 
-        // capabilities flags
-        pDev->haveTransparency = 2;
-        pDev->haveTransparentBg = 2;
-        pDev->haveRaster = 2;
-        pDev->haveCapture = 1;
-        pDev->haveLocator = 0;
+    // capabilities flags
+    pDev->haveTransparency = 2;
+    pDev->haveTransparentBg = 2;
+    pDev->haveRaster = 2;
+    pDev->haveCapture = 1;
+    pDev->haveLocator = 0;
 
-        //XXX todo - not sure what we might need
-        pDev->deviceSpecific = NULL;
-        pDev->displayListOn = FALSE;
+    //XXX todo - not sure what we might need
+    pDev->deviceSpecific = NULL;
+    pDev->displayListOn = FALSE;
 
-        // device attributes
-        setSize(pDev);
-        setDeviceAttributes(pDev);
+    // device attributes
+    setSize(pDev);
+    setDeviceAttributes(pDev);
 
-        // notify handler we are about to add (enables shadow device
-        // to close itself so it doesn't show up in the dev.list()
-        // in front of us
-        //XXXhandler::onBeforeAddDevice(pDC);
+    // notify handler we are about to add (enables shadow device
+    // to close itself so it doesn't show up in the dev.list()
+    // in front of us
+    //XXXhandler::onBeforeAddDevice(pDC);
 
-        // associate with device description and add it
-        gcGEDevDesc = GEcreateDevDesc(pDev);
-        GEaddDevice2(gcGEDevDesc, gcDevice);
+    // associate with device description and add it
+    gcGEDevDesc = GEcreateDevDesc(pDev);
+    GEaddDevice2(gcGEDevDesc, gcDevice);
 
-        // notify handler we have added (so it can regenerate its context)
-        //XXXhandler::onAfterAddDevice(pDC);
+    // notify handler we have added (so it can regenerate its context)
+    //XXXhandler::onAfterAddDevice(pDC);
 
-        // make us active
-        Rf_selectDevice(Rf_ndevNumber(gcGEDevDesc->dev));
+    // make us active
+    Rf_selectDevice(Rf_ndevNumber(gcGEDevDesc->dev));
 
-    }
-    END_SUSPEND_INTERRUPTS;
 
     // set colors
     rtool->configChanged();
