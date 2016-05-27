@@ -475,6 +475,9 @@ RChart::runScript()
         // hourglass .. for long running ones this helps user know its busy
         QApplication::setOverrideCursor(Qt::WaitCursor);
 
+        // turn off updates for a sec
+        setUpdatesEnabled(false);
+
         // run it !!
         rtool->context = context;
         rtool->canvas = canvas;
@@ -521,6 +524,9 @@ RChart::runScript()
             // clear
             canvas->newPage();
         }
+
+        // turn off updates for a sec
+        setUpdatesEnabled(true);
 
         // reset cursor
         QApplication::restoreOverrideCursor();
