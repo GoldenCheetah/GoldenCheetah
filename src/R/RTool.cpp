@@ -1421,9 +1421,6 @@ RTool::metrics(SEXP pAll, SEXP pFilter, SEXP pCompare)
 QList<SEXP>
 RTool::dfForActivity(RideFile *f, int split)
 {
-    // disable split, memory error
-    split=0;
-
     // return a data frame for the ride passed
     QList<SEXP> returning;
 
@@ -1513,11 +1510,11 @@ RTool::dfForActivity(RideFile *f, int split)
             for(int j=index; j<stop; j++) {
                 if (f->isDataPresent(series)) {
                     if (f->dataPoints()[j]->value(series) == 0 && (series == RideFile::lat || series == RideFile::lon))
-                        REAL(vector)[j] = NA_REAL;
+                        REAL(vector)[j-index] = NA_REAL;
                     else
-                        REAL(vector)[j] = f->dataPoints()[j]->value(series);
+                        REAL(vector)[j-index] = f->dataPoints()[j]->value(series);
                 } else {
-                    REAL(vector)[j] = NA_REAL;
+                    REAL(vector)[j-index] = NA_REAL;
                 }
             }
 
