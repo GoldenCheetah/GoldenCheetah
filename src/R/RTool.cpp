@@ -109,7 +109,7 @@ RTool::RTool()
             // currently in the compare pane if compare is enabled or
             // just a 1 item list with the current ride
             { "GC.activities", (DL_FUNC) &RTool::activities, 1 },
-            { "GC.activity", (DL_FUNC) &RTool::activity, 2 },
+            { "GC.activity", (DL_FUNC) &RTool::activity, 3 },
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 1 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 1 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 1 },
@@ -154,7 +154,7 @@ RTool::RTool()
 
                                // activity
                                "GC.activities <- function(filter=\"\") { .Call(\"GC.activities\", filter) }\n"
-                               "GC.activity <- function(activity=0, compare=FALSE) { .Call(\"GC.activity\", activity, compare) }\n"
+                               "GC.activity <- function(activity=0, compare=FALSE, split=0) { .Call(\"GC.activity\", activity, compare, split) }\n"
                                "GC.activity.metrics <- function(compare=FALSE) { .Call(\"GC.activity.metrics\", compare) }\n"
                                "GC.activity.meanmax <- function(compare=FALSE) { .Call(\"GC.activity.meanmax\", compare) }\n"
                                "GC.activity.wbal <- function(compare=FALSE) { .Call(\"GC.activity.wbal\", compare) }\n"
@@ -1418,13 +1418,14 @@ RTool::metrics(SEXP pAll, SEXP pFilter, SEXP pCompare)
     return Rf_allocVector(INTSXP, 0);
 }
 
-SEXP
-RTool::dfForActivity(RideFile *f)
+QList<SEXP>
+RTool::dfForActivity(RideFile *f, int split)
 {
-    // return a data frame for the ride passed
-    SEXP ans;
+    // disable split, memory error
+    split=0;
 
-    int points = f->dataPoints().count();
+    // return a data frame for the ride passed
+    QList<SEXP> returning;
 
     // how many series?
     int seriescount=0;
@@ -1436,102 +1437,122 @@ RTool::dfForActivity(RideFile *f)
 
     // if we have any series we will continue and add a 'time' series
     if (seriescount) seriescount++;
-    else return Rf_allocVector(INTSXP, 0);
+    else {
+        returning << Rf_allocVector(INTSXP, 0);
+        return returning;
+    }
 
-    // we return a list of series vectors
-    PROTECT(ans = Rf_allocVector(VECSXP, seriescount));
+    // start at first sample in ride
+    int index=0;
+    int pcount=0;
 
-    // we collect the names as we go
-    SEXP names;
-    PROTECT(names = Rf_allocVector(STRSXP, seriescount)); // names attribute (column names)
-    int next=0;
+    while(index < f->dataPoints().count()) {
 
-    //
-    // Now we need to add vectors to the ans list...
-    //
+        // we return a list of series vectors
+        SEXP ans = PROTECT(Rf_allocVector(VECSXP, seriescount));
+        pcount++;
 
-    // TIME
+        // we collect the names as we go
+        SEXP names = PROTECT(Rf_allocVector(STRSXP, seriescount)); // names attribute (column names)
+        int next=0;
+        pcount++;
 
-    // add in actual time in POSIXct format
-    SEXP time;
-    PROTECT(time=Rf_allocVector(REALSXP, points));
+        //
+        // We might need to split...
+        //
 
-    // fill with values for date and class
-    for(int k=0; k<points; k++) REAL(time)[k] = f->startTime().addSecs(f->dataPoints()[k]->secs).toUTC().toTime_t();
-
-    // POSIXct class
-    SEXP clas;
-    PROTECT(clas=Rf_allocVector(STRSXP, 2));
-    SET_STRING_ELT(clas, 0, Rf_mkChar("POSIXct"));
-    SET_STRING_ELT(clas, 1, Rf_mkChar("POSIXt"));
-    Rf_classgets(time,clas);
-
-    // we use "UTC" for all timezone
-    Rf_setAttrib(time, Rf_install("tzone"), Rf_mkString("UTC"));
-
-    // add to the data.frame and give it a name
-    SET_VECTOR_ELT(ans, next, time);
-    SET_STRING_ELT(names, next++, Rf_mkChar("time"));
-
-    // time + clas, but not ans!
-    UNPROTECT(2);
-
-    // add to the end
-
-    // PRESENT SERIES
-    for(int i=0; i < static_cast<int>(RideFile::none); i++) {
-
-        // what series we working with?
-        RideFile::SeriesType series = static_cast<RideFile::SeriesType>(i);
-
-        // lets not add lots of NA for the more obscure data series
-        if (i > 15 && !f->isDataPresent(series)) continue;
-
-        // set a vector
-        SEXP vector;
-        PROTECT(vector=Rf_allocVector(REALSXP, points));
-
-        for(int j=0; j<points; j++) {
-            if (f->isDataPresent(series)) {
-                if (f->dataPoints()[j]->value(series) == 0 && (series == RideFile::lat || series == RideFile::lon))
-                    REAL(vector)[j] = NA_REAL;
-                else
-                    REAL(vector)[j] = f->dataPoints()[j]->value(series);
-            } else {
-                REAL(vector)[j] = NA_REAL;
+        // do we stop at the end, or mid-ride ?
+        int stop = f->dataPoints().count();
+        if (split) {
+            for(int i=index+1; i<f->dataPoints().count(); i++) {
+                if (i && (f->dataPoints()[i]->secs - f->dataPoints()[i-1]->secs) > double(split)) {
+                    stop = i;
+                    goto outer;
+                }
             }
         }
+        outer:
+        int points = stop - index;
 
-        // add to the list
-        SET_VECTOR_ELT(ans, next, vector);
+        // TIME
 
-        // give it a name
-        SET_STRING_ELT(names, next, Rf_mkChar(f->seriesName(series, true).toLatin1().constData()));
+        // add in actual time in POSIXct format
+        SEXP time = PROTECT(Rf_allocVector(REALSXP, points));
+        pcount++;
 
-        next++;
+        // fill with values for date and class
+        for(int k=0; k<points; k++) REAL(time)[k] = f->startTime().addSecs(f->dataPoints()[index+k]->secs).toUTC().toTime_t();
 
-        // vector
-        UNPROTECT(1);
+        // POSIXct class
+        SEXP clas = PROTECT(Rf_allocVector(STRSXP, 2));
+        pcount++;
+        SET_STRING_ELT(clas, 0, Rf_mkChar("POSIXct"));
+        SET_STRING_ELT(clas, 1, Rf_mkChar("POSIXt"));
+        Rf_classgets(time,clas);
+
+        // we use "UTC" for all timezone
+        Rf_setAttrib(time, Rf_install("tzone"), Rf_mkString("UTC"));
+
+        // add to the data.frame and give it a name
+        SET_VECTOR_ELT(ans, next, time);
+        SET_STRING_ELT(names, next++, Rf_mkChar("time"));
+
+        // PRESENT SERIES
+        for(int s=0; s < static_cast<int>(RideFile::none); s++) {
+
+            // what series we working with?
+            RideFile::SeriesType series = static_cast<RideFile::SeriesType>(s);
+
+            // lets not add lots of NA for the more obscure data series
+            if (s > 15 && !f->isDataPresent(series)) continue;
+
+            // set a vector
+            SEXP vector = PROTECT(Rf_allocVector(REALSXP, points));
+            pcount++;
+
+            for(int j=index; j<stop; j++) {
+                if (f->isDataPresent(series)) {
+                    if (f->dataPoints()[j]->value(series) == 0 && (series == RideFile::lat || series == RideFile::lon))
+                        REAL(vector)[j] = NA_REAL;
+                    else
+                        REAL(vector)[j] = f->dataPoints()[j]->value(series);
+                } else {
+                    REAL(vector)[j] = NA_REAL;
+                }
+            }
+
+            // add to the list
+            SET_VECTOR_ELT(ans, next, vector);
+
+            // give it a name
+            SET_STRING_ELT(names, next, Rf_mkChar(f->seriesName(series, true).toLatin1().constData()));
+
+            next++;
+
+        }
+
+        // add rownames
+        SEXP rownames = PROTECT(Rf_allocVector(STRSXP, points));
+        pcount++;
+        for(int i=0; i<points; i++) {
+            QString rownumber=QString("%1").arg(i+1);
+            SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
+        }
+
+        // turn the list into a data frame + set column names
+        Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
+        Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+        Rf_namesgets(ans, names);
+
+        // jump to where we got
+        index = stop;
+        returning << ans;
     }
 
-    // add rownames
-    SEXP rownames;
-    PROTECT(rownames = Rf_allocVector(STRSXP, points));
-    for(int i=0; i<points; i++) {
-        QString rownumber=QString("%1").arg(i+1);
-        SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
-    }
-
-    // turn the list into a data frame + set column names
-    Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
-    Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
-    Rf_namesgets(ans, names);
-
-    // ans + names + rownames
-    UNPROTECT(3);
+    UNPROTECT(pcount);
 
     // return a valid result
-    return ans;
+    return returning;
 }
 
 QList<RideItem *>
@@ -1563,7 +1584,7 @@ RTool::activitiesFor(SEXP datetime)
 }
 
 SEXP
-RTool::activity(SEXP datetime, SEXP pCompare)
+RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit)
 {
     // p1 - compare=TRUE|FALSE - return list of compare rides if active, or just current
     pCompare = Rf_coerceVector(pCompare, LGLSXP);
@@ -1575,12 +1596,17 @@ RTool::activity(SEXP datetime, SEXP pCompare)
     QList<RideItem*>activities = rtool->activitiesFor(datetime);
     if (activities.count()) userlist=true; // use compare mode code to create a list of rides
 
+    // p3 split in seconds, 0=means no split
+    pSplit = Rf_coerceVector(pSplit, INTSXP);
+    int split = INTEGER(pSplit)[0];
+
     // user requested specific activities?
     if (userlist) {
 
-            // cool we can return a list of intervals to compare
-            SEXP list;
-            PROTECT(list=Rf_allocVector(VECSXP, activities.count()));
+            // we collect a list to return, appending as we go, rather
+            // than pre-allocating, since we decide to split and may
+            // get multiple responses
+            QList<SEXP> f;
 
             // names
             SEXP names;
@@ -1602,18 +1628,19 @@ RTool::activity(SEXP datetime, SEXP pCompare)
                 // we open, if it wasn't open we also close
                 // to make sure we don't exhause memory
                 bool close = (item->isOpen() == false);
-                SEXP df = rtool->dfForActivity(item->ride());
+                foreach(SEXP df, rtool->dfForActivity(item->ride(), split)) f<<df;
                 if (close) item->close();
 
-                // add to back and move on
-                SET_VECTOR_ELT(list, index, df);
-
-                index++;
             }
+
+            // now create an R list
+            SEXP list;
+            PROTECT(list=Rf_allocVector(VECSXP, f.count()));
+            for(int index=0; index < f.count(); index++) SET_VECTOR_ELT(list, index, f[index]);
 
             // we have to give a name to each row
             SEXP rownames;
-            PROTECT(rownames = Rf_allocVector(STRSXP, activities.count()));
+            PROTECT(rownames = Rf_allocVector(STRSXP, f.count()));
             for(int i=0; i<activities.count(); i++) {
                 QString rownumber=QString("%1").arg(i+1);
                 SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
@@ -1629,18 +1656,16 @@ RTool::activity(SEXP datetime, SEXP pCompare)
 
             return list;
 
-    } else if (compare && rtool->context) {
+    } else if ((split || compare) && rtool->context) { // split or compare will generate a list
 
-        if (rtool->context->isCompareIntervals) {
+        if (compare && rtool->context->isCompareIntervals) {
 
             // how many to return?
             int count=0;
             foreach(CompareInterval p, rtool->context->compareIntervals) if (p.isChecked()) count++;
 
             // cool we can return a list of intervals to compare
-            SEXP list;
-            PROTECT(list=Rf_allocVector(VECSXP, count));
-            int index=0;
+            QList<SEXP> f;
 
             // a named list with data.frame 'activity' and color 'color'
             SEXP namedlist;
@@ -1655,28 +1680,35 @@ RTool::activity(SEXP datetime, SEXP pCompare)
             foreach(CompareInterval p, rtool->context->compareIntervals) {
                 if (p.isChecked()) {
 
-                    // create a named list
-                    PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
+                    foreach(SEXP df,  rtool->dfForActivity(p.rideItem->ride(), split)) {
 
-                    // add the ride
-                    SEXP df = rtool->dfForActivity(p.rideItem->ride());
-                    SET_VECTOR_ELT(namedlist, 0, df);
+                        // create a named list
+                        PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
-                    // add the color
-                    SEXP color;
-                    PROTECT(color=Rf_allocVector(STRSXP, 1));
-                    SET_STRING_ELT(color, 0, Rf_mkChar(p.color.name().toLatin1().constData()));
-                    SET_VECTOR_ELT(namedlist, 1, color);
+                        SET_VECTOR_ELT(namedlist, 0, df);
 
-                    // name them
-                    Rf_namesgets(namedlist, names);
+                        // add the color
+                        SEXP color;
+                        PROTECT(color=Rf_allocVector(STRSXP, 1));
+                        SET_STRING_ELT(color, 0, Rf_mkChar(p.color.name().toLatin1().constData()));
+                        SET_VECTOR_ELT(namedlist, 1, color);
 
-                    // add to back and move on
-                    SET_VECTOR_ELT(list, index++, namedlist);
+                        // name them
+                        Rf_namesgets(namedlist, names);
 
-                    UNPROTECT(2);
+                        // add to back and move on
+                        f << namedlist;
+
+                        UNPROTECT(2);
+                    }
                 }
             }
+
+            // now create an R list
+            SEXP list;
+            PROTECT(list=Rf_allocVector(VECSXP, f.count()));
+            for(int index=0; index < f.count(); index++) SET_VECTOR_ELT(list, index, f[index]);
+
             UNPROTECT(2); // list and names
 
             return list;
@@ -1685,8 +1717,7 @@ RTool::activity(SEXP datetime, SEXP pCompare)
 
             // just return a list of one ride
             // cool we can return a list of intervals to compare
-            SEXP list;
-            PROTECT(list=Rf_allocVector(VECSXP, 1));
+            QList<SEXP> files;
 
             // names
             SEXP names;
@@ -1694,33 +1725,42 @@ RTool::activity(SEXP datetime, SEXP pCompare)
             SET_STRING_ELT(names, 0, Rf_mkChar("activity"));
             SET_STRING_ELT(names, 1, Rf_mkChar("color"));
 
-            // named list of activity and color
-            SEXP namedlist;
-            PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
-
             // add the ride
             RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
             f->recalculateDerivedSeries();
-            SEXP df = rtool->dfForActivity(f);
-            SET_VECTOR_ELT(namedlist, 0, df);
+            foreach(SEXP df, rtool->dfForActivity(f, split)) {
 
-            // add the color
-            SEXP color;
-            PROTECT(color=Rf_allocVector(STRSXP, 1));
-            SET_STRING_ELT(color, 0, Rf_mkChar("#FF00FF"));
-            SET_VECTOR_ELT(namedlist, 1, color);
+                // named list of activity and color
+                SEXP namedlist;
+                PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
-            // name them
-            Rf_namesgets(namedlist, names);
+                SET_VECTOR_ELT(namedlist, 0, df);
 
-            // add to back and move on
-            SET_VECTOR_ELT(list, 0, namedlist);
-            UNPROTECT(4);
+                // add the color
+                SEXP color;
+                PROTECT(color=Rf_allocVector(STRSXP, 1));
+                SET_STRING_ELT(color, 0, Rf_mkChar("#FF00FF"));
+                SET_VECTOR_ELT(namedlist, 1, color);
 
+                // name them
+                Rf_namesgets(namedlist, names);
+
+                // add to back and move on
+                files << namedlist;
+
+                UNPROTECT(2);
+            }
+
+            // now create an R list
+            SEXP list;
+            PROTECT(list=Rf_allocVector(VECSXP, files.count()));
+            for(int index=0; index < files.count(); index++) SET_VECTOR_ELT(list, index, files[index]);
+
+            UNPROTECT(2);
             return list;
         }
 
-    } else if (!compare) { // not compare, so just return a dataframe
+    } else if (!split && !compare) { // not compare, so just return a dataframe
 
         // access via global as this is a static function
         if(rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
@@ -1730,7 +1770,7 @@ RTool::activity(SEXP datetime, SEXP pCompare)
             f->recalculateDerivedSeries();
 
             // get as a data frame
-            SEXP ans = rtool->dfForActivity(f);
+            SEXP ans = rtool->dfForActivity(f, 0)[0];
             return ans;
         }
     }
