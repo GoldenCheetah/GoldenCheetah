@@ -29,7 +29,11 @@
 #include "LTMSettings.h" // for special case of edit LTM settings
 #include "ChartBar.h"
 #include "Utils.h"
+
+// When ESC pressed during R processing we cancel it
+#ifdef GC_WANT_R
 #include "RTool.h"
+#endif
 
 #include <QDesktopWidget>
 #include <QStyle>
@@ -818,10 +822,12 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
 {
     if (!isVisible()) return false; // ignore when we aren't visible
 
+#ifdef GC_WANT_R
     if (e->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(e)->key()==Qt::Key_Escape) {
         // if we're running a script stop it
         if (rtool && rtool->canvas) rtool->cancel();
     }
+#endif
 
     // mouse moved and tabbed -- should we show/hide chart popup controls?
     if (e->type() == QEvent::MouseMove && currentStyle == 0 && tabbed->currentIndex() >= 0) {
