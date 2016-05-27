@@ -67,8 +67,12 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // Recovering from a crash?
     if(!appsettings->cvalue(cyclist, GC_SAFEEXIT, true).toBool()) {
-        GcCrashDialog *crashed = new GcCrashDialog(homeDir);
-        crashed->exec();
+
+        // From V4 we have started to disable this dialog since
+        // the information captured is not longer that valuable
+        // and the instances of crashes are much, much lower
+        // XXXGcCrashDialog *crashed = new GcCrashDialog(homeDir);
+        // XXXcrashed->exec();
     }
     appsettings->setCValue(cyclist, GC_SAFEEXIT, false); // will be set to true on exit
 
