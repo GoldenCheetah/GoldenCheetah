@@ -38,6 +38,7 @@ class RTool {
         // the canvas to plot on, it may be null
         // if no canvas is active
         RCanvas *canvas;
+        RChart *chart;
 
         Context *context;
         QString version;
@@ -64,6 +65,7 @@ class RTool {
 
         bool starting;
         bool failed;
+        bool cancelled;
 
         int width, height;
 
@@ -79,9 +81,10 @@ class RTool {
         static void R_ResetConsole() { }
         static void R_FlushConsole() { }
         static void R_ClearerrConsole() { }
+        static void R_ProcessEvents();
         static void R_Busy(int) { }
-        static void R_Callback() { }
         static int  R_YesNoCancel(const char *) { return 0; }
+        static void cancel();
 
         QStringList messages;
 
@@ -98,6 +101,7 @@ class RTool {
         SEXP dfForDateRangeMeanmax(bool all, DateRange range, SEXP filter); // returns the meanmax for a season
         SEXP dfForDateRangePeaks(bool all, DateRange range, SEXP filter, QList<RideFile::SeriesType> series, QList<int> durations);
         SEXP dfForRideFileCache(RideFileCache *p);      // returns meanmax for a cache
+
 };
 
 // there is a global instance created in main

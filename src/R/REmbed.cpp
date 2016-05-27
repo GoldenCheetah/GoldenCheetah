@@ -108,7 +108,7 @@ REmbed::REmbed(const bool verbose, const bool interactive) : verbose(verbose), i
     Rst.ReadConsole = &RTool::R_ReadConsoleWin;
     Rst.WriteConsole = &RTool::R_WriteConsole;
     Rst.WriteConsoleEx = &RTool::R_WriteConsoleEx;
-    Rst.CallBack = &RTool::R_Callback;
+    Rst.CallBack = &RTool::R_ProcessEvents;
     Rst.ShowMessage = &RTool::R_ShowMessage;
     Rst.YesNoCancel = &RTool::R_YesNoCancel;
     Rst.Busy = &RTool::R_Busy;

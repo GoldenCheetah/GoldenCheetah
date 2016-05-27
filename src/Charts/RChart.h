@@ -112,6 +112,9 @@ class RChart : public GcChartWindow {
         void runScript();
 
     protected:
+        // enable stopping long running scripts
+        bool eventFilter(QObject *, QEvent *e);
+
         QSplitter *splitter;
         QSplitter *leftsplitter;
 

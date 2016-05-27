@@ -93,6 +93,12 @@ void RConsole::setLocalEchoEnabled(bool set)
 
 void RConsole::keyPressEvent(QKeyEvent *e)
 {
+    // if running a script we only process ESC
+    if (rtool && rtool->canvas) {
+        if (e->type() != QKeyEvent::KeyPress || e->key() != Qt::Key_Escape) return;
+    }
+
+    // otherwise lets go
     switch (e->key()) {
     case Qt::Key_Up:
         if (hpos) {
@@ -119,13 +125,20 @@ void RConsole::keyPressEvent(QKeyEvent *e)
         if (textCursor().position() - textCursor().block().position() > 2) QTextEdit::keyPressEvent(e);
         break;
 
+    case Qt::Key_Escape: // R typically uses ESC to cancel
     case Qt::Key_C:
         {
             Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(e)->modifiers();
             bool ctrl = (kmod & Qt::ControlModifier) != 0;
 
-            if (ctrl) {
-                // ^C needs to clear program and go to next line
+            if (e->key() == Qt::Key_Escape || ctrl) {
+
+                // are we doing something?
+                if (rtool && rtool->canvas) {
+                    rtool->cancel();
+                }
+
+                // ESC or ^C needs to clear program and go to next line
                 rtool->R->program.clear();
 
                 QTextCursor move = textCursor();
@@ -178,6 +191,7 @@ void RConsole::keyPressEvent(QKeyEvent *e)
                 // so only print it out if its actually been set
                 SEXP ret = NULL;
 
+                rtool->cancelled = false;
                 int rc = rtool->R->parseEval(line, ret);
 
                 // if this isn't an assignment then print the result
@@ -355,6 +369,12 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
         connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
         configChanged(CONFIG_APPEARANCE);
 
+        // filter ESC so we can stop scripts
+        installEventFilter(this);
+        installEventFilter(console);
+        installEventFilter(splitter);
+        installEventFilter(canvas);
+
     } else {
 
         // not starting
@@ -365,6 +385,23 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
         showCon = NULL;
         leftsplitter = NULL;
     }
+}
+
+bool
+RChart::eventFilter(QObject *, QEvent *e)
+{
+    // not running a script
+    if (!rtool || !rtool->canvas) return false;
+
+    // is it an ESC key?
+    if (e->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(e)->key() == Qt::Key_Escape) {
+        // stop!
+        rtool->cancel();
+        return true;
+    }
+
+    // otherwise do nothing
+    return false;
 }
 
 void
@@ -446,6 +483,7 @@ RChart::runScript()
         rtool->width = rtool->height = 500;
 
         // set to defaults with gc applied
+        rtool->cancelled = false;
         rtool->R->parseEvalQNT("par(par.gc)\n");
 
         QString line = script->toPlainText();

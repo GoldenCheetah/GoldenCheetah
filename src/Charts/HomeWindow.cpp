@@ -29,6 +29,7 @@
 #include "LTMSettings.h" // for special case of edit LTM settings
 #include "ChartBar.h"
 #include "Utils.h"
+#include "RTool.h"
 
 #include <QDesktopWidget>
 #include <QStyle>
@@ -378,13 +379,17 @@ HomeWindow::tabSelected(int index)
     active = true;
 
     if (index >= 0) {
+
+        // show
         charts[index]->show();
-        charts[index]->setProperty("ride", property("ride"));
-        charts[index]->setProperty("dateRange", property("dateRange"));
         controlStack->setCurrentIndex(index);
         titleEdit->setText(charts[index]->property("title").toString());
         tabbed->setCurrentIndex(index);
         chartbar->setCurrentIndex(index);
+
+        // set
+        charts[index]->setProperty("ride", property("ride"));
+        charts[index]->setProperty("dateRange", property("dateRange"));
     }
 
     active = false;
@@ -812,6 +817,11 @@ bool
 HomeWindow::eventFilter(QObject *object, QEvent *e)
 {
     if (!isVisible()) return false; // ignore when we aren't visible
+
+    if (e->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(e)->key()==Qt::Key_Escape) {
+        // if we're running a script stop it
+        if (rtool && rtool->canvas) rtool->cancel();
+    }
 
     // mouse moved and tabbed -- should we show/hide chart popup controls?
     if (e->type() == QEvent::MouseMove && currentStyle == 0 && tabbed->currentIndex() >= 0) {
