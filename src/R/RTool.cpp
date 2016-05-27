@@ -1434,10 +1434,7 @@ RTool::dfForActivity(RideFile *f, int split)
 
     // if we have any series we will continue and add a 'time' series
     if (seriescount) seriescount++;
-    else {
-        returning << Rf_allocVector(INTSXP, 0);
-        return returning;
-    }
+    else return returning;
 
     // start at first sample in ride
     int index=0;
@@ -1767,8 +1764,8 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit)
             f->recalculateDerivedSeries();
 
             // get as a data frame
-            SEXP ans = rtool->dfForActivity(f, 0)[0];
-            return ans;
+            QList<SEXP> returning = rtool->dfForActivity(f, 0);
+            if (returning.count()) return returning[0];
         }
     }
 
