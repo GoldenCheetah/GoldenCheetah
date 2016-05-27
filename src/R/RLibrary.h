@@ -55,6 +55,7 @@ class RLibrary {
 
 // R Library Entry Points used by REmbed
 extern void GC_R_dot_Last(void);
+extern void GC_R_CheckUserInterrupt(void);
 extern void GC_R_RunExitFinalizers(void);
 extern void GC_R_CleanTempDir(void);
 extern int  GC_Rf_initEmbeddedR(int argc, char *argv[]);
@@ -82,7 +83,9 @@ extern void (*(*ptr_GC_ptr_R_WriteConsoleEx))(const char *, int, int);
 extern void (*(*ptr_GC_ptr_R_ResetConsole))(void);
 extern void (*(*ptr_GC_ptr_R_FlushConsole))(void);
 extern void (*(*ptr_GC_ptr_R_ClearerrConsole))(void);
+extern void (*(*ptr_GC_ptr_R_ProcessEvents))(void);
 extern void (*(*ptr_GC_ptr_R_Busy))(int);
+extern int *pGC_R_interrupts_pending;
 #else
 typedef char *(*Prot_GC_getDLLVersion)(void);
 typedef char *(*Prot_GC_getRUser)(void);
@@ -90,6 +93,7 @@ typedef char *(*Prot_GC_get_R_HOME)(void);
 extern Prot_GC_getDLLVersion ptr_GC_getDLLVersion;
 extern Prot_GC_getRUser ptr_GC_getRUser;
 extern Prot_GC_get_R_HOME ptr_GC_get_R_HOME;
+extern int *pGC_R_UserBreak;
 #endif
 
 // R Data
@@ -150,6 +154,7 @@ extern double *pGC_R_NaReal;          // XXX TODO NaReal value
 
 // embedding
 #define R_dot_Last                  GC_R_dot_Last
+#define R_CheckUserInterrupt        GC_R_CheckUserInterrupt
 #define R_RunExitFinalizers         GC_R_RunExitFinalizers
 #define R_CleanTempDir              GC_R_CleanTempDir
 #define Rf_initEmbeddedR            GC_Rf_initEmbeddedR
@@ -171,12 +176,16 @@ extern double *pGC_R_NaReal;          // XXX TODO NaReal value
 #define ptr_R_ResetConsole          (*ptr_GC_ptr_R_ResetConsole)
 #define ptr_R_FlushConsole          (*ptr_GC_ptr_R_FlushConsole)
 #define ptr_R_ClearerrConsole       (*ptr_GC_ptr_R_ClearerrConsole)
+#define ptr_R_ProcessEvents         (*ptr_GC_ptr_R_ProcessEvents)
 #define ptr_R_Busy                  (*ptr_GC_ptr_R_Busy)
 #define R_registerRoutines          GC_R_registerRoutines
 #ifdef WIN32
 #define getDLLVersion				(*ptr_GC_getDLLVersion)
 #define getRUser                    (*ptr_GC_getRUser)
 #define get_R_HOME                  (*ptr_GC_get_R_HOME)
+#define UserBreak                   (*pGC_R_UserBreak)
+#else
+#define R_interrupts_pending        (*pGC_R_interrupts_pending)
 #endif
 
 // data wrangling and manipulation
@@ -215,7 +224,6 @@ extern double *pGC_R_NaReal;          // XXX TODO NaReal value
 #define R_GE_getVersion             GC_R_GE_getVersion
 #define R_CheckDeviceAvailable      GC_R_CheckDeviceAvailable
 #define R_interrupts_suspended      GC_R_interrupts_suspended
-#define R_interrupts_pending        GC_R_interrupts_pending
 
 // globals
 #define R_GlobalEnv                 (*pGC_R_GlobalEnv)

@@ -69,6 +69,7 @@ RTool::RTool()
         ptr_R_ResetConsole = &RTool::R_ResetConsole;
         ptr_R_FlushConsole = &RTool::R_FlushConsole;
         ptr_R_ClearerrConsole = &RTool::R_ClearerrConsole;
+        ptr_R_ProcessEvents = &RTool::R_ProcessEvents;
         ptr_R_Busy = &RTool::R_Busy;
 
         // turn off stderr io
@@ -187,6 +188,7 @@ RTool::RTool()
         // set the "GC" object and methods
         context = NULL;
         canvas = NULL;
+        chart = NULL;
 
         configChanged();
 
@@ -208,6 +210,25 @@ RTool::RTool()
     }
     starting = false;
 }
+
+void
+RTool::R_ProcessEvents()
+{
+    QApplication::processEvents();
+}
+
+void
+RTool::cancel()
+{
+    // gets called when we need to stop a long running script
+    rtool->cancelled = true;
+#ifdef WIN32
+    UserBreak = true;
+#else
+    R_interrupts_pending = 1;
+#endif
+}
+
 
 void
 RTool::configChanged()
@@ -1568,6 +1589,12 @@ RTool::activity(SEXP datetime, SEXP pCompare)
             // create a data.frame for each and add to list
             int index=0;
             foreach(RideItem *item, activities) {
+
+                // we DO NOT use R_CheckUserInterrupt since it longjmps
+                // and leaves quite a mess behind. We check ourselves
+                // if a cancel was requested we honour it
+                QApplication::processEvents();
+                if (rtool->cancelled) break;
 
                 // give it a name
                 SET_STRING_ELT(names, index, Rf_mkChar(QString("%1").arg(index+1).toLatin1().constData()));

@@ -39,6 +39,7 @@
 //
 // R Embedding methods
 typedef void (*Prot_GC_R_dot_Last)(void);
+typedef void (*Prot_GC_R_CheckUserInterrupt)(void);
 typedef void (*Prot_GC_R_RunExitFinalizers)(void);
 typedef void (*Prot_GC_R_CleanTempDir)(void);
 typedef int  (*Prot_GC_Rf_initEmbeddedR)(int argc, char *argv[]);
@@ -59,6 +60,7 @@ typedef void (*(*Prot_GC_ptr_R_WriteConsoleEx))(const char *, int, int);
 typedef void (*(*Prot_GC_ptr_R_ResetConsole))(void);
 typedef void (*(*Prot_GC_ptr_R_FlushConsole))(void);
 typedef void (*(*Prot_GC_ptr_R_ClearerrConsole))(void);
+typedef void (*(*Prot_GC_ptr_R_ProcessEvents))(void);
 typedef void (*(*Prot_GC_ptr_R_Busy))(int);
 #endif
 
@@ -108,6 +110,7 @@ typedef void (*Prot_GC_R_CheckDeviceAvailable)(void);
 //
 // R Embedding methods
 Prot_GC_R_dot_Last ptr_GC_R_dot_Last;
+Prot_GC_R_CheckUserInterrupt ptr_GC_R_CheckUserInterrupt;
 Prot_GC_R_RunExitFinalizers ptr_GC_R_RunExitFinalizers;
 Prot_GC_R_CleanTempDir ptr_GC_R_CleanTempDir;
 Prot_GC_Rf_initEmbeddedR ptr_GC_Rf_initEmbeddedR;
@@ -130,11 +133,14 @@ Prot_GC_ptr_R_WriteConsoleEx ptr_GC_ptr_R_WriteConsoleEx;
 Prot_GC_ptr_R_ResetConsole ptr_GC_ptr_R_ResetConsole;
 Prot_GC_ptr_R_FlushConsole ptr_GC_ptr_R_FlushConsole;
 Prot_GC_ptr_R_ClearerrConsole ptr_GC_ptr_R_ClearerrConsole;
+Prot_GC_ptr_R_ProcessEvents ptr_GC_ptr_R_ProcessEvents;
 Prot_GC_ptr_R_Busy ptr_GC_ptr_R_Busy;
+int *pGC_R_interrupts_pending;
 #else
 Prot_GC_getDLLVersion ptr_GC_getDLLVersion;
 Prot_GC_getRUser ptr_GC_getRUser;
 Prot_GC_get_R_HOME ptr_GC_get_R_HOME;
+int *pGC_R_UserBreak;
 #endif
 
 // R data
@@ -184,6 +190,7 @@ Prot_GC_R_CheckDeviceAvailable ptr_GC_R_CheckDeviceAvailable;
 
 // R Embedding methods
 void GC_R_dot_Last(void) { (*ptr_GC_R_dot_Last)(); }
+void GC_R_CheckUserInterrupt(void) { (*ptr_GC_R_CheckUserInterrupt)(); }
 void GC_R_RunExitFinalizers(void) { (*ptr_GC_R_RunExitFinalizers)(); }
 void GC_R_CleanTempDir(void) { (*ptr_GC_R_CleanTempDir)(); }
 int  GC_Rf_initEmbeddedR(int argc, char *argv[]) { return (*ptr_GC_Rf_initEmbeddedR)(argc,argv); }
@@ -359,6 +366,7 @@ RLibrary::load()
     // ok, now its loaded we need to set all the function pointers
     ptr_GC_Rf_initEmbeddedR = Prot_GC_Rf_initEmbeddedR(resolve("Rf_initEmbeddedR"));
     ptr_GC_R_dot_Last = Prot_GC_R_dot_Last(resolve("R_dot_Last"));
+    ptr_GC_R_CheckUserInterrupt = Prot_GC_R_CheckUserInterrupt(resolve("R_CheckUserInterrupt"));
     ptr_GC_R_RunExitFinalizers = Prot_GC_R_RunExitFinalizers(resolve("R_RunExitFinalizers"));
     ptr_GC_R_CleanTempDir = Prot_GC_R_CleanTempDir(resolve("R_CleanTempDir"));
     ptr_GC_Rf_endEmbeddedR = Prot_GC_Rf_endEmbeddedR(resolve("Rf_endEmbeddedR"));
@@ -430,11 +438,14 @@ RLibrary::load()
     ptr_GC_ptr_R_ResetConsole = Prot_GC_ptr_R_ResetConsole(resolve("ptr_R_ResetConsole"));
     ptr_GC_ptr_R_FlushConsole = Prot_GC_ptr_R_FlushConsole(resolve("ptr_R_FlushConsole"));
     ptr_GC_ptr_R_ClearerrConsole = Prot_GC_ptr_R_ClearerrConsole(resolve("ptr_R_ClearerrConsole"));
+    ptr_GC_ptr_R_ProcessEvents = Prot_GC_ptr_R_ProcessEvents(resolve("ptr_R_ProcessEvents"));
     ptr_GC_ptr_R_Busy = Prot_GC_ptr_R_Busy(resolve("ptr_R_Busy"));
+    pGC_R_interrupts_pending = (int*)(resolve("R_interrupts_pending"));
     #else
     ptr_GC_getDLLVersion = Prot_GC_getDLLVersion(resolve("getDLLVersion"));
     ptr_GC_getRUser = Prot_GC_getRUser(resolve("getRUser"));
     ptr_GC_get_R_HOME = Prot_GC_get_R_HOME(resolve("get_R_HOME"));
+    pGC_R_UserBreak = (int*)(resolve("UserBreak"));
     #endif
 
     // did it work -- resolve sets to false if symbols won't load
