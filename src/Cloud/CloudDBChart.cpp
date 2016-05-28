@@ -50,9 +50,9 @@ CloudDBChartClient::CloudDBChartClient()
 
     g_chart_url_base = g_chart_url_header = g_chartcuration_url_base = CloudDBCommon::cloudDBBaseURL;
 
-    g_chart_url_base.append("chart/");
-    g_chart_url_header.append("chartheader");
-    g_chartcuration_url_base.append("chartcuration/");
+    g_chart_url_base.append("gchart/");
+    g_chart_url_header.append("gchartheader");
+    g_chartcuration_url_base.append("gchartcuration/");
 
 }
 CloudDBChartClient::~CloudDBChartClient() {
@@ -77,7 +77,9 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
 
     QJsonObject json;
     json["header"] = json_header;
-    json["chartxml"] = chart.ChartXML;
+    json["chartType"] = chart.ChartType;
+    json["chartView"] = chart.ChartView;
+    json["chartDef"] = chart.ChartDef;
     QString image;
     image.append(chart.Image.toBase64());
     json["image"] = image;
@@ -93,14 +95,7 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
     // wait for reply (synchronously) and process error codes as necessary
     if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
 
-    QByteArray result = g_reply->readAll();
-    result.replace(QByteArray("\""), QByteArray(""));
-    qint64 id = result.toLongLong();
-    if (id > 0) {
-        chart.Header.Id = id;
-        writeChartCache(&chart);
-    }
-
+    CloudDBHeader::setChartHeaderStale(true);
     return true;
 
 }
@@ -116,7 +111,9 @@ CloudDBChartClient::putChart(ChartAPIv1 chart) {
 
     QJsonObject json;
     json["header"] = json_header;
-    json["chartxml"] = chart.ChartXML;
+    json["chartType"] = chart.ChartType;
+    json["chartView"] = chart.ChartView;
+    json["chartDef"] = chart.ChartDef;
     QString image;
     image.append(chart.Image.toBase64());
     json["image"] = image;
@@ -132,8 +129,9 @@ CloudDBChartClient::putChart(ChartAPIv1 chart) {
     // wait for reply (synchronously) and process error codes as necessary
     if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
 
-    // update cache
-    writeChartCache(&chart);
+    // cache is stale
+    deleteChartCache(chart.Header.Id);
+    CloudDBHeader::setChartHeaderStale(true);
     return true;
 
 }
@@ -255,7 +253,9 @@ CloudDBChartClient::writeChartCache(ChartAPIv1 * chart) {
     out << chart->Header.Id;
     out << chart->Header.Language;
     out << chart->Header.Name;
-    out << chart->ChartXML;
+    out << chart->ChartType;
+    out << chart->ChartView;
+    out << chart->ChartDef;
     out << chart->CreatorEmail;
     out << chart->CreatorNick;
     out << chart->Image;
@@ -299,7 +299,9 @@ bool CloudDBChartClient::readChartCache(qint64 id, ChartAPIv1 *chart) {
     in >> chart->Header.Id;
     in >> chart->Header.Language;
     in >> chart->Header.Name;
-    in >> chart->ChartXML;
+    in >> chart->ChartType;
+    in >> chart->ChartView;
+    in >> chart->ChartDef;
     in >> chart->CreatorEmail;
     in >> chart->CreatorNick;
     in >> chart->Image;
@@ -380,7 +382,9 @@ CloudDBChartClient::unmarshallAPIv1(QByteArray json, QList<ChartAPIv1> *charts) 
 void
 CloudDBChartClient::unmarshallAPIv1Object(QJsonObject* object, ChartAPIv1* chart) {
 
-    chart->ChartXML = object->value("chartxml").toString();
+    chart->ChartType = object->value("chartType").toString();
+    chart->ChartView = object->value("chartView").toString();
+    chart->ChartDef = object->value("chartDef").toString();
     QString imageString = object->value("image").toString();
     QByteArray ba;
     ba.append(imageString);
@@ -406,6 +410,7 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    g_client = new CloudDBChartClient();
    g_currentHeaderList = new QList<CommonAPIHeaderV1>;
    g_fullHeaderList = new QList<CommonAPIHeaderV1>;
+   CloudDBHeader::setChartHeaderStale(true);  //Force Headers to be loaded
    g_currentPresets = new QList<ChartWorkingStructure>;
    g_textFilterActive = false;
    g_networkrequestactive = false; // don't allow Dialog to close while we are retrieving data
@@ -471,8 +476,6 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    textFilter->setVisible(true);
 
    tableWidget = new QTableWidget(0, 2);
-   tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-   tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
    tableWidget->setContentsMargins(0,0,0,0);
    tableWidget->horizontalHeader()->setStretchLastSection(true);
    tableWidget->horizontalHeader()->setVisible(false);
@@ -485,8 +488,8 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    connect(tableWidget, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(cellDoubleClicked(int,int)));
 
    // UserGet Role
-   addAndCloseUserGetButton = new QPushButton(tr("Add selected chart to library"));
-   closeUserGetButton = new QPushButton(tr("Close without selection"));
+   addAndCloseUserGetButton = new QPushButton(tr("Import selected charts"));
+   closeUserGetButton = new QPushButton(tr("Close without import"));
 
    addAndCloseUserGetButton->setEnabled(true);
    closeUserGetButton->setEnabled(true);
@@ -578,12 +581,18 @@ CloudDBChartListDialog::prepareData(QString athlete, CloudDBCommon::UserRole rol
         ownChartsOnly->setChecked(true);
         ownChartsOnly->setEnabled(false);
         setWindowTitle(tr("Chart maintenance - Edit or Delete your Charts"));
+        tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+        tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     } else if (role == CloudDBCommon::CuratorEdit) {
         ownChartsOnly->setChecked(false);
         curationStateCombo->setCurrentIndex(2); // start with uncurated
         setWindowTitle(tr("Curator chart maintenance - Curate, Edit or Delete Charts"));
+        tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+        tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     } else {
         setWindowTitle(tr("Select a Chart"));
+        tableWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     }
 
     if (CloudDBHeader::isStaleChartHeader()) {
@@ -632,20 +641,9 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
             preset.language = chart->Header.Language;
             preset.createdAt = chart->Header.LastChanged;
             preset.image.loadFromData(chart->Image);
-            QXmlInputSource source;
-            source.setData(chart->ChartXML);
-            QXmlSimpleReader xmlReader;
-            LTMChartParser handler;
-            xmlReader.setContentHandler(&handler);
-            xmlReader.setErrorHandler(&handler);
-            xmlReader.parse( source );
-            // in case of corrupt data, settings may be empty
-            if (handler.getSettings().size()>0) {
-                preset.ltmSettings = handler.getSettings().at(0); //only one LTMSettings Object is stored
-                preset.validLTMSettings = true;
-            } else {
-                preset.validLTMSettings = false;
-            }
+            preset.gchartType = chart->ChartType;
+            preset.gchartView = chart->ChartView;
+            preset.gchartDef = chart->ChartDef;
             preset.creatorNick = chart->CreatorNick;
             g_currentPresets->append(preset);
         } else {
@@ -776,19 +774,19 @@ CloudDBChartListDialog::addAndCloseClicked() {
 
     // check if an item of the table is selected
 
-    if (tableWidget->selectedItems().size()>0)
+
+    QList<QTableWidgetItem*> selected = tableWidget->selectedItems();
+    if (selected.count()>0)
     {
-        // the selectionMode allows only 1 item to be selected at a time
-        QTableWidgetItem* s = tableWidget->selectedItems().at(0);
-        if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
-            if (g_currentPresets->at(s->row()).validLTMSettings) {
-                g_selected = g_currentPresets->at(s->row()).ltmSettings;
-                g_selected.name = g_selected.title = g_currentPresets->at(s->row()).name;
-            } else {
-                QMessageBox::warning(0, tr("CloudDB"), QString(tr("Chart definition is corrupt - please choose a different chart")));
+        g_selected.clear();
+        // the selectionMode allows multiple selection so get them all
+        for (int i = 0; i< selected.count(); i++) {
+            QTableWidgetItem* s = selected.at(i);
+            if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
+                g_selected << g_currentPresets->at(s->row()).gchartDef;
             }
-            accept();
         }
+        accept();
     }
 }
 

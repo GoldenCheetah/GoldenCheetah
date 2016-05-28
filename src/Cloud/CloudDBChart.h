@@ -37,7 +37,9 @@
 
 struct ChartAPIv1 {
     CommonAPIHeaderV1 Header;
-    QString ChartXML;
+    QString ChartType;
+    QString ChartView;
+    QString ChartDef;
     QByteArray Image;
     QString CreatorNick;
     QString CreatorEmail;
@@ -76,7 +78,7 @@ private:
     QString g_cacheDir;
 
     static const int chart_magic_string = 1029384756;
-    static const int chart_cache_version = 1;
+    static const int chart_cache_version = 2;
 
     QString  g_chart_url_base;
     QString  g_chart_url_header;
@@ -100,8 +102,9 @@ struct ChartWorkingStructure {
     QString language;
     QDateTime createdAt;
     QPixmap image;
-    bool validLTMSettings;
-    LTMSettings ltmSettings;
+    QString gchartType;
+    QString gchartView;
+    QString gchartDef;
     bool createdByMe;
 };
 
@@ -115,7 +118,7 @@ public:
     ~CloudDBChartListDialog();
 
     bool prepareData(QString athlete, CloudDBCommon::UserRole role);
-    LTMSettings getSelectedSettings() {return g_selected; }
+    QList<QString> getSelectedSettings() {return g_selected; }
 
     // re-implemented
     void closeEvent(QCloseEvent* event);
@@ -177,7 +180,7 @@ private:
     QVBoxLayout *mainLayout;
 
     // UserRole - UserGet
-    LTMSettings g_selected;
+    QList<QString> g_selected;
     QPushButton *addAndCloseUserGetButton, *closeUserGetButton;
 
     // UserRole - UserEdit

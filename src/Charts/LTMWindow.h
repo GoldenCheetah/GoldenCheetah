@@ -227,9 +227,7 @@ class LTMWindow : public GcChartWindow
 
         void exportData();
         void exportConfig();
-#ifdef GC_HAS_CLOUD_DB
-        void shareConfig();
-#endif
+
         QString dataTable(bool html=true); // true as html, false as csv
 
         void configChanged(qint32);
