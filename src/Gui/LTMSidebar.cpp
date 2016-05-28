@@ -32,12 +32,6 @@
 #include "LTMWindow.h" // for LTMWindow::settings()
 #include "LTMChartParser.h" // for LTMChartParser::serialize && ChartTreeView
 
-#ifdef GC_HAS_CLOUD_DB
-#include "CloudDBCommon.h"
-#include "CloudDBChart.h"
-#include "GcUpgrade.h"
-#endif
-
 #include <QApplication>
 #include <QScrollBar>
 #include <QtGui>
@@ -1573,11 +1567,6 @@ LTMSidebar::presetPopup()
     QAction *import = new QAction(tr("Import Charts"), chartTree);
     menu.addAction(import);
     connect(import, SIGNAL(triggered(void)), this, SLOT(importPreset(void)));
-#ifdef GC_HAS_CLOUD_DB
-    QAction *importCloudDB = new QAction(tr("Import Chart from CloudDB..."), chartTree);
-    menu.addAction(importCloudDB);
-    connect(importCloudDB, SIGNAL(triggered(void)), this, SLOT(importCloudDBPreset(void)));
-#endif
 
     // this one needs to be in a corner away from the crowd
     menu.addSeparator();
@@ -1731,33 +1720,6 @@ LTMSidebar::importPreset()
     }
 }
 
-#ifdef GC_HAS_CLOUD_DB
-
-void
-LTMSidebar::importCloudDBPreset()
-{
-    if (!(appsettings->cvalue(context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
-       CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
-       acceptDialog.setModal(true);
-       if (acceptDialog.exec() == QDialog::Rejected) {
-          return;
-       };
-    }
-
-    if (context->cdbChartListDialog == NULL) {
-        context->cdbChartListDialog = new CloudDBChartListDialog();
-    }
-
-    if (context->cdbChartListDialog->prepareData(context->athlete->cyclist, CloudDBCommon::UserImport)) {
-        if (context->cdbChartListDialog->exec() == QDialog::Accepted) {
-            LTMSettings s = context->cdbChartListDialog->getSelectedSettings();
-            // now append to the QList and QTreeWidget
-            context->athlete->presets += s;
-            context->notifyPresetsChanged();
-        }
-    }
-}
-#endif
 
 void
 LTMSidebar::resetPreset()

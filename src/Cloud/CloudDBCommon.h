@@ -139,7 +139,7 @@ public:
 private:
 
     static const int header_magic_string = 1253346430;
-    static const int header_cache_version = 1;
+    static const int header_cache_version = 2;  //increase version to clear existing cache
 
     static bool chartHeaderStatusStale;
     static bool userMetricHeaderStatusStale;
