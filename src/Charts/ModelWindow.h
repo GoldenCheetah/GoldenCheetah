@@ -99,7 +99,7 @@ class ModelWindow : public GcChartWindow
         bool isLegend() const { return legend->isChecked(); }
         void setLegend(bool x) { legend->setChecked(x); }
         QString bin() const { return binWidthLineEdit->text(); }
-        void setBin(QString x) { binWidthLineEdit->setText(x); }
+        void setBin(QString x) { binWidthLineEdit->setText(x); setBinWidthFromLineEdit(); }
 
     public slots:
 
