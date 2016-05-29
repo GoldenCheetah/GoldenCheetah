@@ -37,6 +37,7 @@
 
 struct ChartAPIv1 {
     CommonAPIHeaderV1 Header;
+    QString ChartSport;
     QString ChartType;
     QString ChartView;
     QString ChartDef;
@@ -78,7 +79,7 @@ private:
     QString g_cacheDir;
 
     static const int chart_magic_string = 1029384756;
-    static const int chart_cache_version = 2;
+    static const int chart_cache_version = 3;
 
     QString  g_chart_url_base;
     QString  g_chart_url_header;
@@ -105,6 +106,7 @@ struct ChartWorkingStructure {
     QString gchartType;
     QString gchartView;
     QString gchartDef;
+    QString gchartSport;
     bool createdByMe;
 };
 
@@ -117,7 +119,7 @@ public:
     CloudDBChartListDialog();
     ~CloudDBChartListDialog();
 
-    bool prepareData(QString athlete, CloudDBCommon::UserRole role);
+    bool prepareData(QString athlete, CloudDBCommon::UserRole role, int chartView = 0);
     QList<QString> getSelectedSettings() {return g_selected; }
 
     // re-implemented
@@ -133,6 +135,7 @@ private slots:
     void ownChartsToggled(bool);
     void toggleTextFilterApply();
     void curationStateFilterChanged(int);
+    void sportComboFilterChanged(int);
     void languageFilterChanged(int);
     void textFilterEditingFinished();
     void cellDoubleClicked(int, int);
@@ -171,6 +174,7 @@ private:
     QCheckBox *ownChartsOnly;
     QComboBox *curationStateCombo;
     QComboBox *langCombo;
+    QComboBox *sportCombo;
     QLineEdit *textFilter;
     QPushButton *textFilterApply;
 
@@ -185,6 +189,7 @@ private:
 
     // UserRole - UserEdit
     QPushButton *deleteUserEditButton, *editUserEditButton, *closeUserEditButton;
+    int g_chartView;
 
     // UserRole - Curator Edit
     QPushButton *curateCuratorEditButton, *editCuratorEditButton, *deleteCuratorEditButton, *closeCuratorButton;
@@ -259,6 +264,7 @@ private:
     bool nameOk;
 
     QComboBox *langCombo;
+    QComboBox *sportCombo;
 
     QLabel *image;
 

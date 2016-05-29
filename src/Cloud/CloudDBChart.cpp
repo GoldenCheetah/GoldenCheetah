@@ -77,6 +77,7 @@ CloudDBChartClient::postChart(ChartAPIv1 chart) {
 
     QJsonObject json;
     json["header"] = json_header;
+    json["chartSport"] = chart.ChartSport;
     json["chartType"] = chart.ChartType;
     json["chartView"] = chart.ChartView;
     json["chartDef"] = chart.ChartDef;
@@ -111,6 +112,7 @@ CloudDBChartClient::putChart(ChartAPIv1 chart) {
 
     QJsonObject json;
     json["header"] = json_header;
+    json["chartSport"] = chart.ChartSport;
     json["chartType"] = chart.ChartType;
     json["chartView"] = chart.ChartView;
     json["chartDef"] = chart.ChartDef;
@@ -253,6 +255,7 @@ CloudDBChartClient::writeChartCache(ChartAPIv1 * chart) {
     out << chart->Header.Id;
     out << chart->Header.Language;
     out << chart->Header.Name;
+    out << chart->ChartSport;
     out << chart->ChartType;
     out << chart->ChartView;
     out << chart->ChartDef;
@@ -299,6 +302,7 @@ bool CloudDBChartClient::readChartCache(qint64 id, ChartAPIv1 *chart) {
     in >> chart->Header.Id;
     in >> chart->Header.Language;
     in >> chart->Header.Name;
+    in >> chart->ChartSport;
     in >> chart->ChartType;
     in >> chart->ChartView;
     in >> chart->ChartDef;
@@ -382,6 +386,7 @@ CloudDBChartClient::unmarshallAPIv1(QByteArray json, QList<ChartAPIv1> *charts) 
 void
 CloudDBChartClient::unmarshallAPIv1Object(QJsonObject* object, ChartAPIv1* chart) {
 
+    chart->ChartSport = object->value("chartSport").toString();
     chart->ChartType = object->value("chartType").toString();
     chart->ChartView = object->value("chartView").toString();
     chart->ChartDef = object->value("chartDef").toString();
@@ -448,6 +453,14 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
 
    connect(curationStateCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(curationStateFilterChanged(int)));
 
+   sportCombo = new QComboBox();
+   sportCombo->addItem(tr("Any Sport"));
+   foreach (QString sport, CloudDBCommon::cloudDBSports) {
+       sportCombo->addItem(sport);
+   }
+
+   connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(sportComboFilterChanged(int)));
+
    langCombo = new QComboBox();
    langCombo->addItem(tr("Any Language"));
    foreach (QString lang, CloudDBCommon::cloudDBLangs) {
@@ -467,6 +480,8 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    filterLayout->addWidget(ownChartsOnly);
    filterLayout->addStretch();
    filterLayout->addWidget(curationStateCombo);
+   filterLayout->addStretch();
+   filterLayout->addWidget(sportCombo);
    filterLayout->addStretch();
    filterLayout->addWidget(langCombo);
    filterLayout->addStretch();
@@ -571,9 +586,10 @@ CloudDBChartListDialog::closeEvent(QCloseEvent* event) {
 }
 
 bool
-CloudDBChartListDialog::prepareData(QString athlete, CloudDBCommon::UserRole role) {
+CloudDBChartListDialog::prepareData(QString athlete, CloudDBCommon::UserRole role, int chartView) {
 
     g_role = role;
+    g_chartView = chartView;
     // and now initialize the dialog
     setVisibleButtonsForRole();
 
@@ -617,6 +633,7 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
     curationStateCombo->setEnabled(false);
     ownChartsOnly->setEnabled(false);
     textFilterApply->setEnabled(false);
+    sportCombo->setEnabled(false);
     langCombo->setEnabled(false);
     deleteUserEditButton->setEnabled(false);
     editUserEditButton->setEnabled(false);
@@ -645,6 +662,7 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
             preset.gchartView = chart->ChartView;
             preset.gchartDef = chart->ChartDef;
             preset.creatorNick = chart->CreatorNick;
+            preset.gchartSport = chart->ChartSport;
             g_currentPresets->append(preset);
         } else {
             noError = false;
@@ -699,6 +717,7 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
     curationStateCombo->setEnabled(true);
     ownChartsOnly->setEnabled(true);
     textFilterApply->setEnabled(true);
+    sportCombo->setEnabled(true);
     langCombo->setEnabled(true);
     deleteUserEditButton->setEnabled(true);
     editUserEditButton->setEnabled(true);
@@ -936,6 +955,11 @@ CloudDBChartListDialog::curationStateFilterChanged(int)  {
 }
 
 void
+CloudDBChartListDialog::sportComboFilterChanged(int)  {
+   applyAllFilters();
+}
+
+void
 CloudDBChartListDialog::ownChartsToggled(bool)  {
    applyAllFilters();
 }
@@ -962,6 +986,18 @@ CloudDBChartListDialog::languageFilterChanged(int) {
 void
 CloudDBChartListDialog::applyAllFilters() {
 
+
+    // setup to only show charts that are relevant to the current view
+    unsigned int mask=0;
+    switch(g_chartView) {
+        case 0 : mask = VIEW_HOME; break;
+        default:
+        case 1 : mask = VIEW_ANALYSIS; break;
+        case 2 : mask = VIEW_DIARY; break;
+        case 3 : mask = VIEW_TRAIN; break;
+        case 4 : mask = VIEW_INTERVAL; break;
+    }
+
     QStringList searchList;
     g_currentHeaderList->clear();
     if (!textFilter->text().isEmpty()) {
@@ -972,36 +1008,62 @@ CloudDBChartListDialog::applyAllFilters() {
 
         // list does not contain any deleted chart id's
 
-        int curationState = curationStateCombo->currentIndex();
-        // check curated first
-        if (curationState == 0 ||
-                (curationState == 1 && chart.Curated) ||
-                (curationState == 2 && !chart.Curated ) ) {
 
-            //check own chart only
-            if (!ownChartsOnly->isChecked() ||
-                    (ownChartsOnly->isChecked() && chart.CreatorId == g_currentAthleteId)) {
-
-                // then check language (observe that we have an additional entry "all" in the combo !
-                if (langCombo->currentIndex() == 0 ||
-                        (langCombo->currentIndex() > 0 && CloudDBCommon::cloudDBLangsIds[langCombo->currentIndex()-1] == chart.Language )) {
-
-                    // at last check text filter
-                    if (g_textFilterActive) {
-                        // search with filter Keywords
-                        QString chartInfo = chart.Name + " " + chart.Description;
-                        foreach (QString search, searchList) {
-                            if (chartInfo.contains(search, Qt::CaseInsensitive)) {
-                                g_currentHeaderList->append(chart);
-                                break;
-                            }
-                        }
-                    } else {
-                        g_currentHeaderList->append(chart);
-                    }
+        // first filter based on the current view (Home, Analysis, Diary) - but only on Imp
+        bool chartOkForView = false;
+        if (g_role == CloudDBCommon::UserImport) {
+            int winId = chart.ChartType.toInt();
+            for (int i = 0; GcWindows[i].relevance; i++) {
+                int x = GcWindows[i].id;
+                int y = GcWindows[i].relevance;
+                if (GcWindows[i].id == winId && (GcWindows[i].relevance & mask)) {
+                    chartOkForView = true;
+                    break;
                 }
             }
+        } else {
+            // for editing and curation all charts are shown
+            chartOkForView = true;
+        }
 
+        int curationState = curationStateCombo->currentIndex();
+        if (chartOkForView) {
+
+            // check curated first
+            if (curationState == 0 ||
+                    (curationState == 1 && chart.Curated) ||
+                    (curationState == 2 && !chart.Curated ) ) {
+
+                //check own chart only
+                if (!ownChartsOnly->isChecked() ||
+                        (ownChartsOnly->isChecked() && chart.CreatorId == g_currentAthleteId)) {
+
+                    // then check sport (observe that we have an additional entry "all" in the combo !
+                    if (sportCombo->currentIndex() == 0 ||
+                            (sportCombo->currentIndex() > 0 && CloudDBCommon::cloudDBSportIds[sportCombo->currentIndex()-1] == chart.ChartSport )) {
+
+                        // then check language (observe that we have an additional entry "all" in the combo !
+                        if (langCombo->currentIndex() == 0 ||
+                                (langCombo->currentIndex() > 0 && CloudDBCommon::cloudDBLangsIds[langCombo->currentIndex()-1] == chart.Language )) {
+
+                            // at last check text filter
+                            if (g_textFilterActive) {
+                                // search with filter Keywords
+                                QString chartInfo = chart.Name + " " + chart.Description;
+                                foreach (QString search, searchList) {
+                                    if (chartInfo.contains(search, Qt::CaseInsensitive)) {
+                                        g_currentHeaderList->append(chart);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                g_currentHeaderList->append(chart);
+                            }
+                        }
+                    }
+                }
+
+            }
         }
     }
     g_currentIndex = 0;
@@ -1024,7 +1086,7 @@ CloudDBChartListDialog::cellDoubleClicked(int row, int /*column */) {
     ChartAPIv1* chart = new ChartAPIv1;
     if (row >= 0 && row < g_currentHeaderList->size() ) {
         g_networkrequestactive = true;
-        if (g_client->getChartByID(g_currentHeaderList->at(row).Id, chart)) {
+        if (g_client->getChartByID(g_currentHeaderList->at(g_currentIndex+row).Id, chart)) {
             CloudDBChartShowPictureDialog showImage(chart->Image);
             showImage.exec();
 
@@ -1132,13 +1194,25 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
    name->setMaxLength(50);
    if (update) {
        name->setText(data.Header.Name);
+       nameOk = true; // no need to re-check
    } else {
        name->setText(nameDefault);
+       nameOk = false;
    }
    QRegExp name_rx("^.{5,50}$");
    QValidator *name_validator = new QRegExpValidator(name_rx, this);
    name->setValidator(name_validator);
-   nameOk = false;
+
+   QLabel* sportLabel = new QLabel(tr("Sport"));
+   sportCombo = new QComboBox();
+   foreach (QString sport, CloudDBCommon::cloudDBSports) {
+       sportCombo->addItem(sport);
+   }
+   if (update) {
+       int index = CloudDBCommon::cloudDBSportIds.indexOf(data.ChartSport);
+       sportCombo->setCurrentIndex( index<0 ? 0 : index);
+   }
+
 
    QLabel* langLabel = new QLabel(tr("Language"));
    langCombo = new QComboBox();
@@ -1146,8 +1220,7 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
        langCombo->addItem(lang);
    }
    if (update) {
-       data.Header.Language = CloudDBCommon::cloudDBLangsIds.at(langCombo->currentIndex());
-       int index = CloudDBCommon::cloudDBLangs.indexOf(data.Header.Language);
+       int index = CloudDBCommon::cloudDBLangsIds.indexOf(data.Header.Language);
        langCombo->setCurrentIndex( index<0 ? 0 : index);
    }
 
@@ -1199,18 +1272,21 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
    QGridLayout *detailsLayout = new QGridLayout;
    detailsLayout->addWidget(chartName, 0, 0, Qt::AlignLeft);
    detailsLayout->addWidget(name, 0, 1);
-   detailsLayout->addWidget(langLabel, 0, 2, Qt::AlignLeft);
-   detailsLayout->addWidget(langCombo, 0, 3, Qt::AlignLeft);
 
-   detailsLayout->addWidget(nickLabel, 1, 0, Qt::AlignLeft);
-   detailsLayout->addWidget(nickName, 1, 1);
-   detailsLayout->addWidget(emailLabel, 1, 2, Qt::AlignLeft);
-   detailsLayout->addWidget(email, 1, 3);
+   detailsLayout->addWidget(sportLabel, 1, 0, Qt::AlignLeft);
+   detailsLayout->addWidget(sportCombo, 1, 1, Qt::AlignLeft);
+   detailsLayout->addWidget(langLabel, 1, 2, Qt::AlignLeft);
+   detailsLayout->addWidget(langCombo, 1, 3, Qt::AlignLeft);
 
-   detailsLayout->addWidget(gcVersionLabel, 2, 0, Qt::AlignLeft);
-   detailsLayout->addWidget(gcVersionString, 2, 1);
-   detailsLayout->addWidget(creatorIdLabel, 2, 2, Qt::AlignLeft);
-   detailsLayout->addWidget(creatorId, 2, 3);
+   detailsLayout->addWidget(nickLabel, 2, 0, Qt::AlignLeft);
+   detailsLayout->addWidget(nickName, 2, 1);
+   detailsLayout->addWidget(emailLabel, 2, 2, Qt::AlignLeft);
+   detailsLayout->addWidget(email, 2, 3);
+
+   detailsLayout->addWidget(gcVersionLabel, 3, 0, Qt::AlignLeft);
+   detailsLayout->addWidget(gcVersionString, 3, 1);
+   detailsLayout->addWidget(creatorIdLabel, 3, 2, Qt::AlignLeft);
+   detailsLayout->addWidget(creatorId, 3, 3);
 
    description = new QTextEdit();
    description->setAcceptRichText(false);
@@ -1284,6 +1360,7 @@ CloudDBChartObjectDialog::publishClicked() {
     data.CreatorEmail = email->text();
     data.CreatorNick = nickName->text();
     data.Header.Language = CloudDBCommon::cloudDBLangsIds.at(langCombo->currentIndex());
+    data.ChartSport = CloudDBCommon::cloudDBSportIds.at(sportCombo->currentIndex());
 
     if (!update) {
         appsettings->setCValue(athlete, GC_CLOUDDB_NICKNAME, data.CreatorNick);
