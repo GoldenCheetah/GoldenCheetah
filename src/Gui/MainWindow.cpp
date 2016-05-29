@@ -913,7 +913,7 @@ MainWindow::addChart(QAction*action)
 
 #ifdef GC_HAS_CLOUD_DB
 void
-MainWindow::addChartFromCloudDB(QAction*)
+MainWindow::addChartFromCloudDB()
 {
     if (!(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
        CloudDBAcceptConditionsDialog acceptDialog(currentTab->context->athlete->cyclist);
