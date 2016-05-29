@@ -282,7 +282,7 @@ class RTP : public RideMetric {
         int zoneRange = item->paceZoneRange;
 
         // did user override for this ride?
-        double cv = item->getText("CV","0").toInt();
+        double cv = item->getText("CV","0").toDouble();
 
         // not overriden so use the set value
         // if it has been set at all
