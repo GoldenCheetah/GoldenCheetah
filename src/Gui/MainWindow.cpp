@@ -590,7 +590,6 @@ MainWindow::MainWindow(const QDir &home)
 #ifdef GC_HAS_CLOUD_DB
     // CloudDB options
     optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("Import Chart from CloudDB..."), this, SLOT(cloudDBimportGChart()));
     optionsMenu->addAction(tr("CloudDB Status..."), this, SLOT(cloudDBshowStatus()));
 
     QMenu *cloudDBMenu = optionsMenu->addMenu(tr("CloudDB Contributions"));
@@ -911,6 +910,41 @@ MainWindow::addChart(QAction*action)
     if (id != GcWindowTypes::None)
         currentTab->addChart(id); // called from MainWindow to inset chart
 }
+
+#ifdef GC_HAS_CLOUD_DB
+void
+MainWindow::addChartFromCloudDB(QAction*)
+{
+    if (!(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(currentTab->context->athlete->cyclist);
+       acceptDialog.setModal(true);
+       if (acceptDialog.exec() == QDialog::Rejected) {
+          return;
+       };
+    }
+
+    if (currentTab->context->cdbChartListDialog == NULL) {
+        currentTab->context->cdbChartListDialog = new CloudDBChartListDialog();
+    }
+
+    if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::UserImport, currentTab->currentView())) {
+        if (currentTab->context->cdbChartListDialog->exec() == QDialog::Accepted) {
+            QList<QMap<QString,QString> > charts;
+
+            // get selected chartDef
+            QList<QString> chartDefs = currentTab->context->cdbChartListDialog->getSelectedSettings();
+
+            // parse charts into property pairs
+            foreach (QString chartDef, chartDefs) {
+                QList<QMap<QString,QString> > properties = GcChartWindow::chartPropertiesFromString(chartDef);
+                for (int i = 0; i< properties.size(); i++) {
+                    currentTab->context->mainWindow->athleteTab()->view(currentTab->currentView())->importChart(properties.at(i), false);
+                }
+            }
+        }
+    }
+}
+#endif
 
 void
 MainWindow::setStyleFromSegment(int segment)
@@ -2392,41 +2426,6 @@ void
 MainWindow::cloudDBshowStatus() {
 
     CloudDBStatusClient::displayCloudDBStatus();
-}
-
-void
-MainWindow::cloudDBimportGChart()
-{
-    if (!(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
-       CloudDBAcceptConditionsDialog acceptDialog(currentTab->context->athlete->cyclist);
-       acceptDialog.setModal(true);
-       if (acceptDialog.exec() == QDialog::Rejected) {
-          return;
-       };
-    }
-
-    if (currentTab->context->cdbChartListDialog == NULL) {
-        currentTab->context->cdbChartListDialog = new CloudDBChartListDialog();
-    }
-
-    if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::UserImport)) {
-        if (currentTab->context->cdbChartListDialog->exec() == QDialog::Accepted) {
-            QList<QMap<QString,QString> > charts;
-
-            // get selected chartDef
-            QList<QString> chartDefs = currentTab->context->cdbChartListDialog->getSelectedSettings();
-
-            // parse charts into property pairs
-            foreach (QString chartDef, chartDefs) {
-            charts << GcChartWindow::chartPropertiesFromString(chartDef);
-            }
-
-            // And import them with a dialog to select location
-            ImportChartDialog importer(currentTab->context, charts, this);
-            importer.exec();
-
-        }
-    }
 }
 
 
