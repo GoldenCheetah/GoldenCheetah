@@ -153,6 +153,10 @@ QList<QString> CloudDBCommon::cloudDBLangs = QList<QString>() << QObject::tr("En
                                              QObject::tr("Italian") << QObject::tr("German") << QObject::tr("Russian") << QObject::tr("Czech") <<
                                              QObject::tr("Spanish") << QObject::tr("Portugese") << QObject::tr("Chinese (Simplified)") << QObject::tr("Chinese (Traditional)") << QObject::tr("Other");
 
+QList<QString> CloudDBCommon::cloudDBSportIds = QList<QString>() << "bike" << "run" << "swim" << "other";
+
+QList<QString> CloudDBCommon::cloudDBSports = QList<QString>() << QObject::tr("Bike") << QObject::tr("Run") << QObject::tr("Swim") << QObject::tr("Other");
+
 QString CloudDBCommon::cloudDBTimeFormat = "yyyy-MM-ddTHH:mm:ssZ";
 
 bool CloudDBCommon::addCuratorFeatures = false;
@@ -250,6 +254,12 @@ CloudDBCommon::unmarshallAPIHeaderV1(QByteArray json, QList<CommonAPIHeaderV1> *
     if (document.isObject()) {
         CommonAPIHeaderV1 chartHeader;
         QJsonObject object = document.object();
+        // handle addtional Chart Header properties - if one exists, all are expected to exist
+        if (!object.value("chartView").isUndefined()) {
+            chartHeader.ChartType = object.value("chartType").toString();
+            chartHeader.ChartView = object.value("chartView").toString();
+            chartHeader.ChartSport = object.value("chartSport").toString();
+        }
         QJsonObject header = object["header"].toObject();
         unmarshallAPIHeaderV1Object(&header, &chartHeader);
         charts->append(chartHeader);
@@ -261,6 +271,12 @@ CloudDBCommon::unmarshallAPIHeaderV1(QByteArray json, QList<CommonAPIHeaderV1> *
             if (value.isObject()) {
                 CommonAPIHeaderV1 chartHeader;
                 QJsonObject object = value.toObject();
+                // handle addtional Chart Header properties - if one exists, all are expected to exist
+                if (!object.value("chartView").isUndefined()) {
+                    chartHeader.ChartType = object.value("chartType").toString();
+                    chartHeader.ChartView = object.value("chartView").toString();
+                    chartHeader.ChartSport = object.value("chartSport").toString();
+                }
                 QJsonObject header = object["header"].toObject();
                 unmarshallAPIHeaderV1Object(&header, &chartHeader);
                 charts->append(chartHeader);
@@ -357,6 +373,11 @@ CloudDBHeader::writeHeaderCache(QList<CommonAPIHeaderV1>* header, CloudDBHeaderT
        out << h.CreatorId;
        out << h.Deleted;
        out << h.Curated;
+       if (headerType == CloudDB_Chart) {
+           out << h.ChartSport;
+           out << h.ChartType;
+           out << h.ChartView;
+       }
    }
    file.close();
    return true;
@@ -407,6 +428,11 @@ CloudDBHeader::readHeaderCache(QList<CommonAPIHeaderV1>* header, CloudDBHeaderTy
         in >> h.CreatorId;
         in >> h.Deleted;
         in >> h.Curated;
+        if (headerType == CloudDB_Chart) {
+            in >> h.ChartSport;
+            in >> h.ChartType;
+            in >> h.ChartView;
+        }
         header->append(h);
     }
     file.close();
