@@ -373,7 +373,7 @@ CloudDBHeader::writeHeaderCache(QList<CommonAPIHeaderV1>* header, CloudDBHeaderT
        out << h.CreatorId;
        out << h.Deleted;
        out << h.Curated;
-       if (headerType == CloudDBHeaderType::CloudDB_Chart) {
+       if (headerType == CloudDB_Chart) {
            out << h.ChartSport;
            out << h.ChartType;
            out << h.ChartView;
@@ -428,7 +428,7 @@ CloudDBHeader::readHeaderCache(QList<CommonAPIHeaderV1>* header, CloudDBHeaderTy
         in >> h.CreatorId;
         in >> h.Deleted;
         in >> h.Curated;
-        if (headerType == CloudDBHeaderType::CloudDB_Chart) {
+        if (headerType == CloudDB_Chart) {
             in >> h.ChartSport;
             in >> h.ChartType;
             in >> h.ChartView;

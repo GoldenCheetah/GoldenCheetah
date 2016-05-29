@@ -1014,8 +1014,6 @@ CloudDBChartListDialog::applyAllFilters() {
         if (g_role == CloudDBCommon::UserImport) {
             int winId = chart.ChartType.toInt();
             for (int i = 0; GcWindows[i].relevance; i++) {
-                int x = GcWindows[i].id;
-                int y = GcWindows[i].relevance;
                 if (GcWindows[i].id == winId && (GcWindows[i].relevance & mask)) {
                     chartOkForView = true;
                     break;
