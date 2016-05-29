@@ -233,7 +233,7 @@ class MainWindow : public QMainWindow
         void cloudDBuserEditChart();
         void cloudDBcuratorEditChart();
         void cloudDBshowStatus();
-        void addChartFromCloudDB(QAction *);
+        void addChartFromCloudDB();
 #endif
         // save and restore state to context
         void saveGCState(Context *);
