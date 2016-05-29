@@ -45,6 +45,10 @@ typedef struct {
     QString CreatorId;
     bool    Curated;
     bool    Deleted;
+    // gchart specific header cache fields
+    QString ChartType;
+    QString ChartView;
+    QString ChartSport;
 } CommonAPIHeaderV1;
 
 
@@ -73,6 +77,11 @@ public:
     // Languages explicitely supported to store artifacts == UI Languages
     static QList<QString> cloudDBLangsIds;
     static QList<QString> cloudDBLangs;
+
+    // Sport Types supported
+    static QList<QString> cloudDBSportIds;
+    static QList<QString> cloudDBSports;
+
     static QString cloudDBTimeFormat;
     static const int APIresponseOk = 200; // also used in case of 204 (No Content)
     static const int APIresponseCreated = 201;
@@ -139,7 +148,7 @@ public:
 private:
 
     static const int header_magic_string = 1253346430;
-    static const int header_cache_version = 2;  //increase version to clear existing cache
+    static const int header_cache_version = 3;  //increase version to clear existing cache
 
     static bool chartHeaderStatusStale;
     static bool userMetricHeaderStatusStale;
