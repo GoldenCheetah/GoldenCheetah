@@ -590,13 +590,13 @@ MainWindow::MainWindow(const QDir &home)
 #ifdef GC_HAS_CLOUD_DB
     // CloudDB options
     optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("CloudDB Status..."), this, SLOT(cloudDBshowStatus()));
+    optionsMenu->addAction(tr("Cloud Status..."), this, SLOT(cloudDBshowStatus()));
 
-    QMenu *cloudDBMenu = optionsMenu->addMenu(tr("CloudDB Contributions"));
+    QMenu *cloudDBMenu = optionsMenu->addMenu(tr("Cloud Contributions"));
     cloudDBMenu->addAction(tr("Maintain charts"), this, SLOT(cloudDBuserEditChart()));
 
     if (CloudDBCommon::addCuratorFeatures) {
-        QMenu *cloudDBCurator = optionsMenu->addMenu(tr("CloudDB Curator"));
+        QMenu *cloudDBCurator = optionsMenu->addMenu(tr("Cloud Curator"));
         cloudDBCurator->addAction(tr("Curate charts"), this, SLOT(cloudDBcuratorEditChart()));
     }
 

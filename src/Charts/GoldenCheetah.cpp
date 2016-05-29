@@ -827,7 +827,7 @@ GcChartWindow::setControls(QWidget *x)
     }
     menu->addAction(tr("Export Chart ..."), this, SLOT(saveChart()));
 #ifdef GC_HAS_CLOUD_DB
-    menu->addAction(tr("Export Chart to CloudDB..."), this, SLOT(exportChartToCloudDB()));
+    menu->addAction(tr("Upload Chart..."), this, SLOT(exportChartToCloudDB()));
 #endif
     menu->addAction(tr("Export Chart Image..."), this, SLOT(saveImage()));
     menu->addAction(tr("Remove Chart"), this, SLOT(_closeWindow()));
