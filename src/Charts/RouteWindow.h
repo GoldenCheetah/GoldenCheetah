@@ -63,7 +63,7 @@ class WebBridgeForRoute : public QObject
         void drawIntervals();
 };
 
-class RouteWindow : public GcWindow
+class RouteWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT

@@ -21,7 +21,7 @@
 #include "Context.h"
 
 SpinScanPlotWindow::SpinScanPlotWindow(Context *context) :
-    GcWindow(context), context(context), active(false)
+    GcChartWindow(context), context(context), active(false)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
@@ -62,7 +62,8 @@ SpinScanPlotWindow::SpinScanPlotWindow(Context *context) :
     history[14] = set15;
     history[15] = set16;
 
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    QVBoxLayout *layout = new QVBoxLayout;
+    setChartLayout(layout);
     stack = new QStackedWidget(this);
     
     rtPlot = new SpinScanPlot(this, spinData);

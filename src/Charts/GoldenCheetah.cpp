@@ -695,6 +695,9 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
 
     _mainWidget = new QWidget(this);
     _mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    _chart = new QWidget(this);
+    _chart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    _chart->hide();
     _blank = new QWidget(this);
     _blank->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -703,11 +706,13 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
     _layout->setCurrentWidget(_mainWidget);
 
     // Main layout
-    _mainLayout = new QGridLayout();
+    _mainLayout = new QStackedLayout(_mainWidget);
+    _mainLayout->setStackingMode(QStackedLayout::StackAll);
     _mainLayout->setContentsMargins(2,2,2,2);
 
     // reveal widget
-    _revealControls = new QWidget();
+    _revealControls = new QWidget(this);
+    _revealControls->hide();
     _revealControls->setFixedHeight(50);
     _revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 80%)");
     _revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -729,10 +734,8 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
     _unrevealTimer = new QTimer();
     connect(_unrevealTimer, SIGNAL(timeout()), this, SLOT(hideRevealControls()));
 
-    _revealControls->hide();
-
-    _mainLayout->addWidget(_revealControls,0,0, Qt::AlignTop);
-    _mainWidget->setLayout(_mainLayout);
+    _mainLayout->addWidget(_chart);
+    _mainLayout->addWidget(_revealControls);
 
     connect(this, SIGNAL(colorChanged(QColor)), this, SLOT(colorChanged(QColor)));
 
@@ -790,7 +793,8 @@ void
 GcChartWindow:: setChartLayout(QLayout *layout)
 {
     _chartLayout = layout;
-    _mainLayout->addLayout(_chartLayout,0,0, Qt::AlignTop);
+    _chart->setLayout(_chartLayout);
+    _chart->show();
 }
 
 void
@@ -798,6 +802,7 @@ GcChartWindow:: setRevealLayout(QLayout *layout)
 {
     _revealLayout = layout;
     _revealControls->setLayout(_revealLayout);
+    _revealControls->hide();
 }
 
 void

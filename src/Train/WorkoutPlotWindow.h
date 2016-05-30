@@ -32,7 +32,7 @@
 #include "Settings.h"
 #include "Colors.h"
 
-class WorkoutPlotWindow : public GcWindow
+class WorkoutPlotWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT

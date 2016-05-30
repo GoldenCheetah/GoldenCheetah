@@ -19,17 +19,18 @@
 #include "SummaryWindow.h"
 
 SummaryWindow::SummaryWindow(Context *context) :
-    GcWindow(context), context(context)
+    GcChartWindow(context), context(context)
 {
     setControls(NULL);
     setRideItem(NULL);
 
     splitter = new QSplitter(Qt::Vertical, this);
     splitter->setHandleWidth(1);
-    QVBoxLayout *vlayout = new QVBoxLayout(this);
+    QVBoxLayout *vlayout = new QVBoxLayout;
     vlayout->setSpacing(0);
     vlayout->setContentsMargins(1,1,1,1);
     vlayout->addWidget(splitter);
+    setChartLayout(vlayout);
 
     rideSummary = new RideSummaryWindow(context);
     rideMetadata = new RideMetadata(context);

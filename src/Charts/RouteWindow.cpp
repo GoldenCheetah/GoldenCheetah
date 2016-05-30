@@ -29,7 +29,7 @@ using namespace std;
 
 #define GOOGLE_KEY "ABQIAAAAS9Z2oFR8vUfLGYSzz40VwRQ69UCJw2HkJgivzGoninIyL8-QPBTtnR-6pM84ljHLEk3PDql0e2nJmg"
 
-RouteWindow::RouteWindow(Context *context) : GcWindow(context)
+RouteWindow::RouteWindow(Context *context) : GcChartWindow(context)
 {
     this->context = context;
     this->routeItem = NULL;
@@ -89,7 +89,7 @@ RouteWindow::RouteWindow(Context *context) : GcWindow(context)
     layoutV->addLayout(layoutH);
     //layoutV->addWidget(rideTable);
 
-    setLayout(layoutV);
+    setChartLayout(layoutV);
 
 
 

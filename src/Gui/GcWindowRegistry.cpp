@@ -148,10 +148,10 @@ QList<GcWinID> idsForType(int type)
 }
 
 // instantiate a new window
-GcWindow *
+GcChartWindow *
 GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 {
-    GcWindow *returning = NULL;
+    GcChartWindow *returning = NULL;
 
     switch(id) {
     case GcWindowTypes::Aerolab: returning = new AerolabWindow(context); break;
@@ -161,15 +161,15 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 #ifdef GC_HAVE_ICAL
     case GcWindowTypes::Diary: returning = new DiaryWindow(context); break;
 #else
-    case GcWindowTypes::Diary: returning = new GcWindow(); break;
+    case GcWindowTypes::Diary: returning = new GcChartWindow(context); break;
 #endif
     case GcWindowTypes::Histogram: returning = new HistogramWindow(context); break;
 #ifdef GC_WANT_R
     case GcWindowTypes::RConsole: returning = new RChart(context, true); break;
     case GcWindowTypes::RConsoleSeason: returning = new RChart(context, false); break;
 #else
-    case GcWindowTypes::RConsole: returning = new GcWindow(); break;
-    case GcWindowTypes::RConsoleSeason: returning = new GcWindow(); break;
+    case GcWindowTypes::RConsole: returning = new GcChartWindow(context); break;
+    case GcWindowTypes::RConsoleSeason: returning = new GcChartWindow(context); break;
 #endif
     case GcWindowTypes::Distribution: returning = new HistogramWindow(context, true); break;
     case GcWindowTypes::PerformanceManager: 
@@ -193,7 +193,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 #ifdef GC_HAVE_QWTPLOT3D
     case GcWindowTypes::Model: returning = new ModelWindow(context); break;
 #else
-    case GcWindowTypes::Model: returning = new GcWindow(); break;
+    case GcWindowTypes::Model: returning = new GcChartWindow(context); break;
 #endif
     case GcWindowTypes::PfPv: returning = new PfPvWindow(context); break;
     case GcWindowTypes::HrPw: returning = new HrPwWindow(context); break;
@@ -205,20 +205,20 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::TreeMap: returning = new TreeMapWindow(context); break;
     case GcWindowTypes::WeeklySummary: returning = new SummaryWindow(context); break; // deprecated
 #ifdef GC_VIDEO_NONE
-    case GcWindowTypes::VideoPlayer: returning = new GcWindow(); break;
+    case GcWindowTypes::VideoPlayer: returning = new GcChartWindow(context); break;
 #else
     case GcWindowTypes::VideoPlayer: returning = new VideoWindow(context); break;
 #endif
     case GcWindowTypes::DialWindow: returning = new DialWindow(context); break;
     case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(context); break;
-    case GcWindowTypes::RealtimeControls: returning = new GcWindow(); break;
+    case GcWindowTypes::RealtimeControls: returning = new GcChartWindow(context); break;
     case GcWindowTypes::RealtimePlot: returning = new RealtimePlotWindow(context); break;
     case GcWindowTypes::SpinScanPlot: returning = new SpinScanPlotWindow(context); break;
     case GcWindowTypes::WorkoutPlot: returning = new WorkoutPlotWindow(context); break;
 #ifdef NOWEBKIT
     case GcWindowTypes::MapWindow:
     case GcWindowTypes::StreetViewWindow:
-        returning = new GcWindow(); break;
+        returning = new GcChartWindow(context); break;
         break;
 #else
     case GcWindowTypes::MapWindow: returning = new MapWindow(context); break;
@@ -235,7 +235,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 #if 0 // not till v4.0
     case GcWindowTypes::RouteSegment: returning = new RouteWindow(context); break;
 #else
-    case GcWindowTypes::RouteSegment: returning = new GcWindow(); break;
+    case GcWindowTypes::RouteSegment: returning = new GcChartWindow(context); break;
 #endif
     default: return NULL; break;
     }

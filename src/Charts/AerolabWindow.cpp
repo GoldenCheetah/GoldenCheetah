@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "AerolabWindow.h"
 #include "Aerolab.h"
+#include "TabView.h"
 #include "IntervalItem.h"
 #include "RideItem.h"
 #include "Colors.h"
@@ -29,7 +30,7 @@
 #include <qwt_plot_zoomer.h>
 
 AerolabWindow::AerolabWindow(Context *context) :
-  GcWindow(context), context(context) {
+  GcChartWindow(context), context(context) {
     setControls(NULL);
 
   // Aerolab tab layout:
@@ -49,7 +50,7 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // Crr:
   QHBoxLayout *crrLayout = new QHBoxLayout;
-  QLabel *crrLabel = new QLabel(tr("Crr"), this);
+  crrLabel = new QLabel(tr("Crr"), this);
   crrLabel->setFixedWidth(labelWidth1);
   crrLineEdit = new QLineEdit();
   crrLineEdit->setFixedWidth(75);
@@ -72,7 +73,7 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // CdA:
   QHBoxLayout *cdaLayout = new QHBoxLayout;
-  QLabel *cdaLabel = new QLabel(tr("CdA"), this);
+  cdaLabel = new QLabel(tr("CdA"), this);
   cdaLabel->setFixedWidth(labelWidth1);
   cdaLineEdit = new QLineEdit();
   cdaLineEdit->setFixedWidth(75);
@@ -95,7 +96,7 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // Eta:
   QHBoxLayout *etaLayout = new QHBoxLayout;
-  QLabel *etaLabel = new QLabel(tr("Eta"), this);
+  etaLabel = new QLabel(tr("Eta"), this);
   etaLabel->setFixedWidth(labelWidth1);
   etaLineEdit = new QLineEdit();
   etaLineEdit->setFixedWidth(75);
@@ -128,7 +129,7 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // Total mass:
   QHBoxLayout *mLayout = new QHBoxLayout;
-  QLabel *mLabel = new QLabel(tr("Total Mass (kg)"), this);
+  mLabel = new QLabel(tr("Total Mass (kg)"), this);
   mLabel->setFixedWidth(labelWidth2);
   mLineEdit = new QLineEdit();
   mLineEdit->setFixedWidth(70);
@@ -151,7 +152,7 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // Rho:
   QHBoxLayout *rhoLayout = new QHBoxLayout;
-  QLabel *rhoLabel = new QLabel(tr("Rho (kg/m^3)"), this);
+  rhoLabel = new QLabel(tr("Rho (kg/m^3)"), this);
   rhoLabel->setFixedWidth(labelWidth2);
   rhoLineEdit = new QLineEdit();
   rhoLineEdit->setFixedWidth(70);
@@ -174,7 +175,7 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // Elevation offset:
   QHBoxLayout *eoffsetLayout = new QHBoxLayout;
-  QLabel *eoffsetLabel = new QLabel(tr("Eoffset (m)"), this);
+  eoffsetLabel = new QLabel(tr("Eoffset (m)"), this);
   eoffsetLabel->setFixedWidth(labelWidth2);
   eoffsetLineEdit = new QLineEdit();
   eoffsetLineEdit->setFixedWidth(70);
@@ -196,11 +197,11 @@ AerolabWindow::AerolabWindow(Context *context) :
   eoffsetLayout->addWidget( eoffsetSlider );
 
   QVBoxLayout *checkboxLayout = new QVBoxLayout;
-  QCheckBox *eoffsetAuto = new QCheckBox(tr("eoffset auto"), this);
+  eoffsetAuto = new QCheckBox(tr("eoffset auto"), this);
   eoffsetAuto->setCheckState(Qt::Checked);
   checkboxLayout->addWidget(eoffsetAuto);
 
-  QCheckBox *constantAlt = new QCheckBox(tr("Constant altitude (velodrome,...)"), this);
+  constantAlt = new QCheckBox(tr("Constant altitude (velodrome,...)"), this);
   checkboxLayout->addWidget(constantAlt);
 
   eoffsetLayout->addLayout(checkboxLayout);
@@ -264,7 +265,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   // Build the tab layout:
   vLayout->addWidget(aerolab);
   vLayout->addLayout(cLayout);
-  setLayout(vLayout);
+  setChartLayout(vLayout);
 
 
   // tooltip on hover over point
@@ -307,16 +308,47 @@ AerolabWindow::configChanged(qint32)
   setProperty("color", GColor(CPLOTBACKGROUND));
 
   QPalette palette;
-  palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-  palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
-  palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
+
+  palette.setColor(QPalette::Window, GColor(CPLOTBACKGROUND));
+  palette.setColor(QPalette::Background, GColor(CPLOTBACKGROUND));
+
+  // only change base if moved away from white plots
+  // which is a Mac thing
+#ifndef Q_OS_MAC
+  if (GColor(CPLOTBACKGROUND) != Qt::white)
+#endif
+  {
+      palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+      palette.setColor(QPalette::Window,  GColor(CPLOTBACKGROUND));
+  }
+
   palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
   palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-  palette.setColor(QPalette::Normal, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
   setPalette(palette);
-  setStyleSheet(QString("background-color: %1; color: %2; border: %1")
-                  .arg(GColor(CPLOTBACKGROUND).name())
-                  .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+  aerolab->setPalette(palette);
+  crrLabel->setPalette(palette);
+  cdaLabel->setPalette(palette);
+  etaLabel->setPalette(palette);
+  mLabel->setPalette(palette);
+  rhoLabel->setPalette(palette);
+  eoffsetLabel->setPalette(palette);
+  crrSlider->setPalette(palette);
+  crrLineEdit->setPalette(palette);
+  cdaSlider->setPalette(palette);
+  cdaLineEdit->setPalette(palette);
+  mSlider->setPalette(palette);
+  mLineEdit->setPalette(palette);
+  rhoSlider->setPalette(palette);
+  rhoLineEdit->setPalette(palette);
+  etaSlider->setPalette(palette);
+  etaLineEdit->setPalette(palette);
+  eoffsetLineEdit->setPalette(palette);
+  eoffsetAuto->setPalette(palette);
+  constantAlt->setPalette(palette);
+
+#ifndef Q_OS_MAC
+    aerolab->setStyleSheet(TabView::ourStyleSheet());
+#endif
 }
 
 void

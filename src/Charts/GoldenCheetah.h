@@ -223,7 +223,7 @@ private:
     Q_OBJECT
 
     QStackedLayout *_layout;
-    QGridLayout *_mainLayout;
+    QStackedLayout *_mainLayout;
     QVBoxLayout *_defaultBlankLayout;
 
     QLayout *_chartLayout,
@@ -241,6 +241,8 @@ private:
     QTimer *_unrevealTimer;
     Context *context;
 
+public:
+
     // reveal
     bool virtual hasReveal() { return false; }
     void reveal();
@@ -254,7 +256,6 @@ private:
     void serializeChartToQTextStream(QTextStream& out);
 
 
-public:
     GcChartWindow(Context *context);
 
     // parse a .gchart file / or string and return a list of charts expressed

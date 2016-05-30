@@ -912,6 +912,17 @@ MainWindow::addChart(QAction*action)
 }
 
 #ifdef GC_HAS_CLOUD_DB
+
+void
+MainWindow::exportChartToCloudDB()
+{
+    // upload the current chart selected to the chart db
+    // called from the sidebar menu
+    HomeWindow *page=currentTab->view(currentTab->currentView())->page();
+    if (page->currentStyle == 0 && page->currentChart())
+        page->currentChart()->exportChartToCloudDB();
+}
+
 void
 MainWindow::addChartFromCloudDB()
 {

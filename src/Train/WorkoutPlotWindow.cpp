@@ -21,13 +21,14 @@
 #include "Context.h"
 
 WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
-    GcWindow(context), context(context)
+    GcChartWindow(context), context(context)
 {
     setContentsMargins(0,0,0,0);
     setControls(NULL);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    QVBoxLayout *layout = new QVBoxLayout;
+    setChartLayout(layout);
     layout->setSpacing(0);
     layout->setContentsMargins(2,2,2,2);
     ergPlot = new ErgFilePlot(context);

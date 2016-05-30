@@ -27,6 +27,7 @@
 #include "cmath"
 #include "Units.h" // for MILES_PER_KM
 #include "HelpWhatsThis.h"
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <QString>
@@ -37,25 +38,29 @@
 #include <qwt_plot_marker.h>
 
 TreeMapWindow::TreeMapWindow(Context *context) :
-            GcWindow(context), context(context), active(false), dirty(true), useCustom(false), useToToday(false)
+            GcChartWindow(context), context(context), active(false), dirty(true), useCustom(false), useToToday(false)
 {
-    // the plot
-    mainLayout = new QVBoxLayout;
-    ltmPlot = new TreeMapPlot(this, context);
-    mainLayout->addWidget(ltmPlot);
-    mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
-    setLayout(mainLayout);
-
-    HelpWhatsThis *helpLTMPlot = new HelpWhatsThis(ltmPlot);
-    ltmPlot->setWhatsThis(helpLTMPlot->getWhatsThisText(HelpWhatsThis::ChartTrends_CollectionTreeMap));
-
     // the controls
     QWidget *c = new QWidget;
     HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
     c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrends_CollectionTreeMap));
     QFormLayout *cl = new QFormLayout(c);
     setControls(c);
+
+    // the plot
+    mainLayout = new QVBoxLayout;
+
+    ltmPlot = new TreeMapPlot(this, context);
+    ltmPlot->setVisible(true);
+    mainLayout->addWidget(ltmPlot);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
+    setChartLayout(mainLayout);
+
+    setIsBlank(false);
+
+    HelpWhatsThis *helpLTMPlot = new HelpWhatsThis(ltmPlot);
+    ltmPlot->setWhatsThis(helpLTMPlot->getWhatsThisText(HelpWhatsThis::ChartTrends_CollectionTreeMap));
 
     // read metadata.xml
     QString filename = context->athlete->home->config().absolutePath()+"/metadata.xml";

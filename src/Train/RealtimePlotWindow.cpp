@@ -21,7 +21,7 @@
 #include "Athlete.h"
 
 RealtimePlotWindow::RealtimePlotWindow(Context *context) :
-    GcWindow(context), context(context), active(false)
+    GcChartWindow(context), context(context), active(false)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
@@ -91,9 +91,10 @@ RealtimePlotWindow::RealtimePlotWindow(Context *context) :
     cl->addWidget(smoothSlider);
     cl->addStretch();
 
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    QVBoxLayout *layout = new QVBoxLayout;
     rtPlot = new RealtimePlot(context);
     layout->addWidget(rtPlot);
+    setChartLayout(layout);
 
     // common controls
     connect(showPower, SIGNAL(stateChanged(int)), this, SLOT(setShowPower(int)));

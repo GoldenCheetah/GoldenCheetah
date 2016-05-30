@@ -79,6 +79,7 @@ TreeMapPlot::setData(TMSettings *settings)
 
     // layout and paint
     resizeEvent(NULL);
+
     repaint();
 }
 
@@ -238,6 +239,5 @@ TreeMapPlot::eventFilter(QObject *, QEvent *e)
             }
         }
     }
-
     return false;
 }

@@ -35,7 +35,7 @@
 #include "Settings.h"
 #include "Colors.h"
 
-class SpinScanPlotWindow : public GcWindow
+class SpinScanPlotWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT

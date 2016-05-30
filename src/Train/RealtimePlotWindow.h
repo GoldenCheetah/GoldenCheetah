@@ -36,7 +36,7 @@
 #include "Units.h"
 #include "Colors.h"
 
-class RealtimePlotWindow : public GcWindow
+class RealtimePlotWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT
