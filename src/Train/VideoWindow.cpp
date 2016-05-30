@@ -27,13 +27,13 @@
 
 
 VideoWindow::VideoWindow(Context *context)  :
-    GcWindow(context), context(context), m_MediaChanged(false)
+    GcChartWindow(context), context(context), m_MediaChanged(false)
 {
     setControls(NULL);
     setProperty("color", QColor(Qt::black));
 
     QHBoxLayout *layout = new QHBoxLayout();
-    setLayout(layout);
+    setChartLayout(layout);
 
     curPosition = 1;
 

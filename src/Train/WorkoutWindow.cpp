@@ -24,7 +24,7 @@
 static int MINTOOLHEIGHT = 350; // smaller than this, lose the toolbar
 
 WorkoutWindow::WorkoutWindow(Context *context) :
-    GcWindow(context), draw(true), context(context), active(false), recording(false)
+    GcChartWindow(context), draw(true), context(context), active(false), recording(false)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
@@ -32,9 +32,10 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     setControls(NULL);
     ergFile = NULL;
 
-    QVBoxLayout *main = new QVBoxLayout(this);
+    QVBoxLayout *main = new QVBoxLayout;
     QHBoxLayout *layout = new QHBoxLayout;
     QVBoxLayout *editor = new QVBoxLayout;
+    setChartLayout(main);
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 

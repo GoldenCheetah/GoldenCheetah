@@ -39,7 +39,7 @@
 #include "RideSummaryWindow.h"
 
 
-class DiaryWindow : public GcWindow
+class DiaryWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT

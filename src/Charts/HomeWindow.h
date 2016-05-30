@@ -61,6 +61,11 @@ class HomeWindow : public GcWindow
         void setStyle(int style) { styleChanged(style); }
         int currentStyle;
 
+        int currentTab() { return currentStyle ? -1 : style->currentIndex(); }
+        GcChartWindow *currentChart() {
+            return currentTab() >= 0 ? charts[currentTab()] : NULL;
+        }
+
     public slots:
 
         // GC signals
@@ -81,7 +86,7 @@ class HomeWindow : public GcWindow
 
         // My widget signals and events
         void styleChanged(int);
-        void addChart(GcWindow* newone);
+        void addChart(GcChartWindow* newone);
         void addChartFromMenu(QAction*action); // called with an action
         void appendChart(GcWinID id); // called from Context *to inset chart
         bool removeChart(int, bool confirm = true);
@@ -113,7 +118,7 @@ class HomeWindow : public GcWindow
         Context *context;
         QString name;
         bool active; // ignore gui signals when changing views
-        GcWindow *clicked; // keep track of selected charts
+        GcChartWindow *clicked; // keep track of selected charts
         bool dropPending;
 
         // top bar
@@ -137,12 +142,12 @@ class HomeWindow : public GcWindow
         GcWindowLayout *winFlow;
 
         // the charts!
-        QList<GcWindow*> charts;
+        QList<GcChartWindow*> charts;
         int chartCursor;
 
         bool loaded;
 
-        void translateChartTitles(QList<GcWindow*> charts);
+        void translateChartTitles(QList<GcChartWindow*> charts);
 };
 
 // setup the chart
@@ -151,7 +156,7 @@ class GcWindowDialog : public QDialog
     Q_OBJECT
 
     public:
-        GcWindowDialog(GcWinID, Context *, GcWindow **, bool sidebar=false, LTMSettings *use=NULL);
+        GcWindowDialog(GcWinID, Context *, GcChartWindow **, bool sidebar=false, LTMSettings *use=NULL);
         int exec();               // return pointer to window, or NULL if cancelled
 
     public slots:
@@ -161,7 +166,7 @@ class GcWindowDialog : public QDialog
     protected:
         Context *context;
         GcWinID type;
-        GcWindow **here;
+        GcChartWindow **here;
         bool sidebar;
 
         // we remove from the layout at the end
@@ -171,7 +176,7 @@ class GcWindowDialog : public QDialog
         QFormLayout *controlLayout;
 
         QPushButton *ok, *cancel;
-        GcWindow *win;
+        GcChartWindow *win;
         QLineEdit *title;
         QDoubleSpinBox *height, *width;
 };
@@ -183,7 +188,7 @@ public:
     ViewParser(Context *context) : style(2), context(context) {}
 
     // the results!
-    QList<GcWindow*> charts;
+    QList<GcChartWindow*> charts;
     int style;
 
     // unmarshall
@@ -195,7 +200,7 @@ public:
 
 protected:
     Context *context;
-    GcWindow *chart;
+    GcChartWindow *chart;
 
 };
 

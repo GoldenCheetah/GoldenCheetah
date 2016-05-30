@@ -60,14 +60,14 @@ void RideWindow::loadRide()
 }
 
 RideWindow::RideWindow(Context *context) :
-    GcWindow(context),
+    GcChartWindow(context),
     rideLoaded(false),
     context(context)
 {
     view = new QWebView();
     QVBoxLayout *layout = new QVBoxLayout();
     layout->addWidget(view);
-    setLayout(layout);
+    setChartLayout(layout);
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 }

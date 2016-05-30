@@ -27,14 +27,15 @@
 #include "HelpWhatsThis.h"
 
 DiaryWindow::DiaryWindow(Context *context) :
-    GcWindow(context), context(context), active(false)
+    GcChartWindow(context), context(context), active(false)
 {
     setControls(NULL);
 
     // get config
     fieldDefinitions = context->athlete->rideMetadata()->getFields();
 
-    QVBoxLayout *vlayout = new QVBoxLayout(this);
+    QVBoxLayout *vlayout = new QVBoxLayout;
+    setChartLayout(vlayout);
 
     // controls
     QHBoxLayout *controls = new QHBoxLayout;

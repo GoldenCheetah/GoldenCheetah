@@ -58,7 +58,7 @@ class WWLap;
 class WWNow;
 class WWTelemetry;
 
-class WorkoutWindow : public GcWindow
+class WorkoutWindow : public GcChartWindow
 {
     Q_OBJECT
 

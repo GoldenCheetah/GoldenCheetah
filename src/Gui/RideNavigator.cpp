@@ -35,7 +35,7 @@
 #include <QStyleFactory>
 #include <QScrollBar>
 
-RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(context), active(false), _groupBy(-1)
+RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(context), context(context), active(false), _groupBy(-1)
 {
     // get column headings
     // default column layouts etc
@@ -53,7 +53,8 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
 
     init = false;
 
-    mainLayout = new QVBoxLayout(this);
+    mainLayout = new QVBoxLayout;
+    setChartLayout(mainLayout);
     mainLayout->setSpacing(0);
     if (mainwindow) mainLayout->setContentsMargins(0,0,0,0);
     else mainLayout->setContentsMargins(2,2,2,2); // so we can resize!

@@ -211,7 +211,7 @@ HomeWindow::importChart(QMap<QString,QString>properties, bool select)
     // what type?
     GcWinID type = static_cast<GcWinID>(properties.value("TYPE","1").toInt());
 
-    GcWindow *chart = GcWindowRegistry::newGcWindow(type, context);
+    GcChartWindow *chart = GcWindowRegistry::newGcWindow(type, context);
 
     // bad chart file !
     if (chart == NULL) {
@@ -421,7 +421,7 @@ void
 HomeWindow::tabMoved(int to, int from)
 {
     // re-order the tabs
-    GcWindow *orig = charts[to];
+    GcChartWindow *orig = charts[to];
     charts[to] = charts[from];
     charts[from] = orig;
 
@@ -532,7 +532,7 @@ HomeWindow::dragEnterEvent(QDragEnterEvent *)
 void
 HomeWindow::appendChart(GcWinID id)
 {
-    GcWindow *newone = NULL;
+    GcChartWindow *newone = NULL;
 
     // GcWindowDialog is delete on close, so no need to delete
     GcWindowDialog *f = new GcWindowDialog(id, context, &newone);
@@ -592,7 +592,7 @@ HomeWindow::showControls()
 }
 
 void
-HomeWindow::addChart(GcWindow* newone)
+HomeWindow::addChart(GcChartWindow* newone)
 {
     int chartnum = charts.count();
 
@@ -601,7 +601,7 @@ HomeWindow::addChart(GcWindow* newone)
     if (newone) {
 
         // add the controls
-        QWidget *x = dynamic_cast<GcWindow*>(newone)->controls();
+        QWidget *x = dynamic_cast<GcChartWindow*>(newone)->controls();
         QWidget *c = (x != NULL) ? x : new QWidget(this);
 
         // link settings button to show controls
@@ -742,8 +742,8 @@ HomeWindow::removeChart(int num, bool confirm)
         default:
             break; // never reached
     }
-    ((GcWindow*)(charts[num]))->close(); // disconnect
-    ((GcWindow*)(charts[num]))->deleteLater();
+    ((GcChartWindow*)(charts[num]))->close(); // disconnect
+    ((GcChartWindow*)(charts[num]))->deleteLater();
     charts.removeAt(num);
 
     update();
@@ -772,7 +772,7 @@ HomeWindow::showEvent(QShowEvent *)
 void
 HomeWindow::resizeEvent(QResizeEvent * /* e */)
 {
-    foreach (GcWindow *x, charts) {
+    foreach (GcChartWindow *x, charts) {
 
         switch (currentStyle) {
 
@@ -835,7 +835,7 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
         if (tabbed->currentIndex() >= charts.count()) return false;
 
         QPoint pos = tabbed->widget(tabbed->currentIndex())->mapFromGlobal(QCursor::pos());
-        GcWindow *us = charts[tabbed->currentIndex()];
+        GcChartWindow *us = charts[tabbed->currentIndex()];
 
         // lots of nested if statements to breakout as quickly as possible
         // this code gets called A LOT, since mouse events are from the 
@@ -1043,11 +1043,11 @@ HomeWindow::windowMoved(GcWindow*w)
                 if (chartCursor >= 0) {
                     controlStack->insertWidget(chartCursor, c);
                     winFlow->insert(chartCursor, m);
-                    charts.insert(chartCursor, dynamic_cast<GcWindow*>(l));
+                    charts.insert(chartCursor, dynamic_cast<GcChartWindow*>(l));
                 } else {
                     controlStack->addWidget(c);
                     winFlow->addWidget(m);
-                    charts.append(dynamic_cast<GcWindow*>(l));
+                    charts.append(dynamic_cast<GcChartWindow*>(l));
                 }
                 break;
             }
@@ -1125,7 +1125,7 @@ HomeWindow::drawCursor()
     }
 }
 
-GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcWindow **here, bool sidebar, LTMSettings *use) : context(context), type(type), here(here), sidebar(sidebar)
+GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **here, bool sidebar, LTMSettings *use) : context(context), type(type), here(here), sidebar(sidebar)
 {
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags());
@@ -1250,7 +1250,7 @@ HomeWindow::saveState()
     out<<"<layout name=\""<< name <<"\" style=\"" << currentStyle <<"\">\n";
 
     // iterate over charts
-    foreach (GcWindow *chart, charts) {
+    foreach (GcChartWindow *chart, charts) {
         GcWinID type = chart->property("type").value<GcWinID>();
 
         out<<"\t<chart id=\""<<static_cast<int>(type)<<"\" "
@@ -1403,7 +1403,7 @@ HomeWindow::restoreState(bool useDefault)
 
         // layout the results
         styleChanged(handler.style);
-        foreach(GcWindow *chart, handler.charts) addChart(chart);
+        foreach(GcChartWindow *chart, handler.charts) addChart(chart);
     }
 
     // set to whatever we have selected
@@ -1507,10 +1507,11 @@ bool ViewParser::endDocument()
 
 void HomeWindow::closeWindow(GcWindow*thisone)
 {
-    if (charts.contains(thisone)) removeChart(charts.indexOf(thisone));
+    if (charts.contains(static_cast<GcChartWindow*>(thisone)))
+        removeChart(charts.indexOf(static_cast<GcChartWindow*>(thisone)));
 }
 
-void HomeWindow::translateChartTitles(QList<GcWindow*> charts)
+void HomeWindow::translateChartTitles(QList<GcChartWindow*> charts)
 {
     // Map default (english) title to external (Localized) name, new default
     // charts in *layout.xml need to be added to this list to be translated
@@ -1554,7 +1555,7 @@ void HomeWindow::translateChartTitles(QList<GcWindow*> charts)
     titleMap.insert("Library", tr("Library"));
     titleMap.insert("CV", tr("CV"));
 
-    foreach(GcWindow *chart, charts) {
+    foreach(GcChartWindow *chart, charts) {
         QString chartTitle = chart->property("title").toString();
         chart->setProperty("title", titleMap.value(chartTitle, chartTitle));
     }

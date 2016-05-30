@@ -78,6 +78,7 @@ Q_DECLARE_METATYPE(GcWinID)
 #define VIEW_HOME     0x08
 #define VIEW_INTERVAL 0x16
 
+class GcChartWindow;
 class GcWindowRegistry {
     Q_DECLARE_TR_FUNCTIONS(GcWindowRegistry)
     public:
@@ -87,7 +88,7 @@ class GcWindowRegistry {
     GcWinID id;
 
     static void initialize(); // initialize global registry
-    static GcWindow *newGcWindow(GcWinID id, Context *context);
+    static GcChartWindow *newGcWindow(GcWinID id, Context *context);
     static QStringList windowsForType(int type);
     static QList<GcWinID> idsForType(int type);
     static QString title(GcWinID id);

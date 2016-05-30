@@ -323,7 +323,7 @@ public:
     }
 };
 
-class RideWindow : public GcWindow
+class RideWindow : public GcChartWindow
 {
     Q_OBJECT
 

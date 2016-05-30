@@ -56,7 +56,7 @@ class EditUserMetricDialog;
 // a QSQLTableModel which reads from the "metrics" table
 // via the DBAccess database connection
 //
-class RideNavigator : public GcWindow
+class RideNavigator : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT

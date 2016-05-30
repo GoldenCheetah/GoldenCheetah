@@ -27,7 +27,7 @@
 
 class Context;
 
-class SummaryWindow : public GcWindow
+class SummaryWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT

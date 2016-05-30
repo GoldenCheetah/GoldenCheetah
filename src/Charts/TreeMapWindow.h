@@ -44,7 +44,7 @@ class TMSettings
 };
 
 class TreeMapPlot;
-class TreeMapWindow : public GcWindow
+class TreeMapWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT

@@ -33,7 +33,7 @@ class QLCDNumber;
 class RideItem;
 class IntervalItem;
 
-class AerolabWindow : public GcWindow {
+class AerolabWindow : public GcChartWindow {
   Q_OBJECT
   G_OBJECT
 
@@ -76,6 +76,16 @@ class AerolabWindow : public GcWindow {
   Context *context;
   Aerolab *aerolab;
   QwtPlotZoomer *allZoomer;
+
+  // labels
+  QLabel *crrLabel;
+  QLabel *cdaLabel;
+  QLabel *etaLabel;
+  QLabel *mLabel;
+  QLabel *rhoLabel;
+  QLabel *eoffsetLabel;
+
+  QCheckBox *eoffsetAuto, *constantAlt;
 
   // Bike parameter controls:
   QSlider *crrSlider;

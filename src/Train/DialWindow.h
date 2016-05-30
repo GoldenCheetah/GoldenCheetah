@@ -36,7 +36,7 @@
 #include "Units.h" // for realtimedata structure
 #include "Colors.h" // for realtimedata structure
 
-class DialWindow : public GcWindow
+class DialWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT

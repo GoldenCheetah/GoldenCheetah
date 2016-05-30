@@ -22,7 +22,7 @@
 #include "Context.h"
 
 DialWindow::DialWindow(Context *context) :
-    GcWindow(context), context(context), average(1), isNewLap(false)
+    GcChartWindow(context), context(context), average(1), isNewLap(false)
 {
     rolling.resize(150); // enough for 30 seconds at 5hz
 
@@ -70,12 +70,13 @@ DialWindow::DialWindow(Context *context) :
     controlsLayout->addRow(averageLabel, averageLayout);
 
     // display label...
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(3,3,3,3);
     valueLabel = new QLabel(this);
     valueLabel->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     layout->addWidget(valueLabel);
+    setChartLayout(layout);
 
     // get updates..
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));

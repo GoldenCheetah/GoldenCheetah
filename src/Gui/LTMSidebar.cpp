@@ -1588,7 +1588,7 @@ LTMSidebar::presetMoved(QTreeWidgetItem *, int, int)
 void
 LTMSidebar::addPreset()
 {
-    GcWindow *newone = NULL;
+    GcChartWindow *newone = NULL;
 
     // GcWindowDialog is delete on close, so no need to delete
     GcWindowDialog *f = new GcWindowDialog(GcWindowTypes::LTM, context, &newone, true);
@@ -1617,7 +1617,7 @@ LTMSidebar::addPreset()
 void
 LTMSidebar::editPreset()
 {
-    GcWindow *newone = NULL;
+    GcChartWindow *newone = NULL;
 
     int index = allCharts->indexOfChild(chartTree->selectedItems()[0]);
 

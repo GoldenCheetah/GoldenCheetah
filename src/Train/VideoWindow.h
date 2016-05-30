@@ -154,7 +154,7 @@ class MediaHelper
 #endif
 };
 
-class VideoWindow : public GcWindow
+class VideoWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT
