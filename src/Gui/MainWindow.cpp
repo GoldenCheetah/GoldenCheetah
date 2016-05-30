@@ -668,6 +668,11 @@ MainWindow::MainWindow(const QDir &home)
 #endif
     viewMenu->addSeparator();
     subChartMenu = viewMenu->addMenu(tr("Add Chart"));
+#ifdef GC_HAS_CLOUD_DB
+    viewMenu->addAction(tr("Upload Chart..."), this, SLOT(exportChartToCloudDB()));
+    viewMenu->addAction(tr("Download Chart..."), this, SLOT(addChartFromCloudDB()));
+    viewMenu->addSeparator();
+#endif
     viewMenu->addAction(tr("Reset Layout"), this, SLOT(resetWindowLayout()));
     styleAction = viewMenu->addAction(tr("Tabbed not Tiled"), this, SLOT(toggleStyle()));
     styleAction->setCheckable(true);
