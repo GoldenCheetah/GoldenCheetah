@@ -421,7 +421,7 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    g_networkrequestactive = false; // don't allow Dialog to close while we are retrieving data
 
    showing = new QLabel;
-   showingTextTemplate = tr("Showing %1 to %2 of %3 charts / Total on CloudDB %4");
+   showingTextTemplate = tr("Showing %1 to %2 of %3 charts / Total uploaded %4");
    resetToStart = new QPushButton(tr("First"));
    nextSet = new QPushButton(tr("Next %1").arg(QString::number(const_stepSize)));
    prevSet = new QPushButton(tr("Prev %1").arg(QString::number(const_stepSize)));
@@ -503,8 +503,8 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    connect(tableWidget, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(cellDoubleClicked(int,int)));
 
    // UserGet Role
-   addAndCloseUserGetButton = new QPushButton(tr("Import selected charts"));
-   closeUserGetButton = new QPushButton(tr("Close without import"));
+   addAndCloseUserGetButton = new QPushButton(tr("Download selected chart(s)"));
+   closeUserGetButton = new QPushButton(tr("Close"));
 
    addAndCloseUserGetButton->setEnabled(true);
    closeUserGetButton->setEnabled(true);
@@ -514,8 +514,8 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    connect(closeUserGetButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
 
    buttonUserGetLayout = new QHBoxLayout;
-   buttonUserGetLayout->addWidget(addAndCloseUserGetButton);
    buttonUserGetLayout->addStretch();
+   buttonUserGetLayout->addWidget(addAndCloseUserGetButton);
    buttonUserGetLayout->addWidget(closeUserGetButton);
 
    // UserEdit Role
@@ -528,9 +528,9 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    connect(closeUserEditButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
 
    buttonUserEditLayout = new QHBoxLayout;
+   buttonUserEditLayout->addStretch();
    buttonUserEditLayout->addWidget(deleteUserEditButton);
    buttonUserEditLayout->addWidget(editUserEditButton);
-   buttonUserEditLayout->addStretch();
    buttonUserEditLayout->addWidget(closeUserEditButton);
 
    // CuratorEdit Role
@@ -545,10 +545,10 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    connect(closeCuratorButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
 
    buttonCuratorEditLayout = new QHBoxLayout;
+   buttonCuratorEditLayout->addStretch();
    buttonCuratorEditLayout->addWidget(curateCuratorEditButton);
    buttonCuratorEditLayout->addWidget(editCuratorEditButton);
    buttonCuratorEditLayout->addWidget(deleteCuratorEditButton);
-   buttonCuratorEditLayout->addStretch();
    buttonCuratorEditLayout->addWidget(closeCuratorButton);
 
    // prepare the main layouts - with different buttons layouts
@@ -606,7 +606,7 @@ CloudDBChartListDialog::prepareData(QString athlete, CloudDBCommon::UserRole rol
         tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
         tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     } else {
-        setWindowTitle(tr("Select a Chart"));
+        setWindowTitle(tr("Select charts to download"));
         tableWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
         tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     }
@@ -884,6 +884,9 @@ CloudDBChartListDialog::deleteUserEdit(){
 
     if (tableWidget->selectedItems().size()>0)
     {
+        // chart selected for deletion - but ask again to be sure
+        if (QMessageBox::question(0, tr("Chart Maintenance"), QString(tr("Do you really want to delete this chart definition ?"))) != QMessageBox::Yes) return;
+
         // the selectionMode allows only 1 item to be selected at a time
         QTableWidgetItem* s = tableWidget->selectedItems().at(0);
         if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
@@ -1141,7 +1144,7 @@ CloudDBChartShowPictureDialog::CloudDBChartShowPictureDialog(QByteArray imageDat
     int h = (qreal)size.width()*w/size.height();
     imageLabel->setPixmap(chartImage.scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-    okButton = new QPushButton(tr("Ok"));
+    okButton = new QPushButton(tr("Close"));
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
     buttonLayout->addWidget(okButton);
@@ -1227,7 +1230,7 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
 
    QLabel *nickLabel = new QLabel(tr("Nickname"));
    nickName = new QLineEdit();
-   nickName->setMaxLength(50); // reasonable for displayo
+   nickName->setMaxLength(50); // reasonable for display
    if (update) {
        nickName->setText(data.CreatorNick);
    } else {
@@ -1300,7 +1303,7 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
    image = new QLabel();
    image->setPixmap(chartImage->scaled(chartImageWidth*2, chartImageHeight*2, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-   publishButton = new QPushButton(tr("Publish"), this);
+   publishButton = new QPushButton(tr("Upload"), this);
    cancelButton = new QPushButton(tr("Cancel"), this);
 
    publishButton->setEnabled(true);
@@ -1309,9 +1312,9 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 
    QHBoxLayout *buttonLayout = new QHBoxLayout;
-   buttonLayout->addWidget(cancelButton);
    buttonLayout->addStretch();
    buttonLayout->addWidget(publishButton);
+   buttonLayout->addWidget(cancelButton);
 
    QVBoxLayout *mainLayout = new QVBoxLayout(this);
    mainLayout->addLayout(detailsLayout);
@@ -1333,25 +1336,25 @@ CloudDBChartObjectDialog::publishClicked() {
     // check data consistency
 
     if (name->text().isEmpty() || name->text() == nameDefault || !nameOk) {
-        QMessageBox::warning(0, tr("Export Chart to ClouDB"), QString(tr("Please enter a valid chart name!")));
+        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a valid chart name with min. 5 characters length.")));
         return;
     }
 
     if (nickName->text().isEmpty() || !nickNameOk) {
-        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a nickname!")));
+        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a nickname.")));
         return;
     }
     if (email->text().isEmpty() || !emailOk) {
-        QMessageBox::warning(0, tr("Export Chart to ClouDB"), QString(tr("Please enter a valid e-mail address!")));
+        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a valid e-mail address.")));
         return;
     }
 
     if (description->toPlainText().isEmpty() || description->toPlainText() == descriptionDefault) {
-        QMessageBox::warning(0, tr("Export Chart to ClouDB"), QString(tr("Please enter a sensible chart description!")));
+        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a sensible chart description.")));
         return;
     }
 
-    if (QMessageBox::question(0, tr("CloudDB"), QString(tr("Do you want to publish this chart definition to CloudDB"))) != QMessageBox::Yes) return;
+    if (QMessageBox::question(0, tr("Cloud Upload"), QString(tr("Do you want to upload this chart definition ?"))) != QMessageBox::Yes) return;
 
     data.Header.Name = name->text();
     data.Header.Description = description->toPlainText();
@@ -1377,7 +1380,7 @@ void
 CloudDBChartObjectDialog::nickNameTextChanged(QString text)  {
 
     if (text.isEmpty()) {
-        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a nickname!")));
+        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a nickname.")));
     } else {
         nickNameOk = false;
     }
@@ -1393,7 +1396,7 @@ void
 CloudDBChartObjectDialog::emailTextChanged(QString text)  {
 
     if (text.isEmpty()) {
-        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a valid e-mail address!")));
+        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a valid e-mail address.")));
     } else {
         emailOk = false;
     }
@@ -1409,7 +1412,7 @@ void
 CloudDBChartObjectDialog::nameTextChanged(QString text)  {
 
     if (text.isEmpty()) {
-        QMessageBox::warning(0, tr("Export Chart to CloudDB"), QString(tr("Please enter a chart name!")));
+        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a valid chart name with min. 5 characters length.")));
     } else {
         nameOk = false;
     }
