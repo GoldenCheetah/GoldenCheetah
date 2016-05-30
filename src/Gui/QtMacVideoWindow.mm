@@ -35,14 +35,14 @@ static inline NSString *darwinQStringToNSString (const QString &aString)
 }
 
 VideoWindow::VideoWindow(Context *context)  :
-GcWindow(context), context(context), hasMovie(false)
+GcChartWindow(context), context(context), hasMovie(false)
 {
 
     setControls(NULL);
     setProperty("color", QColor(Qt::black));
 
     QHBoxLayout *layout = new QHBoxLayout();
-    setLayout(layout);
+    setChartLayout(layout);
 
     movie = NULL; // no movie allocated at present
     player = new QtMacMovieView(this);
