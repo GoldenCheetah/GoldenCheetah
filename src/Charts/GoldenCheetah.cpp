@@ -818,21 +818,21 @@ GcChartWindow::setControls(QWidget *x)
     GcWindow::setControls(x);
 
     menu->clear();
-    if (x != NULL) {
-        menu->addAction(tr("Chart Settings..."), this, SIGNAL(showControls()));
-        menu->addSeparator();
+    // if x == NULL only edit the name
+    menu->addAction(tr("Chart Settings..."), this, SIGNAL(showControls()));
+    menu->addSeparator();
 
-        // add any other actions
-        if (actions.count()) {
-            if (actions.count() > 1) menu->addSeparator();
+    // add any other actions
+    if (actions.count()) {
+        if (actions.count() > 1) menu->addSeparator();
 
-            foreach(QAction *act, actions) {
-                menu->addAction(act->text(), act, SIGNAL(triggered()));
-            }
-
-            if (actions.count() > 1) menu->addSeparator();
+        foreach(QAction *act, actions) {
+            menu->addAction(act->text(), act, SIGNAL(triggered()));
         }
+
+        if (actions.count() > 1) menu->addSeparator();
     }
+
     menu->addAction(tr("Export Chart ..."), this, SLOT(saveChart()));
     menu->addAction(tr("Export Chart Image..."), this, SLOT(saveImage()));
 #ifdef GC_HAS_CLOUD_DB
