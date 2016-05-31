@@ -430,13 +430,13 @@ Routes::createRouteFromInterval(IntervalItem *activeInterval)
             if (lastLat != 0 && lastLon != 0 &&
                 point->lat != 0 && point->lon != 0 &&
                 ceil(point->lat) != 180 && ceil(point->lon) != 180) {
-                // distance ith last point
+                // distance with last point
                 double _dist = route->distance(lastLat, lastLon, point->lat, point->lon);
 
                 if (_dist>=0.001)
                     dist += _dist;
 
-                if (dist>0.02) {
+                if (route->getPoints().count() == 0 || dist>0.02) {
                    RoutePoint _point = RoutePoint(point->lon, point->lat);
                    route->addPoint(_point);
                    dist = 0;
@@ -444,6 +444,11 @@ Routes::createRouteFromInterval(IntervalItem *activeInterval)
             }
             lastLat = point->lat;
             lastLon = point->lon;
+        } else if (point->secs == activeInterval->stop) {
+            if (point->lat != 0 && point->lon != 0) {
+                RoutePoint _point = RoutePoint(point->lon, point->lat);
+                route->addPoint(_point);
+            }
         }
     }
 
