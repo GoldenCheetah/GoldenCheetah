@@ -123,7 +123,7 @@ ModelWindow::ModelWindow(Context *context) :
     binWidthSlider = new QSlider(Qt::Horizontal);
     binWidthSlider->setTickPosition(QSlider::TicksBelow);
     binWidthSlider->setTickInterval(1);
-    binWidthSlider->setMinimum(3);
+    binWidthSlider->setMinimum(1);
     binWidthSlider->setMaximum(100);
     binWidthSlider->setValue(5);
     cl->addRow(binWidthSlider);
