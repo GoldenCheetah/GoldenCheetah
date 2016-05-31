@@ -341,14 +341,20 @@ struct Bin2FileReaderState
                 read_bytes(2, bytes_read, sum);
                 read_bytes(2, bytes_read, sum);
                 QString device_type_str;
-                if (device_type == 11)
-                    device_type_str = "Primary Power Id";
-                else if (device_type == 8)
+
+                if (device_type == 8) // No 8 in FIT specification
                     device_type_str = "Power Id";
-                else if (device_type == 123)
-                    device_type_str = "Speed Id";
+                else if (device_type == 11)
+                    device_type_str = "Primary Power Id";
                 else if (device_type == 120)
                     device_type_str = "Chest strap Id";
+                else if (device_type == 121)
+                    device_type_str = "Speed/Cadence Id";
+                else if (device_type == 122)
+                    device_type_str = "Cadence Id";
+                else if (device_type == 123)
+                    device_type_str = "Speed Id";
+
                 else
                     device_type_str = QString("ANT %1 Id").arg(device_type);
 
