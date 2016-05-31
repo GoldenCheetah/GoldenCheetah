@@ -73,9 +73,11 @@ class ModelDataColor : public Color
             } if (iszones == true) { // zone 0 is set to zone 1 to distinguish from no value
                 cHSV = zonecolor.value(val-1, QColor(0,0,0));
             } else if (val) {
-                int red = (double)255 * (double)((val-min)/(max-min));
-                if (red < 0 || red > 255) red = 127;
-                cHSV.setHsv(red, 255, 255);
+                if (max <= min) return RGBA(255,255,255,0); // see thru
+                if (val < min) val = min;
+                if (val > max) val = max;
+                int hue = (double)255 - (double)255 * (double)((val-min)/(max-min));
+                cHSV.setHsv(hue, 255, 255);
             }
             cRGB = cHSV.convertTo(QColor::Rgb);
             colour.r = (double) cRGB.red()/(double)255;
@@ -112,14 +114,15 @@ class ModelDataColor : public Color
                     vec.insert(it, 1, colour);
                 }
             } else {
+                if (max <= min) return vec;
+
                 double val;
                 int i;
                 // just add 100 colors graded from min to max
-                for (i=0, val=min; i<100; i++, val += ((max-min)/100)) {
+                for (i=0, val=min; i<100 && val<=max; i++, val += ((max-min)/100)) {
 
-                    int red = (double)255 * (double)((val-min)/(max-min));
-                    if (red < 0 || red > 255) red = 127;
-                    cHSV.setHsv(red, 255, 255);
+                    int hue = (double)255 - (double)255 * (double)((val-min)/(max-min));
+                    cHSV.setHsv(hue, 255, 255);
                     cRGB = cHSV.convertTo(QColor::Rgb);
                     colour.r = (double) cRGB.red()/(double)255;
                     colour.g = (double) cRGB.green()/(double)255;
