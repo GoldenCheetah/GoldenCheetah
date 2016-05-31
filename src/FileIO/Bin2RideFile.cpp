@@ -343,6 +343,10 @@ struct Bin2FileReaderState
                 QString device_type_str;
                 if (device_type == 11)
                     device_type_str = "Primary Power Id";
+                else if (device_type == 8)
+                    device_type_str = "Power Id";
+                else if (device_type == 123)
+                    device_type_str = "Speed Id";
                 else if (device_type == 120)
                     device_type_str = "Chest strap Id";
                 else
