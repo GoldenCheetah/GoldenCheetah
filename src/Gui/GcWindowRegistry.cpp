@@ -224,10 +224,10 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::MapWindow: returning = new MapWindow(context); break;
     case GcWindowTypes::StreetViewWindow: returning = new StreetViewWindow(context); break;
 #endif
-    case GcWindowTypes::GoogleMap: returning = new GoogleMapControl(context); break;
-    case GcWindowTypes::BingMap: returning = new BingMap(context); break; 
-    //case GcWindowTypes::GoogleMap: returning = new RideMapWindow(context, RideMapWindow::GOOGLE); break; // new GoogleMapControl(context);
-    //case GcWindowTypes::BingMap: returning = new RideMapWindow(context, RideMapWindow::BING); break; //returning = new BingMap(context);
+    //case GcWindowTypes::GoogleMap: returning = new GoogleMapControl(context); break;
+    //case GcWindowTypes::BingMap: returning = new BingMap(context); break;
+    case GcWindowTypes::GoogleMap: id=GcWindowTypes::RideMapWindow; returning = new RideMapWindow(context, RideMapWindow::GOOGLE); break; // new GoogleMapControl(context);
+    case GcWindowTypes::BingMap: id=GcWindowTypes::RideMapWindow; returning = new RideMapWindow(context, RideMapWindow::BING); break; //returning = new BingMap(context);
     case GcWindowTypes::RideMapWindow: returning = new RideMapWindow(context, RideMapWindow::BING); break;
 
     case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(context); break;
