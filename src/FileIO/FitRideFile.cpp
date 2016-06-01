@@ -666,6 +666,7 @@ struct FitFileReaderState
             time = last_time;
         int i = 0;
         time_t this_start_time = 0;
+        double total_distance = 0.0;
         if (FIT_DEBUG)  {
             printf( " FIT decode lap \n");
         }
@@ -688,6 +689,9 @@ struct FitFileReaderState
                 case 2:
                     this_start_time = value.v + qbase_time.toTime_t();
                     break;
+                case 9:
+                    total_distance = value.v / 100000.0;
+                    break;
 
                 // other data (ignored at present):
                 case 254: // lap nbr
@@ -697,7 +701,6 @@ struct FitFileReaderState
                 case 6: // end_position_lon
                 case 7: // total_elapsed_time = value.v / 1000.0;
                 case 8: // total_timer_time
-                case 9: // total_distance = value.v / 100000.0;
                 case 10: // total_cycles
                 case 11: // total calories
                 case 12: // total fat calories
@@ -730,7 +733,7 @@ struct FitFileReaderState
             // Fill empty laps due to false starts or pauses in some devices
             // s.t. Garmin 910xt
             double secs = time - start_time;
-            if ((secs > last_time + 1) &&
+            if ((total_distance == 0.0) && (secs > last_time + 1) &&
                 (isGarminSmartRecording.toInt() != 0) &&
                 (secs - last_time < 100*GarminHWM.toInt())) {
                 double deltaSecs = secs - last_time;
