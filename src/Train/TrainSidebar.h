@@ -237,6 +237,7 @@ class TrainSidebar : public GcWindow
         // Device->getRealtimeData() - from a pull device (Computrainer)
         double displayPower, displayHeartRate, displayCadence, displaySpeed;
         double displayLRBalance, displayLTE, displayRTE, displayLPS, displayRPS;
+        double displaySMO2, displayTHB, displayO2HB, displayHHB;
         double displayDistance, displayWorkoutDistance;
         long load;
         double slope;

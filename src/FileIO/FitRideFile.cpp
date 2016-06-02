@@ -31,7 +31,8 @@
 #include <limits>
 #include <cmath>
 
-#define FIT_DEBUG     false // debug traces
+#define FIT_DEBUG     true // debug traces
+#define LAPSWIM_DEBUG false
 
 #ifndef MATHCONST_PI
 #define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
@@ -666,6 +667,7 @@ struct FitFileReaderState
             time = last_time;
         int i = 0;
         time_t this_start_time = 0;
+        double total_elapsed_time = 0.0;
         double total_distance = 0.0;
         if (FIT_DEBUG)  {
             printf( " FIT decode lap \n");
@@ -689,6 +691,9 @@ struct FitFileReaderState
                 case 2:
                     this_start_time = value.v + qbase_time.toTime_t();
                     break;
+                case 7:
+                    total_elapsed_time = value.v / 1000.0;
+                    break;
                 case 9:
                     total_distance = value.v / 100000.0;
                     break;
@@ -699,7 +704,6 @@ struct FitFileReaderState
                 case 4: // start_position_lon
                 case 5: // end_position_lat
                 case 6: // end_position_lon
-                case 7: // total_elapsed_time = value.v / 1000.0;
                 case 8: // total_timer_time
                 case 10: // total_cycles
                 case 11: // total calories
@@ -720,6 +724,8 @@ struct FitFileReaderState
                 default: ; // ignore it
             }
         }
+        // don't count pauses for lap swimming
+        if (!isLapSwim || total_distance > 0) ++interval;
         if (this_start_time == 0 || this_start_time-start_time < 0) {
             //errors << QString("lap %1 has invalid start time").arg(interval);
             this_start_time = start_time; // time was corrected after lap start
@@ -729,38 +735,21 @@ struct FitFileReaderState
                 return;
             }
         }
-        if (isLapSwim) {
-            // Fill empty laps due to false starts or pauses in some devices
-            // s.t. Garmin 910xt
-            double secs = time - start_time;
-            if ((total_distance == 0.0) && (secs > last_time + 1) &&
-                (isGarminSmartRecording.toInt() != 0) &&
-                (secs - last_time < 100*GarminHWM.toInt())) {
-                double deltaSecs = secs - last_time;
-                for (int i = 1; i <= deltaSecs; i++) {
-                    rideFile->appendPoint(
-                        last_time+i, 0.0, 0.0,
-                        last_distance,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, RideFile::NA, RideFile::NA,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
-                }
-                last_time += deltaSecs;
+        if (rideFile->dataPoints().count()) { // no samples means no laps..
+            if (isLapSwim && total_elapsed_time > 0.0) {
+                if (last_lap_end == 0.0)
+                    last_lap_end = this_start_time - start_time - 1;
+                if (LAPSWIM_DEBUG) qDebug() << (total_distance > 0 ? "Lap" : "Rest") << interval << this_start_time - start_time << time - this_start_time << "+" << last_lap_end << total_elapsed_time << total_distance;
+                if (total_distance > 0) // skip pauses to avoid cluttering
+                    rideFile->addInterval(RideFileInterval::DEVICE,
+                                      round(last_lap_end),
+                                      last_lap_end + total_elapsed_time,
+                                      QObject::tr("Lap %1").arg(interval));
+                last_lap_end += total_elapsed_time;
+            } else {
+                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time,
+                                      QObject::tr("Lap %1").arg(interval));
             }
-            ++interval;
-        } else if (rideFile->dataPoints().count()) { // no samples means no laps
-            ++interval;
-            rideFile->addInterval(RideFileInterval::DEVICE,
-                                  this_start_time - start_time,
-                                  time - start_time,
-                                  QObject::tr("Lap %1").arg(interval));
         }
     }
 
@@ -1088,7 +1077,7 @@ struct FitFileReaderState
                 start_time = 0;
                 last_time = 0;
                 last_distance = 0.00f;
-                interval = 1;
+                interval = 0;
                 QString deviceType = rideFile->deviceType();
                 delete rideFile;
                 rideFile = new RideFile;
@@ -1169,8 +1158,16 @@ struct FitFileReaderState
             QDateTime t;
             t.setTime_t(start_time);
             rideFile->setStartTime(t);
-            interval = 1;
+            rideFile->appendPoint(0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                  0, 0, 0, RideFile::NA,
+                                  0, 0, 0, 0, 0,
+                                  0, 0,
+                                  0, 0, 0, 0,
+                                  0, 0, 0, 0,
+                                  0, 0, 0, 0, 0, 0.0, 0);
         }
+
+        double secs = time - start_time;
 
         // Normalize distance for the most common pool lengths,
         // this is a hack to avoid the need for a double pass when
@@ -1191,6 +1188,29 @@ struct FitFileReaderState
         length_duration += frac_time;
         frac_time = modf(length_duration, &length_duration);
 
+        // No rest lengths for Garmin F910XT, add pause time
+        if ((rideFile->deviceType() == "Garmin FR910XT") &&
+            (secs > last_time + 1) && (isGarminSmartRecording.toInt() != 0) && (secs - last_time < 100*GarminHWM.toInt())) {
+            double deltaSecs = secs - last_time;
+            if (LAPSWIM_DEBUG) qDebug() << "Pause" << last_time+1 << deltaSecs;
+            for (int i = 1; i <= deltaSecs; i++) {
+                rideFile->appendPoint(
+                    last_time+i, 0.0, 0.0,
+                    last_distance,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, RideFile::NA, RideFile::NA,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
+            }
+            last_time += deltaSecs;
+        }
+
         // only fill 100x the maximal smart recording gap defined
         // in preferences - we don't want to crash / stall on bad
         // or corrupt files
@@ -1198,6 +1218,7 @@ struct FitFileReaderState
             double deltaSecs = length_duration;
             double deltaDist = km - last_distance;
             kph = 3600.0 * deltaDist / deltaSecs;
+            if (LAPSWIM_DEBUG) qDebug() << "Length" << last_time+1 << deltaSecs << deltaDist << "type" << length_type;
             for (int i = 1; i <= deltaSecs; i++) {
                 rideFile->appendPoint(
                     last_time + i, cad, 0.0,
@@ -1211,7 +1232,7 @@ struct FitFileReaderState
                     0.0, 0.0,0.0, 0.0,
                     0.0, 0.0,
                     0.0, 0.0, 0.0, 0.0,
-                    interval);
+                    0);
             }
             last_time += deltaSecs;
             last_distance += deltaDist;
@@ -1419,6 +1440,8 @@ struct FitFileReaderState
             }
         }
 
+        if (LAPSWIM_DEBUG) qDebug() << "Lap" << interval << this_start_time - start_time << total_elapsed_time
+                                    << time - this_start_time << total_distance;
         if (this_start_time == 0 || this_start_time-start_time < 0) {
             //errors << QString("lap %1 has invalid start time").arg(interval);
             this_start_time = start_time; // time was corrected after lap start
@@ -1596,7 +1619,7 @@ struct FitFileReaderState
                     decodeRecord(def, time_offset, values);
                     break;
                 case 21: decodeEvent(def, time_offset, values); break;
-                case 23: //decodeDeviceInfo(def, time_offset, values); /* device info */
+                case 23: decodeDeviceInfo(def, time_offset, values); /* device info */
                     break;
                 case 101:
                     decodeLength(def, time_offset, values);
