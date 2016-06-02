@@ -344,6 +344,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     load_msecs = total_msecs = lap_msecs = 0;
     displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
     displaySpeed = displayCadence = slope = load = 0;
+    displaySMO2 = displayTHB = displayO2HB = displayHHB = 0;
     displayLRBalance = displayLTE = displayRTE = displayLPS = displayRPS = 0;
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
@@ -1325,6 +1326,10 @@ void TrainSidebar::updateData(RealtimeData &rtData)
     displayRTE = rtData.getRTE();
     displayLPS = rtData.getLPS();
     displayRPS = rtData.getRPS();
+    displaySMO2 = rtData.getSmO2();
+    displayTHB  = rtData.gettHb();
+    displayO2HB = rtData.getO2Hb();
+    displayHHB = rtData.getHHb();
     // Gradient not supported
     return;
 }
@@ -1519,6 +1524,10 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displayRTE = rtData.getRTE();
             displayLPS = rtData.getLPS();
             displayRPS = rtData.getRPS();
+            displaySMO2 = rtData.getSmO2();
+            displayTHB = rtData.gettHb();
+            displayO2HB = rtData.getO2Hb();
+            displayHHB = rtData.getHHb();
 
             // virtual speed
             double crr = 0.004f; // typical for asphalt surfaces
@@ -1653,10 +1662,10 @@ void TrainSidebar::diskUpdate()
                         << "," << displayRTE
                         << "," << displayLPS
                         << "," << displayRPS
-                        << "," // smo2
-                        << "," // thb
-                        << "," // o2hb
-                        << "," // hhb\n
+                        << "," << displaySMO2
+                        << "," << displayTHB
+                        << "," << displayO2HB
+                        << "," << displayHHB
 
                         << "," << "\n";
 }
