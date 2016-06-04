@@ -73,6 +73,7 @@
 // 3940 - V4.0 DEVELOPMENT STARTS
 // 3941 - V4.0 DEV BUILD 1604
 // 3942 - V4.0 DEV BUILD 1605
+// 3943 - V4.0 DEV BUILD 1606
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -86,11 +87,11 @@
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
-// these three will change until we release
-#define VERSION_LATEST 3942
-#define VERSION_STRING "V4.0 DEV1605"
+// the next two will with each build/release
+#define VERSION_LATEST 3943
+#define VERSION_STRING "V4.0 DEV1606"
 
-// default config for this release is available and maintained here:
+// default config for this release cycle
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/4.0"
 
 class GcUpgradeLogDialog : public QDialog
