@@ -421,7 +421,7 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    g_networkrequestactive = false; // don't allow Dialog to close while we are retrieving data
 
    showing = new QLabel;
-   showingTextTemplate = tr("Showing %1 to %2 of %3 charts / Total uploaded %4");
+   showingTextTemplate = tr("Showing %1 to %2 of %3 charts for %4 / Total uploaded %5");
    resetToStart = new QPushButton(tr("First"));
    nextSet = new QPushButton(tr("Next %1").arg(QString::number(const_stepSize)));
    prevSet = new QPushButton(tr("Prev %1").arg(QString::number(const_stepSize)));
@@ -677,10 +677,19 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
 
     int chartCount = (g_currentHeaderList->size() == 0) ? 0 : g_currentIndex+1;
     int lastIndex = (g_currentIndex+const_stepSize > g_currentHeaderList->size()) ? g_currentHeaderList->size() : g_currentIndex+const_stepSize;
+
+    QString view = tr("unknown");
+    switch(g_chartView) {
+        case 0 : view = tr("Trends"); break;
+        case 1 : view = tr("Activities"); break;
+        case 2 : view = tr("Diary"); break;
+        case 3 : view = tr("Train"); break;
+    }
     showing->setText(QString(showingTextTemplate)
                      .arg(QString::number(chartCount))
                      .arg(QString::number(lastIndex))
                      .arg(QString::number(g_currentHeaderList->size()))
+                     .arg(view)
                      .arg(QString::number(g_fullHeaderList->size())));
 
     for (int i = 0; i< g_currentPresets->size(); i++ ) {
