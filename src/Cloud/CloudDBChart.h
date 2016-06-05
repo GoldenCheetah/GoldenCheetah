@@ -246,8 +246,6 @@ private slots:
 
     void nameTextChanged(QString);
     void nameEditingFinished();
-    void nickNameTextChanged(QString);
-    void nickNameEditingFinished();
     void emailTextChanged(QString);
     void emailEditingFinished();
 
@@ -272,7 +270,6 @@ private:
     QString descriptionDefault;
 
     QLineEdit *nickName;
-    bool nickNameOk;
 
     QLineEdit *email;
     bool emailOk;
