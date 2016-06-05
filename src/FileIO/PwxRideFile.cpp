@@ -305,7 +305,11 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
 
                 // Swim with distance and no GPS => pool swim
                 // limited to account for weird intervals or pauses
-                if (rideFile->isSwim() && badgps && (add.km > 0 || rdist > 0)) {    lapSwim = true;
+                if (rideFile->isSwim() && badgps && (add.km > 0 || rdist > 0)) {
+                    lapSwim = true;
+                    if (rdist == 0.0) // first length used to set Pool Length
+                        rideFile->setTag("Pool Length", // in meters
+                                         QString("%1").arg(add.km*1000.0));
                     add.kph = add.km > rdist ? (add.km - rdist)*3600/deltaSecs : 0.0;
                     if (add.kph == 0.0) add.cad = 0; // rest => no stroke rate
                 }
