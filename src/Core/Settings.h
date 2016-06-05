@@ -234,7 +234,6 @@
 
 #define GC_CLOUDDB_TC_ACCEPTANCE       "<athlete-preferences>clouddb/acceptance"                  // bool
 #define GC_CLOUDDB_TC_ACCEPTANCE_DATE  "<athlete-preferences>clouddb/acceptancedate"              // date/time string of acceptance
-#define GC_CLOUDDB_NICKNAME            "<athlete-preferences>clouddb/nickname"
 #define GC_CLOUDDB_EMAIL               "<athlete-preferences>clouddb/email"
 
 // ride navigator
