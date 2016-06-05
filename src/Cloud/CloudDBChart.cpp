@@ -1230,20 +1230,11 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
 
    QLabel *nickLabel = new QLabel(tr("Nickname"));
    nickName = new QLineEdit();
-   nickName->setMaxLength(50); // reasonable for display
    if (update) {
        nickName->setText(data.CreatorNick);
    } else {
-       nickName->setText(appsettings->cvalue(athlete, GC_CLOUDDB_NICKNAME, "").toString());
+       nickName->setText(appsettings->cvalue(athlete, GC_NICKNAME, "").toString());
    }
-   // regexp: validate / only chars and 0-9 - at least 5 chars long
-   QRegExp nick_rx("^[a-zA-Z0-9_]{5,50}$");
-   QValidator *nick_validator = new QRegExpValidator(nick_rx, this);
-   nickName->setValidator(nick_validator);
-   nickNameOk = !nickName->text().isEmpty(); // nickname from properties is ok when loaded
-
-   connect(nickName, SIGNAL(textChanged(QString)), this, SLOT(nickNameTextChanged(QString)));
-   connect(nickName, SIGNAL(editingFinished()), this, SLOT(nickNameEditingFinished()));
 
    QLabel *emailLabel = new QLabel(tr("E-Mail"));
    email = new QLineEdit();
@@ -1258,7 +1249,7 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
    QRegExp email_rx("^.+@[a-zA-Z_]+\\.[a-zA-Z]{2,10}$");
    QValidator *email_validator = new QRegExpValidator(email_rx, this);
    email->setValidator(email_validator);
-   emailOk = !nickName->text().isEmpty(); // email from properties is ok when loaded
+   emailOk = !email->text().isEmpty(); // email from properties is ok when loaded
 
    connect(email, SIGNAL(textChanged(QString)), this, SLOT(emailTextChanged(QString)));
    connect(email, SIGNAL(editingFinished()), this, SLOT(emailEditingFinished()));
@@ -1340,8 +1331,8 @@ CloudDBChartObjectDialog::publishClicked() {
         return;
     }
 
-    if (nickName->text().isEmpty() || !nickNameOk) {
-        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a nickname.")));
+    if (nickName->text().isEmpty()) {
+        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a nickname for this athlete.")));
         return;
     }
     if (email->text().isEmpty() || !emailOk) {
@@ -1364,7 +1355,7 @@ CloudDBChartObjectDialog::publishClicked() {
     data.ChartSport = CloudDBCommon::cloudDBSportIds.at(sportCombo->currentIndex());
 
     if (!update) {
-        appsettings->setCValue(athlete, GC_CLOUDDB_NICKNAME, data.CreatorNick);
+        appsettings->setCValue(athlete, GC_NICKNAME, data.CreatorNick);
         appsettings->setCValue(athlete, GC_CLOUDDB_EMAIL, data.CreatorEmail);
     }
     accept();
@@ -1376,21 +1367,6 @@ CloudDBChartObjectDialog::cancelClicked()  {
     reject();
 }
 
-void
-CloudDBChartObjectDialog::nickNameTextChanged(QString text)  {
-
-    if (text.isEmpty()) {
-        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a nickname.")));
-    } else {
-        nickNameOk = false;
-    }
-}
-
-void
-CloudDBChartObjectDialog::nickNameEditingFinished()  {
-    // validator check passed
-    nickNameOk = true;
-}
 
 void
 CloudDBChartObjectDialog::emailTextChanged(QString text)  {
