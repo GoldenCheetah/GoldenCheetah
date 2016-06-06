@@ -181,10 +181,13 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         if (lat == 0 && lon == 0) badgps = true;
 
         // If sport was Other and we have distance but no GPS data
-        // we assume it is a pool swimming activity
+        // we assume it is a pool swimming activity and first
+        // distance is pool length
         if (swim == MayBeSwim && badgps && distance > 0) {
             swim = Swim;
             rideFile->setTag("Sport", "Swim");
+            rideFile->setTag("Pool Length", // in meters
+                             QString("%1").arg(distance*1000.0));
         }
 
         // for smart recording, the delta_t will not be constant
