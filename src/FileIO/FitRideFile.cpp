@@ -47,7 +47,7 @@ static int fitFileReaderRegistered =
 
 static const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), Qt::UTC);
 
-static double bearing = 0; // used to compute headwind depending on wind/cyclist bearing difference
+//static double bearing = 0; // used to compute headwind depending on wind/cyclist bearing difference
 
 struct FitField {
     int num;
@@ -961,19 +961,20 @@ struct FitFileReaderState
         double nm = 0;
 
         // compute bearing in order to calculate headwind
-        if ((!rideFile->dataPoints().empty()) && (last_time != 0))
-        {
-            RideFilePoint *prevPoint = rideFile->dataPoints().back();
-            // ensure a movement occurred and valid lat/lon in order to compute cyclist direction
-            if (  (prevPoint->lat != lat || prevPoint->lon != lng )
-               && (prevPoint->lat != 0 || prevPoint->lon != 0 )
-               && (lat != 0 || lng != 0 ) )
-                        bearing = atan2(cos(lat)*sin(lng - prevPoint->lon),
-                                        cos(prevPoint->lat)*sin(lat)-sin(prevPoint->lat)*cos(lat)*cos(lng - prevPoint->lon));
-        }
-        // else keep previous bearing or 0 at beginning
+        // XXif ((!rideFile->dataPoints().empty()) && (last_time != 0))
+        // XX{
+        // XX    RideFilePoint *prevPoint = rideFile->dataPoints().back();
+        // XX    // ensure a movement occurred and valid lat/lon in order to compute cyclist direction
+        // XX    if (  (prevPoint->lat != lat || prevPoint->lon != lng )
+        // XX       && (prevPoint->lat != 0 || prevPoint->lon != 0 )
+        // XX       && (lat != 0 || lng != 0 ) )
+        // XX                bearing = atan2(cos(lat)*sin(lng - prevPoint->lon),
+        // XX                                cos(prevPoint->lat)*sin(lat)-sin(prevPoint->lat)*cos(lat)*cos(lng - prevPoint->lon));
+        // XX}
+        // XXelse keep previous bearing or 0 at beginning
 
-        double headwind = cos(bearing - rideFile->windHeading()) * rideFile->windSpeed() + kph;
+        // XXdouble headwind = cos(bearing - rideFile->windHeading()) * rideFile->windSpeed() + kph;
+        double headwind = 0;
 
         int interval = 0;
         // if there are data points && a time difference > 1sec && smartRecording processing is requested at all
@@ -999,7 +1000,7 @@ struct FitFileReaderState
             double deltaAlt = alt - prevPoint->alt;
             double deltaLon = lng - prevPoint->lon;
             double deltaLat = lat - prevPoint->lat;
-            double deltaHeadwind = headwind - prevPoint->headwind;
+            //XX double deltaHeadwind = headwind - prevPoint->headwind;
             double deltaSlope = slope - prevPoint->slope;
             double deltaLeftRightBalance = lrbalance - prevPoint->lrbalance;
             double deltaLeftTE = leftTorqueEff - prevPoint->lte;
@@ -1039,7 +1040,7 @@ struct FitFileReaderState
                         prevPoint->alt + (deltaAlt * weight),
                         (badgps == 1) ? 0 : prevPoint->lon + (deltaLon * weight),
                         (badgps == 1) ? 0 : prevPoint->lat + (deltaLat * weight),
-                        prevPoint->headwind + (deltaHeadwind * weight),
+                        0.0, // headwind
                         prevPoint->slope + (deltaSlope * weight),
                         temperature,
                         prevPoint->lrbalance + (deltaLeftRightBalance * weight),
