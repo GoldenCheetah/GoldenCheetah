@@ -96,6 +96,13 @@
 			<fielddiary>1</fielddiary>
 		</field>
 		<field>
+			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Pool Length"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
 			<fieldtab>"Device"</fieldtab>
 			<fieldname>"Device"</fieldname>
 			<fieldtype>2</fieldtype>
