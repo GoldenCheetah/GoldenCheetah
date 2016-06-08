@@ -79,7 +79,12 @@ class ModelWindow : public GcChartWindow
 
         // set/get properties
         int preset() const { return presetValues->currentIndex(); }
-        void setPreset(int x) { presetValues->setCurrentIndex(x); }
+        void setPreset(int x) {
+            presetValues->setCurrentIndex(x);
+            disconnect(presetValues, SIGNAL(currentIndexChanged(int)), this, SLOT(applyPreset(int)));
+            connect(presetValues, SIGNAL(currentIndexChanged(int)), this, SLOT(applyPreset(int)));
+        }
+
         int xseries() const { return xSelector->currentIndex(); }
         void setXSeries(int x) { xSelector->setCurrentIndex(x); }
         int yseries() const { return ySelector->currentIndex(); }

@@ -156,7 +156,6 @@ ModelWindow::ModelWindow(Context *context) :
     // now connect up the widgets
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-    connect(presetValues, SIGNAL(currentIndexChanged(int)), this, SLOT(applyPreset(int)));
     connect(xSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setDirty()));
     connect(ySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setDirty()));
     connect(zSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setDirty()));
