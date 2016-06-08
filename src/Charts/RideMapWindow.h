@@ -121,6 +121,10 @@ class RideMapWindow : public GcChartWindow
     // properties can be saved/restored/set by the layout manager
 
     Q_PROPERTY(int maptype READ mapType WRITE setMapType USER true)
+    Q_PROPERTY(bool showmarkers READ showMarkers WRITE setShowMarkers USER true)
+    Q_PROPERTY(bool osmts READ osmTS WRITE setOsmTS USER true)
+    Q_PROPERTY(QString osmtsurl READ osmTSUrl WRITE setOsmTSUrl USER true)
+
 
     public:
         typedef enum {
@@ -135,14 +139,30 @@ class RideMapWindow : public GcChartWindow
 
         QComboBox *mapCombo;
         QCheckBox *showMarkersCk;
+        QCheckBox *osmCustomTS;
+        QLineEdit *osmCustomTSUrl;
 
         // set/get properties
         int mapType() const { return mapCombo->currentIndex(); }
         void setMapType(int x) { mapCombo->setCurrentIndex(x); }
 
+        bool showMarkers() const { return ( showMarkersCk->checkState() == Qt::Checked); }
+        void setShowMarkers(bool x) { if (x) showMarkersCk->setCheckState(Qt::Checked); else showMarkersCk->setCheckState(Qt::Unchecked) ;}
+
+        bool osmTS() const { return ( osmCustomTS->checkState() == Qt::Checked); }
+        void setOsmTS(bool x) { if (x) osmCustomTS->setCheckState(Qt::Checked); else osmCustomTS->setCheckState(Qt::Unchecked) ;}
+
+        QString osmTSUrl() const { return osmCustomTSUrl->text(); }
+        void setOsmTSUrl(QString x) { osmCustomTSUrl->setText(x) ;}
+
+
     public slots:
         void mapTypeSelected(int x);
         void showMarkersChanged(int value);
+        void osmCustomTSChanged(int value);
+        void osmCustomTSURLEditingFinished();
+        void osmCustomTSURLTextChanged(QString text);
+
 
         void forceReplot();
         void rideSelected();
@@ -173,6 +193,9 @@ class RideMapWindow : public GcChartWindow
         RideItem *current;
         bool firstShow;
         IntervalSummaryWindow *overlayIntervals;
+
+        QString osmTileServerUrlDefault;
+        QString osmCurrentTileServerUrl;
 
         QColor GetColor(int watts);
         void createHtml();

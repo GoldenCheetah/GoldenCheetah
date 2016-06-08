@@ -57,7 +57,6 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     //settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM_Config_Settings));
 
     QFormLayout *cl = new QFormLayout(settingsWidget);;
-    cl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
 
     // map choice
     mapCombo= new QComboBox(this);
@@ -67,13 +66,29 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     mapCombo->setCurrentIndex(mapType);
 
-    showMarkersCk = new QCheckBox(tr("Show markers"));
+    showMarkersCk = new QCheckBox();
+
+    osmCustomTS = new QCheckBox();
+    osmCustomTSUrl = new QLineEdit("");
+    osmTileServerUrlDefault = QString("http://tile.openstreetmap.org");
 
     cl->addRow(new QLabel(tr("Map")), mapCombo);
-    cl->addRow(new QLabel(tr("")), showMarkersCk);
+    cl->addRow(new QLabel(tr("Show Markers")), showMarkersCk);
+    cl->addRow(new QLabel(""));
+    cl->addRow(new QLabel(tr("Open Street Map - Custom Tile Server settings")));
+    cl->addRow(new QLabel(tr("Use custom tile server")), osmCustomTS);
+    cl->addRow(new QLabel(tr("Tile server URL")), osmCustomTSUrl);
+
+    if (osmCustomTS->checkState() != Qt::Checked) {
+        osmCurrentTileServerUrl = osmTileServerUrlDefault;
+    }
 
     connect(mapCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(mapTypeSelected(int)));
     connect(showMarkersCk, SIGNAL(stateChanged(int)), this, SLOT(showMarkersChanged(int)));
+    connect(osmCustomTS, SIGNAL(stateChanged(int)), this, SLOT(osmCustomTSChanged(int)));
+    connect(osmCustomTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
+    connect(osmCustomTSUrl, SIGNAL(textChanged(QString)), this, SLOT(osmCustomTSURLTextChanged(QString)));
+
 
     setControls(settingsWidget);
 
@@ -149,6 +164,52 @@ void
 RideMapWindow::showMarkersChanged(int value)
 {
     forceReplot();
+}
+
+void
+RideMapWindow::osmCustomTSChanged(int value)
+{
+    if (value == Qt::Checked) {
+        // toogle from default OSM tile server to custom
+        if (osmCustomTSUrl->text().isEmpty()) {
+            // no URL defined, so nothing to do
+            return;
+        }
+        osmCurrentTileServerUrl = osmCustomTSUrl->text();
+    } else {
+        // toogle from custom OSM tile server to default
+        osmCurrentTileServerUrl = osmTileServerUrlDefault;
+    }
+    if (mapCombo->currentIndex() == OSM) {
+        forceReplot();
+    }
+
+}
+
+void
+RideMapWindow::osmCustomTSURLTextChanged(QString text)
+{
+    if (first) {
+        if (osmCustomTS->isChecked() && (text.length() > 0)) {
+            osmCurrentTileServerUrl = text;
+            // only do this once when the text is set automatically by properties
+            first = false;
+            if (mapCombo->currentIndex() == OSM) {
+                forceReplot();
+            }
+        }
+    }
+}
+
+void
+RideMapWindow::osmCustomTSURLEditingFinished()
+{
+    if (osmCustomTS->isChecked()) {
+        osmCurrentTileServerUrl = osmCustomTSUrl->text();
+        if (mapCombo->currentIndex() == OSM) {
+            forceReplot();
+        }
+    }
 }
 
 void 
@@ -490,7 +551,7 @@ void RideMapWindow::createHtml()
                 "       } \n"
                         // Wrap y (latitude) in a like manner if you want to enable vertical infinite scroll
 
-                "       return \"http://tile.openstreetmap.org/\" + zoom + \"/\" + x + \"/\" + coord.y + \".png\"; \n"
+                "       return \""+osmCurrentTileServerUrl+"/\" + zoom + \"/\" + x + \"/\" + coord.y + \".png\"; \n"
                 "    }, \n"
                 "    tileSize: new google.maps.Size(256, 256), \n"
                 "    name: \"OpenStreetMap\", \n"
