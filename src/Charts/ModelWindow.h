@@ -58,7 +58,7 @@ class ModelWindow : public GcChartWindow
     Q_OBJECT
     G_OBJECT
 
-    Q_PROPERTY(int style READ style WRITE setStyle USER true)
+    Q_PROPERTY(int chartStyle READ chartStyle WRITE setChartStyle USER true)
     Q_PROPERTY(bool grid READ isGrid WRITE setGrid USER true)
     Q_PROPERTY(bool legend READ isLegend WRITE setLegend USER true)
     Q_PROPERTY(bool frame READ isFrame WRITE setFrame USER true)
@@ -93,8 +93,8 @@ class ModelWindow : public GcChartWindow
         void setZSeries(int x) { zSelector->setCurrentIndex(x); }
         int cseries() const { return colorSelector->currentIndex(); }
         void setCSeries(int x) { colorSelector->setCurrentIndex(x); }
-        int style() const { return styleSelector->currentIndex(); }
-        void setStyle(int x) { styleSelector->setCurrentIndex(x); }
+        int chartStyle() const { return styleSelector->currentIndex(); }
+        void setChartStyle(int x) { styleSelector->setCurrentIndex(x); }
         bool isIgnore() const { return ignore->isChecked(); }
         void setIgnore(bool x) { ignore->setChecked(x); }
         bool isGrid() const { return grid->isChecked(); }
