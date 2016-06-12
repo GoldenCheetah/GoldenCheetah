@@ -127,8 +127,11 @@ RouteSegment::addPoint(RoutePoint _point)
 void 
 RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
 {
-    double minimumprecision = 0.100; //100m
-    double maximumprecision = 0.001; //1m , was 10m but changed to 1m for small segment
+    double minimumprecision = 0.050; //50m
+    double maximumprecision = 0.001; //1m , was 10m but changed to 1m for small segment.
+                                     // if there is performance issue we can perhaps have 1m for small segments
+                                     // and keep 10m for longer.
+
     double precision = -1;
 
     int found = 0;
@@ -185,7 +188,11 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
                                 minimumdistance = _nextdist;
                             }
                             if (_nextdist <= minimumprecision) {
-                                end = j+10;
+
+                                if (_nextdist<minimumdistance*1.2)
+                                    end = j+10;
+                                else // we move away
+                                    j = end;
                             }
 
                             if (_nextdist <= maximumprecision) {
