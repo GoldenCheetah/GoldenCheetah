@@ -128,7 +128,7 @@ void
 RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
 {
     double minimumprecision = 0.100; //100m
-    double maximumprecision = 0.010; //10m
+    double maximumprecision = 0.001; //1m
     double precision = -1;
 
     int found = 0;
@@ -426,29 +426,29 @@ Routes::createRouteFromInterval(IntervalItem *activeInterval)
     double dist = 0, lastLat = 0, lastLon = 0;
 
     foreach (RideFilePoint *point, activeInterval->rideItem()->ride()->dataPoints()) {
-        if (point->secs >= activeInterval->start && point->secs < activeInterval->stop) {
-            if (lastLat != 0 && lastLon != 0 &&
-                point->lat != 0 && point->lon != 0 &&
+        if (point->secs >= activeInterval->start && point->secs <= activeInterval->stop) {
+            if (point->lat != 0 && point->lon != 0 &&
                 ceil(point->lat) != 180 && ceil(point->lon) != 180) {
-                // distance with last point
-                double _dist = route->distance(lastLat, lastLon, point->lat, point->lon);
 
-                if (_dist>=0.001)
-                    dist += _dist;
+                if (lastLat == 0 || lastLon == 0 || point->secs == activeInterval->stop) {
+                    RoutePoint _point = RoutePoint(point->lon, point->lat);
+                    route->addPoint(_point);
+                } else  {
+                    // distance with last point
+                    double _dist = route->distance(lastLat, lastLon, point->lat, point->lon);
 
-                if (route->getPoints().count() == 0 || dist>0.02) {
-                   RoutePoint _point = RoutePoint(point->lon, point->lat);
-                   route->addPoint(_point);
-                   dist = 0;
+                    if (_dist>=0.001)
+                        dist += _dist;
+
+                    if (dist>0.02) {
+                       RoutePoint _point = RoutePoint(point->lon, point->lat);
+                       route->addPoint(_point);
+                       dist = 0;
+                    }
                 }
-            }
-            lastLat = point->lat;
-            lastLon = point->lon;
-        } else if (point->secs == activeInterval->stop) {
-            if (point->lat != 0 && point->lon != 0) {
-                RoutePoint _point = RoutePoint(point->lon, point->lat);
-                route->addPoint(_point);
-            }
+                lastLat = point->lat;
+                lastLon = point->lon;
+            }   
         }
     }
 

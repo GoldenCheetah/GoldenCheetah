@@ -56,7 +56,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     //HelpWhatsThis *helpSettings = new HelpWhatsThis(settingsWidget);
     //settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM_Config_Settings));
 
-    QFormLayout *cl = new QFormLayout(settingsWidget);;
+    QFormLayout *commonLayout = new QFormLayout(settingsWidget);
 
     // map choice
     mapCombo= new QComboBox(this);
@@ -68,27 +68,40 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     showMarkersCk = new QCheckBox();
 
-    osmCustomTS = new QCheckBox();
+    commonLayout->addRow(new QLabel(tr("Map")), mapCombo);
+    commonLayout->addRow(new QLabel(tr("Show Markers")), showMarkersCk);
+    commonLayout->addRow(new QLabel(""));
+
+    osmCustomTSTitle = new QLabel(tr("Open Street Map - Custom Tile Server settings"));
+    osmCustomTSTitle->setStyleSheet("font-weight: bold;");
+    osmCustomTSLabel = new QLabel(tr("Tile server"));
+    osmCustomTSUrlLabel = new QLabel(tr("Tile server URL"));
+
+    // tile choice
+    tileCombo= new QComboBox(this);
+    tileCombo->addItem(tr("OpenStreetMap (default)"), QVariant(0));
+    tileCombo->addItem(tr("OpenCycleMap"), QVariant(10));
+    //tileCombo->addItem(tr("OpenCycleMap B"), QVariant(11));
+    tileCombo->addItem(tr("Mapquest"), QVariant(20));
+    tileCombo->addItem(tr("Custom"), QVariant(1000));
+
+
     osmCustomTSUrl = new QLineEdit("");
-    osmTileServerUrlDefault = QString("http://tile.openstreetmap.org");
+    osmCustomTSUrl->setFixedWidth(250);
+    osmCustomTSUrl->setText(QString("http://tile.openstreetmap.org"));
 
-    cl->addRow(new QLabel(tr("Map")), mapCombo);
-    cl->addRow(new QLabel(tr("Show Markers")), showMarkersCk);
-    cl->addRow(new QLabel(""));
-    cl->addRow(new QLabel(tr("Open Street Map - Custom Tile Server settings")));
-    cl->addRow(new QLabel(tr("Use custom tile server")), osmCustomTS);
-    cl->addRow(new QLabel(tr("Tile server URL")), osmCustomTSUrl);
+    osmCustomTSUrl->setVisible(false);
+    osmCustomTSUrlLabel->setVisible(false);
 
-    if (osmCustomTS->checkState() != Qt::Checked) {
-        osmCurrentTileServerUrl = osmTileServerUrlDefault;
-    }
+    commonLayout->addRow(osmCustomTSTitle);
+    commonLayout->addRow(osmCustomTSLabel, tileCombo);
+    commonLayout->addRow(osmCustomTSUrlLabel, osmCustomTSUrl);
 
     connect(mapCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(mapTypeSelected(int)));
     connect(showMarkersCk, SIGNAL(stateChanged(int)), this, SLOT(showMarkersChanged(int)));
-    connect(osmCustomTS, SIGNAL(stateChanged(int)), this, SLOT(osmCustomTSChanged(int)));
     connect(osmCustomTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(osmCustomTSUrl, SIGNAL(textChanged(QString)), this, SLOT(osmCustomTSURLTextChanged(QString)));
-
+    connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
 
     setControls(settingsWidget);
 
@@ -157,40 +170,63 @@ void
 RideMapWindow::mapTypeSelected(int x)
 {
     setMapType(x);
+    if (x==0) {
+        setCustomTSWidgetVisible(true);
+    } else {
+        setCustomTSWidgetVisible(false);
+    }
+    forceReplot();
+}
+
+void
+RideMapWindow::setCustomTSWidgetVisible(bool value)
+{
+    osmCustomTSTitle->setVisible(value);
+    osmCustomTSLabel->setVisible(value);
+    osmCustomTSUrlLabel->setVisible(value);
+    osmCustomTSUrl->setVisible(value);
+    tileCombo->setVisible(value);
+}
+
+void
+RideMapWindow::setTileServerUrlForTileType(int x)
+{
+    osmCustomTSUrl->setVisible(false);
+    osmCustomTSUrlLabel->setVisible(false);
+    if (x == 0)
+        osmCurrentTileServerUrl = QString("http://tile.openstreetmap.org");
+    else if (x == 10)
+        osmCurrentTileServerUrl = QString("http://a.tile.opencyclemap.org/cycle");
+    else if (x == 11)
+        osmCurrentTileServerUrl = QString("http://b.tile.opencyclemap.org/cycle");
+    else if (x == 20)
+        osmCurrentTileServerUrl = QString("http://otile1.mqcdn.com/tiles/1.0.0/osm");
+    else if (x == 1000) {
+        osmCustomTSUrlLabel->setVisible(true);
+        osmCustomTSUrl->setVisible(true);
+    }
+}
+
+void
+RideMapWindow::tileTypeSelected(int x)
+{
+    int type = tileCombo->itemData(x).toInt();
+    setTileServerUrlForTileType(type);
     forceReplot();
 }
 
 void
 RideMapWindow::showMarkersChanged(int value)
 {
+    Q_UNUSED(value);
     forceReplot();
-}
-
-void
-RideMapWindow::osmCustomTSChanged(int value)
-{
-    if (value == Qt::Checked) {
-        // toogle from default OSM tile server to custom
-        if (osmCustomTSUrl->text().isEmpty()) {
-            // no URL defined, so nothing to do
-            return;
-        }
-        osmCurrentTileServerUrl = osmCustomTSUrl->text();
-    } else {
-        // toogle from custom OSM tile server to default
-        osmCurrentTileServerUrl = osmTileServerUrlDefault;
-    }
-    if (mapCombo->currentIndex() == OSM) {
-        forceReplot();
-    }
-
 }
 
 void
 RideMapWindow::osmCustomTSURLTextChanged(QString text)
 {
     if (first) {
-        if (osmCustomTS->isChecked() && (text.length() > 0)) {
+        if (tileCombo->currentData().toInt() == 1000 && (text.length() > 0)) {
             osmCurrentTileServerUrl = text;
             // only do this once when the text is set automatically by properties
             first = false;
@@ -204,11 +240,9 @@ RideMapWindow::osmCustomTSURLTextChanged(QString text)
 void
 RideMapWindow::osmCustomTSURLEditingFinished()
 {
-    if (osmCustomTS->isChecked()) {
+    if (osmCurrentTileServerUrl != osmCustomTSUrl->text()) {
         osmCurrentTileServerUrl = osmCustomTSUrl->text();
-        if (mapCombo->currentIndex() == OSM) {
-            forceReplot();
-        }
+        forceReplot();
     }
 }
 

@@ -122,7 +122,7 @@ class RideMapWindow : public GcChartWindow
 
     Q_PROPERTY(int maptype READ mapType WRITE setMapType USER true)
     Q_PROPERTY(bool showmarkers READ showMarkers WRITE setShowMarkers USER true)
-    Q_PROPERTY(bool osmts READ osmTS WRITE setOsmTS USER true)
+    Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
     Q_PROPERTY(QString osmtsurl READ osmTSUrl WRITE setOsmTSUrl USER true)
 
 
@@ -137,9 +137,10 @@ class RideMapWindow : public GcChartWindow
         ~RideMapWindow();
         bool first;
 
-        QComboBox *mapCombo;
+
+        QComboBox *mapCombo, *tileCombo;
         QCheckBox *showMarkersCk;
-        QCheckBox *osmCustomTS;
+        QLabel *osmCustomTSTitle, *osmCustomTSLabel, *osmCustomTSUrlLabel;
         QLineEdit *osmCustomTSUrl;
 
         // set/get properties
@@ -149,8 +150,8 @@ class RideMapWindow : public GcChartWindow
         bool showMarkers() const { return ( showMarkersCk->checkState() == Qt::Checked); }
         void setShowMarkers(bool x) { if (x) showMarkersCk->setCheckState(Qt::Checked); else showMarkersCk->setCheckState(Qt::Unchecked) ;}
 
-        bool osmTS() const { return ( osmCustomTS->checkState() == Qt::Checked); }
-        void setOsmTS(bool x) { if (x) osmCustomTS->setCheckState(Qt::Checked); else osmCustomTS->setCheckState(Qt::Unchecked) ;}
+        int osmTS() const { return ( tileCombo->currentData().toInt()); }
+        void setOsmTS(int x) { tileCombo->setCurrentIndex(tileCombo->findData(x)); /*setTileServerUrlForTileType(x);*/}
 
         QString osmTSUrl() const { return osmCustomTSUrl->text(); }
         void setOsmTSUrl(QString x) { osmCustomTSUrl->setText(x) ;}
@@ -158,8 +159,8 @@ class RideMapWindow : public GcChartWindow
 
     public slots:
         void mapTypeSelected(int x);
+        void tileTypeSelected(int x);
         void showMarkersChanged(int value);
-        void osmCustomTSChanged(int value);
         void osmCustomTSURLEditingFinished();
         void osmCustomTSURLTextChanged(QString text);
 
@@ -207,6 +208,9 @@ class RideMapWindow : public GcChartWindow
     protected:
         bool event(QEvent *event);
         bool stale;
+
+        void setCustomTSWidgetVisible(bool value);
+        void setTileServerUrlForTileType(int x);
 };
 
 #endif
