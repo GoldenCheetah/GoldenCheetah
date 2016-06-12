@@ -150,7 +150,7 @@ class RideMapWindow : public GcChartWindow
         bool showMarkers() const { return ( showMarkersCk->checkState() == Qt::Checked); }
         void setShowMarkers(bool x) { if (x) showMarkersCk->setCheckState(Qt::Checked); else showMarkersCk->setCheckState(Qt::Unchecked) ;}
 
-        int osmTS() const { return ( tileCombo->currentData().toInt()); }
+        int osmTS() const { return ( tileCombo->itemData(tileCombo->currentIndex()).toInt()); }
         void setOsmTS(int x) { tileCombo->setCurrentIndex(tileCombo->findData(x)); /*setTileServerUrlForTileType(x);*/}
 
         QString osmTSUrl() const { return osmCustomTSUrl->text(); }

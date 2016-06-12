@@ -226,7 +226,7 @@ void
 RideMapWindow::osmCustomTSURLTextChanged(QString text)
 {
     if (first) {
-        if (tileCombo->currentData().toInt() == 1000 && (text.length() > 0)) {
+        if (tileCombo->itemData(tileCombo->currentIndex()).toInt() == 1000 && (text.length() > 0)) {
             osmCurrentTileServerUrl = text;
             // only do this once when the text is set automatically by properties
             first = false;
