@@ -128,7 +128,7 @@ void
 RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
 {
     double minimumprecision = 0.100; //100m
-    double maximumprecision = 0.001; //1m
+    double maximumprecision = 0.001; //1m , was 10m but changed to 1m for small segment
     double precision = -1;
 
     int found = 0;
