@@ -221,8 +221,9 @@ class TSS : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
-        // no zones
-        if (!item->context->athlete->zones(item->isRun) || item->zoneRange < 0) {
+        // run, swim or no zones
+        if (item->isSwim || item->isRun ||
+           !item->context->athlete->zones(item->isRun) || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -254,7 +255,7 @@ class TSS : public RideMetric {
         setValue(score);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new TSS(*this); }
 };
 
@@ -278,8 +279,14 @@ class TSSPerHour : public RideMetric {
         setDescription(tr("Training Stress Score divided by Duration in hours"));
     }
 
-    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
+        // doesn't apply to swims or runs
+        if (item->isSwim || item->isRun) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         // tss
         assert(deps.contains("coggan_tss"));
@@ -300,7 +307,7 @@ class TSSPerHour : public RideMetric {
         setCount(hours);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
     RideMetric *clone() const { return new TSSPerHour(*this); }
 };
 
