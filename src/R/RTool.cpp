@@ -133,6 +133,7 @@ RTool::RTool()
         // the same as the version we built with.
         R->parseEvalNT("print(R.version.string)");
         QStringList strings = rtool->messages;
+
         if (strings.count() == 3) {
             QRegExp exp("^.*([0-9]+\\.[0-9]+\\.[0-9]+).*$");
             if (exp.exactMatch(strings[1])) version = exp.cap(1);
@@ -233,6 +234,9 @@ RTool::cancel()
 void
 RTool::configChanged()
 {
+    // wait until loaded
+    if (starting || failed) return;
+
     // update global R appearances
     QString parCommand=QString("par(par.default)\n"
                                "par(bg=\"%1\", "
