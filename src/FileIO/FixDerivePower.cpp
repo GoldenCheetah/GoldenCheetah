@@ -181,6 +181,9 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
         windHeading = ((FixDerivePowerConfig*)(config))->windHeading->value() / 180 * MATHCONST_PI; // rad
     }
 
+    // Do nothing for swims and runs
+    if (ride->isSwim() || ride->isRun()) return false;
+
     // if its already there do nothing !
     if (ride->areDataPresent()->watts) return false;
 
