@@ -179,6 +179,11 @@ class ANTMessage {
         uint8_t  controlSeq;
         uint16_t controlSerial, controlVendor, controlCmd;
 
+        // footpod
+        bool fpodInstant;
+        uint8_t  fpodStrides;
+        double   fpodSpeed, fpodCadence;
+
     private:
         void init();
 };

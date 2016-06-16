@@ -648,6 +648,37 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 break;
             }
 
+            case ANTChannel::CHANNEL_TYPE_FOOTPOD:
+            {
+                channel = message[3];
+                data_page = message[4];
+
+                switch(data_page) {
+
+                case FOOTPOD_MAIN_PAGE:
+                    {
+                        // SDM main format - strides loop at 255 should be x2
+                        fpodInstant=false;
+                        fpodStrides = message[10];
+                        fpodSpeed = 0;
+                        fpodCadence = 0;
+                    }
+                    break;
+
+                case FOOTPOD_SPEED_CADENCE:
+                    {
+                        // SDM instantaneous speed and cadence
+                        // we ignore these
+                        fpodInstant = true;
+                        fpodStrides = 0;
+                        fpodSpeed = double(message[7]&0x0f) + (double(message[8]/256.00f));
+                        fpodCadence = double(message[6]) + (double(message[7] << 4) / 16.00f);
+                    }
+
+                }
+            }
+            break;
+
             default:
                 break;
             }
@@ -767,6 +798,9 @@ void ANTMessage::init()
     fecPowerOverLimits = fecState = fecHRSource = 0;
     fecDistanceCapability = fecSpeedIsVirtual = false;
     fecEqtType = 0;
+    fpodInstant = false;
+    fpodSpeed=fpodCadence=0;
+    fpodStrides=0;
 }
 
 ANTMessage ANTMessage::resetSystem()
