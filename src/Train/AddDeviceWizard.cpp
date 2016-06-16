@@ -1185,11 +1185,18 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     wheelSizeLayout->addWidget(wheelSizeEdit);
     wheelSizeLayout->addWidget(wheelSizeUnitLabel);
 
+    stridelengthEdit = new QLineEdit(this);
+    stridelengthEdit->setText("78");
+    QHBoxLayout *stridelengthLayout = new QHBoxLayout;
+    stridelengthLayout->addWidget(stridelengthEdit);
+    stridelengthLayout->addStretch();
+
     connect(rimSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
     connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
     connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
 
     form2layout->addRow(new QLabel(tr("Wheel Size"), this), wheelSizeLayout);
+    form2layout->addRow(new QLabel(tr("Stride Length (cm)"), this), stridelengthLayout);
 
     hlayout->addLayout(form2layout);
     layout->addStretch();
@@ -1252,6 +1259,7 @@ AddFinal::validatePage()
                                      QString(defKPH->isChecked() ? "S" : "");
         add.postProcess = virtualPower->currentIndex();
         add.wheelSize = wheelSizeEdit->text().toInt();
+        add.stridelength = stridelengthEdit->text().toInt();
 
         QList<DeviceConfiguration> list = all.getList();
         list.insert(0, add);

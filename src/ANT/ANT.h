@@ -393,6 +393,9 @@ public:
     ANT(QObject *parent = 0, DeviceConfiguration *dc=0, QString athlete="");
     ~ANT();
 
+    // device settings
+    DeviceConfiguration *devConf;
+
 signals:
     void foundDevice(int channel, int device_number, int device_id); // channelInfo
     void lostDevice(int channel);            // dropInfo
@@ -572,7 +575,6 @@ private:
     int channels;  // how many 4 or 8 ? depends upon the USB stick...
 
     // access to device file
-    DeviceConfiguration *devConf;
     QString deviceFilename;
     int baud;
 #ifdef WIN32

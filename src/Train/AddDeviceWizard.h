@@ -226,6 +226,7 @@ class AddFinal : public QWizardPage
         QComboBox *rimSizeCombo;
         QComboBox *tireSizeCombo;
         QLineEdit *wheelSizeEdit;
+        QLineEdit *stridelengthEdit;
         QLineEdit *port;
         QLineEdit *profile;
         QGroupBox *selectDefault;
