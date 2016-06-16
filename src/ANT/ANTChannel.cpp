@@ -837,7 +837,12 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                     // if we set speed and cadence distance and time is done for us.
                     if (fpCount==4) {
 
-                        static const double STRIDELENGTH=0.78; // in meters
+                        // default or get config
+                        double STRIDELENGTH=78; // in cm
+                        if (parent->devConf) STRIDELENGTH=parent->devConf->stridelength;
+
+                        // convert to meters
+                        STRIDELENGTH /= 100;
 
                         // calculate new cadence and speed
                         parent->setCadence((fpStrides*2) * (60/(fpMS/1000.00f)));

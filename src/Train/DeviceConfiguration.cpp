@@ -104,6 +104,11 @@ DeviceConfigurations::readConfig()
             Entry.wheelSize = configVal.toInt();
             if (Entry.wheelSize == 0) Entry.wheelSize = 2100; // default to 700C
 
+            configStr = QString("%1%2").arg(GC_DEV_STRIDE).arg(i+1);
+            configVal = appsettings->value(NULL, configStr);
+            Entry.stridelength = configVal.toInt();
+            if (Entry.stridelength == 0) Entry.stridelength = 78; // default to 78cm
+
             configStr = QString("%1%2").arg(GC_DEV_PROF).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
             Entry.deviceProfile = configVal.toString();
@@ -142,6 +147,10 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
         // wheel size
         configStr = QString("%1%2").arg(GC_DEV_WHEEL).arg(i+1);
         appsettings->setValue(configStr, Configuration.at(i).wheelSize);
+
+        // stridelength
+        configStr = QString("%1%2").arg(GC_DEV_STRIDE).arg(i+1);
+        appsettings->setValue(configStr, QString("%1").arg(Configuration.at(i).stridelength));
 
         // portSpec
         configStr = QString("%1%2").arg(GC_DEV_SPEC).arg(i+1);
