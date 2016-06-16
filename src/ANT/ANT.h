@@ -232,6 +232,7 @@ struct setChannelAtom {
 // ANT+sport
 #define ANT_SPORT_HR_PERIOD 8070
 #define ANT_SPORT_POWER_PERIOD 8182
+#define ANT_SPORT_FOOTPOD_PERIOD 8134
 #define ANT_SPORT_SPEED_PERIOD 8118
 #define ANT_SPORT_CADENCE_PERIOD 8102
 #define ANT_SPORT_SandC_PERIOD 8086
@@ -252,11 +253,13 @@ struct setChannelAtom {
 #define ANT_SPORT_CONTROL_TYPE 0x10
 #define ANT_SPORT_TACX_VORTEX_TYPE 61
 #define ANT_SPORT_FITNESS_EQUIPMENT_TYPE 0x11
+#define ANT_SPORT_FOOTPOD_TYPE 0x7C
 #define ANT_FAST_QUARQ_TYPE_WAS 11 // before release 1.8
 #define ANT_FAST_QUARQ_TYPE 0x60
 #define ANT_QUARQ_TYPE 0x60
 
 #define ANT_SPORT_FREQUENCY 57
+#define ANT_FOOTPOD_FREQUENCY 57
 #define ANT_FAST_QUARQ_FREQUENCY 61
 #define ANT_QUARQ_FREQUENCY 61
 #define ANT_KICKR_FREQUENCY 52
@@ -303,6 +306,10 @@ struct setChannelAtom {
 #define TACX_VORTEX_DATA_SERIAL        1
 #define TACX_VORTEX_DATA_VERSION       2
 #define TACX_VORTEX_DATA_CALIBRATION   3
+
+// Footpod pages
+#define FOOTPOD_MAIN_PAGE               0x01
+#define FOOTPOD_SPEED_CADENCE           0x02
 
 // ant+ fitness equipment profile data pages
 #define FITNESS_EQUIPMENT_GENERAL_PAGE              0x10
