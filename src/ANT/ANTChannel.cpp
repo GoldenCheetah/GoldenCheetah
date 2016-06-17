@@ -845,7 +845,14 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         STRIDELENGTH /= 100;
 
                         // calculate new cadence and speed
-                        parent->setCadence((fpStrides*2) * (60/(fpMS/1000.00f)));
+
+                        // running cadence is per cycle; i.e. a left and right step
+                        // so if you take 100 footsteps a minute (50 left, 50 right) then
+                        // your running cadence will be 50, not 100.
+                        parent->setCadence(fpStrides * (60/(fpMS/1000.00f)));
+
+                        // running speed is strides x 2 (for left and right) multiplied
+                        // by the user defined stride length, which is typicall ~78cm
                         parent->setSpeed((fpStrides*2*STRIDELENGTH) / (fpMS/1000.00f) * 3.6f);
 
                         // reset counters
