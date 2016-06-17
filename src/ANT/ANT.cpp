@@ -62,7 +62,7 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
   { true, ANTChannel::CHANNEL_TYPE_SandC, ANT_SPORT_SandC_PERIOD, ANT_SPORT_SandC_TYPE,
                 ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Speed + Cadence", 'd', ":images/IconCadence.png" },
   { true, ANTChannel::CHANNEL_TYPE_FOOTPOD, ANT_SPORT_FOOTPOD_PERIOD, ANT_SPORT_FOOTPOD_TYPE,
-                ANT_FOOTPOD_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Running Footpod", 'o', ":images/IconSpeed.png" },
+                ANT_FOOTPOD_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Running Footpod", 'o', ":images/IconRun.png" },
   { true, ANTChannel::CHANNEL_TYPE_MOXY, ANT_SPORT_MOXY_PERIOD, ANT_SPORT_MOXY_TYPE,
                 ANT_MOXY_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Moxy", 'm', ":images/IconMoxy.png" },
   { true, ANTChannel::CHANNEL_TYPE_CONTROL, ANT_SPORT_CONTROL_PERIOD, ANT_SPORT_CONTROL_TYPE,

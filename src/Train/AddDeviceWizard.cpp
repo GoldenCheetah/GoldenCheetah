@@ -585,7 +585,13 @@ addSensorTypes(ANT *ant, QComboBox *p)
     for (int i=0; ant->ant_sensor_types[i].suffix !=  '\0'; i++) {
         if (ant->ant_sensor_types[i].user) {
             if (*ant->ant_sensor_types[i].iconname != '\0') {
-                p->addItem(QIcon(ant->ant_sensor_types[i].iconname), ant->ant_sensor_types[i].descriptive_name, ant->ant_sensor_types[i].type);
+
+                // we want dark not light
+                QImage img(ant->ant_sensor_types[i].iconname);
+                img.invertPixels();
+                QIcon icon(QPixmap::fromImage(img));
+
+                p->addItem(icon, ant->ant_sensor_types[i].descriptive_name, ant->ant_sensor_types[i].type);
             } else {
                 p->addItem(ant->ant_sensor_types[i].descriptive_name, ant->ant_sensor_types[i].type);
             }
