@@ -1192,7 +1192,7 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     wheelSizeLayout->addWidget(wheelSizeUnitLabel);
 
     stridelengthEdit = new QLineEdit(this);
-    stridelengthEdit->setText("78");
+    stridelengthEdit->setText("115");
     QHBoxLayout *stridelengthLayout = new QHBoxLayout;
     stridelengthLayout->addWidget(stridelengthEdit);
     stridelengthLayout->addStretch();

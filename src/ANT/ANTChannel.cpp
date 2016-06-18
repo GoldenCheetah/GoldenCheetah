@@ -838,7 +838,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                     if (fpCount==4) {
 
                         // default or get config
-                        double STRIDELENGTH=78; // in cm
+                        double STRIDELENGTH=115; // 1.15m seems to be a common L2 pace stride length (?)
                         if (parent->devConf) STRIDELENGTH=parent->devConf->stridelength;
 
                         // convert to meters
