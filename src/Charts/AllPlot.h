@@ -48,6 +48,9 @@
 #include "UserData.h"
 #include "RideFile.h"
 
+#define MAX(a, b) (((a)>(b))?(a):(b))
+#define MIN(a, b) (((a)<(b))?(a):(b))
+
 class QwtPlotCurve;
 class QwtPlotGappedCurve;
 class QwtPlotIntervalCurve;
@@ -403,6 +406,7 @@ class AllPlotObject : public QObject
     QwtPlotCurve *xpCurve;
     QwtPlotCurve *apCurve;
     QwtPlotCurve *hrCurve;
+    QwtPlotCurve *hrvCurve;
     QwtPlotCurve *tcoreCurve;
     QwtPlotCurve *speedCurve;
     QwtPlotCurve *accelCurve;
@@ -440,6 +444,7 @@ class AllPlotObject : public QObject
     QVector<double> wprimeDist;
 
     QVector<double> hrArray;
+    QVector<double> hrvArray;
     QVector<double> tcoreArray;
     QVector<double> wattsArray;
     QVector<double> atissArray;
@@ -501,6 +506,8 @@ class AllPlotObject : public QObject
     QVector<double> smoothAP;
     QVector<double> smoothXP;
     QVector<double> smoothHr;
+    QVector<double> smoothHrv;
+    QVector<double> smoothHrv_time;
     QVector<double> smoothTcore;
     QVector<double> smoothSpeed;
     QVector<double> smoothAccel;
@@ -626,6 +633,7 @@ class AllPlot : public QwtPlot
         void setShowXP(bool show);
         void setShowAP(bool show);
         void setShowHr(bool show);
+        void setShowHRV(bool show);
         void setShowTcore(bool show);
         void setShowSpeed(bool show);
         void setShowCad(bool show);
@@ -687,6 +695,7 @@ class AllPlot : public QwtPlot
         bool showXP;
         bool showAP;
         bool showHr;
+        bool showHRV;
         bool showTcore;
         bool showSpeed;
         bool showAccel;
