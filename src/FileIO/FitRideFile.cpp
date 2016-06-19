@@ -1723,8 +1723,8 @@ struct FitFileReaderState
         weatherXdata->name = "WEATHER";
         weatherXdata->valuename << "WINDSPEED";
         weatherXdata->valuename << "WINDHEADING";
-        weatherXdata->valuename << "HUMIDITY";
         weatherXdata->valuename << "TEMPERATURE";
+        weatherXdata->valuename << "HUMIDITY";
 
         try {
 
