@@ -16,4 +16,4 @@ Windows: [![Build status](https://ci.appveyor.com/api/projects/status/i6dwn4m8oy
 
 Alternatively official builds are available from http://www.goldencheetah.org
 
-whilst latest developer builds are available from http://goldencheetah.stand2surf.net
+whilst latest developer builds are available from https://github.com/GoldenCheetah/GoldenCheetah/releases
