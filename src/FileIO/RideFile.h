@@ -34,6 +34,8 @@ class Specification;
 class IntervalItem;
 class WPrime;
 class RideFile;
+class XDataSeries;
+class XDataPoint;
 struct RideFilePoint;
 struct RideFileDataPresent;
 class RideFileInterval;
@@ -325,6 +327,11 @@ class RideFile : public QObject // QObject to emit signals
  
         WPrime *wprimeData(); // return wprime, init/refresh if needed
 
+        // XDATA
+        XDataSeries *xdata(QString name);
+        void addXData(QString name, XDataSeries *series);
+        const QMap<QString,XDataSeries*> &xdata() const { return xdata_; }
+
         // METRIC OVERRIDES
         QMap<QString,QMap<QString,QString> > metricOverrides;
 
@@ -400,6 +407,9 @@ class RideFile : public QObject // QObject to emit signals
         void updateAvg(RideFilePoint* point);
 
         bool dstale; // is derived data up to date?
+
+        // xdata series
+        QMap<QString, XDataSeries*> xdata_;
 
         // data required to compute headwind based on weather broadcast
         double windSpeed_, windHeading_;
@@ -503,6 +513,37 @@ class RideFileIterator {
     private:
         RideFile *f;
         int start, stop, index;
+};
+
+class XDataSeries {
+public:
+    QString name;
+    QStringList valuename;
+    QVector<XDataPoint*> datapoints;
+};
+
+// each sample has up to 8 strings or values
+class XDataPoint {
+public:
+    XDataPoint() {
+        secs=km=0;
+        for(int i=0; i<8; i++) {
+            number[i]=0;
+            string[i]="";
+        }
+    }
+    XDataPoint (const XDataPoint &other) {
+        this->secs=other.secs;
+        this->km=other.km;
+        for(int i=0; i<8; i++) {
+            this->number[i]= other.number[i];
+            this->string[i]= other.string[i];
+        }
+    }
+
+    double secs, km;
+    double number[8];
+    QString string[8];
 };
 
 struct RideFileReader {

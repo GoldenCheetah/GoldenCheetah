@@ -117,6 +117,8 @@ void JsonRideFilefree (void * ptr , yyscan_t /*scanner*/)
 \"STOP\"            return STOP;
 \"CALIBRATIONS\"    return CALIBRATIONS;
 \"VALUE\"           return VALUE;
+\"VALUES\"          return VALUES;
+\"XDATA\"           return XDATA;
 \"REFERENCES\"      return REFERENCES;
 \"SAMPLES\"         return SAMPLES;
 \"SECS\"            return SECS;

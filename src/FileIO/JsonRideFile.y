@@ -59,6 +59,11 @@ struct JsonContext {
     QStringList JsonRideFileerrors;
     QMap <QString, QString> JsonOverrides;
 
+    XDataSeries xdataseries;
+    XDataPoint xdatapoint;
+    QStringList stringlist;
+    QVector<double> numberlist;
+
 };
 
 #define YYSTYPE QString
@@ -109,9 +114,10 @@ static QString protect(const QString string)
 %token RIDE STARTTIME RECINTSECS DEVICETYPE IDENTIFIER
 %token OVERRIDES
 %token TAGS INTERVALS NAME START STOP
-%token CALIBRATIONS VALUE
+%token CALIBRATIONS VALUE VALUES
 %token REFERENCES
-%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP 
+%token XDATA
+%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP
 %token LRBALANCE LTE RTE LPS RPS THB SMO2 RVERT RCAD RCON
 %token LPCO RPCO LPPB RPPB LPPE RPPE LPPPB RPPPB LPPPE RPPPE
 
@@ -143,6 +149,7 @@ rideelement: starttime
             | calibrations
             | references
             | samples
+            | xdata
             ;
 
 /*
@@ -233,6 +240,56 @@ reference_list: reference | reference_list ',' reference;
 reference: '{' series '}'               { jc->JsonRide->appendReference(jc->JsonPoint);
                                           jc->JsonPoint = RideFilePoint();
                                         }
+/*
+ * XData series
+ */
+
+xdata: XDATA ':' '[' xdata_list ']'
+xdata_list: xdata_series
+            | xdata_list ',' xdata_series
+            ;
+
+xdata_series: '{' xdata_items '}'              { XDataSeries *add = new XDataSeries;
+                                                 add->name=jc->xdataseries.name;
+                                                 add->datapoints=jc->xdataseries.datapoints;
+                                                 add->valuename=jc->xdataseries.valuename;
+                                                 jc->JsonRide->addXData(add->name, add);
+
+                                                 // clear for next one
+                                                 jc->xdataseries = XDataSeries();
+                                               }
+
+
+xdata_items: xdata_item
+            | xdata_items ',' xdata_item
+            ;
+
+xdata_item: NAME ':' string                     { jc->xdataseries.name = $3; }
+          | VALUE ':' string                    { jc->xdataseries.valuename << $3; }
+          | VALUES ':' '[' string_list ']'      { jc->xdataseries.valuename = jc->stringlist;
+                                                  jc->stringlist.clear(); }
+          | SAMPLES ':' '[' xdata_samples ']'
+          ;
+
+xdata_samples: xdata_sample
+         | xdata_samples ',' xdata_sample
+         ;
+xdata_sample: '{' xdata_value_list '}'          { jc->xdataseries.datapoints.append(new XDataPoint(jc->xdatapoint));
+                                                  jc->xdatapoint = XDataPoint();
+                                                }
+          ;
+
+xdata_value_list: xdata_value | xdata_value_list ',' xdata_value
+xdata_value:
+        SECS ':' number                         { jc->xdatapoint.secs = jc->JsonNumber; }
+        | KM ':' number                         { jc->xdatapoint.km = jc->JsonNumber; }
+        | VALUE ':' number                      { jc->xdatapoint.number[0] = jc->JsonNumber; }
+        | VALUES ':' '[' number_list ']'        { for(int i=0; i<jc->numberlist.count() && i<8; i++)
+                                                      jc->xdatapoint.number[i]= jc->numberlist[i];
+                                                  jc->numberlist.clear(); }
+        | string ':' number                     { /* ignored for future compatibility */ }
+        | string ':' string                     { /* ignored for future compatibility */ }
+        ;
 
 /*
  * Ride datapoints
@@ -307,6 +364,14 @@ number: JS_INTEGER                         { jc->JsonNumber = QString($1).toInt(
 
 string: JS_STRING                          { jc->JsonString = $1; }
         ;
+
+ string_list: string                       { jc->stringlist << $1; }
+            | string_list ',' string       { jc->stringlist << $3; }
+            ;
+
+ number_list: number                       { jc->numberlist << QString($1).toDouble(); }
+            | number_list ',' number       { jc->numberlist << QString($3).toDouble(); }
+
 %%
 
 
@@ -361,7 +426,7 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
     // set to non-zero if you want to
     // to debug the yyparse() state machine
     // sending state transitions to stderr
-    //yydebug = 0;
+    //yydebug = 1;
 
     // parse it
     JsonRideFileparse(jc);
@@ -591,6 +656,90 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
             out << " }";
         }
         out <<"\n\t\t]";
+    }
+
+    //
+    // XDATA
+    //
+    if (ride->xdata().count()) {
+        // output the xdata series
+        out << ",\n\t\t\"XDATA\":[\n";
+
+        bool first = true;
+        QMapIterator<QString,XDataSeries*> xdata(ride->xdata());
+        xdata.toFront();
+        while(xdata.hasNext()) {
+
+            // iterate
+            xdata.next();
+
+            XDataSeries *series = xdata.value();
+
+            // does it have values names?
+            if (series->valuename.isEmpty()) continue;
+
+            if (!first) out<<",\n";
+            out << "\t\t{\n";
+
+            // series name
+            out << "\t\t\t\"NAME\" : \"" << xdata.key() << "\",\n";
+
+            // value names
+            if (series->valuename.count() > 1) {
+                out << "\t\t\t\"VALUES\" : [ ";
+                bool firstv=true;
+                foreach(QString x, series->valuename) {
+                    if (!firstv) out << ", ";
+                    out << "\"" << x << "\"";
+                    firstv=false;
+                }
+                out << " ]";
+            } else {
+                out << "\t\t\t\"VALUE\" : \"" << series->valuename[0] << "\"";
+            }
+
+            // samples
+            if (series->datapoints.count()) {
+                out << ",\n\t\t\t\"SAMPLES\" : [\n";
+
+                bool firsts=true;
+                foreach(XDataPoint *p, series->datapoints) {
+                    if (!firsts) out<< ",\n";
+
+                    // multi value sample
+                    if (series->valuename.count()>1) {
+
+                        out << "\t\t\t\t{ \"SECS\":"<<QString("%1").arg(p->secs) <<", "
+                            << "\"KM\":"<<QString("%1").arg(p->km) << ", "
+                            << "\"VALUES\":[ ";
+
+                        bool firstvv=true;
+                        for(int i=0; i<series->valuename.count(); i++) {
+                            if (!firstvv) out << ", ";
+                            out << QString("%1").arg(p->number[i]);
+                            firstvv=false;
+                         }
+                         out << " ] }";
+
+                    } else {
+
+                        out << "\t\t\t\t{ \"SECS\":"<<QString("%1").arg(p->secs) << ", "
+                            << "\"KM\":"<<QString("%1").arg(p->km) << ", "
+                            << "\"VALUE\":" << QString("%1").arg(p->number[0]) << " }";
+                    }
+                    firsts = false;
+                }
+
+                out << "\n\t\t\t]\n";
+            }
+
+            out << "\t\t}";
+
+            // now do next
+            first = false;
+        }
+
+        out << "\n\t\t]";
     }
 
     // end of ride and document
