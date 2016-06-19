@@ -25,6 +25,7 @@
 #include "RideFile.h"
 #include "IntervalItem.h"
 #include "IntervalTreeView.h"
+#include "SmallPlot.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Zones.h"
@@ -67,9 +68,11 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     mapCombo->setCurrentIndex(mapType);
 
     showMarkersCk = new QCheckBox();
+    showFullPlotCk = new QCheckBox();
 
     commonLayout->addRow(new QLabel(tr("Map")), mapCombo);
     commonLayout->addRow(new QLabel(tr("Show Markers")), showMarkersCk);
+    commonLayout->addRow(new QLabel(tr("Show Full Plot")), showFullPlotCk);
     commonLayout->addRow(new QLabel(""));
 
     osmCustomTSTitle = new QLabel(tr("Open Street Map - Custom Tile Server settings"));
@@ -99,6 +102,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     connect(mapCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(mapTypeSelected(int)));
     connect(showMarkersCk, SIGNAL(stateChanged(int)), this, SLOT(showMarkersChanged(int)));
+    connect(showFullPlotCk, SIGNAL(stateChanged(int)), this, SLOT(showFullPlotChanged(int)));
     connect(osmCustomTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(osmCustomTSUrl, SIGNAL(textChanged(QString)), this, SLOT(osmCustomTSURLTextChanged(QString)));
     connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
@@ -156,6 +160,15 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+    // just the hr and power as a plot
+    smallPlot = new SmallPlot(this);
+    smallPlot->setMaximumHeight(200);
+    smallPlot->setMinimumHeight(100);
+    smallPlot->setVisible(false);
+    layout->addWidget(smallPlot);
+    layout->setStretch(1, 20);
+
 
     first = true;
     configChanged(CONFIG_APPEARANCE);
@@ -220,6 +233,12 @@ RideMapWindow::showMarkersChanged(int value)
 {
     Q_UNUSED(value);
     forceReplot();
+}
+
+void
+RideMapWindow::showFullPlotChanged(int value)
+{
+    smallPlot->setVisible(value != 0);
 }
 
 void
@@ -295,6 +314,7 @@ RideMapWindow::rideSelected()
     }
 
     loadRide();
+    smallPlot->setData(ride);
 }
 
 void RideMapWindow::loadRide()
