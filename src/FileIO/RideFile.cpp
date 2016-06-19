@@ -768,9 +768,66 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
 
         //foreach(RideFile::seriestype x, result->arePresent()) qDebug()<<"present="<<x;
 
+        // sample code for using XDATA, left here temporarily till we have an
+        // example of using it in a ride file reader
+#if 0
+
+        // ADD XDATA TO RIDEFILE
+
+        // For testing xdata, this code just adds an xdata series
+        // XDataSeries *xdata = new XDataSeries();
+        // xdata->name = "SPEED";
+        // xdata->valuename << "SPEED";
+        // for(int i=0; i<100; i++) {
+        // XDataPoint *p = new XDataPoint();
+        // p->km = i;
+        // p->secs = i;
+        // p->number[0] = i;
+        // xdata->datapoints.append(p);
+        // }
+        // result->addXData("SPEED", xdata);
+
+        // DEBUG OUTPUT TO SHOW XDATA LOADED FROM RIDEFILE
+        // for testing, print out what we loaded
+        if (result->xdata_.count()) {
+
+            // output the xdata series
+            qDebug()<<"XDATA";
+
+            QMapIterator<QString,XDataSeries*> xdata(result->xdata());
+            xdata.toFront();
+            while(xdata.hasNext()) {
+
+                // iterate
+                xdata.next();
+
+                XDataSeries *series = xdata.value();
+
+                // does it have values names?
+                if (series->valuename.isEmpty()) {
+                    qDebug()<<"empty xdata"<<series->name;
+                    continue;
+                } else {
+                    qDebug()<<"xdata" <<series->name<<series->valuename<<series->datapoints.count();
+                }
+
+                // samples
+                if (series->datapoints.count()) {
+                    foreach(XDataPoint *p, series->datapoints)
+                        qDebug()<<"sample:"<<p->secs<<p->km<<p->number[0]<<p->number[1];
+                }
+            }
+        }
+#endif
     }
 
     return result;
+}
+
+void
+RideFile::addXData(QString name, XDataSeries *series)
+{
+    xdata_.insert(name, series);
 }
 
 QStringList RideFileFactory::listRideFiles(const QDir &dir) const
