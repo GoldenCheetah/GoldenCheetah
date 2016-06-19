@@ -104,6 +104,7 @@ struct FitFileReaderState
     double last_lap_end; // to align laps for drill mode in pool swimming
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
+    XDataSeries *weatherXdata;
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
@@ -1223,6 +1224,12 @@ struct FitFileReaderState
     void decodeWeather(const FitDefinition &def, int time_offset,
                       const std::vector<FitValue>& values) {
         Q_UNUSED(time_offset);
+
+        time_t time = 0;
+        if (time_offset > 0)
+            time = last_time + time_offset;
+        double windHeading = 0.0, windSpeed = 0.0, temp = 0.0, humidity = 0.0;
+
         int i = 0;
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
@@ -1232,7 +1239,7 @@ struct FitFileReaderState
 
             switch (field.num) {
                 case 253: // Timestamp
-                          // ignored
+                          time = value + qbase_time.toTime_t();
                           break;
                 case 8:   // Weather station name
                           // ignored
@@ -1247,20 +1254,33 @@ struct FitFileReaderState
                          // ignored
                         break;
                 case 3:  // Wind heading (0deg=North)
+                        windHeading = value ; // 180.0 * MATHCONST_PI;
                         rideFile->setWindHeading(value / 180.0 * MATHCONST_PI);
                         break;
                 case 4:  // Wind speed (mm/s)
+                        windSpeed = value * 0.0036;
                         rideFile->setWindSpeed(value * 0.0036);
                         break;
                 case 1:  // Temperature
-                         // ignored
+                        temp = value;
                         break;
                 case 7:  // Humidity
-                         // ignored at present
+                        humidity = value;
                         break;
                 default: ; // ignore it
             }
         }
+
+        double secs = time - start_time;
+        XDataPoint *p = new XDataPoint();
+        p->secs = secs;
+        p->km = last_distance;
+        p->number[0] = windSpeed;
+        p->number[1] = windHeading;
+        p->number[2] = temp;
+        p->number[3] = humidity;
+
+        weatherXdata->datapoints.append(p);
     }
 
     void decodeDeviceSettings(const FitDefinition &def, int time_offset,
@@ -1597,12 +1617,15 @@ struct FitFileReaderState
                     decodeRecord(def, time_offset, values);
                     break;
                 case 21: decodeEvent(def, time_offset, values); break;
-                case 23: //decodeDeviceInfo(def, time_offset, values); /* device info */
+                case 23:
+                    //decodeDeviceInfo(def, time_offset, values); /* device info */
                     break;
                 case 101:
                     decodeLength(def, time_offset, values);
                     break; /* lap swimming */
-                case 128: decodeWeather(def, time_offset, values); break; /* weather broadcast */
+                case 128:
+                    decodeWeather(def, time_offset, values);
+                    break; /* weather broadcast */
 
                 case 1: /* capabilities, device settings and timezone */ break;
                 case 2: decodeDeviceSettings(def, time_offset, values); break;
@@ -1696,6 +1719,13 @@ struct FitFileReaderState
         }
 
         int data_size = 0;
+        weatherXdata = new XDataSeries();
+        weatherXdata->name = "WEATHER";
+        weatherXdata->valuename << "WINDSPEED";
+        weatherXdata->valuename << "WINDHEADING";
+        weatherXdata->valuename << "HUMIDITY";
+        weatherXdata->valuename << "TEMPERATURE";
+
         try {
 
             // read the header
@@ -1777,6 +1807,9 @@ struct FitFileReaderState
                 qDebug() << QString("FitRideFile: unknown base type %1; skipped").arg(num);
 
             file.close();
+
+            if (weatherXdata->datapoints.count()>0)
+                rideFile->addXData("WEATHER", weatherXdata);
 
             return rideFile;
         }
