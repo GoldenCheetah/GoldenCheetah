@@ -53,6 +53,7 @@ class QVBoxLayout;
 class QTabWidget;
 class RideMapWindow;
 class IntervalSummaryWindow;
+class SmallPlot;
 
 // trick the maps api into ignoring gestures by
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
@@ -122,6 +123,7 @@ class RideMapWindow : public GcChartWindow
 
     Q_PROPERTY(int maptype READ mapType WRITE setMapType USER true)
     Q_PROPERTY(bool showmarkers READ showMarkers WRITE setShowMarkers USER true)
+    Q_PROPERTY(bool showfullplot READ showFullPlot WRITE setFullPlot USER true)
     Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
     Q_PROPERTY(QString osmtsurl READ osmTSUrl WRITE setOsmTSUrl USER true)
 
@@ -139,7 +141,7 @@ class RideMapWindow : public GcChartWindow
 
 
         QComboBox *mapCombo, *tileCombo;
-        QCheckBox *showMarkersCk;
+        QCheckBox *showMarkersCk, *showFullPlotCk;
         QLabel *osmCustomTSTitle, *osmCustomTSLabel, *osmCustomTSUrlLabel;
         QLineEdit *osmCustomTSUrl;
 
@@ -149,6 +151,9 @@ class RideMapWindow : public GcChartWindow
 
         bool showMarkers() const { return ( showMarkersCk->checkState() == Qt::Checked); }
         void setShowMarkers(bool x) { if (x) showMarkersCk->setCheckState(Qt::Checked); else showMarkersCk->setCheckState(Qt::Unchecked) ;}
+
+        bool showFullPlot() const { return ( showFullPlotCk->checkState() == Qt::Checked); }
+        void setFullPlot(bool x) { if (x) showFullPlotCk->setCheckState(Qt::Checked); else showFullPlotCk->setCheckState(Qt::Unchecked) ;}
 
         int osmTS() const { return ( tileCombo->itemData(tileCombo->currentIndex()).toInt()); }
         void setOsmTS(int x) { tileCombo->setCurrentIndex(tileCombo->findData(x)); /*setTileServerUrlForTileType(x);*/}
@@ -161,6 +166,7 @@ class RideMapWindow : public GcChartWindow
         void mapTypeSelected(int x);
         void tileTypeSelected(int x);
         void showMarkersChanged(int value);
+        void showFullPlotChanged(int value);
         void osmCustomTSURLEditingFinished();
         void osmCustomTSURLTextChanged(QString text);
 
@@ -206,6 +212,7 @@ class RideMapWindow : public GcChartWindow
         void updateFrame();
 
     protected:
+        SmallPlot *smallPlot;
         bool event(QEvent *event);
         bool stale;
 
