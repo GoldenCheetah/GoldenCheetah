@@ -112,6 +112,14 @@ RideFile::~RideFile()
         //delete interval;
     delete command;
     if (wprime_) delete wprime_;
+
+    // delete any Xdata
+    QMapIterator<QString,XDataSeries*> it(xdata_);
+    while(it.hasNext()) {
+        it.next();
+        XDataSeries *p = it.value();
+        delete p;
+    }
     //!!! if (data) delete data; // need a mechanism to notify the editor
 }
 
