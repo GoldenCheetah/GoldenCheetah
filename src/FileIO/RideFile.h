@@ -515,13 +515,6 @@ class RideFileIterator {
         int start, stop, index;
 };
 
-class XDataSeries {
-public:
-    QString name;
-    QStringList valuename;
-    QVector<XDataPoint*> datapoints;
-};
-
 // each sample has up to 8 strings or values
 class XDataPoint {
 public:
@@ -544,6 +537,15 @@ public:
     double secs, km;
     double number[8];
     QString string[8];
+};
+
+class XDataSeries {
+public:
+    ~XDataSeries() { foreach(XDataPoint *p, datapoints) delete p; }
+
+    QString name;
+    QStringList valuename;
+    QVector<XDataPoint*> datapoints;
 };
 
 struct RideFileReader {

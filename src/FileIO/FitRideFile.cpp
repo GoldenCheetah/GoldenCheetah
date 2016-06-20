@@ -1810,6 +1810,8 @@ struct FitFileReaderState
 
             if (weatherXdata->datapoints.count()>0)
                 rideFile->addXData("WEATHER", weatherXdata);
+            else
+                delete weatherXdata;
 
             return rideFile;
         }
