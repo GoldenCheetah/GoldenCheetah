@@ -883,7 +883,7 @@ HrZones::getFingerprint() const
         // each zone definition (manual edit/default changed)
         for (int j=0; j<ranges[i].zones.count(); j++) {
             x += ranges[i].zones[j].lo;
-
+            x += int(double(100.0f * ranges[i].zones[j].trimp));
         }
     }
     QByteArray ba = QByteArray::number(x);
@@ -906,6 +906,7 @@ HrZones::getFingerprint(QDate forDate) const
         // each zone definition (manual edit/default changed)
         for (int j=0; j<ranges[i].zones.count(); j++) {
             x += ranges[i].zones[j].lo;
+            x += int(double(100.0f * ranges[i].zones[j].trimp));
         }
     }
     QByteArray ba = QByteArray::number(x);
