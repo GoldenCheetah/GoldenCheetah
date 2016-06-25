@@ -233,6 +233,7 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
     case CriticalPowerWindow::kph:
         series = tr("Speed");
         units = tr("kph");
+        scale = linear;
         break;
 
     case CriticalPowerWindow::nm:
@@ -1287,7 +1288,8 @@ CPPlot::plotBests(RideItem *rideItem)
 
     // now set the scale
     QwtScaleDiv div((double)xmin, (double)xmax);
-    if (criticalSeries == CriticalPowerWindow::work)
+    if (criticalSeries == CriticalPowerWindow::work ||
+        criticalSeries == CriticalPowerWindow::kph)
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksEnergy);
     else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksVeloclinic);
@@ -2413,7 +2415,8 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
 
     // now set the scale
     QwtScaleDiv div((double)xmin, (double)xmax);
-    if (criticalSeries == CriticalPowerWindow::work)
+    if (criticalSeries == CriticalPowerWindow::work ||
+        criticalSeries == CriticalPowerWindow::kph)
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksEnergy);
     else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksVeloclinic);
@@ -2555,7 +2558,8 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
 
     // now set the scale
     QwtScaleDiv div((double)xmin, (double)xmax);
-    if (criticalSeries == CriticalPowerWindow::work)
+    if (criticalSeries == CriticalPowerWindow::work ||
+        criticalSeries == CriticalPowerWindow::kph)
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksEnergy);
     else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksVeloclinic);
