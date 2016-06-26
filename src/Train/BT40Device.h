@@ -52,6 +52,7 @@ private:
     QLowEnergyController *m_control;
     static QList<QBluetoothUuid> supportedServiceUuids;
     QList<QLowEnergyService*> m_services;
+    int prevCrankStaleness;
     quint16 prevCrankTime;
     quint16 prevCrankRevs;
     quint16 prevWheelTime;
