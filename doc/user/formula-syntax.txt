@@ -37,6 +37,7 @@ vdottime(VDOT, distance)
 MEAN MAX and ZONE FUNCTIONS
 best(...)
 tiz(...)
+besttime(distance)
 
 PMC FUNCTIONS
 lts(p1)
