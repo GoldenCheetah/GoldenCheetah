@@ -43,6 +43,7 @@ BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(p
     prevWheelRevs = 0;
     prevCrankTime = 0;
     prevCrankRevs = 0;
+    prevCrankStaleness = -1; 	// indicates prev crank data values aren't measured values
 }
 
 BT40Device::~BT40Device() {
@@ -157,15 +158,31 @@ void BT40Device::updateValue(const QLowEnergyCharacteristic &c,
 	ds >> tmp_pwr;
 	double power = (double) tmp_pwr;
 	dynamic_cast<BT40Controller*>(parent)->setWatts(power);
+	if (flags & 0x01) { // power balance present
+	  qint8 byte;
+	  ds >> byte;
+	}
+	if (flags & 0x04) { // accumulated torque data present
+	  qint16 word;
+	  ds >> word;
+	}
+	if (flags & 0x10) { // wheel revolutions data present
+	  getWheelRpm(ds);
+	}
+	if (flags & 0x20) { // crank data present
+	  // If this power meter reports crank revolutions, it is
+	  // likely a crank-based meter (e.g. Stages)
+	  getCadence(ds);
+	}
     }
     else if (c.uuid() == QBluetoothUuid(QBluetoothUuid::CSCMeasurement)) {
 	quint8 flags;
 	ds >> flags;
 	if (flags & 0x1) { // Wheel Revolution Data Present
-	    getWheelRpm(ds);
+	  getWheelRpm(ds);
 	}
 	if (flags & 0x2) { // Crank Revolution Data Present
-	    getCadence(ds);
+          getCadence(ds);
 	}
     }
 }
@@ -199,15 +216,35 @@ void BT40Device::getCadence(QDataStream& ds) {
     quint16 cur_time;
     ds >> cur_revs;
     ds >> cur_time;
-    double rpm = 0.0;
-    quint16 time = cur_time - prevCrankTime;
-    quint16 revs = cur_revs - prevCrankRevs;
-    if (time) {
-	rpm = 1024*60*revs / time;
-    }
+    // figure wether to update cadence and with what value
+    //
+    // If we have a new crank event (new time) we push a new RPM, but
+    // only if the previous data is valid (fixes glitch on first
+    // update)
+    //
+    // If we don't have new crank data, push a zero for RPM, unless
+    // previous data is only 1 or 2 notifications old. This lets us
+    // report RPMs lower than 60 (assuming notification period is 1s)
+    // but still report a zero fairly quickly (2 notification periods)
+    if (cur_time != prevCrankTime) {
+      if (prevCrankStaleness >= 0) {
+	const int time = cur_time + (cur_time < prevCrankTime ? 0x10000:0) - prevCrankTime;
+	const int revs = cur_revs + (cur_revs < prevCrankRevs ? 0x10000:0) - prevCrankRevs;
+	const double rpm = 1024*60*revs / time;
+	dynamic_cast<BT40Controller*>(parent)->setCadence(rpm);
+      }
+    } else if (prevCrankStaleness < 0 || prevCrankStaleness >= 2) {
+      dynamic_cast<BT40Controller*>(parent)->setCadence(0.0);
+    }      
+    // update the staleness of the previous crank data
+    if (cur_time != prevCrankTime) {
+      prevCrankStaleness = 0;
+    } else if (prevCrankStaleness < 2) {
+      prevCrankStaleness += 1;
+    }      
+    // update the previous crank data
     prevCrankRevs = cur_revs;
     prevCrankTime = cur_time;
-    dynamic_cast<BT40Controller*>(parent)->setCadence(rpm);
 }
 
 void BT40Device::getWheelRpm(QDataStream& ds) {
