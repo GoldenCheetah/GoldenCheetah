@@ -228,8 +228,8 @@ void BT40Device::getCadence(QDataStream& ds) {
     // but still report a zero fairly quickly (2 notification periods)
     if (cur_time != prevCrankTime) {
       if (prevCrankStaleness >= 0) {
-	const int time = cur_time + (cur_time < prevCrankTime ? 0x1000:0) - prevCrankTime;
-	const int revs = cur_revs + (cur_revs < prevCrankRevs ? 0x1000:0) - prevCrankRevs;
+	const int time = cur_time + (cur_time < prevCrankTime ? 0x10000:0) - prevCrankTime;
+	const int revs = cur_revs + (cur_revs < prevCrankRevs ? 0x10000:0) - prevCrankRevs;
 	const double rpm = 1024*60*revs / time;
 	dynamic_cast<BT40Controller*>(parent)->setCadence(rpm);
       }
