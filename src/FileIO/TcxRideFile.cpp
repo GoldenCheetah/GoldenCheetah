@@ -211,7 +211,7 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
             // distance - meters
             if (ride->areDataPresent()->km) {
                 QDomElement dist = doc.createElement("DistanceMeters");
-                text = doc.createTextNode(QString("%1").arg((int)(point->km*1000)));
+                text = doc.createTextNode(QString("%1").arg((point->km*1000)));
                 dist.appendChild(text);
                 trackpoint.appendChild(dist);
             }
