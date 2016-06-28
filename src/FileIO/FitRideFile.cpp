@@ -256,6 +256,17 @@ struct FitFileReaderState
         printf("type: %d %llx %llx %s\n", v.type, v.v, v.v2, v.s.c_str());
     }
 
+    void convert2Run() {
+        if (rideFile->areDataPresent()->cad) {
+            foreach(RideFilePoint *pt, rideFile->dataPoints()) {
+                pt->rcad = pt->cad;
+                pt->cad = 0;
+            }
+            rideFile->setDataPresent(RideFile::rcad, true);
+            rideFile->setDataPresent(RideFile::cad, false);
+        }
+    }
+
     void decodeFileId(const FitDefinition &def, int,
                       const std::vector<FitValue>& values) {
         int i = 0;
@@ -386,6 +397,8 @@ struct FitFileReaderState
                     switch (value) {
                         case 1: // running:
                             rideFile->setTag("Sport","Run");
+                            if (rideFile->dataPoints().count()>0)
+                                convert2Run();
                             break;
                         default: // if we can't work it out, assume bike
                             // but only if not already set to another sport,
