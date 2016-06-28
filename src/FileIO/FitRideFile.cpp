@@ -342,6 +342,12 @@ struct FitFileReaderState
 
                 default: rideFile->setDeviceType(QString("Powertap Device %1").arg(prod));break;
             }
+        } else  if (manu == 32) {
+            // wahoo
+            switch (prod) {
+                case 0: rideFile->setDeviceType("Wahoo fitness"); break;
+                default: rideFile->setDeviceType(QString("Wahoo fitness %1").arg(prod));
+            }
         } else  if (manu == 38) {
             // o_synce
             switch (prod) {
@@ -351,15 +357,15 @@ struct FitFileReaderState
         } else if (manu == 70) {
             // does not set product at this point
            rideFile->setDeviceType("Sigmasport ROX");
-
         } else if (manu == 76) {
             // Moxy
             rideFile->setDeviceType("Moxy Monitor");
-
+        } else if (manu == 95) {
+            // Stryd
+            rideFile->setDeviceType("Stryd");
         } else if (manu == 260) {
             // Zwift!
             rideFile->setDeviceType("Zwift");
-
         } else {
             rideFile->setDeviceType(QString("Unknown FIT Device %1:%2").arg(manu).arg(prod));
         }
