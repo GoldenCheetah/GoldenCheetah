@@ -52,7 +52,7 @@ class AddIntervalDialog : public QDialog
 
         static void findPeakPowerStandard(Context *context, const RideFile *ride, QList<AddedInterval> &results);
 
-        static void findPeaks(Context *context, bool typeTime, const RideFile *ride, RideFile::SeriesType series,
+        static void findPeaks(Context *context, bool typeTime, const RideFile *ride, Specification spec, RideFile::SeriesType series,
                               RideFile::Conversion conversion, double windowSizeSecs,
                               int maxIntervals, QList<AddedInterval> &results, QString prefixe, QString overideName);
 

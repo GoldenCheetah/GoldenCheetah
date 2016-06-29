@@ -18,7 +18,7 @@
  */
 
 #include "RideMetric.h"
-#include "BestIntervalDialog.h"
+#include "AddIntervalDialog.h"
 #include "RideItem.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -64,8 +64,8 @@ class PeakPace : public RideMetric {
             return;
         }
 
-        QList<BestIntervalDialog::BestInterval> results;
-        BestIntervalDialog::findBestsKPH(item->ride(), spec, secs, 1, results);
+        QList<AddIntervalDialog::AddedInterval> results;
+        AddIntervalDialog::findPeaks(item->context, true, item->ride(), spec, RideFile::kph, RideFile::original, secs, 1, results, "", "");
         if (results.count() > 0 && results.first().avg > 0 && results.first().avg < 36) pace = 60.0 / results.first().avg;
         else pace = 0.0;
 
@@ -377,8 +377,8 @@ class PeakPaceSwim : public RideMetric {
             return;
         }
 
-        QList<BestIntervalDialog::BestInterval> results;
-        BestIntervalDialog::findBestsKPH(item->ride(), spec, secs, 1, results);
+        QList<AddIntervalDialog::AddedInterval> results;
+        AddIntervalDialog::findPeaks(item->context, true, item->ride(), spec, RideFile::kph, RideFile::original, secs, 1, results, "", "");
         if (results.count() > 0 && results.first().avg > 0 && results.first().avg < 9) pace = 6.0 / results.first().avg;
         else pace = 0.0;
         setValue(pace);
