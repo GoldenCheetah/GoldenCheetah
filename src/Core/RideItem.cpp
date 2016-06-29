@@ -29,7 +29,7 @@
 #include "PaceZones.h"
 #include "Settings.h"
 #include "Colors.h" // for ColorEngine
-#include "BestIntervalDialog.h" // till we fixup ridefilecache to have offsets
+#include "AddIntervalDialog.h" // till we fixup ridefilecache to have offsets
 #include "TimeUtils.h" // time_to_string()
 #include "WPrime.h" // for matches
 
@@ -844,8 +844,8 @@ RideItem::updateIntervals()
         for(int i=0; durations[i] != 0; i++) {
 
             // go hunting for best peak
-            QList<BestIntervalDialog::BestInterval> results;
-            BestIntervalDialog::findBests(f, Specification(), durations[i], 1, results);
+            QList<AddIntervalDialog::AddedInterval> results;
+            AddIntervalDialog::findPeaks(context, true, f, Specification(), RideFile::watts, RideFile::original, durations[i], 1, results, "", "");
 
             // did we get one ?
             if (results.count() > 0 && results[0].avg > 0 && results[0].stop > 0) {
@@ -878,8 +878,8 @@ RideItem::updateIntervals()
         for(int i=0; durations[i] != 0; i++) {
 
             // go hunting for best peak
-            QList<BestIntervalDialog::BestInterval> results;
-            BestIntervalDialog::findBestsKPH(f, Specification(), durations[i], 1, results);
+            QList<AddIntervalDialog::AddedInterval> results;
+            AddIntervalDialog::findPeaks(context, true, f, Specification(), RideFile::kph, RideFile::original, durations[i], 1, results, "", "");
 
             // did we get one ?
             if (results.count() > 0 && results[0].avg > 0 && results[0].stop > 0) {
