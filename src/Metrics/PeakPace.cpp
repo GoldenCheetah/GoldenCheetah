@@ -653,6 +653,365 @@ class PeakPaceSwim90m : public PeakPaceSwim {
         RideMetric *clone() const { return new PeakPaceSwim90m(*this); }
 };
 
+class BestTime : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(BestTime)
+    double meters;
+    double secs;
+
+    public:
+
+    BestTime() : meters(0.0)
+    {
+        setType(RideMetric::Low);
+    }
+    // BestTime ordering is reversed
+    bool isLowerBetter() const { return true; }
+    bool isTime() const { return true; }
+    void setMeters(double meters) { this->meters=meters; }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        QList<AddIntervalDialog::AddedInterval> results;
+        AddIntervalDialog::findPeaks(item->context, false, item->ride(), spec, RideFile::kph, RideFile::original, meters, 1, results, "", "");
+        if (results.count() > 0) secs = results.first().stop - results.first().start;
+        else secs = 0.0;
+
+        setValue(secs);
+    }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("S"); }
+    RideMetric *clone() const { return new BestTime(*this); }
+};
+
+class BestTime50m : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime50m)
+    public:
+        BestTime50m()
+        {
+            setMeters(50);
+            setSymbol("best_50m");
+            setInternalName("Best 50m");
+        }
+        void initialize () {
+            setName(tr("Best 50m"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime50m(*this); }
+};
+
+class BestTime100m : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime100m)
+    public:
+        BestTime100m()
+        {
+            setMeters(100);
+            setSymbol("best_100m");
+            setInternalName("Best 100m");
+        }
+        void initialize () {
+            setName(tr("Best 100m"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime100m(*this); }
+};
+
+class BestTime200m : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime200m)
+    public:
+        BestTime200m()
+        {
+            setMeters(200);
+            setSymbol("best_200m");
+            setInternalName("Best 200m");
+        }
+        void initialize () {
+            setName(tr("Best 200m"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime200m(*this); }
+};
+
+class BestTime400m : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime400m)
+    public:
+        BestTime400m()
+        {
+            setMeters(400);
+            setSymbol("best_400m");
+            setInternalName("Best 400m");
+        }
+        void initialize () {
+            setName(tr("Best 400m"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime400m(*this); }
+};
+
+class BestTime500m : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime500m)
+    public:
+        BestTime500m()
+        {
+            setMeters(500);
+            setSymbol("best_500m");
+            setInternalName("Best 500m");
+        }
+        void initialize () {
+            setName(tr("Best 500m"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime500m(*this); }
+};
+
+class BestTime800m : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime800m)
+    public:
+        BestTime800m()
+        {
+            setMeters(800);
+            setSymbol("best_800m");
+            setInternalName("Best 800m");
+        }
+        void initialize () {
+            setName(tr("Best 800m"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime800m(*this); }
+};
+
+class BestTime1000m : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime1000m)
+    public:
+        BestTime1000m()
+        {
+            setMeters(1000);
+            setSymbol("best_1000m");
+            setInternalName("Best 1000m");
+        }
+        void initialize () {
+            setName(tr("Best 1000m"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime1000m(*this); }
+};
+
+class BestTime1500m : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime1500m)
+    public:
+        BestTime1500m()
+        {
+            setMeters(1500);
+            setSymbol("best_1500m");
+            setInternalName("Best 1500m");
+        }
+        void initialize () {
+            setName(tr("Best 1500m"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime1500m(*this); }
+};
+
+class BestTime2000m : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime2000m)
+    public:
+        BestTime2000m()
+        {
+            setMeters(2000);
+            setSymbol("best_2000m");
+            setInternalName("Best 2000m");
+        }
+        void initialize () {
+            setName(tr("Best 2000m"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime2000m(*this); }
+};
+
+class BestTime3000m : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime3000m)
+    public:
+        BestTime3000m()
+        {
+            setMeters(3000);
+            setSymbol("best_3000m");
+            setInternalName("Best 3000m");
+        }
+        void initialize () {
+            setName(tr("Best 3000m"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime3000m(*this); }
+};
+
+class BestTime4000m : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime4000m)
+    public:
+        BestTime4000m()
+        {
+            setMeters(4000);
+            setSymbol("best_4000m");
+            setInternalName("Best 4000m");
+        }
+        void initialize () {
+            setName(tr("Best 4000m"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime4000m(*this); }
+};
+
+class BestTime5000m : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime5000m)
+    public:
+        BestTime5000m()
+        {
+            setMeters(5000);
+            setSymbol("best_5000m");
+            setInternalName("Best 5000m");
+        }
+        void initialize () {
+            setName(tr("Best 5000m"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime5000m(*this); }
+};
+
+class BestTime10km : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime10km)
+    public:
+        BestTime10km()
+        {
+            setMeters(10000);
+            setSymbol("best_10km");
+            setInternalName("Best 10km");
+        }
+        void initialize () {
+            setName(tr("Best 10km"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime10km(*this); }
+};
+
+class BestTime15km : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime15km)
+    public:
+        BestTime15km()
+        {
+            setMeters(15000);
+            setSymbol("best_15km");
+            setInternalName("Best 15km");
+        }
+        void initialize () {
+            setName(tr("Best 15km"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime15km(*this); }
+};
+
+class BestTime20km : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime20km)
+    public:
+        BestTime20km()
+        {
+            setMeters(20000);
+            setSymbol("best_20km");
+            setInternalName("Best 20km");
+        }
+        void initialize () {
+            setName(tr("Best 20km"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime20km(*this); }
+};
+
+class BestTimeHalfMarathon : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTimeHalfMarathon)
+    public:
+        BestTimeHalfMarathon()
+        {
+            setMeters(21097.5);
+            setSymbol("best_half_marathon");
+            setInternalName("Best Half Marathon");
+        }
+        void initialize () {
+            setName(tr("Best Half Marathon"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTimeHalfMarathon(*this); }
+};
+
+class BestTime30km : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime30km)
+    public:
+        BestTime30km()
+        {
+            setMeters(30000);
+            setSymbol("best_30km");
+            setInternalName("Best 30km");
+        }
+        void initialize () {
+            setName(tr("Best 30km"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime30km(*this); }
+};
+
+class BestTime40km : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTime40km)
+    public:
+        BestTime40km()
+        {
+            setMeters(40000);
+            setSymbol("best_40km");
+            setInternalName("Best 40km");
+        }
+        void initialize () {
+            setName(tr("Best 40km"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTime40km(*this); }
+};
+
+class BestTimeMarathon : public BestTime {
+    Q_DECLARE_TR_FUNCTIONS(BestTimeMarathon)
+    public:
+        BestTimeMarathon()
+        {
+            setMeters(42195);
+            setSymbol("best_Marathon");
+            setInternalName("Best Marathon");
+        }
+        void initialize () {
+            setName(tr("Best Marathon"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
+        }
+        RideMetric *clone() const { return new BestTimeMarathon(*this); }
+};
+
 static bool addAllPacePeaks() {
     RideMetricFactory::instance().addMetric(PeakPace10s());
     RideMetricFactory::instance().addMetric(PeakPace15s());
@@ -683,6 +1042,27 @@ static bool addAllPacePeaks() {
     RideMetricFactory::instance().addMetric(PeakPaceSwim30m());
     RideMetricFactory::instance().addMetric(PeakPaceSwim60m());
     RideMetricFactory::instance().addMetric(PeakPaceSwim90m());
+
+    RideMetricFactory::instance().addMetric(BestTime50m());
+    RideMetricFactory::instance().addMetric(BestTime100m());
+    RideMetricFactory::instance().addMetric(BestTime200m());
+    RideMetricFactory::instance().addMetric(BestTime400m());
+    RideMetricFactory::instance().addMetric(BestTime500m());
+    RideMetricFactory::instance().addMetric(BestTime800m());
+    RideMetricFactory::instance().addMetric(BestTime1000m());
+    RideMetricFactory::instance().addMetric(BestTime1500m());
+    RideMetricFactory::instance().addMetric(BestTime2000m());
+    RideMetricFactory::instance().addMetric(BestTime3000m());
+    RideMetricFactory::instance().addMetric(BestTime4000m());
+    RideMetricFactory::instance().addMetric(BestTime5000m());
+    RideMetricFactory::instance().addMetric(BestTime10km());
+    RideMetricFactory::instance().addMetric(BestTime15km());
+    RideMetricFactory::instance().addMetric(BestTime20km());
+    RideMetricFactory::instance().addMetric(BestTimeHalfMarathon());
+    RideMetricFactory::instance().addMetric(BestTime30km());
+    RideMetricFactory::instance().addMetric(BestTime40km());
+    RideMetricFactory::instance().addMetric(BestTimeMarathon());
+
     return true;
 }
 
