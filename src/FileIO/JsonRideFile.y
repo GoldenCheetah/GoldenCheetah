@@ -661,12 +661,12 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
     //
     // XDATA
     //
-    if (ride->xdata().count()) {
+    if (const_cast<RideFile*>(ride)->xdata().count()) {
         // output the xdata series
         out << ",\n\t\t\"XDATA\":[\n";
 
         bool first = true;
-        QMapIterator<QString,XDataSeries*> xdata(ride->xdata());
+        QMapIterator<QString,XDataSeries*> xdata(const_cast<RideFile*>(ride)->xdata());
         xdata.toFront();
         while(xdata.hasNext()) {
 
@@ -731,6 +731,8 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
                 }
 
                 out << "\n\t\t\t]\n";
+            } else {
+                out << "\n";
             }
 
             out << "\t\t}";

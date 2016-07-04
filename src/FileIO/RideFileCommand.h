@@ -55,6 +55,12 @@ class RideFileCommand : public QObject
         void appendPoints(QVector <struct RideFilePoint> newRows);
         void setDataPresent(RideFile::SeriesType, bool);
 
+        // working with xdata
+        void removeXData(QString name);
+        void addXData(XDataSeries *series);
+        void removeXDataSeries(QString xdata, QString name);
+        void addXDataSeries(QString xdata, QString name);
+
         // execute atomic actions
         void doCommand(RideCommand*, bool noexec=false);
         void undoCommand();
@@ -94,7 +100,8 @@ class RideCommand
 {
     public:
         // supported command types
-        enum commandtype { NoOp, LUW, SetPointValue, DeletePoint, DeletePoints, InsertPoint, AppendPoints, SetDataPresent };
+        enum commandtype { NoOp, LUW, SetPointValue, DeletePoint, DeletePoints, InsertPoint, AppendPoints, SetDataPresent,
+                           removeXData, addXData, RemoveXDataSeries, AddXDataSeries };
         typedef enum commandtype CommandType;
 
 
@@ -125,6 +132,61 @@ class LUWCommand : public RideCommand
 
         QVector<RideCommand*> worklist;
         RideFileCommand *commander;
+};
+
+class RemoveXDataCommand : public RideCommand
+{
+    Q_DECLARE_TR_FUNCTIONS(RemoveXDataCommand)
+
+    public:
+        RemoveXDataCommand(RideFile *ride, QString name);
+        bool doCommand();
+        bool undoCommand();
+
+        // state
+        QString name;
+        XDataSeries *series;
+};
+
+class AddXDataCommand : public RideCommand
+{
+    Q_DECLARE_TR_FUNCTIONS(addXDataCommand)
+
+    public:
+        AddXDataCommand(RideFile *ride, XDataSeries *series);
+        bool doCommand();
+        bool undoCommand();
+
+        // state
+        XDataSeries *series;
+};
+
+class RemoveXDataSeriesCommand : public RideCommand
+{
+    Q_DECLARE_TR_FUNCTIONS(RemoveXDataSeriesCommand)
+
+    public:
+        RemoveXDataSeriesCommand(RideFile *ride, QString xdata, QString name);
+        bool doCommand();
+        bool undoCommand();
+
+        // state
+        QString xdata, name;
+        int index;
+        QVector<double> values;
+};
+
+class AddXDataSeriesCommand : public RideCommand
+{
+    Q_DECLARE_TR_FUNCTIONS(AddXDataSeriesCommand)
+
+    public:
+        AddXDataSeriesCommand(RideFile *ride, QString xdata, QString name);
+        bool doCommand();
+        bool undoCommand();
+
+        // state
+        QString xdata, name;
 };
 
 class SetPointValueCommand : public RideCommand
