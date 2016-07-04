@@ -102,6 +102,35 @@ RideFileCommand::changeLog()
     }
     return log;
 }
+
+void
+RideFileCommand::removeXData(QString name)
+{
+    RemoveXDataCommand *cmd = new RemoveXDataCommand(ride, name);
+    doCommand(cmd);
+}
+
+void
+RideFileCommand::addXData(XDataSeries *series)
+{
+    AddXDataCommand *cmd = new AddXDataCommand(ride, series);
+    doCommand(cmd);
+}
+
+void
+RideFileCommand::addXDataSeries(QString xdata, QString name)
+{
+    AddXDataSeriesCommand *cmd = new AddXDataSeriesCommand(ride, xdata, name);
+    doCommand(cmd);
+}
+
+void
+RideFileCommand::removeXDataSeries(QString xdata, QString name)
+{
+    RemoveXDataSeriesCommand *cmd = new RemoveXDataSeriesCommand(ride, xdata, name);
+    doCommand(cmd);
+}
+
 //----------------------------------------------------------------------
 // Manage the Command Stack
 //----------------------------------------------------------------------
@@ -405,5 +434,144 @@ bool
 SetDataPresentCommand::undoCommand()
 {
     ride->setDataPresent(series, oldvalue);
+    return true;
+}
+
+RemoveXDataCommand::RemoveXDataCommand(RideFile *ride, QString name) : RideCommand(ride), name(name) {
+    type = RideCommand::removeXData;
+    description = tr("Remove XData");
+}
+
+bool
+RemoveXDataCommand::doCommand()
+{
+    series = ride->xdata(name);
+    ride->xdata().remove(name);
+    return true;
+}
+
+bool
+RemoveXDataCommand::undoCommand()
+{
+    ride->xdata().insert(name, series);
+    return true;
+}
+
+
+AddXDataCommand::AddXDataCommand(RideFile *ride, XDataSeries *series) : RideCommand(ride), series(series) {
+    type = RideCommand::addXData;
+    description = tr("Add XData");
+}
+
+bool
+AddXDataCommand::doCommand()
+{
+    ride->xdata().insert(series->name, series);
+    return true;
+}
+
+bool
+AddXDataCommand::undoCommand()
+{
+    ride->xdata().remove(series->name);
+    return true;
+}
+
+RemoveXDataSeriesCommand::RemoveXDataSeriesCommand(RideFile *ride, QString xdata, QString name) : RideCommand(ride), xdata(xdata), name(name) {
+    type = RideCommand::RemoveXDataSeries;
+    description = tr("Remove XData Series");
+}
+
+bool
+RemoveXDataSeriesCommand::doCommand()
+{
+    index = -1;
+
+    // whats the index?
+    XDataSeries *series = ride->xdata(xdata);
+    if (series == NULL)  return false;
+
+    index = series->valuename.indexOf(name);
+    if (index == -1) return false;
+
+    // snaffle away the data and clear
+    values.resize(series->datapoints.count());
+    for(int i=0; i<series->datapoints.count(); i++) {
+        values[i] = series->datapoints[i]->number[index];
+        series->datapoints[i]->number[index] = 0;
+
+        // shift the values down
+        for(int j=index+1; j<8; j++) {
+            series->datapoints[i]->number[j-1] =
+            series->datapoints[i]->number[j];
+        }
+    }
+
+    // remove the name
+    series->valuename.removeAt(index);
+    return true;
+}
+
+bool
+RemoveXDataSeriesCommand::undoCommand()
+{
+
+    if (index == -1 || name == "") return false;
+
+    // add the series back
+    XDataSeries *series = ride->xdata(xdata);
+    if (series == NULL) return false;
+
+    series->valuename.insert(index, name);
+
+    // put data back
+    for(int i=0; i<series->datapoints.count(); i++) {
+        // shift the values right
+        for(int j=index; j<7; j++) {
+            series->datapoints[i]->number[j+1] =
+            series->datapoints[i]->number[j];
+        }
+        series->datapoints[i]->number[index] = values[i];
+    }
+    return true;
+}
+
+
+AddXDataSeriesCommand::AddXDataSeriesCommand(RideFile *ride, QString xdata, QString name) : RideCommand(ride), xdata(xdata), name(name) {
+    type = RideCommand::AddXDataSeries;
+    description = tr("Add XData Series");
+}
+
+bool
+AddXDataSeriesCommand::doCommand()
+{
+    // whats the index?
+    XDataSeries *series = ride->xdata(xdata);
+    if (series == NULL)  return false;
+
+    series->valuename.append(name);
+
+    int index = series->valuename.indexOf(name);
+    if (index == -1) return false;
+
+    // Clear the value
+    for(int i=0; i<series->datapoints.count(); i++) {
+        series->datapoints[i]->number[index] = 0;
+    }
+
+    return true;
+}
+
+bool
+AddXDataSeriesCommand::undoCommand()
+{
+    // add the series back
+    XDataSeries *series = ride->xdata(xdata);
+    if (series == NULL) return false;
+
+    int index = series->valuename.count()-1;
+    if (index == -1) return false;
+    series->valuename.removeAt(index);
+
     return true;
 }

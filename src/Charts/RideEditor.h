@@ -29,6 +29,8 @@
 #include <QtGui>
 #include <QGroupBox>
 #include <QCheckBox>
+#include <QSize>
+#include <QTabBar>
 #include <QTableView>
 #include <QTableWidget>
 #include <QHeaderView>
@@ -42,7 +44,9 @@ class CellDelegate;
 class RideModel;
 class FindDialog;
 class AnomalyDialog;
+class XDataDialog;
 class PasteSpecialDialog;
+class EditorTabBar;
 
 class RideEditor : public GcChartWindow
 {
@@ -89,6 +93,7 @@ class RideEditor : public GcChartWindow
         void redo();
         void find();
         void anomalies();
+        void xdata();
 
         // anomaly list
         void anomalySelected();
@@ -120,6 +125,7 @@ class RideEditor : public GcChartWindow
         // GC signals
         void configChanged(qint32);
         void rideSelected();
+        void setTabBar();
         void intervalSelected();
         void rideDirty();
         void rideClean();
@@ -135,6 +141,7 @@ class RideEditor : public GcChartWindow
         QStringList copyHeadings;
         FindDialog *findTool;
         AnomalyDialog *anomalyTool;
+        XDataDialog *xdataTool;
 
     private:
         Context *context;
@@ -145,9 +152,11 @@ class RideEditor : public GcChartWindow
         QList<QString> whatColumns();
         QSignalMapper *colMapper;
 
+        EditorTabBar *tabbar;
+
         QToolBar *toolbar;
         QAction *saveAct, *undoAct, *redoAct,
-                *searchAct, *checkAct;
+                *searchAct, *checkAct, *xdataAct;
 
         // state data
         struct { int row, column; } currentCell;
@@ -328,4 +337,14 @@ class PasteSpecialDialog : public QDialog
 
         QPushButton *okButton, *cancelButton;
 };
+
+class EditorTabBar : public QTabBar
+{
+    public:
+        EditorTabBar(QWidget *p) : QTabBar(p) {}
+
+    protected:
+        virtual QSize tabSizeHint(int index) const;
+};
+
 #endif // _GC_RideEditor_h

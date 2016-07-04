@@ -27,6 +27,7 @@
 #include "TabView.h"
 #include "HelpWhatsThis.h"
 #include "HrZones.h"
+#include "XDataDialog.h"
 
 #include <QtGui>
 #include <QString>
@@ -122,6 +123,17 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     connect(checkAct, SIGNAL(triggered()), this, SLOT(anomalies()));
     toolbar->addAction(checkAct);
 
+    QIcon xdataIcon(":images/toolbar/properties.png");
+    xdataAct = new QAction(xdataIcon, tr("XData"), this);
+    connect(xdataAct, SIGNAL(triggered()), this, SLOT(xdata()));
+    toolbar->addAction(xdataAct);
+
+    // add a tabbar, with no tabs, hide it and only show
+    // if there are more than one tabs (i.e. we have XDATA)
+    tabbar = new EditorTabBar(this);
+    tabbar->setCurrentIndex(0);
+    tabbar->hide();
+
     // empty model
     model = new RideFileTableModel(NULL);
 
@@ -151,6 +163,7 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     //mainLayout->addWidget(title);
     mainLayout->addWidget(toolbar);
     mainLayout->addWidget(table);
+    mainLayout->addWidget(tabbar);
 
     // trap GC signals
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
@@ -165,6 +178,10 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     findTool->hide();
     anomalyTool = new AnomalyDialog(this);
     anomalyTool->hide();
+
+    // xdatatool
+    xdataTool = new XDataDialog(this);
+    xdataTool->hide();
 
     // allow us to jump to an anomaly
     connect(anomalyTool->anomalyList, SIGNAL(itemSelectionChanged()), this, SLOT(anomalySelected()));
@@ -186,6 +203,13 @@ RideEditor::configChanged(qint32)
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Normal, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
+    tabbar->setPalette(palette);
+    QColor faded = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+    tabbar->setStyleSheet(QString("QTabBar::tab { background-color: %1; border: 2px %1; color: rgba(%3,%4,%5,25%) }"
+                                  "QTabBar::tab:selected { background-color: %1; color: %2; border: 2px %1 }")
+                    .arg(GColor(CPLOTBACKGROUND).name())
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
+                    .arg(faded.red()).arg(faded.green()).arg(faded.blue()));
     table->setPalette(palette);
     table->setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }")
                     .arg(GColor(CPLOTBACKGROUND).name())
@@ -360,6 +384,7 @@ RideEditor::hideEvent(QHideEvent *)
 {
     findTool->hide();
     anomalyTool->hide();
+    xdataTool->hide();
 }
 
 void
@@ -377,6 +402,16 @@ RideEditor::anomalies()
     if (ride && ride->ride() && ride->ride()->dataPoints().count())
         anomalyTool->show();
     
+}
+
+void
+RideEditor::xdata()
+{
+    // work with xdata series (add / remove)
+    if (ride && ride->ride()) {
+        // show the xdata dialog
+        xdataTool->show();
+    }
 }
 
 void
@@ -1277,6 +1312,7 @@ RideEditor::rideSelected()
 {
     findTool->hide(); // hide the dialog!
     anomalyTool->hide();
+    xdataTool->hide();
 
     RideItem *current = myRideItem;
     if (!current || !current->ride() || !current->ride()->dataPoints().count()) {
@@ -1299,6 +1335,9 @@ RideEditor::rideSelected()
         data->found.clear(); // search is not active, so clear
     }
     model->setRide(ride->ride());
+
+    // Set for XDATA
+    setTabBar();
 
     // reset the save icon on the toolbar
     if (ride->isDirty()) saveAct->setEnabled(true);
@@ -1326,6 +1365,32 @@ RideEditor::rideSelected()
 
     // update finder pane to show available channels
     findTool->rideSelected();
+
+    // xdata
+    xdataTool->setRideItem(ride);
+}
+
+void
+RideEditor::setTabBar()
+{
+    while(tabbar->count()) tabbar->removeTab(0);
+    tabbar->hide();
+    tabbar->addTab(tr("STANDARD"));
+    if (ride->ride()->xdata().count()) {
+
+        // we need xdata editing too
+        QMapIterator<QString, XDataSeries *>it(ride->ride()->xdata());
+        it.toFront();
+        while(it.hasNext()) {
+            it.next();
+            QString name = it.key();
+            tabbar->addTab(name);
+        }
+        tabbar->show();
+    } else {
+        tabbar->hide();
+    }
+    tabbar->setCurrentIndex(0);
 }
 
 void
@@ -1384,6 +1449,9 @@ RideEditor::endCommand(bool undo, RideCommand *cmd)
     else redoAct->setEnabled(true);
     if (ride->ride()->command->undoCount() == 0) undoAct->setEnabled(false);
     else undoAct->setEnabled(true);
+
+    // react to xdata changes
+    setTabBar();
 
     // update the selection model when a command has been executed
     switch (cmd->type) {
@@ -1536,6 +1604,7 @@ RideEditor::endCommand(bool undo, RideCommand *cmd)
     // check for anomalies
     if (!inLUW) {
         anomalyTool->check();
+        xdataTool->setRideItem(ride);// rebuild tables
 
         // let everyone know we changed some data
         ride->notifyRideDataChanged();
@@ -2628,4 +2697,11 @@ void
 AnomalyDialog::reject()
 {
     hide();
+}
+
+QSize EditorTabBar::tabSizeHint(int index) const
+{
+    QSize def = QTabBar::tabSizeHint(index);
+    def.setWidth(20); // totally ignored, I hate QT sometimes
+    return def;
 }

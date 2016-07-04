@@ -328,9 +328,9 @@ class RideFile : public QObject // QObject to emit signals
         WPrime *wprimeData(); // return wprime, init/refresh if needed
 
         // XDATA
-        XDataSeries *xdata(QString name);
+        XDataSeries *xdata(QString name) { return xdata_.value(name, NULL); }
         void addXData(QString name, XDataSeries *series);
-        const QMap<QString,XDataSeries*> &xdata() const { return xdata_; }
+        QMap<QString,XDataSeries*> &xdata() { return xdata_; }
 
         // METRIC OVERRIDES
         QMap<QString,QMap<QString,QString> > metricOverrides;
@@ -541,10 +541,19 @@ public:
 
 class XDataSeries {
 public:
+    XDataSeries() {}
+    XDataSeries(XDataSeries &other) {
+        name = other.name;
+        valuename = other.valuename;
+        valuetype = other.valuetype;
+        datapoints = other.datapoints;
+    }
+
     ~XDataSeries() { foreach(XDataPoint *p, datapoints) delete p; }
 
     QString name;
     QStringList valuename;
+    QList<RideFile::SeriesType> valuetype;
     QVector<XDataPoint*> datapoints;
 };
 
