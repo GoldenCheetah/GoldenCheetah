@@ -222,7 +222,8 @@ RideEditor::configChanged(qint32)
                     .arg(faded.red()).arg(faded.green()).arg(faded.blue())
                     .arg(GColor(CPLOTMARKER).name()));
     table->setPalette(palette);
-    table->setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }")
+    table->setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }"
+                                 "QHeaderView { background-color: %1; color: %2; border: %1 }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
     table->horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
@@ -2958,7 +2959,8 @@ void XDataEditor::configChanged()
     palette.setColor(QPalette::Inactive, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
     table->setPalette(palette);
-    table->setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }")
+    table->setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }"
+                                  "QHeaderView { background-color: %1; color: %2; border: %1 }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
     table->horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
