@@ -60,6 +60,7 @@ class RideFileCommand : public QObject
         void addXData(XDataSeries *series);
         void removeXDataSeries(QString xdata, QString name);
         void addXDataSeries(QString xdata, QString name);
+        void setXDataPointValue(QString xdata, int row, int column, double value);
 
         // execute atomic actions
         void doCommand(RideCommand*, bool noexec=false);
@@ -101,7 +102,7 @@ class RideCommand
     public:
         // supported command types
         enum commandtype { NoOp, LUW, SetPointValue, DeletePoint, DeletePoints, InsertPoint, AppendPoints, SetDataPresent,
-                           removeXData, addXData, RemoveXDataSeries, AddXDataSeries };
+                           removeXData, addXData, RemoveXDataSeries, AddXDataSeries, SetXDataPointValue };
         typedef enum commandtype CommandType;
 
 
@@ -201,6 +202,21 @@ class SetPointValueCommand : public RideCommand
         // state
         int row;
         RideFile::SeriesType series;
+        double oldvalue, newvalue;
+};
+
+class SetXDataPointValueCommand : public RideCommand
+{
+    Q_DECLARE_TR_FUNCTIONS(SetXDataPointValueCommand)
+
+    public:
+        SetXDataPointValueCommand(RideFile *ride, QString xdata, int row, int col, double oldvalue, double newvalue);
+        bool doCommand();
+        bool undoCommand();
+
+        // state
+        int row, col;
+        QString xdata;
         double oldvalue, newvalue;
 };
 

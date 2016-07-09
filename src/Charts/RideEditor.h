@@ -38,6 +38,7 @@
 #include <QDesktopWidget>
 #include <QToolBar>
 #include <QItemDelegate>
+#include <QStackedWidget>
 
 class EditorData;
 class CellDelegate;
@@ -47,6 +48,8 @@ class AnomalyDialog;
 class XDataDialog;
 class PasteSpecialDialog;
 class EditorTabBar;
+class XDataEditor;
+class XDataTableModel;
 
 class RideEditor : public GcChartWindow
 {
@@ -126,6 +129,7 @@ class RideEditor : public GcChartWindow
         void configChanged(qint32);
         void rideSelected();
         void setTabBar();
+        void tabbarSelected(int);
         void intervalSelected();
         void rideDirty();
         void rideClean();
@@ -143,6 +147,8 @@ class RideEditor : public GcChartWindow
         AnomalyDialog *anomalyTool;
         XDataDialog *xdataTool;
 
+        QMap<QString,XDataEditor*> xdataEditors;
+
     private:
         Context *context;
 
@@ -152,6 +158,8 @@ class RideEditor : public GcChartWindow
         QList<QString> whatColumns();
         QSignalMapper *colMapper;
 
+        QStackedWidget *stack;
+        QList<QWidget*> xdataViews;
         EditorTabBar *tabbar;
 
         QToolBar *toolbar;
@@ -345,6 +353,24 @@ class EditorTabBar : public QTabBar
 
     protected:
         virtual QSize tabSizeHint(int index) const;
+};
+
+class XDataEditor : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        XDataEditor(QWidget *parent, QString xdata);
+        void setRideItem(RideItem*);
+
+    public slots:
+        void configChanged();
+
+    private:
+        QString xdata;
+        XDataTableModel *model;
+        QTableView *table;
+
 };
 
 #endif // _GC_RideEditor_h

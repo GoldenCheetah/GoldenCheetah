@@ -131,6 +131,24 @@ RideFileCommand::removeXDataSeries(QString xdata, QString name)
     doCommand(cmd);
 }
 
+void
+RideFileCommand::setXDataPointValue(QString xdata, int row, int column, double value)
+{
+    // get current value
+    XDataSeries *series = ride->xdata(xdata);
+    if (!series) return;
+
+    double ovalue = 0;
+    switch(column) {
+        case 0: ovalue = series->datapoints[row]->secs; break;
+        case 1: ovalue = series->datapoints[row]->km; break;
+        default: ovalue = series->datapoints[row]->number[column-2]; break;
+    }
+
+    SetXDataPointValueCommand *cmd = new  SetXDataPointValueCommand(ride, xdata, row, column, ovalue, value);
+    doCommand(cmd);
+}
+
 //----------------------------------------------------------------------
 // Manage the Command Stack
 //----------------------------------------------------------------------
@@ -573,5 +591,45 @@ AddXDataSeriesCommand::undoCommand()
     if (index == -1) return false;
     series->valuename.removeAt(index);
 
+    return true;
+}
+
+SetXDataPointValueCommand::SetXDataPointValueCommand(RideFile *ride, QString xdata, int row, int col, double oldvalue, double newvalue)
+    : RideCommand(ride), row(row), col(col), xdata(xdata), oldvalue(oldvalue), newvalue(newvalue)
+{
+    type = RideCommand::SetXDataPointValue;
+    description = tr("Set XData point value");
+}
+
+bool
+SetXDataPointValueCommand::doCommand()
+{
+    XDataSeries *series = ride->xdata(xdata);
+    if (series && !doubles_equal(oldvalue, newvalue)) {
+        switch(col){
+        case 0:
+        series->datapoints[row]->secs = newvalue;
+        case 1:
+        series->datapoints[row]->km = newvalue;
+        default:
+        series->datapoints[row]->number[col-2] = newvalue;
+        }
+    }
+    return true;
+}
+bool
+SetXDataPointValueCommand::undoCommand()
+{
+    XDataSeries *series = ride->xdata(xdata);
+    if (series && !doubles_equal(oldvalue, newvalue)) {
+        switch(col){
+        case 0:
+        series->datapoints[row]->secs = oldvalue;
+        case 1:
+        series->datapoints[row]->km = oldvalue;
+        default:
+        series->datapoints[row]->number[col-2] = oldvalue;
+        }
+    }
     return true;
 }
