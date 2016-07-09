@@ -224,7 +224,7 @@ XDataTableModel::removeColumns (int , int , const QModelIndex &)
 void
 XDataTableModel::setValue(int row, int column, double value)
 {
-    //ride->command->setPointValue(row, headingsType[column], value);
+    ride->command->setXDataPointValue(xdata, row, column, value);
 }
 
 double

@@ -42,6 +42,7 @@
 
 class EditorData;
 class CellDelegate;
+class XDataCellDelegate;
 class RideModel;
 class FindDialog;
 class AnomalyDialog;
@@ -224,6 +225,40 @@ private:
 
 };
 
+class XDataCellDelegate : public QItemDelegate
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+public:
+    XDataCellDelegate(XDataEditor *, QObject *parent = 0);
+
+    // setup editor in the cell - QDoubleSpinBox
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
+    // Fetch data from model ready for editing
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+
+    // Save data back to model after editing
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+
+    // override stanard painter to underline anomalies in red
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
+    void updateEditorGeometry(QWidget *editor,
+                              const QStyleOptionViewItem &option,
+                              const QModelIndex &index) const;
+
+private slots:
+
+    void commitAndCloseEditor();
+
+private:
+    XDataEditor *xdataEditor;
+
+};
+
 class AnomalyDialog : public QWidget
 {
     Q_OBJECT
@@ -359,6 +394,8 @@ class XDataEditor : public QWidget
 {
     Q_OBJECT
 
+    friend class ::XDataCellDelegate;
+
     public:
         XDataEditor(QWidget *parent, QString xdata);
         void setRideItem(RideItem*);
@@ -366,11 +403,12 @@ class XDataEditor : public QWidget
     public slots:
         void configChanged();
 
-    private:
+    protected:
         QString xdata;
         XDataTableModel *model;
         QTableView *table;
 
+        void setModelValue(int row, int column, double value);
 };
 
 #endif // _GC_RideEditor_h

@@ -1299,6 +1299,139 @@ void CellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
 }
 
 //----------------------------------------------------------------------
+// XData Cell item delegate
+//----------------------------------------------------------------------
+
+// Cell editor - item delegate
+XDataCellDelegate::XDataCellDelegate(XDataEditor *xdataEditor, QObject *parent) : QItemDelegate(parent), xdataEditor(xdataEditor) {}
+
+// setup editor for edit of field!!
+QWidget *XDataCellDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
+{
+    // what are we editing?
+    switch(index.column()) {
+
+    case 0 :
+    {
+
+        QTimeEdit *timeEdit = new QTimeEdit(parent);
+        timeEdit->setDisplayFormat ("hh:mm:ss.zzz");
+        connect(timeEdit, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
+        return timeEdit;
+
+    }
+    break;
+
+    default:
+    {
+        QDoubleSpinBox *valueEdit = new QDoubleSpinBox(parent);
+        connect(valueEdit, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
+        return valueEdit;
+    }
+    break;
+    }
+}
+
+// user hit tab or return so save away the data to our model
+void XDataCellDelegate::commitAndCloseEditor()
+{
+    QDoubleSpinBox *editor = qobject_cast<QDoubleSpinBox *>(sender());
+    emit commitData(editor);
+    emit closeEditor(editor);
+}
+
+// We don't set anything because the data is saved within the view not the model!
+void XDataCellDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+    // what are we editing?
+    switch(index.column()) {
+
+        case 0 :
+        {
+
+            int seconds, msecs;
+            secsMsecs(index.model()->data(index, Qt::DisplayRole).toDouble(), seconds, msecs);
+
+            QTime value = QTime(0,0,0,0).addSecs(seconds).addMSecs(msecs);
+            QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>(editor);
+            timeEdit->setTime(value);
+
+        }
+        break;
+
+        default:
+        {
+            QDoubleSpinBox *valueEdit = qobject_cast<QDoubleSpinBox *>(editor);
+            double value = index.model()->data(index, Qt::DisplayRole).toString().toDouble();
+            valueEdit->setValue(value);
+        }
+    }
+}
+
+void XDataCellDelegate::updateEditorGeometry(QWidget *editor,
+                              const QStyleOptionViewItem &option,
+                              const QModelIndex &/*index*/) const
+{
+    if (editor) editor->setGeometry(option.rect);
+}
+
+// We don't set anything because the data is saved within the view not the model!
+void XDataCellDelegate::setModelData(QWidget *editor, QAbstractItemModel *, const QModelIndex &index) const
+{
+    switch(index.column()) {
+
+    case 0 :
+    {
+        double seconds;
+        QTime midnight(0,0,0,0);
+        QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>(editor);
+        seconds = (double)midnight.secsTo(timeEdit->time()) + (double)timeEdit->time().msec() / (double)1000.00;
+        xdataEditor->setModelValue(index.row(), index.column(), seconds);
+
+    }
+    break;
+
+    default:
+    {
+        QDoubleSpinBox *valueEdit = qobject_cast<QDoubleSpinBox *>(editor);
+        QString value = QString("%1").arg(valueEdit->value());
+        xdataEditor->setModelValue(index.row(), index.column(), valueEdit->value());
+    }
+    break;
+    }
+}
+
+// anomalies are underlined in red, otherwise straight paintjob
+void XDataCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
+                         const QModelIndex &index) const
+{
+    // what are we editing?
+    QString value;
+    switch(index.column()) {
+
+    case 0:
+    {
+        int seconds, msecs;
+        secsMsecs(index.model()->data(index, Qt::DisplayRole).toDouble(), seconds, msecs);
+        value = QTime(0,0,0,0).addSecs(seconds).addMSecs(msecs).toString("hh:mm:ss.zzz");
+    }
+    break;
+
+    default:
+    {
+        value = index.model()->data(index, Qt::DisplayRole).toString();
+    }
+        break;
+    }
+
+    // normal render
+    QStyleOptionViewItem myOption = option;
+    myOption.displayAlignment = Qt::AlignLeft | Qt::AlignVCenter;
+    drawDisplay(painter, myOption, myOption.rect, value);
+    drawFocus(painter, myOption, myOption.rect);
+}
+
+//----------------------------------------------------------------------
 // handle GC Signals
 //----------------------------------------------------------------------
 void
@@ -2798,6 +2931,7 @@ XDataEditor::XDataEditor(QWidget *parent, QString xdata) : QWidget(parent), xdat
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     table->setSelectionMode(QAbstractItemView::ContiguousSelection);
     table->setGridStyle(Qt::NoPen);
+    table->setItemDelegate(new XDataCellDelegate(this));
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     setContentsMargins(0,0,0,0);
@@ -2842,4 +2976,10 @@ void XDataEditor::configChanged()
 void XDataEditor::setRideItem(RideItem *item)
 {
     model->setRide(item->ride());
+}
+
+void
+XDataEditor::setModelValue(int row, int col, double value)
+{
+    model->setValue(row, col, value);
 }
