@@ -390,7 +390,7 @@ class EditorTabBar : public QTabBar
         virtual QSize tabSizeHint(int index) const;
 };
 
-class XDataEditor : public QWidget
+class XDataEditor : public QTableView
 {
     Q_OBJECT
 
@@ -405,8 +405,7 @@ class XDataEditor : public QWidget
 
     protected:
         QString xdata;
-        XDataTableModel *model;
-        QTableView *table;
+        XDataTableModel *_model;
 
         void setModelValue(int row, int column, double value);
 };

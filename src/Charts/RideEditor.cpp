@@ -159,6 +159,7 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     table->setSelectionMode(QAbstractItemView::ContiguousSelection);
     table->installEventFilter(this);
+    //table->setFrameStyle(QFrame::NoFrame);
 
     HelpWhatsThis *helpTable = new HelpWhatsThis(table);
     table->setWhatsThis(helpTable->getWhatsThisText(HelpWhatsThis::ChartRides_Editor));
@@ -2911,34 +2912,24 @@ QSize EditorTabBar::tabSizeHint(int index) const
 ///
 /// XDataEditor
 ///
-XDataEditor::XDataEditor(QWidget *parent, QString xdata) : QWidget(parent), xdata(xdata)
+XDataEditor::XDataEditor(QWidget *parent, QString xdata) : QTableView(parent), xdata(xdata)
 {
 
-    model = new XDataTableModel(NULL, xdata);
-    table = new QTableView(this);
-
-    //table->setAutoFillBackground(true);
-    //table->setAttribute(Qt::WA_OpaquePaintEvent, false);
-    //table->setAttribute(Qt::WA_NoSystemBackground, false);
+    _model = new XDataTableModel(NULL, xdata);
 
 #ifdef Q_OS_WIN
     QStyle *cde = QStyleFactory::create(OS_STYLE);
     table->verticalScrollBar()->setStyle(cde);
     table->horizontalScrollBar()->setStyle(cde);
 #endif
-    //XXXtable->setItemDelegate(new CellDelegate(this));
-    table->verticalHeader()->setDefaultSectionSize(20);
-    table->setModel(model);
-    table->setContextMenuPolicy(Qt::CustomContextMenu);
-    table->setSelectionMode(QAbstractItemView::ContiguousSelection);
-    table->setGridStyle(Qt::NoPen);
-    table->setItemDelegate(new XDataCellDelegate(this));
+    verticalHeader()->setDefaultSectionSize(20);
+    setModel(_model);
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    setSelectionMode(QAbstractItemView::ContiguousSelection);
+    setGridStyle(Qt::NoPen);
+    setItemDelegate(new XDataCellDelegate(this));
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
     setContentsMargins(0,0,0,0);
-    table->setContentsMargins(0,0,0,0);
-    mainLayout->setSpacing(0);
-    mainLayout->addWidget(table);
 
     configChanged();
 }
@@ -2958,30 +2949,38 @@ void XDataEditor::configChanged()
     palette.setColor(QPalette::Inactive, QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Inactive, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
-    table->setPalette(palette);
-    table->setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }"
+    //setFrameStyle(QFrame::NoFrame);
+    setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }"
                                   "QHeaderView { background-color: %1; color: %2; border: %1 }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
-    table->horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
+    horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
-    table->verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
+    verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
 #ifndef Q_OS_MAC
-    table->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
-    table->horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
 #endif
 }
 
 void XDataEditor::setRideItem(RideItem *item)
 {
-    model->setRide(item->ride());
+    _model->setRide(item->ride());
+
+    // resize appropriately
+    resizeColumnsToContents();
+
+    // but time is xx:xx:xx:xxx
+    QFontMetrics fm(font());
+    int cwidth=fm.charWidth("X",0);
+    setColumnWidth(0, 15 * cwidth);
 }
 
 void
 XDataEditor::setModelValue(int row, int col, double value)
 {
-    model->setValue(row, col, value);
+    _model->setValue(row, col, value);
 }
