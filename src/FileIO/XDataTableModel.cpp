@@ -149,12 +149,14 @@ XDataTableModel::setHeaderData(int section, Qt::Orientation , const QVariant & v
         //headings_[section] = value.toString();
         //return true;
     //}
+    return false;
 }
 
 bool
 XDataTableModel::insertRow(int row, const QModelIndex &parent)
 {
     //return insertRows(row, 1, parent);
+    return false;
 }
 
 bool
