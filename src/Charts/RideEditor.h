@@ -131,6 +131,7 @@ class RideEditor : public GcChartWindow
         void rideSelected();
         void setTabBar();
         void tabbarSelected(int);
+        void removeTabRequested(int);
         void intervalSelected();
         void rideDirty();
         void rideClean();
