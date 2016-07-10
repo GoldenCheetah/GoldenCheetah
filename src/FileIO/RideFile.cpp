@@ -158,7 +158,8 @@ RideFile::updateDataTag()
     else flags += '-';
     if (areDataPresent()->hr) flags += 'H'; // Heartrate
     else flags += '-';
-    if (areDataPresent()->cad) flags += 'C'; // cadence
+    if (areDataPresent()->cad ||
+        areDataPresent()->rcad) flags += 'C'; // cadence
     else flags += '-';
     if (areDataPresent()->nm) flags += 'N'; // Torque
     else flags += '-';

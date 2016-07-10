@@ -1751,7 +1751,7 @@ struct AvgCadence : public RideMetric {
         setCount(count);
     }
 
-    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("C"); }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("C") && !ride->isRun; }
 
     RideMetric *clone() const { return new AvgCadence(*this); }
 };
@@ -2284,7 +2284,7 @@ class MaxCadence : public RideMetric {
         setValue(max);
     }
 
-    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("C"); }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("C") && !ride->isRun; }
 
     RideMetric *clone() const { return new MaxCadence(*this); }
 };
