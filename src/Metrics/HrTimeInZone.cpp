@@ -18,7 +18,6 @@
  */
 
 #include "RideMetric.h"
-#include "BestIntervalDialog.h"
 #include "RideItem.h"
 #include "HrZones.h"
 #include "Context.h"

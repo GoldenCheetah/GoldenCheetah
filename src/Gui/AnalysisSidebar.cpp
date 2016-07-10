@@ -32,7 +32,6 @@
 // working with intervals
 #include "IntervalItem.h"
 #include "AddIntervalDialog.h"
-#include "BestIntervalDialog.h"
 
 // working with routes
 #include "Route.h"
