@@ -2919,8 +2919,8 @@ XDataEditor::XDataEditor(QWidget *parent, QString xdata) : QTableView(parent), x
 
 #ifdef Q_OS_WIN
     QStyle *cde = QStyleFactory::create(OS_STYLE);
-    table->verticalScrollBar()->setStyle(cde);
-    table->horizontalScrollBar()->setStyle(cde);
+    verticalScrollBar()->setStyle(cde);
+    horizontalScrollBar()->setStyle(cde);
 #endif
     verticalHeader()->setDefaultSectionSize(20);
     setModel(_model);
