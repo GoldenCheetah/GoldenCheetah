@@ -1741,9 +1741,30 @@ RideFile::insertPoint(int index, RideFilePoint *point)
 }
 
 void
+RideFile::insertXDataPoint(QString _xdata, int index, XDataPoint *point)
+{
+    XDataSeries *series = xdata(_xdata);
+    if (series)  series->datapoints.insert(index, point);
+}
+
+void
+RideFile::deleteXDataPoints(QString _xdata, int index, int count)
+{
+    XDataSeries *series = xdata(_xdata);
+    if (series) series->datapoints.remove(index, count);
+}
+
+void
 RideFile::appendPoints(QVector <struct RideFilePoint *> newRows)
 {
     dataPoints_ += newRows;
+}
+
+void
+RideFile::appendXDataPoints(QString _xdata, QVector<XDataPoint *> points)
+{
+    XDataSeries *series = xdata(_xdata);
+    if (series) series->datapoints << points;
 }
 
 void

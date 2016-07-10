@@ -32,11 +32,14 @@
 // All modifications are made via the RideFileCommand interface to ensure the
 // command pattern is honored for undo/redo etc.
 //
+
+class XDataEditor;
 class XDataTableModel : public QAbstractTableModel
 {
     Q_OBJECT
     G_OBJECT
 
+    friend class ::XDataEditor;
 
     public:
 
@@ -56,14 +59,14 @@ class XDataTableModel : public QAbstractTableModel
         bool insertRow(int row, const QModelIndex & parent = QModelIndex());
         bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex());
         bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex());
-        bool appendRows(QVector<RideFilePoint>newRows);
+        bool appendRows(QVector<XDataPoint*>newRows);
 
         // DO NOT USE THESE -- THEY ARE NULL --
         bool insertColumns (int column, int count, const QModelIndex & parent = QModelIndex());
         bool removeColumns (int column, int count, const QModelIndex & parent = QModelIndex());
         // USE THESE INSTEAD
-        bool insertColumn(RideFile::SeriesType series);
-        bool removeColumn(RideFile::SeriesType series);
+        bool insertColumn(QString name);
+        bool removeColumn(int index);
 
         // get/set value by column number
         void setValue(int row, int column, double value);

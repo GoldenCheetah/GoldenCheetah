@@ -142,58 +142,50 @@ XDataTableModel::setData(const QModelIndex & index, const QVariant &value, int r
 }
 
 bool
-XDataTableModel::setHeaderData(int section, Qt::Orientation , const QVariant & value, int)
+XDataTableModel::setHeaderData(int , Qt::Orientation , const QVariant & , int)
 {
-    //if (section >= headings_.count()) return false;
-    //else {
-        //headings_[section] = value.toString();
-        //return true;
-    //}
     return false;
 }
 
 bool
 XDataTableModel::insertRow(int row, const QModelIndex &parent)
 {
-    //return insertRows(row, 1, parent);
-    return false;
+    return insertRows(row, 1, parent);
 }
 
 bool
 XDataTableModel::insertRows(int row, int count, const QModelIndex &)
 {
-    //if (row >= ride->dataPoints().count()) return false;
-    //else {
-        //while (count--) {
-            //struct RideFilePoint *p = new RideFilePoint;
-            //ride->command->insertPoint(row, p);
-        //}
-        //return true;
-    //}
+    if (row >= series->datapoints.count()) return false;
+    else {
+        while (count--) {
+            XDataPoint *p = new XDataPoint;
+            ride->command->insertXDataPoint(xdata, row, p);
+        }
+        return true;
+    }
     return false;
 }
 
 bool
-XDataTableModel::appendRows(QVector<RideFilePoint>newRows)
+XDataTableModel::appendRows(QVector<XDataPoint*>newRows)
 {
-    //ride->command->appendPoints(newRows);
+    ride->command->appendXDataPoints(xdata, newRows);
     return true;
 }
 
 bool
 XDataTableModel::removeRows(int row, int count, const QModelIndex &)
 {
-    //if ((row + count) > ride->dataPoints().count()) return false;
-    //ride->command->deletePoints(row, count);
+    if ((row + count) > series->datapoints.count()) return false;
+    ride->command->deleteXDataPoints(xdata, row, count);
     return true;
 }
 
 bool
-XDataTableModel::insertColumn(RideFile::SeriesType series)
+XDataTableModel::insertColumn(QString name)
 {
-    //if (headingsType.contains(series)) return false; // already there
-
-    //ride->command->setDataPresent(series, true);
+    ride->command->addXDataSeries(xdata, name);
     return true;
 }
 
@@ -206,13 +198,11 @@ XDataTableModel::insertColumns(int, int, const QModelIndex &)
 }
 
 bool
-XDataTableModel::removeColumn(RideFile::SeriesType series)
+XDataTableModel::removeColumn(int index)
 {
-    //if (headingsType.contains(series))  {
-        //ride->command->setDataPresent(series, false);
-        //return true;
-    //} else
-        return false; // its not there
+    QString name = headerData(index, Qt::Horizontal).toString();
+    ride->command->removeXDataSeries(xdata, name);
+    return true;
 }
 
 bool
