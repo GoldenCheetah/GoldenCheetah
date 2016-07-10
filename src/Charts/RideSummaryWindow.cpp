@@ -535,6 +535,8 @@ RideSummaryWindow::htmlSummary()
 
     // additional metrics for runs & swims
     if (ridesummary) {
+        if (ride->isRun()) averageColumn << "average_run_cad";
+        if (ride->isRun()) maximumColumn << "max_run_cadence";
         if (ride->isRun()) averageColumn << "pace";
         if (ride->isSwim()) averageColumn << "pace_swim";
     } else {

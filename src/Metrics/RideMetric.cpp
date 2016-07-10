@@ -136,6 +136,7 @@
 // 126 08  Mar 2016 Mark Liversedge    Added count of To Exhaustions
 // 127 25  Mar 2016 Mark Liversedge    Best R metric for Exhaustion Points
 // 128 15  May 2016 Mark Liversedge    Add ActivityCRC so R scripts can use when caching
+// 129 10  Jul 2016 Damien Grauser     Average Running Cadence
 
 int DBSchemaVersion = 128;
 
