@@ -2955,8 +2955,10 @@ XDataEditor::XDataEditor(QWidget *parent, QString xdata) : QTableView(parent), x
     setSelectionMode(QAbstractItemView::ContiguousSelection);
     setGridStyle(Qt::NoPen);
     setItemDelegate(new XDataCellDelegate(this));
+    setContextMenuPolicy(Qt::CustomContextMenu);
 
     setContentsMargins(0,0,0,0);
+    installEventFilter(this);
 
     configChanged();
 }
@@ -3010,4 +3012,216 @@ void
 XDataEditor::setModelValue(int row, int col, double value)
 {
     _model->setValue(row, col, value);
+}
+
+bool
+XDataEditor::eventFilter(QObject *object, QEvent *e)
+{
+    // not for me?
+    if (object != (QObject *)this) return false;
+
+    // what happened?
+    switch(e->type())
+    {
+        case QEvent::ContextMenu:
+            borderMenu(mapFromGlobal(QCursor::pos()));
+            return true;
+            break;
+
+#if 0
+        case QEvent::KeyPress:
+        {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+            if (keyEvent->modifiers() & Qt::ControlModifier) {
+                switch (keyEvent->key()) {
+
+                    case Qt::Key_C: // defacto standard for copy
+                        copy();
+                        return true;
+
+                    case Qt::Key_V: // defacto standard for paste
+                        paste();
+                        return true;
+
+                    case Qt::Key_X: // defacto standard for cut
+                        cut();
+                        return true;
+
+                    case Qt::Key_Y: // emerging standard for redo
+                         redo();
+                         return true;
+
+                    case Qt::Key_Z: // common standard for undo
+                         undo();
+                         return true;
+
+                    case Qt::Key_0:
+                        clear();
+                        return true;
+
+                    default:
+                        return false;
+                }
+            }
+            break;
+        }
+#endif
+
+        default:
+            break;
+    }
+    return false;
+}
+
+void
+XDataEditor::borderMenu(const QPoint &pos)
+{
+
+    int column=0, row=0;
+    currentRow=currentColumn=-1;
+
+    // but we need to set the row or column to zero since
+    // we are in the border, this seems an easy and quick way
+    // to do this (the indexAt function assumes pos starts from
+    // 0 for row/col 0 and does not include the vertical
+    // or horizontal header width (which is what we go passed)
+    if (pos.y() <= horizontalHeader()->height()) {
+        row = 0;
+        column = horizontalHeader()->logicalIndexAt(pos - QPoint(verticalHeader()->width(), 0));
+    }
+    if (pos.x() <= verticalHeader()->width()) {
+        column = 0;
+        row = verticalHeader()->logicalIndexAt(pos - QPoint(0, horizontalHeader()->height()));
+    }
+
+    // set to negative if in the border
+    if (pos.x() < verticalHeader()->width()) column = -1;
+    if (pos.y() < horizontalHeader()->height()) row = -1;
+
+    QMenu menu(this);
+
+    menu.addSeparator();
+
+    if (row >= 0 && column < 0) {
+
+        QAction *delAct = new QAction(tr("Delete Row"), this);
+        delAct->setEnabled(isRowSelected());
+        menu.addAction(delAct);
+        connect(delAct, SIGNAL(triggered()), this, SLOT(delRow()));
+
+    }
+
+    if (column <= 0) {
+
+        if ((row+1) == _model->rowCount()) {
+            QAction *appAct = new QAction(tr("Append Row"), this);
+            appAct->setEnabled(true);
+            menu.addAction(appAct);
+            connect(appAct, SIGNAL(triggered()), this, SLOT(appRow()));
+        }
+        if (row >= 0) {
+            QAction *insAct = new QAction(tr("Insert Row"), this);
+            insAct->setEnabled(true);
+            menu.addAction(insAct);
+            connect(insAct, SIGNAL(triggered()), this, SLOT(insRow()));
+        }
+    }
+
+    if (column >= 2){
+
+        QAction *delAct = new QAction(tr("Remove Column"), this);
+        delAct->setEnabled(isColumnSelected());
+        menu.addAction(delAct);
+        connect(delAct, SIGNAL(triggered()), this, SLOT(delCol()));
+    }
+
+    if (row < 0) {
+        QAction *insAct = new QAction(tr("Add Column"), this);
+        insAct->setEnabled(true);
+        menu.addAction(insAct);
+        connect(insAct, SIGNAL(triggered()), this, SLOT(insCol()));
+    }
+
+    currentRow=row;
+    currentColumn=column;
+
+    //currentCell.row = row < 0 ? 0 : row;
+    //currentCell.column = column < 0 ? 0 : column;
+    menu.exec(mapToGlobal(QPoint(pos.x()+5, pos.y()+5)));
+}
+
+
+bool
+XDataEditor::isRowSelected()
+{
+    QList<QModelIndex> selection = selectionModel()->selection().indexes();
+
+    if (selection.count() > 0 &&
+        selection[0].column() == 0 &&
+        selection[selection.count()-1].column() == (_model->columnCount()-1))
+        return true;
+
+    return false;
+}
+
+bool
+XDataEditor::isColumnSelected()
+{
+    QList<QModelIndex> selection = selectionModel()->selection().indexes();
+
+    // if no rows then always true
+    if (_model->rowCount()==0) return true;
+
+    // must select every row for this column to be selected
+    if (selection.count() > 0 &&
+        selection[0].row() == 0 &&
+        selection[selection.count()-1].row() == (_model->rowCount()-1))
+        return true;
+
+    return false;
+}
+
+void
+XDataEditor::insCol()
+{
+    QString name;
+    XDataSeriesSettingsDialog *dialog = new  XDataSeriesSettingsDialog(this, name);
+    int ret = dialog->exec();
+
+    if (ret == QDialog::Accepted && name != "") {
+        _model->insertColumn(name);
+    }
+}
+void
+XDataEditor::delCol()
+{
+    _model->removeColumn(currentColumn);
+}
+void
+XDataEditor::insRow()
+{
+    _model->insertRow(currentRow, QModelIndex());
+}
+void
+XDataEditor::appRow()
+{
+    QVector<XDataPoint*> rows;
+    rows << new XDataPoint;
+    _model->appendRows(rows);
+}
+void
+XDataEditor::delRow()
+{
+ // run through the selected rows and zap them
+    QList<QModelIndex> selection = selectionModel()->selection().indexes();
+
+    if (selection.count() > 0) {
+
+        // delete from table - we do in one hit since row-by-row is VERY slow
+        _model->ride->command->startLUW("Delete Rows");
+        _model->removeRows(selection[0].row(),
+                          selection[selection.count()-1].row() - selection[0].row() + 1, QModelIndex());
+        _model->ride->command->endLUW();
+
+    }
 }

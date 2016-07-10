@@ -71,9 +71,28 @@ RideFileCommand::deletePoints(int index, int count)
 }
 
 void
+RideFileCommand::deleteXDataPoints(QString xdata, int index, int count)
+{
+    QVector<XDataPoint*> current;
+    for(int i=0; i< count; i++) {
+        XDataPoint *point = ride->xdata(xdata)->datapoints[index+i];
+        current.append(point);
+    }
+    DeleteXDataPointsCommand *cmd = new DeleteXDataPointsCommand(ride, xdata , index, count, current);
+    doCommand(cmd);
+}
+
+void
 RideFileCommand::insertPoint(int index, RideFilePoint *points)
 {
     InsertPointCommand *cmd = new InsertPointCommand(ride, index, points);
+    doCommand(cmd);
+}
+
+void
+RideFileCommand::insertXDataPoint(QString xdata, int index, XDataPoint *points)
+{
+    InsertXDataPointCommand *cmd = new InsertXDataPointCommand(ride, xdata, index, points);
     doCommand(cmd);
 }
 
@@ -146,6 +165,16 @@ RideFileCommand::setXDataPointValue(QString xdata, int row, int column, double v
     }
 
     SetXDataPointValueCommand *cmd = new  SetXDataPointValueCommand(ride, xdata, row, column, ovalue, value);
+    doCommand(cmd);
+}
+
+void
+RideFileCommand::appendXDataPoints(QString _xdata, QVector <XDataPoint *> newRows)
+{
+    XDataSeries *series = ride->xdata(_xdata);
+    if (!series) return;
+
+    AppendXDataPointsCommand *cmd = new AppendXDataPointsCommand(ride, _xdata, series->datapoints.count(), newRows);
     doCommand(cmd);
 }
 
@@ -631,5 +660,75 @@ SetXDataPointValueCommand::undoCommand()
         series->datapoints[row]->number[col-2] = oldvalue;
         }
     }
+    return true;
+}
+
+// Remove points
+DeleteXDataPointsCommand::DeleteXDataPointsCommand(RideFile *ride, QString xdata, int row, int count,
+                     QVector<XDataPoint *> current) :
+        RideCommand(ride), // base class looks after these
+        xdata(xdata), row(row), count(count), points(current)
+{
+    type = RideCommand::DeleteXDataPoints;
+    description = tr("Remove XDATA Points");
+}
+
+bool
+DeleteXDataPointsCommand::doCommand()
+{
+    ride->deleteXDataPoints(xdata, row, count);
+    return true;
+}
+
+bool
+DeleteXDataPointsCommand::undoCommand()
+{
+    for (int i=(count-1); i>=0; i--) ride->insertXDataPoint(xdata, row, points[i]);
+    return true;
+}
+
+// Insert a point
+InsertXDataPointCommand::InsertXDataPointCommand(RideFile *ride, QString xdata, int row, XDataPoint *point) :
+        RideCommand(ride), // base class looks after these
+        xdata(xdata), row(row), point(point)
+{
+    type = RideCommand::InsertXDataPoint;
+    description = tr("Insert XData Point");
+}
+
+bool
+InsertXDataPointCommand::doCommand()
+{
+    ride->insertXDataPoint(xdata, row, point);
+    return true;
+}
+
+bool
+InsertXDataPointCommand::undoCommand()
+{
+    ride->deleteXDataPoints(xdata, row, 1);
+    return true;
+}
+
+// Append points
+AppendXDataPointsCommand::AppendXDataPointsCommand(RideFile *ride, QString xdata, int row, QVector<XDataPoint*> points) :
+        RideCommand(ride), // base class looks after these
+        xdata(xdata), row(row), count(points.count()), points(points)
+{
+    type = RideCommand::AppendXDataPoints;
+    description = tr("Append XData Points");
+}
+
+bool
+AppendXDataPointsCommand::doCommand()
+{
+    ride->appendXDataPoints(xdata, points);
+    return true;
+}
+
+bool
+AppendXDataPointsCommand::undoCommand()
+{
+    ride->deleteXDataPoints(xdata, row, count);
     return true;
 }

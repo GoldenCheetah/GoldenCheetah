@@ -403,10 +403,23 @@ class XDataEditor : public QTableView
 
     public slots:
         void configChanged();
+        bool eventFilter(QObject *, QEvent *);
+
+        // add/del rows and columns
+        void borderMenu(const QPoint &pos);
+        void insCol();
+        void delCol();
+        void insRow();
+        void appRow();
+        void delRow();
 
     protected:
         QString xdata;
         XDataTableModel *_model;
+        int currentRow, currentColumn;
+
+        bool isRowSelected();
+        bool isColumnSelected();
 
         void setModelValue(int row, int column, double value);
 };

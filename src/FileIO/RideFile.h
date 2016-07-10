@@ -353,6 +353,9 @@ class RideFile : public QObject // QObject to emit signals
         void insertPoint(int index, RideFilePoint *point);
         void appendPoints(QVector <struct RideFilePoint *> newRows);
         void setDataPresent(SeriesType, bool);
+        void insertXDataPoint(QString xdata, int index, XDataPoint *point);
+        void deleteXDataPoints(QString xdata, int index, int count);
+        void appendXDataPoints(QString xdata, QVector<XDataPoint *> points);
         // ************************************************************
 
         const double &windSpeed() const { return windSpeed_; }
