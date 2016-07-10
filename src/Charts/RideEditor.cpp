@@ -134,6 +134,7 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     tabbar = new EditorTabBar(this);
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setCurrentIndex(0);
+    tabbar->setTabsClosable(true);
     tabbar->hide();
 
     // stack of standard + other editors
@@ -183,6 +184,7 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     connect(context, SIGNAL(rideClean(RideItem*)), this, SLOT(rideClean()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(tabbarSelected(int)));
+    connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(removeTabRequested(int)));
 
     // put find tool and anomaly list in the controls
     findTool = new FindDialog(this);
@@ -217,7 +219,8 @@ RideEditor::configChanged(qint32)
     tabbar->setPalette(palette);
     QColor faded = GCColor::invertColor(GColor(CPLOTBACKGROUND));
     tabbar->setStyleSheet(QString("QTabBar::tab { background-color: %1; border: 0.5px solid %1; color: rgba(%3,%4,%5,50%) }"
-                                  "QTabBar::tab:selected { background-color: %1; color: %2; border: 2px solid %1; border-bottom-color: %6 }")
+                                  "QTabBar::tab:selected { background-color: %1; color: %2; border: 2px solid %1; border-bottom-color: %6 }"
+                                  "QTabBar::close-button:!selected { background-color: %1; }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
                     .arg(faded.red()).arg(faded.green()).arg(faded.blue())
@@ -1532,6 +1535,25 @@ RideEditor::tabbarSelected(int index)
 }
 
 void
+RideEditor::removeTabRequested(int index)
+{
+    // close tab is one way of removing the data from the ride
+    QMessageBox confirm(QMessageBox::Warning, tr("Delete XDATA Series"),
+                       QString(tr("You are about to permanently remove the XDATA "
+                          "series '%1' from the activity\n\n"
+                          "Do you want to continue?")).arg(tabbar->tabText(index)),
+                       QMessageBox::Ok | QMessageBox::Cancel);
+
+    if ((confirm.exec() & QMessageBox::Cancel) != 0) {
+        return;
+    }
+
+    // ok then lets remove it !
+    ride->ride()->command->removeXData(tabbar->tabText(index));
+    return;
+}
+
+void
 RideEditor::setTabBar()
 {
     // where are we, need to go back if possible.
@@ -1547,6 +1569,11 @@ RideEditor::setTabBar()
     while(tabbar->count()) tabbar->removeTab(0);
     tabbar->hide();
     tabbar->addTab(tr("STANDARD"));
+
+    // disable close button on STANDARD tab
+    tabbar->setTabButton(0, QTabBar::RightSide, 0);
+    tabbar->setTabButton(0, QTabBar::LeftSide, 0);
+
     if (ride->ride()->xdata().count()) {
 
         // we need xdata editing too
