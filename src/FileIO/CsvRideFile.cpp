@@ -156,6 +156,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp freemotionCSV("Stages Data", Qt::CaseInsensitive);
     QRegExp cpexportCSV("seconds, value,[ model,]* date", Qt::CaseInsensitive);
     QRegExp rowproCSV("Date,Comment,Password,ID,Version,RowfileId,Rowfile_Id", Qt::CaseInsensitive);
+    QRegExp wahooMACSV("GroundContactTime,MotionCount,MotionPowerZ,Cadence,MotionPowerX,WorkoutActive,Timestamp,Smoothness,MotionPowerY,_ID,VerticalOscillation,", Qt::CaseInsensitive);
 
 
     int recInterval = 1;
@@ -172,11 +173,14 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     bool dfpmExists   = false;
     int iBikeVersion  = 0;
 
+    //UNUSED int timestampIndex=-1;
     int secsIndex=-1;
     //UNUSED int minutesIndex = -1;
     int wattsIndex=-1;
+    int cadenceIndex=-1;
     int smo2Index=-1;
     int hrIndex=-1;
+    int gctIndex = -1, voIndex =-1;
 
     double precAvg=0.0;
     //double precWatts=0.0;
@@ -311,15 +315,24 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     ++lineno;
                     continue;
                }
-                else if(rowproCSV.indexIn(line) != -1) {
+               else if(rowproCSV.indexIn(line) != -1) {
                      csvType = rowpro;
                      rideFile->setDeviceType("RowPro");
                      rideFile->setFileFormat("RowPro CSV (csv)");
                      unitsHeader = 10;
                      ++lineno;
                      continue;
-                }
-                else {  // default
+               }
+               else if(wahooMACSV.indexIn(line) != -1) {
+                   csvType = wahooMA;
+                   rideFile->setDeviceType("Wahoo Fitness");
+                   rideFile->setFileFormat("Wahoo Motion Analysis CSV (csv)");
+                   unitsHeader = 1;
+                   recInterval = 1;
+                   //++lineno;
+                   //continue;
+               }
+               else {  // default
                     csvType = generic;
                     rideFile->setDeviceType("Unknow");
                     rideFile->setFileFormat("Generic CSV (csv)");
@@ -374,29 +387,45 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             if (csvType == rowpro && lineno == 8) {
                 startTime = QDateTime::fromString(line.section(',', 0, 0), "dd/MM/yyyy H:mm:ss");
             }
-            if (lineno == unitsHeader && (csvType == generic || csvType == bsx)) {
+            if (lineno == unitsHeader && (csvType == generic || csvType == bsx || csvType == wahooMA)) {
                 QRegExp timeHeaderSecs("( )*(secs|sec|time|timestamp)( )*", Qt::CaseInsensitive);
+                //QRegExp timeHeaderTimestamp("( )*(timestamp)( )*", Qt::CaseInsensitive);
                 //QRegExp timeHeaderMins("( )*(min|minutes)( )*", Qt::CaseInsensitive);
                 QRegExp wattsHeader("( )*(watts|power)( )*", Qt::CaseInsensitive);
+                QRegExp cadenceHeader("( )*(cadence)( )*", Qt::CaseInsensitive);
                 QRegExp smo2Header("( )*(smo2)( )*", Qt::CaseInsensitive);
                 QRegExp hrHeader("( )*(hr|heart_rate)( )*", Qt::CaseInsensitive);
+                QRegExp gctHeader("( )*(groundcontacttime)( )*", Qt::CaseInsensitive);
+                QRegExp voHeader("( )*(verticaloscillation)( )*", Qt::CaseInsensitive);
                 QStringList headers = line.split(",");
 
                 QStringListIterator i(headers);
 
                 while (i.hasNext()) {
                     QString header = i.next();
-                    if (timeHeaderSecs.indexIn(header) != -1)  {
+                    if (timeHeaderSecs.indexIn(header) == 0)  {
                         secsIndex = headers.indexOf(header);
                         if (csvType == bsx)
                             secsIndex++;
-                    }/* UNUSED else if (timeHeaderMins.indexIn(header) != -1)  {
+                    }
+                    /* UNUSEDelse if (timeHeaderTimestamp.indexIn(header) != -1)  {
+                        timestampIndex = headers.indexOf(header);
+                        if (csvType == bsx)
+                            timestampIndex++;
+                    } */
+                    /* UNUSED else if (timeHeaderMins.indexIn(header) != -1)  {
                         minutesIndex = headers.indexOf(header);
                     } */
-                    if (wattsHeader.indexIn(header) != -1)  {
+
+                    if (wattsHeader.indexIn(header) == 0)  {
                         wattsIndex = headers.indexOf(header);
                         if (csvType == bsx)
                             wattsIndex++;
+                    }
+                    if (cadenceHeader.indexIn(header) != -1)  {
+                        cadenceIndex = headers.indexOf(header);
+                        if (csvType == bsx)
+                            cadenceIndex++;
                     }
                     if (hrHeader.indexIn(header) != -1)  {
                         hrIndex = headers.indexOf(header);
@@ -407,6 +436,16 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         smo2Index = headers.indexOf(header);
                         if (csvType == bsx)
                             smo2Index++;
+                    }
+                    if (gctHeader.indexIn(header) != -1)  {
+                        gctIndex = headers.indexOf(header);
+                        if (csvType == bsx)
+                            gctIndex++;
+                    }
+                    if (voHeader.indexIn(header) != -1)  {
+                        voIndex = headers.indexOf(header);
+                        if (csvType == bsx)
+                            voIndex++;
                     }
                 }
             }
@@ -439,6 +478,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 double lte = 0.0, rte = 0.0;
                 double lps = 0.0, rps = 0.0;
                 double smo2 = 0.0, thb = 0.0;
+                double gct = 0.0, vo = 0.0, rcad = 0.0;
                 //UNUSED double o2hb = 0.0, hhb = 0.0;
                 int interval=0;
                 int pause=0;
@@ -634,26 +674,44 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         thb = line.section(',', 4, 4).remove("\"").toDouble();
                     }
                 }
-                else if (csvType == bsx)  {
+                else if (csvType == bsx || csvType == wahooMA)  {
                     if (secsIndex > -1) {
                         seconds = line.section(',', secsIndex, secsIndex).toDouble();
-                        QDateTime time = QDateTime::fromTime_t(seconds);
+
+                        QDateTime time;
+
+                        if (seconds<1000000000000)
+                            time = QDateTime::fromTime_t(seconds);
+                        else
+                            time = QDateTime::fromMSecsSinceEpoch(seconds);
+
                         if (startTime == QDateTime()) {
                             startTime = time;
                             seconds = 1;
                         }
-                        else
+                        else {
                             seconds = startTime.secsTo(time)+1;
+                        }
                         minutes = seconds / 60.0f;
                     }
+
                     if (wattsIndex > -1) {
                         watts = line.section(',', wattsIndex, wattsIndex).toDouble();
+                    }
+                    if (cadenceIndex > -1) {
+                        cad = line.section(',', cadenceIndex, cadenceIndex).toDouble();
                     }
                     if (hrIndex > -1) {
                         hr = line.section(',', hrIndex, hrIndex).toDouble();
                     }
                     if (smo2Index > -1) {
                         smo2 = line.section(',', smo2Index, smo2Index).toDouble();
+                    }
+                    if (gctIndex > -1) {
+                        gct = line.section(',', gctIndex, gctIndex).toDouble();
+                    }
+                    if (voIndex > -1) {
+                        vo = line.section(',', voIndex, voIndex).toDouble();
                     }
                 }
                else if(csvType == motoactv) {
@@ -755,7 +813,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                               0.0, 0.0,
                                               0.0, 0.0, 0.0, 0.0,
                                               0.0, 0.0, 0.0, 0.0,
-                                              smo2, thb, 0.0, 0.0, 0.0, 0.0, interval);
+                                              smo2, thb,
+                                              0.0, 0.0, 0.0, 0.0, interval);
                     }
 
                     precAvg = (precAvg * precSecs + (watts>0?watts:0) * (seconds - precSecs)) / seconds;
@@ -825,6 +884,10 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           smo2, thb, 0.0, 0.0, 0.0, 0.0, interval);
 
                } else {
+                    if (vo>0 || gct>0) {
+                       rcad = cad;
+                       cad = 0.0;
+                    }
                     rideFile->appendPoint(minutes * 60.0, cad, hr, km,
                                           kph, nm, watts, alt, lon, lat,
                                           headwind, slope, temp, lrbalance,
@@ -832,7 +895,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
-                                          smo2, thb, 0.0, 0.0, 0.0, 0.0, interval);
+                                          smo2, thb,
+                                          vo, rcad, gct, 0.0, interval);
                }
             }
             ++lineno;
