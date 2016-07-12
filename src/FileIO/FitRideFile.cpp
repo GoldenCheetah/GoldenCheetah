@@ -106,6 +106,7 @@ struct FitFileReaderState
     QVariant GarminHWM;
     XDataSeries *weatherXdata;
     XDataSeries *swimXdata;
+    QList<QString> deviceInfos;
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
@@ -268,6 +269,97 @@ struct FitFileReaderState
         }
     }
 
+    QString getManuProd(int manu, int prod) {
+        if (manu == 1) {
+            // Garmin
+            // Product IDs can be found in c/fit_example.h in the FIT SDK.
+            // Multiple product IDs refer to different regions e.g. China, Japan etc.
+            switch (prod) {
+                case 473: case 474: case 475: case 494: return "Garmin FR301";
+                case 717: case 987: return "Garmin FR405";
+                case 782: return "Garmin FR50";
+                case 988: return "Garmin FR60";
+                case 1018: return "Garmin FR310XT";
+                case 1036: case 1199: case 1213: case 1387: return "Garmin Edge 500";
+                case 1124: case 1274: return "Garmin FR110";
+                case 1169: case 1333: case 1334: case 1386: return "Garmin Edge 800";
+                case 1325: return "Garmin Edge 200";
+                case 1328: return "Garmin FR910XT";
+                case 1345: case 1410: return "Garmin FR610";
+                case 1360: return "Garmin FR210";
+                case 1436: return "Garmin FR70";
+                case 1446: return "Garmin FR310XT 4T";
+                case 1482: case 1688: return "Garmin FR10";
+                case 1499: return "Garmin Swim";
+                case 1551: return "Garmin Fenix";
+                case 1561: case 1742: case 1821: return "Garmin Edge 510";
+                case 1567: return "Garmin Edge 810";
+                case 1623: return "Garmin FR620";
+                case 1632: return "Garmin FR220";
+                case 1765: case 2130: case 2131: case 2132: return "Garmin FR920XT";
+                case 1836: case 2052: case 2053: case 2070: case 2100: return "Garmin Edge 1000";
+                case 1903: return "Garmin FR15";
+                case 1967: return "Garmin Fenix2";
+                case 2050: case 2188: case 2189: return "Garmin Fenix3";
+                case 2067: case 2260: return "Garmin Edge 520";
+                case 2147: return "Garmin Edge 25";
+                case 2153: return "Garmin FR225";
+                case 2238: return "Garmin Edge 20";
+                case 20119: return "Garmin Training Center";
+                case 65532: return "Android ANT+ Plugin";
+                case 65534: return "Garmin Connect Website";
+                default: return QString("Garmin %1").arg(prod);
+            }
+        } else if (manu == 6 ) {
+            // SRM
+            // powercontrol now uses FIT files from PC8
+            switch (prod) {
+
+            case 6: return "SRM PC6";
+            case 7: return "SRM PC7";
+            case 8: return "SRM PC8";
+            default: return "SRM Powercontrol";
+            }
+        } else if (manu == 9 ) {
+            // Powertap
+            switch (prod) {
+                case 14: return "Joule 2.0";
+                case 18: return "Joule";
+                case 19: return "Joule GPS";
+                case 22: return "Joule GPS+";
+
+                default: return QString("Powertap Device %1");
+            }
+        } else  if (manu == 32) {
+            // wahoo
+            switch (prod) {
+                case 0: return "Wahoo fitness";
+                default: return QString("Wahoo fitness %1").arg(prod);
+            }
+        } else  if (manu == 38) {
+            // o_synce
+            switch (prod) {
+                case 1: return "o_synce navi2coach";
+                default: return QString("o_synce %1").arg(prod);
+            }
+        } else if (manu == 70) {
+            // does not set product at this point
+           return "Sigmasport ROX";
+        } else if (manu == 76) {
+            // Moxy
+            return "Moxy Monitor";
+        } else if (manu == 95) {
+            // Stryd
+            return "Stryd";
+        } else if (manu == 260) {
+            // Zwift!
+            return "Zwift";
+        } else {
+            return QString("Unknown FIT Device %1:%2").arg(manu).arg(prod);
+        }
+        return "FIT (*.fit)";
+    }
+
     void decodeFileId(const FitDefinition &def, int,
                       const std::vector<FitValue>& values) {
         int i = 0;
@@ -294,94 +386,7 @@ struct FitFileReaderState
                 default: ; // do nothing
             }
         }
-        if (manu == 1) {
-            // Garmin
-            // Product IDs can be found in c/fit_example.h in the FIT SDK.
-            // Multiple product IDs refer to different regions e.g. China, Japan etc.
-            switch (prod) {
-                case 473: case 474: case 475: case 494: rideFile->setDeviceType("Garmin FR301"); break;
-                case 717: case 987: rideFile->setDeviceType("Garmin FR405"); break;
-                case 782: rideFile->setDeviceType("Garmin FR50"); break;
-                case 988: rideFile->setDeviceType("Garmin FR60"); break;
-                case 1018: rideFile->setDeviceType("Garmin FR310XT"); break;
-                case 1036: case 1199: case 1213: case 1387: rideFile->setDeviceType("Garmin Edge 500"); break;
-                case 1124: case 1274: rideFile->setDeviceType("Garmin FR110"); break;
-                case 1169: case 1333: case 1334: case 1386: rideFile->setDeviceType("Garmin Edge 800"); break;
-                case 1325: rideFile->setDeviceType("Garmin Edge 200"); break;
-                case 1328: rideFile->setDeviceType("Garmin FR910XT"); break;
-                case 1345: case 1410: rideFile->setDeviceType("Garmin FR610"); break;
-                case 1360: rideFile->setDeviceType("Garmin FR210"); break;
-                case 1436: rideFile->setDeviceType("Garmin FR70"); break;
-                case 1446: rideFile->setDeviceType("Garmin FR310XT 4T"); break;
-                case 1482: case 1688: rideFile->setDeviceType("Garmin FR10"); break;
-                case 1499: rideFile->setDeviceType("Garmin Swim"); break;
-                case 1551: rideFile->setDeviceType("Garmin Fenix"); break;
-                case 1561: case 1742: case 1821: rideFile->setDeviceType("Garmin Edge 510"); break;
-                case 1567: rideFile->setDeviceType("Garmin Edge 810"); break;
-                case 1623: rideFile->setDeviceType("Garmin FR620"); break;
-                case 1632: rideFile->setDeviceType("Garmin FR220"); break;
-                case 1765: case 2130: case 2131: case 2132: rideFile->setDeviceType("Garmin FR920XT"); break;
-                case 1836: case 2052: case 2053: case 2070: case 2100: rideFile->setDeviceType("Garmin Edge 1000"); break;
-                case 1903: rideFile->setDeviceType("Garmin FR15"); break;
-                case 1967: rideFile->setDeviceType("Garmin Fenix2"); break;
-                case 2050: case 2188: case 2189: rideFile->setDeviceType("Garmin Fenix3"); break;
-                case 2067: case 2260: rideFile->setDeviceType("Garmin Edge 520"); break;
-                case 2147: rideFile->setDeviceType("Garmin Edge 25"); break;
-                case 2153: rideFile->setDeviceType("Garmin FR225"); break;
-                case 2238: rideFile->setDeviceType("Garmin Edge 20"); break;
-                case 20119: rideFile->setDeviceType("Garmin Training Center"); break;
-                case 65532: rideFile->setDeviceType("Android ANT+ Plugin"); break;
-                case 65534: rideFile->setDeviceType("Garmin Connect Website"); break;
-                default: rideFile->setDeviceType(QString("Garmin %1").arg(prod));
-            }
-        } else if (manu == 6 ) {
-            // SRM
-            // powercontrol now uses FIT files from PC8
-            switch (prod) {
-
-            case 6: rideFile->setDeviceType("SRM PC6");break;
-            case 7: rideFile->setDeviceType("SRM PC7");break;
-            case 8: rideFile->setDeviceType("SRM PC8");break;
-            default: rideFile->setDeviceType("SRM Powercontrol");break;
-            }
-        } else if (manu == 9 ) {
-            // Powertap
-            switch (prod) {
-                case 14: rideFile->setDeviceType("Joule 2.0");break;
-                case 18: rideFile->setDeviceType("Joule");break;
-                case 19: rideFile->setDeviceType("Joule GPS");break;
-                case 22: rideFile->setDeviceType("Joule GPS+");break;
-
-                default: rideFile->setDeviceType(QString("Powertap Device %1").arg(prod));break;
-            }
-        } else  if (manu == 32) {
-            // wahoo
-            switch (prod) {
-                case 0: rideFile->setDeviceType("Wahoo fitness"); break;
-                default: rideFile->setDeviceType(QString("Wahoo fitness %1").arg(prod));
-            }
-        } else  if (manu == 38) {
-            // o_synce
-            switch (prod) {
-                case 1: rideFile->setDeviceType("o_synce navi2coach"); break;
-                default: rideFile->setDeviceType(QString("o_synce %1").arg(prod));
-            }
-        } else if (manu == 70) {
-            // does not set product at this point
-           rideFile->setDeviceType("Sigmasport ROX");
-        } else if (manu == 76) {
-            // Moxy
-            rideFile->setDeviceType("Moxy Monitor");
-        } else if (manu == 95) {
-            // Stryd
-            rideFile->setDeviceType("Stryd");
-        } else if (manu == 260) {
-            // Zwift!
-            rideFile->setDeviceType("Zwift");
-        } else {
-            rideFile->setDeviceType(QString("Unknown FIT Device %1:%2").arg(manu).arg(prod));
-        }
-        rideFile->setFileFormat("FIT (*.fit)");
+        rideFile->setDeviceType(getManuProd(manu, prod));
     }
 
     void decodeSession(const FitDefinition &def, int,
@@ -527,22 +532,37 @@ struct FitFileReaderState
     void decodeDeviceInfo(const FitDefinition &def, int,
                           const std::vector<FitValue>& values) {
         int i = 0;
+
+        int index=-1;
+        int manu = -1, prod = -1, version = -1;
+        QString deviceInfo;
+
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
 
             if( value == NA_VALUE )
                 continue;
 
-            switch (field.num) {
+            //qDebug() << field.num << value;
 
-                // all fields are ignored at present
+            switch (field.num) {
+                case 0:   // device index
+                     index = value;
+                     break;
+                case 2:   // manufacturer
+                     manu = value;
+                     break;
+                case 4:   // product
+                     prod = value;
+                     break;
+                case 5:   // software version
+                     version = value;
+                     break;
+
+                // all oher fields are ignored at present
                 case 253: //timestamp
                 case 3:   // serial number
-                case 2:   // manufacturer
-                case 4:   // product
-                case 5:   // software version
                 case 10:  // battery voltage
-                case 0:   // device index
                 case 1:   // ANT+ device type
                           // details: 0x78 = HRM, 0x79 = Spd&Cad, 0x7A = Cad, 0x7B = Speed
                 case 6:   // hardware version
@@ -551,12 +571,21 @@ struct FitFileReaderState
                 case 25:  // source type
                 case 24:  // equipment ID
                 default: ; // do nothing
-            }
+            }    
 
             if (FIT_DEBUG) {
                 printf("decodeDeviceInfo  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
             }
         }
+
+        deviceInfo += getManuProd(manu, prod) + QString(" Version %1\n").arg(version/100.0);
+        if (index == 0) { // keep only the first device now
+            if (deviceInfos.count()>index)
+                deviceInfos.replace(index, deviceInfo);
+            else
+                deviceInfos.append(deviceInfo);
+        }
+
     }
 
     void decodeEvent(const FitDefinition &def, int,
@@ -1843,6 +1872,12 @@ struct FitFileReaderState
                 qDebug() << QString("FitRideFile: unknown record field %1; ignoring it").arg(num);
             foreach(int num, unknown_base_type)
                 qDebug() << QString("FitRideFile: unknown base type %1; skipped").arg(num);
+
+            QString deviceInfo;
+            foreach(QString info, deviceInfos) {
+                deviceInfo += info;
+            }
+            rideFile->setTag("Device Info", deviceInfo);
 
             file.close();
 
