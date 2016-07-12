@@ -23,7 +23,6 @@
 #include "Athlete.h"
 #include "Specification.h"
 #include "Zones.h"
-#include "BestIntervalDialog.h"
 #include <cmath>
 #include <assert.h>
 #include <QApplication>

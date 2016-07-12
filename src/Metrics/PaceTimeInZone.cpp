@@ -22,7 +22,6 @@
 #include "Specification.h"
 #include "Context.h"
 #include "Athlete.h"
-#include "BestIntervalDialog.h"
 #include "PaceZones.h"
 
 #include <cmath>
