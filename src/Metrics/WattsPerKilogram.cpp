@@ -17,7 +17,7 @@
  */
 
 #include "RideMetric.h"
-#include "BestIntervalDialog.h"
+#include "AddIntervalDialog.h"
 #include "RideItem.h"
 #include "Zones.h"
 #include "Context.h"
@@ -88,9 +88,8 @@ class PeakWPK : public RideMetric {
         }
 
         weight = item->ride()->getWeight();
-        //weight = ride->getTag("Weight", appsettings->cvalue(GC_WEIGHT, "75.0").toString()).toDouble(); // default to 75kg
-        QList<BestIntervalDialog::BestInterval> results;
-        BestIntervalDialog::findBests(item->ride(), spec, secs, 1, results);
+        QList<AddIntervalDialog::AddedInterval> results;
+        AddIntervalDialog::findPeaks(item->context, true, item->ride(), spec, RideFile::watts, RideFile::original, secs, 1, results, "", "");
         if (results.count() > 0 && results.first().avg < 3000) wpk = results.first().avg / weight;
         else wpk = 0.0;
         setValue(wpk);

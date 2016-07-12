@@ -530,16 +530,16 @@ AddIntervalDialog::createClicked()
             }
 
             if (methodPeakPower->isChecked()) {
-                findPeaks(context, byTime, ride, RideFile::watts, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak Power","");
+                findPeaks(context, byTime, ride, Specification(), RideFile::watts, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak Power","");
             }
             else if (methodPeakSpeed->isChecked()) {
-                findPeaks(context, byTime, ride, RideFile::kph, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak Speed","");
+                findPeaks(context, byTime, ride, Specification(), RideFile::kph, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak Speed","");
             }
             else if (methodPeakPace->isChecked()) {
-                findPeaks(context, byTime, ride, RideFile::kph, RideFile::pace, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak Pace", "");
+                findPeaks(context, byTime, ride, Specification(), RideFile::kph, RideFile::pace, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak Pace", "");
             }
             else if (methodHeartRate->isChecked()) {
-                findPeaks(context, byTime, ride, RideFile::hr, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak HR", "");
+                findPeaks(context, byTime, ride, Specification(), RideFile::hr, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak HR", "");
             }
         }
 
@@ -827,21 +827,21 @@ AddIntervalDialog::findPeakPowerStandard(Context *context, const RideFile *ride,
 {
     QString prefix = tr("Peak");
 
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 5, 1, results, prefix, "");
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 10, 1, results, prefix, "");
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 20, 1, results, prefix, "");
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 30, 1, results, prefix, "");
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 60, 1, results, prefix, "");
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 120, 1, results, prefix, "");
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 300, 1, results, prefix, "");
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 600, 1, results, prefix, "");
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 1200, 1, results, prefix, "");
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 1800, 1, results, prefix, "");
-    findPeaks(context, true, ride, RideFile::watts, RideFile::original, 3600, 1, results, prefix, "");
+    findPeaks(context, true, ride, Specification(), RideFile::watts, RideFile::original, 5, 1, results, prefix, "");
+    findPeaks(context, true, ride, Specification(), RideFile::watts, RideFile::original, 10, 1, results, prefix, "");
+    findPeaks(context, true, ride, Specification(), RideFile::watts, RideFile::original, 20, 1, results, prefix, "");
+    findPeaks(context, true, ride, Specification(), RideFile::watts, RideFile::original, 30, 1, results, prefix, "");
+    findPeaks(context, true, ride, Specification(), RideFile::watts, RideFile::original, 60, 1, results, prefix, "");
+    findPeaks(context, true, ride, Specification(), RideFile::watts, RideFile::original, 120, 1, results, prefix, "");
+    findPeaks(context, true, ride, Specification(), RideFile::watts, RideFile::original, 300, 1, results, prefix, "");
+    findPeaks(context, true, ride, Specification(), RideFile::watts, RideFile::original, 600, 1, results, prefix, "");
+    findPeaks(context, true, ride, Specification(), RideFile::watts, RideFile::original, 1200, 1, results, prefix, "");
+    findPeaks(context, true, ride, Specification(), RideFile::watts, RideFile::original, 1800, 1, results, prefix, "");
+    findPeaks(context, true, ride, Specification(), RideFile::watts, RideFile::original, 3600, 1, results, prefix, "");
 }
 
 void
-AddIntervalDialog::findPeaks(Context *context, bool typeTime, const RideFile *ride,
+AddIntervalDialog::findPeaks(Context *context, bool typeTime, const RideFile *ride, Specification spec,
                              RideFile::SeriesType series, RideFile::Conversion conversion, double windowSize,
                               int maxIntervals, QList<AddedInterval> &results, QString prefixe, QString overideName)
 {
@@ -857,7 +857,10 @@ AddIntervalDialog::findPeaks(Context *context, bool typeTime, const RideFile *ri
     if (!typeTime && windowSize > ride->dataPoints().last()->km*1000) return;
 
     // We're looking for intervals with durations in [windowSizeSecs, windowSizeSecs + secsDelta).
-    foreach (const RideFilePoint *point, ride->dataPoints()) {
+    RideFileIterator it(const_cast<RideFile*>(ride), spec);
+    while (it.hasNext()) {
+        struct RideFilePoint *point = it.next();
+
         // Discard points until interval duration is < windowSizeSecs + secsDelta.
         while ((typeTime && !window.empty() && intervalDuration(window.first(), point, ride) >= windowSize + secsDelta) ||
                (!typeTime && window.length()>1 && intervalDistance(window.at(1), point, ride) >= windowSize)) {

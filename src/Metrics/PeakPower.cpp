@@ -18,7 +18,7 @@
 
 #include "RideMetric.h"
 #include "RideItem.h"
-#include "BestIntervalDialog.h"
+#include "AddIntervalDialog.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Specification.h"
@@ -287,8 +287,8 @@ class PeakPower : public RideMetric {
             return;
         }
 
-        QList<BestIntervalDialog::BestInterval> results;
-        BestIntervalDialog::findBests(item->ride(), spec, secs, 1, results);
+        QList<AddIntervalDialog::AddedInterval> results;
+        AddIntervalDialog::findPeaks(item->context, true, item->ride(), spec, RideFile::watts, RideFile::original, secs, 1, results, "", "");
         if (results.count() > 0 && results.first().avg < 3000) watts = results.first().avg;
         else watts = 0.0;
 
@@ -593,8 +593,8 @@ class PeakPowerHr : public RideMetric {
         }
 
         // find peak power interval
-        QList<BestIntervalDialog::BestInterval> results;
-        BestIntervalDialog::findBests(item->ride(), spec, secs, 1, results);
+        QList<AddIntervalDialog::AddedInterval> results;
+        AddIntervalDialog::findPeaks(item->context, true, item->ride(), spec, RideFile::watts, RideFile::original, secs, 1, results, "", "");
 
         // work out average hr during that interval
         if (results.count() > 0) {
