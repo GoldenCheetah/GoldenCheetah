@@ -105,6 +105,7 @@ struct FitFileReaderState
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
     XDataSeries *weatherXdata;
+    XDataSeries *swimXdata;
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
@@ -1122,7 +1123,9 @@ struct FitFileReaderState
             time = last_time + time_offset;
         double cad = 0, km = 0, kph = 0;
 
-        bool length_type = false;
+        int length_type = 0;
+        int swim_stroke = 0;
+        int total_strokes = 0;
         double length_duration = 0.0;
 
         int i = 0;
@@ -1153,13 +1156,14 @@ struct FitFileReaderState
                         if (FIT_DEBUG) qDebug() << " total_timer_time:" << value;
                         break;
                 case 5: // total strokes
-                        if (FIT_DEBUG) qDebug() << " total_strokes:" << value;
+                        total_strokes = value;
                         break;
                 case 6: // avg speed
                         kph = value * 3.6 / 1000.0;
                         break;
-                case 7: // swim stroke
-                        if (FIT_DEBUG) qDebug() << " swim_stroke:" << value;
+                case 7: // swim stroke: 0-free, 1-back, 2-breast, 3-fly,
+                        //              4-drill, 5-mixed, 6-IM
+                        swim_stroke = value;
                         break;
                 case 9: // cadence
                         cad = value;
@@ -1177,6 +1181,15 @@ struct FitFileReaderState
                          unknown_record_fields.insert(field.num);
             }
         }
+
+        XDataPoint *p = new XDataPoint();
+        p->secs = last_time;
+        p->km = last_distance;
+        p->number[0] = length_type + swim_stroke;
+        p->number[1] = length_duration;
+        p->number[2] = total_strokes;
+
+        swimXdata->datapoints.append(p);
 
         // Rest interval
         if (!length_type) {
@@ -1745,6 +1758,12 @@ struct FitFileReaderState
         weatherXdata->valuename << "TEMPERATURE";
         weatherXdata->valuename << "HUMIDITY";
 
+        swimXdata = new XDataSeries();
+        swimXdata->name = "SWIM";
+        swimXdata->valuename << "TYPE";
+        swimXdata->valuename << "DURATION";
+        swimXdata->valuename << "STROKES";
+
         try {
 
             // read the header
@@ -1831,6 +1850,11 @@ struct FitFileReaderState
                 rideFile->addXData("WEATHER", weatherXdata);
             else
                 delete weatherXdata;
+
+            if (swimXdata->datapoints.count()>0)
+                rideFile->addXData("SWIM", swimXdata);
+            else
+                delete swimXdata;
 
             return rideFile;
         }
