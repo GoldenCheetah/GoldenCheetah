@@ -47,8 +47,6 @@ static int fitFileReaderRegistered =
 
 static const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), Qt::UTC);
 
-//static double bearing = 0; // used to compute headwind depending on wind/cyclist bearing difference
-
 struct FitField {
     int num;
     int type; // FIT base_type
@@ -821,7 +819,7 @@ struct FitFileReaderState
         if (time_offset > 0)
             time = last_time + time_offset;
         double alt = 0, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = RideFile::NA;
-        double kph = 0, temperature = RideFile::NA, watts = 0, slope = 0;
+        double kph = 0, temperature = RideFile::NA, watts = 0, slope = 0, headwind = 0;
         double leftTorqueEff = 0, rightTorqueEff = 0, leftPedalSmooth = 0, rightPedalSmooth = 0;
 
         double leftPedalCenterOffset = 0;
@@ -1010,22 +1008,6 @@ struct FitFileReaderState
         double secs = time - start_time;
         double nm = 0;
 
-        // compute bearing in order to calculate headwind
-        // XXif ((!rideFile->dataPoints().empty()) && (last_time != 0))
-        // XX{
-        // XX    RideFilePoint *prevPoint = rideFile->dataPoints().back();
-        // XX    // ensure a movement occurred and valid lat/lon in order to compute cyclist direction
-        // XX    if (  (prevPoint->lat != lat || prevPoint->lon != lng )
-        // XX       && (prevPoint->lat != 0 || prevPoint->lon != 0 )
-        // XX       && (lat != 0 || lng != 0 ) )
-        // XX                bearing = atan2(cos(lat)*sin(lng - prevPoint->lon),
-        // XX                                cos(prevPoint->lat)*sin(lat)-sin(prevPoint->lat)*cos(lat)*cos(lng - prevPoint->lon));
-        // XX}
-        // XXelse keep previous bearing or 0 at beginning
-
-        // XXdouble headwind = cos(bearing - rideFile->windHeading()) * rideFile->windSpeed() + kph;
-        double headwind = 0;
-
         int interval = 0;
         // if there are data points && a time difference > 1sec && smartRecording processing is requested at all
         if ((!rideFile->dataPoints().empty()) && (last_time != 0) &&
@@ -1050,7 +1032,7 @@ struct FitFileReaderState
             double deltaAlt = alt - prevPoint->alt;
             double deltaLon = lng - prevPoint->lon;
             double deltaLat = lat - prevPoint->lat;
-            //XX double deltaHeadwind = headwind - prevPoint->headwind;
+            // double deltaHeadwind = headwind - prevPoint->headwind;
             double deltaSlope = slope - prevPoint->slope;
             double deltaLeftRightBalance = lrbalance - prevPoint->lrbalance;
             double deltaLeftTE = leftTorqueEff - prevPoint->lte;
@@ -1316,11 +1298,9 @@ struct FitFileReaderState
                         break;
                 case 3:  // Wind heading (0deg=North)
                         windHeading = value ; // 180.0 * MATHCONST_PI;
-                        rideFile->setWindHeading(value / 180.0 * MATHCONST_PI);
                         break;
                 case 4:  // Wind speed (mm/s)
-                        windSpeed = value * 0.0036;
-                        rideFile->setWindSpeed(value * 0.0036);
+                        windSpeed = value * 0.0036; // km/h
                         break;
                 case 1:  // Temperature
                         temp = value;
@@ -1771,8 +1751,6 @@ struct FitFileReaderState
         // start
         rideFile = new RideFile;
         rideFile->setDeviceType("Garmin FIT");
-        rideFile->setWindHeading(0.0);
-        rideFile->setWindSpeed(0.0);
         rideFile->setRecIntSecs(1.0); // this is a terrible assumption!
         if (!file.open(QIODevice::ReadOnly)) {
             delete rideFile;

@@ -358,11 +358,6 @@ class RideFile : public QObject // QObject to emit signals
         void appendXDataPoints(QString xdata, QVector<XDataPoint *> points);
         // ************************************************************
 
-        const double &windSpeed() const { return windSpeed_; }
-        void setWindSpeed(const double &value) {windSpeed_ = value; }
-        const double &windHeading() const { return windHeading_; }
-        void setWindHeading(const double &value) {windHeading_ = value; }
-
     signals:
         void saved();
         void reverted();
