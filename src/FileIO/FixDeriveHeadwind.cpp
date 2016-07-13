@@ -147,7 +147,7 @@ FixDeriveHeadwind::postProcess(RideFile *ride, DataProcessorConfig *config=0)
 
         } //else keep previous bearing or 0 at beginning
 
-        double headwind = cos(bearing - (windheading/ 180.0 * PI)) * (windspeed* 0.0036) + point->kph;
+        double headwind = cos(bearing - (windheading/ 180.0 * PI)) * (windspeed) + point->kph;
         //qDebug() << point->kph << headwind  << "(" << windspeed << windheading << ")";
 
         point->headwind = headwind;
