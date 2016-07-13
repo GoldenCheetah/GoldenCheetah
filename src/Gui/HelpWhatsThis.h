@@ -74,6 +74,7 @@ Q_OBJECT
                  MenuBar_Edit_AdjustTorqueValues,
                  MenuBar_Edit_EstimatePowerValues,
                  MenuBar_Edit_EstimateDistanceValues,
+                 MenuBar_Edit_EstimateHeadwindValues,
                  MenuBar_Edit_FixElevationErrors,
                  MenuBar_Edit_FixGapsInRecording,
                  MenuBar_Edit_FixGPSErrors,
