@@ -723,9 +723,9 @@ SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch
 ## File and Device IO and Editing
 SOURCES += FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp FileIO/CommPort.cpp \
            FileIO/Computrainer3dpFile.cpp FileIO/CsvRideFile.cpp FileIO/DataProcessor.cpp FileIO/Device.cpp \
-           FileIO/FitlogParser.cpp FileIO/FitlogRideFile.cpp FileIO/FitRideFile.cpp FileIO/FixDeriveDistance.cpp FileIO/FixDerivePower.cpp \
-           FileIO/FixDeriveTorque.cpp FileIO/FixElevation.cpp FileIO/FixFreewheeling.cpp FileIO/FixGaps.cpp FileIO/FixGPS.cpp \
-           FileIO/FixRunningCadence.cpp FileIO/FixRunningPower.cpp \
+           FileIO/FitlogParser.cpp FileIO/FitlogRideFile.cpp FileIO/FitRideFile.cpp FileIO/FixDeriveDistance.cpp \
+           FileIO/FixDeriveHeadwind.cpp FileIO/FixDerivePower.cpp FileIO/FixDeriveTorque.cpp FileIO/FixElevation.cpp \
+           FileIO/FixFreewheeling.cpp FileIO/FixGaps.cpp FileIO/FixGPS.cpp FileIO/FixRunningCadence.cpp FileIO/FixRunningPower.cpp \
            FileIO/FixHRSpikes.cpp FileIO/FixMoxy.cpp FileIO/FixPower.cpp FileIO/FixSmO2.cpp FileIO/FixSpeed.cpp FileIO/FixSpikes.cpp \
            FileIO/FixTorque.cpp FileIO/GcRideFile.cpp FileIO/GpxParser.cpp FileIO/GpxRideFile.cpp FileIO/JouleDevice.cpp FileIO/LapsEditor.cpp \
            FileIO/MacroDevice.cpp FileIO/ManualRideFile.cpp FileIO/MoxyDevice.cpp \
