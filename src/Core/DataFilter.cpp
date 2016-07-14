@@ -96,8 +96,9 @@ static struct {
     { "unset", 2 }, // unset(symbol, filter)
     { "isset", 1 }, // isset(symbol) - is the metric or metadata overridden/defined
 
-    // VDOT functions
+    // VDOT and time/distance functions
     { "vdottime", 2 }, // vdottime(VDOT, distance[km]) - result is seconds
+    { "besttime", 1 }, // besttime(distance[km]) - result is seconds
 
     // add new ones above this line
     { "", -1 }
@@ -2197,6 +2198,14 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     return Result (60*VDOTCalculator::eqvTime(eval(df, leaf->fparms[0], x, m, p, c).number, 1000*eval(df, leaf->fparms[1], x, m, p, c).number));
                 }
                 break;
+
+        case 36 :
+                {   // BESTTIME (distance[km])
+
+                    if (leaf->fparms.count() != 1 || m->fileCache() == NULL) return Result(0);
+
+                    return Result (m->fileCache()->bestTime(eval(df, leaf->fparms[0], x, m, p, c).number));
+                 }
 
         default:
             return Result(0);
