@@ -2296,3 +2296,16 @@ RideBest::getForSymbol(QString symbol, bool metric) const
         return metricValue;
     }
 }
+
+int
+RideFileCache::bestTime(double km)
+{
+    // divisor for series and conversion from secs to hours
+    double divisor = pow(10, decimalsFor(RideFile::kph)) * 3600.0;
+    // linear search over kph mean max array
+    int secs = 0;
+    while (secs < kphMeanMax.count() &&
+           double(kphMeanMax[secs] * secs) / divisor < km) secs++;
+    if (secs < kphMeanMax.count()) return secs;
+    return RideFile::NIL;
+}
