@@ -224,6 +224,9 @@ class RideFileCache
         static void doubleArray(QVector<double> &into, QVector<float> &from, RideFile::SeriesType series);
         static void doubleArrayForDistribution(QVector<double> &into, QVector<float> &from);
 
+        // Best time for distance, used by metrics and Data Filter
+        int bestTime(double km);
+
     protected:
 
         void refreshCache();              // compute arrays and update cache
