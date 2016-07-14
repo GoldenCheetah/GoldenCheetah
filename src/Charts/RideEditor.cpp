@@ -1599,6 +1599,21 @@ RideEditor::setTabBar()
             stack->addWidget(widget);
             widget->show();
         }
+
+        // add a disabled tab with a "+" button
+        tabbar->addTab("");
+        QToolButton *tb = new QToolButton(this);
+        tb->setText("+");
+        tb->setAutoRaise(true);
+        tb->setStyleSheet(QString("QToolButton { background: %1; color: %2; border: 0px; } ")
+                          .arg(GColor(CPLOTBACKGROUND).name())
+                          .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+
+        tabbar->setTabButton(tabbar->count()-1, QTabBar::LeftSide, tb);
+        tabbar->setTabButton(tabbar->count()-1, QTabBar::RightSide, 0);
+        tabbar->setTabEnabled(tabbar->count()-1, false);
+        connect(tb, SIGNAL(clicked(bool)), xdataTool, SLOT(addXDataClicked()));
+
         tabbar->show();
     } else {
         tabbar->hide();
