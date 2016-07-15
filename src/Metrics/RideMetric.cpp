@@ -139,8 +139,9 @@
 // 129 10  Jul 2016 Damien Grauser     Average Running Cadence
 // 130 12  Jul 2016 Ale Martinez       Added Best Times for common distances
 // 131 20  Jul 2016 Damien Grauser     Average Running Vertical Oscillation and Ground Contact Time
+// 132 21  Jul 2016 Ale Martinez       Added SwimMetrics (Stroke Rate et al)
 
-int DBSchemaVersion = 131;
+int DBSchemaVersion = 132;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
