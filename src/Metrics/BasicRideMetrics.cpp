@@ -405,61 +405,6 @@ class TotalDistance : public RideMetric {
 static bool totalDistanceAdded =
     RideMetricFactory::instance().addMetric(TotalDistance());
 
-// DistanceSwim is TotalDistance in swim units, relevant for swims in yards //
-class DistanceSwim : public RideMetric {
-    Q_DECLARE_TR_FUNCTIONS(DistanceSwim)
-    double mts;
-
-    public:
-
-    DistanceSwim() : mts(0.0)
-    {
-        setSymbol("distance_swim");
-        setInternalName("Distance Swim");
-    }
-    // Overrides to use Swim Pace units setting
-    QString units(bool) const {
-        bool metricSwPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::units(metricSwPace);
-    }
-    double value(bool) const {
-        bool metricSwPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::value(metricSwPace);
-    }
-    void initialize() {
-        setName(tr("Distance Swim"));
-        setType(RideMetric::Total);
-        setMetricUnits(tr("m"));
-        setImperialUnits(tr("yd"));
-        setPrecision(0);
-        setConversion(1.0/METERS_PER_YARD);
-        setDescription(tr("Total Distance in meters or yards"));
-    }
-
-    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
-
-        TotalDistance *distance = dynamic_cast<TotalDistance*>(deps.value("total_distance"));
-
-        // convert to meters
-        mts = distance->value(true) * 1000.0;
-        setValue(mts);
-        setCount(distance->count());
-    }
-
-    bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
-
-    RideMetric *clone() const { return new DistanceSwim(*this); }
-};
-
-static bool addDistanceSwim()
-{
-    QVector<QString> deps;
-    deps.append("total_distance");
-    RideMetricFactory::instance().addMetric(DistanceSwim(), &deps);
-    return true;
-}
-static bool distanceSwimAdded = addDistanceSwim();
-
 // climb rating is essentially elev gain ^2 / distance
 // a concept raised by Dan Conelly on his blog
 class ClimbRating : public RideMetric {
@@ -978,73 +923,6 @@ static bool addPace()
     return true;
 }
 static bool paceAdded = addPace();
-
-//////////////////////////////////////////////////////////////////////////////
-class PaceSwim : public RideMetric {
-    Q_DECLARE_TR_FUNCTIONS(PaceSwim)
-    double pace;
-
-    public:
-
-    PaceSwim() : pace(0.0)
-    {
-        setSymbol("pace_swim");
-        setInternalName("Pace Swim");
-    }
-
-    // Swim Pace ordering is reversed
-    bool isLowerBetter() const { return true; }
-
-    // Overrides to use Swim Pace units setting
-    QString units(bool) const {
-        bool metricRunPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::units(metricRunPace);
-    }
-
-    double value(bool) const {
-        bool metricRunPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::value(metricRunPace);
-    }
-
-    QString toString(bool metric) const {
-        return time_to_string(value(metric)*60);
-    }
-
-    void initialize() {
-        setName(tr("Pace Swim"));
-        setType(RideMetric::Average);
-        setMetricUnits(tr("min/100m"));
-        setImperialUnits(tr("min/100yd"));
-        setPrecision(1);
-        setConversion(METERS_PER_YARD);
-        setDescription(tr("Average Speed expressed in swim pace units: min/100m or min/100yd"));
-   }
-
-    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
-
-        AvgSpeed *as = dynamic_cast<AvgSpeed*>(deps.value("average_speed"));
-
-        // divide by zero or stupidly low pace
-        if (as->value(true) > 0.00f) pace = 6.0f / as->value(true);
-        else pace = 0;
-
-        setValue(pace);
-        setCount(as->count());
-    }
-
-    bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
-
-    RideMetric *clone() const { return new PaceSwim(*this); }
-};
-
-static bool addPaceSwim()
-{
-    QVector<QString> deps;
-    deps.append("average_speed");
-    RideMetricFactory::instance().addMetric(PaceSwim(), &deps);
-    return true;
-}
-static bool paceSwimAdded = addPaceSwim();
 
 //////////////////////////////////////////////////////////////////////////////
 
