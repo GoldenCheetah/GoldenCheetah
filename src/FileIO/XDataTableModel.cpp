@@ -241,36 +241,28 @@ XDataTableModel::beginCommand(bool undo, RideCommand *cmd)
 {
     switch (cmd->type) {
 
-        case RideCommand::SetPointValue:
+        case RideCommand::SetXDataPointValue:
             break;
 
-        case RideCommand::InsertPoint:
+        case RideCommand::InsertXDataPoint:
         {
-            InsertPointCommand *dp = (InsertPointCommand *)cmd;
+            InsertXDataPointCommand *dp = (InsertXDataPointCommand *)cmd;
             if (!undo) beginInsertRows(QModelIndex(), dp->row, dp->row);
             else beginRemoveRows(QModelIndex(), dp->row, dp->row);
             break;
         }
 
-        case RideCommand::DeletePoint:
+        case RideCommand::DeleteXDataPoints:
         {
-            DeletePointCommand *dp = (DeletePointCommand *)cmd;
+            DeleteXDataPointsCommand *dp = (DeleteXDataPointsCommand *)cmd;
             if (undo) beginInsertRows(QModelIndex(), dp->row, dp->row);
             else beginRemoveRows(QModelIndex(), dp->row, dp->row);
             break;
         }
 
-        case RideCommand::DeletePoints:
+        case RideCommand::AppendXDataPoints:
         {
-            DeletePointsCommand *ds = (DeletePointsCommand *)cmd;
-            if (undo) beginInsertRows(QModelIndex(), ds->row, ds->row + ds->count - 1);
-            else beginRemoveRows(QModelIndex(), ds->row, ds->row + ds->count - 1);
-            break;
-        }
-
-        case RideCommand::AppendPoints:
-        {
-            AppendPointsCommand *ap = (AppendPointsCommand *)cmd;
+            AppendXDataPointsCommand *ap = (AppendXDataPointsCommand *)cmd;
             if (!undo) beginInsertRows(QModelIndex(), ap->row, ap->row + ap->count - 1);
             else beginRemoveRows(QModelIndex(), ap->row, ap->row + ap->count - 1);
             break;
@@ -285,30 +277,30 @@ XDataTableModel::endCommand(bool undo, RideCommand *cmd)
 {
     switch (cmd->type) {
 
-        case RideCommand::SetPointValue:
+        case RideCommand::SetXDataPointValue:
         {
-            SetPointValueCommand *spv = (SetPointValueCommand*)cmd;
-            //XXXQModelIndex cell(index(spv->row,headingsType.indexOf(spv->series)));
-            //XXXdataChanged(cell, cell);
+            SetXDataPointValueCommand *spv = (SetXDataPointValueCommand*)cmd;
+            QModelIndex cell(index(spv->row,spv->col));
+            dataChanged(cell, cell);
             break;
         }
-        case RideCommand::InsertPoint:
+        case RideCommand::InsertXDataPoint:
             if (!undo) endInsertRows();
             else endRemoveRows();
             break;
 
-        case RideCommand::DeletePoint:
-        case RideCommand::DeletePoints:
+        case RideCommand::DeleteXDataPoints:
             if (undo) endInsertRows();
             else endRemoveRows();
             break;
 
-        case RideCommand::AppendPoints:
+        case RideCommand::AppendXDataPoints:
             if (undo) endRemoveRows();
             else endInsertRows();
             break;
 
-        case RideCommand::SetDataPresent:
+        case RideCommand::AddXDataSeries:
+        case RideCommand::RemoveXDataSeries:
             //XXXsetHeadings();
             emit layoutChanged();
             break;

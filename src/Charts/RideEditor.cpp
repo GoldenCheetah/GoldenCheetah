@@ -1556,6 +1556,22 @@ RideEditor::removeTabRequested(int index)
 void
 RideEditor::setTabBar()
 {
+    // do we need to?
+    QStringList xd, tabs;
+    for(int i=0; i< tabbar->count()-1; i++) tabs << tabbar->tabText(i);
+    QMapIterator<QString, XDataSeries *>ie(ride->ride()->xdata());
+    xd<<tr("STANDARD");
+    ie.toFront();
+    while(ie.hasNext()) {
+       ie.next();
+       xd << ie.key();
+    }
+
+    // no change
+    if (xd == tabs) return;
+
+    // OK - if we get here the tabs have changed ....
+
     // where are we, need to go back if possible.
     QString currentTab = tabbar->currentIndex() >= 0 ? tabbar->tabText(tabbar->currentIndex()) : "";
 
@@ -1821,6 +1837,33 @@ RideEditor::endCommand(bool undo, RideCommand *cmd)
 
             }
             break;
+
+        case RideCommand::AddXDataSeries:
+        {
+                // show the user where the rows went
+                AddXDataSeriesCommand *sp = (AddXDataSeriesCommand*)cmd;
+                XDataEditor *editor = xdataEditors.value(sp->xdata);
+
+                if (!inLUW) editor->selectionModel()->clearSelection();
+
+                // highlight column we just arrived
+                if (undo == false) {
+                    QModelIndex top = editor->model()->index(0, editor->model()->columnCount()-1);
+                    QModelIndex bottom = editor->model()->index(editor->model()->rowCount()-1, editor->model()->columnCount()-1);
+                    QItemSelection highlight(top,bottom);
+
+                    // move cursor and highligth all the rows
+                    if (!inLUW) {
+                        editor->selectionModel()->clearSelection();
+                        editor->selectionModel()->setCurrentIndex(top, QItemSelectionModel::Select);
+                    }
+                    editor->selectionModel()->select(highlight, inLUW ? QItemSelectionModel::Select :
+                                                                QItemSelectionModel::SelectCurrent);
+                }
+
+
+        }
+        break;
 
         case RideCommand::LUW:
         {
