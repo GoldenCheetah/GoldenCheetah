@@ -72,6 +72,7 @@ class Leaf {
 
         // tree traversal etc
         void print(Leaf *, int level);  // print leaf and all children
+        void reset(Leaf *);  // reset counters/state used during parsing user data
         void color(Leaf *, QTextDocument *);  // update the document to match
         bool isDynamic(Leaf *);
         void validateFilter(Context *context, DataFilterRuntime *, Leaf*); // validate
@@ -103,6 +104,7 @@ class Leaf {
         RideFile::SeriesType seriesType; // for ridefilecache
         int loc, leng;
         bool inerror;
+        int xcurrent, xnext; // when working with xdata
 };
 
 class DataFilterRuntime {
@@ -159,6 +161,7 @@ class DataFilter : public QObject
         Leaf *root() { return treeRoot; }
 
         // RideItem always available and supplies th context
+        void reset() { if (treeRoot) treeRoot->reset(treeRoot); }
         Result evaluate(RideItem *rideItem, RideFilePoint *p);
         QStringList getErrors() { return errors; };
         void colorSyntax(QTextDocument *content, int pos);

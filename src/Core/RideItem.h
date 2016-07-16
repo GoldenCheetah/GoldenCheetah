@@ -66,6 +66,9 @@ class RideItem : public QObject
         // metadata (used by navigator)
         QMap<QString,QString> metadata_;
 
+        // xdata series definitions
+        QMap<QString,QStringList>xdata_;
+
         // got any intervals
         QList<IntervalItem*> intervals_;
         QStringList errors_;
@@ -158,6 +161,9 @@ class RideItem : public QObject
 
         // metadata
         QMap<QString, QString> &metadata() { return metadata_; }
+
+        // xdata definitions maps QString<xdata>, QStringList<xdataseries>
+        QMap<QString,QStringList> &xdata() { return xdata_; }
 
         // ride() will open the ride if it isn't already when open=true
         // if we pass false then it will just return ride_ so we can

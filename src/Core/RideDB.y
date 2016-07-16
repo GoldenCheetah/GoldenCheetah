@@ -44,7 +44,7 @@ void RideDBerror(void*jc, const char *error) // used by parser aka yyerror()
 %parse-param { struct RideDBContext *jc }
 
 %token STRING
-%token VERSION RIDES METRICS TAGS INTERVALS
+%token VERSION RIDES METRICS TAGS XDATA INTERVALS
 
 %start document
 %%
@@ -112,6 +112,7 @@ ride: '{' rideelement_list '}'                                  {
                                                                     // now set our ride item clean again, so we don't
                                                                     // overwrite with prior data
                                                                     jc->item.metadata().clear();
+                                                                    jc->item.xdata().clear();
                                                                     jc->item.metrics().fill(0.0f);
                                                                     jc->interval.metrics().fill(0.0f);
                                                                     jc->interval.route = QUuid();
@@ -127,6 +128,7 @@ rideelement_list: rideelement_list ',' rideelement
 rideelement: ride_tuple
             | metrics
             | tags
+            | xdata
             | intervals
             ;
 
@@ -234,6 +236,21 @@ tag: tag_key ':' tag_value                                      /* metadata valu
 tag_key : string                                                { jc->key = jc->JsonString; }
 tag_value : string                                              { jc->value = jc->JsonString; }
 
+/*
+ * XDATA definitions
+ */
+
+xdata: XDATA ':' '{' xdata_list '}'
+xdata_list: xdata | xdata_list ',' xdata ;
+xdata: xdata_name ':' '[' xdata_values ']'                      { jc->item.xdata().insert(jc->key,jc->JsonStringList);
+                                                                  jc->key = ""; jc->JsonStringList.clear(); }
+
+xdata_name : string                                             { jc->key = jc->JsonString; }
+xdata_values:
+    | xdata_value
+    | xdata_value ',' xdata_values
+    ;
+xdata_value: string                                             { jc->JsonStringList << jc->JsonString; }
 
 /*
  * Primitives
@@ -412,6 +429,31 @@ void RideCache::save()
                 // end of the tags
                 stream << "\n\t\t}";
 
+            }
+
+            // xdata definitions
+            if (item->xdata().count()) {
+                stream << ",\n\t\t\"XDATA\":{\n";
+
+                QMap<QString, QStringList>::const_iterator i;
+                for (i=item->xdata().constBegin(); i != item->xdata().constEnd(); i++) {
+
+                    stream << "\t\t\t\"" << i.key() << "\":[ ";
+                    bool first=true;
+                    foreach(QString x, i.value()) {
+                        if (!first) {
+                            stream << ", ";
+                        }
+                        stream << "\"" << protect(x) << "\"";
+                        first=false;
+                    }
+
+                    if (i+1 != item->xdata().constEnd()) stream << "],\n";
+                    else stream << "]\n";
+                }
+
+                // end of the xdata
+                stream << "\n\t\t}";
             }
 
             // intervals
