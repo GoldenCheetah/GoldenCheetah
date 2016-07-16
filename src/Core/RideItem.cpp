@@ -84,7 +84,8 @@ RideItem::setFrom(RideItem&here, bool temp) // used when loading cache/rideDB.js
     fileCache_ = NULL;
     metrics_ = here.metrics_;
 	metadata_ = here.metadata_;
-	errors_ = here.errors_;
+    xdata_ = here.xdata_;
+    errors_ = here.errors_;
     intervals_ = here.intervals_;
 
     // don't update the interval pointers if this is a 
@@ -541,6 +542,16 @@ RideItem::refresh()
 
         // get the metadata
         metadata_ = f->tags();
+
+        // get xdata definitions
+        QMapIterator<QString, XDataSeries *>ie(f->xdata());
+        ie.toFront();
+        while(ie.hasNext()) {
+            ie.next();
+
+            // xdata and series names
+            xdata_.insert(ie.value()->name, ie.value()->valuename);
+        }
 
         // overrides
         overrides_.clear();

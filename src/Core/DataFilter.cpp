@@ -100,6 +100,9 @@ static struct {
     { "vdottime", 2 }, // vdottime(VDOT, distance[km]) - result is seconds
     { "besttime", 1 }, // besttime(distance[km]) - result is seconds
 
+    // XDATA access
+    { "XDATA", 3 },     // e.g. xdata("WEATHER","HUMIDITY", repeat|sparse|interpolate |resample)
+
     // add new ones above this line
     { "", -1 }
 };
@@ -135,6 +138,8 @@ DataFilter::builtins()
 
         } else if (i == 32) { // set example
             returning <<"set(field, value, expr)";
+        } else if (i == 37) {
+            returning << "XDATA(\"xdata\", \"series\", sparse|repeat|interpolate|resample)";
         } else {
             function = DataFilterFunctions[i].name + "(";
             for(int j=0; j<DataFilterFunctions[i].parameters; j++) {
@@ -891,6 +896,67 @@ void Leaf::print(Leaf *leaf, int level)
     }
 }
 
+void Leaf::reset(Leaf *leaf)
+{
+    if (leaf == NULL)  return;
+
+    // reset counters (the reason this function exists !
+    xcurrent = xnext = -1;
+
+    switch(leaf->type) {
+    case Leaf::Compound:
+                        foreach(Leaf *p, *(leaf->lvalue.b)) reset(p);
+                        break;
+
+    case Leaf::Float : break;
+    case Leaf::Integer : break;
+    case Leaf::String : break;
+    case Leaf::Symbol : break;
+    case Leaf::Logical  :
+                    leaf->reset(leaf->lvalue.l);
+                    if (leaf->op) // nonzero ?
+                    leaf->reset(leaf->rvalue.l);
+                    break;
+    case Leaf::Operation :
+                    leaf->reset(leaf->lvalue.l);
+                    leaf->reset(leaf->rvalue.l);
+                    break;
+    case Leaf::UnaryOperation :
+                    leaf->reset(leaf->lvalue.l);
+                    break;
+    case Leaf::BinaryOperation :
+                    leaf->reset(leaf->lvalue.l);
+                    leaf->reset(leaf->rvalue.l);
+                    break;
+    case Leaf::Function :
+                    if (leaf->series) {
+                        if (leaf->lvalue.l) leaf->reset(leaf->lvalue.l);
+                    } else {
+                        foreach(Leaf*l, leaf->fparms) leaf->reset(l);
+                    }
+                    break;
+    case Leaf::Vector :
+                    leaf->reset(leaf->lvalue.l);
+                    leaf->reset(leaf->fparms[0]);
+                    leaf->reset(leaf->fparms[1]);
+    case Leaf::Conditional :
+        {
+                    leaf->reset(leaf->cond.l);
+                    leaf->reset(leaf->lvalue.l);
+                    if (leaf->rvalue.l) leaf->reset(leaf->rvalue.l);
+        }
+        break;
+    case Leaf::Parameters :
+        {
+        foreach(Leaf*l, fparms) leaf->reset(l);
+        }
+        break;
+
+    default:
+        break;
+
+    }
+}
 static bool isCoggan(QString symbol)
 {
     if (!symbol.compare("ctl", Qt::CaseInsensitive)) return true;
@@ -1101,6 +1167,38 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                     // still normal parm check !
                     foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
+
+                } else if (leaf->function == "XDATA") {
+
+                    leaf->dynamic = false;
+
+                    if (leaf->fparms.count() != 3) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("XDATA needs 3 parameters."));
+                    } else {
+
+                        // are the first two strings ?
+                        Leaf *first=leaf->fparms[0];
+                        Leaf *second=leaf->fparms[1];
+                        if (first->type != Leaf::String || second->type != Leaf::String) {
+                            DataFiltererrors << QString(tr("XDATA expects a string for first two parameters"));
+                            leaf->inerror = true;
+                        }
+
+                        // is the third a symbol we like?
+                        Leaf *third=leaf->fparms[2];
+                        if (third->type != Leaf::Symbol) {
+                            DataFiltererrors << QString(tr("XDATA expects a symbol, one of sparse, repeat, interpolate or resample for third parameter."));
+                            leaf->inerror = true;
+                        } else {
+                            QRegExp xdataValidSymbols("^(sparse|repeat|interpolate|resample)$", Qt::CaseInsensitive); // date range
+                            QString symbol = *(third->lvalue.n);
+                            if (!xdataValidSymbols.exactMatch(symbol)) {
+                                DataFiltererrors << QString(tr("XDATA expects one of sparse, repeat, interpolate or resample for third parameter. (%1)").arg(symbol));
+                                leaf->inerror = true;
+                            }
+                        }
+                    }
 
                 } else if (leaf->function == "isset" || leaf->function == "set" || leaf->function == "unset") {
 
@@ -1369,6 +1467,8 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
     if (DataFiltererrors.count() != 0)
         treeRoot= NULL;
 
+    // reset all state to initial
+    reset();
 }
 
 Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
@@ -2206,6 +2306,27 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
                     return Result (m->fileCache()->bestTime(eval(df, leaf->fparms[0], x, m, p, c).number));
                  }
+
+        case 37 :
+                {   // XDATA ("XDATA", "XDATASERIES", (sparse, repeat, interpolate, resample)
+
+                    if (!p) {
+
+                        // processing ride item (e.g. filter, formula)
+                        // we return true or false if the xdata series exists for the ride in question
+                        QString xdata = *(leaf->fparms[0]->lvalue.s);
+                        QString series = *(leaf->fparms[1]->lvalue.s);
+                        if (m->xdata().value(xdata,QStringList()).contains(series))
+                            return Result(1);
+                        else
+                            return Result(0);
+
+                    } else {
+                        // processing data points (e.g. user data/user metric)
+
+                    }
+                    return Result(RideFile::NA);
+                }
 
         default:
             return Result(0);
