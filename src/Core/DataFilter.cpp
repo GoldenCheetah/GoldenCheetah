@@ -2320,12 +2320,61 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                             return Result(1);
                         else
                             return Result(0);
-
                     } else {
+                        QString xdata = *(leaf->fparms[0]->lvalue.s);
+                        QString series = *(leaf->fparms[1]->lvalue.s);
+                        XDataSeries *s = m->ride()->xdata(xdata);
+
+                        // if not there or no values return NA
+                        if (s == NULL || !s->valuename.contains(series) || s->datapoints.count()==0)
+                            return RideFile::NA;
+
+                        int vindex = s->valuename.indexOf(series);
+
                         // processing data points (e.g. user data/user metric)
+                        double secs = p->secs;
+
+                        // before first item
+                        double returning = RideFile::NIL;
+
+                        // first iteration
+                        if (leaf->xcurrent < 0) {
+                            leaf->xcurrent = 0;
+                            while (s->datapoints[leaf->xcurrent]->secs < secs && xcurrent < s->datapoints.count()) {
+                                returning = s->datapoints[leaf->xcurrent]->number[vindex];
+                                leaf->xcurrent++;
+                            }
+
+                            // we got to the next one, so back up one
+                            if (leaf->xcurrent < s->datapoints.count()) {
+                                leaf->xnext = leaf->xcurrent;
+                                leaf->xcurrent--;
+                            }
+                        }
+
+                        // are we at next yet?
+                        if (leaf->xnext > 0 && secs+m->ride()->recIntSecs() > s->datapoints[leaf->xnext]->secs) {
+
+                            // move onto xnext
+                            leaf->xcurrent = leaf->xnext;
+                            leaf->xnext++;
+                            if (leaf->xnext >= s->datapoints.count())  leaf->xnext = -1;
+                            returning = s->datapoints[leaf->xcurrent]->number[vindex];
+                        } else if (leaf->xcurrent >= 0) {
+
+                            // between current and next
+                            returning = s->datapoints[leaf->xcurrent]->number[vindex];
+                        }
+
+                        // at end
+                        if (leaf->xnext < 0 && leaf->xcurrent >=0) {
+                            // at end
+                            returning = s->datapoints[leaf->xcurrent]->number[vindex];
+                        }
+                        return Result(returning);
 
                     }
-                    return Result(RideFile::NA);
+                    return Result(0);
                 }
 
         default:
