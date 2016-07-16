@@ -55,6 +55,9 @@ class UserData : public QObject {
         UserData(QString name, QString units, QString formula, QColor color);
         ~UserData();
 
+        // does it have values other than NA?
+        bool isEmpty();
+
         // user maintained attributes, keep public
         // as get/set is tedious for these kinds of attrs
         QString name, 

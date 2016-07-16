@@ -61,6 +61,15 @@ static bool insensitiveLessThan(const QString &a, const QString &b)
     return a.toLower() < b.toLower();
 }
 
+bool
+UserData::isEmpty()
+{
+    foreach(double v, vector)
+        if (v != RideFile::NA)
+            return false;
+    return true;
+}
+
 EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     QDialog(context->mainWindow, Qt::Dialog), context(context), here(here)
 {
