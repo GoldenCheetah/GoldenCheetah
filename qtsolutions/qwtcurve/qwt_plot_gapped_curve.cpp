@@ -3,21 +3,21 @@
 ////////////////////////////////////////////////////////////////////////////////
 QwtPlotGappedCurve::QwtPlotGappedCurve(double gapValue) 
 :	QwtPlotCurve(), 
-	gapValue_(gapValue) 
+    gapValue_(gapValue), naValue_(0)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 QwtPlotGappedCurve::QwtPlotGappedCurve(const QwtText &title, double gapValue)
 :	QwtPlotCurve(title), 
-	gapValue_(gapValue)  
+    gapValue_(gapValue), naValue_(0)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 QwtPlotGappedCurve::QwtPlotGappedCurve(const QString &title, double gapValue)
 :	QwtPlotCurve(title), 
-	gapValue_(gapValue) 
+    gapValue_(gapValue) , naValue_(0)
 {
 }
 
@@ -38,7 +38,7 @@ void QwtPlotGappedCurve::drawSeries(QPainter *painter, const QwtScaleMap &xMap,
         // First non-missed point will be the start of curve section.
         double x = sample(i).x();
         double y = sample(i).y();
-        if ((y < -0.001 || y > 0.001) && x - last <= gapValue_) {
+        if ((y < (naValue_ + -0.001) || y > (naValue_ + 0.001)) && x - last <= gapValue_) {
 
             int start = i-1;
             int end = i;

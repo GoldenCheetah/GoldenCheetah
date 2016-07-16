@@ -506,15 +506,13 @@ AllPlotObject::setUserData(QList<UserData*>user)
 
     foreach(UserData *userdata, user) {
 
-        // is it empty?
-        //XXXif (userdata->isEmpty()) continue;
-
         UserObject add;
 
         // create curve
         add.name = userdata->name;
         add.units = userdata->units;
         add.curve = new QwtPlotGappedCurve(userdata->name, 3);
+        add.curve->setNAValue(RideFile::NA);
         add.curve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
         add.curve->setYAxis(QwtAxisId(QwtAxis::yRight, 4 + k)); // for now.
         add.curve->attach(plot);

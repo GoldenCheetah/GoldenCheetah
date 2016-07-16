@@ -3663,6 +3663,7 @@ AllPlotWindow::setupSeriesStackPlots()
 
     // and the user series
     for(int k=0; k<userDataSeries.count(); k++) {
+        if (userDataSeries[k]->isEmpty()) continue;
         s.one = static_cast<RideFile::SeriesType>(RideFile::none + 1 + k);
         s.two = RideFile::none;
         serieslist << s;
