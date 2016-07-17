@@ -107,11 +107,6 @@ class Leaf {
         enum { REPEAT, SPARSE, INTERPOLATE, RESAMPLE } xjoin; // how to join xdata with main
 };
 
-struct XDataIndexes {
-    XDataIndexes() : xcurrent(-1), xnext(-1) {}
-    int xcurrent, xnext;
-};
-
 class DataFilterRuntime {
 
     // allocated for each thread to avoid race
@@ -142,7 +137,7 @@ public:
     // user defined functions
     QHash<QString, Leaf*> functions;
 
-    QHash<Leaf*, XDataIndexes> indexes;
+    QHash<Leaf*, int> indexes;
 
     // pd models for estimates
     QList <PDModel*>models;
