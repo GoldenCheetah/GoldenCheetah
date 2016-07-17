@@ -129,7 +129,7 @@ class RideEditor : public GcChartWindow
         // GC signals
         void configChanged(qint32);
         void rideSelected();
-        void setTabBar();
+        void setTabBar(bool force);
         void tabbarSelected(int);
         void removeTabRequested(int);
         void intervalSelected();

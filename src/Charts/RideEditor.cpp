@@ -1495,7 +1495,7 @@ RideEditor::rideSelected()
     model->setRide(ride->ride());
 
     // Set for XDATA, including all views
-    setTabBar();
+    setTabBar(true);
 
     // reset the save icon on the toolbar
     if (ride->isDirty()) saveAct->setEnabled(true);
@@ -1554,7 +1554,7 @@ RideEditor::removeTabRequested(int index)
 }
 
 void
-RideEditor::setTabBar()
+RideEditor::setTabBar(bool force)
 {
     // do we need to?
     QStringList xd, tabs;
@@ -1568,7 +1568,7 @@ RideEditor::setTabBar()
     }
 
     // no change
-    if (xd == tabs) return;
+    if (!force && xd == tabs) return;
 
     // OK - if we get here the tabs have changed ....
 
@@ -1712,7 +1712,7 @@ RideEditor::endCommand(bool undo, RideCommand *cmd)
     else undoAct->setEnabled(true);
 
     // react to xdata changes
-    setTabBar();
+    setTabBar(false);
 
     // update the selection model when a command has been executed
     switch (cmd->type) {
