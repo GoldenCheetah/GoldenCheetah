@@ -52,6 +52,7 @@ class Result {
         QList<double> vector;
 };
 
+class DataFilterRuntime;
 class Leaf {
     Q_DECLARE_TR_FUNCTIONS(Leaf)
 
@@ -71,8 +72,7 @@ class Leaf {
         Result eval(DataFilterRuntime *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL);
 
         // tree traversal etc
-        void print(Leaf *, int level);  // print leaf and all children
-        void reset(Leaf *);  // reset counters/state used during parsing user data
+        void print(Leaf *, int level, DataFilterRuntime*);  // print leaf and all children
         void color(Leaf *, QTextDocument *);  // update the document to match
         bool isDynamic(Leaf *);
         void validateFilter(Context *context, DataFilterRuntime *, Leaf*); // validate
@@ -104,7 +104,12 @@ class Leaf {
         RideFile::SeriesType seriesType; // for ridefilecache
         int loc, leng;
         bool inerror;
-        int xcurrent, xnext; // when working with xdata
+        enum { REPEAT, SPARSE, INTERPOLATE, RESAMPLE } xjoin; // how to join xdata with main
+};
+
+struct XDataIndexes {
+    XDataIndexes() : xcurrent(-1), xnext(-1) {}
+    int xcurrent, xnext;
 };
 
 class DataFilterRuntime {
@@ -137,6 +142,8 @@ public:
     // user defined functions
     QHash<QString, Leaf*> functions;
 
+    QHash<Leaf*, XDataIndexes> indexes;
+
     // pd models for estimates
     QList <PDModel*>models;
 };
@@ -161,7 +168,6 @@ class DataFilter : public QObject
         Leaf *root() { return treeRoot; }
 
         // RideItem always available and supplies th context
-        void reset() { if (treeRoot) treeRoot->reset(treeRoot); }
         Result evaluate(RideItem *rideItem, RideFilePoint *p);
         QStringList getErrors() { return errors; };
         void colorSyntax(QTextDocument *content, int pos);

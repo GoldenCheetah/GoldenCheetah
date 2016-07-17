@@ -103,6 +103,8 @@ static struct {
     // XDATA access
     { "XDATA", 3 },     // e.g. xdata("WEATHER","HUMIDITY", repeat|sparse|interpolate |resample)
 
+    // print to qDebug for debugging
+    { "print", 1 },     // print(..) to qDebug for debugging
     // add new ones above this line
     { "", -1 }
 };
@@ -829,7 +831,7 @@ Leaf::toString()
     return "";
 }
 
-void Leaf::print(Leaf *leaf, int level)
+void Leaf::print(Leaf *leaf, int level, DataFilterRuntime *df)
 {
     qDebug()<<"LEVEL"<<level;
     if (leaf == NULL) {
@@ -839,54 +841,59 @@ void Leaf::print(Leaf *leaf, int level)
     switch(leaf->type) {
     case Leaf::Compound: 
                         qDebug()<<"{";
-                        foreach(Leaf *p, *(leaf->lvalue.b)) print(p, level+1);
+                        foreach(Leaf *p, *(leaf->lvalue.b)) print(p, level+1, df);
                         qDebug()<<"}";
                         break;
 
     case Leaf::Float : qDebug()<<"float"<<leaf->lvalue.f<<leaf->dynamic; break;
     case Leaf::Integer : qDebug()<<"integer"<<leaf->lvalue.i<<leaf->dynamic; break;
     case Leaf::String : qDebug()<<"string"<<*leaf->lvalue.s<<leaf->dynamic; break;
-    case Leaf::Symbol : qDebug()<<"symbol"<<*leaf->lvalue.n<<leaf->dynamic; break;
+    case Leaf::Symbol : {
+                            double value=0;
+                            if (df) value=df->symbols.value(*leaf->lvalue.n).number;
+                            qDebug()<<"symbol"<<*leaf->lvalue.n<<leaf->dynamic<<value;
+                        }
+                        break;
     case Leaf::Logical  : qDebug()<<"lop"<<leaf->op;
-                    leaf->print(leaf->lvalue.l, level+1);
+                    leaf->print(leaf->lvalue.l, level+1, df);
                     if (leaf->op) // nonzero ?
-                    leaf->print(leaf->rvalue.l, level+1);
+                    leaf->print(leaf->rvalue.l, level+1, df);
                     break;
     case Leaf::Operation : qDebug()<<"cop"<<leaf->op;
-                    leaf->print(leaf->lvalue.l, level+1);
-                    leaf->print(leaf->rvalue.l, level+1);
+                    leaf->print(leaf->lvalue.l, level+1, df);
+                    leaf->print(leaf->rvalue.l, level+1, df);
                     break;
     case Leaf::UnaryOperation : qDebug()<<"uop"<<leaf->op;
-                    leaf->print(leaf->lvalue.l, level+1);
+                    leaf->print(leaf->lvalue.l, level+1, df);
                     break;
     case Leaf::BinaryOperation : qDebug()<<"bop"<<leaf->op;
-                    leaf->print(leaf->lvalue.l, level+1);
-                    leaf->print(leaf->rvalue.l, level+1);
+                    leaf->print(leaf->lvalue.l, level+1, df);
+                    leaf->print(leaf->rvalue.l, level+1, df);
                     break;
     case Leaf::Function :
                     if (leaf->series) {
                         qDebug()<<"function"<<leaf->function<<"parm="<<*(leaf->series->lvalue.n);
-                        if (leaf->lvalue.l) leaf->print(leaf->lvalue.l, level+1);
+                        if (leaf->lvalue.l) leaf->print(leaf->lvalue.l, level+1, df);
                     } else {
                         qDebug()<<"function"<<leaf->function<<"parms:"<<leaf->fparms.count();
-                        foreach(Leaf*l, leaf->fparms) leaf->print(l, level+1);
+                        foreach(Leaf*l, leaf->fparms) leaf->print(l, level+1, df);
                     }
                     break;
     case Leaf::Vector : qDebug()<<"vector";
-                    leaf->print(leaf->lvalue.l, level+1);
-                    leaf->print(leaf->fparms[0], level+1);
-                    leaf->print(leaf->fparms[1], level+1);
+                    leaf->print(leaf->lvalue.l, level+1, df);
+                    leaf->print(leaf->fparms[0], level+1, df);
+                    leaf->print(leaf->fparms[1], level+1, df);
     case Leaf::Conditional : qDebug()<<"cond"<<op;
         {
-                    leaf->print(leaf->cond.l, level+1);
-                    leaf->print(leaf->lvalue.l, level+1);
-                    if (leaf->rvalue.l) leaf->print(leaf->rvalue.l, level+1);
+                    leaf->print(leaf->cond.l, level+1, df);
+                    leaf->print(leaf->lvalue.l, level+1, df);
+                    if (leaf->rvalue.l) leaf->print(leaf->rvalue.l, level+1, df);
         }
         break;
     case Leaf::Parameters :
         {
         qDebug()<<"parameters"<<leaf->fparms.count();
-        foreach(Leaf*l, fparms) leaf->print(l, level+1);
+        foreach(Leaf*l, fparms) leaf->print(l, level+1, df);
         }
         break;
 
@@ -896,67 +903,6 @@ void Leaf::print(Leaf *leaf, int level)
     }
 }
 
-void Leaf::reset(Leaf *leaf)
-{
-    if (leaf == NULL)  return;
-
-    // reset counters (the reason this function exists !
-    xcurrent = xnext = -1;
-
-    switch(leaf->type) {
-    case Leaf::Compound:
-                        foreach(Leaf *p, *(leaf->lvalue.b)) reset(p);
-                        break;
-
-    case Leaf::Float : break;
-    case Leaf::Integer : break;
-    case Leaf::String : break;
-    case Leaf::Symbol : break;
-    case Leaf::Logical  :
-                    leaf->reset(leaf->lvalue.l);
-                    if (leaf->op) // nonzero ?
-                    leaf->reset(leaf->rvalue.l);
-                    break;
-    case Leaf::Operation :
-                    leaf->reset(leaf->lvalue.l);
-                    leaf->reset(leaf->rvalue.l);
-                    break;
-    case Leaf::UnaryOperation :
-                    leaf->reset(leaf->lvalue.l);
-                    break;
-    case Leaf::BinaryOperation :
-                    leaf->reset(leaf->lvalue.l);
-                    leaf->reset(leaf->rvalue.l);
-                    break;
-    case Leaf::Function :
-                    if (leaf->series) {
-                        if (leaf->lvalue.l) leaf->reset(leaf->lvalue.l);
-                    } else {
-                        foreach(Leaf*l, leaf->fparms) leaf->reset(l);
-                    }
-                    break;
-    case Leaf::Vector :
-                    leaf->reset(leaf->lvalue.l);
-                    leaf->reset(leaf->fparms[0]);
-                    leaf->reset(leaf->fparms[1]);
-    case Leaf::Conditional :
-        {
-                    leaf->reset(leaf->cond.l);
-                    leaf->reset(leaf->lvalue.l);
-                    if (leaf->rvalue.l) leaf->reset(leaf->rvalue.l);
-        }
-        break;
-    case Leaf::Parameters :
-        {
-        foreach(Leaf*l, fparms) leaf->reset(l);
-        }
-        break;
-
-    default:
-        break;
-
-    }
-}
 static bool isCoggan(QString symbol)
 {
     if (!symbol.compare("ctl", Qt::CaseInsensitive)) return true;
@@ -1191,11 +1137,23 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             DataFiltererrors << QString(tr("XDATA expects a symbol, one of sparse, repeat, interpolate or resample for third parameter."));
                             leaf->inerror = true;
                         } else {
-                            QRegExp xdataValidSymbols("^(sparse|repeat|interpolate|resample)$", Qt::CaseInsensitive); // date range
+                            QStringList xdataValidSymbols;
+                            xdataValidSymbols << "sparse" << "repeat" << "interpolate" << "resample";
                             QString symbol = *(third->lvalue.n);
-                            if (!xdataValidSymbols.exactMatch(symbol)) {
+                            if (!xdataValidSymbols.contains(symbol, Qt::CaseInsensitive)) {
                                 DataFiltererrors << QString(tr("XDATA expects one of sparse, repeat, interpolate or resample for third parameter. (%1)").arg(symbol));
                                 leaf->inerror = true;
+                            } else {
+                                // remember what algorithm was selected
+                                int index = xdataValidSymbols.indexOf(symbol, Qt::CaseInsensitive);
+                                // we're going to set explicitly rather than by cast
+                                // so we don't need to worry about ordering the enum and stringlist
+                                switch(index) {
+                                case 0: leaf->xjoin = Leaf::SPARSE; break;
+                                case 1: leaf->xjoin = Leaf::REPEAT; break;
+                                case 2: leaf->xjoin = Leaf::INTERPOLATE; break;
+                                case 3: leaf->xjoin = Leaf::RESAMPLE; break;
+                                }
                             }
                         }
                     }
@@ -1466,9 +1424,6 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
     // save away the results if it passed semantic validation
     if (DataFiltererrors.count() != 0)
         treeRoot= NULL;
-
-    // reset all state to initial
-    reset();
 }
 
 Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
@@ -2316,11 +2271,17 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                         // we return true or false if the xdata series exists for the ride in question
                         QString xdata = *(leaf->fparms[0]->lvalue.s);
                         QString series = *(leaf->fparms[1]->lvalue.s);
-                        if (m->xdata().value(xdata,QStringList()).contains(series))
-                            return Result(1);
-                        else
-                            return Result(0);
+
+                        if (m->xdata().value(xdata,QStringList()).contains(series)) return Result(1);
+                        else return Result(0);
+
                     } else {
+
+                        // get iteration state from datafilter runtime
+                        XDataIndexes idx = df->indexes.value(this, XDataIndexes());
+                        int xcurrent = idx.xcurrent;
+                        int xnext = idx.xnext;
+
                         QString xdata = *(leaf->fparms[0]->lvalue.s);
                         QString series = *(leaf->fparms[1]->lvalue.s);
                         XDataSeries *s = m->ride()->xdata(xdata);
@@ -2338,44 +2299,96 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                         double returning = RideFile::NIL;
 
                         // first iteration
-                        if (leaf->xcurrent < 0) {
-                            leaf->xcurrent = 0;
-                            while (s->datapoints[leaf->xcurrent]->secs < secs && xcurrent < s->datapoints.count()) {
-                                returning = s->datapoints[leaf->xcurrent]->number[vindex];
-                                leaf->xcurrent++;
+                        if (xcurrent < 0) {
+
+                            xcurrent = 0;
+
+                            double close = fabs(s->datapoints[0]->secs - secs);
+
+                            if (close < m->ride()->recIntSecs()) {
+                                //
+                                // AT (OR NEAR) TO FIRST XDATA SAMPLE
+                                //
+                                returning = s->datapoints[0]->number[vindex];
+
+                                if (s->datapoints.count() > 1) xnext = 1;
+                                else xnext = -1;
+
+                            } else {
+
+                                while (s->datapoints[xcurrent]->secs < secs && xcurrent < s->datapoints.count()) {
+
+                                    //
+                                    // AFTER FIRST XDATA SAMPLE(S)
+                                    //
+                                    returning = s->datapoints[xcurrent]->number[vindex];
+                                    xcurrent++;
+                                }
+
+                                // we got to the next one, so back up one
+                                if (xcurrent < s->datapoints.count()) {
+                                    xnext = xcurrent;
+                                    xcurrent--;
+                                }
+
+                                // we jump back to beginning?
+                                if (xcurrent < 0) {
+
+                                    //
+                                    // BEFORE FIRST XDATA SAMPLE
+                                    //
+                                    returning = RideFile::NA;
+                                }
                             }
 
-                            // we got to the next one, so back up one
-                            if (leaf->xcurrent < s->datapoints.count()) {
-                                leaf->xnext = leaf->xcurrent;
-                                leaf->xcurrent--;
-                            }
-                        }
+                        } else if (xnext > 0 && secs+m->ride()->recIntSecs() > s->datapoints[xnext]->secs) {
 
-                        // are we at next yet?
-                        if (leaf->xnext > 0 && secs+m->ride()->recIntSecs() > s->datapoints[leaf->xnext]->secs) {
+                            //
+                            // AT NEXT XDATA SAMPLE
+                            //
 
                             // move onto xnext
-                            leaf->xcurrent = leaf->xnext;
-                            leaf->xnext++;
-                            if (leaf->xnext >= s->datapoints.count())  leaf->xnext = -1;
-                            returning = s->datapoints[leaf->xcurrent]->number[vindex];
-                        } else if (leaf->xcurrent >= 0) {
+                            xcurrent = xnext;
+                            xnext++;
+                            if (xnext >= s->datapoints.count())  xnext = -1;
+                            returning = s->datapoints[xcurrent]->number[vindex];
 
-                            // between current and next
-                            returning = s->datapoints[leaf->xcurrent]->number[vindex];
+                        } else if (xcurrent >= 0) {
+
+                            //
+                            // MIDWAY BETWEEN LAST AND NEXT SAMPLE
+                            //
+                            returning = s->datapoints[xcurrent]->number[vindex];
+
+                        } else if (xnext < 0 && xcurrent >=0) {
+
+                            //
+                            // PAST THE LAST XDATA SAMPLE
+                            //
+                            returning = s->datapoints[xcurrent]->number[vindex];
                         }
 
-                        // at end
-                        if (leaf->xnext < 0 && leaf->xcurrent >=0) {
-                            // at end
-                            returning = s->datapoints[leaf->xcurrent]->number[vindex];
-                        }
+                        // update state
+                        idx.xcurrent = xcurrent;
+                        idx.xnext = xnext;
+                        df->indexes.insert(this, idx);
+
                         return Result(returning);
 
                     }
                     return Result(0);
                 }
+                break;
+        case 38:  // PRINT(x) to qDebug
+                {
+
+                    // what is the parameter?
+                    if (leaf->fparms.count() != 1) qDebug()<<"bad print.";
+
+                    // symbol we are setting
+                    leaf->print(leaf->fparms[0], 0, df);
+                }
+                break;
 
         default:
             return Result(0);

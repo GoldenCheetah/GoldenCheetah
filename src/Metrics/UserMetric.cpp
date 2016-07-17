@@ -199,6 +199,9 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
         return;
     }
 
+    // clear rt indexes
+    rt->indexes.clear();
+
     // if there are no precomputed metrics then just use the values for the rideitem
     // this is a specific use case when testing a user metric in preferences
     const QHash<QString, RideMetric*> *c = NULL;

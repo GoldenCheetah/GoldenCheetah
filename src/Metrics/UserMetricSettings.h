@@ -56,6 +56,7 @@ class UserMetricSettings {
                 this->conversion != right.conversion ||
                 this->conversionSum != right.conversionSum ||
                 this->program != right.program ||
+                this->precision != right.precision ||
                 this->fingerprint != right.fingerprint)
                 return true;
             else
