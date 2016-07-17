@@ -2278,9 +2278,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     } else {
 
                         // get iteration state from datafilter runtime
-                        XDataIndexes idx = df->indexes.value(this, XDataIndexes());
-                        int xcurrent = idx.xcurrent;
-                        int xnext = idx.xnext;
+                        int idx = df->indexes.value(this, 0);
 
                         QString xdata = *(leaf->fparms[0]->lvalue.s);
                         QString series = *(leaf->fparms[1]->lvalue.s);
@@ -2290,87 +2288,47 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                         if (s == NULL || !s->valuename.contains(series) || s->datapoints.count()==0)
                             return RideFile::NA;
 
+                        // get index of series we care about
                         int vindex = s->valuename.indexOf(series);
 
-                        // processing data points (e.g. user data/user metric)
+                        // where are we in the ride?
                         double secs = p->secs;
 
                         // before first item
-                        double returning = RideFile::NIL;
+                        double returning = RideFile::NA;
 
-                        // first iteration
-                        if (xcurrent < 0) {
+                        // do we need to move on?
+                        while (idx < s->datapoints.count() && s->datapoints[idx]->secs < secs)
+                            idx++;
 
-                            xcurrent = 0;
+                        // so at this point we are looking at a point that is either
+                        // the same point as us or is ahead of us
 
-                            double close = fabs(s->datapoints[0]->secs - secs);
-
-                            if (close < m->ride()->recIntSecs()) {
-                                //
-                                // AT (OR NEAR) TO FIRST XDATA SAMPLE
-                                //
-                                returning = s->datapoints[0]->number[vindex];
-
-                                if (s->datapoints.count() > 1) xnext = 1;
-                                else xnext = -1;
-
-                            } else {
-
-                                while (s->datapoints[xcurrent]->secs < secs && xcurrent < s->datapoints.count()) {
-
-                                    //
-                                    // AFTER FIRST XDATA SAMPLE(S)
-                                    //
-                                    returning = s->datapoints[xcurrent]->number[vindex];
-                                    xcurrent++;
-                                }
-
-                                // we got to the next one, so back up one
-                                if (xcurrent < s->datapoints.count()) {
-                                    xnext = xcurrent;
-                                    xcurrent--;
-                                }
-
-                                // we jump back to beginning?
-                                if (xcurrent < 0) {
-
-                                    //
-                                    // BEFORE FIRST XDATA SAMPLE
-                                    //
-                                    returning = RideFile::NA;
-                                }
-                            }
-
-                        } else if (xnext > 0 && secs+m->ride()->recIntSecs() > s->datapoints[xnext]->secs) {
-
+                        if (idx >= s->datapoints.count()) {
                             //
-                            // AT NEXT XDATA SAMPLE
+                            // PAST LAST XDATA
                             //
 
-                            // move onto xnext
-                            xcurrent = xnext;
-                            xnext++;
-                            if (xnext >= s->datapoints.count())  xnext = -1;
-                            returning = s->datapoints[xcurrent]->number[vindex];
+                            // return the last value we saw
+                            if (idx) returning = s->datapoints[idx-1]->number[vindex];
+                            else  returning = RideFile::NA;
 
-                        } else if (xcurrent >= 0) {
+                        } else if (fabs(s->datapoints[idx]->secs - secs) < m->ride()->recIntSecs()) {
+                            //
+                            // ITS THE SAME AS US!
+                            //
+                            returning = s->datapoints[idx]->number[vindex];
+                        } else {
+                            //
+                            // ITS IN THE FUTURE
+                            //
 
-                            //
-                            // MIDWAY BETWEEN LAST AND NEXT SAMPLE
-                            //
-                            returning = s->datapoints[xcurrent]->number[vindex];
-
-                        } else if (xnext < 0 && xcurrent >=0) {
-
-                            //
-                            // PAST THE LAST XDATA SAMPLE
-                            //
-                            returning = s->datapoints[xcurrent]->number[vindex];
+                            // for now, just return the last value we saw
+                            if (idx) returning = s->datapoints[idx-1]->number[vindex];
+                            else  returning = RideFile::NA;
                         }
 
                         // update state
-                        idx.xcurrent = xcurrent;
-                        idx.xnext = xnext;
                         df->indexes.insert(this, idx);
 
                         return Result(returning);
