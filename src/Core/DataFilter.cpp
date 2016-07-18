@@ -952,6 +952,7 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
     case Leaf::BinaryOperation : return true;
     case Leaf::Function : return true;
     case Leaf::Vector :
+    case Leaf::Index :
     case Leaf::Conditional :
         {
             return true;
@@ -1034,6 +1035,28 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             leaf->validateFilter(context, df, leaf->fparms[1]);
         }
         return;
+
+    case Leaf::Index :
+        {
+            if (leaf->lvalue.l->type != Leaf::Symbol) {
+                leaf->inerror = true;
+                DataFiltererrors << QString(tr("Array subscript needs a symbol name."));
+                return;
+            }
+            QString symbol = leaf->lvalue.l ? *(leaf->lvalue.l->lvalue.n) : "";
+            if (df->dataSeriesSymbols.contains(symbol)) {
+                leaf->seriesType =  RideFile::seriesForSymbol(symbol);
+            } else {
+                leaf->seriesType = RideFile::none;
+            }
+            leaf->validateFilter(context, df, leaf->fparms[0]);
+            if (!Leaf::isNumber(df, leaf->fparms[0])) {
+                leaf->fparms[0]->inerror = true;
+                DataFiltererrors << QString(tr("Index must be numeric."));
+            }
+            leaf->validateFilter(context, df, leaf->lvalue.l);
+            return;
+        }
 
     case Leaf::Function :
         {
@@ -1299,6 +1322,26 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         leaf->inerror = true;
                     }
 
+                } else if (leaf->lvalue.l->type == Leaf::Index) {
+
+                    // add symbol
+                    QString symbol = *(leaf->lvalue.l->lvalue.l->lvalue.n);
+
+                    // add generic symbols
+                    if (!df->dataSeriesSymbols.contains(symbol)) {
+                        df->symbols.insert(symbol, Result(0));
+                    }
+
+                    // validate rhs is numeric
+                    bool rhsType = Leaf::isNumber(df, leaf->rvalue.l);
+                    if (!rhsType) {
+                        DataFiltererrors << QString(tr("variables must be numeric."));
+                        leaf->inerror = true;
+                    }
+
+                    // validate the symbol (after we added it!)
+                    validateFilter(context, df, leaf->lvalue.l);
+
                 } else {
 
                     DataFiltererrors << QString(tr("assignment must be to a symbol."));
@@ -1428,7 +1471,8 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
 
 Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
 {
-    if (!item || !treeRoot || DataFiltererrors.count()) return Result(0);
+    if (!item || !treeRoot || DataFiltererrors.count())
+        return Result(0);
 
     // reset stack
     rt.stack = 0;
@@ -2368,8 +2412,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         // ride series name when running through sample override metrics etc
         if (p && (lhsisNumber = df->dataSeriesSymbols.contains(*(leaf->lvalue.n))) == true) {
 
-            // its a ride series symbol !
-            return Result(p->value(RideFile::seriesForSymbol((*(leaf->lvalue.n)))));
+            RideFile::SeriesType type = RideFile::seriesForSymbol((*(leaf->lvalue.n)));
+            if (type == RideFile::index) return Result(m->ride()->dataPoints().indexOf(p));
+            return Result(p->value(type));
         }
 
         // user defined symbols override all others !
@@ -2516,15 +2561,43 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         case ASSIGN:
         {
             // LHS MUST be a symbol...
-            if (leaf->lvalue.l->type == Leaf::Symbol) {
+            if (leaf->lvalue.l->type == Leaf::Symbol || leaf->lvalue.l->type == Leaf::Index) {
 
-                QString symbol = *(leaf->lvalue.l->lvalue.n);
-                Result value(rhs.isNumber ? rhs.number : 0);
-                df->symbols.insert(symbol, value);
+                Result  value(rhs.isNumber ? rhs.number : 0);
 
+                if (leaf->lvalue.l->type == Leaf::Symbol) {
+
+                    QString symbol = *(leaf->lvalue.l->lvalue.n);
+                    df->symbols.insert(symbol, value);
+
+                } else {
+
+                    if (leaf->lvalue.l->seriesType == RideFile::none) {
+
+                        QString symbol = *(leaf->lvalue.l->lvalue.l->lvalue.n);
+                        int index = eval(df,leaf->lvalue.l->fparms[0], x, m, p, c).number;
+
+                        // generic symbol
+                        if (df->symbols.contains(symbol)) {
+                            Result sym = df->symbols.value(symbol);
+
+                            // resize if need to
+                            if (sym.vector.count() <= index) {
+                                sym.vector.resize(index+1);
+                            }
+
+                            // add value
+                            sym.vector[index] = value.number;
+
+                            // update
+                            df->symbols.insert(symbol, sym);
+                        }
+                    }
+                }
                 return value;
             }
-            return Result(0);
+            // shouldn't get here!
+            return Result(RideFile::NA);
         }
         break;
 
@@ -2722,18 +2795,22 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
         spec.setDateRange(DateRange(QDate(1900,01,01).addDays(fromDS),QDate(1900,01,01).addDays(toDS)));
 
-        Result returning(0);
+        Result returning;
 
         // now iterate and evaluate for each
+        int count=0;
         foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
 
             if (!spec.pass(ride)) continue;
+
+            count++;
 
             // calculate value
             Result res = eval(df, leaf->lvalue.l, x, ride, p, c);
             if (res.isNumber) {
                 returning.number += res.number; // sum for easy access
-                returning.vector << res.number;
+                returning.vector.resize(count);
+                returning.vector[count-1] = res.number;
             }
         }
 
@@ -2741,9 +2818,40 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         if (returning.vector.count() > 100)  {
             df->snips.insert(leaf->signature(), returning);
         }
-
         // always return as sum number (for now)
         return returning;
+    }
+    break;
+
+    //
+    // INDEXING INTO ACTIVITY SAMPLES
+    //
+    case Leaf::Index :
+    {
+        if (!p) return Result(0); // only applies when iterating over samples
+        int index = eval(df,leaf->fparms[0], x, m, p, c).number;
+
+        // ZERO if out of bounds (save a check)
+        if (index < 0 || index >= m->ride()->dataPoints().count())
+            return RideFile::NIL;
+
+        if (leaf->seriesType == RideFile::none) {
+
+            // generic symbol
+            QString symbol = *(leaf->lvalue.l->lvalue.n);
+            if (df->symbols.contains(symbol)) {
+                Result sym = df->symbols.value(symbol);
+                if (sym.vector.count() > index) {
+                    return Result(sym.vector[index]);
+                } else {
+                    return Result(RideFile::NIL);
+                }
+            }
+            // shouldn't get here!
+            return Result(RideFile::NIL);
+        }
+        // otherwise lets return the value !
+        return Result(m->ride()->dataPoints()[index]->value(leaf->seriesType));
     }
     break;
 

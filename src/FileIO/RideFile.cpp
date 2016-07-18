@@ -272,6 +272,7 @@ RideFile::seriesName(SeriesType series, bool compat)
         case RideFile::rcad: return QString("rcad");
         case RideFile::rcontact: return QString("gct");
         case RideFile::gear: return QString("gearratio");
+        case RideFile::index: return QString("index");
         default: return QString("unknown");
         }
     } else {
@@ -327,6 +328,7 @@ RideFile::seriesName(SeriesType series, bool compat)
         case RideFile::rcontact: return QString(tr("GCT"));
         case RideFile::gear: return QString(tr("Gear Ratio"));
         case RideFile::wbal: return QString(tr("W' Consumed"));
+        case RideFile::index: return QString(tr("Sample Index"));
         default: return QString(tr("Unknown"));
         }
     }
@@ -2784,7 +2786,7 @@ static struct {
     QString symbol;
     RideFile::SeriesType series;
 } seriesSymbolTable[] = {
-
+    { "INDEX", RideFile::index },
 	{ "SECS", RideFile::secs },
 	{ "CADENCE", RideFile::cad },
 	{ "CADENCED", RideFile::cadd },

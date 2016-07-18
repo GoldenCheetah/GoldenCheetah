@@ -65,7 +65,7 @@ bool
 UserData::isEmpty()
 {
     foreach(double v, vector)
-        if (v != RideFile::NA)
+        if (v != RideFile::NA && v != RideFile::NIL)
             return false;
     return true;
 }

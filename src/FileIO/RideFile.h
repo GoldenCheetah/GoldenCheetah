@@ -202,7 +202,7 @@ class RideFile : public QObject // QObject to emit signals
                           aPower, wprime, aTISS, anTISS, smo2, thb, 
                           rvert, rcad, rcontact, gear, o2hb, hhb,
                           lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe,
-                          wbal, tcore,
+                          wbal, tcore, index,
                           none }; // none must ALWAYS be last
 
         enum conversion { original, pace };
