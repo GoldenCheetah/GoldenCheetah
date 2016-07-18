@@ -72,7 +72,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %locations
 
-%type <leaf> symbol literal lexpr cexpr expr parms block statement expression;
+%type <leaf> symbol array literal lexpr cexpr expr parms block statement expression;
 %type <leaf> simple_statement if_clause while_clause function_def;
 %type <comp> statements
 
@@ -163,6 +163,13 @@ simple_statement:
                                                   $$->op = $2;
                                                   $$->rvalue.l = $3;
                                                 }
+        | array ASSIGN lexpr                    {
+                                                  $$ = new Leaf(@1.first_column, @3.last_column);
+                                                  $$->type = Leaf::Operation;
+                                                  $$->lvalue.l = $1;
+                                                  $$->op = $2;
+                                                  $$->rvalue.l = $3;
+                                                }
         ;
 
 /*
@@ -246,13 +253,16 @@ lexpr:
                                                   $$->rvalue.l = $5;
                                                   $$->cond.l = $1;
                                                 }
-        | lexpr '[' lexpr ':' lexpr ']'         { $$ = new Leaf(@1.first_column, @6.last_column);
+/* DEPRECATED (TEMPORARILY?)
+        | lexpr '[' lexpr ':' lexpr ']' { $$ = new Leaf(@1.first_column, @6.last_column);
                                                   $$->type = Leaf::Vector;
                                                   $$->lvalue.l = $1;
                                                   $$->fparms << $3;
                                                   $$->fparms << $5;
                                                   $$->op = 0;
                                                 }
+*/
+
         | '!' lexpr %prec OR                    { $$ = new Leaf(@1.first_column, @2.last_column);
                                                   $$->type = Leaf::UnaryOperation;
                                                   $$->lvalue.l = $2;
@@ -270,6 +280,15 @@ lexpr:
                                                   $$->lvalue.l = $1;
                                                   $$->op = $2;
                                                   $$->rvalue.l = $3;
+                                                }
+        ;
+
+array:  symbol '[' expr ']'                    {
+                                                  $$ = new Leaf(@1.first_column, @4.last_column);
+                                                  $$->type = Leaf::Index;
+                                                  $$->lvalue.l = $1;
+                                                  $$->fparms << $3;
+                                                  $$->op = 0;
                                                 }
         ;
 
@@ -433,15 +452,15 @@ expr:
                                                   $$->lvalue.l = $2;
                                                   $$->op = 0;
                                                 }
-        | symbol                                { $$ = $1; }
+        | array                                 { $$ = $1; }
         | literal                               { $$ = $1; }
+        | symbol                                { $$ = $1; }
         ;
 
 /*
  * A built in or user defined symbol
  */
 symbol:
-
         '$' SYMBOL                                { $$ = new Leaf(@1.first_column, @2.last_column);
                                                     $$->type = Leaf::Symbol;
                                                     $$->op = 1; // prompted variable (from user)

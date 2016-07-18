@@ -49,7 +49,7 @@ class Result {
         bool isNumber;           // if true, value is numeric
         QString string;
         double number;
-        QList<double> vector;
+        QVector<double> vector;
 };
 
 class DataFilterRuntime;
@@ -83,7 +83,7 @@ class Leaf {
 
         enum { none, Float, Integer, String, Symbol, 
                Logical, Operation, BinaryOperation, UnaryOperation,
-               Function, Conditional, Vector,
+               Function, Conditional, Vector, Index,
                Parameters, Compound } type;
 
         union value {

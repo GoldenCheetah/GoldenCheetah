@@ -512,7 +512,7 @@ AllPlotObject::setUserData(QList<UserData*>user)
         add.name = userdata->name;
         add.units = userdata->units;
         add.curve = new QwtPlotGappedCurve(userdata->name, 3);
-        add.curve->setNAValue(RideFile::NA);
+        //add.curve->setNAValue(RideFile::NA);
         add.curve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
         add.curve->setYAxis(QwtAxisId(QwtAxis::yRight, 4 + k)); // for now.
         add.curve->attach(plot);
@@ -5960,6 +5960,7 @@ AllPlot::setShow(RideFile::SeriesType type, bool state)
         setShowGear(state);
         break;
     case RideFile::wbal:
+    case RideFile::index:
         break;
     }
 }
