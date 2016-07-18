@@ -31,7 +31,7 @@
 #include <limits>
 #include <cmath>
 
-#define FIT_DEBUG     false // debug traces
+#define FIT_DEBUG     true // debug traces
 
 #ifndef MATHCONST_PI
 #define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
@@ -1624,7 +1624,7 @@ struct FitFileReaderState
                 // Quick fix : we need to support multivalues
                 if (size < field.size) {
                     if (FIT_DEBUG)  {
-                         printf( "   warning : size=%d for size=%d (num=%d)\n",
+                         printf( "   warning : size=%d for type=%d (num=%d)\n",
                                  field.size, field.type, field.num);
                     }
                     read_unknown( field.size-size, &count );
@@ -1633,8 +1633,8 @@ struct FitFileReaderState
                 values.push_back(value);
 
                 if (FIT_DEBUG)  {
-                    printf( " field: type=%d num=%d ",
-                        field.type, field.num);
+                    printf( " field: type=%d num=%d size=%d(%d) ",
+                        field.type, field.num, field.size, size);
                     if (value.type == SingleValue)
                         printf( "value=%lld\n", value.v );
                     else if (value.type == DoubleValue)
