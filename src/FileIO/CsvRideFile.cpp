@@ -125,6 +125,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     int currentInterval = 0;
     int prevInterval = 0;
     double lastKM=0; // when deriving distance from speed
+    XDataSeries *rowSeries=NULL;
 
     /* Joule 1.0
     Version,Date/Time,Km,Minutes,RPE,Tags,"Weight, kg","Work, kJ",FTP,"Sample Rate, s",Device Type,Firmware Version,Last Updated,Category 1,Category 2
@@ -157,7 +158,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp cpexportCSV("seconds, value,[ model,]* date", Qt::CaseInsensitive);
     QRegExp rowproCSV("Date,Comment,Password,ID,Version,RowfileId,Rowfile_Id", Qt::CaseInsensitive);
     QRegExp wahooMACSV("GroundContactTime,MotionCount,MotionPowerZ,Cadence,MotionPowerX,WorkoutActive,Timestamp,Smoothness,MotionPowerY,_ID,VerticalOscillation,", Qt::CaseInsensitive);
-
+    QRegExp rp3CSV("\"id\",\"workout_interval_id\",\"ref\",\"stroke_number\",\"power\",\"avg_power\",\"stroke_rate\",\"time\",\"stroke_length\",\"distance\",\"distance_per_stroke\",\"estimated_500m_time\",\"energy_per_stroke\",\"energy_sum\",\"pulse\",\"work_per_pulse\",\"peak_force\",\"peak_force_pos\",\"rel_peak_force_pos\",\"drive_time\",\"recover_time\",\"k\",\"curve_data\",\"stroke_number_in_interval\",\"avg_calculated_power\"", Qt::CaseSensitive);
 
     int recInterval = 1;
 
@@ -186,6 +187,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     //double precWatts=0.0;
     double precSecs=0.0;
     double maxWatts=0.0;
+    double lastsecs=0.0;
 
     bool eof = false;
     while (!is.atEnd() && !eof) {
@@ -331,8 +333,47 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                    recInterval = 1;
                    //++lineno;
                    //continue;
-               }
-               else {  // default
+               } else if (rp3CSV.indexIn(line) != -1) {
+
+                   csvType = rp3;
+                   rideFile->setDeviceType("Row Perfect 3");
+                   rideFile->setFileFormat("Row Perfect CSV (csv)");
+                   unitsHeader = 1;
+                   recInterval = 1; // oh.. its variable (!)
+
+                   // add XDATA
+                   rowSeries = new XDataSeries();
+                   rowSeries->name = "ROW";
+                   rowSeries->valuename << "ID"
+                                        << "INTERVAL"
+                                        << "REF"
+                                        << "STROKE"
+                                        << "POWER"
+                                        << "AVGPOWER"
+                                        << "STROKERATE"
+                                        << "TIME"
+                                        << "STROKELENGTH"
+                                        << "DISTANCE"
+                                        << "STROKEDISTANCE"
+                                        << "ESTIMATE500MTIME"
+                                        << "STROKEENERGY"
+                                        << "ENERGYSUM"
+                                        << "PULSE"
+                                        << "WORKPERPULSE"
+                                        << "PEAKFORCE"
+                                        << "PEAKFORCEPOS"
+                                        << "PEAKFORCERELPOS"
+                                        << "DRIVETIME"
+                                        << "RECOVERTIME"
+                                        << "K"
+                                        << "CURVEDATA"
+                                        << "STROKENUMINTERVAL"
+                                        << "AVGPOWER";
+
+                    rideFile->addXData("ROW", rowSeries);
+
+
+               } else {  // default
                     csvType = generic;
                     rideFile->setDeviceType("Unknow");
                     rideFile->setFileFormat("Generic CSV (csv)");
@@ -448,8 +489,9 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                             voIndex++;
                     }
                 }
-            }
-            else if (lineno == unitsHeader && csvType != moxy && csvType != peripedal && csvType != rowpro) {
+
+            } else if (lineno == unitsHeader && csvType != moxy && csvType != peripedal && csvType != rowpro && csvType != rp3) {
+
                 if (metricUnits.indexIn(line) != -1)
                     metric = true;
                 else if (englishUnits.indexIn(line) != -1)
@@ -466,8 +508,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 else if (degFUnits.indexIn(line) != -1)
                     tempType = degF;
 
-            }
-            else if (lineno > unitsHeader) {
+            } else if (lineno > unitsHeader) {
                 double minutes=0,nm=0,kph=0,watts=0,km=0,cad=0,alt=0,hr=0,dfpm=0, seconds=0.0;
                 double temp=RideFile::NA;
                 double slope=0.0;
@@ -882,6 +923,42 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
                                           smo2, thb, 0.0, 0.0, 0.0, 0.0, interval);
+
+               } else if (csvType == rp3) {
+
+                    // row perfect is variable rate (for every stroke)
+                    // we add time, distance and power to standard fields
+                    // and the rest becomes XDATA
+                    QStringList els = line.split(",", QString::KeepEmptyParts);
+                    if (els.count() == 25 && els[7].toDouble() >= lastsecs) {
+
+                        // ignore time goes backwards
+                        lastsecs=els[7].toDouble();
+
+                        rideFile->appendPoint(els[7].toDouble(),      // time in seconds
+                                              0,                      // cad
+                                              els[14].toDouble(),     // hr
+                                              els[9].toDouble()/1000, // distance (km, not meters)
+                                              0, 0,                   // kph, nm
+                                              els[4].toDouble(),      // power
+                                              0, 0, 0, 0, 0,          // alt, lon, lat, headw, slope
+                                              -255, 0, 0, 0, 0, 0,    // temp, lrb, lte, rte, lps, rps
+                                              0.0, 0.0,
+                                              0.0, 0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0, 0.0,
+                                              0, 0,                   // smo2, thb
+                                              0, 0, 0, 0.0, 0);
+
+                        // add ALL data series to XDATA
+                        // with NO conversion, stored exactly as found
+                        XDataPoint *p = new XDataPoint();
+                        p->secs = els[7].toDouble();
+                        p->km = els[9].toDouble()/1000;
+                        for(int i=0; i<25; i++)
+                            p->number[i] = els[i].toDouble();
+
+                        rowSeries->datapoints.append(p);
+                    }
 
                } else {
                     if (vo>0 || gct>0) {

@@ -513,12 +513,13 @@ class RideFileIterator {
         int start, stop, index;
 };
 
-// each sample has up to 8 strings or values
+#define XDATA_MAXVALUES 32
+
 class XDataPoint {
 public:
     XDataPoint() {
         secs=km=0;
-        for(int i=0; i<8; i++) {
+        for(int i=0; i<XDATA_MAXVALUES; i++) {
             number[i]=0;
             string[i]="";
         }
@@ -526,15 +527,15 @@ public:
     XDataPoint (const XDataPoint &other) {
         this->secs=other.secs;
         this->km=other.km;
-        for(int i=0; i<8; i++) {
+        for(int i=0; i<XDATA_MAXVALUES; i++) {
             this->number[i]= other.number[i];
             this->string[i]= other.string[i];
         }
     }
 
     double secs, km;
-    double number[8];
-    QString string[8];
+    double number[XDATA_MAXVALUES];
+    QString string[XDATA_MAXVALUES];
 };
 
 class XDataSeries {

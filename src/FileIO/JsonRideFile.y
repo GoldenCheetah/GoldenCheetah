@@ -284,7 +284,7 @@ xdata_value:
         SECS ':' number                         { jc->xdatapoint.secs = jc->JsonNumber; }
         | KM ':' number                         { jc->xdatapoint.km = jc->JsonNumber; }
         | VALUE ':' number                      { jc->xdatapoint.number[0] = jc->JsonNumber; }
-        | VALUES ':' '[' number_list ']'        { for(int i=0; i<jc->numberlist.count() && i<8; i++)
+        | VALUES ':' '[' number_list ']'        { for(int i=0; i<jc->numberlist.count() && i<XDATA_MAXVALUES; i++)
                                                       jc->xdatapoint.number[i]= jc->numberlist[i];
                                                   jc->numberlist.clear(); }
         | string ':' number                     { /* ignored for future compatibility */ }

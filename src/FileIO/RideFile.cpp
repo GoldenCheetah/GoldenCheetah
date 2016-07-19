@@ -120,6 +120,7 @@ RideFile::~RideFile()
         XDataSeries *p = it.value();
         delete p;
     }
+    xdata_.clear();
     //!!! if (data) delete data; // need a mechanism to notify the editor
 }
 
