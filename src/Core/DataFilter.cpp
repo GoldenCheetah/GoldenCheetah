@@ -2354,22 +2354,56 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                             //
 
                             // return the last value we saw
-                            if (idx) returning = s->datapoints[idx-1]->number[vindex];
-                            else  returning = RideFile::NA;
+                            switch(leaf->xjoin) {
+                            case Leaf::INTERPOLATE:
+                            case Leaf::SPARSE:
+                            case Leaf::RESAMPLE:
+                                returning = RideFile::NIL;
+                                break;
+
+                            case Leaf::REPEAT:
+                                if (idx) returning = s->datapoints[idx-1]->number[vindex];
+                                else  returning = RideFile::NIL;
+                                break;
+                            }
 
                         } else if (fabs(s->datapoints[idx]->secs - secs) < m->ride()->recIntSecs()) {
                             //
                             // ITS THE SAME AS US!
                             //
+                            // if its a match we always take the value
                             returning = s->datapoints[idx]->number[vindex];
                         } else {
                             //
                             // ITS IN THE FUTURE
                             //
 
-                            // for now, just return the last value we saw
-                            if (idx) returning = s->datapoints[idx-1]->number[vindex];
-                            else  returning = RideFile::NA;
+                            switch(leaf->xjoin) {
+                            case Leaf::INTERPOLATE:
+                                if (idx) {
+                                    // interpolate then
+                                    double gap = s->datapoints[idx]->secs - s->datapoints[idx-1]->secs;
+                                    double diff = secs - s->datapoints[idx-1]->secs;
+                                    double ratio = diff/gap;
+                                    double vgap = s->datapoints[idx]->number[vindex] - s->datapoints[idx-1]->number[vindex];
+                                    returning = s->datapoints[idx-1]->number[vindex] + (vgap * ratio);
+                                }
+                                break;
+
+                            case Leaf::SPARSE:
+                                returning = RideFile::NIL;
+                                break;
+
+                            case Leaf::RESAMPLE:
+                                returning = RideFile::NIL;
+                                break;
+
+                            case Leaf::REPEAT:
+                                // for now, just return the last value we saw
+                                if (idx) returning = s->datapoints[idx-1]->number[vindex];
+                                else  returning = RideFile::NA;
+                                break;
+                            }
                         }
 
                         // update state
