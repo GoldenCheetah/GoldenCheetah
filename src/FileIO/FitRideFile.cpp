@@ -31,7 +31,7 @@
 #include <limits>
 #include <cmath>
 
-#define FIT_DEBUG     true // debug traces
+#define FIT_DEBUG     false // debug traces
 
 #ifndef MATHCONST_PI
 #define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
