@@ -138,8 +138,9 @@
 // 128 15  May 2016 Mark Liversedge    Add ActivityCRC so R scripts can use when caching
 // 129 10  Jul 2016 Damien Grauser     Average Running Cadence
 // 130 12  Jul 2016 Ale Martinez       Added Best Times for common distances
+// 131 20  Jul 2016 Damien Grauser     Average Running Vertical Oscillation and Ground Contact Time
 
-int DBSchemaVersion = 130;
+int DBSchemaVersion = 131;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

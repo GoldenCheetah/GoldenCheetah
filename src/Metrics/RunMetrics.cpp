@@ -139,3 +139,114 @@ static bool maxRunCadenceAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct AvgRunGroundContactTime : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(VerticalOscillation)
+
+    double total, count;
+
+    public:
+
+    AvgRunGroundContactTime()
+    {
+        setSymbol("average_run_ground_contact");
+        setInternalName("Average Ground Contact Time");
+    }
+
+    void initialize() {
+        setName(tr("Average Ground Contact Time"));
+        setMetricUnits(tr("ms"));
+        setImperialUnits(tr("ms"));
+        setType(RideMetric::Average);
+        setDescription(tr("Average Ground Contact Time"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        total = count = 0;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            if (point->rcontact > 0) {
+                total += point->rcontact;
+                ++count;
+            }
+        }
+        setValue(count > 0 ? total / count : count);
+        setCount(count);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return (ride->present.contains("R") && ride->isRun); }
+
+    RideMetric *clone() const { return new AvgRunGroundContactTime(*this); }
+};
+
+static bool avgRunGroundContactTimeAdded =
+    RideMetricFactory::instance().addMetric(AvgRunGroundContactTime());
+
+//////////////////////////////////////////////////////////////////////////////
+
+struct AvgRunVerticalOscillation  : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AvgRunVerticalOscillation)
+
+    double total, count;
+
+    public:
+
+    AvgRunVerticalOscillation()
+    {
+        setSymbol("average_run_vert_oscillation");
+        setInternalName("Average Vertical Oscillation");
+    }
+
+    void initialize() {
+        setName(tr("Average Vertical Oscillation"));
+        setMetricUnits(tr("cm"));
+        setImperialUnits(tr("in"));
+        setPrecision(1);
+        setConversion(INCH_PER_CM);
+        setType(RideMetric::Average);
+        setDescription(tr("Average Vertical Oscillation"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        total = count = 0;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            if (point->rcontact > 0) {
+                total += point->rvert;
+                ++count;
+            }
+        }
+        setValue(count > 0 ? total / count : count);
+        setCount(count);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return (ride->present.contains("R") && ride->isRun); }
+
+    RideMetric *clone() const { return new AvgRunVerticalOscillation(*this); }
+};
+
+static bool avgRunVerticalOscillationAdded =
+    RideMetricFactory::instance().addMetric(AvgRunVerticalOscillation());
+
+//////////////////////////////////////////////////////////////////////////////
