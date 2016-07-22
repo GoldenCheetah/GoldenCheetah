@@ -400,6 +400,7 @@ class XDataEditor : public QTableView
     public:
         XDataEditor(QWidget *parent, QString xdata);
         void setRideItem(RideItem*);
+        void selectIntervals(QList<IntervalItem*> intervals);
 
     public slots:
         void configChanged();

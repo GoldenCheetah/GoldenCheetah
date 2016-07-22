@@ -1462,6 +1462,15 @@ RideEditor::intervalSelected()
                                                                model->index(end,model->columnCount()-1)),
                                                                 QItemSelectionModel::Select);
         }
+
+        // propagate interval selection to the xdata editors
+        QMapIterator<QString, XDataEditor *>it(xdataEditors);
+        it.toFront();
+        while(it.hasNext()) {
+            it.next();
+            XDataEditor *edit = it.value();
+            edit->selectIntervals(ride->intervalsSelected());
+        }
     }
 }
 
@@ -3064,6 +3073,27 @@ void XDataEditor::setRideItem(RideItem *item)
     QFontMetrics fm(font());
     int cwidth=fm.charWidth("X",0);
     setColumnWidth(0, 15 * cwidth);
+}
+
+void
+XDataEditor::selectIntervals(QList<IntervalItem*> intervals)
+{
+    // highlight selection and jump to last
+    foreach(IntervalItem *interval, intervals) {
+
+        // what is the first dataPoint index for this interval?
+        int start = _model->series->timeIndex(interval->start);
+        int end = _model->series->timeIndex(interval->stop);
+        if (end < _model->series->datapoints.count()-1) end--;
+
+        // select all the rows
+        selectionModel()->clearSelection();
+        selectionModel()->setCurrentIndex(_model->index(start,0), QItemSelectionModel::Select);
+        selectionModel()->select(QItemSelection(_model->index(start,0),
+                                 _model->index(end,_model->columnCount()-1)),
+                                 QItemSelectionModel::Select);
+
+    }
 }
 
 void
