@@ -2945,3 +2945,23 @@ RideFileIterator::previous()
     if (index >= 0 && index >= start) return f->dataPoints()[index--];
     else return NULL;
 }
+
+struct CompareXDataPointSecs {
+    bool operator()(const XDataPoint *p1, const XDataPoint *p2) {
+        return p1->secs < p2->secs;
+    }
+};
+
+int
+XDataSeries::timeIndex(double secs) const
+{
+    // return index offset for specified time
+    XDataPoint p;
+    p.secs = secs;
+
+    QVector<XDataPoint*>::const_iterator i = std::lower_bound(
+        datapoints.begin(), datapoints.end(), &p, CompareXDataPointSecs());
+    if (i == datapoints.end())
+        return datapoints.size()-1;
+    return i - datapoints.begin();
+}

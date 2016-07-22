@@ -550,6 +550,8 @@ public:
 
     ~XDataSeries() { foreach(XDataPoint *p, datapoints) delete p; }
 
+    int timeIndex(double) const;          // get index offset for time in secs
+
     QString name;
     QStringList valuename;
     QList<RideFile::SeriesType> valuetype;
