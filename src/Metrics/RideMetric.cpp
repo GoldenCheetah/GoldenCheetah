@@ -140,8 +140,9 @@
 // 130 12  Jul 2016 Ale Martinez       Added Best Times for common distances
 // 131 20  Jul 2016 Damien Grauser     Average Running Vertical Oscillation and Ground Contact Time
 // 132 21  Jul 2016 Ale Martinez       Added SwimMetrics (Stroke Rate et al)
+// 133 22  Jul 2016 Damien Grauser     Added Efficiency Index
 
-int DBSchemaVersion = 132;
+int DBSchemaVersion = 133;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
