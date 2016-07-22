@@ -30,8 +30,6 @@
 #include <QVector>
 #include <QApplication>
 
-
-
 struct AvgRunCadence : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(AvgRunCadence)
 
@@ -248,5 +246,128 @@ struct AvgRunVerticalOscillation  : public RideMetric {
 
 static bool avgRunVerticalOscillationAdded =
     RideMetricFactory::instance().addMetric(AvgRunVerticalOscillation());
+
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+class Pace : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(Pace)
+    double pace;
+
+    public:
+
+    Pace() : pace(0.0)
+    {
+        setSymbol("pace");
+        setInternalName("Pace");
+    }
+
+    // Pace ordering is reversed
+    bool isLowerBetter() const { return true; }
+
+    // Overrides to use Pace units setting
+    QString units(bool) const {
+        bool metricRunPace = appsettings->value(NULL, GC_PACE, true).toBool();
+        return RideMetric::units(metricRunPace);
+    }
+
+    double value(bool) const {
+        bool metricRunPace = appsettings->value(NULL, GC_PACE, true).toBool();
+        return RideMetric::value(metricRunPace);
+    }
+
+    QString toString(bool metric) const {
+        return time_to_string(value(metric)*60);
+    }
+
+    void initialize() {
+        setName(tr("Pace"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("min/km"));
+        setImperialUnits(tr("min/mile"));
+        setPrecision(1);
+        setConversion(KM_PER_MILE);
+        setDescription(tr("Average Speed expressed in pace units: min/km or min/mile"));
+   }
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        RideMetric *as = deps.value("average_speed");
+
+        // divide by zero or stupidly low pace
+        if (as->value(true) > 0.00f) pace = 60.0f / as->value(true);
+        else pace = 0;
+
+        setValue(pace);
+        setCount(as->count());
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
+
+    RideMetric *clone() const { return new Pace(*this); }
+};
+
+static bool addPace()
+{
+    QVector<QString> deps;
+    deps.append("average_speed");
+    RideMetricFactory::instance().addMetric(Pace(), &deps);
+    return true;
+}
+static bool paceAdded = addPace();
+
+//////////////////////////////////////////////////////////////////////////////
+
+class EfficiencyIndex : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(EfficiencyIndex)
+
+    public:
+
+    EfficiencyIndex()
+    {
+        setSymbol("efficiency_index");
+        setInternalName("Efficiency Index");
+    }
+
+    void initialize() {
+        setName(tr("Efficiency Index"));
+        setType(RideMetric::Average);
+        setMetricUnits("");
+        setPrecision(2);
+        setDescription(tr("Efficiency Index : average speed by average power"));
+   }
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+
+        double avg_power = deps.value("average_power")->value(true);
+        double avg_speed = deps.value("average_speed")->value(true);
+
+        double workout_time = deps.value("workout_time")->value(true);
+        double time_moving = deps.value("time_riding")->value(true);
+
+        double ei=0;
+        if (avg_power > 0.00f && workout_time > 0.00f)
+            ei = 1000 * avg_speed * time_moving / 60.0 / avg_power / workout_time;
+
+        setValue(ei);
+        setCount(1);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->isRun && ride->present.contains("P") && ride->present.contains("S"); }
+
+    RideMetric *clone() const { return new EfficiencyIndex(*this); }
+};
+
+static bool addEfficiencyIndex()
+{
+    QVector<QString> deps;
+    deps.append("average_power");
+    deps.append("average_speed");
+    deps.append("workout_time");
+    deps.append("time_riding");
+    RideMetricFactory::instance().addMetric(EfficiencyIndex(), &deps);
+    return true;
+}
+static bool efficiencyIndexAdded = addEfficiencyIndex();
 
 //////////////////////////////////////////////////////////////////////////////
