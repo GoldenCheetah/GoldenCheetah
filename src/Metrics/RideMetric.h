@@ -340,6 +340,7 @@ class RideMetricFactory {
     }
 
     int metricCount() const { return metricNames.size(); }
+    QHash<QString,RideMetric*> metricHash() const { return metrics; }
 
     void initialize() {
         foreach(const QString &metricName, metrics.keys())
