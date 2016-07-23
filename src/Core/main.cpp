@@ -251,6 +251,21 @@ main(int argc, char *argv[])
         }
     }
 
+    #if 0 // quick hack to get list of metrics and descriptions
+    RideMetricFactory::instance().initialize();
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    QHashIterator<QString,RideMetric*> it(factory.metricHash());
+    it.toFront();
+    while(it.hasNext()) {
+        it.next();
+        fprintf(stderr, "%s|%s\n",
+                it.value()->name().toUtf8().data(),
+                it.value()->description().toUtf8().data());
+    }
+    exit(0);
+    #endif
+
     // help or version printed so just exit now
     if (help) {
         exit(0);
