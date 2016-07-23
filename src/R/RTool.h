@@ -51,7 +51,7 @@ class RTool {
 
         // activities
         static SEXP activities(SEXP filter);
-        static SEXP activity(SEXP datetime, SEXP compare, SEXP split);
+        static SEXP activity(SEXP datetime, SEXP compare, SEXP split, SEXP join);
         static SEXP activityMeanmax(SEXP compare);
         static SEXP activityWBal(SEXP compare);
         static SEXP activityMetrics(SEXP compare);
@@ -93,7 +93,7 @@ class RTool {
 
         // return a dataframe for the ride passed
         QList<RideItem *> activitiesFor(SEXP datetime);   // find the rideitem requested by the user
-        QList<SEXP> dfForActivity(RideFile *f, int split);                // returns date series for an activity
+        QList<SEXP> dfForActivity(RideFile *f, int split, QString join); // returns date series for an activity
         SEXP dfForActivityWBal(RideFile *f);            // returns w' bal series for an activity
         SEXP dfForActivityMeanmax(const RideItem *i);   // returns mean maximals for an activity
         SEXP dfForRideItem(const RideItem *i);          // returns metrics and meradata for an activity
