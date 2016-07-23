@@ -109,7 +109,7 @@ RTool::RTool()
             // currently in the compare pane if compare is enabled or
             // just a 1 item list with the current ride
             { "GC.activities", (DL_FUNC) &RTool::activities, 1 },
-            { "GC.activity", (DL_FUNC) &RTool::activity, 3 },
+            { "GC.activity", (DL_FUNC) &RTool::activity, 4 },
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 1 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 1 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 1 },
@@ -155,7 +155,7 @@ RTool::RTool()
 
                                // activity
                                "GC.activities <- function(filter=\"\") { .Call(\"GC.activities\", filter) }\n"
-                               "GC.activity <- function(activity=0, compare=FALSE, split=0) { .Call(\"GC.activity\", activity, compare, split) }\n"
+                               "GC.activity <- function(activity=0, compare=FALSE, split=0, join=\"repeat\") { .Call(\"GC.activity\", activity, compare, split, join) }\n"
                                "GC.activity.metrics <- function(compare=FALSE) { .Call(\"GC.activity.metrics\", compare) }\n"
                                "GC.activity.meanmax <- function(compare=FALSE) { .Call(\"GC.activity.meanmax\", compare) }\n"
                                "GC.activity.wbal <- function(compare=FALSE) { .Call(\"GC.activity.wbal\", compare) }\n"
@@ -1423,7 +1423,7 @@ RTool::metrics(SEXP pAll, SEXP pFilter, SEXP pCompare)
 }
 
 QList<SEXP>
-RTool::dfForActivity(RideFile *f, int split)
+RTool::dfForActivity(RideFile *f, int split, QString join)
 {
     // return a data frame for the ride passed
     QList<SEXP> returning;
@@ -1434,6 +1434,14 @@ RTool::dfForActivity(RideFile *f, int split)
         RideFile::SeriesType series = static_cast<RideFile::SeriesType>(i);
         if (i > 15 && !f->isDataPresent(series)) continue;
         seriescount++;
+    }
+
+    // add xdata to the series count
+    QMapIterator<QString, XDataSeries *> it(f->xdata());
+    it.toFront();
+    while(it.hasNext()) {
+        it.next();
+        seriescount += it.value()->valuename.count();
     }
 
     // if we have any series we will continue and add a 'time' series
@@ -1529,6 +1537,50 @@ RTool::dfForActivity(RideFile *f, int split)
 
         }
 
+        // XDATA SERIES
+        RideFile::XDataJoin xjoin;
+        xjoin = RideFile::REPEAT;
+        QStringList xdataValidSymbols;
+        xdataValidSymbols << "sparse" << "repeat" << "interpolate" << "resample";
+        int xx = xdataValidSymbols.indexOf(join, Qt::CaseInsensitive);
+        switch(xx) {
+            case 0: xjoin = RideFile::SPARSE; break;
+            default:
+            case 1: xjoin = RideFile::REPEAT; break;
+            case 2: xjoin = RideFile::INTERPOLATE; break;
+            case 3: xjoin = RideFile::RESAMPLE; break;
+        }
+
+        it.toFront(); // reused from above
+        while(it.hasNext()) {
+
+            it.next();
+
+            if (it.value()->valuename.count() == 0) continue;
+
+            // add a series for every one
+            foreach(QString series, it.value()->valuename) {
+
+                // set a vector
+                SEXP vector = PROTECT(Rf_allocVector(REALSXP, points));
+                pcount++;
+
+                int idx=0;
+                for(int j=index; j<stop; j++) {
+                    RideFilePoint *p = f->dataPoints()[j];
+                    REAL(vector)[j-index] = f->xdataValue(p, idx, it.value()->name, series, xjoin);
+                }
+
+                // add to the list
+                SET_VECTOR_ELT(ans, next, vector);
+
+                // give it a name
+                SET_STRING_ELT(names, next, Rf_mkChar(QString("%1_%2").arg(it.value()->name).arg(series).toLatin1().constData()));
+
+                next++;
+            }
+        }
+
         // add rownames
         SEXP rownames = PROTECT(Rf_allocVector(STRSXP, points));
         pcount++;
@@ -1582,11 +1634,14 @@ RTool::activitiesFor(SEXP datetime)
 }
 
 SEXP
-RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit)
+RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
 {
     // p1 - compare=TRUE|FALSE - return list of compare rides if active, or just current
     pCompare = Rf_coerceVector(pCompare, LGLSXP);
     bool compare = LOGICAL(pCompare)[0];
+
+    pJoin = Rf_coerceVector(pJoin, STRSXP);
+    QString join(CHAR(STRING_ELT(pJoin,0)));
 
     // get a list of activitie to return - user specified ALWAYS gets a list
     // even if they only provided a single date to process
@@ -1626,7 +1681,7 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit)
                 // we open, if it wasn't open we also close
                 // to make sure we don't exhause memory
                 bool close = (item->isOpen() == false);
-                foreach(SEXP df, rtool->dfForActivity(item->ride(), split)) f<<df;
+                foreach(SEXP df, rtool->dfForActivity(item->ride(), split, join)) f<<df;
                 if (close) item->close();
 
             }
@@ -1678,7 +1733,7 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit)
             foreach(CompareInterval p, rtool->context->compareIntervals) {
                 if (p.isChecked()) {
 
-                    foreach(SEXP df,  rtool->dfForActivity(p.rideItem->ride(), split)) {
+                    foreach(SEXP df,  rtool->dfForActivity(p.rideItem->ride(), split, join)) {
 
                         // create a named list
                         PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
@@ -1726,7 +1781,7 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit)
             // add the ride
             RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
             f->recalculateDerivedSeries();
-            foreach(SEXP df, rtool->dfForActivity(f, split)) {
+            foreach(SEXP df, rtool->dfForActivity(f, split, join)) {
 
                 // named list of activity and color
                 SEXP namedlist;
@@ -1768,7 +1823,7 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit)
             f->recalculateDerivedSeries();
 
             // get as a data frame
-            QList<SEXP> returning = rtool->dfForActivity(f, 0);
+            QList<SEXP> returning = rtool->dfForActivity(f, 0, join);
             if (returning.count()) return returning[0];
         }
     }
