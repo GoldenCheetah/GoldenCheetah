@@ -204,14 +204,17 @@ class RideFile : public QObject // QObject to emit signals
                           lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe,
                           wbal, tcore, index,
                           none }; // none must ALWAYS be last
+        typedef enum seriestype SeriesType;
 
         enum conversion { original, pace };
+
+        enum xdatajoin { REPEAT, SPARSE, INTERPOLATE, RESAMPLE };
+        typedef enum xdatajoin XDataJoin;
 
         // NA = Not Applicable - i.e Temperature no recorded value
         // NIL = Not available, but still set to zero for compatibility
         //       We should consider looking at code to handle NIL / NA 
         enum specialValues { NA = -255, NIL = 0 };
-        typedef enum seriestype SeriesType;
         typedef enum conversion Conversion;
         static SeriesType lastSeriesType() { return none; }
 
@@ -331,6 +334,7 @@ class RideFile : public QObject // QObject to emit signals
         XDataSeries *xdata(QString name) { return xdata_.value(name, NULL); }
         void addXData(QString name, XDataSeries *series);
         QMap<QString,XDataSeries*> &xdata() { return xdata_; }
+        double xdataValue(RideFilePoint *p, int &idx, QString xdata, QString series, RideFile::XDataJoin);
 
         // METRIC OVERRIDES
         QMap<QString,QMap<QString,QString> > metricOverrides;

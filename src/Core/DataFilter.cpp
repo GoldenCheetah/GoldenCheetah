@@ -1172,10 +1172,10 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                                 // we're going to set explicitly rather than by cast
                                 // so we don't need to worry about ordering the enum and stringlist
                                 switch(index) {
-                                case 0: leaf->xjoin = Leaf::SPARSE; break;
-                                case 1: leaf->xjoin = Leaf::REPEAT; break;
-                                case 2: leaf->xjoin = Leaf::INTERPOLATE; break;
-                                case 3: leaf->xjoin = Leaf::RESAMPLE; break;
+                                case 0: leaf->xjoin = RideFile::SPARSE; break;
+                                case 1: leaf->xjoin = RideFile::REPEAT; break;
+                                case 2: leaf->xjoin = RideFile::INTERPOLATE; break;
+                                case 3: leaf->xjoin = RideFile::RESAMPLE; break;
                                 }
                             }
                         }
@@ -2326,85 +2326,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
                         QString xdata = *(leaf->fparms[0]->lvalue.s);
                         QString series = *(leaf->fparms[1]->lvalue.s);
-                        XDataSeries *s = m->ride()->xdata(xdata);
 
-                        // if not there or no values return NA
-                        if (s == NULL || !s->valuename.contains(series) || s->datapoints.count()==0)
-                            return RideFile::NA;
-
-                        // get index of series we care about
-                        int vindex = s->valuename.indexOf(series);
-
-                        // where are we in the ride?
-                        double secs = p->secs;
-
-                        // before first item
-                        double returning = RideFile::NA;
-
-                        // do we need to move on?
-                        while (idx < s->datapoints.count() && s->datapoints[idx]->secs < secs)
-                            idx++;
-
-                        // so at this point we are looking at a point that is either
-                        // the same point as us or is ahead of us
-
-                        if (idx >= s->datapoints.count()) {
-                            //
-                            // PAST LAST XDATA
-                            //
-
-                            // return the last value we saw
-                            switch(leaf->xjoin) {
-                            case Leaf::INTERPOLATE:
-                            case Leaf::SPARSE:
-                            case Leaf::RESAMPLE:
-                                returning = RideFile::NIL;
-                                break;
-
-                            case Leaf::REPEAT:
-                                if (idx) returning = s->datapoints[idx-1]->number[vindex];
-                                else  returning = RideFile::NIL;
-                                break;
-                            }
-
-                        } else if (fabs(s->datapoints[idx]->secs - secs) < m->ride()->recIntSecs()) {
-                            //
-                            // ITS THE SAME AS US!
-                            //
-                            // if its a match we always take the value
-                            returning = s->datapoints[idx]->number[vindex];
-                        } else {
-                            //
-                            // ITS IN THE FUTURE
-                            //
-
-                            switch(leaf->xjoin) {
-                            case Leaf::INTERPOLATE:
-                                if (idx) {
-                                    // interpolate then
-                                    double gap = s->datapoints[idx]->secs - s->datapoints[idx-1]->secs;
-                                    double diff = secs - s->datapoints[idx-1]->secs;
-                                    double ratio = diff/gap;
-                                    double vgap = s->datapoints[idx]->number[vindex] - s->datapoints[idx-1]->number[vindex];
-                                    returning = s->datapoints[idx-1]->number[vindex] + (vgap * ratio);
-                                }
-                                break;
-
-                            case Leaf::SPARSE:
-                                returning = RideFile::NIL;
-                                break;
-
-                            case Leaf::RESAMPLE:
-                                returning = RideFile::NIL;
-                                break;
-
-                            case Leaf::REPEAT:
-                                // for now, just return the last value we saw
-                                if (idx) returning = s->datapoints[idx-1]->number[vindex];
-                                else  returning = RideFile::NA;
-                                break;
-                            }
-                        }
+                        // get the xdata value for this sample
+                        double returning = m->ride()->xdataValue(p, idx, xdata,series, leaf->xjoin);
 
                         // update state
                         df->indexes.insert(this, idx);

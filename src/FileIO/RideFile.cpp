@@ -858,6 +858,89 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
     return dir.entryList(filters, spec, QDir::Name);
 }
 
+double
+RideFile::xdataValue(RideFilePoint *p, int &idx, QString sxdata, QString series, RideFile::XDataJoin xjoin)
+{
+    double returning = RideFile::NA;
+    XDataSeries *s = xdata(sxdata);
+
+    // if not there or no values return NA
+    if (s == NULL || !s->valuename.contains(series) || s->datapoints.count()==0)
+        return RideFile::NA;
+
+    // get index of series we care about
+    int vindex = s->valuename.indexOf(series);
+
+    // where are we in the ride?
+    double secs = p->secs;
+
+    // do we need to move on?
+    while (idx < s->datapoints.count() && s->datapoints[idx]->secs < secs)
+        idx++;
+
+    // so at this point we are looking at a point that is either
+    // the same point as us or is ahead of us
+
+    if (idx >= s->datapoints.count()) {
+        //
+        // PAST LAST XDATA
+        //
+
+        // return the last value we saw
+        switch(xjoin) {
+        case INTERPOLATE:
+        case SPARSE:
+        case RESAMPLE:
+            returning = RideFile::NIL;
+            break;
+
+        case REPEAT:
+            if (idx) returning = s->datapoints[idx-1]->number[vindex];
+            else  returning = RideFile::NIL;
+            break;
+        }
+
+    } else if (fabs(s->datapoints[idx]->secs - secs) < recIntSecs()) {
+        //
+        // ITS THE SAME AS US!
+        //
+        // if its a match we always take the value
+        returning = s->datapoints[idx]->number[vindex];
+    } else {
+        //
+        // ITS IN THE FUTURE
+        //
+
+        switch(xjoin) {
+        case INTERPOLATE:
+            if (idx) {
+                // interpolate then
+                double gap = s->datapoints[idx]->secs - s->datapoints[idx-1]->secs;
+                double diff = secs - s->datapoints[idx-1]->secs;
+                double ratio = diff/gap;
+                double vgap = s->datapoints[idx]->number[vindex] - s->datapoints[idx-1]->number[vindex];
+                returning = s->datapoints[idx-1]->number[vindex] + (vgap * ratio);
+            }
+            break;
+
+        case SPARSE:
+            returning = RideFile::NIL;
+            break;
+
+        case RESAMPLE:
+            returning = RideFile::NIL;
+            break;
+
+        case REPEAT:
+            // for now, just return the last value we saw
+            if (idx) returning = s->datapoints[idx-1]->number[vindex];
+            else  returning = RideFile::NA;
+            break;
+        }
+    }
+    return returning;
+}
+
 void RideFile::updateMin(RideFilePoint* point)
 {
     // MIN

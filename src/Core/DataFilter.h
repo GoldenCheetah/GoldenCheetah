@@ -104,7 +104,7 @@ class Leaf {
         RideFile::SeriesType seriesType; // for ridefilecache
         int loc, leng;
         bool inerror;
-        enum { REPEAT, SPARSE, INTERPOLATE, RESAMPLE } xjoin; // how to join xdata with main
+        RideFile::XDataJoin xjoin; // how to join xdata with main
 };
 
 class DataFilterRuntime {
