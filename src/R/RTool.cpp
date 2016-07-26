@@ -1568,7 +1568,8 @@ RTool::dfForActivity(RideFile *f, int split, QString join)
                 int idx=0;
                 for(int j=index; j<stop; j++) {
                     RideFilePoint *p = f->dataPoints()[j];
-                    REAL(vector)[j-index] = f->xdataValue(p, idx, it.value()->name, series, xjoin);
+                    double val = f->xdataValue(p, idx, it.value()->name, series, xjoin);
+                    REAL(vector)[j-index] = (val == RideFile::NA) ? NA_REAL : val;
                 }
 
                 // add to the list
