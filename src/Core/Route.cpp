@@ -127,7 +127,10 @@ RouteSegment::addPoint(RoutePoint _point)
 void 
 RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
 {
-    double minimumprecision = 0.050; //50m
+    //qDebug() << "Opening ride: " << item->fileName << " for " << name;
+
+
+    double minimumprecision = 0.100; //100m
     double maximumprecision = 0.001; //1m , was 10m but changed to 1m for small segment.
                                      // if there is performance issue we can perhaps have 1m for small segments
                                      // and keep 10m for longer.
@@ -169,6 +172,7 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
                     } else {
                         if (_dist<minimumprecision) {
                             start = 0; //try to start
+                            // qDebug() << "    Start point identified...";
                         }
                     }
                 }
@@ -210,6 +214,7 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
                         if (start == 0) {
                             start = point->secs;
                             precision = 0;
+                            // qDebug() << "    Start time " << start << "\r\n";
                         }
 
                         if (minimumdistance>precision)
@@ -218,8 +223,12 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
                         break;
                     }
                     else {
+                        //qDebug() << "    WARNING route diverge at " << point->secs << "(" << i <<") after " << (point->secs-start)<< "secs for " << minimumdistance << "km " << routepoint.lat << "-" << routepoint.lon << "/" << point->lat << "-" << point->lon << "\r\n";
+
                         diverge++;
                         if (diverge>2) {
+                            //qDebug() << "    STOP route diverge at " << point->secs << "(" << i <<") after " << (point->secs-start)<< "secs for " << minimumdistance << "km " << routepoint.lat << "-" << routepoint.lon << "/" << point->lat << "-" << point->lon << "\r\n";
+
                             start = -1; //try to restart
                             n = 0;
                         }
@@ -232,12 +241,16 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
 
 
         if (!present) {
+            //qDebug() << "    Route not identified (distance " << precision << "km)\r\n";
+
             break;
 
         } else {
             if (n == this->getPoints().count()-1){
 
                 // Add the interval and continue search
+                qDebug() << "    >>> Route identified in ride: " << name << " start: " << start << " stop: " << stop << " (distance " << precision << "km)\r\n";
+
                 IntervalItem *intervalItem = new IntervalItem(item, name,
                                                               start, stop,
                                                               ride->timeToDistance(start),
