@@ -945,6 +945,23 @@ FormField::setLinkedDefault(QString text)
 }
 
 void
+RideMetadata::setLinkedDefaults(RideFile* ride)
+{
+    bool changed;
+
+    do {
+        changed = false;
+
+        foreach (DefaultDefinition adefault, getDefaults())
+            if (ride->getTag(adefault.field, "") == adefault.value)
+                if (ride->getTag(adefault.linkedField, "") == "") {
+                    ride->setTag(adefault.linkedField, adefault.linkedValue);
+                    changed = true;
+                }
+    } while (changed);
+}
+
+void
 FormField::stateChanged(int state)
 {
     if (active || ourRideItem == NULL) return; // being updated programmatically
