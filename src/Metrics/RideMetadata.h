@@ -177,6 +177,7 @@ class RideMetadata : public QWidget
 
         QPalette palette; // to be applied to all widgets
 
+        void setLinkedDefaults(RideFile* ride);
 
     public slots:
         void configChanged(qint32);

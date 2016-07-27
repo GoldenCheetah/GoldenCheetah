@@ -33,6 +33,7 @@
 #include "JsonRideFile.h"
 #include "TcxRideFile.h" // for opening multi-ride file
 #include "DataProcessor.h"
+#include "RideMetadata.h" // for linked defaults processing
 
 #include <QDebug>
 #include <QWaitCondition>
@@ -1013,6 +1014,9 @@ RideImportWizard::abortClicked()
             ride->setTag("Filename", activitiesTarget);
             if (errors.count() > 0)
                 ride->setTag("Import errors", errors.join("\n"));
+
+            // process linked defaults
+            context->athlete->rideMetadata()->setLinkedDefaults(ride);
 
             // run the processor first...
             DataProcessorFactory::instance().autoProcess(ride);
