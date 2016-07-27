@@ -44,6 +44,10 @@ int RealtimeController::pause() { return 0; }
 int RealtimeController::stop() { return 0; }
 bool RealtimeController::find() { return false; }
 bool RealtimeController::discover(QString) { return false; }
+bool RealtimeController::canDoInquiry() { return false; }
+bool RealtimeController::isConnected() { return false; }
+QList<DeviceConfiguration> RealtimeController::doInquiry() { return QList<DeviceConfiguration>(); }
+bool RealtimeController::connectToDevice() { return false; }
 bool RealtimeController::doesPull() { return false; }
 bool RealtimeController::doesPush() { return false; }
 bool RealtimeController::doesLoad() { return false; }
@@ -118,7 +122,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     case 7 : //MINOURA V100 on H
         {
         double V = rtData.getSpeed();
-        // 7 = V100 on H: y = -0.0036x^3 + 0.2815x^2 + 3.4978x - 9.7857 
+        // 7 = V100 on H: y = -0.0036x^3 + 0.2815x^2 + 3.4978x - 9.7857
         rtData.setWatts(-0.0036*pow(V, 3) + 0.2815*pow(V,2) + (3.4978*V) - 9.7857);
         }
         break;
@@ -126,7 +130,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     case 8 : //MINOURA V100 on 5
         {
         double V = rtData.getSpeed();
-        // 8 = V100 on 5: y = -0.0023x^3 + 0.2067x^2 + 3.8906x - 11.214 
+        // 8 = V100 on 5: y = -0.0023x^3 + 0.2067x^2 + 3.8906x - 11.214
         rtData.setWatts(-0.0023*pow(V, 3) + 0.2067*pow(V,2) + (3.8906*V) - 11.214);
         }
         break;
@@ -134,7 +138,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     case 9 : //MINOURA V100 on 4
         {
         double V = rtData.getSpeed();
-        // 9 = V100 on 4: y = -0.00173x^3 + 0.1825x^2 + 3.4036x - 10 
+        // 9 = V100 on 4: y = -0.00173x^3 + 0.1825x^2 + 3.4036x - 10
         rtData.setWatts(-0.00173*pow(V, 3) + 0.1825*pow(V,2) + (3.4036*V) - 10.00);
         }
         break;
@@ -142,7 +146,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     case 10 : //MINOURA V100 on 3
         {
         double V = rtData.getSpeed();
-        // 10 = V100 on 3: y = -0.0011x^3 + 0.1433x^2 + 2.8808x - 8.1429 
+        // 10 = V100 on 3: y = -0.0011x^3 + 0.1433x^2 + 2.8808x - 8.1429
         rtData.setWatts(-0.0011*pow(V, 3) + 0.1433*pow(V,2) + (2.8808*V) - 8.1429);
         }
         break;
@@ -150,7 +154,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     case 11 : //MINOURA V100 on 2
         {
         double V = rtData.getSpeed();
-        // 11 = V100 on 2: y = -0.0007x^3 + 0.1348x^2 + 1.581x - 3.3571 
+        // 11 = V100 on 2: y = -0.0007x^3 + 0.1348x^2 + 1.581x - 3.3571
         rtData.setWatts(-0.0007*pow(V, 3) + 0.1348*pow(V,2) + (1.581*V) - 3.3571);
         }
         break;
@@ -158,7 +162,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     case 12 : //MINOURA V100 on 1
         {
         double V = rtData.getSpeed();
-        // 12 = V100 on 1: y = 0.0004x^3 + 0.057x^2 + 1.7797x - 5.0714 
+        // 12 = V100 on 1: y = 0.0004x^3 + 0.057x^2 + 1.7797x - 5.0714
         rtData.setWatts(0.0004*pow(V, 3) + 0.057*pow(V,2) + (1.7797*V) - 5.0714);
         }
         break;
@@ -166,7 +170,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     case 13 : //MINOURA V100 on L
         {
         double V = rtData.getSpeed();
-        // 13 = V100 on L: y = 0.0557x^2 + 1.231x - 3.7143 
+        // 13 = V100 on L: y = 0.0557x^2 + 1.231x - 3.7143
         rtData.setWatts(0.0557*pow(V, 2) + (1.231*V) - 3.7143);
         }
         break;
@@ -317,7 +321,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         rtData.setWatts((slope * V) + intercept);
         }
         break;
-        
+
     case 32 : //  TACX BLUE TWIST SETTING 1
         {
         double V = rtData.getSpeed();
@@ -353,7 +357,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         rtData.setWatts((slope * V) + intercept);
         }
         break;
-        
+
     case 36 : //  TACX BLUE MOTION SETTING 2
         {
         double V = rtData.getSpeed();
@@ -362,7 +366,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         rtData.setWatts((slope * V) + intercept);
         }
         break;
-    
+
     case 37 : //  TACX BLUE MOTION SETTING 4
         {
         double V = rtData.getSpeed();

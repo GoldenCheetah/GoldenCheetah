@@ -57,6 +57,16 @@
 #  QMAKE_DEL_FILE = rm -f
 #}
 
+# If you want Kdri (Kettler serial Bluetooth devices: RUN, TRACK, SKYLON, ...)
+# execute ../contrib/kdri-build.sh.
+# Set KDRI_INSTALL to "yes".
+# Set KDRI_INCLUDE to directory path of "kdri.h".
+# Set KDRI_LIBS to path to "libkdri.a" or "libkdri.so"
+#
+# KDRI_INSTALL = yes
+# KDRI_INCLUDE =
+# KDRI_LIBS    =
+
 # If you want SRM download support you must install SRMIO
 #     http://www.zuto.de/project/srmio/
 # Set path to the root of the SRMIO installation

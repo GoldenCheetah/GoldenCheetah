@@ -32,6 +32,13 @@
 // 60. Finalise
 //
 
+#define PAGE_SELECT_DEVICE_TYPE 10
+#define PAGE_SCAN_FOR_DEVICE_TYPE 20
+#define PAGE_FIRMWARE_FOR_FORTIUS 30
+#define PAGE_PAIR_ANT 50
+#define PAGE_PAIR_BLE 55
+#define PAGE_FINALIZE 60
+
 // Main wizard
 AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow), context(context)
 {
@@ -47,12 +54,12 @@ AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow
     setWindowTitle(tr("Add Device Wizard"));
     scanner = new DeviceScanner(this);
 
-    setPage(10, new AddType(this));   // done
-    setPage(20, new AddSearch(this)); // done
-    setPage(30, new AddFirmware(this)); // done
-    setPage(50, new AddPair(this));     // done
-    setPage(55, new AddPairBTLE(this));     // done
-    setPage(60, new AddFinal(this));    // todo -- including virtual power
+    setPage(PAGE_SELECT_DEVICE_TYPE, new AddType(this));   // done
+    setPage(PAGE_SCAN_FOR_DEVICE_TYPE, new AddSearch(this)); // done
+    setPage(PAGE_FIRMWARE_FOR_FORTIUS, new AddFirmware(this)); // done
+    setPage(PAGE_PAIR_ANT, new AddPair(this));     // done
+    setPage(PAGE_PAIR_BLE, new AddPairBTLE(this));     // done
+    setPage(PAGE_FINALIZE, new AddFinal(this));    // todo -- including virtual power
 
     done = false;
 
@@ -89,15 +96,17 @@ AddType::AddType(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent)
     label = new QLabel("", this);
     layout->addWidget(label);
 
-    next = 20;
+    next = PAGE_SCAN_FOR_DEVICE_TYPE;
     setFinalPage(false);
 }
 
 void
 AddType::initializePage()
 {
+    printf("initializePage\n");
     // reset any device search info
     wizard->portSpec = "";
+    wizard->name = "";
     wizard->found = false;
     wizard->current = 0;
     if (wizard->controller) {
@@ -105,7 +114,7 @@ AddType::initializePage()
         wizard->controller = NULL;
     }
 }
-   
+
 
 void
 AddType::clicked(QString p)
@@ -126,20 +135,20 @@ AddType::clicked(QString p)
     // to timeout and we don't want to get stuck on the front page for
     // that long -- it will seem like it has not worked / crashed
     if (wizard->deviceTypes.Supported[wizard->current].connector != DEV_BTLE)
-        wizard->found = wizard->scanner->quickScan(false); // do a quick scan
+        wizard->found = wizard->scanner->quickScan(false, NULL); // do a quick scan
     else
         wizard->found = false;
 
     // Still no dice. Go to the not found dialog
-    if (wizard->found == false) next =20;
+    if (wizard->found == false) next = PAGE_SCAN_FOR_DEVICE_TYPE;
     else {
         switch(wizard->deviceTypes.Supported[wizard->current].type) {
-        case DEV_BT40 : next = 55; break;
-        case DEV_ANTLOCAL : next = 50; break; // pair 
+        case DEV_BT40 : next = PAGE_PAIR_BLE; break;
+        case DEV_ANTLOCAL : next = PAGE_PAIR_ANT; break; // pair
         default:
-        case DEV_CT : next = 60; break; // confirm and add 
-        case DEV_MONARK : next = 60; break; // confirm and add
-        case DEV_FORTIUS : next = 30; break; // confirm and add 
+        case DEV_CT : next = PAGE_FINALIZE; break; // confirm and add
+        case DEV_MONARK : next = PAGE_FINALIZE; break; // confirm and add
+        case DEV_FORTIUS : next = PAGE_FIRMWARE_FOR_FORTIUS; break; // confirm and add
         }
     }
     wizard->next();
@@ -152,6 +161,7 @@ DeviceScanner::run()
 {
     active = true;
     bool result = false;
+    auto devices = QList<DeviceConfiguration>();
 
     for (int i=0; active && !result && i<10; i++) { // search for longer
 
@@ -161,9 +171,9 @@ DeviceScanner::run()
 #else
         sleep(1);
 #endif
-        result = quickScan(false);
+        result = quickScan(false, &devices);
     }
-    if (active) emit finished(result); // only signal if we weren't aborted!
+    if (active) emit finished(result, new QList<DeviceConfiguration>(devices)); // only signal if we weren't aborted!
 }
 
 void
@@ -174,7 +184,7 @@ DeviceScanner::stop()
 
 
 bool
-DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as deep as possible
+DeviceScanner::quickScan(bool deep, QList<DeviceConfiguration>* devices) // scan quickly or if true scan forever, as deep as possible
                                        // for now deep just means try 3 time before giving up, but we
                                        // may want to change that to include scanning more devices?
 {
@@ -193,6 +203,9 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
     case DEV_MONARK : wizard->controller = new MonarkController(NULL, NULL); break;
     case DEV_KETTLER : wizard->controller = new KettlerController(NULL, NULL); break;
 #endif
+#ifdef GC_HAVE_KDRI
+    case DEV_KETTLER_BT: wizard->controller = new KettlerBluetoothController(NULL, NULL); break;
+#endif
 #ifdef GC_HAVE_LIBUSB
     case DEV_FORTIUS : wizard->controller = new FortiusController(NULL, NULL); break;
 #endif
@@ -206,50 +219,61 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
 
     }
 
-    //----------------------------------------------------------------------
-    // Search for USB devices
-    //----------------------------------------------------------------------
 
-    bool isfound = false;
-    int count=0;
-    do {
+    if (wizard->controller->canDoInquiry()) {
+      // find all available devices with controller
+      printf("Devices %p\n", devices);
+      if (devices == NULL) return false;
+      *devices = wizard->controller->doInquiry();
+      return devices->count() > 0;
+    } else {
 
-        // can we find it automatically?
-        isfound = wizard->controller->find();
-
-        if (isfound == false && (wizard->deviceTypes.Supported[wizard->current].connector == DEV_LIBUSB ||
-                            wizard->deviceTypes.Supported[wizard->current].connector == DEV_USB)) {
-
-            // Go to next page where we do not found, rescan and manual override
-            if (!deep) return false;
-        }
-
-    
         //----------------------------------------------------------------------
-        // Search serial ports
+        // Search for USB devices
         //----------------------------------------------------------------------
 
-        if (isfound == false && wizard->deviceTypes.Supported[wizard->current].connector == DEV_SERIAL) {
+        bool isfound = false;
+        int count=0;
+        do {
 
-            // automatically discover a serial port ...
-            QString error;
-            foreach (CommPortPtr port, Serial::myListCommPorts(error)) {
+            // can we find it automatically?
+          isfound = wizard->controller->find();
 
-                // check if controller still exists. gets deleted when scan cancelled
-                if (wizard->controller && wizard->controller->discover(port->name()) == true) {
-                    isfound = true;
-                    wizard->portSpec = port->name();
-                    break;
-                }
-            }
+          if (isfound == false && (wizard->deviceTypes.Supported[wizard->current].connector == DEV_LIBUSB ||
+                              wizard->deviceTypes.Supported[wizard->current].connector == DEV_USB)) {
 
-            // if we still didn't find it then we need to fall back to the user
-            // specifying the device on the next page
-        }
+              // Go to next page where we do not found, rescan and manual override
+              if (!deep) return false;
+          }
 
-    } while (!isfound && deep && count++ < 2);
 
-    return isfound;
+          //----------------------------------------------------------------------
+          // Search serial ports
+          //----------------------------------------------------------------------
+
+          if (isfound == false && wizard->deviceTypes.Supported[wizard->current].connector == DEV_SERIAL) {
+
+              // automatically discover a serial port ...
+              QString error;
+              foreach (CommPortPtr port, Serial::myListCommPorts(error)) {
+
+                  // check if controller still exists. gets deleted when scan cancelled
+                  if (wizard->controller && wizard->controller->discover(port->name()) == true) {
+                      isfound = true;
+                      wizard->portSpec = port->name();
+                      break;
+                  }
+              }
+
+              // if we still didn't find it then we need to fall back to the user
+              // specifying the device on the next page
+          }
+
+        } while (!isfound && deep && count++ < 2);
+
+        return isfound;
+    }
+
 
 }
 
@@ -284,7 +308,7 @@ AddSearch::AddSearch(AddDeviceWizard *parent) : QWizardPage(parent), wizard(pare
     layout->addLayout(hlayout2);
 
     label1 = new QLabel(tr("If your device is not found you can select the device port "
-                               "manually by using the selection box below.")); 
+                               "manually by using the selection box below."));
     label1->setWordWrap(true);
     layout->addWidget(label1);
 
@@ -303,7 +327,7 @@ AddSearch::AddSearch(AddDeviceWizard *parent) : QWizardPage(parent), wizard(pare
 
     connect(stop, SIGNAL(clicked()), this, SLOT(doScan()));
     connect(manual, SIGNAL(currentIndexChanged(int)), this, SLOT(chooseCOMPort()));
-    connect(wizard->scanner, SIGNAL(finished(bool)), this, SLOT(scanFinished(bool)));
+    connect(wizard->scanner, SIGNAL(finished(bool, QList<DeviceConfiguration>*)), this, SLOT(scanFinished(bool, QList<DeviceConfiguration>*)));
 
 }
 
@@ -312,22 +336,38 @@ AddSearch::chooseCOMPort()
 {
     if (active) return;
 
-    if (manual->currentIndex() <= 0) { // we unselected or something.
-        wizard->found = false;
-        wizard->portSpec = "";
+    // wizard shows only names of devices - no "Select Entry"-Entry
+    if (wizard->controller->canDoInquiry()) {
+        // no devices can be selected
+        if (manual->count() == 0) { wizard->found = false; return; } // is this statement necessary?
+
+        // copy all infomation from current device
+        auto currentDevice = this->devices[manual->currentIndex()];
+        wizard->portSpec = currentDevice.portSpec;
+        wizard->name = currentDevice.name;
+        for(int i = 0; i < 6; i++) wizard->mac[i] = currentDevice.mac[i];
+        wizard->found = true;
         return;
+    } else {
+
+
+        if (manual->currentIndex() <= 0) { // we unselected or something.
+            wizard->found = false;
+            wizard->portSpec = "";
+            return;
+        }
+
+        // stop any scan that may be in process?
+        if (isSearching == true) {
+           doScan(); // remember doScan toggles with the stop/search again button
+        }
+
+        // let the user select the port
+        wizard->portSpec = manual->itemText(manual->currentIndex());
+
+        // carry on then
+        wizard->found = true; // ugh
     }
-
-    // stop any scan that may be in process?
-    if (isSearching == true) {
-       doScan(); // remember doScan toggles with the stop/search again button
-    }
-
-    // let the user select the port
-    wizard->portSpec = manual->itemText(manual->currentIndex());
-
-    // carry on then 
-    wizard->found = true; // ugh
 }
 
 void
@@ -335,8 +375,19 @@ AddSearch::initializePage()
 {
     setTitle(QString(tr("%1 Search")).arg(wizard->deviceTypes.Supported[wizard->current].name));
 
-    // we only ask for the device file if it is a serial device
-    if (wizard->deviceTypes.Supported[wizard->current].connector == DEV_SERIAL) {
+    if (wizard->controller->canDoInquiry()) {
+        // this controller supports quering
+
+        // wipe away whatever items it has now
+        for (int i=manual->count(); i > 0; i--) manual->removeItem(0);
+
+        // add in the items we have..
+        manual->hide();
+        label1->hide();
+
+
+    } else if (wizard->deviceTypes.Supported[wizard->current].connector == DEV_SERIAL) {
+        // we only ask for the device file if it is a serial device
 
         // wipe away whatever items it has now
         for (int i=manual->count(); i > 0; i--) manual->removeItem(0);
@@ -363,8 +414,9 @@ AddSearch::initializePage()
 }
 
 void
-AddSearch::scanFinished(bool result)
+AddSearch::scanFinished(bool result, QList<DeviceConfiguration>* devices)
 {
+    printf("Scan finished (result %d)\n", result);
     isSearching = false;
     wizard->found = result;
     bar->setMaximum(100);
@@ -372,7 +424,29 @@ AddSearch::scanFinished(bool result)
     bar->setValue(0);
     stop->setText(tr("Search Again"));
 
-    if (result == true) { // woohoo we found one
+    if(devices) {
+        // this needs to be done before "manual" is changed, because the connected "chooseCOMPort()" will need "this->devices"
+        this->devices = *devices;
+    }
+
+    if (wizard->deviceTypes.Supported[wizard->current].type == DEV_KETTLER_BT) {
+        // wipe away whatever items it has now
+        for (int i=manual->count(); i > 0; i--) manual->removeItem(0);
+
+        // we care about many devices here
+        if (devices->length() == 0) label2->setText(QString(tr("\nNo devices found. Make sure Bluetooth is enabled on your device, then try again.\n")));
+        else if (devices->length() == 1) label2->setText(QString(tr("\nDevice found (%1).\nPress Next to Continue\n")).arg((*devices)[0].name));
+        else label2->setText(QString(tr("\nMultiple devices found.\nSelect one and press Next to continue\n")));
+
+        foreach (DeviceConfiguration device, *devices) manual->addItem(device.name);
+
+        label1->hide();
+        label2->show();
+        if (devices->length() == 0) manual->hide();
+        else { manual->show(); }
+
+
+    } else if (result == true) { // woohoo we found one
 
         if (wizard->deviceTypes.Supported[wizard->current].type == DEV_BT40) {
             // ok we've started finding devices, lets go straight into the
@@ -391,7 +465,8 @@ AddSearch::scanFinished(bool result)
                 label2->setText(tr("\nDevice found.\nPress Next to Continue\n"));
             label2->show();
         }
-    } 
+    }
+    if(devices) delete devices;
     QApplication::processEvents();
     emit completeChanged();
 }
@@ -430,16 +505,17 @@ int
 AddSearch::nextId() const
 {
     // Still no dice. Go to the not found dialog
-    if (wizard->found == false)  return 60;
+    if (wizard->found == false)  return PAGE_FINALIZE;
     else {
         switch(wizard->deviceTypes.Supported[wizard->current].type) {
-        case DEV_ANTLOCAL : return 50; break; // pair 
-        case DEV_BT40 : return 55; break; // pair BT devices
-        default:
-        case DEV_CT : return 60; break; // confirm and add 
-        case DEV_MONARK : return 60; break; // confirm and add
-        case DEV_KETTLER : return 60; break; // confirm and add
-        case DEV_FORTIUS : return 30; break; // confirm and add 
+        case DEV_ANTLOCAL : return PAGE_PAIR_ANT; break; // pair
+        case DEV_BT40 : return PAGE_PAIR_BLE; break; // pair BT devices
+        case DEV_CT : return PAGE_FINALIZE; break; // confirm and add
+        case DEV_MONARK : return PAGE_FINALIZE; break; // confirm and add
+        case DEV_KETTLER : return PAGE_FINALIZE; break; // confirm and add
+        case DEV_KETTLER_BT : return PAGE_FINALIZE; break; // confirm and add
+        case DEV_FORTIUS : return PAGE_FIRMWARE_FOR_FORTIUS; break; // confirm and add
+        default: return PAGE_FINALIZE; break; // confirm and add
         }
     }
 }
@@ -447,6 +523,7 @@ AddSearch::nextId() const
 bool
 AddSearch::validatePage()
 {
+    printf("%d\n", wizard->found);
     return wizard->found;
 }
 
@@ -666,7 +743,7 @@ AddPair::initializePage()
     channelWidget->setUniformRowHeights(true);
     channelWidget->setIndentation(0);
 
-    channelWidget->header()->resizeSection(0,175); // type 
+    channelWidget->header()->resizeSection(0,175); // type
     channelWidget->header()->resizeSection(1,75); // id
     channelWidget->header()->resizeSection(2,120); // value
     channelWidget->header()->resizeSection(3,110); // status
@@ -773,7 +850,7 @@ AddPair::searchTimeout(int channel)
 }
 
 
-void 
+void
 AddPair::getChannelValues()
 {
     if (wizard->controller == NULL) return;
@@ -808,7 +885,7 @@ AddPair::getChannelValues()
             }
         }
     }
-    
+
 }
 
 bool
@@ -908,7 +985,7 @@ AddPairBTLE::initializePage()
     channelWidget->setUniformRowHeights(true);
     channelWidget->setIndentation(0);
 
-    channelWidget->header()->resizeSection(0,175); // type 
+    channelWidget->header()->resizeSection(0,175); // type
     channelWidget->header()->resizeSection(1,75); // id
     channelWidget->header()->resizeSection(2,120); // value
     channelWidget->header()->resizeSection(3,110); // status
@@ -1008,7 +1085,7 @@ AddPairBTLE::searchTimeout(int channel)
 }
 
 
-void 
+void
 AddPairBTLE::getChannelValues()
 {
     if (wizard->controller == NULL) return;
@@ -1035,7 +1112,7 @@ AddPairBTLE::getChannelValues()
             }
         }
     }
-    
+
 }
 
 bool
@@ -1159,7 +1236,7 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem(tr("Power - Tacx Sirius (1)"));                                   // 56
     virtualPower->addItem(tr("Power - Tacx Sirius (2)"));                                   // 57
     virtualPower->addItem(tr("Power - Tacx Sirius (3)"));                                   // 58
-    virtualPower->addItem(tr("Power - Tacx Sirius (4)"));                                   // 59    
+    virtualPower->addItem(tr("Power - Tacx Sirius (4)"));                                   // 59
     virtualPower->addItem(tr("Power - Tacx Sirius (5)"));                                   // 60
     virtualPower->addItem(tr("Power - Tacx Sirius (6)"));                                   // 61
     virtualPower->addItem(tr("Power - Tacx Sirius (7)"));                                   // 62
@@ -1224,6 +1301,7 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
 void
 AddFinal::initializePage()
 {
+    name->setText(wizard->name);
     port->setText(wizard->portSpec);
     profile->setText(wizard->profile);
     virtualPower->setCurrentIndex(0);
@@ -1266,6 +1344,7 @@ AddFinal::validatePage()
         add.postProcess = virtualPower->currentIndex();
         add.wheelSize = wheelSizeEdit->text().toInt();
         add.stridelength = stridelengthEdit->text().toInt();
+        for(int i = 0; i < 6; i++) add.mac[i] = wizard->mac[i];
 
         QList<DeviceConfiguration> list = all.getList();
         list.insert(0, add);
@@ -1275,7 +1354,7 @@ AddFinal::validatePage()
 
         // tell everyone
         wizard->context->notifyConfigChanged(CONFIG_DEVICES);
- 
+
         // shut down the controller, if it is there, since it will
         // still be connected to the device (in case we hit the back button)
         if (wizard->controller) {

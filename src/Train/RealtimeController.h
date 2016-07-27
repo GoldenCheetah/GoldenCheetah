@@ -38,6 +38,7 @@ public:
     RealtimeController (TrainSidebar *parent, DeviceConfiguration *dc = 0);
     virtual ~RealtimeController() {}
 
+    // start, restart, pause and stop data collection
     virtual int start();
     virtual int restart();                              // restart after paused
     virtual int pause();                                // pauses data collection, inbound telemetry is discarded
@@ -45,7 +46,14 @@ public:
 
     // for auto-configuration
     virtual bool find();                                // tell if the device is present (usb typically)
-    virtual bool discover(QString);              // tell if a device is present at serial port passed
+    virtual bool discover(QString);                     // tell if a device is present at serial port passed
+
+    // for querying devices (bluetooth serial port) and connecting to one of them
+    virtual bool canDoInquiry();                            // might there be multiple devices for this device type which the user can choose from?
+    virtual QList<DeviceConfiguration> doInquiry();         // scans for devices in range (only supported for conrollers with "canDoInquiry() == true")
+    virtual bool connectToDevice();                         // connect to device which has DeviceConfiguration from "doInquiry()"; returns false on error
+    virtual bool isConnected();                             // tell, whether device is conncted
+
 
     // push or pull telemetry
     virtual bool doesPush();                    // this device is a push device (e.g. Quarq)
@@ -71,4 +79,3 @@ private:
 };
 
 #endif // _GC_RealtimeController_h
-

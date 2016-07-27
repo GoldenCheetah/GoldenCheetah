@@ -555,6 +555,28 @@ equals(CloudDB, active) {
     }
 }
 
+###==================================
+### OPTIONAL => KDRI LIBRARY FOR BLUETOOTH SERIAL KETTLER DEVICES
+###==================================
+
+##----------------------------------------------##
+## -kdri (currently) only works on Linux/BlueZ 	##
+## -see ../contrib/kdri-build.sh  				##
+##----------------------------------------------##
+!isEmpty(KDRI_INSTALL) {
+
+    SOURCES += Train/KettlerBluetoothController.cpp
+    HEADERS += Train/KettlerBluetoothController.h
+
+    INCLUDEPATH += $${KDRI_INCLUDE}
+    LIBS        += $${KDRI_LIBS}
+
+	# dependencies for Kdri library
+    LIBS += -lbluetooth -lc -lm -lutil -ldl -lpthread -lgcc_s -lrt
+
+    DEFINES += GC_HAVE_KDRI
+}
+
 
 
 ###############################################################################
@@ -634,8 +656,8 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 # cloud services
 HEADERS += Cloud/CalendarDownload.h Cloud/FileStore.h Cloud/LocalFileStore.h Cloud/OAuthDialog.h Cloud/ShareDialog.h \
            Cloud/SportPlusHealthUploader.h Cloud/TPDownloadDialog.h Cloud/TPDownload.h Cloud/TPUploadDialog.h Cloud/TPUpload.h \
-           Cloud/TrainingstagebuchUploader.h Cloud/VeloHeroUploader.h Cloud/WithingsDownload.h 
-# core data 
+           Cloud/TrainingstagebuchUploader.h Cloud/VeloHeroUploader.h Cloud/WithingsDownload.h
+# core data
 HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
            Core/RideItem.h Core/Route.h Core/RouteParser.h Core/Season.h Core/SeasonParser.h Core/Secrets.h Core/Settings.h \
@@ -688,7 +710,7 @@ HEADERS += Train/AddDeviceWizard.h Train/ComputrainerController.h Train/Computra
 ### SOURCE FILES
 ###=============
 
-## ANT+ 
+## ANT+
 SOURCES += ANT/ANTChannel.cpp ANT/ANT.cpp ANT/ANTlocalController.cpp ANT/ANTLogger.cpp ANT/ANTMessage.cpp
 
 ## Charts and related
@@ -712,13 +734,13 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 ## Cloud Services / Web resources
 SOURCES += Cloud/CalendarDownload.cpp Cloud/FileStore.cpp Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp Cloud/ShareDialog.cpp \
            Cloud/SportPlusHealthUploader.cpp Cloud/TPDownload.cpp Cloud/TPDownloadDialog.cpp Cloud/TPUpload.cpp Cloud/TPUploadDialog.cpp \
-           Cloud/TrainingstagebuchUploader.cpp Cloud/VeloHeroUploader.cpp Cloud/WithingsDownload.cpp 
+           Cloud/TrainingstagebuchUploader.cpp Cloud/VeloHeroUploader.cpp Cloud/WithingsDownload.cpp
 
 ## Core Data Structures
 SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch.cpp Core/GcUpgrade.cpp Core/IdleTimer.cpp \
            Core/IntervalItem.cpp Core/main.cpp Core/NamedSearch.cpp Core/RideCache.cpp Core/RideCacheModel.cpp Core/RideItem.cpp \
            Core/Route.cpp Core/RouteParser.cpp Core/Season.cpp Core/SeasonParser.cpp Core/Settings.cpp Core/Specification.cpp \
-           Core/TimeUtils.cpp Core/Units.cpp Core/UserData.cpp Core/Utils.cpp 
+           Core/TimeUtils.cpp Core/Units.cpp Core/UserData.cpp Core/Utils.cpp
 
 ## File and Device IO and Editing
 SOURCES += FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp FileIO/CommPort.cpp \
@@ -782,4 +804,3 @@ DEFERRES += Core/RouteWindow.h Core/RouteWindow.cpp Core/RouteItem.h Core/RouteI
 
 OTHER_FILES += Resources/web/Rider.js Resources/web/ride.js Resources/web/jquery-1.6.4.min.js \
                Resources/web/MapWindow.html Resources/web/StreetViewWindow.html Resources/web/Window.css
-

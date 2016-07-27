@@ -49,6 +49,9 @@
 #ifdef QT_BLUETOOTH_LIB
 #include "BT40Controller.h"
 #endif
+#ifdef GC_HAVE_KDRI
+#include "KettlerBluetoothController.h"
+#endif
 #ifdef GC_HAVE_LIBUSB
 #include "FortiusController.h"
 #endif
@@ -493,7 +496,7 @@ TrainSidebar::eventFilter(QObject *, QEvent *event)
             // and call any training method
             //
             // KEY        FUNCTION
-            //            Start() - will pause/unpause if running 
+            //            Start() - will pause/unpause if running
             //            Stop() - will end workout
             //            Pause() - pause only
             //            UnPause() - unpause
@@ -631,6 +634,10 @@ TrainSidebar::configChanged(qint32)
             Devices[i].controller = new MonarkController(this, &Devices[i]);
         } else if (Devices.at(i).type == DEV_KETTLER) {
             Devices[i].controller = new KettlerController(this, &Devices[i]);
+#endif
+#ifdef GC_HAVE_KDRI
+        } else if (Devices.at(i).type == DEV_KETTLER_BT) {
+            Devices[i].controller = new KettlerBluetoothController(this, &Devices[i]);
 #endif
 #ifdef GC_HAVE_LIBUSB
         } else if (Devices.at(i).type == DEV_FORTIUS) {

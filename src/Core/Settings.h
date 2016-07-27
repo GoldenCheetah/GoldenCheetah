@@ -184,6 +184,7 @@
 #define GC_DEV_DEF                      "<global-trainmode>devicedef"
 #define GC_DEV_WHEEL                    "<global-trainmode>devicewheel"
 #define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
+#define GC_DEV_MAC                      "<global-trainmode>devicemac"
 #define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
 #define TRAIN_AUTOCONNECT               "<global-trainmode>train/autoconnect"

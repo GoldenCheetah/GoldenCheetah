@@ -25,18 +25,19 @@
 
 #include <QList>
 
-#define DEV_PT         0x0001
-#define DEV_SRM        0x0002
-#define DEV_CT         0x0010
-#define DEV_ANTPLUS    0x0020   // Quarqd ANT+ device
-#define DEV_NULL       0x0040
-#define DEV_ANTLOCAL   0x0080   // Local ANT+ device
-#define DEV_GSERVER    0x0100   // NOT IMPLEMENTED IN THIS RELEASE XXX
-#define DEV_GCLIENT    0x0200   // NOT IMPLEMENTED IN THIS RELEASE XXX
-#define DEV_FORTIUS    0x0800   // Tacx Fortius
-#define DEV_BT40       0x2000   // QT Bluetooth support
-#define DEV_MONARK     0x4000   // Monark USB
-#define DEV_KETTLER    0x8000   // Kettler Serial
+#define DEV_PT         0x00001
+#define DEV_SRM        0x00002
+#define DEV_CT         0x00010
+#define DEV_ANTPLUS    0x00020   // Quarqd ANT+ device
+#define DEV_NULL       0x00040
+#define DEV_ANTLOCAL   0x00080   // Local ANT+ device
+#define DEV_GSERVER    0x00100   // NOT IMPLEMENTED IN THIS RELEASE XXX
+#define DEV_GCLIENT    0x00200   // NOT IMPLEMENTED IN THIS RELEASE XXX
+#define DEV_FORTIUS    0x00800   // Tacx Fortius
+#define DEV_BT40       0x02000   // QT Bluetooth support
+#define DEV_MONARK     0x04000   // Monark USB
+#define DEV_KETTLER    0x08000   // Kettler Serial
+#define DEV_KETTLER_BT 0x10000   // Kettler bluetooth serial
 
 #define DEV_QUARQ      0x01     // ants use id:hostname:port
 #define DEV_SERIAL     0x02     // use filename COMx or /dev/cuxxxx
@@ -44,6 +45,7 @@
 #define DEV_USB        0x04     // use filename COMx or /dev/cuxxxx
 #define DEV_LIBUSB     0x08     // will interact directly (i.e. no device file needed)
 #define DEV_BTLE       0x10     // bluetooth
+#define DEV_BT_RFCOMM  0x20     // bluetooth serial port
 
 class DeviceType
 {
@@ -72,4 +74,3 @@ class DeviceTypes
 };
 
 #endif // _GC_DeviceTypes_h
-
