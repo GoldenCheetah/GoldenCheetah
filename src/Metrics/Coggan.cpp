@@ -338,7 +338,7 @@ class EfficiencyFactor : public RideMetric {
         assert(deps.contains("coggan_np"));
         assert(deps.contains("xPace"));
         assert(deps.contains("average_hr"));
-        if (item->isRun) {
+        if (item->isRun && deps.value("coggan_np") == 0) {
             RideMetric *xPace = dynamic_cast<RideMetric*>(deps.value("xPace"));
             assert(xPace);
             ef = xPace->value(true) > 0 ? ((1000.0/METERS_PER_YARD) / xPace->value(true)) : 0.0;
