@@ -2265,6 +2265,31 @@ RideFile::recalculateDerivedSeries(bool force)
             }
         }
 
+        // can we derive cycle length ?
+        // needs speed and cadence
+        if (p->kph && (p->cad || p->rcad)) {
+            // need to say we got it
+            setDataPresent(RideFile::clength, true);
+
+            //  only if ride point has cadence and speed > 0
+            if ((p->cad > 0.0f  || p->rcad > 0.0f ) && p->kph > 0.0f) {
+                double cad = p->rcad;
+                if (cad == 0)
+                    cad = p->cad;
+
+                p->clength = (1000.00f * p->kph) / (cad * 60.00f);
+
+                // rounding to 2 decimals
+                p->clength = round(p->clength * 100.00f) / 100.00f;
+            }
+            else {
+                p->clength = 0.0f; // to be filled up with previous gear later
+            }
+
+        } else {
+            p->clength = 0.0f;
+        }
+
         // last point
         lastP = p;
     }

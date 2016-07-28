@@ -202,7 +202,7 @@ class RideFile : public QObject // QObject to emit signals
                           aPower, wprime, aTISS, anTISS, smo2, thb, 
                           rvert, rcad, rcontact, gear, o2hb, hhb,
                           lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe,
-                          wbal, tcore, index,
+                          wbal, tcore, clength, index,
                           none }; // none must ALWAYS be last
         typedef enum seriestype SeriesType;
 
@@ -444,7 +444,7 @@ struct RideFilePoint
 
     // derived data (we calculate it)
     // xPower, normalised power, aPower
-    double xp, np, apower, atiss, antiss, gear, hhb, o2hb;
+    double xp, np, apower, atiss, antiss, gear, hhb, o2hb, clength;
 
     // create blank point
     RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0), nm(0.0), 
