@@ -249,7 +249,7 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
             if (n == this->getPoints().count()-1){
 
                 // Add the interval and continue search
-                qDebug() << "    >>> Route identified in ride: " << name << " start: " << start << " stop: " << stop << " (distance " << precision << "km)\r\n";
+                //qDebug() << "    >>> Route identified in ride: " << name << " start: " << start << " stop: " << stop << " (distance " << precision << "km)\r\n";
 
                 IntervalItem *intervalItem = new IntervalItem(item, name,
                                                               start, stop,
