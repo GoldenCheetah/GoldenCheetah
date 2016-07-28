@@ -249,7 +249,6 @@ static bool avgRunVerticalOscillationAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////
 class Pace : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(Pace)
     double pace;
@@ -369,5 +368,62 @@ static bool addEfficiencyIndex()
     return true;
 }
 static bool efficiencyIndexAdded = addEfficiencyIndex();
+
+//////////////////////////////////////////////////////////////////////////////
+
+struct AvgStrideLength  : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AvgStrideLength)
+
+    double total, count;
+
+    public:
+
+    AvgStrideLength()
+    {
+        setSymbol("average_stride_length");
+        setInternalName("Average Stride Length");
+    }
+
+    void initialize() {
+        setName(tr("Average Stride Length"));
+        setMetricUnits(tr("m"));
+        setImperialUnits(tr("ft"));
+        setPrecision(2);
+        setConversion(FEET_PER_METER);
+        setType(RideMetric::Average);
+        setDescription(tr("Average Stride Length"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        total = count = 0;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            if (point->clength > 0) {
+                total += point->clength;
+                ++count;
+            }
+        }
+        setValue(count > 0 ? total / count : count);
+        setCount(count);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return (ride->present.contains("S") && ride->present.contains("C") && ride->isRun); }
+
+    RideMetric *clone() const { return new AvgStrideLength(*this); }
+};
+
+static bool avgStrideLengthAdded =
+    RideMetricFactory::instance().addMetric(AvgStrideLength());
 
 //////////////////////////////////////////////////////////////////////////////
