@@ -41,6 +41,7 @@ struct Bin2FileReaderState
 
     int interval;
     double last_interval_secs;
+    int interval_offset;
 
     bool jouleGPS;
     bool jouleGPS_GPSPlus;
@@ -51,7 +52,7 @@ struct Bin2FileReaderState
 
     Bin2FileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), secs(0), km(0),
-        interval(0), last_interval_secs(0.0),  jouleGPS(true), jouleGPS_GPSPlus(true), stopped(true)
+        interval(0), last_interval_secs(0.0), interval_offset(0), jouleGPS(true), jouleGPS_GPSPlus(true), stopped(true)
     {
 
     }
@@ -531,7 +532,14 @@ struct Bin2FileReaderState
                     else if ((jouleGPS_GPSPlus && (flag & 0x03) == 0x03) || (!jouleGPS_GPSPlus && (flag & 0x03) == 0x02)) {
                         // The Interval Mark immediately precedes a Detail Record at the same RTC time.
                         int t = read_interval_mark(&secs, &bytes_read, &sum);
-                        interval = t;
+
+                        if (interval_offset == 0 && t==interval)
+                            interval_offset++;
+
+                        if (t + interval_offset == interval) // end in interval mode
+                            interval=0;
+                        else
+                            interval = t + interval_offset;
                     }
                     else if ((flag & 0x03) == 0x00 ){
                         // The detail record contains current telemetry data.
