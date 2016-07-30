@@ -3078,6 +3078,9 @@ void XDataEditor::setRideItem(RideItem *item)
 void
 XDataEditor::selectIntervals(QList<IntervalItem*> intervals)
 {
+    // no model or no series, nothing to select
+    if (_model == NULL || _model->series == NULL) return;
+
     // highlight selection and jump to last
     foreach(IntervalItem *interval, intervals) {
 
