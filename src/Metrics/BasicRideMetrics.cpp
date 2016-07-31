@@ -1138,7 +1138,7 @@ struct AvgSmO2 : public RideMetric {
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
 
-            if (point->smo2 >= 0.0) {
+            if (point->smo2 > 0.0f) {  // SmO2 should always be > 0.0f
                 total += point->smo2;
                 ++count;
             }
@@ -1191,7 +1191,7 @@ struct AvgtHb : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->thb >= 0.0) {
+            if (point->thb > 0.0) {   //  tHb should always be > 0.0!
                 total += point->thb;
                 ++count;
             }
@@ -1995,9 +1995,9 @@ class MinSmO2 : public RideMetric {
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
 
-            if (point->smo2 > 0 && (notset || point->smo2 < min)) {
-               min = point->smo2;
-               notset = false;
+            if (point->smo2 > 0.0f && (notset || point->smo2 < min)) { 
+                min = point->smo2;
+                notset = false;  
             }
         }
         setValue(min);
@@ -2038,11 +2038,12 @@ class MintHb : public RideMetric {
         }
 
         bool notset = true;
+//        min = 0.0f;  // the constructor takes care of that
 
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->thb > 0 && (notset || point->thb < min)) {
+            if (point->thb > 0 && (notset || point->thb < min)) { // tHb should alwas be > 0. We are not dead, are we?
                 min = point->thb;
                 notset = false;
             }
@@ -2132,6 +2133,7 @@ class MinHr : public RideMetric {
         }
 
         bool notset = true;
+//        min = 0;  // the constructor takes care of that
 
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
