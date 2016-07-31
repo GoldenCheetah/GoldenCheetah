@@ -1138,7 +1138,7 @@ struct AvgSmO2 : public RideMetric {
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
 
-            if (point->smo2 >= 0.0) {
+            if (point->smo2 > 0.0f) {  // SmO2 should always be > 0.0f
                 total += point->smo2;
                 ++count;
             }
