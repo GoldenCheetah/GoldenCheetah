@@ -1191,7 +1191,7 @@ struct AvgtHb : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->thb >= 0.0) {
+            if (point->thb > 0.0) {   //  tHb should always be > 0.0!
                 total += point->thb;
                 ++count;
             }
@@ -1990,17 +1990,14 @@ class MinSmO2 : public RideMetric {
         }
 
         bool notset = true;
-        min = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
 
-            if (point->smo2 >= 0 && (notset || point->smo2 < min)) { // SmO2 might become zero when going beyond anaerobic threshold!
+            if (point->smo2 > 0.0f && (notset || point->smo2 < min)) { 
                 min = point->smo2;
-// we've got to handle that the first values might be zero, e.g. when the athlete did not attach the sensor to the muscle prior to starting recording.
-                if (point->smo2 > 0 && notset)
-                   notset = false;  // we got one non zero value. From now on we only check for smaller values...
+                notset = false;  
             }
         }
         setValue(min);
@@ -2041,7 +2038,7 @@ class MintHb : public RideMetric {
         }
 
         bool notset = true;
-        min = 0.0f;
+//        min = 0.0f;  // the constructor takes care of that
 
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
@@ -2136,7 +2133,7 @@ class MinHr : public RideMetric {
         }
 
         bool notset = true;
-        min = 0;
+//        min = 0;  // the constructor takes care of that
 
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
