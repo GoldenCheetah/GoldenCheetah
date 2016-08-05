@@ -57,8 +57,17 @@ BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWi
     files->setUniformRowHeights(true);
     files->setIndentation(0);
 
+    // honor the context filter
+    FilterSet fs;
+    fs.addFilter(context->isfiltered, context->filters);
+    Specification spec;
+    spec.setFilterSet(fs);
+
     // populate with each ride in the ridelist
     foreach (RideItem *rideItem, context->athlete->rideCache->rides()) {
+
+        // does it match ?
+        if (!spec.pass(rideItem)) continue;
 
         QTreeWidgetItem *add = new QTreeWidgetItem(files->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);
