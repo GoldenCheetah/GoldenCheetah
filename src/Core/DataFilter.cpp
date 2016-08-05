@@ -24,6 +24,7 @@
 #include "RideFileCache.h"
 #include "PMCData.h"
 #include "VDOTCalculator.h"
+#include "DataProcessor.h"
 #include <QDebug>
 
 #include "Zones.h"
@@ -105,6 +106,10 @@ static struct {
 
     // print to qDebug for debugging
     { "print", 1 },     // print(..) to qDebug for debugging
+
+    // autoprocess to run automatic data processors
+    { "autoprocess", 1 }, // autoprocess(filter)
+
     // add new ones above this line
     { "", -1 }
 };
@@ -2347,6 +2352,30 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
                     // symbol we are setting
                     leaf->print(leaf->fparms[0], 0, df);
+                }
+                break;
+
+        case 39 :
+                {   // AUTOPROCESS(expression) to run automatic data processors
+                    Result returning(0);
+
+                    if (leaf->fparms.count() != 1) return returning;
+                    else returning = eval(df, leaf->fparms[0], x, m, p, c);
+
+                    if (returning.number) {
+
+                        // ack ! we need to autoprocess, so open the ride
+                        RideFile *f = m->ride();
+
+                        if (!f) return Result(0); // eek!
+
+                        // now remove the override
+                        if (DataProcessorFactory::instance().autoProcess(f)) {
+                            // rideFile is now dirty!
+                            m->setDirty(true);
+                        }
+                    }
+                    return returning;
                 }
                 break;
 
