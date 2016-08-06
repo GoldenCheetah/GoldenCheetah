@@ -73,6 +73,9 @@ DATE RANGE SELECTION
 daterange(start)
 daterange(stop)
 
+DATA PROCESSOR FUNCTIONS
+autoprocess(filter)
+
 RIDE SAMPLE DATA
 
 SECS
