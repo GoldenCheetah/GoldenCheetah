@@ -308,6 +308,7 @@ struct FitFileReaderState
                 case 1765: case 2130: case 2131: case 2132: rideFile->setDeviceType("Garmin FR920XT"); break;
                 case 1836: case 2052: case 2053: case 2070: case 2100: rideFile->setDeviceType("Garmin Edge 1000"); break;
                 case 1903: rideFile->setDeviceType("Garmin FR15"); break;
+                case 1907: rideFile->setDeviceType("Garmin Vivoactive"); break;
                 case 1967: rideFile->setDeviceType("Garmin Fenix2"); break;
                 case 2050: case 2188: case 2189: rideFile->setDeviceType("Garmin Fenix3"); break;
                 case 2067: case 2260: rideFile->setDeviceType("Garmin Edge 520"); break;
@@ -353,6 +354,12 @@ struct FitFileReaderState
             // Moxy
             rideFile->setDeviceType("Moxy Monitor");
 
+        } else if (manu == 98) {
+            // BSX
+            switch(prod) {
+                  case 2: rideFile->setDeviceType("BSX Insight 2"); break;
+                  default: rideFile->setDeviceType(QString("BSX %1").arg(prod));
+            }
         } else if (manu == 260) {
             // Zwift!
             rideFile->setDeviceType("Zwift");
@@ -436,7 +443,9 @@ struct FitFileReaderState
                     break;
                 case 44: // pool_length
                     pool_length = value / 100000.0;
-                    if (LAPSWIM_DEBUG) qDebug() << "Pool length" << pool_length;
+                    rideFile->setTag("Pool Length", // in meters
+                                      QString("%1").arg(pool_length*1000.0));
+//                    if (LAPSWIM_DEBUG) qDebug() << "Pool length" << pool_length;
                     break;
 
                 // other fields are ignored at present
