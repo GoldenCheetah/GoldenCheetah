@@ -75,6 +75,7 @@ daterange(stop)
 
 DATA PROCESSOR FUNCTIONS
 autoprocess(filter)
+postprocess(processor, filter)
 
 RIDE SAMPLE DATA
 
