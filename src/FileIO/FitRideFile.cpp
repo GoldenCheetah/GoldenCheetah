@@ -303,6 +303,7 @@ struct FitFileReaderState
                 case 2147: return "Garmin Edge 25";
                 case 2153: return "Garmin FR225";
                 case 2238: return "Garmin Edge 20";
+                case 2348: return "Garmin Vivosmart HR";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
                 case 65534: return "Garmin Connect Website";
