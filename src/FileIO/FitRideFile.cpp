@@ -353,6 +353,10 @@ struct FitFileReaderState
         } else if (manu == 260) {
             // Zwift!
             return "Zwift";
+        } else if (manu == 267) {
+            // Bryton
+                case 1505: return "Bryton Rider 310";
+                default: return QString("Bryton %1").arg(prod);
         } else {
             return QString("Unknown FIT Device %1:%2").arg(manu).arg(prod);
         }
