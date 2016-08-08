@@ -107,8 +107,9 @@ static struct {
     // print to qDebug for debugging
     { "print", 1 },     // print(..) to qDebug for debugging
 
-    // autoprocess to run automatic data processors
-    { "autoprocess", 1 }, // autoprocess(filter)
+    // Data Processor functions on filtered activiies
+    { "autoprocess", 1 }, // autoprocess(filter) to run auto data processors
+    { "postprocess", 2 }, // postprocess(processor, filter) to run processor
 
     // add new ones above this line
     { "", -1 }
@@ -2369,8 +2370,40 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
                         if (!f) return Result(0); // eek!
 
-                        // now remove the override
+                        // now run auto data processors
                         if (DataProcessorFactory::instance().autoProcess(f)) {
+                            // rideFile is now dirty!
+                            m->setDirty(true);
+                        }
+                    }
+                    return returning;
+                }
+                break;
+
+        case 40 :
+                {   // POSTPROCESS (processor, expression ) run processor
+                    Result returning(0);
+
+                    if (leaf->fparms.count() < 2) return returning;
+                    else returning = eval(df, leaf->fparms[1], x, m, p, c);
+
+                    if (returning.number) {
+
+                        // processor we are running
+                        QString dp_name = *(leaf->fparms[0]->lvalue.n);
+
+                        // lookup processor
+                        DataProcessor* dp = DataProcessorFactory::instance().getProcessors().value(dp_name, NULL);
+
+                        if (!dp) return Result(0); // No such data processor
+
+                        // ack ! we need to autoprocess, so open the ride
+                        RideFile *f = m->ride();
+
+                        if (!f) return Result(0); // eek!
+
+                        // now run the data processor
+                        if (dp->postProcess(f)) {
                             // rideFile is now dirty!
                             m->setDirty(true);
                         }
