@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
-<TS language="ru" version="2.1">
+<TS version="2.1" language="ru">
 <context>
     <name>AAvgPower</name>
     <message>
@@ -957,7 +957,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="749"/>
         <source>Master</source>
-        <translation type="unfinished"></translation>
+        <translation>Основной</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="754"/>
@@ -1418,7 +1418,7 @@ Press Next to Continue
         <location filename="../../Charts/AllPlot.cpp" line="2959"/>
         <location filename="../../Charts/AllPlot.cpp" line="2994"/>
         <source>Hb</source>
-        <translation>ГГ</translation>
+        <translation>Hb</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3190"/>
@@ -1428,12 +1428,12 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3192"/>
         <source>** Check W' is set correctly **</source>
-        <translation type="unfinished"></translation>
+        <translation>** Проверте достоверность W' **</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3197"/>
         <source>Tau=%1, CP=%2, W'=%3, %4 match >2kJ (%5 kJ) %6</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3200"/>
@@ -1713,7 +1713,7 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="2967"/>
         <source>Nm</source>
-        <translation type="unfinished"></translation>
+        <translation>Нм</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="2967"/>
@@ -2290,7 +2290,7 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="435"/>
         <source>Time of day</source>
-        <translation type="unfinished"></translation>
+        <translation>Время суток</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="741"/>
@@ -3055,7 +3055,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="47"/>
         <source>Average Power relative to Athlete Weight.</source>
-        <translation type="unfinished"></translation>
+        <translation>Средняя мощность спортсмена на его вес.</translation>
     </message>
 </context>
 <context>
@@ -3074,7 +3074,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1539"/>
         <source>Average Cadence, computed when Cadence > 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Средний каденс, отличный от нуля</translation>
     </message>
 </context>
 <context>
@@ -3093,7 +3093,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1199"/>
         <source>Average Core Temperature. The core body temperature estimate is based on HR data</source>
-        <translation type="unfinished"></translation>
+        <translation>Средняя температура тела, оценивается по ЧСС.</translation>
     </message>
 </context>
 <context>
@@ -3477,7 +3477,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="47"/>
         <source>Average Running Cadence</source>
-        <translation type="unfinished"></translation>
+        <translation>Средний каденс бега</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="48"/>
@@ -3497,17 +3497,17 @@ Press Next to Continue
         <location filename="../../Metrics/RunMetrics.cpp" line="209"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="215"/>
         <source>Average Vertical Oscillation</source>
-        <translation type="unfinished"></translation>
+        <translation>Среднее вертикальное колебание</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="210"/>
         <source>cm</source>
-        <translation type="unfinished">см</translation>
+        <translation>см</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="211"/>
         <source>in</source>
-        <translation type="unfinished"></translation>
+        <translation>дюйм</translation>
     </message>
 </context>
 <context>
@@ -3558,7 +3558,7 @@ Press Next to Continue
         <location filename="../../Metrics/RunMetrics.cpp" line="388"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="394"/>
         <source>Average Stride Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Средняя длинна шага</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="389"/>
@@ -4297,7 +4297,7 @@ Let's get you setup.</source>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="988"/>
         <source>Below CP Work</source>
-        <translation type="unfinished"></translation>
+        <translation>Работа ниже CP</translation>
     </message>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="990"/>
@@ -4376,7 +4376,7 @@ Let's get you setup.</source>
         <location filename="../../Gui/Pages.cpp" line="4135"/>
         <location filename="../../Gui/Pages.cpp" line="4263"/>
         <source>Pmax</source>
-        <translation type="unfinished"></translation>
+        <translation>Pmax</translation>
     </message>
     <message>
         <source>Use CP for FTP</source>
@@ -4456,7 +4456,7 @@ Let's get you setup.</source>
         <location filename="../../Charts/CPPlot.cpp" line="1547"/>
         <location filename="../../Charts/CPPlot.cpp" line="1723"/>
         <source>Percent of Best</source>
-        <translation type="unfinished"></translation>
+        <translation>Процент от лучшего</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="193"/>
@@ -4624,7 +4624,7 @@ Let's get you setup.</source>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="271"/>
         <source>m/hour</source>
-        <translation type="unfinished"></translation>
+        <translation>м/час</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="291"/>
@@ -4698,7 +4698,7 @@ Let's get you setup.</source>
         <location filename="../../Charts/CPPlot.cpp" line="568"/>
         <location filename="../../Charts/CPPlot.cpp" line="622"/>
         <source>Pmax</source>
-        <translation type="unfinished"></translation>
+        <translation>Pmax</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="596"/>
@@ -4715,7 +4715,7 @@ Let's get you setup.</source>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="1712"/>
         <source>kph %1 mph</source>
-        <translation type="unfinished"></translation>
+        <translation>км/ч %1 миль/ч</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="1739"/>
@@ -4838,7 +4838,7 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="110"/>
         <source>60 min Peak WPK</source>
-        <translation type="unfinished">Пиковое отношение Вт/кг за 5 минут {60 ?}</translation>
+        <translation>Пиковое отношение Вт/кг за 60 минут</translation>
     </message>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="111"/>
@@ -5034,12 +5034,12 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Charts/ChartBar.cpp" line="127"/>
         <source>Upload Chart...</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить график...</translation>
     </message>
     <message>
         <location filename="../../Charts/ChartBar.cpp" line="128"/>
         <source>Download Chart...</source>
-        <translation type="unfinished"></translation>
+        <translation>Скачать график...</translation>
     </message>
 </context>
 <context>
@@ -5212,7 +5212,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="684"/>
         <source>Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Мои тренировки</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="685"/>
@@ -5222,7 +5222,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="686"/>
         <source>Train</source>
-        <translation type="unfinished"></translation>
+        <translation>Велостанок</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="897"/>
@@ -6237,7 +6237,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="396"/>
         <source>Pmax</source>
-        <translation type="unfinished"></translation>
+        <translation>Pmax</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="399"/>
@@ -6357,7 +6357,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1436"/>
         <source>MM/dd/yyyy</source>
-        <translation>dd/MM/yyyy</translation>
+        <translation>dd.MM.yyyy</translation>
     </message>
 </context>
 <context>
@@ -6667,7 +6667,7 @@ Click Cancel to exit.</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3692"/>
         <source>+</source>
-        <translation></translation>
+        <translation>+</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3693"/>
@@ -6848,7 +6848,7 @@ Click Cancel to exit.</source>
     <message>
         <location filename="../../Train/DialWindow.cpp" line="51"/>
         <source>Smooth (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Сглаживание (сек)</translation>
     </message>
 </context>
 <context>
@@ -7273,7 +7273,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1552"/>
         <source>Vo2Max Estimate</source>
-        <translation>Оценка Vo2max</translation>
+        <translation>Оценка VO2max</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1581"/>
@@ -11697,7 +11697,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="285"/>
         <source>Autoimport</source>
-        <translation type="unfinished"></translation>
+        <translation>Автоимпорт</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="287"/>
@@ -13239,17 +13239,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1602"/>
         <source>Import Charts</source>
-        <translation type="unfinished">Импортировать графики</translation>
+        <translation>Импортировать графики</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1608"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Отмена</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1609"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Импорт</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1645"/>
@@ -13260,7 +13260,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/HomeWindow.cpp" line="1719"/>
         <location filename="../../Charts/HomeWindow.cpp" line="1731"/>
         <source>Diary</source>
-        <translation type="unfinished">Дневник</translation>
+        <translation>Дневник</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1646"/>
@@ -13270,19 +13270,19 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/HomeWindow.cpp" line="1722"/>
         <location filename="../../Charts/HomeWindow.cpp" line="1729"/>
         <source>Trends</source>
-        <translation type="unfinished">Динамика тренировок</translation>
+        <translation>Динамика тренировок</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1647"/>
         <location filename="../../Charts/HomeWindow.cpp" line="1730"/>
         <source>Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Мои тренировки</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1648"/>
         <location filename="../../Charts/HomeWindow.cpp" line="1732"/>
         <source>Train</source>
-        <translation type="unfinished"></translation>
+        <translation>Велостанок</translation>
     </message>
 </context>
 <context>
