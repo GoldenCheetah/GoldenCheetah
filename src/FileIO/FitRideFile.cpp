@@ -340,6 +340,12 @@ struct FitFileReaderState
                 case 1: return "o_synce navi2coach";
                 default: return QString("o_synce %1").arg(prod);
             }
+        } else if (manu == 48) {
+            // Pioneer
+            switch (prod) {
+                case 2: return "Pioneer SGX-CA500";
+                default: return QString("Pioneer %1").arg(prod);
+            }
         } else if (manu == 70) {
             // does not set product at this point
            return "Sigmasport ROX";
