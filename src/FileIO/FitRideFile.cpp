@@ -328,17 +328,23 @@ struct FitFileReaderState
 
                 default: return QString("Powertap Device %1");
             }
-        } else  if (manu == 32) {
+        } else if (manu == 32) {
             // wahoo
             switch (prod) {
                 case 0: return "Wahoo fitness";
                 default: return QString("Wahoo fitness %1").arg(prod);
             }
-        } else  if (manu == 38) {
+        } else if (manu == 38) {
             // o_synce
             switch (prod) {
                 case 1: return "o_synce navi2coach";
                 default: return QString("o_synce %1").arg(prod);
+            }
+        } else if (manu == 48) {
+            // Pioneer
+            switch (prod) {
+                case 2: return "Pioneer SGX-CA500";
+                default: return QString("Pioneer %1").arg(prod);
             }
         } else if (manu == 70) {
             // does not set product at this point
@@ -569,7 +575,7 @@ struct FitFileReaderState
                 case 25:  // source type
                 case 24:  // equipment ID
                 default: ; // do nothing
-            }    
+            }
 
             if (FIT_DEBUG) {
                 printf("decodeDeviceInfo  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
