@@ -421,3 +421,184 @@ static bool addSWolf()
     return true;
 }
 static bool swolfAdded = addSWolf();
+
+///////////////////////////////////////////////////////////////////////////////
+class SwimPaceStroke : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(SwimPaceStroke)
+
+    public:
+
+    enum StrokeType { free = 1, back = 2, breast = 3, fly = 4 };
+
+    void setStroke(StrokeType type) { strokeType = type; }
+
+    SwimPaceStroke() : strokeType(free), total(0.0), count(0.0)
+    {
+        setType(RideMetric::Average);
+        setPrecision(1);
+        setConversion(METERS_PER_YARD);
+    }
+
+    // Swim Pace ordering is reversed
+    bool isLowerBetter() const { return true; }
+
+    // Overrides to use Swim Pace units setting
+    QString units(bool) const {
+        bool metric = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        return RideMetric::units(metric);
+    }
+
+    double value(bool) const {
+        bool metric = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        return RideMetric::value(metric);
+    }
+
+    QString toString(bool metric) const {
+        return time_to_string(value(metric)*60);
+    }
+
+    void initialize() {
+        setName(tr("Swim Pace"));
+        setMetricUnits(tr("min/100m"));
+        setImperialUnits(tr("min/100yd"));
+        setDescription(tr("Average Swim Pace, computed only when Cadence > 0 to avoid kick/drill lengths"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        setValue(RideFile::NIL);
+        setCount(0);
+
+        // no ride or no samples or not a swim
+        if (spec.isEmpty(item->ride()) || !item->isSwim)
+            return;
+
+        XDataSeries *series = item->ride()->xdata("SWIM");
+        if (!series) // no SWIM specific data
+            return;
+        int typeIdx = -1;
+        for (int a=0; a<series->valuename.count(); a++) {
+            if (series->valuename.at(a) == "TYPE")
+                typeIdx = a;
+        }
+        if (typeIdx == -1) // no Stroke Type
+            return;
+
+        int b=0, type=0;
+        total = count = 0;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            for (int j=b; j<series->datapoints.count(); j++) {
+                if (series->datapoints.at(j)->secs > point->secs)
+                    break;
+                b=j;
+                // Stroke Type
+                type = series->datapoints.at(j)->number[typeIdx];
+            }
+            if (type == strokeType) {
+                total += point->kph;
+                ++count;
+            }
+        }
+        setValue((count > 0 && total > 0.0) ? 6.0 * count / total : 0.0);
+        setCount(count);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
+
+    RideMetric *clone() const { return new SwimPaceStroke(*this); }
+
+    private:
+
+    StrokeType strokeType;
+    double total, count;
+};
+
+class SwimPaceFree : public SwimPaceStroke {
+    Q_DECLARE_TR_FUNCTIONS(SwimPaceFree)
+
+    public:
+        SwimPaceFree()
+        {
+            setStroke(free);
+            setSymbol("swim_pace_free");
+            setInternalName("Swim Pace Free");
+        }
+        void initialize ()
+        {
+            SwimPaceStroke::initialize();
+            setName(tr("Swim Pace Free"));
+            setDescription(tr("Average Swim Pace for freestyle lengths"));
+        }
+        RideMetric *clone() const { return new SwimPaceFree(*this); }
+};
+
+class SwimPaceBack : public SwimPaceStroke {
+    Q_DECLARE_TR_FUNCTIONS(SwimPaceBack)
+
+    public:
+        SwimPaceBack()
+        {
+            setStroke(back);
+            setSymbol("swim_pace_back");
+            setInternalName("Swim Pace Back");
+        }
+        void initialize ()
+        {
+            SwimPaceStroke::initialize();
+            setName(tr("Swim Pace Back"));
+            setDescription(tr("Average Swim Pace for backstroke lengths"));
+        }
+        RideMetric *clone() const { return new SwimPaceBack(*this); }
+};
+
+class SwimPaceBreast : public SwimPaceStroke {
+    Q_DECLARE_TR_FUNCTIONS(SwimPaceBreast)
+
+    public:
+        SwimPaceBreast()
+        {
+            setStroke(breast);
+            setSymbol("swim_pace_breast");
+            setInternalName("Swim Pace Breast");
+        }
+        void initialize ()
+        {
+            SwimPaceStroke::initialize();
+            setName(tr("Swim Pace Breast"));
+            setDescription(tr("Average Swim Pace for breaststroke lengths"));
+        }
+        RideMetric *clone() const { return new SwimPaceBreast(*this); }
+};
+
+class SwimPaceFly : public SwimPaceStroke {
+    Q_DECLARE_TR_FUNCTIONS(SwimPaceFly)
+
+    public:
+        SwimPaceFly()
+        {
+            setStroke(fly);
+            setSymbol("swim_pace_fly");
+            setInternalName("Swim Pace Fly");
+        }
+        void initialize ()
+        {
+            SwimPaceStroke::initialize();
+            setName(tr("Swim Pace Fly"));
+            setDescription(tr("Average Swim Pace for freestyle lengths"));
+        }
+        RideMetric *clone() const { return new SwimPaceFly(*this); }
+};
+
+static bool addAllStrokePace() {
+    RideMetricFactory::instance().addMetric(SwimPaceFree());
+    RideMetricFactory::instance().addMetric(SwimPaceBack());
+    RideMetricFactory::instance().addMetric(SwimPaceBreast());
+    RideMetricFactory::instance().addMetric(SwimPaceFly());
+    return true;
+}
+
+static bool allStrokePaceAdded = addAllStrokePace();
