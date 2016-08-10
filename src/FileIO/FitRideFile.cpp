@@ -328,13 +328,13 @@ struct FitFileReaderState
 
                 default: return QString("Powertap Device %1");
             }
-        } else  if (manu == 32) {
+        } else if (manu == 32) {
             // wahoo
             switch (prod) {
                 case 0: return "Wahoo fitness";
                 default: return QString("Wahoo fitness %1").arg(prod);
             }
-        } else  if (manu == 38) {
+        } else if (manu == 38) {
             // o_synce
             switch (prod) {
                 case 1: return "o_synce navi2coach";
@@ -575,7 +575,7 @@ struct FitFileReaderState
                 case 25:  // source type
                 case 24:  // equipment ID
                 default: ; // do nothing
-            }    
+            }
 
             if (FIT_DEBUG) {
                 printf("decodeDeviceInfo  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
