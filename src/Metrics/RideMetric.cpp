@@ -142,8 +142,9 @@
 // 132 21  Jul 2016 Ale Martinez       Added SwimMetrics (Stroke Rate et al)
 // 133 22  Jul 2016 Damien Grauser     Added Efficiency Index
 // 134 22  Jul 2016 Damien Grauser     Add Stride length
+// 135 10  Aug 2016 Ale Martinez       Added Average Swim Pace for the 4 Strokes
 
-int DBSchemaVersion = 134;
+int DBSchemaVersion = 135;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
