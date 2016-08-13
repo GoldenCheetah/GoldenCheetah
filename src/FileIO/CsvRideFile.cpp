@@ -181,6 +181,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     int cadenceIndex=-1;
     int smo2Index=-1;
     int hrIndex=-1;
+    int kphIndex = -1;
     int gctIndex = -1, voIndex =-1;
 
     double precAvg=0.0;
@@ -438,6 +439,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 QRegExp hrHeader("( )*(hr|heart_rate)( )*", Qt::CaseInsensitive);
                 QRegExp gctHeader("( )*(groundcontacttime)( )*", Qt::CaseInsensitive);
                 QRegExp voHeader("( )*(verticaloscillation)( )*", Qt::CaseInsensitive);
+                QRegExp kphHeader("( )*(speed)( )*", Qt::CaseInsensitive);
                 QStringList headers = line.split(",");
 
                 QStringListIterator i(headers);
@@ -487,6 +489,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         voIndex = headers.indexOf(header);
                         if (csvType == bsx)
                             voIndex++;
+                    }
+                    if (kphHeader.indexIn(header) != -1)  {
+                        kphIndex = headers.indexOf(header);
+                        if (csvType == bsx)
+                            kphIndex++;
                     }
                 }
 
@@ -753,6 +760,12 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
                     if (voIndex > -1) {
                         vo = line.section(',', voIndex, voIndex).toDouble();
+                    }
+                    if (kphIndex > -1) {
+                        kph = line.section(',', kphIndex, kphIndex).toDouble() * 3.6f; // running speed is given in m/s, convert to km/h
+                        if (!metric) {
+                           kph *= KM_PER_MILE;
+                        }
                     }
                 }
                else if(csvType == motoactv) {
