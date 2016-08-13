@@ -997,17 +997,17 @@ struct AvgtHb : public RideMetric {
             return;
         }
 
-        total = count = 0;
+        total = count = 0.0f;
 
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->thb >= 0.0) {
+            if (point->thb > 0.0f) {
                 total += point->thb;
                 ++count;
             }
         }
-        setValue(count > 0 ? total / count : 0);
+        setValue(count > 0.0f ? total / count : 0.0f);
         setCount(count);
     }
 
@@ -1800,12 +1800,17 @@ class MinSmO2 : public RideMetric {
             return;
         }
 
+        bool notset = true;
+
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
 
-            if (point->smo2 > 0 && point->smo2 >= min)
+            if (point->smo2 >= 0.0f && (notset || point->smo2 < min)) {
                 min = point->smo2;
+                if (point->smo2 > 0.0f && notset)
+                  notset = false;
+            }
         }
         setValue(min);
     }
@@ -1844,11 +1849,15 @@ class MintHb : public RideMetric {
             return;
         }
 
+        bool notset = true;
+
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->thb > 0 && point->thb >= min)
+            if (point->thb > 0.0f && (notset || point->thb < min)) {
                 min = point->thb;
+                notset = false;
+            }
         }
         setValue(min);
     }
