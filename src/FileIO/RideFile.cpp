@@ -1185,7 +1185,7 @@ void RideFile::updateAvg(RideFilePoint* point)
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
                            double kph, double nm, double watts, double alt,
                            double lon, double lat, double headwind,
-                           double slope, double temp, double lrbalance, 
+                           double slope, double temp, double lrbalance,
                            double lte, double rte, double lps, double rps,
                            double lpco, double rpco,
                            double lppb, double rppb, double lppe, double rppe,
@@ -1193,6 +1193,31 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
                            double smo2, double thb,
                            double rvert, double rcad, double rcontact, double tcore,
                            int interval)
+{
+    appendOrUpdatePoint(secs,cad,hr,km,kph,
+                nm,watts,alt,lon,lat,
+                headwind, slope,
+                temp, lrbalance,
+                lte, rte, lps, rps,
+                lpco, rpco,
+                lppb, rppb, lppe, rppe,
+                lpppb, rpppb, lpppe, rpppe,
+                smo2, thb,
+                rvert, rcad, rcontact, tcore,
+                interval, true);
+}
+
+void RideFile::appendOrUpdatePoint(double secs, double cad, double hr, double km,
+                           double kph, double nm, double watts, double alt,
+                           double lon, double lat, double headwind,
+                           double slope, double temp, double lrbalance, 
+                           double lte, double rte, double lps, double rps,
+                           double lpco, double rpco,
+                           double lppb, double rppb, double lppe, double rppe,
+                           double lpppb, double rpppb, double lpppe, double rpppe,
+                           double smo2, double thb,
+                           double rvert, double rcad, double rcontact, double tcore,
+                           int interval, bool forceAppend)
 {
     // negative values are not good, make them zero
     // although alt, lat, lon, headwind, slope and temperature can be negative of course!
@@ -1260,7 +1285,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     //                                 point on Earth (Mt Everest).
     if (alt > RideFile::maximumFor(RideFile::alt)) alt = RideFile::maximumFor(RideFile::alt);
 
-    RideFilePoint* point = new RideFilePoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat, 
+    RideFilePoint* point = new RideFilePoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat,
                                              headwind, slope, temp,
                                              lrbalance,
                                              lte, rte, lps, rps,
@@ -1270,7 +1295,37 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
                                              smo2, thb,
                                              rvert, rcad, rcontact, tcore,
                                              interval);
-    dataPoints_.append(point);
+
+    if (!forceAppend) {
+        int idx = timeIndex(secs);
+        if (idx != -1) {
+            if (dataPoints_.at(idx)->secs == secs) {
+                updatePoint(point, dataPoints_.at(idx));
+                dataPoints_.replace(idx, point);
+            } else {
+                if (dataPoints_.at(idx)->secs > secs)
+                    dataPoints_.insert(idx, point);
+                else
+                    dataPoints_.insert(idx+1, point);
+            }
+        } else
+           forceAppend = true;
+    }
+
+    if (forceAppend) {
+        RideFilePoint* point = new RideFilePoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat,
+                                                 headwind, slope, temp,
+                                                 lrbalance,
+                                                 lte, rte, lps, rps,
+                                                 lpco, rpco,
+                                                 lppb, rppb, lppe, rppe,
+                                                 lpppb, rpppb, lpppe, rpppe,
+                                                 smo2, thb,
+                                                 rvert, rcad, rcontact, tcore,
+                                                 interval);
+
+        dataPoints_.append(point);
+    }
 
     dataPresent.secs     |= (secs != 0);
     dataPresent.cad      |= (cad != 0);
@@ -1326,6 +1381,89 @@ void RideFile::appendPoint(const RideFilePoint &point)
                 point.smo2, point.thb,
                 point.rvert, point.rcad, point.rcontact, point.tcore,
                 point.interval);
+}
+
+void
+RideFile::updatePoint(RideFilePoint *point, const RideFilePoint *oldPoint){
+    qDebug() << "updatePoint HR "<<oldPoint->hr << "->" << point->hr;
+
+    if (point->cad == 0 && oldPoint->cad != 0)
+        point->cad = oldPoint->cad;
+    if (point->hr == 0 && oldPoint->hr != 0)
+        point->hr = oldPoint->hr;
+    if (point->km == 0 && oldPoint->km != 0)
+        point->km = oldPoint->km;
+    if (point->kph == 0 && oldPoint->kph != 0)
+        point->kph = oldPoint->kph;
+
+    if (point->nm == 0 && oldPoint->nm != 0)
+        point->nm = oldPoint->nm;
+    if (point->watts == 0 && oldPoint->watts != 0)
+        point->watts = oldPoint->watts;
+    if (point->alt == 0 && oldPoint->alt != 0)
+        point->alt = oldPoint->alt;
+    if (point->lat == 0 && oldPoint->lat != 0)
+        point->lat = oldPoint->lat;
+    if (point->lon == 0 && oldPoint->lon != 0)
+        point->lon = oldPoint->lon;
+
+    if (point->headwind == 0 && oldPoint->headwind != 0)
+        point->headwind = oldPoint->headwind;
+    if (point->slope == 0 && oldPoint->slope != 0)
+        point->slope = oldPoint->slope;
+    if (point->temp == RideFile::NA && oldPoint->temp != RideFile::NA)
+        point->temp = oldPoint->temp;
+    if (point->lrbalance == RideFile::NA && oldPoint->lrbalance != RideFile::NA)
+        point->lrbalance = oldPoint->lrbalance;
+
+    if (point->lte == 0 && oldPoint->lte != 0)
+        point->lte = oldPoint->lte;
+    if (point->rte == 0 && oldPoint->rte != 0)
+        point->rte = oldPoint->rte;
+    if (point->lps == 0 && oldPoint->lps != 0)
+        point->lps = oldPoint->lps;
+    if (point->rps == 0 && oldPoint->rps != 0)
+        point->rps = oldPoint->rps;
+
+    if (point->lpco == 0 && oldPoint->lpco != 0)
+        point->lpco = oldPoint->lpco;
+    if (point->rpco == 0 && oldPoint->rpco != 0)
+        point->rpco = oldPoint->rpco;
+
+    if (point->lppb == 0 && oldPoint->lppb != 0)
+        point->lppb = oldPoint->lppb;
+    if (point->rppb == 0 && oldPoint->rppb != 0)
+        point->rppb = oldPoint->rppb;
+    if (point->lppe == 0 && oldPoint->lppe != 0)
+        point->lppe = oldPoint->lppe;
+    if (point->rppe == 0 && oldPoint->rppe != 0)
+        point->rppe = oldPoint->rppe;
+
+    if (point->lpppb == 0 && oldPoint->lpppb != 0)
+        point->lpppb = oldPoint->lpppb;
+    if (point->rpppb == 0 && oldPoint->rpppb != 0)
+        point->rpppb = oldPoint->rpppb;
+    if (point->lpppe == 0 && oldPoint->lpppe != 0)
+        point->lpppe = oldPoint->lpppe;
+    if (point->rpppe == 0 && oldPoint->rpppe != 0)
+        point->rpppe = oldPoint->rpppe;
+
+    if (point->smo2 == 0 && oldPoint->smo2 != 0)
+        point->smo2 = oldPoint->smo2;
+    if (point->thb == 0 && oldPoint->thb != 0)
+        point->thb = oldPoint->thb;
+
+    if (point->rvert == 0 && oldPoint->rvert != 0)
+        point->rvert = oldPoint->rvert;
+    if (point->rcad == 0 && oldPoint->rcad != 0)
+        point->rcad = oldPoint->rcad;
+    if (point->rcontact == 0 && oldPoint->rcontact != 0)
+        point->rcontact = oldPoint->rcontact;
+    if (point->tcore == 0 && oldPoint->tcore != 0)
+        point->tcore = oldPoint->tcore;
+
+    if (point->interval == 0 && oldPoint->interval != 0)
+        point->interval = oldPoint->interval;
 }
 
 void

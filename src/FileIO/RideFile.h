@@ -255,7 +255,22 @@ class RideFile : public QObject // QObject to emit signals
                          double rvert, double rcad, double rcontact, double tcore,
                          int interval);
 
+        void appendOrUpdatePoint(double secs, double cad, double hr, double km,
+                                 double kph, double nm, double watts, double alt,
+                                 double lon, double lat, double headwind, double slope,
+                                 double temperature, double lrbalance,
+                                 double lte, double rte, double lps, double rps,
+                                 double lpco, double rpco,
+                                 double lppb, double rppb, double lppe, double rppe,
+                                 double lpppb, double rpppb, double lpppe, double rpppe,
+                                 double smo2, double thb,
+                                 double rvert, double rcad, double rcontact, double tcore,
+                                 int interval, bool forceAppend);
+
         void appendPoint(const RideFilePoint &);
+
+        void updatePoint(RideFilePoint *point, const RideFilePoint *oldPoint);
+
         const QVector<RideFilePoint*> &dataPoints() const { return dataPoints_; }
 
         // recalculate all the derived data series
