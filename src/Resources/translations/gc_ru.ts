@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru">
+<TS language="ru" version="2.1">
 <context>
     <name>AAvgPower</name>
     <message>
@@ -2629,7 +2629,7 @@ Press Next to Continue
     <message>
         <location filename="../../Core/Athlete.cpp" line="320"/>
         <source>Power Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Профиль мощности</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="321"/>
@@ -2823,12 +2823,12 @@ Press Next to Continue
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="105"/>
         <source>Abort Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Прервать резервирование</translation>
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="106"/>
         <source>Backup successfully stored in %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервная копия успешно сохранена в %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="131"/>
@@ -3483,12 +3483,12 @@ Press Next to Continue
         <location filename="../../Metrics/RunMetrics.cpp" line="48"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="49"/>
         <source>spm</source>
-        <translation type="unfinished"></translation>
+        <translation>шаг/мин</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="51"/>
         <source>Average Running Cadence, computed when Cadence > 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Средний беговой каденс, отличный от нуля</translation>
     </message>
 </context>
 <context>
@@ -4308,7 +4308,7 @@ Let's get you setup.</source>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="993"/>
         <source>Below CP Work is the amount of kJ produced while power is below CP.</source>
-        <translation type="unfinished"></translation>
+        <translation>Работа ниже CP - это количество кДж затраченных на работу ниже критической мощности.</translation>
     </message>
 </context>
 <context>
@@ -5833,7 +5833,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="482"/>
         <source>Google Drive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Google Drive</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="558"/>
@@ -6116,27 +6116,27 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="254"/>
         <source>2 parameter</source>
-        <translation type="unfinished"></translation>
+        <translation>по 2 параметрам</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="255"/>
         <source>3 parameter</source>
-        <translation type="unfinished"></translation>
+        <translation>по 3 параметрам</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="256"/>
         <source>Extended CP</source>
-        <translation type="unfinished"></translation>
+        <translation>расширенная CP</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="257"/>
         <source>Multicomponent</source>
-        <translation type="unfinished"></translation>
+        <translation>Мультикомпонентная</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="258"/>
         <source>Ward-Smith</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ward-Smith</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="263"/>
@@ -6347,7 +6347,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1795"/>
         <source>Save Best Data as CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить лучшие значения в CSV</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1436"/>
@@ -6400,7 +6400,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2776"/>
         <source>Are you sure you want to delete this metric?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены, что хотите удалить метрику?</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2778"/>
@@ -7923,7 +7923,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="185"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Метрические</translation>
     </message>
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="186"/>
@@ -7933,17 +7933,17 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="193"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>ОК</translation>
     </message>
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="194"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Отмена</translation>
     </message>
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="195"/>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Тест</translation>
     </message>
 </context>
 <context>
@@ -8187,17 +8187,17 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="74"/>
         <source>Bike</source>
-        <translation type="unfinished"></translation>
+        <translation>Велоспорт</translation>
     </message>
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="75"/>
         <source>Run</source>
-        <translation type="unfinished"></translation>
+        <translation>Бег</translation>
     </message>
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="76"/>
         <source>Swim</source>
-        <translation type="unfinished"></translation>
+        <translation>Плавание</translation>
     </message>
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="84"/>
@@ -28676,7 +28676,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Gui/Pages.cpp" line="3848"/>
         <source>Bike</source>
-        <translation type="unfinished"></translation>
+        <translation>Велоспорт</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3849"/>
