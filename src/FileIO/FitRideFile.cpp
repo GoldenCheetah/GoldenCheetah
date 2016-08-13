@@ -297,6 +297,7 @@ struct FitFileReaderState
                 case 1765: case 2130: case 2131: case 2132: return "Garmin FR920XT";
                 case 1836: case 2052: case 2053: case 2070: case 2100: return "Garmin Edge 1000";
                 case 1903: return "Garmin FR15";
+                case 1907: return "Garmin Vivoactive";
                 case 1967: return "Garmin Fenix2";
                 case 2050: case 2188: case 2189: return "Garmin Fenix3";
                 case 2067: case 2260: return "Garmin Edge 520";
@@ -355,6 +356,12 @@ struct FitFileReaderState
         } else if (manu == 95) {
             // Stryd
             return "Stryd";
+        } else if (manu == 98) {
+            // BSX
+            switch(prod) {
+                  case 2: return "BSX Insight 2";
+                  default: return QString("BSX %1").arg(prod);
+            }
         } else if (manu == 260) {
             // Zwift!
             return "Zwift";
