@@ -68,7 +68,7 @@ typedef qint64 fit_value_t;
 #define NA_VALUE std::numeric_limits<fit_value_t>::max()
 typedef std::string fit_string_value;
 
-enum fitValueType { SingleValue, DoubleValue, StringValue };
+enum fitValueType { SingleValue, DoubleValue, ListValue, StringValue };
 typedef enum fitValueType FitValueType;
 
 struct FitValue
@@ -77,6 +77,8 @@ struct FitValue
     fit_value_t v;
     fit_value_t v2;
     fit_string_value s;
+    QList<fit_value_t> list;
+    int size;
 };
 
 struct FitFileReaderState
@@ -86,6 +88,8 @@ struct FitFileReaderState
     RideFile *rideFile;
     time_t start_time;
     time_t last_time;
+    quint32 last_event_timestamp;
+    double start_timestamp;
     double last_distance;
     QMap<int, FitDefinition> local_msg_types;
     QSet<int> unknown_record_fields, unknown_global_msg_nums, unknown_base_type;
@@ -358,6 +362,9 @@ struct FitFileReaderState
         } else if (manu == 260) {
             // Zwift!
             return "Zwift";
+        } else if (manu == 267) {
+            // Bryton!
+            return "Bryton";
         } else {
             return QString("Unknown FIT Device %1:%2").arg(manu).arg(prod);
         }
@@ -858,7 +865,7 @@ struct FitFileReaderState
                           // Time MUST NOT go backwards
                           // You canny break the laws of physics, Jim
                           if (time < last_time)
-                              time = last_time;
+                              time = last_time; // Not true for Bryton
                           break;
                 case 0: // POSITION_LAT
                         lati = value;
@@ -976,8 +983,10 @@ struct FitFileReaderState
                          unknown_record_fields.insert(field.num);
             }
         }
+
         if (time == last_time)
-            return; // Sketchy, but some FIT files do this.
+            return; // Not true for Bryton
+
         if (stopped) {
             // As it turns out, this happens all the time in some FIT files.
             // Since we don't really understand the meaning, don't make noise.
@@ -1018,6 +1027,7 @@ struct FitFileReaderState
         // if there are data points && a time difference > 1sec && smartRecording processing is requested at all
         if ((!rideFile->dataPoints().empty()) && (last_time != 0) &&
              (time > last_time + 1) && (isGarminSmartRecording.toInt() != 0)) {
+            qDebug() << "interpolate";
             // Handle smart recording if configured in preferences.  Linearly interpolate missing points.
             RideFilePoint *prevPoint = rideFile->dataPoints().back();
             double deltaSecs = (secs - prevPoint->secs);
@@ -1108,12 +1118,12 @@ struct FitFileReaderState
         }
 
         if (km < 0.00001f) km = last_distance;
-        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, slope, temperature,
+        rideFile->appendOrUpdatePoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, slope, temperature,
                      lrbalance, leftTorqueEff, rightTorqueEff, leftPedalSmooth, rightPedalSmooth,
                      leftPedalCenterOffset, rightPedalCenterOffset,
                      leftTopDeathCenter, rightTopDeathCenter, leftBottomDeathCenter, rightBottomDeathCenter,
                      leftTopPeakPowerPhase, rightTopPeakPowerPhase, leftBottomPeakPowerPhase, rightBottomPeakPowerPhase,
-                     smO2, tHb, rvert, rcad, rcontact, 0.0, interval);
+                     smO2, tHb, rvert, rcad, rcontact, 0.0, interval, false);
         last_time = time;
         last_distance = km;
     }
@@ -1163,8 +1173,9 @@ struct FitFileReaderState
                         time = value + qbase_time.toTime_t();
                         // Time MUST NOT go backwards
                         // You canny break the laws of physics, Jim
+
                         if (time < last_time)
-                            time = last_time;
+                            time = last_time; // Not true for Bryton
                         break;
                 case 3: // total elapsed time
                         length_duration = value / 1000.0;
@@ -1328,6 +1339,101 @@ struct FitFileReaderState
         p->number[3] = humidity;
 
         weatherXdata->datapoints.append(p);
+    }
+
+    void decodeHr(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
+        time_t time = 0;
+        if (time_offset > 0) {
+            time = last_time + time_offset;
+        }
+
+        QList<double> timestamps;
+        QList<double> hr;
+
+        int a = 0;
+        int j = 0;
+        foreach(const FitField &field, def.fields) {
+            FitValue value = values[a++];
+
+            if( value.type == SingleValue && value.v == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 253: // Timestamp
+                          time = value.v + qbase_time.toTime_t();
+                          break;
+                case 0:   // fractional_timestamp
+                          break;
+                case 1:	  // time256
+                          break;
+                case 6:	  // filtered_bpm
+                          if (value.type == SingleValue) {
+                            hr.append(value.v);
+                          }
+                          else {
+                              for (int i=0;i<value.list.size();i++) {
+                                  qDebug() << value.list.at(i);
+                                  hr.append(value.list.at(i));
+                              }
+                          }
+                          break;
+
+                case 9:   // event_timestamp
+                          last_event_timestamp = value.v;
+                          start_timestamp = time-last_event_timestamp/1024.0;
+                          timestamps.append(last_event_timestamp/1024.0);
+                          break;
+                case 10:  // event_timestamp_12
+                          j=0;
+                          for (int i=0;i<value.list.size()-1;i++) {
+
+                              qint16 last_event_timestamp12 = last_event_timestamp & 0xFFF;
+                              qint16 next_event_timestamp12;
+
+                              if (j%2 == 0) {
+                                  next_event_timestamp12 = value.list.at(i) + ((value.list.at(i+1) & 0xF) << 8);
+                                  last_event_timestamp = (last_event_timestamp & 0xFFFFF000) + next_event_timestamp12;
+                              } else {
+                                  next_event_timestamp12 = 16 * value.list.at(i+1) + ((value.list.at(i) & 0xF0) >> 4);
+                                  last_event_timestamp = (last_event_timestamp & 0xFFFFF000) + next_event_timestamp12;
+                                  i++;
+                              }
+                              if (next_event_timestamp12 < last_event_timestamp12)
+                                  last_event_timestamp += 0x1000;
+
+                              qDebug() << (last_event_timestamp / 1024.0);
+                              timestamps.append(last_event_timestamp/1024.0);
+                              j++;
+                          }
+
+                          break;
+
+                default: ; // ignore it
+            }
+        }
+
+        for (int i=0;i<timestamps.count(); i++) {
+            double secs = round(timestamps.at(i) + start_timestamp - start_time);
+            if (secs>0) {
+                int idx = rideFile->timeIndex(round(secs));
+
+                if (rideFile->dataPoints().at(idx)->secs==secs)
+                    rideFile->appendOrUpdatePoint(
+                            secs, 0.0, hr.at(i),
+                            0.0,
+                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                            0.0, 0.0, RideFile::NA, RideFile::NA,
+                            0.0, 0.0,
+                            0.0, 0.0,
+                            0.0, 0.0,
+                            0.0, 0.0,
+                            0.0, 0.0,
+                            0.0, 0.0,
+                            0.0, 0.0,
+                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, false);
+            }
+        }
     }
 
     void decodeDeviceSettings(const FitDefinition &def, int time_offset,
@@ -1511,6 +1617,43 @@ struct FitFileReaderState
 
     }
 
+    void read_header(bool &stop, QStringList &errors, int &data_size) {
+        stop = false;
+        try {
+            // read the header
+            int header_size = read_uint8();
+            if (header_size != 12 && header_size != 14) {
+                errors << QString("bad header size: %1").arg(header_size);
+                stop = true;
+            }
+            int protocol_version = read_uint8();
+            (void) protocol_version;
+
+            // if the header size is 14 we have profile minor then profile major
+            // version. We still don't do anything with this information
+            int profile_version = read_uint16(false); // always littleEndian
+            (void) profile_version; // not sure what to do with this
+
+            data_size = read_uint32(false); // always littleEndian
+            char fit_str[5];
+            if (file.read(fit_str, 4) != 4) {
+                errors << "truncated header";
+                stop = true;
+            }
+            fit_str[4] = '\0';
+            if (strcmp(fit_str, ".FIT") != 0) {
+                errors << QString("bad header, expected \".FIT\" but got \"%1\"").arg(fit_str);
+                stop = true;
+            }
+
+            // read the rest of the header
+            if (header_size == 14) read_uint16(false);
+        } catch (TruncatedRead &e) {
+            errors << "truncated file header";
+            stop = true;
+        }
+    }
+
     int read_record(bool &stop, QStringList &errors) {
         stop = false;
         int count = 0;
@@ -1528,6 +1671,8 @@ struct FitFileReaderState
             int num_fields = read_uint8(&count);
 
             if (FIT_DEBUG)  {
+                //qDebug() << "definition: local type=" << local_msg_type << "global=" << def.global_msg_num << "arch=" << def.is_big_endian << "fields=" << num_fields;
+
                 printf("definition: local type=%d global=%d arch=%d fields=%d\n",
                        local_msg_type, def.global_msg_num, def.is_big_endian,
                        num_fields );
@@ -1581,25 +1726,41 @@ struct FitFileReaderState
                 switch (field.type) {
                     case 0: value.type = SingleValue; value.v = read_uint8(&count); size = 1; break;
                     case 1: value.type = SingleValue; value.v = read_int8(&count); size = 1;  break;
-                    case 2: value.type = SingleValue; value.v = read_uint8(&count); size = 1;
-                        // Multi-values ?
-                        if (field.size>size) {
-                            value.type = DoubleValue;
-                            value.v2 = read_uint8(&count);
-                            size = 2;
-                        }
-                        break;
+                    case 2: size = 1;
+
+                            if (field.size==size) {
+                                value.type = SingleValue; value.v = read_uint8(&count);
+                            } else { // Multi-values ?
+                                value.type = ListValue;
+                                value.list.clear();
+                                for (int i=0;i<field.size/size;i++) {
+                                    value.list.append(read_uint8(&count));
+                                }
+                                size = field.size;
+                            }
+                            break;
                     case 3: value.type = SingleValue; value.v = read_int16(def.is_big_endian, &count); size = 2;  break;
                     case 4: value.type = SingleValue; value.v = read_uint16(def.is_big_endian, &count); size = 2;
-                        // Multi-values ?
-                        if (field.size>size) {
-                            value.type = DoubleValue;
-                            value.v2 = read_uint16(def.is_big_endian, &count);
-                            size = 4;
-                        }
-                        break;
+                            // Multi-values ?
+                            if (field.size>size) {
+                                value.type = DoubleValue;
+                                value.v2 = read_uint16(def.is_big_endian, &count);
+                                size = 4;
+                            }
+                            break;
                     case 5: value.type = SingleValue; value.v = read_int32(def.is_big_endian, &count); size = 4;  break;
-                    case 6: value.type = SingleValue; value.v = read_uint32(def.is_big_endian, &count); size = 4;  break;
+                    case 6: size = 4;
+                            if (field.size==size) {
+                                value.type = SingleValue; value.v = read_uint32(def.is_big_endian, &count);
+                            } else { // Multi-values ?
+                                value.type = ListValue;
+                                value.list.clear();
+                                for (int i=0;i<field.size/size;i++) {
+                                    value.list.append(read_uint32(def.is_big_endian, &count));
+                                }
+                                size = field.size;
+                            }
+                            break;
                     case 7:
                         value.type = StringValue;
                         value.s = read_text(field.size, &count);
@@ -1611,7 +1772,14 @@ struct FitFileReaderState
                     case 10: value.type = SingleValue; value.v = read_uint8z(&count); size = 1; break;
                     case 11: value.type = SingleValue; value.v = read_uint16z(def.is_big_endian, &count); size = 2; break;
                     case 12: value.type = SingleValue; value.v = read_uint32z(def.is_big_endian, &count); size = 4; break;
-                    //case 13: // BYTE
+                    case 13: // BYTE
+                             value.type = ListValue;
+                             value.list.clear();
+                             for (int i=0;i<field.size;i++) {
+                                value.list.append(read_uint8(&count));
+                             }
+                             size = value.list.size();
+                             break;
 
                     // we may need to add support for float, string + byte base types here
                     default:
@@ -1624,11 +1792,12 @@ struct FitFileReaderState
                         read_unknown( field.size, &count );
                         value.type = SingleValue;
                         value.v = NA_VALUE;
-                        unknown_base_type.insert(field.num);
+                        unknown_base_type.insert(field.type);
                         size = field.size;
                 }
                 // Quick fix : we need to support multivalues
                 if (size < field.size) {
+                    qDebug() << "warning : size="<<field.size <<"for type="<<field.type;
                     if (FIT_DEBUG)  {
                          printf( "   warning : size=%d for type=%d (num=%d)\n",
                                  field.size, field.type, field.num);
@@ -1638,15 +1807,30 @@ struct FitFileReaderState
 
                 values.push_back(value);
 
-                if (FIT_DEBUG)  {
+                if (FIT_DEBUG) {
                     printf( " field: type=%d num=%d size=%d(%d) ",
                         field.type, field.num, field.size, size);
-                    if (value.type == SingleValue)
-                        printf( "value=%lld\n", value.v );
-                    else if (value.type == DoubleValue)
+                    if (value.type == SingleValue) {
+                        if (value.v == NA_VALUE)
+                            printf( "value=NA\n");
+                        else
+                            printf( "value=%lld\n", value.v );
+                    }
+                    else if (value.type == DoubleValue) {
                         printf( "value=%lld value2=%lld\n", value.v, value.v2 );
+                    }
                     else if (value.type == StringValue)
                         printf( "value=%s\n", value.s.c_str() );
+                    else if (value.type == ListValue) {
+                        printf( "values=");
+                        for (int i=0;i<value.list.count();i++) {
+                            if (value.v == NA_VALUE)
+                                printf( "NA,");
+                            else
+                                printf( "%lld,", value.list.at(i) );
+                        }
+                        printf( "\n");
+                    }
                 }
             }
             // Most of the record types in the FIT format aren't actually all
@@ -1673,6 +1857,12 @@ struct FitFileReaderState
                 case 128:
                     decodeWeather(def, time_offset, values);
                     break; /* weather broadcast */
+                case 132:
+                    decodeHr(def, time_offset, values); /* HR */
+                    break;
+                case SEGMENT_TYPE: // #142
+                    decodeSegment(def, time_offset, values); /* segment data */
+                    break;
 
                 case 1: /* capabilities, device settings and timezone */ break;
                 case 2: decodeDeviceSettings(def, time_offset, values); break;
@@ -1722,10 +1912,6 @@ struct FitFileReaderState
 
                 case 140: /* unknown */
                 case 141: /* unknown */
-                    break;
-                case SEGMENT_TYPE: // #142
-                    decodeSegment(def, time_offset, values); /* segment data */
-                    break;
                 case 145: /* memo glob */
                 case 147: /* equipment (undocumented) = sensors presets (sensor name, wheel circumference, etc.)  ; see details below: */
                           /* #0: equipment ID / #2: equipment name / #10: default wheel circ. value / #21: user wheel circ. value / #254: local eqt idx */
@@ -1777,61 +1963,28 @@ struct FitFileReaderState
         swimXdata->valuename << "DURATION";
         swimXdata->valuename << "STROKES";
 
-        try {
-
-            // read the header
-            int header_size = read_uint8();
-            if (header_size != 12 && header_size != 14) {
-                errors << QString("bad header size: %1").arg(header_size);
-                file.close();
-                delete rideFile;
-                return NULL;
-            }
-            int protocol_version = read_uint8();
-            (void) protocol_version;
-
-            // if the header size is 14 we have profile minor then profile major
-            // version. We still don't do anything with this information
-            int profile_version = read_uint16(false); // always littleEndian
-            (void) profile_version; // not sure what to do with this
-
-            data_size = read_uint32(false); // always littleEndian
-            char fit_str[5];
-            if (file.read(fit_str, 4) != 4) {
-                errors << "truncated header";
-                file.close();
-                delete rideFile;
-                return NULL;
-            }
-            fit_str[4] = '\0';
-            if (strcmp(fit_str, ".FIT") != 0) {
-                errors << QString("bad header, expected \".FIT\" but got \"%1\"").arg(fit_str);
-                file.close();
-                delete rideFile;
-                return NULL;
-            }
-
-            // read the rest of the header
-            if (header_size == 14) read_uint16(false);
-
-        } catch (TruncatedRead &e) {
-            errors << "truncated file body";
-            return NULL;
-        }
-
-        int bytes_read = 0;
         bool stop = false;
         bool truncated = false;
-        try {
-            while (!stop && (bytes_read < data_size))
-                bytes_read += read_record(stop, errors);
-        }
-        catch (TruncatedRead &e) {
-            errors << "truncated file body";
-            //file.close();
-            //delete rideFile;
-            //return NULL;
-            truncated = true;
+
+        // read the header
+        read_header(stop, errors, data_size);
+
+        if (!stop) {
+
+            int bytes_read = 0;
+
+            try {
+                while (!stop && (bytes_read < data_size)) {
+                    bytes_read += read_record(stop, errors);
+                }
+            }
+            catch (TruncatedRead &e) {
+                errors << "truncated file body";
+                //file.close();
+                //delete rideFile;
+                //return NULL;
+                truncated = true;
+            }
         }
         if (stop) {
             file.close();
@@ -1848,6 +2001,41 @@ struct FitFileReaderState
                     errors << "truncated file body";
                     return NULL;
                 }
+
+                // second file ?
+                try {
+                    int fileNb = 1;
+                    while (file.canReadLine()) {
+                        read_header(stop, errors, data_size);
+                        qDebug() << "FILE" << fileNb++;
+                        if (!stop) {
+
+                            int bytes_read = 0;
+
+                            try {
+                                while (!stop && (bytes_read < data_size)) {
+                                    bytes_read += read_record(stop, errors);
+                                }
+                            }
+                            catch (TruncatedRead &e) {
+                                errors << "truncated second file body";
+                            }
+                        }
+                        if (!truncated) {
+                            try {
+                                int crc = read_uint16( false ); // always littleEndian
+                                (void) crc;
+                            }
+                            catch (TruncatedRead &e) {
+                                errors << "truncated file body";
+                                return NULL;
+                            }
+                        }
+                    }
+                }
+                catch (TruncatedRead &e) {
+                }
+
             }
 
             foreach(int num, unknown_global_msg_nums)
