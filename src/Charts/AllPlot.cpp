@@ -5626,7 +5626,9 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here, QList<UserData
 
             here->timeArray[arrayLength]  = secs + msecs/1000;
 
-            for(int k=0; k<here->U.count(); k++) here->U[k].array[arrayLength] = user[k]->vector[arrayLength];
+            for(int k=0; k<here->U.count() && k<user.count(); k++) {
+                here->U[k].array[arrayLength] = user[k]->vector[arrayLength];
+            }
             if (!here->wattsArray.empty()) here->wattsArray[arrayLength] = max(0, point->watts);
             if (!here->atissArray.empty()) here->atissArray[arrayLength] = max(0, point->atiss);
             if (!here->antissArray.empty()) here->antissArray[arrayLength] = max(0, point->antiss);
