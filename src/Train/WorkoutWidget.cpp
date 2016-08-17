@@ -2110,7 +2110,7 @@ WorkoutWidget::apply(QString code)
                 if (w1 != watts) {
                     index++;
                     new WWPoint(this, secs, w1);
-                    bool addLap = laps_.isEmpty() ? true : (laps_.last().x != secs*1000) && secs != 0;
+                    bool addLap = laps_.isEmpty() ? secs != 0 : (laps_.last().x != secs*1000) && secs != 0;
                     if (insertLapMarkers && addLap)
                     {
                         ErgFileLap lap;
