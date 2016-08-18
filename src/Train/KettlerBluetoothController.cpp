@@ -178,7 +178,14 @@ void KettlerBluetoothController::pushRealtimeData(RealtimeData &) { } // update 
 
 void KettlerBluetoothController::setLoad(double load)
 {
-    //m_kettler->setLoad(load);
+    // this function sets speed in 0.1km/h steps
+    kdri_set_speed(m_connection, (uint16_t)(load * 10.0));
+}
+
+void KettlerBluetoothController::setGradient(double gradient)
+{
+    // this function sets incline in 0.1% steps
+    kdri_set_incline(m_connection, (uint16_t)(gradient * 10.0));
 }
 
 void KettlerBluetoothController::setMode(int mode) {
