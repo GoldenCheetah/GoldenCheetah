@@ -37,7 +37,6 @@
 #include <float.h> // DBL_EPSILON
 
 static int MINTOOLHEIGHT = 350; // minimum size for a full editor
-static int RECOVERY = 70; // anything below 70% of CP is a recovery effort
 
 static double MAXZOOM = 3.0f;
 static double MINZOOM = 0.2f;
@@ -1730,14 +1729,6 @@ WorkoutWidget::qwkcode()
 {
     codeStrings.clear();
 
-    int rnum=-1;
-    int CP=250; // default if none set
-    if (context->athlete->zones(false) != NULL &&
-        (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) != -1) {
-        CP = context->athlete->zones(false)->getCP(rnum); // get actual value
-
-    }
-
     // convert the points to a string that can be edited
     // it is a list of sections separated by commas
     // of the form
@@ -1806,7 +1797,7 @@ WorkoutWidget::qwkcode()
 
                 // its a block
                 section = QString("0@%1-%2").arg(points_[i]->y).arg(points_[i+1]->y);
-                ap = points_[i]->y / CP * 100.0f;
+                ap = points_[i]->y;
 
             } else {
 
@@ -1820,14 +1811,14 @@ WorkoutWidget::qwkcode()
 
             // its a block
             section = QString("%1@%2").arg(qduration(duration)).arg(points_[i]->y);
-            ap = points_[i]->y / CP * 100.0f;
+            ap = points_[i]->y;
 
         } else {
             // its a rise
             section = QString("%1@%2-%3").arg(qduration(duration))
                                          .arg(points_[i]->y)
                                          .arg(points_[i+1]->y);
-            ap = ((points_[i]->y + points_[i+1]->y) / 2) / CP * 100.0f;
+            ap = ((points_[i]->y + points_[i+1]->y) / 2);
         }
 
         if (hasEndLapMarker && hasStartLapMarker) {
@@ -1849,7 +1840,7 @@ WorkoutWidget::qwkcode()
 
         // if we were above recovery and next is below recovery we have
         // an effort followed by some recovery so join together
-        if ((i < aps.count() -1) && aps[i] > RECOVERY && aps[i+1]<aps[i] && aps[i+1] < RECOVERY && !blocks[i+1].startsWith("0@")) {
+        if ((i < aps.count() -1) && aps[i+1]<aps[i] && !blocks[i+1].startsWith("0@")) {
             section.remove("L");
             section += "r" + blocks[i+1];
             i++;
@@ -2110,7 +2101,7 @@ WorkoutWidget::apply(QString code)
                 if (w1 != watts) {
                     index++;
                     new WWPoint(this, secs, w1);
-                    bool addLap = laps_.isEmpty() ? true : (laps_.last().x != secs*1000) && secs != 0;
+                    bool addLap = laps_.isEmpty() ? secs != 0 : (laps_.last().x != secs*1000) && secs != 0;
                     if (insertLapMarkers && addLap)
                     {
                         ErgFileLap lap;
