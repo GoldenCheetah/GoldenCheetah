@@ -1373,7 +1373,6 @@ struct FitFileReaderState
                           }
                           else {
                               for (int i=0;i<value.list.size();i++) {
-                                  qDebug() << value.list.at(i);
                                   hr.append(value.list.at(i));
                               }
                           }
@@ -1402,7 +1401,6 @@ struct FitFileReaderState
                               if (next_event_timestamp12 < last_event_timestamp12)
                                   last_event_timestamp += 0x1000;
 
-                              qDebug() << (last_event_timestamp / 1024.0);
                               timestamps.append(last_event_timestamp/1024.0);
                               j++;
                           }
@@ -2004,10 +2002,8 @@ struct FitFileReaderState
 
                 // second file ?
                 try {
-                    int fileNb = 1;
                     while (file.canReadLine()) {
                         read_header(stop, errors, data_size);
-                        qDebug() << "FILE" << fileNb++;
                         if (!stop) {
 
                             int bytes_read = 0;
