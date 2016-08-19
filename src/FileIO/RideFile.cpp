@@ -1385,8 +1385,6 @@ void RideFile::appendPoint(const RideFilePoint &point)
 
 void
 RideFile::updatePoint(RideFilePoint *point, const RideFilePoint *oldPoint){
-    qDebug() << "updatePoint HR "<<oldPoint->hr << "->" << point->hr;
-
     if (point->cad == 0 && oldPoint->cad != 0)
         point->cad = oldPoint->cad;
     if (point->hr == 0 && oldPoint->hr != 0)
