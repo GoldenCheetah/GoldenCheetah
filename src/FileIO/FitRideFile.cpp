@@ -47,18 +47,6 @@ static int fitFileReaderRegistered =
 
 static const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), Qt::UTC);
 
-struct FitField {
-    int num;
-    int type; // FIT base_type
-    int size; // in bytes
-};
-
-struct FitDefinition {
-    int global_msg_num;
-    bool is_big_endian;
-    std::vector<FitField> fields;
-};
-
 /* FIT has uint32 as largest integer type. So qint64 is large enough to
  * store all integer types - no matter if they're signed or not */
 
@@ -67,16 +55,39 @@ struct FitDefinition {
 typedef qint64 fit_value_t;
 #define NA_VALUE std::numeric_limits<fit_value_t>::max()
 typedef std::string fit_string_value;
+typedef float fit_float_value;
 
-enum fitValueType { SingleValue, DoubleValue, ListValue, StringValue };
+struct FitField {
+    int num;
+    int type; // FIT base_type
+    int size; // in bytes
+    int deve_idx; // Developer Data Index
+};
+
+struct FitDeveField {
+    int dev_id; // Developer Data Index
+    int num;
+    int type; // FIT base_type
+    int size; // in bytes
+    fit_string_value name;
+    fit_string_value unit;
+};
+
+struct FitDefinition {
+    int global_msg_num;
+    bool is_big_endian;
+    std::vector<FitField> fields;
+};
+
+enum fitValueType { SingleValue, ListValue, FloatValue, StringValue };
 typedef enum fitValueType FitValueType;
 
 struct FitValue
 {
     FitValueType type;
     fit_value_t v;
-    fit_value_t v2;
     fit_string_value s;
+    fit_float_value f;
     QList<fit_value_t> list;
     int size;
 };
@@ -92,6 +103,7 @@ struct FitFileReaderState
     double start_timestamp;
     double last_distance;
     QMap<int, FitDefinition> local_msg_types;
+    QMap<int, FitDeveField>  local_deve_fields;
     QSet<int> unknown_record_fields, unknown_global_msg_nums, unknown_base_type;
     int interval;
     int calibration;
@@ -256,8 +268,18 @@ struct FitFileReaderState
         return i == 0x00000000 ? NA_VALUE : i;
     }
 
+    fit_float_value read_float32(int *count = NULL) {
+        float f;
+        if (file.read(reinterpret_cast<char*>(&f), 4) != 4)
+            throw TruncatedRead();
+        if (count)
+            (*count) += 4;
+
+        return f;
+    }
+
     void DumpFitValue(const FitValue& v) {
-        printf("type: %d %llx %llx %s\n", v.type, v.v, v.v2, v.s.c_str());
+        printf("type: %d %llx %s\n", v.type, v.v, v.s.c_str());
     }
 
     void convert2Run() {
@@ -854,7 +876,7 @@ struct FitFileReaderState
         int i = 0;
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i].v;
-            fit_value_t value2 = values[i++].v2;
+            QList<fit_value_t> valueList = values[i++].list;
 
             if( value == NA_VALUE )
                 continue;
@@ -962,25 +984,25 @@ struct FitFileReaderState
                         rightPedalCenterOffset = value;
                         break;
                 case 69: // ? Left Power Phase ?
-                        leftTopDeathCenter = round(value * 360.0/256);
-                        leftBottomDeathCenter = round(value2 * 360.0/256);
+                        leftTopDeathCenter = round(valueList.at(0) * 360.0/256);
+                        leftBottomDeathCenter = round(valueList.at(1) * 360.0/256);
                         break;
                 case 70: // ? Left Peak Phase  ?
-                        leftTopPeakPowerPhase = round(value * 360.0/256);
-                        leftBottomPeakPowerPhase = round(value2 * 360.0/256);
+                        leftTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
+                        leftBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
                         break;
                 case 71: // ? Right Power Phase ?
-                        rightTopDeathCenter = round(value * 360.0/256);
-                        rightBottomDeathCenter = round(value2 * 360.0/256);
+                        rightTopDeathCenter = round(valueList.at(0) * 360.0/256);
+                        rightBottomDeathCenter = round(valueList.at(1) * 360.0/256);
                         break;
                 case 72: // ? Right Peak Phase  ?
-                        rightTopPeakPowerPhase = round(value * 360.0/256);
-                        rightBottomPeakPowerPhase = round(value2 * 360.0/256);
+                        rightTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
+                        rightBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
                         break;
 
 
                 default:
-                         unknown_record_fields.insert(field.num);
+                        unknown_record_fields.insert(field.num);
             }
         }
 
@@ -1615,6 +1637,48 @@ struct FitFileReaderState
 
     }
 
+    void decodeDeveloperFieldDescription(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
+        Q_UNUSED(time_offset);
+        int i = 0;
+
+        FitDeveField fieldDef;
+
+        foreach(const FitField &field, def.fields) {
+            FitValue value = values[i++];
+
+            switch (field.num) {
+                case 0:  // developer_data_index
+                        fieldDef.dev_id = value.v;
+                        break;
+                case 1:  // field_definition_number
+                        fieldDef.num = value.v;
+                        break;
+                case 2:  // fit_base_type_id
+                        fieldDef.type = value.v;
+                        break;
+                case 3:  // field_name
+                        fieldDef.name = value.s;
+                    break;
+                case 4:  // array
+                    break;
+                case 5:  // components
+                    break;
+                case 6:  // scale
+                    break;
+                case 7:  // offset
+                    break;
+                case 8:  // units
+                    fieldDef.unit = value.s;
+                    break;
+                default: ; // ignore it
+            }
+        }
+
+        //qDebug() << "num" << fieldDef.num << "deve_idx" << fieldDef.dev_id << "name" << fieldDef.name.c_str() << "unit" << fieldDef.unit.c_str();
+        local_deve_fields.insert(fieldDef.num, fieldDef);
+    }
+
     void read_header(bool &stop, QStringList &errors, int &data_size) {
         stop = false;
         try {
@@ -1630,7 +1694,8 @@ struct FitFileReaderState
             // if the header size is 14 we have profile minor then profile major
             // version. We still don't do anything with this information
             int profile_version = read_uint16(false); // always littleEndian
-            (void) profile_version; // not sure what to do with this
+            (void) profile_version;
+            //qDebug() << "profile_version" << profile_version/100.0; // not sure what to do with this
 
             data_size = read_uint32(false); // always littleEndian
             char fit_str[5];
@@ -1659,6 +1724,7 @@ struct FitFileReaderState
         if (!(header_byte & 0x80) && (header_byte & 0x40)) {
             // Definition record
             int local_msg_type = header_byte & 0xf;
+            bool with_deve_data = (header_byte & 0x20) == 0x20 ;
 
             local_msg_types.insert(local_msg_type, FitDefinition());
             FitDefinition &def = local_msg_types[local_msg_type];
@@ -1685,9 +1751,32 @@ struct FitFileReaderState
                 int base_type = read_uint8(&count);
                 field.type = base_type & 0x1f;
 
-                if (FIT_DEBUG)  {
+                if (FIT_DEBUG) {
                     printf("  field %d: %d bytes, num %d, type %d, size %d\n",
                            i, field.size, field.num, field.type, field.size );
+                }
+            }
+
+            if (with_deve_data) {
+
+                int num_fields = read_uint8(&count);
+
+                for (int i = 0; i < num_fields; ++i) {
+                    def.fields.push_back(FitField());
+                    FitField &field = def.fields.back();
+
+                    field.num = read_uint8(&count);
+                    field.size = read_uint8(&count);
+                    field.deve_idx = read_uint8(&count);
+                    FitDeveField devField = local_deve_fields[field.num];
+                    field.type = devField.type & 0x1f;
+
+                    //qDebug() << "field" << field.num << "type" << field.type << "size" << field.size << "deve idx" << field.deve_idx;
+
+                    if (FIT_DEBUG) {
+                        printf("  field %d: %d bytes, num %d, type %d, size %d\n",
+                               i, field.size, field.num, field.type, field.size );
+                    }
                 }
             }
         }
@@ -1722,13 +1811,23 @@ struct FitFileReaderState
                 int size;
 
                 switch (field.type) {
-                    case 0: value.type = SingleValue; value.v = read_uint8(&count); size = 1; break;
+                    case 0: size = 1;
+                            if (field.size==size) {
+                                value.type = SingleValue; value.v = read_uint8(&count); size = 1;
+                             } else { // Multi-values
+                                value.type = ListValue;
+                                value.list.clear();
+                                for (int i=0;i<field.size/size;i++) {
+                                    value.list.append(read_uint8(&count));
+                                }
+                                size = field.size;
+                            }
+                            break;
                     case 1: value.type = SingleValue; value.v = read_int8(&count); size = 1;  break;
                     case 2: size = 1;
-
                             if (field.size==size) {
                                 value.type = SingleValue; value.v = read_uint8(&count);
-                            } else { // Multi-values ?
+                            } else { // Multi-values
                                 value.type = ListValue;
                                 value.list.clear();
                                 for (int i=0;i<field.size/size;i++) {
@@ -1738,19 +1837,23 @@ struct FitFileReaderState
                             }
                             break;
                     case 3: value.type = SingleValue; value.v = read_int16(def.is_big_endian, &count); size = 2;  break;
-                    case 4: value.type = SingleValue; value.v = read_uint16(def.is_big_endian, &count); size = 2;
-                            // Multi-values ?
-                            if (field.size>size) {
-                                value.type = DoubleValue;
-                                value.v2 = read_uint16(def.is_big_endian, &count);
-                                size = 4;
+                    case 4: size = 2;
+                            if (field.size==size) {
+                                value.type = SingleValue; value.v = read_uint16(def.is_big_endian, &count);
+                            } else { // Multi-values
+                                value.type = ListValue;
+                                value.list.clear();
+                                for (int i=0;i<field.size/size;i++) {
+                                    value.list.append(read_uint16(def.is_big_endian, &count));
+                                }
+                                size = field.size;
                             }
                             break;
                     case 5: value.type = SingleValue; value.v = read_int32(def.is_big_endian, &count); size = 4;  break;
                     case 6: size = 4;
                             if (field.size==size) {
                                 value.type = SingleValue; value.v = read_uint32(def.is_big_endian, &count);
-                            } else { // Multi-values ?
+                            } else { // Multi-values
                                 value.type = ListValue;
                                 value.list.clear();
                                 for (int i=0;i<field.size/size;i++) {
@@ -1765,9 +1868,27 @@ struct FitFileReaderState
                         size = field.size;
                         break;
 
-                    //case 8: // FLOAT32
+                    case 8: // FLOAT32
+                        size = 4;
+                        value.type = FloatValue;
+                        value.f = read_float32(&count);
+                        size = field.size;
+                        break;
+
                     //case 9: // FLOAT64
-                    case 10: value.type = SingleValue; value.v = read_uint8z(&count); size = 1; break;
+
+                    case 10: size = 1;
+                             if (field.size==size) {
+                                value.type = SingleValue; value.v = read_uint8z(&count); size = 1;
+                             } else { // Multi-values
+                                 value.type = ListValue;
+                                 value.list.clear();
+                                 for (int i=0;i<field.size/size;i++) {
+                                     value.list.append(read_uint8z(&count));
+                                 }
+                                 size = field.size;
+                             }
+                             break;
                     case 11: value.type = SingleValue; value.v = read_uint16z(def.is_big_endian, &count); size = 2; break;
                     case 12: value.type = SingleValue; value.v = read_uint32z(def.is_big_endian, &count); size = 4; break;
                     case 13: // BYTE
@@ -1793,9 +1914,9 @@ struct FitFileReaderState
                         unknown_base_type.insert(field.type);
                         size = field.size;
                 }
-                // Quick fix : we need to support multivalues
+                // Size is greater than expected
                 if (size < field.size) {
-                    qDebug() << "warning : size="<<field.size <<"for type="<<field.type;
+                    qDebug() << "warning : size="<<field.size << "for field" << field.num << "type="<<field.type;
                     if (FIT_DEBUG)  {
                          printf( "   warning : size=%d for type=%d (num=%d)\n",
                                  field.size, field.type, field.num);
@@ -1813,9 +1934,6 @@ struct FitFileReaderState
                             printf( "value=NA\n");
                         else
                             printf( "value=%lld\n", value.v );
-                    }
-                    else if (value.type == DoubleValue) {
-                        printf( "value=%lld value2=%lld\n", value.v, value.v2 );
                     }
                     else if (value.type == StringValue)
                         printf( "value=%s\n", value.s.c_str() );
@@ -1861,6 +1979,11 @@ struct FitFileReaderState
                 case SEGMENT_TYPE: // #142
                     decodeSegment(def, time_offset, values); /* segment data */
                     break;
+
+                case 206: // Developer Field Description
+                    decodeDeveloperFieldDescription(def, time_offset, values);
+                    break;
+
 
                 case 1: /* capabilities, device settings and timezone */ break;
                 case 2: decodeDeviceSettings(def, time_offset, values); break;
@@ -1921,8 +2044,8 @@ struct FitFileReaderState
                            / #3: ID of source garmin connect activity (uint32) ? OR ? timestamp ? / #4: time to finish (ms) / #254: message counter idx */
                 case 150: /* segment trackpoint (undocumented) ; see details below: */
                           /* #1: latitude / #2: longitude / #3: distance from start point / #4: elevation / #5: timer since start (ms) / #6: message counter index */
+                case 207: /* Developer ID */
                     break;
-
                 default:
                     unknown_global_msg_nums.insert(def.global_msg_num);
             }
