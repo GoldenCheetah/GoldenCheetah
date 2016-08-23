@@ -1049,7 +1049,6 @@ struct FitFileReaderState
         // if there are data points && a time difference > 1sec && smartRecording processing is requested at all
         if ((!rideFile->dataPoints().empty()) && (last_time != 0) &&
              (time > last_time + 1) && (isGarminSmartRecording.toInt() != 0)) {
-            qDebug() << "interpolate";
             // Handle smart recording if configured in preferences.  Linearly interpolate missing points.
             RideFilePoint *prevPoint = rideFile->dataPoints().back();
             double deltaSecs = (secs - prevPoint->secs);
@@ -1916,7 +1915,6 @@ struct FitFileReaderState
                 }
                 // Size is greater than expected
                 if (size < field.size) {
-                    qDebug() << "warning : size="<<field.size << "for field" << field.num << "type="<<field.type;
                     if (FIT_DEBUG)  {
                          printf( "   warning : size=%d for type=%d (num=%d)\n",
                                  field.size, field.type, field.num);
