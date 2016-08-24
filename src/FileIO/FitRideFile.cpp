@@ -120,6 +120,7 @@ struct FitFileReaderState
     QVariant GarminHWM;
     XDataSeries *weatherXdata;
     XDataSeries *swimXdata;
+    XDataSeries *deveXdata;
     QList<QString> deviceInfos;
 
     FitFileReaderState(QFile &file, QStringList &errors) :
@@ -872,14 +873,28 @@ struct FitFileReaderState
         double smO2 = 0, tHb = 0;
         //bool run=false;
 
+        XDataPoint *p = NULL;
         fit_value_t lati = NA_VALUE, lngi = NA_VALUE;
         int i = 0;
         foreach(const FitField &field, def.fields) {
+            FitValue _values = values[i];
             fit_value_t value = values[i].v;
             QList<fit_value_t> valueList = values[i++].list;
 
             if( value == NA_VALUE )
                 continue;
+
+            if (field.deve_idx>-1) {
+                qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
+                qDebug() << "name" << local_deve_fields[field.num].name.c_str() << "unit" << local_deve_fields[field.num].unit.c_str() << _values.f;
+
+                FitDeveField deveField = local_deve_fields[field.num];
+                if (p == NULL)
+                   p = new XDataPoint();
+                int idx = deveXdata->valuename.indexOf(deveField.name.c_str());
+                if (idx>-1)
+                    p->number[idx]=_values.f;
+            }
 
             switch (field.num) {
                 case 253: // TIMESTAMP
@@ -1147,6 +1162,11 @@ struct FitFileReaderState
                      smO2, tHb, rvert, rcad, rcontact, 0.0, interval, false);
         last_time = time;
         last_distance = km;
+
+        if (p != NULL) {
+            p->secs = secs;
+            deveXdata->datapoints.append(p);
+        }
     }
 
     void decodeLength(const FitDefinition &def, int time_offset,
@@ -1675,7 +1695,11 @@ struct FitFileReaderState
         }
 
         //qDebug() << "num" << fieldDef.num << "deve_idx" << fieldDef.dev_id << "name" << fieldDef.name.c_str() << "unit" << fieldDef.unit.c_str();
+        if (!local_deve_fields.contains(fieldDef.num)) {
+            deveXdata->valuename << fieldDef.name.c_str();
+        }
         local_deve_fields.insert(fieldDef.num, fieldDef);
+
     }
 
     void read_header(bool &stop, QStringList &errors, int &data_size) {
@@ -1749,6 +1773,7 @@ struct FitFileReaderState
                 field.size = read_uint8(&count);
                 int base_type = read_uint8(&count);
                 field.type = base_type & 0x1f;
+                field.deve_idx = -1;
 
                 if (FIT_DEBUG) {
                     printf("  field %d: %d bytes, num %d, type %d, size %d\n",
@@ -1872,6 +1897,7 @@ struct FitFileReaderState
                         value.type = FloatValue;
                         value.f = read_float32(&count);
                         size = field.size;
+
                         break;
 
                     //case 9: // FLOAT64
@@ -2082,6 +2108,9 @@ struct FitFileReaderState
         swimXdata->valuename << "DURATION";
         swimXdata->valuename << "STROKES";
 
+        deveXdata = new XDataSeries();
+        deveXdata->name = "DEVELOPER";
+
         bool stop = false;
         bool truncated = false;
 
@@ -2179,6 +2208,11 @@ struct FitFileReaderState
                 rideFile->addXData("SWIM", swimXdata);
             else
                 delete swimXdata;
+
+            if (deveXdata->datapoints.count()>0)
+                rideFile->addXData("DEVELOPER", deveXdata);
+            else
+                delete deveXdata;
 
             return rideFile;
         }
