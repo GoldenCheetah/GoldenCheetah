@@ -5668,7 +5668,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here, QList<UserData
             if (!here->slopeArray.empty()) here->slopeArray[arrayLength] = point->slope;
 
             if (!here->tempArray.empty())
-                here->tempArray[arrayLength]   = point->temp;
+                here->tempArray[arrayLength]   = context->athlete->useMetricUnits ? point->temp
+                                                 : point->temp * FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE;
 
             if (!here->windArray.empty())
                 here->windArray[arrayLength] = max(0,
