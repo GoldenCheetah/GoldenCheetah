@@ -118,6 +118,8 @@ void JsonRideFilefree (void * ptr , yyscan_t /*scanner*/)
 \"CALIBRATIONS\"    return CALIBRATIONS;
 \"VALUE\"           return VALUE;
 \"VALUES\"          return VALUES;
+\"UNIT\"            return UNIT;
+\"UNITS\"           return UNITS;
 \"XDATA\"           return XDATA;
 \"REFERENCES\"      return REFERENCES;
 \"SAMPLES\"         return SAMPLES;
