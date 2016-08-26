@@ -232,12 +232,12 @@ XDataDialog::addXDataSeriesClicked()
     const XDataSeries *series = item->ride()->xdata(xdata);
     if (series == NULL) return;
 
-    QString name;
-    XDataSeriesSettingsDialog *dialog = new  XDataSeriesSettingsDialog(this, name);
+    QString name, unit;
+    XDataSeriesSettingsDialog *dialog = new  XDataSeriesSettingsDialog(this, name, unit);
     int ret = dialog->exec();
 
     if (ret == QDialog::Accepted) {
-        item->ride()->command->addXDataSeries(xdata, name);
+        item->ride()->command->addXDataSeries(xdata, name, unit);
     }
 }
 
@@ -251,23 +251,27 @@ XDataSettingsDialog::XDataSettingsDialog(QWidget *parent, XDataSeries &series) :
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    QFormLayout *form = new QFormLayout();
-    mainLayout->addLayout(form);
+    QGridLayout *grid = new QGridLayout();
+    mainLayout->addLayout(grid);
 
 
     QLabel *xdataLabel = new QLabel(tr("xData"), this);
     xdataName = new QLineEdit(this);
 
-    form->addRow(xdataLabel, xdataName);
-    form->addRow(new QLabel("",this), new QLabel("", this));
+    grid->addWidget(xdataLabel, 0, 0);
+    grid->addWidget(xdataName, 0, 1);
+    grid->addWidget(new QLabel("",this), 1, 0);
 
-    form->addRow(new QLabel(tr("Data Series"),this));
+    grid->addWidget(new QLabel(tr("Data Series"), this), 2, 0);
+    grid->addWidget(new QLabel(tr("Units"), this), 2, 1);
     for (int i=0; i<8; i++) {
         xdataSeriesName[i] = new QLineEdit(this);
-        form->addRow(new QLabel(QString(tr("Series %1")).arg(i+1)), xdataSeriesName[i]);
+        xdataUnitName[i] = new QLineEdit(this);
+        grid->addWidget(new QLabel(QString(tr("Series %1")).arg(i+1)), 3+i, 0);
+        grid->addWidget(xdataSeriesName[i], 3+i, 1);
+        grid->addWidget(xdataUnitName[i], 3+i, 2);
     }
-
-    form->addRow(new QLabel("",this), new QLabel("", this));
+    grid->addWidget(new QLabel("",this), 11, 0);
     mainLayout->addStretch();
 
     cancelButton = new QPushButton(tr("Cancel"), this);
@@ -296,6 +300,7 @@ void XDataSettingsDialog::okClicked()
     for(int i=0; i<8; i++) {
         if (xdataSeriesName[i]->text() != "")
             series.valuename << xdataSeriesName[i]->text();
+            series.unitname << xdataUnitName[i]->text();
     }
 
     if (series.valuename.count() >0) accept();
@@ -309,7 +314,7 @@ void XDataSettingsDialog::okClicked()
 ///
 /// XDataSeriesSettingsDialog
 ///
-XDataSeriesSettingsDialog::XDataSeriesSettingsDialog(QWidget *parent, QString &name) : QDialog(parent), name(name)
+XDataSeriesSettingsDialog::XDataSeriesSettingsDialog(QWidget *parent, QString &name, QString &unit) : QDialog(parent), name(name), unit(unit)
 {
     setWindowTitle("XData Series Name");
     setAttribute(Qt::WA_DeleteOnClose);
@@ -323,8 +328,13 @@ XDataSeriesSettingsDialog::XDataSeriesSettingsDialog(QWidget *parent, QString &n
     QLabel *nameLabel = new QLabel(tr("Name"), this);
     nameEdit = new QLineEdit(this);
     nameEdit->setText(name);
-
     form->addRow(nameLabel, nameEdit);
+
+    QLabel *unitLabel = new QLabel(tr("Units"), this);
+    unitEdit = new QLineEdit(this);
+    unitEdit->setText(unit);
+    form->addRow(unitLabel, unitEdit);
+
     form->addRow(new QLabel("",this), new QLabel("", this));
     mainLayout->addStretch();
 
@@ -348,6 +358,7 @@ void XDataSeriesSettingsDialog::okClicked()
         return;
     } else {
         name = nameEdit->text();
+        unit = unitEdit->text();
     }
 
     accept();

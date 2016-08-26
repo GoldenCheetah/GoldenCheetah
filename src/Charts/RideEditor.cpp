@@ -3275,8 +3275,8 @@ XDataEditor::isColumnSelected()
 void
 XDataEditor::insCol()
 {
-    QString name;
-    XDataSeriesSettingsDialog *dialog = new  XDataSeriesSettingsDialog(this, name);
+    QString name, unit;
+    XDataSeriesSettingsDialog *dialog = new  XDataSeriesSettingsDialog(this, name, unit);
     int ret = dialog->exec();
 
     if (ret == QDialog::Accepted && name != "") {

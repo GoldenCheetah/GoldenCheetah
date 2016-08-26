@@ -59,7 +59,7 @@ class RideFileCommand : public QObject
         void removeXData(QString name);
         void addXData(XDataSeries *series);
         void removeXDataSeries(QString xdata, QString name);
-        void addXDataSeries(QString xdata, QString name);
+        void addXDataSeries(QString xdata, QString name, QString unit);
         void setXDataPointValue(QString xdata, int row, int column, double value);
         void deleteXDataPoints(QString xdata, int index, int count);
         void insertXDataPoint(QString xdata, int index, XDataPoint *point);
@@ -186,12 +186,12 @@ class AddXDataSeriesCommand : public RideCommand
     Q_DECLARE_TR_FUNCTIONS(AddXDataSeriesCommand)
 
     public:
-        AddXDataSeriesCommand(RideFile *ride, QString xdata, QString name);
+        AddXDataSeriesCommand(RideFile *ride, QString xdata, QString name, QString unit);
         bool doCommand();
         bool undoCommand();
 
         // state
-        QString xdata, name;
+        QString xdata, name, unit;
 };
 
 class SetPointValueCommand : public RideCommand

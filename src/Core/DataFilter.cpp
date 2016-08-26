@@ -112,6 +112,8 @@ static struct {
     { "postprocess", 2 }, // postprocess(processor, filter) to run processor
 
     // add new ones above this line
+    { "XDATA_UNITS", 2 }, // e.g. xdata("WEATHER", "HUMIDITY") returns "Relative Humidity"
+
     { "", -1 }
 };
 
@@ -148,6 +150,8 @@ DataFilter::builtins()
             returning <<"set(field, value, expr)";
         } else if (i == 37) {
             returning << "XDATA(\"xdata\", \"series\", sparse|repeat|interpolate|resample)";
+        } else if (i == 41) {
+            returning << "XDATA_UNITS(\"xdata\", \"series\")";
         } else {
             function = DataFilterFunctions[i].name + "(";
             for(int j=0; j<DataFilterFunctions[i].parameters; j++) {
@@ -1185,6 +1189,25 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                                 }
                             }
                         }
+                    }
+
+                } else if (leaf->function == "XDATA_UNITS") {
+
+                    leaf->dynamic = false;
+
+                    if (leaf->fparms.count() != 2) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("XDATA_UNITS needs 2 parameters."));
+                    } else {
+
+                        // are the first two strings ?
+                        Leaf *first=leaf->fparms[0];
+                        Leaf *second=leaf->fparms[1];
+                        if (first->type != Leaf::String || second->type != Leaf::String) {
+                            DataFiltererrors << QString(tr("XDATA_UNITS expects a string for first two parameters"));
+                            leaf->inerror = true;
+                        }
+
                     }
 
                 } else if (leaf->function == "isset" || leaf->function == "set" || leaf->function == "unset") {
@@ -2412,6 +2435,28 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 }
                 break;
 
+        case 41 :
+                {   // XDATA_UNITS ("XDATA", "XDATASERIES")
+
+                    if (p) { // only valid when iterating
+                        // processing ride item (e.g. filter, formula)
+                        // we return true or false if the xdata series exists for the ride in question
+                        QString xdata = *(leaf->fparms[0]->lvalue.s);
+                        QString series = *(leaf->fparms[1]->lvalue.s);
+                        XDataSeries *xs = m->ride()->xdata(xdata);
+
+                        if (xs && m->xdata().value(xdata,QStringList()).contains(series)) {
+                            int idx = m->xdata().value(xdata,QStringList()).indexOf(series);
+                            QString units;
+                            int count = m->ride()->xdata(xdata)->unitname.count();
+                            if (idx >= 0 && idx < xs->unitname.count())
+                                units = xs->unitname[idx];
+                            return Result(units);
+                        }
+
+                    } else return Result(""); // not for filtering
+                }
+                break;
         default:
             return Result(0);
         }

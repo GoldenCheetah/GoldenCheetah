@@ -137,9 +137,9 @@ RideFileCommand::addXData(XDataSeries *series)
 }
 
 void
-RideFileCommand::addXDataSeries(QString xdata, QString name)
+RideFileCommand::addXDataSeries(QString xdata, QString name, QString unit)
 {
-    AddXDataSeriesCommand *cmd = new AddXDataSeriesCommand(ride, xdata, name);
+    AddXDataSeriesCommand *cmd = new AddXDataSeriesCommand(ride, xdata, name, unit);
     doCommand(cmd);
 }
 
@@ -584,7 +584,7 @@ RemoveXDataSeriesCommand::undoCommand()
 }
 
 
-AddXDataSeriesCommand::AddXDataSeriesCommand(RideFile *ride, QString xdata, QString name) : RideCommand(ride), xdata(xdata), name(name) {
+AddXDataSeriesCommand::AddXDataSeriesCommand(RideFile *ride, QString xdata, QString name, QString unit) : RideCommand(ride), xdata(xdata), name(name), unit(unit) {
     type = RideCommand::AddXDataSeries;
     description = tr("Add XData Series");
 }
@@ -597,6 +597,7 @@ AddXDataSeriesCommand::doCommand()
     if (series == NULL)  return false;
 
     series->valuename.append(name);
+    series->unitname.append(unit);
 
     int index = series->valuename.indexOf(name);
     if (index == -1) return false;
