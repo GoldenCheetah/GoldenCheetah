@@ -890,12 +890,23 @@ struct FitFileReaderState
                     qDebug() << "name" << local_deve_fields[field.num].name.c_str() << "unit" << local_deve_fields[field.num].unit.c_str() << _values.f;
                 }
 
-                FitDeveField deveField = local_deve_fields[field.num];
-                if (p == NULL)
+                if (p == NULL &&
+                        (_values.type == SingleValue ||
+                         _values.type == FloatValue ||
+                         _values.type == StringValue))
                    p = new XDataPoint();
-                int idx = deveXdata->valuename.indexOf(deveField.name.c_str());
-                if (idx>-1)
-                    p->number[idx]=_values.f;
+
+                //FitDeveField deveField = local_deve_fields[field.num];
+                //int idx = deveXdata->valuename.indexOf(deveField.name.c_str());
+
+                switch (_values.type) {
+                    case SingleValue: p->number[field.num]=_values.v; break;
+                    case FloatValue: p->number[field.num]=_values.f; break;
+                    case StringValue: p->string[field.num]=_values.s.c_str(); break;
+                    default: break;
+                }
+
+
             }
 
             switch (field.num) {
@@ -1698,11 +1709,25 @@ struct FitFileReaderState
 
         //qDebug() << "num" << fieldDef.num << "deve_idx" << fieldDef.dev_id << "name" << fieldDef.name.c_str() << "unit" << fieldDef.unit.c_str();
         if (!local_deve_fields.contains(fieldDef.num)) {
-            deveXdata->valuename << fieldDef.name.c_str();
-            deveXdata->unitname << fieldDef.unit.c_str();
+            if (deveXdata->valuename.count()<=fieldDef.num) {
+                while (deveXdata->valuename.count()<fieldDef.num)
+                    deveXdata->valuename << "";
+                QString name = fieldDef.name.c_str();
+                if (deveXdata->valuename.count(name)>0)
+                    name.append(deveXdata->valuename.count(name));
+                deveXdata->valuename << fieldDef.name.c_str();
+            } else {
+                deveXdata->valuename.replace(fieldDef.num,fieldDef.name.c_str());
+            }
+            if (deveXdata->unitname.count()<=fieldDef.num) {
+                while (deveXdata->unitname.count()<fieldDef.num)
+                    deveXdata->unitname << "";
+                deveXdata->unitname << fieldDef.unit.c_str();
+            } else {
+                deveXdata->unitname.replace(fieldDef.num,fieldDef.unit.c_str());
+            }
         }
         local_deve_fields.insert(fieldDef.num, fieldDef);
-
     }
 
     void read_header(bool &stop, QStringList &errors, int &data_size) {
