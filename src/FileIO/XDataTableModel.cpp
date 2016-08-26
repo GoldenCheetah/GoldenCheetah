@@ -185,7 +185,7 @@ XDataTableModel::removeRows(int row, int count, const QModelIndex &)
 bool
 XDataTableModel::insertColumn(QString name)
 {
-    ride->command->addXDataSeries(xdata, name);
+    ride->command->addXDataSeries(xdata, name, "");
     return true;
 }
 

@@ -79,6 +79,7 @@ class XDataSettingsDialog : public QDialog
 
         QLineEdit *xdataName;
         QLineEdit *xdataSeriesName[8];
+        QLineEdit *xdataUnitName[8];
 
         QPushButton *cancelButton, *okButton;
 
@@ -89,14 +90,15 @@ class XDataSeriesSettingsDialog : public QDialog
     Q_OBJECT
 
     public:
-        XDataSeriesSettingsDialog(QWidget *parent, QString &name);
+        XDataSeriesSettingsDialog(QWidget *parent, QString &name, QString &unit);
 
     private slots:
         void okClicked();
 
     private:
-        QString &name;
+        QString &name, &unit;
         QLineEdit *nameEdit;
+        QLineEdit *unitEdit;
 
         QPushButton *cancelButton, *okButton;
 };
