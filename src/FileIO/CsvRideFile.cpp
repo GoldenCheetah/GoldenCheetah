@@ -370,6 +370,13 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                         << "STROKENUMINTERVAL"
                                         << "AVGPOWER";
 
+                    // and the associated units
+                    rowSeries->unitname << "" << "" << "" << "" << "watts"
+                                        << "watts" << "spm" << "" << "meters" << "meters"
+                                        << "meters" << "" << "joules" << "joules" << "bpm"
+                                        << "joules" << "newtons" << "" << "" << "secs"
+                                        << "secs" << "" << "" << "" << "watts";
+
                     rideFile->addXData("ROW", rowSeries);
 
 

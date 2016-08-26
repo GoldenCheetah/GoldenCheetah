@@ -563,6 +563,7 @@ public:
     XDataSeries(XDataSeries &other) {
         name = other.name;
         valuename = other.valuename;
+        unitname = other.unitname;
         valuetype = other.valuetype;
         datapoints = other.datapoints;
     }
@@ -573,6 +574,7 @@ public:
 
     QString name;
     QStringList valuename;
+    QStringList unitname;
     QList<RideFile::SeriesType> valuetype;
     QVector<XDataPoint*> datapoints;
 };

@@ -114,7 +114,7 @@ static QString protect(const QString string)
 %token RIDE STARTTIME RECINTSECS DEVICETYPE IDENTIFIER
 %token OVERRIDES
 %token TAGS INTERVALS NAME START STOP
-%token CALIBRATIONS VALUE VALUES
+%token CALIBRATIONS VALUE VALUES UNIT UNITS
 %token REFERENCES
 %token XDATA
 %token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP
@@ -253,6 +253,7 @@ xdata_series: '{' xdata_items '}'              { XDataSeries *add = new XDataSer
                                                  add->name=jc->xdataseries.name;
                                                  add->datapoints=jc->xdataseries.datapoints;
                                                  add->valuename=jc->xdataseries.valuename;
+                                                 add->unitname=jc->xdataseries.unitname;
                                                  jc->JsonRide->addXData(add->name, add);
 
                                                  // clear for next one
@@ -266,7 +267,10 @@ xdata_items: xdata_item
 
 xdata_item: NAME ':' string                     { jc->xdataseries.name = $3; }
           | VALUE ':' string                    { jc->xdataseries.valuename << $3; }
+          | UNIT ':' string                     { jc->xdataseries.unitname << $3; }
           | VALUES ':' '[' string_list ']'      { jc->xdataseries.valuename = jc->stringlist;
+                                                  jc->stringlist.clear(); }
+          | UNITS ':' '[' string_list ']'       { jc->xdataseries.unitname = jc->stringlist;
                                                   jc->stringlist.clear(); }
           | SAMPLES ':' '[' xdata_samples ']'
           ;
@@ -696,6 +700,20 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
                 out << " ]";
             } else {
                 out << "\t\t\t\"VALUE\" : \"" << series->valuename[0] << "\"";
+            }
+
+            // unit names
+            if (series->unitname.count() > 1) {
+                out << ",\n\t\t\t\"UNITS\" : [ ";
+                bool firstv=true;
+                foreach(QString x, series->unitname) {
+                    if (!firstv) out << ", ";
+                    out << "\"" << x << "\"";
+                    firstv=false;
+                }
+                out << " ]";
+            } else {
+                if (series->unitname.count() > 0) out << ",\n\t\t\t\"UNIT\" : \"" << series->unitname[0] << "\"";
             }
 
             // samples

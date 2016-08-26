@@ -885,8 +885,10 @@ struct FitFileReaderState
                 continue;
 
             if (field.deve_idx>-1) {
-                qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
-                qDebug() << "name" << local_deve_fields[field.num].name.c_str() << "unit" << local_deve_fields[field.num].unit.c_str() << _values.f;
+                if (FIT_DEBUG) {
+                    qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
+                    qDebug() << "name" << local_deve_fields[field.num].name.c_str() << "unit" << local_deve_fields[field.num].unit.c_str() << _values.f;
+                }
 
                 FitDeveField deveField = local_deve_fields[field.num];
                 if (p == NULL)
@@ -1697,6 +1699,7 @@ struct FitFileReaderState
         //qDebug() << "num" << fieldDef.num << "deve_idx" << fieldDef.dev_id << "name" << fieldDef.name.c_str() << "unit" << fieldDef.unit.c_str();
         if (!local_deve_fields.contains(fieldDef.num)) {
             deveXdata->valuename << fieldDef.name.c_str();
+            deveXdata->unitname << fieldDef.unit.c_str();
         }
         local_deve_fields.insert(fieldDef.num, fieldDef);
 
@@ -2098,15 +2101,22 @@ struct FitFileReaderState
         weatherXdata = new XDataSeries();
         weatherXdata->name = "WEATHER";
         weatherXdata->valuename << "WINDSPEED";
+        weatherXdata->unitname << "kph";
         weatherXdata->valuename << "WINDHEADING";
+        weatherXdata->unitname << "";
         weatherXdata->valuename << "TEMPERATURE";
+        weatherXdata->unitname << "C";
         weatherXdata->valuename << "HUMIDITY";
+        weatherXdata->unitname << "relative humidity";
 
         swimXdata = new XDataSeries();
         swimXdata->name = "SWIM";
         swimXdata->valuename << "TYPE";
+        swimXdata->unitname << "stroketype";
         swimXdata->valuename << "DURATION";
+        swimXdata->unitname << "secs";
         swimXdata->valuename << "STROKES";
+        swimXdata->unitname << "";
 
         deveXdata = new XDataSeries();
         deveXdata->name = "DEVELOPER";
