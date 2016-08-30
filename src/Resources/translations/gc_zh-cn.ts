@@ -1299,8 +1299,8 @@ Press Next to Continue
         <location filename="../../Charts/AllPlot.cpp" line="3753"/>
         <location filename="../../Charts/AllPlot.cpp" line="4432"/>
         <location filename="../../Charts/AllPlot.cpp" line="4439"/>
-        <location filename="../../Charts/AllPlot.cpp" line="6889"/>
-        <location filename="../../Charts/AllPlot.cpp" line="6894"/>
+        <location filename="../../Charts/AllPlot.cpp" line="6892"/>
+        <location filename="../../Charts/AllPlot.cpp" line="6897"/>
         <source>Speed</source>
         <translation>速度</translation>
     </message>
@@ -1637,30 +1637,30 @@ Press Next to Continue
         <translation>右平衡</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="6891"/>
+        <location filename="../../Charts/AllPlot.cpp" line="6894"/>
         <source>min/km</source>
         <translation>min/km</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="6891"/>
+        <location filename="../../Charts/AllPlot.cpp" line="6894"/>
         <source>min/mile</source>
         <translation>min/mi</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="6892"/>
-        <location filename="../../Charts/AllPlot.cpp" line="6897"/>
+        <location filename="../../Charts/AllPlot.cpp" line="6895"/>
+        <location filename="../../Charts/AllPlot.cpp" line="6900"/>
         <source>
 %1 %2</source>
         <translation>
 %1 %2</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="6896"/>
+        <location filename="../../Charts/AllPlot.cpp" line="6899"/>
         <source>min/100m</source>
         <translation>min/100m</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="6896"/>
+        <location filename="../../Charts/AllPlot.cpp" line="6899"/>
         <source>min/100yd</source>
         <translation>min/100yd</translation>
     </message>
@@ -2579,7 +2579,7 @@ Press Next to Continue
 <context>
     <name>AppendXDataPointsCommand</name>
     <message>
-        <location filename="../../FileIO/RideFileCommand.cpp" line="719"/>
+        <location filename="../../FileIO/RideFileCommand.cpp" line="720"/>
         <source>Append XData Points</source>
         <translation>追加X数据点</translation>
     </message>
@@ -2983,8 +2983,12 @@ Press Next to Continue
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="479"/>
+        <source>Weight in kg or lbs: first from Withings data, then from Activity metadata and last from Athlete configuration with 75kg default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Weight in kg or lbs: first from Withings data, then from Activity metadaa and last from Athlete configuration with 75kg default</source>
-        <translation>来自Withings数据、活动元数据和运动员设置的体重(单位为kg或lbs),默认为75kg</translation>
+        <translation type="vanished">来自Withings数据、活动元数据和运动员设置的体重(单位为kg或lbs),默认为75kg</translation>
     </message>
 </context>
 <context>
@@ -3637,7 +3641,7 @@ Press Next to Continue
         <translation>操作</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="73"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="82"/>
         <source>dd MMM yyyy</source>
         <translation>yyyy年M月d日</translation>
     </message>
@@ -3647,106 +3651,106 @@ Press Next to Continue
         <translation>批量导出活动</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="77"/>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="116"/>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="165"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="86"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="125"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="174"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="82"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="91"/>
         <source>Export as</source>
         <translation>导出为...</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="86"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="95"/>
         <source>Export all data (CSV)</source>
         <translation>导出所有数据(CSV)</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="90"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="99"/>
         <source>Browse</source>
         <translation>浏览</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="91"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="100"/>
         <source>Export to</source>
         <translation>导出至</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="98"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="107"/>
         <source>check/uncheck all</source>
         <translation>全选/取消全选</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="114"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="123"/>
         <source>Overwrite existing files</source>
         <translation>覆盖已有文件</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="115"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="124"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="140"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="149"/>
         <source>Select Target Directory</source>
         <translation>选择目标文件夹</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="169"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="178"/>
         <source>Exporting...</source>
         <translation>导出中...</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="172"/>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="179"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="181"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="188"/>
         <source>Abort</source>
         <translation>放弃</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="176"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="185"/>
         <source>%1 activities exported, %2 failed or skipped.</source>
         <translation>%1个活动已导出,%2个导出失败或已忽略.</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="177"/>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="181"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="186"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="190"/>
         <source>Finish</source>
         <translation>完成</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="219"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="228"/>
         <source>Exists - not exported</source>
         <translation>已存在 - 未导出</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="227"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="236"/>
         <source>Removing...</source>
         <translation>删除中...</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="232"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="241"/>
         <source>Reading...</source>
         <translation>读取中...</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="244"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="253"/>
         <source>Writing...</source>
         <translation>写入中...</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="257"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="266"/>
         <source>Exported</source>
         <translation>已导出</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="260"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="269"/>
         <source>Write failed</source>
         <translation>写入失败</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="268"/>
+        <location filename="../../Gui/BatchExportDialog.cpp" line="277"/>
         <source>Read error</source>
         <translation>读取错误</translation>
     </message>
@@ -6544,8 +6548,8 @@ Do you want to apply and restart GoldenCheetah?</source>
 <context>
     <name>DataFilter</name>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1522"/>
-        <location filename="../../Core/DataFilter.cpp" line="1563"/>
+        <location filename="../../Core/DataFilter.cpp" line="1551"/>
+        <location filename="../../Core/DataFilter.cpp" line="1592"/>
         <source>malformed expression.</source>
         <translation>表达式有误</translation>
     </message>
@@ -6750,7 +6754,7 @@ Do you want to apply and restart GoldenCheetah?</source>
         <translation>删除数据点</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFileCommand.cpp" line="673"/>
+        <location filename="../../FileIO/RideFileCommand.cpp" line="674"/>
         <source>Remove XDATA Points</source>
         <translation>删除X数据点</translation>
     </message>
@@ -13344,7 +13348,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>InsertXDataPointCommand</name>
     <message>
-        <location filename="../../FileIO/RideFileCommand.cpp" line="696"/>
+        <location filename="../../FileIO/RideFileCommand.cpp" line="697"/>
         <source>Insert XData Point</source>
         <translation>插入X数据点</translation>
     </message>
@@ -15185,148 +15189,158 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>Leaf</name>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1020"/>
+        <location filename="../../Core/DataFilter.cpp" line="1030"/>
         <source>%1 is unknown</source>
         <translation>%1未知</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1043"/>
+        <location filename="../../Core/DataFilter.cpp" line="1053"/>
         <source>Array subscript needs a symbol name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1055"/>
+        <location filename="../../Core/DataFilter.cpp" line="1065"/>
         <source>Index must be numeric.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1075"/>
+        <location filename="../../Core/DataFilter.cpp" line="1085"/>
         <source>invalid data series for best(): %1</source>
         <translation>最佳():%1数据系列无效</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1080"/>
+        <location filename="../../Core/DataFilter.cpp" line="1090"/>
         <source>invalid data series for tiz(): %1</source>
         <translation>区间时间():%1数据系列无效</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1087"/>
+        <location filename="../../Core/DataFilter.cpp" line="1097"/>
         <source>invalid literal for daterange(): %1</source>
         <translation>数据范围():%1无效</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1101"/>
+        <location filename="../../Core/DataFilter.cpp" line="1111"/>
         <source>invalid literal for config(): %1</source>
         <translation>设置():%1无效</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1107"/>
+        <location filename="../../Core/DataFilter.cpp" line="1117"/>
         <source>invalid literal for const(): %1</source>
         <translation>常数():%1无效</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1134"/>
+        <location filename="../../Core/DataFilter.cpp" line="1144"/>
         <source>which function has at least 2 parameters.</source>
         <translation>至少有两个参数的功能</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1146"/>
+        <location filename="../../Core/DataFilter.cpp" line="1156"/>
         <source>XDATA needs 3 parameters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1153"/>
+        <location filename="../../Core/DataFilter.cpp" line="1163"/>
         <source>XDATA expects a string for first two parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1160"/>
+        <location filename="../../Core/DataFilter.cpp" line="1170"/>
         <source>XDATA expects a symbol, one of sparse, repeat, interpolate or resample for third parameter.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1167"/>
+        <location filename="../../Core/DataFilter.cpp" line="1177"/>
         <source>XDATA expects one of sparse, repeat, interpolate or resample for third parameter. (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1193"/>
+        <location filename="../../Core/DataFilter.cpp" line="1200"/>
+        <source>XDATA_UNITS needs 2 parameters.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Core/DataFilter.cpp" line="1207"/>
+        <source>XDATA_UNITS expects a string for first two parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Core/DataFilter.cpp" line="1222"/>
         <source>isset/set/unset function first parameter is field/metric to set.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1206"/>
+        <location filename="../../Core/DataFilter.cpp" line="1235"/>
         <source>%1 is not supported in isset/set/unset operations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1216"/>
+        <location filename="../../Core/DataFilter.cpp" line="1245"/>
         <source>isset has one parameter, a symbol to check.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1223"/>
+        <location filename="../../Core/DataFilter.cpp" line="1252"/>
         <source>set function needs 3 paramaters; symbol, value and expression.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1224"/>
+        <location filename="../../Core/DataFilter.cpp" line="1253"/>
         <source>unset function needs 2 paramaters; symbol and expression.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1242"/>
+        <location filename="../../Core/DataFilter.cpp" line="1271"/>
         <source>estimate function expects model name as first parameter.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1248"/>
+        <location filename="../../Core/DataFilter.cpp" line="1277"/>
         <source>estimate function expects model name as first parameter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1259"/>
+        <location filename="../../Core/DataFilter.cpp" line="1288"/>
         <source>estimate function expects parameter or duration as second parameter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1279"/>
+        <location filename="../../Core/DataFilter.cpp" line="1308"/>
         <source>function &apos;%1&apos; expects %2 parameter(s) not %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1291"/>
+        <location filename="../../Core/DataFilter.cpp" line="1320"/>
         <source>unknown function %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1301"/>
+        <location filename="../../Core/DataFilter.cpp" line="1330"/>
         <source>unary negation on a string!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1321"/>
-        <location filename="../../Core/DataFilter.cpp" line="1338"/>
+        <location filename="../../Core/DataFilter.cpp" line="1350"/>
+        <location filename="../../Core/DataFilter.cpp" line="1367"/>
         <source>variables must be numeric.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1347"/>
+        <location filename="../../Core/DataFilter.cpp" line="1376"/>
         <source>assignment must be to a symbol.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1360"/>
+        <location filename="../../Core/DataFilter.cpp" line="1389"/>
         <source>comparing strings with numbers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1367"/>
+        <location filename="../../Core/DataFilter.cpp" line="1396"/>
         <source>using a string operations with a number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1396"/>
+        <location filename="../../Core/DataFilter.cpp" line="1425"/>
         <source>internal parser error: parms</source>
         <translation type="unfinished"></translation>
     </message>
@@ -20450,8 +20464,8 @@ on and that its display says, &quot;Host&quot;</source>
         <translation>骑车</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FitRideFile.cpp" line="811"/>
-        <location filename="../../FileIO/FitRideFile.cpp" line="1495"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="847"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="1659"/>
         <source>Lap %1</source>
         <translation>第%1圈</translation>
     </message>
@@ -21959,7 +21973,7 @@ Do you want to continue?</source>
         <translation>°</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="1929"/>
+        <location filename="../../FileIO/RideFile.cpp" line="2065"/>
         <source>Invalid File Name</source>
         <translation>无效的文件名</translation>
     </message>
@@ -22020,7 +22034,7 @@ Do you want to continue?</source>
         <translation>比</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="1930"/>
+        <location filename="../../FileIO/RideFile.cpp" line="2066"/>
         <source>Invalid date/time in filename:
 %1
 Skipping file...</source>
@@ -22028,7 +22042,7 @@ Skipping file...</source>
 跳过文件...</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="2047"/>
+        <location filename="../../FileIO/RideFile.cpp" line="2183"/>
         <source>Wheelsize</source>
         <translation>车轮尺寸</translation>
     </message>
@@ -22116,27 +22130,27 @@ Skipping file...</source>
         <translation>根据功率的持续努力和匹配</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="2868"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3004"/>
         <source>Peak</source>
         <translation>峰值</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="2868"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3004"/>
         <source>Find</source>
         <translation>搜索</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="2875"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3011"/>
         <source>Match</source>
         <translation>匹配</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="2881"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3017"/>
         <source>Climb</source>
         <translation>爬坡</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="2887"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3023"/>
         <source>Best</source>
         <translation>最佳</translation>
     </message>
@@ -24400,7 +24414,7 @@ native format. Should we do so?
 <context>
     <name>SetXDataPointValueCommand</name>
     <message>
-        <location filename="../../FileIO/RideFileCommand.cpp" line="630"/>
+        <location filename="../../FileIO/RideFileCommand.cpp" line="631"/>
         <source>Set XData point value</source>
         <translation>设置X数据点值</translation>
     </message>
@@ -25424,6 +25438,81 @@ If the newly created activity clashes with an existing activity (same date and t
         <location filename="../../Metrics/SwimMetrics.cpp" line="192"/>
         <source>Average Swim Pace, computed only when Cadence &gt; 0 to avoid kick/drill lengths</source>
         <translation>平均游泳配速，仅计算划水时配速</translation>
+    </message>
+</context>
+<context>
+    <name>SwimPaceBack</name>
+    <message>
+        <location filename="../../Metrics/SwimMetrics.cpp" line="552"/>
+        <source>Swim Pace Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SwimMetrics.cpp" line="553"/>
+        <source>Average Swim Pace for backstroke lengths</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SwimPaceBreast</name>
+    <message>
+        <location filename="../../Metrics/SwimMetrics.cpp" line="571"/>
+        <source>Swim Pace Breast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SwimMetrics.cpp" line="572"/>
+        <source>Average Swim Pace for breaststroke lengths</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SwimPaceFly</name>
+    <message>
+        <location filename="../../Metrics/SwimMetrics.cpp" line="590"/>
+        <source>Swim Pace Fly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SwimMetrics.cpp" line="591"/>
+        <source>Average Swim Pace for freestyle lengths</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SwimPaceFree</name>
+    <message>
+        <location filename="../../Metrics/SwimMetrics.cpp" line="533"/>
+        <source>Swim Pace Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SwimMetrics.cpp" line="534"/>
+        <source>Average Swim Pace for freestyle lengths</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SwimPaceStroke</name>
+    <message>
+        <location filename="../../Metrics/SwimMetrics.cpp" line="461"/>
+        <source>Swim Pace</source>
+        <translation type="unfinished">游泳配速</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SwimMetrics.cpp" line="462"/>
+        <source>min/100m</source>
+        <translation type="unfinished">min/100m</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SwimMetrics.cpp" line="463"/>
+        <source>min/100yd</source>
+        <translation type="unfinished">min/100yd</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SwimMetrics.cpp" line="464"/>
+        <source>Average Swim Pace, computed only when Cadence &gt; 0 to avoid kick/drill lengths</source>
+        <translation type="unfinished">平均游泳配速，仅计算划水时配速</translation>
     </message>
 </context>
 <context>
@@ -27534,12 +27623,12 @@ You can remove references when managing the library via the context menu options
 <context>
     <name>WorkoutWidget</name>
     <message>
-        <location filename="../../Train/WorkoutWidget.cpp" line="1489"/>
+        <location filename="../../Train/WorkoutWidget.cpp" line="1491"/>
         <source>File save failed.</source>
         <translation>文件保存失败.</translation>
     </message>
     <message>
-        <location filename="../../Train/WorkoutWidget.cpp" line="2230"/>
+        <location filename="../../Train/WorkoutWidget.cpp" line="2287"/>
         <source>Intensity</source>
         <translation>强度</translation>
     </message>
@@ -27655,27 +27744,27 @@ You can remove references when managing the library via the context menu options
 <context>
     <name>XDataEditor</name>
     <message>
-        <location filename="../../Charts/RideEditor.cpp" line="3195"/>
+        <location filename="../../Charts/RideEditor.cpp" line="3198"/>
         <source>Delete Row</source>
         <translation>删除行</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideEditor.cpp" line="3205"/>
+        <location filename="../../Charts/RideEditor.cpp" line="3208"/>
         <source>Append Row</source>
         <translation>追加行</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideEditor.cpp" line="3211"/>
+        <location filename="../../Charts/RideEditor.cpp" line="3214"/>
         <source>Insert Row</source>
         <translation>插入行</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideEditor.cpp" line="3220"/>
+        <location filename="../../Charts/RideEditor.cpp" line="3223"/>
         <source>Remove Column</source>
         <translation>删除列</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideEditor.cpp" line="3227"/>
+        <location filename="../../Charts/RideEditor.cpp" line="3230"/>
         <source>Add Column</source>
         <translation>新增列</translation>
     </message>
@@ -27683,27 +27772,32 @@ You can remove references when managing the library via the context menu options
 <context>
     <name>XDataSeriesSettingsDialog</name>
     <message>
-        <location filename="../../FileIO/XDataDialog.cpp" line="323"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="328"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../../FileIO/XDataDialog.cpp" line="331"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="333"/>
+        <source>Units</source>
+        <translation type="unfinished">单位</translation>
+    </message>
+    <message>
+        <location filename="../../FileIO/XDataDialog.cpp" line="341"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../../FileIO/XDataDialog.cpp" line="332"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="342"/>
         <source>OK</source>
         <translation>确定</translation>
     </message>
     <message>
-        <location filename="../../FileIO/XDataDialog.cpp" line="347"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="357"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../../FileIO/XDataDialog.cpp" line="347"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="357"/>
         <source>Name is blank</source>
         <translation>名称为空</translation>
     </message>
@@ -27716,38 +27810,43 @@ You can remove references when managing the library via the context menu options
         <translation>X数据</translation>
     </message>
     <message>
-        <location filename="../../FileIO/XDataDialog.cpp" line="264"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="265"/>
         <source>Data Series</source>
         <translation>数据系列</translation>
     </message>
     <message>
-        <location filename="../../FileIO/XDataDialog.cpp" line="267"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="266"/>
+        <source>Units</source>
+        <translation type="unfinished">单位</translation>
+    </message>
+    <message>
+        <location filename="../../FileIO/XDataDialog.cpp" line="270"/>
         <source>Series %1</source>
         <translation>系列 %1</translation>
     </message>
     <message>
-        <location filename="../../FileIO/XDataDialog.cpp" line="273"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="277"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../../FileIO/XDataDialog.cpp" line="274"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="278"/>
         <source>OK</source>
         <translation>确定</translation>
     </message>
     <message>
-        <location filename="../../FileIO/XDataDialog.cpp" line="289"/>
-        <location filename="../../FileIO/XDataDialog.cpp" line="303"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="293"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="308"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../../FileIO/XDataDialog.cpp" line="289"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="293"/>
         <source>XData name is blank</source>
         <translation>X数据名称为空</translation>
     </message>
     <message>
-        <location filename="../../FileIO/XDataDialog.cpp" line="303"/>
+        <location filename="../../FileIO/XDataDialog.cpp" line="308"/>
         <source>Must have at least one data series.</source>
         <translation>至少应有一个数据系列.</translation>
     </message>
