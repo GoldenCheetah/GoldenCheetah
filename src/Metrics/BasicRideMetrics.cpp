@@ -476,7 +476,7 @@ class AthleteWeight : public RideMetric {
         setImperialUnits(tr("lbs"));
         setPrecision(2);
         setConversion(LB_PER_KG);
-        setDescription(tr("Weight in kg or lbs: first from Withings data, then from Activity metadaa and last from Athlete configuration with 75kg default"));
+        setDescription(tr("Weight in kg or lbs: first from Withings data, then from Activity metadata and last from Athlete configuration with 75kg default"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
