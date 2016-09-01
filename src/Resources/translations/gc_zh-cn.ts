@@ -2984,7 +2984,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="479"/>
         <source>Weight in kg or lbs: first from Withings data, then from Activity metadata and last from Athlete configuration with 75kg default</source>
-        <translation type="unfinished"></translation>
+        <translation>来自Withings数据、活动元数据和运动员设置的体重(单位为kg或lbs),默认为75kg</translation>
     </message>
     <message>
         <source>Weight in kg or lbs: first from Withings data, then from Activity metadaa and last from Athlete configuration with 75kg default</source>
@@ -25445,12 +25445,12 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="552"/>
         <source>Swim Pace Back</source>
-        <translation type="unfinished"></translation>
+        <translation>仰泳配速</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="553"/>
         <source>Average Swim Pace for backstroke lengths</source>
-        <translation type="unfinished"></translation>
+        <translation>仰泳部分的平均游泳配速</translation>
     </message>
 </context>
 <context>
@@ -25458,12 +25458,12 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="571"/>
         <source>Swim Pace Breast</source>
-        <translation type="unfinished"></translation>
+        <translation>蛙泳配速</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="572"/>
         <source>Average Swim Pace for breaststroke lengths</source>
-        <translation type="unfinished"></translation>
+        <translation>蛙泳部分的平均游泳配速</translation>
     </message>
 </context>
 <context>
@@ -25471,12 +25471,12 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="590"/>
         <source>Swim Pace Fly</source>
-        <translation type="unfinished"></translation>
+        <translation>蝶泳配速</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="591"/>
         <source>Average Swim Pace for freestyle lengths</source>
-        <translation type="unfinished"></translation>
+        <translation>蝶泳部分的平均游泳配速</translation>
     </message>
 </context>
 <context>
@@ -25484,12 +25484,12 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="533"/>
         <source>Swim Pace Free</source>
-        <translation type="unfinished"></translation>
+        <translation>自由泳配速</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="534"/>
         <source>Average Swim Pace for freestyle lengths</source>
-        <translation type="unfinished"></translation>
+        <translation>自由泳部分的平均游泳配速</translation>
     </message>
 </context>
 <context>
@@ -25497,22 +25497,22 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="461"/>
         <source>Swim Pace</source>
-        <translation type="unfinished">游泳配速</translation>
+        <translation>游泳配速</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="462"/>
         <source>min/100m</source>
-        <translation type="unfinished">min/100m</translation>
+        <translation>min/100m</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="463"/>
         <source>min/100yd</source>
-        <translation type="unfinished">min/100yd</translation>
+        <translation>min/100yd</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="464"/>
         <source>Average Swim Pace, computed only when Cadence &gt; 0 to avoid kick/drill lengths</source>
-        <translation type="unfinished">平均游泳配速，仅计算划水时配速</translation>
+        <translation>平均游泳配速，仅计算划水时配速</translation>
     </message>
 </context>
 <context>
@@ -27779,7 +27779,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../FileIO/XDataDialog.cpp" line="333"/>
         <source>Units</source>
-        <translation type="unfinished">单位</translation>
+        <translation>单位</translation>
     </message>
     <message>
         <location filename="../../FileIO/XDataDialog.cpp" line="341"/>
@@ -27817,7 +27817,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../FileIO/XDataDialog.cpp" line="266"/>
         <source>Units</source>
-        <translation type="unfinished">单位</translation>
+        <translation>单位</translation>
     </message>
     <message>
         <location filename="../../FileIO/XDataDialog.cpp" line="270"/>
