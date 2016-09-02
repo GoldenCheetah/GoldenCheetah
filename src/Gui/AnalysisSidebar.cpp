@@ -453,6 +453,12 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         QAction *collapseAll = new QAction(tr("Collapse All"), rideNavigator);
         connect(collapseAll, SIGNAL(triggered(void)), rideNavigator->tableView, SLOT(collapseAll()));
         menu.addAction(collapseAll);
+
+        // reset to default
+        QAction *resetToDefault = new QAction(tr("Reset to default"), rideNavigator);
+        connect(resetToDefault, SIGNAL(triggered(void)), rideNavigator, SLOT(setWidths()));
+        menu.addAction(resetToDefault);
+
         menu.exec(pos);
     }
 }
