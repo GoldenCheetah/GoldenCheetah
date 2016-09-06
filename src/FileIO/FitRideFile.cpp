@@ -104,6 +104,7 @@ struct FitFileReaderState
     double last_distance;
     QMap<int, FitDefinition> local_msg_types;
     QMap<int, FitDeveField>  local_deve_fields;
+    QMap<int, int> record_deve_fields;
     QSet<int> unknown_record_fields, unknown_global_msg_nums, unknown_base_type;
     int interval;
     int calibration;
@@ -896,141 +897,149 @@ struct FitFileReaderState
                          _values.type == StringValue))
                    p = new XDataPoint();
 
-                //FitDeveField deveField = local_deve_fields[field.num];
-                //int idx = deveXdata->valuename.indexOf(deveField.name.c_str());
+                if (!record_deve_fields.contains(field.num)) {
+                    FitDeveField deveField = local_deve_fields[field.num];
+
+                    deveXdata->valuename << deveField.name.c_str();
+                    deveXdata->unitname << deveField.unit.c_str();
+
+                    record_deve_fields.insert(field.num, record_deve_fields.count());
+                }
+                int idx = record_deve_fields[field.num];
 
                 switch (_values.type) {
-                    case SingleValue: p->number[field.num]=_values.v; break;
-                    case FloatValue: p->number[field.num]=_values.f; break;
-                    case StringValue: p->string[field.num]=_values.s.c_str(); break;
+                    case SingleValue: p->number[idx]=_values.v; break;
+                    case FloatValue: p->number[idx]=_values.f; break;
+                    case StringValue: p->string[idx]=_values.s.c_str(); break;
                     default: break;
                 }
 
 
-            }
+            } else  {
 
-            switch (field.num) {
-                case 253: // TIMESTAMP
-                          time = value + qbase_time.toTime_t();
-                          // Time MUST NOT go backwards
-                          // You canny break the laws of physics, Jim
-                          if (time < last_time)
-                              time = last_time; // Not true for Bryton
-                          break;
-                case 0: // POSITION_LAT
-                        lati = value;
-                        break;
-                case 1: // POSITION_LONG
-                        lngi = value;
-                        break;
-                case 2: // ALTITUDE
-                        alt = value / 5.0 - 500.0;
-                        break;
-                case 3: // HEART_RATE
-                        hr = value;
-                        break;
-                case 4: // CADENCE
-                        if (rideFile->getTag("Sport", "Bike") == "Run")
-                            rcad = value;
-                        else
-                            cad = value;
-                        break;
+                switch (field.num) {
+                    case 253: // TIMESTAMP
+                              time = value + qbase_time.toTime_t();
+                              // Time MUST NOT go backwards
+                              // You canny break the laws of physics, Jim
+                              if (time < last_time)
+                                  time = last_time; // Not true for Bryton
+                              break;
+                    case 0: // POSITION_LAT
+                            lati = value;
+                            break;
+                    case 1: // POSITION_LONG
+                            lngi = value;
+                            break;
+                    case 2: // ALTITUDE
+                            alt = value / 5.0 - 500.0;
+                            break;
+                    case 3: // HEART_RATE
+                            hr = value;
+                            break;
+                    case 4: // CADENCE
+                            if (rideFile->getTag("Sport", "Bike") == "Run")
+                                rcad = value;
+                            else
+                                cad = value;
+                            break;
 
-                case 5: // DISTANCE
-                        km = value / 100000.0;
-                        break;
-                case 6: // SPEED
-                        kph = value * 3.6 / 1000.0;
-                        break;
-                case 7: // POWER
-                        watts = value;
-                        break;
-                case 8: break; // packed speed/dist
-                case 9: // GRADE
-                        slope = value / 100.0;
-                        break;
-                case 10: //resistance = value;
-                         break;
-                case 11: //time_from_course = value / 1000.0;
-                         break;
-                case 12: break; // "cycle_length"
-                case 13: // TEMPERATURE
-                         temperature = value;
-                         break;
-                case 29: // ACCUMULATED_POWER
-                         break;
-                case 30: //LEFT_RIGHT_BALANCE
-                         lrbalance = (value & 0x80 ? 100 - (value & 0x7F) : value & 0x7F);
-                         break;
-                case 31: // GPS Accuracy
-                         break;
+                    case 5: // DISTANCE
+                            km = value / 100000.0;
+                            break;
+                    case 6: // SPEED
+                            kph = value * 3.6 / 1000.0;
+                            break;
+                    case 7: // POWER
+                            watts = value;
+                            break;
+                    case 8: break; // packed speed/dist
+                    case 9: // GRADE
+                            slope = value / 100.0;
+                            break;
+                    case 10: //resistance = value;
+                             break;
+                    case 11: //time_from_course = value / 1000.0;
+                             break;
+                    case 12: break; // "cycle_length"
+                    case 13: // TEMPERATURE
+                             temperature = value;
+                             break;
+                    case 29: // ACCUMULATED_POWER
+                             break;
+                    case 30: //LEFT_RIGHT_BALANCE
+                             lrbalance = (value & 0x80 ? 100 - (value & 0x7F) : value & 0x7F);
+                             break;
+                    case 31: // GPS Accuracy
+                             break;
 
-                case 39: // VERTICAL OSCILLATION
-                         rvert = value / 100.0f;
-                         break;
+                    case 39: // VERTICAL OSCILLATION
+                             rvert = value / 100.0f;
+                             break;
 
-                //case 40: // ACTIVITY_TYPE
-                //         // TODO We should know/test value for run
-                //         run = true;
-                //         break;
+                    //case 40: // ACTIVITY_TYPE
+                    //         // TODO We should know/test value for run
+                    //         run = true;
+                    //         break;
 
-                case 41: // GROUND CONTACT TIME
-                         rcontact = value / 10.0f;
-                         break;
+                    case 41: // GROUND CONTACT TIME
+                             rcontact = value / 10.0f;
+                             break;
 
-                case 43: // LEFT_TORQUE_EFFECTIVENESS
-                         leftTorqueEff = value / 2.0;
-                         break;
-                case 44: // RIGHT_TORQUE_EFFECTIVENESS
-                         rightTorqueEff = value / 2.0;
-                         break;
-                case 45: // LEFT_PEDAL_SMOOTHNESS
-                         leftPedalSmooth = value / 2.0;
-                         break;
-                case 46: // RIGHT_PEDAL_SMOOTHNESS
-                         rightPedalSmooth = value / 2.0;
-                         break;
-                case 47: // COMBINED_PEDAL_SMOOTHNES
-                         //qDebug() << "COMBINED_PEDAL_SMOOTHNES" << value;
-                         break;
-                case 53: // RUNNING CADENCE FRACTIONAL VALUE
-                         break;
-                case 54: // tHb
-                        tHb= value/100.0f;
-                        break;
-                case 57: // SMO2
-                        smO2= value/10.0f;
-                        break;
-                case 61: // ? GPS Altitude ? or atmospheric pressure ?
-                        break;
-                case 66: // ??
-                        break;
-                case 67: // ? Left Platform Center Offset ?
-                        leftPedalCenterOffset = value;
-                        break;
-                case 68: // ? Right Platform Center Offset ?
-                        rightPedalCenterOffset = value;
-                        break;
-                case 69: // ? Left Power Phase ?
-                        leftTopDeathCenter = round(valueList.at(0) * 360.0/256);
-                        leftBottomDeathCenter = round(valueList.at(1) * 360.0/256);
-                        break;
-                case 70: // ? Left Peak Phase  ?
-                        leftTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
-                        leftBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
-                        break;
-                case 71: // ? Right Power Phase ?
-                        rightTopDeathCenter = round(valueList.at(0) * 360.0/256);
-                        rightBottomDeathCenter = round(valueList.at(1) * 360.0/256);
-                        break;
-                case 72: // ? Right Peak Phase  ?
-                        rightTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
-                        rightBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
-                        break;
+                    case 43: // LEFT_TORQUE_EFFECTIVENESS
+                             leftTorqueEff = value / 2.0;
+                             break;
+                    case 44: // RIGHT_TORQUE_EFFECTIVENESS
+                             rightTorqueEff = value / 2.0;
+                             break;
+                    case 45: // LEFT_PEDAL_SMOOTHNESS
+                             leftPedalSmooth = value / 2.0;
+                             break;
+                    case 46: // RIGHT_PEDAL_SMOOTHNESS
+                             rightPedalSmooth = value / 2.0;
+                             break;
+                    case 47: // COMBINED_PEDAL_SMOOTHNES
+                             //qDebug() << "COMBINED_PEDAL_SMOOTHNES" << value;
+                             break;
+                    case 53: // RUNNING CADENCE FRACTIONAL VALUE
+                             break;
+                    case 54: // tHb
+                            tHb= value/100.0f;
+                            break;
+                    case 57: // SMO2
+                            smO2= value/10.0f;
+                            break;
+                    case 61: // ? GPS Altitude ? or atmospheric pressure ?
+                            break;
+                    case 66: // ??
+                            break;
+                    case 67: // ? Left Platform Center Offset ?
+                            leftPedalCenterOffset = value;
+                            break;
+                    case 68: // ? Right Platform Center Offset ?
+                            rightPedalCenterOffset = value;
+                            break;
+                    case 69: // ? Left Power Phase ?
+                            leftTopDeathCenter = round(valueList.at(0) * 360.0/256);
+                            leftBottomDeathCenter = round(valueList.at(1) * 360.0/256);
+                            break;
+                    case 70: // ? Left Peak Phase  ?
+                            leftTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
+                            leftBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
+                            break;
+                    case 71: // ? Right Power Phase ?
+                            rightTopDeathCenter = round(valueList.at(0) * 360.0/256);
+                            rightBottomDeathCenter = round(valueList.at(1) * 360.0/256);
+                            break;
+                    case 72: // ? Right Peak Phase  ?
+                            rightTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
+                            rightBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
+                            break;
 
 
-                default:
-                        unknown_record_fields.insert(field.num);
+                    default:
+                            unknown_record_fields.insert(field.num);
+                }
             }
         }
 
@@ -1709,25 +1718,9 @@ struct FitFileReaderState
 
         //qDebug() << "num" << fieldDef.num << "deve_idx" << fieldDef.dev_id << "name" << fieldDef.name.c_str() << "unit" << fieldDef.unit.c_str();
         if (!local_deve_fields.contains(fieldDef.num)) {
-            if (deveXdata->valuename.count()<=fieldDef.num) {
-                while (deveXdata->valuename.count()<fieldDef.num)
-                    deveXdata->valuename << "";
-                QString name = fieldDef.name.c_str();
-                if (deveXdata->valuename.count(name)>0)
-                    name.append(deveXdata->valuename.count(name));
-                deveXdata->valuename << fieldDef.name.c_str();
-            } else {
-                deveXdata->valuename.replace(fieldDef.num,fieldDef.name.c_str());
-            }
-            if (deveXdata->unitname.count()<=fieldDef.num) {
-                while (deveXdata->unitname.count()<fieldDef.num)
-                    deveXdata->unitname << "";
-                deveXdata->unitname << fieldDef.unit.c_str();
-            } else {
-                deveXdata->unitname.replace(fieldDef.num,fieldDef.unit.c_str());
-            }
+            local_deve_fields.insert(fieldDef.num, fieldDef);
         }
-        local_deve_fields.insert(fieldDef.num, fieldDef);
+
     }
 
     void read_header(bool &stop, QStringList &errors, int &data_size) {
