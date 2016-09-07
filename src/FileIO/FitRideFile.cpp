@@ -886,10 +886,12 @@ struct FitFileReaderState
             if( value == NA_VALUE )
                 continue;
 
+            int native_num = field.num;
+
             if (field.deve_idx>-1) {
                 if (FIT_DEBUG) {
-                    qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
-                    qDebug() << "name" << local_deve_fields[field.num].name.c_str() << "unit" << local_deve_fields[field.num].unit.c_str() << _values.f;
+                    //qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
+                    //qDebug() << "name" << local_deve_fields[field.num].name.c_str() << "unit" << local_deve_fields[field.num].unit.c_str() << _values.f;
                 }
 
                 if (p == NULL &&
@@ -898,27 +900,33 @@ struct FitFileReaderState
                          _values.type == StringValue))
                    p = new XDataPoint();
 
-                if (!record_deve_fields.contains(field.num)) {
-                    FitDeveField deveField = local_deve_fields[field.num];
+                FitDeveField deveField = local_deve_fields[field.num];
 
-                    deveXdata->valuename << deveField.name.c_str();
-                    deveXdata->unitname << deveField.unit.c_str();
+                if (deveField.native==-1) {
+                    native_num = -1;
 
-                    record_deve_fields.insert(field.num, record_deve_fields.count());
-                }
-                int idx = record_deve_fields[field.num];
+                    if (!record_deve_fields.contains(field.num)) {
+                        deveXdata->valuename << deveField.name.c_str();
+                        deveXdata->unitname << deveField.unit.c_str();
 
-                switch (_values.type) {
-                    case SingleValue: p->number[idx]=_values.v; break;
-                    case FloatValue: p->number[idx]=_values.f; break;
-                    case StringValue: p->string[idx]=_values.s.c_str(); break;
-                    default: break;
-                }
+                        record_deve_fields.insert(field.num, record_deve_fields.count());
+                    }
+                    int idx = record_deve_fields[field.num];
 
+                    switch (_values.type) {
+                        case SingleValue: p->number[idx]=_values.v; break;
+                        case FloatValue: p->number[idx]=_values.f; break;
+                        case StringValue: p->string[idx]=_values.s.c_str(); break;
+                        default: break;
+                    }
+                } else
+                    native_num = deveField.native;
 
-            } else  {
+            }
 
-                switch (field.num) {
+            if (native_num>-1) {
+
+                switch (native_num) {
                     case 253: // TIMESTAMP
                               time = value + qbase_time.toTime_t();
                               // Time MUST NOT go backwards
@@ -1689,6 +1697,8 @@ struct FitFileReaderState
         foreach(const FitField &field, def.fields) {
             FitValue value = values[i++];
 
+            //qDebug() << "deve : num" << field.num  << value.v << value.s.c_str();
+
             switch (field.num) {
                 case 0:  // developer_data_index
                         fieldDef.dev_id = value.v;
@@ -1712,6 +1722,11 @@ struct FitFileReaderState
                     break;
                 case 8:  // units
                     fieldDef.unit = value.s;
+                    break;
+                case 9:  // bits
+                case 10: // accumulate
+                case 13: // fit_base_unit_id
+                case 14: // native_mesg_num
                     break;
                 case 15: // native field number
                     fieldDef.native = value.v;
