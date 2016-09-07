@@ -106,6 +106,7 @@ struct FitFileReaderState
     QMap<int, FitDefinition> local_msg_types;
     QMap<int, FitDeveField>  local_deve_fields;
     QMap<int, int> record_deve_fields;
+    QMap<int, int> record_deve_native_fields;
     QSet<int> unknown_record_fields, unknown_global_msg_nums, unknown_base_type;
     int interval;
     int calibration;
@@ -894,9 +895,10 @@ struct FitFileReaderState
                     //qDebug() << "name" << local_deve_fields[field.num].name.c_str() << "unit" << local_deve_fields[field.num].unit.c_str() << _values.f;
                 }
 
-                FitDeveField deveField = local_deve_fields[field.num];
-                //TODO verify it is the first field for nativ
-                native_num = deveField.native;
+                if (record_deve_native_fields.contains(field.num))
+                    native_num = record_deve_native_fields[field.num];
+                else
+                    native_num = -1;
             }
 
             if (native_num>-1) {
@@ -1022,8 +1024,8 @@ struct FitFileReaderState
 
 
                     default:
+                            unknown_record_fields.insert(native_num);
                             native_num = -1;
-                            unknown_record_fields.insert(field.num);
                 }
             }
 
@@ -1752,6 +1754,9 @@ struct FitFileReaderState
             local_deve_fields.insert(fieldDef.num, fieldDef);
         }
 
+        if (fieldDef.native > -1 && !record_deve_native_fields.values().contains(fieldDef.native)) {
+            record_deve_native_fields.insert(fieldDef.num, fieldDef.native);
+        }
     }
 
     void read_header(bool &stop, QStringList &errors, int &data_size) {
