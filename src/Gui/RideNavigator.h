@@ -152,7 +152,7 @@ class RideNavigator : public GcChartWindow
         void noGroups() { currentColumn=-1; setGroupByColumn(); }
 
         QString widths() const { return _widths; }
-        void setWidths (QString x) { _widths = x; resetView(); } // only reset once widths are set
+        void setWidths (QString x="") { _widths = x; resetView(); } // only reset once widths are set, witdths="" resets to default columns
 
         void resetView(); // when columns/width changes
 
