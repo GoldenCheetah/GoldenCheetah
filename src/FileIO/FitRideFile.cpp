@@ -397,6 +397,48 @@ struct FitFileReaderState
         return "FIT (*.fit)";
     }
 
+    QString getNativeFieldName(int native_num) {
+        switch (native_num) {
+
+            case 0: // POSITION_LAT
+                    return "LAT";
+            case 1: // POSITION_LONG
+                    return "LON";
+            case 2: // ALTITUDE
+                    return "ALT";
+            case 3: // HEART_RATE
+                    return "HR";
+            case 4: // CADENCE
+                    return "CAD";
+            case 5: // DISTANCE
+                    return "KM";
+            case 6: // SPEED
+                    return "KPH";
+            case 7: // POWER
+                    return "POWER";
+            case 9: // GRADE
+                    return "SLOPE";
+            case 13: // TEMPERATURE
+                    return "TEMP";
+            case 30: //LEFT_RIGHT_BALANCE
+                     return "LR-BALANCE";
+
+            case 39: // VERTICAL OSCILLATION
+                     return "R-VERT";
+
+            case 41: // GROUND CONTACT TIME
+                     return "R-CONTACT";
+
+            case 54: // tHb
+                    return "THB";
+            case 57: // SMO2
+                    return "SMO2";
+
+            default:
+                    return QString("FIELD_%1").arg(native_num);
+        }
+    }
+
     void decodeFileId(const FitDefinition &def, int,
                       const std::vector<FitValue>& values) {
         int i = 0;
@@ -895,6 +937,7 @@ struct FitFileReaderState
                     //qDebug() << "name" << local_deve_fields[field.num].name.c_str() << "unit" << local_deve_fields[field.num].unit.c_str() << _values.f;
                 }
 
+
                 if (record_deve_native_fields.contains(field.num))
                     native_num = record_deve_native_fields[field.num];
                 else
@@ -1037,8 +1080,14 @@ struct FitFileReaderState
                 if (field.deve_idx>-1) {
                     FitDeveField deveField = local_deve_fields[field.num];
 
+                    QString name = deveField.name.c_str();
+
+                    //if (deveField.native>-1)
+                    //    name = getNativeFieldName(deveField.native);
+
+
                     if (!record_deve_fields.contains(field.num)) {
-                        deveXdata->valuename << deveField.name.c_str();
+                        deveXdata->valuename << name;
                         deveXdata->unitname << deveField.unit.c_str();
 
                         record_deve_fields.insert(field.num, record_deve_fields.count());
