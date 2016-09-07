@@ -894,34 +894,9 @@ struct FitFileReaderState
                     //qDebug() << "name" << local_deve_fields[field.num].name.c_str() << "unit" << local_deve_fields[field.num].unit.c_str() << _values.f;
                 }
 
-                if (p == NULL &&
-                        (_values.type == SingleValue ||
-                         _values.type == FloatValue ||
-                         _values.type == StringValue))
-                   p = new XDataPoint();
-
                 FitDeveField deveField = local_deve_fields[field.num];
-
-                if (deveField.native==-1) {
-                    native_num = -1;
-
-                    if (!record_deve_fields.contains(field.num)) {
-                        deveXdata->valuename << deveField.name.c_str();
-                        deveXdata->unitname << deveField.unit.c_str();
-
-                        record_deve_fields.insert(field.num, record_deve_fields.count());
-                    }
-                    int idx = record_deve_fields[field.num];
-
-                    switch (_values.type) {
-                        case SingleValue: p->number[idx]=_values.v; break;
-                        case FloatValue: p->number[idx]=_values.f; break;
-                        case StringValue: p->string[idx]=_values.s.c_str(); break;
-                        default: break;
-                    }
-                } else
-                    native_num = deveField.native;
-
+                //TODO verify it is the first field for nativ
+                native_num = deveField.native;
             }
 
             if (native_num>-1) {
@@ -1047,7 +1022,43 @@ struct FitFileReaderState
 
 
                     default:
+                            native_num = -1;
                             unknown_record_fields.insert(field.num);
+                }
+            }
+
+            if (native_num == -1) {
+                // native, deve_native or deve to record.
+
+                int idx = -1;
+
+                if (field.deve_idx>-1) {
+                    FitDeveField deveField = local_deve_fields[field.num];
+
+                    if (!record_deve_fields.contains(field.num)) {
+                        deveXdata->valuename << deveField.name.c_str();
+                        deveXdata->unitname << deveField.unit.c_str();
+
+                        record_deve_fields.insert(field.num, record_deve_fields.count());
+                    }
+                    idx = record_deve_fields[field.num];
+                } else {
+                    // TODO Store standard native ignored
+                }
+
+                if (idx>-1) {
+                    if (p == NULL &&
+                            (_values.type == SingleValue ||
+                             _values.type == FloatValue ||
+                             _values.type == StringValue))
+                       p = new XDataPoint();
+
+                    switch (_values.type) {
+                        case SingleValue: p->number[idx]=_values.v; break;
+                        case FloatValue: p->number[idx]=_values.f; break;
+                        case StringValue: p->string[idx]=_values.s.c_str(); break;
+                        default: break;
+                    }
                 }
             }
         }
