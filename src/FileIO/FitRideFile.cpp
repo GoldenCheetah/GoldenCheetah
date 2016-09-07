@@ -69,6 +69,7 @@ struct FitDeveField {
     int num;
     int type; // FIT base_type
     int size; // in bytes
+    int native; // native field number
     fit_string_value name;
     fit_string_value unit;
 };
@@ -1712,11 +1713,15 @@ struct FitFileReaderState
                 case 8:  // units
                     fieldDef.unit = value.s;
                     break;
-                default: ; // ignore it
+                case 15: // native field number
+                    fieldDef.native = value.v;
+                default:
+                    // ignore it
+                    break;
             }
         }
 
-        //qDebug() << "num" << fieldDef.num << "deve_idx" << fieldDef.dev_id << "name" << fieldDef.name.c_str() << "unit" << fieldDef.unit.c_str();
+        //qDebug() << "num" << fieldDef.num << "deve_idx" << fieldDef.dev_id << "type" << fieldDef.type << "native" << fieldDef.native << "name" << fieldDef.name.c_str() << "unit" << fieldDef.unit.c_str();
         if (!local_deve_fields.contains(fieldDef.num)) {
             local_deve_fields.insert(fieldDef.num, fieldDef);
         }
