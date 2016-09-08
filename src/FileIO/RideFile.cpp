@@ -476,7 +476,7 @@ RideFile::fillInIntervals()
     if (dataPoints_.empty())
         return;
     intervals_.clear();
-    double start = 0.0;
+    double start = dataPoints().first()->secs;
     int interval = dataPoints().first()->interval;
     const RideFilePoint *point=NULL, *previous=NULL;
     foreach (point, dataPoints()) {

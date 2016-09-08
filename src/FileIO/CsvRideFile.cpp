@@ -189,6 +189,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     double maxWatts=0.0;
     double lastsecs=0.0;
 
+    // RP3 accrual
+    int lastinterval=0;
+    double accruedseconds=0;
+    double accruedkm=0;
+
     bool eof = false;
     while (!is.atEnd() && !eof) {
         // the readLine() method doesn't handle old Macintosh CR line endings
@@ -937,15 +942,24 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     // we add time, distance and power to standard fields
                     // and the rest becomes XDATA
                     QStringList els = line.split(",", QString::KeepEmptyParts);
-                    if (els.count() == 25 && els[7].toDouble() >= lastsecs) {
+                    if (els.count() == 25) {
+
+                        if (els[1].toInt() != lastinterval) {
+                            // we have a new interval marker!
+                            lastinterval = els[1].toInt();
+                            accruedseconds = lastsecs >= 0 ? lastsecs : 0;
+                            accruedkm = lastKM;
+                            currentInterval++;
+                        }
 
                         // ignore time goes backwards
-                        lastsecs=els[7].toDouble();
+                        lastsecs=accruedseconds + els[7].toDouble();
+                        lastKM=accruedkm + (els[9].toDouble()/1000);
 
-                        rideFile->appendPoint(els[7].toDouble(),      // time in seconds
+                        rideFile->appendPoint(lastsecs,      // time in seconds
                                               0,                      // cad
                                               els[14].toDouble(),     // hr
-                                              els[9].toDouble()/1000, // distance (km, not meters)
+                                              lastKM, // distance (km, not meters)
                                               0, 0,                   // kph, nm
                                               els[4].toDouble(),      // power
                                               0, 0, 0, 0, 0,          // alt, lon, lat, headw, slope
@@ -954,13 +968,14 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                               0.0, 0.0, 0.0, 0.0,
                                               0.0, 0.0, 0.0, 0.0,
                                               0, 0,                   // smo2, thb
-                                              0, 0, 0, 0.0, 0);
+                                              0, 0, 0, 0.0,
+                                              currentInterval);
 
                         // add ALL data series to XDATA
                         // with NO conversion, stored exactly as found
                         XDataPoint *p = new XDataPoint();
-                        p->secs = els[7].toDouble();
-                        p->km = els[9].toDouble()/1000;
+                        p->secs = lastsecs;
+                        p->km = lastKM;
                         for(int i=0; i<25; i++)
                             p->number[i] = els[i].toDouble();
 
