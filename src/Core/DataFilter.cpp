@@ -2442,20 +2442,27 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 {   // XDATA_UNITS ("XDATA", "XDATASERIES")
 
                     if (p) { // only valid when iterating
+
                         // processing ride item (e.g. filter, formula)
                         // we return true or false if the xdata series exists for the ride in question
                         QString xdata = *(leaf->fparms[0]->lvalue.s);
                         QString series = *(leaf->fparms[1]->lvalue.s);
-                        XDataSeries *xs = m->ride()->xdata(xdata);
 
-                        if (xs && m->xdata().value(xdata,QStringList()).contains(series)) {
-                            int idx = m->xdata().value(xdata,QStringList()).indexOf(series);
-                            QString units;
-                            int count = m->ride()->xdata(xdata)->unitname.count();
-                            if (idx >= 0 && idx < xs->unitname.count())
-                                units = xs->unitname[idx];
-                            return Result(units);
-                        }
+                        if (m->xdataMatch(xdata, series, xdata, series)) {
+
+                            // we matched, xdata and series contain what was matched
+                            XDataSeries *xs = m->ride()->xdata(xdata);
+
+                            if (xs && m->xdata().value(xdata,QStringList()).contains(series)) {
+                                int idx = m->xdata().value(xdata,QStringList()).indexOf(series);
+                                QString units;
+                                int count = m->ride()->xdata(xdata)->unitname.count();
+                                if (idx >= 0 && idx < xs->unitname.count())
+                                    units = xs->unitname[idx];
+                                return Result(units);
+                            }
+
+                        } else return Result("");
 
                     } else return Result(""); // not for filtering
                 }
