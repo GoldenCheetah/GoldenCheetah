@@ -2345,7 +2345,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                         QString xdata = *(leaf->fparms[0]->lvalue.s);
                         QString series = *(leaf->fparms[1]->lvalue.s);
 
-                        if (m->xdata().value(xdata,QStringList()).contains(series)) return Result(1);
+                        if (m->xdataMatch(xdata, series, xdata, series)) return Result(1);
                         else return Result(0);
 
                     } else {
@@ -2356,8 +2356,11 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                         QString xdata = *(leaf->fparms[0]->lvalue.s);
                         QString series = *(leaf->fparms[1]->lvalue.s);
 
-                        // get the xdata value for this sample
-                        double returning = m->ride()->xdataValue(p, idx, xdata,series, leaf->xjoin);
+                        double returning = 0;
+
+                        // get the xdata value for this sample (if it exists)
+                        if (m->xdataMatch(xdata, series, xdata, series))
+                            returning = m->ride()->xdataValue(p, idx, xdata,series, leaf->xjoin);
 
                         // update state
                         df->indexes.insert(this, idx);

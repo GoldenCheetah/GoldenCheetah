@@ -165,6 +165,10 @@ class RideItem : public QObject
         // xdata definitions maps QString<xdata>, QStringList<xdataseries>
         QMap<QString,QStringList> &xdata() { return xdata_; }
 
+        // hunt down the xdata series by matching, returns true or false on match
+        // and will set mname and mseries to the value that matched
+        bool xdataMatch(QString name, QString series, QString &mname, QString &mseries);
+
         // ride() will open the ride if it isn't already when open=true
         // if we pass false then it will just return ride_ so we can
         // traverse currently open rides when config changes
