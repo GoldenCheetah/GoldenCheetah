@@ -1469,3 +1469,32 @@ QList<IntervalItem*> RideItem::intervals(RideFileInterval::intervaltype type) co
     }
     return returning;
 }
+
+// search through the xdata and match against wildcards passed
+// if found return true and set mname and mseries to what matched
+// otherwise return false
+bool
+RideItem::xdataMatch(QString name, QString series, QString &mname, QString &mseries)
+{
+    QMapIterator<QString, QStringList>xi(xdata_);
+    xi.toFront();
+    while (xi.hasNext()) {
+        xi.next();
+
+        if (QDir::match(name, xi.key())) {
+
+            // name matches
+            foreach(QString s, xi.value()) {
+
+                if (QDir::match(series, s)) {
+
+                    // series matches too
+                    mname = xi.key();
+                    mseries = s;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
