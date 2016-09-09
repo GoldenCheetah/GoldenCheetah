@@ -162,6 +162,7 @@ class RideFile : public QObject // QObject to emit signals
         friend class RideItem; // derived/wbal stale
         friend class IntervalItem; // access intervals 
         friend class MainWindow; // tells us we were modified
+        friend class ComparePane;
         friend class Context; // tells us we were saved
         friend class Athlete; // tells us we were saved
 
@@ -387,6 +388,10 @@ class RideFile : public QObject // QObject to emit signals
 
         //  should access via IntervalItem
         const QList<RideFileInterval*> &intervals() const { return intervals_; }
+
+        // xdata series
+        QMap<QString, XDataSeries*> xdata_;
+
         void clearIntervals();
         void fillInIntervals();
 
@@ -424,9 +429,6 @@ class RideFile : public QObject // QObject to emit signals
         void updateAvg(RideFilePoint* point);
 
         bool dstale; // is derived data up to date?
-
-        // xdata series
-        QMap<QString, XDataSeries*> xdata_;
 
         // data required to compute headwind based on weather broadcast
         double windSpeed_, windHeading_;

@@ -744,6 +744,53 @@ ComparePane::dropEvent(QDropEvent *event)
                     l->apower = p->apower;
                 }
             }
+
+            // now extract XDATA series too
+            QMapIterator<QString, XDataSeries *>xi(ride->xdata_);
+            xi.toFront();
+            while(xi.hasNext()) {
+                xi.next();
+
+                XDataSeries *x = new XDataSeries();
+                x->name = xi.value()->name;
+                x->valuename = xi.value()->valuename;
+                x->unitname = xi.value()->unitname;
+                x->valuetype = xi.value()->valuetype;
+
+                // add our xdata, with not points yet...
+                add.data->addXData(xi.key(), x);
+
+                // manage offsets
+                bool first = true;
+                double offset = 0.0f, offsetKM = 0.0f;
+
+                foreach(XDataPoint *p, xi.value()->datapoints) {
+
+                    if (p->secs >= stop) break;
+
+                    if (p->secs >= start) {
+
+                        // intervals always start from zero when comparing
+                        if (first) {
+                            first = false;
+                            offset = p->secs;
+                            offsetKM = p->km;
+                        }
+
+                        XDataPoint *addp = new XDataPoint();
+                        addp->km = p->km - offsetKM;
+                        addp->secs = p->secs - offset;
+
+                        for(int i=0; i< XDATA_MAXVALUES; i++) {
+                            addp->number[i] = p->number[i];
+                            addp->string[i] = p->string[i];
+                        }
+
+                        x->datapoints.append(addp);
+                    }
+                }
+            }
+
             add.data->recalculateDerivedSeries();
 
             // just use standard colors and cycle round
