@@ -43,5 +43,8 @@ CompareInterval::~CompareInterval()
     if (cache) {
         //XXX need to reference count! delete cache;
         cache = NULL;
+
+        // delete the ride that was created
+        delete data;
     }
 }
