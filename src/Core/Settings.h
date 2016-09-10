@@ -170,6 +170,7 @@
 #define GC_DPFV_MA                     "<global-general>dataprocess/fixspeed/ma"
 #define GC_CAD2SMO2                     "<global-general>dataprocess/fixmoxy/cad2smo2"
 #define GC_SPD2THB			"<global-general>dataprocess/fixmoxy/spd2thb"
+#define GC_DPFLS_PL                     "<global-general>dataprocess/fixlapswim/pool_length"
 
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
