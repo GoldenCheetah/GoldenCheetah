@@ -26,9 +26,13 @@
 #include "RideFile.h"
 
 struct GpxFileReader : public RideFileReader {
+    Q_DECLARE_TR_FUNCTIONS(GpxFileReader)
+    public:
+
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
-    bool hasWrite() const { return false; }
+    QByteArray toByteArray(Context *context, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad) const;
+    bool writeRideFile(Context *context, const RideFile *ride, QFile &file) const;
+    bool hasWrite() const { return true; }
 };
 
 #endif // _GpxRideFile_h
-
