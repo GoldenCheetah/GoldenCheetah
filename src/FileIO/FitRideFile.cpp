@@ -124,7 +124,8 @@ struct FitFileReaderState
     XDataSeries *weatherXdata;
     XDataSeries *swimXdata;
     XDataSeries *deveXdata;
-    QList<QString> deviceInfos;
+    QMap<int, QString> deviceInfos;
+    QList<QString> xdataInfos;
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
@@ -327,6 +328,7 @@ struct FitFileReaderState
                 case 1765: case 2130: case 2131: case 2132: return "Garmin FR920XT";
                 case 1836: case 2052: case 2053: case 2070: case 2100: return "Garmin Edge 1000";
                 case 1903: return "Garmin FR15";
+                case 1907: return "Garmin Vivoactive";
                 case 1967: return "Garmin Fenix2";
                 case 2050: case 2188: case 2189: return "Garmin Fenix3";
                 case 2067: case 2260: return "Garmin Edge 520";
@@ -355,8 +357,20 @@ struct FitFileReaderState
                 case 18: return "Joule";
                 case 19: return "Joule GPS";
                 case 22: return "Joule GPS+";
+                case 4096: return "Powertap G3";
 
-                default: return QString("Powertap Device %1");
+                default: return QString("Powertap Device %1").arg(prod);
+            }
+        } else if (manu == 13 ) {
+            // dynastream_oem
+            switch (prod) {
+                default: return QString("Dynastream %1").arg(prod);
+            }
+        } else if (manu == 29 ) {
+            // saxonar
+            switch (prod) {
+                case 1031: return "Power2max S";
+                default: return QString("Power2max %1").arg(prod);
             }
         } else if (manu == 32) {
             // wahoo
@@ -392,9 +406,61 @@ struct FitFileReaderState
             // Bryton!
             return "Bryton";
         } else {
-            return QString("Unknown FIT Device %1:%2").arg(manu).arg(prod);
+            QString name = "Unknown FIT Device";
+            return name + QString(" %1:%2").arg(manu).arg(prod);
         }
-        return "FIT (*.fit)";
+    }
+
+    QString getDeviceType(int device_type) {
+        switch (device_type) {
+            case 4: return "Headunit"; // bike_power
+            case 11: return "Powermeter"; // bike_power
+            case 120: return "HR"; // heart_rate
+            case 121: return "Speed-Cadence"; // bike_speed_cadence
+            case 122: return "Cadence"; // bike_speed
+            case 123: return "Speed"; // bike_speed
+            case 124: return "Stride"; // stride_speed_distance
+
+            default: return QString("Type %1").arg(device_type);
+        }
+    }
+
+    RideFile::SeriesType getSeriesForNative(int native_num) {
+        switch (native_num) {
+
+            case 0: // POSITION_LAT
+                    return RideFile::lat;
+            case 1: // POSITION_LONG
+                    return RideFile::lon;
+            case 2: // ALTITUDE
+                    return RideFile::alt;
+            case 3: // HEART_RATE
+                    return RideFile::hr;
+            case 4: // CADENCE
+                    return RideFile::cad;
+            case 5: // DISTANCE
+                    return RideFile::km;
+            case 6: // SPEED
+                    return RideFile::kph;
+            case 7: // POWER
+                    return RideFile::watts;
+            case 9: // GRADE
+                    return RideFile::slope;
+            case 13: // TEMPERATURE
+                    return RideFile::temp;
+            case 30: //LEFT_RIGHT_BALANCE
+                    return RideFile::lrbalance;
+            case 39: // VERTICAL OSCILLATION
+                    return RideFile::rvert;
+            case 41: // GROUND CONTACT TIME
+                    return RideFile::rcontact;
+            case 54: // THb
+                    return RideFile::thb;
+            case 57: // SMO2
+                    return RideFile::smo2;
+            default:
+                    return RideFile::none;
+        }
     }
 
     QString getNativeFieldName(int native_num) {
@@ -429,10 +495,10 @@ struct FitFileReaderState
             case 41: // GROUND CONTACT TIME
                      return "R-CONTACT";
 
-            case 54: // tHb
-                    return "THB";
+            case 54: // THb
+                    return "THb";
             case 57: // SMO2
-                    return "SMO2";
+                    return "SmO2";
 
             default:
                     return QString("FIELD_%1").arg(native_num);
@@ -613,37 +679,41 @@ struct FitFileReaderState
         int i = 0;
 
         int index=-1;
-        int manu = -1, prod = -1, version = -1;
+        int manu = -1, prod = -1, version = -1, type = -1;
+        fit_string_value name;
+
         QString deviceInfo;
 
         foreach(const FitField &field, def.fields) {
-            fit_value_t value = values[i++].v;
-
-            if( value == NA_VALUE )
-                continue;
+            FitValue value = values[i++];
 
             //qDebug() << field.num << value;
 
             switch (field.num) {
                 case 0:   // device index
-                     index = value;
+                     index = value.v;
                      break;
+                case 1:   // ANT+ device type
+                     type = value.v;
+                     break;
+                      // details: 0x78 = HRM, 0x79 = Spd&Cad, 0x7A = Cad, 0x7B = Speed
                 case 2:   // manufacturer
-                     manu = value;
+                     manu = value.v;
                      break;
                 case 4:   // product
-                     prod = value;
+                     prod = value.v;
                      break;
                 case 5:   // software version
-                     version = value;
+                     version = value.v;
                      break;
+                case 27:   // product name
+                     name = values[i++].s;
+                 break;
 
                 // all oher fields are ignored at present
                 case 253: //timestamp
                 case 3:   // serial number
                 case 10:  // battery voltage
-                case 1:   // ANT+ device type
-                          // details: 0x78 = HRM, 0x79 = Spd&Cad, 0x7A = Cad, 0x7B = Speed
                 case 6:   // hardware version
                 case 11:  // battery status
                 case 22:  // ANT network
@@ -655,15 +725,22 @@ struct FitFileReaderState
             if (FIT_DEBUG) {
                 printf("decodeDeviceInfo  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
             }
+            //qDebug() << field.num << value.v;
         }
 
-        deviceInfo += getManuProd(manu, prod) + QString(" Version %1\n").arg(version/100.0);
-        if (index == 0) { // keep only the first device now
-            if (deviceInfos.count()>index)
-                deviceInfos.replace(index, deviceInfo);
-            else
-                deviceInfos.append(deviceInfo);
-        }
+        //deviceInfo += QString("Device %1 ").arg(index);
+        deviceInfo += QString("%1 ").arg(getDeviceType(type));
+        if (manu>-1 && prod>-1)
+            deviceInfo += getManuProd(manu, prod);
+        if (name.length()>0)
+            deviceInfo += QString(" %1").arg(name.c_str());
+        if (version>0)
+            deviceInfo += QString(" (v%1)").arg(version/100.0);
+
+        // What is 7 and 0 ?
+        // 3 for Moxy ?
+        if (type>-1 && type != 0 && type != 7 && type != 3)
+            deviceInfos.insert(index, deviceInfo);
 
     }
 
@@ -1078,15 +1155,30 @@ struct FitFileReaderState
                 int idx = -1;
 
                 if (field.deve_idx>-1) {
-                    FitDeveField deveField = local_deve_fields[field.num];
-
-                    QString name = deveField.name.c_str();
-
-                    //if (deveField.native>-1)
-                    //    name = getNativeFieldName(deveField.native);
-
-
                     if (!record_deve_fields.contains(field.num)) {
+                        FitDeveField deveField = local_deve_fields[field.num];
+
+                        QString name = deveField.name.c_str();
+
+                        if (deveField.native>-1) {
+                            int i = 0;
+                            RideFile::SeriesType series = getSeriesForNative(deveField.native);
+                            QString nativeName = rideFile->symbolForSeries(series);
+
+                            if (nativeName.length() == 0)
+                                nativeName = QString("FIELD_%1").arg(native_num);
+                            else
+                                i++;
+
+                            do {
+                                i++;
+                                name = nativeName + (i>1?QString("-%1").arg(i):"");
+                            }
+                            while (deveXdata->valuename.contains(name));
+                            
+                            xdataInfos.append(QString("XData %1 : %2").arg(name).arg(deveField.name.c_str()));
+                        }
+
                         deveXdata->valuename << name;
                         deveXdata->unitname << deveField.unit.c_str();
 
@@ -2306,7 +2398,12 @@ struct FitFileReaderState
 
             QString deviceInfo;
             foreach(QString info, deviceInfos) {
-                deviceInfo += info;
+                deviceInfo += info + "\n";
+            }
+            if (deviceInfo.length()>0 && xdataInfos.count()>0)
+                 deviceInfo += "\n";
+            foreach(QString info, xdataInfos) {
+                deviceInfo += info + "\n";
             }
             rideFile->setTag("Device Info", deviceInfo);
 
