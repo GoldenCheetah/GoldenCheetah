@@ -100,12 +100,12 @@ GpxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
             }
 
             // GPX standard requires <time>, if present, to come next
-            if (ride->areDataPresent()->secs and point->secs >= 0)
+            if (ride->areDataPresent()->secs && point->secs >= 0)
             {
-                QDomElement time = doc.createElement("time");
+                QDomElement tm = doc.createElement("time");
                 QDomText text = doc.createTextNode(ride->startTime().toUTC().addSecs(point->secs).toString(Qt::ISODate));
-                time.appendChild(text);
-                trkpt.appendChild(time);
+                tm.appendChild(text);
+                trkpt.appendChild(tm);
             }
 
             // Extra things, if any, need to go into an <extensions> tag
