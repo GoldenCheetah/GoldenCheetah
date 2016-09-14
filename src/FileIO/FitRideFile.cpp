@@ -967,6 +967,7 @@ struct FitFileReaderState
             int native_num = field.num;
 
             if (field.deve_idx>-1) {
+
                 if (FIT_DEBUG) {
                     //qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
                     //qDebug() << "name" << local_deve_fields[field.num].name.c_str() << "unit" << local_deve_fields[field.num].unit.c_str() << _values.f;
@@ -1124,7 +1125,7 @@ struct FitFileReaderState
                             QString nativeName = rideFile->symbolForSeries(series);
 
                             if (nativeName.length() == 0)
-                                nativeName = QString("FIELD_%1").arg(native_num);
+                                nativeName = QString("FIELD_%1").arg(deveField.native);
                             else
                                 i++;
 
