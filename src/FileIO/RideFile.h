@@ -180,6 +180,8 @@ class RideFile : public QObject // QObject to emit signals
         friend class SplitActivityWizard;
         friend class SplitConfirm;
         friend class SplitSelect;
+        // fix tools
+        friend class FixLapSwim;
 
         // utility
         static unsigned int computeFileCRC(QString); 
