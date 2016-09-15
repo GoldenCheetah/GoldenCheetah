@@ -81,6 +81,7 @@ Q_OBJECT
                  MenuBar_Edit_FixHRSpikes,
                  MenuBar_Edit_FixPowerSpikes,
                  MenuBar_Edit_FixSpeed,
+                 MenuBar_Edit_FixLapSwim,
                  MenuBar_Edit_FixFreewheeling,
                  MenuBar_Edit_FixMoxy,
 
