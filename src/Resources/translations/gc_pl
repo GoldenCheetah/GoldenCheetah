@@ -1,0 +1,1 @@
+# polish translation for GoldenCheetah
