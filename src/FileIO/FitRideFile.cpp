@@ -399,6 +399,12 @@ struct FitFileReaderState
         } else if (manu == 95) {
             // Stryd
             return "Stryd";
+        } else if (manu == 98) {
+            // BSX
+            switch(prod) {
+                  case 2: return "BSX Insight 2";
+                  default: return QString("BSX %1").arg(prod);
+            }
         } else if (manu == 260) {
             // Zwift!
             return "Zwift";
