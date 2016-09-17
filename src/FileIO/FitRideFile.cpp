@@ -1164,7 +1164,7 @@ struct FitFileReaderState
                             }
                             while (deveXdata->valuename.contains(name));
                             
-                            xdataInfos.append(QString("XData %1 : %2").arg(name).arg(deveField.name.c_str()));
+                            xdataInfos.append(QString("DEVELOPER %1 : Field %2").arg(name).arg(deveField.name.c_str()));
                         }
 
                         deveXdata->valuename << name;
@@ -1922,6 +1922,11 @@ struct FitFileReaderState
 
         if (fieldDef.native > -1 && !record_deve_native_fields.values().contains(fieldDef.native)) {
             record_deve_native_fields.insert(fieldDef.num, fieldDef.native);
+
+            RideFile::SeriesType series = getSeriesForNative(fieldDef.native);
+            QString nativeName = rideFile->symbolForSeries(series);
+
+            xdataInfos.append(QString("STANDARD %1 : Field %2").arg(nativeName).arg(fieldDef.name.c_str()));
         }
     }
 
