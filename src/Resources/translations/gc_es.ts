@@ -102,7 +102,7 @@
     <message>
         <location filename="../../Gui/Pages.cpp" line="1138"/>
         <source>Nickname</source>
-        <translation>Nombre</translation>
+        <translation>Apodo</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1139"/>
@@ -217,12 +217,12 @@
 <context>
     <name>ActivityCRC</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3531"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3540"/>
         <source>Checksum</source>
         <translation>Suma de comprobación</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3535"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3544"/>
         <source>A checksum for the activity, can be used to trigger cache refresh in R scripts.</source>
         <translation>Una suma de comprobación para la actividad, se puede utilizar para disparar actualizaciones de datos precalculados en programas R.</translation>
     </message>
@@ -2537,34 +2537,39 @@ Presione Siguiente para Continuar</translation>
         <translation>Colapsar Todo</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="478"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="458"/>
+        <source>Reset to default</source>
+        <translation>Restablecer Columnas por defecto</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="484"/>
         <source>Sort User Intervals</source>
         <translation>Ordenar intervalos</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="565"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="571"/>
         <source>Rename route</source>
         <translation>Renombrar recorrido</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="570"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="576"/>
         <source>Stop tracking this segment</source>
         <translation>Detener seguimiento de este segmento</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="588"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="594"/>
         <source>Create a route segment</source>
         <translation>Crear un segmento de ruta</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="745"/>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="784"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="751"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="790"/>
         <source>Delete Interval</source>
         <translation>Borrar intervalo</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="745"/>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="784"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="751"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="790"/>
         <source>Unable to delete interval</source>
         <translation>Imposible borrar intervalo</translation>
     </message>
@@ -2598,7 +2603,7 @@ Presione Siguiente para Continuar</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="408"/>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="472"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="478"/>
         <source>Find Intervals...</source>
         <translation>Buscar intervalos...</translation>
     </message>
@@ -2607,25 +2612,25 @@ Presione Siguiente para Continuar</translation>
         <translation type="obsolete">Ordenar intervalos</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="486"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="492"/>
         <source>Zoom out</source>
         <translation>Alejar</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="493"/>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="548"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="499"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="554"/>
         <source>Zoom to interval</source>
         <translation>Enfocar intervalo</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="501"/>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="556"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="507"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="562"/>
         <source>Edit interval</source>
         <translation>Editar Intervalo</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="502"/>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="557"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="508"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="563"/>
         <source>Delete interval</source>
         <translation>Borrar intervalo</translation>
     </message>
@@ -2634,17 +2639,17 @@ Presione Siguiente para Continuar</translation>
         <translation type="obsolete">Crear ruta según intervalo</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="512"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="518"/>
         <source>Rename selected intervals</source>
         <translation>Renombrar intervalo seleccionado</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="514"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="520"/>
         <source>Delete selected intervals</source>
         <translation>Borrar intervalo seleccionado</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="547"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="553"/>
         <source>Zoom Out</source>
         <translation>Alejar</translation>
     </message>
@@ -2657,8 +2662,8 @@ Presione Siguiente para Continuar</translation>
         <translation type="obsolete">Mandar al fondo</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="613"/>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="615"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="619"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="621"/>
         <source>Find Intervals</source>
         <translation>Buscar Intervalos</translation>
     </message>
@@ -2671,12 +2676,12 @@ Presione Siguiente para Continuar</translation>
         <translation type="obsolete">La actividad seleccionada no tiene datos</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="613"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="619"/>
         <source>No activity selected</source>
         <translation>No hay actividad seleccionada</translation>
     </message>
     <message>
-        <location filename="../../Gui/AnalysisSidebar.cpp" line="615"/>
+        <location filename="../../Gui/AnalysisSidebar.cpp" line="621"/>
         <source>Current activity contains no data</source>
         <translation>La actividad seleccionada no tiene datos</translation>
     </message>
@@ -3410,22 +3415,22 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgLPCO</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2744"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2753"/>
         <source>Average Left Pedal Center Offset</source>
         <translation>Desplazamiento del Centro del Pedal Izq medio</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2745"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2754"/>
         <source>mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2746"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2755"/>
         <source>in</source>
         <translation>&quot;</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2750"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2759"/>
         <source>Platform center offset is the location on the left pedal platform where you apply force, on average.</source>
         <translation>La ubicación sobre la plataforma del pedal izquierdo donde se aplica la fuerza, en promedio.</translation>
     </message>
@@ -3433,17 +3438,17 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgLPP</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3258"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3267"/>
         <source>Average Left Power Phase Length</source>
         <translation>Rango de Fase de Potencia Izq media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3259"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3268"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3262"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3271"/>
         <source>It is the left pedal stroke region length where you produce positive power, on average.</source>
         <translation>La longitud de la región de la pedaleada izquierda donde se produce potencia positiva, en promedio.</translation>
     </message>
@@ -3451,17 +3456,17 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgLPPB</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2849"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2858"/>
         <source>Average Left Power Phase Start</source>
         <translation>Inicio de Fase de Potencia Izq media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2850"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2859"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2853"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2862"/>
         <source>It is the left pedal stroke angle where you start producing positive power, on average.</source>
         <translation>El ángulo de la pedaleada izquierda donde se comienza a producir potencia positiva, en promedio.</translation>
     </message>
@@ -3469,17 +3474,17 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgLPPE</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2951"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2960"/>
         <source>Average Left Power Phase End</source>
         <translation>Fin de Fase de Potencia Izq media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2952"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2961"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2955"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2964"/>
         <source>It is the left pedal stroke angle where you end producing positive power, on average.</source>
         <translation>El ángulo de la pedaleada izquierda donde finaliza la producción de potencia positiva, en promedio.</translation>
     </message>
@@ -3487,17 +3492,17 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgLPPP</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3344"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3353"/>
         <source>Average Left Peak Power Phase Length</source>
         <translation>Rango de Fase de Potencia Pico Izq media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3345"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3354"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3348"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3357"/>
         <source>It is the left pedal stroke region length where you produce peak power, on average.</source>
         <translation>La longitud de la región de la pedaleada izquierda donde se produce la potencia pico, en promedio.</translation>
     </message>
@@ -3505,17 +3510,17 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgLPPPB</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3052"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3061"/>
         <source>Average Left Peak Power Phase Start</source>
         <translation>Inicio Fase de Potencia Pico Izq media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3053"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3062"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3056"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3065"/>
         <source>It is the left pedal stroke angle where you start producing peak power, on average.</source>
         <translation>El ángulo de la pedaleada izquierda donde comienza la producción de potencia pico, en promedio.</translation>
     </message>
@@ -3523,17 +3528,17 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgLPPPE</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3155"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3164"/>
         <source>Average Left Peak Power Phase End</source>
         <translation>Fin de Fase de Potencia Pico Izq media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3156"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3165"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3159"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3168"/>
         <source>It is the left pedal stroke angle where you end producing peak power, on average.</source>
         <translation>El ángulo de la pedaleada izquierda donde finaliza la producción de potencia pico, en promedio.</translation>
     </message>
@@ -3541,18 +3546,18 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgLPS</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2641"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2650"/>
         <source>Average Left Pedal Smoothness</source>
         <translation>Fluidez Media Pedal Izq</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2642"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2643"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2651"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2652"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2646"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2655"/>
         <source>It measures how smoothly power is delivered to the left pedal throughout the revolution, on average.</source>
         <translation>Mide que tan redondo es el pedaleo del lado izquierdo, en promedio.</translation>
     </message>
@@ -3560,18 +3565,18 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgLTE</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2536"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2545"/>
         <source>Average Left Torque Effectiveness</source>
         <translation>Efectividade Media Pedal Izq</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2537"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2538"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2546"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2547"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2541"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2550"/>
         <source>It measures how much of the power delivered to the left pedal is pushing it forward, on average.</source>
         <translation>Mide cuanto de la potencia aplicada al pedal izquierdo lo hace avanzar, en promedio.</translation>
     </message>
@@ -3598,22 +3603,22 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgRPCO</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2797"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2806"/>
         <source>Average Right Pedal Center Offset</source>
         <translation>Desplazamiento del Centro del Pedal Der medio</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2798"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2807"/>
         <source>mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2799"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2808"/>
         <source>in</source>
         <translation>&quot;</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2803"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2812"/>
         <source>Platform center offset is the location on the right pedal platform where you apply force, on average.</source>
         <translation>La ubicación sobre la plataforma del pedal derecho donde se aplica la fuerza, en promedio.</translation>
     </message>
@@ -3621,17 +3626,17 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgRPP</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3302"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3311"/>
         <source>Average Right Power Phase Length</source>
         <translation>Rango de Fase de Potencia Der media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3303"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3312"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3306"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3315"/>
         <source>It is the right pedal stroke region length where you produce positive power, on average.</source>
         <translation>La longitud de la región de la pedaleada derecha donde se produce potencia positiva, en promedio.</translation>
     </message>
@@ -3639,17 +3644,17 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgRPPE</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3001"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3010"/>
         <source>Average Right Power Phase End</source>
         <translation>Fin de Fase de Potencia Der media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3002"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3011"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3005"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3014"/>
         <source>It is the right pedal stroke angle where you end producing positive power, on average.</source>
         <translation>El ángulo de la pedaleada derecha donde finaliza la producción de potencia positiva, en promedio.</translation>
     </message>
@@ -3657,17 +3662,17 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgRPPP</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3388"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3397"/>
         <source>Average Right Peak Power Phase Length</source>
         <translation>Rango de Fase de Potencia Pico Der media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3389"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3398"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3392"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3401"/>
         <source>It is the right pedal stroke region length where you produce peak power, on average.</source>
         <translation>La longitud de la región de la pedaleada derecha donde se produce la potencia pico, en promedio.</translation>
     </message>
@@ -3675,17 +3680,17 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgRPPPB</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3103"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3112"/>
         <source>Average Right Peak Power Phase Start</source>
         <translation>Inicio Fase de Potencia Pico Der media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3104"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3113"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3107"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3116"/>
         <source>It is the right pedal stroke angle where you start producing peak power, on average.</source>
         <translation>El ángulo de la pedaleada derecha donde comienza la producción de potencia pico, en promedio.</translation>
     </message>
@@ -3693,17 +3698,17 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgRPPPE</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3205"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3214"/>
         <source>Average Right Peak Power Phase End</source>
         <translation>Fin de Fase de Potencia Pico Der media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3206"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3215"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3209"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3218"/>
         <source>It is the right pedal stroke angle where you end producing peak power, on average.</source>
         <translation>El ángulo de la pedaleada derecha donde finaliza la producción de potencia pico, en promedio.</translation>
     </message>
@@ -3711,18 +3716,18 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgRPS</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2693"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2702"/>
         <source>Average Right Pedal Smoothness</source>
         <translation>Fluidez Media Pedal Der</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2694"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2695"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2703"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2704"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2698"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2707"/>
         <source>It measures how smoothly power is delivered to the right pedal throughout the revolution, on average.</source>
         <translation>Mide que tan redondo es el pedaleo del lado derecho, en promedio.</translation>
     </message>
@@ -3730,18 +3735,18 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgRTE</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2589"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2598"/>
         <source>Average Right Torque Effectiveness</source>
         <translation>Efectividade Media Pedal Der</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2590"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2591"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2599"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2600"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2594"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2603"/>
         <source>It measures how much of the power delivered to the right pedal is pushing it forward, on average.</source>
         <translation>Mide cuanto de la potencia aplicada al pedal derecho lo hace avanzar, en promedio.</translation>
     </message>
@@ -3749,17 +3754,17 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AvgRTPP</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2899"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2908"/>
         <source>Average Right Power Phase Start</source>
         <translation>Inicio Fase de Potencia Der media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2900"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2909"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2903"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2912"/>
         <source>It is the right pedal stroke angle where you start producing positive power, on average.</source>
         <translation>El ángulo de la pedaleada derecha donde comienza la producción de potencia pico, en promedio.</translation>
     </message>
@@ -5600,27 +5605,27 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="30"/>
         <source>GoldenCheetah CloudDB - Terms and Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>GoldenCheetah CloudDB - Términos y Condiciones</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="45"/>
         <source>&lt;b&gt;&lt;big&gt;Please read terms and conditions carefully before accepting !&lt;/big&gt;&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;Por favor lea los términos y condiciones cuidadosamente antes de aceptar !&lt;/big&gt;&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="55"/>
         <source>&lt;center&gt;&lt;b&gt;What is GoldenCheetah CloudDB&lt;/b&gt;&lt;br&gt;You have requested a function with shares or retrieves GoldenCheetah configuration artifacts like chart definitions, worksouts, custom metrics,... in a cloud based data storage extension which is running on Google App Engine in a data center of variable location as provided by Google and/or choosen by the GoldenCheetah team.&lt;br&gt;&lt;center&gt;&lt;b&gt;License and Privacy Rules for Sharing Artifacts&lt;/b&gt;&lt;br&gt;By sharing an artifact to CloudDB you agree to provide it under &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Creative Common License 4.0&lt;/a&gt;. When sharing you are asked to enter a &apos;Nickname&apos; and an &apos;Email-Address&apos; which are stored together with a unique identifier (which is automatically created for your athlete) in the CloudDB. This data is only used to support the CloudDB service and will not be disclosed or shared for other purposes (e.g. advertisement).&lt;br&gt;&lt;center&gt;&lt;b&gt;License and Rules for Importing Artifacts&lt;/b&gt;&lt;br&gt;By importing an artifact from CloudDB you accept the license agreement &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Creative Common License 4.0&lt;/a&gt;. Any artifcats are provided as-is without warranty of any kind, either expressed or implied, including, but not limited to, the implied warrenty of fitness for a particular purpose. The entire risk related to the quality of the artifact is with you. There is no liability regarding damages to your data trough the use of any of the artifacts and there will be no quality check/ensurance by the GoldenCheetah team for the provided artifacts.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Service Availability Disclaimer&lt;/b&gt;&lt;br&gt;The service is provisioned free-of-charge to the users of GoldenCheetah. There is no guarantee nor service level agreement on the 7x24 availabiliy of CloudDB services. The GoldenCheetah team has the right to delete artifacts from the CloudDB at any time and without prior notice to the providing user (e.g. due to quality issues, or due to limitations in storage capacity). The GoldenCheetah team has the right to suspend or stop the complete service or parts of the service at any time and without prior notice to the users.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Service Rules&lt;/b&gt;&lt;br&gt;The use of the service is exclusively granted to GoldenCheetah users - and the only permitted way to access any of the artifacts is through the GoldenCheetah application. Any attempt to access CloudDB data directly is forbidden and will either be blocked or may even end in suspending or stopping the service in general.&lt;br&gt;&lt;center&gt;&lt;b&gt;Accept or Reject&lt;/b&gt;&lt;br&gt;By pressing &apos;Accept the rules and conditions of CloudDB&apos; you confirm that you have read and fully understood the above text and you agree to follow all of these. This decision is recorded so that you will not asked again when using CloudDB related functions. &lt;br&gt;&lt;br&gt;If you are not sure you can choose &apos;Reject and don&apos;t use CloudDB&apos;. In this case this agreement request will appear again whenever you request to use a CloudDB related function in GoldenCheetah.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Source Code&lt;/b&gt;&lt;br&gt;The source code of CloudDB is published under &apos;GNU AFFERO GENERAL PUBLIC LICENSE Version 3&apos; here: &lt;a href= &quot;https://github.com/GoldenCheetah/CloudDB&quot; target=&quot;_blank&quot;&gt;CloudDB Repository&lt;/a&gt;&lt;br&gt;&lt;br&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;center&gt;&lt;b&gt;GoldenCheetah CloudDB&lt;/b&gt;&lt;br&gt;CloudDB permite compartir elementos de configuración de GoldenCheetah tales como gráficos, entrenamientos, métricas personalizadas,... en una base de datos compartida que utiliza Google App Engine en centros de datos de diferentes ubicaciones provista por Google y/o elegidas por el equipo de GoldenCheetah.&lt;br&gt;&lt;center&gt;&lt;b&gt;Licencia y Privacidad de elementos compartidos&lt;/b&gt;&lt;br&gt;Al compartir un elemento en CloudDB usted acuerda ofrecer el mismo bajo la &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Licencia Creative Common 4.0&lt;/a&gt;. Ale compartir se le solicitará ingresar un &apos;Apodo&apos; y una &apos;Dirección de Correo Electrónico&apos; los cuales serán almacendado junto con un identificador único (que será generado automáticamente para su &apos;Atleta&apos;) en la CloudDB. Estos datos solo se utilizan para dar soporte al servicio CloudDB y no seran publicados o utilizados para otros propósitos (Ej. publicidad).&lt;br&gt;&lt;center&gt;&lt;b&gt;Licencia y Reglas para importar elementos&lt;/b&gt;&lt;br&gt;Al importar un elemento descargado de CloudDB usted acepta el acuerdo de licencia &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Licencia Creative Common 4.0&lt;/a&gt;. Todos los elementos ofrecidos se proveen sin garantía de ningún tipo, ni expresa ni implícita, incluyendo pero no limitada a, la garantía de adecuación para cualquier propósito. El riesgo sobre la calidad de los elementos descargados es de vuestra exclusiva responsabilidad. No hay ninguna responsabilidad en cuanto a daños a los datos a través del uso de cualquiera de los elementos descargados y no existe ninguna verificación de calidad o aseguramiento por parte del equipo de GoldenCheetah por los elementos proporcionados.&lt;br&gt;&lt;center&gt;&lt;b&gt;Descargo sobre la disponibilidad del servicio CloudDB&lt;/b&gt;&lt;br&gt;El servicio se ofrece libre de costo a los usuarios de GoldenCheetah. No hay ninguna garantía o acuerdo de nivel de servicio sobre la disponibilidad 7x24 de los servicios CloudDB. El equipo GoldenCheetah se reserva el derecho a eliminar elementos de CloudDB en cualquier momento y sin notificación previa al proveedor (Ej. debido a problemas de calidad o limitaciones en la capacidad de almacenamiento). El equipo GoldenCheetah se reserva el derecho de suspender o detener completamente el servicio parcialmente o en su totalidad en cualquier momento y sin necesidad de notificación previa a los usuarios.&lt;br&gt;&lt;center&gt;&lt;b&gt;Reglas del servicio CloudDB&lt;/b&gt;&lt;br&gt;El uso del servicio se otorga exclusivamente a los usuarios de GoldenCheetah - y el único modo permitido de acceso a los elementos es mediante la aplicación GoldenCheetah. Cualquier intento de acceder a los datos de CloudDB de manera directa está prohibido y sera bloqueado o puede conducir a la suspensión o detención del servicio en general.&lt;br&gt;&lt;center&gt;&lt;b&gt;Aceptar o Rechazar&lt;/b&gt;&lt;br&gt;Al presionar &apos;Aceptar las Reglas y Condiciones de CloudDB&apos; usted confirma que ha leído y entiende completamente el texto anterior y acuerda su cumplimiento. Esta decisión será registrada de manera que no se le vuelva a consultar cada vez que utilize funciones relacionadas con CloudDB. &lt;br&gt;&lt;br&gt;Si usted no está seguro puede presionar &apos;Rechazar y no usar CloudDB&apos;. En este caso esta solicitud de acuerdo volverá a aparecer cada vez que usted intente utilizar una función relacionada con CloudDB en GoldenCheetah.&lt;br&gt;&lt;center&gt;&lt;b&gt;Código Fuente de CloudDB&lt;/b&gt;&lt;br&gt;El código fuente de CloudDB se publica bajo la &apos;Licencia Pública General GNU AFFERO Version 3&apos; en el: &lt;a href= &quot;https://github.com/GoldenCheetah/CloudDB&quot; target=&quot;_blank&quot;&gt;Repositorio CloudDB&lt;/a&gt;&lt;br&gt;&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="110"/>
         <source>Accept the rules and conditions of CloudDB</source>
-        <translation type="unfinished"></translation>
+        <translation>Aceptar las reglas y condiciones de CloudDB</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="113"/>
         <source>Reject and don&apos;t use CloudDB</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechazar y no usar CloudDB</translation>
     </message>
 </context>
 <context>
@@ -5635,147 +5640,147 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="425"/>
         <source>First</source>
-        <translation type="unfinished">Primero</translation>
+        <translation>Primero</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="426"/>
         <source>Next %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Próx. %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="427"/>
         <source>Prev %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ant. %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="444"/>
         <source>My Charts</source>
-        <translation type="unfinished"></translation>
+        <translation>Mis Gŕaficos</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="450"/>
         <source>All</source>
-        <translation type="unfinished">Todos</translation>
+        <translation>Todos</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="451"/>
         <source>Curated Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Solo Curados</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="452"/>
         <source>Uncurated Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Solo No Curados</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="457"/>
         <source>Any Sport</source>
-        <translation type="unfinished"></translation>
+        <translation>Cualquier Deporte</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="465"/>
         <source>Any Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Cualquier Idioma</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="470"/>
         <location filename="../../Cloud/CloudDBChart.cpp" line="983"/>
         <source>Search Keyword</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar Palabra Clave</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="609"/>
         <source>Select charts to download</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar Gŕaficos para Descargar</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="681"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>desconocido</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="683"/>
         <source>Trends</source>
-        <translation type="unfinished">Tendencias</translation>
+        <translation>Tendencias</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="684"/>
         <source>Activities</source>
-        <translation type="unfinished">Actividades</translation>
+        <translation>Actividades</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="685"/>
         <source>Diary</source>
-        <translation type="unfinished">Agenda</translation>
+        <translation>Agenda</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="686"/>
         <source>Train</source>
-        <translation type="unfinished">Rodillo</translation>
+        <translation>Rodillo</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="897"/>
         <source>Chart Maintenance</source>
-        <translation type="unfinished"></translation>
+        <translation>Administrar Gráficos</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="897"/>
         <source>Do you really want to delete this chart definition ?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Está seguro de querer eliminar este gráfico?</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="522"/>
         <location filename="../../Cloud/CloudDBChart.cpp" line="539"/>
         <source>Delete selected chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar el gráfico seleccionado</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="523"/>
         <location filename="../../Cloud/CloudDBChart.cpp" line="538"/>
         <source>Edit selected chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar el gráfico seleccionado</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="507"/>
         <location filename="../../Cloud/CloudDBChart.cpp" line="524"/>
         <location filename="../../Cloud/CloudDBChart.cpp" line="540"/>
         <source>Close</source>
-        <translation type="unfinished">Cerrar</translation>
+        <translation>Cerrar</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="424"/>
         <source>Showing %1 to %2 of %3 charts for %4 / Total uploaded %5</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrando %1 a %2 de %3 gráficos para %4 / Totales publicados: %5</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="506"/>
         <source>Download selected chart(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Descargar gráfico(s) seleccionado(s)</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="537"/>
         <source>Set selected chart &apos;Curated&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcar gráfico seleccionado como &quot;Curado&quot;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="599"/>
         <source>Chart maintenance - Edit or Delete your Charts</source>
-        <translation type="unfinished"></translation>
+        <translation>Administración de Gráficos - Editar o Eliminar sus Gráficos</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="605"/>
         <source>Curator chart maintenance - Curate, Edit or Delete Charts</source>
-        <translation type="unfinished"></translation>
+        <translation>Curadoría de Gráficos - Curar, Editar o Eliminar Gráficos</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="707"/>
         <source>&lt;h3&gt;%1&lt;/h3&gt;&lt;h4&gt;Last Edited At: %2 - Creator: %3&lt;/h4&gt;%4</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;h3&gt;%1&lt;/h3&gt;&lt;h4&gt;Último Editado el: %2 - Creador: %3&lt;/h4&gt;%4</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="987"/>
         <source>Reset Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Restablecer Búsqueda</translation>
     </message>
 </context>
 <context>
@@ -5783,52 +5788,52 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1201"/>
         <source>Chart Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre del Gráfico</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1203"/>
         <source>&lt;Chart Name&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Nombre del Gráfico&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1216"/>
         <source>Sport</source>
-        <translation type="unfinished">Deporte</translation>
+        <translation>Deporte</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1227"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Idioma</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1240"/>
         <source>Nickname</source>
-        <translation type="unfinished">Nombre</translation>
+        <translation>Apodo</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1248"/>
         <source>E-Mail</source>
-        <translation type="unfinished"></translation>
+        <translation>Correo Electrónico</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1266"/>
         <source>Version Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Detalles de la Versión</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1270"/>
         <source>Creator UUid</source>
-        <translation type="unfinished"></translation>
+        <translation>UUid del Creador</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1294"/>
         <source>&lt;Enter the description of the chart here&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Ingrese la descripción del gráfico aquí&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1306"/>
         <source>Upload</source>
-        <translation type="unfinished">Cargar</translation>
+        <translation>Publicar</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1339"/>
@@ -5838,44 +5843,44 @@ Are you sure?</source>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1384"/>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1400"/>
         <source>Upload Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Publicar Gráfico</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1339"/>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1400"/>
         <source>Please enter a valid chart name with min. 5 characters length.</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor ingrese un nombre de gráfico válido con una long. mín. de 5 caracteres.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1344"/>
         <source>Please enter a nickname for this athlete.</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor ingrese un apodo para este atleta.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1348"/>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1384"/>
         <source>Please enter a valid e-mail address.</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor ingrese una dirección de correo electrónico válida</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1353"/>
         <source>Please enter a sensible chart description.</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor ingrese una descripción ilustrativa del gráfico.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1357"/>
         <source>Cloud Upload</source>
-        <translation type="unfinished"></translation>
+        <translation>Publicar Gráfico</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1357"/>
         <source>Do you want to upload this chart definition ?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Quiere publicar este Gráfico?</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1307"/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
 </context>
 <context>
@@ -5883,7 +5888,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1156"/>
         <source>Close</source>
-        <translation type="unfinished">Cerrar</translation>
+        <translation>Cerrar</translation>
     </message>
 </context>
 <context>
@@ -5895,38 +5900,38 @@ Are you sure?</source>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="230"/>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="236"/>
         <source>CloudDB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="213"/>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="230"/>
         <source>Usage has exceeded the free quota - please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha excedido la cuota de uso sin cargo - por favor reintente más tarde.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="221"/>
         <source>Technical problem with CloudDB - please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Problemas técnicos con CloudDB - por favor reintente más tarde.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="227"/>
         <source>Authorization problem with CloudDB - please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Problemas de autorización con CloudDB - por favor reintente más tarde.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="236"/>
         <source>Technical problem with CloudDB - response code: %1 - please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Problemas técnicos con CloudDB - código de respuesta: %1 - por favor reintente más tarde.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="299"/>
         <source>HTTP</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="299"/>
         <source>SSL error(s) has occurred: %1</source>
-        <translation type="unfinished">Error(es) SSL: %1</translation>
+        <translation>Error(es) SSL: %1</translation>
     </message>
 </context>
 <context>
@@ -5934,12 +5939,12 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBCurator.cpp" line="64"/>
         <source>CloudDB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCurator.cpp" line="64"/>
         <source>Technical problem reading curator list - please try again later</source>
-        <translation type="unfinished"></translation>
+        <translation>Problemas técnicos leyendo la lista de curadores - por favor reintente más tarde</translation>
     </message>
 </context>
 <context>
@@ -5948,39 +5953,39 @@ Are you sure?</source>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="70"/>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="99"/>
         <source>CloudDB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="70"/>
         <source>Technical problem reading latest status - please try again later</source>
-        <translation type="unfinished"></translation>
+        <translation>Problemas técnicos leyendo el último estado - por favor reintente más tarde</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="99"/>
         <source>Technical problem reading status text - please try again later</source>
-        <translation type="unfinished"></translation>
+        <translation>Problemas técnicos leyendo texto de estado - por favor reintente más tarde</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="161"/>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="164"/>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="167"/>
         <source>CloudDB Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Estado CloudDB</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="161"/>
         <source>&lt;b&gt;&lt;big&gt;Ok&lt;/b&gt;&lt;/big&gt;&lt;br&gt;&lt;br&gt;All Services should be operational - no problems known.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;Ok&lt;/b&gt;&lt;/big&gt;&lt;br&gt;&lt;br&gt;Todos los Servicios deberían estar operando normalmente - sin problemas reportados.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="164"/>
         <source>&lt;b&gt;&lt;big&gt;Limited Service&lt;/b&gt;&lt;/big&gt;&lt;br&gt;Sorry - some CloudDB services are not operational.&lt;br&gt;&lt;br&gt;&lt;b&gt;More information:&lt;/b&gt;&lt;br&gt;%1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;Servicio Limitado&lt;/b&gt;&lt;/big&gt;&lt;br&gt;Lo lamentamos - algunos servicios CloudDB no estan operativos.&lt;br&gt;&lt;br&gt;&lt;b&gt;Más información:&lt;/b&gt;&lt;br&gt;%1</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="167"/>
         <source>&lt;b&gt;&lt;big&gt;Service outage&lt;/b&gt;&lt;/big&gt;&lt;br&gt;Sorry - CloudDB services are not operational.&lt;br&gt;&lt;br&gt;&lt;b&gt;More information:&lt;/b&gt;&lt;br&gt;%1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;Fuera de Servicio&lt;/b&gt;&lt;/big&gt;&lt;br&gt;Lo lamentamos - Los servicios CloudDB no están operativos.&lt;br&gt;&lt;br&gt;&lt;b&gt;Más información:&lt;/b&gt;&lt;br&gt;%1</translation>
     </message>
 </context>
 <context>
@@ -6202,7 +6207,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="108"/>
         <source>Training</source>
-        <translation type="unfinished"></translation>
+        <translation>Rodillo</translation>
     </message>
     <message>
         <source>Train Devices</source>
@@ -6620,7 +6625,7 @@ Puede demorar.
     <message>
         <location filename="../../Gui/Pages.cpp" line="482"/>
         <source>Google Drive</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="558"/>
@@ -6697,7 +6702,7 @@ Puede demorar.
     <message>
         <location filename="../../Gui/Pages.cpp" line="934"/>
         <source>Google Drive Connection Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Falló la Conexión a Google Drive</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="978"/>
@@ -8269,12 +8274,12 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
 <context>
     <name>EOA</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2317"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2326"/>
         <source>Effect of Altitude</source>
         <translation>Efecto de la Altitud</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2321"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2330"/>
         <source>Relationship between altitude adjusted power and recorded power</source>
         <translation>Relación entre la Potencia ajustada por la altitud y la Potencia registrada</translation>
     </message>
@@ -9983,18 +9988,18 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2134"/>
         <source>Replace</source>
-        <translation type="unfinished"></translation>
+        <translation>Reemplazar</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2135"/>
         <location filename="../../Charts/RideEditor.cpp" line="2253"/>
         <source>Replace All</source>
-        <translation type="unfinished"></translation>
+        <translation>Reemplazar Todo</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2254"/>
         <source>Replaced %1 values</source>
-        <translation type="unfinished"></translation>
+        <translation>Se reemplazaron %1 valores</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2461"/>
@@ -10057,12 +10062,12 @@ Algunas unidades no registran la distancia sin un cuenta kilómetros pero regist
     <message>
         <location filename="../../FileIO/FixDeriveHeadwind.cpp" line="83"/>
         <source>Estimate Headwind Values</source>
-        <translation type="unfinished"></translation>
+        <translation>Estimar Valores de Viento en Contra</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDeriveHeadwind.cpp" line="160"/>
         <source>Derive Headwind from weather on </source>
-        <translation type="unfinished"></translation>
+        <translation>Derivar viento en contra desde datos climáticos en </translation>
     </message>
 </context>
 <context>
@@ -10070,7 +10075,7 @@ Algunas unidades no registran la distancia sin un cuenta kilómetros pero regist
     <message>
         <location filename="../../FileIO/FixDeriveHeadwind.cpp" line="59"/>
         <source>Use weather broadcasted data in FIT file to derive Headwind.</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar datos climáticos en el archivo FIT para derivar Viento en Contra</translation>
     </message>
 </context>
 <context>
@@ -10100,12 +10105,12 @@ Algunas unidades no registran la distancia sin un cuenta kilómetros pero regist
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="64"/>
         <source>Wind (kph)</source>
-        <translation type="unfinished"></translation>
+        <translation>Viento (km/h)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="65"/>
         <source>, heading</source>
-        <translation type="unfinished"></translation>
+        <translation>, dirección</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="108"/>
@@ -10118,7 +10123,15 @@ wind speed shall be indicated in kph
 wind heading (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
 Note: if the ride file already contain wind data
       it will be overridden if wind is entered manually</source>
-        <translation type="unfinished"></translation>
+        <translation>Derivar potencia estimada en base a velocidad/altimetría/peso, etc
+
+El parámetros Peso de la Bici se suma al peso del atleta para calcular la masa total, debería incluir ropa, zapatos, etc
+
+El parámetros CRR es el coeficiente de resistencia a la rodadura, depende de los neumáticos, la presión de inflado y la superficie
+La velocidad del viento debe indicarse en km/h
+La dirección del viento en grados desde -179 to +180 (-90=O, 0=N, 90=E, 180=S)
+Nota: si el archivo ya contiene datos climáticos
+      los mismos serán reemplazados por los datos aquí provistos</translation>
     </message>
     <message>
         <source>Derive estimated power data based on speed/elevation/weight etc
@@ -10273,6 +10286,37 @@ Máx Absoluto - define un valor máximo para la FC, cualquier valor superior ser
     </message>
 </context>
 <context>
+    <name>FixLapSwim</name>
+    <message>
+        <location filename="../../FileIO/FixLapSwim.cpp" line="110"/>
+        <source>Fix Lap Swim from Length Data</source>
+        <translation>Corregir Natación en Piscina</translation>
+    </message>
+</context>
+<context>
+    <name>FixLapSwimConfig</name>
+    <message>
+        <location filename="../../FileIO/FixLapSwim.cpp" line="52"/>
+        <source>Pool Length (m)</source>
+        <translation>Largo de Piscina (m)</translation>
+    </message>
+    <message>
+        <location filename="../../FileIO/FixLapSwim.cpp" line="68"/>
+        <source>Sometimes length times or distances from lap swimming files are wrong.
+You can fix length-by-length information in Editor SWIM tab: TYPE, DURATION and STROKES.
+This tool recompute accumulated time, distance and sample Speed/Cadence from the updated lengths.
+Laps are recreated using pause lengths as markers
+
+Pool Length (in meters) allows to re-define the field if value is &gt; 0</source>
+        <translation>A veces el tiempo o la distancia de los entrenamientos de natación en piscina es incorrecto.
+La información largo-por-largo (TYPE, DURATION y STROKES) se puede corregir utilizando la pestaña SWIM del Editor.
+Esta herramienta permite recalcular tiempo y distancia acumulados más la información segundo a segundo a partir de la información actulizada para cada largo.
+Los intervalos (laps) se recrean utilizando las pausas (largos con TYPE=0) como separadores
+
+Longitud de Piscina (m) permite redefinir este parámetro si el valor es &gt;0</translation>
+    </message>
+</context>
+<context>
     <name>FixMoxy</name>
     <message>
         <location filename="../../FileIO/FixMoxy.cpp" line="109"/>
@@ -10359,7 +10403,7 @@ This tools convert to revolutions or cycles per minute</source>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="160"/>
         <source>Estimate Running Power</source>
-        <translation type="unfinished"></translation>
+        <translation>Estimar Potencia de Carrera</translation>
     </message>
 </context>
 <context>
@@ -10367,22 +10411,22 @@ This tools convert to revolutions or cycles per minute</source>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="62"/>
         <source>Equipment Weight (kg)</source>
-        <translation type="unfinished"></translation>
+        <translation>Peso adicional (kg)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="63"/>
         <source>Draft mult.</source>
-        <translation type="unfinished"></translation>
+        <translation>Coef. de Draft.</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="64"/>
         <source>Wind (kph)</source>
-        <translation type="unfinished"></translation>
+        <translation>Viento (km/h)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="65"/>
         <source>, heading</source>
-        <translation type="unfinished"></translation>
+        <translation>, dirección</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="108"/>
@@ -10395,7 +10439,15 @@ Draft Mult. parameter is the multiplier to adjust for drafting, 1 is no drafting
 wind speed shall be indicated in kph
 wind heading (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
 Note: if the file already contain wind data it will be overridden if wind is entered</source>
-        <translation type="unfinished"></translation>
+        <translation>Deriva datos de potencia estimada en base a velocidad/altimetría/peso, etc utilizando los coeficientes de di Prampero
+
+El parámetro peso adicional se suma al peso del atleta para calcular la masa total, debería incluir ropa, zapatos, etc
+
+El parámetro Coef. de Draft es un multiplicador para considerar el efecto del drafting, 1 es no drafting  y 0.7 un valor razonable para cuado se corre detrás de un grupo
+
+la velocidad del viento debe indicarse en km/h
+la direción del viento en grados desde -179 a +180 (-90=O, 0=N, 90=E, 180=S)
+Nota: si el archivo contiene información climática la misma será reemplazada por los datos aquí indicados</translation>
     </message>
 </context>
 <context>
@@ -11966,7 +12018,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/Pages.cpp" line="66"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Idioma</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="68"/>
@@ -12406,12 +12458,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>Gradient</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2360"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2369"/>
         <source>Gradient</source>
         <translation>Pendiente</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2365"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2374"/>
         <source>Elevation Gain to Total Distance percent ratio</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19191,12 +19243,12 @@ PC del ciclista %3 vatios</translation>
         <translation>Estimar estrés por:</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="564"/>
+        <location filename="../../Gui/ManualRideDialog.cpp" line="563"/>
         <source>Swim</source>
         <translation>Natación</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="567"/>
+        <location filename="../../Gui/ManualRideDialog.cpp" line="566"/>
         <source>Run</source>
         <translation>Carrera</translation>
     </message>
@@ -19245,7 +19297,7 @@ PC del ciclista %3 vatios</translation>
         <translation>Métricas</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="552"/>
+        <location filename="../../Gui/ManualRideDialog.cpp" line="551"/>
         <source>Unable to save</source>
         <translation>Imposible guardar</translation>
     </message>
@@ -19254,7 +19306,7 @@ PC del ciclista %3 vatios</translation>
         <translation type="obsolete">Ya existe una actividad con la misma fecha y hora de inicio o falta parmiso para grabar el archivo.</translation>
     </message>
     <message>
-        <location filename="../../Gui/ManualRideDialog.cpp" line="553"/>
+        <location filename="../../Gui/ManualRideDialog.cpp" line="552"/>
         <source>There is already an activity with the same start time or you do not have permissions to save a file.</source>
         <translation>Ya existe una actividad con la misma fecha y hora o no tiene permisos para guardar un archivo.</translation>
     </message>
@@ -19356,18 +19408,18 @@ PC del ciclista %3 vatios</translation>
 <context>
     <name>MaxCT</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1973"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1982"/>
         <source>Max Core Temperature</source>
         <translation>Temperatura Central Máx</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1974"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1975"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1983"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1984"/>
         <source>C</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1977"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1986"/>
         <source>Maximum Core Temperature. The core body temperature estimate is based on HR data</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19375,18 +19427,18 @@ PC del ciclista %3 vatios</translation>
 <context>
     <name>MaxCadence</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2071"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2080"/>
         <source>Max Cadence</source>
         <translation>Cadencia Máx</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2072"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2073"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2081"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2082"/>
         <source>rpm</source>
         <translation>rpm</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2075"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2084"/>
         <source>Maximum Cadence</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19394,18 +19446,18 @@ PC del ciclista %3 vatios</translation>
 <context>
     <name>MaxHr</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1874"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1883"/>
         <source>Max Heartrate</source>
         <translation>Frec. Cardíaca Máx</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1875"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1876"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1884"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1885"/>
         <source>bpm</source>
         <translation>ppm</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1878"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1887"/>
         <source>Maximum Heart Rate.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19451,12 +19503,12 @@ PC del ciclista %3 vatios</translation>
 <context>
     <name>MaxPowerVariance</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2476"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2485"/>
         <source>Max Power Variance</source>
         <translation>Variación Potencia Máx</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2481"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2490"/>
         <source>Maximum Power Deviation with respect to 30sec Moving Average</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19502,22 +19554,22 @@ PC del ciclista %3 vatios</translation>
 <context>
     <name>MaxSpeed</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2020"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2029"/>
         <source>Max Speed</source>
         <translation>Velocidad Máx</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2021"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2030"/>
         <source>kph</source>
         <translation>km/h</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2022"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2031"/>
         <source>mph</source>
         <translation>mph</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2026"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2035"/>
         <source>Maximum Speed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19525,22 +19577,22 @@ PC del ciclista %3 vatios</translation>
 <context>
     <name>MaxTemp</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2119"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2128"/>
         <source>Max Temp</source>
         <translation>Temp Máx</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2120"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2129"/>
         <source>C</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2121"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2130"/>
         <source>F</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2126"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2135"/>
         <source>Maximum Cadence</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19586,12 +19638,12 @@ PC del ciclista %3 vatios</translation>
 <context>
     <name>MeanPowerVariance</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2408"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2417"/>
         <source>Average Power Variance</source>
         <translation>Variación Potencia Media</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2413"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2422"/>
         <source>Mean Power Deviation with respect to 30sec Moving Average</source>
         <translation type="unfinished"></translation>
     </message>
@@ -20226,18 +20278,18 @@ Tiempo empleado: %1
 <context>
     <name>MinHr</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1920"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1929"/>
         <source>Min Heartrate</source>
         <translation>FC Min</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1921"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1922"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1930"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1931"/>
         <source>bpm</source>
         <translation>ppm</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1924"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1933"/>
         <source>Minimum Heart Rate.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -20264,22 +20316,22 @@ Tiempo empleado: %1
 <context>
     <name>MinTemp</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2173"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2182"/>
         <source>Min Temp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2174"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2183"/>
         <source>C</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2175"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2184"/>
         <source>F</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2180"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2189"/>
         <source>Minimum Temperature</source>
         <translation type="unfinished"></translation>
     </message>
@@ -20306,18 +20358,18 @@ Tiempo empleado: %1
 <context>
     <name>MintHb</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1830"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1835"/>
         <source>Min tHb</source>
         <translation>tHb Mín</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1831"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1832"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1836"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1837"/>
         <source>g/dL</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1835"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1840"/>
         <source>Minimum total hemoglobin concentration. The total grams of hemoglobin per deciliter.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -21232,18 +21284,18 @@ No rides found to import.
 <context>
     <name>NinetyFivePercentHeartRate</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2227"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2236"/>
         <source>95% Heartrate</source>
         <translation>95% Frec. Cardíaca</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2228"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2229"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2237"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2238"/>
         <source>bpm</source>
         <translation>ppm</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2231"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2240"/>
         <source>Heart Rate for which 95% of activity samples has lower HR values</source>
         <translation type="unfinished"></translation>
     </message>
@@ -23790,8 +23842,8 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <translation type="vanished">usando una operación de cadena de caracteres con un número</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FitRideFile.cpp" line="847"/>
-        <location filename="../../FileIO/FitRideFile.cpp" line="1659"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="933"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="1796"/>
         <source>Lap %1</source>
         <translation>Vuelta %1</translation>
     </message>
@@ -27157,17 +27209,17 @@ Saltando archivo...</translation>
 <context>
     <name>RouteDropDialog</name>
     <message>
-        <location filename="../../Gui/ComparePane.cpp" line="1010"/>
+        <location filename="../../Gui/ComparePane.cpp" line="1057"/>
         <source>&quot;%1&quot;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/ComparePane.cpp" line="1035"/>
+        <location filename="../../Gui/ComparePane.cpp" line="1082"/>
         <source>&amp;All Selected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/ComparePane.cpp" line="1037"/>
+        <location filename="../../Gui/ComparePane.cpp" line="1084"/>
         <source>Just this &amp;One</source>
         <translation>Solo &amp;Este</translation>
     </message>
@@ -30532,18 +30584,18 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
 <context>
     <name>TotalCalories</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3464"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3473"/>
         <source>Calories (HR)</source>
         <translation>Calorías (FC)</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3465"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3466"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3474"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3475"/>
         <source>kcal</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3468"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3477"/>
         <source>Total Calories estimated from Time Moving, Heart Rate, Weight, Sex and Age</source>
         <translation type="unfinished"></translation>
     </message>
@@ -31530,12 +31582,12 @@ Presionar F3 en el controlador al finalizar.</translation>
 <context>
     <name>VAM</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2276"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2285"/>
         <source>VAM</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2280"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2289"/>
         <source>Velocita Ascensionale Media, average ascent speed in vertical meters per hour</source>
         <translation type="unfinished"></translation>
     </message>
