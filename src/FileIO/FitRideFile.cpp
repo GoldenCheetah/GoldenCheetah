@@ -105,6 +105,7 @@ struct FitFileReaderState
     double last_distance;
     QMap<int, FitDefinition> local_msg_types;
     QMap<int, FitDeveField>  local_deve_fields;
+    QMap<int, int> record_extra_fields;
     QMap<int, int> record_deve_fields;
     QMap<int, int> record_deve_native_fields;
     QSet<int> unknown_record_fields, unknown_global_msg_nums, unknown_base_type;
@@ -124,6 +125,7 @@ struct FitFileReaderState
     XDataSeries *weatherXdata;
     XDataSeries *swimXdata;
     XDataSeries *deveXdata;
+    XDataSeries *extraXdata;
     QMap<int, QString> deviceInfos;
     QList<QString> xdataInfos;
 
@@ -959,7 +961,9 @@ struct FitFileReaderState
         double smO2 = 0, tHb = 0;
         //bool run=false;
 
-        XDataPoint *p = NULL;
+        XDataPoint *p_deve = NULL;
+        XDataPoint *p_extra = NULL;
+
         fit_value_t lati = NA_VALUE, lngi = NA_VALUE;
         int i = 0;
         foreach(const FitField &field, def.fields) {
@@ -1048,14 +1052,17 @@ struct FitFileReaderState
                              rvert = value / 100.0f;
                              break;
 
-                    //case 40: // ACTIVITY_TYPE
-                    //         // TODO We should know/test value for run
-                    //         run = true;
-                    //         break;
+                    case 40: // GROUND CONTACT TIME PERCENT
+                             //break;
 
                     case 41: // GROUND CONTACT TIME
                              rcontact = value / 10.0f;
                              break;
+
+                    //case 40: // ACTIVITY_TYPE
+                    //         // TODO We should know/test value for run
+                    //         run = true;
+                    //         break;
 
                     case 43: // LEFT_TORQUE_EFFECTIVENESS
                              leftTorqueEff = value / 2.0;
@@ -1150,24 +1157,55 @@ struct FitFileReaderState
                         record_deve_fields.insert(field.num, record_deve_fields.count());
                     }
                     idx = record_deve_fields[field.num];
-                } else {
-                    // TODO Store standard native ignored
-                }
 
-                if (idx>-1) {
-                    if (p == NULL &&
-                            (_values.type == SingleValue ||
-                             _values.type == FloatValue ||
-                             _values.type == StringValue))
-                       p = new XDataPoint();
+                    if (idx>-1) {
+                        if (p_deve == NULL &&
+                                (_values.type == SingleValue ||
+                                 _values.type == FloatValue ||
+                                 _values.type == StringValue))
+                           p_deve = new XDataPoint();
 
-                    switch (_values.type) {
-                        case SingleValue: p->number[idx]=_values.v; break;
-                        case FloatValue: p->number[idx]=_values.f; break;
-                        case StringValue: p->string[idx]=_values.s.c_str(); break;
-                        default: break;
+                        switch (_values.type) {
+                            case SingleValue: p_deve->number[idx]=_values.v; break;
+                            case FloatValue: p_deve->number[idx]=_values.f; break;
+                            case StringValue: p_deve->string[idx]=_values.s.c_str(); break;
+                            default: break;
+                        }
                     }
+                } else {
+                    // Store standard native ignored
+                    if (!record_extra_fields.contains(field.num)) {
+                        RideFile::SeriesType series = getSeriesForNative(field.num);
+                        QString nativeName = rideFile->symbolForSeries(series);
+
+                        if (nativeName.length() == 0)
+                            nativeName = QString("FIELD_%1").arg(field.num);
+
+                        extraXdata->valuename << nativeName;
+                        extraXdata->unitname << "";
+
+                        record_extra_fields.insert(field.num, record_extra_fields.count());
+                    }
+                    idx = record_extra_fields[field.num];
+
+                    if (idx>-1) {
+                        if (p_extra == NULL &&
+                                (_values.type == SingleValue ||
+                                 _values.type == FloatValue ||
+                                 _values.type == StringValue))
+                           p_extra = new XDataPoint();
+
+                        switch (_values.type) {
+                            case SingleValue: p_extra->number[idx]=_values.v; break;
+                            case FloatValue: p_extra->number[idx]=_values.f; break;
+                            case StringValue: p_extra->string[idx]=_values.s.c_str(); break;
+                            default: break;
+                        }
+                    }
+
                 }
+
+
             }
         }
 
@@ -1313,9 +1351,13 @@ struct FitFileReaderState
         last_time = time;
         last_distance = km;
 
-        if (p != NULL) {
-            p->secs = secs;
-            deveXdata->datapoints.append(p);
+        if (p_deve != NULL) {
+            p_deve->secs = secs;
+            deveXdata->datapoints.append(p_deve);
+        }
+        if (p_extra != NULL) {
+            p_extra->secs = secs;
+            extraXdata->datapoints.append(p_extra);
         }
     }
 
@@ -2281,6 +2323,9 @@ struct FitFileReaderState
         deveXdata = new XDataSeries();
         deveXdata->name = "DEVELOPER";
 
+        extraXdata = new XDataSeries();
+        extraXdata->name = "EXTRA";
+
         bool stop = false;
         bool truncated = false;
 
@@ -2388,6 +2433,11 @@ struct FitFileReaderState
                 rideFile->addXData("DEVELOPER", deveXdata);
             else
                 delete deveXdata;
+
+            if (extraXdata->datapoints.count()>0)
+                rideFile->addXData("EXTRA", extraXdata);
+            else
+                delete extraXdata;
 
             return rideFile;
         }
