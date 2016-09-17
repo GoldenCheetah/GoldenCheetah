@@ -1928,9 +1928,11 @@ struct FitFileReaderState
             record_deve_native_fields.insert(fieldDef.num, fieldDef.native);
 
             RideFile::SeriesType series = getSeriesForNative(fieldDef.native);
-            QString nativeName = rideFile->symbolForSeries(series);
 
-            xdataInfos.append(QString("STANDARD %1 : Field %2").arg(nativeName).arg(fieldDef.name.c_str()));
+            if (series != RideFile::none) {
+                QString nativeName = rideFile->symbolForSeries(series);
+                xdataInfos.append(QString("STANDARD %1 : Field %2").arg(nativeName).arg(fieldDef.name.c_str()));
+            }
         }
     }
 
