@@ -70,6 +70,8 @@ struct FitDeveField {
     int type; // FIT base_type
     int size; // in bytes
     int native; // native field number
+    int scale;
+    int offset;
     fit_string_value name;
     fit_string_value unit;
 };
@@ -1134,9 +1136,16 @@ struct FitFileReaderState
                 int idx = -1;
 
                 if (field.deve_idx>-1) {
-                    if (!record_deve_fields.contains(field.num)) {
-                        FitDeveField deveField = local_deve_fields[field.num];
+                    FitDeveField deveField = local_deve_fields[field.num];
 
+                    int scale = deveField.scale;
+                    if (scale == -1)
+                        scale = 1;
+                    int offset = deveField.offset;
+                    if (offset == -1)
+                        offset = 0;
+
+                    if (!record_deve_fields.contains(field.num)) {
                         QString name = deveField.name.c_str();
 
                         if (deveField.native>-1) {
@@ -1173,8 +1182,8 @@ struct FitFileReaderState
                            p_deve = new XDataPoint();
 
                         switch (_values.type) {
-                            case SingleValue: p_deve->number[idx]=_values.v; break;
-                            case FloatValue: p_deve->number[idx]=_values.f; break;
+                            case SingleValue: p_deve->number[idx]=_values.v/(float)scale+offset; break;
+                            case FloatValue: p_deve->number[idx]=_values.f/(float)scale+offset; break;
                             case StringValue: p_deve->string[idx]=_values.s.c_str(); break;
                             default: break;
                         }
@@ -1879,32 +1888,34 @@ struct FitFileReaderState
                         break;
                 case 3:  // field_name
                         fieldDef.name = value.s;
-                    break;
+                        break;
                 case 4:  // array
-                    break;
+                        break;
                 case 5:  // components
-                    break;
+                        break;
                 case 6:  // scale
-                    break;
+                        fieldDef.scale = value.v;
+                        break;
                 case 7:  // offset
-                    break;
+                        fieldDef.offset = value.v;
+                        break;
                 case 8:  // units
-                    fieldDef.unit = value.s;
-                    break;
+                        fieldDef.unit = value.s;
+                        break;
                 case 9:  // bits
                 case 10: // accumulate
                 case 13: // fit_base_unit_id
                 case 14: // native_mesg_num
-                    break;
+                        break;
                 case 15: // native field number
-                    fieldDef.native = value.v;
+                        fieldDef.native = value.v;
                 default:
-                    // ignore it
-                    break;
+                        // ignore it
+                        break;
             }
         }
 
-        //qDebug() << "num" << fieldDef.num << "deve_idx" << fieldDef.dev_id << "type" << fieldDef.type << "native" << fieldDef.native << "name" << fieldDef.name.c_str() << "unit" << fieldDef.unit.c_str();
+        //qDebug() << "num" << fieldDef.num << "deve_idx" << fieldDef.dev_id << "type" << fieldDef.type << "native" << fieldDef.native << "name" << fieldDef.name.c_str() << "unit" << fieldDef.unit.c_str() << "scale" << fieldDef.scale << "offset" << fieldDef.offset;
         if (!local_deve_fields.contains(fieldDef.num)) {
             local_deve_fields.insert(fieldDef.num, fieldDef);
         }
