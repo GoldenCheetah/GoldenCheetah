@@ -1123,6 +1123,10 @@ struct FitFileReaderState
                              lrbalance = value/100.0;
                              break;
 
+                    case 87: // ???
+                         native_num = -2; // currently ignored (even in EXTRA)
+                         break;
+
 
                     default:
                             unknown_record_fields.insert(native_num);
