@@ -1052,14 +1052,14 @@ struct FitFileReaderState
                              rvert = value / 100.0f;
                              break;
 
-                    case 40: // GROUND CONTACT TIME PERCENT
+                    //case 40: // GROUND CONTACT TIME PERCENT
                              //break;
 
                     case 41: // GROUND CONTACT TIME
                              rcontact = value / 10.0f;
                              break;
 
-                    //case 40: // ACTIVITY_TYPE
+                    //case 42: // ACTIVITY_TYPE
                     //         // TODO We should know/test value for run
                     //         run = true;
                     //         break;
@@ -1080,39 +1080,46 @@ struct FitFileReaderState
                              //qDebug() << "COMBINED_PEDAL_SMOOTHNES" << value;
                              break;
                     case 53: // RUNNING CADENCE FRACTIONAL VALUE
+                             if (rideFile->getTag("Sport", "Bike") == "Run")
+                                 rcad += value/128.0f;
+                             else
+                                 cad += value/128.0f;
                              break;
                     case 54: // tHb
-                            tHb= value/100.0f;
-                            break;
+                             tHb= value/100.0f;
+                             break;
                     case 57: // SMO2
-                            smO2= value/10.0f;
-                            break;
+                             smO2= value/10.0f;
+                             break;
                     case 61: // ? GPS Altitude ? or atmospheric pressure ?
-                            break;
+                             break;
                     case 66: // ??
-                            break;
+                             break;
                     case 67: // ? Left Platform Center Offset ?
-                            leftPedalCenterOffset = value;
-                            break;
+                             leftPedalCenterOffset = value;
+                             break;
                     case 68: // ? Right Platform Center Offset ?
-                            rightPedalCenterOffset = value;
-                            break;
+                             rightPedalCenterOffset = value;
+                             break;
                     case 69: // ? Left Power Phase ?
-                            leftTopDeathCenter = round(valueList.at(0) * 360.0/256);
-                            leftBottomDeathCenter = round(valueList.at(1) * 360.0/256);
-                            break;
+                             leftTopDeathCenter = round(valueList.at(0) * 360.0/256);
+                             leftBottomDeathCenter = round(valueList.at(1) * 360.0/256);
+                             break;
                     case 70: // ? Left Peak Phase  ?
-                            leftTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
-                            leftBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
-                            break;
+                             leftTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
+                             leftBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
+                             break;
                     case 71: // ? Right Power Phase ?
-                            rightTopDeathCenter = round(valueList.at(0) * 360.0/256);
-                            rightBottomDeathCenter = round(valueList.at(1) * 360.0/256);
-                            break;
+                             rightTopDeathCenter = round(valueList.at(0) * 360.0/256);
+                             rightBottomDeathCenter = round(valueList.at(1) * 360.0/256);
+                             break;
                     case 72: // ? Right Peak Phase  ?
-                            rightTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
-                            rightBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
-                            break;
+                             rightTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
+                             rightBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
+                             break;
+                    case 84: // Left right balance
+                             lrbalance = value/100.0;
+                             break;
 
 
                     default:
