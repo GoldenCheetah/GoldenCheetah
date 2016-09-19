@@ -1729,6 +1729,8 @@ struct FitFileReaderState
         double total_distance = 0.0;
 
         QString segment_name;
+        bool fail = false;
+
         foreach(const FitField &field, def.fields) {
             const FitValue& value = values[i++];
 
@@ -1794,6 +1796,10 @@ struct FitFileReaderState
                         printf("Found segment name: %s\n", segment_name.toStdString().c_str());
                     }
                     break;
+                case 64:  // status
+                    fail = (value.v == 1);
+                    break;
+
                 case 33:  /* undocumented, ignored */  break;
                 case 71:  /* undocumented, ignored */  break;
                 case 75:  /* undocumented, ignored */  break;
@@ -1831,7 +1837,6 @@ struct FitFileReaderState
                 case 61:  /* undocumented, ignored */  break;
                 case 62:  /* undocumented, ignored */  break;
                 case 63:  /* undocumented, ignored */  break;
-                case 64:  /* undocumented, ignored */  break;
                 case 65:  // Segment UID
                          // ignored
                         break;
@@ -1844,6 +1849,11 @@ struct FitFileReaderState
                 case 82:  /* undocumented, ignored */  break;
                 default: ; // ignore it
             }
+        }
+
+        if (fail) { // Segment started but not ended
+            // no interval
+            return;
         }
 
         if (this_start_time == 0 || this_start_time-start_time < 0) {
