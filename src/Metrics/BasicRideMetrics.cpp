@@ -2132,7 +2132,7 @@ class MaxTemp : public RideMetric {
         setPrecision(1);
         setConversion(FAHRENHEIT_PER_CENTIGRADE);
         setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);
-        setDescription(tr("Maximum Cadence"));
+        setDescription(tr("Maximum Temperature"));
     }
 
     // override to special case NA

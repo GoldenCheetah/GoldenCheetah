@@ -138,7 +138,7 @@ static bool maxRunCadenceAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 struct AvgRunGroundContactTime : public RideMetric {
-    Q_DECLARE_TR_FUNCTIONS(VerticalOscillation)
+    Q_DECLARE_TR_FUNCTIONS(AvgRunGroundContactTime)
 
     double total, count;
 
