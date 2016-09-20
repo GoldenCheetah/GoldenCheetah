@@ -140,10 +140,6 @@
         <translation>.ten Schließen durchführen - 0 bedeutet nie</translation>
     </message>
     <message>
-        <source>Auto Backup Period</source>
-        <translation type="vanished">Sequenz für automatische Backups</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="1295"/>
         <source>Choose Picture</source>
         <translation>Bild wählen</translation>
@@ -201,12 +197,12 @@
 <context>
     <name>ActivityCRC</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3531"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3540"/>
         <source>Checksum</source>
         <translation>Prüfsumme</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3535"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3544"/>
         <source>A checksum for the activity, can be used to trigger cache refresh in R scripts.</source>
         <translation>Prüfsumme für die Aktivität, die als Trigger für einen Cache Refresh in R scripts verwendet werden kann.</translation>
     </message>
@@ -851,50 +847,6 @@ Bei Auswahl von &quot;Zur Bibliothek hinzu kopieren&quot; wird die Datei in die 
         <translation></translation>
     </message>
     <message>
-        <source>Peak 5s</source>
-        <translation type="vanished">Spitze 5s</translation>
-    </message>
-    <message>
-        <source>Peak 10s</source>
-        <translation type="vanished">Spitze 10s</translation>
-    </message>
-    <message>
-        <source>Peak 20s</source>
-        <translation type="vanished">Spitze 20s</translation>
-    </message>
-    <message>
-        <source>Peak 30s</source>
-        <translation type="vanished">Spitze30s</translation>
-    </message>
-    <message>
-        <source>Peak 1min</source>
-        <translation type="vanished">Spitze 1min</translation>
-    </message>
-    <message>
-        <source>Peak 2min</source>
-        <translation type="vanished">Spitze 2min</translation>
-    </message>
-    <message>
-        <source>Peak 5min</source>
-        <translation type="vanished">Spitze 5min</translation>
-    </message>
-    <message>
-        <source>Peak 10min</source>
-        <translation type="vanished">Spitze 10min</translation>
-    </message>
-    <message>
-        <source>Peak 20min</source>
-        <translation type="vanished">Spitze 20min</translation>
-    </message>
-    <message>
-        <source>Best %2%3 #%1</source>
-        <translation type="vanished">Beste %2%3 #%1</translation>
-    </message>
-    <message>
-        <source>Peak 30min</source>
-        <translation type="vanished">Spitze 30min</translation>
-    </message>
-    <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="260"/>
         <source>&amp;Add to Activity</source>
         <translation>Zur &amp;Aktivität hinzufügen</translation>
@@ -908,10 +860,6 @@ Bei Auswahl von &quot;Zur Bibliothek hinzu kopieren&quot; wird die Datei in die 
         <location filename="../../Gui/AddIntervalDialog.cpp" line="499"/>
         <source>No activity selected!</source>
         <translation>Keine Aktivität ausgewählt!</translation>
-    </message>
-    <message>
-        <source>Peak 60min</source>
-        <translation type="vanished">Spitze 60min</translation>
     </message>
 </context>
 <context>
@@ -2604,22 +2552,6 @@ Weiter klicken, um fortzufahren
 <context>
     <name>Athlete</name>
     <message>
-        <source>Zones File Error</source>
-        <translation type="vanished">Fehler beim Lesen der Zonendatei</translation>
-    </message>
-    <message>
-        <source>Reading Zones File</source>
-        <translation type="vanished">Lese Zonendatei</translation>
-    </message>
-    <message>
-        <source>HR Zones File Error</source>
-        <translation type="vanished">Fehler beim Lesen der HF-Zonendatei</translation>
-    </message>
-    <message>
-        <source>Reading HR Zones File</source>
-        <translation type="vanished">Lese HF Zonendatei</translation>
-    </message>
-    <message>
         <location filename="../../Core/Athlete.cpp" line="143"/>
         <source>Pace Zones File %1 Error</source>
         <translation>Fehler beim Lesen der Pace-Zonendatei %1</translation>
@@ -3064,14 +2996,6 @@ Weiter klicken, um fortzufahren
         <source>Enter directory or press [Browse] to select</source>
         <translation>Verzeichnis eingeben oder [Durchsuchen]</translation>
     </message>
-    <message>
-        <source>No autoimport</source>
-        <translation type="vanished">Kein automatischer Import</translation>
-    </message>
-    <message>
-        <source>Autoimport with dialog</source>
-        <translation type="vanished">Import mit Dialog</translation>
-    </message>
 </context>
 <context>
     <name>AverageWPK</name>
@@ -3152,22 +3076,22 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgLPCO</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2744"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2753"/>
         <source>Average Left Pedal Center Offset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2745"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2754"/>
         <source>mm</source>
         <translation>mm</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2746"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2755"/>
         <source>in</source>
         <translation>in</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2750"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2759"/>
         <source>Platform center offset is the location on the left pedal platform where you apply force, on average.</source>
         <translation></translation>
     </message>
@@ -3175,17 +3099,17 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgLPP</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3258"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3267"/>
         <source>Average Left Power Phase Length</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3259"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3268"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3262"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3271"/>
         <source>It is the left pedal stroke region length where you produce positive power, on average.</source>
         <translation></translation>
     </message>
@@ -3193,17 +3117,17 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgLPPB</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2849"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2858"/>
         <source>Average Left Power Phase Start</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2850"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2859"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2853"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2862"/>
         <source>It is the left pedal stroke angle where you start producing positive power, on average.</source>
         <translation></translation>
     </message>
@@ -3211,17 +3135,17 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgLPPE</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2951"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2960"/>
         <source>Average Left Power Phase End</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2952"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2961"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2955"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2964"/>
         <source>It is the left pedal stroke angle where you end producing positive power, on average.</source>
         <translation></translation>
     </message>
@@ -3229,17 +3153,17 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgLPPP</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3344"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3353"/>
         <source>Average Left Peak Power Phase Length</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3345"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3354"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3348"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3357"/>
         <source>It is the left pedal stroke region length where you produce peak power, on average.</source>
         <translation></translation>
     </message>
@@ -3247,17 +3171,17 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgLPPPB</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3052"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3061"/>
         <source>Average Left Peak Power Phase Start</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3053"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3062"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3056"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3065"/>
         <source>It is the left pedal stroke angle where you start producing peak power, on average.</source>
         <translation></translation>
     </message>
@@ -3265,17 +3189,17 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgLPPPE</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3155"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3164"/>
         <source>Average Left Peak Power Phase End</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3156"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3165"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3159"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3168"/>
         <source>It is the left pedal stroke angle where you end producing peak power, on average.</source>
         <translation></translation>
     </message>
@@ -3283,18 +3207,18 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgLPS</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2641"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2650"/>
         <source>Average Left Pedal Smoothness</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2642"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2643"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2651"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2652"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2646"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2655"/>
         <source>It measures how smoothly power is delivered to the left pedal throughout the revolution, on average.</source>
         <translation></translation>
     </message>
@@ -3302,18 +3226,18 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgLTE</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2536"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2545"/>
         <source>Average Left Torque Effectiveness</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2537"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2538"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2546"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2547"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2541"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2550"/>
         <source>It measures how much of the power delivered to the left pedal is pushing it forward, on average.</source>
         <translation></translation>
     </message>
@@ -3340,22 +3264,22 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgRPCO</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2797"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2806"/>
         <source>Average Right Pedal Center Offset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2798"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2807"/>
         <source>mm</source>
         <translation>mm</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2799"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2808"/>
         <source>in</source>
         <translation>in</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2803"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2812"/>
         <source>Platform center offset is the location on the right pedal platform where you apply force, on average.</source>
         <translation></translation>
     </message>
@@ -3363,17 +3287,17 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgRPP</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3302"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3311"/>
         <source>Average Right Power Phase Length</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3303"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3312"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3306"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3315"/>
         <source>It is the right pedal stroke region length where you produce positive power, on average.</source>
         <translation></translation>
     </message>
@@ -3381,17 +3305,17 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgRPPE</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3001"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3010"/>
         <source>Average Right Power Phase End</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3002"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3011"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3005"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3014"/>
         <source>It is the right pedal stroke angle where you end producing positive power, on average.</source>
         <translation></translation>
     </message>
@@ -3399,17 +3323,17 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgRPPP</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3388"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3397"/>
         <source>Average Right Peak Power Phase Length</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3389"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3398"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3392"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3401"/>
         <source>It is the right pedal stroke region length where you produce peak power, on average.</source>
         <translation></translation>
     </message>
@@ -3417,17 +3341,17 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgRPPPB</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3103"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3112"/>
         <source>Average Right Peak Power Phase Start</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3104"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3113"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3107"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3116"/>
         <source>It is the right pedal stroke angle where you start producing peak power, on average.</source>
         <translation></translation>
     </message>
@@ -3435,17 +3359,17 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgRPPPE</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3205"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3214"/>
         <source>Average Right Peak Power Phase End</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3206"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3215"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3209"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3218"/>
         <source>It is the right pedal stroke angle where you end producing peak power, on average.</source>
         <translation></translation>
     </message>
@@ -3453,18 +3377,18 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgRPS</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2693"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2702"/>
         <source>Average Right Pedal Smoothness</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2694"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2695"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2703"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2704"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2698"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2707"/>
         <source>It measures how smoothly power is delivered to the right pedal throughout the revolution, on average.</source>
         <translation></translation>
     </message>
@@ -3472,18 +3396,18 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgRTE</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2589"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2598"/>
         <source>Average Right Torque Effectiveness</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2590"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2591"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2599"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2600"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2594"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2603"/>
         <source>It measures how much of the power delivered to the right pedal is pushing it forward, on average.</source>
         <translation></translation>
     </message>
@@ -3491,17 +3415,17 @@ Weiter klicken, um fortzufahren
 <context>
     <name>AvgRTPP</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2899"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2908"/>
         <source>Average Right Power Phase Start</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2900"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2909"/>
         <source>°</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2903"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2912"/>
         <source>It is the right pedal stroke angle where you start producing positive power, on average.</source>
         <translation></translation>
     </message>
@@ -3523,6 +3447,21 @@ Weiter klicken, um fortzufahren
         <location filename="../../Metrics/RunMetrics.cpp" line="51"/>
         <source>Average Running Cadence, computed when Cadence &gt; 0</source>
         <translation>ø Lauf Schrittfrequenz, errechnet aus Frequenzen &gt; 0</translation>
+    </message>
+</context>
+<context>
+    <name>AvgRunGroundContactTime</name>
+    <message>
+        <location filename="../../Metrics/RunMetrics.cpp" line="154"/>
+        <location filename="../../Metrics/RunMetrics.cpp" line="158"/>
+        <source>Average Ground Contact Time</source>
+        <translation>ø Bodenkontaktzeit</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/RunMetrics.cpp" line="155"/>
+        <location filename="../../Metrics/RunMetrics.cpp" line="156"/>
+        <source>ms</source>
+        <translation>ms</translation>
     </message>
 </context>
 <context>
@@ -3645,13 +3584,6 @@ Weiter klicken, um fortzufahren
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="988"/>
         <source>Average total hemoglobin concentration. The total grams of hemoglobin per deciliter.</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>BT40Controller</name>
-    <message>
-        <source>Cannot Connect to BT40</source>
-        <translation type="vanished">Keine Verbindung zu BT40</translation>
     </message>
 </context>
 <context>
@@ -3789,49 +3721,6 @@ Weiter klicken, um fortzufahren
         <location filename="../../Gui/BatchExportDialog.cpp" line="277"/>
         <source>Read error</source>
         <translation>Lesefehler</translation>
-    </message>
-</context>
-<context>
-    <name>BestIntervalDialog</name>
-    <message>
-        <source>Interval length: </source>
-        <translation type="vanished">Intervalldauer:</translation>
-    </message>
-    <message>
-        <source>How many to find: </source>
-        <translation type="vanished">Gewünschte Intervallzahl:</translation>
-    </message>
-    <message>
-        <source>Results:</source>
-        <translation type="vanished">Ergebnisse:</translation>
-    </message>
-    <message>
-        <source>&amp;Find Intervals</source>
-        <translation type="vanished">&amp;Finde Intervalle</translation>
-    </message>
-    <message>
-        <source>&amp;Done</source>
-        <translation type="vanished">&amp;Fertig</translation>
-    </message>
-    <message>
-        <source>&amp;Add to Intervals</source>
-        <translation type="vanished">Zum Interv&amp;all hinzufügen</translation>
-    </message>
-    <message>
-        <source>Select Activity</source>
-        <translation type="vanished">Aktivität auswählen</translation>
-    </message>
-    <message>
-        <source>No activity selected!</source>
-        <translation type="vanished">Keine Aktivität ausgewählt!</translation>
-    </message>
-    <message>
-        <source>Bad Interval Length</source>
-        <translation type="vanished">Falsche Intervalldauer</translation>
-    </message>
-    <message>
-        <source>Interval length must be greater than zero!</source>
-        <translation type="vanished">Intervalldauer muss größer als Null sein!</translation>
     </message>
 </context>
 <context>
@@ -4411,10 +4300,6 @@ Setup starten.</translation>
         <location filename="../../Gui/Pages.cpp" line="4263"/>
         <source>Pmax</source>
         <translation>Pmax</translation>
-    </message>
-    <message>
-        <source>Use CP for FTP</source>
-        <translation type="vanished">Verwende CP als FTP</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4288"/>
@@ -5170,22 +5055,7 @@ Sind sie sicher?</translation>
     </message>
 </context>
 <context>
-    <name>CloudDBChartClient</name>
-    <message>
-        <source>HTTP</source>
-        <translation type="obsolete">HTTP</translation>
-    </message>
-    <message>
-        <source>SSL error(s) has occurred: %1</source>
-        <translation type="obsolete">Foldende SSL Fehler sind aufgetreten: %1</translation>
-    </message>
-</context>
-<context>
     <name>CloudDBChartListDialog</name>
-    <message>
-        <source>Showing %1 to %2 of %3 charts / Total on CloudDB %4</source>
-        <translation type="vanished">Diagramm %1 bis %2 von %3 / Gesamtanzahl in der CloudDB %4</translation>
-    </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="425"/>
         <source>First</source>
@@ -5278,14 +5148,6 @@ Sind sie sicher?</translation>
         <translation>Wollen Sie die Diagrammdefinition wirklich löschen ?</translation>
     </message>
     <message>
-        <source>Add selected chart to library</source>
-        <translation type="vanished">Ausgewähltes Diagramm zum Bibliothek hinzufügen</translation>
-    </message>
-    <message>
-        <source>Close without selection</source>
-        <translation type="vanished">Ohne Auswahl Schliessen</translation>
-    </message>
-    <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="522"/>
         <location filename="../../Cloud/CloudDBChart.cpp" line="539"/>
         <source>Delete selected chart</source>
@@ -5330,17 +5192,9 @@ Sind sie sicher?</translation>
         <translation>Verwalter Diagramm Pflege - Überprüfen, Editieren oder Löschen</translation>
     </message>
     <message>
-        <source>Select a Chart</source>
-        <translation type="vanished">Diagramm auswählen</translation>
-    </message>
-    <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="707"/>
         <source>&lt;h3&gt;%1&lt;/h3&gt;&lt;h4&gt;Last Edited At: %2 - Creator: %3&lt;/h4&gt;%4</source>
         <translation>&lt;h3&gt;%1&lt;/h3&gt;&lt;h4&gt;Letzte Änderung am: %2 - Urheber: %3&lt;/h4&gt;%4</translation>
-    </message>
-    <message>
-        <source>Chart definition is corrupt - please choose a different chart</source>
-        <translation type="vanished">Diagrammdefinitionsdaten sind defekt - bitte ein anderes Diagramm wälen</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="987"/>
@@ -5443,53 +5297,13 @@ Sind sie sicher?</translation>
         <translation>Wollen Sie diese Diagrammdefinition uploaden ?</translation>
     </message>
     <message>
-        <source>Publish</source>
-        <translation type="vanished">Veröffentlichen</translation>
-    </message>
-    <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1307"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
-    <message>
-        <source>Export Chart to ClouDB</source>
-        <translation type="vanished">Diagramm in die CloudDB exportieren</translation>
-    </message>
-    <message>
-        <source>Please enter a valid chart name!</source>
-        <translation type="vanished">Bitte einen gültigen Diagrammnamen eingeben!</translation>
-    </message>
-    <message>
-        <source>Export Chart to CloudDB</source>
-        <translation type="vanished">Diagramm in die CloudDB exportieren</translation>
-    </message>
-    <message>
-        <source>Please enter a nickname!</source>
-        <translation type="vanished">Bitte einen Spitznamen eingeben!</translation>
-    </message>
-    <message>
-        <source>Please enter a valid e-mail address!</source>
-        <translation type="vanished">Bitte eine gültige e-mail Adresse eingeben!</translation>
-    </message>
-    <message>
-        <source>Please enter a sensible chart description!</source>
-        <translation type="vanished">Bitte eine sinvolle Diagrammbeschreibung eingeben!</translation>
-    </message>
-    <message>
-        <source>Do you want to publish this chart definition to CloudDB</source>
-        <translation type="vanished">Wollen Sie diese Diagrammdefinition über die CloudDB veröffentlichen</translation>
-    </message>
-    <message>
-        <source>Please enter a chart name!</source>
-        <translation type="vanished">Bitte einen Diagrammnamen eingeben!</translation>
-    </message>
 </context>
 <context>
     <name>CloudDBChartShowPictureDialog</name>
-    <message>
-        <source>Ok</source>
-        <translation type="vanished">Ok</translation>
-    </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1156"/>
         <source>Close</source>
@@ -5738,10 +5552,6 @@ Sind sie sicher?</translation>
         <translation>Intervall</translation>
     </message>
     <message>
-        <source>dd MMM, yyyy</source>
-        <translation type="vanished">dd.MMM yyyy</translation>
-    </message>
-    <message>
         <location filename="../../Gui/ComparePane.cpp" line="386"/>
         <source>From</source>
         <translation>Von</translation>
@@ -5801,10 +5611,6 @@ Sind sie sicher?</translation>
         <location filename="../../Gui/ConfigDialog.cpp" line="108"/>
         <source>Training</source>
         <translation>Training</translation>
-    </message>
-    <message>
-        <source>Train Devices</source>
-        <translation type="vanished">Trainingsgeräte</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="165"/>
@@ -6853,10 +6659,6 @@ Wollen Sie die Änderung durchführen und Golden Cheetah neu starten?</translati
 <context>
     <name>DeviceTypes</name>
     <message>
-        <source>ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick</source>
-        <translation type="vanished">ANT+-Geräte z.B. SRM, Powertap, Quarq, Herzfrequenzgurte, Geschwindigkeits- oder Trittfrequenzmesser über Garmin ANT+ USB1 oder USB2 Stick</translation>
-    </message>
-    <message>
         <location filename="../../Train/DeviceTypes.cpp" line="36"/>
         <source>ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM and Powertap power meters, Heart rate belts, speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick</source>
         <translation>ANT+ Geräte und Trainer wie z.B. Kickr, NEO, Muin, SRM und Powertap Leistungsmesser, Herzfrequenzgurte, Geschwindigkeits- und Triffrequenzmesser über ANT+ USB1 oder USB2 stick</translation>
@@ -6870,10 +6672,6 @@ Wollen Sie die Änderung durchführen und Golden Cheetah neu starten?</translati
         <location filename="../../Train/DeviceTypes.cpp" line="47"/>
         <source>Bluetooth Low Energy devices such as KK Inride, Stages PM, Blue HR and Blue SC</source>
         <translation>Bluetooth Low Energy Geräte, z.B. KK Inride, Stages PM, Blue HR oder Blue SC</translation>
-    </message>
-    <message>
-        <source>The Wahoo Fitness Kickr cycling trainer via its Bluetooth smart interface. </source>
-        <translation type="vanished">Wahoo Fitness Kickr Radtrainer Bluetooth smart interface.</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="51"/>
@@ -7248,12 +7046,12 @@ an den Computer anschließen und
 <context>
     <name>EOA</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2317"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2326"/>
         <source>Effect of Altitude</source>
         <translation>Auswirkung der Höhe</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2321"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2330"/>
         <source>Relationship between altitude adjusted power and recorded power</source>
         <translation></translation>
     </message>
@@ -9020,10 +8818,6 @@ Einige Geräte zeichnen keine Distanz auf ohne Geschwindigkeitsmesser, aber die 
 <context>
     <name>FixDerivePowerConfig</name>
     <message>
-        <source>Derive estimated power data based on speed/elevation/weight etc</source>
-        <translation type="vanished">Erzeuge geschätzte Leistung basierend auf Geschwindigkeit/Höhe/Gewicht etc.</translation>
-    </message>
-    <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="62"/>
         <source>Bike Weight (kg)</source>
         <translation>Fahrradgewicht (kg)</translation>
@@ -9063,18 +8857,6 @@ Windgeschwindigkeit bitte in km/h angeben
 Die Einheit für Windrichtung (Quelle)  ist Grad von-179 to +180 (-90=W, 0=N, 90=E, 180=S)
 Hinweis: wenn die Aktivitätes-Datei bereits Wind Daten enhält
     werden die Daten überschrieben, wenn Wind Daten angegeben sind</translation>
-    </message>
-    <message>
-        <source>Derive estimated power data based on speed/elevation/weight etc
-
-Bike Weight parameter is added to athlete&apos;s weight to compound total mass, it should include apparel, shoes, etc
-
-CRR parameter is the coefficient of rolling resistance, it depends on tires and surface</source>
-        <translation type="vanished">Leite geschätzte Leistungswerte aus Geschwindigkeit/Höhe/Gewicht usw. ab
-
-Das Fahrradgewicht wird zum Athletengewicht hinzuaddiert um das Gesamtgewicht zu haben, es sollte daher Schuhe, Kleidung, usw. beinhalten
-
-CRR ist der Rollwiderstandskoeffizient; er hängt von Reifen und Oberfläche ab</translation>
     </message>
 </context>
 <context>
@@ -9215,6 +8997,36 @@ Der Parameter &quot;Absolutes Maximum&quot; definiert einen Wert für Herzfreque
     </message>
 </context>
 <context>
+    <name>FixLapSwim</name>
+    <message>
+        <location filename="../../FileIO/FixLapSwim.cpp" line="110"/>
+        <source>Fix Lap Swim from Length Data</source>
+        <translation>Korrigiere Bahn Schwimmen anhand Bahnlänge</translation>
+    </message>
+</context>
+<context>
+    <name>FixLapSwimConfig</name>
+    <message>
+        <location filename="../../FileIO/FixLapSwim.cpp" line="52"/>
+        <source>Pool Length (m)</source>
+        <translation>Bahnlänge (m)</translation>
+    </message>
+    <message>
+        <location filename="../../FileIO/FixLapSwim.cpp" line="68"/>
+        <source>Sometimes length times or distances from lap swimming files are wrong.
+You can fix length-by-length information in Editor SWIM tab: TYPE, DURATION and STROKES.
+This tool recompute accumulated time, distance and sample Speed/Cadence from the updated lengths.
+Laps are recreated using pause lengths as markers
+
+Pool Length (in meters) allows to re-define the field if value is &gt; 0</source>
+        <translation>Teilweise sind Längen, Zeiten oder Distanzen beim Bahnenschwimmen falsch.
+Sie können dies Bahn für Bahne im Editor &quot;SCHWIMMEN&quot; Tab korrigieren.
+Dieses Werkzeug berechnet die gesamte Zeit, Distanz und Geschwindigkeit/Schlagfrequenz aus der neuen Bahnlänge.
+
+Bahnlänge (in Metern) überschreibt die vorhandenen Bahnlängen, wenn der Wert &gt; 0 ist</translation>
+    </message>
+</context>
+<context>
     <name>FixMoxy</name>
     <message>
         <location filename="../../FileIO/FixMoxy.cpp" line="109"/>
@@ -9224,10 +9036,6 @@ Der Parameter &quot;Absolutes Maximum&quot; definiert einen Wert für Herzfreque
 </context>
 <context>
     <name>FixMoxyConfig</name>
-    <message>
-        <source>When recording from the Moxy in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
-        <translation type="vanished">Wenn die Aufzeichnungen des Moxy im Geschwindigkeit/Trittfrequenz Modus erfolgen werden SmO2 and tHb als Geschwindigkeit und Trittfrequenz übermittelt. Dieser Assistent verschiebt Werte vonr Geschwindigkeit und Trittfrequenz in die Moxy Datenfelder.</translation>
-    </message>
     <message>
         <location filename="../../FileIO/FixMoxy.cpp" line="52"/>
         <source>Field Adjustment</source>
@@ -10077,10 +9885,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation>keine Daten verfügbar</translation>
     </message>
     <message>
-        <source>All Chart Settings</source>
-        <translation type="vanished">Alle Diagrammeinstellungen</translation>
-    </message>
-    <message>
         <location filename="../../Charts/GoldenCheetah.cpp" line="822"/>
         <source>Chart Settings...</source>
         <translation>Diagrammeinstellungen...</translation>
@@ -10157,10 +9961,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <location filename="../../Gui/GcCrashDialog.cpp" line="293"/>
         <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%17&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Wahoo API&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
-        <translation type="vanished">&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Wahoo API&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</translation>
     </message>
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="504"/>
@@ -10359,10 +10159,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation>Starte das Kopieren von: Medien und Workout Dateien...</translation>
     </message>
     <message>
-        <source>%1 media and workout files moved to subdirectory: %2 - %3 failed</source>
-        <translation type="vanished">%1 Medien und Workout Dateien wurden ins Unterverzeichnis: %2 verschoben - %3 fehlgeschlagen</translation>
-    </message>
-    <message>
         <location filename="../../Core/GcUpgrade.cpp" line="598"/>
         <source>Start conversion of native activity files to GoldenCheetah .JSON format...</source>
         <translation>Starte die Konvertierung von original Trainingseinheitsdateien ins GoldenCheetah .JSON format...</translation>
@@ -10492,10 +10288,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>GcWindow</name>
     <message>
-        <source>All Chart Settings</source>
-        <translation type="vanished">Alle Diagrammeinstellungen</translation>
-    </message>
-    <message>
         <location filename="../../Charts/GoldenCheetah.cpp" line="58"/>
         <source>Chart Settings...</source>
         <translation>Diagrammeinstellungen...</translation>
@@ -10601,14 +10393,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation>Herzfrequenz über Leistung</translation>
     </message>
     <message>
-        <source>Google Map</source>
-        <translation type="vanished">Google Map</translation>
-    </message>
-    <message>
-        <source>Bing Map</source>
-        <translation type="vanished">Bing Map</translation>
-    </message>
-    <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="99"/>
         <source>2d Plot</source>
         <translation>2D-Diagramm</translation>
@@ -10693,10 +10477,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 </context>
 <context>
     <name>GeneralPage</name>
-    <message>
-        <source>Language:</source>
-        <translation type="vanished">Sprache:</translation>
-    </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="66"/>
         <source>Language</source>
@@ -10818,25 +10598,9 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation>R Installation (R_HOME)</translation>
     </message>
     <message>
-        <source>Crank Length:</source>
-        <translation type="vanished">Kurbelarmlänge:</translation>
-    </message>
-    <message>
-        <source>Wheelsize:</source>
-        <translation type="vanished">Laufradgröße:</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="119"/>
         <source>Use Garmin Smart Recording</source>
         <translation>Verwende Garmin Smart Recording</translation>
-    </message>
-    <message>
-        <source>Smart Recording Threshold (secs):</source>
-        <translation type="vanished">Grenzwert Smart Recording (sek):</translation>
-    </message>
-    <message>
-        <source>W&apos; bal formula:</source>
-        <translation type="vanished">W&apos;bal Formel:</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="149"/>
@@ -10854,33 +10618,9 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation>Web Services API aktivieren</translation>
     </message>
     <message>
-        <source>Workout and VideoSync Library:</source>
-        <translation type="vanished">Workout und VideoSync Bibliothek:</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="351"/>
         <source>Select Athlete Library</source>
         <translation>Athleten Bibliothek auswählen</translation>
-    </message>
-    <message>
-        <source>Elevation hysteresis (meters):</source>
-        <translation type="vanished">Hysterese für Höhenmeter (m):</translation>
-    </message>
-    <message>
-        <source>STS average (days):</source>
-        <translation type="vanished">STS Durchschnitt (Tage):</translation>
-    </message>
-    <message>
-        <source>LTS average (days):</source>
-        <translation type="vanished">LTS Durchschnitt (Tage):</translation>
-    </message>
-    <message>
-        <source>PMC Stress Balance Today</source>
-        <translation type="vanished">PMC Heutige Stress Balance</translation>
-    </message>
-    <message>
-        <source>Workout Library:</source>
-        <translation type="vanished">Workout Bibliothek:</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="190"/>
@@ -10890,41 +10630,9 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation>Durchsuchen</translation>
     </message>
     <message>
-        <source>mm</source>
-        <translation type="vanished">mm</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="160"/>
         <source>Warn for unsaved activities on exit</source>
         <translation>Beim Beenden warnen, falls ungesicherte Aktivitäten existieren</translation>
-    </message>
-    <message>
-        <source>Athlete Library:</source>
-        <translation type="vanished">Athleten Bibliothek:</translation>
-    </message>
-    <message>
-        <source>Short Term Stress</source>
-        <translation type="vanished">Kurzzeitbelastung (STS)</translation>
-    </message>
-    <message>
-        <source>STS</source>
-        <translation type="vanished">STS</translation>
-    </message>
-    <message>
-        <source>Long Term Stress</source>
-        <translation type="vanished">Langzeitbelastung (LTS)</translation>
-    </message>
-    <message>
-        <source>LTS</source>
-        <translation type="vanished">LTS</translation>
-    </message>
-    <message>
-        <source>Stress Balance</source>
-        <translation type="vanished">Stress Balance</translation>
-    </message>
-    <message>
-        <source>SB</source>
-        <translation type="vanished">SB</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="340"/>
@@ -11088,12 +10796,12 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>Gradient</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2360"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2369"/>
         <source>Gradient</source>
         <translation>Steigung</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2365"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2374"/>
         <source>Elevation Gain to Total Distance percent ratio</source>
         <translation>Verhältnis aus Höhengewinn und Gesamstrecke in Prozent</translation>
     </message>
@@ -12728,10 +12436,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation>Es konnte keine Zone für den zuletzt eingestellte Bereich gefunden werden</translation>
     </message>
     <message>
-        <source>LT must be greater than zero in zone range %1 of hr.zones</source>
-        <translation type="vanished">Laktatschwelle muss in Herzfrequenzzone %1 größer als &quot;0&quot; sein</translation>
-    </message>
-    <message>
         <location filename="../../Metrics/HrZones.cpp" line="45"/>
         <source>Active Recovery</source>
         <translation>aktive Erholung</translation>
@@ -13671,10 +13375,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>IntervalsPage</name>
     <message>
-        <source>Enable interval auto-discovery:</source>
-        <translation type="vanished">Intervallerkennung aktivieren:</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="6540"/>
         <source>Enable interval auto-discovery</source>
         <translation></translation>
@@ -13901,13 +13601,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <location filename="../../Gui/Pages.cpp" line="3195"/>
         <source>Delete</source>
         <translation>Löschen</translation>
-    </message>
-</context>
-<context>
-    <name>KickrController</name>
-    <message>
-        <source>Cannot Connect to Kickr</source>
-        <translation type="vanished">Keine Verbindung zum Kickr</translation>
     </message>
 </context>
 <context>
@@ -14590,10 +14283,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation>Diagramm importieren</translation>
     </message>
     <message>
-        <source>Import Chart from CloudDB...</source>
-        <translation type="vanished">Diagramm aus der CloudDB importieren...</translation>
-    </message>
-    <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1574"/>
         <source>Reset to default</source>
         <translation>Auf Vorschlagswerte zurücksetzen</translation>
@@ -14641,10 +14330,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <location filename="../../Charts/LTMTool.cpp" line="78"/>
         <source>Filter</source>
         <translation>Filter</translation>
-    </message>
-    <message>
-        <source>Chart</source>
-        <translation type="vanished">Diagramm</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="84"/>
@@ -15204,14 +14889,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation>Diagrammdaten exportieren...</translation>
     </message>
     <message>
-        <source>Export Chart Configuration...</source>
-        <translation type="vanished">Exportiere Diagrammeinstellungen...</translation>
-    </message>
-    <message>
-        <source>Export Chart Configuration to CloudDB...</source>
-        <translation type="vanished">Diagrammkonfiguration in die CloudDB exportieren...</translation>
-    </message>
-    <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1082"/>
         <source> grouped by </source>
         <translation> gruppiert nach </translation>
@@ -15634,10 +15311,6 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>Library</name>
     <message>
-        <source>Import Videos and Workouts</source>
-        <translation type="vanished">Videos und Workouts importieren</translation>
-    </message>
-    <message>
         <location filename="../../Train/Library.cpp" line="128"/>
         <source>Import Videos, VideoSyncs and Workouts</source>
         <translation>Videos, VideoSyncs und Workouts finden und importieren</translation>
@@ -15671,17 +15344,9 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>LibrarySearchDialog</name>
     <message>
-        <source>Search for Workouts and Media</source>
-        <translation type="vanished">nach Trainingseinheiten und Medien suchen</translation>
-    </message>
-    <message>
         <location filename="../../Train/Library.cpp" line="253"/>
         <source>Search for Workouts, Syncs and Media</source>
         <translation>Nach Workouts, VideoSyncs und Medien suchen</translation>
-    </message>
-    <message>
-        <source>Workout files (.erg, .mrc etc)</source>
-        <translation type="vanished">Trainingsdateien (.erg, .mrc usw)</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="260"/>
@@ -15994,21 +15659,9 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>Diagramm hinzufügen</translation>
     </message>
     <message>
-        <source>Download from Device</source>
-        <translation type="vanished">Download von Gerät</translation>
-    </message>
-    <message>
-        <source>Create Manual Activity</source>
-        <translation type="vanished">Aktivität manuell hinzufügen</translation>
-    </message>
-    <message>
         <location filename="../../Gui/MainWindow.cpp" line="374"/>
         <source>Toggle Sidebar</source>
         <translation>Sidebar an/aus</translation>
-    </message>
-    <message>
-        <source>Split Activity...</source>
-        <translation type="vanished">Aktivität aufteilen...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1621"/>
@@ -16099,10 +15752,6 @@ on and that its display says, &quot;PC Link&quot;</source>
         <location filename="../../Gui/MainWindow.cpp" line="1374"/>
         <source>Chart Import</source>
         <translation>Diagramm Import</translation>
-    </message>
-    <message>
-        <source>Imported %1 charts</source>
-        <translation type="vanished">%1 Diagramme importiert</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1521"/>
@@ -16251,10 +15900,6 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>Vergleichsbereich an/aus</translation>
     </message>
     <message>
-        <source>Find Intervals...</source>
-        <translation type="vanished">Intervalle suchen...</translation>
-    </message>
-    <message>
         <location filename="../../Gui/MainWindow.cpp" line="486"/>
         <source>Open &amp;Window</source>
         <translation>Öffne neues &amp;Fenster</translation>
@@ -16370,21 +16015,9 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>Heat Map erzeugen...</translation>
     </message>
     <message>
-        <source>CloudDB Status...</source>
-        <translation type="vanished">CloudDB Status...</translation>
-    </message>
-    <message>
-        <source>CloudDB Contributions</source>
-        <translation type="vanished">CloudDB Beiträge</translation>
-    </message>
-    <message>
         <location filename="../../Gui/MainWindow.cpp" line="596"/>
         <source>Maintain charts</source>
         <translation>Diagramm bearbeiten</translation>
-    </message>
-    <message>
-        <source>CloudDB Curator</source>
-        <translation type="vanished">CloudDB Verwalter</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="600"/>
@@ -16508,14 +16141,6 @@ Please check your preference settings.</source>
         <location filename="../../Gui/MainWindow.cpp" line="583"/>
         <source>Download workouts from ErgDB...</source>
         <translation>Workouts von der ErgDB herunterladen...</translation>
-    </message>
-    <message>
-        <source>Import workouts or videos...</source>
-        <translation type="vanished">Videos und Workouts importieren...</translation>
-    </message>
-    <message>
-        <source>Scan disk for videos and workouts...</source>
-        <translation type="vanished">Nach Videos und Workouts auf Festplatte suchen...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="649"/>
@@ -16805,18 +16430,18 @@ Please check your preference settings.</source>
 <context>
     <name>MaxCT</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1973"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1982"/>
         <source>Max Core Temperature</source>
         <translation>Max. Kern Temperatur</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1974"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1975"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1983"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1984"/>
         <source>C</source>
         <translation>°C</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1977"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1986"/>
         <source>Maximum Core Temperature. The core body temperature estimate is based on HR data</source>
         <translation></translation>
     </message>
@@ -16824,18 +16449,18 @@ Please check your preference settings.</source>
 <context>
     <name>MaxCadence</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2071"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2080"/>
         <source>Max Cadence</source>
         <translation>Maximale Trittfrequenz </translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2072"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2073"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2081"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2082"/>
         <source>rpm</source>
         <translation>1/min</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2075"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2084"/>
         <source>Maximum Cadence</source>
         <translation></translation>
     </message>
@@ -16843,18 +16468,18 @@ Please check your preference settings.</source>
 <context>
     <name>MaxHr</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1874"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1883"/>
         <source>Max Heartrate</source>
         <translation>Maximale Herzfrequenz </translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1875"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1876"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1884"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1885"/>
         <source>bpm</source>
         <translation>1/min</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1878"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1887"/>
         <source>Maximum Heart Rate.</source>
         <translation></translation>
     </message>
@@ -16900,12 +16525,12 @@ Please check your preference settings.</source>
 <context>
     <name>MaxPowerVariance</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2476"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2485"/>
         <source>Max Power Variance</source>
         <translation>Maximale Leistungsvariabilität</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2481"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2490"/>
         <source>Maximum Power Deviation with respect to 30sec Moving Average</source>
         <translation></translation>
     </message>
@@ -16951,22 +16576,22 @@ Please check your preference settings.</source>
 <context>
     <name>MaxSpeed</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2020"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2029"/>
         <source>Max Speed</source>
         <translation>Maximale Geschwindigkeit</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2021"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2030"/>
         <source>kph</source>
         <translation>km/h</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2022"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2031"/>
         <source>mph</source>
         <translation>mi/h</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2026"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2035"/>
         <source>Maximum Speed</source>
         <translation></translation>
     </message>
@@ -16974,24 +16599,24 @@ Please check your preference settings.</source>
 <context>
     <name>MaxTemp</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2119"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2128"/>
         <source>Max Temp</source>
         <translation>Maximale Temperatur</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2120"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2129"/>
         <source>C</source>
         <translation>°C</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2121"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2130"/>
         <source>F</source>
         <translation>°F</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2126"/>
-        <source>Maximum Cadence</source>
-        <translation></translation>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2135"/>
+        <source>Maximum Temperature</source>
+        <translation>Maximale Temperatur</translation>
     </message>
 </context>
 <context>
@@ -17035,12 +16660,12 @@ Please check your preference settings.</source>
 <context>
     <name>MeanPowerVariance</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2408"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2417"/>
         <source>Average Power Variance</source>
         <translation>ø Leistungsvariabilität</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2413"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2422"/>
         <source>Mean Power Deviation with respect to 30sec Moving Average</source>
         <translation></translation>
     </message>
@@ -17386,18 +17011,18 @@ Sie haben die Möglichkeit vor der Zusammenführung Daten zu Importieren oder Do
 <context>
     <name>MinHr</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1920"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1929"/>
         <source>Min Heartrate</source>
         <translation>Minimal Herzfrequenz</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1921"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1922"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1930"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1931"/>
         <source>bpm</source>
         <translation>1/min</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1924"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1933"/>
         <source>Minimum Heart Rate.</source>
         <translation></translation>
     </message>
@@ -17424,22 +17049,22 @@ Sie haben die Möglichkeit vor der Zusammenführung Daten zu Importieren oder Do
 <context>
     <name>MinTemp</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2173"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2182"/>
         <source>Min Temp</source>
         <translation>Min. Temp.</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2174"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2183"/>
         <source>C</source>
         <translation>°C</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2175"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2184"/>
         <source>F</source>
         <translation>°F</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2180"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2189"/>
         <source>Minimum Temperature</source>
         <translation></translation>
     </message>
@@ -17466,18 +17091,18 @@ Sie haben die Möglichkeit vor der Zusammenführung Daten zu Importieren oder Do
 <context>
     <name>MintHb</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1830"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1835"/>
         <source>Min tHb</source>
         <translation>Min. tHb</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1831"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1832"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1836"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1837"/>
         <source>g/dL</source>
         <translation>g/dl</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1835"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="1840"/>
         <source>Minimum total hemoglobin concentration. The total grams of hemoglobin per deciliter.</source>
         <translation></translation>
     </message>
@@ -18356,18 +17981,18 @@ No rides found to import.
 <context>
     <name>NinetyFivePercentHeartRate</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2227"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2236"/>
         <source>95% Heartrate</source>
         <translation>95% Herzfrequenz</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2228"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2229"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2237"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2238"/>
         <source>bpm</source>
         <translation>1/min</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2231"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2240"/>
         <source>Heart Rate for which 95% of activity samples has lower HR values</source>
         <translation></translation>
     </message>
@@ -20736,10 +20361,6 @@ on and that its display says, &quot;Host&quot;</source>
         <source>Import</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Auto</source>
-        <translation type="vanished">automatisch</translation>
-    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -20765,94 +20386,10 @@ on and that its display says, &quot;Host&quot;</source>
         <translation>Radfahren</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FitRideFile.cpp" line="892"/>
-        <location filename="../../FileIO/FitRideFile.cpp" line="1739"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="939"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="1870"/>
         <source>Lap %1</source>
         <translation>Runde %1</translation>
-    </message>
-    <message>
-        <source>%1 is unknown</source>
-        <translation type="vanished">%1 ist unbekannt</translation>
-    </message>
-    <message>
-        <source>invalid data series for best(): %1</source>
-        <translation type="vanished">ungültige Datenserie für &quot;best()&quot;: %1</translation>
-    </message>
-    <message>
-        <source>invalid data series for tiz(): %1</source>
-        <translation type="vanished">ungültige Datenserie für &quot;tiz()&quot;: %1</translation>
-    </message>
-    <message>
-        <source>invalid literal for daterange(): %1</source>
-        <translation type="vanished">ungültiges Schlüsselwort für daterange(): %1</translation>
-    </message>
-    <message>
-        <source>invalid literal for config(): %1</source>
-        <translation type="vanished">ungültiges Schlüsselwort für config(): %1</translation>
-    </message>
-    <message>
-        <source>invalid literal for const(): %1</source>
-        <translation type="vanished">ungültiges Schlüsselwort für const(): %1</translation>
-    </message>
-    <message>
-        <source>which function has at least 2 parameters.</source>
-        <translation type="vanished">die Funktion hat mindestens 2 Parameter.</translation>
-    </message>
-    <message>
-        <source>isset/set/unset function first parameter is field/metric to set.</source>
-        <translation type="vanished">&apos;isset/set/unset&apos; Funktionen - der erste Parameter muss &apos;field/metric&apos; sein.</translation>
-    </message>
-    <message>
-        <source>%1 is not supported in isset/set/unset operations</source>
-        <translation type="vanished">%1 wird bei &apos;isset/set/unset&apos; Operationen nicht unterstützt</translation>
-    </message>
-    <message>
-        <source>isset has one parameter, a symbol to check.</source>
-        <translation type="vanished">&apos;isset&apos; hat einen Parameter - das zu prüfenden &apos;symbol&apos;.</translation>
-    </message>
-    <message>
-        <source>set function needs 3 paramaters; symbol, value and expression.</source>
-        <translation type="vanished">&apos;set&apos; Funktion benötigt 3 Parameter - &apos; symbol&apos;,&apos; value&apos; und &apos;expression&apos;.</translation>
-    </message>
-    <message>
-        <source>unset function needs 2 paramaters; symbol and expression.</source>
-        <translation type="vanished">&apos;unset&apos; Funktion benötigt 2 Parameter - &apos;symbol&apos; und &apos;expression&apos;.</translation>
-    </message>
-    <message>
-        <source>estimate function expects model name as first parameter.</source>
-        <translation type="vanished">&apos;estimate&apos; Funktion erwartet &apos;model name&apos; als ersten Parameter.</translation>
-    </message>
-    <message>
-        <source>estimate function expects model name as first parameter</source>
-        <translation type="vanished">&apos;estimate&apos; Funktion erwartet &apos;model name&apos; als ersten Parameter.</translation>
-    </message>
-    <message>
-        <source>estimate function expects parameter or duration as second parameter</source>
-        <translation type="vanished">&apos;estimate&apos; Funktion erwartet &apos;parameter&apos; oder &apos;duration&quot; als zweiten Parameter</translation>
-    </message>
-    <message>
-        <source>function &apos;%1&apos; expects %2 parameter(s) not %3</source>
-        <translation type="vanished">Funktion &apos;%1&apos; erwartet %2 Parameter, nicht %3</translation>
-    </message>
-    <message>
-        <source>unknown function %1</source>
-        <translation type="vanished">Funktion %1 nicht bekannt</translation>
-    </message>
-    <message>
-        <source>unary negation on a string!</source>
-        <translation type="vanished">unäre &apos;-&apos; Operation bei einem &apos;string&apos;!</translation>
-    </message>
-    <message>
-        <source>comparing strings with numbers</source>
-        <translation type="vanished">vergleiche Text mit Zahlen</translation>
-    </message>
-    <message>
-        <source>using a string operations with a number</source>
-        <translation type="vanished">verwende eine Text Operation mit einer Zahl</translation>
-    </message>
-    <message>
-        <source>internal parser error: parms</source>
-        <translation type="vanished">Interval Parser Fehler: &apos;parms&apos;</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.h" line="213"/>
@@ -20866,11 +20403,6 @@ yyyy</translation>
         <location filename="../../Charts/LTMPlot.h" line="241"/>
         <source>All</source>
         <translation>Alles</translation>
-    </message>
-    <message>
-        <source>dd MMM, yyyy</source>
-        <extracomment>Ensure EQUAL translation for EACH variant of date format used, don&apos;t mix</extracomment>
-        <translation type="vanished">dd.MMM yyyy</translation>
     </message>
     <message>
         <location filename="../../FileIO/KmlRideFile.cpp" line="146"/>
@@ -20946,10 +20478,6 @@ yyyy</translation>
         <location filename="../../FileIO/KmlRideFile.cpp" line="301"/>
         <source>Bike %1</source>
         <translation>Radfahren %1</translation>
-    </message>
-    <message>
-        <source>Problem Saving Charts Configuration</source>
-        <translation type="vanished">Problem beim Speichern der Diagrammdefinitionen</translation>
     </message>
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="196"/>
@@ -21630,13 +21158,6 @@ yyyy</translation>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="46"/>
         <source>Activity Count</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>RideDelegate</name>
-    <message>
-        <source>dd MMM yyyy</source>
-        <translation type="vanished">dd.MMM yyyy</translation>
     </message>
 </context>
 <context>
@@ -22855,10 +22376,6 @@ Skipping file...</source>
         <translation>Fehler: Unbekannter Dateityp</translation>
     </message>
     <message>
-        <source>Error - Not a valid file</source>
-        <translation type="vanished">Fehler: Fehlerhafte Datei</translation>
-    </message>
-    <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="473"/>
         <source>Step 2 of 4: Validating Files</source>
         <translation>Schritt 2 von 4: Prüfe Dateien</translation>
@@ -22886,10 +22403,6 @@ Skipping file...</source>
         <location filename="../../Gui/RideImportWizard.cpp" line="593"/>
         <source>Warning - </source>
         <translation>Warnung - </translation>
-    </message>
-    <message>
-        <source>dd MMM yyyy</source>
-        <translation type="vanished">dd.MMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="646"/>
@@ -22930,10 +22443,6 @@ Skipping file...</source>
         <location filename="../../Gui/RideImportWizard.cpp" line="1047"/>
         <source>Error - .JSON creation failed</source>
         <translation>Fehler - .JSON konnte nicht erstellt werden</translation>
-    </message>
-    <message>
-        <source> </source>
-        <translation type="vanished"> </translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="89"/>
@@ -22989,10 +22498,6 @@ Skipping file...</source>
         <location filename="../../Gui/RideImportWizard.cpp" line="278"/>
         <source>Import Files</source>
         <translation>Dateien importieren</translation>
-    </message>
-    <message>
-        <source>Step 3 of 4: Confirm Date and Time</source>
-        <translation type="vanished">Schritt 3 von 4: Datum und Zeit bestätigen</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="692"/>
@@ -23208,10 +22713,6 @@ Skipping file...</source>
         <location filename="../../Charts/RideMapWindow.cpp" line="66"/>
         <source>Bing</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Show markers</source>
-        <translation type="vanished">Markierungen anzeigen</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="73"/>
@@ -23751,81 +23252,6 @@ Skipping file...</source>
         <location filename="../../Cloud/ShareDialog.cpp" line="879"/>
         <source> Error from RideWithGPS: </source>
         <translation> Fehlermeldung von RideWithGPS: </translation>
-    </message>
-</context>
-<context>
-    <name>RiderPage</name>
-    <message>
-        <source>Nickname</source>
-        <translation type="vanished">Spitzname</translation>
-    </message>
-    <message>
-        <source>Date of Birth</source>
-        <translation type="vanished">Geburtsdatum</translation>
-    </message>
-    <message>
-        <source>Sex</source>
-        <translation type="vanished">Geschlecht</translation>
-    </message>
-    <message>
-        <source>Unit</source>
-        <translation type="vanished">Einheiten</translation>
-    </message>
-    <message>
-        <source>Bio</source>
-        <translation type="vanished">Biographie</translation>
-    </message>
-    <message>
-        <source>Weight (%1)</source>
-        <translation type="vanished">Gewicht (%1)</translation>
-    </message>
-    <message>
-        <source>kg</source>
-        <translation type="vanished">kg</translation>
-    </message>
-    <message>
-        <source>lb</source>
-        <translation type="vanished">lb</translation>
-    </message>
-    <message>
-        <source>Height (%1)</source>
-        <translation type="vanished">Körpergröße (%1)</translation>
-    </message>
-    <message>
-        <source>cm</source>
-        <translation type="vanished">cm</translation>
-    </message>
-    <message>
-        <source>in</source>
-        <translation type="vanished">in</translation>
-    </message>
-    <message>
-        <source>W&apos;bal tau (s)</source>
-        <translation type="vanished">W&apos;bal tau (s)</translation>
-    </message>
-    <message>
-        <source>Male</source>
-        <translation type="vanished">männlich</translation>
-    </message>
-    <message>
-        <source>Female</source>
-        <translation type="vanished">weiblich</translation>
-    </message>
-    <message>
-        <source>Metric</source>
-        <translation type="vanished">metrisch</translation>
-    </message>
-    <message>
-        <source>Imperial</source>
-        <translation type="vanished">imperial</translation>
-    </message>
-    <message>
-        <source>Choose Picture</source>
-        <translation type="vanished">Wähle Bild</translation>
-    </message>
-    <message>
-        <source>Images (*.png *.jpg *.bmp)</source>
-        <translation type="vanished">Bilder (*.png, *.jpg, *.bmp)</translation>
     </message>
 </context>
 <context>
@@ -25173,118 +24599,14 @@ Möchten Sie fortfahren?</translation>
         <translation>ID</translation>
     </message>
     <message>
-        <source>Workout Code</source>
-        <translation type="vanished">Workout Code</translation>
-    </message>
-    <message>
-        <source>Sport</source>
-        <translation type="vanished">Sport</translation>
-    </message>
-    <message>
-        <source>Objective</source>
-        <translation type="vanished">Ziel</translation>
-    </message>
-    <message>
-        <source>Summary</source>
-        <translation type="vanished">Zusammenfassung</translation>
-    </message>
-    <message>
-        <source>Notes</source>
-        <translation type="vanished">Bemerkungen</translation>
-    </message>
-    <message>
-        <source>Keywords</source>
-        <translation type="vanished">Schlüsselwörter</translation>
-    </message>
-    <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="30"/>
         <source>Recording Interval</source>
         <translation>Aufzeichnungsintervall</translation>
     </message>
     <message>
-        <source>Weight</source>
-        <translation type="vanished">Gewicht</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Gerät</translation>
-    </message>
-    <message>
-        <source>Device Info</source>
-        <translation type="vanished">Geräteinfo</translation>
-    </message>
-    <message>
-        <source>Dropouts</source>
-        <translation type="vanished">Datenausfälle</translation>
-    </message>
-    <message>
-        <source>Dropout Time</source>
-        <translation type="vanished">Datenausfallzeit</translation>
-    </message>
-    <message>
-        <source>Spikes</source>
-        <translation type="vanished">Störspitzen</translation>
-    </message>
-    <message>
-        <source>Spike Time</source>
-        <translation type="vanished">Störspitzenzeit</translation>
-    </message>
-    <message>
-        <source>Torque Adjust</source>
-        <translation type="vanished">Drehmomentabgleich</translation>
-    </message>
-    <message>
-        <source>Filename</source>
-        <translation type="vanished">Dateiname</translation>
-    </message>
-    <message>
-        <source>Year</source>
-        <translation type="vanished">Jahr</translation>
-    </message>
-    <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="31"/>
         <source>Change History</source>
         <translation>Änderungshistorie</translation>
-    </message>
-    <message>
-        <source>Data</source>
-        <translation type="vanished">Daten</translation>
-    </message>
-    <message>
-        <source>Lean Mass</source>
-        <translation type="vanished">Magermasse</translation>
-    </message>
-    <message>
-        <source>Fat Mass</source>
-        <translation type="vanished">Fettmasse</translation>
-    </message>
-    <message>
-        <source>Fat Ratio</source>
-        <translation type="vanished">Körperfettanteil</translation>
-    </message>
-    <message>
-        <source>Height</source>
-        <translation type="vanished">Größe</translation>
-    </message>
-    <message>
-        <source>BMI</source>
-        <translation type="vanished">Body-Mass-Index</translation>
-    </message>
-    <message>
-        <source>File Format</source>
-        <translation type="vanished">Dateiformat</translation>
-    </message>
-    <message>
-        <source>Athlete</source>
-        <translation type="vanished">Athlet</translation>
-    </message>
-    <message>
-        <source>Month</source>
-        <translation type="vanished">Monat</translation>
-    </message>
-    <message>
-        <source>Weekday</source>
-        <translation type="vanished">Wochentag</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="33"/>
@@ -25295,10 +24617,6 @@ Möchten Sie fortfahren?</translation>
         <location filename="../../Metrics/SpecialFields.cpp" line="34"/>
         <source>Route</source>
         <translation>Route</translation>
-    </message>
-    <message>
-        <source>RPE</source>
-        <translation type="vanished">RPE</translation>
     </message>
 </context>
 <context>
@@ -25657,10 +24975,6 @@ Falls eine neu erstellte Aktivität zeitlich mit einer bereits exisiterenden zus
         <location filename="../../FileIO/SrmDevice.cpp" line="175"/>
         <source>opening PC6/7 at %1</source>
         <translation>öffne PC6/7 bei %1</translation>
-    </message>
-    <message>
-        <source>unsupported SRM Protocl version: %1</source>
-        <translation type="vanished">nicht unterstützte SRM Protokollversion: %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="180"/>
@@ -26482,129 +25796,6 @@ Falls eine neu erstellte Aktivität zeitlich mit einer bereits exisiterenden zus
     </message>
 </context>
 <context>
-    <name>ToolsDialog</name>
-    <message>
-        <source> mins</source>
-        <translation type="vanished"> min</translation>
-    </message>
-    <message>
-        <source> secs</source>
-        <translation type="vanished"> s</translation>
-    </message>
-    <message>
-        <source> watts</source>
-        <translation type="vanished"> Watt</translation>
-    </message>
-    <message>
-        <source>Critical Power Estimator</source>
-        <translation type="vanished">Critical Power Rechner</translation>
-    </message>
-    <message>
-        <source>Sport</source>
-        <translation type="vanished">Sport</translation>
-    </message>
-    <message>
-        <source>Bike</source>
-        <translation type="vanished">Radfahren</translation>
-    </message>
-    <message>
-        <source>Run</source>
-        <translation type="vanished">Laufen</translation>
-    </message>
-    <message>
-        <source>Swim</source>
-        <translation type="vanished">Schwimmen</translation>
-    </message>
-    <message>
-        <source>Your best short effort (3-5 min):</source>
-        <translation type="vanished">Beste kurzzeitige Maximalleistung (3-5min):</translation>
-    </message>
-    <message>
-        <source>Your best long effort (15-60 min):</source>
-        <translation type="vanished">Beste Langzeitmaximalleistung (15-60min):</translation>
-    </message>
-    <message>
-        <source>Your critical power:</source>
-        <translation type="vanished">Berechnete CP:</translation>
-    </message>
-    <message>
-        <source>Your W&apos;:</source>
-        <translation type="vanished">Ihr W&apos;:</translation>
-    </message>
-    <message>
-        <source>Estimate</source>
-        <translation type="vanished">Schätzung</translation>
-    </message>
-    <message>
-        <source> km</source>
-        <translation type="vanished"> km</translation>
-    </message>
-    <message>
-        <source> mi</source>
-        <translation type="vanished"> mi</translation>
-    </message>
-    <message>
-        <source> m</source>
-        <translation type="vanished">m</translation>
-    </message>
-    <message>
-        <source> yd</source>
-        <translation type="vanished"> yd</translation>
-    </message>
-    <message>
-        <source>Your critical pace:</source>
-        <translation type="vanished">Ihre kritische Pace:</translation>
-    </message>
-    <message>
-        <source>Your D&apos;:</source>
-        <translation type="vanished">Ihr D&apos;:</translation>
-    </message>
-    <message>
-        <source>%1 watts</source>
-        <translation type="vanished">%1 Watt</translation>
-    </message>
-    <message>
-        <source>%1 kJ</source>
-        <translation type="vanished">%1 kJ</translation>
-    </message>
-    <message>
-        <source>min/km</source>
-        <translation type="vanished">min/km</translation>
-    </message>
-    <message>
-        <source>min/mi</source>
-        <translation type="vanished">min/Meile</translation>
-    </message>
-    <message>
-        <source>km</source>
-        <translation type="vanished">km</translation>
-    </message>
-    <message>
-        <source>mi</source>
-        <translation type="vanished">mi</translation>
-    </message>
-    <message>
-        <source>min/100m</source>
-        <translation type="vanished">min/100m</translation>
-    </message>
-    <message>
-        <source>min/100yd</source>
-        <translation type="vanished">min/100yd</translation>
-    </message>
-    <message>
-        <source>m</source>
-        <translation type="vanished">m</translation>
-    </message>
-    <message>
-        <source>yd</source>
-        <translation type="vanished">yd</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="vanished">Fertig</translation>
-    </message>
-</context>
-<context>
     <name>ToolsRhoEstimator</name>
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="36"/>
@@ -26686,18 +25877,18 @@ Falls eine neu erstellte Aktivität zeitlich mit einer bereits exisiterenden zus
 <context>
     <name>TotalCalories</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3464"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3473"/>
         <source>Calories (HR)</source>
         <translation>Kalorien (HF)</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3465"/>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3466"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3474"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3475"/>
         <source>kcal</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3468"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="3477"/>
         <source>Total Calories estimated from Time Moving, Heart Rate, Weight, Sex and Age</source>
         <translation></translation>
     </message>
@@ -26799,14 +25990,6 @@ Klicken Sie auf &quot;Abbrechen&quot; um dieses Fenster zu schließen.</translat
         <location filename="../../Train/TrainDB.cpp" line="535"/>
         <source>None</source>
         <translation>Nicht aktiv</translation>
-    </message>
-    <message>
-        <source> Manual Erg Mode</source>
-        <translation type="vanished">Manuelle Ergometer Modus</translation>
-    </message>
-    <message>
-        <source> Manual Slope Mode</source>
-        <translation type="vanished">Manueller &quot;Slope&quot; Modus</translation>
     </message>
 </context>
 <context>
@@ -26942,10 +26125,6 @@ Klicken Sie auf &quot;Abbrechen&quot; um dieses Fenster zu schließen.</translat
         <translation>Die Workout Datei ist entweder ungültig oder existiert nicht und wird aus der Bibliothek entfernt.</translation>
     </message>
     <message>
-        <source>Delete selected workout</source>
-        <translation type="vanished">Ausgewähltes Workout löschen</translation>
-    </message>
-    <message>
         <location filename="../../Train/TrainSidebar.cpp" line="523"/>
         <source>Import Video from File</source>
         <translation>Video aus Datei importieren</translation>
@@ -26956,23 +26135,11 @@ Klicken Sie auf &quot;Abbrechen&quot; um dieses Fenster zu schließen.</translat
         <translation>Nach Videos suchen</translation>
     </message>
     <message>
-        <source>Delete selected video</source>
-        <translation type="vanished">Ausgewähltes Video löschen</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this video?</source>
-        <translation type="vanished">Dieses Video löschen?</translation>
-    </message>
-    <message>
         <location filename="../../Train/TrainSidebar.cpp" line="862"/>
         <location filename="../../Train/TrainSidebar.cpp" line="934"/>
         <location filename="../../Train/TrainSidebar.cpp" line="2124"/>
         <source>Delete</source>
         <translation>Löschen</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this workout?</source>
-        <translation type="vanished">Dieses Workout löschen?</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1624"/>
@@ -27394,12 +26561,12 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>VAM</name>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2276"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2285"/>
         <source>VAM</source>
         <translation>Klettergeschwindigkeit</translation>
     </message>
     <message>
-        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2280"/>
+        <location filename="../../Metrics/BasicRideMetrics.cpp" line="2289"/>
         <source>Velocita Ascensionale Media, average ascent speed in vertical meters per hour</source>
         <translation></translation>
     </message>
@@ -27461,14 +26628,6 @@ F3 drücken, wenn fertig.</translation>
         <location filename="../../Metrics/VDOTCalculator.cpp" line="125"/>
         <source> secs</source>
         <translation> s</translation>
-    </message>
-    <message>
-        <source>Your VDOT:</source>
-        <translation type="vanished">Ihr VDOT:</translation>
-    </message>
-    <message>
-        <source>Your Daniels&apos; Training Paces:</source>
-        <translation type="vanished">Ihre Daniel&apos;s Trainingspace:</translation>
     </message>
     <message>
         <location filename="../../Metrics/VDOTCalculator.cpp" line="136"/>
@@ -27651,21 +26810,6 @@ F3 drücken, wenn fertig.</translation>
     </message>
 </context>
 <context>
-    <name>VerticalOscillation</name>
-    <message>
-        <location filename="../../Metrics/RunMetrics.cpp" line="154"/>
-        <location filename="../../Metrics/RunMetrics.cpp" line="158"/>
-        <source>Average Ground Contact Time</source>
-        <translation>ø Bodenkontaktzeit</translation>
-    </message>
-    <message>
-        <location filename="../../Metrics/RunMetrics.cpp" line="155"/>
-        <location filename="../../Metrics/RunMetrics.cpp" line="156"/>
-        <source>ms</source>
-        <translation>ms</translation>
-    </message>
-</context>
-<context>
     <name>VideoWindow</name>
     <message>
         <location filename="../../Train/VideoWindow.cpp" line="302"/>
@@ -27819,37 +26963,6 @@ F3 drücken, wenn fertig.</translation>
         <location filename="../../Metrics/WPrime.cpp" line="1293"/>
         <source>Time expended when Power is above CP and W&apos; bal is above 75% of W&apos;.</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>WFApi</name>
-    <message>
-        <source>Unknown</source>
-        <translation type="vanished">Unbekannt</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation type="vanished">Kein</translation>
-    </message>
-    <message>
-        <source>Power Meter</source>
-        <translation type="vanished">Leistungsmeßgerät</translation>
-    </message>
-    <message>
-        <source>Bike Speed</source>
-        <translation type="vanished">Radgeschwindigkeit</translation>
-    </message>
-    <message>
-        <source>Bike Cadence</source>
-        <translation type="vanished">Trittfrequenz</translation>
-    </message>
-    <message>
-        <source>Speed and Cadence</source>
-        <translation type="vanished">Geschwindigkeit und Schrittfrequenz</translation>
-    </message>
-    <message>
-        <source>Heart Rate</source>
-        <translation type="vanished">Herzfrequenz</translation>
     </message>
 </context>
 <context>
@@ -29088,10 +28201,6 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
 </source>
         <translation>Erweitere letzten Bereich %1 auf unendlich um alle Daten einzuschließen.
 </translation>
-    </message>
-    <message>
-        <source>CP must be greater than zero in zone range %1 of power.zones</source>
-        <translation type="vanished">CP muss größer als 0 sein (Zonenbereich %1 von power.zones)</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="485"/>
