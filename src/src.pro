@@ -191,7 +191,8 @@ TRANSLATIONS = Resources/translations/gc_fr.ts \
                Resources/translations/gc_pt.ts \
                Resources/translations/gc_ru.ts \
                Resources/translations/gc_zh-cn.ts \
-               Resources/translations/gc_zh-tw.ts
+               Resources/translations/gc_zh-tw.ts \
+               Resources/translations/gc_nl.ts
 
 # need lrelease to generate qm files
 isEmpty(QMAKE_LRELEASE) {
