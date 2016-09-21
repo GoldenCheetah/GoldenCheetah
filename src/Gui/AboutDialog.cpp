@@ -167,6 +167,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Luke NRG");
     contributors.append("Magnus Gille");
     contributors.append("Marc Boudreau");
+    contributors.append("Marcel Breij");
     contributors.append("Mark Buller");
     contributors.append("Mark Liversedge");
     contributors.append("Mark Rages");
