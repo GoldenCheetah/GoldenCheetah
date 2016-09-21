@@ -1039,7 +1039,7 @@ struct AAvgPower : public RideMetric {
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
         setType(RideMetric::Average);
-        setDescription(tr("Average altitude power. Recorded power ajusted to take into account the effect of altitude on vo2max and thus power output."));
+        setDescription(tr("Average altitude power. Recorded power adjusted to take into account the effect of altitude on vo2max and thus power output."));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
