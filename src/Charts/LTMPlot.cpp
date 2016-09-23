@@ -974,7 +974,10 @@ LTMPlot::setData(LTMSettings *set)
                             if (metricDetail.uunits == "km") precision=0;
 
                             // we have a metric so lets be precise ...
-                            labelString = QString("%1").arg(value, 0, 'f', precision);
+                            if (PaceZones::isPaceUnit(metricDetail.uunits))
+                                labelString = time_to_string(value*60);
+                            else
+                                labelString = QString("%1").arg(value, 0, 'f', precision);
 
                         } else {
                             // no precision
@@ -1138,7 +1141,10 @@ LTMPlot::setData(LTMSettings *set)
                         if (metricDetail.uunits == "km") precision=0;
 
                         // we have a metric so lets be precise ...
-                        labelString = QString("%1").arg(value, 0, 'f', precision);
+                        if (PaceZones::isPaceUnit(metricDetail.uunits))
+                            labelString = time_to_string(value*60);
+                        else
+                            labelString = QString("%1").arg(value, 0, 'f', precision);
 
                     } else {
                         // no precision
@@ -2079,7 +2085,10 @@ LTMPlot::setCompareData(LTMSettings *set)
                                 if (metricDetail.uunits == "km") precision=0;
 
                                 // we have a metric so lets be precise ...
-                                labelString = QString("%1").arg(value , 0, 'f', precision);
+                                if (PaceZones::isPaceUnit(metricDetail.uunits))
+                                    labelString = time_to_string(value*60);
+                                else
+                                    labelString = QString("%1").arg(value , 0, 'f', precision);
     
                             } else {
                                 // no precision
@@ -2242,7 +2251,10 @@ LTMPlot::setCompareData(LTMSettings *set)
                             if (metricDetail.uunits == "km") precision=0;
 
                             // we have a metric so lets be precise ...
-                            labelString = QString("%1").arg(value, 0, 'f', precision);
+                            if (PaceZones::isPaceUnit(metricDetail.uunits))
+                                labelString = time_to_string(value*60);
+                            else
+                                labelString = QString("%1").arg(value, 0, 'f', precision);
 
                         } else {
                             // no precision
