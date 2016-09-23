@@ -3554,18 +3554,27 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
             precision = 1; // need more precision now
         }
 
+
+        // convert minutes to time string for pace, otherwise use precision
+        QString txtValue;
+        if (PaceZones::isPaceUnit(units) || PaceZones::isPaceUnit(this->axisTitle(curve->yAxis()).text())) {
+            txtValue = QString("%1").arg(time_to_string(value*60.0));
+        } else {
+            txtValue = QString("%1").arg(value, 0, 'f', precision);
+        }
+
         // output the tooltip
         QString text;
         if (!parent->isCompare()) {
             text = QString("%1\n%2\n%3 %4")
                         .arg(datestr)
                         .arg(curve->title().text())
-                        .arg(value, 0, 'f', precision)
+                        .arg(txtValue)
                         .arg(this->axisTitle(curve->yAxis()).text());
         } else {
             text = QString("%1\n%2 %3")
                         .arg(curve->title().text())
-                        .arg(value, 0, 'f', precision)
+                        .arg(txtValue)
                         .arg(this->axisTitle(curve->yAxis()).text());
         }
 
