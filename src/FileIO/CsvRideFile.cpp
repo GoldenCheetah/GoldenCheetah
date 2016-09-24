@@ -740,7 +740,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
                         QDateTime time;
 
-                        if (seconds<1000000000000)
+                        if (seconds < 1000000000000.0L)
                             time = QDateTime::fromTime_t(seconds);
                         else
                             time = QDateTime::fromMSecsSinceEpoch(seconds);
