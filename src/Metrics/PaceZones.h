@@ -214,6 +214,7 @@ class PaceZones : public QObject
         QString kphToPaceString(double kph, bool metric) const;
         QString paceUnits(bool metric) const;
         QString paceSetting() const;
+        static bool isPaceUnit(QString unit);
 };
 
 QColor paceZoneColor(int zone, int num_zones);

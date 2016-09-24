@@ -1016,3 +1016,12 @@ PaceZones::paceSetting() const
 {
     return swim ? GC_SWIMPACE : GC_PACE;
 }
+
+bool
+PaceZones::isPaceUnit(QString units)
+{
+    return (units == "min/km") || (units == tr("min/km")) ||
+           (units == "min/mile") || (units == tr("min/mile")) ||
+           (units == "min/100m") || (units == tr("min/100m")) ||
+           (units == "min/100yd") || (units ==  tr("min/100yd"));
+}
