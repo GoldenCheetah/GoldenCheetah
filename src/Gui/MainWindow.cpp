@@ -605,7 +605,8 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addSeparator();
 #endif
     // options are always at the end of the tools menu
-    optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()));
+    QAction *pref = optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()));
+    pref->setMenuRole(QAction:: PreferencesRole);
 
     HelpWhatsThis *optionsMenuHelp = new HelpWhatsThis(optionsMenu);
     optionsMenu->setWhatsThis(optionsMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Tools));
