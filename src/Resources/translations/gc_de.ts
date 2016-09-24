@@ -10344,7 +10344,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="85"/>
         <source>Activity Summary</source>
-        <translation>Zusammenfassung</translation>
+        <translation>Zusammenfassung Aktivität</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="86"/>
