@@ -220,7 +220,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
                 //       the TP upload web-service happy with zero values
                 if (add.watts == 1) add.watts = 0.0;
             } else add.watts = 0.0;
-            // lrbalance
+            // lrbalance (pwrright)
             QDomElement lrbalance = node.firstChildElement("pwrright");
             if (!lrbalance.isNull()) {
                 if (add.watts == 0) {
@@ -258,6 +258,23 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
             QDomElement temp = node.firstChildElement("temp");
             if (!temp.isNull()) add.temp = temp.text().toDouble();
             else add.temp = RideFile::NA;
+
+            // torque_effectiveness_left
+            QDomElement lte = node.firstChildElement("torque_effectiveness_left");
+            if (!lte.isNull()) add.lte = lte.text().toDouble();
+            else add.lte = 0.0;
+            // torque_effectiveness_right
+            QDomElement rte = node.firstChildElement("torque_effectiveness_right");
+            if (!rte.isNull()) add.rte = rte.text().toDouble();
+            else add.rte = 0.0;
+            // pedal_smoothness_left
+            QDomElement lps = node.firstChildElement("pedal_smoothness_left");
+            if (!lps.isNull()) add.lps = lps.text().toDouble();
+            else add.lps = 0.0;
+            // pedal_smoothness_right
+            QDomElement rps = node.firstChildElement("pedal_smoothness_right");
+            if (!rps.isNull()) add.rps = rps.text().toDouble();
+            else add.rps = 0.0;
 
             // if there are data points && a time difference > 1sec && smartRecording processing is requested at all
             if ((!rideFile->dataPoints().empty()) && (add.secs > rtime + 1) && (isGarminSmartRecording.toInt() != 0)) {
