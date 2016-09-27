@@ -170,7 +170,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 #ifdef GC_WANT_HTTP
     offset += 1;
     startHttp = new QCheckBox(tr("Enable API Web Services"), this);
-    startHttp->setChecked(appsettings->value(NULL, GC_START_HTTP, true).toBool());
+    startHttp->setChecked(appsettings->value(NULL, GC_START_HTTP, false).toBool());
     configLayout->addWidget(startHttp, 7,1, Qt::AlignLeft);
 #endif
 #ifdef GC_WANT_R
