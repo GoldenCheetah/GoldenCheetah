@@ -16,8 +16,8 @@
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1042"/>
-        <source>Average altitude power. Recorded power ajusted to take into account the effect of altitude on vo2max and thus power output.</source>
-        <translation>Potencia promedio ajustada para tener en cuenta el efecto de la altitud en el VO2max y la potencia.</translation>
+        <source>Average altitude power. Recorded power adjusted to take into account the effect of altitude on vo2max and thus power output.</source>
+        <translation>Potencia media ajustada teniendo en cuenta el efecto de la altitud en el VO2max y, por lo tanto, en la potencia.</translation>
     </message>
 </context>
 <context>
@@ -80,77 +80,77 @@
 <context>
     <name>AboutRiderPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1138"/>
+        <location filename="../../Gui/Pages.cpp" line="1140"/>
         <source>Nickname</source>
         <translation>Apodo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1139"/>
+        <location filename="../../Gui/Pages.cpp" line="1141"/>
         <source>Date of Birth</source>
         <translation>Fecha de Nacimiento</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1140"/>
+        <location filename="../../Gui/Pages.cpp" line="1142"/>
         <source>Sex</source>
         <translation>Sexo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1150"/>
+        <location filename="../../Gui/Pages.cpp" line="1152"/>
         <source>Male</source>
         <translation>Masculino</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1151"/>
+        <location filename="../../Gui/Pages.cpp" line="1153"/>
         <source>Female</source>
         <translation>Femenino</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1174"/>
+        <location filename="../../Gui/Pages.cpp" line="1176"/>
         <source>Crank Length</source>
         <translation>Largo Palancas/Bielas</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1207"/>
+        <location filename="../../Gui/Pages.cpp" line="1209"/>
         <source>Wheelsize</source>
         <translation>Tamaño de rueda</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1221"/>
+        <location filename="../../Gui/Pages.cpp" line="1223"/>
         <source>mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1238"/>
+        <location filename="../../Gui/Pages.cpp" line="1240"/>
         <source>Auto Backup Folder</source>
         <translation>Carpeta Auto Resguardo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1241"/>
+        <location filename="../../Gui/Pages.cpp" line="1243"/>
         <source>Browse</source>
         <translation>Buscar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1247"/>
+        <location filename="../../Gui/Pages.cpp" line="1249"/>
         <source>Auto Backup execution every</source>
         <translation>Auto Resguardo cada</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1249"/>
+        <location filename="../../Gui/Pages.cpp" line="1251"/>
         <source>times the athlete is closed - 0 means never</source>
         <translation>veces el atleta se cierra - 0 significa nunca</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1295"/>
+        <location filename="../../Gui/Pages.cpp" line="1297"/>
         <source>Choose Picture</source>
         <translation>Seleccionar foto</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1296"/>
+        <location filename="../../Gui/Pages.cpp" line="1298"/>
         <source>Images (*.png *.jpg *.bmp)</source>
         <translation>Imágenes (*.png *.jpg *.bmp)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1310"/>
+        <location filename="../../Gui/Pages.cpp" line="1312"/>
         <source>Choose Backup Directory</source>
         <translation>Elegir Carpeta de Resguardo</translation>
     </message>
@@ -2935,52 +2935,52 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>AutoImportPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6334"/>
+        <location filename="../../Gui/Pages.cpp" line="6336"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6335"/>
+        <location filename="../../Gui/Pages.cpp" line="6337"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6336"/>
+        <location filename="../../Gui/Pages.cpp" line="6338"/>
         <source>Browse</source>
         <translation>Buscar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6347"/>
+        <location filename="../../Gui/Pages.cpp" line="6349"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6348"/>
+        <location filename="../../Gui/Pages.cpp" line="6350"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6349"/>
+        <location filename="../../Gui/Pages.cpp" line="6351"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6350"/>
+        <location filename="../../Gui/Pages.cpp" line="6352"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6363"/>
+        <location filename="../../Gui/Pages.cpp" line="6365"/>
         <source>Directory</source>
         <translation>Carpeta</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6364"/>
+        <location filename="../../Gui/Pages.cpp" line="6366"/>
         <source>Import Rule</source>
         <translation>Regla de Importación</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6457"/>
+        <location filename="../../Gui/Pages.cpp" line="6459"/>
         <source>Enter directory or press [Browse] to select</source>
         <translation>Ingrese carpeta o presione [Buscar] para seleccionar</translation>
     </message>
@@ -3999,22 +3999,22 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>BestsMetricsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2517"/>
+        <location filename="../../Gui/Pages.cpp" line="2519"/>
         <source>Available Metrics</source>
         <translation>Métricas Disponibles</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2522"/>
+        <location filename="../../Gui/Pages.cpp" line="2524"/>
         <source>Selected Metrics</source>
         <translation>Métricas Seleccionadas</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2538"/>
+        <location filename="../../Gui/Pages.cpp" line="2540"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2539"/>
+        <location filename="../../Gui/Pages.cpp" line="2541"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
@@ -4226,122 +4226,122 @@ Comencemos la configuración.</translation>
 <context>
     <name>CPPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4098"/>
-        <location filename="../../Gui/Pages.cpp" line="4107"/>
+        <location filename="../../Gui/Pages.cpp" line="4100"/>
+        <location filename="../../Gui/Pages.cpp" line="4109"/>
         <source>Update</source>
         <translation>Modificar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4100"/>
-        <location filename="../../Gui/Pages.cpp" line="4113"/>
+        <location filename="../../Gui/Pages.cpp" line="4102"/>
+        <location filename="../../Gui/Pages.cpp" line="4115"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4101"/>
-        <location filename="../../Gui/Pages.cpp" line="4114"/>
+        <location filename="../../Gui/Pages.cpp" line="4103"/>
+        <location filename="../../Gui/Pages.cpp" line="4116"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4106"/>
-        <location filename="../../Gui/Pages.cpp" line="4119"/>
+        <location filename="../../Gui/Pages.cpp" line="4108"/>
+        <location filename="../../Gui/Pages.cpp" line="4121"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4108"/>
-        <location filename="../../Gui/Pages.cpp" line="4120"/>
+        <location filename="../../Gui/Pages.cpp" line="4110"/>
+        <location filename="../../Gui/Pages.cpp" line="4122"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4110"/>
+        <location filename="../../Gui/Pages.cpp" line="4112"/>
         <source>Def</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4131"/>
-        <location filename="../../Gui/Pages.cpp" line="4255"/>
+        <location filename="../../Gui/Pages.cpp" line="4133"/>
+        <location filename="../../Gui/Pages.cpp" line="4257"/>
         <source>From Date</source>
         <translation>Desde </translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4132"/>
-        <location filename="../../Gui/Pages.cpp" line="4257"/>
+        <location filename="../../Gui/Pages.cpp" line="4134"/>
+        <location filename="../../Gui/Pages.cpp" line="4259"/>
         <source>Critical Power</source>
         <translation>Potencia Crítica</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4133"/>
-        <location filename="../../Gui/Pages.cpp" line="4259"/>
+        <location filename="../../Gui/Pages.cpp" line="4135"/>
+        <location filename="../../Gui/Pages.cpp" line="4261"/>
         <source>FTP</source>
         <translation>PUF</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4134"/>
-        <location filename="../../Gui/Pages.cpp" line="4262"/>
+        <location filename="../../Gui/Pages.cpp" line="4136"/>
+        <location filename="../../Gui/Pages.cpp" line="4264"/>
         <source>W&apos;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4135"/>
-        <location filename="../../Gui/Pages.cpp" line="4263"/>
+        <location filename="../../Gui/Pages.cpp" line="4137"/>
+        <location filename="../../Gui/Pages.cpp" line="4265"/>
         <source>Pmax</source>
         <translation>Pmáx</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4288"/>
-        <location filename="../../Gui/Pages.cpp" line="4346"/>
-        <location filename="../../Gui/Pages.cpp" line="4394"/>
+        <location filename="../../Gui/Pages.cpp" line="4290"/>
+        <location filename="../../Gui/Pages.cpp" line="4348"/>
+        <location filename="../../Gui/Pages.cpp" line="4396"/>
         <source>MMM d, yyyy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4199"/>
+        <location filename="../../Gui/Pages.cpp" line="4201"/>
         <source>Short</source>
         <translation>Corto</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4141"/>
+        <location filename="../../Gui/Pages.cpp" line="4143"/>
         <source>Use CP for all metrics</source>
         <translation>Usar PC para todas las métricas</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4142"/>
+        <location filename="../../Gui/Pages.cpp" line="4144"/>
         <source>Use FTP for Coggan metrics</source>
         <translation>Usar PUF para métricas de Coggan</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4200"/>
+        <location filename="../../Gui/Pages.cpp" line="4202"/>
         <source>Long</source>
         <translation>Largo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4201"/>
+        <location filename="../../Gui/Pages.cpp" line="4203"/>
         <source>From Watts</source>
         <translation>Desde vatios</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4324"/>
-        <location filename="../../Gui/Pages.cpp" line="4374"/>
+        <location filename="../../Gui/Pages.cpp" line="4326"/>
+        <location filename="../../Gui/Pages.cpp" line="4376"/>
         <source>CP must be &gt; 0</source>
         <translation>PC debe ser &gt; 0</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4551"/>
+        <location filename="../../Gui/Pages.cpp" line="4553"/>
         <source>Maximum of 10 zones reached.</source>
         <translation>Se alcancó el máximo de 10 zonas.</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4576"/>
-        <location filename="../../Gui/Pages.cpp" line="4583"/>
+        <location filename="../../Gui/Pages.cpp" line="4578"/>
+        <location filename="../../Gui/Pages.cpp" line="4585"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4578"/>
-        <location filename="../../Gui/Pages.cpp" line="4585"/>
+        <location filename="../../Gui/Pages.cpp" line="4580"/>
+        <location filename="../../Gui/Pages.cpp" line="4587"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -4747,98 +4747,98 @@ ddd, dd MMM yyyy</source>
 <context>
     <name>CVPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5652"/>
-        <location filename="../../Gui/Pages.cpp" line="5661"/>
+        <location filename="../../Gui/Pages.cpp" line="5654"/>
+        <location filename="../../Gui/Pages.cpp" line="5663"/>
         <source>Update</source>
         <translation>Modificar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5654"/>
-        <location filename="../../Gui/Pages.cpp" line="5668"/>
+        <location filename="../../Gui/Pages.cpp" line="5656"/>
+        <location filename="../../Gui/Pages.cpp" line="5670"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5655"/>
-        <location filename="../../Gui/Pages.cpp" line="5669"/>
+        <location filename="../../Gui/Pages.cpp" line="5657"/>
+        <location filename="../../Gui/Pages.cpp" line="5671"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5662"/>
-        <location filename="../../Gui/Pages.cpp" line="5674"/>
+        <location filename="../../Gui/Pages.cpp" line="5664"/>
+        <location filename="../../Gui/Pages.cpp" line="5676"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5663"/>
-        <location filename="../../Gui/Pages.cpp" line="5675"/>
+        <location filename="../../Gui/Pages.cpp" line="5665"/>
+        <location filename="../../Gui/Pages.cpp" line="5677"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5665"/>
+        <location filename="../../Gui/Pages.cpp" line="5667"/>
         <source>Def</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5685"/>
-        <location filename="../../Gui/Pages.cpp" line="5721"/>
+        <location filename="../../Gui/Pages.cpp" line="5687"/>
+        <location filename="../../Gui/Pages.cpp" line="5723"/>
         <source>From Date</source>
         <translation>Desde </translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5686"/>
-        <location filename="../../Gui/Pages.cpp" line="5722"/>
+        <location filename="../../Gui/Pages.cpp" line="5688"/>
+        <location filename="../../Gui/Pages.cpp" line="5724"/>
         <source>Critical Velocity</source>
         <translation>Velocidad Crítica</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5698"/>
+        <location filename="../../Gui/Pages.cpp" line="5700"/>
         <source>Metric Pace</source>
         <translation>Ritmo en unidades métricas</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5742"/>
-        <location filename="../../Gui/Pages.cpp" line="5823"/>
-        <location filename="../../Gui/Pages.cpp" line="5846"/>
+        <location filename="../../Gui/Pages.cpp" line="5744"/>
+        <location filename="../../Gui/Pages.cpp" line="5825"/>
+        <location filename="../../Gui/Pages.cpp" line="5848"/>
         <source>MMM d, yyyy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5758"/>
+        <location filename="../../Gui/Pages.cpp" line="5760"/>
         <source>Short</source>
         <translation>Corto</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5759"/>
+        <location filename="../../Gui/Pages.cpp" line="5761"/>
         <source>Long</source>
         <translation>Largo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5760"/>
+        <location filename="../../Gui/Pages.cpp" line="5762"/>
         <source>From</source>
         <translation>Desde</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5809"/>
+        <location filename="../../Gui/Pages.cpp" line="5811"/>
         <source>CV must be &gt; 0</source>
         <translation>VC debe ser &gt; 0</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5976"/>
+        <location filename="../../Gui/Pages.cpp" line="5978"/>
         <source>Maximum of 10 zones reached.</source>
         <translation>Se alcancó el máximo de 10 zonas.</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5999"/>
-        <location filename="../../Gui/Pages.cpp" line="6006"/>
+        <location filename="../../Gui/Pages.cpp" line="6001"/>
+        <location filename="../../Gui/Pages.cpp" line="6008"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6001"/>
-        <location filename="../../Gui/Pages.cpp" line="6008"/>
+        <location filename="../../Gui/Pages.cpp" line="6003"/>
+        <location filename="../../Gui/Pages.cpp" line="6010"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -5405,97 +5405,97 @@ Are you sure?</source>
 <context>
     <name>ColorsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1948"/>
+        <location filename="../../Gui/Pages.cpp" line="1950"/>
         <source>Color</source>
         <translation>Color</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1949"/>
+        <location filename="../../Gui/Pages.cpp" line="1951"/>
         <source>Select</source>
         <translation>Selección</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1962"/>
+        <location filename="../../Gui/Pages.cpp" line="1964"/>
         <source>Activity Scrollbar</source>
         <translation>Barra de desplazamiento de Actividades</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1965"/>
+        <location filename="../../Gui/Pages.cpp" line="1967"/>
         <source>Activity Headings</source>
         <translation>Encabezados de Actividades</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1976"/>
+        <location filename="../../Gui/Pages.cpp" line="1978"/>
         <source>Line Width</source>
         <translation>Ancho de Línea</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1958"/>
+        <location filename="../../Gui/Pages.cpp" line="1960"/>
         <source>Antialias</source>
         <translation>Antialias</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1924"/>
+        <location filename="../../Gui/Pages.cpp" line="1926"/>
         <source>Styling</source>
         <translation>Estilo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1926"/>
+        <location filename="../../Gui/Pages.cpp" line="1928"/>
         <source>Metallic (Mac)</source>
         <translation>Metálico (Mac)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1927"/>
+        <location filename="../../Gui/Pages.cpp" line="1929"/>
         <source>Flat Color (Windows)</source>
         <translation>Color Plano (Windows)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1937"/>
+        <location filename="../../Gui/Pages.cpp" line="1939"/>
         <source>Swatch</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1938"/>
+        <location filename="../../Gui/Pages.cpp" line="1940"/>
         <source>Name</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1973"/>
+        <location filename="../../Gui/Pages.cpp" line="1975"/>
         <source>Apply Theme</source>
         <translation>Aplicar Tema</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1977"/>
+        <location filename="../../Gui/Pages.cpp" line="1979"/>
         <source>Default</source>
         <translation>Por defecto</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1978"/>
+        <location filename="../../Gui/Pages.cpp" line="1980"/>
         <source>Title</source>
         <translation>Título</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1979"/>
+        <location filename="../../Gui/Pages.cpp" line="1981"/>
         <source>Chart Markers</source>
         <translation>Marcadores de Gráfico</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1980"/>
+        <location filename="../../Gui/Pages.cpp" line="1982"/>
         <source>Chart Labels</source>
         <translation>Rótulos de Gráfico</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1981"/>
+        <location filename="../../Gui/Pages.cpp" line="1983"/>
         <source>Calendar Text</source>
         <translation>Texto en Calendario</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2088"/>
+        <location filename="../../Gui/Pages.cpp" line="2090"/>
         <source>Theme</source>
         <translation>Tema</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2089"/>
+        <location filename="../../Gui/Pages.cpp" line="2091"/>
         <source>Colors</source>
         <translation>Colores</translation>
     </message>
@@ -5658,212 +5658,212 @@ Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenC
 <context>
     <name>CredentialsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="665"/>
+        <location filename="../../Gui/Pages.cpp" line="667"/>
         <source>Website</source>
         <translation>Sitio Web</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="378"/>
-        <location filename="../../Gui/Pages.cpp" line="641"/>
-        <location filename="../../Gui/Pages.cpp" line="792"/>
-        <location filename="../../Gui/Pages.cpp" line="816"/>
-        <location filename="../../Gui/Pages.cpp" line="840"/>
-        <location filename="../../Gui/Pages.cpp" line="865"/>
+        <location filename="../../Gui/Pages.cpp" line="380"/>
+        <location filename="../../Gui/Pages.cpp" line="643"/>
+        <location filename="../../Gui/Pages.cpp" line="794"/>
+        <location filename="../../Gui/Pages.cpp" line="818"/>
+        <location filename="../../Gui/Pages.cpp" line="842"/>
+        <location filename="../../Gui/Pages.cpp" line="867"/>
         <source>Username</source>
         <translation>Nombre Usuario</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="379"/>
-        <location filename="../../Gui/Pages.cpp" line="642"/>
-        <location filename="../../Gui/Pages.cpp" line="793"/>
-        <location filename="../../Gui/Pages.cpp" line="817"/>
-        <location filename="../../Gui/Pages.cpp" line="841"/>
-        <location filename="../../Gui/Pages.cpp" line="866"/>
+        <location filename="../../Gui/Pages.cpp" line="381"/>
+        <location filename="../../Gui/Pages.cpp" line="644"/>
+        <location filename="../../Gui/Pages.cpp" line="795"/>
+        <location filename="../../Gui/Pages.cpp" line="819"/>
+        <location filename="../../Gui/Pages.cpp" line="843"/>
+        <location filename="../../Gui/Pages.cpp" line="868"/>
         <source>Password</source>
         <translation>Clave</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="375"/>
+        <location filename="../../Gui/Pages.cpp" line="377"/>
         <source>TrainingPeaks</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="380"/>
+        <location filename="../../Gui/Pages.cpp" line="382"/>
         <source>Account Type</source>
         <translation>Tipo de Cuenta</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="415"/>
+        <location filename="../../Gui/Pages.cpp" line="417"/>
         <source>Twitter</source>
         <translation>Twitter</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="418"/>
         <location filename="../../Gui/Pages.cpp" line="420"/>
-        <location filename="../../Gui/Pages.cpp" line="446"/>
+        <location filename="../../Gui/Pages.cpp" line="422"/>
         <location filename="../../Gui/Pages.cpp" line="448"/>
-        <location filename="../../Gui/Pages.cpp" line="490"/>
-        <location filename="../../Gui/Pages.cpp" line="538"/>
-        <location filename="../../Gui/Pages.cpp" line="581"/>
+        <location filename="../../Gui/Pages.cpp" line="450"/>
+        <location filename="../../Gui/Pages.cpp" line="492"/>
+        <location filename="../../Gui/Pages.cpp" line="540"/>
         <location filename="../../Gui/Pages.cpp" line="583"/>
-        <location filename="../../Gui/Pages.cpp" line="609"/>
+        <location filename="../../Gui/Pages.cpp" line="585"/>
         <location filename="../../Gui/Pages.cpp" line="611"/>
-        <location filename="../../Gui/Pages.cpp" line="741"/>
+        <location filename="../../Gui/Pages.cpp" line="613"/>
+        <location filename="../../Gui/Pages.cpp" line="743"/>
         <source>Authorise</source>
         <translation>Autorizar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="443"/>
+        <location filename="../../Gui/Pages.cpp" line="445"/>
         <source>Dropbox</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="470"/>
-        <location filename="../../Gui/Pages.cpp" line="549"/>
+        <location filename="../../Gui/Pages.cpp" line="472"/>
+        <location filename="../../Gui/Pages.cpp" line="551"/>
         <source>Athlete Folder</source>
         <translation>Carpeta del Atleta</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="473"/>
-        <location filename="../../Gui/Pages.cpp" line="542"/>
-        <location filename="../../Gui/Pages.cpp" line="566"/>
+        <location filename="../../Gui/Pages.cpp" line="475"/>
+        <location filename="../../Gui/Pages.cpp" line="544"/>
+        <location filename="../../Gui/Pages.cpp" line="568"/>
         <source>Browse</source>
         <translation>Buscar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="482"/>
+        <location filename="../../Gui/Pages.cpp" line="484"/>
         <source>Google Drive</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="558"/>
+        <location filename="../../Gui/Pages.cpp" line="560"/>
         <source>Shared Local Folder</source>
         <translation>Carpeta Local Compartida</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="563"/>
+        <location filename="../../Gui/Pages.cpp" line="565"/>
         <source>Shared Local Athlete Folder</source>
         <translation>Carpeta Local Compartida del Atleta</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="578"/>
+        <location filename="../../Gui/Pages.cpp" line="580"/>
         <source>Strava</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="607"/>
+        <location filename="../../Gui/Pages.cpp" line="609"/>
         <source>Cycling Analytics</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="638"/>
+        <location filename="../../Gui/Pages.cpp" line="640"/>
         <source>RideWithGPS</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="709"/>
+        <location filename="../../Gui/Pages.cpp" line="711"/>
         <source>Generic CalDAV</source>
         <translation>CalDAV Genérico</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="710"/>
-        <location filename="../../Gui/Pages.cpp" line="739"/>
+        <location filename="../../Gui/Pages.cpp" line="712"/>
+        <location filename="../../Gui/Pages.cpp" line="741"/>
         <source>Google Calendar</source>
         <translation>Calendario Google</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="719"/>
+        <location filename="../../Gui/Pages.cpp" line="721"/>
         <source>Calendar Type</source>
         <translation>Tipo de Calendario</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="720"/>
+        <location filename="../../Gui/Pages.cpp" line="722"/>
         <source>Google CalID</source>
         <translation>CalID Google</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="789"/>
+        <location filename="../../Gui/Pages.cpp" line="791"/>
         <source>Trainingstagebuch</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="813"/>
+        <location filename="../../Gui/Pages.cpp" line="815"/>
         <source>Selfloops</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="862"/>
+        <location filename="../../Gui/Pages.cpp" line="864"/>
         <source>SportPlusHealth</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="906"/>
+        <location filename="../../Gui/Pages.cpp" line="908"/>
         <source>Dropbox Connection Failed</source>
         <translation>Falló la Conexión a Dropbox</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="919"/>
-        <location filename="../../Gui/Pages.cpp" line="947"/>
+        <location filename="../../Gui/Pages.cpp" line="921"/>
+        <location filename="../../Gui/Pages.cpp" line="949"/>
         <source>Choose Athlete Directory</source>
         <translation>Elegir Carpeta del Atleta</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="934"/>
+        <location filename="../../Gui/Pages.cpp" line="936"/>
         <source>Google Drive Connection Failed</source>
         <translation>Falló la Conexión a Google Drive</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="978"/>
+        <location filename="../../Gui/Pages.cpp" line="980"/>
         <source>Choose Shared Local Folder Athlete Directory</source>
         <translation>Elegir Carpeta Local Compartida del Atleta</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="662"/>
+        <location filename="../../Gui/Pages.cpp" line="664"/>
         <source>Withings Wifi Scales</source>
         <translation>Balancas Withings WiFi</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="666"/>
+        <location filename="../../Gui/Pages.cpp" line="668"/>
         <source>User Id</source>
         <translation>Id Usuario</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="667"/>
+        <location filename="../../Gui/Pages.cpp" line="669"/>
         <source>Public Key</source>
         <translation>Clave Pública</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="692"/>
+        <location filename="../../Gui/Pages.cpp" line="694"/>
         <source>Web Calendar</source>
         <translation>Calendario Web</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="694"/>
+        <location filename="../../Gui/Pages.cpp" line="696"/>
         <source>Webcal URL</source>
         <translation>URL Webcal</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="707"/>
+        <location filename="../../Gui/Pages.cpp" line="709"/>
         <source>CalDAV Calendar</source>
         <translation>Calendario CalDAV</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="716"/>
+        <location filename="../../Gui/Pages.cpp" line="718"/>
         <source>CalDAV URL</source>
         <translation>URL CalDAV</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="717"/>
+        <location filename="../../Gui/Pages.cpp" line="719"/>
         <source>CalDAV User Id</source>
         <translation>Id Usuario CalDAV</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="718"/>
+        <location filename="../../Gui/Pages.cpp" line="720"/>
         <source>CalDAV Password</source>
         <translation>Clave CalDAV</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="837"/>
+        <location filename="../../Gui/Pages.cpp" line="839"/>
         <source>Velo Hero</source>
         <translation></translation>
     </message>
@@ -6263,47 +6263,47 @@ Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenC
 <context>
     <name>CustomMetricsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2712"/>
+        <location filename="../../Gui/Pages.cpp" line="2714"/>
         <source>Symbol</source>
         <translation>Símbolo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2713"/>
+        <location filename="../../Gui/Pages.cpp" line="2715"/>
         <source>Name</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2726"/>
+        <location filename="../../Gui/Pages.cpp" line="2728"/>
         <source>Edit</source>
         <translation>Editar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2727"/>
+        <location filename="../../Gui/Pages.cpp" line="2729"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2728"/>
+        <location filename="../../Gui/Pages.cpp" line="2730"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2733"/>
+        <location filename="../../Gui/Pages.cpp" line="2735"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2734"/>
+        <location filename="../../Gui/Pages.cpp" line="2736"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2776"/>
+        <location filename="../../Gui/Pages.cpp" line="2778"/>
         <source>Are you sure you want to delete this metric?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2778"/>
+        <location filename="../../Gui/Pages.cpp" line="2780"/>
         <source>Remove</source>
         <translation>Eliminar</translation>
     </message>
@@ -6521,62 +6521,62 @@ Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenC
 <context>
     <name>DefaultsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3692"/>
+        <location filename="../../Gui/Pages.cpp" line="3694"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3693"/>
+        <location filename="../../Gui/Pages.cpp" line="3695"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3704"/>
+        <location filename="../../Gui/Pages.cpp" line="3706"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3705"/>
+        <location filename="../../Gui/Pages.cpp" line="3707"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3706"/>
+        <location filename="../../Gui/Pages.cpp" line="3708"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3707"/>
+        <location filename="../../Gui/Pages.cpp" line="3709"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3718"/>
+        <location filename="../../Gui/Pages.cpp" line="3720"/>
         <source>Field</source>
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3719"/>
+        <location filename="../../Gui/Pages.cpp" line="3721"/>
         <source>Value</source>
         <translation>Valor</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3720"/>
+        <location filename="../../Gui/Pages.cpp" line="3722"/>
         <source>Linked field</source>
         <translation>Campo Vinculado</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3721"/>
+        <location filename="../../Gui/Pages.cpp" line="3723"/>
         <source>Default Value</source>
         <translation>Valor por Defecto</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3798"/>
+        <location filename="../../Gui/Pages.cpp" line="3800"/>
         <source>New</source>
         <translation>Nuevo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3800"/>
+        <location filename="../../Gui/Pages.cpp" line="3802"/>
         <source>New (%1)</source>
         <translation>Nuevo (%1)</translation>
     </message>
@@ -6613,32 +6613,32 @@ Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenC
 <context>
     <name>DevicePage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1527"/>
+        <location filename="../../Gui/Pages.cpp" line="1529"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1528"/>
+        <location filename="../../Gui/Pages.cpp" line="1530"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1548"/>
+        <location filename="../../Gui/Pages.cpp" line="1550"/>
         <source>Auto-connect devices in Train View</source>
         <translation>Auto-conectar dispositivos en la Vista de Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1551"/>
+        <location filename="../../Gui/Pages.cpp" line="1553"/>
         <source>Allow multiple devices in Train View</source>
         <translation>Permitir múltiples dispositivos en Vista de Entrenar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1522"/>
+        <location filename="../../Gui/Pages.cpp" line="1524"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1523"/>
+        <location filename="../../Gui/Pages.cpp" line="1525"/>
         <source>-</source>
         <translation></translation>
     </message>
@@ -7442,6 +7442,7 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
     </message>
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="250"/>
+        <location filename="../../Core/NamedSearch.cpp" line="281"/>
         <source>Name</source>
         <translation>Nombre</translation>
     </message>
@@ -7459,6 +7460,11 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
         <location filename="../../Core/NamedSearch.cpp" line="267"/>
         <source>Update</source>
         <translation>Modificar</translation>
+    </message>
+    <message>
+        <location filename="../../Core/NamedSearch.cpp" line="282"/>
+        <source>Query</source>
+        <translation>Consulta</translation>
     </message>
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="297"/>
@@ -8241,107 +8247,107 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
 <context>
     <name>FieldsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3151"/>
+        <location filename="../../Gui/Pages.cpp" line="3153"/>
         <source>Text</source>
         <translation>Texto</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3152"/>
+        <location filename="../../Gui/Pages.cpp" line="3154"/>
         <source>Textbox</source>
         <translation>Texto Largo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3153"/>
+        <location filename="../../Gui/Pages.cpp" line="3155"/>
         <source>ShortText</source>
         <translation>Texto Corto</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3154"/>
+        <location filename="../../Gui/Pages.cpp" line="3156"/>
         <source>Integer</source>
         <translation>Entero</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3155"/>
+        <location filename="../../Gui/Pages.cpp" line="3157"/>
         <source>Double</source>
         <translation>Doble</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3156"/>
+        <location filename="../../Gui/Pages.cpp" line="3158"/>
         <source>Date</source>
         <translation>Fecha</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3157"/>
+        <location filename="../../Gui/Pages.cpp" line="3159"/>
         <source>Time</source>
         <translation>Hora</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3411"/>
+        <location filename="../../Gui/Pages.cpp" line="3413"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3412"/>
+        <location filename="../../Gui/Pages.cpp" line="3414"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3413"/>
+        <location filename="../../Gui/Pages.cpp" line="3415"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3398"/>
+        <location filename="../../Gui/Pages.cpp" line="3400"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3158"/>
+        <location filename="../../Gui/Pages.cpp" line="3160"/>
         <source>Checkbox</source>
         <translation>Botón Selección</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3399"/>
+        <location filename="../../Gui/Pages.cpp" line="3401"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3410"/>
+        <location filename="../../Gui/Pages.cpp" line="3412"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3424"/>
+        <location filename="../../Gui/Pages.cpp" line="3426"/>
         <source>Screen Tab</source>
         <translation>Pestaña</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3425"/>
+        <location filename="../../Gui/Pages.cpp" line="3427"/>
         <source>Field</source>
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3426"/>
+        <location filename="../../Gui/Pages.cpp" line="3428"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3427"/>
+        <location filename="../../Gui/Pages.cpp" line="3429"/>
         <source>Values</source>
         <translation>Valores</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3428"/>
+        <location filename="../../Gui/Pages.cpp" line="3430"/>
         <source>Diary</source>
         <translation>Agenda</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3545"/>
+        <location filename="../../Gui/Pages.cpp" line="3547"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3547"/>
+        <location filename="../../Gui/Pages.cpp" line="3549"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -8705,6 +8711,21 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
         <location filename="../../Charts/RideEditor.cpp" line="2116"/>
         <source>Clear</source>
         <translation>Borrar</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/RideEditor.cpp" line="2126"/>
+        <source>Time</source>
+        <translation>Tiempo</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/RideEditor.cpp" line="2126"/>
+        <source>Column</source>
+        <translation>Columna</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/RideEditor.cpp" line="2126"/>
+        <source>Value</source>
+        <translation>Valor</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2134"/>
@@ -10517,99 +10538,104 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Chino (Tradicional)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="101"/>
+        <location filename="../../Gui/Pages.cpp" line="80"/>
+        <source>Dutch</source>
+        <translation>Holandés</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/Pages.cpp" line="103"/>
         <source>Unit</source>
         <translation>Unidades</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="103"/>
+        <location filename="../../Gui/Pages.cpp" line="105"/>
         <source>Metric</source>
         <translation>Métricas</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="104"/>
+        <location filename="../../Gui/Pages.cpp" line="106"/>
         <source>Imperial</source>
         <translation>Imperiales</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="125"/>
+        <location filename="../../Gui/Pages.cpp" line="127"/>
         <source>Smart Recording Threshold (secs)</source>
         <translation>Umbral del Smart Recording (seg)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="138"/>
+        <location filename="../../Gui/Pages.cpp" line="140"/>
         <source>Elevation hysteresis (meters)</source>
         <translation>Histéresis Altimetría (metros)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="147"/>
+        <location filename="../../Gui/Pages.cpp" line="149"/>
         <source>W&apos; bal formula</source>
         <translation>Fórmula W&apos; bal</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="175"/>
+        <location filename="../../Gui/Pages.cpp" line="177"/>
         <source>Enable R</source>
         <translation>Utilizar R</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="186"/>
+        <location filename="../../Gui/Pages.cpp" line="188"/>
         <source>Athlete Library</source>
         <translation>Biblioteca Atletas</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="205"/>
+        <location filename="../../Gui/Pages.cpp" line="207"/>
         <source>Workout and VideoSync Library</source>
         <translation>Biblioteca de Entrenamientos y VideoSync</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="225"/>
+        <location filename="../../Gui/Pages.cpp" line="227"/>
         <source>R Installation Directory</source>
         <translation>Directorio de Instalación de R</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="329"/>
+        <location filename="../../Gui/Pages.cpp" line="331"/>
         <source>R Installation (R_HOME)</source>
         <translation>Instalación de R (R_HOME)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="119"/>
+        <location filename="../../Gui/Pages.cpp" line="121"/>
         <source>Use Garmin Smart Recording</source>
         <translation>Usar Garmin Smart Recording</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="149"/>
+        <location filename="../../Gui/Pages.cpp" line="151"/>
         <source>Differential</source>
         <translation>Diferencial</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="150"/>
+        <location filename="../../Gui/Pages.cpp" line="152"/>
         <source>Integral</source>
         <translation>Integral</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="160"/>
+        <location filename="../../Gui/Pages.cpp" line="162"/>
         <source>Warn for unsaved activities on exit</source>
         <translation>Advertir por actividades no guardadas al salir</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="170"/>
+        <location filename="../../Gui/Pages.cpp" line="172"/>
         <source>Enable API Web Services</source>
         <translation>Habilitar Servicios de Interfaz Web</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="351"/>
+        <location filename="../../Gui/Pages.cpp" line="353"/>
         <source>Select Athlete Library</source>
         <translation>Seleccionar Biblioteca de Atletas</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="190"/>
-        <location filename="../../Gui/Pages.cpp" line="208"/>
-        <location filename="../../Gui/Pages.cpp" line="228"/>
+        <location filename="../../Gui/Pages.cpp" line="192"/>
+        <location filename="../../Gui/Pages.cpp" line="210"/>
+        <location filename="../../Gui/Pages.cpp" line="230"/>
         <source>Browse</source>
         <translation>Buscar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="340"/>
+        <location filename="../../Gui/Pages.cpp" line="342"/>
         <source>Select Workout Library</source>
         <translation>Seleccionar Biblioteca de Entrenamientos</translation>
     </message>
@@ -11978,59 +12004,59 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>HrSchemePage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4758"/>
+        <location filename="../../Gui/Pages.cpp" line="4760"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4759"/>
+        <location filename="../../Gui/Pages.cpp" line="4761"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4752"/>
+        <location filename="../../Gui/Pages.cpp" line="4754"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4753"/>
+        <location filename="../../Gui/Pages.cpp" line="4755"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4768"/>
+        <location filename="../../Gui/Pages.cpp" line="4770"/>
         <source>Short</source>
         <translation>Corto</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4769"/>
+        <location filename="../../Gui/Pages.cpp" line="4771"/>
         <source>Long</source>
         <translation>Largo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4770"/>
+        <location filename="../../Gui/Pages.cpp" line="4772"/>
         <source>Percent of LT</source>
         <translation>Porcentaje del UL</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4771"/>
+        <location filename="../../Gui/Pages.cpp" line="4773"/>
         <source>Trimp k</source>
         <translation>Trimp k</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4826"/>
+        <location filename="../../Gui/Pages.cpp" line="4828"/>
         <source>Maximum of 10 zones reached.</source>
         <translation>Se alcancó el máximo de 10 zonas.</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4859"/>
-        <location filename="../../Gui/Pages.cpp" line="4866"/>
+        <location filename="../../Gui/Pages.cpp" line="4861"/>
+        <location filename="../../Gui/Pages.cpp" line="4868"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4861"/>
-        <location filename="../../Gui/Pages.cpp" line="4868"/>
+        <location filename="../../Gui/Pages.cpp" line="4863"/>
+        <location filename="../../Gui/Pages.cpp" line="4870"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -12168,27 +12194,27 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>HrZonePage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4672"/>
+        <location filename="../../Gui/Pages.cpp" line="4674"/>
         <source>Sport</source>
         <translation>Deporte</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4674"/>
+        <location filename="../../Gui/Pages.cpp" line="4676"/>
         <source>Bike</source>
         <translation>Ciclismo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4675"/>
+        <location filename="../../Gui/Pages.cpp" line="4677"/>
         <source>Run</source>
         <translation>Carrera</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4716"/>
+        <location filename="../../Gui/Pages.cpp" line="4718"/>
         <source>Lactate Threshold</source>
         <translation>Umbral de Lactado</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4717"/>
+        <location filename="../../Gui/Pages.cpp" line="4719"/>
         <source>Default</source>
         <translation>Por defecto</translation>
     </message>
@@ -13202,22 +13228,22 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>IntervalMetricsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2320"/>
+        <location filename="../../Gui/Pages.cpp" line="2322"/>
         <source>Available Metrics</source>
         <translation>Métricas Disponibles</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2325"/>
+        <location filename="../../Gui/Pages.cpp" line="2327"/>
         <source>Selected Metrics</source>
         <translation>Métricas Seleccionadas</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2341"/>
+        <location filename="../../Gui/Pages.cpp" line="2343"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2342"/>
+        <location filename="../../Gui/Pages.cpp" line="2344"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
@@ -13254,7 +13280,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>IntervalsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6540"/>
+        <location filename="../../Gui/Pages.cpp" line="6542"/>
         <source>Enable interval auto-discovery</source>
         <translation>Habilitar auto-detección de intervalos</translation>
     </message>
@@ -13416,68 +13442,68 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>KeywordsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3171"/>
+        <location filename="../../Gui/Pages.cpp" line="3173"/>
         <source>Field</source>
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3178"/>
+        <location filename="../../Gui/Pages.cpp" line="3180"/>
         <source>Use for Background</source>
         <translation>Usar como Fondo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3194"/>
+        <location filename="../../Gui/Pages.cpp" line="3196"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3196"/>
+        <location filename="../../Gui/Pages.cpp" line="3198"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3197"/>
+        <location filename="../../Gui/Pages.cpp" line="3199"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3209"/>
+        <location filename="../../Gui/Pages.cpp" line="3211"/>
         <source>Keyword</source>
         <translation>Palabra</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3210"/>
+        <location filename="../../Gui/Pages.cpp" line="3212"/>
         <source>Color</source>
         <translation>Color</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3211"/>
+        <location filename="../../Gui/Pages.cpp" line="3213"/>
         <source>Related Notes Words</source>
         <translation>Palabras Relacionadas</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3340"/>
-        <location filename="../../Gui/Pages.cpp" line="3346"/>
+        <location filename="../../Gui/Pages.cpp" line="3342"/>
+        <location filename="../../Gui/Pages.cpp" line="3348"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3348"/>
+        <location filename="../../Gui/Pages.cpp" line="3350"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3182"/>
+        <location filename="../../Gui/Pages.cpp" line="3184"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3183"/>
+        <location filename="../../Gui/Pages.cpp" line="3185"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3195"/>
+        <location filename="../../Gui/Pages.cpp" line="3197"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
@@ -13698,13 +13724,13 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="106"/>
         <location filename="../../Charts/LTMPlot.cpp" line="267"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="1458"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1464"/>
         <source>Date</source>
         <translation>Fecha</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="269"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="1440"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1446"/>
         <source>Time of Day</source>
         <translation>Hora</translation>
     </message>
@@ -13712,7 +13738,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <location filename="../../Charts/LTMPlot.cpp" line="644"/>
         <location filename="../../Charts/LTMPlot.cpp" line="682"/>
         <location filename="../../Charts/LTMPlot.cpp" line="724"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="1839"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1845"/>
         <source>%1 trend</source>
         <translation>%1 tendencia</translation>
     </message>
@@ -13737,91 +13763,91 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Mejores %1</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="1291"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="2409"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1297"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="2421"/>
         <source>Best</source>
         <translation>Mejor</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="1443"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1449"/>
         <source>Day</source>
         <translation>Día</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="1446"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1452"/>
         <source>Week</source>
         <translation>Semana</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="1449"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1455"/>
         <source>Month</source>
         <translation>Mes</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="1452"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1458"/>
         <source>Year</source>
         <translation>Año</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="1455"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="3515"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1461"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="3527"/>
         <source>All</source>
         <translation>Todos</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="1762"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="1798"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1768"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1804"/>
         <source>%1 %2 trend</source>
         <translation>%1 %2 tendencia</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="1932"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1938"/>
         <source>%1 %2 Outliers</source>
         <translation>%1 %2 Atípicos</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="2020"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="2026"/>
         <source>%1 %2 Best</source>
         <translation>%1 %2 Mejores</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="3813"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="3834"/>
         <source>Today</source>
         <translation>Hoy</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="973"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="1137"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="2078"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="2241"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="2488"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="2617"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="2734"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="3381"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="3551"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1140"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="2084"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="2250"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="2500"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="2629"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="2746"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="3393"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="3563"/>
         <source>seconds</source>
         <translation>segundos</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="2502"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="2650"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="2888"/>
-        <location filename="../../Charts/LTMPlot.cpp" line="3339"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="2514"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="2662"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="2900"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="3351"/>
         <source>Ramp</source>
         <translation>Rampa</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="3381"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="3393"/>
         <source>hours</source>
         <translation>horas</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="3519"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="3531"/>
         <source>Week Commencing %1</source>
         <translation>Semana Comenzando el %1</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMPlot.cpp" line="1280"/>
+        <location filename="../../Charts/LTMPlot.cpp" line="1286"/>
         <source>watts</source>
         <translation>vatios</translation>
     </message>
@@ -14852,105 +14878,105 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>LTPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4933"/>
-        <location filename="../../Gui/Pages.cpp" line="4942"/>
+        <location filename="../../Gui/Pages.cpp" line="4935"/>
+        <location filename="../../Gui/Pages.cpp" line="4944"/>
         <source>Update</source>
         <translation>Modificar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4935"/>
-        <location filename="../../Gui/Pages.cpp" line="4949"/>
+        <location filename="../../Gui/Pages.cpp" line="4937"/>
+        <location filename="../../Gui/Pages.cpp" line="4951"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4936"/>
-        <location filename="../../Gui/Pages.cpp" line="4950"/>
+        <location filename="../../Gui/Pages.cpp" line="4938"/>
+        <location filename="../../Gui/Pages.cpp" line="4952"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4943"/>
-        <location filename="../../Gui/Pages.cpp" line="4955"/>
+        <location filename="../../Gui/Pages.cpp" line="4945"/>
+        <location filename="../../Gui/Pages.cpp" line="4957"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4944"/>
-        <location filename="../../Gui/Pages.cpp" line="4956"/>
+        <location filename="../../Gui/Pages.cpp" line="4946"/>
+        <location filename="../../Gui/Pages.cpp" line="4958"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4946"/>
+        <location filename="../../Gui/Pages.cpp" line="4948"/>
         <source>Def</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4974"/>
-        <location filename="../../Gui/Pages.cpp" line="5014"/>
+        <location filename="../../Gui/Pages.cpp" line="4976"/>
+        <location filename="../../Gui/Pages.cpp" line="5016"/>
         <source>From Date</source>
         <translation>Desde </translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4975"/>
-        <location filename="../../Gui/Pages.cpp" line="5015"/>
+        <location filename="../../Gui/Pages.cpp" line="4977"/>
+        <location filename="../../Gui/Pages.cpp" line="5017"/>
         <source>Lactate Threshold</source>
         <translation>Umbral de Lactado</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5282"/>
+        <location filename="../../Gui/Pages.cpp" line="5284"/>
         <source>Maximum of 10 zones reached.</source>
         <translation>Se alcancó el máximo de 10 zonas.</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5317"/>
-        <location filename="../../Gui/Pages.cpp" line="5324"/>
+        <location filename="../../Gui/Pages.cpp" line="5319"/>
+        <location filename="../../Gui/Pages.cpp" line="5326"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5319"/>
-        <location filename="../../Gui/Pages.cpp" line="5326"/>
+        <location filename="../../Gui/Pages.cpp" line="5321"/>
+        <location filename="../../Gui/Pages.cpp" line="5328"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4992"/>
-        <location filename="../../Gui/Pages.cpp" line="5016"/>
+        <location filename="../../Gui/Pages.cpp" line="4994"/>
+        <location filename="../../Gui/Pages.cpp" line="5018"/>
         <source>Rest HR</source>
         <translation>FC Reposo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4993"/>
-        <location filename="../../Gui/Pages.cpp" line="5017"/>
+        <location filename="../../Gui/Pages.cpp" line="4995"/>
+        <location filename="../../Gui/Pages.cpp" line="5019"/>
         <source>Max HR</source>
         <translation>FC Máx</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5037"/>
-        <location filename="../../Gui/Pages.cpp" line="5107"/>
-        <location filename="../../Gui/Pages.cpp" line="5127"/>
+        <location filename="../../Gui/Pages.cpp" line="5039"/>
+        <location filename="../../Gui/Pages.cpp" line="5109"/>
+        <location filename="../../Gui/Pages.cpp" line="5129"/>
         <source>MMM d, yyyy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5054"/>
+        <location filename="../../Gui/Pages.cpp" line="5056"/>
         <source>Short</source>
         <translation>Abreviatura</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5055"/>
+        <location filename="../../Gui/Pages.cpp" line="5057"/>
         <source>Long</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5056"/>
+        <location filename="../../Gui/Pages.cpp" line="5058"/>
         <source>From BPM</source>
         <translation>Desde PPM</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5057"/>
+        <location filename="../../Gui/Pages.cpp" line="5059"/>
         <source>Trimp k</source>
         <translation></translation>
     </message>
@@ -15499,8 +15525,8 @@ encendido y muestra &quot;PC-Link&quot;</translation>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1892"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1934"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1893"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1935"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
@@ -15525,18 +15551,18 @@ encendido y muestra &quot;PC-Link&quot;</translation>
         <translation>&amp;Descargar del dispositivo...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="667"/>
+        <location filename="../../Gui/MainWindow.cpp" line="668"/>
         <source>Diary</source>
         <translation>Agenda</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="665"/>
+        <location filename="../../Gui/MainWindow.cpp" line="666"/>
         <source>Train</source>
         <translation>Entrenar</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="242"/>
-        <location filename="../../Gui/MainWindow.cpp" line="670"/>
+        <location filename="../../Gui/MainWindow.cpp" line="671"/>
         <source>Add Chart</source>
         <translation>Agregar Gráfico</translation>
     </message>
@@ -15551,7 +15577,7 @@ encendido y muestra &quot;PC-Link&quot;</translation>
         <translation>Vista desplegada</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="663"/>
+        <location filename="../../Gui/MainWindow.cpp" line="664"/>
         <source>Activities</source>
         <translation>Actividades</translation>
     </message>
@@ -15671,34 +15697,34 @@ encendido y muestra &quot;PC-Link&quot;</translation>
         <translation>Buscar intervalos...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1454"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1455"/>
         <source>Select Activity</source>
         <translation>Elegir Actividad</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1454"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1621"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1455"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1622"/>
         <source>No activity selected!</source>
         <translation>No hay actividad seleccionada!</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1467"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1468"/>
         <source>Export Activity</source>
         <translation>Exportar Actividad</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1520"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1521"/>
         <source>Export Failed</source>
         <translation>Falló la Exportación</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1597"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1609"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1598"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1610"/>
         <source>No activity selected</source>
         <translation>No hay actividad seleccionada</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1599"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1600"/>
         <source>Current activity contains no data to split</source>
         <translation>La actividad seleccionada no tiene datos para dividir</translation>
     </message>
@@ -15743,23 +15769,23 @@ encendido y muestra &quot;PC-Link&quot;</translation>
         <translation>&amp;Opciones...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="640"/>
+        <location filename="../../Gui/MainWindow.cpp" line="641"/>
         <source>&amp;View</source>
         <translation>&amp;Ver</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="642"/>
-        <location filename="../../Gui/MainWindow.cpp" line="644"/>
+        <location filename="../../Gui/MainWindow.cpp" line="643"/>
+        <location filename="../../Gui/MainWindow.cpp" line="645"/>
         <source>Toggle Full Screen</source>
         <translation>Cambiar a Pantalla Completa</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="646"/>
+        <location filename="../../Gui/MainWindow.cpp" line="647"/>
         <source>Show Left Sidebar</source>
         <translation>Mostrar barra lateral Izq</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="653"/>
+        <location filename="../../Gui/MainWindow.cpp" line="654"/>
         <source>Show Toolbar</source>
         <translation>Mostrar Barra de Herramientas</translation>
     </message>
@@ -15819,98 +15845,98 @@ encendido y muestra &quot;PC-Link&quot;</translation>
         <translation>Curador CloudDB</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="614"/>
+        <location filename="../../Gui/MainWindow.cpp" line="615"/>
         <source>&amp;Edit</source>
         <translation>&amp;Editar</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="649"/>
+        <location filename="../../Gui/MainWindow.cpp" line="650"/>
         <source>Show Compare Pane</source>
         <translation>Mostrar Panel de Comparación</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="657"/>
+        <location filename="../../Gui/MainWindow.cpp" line="658"/>
         <source>Show Athlete Tabs</source>
         <translation>Mostrar Pestañas de Atletas</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="664"/>
+        <location filename="../../Gui/MainWindow.cpp" line="665"/>
         <source>Trends</source>
         <translation>Tendencias</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="676"/>
+        <location filename="../../Gui/MainWindow.cpp" line="677"/>
         <source>Reset Layout</source>
         <translation>Restablecer Diseño</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="677"/>
+        <location filename="../../Gui/MainWindow.cpp" line="678"/>
         <source>Tabbed not Tiled</source>
         <translation>Vista con Pestañas</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="690"/>
+        <location filename="../../Gui/MainWindow.cpp" line="691"/>
         <source>&amp;Help Overview</source>
         <translation>Opciones de &amp;Ayuda</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="694"/>
+        <location filename="../../Gui/MainWindow.cpp" line="695"/>
         <source>&amp;Discussion and Support Forum</source>
         <translation>Foro de &amp;Discusión y Soporte</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1163"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1164"/>
         <source>You are about to reset all charts to the default setup</source>
         <translation>Está por reconfigurar todos los gráficos a su estado por defecto</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1164"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1165"/>
         <source>Do you want to continue?</source>
         <translation>¿Desea continuar?</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1374"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1375"/>
         <source>Chart Import</source>
         <translation>Importar Gráfico</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1611"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1612"/>
         <source>Current activity contains no data to merge</source>
         <translation>La actividad seleccionada no tiene datos para combinar</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1892"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1934"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1893"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1935"/>
         <source>&amp;New Athlete...</source>
         <translation>&amp;Nuevo Atleta...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2047"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2048"/>
         <source>Refresh in Progress</source>
         <translation>Actualización en Curso</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="689"/>
+        <location filename="../../Gui/MainWindow.cpp" line="690"/>
         <source>&amp;Help</source>
         <translation>&amp;Ayuda</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="692"/>
+        <location filename="../../Gui/MainWindow.cpp" line="693"/>
         <source>&amp;User Guide</source>
         <translation>Guía de &amp;Usuario</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="693"/>
+        <location filename="../../Gui/MainWindow.cpp" line="694"/>
         <source>&amp;Log a bug or feature request</source>
         <translation>&amp;Registrar un error o requerimiento</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="696"/>
+        <location filename="../../Gui/MainWindow.cpp" line="697"/>
         <source>&amp;About GoldenCheetah</source>
         <translation>&amp;Acerca de GoldenCheetah</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1621"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1622"/>
         <source>Delete Activity</source>
         <translation>Eliminar Actividad</translation>
     </message>
@@ -16005,54 +16031,54 @@ encendido y muestra &quot;PC-Link&quot;</translation>
         <translation>Curar Gráficos</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="672"/>
+        <location filename="../../Gui/MainWindow.cpp" line="673"/>
         <source>Upload Chart...</source>
         <translation>Publicar Gráfico...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="673"/>
+        <location filename="../../Gui/MainWindow.cpp" line="674"/>
         <source>Download Chart...</source>
         <translation>Descargar Gráfico...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1061"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1767"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1784"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1062"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1768"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1785"/>
         <source>Activity Import</source>
         <translation>Importar Actividad</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1061"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1767"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1784"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1062"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1768"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1785"/>
         <source>Closing of athlete window not possible while background activity import is in progress...</source>
         <translation>No es posible cerrar la ventana del atleta mientras se está realizando una importación de actividades en segundo plano...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1374"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1375"/>
         <source>Imported %1 metric charts</source>
         <translation>%1 Gráficos Importados</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1521"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1522"/>
         <source>Failed to export activity, please check permissions</source>
         <translation>Error al exportar actividad, verifique los permisos</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1558"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1559"/>
         <source>There is no currently selected activity to save.</source>
         <translation>No hay actividad seleccionada para guardar.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1597"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1599"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1609"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1611"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1598"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1600"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1610"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1612"/>
         <source>Split Activity</source>
         <translation>Dividir Actividad</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2138"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2139"/>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
@@ -16061,48 +16087,48 @@ Please check your preference settings.</source>
 Por favor verifique sus preferencias.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2436"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2437"/>
         <source>CloudDB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2436"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2437"/>
         <source>Current athlete is not registered as curator - please contact the GoldenCheetah team</source>
         <translation>Este atleta no está registrado como curador - por favor contacte al equipo GoldenCheetah</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1542"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2107"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1543"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2108"/>
         <source>Import from File</source>
         <translation>Importar de Archivo</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1557"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1558"/>
         <source>No Activity To Save</source>
         <translation>No hay actividad para Guardar</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1627"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1628"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation>Confirma que quiere eliminar la actividad:</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2053"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2054"/>
         <source>Export Metrics</source>
         <translation>Exportar Métricas</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2053"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2054"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation>Variables Separada por Comas (*.csv)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2137"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2138"/>
         <source>Workout Directory Invalid</source>
         <translation>Directorio de Entrenamientos Inválido</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1629"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1630"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
@@ -16843,22 +16869,22 @@ Podrá importar o descargar los datos antes de combinarlos y ajustar manualmente
 <context>
     <name>MetadataPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3100"/>
+        <location filename="../../Gui/Pages.cpp" line="3102"/>
         <source>Fields</source>
         <translation>Campos</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3101"/>
+        <location filename="../../Gui/Pages.cpp" line="3103"/>
         <source>Notes Keywords</source>
         <translation>Palabras Clave</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3102"/>
+        <location filename="../../Gui/Pages.cpp" line="3104"/>
         <source>Defaults</source>
         <translation>Valores por defecto</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3103"/>
+        <location filename="../../Gui/Pages.cpp" line="3105"/>
         <source>Processing</source>
         <translation>Procesamiento</translation>
     </message>
@@ -18004,54 +18030,54 @@ No rides found to import.
 <context>
     <name>PaceSchemePage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5487"/>
+        <location filename="../../Gui/Pages.cpp" line="5489"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5488"/>
+        <location filename="../../Gui/Pages.cpp" line="5490"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5493"/>
+        <location filename="../../Gui/Pages.cpp" line="5495"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5494"/>
+        <location filename="../../Gui/Pages.cpp" line="5496"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5503"/>
+        <location filename="../../Gui/Pages.cpp" line="5505"/>
         <source>Short</source>
         <translation>Corto</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5504"/>
+        <location filename="../../Gui/Pages.cpp" line="5506"/>
         <source>Long</source>
         <translation>Largo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5505"/>
+        <location filename="../../Gui/Pages.cpp" line="5507"/>
         <source>Percent of CV</source>
         <translation>Porcentaje de VC</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5550"/>
+        <location filename="../../Gui/Pages.cpp" line="5552"/>
         <source>Maximum of 10 zones reached.</source>
         <translation>Se alcancó el máximo de 10 zonas.</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5573"/>
-        <location filename="../../Gui/Pages.cpp" line="5580"/>
+        <location filename="../../Gui/Pages.cpp" line="5575"/>
+        <location filename="../../Gui/Pages.cpp" line="5582"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5575"/>
-        <location filename="../../Gui/Pages.cpp" line="5582"/>
+        <location filename="../../Gui/Pages.cpp" line="5577"/>
+        <location filename="../../Gui/Pages.cpp" line="5584"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -18212,27 +18238,27 @@ No rides found to import.
 <context>
     <name>PaceZonePage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5414"/>
+        <location filename="../../Gui/Pages.cpp" line="5416"/>
         <source>Sport</source>
         <translation>Deporte</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5416"/>
+        <location filename="../../Gui/Pages.cpp" line="5418"/>
         <source>Run</source>
         <translation>Carrera</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5417"/>
+        <location filename="../../Gui/Pages.cpp" line="5419"/>
         <source>Swim</source>
         <translation>Natación</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5458"/>
+        <location filename="../../Gui/Pages.cpp" line="5460"/>
         <source>Critical Velocity</source>
         <translation>Velocidad Crítica</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="5459"/>
+        <location filename="../../Gui/Pages.cpp" line="5461"/>
         <source>Default</source>
         <translation>Por defecto</translation>
     </message>
@@ -18539,21 +18565,25 @@ No rides found to import.
     </message>
     <message>
         <location filename="../../Metrics/PaceZones.cpp" line="1009"/>
+        <location filename="../../Metrics/PaceZones.cpp" line="1025"/>
         <source>min/100m</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../../Metrics/PaceZones.cpp" line="1009"/>
+        <location filename="../../Metrics/PaceZones.cpp" line="1026"/>
         <source>min/100yd</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../../Metrics/PaceZones.cpp" line="1011"/>
+        <location filename="../../Metrics/PaceZones.cpp" line="1023"/>
         <source>min/km</source>
         <translation>min/km</translation>
     </message>
     <message>
         <location filename="../../Metrics/PaceZones.cpp" line="1011"/>
+        <location filename="../../Metrics/PaceZones.cpp" line="1024"/>
         <source>min/mile</source>
         <translation>min/milla</translation>
     </message>
@@ -20222,27 +20252,27 @@ y que muestra la palabra &quot;Host&quot;</translation>
 <context>
     <name>ProcessorPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3613"/>
+        <location filename="../../Gui/Pages.cpp" line="3615"/>
         <source>Processor</source>
         <translation>Procesador</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3614"/>
+        <location filename="../../Gui/Pages.cpp" line="3616"/>
         <source>Apply</source>
         <translation>Aplicar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3615"/>
+        <location filename="../../Gui/Pages.cpp" line="3617"/>
         <source>Settings</source>
         <translation>Ajustes</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3644"/>
+        <location filename="../../Gui/Pages.cpp" line="3646"/>
         <source>Manual</source>
         <translation>Manual</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3645"/>
+        <location filename="../../Gui/Pages.cpp" line="3647"/>
         <source>Import</source>
         <translation>Importar</translation>
     </message>
@@ -20272,7 +20302,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
     </message>
     <message>
         <location filename="../../FileIO/FitRideFile.cpp" line="939"/>
-        <location filename="../../FileIO/FitRideFile.cpp" line="1860"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="1870"/>
         <source>Lap %1</source>
         <translation>Vuelta %1</translation>
     </message>
@@ -20467,6 +20497,11 @@ yyyy</source>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="154"/>
         <source>Chinese (Simplified)</source>
         <translation>Chino (Simplificado)</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/CloudDBCommon.cpp" line="154"/>
+        <source>Dutch</source>
+        <translation>Holandés</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="158"/>
@@ -20888,12 +20923,12 @@ yyyy</source>
 <context>
     <name>RemotePage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1799"/>
+        <location filename="../../Gui/Pages.cpp" line="1801"/>
         <source>Action</source>
         <translation>Acción</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1800"/>
+        <location filename="../../Gui/Pages.cpp" line="1802"/>
         <source>ANT+ Command</source>
         <translation>Comando ANT+</translation>
     </message>
@@ -23140,60 +23175,60 @@ Saltando archivo...</translation>
 <context>
     <name>RiderPhysPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1320"/>
-        <location filename="../../Gui/Pages.cpp" line="1329"/>
-        <location filename="../../Gui/Pages.cpp" line="1395"/>
+        <location filename="../../Gui/Pages.cpp" line="1322"/>
+        <location filename="../../Gui/Pages.cpp" line="1331"/>
+        <location filename="../../Gui/Pages.cpp" line="1397"/>
         <source>Weight (%1)</source>
         <translation>Peso (%1)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1320"/>
-        <location filename="../../Gui/Pages.cpp" line="1395"/>
+        <location filename="../../Gui/Pages.cpp" line="1322"/>
+        <location filename="../../Gui/Pages.cpp" line="1397"/>
         <source>kg</source>
         <translation>kg</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1324"/>
-        <location filename="../../Gui/Pages.cpp" line="1333"/>
-        <location filename="../../Gui/Pages.cpp" line="1398"/>
+        <location filename="../../Gui/Pages.cpp" line="1326"/>
+        <location filename="../../Gui/Pages.cpp" line="1335"/>
+        <location filename="../../Gui/Pages.cpp" line="1400"/>
         <source>Height (%1)</source>
         <translation>Altura (%1)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1324"/>
-        <location filename="../../Gui/Pages.cpp" line="1398"/>
+        <location filename="../../Gui/Pages.cpp" line="1326"/>
+        <location filename="../../Gui/Pages.cpp" line="1400"/>
         <source>cm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1329"/>
-        <location filename="../../Gui/Pages.cpp" line="1395"/>
+        <location filename="../../Gui/Pages.cpp" line="1331"/>
+        <location filename="../../Gui/Pages.cpp" line="1397"/>
         <source>lb</source>
         <translation>lb</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1333"/>
-        <location filename="../../Gui/Pages.cpp" line="1398"/>
+        <location filename="../../Gui/Pages.cpp" line="1335"/>
+        <location filename="../../Gui/Pages.cpp" line="1400"/>
         <source>in</source>
         <translation>&quot;</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1401"/>
+        <location filename="../../Gui/Pages.cpp" line="1403"/>
         <source>W&apos;bal tau (s)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1425"/>
+        <location filename="../../Gui/Pages.cpp" line="1427"/>
         <source>STS average (days)</source>
         <translation>Constante de tiempo ECP (días)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1426"/>
+        <location filename="../../Gui/Pages.cpp" line="1428"/>
         <source>LTS average (days)</source>
         <translation>Constante de tiempo ELP (días)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1441"/>
+        <location filename="../../Gui/Pages.cpp" line="1443"/>
         <source>PMC Stress Balance Today</source>
         <translation>Balance de Estrés Hoy</translation>
     </message>
@@ -23901,54 +23936,54 @@ formato GoldenCheetah. ¿Confirma?</translation>
 <context>
     <name>SchemePage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3938"/>
+        <location filename="../../Gui/Pages.cpp" line="3940"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3939"/>
+        <location filename="../../Gui/Pages.cpp" line="3941"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3932"/>
+        <location filename="../../Gui/Pages.cpp" line="3934"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3933"/>
+        <location filename="../../Gui/Pages.cpp" line="3935"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3948"/>
+        <location filename="../../Gui/Pages.cpp" line="3950"/>
         <source>Short</source>
         <translation>Abreviatura</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3949"/>
+        <location filename="../../Gui/Pages.cpp" line="3951"/>
         <source>Long</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3950"/>
+        <location filename="../../Gui/Pages.cpp" line="3952"/>
         <source>Percent of CP</source>
         <translation>Porcentaje de PC</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3995"/>
+        <location filename="../../Gui/Pages.cpp" line="3997"/>
         <source>Maximum of 10 zones reached.</source>
         <translation>Se alcancó el máximo de 10 zonas.</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4018"/>
-        <location filename="../../Gui/Pages.cpp" line="4025"/>
+        <location filename="../../Gui/Pages.cpp" line="4020"/>
+        <location filename="../../Gui/Pages.cpp" line="4027"/>
         <source>New</source>
         <translation>Nueva</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="4020"/>
-        <location filename="../../Gui/Pages.cpp" line="4027"/>
+        <location filename="../../Gui/Pages.cpp" line="4022"/>
+        <location filename="../../Gui/Pages.cpp" line="4029"/>
         <source>New (%1)</source>
         <translation>Nueva (%1)</translation>
     </message>
@@ -24085,64 +24120,64 @@ formato GoldenCheetah. ¿Confirma?</translation>
 <context>
     <name>SeasonsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6130"/>
+        <location filename="../../Gui/Pages.cpp" line="6132"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6131"/>
+        <location filename="../../Gui/Pages.cpp" line="6133"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6132"/>
+        <location filename="../../Gui/Pages.cpp" line="6134"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6133"/>
+        <location filename="../../Gui/Pages.cpp" line="6135"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6179"/>
         <location filename="../../Gui/Pages.cpp" line="6181"/>
-        <location filename="../../Gui/Pages.cpp" line="6272"/>
+        <location filename="../../Gui/Pages.cpp" line="6183"/>
         <location filename="../../Gui/Pages.cpp" line="6274"/>
+        <location filename="../../Gui/Pages.cpp" line="6276"/>
         <source>ddd MMM d, yyyy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6118"/>
+        <location filename="../../Gui/Pages.cpp" line="6120"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6119"/>
+        <location filename="../../Gui/Pages.cpp" line="6121"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6113"/>
-        <location filename="../../Gui/Pages.cpp" line="6144"/>
+        <location filename="../../Gui/Pages.cpp" line="6115"/>
+        <location filename="../../Gui/Pages.cpp" line="6146"/>
         <source>Name</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6114"/>
-        <location filename="../../Gui/Pages.cpp" line="6145"/>
+        <location filename="../../Gui/Pages.cpp" line="6116"/>
+        <location filename="../../Gui/Pages.cpp" line="6147"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6115"/>
-        <location filename="../../Gui/Pages.cpp" line="6146"/>
+        <location filename="../../Gui/Pages.cpp" line="6117"/>
+        <location filename="../../Gui/Pages.cpp" line="6148"/>
         <source>From</source>
         <translation>Desde</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="6116"/>
-        <location filename="../../Gui/Pages.cpp" line="6147"/>
+        <location filename="../../Gui/Pages.cpp" line="6118"/>
+        <location filename="../../Gui/Pages.cpp" line="6149"/>
         <source>To</source>
         <translation>Hasta</translation>
     </message>
@@ -25092,22 +25127,22 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
 <context>
     <name>SummaryMetricsPage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2899"/>
+        <location filename="../../Gui/Pages.cpp" line="2901"/>
         <source>Available Metrics</source>
         <translation>Métricas Disponibles</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2904"/>
+        <location filename="../../Gui/Pages.cpp" line="2906"/>
         <source>Selected Metrics</source>
         <translation>Métricas Seleccionadas</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2920"/>
+        <location filename="../../Gui/Pages.cpp" line="2922"/>
         <source>Up</source>
         <translation>Arriba</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="2921"/>
+        <location filename="../../Gui/Pages.cpp" line="2923"/>
         <source>Down</source>
         <translation>Abajo</translation>
     </message>
@@ -27769,27 +27804,27 @@ Usted puede eliminar las referencias cuando administra la biblitoteca usando el 
 <context>
     <name>ZonePage</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3846"/>
+        <location filename="../../Gui/Pages.cpp" line="3848"/>
         <source>Sport</source>
         <translation>Deporte</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3848"/>
+        <location filename="../../Gui/Pages.cpp" line="3850"/>
         <source>Bike</source>
         <translation>Ciclismo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3849"/>
+        <location filename="../../Gui/Pages.cpp" line="3851"/>
         <source>Run</source>
         <translation>Carrera</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3890"/>
+        <location filename="../../Gui/Pages.cpp" line="3892"/>
         <source>Critical Power</source>
         <translation>Potencia Crítica</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="3891"/>
+        <location filename="../../Gui/Pages.cpp" line="3893"/>
         <source>Default</source>
         <translation>Por defecto</translation>
     </message>
@@ -28313,27 +28348,27 @@ Usted puede eliminar las referencias cuando administra la biblitoteca usando el 
 <context>
     <name>deviceModel</name>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1679"/>
+        <location filename="../../Gui/Pages.cpp" line="1681"/>
         <source>Device Name</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1681"/>
+        <location filename="../../Gui/Pages.cpp" line="1683"/>
         <source>Device Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1683"/>
+        <location filename="../../Gui/Pages.cpp" line="1685"/>
         <source>Port Spec</source>
         <translation>Puerto</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1685"/>
+        <location filename="../../Gui/Pages.cpp" line="1687"/>
         <source>Profile</source>
         <translation>Perfil</translation>
     </message>
     <message>
-        <location filename="../../Gui/Pages.cpp" line="1687"/>
+        <location filename="../../Gui/Pages.cpp" line="1689"/>
         <source>Virtual</source>
         <translation>Virtual</translation>
     </message>
