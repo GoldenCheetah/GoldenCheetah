@@ -2123,7 +2123,7 @@ FindDialog::FindDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
     resultsTable->horizontalHeader()->setStretchLastSection(true);
 
     QStringList header;
-    header << "Time" << "Column" << "Value";
+    header << tr("Time") << tr("Column") << tr("Value");
     resultsTable->setHorizontalHeaderLabels(header);
     resultsTable->verticalHeader()->hide();
     resultsTable->setShowGrid(false);
