@@ -278,8 +278,8 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     searchList->setIndentation(3);
     QStringList headings;
     headings<<"";
-    headings<<"Name";
-    headings<<"Query";
+    headings<<tr("Name");
+    headings<<tr("Query");
     searchList->setHeaderLabels(headings);
     searchList->header()->setMinimumSectionSize(30);
     searchList->header()->resizeSection(0, 30);
