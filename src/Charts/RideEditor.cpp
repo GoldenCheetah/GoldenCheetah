@@ -2505,7 +2505,7 @@ FindDialog::clearResultsTable()
 PasteSpecialDialog::PasteSpecialDialog(RideEditor *rideEditor, QWidget *parent) : QDialog(parent), rideEditor(rideEditor)
 {
     // setup the basic window settings; nonmodal, ontop and delete on close
-    setWindowTitle("Paste Special");
+    setWindowTitle(tr("Paste Special"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
@@ -2570,7 +2570,7 @@ PasteSpecialDialog::PasteSpecialDialog(RideEditor *rideEditor, QWidget *parent) 
     QHBoxLayout *selectorLayout = new QHBoxLayout;
     QLabel *selectLabel = new QLabel(tr("Column Type"));
     columnSelect = new QComboBox;
-    columnSelect->addItem("Ignore");
+    columnSelect->addItem(tr("Ignore"));
     foreach (QString name, rideEditor->model->headings())
         columnSelect->addItem(name);
     selectorLayout->addWidget(selectLabel);
