@@ -18729,10 +18729,16 @@ No rides found to import.
         <translation>Cancelar</translation>
     </message>
     <message>
+        <location filename="../../Charts/RideEditor.cpp" line="2573"/>
         <location filename="../../Charts/RideEditor.cpp" line="2717"/>
         <location filename="../../Charts/RideEditor.cpp" line="2808"/>
         <source>Ignore</source>
         <translation>Ignorar</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/RideEditor.cpp" line="2508"/>
+        <source>Paste Special</source>
+        <translation>Pegado Especial</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2720"/>
@@ -20280,23 +20286,23 @@ y que muestra la palabra &quot;Host&quot;</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../FileIO/PwxRideFile.cpp" line="596"/>
+        <location filename="../../FileIO/PwxRideFile.cpp" line="613"/>
         <source>Biking</source>
         <translation>Ciclismo</translation>
     </message>
     <message>
-        <location filename="../../FileIO/PwxRideFile.cpp" line="596"/>
+        <location filename="../../FileIO/PwxRideFile.cpp" line="613"/>
         <source>Cycling</source>
         <translation>Ciclismo</translation>
     </message>
     <message>
-        <location filename="../../FileIO/PwxRideFile.cpp" line="596"/>
+        <location filename="../../FileIO/PwxRideFile.cpp" line="613"/>
         <source>Cycle</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="158"/>
-        <location filename="../../FileIO/PwxRideFile.cpp" line="596"/>
+        <location filename="../../FileIO/PwxRideFile.cpp" line="613"/>
         <source>Bike</source>
         <translation>Bicicleta</translation>
     </message>
@@ -24530,6 +24536,61 @@ formato GoldenCheetah. ¿Confirma?</translation>
         <translation>Ruta</translation>
     </message>
     <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="35"/>
+        <source>Sport</source>
+        <translation>Deporte</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="36"/>
+        <source>Workout Code</source>
+        <translation>Código</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="37"/>
+        <source>Workout Title</source>
+        <translation>Título</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="38"/>
+        <source>Weight</source>
+        <translation>Peso</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="39"/>
+        <source>RPE</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="40"/>
+        <source>Objective</source>
+        <translation>Objetivo</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="41"/>
+        <source>Keywords</source>
+        <translation>Palabras Claves</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="42"/>
+        <source>Equipment</source>
+        <translation>Equipamiento</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="43"/>
+        <source>Device</source>
+        <translation>Dispositivo</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="44"/>
+        <source>Device Info</source>
+        <translation>Info Dispositivo</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="45"/>
+        <source>Pool Length</source>
+        <translation>Largo de Piscina</translation>
+    </message>
+    <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="33"/>
         <source>Source Filename</source>
         <translation>Nombre de Archivo original</translation>
@@ -24538,32 +24599,32 @@ formato GoldenCheetah. ¿Confirma?</translation>
 <context>
     <name>SpecialTabs</name>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="118"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="129"/>
         <source>Workout</source>
         <translation>Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="119"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="130"/>
         <source>Notes</source>
         <translation>Notas</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="120"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="131"/>
         <source>Metric</source>
         <translation>Métricas</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="121"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="132"/>
         <source>Extra</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="122"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="133"/>
         <source>Device</source>
         <translation>Dispositivo</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="123"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="134"/>
         <source>Athlete</source>
         <translation>Atleta</translation>
     </message>
