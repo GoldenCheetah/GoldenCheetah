@@ -778,7 +778,7 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
         s.setAttribute("min", "0");
         s.setAttribute("avg", "0");
         summarydata.appendChild(s);
-    }
+    }  
 
     // interval "segments"
     foreach (RideFileInterval *i, ride->intervals()) {
@@ -920,6 +920,35 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
                 text = doc.createTextNode(QString("%1").arg(point->temp));
                 temp.appendChild(text);
                 sample.appendChild(temp);
+            }
+
+            // torque_effectiveness_left
+            if (ride->areDataPresent()->lte) {
+                QDomElement lte = doc.createElement("torque_effectiveness_left");
+                text = doc.createTextNode(QString("%1").arg(point->lte));
+                lte.appendChild(text);
+                sample.appendChild(lte);
+            }
+            // torque_effectiveness_right
+            if (ride->areDataPresent()->rte) {
+                QDomElement rte = doc.createElement("torque_effectiveness_right");
+                text = doc.createTextNode(QString("%1").arg(point->rte));
+                rte.appendChild(text);
+                sample.appendChild(rte);
+            }
+            // pedal_smoothness_left
+            if (ride->areDataPresent()->lps) {
+                QDomElement lps = doc.createElement("pedal_smoothness_left");
+                text = doc.createTextNode(QString("%1").arg(point->lps));
+                lps.appendChild(text);
+                sample.appendChild(lps);
+            }
+            // pedal_smoothness_right
+            if (ride->areDataPresent()->rps) {
+                QDomElement rps = doc.createElement("pedal_smoothness_right");
+                text = doc.createTextNode(QString("%1").arg(point->rps));
+                rps.appendChild(text);
+                sample.appendChild(rps);
             }
         }
     }
