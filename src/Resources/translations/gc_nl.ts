@@ -107,7 +107,7 @@
     <message>
         <location filename="../../Gui/Pages.cpp" line="1176"/>
         <source>Crank Length</source>
-        <translation>Crank Lengte</translation>
+        <translation>Cranklengte</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1209"/>
@@ -5691,7 +5691,7 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="382"/>
         <source>Account Type</source>
-        <translation>Account Type</translation>
+        <translation>Accounttype</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="417"/>
@@ -7471,7 +7471,7 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="282"/>
         <source>Query</source>
-        <translation type="unfinished">Vraag</translation>
+        <translation>Vraag</translation>
     </message>
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="297"/>
@@ -8727,17 +8727,17 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2126"/>
         <source>Time</source>
-        <translation type="unfinished">Tijd</translation>
+        <translation>Tijd</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2126"/>
         <source>Column</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolom</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2126"/>
         <source>Value</source>
-        <translation type="unfinished">Waarde</translation>
+        <translation>Waarde</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2134"/>
@@ -13505,7 +13505,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/Pages.cpp" line="3213"/>
         <source>Related Notes Words</source>
-        <translation>Gerelateerde Notes Woorden</translation>
+        <translation>Gerelateerde Aantekeningen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3342"/>
@@ -14816,7 +14816,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1082"/>
         <source> grouped by </source>
-        <translation>gegroepeerd per</translation>
+        <translation> gegroepeerd per </translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1086"/>
@@ -16081,7 +16081,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1622"/>
         <source>Delete Activity</source>
-        <translation>Activiteit Verwijderen</translation>
+        <translation>Activiteit &amp;Verwijderen</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1628"/>
@@ -16263,7 +16263,7 @@ Controleer je voorkeur instellingen alsjeblieft.</translation>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="226"/>
         <source>Manually</source>
-        <translation>Manueel</translation>
+        <translation>Handmatig</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="234"/>
@@ -16874,7 +16874,7 @@ Als je klikt zal de activiteit worden bewaard, als je niet wilt verder gaan ga d
 You will be able to import or download data before merging or joining the data and manually adjusting the alignment of data series before it is saved.</source>
         <translation>Deze assistent zal je helpen bij het in lijn brengen met de data in de nu geselecteerde activiteit.
 
-Je kunt nu data importeren of downloaden voordat je de data samenvoegt en het manueel in lijn brengt voordat je het bewaart.</translation>
+Je kunt nu data importeren of downloaden voordat je de data samenvoegt en het handmatig in lijn brengt voordat je het bewaart.</translation>
     </message>
 </context>
 <context>
@@ -16887,7 +16887,7 @@ Je kunt nu data importeren of downloaden voordat je de data samenvoegt en het ma
     <message>
         <location filename="../../Gui/Pages.cpp" line="3103"/>
         <source>Notes Keywords</source>
-        <translation>Aantekeningen Sleutelwoorden</translation>
+        <translation>Sleutelwoorden</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3104"/>
@@ -18738,10 +18738,16 @@ Geen ritten gevonden om te importeren.
         <translation>Annuleren</translation>
     </message>
     <message>
+        <location filename="../../Charts/RideEditor.cpp" line="2573"/>
         <location filename="../../Charts/RideEditor.cpp" line="2717"/>
         <location filename="../../Charts/RideEditor.cpp" line="2808"/>
         <source>Ignore</source>
         <translation>Negeer</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/RideEditor.cpp" line="2508"/>
+        <source>Paste Special</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2720"/>
@@ -19917,7 +19923,7 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Charts/PfPvWindow.cpp" line="155"/>
         <source>Crank Length (m):</source>
-        <translation>Crank Lengte (m):</translation>
+        <translation>Cranklengte (m):</translation>
     </message>
     <message>
         <location filename="../../Charts/PfPvWindow.cpp" line="159"/>
@@ -20278,12 +20284,12 @@ en dat het display, &quot;Host&quot; toont</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3646"/>
         <source>Manual</source>
-        <translation>Handleiding</translation>
+        <translation>Handmatig</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3647"/>
         <source>Import</source>
-        <translation>Importeer</translation>
+        <translation>Bij Import</translation>
     </message>
 </context>
 <context>
@@ -20370,11 +20376,11 @@ yyyy</translation>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="154"/>
         <source>Dutch</source>
-        <translation type="unfinished">Nederlands</translation>
+        <translation>Nederlands</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="158"/>
-        <location filename="../../FileIO/PwxRideFile.cpp" line="596"/>
+        <location filename="../../FileIO/PwxRideFile.cpp" line="613"/>
         <source>Bike</source>
         <translation>Fietsen</translation>
     </message>
@@ -20494,17 +20500,17 @@ yyyy</translation>
         <translation>Fietsen %1</translation>
     </message>
     <message>
-        <location filename="../../FileIO/PwxRideFile.cpp" line="596"/>
+        <location filename="../../FileIO/PwxRideFile.cpp" line="613"/>
         <source>Biking</source>
         <translation>Fietsen</translation>
     </message>
     <message>
-        <location filename="../../FileIO/PwxRideFile.cpp" line="596"/>
+        <location filename="../../FileIO/PwxRideFile.cpp" line="613"/>
         <source>Cycling</source>
         <translation>Fietsen</translation>
     </message>
     <message>
-        <location filename="../../FileIO/PwxRideFile.cpp" line="596"/>
+        <location filename="../../FileIO/PwxRideFile.cpp" line="613"/>
         <source>Cycle</source>
         <translation>Fiets</translation>
     </message>
@@ -21111,7 +21117,7 @@ yyyy</translation>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="118"/>
         <source>Find</source>
-        <translation></translation>
+        <translation>Zoek</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="123"/>
@@ -24535,7 +24541,7 @@ eigen formaat. Zullen we dat doen?
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="31"/>
         <source>Change History</source>
-        <translation>Historie Wijzigen</translation>
+        <translation>Wijzigingen Historie</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="33"/>
@@ -24547,36 +24553,91 @@ eigen formaat. Zullen we dat doen?
         <source>Route</source>
         <translation>Route</translation>
     </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="35"/>
+        <source>Sport</source>
+        <translation type="unfinished">Sport</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="36"/>
+        <source>Workout Code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="37"/>
+        <source>Workout Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="38"/>
+        <source>Weight</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="39"/>
+        <source>RPE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="40"/>
+        <source>Objective</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="41"/>
+        <source>Keywords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="42"/>
+        <source>Equipment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="43"/>
+        <source>Device</source>
+        <translation type="unfinished">Apparaat</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="44"/>
+        <source>Device Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="45"/>
+        <source>Pool Length</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SpecialTabs</name>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="118"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="129"/>
         <source>Workout</source>
         <translation>Training</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="119"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="130"/>
         <source>Notes</source>
         <translation>Aantekeningen</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="120"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="131"/>
         <source>Metric</source>
         <translation>Indicator</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="121"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="132"/>
         <source>Extra</source>
         <translation>Extra</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="122"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="133"/>
         <source>Device</source>
         <translation>Apparaat</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="123"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="134"/>
         <source>Athlete</source>
         <translation>Atleet</translation>
     </message>
