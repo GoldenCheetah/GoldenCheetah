@@ -32,6 +32,17 @@ SpecialFields::SpecialFields()
     namesmap.insert("Calendar Text", "Calendar Text");               // set by openRideFile and rideMetadata DO NOT TRANSLATE
     namesmap.insert("Source Filename", tr("Source Filename"));       // set by openRideFile
     namesmap.insert("Route", tr("Route"));                           // GPS map Route tag
+    namesmap.insert("Sport", tr("Sport"));                           // Sport Code
+    namesmap.insert("Workout Code", tr("Workout Code"));             // Workout Code
+    namesmap.insert("Workout Title", tr("Workout Title"));           // Workout Title
+    namesmap.insert("Weight", tr("Weight"));                         // Weight tag
+    namesmap.insert("RPE", tr("RPE"));                               // RPE tag
+    namesmap.insert("Objective", tr("Objective"));                   // Objective tag
+    namesmap.insert("Keywords", tr("Keywords"));                     // Keywords tag
+    namesmap.insert("Equipment", tr("Equipment"));                   // Equipment tag
+    namesmap.insert("Device", tr("Device"));                         // Device tag
+    namesmap.insert("Device Info", tr("Device Info"));               // Device Info tag
+    namesmap.insert("Pool Length", tr("Pool Length"));               // Pool Length tag
 
     // now add all the metric fields (for metric overrides)
     const RideMetricFactory &factory = RideMetricFactory::instance();
