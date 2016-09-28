@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="nl">
+<TS version="2.0" language="nl">
 <context>
     <name>AAvgPower</name>
     <message>
@@ -15995,7 +15995,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1164"/>
         <source>You are about to reset all charts to the default setup</source>
-        <translation>Je gaat alle inzichten restten naar de standaard setup</translation>
+        <translation>Je gaat alle inzichten resetten naar de standaard setup</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1165"/>
@@ -16213,7 +16213,7 @@ Controleer je voorkeur instellingen alsjeblieft.</translation>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="170"/>
         <source>Workout Code:</source>
-        <translation>Training Code:</translation>
+        <translation>Trainingscode:</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="172"/>
@@ -18747,7 +18747,7 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2508"/>
         <source>Paste Special</source>
-        <translation type="unfinished"></translation>
+        <translation>Plak Speciaal</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2720"/>
@@ -24556,57 +24556,57 @@ eigen formaat. Zullen we dat doen?
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="35"/>
         <source>Sport</source>
-        <translation type="unfinished">Sport</translation>
+        <translation>Sport</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="36"/>
         <source>Workout Code</source>
-        <translation type="unfinished"></translation>
+        <translation>Trainingscode</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="37"/>
         <source>Workout Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Trainingsnaam</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="38"/>
         <source>Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Gewicht</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="39"/>
         <source>RPE</source>
-        <translation type="unfinished"></translation>
+        <translation>RPE</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="40"/>
         <source>Objective</source>
-        <translation type="unfinished"></translation>
+        <translation>Doel</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="41"/>
         <source>Keywords</source>
-        <translation type="unfinished"></translation>
+        <translation>Sleutelwoorden</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="42"/>
         <source>Equipment</source>
-        <translation type="unfinished"></translation>
+        <translation>Apparatuur</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="43"/>
         <source>Device</source>
-        <translation type="unfinished">Apparaat</translation>
+        <translation>Apparaat</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="44"/>
         <source>Device Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Apparaatinfo</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="45"/>
         <source>Pool Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Badlengte</translation>
     </message>
 </context>
 <context>
