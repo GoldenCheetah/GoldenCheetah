@@ -224,6 +224,13 @@ ComparePane::refreshTable()
             // get the metric name
             const RideMetric *m = factory.rideMetric(metric);
             if (m) {
+                // Show only metrics relevant for all intervals in compare pane
+                bool isRelevant = true;
+                foreach(CompareInterval x, context->compareIntervals) {
+                    isRelevant = isRelevant && m->isRelevantForRide(x.rideItem);
+                }
+                if (!isRelevant) continue;
+
                 worklist << metric;
                 QString units;
                 // check for both original and translated
