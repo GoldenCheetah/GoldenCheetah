@@ -1794,8 +1794,17 @@ RideSummaryWindow::htmlCompareSummary() const
                                              // case we ever come back here or use it for other things.
             summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
+            QStringList relevantMetricsList;
             foreach (QString symbol, metricsList) {
                 const RideMetric *m = factory.rideMetric(symbol);
+
+                // Skip metrics not relevant for all intervals in compare pane
+                bool isRelevant = false;
+                foreach (RideItem *metrics, intervalMetrics) {
+                    isRelevant = isRelevant || m->isRelevantForRide(metrics);
+                }
+                if (!isRelevant) continue;
+                relevantMetricsList << symbol;
 
                 QString name, units;
                 if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
@@ -1827,7 +1836,7 @@ RideSummaryWindow::htmlCompareSummary() const
                 summary += "<td nowrap='yes'><font color='" + context->compareIntervals[counter].color.name() + "'>" + context->compareIntervals[counter].name + "</font></td>";
                 summary += "<td bgcolor='" + bgColor.name() +"'>&nbsp;</td>"; // spacing
 
-                foreach (QString symbol, metricsList) {
+                foreach (QString symbol, relevantMetricsList) {
 
                     // the values ...
                     const RideMetric *m = factory.rideMetric(symbol);
