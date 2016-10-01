@@ -1797,6 +1797,13 @@ RideSummaryWindow::htmlCompareSummary() const
             foreach (QString symbol, metricsList) {
                 const RideMetric *m = factory.rideMetric(symbol);
 
+                // Show only metrics relevant for compared intervals
+                bool isRelevant = true;
+                foreach (RideItem *metrics, intervalMetrics) {
+                    isRelevant = isRelevant && m->isRelevantForRide(metrics);
+                }
+                if (!isRelevant) continue;
+
                 QString name, units;
                 if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
                         units = m->units(context->athlete->useMetricUnits);
@@ -1831,6 +1838,9 @@ RideSummaryWindow::htmlCompareSummary() const
 
                     // the values ...
                     const RideMetric *m = factory.rideMetric(symbol);
+
+                    // skip if not relevant
+                    if (!m->isRelevantForRide(metrics)) continue;
 
                     // get value and convert if needed (use local context for units)
                     double value = metrics->getForSymbol(symbol) 
