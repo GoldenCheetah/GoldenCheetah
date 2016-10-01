@@ -106,7 +106,7 @@ struct FitFileReaderState
     double start_timestamp;
     double last_distance;
     QMap<int, FitDefinition> local_msg_types;
-    QMap<int, FitDeveField>  local_deve_fields;
+    QMap<QString, FitDeveField>  local_deve_fields;
     QMap<int, int> record_extra_fields;
     QMap<int, int> record_deve_fields;
     QMap<int, int> record_deve_native_fields;
@@ -1142,7 +1142,8 @@ struct FitFileReaderState
                 int idx = -1;
 
                 if (field.deve_idx>-1) {
-                    FitDeveField deveField = local_deve_fields[field.num];
+                    QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
+                    FitDeveField deveField = local_deve_fields[key];
 
                     int scale = deveField.scale;
                     if (scale == -1)
@@ -1932,8 +1933,10 @@ struct FitFileReaderState
         }
 
         //qDebug() << "num" << fieldDef.num << "deve_idx" << fieldDef.dev_id << "type" << fieldDef.type << "native" << fieldDef.native << "name" << fieldDef.name.c_str() << "unit" << fieldDef.unit.c_str() << "scale" << fieldDef.scale << "offset" << fieldDef.offset;
-        if (!local_deve_fields.contains(fieldDef.num)) {
-            local_deve_fields.insert(fieldDef.num, fieldDef);
+        QString key = QString("%1.%2").arg(fieldDef.dev_id).arg(fieldDef.num);
+
+        if (!local_deve_fields.contains(key)) {
+            local_deve_fields.insert((key), fieldDef);
         }
 
         if (fieldDef.native > -1 && !record_deve_native_fields.values().contains(fieldDef.native)) {
@@ -2038,7 +2041,9 @@ struct FitFileReaderState
                     field.num = read_uint8(&count);
                     field.size = read_uint8(&count);
                     field.deve_idx = read_uint8(&count);
-                    FitDeveField devField = local_deve_fields[field.num];
+
+                    QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
+                    FitDeveField devField = local_deve_fields[key];
                     field.type = devField.type & 0x1f;
 
                     //qDebug() << "field" << field.num << "type" << field.type << "size" << field.size << "deve idx" << field.deve_idx;
@@ -2064,6 +2069,7 @@ struct FitFileReaderState
             }
 
             if (!local_msg_types.contains(local_msg_type)) {
+                printf( "local type %d without previous definition\n", local_msg_type );
                 errors << QString("local type %1 without previous definition").arg(local_msg_type);
                 stop = true;
                 return count;
