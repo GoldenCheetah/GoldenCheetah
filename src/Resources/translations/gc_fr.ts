@@ -3397,7 +3397,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1539"/>
         <source>Average Cadence, computed when Cadence &gt; 0</source>
-        <translation>Cadece moyenne, calculée lorsque la cadence &gt; 0</translation>
+        <translation>Cadence moyenne, calculée lorsque la cadence &gt; 0</translation>
     </message>
 </context>
 <context>
@@ -3498,7 +3498,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2862"/>
         <source>It is the left pedal stroke angle where you start producing positive power, on average.</source>
-        <translation>Correspond à l&apos;angle où vous commencez à produir une puissance positive, en moyenne.</translation>
+        <translation>Correspond à l&apos;angle où vous commencez à produire une puissance positive sur la pédale gauche, en moyenne.</translation>
     </message>
     <message>
         <source>Â°</source>
@@ -3520,7 +3520,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2964"/>
         <source>It is the left pedal stroke angle where you end producing positive power, on average.</source>
-        <translation>Correspond à l&apos;angle où vous arrêtez de produir une puissance positive, en moyenne.</translation>
+        <translation>Correspond à l&apos;angle où vous arrêtez de produire une puissance positive sur la pédale gauche, en moyenne.</translation>
     </message>
     <message>
         <source>Â°</source>
@@ -3564,7 +3564,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3065"/>
         <source>It is the left pedal stroke angle where you start producing peak power, on average.</source>
-        <translation>Correspond à l&apos;angle où vous commencez à produir votre puissance de pointe, en moyenne.</translation>
+        <translation>Correspond à l&apos;angle où vous commencez à produire votre puissance de pointe sur la pédale gauche, en moyenne.</translation>
     </message>
     <message>
         <source>Â°</source>
@@ -3586,7 +3586,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3168"/>
         <source>It is the left pedal stroke angle where you end producing peak power, on average.</source>
-        <translation>Correspond à l&apos;angle où vous arrêtez de produir votre puissance de pointe, en moyenne.</translation>
+        <translation>Correspond à l&apos;angle où vous arrêtez de produire votre puissance de pointe sur la pédale gauche, en moyenne.</translation>
     </message>
     <message>
         <source>Â°</source>
@@ -3647,7 +3647,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="880"/>
         <source>Average Power from all samples with power greater than or equal to zero</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance moyenne des valeurs plus grande ou égale à zéro</translation>
     </message>
 </context>
 <context>
@@ -3670,7 +3670,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2812"/>
         <source>Platform center offset is the location on the right pedal platform where you apply force, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le décalage de la plate-forme est l&apos;emplacement sur la plate-forme de la pédale droite où vous appliquez la force, en moyenne.</translation>
     </message>
 </context>
 <context>
@@ -3688,7 +3688,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3315"/>
         <source>It is the right pedal stroke region length where you produce positive power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Correspond à la région sur la course de la pédale droite où vous produisez une puissance positive, en moyenne.</translation>
     </message>
     <message>
         <source>Â°</source>
@@ -3705,7 +3705,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3014"/>
         <source>It is the right pedal stroke angle where you end producing positive power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Correspond à l&apos;angle où vous arrêtez de produire une puissance positive sur la pédale droite, en moyenne.</translation>
     </message>
     <message>
         <source>Â°</source>
@@ -3732,7 +3732,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3401"/>
         <source>It is the right pedal stroke region length where you produce peak power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Correspond à la région sur la course de la pédale droite où vous produisez votre puissance de pointe, en moyenne.</translation>
     </message>
     <message>
         <source>Â°</source>
@@ -3754,7 +3754,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3116"/>
         <source>It is the right pedal stroke angle where you start producing peak power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Correspond à l&apos;angle où vous commencez à produire votre puissance de pointe sur la pédale droite, en moyenne.</translation>
     </message>
     <message>
         <source>Â°</source>
@@ -3776,7 +3776,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3218"/>
         <source>It is the right pedal stroke angle where you end producing peak power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Correspond à l&apos;angle où vous arrêtez de produire votre puissance de pointe sur la pédale droite, en moyenne.</translation>
     </message>
     <message>
         <source>Â°</source>
@@ -3799,7 +3799,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2707"/>
         <source>It measures how smoothly power is delivered to the right pedal throughout the revolution, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mesure la fluidité de la puissance délivrée sur la pédale droite tout au long de la révolution, en moyenne.</translation>
     </message>
 </context>
 <context>
@@ -3818,7 +3818,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2603"/>
         <source>It measures how much of the power delivered to the right pedal is pushing it forward, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mesure la quantité de puissance délivrée à la pédale droite qui la pousse vers l&apos;avant, en moyenne.</translation>
     </message>
 </context>
 <context>
@@ -3836,7 +3836,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2912"/>
         <source>It is the right pedal stroke angle where you start producing positive power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Correspond à l&apos;angle où vous commencez à produire une puissance positive sur la pédale droite, en moyenne.</translation>
     </message>
     <message>
         <source>Â°</source>
@@ -3848,18 +3848,18 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="47"/>
         <source>Average Running Cadence</source>
-        <translation type="unfinished"></translation>
+        <translation>Cadence moyenne de course</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="48"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="49"/>
         <source>spm</source>
-        <translation type="unfinished">spm</translation>
+        <translation>spm</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="51"/>
         <source>Average Running Cadence, computed when Cadence &gt; 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Cadence moyenne, calculée lorsque la cadence &gt; 0</translation>
     </message>
 </context>
 <context>
@@ -3868,13 +3868,13 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
         <location filename="../../Metrics/RunMetrics.cpp" line="154"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="158"/>
         <source>Average Ground Contact Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps de contact au sol moyen</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="155"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="156"/>
         <source>ms</source>
-        <translation type="unfinished">ms</translation>
+        <translation>ms</translation>
     </message>
 </context>
 <context>
@@ -3883,17 +3883,17 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
         <location filename="../../Metrics/RunMetrics.cpp" line="209"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="215"/>
         <source>Average Vertical Oscillation</source>
-        <translation type="unfinished"></translation>
+        <translation>Oscillation verticale moyenne</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="210"/>
         <source>cm</source>
-        <translation type="unfinished">cm</translation>
+        <translation>cm</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="211"/>
         <source>in</source>
-        <translation type="unfinished">in</translation>
+        <translation>in</translation>
     </message>
 </context>
 <context>
@@ -3912,7 +3912,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="934"/>
         <source>Average Muscle Oxygen Saturation, the percentage of hemoglobin that is carrying oxygen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Saturation moyenne d&apos;oxygène du muscle. le pourcentage d&apos;hémoglobine transportant de l&apos;oxygène.</translation>
     </message>
 </context>
 <context>
@@ -3935,7 +3935,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="823"/>
         <source>Average Speed in kph or mph, computed from distance over time when speed not zero</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vitesse moyenne en km/h ou mi/h</translation>
     </message>
 </context>
 <context>
@@ -11199,7 +11199,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="365"/>
         <source>Gravity Ordered Velocity Stress Score, the TSS like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration</source>
-        <translation type="unfinished"></translation>
+        <translation>GOSS (Gravity Ordered Velocity Stress Score) est un métrique de stress comme TSS défini par le Dr Skiba pour la course à pied, qui prend en comptet les variations de la vitesse, la pente, l&apos;intensité relative et la durée</translation>
     </message>
 </context>
 <context>
@@ -12464,7 +12464,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2374"/>
         <source>Elevation Gain to Total Distance percent ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Pourcentage du dénivelé positif sur la distance totale</translation>
     </message>
 </context>
 <context>
@@ -12761,7 +12761,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1253"/>
         <source>Total Heartbeats</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre de battements cardiaques</translation>
     </message>
 </context>
 <context>
@@ -13102,7 +13102,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="177"/>
         <source>Predefined sets of curves which can be applied as chart definition, or as starting point for individual adjustments</source>
-        <translation type="unfinished"></translation>
+        <translation>Ensembles prédéfinis de courbes qui peuvent être utilisées comme graphique, ou comme point de départ pour de nouveaux graphiques</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="191"/>
@@ -13259,12 +13259,12 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="311"/>
         <source>Training</source>
-        <translation type="unfinished"></translation>
+        <translation>Entraînement</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="313"/>
         <source>Remote Controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Télécommandes</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="315"/>
@@ -13431,12 +13431,12 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="222"/>
         <source>Unable to process chart file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de traiter le fichier du graphique</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="223"/>
         <source>Bad chart type (%1).</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur de type de graphique (% 1).</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="714"/>
@@ -13655,7 +13655,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1489"/>
         <source>Normalized Power to Average Heart Rate ratio in watts/bpm</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ratio entre la puissance normalisée et la fréquence cardiaque moyenne en watt/puls</translation>
     </message>
 </context>
 <context>
@@ -13668,7 +13668,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1301"/>
         <source>Power to Heart Rate Ratio in watts/bpm</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ratio entre la puissance et la fréquence cardiaque en watt/puls</translation>
     </message>
 </context>
 <context>
@@ -13681,7 +13681,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Charts/HrPwPlot.cpp" line="469"/>
         <source>Power (Watts)</source>
-        <translation>Puisance (watts)</translation>
+        <translation type="unfinished">Puissance (watt)</translation>
     </message>
 </context>
 <context>
@@ -15142,7 +15142,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Gui/Pages.cpp" line="6540"/>
         <source>Enable interval auto-discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer la découverte automatique d&apos;intervalles</translation>
     </message>
 </context>
 <context>
@@ -15319,7 +15319,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Train/KettlerController.cpp" line="84"/>
         <source>Cannot Connect to Kettler</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de se connecter au Kettler</translation>
     </message>
 </context>
 <context>
@@ -15415,7 +15415,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="264"/>
         <source>L10 Sustained Time</source>
-        <translation>Soutenu dans la zone L10</translation>
+        <translation>Temps soutenu dans la zone L10</translation>
     </message>
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="265"/>
@@ -15426,7 +15426,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="267"/>
         <source>Sustained Time in Power Zone 10, based on (sustained) EFFORT intervals.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps soutenu dans la zone de puissance 10, basé sur les intervalles de type effort soutenu</translation>
     </message>
 </context>
 <context>
@@ -15434,7 +15434,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="46"/>
         <source>L1 Sustained Time</source>
-        <translation>Soutenu dans la zone L1</translation>
+        <translation>Temps soutenu dans la zone L1</translation>
     </message>
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="47"/>
@@ -15445,7 +15445,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="49"/>
         <source>Sustained Time in Power Zone 1, based on (sustained) EFFORT intervals.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps soutenu dans la zone de puissance 1, basé sur les intervalles de type effort soutenu</translation>
     </message>
 </context>
 <context>
@@ -15453,7 +15453,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="72"/>
         <source>L2 Sustained Time</source>
-        <translation>Soutenu dans la zone L2</translation>
+        <translation>Temps soutenu dans la zone L2</translation>
     </message>
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="73"/>
@@ -15464,7 +15464,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="75"/>
         <source>Sustained Time in Power Zone 2, based on (sustained) EFFORT intervals.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps soutenu dans la zone de puissance 2, basé sur les intervalles de type effort soutenu</translation>
     </message>
 </context>
 <context>
@@ -15472,7 +15472,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="96"/>
         <source>L3 Sustained Time</source>
-        <translation>Soutenu dans la zone L3</translation>
+        <translation>Temps soutenu dans la zone L3</translation>
     </message>
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="97"/>
@@ -15483,7 +15483,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="99"/>
         <source>Sustained Time in Power Zone 3, based on (sustained) EFFORT intervals.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps soutenu dans la zone de puissance 3, basé sur les intervalles de type effort soutenu</translation>
     </message>
 </context>
 <context>
@@ -15491,7 +15491,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="120"/>
         <source>L4 Sustained Time</source>
-        <translation>Soutenu dans la zone L4</translation>
+        <translation>Temps soutenu dans la zone L4</translation>
     </message>
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="121"/>
@@ -15502,7 +15502,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="123"/>
         <source>Sustained Time in Power Zone 4, based on (sustained) EFFORT intervals.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps soutenu dans la zone de puissance 4, basé sur les intervalles de type effort soutenu</translation>
     </message>
 </context>
 <context>
@@ -15510,7 +15510,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="144"/>
         <source>L5 Sustained Time</source>
-        <translation>Soutenu dans la zone L5</translation>
+        <translation>Temps soutenu dans la zone L5</translation>
     </message>
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="145"/>
@@ -15521,7 +15521,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="147"/>
         <source>Sustained Time in Power Zone 5, based on (sustained) EFFORT intervals.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps soutenu dans la zone de puissance 5, basé sur les intervalles de type effort soutenu</translation>
     </message>
 </context>
 <context>
@@ -15529,7 +15529,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="168"/>
         <source>L6 Sustained Time</source>
-        <translation>Soutenu dans la zone L6</translation>
+        <translation>Temps soutenu dans la zone L6</translation>
     </message>
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="169"/>
@@ -15540,7 +15540,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="171"/>
         <source>Sustained Time in Power Zone 6, based on (sustained) EFFORT intervals.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps soutenu dans la zone de puissance 6, basé sur les intervalles de type effort soutenu</translation>
     </message>
 </context>
 <context>
@@ -15548,7 +15548,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="192"/>
         <source>L7 Sustained Time</source>
-        <translation>Soutenu dans la zone L7</translation>
+        <translation>Temps soutenu dans la zone L7</translation>
     </message>
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="193"/>
@@ -15559,7 +15559,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="195"/>
         <source>Sustained Time in Power Zone 7, based on (sustained) EFFORT intervals.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps soutenu dans la zone de puissance 7, basé sur les intervalles de type effort soutenu</translation>
     </message>
 </context>
 <context>
@@ -15567,7 +15567,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="216"/>
         <source>L8 Sustained Time</source>
-        <translation>Soutenu dans la zone L8</translation>
+        <translation>Temps soutenu dans la zone L8</translation>
     </message>
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="217"/>
@@ -15578,7 +15578,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="219"/>
         <source>Sustained Time in Power Zone 8, based on (sustained) EFFORT intervals.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps soutenu dans la zone de puissance 8, basé sur les intervalles de type effort soutenu</translation>
     </message>
 </context>
 <context>
@@ -15586,7 +15586,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="240"/>
         <source>L9 Sustained Time</source>
-        <translation>Soutenu dans la zone L9</translation>
+        <translation>Temps soutenu dans la zone L9</translation>
     </message>
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="241"/>
@@ -15597,7 +15597,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="243"/>
         <source>Sustained Time in Power Zone 9, based on (sustained) EFFORT intervals.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps soutenu dans la zone de puissance 9, basé sur les intervalles de type effort soutenu</translation>
     </message>
 </context>
 <context>
@@ -15605,7 +15605,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="80"/>
         <source>Lactate Normalized Power as defined by Dr. Skiba in GOVSS algorithm</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance normalisée au lactate comme définit par le Dr. Skiba dans l&apos;algorithme de GOVSS</translation>
     </message>
 </context>
 <context>
@@ -15671,7 +15671,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="1280"/>
         <source>watts</source>
-        <translation>watts</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <source>trend</source>
@@ -15732,7 +15732,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="3813"/>
         <source>Today</source>
-        <translation type="unfinished">Aujourd&apos;hui</translation>
+        <translation>Aujourd&apos;hui</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="973"/>
@@ -15965,13 +15965,13 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../../Gui/LTMSidebar.cpp" line="514"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="597"/>
         <source>Edit phase</source>
-        <translation type="unfinished"></translation>
+        <translation>Editer la phase</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="515"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="598"/>
         <source>Delete phase</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer la phase</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="517"/>
@@ -15991,7 +15991,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../../Gui/LTMSidebar.cpp" line="1344"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="1351"/>
         <source>Add Phase</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter une phase</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="659"/>
@@ -16057,7 +16057,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../../Gui/LTMSidebar.cpp" line="1344"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="1351"/>
         <source>You can only add phases to user defined seasons. Please select a season you have created before adding a phase.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous ne pouvez ajouter des phases qu&apos;à des saisons définies par l&apos;utilisateur. Veuillez sélectionner une saison que vous avez créée avant d&apos;y ajouter une phase.</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1439"/>
@@ -16665,17 +16665,17 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1029"/>
         <source>Coggan Expected Chronic Training Load</source>
-        <translation type="unfinished"></translation>
+        <translation>Charge à long terme selon Coggan attendue</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1044"/>
         <source>Coggan Expected Acute Training Load</source>
-        <translation type="unfinished"></translation>
+        <translation>Charge à court terme selon Coggan attendue</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1059"/>
         <source>Coggan Expected Training Stress Balance</source>
-        <translation type="unfinished"></translation>
+        <translation>Equilibre de charge selon Coggan attendu</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1075"/>
@@ -17246,12 +17246,12 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1053"/>
         <source>Array subscript needs a symbol name.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;élément du tableau a besoin d&apos;un nom de symbole.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1065"/>
         <source>Index must be numeric.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;index doit être numérique</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1085"/>
@@ -17286,12 +17286,12 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1156"/>
         <source>XDATA needs 3 parameters.</source>
-        <translation type="unfinished"></translation>
+        <translation>XDATA requiert 3 paramètres.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1163"/>
         <source>XDATA expects a string for first two parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>YData requiert une chaine de caractères pour les deux premiers paramètres</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1170"/>
