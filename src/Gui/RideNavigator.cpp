@@ -66,7 +66,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     groupByModel = new GroupByModel(this);
     groupByModel->setSourceModel(searchFilter);
 
-    sortModel = new QSortFilterProxyModel(this);
+    sortModel = new RideNavigatorSortProxyModel(this);
     sortModel->setSourceModel(groupByModel);
     sortModel->setDynamicSortFilter(true);
 
@@ -1380,3 +1380,29 @@ RideTreeView::RideTreeView()
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 }
+
+
+RideNavigatorSortProxyModel::RideNavigatorSortProxyModel(QObject *parent) : QSortFilterProxyModel (parent)
+{}
+
+bool RideNavigatorSortProxyModel::lessThan(const QModelIndex &left,
+                                           const QModelIndex &right) const
+{
+    QVariant leftData = sourceModel()->data(left);
+    QVariant rightData = sourceModel()->data(right);
+
+    if (leftData.type() == QVariant::DateTime) {
+        return leftData.toDateTime() < rightData.toDateTime();
+    }
+    QString leftString = leftData.toString();
+    QString rightString = rightData.toString();
+
+    if (leftString.contains(QRegExp("[^0-9.,]")) ||
+            rightString.contains(QRegExp("[^0-9.,]"))) { // alpha
+        return QString::localeAwareCompare(leftString, rightString) < 0;
+    }
+    // assume numeric
+    return leftString.toDouble() < rightString.toDouble();
+
+}
+

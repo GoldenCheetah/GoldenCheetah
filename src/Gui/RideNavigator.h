@@ -41,6 +41,7 @@ class SearchFilterBox;
 class DiaryWindow;
 class DiarySidebar;
 class QSortFilterProxyModel;
+class RideNavigatorSortProxyModel;
 class DataFilter;
 class GcMiniCalendar;
 class SearchBox;
@@ -161,7 +162,7 @@ class RideNavigator : public GcChartWindow
 
     protected:
         GroupByModel *groupByModel; // for group by
-        QSortFilterProxyModel *sortModel; // for sort/filter
+        RideNavigatorSortProxyModel *sortModel; // for sort/filter
 
         // keep track of the headers
         QList<QString> logicalHeadings;
@@ -295,5 +296,17 @@ class RideTreeView : public QTreeView
         void dragMoveEvent(QDragMoveEvent *e) {
             e->accept();
         }
+};
+
+class RideNavigatorSortProxyModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+
+public:
+    RideNavigatorSortProxyModel(QObject *parent = 0);
+
+protected:
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const Q_DECL_OVERRIDE;
+
 };
 #endif
