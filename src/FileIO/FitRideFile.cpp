@@ -106,10 +106,10 @@ struct FitFileReaderState
     double start_timestamp;
     double last_distance;
     QMap<int, FitDefinition> local_msg_types;
-    QMap<QString, FitDeveField>  local_deve_fields;
+    QMap<QString, FitDeveField>  local_deve_fields; // All developer fields
     QMap<int, int> record_extra_fields;
-    QMap<int, int> record_deve_fields;
-    QMap<int, int> record_deve_native_fields;
+    QMap<QString, int> record_deve_fields; // Developer fields in DEVELOPER XDATA
+    QMap<QString, int> record_deve_native_fields; // Developer fields with native values
     QSet<int> unknown_record_fields, unknown_global_msg_nums, unknown_base_type;
     int interval;
     int calibration;
@@ -981,15 +981,12 @@ struct FitFileReaderState
             int native_num = field.num;
 
             if (field.deve_idx>-1) {
+                QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
+                qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
+                qDebug() << "name" << local_deve_fields[key].name.c_str() << "unit" << local_deve_fields[key].unit.c_str() << _values.f;
 
-                if (FIT_DEBUG) {
-                    //qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
-                    //qDebug() << "name" << local_deve_fields[field.num].name.c_str() << "unit" << local_deve_fields[field.num].unit.c_str() << _values.f;
-                }
-
-
-                if (record_deve_native_fields.contains(field.num))
-                    native_num = record_deve_native_fields[field.num];
+                if (record_deve_native_fields.contains(key))
+                    native_num = record_deve_native_fields[key];
                 else
                     native_num = -1;
             }
@@ -1152,7 +1149,7 @@ struct FitFileReaderState
                     if (offset == -1)
                         offset = 0;
 
-                    if (!record_deve_fields.contains(field.num)) {
+                    if (!record_deve_fields.contains(key)) {
                         QString name = deveField.name.c_str();
 
                         if (deveField.native>-1) {
@@ -1177,9 +1174,9 @@ struct FitFileReaderState
                         deveXdata->valuename << name;
                         deveXdata->unitname << deveField.unit.c_str();
 
-                        record_deve_fields.insert(field.num, record_deve_fields.count());
+                        record_deve_fields.insert(key, record_deve_fields.count());
                     }
-                    idx = record_deve_fields[field.num];
+                    idx = record_deve_fields[key];
 
                     if (idx>-1) {
                         if (p_deve == NULL &&
@@ -1940,7 +1937,7 @@ struct FitFileReaderState
         }
 
         if (fieldDef.native > -1 && !record_deve_native_fields.values().contains(fieldDef.native)) {
-            record_deve_native_fields.insert(fieldDef.num, fieldDef.native);
+            record_deve_native_fields.insert(key, fieldDef.native);
 
             RideFile::SeriesType series = getSeriesForNative(fieldDef.native);
 
