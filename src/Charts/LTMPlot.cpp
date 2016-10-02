@@ -974,16 +974,16 @@ LTMPlot::setData(LTMSettings *set)
                             if (metricDetail.uunits == "km") precision=0;
 
                             // we have a metric so lets be precise ...
-                            if (PaceZones::isPaceUnit(metricDetail.uunits))
-                                labelString = time_to_string(value*60);
-                            else
-                                labelString = QString("%1").arg(value, 0, 'f', precision);
+                            labelString = QString("%1").arg(value, 0, 'f', precision);
 
                         } else {
                             // no precision
                             labelString = (QString("%1").arg(value, 0, 'f', 1));
                         }
 
+                        // Pace units use mm:ss format for the label
+                        if (PaceZones::isPaceUnit(metricDetail.uunits))
+                            labelString = time_to_string(value*60);
 
                         // Qwt uses its own text objects
                         QwtText text(labelString);
@@ -1141,15 +1141,16 @@ LTMPlot::setData(LTMSettings *set)
                         if (metricDetail.uunits == "km") precision=0;
 
                         // we have a metric so lets be precise ...
-                        if (PaceZones::isPaceUnit(metricDetail.uunits))
-                            labelString = time_to_string(value*60);
-                        else
-                            labelString = QString("%1").arg(value, 0, 'f', precision);
+                        labelString = QString("%1").arg(value, 0, 'f', precision);
 
                     } else {
                         // no precision
                         labelString = (QString("%1").arg(value, 0, 'f', 1));
                     }
+
+                    // Pace units use mm:ss format for the label
+                    if (PaceZones::isPaceUnit(metricDetail.uunits))
+                        labelString = time_to_string(value*60);
 
 
                     // Qwt uses its own text objects
@@ -2085,15 +2086,16 @@ LTMPlot::setCompareData(LTMSettings *set)
                                 if (metricDetail.uunits == "km") precision=0;
 
                                 // we have a metric so lets be precise ...
-                                if (PaceZones::isPaceUnit(metricDetail.uunits))
-                                    labelString = time_to_string(value*60);
-                                else
-                                    labelString = QString("%1").arg(value , 0, 'f', precision);
+                                labelString = QString("%1").arg(value , 0, 'f', precision);
     
                             } else {
                                 // no precision
                                 labelString = (QString("%1").arg(value, 0, 'f', 1));
                             }
+
+                            // Pace units use mm:ss format for the label
+                            if (PaceZones::isPaceUnit(metricDetail.uunits))
+                                labelString = time_to_string(value*60);
 
 
                             // Qwt uses its own text objects
@@ -2251,15 +2253,16 @@ LTMPlot::setCompareData(LTMSettings *set)
                             if (metricDetail.uunits == "km") precision=0;
 
                             // we have a metric so lets be precise ...
-                            if (PaceZones::isPaceUnit(metricDetail.uunits))
-                                labelString = time_to_string(value*60);
-                            else
-                                labelString = QString("%1").arg(value, 0, 'f', precision);
+                            labelString = QString("%1").arg(value, 0, 'f', precision);
 
                         } else {
                             // no precision
                             labelString = (QString("%1").arg(value, 0, 'f', 1));
                         }
+
+                        // Pace units use mm:ss format for the label
+                        if (PaceZones::isPaceUnit(metricDetail.uunits))
+                            labelString = time_to_string(value*60);
 
 
                         // Qwt uses its own text objects
