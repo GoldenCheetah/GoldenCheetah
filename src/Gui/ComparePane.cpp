@@ -64,7 +64,7 @@ QColor standardColor(int num)
    return standardColors.at(num % standardColors.count());
 }
 
-// we need to fix the sort order!
+// we need to fix the sort order! (fixed for time fields)
 class CTableWidgetItem : public QTableWidgetItem
 {
     public:
@@ -311,7 +311,7 @@ ComparePane::refreshTable()
     
                     // or maybe its a duration (worry about local lang or translated)
                     if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
-                        strValue = time_to_string(value);
+                        strValue = time_to_string_for_sorting(value);
 
                 }
 
