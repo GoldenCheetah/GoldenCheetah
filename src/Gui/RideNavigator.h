@@ -306,7 +306,6 @@ public:
     RideNavigatorSortProxyModel(QObject *parent = 0);
 
 protected:
-    bool lessThan(const QModelIndex &left, const QModelIndex &right) const Q_DECL_OVERRIDE;
-
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
 };
 #endif
