@@ -54,6 +54,11 @@ WithingsDownload::download()
 void
 WithingsDownload::downloadFinished(QNetworkReply *reply)
 {
+
+    if (reply->error() != QNetworkReply::NoError) {
+       QMessageBox::warning(context->mainWindow, tr("Network Problem"), tr("No Withings Data downloaded"));
+       return;
+    }
     QString text = reply->readAll();
     QStringList errors;
 

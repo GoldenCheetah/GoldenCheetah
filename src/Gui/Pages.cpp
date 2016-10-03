@@ -461,7 +461,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(dropauthLabel, ++row, 0);
     grid->addWidget(dropboxAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
     if (appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "")!="")
-        grid->addWidget(dropboxAuthorised, row, 2, Qt::AlignLeft | Qt::AlignVCenter);
+        grid->addWidget(dropboxAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
     else
         dropboxAuthorised->hide(); // if no token no show
 
