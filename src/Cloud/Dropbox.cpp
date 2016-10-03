@@ -55,6 +55,10 @@ Dropbox::open(QStringList &errors)
     connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
+    if (reply->error() != QNetworkReply::NoError) {
+       errors << tr("Network Problem reading Dropbox data");
+       return false;
+    }
     // did we get a good response ?
     QByteArray r = reply->readAll();
     QJsonParseError parseError;
@@ -71,11 +75,13 @@ Dropbox::open(QStringList &errors)
         root_->isDir = document.object()["is_dir"].toBool();
         root_->size = document.object()["bytes"].toInt();
 
-    }
+        // happy with what we got ?
+        if (root_->name != "/") errors << tr("invalid root path.");
+        if (root_->isDir != true) errors << tr("root is not a directory.");
 
-    // happy with what we got ?
-    if (root_->name != "/") errors << tr("invalid root path.");
-    if (root_->isDir != true) errors << tr("root is not a directory.");
+    } else {
+        errors << tr("problem parsing Dropbox data");
+    }
 
     // ok so far ?
     if (errors.count()) return false;
@@ -249,7 +255,16 @@ Dropbox::writeFile(QByteArray &data, QString remotename)
 void
 Dropbox::writeFileCompleted()
 {
-    notifyWriteComplete(replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Completed."));
+    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    if (reply->error() == QNetworkReply::NoError) {
+        notifyWriteComplete(
+            replyName(static_cast<QNetworkReply*>(QObject::sender())),
+            tr("Completed."));
+    } else {
+        notifyWriteComplete(
+            replyName(static_cast<QNetworkReply*>(QObject::sender())),
+            tr("Network Error - Upload failed."));
+    }
 }
 
 void
