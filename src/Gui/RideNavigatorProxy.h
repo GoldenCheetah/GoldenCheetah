@@ -360,7 +360,7 @@ public:
             } else {
 
                 // column 1 = ride_time we have to use ride_date
-                if (proxyIndex.column() == 1)  {
+                if (proxyIndex.column() == 1 && proxyIndex.internalPointer())  {
                     QString date;
 
                     // hideous code, sorry
