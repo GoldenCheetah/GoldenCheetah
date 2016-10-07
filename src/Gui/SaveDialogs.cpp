@@ -195,6 +195,26 @@ MainWindow::saveSilent(Context *context, RideItem *rideItem)
     rideItem->ride()->emitSaved();
 }
 
+
+void
+MainWindow::saveAllFilesSilent(Context *context)
+{
+    QList<RideItem*> dirtyList;
+
+    // get a list of rides to save
+    foreach (RideItem *rideItem, context->athlete->rideCache->rides())
+        if (rideItem->isDirty() == true)
+            dirtyList.append(rideItem);
+
+    // we have some files to save...
+    if (dirtyList.count() > 0) {
+        for (int i=0; i<dirtyList.count(); i++) {
+                this->saveRideSingleDialog(context, dirtyList.at(i));
+
+        }
+    }
+}
+
 //----------------------------------------------------------------------
 // Save Single File Dialog Widget
 //----------------------------------------------------------------------
