@@ -193,6 +193,7 @@ class MainWindow : public QMainWindow
         void addIntervals(); // pass thru to tab
         bool saveRideSingleDialog(Context *, RideItem *);
         void saveSilent(Context *, RideItem *);
+        void saveAllFilesSilent(Context *);
         void downloadRide();
         void manualRide();
         void exportRide();
@@ -222,6 +223,7 @@ class MainWindow : public QMainWindow
         void mergeRide();
         void deleteRide();
         void saveRide();                        // save current ride menu item
+        void saveAllUnsavedRides();
         void revertRide();
         bool saveRideExitDialog(Context *);              // save dirty rides on exit dialog
 

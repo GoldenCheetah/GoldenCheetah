@@ -501,6 +501,8 @@ MainWindow::MainWindow(const QDir &home)
     connect(backupMapper, SIGNAL(mapped(const QString &)), this, SLOT(backupAthlete(const QString &)));
 
     fileMenu->addSeparator();
+    fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
+    fileMenu->addSeparator();
     fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
     fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab()));
     fileMenu->addAction(tr("&Quit All Windows"), this, SLOT(closeAll()), tr("Ctrl+Q"));
@@ -1571,6 +1573,19 @@ MainWindow::saveRide()
     // save
     if (currentTab->context->ride) {
         saveRideSingleDialog(currentTab->context, currentTab->context->ride); // will signal save to everyone
+    }
+}
+
+void
+MainWindow::saveAllUnsavedRides()
+{
+    // flush in-flight changes
+    currentTab->context->notifyMetadataFlush();
+    currentTab->context->ride->notifyRideMetadataChanged();
+
+    // save
+    if (currentTab->context->ride) {
+        saveAllFilesSilent(currentTab->context); // will signal save to everyone
     }
 }
 
