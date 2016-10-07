@@ -297,7 +297,7 @@ TabView::setBottom(QWidget *widget)
 void 
 TabView::dragEvent(bool x)
 {
-    setShowBottom(x);
+    setBottomRequested(x);
     context->mainWindow->setToolButtons(); // toolbuttons reflect show/hide status
 }
 
