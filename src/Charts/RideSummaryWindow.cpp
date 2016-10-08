@@ -475,6 +475,10 @@ RideSummaryWindow::htmlSummary()
         return summary;
     }
 
+    // activities counts by sport to select training zones
+    int nActivities, nRides, nRuns, nSwims;
+    context->athlete->rideCache->getRideTypeCounts(specification, nActivities, nRides, nRuns, nSwims);
+
     // set those colors
     summary = GCColor::css(ridesummary);
     summary += "<center>";
@@ -540,8 +544,6 @@ RideSummaryWindow::htmlSummary()
         if (ride->isRun()) averageColumn << "pace";
         if (ride->isSwim()) averageColumn << "pace_swim";
     } else {
-        int nActivities, nRides, nRuns, nSwims;
-        context->athlete->rideCache->getRideTypeCounts(specification,                    nActivities, nRides, nRuns, nSwims);
         if (nRuns > 0) averageColumn << "pace";
         if (nSwims > 0) averageColumn << "pace_swim";
     }
@@ -633,8 +635,6 @@ RideSummaryWindow::htmlSummary()
     } else {
         // For data range use base metric for single sport if homogeneous
         // or combined if mixed
-        int nActivities, nRides, nRuns, nSwims;
-        context->athlete->rideCache->getRideTypeCounts(specification,                    nActivities, nRides, nRuns, nSwims);
         pmc = context->athlete->getPMCFor(
                             nActivities == nRides ? "coggan_tss" :
                             nActivities == nRuns ? "govss" :
@@ -771,7 +771,9 @@ RideSummaryWindow::htmlSummary()
              const RideMetric *m = factory.rideMetric(symbol);
              if (!m) break;
 
-             if (ridesummary && !m->isRelevantForRide(rideItem)) continue; // don't display non relevant metric
+             if ((ridesummary && !m->isRelevantForRide(rideItem)) ||
+                 (!ridesummary && !context->athlete->rideCache->isMetricRelevantForRides(specification, m)))
+                 continue; // don't display non relevant metric
  
              // HTML table row
              QString s("<tr><td>%1%2:</td><td align=\"right\">%3</td></tr>");
@@ -934,8 +936,6 @@ RideSummaryWindow::htmlSummary()
 
     int numzones = 0;
     int range = -1;
-    int nActivities, nRides, nRuns, nSwims;
-    context->athlete->rideCache->getRideTypeCounts(specification, nActivities, nRides, nRuns, nSwims);
 
     //
     // Time In Pace Zones for Running and Swimming activities
@@ -2161,6 +2161,9 @@ RideSummaryWindow::htmlCompareSummary() const
             foreach (QString symbol, metricsList) {
                 const RideMetric *m = factory.rideMetric(symbol);
 
+                // skip not relevant metrics
+                if (!context->athlete->rideCache->isMetricRelevantForRides(specification, m)) continue;
+
                 QString name, units;
                 if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
                     units = m->units(context->athlete->useMetricUnits);
@@ -2191,6 +2194,9 @@ RideSummaryWindow::htmlCompareSummary() const
 
                     // the values ...
                     const RideMetric *m = factory.rideMetric(symbol);
+
+                    // skip not relevant metrics
+                    if (!context->athlete->rideCache->isMetricRelevantForRides(specification, m)) continue;
 
                     // get value and convert if needed (use local context for units)
                     double value = dr.context->athlete->rideCache->getAggregate(symbol, dr.specification,

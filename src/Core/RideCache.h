@@ -73,6 +73,9 @@ class RideCache : public QObject
         // Count of activities matching specification
         void getRideTypeCounts(Specification specification, int& nActivities,
                                int& nRides, int& nRuns, int& nSwims);
+        // Check if metric is relevant for some  activity matching specification
+        bool isMetricRelevantForRides(Specification specification,
+                                      const RideMetric* metric);
 
         // is running ?
         bool isRunning() { return future.isRunning(); }
