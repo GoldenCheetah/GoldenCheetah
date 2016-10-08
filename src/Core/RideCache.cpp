@@ -902,3 +902,21 @@ RideCache::getRideTypeCounts(Specification specification, int& nActivities,
         else nRides++;
     }
 }
+
+bool
+RideCache::isMetricRelevantForRides(Specification specification,
+                                    const RideMetric* metric)
+{
+    bool isRelevant = false;
+
+    // loop through and aggregate
+    foreach (RideItem *ride, rides_) {
+
+        // skip filtered rides
+        if (!specification.pass(ride)) continue;
+
+        isRelevant = isRelevant || metric->isRelevantForRide(ride);
+    }
+
+    return isRelevant;
+}
