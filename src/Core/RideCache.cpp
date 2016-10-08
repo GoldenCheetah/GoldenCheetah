@@ -907,16 +907,14 @@ bool
 RideCache::isMetricRelevantForRides(Specification specification,
                                     const RideMetric* metric)
 {
-    bool isRelevant = false;
-
     // loop through and aggregate
     foreach (RideItem *ride, rides_) {
 
         // skip filtered rides
         if (!specification.pass(ride)) continue;
 
-        isRelevant = isRelevant || metric->isRelevantForRide(ride);
+        if (metric->isRelevantForRide(ride)) return true;
     }
 
-    return isRelevant;
+    return false;
 }
