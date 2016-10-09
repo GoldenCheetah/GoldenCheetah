@@ -401,6 +401,16 @@ ComparePane::refreshTable()
             // get the metric name
             const RideMetric *m = factory.rideMetric(metric);
             if (m) {
+                // Skip metrics not relevant for all ranges in compare pane
+                bool isRelevant = false;
+                foreach(CompareDateRange x, context->compareDateRanges) {
+                    if (x.context->athlete->rideCache->isMetricRelevantForRides(x.specification, m)) {
+                        isRelevant = true;
+                        break;
+                    }
+                }
+                if (!isRelevant) continue;
+
                 worklist << metric;
                 QString units;
                 if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
