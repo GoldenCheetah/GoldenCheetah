@@ -1207,6 +1207,17 @@ RideSummaryWindow::htmlSummary()
             activities++;
         }
 
+        // Select relevant metrics for activities of each sport
+        QStringList rideMetrics, runMetrics, swimMetrics;
+        for (j = 0; j< metricColumn.count(); ++j) {
+            QString symbol = metricColumn[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            if (context->athlete->rideCache->isMetricRelevantForRides(specification, m, RideCache::OnlyRides)) rideMetrics << symbol;
+            if (context->athlete->rideCache->isMetricRelevantForRides(specification, m, RideCache::OnlyRuns)) runMetrics << symbol;
+            if (context->athlete->rideCache->isMetricRelevantForRides(specification, m, RideCache::OnlySwims)) swimMetrics << symbol;
+        }
+
         // some people have a LOT of metrics, so we only show so many since
         // you quickly run out of screen space, but if they have > 4 we can
         // take out elevation and work from the totals/
@@ -1214,7 +1225,9 @@ RideSummaryWindow::htmlSummary()
         int totalCols;
         if (metricColumn.count() > 4) totalCols = 2;
         else totalCols = rtotalColumn.count();
-        int metricCols = metricColumn.count() > 7 ? 7 : metricColumn.count();
+        int rideCols = rideMetrics.count() > 7 ? 7 : rideMetrics.count();
+        int runCols = runMetrics.count() > 7 ? 7 : runMetrics.count();
+        int swimCols = swimMetrics.count() > 7 ? 7 : swimMetrics.count();
 
         //Rides first
         if (context->ishomefiltered || context->isfiltered || filtered) {
@@ -1244,8 +1257,8 @@ RideSummaryWindow::htmlSummary()
 
             summary += QString("<td align=\"center\">%1</td>").arg(m->name());
         }
-        for (j = 0; j< metricCols; ++j) {
-            QString symbol = metricColumn[j];
+        for (j = 0; j< rideCols; ++j) {
+            QString symbol = rideMetrics[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
             summary += QString("<td align=\"center\">%1</td>").arg(m->name());
@@ -1263,8 +1276,8 @@ RideSummaryWindow::htmlSummary()
             if (units == "seconds" || units == tr("seconds")) units = "";
             summary += QString("<td align=\"center\">%1</td>").arg(units);
         }
-        for (j = 0; j< metricCols; ++j) {
-            QString symbol = metricColumn[j];
+        for (j = 0; j< rideCols; ++j) {
+            QString symbol = rideMetrics[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
             QString units = m->units(useMetricUnits);
@@ -1305,8 +1318,8 @@ RideSummaryWindow::htmlSummary()
                 QString value = ride->getStringForSymbol(symbol,useMetricUnits);
                 summary += QString("<td align=\"center\">%1</td>").arg(value);
             }
-            for (j = 0; j< metricCols; ++j) {
-                QString symbol = metricColumn[j];
+            for (j = 0; j< rideCols; ++j) {
+                QString symbol = rideMetrics[j];
 
                 // get this value
                 QString value = ride->getStringForSymbol(symbol,useMetricUnits);
@@ -1344,8 +1357,8 @@ RideSummaryWindow::htmlSummary()
 
             summary += QString("<td align=\"center\">%1</td>").arg(m->name());
         }
-        for (j = 0; j< metricCols; ++j) {
-            QString symbol = metricColumn[j];
+        for (j = 0; j< runCols; ++j) {
+            QString symbol = runMetrics[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
             summary += QString("<td align=\"center\">%1</td>").arg(m->name());
@@ -1363,8 +1376,8 @@ RideSummaryWindow::htmlSummary()
             if (units == "seconds" || units == tr("seconds")) units = "";
             summary += QString("<td align=\"center\">%1</td>").arg(units);
         }
-        for (j = 0; j< metricCols; ++j) {
-            QString symbol = metricColumn[j];
+        for (j = 0; j< runCols; ++j) {
+            QString symbol = runMetrics[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
             QString units = m->units(useMetricUnits);
@@ -1404,8 +1417,8 @@ RideSummaryWindow::htmlSummary()
                 QString value = ride->getStringForSymbol(symbol,useMetricUnits);
                 summary += QString("<td align=\"center\">%1</td>").arg(value);
             }
-            for (j = 0; j< metricCols; ++j) {
-                QString symbol = metricColumn[j];
+            for (j = 0; j< runCols; ++j) {
+                QString symbol = runMetrics[j];
 
                 // get this value
                 QString value = ride->getStringForSymbol(symbol,useMetricUnits);
@@ -1443,8 +1456,8 @@ RideSummaryWindow::htmlSummary()
 
             summary += QString("<td align=\"center\">%1</td>").arg(m->name());
         }
-        for (j = 0; j< metricCols; ++j) {
-            QString symbol = metricColumn[j];
+        for (j = 0; j< swimCols; ++j) {
+            QString symbol = swimMetrics[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
             summary += QString("<td align=\"center\">%1</td>").arg(m->name());
@@ -1462,8 +1475,8 @@ RideSummaryWindow::htmlSummary()
             if (units == "seconds" || units == tr("seconds")) units = "";
             summary += QString("<td align=\"center\">%1</td>").arg(units);
         }
-        for (j = 0; j< metricCols; ++j) {
-            QString symbol = metricColumn[j];
+        for (j = 0; j< swimCols; ++j) {
+            QString symbol = swimMetrics[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
             QString units = m->units(useMetricUnits);
@@ -1503,8 +1516,8 @@ RideSummaryWindow::htmlSummary()
                 QString value = ride->getStringForSymbol(symbol,useMetricUnits);
                 summary += QString("<td align=\"center\">%1</td>").arg(value);
             }
-            for (j = 0; j< metricCols; ++j) {
-                QString symbol = metricColumn[j];
+            for (j = 0; j< swimCols; ++j) {
+                QString symbol = swimMetrics[j];
 
                 // get this value
                 QString value = ride->getStringForSymbol(symbol,useMetricUnits);
