@@ -110,6 +110,7 @@ struct FitFileReaderState
     QMap<int, int> record_extra_fields;
     QMap<QString, int> record_deve_fields; // Developer fields in DEVELOPER XDATA
     QMap<QString, int> record_deve_native_fields; // Developer fields with native values
+    QSet<int> record_native_fields;
     QSet<int> unknown_record_fields, unknown_global_msg_nums, unknown_base_type;
     int interval;
     int calibration;
@@ -979,13 +980,15 @@ struct FitFileReaderState
                 continue;
 
             int native_num = field.num;
+            if (!record_native_fields.contains(native_num))
+                record_native_fields.insert(native_num);
 
             if (field.deve_idx>-1) {
                 QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
-                qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
-                qDebug() << "name" << local_deve_fields[key].name.c_str() << "unit" << local_deve_fields[key].unit.c_str() << local_deve_fields[key].offset << "(" << _values.v << _values.f << ")";
+                //qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
+                //qDebug() << "name" << local_deve_fields[key].name.c_str() << "unit" << local_deve_fields[key].unit.c_str() << local_deve_fields[key].offset << "(" << _values.v << _values.f << ")";
 
-                if (record_deve_native_fields.contains(key))
+                if (record_deve_native_fields.contains(key) && !record_native_fields.contains(record_deve_native_fields[key]))
                     native_num = record_deve_native_fields[key];
                 else
                     native_num = -1;
