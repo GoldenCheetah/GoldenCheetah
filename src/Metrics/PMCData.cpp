@@ -142,10 +142,10 @@ void PMCData::refresh()
         last = context->athlete->rideCache->rides().last()->dateTime.date();
     }
 
-    // what is earliest date we got ?
+    // what is earliest date we got ? (substract 1 day to include first ride)
     start_ = QDate(9999,12,31);
     if (seed != QDate() && seed < start_) start_ = seed;
-    if (first != QDate() && first < start_) start_ = first;
+    if (first != QDate() && first < start_) start_ = first.addDays(-1);
 
     // whats the latest date we got ? (and add a year for decay)
     end_ = QDate();
