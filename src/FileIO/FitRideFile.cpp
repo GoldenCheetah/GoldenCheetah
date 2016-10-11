@@ -983,7 +983,7 @@ struct FitFileReaderState
             if (field.deve_idx>-1) {
                 QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
                 qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
-                qDebug() << "name" << local_deve_fields[key].name.c_str() << "unit" << local_deve_fields[key].unit.c_str() << _values.f;
+                qDebug() << "name" << local_deve_fields[key].name.c_str() << "unit" << local_deve_fields[key].unit.c_str() << local_deve_fields[key].offset << "(" << _values.v << _values.f << ")";
 
                 if (record_deve_native_fields.contains(key))
                     native_num = record_deve_native_fields[key];
