@@ -55,6 +55,7 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     name = new QLineEdit(this);
 
     dob = new QDateEdit(this);
+    dob->setCalendarPopup(true);
 
     sex = new QComboBox(this);
     sex->addItem(tr("Male"));

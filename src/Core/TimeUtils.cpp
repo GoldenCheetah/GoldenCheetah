@@ -181,6 +181,7 @@ DateSettingsEdit::DateSettingsEdit(QWidget *parent) : parent(parent), active(fal
     radioFrom->setFont(sameFont);
     startDateEdit = new QDateEdit(this);
     startDateEdit->setDate(QDate::currentDate().addMonths(-3));
+    startDateEdit ->setCalendarPopup(true);
     QHBoxLayout *from = new QHBoxLayout;
     from->addWidget(radioFrom);
     from->addWidget(startDateEdit);
@@ -192,7 +193,9 @@ DateSettingsEdit::DateSettingsEdit(QWidget *parent) : parent(parent), active(fal
     radioCustom->setFont(sameFont);
     radioCustom->setChecked(false);
     fromDateEdit = new QDateEdit(this);
+    fromDateEdit ->setCalendarPopup(true);
     toDateEdit = new QDateEdit(this);
+    toDateEdit ->setCalendarPopup(true);
     QHBoxLayout *custom = new QHBoxLayout;
     custom->addWidget(radioCustom);
     custom->addWidget(fromDateEdit);
