@@ -1147,6 +1147,7 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
 
     dob = new QDateEdit(this);
     dob->setDate(appsettings->cvalue(context->athlete->cyclist, GC_DOB).toDate());
+    dob->setCalendarPopup(true);
 
     sex = new QComboBox(this);
     sex->addItem(tr("Male"));
@@ -4137,6 +4138,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     QLabel *pmaxLabel = new QLabel(tr("Pmax"));
     dateEdit = new QDateEdit;
     dateEdit->setDate(QDate::currentDate());
+    dateEdit->setCalendarPopup(true);
 
      // Use CP for FTP
     useCPForFTPCombo = new QComboBox(this);
@@ -4977,6 +4979,7 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     QLabel *ltLabel = new QLabel(tr("Lactate Threshold"));
     dateEdit = new QDateEdit;
     dateEdit->setDate(QDate::currentDate());
+    dateEdit->setCalendarPopup(true);
 
     ltEdit = new QDoubleSpinBox;
     ltEdit->setMinimum(0);
@@ -5688,6 +5691,7 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     QLabel *cpLabel = new QLabel(tr("Critical Velocity"));
     dateEdit = new QDateEdit;
     dateEdit->setDate(QDate::currentDate());
+    dateEdit->setCalendarPopup(true);
 
     // CV default is 4min/km for Running a round number inline with
     // CP default and 1:36min/100 for swimming (4:1 relation)
