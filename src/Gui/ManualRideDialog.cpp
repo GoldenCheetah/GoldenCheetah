@@ -142,6 +142,7 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     QLabel *dateLabel = new QLabel(tr("Date:"), this);
     dateEdit = new QDateEdit(this);
     dateEdit->setDate(QDate::currentDate());
+    dateEdit->setCalendarPopup(true);
 
     QLabel *timeLabel = new QLabel(tr("Start time:"), this);
     timeEdit = new QTimeEdit(this);

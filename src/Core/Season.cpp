@@ -120,9 +120,11 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
 
     fromEdit = new QDateEdit(this);
     fromEdit->setDate(season->getStart());
+    fromEdit->setCalendarPopup(true);
 
     toEdit = new QDateEdit(this);
     toEdit->setDate(season->getEnd());
+    toEdit->setCalendarPopup(true);
 
     seedEdit = new QDoubleSpinBox(this);
     seedEdit->setDecimals(0);
@@ -207,6 +209,7 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
 
     dateEdit = new QDateEdit(this);
     dateEdit->setDate(event->date);
+    dateEdit->setCalendarPopup(true);
 
     grid->addWidget(name, 0,0);
     grid->addWidget(nameEdit, 0,1);
@@ -591,9 +594,11 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase) :
 
     fromEdit = new QDateEdit(this);
     fromEdit->setDate(phase->getStart());
+    fromEdit->setCalendarPopup(true);
 
     toEdit = new QDateEdit(this);
     toEdit->setDate(phase->getEnd());
+    toEdit->setCalendarPopup(true);
 
     seedEdit = new QDoubleSpinBox(this);
     seedEdit->setDecimals(0);
