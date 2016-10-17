@@ -56,6 +56,7 @@ class LTMPlot : public QwtPlot
         void setData(LTMSettings *);
         void setCompareData(LTMSettings *);
         void setAxisTitle(QwtAxisId axis, QString label);
+        static bool isMinutes(QString units);
 
     public slots:
         void pointHover(QwtPlotCurve*, int);
