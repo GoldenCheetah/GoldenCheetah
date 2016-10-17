@@ -111,7 +111,7 @@ class PaceSwim : public RideMetric {
     }
 
     QString toString(bool metric) const {
-        return time_to_string(value(metric)*60);
+        return time_to_string(value(metric)*60, true);
     }
 
     void initialize() {
@@ -179,7 +179,7 @@ class SwimPace : public RideMetric {
     }
 
     QString toString(bool metric) const {
-        return time_to_string(value(metric)*60);
+        return time_to_string(value(metric)*60, true);
     }
 
     void initialize() {
@@ -454,7 +454,7 @@ class SwimPaceStroke : public RideMetric {
     }
 
     QString toString(bool metric) const {
-        return time_to_string(value(metric)*60);
+        return time_to_string(value(metric)*60, true);
     }
 
     void initialize() {
