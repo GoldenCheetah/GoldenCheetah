@@ -1230,8 +1230,35 @@ void
 LTMSidebar::deleteRange()
 {
     if (dateRangeTree->selectedItems().count() != 1) return;
-    int index = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
 
+    // what is selected?
+    QTreeWidgetItem *selected = dateRangeTree->selectedItems().first();
+    int index = allDateRanges->indexOfChild(selected);
+
+    // its a phase, not a season
+    if (index == -1) {
+
+        // deleting a phase, selected item is not a child of root
+        // so lets get parent (we know .first() returns non-null).
+        index = allDateRanges->indexOfChild(selected->parent());
+        if (index >= 0) {
+
+            // delete the nth phase !
+            // XXX there is no method to do this, so FOR NOW we
+            // XXX will implement here, the season/phase code needs
+            // XXX to be cleaned up for general use in planning anyway
+            int phase = selected->parent()->indexOfChild(selected);
+
+            delete selected->parent()->takeChild(phase);
+            seasons->seasons[index].phases.removeAt(phase);
+
+            // save change
+            seasons->writeSeasons();
+        }
+        return;
+    }
+
+    // if we get here its a season
     if (seasons->seasons[index].getType() == Season::temporary) {
         QMessageBox::warning(this, tr("Delete Season"), tr("You can only delete user defined seasons. Please select a season you have created for deletion."));
         return; // must be a user season
