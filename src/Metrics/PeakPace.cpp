@@ -51,7 +51,7 @@ class PeakPace : public RideMetric {
         return RideMetric::value(metricRunPace);
     }
     QString toString(bool metric) const {
-        return time_to_string(value(metric)*60);
+        return time_to_string(value(metric)*60, true);
     }
     void setSecs(double secs) { this->secs=secs; }
 
@@ -364,7 +364,7 @@ class PeakPaceSwim : public RideMetric {
         return RideMetric::value(metricSwimPace);
     }
     QString toString(bool metric) const {
-        return time_to_string(value(metric)*60);
+        return time_to_string(value(metric)*60, true);
     }
     void setSecs(double secs) { this->secs=secs; }
 
@@ -666,7 +666,9 @@ class BestTime : public RideMetric {
     }
     // BestTime ordering is reversed
     bool isLowerBetter() const { return true; }
-    bool isTime() const { return true; }
+    QString toString(bool metric) const {
+        return time_to_string(value(metric)*60, true);
+    }
     void setMeters(double meters) { this->meters=meters; }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -683,7 +685,7 @@ class BestTime : public RideMetric {
         if (results.count() > 0) secs = results.first().stop - results.first().start;
         else secs = 0.0;
 
-        setValue(secs);
+        setValue(secs / 60.0);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("S"); }
     RideMetric *clone() const { return new BestTime(*this); }
@@ -700,8 +702,8 @@ class BestTime50m : public BestTime {
         }
         void initialize () {
             setName(tr("Best 50m"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime50m(*this); }
 };
@@ -717,8 +719,8 @@ class BestTime100m : public BestTime {
         }
         void initialize () {
             setName(tr("Best 100m"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime100m(*this); }
 };
@@ -734,8 +736,8 @@ class BestTime200m : public BestTime {
         }
         void initialize () {
             setName(tr("Best 200m"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime200m(*this); }
 };
@@ -751,8 +753,8 @@ class BestTime400m : public BestTime {
         }
         void initialize () {
             setName(tr("Best 400m"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime400m(*this); }
 };
@@ -768,8 +770,8 @@ class BestTime500m : public BestTime {
         }
         void initialize () {
             setName(tr("Best 500m"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime500m(*this); }
 };
@@ -785,8 +787,8 @@ class BestTime800m : public BestTime {
         }
         void initialize () {
             setName(tr("Best 800m"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime800m(*this); }
 };
@@ -802,8 +804,8 @@ class BestTime1000m : public BestTime {
         }
         void initialize () {
             setName(tr("Best 1000m"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime1000m(*this); }
 };
@@ -819,8 +821,8 @@ class BestTime1500m : public BestTime {
         }
         void initialize () {
             setName(tr("Best 1500m"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime1500m(*this); }
 };
@@ -836,8 +838,8 @@ class BestTime2000m : public BestTime {
         }
         void initialize () {
             setName(tr("Best 2000m"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime2000m(*this); }
 };
@@ -853,8 +855,8 @@ class BestTime3000m : public BestTime {
         }
         void initialize () {
             setName(tr("Best 3000m"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime3000m(*this); }
 };
@@ -870,8 +872,8 @@ class BestTime4000m : public BestTime {
         }
         void initialize () {
             setName(tr("Best 4000m"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime4000m(*this); }
 };
@@ -887,8 +889,8 @@ class BestTime5000m : public BestTime {
         }
         void initialize () {
             setName(tr("Best 5000m"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime5000m(*this); }
 };
@@ -904,8 +906,8 @@ class BestTime10km : public BestTime {
         }
         void initialize () {
             setName(tr("Best 10km"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime10km(*this); }
 };
@@ -921,8 +923,8 @@ class BestTime15km : public BestTime {
         }
         void initialize () {
             setName(tr("Best 15km"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime15km(*this); }
 };
@@ -938,8 +940,8 @@ class BestTime20km : public BestTime {
         }
         void initialize () {
             setName(tr("Best 20km"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime20km(*this); }
 };
@@ -955,8 +957,8 @@ class BestTimeHalfMarathon : public BestTime {
         }
         void initialize () {
             setName(tr("Best Half Marathon"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTimeHalfMarathon(*this); }
 };
@@ -972,8 +974,8 @@ class BestTime30km : public BestTime {
         }
         void initialize () {
             setName(tr("Best 30km"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime30km(*this); }
 };
@@ -989,8 +991,8 @@ class BestTime40km : public BestTime {
         }
         void initialize () {
             setName(tr("Best 40km"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTime40km(*this); }
 };
@@ -1006,8 +1008,8 @@ class BestTimeMarathon : public BestTime {
         }
         void initialize () {
             setName(tr("Best Marathon"));
-            setMetricUnits(tr("seconds"));
-            setImperialUnits(tr("seconds"));
+            setMetricUnits(tr("minutes"));
+            setImperialUnits(tr("minutes"));
         }
         RideMetric *clone() const { return new BestTimeMarathon(*this); }
 };
