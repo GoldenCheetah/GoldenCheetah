@@ -121,16 +121,7 @@ bool LibUsb::find()
     usb_find_busses();
     usb_find_devices();
 
-    switch (type) {
-
-    // Search USB busses for USB2 ANT+ stick host controllers
-    default:
-    case TYPE_ANT: return findAntStick();
-              break;
-
-    case TYPE_FORTIUS: return findFortius();
-              break;
-    }
+    return getDevice();
 }
 
 void LibUsb::close()
@@ -253,37 +244,39 @@ int LibUsb::write(char *buf, int bytes, int timeout)
     return rc;
 }
 
-bool LibUsb::findFortius()
+struct usb_device* LibUsb::getDevice()
 {
-#ifdef WIN32
-    if (libNotInstalled) return false;
-#endif
-    struct usb_bus* bus;
-    struct usb_device* dev;
+    for (struct usb_bus *bus = usb_get_busses(); bus; bus = bus->next)
+    {
+        for (struct usb_device *dev = bus->devices; dev; dev = dev->next)
+        {
+            switch (type)
+            {
+            case TYPE_ANT:
+                if (dev->descriptor.idVendor == GARMIN_USB2_VID &&
+                        (dev->descriptor.idProduct == GARMIN_USB2_PID ||
+                         dev->descriptor.idProduct == GARMIN_OEM_PID))
+                {
+                    return dev;
+                }
 
-    bool found = false;
+                break;
 
-    //
-    // Search for an UN-INITIALISED Fortius device
-    //
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+            case TYPE_FORTIUS:
+                if (dev->descriptor.idVendor == FORTIUS_VID &&
+                        (dev->descriptor.idProduct == FORTIUS_INIT_PID ||
+                         dev->descriptor.idProduct == FORTIUS_PID ||
+                         dev->descriptor.idProduct == FORTIUSVR_PID))
+                {
+                    return dev;
+                }
 
-
-        for (dev = bus->devices; dev; dev = dev->next) {
-
-
-            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_INIT_PID) {
-                found = true;
-            }
-            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_PID) {
-                found = true;
-            }
-            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUSVR_PID) {
-                found = true;
+                break;
             }
         }
     }
-    return found;
+
+    return NULL;
 }
 
 // Open connection to a Tacx Fortius
@@ -320,7 +313,7 @@ struct usb_dev_handle* LibUsb::OpenFortius()
 #ifdef WIN32
     if (libNotInstalled) return NULL;
 #endif
-    struct usb_bus* bus;
+
     struct usb_device* dev;
     struct usb_dev_handle* udev;
 
@@ -329,26 +322,17 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     //
     // Search for an UN-INITIALISED Fortius device
     //
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
-
-
-        for (dev = bus->devices; dev; dev = dev->next) {
-
-
-            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_INIT_PID) {
-
-                if ((udev = usb_open(dev))) {
-
-                    // LOAD THE FIRMWARE
-                    ezusb_load_ram (udev, appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0);
-                }
-
-                // Now close the connection, our work here is done
-                usb_close(udev);
-                programmed = true;
-
-            }
+    dev = getDevice();
+    if (dev && dev->descriptor.idProduct == FORTIUS_INIT_PID)
+    {
+        if ((udev = usb_open(dev))) {
+            // LOAD THE FIRMWARE
+            ezusb_load_ram (udev, appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0);
         }
+
+        // Now close the connection, our work here is done
+        usb_close(udev);
+        programmed = true;
     }
 
     // We need to rescan devices, since once the Fortius has
@@ -374,44 +358,16 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     //
     // Now search for an INITIALISED Fortius device
     //
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+    dev = getDevice();
+    if (dev && (dev->descriptor.idProduct == FORTIUS_PID || dev->descriptor.idProduct == FORTIUSVR_PID))
+    {
+        //Avoid noisy output
+        //qDebug() << "Found a Garmin USB2 ANT+ stick";
 
-        for (dev = bus->devices; dev; dev = dev->next) {
-
-            if (dev->descriptor.idVendor == FORTIUS_VID && 
-                (dev->descriptor.idProduct == FORTIUS_PID || dev->descriptor.idProduct == FORTIUSVR_PID)) {
-
-                //Avoid noisy output
-                //qDebug() << "Found a Garmin USB2 ANT+ stick";
-
-                return openUsb(dev, false);
-            }
-        }
+        return openUsb(dev, false);
     }
+
     return NULL;
-}
-
-bool LibUsb::findAntStick()
-{
-
-#ifdef WIN32
-    if (libNotInstalled) return false;
-#endif
-
-    struct usb_bus* bus;
-    struct usb_device* dev;
-    bool found = false;
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
-
-        for (dev = bus->devices; dev; dev = dev->next) {
-
-            if (dev->descriptor.idVendor == GARMIN_USB2_VID && 
-                (dev->descriptor.idProduct == GARMIN_USB2_PID || dev->descriptor.idProduct == GARMIN_OEM_PID)) {
-                found = true;
-            }
-        }
-    }
-    return found;
 }
 
 struct usb_dev_handle* LibUsb::OpenAntStick()
@@ -419,42 +375,32 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
 #ifdef WIN32
     if (libNotInstalled) return NULL;
 #endif
-    struct usb_bus* bus;
+
     struct usb_device* dev;
     struct usb_dev_handle* udev;
 
 // for Mac and Linux we do a bus reset on it first...
 #ifndef WIN32
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
-
-        for (dev = bus->devices; dev; dev = dev->next) {
-
-            if (dev->descriptor.idVendor == GARMIN_USB2_VID &&
-                (dev->descriptor.idProduct == GARMIN_USB2_PID || dev->descriptor.idProduct == GARMIN_OEM_PID)) {
-
-                if ((udev = usb_open(dev))) {
-                    usb_reset(udev);
-                    usb_close(udev);
-                }
-            }
+    dev = getDevice();
+    if (dev)
+    {
+        if ((udev = usb_open(dev)))
+        {
+            usb_reset(udev);
+            usb_close(udev);
         }
     }
 #endif
 
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+    dev = getDevice();
+    if (dev)
+    {
+        //Avoid noisy output
+        //qDebug() << "Found a Garmin USB2 ANT+ stick";
 
-        for (dev = bus->devices; dev; dev = dev->next) {
-
-            if (dev->descriptor.idVendor == GARMIN_USB2_VID && 
-                (dev->descriptor.idProduct == GARMIN_USB2_PID || dev->descriptor.idProduct == GARMIN_OEM_PID)) {
-
-                //Avoid noisy output
-                qDebug() << "Found a Garmin USB2 ANT+ stick:" << QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
-
-                return openUsb(dev, true);
-            }
-        }
+        return openUsb(dev, true);
     }
+
     return NULL;
 }
 
