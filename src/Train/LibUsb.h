@@ -28,14 +28,12 @@
 
 #include <usb.h> // for the constants etc
 
+#include "LibUsbLib.h"
+
 // EZ-USB firmware loader for Fortius
 extern "C" {
 #include "EzUsb.h"
 }
-
-#ifdef WIN32
-#include <QLibrary> // for dynamically loading libusb0.dll
-#endif
 
 #define GARMIN_USB2_VID   0x0fcf
 #define GARMIN_USB2_PID   0x1008
@@ -55,6 +53,7 @@ class LibUsb {
 
 public:
     LibUsb(int type);
+    ~LibUsb();
     int open();
     void close();
     int read(char *buf, int bytes);
@@ -81,6 +80,8 @@ private:
 
     int type;
 
+    LibUsbLib *usbLib;
+
 #ifdef WIN32
     bool libNotInstalled;
     typedef void (*PrototypeVoid)();
@@ -93,7 +94,6 @@ private:
     typedef usb_dev_handle* (*PrototypeHandle_Device) (struct usb_device *dev);
 
 
-    PrototypeVoid usb_init;
     PrototypeVoid_Int usb_set_debug;
     PrototypeVoid usb_find_busses;
     PrototypeVoid usb_find_devices;

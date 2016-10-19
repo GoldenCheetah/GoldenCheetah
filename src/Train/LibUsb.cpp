@@ -21,14 +21,19 @@
 #include <QString>
 #include <QDebug>
 
+#ifdef WIN32
+#include <QLibrary> // for dynamically loading libusb0.dll
+#endif
+
 #ifndef Q_CC_MSVC
 #include <unistd.h>
 #endif
+
 #include "LibUsb.h"
 #include "Settings.h"
 #include "Context.h"
 
-LibUsb::LibUsb(int type) : type(type)
+LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
 {
 
     intf = NULL;
@@ -47,7 +52,6 @@ LibUsb::LibUsb(int type) : type(type)
 
     // get the Functions for all used signatures
 
-    usb_init = PrototypeVoid(lib.resolve("usb_init"));
     usb_set_debug = PrototypeVoid_Int(lib.resolve("usb_set_debug"));
     usb_find_busses = PrototypeVoid(lib.resolve("usb_find_busses"));
     usb_find_devices = PrototypeVoid(lib.resolve("usb_find_devices"));
@@ -67,11 +71,12 @@ LibUsb::LibUsb(int type) : type(type)
 #endif
 
     // Initialize the library.
-    usb_init();
-    usb_set_debug(0);
-    usb_find_busses();
-    usb_find_devices();
+    usbLib->initialize(0);
+}
 
+LibUsb::~LibUsb()
+{
+    delete usbLib;
 }
 
 int LibUsb::open()
