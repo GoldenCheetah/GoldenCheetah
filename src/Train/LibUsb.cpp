@@ -384,40 +384,7 @@ struct usb_dev_handle* LibUsb::OpenFortius()
                 //Avoid noisy output
                 //qDebug() << "Found a Garmin USB2 ANT+ stick";
 
-                if ((udev = usb_open(dev))) {
-
-                    if (dev->descriptor.bNumConfigurations) {
-
-                        if ((intf = usb_find_interface(&dev->config[0])) != NULL) {
-
-                            int rc = usb_set_configuration(udev, 1);
-                            if (rc < 0) {
-                                qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
-
-                                if (OperatingSystem == LINUX) {
-                                    // looks like the udev rule has not been implemented
-                                    qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
-                                    qDebug()<<"did you remember to setup a udev rule for this device?";
-                                }
-                            } else {
-                                rc = usb_claim_interface(udev, interface);
-                                if (rc < 0) {
-                                    qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
-                                } else {
-                                    if (OperatingSystem != OSX) {
-                                        // fails on Mac OS X, we don't actually need it anyway
-                                        rc = usb_set_altinterface(udev, alternate);
-                                        if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
-                                    }
-
-                                    return udev;
-                                }
-                            }
-                        }
-                    }
-
-                    usb_close(udev);
-                }
+                return openUsb(dev, false);
             }
         }
     }
@@ -484,46 +451,52 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
                 //Avoid noisy output
                 qDebug() << "Found a Garmin USB2 ANT+ stick:" << QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
 
-                if ((udev = usb_open(dev))) {
-
-                    if (dev->descriptor.bNumConfigurations) {
-
-                        if ((intf = usb_find_interface(&dev->config[0])) != NULL) {
-
-#ifdef Q_OS_LINUX
-                            usb_detach_kernel_driver_np(udev, interface);
-#endif
-
-                            int rc = usb_set_configuration(udev, 1);
-                            if (rc < 0) {
-                                qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
-                                if (OperatingSystem == LINUX) {
-                                    // looks like the udev rule has not been implemented
-                                    qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
-                                    qDebug()<<"did you remember to setup a udev rule for this device?";
-                                }
-                            } else {
-                                rc = usb_claim_interface(udev, interface);
-                                if (rc < 0) {
-                                    qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
-                                } else {
-                                    if (OperatingSystem != OSX) {
-                                        // fails on Mac OS X, we don't actually need it anyway
-                                        rc = usb_set_altinterface(udev, alternate);
-                                        if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
-                                    }
-
-                                    return udev;
-                                }
-                            }
-                        }
-                    }
-
-                    usb_close(udev);
-                }
+                return openUsb(dev, true);
             }
         }
     }
+    return NULL;
+}
+
+struct usb_dev_handle *LibUsb::openUsb(struct usb_device *dev, bool detachKernelDriver)
+{
+    struct usb_dev_handle* udev;
+    if ((udev = usb_open(dev))) {
+
+        if (dev->descriptor.bNumConfigurations) {
+
+            if ((intf = usb_find_interface(&dev->config[0])) != NULL) {
+
+#ifdef Q_OS_LINUX
+                if (detachKernelDriver) usb_detach_kernel_driver_np(udev, interface);
+#endif
+
+                int rc = usb_set_configuration(udev, 1);
+                if (rc < 0) {
+                    qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
+                    if (OperatingSystem == LINUX) {
+                        // looks like the udev rule has not been implemented
+                        qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(dev->bus->dirname).arg(dev->filename);
+                        qDebug()<<"did you remember to setup a udev rule for this device?";
+                    }
+                }
+
+                rc = usb_claim_interface(udev, interface);
+                if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
+
+                if (OperatingSystem != OSX) {
+                    // fails on Mac OS X, we don't actually need it anyway
+                    rc = usb_set_altinterface(udev, alternate);
+                    if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+                }
+
+                return udev;
+            }
+        }
+
+        usb_close(udev);
+    }
+
     return NULL;
 }
 
