@@ -137,8 +137,8 @@ class RideEditor : public GcChartWindow
         void rideClean();
 
         // util
-        void getPaste(QVector<QVector<double> >&cells,
-                      QStringList &seps, QStringList &head, bool);
+        /*void getPaste(QVector<QVector<double> >&cells,
+                      QStringList &seps, QStringList &head, bool);*/
 
     protected:
         EditorData *data;
@@ -412,7 +412,11 @@ class XDataEditor : public QTableView
         void delCol();
         void insRow();
         void appRow();
+        void appRows(int count);
         void delRow();
+        void copy();
+        void cut();
+        void paste();
 
     protected:
         QString xdata;
@@ -423,6 +427,10 @@ class XDataEditor : public QTableView
         bool isColumnSelected();
 
         void setModelValue(int row, int column, double value);
+
+        // util
+        //void getPaste(QVector<QVector<double> >&cells,
+        //              QStringList &seps, QStringList &head, bool);
 };
 
 #endif // _GC_RideEditor_h
