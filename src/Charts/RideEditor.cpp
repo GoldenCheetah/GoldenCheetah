@@ -65,6 +65,54 @@ static void secsMsecs(double value, int &secs, int &msecs)
     msecs = round((value - secs) * 100) * 10;
 }
 
+// get clipboard into a 2-dim array of doubles
+void
+getPaste(QVector<QVector<double> >&cells, QStringList &seps, QStringList &head, bool hasHeader)
+{
+    QString text = QApplication::clipboard()->text();
+
+    int row = 0;
+    int col = 0;
+    bool first = true;
+
+    QString regexpStr;
+    regexpStr = "[";
+    foreach (QString sep, seps) regexpStr += sep;
+    regexpStr += "]";
+    QRegExp sep(regexpStr); // RegExp for separators
+
+    QRegExp ELine(("\n|\r|\r\n")); //RegExp for line endings
+
+    foreach(QString line, text.split(ELine)) {
+        if (line == "") continue;
+
+        if (hasHeader && first == true) {
+            foreach (QString token, line.split(sep)) {
+                head << token;
+            }
+        } else {
+            cells.resize(row+1);
+            foreach (QString token, line.split(sep)) {
+                cells[row].resize(col+1);
+
+                // use strtod to get better precision
+                char *p;
+                cells[row][col] = strtod(token.toLatin1(), &p);
+
+                col++;
+
+                // if there are more cols than in the
+                // heading row then set to unknown
+                while (hasHeader && (col+1) > head.count())
+                    head << "unknown";
+            }
+            row++;
+            col = 0;
+        }
+        first = false;
+    }
+}
+
 RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), ride(NULL), context(context), inLUW(false), colMapper(NULL)
 {
     setControls(NULL);
@@ -1029,54 +1077,6 @@ RideEditor::paste()
         }
     }
     ride->ride()->command->endLUW();
-}
-
-// get clipboard into a 2-dim array of doubles
-void
-RideEditor::getPaste(QVector<QVector<double> >&cells, QStringList &seps, QStringList &head, bool hasHeader)
-{
-    QString text = QApplication::clipboard()->text();
-
-    int row = 0;
-    int col = 0;
-    bool first = true;
-
-    QString regexpStr;
-    regexpStr = "[";
-    foreach (QString sep, seps) regexpStr += sep;
-    regexpStr += "]";
-    QRegExp sep(regexpStr); // RegExp for separators
-
-    QRegExp ELine(("\n|\r|\r\n")); //RegExp for line endings
-
-    foreach(QString line, text.split(ELine)) {
-        if (line == "") continue;
-
-        if (hasHeader && first == true) {
-            foreach (QString token, line.split(sep)) {
-                head << token;
-            }
-        } else {
-            cells.resize(row+1);
-            foreach (QString token, line.split(sep)) {
-                cells[row].resize(col+1);
-
-                // use strtod to get better precision
-                char *p;
-                cells[row][col] = strtod(token.toLatin1(), &p);
-
-                col++;
-
-                // if there are more cols than in the
-                // heading row then set to unknown
-                while (hasHeader && (col+1) > head.count())
-                    head << "unknown";
-            }
-            row++;
-            col = 0;
-        }
-        first = false;
-    }
 }
 
 void
@@ -2552,7 +2552,7 @@ PasteSpecialDialog::PasteSpecialDialog(RideEditor *rideEditor, QWidget *parent) 
 
     // what we got?
     seps << "\t";
-    rideEditor->getPaste(cells, seps, sourceHeadings, false);
+    getPaste(cells, seps, sourceHeadings, false);
 
     resultsTable = new QTableView(this);
     resultsTable->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -2911,7 +2911,7 @@ PasteSpecialDialog::sepsChanged()
     if (space->isChecked()) seps << " ";
     if (other->isChecked()) seps << otherText->text();
 
-    rideEditor->getPaste(cells, seps, sourceHeadings, hasHeader->isChecked());
+    getPaste(cells, seps, sourceHeadings, hasHeader->isChecked());
     setResultsTable();
 }
 
@@ -3119,7 +3119,7 @@ XDataEditor::eventFilter(QObject *object, QEvent *e)
             return true;
             break;
 
-#if 0
+
         case QEvent::KeyPress:
         {
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
@@ -3138,7 +3138,7 @@ XDataEditor::eventFilter(QObject *object, QEvent *e)
                         cut();
                         return true;
 
-                    case Qt::Key_Y: // emerging standard for redo
+                    /*case Qt::Key_Y: // emerging standard for redo
                          redo();
                          return true;
 
@@ -3148,7 +3148,7 @@ XDataEditor::eventFilter(QObject *object, QEvent *e)
 
                     case Qt::Key_0:
                         clear();
-                        return true;
+                        return true;*/
 
                     default:
                         return false;
@@ -3156,7 +3156,6 @@ XDataEditor::eventFilter(QObject *object, QEvent *e)
             }
             break;
         }
-#endif
 
         default:
             break;
@@ -3190,6 +3189,30 @@ XDataEditor::borderMenu(const QPoint &pos)
     if (pos.y() < horizontalHeader()->height()) row = -1;
 
     QMenu menu(this);
+
+    QIcon cutIcon(":images/toolbar/cut.png");
+    QIcon pasteIcon(":images/toolbar/paste.png");
+    QIcon copyIcon(":images/toolbar/copy.png");
+
+    bool pastable = QApplication::clipboard()->text() == "" ? false : true;
+
+    QAction *cutAct = new QAction(cutIcon, tr("Cut"), this);
+    cutAct->setShortcut(QKeySequence("Ctrl+X"));
+    cutAct->setEnabled(isRowSelected() || isColumnSelected());
+    menu.addAction(cutAct);
+    connect(cutAct, SIGNAL(triggered()), this, SLOT(cut()));
+
+    QAction *copyAct = new QAction(copyIcon, tr("Copy"), this);
+    copyAct->setShortcut(QKeySequence("Ctrl+C"));
+    copyAct->setEnabled(true);
+    menu.addAction(copyAct);
+    connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
+
+    QAction *pasteAct = new QAction(pasteIcon, tr("Paste"), this);
+    pasteAct->setShortcut(QKeySequence("Ctrl+V"));
+    pasteAct->setEnabled(pastable);
+    menu.addAction(pasteAct);
+    connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
 
     menu.addSeparator();
 
@@ -3298,6 +3321,14 @@ XDataEditor::appRow()
 {
     QVector<XDataPoint*> rows;
     rows << new XDataPoint;
+    _model->appendRows(rows);  
+}
+void
+XDataEditor::appRows(int count)
+{
+    QVector<XDataPoint*> rows;
+    for (int i=0;i<count;i++)
+    rows << new XDataPoint;
     _model->appendRows(rows);
 }
 void
@@ -3309,10 +3340,120 @@ XDataEditor::delRow()
     if (selection.count() > 0) {
 
         // delete from table - we do in one hit since row-by-row is VERY slow
-        _model->ride->command->startLUW("Delete Rows");
+        _model->ride->command->startLUW("Delete XData Rows");
         _model->removeRows(selection[0].row(),
                           selection[selection.count()-1].row() - selection[0].row() + 1, QModelIndex());
         _model->ride->command->endLUW();
 
     }
 }
+
+void
+XDataEditor::copy()
+{
+    QList<QModelIndex> selection = selectionModel()->selection().indexes();
+
+    if (selection.count() > 0) {
+        QString text;
+        for (int row = selection[0].row(); row <= selection[selection.count()-1].row(); row++) {
+
+            for (int column = selection[0].column();  column <= selection[selection.count()-1].column(); column++) {
+                if (column == selection[selection.count()-1].column())
+                    text += QString("%1").arg(_model->getValue(row,column-2), 0, 'g', 11);
+                else
+                    text += QString("%1\t").arg(_model->getValue(row,column-2), 0, 'g', 11);
+            }
+            text += "\n";
+        }
+        QApplication::clipboard()->setText(text);
+    }
+}
+
+void
+XDataEditor::cut()
+{
+    copy();
+    if (isRowSelected()) delRow();
+    else if (isColumnSelected()) delCol();
+}
+
+void
+XDataEditor::paste()
+{
+    QVector<QVector<double> > cells;
+    QStringList seps, head;
+    seps << "\t";
+
+    getPaste(cells, seps, head, false);
+
+    // empty paste buffer
+    if (cells.count() == 0 || cells[0].count() == 0) return;
+
+    // if selected range is not the same
+    // size as the copy buffer then barf
+    // unless just a single cell selected
+    QList<QModelIndex> selection = selectionModel()->selection().indexes();
+
+    // is anything selected?
+    if (selection.count() == 0) {
+        // wrong size
+        QMessageBox oops(QMessageBox::Critical, tr("Paste error"),
+                         tr("Please select target cell or cells to paste values into."));
+        oops.exec();
+        return;
+    }
+
+    int selectedrow = selection[0].row();
+    int selectedcol = selection[0].column();
+    int selectedrows = selection[selection.count()-1].row() - selectedrow + 1;
+    int selectedcols = selection[selection.count()-1].column() - selectedcol + 1;
+
+    if (selection.count() > 1 &&
+        (selectedrows != cells.count() || selectedcols != cells[0].count())) {
+
+        // wrong size
+        QMessageBox oops(QMessageBox::Critical, tr("Paste error"),
+                         tr("Copy buffer and selected area are diffferent sizes."));
+        oops.exec();
+        return;
+    }
+
+    // overrun cols?
+    if (selection.count() == 1 &&
+        (selectedcol + cells[0].count()) > _model->columnCount(QModelIndex())) {
+        QMessageBox oops(QMessageBox::Critical, tr("Paste error"),
+                         tr("Copy buffer has more columns than available."));
+        oops.exec();
+        return;
+    }
+
+    // overrun rows?
+    if (selection.count() == 1 &&
+        (selectedrow + cells.count()) > _model->rowCount(QModelIndex()) ) {
+        QMessageBox oops(QMessageBox::Critical, tr("Paste error"),
+                         tr("Copy buffer has more rows than available."));
+        oops.exec();
+        return;
+    }
+
+    // go paste!
+    _model->ride->command->startLUW("Paste XData Cells");
+
+    for (int i=0; i<cells.count(); i++) {
+
+        // just in case check boundary (i.e. truncate)
+        if (selectedrow+i > _model->rowCount() ) break;
+        for(int j=0; j<cells[i].count(); j++) {
+
+            // just in case check boundary (i.e. truncate)
+            if ((selectedcol+j > _model->columnCount()-1)) break;
+
+            // set table
+            setModelValue(selectedrow+i, selectedcol+j, cells[i][j]);
+        }
+    }
+    _model->ride->command->endLUW();
+}
+
+
+
