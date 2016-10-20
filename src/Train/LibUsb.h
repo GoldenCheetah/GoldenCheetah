@@ -30,11 +30,6 @@
 
 #include "LibUsbLib.h"
 
-// EZ-USB firmware loader for Fortius
-extern "C" {
-#include "EzUsb.h"
-}
-
 #define GARMIN_USB2_VID   0x0fcf
 #define GARMIN_USB2_PID   0x1008
 #define GARMIN_OEM_PID    0x1009

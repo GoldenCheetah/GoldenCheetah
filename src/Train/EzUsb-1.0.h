@@ -38,6 +38,8 @@
 #endif
 #endif
 
+#include <libusb-1.0/libusb.h>
+
 #define FX_TYPE_UNDEFINED  -1
 #define FX_TYPE_AN21       0	/* Original AnchorChips parts */
 #define FX_TYPE_FX1        1	/* Updated Cypress versions */

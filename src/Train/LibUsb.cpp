@@ -29,6 +29,11 @@
 #include <unistd.h>
 #endif
 
+// EZ-USB firmware loader for Fortius
+extern "C" {
+#include "EzUsb.h"
+}
+
 #include "LibUsb.h"
 #include "Settings.h"
 #include "Context.h"

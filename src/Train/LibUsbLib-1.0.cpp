@@ -19,6 +19,9 @@
 #include <QDebug>
 #include <libusb-1.0/libusb.h>
 
+// EZ-USB firmware loader for Fortius
+#include "EzUsb-1.0.h"
+
 #include "LibUsbLib.h"
 
 class LibUsbLibUtils

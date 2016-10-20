@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <libusb-1.0/libusb.h>
 
 #include "EzUsb-1.0.h"
 

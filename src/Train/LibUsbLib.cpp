@@ -19,6 +19,11 @@
 #include <QLibrary>
 #include <usb.h>
 
+// EZ-USB firmware loader for Fortius
+extern "C" {
+#include "EzUsb.h"
+}
+
 #include "LibUsbLib.h"
 
 //-----------------------------------------------------------------------------
