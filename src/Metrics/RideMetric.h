@@ -164,6 +164,9 @@ public:
         case Peak:
             setValue(value(true) > other.value(true) ? value(true) : other.value(true));
             break;
+        case Low:
+            setValue((value(true) > 0.0 && value(true) < other.value(true)) ? value(true) : other.value(true));
+            break;
         case Average:
             setValue(((value(true) * count()) + (other.value(true) * other.count()))
                                 / (count()+other.count()));

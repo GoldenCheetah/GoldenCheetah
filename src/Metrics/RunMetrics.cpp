@@ -276,7 +276,7 @@ class Pace : public RideMetric {
     }
 
     QString toString(bool metric) const {
-        return time_to_string(value(metric)*60);
+        return time_to_string(value(metric)*60, true);
     }
 
     void initialize() {

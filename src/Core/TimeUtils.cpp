@@ -23,13 +23,13 @@
 #include <QFormLayout>
 #include <QLabel>
 
-QString time_to_string(double secs)
+QString time_to_string(double secs, bool forceMinutes)
 {
     // negs are bad
     if (secs<0) secs=0;
 
     QString result;
-    if (secs < 60) result = QString("%1").arg(secs); // special case for < 60s
+    if (!forceMinutes && secs < 60) result = QString("%1").arg(secs); // special case for < 60s
     else{
         unsigned rounded = static_cast<unsigned>(round(secs));
         bool needs_colon = false;
