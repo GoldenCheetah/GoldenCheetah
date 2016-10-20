@@ -57,7 +57,6 @@ LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
 
     // get the Functions for all used signatures
 
-    usb_set_debug = PrototypeVoid_Int(lib.resolve("usb_set_debug"));
     usb_clear_halt = PrototypeInt_Handle_Int(lib.resolve("usb_clear_halt"));
     usb_close = PrototypeInt_Handle(lib.resolve("usb_close"));
     usb_bulk_read = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_read"));
@@ -122,7 +121,6 @@ bool LibUsb::find()
     if (libNotInstalled) return false;
 #endif
 
-    usb_set_debug(0);
     usbLib->findDevices();
 
     return getDevice();

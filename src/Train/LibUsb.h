@@ -80,7 +80,6 @@ private:
 #ifdef WIN32
     bool libNotInstalled;
     typedef char* (*PrototypeChar_Void)();
-    typedef void (*PrototypeVoid_Int)(int);
     typedef int (*PrototypeInt_Handle)(usb_dev_handle*);
     typedef int (*PrototypeInt_Handle_Int)(usb_dev_handle*, unsigned int);
     typedef int (*PrototypeInt_Handle_Int_Char_Int_Int)(usb_dev_handle*, int, char*, int, int);
@@ -88,7 +87,6 @@ private:
     typedef usb_dev_handle* (*PrototypeHandle_Device) (struct usb_device *dev);
 
 
-    PrototypeVoid_Int usb_set_debug;
     PrototypeInt_Handle_Int usb_clear_halt;
     PrototypeInt_Handle_Int usb_release_interface;
     PrototypeInt_Handle usb_close;
