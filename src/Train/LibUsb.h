@@ -74,8 +74,6 @@ private:
     struct usb_interface_descriptor* intf;
 
     int readEndpoint, writeEndpoint;
-    int interface;
-    int alternate;
 
     char readBuf[64];
     int readBufIndex;
