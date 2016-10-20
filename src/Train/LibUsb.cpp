@@ -317,8 +317,6 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     struct usb_device* dev;
     struct usb_dev_handle* udev;
 
-    bool programmed = false;
-
     //
     // Search for an UN-INITIALISED Fortius device
     //
@@ -332,20 +330,18 @@ struct usb_dev_handle* LibUsb::OpenFortius()
 
         // Now close the connection, our work here is done
         usb_close(udev);
-        programmed = true;
-    }
 
-    // We need to rescan devices, since once the Fortius has
-    // been programmed it will present itself again with a
-    // different PID. But it takes its time, so we sleep for
-    // 3 seconds. This may be too short on some operating
-    // systems. We can fix if issues are reported.  On my Linux
-    // host running a v3 kernel on an AthlonXP 2 seconds is not
-    // long enough.
-    // 
-    // Given this is only required /the first time/ the Fortius
-    // is connected, it can't be that bad?
-    if (programmed == true) {
+        // We need to rescan devices, since once the Fortius has
+        // been programmed it will present itself again with a
+        // different PID. But it takes its time, so we sleep for
+        // 3 seconds. This may be too short on some operating
+        // systems. We can fix if issues are reported.  On my Linux
+        // host running a v3 kernel on an AthlonXP 2 seconds is not
+        // long enough.
+        //
+        // Given this is only required /the first time/ the Fortius
+        // is connected, it can't be that bad?
+
 #ifdef WIN32
         Sleep(3000); // windows sleep is in milliseconds
 #else
@@ -382,13 +378,10 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
 // for Mac and Linux we do a bus reset on it first...
 #ifndef WIN32
     dev = getDevice();
-    if (dev)
+    if (dev && (udev = usb_open(dev)))
     {
-        if ((udev = usb_open(dev)))
-        {
-            usb_reset(udev);
-            usb_close(udev);
-        }
+        usb_reset(udev);
+        usb_close(udev);
     }
 #endif
 
