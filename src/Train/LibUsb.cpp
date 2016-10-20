@@ -129,15 +129,15 @@ void LibUsb::close()
 #ifdef WIN32
     if (libNotInstalled) return;
 #endif
-    if (device) {
-        // stop any further write attempts whilst we close down
-        usb_dev_handle *p = device;
-        device = NULL;
-
-        usb_release_interface(p, intf->bInterfaceNumber);
-        //usb_reset(p);
-        usb_close(p);
+    if (!device)
+    {
+        return;
     }
+
+    usb_release_interface(device, intf->bInterfaceNumber);
+    //usb_reset(device);
+    usb_close(device);
+    device = NULL;
 }
 
 int LibUsb::read(char *buf, int bytes)
