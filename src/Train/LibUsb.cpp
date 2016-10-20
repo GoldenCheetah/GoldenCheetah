@@ -134,7 +134,7 @@ void LibUsb::close()
         usb_dev_handle *p = device;
         device = NULL;
 
-        usb_release_interface(p, interface);
+        usb_release_interface(p, intf->bInterfaceNumber);
         //usb_reset(p);
         usb_close(p);
     }
@@ -407,7 +407,7 @@ struct usb_dev_handle *LibUsb::openUsb(struct usb_device *dev, bool detachKernel
             if ((intf = usb_find_interface(&dev->config[0])) != NULL) {
 
 #ifdef Q_OS_LINUX
-                if (detachKernelDriver) usb_detach_kernel_driver_np(udev, interface);
+                if (detachKernelDriver) usb_detach_kernel_driver_np(udev, intf->bInterfaceNumber);
 #endif
 
                 int rc = usb_set_configuration(udev, 1);
@@ -420,12 +420,12 @@ struct usb_dev_handle *LibUsb::openUsb(struct usb_device *dev, bool detachKernel
                     }
                 }
 
-                rc = usb_claim_interface(udev, interface);
+                rc = usb_claim_interface(udev, intf->bInterfaceNumber);
                 if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
 
                 if (OperatingSystem != OSX) {
                     // fails on Mac OS X, we don't actually need it anyway
-                    rc = usb_set_altinterface(udev, alternate);
+                    rc = usb_set_altinterface(udev, intf->bAlternateSetting);
                     if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
                 }
 
@@ -449,8 +449,6 @@ struct usb_interface_descriptor* LibUsb::usb_find_interface(struct usb_config_de
 
     readEndpoint = -1;
     writeEndpoint = -1;
-    interface = -1;
-    alternate = -1;
 
     if (!config_descriptor) return NULL;
 
@@ -461,9 +459,6 @@ struct usb_interface_descriptor* LibUsb::usb_find_interface(struct usb_config_de
     intf = &config_descriptor->interface[0].altsetting[0];
 
     if (intf->bNumEndpoints != 2) return NULL;
-
-    interface = intf->bInterfaceNumber;
-    alternate = intf->bAlternateSetting;
 
     for (int i = 0 ; i < 2; i++)
     {
