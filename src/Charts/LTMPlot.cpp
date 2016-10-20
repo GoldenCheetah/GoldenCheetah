@@ -981,9 +981,9 @@ LTMPlot::setData(LTMSettings *set)
                             labelString = (QString("%1").arg(value, 0, 'f', 1));
                         }
 
-                        // Pace units use mm:ss format for the label
-                        if (PaceZones::isPaceUnit(metricDetail.uunits))
-                            labelString = time_to_string(value*60);
+                        // Format minutes in sexagesimal format
+                        if (isMinutes(metricDetail.uunits))
+                            labelString = time_to_string(value*60, true);
 
                         // Qwt uses its own text objects
                         QwtText text(labelString);
@@ -1148,9 +1148,9 @@ LTMPlot::setData(LTMSettings *set)
                         labelString = (QString("%1").arg(value, 0, 'f', 1));
                     }
 
-                    // Pace units use mm:ss format for the label
-                    if (PaceZones::isPaceUnit(metricDetail.uunits))
-                        labelString = time_to_string(value*60);
+                    // Format minutes in sexagesimal format
+                    if (isMinutes(metricDetail.uunits))
+                        labelString = time_to_string(value*60, true);
 
 
                     // Qwt uses its own text objects
@@ -2093,9 +2093,9 @@ LTMPlot::setCompareData(LTMSettings *set)
                                 labelString = (QString("%1").arg(value, 0, 'f', 1));
                             }
 
-                            // Pace units use mm:ss format for the label
-                            if (PaceZones::isPaceUnit(metricDetail.uunits))
-                                labelString = time_to_string(value*60);
+                            // Format minutes in sexagesimal format
+                            if (isMinutes(metricDetail.uunits))
+                                labelString = time_to_string(value*60, true);
 
 
                             // Qwt uses its own text objects
@@ -2260,9 +2260,9 @@ LTMPlot::setCompareData(LTMSettings *set)
                             labelString = (QString("%1").arg(value, 0, 'f', 1));
                         }
 
-                        // Pace units use mm:ss format for the label
-                        if (PaceZones::isPaceUnit(metricDetail.uunits))
-                            labelString = time_to_string(value*60);
+                        // Format minutes in sexagesimal format
+                        if (isMinutes(metricDetail.uunits))
+                            labelString = time_to_string(value*60, true);
 
 
                         // Qwt uses its own text objects
@@ -3572,8 +3572,8 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
 
         // convert minutes to time string for pace, otherwise use precision
         QString txtValue;
-        if (PaceZones::isPaceUnit(units) || PaceZones::isPaceUnit(this->axisTitle(curve->yAxis()).text())) {
-            txtValue = QString("%1").arg(time_to_string(value*60.0));
+        if (isMinutes(units) || isMinutes(this->axisTitle(curve->yAxis()).text())) {
+            txtValue = QString("%1").arg(time_to_string(value*60.0, true));
         } else {
             txtValue = QString("%1").arg(value, 0, 'f', precision);
         }
@@ -3876,4 +3876,9 @@ void LTMPlot::refreshZoneLabels(QwtAxisId axisid)
     }
     bg = new LTMPlotBackground(this, axisid);
     bg->attach(this);
+}
+
+bool LTMPlot::isMinutes(QString units)
+{
+    return units == "minutes" || units == tr("minutes") || PaceZones::isPaceUnit(units);
 }
