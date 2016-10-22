@@ -79,7 +79,6 @@ private:
 
 #ifdef WIN32
     bool libNotInstalled;
-    typedef void (*PrototypeVoid)();
     typedef char* (*PrototypeChar_Void)();
     typedef void (*PrototypeVoid_Int)(int);
     typedef int (*PrototypeInt_Handle)(usb_dev_handle*);
@@ -90,8 +89,6 @@ private:
 
 
     PrototypeVoid_Int usb_set_debug;
-    PrototypeVoid usb_find_busses;
-    PrototypeVoid usb_find_devices;
     PrototypeInt_Handle_Int usb_clear_halt;
     PrototypeInt_Handle_Int usb_release_interface;
     PrototypeInt_Handle usb_close;

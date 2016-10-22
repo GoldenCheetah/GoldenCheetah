@@ -88,4 +88,8 @@ void LibUsbLib::initialize(int logLevel)
 
     libusb_set_debug(impl->ctx, logLevel);
 }
+
+void LibUsbLib::findDevices()
+{
+}
 //-----------------------------------------------------------------------------

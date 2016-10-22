@@ -35,6 +35,7 @@ public:
     Impl();
 
     void initialize(int logLevel);
+    void findDevices();
 
 #ifdef WIN32
     bool isLibUsbInstalled() const;
@@ -82,6 +83,18 @@ void LibUsbLib::Impl::initialize(int logLevel)
 
     usb_init();
     usb_set_debug(logLevel);
+    findDevices();
+}
+
+void LibUsbLib::Impl::findDevices()
+{
+#ifdef WIN32
+    if (!isLibUsbInstalled())
+    {
+        return;
+    }
+#endif
+
     usb_find_busses();
     usb_find_devices();
 }
@@ -110,5 +123,10 @@ LibUsbLib::~LibUsbLib()
 void LibUsbLib::initialize(int logLevel)
 {
     impl->initialize(logLevel);
+}
+
+void LibUsbLib::findDevices()
+{
+    impl->findDevices();
 }
 //-----------------------------------------------------------------------------

@@ -29,6 +29,7 @@ public:
     ~LibUsbLib();
 
     void initialize(int logLevel);
+    void findDevices();
 
 private:
     LibUsbLib(const LibUsbLib&);

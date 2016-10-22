@@ -58,8 +58,6 @@ LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
     // get the Functions for all used signatures
 
     usb_set_debug = PrototypeVoid_Int(lib.resolve("usb_set_debug"));
-    usb_find_busses = PrototypeVoid(lib.resolve("usb_find_busses"));
-    usb_find_devices = PrototypeVoid(lib.resolve("usb_find_devices"));
     usb_clear_halt = PrototypeInt_Handle_Int(lib.resolve("usb_clear_halt"));
     usb_close = PrototypeInt_Handle(lib.resolve("usb_close"));
     usb_bulk_read = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_read"));
@@ -95,11 +93,8 @@ int LibUsb::open()
     readBufIndex = 0;
     readBufSize = 0;
 
-    // Find all busses.
-    usb_find_busses();
-
-    // Find all connected devices.
-    usb_find_devices();
+    // Find all busses and connected devices.
+    usbLib->findDevices();
 
     switch (type) {
 
@@ -128,8 +123,7 @@ bool LibUsb::find()
 #endif
 
     usb_set_debug(0);
-    usb_find_busses();
-    usb_find_devices();
+    usbLib->findDevices();
 
     return getDevice();
 }
@@ -357,8 +351,7 @@ struct usb_dev_handle* LibUsb::OpenFortius()
 #else
         sleep(3);  // do not be tempted to reduce this, it really does take that long!
 #endif
-        usb_find_busses();
-        usb_find_devices();
+        usbLib->findDevices();
     }
 
     //
