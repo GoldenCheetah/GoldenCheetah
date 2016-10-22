@@ -61,7 +61,6 @@ LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
     usb_close = PrototypeInt_Handle(lib.resolve("usb_close"));
     usb_bulk_read = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_read"));
     usb_bulk_write = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_write"));
-    usb_get_busses = PrototypeBus(lib.resolve("usb_get_busses"));
     usb_open = PrototypeHandle_Device(lib.resolve("usb_open"));
     usb_set_configuration = PrototypeInt_Handle_Int(lib.resolve("usb_set_configuration"));
     usb_claim_interface = PrototypeInt_Handle_Int(lib.resolve("usb_claim_interface"));
@@ -123,7 +122,10 @@ bool LibUsb::find()
 
     usbLib->findDevices();
 
-    return getDevice();
+    UsbDevice *device = getDevice();
+    bool result = device;
+    delete device;
+    return result;
 }
 
 void LibUsb::close()
@@ -246,39 +248,57 @@ int LibUsb::write(char *buf, int bytes, int timeout)
     return rc;
 }
 
-struct usb_device* LibUsb::getDevice()
+UsbDevice* LibUsb::getDevice() const
 {
-    for (struct usb_bus *bus = usb_get_busses(); bus; bus = bus->next)
+    QVector<UsbDevice *> deviceList;
+    if (!usbLib->getDevices(deviceList))
     {
-        for (struct usb_device *dev = bus->devices; dev; dev = dev->next)
-        {
-            switch (type)
-            {
-            case TYPE_ANT:
-                if (dev->descriptor.idVendor == GARMIN_USB2_VID &&
-                        (dev->descriptor.idProduct == GARMIN_USB2_PID ||
-                         dev->descriptor.idProduct == GARMIN_OEM_PID))
-                {
-                    return dev;
-                }
-
-                break;
-
-            case TYPE_FORTIUS:
-                if (dev->descriptor.idVendor == FORTIUS_VID &&
-                        (dev->descriptor.idProduct == FORTIUS_INIT_PID ||
-                         dev->descriptor.idProduct == FORTIUS_PID ||
-                         dev->descriptor.idProduct == FORTIUSVR_PID))
-                {
-                    return dev;
-                }
-
-                break;
-            }
-        }
+        return NULL;
     }
 
-    return NULL;
+    // Look for matching device. Delete all unused devices.
+    // Never leave any items in the list unprocessed, else we have leaks.
+    UsbDevice *matchingDev = NULL;
+    foreach (UsbDevice *dev, deviceList)
+    {
+        // We've already found a matching dev -> dispose and continue
+        if (matchingDev)
+        {
+            delete dev;
+            continue;
+        }
+
+        switch (type)
+        {
+        case TYPE_ANT:
+            if (dev->vendorId() == GARMIN_USB2_VID &&
+                    (dev->productId() == GARMIN_USB2_PID ||
+                     dev->productId() == GARMIN_OEM_PID))
+            {
+                matchingDev = dev;
+                continue;
+            }
+
+            break;
+
+        case TYPE_FORTIUS:
+            if (dev->vendorId() == FORTIUS_VID &&
+                    (dev->productId() == FORTIUS_INIT_PID ||
+                     dev->productId() == FORTIUS_PID ||
+                     dev->productId() == FORTIUSVR_PID))
+            {
+                matchingDev = dev;
+                continue;
+            }
+
+            break;
+        }
+
+        // Not a match -> dispose
+        delete dev;
+    }
+
+    return matchingDev;
 }
 
 // Open connection to a Tacx Fortius
@@ -316,55 +336,66 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     if (libNotInstalled) return NULL;
 #endif
 
-    struct usb_device* dev;
-    struct usb_dev_handle* udev;
+    UsbDevice *dev;
+    struct usb_dev_handle* udev = NULL;
 
     //
     // Search for an UN-INITIALISED Fortius device
     //
     dev = getDevice();
-    if (dev && dev->descriptor.idProduct == FORTIUS_INIT_PID)
+    if (dev)
     {
-        if ((udev = usb_open(dev))) {
-            // LOAD THE FIRMWARE
-            ezusb_load_ram (udev, appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0);
-        }
+        if (dev->productId() == FORTIUS_INIT_PID)
+        {
+            if ((udev = usb_open(dev->rawDev()))) {
+                // LOAD THE FIRMWARE
+                ezusb_load_ram (udev, appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0);
+            }
 
-        // Now close the connection, our work here is done
-        usb_close(udev);
+            // Now close the connection, our work here is done
+            usb_close(udev);
+            udev = NULL;
 
-        // We need to rescan devices, since once the Fortius has
-        // been programmed it will present itself again with a
-        // different PID. But it takes its time, so we sleep for
-        // 3 seconds. This may be too short on some operating
-        // systems. We can fix if issues are reported.  On my Linux
-        // host running a v3 kernel on an AthlonXP 2 seconds is not
-        // long enough.
-        //
-        // Given this is only required /the first time/ the Fortius
-        // is connected, it can't be that bad?
+            // We need to rescan devices, since once the Fortius has
+            // been programmed it will present itself again with a
+            // different PID. But it takes its time, so we sleep for
+            // 3 seconds. This may be too short on some operating
+            // systems. We can fix if issues are reported.  On my Linux
+            // host running a v3 kernel on an AthlonXP 2 seconds is not
+            // long enough.
+            //
+            // Given this is only required /the first time/ the Fortius
+            // is connected, it can't be that bad?
 
 #ifdef WIN32
-        Sleep(3000); // windows sleep is in milliseconds
+            Sleep(3000); // windows sleep is in milliseconds
 #else
-        sleep(3);  // do not be tempted to reduce this, it really does take that long!
+            sleep(3);  // do not be tempted to reduce this, it really does take that long!
 #endif
-        usbLib->findDevices();
+            usbLib->findDevices();
+        }
+
+        delete dev;
     }
 
     //
     // Now search for an INITIALISED Fortius device
     //
     dev = getDevice();
-    if (dev && (dev->descriptor.idProduct == FORTIUS_PID || dev->descriptor.idProduct == FORTIUSVR_PID))
+    if (dev)
     {
-        //Avoid noisy output
-        //qDebug() << "Found a Garmin USB2 ANT+ stick";
+        if (dev->productId() == FORTIUS_PID || dev->productId() == FORTIUSVR_PID)
+        {
+            //Avoid noisy output
+            //qDebug() << "Found a Garmin USB2 ANT+ stick";
 
-        return openUsb(dev, false);
+            udev = openUsb(dev, false);
+        }
+
+        delete dev;
     }
 
-    return NULL;
+    return udev;
 }
 
 struct usb_dev_handle* LibUsb::OpenAntStick()
@@ -373,16 +404,22 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
     if (libNotInstalled) return NULL;
 #endif
 
-    struct usb_device* dev;
-    struct usb_dev_handle* udev;
+    UsbDevice *dev;
+    struct usb_dev_handle* udev = NULL;
 
 // for Mac and Linux we do a bus reset on it first...
 #ifndef WIN32
     dev = getDevice();
-    if (dev && (udev = usb_open(dev)))
+    if (dev)
     {
-        usb_reset(udev);
-        usb_close(udev);
+        if ((udev = usb_open(dev->rawDev())))
+        {
+            usb_reset(udev);
+            usb_close(udev);
+            udev = NULL;
+        }
+
+        delete dev;
     }
 #endif
 
@@ -392,20 +429,21 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
         //Avoid noisy output
         //qDebug() << "Found a Garmin USB2 ANT+ stick";
 
-        return openUsb(dev, true);
+        udev = openUsb(dev, true);
+        delete dev;
     }
 
-    return NULL;
+    return udev;
 }
 
-struct usb_dev_handle *LibUsb::openUsb(struct usb_device *dev, bool detachKernelDriver)
+struct usb_dev_handle *LibUsb::openUsb(UsbDevice *dev, bool detachKernelDriver)
 {
     struct usb_dev_handle* udev;
-    if ((udev = usb_open(dev))) {
+    if ((udev = usb_open(dev->rawDev()))) {
 
-        if (dev->descriptor.bNumConfigurations) {
+        if (dev->rawDev()->descriptor.bNumConfigurations) {
 
-            if ((intf = usb_find_interface(&dev->config[0])) != NULL) {
+            if ((intf = usb_find_interface(&dev->rawDev()->config[0])) != NULL) {
 
 #ifdef Q_OS_LINUX
                 if (detachKernelDriver) usb_detach_kernel_driver_np(udev, intf->bInterfaceNumber);
@@ -416,7 +454,7 @@ struct usb_dev_handle *LibUsb::openUsb(struct usb_device *dev, bool detachKernel
                     qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
                     if (OperatingSystem == LINUX) {
                         // looks like the udev rule has not been implemented
-                        qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(dev->bus->dirname).arg(dev->filename);
+                        qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(dev->rawDev()->bus->dirname).arg(dev->rawDev()->filename);
                         qDebug()<<"did you remember to setup a udev rule for this device?";
                     }
                 }

@@ -19,6 +19,43 @@
 #ifndef gc_LibUsbLib_h
 #define gc_LibUsbLib_h
 
+// REMOVE ME!!!!!!!!!!!!
+#include <usb.h>
+// REMOVE ME!!!!!!!!!!!!
+
+#include <QVector>
+
+
+//-----------------------------------------------------------------------------
+// UsbDevice
+//
+class LibUsbLib;
+
+class UsbDevice
+{
+    friend class LibUsbLib;
+
+public:
+    UsbDevice();
+    ~UsbDevice();
+
+    int vendorId() const;
+    int productId() const;
+
+    // REMOVE ME!!!!!!!!!!!!
+    struct usb_device* rawDev() const;
+    // REMOVE ME!!!!!!!!!!!!
+
+private:
+    UsbDevice(const UsbDevice&);
+    UsbDevice& operator=(const UsbDevice&);
+
+    class Impl;
+    Impl *impl;
+};
+//-----------------------------------------------------------------------------
+
+
 //-----------------------------------------------------------------------------
 // LibUsbLib
 //
@@ -30,6 +67,7 @@ public:
 
     void initialize(int logLevel);
     void findDevices();
+    bool getDevices(QVector<UsbDevice *> &deviceList);
 
 private:
     LibUsbLib(const LibUsbLib&);
