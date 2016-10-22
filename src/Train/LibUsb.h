@@ -63,11 +63,8 @@ private:
     struct usb_dev_handle* OpenFortius();
     struct usb_dev_handle* openUsb(UsbDevice *device, bool detachKernelDriver);
 
-    struct usb_interface_descriptor* usb_find_interface(struct usb_config_descriptor* config_descriptor);
     struct usb_dev_handle* device;
-    struct usb_interface_descriptor* intf;
-
-    int readEndpoint, writeEndpoint;
+    UsbDeviceInterface* intf;
 
     char readBuf[64];
     int readBufIndex;

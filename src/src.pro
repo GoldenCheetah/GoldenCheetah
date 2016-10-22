@@ -453,7 +453,8 @@ unix:!macx {
     LIBS        += $${LIBUSB_LIBS}
 
     # lots of dependents
-    SOURCES     += Train/LibUsb.cpp Train/Fortius.cpp Train/FortiusController.cpp
+    SOURCES     += Train/LibUsbLib_UsbDeviceImplGetInterface.cpp Train/LibUsb.cpp \
+                   Train/Fortius.cpp Train/FortiusController.cpp
     HEADERS     += Train/LibUsbLib.h Train/LibUsb.h Train/Fortius.cpp Train/FortiusController.h
 
     !isEqual(LIBUSB_USE_V_1, true) {

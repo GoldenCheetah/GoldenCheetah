@@ -108,8 +108,8 @@ int LibUsb::open()
     if (device == NULL) return -1;
 
     // Clear halt is needed, but ignore return code
-    usb_clear_halt(device, writeEndpoint);
-    usb_clear_halt(device, readEndpoint);
+    usb_clear_halt(device, intf->writeEndpoint());
+    usb_clear_halt(device, intf->readEndpoint());
 
     return 0;
 }
@@ -138,7 +138,10 @@ void LibUsb::close()
         return;
     }
 
-    usb_release_interface(device, intf->bInterfaceNumber);
+    usb_release_interface(device, intf->interfaceNumber());
+    delete intf;
+    intf = NULL;
+
     //usb_reset(device);
     usb_close(device);
     device = NULL;
@@ -183,7 +186,7 @@ int LibUsb::read(char *buf, int bytes, int timeout)
     readBufSize = 0;
     readBufIndex = 0;
 
-    int rc = usb_bulk_read(device, readEndpoint, readBuf, 64, timeout);
+    int rc = usb_bulk_read(device, intf->readEndpoint(), readBuf, 64, timeout);
     if (rc < 0)
     {
         // don't report timeouts - lots of noise so commented out
@@ -229,12 +232,12 @@ int LibUsb::write(char *buf, int bytes, int timeout)
 
     int rc;
     if (OperatingSystem == WINDOWS) {
-        rc = usb_interrupt_write(device, writeEndpoint, buf, bytes, 1000);
+        rc = usb_interrupt_write(device, intf->writeEndpoint(), buf, bytes, 1000);
     } else {
         // we use a non-interrupted write on Linux/Mac since the interrupt
         // write block size is incorrectly implemented in the version of
         // libusb we build with. It is no less efficient.
-        rc = usb_bulk_write(device, writeEndpoint, buf, bytes, timeout);
+        rc = usb_bulk_write(device, intf->writeEndpoint(), buf, bytes, timeout);
     }
 
     if (rc < 0)
@@ -441,76 +444,38 @@ struct usb_dev_handle *LibUsb::openUsb(UsbDevice *dev, bool detachKernelDriver)
     struct usb_dev_handle* udev;
     if ((udev = usb_open(dev->rawDev()))) {
 
-        if (dev->rawDev()->descriptor.bNumConfigurations) {
-
-            if ((intf = usb_find_interface(&dev->rawDev()->config[0])) != NULL) {
-
+        if ((intf = dev->getInterface()))
+        {
 #ifdef Q_OS_LINUX
-                if (detachKernelDriver) usb_detach_kernel_driver_np(udev, intf->bInterfaceNumber);
+            if (detachKernelDriver) usb_detach_kernel_driver_np(udev, intf->interfaceNumber());
 #endif
 
-                int rc = usb_set_configuration(udev, 1);
-                if (rc < 0) {
-                    qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
-                    if (OperatingSystem == LINUX) {
-                        // looks like the udev rule has not been implemented
-                        qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(dev->rawDev()->bus->dirname).arg(dev->rawDev()->filename);
-                        qDebug()<<"did you remember to setup a udev rule for this device?";
-                    }
+            int rc = usb_set_configuration(udev, 1);
+            if (rc < 0) {
+                qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
+                if (OperatingSystem == LINUX) {
+                    // looks like the udev rule has not been implemented
+                    qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(dev->rawDev()->bus->dirname).arg(dev->rawDev()->filename);
+                    qDebug()<<"did you remember to setup a udev rule for this device?";
                 }
-
-                rc = usb_claim_interface(udev, intf->bInterfaceNumber);
-                if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
-
-                if (OperatingSystem != OSX) {
-                    // fails on Mac OS X, we don't actually need it anyway
-                    rc = usb_set_altinterface(udev, intf->bAlternateSetting);
-                    if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
-                }
-
-                return udev;
             }
+
+            rc = usb_claim_interface(udev, intf->interfaceNumber());
+            if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
+
+            if (OperatingSystem != OSX) {
+                // fails on Mac OS X, we don't actually need it anyway
+                rc = usb_set_altinterface(udev, intf->alternateSetting());
+                if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+            }
+
+            return udev;
         }
 
         usb_close(udev);
     }
 
     return NULL;
-}
-
-struct usb_interface_descriptor* LibUsb::usb_find_interface(struct usb_config_descriptor* config_descriptor)
-{
-#ifdef WIN32
-    if (libNotInstalled) return NULL;
-#endif
-
-    struct usb_interface_descriptor* intf;
-
-    readEndpoint = -1;
-    writeEndpoint = -1;
-
-    if (!config_descriptor) return NULL;
-
-    if (!config_descriptor->bNumInterfaces) return NULL;
-
-    if (!config_descriptor->interface[0].num_altsetting) return NULL;
-
-    intf = &config_descriptor->interface[0].altsetting[0];
-
-    if (intf->bNumEndpoints != 2) return NULL;
-
-    for (int i = 0 ; i < 2; i++)
-    {
-        if (intf->endpoint[i].bEndpointAddress & USB_ENDPOINT_DIR_MASK)
-            readEndpoint = intf->endpoint[i].bEndpointAddress;
-        else
-            writeEndpoint = intf->endpoint[i].bEndpointAddress;
-    }
-
-    if (readEndpoint < 0 || writeEndpoint < 0)
-        return NULL;
-
-    return intf;
 }
 #else
 

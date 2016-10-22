@@ -27,6 +27,32 @@
 
 
 //-----------------------------------------------------------------------------
+// UsbDeviceInterface
+//
+class UsbDeviceInterface
+{
+    friend class UsbDevice;
+
+public:
+    UsbDeviceInterface();
+    ~UsbDeviceInterface();
+
+    int interfaceNumber() const;
+    int alternateSetting() const;
+    int readEndpoint() const;
+    int writeEndpoint() const;
+
+private:
+    UsbDeviceInterface(const UsbDeviceInterface&);
+    UsbDeviceInterface& operator=(const UsbDeviceInterface&);
+
+    class Impl;
+    Impl *impl;
+};
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
 // UsbDevice
 //
 class LibUsbLib;
@@ -41,6 +67,8 @@ public:
 
     int vendorId() const;
     int productId() const;
+
+    UsbDeviceInterface* getInterface();
 
     // REMOVE ME!!!!!!!!!!!!
     struct usb_device* rawDev() const;

@@ -29,9 +29,21 @@ extern "C" {
 //-----------------------------------------------------------------------------
 // Declarations
 //
+class UsbDeviceInterface::Impl
+{
+public:
+    int interfaceNumber;
+    int alternateSetting;
+    int readEndpoint;
+    int writeEndpoint;
+};
+
+
 class UsbDevice::Impl
 {
 public:
+    UsbDeviceInterface* getInterface(struct usb_config_descriptor *configDescriptor);
+
     struct usb_device *dev;
 
 #ifdef WIN32
@@ -71,8 +83,46 @@ public:
 
 
 //-----------------------------------------------------------------------------
+// UsbDeviceInterface
+//
+UsbDeviceInterface::UsbDeviceInterface() : impl(new Impl)
+{
+}
+
+UsbDeviceInterface::~UsbDeviceInterface()
+{
+    delete impl;
+}
+
+int UsbDeviceInterface::interfaceNumber() const
+{
+    return impl->interfaceNumber;
+}
+
+int UsbDeviceInterface::alternateSetting() const
+{
+    return impl->alternateSetting;
+}
+
+int UsbDeviceInterface::readEndpoint() const
+{
+    return impl->readEndpoint;
+}
+
+int UsbDeviceInterface::writeEndpoint() const
+{
+    return impl->writeEndpoint;
+}
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
 // UsbDevice::Impl
 //
+#define USB_CONFIG_DESCRIPTOR struct usb_config_descriptor
+#define USB_INTERFACE_DESCRIPTOR struct usb_interface_descriptor
+#include "LibUsbLib_UsbDeviceImplGetInterface.cpp"
+
 #ifdef WIN32
 void UsbDevice::Impl::libInit(QLibrary *lib)
 {
@@ -102,6 +152,17 @@ int UsbDevice::vendorId() const
 int UsbDevice::productId() const
 {
     return impl->dev->descriptor.idProduct;
+}
+
+UsbDeviceInterface* UsbDevice::getInterface()
+{
+    if (!impl->dev->descriptor.bNumConfigurations)
+    {
+        return NULL;
+    }
+
+    struct usb_config_descriptor *configDescriptor = &impl->dev->config[0];
+    return impl->getInterface(configDescriptor);
 }
 
 // REMOVE ME!!!!!!!!!!!!
