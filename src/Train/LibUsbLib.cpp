@@ -29,6 +29,19 @@ extern "C" {
 //-----------------------------------------------------------------------------
 // Declarations
 //
+class UsbDevice::Impl
+{
+public:
+    struct usb_device *dev;
+
+#ifdef WIN32
+    void libInit(QLibrary *lib);
+
+    QLibrary *lib;
+#endif
+};
+
+
 class LibUsbLib::Impl
 {
 public:
@@ -36,6 +49,7 @@ public:
 
     void initialize(int logLevel);
     void findDevices();
+    bool getDevices(QVector<UsbDevice *> &deviceList) const;
 
 #ifdef WIN32
     bool isLibUsbInstalled() const;
@@ -44,13 +58,58 @@ public:
 
     typedef void (*PrototypeVoid)();
     typedef void (*PrototypeVoid_Int)(int);
+    typedef struct usb_bus* (*PrototypeBus)(void);
 
     PrototypeVoid usb_init;
     PrototypeVoid_Int usb_set_debug;
     PrototypeVoid usb_find_busses;
     PrototypeVoid usb_find_devices;
+    PrototypeBus usb_get_busses;
 #endif
 };
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+// UsbDevice::Impl
+//
+#ifdef WIN32
+void UsbDevice::Impl::libInit(QLibrary *lib)
+{
+    this->lib = lib;
+}
+#endif
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+// UsbDevice
+//
+UsbDevice::UsbDevice() : impl(new Impl)
+{
+}
+
+UsbDevice::~UsbDevice()
+{
+    delete impl;
+}
+
+int UsbDevice::vendorId() const
+{
+    return impl->dev->descriptor.idVendor;
+}
+
+int UsbDevice::productId() const
+{
+    return impl->dev->descriptor.idProduct;
+}
+
+// REMOVE ME!!!!!!!!!!!!
+struct usb_device* UsbDevice::rawDev() const
+{
+    return impl->dev;
+}
+// REMOVE ME!!!!!!!!!!!!
 //-----------------------------------------------------------------------------
 
 
@@ -69,6 +128,7 @@ LibUsbLib::Impl::Impl()
     usb_set_debug = PrototypeVoid_Int(lib.resolve("usb_set_debug"));
     usb_find_busses = PrototypeVoid(lib.resolve("usb_find_busses"));
     usb_find_devices = PrototypeVoid(lib.resolve("usb_find_devices"));
+    usb_get_busses = PrototypeBus(lib.resolve("usb_get_busses"));
 #endif
 }
 
@@ -97,6 +157,32 @@ void LibUsbLib::Impl::findDevices()
 
     usb_find_busses();
     usb_find_devices();
+}
+
+bool LibUsbLib::Impl::getDevices(QVector<UsbDevice *> &deviceList) const
+{
+#ifdef WIN32
+    if (!isLibUsbInstalled())
+    {
+        return false;
+    }
+#endif
+
+    for (struct usb_bus *bus = usb_get_busses(); bus; bus = bus->next)
+    {
+        for (struct usb_device *dev = bus->devices; dev; dev = dev->next)
+        {
+            UsbDevice *device = new UsbDevice;
+            device->impl->dev = dev;
+            deviceList.append(device);
+
+#ifdef WIN32
+            device->impl->libInit(&lib);
+#endif
+        }
+    }
+
+    return true;
 }
 
 #ifdef WIN32
@@ -128,5 +214,10 @@ void LibUsbLib::initialize(int logLevel)
 void LibUsbLib::findDevices()
 {
     impl->findDevices();
+}
+
+bool LibUsbLib::getDevices(QVector<UsbDevice *> &deviceList)
+{
+    return impl->getDevices(deviceList);
 }
 //-----------------------------------------------------------------------------

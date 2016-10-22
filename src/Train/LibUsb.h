@@ -58,10 +58,10 @@ public:
     bool find();
 private:
 
-    struct usb_device* getDevice();
+    UsbDevice *getDevice() const;
     struct usb_dev_handle* OpenAntStick();
     struct usb_dev_handle* OpenFortius();
-    struct usb_dev_handle* openUsb(struct usb_device *device, bool detachKernelDriver);
+    struct usb_dev_handle* openUsb(UsbDevice *device, bool detachKernelDriver);
 
     struct usb_interface_descriptor* usb_find_interface(struct usb_config_descriptor* config_descriptor);
     struct usb_dev_handle* device;
@@ -83,7 +83,6 @@ private:
     typedef int (*PrototypeInt_Handle)(usb_dev_handle*);
     typedef int (*PrototypeInt_Handle_Int)(usb_dev_handle*, unsigned int);
     typedef int (*PrototypeInt_Handle_Int_Char_Int_Int)(usb_dev_handle*, int, char*, int, int);
-    typedef struct usb_bus* (*PrototypeBus) (void);
     typedef usb_dev_handle* (*PrototypeHandle_Device) (struct usb_device *dev);
 
 
@@ -92,7 +91,6 @@ private:
     PrototypeInt_Handle usb_close;
     PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_read;
     PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_write;
-    PrototypeBus usb_get_busses;
     PrototypeHandle_Device usb_open;
     PrototypeInt_Handle_Int usb_set_configuration;
     PrototypeInt_Handle_Int usb_claim_interface;

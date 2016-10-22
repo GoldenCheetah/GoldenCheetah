@@ -33,10 +33,22 @@ public:
 //-----------------------------------------------------------------------------
 // Declarations
 //
+class UsbDevice::Impl
+{
+public:
+    ~Impl();
+
+    libusb_device *dev = NULL;
+    int vendorId = 0;
+    int productId = 0;
+};
+
+
 class LibUsbLib::Impl
 {
 public:
     ~Impl();
+    bool getDeviceDescriptor(libusb_device *device, libusb_device_descriptor &deviceDescriptor) const;
 
     LibUsbLibUtils *utils = new LibUsbLibUtils;
     libusb_context *ctx = NULL;
@@ -54,12 +66,66 @@ void LibUsbLibUtils::logError(const char *fctName, int errorCode) const
 }
 //-----------------------------------------------------------------------------
 
+
+//-----------------------------------------------------------------------------
+// UsbDevice::Impl
+//
+UsbDevice::Impl::~Impl()
+{
+    libusb_unref_device(dev);
+}
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+// UsbDevice
+//
+UsbDevice::UsbDevice() : impl(new Impl())
+{
+}
+
+UsbDevice::~UsbDevice()
+{
+    delete impl;
+}
+
+int UsbDevice::vendorId() const
+{
+    return impl->vendorId;
+}
+
+int UsbDevice::productId() const
+{
+    return impl->productId;
+}
+
+// REMOVE ME!!!!!!!!!!!!
+struct usb_device* UsbDevice::rawDev() const
+{
+    return NULL;
+}
+// REMOVE ME!!!!!!!!!!!!
+//-----------------------------------------------------------------------------
+
+
 //-----------------------------------------------------------------------------
 // LibUsbLib::Impl
 //
 LibUsbLib::Impl::~Impl()
 {
     delete utils;
+}
+
+bool LibUsbLib::Impl::getDeviceDescriptor(libusb_device *device, libusb_device_descriptor &deviceDescriptor) const
+{
+    int rc = libusb_get_device_descriptor(device, &deviceDescriptor);
+    if (rc < 0)
+    {
+        utils->logError("libusb_get_device_descriptor", rc);
+        return false;
+    }
+
+    return true;
 }
 //-----------------------------------------------------------------------------
 
@@ -91,5 +157,37 @@ void LibUsbLib::initialize(int logLevel)
 
 void LibUsbLib::findDevices()
 {
+}
+
+bool LibUsbLib::getDevices(QVector<UsbDevice *> &deviceList)
+{
+    libusb_device **list;
+    ssize_t listCount = libusb_get_device_list(impl->ctx, &list);
+    if (listCount < 0)
+    {
+        impl->utils->logError("libusb_get_device_list", listCount);
+        return false;
+    }
+
+    for (int i = 0; i < listCount; i++)
+    {
+        libusb_device *rawDev = list[i];
+        libusb_device_descriptor deviceDescriptor;
+        if (!impl->getDeviceDescriptor(rawDev, deviceDescriptor))
+        {
+            // Useless device, unref it
+            libusb_unref_device(rawDev);
+            continue;
+        }
+
+        UsbDevice *device = new UsbDevice;
+        device->impl->dev = rawDev;
+        device->impl->vendorId = deviceDescriptor.idVendor;
+        device->impl->productId = deviceDescriptor.idProduct;
+        deviceList.append(device);
+    }
+
+    libusb_free_device_list(list, 0);
+    return true;
 }
 //-----------------------------------------------------------------------------
