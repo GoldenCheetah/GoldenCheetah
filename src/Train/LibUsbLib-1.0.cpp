@@ -33,10 +33,21 @@ public:
 //-----------------------------------------------------------------------------
 // Declarations
 //
+class UsbDeviceInterface::Impl
+{
+public:
+    int interfaceNumber;
+    int alternateSetting;
+    int readEndpoint;
+    int writeEndpoint;
+};
+
+
 class UsbDevice::Impl
 {
 public:
     ~Impl();
+    UsbDeviceInterface* getInterface(libusb_config_descriptor *configDescriptor);
 
     libusb_device *dev = NULL;
     int vendorId = 0;
@@ -68,12 +79,55 @@ void LibUsbLibUtils::logError(const char *fctName, int errorCode) const
 
 
 //-----------------------------------------------------------------------------
+// UsbDeviceInterface
+//
+UsbDeviceInterface::UsbDeviceInterface() : impl(new Impl)
+{
+}
+
+UsbDeviceInterface::~UsbDeviceInterface()
+{
+    delete impl;
+}
+
+int UsbDeviceInterface::interfaceNumber() const
+{
+    return impl->interfaceNumber;
+}
+
+int UsbDeviceInterface::alternateSetting() const
+{
+    return impl->alternateSetting;
+}
+
+int UsbDeviceInterface::readEndpoint() const
+{
+    return impl->readEndpoint;
+}
+
+int UsbDeviceInterface::writeEndpoint() const
+{
+    return impl->writeEndpoint;
+}
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
 // UsbDevice::Impl
 //
 UsbDevice::Impl::~Impl()
 {
     libusb_unref_device(dev);
 }
+
+#define USB_CONFIG_DESCRIPTOR libusb_config_descriptor
+#define USB_INTERFACE_DESCRIPTOR libusb_interface_descriptor
+
+// UNCOMMENT ME!!!!!!!!!!!
+//#define USB_ENDPOINT_DIR_MASK LIBUSB_ENDPOINT_DIR_MASK
+// UNCOMMENT ME!!!!!!!!!!!
+
+#include "LibUsbLib_UsbDeviceImplGetInterface.cpp"
 //-----------------------------------------------------------------------------
 
 
@@ -97,6 +151,21 @@ int UsbDevice::vendorId() const
 int UsbDevice::productId() const
 {
     return impl->productId;
+}
+
+UsbDeviceInterface* UsbDevice::getInterface()
+{
+    libusb_config_descriptor *configDescriptor;
+    int rc = libusb_get_config_descriptor(impl->dev, 0, &configDescriptor);
+    if (rc < 0)
+    {
+        libusb_free_config_descriptor(configDescriptor);
+        return NULL;
+    }
+
+    UsbDeviceInterface *interface = impl->getInterface(configDescriptor);
+    libusb_free_config_descriptor(configDescriptor);
+    return interface;
 }
 
 // REMOVE ME!!!!!!!!!!!!
