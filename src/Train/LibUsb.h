@@ -77,10 +77,8 @@ private:
 #ifdef WIN32
     bool libNotInstalled;
     typedef char* (*PrototypeChar_Void)();
-    typedef int (*PrototypeInt_Handle_Int)(usb_dev_handle*, unsigned int);
 
 
-    PrototypeInt_Handle_Int usb_set_altinterface;
     PrototypeChar_Void usb_strerror;
 
 #endif

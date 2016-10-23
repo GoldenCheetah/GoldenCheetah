@@ -175,6 +175,17 @@ int UsbDeviceHandle::claimInterface(int interfaceNumber)
     return rc;
 }
 
+int UsbDeviceHandle::setAltInterface(int interfaceNumber, int altSetting)
+{
+    int rc = libusb_set_interface_alt_setting(impl->handle, interfaceNumber, altSetting);
+    if (rc < 0)
+    {
+        impl->utils->logError("libusb_set_interface_alt_setting", rc);
+    }
+
+    return rc;
+}
+
 // REMOVE ME!!!!!!!!!!!!
 usb_dev_handle* UsbDeviceHandle::rawHandle() const
 {
