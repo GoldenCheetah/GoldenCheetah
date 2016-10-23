@@ -164,6 +164,17 @@ int UsbDeviceHandle::setConfiguration(int configuration)
     return libusb_set_configuration(impl->handle, configuration);
 }
 
+int UsbDeviceHandle::claimInterface(int interfaceNumber)
+{
+    int rc = libusb_claim_interface(impl->handle, interfaceNumber);
+    if (rc < 0)
+    {
+        impl->utils->logError("ĺibusb_claim_interface", rc);
+    }
+
+    return rc;
+}
+
 // REMOVE ME!!!!!!!!!!!!
 usb_dev_handle* UsbDeviceHandle::rawHandle() const
 {

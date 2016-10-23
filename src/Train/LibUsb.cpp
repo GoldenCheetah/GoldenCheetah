@@ -57,7 +57,6 @@ LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
 
     // get the Functions for all used signatures
 
-    usb_claim_interface = PrototypeInt_Handle_Int(lib.resolve("usb_claim_interface"));
     usb_set_altinterface = PrototypeInt_Handle_Int(lib.resolve("usb_set_altinterface"));
     usb_strerror = PrototypeChar_Void(lib.resolve("usb_strerror"));
 
@@ -457,7 +456,7 @@ UsbDeviceHandle* LibUsb::openUsb(UsbDevice *dev, bool detachKernelDriver)
                 }
             }
 
-            rc = usb_claim_interface(udev->rawHandle(), intf->interfaceNumber());
+            rc = udev->claimInterface(intf->interfaceNumber());
             if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
 
             if (OperatingSystem != OSX)
