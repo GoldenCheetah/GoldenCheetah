@@ -57,7 +57,6 @@ LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
 
     // get the Functions for all used signatures
 
-    usb_bulk_read = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_read"));
     usb_bulk_write = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_write"));
     usb_set_configuration = PrototypeInt_Handle_Int(lib.resolve("usb_set_configuration"));
     usb_claim_interface = PrototypeInt_Handle_Int(lib.resolve("usb_claim_interface"));
@@ -181,14 +180,11 @@ int LibUsb::read(char *buf, int bytes, int timeout)
     readBufSize = 0;
     readBufIndex = 0;
 
-    int rc = usb_bulk_read(device->rawHandle(), intf->readEndpoint(), readBuf, 64, timeout);
+    int rc = device->bulkRead(intf->readEndpoint(), readBuf, 64, &readBufSize, timeout);
     if (rc < 0)
     {
-        // don't report timeouts - lots of noise so commented out
-        //qDebug()<<"usb_bulk_read Error reading: "<<rc<< usb_strerror();
         return rc;
     }
-    readBufSize = rc;
 
     int bytesToGo = bytes - bufRemain;
     if (bytesToGo < readBufSize)

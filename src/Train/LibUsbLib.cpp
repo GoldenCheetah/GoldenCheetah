@@ -36,6 +36,7 @@ public:
     void clearHalt(int endpoint);
     void releaseInterface(int interfaceNumber);
     void reset();
+    int bulkRead(int endpoint, char *bytes, int size, int timeout);
 
     usb_dev_handle *handle;
 
@@ -44,11 +45,13 @@ public:
 
     typedef int (*PrototypeInt_Handle_Int)(usb_dev_handle*, unsigned int);
     typedef int (*PrototypeInt_Handle)(usb_dev_handle*);
+    typedef int (*PrototypeInt_Handle_Int_Char_Int_Int)(usb_dev_handle*, int, char*, int, int);
 
     PrototypeInt_Handle_Int usb_clear_halt;
     PrototypeInt_Handle_Int usb_release_interface;
     PrototypeInt_Handle usb_reset;
     PrototypeInt_Handle usb_close;
+    PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_read;
 #endif
 };
 
@@ -134,6 +137,11 @@ void UsbDeviceHandle::Impl::reset()
     usb_reset(handle);
 }
 
+int UsbDeviceHandle::Impl::bulkRead(int endpoint, char *bytes, int size, int timeout)
+{
+    return usb_bulk_read(handle, endpoint, bytes, size, timeout);
+}
+
 #ifdef WIN32
 void UsbDeviceHandle::Impl::libInit(QLibrary *lib)
 {
@@ -141,6 +149,7 @@ void UsbDeviceHandle::Impl::libInit(QLibrary *lib)
     usb_release_interface = PrototypeInt_Handle_Int(lib->resolve("usb_release_interface"));
     usb_reset = PrototypeInt_Handle(lib->resolve("usb_reset"));
     usb_close = PrototypeInt_Handle(lib->resolve("usb_close"));
+    usb_bulk_read = PrototypeInt_Handle_Int_Char_Int_Int(lib->resolve("usb_bulk_read"));
 }
 #endif
 //-----------------------------------------------------------------------------
@@ -171,6 +180,13 @@ void UsbDeviceHandle::releaseInterface(int interfaceNumber)
 void UsbDeviceHandle::reset()
 {
     impl->reset();
+}
+
+int UsbDeviceHandle::bulkRead(int endpoint, char *bytes, int size, int *actualSize, int timeout)
+{
+    int sizeRead = impl->bulkRead(endpoint, bytes, size, timeout);
+    *actualSize = sizeRead < 0 ? 0 : sizeRead;
+    return sizeRead < 0 ? sizeRead : 0;
 }
 
 // REMOVE ME!!!!!!!!!!!!

@@ -123,6 +123,19 @@ void UsbDeviceHandle::reset()
     }
 }
 
+int UsbDeviceHandle::bulkRead(int endpoint, char *bytes, int size, int *actualSize, int timeout)
+{
+    int rc = libusb_bulk_transfer(impl->handle, endpoint, (unsigned char*)bytes, size, actualSize, timeout);
+
+    // don't report timeouts
+    if (rc < 0 && rc != LIBUSB_ERROR_TIMEOUT)
+    {
+        impl->utils->logError("libusb_bulk_transfer", rc);
+    }
+
+    return rc;
+}
+
 // REMOVE ME!!!!!!!!!!!!
 usb_dev_handle* UsbDeviceHandle::rawHandle() const
 {
