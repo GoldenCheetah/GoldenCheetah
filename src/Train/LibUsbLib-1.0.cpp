@@ -159,6 +159,11 @@ void UsbDeviceHandle::detachKernelDriver(int interfaceNumber)
 }
 #endif
 
+int UsbDeviceHandle::setConfiguration(int configuration)
+{
+    return libusb_set_configuration(impl->handle, configuration);
+}
+
 // REMOVE ME!!!!!!!!!!!!
 usb_dev_handle* UsbDeviceHandle::rawHandle() const
 {
