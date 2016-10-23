@@ -437,7 +437,10 @@ UsbDeviceHandle* LibUsb::openUsb(UsbDevice *dev, bool detachKernelDriver)
         if ((intf = dev->getInterface()))
         {
 #ifdef Q_OS_LINUX
-            if (detachKernelDriver) usb_detach_kernel_driver_np(udev->rawHandle(), intf->interfaceNumber());
+            if (detachKernelDriver)
+            {
+                udev->detachKernelDriver(intf->interfaceNumber());
+            }
 #endif
 
             int rc = usb_set_configuration(udev->rawHandle(), 1);

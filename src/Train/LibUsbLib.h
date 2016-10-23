@@ -44,6 +44,10 @@ public:
     int bulkWrite(int endpoint, char *bytes, int size, int *actualSize, int timeout);
     int interruptWrite(int endpoint, char *bytes, int size, int *actualSize, int timeout);
 
+#ifdef Q_OS_LINUX
+    void detachKernelDriver(int interfaceNumber);
+#endif
+
     // REMOVE ME!!!!!!!!!!!!
     usb_dev_handle* rawHandle() const;
     // REMOVE ME!!!!!!!!!!!!
