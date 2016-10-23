@@ -57,10 +57,8 @@ LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
 
     // get the Functions for all used signatures
 
-    usb_bulk_write = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_write"));
     usb_set_configuration = PrototypeInt_Handle_Int(lib.resolve("usb_set_configuration"));
     usb_claim_interface = PrototypeInt_Handle_Int(lib.resolve("usb_claim_interface"));
-    usb_interrupt_write = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_interrupt_write"));
     usb_set_altinterface = PrototypeInt_Handle_Int(lib.resolve("usb_set_altinterface"));
     usb_strerror = PrototypeChar_Void(lib.resolve("usb_strerror"));
 
@@ -221,15 +219,15 @@ int LibUsb::write(char *buf, int bytes, int timeout)
     // check it isn't closed
     if (!device) return -1;
 
-    int rc;
-    if (OperatingSystem == WINDOWS) {
-        rc = usb_interrupt_write(device->rawHandle(), intf->writeEndpoint(), buf, bytes, 1000);
-    } else {
-        // we use a non-interrupted write on Linux/Mac since the interrupt
-        // write block size is incorrectly implemented in the version of
-        // libusb we build with. It is no less efficient.
-        rc = usb_bulk_write(device->rawHandle(), intf->writeEndpoint(), buf, bytes, timeout);
-    }
+    int rc, bytesWritten;
+#ifdef WIN32
+    rc = device->interruptWrite(intf->writeEndpoint(), buf, bytes, &bytesWritten, 1000);
+#else
+    // we use a non-interrupted write on Linux/Mac since the interrupt
+    // write block size is incorrectly implemented in the version of
+    // libusb we build with. It is no less efficient.
+    rc = device->bulkWrite(intf->writeEndpoint(), buf, bytes, &bytesWritten, timeout);
+#endif
 
     if (rc < 0)
     {
@@ -239,7 +237,7 @@ int LibUsb::write(char *buf, int bytes, int timeout)
         qDebug()<<"usb_interrupt_write Error writing ["<<rc<<"]: "<< usb_strerror();
     }
 
-    return rc;
+    return rc < 0 ? rc : bytesWritten;
 }
 
 UsbDevice* LibUsb::getDevice() const

@@ -37,6 +37,8 @@ public:
     void releaseInterface(int interfaceNumber);
     void reset();
     int bulkRead(int endpoint, char *bytes, int size, int timeout);
+    int bulkWrite(int endpoint, char *bytes, int size, int timeout);
+    int interruptWrite(int endpoint, char *bytes, int size, int timeout);
 
     usb_dev_handle *handle;
 
@@ -52,6 +54,8 @@ public:
     PrototypeInt_Handle usb_reset;
     PrototypeInt_Handle usb_close;
     PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_read;
+    PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_write;
+    PrototypeInt_Handle_Int_Char_Int_Int usb_interrupt_write;
 #endif
 };
 
@@ -142,6 +146,16 @@ int UsbDeviceHandle::Impl::bulkRead(int endpoint, char *bytes, int size, int tim
     return usb_bulk_read(handle, endpoint, bytes, size, timeout);
 }
 
+int UsbDeviceHandle::Impl::bulkWrite(int endpoint, char *bytes, int size, int timeout)
+{
+    return usb_bulk_write(handle, endpoint, bytes, size, timeout);
+}
+
+int UsbDeviceHandle::Impl::interruptWrite(int endpoint, char *bytes, int size, int timeout)
+{
+    return usb_interrupt_write(handle, endpoint, bytes, size, timeout);
+}
+
 #ifdef WIN32
 void UsbDeviceHandle::Impl::libInit(QLibrary *lib)
 {
@@ -150,6 +164,8 @@ void UsbDeviceHandle::Impl::libInit(QLibrary *lib)
     usb_reset = PrototypeInt_Handle(lib->resolve("usb_reset"));
     usb_close = PrototypeInt_Handle(lib->resolve("usb_close"));
     usb_bulk_read = PrototypeInt_Handle_Int_Char_Int_Int(lib->resolve("usb_bulk_read"));
+    usb_bulk_write = PrototypeInt_Handle_Int_Char_Int_Int(lib->resolve("usb_bulk_write"));
+    usb_interrupt_write = PrototypeInt_Handle_Int_Char_Int_Int(lib->resolve("usb_interrupt_write"));
 }
 #endif
 //-----------------------------------------------------------------------------
@@ -187,6 +203,20 @@ int UsbDeviceHandle::bulkRead(int endpoint, char *bytes, int size, int *actualSi
     int sizeRead = impl->bulkRead(endpoint, bytes, size, timeout);
     *actualSize = sizeRead < 0 ? 0 : sizeRead;
     return sizeRead < 0 ? sizeRead : 0;
+}
+
+int UsbDeviceHandle::bulkWrite(int endpoint, char *bytes, int size, int *actualSize, int timeout)
+{
+    int sizeWritten = impl->bulkWrite(endpoint, bytes, size, timeout);
+    *actualSize = sizeWritten < 0 ? 0 : sizeWritten;
+    return sizeWritten < 0 ? sizeWritten : 0;
+}
+
+int UsbDeviceHandle::interruptWrite(int endpoint, char *bytes, int size, int *actualSize, int timeout)
+{
+    int sizeWritten = impl->interruptWrite(endpoint, bytes, size, timeout);
+    *actualSize = sizeWritten < 0 ? 0 : sizeWritten;
+    return sizeWritten < 0 ? sizeWritten : 0;
 }
 
 // REMOVE ME!!!!!!!!!!!!
