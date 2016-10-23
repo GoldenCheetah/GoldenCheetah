@@ -82,7 +82,6 @@ private:
     typedef int (*PrototypeInt_Handle_Int_Char_Int_Int)(usb_dev_handle*, int, char*, int, int);
 
 
-    PrototypeInt_Handle_Int usb_release_interface;
     PrototypeInt_Handle usb_close;
     PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_read;
     PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_write;
