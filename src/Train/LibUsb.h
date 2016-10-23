@@ -78,13 +78,10 @@ private:
     bool libNotInstalled;
     typedef char* (*PrototypeChar_Void)();
     typedef int (*PrototypeInt_Handle_Int)(usb_dev_handle*, unsigned int);
-    typedef int (*PrototypeInt_Handle_Int_Char_Int_Int)(usb_dev_handle*, int, char*, int, int);
 
 
-    PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_write;
     PrototypeInt_Handle_Int usb_set_configuration;
     PrototypeInt_Handle_Int usb_claim_interface;
-    PrototypeInt_Handle_Int_Char_Int_Int usb_interrupt_write;
     PrototypeInt_Handle_Int usb_set_altinterface;
     PrototypeChar_Void usb_strerror;
 

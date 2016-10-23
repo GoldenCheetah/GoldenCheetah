@@ -136,6 +136,16 @@ int UsbDeviceHandle::bulkRead(int endpoint, char *bytes, int size, int *actualSi
     return rc;
 }
 
+int UsbDeviceHandle::bulkWrite(int endpoint, char *bytes, int size, int *actualSize, int timeout)
+{
+    return libusb_bulk_transfer(impl->handle, endpoint, (unsigned char*)bytes, size, actualSize, timeout);
+}
+
+int UsbDeviceHandle::interruptWrite(int endpoint, char *bytes, int size, int *actualSize, int timeout)
+{
+    return libusb_interrupt_transfer(impl->handle, endpoint, (unsigned char*)bytes, size, actualSize, timeout);
+}
+
 // REMOVE ME!!!!!!!!!!!!
 usb_dev_handle* UsbDeviceHandle::rawHandle() const
 {

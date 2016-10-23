@@ -41,6 +41,8 @@ public:
     void releaseInterface(int interfaceNumber);
     void reset();
     int bulkRead(int endpoint, char *bytes, int size, int *actualSize, int timeout);
+    int bulkWrite(int endpoint, char *bytes, int size, int *actualSize, int timeout);
+    int interruptWrite(int endpoint, char *bytes, int size, int *actualSize, int timeout);
 
     // REMOVE ME!!!!!!!!!!!!
     usb_dev_handle* rawHandle() const;
