@@ -45,6 +45,7 @@ public:
     int interruptWrite(int endpoint, char *bytes, int size, int *actualSize, int timeout);
     int setConfiguration(int configuration);
     int claimInterface(int interfaceNumber);
+    int setAltInterface(int interfaceNumber, int altSetting);
 
 #ifdef Q_OS_LINUX
     void detachKernelDriver(int interfaceNumber);

@@ -57,7 +57,6 @@ LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
 
     // get the Functions for all used signatures
 
-    usb_set_altinterface = PrototypeInt_Handle_Int(lib.resolve("usb_set_altinterface"));
     usb_strerror = PrototypeChar_Void(lib.resolve("usb_strerror"));
 
 #endif
@@ -462,7 +461,7 @@ UsbDeviceHandle* LibUsb::openUsb(UsbDevice *dev, bool detachKernelDriver)
             if (OperatingSystem != OSX)
             {
                 // fails on Mac OS X, we don't actually need it anyway
-                rc = usb_set_altinterface(udev->rawHandle(), intf->alternateSetting());
+                rc = udev->setAltInterface(intf->interfaceNumber(), intf->alternateSetting());
                 if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
             }
 
