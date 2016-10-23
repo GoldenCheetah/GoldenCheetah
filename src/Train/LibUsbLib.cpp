@@ -104,6 +104,7 @@ public:
     void initialize(int logLevel);
     void findDevices();
     bool getDevices(QVector<UsbDevice *> &deviceList) const;
+    char* getErrorMessage();
 
 #ifdef WIN32
     bool isLibUsbInstalled() const;
@@ -113,12 +114,14 @@ public:
     typedef void (*PrototypeVoid)();
     typedef void (*PrototypeVoid_Int)(int);
     typedef struct usb_bus* (*PrototypeBus)(void);
+    typedef char* (*PrototypeChar_Void)();
 
     PrototypeVoid usb_init;
     PrototypeVoid_Int usb_set_debug;
     PrototypeVoid usb_find_busses;
     PrototypeVoid usb_find_devices;
     PrototypeBus usb_get_busses;
+    PrototypeChar_Void usb_strerror;
 #endif
 };
 //-----------------------------------------------------------------------------
@@ -407,6 +410,7 @@ LibUsbLib::Impl::Impl()
     usb_find_busses = PrototypeVoid(lib.resolve("usb_find_busses"));
     usb_find_devices = PrototypeVoid(lib.resolve("usb_find_devices"));
     usb_get_busses = PrototypeBus(lib.resolve("usb_get_busses"));
+    usb_strerror = PrototypeChar_Void(lib.resolve("usb_strerror"));
 #endif
 }
 
@@ -463,6 +467,18 @@ bool LibUsbLib::Impl::getDevices(QVector<UsbDevice *> &deviceList) const
     return true;
 }
 
+char* LibUsbLib::Impl::getErrorMessage()
+{
+#ifdef WIN32
+    if (!isLibUsbInstalled())
+    {
+        return NULL;
+    }
+#endif
+
+    return usb_strerror();
+}
+
 #ifdef WIN32
 bool LibUsbLib::Impl::isLibUsbInstalled() const
 {
@@ -498,4 +514,16 @@ bool LibUsbLib::getDevices(QVector<UsbDevice *> &deviceList)
 {
     return impl->getDevices(deviceList);
 }
+
+const char* LibUsbLib::getErrorMessage(int)
+{
+    return impl->getErrorMessage();
+}
+
+#ifdef WIN32
+bool LibUsbLib::isLibUsbInstalled() const
+{
+    return impl->isLibUsbInstalled();
+}
+#endif
 //-----------------------------------------------------------------------------

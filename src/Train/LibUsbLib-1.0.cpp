@@ -391,4 +391,16 @@ bool LibUsbLib::getDevices(QVector<UsbDevice *> &deviceList)
     libusb_free_device_list(list, 0);
     return true;
 }
+
+const char* LibUsbLib::getErrorMessage(int errorCode)
+{
+    return libusb_strerror((libusb_error)errorCode);
+}
+
+#ifdef WIN32
+bool LibUsbLib::isLibUsbInstalled() const
+{
+    return true;
+}
+#endif
 //-----------------------------------------------------------------------------
