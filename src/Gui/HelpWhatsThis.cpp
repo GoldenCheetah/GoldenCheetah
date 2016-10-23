@@ -62,6 +62,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
 
     switch (chapter) {
 
+    default:
     case Default:
         return text.arg("Main-Page_Table-of-contents").arg("Table of Contents");
 

@@ -47,7 +47,7 @@ RideFile *GpxFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 }
 
 QByteArray
-GpxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad) const
+GpxFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad) const
 {
     //
     // GPX Standard defined here:  http://www.topografix.com/GPX/1/1/
