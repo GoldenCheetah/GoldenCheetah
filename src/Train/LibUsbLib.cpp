@@ -154,6 +154,16 @@ int UsbDevice::productId() const
     return impl->dev->descriptor.idProduct;
 }
 
+int UsbDevice::busNumber() const
+{
+    return impl->dev->bus->location;
+}
+
+int UsbDevice::deviceAddress() const
+{
+    return impl->dev->devnum;
+}
+
 UsbDeviceInterface* UsbDevice::getInterface()
 {
     if (!impl->dev->descriptor.bNumConfigurations)

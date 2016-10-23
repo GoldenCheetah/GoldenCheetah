@@ -453,10 +453,14 @@ struct usb_dev_handle *LibUsb::openUsb(UsbDevice *dev, bool detachKernelDriver)
             int rc = usb_set_configuration(udev, 1);
             if (rc < 0) {
                 qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
-                if (OperatingSystem == LINUX) {
+                if (OperatingSystem == LINUX)
+                {
                     // looks like the udev rule has not been implemented
-                    qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(dev->rawDev()->bus->dirname).arg(dev->rawDev()->filename);
-                    qDebug()<<"did you remember to setup a udev rule for this device?";
+                    QString path = QString("/dev/bus/usb/%1/%2")
+                            .arg(dev->busNumber(), 3, 10, QChar('0'))
+                            .arg(dev->deviceAddress(), 3, 10, QChar('0'));
+                    qDebug() << "check permissions on:" << path;
+                    qDebug() << "did you remember to setup a udev rule for this device?";
                 }
             }
 

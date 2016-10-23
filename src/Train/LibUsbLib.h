@@ -67,6 +67,8 @@ public:
 
     int vendorId() const;
     int productId() const;
+    int busNumber() const;
+    int deviceAddress() const;
 
     UsbDeviceInterface* getInterface();
 
