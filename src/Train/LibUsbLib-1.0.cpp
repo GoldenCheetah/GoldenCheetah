@@ -153,6 +153,16 @@ int UsbDevice::productId() const
     return impl->productId;
 }
 
+int UsbDevice::busNumber() const
+{
+    return libusb_get_bus_number(impl->dev);
+}
+
+int UsbDevice::deviceAddress() const
+{
+    return libusb_get_device_address(impl->dev);
+}
+
 UsbDeviceInterface* UsbDevice::getInterface()
 {
     libusb_config_descriptor *configDescriptor;
