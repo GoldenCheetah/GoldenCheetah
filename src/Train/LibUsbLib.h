@@ -43,6 +43,7 @@ public:
     int bulkRead(int endpoint, char *bytes, int size, int *actualSize, int timeout);
     int bulkWrite(int endpoint, char *bytes, int size, int *actualSize, int timeout);
     int interruptWrite(int endpoint, char *bytes, int size, int *actualSize, int timeout);
+    int setConfiguration(int configuration);
 
 #ifdef Q_OS_LINUX
     void detachKernelDriver(int interfaceNumber);

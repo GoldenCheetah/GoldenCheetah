@@ -39,6 +39,7 @@ public:
     int bulkRead(int endpoint, char *bytes, int size, int timeout);
     int bulkWrite(int endpoint, char *bytes, int size, int timeout);
     int interruptWrite(int endpoint, char *bytes, int size, int timeout);
+    int setConfiguration(int configuration);
 
     usb_dev_handle *handle;
 
@@ -56,6 +57,7 @@ public:
     PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_read;
     PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_write;
     PrototypeInt_Handle_Int_Char_Int_Int usb_interrupt_write;
+    PrototypeInt_Handle_Int usb_set_configuration;
 #endif
 };
 
@@ -156,6 +158,11 @@ int UsbDeviceHandle::Impl::interruptWrite(int endpoint, char *bytes, int size, i
     return usb_interrupt_write(handle, endpoint, bytes, size, timeout);
 }
 
+int UsbDeviceHandle::Impl::setConfiguration(int configuration)
+{
+    return usb_set_configuration(handle, configuration);
+}
+
 #ifdef WIN32
 void UsbDeviceHandle::Impl::libInit(QLibrary *lib)
 {
@@ -166,6 +173,7 @@ void UsbDeviceHandle::Impl::libInit(QLibrary *lib)
     usb_bulk_read = PrototypeInt_Handle_Int_Char_Int_Int(lib->resolve("usb_bulk_read"));
     usb_bulk_write = PrototypeInt_Handle_Int_Char_Int_Int(lib->resolve("usb_bulk_write"));
     usb_interrupt_write = PrototypeInt_Handle_Int_Char_Int_Int(lib->resolve("usb_interrupt_write"));
+    usb_set_configuration = PrototypeInt_Handle_Int(lib->resolve("usb_set_configuration"));
 }
 #endif
 //-----------------------------------------------------------------------------
@@ -217,6 +225,11 @@ int UsbDeviceHandle::interruptWrite(int endpoint, char *bytes, int size, int *ac
     int sizeWritten = impl->interruptWrite(endpoint, bytes, size, timeout);
     *actualSize = sizeWritten < 0 ? 0 : sizeWritten;
     return sizeWritten < 0 ? sizeWritten : 0;
+}
+
+int UsbDeviceHandle::setConfiguration(int configuration)
+{
+    return impl->setConfiguration(configuration);
 }
 
 #ifdef Q_OS_LINUX
