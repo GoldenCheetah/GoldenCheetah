@@ -98,6 +98,11 @@ UsbDeviceHandle::~UsbDeviceHandle()
     delete impl;
 }
 
+void UsbDeviceHandle::clearHalt(int endpoint)
+{
+    libusb_clear_halt(impl->handle, endpoint);
+}
+
 // REMOVE ME!!!!!!!!!!!!
 usb_dev_handle* UsbDeviceHandle::rawHandle() const
 {

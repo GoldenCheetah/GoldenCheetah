@@ -37,6 +37,8 @@ public:
     UsbDeviceHandle();
     ~UsbDeviceHandle();
 
+    void clearHalt(int endpoint);
+
     // REMOVE ME!!!!!!!!!!!!
     usb_dev_handle* rawHandle() const;
     // REMOVE ME!!!!!!!!!!!!
