@@ -219,6 +219,13 @@ int UsbDeviceHandle::interruptWrite(int endpoint, char *bytes, int size, int *ac
     return sizeWritten < 0 ? sizeWritten : 0;
 }
 
+#ifdef Q_OS_LINUX
+void UsbDeviceHandle::detachKernelDriver(int interfaceNumber)
+{
+    usb_detach_kernel_driver_np(impl->handle, interfaceNumber);
+}
+#endif
+
 // REMOVE ME!!!!!!!!!!!!
 usb_dev_handle* UsbDeviceHandle::rawHandle() const
 {

@@ -146,6 +146,19 @@ int UsbDeviceHandle::interruptWrite(int endpoint, char *bytes, int size, int *ac
     return libusb_interrupt_transfer(impl->handle, endpoint, (unsigned char*)bytes, size, actualSize, timeout);
 }
 
+#ifdef Q_OS_LINUX
+void UsbDeviceHandle::detachKernelDriver(int interfaceNumber)
+{
+    int rc = libusb_detach_kernel_driver(impl->handle, interfaceNumber);
+
+    // LIBUSB_ERROR_NOT_FOUND means no kernel driver was attached
+    if (rc != LIBUSB_ERROR_NOT_FOUND && rc < 0)
+    {
+        impl->utils->logError("libusb_detach_kernel_driver", rc);
+    }
+}
+#endif
+
 // REMOVE ME!!!!!!!!!!!!
 usb_dev_handle* UsbDeviceHandle::rawHandle() const
 {
