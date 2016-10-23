@@ -139,7 +139,6 @@ void LibUsb::close()
     delete intf;
     intf = NULL;
 
-    //usb_reset(device);
     usb_close(device->rawHandle());
     delete device;
     device = NULL;
@@ -417,7 +416,7 @@ UsbDeviceHandle* LibUsb::openAntStick()
     {
         if ((udev = dev->open()))
         {
-            usb_reset(udev->rawHandle());
+            udev->reset();
             usb_close(udev->rawHandle());
             delete udev;
             udev = NULL;
