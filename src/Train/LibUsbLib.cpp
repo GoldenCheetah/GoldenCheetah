@@ -265,12 +265,10 @@ int UsbDeviceHandle::setAltInterface(int, int altSetting)
     return impl->setAltInterface(altSetting);
 }
 
-// REMOVE ME!!!!!!!!!!!!
-usb_dev_handle* UsbDeviceHandle::rawHandle() const
+void UsbDeviceHandle::loadRam(const char *path)
 {
-    return impl->handle;
+    ezusb_load_ram(impl->handle, path, 0, 0);
 }
-// REMOVE ME!!!!!!!!!!!!
 //-----------------------------------------------------------------------------
 
 
