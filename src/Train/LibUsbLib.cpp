@@ -32,7 +32,17 @@ extern "C" {
 class UsbDeviceHandle::Impl
 {
 public:
+    void clearHalt(int endpoint);
+
     usb_dev_handle *handle;
+
+#ifdef WIN32
+    void libInit(QLibrary *lib);
+
+    typedef int (*PrototypeInt_Handle_Int)(usb_dev_handle*, unsigned int);
+
+    PrototypeInt_Handle_Int usb_clear_halt;
+#endif
 };
 
 
@@ -95,6 +105,23 @@ public:
 
 
 //-----------------------------------------------------------------------------
+// UsbDeviceHandle::Impl
+//
+void UsbDeviceHandle::Impl::clearHalt(int endpoint)
+{
+    usb_clear_halt(handle, endpoint);
+}
+
+#ifdef WIN32
+void UsbDeviceHandle::Impl::libInit(QLibrary *lib)
+{
+    usb_clear_halt = PrototypeInt_Handle_Int(lib->resolve("usb_clear_halt"));
+}
+#endif
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
 // UsbDeviceHandle
 //
 UsbDeviceHandle::UsbDeviceHandle() : impl(new Impl)
@@ -104,6 +131,11 @@ UsbDeviceHandle::UsbDeviceHandle() : impl(new Impl)
 UsbDeviceHandle::~UsbDeviceHandle()
 {
     delete impl;
+}
+
+void UsbDeviceHandle::clearHalt(int endpoint)
+{
+    impl->clearHalt(endpoint);
 }
 
 // REMOVE ME!!!!!!!!!!!!
@@ -166,6 +198,11 @@ UsbDeviceHandle* UsbDevice::Impl::open()
 
     UsbDeviceHandle *usbDevHandle = new UsbDeviceHandle;
     usbDevHandle->impl->handle = handle;
+
+#ifdef WIN32
+    usbDevHandle->impl->libInit(lib);
+#endif
+
     return usbDevHandle;
 }
 

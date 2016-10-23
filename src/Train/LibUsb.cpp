@@ -57,7 +57,6 @@ LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
 
     // get the Functions for all used signatures
 
-    usb_clear_halt = PrototypeInt_Handle_Int(lib.resolve("usb_clear_halt"));
     usb_close = PrototypeInt_Handle(lib.resolve("usb_close"));
     usb_bulk_read = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_read"));
     usb_bulk_write = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_write"));
@@ -107,8 +106,8 @@ int LibUsb::open()
     if (device == NULL) return -1;
 
     // Clear halt is needed, but ignore return code
-    usb_clear_halt(device->rawHandle(), intf->writeEndpoint());
-    usb_clear_halt(device->rawHandle(), intf->readEndpoint());
+    device->clearHalt(intf->writeEndpoint());
+    device->clearHalt(intf->readEndpoint());
 
     return 0;
 }
