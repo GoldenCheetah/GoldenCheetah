@@ -1729,7 +1729,6 @@ struct FitFileReaderState
         time_t this_start_time = 0;
         ++interval;
         double total_elapsed_time = 0.0;
-        double total_distance = 0.0;
 
         QString segment_name;
         bool fail = false;
@@ -1776,7 +1775,7 @@ struct FitFileReaderState
                         break;
                 case 9:  // leader best (ms) ? segment distance ? FIXME : to be investigated.
                          // => depends on file / device / version ?
-                    total_distance = value.v / 100000.0;
+                    //not used XXX total_distance = value.v / 100000.0;
                     break;
                 case 10: // personal rank ? to be confirmed
                          // ignored

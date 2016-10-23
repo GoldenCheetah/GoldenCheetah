@@ -131,6 +131,12 @@ LIBS += $${LIBZ_LIBS}
 } else {
     # gnu toolchain wants math libs
     LIBS += -lm
+
+    # Linux gcc 5 grumbles about unused static globals and leads
+    # to a gazillion warnings that are harmless so lets remove them
+    unix:!macx {
+        QMAKE_CXXFLAGS += -Wno-unused-variable
+    }
 }
 
 # windows icon and use QT zlib, not sure why different but keep for now

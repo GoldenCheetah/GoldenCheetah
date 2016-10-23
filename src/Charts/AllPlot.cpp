@@ -5962,6 +5962,7 @@ AllPlot::setShow(RideFile::SeriesType type, bool state)
     case RideFile::gear: 
         setShowGear(state);
         break;
+    default:
     case RideFile::wbal:
     case RideFile::index:
         break;
