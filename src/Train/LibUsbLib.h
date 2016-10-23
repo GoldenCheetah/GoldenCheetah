@@ -40,6 +40,7 @@ public:
     void clearHalt(int endpoint);
     void releaseInterface(int interfaceNumber);
     void reset();
+    int bulkRead(int endpoint, char *bytes, int size, int *actualSize, int timeout);
 
     // REMOVE ME!!!!!!!!!!!!
     usb_dev_handle* rawHandle() const;
