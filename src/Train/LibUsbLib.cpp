@@ -34,6 +34,7 @@ class UsbDeviceHandle::Impl
 public:
     void clearHalt(int endpoint);
     void releaseInterface(int interfaceNumber);
+    void reset();
 
     usb_dev_handle *handle;
 
@@ -41,9 +42,11 @@ public:
     void libInit(QLibrary *lib);
 
     typedef int (*PrototypeInt_Handle_Int)(usb_dev_handle*, unsigned int);
+    typedef int (*PrototypeInt_Handle)(usb_dev_handle*);
 
     PrototypeInt_Handle_Int usb_clear_halt;
     PrototypeInt_Handle_Int usb_release_interface;
+    PrototypeInt_Handle usb_reset;
 #endif
 };
 
@@ -119,11 +122,17 @@ void UsbDeviceHandle::Impl::releaseInterface(int interfaceNumber)
     usb_release_interface(handle, interfaceNumber);
 }
 
+void UsbDeviceHandle::Impl::reset()
+{
+    usb_reset(handle);
+}
+
 #ifdef WIN32
 void UsbDeviceHandle::Impl::libInit(QLibrary *lib)
 {
     usb_clear_halt = PrototypeInt_Handle_Int(lib->resolve("usb_clear_halt"));
     usb_release_interface = PrototypeInt_Handle_Int(lib->resolve("usb_release_interface"));
+    usb_reset = PrototypeInt_Handle(lib->resolve("usb_reset"));
 }
 #endif
 //-----------------------------------------------------------------------------
@@ -149,6 +158,11 @@ void UsbDeviceHandle::clearHalt(int endpoint)
 void UsbDeviceHandle::releaseInterface(int interfaceNumber)
 {
     impl->releaseInterface(interfaceNumber);
+}
+
+void UsbDeviceHandle::reset()
+{
+    impl->reset();
 }
 
 // REMOVE ME!!!!!!!!!!!!

@@ -39,6 +39,7 @@ public:
 
     void clearHalt(int endpoint);
     void releaseInterface(int interfaceNumber);
+    void reset();
 
     // REMOVE ME!!!!!!!!!!!!
     usb_dev_handle* rawHandle() const;

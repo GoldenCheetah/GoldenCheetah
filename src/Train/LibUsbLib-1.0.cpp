@@ -113,6 +113,15 @@ void UsbDeviceHandle::releaseInterface(int interfaceNumber)
     }
 }
 
+void UsbDeviceHandle::reset()
+{
+    int rc = libusb_reset_device(impl->handle);
+    if (rc < 0)
+    {
+        impl->utils->logError("libusb_reset_device", rc);
+    }
+}
+
 // REMOVE ME!!!!!!!!!!!!
 usb_dev_handle* UsbDeviceHandle::rawHandle() const
 {
