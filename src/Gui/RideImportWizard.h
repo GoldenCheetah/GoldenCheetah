@@ -41,6 +41,14 @@ class RideImportWizard : public QDialog
     Q_OBJECT
     G_OBJECT
 
+    enum tableheader {
+		Filename,
+		Date,
+		Time,
+		Duration,
+		Distance,
+		Status
+	};
 
 public:
     RideImportWizard(QList<QUrl> *urls, Context *context, QWidget *parent = 0);
