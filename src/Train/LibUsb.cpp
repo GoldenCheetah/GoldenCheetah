@@ -61,7 +61,6 @@ LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
     usb_close = PrototypeInt_Handle(lib.resolve("usb_close"));
     usb_bulk_read = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_read"));
     usb_bulk_write = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_write"));
-    usb_open = PrototypeHandle_Device(lib.resolve("usb_open"));
     usb_set_configuration = PrototypeInt_Handle_Int(lib.resolve("usb_set_configuration"));
     usb_claim_interface = PrototypeInt_Handle_Int(lib.resolve("usb_claim_interface"));
     usb_release_interface = PrototypeInt_Handle_Int(lib.resolve("usb_release_interface"));
@@ -98,18 +97,18 @@ int LibUsb::open()
 
     // Search USB busses for USB2 ANT+ stick host controllers
     default:
-    case TYPE_ANT: device = OpenAntStick();
+    case TYPE_ANT: device = openAntStick();
               break;
 
-    case TYPE_FORTIUS: device = OpenFortius();
+    case TYPE_FORTIUS: device = openFortius();
               break;
     }
 
     if (device == NULL) return -1;
 
     // Clear halt is needed, but ignore return code
-    usb_clear_halt(device, intf->writeEndpoint());
-    usb_clear_halt(device, intf->readEndpoint());
+    usb_clear_halt(device->rawHandle(), intf->writeEndpoint());
+    usb_clear_halt(device->rawHandle(), intf->readEndpoint());
 
     return 0;
 }
@@ -138,12 +137,13 @@ void LibUsb::close()
         return;
     }
 
-    usb_release_interface(device, intf->interfaceNumber());
+    usb_release_interface(device->rawHandle(), intf->interfaceNumber());
     delete intf;
     intf = NULL;
 
     //usb_reset(device);
-    usb_close(device);
+    usb_close(device->rawHandle());
+    delete device;
     device = NULL;
 }
 
@@ -186,7 +186,7 @@ int LibUsb::read(char *buf, int bytes, int timeout)
     readBufSize = 0;
     readBufIndex = 0;
 
-    int rc = usb_bulk_read(device, intf->readEndpoint(), readBuf, 64, timeout);
+    int rc = usb_bulk_read(device->rawHandle(), intf->readEndpoint(), readBuf, 64, timeout);
     if (rc < 0)
     {
         // don't report timeouts - lots of noise so commented out
@@ -232,12 +232,12 @@ int LibUsb::write(char *buf, int bytes, int timeout)
 
     int rc;
     if (OperatingSystem == WINDOWS) {
-        rc = usb_interrupt_write(device, intf->writeEndpoint(), buf, bytes, 1000);
+        rc = usb_interrupt_write(device->rawHandle(), intf->writeEndpoint(), buf, bytes, 1000);
     } else {
         // we use a non-interrupted write on Linux/Mac since the interrupt
         // write block size is incorrectly implemented in the version of
         // libusb we build with. It is no less efficient.
-        rc = usb_bulk_write(device, intf->writeEndpoint(), buf, bytes, timeout);
+        rc = usb_bulk_write(device->rawHandle(), intf->writeEndpoint(), buf, bytes, timeout);
     }
 
     if (rc < 0)
@@ -332,7 +332,7 @@ UsbDevice* LibUsb::getDevice() const
 //      path is the filename of the firmware file
 //      fx2 is non-zero to indicate an fx2 device (we pass 0, since the Fortius is fx)
 //      stage is to control two stage loading, we load in a single stage
-struct usb_dev_handle* LibUsb::OpenFortius()
+UsbDeviceHandle* LibUsb::openFortius()
 {
 
 #ifdef WIN32
@@ -340,7 +340,7 @@ struct usb_dev_handle* LibUsb::OpenFortius()
 #endif
 
     UsbDevice *dev;
-    struct usb_dev_handle* udev = NULL;
+    UsbDeviceHandle *udev = NULL;
 
     //
     // Search for an UN-INITIALISED Fortius device
@@ -350,13 +350,15 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     {
         if (dev->productId() == FORTIUS_INIT_PID)
         {
-            if ((udev = usb_open(dev->rawDev()))) {
+            if ((udev = dev->open()))
+            {
                 // LOAD THE FIRMWARE
-                ezusb_load_ram (udev, appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0);
+                ezusb_load_ram (udev->rawHandle(), appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0);
             }
 
             // Now close the connection, our work here is done
-            usb_close(udev);
+            usb_close(udev->rawHandle());
+            delete udev;
             udev = NULL;
 
             // We need to rescan devices, since once the Fortius has
@@ -401,24 +403,25 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     return udev;
 }
 
-struct usb_dev_handle* LibUsb::OpenAntStick()
+UsbDeviceHandle* LibUsb::openAntStick()
 {
 #ifdef WIN32
     if (libNotInstalled) return NULL;
 #endif
 
     UsbDevice *dev;
-    struct usb_dev_handle* udev = NULL;
+    UsbDeviceHandle *udev = NULL;
 
 // for Mac and Linux we do a bus reset on it first...
 #ifndef WIN32
     dev = getDevice();
     if (dev)
     {
-        if ((udev = usb_open(dev->rawDev())))
+        if ((udev = dev->open()))
         {
-            usb_reset(udev);
-            usb_close(udev);
+            usb_reset(udev->rawHandle());
+            usb_close(udev->rawHandle());
+            delete udev;
             udev = NULL;
         }
 
@@ -439,18 +442,18 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
     return udev;
 }
 
-struct usb_dev_handle *LibUsb::openUsb(UsbDevice *dev, bool detachKernelDriver)
+UsbDeviceHandle* LibUsb::openUsb(UsbDevice *dev, bool detachKernelDriver)
 {
-    struct usb_dev_handle* udev;
-    if ((udev = usb_open(dev->rawDev()))) {
-
+    UsbDeviceHandle *udev;
+    if ((udev = dev->open()))
+    {
         if ((intf = dev->getInterface()))
         {
 #ifdef Q_OS_LINUX
-            if (detachKernelDriver) usb_detach_kernel_driver_np(udev, intf->interfaceNumber());
+            if (detachKernelDriver) usb_detach_kernel_driver_np(udev->rawHandle(), intf->interfaceNumber());
 #endif
 
-            int rc = usb_set_configuration(udev, 1);
+            int rc = usb_set_configuration(udev->rawHandle(), 1);
             if (rc < 0) {
                 qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
                 if (OperatingSystem == LINUX)
@@ -464,19 +467,21 @@ struct usb_dev_handle *LibUsb::openUsb(UsbDevice *dev, bool detachKernelDriver)
                 }
             }
 
-            rc = usb_claim_interface(udev, intf->interfaceNumber());
+            rc = usb_claim_interface(udev->rawHandle(), intf->interfaceNumber());
             if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
 
-            if (OperatingSystem != OSX) {
+            if (OperatingSystem != OSX)
+            {
                 // fails on Mac OS X, we don't actually need it anyway
-                rc = usb_set_altinterface(udev, intf->alternateSetting());
+                rc = usb_set_altinterface(udev->rawHandle(), intf->alternateSetting());
                 if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
             }
 
             return udev;
         }
 
-        usb_close(udev);
+        usb_close(udev->rawHandle());
+        delete udev;
     }
 
     return NULL;

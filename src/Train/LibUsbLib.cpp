@@ -29,6 +29,13 @@ extern "C" {
 //-----------------------------------------------------------------------------
 // Declarations
 //
+class UsbDeviceHandle::Impl
+{
+public:
+    usb_dev_handle *handle;
+};
+
+
 class UsbDeviceInterface::Impl
 {
 public:
@@ -43,6 +50,7 @@ class UsbDevice::Impl
 {
 public:
     UsbDeviceInterface* getInterface(struct usb_config_descriptor *configDescriptor);
+    UsbDeviceHandle* open();
 
     struct usb_device *dev;
 
@@ -50,6 +58,10 @@ public:
     void libInit(QLibrary *lib);
 
     QLibrary *lib;
+
+    typedef usb_dev_handle* (*PrototypeHandle_Device)(struct usb_device *dev);
+
+    PrototypeHandle_Device usb_open;
 #endif
 };
 
@@ -79,6 +91,27 @@ public:
     PrototypeBus usb_get_busses;
 #endif
 };
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+// UsbDeviceHandle
+//
+UsbDeviceHandle::UsbDeviceHandle() : impl(new Impl)
+{
+}
+
+UsbDeviceHandle::~UsbDeviceHandle()
+{
+    delete impl;
+}
+
+// REMOVE ME!!!!!!!!!!!!
+usb_dev_handle* UsbDeviceHandle::rawHandle() const
+{
+    return impl->handle;
+}
+// REMOVE ME!!!!!!!!!!!!
 //-----------------------------------------------------------------------------
 
 
@@ -123,10 +156,24 @@ int UsbDeviceInterface::writeEndpoint() const
 #define USB_INTERFACE_DESCRIPTOR struct usb_interface_descriptor
 #include "LibUsbLib_UsbDeviceImplGetInterface.cpp"
 
+UsbDeviceHandle* UsbDevice::Impl::open()
+{
+    usb_dev_handle *handle = usb_open(dev);
+    if (!handle)
+    {
+        return NULL;
+    }
+
+    UsbDeviceHandle *usbDevHandle = new UsbDeviceHandle;
+    usbDevHandle->impl->handle = handle;
+    return usbDevHandle;
+}
+
 #ifdef WIN32
 void UsbDevice::Impl::libInit(QLibrary *lib)
 {
     this->lib = lib;
+    usb_open = PrototypeHandle_Device(lib->resolve("usb_open"));
 }
 #endif
 //-----------------------------------------------------------------------------
@@ -175,12 +222,10 @@ UsbDeviceInterface* UsbDevice::getInterface()
     return impl->getInterface(configDescriptor);
 }
 
-// REMOVE ME!!!!!!!!!!!!
-struct usb_device* UsbDevice::rawDev() const
+UsbDeviceHandle* UsbDevice::open()
 {
-    return impl->dev;
+    return impl->open();
 }
-// REMOVE ME!!!!!!!!!!!!
 //-----------------------------------------------------------------------------
 
 
