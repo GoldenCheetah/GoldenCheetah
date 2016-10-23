@@ -36,6 +36,7 @@ public:
 class UsbDeviceHandle::Impl
 {
 public:
+    LibUsbLibUtils *utils;
     libusb_device_handle *handle;
 };
 
@@ -101,6 +102,15 @@ UsbDeviceHandle::~UsbDeviceHandle()
 void UsbDeviceHandle::clearHalt(int endpoint)
 {
     libusb_clear_halt(impl->handle, endpoint);
+}
+
+void UsbDeviceHandle::releaseInterface(int interfaceNumber)
+{
+    int rc = libusb_release_interface(impl->handle, interfaceNumber);
+    if (rc < 0)
+    {
+        impl->utils->logError("libusb_release_interface", rc);
+    }
 }
 
 // REMOVE ME!!!!!!!!!!!!
@@ -224,6 +234,7 @@ UsbDeviceHandle* UsbDevice::open()
     }
 
     UsbDeviceHandle *usbHandle = new UsbDeviceHandle;
+    usbHandle->impl->utils = impl->utils;
     usbHandle->impl->handle = handle;
     return usbHandle;
 }

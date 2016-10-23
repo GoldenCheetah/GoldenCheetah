@@ -62,7 +62,6 @@ LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
     usb_bulk_write = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_write"));
     usb_set_configuration = PrototypeInt_Handle_Int(lib.resolve("usb_set_configuration"));
     usb_claim_interface = PrototypeInt_Handle_Int(lib.resolve("usb_claim_interface"));
-    usb_release_interface = PrototypeInt_Handle_Int(lib.resolve("usb_release_interface"));
     usb_interrupt_write = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_interrupt_write"));
     usb_set_altinterface = PrototypeInt_Handle_Int(lib.resolve("usb_set_altinterface"));
     usb_strerror = PrototypeChar_Void(lib.resolve("usb_strerror"));
@@ -136,7 +135,7 @@ void LibUsb::close()
         return;
     }
 
-    usb_release_interface(device->rawHandle(), intf->interfaceNumber());
+    device->releaseInterface(intf->interfaceNumber());
     delete intf;
     intf = NULL;
 
