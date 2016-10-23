@@ -127,6 +127,11 @@ public:
     void initialize(int logLevel);
     void findDevices();
     bool getDevices(QVector<UsbDevice *> &deviceList);
+    const char* getErrorMessage(int errorCode);
+    
+#ifdef WIN32
+    bool isLibUsbInstalled() const;
+#endif
 
 private:
     LibUsbLib(const LibUsbLib&);

@@ -21,10 +21,6 @@
 #include <QString>
 #include <QDebug>
 
-#ifdef WIN32
-#include <QLibrary> // for dynamically loading libusb0.dll
-#endif
-
 #ifndef Q_CC_MSVC
 #include <unistd.h>
 #endif
@@ -41,19 +37,10 @@ LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
     readBufSize = 0;
 
 #ifdef WIN32
-    QLibrary lib("libusb0");
-    if (!lib.isLoaded()) {
-        if(!lib.load()) {
-            libNotInstalled = true;
-            return;
-        }
+    if (!usbLib->isLibUsbInstalled())
+    {
+        return;
     }
-    libNotInstalled = false;
-
-    // get the Functions for all used signatures
-
-    usb_strerror = PrototypeChar_Void(lib.resolve("usb_strerror"));
-
 #endif
 
     // Initialize the library.
@@ -67,10 +54,13 @@ LibUsb::~LibUsb()
 
 int LibUsb::open()
 {
-
 #ifdef WIN32
-    if (libNotInstalled) return -1;
+    if (!usbLib->isLibUsbInstalled())
+    {
+        return -1;
+    }
 #endif
+
     // reset counters
     intf = NULL;
     readBufIndex = 0;
@@ -102,7 +92,10 @@ int LibUsb::open()
 bool LibUsb::find()
 {
 #ifdef WIN32
-    if (libNotInstalled) return false;
+    if (!usbLib->isLibUsbInstalled())
+    {
+        return false;
+    }
 #endif
 
     usbLib->findDevices();
@@ -116,8 +109,12 @@ bool LibUsb::find()
 void LibUsb::close()
 {
 #ifdef WIN32
-    if (libNotInstalled) return;
+    if (!usbLib->isLibUsbInstalled())
+    {
+        return;
+    }
 #endif
+
     if (!device)
     {
         return;
@@ -134,16 +131,24 @@ void LibUsb::close()
 int LibUsb::read(char *buf, int bytes)
 {
 #ifdef WIN32
-    if (libNotInstalled) return -1;
+    if (!usbLib->isLibUsbInstalled())
+    {
+        return -1;
+    }
 #endif
+
 	return this->read(buf, bytes, 125);
 }
 
 int LibUsb::read(char *buf, int bytes, int timeout)
 {
 #ifdef WIN32
-    if (libNotInstalled) return -1;
+    if (!usbLib->isLibUsbInstalled())
+    {
+        return -1;
+    }
 #endif
+
     // check it isn't closed already
     if (!device) return -1;
 
@@ -197,15 +202,22 @@ int LibUsb::read(char *buf, int bytes, int timeout)
 int LibUsb::write(char *buf, int bytes)
 {
 #ifdef WIN32
-    if (libNotInstalled) return -1;
+    if (!usbLib->isLibUsbInstalled())
+    {
+        return -1;
+    }
 #endif
+
 	return this->write(buf, bytes, 125);
 }
 
 int LibUsb::write(char *buf, int bytes, int timeout)
 {
 #ifdef WIN32
-    if (libNotInstalled) return -1;
+    if (!usbLib->isLibUsbInstalled())
+    {
+        return -1;
+    }
 #endif
 
     // check it isn't closed
@@ -226,7 +238,7 @@ int LibUsb::write(char *buf, int bytes, int timeout)
         // Report timeouts - previously we ignored -110 errors. This masked a serious
         // problem with write on Linux/Mac, the USB stick needed a reset to avoid
         // these error messages, so we DO report them now
-        qDebug()<<"usb_interrupt_write Error writing ["<<rc<<"]: "<< usb_strerror();
+        qDebug() << "usb_interrupt_write Error writing [" << rc << "]: " << usbLib->getErrorMessage(rc);
     }
 
     return rc < 0 ? rc : bytesWritten;
@@ -315,11 +327,6 @@ UsbDevice* LibUsb::getDevice() const
 //      stage is to control two stage loading, we load in a single stage
 UsbDeviceHandle* LibUsb::openFortius()
 {
-
-#ifdef WIN32
-    if (libNotInstalled) return NULL;
-#endif
-
     UsbDevice *dev;
     UsbDeviceHandle *udev = NULL;
 
@@ -385,10 +392,6 @@ UsbDeviceHandle* LibUsb::openFortius()
 
 UsbDeviceHandle* LibUsb::openAntStick()
 {
-#ifdef WIN32
-    if (libNotInstalled) return NULL;
-#endif
-
     UsbDevice *dev;
     UsbDeviceHandle *udev = NULL;
 
@@ -438,7 +441,7 @@ UsbDeviceHandle* LibUsb::openUsb(UsbDevice *dev, bool detachKernelDriver)
             int rc = udev->setConfiguration(1);
             if (rc < 0)
             {
-                qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
+                qDebug() << "usb_set_configuration Error: " << usbLib->getErrorMessage(rc);
                 if (OperatingSystem == LINUX)
                 {
                     // looks like the udev rule has not been implemented
@@ -451,13 +454,19 @@ UsbDeviceHandle* LibUsb::openUsb(UsbDevice *dev, bool detachKernelDriver)
             }
 
             rc = udev->claimInterface(intf->interfaceNumber());
-            if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
+            if (rc < 0)
+            {
+                qDebug() << "usb_claim_interface Error: " << usbLib->getErrorMessage(rc);
+            }
 
             if (OperatingSystem != OSX)
             {
                 // fails on Mac OS X, we don't actually need it anyway
                 rc = udev->setAltInterface(intf->interfaceNumber(), intf->alternateSetting());
-                if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+                if (rc < 0)
+                {
+                    qDebug() << "usb_set_altinterface Error: " << usbLib->getErrorMessage(rc);
+                }
             }
 
             return udev;

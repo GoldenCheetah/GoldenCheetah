@@ -26,8 +26,6 @@
 #include <windows.h>
 #endif
 
-#include <usb.h> // for the constants etc
-
 #include "LibUsbLib.h"
 
 #define GARMIN_USB2_VID   0x0fcf
@@ -73,15 +71,6 @@ private:
     int type;
 
     LibUsbLib *usbLib;
-
-#ifdef WIN32
-    bool libNotInstalled;
-    typedef char* (*PrototypeChar_Void)();
-
-
-    PrototypeChar_Void usb_strerror;
-
-#endif
 };
 #endif
 #endif // gc_LibUsb_h
