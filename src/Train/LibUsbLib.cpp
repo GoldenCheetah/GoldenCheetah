@@ -32,6 +32,7 @@ extern "C" {
 class UsbDeviceHandle::Impl
 {
 public:
+    ~Impl();
     void clearHalt(int endpoint);
     void releaseInterface(int interfaceNumber);
     void reset();
@@ -47,6 +48,7 @@ public:
     PrototypeInt_Handle_Int usb_clear_halt;
     PrototypeInt_Handle_Int usb_release_interface;
     PrototypeInt_Handle usb_reset;
+    PrototypeInt_Handle usb_close;
 #endif
 };
 
@@ -112,6 +114,11 @@ public:
 //-----------------------------------------------------------------------------
 // UsbDeviceHandle::Impl
 //
+UsbDeviceHandle::Impl::~Impl()
+{
+    usb_close(handle);
+}
+
 void UsbDeviceHandle::Impl::clearHalt(int endpoint)
 {
     usb_clear_halt(handle, endpoint);
@@ -133,6 +140,7 @@ void UsbDeviceHandle::Impl::libInit(QLibrary *lib)
     usb_clear_halt = PrototypeInt_Handle_Int(lib->resolve("usb_clear_halt"));
     usb_release_interface = PrototypeInt_Handle_Int(lib->resolve("usb_release_interface"));
     usb_reset = PrototypeInt_Handle(lib->resolve("usb_reset"));
+    usb_close = PrototypeInt_Handle(lib->resolve("usb_close"));
 }
 #endif
 //-----------------------------------------------------------------------------

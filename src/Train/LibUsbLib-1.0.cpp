@@ -96,6 +96,7 @@ UsbDeviceHandle::UsbDeviceHandle() : impl(new Impl)
 
 UsbDeviceHandle::~UsbDeviceHandle()
 {
+    libusb_close(impl->handle);
     delete impl;
 }
 

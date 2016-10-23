@@ -57,7 +57,6 @@ LibUsb::LibUsb(int type) : type(type), usbLib(new LibUsbLib)
 
     // get the Functions for all used signatures
 
-    usb_close = PrototypeInt_Handle(lib.resolve("usb_close"));
     usb_bulk_read = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_read"));
     usb_bulk_write = PrototypeInt_Handle_Int_Char_Int_Int(lib.resolve("usb_bulk_write"));
     usb_set_configuration = PrototypeInt_Handle_Int(lib.resolve("usb_set_configuration"));
@@ -139,7 +138,6 @@ void LibUsb::close()
     delete intf;
     intf = NULL;
 
-    usb_close(device->rawHandle());
     delete device;
     device = NULL;
 }
@@ -354,7 +352,6 @@ UsbDeviceHandle* LibUsb::openFortius()
             }
 
             // Now close the connection, our work here is done
-            usb_close(udev->rawHandle());
             delete udev;
             udev = NULL;
 
@@ -417,7 +414,6 @@ UsbDeviceHandle* LibUsb::openAntStick()
         if ((udev = dev->open()))
         {
             udev->reset();
-            usb_close(udev->rawHandle());
             delete udev;
             udev = NULL;
         }
@@ -477,7 +473,6 @@ UsbDeviceHandle* LibUsb::openUsb(UsbDevice *dev, bool detachKernelDriver)
             return udev;
         }
 
-        usb_close(udev->rawHandle());
         delete udev;
     }
 
