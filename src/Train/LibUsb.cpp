@@ -29,11 +29,6 @@
 #include <unistd.h>
 #endif
 
-// EZ-USB firmware loader for Fortius
-extern "C" {
-#include "EzUsb.h"
-}
-
 #include "LibUsb.h"
 #include "Settings.h"
 #include "Context.h"
@@ -339,7 +334,7 @@ UsbDeviceHandle* LibUsb::openFortius()
             if ((udev = dev->open()))
             {
                 // LOAD THE FIRMWARE
-                ezusb_load_ram (udev->rawHandle(), appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0);
+                udev->loadRam(appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1());
             }
 
             // Now close the connection, our work here is done

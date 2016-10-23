@@ -19,10 +19,6 @@
 #ifndef gc_LibUsbLib_h
 #define gc_LibUsbLib_h
 
-// REMOVE ME!!!!!!!!!!!!
-#include <usb.h>
-// REMOVE ME!!!!!!!!!!!!
-
 #include <QVector>
 
 
@@ -46,14 +42,11 @@ public:
     int setConfiguration(int configuration);
     int claimInterface(int interfaceNumber);
     int setAltInterface(int interfaceNumber, int altSetting);
+    void loadRam(const char *path);
 
 #ifdef Q_OS_LINUX
     void detachKernelDriver(int interfaceNumber);
 #endif
-
-    // REMOVE ME!!!!!!!!!!!!
-    usb_dev_handle* rawHandle() const;
-    // REMOVE ME!!!!!!!!!!!!
 
 private:
     UsbDeviceHandle(const UsbDeviceHandle&);

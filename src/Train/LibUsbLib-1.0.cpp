@@ -186,12 +186,10 @@ int UsbDeviceHandle::setAltInterface(int interfaceNumber, int altSetting)
     return rc;
 }
 
-// REMOVE ME!!!!!!!!!!!!
-usb_dev_handle* UsbDeviceHandle::rawHandle() const
+void UsbDeviceHandle::loadRam(const char *path)
 {
-    return NULL;
+    ezusb_load_ram(impl->handle, path, 0, 0, 0);
 }
-// REMOVE ME!!!!!!!!!!!!
 //-----------------------------------------------------------------------------
 
 
@@ -239,11 +237,7 @@ UsbDevice::Impl::~Impl()
 
 #define USB_CONFIG_DESCRIPTOR libusb_config_descriptor
 #define USB_INTERFACE_DESCRIPTOR libusb_interface_descriptor
-
-// UNCOMMENT ME!!!!!!!!!!!
-//#define USB_ENDPOINT_DIR_MASK LIBUSB_ENDPOINT_DIR_MASK
-// UNCOMMENT ME!!!!!!!!!!!
-
+#define USB_ENDPOINT_DIR_MASK LIBUSB_ENDPOINT_DIR_MASK
 #include "LibUsbLib_UsbDeviceImplGetInterface.cpp"
 //-----------------------------------------------------------------------------
 
