@@ -40,6 +40,7 @@ public:
     int bulkWrite(int endpoint, char *bytes, int size, int timeout);
     int interruptWrite(int endpoint, char *bytes, int size, int timeout);
     int setConfiguration(int configuration);
+    int claimInterface(int interfaceNumber);
 
     usb_dev_handle *handle;
 
@@ -58,6 +59,7 @@ public:
     PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_write;
     PrototypeInt_Handle_Int_Char_Int_Int usb_interrupt_write;
     PrototypeInt_Handle_Int usb_set_configuration;
+    PrototypeInt_Handle_Int usb_claim_interface;
 #endif
 };
 
@@ -163,6 +165,11 @@ int UsbDeviceHandle::Impl::setConfiguration(int configuration)
     return usb_set_configuration(handle, configuration);
 }
 
+int UsbDeviceHandle::Impl::claimInterface(int interfaceNumber)
+{
+    return usb_claim_interface(handle, interfaceNumber);
+}
+
 #ifdef WIN32
 void UsbDeviceHandle::Impl::libInit(QLibrary *lib)
 {
@@ -174,6 +181,7 @@ void UsbDeviceHandle::Impl::libInit(QLibrary *lib)
     usb_bulk_write = PrototypeInt_Handle_Int_Char_Int_Int(lib->resolve("usb_bulk_write"));
     usb_interrupt_write = PrototypeInt_Handle_Int_Char_Int_Int(lib->resolve("usb_interrupt_write"));
     usb_set_configuration = PrototypeInt_Handle_Int(lib->resolve("usb_set_configuration"));
+    usb_claim_interface = PrototypeInt_Handle_Int(lib->resolve("usb_claim_interface"));
 }
 #endif
 //-----------------------------------------------------------------------------
@@ -238,6 +246,11 @@ void UsbDeviceHandle::detachKernelDriver(int interfaceNumber)
     usb_detach_kernel_driver_np(impl->handle, interfaceNumber);
 }
 #endif
+
+int UsbDeviceHandle::claimInterface(int interfaceNumber)
+{
+    return impl->claimInterface(interfaceNumber);
+}
 
 // REMOVE ME!!!!!!!!!!!!
 usb_dev_handle* UsbDeviceHandle::rawHandle() const
