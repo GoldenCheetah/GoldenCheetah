@@ -27,6 +27,31 @@
 
 
 //-----------------------------------------------------------------------------
+// UsbDeviceHandle
+//
+class UsbDeviceHandle
+{
+    friend class UsbDevice;
+
+public:
+    UsbDeviceHandle();
+    ~UsbDeviceHandle();
+
+    // REMOVE ME!!!!!!!!!!!!
+    usb_dev_handle* rawHandle() const;
+    // REMOVE ME!!!!!!!!!!!!
+
+private:
+    UsbDeviceHandle(const UsbDeviceHandle&);
+    UsbDeviceHandle& operator=(const UsbDeviceHandle&);
+
+    class Impl;
+    Impl *impl;
+};
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
 // UsbDeviceInterface
 //
 class UsbDeviceInterface
@@ -71,10 +96,7 @@ public:
     int deviceAddress() const;
 
     UsbDeviceInterface* getInterface();
-
-    // REMOVE ME!!!!!!!!!!!!
-    struct usb_device* rawDev() const;
-    // REMOVE ME!!!!!!!!!!!!
+    UsbDeviceHandle* open();
 
 private:
     UsbDevice(const UsbDevice&);

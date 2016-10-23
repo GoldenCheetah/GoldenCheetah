@@ -33,6 +33,13 @@ public:
 //-----------------------------------------------------------------------------
 // Declarations
 //
+class UsbDeviceHandle::Impl
+{
+public:
+    libusb_device_handle *handle;
+};
+
+
 class UsbDeviceInterface::Impl
 {
 public:
@@ -49,6 +56,7 @@ public:
     ~Impl();
     UsbDeviceInterface* getInterface(libusb_config_descriptor *configDescriptor);
 
+    LibUsbLibUtils *utils;
     libusb_device *dev = NULL;
     int vendorId = 0;
     int productId = 0;
@@ -75,6 +83,27 @@ void LibUsbLibUtils::logError(const char *fctName, int errorCode) const
     qDebug().nospace() << "Error in function '" << fctName << "'. ErrorCode=" << errorCode
              << ". ErrorMessage: '" << libusb_error_name(errorCode) << "'";
 }
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+// UsbDeviceHandle
+//
+UsbDeviceHandle::UsbDeviceHandle() : impl(new Impl)
+{
+}
+
+UsbDeviceHandle::~UsbDeviceHandle()
+{
+    delete impl;
+}
+
+// REMOVE ME!!!!!!!!!!!!
+usb_dev_handle* UsbDeviceHandle::rawHandle() const
+{
+    return NULL;
+}
+// REMOVE ME!!!!!!!!!!!!
 //-----------------------------------------------------------------------------
 
 
@@ -178,12 +207,21 @@ UsbDeviceInterface* UsbDevice::getInterface()
     return interface;
 }
 
-// REMOVE ME!!!!!!!!!!!!
-struct usb_device* UsbDevice::rawDev() const
+UsbDeviceHandle* UsbDevice::open()
 {
-    return NULL;
+    libusb_device_handle *handle;
+    int rc = libusb_open(impl->dev, &handle);
+    if (rc < 0)
+    {
+        impl->utils->logError("libusb_open", rc);
+        libusb_close(handle);
+        return NULL;
+    }
+
+    UsbDeviceHandle *usbHandle = new UsbDeviceHandle;
+    usbHandle->impl->handle = handle;
+    return usbHandle;
 }
-// REMOVE ME!!!!!!!!!!!!
 //-----------------------------------------------------------------------------
 
 
@@ -260,6 +298,7 @@ bool LibUsbLib::getDevices(QVector<UsbDevice *> &deviceList)
         }
 
         UsbDevice *device = new UsbDevice;
+        device->impl->utils = impl->utils;
         device->impl->dev = rawDev;
         device->impl->vendorId = deviceDescriptor.idVendor;
         device->impl->productId = deviceDescriptor.idProduct;
