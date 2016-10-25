@@ -129,12 +129,10 @@ static int ezusb_write(libusb_device_handle *device, const char *label,
 		LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
 		opcode, addr & 0xFFFF, addr >> 16,
 		(unsigned char*)data, (uint16_t)len, 1000);
-	if (status != len) {
-		if (status < 0)
-			printf("%s: %s\n", label, libusb_error_name(status));
-		else
-			printf("%s ==> %d\n", label, status);
-	}
+    if (status < 0)
+        printf("%s: %s\n", label, libusb_error_name(status));
+    else if ((unsigned)status != len)
+        printf("%s ==> %d\n", label, status);
 	return (status < 0) ? -EIO : 0;
 }
 
@@ -152,12 +150,10 @@ static int ezusb_read(libusb_device_handle *device, const char *label,
 		LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
 		opcode, addr & 0xFFFF, addr >> 16,
 		(unsigned char*)data, (uint16_t)len, 1000);
-	if (status != len) {
-		if (status < 0)
-			printf("%s: %s\n", label, libusb_error_name(status));
-		else
-			printf("%s ==> %d\n", label, status);
-	}
+    if (status < 0)
+        printf("%s: %s\n", label, libusb_error_name(status));
+    else if ((unsigned)status != len)
+        printf("%s ==> %d\n", label, status);
 	return (status < 0) ? -EIO : 0;
 }
 
