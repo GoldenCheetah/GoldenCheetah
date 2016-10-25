@@ -1014,7 +1014,7 @@ AllPlotWindow::refreshCustomTable(int indexSelectedItem)
     header << tr("Name") << tr("Formula"); 
     customTable->setHorizontalHeaderLabels(header);
 
-    QTableWidgetItem *selected = new QTableWidgetItem();
+    QTableWidgetItem *selected = NULL;
     // now lets add a row for each metric
     customTable->setRowCount(userDataSeries.count());
     int i=0;
