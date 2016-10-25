@@ -145,10 +145,11 @@ void sigabort(int x)
 void nostderr(QString dir)
 {
     // redirect stderr to a file
-    QFile *fp = new QFile(QString("%1/goldencheetah.log").arg(dir));
-    if (fp->open(QIODevice::WriteOnly|QIODevice::Truncate) == true) {
-        close(2);
-        if(dup(fp->handle()) == -1) fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
+    QFile fp(QString("%1/goldencheetah.log").arg(dir));
+    if (fp.open(QIODevice::WriteOnly|QIODevice::Truncate) == true) {
+        close(STDERR_FILENO);
+        if(dup(fp.handle()) != STDERR_FILENO) fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
+        fp.close();
     } else {
         fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
     }
