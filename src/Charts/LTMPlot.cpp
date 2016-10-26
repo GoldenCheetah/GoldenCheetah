@@ -793,6 +793,49 @@ LTMPlot::setData(LTMSettings *set)
                     curves.insert(trendSymbol, trend);
                 }
             }
+
+            // Simple Average
+            if (metricDetail.trendtype == 4 && count > 2) {
+
+                // override class variable as doing it temporarily for trend line only
+                double maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
+                    groupForDate(settings->start.date(), settings->groupBy);
+
+                QString trendName = QString(tr("%1 average")).arg(metricDetail.uname);
+                QString trendSymbol = QString("%1_trend")
+                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
+                                       metricDetail.bestSymbol : metricDetail.symbol);
+
+                QwtPlotCurve *trend = new QwtPlotCurve(trendName);
+                trend->setVisible(!metricDetail.hidden);
+
+                // cosmetics
+                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                cpen.setWidth(2); // double thickness for trend lines
+                cpen.setStyle(Qt::SolidLine);
+                trend->setPen(cpen);
+                if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true)
+                    trend->setRenderHint(QwtPlotItem::RenderAntialiased);
+                trend->setBaseline(0);
+                trend->setYAxis(axisid);
+                trend->setStyle(QwtPlotCurve::Lines);
+
+                // perform simple average
+                LTMTrend regress(xdata.data(), ydata.data(), count);
+                double xtrend[2], ytrend[2];
+                xtrend[0] = 0.0;
+                ytrend[0] = regress.getYavg();
+                // point 2 is at far right of chart, not the last point
+                // since we may be forecasting...
+                xtrend[1] = maxX;
+                ytrend[1] = regress.getYavg();
+                trend->setSamples(xtrend,ytrend, 2);
+
+                trend->attach(this);
+                trend->setItemAttribute(QwtPlotItem::Legend, false);
+                curves.insert(trendSymbol, trend);
+
+            }
         }
 
         // highlight outliers
