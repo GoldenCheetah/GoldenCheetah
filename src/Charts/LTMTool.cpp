@@ -2025,6 +2025,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     trendType->addItem(tr("Linear Trend"));
     trendType->addItem(tr("Quadratic Trend"));
     trendType->addItem(tr("Moving Average"));
+    trendType->addItem(tr("Simple Average"));
     trendType->setCurrentIndex(metricDetail->trendtype);
 
     // add to grid
