@@ -28,6 +28,7 @@ class LTMTrend
         double getYforX(double x) const { return (a + b * x); }
         double intercept() { return a; }
         double slope() { return b; }
+        double getYavg() { return points > 0 ? sumY / (double)points : 0.0; }
 
         double minX, maxX, minY, maxY; // for the data set we have
 
