@@ -612,5 +612,7 @@ main(int argc, char *argv[])
 
     } while (restarting);
 
+    delete application;
+
     return ret;
 }
