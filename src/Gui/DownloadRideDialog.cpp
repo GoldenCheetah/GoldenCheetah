@@ -26,6 +26,7 @@
 #include "JsonRideFile.h"
 #include "HelpWhatsThis.h"
 #include "RideItem.h"
+#include "RideMetadata.h"
 #include <assert.h>
 #include <errno.h>
 #include <QtGui>
@@ -440,6 +441,11 @@ DownloadRideDialog::downloadClicked()
             // add Source File Tag + New File Name
             ride->setTag("Source Filename", filename);
             ride->setTag("Filename", targetFileName);
+            // add Sport Tag when device is bike only
+            if (devtype->isBikeOnly()) ride->setTag("Sport", "Bike");
+            // process linked defaults
+            context->athlete->rideMetadata()->setLinkedDefaults(ride);
+
             JsonFileReader reader;
             // write to tempActivties first (until RideCache is updated without crash)
             targetFileTmpActivitiesName = context->athlete->home->tmpActivities().canonicalPath() + "/" + targetFileName;
