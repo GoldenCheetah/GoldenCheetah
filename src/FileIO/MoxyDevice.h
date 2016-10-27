@@ -36,6 +36,7 @@ struct MoxyDevices : public Devices
     virtual QString downloadInstructions() const;
     virtual bool canCleanup( void ) {return true; };
     virtual bool canPreview() { return false; }; // Moxy is dumb ass
+    virtual bool isBikeOnly() { return false; }; // Moxy is multisport
 };
 
 struct MoxyDevice : public Device,QThread
