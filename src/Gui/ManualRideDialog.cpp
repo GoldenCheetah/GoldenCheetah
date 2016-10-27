@@ -522,6 +522,9 @@ ManualRideDialog::okClicked()
         rideFile->metricOverrides.insert("total_work", override);
     }
 
+    // process linked defaults
+    context->athlete->rideMetadata()->setLinkedDefaults(rideFile);
+
     // what should the filename be?
     QChar zero = QLatin1Char ('0');
     QString basename = QString ("%1_%2_%3_%4_%5_%6")
