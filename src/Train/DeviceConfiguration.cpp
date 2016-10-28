@@ -172,22 +172,26 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
 }
 
 const QStringList
-WheelSize::RIM_SIZES = QStringList() << "--" << "700c/29er" << "650b/27.5\"" << "650c" << "26\"";
+WheelSize::RIM_SIZES = QStringList() << "--" << "700c/29er/622mm" << "650b/27.5\"/584mm" << "650c/571mm" << "26\"/559mm";
 
-static const float RIM_DIAMETERS[] = {0, 622, 571, 559};
+static const float RIM_DIAMETERS[] = {0, 622, 584, 571, 559};
 
 const QStringList
 WheelSize::TIRE_SIZES = QStringList() << "--" << "20mm" << "23mm" << "25mm" << "28mm" << "1.00\"" << "1.50\"" << "1.75\"" << "1.90\"" << "1.95\"" << "2.00\"" << "2.10\"" << "2.125\"";
 
-                                    // -- 20mm 23mm 25mm 28mm 1.00"  1.50"  1.75"  1.90"  1.95" 2.00"  2.10"  2.125"
-static const float TIRE_DIAMETERS[] = {0, 40,  46,  50,  56,  50.8,  76.2,  88.9,  96.5,  99,   101.6, 106.7, 108};
+                                    // -- 20mm 23mm 25mm 28mm 1.00"  1.50"  1.75"  1.90"  1.95"  2.00"  2.10"  2.125"
+static const float TIRE_DIAMETERS[] = {0, 40,  46,  50,  56,  50.8,  76.2,  88.9,  96.5,  99.1,  101.6, 106.7, 108};
 
 int
 WheelSize::calcPerimeter(int rimSizeIndex, int tireSizeIndex)
 {
     // http://www.bikecalc.com/wheel_size_math
 
-    if (rimSizeIndex>0 && rimSizeIndex<4 && tireSizeIndex<14) {
+    if (rimSizeIndex>=0
+        && rimSizeIndex<static_cast<int>(sizeof(RIM_DIAMETERS)/sizeof(*RIM_DIAMETERS))
+        && tireSizeIndex>=0
+        && tireSizeIndex<=static_cast<int>(sizeof(TIRE_DIAMETERS)/sizeof(*TIRE_DIAMETERS))) {
+
         float rim = RIM_DIAMETERS[rimSizeIndex];
         float tire = TIRE_DIAMETERS[tireSizeIndex];
 
