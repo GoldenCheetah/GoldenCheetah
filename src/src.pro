@@ -411,12 +411,23 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
 
 !isEmpty(LIBUSB_INSTALL) {
 
-    # we will work out the rest if you tell use where it is installed
-    isEmpty(LIBUSB_INCLUDE) { LIBUSB_INCLUDE = $${LIBUSB_INSTALL}/include }
-    isEmpty(LIBUSB_LIBS)    {
-        # needs fixing for msvc toolchain
-        unix  { LIBUSB_LIBS = -L$${LIBUSB_INSTALL}/lib -lusb }
-        win32 { LIBUSB_LIBS = -L$${LIBUSB_INSTALL}/lib/gcc -lusb }
+    unix:!macx {
+        # libusb-compat
+        INCLUDEPATH += $${PWD}/../libusb-compat/libusb
+        LIBS        += $${PWD}/../libusb-compat/libusb/.libs/libusb.a
+
+        # libusb-1.0
+        # we will work out the rest if you tell use where it is installed
+        isEmpty(LIBUSB_INCLUDE) { LIBUSB_INCLUDE = $${LIBUSB_INSTALL}/include/libusb-1.0 }
+        isEmpty(LIBUSB_LIBS)    { LIBUSB_LIBS = -L$${LIBUSB_INSTALL}/lib -lusb-1.0 }
+    } else {
+        # we will work out the rest if you tell use where it is installed
+        isEmpty(LIBUSB_INCLUDE) { LIBUSB_INCLUDE = $${LIBUSB_INSTALL}/include }
+        isEmpty(LIBUSB_LIBS)    {
+            # needs fixing for msvc toolchain
+            unix  { LIBUSB_LIBS = -L$${LIBUSB_INSTALL}/lib -lusb }
+            win32 { LIBUSB_LIBS = -L$${LIBUSB_INSTALL}/lib/gcc -lusb }
+        }
     }
 
     DEFINES     += GC_HAVE_LIBUSB

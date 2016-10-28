@@ -1,7 +1,7 @@
 TEMPLATE = subdirs
 SUBDIRS = qwt
 unix:!macx {
-    SUBDIRS += kqoauth
+    SUBDIRS += kqoauth libusb-compat
 }
 SUBDIRS += src
 CONFIG += ordered
