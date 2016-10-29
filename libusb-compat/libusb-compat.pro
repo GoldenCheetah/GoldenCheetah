@@ -6,6 +6,9 @@
 
 include(../src/gcconfig.pri)
 
+# Hack: Using subdirs template enables build in QtCreator
+TEMPLATE = subdirs
+
 MAKEFILE = Makefile.phony
 
 !isEmpty(LIBUSB_INSTALL) {
