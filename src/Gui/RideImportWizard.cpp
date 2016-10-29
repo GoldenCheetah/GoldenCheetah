@@ -441,7 +441,7 @@ RideImportWizard::process()
 
         // get fullpath name for processing
         QFileInfo thisfile(filenames[i]);
-        if (!thisfile.exists())  tableWidget->item(i,5)->setText(tr("Error - File does not exit."));
+        if (!thisfile.exists())  tableWidget->item(i,5)->setText(tr("Error - File does not exist."));
         else if (!thisfile.isFile())  tableWidget->item(i,5)->setText(tr("Error - Not a file."));
         else if (!thisfile.isReadable())  tableWidget->item(i,5)->setText(tr("Error - File is not readable."));
         else {
