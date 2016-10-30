@@ -73,6 +73,7 @@ class DanielsPoints : public RideMetric {
 
         static const double EPSILON = 0.1;
         static const double NEGLIGIBLE = 0.1;
+        int loops = 0;
 
         double secsDelta = item->ride()->recIntSecs();
         double sampsPerWindow = 25.0 / secsDelta;
@@ -84,6 +85,7 @@ class DanielsPoints : public RideMetric {
 
         score = 0.0;
         double cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
+
 
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
@@ -99,7 +101,9 @@ class DanielsPoints : public RideMetric {
             lastSecs = point->secs;
             inc(secsDelta, weighted, cp);
         }
-        while (weighted > NEGLIGIBLE) {
+
+        // we must limit this loop, it could end up looping forever (and did before we constrained it)
+        while (++loops < 10000 && !std::isnan(weighted) && !std::isinf(weighted) && weighted > NEGLIGIBLE) {
             weighted *= attenuation;
             lastSecs += secsDelta;
             inc(secsDelta, weighted, cp);
