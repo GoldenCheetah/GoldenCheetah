@@ -91,6 +91,7 @@ private:
 
     QStringList deleteMe; // list of temp files created during import
 
+    enum { READY, RUNNING, DONE } _importState;
 
 };
 
