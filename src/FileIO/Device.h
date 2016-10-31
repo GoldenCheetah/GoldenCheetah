@@ -105,6 +105,8 @@ struct Devices
 
     virtual QString downloadInstructions() const { return ""; };
 
+    virtual bool isBikeOnly() { return true; }; // Most supported devices are !
+
     static QList<QString> typeNames();
     static DevicesPtr getType(const QString &deviceTypeName );
     static bool addType(const QString &deviceTypeName, DevicesPtr p );
