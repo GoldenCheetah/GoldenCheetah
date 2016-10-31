@@ -108,7 +108,7 @@ struct FitFileReaderState
     QMap<int, FitDefinition> local_msg_types;
     QMap<QString, FitDeveField>  local_deve_fields; // All developer fields
     QMap<int, int> record_extra_fields;
-    QMap<QString, int> record_deve_fields; // Developer fields in DEVELOPER XDATA
+    QMap<QString, int> record_deve_fields; // Developer fields in DEVELOPER XDATA or STANDARD DATA
     QMap<QString, int> record_deve_native_fields; // Developer fields with native values
     QSet<int> record_native_fields;
     QSet<int> unknown_record_fields, unknown_global_msg_nums, unknown_base_type;
@@ -130,7 +130,7 @@ struct FitFileReaderState
     XDataSeries *deveXdata;
     XDataSeries *extraXdata;
     QMap<int, QString> deviceInfos;
-    QList<QString> xdataInfos;
+    QList<QString> dataInfos;
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
@@ -474,6 +474,44 @@ struct FitFileReaderState
             default:
                     return RideFile::none;
         }
+    }
+
+    void addRecordDeveField(QString key, FitDeveField deveField, bool xdata) {
+        QString name = deveField.name.c_str();
+
+        if (deveField.native>-1) {
+            int i = 0;
+            RideFile::SeriesType series = getSeriesForNative(deveField.native);
+            QString nativeName = rideFile->symbolForSeries(series);
+
+            if (nativeName.length() == 0)
+                nativeName = QString("FIELD_%1").arg(deveField.native);
+            else
+                i++;
+
+            QString typeName;
+            if (xdata) {
+                typeName = "DEVELOPER";
+                do {
+                    i++;
+                    name = nativeName + (i>1?QString("-%1").arg(i):"");
+                }
+                while (deveXdata->valuename.contains(name));
+            }
+            else {
+                typeName = "STANDARD";
+                name = nativeName;
+            }
+            dataInfos.append(QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg(typeName).arg(name));
+        }
+
+        if (xdata) {
+            deveXdata->valuename << name;
+            deveXdata->unitname << deveField.unit.c_str();
+
+            record_deve_fields.insert(key, deveXdata->valuename.count()-1);
+        } else
+            record_deve_fields.insert(key, -1);
     }
 
     void decodeFileId(const FitDefinition &def, int,
@@ -976,22 +1014,41 @@ struct FitFileReaderState
             fit_value_t value = values[i].v;
             QList<fit_value_t> valueList = values[i++].list;
 
+            double deve_value = 0.0;
+
             if( value == NA_VALUE )
                 continue;
 
             int native_num = field.num;
-            qDebug()<< "native_num"<<native_num;
 
             if (field.deve_idx>-1) {
                 QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
-                qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
-                qDebug() << "name" << local_deve_fields[key].name.c_str() << "unit" << local_deve_fields[key].unit.c_str() << local_deve_fields[key].offset << "(" << _values.v << _values.f << ")";
+                //qDebug() << "deve_idx" << field.deve_idx << "num" << field.num << "type" << field.type;
+                //qDebug() << "name" << local_deve_fields[key].name.c_str() << "unit" << local_deve_fields[key].unit.c_str() << local_deve_fields[key].offset << "(" << _values.v << _values.f << ")";
 
-                if (record_deve_native_fields.contains(key) && !record_native_fields.contains(record_deve_native_fields[key]))
+                if (record_deve_native_fields.contains(key) && !record_native_fields.contains(record_deve_native_fields[key])) {
                     native_num = record_deve_native_fields[key];
+
+                    int scale = local_deve_fields[key].scale;
+                    if (scale == -1)
+                        scale = 1;
+                    int offset = local_deve_fields[key].offset;
+                    if (offset == -1)
+                        offset = 0;
+
+                    switch (_values.type) {
+                        case SingleValue: deve_value=_values.v/(float)scale+offset; break;
+                        case FloatValue: deve_value=_values.f/(float)scale+offset; break;
+                        default: deve_value = 0.0; break;
+                    }
+                    //qDebug() << "deve_value" << deve_value;
+                }
                 else
                     native_num = -1;
+
+                //qDebug()<< "native_num"<<native_num;
             } else {
+                //qDebug()<< "native_num"<<native_num;
                 if (!record_native_fields.contains(native_num))
                     record_native_fields.insert(native_num);
             }
@@ -1013,7 +1070,10 @@ struct FitFileReaderState
                             lngi = value;
                             break;
                     case 2: // ALTITUDE
-                            alt = value / 5.0 - 500.0;
+                            if (field.deve_idx>-1)
+                                alt = deve_value;
+                            else
+                                alt = value / 5.0 - 500.0;
                             break;
                     case 3: // HEART_RATE
                             hr = value;
@@ -1055,14 +1115,20 @@ struct FitFileReaderState
                              break;
 
                     case 39: // VERTICAL OSCILLATION
-                             rvert = value / 100.0f;
+                             if (field.deve_idx>-1)
+                                rvert = deve_value;
+                             else
+                                rvert = value / 100.0f;
                              break;
 
                     //case 40: // GROUND CONTACT TIME PERCENT
                              //break;
 
                     case 41: // GROUND CONTACT TIME
-                             rcontact = value / 10.0f;
+                             if (field.deve_idx>-1)
+                                 rcontact = deve_value;
+                             else
+                                rcontact = value / 10.0f;
                              break;
 
                     //case 42: // ACTIVITY_TYPE
@@ -1092,10 +1158,16 @@ struct FitFileReaderState
                                  cad += value/128.0f;
                              break;
                     case 54: // tHb
-                             tHb= value/100.0f;
+                             if (field.deve_idx>-1)
+                                tHb = deve_value;
+                             else
+                                tHb= value/100.0f;
                              break;
                     case 57: // SMO2
-                             smO2= value/10.0f;
+                             if (field.deve_idx>-1)
+                                 smO2 = deve_value;
+                             else
+                                 smO2= value/10.0f;
                              break;
                     case 61: // ? GPS Altitude ? or atmospheric pressure ?
                              break;
@@ -1147,39 +1219,8 @@ struct FitFileReaderState
                     QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
                     FitDeveField deveField = local_deve_fields[key];
 
-                    int scale = deveField.scale;
-                    if (scale == -1)
-                        scale = 1;
-                    int offset = deveField.offset;
-                    if (offset == -1)
-                        offset = 0;
-
                     if (!record_deve_fields.contains(key)) {
-                        QString name = deveField.name.c_str();
-
-                        if (deveField.native>-1) {
-                            int i = 0;
-                            RideFile::SeriesType series = getSeriesForNative(deveField.native);
-                            QString nativeName = rideFile->symbolForSeries(series);
-
-                            if (nativeName.length() == 0)
-                                nativeName = QString("FIELD_%1").arg(deveField.native);
-                            else
-                                i++;
-
-                            do {
-                                i++;
-                                name = nativeName + (i>1?QString("-%1").arg(i):"");
-                            }
-                            while (deveXdata->valuename.contains(name));
-                            
-                            xdataInfos.append(QString("DEVELOPER %1 : Field %2").arg(name).arg(deveField.name.c_str()));
-                        }
-
-                        deveXdata->valuename << name;
-                        deveXdata->unitname << deveField.unit.c_str();
-
-                        record_deve_fields.insert(key, record_deve_fields.count());
+                        addRecordDeveField(key, deveField, true);
                     }
                     idx = record_deve_fields[key];
 
@@ -1189,6 +1230,13 @@ struct FitFileReaderState
                                  _values.type == FloatValue ||
                                  _values.type == StringValue))
                            p_deve = new XDataPoint();
+
+                        int scale = deveField.scale;
+                        if (scale == -1)
+                            scale = 1;
+                        int offset = deveField.offset;
+                        if (offset == -1)
+                            offset = 0;
 
                         switch (_values.type) {
                             case SingleValue: p_deve->number[idx]=_values.v/(float)scale+offset; break;
@@ -1208,6 +1256,8 @@ struct FitFileReaderState
 
                         extraXdata->valuename << nativeName;
                         extraXdata->unitname << "";
+
+                        //dataInfos.append(QString("EXTRA %1").arg(nativeName));
 
                         record_extra_fields.insert(field.num, record_extra_fields.count());
                     }
@@ -1231,6 +1281,15 @@ struct FitFileReaderState
                 }
 
 
+            } else {
+                if (field.deve_idx>-1) {
+                    QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
+                    FitDeveField deveField = local_deve_fields[key];
+
+                    if (!record_deve_fields.contains(key)) {
+                        addRecordDeveField(key, deveField, false);
+                    }
+                }
             }
         }
 
@@ -1943,12 +2002,12 @@ struct FitFileReaderState
         if (fieldDef.native > -1 && !record_deve_native_fields.values().contains(fieldDef.native)) {
             record_deve_native_fields.insert(key, fieldDef.native);
 
-            RideFile::SeriesType series = getSeriesForNative(fieldDef.native);
+            /*RideFile::SeriesType series = getSeriesForNative(fieldDef.native);
 
             if (series != RideFile::none) {
                 QString nativeName = rideFile->symbolForSeries(series);
-                xdataInfos.append(QString("STANDARD %1 : Field %2").arg(nativeName).arg(fieldDef.name.c_str()));
-            }
+                dataInfos.append(QString("NATIVE %1 : Field %2").arg(nativeName).arg(fieldDef.name.c_str()));
+            }*/
         }
     }
 
@@ -2458,12 +2517,15 @@ struct FitFileReaderState
             foreach(QString info, deviceInfos) {
                 deviceInfo += info + "\n";
             }
-            if (deviceInfo.length()>0 && xdataInfos.count()>0)
-                 deviceInfo += "\n";
-            foreach(QString info, xdataInfos) {
-                deviceInfo += info + "\n";
+            if (deviceInfo.length()>0)
+                rideFile->setTag("Device Info", deviceInfo);
+
+            QString dataInfo;
+            foreach(QString info, dataInfos) {
+                dataInfo += info + "\n";
             }
-            rideFile->setTag("Device Info", deviceInfo);
+            if (dataInfo.length()>0)
+                rideFile->setTag("Data Info", dataInfo);
 
             file.close();
 
