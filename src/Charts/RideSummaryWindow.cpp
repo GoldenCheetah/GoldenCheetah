@@ -247,8 +247,8 @@ RideSummaryWindow::rideSelected()
 void
 RideSummaryWindow::rideItemChanged()
 {
-    // did it really change ?
-    if (!firstload && _connected == myRideItem) return;
+    // did it really change while visible ?
+    if (!firstload && _connected == myRideItem && !isVisible()) return;
 
     // ignore intervals changed if not set?
     justloaded = true;
