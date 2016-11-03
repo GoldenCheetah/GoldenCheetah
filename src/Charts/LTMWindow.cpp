@@ -1147,18 +1147,82 @@ LTMWindow::dataTable(bool html)
             summary += tr("Date");
         }
 
+        QList<QVector<double> > hdatas;
+        QList<QString> fontcolors;
+
+        // highlight
+        for (int a=0; a < settings.metrics.count(); a++) {
+            MetricDetail metricDetail = settings.metrics[a];
+
+            int brightness = metricDetail.penColor.red() *0.299 + metricDetail.penColor.green()*0.587 + metricDetail.penColor.blue()*0.114;
+            fontcolors.append( brightness > 128 ? "#000" : "#fff" );
+
+            // highlight lowest / top N values
+            if (metricDetail.lowestN > 0 || metricDetail.topN > 0) {
+                QMap<double, int> sortedList;
+
+                // copy the yvalues, retaining the offset
+                for(int i=0; i<columns[a].y.count(); i++) {
+                    // pmc metrics we highlight TROUGHS
+                    if (metricDetail.type == METRIC_STRESS || metricDetail.type == METRIC_PM) {
+                        if (i && i < (columns[a].y.count()-1) // not at start/end
+                            && ((columns[a].y[i-1] > columns[a].y[i] && columns[a].y[i+1] > columns[a].y[i]) || // is a trough
+                                (columns[a].y[i-1] < columns[a].y[i] && columns[a].y[i+1] < columns[a].y[i])))  // is a peak
+                            sortedList.insert(columns[a].y[i], i);
+                    } else
+                        sortedList.insert(columns[a].y[i], i);
+                }
+
+                // copy the top N values
+                QVector<double> hdata;
+                hdata.resize(metricDetail.topN + metricDetail.lowestN);
+
+
+                // QMap orders the list so start at the top and work
+                // backwards for topN
+                int counter = 0;
+                QMapIterator<double, int> i(sortedList);
+                if (metricDetail.topN) {
+                    i.toBack();
+                    while (i.hasPrevious() && counter < metricDetail.topN) {
+                        i.previous();
+                        hdata[counter] = i.value();
+                        counter++;
+                    }
+                }
+
+                if (metricDetail.lowestN) {
+                    i.toFront();
+                    counter = 0; // and forwards for bottomN
+                    while (i.hasNext() && counter < metricDetail.lowestN) {
+                        i.next();
+                        hdata[metricDetail.topN + counter] = i.value();
+                        counter++;
+                    }
+                }
+                hdatas.append(hdata);
+            }
+
+        }
+
         // metric name
         for (int i=0; i < settings.metrics.count(); i++) {
 
-            if (html) summary += "<td align=\"center\" valign=\"top\"><b>%1</b></td>";
+            if (html) summary += "<td align=\"center\" style=\"font-weight:bold;background-color:%2;color:%3\" valign=\"top\">%1</td>";
             else summary += ", %1";
 
             QString name = settings.metrics[i].uname;
+            QString bcolor = settings.metrics[i].penColor.lighter(80).name();
+
             if (name == "Coggan Acute Training Load" || name == tr("Coggan Acute Training Load")) name = "ATL";
             if (name == "Coggan Chronic Training Load" || name == tr("Coggan Chronic Training Load")) name = "CTL";
             if (name == "Coggan Training Stress Balance" || name == tr("Coggan Training Stress Balance")) name = "TSB";
 
             summary = summary.arg(name);
+            if (html) {
+                summary = summary.arg(bcolor);
+                summary = summary.arg(fontcolors.at(i));
+            }
         }
 
         if (html) {
@@ -1168,12 +1232,17 @@ LTMWindow::dataTable(bool html)
 
             // units
             for (int i=0; i < settings.metrics.count(); i++) {
-                summary += "<td align=\"center\" valign=\"top\">"
-                        "<b>%1</b></td>";
+                summary += "<td align=\"center\" style=\"font-weight:bold;background-color:%2;color:%3\" valign=\"top\">"
+                        "%1</td>";
                 QString units = settings.metrics[i].uunits;
+                QString bcolor = settings.metrics[i].penColor.lighter(80).name();
+
+
                 if (units == "seconds" || units == tr("seconds")) units = tr("hours");
                 if (units == settings.metrics[i].uname) units = "";
                 summary = summary.arg(units != "" ? QString("(%1)").arg(units) : "");
+                summary = summary.arg(bcolor);
+                summary = summary.arg(fontcolors.at(i));
             }
             summary += "</tr>";
 
@@ -1210,7 +1279,7 @@ LTMWindow::dataTable(bool html)
 
             // Remaining columns - each metric value
             for(int j=0; j<columns.count(); j++) {
-                if (html) summary += "<td align=\"center\" valign=\"top\">%1</td>";
+                if (html) summary += "<td align=\"center\" style=\"%2\" valign=\"top\">%1</td>";
                 else summary += ", %1";
 
                 // now format the actual value....
@@ -1225,11 +1294,17 @@ LTMWindow::dataTable(bool html)
                     QString v = QString("%1").arg(columns[j].y[row], 0, 'f', precision);
 
                     summary = summary.arg(v);
-
                 } else {
                     // no precision
                     summary = summary.arg(QString("%1").arg(columns[j].y[row], 0, 'f', 0));
                 }
+
+                //
+                if (hdatas.at(j).contains(row)) {
+                    QString c = QString("background-color:%1;color:%2").arg(settings.metrics[j].penColor.name()).arg(fontcolors.at(j));
+                    summary = summary.arg(c);
+                } else
+                    summary = summary.arg("");
             }
 
             // ok, this row is done
