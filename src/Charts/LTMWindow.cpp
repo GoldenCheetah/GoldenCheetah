@@ -1201,8 +1201,11 @@ LTMWindow::dataTable(bool html)
                     }
                 }
                 hdatas.append(hdata);
+            } else {
+                // add an empty vector to maintain alignment with fontcolors
+                QVector<double> hdata;
+                hdatas.append(hdata);
             }
-
         }
 
         // metric name
