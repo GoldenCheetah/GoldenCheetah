@@ -77,6 +77,7 @@
 // 3944 - V4.0 DEV BUILD 1607
 // 3945 - V3.4 DEV BUILD 1608 (FIT SUPPORT INTERIM SUPORT)
 // 3946 - V3.4 RC1
+// 3947 - V3.4 RC2
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -91,8 +92,8 @@
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 3946
-#define VERSION_STRING "V3.4 RC1"
+#define VERSION_LATEST 3947
+#define VERSION_STRING "V3.4 RC2"
 
 // default config for this release cycle
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/4.0"
