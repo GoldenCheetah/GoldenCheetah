@@ -274,7 +274,7 @@ unix:!macx {
     # kqoauth is not packaged for the Debian and this makes
     # life much easier for the package maintainer
     INCLUDEPATH += ../kqoauth
-    LIBS        += ../kqoauth/libkqoauth.a
+    LIBS        += ../kqoauth/lib/libkqoauth.a
     DEFINES     += GC_HAVE_KQOAUTH
 
 } else {
