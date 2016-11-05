@@ -207,6 +207,15 @@ isEmpty(QMAKE_LRELEASE) {
     else:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 }
 
+# empty variable: used to prevent the path from translations.qrc from being "fixified" to src dir
+__EMPTY_TR_QRC_ROOT__ =
+
+# copy translations.qrc file
+trqrc.target = $(__EMPTY_TR_QRC_ROOT__)Resources/translations.qrc
+trqrc.depends = $${PWD}/Resources/translations.qrc
+trqrc.commands = $$QMAKE_COPY_FILE $$shell_path($$trqrc.depends) $$shell_path($$trqrc.target)
+QMAKE_EXTRA_TARGETS += trqrc
+
 # how to run lrelease
 isEmpty(TS_DIR):TS_DIR = Resources/translations
 TSQM.name = lrelease ${QMAKE_FILE_IN}
@@ -220,7 +229,7 @@ QMAKE_EXTRA_COMPILERS += TSQM
 ### RESOURCES
 ###==========
 
-RESOURCES = Resources/application.qrc Resources/RideWindow.qrc
+RESOURCES = Resources/application.qrc Resources/RideWindow.qrc $$trqrc.target
 
 
 
