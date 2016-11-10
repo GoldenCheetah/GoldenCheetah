@@ -450,8 +450,7 @@ ManualRideDialog::okClicked()
     }
 
     // basic data
-    // Override Distance only if we don't have samples
-    if (distance->value() && (!lapsEditor || lapsEditor->dataPoints().isEmpty())) {
+    if (distance->value()) {
         QMap<QString,QString> override;
         if (!context->athlete->useMetricUnits) {
             override.insert("value", QString("%1").arg(distance->value() * KM_PER_MILE));
@@ -463,12 +462,14 @@ ManualRideDialog::okClicked()
 
     QTime time = duration->time();
     double seconds = (time.hour() * 3600) + (time.minute() * 60.00) + (time.second());
-    // Override Duration & Time Riding only if we don't have samples
-    if (seconds && (!lapsEditor || lapsEditor->dataPoints().isEmpty())) {
+    if (seconds) {
         QMap<QString,QString> override;
         override.insert("value", QString("%1").arg(seconds));
         rideFile->metricOverrides.insert("workout_time", override);
-        rideFile->metricOverrides.insert("time_riding", override);
+        // Override time_riding to duration
+        // only if we don't have better information
+        if (!lapsEditor || lapsEditor->dataPoints().count() == 0)
+            rideFile->metricOverrides.insert("time_riding", override);
     }
 
     // basic metadata

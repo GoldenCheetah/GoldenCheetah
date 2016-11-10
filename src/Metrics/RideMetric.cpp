@@ -231,8 +231,8 @@ RideMetric::computeMetrics(RideItem *item, Specification spec, const QStringList
             m->setCount(0);
             m->compute(item, spec, done);
 
-            // override the computed value if set by user
-            if (item->ride() && item->ride()->metricOverrides.contains(symbol))
+            // override the computed value if set by user, but not for intervals
+            if (!spec.interval() && item->ride() && item->ride()->metricOverrides.contains(symbol))
                 m->override(item->ride()->metricOverrides.value(symbol));
 
             // all computed add to the return list
