@@ -25,6 +25,7 @@ UserMetric::UserMetric(Context *context, UserMetricSettings settings)
 {
     // compile the program - built in a context that can close.
     program = new DataFilter(NULL, context, settings.program);
+    program->refcount = 1;
     root = program->root();
     rt = &program->rt;
 
@@ -43,6 +44,7 @@ UserMetric::UserMetric(const UserMetric *from) : RideMetric()
 {
     this->settings = from->settings;
     this->program = from->program;
+    this->program->refcount++;
 
     this->root = from->program->root();
     this->finit = from->finit;
@@ -64,7 +66,11 @@ UserMetric::UserMetric(const UserMetric *from) : RideMetric()
 
 UserMetric::~UserMetric()
 {
-    if (!clone_ && program) delete program;
+    // program is shared, only delete when last is destroyed
+    if (program) {
+        program->refcount--;
+        if (!program->refcount) delete program;
+    }
     if (clone_) delete rt;
 }
 

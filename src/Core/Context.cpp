@@ -99,6 +99,7 @@ Context::notifyConfigChanged(qint32 state)
 void 
 Context::userMetricsConfigChanged()
 {
+
     // read em in...
     QString metrics = QString("%1/../usermetrics.xml").arg(athlete->home->root().absolutePath());
     if (QFile(metrics).exists()) {
@@ -124,7 +125,7 @@ Context::userMetricsConfigChanged()
         // we'll fix it
         UserMetricSchemaVersion = changed;
 
-        // update metric factory 
+        // update metric factory deleting originals
         RideMetricFactory::instance().removeUserMetrics();
     
         // now add initial metrics -- what about multiple contexts (?) XXX
