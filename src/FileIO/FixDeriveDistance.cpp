@@ -85,7 +85,7 @@ class FixDeriveDistance : public DataProcessor {
         ~FixDeriveDistance() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -105,7 +105,7 @@ double _deg2rad(double deg) {
 }
 
 bool
-FixDeriveDistance::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixDeriveDistance::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     Q_UNUSED(config);
 

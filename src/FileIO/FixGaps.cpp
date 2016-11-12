@@ -118,7 +118,7 @@ class FixGaps : public DataProcessor {
         ~FixGaps() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -134,7 +134,7 @@ class FixGaps : public DataProcessor {
 static bool fixGapsAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Gaps in Recording"), new FixGaps());
 
 bool
-FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     // get settings
     double tolerance, stop;

@@ -85,7 +85,7 @@ class FixDeriveTorque : public DataProcessor {
         ~FixDeriveTorque() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -101,7 +101,7 @@ class FixDeriveTorque : public DataProcessor {
 static bool FixDeriveTorqueAdded = DataProcessorFactory::instance().registerProcessor(QString("Add Torque Values"), new FixDeriveTorque());
 
 bool
-FixDeriveTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixDeriveTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     Q_UNUSED(config);
     static const double PI = 3.1415927f;

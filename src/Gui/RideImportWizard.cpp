@@ -1018,8 +1018,8 @@ RideImportWizard::abortClicked()
             // process linked defaults
             context->athlete->rideMetadata()->setLinkedDefaults(ride);
 
-            // run the processor first...
-            DataProcessorFactory::instance().autoProcess(ride);
+            // run the processor first... import
+            DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
             ride->recalculateDerivedSeries();
 
             // serialize
@@ -1049,6 +1049,9 @@ RideImportWizard::abortClicked()
         } else {
             tableWidget->item(i,5)->setText(tr("Error - Import of activitiy file failed"));
         }
+
+        // now metrics have been calculated
+        DataProcessorFactory::instance().autoProcess(ride, "Save", "ADD");
 
         // clear
         delete ride;

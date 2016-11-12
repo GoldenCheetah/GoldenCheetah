@@ -98,7 +98,7 @@ class FixLapSwim : public DataProcessor {
         ~FixLapSwim() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -114,7 +114,7 @@ class FixLapSwim : public DataProcessor {
 static bool FixLapSwimAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Lap Swim"), new FixLapSwim());
 
 bool
-FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     // get settings
     double pl;

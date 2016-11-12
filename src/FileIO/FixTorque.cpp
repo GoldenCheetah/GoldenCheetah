@@ -92,7 +92,7 @@ class FixTorque : public DataProcessor {
         ~FixTorque() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -108,7 +108,7 @@ class FixTorque : public DataProcessor {
 static bool fixTorqueAdded = DataProcessorFactory::instance().registerProcessor(QString("Adjust Torque Values"), new FixTorque());
 
 bool
-FixTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     // does this ride have torque?
     if (ride->areDataPresent()->nm == false) return false;

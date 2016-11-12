@@ -61,7 +61,7 @@ class FixGPS : public DataProcessor {
         ~FixGPS() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -77,7 +77,7 @@ class FixGPS : public DataProcessor {
 static bool fixGPSAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix GPS errors"), new FixGPS());
 
 bool
-FixGPS::postProcess(RideFile *ride, DataProcessorConfig *)
+FixGPS::postProcess(RideFile *ride, DataProcessorConfig *, QString op)
 {
     // ignore null or files without GPS data
     if (!ride || ride->areDataPresent()->lat == false || ride->areDataPresent()->lon == false)

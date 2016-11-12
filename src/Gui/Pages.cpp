@@ -3646,11 +3646,14 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
         QComboBox *comboButton = new QComboBox(this);
         comboButton->addItem(tr("Manual"));
         comboButton->addItem(tr("Import"));
+        comboButton->addItem(tr("Save"));
         processorTree->setItemWidget(add, 1, comboButton);
 
         QString configsetting = QString("dp/%1/apply").arg(i.key());
         if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Manual").toString() == "Manual")
             comboButton->setCurrentIndex(0);
+        else if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Save").toString() == "Save")
+            comboButton->setCurrentIndex(2);
         else
             comboButton->setCurrentIndex(1);
 
@@ -3674,8 +3677,16 @@ ProcessorPage::saveClicked()
     for (int i=0; i<processorTree->invisibleRootItem()->childCount(); i++) {
         // auto (which means run on import) or manual?
         QString configsetting = QString("dp/%1/apply").arg(processorTree->invisibleRootItem()->child(i)->text(3));
-        QString apply = ((QComboBox*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 1)))->currentIndex() ?
-                        "Auto" : "Manual";
+        QString apply;
+
+        // which mode is selected?
+        switch(((QComboBox*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 1)))->currentIndex())  {
+            default:
+            case 0: apply = "Manual"; break;
+            case 1: apply = "Auto"; break;
+            case 2: apply = "Save"; break;
+        }
+
         appsettings->setValue(GC_QSETTINGS_GLOBAL_GENERAL+configsetting, apply);
         ((DataProcessorConfig*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 2)))->saveConfig();
     }

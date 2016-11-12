@@ -244,17 +244,19 @@ RideItem::setRide(RideFile *overwrite)
     RideFile *old = ride_;
     ride_ = overwrite; // overwrite
 
-    // connect up to new one
-    connect(ride_, SIGNAL(modified()), this, SLOT(modified()));
-    connect(ride_, SIGNAL(saved()), this, SLOT(saved()));
-    connect(ride_, SIGNAL(reverted()), this, SLOT(reverted()));
+    // connect up to new one - if its not null
+    if (ride_) {
+        connect(ride_, SIGNAL(modified()), this, SLOT(modified()));
+        connect(ride_, SIGNAL(saved()), this, SLOT(saved()));
+        connect(ride_, SIGNAL(reverted()), this, SLOT(reverted()));
+
+        // update status
+        setDirty(true);
+        notifyRideDataChanged();
+    }
 
     // don't bother with the old one any more
-    disconnect(old);
-
-    // update status
-    setDirty(true);
-    notifyRideDataChanged();
+    if (old) disconnect(old);
 
     //XXX SORRY ! memory leak XXX
     //XXX delete old; // now wipe it once referrers had chance to change

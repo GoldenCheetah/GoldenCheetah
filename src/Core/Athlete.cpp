@@ -403,6 +403,7 @@ AthleteDirectoryStructure::AthleteDirectoryStructure(const QDir home){
     athlete_logs = "logs";
     athlete_quarantine = "quarantine";
     athlete_planned = "planned";
+    athlete_snippets = "snippets";
 
 }
 
@@ -429,6 +430,7 @@ AthleteDirectoryStructure::createAllSubdirs() {
     myhome.mkdir(athlete_temp);
     myhome.mkdir(athlete_quarantine);
     myhome.mkdir(athlete_planned);
+    myhome.mkdir(athlete_snippets);
 
 }
 
@@ -448,7 +450,8 @@ AthleteDirectoryStructure::subDirsExist() {
             logs().exists() &&
             temp().exists() &&
             quarantine().exists()&&
-            planned().exists()
+            planned().exists() &&
+            snippets().exists()
             );
 }
 

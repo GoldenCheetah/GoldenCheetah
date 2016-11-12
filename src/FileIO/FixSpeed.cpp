@@ -94,7 +94,7 @@ class FixSpeed : public DataProcessor {
         ~FixSpeed() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -110,7 +110,7 @@ class FixSpeed : public DataProcessor {
 static bool FixSpeedAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Speed"), new FixSpeed());
 
 bool
-FixSpeed::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixSpeed::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     // get settings
     int ma;

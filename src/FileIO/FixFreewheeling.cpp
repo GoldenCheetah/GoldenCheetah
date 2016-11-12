@@ -68,7 +68,7 @@ class FixFreewheeling : public DataProcessor {
         ~FixFreewheeling() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -84,7 +84,7 @@ class FixFreewheeling : public DataProcessor {
 static bool FixFreewheelingAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Freewheeling"), new FixFreewheeling());
 
 bool
-FixFreewheeling::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixFreewheeling::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     Q_UNUSED(config);
 

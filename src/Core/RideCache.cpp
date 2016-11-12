@@ -23,6 +23,7 @@
 #include "RideFileCache.h"
 #include "RideCacheModel.h"
 #include "Specification.h"
+#include "DataProcessor.h"
 
 #include "Route.h"
 
@@ -295,6 +296,10 @@ RideCache::removeCurrentRide()
         qDebug()<<"ERROR: delete not found.";
         return;
     }
+
+    // dataprocessor runs on "save" which is a short
+    // hand for add, update, delete
+    DataProcessorFactory::instance().autoProcess(todelete->ride(), "Save", "DELETE");
 
     // remove from the cache, before deleting it this is so
     // any aggregating functions no longer see it, when recalculating

@@ -1287,7 +1287,7 @@ class WCPZoneTime4 : public WCPZoneTime {
         }
         void initialize ()
         {
-            setName(tr("W4 W'bal Severe Fatigue"));
+            setName(tr("W4 Above CP W'bal Severe Fatigue"));
             setMetricUnits(tr("seconds"));
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time expended when Power is above CP and W' bal is above 75% of W'."));

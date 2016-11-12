@@ -41,8 +41,11 @@ DataProcessorFactory::registerProcessor(QString name, DataProcessor *processor)
 }
 
 bool
-DataProcessorFactory::autoProcess(RideFile *ride)
+DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
 {
+    // mode will be either "Auto" for automatically run (at import, or data filter)
+    // or it will be "Save" for running just before we save
+
     // check if autoProcess is allow at all
     if (!autoprocess) return false;
 
@@ -54,8 +57,10 @@ DataProcessorFactory::autoProcess(RideFile *ride)
     while (i.hasNext()) {
         i.next();
         QString configsetting = QString("dp/%1/apply").arg(i.key());
-        if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Manual").toString() == "Auto")
-            i.value()->postProcess(ride);
+
+        // if we're being run manually, run all that are defined
+        if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Manual").toString() == mode)
+            i.value()->postProcess(ride, NULL, op);
     }
 
     return changed;
@@ -117,7 +122,7 @@ ManualDataProcessorDialog::okClicked()
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-    if (ride && ride->ride() && processor->postProcess((RideFile *)ride->ride(), config) == true) {
+    if (ride && ride->ride() && processor->postProcess((RideFile *)ride->ride(), config, "UPDATE") == true) {
         context->notifyRideSelected(ride);     // to remain compatible with rest of GC for now
     }
 

@@ -97,7 +97,7 @@ class FixMoxy : public DataProcessor {
         ~FixMoxy() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -113,7 +113,7 @@ class FixMoxy : public DataProcessor {
 static bool FixMoxyAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Moxy"), new FixMoxy());
 
 bool
-FixMoxy::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixMoxy::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     Q_UNUSED(config);
     bool isCad;

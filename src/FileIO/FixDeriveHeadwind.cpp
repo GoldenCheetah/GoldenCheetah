@@ -71,7 +71,7 @@ class FixDeriveHeadwind : public DataProcessor {
         ~FixDeriveHeadwind() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -87,7 +87,7 @@ class FixDeriveHeadwind : public DataProcessor {
 static bool FixDeriveHeadwindAdded = DataProcessorFactory::instance().registerProcessor(QString("Estimate Headwind Values"), new FixDeriveHeadwind());
 
 bool
-FixDeriveHeadwind::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixDeriveHeadwind::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     Q_UNUSED(config);
 

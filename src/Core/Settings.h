@@ -203,6 +203,7 @@
 #define GC_VERSION_USED                 "<athlete-general>versionused"
 #define GC_SAFEEXIT                     "<athlete-general>safeexit"
 #define GC_UPGRADE_FOLDER_SUCCESS       "<athlete-general>upgradesuccess/folder"     // success tracking of folder upgrade stored on athlete level
+#define GC_ATHLETE_SNIPPETID            "<athlete-general>snippetid"
 
 #define GC_LTM_LAST_DATE_RANGE          "<athlete-layout>ltmwindow/lastDateRange"
 #define GC_LTM_AUTOFILTERS              "<athlete-layout>ltmwindow/autofilters"

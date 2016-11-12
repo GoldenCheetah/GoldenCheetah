@@ -103,7 +103,7 @@ class FixHRSpikes : public DataProcessor {
         ~FixHRSpikes() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -119,7 +119,7 @@ class FixHRSpikes : public DataProcessor {
 static bool fixHRSpikesAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix HR Spikes"), new FixHRSpikes());
 
 bool
-FixHRSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixHRSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     // does this ride have heart rate data?
     if (ride->areDataPresent()->hr == false) return false;
