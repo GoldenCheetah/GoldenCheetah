@@ -2397,7 +2397,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                         if (!f) return Result(0); // eek!
 
                         // now run auto data processors
-                        if (DataProcessorFactory::instance().autoProcess(f)) {
+                        if (DataProcessorFactory::instance().autoProcess(f, "Auto", "UPDATE")) {
                             // rideFile is now dirty!
                             m->setDirty(true);
                         }

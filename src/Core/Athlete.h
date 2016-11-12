@@ -193,6 +193,7 @@ class AthleteDirectoryStructure : public QObject {
             QDir temp() { return QDir(myhome.absolutePath()+"/"+athlete_temp);}
             QDir quarantine() { return QDir(myhome.absolutePath()+"/"+athlete_quarantine);}
             QDir planned() { return QDir(myhome.absolutePath()+"/"+athlete_planned);}
+            QDir snippets() { return QDir(myhome.absolutePath()+"/"+athlete_snippets);}
             QDir root() { return myhome; }
 
             // supporting functions to work with the subDirs
@@ -218,6 +219,7 @@ class AthleteDirectoryStructure : public QObject {
             QString athlete_temp;
             QString athlete_quarantine;
             QString athlete_planned;
+            QString athlete_snippets;
 
 };
 

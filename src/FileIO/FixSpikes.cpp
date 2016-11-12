@@ -119,7 +119,7 @@ class FixSpikes : public DataProcessor {
         ~FixSpikes() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -135,7 +135,7 @@ class FixSpikes : public DataProcessor {
 static bool fixSpikesAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Power Spikes"), new FixSpikes());
 
 bool
-FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     // does this ride have power?
     if (ride->areDataPresent()->watts == false) return false;

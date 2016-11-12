@@ -94,7 +94,7 @@ class FixPower : public DataProcessor {
         ~FixPower() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -110,7 +110,7 @@ class FixPower : public DataProcessor {
 static bool FixPowerAdded = DataProcessorFactory::instance().registerProcessor(QString("Adjust Power Values"), new FixPower());
 
 bool
-FixPower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     // Lets do it then!
     QString tp;

@@ -148,7 +148,7 @@ class FixRunningPower : public DataProcessor {
         ~FixRunningPower() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -164,7 +164,7 @@ class FixRunningPower : public DataProcessor {
 static bool FixRunningPowerAdded = DataProcessorFactory::instance().registerProcessor(QString("Estimate Running Power"), new FixRunningPower());
 
 bool
-FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     // get settings
     double MEquip; // Equipment weight kg

@@ -64,7 +64,7 @@ class FixRunningCadence : public DataProcessor {
         ~FixRunningCadence() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -80,7 +80,7 @@ class FixRunningCadence : public DataProcessor {
 static bool FixRunningCadenceAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Running Cadence"), new FixRunningCadence());
 
 bool
-FixRunningCadence::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixRunningCadence::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     Q_UNUSED(config);
     // does this ride have cadence?

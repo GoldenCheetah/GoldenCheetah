@@ -146,7 +146,7 @@ class FixDerivePower : public DataProcessor {
         ~FixDerivePower() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -162,7 +162,7 @@ class FixDerivePower : public DataProcessor {
 static bool FixDerivePowerAdded = DataProcessorFactory::instance().registerProcessor(QString("Estimate Power Values"), new FixDerivePower());
 
 bool
-FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     // get settings
     double MBik; // Bike weight kg

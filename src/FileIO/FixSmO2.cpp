@@ -68,7 +68,7 @@ class FixSmO2 : public DataProcessor {
         ~FixSmO2() {}
 
         // the processor
-        bool postProcess(RideFile *, DataProcessorConfig* config);
+        bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
         DataProcessorConfig* processorConfig(QWidget *parent) {
@@ -84,7 +84,7 @@ class FixSmO2 : public DataProcessor {
 static bool fixSmO2Added = DataProcessorFactory::instance().registerProcessor(QString("Fix SmO2 Anomaly"), new FixSmO2());
 
 bool
-FixSmO2::postProcess(RideFile *ride, DataProcessorConfig *config=0)
+FixSmO2::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
     Q_UNUSED(config);
     // does this ride have power?

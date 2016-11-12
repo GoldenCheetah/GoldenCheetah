@@ -26,6 +26,7 @@
 #include "RideFileCommand.h"
 #include "Settings.h"
 #include "SaveDialogs.h"
+#include "DataProcessor.h"
 
 //----------------------------------------------------------------------
 // Utility functions to get and set WARN on CONVERT application setting
@@ -167,6 +168,9 @@ MainWindow::saveSilent(Context *context, RideItem *rideItem)
     } else {
         savedFile.setFileName(currentFile.fileName());
     }
+
+    // run the data processors configured to run "on save"
+    DataProcessorFactory::instance().autoProcess(rideItem->ride(), "Save", "UPDATE");
 
     // update the change history
     QString log = rideItem->ride()->getTag("Change History", "");
