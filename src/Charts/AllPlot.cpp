@@ -4155,15 +4155,28 @@ AllPlot::setDataFromPlot(AllPlot *plot)
             double max = qMax(39.0f, float(thereCurve->maxYValue()+0.5f));
             setAxisScale(QwtPlot::yLeft, min, max);
 
-        } else if (scope != RideFile::lrbalance) {
+        } else if (scope == RideFile::lrbalance) {
+
+            setAxisScale(QwtPlot::yLeft, 0, 100); // 100 %
+
+        } else if (scope == RideFile::lpco || scope == RideFile::rpco) {
+
+            // get the min/max values for both curves
+            double min = qMin(float(thereCurve->minYValue()), float(thereCurve2->minYValue()));
+            double max = qMax(float(thereCurve->maxYValue()), float(thereCurve2->maxYValue()));
+            setAxisScale(QwtPlot::yLeft, min, max); // not more than 15 degrees
+
+        } else if (scope == RideFile::lppb || scope == RideFile::rppb) {
+
+            setAxisScale(QwtPlot::yLeft, 0, 360); // 360 degrees
+
+        } else {
             if (thereCurve)
                 setAxisScale(QwtPlot::yLeft, thereCurve->minYValue(), 1.1f * thereCurve->maxYValue());
             if (thereICurve)
                 setAxisScale(QwtPlot::yLeft, thereICurve->boundingRect().top(), 1.1f * thereICurve->boundingRect().bottom());
             if (thereASCurve)
                 setAxisScale(QwtPlot::yLeft, thereASCurve->minYValue(), 1.1f * thereASCurve->maxYValue());
-        } else {
-            setAxisScale(QwtPlot::yLeft, 0, 100); // 100 %
         }
 
 
