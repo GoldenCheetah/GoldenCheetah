@@ -1020,6 +1020,7 @@ struct FitFileReaderState
                 continue;
 
             int native_num = field.num;
+            bool native_profile = true;
 
             if (field.deve_idx>-1) {
                 QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
@@ -1041,7 +1042,14 @@ struct FitFileReaderState
                         case FloatValue: deve_value=_values.f/(float)scale+offset; break;
                         default: deve_value = 0.0; break;
                     }
-                    //qDebug() << "deve_value" << deve_value;
+
+                    // For compatibility with old Moxy deve Fields (with the native profile)
+                    if (_values.type == SingleValue && (native_num == 54 || native_num == 57) )
+                        native_profile = true;
+                    else
+                        native_profile = false;// Now Dynastream decided to use float values for CIQ
+
+                    //qDebug() << "deve_value" << deve_value << native_profile;
                 }
                 else
                     native_num = -1;
@@ -1070,7 +1078,7 @@ struct FitFileReaderState
                             lngi = value;
                             break;
                     case 2: // ALTITUDE
-                            if (field.deve_idx>-1)
+                            if (!native_profile && field.deve_idx>-1)
                                 alt = deve_value;
                             else
                                 alt = value / 5.0 - 500.0;
@@ -1115,7 +1123,7 @@ struct FitFileReaderState
                              break;
 
                     case 39: // VERTICAL OSCILLATION
-                             if (field.deve_idx>-1)
+                             if (!native_profile && field.deve_idx>-1)
                                 rvert = deve_value;
                              else
                                 rvert = value / 100.0f;
@@ -1125,7 +1133,7 @@ struct FitFileReaderState
                              //break;
 
                     case 41: // GROUND CONTACT TIME
-                             if (field.deve_idx>-1)
+                             if (!native_profile && field.deve_idx>-1)
                                  rcontact = deve_value;
                              else
                                 rcontact = value / 10.0f;
@@ -1158,14 +1166,16 @@ struct FitFileReaderState
                                  cad += value/128.0f;
                              break;
                     case 54: // tHb
-                             if (field.deve_idx>-1)
+                             if (!native_profile && field.deve_idx>-1) {
                                 tHb = deve_value;
+                             }
                              else
                                 tHb= value/100.0f;
                              break;
                     case 57: // SMO2
-                             if (field.deve_idx>-1)
+                             if (!native_profile && field.deve_idx>-1) {
                                  smO2 = deve_value;
+                             }
                              else
                                  smO2= value/10.0f;
                              break;
