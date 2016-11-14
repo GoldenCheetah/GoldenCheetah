@@ -218,8 +218,10 @@ Snippets::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
                 //
                 bool firstMetric = true;
                 for(int i=0; i<factory.metricCount(); i++) {
-                    QString name = factory.metricName(i);
-                    int index = factory.rideMetric(name)->index();
+                    QString sym = factory.metricName(i);
+                    const RideMetric *m = factory.rideMetric(sym);
+                    QString name = m ? m->name() : sym;
+                    int index = factory.rideMetric(sym)->index();
                     if (!firstMetric) out << ",\n";
                     firstMetric = false;
                     out << "\t\t\t\t\t\"" << name << "\":\"" << QString("%1").arg(interval.metrics()[index], 0, 'f', 5) <<"\"";
