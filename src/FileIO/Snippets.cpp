@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "Settings.h"
 #include "Units.h"
+#include "IntervalItem.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -155,7 +156,7 @@ Snippets::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
         }
 
         //
-        // METRICS
+        // RIDE METRICS
         //
 
         out << ",\n\t\t\"METRICS\": {\n";
@@ -182,6 +183,56 @@ Snippets::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
             first = false;
         }
         out << "\n\t\t}";
+
+        //
+        // INTERVALS
+        //
+        if (ride->intervals().count()) {
+
+            out << ",\n\t\t\"INTERVALS\": [";
+
+            bool first = true;
+            // and output each one
+            foreach(RideFileInterval *ri, ride->intervals()) {
+
+                // create an interval item for each interval
+                IntervalItem interval(&rideItem, ri->name, ri->start, ri->stop, 0, 0, 1,
+                                             QColor(Qt::black), RideFileInterval::USER);
+                // refresh metrics
+                interval.refresh();
+
+                // lists of intervals
+                if (first) out << "\n";
+                else out << ",\n";
+                first=false;
+
+                // name is all we put in there
+                out << "\t\t\t{\n";
+                out << "\t\t\t\t\"name\": \"" << protect(ri->name) << "\",\n";
+
+                // the metrics for this interval
+                out << "\t\t\t\t\"METRICS\": {\n";
+
+                //
+                // INTERVAL METRICS
+                //
+                bool firstMetric = true;
+                for(int i=0; i<factory.metricCount(); i++) {
+                    QString name = factory.metricName(i);
+                    int index = factory.rideMetric(name)->index();
+                    if (!firstMetric) out << ",\n";
+                    firstMetric = false;
+                    out << "\t\t\t\t\t\"" << name << "\":\"" << QString("%1").arg(interval.metrics()[index], 0, 'f', 5) <<"\"";
+                }
+
+                out << "\n\t\t\t\t}\n";
+
+                // and we're done
+                out << "\t\t\t}";
+            }
+
+            out << "\n\t\t]";
+        }
 
         // all done
         out << "\n\t}\n}\n";
