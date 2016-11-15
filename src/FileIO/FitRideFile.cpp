@@ -1210,8 +1210,7 @@ struct FitFileReaderState
                              break;
 
                     case 87: // ???
-                         native_num = -2; // currently ignored (even in EXTRA)
-                         break;
+                             break;
 
 
                     default:
@@ -1957,11 +1956,14 @@ struct FitFileReaderState
         int i = 0;
 
         FitDeveField fieldDef;
+        fieldDef.scale = -1;
+        fieldDef.offset = -1;
+        fieldDef.native = -1;
 
         foreach(const FitField &field, def.fields) {
             FitValue value = values[i++];
 
-            //qDebug() << "deve : num" << field.num  << value.v << value.s.c_str();
+            qDebug() << "deve : num" << field.num  << value.v << value.s.c_str();
 
             switch (field.num) {
                 case 0:  // developer_data_index
@@ -1996,6 +1998,7 @@ struct FitFileReaderState
                         break;
                 case 15: // native field number
                         fieldDef.native = value.v;
+                        break;
                 default:
                         // ignore it
                         break;
@@ -2003,6 +2006,7 @@ struct FitFileReaderState
         }
 
         //qDebug() << "num" << fieldDef.num << "deve_idx" << fieldDef.dev_id << "type" << fieldDef.type << "native" << fieldDef.native << "name" << fieldDef.name.c_str() << "unit" << fieldDef.unit.c_str() << "scale" << fieldDef.scale << "offset" << fieldDef.offset;
+
         QString key = QString("%1.%2").arg(fieldDef.dev_id).arg(fieldDef.num);
 
         if (!local_deve_fields.contains(key)) {
