@@ -8,6 +8,23 @@
 #CONFIG += debug
 #CONFIG += release
 
+# Uncomment when WebKit is not available (e.g. QT >= 5.6)
+#DEFINES += NOWEBKIT
+
+# Uncomment below if you want an R chart
+# You will need R installed along with the Rcpp and RInside
+# packages. There is an R script in the `util' directory that
+# can be run to install these packages; see it for more info.
+#DEFINES += GC_WANT_R
+
+# put output into a separate dir
+# to keep main directory clear
+#DESTDIR = .
+#OBJECTS_DIR = ./.obj
+#MOC_DIR = ./.moc
+#RCC_DIR = ./.rcc
+#UI_DIR = ./.ui
+
 # If you want a console window to appear on Windows machines
 # then uncomment the following two lines.
 #CONFIG += console
@@ -18,6 +35,9 @@
 # then set the full path and filename here.
 #QMAKE_LRELEASE = /usr/bin/lrelease
 
+# MSVC needs the WINDOWS KIT libraries for the memory model you are building
+#WINKIT_INSTALL= "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
+
 # We use g++ on all platforms so switch on auto vectorization amongst other
 # things to speed up looping over ride file points
 #QMAKE_CXXFLAGS += -O3
@@ -26,6 +46,11 @@
 # You may need to specify the full path if things don't work.
 #QMAKE_LEX  = flex
 #QMAKE_YACC = bison
+# If you're compiling with nmake and VC then you
+# will likely also use win_flex and win_bison
+# so uncomment below
+#QMAKE_LEX = win_flex
+#QMAKE_YACC = win_bison
 #win32 {
 #  QMAKE_YACC = bison --file-prefix=y -t
 #  QMAKE_MOVE = cmd /c move
@@ -206,8 +231,8 @@
 # then you should comment the line below, otherwise you
 # will need to have the compress libraries installed
 # separately. 
-LIBZ_INCLUDE =
-LIBZ_LIBS    = -lz
+#LIBZ_INCLUDE =
+#LIBZ_LIBS    = -lz
 
 macx {
     # Uncomment this line to build with OS X Tiger support on a Leopard system:
@@ -218,9 +243,6 @@ macx {
 
     # Uncomment this line if you have SDK 10.7 or higher
     #DEFINES += GC_HAVE_LION
-
-    # Uncomment this line if you have the Mac OSX Wahoo API installed (Kickr)
-    #HAVE_WFAPI = true
 
     #uncomment below if you are running on the 10.9 developer preview
     #INCLUDEPATH += /Library/Developer/CommandLineTools/SDKs/MacOSX10.9.sdk/usr/include/ 
@@ -254,3 +276,13 @@ DEFINES += GC_VIDEO_NONE             # dont add any video playback support
 #DEFINES += GC_VIDEO_QUICKTIME        # mac only and the default
 #DEFINES += GC_VIDEO_QT5              # use QT5 qvideowidget if QT > 5.2.1
 #DEFINES += GC_VIDEO_VLC               # use VideoLan library needs VLC_INSTALL defined above
+
+
+# Using the GoldenCheetah/CloudDB feature (with a private CloudDB instance)
+# requires that you have a running instance of CloudDB on Google App Engine
+# (for details on CloudDB please check the documentation here: https://github.com/GoldenCheetah/CloudDB
+#DEFINES +=GC_CLOUD_DB_BASIC_AUTH=
+#DEFINES +=GC_CLOUD_DB_APP_NAME=
+#CloudDB = active
+
+

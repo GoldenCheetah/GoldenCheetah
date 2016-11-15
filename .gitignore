@@ -1,14 +1,32 @@
 Makefile
 .qmake.stash
-
+*.o
+*.so.*
+*.so
+*.a
+*~
+*.orig
+*.rej
 # old skool
 .svn
 *.pri
+*.prl
+*.swp
+*.user
 
 # osx noise
 .DS_Store
 profile
 
+# qmake Xcode generator side-effects
+*.xcodeproj
+xcshareddata/
+*.xcworkspace
+*.pbxproj
+*.mak
+*.build/
+
+moc_*
 moc/
 obj/
 lib/

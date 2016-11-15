@@ -6,6 +6,13 @@ Info.plist
 *.xcodeproj
 gcconfig.pri
 
+# QtCreator
+src.pro.user
+*.autosave
+
+# MSVC2015
+*.opt
+
 # old skool
 .svn
 
@@ -18,6 +25,10 @@ moc_*
 qrc_application.cpp
 qrc_RideWindow.cpp
 .qmake.stash
+
+#coverity
+cov-int/*
+GoldenCheetah.tgz
 
 # ignore other object files
 *.o

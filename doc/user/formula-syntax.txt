@@ -37,6 +37,7 @@ vdottime(VDOT, distance)
 MEAN MAX and ZONE FUNCTIONS
 best(...)
 tiz(...)
+besttime(km)
 
 PMC FUNCTIONS
 lts(p1)
@@ -71,6 +72,10 @@ const(pi)
 DATE RANGE SELECTION
 daterange(start)
 daterange(stop)
+
+DATA PROCESSOR FUNCTIONS
+autoprocess(filter)
+postprocess(processor, filter)
 
 RIDE SAMPLE DATA
 

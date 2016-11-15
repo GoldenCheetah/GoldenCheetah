@@ -29,9 +29,12 @@ public:
     virtual void drawSeries(QPainter *painter, const QwtScaleMap &xMap,
                                                 const QwtScaleMap &yMap, const QRectF &canvRect, int from, int to) const;
 
+    void setNAValue(double x) { naValue_=x; }
+
 private:
 	/// Value that denotes missed Y data at point
-	double gapValue_;
+    double gapValue_;
+    double naValue_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

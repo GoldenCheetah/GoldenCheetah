@@ -7,9 +7,8 @@ compiler:
 - gcc
 env:
   matrix:
-## Test 4.8 or 5.4.2
   - BRANCH=master QT=qt4 QT_PATH=qt
-  - BRANCH=master QT=qt5 QT_PATH=qt5
+  - BRANCH=master QT=qt5 QT_PATH=qt5 QT_VER=5.5.1
   global:
   - secure: iqYW7f3//ZkMVzeCEarYn0S0DqKjFU9juBh0KF6WTlUsKX902Jtsk7dFoJlNDYBf63HLgV+wW2Hc6MxI9sGiUkom0gY9/To/aeGIJFGEX2sLm/e0Ok3qN521FA0Q/OiCFsD0RC6J+yrHxzI+rf8Z1rujceUsz2KgsrfAjYYv+BY=
   - secure: C6f58PXwvvHeVOjCLbyDRjgyF0tk+bXjCNUDur8VJLhJEGNdnrt+rH+d3azYaX0n348ZnQZ14as4M4rHjN1A/3DRbdUdOS7PQZrkj/n363ck1tvYOG/tzYqkEcVoQyjIJ7ZoTuBXDQry/VJmLxQjM0glTa2upNFHMOMwqZNkF+I=
@@ -18,26 +17,29 @@ env:
   - secure: rb/MKPHEK8yOK5uYpXq2o+MQ7h65ft+c/xE9XmLFk1jLnK0oxe6+KeoSFlQ0n5UwLSsHrytMXVaUHex6EEt0TheXFlohi7BcNFWRWXr+wLucuaPjMnU49VErrSigjJ5VW/rcR7fORmnDwn5y06r3Rer9SC1hImCxf/pqF8hFZps=
   - secure: FXJzm98lwbc1R2eh9/CvVReVRHEPLDm+sCRjiV9HJgeCveIUauLasp9Skamz0c6OKLmkjLY8JERPT491ZgCG8YcQ9x1bM8HGbmRqnn9xSUxINIRzVmyTiLMBoT/ibHHeFjFpyiGfukOAkHwMNNsrSrbaekhiJuekaXo7iTwYQB0=
 before_install:
+## try early just to check, can delete later
 - date
 - brew update
-##- sh travis/install-qt.sh
-- brew install $QT
+- sh travis/install-qt.sh
+##- brew install $QT
 - brew install libical
 - brew install libusb libusb-compat
 - brew install srmio
 - brew install libsamplerate
+- brew tap homebrew/science
+- brew install r
 ## Disable KML for now
 ##- brew install --HEAD travis/libkml.rb
 - sudo chmod -R +w /usr/local
 - curl -O http://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.2.2.dmg
 - git clone --depth 1 https://github.com/sintegrial/qwtplot3d.git qwtplot3d
 - cd qwtplot3d
-- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
+- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing"
 - CC=clang CXX=clang++ make -j2
 - cd ..
 - git clone --branch 0.98 https://github.com/kypeli/kQOAuth.git kQOAuth-0.98
 - cd kQOAuth-0.98
-- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
+- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing"
 - CC=clang CXX=clang++ make -j2 qmake_all
 - CC=clang CXX=clang++ sudo make install
 - cd ..
@@ -48,7 +50,7 @@ before_script:
 - sudo cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib /usr/local/lib
 - cp /Volumes/release/D2XX/bin/*.h D2XX
 - sed -i "" "s|libftd2xx.dylib|@executable_path/../Frameworks/libftd2xx.1.2.2.dylib|"
-  src/D2XX.cpp
+  src/FileIO/D2XX.cpp
 - cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 - cp src/gcconfig.pri.in src/gcconfig.pri
 - /usr/local/opt/$QT_PATH/bin/lupdate src/src.pro
@@ -57,6 +59,8 @@ before_script:
   src/gcconfig.pri
 - sed -i "" "s|#\(QMAKE_CXXFLAGS\).*|\1_RELEASE += -mmacosx-version-min=10.7 -arch
   x86_64|" src/gcconfig.pri
+- sed -i "" "s|^#CloudDB|CloudDB|" src/gcconfig.pri
+- sed -i "" "s|^#LIBZ|LIBZ|" src/gcconfig.pri
 - sed -i "" "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
 - sed -i "" "s|#\(D2XX_INCLUDE =.*\)|\1 ../D2XX|" src/gcconfig.pri
 - sed -i "" "s|#\(D2XX_LIBS    =.*\)|\1 -L../D2XX -lftd2xx.1.2.2|" src/gcconfig.pri
@@ -73,7 +77,7 @@ before_script:
 - sed -i "" "s|#\(ICAL_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
 - sed -i "" "s|#\(ICAL_LIBS    =.*\)|\1 -L/usr/local/lib -lical|" src/gcconfig.pri
 - sed -i "" "s|#\(LIBUSB_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(LIBUSB_LIBS    =.*\)|\1 -L/usr/local/lib -lusb|" src/gcconfig.pri
+- sed -i "" "s|#\(LIBUSB_LIBS    =.*\)|\1 -L/usr/local/lib -lusb -lusb-1.0|" src/gcconfig.pri
 - sed -i "" "s|#\(SAMPLERATE_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
 - sed -i "" "s|#\(SAMPLERATE_LIBS =\).*|\1 -L/usr/local/lib -lsamplerate|" src/gcconfig.pri
 - sed -i "" "s|#\(DEFINES += GC_HAVE_LION*\)|\1|" src/gcconfig.pri
@@ -81,15 +85,17 @@ before_script:
 - sed -i "" "s|#\(DEFINES += GC_WANT_ROBOT.*\)|\1 |" src/gcconfig.pri
 - sed -i "" "s|\(DEFINES += GC_VIDEO_NONE.*\)|#\1 |" src/gcconfig.pri
 - sed -i "" "s|#\(DEFINES += GC_VIDEO_QUICKTIME.*\)|\1 |" src/gcconfig.pri
+##Issues with c++11 and stdlib on travis and dependencies (e.g. plot3d)
+- sed -i "" "s|#\(DEFINES += GC_WANT_R.*\)|\1 |" src/gcconfig.pri
 - echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
-- sed -i "" "s/__GC_GOOGLE_CALENDAR_CLIENT_SECRET__/"$GC_GOOGLE_CALENDAR_CLIENT_SECRET"/" src/Secrets.h
-- sed -i "" "s/__GC_STRAVA_CLIENT_SECRET__/"$GC_STRAVA_CLIENT_SECRET"/" src/Secrets.h
-- sed -i "" "s/__GC_DROPBOX_CLIENT_SECRET__/"$GC_DROPBOX_CLIENT_SECRET"/" src/Secrets.h
-- sed -i "" "s/__GC_CYCLINGANALYTICS_CLIENT_SECRET__/"$GC_CYCLINGANALYTICS_CLIENT_SECRET"/" src/Secrets.h
-- sed -i "" "s/__GC_TWITTER_CONSUMER_SECRET__/"$GC_TWITTER_CONSUMER_SECRET"/" src/Secrets.h
+- sed -i "" "s/__GC_GOOGLE_CALENDAR_CLIENT_SECRET__/"$GC_GOOGLE_CALENDAR_CLIENT_SECRET"/" src/Core/Secrets.h
+- sed -i "" "s/__GC_STRAVA_CLIENT_SECRET__/"$GC_STRAVA_CLIENT_SECRET"/" src/Core/Secrets.h
+- sed -i "" "s/__GC_DROPBOX_CLIENT_SECRET__/"$GC_DROPBOX_CLIENT_SECRET"/" src/Core/Secrets.h
+- sed -i "" "s/__GC_CYCLINGANALYTICS_CLIENT_SECRET__/"$GC_CYCLINGANALYTICS_CLIENT_SECRET"/" src/Core/Secrets.h
+- sed -i "" "s/__GC_TWITTER_CONSUMER_SECRET__/"$GC_TWITTER_CONSUMER_SECRET"/" src/Core/Secrets.h
 - cat src/gcconfig.pri
 script:
-- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+=-Wno-unused-private-field
+- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing"
 - CC=clang CXX=clang++ make qmake_all
 - CC=clang CXX=clang++ make -j4 sub-qwt --silent
 - CC=clang CXX=clang++ make -j4 sub-src
@@ -106,12 +112,13 @@ after_success:
 - cd /Volumes/GoldenCheetah
 - ls -laR GoldenCheetah.app
 - GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
-before_deploy:
-- gem install mime-types -v 2.6.2
-deploy:
-  provider: releases
-  api_key: $GH_OAUTH_TOKEN
-  file: GoldenCheetah_$QT.dmg
-  skip_cleanup: true
-  on:
-    tags: true
+##deploy broken in travis, read-only filesystem error
+##before_deploy:
+##- gem install mime-types -v 2.6.2
+##deploy:
+##  provider: releases
+##  api_key: $GH_OAUTH_TOKEN
+##  file: GoldenCheetah_$QT.dmg
+##  skip_cleanup: true
+##  on:
+##    tags: true
