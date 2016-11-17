@@ -129,6 +129,7 @@ class WorkoutWidget : public QWidget
 
         // when recording we collect telemetry and plot it
         bool recording() { return recording_; }
+        QList<long> sampleTimes; // time of 1s samples
         QList<int> wbal; // 1s samples [joules]
         QList<int> watts; // 1s samples [watts]
         QList<int> hr; // 1s samples [bpm]

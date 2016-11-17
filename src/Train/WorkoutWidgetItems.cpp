@@ -371,82 +371,13 @@ WWTelemetry::paint(QPainter *painter)
     if (!workoutWidget()->recording()) return;
 
     // Draw POWER
-    QPen linePen(GColor(CPOWER));
-    linePen.setWidth(1);
-    painter->setPen(linePen);
-
-    int secs=0; QPointF last;
-    foreach(int watts, workoutWidget()->watts) {
-
-        if (!secs) last = workoutWidget()->transform(secs, watts);
-        else {
-
-            // join the dots
-            QPointF here = workoutWidget()->transform(secs, watts);
-            painter->drawLine(last, here);
-            last = here;
-        }
-
-        secs++;
-    }
-
+    paintSampleList(painter, GColor(CPOWER), workoutWidget()->watts, RideFile::watts);
     // Draw HR
-    QPen hlinePen(GColor(CHEARTRATE));
-    hlinePen.setWidth(1);
-    painter->setPen(hlinePen);
-
-    secs=0;
-    foreach(int hr, workoutWidget()->hr) {
-
-        if (!secs) last = workoutWidget()->transform(secs, hr, RideFile::hr);
-        else {
-
-            // join the dots
-            QPointF here = workoutWidget()->transform(secs, hr, RideFile::hr);
-            painter->drawLine(last, here);
-            last = here;
-        }
-
-        secs++;
-    }
+    paintSampleList(painter, GColor(CHEARTRATE), workoutWidget()->hr, RideFile::hr);
     // Draw Speed
-    QPen slinePen(GColor(CSPEED));
-    slinePen.setWidth(1);
-    painter->setPen(slinePen);
-
-    secs=0;
-    foreach(double speed, workoutWidget()->speed) {
-
-        if (!secs) last = workoutWidget()->transform(secs, speed, RideFile::kph);
-        else {
-
-            // join the dots
-            QPointF here = workoutWidget()->transform(secs, speed, RideFile::kph);
-            painter->drawLine(last, here);
-            last = here;
-        }
-
-        secs++;
-    }
+    paintSampleList(painter, GColor(CSPEED), workoutWidget()->speed, RideFile::kph);
     // Draw Cadence
-    QPen clinePen(GColor(CCADENCE));
-    clinePen.setWidth(1);
-    painter->setPen(clinePen);
-
-    secs=0;
-    foreach(int cad, workoutWidget()->cadence) {
-
-        if (!secs) last = workoutWidget()->transform(secs, cad, RideFile::cad);
-        else {
-
-            // join the dots
-            QPointF here = workoutWidget()->transform(secs, cad, RideFile::cad);
-            painter->drawLine(last, here);
-            last = here;
-        }
-
-        secs++;
-    }
+    paintSampleList(painter, GColor(CCADENCE), workoutWidget()->cadence, RideFile::cad);
 
     //
     // W'bal last, if not zones return
@@ -475,25 +406,25 @@ WWTelemetry::paint(QPainter *painter)
     double ratio = workoutWidget()->canvas().height() / WPRIME;
 
     // join the dots
-    last = QPointF(tl.x(),tl.y());
+    QPointF last = QPointF(tl.x(),tl.y());
 
     // run through the wpBal values...
-    secs=0;
-    foreach(int b , workoutWidget()->wbal) {
-
-        // next second
-        secs++;
-
+    int index = 0;
+    foreach(int b, workoutWidget()->wbal) {
         // this dot...
         if (b < 0) b=0;
 
         // x and y pixel location
-        double px = workoutWidget()->transform(secs,0).x();
+        double now = workoutWidget()->sampleTimes.at(index) / 1000.0f;
+        double px = workoutWidget()->transform(now, 0).x();
         double py = tl.y() + ((WPRIME-b) * ratio);
 
         QPointF dot(px,py);
         painter->drawLine(last, dot);
         last = dot;
+
+        // next sample
+        index++;
     }
 }
 
