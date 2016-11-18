@@ -154,7 +154,7 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
     }
     else if (qName == "Speed")
     {
-        speed = round(buffer.toDouble()*3.6); // Speed comes in m/s
+        speed = buffer.toDouble()*3.6; // Speed comes in m/s
     }
     else if (qName == "Distance")
     {
