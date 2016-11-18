@@ -502,7 +502,14 @@ struct FitFileReaderState
                 typeName = "STANDARD";
                 name = nativeName;
             }
-            dataInfos.append(QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg(typeName).arg(name));
+
+
+            if (xdata && dataInfos.contains(QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg("STANDARD").arg(nativeName))) {
+                int secs = last_time-start_time;
+                int idx = dataInfos.indexOf(QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg("STANDARD").arg(nativeName));
+                dataInfos.replace(idx, QString("CIQ '%1' -> %2 %3 (STANDARD until %4 secs)").arg(deveField.name.c_str()).arg(typeName).arg(name).arg(secs));
+            } else
+                dataInfos.append(QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg(typeName).arg(name));
         }
 
         if (xdata) {
@@ -1054,11 +1061,12 @@ struct FitFileReaderState
                 else
                     native_num = -1;
 
-                //qDebug()<< "native_num"<<native_num;
+                //qDebug()<< "native_num"<<native_num << time;
             } else {
                 //qDebug()<< "native_num"<<native_num;
-                if (!record_native_fields.contains(native_num))
+                if (!record_native_fields.contains(native_num)) {
                     record_native_fields.insert(native_num);
+                }
             }
 
             if (native_num>-1) {
@@ -1230,6 +1238,10 @@ struct FitFileReaderState
 
                     if (!record_deve_fields.contains(key)) {
                         addRecordDeveField(key, deveField, true);
+                    } else {
+                        if (record_deve_fields[key] == -1) {
+                            addRecordDeveField(key, deveField, true);
+                        }
                     }
                     idx = record_deve_fields[key];
 
@@ -1963,7 +1975,7 @@ struct FitFileReaderState
         foreach(const FitField &field, def.fields) {
             FitValue value = values[i++];
 
-            qDebug() << "deve : num" << field.num  << value.v << value.s.c_str();
+            //qDebug() << "deve : num" << field.num  << value.v << value.s.c_str();
 
             switch (field.num) {
                 case 0:  // developer_data_index
