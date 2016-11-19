@@ -109,7 +109,7 @@ void KettlerConnection::requestAll()
     // Discard any existing data
     QByteArray discarded = m_serial->readAll();
 
-    m_serial->write("st\r\n");
+    m_serial->write("ST\r\n");
     m_serial->waitForBytesWritten(1000);
 
     QByteArray data;
