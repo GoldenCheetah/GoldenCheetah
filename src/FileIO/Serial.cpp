@@ -382,11 +382,11 @@ find_devices(char *result[], int capacity)
     // To help decode this regexp;
     // /dev/cu.PL2303-[0-9A-F]+        - Prolific device driver for USB/serial device
     // /dev/cu.usbserial               - typical for Sewell on Mac
-    // /dev/ANTUSBStick.slabvcp        - Silicon Labs Virtual Com driver for Garmin USB1 stick on a Mac
-    // /dev/SLAB_USBtoUART             - Silicon Labs Driver for USB/Serial
-    // /dev/usbmodem[0-9A-F]+          - Usb modem module driver (generic)
-    // /dev/usbserial-[0-9A-Z]+        - usbserial module driver (generic)
-    // /dev/KeySerial[0-9]             - Keyspan USB/Serial driver
+    // /dev/cu.ANTUSBStick.slabvcp     - Silicon Labs Virtual Com driver for Garmin USB1 stick on a Mac
+    // /dev/cu.SLAB_USBtoUART          - Silicon Labs Driver for USB/Serial
+    // /dev/cu.usbmodem[0-9A-F]+       - Usb modem module driver (generic)
+    // /dev/cu.usbserial-[0-9A-Z]+     - usbserial module driver (generic)
+    // /dev/cu.KeySerial[0-9]          - Keyspan USB/Serial driver
     // /dev/ttyU[0-9]                  - Open BSD usb serial devices
     // /dev/ttyUSB[0-9]                - Standard USB/Serial device on Linux/Mac
     // /dev/ttyS[0-2]                  - Serial TTY, 0-2 is restrictive, but noone has complained yet!
