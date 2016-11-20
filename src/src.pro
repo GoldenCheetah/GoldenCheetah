@@ -191,6 +191,8 @@ macx {
     HEADERS += Gui/QTFullScreen.h
     SOURCES += Gui/QTFullScreen.cpp
 
+    HEADERS += Train/VideoWindow.h
+    SOURCES += Train/VideoWindow.cpp
 }
 
 #### these are no longer non-mac only
