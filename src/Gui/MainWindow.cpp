@@ -93,13 +93,10 @@
 #include "HelpWindow.h"
 #include "HomeWindow.h"
 #include "GcScopeBar.h"
-#ifdef Q_OS_MAC
-#include "QtMacButton.h" // mac
-#include "QtMacSegmentedButton.h" // mac
-#else
+#if !defined(Q_OS_MAC)
 #include "QTFullScreen.h" // not mac!
-#include "../qtsolutions/segmentcontrol/qtsegmentcontrol.h"
 #endif
+#include "../qtsolutions/segmentcontrol/qtsegmentcontrol.h"
 
 // SEARCH / FILTER
 #include "NamedSearch.h"
@@ -131,9 +128,6 @@ MainWindow::MainWindow(const QDir &home)
     mainwindows.append(this);  // add us to the list of open windows
     init = false;
     if (desktop == NULL) desktop = QApplication::desktop();
-#ifdef Q_OS_MAC
-    head = NULL; // early resize event causes a crash
-#endif
 
     // create a splash to keep user informed on first load
     // first one in middle of display, not middle of window
@@ -247,97 +241,10 @@ MainWindow::MainWindow(const QDir &home)
     connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
 #endif
 
-    /*----------------------------------------------------------------------
-     *  Mac Toolbar
-     *--------------------------------------------------------------------*/
-#ifdef Q_OS_MAC
-#if QT_VERSION > 0x50000
-#if QT_VERSION >= 0x50201
-    setUnifiedTitleAndToolBarOnMac(true);
-#endif
-    head = addToolBar(context->athlete->cyclist);
-    head->setObjectName(context->athlete->cyclist);
-    head->setContentsMargins(20,0,20,0);
-    head->setFloatable(false);
-    head->setMovable(false);
-#else
-    setUnifiedTitleAndToolBarOnMac(true);
-    head = addToolBar(context->athlete->cyclist);
-    head->setContentsMargins(0,0,0,0);
-#endif
-
-    sidebar = new QtMacButton(this, QtMacButton::TexturedRounded);
-    QPixmap *sidebarImg = new QPixmap(":images/mac/sidebar.png");
-    sidebar->setImage(sidebarImg);
-    sidebar->setMinimumSize(24, 24);
-    sidebar->setMaximumSize(24, 24);
-    sidebar->setToolTip("Sidebar");
-    sidebar->setSelected(true); // assume always start up with sidebar selected
-    HelpWhatsThis *helpSideBar = new HelpWhatsThis(sidebar);
-    sidebar->setWhatsThis(helpSideBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleSidebar));
-
-    lowbar = new QtMacButton(this, QtMacButton::TexturedRounded);
-    QPixmap *lowbarImg = new QPixmap(":images/mac/lowbar.png");
-    lowbar->setImage(lowbarImg);
-    lowbar->setMinimumSize(25, 25);
-    lowbar->setMaximumSize(25, 25);
-    lowbar->setToolTip("Compare");
-    lowbar->setSelected(false); // assume always start up with lowbar deselected
-    HelpWhatsThis *helpLowBar = new HelpWhatsThis(lowbar);
-    lowbar->setWhatsThis(helpLowBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleComparePane));
-
-    QWidget *viewsel = new QWidget(this);
-    viewsel->setContentsMargins(0,0,0,0);
-    QHBoxLayout *pq = new QHBoxLayout(viewsel);
-    pq->setContentsMargins(0,0,0,0);
-    pq->setSpacing(5);
-    QHBoxLayout *ps = new QHBoxLayout;
-    ps->setContentsMargins(0,0,0,0);
-    ps->setSpacing (2); // low and sidebar button close together
-    ps->addWidget(sidebar);
-    ps->addWidget(lowbar);
-    pq->addLayout(ps);
-
-    styleSelector = new QtMacSegmentedButton(2, viewsel);
-    styleSelector->setWidth(80); // actually its 80 but we want a 30px space between is and the searchbox
-    styleSelector->setImage(0, new QPixmap(":images/mac/tabbed.png"), 24);
-    styleSelector->setImage(1, new QPixmap(":images/mac/tiled.png"), 24);
-    pq->addWidget(styleSelector);
-    connect(sidebar, SIGNAL(clicked(bool)), this, SLOT(toggleSidebar()));
-    connect(lowbar, SIGNAL(clicked(bool)), this, SLOT(toggleLowbar()));
-    connect(styleSelector, SIGNAL(clicked(int,bool)), this, SLOT(toggleStyle()));
-
-    // setup Mac thetoolbar
-    head->addWidget(new Spacer(this));
-    head->addWidget(new Spacer(this));
-    head->addWidget(scopebar);
-    head->addWidget(new Spacer(this));
-    head->addWidget(viewsel);
-
-    // SearchBox and its animator
-    searchBox = new SearchFilterBox(this,context,false);
-    anim = new QPropertyAnimation(searchBox, "xwidth", this);
-
-#if QT_VERSION > 0x50000
-    QStyle *toolStyle = QStyleFactory::create("fusion");
-#else
-    QStyle *toolStyle = QStyleFactory::create("Cleanlooks");
-#endif
-    searchBox->setStyle(toolStyle);
-    searchBox->setFixedWidth(150);
-    head->addWidget(searchBox);
-    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
-    connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
-    connect(searchBox->searchbox, SIGNAL(haveFocus()), this, SLOT(searchFocusIn()));
-    connect(searchBox->searchbox, SIGNAL(lostFocus()), this, SLOT(searchFocusOut()));
-
-#endif
 
     /*----------------------------------------------------------------------
-     *  Windows and Linux Toolbar
+     *  Toolbar
      *--------------------------------------------------------------------*/
-#ifndef Q_OS_MAC
-
     head = new GcToolBar(this);
 
 #if QT_VERSION > 0x50000
@@ -415,7 +322,7 @@ MainWindow::MainWindow(const QDir &home)
     Spacer *spacer = new Spacer(this);
     spacer->setFixedWidth(5);
     head->addWidget(spacer);
-#endif
+
 
     /*----------------------------------------------------------------------
      * Central Widget
@@ -452,21 +359,8 @@ MainWindow::MainWindow(const QDir &home)
     QVBoxLayout *mainLayout = new QVBoxLayout(central);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
-#ifndef Q_OS_MAC // nonmac toolbar on main view -- its not
-                 // unified with the title bar.
     mainLayout->addWidget(head);
-#endif
     mainLayout->addWidget(tabbar);
-#if (defined Q_OS_MAC) && (QT_VERSION >= 0x50201)
-    blackline = new QWidget(this);
-    blackline->setContentsMargins(0,0,0,0);
-    blackline->setFixedHeight(1);
-    QPalette linePalette;
-    linePalette.setBrush(backgroundRole(), Qt::darkGray);
-    blackline->setPalette(linePalette);
-    blackline->setAutoFillBackground(true);
-    mainLayout->addWidget(blackline);
-#endif
     mainLayout->addWidget(tabStack);
     setCentralWidget(central);
 
@@ -652,11 +546,9 @@ MainWindow::MainWindow(const QDir &home)
     showhideLowbar = viewMenu->addAction(tr("Show Compare Pane"), this, SLOT(showLowbar(bool)));
     showhideLowbar->setCheckable(true);
     showhideLowbar->setChecked(false);
-#if (!defined Q_OS_MAC) || (QT_VERSION >= 0x50201) // not on a Mac
     showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)));
     showhideToolbar->setCheckable(true);
     showhideToolbar->setChecked(true);
-#endif
     showhideTabbar = viewMenu->addAction(tr("Show Athlete Tabs"), this, SLOT(showTabbar(bool)));
     showhideTabbar->setCheckable(true);
     showhideTabbar->setChecked(true);
@@ -810,23 +702,9 @@ MainWindow::showTabbar(bool want)
     setUpdatesEnabled(false);
     showhideTabbar->setChecked(want);
     if (want) {
-#ifdef Q_OS_MAC
-    setDocumentMode(true);
-    tabbar->setDocumentMode(true);
-#if QT_VERSION >= 0x50201
-    if (!GCColor::isFlat()) blackline->hide();
-#endif
-#endif
         tabbar->show();
     }
     else {
-#ifdef Q_OS_MAC
-    setDocumentMode(false);
-    tabbar->setDocumentMode(false);
-#if QT_VERSION >= 0x50201
-    if (!GCColor::isFlat()) blackline->show();
-#endif
-#endif
         tabbar->hide();
     }
     setUpdatesEnabled(true);
@@ -835,7 +713,6 @@ MainWindow::showTabbar(bool want)
 void
 MainWindow::showToolbar(bool want)
 {
-#if (!defined Q_OS_MAC) || (QT_VERSION >= 0x50201)
     setUpdatesEnabled(false);
     showhideToolbar->setChecked(want);
     if (want) {
@@ -845,7 +722,6 @@ MainWindow::showToolbar(bool want)
         head->hide();
     }
     setUpdatesEnabled(true);
-#endif
 }
 
 void
@@ -1008,24 +884,6 @@ MainWindow::eventFilter(QObject *o, QEvent *e)
 void
 MainWindow::resizeEvent(QResizeEvent*)
 {
-// on a mac we hide/show the toolbar on fullscreen mode
-// when using QT5 since it has problems rendering
-#if (defined Q_OS_MAC) && (QT_VERSION >= 0x50201)
-    if (head) {
-        QRect screenSize = desktop->availableGeometry();
-        if ((screenSize.width() == frameGeometry().width() || screenSize.height() == frameGeometry().height()) && // fullscreen
-           (head->isVisible())) {// and it is visible
-            head->hide();
-            head->updateGeometry();
-            head->show();
-            head->updateGeometry();
-        }
-
-        // painting
-        head->repaint();
-    }
-#endif
-
     //appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
     //appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
 }
@@ -1261,13 +1119,8 @@ MainWindow::setToolButtons()
     styleAction->setChecked(select);
     showhideLowbar->setChecked(lowselected);
 
-#ifdef Q_OS_MAC
-    styleSelector->setSelected(select, true);
-    lowbar->setSelected(lowselected);
-#else
     if (styleSelector->isSegmentSelected(select) == false)
         styleSelector->setSegmentSelected(select, true);
-#endif
 
     int index = currentTab->currentView();
 
@@ -1994,11 +1847,7 @@ MainWindow::saveGCState(Context *context)
     context->showSidebar = showhideSidebar->isChecked();
     //context->showTabbar = showhideTabbar->isChecked();
     context->showLowbar = showhideLowbar->isChecked();
-#if (!defined Q_OS_MAC) || (QT_VERSION >= 0x50201) // not on a Mac
     context->showToolbar = showhideToolbar->isChecked();
-#else
-    context->showToolbar = true;
-#endif
     context->searchText = searchBox->text();
     context->style = styleAction->isChecked();
     context->setIndex(scopebar->selected());
@@ -2280,30 +2129,8 @@ MainWindow::configChanged(qint32)
                              "QMenuBar::item { color: black; background: %1; }").arg(menuColorString));
 #endif
 
-// Mac
-#ifdef Q_OS_MAC
-    if (GCColor::isFlat()) {
+// Mac and Linux
 
-#if (QT_VERSION >= 0x50201)
-        // flat mode
-        head->setStyleSheet(QString(" QToolBar:active { border: 0px; background-color: %1; } "
-                            " QToolBar:!active { border: 0px; background-color: %1; }").arg(GColor(CCHROME).name()));
-        blackline->hide();
-#endif
-
-    } else {
-
-        // metallic mode
-#if QT_VERSION >= 0x50201
-        // black line back, but only if we aren't showing the tabbar
-        if (!showhideTabbar->isChecked()) blackline->show();
-        head->setStyleSheet(" QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #F0F0F0, stop: 1 #E8E8E8 ); } "
-                            " QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #B5B5B5 ); } ");
-#endif
-    }
-#endif
-
-#ifndef Q_OS_MAC
     QPalette tabbarPalette;
     tabbar->setAutoFillBackground(true);
     tabbar->setShape(QTabBar::RoundedSouth);
@@ -2314,7 +2141,6 @@ MainWindow::configChanged(qint32)
     else
         tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
     tabbar->setPalette(tabbarPalette);
-#endif
 
     // set the default fontsize
     QFont font;

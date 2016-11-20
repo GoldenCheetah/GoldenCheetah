@@ -257,12 +257,6 @@ class MainWindow : public QMainWindow
 
         SearchFilterBox *searchBox;
 
-#ifdef Q_OS_MAC
-        // Mac Native Support
-        QtMacButton *sidebar, *lowbar;
-        QtMacSegmentedButton *styleSelector;
-        QToolBar *head;
-#else
         // Not on Mac so use other types
         QPushButton *sidebar, *lowbar;
         QtSegmentControl *styleSelector;
@@ -270,7 +264,7 @@ class MainWindow : public QMainWindow
 
         // the icons
         QIcon sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
-#endif
+
         // tab bar (that supports swtitching on drag and drop)
         DragBar *tabbar;
         QStackedWidget *tabStack;
@@ -291,7 +285,7 @@ class MainWindow : public QMainWindow
         QAction *styleAction;
         QAction *showhideSidebar;
         QAction *showhideLowbar;
-#if (!defined Q_OS_MAC) || (QT_VERSION >= 0x50201) // not on a Mac
+#if (QT_VERSION >= 0x50201) // not on a Mac
         QAction *showhideToolbar;
 #endif
         QAction *showhideTabbar;
@@ -302,9 +296,6 @@ class MainWindow : public QMainWindow
         // Miscellany
         QSignalMapper *toolMapper;
 
-#if (defined Q_OS_MAC) && (QT_VERSION >= 0x50201)
-        QWidget *blackline;
-#endif
 };
 
 #endif // _GC_MainWindow_h
