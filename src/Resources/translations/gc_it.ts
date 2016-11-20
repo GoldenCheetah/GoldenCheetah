@@ -6,7 +6,7 @@
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1038"/>
         <source>Average aPower</source>
-        <translation>aPotenza media</translation>
+        <translation>aPower medio</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1039"/>
@@ -17,7 +17,7 @@
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1042"/>
         <source>Average altitude power. Recorded power adjusted to take into account the effect of altitude on vo2max and thus power output.</source>
-        <translation>Potenza di altitudine media. Potenza registrata per tenere in conto l&apos;effetto dell&apos;altitudine sulla VO2max e quindi slla potenza prodotta.</translation>
+        <translation>Potenza di altitudine media. Potenza registrata modificata per tenere conto dell&apos;effetto dell&apos;altitudine sulla VO2max e quindi sulla potenza prodotta.</translation>
     </message>
 </context>
 <context>
@@ -25,7 +25,7 @@
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="140"/>
         <source>Cannot open ANT+ device</source>
-        <translation>Impossibile aprire il dipsositivo ANT+</translation>
+        <translation>Impossibile aprire il dispositivo ANT+</translation>
     </message>
 </context>
 <context>
@@ -46,7 +46,7 @@
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="25"/>
         <source>About GoldenCheetah</source>
-        <translation> A porposito di GoldenCheetah</translation>
+        <translation>A proposito di GoldenCheetah</translation>
     </message>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="36"/>
@@ -137,7 +137,7 @@
     <message>
         <location filename="../../Gui/Pages.cpp" line="1251"/>
         <source>times the athlete is closed - 0 means never</source>
-        <translation>Numero di volte il profilo Atleta viene chiuso - 0 significa mai</translation>
+        <translation>quante volte il profilo Atleta viene chiuso - 0 significa mai</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1297"/>
@@ -152,7 +152,7 @@
     <message>
         <location filename="../../Gui/Pages.cpp" line="1312"/>
         <source>Choose Backup Directory</source>
-        <translation>Seleziona Rubrica di Destinazione per il Backup</translation>
+        <translation>Seleziona Cartella di Destinazione per il Backup</translation>
     </message>
 </context>
 <context>
@@ -160,12 +160,12 @@
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="277"/>
         <source>Workout Wizard</source>
-        <translation>Creazione sedute di allenamento</translation>
+        <translation>Wizard esercizio</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="278"/>
         <source>Absolute Wattage Workout Creator</source>
-        <translation>Creazione allenamento in wattaggio assoluto</translation>
+        <translation>Creazione esercizio in wattaggio assoluto</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="282"/>
@@ -186,7 +186,7 @@
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="366"/>
         <source>Save Workout</source>
-        <translation>Salva allenamento</translation>
+        <translation>Salva esercizio</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="367"/>
@@ -204,7 +204,7 @@
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3544"/>
         <source>A checksum for the activity, can be used to trigger cache refresh in R scripts.</source>
-        <translation>Checksum (Somma di Controllo) di attivita&apos;, essere usata per attivare un aggiornamento della cache in uno script R.</translation>
+        <translation>Checksum (Somma di Controllo) di attivita&apos;, può essere usata per attivare un aggiornamento della cache in uno script R.</translation>
     </message>
 </context>
 <context>
@@ -1104,7 +1104,7 @@ Clicca Successivo per Continuare</translation>
     <message>
         <location filename="../../Metrics/AerobicDecoupling.cpp" line="61"/>
         <source>Aerobic decoupling is a measure of how much heart rate rises or how much power/pace falls off during the course of a long ride/run.</source>
-        <translation>Il disaccoppiamento aerobico e&apos; una misura dell&apos;aumento della frequenza cardiaca o della diminuzione della poenza/ritmo durante una lunga corsa in bici/corsa a piedi.</translation>
+        <translation>Il disaccoppiamento aerobico e&apos; una misura dell&apos;aumento della frequenza cardiaca o della diminuzione della potenza/ritmo durante una lunga uscita in bici/corsa a piedi.</translation>
     </message>
 </context>
 <context>
@@ -1487,7 +1487,7 @@ Clicca Successivo per Continuare</translation>
         <location filename="../../Charts/AllPlot.cpp" line="4621"/>
         <location filename="../../Charts/AllPlot.cpp" line="4624"/>
         <source>xPower</source>
-        <translation>xPotenza</translation>
+        <translation>xPower</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3921"/>
@@ -1562,12 +1562,12 @@ Clicca Successivo per Continuare</translation>
         <location filename="../../Charts/AllPlot.cpp" line="4727"/>
         <location filename="../../Charts/AllPlot.cpp" line="4730"/>
         <source>aPower</source>
-        <translation>aPotenza</translation>
+        <translation>aPower</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4465"/>
         <source>Matches</source>
-        <translation>&quot;Cerini&quot;</translation>
+        <translation>Matches</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4667"/>
@@ -1758,7 +1758,7 @@ Clicca Successivo per Continuare</translation>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="345"/>
         <source>aPower</source>
-        <translation>aPotenza</translation>
+        <translation>aPower</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="349"/>
@@ -1903,7 +1903,7 @@ Clicca Successivo per Continuare</translation>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="464"/>
         <source>Matches</source>
-        <translation>&quot;Cerini&quot;</translation>
+        <translation>Matches</translation>
     </message>
 </context>
 <context>
@@ -2088,7 +2088,7 @@ Clicca Successivo per Continuare</translation>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="349"/>
         <source>Heart Rate</source>
-        <translation>Frequanza Cardiaca</translation>
+        <translation>Frequenza Cardiaca</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="351"/>
@@ -2232,7 +2232,7 @@ Clicca Successivo per Continuare</translation>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="413"/>
         <source>Skiba xPower</source>
-        <translation>xPotenza Skiba</translation>
+        <translation>xPower Skiba</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="417"/>
@@ -2606,7 +2606,7 @@ Clicca Successivo per Continuare</translation>
     <message>
         <location filename="../../Core/Athlete.cpp" line="323"/>
         <source>Tempo &amp; Threshold Time</source>
-        <translation>Ritmo (Tempo) &amp; Soglia Tempo</translation>
+        <translation>Ritmo &amp; Soglia Tempo</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="324"/>
@@ -2681,7 +2681,7 @@ Clicca Successivo per Continuare</translation>
     <message>
         <location filename="../../Core/Athlete.cpp" line="331"/>
         <source>Aerobic Response</source>
-        <translation>Ripsosta Aerobica</translation>
+        <translation>Risposta Aerobica</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="332"/>
@@ -2696,12 +2696,12 @@ Clicca Successivo per Continuare</translation>
     <message>
         <location filename="../../Core/Athlete.cpp" line="334"/>
         <source>PMC (Skiba)</source>
-        <translation>MPC (Skiba)</translation>
+        <translation>PMC (Skiba)</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="335"/>
         <source>PMC (TRIMP)</source>
-        <translation>PMS (TRIMP)</translation>
+        <translation>PMC (TRIMP)</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="336"/>
@@ -3523,7 +3523,7 @@ Clicca Successivo per Continuare</translation>
         <location filename="../../Metrics/RunMetrics.cpp" line="388"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="394"/>
         <source>Average Stride Length</source>
-        <translation>Lunghezza media delpasso</translation>
+        <translation>Lunghezza media del passo</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="389"/>
@@ -3608,7 +3608,7 @@ Clicca Successivo per Continuare</translation>
     <message>
         <location filename="../../Gui/BatchExportDialog.cpp" line="82"/>
         <source>dd MMM yyyy</source>
-        <translation></translation>
+        <translation>dd MMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchExportDialog.cpp" line="86"/>
@@ -4061,7 +4061,7 @@ Cominciamo con qualche dato.</translation>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="151"/>
         <source>Import files from your disk or usb device</source>
-        <translation>Importa file dal tuo hard Disk o dispositivo usb</translation>
+        <translation>Importa file dal tuo Hard Disk o dispositivo USB</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="152"/>
@@ -4090,13 +4090,13 @@ Cominciamo con qualche dato.</translation>
         <location filename="../../Charts/BlankState.cpp" line="203"/>
         <source>No ride ?
 Let&apos;s start with some data.</source>
-        <translation>Nessuna corsa in bici?
+        <translation>Nessuna uscita in bici?
 Aggiungi una nuova attivita&apos;.</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="209"/>
         <source>Import files from your disk or usb device</source>
-        <translation>Importa file dal tuo hard disk o dispositivo usb</translation>
+        <translation>Importa file dal tuo Hard Disk o dispositivo USB</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="210"/>
@@ -4125,13 +4125,13 @@ Aggiungi una nuova attivita&apos;.</translation>
         <location filename="../../Charts/BlankState.cpp" line="174"/>
         <source>No ride ?
 Let&apos;s start with some data.</source>
-        <translation>Nessuna corsa in bici?
+        <translation>Nessuna uscita in bici?
 Cominciamo con qualche dato.</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="180"/>
         <source>Import files from your disk or usb device</source>
-        <translation>Importa file dal tuo hard Disk o dispositivo usb</translation>
+        <translation>Importa file dal tuo Hard Disk o dispositivo USB</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="181"/>
@@ -4173,7 +4173,7 @@ Cominciamo con qualche dato.</translation>
         <location filename="../../Charts/BlankState.cpp" line="232"/>
         <source>No devices or workouts ?
 Let&apos;s get you setup.</source>
-        <translation>Nessun dispositivo o allenamento?
+        <translation>Nessun dispositivo o esercizi?
 Iniziamo la configurazione.</translation>
     </message>
     <message>
@@ -4189,7 +4189,7 @@ Iniziamo la configurazione.</translation>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="248"/>
         <source>Find and Import your videos and workouts.</source>
-        <translation>Cerca e importa video ed allenamenti.</translation>
+        <translation>Cerca e importa video ed esercizi.</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="249"/>
@@ -4199,12 +4199,12 @@ Iniziamo la configurazione.</translation>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="255"/>
         <source>Download workout files from the Erg DB.</source>
-        <translation>Scarica Allenamenti da Erg DB.</translation>
+        <translation>Scarica Esercizi da Erg DB.</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="256"/>
         <source>Download workouts</source>
-        <translation>Scarica allenamenti</translation>
+        <translation>Scarica esercizi</translation>
     </message>
 </context>
 <context>
@@ -4298,7 +4298,7 @@ Iniziamo la configurazione.</translation>
         <location filename="../../Gui/Pages.cpp" line="4348"/>
         <location filename="../../Gui/Pages.cpp" line="4396"/>
         <source>MMM d, yyyy</source>
-        <translation></translation>
+        <translation>MMM d, yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4201"/>
@@ -4590,7 +4590,7 @@ Iniziamo la configurazione.</translation>
         <location filename="../../Charts/CPPlot.cpp" line="544"/>
         <location filename="../../Charts/CPPlot.cpp" line="600"/>
         <source>CP</source>
-        <translation>CPPC</translation>
+        <translation>CP</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="545"/>
@@ -4717,7 +4717,7 @@ Iniziamo la configurazione.</translation>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="1481"/>
         <source>ddd MMM d, yyyy hh:mm</source>
-        <translation></translation>
+        <translation>ddd MMM d, yyyy hh:mm</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="1014"/>
@@ -4728,7 +4728,7 @@ Iniziamo la configurazione.</translation>
         <location filename="../../Charts/CPPlot.cpp" line="1695"/>
         <source>
 ddd, dd MMM yyyy</source>
-        <translation></translation>
+        <translation>ddd, dd MMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2187"/>
@@ -4808,7 +4808,7 @@ ddd, dd MMM yyyy</source>
         <location filename="../../Gui/Pages.cpp" line="5825"/>
         <location filename="../../Gui/Pages.cpp" line="5848"/>
         <source>MMM d, yyyy</source>
-        <translation></translation>
+        <translation>MMM d, yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="5760"/>
@@ -4924,7 +4924,7 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Cloud/CalendarDownload.cpp" line="82"/>
         <source>Remote Calendar not available, reverting to cached workouts.</source>
-        <translation>Calendario Remoto non disponibile, ritorno agli allenamenti in memoria.</translation>
+        <translation>Calendario Remoto non disponibile, ritorno agli esercizi in memoria.</translation>
     </message>
 </context>
 <context>
@@ -5908,7 +5908,7 @@ Vuoi procedere e riavviare Golden Cheetah?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="68"/>
         <source>Delta compare</source>
-        <translation>Comapara Delta</translation>
+        <translation>Compara Delta</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="71"/>
@@ -5918,7 +5918,7 @@ Vuoi procedere e riavviare Golden Cheetah?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="101"/>
         <source>Critical Power </source>
-        <translation>Potenza Critica </translation>
+        <translation>Potenza Critica (CP)</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="138"/>
@@ -6172,7 +6172,7 @@ Vuoi procedere e riavviare Golden Cheetah?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1451"/>
         <source>xPower</source>
-        <translation>xPotenza</translation>
+        <translation>xPower</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1452"/>
@@ -6232,7 +6232,7 @@ Vuoi procedere e riavviare Golden Cheetah?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1463"/>
         <source>aPower</source>
-        <translation>aPotenza</translation>
+        <translation>aPower</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1464"/>
@@ -6262,7 +6262,7 @@ Vuoi procedere e riavviare Golden Cheetah?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1436"/>
         <source>MM/dd/yyyy</source>
-        <translation></translation>
+        <translation>MM/dd/yyyy</translation>
     </message>
 </context>
 <context>
@@ -6724,7 +6724,7 @@ Vuoi procedere e riavviare Golden Cheetah?</translation>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="95"/>
         <source>Weekly Summary</source>
-        <translation>Sommario settimanale</translation>
+        <translation>Sommario Settimanale</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="96"/>
@@ -6770,7 +6770,7 @@ Vuoi procedere e riavviare Golden Cheetah?</translation>
         <location filename="../../Gui/DiarySidebar.cpp" line="440"/>
         <location filename="../../Gui/DiarySidebar.cpp" line="442"/>
         <source>dddd MMMM d</source>
-        <translation></translation>
+        <translation>dddd MMMM d</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="442"/>
@@ -6780,7 +6780,7 @@ Vuoi procedere e riavviare Golden Cheetah?</translation>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="444"/>
         <source>MMMM yyyy</source>
-        <translation></translation>
+        <translation>MMMM yyyy</translation>
     </message>
 </context>
 <context>
@@ -7253,7 +7253,7 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1871"/>
         <source>Stress Balance    (SB/TSB)</source>
-        <translation>Bilanciamento stress    (SB/TSB)</translation>
+        <translation>Bilanciamento Stress    (SB/TSB)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1872"/>
@@ -7917,7 +7917,7 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="28"/>
         <source>Download workouts from ErgDB</source>
-        <translation>Scarica allenamento da ErgDB</translation>
+        <translation>Scarica esercizio da ErgDB</translation>
     </message>
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="46"/>
@@ -7947,7 +7947,7 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="76"/>
         <source>dd MMM yyyy</source>
-        <translation></translation>
+        <translation>dd MMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="79"/>
@@ -7964,7 +7964,7 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="92"/>
         <source>Overwrite existing workouts</source>
-        <translation>Sovrascrivi file esistenti</translation>
+        <translation>Sovrascrivi esercizi esistenti</translation>
     </message>
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="93"/>
@@ -7985,7 +7985,7 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="137"/>
         <source>%1 workouts downloaded, %2 failed or skipped.</source>
-        <translation>%1 allenamenti scaricati, %2 fallito o saltato.</translation>
+        <translation>%1 esercizi scaricati, %2 fallito o saltato.</translation>
     </message>
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="138"/>
@@ -8059,7 +8059,7 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="60"/>
         <source>Critical Power Estimator</source>
-        <translation>Estimatore Potenza Critica</translation>
+        <translation>Estimatore Potenza Critica (CP)</translation>
     </message>
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="72"/>
@@ -8490,7 +8490,7 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
     <message>
         <location filename="../../Cloud/FileStore.cpp" line="529"/>
         <source>Workout Id</source>
-        <translation>ID allenamento</translation>
+        <translation>ID esercizio</translation>
     </message>
     <message>
         <location filename="../../Cloud/FileStore.cpp" line="530"/>
@@ -8870,7 +8870,7 @@ Il parametro del peso della bicicletta e&apos; aggiunto al peso dell&apos;atleta
 Il parametro CRR e&apos; il coefficiente di resistenza al rotolamento, dipende dai copertoni e dalla superficie di rotolamento
 la velocita&apos; del vento deve essere indicata in km/h
 l&apos;unita&apos; di direzione del vento (origine) e&apos;in gradi da -179 a +180 (-90=O, 0=N, 90=E, 180=S)
-Nota: se il file di corsa contiene gia&apos; i dati sul vento
+Nota: se il file di uscita in bici contiene gia&apos; i dati sul vento
       sara&apos; ignorato se i dati sul vento sono stati inseriti manualmente</translation>
     </message>
 </context>
@@ -9424,7 +9424,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Colors.cpp" line="100"/>
         <source>Skiba xPower</source>
-        <translation>xPotenza Skiba</translation>
+        <translation>xPower Skiba</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="101"/>
@@ -9534,7 +9534,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Colors.cpp" line="122"/>
         <source>Stress Balance</source>
-        <translation>Stress Balancio</translation>
+        <translation>Bilanciamento Stress</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="123"/>
@@ -9679,12 +9679,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Colors.cpp" line="151"/>
         <source>Calendar Actual Workout</source>
-        <translation>Calendario Allenamento Attuale</translation>
+        <translation>Calendario Esercizio Attuale</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="152"/>
         <source>Calendar Planned Workout</source>
-        <translation>Calendario Allenamento Pianificato</translation>
+        <translation>Calendario Esercizio Pianificato</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="153"/>
@@ -9819,7 +9819,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="365"/>
         <source>Gravity Ordered Velocity Stress Score, the TSS like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration</source>
-        <translation>Punteggio Stress Velocita&apos; ordinato per gravita&apos;, misura simile al TISS di Skiba per la corsa, tiene conto della varizione in velocita&apos;, inclinazione, intensita&apos; relativa, e durata</translation>
+        <translation>Gravity Ordered Velocity Stress Score, misura simile al TSS definita da Skiba per la corsa, tiene conto della variazione in velocita&apos;, inclinazione, intensita&apos; relativa, e durata</translation>
     </message>
 </context>
 <context>
@@ -10026,7 +10026,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="832"/>
         <source>MMMM yyyy</source>
-        <translation></translation>
+        <translation>MMMM yyyy</translation>
     </message>
 </context>
 <context>
@@ -10109,7 +10109,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="542"/>
         <source>%1 media and workout files moved to subdirectory: \%2 - %3 failed</source>
-        <translation>Spostamento  %1 file di supporto e allenamento tra le subrubriche: \%2 - %3 fallito</translation>
+        <translation>Spostamento  %1 file di supporto e esercizio tra le subrubriche: \%2 - %3 fallito</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="748"/>
@@ -10169,7 +10169,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="527"/>
         <source>Start copying of: Media and Workout files... </source>
-        <translation>Comincia la copia di: File Supporto e Allenamento... </translation>
+        <translation>Comincia la copia di: File Supporto e Esercizio... </translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="598"/>
@@ -10194,7 +10194,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="676"/>
         <source>-&gt; Error: Activity %1 - Invalid File Name (expected format &apos;YYYY_MM_DD_HH_MM_SS.%2&apos;)</source>
-        <translation>-&gt; Errore: Attivita&apos; %1 - Nome del file non valido (formato atteso &apos;AAAA_MM_GG_OO_MM_SS.%2&apos;)</translation>
+        <translation>-&gt; Errore: Attivita&apos; %1 - Nome del file non valido (formato atteso &apos;YYYY_MM_DD_HH_MM_SS.%2&apos;)</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="682"/>
@@ -10442,7 +10442,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="106"/>
         <source>Workout</source>
-        <translation>Allenamento</translation>
+        <translation>Esercizio</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="107"/>
@@ -10483,7 +10483,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="112"/>
         <source>Workout Editor</source>
-        <translation>Editore allenamento</translation>
+        <translation>Editore Esercizio</translation>
     </message>
 </context>
 <context>
@@ -10581,7 +10581,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="140"/>
         <source>Elevation hysteresis (meters)</source>
-        <translation>Isteresi Altitudinene (metri)</translation>
+        <translation>Isteresi Altitudine (metri)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="149"/>
@@ -10601,7 +10601,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="207"/>
         <source>Workout and VideoSync Library</source>
-        <translation>Libreria Allenamento e VideoSync</translation>
+        <translation>Libreria Esercizio e VideoSync</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="227"/>
@@ -10653,7 +10653,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="342"/>
         <source>Select Workout Library</source>
-        <translation>Seleziona Libreria Allenamenti</translation>
+        <translation>Seleziona Libreria Esercizi</translation>
     </message>
 </context>
 <context>
@@ -10686,7 +10686,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GenerateHeatMapDialog.cpp" line="72"/>
         <source>dd MMM yyyy</source>
-        <translation></translation>
+        <translation>dd MMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/GenerateHeatMapDialog.cpp" line="76"/>
@@ -10827,12 +10827,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="548"/>
         <source>Workout Wizard</source>
-        <translation>Creazione Allenamenti</translation>
+        <translation>Creazione Esercizio</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="550"/>
         <source>Manually create a workout based on gradient (slope) and distance, maximum grade is 5.</source>
-        <translation>Crea manualmente un allenamento basato su gradiente (inclinazione) e distamza, il grado massimo e&apos; 5.</translation>
+        <translation>Crea manualmente un esercizio basato su gradiente (inclinazione) e distanza, il grado massimo e&apos; 5.</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="556"/>
@@ -10864,7 +10864,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="603"/>
         <source>Save Workout</source>
-        <translation>Salva allenamento</translation>
+        <translation>Salva Esercizio</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="604"/>
@@ -10916,12 +10916,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="816"/>
         <source>Tempo</source>
-        <translation>Tempo</translation>
+        <translation>Ritmo</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="817"/>
         <source>Threshold</source>
-        <translation>Soglia</translation>
+        <translation>Soglia Anaerobica</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="818"/>
@@ -10946,7 +10946,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="829"/>
         <source>Steady</source>
-        <translation>Costante</translation>
+        <translation>Stazionario</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="830"/>
@@ -11056,7 +11056,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="916"/>
         <source>yyyy-MM (MMMM)</source>
-        <translation></translation>
+        <translation>yyyy-MM (MMMM)</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigatorProxy.h" line="253"/>
@@ -11123,7 +11123,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="78"/>
         <source>Ride indoors, following pre-programmed workouts - with multi device and video playback support</source>
-        <translation>Corsa bici indoor, seguendo allenamenti pre-programmati - con supporto dispositivi multipli e playback</translation>
+        <translation>Allenamento in bici indoor, seguendo esercizi pre-programmati - con supporto dispositivi multipli e playback</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="82"/>
@@ -11185,17 +11185,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="127"/>
         <source>Downloading of Workouts for the ERGDB (online workout DB) for Train - Indoor Riding</source>
-        <translation>Scaricamento degli allenamenti per il ERGDB (DB allenamento in linea) per seduta allenamento - corsa indoor</translation>
+        <translation>Scaricamento degli esercizi per il ERGDB (DB allenamento in linea) per seduta allenamento - corsa indoor</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="129"/>
         <source>Creation of a new Workout for Train - Indoor Riding</source>
-        <translation>Creazione di un nuovo Allenamento per seduta allenamento - Corsa indoor</translation>
+        <translation>Creazione di un nuovo Esercizio per seduta allenamento - Corsa indoor</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="131"/>
         <source>Search for Workout files and Video files in a configurable set of folders and add to the Train - Indoor Riding - Workout/Video library</source>
-        <translation>Cerca per un file di allenamento e file video in un gruppo configurabile di cartelle e aggiungi alle sedute di allenamento - Corsa Indoor - Allenamento/libreria video</translation>
+        <translation>Cerca per un file di esercizio e file video in un gruppo configurabile di cartelle e aggiungi alle sedute di allenamento -  Indoor - Allenamento/libreria video</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="74"/>
@@ -11432,7 +11432,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Gui/HelpWhatsThis.cpp" line="189"/>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="217"/>
         <source>Critical Mean Maximal Power Curve</source>
-        <translation>Curva Potenza Massimale Media Critica</translation>
+        <translation>Curva Potenza Media Massima Critica</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="177"/>
@@ -11781,7 +11781,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1519"/>
         <source>Ride Log</source>
-        <translation>Registro Corsa in bici</translation>
+        <translation>Registro Uscita in bici</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1520"/>
@@ -11866,7 +11866,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1536"/>
         <source>Ride</source>
-        <translation>Corsa in bici</translation>
+        <translation>Uscita in bici</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1537"/>
@@ -11921,7 +11921,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1547"/>
         <source>Workout</source>
-        <translation>Allenamento</translation>
+        <translation>Esercizio</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1553"/>
@@ -12227,7 +12227,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="4718"/>
         <source>Lactate Threshold</source>
-        <translation>Soglia Lattato</translation>
+        <translation>Soglia Lattacida</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4719"/>
@@ -12525,17 +12525,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/HrZones.cpp" line="45"/>
         <source>Endurance</source>
-        <translation>resistenza</translation>
+        <translation>Resistenza</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrZones.cpp" line="45"/>
         <source>Tempo</source>
-        <translation>Tempo</translation>
+        <translation>Ritmo</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrZones.cpp" line="45"/>
         <source>Threshold</source>
-        <translation>Soglia</translation>
+        <translation>Soglia Anaerobica</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrZones.cpp" line="46"/>
@@ -13122,12 +13122,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="641"/>
         <source>Workout Wizard</source>
-        <translation>Creazione Allenamenti</translation>
+        <translation>Creazione Esercizi</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="642"/>
         <source>Import current activity as a Gradient ride (slope based)</source>
-        <translation>Importa attivita&apos; in uso come corsa in bici a Gradiente (basata sulla pendenza)</translation>
+        <translation>Importa attivita&apos; in uso come uscita in bici a Gradiente (basata sulla pendenza)</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="647"/>
@@ -13207,7 +13207,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="754"/>
         <source>Save Workout</source>
-        <translation>Salva Allenamenti</translation>
+        <translation>Salva Esercizi</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="755"/>
@@ -13236,7 +13236,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="165"/>
         <source>Intensity Factor is the ratio between NP and the Functional Threshold Power (FTP) configured in Power Zones.</source>
-        <translation>Il fattore di intensita&apos; e&apos; il rapporto tra NP e la Potenza Funzionale di Soglia (FTP) configurata in Zone di Potenza.</translation>
+        <translation>Il fattore di intensita&apos; e&apos; il rapporto tra NP e la Potenza di Soglia Funzionale (FTP) configurata in Zone di Potenza.</translation>
     </message>
 </context>
 <context>
@@ -13355,7 +13355,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="358"/>
         <source>Read summary...</source>
-        <translation>leggi Sommario...</translation>
+        <translation>Leggi Sommario...</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="390"/>
@@ -13717,7 +13717,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="80"/>
         <source>Lactate Normalized Power as defined by Dr. Skiba in GOVSS algorithm</source>
-        <translation>Potenza normalizzata per il Lattato come definita da Dr. Skiba nell&apos;algoritmo GOVSS</translation>
+        <translation>Potenza normalizzata Lattacida come definita da Dr. Skiba nell&apos;algoritmo GOVSS</translation>
     </message>
 </context>
 <context>
@@ -13878,7 +13878,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMPopup.cpp" line="144"/>
         <location filename="../../Charts/LTMPopup.cpp" line="289"/>
         <source>ddd, dd MMM yy hh:mm</source>
-        <translation></translation>
+        <translation>ddd, dd MMM yy hh:mm</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="49"/>
@@ -13894,12 +13894,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="199"/>
         <source>dddd, d MMMM yyyy</source>
-        <translation></translation>
+        <translation>dddd, d MMMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="202"/>
         <source>MMMM yyyy</source>
-        <translation></translation>
+        <translation>MMMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="208"/>
@@ -13911,13 +13911,13 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMPopup.cpp" line="209"/>
         <location filename="../../Charts/LTMPopup.cpp" line="210"/>
         <source>dd MMMM yyyy</source>
-        <translation></translation>
+        <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="215"/>
         <location filename="../../Charts/LTMPopup.cpp" line="216"/>
         <source>dd MMMM yy</source>
-        <translation></translation>
+        <translation>dd MMMM yy</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="223"/>
@@ -14084,7 +14084,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="727"/>
         <source>Workout Code|Sport</source>
-        <translation>Codice Allenamento|Sport</translation>
+        <translation>Codice Esercizio|Sport</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="808"/>
@@ -14374,7 +14374,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="377"/>
         <source>Skiba Stress Balance</source>
-        <translation>Bilancio Stress Skiba</translation>
+        <translation>Bilanciamento Stress di Skiba</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="379"/>
@@ -14388,7 +14388,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMTool.cpp" line="1106"/>
         <location filename="../../Charts/LTMTool.cpp" line="1182"/>
         <source>Stress Balance</source>
-        <translation>Bilancio Stress</translation>
+        <translation>Bilanciamento Stress</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="392"/>
@@ -14439,7 +14439,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="453"/>
         <source>Aerobic TISS Stress Balance</source>
-        <translation>TISS Aerobico Bilancio Stress</translation>
+        <translation>TISS Aerobico Bilanciamento Stress</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="468"/>
@@ -14464,7 +14464,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="529"/>
         <source>Anaerobic TISS Stress Balance</source>
-        <translation>TISS Anaerobico Bilancio Stress</translation>
+        <translation>TISS Anaerobico Bilanciamento Stress</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="544"/>
@@ -14489,7 +14489,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="604"/>
         <source>Daniels Stress Balance</source>
-        <translation>Bilancio Stress di Daniels</translation>
+        <translation>Bilanciamento Stress di Daniels</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="619"/>
@@ -14524,7 +14524,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="680"/>
         <source>Work (Kj) Stress Balance</source>
-        <translation>Lavoro (Kj) Bilancio Stress</translation>
+        <translation>Lavoro (Kj) Bilanciamento Stress</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="695"/>
@@ -14574,7 +14574,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="832"/>
         <source>Below CP Work (Kj) Stress Balance</source>
-        <translation>Lavoro sotto CP (kj) Bilancio Stress</translation>
+        <translation>Lavoro sotto CP (kj) Bilanciamento Stress</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="847"/>
@@ -14605,7 +14605,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="908"/>
         <source>Distance (km|mi) Stress Balance</source>
-        <translation>Distanza (km|mi) Stress Bilancio</translation>
+        <translation>Distanza (km|mi) Bilanciamento Stress</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="923"/>
@@ -14620,17 +14620,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="954"/>
         <source>Coggan Chronic Training Load</source>
-        <translation>Coggan Chronic Training Load (CTL)</translation>
+        <translation>Carico  di Allenamento Cronico di Coggan (CTL)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="969"/>
         <source>Coggan Acute Training Load</source>
-        <translation>Coggan Carico Allenamento Acuto (ATL)</translation>
+        <translation>Carico di Allenamento Acuto di Coggan (ATL)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="984"/>
         <source>Coggan Training Stress Balance</source>
-        <translation>Coggan Bilancio Strees Allenamento</translation>
+        <translation>Bilanciamento del Carico di Allenamento di Coggan</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="999"/>
@@ -14645,17 +14645,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1029"/>
         <source>Coggan Expected Chronic Training Load</source>
-        <translation>Carico allenamento cronico atteso di Coggan</translation>
+        <translation>Carico  di Allenamento Cronico Atteso secondo Coggan</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1044"/>
         <source>Coggan Expected Acute Training Load</source>
-        <translation>Carico allenamento acuto atteso di Coggan</translation>
+        <translation>Carico di Allenamento Acuto secondo Coggan</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1059"/>
         <source>Coggan Expected Training Stress Balance</source>
-        <translation>Bilancio Strees allenamento atteso di Coggan</translation>
+        <translation>Bilanciamento del Carico di Allenamento Atteso secondo Coggan</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1075"/>
@@ -14670,7 +14670,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1104"/>
         <source>TRIMP Stress Balance</source>
-        <translation>TRIMP Bilancio Stress</translation>
+        <translation>TRIMP Bilanciamento Stress</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1119"/>
@@ -14715,7 +14715,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1180"/>
         <source>TriScore Stress Balance</source>
-        <translation>TriScore Bilancio Stress</translation>
+        <translation>TriScore Bilanciamento Stress</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1195"/>
@@ -14861,17 +14861,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1157"/>
         <source>Coggan Acute Training Load</source>
-        <translation>Carico Allenamento Acuto di Coggan</translation>
+        <translation>Carico di Allenamento Acuto di Coggan</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1158"/>
         <source>Coggan Chronic Training Load</source>
-        <translation>Carico Allenamento Cronico di Coggan</translation>
+        <translation>Carico di Allenamento Cronico di Coggan</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1159"/>
         <source>Coggan Training Stress Balance</source>
-        <translation>Bilancio Strees Allenamento di Coggan</translation>
+        <translation>Bilanciamento del Carico di Allenamento di Coggan</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1174"/>
@@ -14936,7 +14936,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Gui/Pages.cpp" line="4977"/>
         <location filename="../../Gui/Pages.cpp" line="5017"/>
         <source>Lactate Threshold</source>
-        <translation>Soglia Lattato</translation>
+        <translation>Soglia Lattacida</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="5284"/>
@@ -14972,7 +14972,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Gui/Pages.cpp" line="5109"/>
         <location filename="../../Gui/Pages.cpp" line="5129"/>
         <source>MMM d, yyyy</source>
-        <translation></translation>
+        <translation>MMM d, yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="5056"/>
@@ -15231,12 +15231,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="128"/>
         <source>Import Videos, VideoSyncs and Workouts</source>
-        <translation>Importa Videos, VideoSyncs e Workouts</translation>
+        <translation>Importa Videos, VideoSyncs e Esercizi</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="129"/>
         <source>No supported videos, videoSyncs or workouts were found to import</source>
-        <translation>Non sono stati trovati Videos, VideoSyncs e Workouts supportati per l&apos;importazione</translation>
+        <translation>Non sono stati trovati Videos, VideoSyncs e Esercizi supportati per l&apos;importazione</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="179"/>
@@ -15251,12 +15251,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="207"/>
         <source>Copy Workout Failed</source>
-        <translation>Copia Allenamenti Fallita</translation>
+        <translation>Copia Esercizi Fallita</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="208"/>
         <source>%1 already exists in workout library: %2</source>
-        <translation>%1 esiste gia&apos; nella libreria allenamenti: %2</translation>
+        <translation>%1 esiste gia&apos; nella libreria esercizi: %2</translation>
     </message>
 </context>
 <context>
@@ -15264,12 +15264,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="253"/>
         <source>Search for Workouts, Syncs and Media</source>
-        <translation>Cerca per Allenamenti, Sync e Media</translation>
+        <translation>Cerca Esercizi, Sync e Media</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="260"/>
         <source>Workout files (.erg, .mrc, .zwo etc)</source>
-        <translation>Files Allenamenti (.erg, mrc, zwo ecc.)</translation>
+        <translation>Files Esercizi (.erg, mrc, zwo ecc.)</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="262"/>
@@ -15304,7 +15304,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="319"/>
         <source>Workouts</source>
-        <translation>Allenamenti</translation>
+        <translation>Esercizi</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="321"/>
@@ -15492,7 +15492,8 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../FileIO/MacroDevice.cpp" line="49"/>
         <source>Make sure the Macro unit is turned
 on and that its display says, &quot;PC Link&quot;</source>
-        <translation>Fai in modo che l&apos;unita&apos; Macro sia accesa e che il display abbia, &quot;PC LINK&quot;</translation>
+        <translation>Accertati che l&apos;unita&apos; Macro sia accesa
+ e che il display abbia, &quot;PC LINK&quot;</translation>
     </message>
 </context>
 <context>
@@ -15587,7 +15588,7 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="387"/>
         <source>Tiled View</source>
-        <translation>Vista a piastrella</translation>
+        <translation>Vista a pila</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="666"/>
@@ -15853,12 +15854,12 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="586"/>
         <source>Import workouts, videos, videoSyncs...</source>
-        <translation>Importa Allenamenti, Videos, VideoSyncs...</translation>
+        <translation>Importa Esercizi, Videos, VideoSyncs...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="587"/>
         <source>Scan disk for workouts, videos, videoSyncs...</source>
-        <translation>Scansiona disco per allenamenti, video, videoSyncs...</translation>
+        <translation>Scansiona disco per esercizi, video, videoSyncs...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="598"/>
@@ -15899,7 +15900,7 @@ on and that its display says, &quot;PC Link&quot;</source>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
-        <translation>La rubrica di allenamento non e&apos; configurata, o la directory selezionata non esiste piu&apos;.
+        <translation>La rubrica di esercizio non e&apos; configurata, o la directory selezionata non esiste piu&apos;.
 
 Si prega di verificare le impostazioni delle preferenze.</translation>
     </message>
@@ -15916,7 +15917,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="680"/>
         <source>Tabbed not Tiled</source>
-        <translation>Tabulato non a piastrella</translation>
+        <translation>Tabulato non a pila</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="517"/>
@@ -15972,12 +15973,12 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="584"/>
         <source>Create a new workout...</source>
-        <translation>Crea un nuovo allenamento...</translation>
+        <translation>Crea un nuovo esercizio...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="585"/>
         <source>Download workouts from ErgDB...</source>
-        <translation>Download Allenamento da ErgDB...</translation>
+        <translation>Scarica esercizio da ErgDB...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="589"/>
@@ -16143,7 +16144,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="2153"/>
         <source>Workout Directory Invalid</source>
-        <translation>Rubrica Allenamenti non valida</translation>
+        <translation>Rubrica Esercizi non valida</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1645"/>
@@ -16214,7 +16215,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="170"/>
         <source>Workout Code:</source>
-        <translation>Codice Allenamento:</translation>
+        <translation>Codice Esercizio:</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="174"/>
@@ -16430,7 +16431,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1652"/>
         <source>Max Power</source>
-        <translation>max Potenza</translation>
+        <translation>Potenza Max</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1653"/>
@@ -16653,7 +16654,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="679"/>
         <source>dd MMM yyyy</source>
-        <translation></translation>
+        <translation>dd MMM yyyy</translation>
     </message>
 </context>
 <context>
@@ -17581,7 +17582,7 @@ Parsing ... </source>
         <source>
 Importing %1 Ride(s)... 
 </source>
-        <translation>Importo in corso %1 Corsa(e) in bici...
+        <translation>Importo in corso %1 Uscita(e) in bici...
 </translation>
     </message>
     <message>
@@ -17589,7 +17590,7 @@ Importing %1 Ride(s)...
         <source>
 No rides found to import. 
 </source>
-        <translation>Nessuna corsa in bici trovata da importare.
+        <translation>Nessuna uscita in bici trovata da importare.
 </translation>
     </message>
     <message>
@@ -17681,7 +17682,7 @@ No rides found to import.
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1122"/>
         <source>MMM d, yyyy</source>
-        <translation></translation>
+        <translation>MMM d, yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1123"/>
@@ -17696,7 +17697,7 @@ No rides found to import.
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1129"/>
         <source>ddd MMM d, yyyy hh:mm</source>
-        <translation></translation>
+        <translation>ddd MMM d, yyyy hh:mm</translation>
     </message>
 </context>
 <context>
@@ -17754,7 +17755,7 @@ No rides found to import.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="44"/>
         <source>Lactate Heartrate</source>
-        <translation>Frequenza cardiaca Lattato</translation>
+        <translation>Frequenza cardiaca Lattacida</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="45"/>
@@ -17892,7 +17893,7 @@ No rides found to import.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="343"/>
         <source>Athlete already exists </source>
-        <translation>L&apos;Atleta e&apos; gia&apos; presente </translation>
+        <translation>L&apos; Atleta e&apos; gia&apos; presente </translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="346"/>
@@ -18493,12 +18494,12 @@ No rides found to import.
     <message>
         <location filename="../../Metrics/PaceZones.cpp" line="94"/>
         <source>Tempo</source>
-        <translation>Tempo</translation>
+        <translation>Ritmo</translation>
     </message>
     <message>
         <location filename="../../Metrics/PaceZones.cpp" line="94"/>
         <source>Threshold</source>
-        <translation>Soglia</translation>
+        <translation>Soglia Anaerobica</translation>
     </message>
     <message>
         <location filename="../../Metrics/PaceZones.cpp" line="95"/>
@@ -18508,7 +18509,7 @@ No rides found to import.
     <message>
         <location filename="../../Metrics/PaceZones.cpp" line="95"/>
         <source>Anaerobic</source>
-        <translation>Anaerobico</translation>
+        <translation>Capacita&apos; Anaerobica</translation>
     </message>
     <message>
         <location filename="../../Metrics/PaceZones.cpp" line="143"/>
@@ -18845,7 +18846,6 @@ No rides found to import.
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2856"/>
         <source>Copy/Paste Mismatch</source>
-        <translatorcomment>いまいち</translatorcomment>
         <translation>Copia/Incolla incongruenza</translation>
     </message>
     <message>
@@ -19378,7 +19378,7 @@ Vuoi continuare?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="49"/>
         <source>Average Power as Percent of Mean Maximal Power for Duration.</source>
-        <translation>Potenza media espressa come percentuale della potenza massimale media per la durata.</translation>
+        <translation>Potenza media espressa come percentuale della potenza media massima per la durata.</translation>
     </message>
 </context>
 <context>
@@ -20020,7 +20020,7 @@ Vuoi continuare?</translation>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2319"/>
         <source>aPower (watts)</source>
-        <translation>aPotenza (Watt)</translation>
+        <translation>aPower (Watt)</translation>
     </message>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2323"/>
@@ -20327,7 +20327,8 @@ on and that its display says, &quot;Host&quot;</source>
         <location filename="../../Charts/LTMPlot.h" line="219"/>
         <source>MMM dd
 yyyy</source>
-        <translation></translation>
+        <translation>MMM dd
+yyyy</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.h" line="241"/>
@@ -20421,7 +20422,7 @@ yyyy</source>
     <message>
         <location filename="../../Train/LibraryParser.cpp" line="79"/>
         <source>Problem Saving Workout Library</source>
-        <translation>Problema nel salvare la librearia di Allenamento</translation>
+        <translation>Problema nel salvare la librearia di Esercizio</translation>
     </message>
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="195"/>
@@ -20615,7 +20616,7 @@ yyyy</source>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="437"/>
         <source>XPower</source>
-        <translation>XPotenza</translation>
+        <translation>XPower</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="440"/>
@@ -20884,12 +20885,12 @@ yyyy</source>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="414"/>
         <source>Workout Wizard</source>
-        <translation>Wizard Workout</translation>
+        <translation>Wizard Esercizio</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="415"/>
         <source>Relative Wattage Workout Wizard, current CP60 = </source>
-        <translation>Wizard Allenamenti a wattaggio relativo, in uso CP60 = </translation>
+        <translation>Wizard Esercizi a wattaggio relativo, in uso CP60 = </translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="419"/>
@@ -20915,7 +20916,7 @@ yyyy</source>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="501"/>
         <source>Save Workout</source>
-        <translation>Salva allenamento</translation>
+        <translation>Salva Esercizio</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="502"/>
@@ -20933,7 +20934,7 @@ yyyy</source>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="168"/>
         <source>Relative Intensity is the ratio between xPower and the Critical Power (CP) configured in Power Zones, similar to IF.</source>
-        <translation>I&apos; intensita&apos; relativa e&apos; il rapporto tra xPotenza e Potenza Critica (CP) configurata in Zone di Potenza, simile a IF.</translation>
+        <translation>L&apos; Intensita&apos; Relativa e&apos; il rapporto tra xPower e Potenza Critica (CP) configurata in Zone di Potenza, simile a IF.</translation>
     </message>
 </context>
 <context>
@@ -21054,7 +21055,7 @@ yyyy</source>
     <message>
         <location filename="../../Core/RideCache.cpp" line="375"/>
         <source>Problem Saving Ride Cache</source>
-        <translation>Problema nel salvare la memoria di transito della corsa in bici</translation>
+        <translation>Problema nel salvare la memoria di transito dell&apos;uscita in bici</translation>
     </message>
     <message>
         <location filename="../../Core/RideCache.cpp" line="376"/>
@@ -21072,7 +21073,7 @@ yyyy</source>
     <message>
         <location filename="../../FileIO/ManualRideFile.cpp" line="49"/>
         <source>Could not open ride file: &quot;</source>
-        <translation>Non posso aprire il file della corsa in bici: &quot;</translation>
+        <translation>Non posso aprire il file dell&apos;uscita in bici: &quot;</translation>
     </message>
     <message>
         <location filename="../../FileIO/ManualRideFile.cpp" line="86"/>
@@ -21082,7 +21083,7 @@ yyyy</source>
     <message>
         <location filename="../../FileIO/ManualRideFile.cpp" line="119"/>
         <source>Unknown ride metric &quot;%1&quot;.</source>
-        <translation>Misure corsa in bici sconosciute &quot;%1&quot;.</translation>
+        <translation>Misure uscita in bici sconosciute &quot;%1&quot;.</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="43"/>
@@ -21507,12 +21508,12 @@ Vuoi continuare?</translation>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="293"/>
         <source>xPower</source>
-        <translation>xPotenza</translation>
+        <translation>xPower</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="294"/>
         <source>aPower</source>
-        <translation>aPotenza</translation>
+        <translation>aPower</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="295"/>
@@ -21985,7 +21986,7 @@ Salto il file...</translation>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="545"/>
         <source>Sustained efforts and matches using power</source>
-        <translation>Sforzi sostenuti e &quot;cerini&quot; usando la potenza</translation>
+        <translation>Sforzi sostenuti e matches usando la potenza</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="3004"/>
@@ -22348,7 +22349,7 @@ Salto il file...</translation>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="678"/>
         <source>Step 3 of 4: %1 ride(s) are missing the date and time.</source>
-        <translation>Livello 3 di 4: %1 corsa(e) in bici non indicano data e orario.</translation>
+        <translation>Livello 3 di 4: %1 uscita(e) in bici non indicano data e orario.</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="680"/>
@@ -22734,7 +22735,7 @@ Salto il file...</translation>
         <location filename="../../Gui/RideNavigator.cpp" line="42"/>
         <location filename="../../Gui/RideNavigator.cpp" line="244"/>
         <source>*|Workout Code|Date|</source>
-        <translation>*|Codice Allenamento|Data|</translation>
+        <translation>*|Codice Esercizio|Data|</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="256"/>
@@ -22880,7 +22881,7 @@ Salto il file...</translation>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1398"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1497"/>
         <source>dd MMM yyyy</source>
-        <translation></translation>
+        <translation>dd MMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1532"/>
@@ -22928,7 +22929,7 @@ Salto il file...</translation>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="328"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="332"/>
         <source>dd MMM yy</source>
-        <translation></translation>
+        <translation>dd MMM yy</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="331"/>
@@ -22959,13 +22960,13 @@ Salto il file...</translation>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="391"/>
         <source>dddd MMMM d, yyyy, hh:mm</source>
-        <translation></translation>
+        <translation>dddd MMMM d, yyyy, hh:mm</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="396"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="398"/>
         <source>dddd MMMM d yyyy</source>
-        <translation></translation>
+        <translation>dddd MMMM d yyyy</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="486"/>
@@ -23040,7 +23041,7 @@ Salto il file...</translation>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="923"/>
         <source>d MMM yyyy</source>
-        <translation></translation>
+        <translation>d MMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="980"/>
@@ -23078,13 +23079,13 @@ Salto il file...</translation>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1225"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1231"/>
         <source> ride</source>
-        <translation> corsa in bici</translation>
+        <translation> uscita in bici</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1225"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1231"/>
         <source> rides</source>
-        <translation> corse in bici</translation>
+        <translation> uscite in bici</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1240"/>
@@ -23247,7 +23248,7 @@ Salto il file...</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1443"/>
         <source>PMC Stress Balance Today</source>
-        <translation>Bilancio Stress PMC Oggi</translation>
+        <translation>PMC Bilanciamento Stress Oggi</translation>
     </message>
 </context>
 <context>
@@ -23286,7 +23287,7 @@ Salto il file...</translation>
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="263"/>
         <source>Swimming Relative Intensity, used for SwimScore calculation, defined as xPowerSwim/STP</source>
-        <translation>Intensita&apos; relativa Nuoto, usata per il calcolo dello SwimScore, definito come xPotenza/STP</translation>
+        <translation>Intensita&apos; Relativa Nuoto, usata per il calcolo dello SwimScore, definito come xPowerSwim/STP</translation>
     </message>
 </context>
 <context>
@@ -23331,7 +23332,7 @@ You have made changes to some rides which
 have not been saved. They are listed below.</source>
         <translation>Attenzione
 
-Hai fatto dei cambiamenti ad alcune corse in bici che non sono state salvate. Sono elencate di seguito.</translation>
+Hai fatto dei cambiamenti ad alcune uscite in bici che non sono state salvate. Sono elencate di seguito.</translation>
     </message>
     <message>
         <location filename="../../Gui/SaveDialogs.cpp" line="322"/>
@@ -24161,7 +24162,7 @@ di GoldenCheetah. Procediamo?</translation>
         <location filename="../../Gui/Pages.cpp" line="6274"/>
         <location filename="../../Gui/Pages.cpp" line="6276"/>
         <source>ddd MMM d, yyyy</source>
-        <translation></translation>
+        <translation>ddd MMM d, yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="6120"/>
@@ -24534,7 +24535,7 @@ di GoldenCheetah. Procediamo?</translation>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="36"/>
         <source>Workout Code</source>
-        <translation>Codice Allenamento</translation>
+        <translation>Codice Esercizio</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="35"/>
@@ -24559,7 +24560,7 @@ di GoldenCheetah. Procediamo?</translation>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="37"/>
         <source>Workout Title</source>
-        <translation>Titolo Allenamento</translation>
+        <translation>Titolo Esercizio</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="38"/>
@@ -24612,7 +24613,7 @@ di GoldenCheetah. Procediamo?</translation>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="129"/>
         <source>Workout</source>
-        <translation>Allenamento</translation>
+        <translation>Esercizio</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="130"/>
@@ -24721,7 +24722,7 @@ di GoldenCheetah. Procediamo?</translation>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="327"/>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="374"/>
         <source>dd MMM yyyy</source>
-        <translation></translation>
+        <translation>dd MMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="352"/>
@@ -25010,7 +25011,7 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="282"/>
         <source>found %1 ride blocks</source>
-        <translation>trovato %1 blocco/i corse in bici</translation>
+        <translation>trovato %1 blocco/i uscite in bici</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="302"/>
@@ -25033,7 +25034,7 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="397"/>
         <source>skipping unselected ride block %1</source>
-        <translation>salto blocco corsa in bici non selezionato: %1</translation>
+        <translation>salto blocco uscita in bici non selezionato: %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="443"/>
@@ -25228,7 +25229,7 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
     <message>
         <location filename="../../Charts/SummaryWindow.cpp" line="51"/>
         <source>dddd MMMM d, yyyy, hh:mm</source>
-        <translation></translation>
+        <translation>dddd MMMM d, yyyy, hh:mm</translation>
     </message>
 </context>
 <context>
@@ -25659,7 +25660,7 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
     <message>
         <location filename="../../Gui/TabView.cpp" line="66"/>
         <source>Intensity Adjustments and Workout Control</source>
-        <translation>Aggiustamenti Intensita&apos; e Controllo Allenamenti</translation>
+        <translation>Aggiustamenti Intensita&apos; e Controllo Esercizi</translation>
     </message>
 </context>
 <context>
@@ -25986,7 +25987,7 @@ Clicca Cancella per uscire.</translation>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="237"/>
         <source>Save workout data</source>
-        <translation>Salva dati allenamento</translation>
+        <translation>Salva dati esercizio</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="243"/>
@@ -26004,7 +26005,7 @@ Clicca Cancella per uscire.</translation>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="250"/>
         <source>Workouts</source>
-        <translation>Allenamenti</translation>
+        <translation>Esercizi</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="263"/>
@@ -26019,32 +26020,32 @@ Clicca Cancella per uscire.</translation>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="416"/>
         <source>Import Workout from File</source>
-        <translation>Importa Allenamento da file</translation>
+        <translation>Importa Esercizio da file</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="417"/>
         <source>Get Workouts from ErgDB</source>
-        <translation>Ottieni gli allenamenti da ErgDB</translation>
+        <translation>Ottieni gli esercizi da ErgDB</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="418"/>
         <source>Create Workout via Wizard</source>
-        <translation>Crea un allenamento via Wizard</translation>
+        <translation>Crea un esercizio via Wizard</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="419"/>
         <source>Scan for Workouts</source>
-        <translation>Scansiona per nuovi allenamenti</translation>
+        <translation>Scansiona per nuovi esercizi</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="442"/>
         <source>Delete selected Workout</source>
-        <translation>Cancella allenamenti selezionati</translation>
+        <translation>Cancella esercizi selezionati</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="445"/>
         <source>Delete %1 selected Workouts</source>
-        <translation>Cancella %1 allenamenti selezionati</translation>
+        <translation>Cancella %1 esercizi selezionati</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="468"/>
@@ -26101,17 +26102,17 @@ Clicca Cancella per uscire.</translation>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="921"/>
         <source>Are you sure you want to delete this Workout?</source>
-        <translation>Sei sicuro di voler cancellare questo Allenamento?</translation>
+        <translation>Sei sicuro di voler cancellare questo Esercizio?</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="924"/>
         <source>Are you sure you want to delete this %1 workouts?</source>
-        <translation>Sei sicuro di voler cancellare questo allenamento %1?</translation>
+        <translation>Sei sicuro di voler cancellare questi esercizi %1?</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="963"/>
         <source>The Workout file is either not valid or not existing and will be removed from the library.</source>
-        <translation>Il file Allenamento e&apos; o non valido o non esistente e sara&apos; rimosso dalla libreria.</translation>
+        <translation>Il file Esercizio e&apos; o non valido o non esistente e sara&apos; rimosso dalla libreria.</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="523"/>
@@ -26339,7 +26340,7 @@ Premi F3 sul Controller quando finito.</translation>
     <message>
         <location filename="../../Cloud/TwitterDialog.cpp" line="39"/>
         <source>Workout Time</source>
-        <translation>Orario Allenamento</translation>
+        <translation>Orario Esercizio</translation>
     </message>
     <message>
         <location filename="../../Cloud/TwitterDialog.cpp" line="34"/>
@@ -26712,7 +26713,7 @@ Premi F3 sul Controller quando finito.</translation>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="129"/>
         <source>Skiba Variability Index is the ratio between xPower and Average Power.</source>
-        <translation>L&apos;Indice di Variabilita&apos; di Skiba e&apos; la proporzione tra xPotenza e Potenza media.</translation>
+        <translation>L&apos;Indice di Variabilita&apos; di Skiba (VI) e&apos; la proporzione tra xPower e Potenza Media.</translation>
     </message>
 </context>
 <context>
@@ -27339,7 +27340,7 @@ Premi F3 sul Controller quando finito.</translation>
         <source>Please note, that when importing or drag and dropping videos into the library we DO NOT copy the file into the GoldenCheetah library, instead we add a REFERENCE to it. We DO copy workout and videoSync files, since they are smaller.
 
 You can remove references when managing the library via the context menu options</source>
-        <translation>Si prega notare che quando si importano o si trasferiscono filmati nella library NON si COPIANO i file nella library di GoldenCheetah, invece gli si aggiunge una REFERENZA. Si COPIANO invece i file di allenamento e videoSync, peche&apos; sono di piccole dimensioni.
+        <translation>Si prega notare che quando si importano o si trasferiscono filmati nella library NON si COPIANO i file nella library di GoldenCheetah, invece gli si aggiunge una REFERENZA. Si COPIANO invece i file di esercizio e videoSync, peche&apos; sono di piccole dimensioni.
 
 Si possono rimuovere le referenze quando si gestisce la librearia atraverso le opzioni del menu di contesto</translation>
     </message>
@@ -27369,7 +27370,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Train/WorkoutWizard.h" line="210"/>
         <source>Workout Metrics</source>
-        <translation>Misure Allenamento</translation>
+        <translation>Misure Esercizio</translation>
     </message>
 </context>
 <context>
@@ -27396,12 +27397,12 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="229"/>
         <source>Workout Creator</source>
-        <translation>Creazione Allenamenti</translation>
+        <translation>Creazione Esercizi</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="230"/>
         <source>Select the workout type to be created</source>
-        <translation>Seleziona il tipo d&apos;allenamento da creare</translation>
+        <translation>Seleziona il tipo d&apos;esercizio da creare</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="232"/>
@@ -27512,7 +27513,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="401"/>
         <source>You have unsaved changes to a workout.</source>
-        <translation>Hai dei cambiamnti ad un allenamento che non hai salvato.</translation>
+        <translation>Hai dei cambiamnti ad un esercizio che non hai salvato.</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="402"/>
@@ -27522,7 +27523,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="434"/>
         <source>Save Workout File</source>
-        <translation>Salva file di allenamento</translation>
+        <translation>Salva file di esercizio</translation>
     </message>
 </context>
 <context>
@@ -27716,7 +27717,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="162"/>
         <source>Normalized Swim Pace in min/100m or min/100yd, defined as the constant pace which requires the same xPowerSwim</source>
-        <translation>Ritmo nuoto normalizzato in min/100m o min/100yd, definito come il ritmo costante che richiede la stessa xPotenzaNuoto</translation>
+        <translation>Ritmo nuoto normalizzato in min/100m o min/100yd, definito come il ritmo costante che richiede lo stesso xPowerSwim</translation>
     </message>
 </context>
 <context>
@@ -27724,7 +27725,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="53"/>
         <source>xPower</source>
-        <translation>xPotenza</translation>
+        <translation>xPower</translation>
     </message>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="55"/>
@@ -27735,7 +27736,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="57"/>
         <source>xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant, similar to NP.</source>
-        <translation>xPotenza è una stima della potenza che si puo&apos; mantenere per lo stesso &apos;costo&apos; fisiologico se la potenza prodotta fosse stata perfettamente costante, simile a NP.</translation>
+        <translation>xPower è una stima della potenza che si puo&apos; mantenere per lo stesso &apos;costo&apos; fisiologico se la potenza prodotta fosse stata perfettamente costante, simile a NP.</translation>
     </message>
 </context>
 <context>
@@ -27743,7 +27744,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="69"/>
         <source>xPower Swim</source>
-        <translation>xPotenza Nuoto</translation>
+        <translation>xPower Nuoto</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="71"/>
@@ -28216,12 +28217,12 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/Zones.cpp" line="43"/>
         <source>Tempo</source>
-        <translation>Tempo</translation>
+        <translation>Ritmo</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="43"/>
         <source>Threshold</source>
-        <translation>Soglia</translation>
+        <translation>Soglia Anaerobica</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="44"/>
@@ -28231,12 +28232,12 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/Zones.cpp" line="44"/>
         <source>Anaerobic</source>
-        <translation>Anaerobico</translation>
+        <translation>Capacita&apos; Anaerobica</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="44"/>
         <source>Neuromuscular</source>
-        <translation>Neuromuscolare</translation>
+        <translation>Potenza Neuromuscolare</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="162"/>
@@ -28269,7 +28270,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="202"/>
         <source>Skiba&apos;s altitude adjusted stress score taking into account both the intensity and the duration of the training session plus the altitude effect, similar to aTSS it can be computed as 100 * hours * (aPower Relative Intensity)^2</source>
-        <translation>Altitudine Skiba aggiustata tenuto conto sia dell&apos;intensita&apos; che della durata delle sessioni di allenamento piu&apos; l&apos;effetto dell&apos;altitudine, come per il TSS puo&apos; essere calcolato come 100 * ore * (aPotenza Intensita&apos; relativa)^2</translation>
+        <translation>Altitudine Skiba aggiustata tenuto conto sia dell&apos;intensita&apos; che della durata delle sessioni di allenamento piu&apos; l&apos;effetto dell&apos;altitudine, come per il TSS puo&apos; essere calcolato come 100 * ore * (aPower Intensita&apos; relativa)^2</translation>
     </message>
 </context>
 <context>
@@ -28277,7 +28278,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="302"/>
         <source>aPower Efficiency Factor</source>
-        <translation>Fattore Efficienza aPotenza</translation>
+        <translation>Fattore Efficienza aPower</translation>
     </message>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="307"/>
@@ -28306,7 +28307,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="161"/>
         <source>aPower Relative Intensity</source>
-        <translation>Intensita&apos; Relativa aPotenza</translation>
+        <translation>Intensita&apos; Relativa aPower</translation>
     </message>
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="166"/>
@@ -28319,12 +28320,12 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="243"/>
         <source>aPower Response Index</source>
-        <translation>Indice Risposta aPotenza</translation>
+        <translation>Indice Risposta aPower</translation>
     </message>
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="248"/>
         <source>The ratio between axPower and Average HR, similar to aPower Efficiency Factor</source>
-        <translation>Ia proporzione tra axPower e la FC media, simile al fattore di efficienza aPotenza</translation>
+        <translation>Ia proporzione tra axPower e la FC media, simile al fattore di efficienza aPower</translation>
     </message>
 </context>
 <context>
@@ -28377,7 +28378,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="125"/>
         <source>Altitude Adjusted Variability Index is the ratio between aNP and Average aPower.</source>
-        <translation>L&apos; indice di VAriabilita&apos; aggiustato per l&apos;altitudine e&apos; il rapporto tra aNP e aPotenza media.</translation>
+        <translation>L&apos; indice di Variabilita&apos; aggiustato per l&apos;altitudine e&apos; il rapporto tra aNP e aPower medio.</translation>
     </message>
 </context>
 <context>
@@ -28390,7 +28391,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="128"/>
         <source>Skiba Altitude Adjusted Variability Index is the ratio between axPower and Average aPower.</source>
-        <translation>L&apos;indice di Skiba di variabilita&apos; aggiustato per l&apos;altitudine e&apos; il rapporto tra axPotenza e aPotenza media.</translation>
+        <translation>L&apos;indice di Skiba di variabilita&apos; aggiustato per l&apos;altitudine e&apos; il rapporto tra axPower e aPower medio.</translation>
     </message>
 </context>
 <context>
@@ -28409,7 +28410,7 @@ Si possono rimuovere le referenze quando si gestisce la librearia atraverso le o
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="56"/>
         <source>Altitude Adjusted xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant at altitude, similar to aNP.</source>
-        <translation>aPotenza aggiustata per l&apos;altitudine è una stima della potenza che si puo&apos; avere mantenere per lo stesso &apos;costo&apos; fisiologico se la potenza prodotta fosse stata perfettamente costante, simile a aNP.</translation>
+        <translation>axPower (xPower corretto per l&apos;altitudine) è una stima della potenza che avreste potuto mantenere per lo stesso &apos;costo&apos; fisiologico se la potenza prodotta fosse stata perfettamente costante, simile a aNP.</translation>
     </message>
 </context>
 <context>
