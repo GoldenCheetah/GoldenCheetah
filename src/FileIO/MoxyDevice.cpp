@@ -38,7 +38,7 @@ MoxyDevices::downloadInstructions() const
 DevicePtr
 MoxyDevices::newDevice( CommPortPtr dev )
 {
-    return DevicePtr( new MoxyDevice( dev ));
+    return DevicePtr( static_cast<Device *>(new MoxyDevice( dev )));
 }
 
 static QDateTime dateTimeForRow(QString line)
