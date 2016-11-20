@@ -263,6 +263,11 @@ QString GcCrashDialog::versionHTML()
     vlc = "yes";
     #endif
 
+    // -- WEBKIT ---
+    QString webkit = "yes";
+    #ifdef NOWEBKIT
+    webkit = "none";
+    #endif
     #ifdef GC_HAVE_SAMPLERATE
     QString src = QString(src_get_version()).mid(14,6);
     #else
@@ -308,6 +313,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">SAMPLERATE</td><td>%15</td></tr>"
             "<tr><td colspan=\"2\">SSL</td><td>%16</td></tr>"
             "<tr><td colspan=\"2\">R</td><td>%17</td></tr>"
+            "<tr><td colspan=\"2\">WEBKIT</td><td>%18</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -343,6 +349,7 @@ QString GcCrashDialog::versionHTML()
             .arg("none")
 #endif
 #endif
+            .arg(webkit)
 
             ;
 
