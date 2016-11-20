@@ -641,10 +641,11 @@ MainWindow::setSplash(bool first)
     progress = new QLabel(splash);
     progress->setAlignment(Qt::AlignCenter);
     QHBoxLayout *l = new QHBoxLayout(splash);
+    l->setSpacing(0);
     l->addWidget(progress);
 
     // lets go
-    splash->setFixedSize(100,50);
+    splash->setFixedSize(100,80);
 
     if (first) {
         // middle of screen
