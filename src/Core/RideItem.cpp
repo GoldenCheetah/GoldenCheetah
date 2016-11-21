@@ -1483,12 +1483,12 @@ RideItem::xdataMatch(QString name, QString series, QString &mname, QString &mser
     while (xi.hasNext()) {
         xi.next();
 
-        if (QDir::match(name, xi.key())) {
+        if (name == xi.key() || QDir::match(name, xi.key())) {
 
             // name matches
             foreach(QString s, xi.value()) {
 
-                if (QDir::match(series, s)) {
+                if (s == series || QDir::match(series, s)) {
 
                     // series matches too
                     mname = xi.key();
