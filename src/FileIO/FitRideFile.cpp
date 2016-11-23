@@ -328,8 +328,8 @@ struct FitFileReaderState
                 case 1551: return "Garmin Fenix";
                 case 1561: case 1742: case 1821: return "Garmin Edge 510";
                 case 1567: return "Garmin Edge 810";
-                case 1623: return "Garmin FR620";
-                case 1632: return "Garmin FR220";
+                case 1623: case 2173: return "Garmin FR620";
+                case 1632: case 2174: return "Garmin FR220";
                 case 1765: case 2130: case 2131: case 2132: return "Garmin FR920XT";
                 case 1836: case 2052: case 2053: case 2070: case 2100: return "Garmin Edge 1000";
                 case 1903: return "Garmin FR15";
@@ -338,11 +338,15 @@ struct FitFileReaderState
                 case 2050: case 2188: case 2189: return "Garmin Fenix3";
                 case 2067: case 2260: return "Garmin Edge 520";
                 case 2147: return "Garmin Edge 25";
-                case 2153: return "Garmin FR225";
+                case 2153: case 2219: return "Garmin FR225";
                 case 2156: return "Garmin FR630";
                 case 2157: return "Garmin FR230";
+                case 2204: return "Garmin Edge 1000 Explore";
                 case 2238: return "Garmin Edge 20";
-                case 2530: return "Garmin Edge 820";    
+                case 2413: return "Garmin Fenix 3 HR";
+                case 2431: return "Garmin FR235";
+                case 2530: return "Garmin Edge 820";
+                case 2531: return "Garmin Edge 820 Explore";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
                 case 65534: return "Garmin Connect Website";
