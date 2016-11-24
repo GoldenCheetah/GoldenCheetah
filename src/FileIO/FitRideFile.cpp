@@ -334,8 +334,8 @@ struct FitFileReaderState
                 case 1836: case 2052: case 2053: case 2070: case 2100: return "Garmin Edge 1000";
                 case 1903: return "Garmin FR15";
                 case 1907: return "Garmin Vivoactive";
-                case 1967: return "Garmin Fenix2";
-                case 2050: case 2188: case 2189: return "Garmin Fenix3";
+                case 1967: return "Garmin Fenix 2";
+                case 2050: case 2188: case 2189: return "Garmin Fenix 3";
                 case 2067: case 2260: return "Garmin Edge 520";
                 case 2147: return "Garmin Edge 25";
                 case 2153: case 2219: return "Garmin FR225";
