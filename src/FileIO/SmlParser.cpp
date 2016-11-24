@@ -117,6 +117,7 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
         else if (qName == "PoolLength")
         {
             rideFile->setTag("Pool Length", buffer);
+            rideFile->setTag("Sport", "Swim"); // Just in case Activity was renamed
         }
         return true;
     }
@@ -247,7 +248,7 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
         lastLat = lat;
 
         // Update distance, speed and cadence for swimming lengths
-        if (swimming && distance > 0.0 && time > lastLength) {
+        if (swimming && distance > 0.0 && round(time) > lastLength) {
             if (SMLdebug) qDebug() << "Time" << time << "Distance" << distance << "lastLength" << lastLength << "lastDistance" << lastDistance;
             if (distance > lastDistance) {
                 double deltaSecs = round(time) - lastLength;
