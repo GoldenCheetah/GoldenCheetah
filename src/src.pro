@@ -157,16 +157,33 @@ macx {
     QMAKE_INFO_PLIST = ./Resources/mac/Info.plist.app
 
     # on mac we use native buttons and video, but have native fullscreen support
-    LIBS    += -lobjc -framework IOKit -framework AppKit -framework QTKit
-    HEADERS += \
-            Gui/QtMacVideoWindow.h \
-            Gui/QtMacSegmentedButton.h \
-            Gui/QtMacButton.h
+    LIBS    += -lobjc -framework IOKit -framework AppKit
 
-    OBJECTIVE_SOURCES += \
-            Gui/QtMacVideoWindow.mm \
-            Gui/QtMacSegmentedButton.mm \
-            Gui/QtMacButton.mm
+    # on mac we use QTKit or AV Foundation
+    contains(DEFINES, "GC_VIDEO_AV") {
+
+        # explicitly wants AV Foundation
+        LIBS += -framework AVFoundation
+        HEADERS +=  Gui/QtMacVideoWindow.h
+        OBJECTIVE_SOURCES += Gui/QtMacVideoWindow.mm
+
+    } else {
+
+        contains(DEFINES, "GC_VIDEO_NONE") {
+
+            # we have a blank videowindow, it will do nothing
+            HEADERS += Train/VideoWindow.h
+            SOURCES += Train/VideoWindow.cpp
+
+        } else {
+
+            # default is to use QuickTime for now
+            LIBS += -framework QTKit
+            HEADERS +=  Gui/QtMacVideoWindow.h
+            OBJECTIVE_SOURCES += Gui/QtMacVideoWindow.mm
+
+        }
+    }
 
 } else {
 
@@ -174,13 +191,14 @@ macx {
     HEADERS += Gui/QTFullScreen.h
     SOURCES += Gui/QTFullScreen.cpp
 
-    HEADERS += ../qtsolutions/segmentcontrol/qtsegmentcontrol.h
-    SOURCES += ../qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
-
-    # we now have videowindow, it will do nothing
     HEADERS += Train/VideoWindow.h
     SOURCES += Train/VideoWindow.cpp
 }
+
+#### these are no longer non-mac only
+HEADERS += ../qtsolutions/segmentcontrol/qtsegmentcontrol.h
+SOURCES += ../qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
+
 
 
 ###=================
