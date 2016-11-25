@@ -50,6 +50,13 @@ SmlParser::SmlParser(RideFile* rideFile) : rideFile(rideFile)
     header = false;
     lap = 0;
     strokes = 0;
+    style = 0;
+
+    swimXdata = new XDataSeries();
+    swimXdata->name = "SWIM";
+    swimXdata->valuename << "TYPE";
+    swimXdata->valuename << "DURATION";
+    swimXdata->valuename << "STROKES";
 }
 
 bool
@@ -174,6 +181,16 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
     {
         if (buffer == "Stroke") strokes++;
     }
+    else if (qName == "PrevPoolLengthStyle")
+    {
+        // style is coded to be compatible with FIT files
+        if (buffer == "Freestyle") style = 0;
+        else if (buffer == "Backstroke") style = 1;
+        else if (buffer == "Breaststroke") style = 2;
+        else if (buffer == "Flystroke") style = 3;
+        else if (buffer == "Drill") style = 4;
+        else if (buffer == "Other") style = 5;
+    }
 
 
     else if (qName == "Sample")
@@ -236,6 +253,7 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
         // Record point on periodic samples only
         if (periodic && round(time) > round(lastTime)) {
             if (distance > lastDistance) lastDistance = distance;
+            if (SMLdebug) qDebug() << "    Time" << time;
             rideFile->appendPoint(round(time), cad, hr, lastDistance, speed, 0,
                          watts, alt, lon, lat, 0, 0.0, temp, 0.0, 0.0,
                          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -250,6 +268,15 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
         // Update distance, speed and cadence for swimming lengths
         if (swimming && distance > 0.0 && round(time) > lastLength) {
             if (SMLdebug) qDebug() << "Time" << time << "Distance" << distance << "lastLength" << lastLength << "lastDistance" << lastDistance;
+            // length-by-length Swim XData
+            XDataPoint *p = new XDataPoint();
+            p->secs = lastLength;
+            p->km = lastDistance;
+            p->number[0] = (distance > lastDistance) ? 1 + style : 0;
+            p->number[1] = time - lastLength;
+            p->number[2] = (distance > lastDistance) ? strokes : 0;
+            swimXdata->datapoints.append(p);
+
             if (distance > lastDistance) {
                 double deltaSecs = round(time) - lastLength;
                 double deltaDist = (distance - lastDistance) / deltaSecs;
@@ -289,6 +316,16 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
             secs += rr;
         }
         if (ewmaRR >= 0.0) rideFile->setDataPresent(rideFile->hr, true);
+    }
+
+    else if (qName == "Samples")
+    {
+        if (SMLdebug) qDebug()<<"Swim XData records"<<swimXdata->datapoints.count();
+        // Add length-by-length Swim XData, if present
+        if (swimXdata->datapoints.count()>0)
+            rideFile->addXData("SWIM", swimXdata);
+        else
+            delete swimXdata;
     }
 
     return true;
