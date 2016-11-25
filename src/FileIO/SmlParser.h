@@ -66,6 +66,8 @@ private:
     bool        swimming;
     int         lap;
     int         strokes;
+    int         style;
+    XDataSeries *swimXdata;
 
     // header processing state
     bool header;
