@@ -1,5 +1,5 @@
 TARGET = kqoauth
-DESTDIR = .
+DESTDIR = ./lib
 win32:DLLDESTDIR = $${DESTDIR}
 
 VERSION = 0.97

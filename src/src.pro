@@ -101,15 +101,15 @@ win32 {
 
     #QWT is configured to build 2 libs (release/debug) on win32 (see qwtbuild.pri)
     CONFIG(release, debug|release){
-    LIBS += -L$${PWD}/../qwt/lib -lqwt
+    LIBS += -L../qwt/lib -lqwt
     }
     CONFIG(debug, debug|release) {
-    LIBS += -L$${PWD}/../qwt/lib -lqwtd
+    LIBS += -L../qwt/lib -lqwtd
     }
 
 } else {
     #QWT is configured to build 1 lib for all other OS (see qwtbuild.pri)
-    LIBS += -L$${PWD}/../qwt/lib -lqwt
+    LIBS += -L../qwt/lib -lqwt
 }
 
 # compress and math libs must be defined in gcconfig.pri
@@ -225,8 +225,17 @@ isEmpty(QMAKE_LRELEASE) {
     else:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 }
 
+# empty variable: used to prevent the path from translations.qrc from being "fixified" to src dir
+__EMPTY_TR_QRC_ROOT__ =
+
+# copy translations.qrc file
+trqrc.target = $(__EMPTY_TR_QRC_ROOT__)Resources/translations.qrc
+trqrc.depends = $${PWD}/Resources/translations.qrc
+trqrc.commands = $$QMAKE_COPY_FILE $$shell_path($$trqrc.depends) $$shell_path($$trqrc.target)
+QMAKE_EXTRA_TARGETS += trqrc
+
 # how to run lrelease
-isEmpty(TS_DIR):TS_DIR = $${PWD}/Resources/translations
+isEmpty(TS_DIR):TS_DIR = Resources/translations
 TSQM.name = lrelease ${QMAKE_FILE_IN}
 TSQM.input = TRANSLATIONS
 TSQM.output = $$TS_DIR/${QMAKE_FILE_BASE}.qm
@@ -238,7 +247,7 @@ QMAKE_EXTRA_COMPILERS += TSQM
 ### RESOURCES
 ###==========
 
-RESOURCES = $${PWD}/Resources/application.qrc $${PWD}/Resources/RideWindow.qrc
+RESOURCES = Resources/application.qrc Resources/RideWindow.qrc $$trqrc.target
 
 
 
@@ -291,8 +300,8 @@ unix:!macx {
     # build from version in repo for Linux builds since
     # kqoauth is not packaged for the Debian and this makes
     # life much easier for the package maintainer
-    INCLUDEPATH += $${PWD}/../kqoauth
-    LIBS        += $${PWD}/../kqoauth/libkqoauth.a
+    INCLUDEPATH += ../kqoauth
+    LIBS        += ../kqoauth/lib/libkqoauth.a
     DEFINES     += GC_HAVE_KQOAUTH
 
 } else {
