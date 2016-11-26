@@ -64,7 +64,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   crrSlider->setTickPosition(QSlider::TicksBelow);
   crrSlider->setTickInterval(1000);
   crrSlider->setMinimum(1000);
-  crrSlider->setMaximum(10000);
+  crrSlider->setMaximum(15000);
   crrSlider->setValue(aerolab->intCrr());
   crrLayout->addWidget( crrLabel );
   crrLayout->addWidget( crrLineEdit );
@@ -117,11 +117,19 @@ AerolabWindow::AerolabWindow(Context *context) :
   //etaLayout->addWidget( etaQLCDNumber );
   etaLayout->addWidget( etaSlider );
 
+  // Eta:
+  QHBoxLayout *commentLayout = new QHBoxLayout;
+  commentLabel = new QLabel(tr("Comment"), this);
+  commentLabel->setFixedWidth(labelWidth1);
+  commentEdit = new QLineEdit();
+  commentLayout->addWidget( commentLabel );
+  commentLayout->addWidget( commentEdit );
 
   // Add to leftControls:
   leftControls->addLayout( crrLayout );
   leftControls->addLayout( cdaLayout );
   leftControls->addLayout( etaLayout );
+  leftControls->addLayout( commentLayout );
 
   // Right controls layout:
   QVBoxLayout *rightControls  =  new QVBoxLayout;
@@ -217,6 +225,9 @@ AerolabWindow::AerolabWindow(Context *context) :
   QPushButton *btnEstCdACrr = new QPushButton(tr("&Estimate CdA and Crr"), this);
   smoothLayout->addWidget(btnEstCdACrr);
 
+  btnSave = new QPushButton(tr("&Save parameters"), this);
+  smoothLayout->addWidget(btnSave);
+
   // Add to leftControls:
   rightControls->addLayout( mLayout );
   rightControls->addLayout( rhoLayout );
@@ -249,12 +260,14 @@ AerolabWindow::AerolabWindow(Context *context) :
   connect(rhoLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(setRhoFromText(const QString)));
   connect(etaSlider, SIGNAL(valueChanged(int)), this, SLOT(setEtaFromSlider()));
   connect(etaLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(setEtaFromText(const QString)));
+  connect(commentEdit, SIGNAL(textChanged(const QString)), this, SLOT(setComment(const QString)));
   connect(eoffsetSlider, SIGNAL(valueChanged(int)), this, SLOT(setEoffsetFromSlider()));
   connect(eoffsetLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(setEoffsetFromText(const QString)));
   connect(eoffsetAuto, SIGNAL(stateChanged(int)), this, SLOT(setAutoEoffset(int)));
   connect(constantAlt, SIGNAL(stateChanged(int)), this, SLOT(setConstantAlt(int)));
   connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
   connect(btnEstCdACrr, SIGNAL(clicked()), this, SLOT(doEstCdACrr()));
+  connect(btnSave, SIGNAL(clicked()), this, SLOT(saveParametersInRide()));
   connect(context, SIGNAL(configChanged(qint32)), aerolab, SLOT(configChanged(qint32)));
   connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
   connect(context, SIGNAL(intervalSelected() ), this, SLOT(intervalSelected()));
@@ -297,7 +310,7 @@ void
 AerolabWindow::zoomChanged()
 {
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
 }
 
 
@@ -329,6 +342,7 @@ AerolabWindow::configChanged(qint32)
   crrLabel->setPalette(palette);
   cdaLabel->setPalette(palette);
   etaLabel->setPalette(palette);
+  commentLabel->setPalette(palette);
   mLabel->setPalette(palette);
   rhoLabel->setPalette(palette);
   eoffsetLabel->setPalette(palette);
@@ -345,6 +359,7 @@ AerolabWindow::configChanged(qint32)
   eoffsetLineEdit->setPalette(palette);
   eoffsetAuto->setPalette(palette);
   constantAlt->setPalette(palette);
+  commentEdit->setPalette(palette);
 
 #ifndef Q_OS_MAC
     aerolab->setStyleSheet(TabView::ourStyleSheet());
@@ -358,12 +373,70 @@ AerolabWindow::rideSelected() {
 
   RideItem *ride = myRideItem;
 
+  commentEdit->setText("");
+
+  // Read values en Ride
+  double totalMass = ride->ride()->getTag("Total Weight", "0").toDouble();
+  if (totalMass>0) {
+    int value = 100 * totalMass;
+    aerolab->setIntTotalMass(value);
+    mLineEdit->setText(QString("%1").arg(aerolab->getTotalMass()) );
+    mSlider->setValue(aerolab->intTotalMass());
+  }
+
+  if (hasNewParametersInRide()) {
+      double eta = ride->ride()->getTag("aerolab.Eta", "0").toDouble();
+      if (eta>0) {
+        int value = 10000 * eta;
+        aerolab->setIntEta(value);
+        etaLineEdit->setText(QString("%1").arg(aerolab->getEta()) );
+        etaSlider->setValue(aerolab->intEta());
+      }
+
+      double rho = ride->ride()->getTag("aerolab.Rho", "0").toDouble();
+      if (rho>0) {
+        int value = 10000 * rho;
+        aerolab->setIntRho(value);
+        rhoLineEdit->setText(QString("%1").arg(aerolab->getRho()) );
+        rhoSlider->setValue(aerolab->intRho());
+      }
+
+      double eoffset = ride->ride()->getTag("aerolab.EOffset", "0").toDouble();
+      if (eoffset!=0) {
+        int value = 100 * eoffset;
+        aerolab->setIntEoffset(value);
+        eoffsetLineEdit->setText(QString("%1").arg(aerolab->getEoffset()) );
+        eoffsetSlider->setValue(aerolab->intEoffset());
+      }
+
+      double cda = ride->ride()->getTag("aerolab.Cda", "0").toDouble();
+      if (cda>0) {
+        int value = 10000 * cda;
+        aerolab->setIntCda(value);
+        cdaLineEdit->setText(QString("%1").arg(aerolab->getCda()) );
+        cdaSlider->setValue(aerolab->intCda());
+      }
+
+      double crr = ride->ride()->getTag("aerolab.Crr", "0").toDouble();
+      if (crr>0) {
+        int value = 1000000 * crr;
+        aerolab->setIntCrr(value);
+        crrLineEdit->setText(QString("%1").arg(aerolab->getCrr()) );
+        crrSlider->setValue(aerolab->intCrr());
+      }
+
+      QString comment = ride->ride()->getTag("aerolab.Comment", "");
+      if (comment.length()>0) {
+        commentEdit->setText(comment);
+      }
+    }
+
   if (!ride)
     return;
 
 
 
-  aerolab->setData(ride, true);
+  refresh(ride, true);
 
   allZoomer->setZoomBase();
 }
@@ -376,7 +449,7 @@ AerolabWindow::setCrrFromText(const QString text) {
     //crrQLCDNumber->display(QString("%1").arg(aerolab->getCrr()));
     crrSlider->setValue(aerolab->intCrr());
     RideItem *ride = context->rideItem();
-    aerolab->setData(ride, false);
+    refresh(ride, false);
   }
 }
 
@@ -388,7 +461,7 @@ AerolabWindow::setCrrFromSlider() {
     //crrQLCDNumber->display(QString("%1").arg(aerolab->getCrr()));
     crrLineEdit->setText(QString("%1").arg(aerolab->getCrr()) );
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
   }
 }
 
@@ -400,7 +473,7 @@ AerolabWindow::setCdaFromText(const QString text) {
     //cdaQLCDNumber->display(QString("%1").arg(aerolab->getCda()));
     cdaSlider->setValue(aerolab->intCda());
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
   }
 }
 
@@ -412,7 +485,7 @@ AerolabWindow::setCdaFromSlider() {
     //cdaQLCDNumber->display(QString("%1").arg(aerolab->getCda()));
     cdaLineEdit->setText(QString("%1").arg(aerolab->getCda()) );
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
   }
 }
 
@@ -426,7 +499,7 @@ AerolabWindow::setTotalMassFromText(const QString text) {
     //mQLCDNumber->display(QString("%1").arg(aerolab->getTotalMass()));
     mSlider->setValue(aerolab->intTotalMass());
     RideItem *ride = context->rideItem();
-    aerolab->setData(ride, false);
+    refresh(ride, false);
   }
 }
 
@@ -438,7 +511,7 @@ AerolabWindow::setTotalMassFromSlider() {
     //mQLCDNumber->display(QString("%1").arg(aerolab->getTotalMass()));
     mLineEdit->setText(QString("%1").arg(aerolab->getTotalMass()) );
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
   }
 }
 
@@ -450,7 +523,7 @@ AerolabWindow::setRhoFromText(const QString text) {
     //rhoQLCDNumber->display(QString("%1").arg(aerolab->getRho()));
     rhoSlider->setValue(aerolab->intRho());
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
   }
 }
 
@@ -462,7 +535,7 @@ AerolabWindow::setRhoFromSlider() {
     //rhoQLCDNumber->display(QString("%1").arg(aerolab->getRho()));
     rhoLineEdit->setText(QString("%1").arg(aerolab->getRho()) );
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
   }
 }
 
@@ -474,8 +547,16 @@ AerolabWindow::setEtaFromText(const QString text) {
     //etaQLCDNumber->display(QString("%1").arg(aerolab->getEta()));
     etaSlider->setValue(aerolab->intEta());
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
   }
+}
+
+void
+AerolabWindow::setComment(const QString ) {
+    if (hasNewParametersInRide()) {
+        btnSave->setEnabled(true);
+    } else
+        btnSave->setEnabled(false);
 }
 
 void
@@ -486,7 +567,7 @@ AerolabWindow::setEtaFromSlider() {
     //etaQLCDNumber->display(QString("%1").arg(aerolab->getEta()));
     etaLineEdit->setText(QString("%1").arg(aerolab->getEta()) );
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
   }
 }
 
@@ -498,7 +579,7 @@ AerolabWindow::setEoffsetFromText(const QString text) {
     //eoffsetQLCDNumber->display(QString("%1").arg(aerolab->getEoffset()));
     eoffsetSlider->setValue(aerolab->intEoffset());
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
   }
 }
 
@@ -510,7 +591,7 @@ AerolabWindow::setEoffsetFromSlider() {
     //eoffsetQLCDNumber->display(QString("%1").arg(aerolab->getEoffset()));
     eoffsetLineEdit->setText(QString("%1").arg(aerolab->getEoffset()) );
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
   }
 }
 
@@ -526,7 +607,7 @@ AerolabWindow::setConstantAlt(int value)
     aerolab->setConstantAlt(value);
     // refresh
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
 }
 
 void
@@ -535,7 +616,7 @@ AerolabWindow::setByDistance(int value)
     aerolab->setByDistance(value);
     // refresh
     RideItem *ride = myRideItem;
-    aerolab->setData(ride, false);
+    refresh(ride, false);
 }
 
 void
@@ -551,7 +632,7 @@ AerolabWindow::doEstCdACrr()
         cdaLineEdit->setText(QString("%1").arg(aerolab->getCda()) );
         cdaSlider->setValue(aerolab->intCda());
         /* Refresh */
-        aerolab->setData(ride, false);
+        refresh(ride, false);
     } else {
         /* report error: insufficient data to estimate Cda&Crr */
         QMessageBox::warning(this, tr("Estimate CdA and Crr"), errMsg);
@@ -586,7 +667,7 @@ void AerolabWindow::intervalSelected()
     }
 
     // set the elevation data
-    aerolab->setData( ride, true );
+    refresh(ride, true);
 }
 
 double AerolabWindow::getCanvasTop() const
@@ -599,4 +680,66 @@ double AerolabWindow::getCanvasBottom() const
 {
     const QwtDoubleRect &canvasRect = allZoomer->zoomRect();
     return canvasRect.bottom();
+}
+
+void AerolabWindow::saveParametersInRide()
+{
+    if (hasNewParametersInRide()) {
+        rideItem()->ride()->setTag("aerolab.Cda", QString("%1").arg(aerolab->getCda()));
+        rideItem()->ride()->setTag("aerolab.Crr", QString("%1").arg(aerolab->getCrr()));
+        rideItem()->ride()->setTag("Total Weight", QString("%1").arg(aerolab->getTotalMass()));
+        rideItem()->ride()->setTag("aerolab.Eta", QString("%1").arg(aerolab->getEta()));
+        rideItem()->ride()->setTag("aerolab.Rho", QString("%1").arg(aerolab->getRho()));
+        rideItem()->ride()->setTag("aerolab.EOffset", QString("%1").arg(aerolab->getEoffset()));
+        rideItem()->ride()->setTag("aerolab.Comment", QString("%1").arg(commentEdit->text()));
+        rideItem()->setDirty(true);
+
+        context->mainWindow->saveSilent(context, rideItem());
+        btnSave->setEnabled(false);
+     }
+}
+
+bool AerolabWindow::hasNewParametersInRide()
+{
+    bool newValues = false;
+
+    if (rideItem()->ride()->getTag("Total Weight", "0").toDouble() != aerolab->getTotalMass()) {
+        newValues = true;
+        //qDebug() << "new Total Weight" << rideItem()->ride()->getTag("Total Weight", "0").toDouble() << aerolab->getTotalMass();
+    }
+    if (rideItem()->ride()->getTag("aerolab.Eta", "0").toDouble() != aerolab->getEta()) {
+        newValues = true;
+        //qDebug() << "new Eta" << rideItem()->ride()->getTag("aerolab.Eta", "0").toDouble() << aerolab->getEta();
+    }
+    if (rideItem()->ride()->getTag("aerolab.Rho", "0").toDouble() != aerolab->getRho()) {
+        newValues = true;
+        //qDebug() << "new Rho" << rideItem()->ride()->getTag("aerolab.Rho", "0").toDouble() << aerolab->getRho();
+    }
+    if (rideItem()->ride()->getTag("aerolab.EOffset", "0").toDouble() != aerolab->getEoffset()) {
+        newValues = true;
+        //qDebug() << "new EOffset" << rideItem()->ride()->getTag("aerolab.EOffset", "0").toDouble() << aerolab->getEoffset();
+    }
+    if (rideItem()->ride()->getTag("aerolab.Cda", "0").toDouble() != aerolab->getCda()) {
+        newValues = true;
+        //qDebug() << "new Cda" << rideItem()->ride()->getTag("aerolab.Cda", "0").toDouble() << aerolab->getCda();
+    }
+    if (rideItem()->ride()->getTag("aerolab.Crr", "0").toDouble() != aerolab->getCrr()) {
+        newValues = true;
+        //qDebug() << "new Crr" << rideItem()->ride()->getTag("aerolab.Crr", "0").toDouble() << aerolab->getCrr();
+    }
+    if (rideItem()->ride()->getTag("aerolab.Comment", "") != commentEdit->text()) {
+        newValues = true;
+        //qDebug() << "new Comment" << rideItem()->ride()->getTag("aerolab.Comment", "") << commentEdit->text();
+    }
+
+    return newValues;
+}
+
+void AerolabWindow::refresh(RideItem *_rideItem, bool newzoom) {
+    if (hasNewParametersInRide()) {
+        btnSave->setEnabled(true);
+    } else
+        btnSave->setEnabled(false);
+
+    aerolab->setData(_rideItem, newzoom);
 }

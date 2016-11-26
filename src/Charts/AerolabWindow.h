@@ -58,6 +58,7 @@ class AerolabWindow : public GcChartWindow {
   void setRhoFromText(const QString text);
   void setEtaFromSlider();
   void setEtaFromText(const QString text);
+  void setComment(const QString text);
   void setEoffsetFromSlider();
   void setEoffsetFromText(const QString text);
   void doEstCdACrr();
@@ -69,6 +70,7 @@ class AerolabWindow : public GcChartWindow {
   void zoomInterval(IntervalItem *); // zoom into a specified interval
   void configChanged(qint32);
   void intervalSelected();
+  void saveParametersInRide();
 
   protected slots:
 
@@ -81,6 +83,7 @@ class AerolabWindow : public GcChartWindow {
   QLabel *crrLabel;
   QLabel *cdaLabel;
   QLabel *etaLabel;
+  QLabel *commentLabel;
   QLabel *mLabel;
   QLabel *rhoLabel;
   QLabel *eoffsetLabel;
@@ -107,6 +110,12 @@ class AerolabWindow : public GcChartWindow {
   QLineEdit *eoffsetLineEdit;
   //QLCDNumber *eoffsetQLCDNumber;
 
+  QLineEdit *commentEdit;
+
+  QPushButton *btnSave;
+
+  void refresh(RideItem *_rideItem, bool newzoom);
+  bool hasNewParametersInRide();
 };
 
 #endif // _GC_AerolabWindow_h
