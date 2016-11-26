@@ -39,8 +39,6 @@
 #endif
 
 class QTFullScreen;
-class QtMacSegmentedButton;
-class QtMacButton;
 class GcToolBar;
 class GcScopeBar;
 class Library;
@@ -285,9 +283,7 @@ class MainWindow : public QMainWindow
         QAction *styleAction;
         QAction *showhideSidebar;
         QAction *showhideLowbar;
-#if (QT_VERSION >= 0x50201) // not on a Mac
         QAction *showhideToolbar;
-#endif
         QAction *showhideTabbar;
 
         QAction *tweetAction;
