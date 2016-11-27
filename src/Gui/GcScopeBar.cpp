@@ -20,7 +20,6 @@
 #include "DiaryWindow.h"
 #include "DiarySidebar.h"
 #include "Context.h"
-#include "QtMacButton.h"
 #include "HelpWhatsThis.h"
 
 GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context(context)
