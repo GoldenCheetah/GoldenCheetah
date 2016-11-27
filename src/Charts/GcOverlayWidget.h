@@ -35,11 +35,6 @@
 
 
 class Context;
-#ifdef Q_OS_MAC
-class QtMacButton;
-#else
-class GcScopeButton;
-#endif
 class GcLabel;
 
 class GcOverlayWidgetItem

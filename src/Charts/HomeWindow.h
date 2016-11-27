@@ -38,10 +38,6 @@
 #include "Context.h"
 #include "RideItem.h"
 
-#ifdef Q_OS_MAC
-#include "QtMacSegmentedButton.h"
-#endif
-
 class ChartBar;
 class LTMSettings;
 
