@@ -373,46 +373,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     QPixmap passwords = QPixmap(":/images/toolbar/passwords.png");
 
-    //////////////////////////////////////////////////
-    // TrainingPeaks
-
-    QLabel *tp = new QLabel(tr("TrainingPeaks"));
-    tp->setFont(current);
-
-    QLabel *userLabel = new QLabel(tr("Username"));
-    QLabel *passLabel = new QLabel(tr("Password"));
-    QLabel *typeLabel = new QLabel(tr("Account Type"));
-
-    tpUser = new QLineEdit(this);
-    tpUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_TPUSER, "").toString());
-
-    tpPass = new QLineEdit(this);
-    tpPass->setEchoMode(QLineEdit::Password);
-    tpPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_TPPASS, "").toString());
-
-    tpType = new QComboBox(this);
-    tpType->addItem("Shared Free");
-    tpType->addItem("Coached Free");
-    tpType->addItem("Self Coached Premium");
-    tpType->addItem("Shared Self Coached Premium");
-    tpType->addItem("Coached Premium");
-    tpType->addItem("Shared Coached Premium");
-
-    tpType->setCurrentIndex(appsettings->cvalue(context->athlete->cyclist, GC_TPTYPE, "0").toInt());
-
-    grid->addWidget(tp, row, 0);
-
-    grid->addWidget(userLabel, ++row, 0);
-    grid->addWidget(tpUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(passLabel, ++row, 0);
-    grid->addWidget(tpPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(typeLabel, ++row, 0);
-    grid->addWidget(tpType, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-
-    //////////////////////////////////////////////////
     // Twitter
 
 #ifdef GC_HAVE_KQOAUTH
@@ -1089,8 +1049,6 @@ void CredentialsPage::dvCALDAVTypeChanged(int type)
 qint32
 CredentialsPage::saveClicked()
 {
-    appsettings->setCValue(context->athlete->cyclist, GC_TPUSER, tpUser->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_TPPASS, tpPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_RWGPSUSER, rideWithGPSUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_RWGPSPASS, rideWithGPSPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TTBUSER, ttbUser->text());
@@ -1101,7 +1059,6 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_SPORTPLUSHEALTHPASS, sphPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_SELUSER, selUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_SELPASS, selPass->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_TPTYPE, tpType->currentIndex());
     appsettings->setCValue(context->athlete->cyclist, GC_WIURL, wiURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WIUSER, wiUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WIKEY, wiPass->text());
