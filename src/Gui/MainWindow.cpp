@@ -72,10 +72,6 @@
 #include "WorkoutWizard.h"
 #include "ErgDBDownloadDialog.h"
 #include "AddDeviceWizard.h"
-#ifdef GC_HAVE_SOAP
-#include "TPUploadDialog.h"
-#include "TPDownloadDialog.h"
-#endif
 #ifdef GC_HAVE_ICAL
 #include "CalDAV.h"
 #endif
@@ -454,11 +450,6 @@ MainWindow::MainWindow(const QDir &home)
                          SLOT(uploadGoogleDrive()), tr(""));
     shareMenu->addAction(tr("Synchronise GoogleDrive..."), this,
                          SLOT(syncGoogleDrive()), tr("Ctrl+P"));
-#endif
-#ifdef GC_HAVE_SOAP
-    shareMenu->addSeparator ();
-    shareMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+T"));
-    shareMenu->addAction(tr("Synchronise TrainingPeaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
 #endif
 
     HelpWhatsThis *helpShare = new HelpWhatsThis(rideMenu);
@@ -2086,29 +2077,6 @@ MainWindow::syncLocalFileStore()
     FileStoreSyncDialog upload(currentTab->context, &db);
     upload.exec();
 }
-
-
-/*----------------------------------------------------------------------
- * TrainingPeaks.com
- *--------------------------------------------------------------------*/
-
-#ifdef GC_HAVE_SOAP
-void
-MainWindow::uploadTP()
-{
-    if (currentTab->context->ride) {
-        TPUploadDialog uploader(currentTab->context->athlete->cyclist, currentTab->context->ride->ride(), currentTab->context);
-        uploader.exec();
-    }
-}
-
-void
-MainWindow::downloadTP()
-{
-    TPDownloadDialog downloader(currentTab->context);
-    downloader.exec();
-}
-#endif
 
 
 /*----------------------------------------------------------------------

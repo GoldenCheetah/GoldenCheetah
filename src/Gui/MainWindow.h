@@ -203,10 +203,6 @@ class MainWindow : public QMainWindow
 #endif
         void share();
         void manualProcess(QString);
-#ifdef GC_HAVE_SOAP
-        void uploadTP();
-        void downloadTP();
-#endif
 #if QT_VERSION > 0x050000
         void uploadDropbox();
         void syncDropbox();

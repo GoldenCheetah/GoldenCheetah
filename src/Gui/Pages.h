@@ -250,11 +250,6 @@ class CredentialsPage : public QScrollArea
 
         Context *context;
 
-        QLineEdit *tpUser;
-        QLineEdit *tpPass;
-        QComboBox *tpType;
-        QPushButton *tpTest;
-
 #ifdef GC_HAVE_KQOAUTH
         QPushButton *twitterAuthorise;
 #endif
