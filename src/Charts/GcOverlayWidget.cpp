@@ -25,7 +25,6 @@
 #include "DiaryWindow.h"
 #include "DiarySidebar.h"
 #include "Context.h"
-#include "QtMacButton.h"
 
 GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(parent), context(context)
 {
