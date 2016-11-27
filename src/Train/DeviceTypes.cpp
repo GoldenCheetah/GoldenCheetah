@@ -59,6 +59,12 @@ DeviceTypes::DeviceTypes()
         tr("Kettler serial device ") ,
         ":images/devices/kettler_ex1.png"                                        },
 #endif
+#ifdef GC_HAVE_KDRI
+      { DEV_KETTLER_BT,  DEV_BT_RFCOMM,  (char *) "Kettler Bluetooth",          true,    false,
+        tr("Support for following Kettler models via bluetooth: TOUR, RACER, ERGO, RECUMBENT,"
+        "UNIX, SKYLON, RUN, TRACK.") ,
+        ":images/devices/kettler_ex1.png" },
+#endif
 #ifdef GC_HAVE_LIBUSB
       { DEV_FORTIUS,  DEV_LIBUSB,  (char *) "Tacx Fortius",          true,    false,
         tr("Tacx Fortius/iMagic bike trainer with the handlebar controller connected "

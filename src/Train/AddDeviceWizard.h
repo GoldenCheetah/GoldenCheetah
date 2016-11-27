@@ -27,6 +27,9 @@
 #ifdef QT_BLUETOOTH_LIB
 #include "BT40Controller.h"
 #endif
+#ifdef GC_HAVE_KDRI
+#include "KettlerBluetoothController.h"
+#endif
 #ifdef GC_HAVE_LIBUSB
 #include "FortiusController.h"
 #endif
@@ -68,6 +71,8 @@ public:
     bool found;                 // we found one!
     QString portSpec;           // where did we find it?
     QString profile;
+    QString name;               // does this device have a predefined name? (otherwise "")
+    uint8_t mac[6];             // MAC address of device (only used for serial Bluetooth devices)
 
     DeviceScanner *scanner;
 
@@ -112,7 +117,7 @@ class AddSearch : public QWizardPage
         int nextId() const;
         bool validatePage();
         void doScan();
-        void scanFinished(bool);
+        void scanFinished(bool, QList<DeviceConfiguration>*);
         void cleanupPage();
         void chooseCOMPort();
 
@@ -124,6 +129,7 @@ class AddSearch : public QWizardPage
         QComboBox *manual;
         QLabel *label, *label1, *label2;
         QString specified;
+        QList<DeviceConfiguration> devices;
 };
 
 class AddFirmware : public QWizardPage
@@ -243,11 +249,11 @@ class DeviceScanner : public QThread
     Q_OBJECT
 
 signals:
-    void finished(bool); // threaded scan finished with result x
+    void finished(bool, QList<DeviceConfiguration>*); // threaded scan finished with result x
 
 public:
     DeviceScanner(AddDeviceWizard *);
-    bool quickScan(bool deep); // non-threaded
+    bool quickScan(bool deep, QList<DeviceConfiguration>*); // non-threaded
     void run();       // threaded
     void stop();      // stop threaded search
 

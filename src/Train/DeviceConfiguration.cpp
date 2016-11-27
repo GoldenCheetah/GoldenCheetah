@@ -37,6 +37,7 @@ DeviceConfiguration::DeviceConfiguration()
     wheelSize=2100;
     postProcess=0;
     controller=NULL;
+    for(int8_t i = 0; i < 6; i++) this->mac[i] = 0x00;
 }
 
 
@@ -121,6 +122,11 @@ DeviceConfigurations::readConfig()
             configVal = appsettings->value(NULL, configStr);
             Entry.postProcess = configVal.toInt();
 
+            configStr = QString("%1%2").arg(GC_DEV_MAC).arg(i+1);
+            configVal = appsettings->value(NULL, configStr);
+            auto byteArray = configVal.toByteArray();
+            for(int i = 0; i < 6; i++) Entry.mac[i] = byteArray[i];
+
             Entries.append(Entry);
     }
     return Entries;
@@ -143,7 +149,7 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
         // type
         configStr = QString("%1%2").arg(GC_DEV_TYPE).arg(i+1);
         appsettings->setValue(configStr, Configuration.at(i).type);
-        
+
         // wheel size
         configStr = QString("%1%2").arg(GC_DEV_WHEEL).arg(i+1);
         appsettings->setValue(configStr, Configuration.at(i).wheelSize);
@@ -167,6 +173,10 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
         // virtual post Process...
         configStr = QString("%1%2").arg(GC_DEV_VIRTUAL).arg(i+1);
         appsettings->setValue(configStr, Configuration.at(i).postProcess);
+
+        // mac addr
+        configStr = QString("%1%2").arg(GC_DEV_MAC).arg(i+1);
+        appsettings->setValue(configStr, QByteArray((const char*) Configuration.at(i).mac, 6));
     }
 
 }

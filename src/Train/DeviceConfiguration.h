@@ -37,6 +37,9 @@ class DeviceConfiguration
                                 // used by ANT to store ANTIDs
                                 // available for use by all devices
 
+    // for bluetooth serial port (device is identified by MAC address)
+    uint8_t mac[6];
+
     QString defaultString;      // PHCS for power/heartrate/cadence/speed from this device
     int  wheelSize;             // set wheel size for each device
     int  stridelength;          // stride length in cm

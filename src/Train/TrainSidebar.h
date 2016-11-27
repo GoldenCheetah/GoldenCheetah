@@ -301,4 +301,3 @@ class MultiDeviceDialog : public QDialog
         QPushButton *applyButton, *cancelButton;
 };
 #endif // _GC_TrainSidebar_h
-
