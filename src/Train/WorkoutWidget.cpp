@@ -795,8 +795,8 @@ WorkoutWidget::setBlockCursor()
 
     bool returning=false;
     QPointF last(0,0);
-    int lastx=0;
-    int lasty=0;
+    double lastx=0;
+    double lasty=0;
     int hoveri=-1;
 
     foreach(WWPoint *p, points_) {
@@ -1775,7 +1775,7 @@ WorkoutWidget::qwkcode()
         double ap=0;
 
         // how long is this section ?
-        int duration = points_[i+1]->x - points_[i]->x;
+        int duration = round(points_[i+1]->x) - round(points_[i]->x);
 
         bool hasStartLapMarker, hasEndLapMarker;
         hasStartLapMarker = hasEndLapMarker = false;
@@ -1917,7 +1917,7 @@ WorkoutWidget::hoverQwkcode()
     for (int i=from; i<=to; i++) {
 
         if (i>from) {
-            int time= points_[i]->x - points_[i-1]->x;
+            double time = points_[i]->x - points_[i-1]->x;
             sumTime += time;
             sumJoules += time * ((points_[i]->y + points_[i-1]->y)/2);
         }
