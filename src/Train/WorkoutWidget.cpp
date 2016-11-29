@@ -1775,7 +1775,7 @@ WorkoutWidget::qwkcode()
         double ap=0;
 
         // how long is this section ?
-        int duration = points_[i+1]->x - points_[i]->x;
+        int duration = round(points_[i+1]->x) - round(points_[i]->x);
 
         bool hasStartLapMarker, hasEndLapMarker;
         hasStartLapMarker = hasEndLapMarker = false;
