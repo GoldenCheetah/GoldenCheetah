@@ -2608,12 +2608,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Core/Athlete.cpp" line="322"/>
         <source>Power &amp; Speed Trend</source>
-        <translation>Effekt- und Hastighetsutveckling</translation>
+        <translation>Effekt- och Hastighetsutveckling</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="323"/>
         <source>Tempo &amp; Threshold Time</source>
-        <translation>Tempo- &amp; Tröskel tid</translation>
+        <translation>Tempo- och Tröskel Tid</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="324"/>
@@ -4987,7 +4987,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/ChooseCyclistDialog.cpp" line="66"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
     <message>
         <location filename="../../Gui/ChooseCyclistDialog.cpp" line="67"/>
@@ -6821,7 +6821,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="66"/>
         <source>&amp;Download</source>
-        <translation>&amp;Laddaner</translation>
+        <translation>&amp;Ladda Ner</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="38"/>
@@ -6836,12 +6836,12 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="68"/>
         <source>&amp;Rescan</source>
-        <translation>&amp;Sök Igen</translation>
+        <translation>Sök &amp;Igen</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="69"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="70"/>
@@ -6994,12 +6994,12 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="375"/>
         <source>&amp;Overwrite</source>
-        <translation>&amp;Skriv över</translation>
+        <translation>Skriv &amp;Över</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="375"/>
         <source>&amp;Skip</source>
-        <translation>Hoppa &amp;över</translation>
+        <translation>&amp;Hoppa över</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="378"/>
@@ -7071,7 +7071,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMSettings.cpp" line="53"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMSettings.cpp" line="71"/>
@@ -7105,7 +7105,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Core/IntervalItem.cpp" line="209"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
 </context>
 <context>
@@ -7424,7 +7424,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2073"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2202"/>
@@ -7555,7 +7555,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Core/Season.cpp" line="634"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
 </context>
 <context>
@@ -7618,7 +7618,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Core/Season.cpp" line="163"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
 </context>
 <context>
@@ -7646,7 +7646,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Core/Season.cpp" line="222"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
 </context>
 <context>
@@ -7698,7 +7698,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Core/UserData.cpp" line="207"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
     <message>
         <location filename="../../Core/UserData.cpp" line="242"/>
@@ -9115,22 +9115,22 @@ Detta verktyg gör om data mätt på båda benen till bara ett ben (dvs frekvens
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="62"/>
         <source>Equipment Weight (kg)</source>
-        <translation>Gewicht der Ausrüstung (kg)</translation>
+        <translation>Utrustningsvikt (kg)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="63"/>
         <source>Draft mult.</source>
-        <translation>Windschatten (Faktor)</translation>
+        <translation>Ta Rygg (faktor).</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="64"/>
         <source>Wind (kph)</source>
-        <translation>Wind (km/h)</translation>
+        <translation>Vind (km/h)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="65"/>
         <source>, heading</source>
-        <translation>, Richtung</translation>
+        <translation>, vindriktning</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="108"/>
@@ -9143,16 +9143,16 @@ Draft Mult. parameter is the multiplier to adjust for drafting, 1 is no drafting
 wind speed shall be indicated in kph
 wind heading (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
 Note: if the file already contain wind data it will be overridden if wind is entered</source>
-        <translation>Schätzung der Leistung (Laufen) aufgrund von Geschwindigkeit/Höhe/Gewicht usw. unter Verwendung der &apos;di Prampero&apos; Koeffizienten
+        <translation>Beräknar löpeffekt utifrån &apos;di Prampero&apos; koefficienterna och data om hastighet, höjdförändringar, vikt mm
 
-Das Ausrüstungsgewicht wird zum Athletengewicht addiert um das Gesamtgewicht zu errechnen
+Utrustningsvikt (kläder, skor, elektronik, näring, vätska, etc) läggs till idrottarens vikt för att beräkna totalvikten.
 
-Windschatten Faktor dient der Anpassung an Windschattenlaufen, 1 ist kein Windschatten und 0.7 erscheint passend beim Lauf in der Gruppe
+&apos;Ta rygg (faktor)&apos; är en multiplikationskonstant som modellerar om idrottaren ligger i vindskugga bakom framförvarande löpare,
+faktorn 1 används om idrottaren tar all vind själv och 0.7 om idrottaren befinner sig inne i en klunga
 
-Windgeschwindigkeit wird in km/h erwartet
-Windrichtung (Quelle) wird in Grad erwartet-179 bis +180 (-90=W, 0=N, 90=E, 180=S)
-Hinweis: wenn die Datei bereit Wind Daten enthält werden diese überschrieben wenn hier
-     Windaten erfasst werden</translation>
+Vindhastighet anges i km/h (metrisk)
+Vindriktning anges i grader och anger från vilket håll vinden kommer ifrån, tillåtna värden är -179 upp till +180 (-90=Väst, 0=Nord, 90=Öst, 180=Syd)
+Notera: om aktivitetsfilen redan har vind information kommer detta att skrivas över om ny vind information matas in</translation>
     </message>
 </context>
 <context>
@@ -15127,7 +15127,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../FileIO/LapsEditor.cpp" line="87"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
 </context>
 <context>
@@ -15641,7 +15641,7 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="513"/>
         <source>&amp;Download from device...</source>
-        <translation>&amp;Nerladdning från Enhet...</translation>
+        <translation>Nerla&amp;ddning från Enhet...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="667"/>
@@ -15677,17 +15677,17 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="484"/>
         <source>&amp;Athlete</source>
-        <translation>Idrott&amp;are</translation>
+        <translation>&amp;Idrottare</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="506"/>
         <source>&amp;Quit All Windows</source>
-        <translation>Stäng alla fönster (&amp;Q)</translation>
+        <translation>Avsluta alla fönster &amp;Q</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="512"/>
         <source>A&amp;ctivity</source>
-        <translation>Aktivitet (&amp;c)</translation>
+        <translation>&amp;Aktivitet</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="513"/>
@@ -15722,12 +15722,12 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="522"/>
         <source>D&amp;elete activity...</source>
-        <translation>Rad&amp;era aktivitet...</translation>
+        <translation>Radera akti&amp;vitet...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="523"/>
         <source>Split &amp;activity...</source>
-        <translation>Dela upp &amp;aktvitet...</translation>
+        <translation>Dela u&amp;pp aktvitet...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="524"/>
@@ -15801,7 +15801,8 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="564"/>
         <source>&amp;Upload to TrainingPeaks</source>
-        <translation>Ladda &amp;upp till TrainingPeaks</translation>
+        <translatorcomment>3.4:CTRL+T</translatorcomment>
+        <translation>Ladda upp till &amp;TrainingPeaks</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="534"/>
@@ -15902,12 +15903,12 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="486"/>
         <source>Open &amp;Window</source>
-        <translation>Öppna nytt Fönster (&amp;w)</translation>
+        <translation>&amp;Öppna nytt Fönster</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="487"/>
         <source>Open &amp;Tab</source>
-        <translation>Öppna ny Flik (&amp;t)</translation>
+        <translation>Öppna ny &amp;Flik</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="498"/>
@@ -15922,16 +15923,17 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="505"/>
         <source>&amp;Close Tab</source>
-        <translation>Stäng Flik (&amp;c)</translation>
+        <translation>Stäng Flik &amp;C</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="532"/>
         <source>Sha&amp;re</source>
-        <translation>Dela (&amp;r)</translation>
+        <translation>&amp;Dela</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="533"/>
         <source>Share Online...</source>
+        <translatorcomment>CTRL+U</translatorcomment>
         <translation>Dela Online...</translation>
     </message>
     <message>
@@ -15947,7 +15949,8 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="554"/>
         <source>Upload to &amp;Dropbox</source>
-        <translation>Ladda upp till &amp;Dropbox</translation>
+        <translatorcomment>3.4:CTRL+R</translatorcomment>
+        <translation>Ladda upp till D&amp;ropbox</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="554"/>
@@ -15967,6 +15970,7 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="557"/>
         <source>Upload to &amp;GoogleDrive</source>
+        <translatorcomment>3.4:</translatorcomment>
         <translation>Ladda upp till &amp;GoogleDrive</translation>
     </message>
     <message>
@@ -16101,17 +16105,17 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="572"/>
         <source>&amp;Tools</source>
-        <translation>&amp;Verktyg</translation>
+        <translation>Verk&amp;tyg</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="608"/>
         <source>&amp;Options...</source>
-        <translation>&amp;Inställningar...</translation>
+        <translation>Inst&amp;ällningar...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="640"/>
         <source>&amp;View</source>
-        <translation>Utseende (&amp;V)</translation>
+        <translation>&amp;Utseende</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="642"/>
@@ -16192,7 +16196,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="696"/>
         <source>&amp;About GoldenCheetah</source>
-        <translation>Om GoldenCheet&amp;ah</translation>
+        <translation>&amp;Om GoldenCheetah</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1374"/>
@@ -16404,7 +16408,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="273"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
 </context>
 <context>
@@ -16453,7 +16457,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2080"/>
         <source>Max Cadence</source>
-        <translation>Maximal Kadens </translation>
+        <translation>Max Kadens </translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2081"/>
@@ -16464,7 +16468,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2084"/>
         <source>Maximum Cadence</source>
-        <translation>Maximal Kadens</translation>
+        <translation>Maxima Kadens</translation>
     </message>
 </context>
 <context>
@@ -16483,7 +16487,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1887"/>
         <source>Maximum Heart Rate.</source>
-        <translation>Maximal Hjärtfrekvens.</translation>
+        <translation>Maxima Hjärtfrekvens.</translation>
     </message>
 </context>
 <context>
@@ -16529,12 +16533,12 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2485"/>
         <source>Max Power Variance</source>
-        <translation>Maxima Effektvariation</translation>
+        <translation>Max Effektvariation</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2490"/>
         <source>Maximum Power Deviation with respect to 30sec Moving Average</source>
-        <translation>Maxima Effektojämnhet relativt 30s glidande medeltal</translation>
+        <translation>Maxima Effektvariation relativt 30s glidande medeltal</translation>
     </message>
 </context>
 <context>
@@ -16626,7 +16630,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="776"/>
         <source>Max W&apos; Expended</source>
-        <translation>Max. W&apos; förbrukning</translation>
+        <translation>Max W&apos; Förbrukad</translation>
     </message>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="778"/>
@@ -16645,7 +16649,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1740"/>
         <source>Max tHb</source>
-        <translation>Max. tHb</translation>
+        <translation>Max tHb</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1741"/>
@@ -17026,7 +17030,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1933"/>
         <source>Minimum Heart Rate.</source>
-        <translation>Min Hjärtfrekvens.</translation>
+        <translation>Minima Hjärtfrekvens.</translation>
     </message>
 </context>
 <context>
@@ -17053,7 +17057,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2182"/>
         <source>Min Temp</source>
-        <translation>Min. Temp.</translation>
+        <translation>Min Temp</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2183"/>
@@ -17095,7 +17099,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1835"/>
         <source>Min tHb</source>
-        <translation>Min. tHb</translation>
+        <translation>Min tHb</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1836"/>
@@ -17536,7 +17540,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
         <location filename="../../Charts/ModelWindow.cpp" line="105"/>
         <location filename="../../Charts/ModelWindow.cpp" line="113"/>
         <source>Time at X&amp;Y</source>
-        <translation>Tid vid x&amp;y</translation>
+        <translation>Tid vid X&amp;Y</translation>
     </message>
     <message>
         <location filename="../../Charts/ModelWindow.cpp" line="112"/>
@@ -21052,7 +21056,7 @@ yyyy</translation>
     <message>
         <location filename="../../Core/IntervalItem.cpp" line="262"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
 </context>
 <context>
@@ -23336,7 +23340,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/ComparePane.cpp" line="1084"/>
         <source>Just this &amp;One</source>
-        <translation>Bara den här (&amp;O)</translation>
+        <translation>&amp;Bara den här</translation>
     </message>
 </context>
 <context>
@@ -24391,7 +24395,7 @@ Skall konvertering ske?</translation>
     <message>
         <location filename="../../Cloud/ShareDialog.cpp" line="278"/>
         <source>&amp;Upload Activity</source>
-        <translation>Ladda&amp;upp Aktivitet</translation>
+        <translation>&amp;Ladda upp Aktivitet</translation>
     </message>
     <message>
         <location filename="../../Cloud/ShareDialog.cpp" line="395"/>
@@ -24456,7 +24460,7 @@ Skall konvertering ske?</translation>
     <message>
         <location filename="../../Cloud/ShareDialog.cpp" line="280"/>
         <source>&amp;Close</source>
-        <translation>Stäng (&amp;C)</translation>
+        <translation>&amp;Stäng</translation>
     </message>
     <message>
         <location filename="../../Cloud/ShareDialog.cpp" line="303"/>
@@ -26437,7 +26441,7 @@ Tryck F3 när det är klart.</translation>
     <message>
         <location filename="../../Cloud/TwitterDialog.cpp" line="77"/>
         <source>&amp;Cancel</source>
-        <translation>Avbryt [&amp;C]</translation>
+        <translation>&amp;Avbryt</translation>
     </message>
     <message>
         <location filename="../../Cloud/TwitterDialog.cpp" line="127"/>
