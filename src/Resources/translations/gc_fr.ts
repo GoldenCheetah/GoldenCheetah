@@ -19341,7 +19341,7 @@ CP du cycliste fixée à %3 watts</translation>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="776"/>
         <source>Max W&apos; Expended</source>
-        <translation>Depense W&apos; Maxium</translation>
+        <translation>Depense W&apos; Maximum</translation>
     </message>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="778"/>
