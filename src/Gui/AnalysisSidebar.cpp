@@ -540,6 +540,8 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
     QVariant v = trItem ? trItem->data(0, Qt::UserRole) : QVariant();
     IntervalItem *interval = static_cast<IntervalItem*>(v.value<void*>());
 
+    RideItem *rideItem = context->ride;
+
     if (trItem != NULL && root && interval) {
 
         // what kind if interval are we looking at ?
@@ -557,15 +559,29 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         menu.addAction(actZoomOut);
         menu.addAction(actZoomInt);
 
-        // EDIT / DELETE USER ONLY
-        if (isUser) {
+        // EDIT / DELETE SINGLE USER INTERVAL
+        if (rideItem && rideItem->intervalsSelected(RideFileInterval::USER).count() == 1) {
+            menu.addSeparator();
             QAction *actEditInt = new QAction(tr("Edit interval"), intervalTree);
             QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalTree);
             connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editIntervalSelected(void)));
-            connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteInterval(void)));
+            connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
             menu.addAction(actEditInt);
             menu.addAction(actDeleteInt);
         }
+
+        // RENAME DELETE LOTS OF USER INTERVALS
+        if (rideItem && rideItem->intervalsSelected(RideFileInterval::USER).count() > 1) {
+            menu.addSeparator();
+            QAction *actRenameInt = new QAction(tr("Rename selected intervals"), intervalTree);
+            connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameIntervalsSelected(void)));
+            QAction *actDeleteInt = new QAction(tr("Delete selected intervals"), intervalTree);
+            connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
+
+            menu.addAction(actRenameInt);
+            menu.addAction(actDeleteInt);
+        }
+
 
         if (type == RideFileInterval::ROUTE) {
             QAction *actEditInt = new QAction(tr("Rename route"), intervalTree);
@@ -757,39 +773,6 @@ AnalysisSidebar::deleteIntervalSelected()
         foreach (QTreeWidgetItem*item, deleteList) {
             userIntervals->removeChild(item);
             delete item;
-        }
-        context->notifyIntervalsChanged();
-    }
-}
-
-void
-AnalysisSidebar::deleteInterval()
-{
-    // delete the activeInterval
-
-    // run down the USER tree looking for it and delete it
-    QTreeWidgetItem *userIntervals = trees.value(RideFileInterval::USER, NULL);
-
-    if (userIntervals) {
-
-        // loop through the intervals for this tree
-        for(int j=0; j<userIntervals->childCount(); j++) {
-
-            // get pointer to the IntervalItem for this item
-            QVariant v = userIntervals->child(j)->data(0, Qt::UserRole);
-
-            // make the IntervalItem selected flag reflect the current selection state
-            IntervalItem *item = static_cast<IntervalItem*>(v.value<void*>());
-
-            // is it selected and linked ?
-            if (item->selected && item == activeInterval && item->rideInterval) {
-                RideItem *rideItem = context->ride;
-                if (rideItem->removeInterval(item) == true) {
-                    delete userIntervals->takeChild(j);
-                } else {
-                    QMessageBox::warning(this, tr("Delete Interval"), tr("Unable to delete interval"));
-                }
-            }
         }
         context->notifyIntervalsChanged();
     }
