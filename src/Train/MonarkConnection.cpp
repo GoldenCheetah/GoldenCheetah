@@ -265,6 +265,9 @@ void MonarkConnection::identifyModel()
     } else if (m_id.toLower().startsWith("novo") && servo != "manual") {
         m_type = MONARK_LC_NOVO;
         setLoad(100);
+    } else if (m_id.toLower().startsWith("mec")) {
+        m_type = MONARK_839E;
+        setLoad(100);
     }
 
 }
@@ -314,7 +317,8 @@ bool MonarkConnection::canDoLoad()
     switch (m_type)
     {
     case MONARK_LC: // fall through
-    case MONARK_LC_NOVO:
+    case MONARK_LC_NOVO: // fall through
+    case MONARK_839E:
         result = true;
         break;
     case MONARK_LT2: // fall through
@@ -337,6 +341,7 @@ bool MonarkConnection::canDoKp()
         break;
     case MONARK_LC: // fall through
     case MONARK_LT2: // fall through
+    case MONARK_839E: // fall through
     default:
         result = false;
         break;
@@ -384,6 +389,7 @@ bool MonarkConnection::discover(QString portName)
         // Should check for all bike ids known to use this protocol
         if (QString(id).toLower().contains("lt") ||
             QString(id).toLower().contains("lc") ||
+            QString(id).toLower().contains("mec") ||
             QString(id).toLower().contains("novo")) {
             found = true;
         }
