@@ -48,6 +48,7 @@
 #include <qwt_text.h>
 #include <qwt_legend.h>
 #include <qwt_series_data.h>
+#include <qwt_scale_engine.h>
 
 #include "qwt_plot_gapped_curve.h"
 
@@ -2699,6 +2700,16 @@ AllPlot::replot() {
     }
 
 void
+AllPlot::setAxisScaleDiv(const QwtAxisId& axis, double min, double max, double step) {
+    int maxMajorTicks = 0;
+    int maxMinorTicks = 0;
+    QwtPlot::setAxisScaleDiv(axis, 
+        QwtLinearScaleEngine().divideScale(
+            min, max, maxMajorTicks, maxMinorTicks, step)
+    );
+}
+
+void
 AllPlot::setYMax()
 {
     // first lets show or hide, otherwise all the efforts to set scales
@@ -2793,12 +2804,8 @@ AllPlot::setYMax()
                 while( ( qCeil(maxY / step) * labelWidth ) > axisHeight ) nextStep(step);
         }
 
-        QwtValueList xytick[QwtScaleDiv::NTickTypes];
-        for (int i=0;i<maxY && i<2000;i+=step)
-            xytick[QwtScaleDiv::MajorTick]<<i;
-
         setAxisTitle(yLeft, tr("Watts"));
-        setAxisScaleDiv(QwtPlot::yLeft,QwtScaleDiv(0.0,maxY,xytick));
+        AllPlot::setAxisScaleDiv(QwtPlot::yLeft, 0, maxY, step);
         axisWidget(yLeft)->update();
     }
 
@@ -2865,10 +2872,6 @@ AllPlot::setYMax()
                 while((qCeil(ymax / step) * labelWidth) > axisHeight) nextStep(step);
         }
 
-        QwtValueList xytick[QwtScaleDiv::NTickTypes];
-        for (int i=0;i<ymax;i+=step)
-            xytick[QwtScaleDiv::MajorTick]<<i;
-
         setAxisTitle(QwtAxisId(QwtAxis::yLeft, 1), labels.join(" / "));
 
         if (labels.count() == 1 && labels[0] == tr("Core Temperature")) {
@@ -2886,8 +2889,7 @@ AllPlot::setYMax()
             setAxisScale(QwtAxisId(QwtAxis::yLeft, 1),ymin<100.0f?ymin:0, ymax, step);
 
         } else {
-
-            setAxisScaleDiv(QwtAxisId(QwtAxis::yLeft, 1),QwtScaleDiv(ymin, ymax, xytick));
+            AllPlot::setAxisScaleDiv(QwtAxisId(QwtAxis::yLeft, 1), ymin, ymax, step);
         }
     }
 
@@ -2984,10 +2986,6 @@ AllPlot::setYMax()
                 while((qCeil(ymax / step) * labelWidth) > axisHeight) nextStep(step);
         }
 
-        QwtValueList xytick[QwtScaleDiv::NTickTypes];
-        for (int i=0;i<ymax;i+=step)
-            xytick[QwtScaleDiv::MajorTick]<<i;
-
         setAxisTitle(QwtAxisId(QwtAxis::yRight, 0), labels.join(" / "));
 
         // we just have Hb ?
@@ -3010,8 +3008,9 @@ AllPlot::setYMax()
             // we just have Hb ...
             setAxisScale(QwtAxisId(QwtAxis::yRight, 0),ymin<100.0f?ymin:0, ymax, step);
 
-        } else 
-            setAxisScaleDiv(QwtAxisId(QwtAxis::yRight, 0),QwtScaleDiv(0, ymax, xytick));
+        } else {
+            AllPlot::setAxisScaleDiv(QwtAxisId(QwtAxis::yRight, 0), ymin, ymax, step);
+        }
     }
 
     // QwtAxis::yRight, 1
@@ -3039,11 +3038,7 @@ AllPlot::setYMax()
                 while( ( qCeil( (ymax - ymin ) / step) * labelWidth ) > axisHeight ) nextStep(step);
         }
 
-        QwtValueList xytick[QwtScaleDiv::NTickTypes];
-        for (int i=ymin;i<ymax;i+=step)
-            xytick[QwtScaleDiv::MajorTick]<<i;
-
-        setAxisScaleDiv(QwtAxisId(QwtAxis::yRight, 1),QwtScaleDiv(ymin,ymax,xytick));
+        AllPlot::setAxisScaleDiv(QwtAxisId(QwtAxis::yRight, 1), ymin, ymax, step);
         standard->altCurve->setBaseline(ymin);
     }
 
