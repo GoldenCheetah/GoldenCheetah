@@ -44,7 +44,6 @@
 #include <qwt_plot_marker.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_widget.h>
-#include <qwt_compat.h>
 #include <qwt_text.h>
 #include <qwt_legend.h>
 #include <qwt_series_data.h>
