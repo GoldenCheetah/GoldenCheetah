@@ -592,7 +592,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     lat = line.section(',', 9, 9).toDouble();
                     headwind = line.section(',', 10, 10).toDouble();
                     slope = line.section(',', 11, 11).toDouble();
-                    temp = line.section(',', 12, 12).toDouble();
+                    temp = (line.section(',', 12, 12)==""?RideFile::NA:line.section(',', 12, 12).toDouble());
                     interval = line.section(',', 13, 13).toInt();
                     lrbalance = line.section(',', 14, 14).toInt();
                     lte = line.section(',', 15, 15).toInt();
