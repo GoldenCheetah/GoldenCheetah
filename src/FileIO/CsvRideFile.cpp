@@ -126,6 +126,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     int prevInterval = 0;
     double lastKM=0; // when deriving distance from speed
     XDataSeries *rowSeries=NULL;
+    XDataSeries *trainSeries=NULL;
 
     /* Joule 1.0
     Version,Date/Time,Km,Minutes,RPE,Tags,"Weight, kg","Work, kJ",FTP,"Sample Rate, s",Device Type,Firmware Version,Last Updated,Category 1,Category 2
@@ -287,6 +288,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rideFile->setFileFormat("GoldenCheetah CSV (csv)");
                     unitsHeader = 1;
                     recInterval = 1;
+
                     ++lineno;
                     continue;
                }
@@ -540,6 +542,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 double smo2 = 0.0, thb = 0.0;
                 double gct = 0.0, vo = 0.0, rcad = 0.0;
                 //UNUSED double o2hb = 0.0, hhb = 0.0;
+                double target = 0.0;
+
                 int interval=0;
                 int pause=0;
 
@@ -599,6 +603,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     thb = line.section(',', 20, 20).toInt();
                     //UNUSED o2hb = line.section(',', 21, 21).toInt();
                     //UNUSED hhb = line.section(',', 22, 22).toInt();
+                    target = line.section(',', 23, 23).toInt();
 
                 } else if (csvType == peripedal) {
 
@@ -1009,6 +1014,23 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           0.0, 0.0, 0.0, 0.0,
                                           smo2, thb,
                                           vo, rcad, gct, 0.0, interval);
+
+                    if (target > 0.0) {
+                        if (trainSeries == NULL)  {
+                            // add XDATA
+                            trainSeries = new XDataSeries();
+                            trainSeries->name = "TRAIN";
+                            trainSeries->valuename << "TARGET";
+                            trainSeries->unitname << "Watts";
+                        }
+
+                        XDataPoint *p = new XDataPoint();
+                        p->secs = minutes * 60.0;
+                        p->km = km;
+                        p->number[0] = target;
+
+                        trainSeries->datapoints.append(p);
+                    }
                }
             }
             ++lineno;
@@ -1101,6 +1123,13 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     }
 
     if (csvType == rowpro) rideFile->setTag("Sport","Row");
+
+    if (trainSeries != NULL) {
+        if (trainSeries->datapoints.count()>0)
+            rideFile->addXData("TRAIN", trainSeries);
+        else
+            delete trainSeries;
+    }
 
     // did we actually read any samples?
     if (rideFile->dataPoints().count() > 0) {
