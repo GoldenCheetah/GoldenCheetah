@@ -143,6 +143,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Frank Zschockelt");
     contributors.append("Gareth Coco");
     contributors.append("Greg Lonnon");
+    contributors.append("Henrik Johansson");
     contributors.append("Ilja Booij");
     contributors.append("Irvin Sirotić");
     contributors.append("Ivor Hewitt");

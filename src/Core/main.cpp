@@ -43,10 +43,6 @@
 #include <signal.h>
 
 
-#ifdef Q_OS_MAC
-#include "QtMacSegmentedButton.h" // for cocoa initialiser
-#endif
-
 #ifdef Q_OS_X11
 #include <X11/Xlib.h>
 #endif
@@ -299,11 +295,6 @@ main(int argc, char *argv[])
     application = new QApplication(argc, argv);
     //XXXIdleEventFilter idleFilter;
     //XXXapplication->installEventFilter(&idleFilter);
-
-#ifdef Q_OS_MAC
-    // get an autorelease pool setup
-    static CocoaInitializer cocoaInitializer;
-#endif
 
     // set default colors
     GCColor::setupColors();

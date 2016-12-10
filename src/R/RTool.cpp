@@ -1890,6 +1890,9 @@ RTool::dfForRideFileCache(RideFileCache *cache)
                 if (static_cast<unsigned int>(values.count()) > size) size = values.count();
                 seriescount++;
             }
+            if (series==RideFile::watts) {
+                seriescount++; // add powerdate
+            }
         }
 
     } else {
@@ -1938,6 +1941,38 @@ RTool::dfForRideFileCache(RideFileCache *cache)
 
         // vector
         UNPROTECT(1);
+
+        // if is power add the dates
+        if(series == RideFile::watts) {
+
+            QDate d1970(1970,01,01);
+
+            // dates
+            QVector<QDate> dates = cache->meanMaxDates(series);
+            SEXP vector;
+            PROTECT(vector=Rf_allocVector(INTSXP, values.count()));
+            SEXP dclas;
+            PROTECT(dclas=Rf_allocVector(STRSXP, 1));
+            SET_STRING_ELT(dclas, 0, Rf_mkChar("Date"));
+            Rf_classgets(vector,dclas);
+
+            // will have different sizes e.g. when a daterange
+            // since longest ride with e.g. power may be different
+            // to longest ride with heartrate
+            for(int j=0; j<values.count(); j++) INTEGER(vector)[j] = d1970.daysTo(dates[j]);
+
+            // add to the list
+            SET_VECTOR_ELT(ans, next, vector);
+
+            // give it a name
+            SET_STRING_ELT(names, next, Rf_mkChar("power_date"));
+
+
+            next++;
+
+            // vector
+            UNPROTECT(2);
+        }
     }
 
     // add rownames

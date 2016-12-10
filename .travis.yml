@@ -7,7 +7,6 @@ compiler:
 - gcc
 env:
   matrix:
-  - BRANCH=master QT=qt4 QT_PATH=qt
   - BRANCH=master QT=qt5 QT_PATH=qt5 QT_VER=5.5.1
   global:
   - secure: iqYW7f3//ZkMVzeCEarYn0S0DqKjFU9juBh0KF6WTlUsKX902Jtsk7dFoJlNDYBf63HLgV+wW2Hc6MxI9sGiUkom0gY9/To/aeGIJFGEX2sLm/e0Ok3qN521FA0Q/OiCFsD0RC6J+yrHxzI+rf8Z1rujceUsz2KgsrfAjYYv+BY=

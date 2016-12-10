@@ -308,18 +308,9 @@ ComparePane::refreshTable()
                 QString strValue;
 
                 if (m) {
-                    // get value and convert if needed
-                    double value = metrics.getForSymbol(worklist[i]) 
-                                * (context->athlete->useMetricUnits ? 1 : m->conversion()) 
-                                + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
-
-                    // use right precision
-                    strValue = QString("%1").arg(value, 0, 'f', m->precision());
-    
-                    // or maybe its a duration (worry about local lang or translated)
-                    if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
-                        strValue = time_to_string_for_sorting(value);
-
+                    // get the formated value
+                    strValue = metrics.getStringForSymbol(worklist[i],
+                                          context->athlete->useMetricUnits);
                 }
 
                 // add to the table

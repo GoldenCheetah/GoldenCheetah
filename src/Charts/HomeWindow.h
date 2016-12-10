@@ -38,10 +38,6 @@
 #include "Context.h"
 #include "RideItem.h"
 
-#ifdef Q_OS_MAC
-#include "QtMacSegmentedButton.h"
-#endif
-
 class ChartBar;
 class LTMSettings;
 
@@ -61,7 +57,7 @@ class HomeWindow : public GcWindow
         void setStyle(int style) { styleChanged(style); }
         int currentStyle;
 
-        int currentTab() { return currentStyle ? -1 : style->currentIndex(); }
+        int currentTab() { return currentStyle ? -1 : controlStack->currentIndex(); }
         GcChartWindow *currentChart() {
             return currentTab() >= 0 ? charts[currentTab()] : NULL;
         }

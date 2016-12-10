@@ -750,6 +750,7 @@ class AllPlot : public QwtPlot
         QFont labelFont;
 
         void setAltSlopePlotStyle (AllPlotSlopeCurve *curve);
+        void setAxisScaleDiv(const QwtAxisId&, double, double, double);
         static inline void nextStep( int& step ) {
             if (step >= 5000)
             {
