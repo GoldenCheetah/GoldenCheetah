@@ -23,6 +23,10 @@
 #include "LTMChartParser.h"
 #include "GcUpgrade.h"
 
+#ifdef GC_WANT_R
+#include <RTool.h>
+#endif
+
 #include <QtGlobal>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -811,6 +815,18 @@ CloudDBChartListDialog::addAndCloseClicked() {
         for (int i = 0; i< selected.count(); i++) {
             QTableWidgetItem* s = selected.at(i);
             if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
+#ifdef GC_WANT_R
+                int chartType = g_currentPresets->at(s->row()).gchartType.toInt();
+                if (chartType == GcWindowTypes::RConsole ||
+                    chartType == GcWindowTypes::RConsoleSeason ) {
+                    if (rtool == NULL) {
+                        QMessageBox::information(0, tr("Chart requires 'R'"), tr("The chart your are downloading requires 'R' to be installed \
+                                                                              and activated for GoldenCheetah to show any graphics. Either 'R' is not activated \
+                                                                              in the preferences, or not even installed.<br><br> Please ensure 'R' \
+                                                                              is installed and activated to be able to use this chart."));
+                    }
+                }
+#endif
                 g_selected << g_currentPresets->at(s->row()).gchartDef;
             }
         }

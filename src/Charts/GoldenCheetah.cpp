@@ -1090,6 +1090,31 @@ GcChartWindow::exportChartToCloudDB()
         }
     }
 
+    // block the upload of charts which do not contain any usefull configuration
+    if ( chart.ChartType.toInt() == GcWindowTypes::RideSummary ||
+         chart.ChartType.toInt() == GcWindowTypes::MetadataWindow ||
+         chart.ChartType.toInt() == GcWindowTypes::Summary ||
+         chart.ChartType.toInt() == GcWindowTypes::RideEditor ||
+         chart.ChartType.toInt() == GcWindowTypes::Diary ||
+         chart.ChartType.toInt() == GcWindowTypes::ActivityNavigator ||
+         chart.ChartType.toInt() == GcWindowTypes::DateRangeSummary ||
+         chart.ChartType.toInt() == GcWindowTypes::GoogleMap ||
+         chart.ChartType.toInt() == GcWindowTypes::BingMap ||
+         chart.ChartType.toInt() == GcWindowTypes::RideMapWindow )
+    {
+
+        QMessageBox::information(0, tr("Upload not possible"), tr("Standard charts without configuration cannot be uploaded to the GoldenCheetah Cloud."));
+        return;
+    }
+
+    // block upload if LTM chart has User Metric
+    if ( chart.ChartType.toInt() == GcWindowTypes::LTM && chartHasUserMetrics()) {
+
+        QMessageBox::information(0, tr("Upload not possible"), tr("Charts containing user defined metrics cannot be uploaded to the GoldenCheetah Cloud."));
+        return;
+
+    }
+
     QPixmap picture;
     menuButton->hide();
     picture = grab(geometry());
@@ -1111,5 +1136,33 @@ GcChartWindow::exportChartToCloudDB()
             CloudDBHeader::setChartHeaderStale(true);
         }
     }
+}
+
+bool
+GcChartWindow::chartHasUserMetrics() {
+
+    // iterate over chart properties
+    const QMetaObject *m = metaObject();
+
+    for (int i=0; i<m->propertyCount(); i++) {
+        QMetaProperty p = m->property(i);
+        if (p.isUser(this)) {
+            if (QString(p.typeName()) == "LTMSettings") {
+                LTMSettings x = p.read(this).value<LTMSettings>();
+                foreach (MetricDetail metricDetail, x.metrics) {
+                    // check first if it's a RideMetric
+                    if (metricDetail.metric) {
+                        const RideMetric *m = metricDetail.metric;
+                        if (m->isUser()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
+
 }
 #endif
