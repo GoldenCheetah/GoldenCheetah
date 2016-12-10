@@ -57,7 +57,7 @@ class HomeWindow : public GcWindow
         void setStyle(int style) { styleChanged(style); }
         int currentStyle;
 
-        int currentTab() { return currentStyle ? -1 : style->currentIndex(); }
+        int currentTab() { return currentStyle ? -1 : controlStack->currentIndex(); }
         GcChartWindow *currentChart() {
             return currentTab() >= 0 ? charts[currentTab()] : NULL;
         }

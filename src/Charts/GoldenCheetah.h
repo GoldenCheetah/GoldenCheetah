@@ -279,6 +279,7 @@ public slots:
     void saveChart();
 #ifdef GC_HAS_CLOUD_DB
     void exportChartToCloudDB();
+    bool chartHasUserMetrics();
 #endif
     void colorChanged(QColor);
 };
