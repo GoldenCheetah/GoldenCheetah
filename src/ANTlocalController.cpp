@@ -90,7 +90,22 @@ ANTlocalController::discover(QString name)
 
 bool ANTlocalController::doesPush() { return false; }
 bool ANTlocalController::doesPull() { return true; }
-bool ANTlocalController::doesLoad() { return false; }
+bool ANTlocalController::doesLoad() { return true; }
+
+void
+ANTlocalController::setLoad(double x) {
+    myANTlocal->setLoad(x);
+}
+
+void
+ANTlocalController::setGradient(double x) {
+    myANTlocal->setGradient(x);
+}
+
+void
+ANTlocalController::setMode(int mode) {
+    myANTlocal->setMode(mode);
+}
 
 /*
  * gets called from the GUI to get updated telemetry.
