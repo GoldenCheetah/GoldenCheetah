@@ -149,9 +149,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     autoImportConfig = new RideAutoImportConfig(home->config());
     autoImport = NULL;
 
-    // read athlete's charts.xml and translate etc
-    loadCharts();
-
     // Search / filter
     namedSearches = new NamedSearches(this); // must be before navigator
 
@@ -187,6 +184,10 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // now most dependencies are in get cache
     rideCache = new RideCache(context);
+
+    // read athlete's charts.xml and translate etc, it needs to be
+    // after RideCache creation to allow for Custom Metrics initialization
+    loadCharts();
 
     // Downloaders
     withingsDownload = new WithingsDownload(context);
