@@ -75,7 +75,17 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[31] = {
+  // find a way to statically define the GcWindowsInit array size
+  enum GcWindowsInitCounts {
+      StartCount = 28,
+#ifndef NOWEBKIT
+      MapAddedCount,
+      StreetViewAddedCount,
+#endif
+      ActualCount
+  };
+
+  static GcWindowRegistry GcWindowsInit[ActualCount] = {
     // name                     GcWinID
     { VIEW_HOME|VIEW_DIARY, tr("Metric Trends"),GcWindowTypes::LTM },
     { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
@@ -106,8 +116,10 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
     { VIEW_TRAIN, tr("Realtime"),GcWindowTypes::RealtimePlot },
     { VIEW_TRAIN, tr("Pedal Stroke"),GcWindowTypes::SpinScanPlot },
+#ifndef NOWEBKIT
     { VIEW_TRAIN, tr("Map"), GcWindowTypes::MapWindow },
     { VIEW_TRAIN, tr("StreetView"), GcWindowTypes::StreetViewWindow },
+#endif
     { VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
     { VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
     { 0, "", GcWindowTypes::None }};
