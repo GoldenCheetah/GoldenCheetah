@@ -60,6 +60,7 @@
 #ifdef GC_WANT_R
 #include "RChart.h"
 #endif
+#include "PlanningWindow.h"
 // Not until v4.0
 //#include "RouteWindow.h"
 
@@ -75,12 +76,13 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[31] = {
+  static GcWindowRegistry GcWindowsInit[32] = {
     // name                     GcWinID
     { VIEW_HOME|VIEW_DIARY, tr("Metric Trends"),GcWindowTypes::LTM },
     { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
     //{ VIEW_HOME, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
     { VIEW_HOME|VIEW_DIARY,  tr("Critical Mean Maximal"),GcWindowTypes::CriticalPowerSummary },
+    { VIEW_HOME,  tr("Training Plan"),GcWindowTypes::SeasonPlan },
     //{ VIEW_HOME|VIEW_DIARY,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Activity Summary"),GcWindowTypes::RideSummary },
     { VIEW_ANALYSIS, tr("Details"),GcWindowTypes::MetadataWindow },
@@ -237,6 +239,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 #else
     case GcWindowTypes::RouteSegment: returning = new GcChartWindow(context); break;
 #endif
+    case GcWindowTypes::SeasonPlan: returning = new PlanningWindow(context); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));
