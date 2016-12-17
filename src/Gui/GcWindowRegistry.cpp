@@ -57,6 +57,7 @@
 #include "GoogleMapControl.h"
 #include "BingMap.h"
 #include "RideMapWindow.h"
+#include "WebPageWindow.h"
 #ifdef GC_WANT_R
 #include "RChart.h"
 #endif
@@ -112,6 +113,7 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("StreetView"), GcWindowTypes::StreetViewWindow },
     { VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
     { VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
+    //{ VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
     { 0, "", GcWindowTypes::None }};
   // initialize the global registry
   GcWindows = GcWindowsInit;
@@ -234,6 +236,8 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 
     case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(context); break;
     case GcWindowTypes::WorkoutWindow: returning = new WorkoutWindow(context); break;
+
+    case GcWindowTypes::WebPageWindow: returning = new WebPageWindow(context); break;
 #if 0 // not till v4.0
     case GcWindowTypes::RouteSegment: returning = new RouteWindow(context); break;
 #else

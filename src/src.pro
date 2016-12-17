@@ -708,8 +708,8 @@ HEADERS += Train/AddDeviceWizard.h Train/ComputrainerController.h Train/Computra
            Train/Library.h Train/LibraryParser.h Train/MeterWidget.h Train/NullController.h Train/RealtimeController.h \
            Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
            Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
-           Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WorkoutWidget.h Train/WorkoutWidgetItems.h \
-           Train/WorkoutWindow.h Train/WorkoutWizard.h Train/ZwoParser.h
+           Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WebPageWindow.h \
+           Train/WorkoutWidget.h Train/WorkoutWidgetItems.h Train/WorkoutWindow.h Train/WorkoutWizard.h Train/ZwoParser.h
 
 
 ###=============
@@ -796,8 +796,8 @@ SOURCES += Train/AddDeviceWizard.cpp Train/ComputrainerController.cpp Train/Comp
            Train/Library.cpp Train/LibraryParser.cpp Train/MeterWidget.cpp Train/NullController.cpp Train/RealtimeController.cpp \
            Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
            Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
-           Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WorkoutWidget.cpp Train/WorkoutWidgetItems.cpp \
-           Train/WorkoutWindow.cpp Train/WorkoutWizard.cpp Train/ZwoParser.cpp
+           Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \
+           Train/WorkoutWidget.cpp Train/WorkoutWidgetItems.cpp Train/WorkoutWindow.cpp Train/WorkoutWizard.cpp Train/ZwoParser.cpp
 
 
 ###======================================
