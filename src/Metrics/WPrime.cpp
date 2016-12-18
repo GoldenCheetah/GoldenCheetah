@@ -208,7 +208,9 @@ WPrime::setRide(RideFile *input)
     }
 
     // Tau can be set in the ridefile metadata
-    if (!TAU) {
+    // or in the athlete preferences, but when we have an 
+    // integral formulation it should be computed from data
+    if (!TAU || integral) {
         if (countBelowCP > 0)
             TAU = 546.00f * exp(-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
         else
