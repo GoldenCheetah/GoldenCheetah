@@ -5099,6 +5099,7 @@ LTPage::editClicked()
     int index = ranges->indexOfTopLevelItem(edit);
 
     // date
+    hrZones->setStartDate(index, dateEdit->date());
     edit->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
 
     // LT
@@ -5819,6 +5820,7 @@ CVPage::editClicked()
     int index = ranges->indexOfTopLevelItem(edit);
 
     // date
+    paceZones->setStartDate(index, dateEdit->date());
     edit->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
 
     // CV
