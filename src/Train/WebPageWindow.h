@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2009 Greg Lonnon (greg.lonnon@gmail.com)
- *               2011 Mark Liversedge (liversedge@gmail.com)
- *               2016 Damien Grauser (Damien.Grauser@gmail.com)
+ * Copyright (c) 2016 Damien Grauser (Damien.Grauser@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -58,7 +56,7 @@ class SmallPlot;
 // trick the maps api into ignoring gestures by
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
 #ifdef NOWEBKIT
-class mapWebPage : public QWebEnginePage
+class simpleWebPage : public QWebEnginePage
 {
 };
 #else
