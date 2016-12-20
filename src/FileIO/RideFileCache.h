@@ -41,7 +41,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 24;
+static const unsigned int RideFileCacheVersion = 25;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -67,6 +67,7 @@ static const unsigned int RideFileCacheVersion = 24;
 // 22       02-Feb-15    Added weight to header
 // 23       14-Jun-15    Added W'bal TiZ and Distribution
 // 24       15-Jun-15    Fix percentify error on W'bal Distribution
+// 25       19-Dec-16    Added aPower
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
@@ -99,6 +100,7 @@ struct RideFileCacheHeader {
                  vamMeanMaxCount,
                  wattsKgMeanMaxCount,
                  aPowerMeanMaxCount,
+                 aPowerKgMeanMaxCount,
                  wattsDistCount,
                  hrDistCount,
                  cadDistCount,
@@ -273,6 +275,7 @@ class RideFileCache
         QVector<float> vamMeanMax; // RideFile::vam
         QVector<float> wattsKgMeanMax; // watts/kg
         QVector<float> aPowerMeanMax; // RideFile::aPower
+        QVector<float> aPowerKgMeanMax; // aPower/kg
 
         QVector<float> heatMeanMax; // The heat of training for aggregated power data
 
@@ -295,6 +298,7 @@ class RideFileCache
         QVector<double> vamMeanMaxDouble; // RideFile::kph
         QVector<double> wattsKgMeanMaxDouble; // watts/kg
         QVector<double> aPowerMeanMaxDouble; // RideFile::aPower
+        QVector<double> aPowerKgMeanMaxDouble; // aPower/kg
 
         QVector<QDate> wattsMeanMaxDate; // RideFile::watts
         QVector<QDate> hrMeanMaxDate; // RideFile::hr
@@ -311,6 +315,7 @@ class RideFileCache
         QVector<QDate> vamMeanMaxDate; // RideFile::vam
         QVector<QDate> wattsKgMeanMaxDate; // watts/kg
         QVector<QDate> aPowerMeanMaxDate; // RideFile::aPower
+        QVector<QDate> aPowerKgMeanMaxDate; // aPower/kg
 
         //
         // SAMPLE DISTRIBUTION
