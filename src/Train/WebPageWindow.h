@@ -121,7 +121,6 @@ class WebPageWindow : public GcChartWindow
         void urlChanged(const QUrl& url);
         void loadFinished(bool ok);
         void finished(QNetworkReply*reply);
-        void onError(QNetworkReply::NetworkError err);
 
     protected:
         bool event(QEvent *event);

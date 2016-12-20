@@ -192,16 +192,6 @@ WebPageWindow::finished(QNetworkReply * reply)
     }
 }
 
-void
-WebPageWindow::onError(QNetworkReply::NetworkError err)
-{
-    if(err !=QNetworkReply::NoError) {
-       QMessageBox::warning(0, QString("Error!"),
-                           QString("Error loading webpage: \n") + QString::number(err),
-                           QMessageBox::Ok);
-    }
-}
-
 bool
 WebPageWindow::event(QEvent *event)
 {
