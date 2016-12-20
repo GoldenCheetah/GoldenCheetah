@@ -152,10 +152,7 @@ WebPageWindow::customURLEditingFinished()
 void 
 WebPageWindow::configChanged(qint32)
 {
-    setProperty("color", GColor(CPLOTBACKGROUND));
-#ifndef Q_OS_MAC
-    overlayIntervals->setStyleSheet(TabView::ourStyleSheet());
-#endif
+
 }
 
 void
