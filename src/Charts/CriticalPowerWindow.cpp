@@ -1387,6 +1387,7 @@ CriticalPowerWindow::updateCpint(double minutes)
             units = "metres/hour";
             break;
 
+        case aPowerKg:
         case wattsKg:
             units = "Watts/kg";
             break;
@@ -1461,6 +1462,7 @@ CriticalPowerWindow::seriesName(CriticalSeriesType series)
         case nm: return QString(tr("Torque"));
         case vam: return QString(tr("VAM"));
         case aPower: return QString(tr("aPower"));
+        case aPowerKg: return QString(tr("aPower per Kilogram"));
         case work: return QString(tr("Work"));
         case veloclinicplot: return QString(tr("Veloclinic Plot"));
 
@@ -1487,6 +1489,7 @@ CriticalPowerWindow::getRideSeries(CriticalSeriesType series)
         case nm: return RideFile::nm;
         case vam: return RideFile::vam;
         case aPower: return RideFile::aPower;
+        case aPowerKg: return RideFile::aPowerKg;
 
         case veloclinicplot: return RideFile::watts;
 
@@ -1511,6 +1514,7 @@ CriticalPowerWindow::addSeries()
                << nm
                << vam
                << aPower
+               << aPowerKg
                << kphd
                << wattsd
                << nmd

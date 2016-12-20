@@ -266,6 +266,16 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
         }
         break;
 
+    case CriticalPowerWindow::aPowerKg:
+        if (context->athlete->useMetricUnits) {
+            series = tr("Altitude Power per kilogram");
+            units = tr("w/kg");
+        } else {
+            series = tr("Altitude Power per lb");
+            units = tr("w/lb");
+        }
+        break;
+
     case CriticalPowerWindow::vam:
         series = tr("VAM");
         units = tr("m/hour");
@@ -444,7 +454,7 @@ CPPlot::plotModel()
 
     // first lets clear any curves we shouldn't be displaying
     // no model curve if not power !
-    if (model == 0 || (rideSeries != RideFile::watts && rideSeries != RideFile::wattsKg && rideSeries != RideFile::kph)) {
+    if (model == 0 || (rideSeries != RideFile::watts && rideSeries != RideFile::wattsKg && rideSeries != RideFile::aPower && rideSeries != RideFile::aPowerKg && rideSeries != RideFile::kph)) {
         if (modelCurve) {
             modelCurve->detach();
             delete modelCurve;
@@ -468,7 +478,7 @@ CPPlot::plotModel()
     }
 
     // we don't want a model
-    if (rideSeries != RideFile::wattsKg && rideSeries != RideFile::watts && rideSeries != RideFile::kph) return;
+    if (rideSeries != RideFile::wattsKg && rideSeries != RideFile::watts && rideSeries != RideFile::aPowerKg && rideSeries != RideFile::aPower && rideSeries != RideFile::kph) return;
 
     // we don't have any bests yet?
     if (bestsCache == NULL) return;
@@ -970,8 +980,8 @@ CPPlot::plotBests(RideItem *rideItem)
     // be a rainbow curve. Otherwise its gonna be plain
     int shadingCP = 0; 
     double shadingRatio = 1.0;
-    if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts) && shadeMode) shadingCP = dateCP;
-    if (rideSeries == RideFile::wattsKg && shadeMode) shadingRatio = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
+    if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::aPower) && shadeMode) shadingCP = dateCP;
+    if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPowerKg) && shadeMode) shadingRatio = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
     double shadingCV = 0.0;
     if (rideSeries == RideFile::kph && shadeMode) shadingCV = dateCV;
 
@@ -1069,7 +1079,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
             // when plotting power bests AND a model we draw bests as dots
             // but only if in 'plain' mode .. not doing a rainbow curve.
-            if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts || rideSeries == RideFile::kph) && model) {
+            if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::aPower || rideSeries == RideFile::kph) && model) {
 
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::Ellipse);
@@ -1084,7 +1094,7 @@ CPPlot::plotBests(RideItem *rideItem)
             line.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble());
 
             curve->setPen(line);
-            if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::kph)
+            if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPower || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::kph)
                 curve->setBrush(Qt::NoBrush);
             else
                 curve->setBrush(QBrush(fill));
@@ -1770,7 +1780,7 @@ CPPlot::exportBests(QString filename)
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) return; // couldn't open file
 
     // do we want to export the model estimate too ?
-    bool expmodel = (model && pdModel && (rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts || rideSeries == RideFile::kph));
+    bool expmodel = (model && pdModel && (rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::aPower || rideSeries == RideFile::kph));
 
     // open stream and write header
     QTextStream stream(&f);
@@ -1916,7 +1926,7 @@ CPPlot::refreshReferenceLines(RideItem *rideItem)
     if (!rideItem && !rideItem->ride()) return;
 
     // horizontal lines at reference points
-    if (rideSeries == RideFile::aPower || rideSeries == RideFile::xPower || rideSeries == RideFile::NP || rideSeries == RideFile::watts  || rideSeries == RideFile::wattsKg) {
+    if (rideSeries == RideFile::aPower || rideSeries == RideFile::xPower || rideSeries == RideFile::NP || rideSeries == RideFile::watts  || rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPowerKg) {
 
         if (rideItem->ride()) {
             foreach(const RideFilePoint *referencePoint, rideItem->ride()->referencePoints()) {
@@ -2240,7 +2250,7 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         // set the baseline data
         baseline = compareDateRanges[0].rideFileCache()->meanMaxArray(rideSeries);
 
-        if (model && (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::kph)) {
+        if (model && (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPower || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::kph)) {
 
             // get a model
             switch (model) {
@@ -2307,7 +2317,7 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                 if (showBest) plotCache(deltaArray, compareDateRanges[j].color);
 
                 // and plot a model too -- its neat to compare them...
-                if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::kph) {
+                if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPower || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::kph) {
                     plotModel(cache->meanMaxArray(rideSeries), compareDateRanges[j].color, baselineModel);
                 }
 
@@ -2328,7 +2338,7 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                 if (showBest) plotCache(cache->meanMaxArray(rideSeries), compareDateRanges[j].color);
 
                 // and plot a model too -- its neat to compare them...
-                if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::kph)
+                if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPower || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::kph)
                     plotModel(cache->meanMaxArray(rideSeries), compareDateRanges[j].color, NULL);
 
                 int xCount = 0;
