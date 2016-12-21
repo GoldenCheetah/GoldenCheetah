@@ -35,6 +35,8 @@
 
 #ifdef NOWEBKIT
 #include <QtWebChannel>
+#include <QWebEngineProfile>
+#include <QWebEngineDownloadItem>
 #endif
 
 // overlay helper
@@ -42,6 +44,37 @@
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
 #include <QDebug>
+
+#ifdef NOWEBKIT
+#include <QWebEngineUrlRequestInterceptor>
+#include <QWebEngineSettings>
+#include <QWebEngineUrlSchemeHandler>
+#include <QWebEngineUrlRequestJob>
+
+// request interceptor to get downloads in QtWebEngine
+class WebDownloadInterceptor : public QWebEngineUrlRequestInterceptor
+{
+    public:
+        WebDownloadInterceptor() : QWebEngineUrlRequestInterceptor(Q_NULLPTR) {}
+
+    public slots:
+        void interceptRequest(QWebEngineUrlRequestInfo &info) {
+            //qDebug()<<info.requestUrl().toString();
+        }
+};
+
+// custom scheme handler
+class WebSchemeHandler : public QWebEngineUrlSchemeHandler
+{
+    public:
+        WebSchemeHandler() : QWebEngineUrlSchemeHandler(Q_NULLPTR) {}
+    public slots:
+        void requestStarted(QWebEngineUrlRequestJob *request) {
+            //qDebug()<<"urlscheme request"<<request->requestUrl().toString();
+        }
+};
+
+#endif
 
 // declared in main, we only want to use it to get QStyle
 extern QApplication *application;
@@ -98,6 +131,28 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 #ifdef NOWEBKIT
     view = new QWebEngineView(this);
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
+
+    // set user agent to look like Chrome
+    view->page()->profile()->setHttpUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36");
+
+    // add a download interceptor
+    WebDownloadInterceptor *interceptor = new WebDownloadInterceptor;
+    view->page()->profile()->setRequestInterceptor(interceptor);
+
+    // cookies and storage
+    view->page()->profile()->setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
+    view->page()->profile()->setCachePath("/tmp");
+    view->page()->profile()->setPersistentStoragePath("/tmp");
+
+    // web scheme handler
+    WebSchemeHandler *handler = new WebSchemeHandler;
+    //view->page()->profile()->installUrlSchemeHandler("filesystem:https", handler);
+    //view->page()->profile()->installUrlSchemeHandler("filesystem:http", handler);
+
+    // add some settings
+    view->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
+    view->settings()->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
+
 #else
     view = new QWebView();
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
@@ -118,6 +173,15 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     first = true;
     configChanged(CONFIG_APPEARANCE);
 
+    // intercept downloads
+#ifdef NOWEBKIT
+    connect(view->page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadItem*)), this, SLOT(downloadRequested(QWebEngineDownloadItem*)));
+    connect(view->page(), SIGNAL(linkHovered(QString)), this, SLOT(linkHovered(QString)));
+#else
+    view->page()->setForwardUnsupportedContent(true);
+    connect(view->page(),SIGNAL(downloadRequested(QNetworkRequest)),this,SLOT(download(QNetworkRequest)));
+    connect(view->page(),SIGNAL(unsupportedContent(QNetworkReply*)),this,SLOT(unsupportedContent(QNetworkReply*)));
+#endif
 }
 
 WebPageWindow::~WebPageWindow()
@@ -144,6 +208,7 @@ WebPageWindow::forceReplot()
     view->setUrl(QUrl(customUrl->text()));
 #else
     view->page()->mainFrame()->load(QUrl(customUrl->text()));
+    qDebug()<<"load page"<<customUrl->text();
 #endif
 }
 
@@ -154,6 +219,7 @@ WebPageWindow::userUrl()
     view->setUrl(QUrl(rCustomUrl->text()));
 #else
     view->page()->mainFrame()->load(QUrl(rCustomUrl->text()));
+    qDebug()<<"load page"<<rCustomUrl->text();
 #endif
 }
 
@@ -200,3 +266,29 @@ WebPageWindow::event(QEvent *event)
     }
     return QWidget::event(event);
 }
+
+#ifdef NOWEBKIT
+void
+WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
+{
+    qDebug()<<"Download Requested:"<<item->url().toString();
+}
+void
+WebPageWindow::linkHovered(QString link)
+{
+    //qDebug()<<"hovering over:" << link;
+}
+#else
+// downloads requested ...
+void
+WebPageWindow::download(const QNetworkRequest &request)
+{
+    //qDebug()<<"Download Requested: "<<request.url();
+}
+
+void
+WebPageWindow::unsupportedContent(QNetworkReply * reply)
+{
+    //qDebug()<<"Unsupported Content: "<<reply->url();
+}
+#endif
