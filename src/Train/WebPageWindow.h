@@ -84,25 +84,30 @@ class WebPageWindow : public GcChartWindow
         ~WebPageWindow();
         bool first;
 
-        QLabel *customUrlLabel;
-        QLineEdit *customUrl;
-
         // set/get properties
         QString url() const { return customUrl->text(); }
-        void setUrl(QString x) { customUrl->setText(x) ;}
+        void setUrl(QString x) { customUrl->setText(x) ; forceReplot(); }
 
+        // reveal
+        bool hasReveal() { return true; }
 
     public slots:
-        void customURLEditingFinished();
-        void customURLTextChanged(QString text);
 
-
+        void userUrl();
         void forceReplot();
         void configChanged(qint32);
 
     private:
         Context *context;
         QVBoxLayout *layout;
+
+        // setting dialog
+        QLabel *customUrlLabel;
+        QLineEdit *customUrl;
+
+        // reveal controls
+        QLineEdit *rCustomUrl;
+        QPushButton *rButton;
 
 #ifdef NOWEBKIT
         QWebEngineView *view;
@@ -111,14 +116,10 @@ class WebPageWindow : public GcChartWindow
 #endif
 
         WebPageWindow();  // default ctor
-        QString currentPage;
         bool firstShow;
 
-        QString defaultUrl;
-        QString currentUrl;
     private slots:
-        void updateFrame();
-        void urlChanged(const QUrl& url);
+
         void loadFinished(bool ok);
         void finished(QNetworkReply*reply);
 

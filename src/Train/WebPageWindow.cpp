@@ -43,8 +43,30 @@
 #include "IntervalSummaryWindow.h"
 #include <QDebug>
 
+// declared in main, we only want to use it to get QStyle
+extern QApplication *application;
+
 WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context(context), firstShow(true)
 {
+    //
+    // reveal controls widget
+    //
+
+    // layout reveal controls
+    QHBoxLayout *revealLayout = new QHBoxLayout;
+    revealLayout->setContentsMargins(0,0,0,0);
+
+    rButton = new QPushButton(application->style()->standardIcon(QStyle::SP_ArrowRight), "", this);
+    rCustomUrl = new QLineEdit(this);
+    revealLayout->addStretch();
+    revealLayout->addWidget(rButton);
+    revealLayout->addWidget(rCustomUrl);
+    revealLayout->addStretch();
+
+    connect(rCustomUrl, SIGNAL(returnPressed()), this, SLOT(userUrl()));
+    connect(rButton, SIGNAL(clicked(bool)), this, SLOT(userUrl()));
+
+    setRevealLayout(revealLayout);
 
     //
     // Chart settings
@@ -57,18 +79,13 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 
 
     QFormLayout *commonLayout = new QFormLayout(settingsWidget);
-
-
-
     customUrlLabel = new QLabel(tr("URL"));
-    customUrl = new QLineEdit("");
+    customUrl = new QLineEdit(this);
     customUrl->setFixedWidth(250);
-    customUrl->setText(QString("http://www.youtube.com"));
+    customUrl->setText("");
 
     commonLayout->addRow(customUrlLabel, customUrl);
-
-    connect(customUrl, SIGNAL(editingFinished()), this, SLOT(customURLEditingFinished()));
-    connect(customUrl, SIGNAL(textChanged(QString)), this, SLOT(customURLTextChanged(QString)));
+    commonLayout->addRow(new QLabel("Hit return to apply URL"));
 
     setControls(settingsWidget);
 
@@ -80,8 +97,10 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 
 #ifdef NOWEBKIT
     view = new QWebEngineView(this);
+    connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
 #else
     view = new QWebView();
+    connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
 #endif
     view->setPage(new simpleWebPage());
     view->setContentsMargins(0,0,0,0);
@@ -93,93 +112,61 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     HelpWhatsThis *help = new HelpWhatsThis(view);
     view->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Map));
 
+    // if we change in settings, force replot by pressing return
+    connect(customUrl, SIGNAL(returnPressed()), this, SLOT(forceReplot()));
+
     first = true;
     configChanged(CONFIG_APPEARANCE);
 
-#ifdef NOWEBKIT
-    view->page()->setHtml(currentPage);
-#else
-
-    QString urlstr = "";
-
-        urlstr = QString("https://www.strava.com/oauth/authorize?");
-        urlstr.append("client_id=").append(GC_STRAVA_CLIENT_ID).append("&");
-        urlstr.append("scope=view_private,write&");
-        urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
-        urlstr.append("response_type=code&");
-        urlstr.append("approval_prompt=force");
-
-    QUrl url = QUrl(urlstr);
-    view->setUrl(url);
-
-    // connects
-    connect(view, SIGNAL(urlChanged(const QUrl&)), this,
-            SLOT(urlChanged(const QUrl&)));
-    connect(view, SIGNAL(loadFinished(bool)), this,
-            SLOT(loadFinished(bool)));
-
-    QNetworkAccessManager*nam=view->page()->networkAccessManager();
-
-    connect(nam,SIGNAL(finished(QNetworkReply*)),this,
-            SLOT(finished(QNetworkReply*)));
-
-#endif
 }
 
 WebPageWindow::~WebPageWindow()
 {
 }
 
-void
-WebPageWindow::customURLTextChanged(QString text)
-{
-    if (currentUrl != text) {
-        if (first) {
-            forceReplot();
-        }
-    }
-}
-
-void
-WebPageWindow::customURLEditingFinished()
-{
-    if (currentUrl != customUrl->text()) {
-        currentUrl = customUrl->text();
-        forceReplot();
-    }
-}
-
 void 
 WebPageWindow::configChanged(qint32)
 {
 
+    // tinted palette for headings etc
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    setPalette(palette);
 }
 
 void
 WebPageWindow::forceReplot()
 {   
 #ifdef NOWEBKIT
-    view->page()->setHtml(currentPage);
+    view->setUrl(QUrl(customUrl->text()));
 #else
-    view->page()->mainFrame()->load(QUrl(currentUrl));
+    view->page()->mainFrame()->load(QUrl(customUrl->text()));
 #endif
-
-
-}
-
-void WebPageWindow::updateFrame()
-{
 }
 
 void
-WebPageWindow::urlChanged(const QUrl &url)
+WebPageWindow::userUrl()
 {
-    qDebug() << "urlChanged" << url;
+#ifdef NOWEBKIT
+    view->setUrl(QUrl(rCustomUrl->text()));
+#else
+    view->page()->mainFrame()->load(QUrl(rCustomUrl->text()));
+#endif
 }
 
 void
-WebPageWindow::loadFinished(bool ok) {
-    qDebug() << "loadFinished" << ok;
+WebPageWindow::loadFinished(bool ok)
+{
+    QString string;
+#ifdef NOWEBKIT
+    if (ok) string = view->url().toString();
+#else
+    if (ok) string =  view->page()->mainFrame()->url().toString();
+#endif
+    rCustomUrl->setText(string);
 }
 
 void
