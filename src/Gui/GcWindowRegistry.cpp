@@ -77,7 +77,7 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[32] = {
+  static GcWindowRegistry GcWindowsInit[33] = {
     // name                     GcWinID
     { VIEW_HOME|VIEW_DIARY, tr("Metric Trends"),GcWindowTypes::LTM },
     { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
@@ -113,7 +113,7 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("StreetView"), GcWindowTypes::StreetViewWindow },
     { VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
     { VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
-    //{ VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
+    { VIEW_ANALYSIS|VIEW_HOME|VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
     { 0, "", GcWindowTypes::None }};
   // initialize the global registry
   GcWindows = GcWindowsInit;
