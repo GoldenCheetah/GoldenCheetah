@@ -67,11 +67,18 @@ class WebDownloadInterceptor : public QWebEngineUrlRequestInterceptor
 class WebSchemeHandler : public QWebEngineUrlSchemeHandler
 {
     public:
-        WebSchemeHandler() : QWebEngineUrlSchemeHandler(Q_NULLPTR) {}
+        WebSchemeHandler(QWebEngineView *view) : QWebEngineUrlSchemeHandler(Q_NULLPTR), view(view) {}
     public slots:
         void requestStarted(QWebEngineUrlRequestJob *request) {
-            //qDebug()<<"urlscheme request"<<request->requestUrl().toString();
+
+            QString inject = QString("window.resolveLocalFileSystemURL = window.resolveLocalFileSystemURL || window.webkitResolveLocalFileSystemURL; "
+                                     "window.resolveLocalFileSystemURL('%1', function(fs) {console.warn(fs.name);}, function(evt) {console.warn(evt.target.error.code);} );")
+                             .arg(request->requestUrl().toString());
+            view->page()->runJavaScript(inject);
         }
+
+    private:
+        QWebEngineView *view;
 };
 
 #endif
@@ -132,8 +139,7 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     view = new QWebEngineView(this);
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
 
-    // set user agent to look like Chrome
-    view->page()->profile()->setHttpUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36");
+    //view->page()->profile()->setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
 
     // add a download interceptor
     WebDownloadInterceptor *interceptor = new WebDownloadInterceptor;
@@ -141,13 +147,14 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 
     // cookies and storage
     view->page()->profile()->setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
-    view->page()->profile()->setCachePath("/tmp");
-    view->page()->profile()->setPersistentStoragePath("/tmp");
+    QString temp = const_cast<AthleteDirectoryStructure*>(context->athlete->directoryStructure())->temp().absolutePath();
+    view->page()->profile()->setCachePath(temp);
+    view->page()->profile()->setPersistentStoragePath(temp);
 
     // web scheme handler
-    WebSchemeHandler *handler = new WebSchemeHandler;
+    WebSchemeHandler *handler = new WebSchemeHandler(view);
     //view->page()->profile()->installUrlSchemeHandler("filesystem:https", handler);
-    //view->page()->profile()->installUrlSchemeHandler("filesystem:http", handler);
+    view->page()->profile()->installUrlSchemeHandler("filesystem", handler);
 
     // add some settings
     view->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
@@ -208,7 +215,7 @@ WebPageWindow::forceReplot()
     view->setUrl(QUrl(customUrl->text()));
 #else
     view->page()->mainFrame()->load(QUrl(customUrl->text()));
-    qDebug()<<"load page"<<customUrl->text();
+    //qDebug()<<"load page"<<customUrl->text();
 #endif
 }
 
@@ -219,7 +226,7 @@ WebPageWindow::userUrl()
     view->setUrl(QUrl(rCustomUrl->text()));
 #else
     view->page()->mainFrame()->load(QUrl(rCustomUrl->text()));
-    qDebug()<<"load page"<<rCustomUrl->text();
+    //qDebug()<<"load page"<<rCustomUrl->text();
 #endif
 }
 
