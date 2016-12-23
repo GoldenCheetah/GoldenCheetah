@@ -54,8 +54,6 @@
 #ifndef NOWEBKIT
 #include "RideWindow.h"
 #endif
-#include "GoogleMapControl.h"
-#include "BingMap.h"
 #include "RideMapWindow.h"
 #include "WebPageWindow.h"
 #ifdef GC_WANT_R
