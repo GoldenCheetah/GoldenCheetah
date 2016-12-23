@@ -2789,7 +2789,8 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
         if (value == RideFile::NA) continue;
 
         // convert seconds to hours
-        if (metricDetail.uunits == tr("seconds")) value /= 3600;
+        if (metricDetail.uunits == "seconds" ||
+            metricDetail.uunits == tr("seconds")) value /= 3600;
 
         if (value || wantZero) {
             unsigned long seconds = ride->getForSymbol("workout_time");
