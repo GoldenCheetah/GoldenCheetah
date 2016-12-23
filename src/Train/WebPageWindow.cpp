@@ -222,10 +222,14 @@ WebPageWindow::forceReplot()
 void
 WebPageWindow::userUrl()
 {
+    // add http:// if scheme is missing
+    QRegExp hasscheme("^[^:]*://.*");
+    QString url = rCustomUrl->text();
+    if (!hasscheme.exactMatch(url)) url = "http://" + url;
 #ifdef NOWEBKIT
-    view->setUrl(QUrl(rCustomUrl->text()));
+    view->setUrl(QUrl(url));
 #else
-    view->page()->mainFrame()->load(QUrl(rCustomUrl->text()));
+    view->page()->mainFrame()->load(QUrl(url));
     //qDebug()<<"load page"<<rCustomUrl->text();
 #endif
 }
@@ -278,7 +282,7 @@ WebPageWindow::event(QEvent *event)
 void
 WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
 {
-    qDebug()<<"Download Requested:"<<item->url().toString();
+    //qDebug()<<"Download Requested:"<<item->url().toString();
 }
 void
 WebPageWindow::linkHovered(QString link)
