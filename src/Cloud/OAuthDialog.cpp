@@ -388,7 +388,8 @@ static QString RawJsonStringGrab(const QByteArray& payload,
 
 void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
 
-    if (reply->error() == QNetworkReply::NoError) {
+    // we can handle SSL handshake errors, if we got here then some kind of protocol was agreed
+    if (reply->error() == QNetworkReply::NoError || reply->error() == QNetworkReply::SslHandshakeFailedError) {
         QByteArray payload = reply->readAll(); // JSON
         QString refresh_token;
         QString access_token;
