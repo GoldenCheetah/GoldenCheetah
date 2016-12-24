@@ -463,6 +463,12 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
                                     tr("Information"), info);
             information.exec();
         }
+    } else {
+
+            QString error = QString(tr("Error retrieving access token, %1 (%2)")).arg(reply->errorString()).arg(reply->error());
+            QMessageBox oautherr(QMessageBox::Critical, tr("SSL Token Refresh Error"), error);
+            oautherr.setDetailedText(error);
+            oautherr.exec();
     }
     // job done, dialog can be closed
     accept();
