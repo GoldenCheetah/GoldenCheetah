@@ -72,6 +72,7 @@ private slots:
     void urlChanged(const QUrl& url);
     void loadFinished(bool ok);
     void networkRequestFinished(QNetworkReply *reply);
+    void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
 
 #ifdef GC_HAVE_KQOAUTH
     // Twitter OAUTH
