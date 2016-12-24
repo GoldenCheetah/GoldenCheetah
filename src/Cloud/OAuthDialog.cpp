@@ -286,13 +286,21 @@ OAuthDialog::urlChanged(const QUrl &url)
             QNetworkRequest request = QNetworkRequest(url);
             request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
 
-            // now get the final token
+            // now get the final token - but ignore errors
             manager = new QNetworkAccessManager(this);
+            connect(manager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
             connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
             manager->post(request, data);
 
         }
     }
+}
+
+// just ignore handshake errors
+void
+OAuthDialog::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+{
+    reply->ignoreSslErrors();
 }
 
 void
@@ -346,10 +354,10 @@ OAuthDialog::loadFinished(bool ok) {
                 request.setHeader(QNetworkRequest::ContentTypeHeader,
                                   "application/x-www-form-urlencoded");
 
-                // not get the final token
+                // not get the final token - ignoring errors
                 manager = new QNetworkAccessManager(this);
-                connect(manager, SIGNAL(finished(QNetworkReply*)), this,
-                        SLOT(networkRequestFinished(QNetworkReply*)));
+                connect(manager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
+                connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
                 manager->post(request, data);
             }
         }
