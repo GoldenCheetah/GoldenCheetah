@@ -84,11 +84,18 @@ GoogleDrive::GoogleDrive(Context *context)
     : FileStore(context), context_(context), root_(NULL) {
     printd("GoogleDrive::GoogleDrive\n");
     nam_ = new QNetworkAccessManager(this);
+    connect(nam_, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
     root_ = NULL;
 }
 
 GoogleDrive::~GoogleDrive() {
     delete nam_;
+}
+
+void GoogleDrive::onSslErrors(QNetworkReply*reply, const QList<QSslError> & )
+{
+    reply->ignoreSslErrors();
+
 }
 
 // open by connecting and getting a basic list of folders available

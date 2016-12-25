@@ -79,6 +79,9 @@ class GoogleDrive : public FileStore {
         // sending data
         void writeFileCompleted();
 
+        // dealing with SSL handshake problems
+        void onSslErrors(QNetworkReply*reply, const QList<QSslError> & );
+
     private:
         struct FileInfo;
 
