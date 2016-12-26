@@ -120,6 +120,11 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString athlete) : QThre
     currentRollingResistance = rollingResistance = 0.004; // typical for road
     gradient = 0.1;
 
+    // elapsed time reference
+    elapsedTimer.start();
+    if (!elapsedTimer.isMonotonic())
+        qDebug() << "Caution: ANT timer is not monotonic";
+
     // state machine
     state = ST_WAIT_FOR_SYNC;
     length = bytes = 0;
@@ -1296,4 +1301,9 @@ void ANT::setFecChannel(int channel)
 void ANT::setControlChannel(int channel)
 {
     controlChannel = channel;
+}
+
+qint64 ANT::getElapsedTime()
+{
+    return elapsedTimer.elapsed();
 }

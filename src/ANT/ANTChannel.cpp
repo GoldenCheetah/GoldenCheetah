@@ -59,7 +59,7 @@ ANTChannel::init()
     status = Closed;
     fecPrevRawDistance=0;
     fecCapabilities=0;
-    lastMessageTimestamp = lastMessageTimestamp2 = QTime::currentTime();
+    lastMessageTimestamp = lastMessageTimestamp2 = parent->getElapsedTime();
 }
 
 //
@@ -631,9 +631,9 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                if (time) {
                    rpm = 1024*60*revs / time;
                    last_measured_rpm = rpm;
-                   lastMessageTimestamp = QTime::currentTime();
+                   lastMessageTimestamp = parent->getElapsedTime();
                } else {
-                   int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
+                   qint64 ms = parent->getElapsedTime() - lastMessageTimestamp;
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getCadence());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
                    if (rpm < last_measured_rpm / 2.0)
@@ -658,9 +658,10 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
                    if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
                    else parent->setCadence(rpm);
-                   lastMessageTimestamp = QTime::currentTime();
+                   lastMessageTimestamp = parent->getElapsedTime();
                } else {
-                   int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
+                   qint64 ms = parent->getElapsedTime() - lastMessageTimestamp;
+                   //qDebug() << "cadence ms:" << ms;
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getCadence());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
                    if (rpm < last_measured_rpm / 2.0)
@@ -676,9 +677,10 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    rpm = 1024*60*revs / time;
                    if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
                    else parent->setWheelRpm(rpm);
-                   lastMessageTimestamp2 = QTime::currentTime();
+                   lastMessageTimestamp2 = parent->getElapsedTime();
                } else {
-                   int ms = lastMessageTimestamp2.msecsTo(QTime::currentTime());
+                   qint64 ms = parent->getElapsedTime() - lastMessageTimestamp2;
+                   //qDebug() << "speed ms:" << ms;
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getWheelRpm());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
                    if (rpm < (float) 15.0)
@@ -697,9 +699,9 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                uint16_t revs = antMessage.wheelRevolutions - lastMessage.wheelRevolutions;
                if (time) {
                    rpm = 1024*60*revs / time;
-                   lastMessageTimestamp = QTime::currentTime();
+                   lastMessageTimestamp = parent->getElapsedTime();
                } else {
-                   int ms = lastMessageTimestamp.msecsTo(QTime::currentTime());
+                   qint64 ms = parent->getElapsedTime() - lastMessageTimestamp;
                    rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getWheelRpm());
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
                    if (rpm < (float) 15.0)
@@ -823,8 +825,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 // just process strides for now
                 if (antMessage.fpodInstant == false) {
 
-                    QTime now=QTime::currentTime();
-                    int ms = lastMessageTimestamp.msecsTo(now);
+                    qint64 now = parent->getElapsedTime();
+                    qint64 ms = now - lastMessageTimestamp;
                     lastMessageTimestamp = now;
 
                     // how many strides since last ?

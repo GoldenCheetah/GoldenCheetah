@@ -37,6 +37,7 @@
 #include <QStringList>
 #include <QTime>
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QProgressDialog>
 #include <QFile>
 
@@ -564,6 +565,8 @@ public:
     void setTrainerReady(bool status) { telemetry.setTrainerReady(status); }
     void setTrainerRunning(bool status) { telemetry.setTrainerRunning(status); }
 
+    qint64 getElapsedTime();
+
 private:
 
     void run();
@@ -608,6 +611,8 @@ private:
     int checksum;
     int powerchannels; // how many power channels do we have?
     QDateTime lastCadenceMessage;
+
+    QElapsedTimer elapsedTimer;
 
     QQueue<setChannelAtom> channelQueue; // messages for configuring channels from controller
 
