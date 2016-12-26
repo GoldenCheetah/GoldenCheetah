@@ -760,14 +760,14 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    parent->setTrainerStatusAvailable(true);
                    // temporarily disabled until calibration included in the code / TODO : remove && false
                    parent->setTrainerCalibRequired((antMessage.fecPowerCalibRequired || antMessage.fecResisCalibRequired) && false);
-                   if (antMessage.fecPowerCalibRequired)
-                        qDebug() << "Trainer calibration required (power)";
-                   if (antMessage.fecResisCalibRequired)
-                        qDebug() << "Trainer calibration required (resistance)";
+                   //if (antMessage.fecPowerCalibRequired)
+                   //     qDebug() << "Trainer calibration required (power)";
+                   //if (antMessage.fecResisCalibRequired)
+                   //     qDebug() << "Trainer calibration required (resistance)";
                    // temporarily disabled until calibration included in the code / TODO : remove && false
                    parent->setTrainerConfigRequired(antMessage.fecUserConfigRequired && false);
-                   if (antMessage.fecUserConfigRequired)
-                        qDebug() << "Trainer configuration required";
+                   //if (antMessage.fecUserConfigRequired)
+                   //     qDebug() << "Trainer configuration required";
                    parent->setTrainerBrakeFault(antMessage.fecPowerOverLimits==FITNESS_EQUIPMENT_POWER_NOK_LOWSPEED
                                             ||  antMessage.fecPowerOverLimits==FITNESS_EQUIPMENT_POWER_NOK_HIGHSPEED
                                             ||  antMessage.fecPowerOverLimits==FITNESS_EQUIPMENT_POWER_NOK);
