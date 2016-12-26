@@ -60,6 +60,7 @@ ANTChannel::init()
     fecPrevRawDistance=0;
     fecCapabilities=0;
     lastMessageTimestamp = lastMessageTimestamp2 = parent->getElapsedTime();
+    blacklisted=0;
 }
 
 //
@@ -341,6 +342,12 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
         manufacturer_id=MANUFACTURER_MANUFACTURER_ID(message);
         product_id=MANUFACTURER_MODEL_NUMBER_ID(message);
         checkCinqo();
+
+        // If we are a Tacx FE-C trainer then blacklist the Speed and Cadence channel
+        // on the same device, as known to cause problems due to poor quality data
+        // (multiple unchanged messages between valid updates)
+        if (is_fec && manufacturer_id == 0x59)
+            parent->blacklistSensor(device_number, ANT_SPORT_SandC_TYPE);
 
     } else if (MESSAGE_IS_BATTERY_VOLTAGE(message)) {
         // todo: push battery status up to train view when we have a means to display notifications
@@ -649,45 +656,48 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            {
                float rpm;
                static float last_measured_rpm;
-               // cadence first...
-               uint16_t time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
-               uint16_t revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
-               if (time) {
-                   rpm = 1024*60*revs / time;
-                   last_measured_rpm = rpm;
 
-                   if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
-                   else parent->setCadence(rpm);
-                   lastMessageTimestamp = parent->getElapsedTime();
-               } else {
-                   qint64 ms = parent->getElapsedTime() - lastMessageTimestamp;
-                   //qDebug() << "cadence ms:" << ms;
-                   rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getCadence());
-                   // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
-                   if (rpm < last_measured_rpm / 2.0)
-                       rpm = 0.0; // if rpm is less than half previous cadence we consider that we are stopped
-                   parent->setCadence(rpm);
-               }
-               value = rpm;
+               if (!blacklisted) {
+                   // cadence first...
+                   uint16_t time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
+                   uint16_t revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
+                   if (time) {
+                       rpm = 1024*60*revs / time;
+                       last_measured_rpm = rpm;
 
-               // now speed ...
-               time = antMessage.wheelMeasurementTime - lastMessage.wheelMeasurementTime;
-               revs = antMessage.wheelRevolutions - lastMessage.wheelRevolutions;
-               if (time) {
-                   rpm = 1024*60*revs / time;
-                   if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
-                   else parent->setWheelRpm(rpm);
-                   lastMessageTimestamp2 = parent->getElapsedTime();
-               } else {
-                   qint64 ms = parent->getElapsedTime() - lastMessageTimestamp2;
-                   //qDebug() << "speed ms:" << ms;
-                   rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getWheelRpm());
-                   // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
-                   if (rpm < (float) 15.0)
-                       rpm = 0.0; // if rpm is less than 15rpm (=4s) then we consider that we are stopped
-                   parent->setWheelRpm(rpm);
+                       if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
+                       else parent->setCadence(rpm);
+                       lastMessageTimestamp = parent->getElapsedTime();
+                   } else {
+                       qint64 ms = parent->getElapsedTime() - lastMessageTimestamp;
+                       //qDebug() << "cadence ms:" << ms;
+                       rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getCadence());
+                       // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
+                       if (rpm < last_measured_rpm / 2.0)
+                           rpm = 0.0; // if rpm is less than half previous cadence we consider that we are stopped
+                       parent->setCadence(rpm);
+                   }
+                   value = rpm;
+
+                   // now speed ...
+                   time = antMessage.wheelMeasurementTime - lastMessage.wheelMeasurementTime;
+                   revs = antMessage.wheelRevolutions - lastMessage.wheelRevolutions;
+                   if (time) {
+                       rpm = 1024*60*revs / time;
+                       if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
+                       else parent->setWheelRpm(rpm);
+                       lastMessageTimestamp2 = parent->getElapsedTime();
+                   } else {
+                       qint64 ms = parent->getElapsedTime() - lastMessageTimestamp2;
+                       //qDebug() << "speed ms:" << ms;
+                       rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getWheelRpm());
+                       // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
+                       if (rpm < (float) 15.0)
+                           rpm = 0.0; // if rpm is less than 15rpm (=4s) then we consider that we are stopped
+                       parent->setWheelRpm(rpm);
+                   }
+                   value2 = rpm;
                }
-               value2 = rpm;
            }
            break;
 
