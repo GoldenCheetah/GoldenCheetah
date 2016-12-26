@@ -1307,3 +1307,24 @@ qint64 ANT::getElapsedTime()
 {
     return elapsedTimer.elapsed();
 }
+
+// blacklist a specific sensor
+void ANT::blacklistSensor(int device_number, int device_id)
+{
+    for (int i=0; i<channels; i++) {
+        if ((antChannel[i]->device_number == device_number) && (antChannel[i]->device_id == device_id)) {
+            if (!antChannel[i]->blacklisted) {
+                char *name = NULL;
+                for (int i=0; ant_sensor_types[i].suffix !=  '\0'; i++) {
+                    if (ant_sensor_types[i].device_id == device_id)
+                        name = (char*)ant_sensor_types[i].descriptive_name;
+                }
+
+                if (name)
+                    qDebug() << "*** Blacklisting" << name << "sensor id" << device_number;
+
+                antChannel[i]->blacklisted = 1;
+            }
+        }
+    }
+}
