@@ -102,10 +102,10 @@ class ANTChannel : public QObject {
         char id[10]; // short identifier
         ANTChannelInitialisation mi;
 
-        int   messages_received; // for signal strength metric
-        int   messages_dropped;
-        QTime lastMessageTimestamp;
-        QTime lastMessageTimestamp2;
+        int    messages_received; // for signal strength metric
+        int    messages_dropped;
+        qint64 lastMessageTimestamp; // for time comparisons
+        qint64 lastMessageTimestamp2;
 
         unsigned char rx_burst_data[RX_BURST_DATA_LEN];
         int           rx_burst_data_index;
