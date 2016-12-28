@@ -45,6 +45,10 @@ CloudDBChartClient::CloudDBChartClient()
     QDir cacheDir(QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).at(0));
     cacheDir.cdUp();
     g_cacheDir = QString(cacheDir.absolutePath()+"/GoldenCheetahCloudDB");
+    QDir newCacheDir(g_cacheDir);
+    if (!newCacheDir.exists()) {
+        cacheDir.mkdir("GoldenCheetahCloudDB");
+    }
 
     // general handling for sslErrors
     connect(g_nam, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this,
