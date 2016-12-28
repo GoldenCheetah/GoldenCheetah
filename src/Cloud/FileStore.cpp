@@ -1036,7 +1036,7 @@ FileStoreSyncDialog::syncNext()
             listindex = i+1; // start from the next one
 
             progressLabel->setText(QString(tr("Processed %1 of %2")).arg(downloadcounter).arg(downloadtotal));
-            if (curr->text(6) == "Download") {
+            if (curr->text(6) == tr("Download")) {
                 curr->setText(7, tr("Downloading"));
                 rideListSync->setCurrentItem(curr);
 
