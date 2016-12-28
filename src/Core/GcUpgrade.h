@@ -81,6 +81,7 @@
 // 3950 - V3.4 RELEASE (November 18 2016)
 // 3955 - V3.4 RELEASE SIERRA BUILD UPDATE (November 19 2016)
 // 3956 - V3.4 FIXUP GOOGLE DRIVE ISSUES ON MAC (December 25 2016)
+// 3957 - V3.4 FIXUP SYNC DIALOG FOR NON-ENGLISH TRANSLATIONS
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -89,13 +90,13 @@
 #define VERSION311_BUILD  3101 // first build with 3.1 upgrade process
 #define VERSION32_BUILD   3200 // released
 #define VERSION33_BUILD   3933 // development release
-#define VERSION34_BUILD   3956 // released
+#define VERSION34_BUILD   3957 // released
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 3956
+#define VERSION_LATEST 3957
 #define VERSION_STRING "V3.4"
 
 // default config for this release cycle
