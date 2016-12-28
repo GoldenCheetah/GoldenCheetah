@@ -1315,9 +1315,9 @@ void ANT::blacklistSensor(int device_number, int device_id)
         if ((antChannel[i]->device_number == device_number) && (antChannel[i]->device_id == device_id)) {
             if (!antChannel[i]->blacklisted) {
                 char *name = NULL;
-                for (int i=0; ant_sensor_types[i].suffix !=  '\0'; i++) {
-                    if (ant_sensor_types[i].device_id == device_id)
-                        name = (char*)ant_sensor_types[i].descriptive_name;
+                for (int j=0; ant_sensor_types[j].suffix !=  '\0'; j++) {
+                    if (ant_sensor_types[j].device_id == device_id)
+                        name = (char*)ant_sensor_types[j].descriptive_name;
                 }
 
                 if (name)
