@@ -66,7 +66,7 @@ int MonarkConnection::pollInterval()
  * Private function that reads a complete reply and prepares if for
  * processing by replacing \r with \0
  */
-QByteArray MonarkConnection::readAnswer(int timeoutMs)
+QString MonarkConnection::readAnswer(int timeoutMs)
 {
     QByteArray data;
 
@@ -81,7 +81,7 @@ QByteArray MonarkConnection::readAnswer(int timeoutMs)
     } while (data.indexOf('\r') == -1);
 
     data.replace("\r", "\0");
-    return data;
+    return QString(data);
 }
 
 /**
@@ -178,7 +178,7 @@ void MonarkConnection::requestPower()
         // failure to write to device, bail out
         this->exit(-1);
     }
-    QByteArray data = readAnswer(500);
+    QString data = readAnswer(500);
     m_readMutex.lock();
     m_power = data.toInt();
     m_readMutex.unlock();
@@ -193,7 +193,7 @@ void MonarkConnection::requestPulse()
         // failure to write to device, bail out
         this->exit(-1);
     }
-    QByteArray data = readAnswer(500);
+    QString data = readAnswer(500);
     m_readMutex.lock();
     m_pulse = data.toInt();
     m_readMutex.unlock();
@@ -208,7 +208,7 @@ void MonarkConnection::requestCadence()
         // failure to write to device, bail out
         this->exit(-1);
     }
-    QByteArray data = readAnswer(500);
+    QString data = readAnswer(500);
     m_readMutex.lock();
     m_cadence = data.toInt();
     m_readMutex.unlock();
@@ -223,8 +223,8 @@ int MonarkConnection::readConfiguredLoad()
         // failure to write to device, bail out
         this->exit(-1);
     }
-    QByteArray data = readAnswer(500);
-    data.remove(0,1);
+    QString data = readAnswer(500);
+    //data.remove(0,1);
     qDebug() << "Current configure load: " << data.toInt();
     return data.toInt();
 }
@@ -239,8 +239,7 @@ void MonarkConnection::identifyModel()
         // failure to write to device, bail out
         this->exit(-1);
     }
-    QByteArray data = readAnswer(500);
-    m_id = QString(data);
+    m_id = readAnswer(500);
 
     if (m_id.toLower().startsWith("novo"))
     {
@@ -250,8 +249,7 @@ void MonarkConnection::identifyModel()
             // failure to write to device, bail out
             this->exit(-1);
         }
-        QByteArray data = readAnswer(500);
-        servo = QString(data);
+        servo = readAnswer(500);
     }
 
 
