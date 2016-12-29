@@ -56,7 +56,7 @@ private:
     QString m_id;
     void run();
     QTimer *m_timer;
-    QByteArray readAnswer(int timeoutMs = -1);
+    QString readAnswer(int timeoutMs = -1);
     QMutex m_mutex;
     QMutex m_readMutex;
     unsigned int m_load;
@@ -65,7 +65,7 @@ private:
     double m_kpToWrite;
     bool m_shouldWriteLoad;
     bool m_shouldWriteKp;
-    enum MonarkType { MONARK_UNKNOWN, MONARK_LT2, MONARK_LC, MONARK_LC_NOVO } m_type;
+    enum MonarkType { MONARK_UNKNOWN, MONARK_LT2, MONARK_LC, MONARK_LC_NOVO, MONARK_839E } m_type;
     bool canDoLoad();
     bool canDoKp();
     quint32 m_power;
