@@ -123,6 +123,33 @@ private:
     bool loggedIn, uploadSuccessful;
 };
 
+// uploader to todaysplan.com
+class TodaysPlanUploader : public ShareDialogUploader
+{
+    Q_OBJECT
+    G_OBJECT
+
+public:
+    TodaysPlanUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
+
+    virtual bool canUpload( QString &err );
+    virtual bool wasUploaded();
+    virtual void upload();
+
+private slots:
+    void requestUploadTodaysPlan();
+    void requestUploadTodaysPlanFinished(QNetworkReply *reply);
+
+private:
+    QString token;
+
+    bool loggedIn, uploadSuccessful;
+
+    QString uploadStatus;
+    int uploadProgress;
+    int todaysPlanUploadId;
+};
+
 // uploader to cyclinganalytics.com
 class CyclingAnalyticsUploader : public ShareDialogUploader
 {
@@ -261,6 +288,7 @@ private:
 
 
      QCheckBox *stravaChk;
+     QCheckBox *todaysPlanChk;
      QCheckBox *cyclingAnalyticsChk;
      QCheckBox *rideWithGPSChk;
      QCheckBox *selfLoopsChk;
@@ -272,6 +300,7 @@ private:
      RideItem *ride;
 
      ShareDialogUploader *stravaUploader;
+     ShareDialogUploader *todaysPlanUploader;
      ShareDialogUploader *cyclingAnalyticsUploader;
      ShareDialogUploader *rideWithGpsUploader;
      ShareDialogUploader *selfLoopsUploader;

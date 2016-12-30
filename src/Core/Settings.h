@@ -287,7 +287,8 @@
 #define GC_STRAVA_TOKEN                 "<athlete-private>strava_token"
 //Cycling Analytics
 #define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
-
+//Today's Plan
+#define GC_TODAYSPLAN_TOKEN             "<athlete-private>todaysplan_token"
 
 // --------------------------------------------------------------------------------
 #include <QSettings>

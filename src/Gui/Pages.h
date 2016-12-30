@@ -236,6 +236,7 @@ class CredentialsPage : public QScrollArea
         void chooseGoogleDriveAuthScope(const QString& scope);
 #endif
         void authoriseStrava();
+        void authoriseTodaysPlan();
         void authoriseCyclingAnalytics();
         void authoriseGoogleCalendar();
         void dvCALDAVTypeChanged(int);
@@ -265,6 +266,7 @@ class CredentialsPage : public QScrollArea
 
         QComboBox *dvCALDAVType;
         QPushButton *stravaAuthorise, *stravaAuthorised, *twitterAuthorised;
+        QPushButton *tdpAuthorise, *tdpAuthorised;
         QPushButton *networkFileStoreFolderBrowse;
         QLineEdit *networkFileStoreFolder;
         QPushButton *cyclingAnalyticsAuthorise, *cyclingAnalyticsAuthorised;

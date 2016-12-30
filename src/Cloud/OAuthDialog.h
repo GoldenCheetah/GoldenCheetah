@@ -61,6 +61,7 @@ public:
         CYCLING_ANALYTICS,
         GOOGLE_CALENDAR,
         GOOGLE_DRIVE,
+        TODAYSPLAN,
     } OAuthSite;
 
     OAuthDialog(Context *context, OAuthSite site);
