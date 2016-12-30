@@ -68,6 +68,7 @@
 #include "TwitterDialog.h"
 #endif
 #include "ShareDialog.h"
+#include "TodaysPlan.h"
 #include "WithingsDownload.h"
 #include "WorkoutWizard.h"
 #include "ErgDBDownloadDialog.h"
@@ -452,7 +453,13 @@ MainWindow::MainWindow(const QDir &home)
                          SLOT(uploadGoogleDrive()), tr(""));
     shareMenu->addAction(tr("Synchronise GoogleDrive..."), this,
                          SLOT(syncGoogleDrive()), tr("Ctrl+P"));
+    shareMenu->addSeparator ();
+    shareMenu->addAction(tr("Upload to Today's Plan"), this,
+                         SLOT(uploadTodaysPlan()), tr(""));
+    shareMenu->addAction(tr("Synchronise Today's Plan..."), this,
+                         SLOT(syncTodaysPlan()), tr(""));
 #endif
+
 
     HelpWhatsThis *helpShare = new HelpWhatsThis(rideMenu);
     shareMenu->setWhatsThis(helpShare->getWhatsThisText(HelpWhatsThis::MenuBar_Share));
@@ -2084,6 +2091,24 @@ MainWindow::syncGoogleDrive()
 {
     GoogleDrive gd(currentTab->context);
     FileStoreSyncDialog upload(currentTab->context, &gd);
+    upload.exec();
+}
+
+void
+MainWindow::uploadTodaysPlan()
+{
+    // upload current ride, if we have one
+    if (currentTab->context->ride) {
+        TodaysPlan tp(currentTab->context);
+        FileStore::upload(this, &tp, currentTab->context->ride);
+    }
+}
+
+void
+MainWindow::syncTodaysPlan()
+{
+    TodaysPlan db(currentTab->context);
+    FileStoreSyncDialog upload(currentTab->context, &db);
     upload.exec();
 }
 #endif

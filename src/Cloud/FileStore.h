@@ -91,6 +91,11 @@ class FileStore : public QObject {
         virtual QList<FileStoreEntry*> readdir(QString path, QStringList &errors) { 
             Q_UNUSED(path); errors << "not implemented."; return QList<FileStoreEntry*>(); 
         }
+        virtual QList<FileStoreEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to) {
+            Q_UNUSED(from);
+            Q_UNUSED(to);
+            return readdir(path, errors);
+        }
 
         // UTILITY
         void mapReply(QNetworkReply *reply, QString name) { replymap_.insert(reply,name); }
@@ -100,6 +105,8 @@ class FileStore : public QObject {
 
         // PUBLIC INTERFACES. DO NOT REIMPLEMENT
         static bool upload(QWidget *parent, FileStore *store, RideItem*);
+
+        bool useZip;
 
     signals:
         void writeComplete(QString name, QString message);
@@ -301,6 +308,8 @@ class FileStoreEntry
         // THESE MEMBERS NEED TO BE MAINTAINED BY
         // THE FILESTORE IMPLEMENTATION (Dropbox, Google etc)
         QString name;                       // file name
+        QString label;                      // alternate name
+        QString id;                         // file id
         bool isDir;                         // is a directory
         unsigned long size;                 // my size
         QDateTime modified;                 // last modification date
