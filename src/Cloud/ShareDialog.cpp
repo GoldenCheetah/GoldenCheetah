@@ -921,7 +921,9 @@ RideWithGpsUploader::requestUploadRideWithGPSFinished(QNetworkReply *reply)
 TodaysPlanUploader::TodaysPlanUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     ShareDialogUploader(tr("TodaysPlan"), context, ride, parent)
 {
-    rideName = ride->fileName.replace(".json", "tcx.gz");
+    rideName = ride->fileName;
+    rideName = rideName.replace(".json", "");
+    rideName.append(".tcx.gz");
     todaysPlanUploadId = ride->ride()->getTag("TodaysPlan uploadId", "0").toInt();
 }
 
@@ -1026,10 +1028,13 @@ TodaysPlanUploader::requestUploadTodaysPlanFinished(QNetworkReply *reply)
 
         // parse the response
         QString response = reply->readAll();
+        //qDebug() << response;
         MVJSONReader jsonResponse(string(response.toLatin1()));
 
         // get values
-        uploadError = jsonResponse.root->getFieldString("error").c_str();
+        QString state = jsonResponse.root->getFieldString("state").c_str();
+        if (state == "error")
+            uploadError = jsonResponse.root->getFieldString("message").c_str();
         todaysPlanUploadId = jsonResponse.root->getFieldInt("id");
 
     } catch(...) {
@@ -1054,7 +1059,7 @@ TodaysPlanUploader::requestUploadTodaysPlanFinished(QNetworkReply *reply)
         ride->ride()->setTag("TodaysPlan uploadId", QString("%1").arg(todaysPlanUploadId));
         ride->setDirty(true);
 
-        //qDebug() << "uploadId: " << todaysPlanUploadId << rideName;
+        qDebug() << "uploadId: " << todaysPlanUploadId << rideName;
         parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
         uploadSuccessful = true;
     }
