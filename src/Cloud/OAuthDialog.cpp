@@ -145,12 +145,18 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
         urlstr.append("response_type=code&");
         urlstr.append("client_id=").append(GC_GOOGLE_DRIVE_CLIENT_ID);
 #endif
+    } else if (site == TODAYSPLAN) {
+        urlstr = QString("https://staging.todaysplan.com.au/en/authorize/");
+        //urlstr = QString("https://whats.todaysplan.com.au/authorize/");
+#ifdef GC_TODAYSPLAN_CLIENT_ID
+        urlstr.append(GC_TODAYSPLAN_CLIENT_ID);
+#endif
     }
 
     // different process to get the token for STRAVA, CYCLINGANALYTICS vs.
     // TWITTER
     if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS ||
-        site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE) {
+        site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == TODAYSPLAN) {
         url = QUrl(urlstr);
         view->setUrl(url);
         // connects
@@ -228,7 +234,7 @@ void
 OAuthDialog::urlChanged(const QUrl &url)
 {
     // STRAVA & CYCLINGANALYTICS work with Call-back URLs / change of URL indicates next step is required
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS) {
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN) {
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
                 url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
@@ -270,6 +276,18 @@ OAuthDialog::urlChanged(const QUrl &url)
                 params.addQueryItem("client_secret", GC_CYCLINGANALYTICS_CLIENT_SECRET);
 #endif
                 params.addQueryItem("grant_type", "authorization_code");
+
+            }
+
+            else if (site == TODAYSPLAN) {
+                urlstr = QString("https://staging.todaysplan.com.au/rest/oauth/access_token?");
+                //urlstr = QString("https://whats.todaysplan.com.au/rest/oauth/access_token?");
+                params.addQueryItem("client_id", GC_TODAYSPLAN_CLIENT_ID);
+#ifdef GC_TODAYSPLAN_CLIENT_SECRET
+                params.addQueryItem("client_secret", GC_TODAYSPLAN_CLIENT_SECRET);
+#endif
+                params.addQueryItem("grant_type", "authorization_code");
+                params.addQueryItem("redirect_uri", "https://goldencheetah.github.io/blank.html");
 
             }
 
@@ -470,6 +488,11 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
                 tr("Google Drive authorization was successful."));
             QMessageBox information(QMessageBox::Information,
                                     tr("Information"), info);
+            information.exec();
+        } else if (site == TODAYSPLAN) {
+            appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, access_token);
+            QString info = QString(tr("Today's Plan authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
         }
     } else {

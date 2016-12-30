@@ -565,6 +565,34 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     connect(stravaAuthorise, SIGNAL(clicked()), this, SLOT(authoriseStrava()));
 
     //////////////////////////////////////////////////
+    // Today's Plan
+
+    QLabel *tdp = new QLabel(tr("Today's Plan"));
+    tdp->setFont(current);
+
+    QLabel *tdpauthLabel = new QLabel(tr("Authorise"));
+
+    tdpAuthorise = new QPushButton(tr("Authorise"), this);
+
+    tdpAuthorised = new QPushButton(this);
+    tdpAuthorised->setContentsMargins(0,0,0,0);
+    tdpAuthorised->setIcon(passwords.scaled(16,16));
+    tdpAuthorised->setIconSize(QSize(16,16));
+    tdpAuthorised->setFixedHeight(16);
+    tdpAuthorised->setFixedWidth(16);
+
+    grid->addWidget(tdp, ++row, 0);
+
+    grid->addWidget(tdpauthLabel, ++row, 0);
+    grid->addWidget(tdpAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    if (appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "")!="")
+        grid->addWidget(tdpAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    else
+        tdpAuthorised->hide(); // if no token no show
+
+    connect(tdpAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTodaysPlan()));
+
+    //////////////////////////////////////////////////
     // Cycling Analytics
 
 
@@ -976,6 +1004,17 @@ void CredentialsPage::authoriseDropbox()
 void CredentialsPage::authoriseStrava()
 {
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::STRAVA);
+    if (oauthDialog->sslLibMissing()) {
+        delete oauthDialog;
+    } else {
+        oauthDialog->setWindowModality(Qt::ApplicationModal);
+        oauthDialog->exec();
+    }
+}
+
+void CredentialsPage::authoriseTodaysPlan()
+{
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TODAYSPLAN);
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {

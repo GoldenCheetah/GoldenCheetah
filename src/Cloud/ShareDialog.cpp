@@ -130,6 +130,15 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     }
     vbox1->addWidget(rideWithGPSChk,0,col++);
 
+    todaysPlanUploader = new TodaysPlanUploader(context, ride, this);
+    todaysPlanChk = new QCheckBox(tr("Today's Plan"));
+    if( ! todaysPlanUploader->canUpload( err ) ){
+        todaysPlanChk->setEnabled( false );
+    } else if( ! todaysPlanUploader->wasUploaded() ){
+        todaysPlanChk->setChecked( true );
+    }
+    vbox1->addWidget(todaysPlanChk,0,col++);
+
     cyclingAnalyticsUploader = new CyclingAnalyticsUploader(context, ride, this);
     cyclingAnalyticsChk = new QCheckBox(tr("Cycling Analytics"));
     if( ! cyclingAnalyticsUploader->canUpload( err ) ){
@@ -297,6 +306,7 @@ ShareDialog::upload()
     if ( !rideWithGPSChk->isChecked() && !selfLoopsChk->isChecked()
         && !veloHeroChk->isChecked() && !trainingstagebuchChk->isChecked()
         && !stravaChk->isChecked() && !cyclingAnalyticsChk->isChecked()
+        && !todaysPlanChk->isChecked()
         && !sportplushealthChk->isChecked() //&& !garminChk->isChecked()
         ) {
         QMessageBox aMsgBox;
@@ -316,6 +326,9 @@ ShareDialog::upload()
         shareSiteCount ++;
     }
     if (rideWithGPSChk->isChecked()) {
+        shareSiteCount ++;
+    }
+    if (todaysPlanChk->isChecked()) {
         shareSiteCount ++;
     }
     if (cyclingAnalyticsChk->isChecked()) {
@@ -342,6 +355,9 @@ ShareDialog::upload()
     }
     if (rideWithGPSChk->isEnabled() && rideWithGPSChk->isChecked()) {
         doUploader( rideWithGpsUploader );
+    }
+    if (todaysPlanChk->isEnabled() && todaysPlanChk->isChecked()) {
+        doUploader( todaysPlanUploader );
     }
     if (cyclingAnalyticsChk->isEnabled() && cyclingAnalyticsChk->isChecked()) {
         doUploader( cyclingAnalyticsUploader );
@@ -416,6 +432,13 @@ ShareDialog::doUploader( ShareDialogUploader *uploader )
 
     uploader->upload();
 }
+
+//
+// Uploader
+//
+
+// Strava
+// ----------------
 
 StravaUploader::StravaUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     ShareDialogUploader( tr("Strava"), context, ride, parent)
@@ -706,6 +729,9 @@ StravaUploader::requestVerifyUploadFinished(QNetworkReply *reply)
     }
 }
 
+// RideWithGps
+// ----------------
+
 RideWithGpsUploader::RideWithGpsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     ShareDialogUploader( tr("Ride With GPS"), context, ride, parent)
 {
@@ -889,6 +915,153 @@ RideWithGpsUploader::requestUploadRideWithGPSFinished(QNetworkReply *reply)
     }
 }
 
+// Today's Plan
+// ----------------
+
+TodaysPlanUploader::TodaysPlanUploader(Context *context, RideItem *ride, ShareDialog *parent) :
+    ShareDialogUploader(tr("TodaysPlan"), context, ride, parent)
+{
+    todaysPlanUploadId = ride->ride()->getTag("TodaysPlan uploadId", "0").toInt();
+}
+
+bool
+TodaysPlanUploader::canUpload( QString &err )
+{
+#ifdef GC_TODAYSPLAN_CLIENT_SECRET
+    token = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString();
+    if( token!="" )
+        return true;
+
+    err = tr("no Today's Plan token set. Please authorize in Settings.");
+#else
+    err = tr("Today's Plan support isn't enabled in this build");
+#endif
+    return false;
+}
+
+bool
+TodaysPlanUploader::wasUploaded()
+{
+    return todaysPlanUploadId>0;
+}
+
+void
+TodaysPlanUploader::upload()
+{
+    // OAuth no more login
+    token = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString();
+    if (token=="")
+        return;
+
+    requestUploadTodaysPlan();
+
+    if(!uploadSuccessful)
+    {
+        parent->progressLabel->setText(tr("Error uploading to Today's Plan"));
+    }
+    else
+    {
+        parent->progressLabel->setText(tr("Successfully uploaded to Today's Plan"));
+    }
+}
+
+void
+TodaysPlanUploader::requestUploadTodaysPlan()
+{
+    parent->progressLabel->setText(tr("Upload to Today's Plan..."));
+    parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+
+    QEventLoop eventLoop;
+    QNetworkAccessManager networkMgr;
+
+    connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadTodaysPlanFinished(QNetworkReply*)));
+    connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
+
+    //QUrl url = QUrl( "https://whats.todaysplan.com.au/rest/files/upload" );
+    QUrl url = QUrl( "https://staging.todaysplan.com.au/rest/files/upload" );
+    QNetworkRequest request = QNetworkRequest(url);
+
+    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+
+    TcxFileReader reader;
+    QByteArray file = reader.toByteArray(context, ride->ride(), parent->altitudeChk->isChecked(), parent->powerChk->isChecked(), parent->heartrateChk->isChecked(), parent->cadenceChk->isChecked());
+
+    // MULTIPART *****************
+
+    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+    multiPart->setBoundary(boundary.toLatin1());
+
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+
+    QHttpPart jsonPart;
+    jsonPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"json\""));
+    QString json = QString("{ filename: \"file.tcx\"; name: \"%1\" }").arg(parent->titleEdit->text());
+    jsonPart.setBody(json.toLatin1());
+
+    QHttpPart attachmentPart;
+    attachmentPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"attachment\"; type=\"text/xml\""));
+    attachmentPart.setBody(file);
+
+    multiPart->append(jsonPart);
+    multiPart->append(attachmentPart);
+
+    networkMgr.post(request, multiPart);
+
+    parent->progressBar->setValue(parent->progressBar->value()+30/parent->shareSiteCount);
+    parent->progressLabel->setText(tr("Upload... Sending to Today's Plan"));
+
+    eventLoop.exec();
+}
+
+void
+TodaysPlanUploader::requestUploadTodaysPlanFinished(QNetworkReply *reply)
+{
+    parent->progressBar->setValue(parent->progressBar->value()+50/parent->shareSiteCount);
+    parent->progressLabel->setText(tr("Upload to Today's Plan finished."));
+    uploadSuccessful = false;
+
+    QString uploadError;
+    try {
+
+        // parse the response
+        QString response = reply->readAll();
+        MVJSONReader jsonResponse(string(response.toLatin1()));
+
+        // get values
+        uploadError = jsonResponse.root->getFieldString("error").c_str();
+        todaysPlanUploadId = jsonResponse.root->getFieldInt("id");
+
+    } catch(...) {
+
+        // problem!
+        uploadError = "bad response or parser exception.";
+        todaysPlanUploadId = 0;
+    }
+
+    // if not there clean out
+    if (uploadError.toLower() == "none" || uploadError.toLower() == "null")
+        uploadError = "";
+
+    if (uploadError.length()>0 || reply->error() != QNetworkReply::NoError) {
+        qDebug() << "Error " << reply->error() ;
+        qDebug() << "Error " << uploadError;
+        parent->errorLabel->setText(parent->errorLabel->text()+ tr(" Error from Today's Plan: ") + uploadError + "\n" );
+
+    } else {
+
+        // Success
+        ride->ride()->setTag("TodaysPlan uploadId", QString("%1").arg(todaysPlanUploadId));
+        ride->setDirty(true);
+
+        qDebug() << "uploadId: " << todaysPlanUploadId;
+        parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+        uploadSuccessful = true;
+    }
+}
+
+// CyclingAnalytics
+// ----------------
+
 CyclingAnalyticsUploader::CyclingAnalyticsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     ShareDialogUploader(tr("CyclingAnalytics"), context, ride, parent)
 {
@@ -1037,6 +1210,9 @@ CyclingAnalyticsUploader::requestUploadCyclingAnalyticsFinished(QNetworkReply *r
         uploadSuccessful = true;
     }
 }
+
+// SelfLoops
+// ----------------
 
 SelfLoopsUploader::SelfLoopsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     ShareDialogUploader(tr("SelfLoops"),context, ride, parent)
