@@ -921,7 +921,7 @@ RideWithGpsUploader::requestUploadRideWithGPSFinished(QNetworkReply *reply)
 TodaysPlanUploader::TodaysPlanUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     ShareDialogUploader(tr("TodaysPlan"), context, ride, parent)
 {
-    rideName = ride->fileName.replace(".json", "");
+    rideName = ride->fileName.replace(".json", "tcx.gz");
     todaysPlanUploadId = ride->ride()->getTag("TodaysPlan uploadId", "0").toInt();
 }
 
