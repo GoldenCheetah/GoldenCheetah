@@ -921,6 +921,7 @@ RideWithGpsUploader::requestUploadRideWithGPSFinished(QNetworkReply *reply)
 TodaysPlanUploader::TodaysPlanUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     ShareDialogUploader(tr("TodaysPlan"), context, ride, parent)
 {
+    rideName = ride->fileName.replace(".json", "");
     todaysPlanUploadId = ride->ride()->getTag("TodaysPlan uploadId", "0").toInt();
 }
 
@@ -984,7 +985,7 @@ TodaysPlanUploader::requestUploadTodaysPlan()
     QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
 
     TcxFileReader reader;
-    QByteArray file = reader.toByteArray(context, ride->ride(), parent->altitudeChk->isChecked(), parent->powerChk->isChecked(), parent->heartrateChk->isChecked(), parent->cadenceChk->isChecked());
+    QByteArray file = zCompress(reader.toByteArray(context, ride->ride(), parent->altitudeChk->isChecked(), parent->powerChk->isChecked(), parent->heartrateChk->isChecked(), parent->cadenceChk->isChecked()));
 
     // MULTIPART *****************
 
@@ -995,7 +996,7 @@ TodaysPlanUploader::requestUploadTodaysPlan()
 
     QHttpPart jsonPart;
     jsonPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"json\""));
-    QString json = QString("{ filename: \"file.tcx\"; name: \"%1\" }").arg(parent->titleEdit->text());
+    QString json = QString("{ filename: \"%1\"; name: \"%2\" }").arg(rideName).arg(parent->titleEdit->text());
     jsonPart.setBody(json.toLatin1());
 
     QHttpPart attachmentPart;
@@ -1043,8 +1044,8 @@ TodaysPlanUploader::requestUploadTodaysPlanFinished(QNetworkReply *reply)
         uploadError = "";
 
     if (uploadError.length()>0 || reply->error() != QNetworkReply::NoError) {
-        qDebug() << "Error " << reply->error() ;
-        qDebug() << "Error " << uploadError;
+        //qDebug() << "Error " << reply->error() ;
+        //qDebug() << "Error " << uploadError;
         parent->errorLabel->setText(parent->errorLabel->text()+ tr(" Error from Today's Plan: ") + uploadError + "\n" );
 
     } else {
@@ -1053,7 +1054,7 @@ TodaysPlanUploader::requestUploadTodaysPlanFinished(QNetworkReply *reply)
         ride->ride()->setTag("TodaysPlan uploadId", QString("%1").arg(todaysPlanUploadId));
         ride->setDirty(true);
 
-        qDebug() << "uploadId: " << todaysPlanUploadId;
+        //qDebug() << "uploadId: " << todaysPlanUploadId << rideName;
         parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
         uploadSuccessful = true;
     }
