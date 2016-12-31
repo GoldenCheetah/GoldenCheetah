@@ -24,6 +24,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideMetric.h"
+#include "RideItem.h"
 
 #ifndef GC_VERSION
 #define GC_VERSION "(developer build)"
@@ -109,11 +110,9 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     QStringList worklist = QStringList();
     for (int i=0; metrics[i];i++) worklist << metrics[i];
 
-    Q_UNUSED(context);
-#if 0 //XXX REFACTOR COMPUTE METRICS
-    QHash<QString, RideMetricPtr> computed; 
     if (context) { // can't do this standalone
-        computed = RideMetric::computeMetrics(context, ride, context->athlete->zones(), context->athlete->hrZones(), worklist);
+        RideItem *tempItem = new RideItem(const_cast<RideFile*>(ride), context);
+        QHash<QString,RideMetricPtr> computed = RideMetric::computeMetrics(tempItem, Specification(), worklist);
 
         QDomElement lap_time = doc.createElement("TotalTimeSeconds");
         text = doc.createTextNode(QString("%1").arg(computed.value("workout_time")->value(true)));
@@ -162,7 +161,6 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
         lap_triggerMethod.appendChild(text);
         lap.appendChild(lap_triggerMethod);
     }
-#endif
 
     // samples
     // data points: timeoffset, dist, hr, spd, pwr, torq, cad, lat, lon, alt
