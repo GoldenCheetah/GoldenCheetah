@@ -138,7 +138,7 @@ Dropbox::readdir(QString path, QStringList &errors)
     }
 
     // lets connect and get basic info on the root directory
-    QString url("https://api.dropboxapi.com/1/metadata/auto" + path + "?include_deleted=false&list=true");
+    QString url("https://api.dropboxapi.com/1/metadata/auto/" + path + "?include_deleted=false&list=true");
 
     // request using the bearer token
     QNetworkRequest request(url);
