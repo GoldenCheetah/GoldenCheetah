@@ -63,6 +63,10 @@ protected:
     Context *context;
     RideItem *ride;
     ShareDialog *parent;
+
+private slots:
+    void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
+
 };
 
 // uploader to strava.com
