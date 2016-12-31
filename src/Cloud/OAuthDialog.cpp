@@ -146,8 +146,8 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
         urlstr.append("client_id=").append(GC_GOOGLE_DRIVE_CLIENT_ID);
 #endif
     } else if (site == TODAYSPLAN) {
-        urlstr = QString("https://staging.todaysplan.com.au/en/authorize/");
-        //urlstr = QString("https://whats.todaysplan.com.au/authorize/");
+        //urlstr = QString("https://staging.todaysplan.com.au/en/authorize/");
+        urlstr = QString("https://whats.todaysplan.com.au/authorize/");
 #ifdef GC_TODAYSPLAN_CLIENT_ID
         urlstr.append(GC_TODAYSPLAN_CLIENT_ID);
 #endif
@@ -280,8 +280,8 @@ OAuthDialog::urlChanged(const QUrl &url)
             }
 
             else if (site == TODAYSPLAN) {
-                urlstr = QString("https://staging.todaysplan.com.au/rest/oauth/access_token?");
-                //urlstr = QString("https://whats.todaysplan.com.au/rest/oauth/access_token?");
+                //urlstr = QString("https://staging.todaysplan.com.au/rest/oauth/access_token?");
+                urlstr = QString("https://whats.todaysplan.com.au/rest/oauth/access_token?");
                 params.addQueryItem("client_id", GC_TODAYSPLAN_CLIENT_ID);
 #ifdef GC_TODAYSPLAN_CLIENT_SECRET
                 params.addQueryItem("client_secret", GC_TODAYSPLAN_CLIENT_SECRET);

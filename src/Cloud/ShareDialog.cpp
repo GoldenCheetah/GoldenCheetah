@@ -978,8 +978,8 @@ TodaysPlanUploader::requestUploadTodaysPlan()
     connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadTodaysPlanFinished(QNetworkReply*)));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
 
-    //QUrl url = QUrl( "https://whats.todaysplan.com.au/rest/files/upload" );
-    QUrl url = QUrl( "https://staging.todaysplan.com.au/rest/files/upload" );
+    QUrl url = QUrl( "https://whats.todaysplan.com.au/rest/files/upload" );
+    //QUrl url = QUrl( "https://staging.todaysplan.com.au/rest/files/upload" );
     QNetworkRequest request = QNetworkRequest(url);
 
     QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
