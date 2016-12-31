@@ -56,6 +56,13 @@ ShareDialogUploader::wasUploaded()
     return false;
 }
 
+// just ignore handshake errors
+void
+ShareDialogUploader::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+{
+    reply->ignoreSslErrors();
+}
+
 //
 // Utility function to create a QByteArray of data in GZIP format
 // This is essentially the same as qCompress but creates it in
@@ -513,6 +520,8 @@ StravaUploader::requestUploadStrava()
 
     // trap network response from access manager
     networkManager->disconnect();
+    connect(networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this,
+            SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
     connect(networkManager, SIGNAL(finished(QNetworkReply*)), this,
             SLOT(requestUploadStravaFinished(QNetworkReply*)));
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), eventLoop,
@@ -794,6 +803,7 @@ RideWithGpsUploader::requestUploadRideWithGPS()
     QTime rideTime = QTime(hour, minute, second);
     QDateTime rideDateTime = QDateTime(rideDate, rideTime);
 
+    connect(&networkMgr, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadRideWithGPSFinished(QNetworkReply*)));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
     QString out, data;
@@ -975,6 +985,7 @@ TodaysPlanUploader::requestUploadTodaysPlan()
     QEventLoop eventLoop;
     QNetworkAccessManager networkMgr;
 
+    connect(&networkMgr, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadTodaysPlanFinished(QNetworkReply*)));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
 
@@ -1029,7 +1040,7 @@ TodaysPlanUploader::requestUploadTodaysPlanFinished(QNetworkReply *reply)
 
         // parse the response
         QString response = reply->readAll();
-        //qDebug() << response;
+        //qDebug() << "response" << response;
         MVJSONReader jsonResponse(string(response.toLatin1()));
 
         // get values
@@ -1125,6 +1136,7 @@ CyclingAnalyticsUploader::requestUploadCyclingAnalytics()
     QEventLoop eventLoop;
     QNetworkAccessManager networkMgr;
 
+    connect(&networkMgr, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadCyclingAnalyticsFinished(QNetworkReply*)));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
 
@@ -1281,6 +1293,7 @@ SelfLoopsUploader::requestUploadSelfLoops()
     QEventLoop eventLoop;
     QNetworkAccessManager networkMgr;
 
+    connect(&networkMgr, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadSelfLoopsFinished(QNetworkReply*)));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
 
