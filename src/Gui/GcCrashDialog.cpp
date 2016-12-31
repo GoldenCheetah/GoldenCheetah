@@ -314,6 +314,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">SSL</td><td>%16</td></tr>"
             "<tr><td colspan=\"2\">R</td><td>%17</td></tr>"
             "<tr><td colspan=\"2\">WEBKIT</td><td>%18</td></tr>"
+            "<tr><td colspan=\"2\">LMFIT</td><td>%19</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -350,6 +351,11 @@ QString GcCrashDialog::versionHTML()
 #endif
 #endif
             .arg(webkit)
+#ifdef GC_HAVE_LMFIT
+            .arg("yes")
+#else
+            .arg("none")
+#endif
 
             ;
 
