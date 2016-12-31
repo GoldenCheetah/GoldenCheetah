@@ -23,6 +23,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideMetric.h"
+#include "RideItem.h"
 
 #ifndef GC_VERSION
 #define GC_VERSION "(developer build)"
@@ -84,7 +85,6 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
     //metadata.setAttribute("Modified", "");
     activity.appendChild(metadata);
 
-#if 0 //XXX REFACTOR COMPUTE METRICS
     const char *metrics[] = {
         "total_distance",
         "workout_time",
@@ -102,7 +102,8 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
     QStringList worklist = QStringList();
     for (int i=0; metrics[i];i++) worklist << metrics[i];
 
-    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, ride, context->athlete->zones(), context->athlete->hrZones(), worklist);
+    RideItem *tempItem = new RideItem(const_cast<RideFile*>(ride), context);
+    QHash<QString,RideMetricPtr> computed = RideMetric::computeMetrics(tempItem, Specification(), worklist);
 
     QDomElement duration = doc.createElement("Duration");
     duration.setAttribute("TotalSeconds", QString("%1").arg(computed.value("workout_time")->value(true)));
@@ -135,7 +136,7 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
     QDomElement calories = doc.createElement("Calories");
     calories.setAttribute("TotalCal", QString("%1").arg(computed.value("total_work")->value(true)));
     activity.appendChild(calories);
-#endif
+
     //QDomElement laps = doc.createElement("Laps");
     //activity.appendChild(laps);
 
@@ -166,9 +167,8 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
                 continue;
             }
 
-#if 0
-            computed =
-                RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), worklist);
+            RideItem *tempItem = new RideItem(const_cast<RideFile*>(&f), context);
+            computed = RideMetric::computeMetrics(tempItem, Specification(), worklist);
 
             QDomElement lap = doc.createElement("Lap");
             lap.setAttribute("StartTime", ride->startTime().addSecs(interval->start).toString(Qt::ISODate)+"Z");
@@ -202,7 +202,7 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
             QDomElement lap_calories = doc.createElement("Calories");
             lap_calories.setAttribute("TotalCal", QString("%1").arg(computed.value("total_work")->value(true)));
             lap.appendChild(lap_calories);
-#endif
+
         }
     }
 
