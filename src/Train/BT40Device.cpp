@@ -77,6 +77,18 @@ void BT40Device::controllerError(QLowEnergyController::Error error)
 
 void BT40Device::deviceDisconnected() {
     qDebug() << "Lost connection to" << m_currentDevice.name();
+    // Zero any readings provided by this device
+    foreach (QLowEnergyService* const &service, m_services) {
+	if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::HeartRate)) {
+	    dynamic_cast<BT40Controller*>(parent)->setBPM(0.0);
+	}
+	else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingPower)) {
+	    dynamic_cast<BT40Controller*>(parent)->setWatts(0.0);
+	}
+	else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence)) {
+	    dynamic_cast<BT40Controller*>(parent)->setWheelRpm(0.0);
+	}
+    }
     // Try to reconnect if the connection was lost inadvertently
     if (connected) {
         this->connectDevice();
