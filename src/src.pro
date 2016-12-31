@@ -250,7 +250,19 @@ RESOURCES = $${PWD}/Resources/application.qrc $${PWD}/Resources/RideWindow.qrc
 #                                                                             #
 ###############################################################################
 
+###========================================
+### OPTIONAL => LMFIT Model fitting library
+###========================================
+!isEmpty(LMFIT_INSTALL) {
 
+    # we will work out the rest if you tell us where it is installed
+    isEmpty(LMFIT_INCLUDE) { LMFIT_INCLUDE = $${LMFIT_INSTALL}/src }
+    isEmpty(LMFIT_LIBS)    { LMFIT_LIBS    = -L$${LMFIT_INSTALL}/lib -llmfit }
+
+    INCLUDEPATH += $${LMFIT_INCLUDE}
+    LIBS        += $${LMFIT_LIBS}
+    DEFINES     += GC_HAVE_LMFIT
+}
 
 ###====================
 ### OPTIONAL => Embed R
