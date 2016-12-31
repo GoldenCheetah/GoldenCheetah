@@ -148,7 +148,6 @@ private:
     QString uploadStatus;
     int uploadProgress;
     int todaysPlanUploadId;
-    QString rideName;
 };
 
 // uploader to cyclinganalytics.com
