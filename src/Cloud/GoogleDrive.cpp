@@ -35,7 +35,7 @@
 
 #ifndef GOOGLE_DRIVE_DEBUG
 // TODO(gille): This should be a command line flag.
-#define GOOGLE_DRIVE_DEBUG false
+#define GOOGLE_DRIVE_DEBUG true
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
@@ -594,6 +594,7 @@ bool GoogleDrive::writeFile(QByteArray &data, QString remote_name) {
 void GoogleDrive::writeFileCompleted() {
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
     QByteArray r = reply->readAll();
+
     printd("QNetworkReply: %d\n", reply->error());
     printd("write file: %s\n", r.data());
 
@@ -711,7 +712,7 @@ QString GoogleDrive::GetScope(Context* context) {
 
 QString GoogleDrive::GetRootDirId() {
     if (GetScope(context_) == "drive.appdata") {
-        return "appdata";
+        return "appdata"; // dgr : not appDataFolder ?
     } else {
         return "root";
     }
