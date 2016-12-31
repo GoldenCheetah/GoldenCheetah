@@ -452,30 +452,19 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
     }
 }
 
-// Writes valid .json (validated at www.jsonlint.com)
-bool
-JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) const
+QByteArray
+JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad) const
 {
-    // can we open the file for writing?
-    if (!file.open(QIODevice::WriteOnly)) return false;
-
-    // truncate existing
-    file.resize(0);
-
-    // setup streamer
-    QTextStream out(&file);
-    // unified codepage and BOM for identification on all platforms
-    out.setCodec("UTF-8");
-    out.setGenerateByteOrderMark(true);
+    QByteArray out;
 
     // start of document and ride
-    out << "{\n\t\"RIDE\":{\n";
+    out += "{\n\t\"RIDE\":{\n";
 
     // first class variables
-    out << "\t\t\"STARTTIME\":\"" << protect(ride->startTime().toUTC().toString(DATETIME_FORMAT)) << "\",\n";
-    out << "\t\t\"RECINTSECS\":" << ride->recIntSecs() << ",\n";
-    out << "\t\t\"DEVICETYPE\":\"" << protect(ride->deviceType()) << "\",\n";
-    out << "\t\t\"IDENTIFIER\":\"" << protect(ride->id()) << "\"";
+    out += "\t\t\"STARTTIME\":\"" + protect(ride->startTime().toUTC().toString(DATETIME_FORMAT)) + "\",\n";
+    out += "\t\t\"RECINTSECS\":" + QString("%1").arg(ride->recIntSecs()) + ",\n";
+    out += "\t\t\"DEVICETYPE\":\"" + protect(ride->deviceType()) + "\",\n";
+    out += "\t\t\"IDENTIFIER\":\"" + protect(ride->id()) + "\"";
 
     //
     // OVERRIDES
@@ -494,28 +483,28 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
             if (k.value().isEmpty()) continue;
 
             if (nonblanks == false) {
-                out << ",\n\t\t\"OVERRIDES\":[\n";
+                out += ",\n\t\t\"OVERRIDES\":[\n";
                 nonblanks = true;
 
             }
             // begin of overrides
-            out << "\t\t\t{ \"" << k.key() << "\":{ ";
+            out += "\t\t\t{ \"" + k.key() + "\":{ ";
 
             // key/value pairs
             QMap<QString, QString>::const_iterator j;
             for (j=k.value().constBegin(); j != k.value().constEnd(); j++) {
 
                 // comma separated
-                out << "\"" << j.key() << "\":\"" << j.value() << "\"";
-                if (j+1 != k.value().constEnd()) out << ", ";
+                out += "\"" + j.key() + "\":\"" + j.value() + "\"";
+                if (j+1 != k.value().constEnd()) out += ", ";
             }
-            if (k+1 != ride->metricOverrides.constEnd()) out << " }},\n";
-            else out << " }}\n";
+            if (k+1 != ride->metricOverrides.constEnd()) out += " }},\n";
+            else out += " }}\n";
         }
 
         if (nonblanks == true) {
             // end of the overrides
-            out << "\t\t]";
+            out += "\t\t]";
         }
     }
 
@@ -524,18 +513,18 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
     //
     if (ride->tags().count()) {
 
-        out << ",\n\t\t\"TAGS\":{\n";
+        out += ",\n\t\t\"TAGS\":{\n";
 
         QMap<QString,QString>::const_iterator i;
         for (i=ride->tags().constBegin(); i != ride->tags().constEnd(); i++) {
 
-                out << "\t\t\t\"" << i.key() << "\":\"" << protect(i.value()) << "\"";
-                if (i+1 != ride->tags().constEnd()) out << ",\n";
-                else out << "\n";
+                out += "\t\t\t\"" + i.key() + "\":\"" + protect(i.value()) + "\"";
+                if (i+1 != ride->tags().constEnd()) out += ",\n";
+                else out += "\n";
         }
 
         // end of the tags
-        out << "\t\t}";
+        out += "\t\t}";
     }
 
     //
@@ -543,19 +532,19 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
     //
     if (!ride->intervals().empty()) {
 
-        out << ",\n\t\t\"INTERVALS\":[\n";
+        out += ",\n\t\t\"INTERVALS\":[\n";
         bool first = true;
 
         foreach (RideFileInterval *i, ride->intervals()) {
             if (first) first=false;
-            else out << ",\n";
+            else out += ",\n";
 
-            out << "\t\t\t{ ";
-            out << "\"NAME\":\"" << protect(i->name) << "\"";
-            out << ", \"START\": " << QString("%1").arg(i->start);
-            out << ", \"STOP\": " << QString("%1").arg(i->stop) << " }";
+            out += "\t\t\t{ ";
+            out += "\"NAME\":\"" + protect(i->name) + "\"";
+            out += ", \"START\": " + QString("%1").arg(i->start);
+            out += ", \"STOP\": " + QString("%1").arg(i->stop) + " }";
         }
-        out <<"\n\t\t]";
+        out += "\n\t\t]";
     }
 
     //
@@ -563,19 +552,19 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
     //
     if (!ride->calibrations().empty()) {
 
-        out << ",\n\t\t\"CALIBRATIONS\":[\n";
+        out += ",\n\t\t\"CALIBRATIONS\":[\n";
         bool first = true;
 
         foreach (RideFileCalibration *i, ride->calibrations()) {
             if (first) first=false;
-            else out << ",\n";
+            else out += ",\n";
 
-            out << "\t\t\t{ ";
-            out << "\"NAME\":\"" << protect(i->name) << "\"";
-            out << ", \"START\": " << QString("%1").arg(i->start);
-            out << ", \"VALUE\": " << QString("%1").arg(i->value) << " }";
+            out += "\t\t\t{ ";
+            out += "\"NAME\":\"" + protect(i->name) + "\"";
+            out += ", \"START\": " + QString("%1").arg(i->start);
+            out += ", \"VALUE\": " + QString("%1").arg(i->value) + " }";
         }
-        out <<"\n\t\t]";
+        out += "\n\t\t]";
     }
 
     //
@@ -583,24 +572,24 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
     //
     if (!ride->referencePoints().empty()) {
 
-        out << ",\n\t\t\"REFERENCES\":[\n";
+        out += ",\n\t\t\"REFERENCES\":[\n";
         bool first = true;
 
         foreach (RideFilePoint *p, ride->referencePoints()) {
             if (first) first=false;
-            else out << ",\n";
+            else out += ",\n";
 
-            out << "\t\t\t{ ";
+            out += "\t\t\t{ ";
 
-            if (p->watts > 0) out << " \"WATTS\":" << QString("%1").arg(p->watts);
-            if (p->cad > 0) out << " \"CAD\":" << QString("%1").arg(p->cad);
-            if (p->hr > 0) out << " \"HR\":"  << QString("%1").arg(p->hr);
-            if (p->secs > 0) out << " \"SECS\":" << QString("%1").arg(p->secs);
+            if (p->watts > 0) out += " \"WATTS\":" + QString("%1").arg(p->watts);
+            if (p->cad > 0) out += " \"CAD\":" + QString("%1").arg(p->cad);
+            if (p->hr > 0) out += " \"HR\":"  + QString("%1").arg(p->hr);
+            if (p->secs > 0) out += " \"SECS\":" + QString("%1").arg(p->secs);
 
             // sample points in here!
-            out << " }";
+            out += " }";
         }
-        out <<"\n\t\t]";
+        out +="\n\t\t]";
     }
 
     //
@@ -608,58 +597,58 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
     //
     if (ride->dataPoints().count()) {
 
-        out << ",\n\t\t\"SAMPLES\":[\n";
+        out += ",\n\t\t\"SAMPLES\":[\n";
         bool first = true;
 
         foreach (RideFilePoint *p, ride->dataPoints()) {
 
             if (first) first=false;
-            else out << ",\n";
+            else out += ",\n";
 
-            out << "\t\t\t{ ";
+            out += "\t\t\t{ ";
 
             // always store time
-            out << "\"SECS\":" << QString("%1").arg(p->secs);
+            out += "\"SECS\":" + QString("%1").arg(p->secs);
 
-            if (ride->areDataPresent()->km) out << ", \"KM\":" << QString("%1").arg(p->km);
-            if (ride->areDataPresent()->watts) out << ", \"WATTS\":" << QString("%1").arg(p->watts);
-            if (ride->areDataPresent()->nm) out << ", \"NM\":" << QString("%1").arg(p->nm);
-            if (ride->areDataPresent()->cad) out << ", \"CAD\":" << QString("%1").arg(p->cad);
-            if (ride->areDataPresent()->kph) out << ", \"KPH\":" << QString("%1").arg(p->kph);
-            if (ride->areDataPresent()->hr) out << ", \"HR\":"  << QString("%1").arg(p->hr);
-            if (ride->areDataPresent()->alt) out << ", \"ALT\":" << QString("%1").arg(p->alt);
+            if (ride->areDataPresent()->km) out += ", \"KM\":" + QString("%1").arg(p->km);
+            if (ride->areDataPresent()->watts && withWatts) out += ", \"WATTS\":" + QString("%1").arg(p->watts);
+            if (ride->areDataPresent()->nm) out += ", \"NM\":" + QString("%1").arg(p->nm);
+            if (ride->areDataPresent()->cad && withCad) out += ", \"CAD\":" + QString("%1").arg(p->cad);
+            if (ride->areDataPresent()->kph) out += ", \"KPH\":" + QString("%1").arg(p->kph);
+            if (ride->areDataPresent()->hr && withHr) out += ", \"HR\":"  + QString("%1").arg(p->hr);
+            if (ride->areDataPresent()->alt && withAlt) out += ", \"ALT\":" + QString("%1").arg(p->alt);
             if (ride->areDataPresent()->lat)
-                out << ", \"LAT\":" << QString("%1").arg(p->lat, 0, 'g', 11);
+                out += ", \"LAT\":" + QString("%1").arg(p->lat, 0, 'g', 11);
             if (ride->areDataPresent()->lon)
-                out << ", \"LON\":" << QString("%1").arg(p->lon, 0, 'g', 11);
-            if (ride->areDataPresent()->headwind) out << ", \"HEADWIND\":" << QString("%1").arg(p->headwind);
-            if (ride->areDataPresent()->slope) out << ", \"SLOPE\":" << QString("%1").arg(p->slope);
-            if (ride->areDataPresent()->temp && p->temp != RideFile::NA) out << ", \"TEMP\":" << QString("%1").arg(p->temp);
-            if (ride->areDataPresent()->lrbalance && p->lrbalance != RideFile::NA) out << ", \"LRBALANCE\":" << QString("%1").arg(p->lrbalance);
-            if (ride->areDataPresent()->lte) out << ", \"LTE\":" << QString("%1").arg(p->lte);
-            if (ride->areDataPresent()->rte) out << ", \"RTE\":" << QString("%1").arg(p->rte);
-            if (ride->areDataPresent()->lps) out << ", \"LPS\":" << QString("%1").arg(p->lps);
-            if (ride->areDataPresent()->rps) out << ", \"RPS\":" << QString("%1").arg(p->rps);
-            if (ride->areDataPresent()->lpco) out << ", \"LPCO\":" << QString("%1").arg(p->lpco);
-            if (ride->areDataPresent()->rpco) out << ", \"RPCO\":" << QString("%1").arg(p->rpco);
-            if (ride->areDataPresent()->lppb) out << ", \"LPPB\":" << QString("%1").arg(p->lppb);
-            if (ride->areDataPresent()->rppb) out << ", \"RPPB\":" << QString("%1").arg(p->rppb);
-            if (ride->areDataPresent()->lppe) out << ", \"LPPE\":" << QString("%1").arg(p->lppe);
-            if (ride->areDataPresent()->rppe) out << ", \"RPPE\":" << QString("%1").arg(p->rppe);
-            if (ride->areDataPresent()->lpppb) out << ", \"LPPPB\":" << QString("%1").arg(p->lpppb);
-            if (ride->areDataPresent()->rpppb) out << ", \"RPPPB\":" << QString("%1").arg(p->rpppb);
-            if (ride->areDataPresent()->lpppe) out << ", \"LPPPE\":" << QString("%1").arg(p->lpppe);
-            if (ride->areDataPresent()->rpppe) out << ", \"RPPPE\":" << QString("%1").arg(p->rpppe);
-            if (ride->areDataPresent()->smo2) out << ", \"SMO2\":" << QString("%1").arg(p->smo2);
-            if (ride->areDataPresent()->thb) out << ", \"THB\":" << QString("%1").arg(p->thb);
-            if (ride->areDataPresent()->rcad) out << ", \"RCAD\":" << QString("%1").arg(p->rcad);
-            if (ride->areDataPresent()->rvert) out << ", \"RVERT\":" << QString("%1").arg(p->rvert);
-            if (ride->areDataPresent()->rcontact) out << ", \"RCON\":" << QString("%1").arg(p->rcontact);
+                out += ", \"LON\":" + QString("%1").arg(p->lon, 0, 'g', 11);
+            if (ride->areDataPresent()->headwind) out += ", \"HEADWIND\":" + QString("%1").arg(p->headwind);
+            if (ride->areDataPresent()->slope) out += ", \"SLOPE\":" + QString("%1").arg(p->slope);
+            if (ride->areDataPresent()->temp && p->temp != RideFile::NA) out += ", \"TEMP\":" + QString("%1").arg(p->temp);
+            if (ride->areDataPresent()->lrbalance && p->lrbalance != RideFile::NA) out += ", \"LRBALANCE\":" + QString("%1").arg(p->lrbalance);
+            if (ride->areDataPresent()->lte) out += ", \"LTE\":" + QString("%1").arg(p->lte);
+            if (ride->areDataPresent()->rte) out += ", \"RTE\":" + QString("%1").arg(p->rte);
+            if (ride->areDataPresent()->lps) out += ", \"LPS\":" + QString("%1").arg(p->lps);
+            if (ride->areDataPresent()->rps) out += ", \"RPS\":" + QString("%1").arg(p->rps);
+            if (ride->areDataPresent()->lpco) out += ", \"LPCO\":" + QString("%1").arg(p->lpco);
+            if (ride->areDataPresent()->rpco) out += ", \"RPCO\":" + QString("%1").arg(p->rpco);
+            if (ride->areDataPresent()->lppb) out += ", \"LPPB\":" + QString("%1").arg(p->lppb);
+            if (ride->areDataPresent()->rppb) out += ", \"RPPB\":" + QString("%1").arg(p->rppb);
+            if (ride->areDataPresent()->lppe) out += ", \"LPPE\":" + QString("%1").arg(p->lppe);
+            if (ride->areDataPresent()->rppe) out += ", \"RPPE\":" + QString("%1").arg(p->rppe);
+            if (ride->areDataPresent()->lpppb) out += ", \"LPPPB\":" + QString("%1").arg(p->lpppb);
+            if (ride->areDataPresent()->rpppb) out += ", \"RPPPB\":" + QString("%1").arg(p->rpppb);
+            if (ride->areDataPresent()->lpppe) out += ", \"LPPPE\":" + QString("%1").arg(p->lpppe);
+            if (ride->areDataPresent()->rpppe) out += ", \"RPPPE\":" + QString("%1").arg(p->rpppe);
+            if (ride->areDataPresent()->smo2) out += ", \"SMO2\":" + QString("%1").arg(p->smo2);
+            if (ride->areDataPresent()->thb) out += ", \"THB\":" + QString("%1").arg(p->thb);
+            if (ride->areDataPresent()->rcad) out += ", \"RCAD\":" + QString("%1").arg(p->rcad);
+            if (ride->areDataPresent()->rvert) out += ", \"RVERT\":" + QString("%1").arg(p->rvert);
+            if (ride->areDataPresent()->rcontact) out += ", \"RCON\":" + QString("%1").arg(p->rcontact);
 
             // sample points in here!
-            out << " }";
+            out += " }";
         }
-        out <<"\n\t\t]";
+        out +="\n\t\t]";
     }
 
     //
@@ -667,7 +656,7 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
     //
     if (const_cast<RideFile*>(ride)->xdata().count()) {
         // output the xdata series
-        out << ",\n\t\t\"XDATA\":[\n";
+        out += ",\n\t\t\"XDATA\":[\n";
 
         bool first = true;
         QMapIterator<QString,XDataSeries*> xdata(const_cast<RideFile*>(ride)->xdata());
@@ -682,88 +671,112 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
             // does it have values names?
             if (series->valuename.isEmpty()) continue;
 
-            if (!first) out<<",\n";
-            out << "\t\t{\n";
+            if (!first) out+",\n";
+            out += "\t\t{\n";
 
             // series name
-            out << "\t\t\t\"NAME\" : \"" << xdata.key() << "\",\n";
+            out += "\t\t\t\"NAME\" : \"" + xdata.key() + "\",\n";
 
             // value names
             if (series->valuename.count() > 1) {
-                out << "\t\t\t\"VALUES\" : [ ";
+                out += "\t\t\t\"VALUES\" : [ ";
                 bool firstv=true;
                 foreach(QString x, series->valuename) {
-                    if (!firstv) out << ", ";
-                    out << "\"" << x << "\"";
+                    if (!firstv) out += ", ";
+                    out += "\"" + x + "\"";
                     firstv=false;
                 }
-                out << " ]";
+                out += " ]";
             } else {
-                out << "\t\t\t\"VALUE\" : \"" << series->valuename[0] << "\"";
+                out += "\t\t\t\"VALUE\" : \"" + series->valuename[0] + "\"";
             }
 
             // unit names
             if (series->unitname.count() > 1) {
-                out << ",\n\t\t\t\"UNITS\" : [ ";
+                out += ",\n\t\t\t\"UNITS\" : [ ";
                 bool firstv=true;
                 foreach(QString x, series->unitname) {
-                    if (!firstv) out << ", ";
-                    out << "\"" << x << "\"";
+                    if (!firstv) out += ", ";
+                    out += "\"" + x + "\"";
                     firstv=false;
                 }
-                out << " ]";
+                out += " ]";
             } else {
-                if (series->unitname.count() > 0) out << ",\n\t\t\t\"UNIT\" : \"" << series->unitname[0] << "\"";
+                if (series->unitname.count() > 0) out += ",\n\t\t\t\"UNIT\" : \"" + series->unitname[0] + "\"";
             }
 
             // samples
             if (series->datapoints.count()) {
-                out << ",\n\t\t\t\"SAMPLES\" : [\n";
+                out += ",\n\t\t\t\"SAMPLES\" : [\n";
 
                 bool firsts=true;
                 foreach(XDataPoint *p, series->datapoints) {
-                    if (!firsts) out<< ",\n";
+                    if (!firsts) out+ ",\n";
 
                     // multi value sample
                     if (series->valuename.count()>1) {
 
-                        out << "\t\t\t\t{ \"SECS\":"<<QString("%1").arg(p->secs) <<", "
-                            << "\"KM\":"<<QString("%1").arg(p->km) << ", "
-                            << "\"VALUES\":[ ";
+                        out += "\t\t\t\t{ \"SECS\":"+QString("%1").arg(p->secs) +", "
+                            + "\"KM\":"+QString("%1").arg(p->km) + ", "
+                            + "\"VALUES\":[ ";
 
                         bool firstvv=true;
                         for(int i=0; i<series->valuename.count(); i++) {
-                            if (!firstvv) out << ", ";
-                            out << QString("%1").arg(p->number[i]);
+                            if (!firstvv) out += ", ";
+                            out += QString("%1").arg(p->number[i]);
                             firstvv=false;
                          }
-                         out << " ] }";
+                         out += " ] }";
 
                     } else {
 
-                        out << "\t\t\t\t{ \"SECS\":"<<QString("%1").arg(p->secs) << ", "
-                            << "\"KM\":"<<QString("%1").arg(p->km) << ", "
-                            << "\"VALUE\":" << QString("%1").arg(p->number[0]) << " }";
+                        out += "\t\t\t\t{ \"SECS\":"+QString("%1").arg(p->secs) + ", "
+                            + "\"KM\":"+QString("%1").arg(p->km) + ", "
+                            + "\"VALUE\":" + QString("%1").arg(p->number[0]) + " }";
                     }
                     firsts = false;
                 }
 
-                out << "\n\t\t\t]\n";
+                out += "\n\t\t\t]\n";
             } else {
-                out << "\n";
+                out += "\n";
             }
 
-            out << "\t\t}";
+            out += "\t\t}";
 
             // now do next
             first = false;
         }
 
-        out << "\n\t\t]";
+        out += "\n\t\t]";
     }
 
     // end of ride and document
-    out << "\n\t}\n}\n";
+    out += "\n\t}\n}\n";
+
+    return out;
+}
+
+// Writes valid .json (validated at www.jsonlint.com)
+bool
+JsonFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file) const
+{
+    // can we open the file for writing?
+    if (!file.open(QIODevice::WriteOnly)) return false;
+
+    // truncate existing
+    file.resize(0);
+
+    QByteArray xml = toByteArray(context, ride, true, true, true, true);
+
+    // setup streamer
+    QTextStream out(&file);
+    // unified codepage and BOM for identification on all platforms
+    out.setCodec("UTF-8");
+    out.setGenerateByteOrderMark(true);
+
+    out << xml;
+    out.flush();
 
     // close
     file.close();

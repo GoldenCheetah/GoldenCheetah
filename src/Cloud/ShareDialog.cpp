@@ -31,6 +31,7 @@
 
 // access to metrics
 #include "RideMetric.h"
+#include "JsonRideFile.h"
 #include "TcxRideFile.h"
 
 #ifdef Q_CC_MSVC
@@ -921,9 +922,6 @@ RideWithGpsUploader::requestUploadRideWithGPSFinished(QNetworkReply *reply)
 TodaysPlanUploader::TodaysPlanUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     ShareDialogUploader(tr("TodaysPlan"), context, ride, parent)
 {
-    rideName = ride->fileName;
-    rideName = rideName.replace(".json", "");
-    rideName.append(".tcx.gz");
     todaysPlanUploadId = ride->ride()->getTag("TodaysPlan uploadId", "0").toInt();
 }
 
@@ -986,8 +984,11 @@ TodaysPlanUploader::requestUploadTodaysPlan()
 
     QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
 
-    TcxFileReader reader;
+    //TcxFileReader reader;
+    JsonFileReader reader;
     QByteArray file = zCompress(reader.toByteArray(context, ride->ride(), parent->altitudeChk->isChecked(), parent->powerChk->isChecked(), parent->heartrateChk->isChecked(), parent->cadenceChk->isChecked()));
+    QString    rideName = ride->fileName;
+    rideName.append(".gz");
 
     // MULTIPART *****************
 
@@ -1059,7 +1060,7 @@ TodaysPlanUploader::requestUploadTodaysPlanFinished(QNetworkReply *reply)
         ride->ride()->setTag("TodaysPlan uploadId", QString("%1").arg(todaysPlanUploadId));
         ride->setDirty(true);
 
-        qDebug() << "uploadId: " << todaysPlanUploadId << rideName;
+        //qDebug() << "uploadId: " << todaysPlanUploadId << rideName;
         parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
         uploadSuccessful = true;
     }
