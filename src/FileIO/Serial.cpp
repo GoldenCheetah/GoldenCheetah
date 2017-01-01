@@ -380,21 +380,22 @@ find_devices(char *result[], int capacity)
     // relevant for PT downloads. The original list was rather restrictive in this respect
     //
     // To help decode this regexp;
-    // /dev/cu.PL2303-[0-9A-F]+        - Prolific device driver for USB/serial device
-    // /dev/cu.usbserial               - typical for Sewell on Mac
-    // /dev/cu.ANTUSBStick.slabvcp     - Silicon Labs Virtual Com driver for Garmin USB1 stick on a Mac
-    // /dev/cu.SLAB_USBtoUART          - Silicon Labs Driver for USB/Serial
-    // /dev/cu.usbmodem[0-9A-F]+       - Usb modem module driver (generic)
-    // /dev/cu.usbserial-[0-9A-Z]+     - usbserial module driver (generic)
-    // /dev/cu.KeySerial[0-9]          - Keyspan USB/Serial driver
-    // /dev/ttyU[0-9]                  - Open BSD usb serial devices
-    // /dev/ttyUSB[0-9]                - Standard USB/Serial device on Linux/Mac
-    // /dev/ttyS[0-2]                  - Serial TTY, 0-2 is restrictive, but noone has complained yet!
-    // /dev/ttyACM*                    - ACM converter, admittedly used largely for Mobiles
-    // /dev/ttyMI*                     - MOXA PCI cards
-    // /dev/rfcomm*                    - Bluetooth devices
-    if (regcomp(&reg, 
-                "^(cu\\.(PL2303-[0-9A-F]+|ANTUSBStick.slabvcp|SLAB_USBtoUART|usbmodem[0-9A-F]+|usbserial-[0-9A-Z]+|KeySerial[0-9]|usbserial)|ttyU[0-9]|ttyUSB[0-9]|ttyS[0-2]|ttyACM*|ttyMI*|rfcomm*)$",
+    // /dev/cu.PL2303-[0-9A-F]+              - Prolific device driver for USB/serial device
+    // /dev/cu.usbserial                     - typical for Sewell on Mac
+    // /dev/cu.ANTUSBStick.slabvcp           - Silicon Labs Virtual Com driver for Garmin USB1 stick on a Mac
+    // /dev/cu.SLAB_USBtoUART                - Silicon Labs Driver for USB/Serial
+    // /dev/cu.usbmodem[0-9A-F]+             - Usb modem module driver (generic)
+    // /dev/cu.usbserial-[0-9A-Z]+           - usbserial module driver (generic)
+    // /dev/cu.KeySerial[0-9]                - Keyspan USB/Serial driver
+    // /dev/cu.KETTLER[0-9A-Z]+-SerialPort   - Kettler serial over bluetooth
+    // /dev/ttyU[0-9]                        - Open BSD usb serial devices
+    // /dev/ttyUSB[0-9]                      - Standard USB/Serial device on Linux/Mac
+    // /dev/ttyS[0-2]                        - Serial TTY, 0-2 is restrictive, but noone has complained yet!
+    // /dev/ttyACM*                          - ACM converter, admittedly used largely for Mobiles
+    // /dev/ttyMI*                           - MOXA PCI cards
+    // /dev/rfcomm*                          - Bluetooth devices
+    if (regcomp(&reg,
+                "^(cu\\.(PL2303-[0-9A-F]+|ANTUSBStick.slabvcp|SLAB_USBtoUART|usbmodem[0-9A-F]+|usbserial-[0-9A-Z]+|KeySerial[0-9]|usbserial|KETTLER[0-9A-Z]+-SerialPort)|ttyU[0-9]|ttyUSB[0-9]|ttyS[0-2]|ttyACM*|ttyMI*|rfcomm*)$",
                 REG_EXTENDED|REG_NOSUB)) {
         assert(0);
     }
