@@ -92,6 +92,7 @@ RTool::RTool()
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0 ,0, 0 },
             { "GC.season", (DL_FUNC) &RTool::season, 0 ,0, 0 },
             { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0 ,0, 0 },
+            { "GC.season.intervals", (DL_FUNC) &RTool::seasonIntervals, 0 ,0, 0 },
             { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 0 ,0, 0 },
             { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 0 ,0, 0 },
             { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 0 ,0, 0 },
@@ -117,6 +118,8 @@ RTool::RTool()
             // all=FALSE, compare=FALSE
             { "GC.season", (DL_FUNC) &RTool::season, 2 },
             { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 3 },
+            // type=any, compare=FALSE
+            { "GC.season.intervals", (DL_FUNC) &RTool::seasonIntervals, 2 },
             { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 3 },
             { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 5 },
             // return a data.frame of pmc series (all=FALSE, metric="TSS")
@@ -163,6 +166,7 @@ RTool::RTool()
                                // season
                                "GC.season <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season\", all, compare) }\n"
                                "GC.season.metrics <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.metrics\", all, filter, compare) }\n"
+                               "GC.season.intervals <- function(type=\"any\", compare=FALSE) { .Call(\"GC.season.intervals\", type, compare) }\n"
                                "GC.season.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
                                "GC.season.meanmax <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.meanmax\", all, filter, compare) }\n"
                                // find peaks does a few validation checks on the R side
@@ -815,7 +819,7 @@ RTool::dfForRideItem(const RideItem *ri)
 
         // count active fields
         foreach(FieldDefinition def, rtool->context->athlete->rideMetadata()->getFields()) {
-            if (def.name != "" && def.tab != "" && !rtool->context->specialFields.isSpecial(def.name) &&
+            if (def.name != "" && def.tab != "" &&
                 !rtool->context->specialFields.isMetric(def.name))
                 meta++;
         }
@@ -916,7 +920,7 @@ RTool::dfForRideItem(const RideItem *ri)
     foreach(FieldDefinition field, rtool->context->athlete->rideMetadata()->getFields()) {
 
         // don't add incomplete meta definitions or metric override fields
-        if (field.name == "" || field.tab == "" || rtool->context->specialFields.isSpecial(field.name) ||
+        if (field.name == "" || field.tab == "" ||
             rtool->context->specialFields.isMetric(field.name)) continue;
 
         // Create a string vector
@@ -985,7 +989,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 
         // count active fields
         foreach(FieldDefinition def, rtool->context->athlete->rideMetadata()->getFields()) {
-            if (def.name != "" && def.tab != "" && !rtool->context->specialFields.isSpecial(def.name) &&
+            if (def.name != "" && def.tab != "" &&
                 !rtool->context->specialFields.isMetric(def.name))
                 meta++;
         }
@@ -1138,7 +1142,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     foreach(FieldDefinition field, rtool->context->athlete->rideMetadata()->getFields()) {
 
         // don't add incomplete meta definitions or metric override fields
-        if (field.name == "" || field.tab == "" || rtool->context->specialFields.isSpecial(field.name) ||
+        if (field.name == "" || field.tab == "" ||
             rtool->context->specialFields.isMetric(field.name)) continue;
 
         // Create a string vector
@@ -1305,6 +1309,13 @@ RTool::season(SEXP pAll, SEXP pCompare)
 
     // fail
     return df;
+}
+
+SEXP
+RTool::seasonIntervals(SEXP /*pType*/, SEXP /*pCompare*/)
+{
+    // fail
+    return Rf_allocVector(INTSXP, 0);
 }
 
 SEXP
