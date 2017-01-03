@@ -56,11 +56,12 @@ CloudDBChartClient::CloudDBChartClient()
 
     // common definitions used
 
-    g_chart_url_base = g_chart_url_header = g_chartcuration_url_base = CloudDBCommon::cloudDBBaseURL;
+    g_chart_url_base = g_chart_url_header = g_chartcuration_url_base = g_chartdownloadincr_url_base = CloudDBCommon::cloudDBBaseURL;
 
     g_chart_url_base.append("gchart/");
     g_chart_url_header.append("gchartheader");
     g_chartcuration_url_base.append("gchartcuration/");
+    g_chartdownloadincr_url_base.append("gchartuse/");
 
 }
 CloudDBChartClient::~CloudDBChartClient() {
@@ -208,6 +209,17 @@ CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
     deleteChartCache(id);
     return true;
 }
+
+void
+CloudDBChartClient::incrementDownloadCounterByID(qint64 id) {
+
+    QNetworkRequest request;
+    CloudDBCommon::prepareRequest(request, g_chartdownloadincr_url_base+QString::number(id, 10));
+    g_reply = g_nam->put(request, "{ \"id\": \"dummy\"");
+
+    // ignore any errors or reply - user does not need to be informed in case of problems
+}
+
 
 
 bool
@@ -832,6 +844,9 @@ CloudDBChartListDialog::addAndCloseClicked() {
                 }
 #endif
                 g_selected << g_currentPresets->at(s->row()).gchartDef;
+
+                // increment download counter
+                g_client->incrementDownloadCounterByID(g_currentPresets->at(s->row()).id);
             }
         }
         accept();

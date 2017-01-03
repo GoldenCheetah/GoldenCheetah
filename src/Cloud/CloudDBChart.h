@@ -61,6 +61,7 @@ public:
     bool getChartByID(qint64 id, ChartAPIv1 *chart);
     bool deleteChartByID(qint64 id);
     bool curateChartByID(qint64 id, bool newStatus);
+    void incrementDownloadCounterByID(qint64 id);
     bool getAllChartHeader(QList<CommonAPIHeaderV1>* header);
 
     void updateChartInCache(qint64 id);
@@ -84,6 +85,7 @@ private:
     QString  g_chart_url_base;
     QString  g_chart_url_header;
     QString  g_chartcuration_url_base;
+    QString  g_chartdownloadincr_url_base;
 
     bool writeChartCache(ChartAPIv1 *);
     bool readChartCache(qint64 id, ChartAPIv1 *chart);
