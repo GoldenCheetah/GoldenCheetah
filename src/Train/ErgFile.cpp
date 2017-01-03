@@ -41,6 +41,48 @@ static bool setSupported()
     return true;
 }
 static bool isinit = setSupported();
+
+
+// Section markers
+static QRegExp startHeader("^.*\\[COURSE HEADER\\].*$", Qt::CaseInsensitive);
+static QRegExp endHeader("^.*\\[END COURSE HEADER\\].*$", Qt::CaseInsensitive);
+static QRegExp startData("^.*\\[COURSE DATA\\].*$", Qt::CaseInsensitive);
+static QRegExp endData("^.*\\[END COURSE DATA\\].*$", Qt::CaseInsensitive);
+// ignore whitespace and support for ';' comments (a GC extension)
+static QRegExp ignore("^(;.*|[ \\t\\n]*)$", Qt::CaseInsensitive);
+// workout settings
+static QRegExp settings("^([^=]*)=[ \\t]*([^=\\n\\r\\t]*).*$", Qt::CaseInsensitive);
+
+// format setting for ergformat
+static QRegExp ergformat("^[;]*(MINUTES[ \\t]+WATTS).*$", Qt::CaseInsensitive);
+static QRegExp mrcformat("^[;]*(MINUTES[ \\t]+PERCENT).*$", Qt::CaseInsensitive);
+static QRegExp crsformat("^[;]*(DISTANCE[ \\t]+GRADE[ \\t]+WIND).*$", Qt::CaseInsensitive);
+
+// time watts records
+static QRegExp absoluteWatts("^[ \\t]*([0-9\\.]+)[ \\t]*([0-9\\.]+)[ \\t\\n]*$", Qt::CaseInsensitive);
+static QRegExp relativeWatts("^[ \\t]*([0-9\\.]+)[ \\t]*([0-9\\.]+)%[ \\t\\n]*$", Qt::CaseInsensitive);
+
+// distance slope wind records
+static QRegExp absoluteSlope("^[ \\t]*([0-9\\.]+)[ \\t]*([-0-9\\.]+)[ \\t\\n]*([-0-9\\.]+)[ \\t\\n]*$",
+                      Qt::CaseInsensitive);
+
+// Lap marker in an ERG/MRC file
+static QRegExp lapmarker("^[ \\t]*([0-9\\.]+)[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
+static QRegExp crslapmarker("^[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
+
+
+long ErgFile::GetDuration() const {
+    return Duration;
+}
+
+ErgFileFormat ErgFile::GetFormat() {
+    return format;
+}
+
+Context* ErgFile::GetContext() {
+    return context;
+}
+
 bool ErgFile::isWorkout(QString name)
 {
     foreach(QString extension, supported) {
@@ -49,8 +91,9 @@ bool ErgFile::isWorkout(QString name)
     }
     return false;
 }
-ErgFile::ErgFile(QString filename, int mode, Context *context) :
-    filename(filename), mode(mode), context(context)
+
+ErgFile::ErgFile(QString filename, ErgFileMode mode, Context *context) :
+    filenameOnDisk(filename), mode(mode), context(context)
 {
     if (context->athlete->zones(false)) {
         int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
@@ -59,7 +102,7 @@ ErgFile::ErgFile(QString filename, int mode, Context *context) :
     reload();
 }
 
-ErgFile::ErgFile(Context *context) : mode(nomode), context(context)
+ErgFile::ErgFile(Context *context) : mode(NoMode), context(context)
 {
     if (context->athlete->zones(false)) {
         int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
@@ -67,22 +110,22 @@ ErgFile::ErgFile(Context *context) : mode(nomode), context(context)
     } else {
         CP = 300;
     }
-    filename ="";
+    filenameOnDisk ="";
 }
 
 void
 ErgFile::setFrom(ErgFile *f)
 {
     // don't rename it !
-    QString filename=this->filename;
-    QString Filename=this->filename;
+    QString filename=this->filenameOnDisk;
+    QString Filename=this->filenameOnDisk;
 
     // take a copy
     *this = *f;
 
     // keep filename
-    this->filename = filename;
-    this->Filename = Filename;
+    this->filenameOnDisk = filename;
+    this->filenameInsideFile = Filename;
 }
 
 ErgFile *
@@ -97,8 +140,8 @@ void ErgFile::reload()
 {
     // which parser to call? NOTE: we should look at moving to an ergfile factory
     // like we do with ride files if we end up with lots of different formats
-    if (filename.endsWith(".pgmf", Qt::CaseInsensitive)) parseTacx();
-    else if (filename.endsWith(".zwo", Qt::CaseInsensitive)) parseZwift();
+    if (filenameOnDisk.endsWith(".pgmf", Qt::CaseInsensitive)) parseTacx();
+    else if (filenameOnDisk.endsWith(".zwo", Qt::CaseInsensitive)) parseZwift();
     else parseComputrainer();
 
 }
@@ -108,19 +151,19 @@ void ErgFile::parseZwift()
     // Initialise
     Version = "";
     Units = "";
-    Filename = "";
+    filenameInsideFile = "";
     Name = "";
     Duration = -1;
     Ftp = 0;            // FTP this file was targetted at
     MaxWatts = 0;       // maxWatts in this ergfile (scaling)
     valid = false;             // did it parse ok?
     rightPoint = leftPoint = 0;
-    format = ERG; // default to couse until we know
+    format = ErgFormat; // default to couse until we know
     Points.clear();
     Laps.clear();
 
     // parse the file
-    QFile zwo(filename);
+    QFile zwo(filenameOnDisk);
     QXmlInputSource source(&zwo);
     QXmlSimpleReader xmlReader;
     ZwoParser handler;
@@ -164,14 +207,14 @@ void ErgFile::parseTacx()
     // Initialise
     Version = "";
     Units = "";
-    Filename = "";
+    filenameInsideFile = "";
     Name = "";
     Duration = -1;
     Ftp = 0;            // FTP this file was targetted at
     MaxWatts = 0;       // maxWatts in this ergfile (scaling)
     valid = false;             // did it parse ok?
     rightPoint = leftPoint = 0;
-    format = CRS; // default to couse until we know
+    format = CrsFormat; // default to couse until we know
     Points.clear();
     Laps.clear();
 
@@ -180,7 +223,7 @@ void ErgFile::parseTacx()
     double ralt = 200; // always start at 200 meters just to prettify the graph
 
     // open the file for binary reading and open a datastream
-    QFile pgmfFile(filename);
+    QFile pgmfFile(filenameOnDisk);
     if (pgmfFile.open(QIODevice::ReadOnly) == false) return;
     QDataStream input(&pgmfFile);
     input.setByteOrder(QDataStream::LittleEndian);
@@ -260,10 +303,12 @@ void ErgFile::parseTacx()
                     input>>general.brakeCategory;
                     switch (general.wattSlopePulse) {
                     case 0 :
-                        mode = format = ERG;
+                        format = ErgFormat;
+                        mode = ErgMode;
                         break;
                     case 1 :
-                        mode = format = CRS;
+                        format = CrsFormat;
+                        mode = CrsMode;
                         break;
                     default:
                         happy = false;
@@ -286,7 +331,7 @@ void ErgFile::parseTacx()
 
                         ErgFilePoint add;
 
-                        if (format == CRS) {
+                        if (format == CrsFormat) {
 		                    // distance guff
                             add.x = rdist;
 		                    double distance = program.distance; // in meters
@@ -341,12 +386,12 @@ void ErgFile::parseTacx()
 
 void ErgFile::parseComputrainer(QString p)
 {
-    QFile ergFile(filename);
-    int section = NOMANSLAND;            // section 0=init, 1=header data, 2=course data
+    QFile ergFile(filenameOnDisk);
+    enum ErgSection section = NomanslandSection;            // section 0=init, 1=header data, 2=course data
     leftPoint=rightPoint=0;
     MaxWatts = Ftp = 0;
     int lapcounter = 0;
-    format = ERG;                         // either ERG or MRC
+    format = ErgFormat;                         // either ERG or MRC
     Points.clear();
 
     // start by assuming the input file is Metric
@@ -361,32 +406,7 @@ void ErgFile::parseComputrainer(QString p)
         valid = false;
         return;
     }
-    // Section markers
-    QRegExp startHeader("^.*\\[COURSE HEADER\\].*$", Qt::CaseInsensitive);
-    QRegExp endHeader("^.*\\[END COURSE HEADER\\].*$", Qt::CaseInsensitive);
-    QRegExp startData("^.*\\[COURSE DATA\\].*$", Qt::CaseInsensitive);
-    QRegExp endData("^.*\\[END COURSE DATA\\].*$", Qt::CaseInsensitive);
-    // ignore whitespace and support for ';' comments (a GC extension)
-    QRegExp ignore("^(;.*|[ \\t\\n]*)$", Qt::CaseInsensitive);
-    // workout settings
-    QRegExp settings("^([^=]*)=[ \\t]*([^=\\n\\r\\t]*).*$", Qt::CaseInsensitive);
 
-    // format setting for ergformat
-    QRegExp ergformat("^[;]*(MINUTES[ \\t]+WATTS).*$", Qt::CaseInsensitive);
-    QRegExp mrcformat("^[;]*(MINUTES[ \\t]+PERCENT).*$", Qt::CaseInsensitive);
-    QRegExp crsformat("^[;]*(DISTANCE[ \\t]+GRADE[ \\t]+WIND).*$", Qt::CaseInsensitive);
-
-    // time watts records
-    QRegExp absoluteWatts("^[ \\t]*([0-9\\.]+)[ \\t]*([0-9\\.]+)[ \\t\\n]*$", Qt::CaseInsensitive);
-    QRegExp relativeWatts("^[ \\t]*([0-9\\.]+)[ \\t]*([0-9\\.]+)%[ \\t\\n]*$", Qt::CaseInsensitive);
-
-    // distance slope wind records
-    QRegExp absoluteSlope("^[ \\t]*([0-9\\.]+)[ \\t]*([-0-9\\.]+)[ \\t\\n]*([-0-9\\.]+)[ \\t\\n]*$",
-                           Qt::CaseInsensitive);
-
-    // Lap marker in an ERG/MRC file
-    QRegExp lapmarker("^[ \\t]*([0-9\\.]+)[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
-    QRegExp crslapmarker("^[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
 
     // ok. opened ok lets parse.
     QTextStream inputStream(&ergFile);
@@ -412,22 +432,25 @@ void ErgFile::parseComputrainer(QString p)
 
             // so what we go then?
             if (startHeader.exactMatch(line)) {
-                section = SETTINGS;
+                section = SettingsSection;
             } else if (endHeader.exactMatch(line)) {
-                section = NOMANSLAND;
+                section = NomanslandSection;
             } else if (startData.exactMatch(line)) {
-                section = DATA;
+                section = DataSection;
             } else if (endData.exactMatch(line)) {
-                section = END;
+                section = EndSection;
             } else if (ergformat.exactMatch(line)) {
                 // save away the format
-                mode = format = ERG;
+                format = ErgFormat;
+                mode = ErgMode;
             } else if (mrcformat.exactMatch(line)) {
                 // save away the format
-                mode = format = MRC;
+                format = MrcFormat;
+                mode = MrcMode;
             } else if (crsformat.exactMatch(line)) {
                 // save away the format
-                mode = format = CRS;
+                format = CrsFormat;
+                mode = CrsMode;
             } else if (lapmarker.exactMatch(line)) {
                 // lap marker found
                 ErgFileLap add;
@@ -454,7 +477,7 @@ void ErgFile::parseComputrainer(QString p)
                 if (pversion.exactMatch(settings.cap(1))) Version = settings.cap(2);
 
                 QRegExp pfilename("^FILE NAME *", Qt::CaseInsensitive);
-                if (pfilename.exactMatch(settings.cap(1))) Filename = settings.cap(2);
+                if (pfilename.exactMatch(settings.cap(1))) filenameInsideFile = settings.cap(2);
 
                 QRegExp pname("^DESCRIPTION *", Qt::CaseInsensitive);
                 if (pname.exactMatch(settings.cap(1))) Name = settings.cap(2);
@@ -488,7 +511,7 @@ void ErgFile::parseComputrainer(QString p)
 
                 switch (format) {
 
-                case ERG:       // its an absolute wattage
+                case ErgFormat:       // its an absolute wattage
                     if (Ftp) { // adjust if target FTP is set.
                         // if ftp is set then convert to the users CP
 
@@ -498,7 +521,7 @@ void ErgFile::parseComputrainer(QString p)
                         add.y = add.val = int(watts);
                     }
                     break;
-                case MRC:       // its a percent relative to CP (mrc file)
+                case MrcFormat:       // its a percent relative to CP (mrc file)
                     add.y *= CP;
                     add.y /= 100.00;
                     add.val = add.y;
@@ -550,11 +573,11 @@ void ErgFile::parseComputrainer(QString p)
     // done.
     if (p=="") ergFile.close();
 
-    if (section == END && Points.count() > 0) {
+    if (section == EndSection && Points.count() > 0) {
         valid = true;
 
         // add the last point for a crs file
-        if (mode == CRS) {
+        if (mode == CrsMode) {
             ErgFilePoint add;
             add.x = rdist;
             add.val = 0.0;
@@ -613,17 +636,17 @@ ErgFile::save(QStringList &errors)
 {
     // save the file including changes
     // XXX TODO we don't support writing pgmf or CRS just yet...
-    if (filename.endsWith("pgmf", Qt::CaseInsensitive) || format == CRS) {
+    if (filenameOnDisk.endsWith("pgmf", Qt::CaseInsensitive) || format == CrsFormat) {
         errors << QString(QObject::tr("Unsupported file format"));
         return false;
     }
 
     // type
     QString typestring("UNKNOWN");
-    if (format==ERG) typestring = "ERG";
-    if (format==MRC) typestring = "MRC";
-    if (format==CRS) typestring = "CRS";
-    if (filename.endsWith("zwo", Qt::CaseInsensitive)) typestring="ZWO";
+    if (format==ErgFormat) typestring = "ERG";
+    if (format==MrcFormat) typestring = "MRC";
+    if (format==CrsFormat) typestring = "CRS";
+    if (filenameOnDisk.endsWith("zwo", Qt::CaseInsensitive)) typestring="ZWO";
 
     // get CP so we can scale back etc
     int CP=0;
@@ -637,10 +660,10 @@ ErgFile::save(QStringList &errors)
     //
     // ERG file
     //
-    if (typestring == "ERG" && format == ERG) {
+    if (typestring == "ERG" && format == ErgFormat) {
 
         // open the file etc
-        QFile f(filename);
+        QFile f(filenameOnDisk);
         if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text) == false) {
             errors << "Unable to open file for writing.";
             return false;
@@ -671,7 +694,7 @@ ErgFile::save(QStringList &errors)
         if (Version != "") out<<"VERSION="<<Version<<"\n";
         if (Units != "") out<<"UNITS="<<Units<<"\n";
         if (Name != "") out<<"DESCRIPTION="<<Name<<"\n";
-        if (Filename != "") out<<"FILE NAME="<<Filename<<"\n";
+        if (filenameInsideFile != "") out<<"FILE NAME="<<filenameInsideFile<<"\n";
         out << "MINUTES WATTS\n";
         out << "[END COURSE HEADER]\n";
 
@@ -736,10 +759,10 @@ ErgFile::save(QStringList &errors)
     //
     // MRC
     //
-    if (typestring == "MRC" && format == MRC) {
+    if (typestring == "MRC" && format == MrcFormat) {
 
         // open the file etc
-        QFile f(filename);
+        QFile f(filenameOnDisk);
         if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text) == false) {
             errors << "Unable to open file for writing.";
             return false;
@@ -769,7 +792,7 @@ ErgFile::save(QStringList &errors)
         if (Version != "") out<<"VERSION="<<Version<<"\n";
         if (Units != "") out<<"UNITS="<<Units<<"\n";
         if (Name != "") out<<"DESCRIPTION="<<Name<<"\n";
-        if (Filename != "") out<<"FILE NAME="<<Filename<<"\n";
+        if (filenameInsideFile != "") out<<"FILE NAME="<<filenameInsideFile<<"\n";
         out << "MINUTES PERCENT\n";
         out << "[END COURSE HEADER]\n";
 
@@ -810,10 +833,10 @@ ErgFile::save(QStringList &errors)
 
     }
 
-    if (typestring == "ZWO" && format == ERG) {
+    if (typestring == "ZWO" && format == ErgFormat) {
 
         // open the file etc
-        QFile f(filename);
+        QFile f(filenameOnDisk);
         if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text) == false) {
             errors << "Unable to open file for writing.";
             return false;
@@ -1040,7 +1063,7 @@ ErgFile::calculateMetrics()
     // is it valid?
     if (!isValid()) return;
 
-    if (format == CRS) {
+    if (format == CrsFormat) {
 
         ErgFilePoint last;
         bool first = true;

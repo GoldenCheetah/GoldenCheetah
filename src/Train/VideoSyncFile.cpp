@@ -39,7 +39,7 @@ bool VideoSyncFile::isVideoSync(QString name)
     }
     return false;
 }
-VideoSyncFile::VideoSyncFile(QString filename, int& /*mode*/, Context *context) :
+VideoSyncFile::VideoSyncFile(QString filename, Context *context) :
     filename(filename), context(context)
 {
     reload();

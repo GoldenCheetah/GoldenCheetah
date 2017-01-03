@@ -310,7 +310,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
     if (ergfile) {
 
         // is this by distance or time?
-        bydist = (ergfile->format == CRS) ? true : false;
+        bydist = (ergfile->format == CrsFormat) ? true : false;
 
         if (bydist == true) {
 

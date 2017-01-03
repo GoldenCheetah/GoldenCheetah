@@ -49,6 +49,9 @@
 
 class ErgFileData : public QwtPointArrayData
 {
+    friend class ErgFile;
+    friend class ErgFilePlot;
+
     public:
     ErgFileData (Context *context) : QwtPointArrayData(QVector<double>(), QVector<double>()), context(context) {}
     double x(size_t i) const ;
@@ -64,6 +67,8 @@ class ErgFileData : public QwtPointArrayData
 
 class NowData : public QwtPointArrayData
 {
+    //friend class ErgFile;
+
     public:
     NowData (Context *context) : QwtPointArrayData(QVector<double>(), QVector<double>()), context(context) {}
     double x(size_t i) const ;
@@ -125,6 +130,10 @@ public:
 
 class ErgFilePlot : public QwtPlot
 {
+    friend class ErgFile;
+    friend class ErgFileLap;
+    friend class ErgFilePoint;
+
     Q_OBJECT
     G_OBJECT
 
@@ -132,7 +141,6 @@ class ErgFilePlot : public QwtPlot
     public:
 
     ErgFilePlot(Context *context);
-    QList<QwtPlotMarker *> Marks;
 
     void setData(ErgFile *); // set the course
     void reset(); // reset counters etc when plot changes
@@ -146,6 +154,7 @@ class ErgFilePlot : public QwtPlot
 
     private:
 
+    QList<QwtPlotMarker *> Marks;
     WPrime calculator;
     Context *context;
     bool bydist;

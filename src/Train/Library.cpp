@@ -107,16 +107,14 @@ Library::importFiles(Context *context, QStringList files)
 
         // if it is a workout we parse it to check
         if (ErgFile::isWorkout(file)) {
-            int mode=0;
-            ErgFile *p = new ErgFile(file, mode, context);
+            ErgFile *p = new ErgFile(file, NoMode, context);
             if (p->isValid()) workouts << file;
             delete p;
         }
 
         // if it is a VideoSync we parse it to check
         if (VideoSyncFile::isVideoSync(file)) {
-            int mode;
-            VideoSyncFile *p = new VideoSyncFile(file, mode, context);
+            VideoSyncFile *p = new VideoSyncFile(file, context);
             if (p->isValid()) videosyncs << file;
             delete p;
         }
@@ -181,8 +179,7 @@ Library::importFiles(Context *context, QStringList files)
             }
 
             // still add it, it may not have been scanned
-            int mode;
-            VideoSyncFile file(targetSync, mode, context);
+            VideoSyncFile file(targetSync, context);
             trainDB->importVideoSync(targetSync, &file);
         }
 
@@ -209,8 +206,7 @@ Library::importFiles(Context *context, QStringList files)
             }
 
             // still add it, it may noit have been scanned...
-            int mode=0;
-            ErgFile file(targetWorkout, mode, context);
+            ErgFile file(targetWorkout, NoMode, context);
             trainDB->importWorkout(targetWorkout, &file);
 
         }
@@ -611,8 +607,7 @@ LibrarySearchDialog::updateDB()
 
     // workouts
     foreach(QString ergFile, workoutsFound) {
-        int mode=0;
-        ErgFile file(ergFile, mode, context);
+        ErgFile file(ergFile, NoMode, context);
         if (file.isValid()) {
             trainDB->importWorkout(ergFile, &file);
         }
@@ -625,8 +620,7 @@ LibrarySearchDialog::updateDB()
 
     // videosyncs
     foreach(QString videosync, videosyncsFound) {
-        int mode=0;
-        VideoSyncFile file(videosync, mode, context);
+        VideoSyncFile file(videosync, context);
         trainDB->importVideoSync(videosync, &file);
     }
 
@@ -646,8 +640,7 @@ LibrarySearchDialog::updateDB()
 
             // is a videosync?
             if (VideoSyncFile::isVideoSync(r)) {
-                int mode=0;
-                VideoSyncFile file(r, mode, context);
+                VideoSyncFile file(r, context);
                 if (file.isValid()) {
                     trainDB->importVideoSync(r, &file);
                 }
@@ -655,8 +648,7 @@ LibrarySearchDialog::updateDB()
 
             // is a workout?
             if (ErgFile::isWorkout(r)) {
-                int mode=0;
-                ErgFile file(r, mode, context);
+                ErgFile file(r, NoMode, context);
                 if (file.isValid()) {
                     trainDB->importWorkout(r, &file);
                 }
@@ -745,15 +737,13 @@ WorkoutImportDialog::WorkoutImportDialog(Context *context, QStringList files) :
 
         // if it is a workout we parse it to check
         if (ErgFile::isWorkout(file)) {
-            int mode=0;
-            ErgFile *p = new ErgFile(file, mode, context);
+            ErgFile *p = new ErgFile(file, NoMode, context);
             if (p->isValid()) workouts << file;
             delete p;
         }
         // if it is a videosync we parse it to check
         if (VideoSyncFile::isVideoSync(file)) {
-            int mode=0;
-            VideoSyncFile *p = new VideoSyncFile(file, mode, context);
+            VideoSyncFile *p = new VideoSyncFile(file, context);
             if (p->isValid()) videosyncs << file;
             delete p;
         }
@@ -855,8 +845,7 @@ WorkoutImportDialog::import()
         if (!QFile(workout).exists()) continue;
 
         // cannot read or not valid
-        int mode=0;
-        ErgFile file(workout, mode, context);
+        ErgFile file(workout, NoMode, context);
         if (!file.isValid()) continue;
 
         // get target name
@@ -891,8 +880,7 @@ WorkoutImportDialog::import()
         if (!QFile(videosync).exists()) continue;
 
         // cannot read or not valid
-        int mode=0;
-        VideoSyncFile file(videosync, mode, context);
+        VideoSyncFile file(videosync, context);
         if (!file.isValid()) continue;
 
         // get target name

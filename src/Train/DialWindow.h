@@ -19,6 +19,7 @@
 #ifndef _GC_DialWindow_h
 #define _GC_DialWindow_h 1
 #include "GoldenCheetah.h"
+#include "RealtimeData.h" // for realtimedata structure
 
 #include <QtGui>
 #include <QObject> // for Q_PROPERTY
@@ -26,15 +27,6 @@
 #include <QLineEdit>
 #include <QFormLayout>
 
-#include "Context.h"
-#include "Zones.h" // for data series types
-#include "RideFile.h" // for data series types
-#include "ErgFile.h" // for workout modes
-#include "RealtimeData.h" // for realtimedata structure
-
-#include "Settings.h" // for realtimedata structure
-#include "Units.h" // for realtimedata structure
-#include "Colors.h" // for realtimedata structure
 
 class DialWindow : public GcChartWindow
 {

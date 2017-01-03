@@ -20,6 +20,12 @@
 #include "DialWindow.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "Zones.h" // for data series types
+#include "RideFile.h" // for data series types
+#include "ErgFile.h" // for workout modes
+#include "Settings.h" // for realtimedata structure
+#include "Units.h" // for realtimedata structure
+#include "Colors.h" // for realtimedata structure
 
 DialWindow::DialWindow(Context *context) :
     GcChartWindow(context), context(context), average(1), isNewLap(false)
@@ -160,7 +166,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         }
 
         // if we have a target load and erg mode then red background if not on target...
-        if (series == RealtimeData::Watts && (rtData.mode == ERG || rtData.mode == MRC) && rtData.getLoad() > 0) {
+        if (series == RealtimeData::Watts && (rtData.mode == ErgMode || rtData.mode == MrcMode) && rtData.getLoad() > 0) {
 
             // background for power, if we have a target load
             double load=rtData.getLoad();
@@ -456,7 +462,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::Load:
-        if (rtData.mode == ERG || rtData.mode == MRC) {
+        if (rtData.mode == ErgMode || rtData.mode == MrcMode) {
             value = rtData.getLoad();
             valueLabel->setText(QString("%1").arg(round(value)));
         } else {

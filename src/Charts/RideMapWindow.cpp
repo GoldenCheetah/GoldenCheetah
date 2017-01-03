@@ -229,7 +229,7 @@ RideMapWindow::tileTypeSelected(int x)
 }
 
 void
-RideMapWindow::showMarkersChanged(int value)
+RideMapWindow::showMarkersChanged(int /* unused_value */)
 {
     Q_UNUSED(value);
     forceReplot();

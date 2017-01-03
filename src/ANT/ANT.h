@@ -26,6 +26,7 @@
 #include "GoldenCheetah.h"
 #include "RealtimeData.h"
 #include "DeviceConfiguration.h"
+#include "ErgFileEnums.h"
 
 //
 // QT stuff
