@@ -671,7 +671,7 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
             // does it have values names?
             if (series->valuename.isEmpty()) continue;
 
-            if (!first) out+",\n";
+            if (!first) out += ",\n";
             out += "\t\t{\n";
 
             // series name
