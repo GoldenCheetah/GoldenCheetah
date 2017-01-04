@@ -151,6 +151,8 @@
 #define GC_SWIMPACE                     "<global-general>swimpace"
 #define GC_ELEVATION_HYSTERESIS         "<global-general>elevationHysteresis"
 #define GC_UNIT                         "<global-general>unit"
+#define GC_ALLOW_TELEMETRY              "<global-general>telemetry"
+#define GC_ALLOW_TELEMETRY_DATE         "<global-general>telemetryDate"
 
 
 
