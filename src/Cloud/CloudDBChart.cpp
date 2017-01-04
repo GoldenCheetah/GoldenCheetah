@@ -201,7 +201,7 @@ CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
     CloudDBCommon::prepareRequest(request, g_chartcuration_url_base+QString::number(id, 10), &query);
 
     // add a payload to "PUT" even though it's not processed
-    g_reply = g_nam->put(request, "{ \"id\": \"dummy\"");
+    g_reply = g_nam->put(request, "{ \"id\": \"dummy\" }");
 
     // wait for reply (synchronously) and process error codes as necessary
     if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
@@ -215,7 +215,7 @@ CloudDBChartClient::incrementDownloadCounterByID(qint64 id) {
 
     QNetworkRequest request;
     CloudDBCommon::prepareRequest(request, g_chartdownloadincr_url_base+QString::number(id, 10));
-    g_reply = g_nam->put(request, "{ \"id\": \"dummy\"");
+    g_reply = g_nam->put(request, "{ \"id\": \"dummy\" }");
 
     // ignore any errors or reply - user does not need to be informed in case of problems
 }
