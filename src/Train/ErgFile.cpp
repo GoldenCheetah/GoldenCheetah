@@ -373,7 +373,7 @@ void ErgFile::parseComputrainer(QString p)
 
     // format setting for ergformat
     QRegExp ergformat("^[;]*(MINUTES[ \\t]+WATTS).*$", Qt::CaseInsensitive);
-    QRegExp mrcformat("^[;]*(MINUTES[ \\t]+PERCENT).*$", Qt::CaseInsensitive);
+    QRegExp mrcformat("^[;]*(MINUTES[ \\t]+(PERCENT|FTP)).*$", Qt::CaseInsensitive);
     QRegExp crsformat("^[;]*(DISTANCE[ \\t]+GRADE[ \\t]+WIND).*$", Qt::CaseInsensitive);
 
     // time watts records

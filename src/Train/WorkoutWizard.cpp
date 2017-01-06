@@ -509,7 +509,7 @@ void RelWattagePage::SaveWorkout()
     f.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream stream(&f);
     // create the header
-    SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("MINUTES PERCENTAGE"));
+    SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("MINUTES PERCENT"));
     QVector<QPair<QString, QString> > rawData;
     we->rawData(rawData);
     double currentX = 0;
