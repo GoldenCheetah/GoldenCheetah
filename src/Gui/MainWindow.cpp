@@ -2091,11 +2091,14 @@ void
 MainWindow::configChanged(qint32)
 {
 
-// Windows
-#ifdef WIN32
+// Windows and Linux menu bar should match chrome
+#if defined (WIN32) || defined (Q_OS_LINUX)
+    QColor textCol(Qt::black);
+    if (GCColor::luminance(GColor(CCHROME)) < 127)  textCol = QColor(Qt::white);
     QString menuColorString = (GCColor::isFlat() ? GColor(CCHROME).name() : "rgba(225,225,225)");
-    menuBar()->setStyleSheet(QString("QMenuBar { color: black; background: %1; }"
-                             "QMenuBar::item { color: black; background: %1; }").arg(menuColorString));
+    menuBar()->setStyleSheet(QString("QMenuBar { color: %1; background: %2; }"
+                             "QMenuBar::item { color: %1; background: %2; }")
+                             .arg(textCol.name()).arg(menuColorString));
 #endif
 
 // Mac and Linux
