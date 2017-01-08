@@ -103,6 +103,7 @@ CloudDBAcceptConditionsDialog::CloudDBAcceptConditionsDialog(QString athlete) : 
 
     scrollText = new QScrollArea();
     scrollText->setWidget(text);
+    scrollText->setWidgetResizable(true);
     layout->addWidget(scrollText);
 
     QHBoxLayout *lastRow = new QHBoxLayout;
