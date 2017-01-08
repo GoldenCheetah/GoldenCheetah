@@ -107,6 +107,8 @@
 #include "CloudDBChart.h"
 #include "CloudDBCurator.h"
 #include "CloudDBStatus.h"
+#include "CloudDBTelemetry.h"
+#include "CloudDBVersion.h"
 #include "GcUpgrade.h"
 #endif
 
@@ -607,6 +609,34 @@ MainWindow::MainWindow(const QDir &home)
     configChanged(CONFIG_APPEARANCE);
 
     init = true;
+
+    /*----------------------------------------------------------------------
+     * Lets ask for telemetry and check for updates
+     *--------------------------------------------------------------------*/
+
+#ifdef GC_HAS_CLOUD_DB
+
+    if (appsettings->value(NULL, GC_ALLOW_TELEMETRY, "undefined").toString() == "undefined" ) {
+        // ask user if storing is allowed
+
+        // check for Telemetry Storage acceptance
+        CloudDBAcceptTelemetryDialog acceptDialog;
+        acceptDialog.setModal(true);
+        if (acceptDialog.exec() == QDialog::Accepted) {
+            CloudDBTelemetryClient::storeTelemetry();
+        };
+    }
+
+    QList<VersionAPIGetV1> versions = CloudDBVersionClient::getLatestVersions();
+    if (versions.count() > 0) {
+        CloudDBUpdateAvailableDialog updateAvailableDialog(versions);
+        updateAvailableDialog.setModal(true);
+        // we are not interested in the result - update check status is updated as part of the dialog box
+        updateAvailableDialog.exec();
+    }
+
+#endif
+
 }
 
 
