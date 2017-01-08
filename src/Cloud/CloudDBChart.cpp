@@ -459,6 +459,9 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    curationStateCombo->addItem(tr("Curated Only"));
    curationStateCombo->addItem(tr("Uncurated Only"));
 
+   // default to curated charts only
+   curationStateCombo->setCurrentIndex(1);
+
    connect(curationStateCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(curationStateFilterChanged(int)));
 
    sportCombo = new QComboBox();
