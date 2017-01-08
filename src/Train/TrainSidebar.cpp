@@ -37,6 +37,8 @@
 #include <QInputEvent>
 #include <QKeyEvent>
 
+#include <QSound>
+
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
 #include "ComputrainerController.h"
@@ -585,6 +587,9 @@ TrainSidebar::configChanged(qint32)
     // auto connect is off by default
     autoConnect = appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool();
 
+    // lap sounds are off by default
+    lapAudioEnabled = appsettings->value(this, TRAIN_LAPALERT, false).toBool();
+
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 #if !defined GC_VIDEO_NONE
     mediaTree->setStyleSheet(GCColor::stylesheet());
@@ -1130,6 +1135,7 @@ void TrainSidebar::Start()       // when start button is pressed
         wbalr = 0;
         wbal = WPRIME;
         calibrating = false;
+        lapAudioThisLap = true;
 
         if (status & RT_WORKOUT) {
             load_timer->start(LOADRATE);      // start recording
@@ -1500,6 +1506,15 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (ergFile) lapTimeRemaining = ergFile->nextLap(load_msecs) - load_msecs;
                 else lapTimeRemaining = 0;
 
+#if QT_VERSION >= 0x050600
+                // alert when approaching end of lap
+                // only enabled for for Qt version 5.6 onwards, see https://bugreports.qt.io/browse/QTBUG-40823
+                if (lapTimeRemaining < 3000 && lapAudioEnabled && lapAudioThisLap) {
+                    lapAudioThisLap = false;
+                    QSound::play(":audio/lap.wav");
+                }
+#endif
+
                 if(lapTimeRemaining < 0) {
                         if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
                         if(lapTimeRemaining < 0)
@@ -1612,6 +1627,7 @@ void TrainSidebar::resetLapTimer()
 {
     lap_time.restart();
     lap_elapsed_msec = 0;
+    lapAudioThisLap = true;
 }
 
 // can be called from the controller
