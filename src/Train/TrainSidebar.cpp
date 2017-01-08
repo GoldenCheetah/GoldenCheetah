@@ -1506,9 +1506,11 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (ergFile) lapTimeRemaining = ergFile->nextLap(load_msecs) - load_msecs;
                 else lapTimeRemaining = 0;
 
-#if QT_VERSION >= 0x050600
+#if defined Q_OS_LINUX && QT_VERSION < 0x050600
+                // Sorry, lap alerts are only enabled for for Qt version 5.6 onwards on Linux
+                // see https://bugreports.qt.io/browse/QTBUG-40823
+#else
                 // alert when approaching end of lap
-                // only enabled for for Qt version 5.6 onwards, see https://bugreports.qt.io/browse/QTBUG-40823
                 if (lapTimeRemaining < 3000 && lapAudioEnabled && lapAudioThisLap) {
                     lapAudioThisLap = false;
                     QSound::play(":audio/lap.wav");
