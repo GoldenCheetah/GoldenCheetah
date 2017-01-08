@@ -470,6 +470,7 @@ TrainConfig::TrainConfig(QDir home, Context *context) :
 
     // the widgets
     devicePage = new DevicePage(this, context);
+    optionsPage = new TrainOptionsPage(this, context);
     remotePage = new RemotePage(this, context);
 
     setContentsMargins(0,0,0,0);
@@ -479,6 +480,7 @@ TrainConfig::TrainConfig(QDir home, Context *context) :
 
     QTabWidget *tabs = new QTabWidget(this);
     tabs->addTab(devicePage, tr("Train Devices"));
+    tabs->addTab(optionsPage, tr("Preferences"));
     tabs->addTab(remotePage, tr("Remote Controls"));
 
     mainLayout->addWidget(tabs);
@@ -489,6 +491,7 @@ qint32 TrainConfig::saveClicked()
     qint32 state = 0;
 
     state |= devicePage->saveClicked();
+    state |= optionsPage->saveClicked();
     state |= remotePage->saveClicked();
 
     return state;
