@@ -43,6 +43,8 @@ class RTool {
         Context *context;
         QString version;
 
+        // layout and page size
+        static SEXP windowSize();
         static SEXP pageSize(SEXP width, SEXP height);
 
         // athlete

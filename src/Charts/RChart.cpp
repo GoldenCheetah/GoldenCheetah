@@ -181,6 +181,7 @@ void RConsole::keyPressEvent(QKeyEvent *e)
             // R functions to access the athlete data/model etc
             rtool->context = context;
             rtool->canvas = parent->canvas;
+            rtool->chart = parent;
 
             try {
 
@@ -219,6 +220,7 @@ void RConsole::keyPressEvent(QKeyEvent *e)
             // clear context
             rtool->context = NULL;
             rtool->canvas = NULL;
+            rtool->chart = NULL;
         }
 
         // prompt ">" for new command and ">>" for a continuation line
@@ -481,9 +483,10 @@ RChart::runScript()
         // run it !!
         rtool->context = context;
         rtool->canvas = canvas;
+        rtool->chart = this;
 
         // set default page size
-        rtool->width = rtool->height = 500;
+        rtool->width = rtool->height = 0; // sets the canvas to the window size
 
         // set to defaults with gc applied
         rtool->cancelled = false;
@@ -535,8 +538,12 @@ RChart::runScript()
         // weird things can happen!
         rtool->R->program.clear();
 
+        // scale to fit and center on output
+        canvas->fitInView(canvas->sceneRect(), Qt::KeepAspectRatio);
+
         // clear context
         rtool->context = NULL;
         rtool->canvas = NULL;
+        rtool->chart = NULL;
     }
 }
