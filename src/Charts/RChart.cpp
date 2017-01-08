@@ -392,6 +392,11 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
 bool
 RChart::eventFilter(QObject *, QEvent *e)
 {
+    // on resize event scale the display
+    if (e->type() == QEvent::Resize) {
+        canvas->fitInView(canvas->sceneRect(), Qt::KeepAspectRatio);
+    }
+
     // not running a script
     if (!rtool || !rtool->canvas) return false;
 
@@ -401,7 +406,6 @@ RChart::eventFilter(QObject *, QEvent *e)
         rtool->cancel();
         return true;
     }
-
     // otherwise do nothing
     return false;
 }
