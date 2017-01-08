@@ -575,9 +575,12 @@ equals(CloudDB, active) {
         greaterThan(QT_MINOR_VERSION, 4) {
 
             HEADERS += Cloud/CloudDBChart.h Cloud/CloudDBCommon.h \
-                       Cloud/CloudDBCurator.h Cloud/CloudDBStatus.h
+                       Cloud/CloudDBCurator.h Cloud/CloudDBStatus.h \
+                       Cloud/CloudDBVersion.h Cloud/CloudDBTelemetry.h
             SOURCES += Cloud/CloudDBChart.cpp Cloud/CloudDBCommon.cpp \
-                       Cloud/CloudDBCurator.cpp Cloud/CloudDBStatus.cpp
+                       Cloud/CloudDBCurator.cpp Cloud/CloudDBStatus.cpp \
+                       Cloud/CloudDBVersion.cpp Cloud/CloudDBTelemetry.cpp
+
             DEFINES += GC_HAS_CLOUD_DB
 
         } else {
