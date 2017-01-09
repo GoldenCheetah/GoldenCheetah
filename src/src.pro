@@ -52,7 +52,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 } else {
 
     ## QT5 modules we use
-    QT += widgets concurrent serialport
+    QT += widgets concurrent serialport multimedia multimediawidgets
 
     ## If building with QT5 there is experimental suport for building
     ## with WebEngine now that WebKit is deprecated in QT 5.6
@@ -72,7 +72,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
         QT += macextras webengine webenginecore webenginewidgets positioning
 
     } else {
-        QT += multimedia multimediawidgets
+
     }
 }
 
