@@ -1546,17 +1546,9 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
     deviceList->setEditTriggers(QAbstractItemView::NoEditTriggers);
     deviceList->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    autoConnect = new QCheckBox(tr("Auto-connect devices in Train View"), this);
-    autoConnect->setChecked(appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool());
-
-    multiCheck = new QCheckBox(tr("Allow multiple devices in Train View"), this);
-    multiCheck->setChecked(appsettings->value(this, TRAIN_MULTI, false).toBool());
-
     mainLayout->addWidget(deviceList);
     QHBoxLayout *bottom = new QHBoxLayout;
     bottom->setSpacing(2);
-    bottom->addWidget(multiCheck);
-    bottom->addWidget(autoConnect);
     bottom->addStretch();
     bottom->addWidget(addButton);
     bottom->addWidget(delButton);
@@ -1573,8 +1565,6 @@ DevicePage::saveClicked()
     // Save the device configuration...
     DeviceConfigurations all;
     all.writeConfig(deviceListModel->Configuration);
-    appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
-    appsettings->setValue(TRAIN_AUTOCONNECT, autoConnect->isChecked());
 
     return 0;
 }
@@ -1786,6 +1776,48 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
 
         return false;
 }
+
+//
+// Train view options page
+//
+TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
+{
+    autoConnect = new QCheckBox(tr("Auto-connect devices in Train View"), this);
+    autoConnect->setChecked(appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool());
+
+    multiCheck = new QCheckBox(tr("Allow multiple devices in Train View"), this);
+    multiCheck->setChecked(appsettings->value(this, TRAIN_MULTI, false).toBool());
+
+    autoHide = new QCheckBox(tr("Auto-hide bottom bar in Train View"), this);
+    autoHide->setChecked(appsettings->value(this, TRAIN_AUTOHIDE, false).toBool());
+
+    // Disabled until ported across from the existing bottom bar checkbox
+    autoHide->setDisabled(true);
+
+    lapAlert = new QCheckBox(tr("Play sound before new lap"), this);
+    lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
+
+    QVBoxLayout *all = new QVBoxLayout(this);
+    all->addWidget(multiCheck);
+    all->addWidget(autoConnect);
+    all->addWidget(autoHide);
+    all->addWidget(lapAlert);
+    all->addStretch();
+}
+
+
+qint32
+TrainOptionsPage::saveClicked()
+{
+    // Save the train view settings...
+    appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
+    appsettings->setValue(TRAIN_AUTOCONNECT, autoConnect->isChecked());
+    appsettings->setValue(TRAIN_AUTOHIDE, autoHide->isChecked());
+    appsettings->setValue(TRAIN_LAPALERT, lapAlert->isChecked());
+
+    return 0;
+}
+
 
 //
 // Remote control page
