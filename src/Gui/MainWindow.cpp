@@ -616,6 +616,7 @@ MainWindow::MainWindow(const QDir &home)
 
 #ifdef GC_HAS_CLOUD_DB
 
+#if 0  // temporarily de-activated
     if (appsettings->value(NULL, GC_ALLOW_TELEMETRY, "undefined").toString() == "undefined" ) {
         // ask user if storing is allowed
 
@@ -626,6 +627,7 @@ MainWindow::MainWindow(const QDir &home)
             CloudDBTelemetryClient::storeTelemetry();
         };
     }
+#endif
 
     QList<VersionAPIGetV1> versions = CloudDBVersionClient::getLatestVersions();
     if (versions.count() > 0) {
