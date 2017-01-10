@@ -3107,8 +3107,8 @@ RideFile::symbolForSeries(SeriesType series)
 }
 
 // Iterator
-RideFileIterator::RideFileIterator(RideFile *f, Specification spec)
-    : f(f)
+RideFileIterator::RideFileIterator(RideFile *f, Specification spec, IterationSpec mode)
+    : f(f), mode(mode)
 {
     // index, start and stop are set to -1
     // if they are out of bounds or f is NULL
@@ -3129,6 +3129,25 @@ RideFileIterator::RideFileIterator(RideFile *f, Specification spec)
 
         // check!
         if (stop >= f->dataPoints().count()) stop = -1;
+
+        // ok, so now adjust for BEFORE, AFTER
+        if (mode == Before) {
+            if (start <= 0) {
+                start = stop -1; // interval start of ride
+            } else {
+                stop = start;
+                start = 0;
+            }
+        }
+
+        if (mode == After) {
+            if (stop == f->dataPoints().count()-1) {
+                start = stop = -1;
+            } else {
+                start = stop;
+                stop = f->dataPoints().count()-1;
+            }
+        }
 
     } else {
 
