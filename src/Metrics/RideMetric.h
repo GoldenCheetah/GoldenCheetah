@@ -299,7 +299,7 @@ public:
         Leaf *root;
 
         // functions, to save lots of lookups
-        Leaf *finit, *frelevant, *fsample, *fvalue, *fcount;
+        Leaf *finit, *frelevant, *fsample, *fbefore, *fafter, *fvalue, *fcount;
 
         // our runtime
         DataFilterRuntime *rt;

@@ -515,7 +515,9 @@ class RideFileIterator {
 
     public:
 
-        RideFileIterator(RideFile *, Specification);
+        enum IterationSpec { Before=0, Sample=1, After=2 };
+
+        RideFileIterator(RideFile *, Specification, IterationSpec mode=RideFileIterator::Sample);
 
         void toFront();
         void toBack();
@@ -534,6 +536,7 @@ class RideFileIterator {
 
     private:
         RideFile *f;
+        IterationSpec mode;
         int start, stop, index;
 };
 
