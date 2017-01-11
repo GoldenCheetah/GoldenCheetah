@@ -44,7 +44,7 @@
 //
 
 // nothing doing in base class, for now
-FileStore::FileStore(Context *context) : context(context)
+FileStore::FileStore(Context *context) : useZip(true), useMetric(false), context(context)
 {
 }
 
@@ -807,6 +807,11 @@ FileStoreSyncDialog::refreshClicked()
         exists->setEnabled(false);
         rideListDown->setItemWidget(add, 4, exists);
         add->setTextAlignment(4, Qt::AlignCenter);
+        if (workouts[i]->id.length()>0)
+            add->setText(6, workouts[i]->id); // download_id
+        else
+            add->setText(6, workouts[i]->name);
+
         if (rideFiles.contains(targetnosuffix.mid(0,14))) exists->setChecked(Qt::Checked);
         else {
             exists->setChecked(Qt::Unchecked);
@@ -824,13 +829,24 @@ FileStoreSyncDialog::refreshClicked()
             sync->setTextAlignment(2, Qt::AlignLeft);
             sync->setText(3, ridedatetime.toString("hh:mm:ss"));
             sync->setTextAlignment(3, Qt::AlignCenter);
+
+            if (store->useMetric) { // Only for Today's Plan
+                long secs = workouts[i]->duration;
+                QChar zero = QLatin1Char ( '0' );
+                QString duration = QString("%1:%2:%3").arg(secs/3600,2,10,zero)
+                                                  .arg(secs%3600/60,2,10,zero)
+                                                  .arg(secs%60,2,10,zero);
+                sync->setText(4, duration);
+                sync->setTextAlignment(4, Qt::AlignCenter);
+
+                double distance = workouts[i]->distance;
+                sync->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
+                sync->setTextAlignment(5, Qt::AlignRight);
+            }
             sync->setText(6, tr("Download"));
             sync->setTextAlignment(6, Qt::AlignLeft);
             sync->setText(7, "");
         }
-
-        add->setText(5, "");
-        add->setText(6, workouts[i]->id); // download_id
     }
 
     //
@@ -1091,7 +1107,7 @@ FileStoreSyncDialog::syncNext()
                 rideListSync->setCurrentItem(curr);
 
                 QByteArray *data = new QByteArray;
-                store->readFile(data, curr->text(1)); // filename
+                store->readFile(data, curr->text(6)); // filename
                 QApplication::processEvents();
 
             } else {

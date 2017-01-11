@@ -55,6 +55,7 @@ TodaysPlan::TodaysPlan(Context *context) : FileStore(context), context(context),
     connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
     useZip = false; // gzip
+    useMetric = true; // distance and duration metadata
 }
 
 TodaysPlan::~TodaysPlan() {
@@ -176,6 +177,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
     if (TODAYSPLAN_DEBUG)
          url = "https://staging.todaysplan.com.au/rest/users/activities/search/0/100";
 
+    //url="https://staging.todaysplan.com.au/rest/files/search/0/100";
 
     // request using the bearer token
     QNetworkRequest request(url);
@@ -188,7 +190,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
     jsonString += "\"fromTs\": \""+ QString("%1").arg(from.toMSecsSinceEpoch()) +"\", ";
     jsonString += "\"toTs\": \"" + QString("%1").arg(to.toMSecsSinceEpoch()) + "\", ";
     jsonString += "\"isNotNull\": [\"fileId\"]}, ";
-    jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\"], "; //,\"training\",\"distance\",\"avgWatts\"
+    jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\",\"distance\",\"training\"], "; //\"avgWatts\"
     jsonString += "\"opts\": 0 ";
     jsonString += "}";
 
@@ -217,19 +219,21 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
 
         // lets look at that then
         for(int i=0; i<results.size(); i++) {
-            QJsonValue each = results.at(i);
+            QJsonObject each = results.at(i).toObject();
             FileStoreEntry *add = newFileStoreEntry();
 
             //TodaysPlan has full path, we just want the file name
-            add->label = QFileInfo(each.toObject()["name"].toString()).fileName();
-            add->id = each.toObject()["fileId"].toInt();
+            add->label = QFileInfo(each["name"].toString()).fileName();
+            add->id = QString("%1").arg(each["fileId"].toInt());
             add->isDir = false;
+            add->distance = each["distance"].toInt()/1000.0;
+            add->duration = each["training"].toInt();
             //add->size
             //add->modified
 
-            //QString name = QDateTime::fromMSecsSinceEpoch(each.toObject()["ts"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+=".json";
+            //QString name = QDateTime::fromMSecsSinceEpoch(each["ts"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+=".json";
             //add->name = name;
-            QJsonObject fileindex = each.toObject()["fileindex"].toObject();
+            QJsonObject fileindex = each["fileindex"].toObject();
             add->name = QFileInfo(fileindex["filename"].toString()).fileName();
 
 
