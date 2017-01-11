@@ -362,7 +362,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
     // find the curPosition
     if (context->currentVideoSyncFile())
     {
-        // when we selected a videosync file in traning mode (rlv...):
+        // when we selected a videosync file in training mode (rlv...):
 
         QVector<VideoSyncFilePoint> VideoSyncFiledataPoints = context->currentVideoSyncFile()->Points;
 
@@ -451,7 +451,7 @@ void VideoWindow::seekPlayback(long ms)
 #ifdef GC_VIDEO_VLC
     if (!m) return;
 
-    // when we selected a videosync file in traning mode (rlv...)
+    // when we selected a videosync file in training mode (rlv...)
     if (context->currentVideoSyncFile())
     {
         context->currentVideoSyncFile()->manualOffset += (double) ms; //we consider +/- 1km
