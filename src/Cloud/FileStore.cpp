@@ -81,7 +81,7 @@ FileStore::upload(QWidget *parent, FileStore *store, RideItem *item)
 //
 // Utility function to create a QByteArray of data in GZIP format
 // This is essentially the same as qCompress but creates it in
-// GZIP format (with recquisite headers) instead of ZLIB's format
+// GZIP format (with requisite headers) instead of ZLIB's format
 // which has less filename info in the header
 //
 static QByteArray zCompress(const QByteArray &source)
