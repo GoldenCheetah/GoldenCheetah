@@ -618,6 +618,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Cloud/Dropbox.h
     SOURCES += Cloud/GoogleDrive.cpp
     HEADERS += Cloud/GoogleDrive.h
+    SOURCES += Cloud/TodaysPlan.cpp
+    HEADERS += Cloud/TodaysPlan.h
     SOURCES += Train/MonarkController.cpp Train/MonarkConnection.cpp
     HEADERS += Train/MonarkController.h Train/MonarkConnection.h
     SOURCES += Train/Kettler.cpp Train/KettlerController.cpp Train/KettlerConnection.cpp
@@ -674,7 +676,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 
 # cloud services
 HEADERS += Cloud/CalendarDownload.h Cloud/FileStore.h Cloud/LocalFileStore.h Cloud/OAuthDialog.h Cloud/ShareDialog.h \
-           Cloud/SportPlusHealthUploader.h Cloud/TodaysPlan.h Cloud/TrainingstagebuchUploader.h Cloud/VeloHeroUploader.h Cloud/WithingsDownload.h
+           Cloud/SportPlusHealthUploader.h Cloud/TrainingstagebuchUploader.h Cloud/VeloHeroUploader.h Cloud/WithingsDownload.h
 # core data 
 HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
@@ -754,7 +756,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 
 ## Cloud Services / Web resources
 SOURCES += Cloud/CalendarDownload.cpp Cloud/FileStore.cpp Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp Cloud/ShareDialog.cpp \
-           Cloud/SportPlusHealthUploader.cpp Cloud/TodaysPlan.cpp Cloud/TrainingstagebuchUploader.cpp Cloud/VeloHeroUploader.cpp Cloud/WithingsDownload.cpp
+           Cloud/SportPlusHealthUploader.cpp Cloud/TrainingstagebuchUploader.cpp Cloud/VeloHeroUploader.cpp Cloud/WithingsDownload.cpp
 
 ## Core Data Structures
 SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch.cpp Core/GcUpgrade.cpp Core/IdleTimer.cpp \
