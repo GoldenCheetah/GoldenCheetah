@@ -80,8 +80,9 @@ TodaysPlan::open(QStringList &errors)
         return false;
     }
 
-    //QString url("https://staging.todaysplan.com.au/rest/users/delegates/users");
     QString url("https://whats.todaysplan.com.au/rest/users/delegates/users");
+    if (TODAYSPLAN_DEBUG)
+        url = "https://staging.todaysplan.com.au/rest/users/delegates/users";
 
     // request using the bearer token
     QNetworkRequest request(url);
@@ -168,10 +169,12 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
     }
 
     // lets connect and get activities list
-    //QString url("https://staging.todaysplan.com.au/rest/files/search/0/100");
+    // old API ?
+    // QString url("https://whats.todaysplan.com.au/rest/files/search/0/100");
 
-    //QString url("https://staging.todaysplan.com.au/rest/users/activities/search/0/100");
     QString url("https://whats.todaysplan.com.au/rest/users/activities/search/0/100");
+    if (TODAYSPLAN_DEBUG)
+         url = "https://staging.todaysplan.com.au/rest/users/activities/search/0/100";
 
 
     // request using the bearer token
@@ -252,8 +255,9 @@ TodaysPlan::readFile(QByteArray *data, QString remotename)
     if (token == "") return false;
 
     // lets connect and get basic info on the root directory
-    //QString url("https://staging.todaysplan.com.au/rest/files/download/");
     QString url("https://whats.todaysplan.com.au/rest/files/download/");
+    if (TODAYSPLAN_DEBUG)
+        url = "https://staging.todaysplan.com.au/rest/files/download/";
 
     // request using the bearer token
     QNetworkRequest request(url);
@@ -285,8 +289,9 @@ TodaysPlan::writeFile(QByteArray &data, QString remotename)
     if (token == "") return false;
 
     // lets connect and get basic info on the root directory
-    //QUrl url = QUrl( "https://staging.todaysplan.com.au/rest/files/upload" );
-    QUrl url = QUrl( "https://whats.todaysplan.com.au/rest/files/upload" );
+    QString url("https://whats.todaysplan.com.au/rest/files/upload");
+    if (TODAYSPLAN_DEBUG)
+        url = "https://staging.todaysplan.com.au/rest/files/upload";
 
     QNetworkRequest request = QNetworkRequest(url);
 
