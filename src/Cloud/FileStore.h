@@ -107,6 +107,7 @@ class FileStore : public QObject {
         static bool upload(QWidget *parent, FileStore *store, RideItem*);
 
         bool useZip;
+        bool useMetric; // FileStore know distance or duration metadata (eg Today's Plan)
 
     signals:
         void writeComplete(QString name, QString message);
@@ -313,6 +314,8 @@ class FileStoreEntry
         bool isDir;                         // is a directory
         unsigned long size;                 // my size
         QDateTime modified;                 // last modification date
+        double distance;                    // distance (km)
+        long duration;                      // duration (secs)
 
         // This is just file metadata written by the implementation.
         //QMap<QString, QString> metadata;
