@@ -21,11 +21,7 @@
 
 GcToolBar::GcToolBar(QWidget *parent) : QWidget(parent)
 {
-#ifdef WIN32
-    setFixedHeight(40);
-#else
-    setFixedHeight(50);
-#endif
+    //Height will be set when widget is added in MainWindow
     setContentsMargins(0,0,0,0);
     layout = new QHBoxLayout(this);
     layout->setSpacing(10);
