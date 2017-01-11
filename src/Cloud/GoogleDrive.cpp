@@ -35,7 +35,7 @@
 
 #ifndef GOOGLE_DRIVE_DEBUG
 // TODO(gille): This should be a command line flag.
-#define GOOGLE_DRIVE_DEBUG true
+#define GOOGLE_DRIVE_DEBUG false
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
