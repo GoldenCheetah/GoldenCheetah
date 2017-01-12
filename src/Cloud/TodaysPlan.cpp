@@ -81,9 +81,9 @@ TodaysPlan::open(QStringList &errors)
         return false;
     }
 
-    QString url("https://whats.todaysplan.com.au/rest/users/delegates/users");
-    if (TODAYSPLAN_DEBUG)
-        url = "https://staging.todaysplan.com.au/rest/users/delegates/users";
+    // use the configed URL
+    QString url = QString("%1/rest/users/delegates/users")
+          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
 
     // request using the bearer token
     QNetworkRequest request(url);
@@ -172,10 +172,9 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
     // lets connect and get activities list
     // old API ?
     // QString url("https://whats.todaysplan.com.au/rest/files/search/0/100");
+    QString url = QString("%1/rest/users/activities/search/0/100")
+          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
 
-    QString url("https://whats.todaysplan.com.au/rest/users/activities/search/0/100");
-    if (TODAYSPLAN_DEBUG)
-         url = "https://staging.todaysplan.com.au/rest/users/activities/search/0/100";
 
     //url="https://staging.todaysplan.com.au/rest/files/search/0/100";
 
@@ -259,9 +258,8 @@ TodaysPlan::readFile(QByteArray *data, QString remotename)
     if (token == "") return false;
 
     // lets connect and get basic info on the root directory
-    QString url("https://whats.todaysplan.com.au/rest/files/download/");
-    if (TODAYSPLAN_DEBUG)
-        url = "https://staging.todaysplan.com.au/rest/files/download/";
+    QString url = QString("%1/rest/files/download/")
+          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
 
     // request using the bearer token
     QNetworkRequest request(url);
@@ -293,9 +291,8 @@ TodaysPlan::writeFile(QByteArray &data, QString remotename)
     if (token == "") return false;
 
     // lets connect and get basic info on the root directory
-    QString url("https://whats.todaysplan.com.au/rest/files/upload");
-    if (TODAYSPLAN_DEBUG)
-        url = "https://staging.todaysplan.com.au/rest/files/upload";
+    QString url = QString("%1/rest/files/upload")
+          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
 
     QNetworkRequest request = QNetworkRequest(url);
 

@@ -297,6 +297,7 @@
 #define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
 //Today's Plan
 #define GC_TODAYSPLAN_TOKEN             "<athlete-private>todaysplan_token"
+#define GC_TODAYSPLAN_URL               "<athlete-private>todaysplan_url"
 
 // --------------------------------------------------------------------------------
 #include <QSettings>
