@@ -272,6 +272,8 @@ class CredentialsPage : public QScrollArea
         QPushButton *cyclingAnalyticsAuthorise, *cyclingAnalyticsAuthorised;
         QPushButton *googleCalendarAuthorise, *googleCalendarAuthorised;
 
+        QLineEdit *tdpURL;
+
         QLineEdit *rideWithGPSUser;
         QLineEdit *rideWithGPSPass;
 

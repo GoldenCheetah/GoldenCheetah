@@ -583,6 +583,13 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     grid->addWidget(tdp, ++row, 0);
 
+    // Today's plan url can be on a private tenant
+    QLabel *tdpurllabel = new QLabel("URL"); // don't translate a technical term
+    tdpURL = new QLineEdit(this);
+    tdpURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
+    grid->addWidget(tdpurllabel, ++row, 0);
+    grid->addWidget(tdpURL, row, 1, 0 /*Qt::AlignLeft | Qt::AlignVCenter*/);
+
     grid->addWidget(tdpauthLabel, ++row, 0);
     grid->addWidget(tdpAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
     if (appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "")!="")
@@ -1014,7 +1021,7 @@ void CredentialsPage::authoriseStrava()
 
 void CredentialsPage::authoriseTodaysPlan()
 {
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TODAYSPLAN);
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TODAYSPLAN, tdpURL->text());
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {
@@ -1103,6 +1110,7 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_WIKEY, wiPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_URL, tdpURL->text());
 #if QT_VERSION >= 0x050000 // only in QT5 or higher
     appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_FOLDER, dropboxFolder->text());
     appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER,
