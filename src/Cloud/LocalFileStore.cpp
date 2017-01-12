@@ -104,6 +104,7 @@ LocalFileStore::readdir(QString path, QStringList &errors)
 
         //QFileInfo has full path, we just want the file name
         add->name = info.fileName();
+        add->id = add->name;
         add->isDir = info.isDir();
         add->size = info.size();
 
@@ -120,7 +121,7 @@ LocalFileStore::readdir(QString path, QStringList &errors)
 
 // read a file at location (relative to home) into passed array
 bool
-LocalFileStore::readFile(QByteArray *data, QString remotename)
+LocalFileStore::readFile(QByteArray *data, QString remotename, QString)
 {
 
     // is the path set ?

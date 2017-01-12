@@ -54,7 +54,9 @@ TodaysPlan::TodaysPlan(Context *context) : FileStore(context), context(context),
     nam = new QNetworkAccessManager(this);
     connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
-    useZip = false; // gzip
+    uploadCompression = gzip; // gzip
+    downloadCompression = none;
+
     useMetric = true; // distance and duration metadata
 }
 
@@ -246,7 +248,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
 
 // read a file at location (relative to home) into passed array
 bool
-TodaysPlan::readFile(QByteArray *data, QString remotename)
+TodaysPlan::readFile(QByteArray *data, QString remotename, QString remoteid)
 {
     printd("TodaysPlan::readFile(%s)\n", remotename.toStdString().c_str());
 
@@ -258,8 +260,10 @@ TodaysPlan::readFile(QByteArray *data, QString remotename)
     if (token == "") return false;
 
     // lets connect and get basic info on the root directory
-    QString url = QString("%1/rest/files/download/")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
+    QString url = QString("%1/rest/files/download/%2")
+          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString()).arg(remoteid);
+
+    printd("url:%s\n", url.toStdString().c_str());
 
     // request using the bearer token
     QNetworkRequest request(url);
@@ -352,8 +356,6 @@ TodaysPlan::writeFileCompleted()
 void
 TodaysPlan::readyRead()
 {
-    printd("TodaysPlan::readyRead\n");
-
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
     buffers.value(reply)->append(reply->readAll());
 }
@@ -365,8 +367,7 @@ TodaysPlan::readFileCompleted()
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s", reply->readAll().toStdString().c_str());
+    printd("reply:%s", buffers.value(reply)->toStdString().c_str());
 
-    //notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
-    notifyReadComplete(buffers.value(reply), replyName(reply), tr("Not implemented."));
+    notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
 }
