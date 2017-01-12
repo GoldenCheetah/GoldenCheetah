@@ -79,8 +79,8 @@ class FileStore : public QObject {
         void notifyWriteComplete(QString name,QString message) { emit writeComplete(name,message); }
 
         // read a file  and notify when done
-        virtual bool readFile(QByteArray *data, QString remotename) {
-            Q_UNUSED(data); Q_UNUSED(remotename); return false;
+        virtual bool readFile(QByteArray *data, QString remotename, QString remoteid) {
+            Q_UNUSED(data); Q_UNUSED(remotename); Q_UNUSED(remoteid); return false;
         }
         void notifyReadComplete(QByteArray *data, QString name, QString message) { emit readComplete(data,name,message); }
 
@@ -102,11 +102,17 @@ class FileStore : public QObject {
         QString replyName(QNetworkReply *reply) { return replymap_.value(reply,""); }
         void compressRide(RideFile*ride, QByteArray &data, QString name);
         RideFile *uncompressRide(QByteArray *data, QString name, QStringList &errors);
+        QString uploadExtension();
 
         // PUBLIC INTERFACES. DO NOT REIMPLEMENT
         static bool upload(QWidget *parent, FileStore *store, RideItem*);
 
-        bool useZip;
+        enum compression { none, zip, gzip };
+        typedef enum compression CompressionType;
+
+        CompressionType uploadCompression;
+        CompressionType downloadCompression;
+
         bool useMetric; // FileStore know distance or duration metadata (eg Today's Plan)
 
     signals:

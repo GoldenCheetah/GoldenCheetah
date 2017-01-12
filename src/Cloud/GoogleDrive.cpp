@@ -414,6 +414,7 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
         FileStoreEntry *add = newFileStoreEntry();
         // Google Drive just stores the file name.
         add->name = it->second->name;
+        add->id = add->name;
         printd("Returning entry: %s\n", add->name.toStdString().c_str());
         add->isDir = it->second->is_dir;
         add->size = it->second->size;
@@ -426,7 +427,7 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
 }
 
 // read a file at location (relative to home) into passed array
-bool GoogleDrive::readFile(QByteArray *data, QString remote_name) {
+bool GoogleDrive::readFile(QByteArray *data, QString remote_name, QString) {
     printd("readfile %s\n", remote_name.toStdString().c_str());
     // this must be performed asyncronously and call made
     // to notifyReadComplete(QByteArray &data, QString remotename,

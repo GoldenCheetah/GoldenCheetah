@@ -44,7 +44,7 @@
 //
 
 // nothing doing in base class, for now
-FileStore::FileStore(Context *context) : useZip(true), useMetric(false), context(context)
+FileStore::FileStore(Context *context) : uploadCompression(zip), downloadCompression(zip), useMetric(false), context(context)
 {
 }
 
@@ -84,7 +84,7 @@ FileStore::upload(QWidget *parent, FileStore *store, RideItem *item)
 // GZIP format (with requisite headers) instead of ZLIB's format
 // which has less filename info in the header
 //
-static QByteArray zCompress(const QByteArray &source)
+static QByteArray gCompress(const QByteArray &source)
 {
     // int size is source.size()
     // const char *data is source.data()
@@ -114,6 +114,56 @@ static QByteArray zCompress(const QByteArray &source)
     return QByteArray(dest.data(), (source.size()/2) - strm.avail_out);
 }
 
+static QByteArray gUncompress(const QByteArray &data)
+{
+    if (data.size() <= 4) {
+        qWarning("gUncompress: Input data is truncated");
+        return QByteArray();
+    }
+
+    QByteArray result;
+
+    int ret;
+    z_stream strm;
+    static const int CHUNK_SIZE = 1024;
+    char out[CHUNK_SIZE];
+
+    /* allocate inflate state */
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    strm.avail_in = data.size();
+    strm.next_in = (Bytef*)(data.data());
+
+    ret = inflateInit2(&strm, 15 +  16); // gzip decoding
+    if (ret != Z_OK)
+        return QByteArray();
+
+    // run inflate()
+    do {
+        strm.avail_out = CHUNK_SIZE;
+        strm.next_out = (Bytef*)(out);
+
+        ret = inflate(&strm, Z_NO_FLUSH);
+        Q_ASSERT(ret != Z_STREAM_ERROR);  // state not clobbered
+
+        switch (ret) {
+        case Z_NEED_DICT:
+            ret = Z_DATA_ERROR;     // and fall through
+        case Z_DATA_ERROR:
+        case Z_MEM_ERROR:
+            (void)inflateEnd(&strm);
+            return QByteArray();
+        }
+
+        result.append(out, CHUNK_SIZE - strm.avail_out);
+    } while (strm.avail_out == 0);
+
+    // clean up and return
+    inflateEnd(&strm);
+    return result;
+}
+
 void
 FileStore::compressRide(RideFile*ride, QByteArray &data, QString name)
 {
@@ -126,7 +176,7 @@ FileStore::compressRide(RideFile*ride, QByteArray &data, QString name)
     QFile jsonFile(tempfile.fileName());
     if (RideFileFactory::instance().writeRideFile(NULL, ride, jsonFile, "json") == true) {
 
-        if (useZip) {
+        if (uploadCompression == zip) {
             // create a temp zip file
             QTemporaryFile zipFile;
             zipFile.open();
@@ -147,10 +197,12 @@ FileStore::compressRide(RideFile*ride, QByteArray &data, QString name)
             zip.open(QFile::ReadOnly);
             data = zip.readAll();
             zip.close();
-        } else {
+        } else if (uploadCompression == gzip) {
             // read the ride file
             jsonFile.open(QFile::ReadOnly);
-            data = zCompress(jsonFile.readAll());
+            data = gCompress(jsonFile.readAll());
+        } else {
+            data = jsonFile.readAll();
         }
     }
 }
@@ -160,24 +212,36 @@ RideFile *
 FileStore::uncompressRide(QByteArray *data, QString name, QStringList &errors)
 {
     // make sure its named as we expect
-    if (!name.endsWith(".json.zip") && !name.endsWith(".json.gz")) {
+    if ((downloadCompression== zip && !name.endsWith(".json.zip")) ||
+        (downloadCompression== gzip && !name.endsWith(".json.gz"))) {
         errors << tr("expected compressed activity file.");
         return NULL;
     }
 
-    // write out to a zip file first
-    QTemporaryFile zipfile;
-    zipfile.open();
-    zipfile.write(*data);
-    zipfile.close();
+    QByteArray jsonData;
 
-    // open zip
-    ZipReader reader(zipfile.fileName());
-    ZipReader::FileInfo info = reader.entryInfoAt(0);
-    QByteArray jsonData = reader.fileData(info.filePath);
+    if (downloadCompression == zip) {
+        // write out to a zip file first
+        QTemporaryFile zipfile;
+        zipfile.open();
+        zipfile.write(*data);
+        zipfile.close();
 
-    // uncompress and write to tmp without the .zip
-    name = name.mid(0, name.length()-4);
+        // open zip
+        ZipReader reader(zipfile.fileName());
+        ZipReader::FileInfo info = reader.entryInfoAt(0);
+        jsonData = reader.fileData(info.filePath);
+        // name without the .zip
+        name = name.mid(0, name.length()-4);
+    } else if (downloadCompression == gzip) {
+        jsonData = gUncompress(*data);
+        // name without the .gz
+        name = name.mid(0, name.length()-3);
+    } else {
+        jsonData = *data;
+    }
+
+    // uncompress and write to tmp
     QString tmp = context->athlete->home->temp().absolutePath() + "/" + QFileInfo(name).baseName() + "." + QFileInfo(name).suffix();
     
     // uncompress and write a file
@@ -194,6 +258,21 @@ FileStore::uncompressRide(QByteArray *data, QString name, QStringList &errors)
 
     // return whatever we got
     return ride;
+}
+
+QString
+FileStore::uploadExtension() {
+    switch (uploadCompression) {
+        case zip:
+            return ".json.zip";
+
+        case gzip:
+            return ".json.gz";
+
+        case none:
+        default:
+            return ".json";
+    }
 }
 
 FileStoreUploadDialog::FileStoreUploadDialog(QWidget *parent, FileStore *store, RideItem *item) : QDialog(parent), store(store), item(item)
@@ -221,7 +300,7 @@ FileStoreUploadDialog::FileStoreUploadDialog(QWidget *parent, FileStore *store, 
     connect(store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completed(QString,QString)));
 
     // ok, so now we can kickoff the upload
-    store->writeFile(data, QFileInfo(item->fileName).baseName() + (store->useZip?".json.zip":".json.gz"));
+    store->writeFile(data, QFileInfo(item->fileName).baseName() + store->uploadExtension());
 }
 
 void
@@ -574,13 +653,13 @@ FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store)
     // ride list
     rideListDown = new QTreeWidget(this);
     rideListDown->headerItem()->setText(0, " ");
-    rideListDown->headerItem()->setText(1, tr("Workout Id"));
+    rideListDown->headerItem()->setText(1, tr("Workout Name"));
     rideListDown->headerItem()->setText(2, tr("Date"));
     rideListDown->headerItem()->setText(3, tr("Time"));
     rideListDown->headerItem()->setText(4, tr("Exists"));
     rideListDown->headerItem()->setText(5, tr("Status"));
-    rideListDown->headerItem()->setText(6, tr("Alternate Id"));
-    rideListDown->setColumnCount(7);
+    rideListDown->headerItem()->setText(6, tr("Workout Id"));
+    rideListDown->setColumnCount(6);
     rideListDown->setSelectionMode(QAbstractItemView::SingleSelection);
     rideListDown->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     rideListDown->setUniformRowHeights(true);
@@ -647,6 +726,7 @@ FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store)
     rideListSync->headerItem()->setText(5, tr("Distance"));
     rideListSync->headerItem()->setText(6, tr("Action"));
     rideListSync->headerItem()->setText(7, tr("Status"));
+    rideListSync->headerItem()->setText(8, tr("Workout Id"));
     rideListSync->setColumnCount(8);
     rideListSync->setSelectionMode(QAbstractItemView::SingleSelection);
     rideListSync->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
@@ -807,10 +887,7 @@ FileStoreSyncDialog::refreshClicked()
         exists->setEnabled(false);
         rideListDown->setItemWidget(add, 4, exists);
         add->setTextAlignment(4, Qt::AlignCenter);
-        if (workouts[i]->id.length()>0)
-            add->setText(6, workouts[i]->id); // download_id
-        else
-            add->setText(6, workouts[i]->name);
+        add->setText(6, workouts[i]->id); // download_id
 
         if (rideFiles.contains(targetnosuffix.mid(0,14))) exists->setChecked(Qt::Checked);
         else {
@@ -846,6 +923,8 @@ FileStoreSyncDialog::refreshClicked()
             sync->setText(6, tr("Download"));
             sync->setTextAlignment(6, Qt::AlignLeft);
             sync->setText(7, "");
+
+            sync->setText(8, workouts[i]->id); // download_id
         }
     }
 
@@ -1107,7 +1186,7 @@ FileStoreSyncDialog::syncNext()
                 rideListSync->setCurrentItem(curr);
 
                 QByteArray *data = new QByteArray;
-                store->readFile(data, curr->text(6)); // filename
+                store->readFile(data, curr->text(1), curr->text(8)); // filename
                 QApplication::processEvents();
 
             } else {
@@ -1126,7 +1205,7 @@ FileStoreSyncDialog::syncNext()
                     store->compressRide(ride, data, QFileInfo(curr->text(1)).baseName() + ".json");
                     delete ride; // clean up!
 
-                    store->writeFile(data, QFileInfo(curr->text(1)).baseName() + (store->useZip?".json.zip":".json.gz"));
+                    store->writeFile(data, QFileInfo(curr->text(1)).baseName() + store->uploadExtension());
                     QApplication::processEvents();
                     return true;
 
@@ -1189,7 +1268,7 @@ FileStoreSyncDialog::downloadNext()
             progressLabel->setText(QString(tr("Downloaded %1 of %2")).arg(downloadcounter).arg(downloadtotal));
 
             QByteArray *data = new QByteArray; // gets deleted when read completes
-            store->readFile(data, curr->text(1));
+            store->readFile(data, curr->text(1), curr->text(6));
             QApplication::processEvents();
             return true;
         }
@@ -1297,7 +1376,7 @@ FileStoreSyncDialog::uploadNext()
                     store->compressRide(ride, data, QFileInfo(curr->text(1)).baseName() + ".json");
                     delete ride; // clean up!
 
-                    store->writeFile(data, QFileInfo(curr->text(1)).baseName() + (store->useZip?".json.zip":".json.gz"));
+                    store->writeFile(data, QFileInfo(curr->text(1)).baseName() + store->uploadExtension());
                     QApplication::processEvents();
                     return true;
 

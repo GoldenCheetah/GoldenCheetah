@@ -43,7 +43,7 @@ class LocalFileStore : public FileStore {
         bool writeFile(QByteArray &data, QString remotename);
 
         // read a file
-        bool readFile(QByteArray *data, QString remotename); 
+        bool readFile(QByteArray *data, QString remotename, QString);
 
         // create a folder
         bool createFolder(QString path);
