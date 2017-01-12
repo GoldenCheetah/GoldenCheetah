@@ -303,6 +303,7 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(sidebar);
     head->addWidget(lowbar);
     head->addWidget(styleSelector);
+    head->setFixedHeight(scopebar->height() + 7);
 
     // add a search box on far right, but with a little space too
     searchBox = new SearchFilterBox(this,context,false);
