@@ -187,7 +187,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
     QByteArray jsonString;
     jsonString += "{\"criteria\": {";
     jsonString += "\"fromTs\": \""+ QString("%1").arg(from.toMSecsSinceEpoch()) +"\", ";
-    jsonString += "\"toTs\": \"" + QString("%1").arg(to.toMSecsSinceEpoch()) + "\", ";
+    jsonString += "\"toTs\": \"" + QString("%1").arg(to.addDays(1).addSecs(-1).toMSecsSinceEpoch()) + "\", ";
     jsonString += "\"isNotNull\": [\"fileId\"]}, ";
     jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\",\"distance\",\"training\"], "; //\"avgWatts\"
     jsonString += "\"opts\": 0 ";
