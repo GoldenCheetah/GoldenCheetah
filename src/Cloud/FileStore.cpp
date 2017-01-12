@@ -160,7 +160,7 @@ RideFile *
 FileStore::uncompressRide(QByteArray *data, QString name, QStringList &errors)
 {
     // make sure its named as we expect
-    if (!name.endsWith(".json.zip")) {
+    if (!name.endsWith(".json.zip") && !name.endsWith(".json.gz")) {
         errors << tr("expected compressed activity file.");
         return NULL;
     }
@@ -1297,7 +1297,7 @@ FileStoreSyncDialog::uploadNext()
                     store->compressRide(ride, data, QFileInfo(curr->text(1)).baseName() + ".json");
                     delete ride; // clean up!
 
-                    store->writeFile(data, QFileInfo(curr->text(1)).baseName() + ".json.zip");
+                    store->writeFile(data, QFileInfo(curr->text(1)).baseName() + (store->useZip?".json.zip":".json.gz"));
                     QApplication::processEvents();
                     return true;
 
