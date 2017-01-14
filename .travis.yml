@@ -120,8 +120,9 @@ after_success:
 deploy:
   provider: releases
   api_key:
-    secure: XljNoPrDYmKmg/rdJ5+EpyauVFWvbeS8Dx6FmBLoBTrHWDZVtZzLEOKTpqGX5GnzWHv45Ao+J8SSummlqogFhO8O189escMQmr/kibVsQFEeXvViyjEIjPs1jrD16nOJoIw2XmJfN+2iXkg5JWMouKVWLmUdzoRHW6vO+1ZSzjtq+6C15rkMq5geHJbntcB1uDQBk878Cg42fNHuOnbG5f2tVVmnEeSKDwG/4SvrK7ZgTbPkF97Pz0Z9j8vIgSNlyswkOcS1do4ScmtL0ew4ZLhp7d4Zey5EHOSGl6KOJfHe/A6//bopfUgQSELsdwS1gQ2QoupmptvFw/qMISprG+cHRKLlzofvs387pCz4/iA9J13dYKf4w287b2YTqnquwNXFdJAGa+QBnTmV4WDif8sQ+XilnC+BGxTaszQ4p3srReZqRGvMPABwk/gu+03dnrWpquivllnrvpdBVKuihN/bKck97ul/3Z9uc7CgECsWg6TubJeQ1XO91mWzS34/zbf82VPhUEm2Q1EiRP6w/OfluR9e/2ZZyElriW4h7e4fVicBc0Qz9MMIZUIesGUtiwM1JZLpRSuwEttdqXcVYq2ufBw8+yfTD3zkcd21BVESEjzLqngBcBJmS0N1swtGf8hbNEaWUrti7aViKRvkme1X558pn3Pu/nuUzUM4TI8=
+    secure: KlfkRM8oGP02y5LhbdxetnhqUG3YzVylvyhT8BTYjdoJtkJr7YXYpdhj9byZ9aiy1gSWI/g7A1X6/P8/McqRtgt4dEYr4Zg8QO7Y7QdTpgNQEwu8ZrkyyG/7b/rSkfFHDjrOAHslLVXuBNwWgi8YW1aTn0rY2AqDbOri7u6tt9Q=
   file: src/$FINAL_NAME
   skip_cleanup: true
   on:
     repo: GoldenCheetah/GoldenCheetah
+
