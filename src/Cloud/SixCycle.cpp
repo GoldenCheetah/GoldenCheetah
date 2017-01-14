@@ -98,9 +98,13 @@ SixCycle::open(QStringList &errors)
     request.setHeader(QNetworkRequest::ContentTypeHeader,  "application/x-www-form-urlencoded");
     QNetworkReply *reply = nam->post(request, postData.toString(QUrl::FullyEncoded).toUtf8());
 
-    // blocking request - wait for response
+    // blocking request - wait for response, timeout after 5 seconds
     QEventLoop loop;
+
     connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    QTimer::singleShot(5000,&loop, SLOT(quit())); // timeout after 5 seconds
+
     loop.exec();
 
     if (reply->error() != QNetworkReply::NoError) {
@@ -111,8 +115,6 @@ SixCycle::open(QStringList &errors)
 
     // did we get a good response ?
     QByteArray r = reply->readAll();
-    printd("response: %s\n", r.toStdString().c_str());
-
     QJsonParseError parseError;
     QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
 
@@ -144,7 +146,8 @@ SixCycle::open(QStringList &errors)
         if (root_->isDir != true) errors << tr("root is not a directory.");
 
     } else {
-        errors << tr("problem parsing SixCycle authentication response.");
+        errors << tr("Problem with SixCycle authentication.");
+        printd("timed out, empty or invalid response.\n");
     }
 
     // ok so far ?
