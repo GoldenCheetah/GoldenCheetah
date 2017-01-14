@@ -618,6 +618,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Cloud/Dropbox.h
     SOURCES += Cloud/GoogleDrive.cpp
     HEADERS += Cloud/GoogleDrive.h
+    SOURCES += Cloud/SixCycle.cpp
+    HEADERS += Cloud/SixCycle.h
     SOURCES += Cloud/TodaysPlan.cpp
     HEADERS += Cloud/TodaysPlan.h
     SOURCES += Train/MonarkController.cpp Train/MonarkConnection.cpp

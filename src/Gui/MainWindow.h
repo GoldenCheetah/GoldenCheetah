@@ -211,6 +211,9 @@ class MainWindow : public QMainWindow
 
         void uploadGoogleDrive();
         void syncGoogleDrive();
+
+        void uploadSixCycle();
+        void syncSixCycle();
 #endif
         void uploadLocalFileStore();
         void syncLocalFileStore();

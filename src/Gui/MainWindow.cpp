@@ -80,6 +80,7 @@
 #if QT_VERSION > 0x050000
 #include "Dropbox.h"
 #include "GoogleDrive.h"
+#include "SixCycle.h"
 #endif
 #include "LocalFileStore.h"
 #include "FileStore.h"
@@ -459,6 +460,11 @@ MainWindow::MainWindow(const QDir &home)
                          SLOT(uploadTodaysPlan()), tr(""));
     shareMenu->addAction(tr("Synchronise Today's Plan..."), this,
                          SLOT(syncTodaysPlan()), tr(""));
+    shareMenu->addSeparator ();
+    shareMenu->addAction(tr("Upload to SixCycle"), this,
+                         SLOT(uploadSixCycle()), tr(""));
+    shareMenu->addAction(tr("Synchronise SixCycle..."), this,
+                         SLOT(syncSixCycle()), tr(""));
 #endif
 
 
@@ -2092,6 +2098,24 @@ MainWindow::syncGoogleDrive()
 {
     GoogleDrive gd(currentTab->context);
     FileStoreSyncDialog upload(currentTab->context, &gd);
+    upload.exec();
+}
+
+void
+MainWindow::uploadSixCycle()
+{
+    // upload current ride, if we have one
+    if (currentTab->context->ride) {
+        SixCycle tp(currentTab->context);
+        FileStore::upload(this, &tp, currentTab->context->ride);
+    }
+}
+
+void
+MainWindow::syncSixCycle()
+{
+    SixCycle db(currentTab->context);
+    FileStoreSyncDialog upload(currentTab->context, &db);
     upload.exec();
 }
 

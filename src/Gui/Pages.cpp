@@ -602,6 +602,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     //////////////////////////////////////////////////
     // SixCycle
 
+#if QT_VERSION > 0x050000 // only supported on QT5 or higher
     QLabel *sc = new QLabel(tr("SixCycle"));
     sc->setFont(current);
 
@@ -631,6 +632,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     grid->addWidget(scpassLabel, ++row, 0);
     grid->addWidget(scPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+#endif
 
     //////////////////////////////////////////////////
     // Cycling Analytics
@@ -1145,14 +1147,14 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_URL, tdpURL->text());
 #if QT_VERSION >= 0x050000 // only in QT5 or higher
+    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_USER, scUser->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_PASS, scPass->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_URL, scURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_FOLDER, dropboxFolder->text());
     appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER,
                            googleDriveFolder->text());
 #endif
     appsettings->setCValue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, networkFileStoreFolder->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_USER, scUser->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_PASS, scPass->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_URL, scURL->text());
 
     // escape the at character
     QString url = dvURL->text();
