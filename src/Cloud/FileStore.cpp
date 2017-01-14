@@ -44,7 +44,9 @@
 //
 
 // nothing doing in base class, for now
-FileStore::FileStore(Context *context) : uploadCompression(zip), downloadCompression(zip), useMetric(false), context(context)
+FileStore::FileStore(Context *context) :
+    uploadCompression(zip), downloadCompression(zip),
+    filetype(uploadType::JSON), useMetric(false), context(context)
 {
 }
 
@@ -172,9 +174,16 @@ FileStore::compressRide(RideFile*ride, QByteArray &data, QString name)
     tempfile.open();
     tempfile.close();
 
-    // write as json
+    // write as file type requested
+    QString spec;
+    switch(filetype) {
+        default:
+        case JSON: spec="json"; break;
+        case TCX: spec="tcx"; break;
+    }
+
     QFile jsonFile(tempfile.fileName());
-    if (RideFileFactory::instance().writeRideFile(NULL, ride, jsonFile, "json") == true) {
+    if (RideFileFactory::instance().writeRideFile(NULL, ride, jsonFile, spec) == true) {
 
         if (uploadCompression == zip) {
             // create a temp zip file
@@ -202,6 +211,7 @@ FileStore::compressRide(RideFile*ride, QByteArray &data, QString name)
             jsonFile.open(QFile::ReadOnly);
             data = gCompress(jsonFile.readAll());
         } else {
+            jsonFile.open(QFile::ReadOnly);
             data = jsonFile.readAll();
         }
     }
@@ -262,17 +272,20 @@ FileStore::uncompressRide(QByteArray *data, QString name, QStringList &errors)
 
 QString
 FileStore::uploadExtension() {
-    switch (uploadCompression) {
-        case zip:
-            return ".json.zip";
-
-        case gzip:
-            return ".json.gz";
-
-        case none:
+    QString spec;
+    switch (filetype) {
         default:
-            return ".json";
+        case JSON: spec = ".json"; break;
+        case TCX: spec = ".tcx"; break;
     }
+
+    switch (uploadCompression) {
+        case zip: spec += ".zip"; break;
+        case gzip: spec += ".gz"; break;
+        default:
+        case none: break;
+    }
+    return spec;
 }
 
 FileStoreUploadDialog::FileStoreUploadDialog(QWidget *parent, FileStore *store, RideItem *item) : QDialog(parent), store(store), item(item)

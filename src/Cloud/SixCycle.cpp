@@ -53,8 +53,11 @@ SixCycle::SixCycle(Context *context) : FileStore(context), context(context), roo
     nam = new QNetworkAccessManager(this);
     connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
-    uploadCompression = gzip; // gzip
+    // how is data uploaded and downloaded?
+    uploadCompression = none;
     downloadCompression = none;
+    filetype = FileStore::uploadType::TCX;
+
     session_token = ""; // not authenticated yet
 
     useMetric = true; // distance and duration metadata
@@ -316,44 +319,75 @@ SixCycle::writeFile(QByteArray &data, QString remotename)
         // we didn't get a token?
         if (session_token == "") return false;
     }
-    return false; //XXX not implemented yet!
 
-    // lets connect and get basic info on the root directory
-    QString url = QString("%1/rest/files/upload")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://whats.SixCycle.com.au").toString());
+    // Writing to SixCycle:
+    //
+    // curl -X POST -H "Authorization: Token b635be6030e563fc74840bdac7811f4e994c7b61" -F "rawFile=@running.fit" -F user="http://stg.sixcycle.com/api/v1/user/1174/" -v https://stg.sixcycle.com/api/v1/activitysummarydata/
+    //
+    // The -v tag means verbose and will provide all the protocol info. It should look something like this:
+    //
+    //> POST /api/v1/activitysummarydata/ HTTP/1.1
+    //> Host: stg.sixcycle.com
+    //> User-Agent: curl/7.50.3
+    //> Accept: */*
+    //> Authorization: Token b635be6030e563fc74840bdac7811f4e994c7b61
+    //> Content-Length: 36969
+    //> Expect: 100-continue
+    //> Content-Type: multipart/form-data; boundary=------------------------24675cd48c8a2baf
 
-    QNetworkRequest request = QNetworkRequest(url);
+    //The header content-type should be multipart/form-data and we have 2 fields, user and rawFile.
+    //The user field is a url given in the login response on success.
+
+    // set the target url
+    QString url = QString("%1/api/v1/activitysummarydata")
+          .arg(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
+    //url = "http://requestb.in/1bakg1q1";
+    printd("endpoint: '%s'\n", url.toStdString().c_str());
+
+    // create a request passing the session token and user
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", (QString("Token %1").arg(session_token)).toLatin1());
 
     // MULTIPART *****************
-
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+
+    // boundary is a random number
     QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
     multiPart->setBoundary(boundary.toLatin1());
+    printd("boundary: '%s'\n", boundary.toStdString().c_str());
 
-    //request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+    // set the user this is for
+    QHttpPart userPart;
+    userPart.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    userPart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                       QString("form-data; name=\"user\";"));
+    userPart.setBody(QByteArray(session_user.toLatin1()));
 
-    QHttpPart jsonPart;
-    jsonPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"json\""));
-    QString json = QString("{ filename: \"%1\" }").arg(remotename);
-    jsonPart.setBody(json.toLatin1());
+    // second part is the file (rawFile)
+    printd("user: %s\n", session_user.toStdString().c_str());
+    printd("remotename: %s\n", remotename.toStdString().c_str());
+    printd("data begins: %s ...\n", data.toStdString().substr(0,20).c_str());
 
-    QHttpPart attachmentPart;
-    attachmentPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"attachment\"; type=\"text/xml\""));
-    attachmentPart.setBody(data);
+    QHttpPart filePart;
+    filePart.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                       QString("form-data; name=\"rawFile\"; filename=\"%1\";").arg(remotename));
+    filePart.setBody(data);
 
-    multiPart->append(jsonPart);
-    multiPart->append(attachmentPart);
+    multiPart->append(filePart);
+    multiPart->append(userPart);
 
     // post the file
-    QNetworkReply *reply;
-
     reply = nam->post(request, multiPart);
+
+    multiPart->setParent(reply);
 
     // catch finished signal
     connect(reply, SIGNAL(finished()), this, SLOT(writeFileCompleted()));
 
     // remember
     mapReply(reply,remotename);
+
     return true;
 }
 
@@ -362,9 +396,9 @@ SixCycle::writeFileCompleted()
 {
     printd("SixCycle::writeFileCompleted()\n");
 
-    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    //QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s", reply->readAll().toStdString().c_str());
+    printd("reply:%s\n", reply->readAll().toStdString().c_str());
 
     if (reply->error() == QNetworkReply::NoError) {
         notifyWriteComplete(
