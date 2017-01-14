@@ -600,6 +600,39 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     connect(tdpAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTodaysPlan()));
 
     //////////////////////////////////////////////////
+    // SixCycle
+
+    QLabel *sc = new QLabel(tr("SixCycle"));
+    sc->setFont(current);
+
+    // SixCycle can be on a staging or private tenant
+    QLabel *scurllabel = new QLabel("API URL"); // don't translate a technical term
+    scURL = new QLineEdit(this);
+    scURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
+
+    QLabel *scuserLabel = new QLabel(tr("Username"));
+    QLabel *scpassLabel = new QLabel(tr("Password"));
+
+    scUser = new QLineEdit(this);
+    scUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_USER, "").toString());
+
+    scPass = new QLineEdit(this);
+    scPass->setEchoMode(QLineEdit::Password);
+    scPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_PASS, "").toString());
+
+    // add widgets to layout
+    grid->addWidget(sc, ++row, 0);
+
+    grid->addWidget(scurllabel, ++row, 0);
+    grid->addWidget(scURL, row, 1, 0 /*Qt::AlignLeft | Qt::AlignVCenter*/);
+
+    grid->addWidget(scuserLabel, ++row, 0);
+    grid->addWidget(scUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(scpassLabel, ++row, 0);
+    grid->addWidget(scPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    //////////////////////////////////////////////////
     // Cycling Analytics
 
 
@@ -1117,6 +1150,9 @@ CredentialsPage::saveClicked()
                            googleDriveFolder->text());
 #endif
     appsettings->setCValue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, networkFileStoreFolder->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_USER, scUser->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_PASS, scPass->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_URL, scURL->text());
 
     // escape the at character
     QString url = dvURL->text();
