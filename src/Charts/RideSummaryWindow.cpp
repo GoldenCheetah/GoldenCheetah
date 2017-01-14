@@ -1538,14 +1538,8 @@ RideSummaryWindow::htmlSummary()
             summary += " <li>" + i.next();
         summary += "</ul>";
     }
-    summary += "<br><hr width=\"80%\">";
+    summary += "<br></center>";
 
-    // The extra <center> works around a bug in QT 4.3.1,
-    // which will otherwise put the following above the <hr>.
-    summary += tr("<br>BikeScore and SwimScore are trademarks of Dr. Philip "
-        "Friere Skiba, PhysFarm Training Systems LLC");
-
-    summary += tr("<br>FTP, TSS, NP and IF are trademarks of Peaksware LLC</center>");
     return summary;
 }
 
@@ -2563,14 +2557,8 @@ RideSummaryWindow::htmlCompareSummary() const
     }
 
     // add the usual disclaimers etc at the bottom
-    summary += "<br><hr width=\"80%\">";
+    summary += "<br></center>";
 
-    // The extra <center> works around a bug in QT 4.3.1,
-    // which will otherwise put the following above the <hr>.
-    summary += tr("<br>BikeScore is a trademark of Dr. Philip "
-        "Friere Skiba, PhysFarm Training Systems LLC");
-
-    summary += tr("<br>FTP, TSS, NP and IF are trademarks of Peaksware LLC</center>");
     return summary;
 }
 
