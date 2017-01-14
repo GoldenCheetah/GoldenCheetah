@@ -108,7 +108,7 @@ after_success:
 - echo "Cleaning up installed QT libraries from $QT"
 - brew remove $QT
 - echo "Renaming dmg file to branch and build number ready for deploy"
-- export FINAL_NAME=master-build-${TRAVIS_BUILD_NUMBER}.dmg
+- export FINAL_NAME=dev-prerelease-branch-master-build-${TRAVIS_BUILD_NUMBER}.dmg
 - mv GoldenCheetah.dmg $FINAL_NAME
 - ls -l $FINAL_NAME
 - echo "Mounting dmg file and testing it can execute"
