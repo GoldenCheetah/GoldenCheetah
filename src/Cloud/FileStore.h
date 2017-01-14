@@ -150,12 +150,14 @@ class FileStoreUploadDialog : public QDialog
         QPushButton *okcancel;      // cancel whilst occurring, ok once done
 
     public slots:
+        int exec();
         void completed(QString name, QString message);
 
     private:
         FileStore *store;
         RideItem *item;
         QByteArray data;            // compressed data to upload
+        bool status;                // did upload get kicked off ok?
 };
 
 // XXX a better approach might be to reimplement QFileSystemModel on 

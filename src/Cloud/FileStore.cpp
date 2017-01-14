@@ -296,11 +296,38 @@ FileStoreUploadDialog::FileStoreUploadDialog(QWidget *parent, FileStore *store, 
     buttons->addWidget(okcancel);
     layout->addLayout(buttons);
 
+    // ok, so now we can kickoff the upload
+    status = store->writeFile(data, QFileInfo(item->fileName).baseName() + store->uploadExtension());
+
+    if (status == false) {
+
+        // didn't work dude
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(tr("Upload Failed") + store->name());
+        msgBox.setText(tr("Unable to upload, check your configuration in preferences."));
+
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+
+        QWidget::hide(); // don't show just yet...
+        QApplication::processEvents();
+
+        return;
+    }
+
     // get notification when done
     connect(store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completed(QString,QString)));
 
-    // ok, so now we can kickoff the upload
-    store->writeFile(data, QFileInfo(item->fileName).baseName() + store->uploadExtension());
+}
+
+int
+FileStoreUploadDialog::exec()
+{
+    if (status) return QDialog::exec();
+    else {
+        QDialog::accept();
+        return 0;
+    }
 }
 
 void
