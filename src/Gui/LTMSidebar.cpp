@@ -223,11 +223,13 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     summary = new QWebEngineView(this);
     summary->setContentsMargins(0,0,0,0);
     summary->page()->view()->setContentsMargins(0,0,0,0);
+    summary->page()->profile()->setHttpCacheType(QWebEngineProfile::NoCache);
     //XXX WEBENGINEsummary->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
     summary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     summary->setAcceptDrops(false);
     summary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize());
     summary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
+
 #else
     summary = new QWebView(this);
     summary->setContentsMargins(0,0,0,0);

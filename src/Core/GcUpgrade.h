@@ -26,6 +26,7 @@
 #ifdef NOWEBKIT
 #include <QWebEngineView>
 #include <QWebEngineSettings>
+#include <QWebEngineProfile>
 #else
 #include <QWebView>
 #include <QWebFrame>

@@ -41,6 +41,10 @@
 #include "PDModel.h"
 #include "HelpWhatsThis.h"
 
+#ifdef NOWEBKIT
+#include <QWebEngineProfile>
+#endif
+
 #include <QtGui>
 #include <QLabel>
 
@@ -92,6 +96,7 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
 
  #ifdef NOWEBKIT
     rideSummary = new QWebEngineView(this);
+    rideSummary->page()->profile()->setHttpCacheType(QWebEngineProfile::NoCache);
  #else
     rideSummary = new QWebView(this);
  #endif

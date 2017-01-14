@@ -136,6 +136,7 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
     report->setAcceptDrops(false);
     report->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
     report->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
+    report->page()->profile()->setHttpCacheType(QWebEngineProfile::NoCache);
 #else
     report = new QWebView(this);
     report->setContentsMargins(0,0,0,0);
