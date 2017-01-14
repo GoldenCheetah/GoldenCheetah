@@ -124,4 +124,4 @@ deploy:
   file: src/$FINAL_NAME
   skip_cleanup: true
   on:
-    repo: arunh/GoldenCheetah
+    repo: GoldenCheetah/GoldenCheetah
