@@ -274,6 +274,10 @@ class CredentialsPage : public QScrollArea
 
         QLineEdit *tdpURL;
 
+        QLineEdit *scURL;
+        QLineEdit *scUser;
+        QLineEdit *scPass;
+
         QLineEdit *rideWithGPSUser;
         QLineEdit *rideWithGPSPass;
 
