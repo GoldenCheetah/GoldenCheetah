@@ -711,7 +711,7 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
 
                 bool firsts=true;
                 foreach(XDataPoint *p, series->datapoints) {
-                    if (!firsts) out+ ",\n";
+                    if (!firsts) out += ",\n";
 
                     // multi value sample
                     if (series->valuename.count()>1) {
