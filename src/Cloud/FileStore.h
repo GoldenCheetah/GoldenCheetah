@@ -112,6 +112,7 @@ class FileStore : public QObject {
 
         CompressionType uploadCompression;
         CompressionType downloadCompression;
+        enum uploadType { JSON, TCX } filetype;
 
         bool useMetric; // FileStore know distance or duration metadata (eg Today's Plan)
 
