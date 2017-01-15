@@ -73,8 +73,6 @@ AboutPage::AboutPage(Context *context) : context(context)
                 "<p>Activity files and other data are stored in<br>"
                 "<a href=\"%1\">%2</a>"
                 "<p>Trademarks used with permission<br>"
-                "TSS, NP, IF courtesy of <a href=\"http://www.peaksware.com\">"
-                "Peaksware LLC</a>.<br>"
                 "BikeScore, xPower, SwimScore courtesy of <a href=\"http://www.physfarm.com\">"
                 "Physfarm Training Systems</a>.<br>"
                 "Virtual Speed courtesy of Tom Compton <a href=\"http://www.analyticcycling.com\">"
@@ -124,6 +122,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Andrew Bryson");
     contributors.append("Andy Froncioni");
     contributors.append("Antonius Riha");
+    contributors.append("Arun Horne");
     contributors.append("Austin Roach");
     contributors.append("Berend De Schouwer");
     contributors.append("Bruno Assis");

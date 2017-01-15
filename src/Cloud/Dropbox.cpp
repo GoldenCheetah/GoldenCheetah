@@ -138,7 +138,7 @@ Dropbox::readdir(QString path, QStringList &errors)
     }
 
     // lets connect and get basic info on the root directory
-    QString url("https://api.dropboxapi.com/1/metadata/auto" + path + "?include_deleted=false&list=true");
+    QString url("https://api.dropboxapi.com/1/metadata/auto/" + path + "?include_deleted=false&list=true");
 
     // request using the bearer token
     QNetworkRequest request(url);
@@ -172,6 +172,7 @@ Dropbox::readdir(QString path, QStringList &errors)
             add->name = QFileInfo(each.toObject()["path"].toString()).fileName();
             add->isDir = each.toObject()["is_dir"].toBool();
             add->size = each.toObject()["bytes"].toInt();
+            add->id = add->name;
 
             // dates in format "Tue, 19 Jul 2011 21:55:38 +0000"
             add->modified = QDateTime::fromString(each.toObject()["modified"].toString().mid(0,25),
@@ -187,7 +188,7 @@ Dropbox::readdir(QString path, QStringList &errors)
 
 // read a file at location (relative to home) into passed array
 bool
-Dropbox::readFile(QByteArray *data, QString remotename)
+Dropbox::readFile(QByteArray *data, QString remotename, QString)
 {
     // this must be performed asyncronously and call made
     // to notifyReadComplete(QByteArray &data, QString remotename, QString message) when done

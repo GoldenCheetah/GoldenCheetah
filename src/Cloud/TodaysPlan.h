@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Joern Rischmueller (joern.rm@gmail.com)
+ * Copyright (c) 2016 Damien.Grauser (damien.grauser@pev-geneve.ch)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,21 +16,23 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef GC_LocalFileStore_h
-#define GC_LocalFileStore_h
+#ifndef GC_TodaysPlan_h
+#define GC_TodaysPlan_h
 
 #include "FileStore.h"
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
 
-class LocalFileStore : public FileStore {
+class TodaysPlan : public FileStore {
 
     Q_OBJECT
 
     public:
 
-        LocalFileStore(Context *context);
-        ~LocalFileStore();
+        TodaysPlan(Context *context);
+        ~TodaysPlan();
 
-        QString name() { return (tr("Local Store ") + home()); }
+        QString name() { return (tr("Today's Plan")); }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);
@@ -39,22 +41,37 @@ class LocalFileStore : public FileStore {
         // home directory
         QString home();
 
-        // write a file 
+        // write a file
         bool writeFile(QByteArray &data, QString remotename);
 
         // read a file
-        bool readFile(QByteArray *data, QString remotename, QString);
+        bool readFile(QByteArray *data, QString remotename, QString remoteid);
 
         // create a folder
-        bool createFolder(QString path);
+        bool createFolder(QString);
 
         // dirent style api
         FileStoreEntry *root() { return root_; }
-        QList<FileStoreEntry*> readdir(QString path, QStringList &errors);
+        QList<FileStoreEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
+
+    public slots:
+
+        // getting data
+        void readyRead(); // a readFile operation has work to do
+        void readFileCompleted();
+
+        // sending data
+        void writeFileCompleted();
 
     private:
         Context *context;
+        QNetworkAccessManager *nam;
+        QNetworkReply *reply;
         FileStoreEntry *root_;
 
+        QMap<QNetworkReply*, QByteArray*> buffers;
+
+    private slots:
+        void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
 };
 #endif

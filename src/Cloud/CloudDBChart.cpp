@@ -56,11 +56,12 @@ CloudDBChartClient::CloudDBChartClient()
 
     // common definitions used
 
-    g_chart_url_base = g_chart_url_header = g_chartcuration_url_base = CloudDBCommon::cloudDBBaseURL;
+    g_chart_url_base = g_chart_url_header = g_chartcuration_url_base = g_chartdownloadincr_url_base = CloudDBCommon::cloudDBBaseURL;
 
     g_chart_url_base.append("gchart/");
     g_chart_url_header.append("gchartheader");
     g_chartcuration_url_base.append("gchartcuration/");
+    g_chartdownloadincr_url_base.append("gchartuse/");
 
 }
 CloudDBChartClient::~CloudDBChartClient() {
@@ -200,7 +201,7 @@ CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
     CloudDBCommon::prepareRequest(request, g_chartcuration_url_base+QString::number(id, 10), &query);
 
     // add a payload to "PUT" even though it's not processed
-    g_reply = g_nam->put(request, "{ \"id\": \"dummy\"");
+    g_reply = g_nam->put(request, "{ \"id\": \"dummy\" }");
 
     // wait for reply (synchronously) and process error codes as necessary
     if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
@@ -208,6 +209,17 @@ CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
     deleteChartCache(id);
     return true;
 }
+
+void
+CloudDBChartClient::incrementDownloadCounterByID(qint64 id) {
+
+    QNetworkRequest request;
+    CloudDBCommon::prepareRequest(request, g_chartdownloadincr_url_base+QString::number(id, 10));
+    g_reply = g_nam->put(request, "{ \"id\": \"dummy\" }");
+
+    // ignore any errors or reply - user does not need to be informed in case of problems
+}
+
 
 
 bool
@@ -458,6 +470,9 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    curationStateCombo->addItem(tr("All"));
    curationStateCombo->addItem(tr("Curated Only"));
    curationStateCombo->addItem(tr("Uncurated Only"));
+
+   // default to curated charts only
+   curationStateCombo->setCurrentIndex(1);
 
    connect(curationStateCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(curationStateFilterChanged(int)));
 
@@ -832,6 +847,9 @@ CloudDBChartListDialog::addAndCloseClicked() {
                 }
 #endif
                 g_selected << g_currentPresets->at(s->row()).gchartDef;
+
+                // increment download counter
+                g_client->incrementDownloadCounterByID(g_currentPresets->at(s->row()).id);
             }
         }
         accept();

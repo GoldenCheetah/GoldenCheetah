@@ -84,7 +84,7 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
 
     // the dialog box for the chart settings
     chartSettings = new ChartSettings(this, masterControls);
-    chartSettings->setMaximumWidth(450);
+    chartSettings->setMaximumWidth(650);
     chartSettings->setMaximumHeight(600);
     chartSettings->hide();
 

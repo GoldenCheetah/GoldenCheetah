@@ -52,7 +52,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 } else {
 
     ## QT5 modules we use
-    QT += widgets concurrent serialport
+    QT += widgets concurrent serialport multimedia multimediawidgets
 
     ## If building with QT5 there is experimental suport for building
     ## with WebEngine now that WebKit is deprecated in QT 5.6
@@ -72,7 +72,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
         QT += macextras webengine webenginecore webenginewidgets positioning
 
     } else {
-        QT += multimedia multimediawidgets
+
     }
 }
 
@@ -575,9 +575,12 @@ equals(CloudDB, active) {
         greaterThan(QT_MINOR_VERSION, 4) {
 
             HEADERS += Cloud/CloudDBChart.h Cloud/CloudDBCommon.h \
-                       Cloud/CloudDBCurator.h Cloud/CloudDBStatus.h
+                       Cloud/CloudDBCurator.h Cloud/CloudDBStatus.h \
+                       Cloud/CloudDBVersion.h Cloud/CloudDBTelemetry.h
             SOURCES += Cloud/CloudDBChart.cpp Cloud/CloudDBCommon.cpp \
-                       Cloud/CloudDBCurator.cpp Cloud/CloudDBStatus.cpp
+                       Cloud/CloudDBCurator.cpp Cloud/CloudDBStatus.cpp \
+                       Cloud/CloudDBVersion.cpp Cloud/CloudDBTelemetry.cpp
+
             DEFINES += GC_HAS_CLOUD_DB
 
         } else {
@@ -615,6 +618,10 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Cloud/Dropbox.h
     SOURCES += Cloud/GoogleDrive.cpp
     HEADERS += Cloud/GoogleDrive.h
+    SOURCES += Cloud/SixCycle.cpp
+    HEADERS += Cloud/SixCycle.h
+    SOURCES += Cloud/TodaysPlan.cpp
+    HEADERS += Cloud/TodaysPlan.h
     SOURCES += Train/MonarkController.cpp Train/MonarkConnection.cpp
     HEADERS += Train/MonarkController.h Train/MonarkConnection.h
     SOURCES += Train/Kettler.cpp Train/KettlerController.cpp Train/KettlerConnection.cpp

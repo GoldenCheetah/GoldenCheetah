@@ -83,6 +83,7 @@ RTool::RTool()
         R_CMethodDef cMethods[] = {
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 ,0, 0 },
             { "GC.page", (DL_FUNC) &RTool::pageSize, 0 ,0, 0 },
+            { "GC.size", (DL_FUNC) &RTool::windowSize, 0 ,0, 0 },
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 ,0, 0 },
             { "GC.athlete.zones", (DL_FUNC) &RTool::zones, 0 ,0, 0 },
             { "GC.activities", (DL_FUNC) &RTool::activities, 0 ,0, 0 },
@@ -101,6 +102,7 @@ RTool::RTool()
         R_CallMethodDef callMethods[] = {
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 },
             { "GC.page", (DL_FUNC) &RTool::pageSize, 2 },
+            { "GC.size", (DL_FUNC) &RTool::windowSize, 0 },
 
             // athlete
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 },
@@ -150,7 +152,8 @@ RTool::RTool()
 
                                 // graphics device
                                "GC.display <- function() { .Call(\"GC.display\") }\n"
-                               "GC.page <- function(width=500, height=500) { .Call(\"GC.page\", width, height) }\n"
+                               "GC.page <- function(width=0, height=0) { .Call(\"GC.page\", width, height) }\n"
+                               "GC.size <- function() { .Call(\"GC.size\") }\n"
 
                                // athlete
                                "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
@@ -730,6 +733,19 @@ RTool::pageSize(SEXP width, SEXP height)
 
     // fail
     return Rf_allocVector(INTSXP, 0);
+}
+
+SEXP
+RTool::windowSize()
+{
+    // return a vector of width, height
+    SEXP ans;
+    PROTECT(ans = Rf_allocVector(INTSXP, 2));
+    INTEGER(ans)[0] = rtool->chart ? rtool->chart->geometry().width() : 500;
+    INTEGER(ans)[1] = rtool->chart ? rtool->chart->geometry().height() : 500;
+    UNPROTECT(1);
+
+    return ans;
 }
 
 SEXP

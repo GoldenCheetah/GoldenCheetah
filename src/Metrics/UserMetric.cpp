@@ -33,6 +33,8 @@ UserMetric::UserMetric(Context *context, UserMetricSettings settings)
     finit = rt->functions.contains("init") ? rt->functions.value("init") : NULL;
     frelevant = rt->functions.contains("relevant") ? rt->functions.value("relevant") : NULL;
     fsample = rt->functions.contains("sample") ? rt->functions.value("sample") : NULL;
+    fbefore = rt->functions.contains("before") ? rt->functions.value("before") : NULL;
+    fafter = rt->functions.contains("after") ? rt->functions.value("after") : NULL;
     fvalue = rt->functions.contains("value") ? rt->functions.value("value") : NULL;
     fcount = rt->functions.contains("count") ? rt->functions.value("count") : NULL;
 
@@ -50,6 +52,8 @@ UserMetric::UserMetric(const UserMetric *from) : RideMetric()
     this->finit = from->finit;
     this->frelevant = from->frelevant;
     this->fsample = from->fsample;
+    this->fbefore = from->fbefore;
+    this->fafter = from->fafter;
     this->fvalue = from->fvalue;
     this->fcount = from->fcount;
 
@@ -225,6 +229,16 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
         return;
     }
 
+    //qDebug()<<"BEFORE";
+    if (!spec.isEmpty(item->ride()) && fbefore) {
+        RideFileIterator it(item->ride(), spec, RideFileIterator::Before);
+
+        while(it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            root->eval(rt, fbefore, 0, const_cast<RideItem*>(item), point, c);
+        }
+    }
+
     //qDebug()<<"SAMPLE";
     // process samples, if there are any and a function exists
     if (!spec.isEmpty(item->ride()) && fsample) {
@@ -235,6 +249,17 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
             root->eval(rt, fsample, 0, const_cast<RideItem*>(item), point, c);
         }
     }
+
+    //qDebug()<<"AFTER";
+    if (!spec.isEmpty(item->ride()) && fafter) {
+        RideFileIterator it(item->ride(), spec, RideFileIterator::After);
+
+        while(it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            root->eval(rt, fafter, 0, const_cast<RideItem*>(item), point, c);
+        }
+    }
+
 
     //qDebug()<<"VALUE";
     // value ?

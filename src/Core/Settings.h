@@ -151,6 +151,9 @@
 #define GC_SWIMPACE                     "<global-general>swimpace"
 #define GC_ELEVATION_HYSTERESIS         "<global-general>elevationHysteresis"
 #define GC_UNIT                         "<global-general>unit"
+#define GC_ALLOW_TELEMETRY              "<global-general>telemetry"
+#define GC_ALLOW_TELEMETRY_DATE         "<global-general>telemetryDate"
+#define GC_LAST_VERSION_CHECKED         "<global-general>lastVersionChecked"
 
 
 
@@ -191,6 +194,8 @@
 #define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
 #define TRAIN_AUTOCONNECT               "<global-trainmode>train/autoconnect"
+#define TRAIN_AUTOHIDE                  "<global-trainmode>train/autohide"
+#define TRAIN_LAPALERT                  "<global-trainmode>train/lapalert"
 #define GC_REMOTE_START                 "<global-trainmode>remote/start"
 #define GC_REMOTE_STOP                  "<global-trainmode>remote/stop"
 #define GC_REMOTE_LAP                   "<global-trainmode>remote/lap"
@@ -292,6 +297,11 @@
 #define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
 //Today's Plan
 #define GC_TODAYSPLAN_TOKEN             "<athlete-private>todaysplan_token"
+#define GC_TODAYSPLAN_URL               "<athlete-private>todaysplan_url"
+//SixCycle
+#define GC_SIXCYCLE_USER                "<athlete-private>sixcycle_user"
+#define GC_SIXCYCLE_PASS                "<athlete-private>sixcycle_pass"
+#define GC_SIXCYCLE_URL                 "<athlete-private>sixcycle_url"
 
 // --------------------------------------------------------------------------------
 #include <QSettings>

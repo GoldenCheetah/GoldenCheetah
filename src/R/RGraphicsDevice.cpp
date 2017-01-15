@@ -93,14 +93,19 @@ void RGraphicsDevice::NewPage(const pGEcontext, pDevDesc pDev)
     // fire event (pass previousPageSnapshot)
     if (!rtool || !rtool->canvas) return;
 
-    // clear the scene
-    rtool->canvas->newPage();
+    // canvas size?
+    int w = rtool->chart ? rtool->chart->geometry().width() : 500;
+    int h = rtool->chart ? rtool->chart->geometry().height() : 500;
 
     // set the page size to user preference
     pDev->left = 0;
-    pDev->right = rtool->width;
+    pDev->right = rtool->width ? rtool->width : w;
     pDev->bottom = 0;
-    pDev->top = rtool->height;
+    pDev->top = rtool->height ? rtool->height : h;
+
+    // clear the scene
+    rtool->canvas->newPage();
+
 }
 
 Rboolean RGraphicsDevice::NewFrameConfirm_(pDevDesc)
@@ -121,10 +126,13 @@ void RGraphicsDevice::Mode(int, pDevDesc)
 
 void RGraphicsDevice::Size(double *left, double *right, double *bottom, double *top, pDevDesc)
 {
+    int w = rtool->chart ? rtool->chart->geometry().width() : 500;
+    int h = rtool->chart ? rtool->chart->geometry().height() : 500;
+
     *left = 0.0f;
-    *right = rtool->width;
+    *right = rtool->width ? rtool->width : w;
     *bottom = 0.0f; //XXXs_height;
-    *top = rtool->height;
+    *top = rtool->height ? rtool->height : h;
 }
 
 void RGraphicsDevice::Clip(double , double , double , double , pDevDesc)

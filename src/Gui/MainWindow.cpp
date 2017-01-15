@@ -68,6 +68,7 @@
 #include "TwitterDialog.h"
 #endif
 #include "ShareDialog.h"
+#include "TodaysPlan.h"
 #include "WithingsDownload.h"
 #include "WorkoutWizard.h"
 #include "ErgDBDownloadDialog.h"
@@ -79,6 +80,7 @@
 #if QT_VERSION > 0x050000
 #include "Dropbox.h"
 #include "GoogleDrive.h"
+#include "SixCycle.h"
 #endif
 #include "LocalFileStore.h"
 #include "FileStore.h"
@@ -107,6 +109,8 @@
 #include "CloudDBChart.h"
 #include "CloudDBCurator.h"
 #include "CloudDBStatus.h"
+#include "CloudDBTelemetry.h"
+#include "CloudDBVersion.h"
 #include "GcUpgrade.h"
 #endif
 
@@ -300,6 +304,7 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(sidebar);
     head->addWidget(lowbar);
     head->addWidget(styleSelector);
+    head->setFixedHeight(scopebar->height() + 7);
 
     // add a search box on far right, but with a little space too
     searchBox = new SearchFilterBox(this,context,false);
@@ -450,7 +455,18 @@ MainWindow::MainWindow(const QDir &home)
                          SLOT(uploadGoogleDrive()), tr(""));
     shareMenu->addAction(tr("Synchronise GoogleDrive..."), this,
                          SLOT(syncGoogleDrive()), tr("Ctrl+P"));
+    shareMenu->addSeparator ();
+    shareMenu->addAction(tr("Upload to Today's Plan"), this,
+                         SLOT(uploadTodaysPlan()), tr(""));
+    shareMenu->addAction(tr("Synchronise Today's Plan..."), this,
+                         SLOT(syncTodaysPlan()), tr(""));
+    shareMenu->addSeparator ();
+    shareMenu->addAction(tr("Upload to SixCycle"), this,
+                         SLOT(uploadSixCycle()), tr(""));
+    shareMenu->addAction(tr("Synchronise SixCycle..."), this,
+                         SLOT(syncSixCycle()), tr(""));
 #endif
+
 
     HelpWhatsThis *helpShare = new HelpWhatsThis(rideMenu);
     shareMenu->setWhatsThis(helpShare->getWhatsThisText(HelpWhatsThis::MenuBar_Share));
@@ -607,6 +623,36 @@ MainWindow::MainWindow(const QDir &home)
     configChanged(CONFIG_APPEARANCE);
 
     init = true;
+
+    /*----------------------------------------------------------------------
+     * Lets ask for telemetry and check for updates
+     *--------------------------------------------------------------------*/
+
+#ifdef GC_HAS_CLOUD_DB
+
+#if 0  // temporarily de-activated
+    if (appsettings->value(NULL, GC_ALLOW_TELEMETRY, "undefined").toString() == "undefined" ) {
+        // ask user if storing is allowed
+
+        // check for Telemetry Storage acceptance
+        CloudDBAcceptTelemetryDialog acceptDialog;
+        acceptDialog.setModal(true);
+        if (acceptDialog.exec() == QDialog::Accepted) {
+            CloudDBTelemetryClient::storeTelemetry();
+        };
+    }
+#endif
+
+    QList<VersionAPIGetV1> versions = CloudDBVersionClient::getLatestVersions();
+    if (versions.count() > 0) {
+        CloudDBUpdateAvailableDialog updateAvailableDialog(versions);
+        updateAvailableDialog.setModal(true);
+        // we are not interested in the result - update check status is updated as part of the dialog box
+        updateAvailableDialog.exec();
+    }
+
+#endif
+
 }
 
 
@@ -2054,6 +2100,42 @@ MainWindow::syncGoogleDrive()
     FileStoreSyncDialog upload(currentTab->context, &gd);
     upload.exec();
 }
+
+void
+MainWindow::uploadSixCycle()
+{
+    // upload current ride, if we have one
+    if (currentTab->context->ride) {
+        SixCycle tp(currentTab->context);
+        FileStore::upload(this, &tp, currentTab->context->ride);
+    }
+}
+
+void
+MainWindow::syncSixCycle()
+{
+    SixCycle db(currentTab->context);
+    FileStoreSyncDialog upload(currentTab->context, &db);
+    upload.exec();
+}
+
+void
+MainWindow::uploadTodaysPlan()
+{
+    // upload current ride, if we have one
+    if (currentTab->context->ride) {
+        TodaysPlan tp(currentTab->context);
+        FileStore::upload(this, &tp, currentTab->context->ride);
+    }
+}
+
+void
+MainWindow::syncTodaysPlan()
+{
+    TodaysPlan db(currentTab->context);
+    FileStoreSyncDialog upload(currentTab->context, &db);
+    upload.exec();
+}
 #endif
 
 /*----------------------------------------------------------------------
@@ -2091,11 +2173,14 @@ void
 MainWindow::configChanged(qint32)
 {
 
-// Windows
-#ifdef WIN32
+// Windows and Linux menu bar should match chrome
+#if defined (WIN32) || defined (Q_OS_LINUX)
+    QColor textCol(Qt::black);
+    if (GCColor::luminance(GColor(CCHROME)) < 127)  textCol = QColor(Qt::white);
     QString menuColorString = (GCColor::isFlat() ? GColor(CCHROME).name() : "rgba(225,225,225)");
-    menuBar()->setStyleSheet(QString("QMenuBar { color: black; background: %1; }"
-                             "QMenuBar::item { color: black; background: %1; }").arg(menuColorString));
+    menuBar()->setStyleSheet(QString("QMenuBar { color: %1; background: %2; }"
+                             "QMenuBar::item { color: %1; background: %2; }")
+                             .arg(textCol.name()).arg(menuColorString));
 #endif
 
 // Mac and Linux

@@ -51,7 +51,7 @@ class GoogleDrive : public FileStore {
         virtual bool writeFile(QByteArray &data, QString remotename);
 
         // read a file
-        virtual bool readFile(QByteArray *data, QString remotename);
+        virtual bool readFile(QByteArray *data, QString remotename, QString);
 
         // create a folder
         virtual bool createFolder(QString path);

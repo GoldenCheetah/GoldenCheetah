@@ -272,6 +272,12 @@ class CredentialsPage : public QScrollArea
         QPushButton *cyclingAnalyticsAuthorise, *cyclingAnalyticsAuthorised;
         QPushButton *googleCalendarAuthorise, *googleCalendarAuthorised;
 
+        QLineEdit *tdpURL;
+
+        QLineEdit *scURL;
+        QLineEdit *scUser;
+        QLineEdit *scPass;
+
         QLineEdit *rideWithGPSUser;
         QLineEdit *rideWithGPSPass;
 
@@ -364,9 +370,23 @@ class DevicePage : public QWidget
         QVBoxLayout *mainLayout;
 
         deviceModel *deviceListModel;
+};
 
+class TrainOptionsPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+    public:
+        TrainOptionsPage(QWidget *parent, Context *context);
+        qint32 saveClicked();
+
+    private:
+        Context     *context;
         QCheckBox   *multiCheck;
         QCheckBox   *autoConnect;
+        QCheckBox   *autoHide;
+        QCheckBox   *lapAlert;
 };
 
 class RemotePage : public QWidget

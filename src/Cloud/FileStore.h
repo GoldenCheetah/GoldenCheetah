@@ -79,8 +79,8 @@ class FileStore : public QObject {
         void notifyWriteComplete(QString name,QString message) { emit writeComplete(name,message); }
 
         // read a file  and notify when done
-        virtual bool readFile(QByteArray *data, QString remotename) {
-            Q_UNUSED(data); Q_UNUSED(remotename); return false;
+        virtual bool readFile(QByteArray *data, QString remotename, QString remoteid) {
+            Q_UNUSED(data); Q_UNUSED(remotename); Q_UNUSED(remoteid); return false;
         }
         void notifyReadComplete(QByteArray *data, QString name, QString message) { emit readComplete(data,name,message); }
 
@@ -91,15 +91,31 @@ class FileStore : public QObject {
         virtual QList<FileStoreEntry*> readdir(QString path, QStringList &errors) { 
             Q_UNUSED(path); errors << "not implemented."; return QList<FileStoreEntry*>(); 
         }
+        virtual QList<FileStoreEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to) {
+            Q_UNUSED(from);
+            Q_UNUSED(to);
+            return readdir(path, errors);
+        }
 
         // UTILITY
         void mapReply(QNetworkReply *reply, QString name) { replymap_.insert(reply,name); }
         QString replyName(QNetworkReply *reply) { return replymap_.value(reply,""); }
         void compressRide(RideFile*ride, QByteArray &data, QString name);
         RideFile *uncompressRide(QByteArray *data, QString name, QStringList &errors);
+        QString uploadExtension();
 
         // PUBLIC INTERFACES. DO NOT REIMPLEMENT
         static bool upload(QWidget *parent, FileStore *store, RideItem*);
+
+        enum compression { none, zip, gzip };
+        typedef enum compression CompressionType;
+
+        CompressionType uploadCompression;
+        CompressionType downloadCompression;
+        enum uploadType { JSON, TCX } filetype;
+
+        bool useMetric; // FileStore know distance or duration metadata (eg Today's Plan)
+        bool useEndDate; // Dates for file entries use end date time not start (weird, I know, but thats how SixCycle work)
 
     signals:
         void writeComplete(QString name, QString message);
@@ -136,12 +152,14 @@ class FileStoreUploadDialog : public QDialog
         QPushButton *okcancel;      // cancel whilst occurring, ok once done
 
     public slots:
+        int exec();
         void completed(QString name, QString message);
 
     private:
         FileStore *store;
         RideItem *item;
         QByteArray data;            // compressed data to upload
+        bool status;                // did upload get kicked off ok?
 };
 
 // XXX a better approach might be to reimplement QFileSystemModel on 
@@ -236,6 +254,7 @@ class FileStoreSyncDialog : public QDialog
     private:
         Context *context;
         FileStore *store;
+        QList<FileStoreEntry*> workouts;
 
         bool downloading;
         bool sync;
@@ -301,9 +320,13 @@ class FileStoreEntry
         // THESE MEMBERS NEED TO BE MAINTAINED BY
         // THE FILESTORE IMPLEMENTATION (Dropbox, Google etc)
         QString name;                       // file name
+        QString label;                      // alternate name
+        QString id;                         // file id
         bool isDir;                         // is a directory
         unsigned long size;                 // my size
         QDateTime modified;                 // last modification date
+        double distance;                    // distance (km)
+        long duration;                      // duration (secs)
 
         // This is just file metadata written by the implementation.
         //QMap<QString, QString> metadata;

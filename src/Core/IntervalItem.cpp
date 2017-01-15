@@ -97,7 +97,9 @@ IntervalItem::refresh()
     metrics_.fill(0, factory.metricCount());
 
     // ok, lets collect the metrics
-    QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(rideItem_, Specification(this, f->recIntSecs()), factory.allMetrics());
+    QHash<QString,RideMetricPtr> computed=RideMetric::computeMetrics(rideItem_, Specification(this, f->recIntSecs()), factory.allMetrics());
+    // take a deep copy, quick before the thread exits.
+    //XXXcomputed.detach();
 
     // snaffle away all the computed values into the array
     QHashIterator<QString, RideMetricPtr> i(computed);

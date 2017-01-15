@@ -168,6 +168,7 @@ class TrainConfig : public QWidget
         Context *context;
 
         DevicePage *devicePage;
+        TrainOptionsPage *optionsPage;
         RemotePage *remotePage;
 };
 

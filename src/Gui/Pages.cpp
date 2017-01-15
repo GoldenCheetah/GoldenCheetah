@@ -583,6 +583,13 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     grid->addWidget(tdp, ++row, 0);
 
+    // Today's plan url can be on a private tenant
+    QLabel *tdpurllabel = new QLabel("URL"); // don't translate a technical term
+    tdpURL = new QLineEdit(this);
+    tdpURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
+    grid->addWidget(tdpurllabel, ++row, 0);
+    grid->addWidget(tdpURL, row, 1, 0 /*Qt::AlignLeft | Qt::AlignVCenter*/);
+
     grid->addWidget(tdpauthLabel, ++row, 0);
     grid->addWidget(tdpAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
     if (appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "")!="")
@@ -591,6 +598,41 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
         tdpAuthorised->hide(); // if no token no show
 
     connect(tdpAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTodaysPlan()));
+
+    //////////////////////////////////////////////////
+    // SixCycle
+
+#if QT_VERSION > 0x050000 // only supported on QT5 or higher
+    QLabel *sc = new QLabel(tr("SixCycle"));
+    sc->setFont(current);
+
+    // SixCycle can be on a staging or private tenant
+    QLabel *scurllabel = new QLabel("API URL"); // don't translate a technical term
+    scURL = new QLineEdit(this);
+    scURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
+
+    QLabel *scuserLabel = new QLabel(tr("Username"));
+    QLabel *scpassLabel = new QLabel(tr("Password"));
+
+    scUser = new QLineEdit(this);
+    scUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_USER, "").toString());
+
+    scPass = new QLineEdit(this);
+    scPass->setEchoMode(QLineEdit::Password);
+    scPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_PASS, "").toString());
+
+    // add widgets to layout
+    grid->addWidget(sc, ++row, 0);
+
+    grid->addWidget(scurllabel, ++row, 0);
+    grid->addWidget(scURL, row, 1, 0 /*Qt::AlignLeft | Qt::AlignVCenter*/);
+
+    grid->addWidget(scuserLabel, ++row, 0);
+    grid->addWidget(scUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(scpassLabel, ++row, 0);
+    grid->addWidget(scPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+#endif
 
     //////////////////////////////////////////////////
     // Cycling Analytics
@@ -1014,7 +1056,7 @@ void CredentialsPage::authoriseStrava()
 
 void CredentialsPage::authoriseTodaysPlan()
 {
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TODAYSPLAN);
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TODAYSPLAN, tdpURL->text());
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {
@@ -1103,7 +1145,11 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_WIKEY, wiPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_URL, tdpURL->text());
 #if QT_VERSION >= 0x050000 // only in QT5 or higher
+    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_USER, scUser->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_PASS, scPass->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_URL, scURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_FOLDER, dropboxFolder->text());
     appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER,
                            googleDriveFolder->text());
@@ -1546,17 +1592,9 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
     deviceList->setEditTriggers(QAbstractItemView::NoEditTriggers);
     deviceList->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    autoConnect = new QCheckBox(tr("Auto-connect devices in Train View"), this);
-    autoConnect->setChecked(appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool());
-
-    multiCheck = new QCheckBox(tr("Allow multiple devices in Train View"), this);
-    multiCheck->setChecked(appsettings->value(this, TRAIN_MULTI, false).toBool());
-
     mainLayout->addWidget(deviceList);
     QHBoxLayout *bottom = new QHBoxLayout;
     bottom->setSpacing(2);
-    bottom->addWidget(multiCheck);
-    bottom->addWidget(autoConnect);
     bottom->addStretch();
     bottom->addWidget(addButton);
     bottom->addWidget(delButton);
@@ -1573,8 +1611,6 @@ DevicePage::saveClicked()
     // Save the device configuration...
     DeviceConfigurations all;
     all.writeConfig(deviceListModel->Configuration);
-    appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
-    appsettings->setValue(TRAIN_AUTOCONNECT, autoConnect->isChecked());
 
     return 0;
 }
@@ -1786,6 +1822,48 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
 
         return false;
 }
+
+//
+// Train view options page
+//
+TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
+{
+    autoConnect = new QCheckBox(tr("Auto-connect devices in Train View"), this);
+    autoConnect->setChecked(appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool());
+
+    multiCheck = new QCheckBox(tr("Allow multiple devices in Train View"), this);
+    multiCheck->setChecked(appsettings->value(this, TRAIN_MULTI, false).toBool());
+
+    autoHide = new QCheckBox(tr("Auto-hide bottom bar in Train View"), this);
+    autoHide->setChecked(appsettings->value(this, TRAIN_AUTOHIDE, false).toBool());
+
+    // Disabled until ported across from the existing bottom bar checkbox
+    autoHide->setDisabled(true);
+
+    lapAlert = new QCheckBox(tr("Play sound before new lap"), this);
+    lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
+
+    QVBoxLayout *all = new QVBoxLayout(this);
+    all->addWidget(multiCheck);
+    all->addWidget(autoConnect);
+    all->addWidget(autoHide);
+    all->addWidget(lapAlert);
+    all->addStretch();
+}
+
+
+qint32
+TrainOptionsPage::saveClicked()
+{
+    // Save the train view settings...
+    appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
+    appsettings->setValue(TRAIN_AUTOCONNECT, autoConnect->isChecked());
+    appsettings->setValue(TRAIN_AUTOHIDE, autoHide->isChecked());
+    appsettings->setValue(TRAIN_LAPALERT, lapAlert->isChecked());
+
+    return 0;
+}
+
 
 //
 // Remote control page
