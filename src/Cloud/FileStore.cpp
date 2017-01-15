@@ -930,10 +930,10 @@ FileStoreSyncDialog::refreshClicked()
             foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
                 QDateTime end = item->dateTime.addSecs(item->getForSymbol("workout_time"));
-                long diff = end.toSecsSinceEpoch() - ridedatetime.toSecsSinceEpoch();
+                long diff = end.toMSecsSinceEpoch() - ridedatetime.toMSecsSinceEpoch();
 
                 // account for rounding so +/- 2 seconds is close enough
-                if (diff < 2 && diff > -2) {
+                if (diff < 2000 && diff > -2000) {
 
                     targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
                            .arg ( item->dateTime.date().year(), 4, 10, zero )
