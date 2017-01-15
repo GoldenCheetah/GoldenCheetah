@@ -101,6 +101,7 @@ class RTool {
         SEXP dfForActivityMeanmax(const RideItem *i);   // returns mean maximals for an activity
         SEXP dfForRideItem(const RideItem *i);          // returns metrics and meradata for an activity
         SEXP dfForDateRange(bool all, DateRange range, SEXP filter); // returns metrics and metadata for a season
+        SEXP dfForDateRangeIntervals(DateRange range); // returns metrics and metadata for a season
         SEXP dfForDateRangeMeanmax(bool all, DateRange range, SEXP filter); // returns the meanmax for a season
         SEXP dfForDateRangePeaks(bool all, DateRange range, SEXP filter, QList<RideFile::SeriesType> series, QList<int> durations);
         SEXP dfForRideFileCache(RideFileCache *p);      // returns meanmax for a cache
