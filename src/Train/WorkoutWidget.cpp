@@ -147,6 +147,7 @@ WorkoutWidget::start()
     hr.clear();
     speed.clear();
     cadence.clear();
+    sampleTimes.clear();
 
     // and resampling data
     count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum =0;
@@ -199,6 +200,7 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
         speed << s;
         int c = cadenceSum / 5.0f;
         cadence << c;
+        sampleTimes << context->getNow();
 
         // clear for next time
         count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum =0;
