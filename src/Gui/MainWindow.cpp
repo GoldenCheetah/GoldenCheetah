@@ -460,11 +460,13 @@ MainWindow::MainWindow(const QDir &home)
                          SLOT(uploadTodaysPlan()), tr(""));
     shareMenu->addAction(tr("Synchronise Today's Plan..."), this,
                          SLOT(syncTodaysPlan()), tr(""));
+#if 0 // parking whilst the API is fixed up
     shareMenu->addSeparator ();
     shareMenu->addAction(tr("Upload to SixCycle"), this,
                          SLOT(uploadSixCycle()), tr(""));
     shareMenu->addAction(tr("Synchronise SixCycle..."), this,
                          SLOT(syncSixCycle()), tr(""));
+#endif
 #endif
 
 
