@@ -1355,7 +1355,7 @@ RTool::dfForDateRangeIntervals(DateRange range)
         if (range.pass(ride->dateTime.date())) {
             // repeat for each interval
             foreach(IntervalItem *interval, ride->intervals()) {
-                SET_STRING_ELT(intervaltypes, k++, Rf_mkChar(RideFileInterval::typeDescriptionLong(interval->type).toLatin1().constData()));
+                SET_STRING_ELT(intervaltypes, k++, Rf_mkChar(RideFileInterval::typeDescription(interval->type).toLatin1().constData()));
             }
         }
     }
