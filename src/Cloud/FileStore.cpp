@@ -253,7 +253,7 @@ FileStore::uncompressRide(QByteArray *data, QString name, QStringList &errors)
 
     // uncompress and write to tmp
     QString tmp = context->athlete->home->temp().absolutePath() + "/" + QFileInfo(name).baseName() + "." + QFileInfo(name).suffix();
-    
+
     // uncompress and write a file
     QFile file(tmp);
     file.open(QFile::WriteOnly);
@@ -880,7 +880,7 @@ FileStoreSyncDialog::refreshClicked()
     }
 
     //
-    // Setup the upload list
+    // Setup the Download list
     //
     QChar zero = QLatin1Char('0');
     uploadFiles.clear();
@@ -911,11 +911,6 @@ FileStoreSyncDialog::refreshClicked()
         add->setText(3, ridedatetime.toString("hh:mm:ss"));
         add->setTextAlignment(3, Qt::AlignCenter);
 
-        // keep a record of the filestore entry this relates to
-        // since we can pass to the store->readFile function for stores
-        // that need additional information
-        add->setData(0,Qt::UserRole, i);
-
         QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
                            .arg ( ridedatetime.date().year(), 4, 10, zero )
                            .arg ( ridedatetime.date().month(), 2, 10, zero )
@@ -926,6 +921,7 @@ FileStoreSyncDialog::refreshClicked()
 
         // if the filestore uses enddate we need to compare date the ride finished
         // rather than date the ride started!
+
         if (store->useEndDate) {
 
             // this is fucking painful, we need to look at every ride we have

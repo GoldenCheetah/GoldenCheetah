@@ -247,7 +247,7 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
         // results ?
         QJsonArray results = document.array();
 
-        printd("items found: %d", results.size());
+        printd("items found: %d\n", results.size());
 
         // lets look at that then
         for(int i=0; i<results.size(); i++) {
@@ -256,8 +256,8 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
             FileStoreEntry *add = newFileStoreEntry();
 
             //SixCycle has full path, we just want the file name
-            add->label = each["url"].toString();
-            add->id = QString("%1").arg(each["id"].toInt());
+            add->id = each["url"].toString();
+            add->label = QString("%1").arg(each["id"].toInt());
             add->isDir = false;
             add->distance = 0; // NA
             add->duration = 0; // NA
@@ -267,7 +267,7 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
             //QString name = QDateTime::fromMSecsSinceEpoch(each["ts"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+=".json";
             //add->name = name;
             QString dateString = each["activityEndDateTime"].toString();
-            QString suffix = QFileInfo(add->label).suffix();
+            QString suffix = QFileInfo(add->id).suffix();
             QDateTime endTime= QDateTime::fromString(dateString, Qt::ISODate);
             QChar zero = QLatin1Char ( '0' );
             add->name = QString ( "%1_%2_%3_%4_%5_%6.%7" )
@@ -298,18 +298,19 @@ SixCycle::readFile(QByteArray *data, QString remotename, QString remoteid)
     if (session_token == "") {
         return false;
     }
+
     // this must be performed asyncronously and call made
     // to notifyReadComplete(QByteArray &data, QString remotename, QString message) when done
 
     // lets connect and get basic info on the root directory
-    QString url = QString("%1/rest/files/download/%2")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://whats.SixCycle.com.au").toString()).arg(remoteid);
+    QString url = remoteid;
 
     printd("url:%s\n", url.toStdString().c_str());
 
     // request using the bearer token
     QNetworkRequest request(url);
-    //request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+    //request.setRawHeader("Authorization", (QString("Token %1").arg(session_token)).toLatin1());
+    //request.setRawHeader("Accept-Encoding", "gzip, deflate");
 
     // put the file
     QNetworkReply *reply = nam->get(request);
@@ -391,7 +392,7 @@ SixCycle::writeFile(QByteArray &data, QString remotename)
     printd("data begins: %s ...\n", data.toStdString().substr(0,20).c_str());
 
     QHttpPart filePart;
-    filePart.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
+    filePart.setHeader(QNetworkRequest::ContentTypeHeader, "application/octet-stream");
     filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
                        QString("form-data; name=\"rawFile\"; filename=\"%1\";").arg(remotename));
     filePart.setBody(data);
@@ -447,7 +448,11 @@ SixCycle::readFileCompleted()
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s", buffers.value(reply)->toStdString().c_str());
+    printd("reply begins:%s", buffers.value(reply)->toStdString().substr(0,80).c_str());
 
-    notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
+    // lets not override the date use an unformatted file name
+    QString name = QString("temp.%1").arg(QFileInfo(replyName(reply)).suffix());
+
+    // process it then ........
+    notifyReadComplete(buffers.value(reply), name, tr("Completed."));
 }
