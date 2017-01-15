@@ -25199,7 +25199,7 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="247"/>
         <source>Stroke Rate in strokes/min, counting both arms for freestyle/backstroke, corrected by 3m push-off length for pool swims</source>
-        <translation>Armtagsfrekvems i armtag/min, räknat på båda armarna för crawl/ryggsim, korrigerat med 3m frånskjut vid poolsimning</translation>
+        <translation>Armtagsfrekvens i armtag/min, räknat på båda armarna för crawl/ryggsim, korrigerat med 3m frånskjut vid poolsimning</translation>
     </message>
 </context>
 <context>
