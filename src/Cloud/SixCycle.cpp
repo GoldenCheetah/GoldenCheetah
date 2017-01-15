@@ -192,43 +192,52 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
         return returning;
     }
 
-    // lets connect and get activities list
-    // old API ?
-    // QString url("https://whats.SixCycle.com.au/rest/files/search/0/100");
-    QString url = QString("%1/rest/users/activities/search/0/100")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://whats.SixCycle.com.au").toString());
+    // From the SixCycle docs:
+    //
+    // curl -X POST -H "Authorization: Token b635be6030e563fc74840bdac7811f4e994c7b61"
+    //                 https://live.sixcycle.com/api/v1/activitysummaryfile/
+    //
+    // example responses:
+    // [{"url":"https://s3.amazonaws.com/sixcycle/rawFiles/biking_bd372d69-ae61-4e08-accc-a08805cc67c7.fit",
+    //   "dataCheckSum":"28352b42980ce8d09e18feeee027621c","activityEndDateTime":"2015-07-11T17:36:26Z","id":28684},
+    //  {"url":"https://s3.amazonaws.com/sixcycle/rawFiles/com_20160229_105346_2016-02-29-06-37-38_06f16b19-7f1f-418a-8af4-2eb0869a9d57.fit",
+    //   "dataCheckSum":"9052927da57b8fc44783e76322d30c2c","activityEndDateTime":"2016-02-29T12:31:10Z","id":28682},
+    //  {"url":"https://s3.amazonaws.com/sixcycle/rawFiles/840_conordunne_2015-09-13-08-55-15Z_d44fb7c7-ed3a-4e66-9b6b-c6a782974c5b.pwx",
+    //   "dataCheckSum":"6caf38aa1c0bb2101225680e05f5ece6","activityEndDateTime":"2015-09-10T15:44:54Z","id":35929}]
+    //
+    QString url = QString("%1/api/v1/activitysummaryfile")
+          .arg(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
 
+    printd("endpoint: %s\n", url.toStdString().c_str());
 
-    //url="https://staging.SixCycle.com.au/rest/files/search/0/100";
-
-    // request using the bearer token
+    // request using the session token
     QNetworkRequest request(url);
-    //request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
-    request.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+    request.setHeader(QNetworkRequest::ContentTypeHeader,  "application/x-www-form-urlencoded");
+    request.setRawHeader("Authorization", (QString("Token %1").arg(session_token)).toLatin1());
 
-    // application/json
-    QByteArray jsonString;
-    jsonString += "{\"criteria\": {";
-    jsonString += "\"fromTs\": \""+ QString("%1").arg(from.toMSecsSinceEpoch()) +"\", ";
-    jsonString += "\"toTs\": \"" + QString("%1").arg(to.addDays(1).addSecs(-1).toMSecsSinceEpoch()) + "\", ";
-    jsonString += "\"isNotNull\": [\"fileId\"]}, ";
-    jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\",\"distance\",\"training\"], "; //\"avgWatts\"
-    jsonString += "\"opts\": 0 ";
-    jsonString += "}";
+    printd("session token: %s\n", session_token.toStdString().c_str());
 
-    QByteArray jsonStringDataSize = QByteArray::number(jsonString.size());
-    request.setRawHeader("Content-Length", jsonStringDataSize);
+    // pass the user id
+    QUrlQuery postData(url);
+    postData.addQueryItem("user", session_user);
 
-    QNetworkReply *reply = nam->post(request, jsonString);
+    printd("user: %s\n", session_user.toStdString().c_str());
 
-    // blocking request
+    // post the request
+    reply = nam->post(request, postData.toString(QUrl::FullyEncoded).toUtf8());
+
+    // blocking request, with a 10 seconds timeout (might have a lot of data)
     QEventLoop loop;
     connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    QTimer::singleShot(10000,&loop, SLOT(quit())); // timeout after 10000 seconds
+
     loop.exec();
 
     // did we get a good response ?
     QByteArray r = reply->readAll();
     printd("response: %s\n", r.toStdString().c_str());
+
+    return returning;
 
     QJsonParseError parseError;
     QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
