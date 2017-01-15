@@ -15,6 +15,14 @@ env:
   - secure: UkW6SpgeACb6enGZADTAtPPRe23Tffne/SRQoBsZ3kGbKzgv8kTCLY0G5N71B1xEGdLB/36piOa0yji2SMW1jbflxR7tdOsiNpfd9R5qYqWVZRulY0qite8ZCwU5dqgy87pp4ECC1hNSOTq17aa4Sc4G4egg9AOy8cntLBTtxJA=
   - secure: rb/MKPHEK8yOK5uYpXq2o+MQ7h65ft+c/xE9XmLFk1jLnK0oxe6+KeoSFlQ0n5UwLSsHrytMXVaUHex6EEt0TheXFlohi7BcNFWRWXr+wLucuaPjMnU49VErrSigjJ5VW/rcR7fORmnDwn5y06r3Rer9SC1hImCxf/pqF8hFZps=
   - secure: FXJzm98lwbc1R2eh9/CvVReVRHEPLDm+sCRjiV9HJgeCveIUauLasp9Skamz0c6OKLmkjLY8JERPT491ZgCG8YcQ9x1bM8HGbmRqnn9xSUxINIRzVmyTiLMBoT/ibHHeFjFpyiGfukOAkHwMNNsrSrbaekhiJuekaXo7iTwYQB0=
+  - secure: K9+6ufffQ2a6dCTwVSI5ZtrGE+JSsj2ZeQwJ8Xk/y1yhSlbnW6Uptfs5oZ4XJ/BAQbuKbctnczP/jwDtGBG/Y0WOxn8m1DYBrkeLeToc0JZ8dn2lF6H6BEcB3VI3iPUtxAXWHNeSCk2qaC83z80Ydjc5GCxoAOwlw5/BEsRYI/s=
+  - secure: n6khzr3bPnvh2lTE1NmcaPWRWkqLBUcXZL20EO0Q0HyhH2O22fwsKfnODCDtP1UEQxW+E0G3DkedSz/RmpMWbv1KpWKNNKl74wIdUE53nRIBLTULRoypCq1tDZzQqkoogbXu3pWrb23YoUuM2p5zxM9l3TiNbcrdZeQ+PInVL6o=
+  - secure: mJEJUwt1jhx5qx5h5C8gnYJyaUb5fItSJGU/Tgp0IMCPCUSXtjHf9QTKITAKvg/hY8zggSwo+Vg2VzdMypdxDKqAeH/xAjq/o1+4linWphSjWpUGTqF/B8sR37WtduXtetamX+ctsbG4I77Xw+7y8OPPoCPxDct9hWxfCw6eBrI=
+  - secure: BX7lVlMs6c6qOCMc7Eu0s3G7/es+3h/EGElS/4wjw4/nxp91bd0RbkOmGmgEKOFw5XRFl8gV0kEzmFhrJTdGfTnWHmdsGjSo2VzwePgW/PbDdQrTVD2rYBmmPoeTXf3S3v0P7d3pBrpuxAqkmj7bFkpnvviCN9erC4bUhSg6jEI=
+  - secure: AC6pelym0R1Pq6GgcAy7E/BmlNWrni+41P8V8PMtjBKEtiyJ3tQa+KCn5g0UfGzktRHk+0l+szz3Wdy+bzl+ifiJVhXXs95B9F9El03p33UQLFPi+wFlivddP5DLc+4vIsDUiaNX97p89vo1/R96OLjpF1mUzfOMKYmAiMGP/Co=
+  - secure: QXyyyutxesRVae/WFi75dxlNw2qTyWc6WQ3vmRER9BFhlrNtt8lmE+M6ghMDOhxigzSXWxHcG9r66BLOw4DML7AXg4f3NIAIYuYQrpfsWQ1TKGC/vVvIPDlNBKL62zSOoNowjup1HfZpB575wl4JkmHjoMPDfQ4yM/JVR+MKmIM=
+  - secure: lefpL3SB8yN0Vn1R2e0hAFpJgFnu4rJ/vn7DucSKQvJ61K7t3LrUHFXElDQGFZMbytx4OJDeYsJtrccrIHjcsSAEIyW8TTcwn5/JopnyeQ3ukV5AYpEoQusym09XKru9E7awqvnZrXz6mdoIum5JP7+H116mPN4vsvz5nkNWxeg=
+  - secure: RAGPq/thN9x6STNueDbeJWGUN75OLNcUVUkLHI/eZwPrkMaiQPfxIaJ+8eO2PszDcBojw3eYVhzbRvLnLiXmHL3buwD6oXMTyYnxGzCZ61DeDQ2cQa8ynKmRim5JL3viKMqtdyasXVoGf/u0GqMsgaLcqN6e/vXuXMGu6kkUPEQ=
 before_install:
 ## try early just to check, can delete later
 - date
@@ -92,6 +100,14 @@ before_script:
 - sed -i "" "s/__GC_DROPBOX_CLIENT_SECRET__/"$GC_DROPBOX_CLIENT_SECRET"/" src/Core/Secrets.h
 - sed -i "" "s/__GC_CYCLINGANALYTICS_CLIENT_SECRET__/"$GC_CYCLINGANALYTICS_CLIENT_SECRET"/" src/Core/Secrets.h
 - sed -i "" "s/__GC_TWITTER_CONSUMER_SECRET__/"$GC_TWITTER_CONSUMER_SECRET"/" src/Core/Secrets.h
+- sed -i "" "s/__GC_DROPBOX_CLIENT_ID__/"$GC_DROPBOX_CLIENT_ID"/" src/Core/Secrets.h
+- sed -i "" "s/__GC_MAPQUESTAPI_KEY__/"$GC_MAPQUESTAPI_KEY"/" src/Core/Secrets.h
+- sed -i "" "s/__GC_CLOUD_DB_BASIC_AUTH__/"$GC_CLOUD_DB_BASIC_AUTH"/" src/Core/Secrets.h
+- sed -i "" "s/__GC_CLOUD_DB_APP_NAME__/"$GC_CLOUD_DB_APP_NAME"/" src/Core/Secrets.h
+- sed -i "" "s/__GC_GOOGLE_DRIVE_CLIENT_ID__/"$GC_GOOGLE_DRIVE_CLIENT_ID"/" src/Core/Secrets.h
+- sed -i "" "s/__GC_GOOGLE_DRIVE_CLIENT_SECRET__/"$GC_GOOGLE_DRIVE_CLIENT_SECRET"/" src/Core/Secrets.h
+- sed -i "" "s/__GC_GOOGLE_DRIVE_API_KEY__/"$GC_GOOGLE_DRIVE_API_KEY"/" src/Core/Secrets.h
+- sed -i "" "s/__GC_TODAYSPLAN_CLIENT_SECRET__/"$GC_TODAYSPLAN_CLIENT_SECRET"/" src/Core/Secrets.h
 - cat src/gcconfig.pri
 script:
 - CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing"
