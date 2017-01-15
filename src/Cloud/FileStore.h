@@ -115,6 +115,7 @@ class FileStore : public QObject {
         enum uploadType { JSON, TCX } filetype;
 
         bool useMetric; // FileStore know distance or duration metadata (eg Today's Plan)
+        bool useEndDate; // Dates for file entries use end date time not start (weird, I know, but thats how SixCycle work)
 
     signals:
         void writeComplete(QString name, QString message);
@@ -253,6 +254,7 @@ class FileStoreSyncDialog : public QDialog
     private:
         Context *context;
         FileStore *store;
+        QList<FileStoreEntry*> workouts;
 
         bool downloading;
         bool sync;
