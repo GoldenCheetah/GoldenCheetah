@@ -122,6 +122,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Andrew Bryson");
     contributors.append("Andy Froncioni");
     contributors.append("Antonius Riha");
+    contributors.append("Arun Horne");
     contributors.append("Austin Roach");
     contributors.append("Berend De Schouwer");
     contributors.append("Bruno Assis");
