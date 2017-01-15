@@ -61,6 +61,7 @@ SixCycle::SixCycle(Context *context) : FileStore(context), context(context), roo
     session_token = ""; // not authenticated yet
 
     useMetric = true; // distance and duration metadata
+    useEndDate = true; // god knows why
 }
 
 SixCycle::~SixCycle() {
@@ -205,7 +206,7 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
     //  {"url":"https://s3.amazonaws.com/sixcycle/rawFiles/840_conordunne_2015-09-13-08-55-15Z_d44fb7c7-ed3a-4e66-9b6b-c6a782974c5b.pwx",
     //   "dataCheckSum":"6caf38aa1c0bb2101225680e05f5ece6","activityEndDateTime":"2015-09-10T15:44:54Z","id":35929}]
     //
-    QString url = QString("%1/api/v1/activitysummaryfile")
+    QString url = QString("%1/api/v1/activitysummaryfile/")
           .arg(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
 
     printd("endpoint: %s\n", url.toStdString().c_str());
@@ -235,38 +236,50 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
 
     // did we get a good response ?
     QByteArray r = reply->readAll();
-    printd("response: %s\n", r.toStdString().c_str());
-
-    return returning;
+    printd("response begins: %s ...\n", r.toStdString().substr(0,300).c_str());
 
     QJsonParseError parseError;
     QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
 
     // if path was returned all is good, lets set root
     if (parseError.error == QJsonParseError::NoError) {
+
         // results ?
-        QJsonObject result = document.object()["result"].toObject();
-        QJsonArray results = result["results"].toArray();
+        QJsonArray results = document.array();
+
+        printd("items found: %d", results.size());
 
         // lets look at that then
         for(int i=0; i<results.size(); i++) {
+
             QJsonObject each = results.at(i).toObject();
             FileStoreEntry *add = newFileStoreEntry();
 
             //SixCycle has full path, we just want the file name
-            add->label = QFileInfo(each["name"].toString()).fileName();
-            add->id = QString("%1").arg(each["fileId"].toInt());
+            add->label = each["url"].toString();
+            add->id = QString("%1").arg(each["id"].toInt());
             add->isDir = false;
-            add->distance = each["distance"].toInt()/1000.0;
-            add->duration = each["training"].toInt();
+            add->distance = 0; // NA
+            add->duration = 0; // NA
             //add->size
             //add->modified
 
             //QString name = QDateTime::fromMSecsSinceEpoch(each["ts"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+=".json";
             //add->name = name;
-            QJsonObject fileindex = each["fileindex"].toObject();
-            add->name = QFileInfo(fileindex["filename"].toString()).fileName();
+            QString dateString = each["activityEndDateTime"].toString();
+            QString suffix = QFileInfo(add->label).suffix();
+            QDateTime endTime= QDateTime::fromString(dateString, Qt::ISODate);
+            QChar zero = QLatin1Char ( '0' );
+            add->name = QString ( "%1_%2_%3_%4_%5_%6.%7" )
+                                       .arg ( endTime.date().year(), 4, 10, zero )
+                                       .arg ( endTime.date().month(), 2, 10, zero )
+                                       .arg ( endTime.date().day(), 2, 10, zero )
+                                       .arg ( endTime.time().hour(), 2, 10, zero )
+                                       .arg ( endTime.time().minute(), 2, 10, zero )
+                                       .arg ( endTime.time().second(), 2, 10, zero )
+                                       .arg ( suffix );
 
+            printd("entry: %s (%s) [%s]\n", add->name.toStdString().c_str(), add->label.toStdString().c_str(), dateString.toStdString().c_str());
 
             returning << add;
         }
@@ -348,7 +361,7 @@ SixCycle::writeFile(QByteArray &data, QString remotename)
     //The user field is a url given in the login response on success.
 
     // set the target url
-    QString url = QString("%1/api/v1/activitysummarydata")
+    QString url = QString("%1/api/v1/activitysummarydata/")
           .arg(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
     //url = "http://requestb.in/1bakg1q1";
     printd("endpoint: '%s'\n", url.toStdString().c_str());
@@ -405,9 +418,9 @@ SixCycle::writeFileCompleted()
 {
     printd("SixCycle::writeFileCompleted()\n");
 
-    //QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    QString writestatus =  reply->readAll();
 
-    printd("reply:%s\n", reply->readAll().toStdString().c_str());
+    printd("reply:%s\n", writestatus.toStdString().c_str());
 
     if (reply->error() == QNetworkReply::NoError) {
         notifyWriteComplete(

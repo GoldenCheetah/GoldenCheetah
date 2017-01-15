@@ -46,7 +46,7 @@
 // nothing doing in base class, for now
 FileStore::FileStore(Context *context) :
     uploadCompression(zip), downloadCompression(zip),
-    filetype(uploadType::JSON), useMetric(false), context(context)
+    filetype(uploadType::JSON), useMetric(false), useEndDate(false), context(context)
 {
 }
 
@@ -867,7 +867,7 @@ FileStoreSyncDialog::refreshClicked()
 
     // get a list of all rides in the home directory
     QStringList errors;
-    QList<FileStoreEntry*> workouts = store->readdir(store->home(), errors, from->dateTime(), to->dateTime());
+    workouts = store->readdir(store->home(), errors, from->dateTime(), to->dateTime());
 
     // clear current
     rideFiles.clear();
@@ -911,6 +911,11 @@ FileStoreSyncDialog::refreshClicked()
         add->setText(3, ridedatetime.toString("hh:mm:ss"));
         add->setTextAlignment(3, Qt::AlignCenter);
 
+        // keep a record of the filestore entry this relates to
+        // since we can pass to the store->readFile function for stores
+        // that need additional information
+        add->setData(0,Qt::UserRole, i);
+
         QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
                            .arg ( ridedatetime.date().year(), 4, 10, zero )
                            .arg ( ridedatetime.date().month(), 2, 10, zero )
@@ -919,6 +924,32 @@ FileStoreSyncDialog::refreshClicked()
                            .arg ( ridedatetime.time().minute(), 2, 10, zero )
                            .arg ( ridedatetime.time().second(), 2, 10, zero );
 
+        // if the filestore uses enddate we need to compare date the ride finished
+        // rather than date the ride started!
+        if (store->useEndDate) {
+
+            // this is fucking painful, we need to look at every ride we have
+            // and add on the duration - if it ends at the same time as this
+            // then adjust the target no suffix to the start time
+            foreach(RideItem *item, context->athlete->rideCache->rides()) {
+
+                QDateTime end = item->dateTime.addSecs(item->getForSymbol("workout_time"));
+                long diff = end.toSecsSinceEpoch() - ridedatetime.toSecsSinceEpoch();
+
+                // account for rounding so +/- 2 seconds is close enough
+                if (diff < 2 && diff > -2) {
+
+                    targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
+                           .arg ( item->dateTime.date().year(), 4, 10, zero )
+                           .arg ( item->dateTime.date().month(), 2, 10, zero )
+                           .arg ( item->dateTime.date().day(), 2, 10, zero )
+                           .arg ( item->dateTime.time().hour(), 2, 10, zero )
+                           .arg ( item->dateTime.time().minute(), 2, 10, zero )
+                           .arg ( item->dateTime.time().second(), 2, 10, zero );
+                     break;
+                 }
+             }
+        }
         uploadFiles << targetnosuffix.mid(0,14);
 
         // exists? - we ignore seconds, since TP seems to do odd
