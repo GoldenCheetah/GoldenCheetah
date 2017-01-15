@@ -6663,22 +6663,22 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="36"/>
         <source>ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM and Powertap power meters, Heart rate belts, speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick</source>
-        <translation>ANT+ enheter och Trainers så som. Kickr, NEO, Muin, SRM och Powertap effektmätare, hjärtfrekvensband, hastighets- och kadenssensorer via ANT+ USB1 oder USB2 stickor</translation>
+        <translation>ANT+ enheter och Trainers så som. Kickr, NEO, Muin, SRM och Powertap effektmätare, hjärtfrekvensband, hastighets- och kadenssensorer via ANT USB1 eller USB2 stickor</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="41"/>
         <source>ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM, Powertap or Quarq power meters, Heart rate belts, speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick</source>
-        <translation>ANT+ enheter och Trainers så som. Kickr, NEO, Muin, SRM Powertap eller Quarq effektmätare, hjärtfrekvensband, hastighets- och kadenssensorer via ANT+ USB1 oder USB2 stickor</translation>
+        <translation>ANT+ enheter och Trainers så som. Kickr, NEO, Muin, SRM Powertap eller Quarq effektmätare, hjärtfrekvensband, hastighets- och kadenssensorer via ANT USB1 eller USB2 stickor</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="47"/>
         <source>Bluetooth Low Energy devices such as KK Inride, Stages PM, Blue HR and Blue SC</source>
-        <translation>Bluetooth Low Energy enheter,så som KK Inride, Stages PM, Blue HR oder Blue SC</translation>
+        <translation>Bluetooth Low Energy enheter, så som KK Inride, Stages PM, Blue HR eller Blue SC</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="51"/>
         <source>Racermate Computrainer Lab or Pro bike trainer with the handlebar controller connected via a USB adaptor or directly connected to a local serial port.</source>
-        <translation>Racermater Computrainer Lab eller Pro bike trainer med styrkontrollenheten kopplad via USB adapter eller direkt till serieporten.</translation>
+        <translation>Racermater Computrainer Lab eller Pro bike trainer med manöverenheten kopplad via USB adapter eller direkt till serieporten.</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="56"/>
@@ -6693,7 +6693,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="64"/>
         <source>Tacx Fortius/iMagic bike trainer with the handlebar controller connected to a USB port. Please make sure you have device firmware to hand.</source>
-        <translation>Tacx Fortius/iMagic trainer med kontrollenhet kopplad med USB. Tacx Firmware wird benötigt.</translation>
+        <translation>Tacx Fortius/iMagic trainer med kontrollenhet kopplad med USB. Tacx Firmware behövs.</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="70"/>
@@ -6754,7 +6754,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="373"/>
         <source>Maximums</source>
-        <translation>Maxima</translation>
+        <translation>Maximums</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="378"/>
@@ -6764,7 +6764,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="400"/>
         <source>^(Average|Max) </source>
-        <translation>^(Genomsnitt|Maximma) </translation>
+        <translation>^(Genomsnitt|Max) </translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="404"/>
@@ -8256,7 +8256,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="186"/>
         <source>Fatigue Index is power decay from Max Power to Min Power as a percent of Max Power.</source>
-        <translation>Utmattningsindex är effektmisnkningen från max till min som procent av max effekt.</translation>
+        <translation>Utmattningsindex är effektminskningen från Max till Min som procent av Maxeffekt.</translation>
     </message>
 </context>
 <context>
@@ -8897,7 +8897,7 @@ Detta kräver kontakt med internet för att fungera. </translation>
     <message>
         <location filename="../../FileIO/FixFreewheeling.cpp" line="80"/>
         <source>Fix freewheeling power/cadence.</source>
-        <translation>Korrigera frihjulnings effekt och Kadens.</translation>
+        <translation>Korrigera effekt och kadens vid frihjulning.</translation>
     </message>
 </context>
 <context>
@@ -8905,7 +8905,7 @@ Detta kräver kontakt med internet för att fungera. </translation>
     <message>
         <location filename="../../FileIO/FixFreewheeling.cpp" line="47"/>
         <source>ANT+ crank based power meters will send  3 duplicate values for power and cadence when the  rider starts to freewheel. The duplicates should  not be retained. This tool removes the duplicates.</source>
-        <translation>ANT+  effektmätare indikerar frihjulning eller stopp genom att sända flera identiska värden på effekt och kadens i följd. Dessa dubletter bör man ta bort vilket görs av detta verktyg.</translation>
+        <translation>ANT+ effektmätare indikerar frihjulning eller stopp genom att sända flera identiska värden på effekt och kadens i följd. Dessa dubletter bör man ta bort vilket görs av detta verktyg.</translation>
     </message>
 </context>
 <context>
@@ -8921,7 +8921,7 @@ Detta kräver kontakt med internet för att fungera. </translation>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="42"/>
         <source>Remove GPS errors and interpolate positional data where the GPS device did not record any data, or the data that was recorded is invalid.</source>
-        <translation>Ta bort GPS fel och interpolera ev avbrott i eller ogiltigheter i GPS data.</translation>
+        <translation>Ta bort GPS fel och interpolera ev avbrott eller ogiltigheter i GPS data.</translation>
     </message>
 </context>
 <context>
@@ -8979,7 +8979,7 @@ Stopp - detta är största längden (i sekunder) som kommer att fyllas med uppsk
     <message>
         <location filename="../../FileIO/FixHRSpikes.cpp" line="54"/>
         <source>Max</source>
-        <translation>Absolut Maxima</translation>
+        <translation>Absolut Maximum</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixHRSpikes.cpp" line="70"/>
@@ -8990,7 +8990,7 @@ It takes the following parameter:
 Absolute Max - this defines an absolute value for heart rates, and will smooth any values above this absolute value that have been identified as being anomalies (i.e. at odds with the data surrounding it).</source>
         <translation>Ibland rapporterar hjärtfrekvenssensorer orimligt stora värden, noll eller inga värden alls. Denna funktion identifierar dessa och ersätter dem med rimliga uppskattningar genom interpolation.
 
-Inparametern Absolut Maxima&quot; bestämmer den tröskel som om den överskrids identifierar orimligt stora värden.</translation>
+Inparametern &quot;Absolut Maximum&quot; bestämmer den tröskel som om den överskrids identifierar orimligt stora värden.</translation>
     </message>
 </context>
 <context>
@@ -8998,7 +8998,7 @@ Inparametern Absolut Maxima&quot; bestämmer den tröskel som om den överskrids
     <message>
         <location filename="../../FileIO/FixLapSwim.cpp" line="110"/>
         <source>Fix Lap Swim from Length Data</source>
-        <translation>Korrigera poolsimmning från Poollängd</translation>
+        <translation>Korrigera poolsimning mha Längd Information</translation>
     </message>
 </context>
 <context>
@@ -12515,7 +12515,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Metrics/HrZones.cpp" line="622"/>
         <source>Threshold (bpm): %1</source>
-        <translation>Treöskel (slag/min): %1</translation>
+        <translation>Tröskel (slag/min): %1</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrZones.cpp" line="630"/>
@@ -16449,7 +16449,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1986"/>
         <source>Maximum Core Temperature. The core body temperature estimate is based on HR data</source>
-        <translation>Maxima Kroppstemperatur. Kroppstemperaturen beräknas från HR data</translation>
+        <translation>Maximum Kroppstemperatur. Kroppstemperaturen beräknas från HR data</translation>
     </message>
 </context>
 <context>
@@ -16468,7 +16468,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2084"/>
         <source>Maximum Cadence</source>
-        <translation>Maxima Kadens</translation>
+        <translation>Maximum Kadens</translation>
     </message>
 </context>
 <context>
@@ -16487,7 +16487,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1887"/>
         <source>Maximum Heart Rate.</source>
-        <translation>Maxima Hjärtfrekvens.</translation>
+        <translation>Maximum Hjärtfrekvens.</translation>
     </message>
 </context>
 <context>
@@ -16495,7 +16495,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="806"/>
         <source>Maximum W&apos;bal Match</source>
-        <translation>Maxima W&apos;bal Tändstickor</translation>
+        <translation>Maximum W&apos;bal Tändstickor</translation>
     </message>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="808"/>
@@ -16506,7 +16506,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="811"/>
         <source>Maximum W&apos; bal Match, W&apos; bal tracks the level of W&apos; according to CP model during intermitent exercise.</source>
-        <translation>Maxima W&apos;bal Tändstickor, W&apos;bal beräknas efter CP modellen.</translation>
+        <translation>Maximum W&apos;bal Tändstickor, W&apos;bal beräknas efter CP modellen.</translation>
     </message>
 </context>
 <context>
@@ -16525,7 +16525,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1656"/>
         <source>Maximum Power</source>
-        <translation>Maxima Effekt</translation>
+        <translation>Maximum Effekt</translation>
     </message>
 </context>
 <context>
@@ -16538,7 +16538,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2490"/>
         <source>Maximum Power Deviation with respect to 30sec Moving Average</source>
-        <translation>Maxima Effektvariation relativt 30s glidande medeltal</translation>
+        <translation>Maximum Effektvariation relativt 30s glidande medeltal</translation>
     </message>
 </context>
 <context>
@@ -16557,7 +16557,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="106"/>
         <source>Maximum Running Cadence</source>
-        <translation>Maxima Stegfrekvens (Löpning)</translation>
+        <translation>Maximum Stegfrekvens (Löpning)</translation>
     </message>
 </context>
 <context>
@@ -16576,7 +16576,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1700"/>
         <source>Maximum Muscle Oxygen Saturation, the percentage of hemoglobin that is carrying oxygen.</source>
-        <translation>Maxima Muskel Syresaturation, del av hemoglobinet som bär oxygen.</translation>
+        <translation>Maximum Muskel Syresaturation, del av hemoglobinet som bär oxygen.</translation>
     </message>
 </context>
 <context>
@@ -16599,7 +16599,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2035"/>
         <source>Maximum Speed</source>
-        <translation>Maxima Hastighet</translation>
+        <translation>Maximum Hastighet</translation>
     </message>
 </context>
 <context>
@@ -16622,7 +16622,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2135"/>
         <source>Maximum Temperature</source>
-        <translation>Maxima Temperatur</translation>
+        <translation>Maximum Temperatur</translation>
     </message>
 </context>
 <context>
@@ -16641,7 +16641,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="781"/>
         <source>Maximum W&apos; bal Expended expressed as percentage of W&apos;, W&apos; bal tracks the level of W&apos; according to CP model during intermitent exercise.</source>
-        <translation>Maxima W&apos;bal förbrukat i procent av W&apos;, CP modellen beräknar momentannivå av W&apos;bal under aktiviteter utifrån bla effekt data.</translation>
+        <translation>Maximum W&apos;bal förbrukat i procent av W&apos;, CP modellen beräknar momentannivå av W&apos;bal under aktiviteter utifrån bla effekt data.</translation>
     </message>
 </context>
 <context>
@@ -16660,7 +16660,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1745"/>
         <source>Maximum total hemoglobin concentration. The total grams of hemoglobin per deciliter.</source>
-        <translation>Maxima total hemoglobinkoncentration. Totala antalet gram hemoglobin per deciliter vävnad.</translation>
+        <translation>Maximum total hemoglobinkoncentration. Totala antalet gram hemoglobin per deciliter vävnad.</translation>
     </message>
 </context>
 <context>
@@ -17030,7 +17030,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1933"/>
         <source>Minimum Heart Rate.</source>
-        <translation>Minima Hjärtfrekvens.</translation>
+        <translation>Minimum Hjärtfrekvens.</translation>
     </message>
 </context>
 <context>
@@ -17049,7 +17049,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1791"/>
         <source>Minimum Muscle Oxygen Saturation, the percentage of hemoglobin that is carrying oxygen.</source>
-        <translation>Minima Muscle Oxygen Saturation, procent av hemoglobinet som bär på oxygen.</translation>
+        <translation>Minimum Muscle Oxygen Saturation, procent av hemoglobinet som bär på oxygen.</translation>
     </message>
 </context>
 <context>
@@ -17072,7 +17072,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2189"/>
         <source>Minimum Temperature</source>
-        <translation>Minima Temperatur</translation>
+        <translation>Minimum Temperatur</translation>
     </message>
 </context>
 <context>
@@ -17080,7 +17080,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="746"/>
         <source>Minimum W&apos; bal</source>
-        <translation>Minima W&apos; bal</translation>
+        <translation>Minimum W&apos; bal</translation>
     </message>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="748"/>
@@ -17091,7 +17091,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="751"/>
         <source>Minimum W&apos; bal, W&apos; bal tracks the level of W&apos; according to CP model during intermitent exercise.</source>
-        <translation>Minima W&apos;bal, W&apos;bal beräknar momentan nivå i % av W&apos; enligt CP modellen.</translation>
+        <translation>Minimum W&apos;bal, W&apos;bal beräknar momentan nivå i % av W&apos; enligt CP modellen.</translation>
     </message>
 </context>
 <context>
@@ -17110,7 +17110,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1840"/>
         <source>Minimum total hemoglobin concentration. The total grams of hemoglobin per deciliter.</source>
-        <translation>Minima total hemoglobin koncentration. Totalt antal gram hemoglobin per deciliter vävnad.</translation>
+        <translation>Minimum total hemoglobin koncentration. Totalt antal gram hemoglobin per deciliter vävnad.</translation>
     </message>
 </context>
 <context>
@@ -17872,7 +17872,7 @@ No rides found to import.
         <location filename="../../Gui/NewCyclistDialog.cpp" line="228"/>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="246"/>
         <source>CV Swim (%1)</source>
-        <translation>CV Simmning (%1)</translation>
+        <translation>CV Simning (%1)</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="47"/>
@@ -18188,7 +18188,7 @@ No rides found to import.
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="118"/>
         <source>Pace Swim</source>
-        <translation>Tempo Simmning</translation>
+        <translation>Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="120"/>
@@ -19194,7 +19194,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="571"/>
         <source>10 min Peak Pace Swim</source>
-        <translation>10 min Topp-Tempo Simmning</translation>
+        <translation>10 min Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="572"/>
@@ -19212,7 +19212,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="400"/>
         <source>10 sec Peak Pace Swim</source>
-        <translation>10s Topp-Tempo Simmning</translation>
+        <translation>10s Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="401"/>
@@ -19230,7 +19230,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="419"/>
         <source>15 sec Peak Pace Swim</source>
-        <translation>15s Topp-Tempo Simmning</translation>
+        <translation>15s Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="420"/>
@@ -19248,7 +19248,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="476"/>
         <source>1 min Peak Pace Swim</source>
-        <translation>1 min Topp-Tempo Simmning</translation>
+        <translation>1 min Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="477"/>
@@ -19266,7 +19266,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="590"/>
         <source>20 min Peak Pace Swim</source>
-        <translation>20 min Topp-Tempo Simmning</translation>
+        <translation>20 min Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="591"/>
@@ -19284,7 +19284,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="438"/>
         <source>20 sec Peak Pace Swim</source>
-        <translation>20s Topp-Tempo Simmning</translation>
+        <translation>20s Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="439"/>
@@ -19302,7 +19302,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="495"/>
         <source>2 min Peak Pace Swim</source>
-        <translation>2 min Topp-Tempo Simmning</translation>
+        <translation>2 min Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="496"/>
@@ -19320,7 +19320,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="609"/>
         <source>30 min Peak Pace Swim</source>
-        <translation>30 min Topp-Tempo Simmning</translation>
+        <translation>30 min Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="610"/>
@@ -19338,7 +19338,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="457"/>
         <source>30 sec Peak Pace Swim</source>
-        <translation>30s Topp-Tempo Simmning</translation>
+        <translation>30s Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="458"/>
@@ -19356,7 +19356,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="514"/>
         <source>3 min Peak Pace Swim</source>
-        <translation>3 min Topp-Tempo Simmning</translation>
+        <translation>3 min Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="515"/>
@@ -19374,7 +19374,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="533"/>
         <source>5 min Peak Pace Swim</source>
-        <translation>5 min Topp-Tempo Simmning</translation>
+        <translation>5 min Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="534"/>
@@ -19392,7 +19392,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="628"/>
         <source>60 min Peak Pace Swim</source>
-        <translation>60 min Topp-Tempo Simmning</translation>
+        <translation>60 min Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="629"/>
@@ -19410,7 +19410,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="552"/>
         <source>8 min Peak Pace Swim</source>
-        <translation>8 min Topp-Tempo Simmning</translation>
+        <translation>8 min Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="553"/>
@@ -19428,7 +19428,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="647"/>
         <source>90 min Peak Pace Swim</source>
-        <translation>90 min Topp-Tempo Simmning</translation>
+        <translation>90 min Topp-Tempo Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="648"/>
@@ -22041,7 +22041,7 @@ Skipping file...</source>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="541"/>
         <source>Peak pace for running and swimming</source>
-        <translation>Topptempon vid löpning och simmning</translation>
+        <translation>Topptempon vid löpning och simning</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="542"/>
@@ -22919,7 +22919,7 @@ Skipping file...</source>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1806"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="2161"/>
         <source>^(Average|Max) </source>
-        <translation>^(Medel|Maxima) </translation>
+        <translation>^(Medel|Max) </translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="208"/>
@@ -24863,7 +24863,7 @@ Dessutom kan man ställa in minsta godkända segmentlängd för att ignorera de 
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="534"/>
         <source>Minimum Gap (minutes)</source>
-        <translation>Minsta Abrottslängd (min)</translation>
+        <translation>Minsta Avbrottslängd (min)</translation>
     </message>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="535"/>
@@ -25199,7 +25199,7 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="247"/>
         <source>Stroke Rate in strokes/min, counting both arms for freestyle/backstroke, corrected by 3m push-off length for pool swims</source>
-        <translation>Armtagsfrekvems i armtag/min, räknat på båda armarna för crawl/ryggsim, korrigerat med 3m frånskjut vid poolsimmning</translation>
+        <translation>Armtagsfrekvems i armtag/min, räknat på båda armarna för crawl/ryggsim, korrigerat med 3m frånskjut vid poolsimning</translation>
     </message>
 </context>
 <context>
@@ -25218,7 +25218,7 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="310"/>
         <source>Strokes per length, counting the arm using the watch, Pool Length defaults to 50m for open water swims</source>
-        <translation>Armtag per poollängd, räknat på armen med simklockan, Poollängd antas vara 50m vid öppetvattensimmning</translation>
+        <translation>Armtag per poollängd, räknat på armen med simklockan, Poollängd antas vara 50m vid öppetvattensimning</translation>
     </message>
 </context>
 <context>
@@ -27757,7 +27757,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="69"/>
         <source>xPower Swim</source>
-        <translation>xPower Simmning</translation>
+        <translation>xPower Simning</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="71"/>
