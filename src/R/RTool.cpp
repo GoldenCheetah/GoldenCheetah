@@ -22,6 +22,7 @@
 
 #include "RideCache.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "RideFile.h"
 #include "RideFileCache.h"
 #include "Colors.h"
@@ -1228,6 +1229,226 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     return ans;
 }
 
+SEXP
+RTool::dfForDateRangeIntervals(DateRange range)
+{
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    int intervals = 0;
+    int metrics = factory.metricCount();
+
+    // how many rides to return if we're limiting to the
+    // currently selected date range ?
+
+    // apply any global filters
+    Specification specification;
+    FilterSet fs;
+    fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
+    fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
+    specification.setFilterSet(fs);
+
+    // we need to count intervals that are in range...
+    intervals = 0;
+    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+        if (!specification.pass(ride)) continue;
+        if (range.pass(ride->dateTime.date())) intervals += ride->intervals().count();
+    }
+
+    // get a listAllocated
+    SEXP ans;
+    SEXP names; // column names
+    SEXP rownames; // row names (numeric)
+
+    // +5 is for date and datetime, name, type and color
+    PROTECT(ans=Rf_allocVector(VECSXP, metrics+5));
+    PROTECT(names = Rf_allocVector(STRSXP, metrics+5));
+
+    // we have to give a name to each row
+    PROTECT(rownames = Rf_allocVector(STRSXP, intervals));
+    for(int i=0; i<intervals; i++) {
+        QString rownumber=QString("%1").arg(i+1);
+        SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
+    }
+
+    // next name
+    int next=0;
+
+    // DATE
+    SEXP date;
+    PROTECT(date=Rf_allocVector(INTSXP, intervals));
+
+    int k=0;
+    QDate d1970(1970,01,01);
+    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+        if (!specification.pass(ride)) continue;
+        if (range.pass(ride->dateTime.date())) {
+            foreach(IntervalItem *interval, ride->intervals()) {
+                INTEGER(date)[k++] = d1970.daysTo(ride->dateTime.date());
+            }
+        }
+    }
+
+    SEXP dclas;
+    PROTECT(dclas=Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(dclas, 0, Rf_mkChar("Date"));
+    Rf_classgets(date,dclas);
+
+    // add to the data.frame and give it a name
+    SET_VECTOR_ELT(ans, next, date);
+    SET_STRING_ELT(names, next++, Rf_mkChar("date"));
+
+    // TIME
+    SEXP time;
+    PROTECT(time=Rf_allocVector(REALSXP, intervals));
+
+    // fill with values for date and class if its one we need to return
+    k=0;
+    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+        if (!specification.pass(ride)) continue;
+        if (range.pass(ride->dateTime.date())) {
+            // repeat for each interval
+            foreach(IntervalItem *interval, ride->intervals()) {
+                REAL(time)[k++] = ride->dateTime.toUTC().toTime_t() + interval->start;  // time offsets by time of interval
+            }
+        }
+    }
+
+    // POSIXct class
+    SEXP clas;
+    PROTECT(clas=Rf_allocVector(STRSXP, 2));
+    SET_STRING_ELT(clas, 0, Rf_mkChar("POSIXct"));
+    SET_STRING_ELT(clas, 1, Rf_mkChar("POSIXt"));
+    Rf_classgets(time,clas);
+
+    // we use "UTC" for all timezone
+    Rf_setAttrib(time, Rf_install("tzone"), Rf_mkString("UTC"));
+
+    // add to the data.frame and give it a name
+    SET_VECTOR_ELT(ans, next, time);
+    SET_STRING_ELT(names, next++, Rf_mkChar("time"));
+
+
+    // NAME
+    SEXP intervalnames;
+    PROTECT(intervalnames = Rf_allocVector(STRSXP, intervals));
+    k=0;
+    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+        if (!specification.pass(ride)) continue;
+        if (range.pass(ride->dateTime.date())) {
+            // repeat for each interval
+            foreach(IntervalItem *interval, ride->intervals()) {
+                SET_STRING_ELT(intervalnames, k++, Rf_mkChar(interval->name.toLatin1().constData()));
+            }
+        }
+    }
+
+    // add to the list and give a columnname
+    SET_VECTOR_ELT(ans, next, intervalnames);
+    SET_STRING_ELT(names, next, Rf_mkChar("name"));
+    next++;
+
+    // TYPE
+    SEXP intervaltypes;
+    PROTECT(intervaltypes = Rf_allocVector(STRSXP, intervals));
+    k=0;
+    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+        if (!specification.pass(ride)) continue;
+        if (range.pass(ride->dateTime.date())) {
+            // repeat for each interval
+            foreach(IntervalItem *interval, ride->intervals()) {
+                SET_STRING_ELT(intervaltypes, k++, Rf_mkChar(RideFileInterval::typeDescriptionLong(interval->type).toLatin1().constData()));
+            }
+        }
+    }
+    SET_VECTOR_ELT(ans, next, intervaltypes);
+    SET_STRING_ELT(names, next, Rf_mkChar("type"));
+    next++;
+
+    // time + clas + name + type, but not ans!
+    UNPROTECT(6);
+
+    //
+    // METRICS
+    //
+    for(int i=0; i<factory.metricCount();i++) {
+
+        // set a vector
+        SEXP m;
+        PROTECT(m=Rf_allocVector(REALSXP, intervals));
+
+        QString symbol = factory.metricName(i);
+        const RideMetric *metric = factory.rideMetric(symbol);
+        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        name = name.replace(" ","_");
+        name = name.replace("'","_");
+
+        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+
+        int index=0;
+        foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+            if (!specification.pass(item)) continue;
+            if (range.pass(item->dateTime.date())) {
+
+                foreach(IntervalItem *interval, item->intervals()) {
+                    REAL(m)[index++] = interval->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
+                                                          + (useMetricUnits ? 0.0f : metric->conversionSum());
+                }
+            }
+        }
+
+        // add to the list
+        SET_VECTOR_ELT(ans, next, m);
+
+        // give it a name
+        SET_STRING_ELT(names, next, Rf_mkChar(name.toLatin1().constData()));
+
+        next++;
+
+        // vector
+        UNPROTECT(1);
+    }
+
+    // add Color
+    SEXP color;
+    PROTECT(color=Rf_allocVector(STRSXP, intervals));
+
+    int index=0;
+    foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+        if (!specification.pass(item)) continue;
+        if (range.pass(item->dateTime.date())) {
+
+            // apply item color, remembering that 1,1,1 means use default (reverse in this case)
+            if (item->color == QColor(1,1,1,1)) {
+
+                // use the inverted color, not plot marker as that hideous
+                QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+
+                // white is jarring on a dark background!
+                if (col==QColor(Qt::white)) col=QColor(127,127,127);
+
+                SET_STRING_ELT(color, index++, Rf_mkChar(col.name().toLatin1().constData()));
+            } else
+                SET_STRING_ELT(color, index++, Rf_mkChar(item->color.name().toLatin1().constData()));
+        }
+    }
+
+    // add to the list and name it
+    SET_VECTOR_ELT(ans, next, color);
+    SET_STRING_ELT(names, next, Rf_mkChar("color"));
+    next++;
+
+    UNPROTECT(1);
+
+    // turn the list into a data frame + set column names
+    Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+    Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
+    Rf_namesgets(ans, names);
+
+    // ans + names
+    UNPROTECT(3);
+
+    // return it
+    return ans;
+}
 
 // returns a data frame of season info
 SEXP
@@ -1328,8 +1549,116 @@ RTool::season(SEXP pAll, SEXP pCompare)
 }
 
 SEXP
-RTool::seasonIntervals(SEXP /*pType*/, SEXP /*pCompare*/)
+RTool::seasonIntervals(SEXP /*pType*/, SEXP pCompare)
 {
+    // p1 - type of intervals to get (vector of strings)
+    // p2 - compare mode (true or false)
+    //pType = Rf_coerceVector(pAll, LGLSXP);
+    //bool all = LOGICAL(pAll)[0];
+
+    // p2 - all=TRUE|FALSE - return list of compares (or current if not active)
+    pCompare = Rf_coerceVector(pCompare, LGLSXP);
+    bool compare = LOGICAL(pCompare)[0];
+
+    // want a list of compares not a dataframe
+    if (compare && rtool->context) {
+
+        // only return compares if its actually active
+        if (rtool->context->isCompareDateRanges) {
+
+            // how many to return?
+            int count=0;
+            foreach(CompareDateRange p, rtool->context->compareDateRanges) if (p.isChecked()) count++;
+
+            // cool we can return a list of intervals to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(VECSXP, count));
+            int index=0;
+
+            // a named list with data.frame 'intervals' and color 'color'
+            SEXP namedlist;
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("intervals"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // create a data.frame for each and add to list
+            foreach(CompareDateRange p, rtool->context->compareDateRanges) {
+                if (p.isChecked()) {
+
+                    // create a named list
+                    PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
+
+                    // add the ride
+                    SEXP df = rtool->dfForDateRangeIntervals(DateRange(p.start, p.end));
+                    SET_VECTOR_ELT(namedlist, 0, df);
+
+                    // add the color
+                    SEXP color;
+                    PROTECT(color=Rf_allocVector(STRSXP, 1));
+                    SET_STRING_ELT(color, 0, Rf_mkChar(p.color.name().toLatin1().constData()));
+                    SET_VECTOR_ELT(namedlist, 1, color);
+
+                    // name them
+                    Rf_namesgets(namedlist, names);
+
+                    // add to back and move on
+                    SET_VECTOR_ELT(list, index++, namedlist);
+
+                    UNPROTECT(2);
+                }
+            }
+            UNPROTECT(2); // list and names
+
+            return list;
+
+        } else { // compare isn't active...
+
+            // otherwise return the current metrics in a compare list
+            SEXP list;
+            PROTECT(list=Rf_allocVector(VECSXP, 1));
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("intervals"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // named list of metrics and color
+            SEXP namedlist;
+            PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
+
+            // add the metrics
+            DateRange range = rtool->context->currentDateRange();
+            SEXP df = rtool->dfForDateRangeIntervals(range);
+            SET_VECTOR_ELT(namedlist, 0, df);
+
+            // add the color
+            SEXP color;
+            PROTECT(color=Rf_allocVector(STRSXP, 1));
+            SET_STRING_ELT(color, 0, Rf_mkChar("#FF00FF"));
+            SET_VECTOR_ELT(namedlist, 1, color);
+
+            // name them
+            Rf_namesgets(namedlist, names);
+
+            // add to back and move on
+            SET_VECTOR_ELT(list, 0, namedlist);
+            UNPROTECT(4);
+
+            return list;
+        }
+
+    } else if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
+
+        // just a datafram of metrics
+        DateRange range = rtool->context->currentDateRange();
+        return rtool->dfForDateRangeIntervals(range);
+
+    }
+
     // fail
     return Rf_allocVector(INTSXP, 0);
 }
