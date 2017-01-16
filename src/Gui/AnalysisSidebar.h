@@ -72,14 +72,13 @@ class AnalysisSidebar : public QWidget
         // interval functions
         void addIntervals();
         void editInterval(); // from right click
-        void deleteInterval(); // from right click
         void deleteRoute(); // stop tracking this route
         void editRoute(); // change route name
         void zoomInterval(); // from right click
         void sortIntervals(); // from menu popup
-        void renameIntervalsSelected(void); // from menu popup -- rename a series
+        void renameIntervalsSelected(void); // from menu popup and right click -- rename a series
         void editIntervalSelected(); // from menu popup
-        void deleteIntervalSelected(void); // from menu popup
+        void deleteIntervalSelected(void); // from menu popup and and right click
         void clickZoomInterval(QTreeWidgetItem*); // from treeview
         void zoomIntervalSelected(void); // from menu popup
         void zoomOut();
