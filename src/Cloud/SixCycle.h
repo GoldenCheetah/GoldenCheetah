@@ -32,7 +32,7 @@ class SixCycle : public FileStore {
         SixCycle(Context *context);
         ~SixCycle();
 
-        QString name() { return (tr("SixCycle")); }
+        QString name() { return (tr("Sixcycle")); }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);

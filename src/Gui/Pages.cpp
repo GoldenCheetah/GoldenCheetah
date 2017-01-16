@@ -600,14 +600,14 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     connect(tdpAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTodaysPlan()));
 
     //////////////////////////////////////////////////
-    // SixCycle
+    // Sixcycle
 
 #if QT_VERSION > 0x050000 // only supported on QT5 or higher
-    QLabel *sc = new QLabel(tr("SixCycle"));
+    QLabel *sc = new QLabel(tr("Sixcycle"));
     sc->setFont(current);
 
     // SixCycle can be on a staging or private tenant
-    QLabel *scurllabel = new QLabel("API URL"); // don't translate a technical term
+    QLabel *scurllabel = new QLabel("URL"); // don't translate a technical term
     scURL = new QLineEdit(this);
     scURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
 
