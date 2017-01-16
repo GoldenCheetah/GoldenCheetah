@@ -170,7 +170,7 @@ RTool::RTool()
                                // season
                                "GC.season <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season\", all, compare) }\n"
                                "GC.season.metrics <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.metrics\", all, filter, compare) }\n"
-                               "GC.season.intervals <- function(type=\"any\", compare=FALSE) { .Call(\"GC.season.intervals\", type, compare) }\n"
+                               "GC.season.intervals <- function(type=NULL, compare=FALSE) { .Call(\"GC.season.intervals\", type, compare) }\n"
                                "GC.season.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
                                "GC.season.meanmax <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.meanmax\", all, filter, compare) }\n"
                                // find peaks does a few validation checks on the R side
@@ -1230,7 +1230,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 }
 
 SEXP
-RTool::dfForDateRangeIntervals(DateRange range)
+RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
 {
     const RideMetricFactory &factory = RideMetricFactory::instance();
     int intervals = 0;
@@ -1250,7 +1250,14 @@ RTool::dfForDateRangeIntervals(DateRange range)
     intervals = 0;
     foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
-        if (range.pass(ride->dateTime.date())) intervals += ride->intervals().count();
+        if (!range.pass(ride->dateTime.date())) continue;
+
+        if (types.isEmpty()) intervals += ride->intervals().count();
+        else {
+            foreach(IntervalItem *item, ride->intervals())
+                if (types.contains(RideFileInterval::typeDescription(item->type)))
+                    intervals++;
+        }
     }
 
     // get a listAllocated
@@ -1281,9 +1288,9 @@ RTool::dfForDateRangeIntervals(DateRange range)
     foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (range.pass(ride->dateTime.date())) {
-            foreach(IntervalItem *interval, ride->intervals()) {
-                INTEGER(date)[k++] = d1970.daysTo(ride->dateTime.date());
-            }
+            foreach(IntervalItem *item, ride->intervals())
+                if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(item->type)))
+                    INTEGER(date)[k++] = d1970.daysTo(ride->dateTime.date());
         }
     }
 
@@ -1305,10 +1312,9 @@ RTool::dfForDateRangeIntervals(DateRange range)
     foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (range.pass(ride->dateTime.date())) {
-            // repeat for each interval
-            foreach(IntervalItem *interval, ride->intervals()) {
-                REAL(time)[k++] = ride->dateTime.toUTC().toTime_t() + interval->start;  // time offsets by time of interval
-            }
+            foreach(IntervalItem *item, ride->intervals())
+                if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(item->type)))
+                    REAL(time)[k++] = ride->dateTime.toUTC().toTime_t() + item->start;  // time offsets by time of interval
         }
     }
 
@@ -1334,10 +1340,9 @@ RTool::dfForDateRangeIntervals(DateRange range)
     foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (range.pass(ride->dateTime.date())) {
-            // repeat for each interval
-            foreach(IntervalItem *interval, ride->intervals()) {
-                SET_STRING_ELT(intervalnames, k++, Rf_mkChar(interval->name.toLatin1().constData()));
-            }
+            foreach(IntervalItem *item, ride->intervals())
+                if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(item->type)))
+                    SET_STRING_ELT(intervalnames, k++, Rf_mkChar(item->name.toLatin1().constData()));
         }
     }
 
@@ -1353,10 +1358,9 @@ RTool::dfForDateRangeIntervals(DateRange range)
     foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (range.pass(ride->dateTime.date())) {
-            // repeat for each interval
-            foreach(IntervalItem *interval, ride->intervals()) {
-                SET_STRING_ELT(intervaltypes, k++, Rf_mkChar(RideFileInterval::typeDescription(interval->type).toLatin1().constData()));
-            }
+            foreach(IntervalItem *item, ride->intervals())
+                if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(item->type)))
+                    SET_STRING_ELT(intervaltypes, k++, Rf_mkChar(RideFileInterval::typeDescription(item->type).toLatin1().constData()));
         }
     }
     SET_VECTOR_ELT(ans, next, intervaltypes);
@@ -1389,7 +1393,8 @@ RTool::dfForDateRangeIntervals(DateRange range)
             if (range.pass(item->dateTime.date())) {
 
                 foreach(IntervalItem *interval, item->intervals()) {
-                    REAL(m)[index++] = interval->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
+                    if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(interval->type)))
+                        REAL(m)[index++] = interval->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
                                                           + (useMetricUnits ? 0.0f : metric->conversionSum());
                 }
             }
@@ -1414,10 +1419,14 @@ RTool::dfForDateRangeIntervals(DateRange range)
     int index=0;
     foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
         if (!specification.pass(item)) continue;
-        if (range.pass(item->dateTime.date())) {
+        if (!range.pass(item->dateTime.date())) continue;
+
+        foreach(IntervalItem *interval, item->intervals()) {
+
+            if (!types.isEmpty() && !types.contains(RideFileInterval::typeDescription(interval->type))) continue;
 
             // apply item color, remembering that 1,1,1 means use default (reverse in this case)
-            if (item->color == QColor(1,1,1,1)) {
+            if (interval->color == QColor(1,1,1,1)) {
 
                 // use the inverted color, not plot marker as that hideous
                 QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
@@ -1549,10 +1558,15 @@ RTool::season(SEXP pAll, SEXP pCompare)
 }
 
 SEXP
-RTool::seasonIntervals(SEXP /*pType*/, SEXP pCompare)
+RTool::seasonIntervals(SEXP pTypes, SEXP pCompare)
 {
     // p1 - type of intervals to get (vector of strings)
     // p2 - compare mode (true or false)
+    pTypes = Rf_coerceVector(pTypes, STRSXP);
+    QStringList types;
+    for(int i=0; i<Rf_length(pTypes); i++)
+        types << QString(CHAR(STRING_ELT(pTypes,i)));
+
     //pType = Rf_coerceVector(pAll, LGLSXP);
     //bool all = LOGICAL(pAll)[0];
 
@@ -1592,7 +1606,7 @@ RTool::seasonIntervals(SEXP /*pType*/, SEXP pCompare)
                     PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
                     // add the ride
-                    SEXP df = rtool->dfForDateRangeIntervals(DateRange(p.start, p.end));
+                    SEXP df = rtool->dfForDateRangeIntervals(DateRange(p.start, p.end), types);
                     SET_VECTOR_ELT(namedlist, 0, df);
 
                     // add the color
@@ -1632,7 +1646,7 @@ RTool::seasonIntervals(SEXP /*pType*/, SEXP pCompare)
 
             // add the metrics
             DateRange range = rtool->context->currentDateRange();
-            SEXP df = rtool->dfForDateRangeIntervals(range);
+            SEXP df = rtool->dfForDateRangeIntervals(range, types);
             SET_VECTOR_ELT(namedlist, 0, df);
 
             // add the color
@@ -1655,7 +1669,7 @@ RTool::seasonIntervals(SEXP /*pType*/, SEXP pCompare)
 
         // just a datafram of metrics
         DateRange range = rtool->context->currentDateRange();
-        return rtool->dfForDateRangeIntervals(range);
+        return rtool->dfForDateRangeIntervals(range, types);
 
     }
 
