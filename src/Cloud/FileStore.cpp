@@ -180,6 +180,7 @@ FileStore::compressRide(RideFile*ride, QByteArray &data, QString name)
         default:
         case JSON: spec="json"; break;
         case TCX: spec="tcx"; break;
+        case PWX: spec="pwx"; break;
     }
 
     QFile jsonFile(tempfile.fileName());
@@ -277,6 +278,7 @@ FileStore::uploadExtension() {
         default:
         case JSON: spec = ".json"; break;
         case TCX: spec = ".tcx"; break;
+        case PWX: spec = ".pwx"; break;
     }
 
     switch (uploadCompression) {

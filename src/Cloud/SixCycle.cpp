@@ -56,7 +56,7 @@ SixCycle::SixCycle(Context *context) : FileStore(context), context(context), roo
     // how is data uploaded and downloaded?
     uploadCompression = none;
     downloadCompression = none;
-    filetype = FileStore::uploadType::TCX;
+    filetype = FileStore::uploadType::PWX;
 
     session_token = ""; // not authenticated yet
 
@@ -78,14 +78,14 @@ SixCycle::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
 bool
 SixCycle::open(QStringList &errors)
 {
-    printd("SixCycle::open\n");
+    printd("Sixcycle::open\n");
 
     // do we have a token
     QString user = appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_USER, "").toString();
     QString pass = appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_PASS, "").toString();
 
     if (user == "") {
-        errors << "You must setup SixCylce login details first";
+        errors << "You must setup Sixcycle login details first";
         return false;
     }
 
@@ -113,7 +113,7 @@ SixCycle::open(QStringList &errors)
 
     if (reply->error() != QNetworkReply::NoError) {
         qDebug() << "error" << reply->errorString();
-        errors << tr("Network Problem authenticating with the SixCycle service");
+        errors << tr("Network Problem authenticating with the Sixcycle service");
         return false;
     }
 
@@ -150,7 +150,7 @@ SixCycle::open(QStringList &errors)
         if (root_->isDir != true) errors << tr("root is not a directory.");
 
     } else {
-        errors << tr("Problem with SixCycle authentication.");
+        errors << tr("Problem with Sixcycle authentication.");
         printd("timed out, empty or invalid response.\n");
     }
 
@@ -162,7 +162,7 @@ SixCycle::open(QStringList &errors)
 bool
 SixCycle::close()
 {
-    printd("SixCycle::close\n");
+    printd("Sixcycle::close\n");
     // nothing to do for now
     return true;
 }
@@ -177,7 +177,7 @@ SixCycle::home()
 bool
 SixCycle::createFolder(QString)
 {
-    printd("SixCycle::createFolder\n");
+    printd("Sixcycle::createFolder\n");
 
     return false;
 }
@@ -185,11 +185,11 @@ SixCycle::createFolder(QString)
 QList<FileStoreEntry*>
 SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 {
-    printd("SixCycle::readdir(%s)\n", path.toStdString().c_str());
+    printd("Sixcycle::readdir(%s)\n", path.toStdString().c_str());
 
     QList<FileStoreEntry*> returning;
     if (session_token == "") {
-        errors << tr("You must authenticate with SixCycle first");
+        errors << tr("You must authenticate with Sixcycle first");
         return returning;
     }
 
@@ -293,7 +293,7 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
 bool
 SixCycle::readFile(QByteArray *data, QString remotename, QString remoteid)
 {
-    printd("SixCycle::readFile(%s)\n", remotename.toStdString().c_str());
+    printd("Sixcycle::readFile(%s)\n", remotename.toStdString().c_str());
 
     if (session_token == "") {
         return false;
@@ -328,7 +328,7 @@ SixCycle::readFile(QByteArray *data, QString remotename, QString remoteid)
 bool
 SixCycle::writeFile(QByteArray &data, QString remotename)
 {
-    printd("SixCycle::writeFile(%s)\n", remotename.toStdString().c_str());
+    printd("Sixcycle::writeFile(%s)\n", remotename.toStdString().c_str());
 
     // if we are called to upload a single ride we will not have been
     // authenticated yet, so lets try and do that now. When called via
@@ -417,11 +417,11 @@ SixCycle::writeFile(QByteArray &data, QString remotename)
 void
 SixCycle::writeFileCompleted()
 {
-    printd("SixCycle::writeFileCompleted()\n");
+    printd("Sixcycle::writeFileCompleted()\n");
 
     QString writestatus =  reply->readAll();
 
-    printd("reply:%s\n", writestatus.toStdString().c_str());
+    printd("reply begins: %s ...\n", writestatus.toStdString().substr(0,80).c_str());
 
     if (reply->error() == QNetworkReply::NoError) {
         notifyWriteComplete(
@@ -444,7 +444,7 @@ SixCycle::readyRead()
 void
 SixCycle::readFileCompleted()
 {
-    printd("SixCycle::readFileCompleted\n");
+    printd("Sixcycle::readFileCompleted\n");
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
