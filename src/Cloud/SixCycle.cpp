@@ -61,7 +61,7 @@ SixCycle::SixCycle(Context *context) : FileStore(context), context(context), roo
     session_token = ""; // not authenticated yet
 
     useMetric = true; // distance and duration metadata
-    useEndDate = true; // god knows why
+    useEndDate = false; // startDateTime added, so no longer need this
 }
 
 SixCycle::~SixCycle() {
@@ -266,7 +266,7 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
 
             //QString name = QDateTime::fromMSecsSinceEpoch(each["ts"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+=".json";
             //add->name = name;
-            QString dateString = each["activityEndDateTime"].toString();
+            QString dateString = each["activityStartDateTime"].toString();
             QString suffix = QFileInfo(add->id).suffix();
             QDateTime endTime= QDateTime::fromString(dateString, Qt::ISODate);
             QChar zero = QLatin1Char ( '0' );
