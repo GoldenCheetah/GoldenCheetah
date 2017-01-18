@@ -94,7 +94,7 @@ bool Kettler::discover(QString portName)
         QByteArray data = sp.readAll();
 
         // Read id from bike
-        sp.write("cd\r\n");
+        sp.write("ID\r\n");
         sp.waitForBytesWritten(500);
 
         QByteArray reply = sp.readAll();
