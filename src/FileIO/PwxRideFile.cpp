@@ -891,19 +891,23 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
             sample.appendChild(dist);
 
 
-            // lat
-            if (ride->areDataPresent()->lat && point->lat > -90.0 && point->lat < 90.0) {
-                QDomElement lat = doc.createElement("lat");
-                text = doc.createTextNode(QString("%1").arg(point->lat, 0, 'g', 11));
-                lat.appendChild(text);
-                sample.appendChild(lat);
-            }
-            // lon
-            if (ride->areDataPresent()->lon && point->lon > -180.00 && point->lon < 180.00) {
-                QDomElement lon = doc.createElement("lon");
-                text = doc.createTextNode(QString("%1").arg(point->lon, 0, 'g', 11));
-                lon.appendChild(text);
-                sample.appendChild(lon);
+            // lat/lon only if both non-zero and valid.
+            if (point->lat && point->lon) {
+
+                // lon
+                if (ride->areDataPresent()->lat && point->lat > -90.0 && point->lat < 90.0) {
+                    QDomElement lat = doc.createElement("lat");
+                    text = doc.createTextNode(QString("%1").arg(point->lat, 0, 'g', 11));
+                    lat.appendChild(text);
+                    sample.appendChild(lat);
+                }
+                // lon
+                if (ride->areDataPresent()->lon && point->lon > -180.00 && point->lon < 180.00) {
+                    QDomElement lon = doc.createElement("lon");
+                    text = doc.createTextNode(QString("%1").arg(point->lon, 0, 'g', 11));
+                    lon.appendChild(text);
+                    sample.appendChild(lon);
+                }
             }
 
             // alt

@@ -236,7 +236,7 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
 
     // did we get a good response ?
     QByteArray r = reply->readAll();
-    printd("response begins: %s ...\n", r.toStdString().substr(0,300).c_str());
+    printd("response begins: %s ...\n", r.toStdString().substr(0,900).c_str());
 
     QJsonParseError parseError;
     QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
@@ -259,8 +259,8 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
             add->id = each["url"].toString();
             add->label = QString("%1").arg(each["id"].toInt());
             add->isDir = false;
-            add->distance = 0; // NA
-            add->duration = 0; // NA
+            add->distance = double(each["meters_in_distance"].toInt()) / 1000.0f;
+            add->duration = double(each["seconds_in_activity"].toInt());
             //add->size
             //add->modified
 
