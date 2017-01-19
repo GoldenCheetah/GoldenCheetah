@@ -19,6 +19,8 @@
 #include "FitRideFile.h"
 #include "Settings.h"
 #include "Units.h"
+#include "RideItem.h"
+#include "Specification.h"
 #include <QSharedPointer>
 #include <QMap>
 #include <QSet>
@@ -465,7 +467,7 @@ struct FitFileReaderState
                     return RideFile::watts;
             case 9: // GRADE
                     return RideFile::slope;
-            case 13: // TEMPERATURE
+            case 13: // TURE
                     return RideFile::temp;
             case 30: //LEFT_RIGHT_BALANCE
                     return RideFile::lrbalance;
@@ -2592,4 +2594,640 @@ RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     return state->run();
 }
 
-// vi:expandtab tabstop=4 shiftwidth=4
+
+// ******************************
+
+void write_uint8(QByteArray *array, fit_value_t value) {
+    array->append(value);
+}
+
+void write_uint16(QByteArray *array, fit_value_t value,  bool is_big_endian) {
+    value = is_big_endian
+        ? qFromBigEndian<qint16>( value )
+        : qFromLittleEndian<qint16>( value );
+
+    for (int i=0; i<16; i=i+8) {
+        array->append(value >> i);
+    }
+}
+
+void write_uint32(QByteArray *array, fit_value_t value,  bool is_big_endian) {
+    value = is_big_endian
+        ? qFromBigEndian<qint32>( value )
+        : qFromLittleEndian<qint32>( value );
+
+    for (int i=0; i<32; i=i+8) {
+        array->append(value >> i);
+    }
+}
+
+
+uint16_t crc16(char *buf, int len)
+{
+  uint16_t crc = 0x0000;
+
+  for (int pos = 0; pos < len; pos++) {
+    crc ^= (uint16_t)buf[pos] & 0xff;
+
+    for (int i = 8; i != 0; i--) {      // Each bit
+        if ((crc & 0x0001) != 0) {      // LSB set
+          crc >>= 1;                    // Shift right
+          crc ^= 0xA001;                // XOR 0xA001
+        }
+        else
+          crc >>= 1;                    // Shift right
+     }
+  }
+
+  return crc;
+}
+
+void write_header(QByteArray *array, quint32 data_size) {
+    quint8 header_size = 14;
+    quint8 protocol_version = 16;
+    quint16 profile_version = 1320; // always littleEndian
+
+    write_uint8(array, header_size);
+    write_uint8(array, protocol_version);
+    write_uint16(array, profile_version, false);
+    write_uint32(array, data_size, false);
+    array->append(".FIT");
+
+    uint16_t header_crc = crc16(array->data(), array->length());
+    write_uint16(array, header_crc, false);
+}
+
+void write_file_id(QByteArray *array, const RideFile *ride) {
+    // 0	type
+    // 1	manufacturer
+    // 2	product/garmin_product
+    // 3	serial_number
+    // 4	time_created
+    // 5	number
+    // 8	product_name
+
+    int definition_header = 64;
+    int reserved = 0;
+    int is_big_endian = 1;
+    int global_msg_num = 0;
+    int num_fields = 2;
+
+    // Definition ------
+    write_uint8(array, definition_header);
+    write_uint8(array, reserved);
+    write_uint8(array, is_big_endian);
+    write_uint16(array, global_msg_num, true);
+    write_uint8(array, num_fields);
+
+    // Field (1)
+    int field_num = 0; // type
+    int field_size = 1;
+    int base_type = 0;
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Field (2)
+    field_num = 4; // time_created
+    field_size = 4;
+    base_type = 134; // 6 0x86
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Record ------
+    int record_header = 0;
+
+
+    write_uint8(array, record_header);
+    int value = 4; // file:activity
+    write_uint8(array, value);
+    value = ride->startTime().toTime_t() - qbase_time.toTime_t(); // time_created
+    write_uint32(array, value, true);
+}
+
+void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMetricPtr> computed) {
+    int definition_header = 64;
+    int reserved = 0;
+    int is_big_endian = 1;
+    int global_msg_num = 18;
+    int num_fields = 4;
+
+    // Definition ------
+    write_uint8(array, definition_header);
+    write_uint8(array, reserved);
+    write_uint8(array, is_big_endian);
+    write_uint16(array, global_msg_num, true);
+    write_uint8(array, num_fields);
+
+    // Field (1)
+    int field_num = 253; // timestamp
+    int field_size = 4;
+    int base_type = 134; // 6 0x86
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Field (2)
+    field_num = 2; // start_time
+    field_size = 4;
+    base_type = 134; // 6 0x86
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Field (3)
+    field_num = 7; // total_elapsed_time
+    field_size = 4;
+    base_type = 134; // 6 0x86
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Field (4)
+    field_num = 5; // sport
+    field_size = 1;
+    base_type = 0;
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Record ------
+    int record_header = 0;
+
+    write_uint8(array, record_header);
+
+    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();
+    write_uint32(array, value, true);
+
+    value = ride->startTime().toTime_t() - qbase_time.toTime_t();
+    write_uint32(array, value, true);
+
+    write_uint32(array, 2000, true);
+
+    write_uint8(array, 2);
+
+}
+
+void write_start_event(QByteArray *array, const RideFile *ride) {
+    int definition_header = 64;
+    int reserved = 0;
+    int is_big_endian = 1;
+    int global_msg_num = 21;
+    int num_fields = 3;
+
+    // Definition ------
+    write_uint8(array, definition_header);
+    write_uint8(array, reserved);
+    write_uint8(array, is_big_endian);
+    write_uint16(array, global_msg_num, true);
+    write_uint8(array, num_fields);
+
+    // Field (1)
+    int field_num = 0; // event
+    int field_size = 1;
+    int base_type = 0;
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Field (2)
+    field_num = 1; // event_type
+    field_size = 1;
+    base_type = 0;
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Field (3)
+    field_num = 253; // timestamp
+    field_size = 4;
+    base_type = 134; // 6 0x86
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Record ------
+    int record_header = 0;
+
+    write_uint8(array, record_header);
+
+    int value = 0;
+    write_uint8(array, value);
+
+    value = 0;
+    write_uint8(array, value);
+
+    value = ride->startTime().toTime_t() - qbase_time.toTime_t();
+    write_uint32(array, value, true);
+
+}
+
+void write_stop_event(QByteArray *array, const RideFile *ride) {
+    int definition_header = 64;
+    int reserved = 0;
+    int is_big_endian = 1;
+    int global_msg_num = 21;
+    int num_fields = 3;
+
+    // Definition ------
+    write_uint8(array, definition_header);
+    write_uint8(array, reserved);
+    write_uint8(array, is_big_endian);
+    write_uint16(array, global_msg_num, true);
+    write_uint8(array, num_fields);
+
+    // Field (1)
+    int field_num = 0; // event
+    int field_size = 1;
+    int base_type = 0;
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Field (2)
+    field_num = 1; // event_type
+    field_size = 1;
+    base_type = 0;
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Field (3)
+    field_num = 253; // timestamp
+    field_size = 4;
+    base_type = 134; // 6 0x86
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Record ------
+    int record_header = 0;
+
+    write_uint8(array, record_header);
+
+    int value = 0;
+    write_uint8(array, value);
+
+    value = 4;
+    write_uint8(array, value);
+
+    value = ride->startTime().toTime_t() - qbase_time.toTime_t() + 2;
+    write_uint32(array, value, true);
+
+}
+
+void write_activity(QByteArray *array, const RideFile *ride) {
+    int definition_header = 64;
+    int reserved = 0;
+    int is_big_endian = 1;
+    int global_msg_num = 34;
+    int num_fields = 3;
+
+    // Definition ------
+    write_uint8(array, definition_header);
+    write_uint8(array, reserved);
+    write_uint8(array, is_big_endian);
+    write_uint16(array, global_msg_num, true);
+    write_uint8(array, num_fields);
+
+    // Field (1)
+    int field_num = 3; // event
+    int field_size = 1;
+    int base_type = 0;
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Field (2)
+    field_num = 1; // event_type
+    field_size = 1;
+    base_type = 0;
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Field (3)
+    field_num = 253; // timestamp
+    field_size = 4;
+    base_type = 134; // 6 0x86
+
+    write_uint8(array, field_num);
+    write_uint8(array, field_size);
+    write_uint8(array, base_type);
+
+    // Record ------
+    int record_header = 0;
+
+    write_uint8(array, record_header);
+
+    int value = 26;
+    write_uint8(array, value);
+
+    value = 1;
+    write_uint8(array, value);
+
+    value = ride->startTime().toTime_t() + ride->dataPoints().last()->secs;
+    write_uint32(array, value, true);
+
+}
+
+void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad ) {
+    int definition_header = 64;
+    int reserved = 0;
+    int is_big_endian = 1;
+    int global_msg_num = 20;
+    int num_fields = 1;
+
+    // Definition ------
+    write_uint8(array, definition_header);
+    write_uint8(array, reserved);
+    write_uint8(array, is_big_endian);
+    write_uint16(array, global_msg_num, true);
+
+    QByteArray *fields = new QByteArray();
+
+    int field_num = 253; // timestamp
+    int field_size = 4;
+    int base_type = 134; // 6 0x86
+
+    write_uint8(fields, field_num);
+    write_uint8(fields, field_size);
+    qDebug() << fields->toHex();
+    write_uint8(fields, base_type);
+    qDebug() << fields->toHex();
+
+    if ( ride->areDataPresent()->lat ) {
+        num_fields ++;
+        field_num = 0; // position_lat
+        field_size = 4;
+        base_type = 133; // 5 0x85
+
+
+        write_uint8(fields, field_num);
+        qDebug() << fields->toHex();
+        write_uint8(fields, field_size);
+        qDebug() << fields->toHex();
+        write_uint8(fields, base_type);
+        qDebug() << fields->toHex();
+
+        num_fields ++;
+        field_num = 1; // position_long
+        field_size = 4;
+        base_type = 133; // 5 0x85
+
+        write_uint8(fields, field_num);
+        qDebug() << fields->toHex();
+        write_uint8(fields, field_size);
+        qDebug() << fields->toHex();
+        write_uint8(fields, base_type);
+        qDebug() << fields->toHex();
+    }
+
+    if ( withAlt && ride->areDataPresent()->alt ) {
+        num_fields ++;
+        field_num = 2; // altitude
+        field_size = 2;
+        base_type = 132; // 4 0x84
+
+        write_uint8(fields, field_num);
+        write_uint8(fields, field_size);
+        write_uint8(fields, base_type);
+    }
+    if ( withHr && ride->areDataPresent()->hr ) {
+        num_fields ++;
+        field_num = 3; // heart_rate
+        field_size = 1;
+        base_type = 2;
+
+        write_uint8(fields, field_num);
+        write_uint8(fields, field_size);
+        write_uint8(fields, base_type);
+    }
+    if ( withCad && ride->areDataPresent()->cad ) {
+        num_fields ++;
+        field_num = 4; // cadence
+        field_size = 1;
+        base_type = 2;
+
+        write_uint8(fields, field_num);
+        write_uint8(fields, field_size);
+        write_uint8(fields, base_type);
+    }
+    if ( ride->areDataPresent()->km ) {
+        num_fields ++;
+        field_num = 5; // distance
+        field_size = 4;
+        base_type = 134; // 6 0x86
+
+        write_uint8(fields, field_num);
+        write_uint8(fields, field_size);
+        write_uint8(fields, base_type);
+    }
+    if ( ride->areDataPresent()->kph ) {
+        num_fields ++;
+        field_num = 6; // speed
+        field_size = 2;
+        base_type = 132; // 4 0x84
+
+        write_uint8(fields, field_num);
+        write_uint8(fields, field_size);
+        write_uint8(fields, base_type);
+    }
+    if ( withWatts && ride->areDataPresent()->watts ) {
+        num_fields ++;
+        field_num = 7; // power
+        field_size = 2;
+        base_type = 132; // 4 0x84
+
+        write_uint8(fields, field_num);
+        write_uint8(fields, field_size);
+        write_uint8(fields, base_type);
+    }
+    /* can be NA...
+    if ( ride->areDataPresent()->temp ) {
+        num_fields ++;
+        field_num = 13; // temperature
+        field_size = 1;
+        base_type = 2;
+
+        write_uint8(fields, field_num);
+        write_uint8(fields, field_size);
+        write_uint8(fields, base_type);
+    }
+    if ( ride->areDataPresent()->lrbalance ) {
+        num_fields ++;
+        field_num = 30; // left_right_balance
+        field_size = 1;
+        base_type = 2;
+
+        write_uint8(fields, field_num);
+        write_uint8(fields, field_size);
+        write_uint8(fields, base_type);
+    }*/
+
+    /*num_fields ++;
+    field_num = 3; // heart_rate
+    field_size = 1;
+    base_type = 2;
+
+    write_uint8(fields, field_num);
+    write_uint8(fields, field_size);
+    write_uint8(fields, base_type);
+
+    num_fields ++;
+    field_num = 7; // power
+    field_size = 2;
+    base_type = 4;
+
+    write_uint8(fields, field_num);
+    write_uint8(fields, field_size);
+    write_uint8(fields, base_type);*/
+
+    write_uint8(array, num_fields);
+    array->append(fields->data(), fields->size());
+
+    // Record ------
+    foreach (const RideFilePoint *point, ride->dataPoints()) {
+        int record_header = 0;
+
+        write_uint8(array, record_header);
+
+        int value = point->secs + ride->startTime().toTime_t() - qbase_time.toTime_t();
+        write_uint32(array, value, true);
+
+        if ( ride->areDataPresent()->lat ) {
+            write_uint32(array, point->lat, true);
+            write_uint32(array, point->lon, true);
+        }
+        if ( withAlt && ride->areDataPresent()->alt ) {
+            write_uint16(array, (point->alt+500) * 5, true);
+        }
+        if ( withHr && ride->areDataPresent()->hr ) {
+            write_uint8(array, point->hr);
+        }
+        if ( withCad && ride->areDataPresent()->cad ) {
+            write_uint8(array, point->cad);
+        }
+        if ( ride->areDataPresent()->km ) {
+            write_uint32(array, point->km * 100000, true);
+        }
+        if ( ride->areDataPresent()->kph ) {
+            write_uint16(array, point->kph / 3.6 * 1000, true);
+        }
+        if ( withWatts && ride->areDataPresent()->watts ) {
+            write_uint16(array, point->watts, true);
+        }
+        /*if ( ride->areDataPresent()->temp ) {
+            write_uint8(array, point->temp);
+        }
+        if ( ride->areDataPresent()->lrbalance ) {
+            write_uint8(array, point->lrbalance);
+        }*/
+
+        /*int value = 853367909;
+        write_uint32(array, value, true);
+        write_uint8(array, 0);
+        write_uint16(array, 150, true);
+        break;*/
+    }
+
+}
+
+QByteArray
+FitFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad) const
+{
+    const char *metrics[] = {
+        "total_distance",
+        "workout_time",
+        "total_work",
+        "average_hr",
+        "max_heartrate",
+        "average_cad",
+        "max_cadence",
+        "average_power",
+        "max_power",
+        "max_speed",
+        "average_speed",
+        NULL
+    };
+
+    QStringList worklist = QStringList();
+    for (int i=0; metrics[i];i++) worklist << metrics[i];
+
+    QHash<QString,RideMetricPtr> computed;
+    if (context) { // can't do this standalone
+        RideItem *tempItem = new RideItem(const_cast<RideFile*>(ride), context);
+        computed = RideMetric::computeMetrics(tempItem, Specification(), worklist);
+    }
+
+    QByteArray array;
+    QByteArray data;
+
+    // An activity file shall contain file_id, activity, session, and lap messages.
+    // The file may also contain record, event, length and/or hrv messages.
+    // All data messages in an activity file (other than hrv) are related by a timestamp.
+
+    write_file_id(&data, ride); // 0
+    //write_file_creator(&data); // 49
+
+    write_session(&data, ride, computed); // 18 x12
+    //data += QByteArray::fromHex("40 00 01 00 12 1a 05 01 00 12 01 02 34 02 83 10 01 02 14 02 84 0e 02 84 39 01 01 24 02 84 25 02 84 13 01 02 11 01 02 15 02 84 0f 02 84 22 02 84 02 04 86 fd 04 86 41 14 86 44 18 86 16 02 84 17 02 84 09 04 86 07 04 86 3b 04 86 08 04 86 30 04 86 23 02 84 00 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 32 dd 5c 64 32 dd 5c 64 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
+
+    //write_start_event(&data, ride); // 21 x15
+    //data += QByteArray::fromHex("40 00 01 00 15 05 00 01 00 01 01 00 04 01 02 03 04 86 fd 04 86 00 00 00 00 00 00 00 01 32 dd 5c 64");
+
+    write_record(&data, ride, withAlt, withWatts, withHr, withCad); // 20 x14
+    //data += QByteArray::fromHex("40 00 01 00 14 09 fd 04 86 04 01 02 05 04 86 03 01 02 07 02 84 06 02 84 1e 01 02 02 02 84 09 02 83 00 32 dd 5c 65 4b 00 00 00 00 00 00 96 10 47 00 09 c4 00 00");
+    //data += QByteArray::fromHex("40 00 01 00 14 03 fd 04 86                   03 01 02 07 02 84                                     00 32 dd 5c 65                00 00 96                     ");
+
+
+    //write_stop_event(&data, ride); // 21 x15
+    //data += QByteArray::fromHex("40 00 01 00 15 05 00 01 00 01 01 00 04 01 02 03 04 86 fd 04 86 00 00 04 00 00 00 00 01 32 dd 5c 65 00 08 09 01 ff ff ff ff 32 dd 5c 98");
+
+    //write_activity(&data, ride); // 34 x22
+    //data += QByteArray::fromHex("40 00 01 00 22 06 03 01 00 04 01 00 02 01 00 01 02 84 fd 04 86 00 04 86 00 1a 01 00 00 01 32 dd 5c 98 00 00 03 e8");
+
+    write_header(&array, data.size());
+    array += data;
+
+    uint16_t array_crc = crc16(array.data(), array.length());
+    write_uint16(&array, array_crc, false);
+
+    return array;
+}
+
+bool
+FitFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file) const
+{
+    QByteArray content = toByteArray(context, ride, true, true, true, true);
+
+    if (!file.open(QIODevice::WriteOnly)) return(false);
+    file.resize(0);
+    QDataStream out(&file);
+    //out << (qint8)14;
+    out.setByteOrder(QDataStream::LittleEndian);
+    //qDebug() << out;
+    //out << content;
+    file.write(content);
+    file.close();
+    return(true);
+}
+
+
+
+
