@@ -197,6 +197,32 @@ class WWTelemetry : public WorkoutWidgetItem {
     private:
         Context *context;
 
+        template<typename T>
+        void paintSampleList(QPainter* painter, const QColor& color, const QList<T>& list,
+                             const RideFile::SeriesType& seriesType)
+        {
+            QPen linePen(color);
+            linePen.setWidth(1);
+            painter->setPen(linePen);
+
+            int index = 0;
+            QPointF last;
+            foreach (T sample, list)
+            {
+                double now = workoutWidget()->sampleTimes.at(index) / 1000.0f;
+                if (!index) {
+                    last = workoutWidget()->transform(now, sample, seriesType);
+                }
+                else {
+                    // join the dots
+                    QPointF here = workoutWidget()->transform(now, sample, seriesType);
+                    painter->drawLine(last, here);
+                    last = here;
+                }
+
+                index++;
+            }
+        }
 };
 
 // draws a selection rectangle
