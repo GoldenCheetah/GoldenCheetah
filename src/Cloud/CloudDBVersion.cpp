@@ -72,13 +72,11 @@ CloudDBVersionClient::getLatestVersions() {
     connect(l_reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
-    if (l_reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem reading latest Version - please try again later")));
-        return retrieved;
-    };
+    if (l_reply->error() == QNetworkReply::NoError) {
+        QByteArray result = l_reply->readAll();
+        unmarshallAPIGetV1(result, &retrieved);
+    };   // silently ignore network errors, since the user can't do anything about it anyway
 
-    QByteArray result = l_reply->readAll();
-    unmarshallAPIGetV1(result, &retrieved);
     return retrieved;
 }
 

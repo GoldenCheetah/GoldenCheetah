@@ -461,9 +461,9 @@ MainWindow::MainWindow(const QDir &home)
     shareMenu->addAction(tr("Synchronise Today's Plan..."), this,
                          SLOT(syncTodaysPlan()), tr(""));
     shareMenu->addSeparator ();
-    shareMenu->addAction(tr("Upload to SixCycle"), this,
+    shareMenu->addAction(tr("Upload to Sixcycle"), this,
                          SLOT(uploadSixCycle()), tr(""));
-    shareMenu->addAction(tr("Synchronise SixCycle..."), this,
+    shareMenu->addAction(tr("Synchronise Sixcycle..."), this,
                          SLOT(syncSixCycle()), tr(""));
 #endif
 

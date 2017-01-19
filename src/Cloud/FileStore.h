@@ -112,7 +112,7 @@ class FileStore : public QObject {
 
         CompressionType uploadCompression;
         CompressionType downloadCompression;
-        enum uploadType { JSON, TCX } filetype;
+        enum uploadType { JSON, TCX, PWX } filetype;
 
         bool useMetric; // FileStore know distance or duration metadata (eg Today's Plan)
         bool useEndDate; // Dates for file entries use end date time not start (weird, I know, but thats how SixCycle work)

@@ -1511,7 +1511,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 // see https://bugreports.qt.io/browse/QTBUG-40823
 #else
                 // alert when approaching end of lap
-                if (lapTimeRemaining < 3000 && lapAudioEnabled && lapAudioThisLap) {
+                if (lapTimeRemaining > 0 && lapTimeRemaining < 3000 && lapAudioEnabled && lapAudioThisLap) {
                     lapAudioThisLap = false;
                     QSound::play(":audio/lap.wav");
                 }
@@ -2240,6 +2240,10 @@ void
 TrainSidebar::viewChanged(int index)
 {
     //qDebug() << "view has changed to:" << index;
+
+    // ensure buttons reflect current state
+    setStatusFlags(0);
+
     if (!autoConnect) return;
 
     // fixme: value hard-coded throughout
